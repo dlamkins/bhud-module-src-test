@@ -147,10 +147,15 @@ namespace BhModule.Community.Pathing
 			_packsLoading = !string.IsNullOrWhiteSpace(loadingMessage);
 		}
 
+		public IProgress<string> GetModuleProgressHandler()
+		{
+			return new Progress<string>(UpdateModuleLoading);
+		}
+
 		protected override async Task LoadAsync()
 		{
 			Stopwatch sw = Stopwatch.StartNew();
-			_watcher = new PackInitiator(DirectoriesManager.GetFullDirectoryPath("markers"), _moduleSettings, new Progress<string>(UpdateModuleLoading));
+			_watcher = new PackInitiator(DirectoriesManager.GetFullDirectoryPath("markers"), _moduleSettings, GetModuleProgressHandler());
 			await _watcher.Init();
 			sw.Stop();
 			Logger.Debug($"Took {sw.ElapsedMilliseconds} ms to complete loading Pathing module...");

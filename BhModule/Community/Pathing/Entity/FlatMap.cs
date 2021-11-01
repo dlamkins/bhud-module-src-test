@@ -44,11 +44,13 @@ namespace BhModule.Community.Pathing.Entity
 
 		private readonly Tooltip _activeTooltip;
 
+		private ContextMenuStrip _activeContextMenu;
+
 		private ContextMenuStrip BuildPathableMenu(IPathingEntity pathingEntry)
 		{
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Expected O, but got Unknown
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Expected O, but got Unknown
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
 			ContextMenuStrip newMenu = new ContextMenuStrip();
 			((Control)newMenu.AddMenuItem("Hide Parent Category")).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
@@ -71,8 +73,10 @@ namespace BhModule.Community.Pathing.Entity
 			}
 			((Control)newMenu).add_Hidden((EventHandler<EventArgs>)delegate
 			{
-				((Control)newMenu).Dispose();
+				((Control)_activeContextMenu).Dispose();
+				_activeContextMenu = null;
 			});
+			_activeContextMenu = newMenu;
 			return newMenu;
 		}
 
@@ -110,8 +114,12 @@ namespace BhModule.Community.Pathing.Entity
 
 		private void UIOnIsMapOpenChanged(object sender, ValueEventArgs<bool> e)
 		{
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 			TriggerFadeIn();
+			if (_activeContextMenu != null)
+			{
+				((Control)_activeContextMenu).set_Visible(false);
+			}
 			_lastCameraPos = GameService.Gw2Mumble.get_PlayerCamera().get_Position().Z;
 		}
 

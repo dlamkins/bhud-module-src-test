@@ -1,15 +1,11 @@
 using System;
 using System.Diagnostics;
-using System.IO;
-using System.Net.Http;
-using System.Threading;
 using BhModule.Community.Pathing.UI.Presenter;
 using BhModule.Community.Pathing.Utility;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Flurl;
-using Flurl.Http;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -17,8 +13,6 @@ namespace BhModule.Community.Pathing.UI.Controls
 {
 	public class MarkerPackHero : Container
 	{
-		private static readonly Logger Logger;
-
 		private const int DEFAULT_WIDTH = 500;
 
 		private const int DEFAULT_HEIGHT = 170;
@@ -39,7 +33,6 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		static MarkerPackHero()
 		{
-			Logger = Logger.GetLogger<MarkerPackHero>();
 			_textureHeroBackground = PathingModule.Instance.ContentsManager.GetTexture("png\\controls\\155209.png");
 		}
 
@@ -72,31 +65,12 @@ namespace BhModule.Community.Pathing.UI.Controls
 			((Control)this).ResumeLayout(true);
 		}
 
-		private async void DownloadButtonOnClick(object sender, MouseEventArgs e)
+		private void DownloadButtonOnClick(object sender, MouseEventArgs e)
 		{
 			((Control)_downloadButton).set_Enabled(false);
 			_downloadButton.Text = "Downloading...";
-			byte[] downloadedPack;
-			try
-			{
-				downloadedPack = await GeneratedExtensions.GetBytesAsync(GeneratedExtensions.WithHeader(_markerPackPkg.Download, "user-agent", (object)"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"), default(CancellationToken), (HttpCompletionOption)0);
-			}
-			catch (Exception ex)
-			{
-				Logger.Error(ex, "Failed to download marker pack!");
-				return;
-			}
-			string fullPath = Path.Combine(DataDirUtil.MarkerDir, _markerPackPkg.FileName);
-			if (!File.Exists(fullPath))
-			{
-				File.WriteAllBytes(fullPath, downloadedPack);
-				Logger.Info("Marker pack saved to '" + fullPath + "'.");
-				_downloadButton.Text = "Downloaded";
-			}
-			else
-			{
-				Logger.Warn("Module already exists at path '" + fullPath + "'.");
-			}
+			PackHandlingUtil.DownloadPack(_markerPackPkg);
+			_downloadButton.Text = "Downloaded";
 		}
 
 		private void InfoButtonOnClick(object sender, MouseEventArgs e)
