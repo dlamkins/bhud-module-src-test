@@ -35,7 +35,7 @@ namespace BhModule.Community.Pathing.UI.Views
 			val.set_Text("Open Settings");
 			((Control)val).set_Parent(buildPanel);
 			_bttnOpenSettings = val;
-			((Control)_bttnOpenSettings).set_Location(new Point(Math.Min(((Control)buildPanel).get_Width() / 2 - ((Control)_bttnOpenSettings).get_Width() / 2, 20), Math.Min(((Control)buildPanel).get_Height() / 2 - ((Control)_bttnOpenSettings).get_Height(), 20)));
+			((Control)_bttnOpenSettings).set_Location(new Point(Math.Max(((Control)buildPanel).get_Width() / 2 - ((Control)_bttnOpenSettings).get_Width() / 2, 20), Math.Max(((Control)buildPanel).get_Height() / 2 - ((Control)_bttnOpenSettings).get_Height(), 20)));
 			((Control)_bttnOpenSettings).add_Click((EventHandler<MouseEventArgs>)_bttnOpenSettings_Click);
 		}
 
