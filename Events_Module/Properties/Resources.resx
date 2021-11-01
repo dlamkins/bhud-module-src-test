@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="Click to toggle tracking for this event."><value>Click to toggle tracking for this event.</value></data>
+  <data name="Day-Night Cycle"><value>Day-Night Cycle</value></data>
+  <data name="Starts in {0}"><value>Starts in {0}</value></data>
+  <data name="The Shatterer"><value>The Shatterer</value></data>
+  <data name="Night Bosses"><value>Night Bosses</value></data>
+  <data name="Evolved Jungle Wurm"><value>Evolved Jungle Wurm</value></data>
+  <data name="Dangerous Prey"><value>Dangerous Prey</value></data>
+  <data name="Modniir Ulgoth"><value>Modniir Ulgoth</value></data>
+  <data name="Battle in Tarir"><value>Battle in Tarir</value></data>
+  <data name="Alphabetical"><value>Alphabetical</value></data>
+  <data name="Meta Event"><value>Meta Event</value></data>
+  <data name="Group Event"><value>Group Event</value></data>
+  <data name="Crash Site"><value>Crash Site</value></data>
+  <data name="Read about this event on the wiki."><value>Read about this event on the wiki.</value></data>
+  <data name="Sandstorm"><value>Sandstorm</value></data>
+  <data name="World Bosses"><value>World Bosses</value></data>
+  <data name="The Haunting of Doomlore Shrine"><value>The Haunting of Doomlore Shrine</value></data>
+  <data name="Claw of Jormag"><value>Claw of Jormag</value></data>
+  <data name="Forged with Fire"><value>Forged with Fire</value></data>
+  <data name="Casino Blitz"><value>Casino Blitz</value></data>
+  <data name="Svanir Shaman Chief"><value>Svanir Shaman Chief</value></data>
+  <data name="Maws of Torment"><value>Maws of Torment</value></data>
+  <data name="Advancing on the Blighting Towers"><value>Advancing on the Blighting Towers</value></data>
+  <data name="Ley-Line Anomaly (Timberline Falls)"><value>Ley-Line Anomaly (Timberline Falls)</value></data>
+  <data name="Next Up"><value>Next Up</value></data>
+  <data name="Failed to copy waypoint to clipboard. Try again."><value>Failed to copy waypoint to clipboard. Try again.</value></data>
+  <data name="Great Jungle Wurm"><value>Great Jungle Wurm</value></data>
+  <data name="Upcoming Event Times:"><value>Upcoming Event Times:</value></data>
+  <data name="Chak Gerent"><value>Chak Gerent</value></data>
+  <data name="Copied waypoint to clipboard!"><value>Copied waypoint to clipboard!</value></data>
+  <data name="Watched Events"><value>Watched Events</value></data>
+  <data name="Megadestroyer"><value>Megadestroyer</value></data>
+  <data name="Admiral Taidha Covington"><value>Admiral Taidha Covington</value></data>
+  <data name="Ley-Line Anomaly (Gendarran Fields)"><value>Ley-Line Anomaly (Gendarran Fields)</value></data>
+  <data name="A Concert for the Ages"><value>A Concert for the Ages</value></data>
+  <data name="The Search for Buried Treasure"><value>The Search for Buried Treasure</value></data>
+  <data name="Inquest Golem Mark II"><value>Inquest Golem Mark II</value></data>
+  <data name="Storms of Winter"><value>Storms of Winter</value></data>
+  <data name="Mute Notifications"><value>Mute Notifications</value></data>
+  <data name="Events and Metas"><value>Events and Metas</value></data>
+  <data name="Shadow Behemoth"><value>Shadow Behemoth</value></data>
+  <data name="Failed to load metas from events.json!"><value>Failed to load metas from events.json!</value></data>
+  <data name="Server Reset"><value>Server Reset</value></data>
+  <data name="Palawadan, Jewel of Istan"><value>Palawadan, Jewel of Istan</value></data>
+  <data name="Defending Tarir"><value>Defending Tarir</value></data>
+  <data name="Hidden Events"><value>Hidden Events</value></data>
+  <data name="Drakkar, the Ice Dragon's Champion"><value>Drakkar, the Ice Dragon's Champion</value></data>
+  <data name="Night and the Enemy"><value>Night and the Enemy</value></data>
+  <data name="All Events"><value>All Events</value></data>
+  <data name="Day"><value>Day</value></data>
+  <data name="Night"><value>Night</value></data>
+  <data name="Other"><value>Other</value></data>
+  <data name="Event Search"><value>Event Search</value></data>
+  <data name="Ley-Line Anomaly (Iron Marches)"><value>Ley-Line Anomaly (Iron Marches)</value></data>
+  <data name="Securing Verdant Brink"><value>Securing Verdant Brink</value></data>
+  <data name="Enable Notifications"><value>Enable Notifications</value></data>
+  <data name="Thunderhead Keep"><value>Thunderhead Keep</value></data>
+  <data name="Fire Elemental"><value>Fire Elemental</value></data>
+  <data name="The Path to Ascension"><value>The Path to Ascension</value></data>
+  <data name="Choya Pinata"><value>Choya Piñata</value></data>
+  <data name="Notification_Tooltip"><value>Left click to copy waypoint.
+Right click to dismiss.</value></data>
+  <data name="Event Categories"><value>Event Categories</value></data>
+  <data name="Ceremony of the Sacred Flame"><value>Ceremony of the Sacred Flame</value></data>
+  <data name="Karka Queen"><value>Karka Queen</value></data>
+  <data name="Junundu Rising"><value>Junundu Rising</value></data>
+  <data name="Serpents' Ire"><value>Serpents' Ire</value></data>
+  <data name="Nearby waypoint: {0}"><value>Nearby waypoint: {0}</value></data>
+  <data name="Tequatl the Sunless"><value>Tequatl the Sunless</value></data>
+  <data name="Trial by Fire"><value>Trial by Fire</value></data>
+  <data name="Dawn"><value>Dawn</value></data>
+  <data name="Dusk"><value>Dusk</value></data>
+  <data name="The Oil Floes"><value>The Oil Floes</value></data>
+  <data name="The Ooze Pit Trials"><value>The Ooze Pit Trials</value></data>
+  </root>

@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>Events Module</AssemblyName>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <TargetFramework>net472</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>Preview</LangVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace />
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="costura\adhesive.dll.compressed" />
+    <None Remove="costura\asyncclipboardservice.dll.compressed" />
+    <None Remove="costura\asyncclipboardservice.pdb.compressed" />
+    <None Remove="costura\costura.dll.compressed" />
+    <None Remove="costura\gw2sharp.dll.compressed" />
+    <None Remove="costura\humanizer.dll.compressed" />
+    <None Remove="costura\de.humanizer.resources.dll.compressed" />
+    <None Remove="costura\es.humanizer.resources.dll.compressed" />
+    <None Remove="costura\fr.humanizer.resources.dll.compressed" />
+    <None Remove="costura\zh-CN.humanizer.resources.dll.compressed" />
+    <None Remove="costura\monogame.extended.dll.compressed" />
+    <None Remove="costura\newtonsoft.json.dll.compressed" />
+    <EmbeddedResource Include="costura\adhesive.dll.compressed" />
+    <EmbeddedResource Include="costura\asyncclipboardservice.dll.compressed" />
+    <EmbeddedResource Include="costura\asyncclipboardservice.pdb.compressed" />
+    <EmbeddedResource Include="costura\costura.dll.compressed" />
+    <EmbeddedResource Include="costura\gw2sharp.dll.compressed" />
+    <EmbeddedResource Include="costura\humanizer.dll.compressed" />
+    <EmbeddedResource Include="costura\de.humanizer.resources.dll.compressed" />
+    <EmbeddedResource Include="costura\es.humanizer.resources.dll.compressed" />
+    <EmbeddedResource Include="costura\fr.humanizer.resources.dll.compressed" />
+    <EmbeddedResource Include="costura\zh-CN.humanizer.resources.dll.compressed" />
+    <EmbeddedResource Include="costura\monogame.extended.dll.compressed" />
+    <EmbeddedResource Include="costura\newtonsoft.json.dll.compressed" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Blish HUD" />
+    <Reference Include="MonoGame.Framework" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Core" />
+    <Reference Include="Newtonsoft.Json" />
+    <Reference Include="MonoGame.Extended" />
+    <Reference Include="Humanizer" />
+    <Reference Include="AsyncClipboardService" />
+    <Reference Include="Flurl" />
+    <Reference Include="Flurl.Http" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+</Project>
