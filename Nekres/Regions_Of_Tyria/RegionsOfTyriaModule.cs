@@ -113,7 +113,7 @@ namespace Nekres.Regions_Of_Tyria
 
 		protected override async void Update(GameTime gameTime)
 		{
-			if (!(gameTime.get_TotalGameTime().TotalMilliseconds - _lastRun < 10.0) && !(DateTime.UtcNow.Subtract(_lastUpdate).TotalMilliseconds < 1000.0) && _toggleSectorNotificationSetting.get_Value() && GameService.Gw2Mumble.get_IsAvailable() && GameService.GameIntegration.get_Gw2Instance().get_IsInGame())
+			if (!(gameTime.get_TotalGameTime().TotalMilliseconds - _lastRun < 10.0) && !(DateTime.UtcNow.Subtract(_lastUpdate).TotalMilliseconds < 1000.0) && _toggleSectorNotificationSetting.get_Value() && GameService.Gw2Mumble.get_IsAvailable() && GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && !GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode())
 			{
 				_lastRun = gameTime.get_ElapsedGameTime().TotalMilliseconds;
 				_lastUpdate = DateTime.UtcNow;
