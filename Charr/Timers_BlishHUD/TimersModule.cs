@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -31,7 +32,7 @@ namespace Charr.Timers_BlishHUD
 
 		public AlertContainer _alertContainer;
 
-		private AlertWindow _alertSettingsWindow;
+		private StandardWindow _alertSettingsWindow;
 
 		private List<AlertPanel> _testAlertPanels;
 
@@ -480,260 +481,295 @@ namespace Charr.Timers_BlishHUD
 			//IL_021c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0223: Unknown result type (might be due to invalid IL or missing references)
 			//IL_022f: Expected O, but got Unknown
-			//IL_0257: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0234: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0246: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0252: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025e: Expected O, but got Unknown
+			//IL_025e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0263: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0273: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0286: Expected O, but got Unknown
-			//IL_0286: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0292: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029f: Expected O, but got Unknown
-			//IL_02b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0312: Unknown result type (might be due to invalid IL or missing references)
-			//IL_031d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0347: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0364: Unknown result type (might be due to invalid IL or missing references)
-			//IL_036f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0386: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0431: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0436: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0442: Unknown result type (might be due to invalid IL or missing references)
-			//IL_044d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0458: Unknown result type (might be due to invalid IL or missing references)
-			//IL_045f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_046e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_047f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_048e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0499: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04a8: Expected O, but got Unknown
-			//IL_04d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0504: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0513: Unknown result type (might be due to invalid IL or missing references)
-			//IL_052e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0539: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0548: Expected O, but got Unknown
-			//IL_0576: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0277: Expected O, but got Unknown
+			//IL_028f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_030a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0314: Unknown result type (might be due to invalid IL or missing references)
+			//IL_031e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0325: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0338: Expected O, but got Unknown
+			//IL_0338: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0348: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0356: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0372: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0385: Expected O, but got Unknown
+			//IL_0385: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0395: Unknown result type (might be due to invalid IL or missing references)
+			//IL_039d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0405: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0411: Expected O, but got Unknown
+			//IL_0411: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0416: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0421: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0428: Unknown result type (might be due to invalid IL or missing references)
+			//IL_042f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0437: Unknown result type (might be due to invalid IL or missing references)
+			//IL_043e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_044b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0516: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0533: Unknown result type (might be due to invalid IL or missing references)
+			//IL_053e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0555: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0570: Unknown result type (might be due to invalid IL or missing references)
 			//IL_057b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0587: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0592: Unknown result type (might be due to invalid IL or missing references)
-			//IL_059d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05e8: Expected O, but got Unknown
-			//IL_0616: Unknown result type (might be due to invalid IL or missing references)
+			//IL_059f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05ed: Expected O, but got Unknown
+			//IL_060a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_060f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_061b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0627: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0632: Unknown result type (might be due to invalid IL or missing references)
-			//IL_063d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0644: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0653: Unknown result type (might be due to invalid IL or missing references)
-			//IL_066e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0679: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0688: Expected O, but got Unknown
-			//IL_06b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_070e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0719: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0728: Expected O, but got Unknown
-			//IL_0755: Unknown result type (might be due to invalid IL or missing references)
-			//IL_075a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0766: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0771: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0778: Unknown result type (might be due to invalid IL or missing references)
-			//IL_077f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_078e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07c0: Expected O, but got Unknown
-			//IL_07c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07d7: Expected O, but got Unknown
-			//IL_0852: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0857: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0863: Unknown result type (might be due to invalid IL or missing references)
-			//IL_086e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0875: Unknown result type (might be due to invalid IL or missing references)
-			//IL_087c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_088b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08b9: Expected O, but got Unknown
-			//IL_08ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08f9: Expected O, but got Unknown
-			//IL_0953: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0958: Unknown result type (might be due to invalid IL or missing references)
-			//IL_095a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_095d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_097b: Expected I4, but got Unknown
-			//IL_09f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_09fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a01: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a0d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a18: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a1f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a26: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a35: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a50: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a5b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a66: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a6b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a77: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a82: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a9e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0626: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0631: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0637: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0646: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0650: Unknown result type (might be due to invalid IL or missing references)
+			//IL_065f: Expected O, but got Unknown
+			//IL_068d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0692: Unknown result type (might be due to invalid IL or missing references)
+			//IL_069e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06ee: Expected O, but got Unknown
+			//IL_071c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0721: Unknown result type (might be due to invalid IL or missing references)
+			//IL_072d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0738: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0743: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0749: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0763: Unknown result type (might be due to invalid IL or missing references)
+			//IL_076e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_077d: Expected O, but got Unknown
+			//IL_07ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_080c: Expected O, but got Unknown
+			//IL_083a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_083f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_084b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0856: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0861: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0867: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0881: Unknown result type (might be due to invalid IL or missing references)
+			//IL_088c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_089b: Expected O, but got Unknown
+			//IL_08c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_090b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0916: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0922: Expected O, but got Unknown
+			//IL_0923: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0928: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0939: Expected O, but got Unknown
+			//IL_09b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a0a: Expected O, but got Unknown
+			//IL_0a0b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a10: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a1c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a29: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a3b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a4a: Expected O, but got Unknown
+			//IL_0aa4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0aa9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ab5: Expected O, but got Unknown
-			//IL_0ac8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0acd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ad9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ae4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0af1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0b03: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0b0f: Expected O, but got Unknown
-			//IL_0b56: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0b7c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0b81: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0b8d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0b98: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0b9f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0aab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0aae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0acc: Expected I4, but got Unknown
+			//IL_0b43: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b4d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b52: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b5e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b69: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b70: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b76: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b90: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b9b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0ba6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0bb5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0bcc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0bd7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0be3: Expected O, but got Unknown
-			//IL_0be3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0be8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0bf4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0bff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c0e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c1a: Expected O, but got Unknown
-			//IL_0c3f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c44: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c50: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c5b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c66: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c6d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c74: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c83: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c9a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ca5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0cb1: Expected O, but got Unknown
-			//IL_0cb2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0cb7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0cc3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0cce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0cdd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ce7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0cf6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d03: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d28: Expected O, but got Unknown
-			//IL_0d29: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0bab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0bb7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0bc2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0bde: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0be9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0bf5: Expected O, but got Unknown
+			//IL_0c08: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c0d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c19: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c24: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c31: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c43: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c4f: Expected O, but got Unknown
+			//IL_0c96: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cbc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cc1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ccd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cd8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cdf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ce5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cfb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d06: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d12: Expected O, but got Unknown
+			//IL_0d12: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d17: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d23: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0d2e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d3a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d45: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d50: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d5b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d6c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d3d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d49: Expected O, but got Unknown
+			//IL_0d6e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0d73: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d84: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d96: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0da0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0db9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0dce: Expected O, but got Unknown
-			//IL_0dfc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e01: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e0d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e18: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e23: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e2a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e31: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e40: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e57: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e62: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e6e: Expected O, but got Unknown
-			//IL_0e6f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e74: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e80: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e8b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e9a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ea4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0eb3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ec0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ee5: Expected O, but got Unknown
-			//IL_0ee6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0eeb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ef7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0f02: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0f0d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0f18: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0f29: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0f30: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d7f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d8a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d95: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d9c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0da2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0db8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0dc3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0dcf: Expected O, but got Unknown
+			//IL_0dd0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0dd5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0de1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0dec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0dfb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0e05: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0e14: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0e21: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0e46: Expected O, but got Unknown
+			//IL_0e47: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0e4c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0e58: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0e63: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0e6e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0e79: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0e8a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0e91: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ea2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0eb4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ebe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ed7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0eec: Expected O, but got Unknown
+			//IL_0f1a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f1f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f2b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f36: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0f41: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0f53: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0f5d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0f76: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0f8b: Expected O, but got Unknown
-			//IL_0fb9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0fbe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0fca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0fd7: Expected O, but got Unknown
-			//IL_100c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_101f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_108f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_10e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_10eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1101: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1118: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1121: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1126: Unknown result type (might be due to invalid IL or missing references)
-			//IL_112e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1144: Unknown result type (might be due to invalid IL or missing references)
-			//IL_114b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1158: Unknown result type (might be due to invalid IL or missing references)
-			//IL_12d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_12d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_12eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1307: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1317: Unknown result type (might be due to invalid IL or missing references)
-			//IL_131c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1332: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1348: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1353: Unknown result type (might be due to invalid IL or missing references)
-			//IL_135a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_136c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_137e: Expected O, but got Unknown
-			//IL_13c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_13cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_13cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_13d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_13d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_13e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_13e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_13ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_13fb: Expected O, but got Unknown
+			//IL_0f48: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f4e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f64: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f6f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f7b: Expected O, but got Unknown
+			//IL_0f7c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f81: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f8d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f98: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0fa7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0fb1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0fc0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0fcd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ff2: Expected O, but got Unknown
+			//IL_0ff3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ff8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1004: Unknown result type (might be due to invalid IL or missing references)
+			//IL_100f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_101a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_103d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_104e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_106a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1098: Expected O, but got Unknown
+			//IL_10c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_10cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_10d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_10e4: Expected O, but got Unknown
+			//IL_1119: Unknown result type (might be due to invalid IL or missing references)
+			//IL_112c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_119c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_11f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_11f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_120e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1225: Unknown result type (might be due to invalid IL or missing references)
+			//IL_122e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1233: Unknown result type (might be due to invalid IL or missing references)
+			//IL_123b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1251: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1258: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1265: Unknown result type (might be due to invalid IL or missing references)
+			//IL_13dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_13e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_13f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1414: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1424: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1429: Unknown result type (might be due to invalid IL or missing references)
+			//IL_143f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1455: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1460: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1467: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1479: Unknown result type (might be due to invalid IL or missing references)
+			//IL_148b: Expected O, but got Unknown
+			//IL_14d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_14d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_14da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_14df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_14e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_14ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_14f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_14fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1508: Expected O, but got Unknown
 			Panel val = new Panel();
 			val.set_CanScroll(false);
 			((Control)val).set_Size(((Rectangle)(ref panelBounds)).get_Size());
@@ -803,11 +839,6 @@ namespace Charr.Timers_BlishHUD
 			((Panel)val4).set_CanScroll(true);
 			((Panel)val4).set_ShowBorder(true);
 			FlowPanel timerPanel = val4;
-			((Control)searchBox).set_Width(((Control)menuSection).get_Width());
-			((TextInputBase)searchBox).add_TextChanged((EventHandler<EventArgs>)delegate
-			{
-				timerPanel.FilterChildren<TimerDetailsButton>((Func<TimerDetailsButton, bool>)((TimerDetailsButton db) => ((DetailsButton)db).get_Text().ToLower().Contains(((TextInputBase)searchBox).get_Text().ToLower())));
-			});
 			StandardButton val5 = new StandardButton();
 			((Control)val5).set_Parent((Container)(object)mainPanel);
 			val5.set_Text("Alert Settings");
@@ -820,17 +851,63 @@ namespace Charr.Timers_BlishHUD
 			val7.set_Text("Disable All");
 			StandardButton disableAllButton = val7;
 			((Control)timerPanel).set_Size(new Point(((Control)mainPanel).get_Right() - ((Control)menuSection).get_Right() - ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)mainPanel).get_Height() - ((Control)enableAllButton).get_Height() - ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y * 2));
+			if (!Directory.EnumerateFiles(DirectoriesManager.GetFullDirectoryPath("timers")).Any())
+			{
+				Panel val8 = new Panel();
+				((Control)val8).set_Parent((Container)(object)mainPanel);
+				((Control)val8).set_Location(new Point(((Control)menuSection).get_Right() + ((DesignStandard)(ref Panel.MenuStandard)).get_ControlOffset().X, ((DesignStandard)(ref Panel.MenuStandard)).get_ControlOffset().Y));
+				val8.set_ShowBorder(true);
+				((Control)val8).set_Size(((Control)timerPanel).get_Size());
+				Panel noTimersPanel = val8;
+				Label val9 = new Label();
+				val9.set_Text("You don't have any timers!\nDownload some and place them in your timers folder.");
+				val9.set_HorizontalAlignment((HorizontalAlignment)1);
+				val9.set_VerticalAlignment((VerticalAlignment)2);
+				((Control)val9).set_Parent((Container)(object)noTimersPanel);
+				((Control)val9).set_Size(new Point(((Control)noTimersPanel).get_Width(), ((Control)noTimersPanel).get_Height() / 2 - 64));
+				((Control)val9).set_ClipsBounds(false);
+				Label noTimersNotice = val9;
+				StandardButton val10 = new StandardButton();
+				val10.set_Text("Download Hero's Timers");
+				((Control)val10).set_Parent((Container)(object)noTimersPanel);
+				((Control)val10).set_Width(196);
+				((Control)val10).set_Location(new Point(((Control)noTimersPanel).get_Width() / 2 - 200, ((Control)noTimersNotice).get_Bottom() + 24));
+				StandardButton val11 = new StandardButton();
+				val11.set_Text("Open Timers Folder");
+				((Control)val11).set_Parent((Container)(object)noTimersPanel);
+				((Control)val11).set_Width(196);
+				((Control)val11).set_Location(new Point(((Control)noTimersPanel).get_Width() / 2 + 4, ((Control)noTimersNotice).get_Bottom() + 24));
+				StandardButton openTimersFolder = val11;
+				Label val12 = new Label();
+				val12.set_Text("Once done, restart this module or Blish HUD to enable them.");
+				val12.set_HorizontalAlignment((HorizontalAlignment)1);
+				val12.set_VerticalAlignment((VerticalAlignment)0);
+				((Control)val12).set_Parent((Container)(object)noTimersPanel);
+				val12.set_AutoSizeHeight(true);
+				((Control)val12).set_Width(((Control)noTimersNotice).get_Width());
+				((Control)val12).set_Top(((Control)openTimersFolder).get_Bottom() + 4);
+				((Control)val10).add_Click((EventHandler<MouseEventArgs>)delegate
+				{
+					Process.Start("https://github.com/QuitarHero/Hero-Timers/releases/latest/download/Hero-Timers.zip");
+				});
+				((Control)openTimersFolder).add_Click((EventHandler<MouseEventArgs>)delegate
+				{
+					Process.Start("explorer.exe", "/open, \"" + DirectoriesManager.GetFullDirectoryPath("timers") + "\\\"");
+				});
+			}
+			((Control)searchBox).set_Width(((Control)menuSection).get_Width());
+			((TextInputBase)searchBox).add_TextChanged((EventHandler<EventArgs>)delegate
+			{
+				timerPanel.FilterChildren<TimerDetailsButton>((Func<TimerDetailsButton, bool>)((TimerDetailsButton db) => ((DetailsButton)db).get_Text().ToLower().Contains(((TextInputBase)searchBox).get_Text().ToLower())));
+			});
 			((Control)val5).set_Location(new Point(((Control)menuSection).get_Right() + ((DesignStandard)(ref Panel.MenuStandard)).get_ControlOffset().X, ((Control)timerPanel).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
 			((Control)enableAllButton).set_Location(new Point(((Control)timerPanel).get_Right() - ((Control)enableAllButton).get_Width() - ((Control)disableAllButton).get_Width() - ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X * 2, ((Control)timerPanel).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
 			((Control)disableAllButton).set_Location(new Point(((Control)enableAllButton).get_Right() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)timerPanel).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
-			AlertWindow alertWindow = new AlertWindow();
-			((Control)alertWindow).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			alertWindow.Title = "Alert Settings";
-			((Control)alertWindow).set_Width(460);
-			((Control)alertWindow).set_Height(500);
-			alertWindow.WindowBackground = Resources.AlertSettingsBackground;
-			alertWindow.Emblem = Resources.TextureTimerEmblem;
-			_alertSettingsWindow = alertWindow;
+			StandardWindow val13 = new StandardWindow(Resources.AlertSettingsBackground, new Rectangle(24, 17, 505, 390), new Rectangle(38, 45, 472, 350));
+			((Control)val13).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			((WindowBase2)val13).set_Title("Alert Settings");
+			((WindowBase2)val13).set_Emblem(Resources.TextureTimerEmblem);
+			_alertSettingsWindow = val13;
 			((Control)_alertSettingsWindow).Hide();
 			((Control)val5).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
@@ -847,70 +924,70 @@ namespace Charr.Timers_BlishHUD
 					((Control)_alertSettingsWindow).set_Location(new Point(GameService.Input.get_Mouse().get_Position().X + 10, GameService.Input.get_Mouse().get_Position().Y - ((Control)_alertSettingsWindow).get_Height() / 4));
 				}
 			});
-			Checkbox val8 = new Checkbox();
-			((Control)val8).set_Parent((Container)(object)_alertSettingsWindow);
-			val8.set_Text("Lock Alerts Container");
-			((Control)val8).set_BasicTooltipText("When enabled, the alerts container will be locked and cannot be moved.");
-			((Control)val8).set_Location(new Point(_alertSettingsWindow.ValidChildRegion().X + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, _alertSettingsWindow.ValidChildRegion().Y - ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
-			Checkbox lockAlertsWindowCB = val8;
+			Checkbox val14 = new Checkbox();
+			((Control)val14).set_Parent((Container)(object)_alertSettingsWindow);
+			val14.set_Text("Lock Alerts Container");
+			((Control)val14).set_BasicTooltipText("When enabled, the alerts container will be locked and cannot be moved.");
+			((Control)val14).set_Location(new Point(((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
+			Checkbox lockAlertsWindowCB = val14;
 			lockAlertsWindowCB.set_Checked(_lockAlertContainerSetting.get_Value());
 			lockAlertsWindowCB.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
 			{
 				_lockAlertContainerSetting.set_Value(lockAlertsWindowCB.get_Checked());
 			});
-			Checkbox val9 = new Checkbox();
-			((Control)val9).set_Parent((Container)(object)_alertSettingsWindow);
-			val9.set_Text("Center Alerts Container");
-			((Control)val9).set_BasicTooltipText("When enabled, the location of the alerts container will always be set to the center of the screen.");
-			((Control)val9).set_Location(new Point(_alertSettingsWindow.ValidChildRegion().X + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)lockAlertsWindowCB).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
-			Checkbox centerAlertsWindowCB = val9;
+			Checkbox val15 = new Checkbox();
+			((Control)val15).set_Parent((Container)(object)_alertSettingsWindow);
+			val15.set_Text("Center Alerts Container");
+			((Control)val15).set_BasicTooltipText("When enabled, the location of the alerts container will always be set to the center of the screen.");
+			((Control)val15).set_Location(new Point(((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)lockAlertsWindowCB).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
+			Checkbox centerAlertsWindowCB = val15;
 			centerAlertsWindowCB.set_Checked(_centerAlertContainerSetting.get_Value());
 			centerAlertsWindowCB.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
 			{
 				_centerAlertContainerSetting.set_Value(centerAlertsWindowCB.get_Checked());
 			});
-			Checkbox val10 = new Checkbox();
-			((Control)val10).set_Parent((Container)(object)_alertSettingsWindow);
-			val10.set_Text("Hide Alerts");
-			((Control)val10).set_BasicTooltipText("When enabled, alerts on the screen will be hidden.");
-			((Control)val10).set_Location(new Point(_alertSettingsWindow.ValidChildRegion().X + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)centerAlertsWindowCB).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
-			Checkbox hideAlertsCB = val10;
+			Checkbox val16 = new Checkbox();
+			((Control)val16).set_Parent((Container)(object)_alertSettingsWindow);
+			val16.set_Text("Hide Alerts");
+			((Control)val16).set_BasicTooltipText("When enabled, alerts on the screen will be hidden.");
+			((Control)val16).set_Location(new Point(((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)centerAlertsWindowCB).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
+			Checkbox hideAlertsCB = val16;
 			hideAlertsCB.set_Checked(_hideAlertsSetting.get_Value());
 			hideAlertsCB.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
 			{
 				_hideAlertsSetting.set_Value(hideAlertsCB.get_Checked());
 			});
-			Checkbox val11 = new Checkbox();
-			((Control)val11).set_Parent((Container)(object)_alertSettingsWindow);
-			val11.set_Text("Hide Directions");
-			((Control)val11).set_BasicTooltipText("When enabled, directions on the screen will be hidden.");
-			((Control)val11).set_Location(new Point(_alertSettingsWindow.ValidChildRegion().X + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)hideAlertsCB).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
-			Checkbox hideDirectionsCB = val11;
+			Checkbox val17 = new Checkbox();
+			((Control)val17).set_Parent((Container)(object)_alertSettingsWindow);
+			val17.set_Text("Hide Directions");
+			((Control)val17).set_BasicTooltipText("When enabled, directions on the screen will be hidden.");
+			((Control)val17).set_Location(new Point(((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)hideAlertsCB).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
+			Checkbox hideDirectionsCB = val17;
 			hideDirectionsCB.set_Checked(_hideDirectionsSetting.get_Value());
 			hideDirectionsCB.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
 			{
 				_hideDirectionsSetting.set_Value(hideDirectionsCB.get_Checked());
 			});
-			Checkbox val12 = new Checkbox();
-			((Control)val12).set_Parent((Container)(object)_alertSettingsWindow);
-			val12.set_Text("Hide Markers");
-			((Control)val12).set_BasicTooltipText("When enabled, markers on the screen will be hidden.");
-			((Control)val12).set_Location(new Point(_alertSettingsWindow.ValidChildRegion().X + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)hideDirectionsCB).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
-			Checkbox hideMarkersCB = val12;
+			Checkbox val18 = new Checkbox();
+			((Control)val18).set_Parent((Container)(object)_alertSettingsWindow);
+			val18.set_Text("Hide Markers");
+			((Control)val18).set_BasicTooltipText("When enabled, markers on the screen will be hidden.");
+			((Control)val18).set_Location(new Point(((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)hideDirectionsCB).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
+			Checkbox hideMarkersCB = val18;
 			hideMarkersCB.set_Checked(_hideMarkersSetting.get_Value());
 			hideMarkersCB.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
 			{
 				_hideMarkersSetting.set_Value(hideMarkersCB.get_Checked());
 			});
-			Label val13 = new Label();
-			((Control)val13).set_Parent((Container)(object)_alertSettingsWindow);
-			val13.set_Text("Alert Size");
-			val13.set_AutoSizeWidth(true);
-			((Control)val13).set_Location(new Point(_alertSettingsWindow.ValidChildRegion().X + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)hideMarkersCB).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
-			Label alertSizeLabel = val13;
-			Dropdown val14 = new Dropdown();
-			((Control)val14).set_Parent((Container)(object)_alertSettingsWindow);
-			Dropdown alertSizeDropdown = val14;
+			Label val19 = new Label();
+			((Control)val19).set_Parent((Container)(object)_alertSettingsWindow);
+			val19.set_Text("Alert Size");
+			val19.set_AutoSizeWidth(true);
+			((Control)val19).set_Location(new Point(((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)hideMarkersCB).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
+			Label alertSizeLabel = val19;
+			Dropdown val20 = new Dropdown();
+			((Control)val20).set_Parent((Container)(object)_alertSettingsWindow);
+			Dropdown alertSizeDropdown = val20;
 			alertSizeDropdown.get_Items().Add("Small");
 			alertSizeDropdown.get_Items().Add("Medium");
 			alertSizeDropdown.get_Items().Add("Large");
@@ -919,16 +996,16 @@ namespace Charr.Timers_BlishHUD
 			{
 				_alertSizeSetting.set_Value((AlertSize)Enum.Parse(typeof(AlertSize), alertSizeDropdown.get_SelectedItem(), ignoreCase: true));
 			});
-			Label val15 = new Label();
-			((Control)val15).set_Parent((Container)(object)_alertSettingsWindow);
-			val15.set_Text("Alert Display Orientation");
-			val15.set_AutoSizeWidth(true);
-			((Control)val15).set_Location(new Point(_alertSettingsWindow.ValidChildRegion().X + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)alertSizeLabel).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
-			Label alertDisplayOrientationLabel = val15;
-			Dropdown val16 = new Dropdown();
-			((Control)val16).set_Parent((Container)(object)_alertSettingsWindow);
-			((Control)val16).set_Location(new Point(((Control)alertDisplayOrientationLabel).get_Right() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)alertDisplayOrientationLabel).get_Top()));
-			Dropdown alertDisplayOrientationDropdown = val16;
+			Label val21 = new Label();
+			((Control)val21).set_Parent((Container)(object)_alertSettingsWindow);
+			val21.set_Text("Alert Display Orientation");
+			val21.set_AutoSizeWidth(true);
+			((Control)val21).set_Location(new Point(((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)alertSizeLabel).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
+			Label alertDisplayOrientationLabel = val21;
+			Dropdown val22 = new Dropdown();
+			((Control)val22).set_Parent((Container)(object)_alertSettingsWindow);
+			((Control)val22).set_Location(new Point(((Control)alertDisplayOrientationLabel).get_Right() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)alertDisplayOrientationLabel).get_Top()));
+			Dropdown alertDisplayOrientationDropdown = val22;
 			alertDisplayOrientationDropdown.get_Items().Add("Left to Right");
 			alertDisplayOrientationDropdown.get_Items().Add("Right to Left");
 			alertDisplayOrientationDropdown.get_Items().Add("Top to Bottom");
@@ -968,16 +1045,16 @@ namespace Charr.Timers_BlishHUD
 				}
 			});
 			((Control)alertSizeDropdown).set_Location(new Point(((Control)alertDisplayOrientationDropdown).get_Left(), ((Control)alertSizeLabel).get_Top()));
-			Label val17 = new Label();
-			((Control)val17).set_Parent((Container)(object)_alertSettingsWindow);
-			val17.set_Text("Alert Preview");
-			val17.set_AutoSizeWidth(true);
-			((Control)val17).set_Location(new Point(_alertSettingsWindow.ValidChildRegion().X + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)alertDisplayOrientationDropdown).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
-			StandardButton val18 = new StandardButton();
-			((Control)val18).set_Parent((Container)(object)_alertSettingsWindow);
-			val18.set_Text("Add Test Alert");
-			((Control)val18).set_Location(new Point(((Control)alertDisplayOrientationDropdown).get_Left(), ((Control)alertDisplayOrientationDropdown).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
-			StandardButton addTestAlertButton = val18;
+			Label val23 = new Label();
+			((Control)val23).set_Parent((Container)(object)_alertSettingsWindow);
+			val23.set_Text("Alert Preview");
+			val23.set_AutoSizeWidth(true);
+			((Control)val23).set_Location(new Point(((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)alertDisplayOrientationDropdown).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
+			StandardButton val24 = new StandardButton();
+			((Control)val24).set_Parent((Container)(object)_alertSettingsWindow);
+			val24.set_Text("Add Test Alert");
+			((Control)val24).set_Location(new Point(((Control)alertDisplayOrientationDropdown).get_Left(), ((Control)alertDisplayOrientationDropdown).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
+			StandardButton addTestAlertButton = val24;
 			((Control)addTestAlertButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				//IL_002c: Unknown result type (might be due to invalid IL or missing references)
@@ -999,11 +1076,11 @@ namespace Charr.Timers_BlishHUD
 				testAlertPanels.Add(alertPanel);
 				_alertContainer.UpdateDisplay();
 			});
-			StandardButton val19 = new StandardButton();
-			((Control)val19).set_Parent((Container)(object)_alertSettingsWindow);
-			val19.set_Text("Clear Test Alerts");
-			((Control)val19).set_Location(new Point(((Control)addTestAlertButton).get_Right() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)addTestAlertButton).get_Top()));
-			StandardButton clearTestAlertsButton = val19;
+			StandardButton val25 = new StandardButton();
+			((Control)val25).set_Parent((Container)(object)_alertSettingsWindow);
+			val25.set_Text("Clear Test Alerts");
+			((Control)val25).set_Location(new Point(((Control)addTestAlertButton).get_Right() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)addTestAlertButton).get_Top()));
+			StandardButton clearTestAlertsButton = val25;
 			((Control)clearTestAlertsButton).set_Width((int)((double)((Control)clearTestAlertsButton).get_Width() * 1.15));
 			((Control)clearTestAlertsButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
@@ -1016,48 +1093,48 @@ namespace Charr.Timers_BlishHUD
 			});
 			((Control)alertSizeDropdown).set_Width(((Control)addTestAlertButton).get_Width() + ((Control)clearTestAlertsButton).get_Width() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X);
 			((Control)alertDisplayOrientationDropdown).set_Width(((Control)alertSizeDropdown).get_Width());
-			Label val20 = new Label();
-			((Control)val20).set_Parent((Container)(object)_alertSettingsWindow);
-			val20.set_Text("Alert Container Position");
-			val20.set_AutoSizeWidth(true);
-			((Control)val20).set_Location(new Point(_alertSettingsWindow.ValidChildRegion().X + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)clearTestAlertsButton).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
-			Label alertContainerPositionLabel = val20;
-			StandardButton val21 = new StandardButton();
-			((Control)val21).set_Parent((Container)(object)_alertSettingsWindow);
-			val21.set_Text("Reset Position");
-			((Control)val21).set_Location(new Point(((Control)addTestAlertButton).get_Left(), ((Control)alertContainerPositionLabel).get_Top()));
-			StandardButton resetAlertContainerPositionButton = val21;
+			Label val26 = new Label();
+			((Control)val26).set_Parent((Container)(object)_alertSettingsWindow);
+			val26.set_Text("Alert Container Position");
+			val26.set_AutoSizeWidth(true);
+			((Control)val26).set_Location(new Point(((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)clearTestAlertsButton).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
+			Label alertContainerPositionLabel = val26;
+			StandardButton val27 = new StandardButton();
+			((Control)val27).set_Parent((Container)(object)_alertSettingsWindow);
+			val27.set_Text("Reset Position");
+			((Control)val27).set_Location(new Point(((Control)addTestAlertButton).get_Left(), ((Control)alertContainerPositionLabel).get_Top()));
+			StandardButton resetAlertContainerPositionButton = val27;
 			((Control)resetAlertContainerPositionButton).set_Width(((Control)alertSizeDropdown).get_Width());
 			((Control)resetAlertContainerPositionButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 				_alertContainerLocationSetting.set_Value(new Point(((Control)GameService.Graphics.get_SpriteScreen()).get_Width() / 2 - ((Control)_alertContainer).get_Width() / 2, ((Control)GameService.Graphics.get_SpriteScreen()).get_Height() / 2 - ((Control)_alertContainer).get_Height() / 2));
 			});
-			Label val22 = new Label();
-			((Control)val22).set_Parent((Container)(object)_alertSettingsWindow);
-			val22.set_Text("Alert Move Delay");
-			((Control)val22).set_BasicTooltipText("How many seconds alerts will take to reposition itself.");
-			val22.set_AutoSizeWidth(true);
-			((Control)val22).set_Location(new Point(_alertSettingsWindow.ValidChildRegion().X + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)resetAlertContainerPositionButton).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
-			Label alertMoveDelayLabel = val22;
-			TextBox val23 = new TextBox();
-			((Control)val23).set_Parent((Container)(object)_alertSettingsWindow);
-			((Control)val23).set_BasicTooltipText("How many seconds alerts will take to reposition itself.");
-			((Control)val23).set_Location(new Point(((Control)resetAlertContainerPositionButton).get_Left(), ((Control)alertMoveDelayLabel).get_Top()));
-			((Control)val23).set_Width(((Control)resetAlertContainerPositionButton).get_Width() / 5);
-			((Control)val23).set_Height(((Control)alertMoveDelayLabel).get_Height());
-			((TextInputBase)val23).set_Text($"{_alertMoveDelaySetting.get_Value():0.00}");
-			TextBox alertMoveDelayTextBox = val23;
-			TrackBar val24 = new TrackBar();
-			((Control)val24).set_Parent((Container)(object)_alertSettingsWindow);
-			((Control)val24).set_BasicTooltipText("How many seconds alerts will take to reposition itself.");
-			val24.set_MinValue(0f);
-			val24.set_MaxValue(3f);
-			val24.set_Value(_alertMoveDelaySetting.get_Value());
-			val24.set_SmallStep(true);
-			((Control)val24).set_Location(new Point(((Control)alertMoveDelayTextBox).get_Right() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)alertMoveDelayLabel).get_Top()));
-			((Control)val24).set_Width(((Control)resetAlertContainerPositionButton).get_Width() - ((Control)alertMoveDelayTextBox).get_Width() - ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X);
-			TrackBar alertMoveDelaySlider = val24;
+			Label val28 = new Label();
+			((Control)val28).set_Parent((Container)(object)_alertSettingsWindow);
+			val28.set_Text("Alert Move Delay");
+			((Control)val28).set_BasicTooltipText("How many seconds alerts will take to reposition itself.");
+			val28.set_AutoSizeWidth(true);
+			((Control)val28).set_Location(new Point(((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)resetAlertContainerPositionButton).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
+			Label alertMoveDelayLabel = val28;
+			TextBox val29 = new TextBox();
+			((Control)val29).set_Parent((Container)(object)_alertSettingsWindow);
+			((Control)val29).set_BasicTooltipText("How many seconds alerts will take to reposition itself.");
+			((Control)val29).set_Location(new Point(((Control)resetAlertContainerPositionButton).get_Left(), ((Control)alertMoveDelayLabel).get_Top()));
+			((Control)val29).set_Width(((Control)resetAlertContainerPositionButton).get_Width() / 5);
+			((Control)val29).set_Height(((Control)alertMoveDelayLabel).get_Height());
+			((TextInputBase)val29).set_Text($"{_alertMoveDelaySetting.get_Value():0.00}");
+			TextBox alertMoveDelayTextBox = val29;
+			TrackBar val30 = new TrackBar();
+			((Control)val30).set_Parent((Container)(object)_alertSettingsWindow);
+			((Control)val30).set_BasicTooltipText("How many seconds alerts will take to reposition itself.");
+			val30.set_MinValue(0f);
+			val30.set_MaxValue(3f);
+			val30.set_Value(_alertMoveDelaySetting.get_Value());
+			val30.set_SmallStep(true);
+			((Control)val30).set_Location(new Point(((Control)alertMoveDelayTextBox).get_Right() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)alertMoveDelayLabel).get_Top()));
+			((Control)val30).set_Width(((Control)resetAlertContainerPositionButton).get_Width() - ((Control)alertMoveDelayTextBox).get_Width() - ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X);
+			TrackBar alertMoveDelaySlider = val30;
 			((TextInputBase)alertMoveDelayTextBox).add_TextChanged((EventHandler<EventArgs>)delegate
 			{
 				int cursorIndex2 = ((TextInputBase)alertMoveDelayTextBox).get_CursorIndex();
@@ -1080,31 +1157,31 @@ namespace Charr.Timers_BlishHUD
 				_alertMoveDelaySetting.set_Value(num2);
 				((TextInputBase)alertMoveDelayTextBox).set_Text($"{num2:0.00}");
 			});
-			Label val25 = new Label();
-			((Control)val25).set_Parent((Container)(object)_alertSettingsWindow);
-			val25.set_Text("Alert Fade In/Out Delay");
-			((Control)val25).set_BasicTooltipText("How many seconds alerts will take to appear/disappear.");
-			val25.set_AutoSizeWidth(true);
-			((Control)val25).set_Location(new Point(_alertSettingsWindow.ValidChildRegion().X + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)alertMoveDelayLabel).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
-			Label alertFadeDelayLabel = val25;
-			TextBox val26 = new TextBox();
-			((Control)val26).set_Parent((Container)(object)_alertSettingsWindow);
-			((Control)val26).set_BasicTooltipText("How many seconds alerts will take to appear/disappear.");
-			((Control)val26).set_Location(new Point(((Control)resetAlertContainerPositionButton).get_Left(), ((Control)alertFadeDelayLabel).get_Top()));
-			((Control)val26).set_Width(((Control)resetAlertContainerPositionButton).get_Width() / 5);
-			((Control)val26).set_Height(((Control)alertFadeDelayLabel).get_Height());
-			((TextInputBase)val26).set_Text($"{_alertFadeDelaySetting.get_Value():0.00}");
-			TextBox alertFadeDelayTextBox = val26;
-			TrackBar val27 = new TrackBar();
-			((Control)val27).set_Parent((Container)(object)_alertSettingsWindow);
-			((Control)val27).set_BasicTooltipText("How many seconds alerts will take to appear/disappear.");
-			val27.set_MinValue(0f);
-			val27.set_MaxValue(3f);
-			val27.set_Value(_alertFadeDelaySetting.get_Value());
-			val27.set_SmallStep(true);
-			((Control)val27).set_Location(new Point(((Control)alertFadeDelayTextBox).get_Right() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)alertFadeDelayLabel).get_Top()));
-			((Control)val27).set_Width(((Control)resetAlertContainerPositionButton).get_Width() - ((Control)alertFadeDelayTextBox).get_Width() - ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X);
-			TrackBar alertFadeDelaySlider = val27;
+			Label val31 = new Label();
+			((Control)val31).set_Parent((Container)(object)_alertSettingsWindow);
+			val31.set_Text("Alert Fade In/Out Delay");
+			((Control)val31).set_BasicTooltipText("How many seconds alerts will take to appear/disappear.");
+			val31.set_AutoSizeWidth(true);
+			((Control)val31).set_Location(new Point(((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)alertMoveDelayLabel).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
+			Label alertFadeDelayLabel = val31;
+			TextBox val32 = new TextBox();
+			((Control)val32).set_Parent((Container)(object)_alertSettingsWindow);
+			((Control)val32).set_BasicTooltipText("How many seconds alerts will take to appear/disappear.");
+			((Control)val32).set_Location(new Point(((Control)resetAlertContainerPositionButton).get_Left(), ((Control)alertFadeDelayLabel).get_Top()));
+			((Control)val32).set_Width(((Control)resetAlertContainerPositionButton).get_Width() / 5);
+			((Control)val32).set_Height(((Control)alertFadeDelayLabel).get_Height());
+			((TextInputBase)val32).set_Text($"{_alertFadeDelaySetting.get_Value():0.00}");
+			TextBox alertFadeDelayTextBox = val32;
+			TrackBar val33 = new TrackBar();
+			((Control)val33).set_Parent((Container)(object)_alertSettingsWindow);
+			((Control)val33).set_BasicTooltipText("How many seconds alerts will take to appear/disappear.");
+			val33.set_MinValue(0f);
+			val33.set_MaxValue(3f);
+			val33.set_Value(_alertFadeDelaySetting.get_Value());
+			val33.set_SmallStep(true);
+			((Control)val33).set_Location(new Point(((Control)alertFadeDelayTextBox).get_Right() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)alertFadeDelayLabel).get_Top()));
+			((Control)val33).set_Width(((Control)resetAlertContainerPositionButton).get_Width() - ((Control)alertFadeDelayTextBox).get_Width() - ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X);
+			TrackBar alertFadeDelaySlider = val33;
 			((TextInputBase)alertFadeDelayTextBox).add_TextChanged((EventHandler<EventArgs>)delegate
 			{
 				int cursorIndex = ((TextInputBase)alertFadeDelayTextBox).get_CursorIndex();
@@ -1127,10 +1204,10 @@ namespace Charr.Timers_BlishHUD
 				_alertFadeDelaySetting.set_Value(num);
 				((TextInputBase)alertFadeDelayTextBox).set_Text($"{num:0.00}");
 			});
-			StandardButton val28 = new StandardButton();
-			((Control)val28).set_Parent((Container)(object)_alertSettingsWindow);
-			val28.set_Text("Close");
-			StandardButton closeAlertSettingsButton = val28;
+			StandardButton val34 = new StandardButton();
+			((Control)val34).set_Parent((Container)(object)_alertSettingsWindow);
+			val34.set_Text("Close");
+			StandardButton closeAlertSettingsButton = val34;
 			((Control)closeAlertSettingsButton).set_Location(new Point((((Control)_alertSettingsWindow).get_Left() + ((Control)_alertSettingsWindow).get_Right()) / 2 - ((Control)closeAlertSettingsButton).get_Width() / 2, ((Control)_alertSettingsWindow).get_Bottom() - ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y - ((Control)closeAlertSettingsButton).get_Height()));
 			((Control)closeAlertSettingsButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
@@ -1152,17 +1229,17 @@ namespace Charr.Timers_BlishHUD
 				TimerDetailsButton entry = timerDetailsButton;
 				if (!string.IsNullOrEmpty(enc2.Author))
 				{
-					GlowButton val29 = new GlowButton();
-					val29.set_Icon(AsyncTexture2D.op_Implicit(Resources.TextureDescription));
-					((Control)val29).set_BasicTooltipText("By: " + enc2.Author);
-					((Control)val29).set_Parent((Container)(object)entry);
+					GlowButton val35 = new GlowButton();
+					val35.set_Icon(AsyncTexture2D.op_Implicit(Resources.TextureDescription));
+					((Control)val35).set_BasicTooltipText("By: " + enc2.Author);
+					((Control)val35).set_Parent((Container)(object)entry);
 				}
-				GlowButton val30 = new GlowButton();
-				((Control)val30).set_Parent((Container)(object)entry);
-				val30.set_Icon(AsyncTexture2D.op_Implicit(Resources.TextureX));
-				val30.set_ToggleGlow(true);
-				((Control)val30).set_BasicTooltipText(enc2.Description);
-				((Control)val30).set_Enabled(false);
+				GlowButton val36 = new GlowButton();
+				((Control)val36).set_Parent((Container)(object)entry);
+				val36.set_Icon(AsyncTexture2D.op_Implicit(Resources.TextureX));
+				val36.set_ToggleGlow(true);
+				((Control)val36).set_BasicTooltipText(enc2.Description);
+				((Control)val36).set_Enabled(false);
 				_allTimerDetails.Add(entry);
 			}
 			foreach (Encounter enc3 in _encounters)
@@ -1184,19 +1261,19 @@ namespace Charr.Timers_BlishHUD
 				TimerDetailsButton entry2 = timerDetailsButton2;
 				if (!string.IsNullOrEmpty(enc3.Author))
 				{
-					GlowButton val31 = new GlowButton();
-					val31.set_Icon(AsyncTexture2D.op_Implicit(Resources.TextureDescription));
-					((Control)val31).set_BasicTooltipText("By: " + enc3.Author);
-					((Control)val31).set_Parent((Container)(object)entry2);
+					GlowButton val37 = new GlowButton();
+					val37.set_Icon(AsyncTexture2D.op_Implicit(Resources.TextureDescription));
+					((Control)val37).set_BasicTooltipText("By: " + enc3.Author);
+					((Control)val37).set_Parent((Container)(object)entry2);
 				}
-				GlowButton val32 = new GlowButton();
-				val32.set_Icon(AsyncTexture2D.op_Implicit(Resources.TextureEye));
-				val32.set_ActiveIcon(AsyncTexture2D.op_Implicit(Resources.TextureEyeActive));
-				((Control)val32).set_BasicTooltipText("Click to toggle timer");
-				val32.set_ToggleGlow(true);
-				val32.set_Checked(enc3.Enabled);
-				((Control)val32).set_Parent((Container)(object)entry2);
-				GlowButton toggleButton = val32;
+				GlowButton val38 = new GlowButton();
+				val38.set_Icon(AsyncTexture2D.op_Implicit(Resources.TextureEye));
+				val38.set_ActiveIcon(AsyncTexture2D.op_Implicit(Resources.TextureEyeActive));
+				((Control)val38).set_BasicTooltipText("Click to toggle timer");
+				val38.set_ToggleGlow(true);
+				val38.set_Checked(enc3.Enabled);
+				((Control)val38).set_Parent((Container)(object)entry2);
+				GlowButton toggleButton = val38;
 				((Control)toggleButton).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
 					enc3.Enabled = toggleButton.get_Checked();
@@ -1206,13 +1283,13 @@ namespace Charr.Timers_BlishHUD
 				});
 				_allTimerDetails.Add(entry2);
 			}
-			Menu val33 = new Menu();
+			Menu val39 = new Menu();
 			Rectangle contentRegion = ((Container)menuSection).get_ContentRegion();
-			((Control)val33).set_Size(((Rectangle)(ref contentRegion)).get_Size());
-			val33.set_MenuItemHeight(40);
-			((Control)val33).set_Parent((Container)(object)menuSection);
-			val33.set_CanSelect(true);
-			Menu timerCategories = val33;
+			((Control)val39).set_Size(((Rectangle)(ref contentRegion)).get_Size());
+			val39.set_MenuItemHeight(40);
+			((Control)val39).set_Parent((Container)(object)menuSection);
+			val39.set_CanSelect(true);
+			Menu timerCategories = val39;
 			MenuItem obj = timerCategories.AddMenuItem("All Timers", (Texture2D)null);
 			obj.Select();
 			_displayedTimerDetails = _allTimerDetails.Where((TimerDetailsButton db) => true).ToList();
