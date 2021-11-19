@@ -134,9 +134,9 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		public override void Draw(SpriteBatch spriteBatch, Rectangle drawBounds, Rectangle scissor)
 		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			if (GameService.GameIntegration.get_IsInGame())
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			if (GameService.GameIntegration.get_Gw2Instance().get_IsInGame())
 			{
 				((Control)this).Draw(spriteBatch, drawBounds, scissor);
 			}
@@ -152,11 +152,11 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			if (GameService.GameIntegration.get_IsInGame())
+			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+			if (GameService.GameIntegration.get_Gw2Instance().get_IsInGame())
 			{
 				AlphaMaskEffect.SharedInstance.SetEffectState(_croppedMask);
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _croppedWindow, bounds, Color.get_White() * 0.9f);

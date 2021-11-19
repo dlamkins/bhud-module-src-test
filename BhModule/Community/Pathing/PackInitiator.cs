@@ -156,7 +156,6 @@ namespace BhModule.Community.Pathing
 				}
 				_lastMap = mapId;
 			}
-			Logger.Info($"Loading markers for map {mapId}...");
 			Thread thread = new Thread((ThreadStart)async delegate
 			{
 				await LoadMapFromEachPack(mapId);
@@ -202,7 +201,7 @@ namespace BhModule.Community.Pathing
 			_loadingIndicator.Report("");
 			_isLoading = false;
 			loadTimer.Stop();
-			Logger.Info(string.Format("Finished loading packs {0} in {1} ms.", string.Join(", ", _packs.Select((Pack pack) => pack.Name)), loadTimer.ElapsedMilliseconds));
+			Logger.Info(string.Format("Finished loading packs {0} in {1} ms for map {2}.", string.Join(", ", _packs.Select((Pack pack) => pack.Name)), loadTimer.ElapsedMilliseconds, mapId));
 		}
 
 		private void OnMapChanged(object sender, ValueEventArgs<int> e)

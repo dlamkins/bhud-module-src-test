@@ -35,12 +35,22 @@ namespace BhModule.Community.Pathing.State
 
 		public override void Update(GameTime gameTime)
 		{
-			UpdateCadenceUtil.UpdateWithCadence(UpdateAchievements, gameTime, 300010.0, ref _lastAchievementCheck);
+			UpdateCadenceUtil.UpdateAsyncWithCadence(UpdateAchievements, gameTime, 300010.0, ref _lastAchievementCheck);
 		}
 
 		protected override Task<bool> Initialize()
 		{
+			PathingModule.Instance.Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
 			return Task.FromResult(result: true);
+		}
+
+		private void Gw2ApiManager_SubtokenUpdated(object sender, ValueEventArgs<IEnumerable<TokenPermission>> e)
+		{
+			lock (_achievementStates)
+			{
+				_achievementStates.Clear();
+			}
+			_lastAchievementCheck = 300010.0;
 		}
 
 		public override Task Unload()
@@ -65,18 +75,7 @@ namespace BhModule.Community.Pathing.State
 			return achievement.AchievementBits.Contains(achievementBit);
 		}
 
-		private void HandleAchievementUpdate(Task<IApiV2ObjectList<AccountAchievement>> accountAchievementTask)
-		{
-			lock (_achievementStates)
-			{
-				foreach (AccountAchievement achievement in (IEnumerable<AccountAchievement>)accountAchievementTask.Result)
-				{
-					_achievementStates.AddOrUpdate(achievement.get_Id(), new AchievementStatus(achievement), (int _, AchievementStatus _) => new AchievementStatus(achievement));
-				}
-			}
-		}
-
-		private void UpdateAchievements(GameTime gameTime)
+		private async Task UpdateAchievements(GameTime gameTime)
 		{
 			if (!base.Running)
 			{
@@ -84,15 +83,23 @@ namespace BhModule.Community.Pathing.State
 			}
 			try
 			{
-				if (PathingModule.Instance.Gw2ApiManager.HavePermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
+				if (PathingModule.Instance.Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
 				{
 					(TokenPermission)1,
 					(TokenPermission)6
 				}))
 				{
 					Logger.Debug("Getting user achievements from the API.");
-					((IBlobClient<IApiV2ObjectList<AccountAchievement>>)(object)PathingModule.Instance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
-						.get_Achievements()).GetAsync(default(CancellationToken)).ContinueWith(HandleAchievementUpdate, TaskContinuationOptions.NotOnFaulted);
+					IApiV2ObjectList<AccountAchievement> achievements = await ((IBlobClient<IApiV2ObjectList<AccountAchievement>>)(object)PathingModule.Instance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
+						.get_Achievements()).GetAsync(default(CancellationToken));
+					lock (_achievementStates)
+					{
+						foreach (AccountAchievement achievement in (IEnumerable<AccountAchievement>)achievements)
+						{
+							_achievementStates.AddOrUpdate(achievement.get_Id(), new AchievementStatus(achievement), (int _, AchievementStatus _) => new AchievementStatus(achievement));
+						}
+					}
+					Logger.Debug("Loaded {achievementCount} player achievements from the API.", new object[1] { ((IReadOnlyCollection<AccountAchievement>)achievements).Count });
 				}
 				else
 				{
