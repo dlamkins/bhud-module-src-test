@@ -197,6 +197,10 @@ namespace Nekres.Regions_Of_Tyria
 
 		private async Task<Sector> GetSector(Map currentMap)
 		{
+			if (currentMap == null)
+			{
+				return null;
+			}
 			Coordinates2 playerLocation = GameService.Gw2Mumble.get_RawClient().get_AvatarPosition().ToContinentCoords(CoordsUnit.Meters, currentMap.get_MapRect(), currentMap.get_ContinentRect())
 				.SwapYZ()
 				.ToPlane();
