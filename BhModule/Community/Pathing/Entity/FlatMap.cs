@@ -257,7 +257,12 @@ namespace BhModule.Community.Pathing.Entity
 					((Control)_activeTooltip).Hide();
 					return;
 				}
-				tooltipTitle = mapPathable.TipName;
+				if ((tooltipTitle = mapPathable.TipName) == "")
+				{
+					((Control)this).set_Tooltip((Tooltip)null);
+					((Control)_activeTooltip).Hide();
+					return;
+				}
 				if (!string.IsNullOrWhiteSpace(mapPathable.TipDescription))
 				{
 					tooltipDescription = mapPathable.TipDescription + "\n\n";

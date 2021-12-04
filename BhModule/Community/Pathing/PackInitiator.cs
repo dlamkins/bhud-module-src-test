@@ -184,19 +184,16 @@ namespace BhModule.Community.Pathing
 				Logger.Warn(e, "Loading pack failed.");
 				if (retry > 0)
 				{
-					PackInitiator packInitiator = this;
-					int num = retry - 1;
-					retry = num;
-					await packInitiator.LoadMapFromEachPack(num);
+					await LoadMapFromEachPack(retry - 1);
 				}
 				Logger.Error($"Loading pack failed after {3} attempts.");
 			}
 			_loadingIndicator.Report("Finalizing marker collection...");
 			await _packState.LoadPackCollection(_sharedPackCollection);
 			Pack[] array2 = _packs.ToArray();
-			for (int num = 0; num < array2.Length; num++)
+			for (int j = 0; j < array2.Length; j++)
 			{
-				array2[num].ReleaseLocks();
+				array2[j].ReleaseLocks();
 			}
 			_loadingIndicator.Report("");
 			_isLoading = false;

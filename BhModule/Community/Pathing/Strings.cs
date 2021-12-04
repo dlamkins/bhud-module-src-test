@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 
 namespace BhModule.Community.Pathing
 {
-	[GeneratedCode("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+	[GeneratedCode("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
 	[DebuggerNonUserCode]
 	[CompilerGenerated]
 	internal class Strings
