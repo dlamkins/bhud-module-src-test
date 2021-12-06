@@ -287,11 +287,11 @@ namespace BhModule.Community.Pathing.Entity
 			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0119: Invalid comparison between Unknown and I4
-			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0170: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
 			if (!GameService.GameIntegration.get_Gw2Instance().get_IsInGame())
 			{
 				return;
@@ -309,9 +309,10 @@ namespace BhModule.Community.Pathing.Entity
 				select poi;
 			bool showModTooltip = (GameService.Input.get_Keyboard().get_ActiveModifiers() & 4) == 4;
 			_activeEntity = null;
+			float overrideOpacity = (GameService.Gw2Mumble.get_UI().get_IsMapOpen() ? _packState.UserConfiguration.MapDrawOpacity.get_Value() : _packState.UserConfiguration.MiniMapDrawOpacity.get_Value());
 			foreach (IPathingEntity pathable in orderedEnumerable)
 			{
-				RectangleF? hint = pathable.RenderToMiniMap(spriteBatch, bounds, (offsetX, offsetY), scale, opacity);
+				RectangleF? hint = pathable.RenderToMiniMap(spriteBatch, bounds, (offsetX, offsetY), scale, overrideOpacity * opacity);
 				if (((Control)this).get_MouseOver() && hint.HasValue)
 				{
 					RectangleF value = hint.Value;

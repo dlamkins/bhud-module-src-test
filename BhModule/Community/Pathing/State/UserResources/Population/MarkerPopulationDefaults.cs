@@ -33,6 +33,12 @@ namespace BhModule.Community.Pathing.State.UserResources.Population
 		public float TriggerRange { get; set; } = 2f;
 
 
+		public float MapDisplaySize { get; set; } = 20f;
+
+
+		public bool MapVisibility { get; set; } = true;
+
+
 		public CullDirection Cull { get; set; }
 
 		public Guid Guid { get; set; } = Guid.Empty;
@@ -41,7 +47,7 @@ namespace BhModule.Community.Pathing.State.UserResources.Population
 		public bool MiniMapVisibility { get; set; } = true;
 
 
-		public bool MapVisibility { get; set; } = true;
+		public bool ScaleOnMapWithZoom { get; set; } = true;
 
 
 		public bool InGameVisibility { get; set; } = true;

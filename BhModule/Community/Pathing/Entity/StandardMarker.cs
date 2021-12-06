@@ -71,6 +71,10 @@ namespace BhModule.Community.Pathing.Entity
 
 		private const string ATTR_INVERTBEHAVIOR = "invert-behavior";
 
+		private const string ATTR_MAPDISPLAYSIZE = "mapdisplaysize";
+
+		private const string ATTR_SCALEONMAPWITHZOOM = "scaleonmapwithzoom";
+
 		private const string ATTR_MINIMAPVISIBILITY = "minimapvisibility";
 
 		private const string ATTR_MAPVISIBILITY = "mapvisibility";
@@ -168,6 +172,10 @@ namespace BhModule.Community.Pathing.Entity
 
 		public bool InvertBehavior { get; set; }
 
+		public float MapDisplaySize { get; set; }
+
+		public bool ScaleOnMapWithZoom { get; set; }
+
 		public bool MiniMapVisibility { get; set; }
 
 		public bool MapVisibility { get; set; }
@@ -255,24 +263,26 @@ namespace BhModule.Community.Pathing.Entity
 
 		public override RectangleF? RenderToMiniMap(SpriteBatch spriteBatch, Rectangle bounds, (double X, double Y) offsets, double scale, float opacity)
 		{
-			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
 			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0166: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0238: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0168: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0222: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0224: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0235: Unknown result type (might be due to invalid IL or missing references)
 			if (IsFiltered(EntityRenderTarget.Map) || Texture == null)
 			{
 				return null;
@@ -290,23 +300,27 @@ namespace BhModule.Community.Pathing.Entity
 			{
 				return null;
 			}
+			if (!ScaleOnMapWithZoom)
+			{
+				scale = 1.0;
+			}
 			Vector2 location = GetScaledLocation(Position.X, Position.Y, scale, offsets);
 			if (!((Rectangle)(ref bounds)).Contains(location))
 			{
 				return null;
 			}
-			float drawScale = (float)(0.30000001192092896 / scale);
+			float drawScale = (float)(1.0 / scale);
 			RectangleF drawRect = default(RectangleF);
-			((RectangleF)(ref drawRect))._002Ector(Point2.op_Implicit(location - new Vector2((float)Texture.get_Width() / 2f * drawScale, (float)Texture.get_Height() / 2f * drawScale)), Size2.op_Implicit(new Vector2((float)Texture.get_Width() * drawScale, (float)Texture.get_Height() * drawScale)));
-			spriteBatch.Draw(Texture, drawRect, Tint);
+			((RectangleF)(ref drawRect))._002Ector(Point2.op_Implicit(location - new Vector2(MapDisplaySize / 2f * drawScale, MapDisplaySize / 2f * drawScale)), Size2.op_Implicit(new Vector2(MapDisplaySize * drawScale, MapDisplaySize * drawScale)));
+			spriteBatch.Draw(Texture, drawRect, Tint * opacity);
 			if (_packState.UserConfiguration.MapShowAboveBelowIndicators.get_Value() && scale < 2.0)
 			{
 				float diff = Position.Z - GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Z;
 				if (Math.Abs(diff) > 30f)
 				{
 					RectangleF indicatorPosition = default(RectangleF);
-					((RectangleF)(ref indicatorPosition))._002Ector(((RectangleF)(ref drawRect)).get_Right() - (float)_aboveTexture.get_Width() * drawScale, ((RectangleF)(ref drawRect)).get_Top(), (float)_aboveTexture.get_Width() * drawScale * 3f, (float)_aboveTexture.get_Height() * drawScale * 3f);
-					spriteBatch.Draw((diff > 0f) ? _aboveTexture : _belowTexture, indicatorPosition, Color.get_White());
+					((RectangleF)(ref indicatorPosition))._002Ector(((RectangleF)(ref drawRect)).get_Right() - (float)_aboveTexture.get_Width() * drawScale, ((RectangleF)(ref drawRect)).get_Top(), (float)_aboveTexture.get_Width() * drawScale, (float)_aboveTexture.get_Height() * drawScale);
+					spriteBatch.Draw((diff > 0f) ? _aboveTexture : _belowTexture, indicatorPosition, Color.get_White() * opacity);
 				}
 			}
 			return drawRect;
@@ -629,6 +643,21 @@ namespace BhModule.Community.Pathing.Entity
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private void Populate_MapScaling(TmfLib.Prototype.AttributeCollection collection, IPackResourceManager resourceManager)
+		{
+			MapDisplaySize = _packState.UserResourceStates.Population.MarkerPopulationDefaults.MapDisplaySize;
+			ScaleOnMapWithZoom = _packState.UserResourceStates.Population.MarkerPopulationDefaults.ScaleOnMapWithZoom;
+			if (collection.TryPopAttribute("mapdisplaysize", out var attribute2))
+			{
+				MapDisplaySize = attribute2.GetValueAsFloat(MapDisplaySize);
+			}
+			if (collection.TryPopAttribute("scaleonmapwithzoom", out var attribute))
+			{
+				ScaleOnMapWithZoom = attribute.GetValueAsBool();
+			}
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private void Populate_MapVisibility(TmfLib.Prototype.AttributeCollection collection, IPackResourceManager resourceManager)
 		{
 			MiniMapVisibility = _packState.UserResourceStates.Population.MarkerPopulationDefaults.MiniMapVisibility;
@@ -886,7 +915,6 @@ namespace BhModule.Community.Pathing.Entity
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			Populate(pointOfInterest.GetAggregatedAttributes(), TextureResourceManager.GetTextureResourceManager(pointOfInterest.ResourceManager));
-			Initialize();
 		}
 
 		private void Populate(TmfLib.Prototype.AttributeCollection collection, TextureResourceManager resourceManager)
@@ -903,17 +931,13 @@ namespace BhModule.Community.Pathing.Entity
 			Populate_Alpha(collection, resourceManager);
 			Populate_FadeNearAndFar(collection, resourceManager);
 			Populate_Cull(collection, resourceManager);
+			Populate_MapScaling(collection, resourceManager);
 			Populate_MapVisibility(collection, resourceManager);
 			Populate_CanFade(collection, resourceManager);
 			Populate_Tip(collection, resourceManager);
 			Populate_InvertBehavior(collection, resourceManager);
 			Populate_TacOMisc(collection, resourceManager);
 			Populate_Behaviors(collection, resourceManager);
-		}
-
-		private void Initialize()
-		{
-			FadeIn();
 		}
 
 		public override void Update(GameTime gameTime)

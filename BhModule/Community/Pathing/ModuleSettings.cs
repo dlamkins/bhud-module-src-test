@@ -53,9 +53,13 @@ namespace BhModule.Community.Pathing
 
 		public SettingEntry<MapVisibilityLevel> MapTrailVisibilityLevel { get; private set; }
 
+		public SettingEntry<float> MapDrawOpacity { get; private set; }
+
 		public SettingEntry<MapVisibilityLevel> MiniMapMarkerVisibilityLevel { get; private set; }
 
 		public SettingEntry<MapVisibilityLevel> MiniMapTrailVisibilityLevel { get; private set; }
+
+		public SettingEntry<float> MiniMapDrawOpacity { get; private set; }
 
 		public SettingEntry<bool> MapShowAboveBelowIndicators { get; private set; }
 
@@ -109,10 +113,14 @@ namespace BhModule.Community.Pathing
 			MapPathablesEnabled = MapSettings.DefineSetting<bool>("MapPathablesEnabled", true, (Func<string>)(() => "Show Markers on Maps"), (Func<string>)null);
 			MapMarkerVisibilityLevel = MapSettings.DefineSetting<MapVisibilityLevel>("MapMarkerVisibilityLevel", MapVisibilityLevel.Default, (Func<string>)(() => Strings.Setting_MapShowMarkersOnFullscreen), (Func<string>)(() => ""));
 			MapTrailVisibilityLevel = MapSettings.DefineSetting<MapVisibilityLevel>("MapTrailVisibilityLevel", MapVisibilityLevel.Default, (Func<string>)(() => Strings.Setting_MapShowTrailsOnFullscreen), (Func<string>)(() => ""));
+			MapDrawOpacity = MapSettings.DefineSetting<float>("MapDrawOpacity", 1f, (Func<string>)(() => "Opacity on Fullscreen Map"), (Func<string>)(() => ""));
 			MiniMapMarkerVisibilityLevel = MapSettings.DefineSetting<MapVisibilityLevel>("MiniMapMarkerVisibilityLevel", MapVisibilityLevel.Default, (Func<string>)(() => Strings.Setting_MapShowMarkersOnCompass), (Func<string>)(() => ""));
 			MiniMapTrailVisibilityLevel = MapSettings.DefineSetting<MapVisibilityLevel>("MiniMapTrailVisibilityLevel", MapVisibilityLevel.Default, (Func<string>)(() => Strings.Setting_MapShowTrailsOnCompass), (Func<string>)(() => ""));
+			MiniMapDrawOpacity = MapSettings.DefineSetting<float>("MiniMapDrawOpacity", 1f, (Func<string>)(() => "Opacity on the Minimap"), (Func<string>)(() => ""));
 			MapShowAboveBelowIndicators = MapSettings.DefineSetting<bool>("MapShowAboveBelowIndicators", true, (Func<string>)(() => Strings.Setting_MapShowAboveBelowIndicators), (Func<string>)(() => ""));
-			MapFadeVerticallyDistantTrailSegments = MapSettings.DefineSetting<bool>("MapFadeVerticallyDistantTrailSegments", true, (Func<string>)(() => "Fade Trail Segments Which Are High Above or Below"), (Func<string>)null);
+			MapFadeVerticallyDistantTrailSegments = MapSettings.DefineSetting<bool>("MapFadeVerticallyDistantTrailSegments", true, (Func<string>)(() => "Fade Trail Segments Which Are High Above or Below"), (Func<string>)(() => ""));
+			SettingComplianceExtensions.SetRange(MapDrawOpacity, 0f, 1f);
+			SettingComplianceExtensions.SetRange(MiniMapDrawOpacity, 0f, 1f);
 		}
 
 		private void InitKeyBindSettings(SettingCollection settings)
