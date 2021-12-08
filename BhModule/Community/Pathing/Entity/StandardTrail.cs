@@ -56,7 +56,7 @@ namespace BhModule.Community.Pathing.Entity
 
 		private const string ATTR_TRAILSCALE = "trailscale";
 
-		private const string ATTR_WALL = "is-wall";
+		private const string ATTR_ISWALL = "iswall";
 
 		private const string ATTR_TRIGGERRANGE = "triggerrange";
 
@@ -532,7 +532,7 @@ namespace BhModule.Community.Pathing.Entity
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private void Populate_IsWall(AttributeCollection collection, IPackResourceManager resourceManager)
 		{
-			if (collection.TryPopAttribute("is-wall", out var attribute))
+			if (collection.TryPopAttribute("iswall", out var attribute))
 			{
 				IsWall = attribute.GetValueAsBool();
 			}

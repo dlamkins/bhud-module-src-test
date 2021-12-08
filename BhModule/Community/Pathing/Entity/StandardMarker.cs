@@ -69,7 +69,7 @@ namespace BhModule.Community.Pathing.Entity
 
 		private const string ATTR_ICONSIZE = "iconsize";
 
-		private const string ATTR_INVERTBEHAVIOR = "invert-behavior";
+		private const string ATTR_INVERTBEHAVIOR = "invertbehavior";
 
 		private const string ATTR_MAPDISPLAYSIZE = "mapdisplaysize";
 
@@ -636,7 +636,7 @@ namespace BhModule.Community.Pathing.Entity
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private void Populate_InvertBehavior(TmfLib.Prototype.AttributeCollection collection, IPackResourceManager resourceManager)
 		{
-			if (collection.TryPopAttribute("invert-behavior", out var attribute))
+			if (collection.TryPopAttribute("invertbehavior", out var attribute))
 			{
 				InvertBehavior = attribute.GetValueAsBool();
 			}

@@ -16,6 +16,8 @@ namespace BhModule.Community.Pathing.State
 
 		private const string STATE_FILE = "categories.txt";
 
+		private const string INVERTEDSTATE_FILE = "invcategories.txt";
+
 		private const double INTERVAL_SAVESTATE = 5000.0;
 
 		private const double INTERVAL_UPDATEINACTIVECATEGORIES = 100.0;
@@ -23,6 +25,8 @@ namespace BhModule.Community.Pathing.State
 		private HashSet<string> _inactiveCategories = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
 		private readonly SafeList<PathingCategory> _rawInactiveCategories = new SafeList<PathingCategory>();
+
+		private readonly SafeList<PathingCategory> _rawInvertedCategories = new SafeList<PathingCategory>();
 
 		private double _lastSaveState;
 
@@ -37,83 +41,112 @@ namespace BhModule.Community.Pathing.State
 		{
 		}
 
-		private async Task LoadState()
+		private async Task LoadCategoryState(string stateFileName, SafeList<PathingCategory> rawCategoriesList, PathingCategory rootCategory)
 		{
-			string categoryStatesPath = Path.Combine(DataDirUtil.GetSafeDataDir("states"), "categories.txt");
-			if (!File.Exists(categoryStatesPath))
+			string categoryStatePath = Path.Combine(DataDirUtil.GetSafeDataDir("states"), stateFileName);
+			if (File.Exists(categoryStatePath))
 			{
-				return;
-			}
-			string[] recordedCategories = Array.Empty<string>();
-			try
-			{
-				recordedCategories = await FileUtil.ReadLinesAsync(categoryStatesPath);
-			}
-			catch (Exception e)
-			{
-				Logger.Error(e, "Failed to read categories.txt (" + categoryStatesPath + ").");
-			}
-			_rawInactiveCategories.Clear();
-			PathingCategory rootCategory = _rootPackState.RootCategory;
-			if (rootCategory != null)
-			{
+				string[] recordedCategories = Array.Empty<string>();
+				try
+				{
+					recordedCategories = await FileUtil.ReadLinesAsync(categoryStatePath);
+				}
+				catch (Exception e)
+				{
+					Logger.Error(e, "Failed to read categories.txt (" + categoryStatePath + ").");
+				}
+				rawCategoriesList.Clear();
 				string[] array = recordedCategories;
 				foreach (string categoryNamespace in array)
 				{
-					_rawInactiveCategories.Add(rootCategory.GetOrAddCategoryFromNamespace(categoryNamespace));
+					rawCategoriesList.Add(rootCategory.GetOrAddCategoryFromNamespace(categoryNamespace));
 				}
+			}
+		}
+
+		private async Task LoadStates()
+		{
+			PathingCategory rootCategory = _rootPackState.RootCategory;
+			if (rootCategory != null)
+			{
+				Logger.Debug("Loading CategoryStates state.");
+				await LoadCategoryState("categories.txt", _rawInactiveCategories, rootCategory);
+				await LoadCategoryState("invcategories.txt", _rawInvertedCategories, rootCategory);
 				_calculationDirty = true;
 			}
 		}
 
-		private async Task SaveState(GameTime gameTime)
+		private async Task SaveCategoryState(string stateFileName, SafeList<PathingCategory> rawCategoriesList)
 		{
-			if (!_stateDirty)
-			{
-				return;
-			}
-			Logger.Debug("Saving CategoryStates state.");
-			PathingCategory[] inactiveCategories = _rawInactiveCategories.ToArray();
-			string categoryStatesPath = Path.Combine(DataDirUtil.GetSafeDataDir("states"), "categories.txt");
+			PathingCategory[] toggledCategories = rawCategoriesList.ToArray();
+			string categoryStatePath = Path.Combine(DataDirUtil.GetSafeDataDir("states"), stateFileName);
 			try
 			{
-				await FileUtil.WriteLinesAsync(categoryStatesPath, inactiveCategories.Select((PathingCategory c) => c.Namespace));
+				await FileUtil.WriteLinesAsync(categoryStatePath, toggledCategories.Select((PathingCategory c) => c.Namespace));
 			}
 			catch (Exception e)
 			{
-				Logger.Error(e, "Failed to write categories.txt (" + categoryStatesPath + ").");
+				Logger.Error(e, "Failed to write " + stateFileName + " (" + categoryStatePath + ").");
 			}
-			_stateDirty = false;
+		}
+
+		private async Task SaveStates(GameTime gameTime)
+		{
+			if (_stateDirty)
+			{
+				Logger.Debug("Saving CategoryStates state.");
+				await SaveCategoryState("categories.txt", _rawInactiveCategories);
+				await SaveCategoryState("invcategories.txt", _rawInvertedCategories);
+				_stateDirty = false;
+			}
+		}
+
+		private void AddAllSubCategories(HashSet<string> categories, PathingCategory topCategory)
+		{
+			Queue<PathingCategory> remainingCategories = new Queue<PathingCategory>(topCategory);
+			while (remainingCategories.Count > 0)
+			{
+				PathingCategory category = remainingCategories.Dequeue();
+				categories.Add(category.Namespace);
+				foreach (PathingCategory subCategory in category)
+				{
+					remainingCategories.Enqueue(subCategory);
+				}
+			}
 		}
 
 		private void CalculateOptimizedCategoryStates(GameTime gameTime)
 		{
-			if (_calculationDirty)
+			if (!_calculationDirty || _rootPackState.RootCategory == null)
 			{
-				PathingCategory[] array = _rawInactiveCategories.ToArray();
-				HashSet<string> preCalcInactiveCategories = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-				PathingCategory[] array2 = array;
-				foreach (PathingCategory inactiveCategory in array2)
+				return;
+			}
+			PathingCategory[] inactiveCategories = _rawInactiveCategories.ToArray();
+			PathingCategory[] activeInvertedCategories = _rawInvertedCategories.ToArray();
+			Queue<PathingCategory> remainingCategories = new Queue<PathingCategory>();
+			remainingCategories.Enqueue(_rootPackState.RootCategory);
+			HashSet<string> preCalcInactiveCategories = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+			while (remainingCategories.Count > 0)
+			{
+				PathingCategory category = remainingCategories.Dequeue();
+				if (inactiveCategories.Contains(category) || (!category.DefaultToggle && !activeInvertedCategories.Contains(category)))
 				{
-					AddAllSubCategories(preCalcInactiveCategories, inactiveCategory);
+					preCalcInactiveCategories.Add(category.Namespace);
+					AddAllSubCategories(preCalcInactiveCategories, category);
+					continue;
 				}
-				_inactiveCategories = preCalcInactiveCategories;
-				_calculationDirty = false;
+				foreach (PathingCategory subCategory in category)
+				{
+					remainingCategories.Enqueue(subCategory);
+				}
 			}
-		}
-
-		private void AddAllSubCategories(HashSet<string> categories, PathingCategory currentCategory)
-		{
-			categories.Add(currentCategory.Namespace);
-			foreach (PathingCategory subCategory in currentCategory)
-			{
-				AddAllSubCategories(categories, subCategory);
-			}
+			_inactiveCategories = preCalcInactiveCategories;
+			_calculationDirty = false;
 		}
 
 		protected override async Task<bool> Initialize()
 		{
-			await LoadState();
+			await LoadStates();
 			return true;
 		}
 
@@ -121,18 +154,19 @@ namespace BhModule.Community.Pathing.State
 		{
 			_inactiveCategories.Clear();
 			_rawInactiveCategories.Clear();
-			await LoadState();
+			_rawInvertedCategories.Clear();
+			await LoadStates();
 		}
 
 		public override void Update(GameTime gameTime)
 		{
 			UpdateCadenceUtil.UpdateWithCadence(CalculateOptimizedCategoryStates, gameTime, 100.0, ref _lastInactiveCategoriesCalculation);
-			UpdateCadenceUtil.UpdateAsyncWithCadence(SaveState, gameTime, 5000.0, ref _lastSaveState);
+			UpdateCadenceUtil.UpdateAsyncWithCadence(SaveStates, gameTime, 5000.0, ref _lastSaveState);
 		}
 
 		public override async Task Unload()
 		{
-			await SaveState(null);
+			await SaveStates(null);
 		}
 
 		public bool GetNamespaceInactive(string categoryNamespace)
@@ -140,20 +174,41 @@ namespace BhModule.Community.Pathing.State
 			return _inactiveCategories.Contains(categoryNamespace);
 		}
 
+		private bool GetCategoryInactive(PathingCategory category, SafeList<PathingCategory> rawCategoriesList)
+		{
+			return rawCategoriesList.Contains(category);
+		}
+
 		public bool GetCategoryInactive(PathingCategory category)
 		{
-			return _rawInactiveCategories.Contains(category);
+			if (category.DefaultToggle)
+			{
+				return GetCategoryInactive(category, _rawInactiveCategories);
+			}
+			return !GetCategoryInactive(category, _rawInvertedCategories);
+		}
+
+		private void SetInactive(PathingCategory category, bool isInactive, SafeList<PathingCategory> rawCategoriesList)
+		{
+			rawCategoriesList.Remove(category);
+			if (isInactive)
+			{
+				rawCategoriesList.Add(category);
+			}
+			_stateDirty = true;
+			_calculationDirty = true;
 		}
 
 		public void SetInactive(PathingCategory category, bool isInactive)
 		{
-			_rawInactiveCategories.Remove(category);
-			if (isInactive)
+			if (category.DefaultToggle)
 			{
-				_rawInactiveCategories.Add(category);
+				SetInactive(category, isInactive, _rawInactiveCategories);
 			}
-			_stateDirty = true;
-			_calculationDirty = true;
+			else
+			{
+				SetInactive(category, !isInactive, _rawInvertedCategories);
+			}
 		}
 
 		public void SetInactive(string categoryNamespace, bool isInactive)
