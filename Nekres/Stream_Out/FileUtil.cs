@@ -5,13 +5,13 @@ using Blish_HUD;
 
 namespace Nekres.Stream_Out
 {
-	public static class FileUtil
+	internal static class FileUtil
 	{
 		private static readonly Logger Logger = Logger.GetLogger(typeof(FileUtil));
 
-		public static async Task WriteAllTextAsync(string filePath, string data)
+		public static async Task WriteAllTextAsync(string filePath, string data, bool overwrite = true)
 		{
-			if (string.IsNullOrEmpty(filePath))
+			if (string.IsNullOrEmpty(filePath) || (!overwrite && File.Exists(filePath)))
 			{
 				return;
 			}

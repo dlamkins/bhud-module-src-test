@@ -10,13 +10,13 @@ namespace Nekres.Stream_Out
 		{
 			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Expected I4, but got Unknown
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Expected I4, but got Unknown
 			Locale value = overlay.get_UserLocale().get_Value();
-			Locale val = value;
-			return (int)val switch
+			if (1 == 0)
+			{
+			}
+			CultureInfo result = (int)value switch
 			{
 				0 => new CultureInfo("en-US"), 
 				1 => new CultureInfo("es-ES"), 
@@ -26,6 +26,10 @@ namespace Nekres.Stream_Out
 				5 => new CultureInfo("zh-CN"), 
 				_ => System.Globalization.CultureInfo.CurrentCulture, 
 			};
+			if (1 == 0)
+			{
+			}
+			return result;
 		}
 	}
 }

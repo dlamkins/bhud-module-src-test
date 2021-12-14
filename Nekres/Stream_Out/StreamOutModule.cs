@@ -6,6 +6,7 @@ using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
@@ -31,7 +32,9 @@ namespace Nekres.Stream_Out
 			Suffixed
 		}
 
-		private static readonly Logger Logger = Logger.GetLogger<StreamOutModule>();
+		internal static readonly Logger Logger = Logger.GetLogger<StreamOutModule>();
+
+		internal static StreamOutModule ModuleInstance;
 
 		private SettingEntry<bool> _onlyLastDigitSettingEntry;
 
@@ -60,6 +63,8 @@ namespace Nekres.Stream_Out
 		private SettingEntry<int> _sessionDeathsDaily;
 
 		private SettingEntry<Guid> _accountGuid;
+
+		private SettingEntry<string> _accountName;
 
 		private const string SERVER_ADDRESS = "server_address.txt";
 
@@ -95,6 +100,12 @@ namespace Nekres.Stream_Out
 
 		private const string PVP_WIN_LOSS_RATIO = "pvp_win_loss_ratio.txt";
 
+		private const string KILLPROOF_ME_UNSTABLE_FRACTAL_ESSENCE = "unstable_fractal_essence.txt";
+
+		private const string KILLPROOF_ME_LEGENDARY_DIVINATION = "legendary_divination.txt";
+
+		private const string KILLPROOF_ME_LEGENDARY_INSIGHT = "legendary_insight.txt";
+
 		private const string DEATHS_WEEK = "deaths_week.txt";
 
 		private const string DEATHS_DAY = "deaths_day.txt";
@@ -103,13 +114,9 @@ namespace Nekres.Stream_Out
 
 		private const string SWORDS = "⚔";
 
-		private static readonly Color Gold = Color.FromArgb(210, 180, 66);
+		private const string KILLPROOF_API_URL = "https://killproof.me/api/kp/";
 
-		private static readonly Color Silver = Color.FromArgb(153, 153, 153);
-
-		private static readonly Color Copper = Color.FromArgb(190, 100, 35);
-
-		private static readonly Color Karma = Color.FromArgb(220, 80, 190);
+		private bool _hasSubToken;
 
 		private DateTime? _prevApiRequestTime;
 
@@ -127,6 +134,7 @@ namespace Nekres.Stream_Out
 		public StreamOutModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
 			: this(moduleParameters)
 		{
+			ModuleInstance = this;
 		}
 
 		protected override void DefineSettings(SettingCollection settings)
@@ -135,6 +143,8 @@ namespace Nekres.Stream_Out
 			_addUnicodeSymbols = settings.DefineSetting<UnicodeSigning>("UnicodeSymbols", UnicodeSigning.Suffixed, (Func<string>)(() => "Numeric Value Signing"), (Func<string>)(() => "The way numeric values should be signed with unicode symbols."));
 			SettingCollection cache = settings.AddSubCollection("CachedValues", false);
 			cache.set_RenderInUi(false);
+			_accountGuid = cache.DefineSetting<Guid>("AccountGuid", Guid.Empty, (Func<string>)null, (Func<string>)null);
+			_accountName = cache.DefineSetting<string>("AccountName", string.Empty, (Func<string>)null, (Func<string>)null);
 			_resetTimeWvW = cache.DefineSetting<DateTime?>("ResetTimeWvW", (DateTime?)null, (Func<string>)null, (Func<string>)null);
 			_resetTimeDaily = cache.DefineSetting<DateTime?>("ResetTimeDaily", (DateTime?)null, (Func<string>)null, (Func<string>)null);
 			_sessionKillsWvW = cache.DefineSetting<int>("SessionKillsWvW", 0, (Func<string>)null, (Func<string>)null);
@@ -146,15 +156,62 @@ namespace Nekres.Stream_Out
 			_totalKillsAtResetPvP = cache.DefineSetting<int>("TotalKillsAtResetPvP", 0, (Func<string>)null, (Func<string>)null);
 			_totalDeathsAtResetWvW = cache.DefineSetting<int>("TotalDeathsAtResetWvW", 0, (Func<string>)null, (Func<string>)null);
 			_totalDeathsAtResetDaily = cache.DefineSetting<int>("TotalDeathsAtResetDaily", 0, (Func<string>)null, (Func<string>)null);
-			_accountGuid = cache.DefineSetting<Guid>("AccountGuid", Guid.Empty, (Func<string>)null, (Func<string>)null);
 		}
 
 		protected override void Initialize()
 		{
+			Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)SubTokenUpdated);
+		}
+
+		private void SubTokenUpdated(object o, ValueEventArgs<IEnumerable<TokenPermission>> e)
+		{
+			_hasSubToken = true;
 		}
 
 		protected override async Task LoadAsync()
 		{
+			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wvw_kills_week.txt", "0⚔", overwrite: false);
+			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wvw_kills_total.txt", "0⚔", overwrite: false);
+			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wvw_kills_day.txt", "0⚔", overwrite: false);
+			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_kills_day.txt", "0⚔", overwrite: false);
+			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_kills_total.txt", "0⚔", overwrite: false);
+			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/deaths_week.txt", "0☠", overwrite: false);
+			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/deaths_day.txt", "0☠", overwrite: false);
+			await Task.Run(delegate
+			{
+				Gw2Util.GeneratePvpTierImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_tier_icon.png", 1, 3, overwrite: false);
+			});
+			await Task.Run(delegate
+			{
+				Gw2Util.GenerateCoinsImage(ModuleInstance.DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wallet_coins.png", 10000000, overwrite: false);
+			});
+			await Task.Run(delegate
+			{
+				Gw2Util.GenerateKarmaImage(ModuleInstance.DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wallet_karma.png", 10000000, overwrite: false);
+			});
+			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_rank.txt", "Bronze I", overwrite: false);
+			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_win_loss_ratio.txt", "1.0", overwrite: false);
+			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wvw_rank.txt", "1 : Invader", overwrite: false);
+			ExtractIcons("1614804.png", DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_rank_icon.png");
+			string staticDir = DirectoriesManager.GetFullDirectoryPath("stream_out") + "/static";
+			if (!Directory.Exists(staticDir))
+			{
+				Directory.CreateDirectory(staticDir);
+			}
+			ExtractIcons("legendary_divination.png", staticDir + "/legendary_divination.png");
+			ExtractIcons("legendary_insight.png", staticDir + "/legendary_insight.png");
+			ExtractIcons("unstable_fractal_essence.png", staticDir + "/unstable_fractal_essence.png");
+		}
+
+		private void ExtractIcons(string iconName, string iconOutputName)
+		{
+			if (File.Exists(iconName))
+			{
+				return;
+			}
+			using Stream texStr = ContentsManager.GetFileStream(iconName);
+			using Bitmap icon = new Bitmap(texStr);
+			icon.Save(iconOutputName, ImageFormat.Png);
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)
@@ -175,20 +232,21 @@ namespace Nekres.Stream_Out
 				_prevServerAddress = GameService.Gw2Mumble.get_Info().get_ServerAddress();
 				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/server_address.txt", string.IsNullOrEmpty(GameService.Gw2Mumble.get_Info().get_ServerAddress()) ? string.Empty : (_onlyLastDigitSettingEntry.get_Value() ? ("*" + GameService.Gw2Mumble.get_Info().get_ServerAddress().Substring(GameService.Gw2Mumble.get_Info().get_ServerAddress().LastIndexOf('.'))) : GameService.Gw2Mumble.get_Info().get_ServerAddress()));
 			}
-			if (!_prevApiRequestTime.HasValue || DateTime.UtcNow.Subtract(_prevApiRequestTime.Value).TotalSeconds > 300.0)
+			if (_hasSubToken && (!_prevApiRequestTime.HasValue || DateTime.UtcNow.Subtract(_prevApiRequestTime.Value).TotalSeconds > 300.0))
 			{
 				_prevApiRequestTime = DateTime.UtcNow;
+				await CheckForReset();
 				await UpdateWallet();
 				await UpdateStandingsForPvP();
 				await UpdateStatsForPvp();
 				await UpdateRankForWvw();
 				await UpdateKillsAndDeaths();
+				await UpdateKillProofs();
 			}
 		}
 
 		private async Task UpdateKillsAndDeaths()
 		{
-			await CheckForReset();
 			string prefixKills = ((_addUnicodeSymbols.get_Value() == UnicodeSigning.Prefixed) ? "⚔" : string.Empty);
 			string suffixKills = ((_addUnicodeSymbols.get_Value() == UnicodeSigning.Suffixed) ? "⚔" : string.Empty);
 			string prefixDeaths = ((_addUnicodeSymbols.get_Value() == UnicodeSigning.Prefixed) ? "☠" : string.Empty);
@@ -225,6 +283,8 @@ namespace Nekres.Stream_Out
 			GameService.Gw2Mumble.get_PlayerCharacter().remove_NameChanged((EventHandler<ValueEventArgs<string>>)OnNameChanged);
 			GameService.Gw2Mumble.get_PlayerCharacter().remove_SpecializationChanged((EventHandler<ValueEventArgs<int>>)OnSpecializationChanged);
 			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
+			Gw2ApiManager.remove_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)SubTokenUpdated);
+			ModuleInstance = null;
 		}
 
 		private async void OnMapChanged(object o, ValueEventArgs<int> e)
@@ -325,17 +385,14 @@ namespace Nekres.Stream_Out
 			{
 				return;
 			}
-			MemoryStream stream = new MemoryStream(File.ReadAllBytes(path));
-			using (Bitmap bitmap = (Bitmap)Image.FromStream(stream))
+			using MemoryStream stream = new MemoryStream(File.ReadAllBytes(path));
+			using Bitmap bitmap = (Bitmap)Image.FromStream(stream);
+			using (Graphics gfx = Graphics.FromImage(bitmap))
 			{
-				using (Graphics gfx = Graphics.FromImage(bitmap))
-				{
-					gfx.Clear(Color.Transparent);
-					gfx.Flush();
-				}
-				bitmap.Save(path, ImageFormat.Png);
+				gfx.Clear(Color.Transparent);
+				gfx.Flush();
 			}
-			stream.Close();
+			bitmap.Save(path, ImageFormat.Png);
 		}
 
 		private async Task<IEnumerable<ContinentFloorRegionMapSector>> RequestSectors(int continentId, int floor, int regionId, int mapId)
@@ -366,7 +423,7 @@ namespace Nekres.Stream_Out
 
 		private async Task<int> RequestTotalDeaths()
 		{
-			if (!Gw2ApiManager.HavePermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
+			if (!Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
 			{
 				(TokenPermission)1,
 				(TokenPermission)3
@@ -379,7 +436,7 @@ namespace Nekres.Stream_Out
 
 		private async Task<int> RequestTotalKillsForWvW()
 		{
-			if (!Gw2ApiManager.HavePermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
+			if (!Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
 			{
 				(TokenPermission)1,
 				(TokenPermission)6
@@ -393,7 +450,7 @@ namespace Nekres.Stream_Out
 
 		private async Task<int> RequestTotalKillsForPvP()
 		{
-			if (!Gw2ApiManager.HavePermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
+			if (!Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
 			{
 				(TokenPermission)1,
 				(TokenPermission)6
@@ -472,7 +529,7 @@ namespace Nekres.Stream_Out
 
 		private async Task CheckForReset()
 		{
-			if (!Gw2ApiManager.HavePermission((TokenPermission)1))
+			if (!Gw2ApiManager.HasPermission((TokenPermission)1))
 			{
 				return;
 			}
@@ -481,6 +538,7 @@ namespace Nekres.Stream_Out
 				if (!response.IsFaulted)
 				{
 					bool isNewAcc = !response.Result.get_Id().Equals(_accountGuid.get_Value());
+					_accountName.set_Value(response.Result.get_Name());
 					_accountGuid.set_Value(response.Result.get_Id());
 					await ResetWorldVersusWorld(response.Result.get_World(), isNewAcc);
 					await ResetDaily(isNewAcc);
@@ -490,7 +548,7 @@ namespace Nekres.Stream_Out
 
 		private async Task UpdateRankForWvw()
 		{
-			if (!Gw2ApiManager.HavePermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
+			if (!Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
 			{
 				(TokenPermission)1,
 				(TokenPermission)6
@@ -503,7 +561,7 @@ namespace Nekres.Stream_Out
 				if (!response.IsFaulted)
 				{
 					int? wvwRank = response.Result.get_WvwRank();
-					if (!(wvwRank <= 0))
+					if (wvwRank.HasValue && !(wvwRank <= 0))
 					{
 						await ((IAllExpandableClient<WvwRank>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Wvw()
 							.get_Ranks()).AllAsync(default(CancellationToken)).ContinueWith((Func<Task<IApiV2ObjectList<WvwRank>>, Task>)async delegate(Task<IApiV2ObjectList<WvwRank>> t)
@@ -521,7 +579,7 @@ namespace Nekres.Stream_Out
 
 		private async Task UpdateStandingsForPvP()
 		{
-			if (!Gw2ApiManager.HavePermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
+			if (!Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
 			{
 				(TokenPermission)1,
 				(TokenPermission)7
@@ -599,33 +657,10 @@ namespace Nekres.Stream_Out
 										break;
 									}
 								}
-								Stream tierIconFilledStream = ContentsManager.GetFileStream("1495585.png");
-								Bitmap tierIconFilled = new Bitmap(tierIconFilledStream);
-								Stream tierIconEmptyStream = ContentsManager.GetFileStream("1495584.png");
-								Bitmap tierIconEmpty = new Bitmap(tierIconEmptyStream);
-								int width = rank.get_Tiers().Count * (Math.Max(tierIconFilled.Width, tierIconEmpty.Width) + 2);
-								int height = Math.Max(tierIconFilled.Height, tierIconEmpty.Height);
-								using (Bitmap bitmap = new Bitmap(width, height))
+								await Task.Run(delegate
 								{
-									using (Graphics canvas = Graphics.FromImage(bitmap))
-									{
-										canvas.SetHighestQuality();
-										int drawn = 0;
-										for (int count = rank.get_Tiers().Count; drawn < count; drawn++)
-										{
-											int margin = ((drawn > 0) ? (drawn * 2) : 0);
-											Bitmap tierIcon = ((drawn < tier) ? tierIconFilled : tierIconEmpty);
-											canvas.DrawImage(tierIcon, new Rectangle(drawn * tierIcon.Width + margin, height / 2 - tierIcon.Height / 2, tierIcon.Width, tierIcon.Width), new Rectangle(0, 0, tierIcon.Width, tierIcon.Width), GraphicsUnit.Pixel);
-										}
-										canvas.Flush();
-										canvas.Save();
-									}
-									bitmap.Save(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_tier_icon.png", ImageFormat.Png);
-								}
-								tierIconFilled.Dispose();
-								tierIconFilledStream.Close();
-								tierIconEmpty.Dispose();
-								tierIconEmptyStream.Close();
+									Gw2Util.GeneratePvpTierImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_tier_icon.png", tier, rank.get_Tiers().Count);
+								});
 								await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_rank.txt", rank.get_Name() + " " + tier.ToRomanNumeral());
 								await SaveToImage(RenderUrl.op_Implicit(rank.get_OverlaySmall()), DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_rank_icon.png");
 							}
@@ -637,7 +672,7 @@ namespace Nekres.Stream_Out
 
 		private async Task UpdateStatsForPvp()
 		{
-			if (!Gw2ApiManager.HavePermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
+			if (!Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
 			{
 				(TokenPermission)1,
 				(TokenPermission)7
@@ -670,7 +705,7 @@ namespace Nekres.Stream_Out
 
 		private async Task UpdateWallet()
 		{
-			if (!Gw2ApiManager.HavePermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
+			if (!Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
 			{
 				(TokenPermission)1,
 				(TokenPermission)10
@@ -679,101 +714,117 @@ namespace Nekres.Stream_Out
 				return;
 			}
 			await ((IBlobClient<IApiV2ObjectList<AccountCurrency>>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
-				.get_Wallet()).GetAsync(default(CancellationToken)).ContinueWith(delegate(Task<IApiV2ObjectList<AccountCurrency>> task)
+				.get_Wallet()).GetAsync(default(CancellationToken)).ContinueWith((Func<Task<IApiV2ObjectList<AccountCurrency>>, Task>)async delegate(Task<IApiV2ObjectList<AccountCurrency>> task)
 			{
 				if (!task.IsFaulted)
 				{
-					int value = ((IEnumerable<AccountCurrency>)task.Result).First((AccountCurrency x) => x.get_Id() == 1).get_Value();
-					int num = value % 100;
-					value = (value - num) / 100;
-					int num2 = value % 100;
-					int num3 = (value - num2) / 100;
-					int num4 = ((num3 > 0) ? 3 : ((num2 <= 0) ? 1 : 2));
-					Font font = new Font("Arial", 12f);
-					Size size = num.ToString().Measure(font);
-					Size size2 = num2.ToString().Measure(font);
-					Size size3 = num3.ToString().Measure(font);
-					int num5 = Math.Max(Math.Max(size2.Height, size3.Height), size.Height);
-					Stream fileStream = ContentsManager.GetFileStream("copper_coin.png");
-					Bitmap bitmap = new Bitmap(fileStream).FitToHeight(num5 - 5);
-					Stream fileStream2 = ContentsManager.GetFileStream("silver_coin.png");
-					Bitmap bitmap2 = new Bitmap(fileStream2).FitToHeight(num5 - 5);
-					Stream fileStream3 = ContentsManager.GetFileStream("gold_coin.png");
-					Bitmap bitmap3 = new Bitmap(fileStream3).FitToHeight(num5 - 5);
-					int num6 = 5;
-					int num7 = size.Width + bitmap.Width;
-					if (num4 > 1)
+					int coins = ((IEnumerable<AccountCurrency>)task.Result).First((AccountCurrency x) => x.get_Id() == 1).get_Value();
+					await Task.Run(delegate
 					{
-						num7 += num6 + size2.Width + bitmap2.Width;
-					}
-					if (num4 > 2)
+						Gw2Util.GenerateCoinsImage(ModuleInstance.DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wallet_coins.png", coins);
+					});
+					int karma = ((IEnumerable<AccountCurrency>)task.Result).First((AccountCurrency x) => x.get_Id() == 2).get_Value();
+					await Task.Run(delegate
 					{
-						num7 += num6 + size3.Width + bitmap3.Width;
-					}
-					int num8 = Math.Max(num5, Math.Max(Math.Max(bitmap2.Height, bitmap3.Height), bitmap.Height));
-					using (Bitmap bitmap4 = new Bitmap(num7, num8))
+						Gw2Util.GenerateKarmaImage(ModuleInstance.DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wallet_karma.png", karma);
+					});
+				}
+			});
+		}
+
+		private async Task UpdateKillProofs()
+		{
+			await TaskUtil.GetJsonResponse<object>(string.Format("{0}{1}?lang={2}", "https://killproof.me/api/kp/", _accountName.get_Value(), GameService.Overlay.get_UserLocale().get_Value())).ContinueWith((Func<Task<(bool, object)>, Task>)async delegate(Task<(bool, dynamic)> task)
+			{
+				if (!task.IsFaulted && ((ValueTuple<bool, object>)task.Result).Item1)
+				{
+					IEnumerable<object> killProofs = ((dynamic)((ValueTuple<bool, object>)task.Result).Item2).killproofs;
+					if (!killProofs.IsNullOrEmpty())
 					{
-						using (Graphics graphics = Graphics.FromImage(bitmap4))
+						string killproofDir = DirectoriesManager.GetFullDirectoryPath("stream_out") + "/killproof.me";
+						if (!Directory.Exists(killproofDir))
 						{
-							graphics.SetHighestQuality();
-							int num9 = size3.Width;
-							if (num4 == 3)
-							{
-								using (SolidBrush brush = new SolidBrush(Gold))
-								{
-									graphics.DrawString(num3.ToString(), font, brush, 0f, num8 / 2 - size3.Height / 2);
-								}
-								graphics.DrawImage(bitmap3, new Rectangle(num9, num8 / 2 - bitmap3.Height / 2, bitmap3.Width, bitmap3.Width), new Rectangle(0, 0, bitmap3.Width, bitmap3.Width), GraphicsUnit.Pixel);
-							}
-							if (num4 != 1)
-							{
-								num9 += bitmap3.Width + num6;
-								using (SolidBrush brush2 = new SolidBrush(Silver))
-								{
-									graphics.DrawString(num2.ToString(), font, brush2, num9, num8 / 2 - size2.Height / 2);
-								}
-								num9 += size2.Width;
-								graphics.DrawImage(bitmap2, new Rectangle(num9, num8 / 2 - bitmap2.Height / 2, bitmap2.Width, bitmap2.Width), new Rectangle(0, 0, bitmap2.Width, bitmap2.Width), GraphicsUnit.Pixel);
-							}
-							num9 += bitmap2.Width + num6;
-							using (SolidBrush brush3 = new SolidBrush(Copper))
-							{
-								graphics.DrawString(num.ToString(), font, brush3, num9, num8 / 2 - size.Height / 2);
-							}
-							num9 += size.Width;
-							graphics.DrawImage(bitmap, new Rectangle(num9, num8 / 2 - bitmap.Height / 2, bitmap.Width, bitmap.Width), new Rectangle(0, 0, bitmap.Width, bitmap.Width), GraphicsUnit.Pixel);
-							graphics.Flush();
-							graphics.Save();
+							Directory.CreateDirectory(killproofDir);
 						}
-						bitmap4.Save(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wallet_coins.png", ImageFormat.Png);
-					}
-					bitmap.Dispose();
-					fileStream.Close();
-					bitmap2.Dispose();
-					fileStream2.Close();
-					bitmap3.Dispose();
-					fileStream3.Close();
-					string text = ((IEnumerable<AccountCurrency>)task.Result).First((AccountCurrency x) => x.get_Id() == 2).get_Value().ToString("N0", GameService.Overlay.CultureInfo());
-					Size size4 = text.Measure(font);
-					Stream fileStream4 = ContentsManager.GetFileStream("karma.png");
-					Bitmap bitmap5 = new Bitmap(fileStream4).FitToHeight(size4.Height);
-					using (Bitmap bitmap6 = new Bitmap(size4.Width + bitmap5.Width, Math.Max(size4.Height, bitmap5.Height)))
-					{
-						using (Graphics graphics2 = Graphics.FromImage(bitmap6))
+						int count = 0;
+						AsyncTaskMethodBuilder asyncTaskMethodBuilder = default(AsyncTaskMethodBuilder);
+						foreach (object killProof in killProofs)
 						{
-							graphics2.SetHighestQuality();
-							using (SolidBrush brush4 = new SolidBrush(Karma))
+							switch ((int)((dynamic)killProof).id)
 							{
-								graphics2.DrawString(text, font, brush4, 0f, size4.Height / 2 - bitmap5.Height / 2);
+							case 88485:
+							{
+								object awaiter5 = FileUtil.WriteAllTextAsync(killproofDir + "/legendary_divination.txt", ((dynamic)killProof).amount.ToString()).GetAwaiter();
+								if (!(bool)((dynamic)awaiter5).IsCompleted)
+								{
+									ICriticalNotifyCompletion awaiter2 = awaiter5 as ICriticalNotifyCompletion;
+									_003C_003CUpdateKillProofs_003Eb__82_0_003Ed stateMachine = (_003C_003CUpdateKillProofs_003Eb__82_0_003Ed)/*Error near IL_047e: stateMachine*/;
+									if (awaiter2 == null)
+									{
+										INotifyCompletion awaiter3 = (INotifyCompletion)awaiter5;
+										asyncTaskMethodBuilder.AwaitOnCompleted(ref awaiter3, ref stateMachine);
+									}
+									else
+									{
+										asyncTaskMethodBuilder.AwaitUnsafeOnCompleted(ref awaiter2, ref stateMachine);
+									}
+									/*Error near IL_04b6: leave MoveNext - await not detected correctly*/;
+								}
+								((dynamic)awaiter5).GetResult();
+								count++;
+								break;
 							}
-							graphics2.DrawImage(bitmap5, new Rectangle(size4.Width, num8 / 2 - bitmap5.Height / 2, bitmap5.Width, bitmap5.Width), new Rectangle(0, 0, bitmap5.Width, bitmap5.Width), GraphicsUnit.Pixel);
-							graphics2.Flush();
-							graphics2.Save();
+							case 77302:
+							{
+								object awaiter4 = FileUtil.WriteAllTextAsync(killproofDir + "/legendary_insight.txt", ((dynamic)killProof).amount.ToString()).GetAwaiter();
+								if (!(bool)((dynamic)awaiter4).IsCompleted)
+								{
+									ICriticalNotifyCompletion awaiter2 = awaiter4 as ICriticalNotifyCompletion;
+									_003C_003CUpdateKillProofs_003Eb__82_0_003Ed stateMachine = (_003C_003CUpdateKillProofs_003Eb__82_0_003Ed)/*Error near IL_0754: stateMachine*/;
+									if (awaiter2 == null)
+									{
+										INotifyCompletion awaiter3 = (INotifyCompletion)awaiter4;
+										asyncTaskMethodBuilder.AwaitOnCompleted(ref awaiter3, ref stateMachine);
+									}
+									else
+									{
+										asyncTaskMethodBuilder.AwaitUnsafeOnCompleted(ref awaiter2, ref stateMachine);
+									}
+									/*Error near IL_078c: leave MoveNext - await not detected correctly*/;
+								}
+								((dynamic)awaiter4).GetResult();
+								count++;
+								break;
+							}
+							case 94020:
+							{
+								object awaiter = FileUtil.WriteAllTextAsync(killproofDir + "/unstable_fractal_essence.txt", ((dynamic)killProof).amount.ToString()).GetAwaiter();
+								if (!(bool)((dynamic)awaiter).IsCompleted)
+								{
+									ICriticalNotifyCompletion awaiter2 = awaiter as ICriticalNotifyCompletion;
+									_003C_003CUpdateKillProofs_003Eb__82_0_003Ed stateMachine = (_003C_003CUpdateKillProofs_003Eb__82_0_003Ed)/*Error near IL_0a2a: stateMachine*/;
+									if (awaiter2 == null)
+									{
+										INotifyCompletion awaiter3 = (INotifyCompletion)awaiter;
+										asyncTaskMethodBuilder.AwaitOnCompleted(ref awaiter3, ref stateMachine);
+									}
+									else
+									{
+										asyncTaskMethodBuilder.AwaitUnsafeOnCompleted(ref awaiter2, ref stateMachine);
+									}
+									/*Error near IL_0a62: leave MoveNext - await not detected correctly*/;
+								}
+								((dynamic)awaiter).GetResult();
+								count++;
+								break;
+							}
+							}
+							if (count == 3)
+							{
+								break;
+							}
 						}
-						bitmap6.Save(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wallet_karma.png");
 					}
-					bitmap5.Dispose();
-					fileStream4.Close();
 				}
 			});
 		}

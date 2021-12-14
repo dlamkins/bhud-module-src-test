@@ -4,7 +4,7 @@ using System.Drawing.Drawing2D;
 
 namespace Nekres.Stream_Out
 {
-	public static class BitmapExtensions
+	internal static class BitmapExtensions
 	{
 		public static Bitmap FitToHeight(this Bitmap source, int destHeight)
 		{
