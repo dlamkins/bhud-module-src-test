@@ -15,6 +15,7 @@ using Blish_HUD.Settings;
 using Blish_HUD.Settings.UI.Views;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using SemVer;
 
 namespace BhModule.Community.Pathing
 {
@@ -90,13 +91,16 @@ namespace BhModule.Community.Pathing
 			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c2: Expected O, but got Unknown
-			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0106: Expected O, but got Unknown
-			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014a: Expected O, but got Unknown
-			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018e: Expected O, but got Unknown
+			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bd: Expected O, but got Unknown
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f6: Expected O, but got Unknown
+			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013a: Expected O, but got Unknown
+			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017e: Expected O, but got Unknown
+			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c2: Expected O, but got Unknown
 			CornerIcon val = new CornerIcon();
 			val.set_IconName(Strings.General_UiName);
 			val.set_Icon(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\pathing-icon.png")));
@@ -106,6 +110,7 @@ namespace BhModule.Community.Pathing
 			((WindowBase2)val2).set_Title(Strings.General_UiName);
 			((Control)val2).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((Control)val2).set_Location(new Point(100, 100));
+			((Control)val2).set_ClipsBounds(Program.get_OverlayVersion() == new Version(0, 11, 2, (string)null, (string)null) && GameService.Graphics.GetDpiScaleRatio() != 1f);
 			((WindowBase2)val2).set_Emblem(ContentsManager.GetTexture("png\\controls\\1615829.png"));
 			_settingsWindow = val2;
 			_settingsWindow.get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156740+155150.png")), (Func<IView>)(() => (IView)new SettingsView(_moduleSettings.PackSettings, -1)), Strings.Window_MainSettingsTab, (int?)null));

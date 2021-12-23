@@ -803,29 +803,33 @@ namespace BhModule.Community.Pathing.Entity
 
 		private void Populate_Behaviors(TmfLib.Prototype.AttributeCollection collection, IPackResourceManager resourceManager)
 		{
-			if (collection.TryGetSubset("festival", out var attributes14))
+			if (collection.TryGetSubset("festival", out var attributes15))
 			{
-				AddBehavior(FestivalFilter.BuildFromAttributes(attributes14));
+				AddBehavior(FestivalFilter.BuildFromAttributes(attributes15));
 			}
-			if (collection.TryGetSubset("mount", out var attributes13))
+			if (collection.TryGetSubset("mount", out var attributes14))
 			{
-				AddBehavior(MountFilter.BuildFromAttributes(attributes13));
+				AddBehavior(MountFilter.BuildFromAttributes(attributes14));
 			}
-			if (collection.TryGetSubset("profession", out var attributes12))
+			if (collection.TryGetSubset("profession", out var attributes13))
 			{
-				AddBehavior(ProfessionFilter.BuildFromAttributes(attributes12));
+				AddBehavior(ProfessionFilter.BuildFromAttributes(attributes13));
 			}
-			if (collection.TryGetSubset("race", out var attributes11))
+			if (collection.TryGetSubset("race", out var attributes12))
 			{
-				AddBehavior(RaceFilter.BuildFromAttributes(attributes11));
+				AddBehavior(RaceFilter.BuildFromAttributes(attributes12));
 			}
-			if (collection.TryGetSubset("specialization", out var attributes10))
+			if (collection.TryGetSubset("specialization", out var attributes11))
 			{
-				AddBehavior(SpecializationFilter.BuildFromAttributes(attributes10));
+				AddBehavior(SpecializationFilter.BuildFromAttributes(attributes11));
 			}
-			if (collection.TryGetSubset("maptype", out var attributes9))
+			if (collection.TryGetSubset("maptype", out var attributes10))
 			{
-				AddBehavior(MapTypeFilter.BuildFromAttributes(attributes9));
+				AddBehavior(MapTypeFilter.BuildFromAttributes(attributes10));
+			}
+			if (collection.TryGetSubset("schedule", out var attributes9))
+			{
+				AddBehavior(ScheduleFilter.BuildFromAttributes(attributes9));
 			}
 			if (collection.TryGetSubset("behavior", out var attributes8))
 			{

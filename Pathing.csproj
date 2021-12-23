@@ -25,12 +25,16 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="Gw2Sharp" />
     <Reference Include="System.Numerics" />
+    <Reference Include="Cronos">
+      <HintPath>..\..\working\Cronos.dll</HintPath>
+    </Reference>
     <Reference Include="Flurl.Http" />
     <Reference Include="YamlDotNet">
       <HintPath>..\..\working\YamlDotNet.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json" />
     <Reference Include="Flurl" />
+    <Reference Include="SemVer" />
     <Reference Include="AsyncClipboardService" />
     <Reference Include="System.Net.Http" />
   </ItemGroup>
