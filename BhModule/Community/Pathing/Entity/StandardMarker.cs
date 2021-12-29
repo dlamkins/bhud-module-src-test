@@ -647,13 +647,9 @@ namespace BhModule.Community.Pathing.Entity
 		{
 			MapDisplaySize = _packState.UserResourceStates.Population.MarkerPopulationDefaults.MapDisplaySize;
 			ScaleOnMapWithZoom = _packState.UserResourceStates.Population.MarkerPopulationDefaults.ScaleOnMapWithZoom;
-			if (collection.TryPopAttribute("mapdisplaysize", out var attribute2))
+			if (collection.TryPopAttribute("mapdisplaysize", out var attribute))
 			{
-				MapDisplaySize = attribute2.GetValueAsFloat(MapDisplaySize);
-			}
-			if (collection.TryPopAttribute("scaleonmapwithzoom", out var attribute))
-			{
-				ScaleOnMapWithZoom = attribute.GetValueAsBool();
+				MapDisplaySize = attribute.GetValueAsFloat(MapDisplaySize);
 			}
 		}
 
