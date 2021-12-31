@@ -43,6 +43,10 @@ namespace BhModule.Community.Pathing.Entity
 		[Browsable(false)]
 		public abstract float DrawOrder { get; }
 
+		[Description("Indicates if the entity is currently filtered.")]
+		[Category("State Debug")]
+		public bool BehaviorFiltered { get; private set; }
+
 		[Browsable(false)]
 		public int MapId { get; set; }
 
@@ -119,19 +123,21 @@ namespace BhModule.Community.Pathing.Entity
 
 		private void UpdateBehaviors(GameTime gameTime)
 		{
+			bool filtered = false;
 			foreach (IBehavior behavior in Behaviors)
 			{
 				((IUpdatable)behavior).Update(gameTime);
+				ICanFilter filter = behavior as ICanFilter;
+				if (filter != null)
+				{
+					filtered |= filter.IsFiltered();
+				}
 			}
-			if (DistanceToPlayer <= TriggerRange)
-			{
-				Focus();
-			}
-			else
-			{
-				Unfocus();
-			}
+			BehaviorFiltered = _packState.UserConfiguration.PackAllowMarkersToAutomaticallyHide.get_Value() && filtered;
+			HandleBehavior();
 		}
+
+		public abstract void HandleBehavior();
 
 		public bool IsFiltered(EntityRenderTarget renderTarget)
 		{
@@ -154,18 +160,7 @@ namespace BhModule.Community.Pathing.Entity
 			{
 				return true;
 			}
-			if (_packState.UserConfiguration.PackAllowMarkersToAutomaticallyHide.get_Value())
-			{
-				foreach (IBehavior behavior in Behaviors)
-				{
-					ICanFilter filterable = behavior as ICanFilter;
-					if (filterable != null && filterable.IsFiltered())
-					{
-						return true;
-					}
-				}
-			}
-			return false;
+			return BehaviorFiltered;
 		}
 
 		protected Vector2 GetScaledLocation(double x, double y, double scale, (double X, double Y) offsets)

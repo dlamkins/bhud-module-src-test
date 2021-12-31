@@ -32,7 +32,10 @@ namespace BhModule.Community.Pathing.Behavior.Modifier
 
 		public void Interact(bool autoTriggered)
 		{
-			_packstate.CategoryStates.SetInactive(Category, !_packstate.CategoryStates.GetCategoryInactive(Category));
+			if (!_pathingEntity.BehaviorFiltered)
+			{
+				_packstate.CategoryStates.SetInactive(Category, !_packstate.CategoryStates.GetCategoryInactive(Category));
+			}
 		}
 	}
 }

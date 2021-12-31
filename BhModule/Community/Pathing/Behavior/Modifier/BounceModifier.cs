@@ -63,15 +63,18 @@ namespace BhModule.Community.Pathing.Behavior.Modifier
 				{
 					bounceAnimation.CancelAndComplete();
 				}
-				_bounceAnimation = ((TweenerImpl)GameService.Animation.get_Tweener()).Tween<StandardMarker>(_pathingEntity, (object)new
+				if (!_pathingEntity.BehaviorFiltered)
 				{
-					HeightOffset = _originalVerticalOffset + BounceHeight
-				}, BounceDuration, BounceDelay, true).From((object)new
-				{
-					HeightOffset = _originalVerticalOffset
-				}).Ease((Func<float, float>)Ease.QuadInOut)
-					.Repeat(-1)
-					.Reflect();
+					_bounceAnimation = ((TweenerImpl)GameService.Animation.get_Tweener()).Tween<StandardMarker>(_pathingEntity, (object)new
+					{
+						HeightOffset = _originalVerticalOffset + BounceHeight
+					}, BounceDuration, BounceDelay, true).From((object)new
+					{
+						HeightOffset = _originalVerticalOffset
+					}).Ease((Func<float, float>)Ease.QuadInOut)
+						.Repeat(-1)
+						.Reflect();
+				}
 			}
 		}
 

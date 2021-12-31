@@ -219,7 +219,8 @@ namespace BhModule.Community.Pathing.Entity
 		[Category("Behavior")]
 		public override float TriggerRange { get; set; }
 
-		[Browsable(false)]
+		[Description("The focused state indicates if the player is within the trigger range which may activate a behavior.")]
+		[Category("State Debug")]
 		public bool Focused
 		{
 			get
@@ -794,6 +795,18 @@ namespace BhModule.Community.Pathing.Entity
 			if (behavior != null)
 			{
 				base.Behaviors.Add(behavior);
+			}
+		}
+
+		public override void HandleBehavior()
+		{
+			if (base.DistanceToPlayer <= TriggerRange)
+			{
+				Focus();
+			}
+			else
+			{
+				Unfocus();
 			}
 		}
 

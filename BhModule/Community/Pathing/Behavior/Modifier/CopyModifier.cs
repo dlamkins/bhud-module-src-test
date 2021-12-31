@@ -40,7 +40,7 @@ namespace BhModule.Community.Pathing.Behavior.Modifier
 
 		public void Interact(bool autoTriggered)
 		{
-			if (_packState.UserConfiguration.PackMarkerConsentToClipboard.get_Value() == MarkerClipboardConsentLevel.Never || (_packState.UserConfiguration.PackMarkerConsentToClipboard.get_Value() == MarkerClipboardConsentLevel.OnlyWhenInteractedWith && autoTriggered))
+			if (_packState.UserConfiguration.PackMarkerConsentToClipboard.get_Value() == MarkerClipboardConsentLevel.Never || (_packState.UserConfiguration.PackMarkerConsentToClipboard.get_Value() == MarkerClipboardConsentLevel.OnlyWhenInteractedWith && autoTriggered) || _pathingEntity.BehaviorFiltered)
 			{
 				return;
 			}

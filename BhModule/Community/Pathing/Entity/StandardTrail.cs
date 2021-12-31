@@ -546,6 +546,10 @@ namespace BhModule.Community.Pathing.Entity
 			}
 		}
 
+		public override void HandleBehavior()
+		{
+		}
+
 		private void Populate_Behaviors(AttributeCollection collection, IPackResourceManager resourceManager)
 		{
 			if (collection.TryGetSubset("festival", out var attributes8))
@@ -662,7 +666,7 @@ namespace BhModule.Community.Pathing.Entity
 			Vector3 val;
 			Vector3 prevPoint = (val = pointsArr[0]);
 			yield return val;
-			_003C_003Ec__DisplayClass93_0 CS_0024_003C_003E8__locals0 = default(_003C_003Ec__DisplayClass93_0);
+			_003C_003Ec__DisplayClass94_0 CS_0024_003C_003E8__locals0 = default(_003C_003Ec__DisplayClass94_0);
 			for (int j = 0; j < pointsArr.Length - 1; j++)
 			{
 				Vector3 p0 = pointsArr[j];

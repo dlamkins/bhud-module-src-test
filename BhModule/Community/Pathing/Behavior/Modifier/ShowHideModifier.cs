@@ -41,7 +41,10 @@ namespace BhModule.Community.Pathing.Behavior.Modifier
 
 		public void Interact(bool autoTriggered)
 		{
-			_packstate.CategoryStates.SetInactive(Category, !ShowOnInteract);
+			if (!_pathingEntity.BehaviorFiltered)
+			{
+				_packstate.CategoryStates.SetInactive(Category, !ShowOnInteract);
+			}
 		}
 
 		public void Focus()
