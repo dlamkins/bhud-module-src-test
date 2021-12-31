@@ -605,56 +605,39 @@ namespace Nekres.Stream_Out
 								int tier = 1;
 								bool found = false;
 								int ranksTotal = season.get_Ranks().Count;
+								List<PvpSeasonRankTier> tiers = season.get_Ranks().SelectMany((PvpSeasonRank x) => x.get_Tiers()).ToList();
+								int maxRating = tiers.MaxBy((PvpSeasonRankTier y) => y.get_Rating()).get_Rating();
+								int minRating = tiers.MinBy((PvpSeasonRankTier y) => y.get_Rating()).get_Rating();
+								if (standing.get_Current().get_Rating() > maxRating)
+								{
+									rank = season.get_Ranks().Last();
+									tier = rank.get_Tiers().Count;
+									found = true;
+								}
+								if (standing.get_Current().get_Rating() < minRating)
+								{
+									rank = season.get_Ranks().First();
+									tier = 1;
+									found = true;
+								}
 								for (int i = 0; i < ranksTotal; i++)
 								{
+									if (found)
+									{
+										break;
+									}
 									PvpSeasonRank currentRank = season.get_Ranks()[i];
-									PvpSeasonRank nextRank = ((i + 1 < ranksTotal) ? season.get_Ranks()[i + 1] : null);
 									int tiersTotal = currentRank.get_Tiers().Count;
 									for (int j = 0; j < tiersTotal; j++)
 									{
-										int currentTier = currentRank.get_Tiers()[j].get_Rating();
-										object obj;
-										if (j + 1 >= tiersTotal)
-										{
-											obj = ((nextRank != null) ? nextRank.get_Tiers()[0] : null);
-										}
-										else
-										{
-											obj = currentRank.get_Tiers()[j + 1];
-										}
-										PvpSeasonRankTier nextTier = (PvpSeasonRankTier)obj;
-										if (i == 0 && j == 0 && standing.get_Current().get_Rating() < currentTier)
-										{
-											found = true;
-											break;
-										}
-										if (i + 1 == ranksTotal && j + 1 == tiersTotal && standing.get_Current().get_Rating() >= currentTier)
-										{
-											rank = season.get_Ranks().Last();
-											tier = tiersTotal;
-											found = true;
-											break;
-										}
-										int num;
-										if (currentTier <= standing.get_Current().get_Rating())
-										{
-											num = ((standing.get_Current().get_Rating() < ((nextTier != null) ? nextTier.get_Rating() : 0)) ? 1 : 0);
-										}
-										else
-										{
-											num = 0;
-										}
-										if (num != 0)
+										int nextTierRating = currentRank.get_Tiers()[j].get_Rating();
+										if (!(standing.get_Current().get_Rating() > nextTierRating))
 										{
 											tier = j + 1;
 											rank = currentRank;
 											found = true;
 											break;
 										}
-									}
-									if (found)
-									{
-										break;
 									}
 								}
 								await Task.Run(delegate
