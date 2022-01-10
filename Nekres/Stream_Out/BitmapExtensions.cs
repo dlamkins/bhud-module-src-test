@@ -34,5 +34,44 @@ namespace Nekres.Stream_Out
 			source.Dispose();
 			return newBitmap;
 		}
+
+		public static void Colorize(this Bitmap source, Color replacement)
+		{
+			for (int x = 0; x < source.Width; x++)
+			{
+				for (int y = 0; y < source.Height; y++)
+				{
+					source.SetPixel(x, y, Color.FromArgb(source.GetPixel(x, y).A, replacement.R, replacement.G, replacement.B));
+				}
+			}
+		}
+
+		public static Bitmap Merge(this Bitmap bmp1, Bitmap bmp2)
+		{
+			Bitmap result = new Bitmap(Math.Max(bmp1.Width, bmp2.Width), Math.Max(bmp1.Height, bmp2.Height));
+			using (Graphics g = Graphics.FromImage(result))
+			{
+				g.DrawImage(bmp1, Point.Empty);
+				g.DrawImage(bmp2, Point.Empty);
+			}
+			return result;
+		}
+
+		public static void Flip(this Bitmap source, bool xFlip, bool yFlip)
+		{
+			if (xFlip)
+			{
+				if (yFlip)
+				{
+					source.RotateFlip(RotateFlipType.Rotate180FlipNone);
+					return;
+				}
+				source.RotateFlip(RotateFlipType.RotateNoneFlipX);
+			}
+			if (yFlip)
+			{
+				source.RotateFlip(RotateFlipType.Rotate180FlipX);
+			}
+		}
 	}
 }

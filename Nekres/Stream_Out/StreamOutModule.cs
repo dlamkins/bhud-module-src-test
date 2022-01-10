@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
@@ -39,6 +40,8 @@ namespace Nekres.Stream_Out
 		private SettingEntry<bool> _onlyLastDigitSettingEntry;
 
 		private SettingEntry<UnicodeSigning> _addUnicodeSymbols;
+
+		private SettingEntry<bool> _useCatmanderTag;
 
 		private SettingEntry<DateTime?> _resetTimeWvW;
 
@@ -76,9 +79,19 @@ namespace Nekres.Stream_Out
 
 		private const string PROFESSION_ICON = "profession_icon.png";
 
+		private const string COMMANDER_ICON = "commander_icon.png";
+
 		private const string WALLET_COINS = "wallet_coins.png";
 
 		private const string WALLET_KARMA = "wallet_karma.png";
+
+		private const string GUILD_NAME = "guild_name.txt";
+
+		private const string GUILD_TAG = "guild_tag.txt";
+
+		private const string GUILD_EMBLEM = "guild_emblem.png";
+
+		private const string GUILD_MOTD = "guild_motd.txt";
 
 		private const string WVW_KILLS_WEEK = "wvw_kills_week.txt";
 
@@ -98,7 +111,7 @@ namespace Nekres.Stream_Out
 
 		private const string PVP_TIER_ICON = "pvp_tier_icon.png";
 
-		private const string PVP_WIN_LOSS_RATIO = "pvp_win_loss_ratio.txt";
+		private const string PVP_WINRATE = "pvp_winrate.txt";
 
 		private const string KILLPROOF_ME_UNSTABLE_FRACTAL_ESSENCE = "unstable_fractal_essence.txt";
 
@@ -115,6 +128,12 @@ namespace Nekres.Stream_Out
 		private const string SWORDS = "⚔";
 
 		private const string KILLPROOF_API_URL = "https://killproof.me/api/kp/";
+
+		private Bitmap Commander_Icon;
+
+		private Bitmap Catmander_Icon;
+
+		private Regex GUILD_MOTD_PUBLIC = new Regex("(?<=\\[public\\]).*(?=\\[\\/public\\])", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Singleline);
 
 		private bool _hasSubToken;
 
@@ -141,6 +160,7 @@ namespace Nekres.Stream_Out
 		{
 			_onlyLastDigitSettingEntry = settings.DefineSetting<bool>("OnlyLastDigits", true, (Func<string>)(() => "Only Output Last Digits of Server Address"), (Func<string>)(() => "Only outputs the last digits of the server address you are currently connected to.\nThis is the address shown when entering \"/ip\" in chat."));
 			_addUnicodeSymbols = settings.DefineSetting<UnicodeSigning>("UnicodeSymbols", UnicodeSigning.Suffixed, (Func<string>)(() => "Numeric Value Signing"), (Func<string>)(() => "The way numeric values should be signed with unicode symbols."));
+			_useCatmanderTag = settings.DefineSetting<bool>("CatmanderTag", false, (Func<string>)(() => "Use Catmander Tag"), (Func<string>)(() => "Replaces the commander_icon.png with the Catmander icon if you tag up as Commander in-game."));
 			SettingCollection cache = settings.AddSubCollection("CachedValues", false);
 			cache.set_RenderInUi(false);
 			_accountGuid = cache.DefineSetting<Guid>("AccountGuid", Guid.Empty, (Func<string>)null, (Func<string>)null);
@@ -190,35 +210,43 @@ namespace Nekres.Stream_Out
 				Gw2Util.GenerateKarmaImage(ModuleInstance.DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wallet_karma.png", 10000000, overwrite: false);
 			});
 			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_rank.txt", "Bronze I", overwrite: false);
-			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_win_loss_ratio.txt", "1.0", overwrite: false);
+			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_winrate.txt", "50%", overwrite: false);
 			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wvw_rank.txt", "1 : Invader", overwrite: false);
-			ExtractIcons("1614804.png", DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_rank_icon.png");
-			string staticDir = DirectoriesManager.GetFullDirectoryPath("stream_out") + "/static";
-			if (!Directory.Exists(staticDir))
+			string moduleDir = DirectoriesManager.GetFullDirectoryPath("stream_out");
+			ExtractIcons("1614804.png", moduleDir, "pvp_rank_icon.png");
+			ExtractIcons(_useCatmanderTag.get_Value() ? "catmander_tag_white.png" : "commander_tag_white.png", moduleDir, "commander_icon.png");
+			if (!GameService.Gw2Mumble.get_PlayerCharacter().get_IsCommander())
 			{
-				Directory.CreateDirectory(staticDir);
+				ClearImage(moduleDir + "/commander_icon.png");
 			}
-			ExtractIcons("legendary_divination.png", staticDir + "/legendary_divination.png");
-			ExtractIcons("legendary_insight.png", staticDir + "/legendary_insight.png");
-			ExtractIcons("unstable_fractal_essence.png", staticDir + "/unstable_fractal_essence.png");
+			ExtractIcons("legendary_divination.png", moduleDir + "/static/", "legendary_divination.png");
+			ExtractIcons("legendary_insight.png", moduleDir + "/static/", "legendary_insight.png");
+			ExtractIcons("unstable_fractal_essence.png", moduleDir + "/static/", "unstable_fractal_essence.png");
 		}
 
-		private void ExtractIcons(string iconName, string iconOutputName)
+		private void ExtractIcons(string iconName, string outputDir, string iconOutputName)
 		{
-			if (File.Exists(iconName))
+			if (!Directory.Exists(outputDir))
+			{
+				Directory.CreateDirectory(outputDir);
+			}
+			string fullname = outputDir + "/" + iconOutputName;
+			if (File.Exists(fullname))
 			{
 				return;
 			}
 			using Stream texStr = ContentsManager.GetFileStream(iconName);
 			using Bitmap icon = new Bitmap(texStr);
-			icon.Save(iconOutputName, ImageFormat.Png);
+			icon.Save(fullname, ImageFormat.Png);
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
 			GameService.Gw2Mumble.get_PlayerCharacter().add_NameChanged((EventHandler<ValueEventArgs<string>>)OnNameChanged);
 			GameService.Gw2Mumble.get_PlayerCharacter().add_SpecializationChanged((EventHandler<ValueEventArgs<int>>)OnSpecializationChanged);
+			GameService.Gw2Mumble.get_PlayerCharacter().add_IsCommanderChanged((EventHandler<ValueEventArgs<bool>>)OnIsCommanderChanged);
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
+			_useCatmanderTag.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUseCatmanderTagSettingChanged);
 			OnNameChanged(null, new ValueEventArgs<string>(GameService.Gw2Mumble.get_PlayerCharacter().get_Name()));
 			OnSpecializationChanged(null, new ValueEventArgs<int>(GameService.Gw2Mumble.get_PlayerCharacter().get_Specialization()));
 			OnMapChanged(null, new ValueEventArgs<int>(GameService.Gw2Mumble.get_CurrentMap().get_Id()));
@@ -242,6 +270,7 @@ namespace Nekres.Stream_Out
 				await UpdateRankForWvw();
 				await UpdateKillsAndDeaths();
 				await UpdateKillProofs();
+				await UpdateGuild();
 			}
 		}
 
@@ -283,7 +312,9 @@ namespace Nekres.Stream_Out
 			GameService.Gw2Mumble.get_PlayerCharacter().remove_NameChanged((EventHandler<ValueEventArgs<string>>)OnNameChanged);
 			GameService.Gw2Mumble.get_PlayerCharacter().remove_SpecializationChanged((EventHandler<ValueEventArgs<int>>)OnSpecializationChanged);
 			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
+			GameService.Gw2Mumble.get_PlayerCharacter().remove_IsCommanderChanged((EventHandler<ValueEventArgs<bool>>)OnIsCommanderChanged);
 			Gw2ApiManager.remove_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)SubTokenUpdated);
+			_useCatmanderTag.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUseCatmanderTagSettingChanged);
 			ModuleInstance = null;
 		}
 
@@ -361,6 +392,48 @@ namespace Nekres.Stream_Out
 			await streamOutModule.SaveToImage(val.HasValue ? RenderUrl.op_Implicit(val.GetValueOrDefault()) : null, DirectoriesManager.GetFullDirectoryPath("stream_out") + "/profession_icon.png");
 		}
 
+		private async void OnIsCommanderChanged(object o, ValueEventArgs<bool> e)
+		{
+			if (!e.get_Value())
+			{
+				ClearImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/commander_icon.png");
+			}
+			else
+			{
+				SaveCommanderIcon(_useCatmanderTag.get_Value());
+			}
+		}
+
+		private async void SaveCommanderIcon(bool useCatmanderIcon)
+		{
+			if (useCatmanderIcon)
+			{
+				if (Catmander_Icon == null)
+				{
+					using Stream catmanderIconStream = ContentsManager.GetFileStream("catmander_tag_white.png");
+					Catmander_Icon = new Bitmap(catmanderIconStream);
+					await catmanderIconStream.FlushAsync();
+				}
+				Catmander_Icon.Save(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/commander_icon.png", ImageFormat.Png);
+				return;
+			}
+			if (Commander_Icon == null)
+			{
+				using Stream commanderIconStream = ContentsManager.GetFileStream("commander_tag_white.png");
+				Commander_Icon = new Bitmap(commanderIconStream);
+				await commanderIconStream.FlushAsync();
+			}
+			Commander_Icon.Save(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/commander_icon.png", ImageFormat.Png);
+		}
+
+		private void OnUseCatmanderTagSettingChanged(object o, ValueChangedEventArgs<bool> e)
+		{
+			if (GameService.Gw2Mumble.get_PlayerCharacter().get_IsCommander())
+			{
+				SaveCommanderIcon(e.get_NewValue());
+			}
+		}
+
 		private async Task SaveToImage(string renderUri, string path)
 		{
 			await Gw2ApiManager.get_Gw2ApiClient().get_Render().DownloadToByteArrayAsync(renderUri, default(CancellationToken))
@@ -432,6 +505,108 @@ namespace Nekres.Stream_Out
 				return -1;
 			}
 			return await ((IAllExpandableClient<Character>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Characters()).AllAsync(default(CancellationToken)).ContinueWith((Task<IApiV2ObjectList<Character>> task) => task.IsFaulted ? (-1) : ((IEnumerable<Character>)task.Result).Sum((Character x) => x.get_Deaths()));
+		}
+
+		private async Task UpdateGuild()
+		{
+			int num;
+			if (GameService.Gw2Mumble.get_IsAvailable())
+			{
+				Gw2ApiManager gw2ApiManager = Gw2ApiManager;
+				TokenPermission[] array = new TokenPermission[3];
+				RuntimeHelpers.InitializeArray(array, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);
+				num = ((!gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)array)) ? 1 : 0);
+			}
+			else
+			{
+				num = 1;
+			}
+			if (num != 0)
+			{
+				return;
+			}
+			Guid guildId = await ((IBlobClient<CharactersCore>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Characters()
+				.get_Item(GameService.Gw2Mumble.get_PlayerCharacter().get_Name())
+				.get_Core()).GetAsync(default(CancellationToken)).ContinueWith((Task<CharactersCore> task) => task.IsFaulted ? Guid.Empty : task.Result.get_Guild());
+			if (guildId == Guid.Empty)
+			{
+				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_name.txt", string.Empty);
+				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_tag.txt", string.Empty);
+				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_motd.txt", string.Empty);
+				ClearImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_emblem.png");
+				return;
+			}
+			await ((IBlobClient<Guild>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Guild()
+				.get_Item(guildId)).GetAsync(default(CancellationToken)).ContinueWith((Func<Task<Guild>, Task>)async delegate(Task<Guild> task)
+			{
+				if (!task.IsFaulted)
+				{
+					string name = task.Result.get_Name();
+					string tag = task.Result.get_Tag();
+					string motd = task.Result.get_Motd() ?? string.Empty;
+					await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_name.txt", name);
+					await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_tag.txt", "[" + tag + "]");
+					await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_motd.txt", GUILD_MOTD_PUBLIC.Match(motd).Value);
+					GuildEmblem emblem = task.Result.get_Emblem();
+					if (emblem != null)
+					{
+						Emblem bg = await ((IBulkExpandableClient<Emblem, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Emblem()
+							.get_Backgrounds()).GetAsync(emblem.get_Background().get_Id(), default(CancellationToken));
+						Emblem fg = await ((IBulkExpandableClient<Emblem, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Emblem()
+							.get_Foregrounds()).GetAsync(emblem.get_Foreground().get_Id(), default(CancellationToken));
+						List<RenderUrl> layersCombined = new List<RenderUrl>();
+						layersCombined.AddRange(bg.get_Layers());
+						layersCombined.AddRange(fg.get_Layers().Skip(1));
+						List<Bitmap> layers = new List<Bitmap>();
+						foreach (RenderUrl item in layersCombined)
+						{
+							RenderUrl renderUrl = item;
+							using (MemoryStream textureStream = new MemoryStream())
+							{
+								await ((RenderUrl)(ref renderUrl)).DownloadToStreamAsync((Stream)textureStream, default(CancellationToken));
+								layers.Add(new Bitmap(textureStream));
+							}
+							renderUrl = default(RenderUrl);
+						}
+						List<int> colorsCombined = new List<int>();
+						colorsCombined.AddRange(emblem.get_Background().get_Colors());
+						colorsCombined.AddRange(emblem.get_Foreground().get_Colors());
+						List<Color> colors = new List<Color>();
+						foreach (int color2 in colorsCombined)
+						{
+							List<Color> list = colors;
+							list.Add(await ((IBulkExpandableClient<Color, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Colors()).GetAsync(color2, default(CancellationToken)));
+						}
+						Bitmap result = null;
+						for (int i = 0; i < layers.Count; i++)
+						{
+							Color color = Color.FromArgb(colors[i].get_Cloth().get_Rgb()[0], colors[i].get_Cloth().get_Rgb()[1], colors[i].get_Cloth().get_Rgb()[2]);
+							Bitmap layer = layers[i];
+							layer.Colorize(color);
+							if (i < bg.get_Layers().Count)
+							{
+								layer.Flip(((IEnumerable<ApiEnum<GuildEmblemFlag>>)emblem.get_Flags()).Any((ApiEnum<GuildEmblemFlag> x) => x == ApiEnum<GuildEmblemFlag>.op_Implicit((GuildEmblemFlag)0)), ((IEnumerable<ApiEnum<GuildEmblemFlag>>)emblem.get_Flags()).Any((ApiEnum<GuildEmblemFlag> x) => x == ApiEnum<GuildEmblemFlag>.op_Implicit((GuildEmblemFlag)1)));
+							}
+							else
+							{
+								layer.Flip(((IEnumerable<ApiEnum<GuildEmblemFlag>>)emblem.get_Flags()).Any((ApiEnum<GuildEmblemFlag> x) => x == ApiEnum<GuildEmblemFlag>.op_Implicit((GuildEmblemFlag)2)), ((IEnumerable<ApiEnum<GuildEmblemFlag>>)emblem.get_Flags()).Any((ApiEnum<GuildEmblemFlag> x) => x == ApiEnum<GuildEmblemFlag>.op_Implicit((GuildEmblemFlag)3)));
+							}
+							if (result == null)
+							{
+								result = layer;
+							}
+							else
+							{
+								Bitmap merged = result.Merge(layer);
+								result.Dispose();
+								layer.Dispose();
+								result = merged;
+							}
+						}
+						result?.Save(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_emblem.png", ImageFormat.Png);
+					}
+				}
+			});
 		}
 
 		private async Task<int> RequestTotalKillsForWvW()
@@ -678,9 +853,7 @@ namespace Nekres.Stream_Out
 					double totalGames = wins + losses + desertions + byes;
 					if (!(totalGames <= 0.0))
 					{
-						double winRatio = (double)(wins + byes) / totalGames * 100.0;
-						double lossRatio = (double)(losses + desertions) / totalGames * 100.0;
-						await FileUtil.WriteAllTextAsync(data: Math.Round(winRatio / lossRatio, 1).ToString(CultureInfo.InvariantCulture), filePath: DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_win_loss_ratio.txt");
+						await FileUtil.WriteAllTextAsync(data: Math.Round((double)(wins + byes) / totalGames * 100.0).ToString(CultureInfo.InvariantCulture) + "%", filePath: DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_winrate.txt");
 					}
 				}
 			});
@@ -741,7 +914,7 @@ namespace Nekres.Stream_Out
 								if (!(bool)((dynamic)awaiter5).IsCompleted)
 								{
 									ICriticalNotifyCompletion awaiter2 = awaiter5 as ICriticalNotifyCompletion;
-									_003C_003CUpdateKillProofs_003Eb__82_0_003Ed stateMachine = (_003C_003CUpdateKillProofs_003Eb__82_0_003Ed)/*Error near IL_047e: stateMachine*/;
+									_003C_003CUpdateKillProofs_003Eb__95_0_003Ed stateMachine = (_003C_003CUpdateKillProofs_003Eb__95_0_003Ed)/*Error near IL_047e: stateMachine*/;
 									if (awaiter2 == null)
 									{
 										INotifyCompletion awaiter3 = (INotifyCompletion)awaiter5;
@@ -763,7 +936,7 @@ namespace Nekres.Stream_Out
 								if (!(bool)((dynamic)awaiter4).IsCompleted)
 								{
 									ICriticalNotifyCompletion awaiter2 = awaiter4 as ICriticalNotifyCompletion;
-									_003C_003CUpdateKillProofs_003Eb__82_0_003Ed stateMachine = (_003C_003CUpdateKillProofs_003Eb__82_0_003Ed)/*Error near IL_0754: stateMachine*/;
+									_003C_003CUpdateKillProofs_003Eb__95_0_003Ed stateMachine = (_003C_003CUpdateKillProofs_003Eb__95_0_003Ed)/*Error near IL_0754: stateMachine*/;
 									if (awaiter2 == null)
 									{
 										INotifyCompletion awaiter3 = (INotifyCompletion)awaiter4;
@@ -785,7 +958,7 @@ namespace Nekres.Stream_Out
 								if (!(bool)((dynamic)awaiter).IsCompleted)
 								{
 									ICriticalNotifyCompletion awaiter2 = awaiter as ICriticalNotifyCompletion;
-									_003C_003CUpdateKillProofs_003Eb__82_0_003Ed stateMachine = (_003C_003CUpdateKillProofs_003Eb__82_0_003Ed)/*Error near IL_0a2a: stateMachine*/;
+									_003C_003CUpdateKillProofs_003Eb__95_0_003Ed stateMachine = (_003C_003CUpdateKillProofs_003Eb__95_0_003Ed)/*Error near IL_0a2a: stateMachine*/;
 									if (awaiter2 == null)
 									{
 										INotifyCompletion awaiter3 = (INotifyCompletion)awaiter;
