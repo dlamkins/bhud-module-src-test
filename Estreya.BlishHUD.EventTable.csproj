@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <AssemblyName>Estreya.BlishHUD.EventTable</AssemblyName>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <UseWindowsForms>True</UseWindowsForms>
+    <TargetFramework>net472</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>Preview</LangVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemGroup />
+  <ItemGroup>
+    <Reference Include="Blish HUD" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="Gw2Sharp" />
+    <Reference Include="MonoGame.Framework" />
+    <Reference Include="System.Core" />
+    <Reference Include="MonoGame.Extended" />
+    <Reference Include="Newtonsoft.Json" />
+    <Reference Include="AsyncClipboardService" />
+  </ItemGroup>
+</Project>
