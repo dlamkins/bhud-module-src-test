@@ -528,7 +528,7 @@ namespace Nekres.Stream_Out
 			Guid guildId = await ((IBlobClient<CharactersCore>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Characters()
 				.get_Item(GameService.Gw2Mumble.get_PlayerCharacter().get_Name())
 				.get_Core()).GetAsync(default(CancellationToken)).ContinueWith((Task<CharactersCore> task) => task.IsFaulted ? Guid.Empty : task.Result.get_Guild());
-			if (guildId == Guid.Empty)
+			if (guildId.Equals(Guid.Empty))
 			{
 				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_name.txt", string.Empty);
 				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_tag.txt", string.Empty);
@@ -548,7 +548,11 @@ namespace Nekres.Stream_Out
 					await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_tag.txt", "[" + tag + "]");
 					await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_motd.txt", GUILD_MOTD_PUBLIC.Match(motd).Value);
 					GuildEmblem emblem = task.Result.get_Emblem();
-					if (emblem != null)
+					if (emblem == null)
+					{
+						ClearImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_emblem.png");
+					}
+					else
 					{
 						Emblem bg = await ((IBulkExpandableClient<Emblem, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Emblem()
 							.get_Backgrounds()).GetAsync(emblem.get_Background().get_Id(), default(CancellationToken));
