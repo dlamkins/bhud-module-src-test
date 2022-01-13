@@ -118,7 +118,7 @@ namespace BhModule.Community.Pathing
 
 		private async Task LoadAllPacks()
 		{
-			foreach (string markerDir in _packState.UserResourceStates.Advanced.MarkerLoadPaths.Concat(new string[1] { _watchPath }))
+			foreach (string markerDir in (_packState.UserResourceStates.Advanced.MarkerLoadPaths ?? Array.Empty<string>()).Concat(new string[1] { _watchPath }))
 			{
 				await LoadPackedPackFiles(Directory.GetFiles(markerDir, "*.zip", SearchOption.AllDirectories));
 				await LoadPackedPackFiles(Directory.GetFiles(markerDir, "*.taco", SearchOption.AllDirectories));
