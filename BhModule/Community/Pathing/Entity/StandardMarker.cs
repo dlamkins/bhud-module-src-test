@@ -264,11 +264,11 @@ namespace BhModule.Community.Pathing.Entity
 
 		public override RectangleF? RenderToMiniMap(SpriteBatch spriteBatch, Rectangle bounds, (double X, double Y) offsets, double scale, float opacity)
 		{
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
 			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
@@ -301,14 +301,14 @@ namespace BhModule.Community.Pathing.Entity
 			{
 				return null;
 			}
-			if (!ScaleOnMapWithZoom)
-			{
-				scale = 1.0;
-			}
 			Vector2 location = GetScaledLocation(Position.X, Position.Y, scale, offsets);
 			if (!((Rectangle)(ref bounds)).Contains(location))
 			{
 				return null;
+			}
+			if (!ScaleOnMapWithZoom)
+			{
+				scale = 1.0;
 			}
 			float drawScale = (float)(1.0 / scale);
 			RectangleF drawRect = default(RectangleF);
@@ -648,9 +648,13 @@ namespace BhModule.Community.Pathing.Entity
 		{
 			MapDisplaySize = _packState.UserResourceStates.Population.MarkerPopulationDefaults.MapDisplaySize;
 			ScaleOnMapWithZoom = _packState.UserResourceStates.Population.MarkerPopulationDefaults.ScaleOnMapWithZoom;
-			if (collection.TryPopAttribute("mapdisplaysize", out var attribute))
+			if (collection.TryPopAttribute("mapdisplaysize", out var attribute2))
 			{
-				MapDisplaySize = attribute.GetValueAsFloat(MapDisplaySize);
+				MapDisplaySize = attribute2.GetValueAsFloat(MapDisplaySize);
+			}
+			if (collection.TryPopAttribute("scaleonmapwithzoom", out var attribute))
+			{
+				ScaleOnMapWithZoom = attribute.GetValueAsBool();
 			}
 		}
 

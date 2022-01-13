@@ -8,6 +8,8 @@ namespace BhModule.Community.Pathing.State
 	{
 		new int CurrentMapId { get; set; }
 
+		Task Load();
+
 		Task LoadPackCollection(IPackCollection collection);
 
 		Task Unload();

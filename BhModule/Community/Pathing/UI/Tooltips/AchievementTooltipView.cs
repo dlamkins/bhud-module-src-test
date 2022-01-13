@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Blish_HUD;
 using Blish_HUD.Common.UI.Views;
 using Blish_HUD.Controls;
@@ -171,8 +172,8 @@ namespace BhModule.Community.Pathing.UI.Tooltips
 			if (_achievement != null)
 			{
 				_achievementNameLabel.set_Text(_achievement.get_Name());
-				_achievementDescriptionLabel.set_Text(_achievement.get_Description());
-				_achievementRequirementLabel.set_Text(_achievement.get_Requirement());
+				_achievementDescriptionLabel.set_Text(CleanMessage(_achievement.get_Description()));
+				_achievementRequirementLabel.set_Text(CleanMessage(_achievement.get_Requirement()));
 				((Control)_achievementNameLabel).set_Height(string.IsNullOrEmpty(_achievement.get_Description()) ? ((Control)_categoryIconImage).get_Height() : (((Control)_categoryIconImage).get_Height() / 2));
 				((Control)_achievementDescriptionLabel).set_Width(Math.Max(((Control)_achievementNameLabel).get_Width(), 200));
 				((Control)_achievementRequirementLabel).set_Width(new int[3]
@@ -183,6 +184,18 @@ namespace BhModule.Community.Pathing.UI.Tooltips
 				}.Max());
 				((Control)_achievementRequirementLabel).set_Top(Math.Max(((Control)_achievementDescriptionLabel).get_Bottom() + 8, ((Control)_categoryIconImage).get_Bottom() + 8));
 			}
+		}
+
+		private static string CleanMessage(string message)
+		{
+			string cleanedMessage = message;
+			string pattern = "<c[=@][@=]?([^>]+)>(.*?)(<\\/?c\\/?>|$)";
+			foreach (Match match in Regex.Matches(cleanedMessage, pattern, RegexOptions.IgnoreCase | RegexOptions.Singleline))
+			{
+				string rawText = match.Groups[2].Value;
+				cleanedMessage = cleanedMessage.Replace(match.Value, rawText);
+			}
+			return Regex.Replace(cleanedMessage, "(<br ?\\/?>)+", "\n", RegexOptions.IgnoreCase);
 		}
 	}
 }

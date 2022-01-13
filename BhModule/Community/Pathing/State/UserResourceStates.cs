@@ -15,6 +15,8 @@ namespace BhModule.Community.Pathing.State
 	{
 		private static readonly Logger Logger = Logger.GetLogger<UserResourceStates>();
 
+		public AdvancedDefaults Advanced { get; set; }
+
 		public PopulationDefaults Population { get; set; }
 
 		public IgnoreDefaults Ignore { get; set; }
@@ -54,6 +56,7 @@ namespace BhModule.Community.Pathing.State
 		{
 			string userResourceDir = DataDirUtil.GetSafeDataDir("user");
 			ISerializer yamlSerializer = new SerializerBuilder().WithNamingConvention(HyphenatedNamingConvention.Instance).WithTypeConverter(new ColorConverter()).Build();
+			await ExportDefaultState(Path.Combine(userResourceDir, "advanced.yaml"), yamlSerializer, new AdvancedDefaults());
 			await ExportDefaultState(Path.Combine(userResourceDir, "populate.yaml"), yamlSerializer, new PopulationDefaults());
 			await ExportDefaultState(Path.Combine(userResourceDir, "ignore.yaml"), yamlSerializer, new IgnoreDefaults());
 			await ExportDefaultState(Path.Combine(userResourceDir, "static.yaml"), yamlSerializer, new StaticValues());
@@ -80,6 +83,7 @@ namespace BhModule.Community.Pathing.State
 			string userResourceDir = DataDirUtil.GetSafeDataDir("user");
 			IDeserializer yamlDeserializer = new DeserializerBuilder().WithNamingConvention(HyphenatedNamingConvention.Instance).WithTypeConverter(new ColorConverter()).IgnoreUnmatchedProperties()
 				.Build();
+			Advanced = await LoadState(Path.Combine(userResourceDir, "advanced.yaml"), yamlDeserializer, () => new AdvancedDefaults());
 			Population = await LoadState(Path.Combine(userResourceDir, "populate.yaml"), yamlDeserializer, () => new PopulationDefaults());
 			Ignore = await LoadState(Path.Combine(userResourceDir, "ignore.yaml"), yamlDeserializer, () => new IgnoreDefaults());
 			Static = await LoadState(Path.Combine(userResourceDir, "static.yaml"), yamlDeserializer, () => new StaticValues());

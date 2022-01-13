@@ -171,11 +171,6 @@ namespace BhModule.Community.Pathing
 			return (IView)(object)new SettingsHintView(((Action)((Control)_settingsWindow).Show, _watcher));
 		}
 
-		protected override void OnModuleLoaded(EventArgs e)
-		{
-			((Module)this).OnModuleLoaded(e);
-		}
-
 		protected override void Update(GameTime gameTime)
 		{
 			_watcher?.Update(gameTime);

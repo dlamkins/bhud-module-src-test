@@ -20,11 +20,13 @@ namespace BhModule.Community.Pathing
 {
 	public class SharedPackState : IRootPackState, IPackState, IUpdatable
 	{
+		private ManagedState[] _managedStates;
+
 		private bool _initialized;
 
 		private bool _loadingPack;
 
-		private ManagedState[] _managedStates;
+		private bool _loadingState;
 
 		public ModuleSettings UserConfiguration { get; }
 
@@ -60,9 +62,19 @@ namespace BhModule.Community.Pathing
 			KeyBindings.Interact.add_Activated((EventHandler<EventArgs>)OnInteractPressed);
 		}
 
+		public async Task Load()
+		{
+			await InitStates();
+		}
+
 		private async Task ReloadStates()
 		{
-			await Task.WhenAll(_managedStates.Select((ManagedState state) => state.Reload()));
+			if (_initialized && !_loadingState)
+			{
+				_loadingState = true;
+				await Task.WhenAll(_managedStates.Select((ManagedState state) => state.Reload()));
+				_loadingState = false;
+			}
 		}
 
 		private async Task InitStates()
@@ -104,14 +116,7 @@ namespace BhModule.Community.Pathing
 			}
 			_loadingPack = true;
 			RootCategory = collection.Categories;
-			if (_initialized)
-			{
-				await ReloadStates();
-			}
-			else
-			{
-				await InitStates();
-			}
+			await ReloadStates();
 			await InitPointsOfInterest(collection.PointsOfInterest);
 			_loadingPack = false;
 		}

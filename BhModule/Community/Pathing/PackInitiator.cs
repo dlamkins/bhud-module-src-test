@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using BhModule.Community.Pathing.Content;
 using BhModule.Community.Pathing.State;
 using BhModule.Community.Pathing.UI.Controls;
 using Blish_HUD;
@@ -21,8 +20,6 @@ namespace BhModule.Community.Pathing
 	public class PackInitiator : IUpdatable
 	{
 		private static readonly Logger Logger = Logger.GetLogger<PackInitiator>();
-
-		private const int LOAD_RETRY_COUNTS = 3;
 
 		private readonly string _watchPath;
 
@@ -95,6 +92,7 @@ namespace BhModule.Community.Pathing
 
 		public async Task Init()
 		{
+			await _packState.Load();
 			await LoadAllPacks();
 		}
 
@@ -112,13 +110,6 @@ namespace BhModule.Community.Pathing
 			}
 		}
 
-		private async Task LoadWebPackFile()
-		{
-			WebReader webReader = new WebReader("https://webpacks.blishhud.com/reactif-en/");
-			await webReader.InitWebReader();
-			_packs.Add(Pack.FromIDataReader(webReader));
-		}
-
 		private async Task UnloadStateAndCollection()
 		{
 			_sharedPackCollection?.Unload();
@@ -127,9 +118,12 @@ namespace BhModule.Community.Pathing
 
 		private async Task LoadAllPacks()
 		{
-			await LoadPackedPackFiles(Directory.GetFiles(_watchPath, "*.zip", SearchOption.AllDirectories));
-			await LoadPackedPackFiles(Directory.GetFiles(_watchPath, "*.taco", SearchOption.AllDirectories));
-			await LoadUnpackedPackFiles(_watchPath);
+			foreach (string markerDir in _packState.UserResourceStates.Advanced.MarkerLoadPaths.Concat(new string[1] { _watchPath }))
+			{
+				await LoadPackedPackFiles(Directory.GetFiles(markerDir, "*.zip", SearchOption.AllDirectories));
+				await LoadPackedPackFiles(Directory.GetFiles(markerDir, "*.taco", SearchOption.AllDirectories));
+				await LoadUnpackedPackFiles(markerDir);
+			}
 			if (GameService.Gw2Mumble.get_CurrentMap().get_Id() != 0)
 			{
 				PackInitiator packInitiator = this;
@@ -151,7 +145,6 @@ namespace BhModule.Community.Pathing
 			{
 				if (mapId == _lastMap)
 				{
-					Debugger.Break();
 					return;
 				}
 				_lastMap = mapId;
@@ -164,29 +157,38 @@ namespace BhModule.Community.Pathing
 			thread.Start();
 		}
 
-		private async Task LoadMapFromEachPack(int mapId, int retry = 3)
+		private async Task LoadMapFromEachPack(int mapId)
 		{
 			_isLoading = true;
 			Stopwatch loadTimer = Stopwatch.StartNew();
 			_loadingIndicator.Report("Loading marker packs...");
 			await PrepareState(mapId);
+			Pack lastPack = null;
 			try
 			{
 				Pack[] array = _packs.ToArray();
 				foreach (Pack pack2 in array)
 				{
+					lastPack = pack2;
 					_loadingIndicator.Report("Loading " + pack2.Name + "...");
 					await pack2.LoadMapAsync(mapId, _sharedPackCollection, _packReaderSettings);
+				}
+			}
+			catch (FileNotFoundException e2)
+			{
+				Logger.Warn("Pack file '{packPath}' failed to load because it could not be found.", new object[1] { e2.FileName });
+				if (lastPack != null)
+				{
+					_packs.Remove(lastPack);
 				}
 			}
 			catch (Exception e)
 			{
 				Logger.Warn(e, "Loading pack failed.");
-				if (retry > 0)
+				if (lastPack != null)
 				{
-					await LoadMapFromEachPack(retry - 1);
+					_packs.Remove(lastPack);
 				}
-				Logger.Error($"Loading pack failed after {3} attempts.");
 			}
 			_loadingIndicator.Report("Finalizing marker collection...");
 			await _packState.LoadPackCollection(_sharedPackCollection);

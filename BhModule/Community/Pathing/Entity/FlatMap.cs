@@ -46,6 +46,8 @@ namespace BhModule.Community.Pathing.Entity
 
 		private ContextMenuStrip _activeContextMenu;
 
+		private bool _mapFallTriggered;
+
 		private ContextMenuStrip BuildPathableMenu(IPathingEntity pathingEntry)
 		{
 			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
@@ -121,6 +123,7 @@ namespace BhModule.Community.Pathing.Entity
 				((Control)_activeContextMenu).set_Visible(false);
 			}
 			_lastCameraPos = GameService.Gw2Mumble.get_PlayerCamera().get_Position().Z;
+			_mapFallTriggered = false;
 		}
 
 		protected override void OnRightMouseButtonPressed(MouseEventArgs e)
@@ -220,17 +223,30 @@ namespace BhModule.Community.Pathing.Entity
 		public override void DoUpdate(GameTime gameTime)
 		{
 			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
 			UpdateBounds();
 			if (GameService.Gw2Mumble.get_UI().get_IsMapOpen())
 			{
 				if ((int)GameService.Gw2Mumble.get_PlayerCharacter().get_CurrentMount() == 0)
 				{
 					GameTime currentGameTime = GameService.Overlay.get_CurrentGameTime();
-					if (((currentGameTime != null) ? new double?(currentGameTime.get_TotalGameTime().TotalSeconds) : null) - _lastMapViewChanged > 1.0 && Math.Abs(_lastCameraPos - GameService.Gw2Mumble.get_PlayerCamera().get_Position().Z) > 0.1f)
+					if (((currentGameTime != null) ? new double?(currentGameTime.get_TotalGameTime().TotalSeconds) : null) - _lastMapViewChanged < 1.2000000476837158)
 					{
-						((Control)this).Hide();
+						_lastCameraPos = GameService.Gw2Mumble.get_PlayerCamera().get_Position().Z;
+					}
+					else if (Math.Abs(_lastCameraPos - GameService.Gw2Mumble.get_PlayerCamera().get_Position().Z) > 0.25f)
+					{
+						GameTime currentGameTime2 = GameService.Overlay.get_CurrentGameTime();
+						if (((currentGameTime2 != null) ? new double?(currentGameTime2.get_TotalGameTime().TotalSeconds) : null) - _lastMapViewChanged < 1.5)
+						{
+							_mapFallTriggered = true;
+						}
+						else if (!_mapFallTriggered)
+						{
+							((Control)this).Hide();
+						}
 					}
 				}
 				_lastCameraPos = GameService.Gw2Mumble.get_PlayerCamera().get_Position().Z;

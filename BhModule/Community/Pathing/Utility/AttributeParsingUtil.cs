@@ -176,7 +176,7 @@ namespace BhModule.Community.Pathing.Utility
 		{
 			try
 			{
-				return CronExpression.Parse(attribute.GetValueAsString());
+				return (attribute.GetValueAsString().Split(new char[1] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Length > 5) ? CronExpression.Parse(attribute.GetValueAsString(), CronFormat.IncludeSeconds) : CronExpression.Parse(attribute.GetValueAsString());
 			}
 			catch (CronFormatException ex)
 			{
