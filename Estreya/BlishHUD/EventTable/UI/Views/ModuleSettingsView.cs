@@ -101,6 +101,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderSetting((Panel)(object)parentPanel, (SettingEntry)(object)ModuleSettings.ShowTooltips);
 			RenderSetting((Panel)(object)parentPanel, (SettingEntry)(object)ModuleSettings.CopyWaypointOnClick);
 			RenderSetting((Panel)(object)parentPanel, (SettingEntry)(object)ModuleSettings.ShowContextMenuOnClick);
+			RenderSetting((Panel)(object)parentPanel, (SettingEntry)(object)ModuleSettings.BuildDirection);
 			RenderEmptyLine((Panel)(object)parentPanel);
 			RenderSetting((Panel)(object)parentPanel, (SettingEntry)(object)ModuleSettings.EventHeight);
 			RenderSetting((Panel)(object)parentPanel, (SettingEntry)(object)ModuleSettings.EventFontSize);

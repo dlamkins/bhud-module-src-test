@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
@@ -18,9 +17,6 @@ using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.EventTable.State;
 using Estreya.BlishHUD.EventTable.UI.Container;
 using Estreya.BlishHUD.EventTable.UI.Views;
-using Gw2Sharp.WebApi.V2;
-using Gw2Sharp.WebApi.V2.Clients;
-using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 
@@ -31,15 +27,13 @@ namespace Estreya.BlishHUD.EventTable
 	{
 		private static readonly Logger Logger = Logger.GetLogger<EventTableModule>();
 
-		private const double INTERVAL_UPDATE_WORLDBOSSES = 300010.0;
-
-		private TimeSpan TIME_SINCE_LAST_UPDATE_WORLDBOSSES = TimeSpan.FromMilliseconds(300010.0);
-
 		internal static EventTableModule ModuleInstance;
 
 		internal ModuleSettings ModuleSettings;
 
 		private bool visibleStateFromTick = true;
+
+		private TimeSpan _eventTimeSpan = TimeSpan.Zero;
 
 		private EventTableContainer Container { get; set; }
 
@@ -59,15 +53,32 @@ namespace Estreya.BlishHUD.EventTable
 
 		internal bool Debug => ModuleSettings.DebugEnabled.get_Value();
 
+		internal int EventHeight => ModuleSettings?.EventHeight?.get_Value() ?? 30;
+
 		internal DateTime DateTimeNow => DateTime.Now;
+
+		internal TimeSpan EventTimeSpan
+		{
+			get
+			{
+				if (_eventTimeSpan == TimeSpan.Zero)
+				{
+					_eventTimeSpan = TimeSpan.FromMinutes(ModuleSettings.EventTimeSpan.get_Value());
+				}
+				return _eventTimeSpan;
+			}
+		}
+
+		internal DateTime EventTimeMin => ModuleInstance.DateTimeNow.Subtract(EventTimeSpan.Subtract(TimeSpan.FromMilliseconds(EventTimeSpan.TotalMilliseconds / 2.0)));
+
+		internal DateTime EventTimeMax => ModuleInstance.DateTimeNow.Add(EventTimeSpan.Subtract(TimeSpan.FromMilliseconds(EventTimeSpan.TotalMilliseconds / 2.0)));
 
 		internal Collection<ManagedState> States { get; private set; } = new Collection<ManagedState>();
 
 
 		internal HiddenState HiddenState { get; private set; }
 
-		internal List<string> CompletedWorldbosses { get; private set; } = new List<string>();
-
+		internal WorldbossState WorldbossState { get; private set; }
 
 		[ImportingConstructor]
 		public EventTableModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
@@ -83,23 +94,13 @@ namespace Estreya.BlishHUD.EventTable
 
 		protected override void Initialize()
 		{
-			Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
-		}
-
-		private void Gw2ApiManager_SubtokenUpdated(object sender, ValueEventArgs<IEnumerable<TokenPermission>> e)
-		{
-			Task.Run(async delegate
-			{
-				await UpdateCompletedWorldbosses(null);
-			});
 		}
 
 		protected override async Task LoadAsync()
 		{
 			using (StreamReader eventsReader = new StreamReader(ContentsManager.GetFileStream("events.json")))
 			{
-				string json = await eventsReader.ReadToEndAsync();
-				EventCategories = await Task.Run(() => JsonConvert.DeserializeObject<List<EventCategory>>(json));
+				EventCategories = JsonConvert.DeserializeObject<List<EventCategory>>(await eventsReader.ReadToEndAsync());
 			}
 			ModuleSettings.InitializeEventSettings(EventCategories);
 			EventTableModule eventTableModule = this;
@@ -120,6 +121,9 @@ namespace Estreya.BlishHUD.EventTable
 				case "GlobalEnabled":
 					ToggleContainer(ModuleSettings.GlobalEnabled.get_Value());
 					break;
+				case "EventTimeSpan":
+					_eventTimeSpan = TimeSpan.Zero;
+					break;
 				}
 			};
 			await InitializeStates();
@@ -129,50 +133,15 @@ namespace Estreya.BlishHUD.EventTable
 		{
 			string eventsDirectory = DirectoriesManager.GetFullDirectoryPath("events");
 			HiddenState = new HiddenState(eventsDirectory);
+			WorldbossState = new WorldbossState(Gw2ApiManager);
 			lock (States)
 			{
 				States.Add(HiddenState);
+				States.Add(WorldbossState);
 			}
 			foreach (ManagedState state in States)
 			{
 				await state.Start();
-			}
-		}
-
-		private async Task UpdateCompletedWorldbosses(GameTime gameTime)
-		{
-			if (gameTime != null)
-			{
-				TIME_SINCE_LAST_UPDATE_WORLDBOSSES += gameTime.get_ElapsedGameTime();
-			}
-			if (gameTime != null && !(TIME_SINCE_LAST_UPDATE_WORLDBOSSES.TotalMilliseconds >= 300010.0))
-			{
-				return;
-			}
-			try
-			{
-				lock (CompletedWorldbosses)
-				{
-					CompletedWorldbosses.Clear();
-				}
-				if (Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
-				{
-					(TokenPermission)1,
-					(TokenPermission)6
-				}))
-				{
-					IApiV2ObjectList<string> bosses = await ((IBlobClient<IApiV2ObjectList<string>>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
-						.get_WorldBosses()).GetAsync(default(CancellationToken));
-					lock (CompletedWorldbosses)
-					{
-						CompletedWorldbosses.AddRange((IEnumerable<string>)bosses);
-					}
-					TIME_SINCE_LAST_UPDATE_WORLDBOSSES = TimeSpan.Zero;
-				}
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.Message);
 			}
 		}
 
@@ -244,12 +213,16 @@ namespace Estreya.BlishHUD.EventTable
 
 		protected override void Update(GameTime gameTime)
 		{
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
 			CheckMumble();
 			Container.UpdatePosition(ModuleSettings.LocationX.get_Value(), ModuleSettings.LocationY.get_Value());
-			Task.Run(async delegate
-			{
-				await UpdateCompletedWorldbosses(gameTime);
-			});
+			SettingComplianceExtensions.SetRange(ModuleSettings.LocationX, 0, (int)((float)GameService.Graphics.get_Resolution().X / GameService.Graphics.get_UIScaleMultiplier()));
+			SettingComplianceExtensions.SetRange(ModuleSettings.LocationY, 0, (int)((float)GameService.Graphics.get_Resolution().Y / GameService.Graphics.get_UIScaleMultiplier()));
+			SettingComplianceExtensions.SetRange(ModuleSettings.Width, 0, (int)((float)GameService.Graphics.get_Resolution().X / GameService.Graphics.get_UIScaleMultiplier()));
+			SettingComplianceExtensions.SetRange(ModuleSettings.Height, 0, (int)((float)GameService.Graphics.get_Resolution().Y / GameService.Graphics.get_UIScaleMultiplier()));
 			foreach (ManagedState state in States)
 			{
 				state.Update(gameTime);

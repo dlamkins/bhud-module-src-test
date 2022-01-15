@@ -10,6 +10,7 @@ using Blish_HUD.Input;
 using Blish_HUD.Settings;
 using Blish_HUD._Extensions;
 using Estreya.BlishHUD.EventTable.Helpers;
+using Estreya.BlishHUD.EventTable.Input;
 using Estreya.BlishHUD.EventTable.Json;
 using Estreya.BlishHUD.EventTable.UI.Views;
 using Microsoft.Xna.Framework;
@@ -22,6 +23,8 @@ namespace Estreya.BlishHUD.EventTable.Models
 	[Serializable]
 	public class Event
 	{
+		private static readonly Logger Logger = Logger.GetLogger<Event>();
+
 		[JsonIgnore]
 		private Tooltip _tooltip;
 
@@ -181,7 +184,6 @@ namespace Estreya.BlishHUD.EventTable.Models
 			//IL_0334: Unknown result type (might be due to invalid IL or missing references)
 			//IL_036f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0371: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0399: Unknown result type (might be due to invalid IL or missing references)
 			Rectangle eventTexturePosition = default(Rectangle);
 			Rectangle eventTimeRemainingPosition = default(Rectangle);
 			foreach (DateTime eventStart in startOccurences)
@@ -224,49 +226,40 @@ namespace Estreya.BlishHUD.EventTable.Models
 						SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, control, timeRemainingString, font, eventTimeRemainingPosition, textColor, false, (HorizontalAlignment)0, (VerticalAlignment)1);
 					}
 				}
-				if (!Filler && !string.IsNullOrWhiteSpace(APICode) && EventTableModule.ModuleInstance.CompletedWorldbosses.Contains(APICode))
+				if (!Filler && !string.IsNullOrWhiteSpace(APICode) && EventTableModule.ModuleInstance.WorldbossState.IsCompleted(APICode))
 				{
 					DrawCrossOut(spriteBatch, control, baseTexture, eventTexturePosition, Color.get_Red());
 				}
 			}
-			DrawTooltip(control, bounds, allCategories, currentCategory, pixelPerMinute, eventHeight, now, min, max);
 		}
 
-		public void DrawTooltip(Control control, Rectangle bounds, List<EventCategory> allCategories, EventCategory currentCategory, double pixelPerMinute, int eventHeight, DateTime now, DateTime min, DateTime max)
+		private void UpdateTooltip(string description)
 		{
-			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-			if (!EventTableModule.ModuleInstance.ModuleSettings.ShowTooltips.get_Value() || Filler || !control.get_MouseOver())
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001d: Expected O, but got Unknown
+			_tooltip = new Tooltip((ITooltipView)(object)new TooltipView(Name, description, Icon));
+		}
+
+		private string GetTimeRemaining(DateTime now, DateTime max, DateTime min)
+		{
+			IEnumerable<DateTime> filteredStartOccurences = from so in GetStartOccurences(now, max, min)
+				where so <= now && so.AddMinutes(Duration) > now
+				select so;
+			if (filteredStartOccurences.Any())
 			{
-				return;
+				TimeSpan timeRemaining = filteredStartOccurences.First().AddMinutes(Duration).Subtract(now);
+				return FormatTimeSpan(timeRemaining);
 			}
-			IEnumerable<Event> eventFilter = from ev in (from ev in currentCategory.Events
-					group ev by ev.Name).SelectMany((IGrouping<string, Event> g) => g.Select((Event innerG) => innerG))
-				where ev.GetStartOccurences(now, max, min).Count > 0
-				select ev;
-			IEnumerable<Event> enumerable;
-			if (!currentCategory.ShowCombined)
+			return null;
+		}
+
+		private string FormatTimeSpan(TimeSpan ts)
+		{
+			if (ts.Hours <= 0)
 			{
-				IEnumerable<Event> events2 = currentCategory.Events;
-				enumerable = events2;
+				return ts.ToString("mm\\:ss");
 			}
-			else
-			{
-				enumerable = eventFilter;
-			}
-			IEnumerable<Event> events = enumerable;
-			if (!currentCategory.ShowCombined || events.Contains(this))
-			{
-				bool isMouseOver = IsHovered(allCategories, currentCategory, now, max, min, bounds, control.get_RelativeMousePosition(), pixelPerMinute, eventHeight, EventTableModule.ModuleInstance.Debug);
-				if (isMouseOver && !((Control)Tooltip).get_Visible())
-				{
-					Tooltip.Show(0, 0);
-				}
-				else if (!isMouseOver && ((Control)Tooltip).get_Visible())
-				{
-					((Control)Tooltip).Hide();
-				}
-			}
+			return ts.ToString("hh\\:mm\\:ss");
 		}
 
 		private string GetLongestEventName(int maxSize, BitmapFont font)
@@ -402,7 +395,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 		public List<DateTime> GetStartOccurences(DateTime now, DateTime max, DateTime min, bool addTimezoneOffset = true, bool limitsBetweenRanges = false)
 		{
 			List<DateTime> startOccurences = new List<DateTime>();
-			if (isDisabled())
+			if (IsDisabled())
 			{
 				return startOccurences;
 			}
@@ -461,7 +454,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 				bool anyFromCategoryRendered = false;
 				foreach (Event e in category.Events)
 				{
-					if (!e.isDisabled())
+					if (!e.IsDisabled())
 					{
 						anyFromCategoryRendered = true;
 						if (((!e.Filler || !(category.Key == evc.Key)) && !(category.Key != evc.Key)) || (!e.Filler && !(e.Name != Name)))
@@ -540,6 +533,57 @@ namespace Estreya.BlishHUD.EventTable.Models
 			}
 		}
 
+		public void HandleHover(object sender, MouseEventArgs e, double pixelPerMinute)
+		{
+			List<DateTime> occurences = GetStartOccurences(EventTableModule.ModuleInstance.DateTimeNow, EventTableModule.ModuleInstance.EventTimeMax, EventTableModule.ModuleInstance.EventTimeMin);
+			IEnumerable<DateTime> hoveredOccurences = occurences.Where(delegate(DateTime eo)
+			{
+				//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+				//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+				double xPosition = GetXPosition(eo, EventTableModule.ModuleInstance.EventTimeMin, pixelPerMinute);
+				double num2 = xPosition + (double)Duration * pixelPerMinute;
+				return (double)e.Position.X > xPosition && (double)e.Position.X < num2;
+			});
+			if (((Control)Tooltip).get_Visible())
+			{
+				return;
+			}
+			string description = Location ?? "";
+			if (hoveredOccurences.Any())
+			{
+				DateTime hoveredOccurence = hoveredOccurences.First();
+				bool num = hoveredOccurence.AddMinutes(Duration) < EventTableModule.ModuleInstance.DateTimeNow;
+				bool isNext = !num && hoveredOccurence > EventTableModule.ModuleInstance.DateTimeNow;
+				bool isCurrent = !num && !isNext;
+				if (num)
+				{
+					description = Location + ((!string.IsNullOrWhiteSpace(Location)) ? "\n" : string.Empty) + "\nFinished since: " + FormatTimeSpan(EventTableModule.ModuleInstance.DateTimeNow - hoveredOccurence.AddMinutes(Duration));
+				}
+				else if (isNext)
+				{
+					description = Location + ((!string.IsNullOrWhiteSpace(Location)) ? "\n" : string.Empty) + "\nStarts in: " + FormatTimeSpan(hoveredOccurence - EventTableModule.ModuleInstance.DateTimeNow);
+				}
+				else if (isCurrent)
+				{
+					description = Location + ((!string.IsNullOrWhiteSpace(Location)) ? "\n" : string.Empty) + "\nRemaining: " + FormatTimeSpan(hoveredOccurence.AddMinutes(Duration) - EventTableModule.ModuleInstance.DateTimeNow);
+				}
+			}
+			else
+			{
+				Logger.Error("Can't find hovered event: " + Name + " - " + string.Join(", ", occurences.Select((DateTime o) => o.ToString())));
+			}
+			UpdateTooltip(description);
+			Tooltip.Show(0, 0);
+		}
+
+		public void HandleNonHover(object sender, MouseEventArgs e)
+		{
+			if (((Control)Tooltip).get_Visible())
+			{
+				((Control)Tooltip).Hide();
+			}
+		}
+
 		private void Finish()
 		{
 			DateTime now = EventTableModule.ModuleInstance.DateTimeNow.ToUniversalTime();
@@ -556,7 +600,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 			}
 		}
 
-		public bool isDisabled()
+		public bool IsDisabled()
 		{
 			IEnumerable<SettingEntry<bool>> eventSetting = EventTableModule.ModuleInstance.ModuleSettings.AllEvents.Where((SettingEntry<bool> e) => ((SettingEntry)e).get_EntryKey() == Name);
 			if (eventSetting.Any())

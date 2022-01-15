@@ -23,7 +23,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		public List<KeyValuePair<DateTime, Event>> GetEventOccurences(List<SettingEntry<bool>> eventSettings, DateTime now, DateTime max, DateTime min, bool fillGaps)
 		{
-			List<Event> activeEvents = Events.Where((Event e) => !e.isDisabled()).ToList();
+			List<Event> activeEvents = Events.Where((Event e) => !e.IsDisabled()).ToList();
 			List<KeyValuePair<DateTime, Event>> activeEventStarts = new List<KeyValuePair<DateTime, Event>>();
 			foreach (Event activeEvent in activeEvents)
 			{

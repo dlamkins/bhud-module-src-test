@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 
@@ -7,35 +6,15 @@ namespace Estreya.BlishHUD.EventTable.State
 {
 	internal abstract class ManagedState : IDisposable
 	{
-		private string _path;
-
-		protected string BasePath { get; private set; }
-
-		protected string FileName { get; private set; }
-
 		private int SaveInternal { get; set; }
 
 		private TimeSpan TimeSinceSave { get; set; } = TimeSpan.Zero;
 
 
-		protected string Path
-		{
-			get
-			{
-				if (_path == null)
-				{
-					_path = System.IO.Path.Combine(BasePath, FileName);
-				}
-				return _path;
-			}
-		}
-
 		public bool Running { get; private set; }
 
-		protected ManagedState(string basePath, string fileName, int saveInterval = 60000)
+		protected ManagedState(int saveInterval = 60000)
 		{
-			BasePath = basePath;
-			FileName = fileName;
 			SaveInternal = saveInterval;
 		}
 

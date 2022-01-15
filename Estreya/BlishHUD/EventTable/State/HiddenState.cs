@@ -17,12 +17,29 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		private bool dirty;
 
+		private string _path;
+
+		private string BasePath { get; set; }
+
+		private string Path
+		{
+			get
+			{
+				if (_path == null)
+				{
+					_path = System.IO.Path.Combine(BasePath, "hidden.txt");
+				}
+				return _path;
+			}
+		}
+
 		private Dictionary<string, DateTime> Instances { get; set; } = new Dictionary<string, DateTime>();
 
 
 		public HiddenState(string basePath)
-			: base(basePath, "hidden.txt", 30000)
+			: base(30000)
 		{
+			BasePath = basePath;
 		}
 
 		public override async Task Reload()
@@ -89,17 +106,18 @@ namespace Estreya.BlishHUD.EventTable.State
 			}
 		}
 
-		protected override async Task Initialize()
+		protected override Task Initialize()
 		{
+			return Task.CompletedTask;
 		}
 
 		protected override async Task Load()
 		{
-			if (!File.Exists(base.Path))
+			if (!File.Exists(Path))
 			{
 				return;
 			}
-			string[] lines = await FileUtil.ReadLinesAsync(base.Path);
+			string[] lines = await FileUtil.ReadLinesAsync(Path);
 			if (lines == null || lines.Length == 0)
 			{
 				return;
@@ -131,12 +149,13 @@ namespace Estreya.BlishHUD.EventTable.State
 					lines.Add(string.Format("{0}{1}{2}", instance.Key, "<-->", instance.Value));
 				}
 			}
-			await FileUtil.WriteLinesAsync(base.Path, lines.ToArray());
+			await FileUtil.WriteLinesAsync(Path, lines.ToArray());
 			dirty = false;
 		}
 
-		protected override async Task InternalUnload()
+		protected override Task InternalUnload()
 		{
+			return Task.CompletedTask;
 		}
 	}
 }
