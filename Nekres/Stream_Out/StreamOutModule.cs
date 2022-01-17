@@ -559,8 +559,14 @@ namespace Nekres.Stream_Out
 						Emblem fg = await ((IBulkExpandableClient<Emblem, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Emblem()
 							.get_Foregrounds()).GetAsync(emblem.get_Foreground().get_Id(), default(CancellationToken));
 						List<RenderUrl> layersCombined = new List<RenderUrl>();
-						layersCombined.AddRange(bg.get_Layers());
-						layersCombined.AddRange(fg.get_Layers().Skip(1));
+						if (bg != null)
+						{
+							layersCombined.AddRange(bg.get_Layers());
+						}
+						if (fg != null)
+						{
+							layersCombined.AddRange(fg.get_Layers().Skip(1));
+						}
 						List<Bitmap> layers = new List<Bitmap>();
 						foreach (RenderUrl item in layersCombined)
 						{
@@ -572,42 +578,45 @@ namespace Nekres.Stream_Out
 							}
 							renderUrl = default(RenderUrl);
 						}
-						List<int> colorsCombined = new List<int>();
-						colorsCombined.AddRange(emblem.get_Background().get_Colors());
-						colorsCombined.AddRange(emblem.get_Foreground().get_Colors());
-						List<Color> colors = new List<Color>();
-						foreach (int color2 in colorsCombined)
+						if (!layers.Any())
 						{
-							List<Color> list = colors;
-							list.Add(await ((IBulkExpandableClient<Color, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Colors()).GetAsync(color2, default(CancellationToken)));
+							ClearImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_emblem.png");
 						}
-						Bitmap result = null;
-						for (int i = 0; i < layers.Count; i++)
+						else
 						{
-							Color color = Color.FromArgb(colors[i].get_Cloth().get_Rgb()[0], colors[i].get_Cloth().get_Rgb()[1], colors[i].get_Cloth().get_Rgb()[2]);
-							Bitmap layer = layers[i];
-							layer.Colorize(color);
-							if (i < bg.get_Layers().Count)
+							List<int> colorsCombined = new List<int>();
+							colorsCombined.AddRange(emblem.get_Background().get_Colors());
+							colorsCombined.AddRange(emblem.get_Foreground().get_Colors());
+							List<Color> colors = new List<Color>();
+							foreach (int color2 in colorsCombined)
 							{
-								layer.Flip(((IEnumerable<ApiEnum<GuildEmblemFlag>>)emblem.get_Flags()).Any((ApiEnum<GuildEmblemFlag> x) => x == ApiEnum<GuildEmblemFlag>.op_Implicit((GuildEmblemFlag)0)), ((IEnumerable<ApiEnum<GuildEmblemFlag>>)emblem.get_Flags()).Any((ApiEnum<GuildEmblemFlag> x) => x == ApiEnum<GuildEmblemFlag>.op_Implicit((GuildEmblemFlag)1)));
+								List<Color> list = colors;
+								list.Add(await ((IBulkExpandableClient<Color, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Colors()).GetAsync(color2, default(CancellationToken)));
 							}
-							else
+							Bitmap result = new Bitmap(256, 256);
+							for (int i = 0; i < layers.Count; i++)
 							{
-								layer.Flip(((IEnumerable<ApiEnum<GuildEmblemFlag>>)emblem.get_Flags()).Any((ApiEnum<GuildEmblemFlag> x) => x == ApiEnum<GuildEmblemFlag>.op_Implicit((GuildEmblemFlag)2)), ((IEnumerable<ApiEnum<GuildEmblemFlag>>)emblem.get_Flags()).Any((ApiEnum<GuildEmblemFlag> x) => x == ApiEnum<GuildEmblemFlag>.op_Implicit((GuildEmblemFlag)3)));
-							}
-							if (result == null)
-							{
-								result = layer;
-							}
-							else
-							{
+								Bitmap layer = layers[i].FitTo(result);
+								if (colors.Any())
+								{
+									Color color = Color.FromArgb(colors[i].get_Cloth().get_Rgb()[0], colors[i].get_Cloth().get_Rgb()[1], colors[i].get_Cloth().get_Rgb()[2]);
+									layer.Colorize(color);
+								}
+								if (bg != null && i < bg.get_Layers().Count)
+								{
+									layer.Flip(((IEnumerable<ApiEnum<GuildEmblemFlag>>)emblem.get_Flags()).Any((ApiEnum<GuildEmblemFlag> x) => x == ApiEnum<GuildEmblemFlag>.op_Implicit((GuildEmblemFlag)0)), ((IEnumerable<ApiEnum<GuildEmblemFlag>>)emblem.get_Flags()).Any((ApiEnum<GuildEmblemFlag> x) => x == ApiEnum<GuildEmblemFlag>.op_Implicit((GuildEmblemFlag)1)));
+								}
+								else
+								{
+									layer.Flip(((IEnumerable<ApiEnum<GuildEmblemFlag>>)emblem.get_Flags()).Any((ApiEnum<GuildEmblemFlag> x) => x == ApiEnum<GuildEmblemFlag>.op_Implicit((GuildEmblemFlag)2)), ((IEnumerable<ApiEnum<GuildEmblemFlag>>)emblem.get_Flags()).Any((ApiEnum<GuildEmblemFlag> x) => x == ApiEnum<GuildEmblemFlag>.op_Implicit((GuildEmblemFlag)3)));
+								}
 								Bitmap merged = result.Merge(layer);
 								result.Dispose();
 								layer.Dispose();
 								result = merged;
 							}
+							result?.Save(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_emblem.png", ImageFormat.Png);
 						}
-						result?.Save(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_emblem.png", ImageFormat.Png);
 					}
 				}
 			});

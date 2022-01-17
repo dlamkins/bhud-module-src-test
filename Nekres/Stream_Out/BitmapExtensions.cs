@@ -35,6 +35,35 @@ namespace Nekres.Stream_Out
 			return newBitmap;
 		}
 
+		public static Bitmap FitTo(this Bitmap source, Bitmap other)
+		{
+			if (other == null)
+			{
+				throw new ArgumentNullException();
+			}
+			if (source.Size.Equals(other.Size))
+			{
+				return source;
+			}
+			float scale = Math.Min(other.Width / source.Width, other.Height / source.Height);
+			int newHeight = Convert.ToInt32((float)source.Width * scale);
+			int newWidth = Convert.ToInt32((float)source.Height * scale);
+			Bitmap newBitmap = new Bitmap(newWidth, newHeight);
+			using (Graphics gfx = Graphics.FromImage(newBitmap))
+			{
+				gfx.InterpolationMode = InterpolationMode.HighQualityBicubic;
+				gfx.SmoothingMode = SmoothingMode.HighQuality;
+				gfx.PixelOffsetMode = PixelOffsetMode.HighQuality;
+				gfx.CompositingQuality = CompositingQuality.HighQuality;
+				gfx.Clear(Color.Transparent);
+				gfx.DrawImage(source, 0, 0, newWidth, newHeight);
+				gfx.Flush();
+				gfx.Save();
+			}
+			source.Dispose();
+			return newBitmap;
+		}
+
 		public static void Colorize(this Bitmap source, Color replacement)
 		{
 			for (int x = 0; x < source.Width; x++)
