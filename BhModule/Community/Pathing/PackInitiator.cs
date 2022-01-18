@@ -56,7 +56,7 @@ namespace BhModule.Community.Pathing
 			val.set_Text("All Markers");
 			val.set_CanCheck(true);
 			val.set_Checked(_moduleSettings.GlobalPathablesEnabled.get_Value());
-			val.set_Submenu((ContextMenuStrip)(object)(isAnyMarkers ? new CategoryContextMenuStrip(_packState, _sharedPackCollection.Categories) : null));
+			val.set_Submenu((ContextMenuStrip)(object)(isAnyMarkers ? new CategoryContextMenuStrip(_packState, _sharedPackCollection.Categories, forceShowAll: false) : null));
 			ContextMenuStripItem allMarkers = val;
 			allMarkers.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object _, CheckChangedEvent e)
 			{

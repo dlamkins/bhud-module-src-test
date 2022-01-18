@@ -4,6 +4,7 @@ using System.Linq;
 using BhModule.Community.Pathing.State;
 using BhModule.Community.Pathing.Utility;
 using Blish_HUD.Controls;
+using Blish_HUD.Input;
 using TmfLib.Pathable;
 
 namespace BhModule.Community.Pathing.UI.Controls
@@ -14,17 +15,20 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		private readonly PathingCategory _pathingCategory;
 
-		public CategoryContextMenuStrip(IPackState packState, PathingCategory pathingCategory)
+		private bool _forceShowAll;
+
+		public CategoryContextMenuStrip(IPackState packState, PathingCategory pathingCategory, bool forceShowAll)
 			: this()
 		{
 			_packState = packState;
 			_pathingCategory = pathingCategory;
+			_forceShowAll = forceShowAll;
 		}
 
-		private (IEnumerable<PathingCategory> SubCategories, int Skipped) GetSubCategories()
+		private (IEnumerable<PathingCategory> SubCategories, int Skipped) GetSubCategories(bool forceShowAll = false)
 		{
 			IEnumerable<PathingCategory> subCategories = _pathingCategory.Where((PathingCategory cat) => cat.LoadedFromPack);
-			if (_packState.UserConfiguration.PackShowCategoriesFromAllMaps.get_Value())
+			if (_packState.UserConfiguration.PackShowCategoriesFromAllMaps.get_Value() || forceShowAll)
 			{
 				return (subCategories, 0);
 			}
@@ -60,25 +64,39 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		protected override void OnShown(EventArgs e)
 		{
-			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Expected O, but got Unknown
-			var (subCategories, skipped) = GetSubCategories();
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a7: Expected O, but got Unknown
+			var (subCategories, skipped) = GetSubCategories(_forceShowAll);
 			foreach (PathingCategory subCategory in subCategories)
 			{
-				((ContextMenuStrip)this).AddMenuItem((ContextMenuStripItem)(object)new CategoryContextMenuStripItem(_packState, subCategory));
+				((ContextMenuStrip)this).AddMenuItem((ContextMenuStripItem)(object)new CategoryContextMenuStripItem(_packState, subCategory, _forceShowAll));
 			}
 			if (skipped > 0 && _packState.UserConfiguration.PackShowWhenCategoriesAreFiltered.get_Value())
 			{
 				ContextMenuStripItem val = new ContextMenuStripItem();
 				val.set_Text($"{skipped} Categories Are Hidden");
 				((Control)val).set_Enabled(false);
-				((Control)val).set_BasicTooltipText("Categories hidden because they are for markers on a different map.\n\nYou can disable this filter by toggling\nPathing Module Settings > Show Categories From All Maps.");
-				((ContextMenuStrip)this).AddMenuItem(val);
+				val.set_CanCheck(true);
+				((Control)val).set_BasicTooltipText(Strings.Info_HiddenCategories);
+				ContextMenuStripItem showAllSkippedCategories = val;
+				((ContextMenuStrip)this).AddMenuItem(showAllSkippedCategories);
+				((Control)showAllSkippedCategories).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)ShowAllSkippedCategories_LeftMouseButtonReleased);
 			}
 			((ContextMenuStrip)this).OnShown(e);
+		}
+
+		private void ShowAllSkippedCategories_LeftMouseButtonReleased(object sender, MouseEventArgs e)
+		{
+			((Container)this).ClearChildren();
+			IEnumerable<PathingCategory> subCategories = GetSubCategories(forceShowAll: true).SubCategories;
+			foreach (PathingCategory subCategory in subCategories)
+			{
+				((ContextMenuStrip)this).AddMenuItem((ContextMenuStripItem)(object)new CategoryContextMenuStripItem(_packState, subCategory, forceShowAll: true));
+			}
 		}
 
 		protected override void OnHidden(EventArgs e)

@@ -44,6 +44,8 @@ namespace BhModule.Community.Pathing
 
 		internal static string General_UiName => ResourceManager.GetString("General_UiName", resourceCulture);
 
+		internal static string Info_HiddenCategories => ResourceManager.GetString("Info_HiddenCategories", resourceCulture);
+
 		internal static string Repo_Categories => ResourceManager.GetString("Repo_Categories", resourceCulture);
 
 		internal static string Repo_Download => ResourceManager.GetString("Repo_Download", resourceCulture);

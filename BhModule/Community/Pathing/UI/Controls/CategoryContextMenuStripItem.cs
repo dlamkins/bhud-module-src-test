@@ -32,14 +32,17 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		private readonly PathingCategory _pathingCategory;
 
+		private readonly bool _forceShowAll;
+
 		private readonly List<(Texture2D, string, Action)> _contexts;
 
-		public CategoryContextMenuStripItem(IPackState packState, PathingCategory pathingCategory)
+		public CategoryContextMenuStripItem(IPackState packState, PathingCategory pathingCategory, bool forceShowAll)
 			: this()
 		{
 			_packState = packState;
 			_pathingCategory = pathingCategory;
 			_contexts = new List<(Texture2D, string, Action)>();
+			_forceShowAll = forceShowAll;
 			BuildCategoryMenu();
 			DetectAndBuildContexts();
 		}
@@ -49,9 +52,9 @@ namespace BhModule.Community.Pathing.UI.Controls
 			((ContextMenuStripItem)this).set_Text(_pathingCategory.DisplayName);
 			if (_packState.CategoryStates != null)
 			{
-				if (_pathingCategory.Any((PathingCategory c) => CategoryUtil.UiCategoryIsNotFiltered(c, _packState)))
+				if ((_forceShowAll && _pathingCategory.Any()) || _pathingCategory.Any((PathingCategory c) => CategoryUtil.UiCategoryIsNotFiltered(c, _packState)))
 				{
-					((ContextMenuStripItem)this).set_Submenu((ContextMenuStrip)(object)new CategoryContextMenuStrip(_packState, _pathingCategory));
+					((ContextMenuStripItem)this).set_Submenu((ContextMenuStrip)(object)new CategoryContextMenuStrip(_packState, _pathingCategory, _forceShowAll));
 				}
 				if (!_pathingCategory.IsSeparator)
 				{
