@@ -120,8 +120,6 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderSetting((Panel)(object)parentPanel, (SettingEntry)(object)ModuleSettings.LocationX);
 			RenderSetting((Panel)(object)parentPanel, (SettingEntry)(object)ModuleSettings.LocationY);
 			RenderSetting((Panel)(object)parentPanel, (SettingEntry)(object)ModuleSettings.Width);
-			RenderSetting((Panel)(object)parentPanel, (SettingEntry)(object)ModuleSettings.Height);
-			RenderSetting((Panel)(object)parentPanel, (SettingEntry)(object)ModuleSettings.SnapHeight);
 		}
 
 		private void RenderEmptyLine(Panel parent)

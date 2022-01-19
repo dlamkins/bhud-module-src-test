@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Modules.Managers;
+using Estreya.BlishHUD.EventTable.Utils;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
@@ -17,7 +18,7 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		private TimeSpan updateInterval = TimeSpan.FromMinutes(5.0).Add(TimeSpan.FromMilliseconds(100.0));
 
-		private TimeSpan timeSinceUpdate = TimeSpan.Zero;
+		private double timeSinceUpdate;
 
 		private List<string> completedWorldbosses = new List<string>();
 
@@ -49,14 +50,6 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		private async Task UpdateCompletedWorldbosses(GameTime gameTime)
 		{
-			if (gameTime != null)
-			{
-				timeSinceUpdate += gameTime.get_ElapsedGameTime();
-			}
-			if (gameTime != null && !(timeSinceUpdate >= updateInterval))
-			{
-				return;
-			}
 			try
 			{
 				lock (completedWorldbosses)
@@ -75,7 +68,6 @@ namespace Estreya.BlishHUD.EventTable.State
 					{
 						completedWorldbosses.AddRange((IEnumerable<string>)bosses);
 					}
-					timeSinceUpdate = TimeSpan.Zero;
 				}
 			}
 			catch (Exception ex)
@@ -100,7 +92,7 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		protected override void InternalUpdate(GameTime gameTime)
 		{
-			UpdateCompletedWorldbosses(gameTime).Wait();
+			UpdateCadenceUtil.UpdateAsyncWithCadence(UpdateCompletedWorldbosses, gameTime, updateInterval.TotalMilliseconds, ref timeSinceUpdate);
 		}
 
 		protected override async Task Load()

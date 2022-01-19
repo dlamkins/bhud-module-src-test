@@ -62,15 +62,11 @@ namespace Estreya.BlishHUD.EventTable
 
 		public SettingEntry<int> LocationY { get; private set; }
 
-		public SettingEntry<int> Height { get; private set; }
-
-		public SettingEntry<bool> SnapHeight { get; private set; }
-
 		public SettingEntry<int> Width { get; private set; }
 
 		public SettingCollection EventSettings { get; private set; }
 
-		public SettingEntry<int> EventTimeSpan { get; private set; }
+		public SettingEntry<string> EventTimeSpan { get; private set; }
 
 		public SettingEntry<int> EventHeight { get; private set; }
 
@@ -147,9 +143,8 @@ namespace Estreya.BlishHUD.EventTable
 			BackgroundColorOpacity = GlobalSettings.DefineSetting<float>("BackgroundColorOpacity", 0f, (Func<string>)(() => "Background Color Opacity"), (Func<string>)(() => "Defines the opacity of the background."));
 			SettingComplianceExtensions.SetRange(BackgroundColorOpacity, 0f, 1f);
 			BackgroundColorOpacity.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)SettingChanged<float>);
-			EventTimeSpan = GlobalSettings.DefineSetting<int>("EventTimeSpan", 120, (Func<string>)(() => "Event Timespan"), (Func<string>)(() => "The timespan the event table should cover."));
-			SettingComplianceExtensions.SetRange(EventTimeSpan, 30, 300);
-			EventTimeSpan.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)SettingChanged<int>);
+			EventTimeSpan = GlobalSettings.DefineSetting<string>("EventTimeSpan", "120", (Func<string>)(() => "Event Timespan"), (Func<string>)(() => "The timespan the event table should cover."));
+			EventTimeSpan.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)SettingChanged<string>);
 			EventHeight = GlobalSettings.DefineSetting<int>("EventHeight", 20, (Func<string>)(() => "Event Height"), (Func<string>)(() => "Defines the height of a single event row."));
 			SettingComplianceExtensions.SetRange(EventHeight, 5, 50);
 			EventHeight.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)SettingChanged<int>);
@@ -191,16 +186,6 @@ namespace Estreya.BlishHUD.EventTable
 			LocationY = LocationSettings.DefineSetting<int>("LocationY", (int)((double)height * 0.1), (Func<string>)(() => "Location Y"), (Func<string>)(() => "Where the event table should be displayed on the Y axis."));
 			SettingComplianceExtensions.SetRange(LocationY, 0, height);
 			LocationY.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)SettingChanged<int>);
-			Height = LocationSettings.DefineSetting<int>("Height", (int)((double)height * 0.2), (Func<string>)(() => "Height"), (Func<string>)(() => "The height of the event table."));
-			SettingComplianceExtensions.SetRange(Height, 0, height);
-			SettingComplianceExtensions.SetDisabled((SettingEntry)(object)Height, true);
-			Height.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)SettingChanged<int>);
-			SnapHeight = LocationSettings.DefineSetting<bool>("SnapHeight", true, (Func<string>)(() => "Snap Height"), (Func<string>)(() => "Whether the event table should auto resize height to content."));
-			SnapHeight.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object s, ValueChangedEventArgs<bool> e)
-			{
-				SettingComplianceExtensions.SetDisabled((SettingEntry)(object)Height, e.get_NewValue());
-				SettingChanged<bool>(s, e);
-			});
 			Width = LocationSettings.DefineSetting<int>("Width", (int)((double)width * 0.5), (Func<string>)(() => "Width"), (Func<string>)(() => "The width of the event table."));
 			SettingComplianceExtensions.SetRange(Width, 0, width);
 			Width.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)SettingChanged<int>);

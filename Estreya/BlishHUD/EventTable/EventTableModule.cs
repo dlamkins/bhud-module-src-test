@@ -63,7 +63,20 @@ namespace Estreya.BlishHUD.EventTable
 			{
 				if (_eventTimeSpan == TimeSpan.Zero)
 				{
-					_eventTimeSpan = TimeSpan.FromMinutes(ModuleSettings.EventTimeSpan.get_Value());
+					if (double.TryParse(ModuleSettings.EventTimeSpan.get_Value(), out var timespan))
+					{
+						if (timespan > 1440.0)
+						{
+							timespan = 1440.0;
+							Logger.Warn("Event Timespan over 1440. Cap at 1440 for performance reasons.");
+						}
+						_eventTimeSpan = TimeSpan.FromMinutes(timespan);
+					}
+					else
+					{
+						Logger.Error("Event Timespan '" + ModuleSettings.EventTimeSpan.get_Value() + "' no real number, default to 120");
+						_eventTimeSpan = TimeSpan.FromMinutes(120.0);
+					}
 				}
 				return _eventTimeSpan;
 			}
@@ -115,8 +128,7 @@ namespace Estreya.BlishHUD.EventTable
 				switch (eventArgs.Name)
 				{
 				case "Width":
-				case "Height":
-					Container.UpdateSize(ModuleSettings.Width.get_Value(), ModuleSettings.Height.get_Value());
+					Container.UpdateSize(ModuleSettings.Width.get_Value(), -1);
 					break;
 				case "GlobalEnabled":
 					ToggleContainer(ModuleSettings.GlobalEnabled.get_Value());
@@ -164,25 +176,25 @@ namespace Estreya.BlishHUD.EventTable
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
-			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0141: Expected O, but got Unknown
-			//IL_0176: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0180: Expected O, but got Unknown
+			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0132: Expected O, but got Unknown
+			//IL_0167: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0171: Expected O, but got Unknown
 			((Module)this).OnModuleLoaded(e);
 			Container.UpdatePosition(ModuleSettings.LocationX.get_Value(), ModuleSettings.LocationY.get_Value());
-			Container.UpdateSize(ModuleSettings.Width.get_Value(), ModuleSettings.Height.get_Value());
+			Container.UpdateSize(ModuleSettings.Width.get_Value(), -1);
 			ManageEventTab = GameService.Overlay.get_BlishHudWindow().AddTab("Event Table", ContentsManager.GetRenderIcon("images\\event_boss.png"), (Func<IView>)(() => (IView)(object)new ManageEventsView(EventCategories, ModuleSettings.AllEvents)), 0);
 			Rectangle settingsWindowSize = default(Rectangle);
 			((Rectangle)(ref settingsWindowSize))._002Ector(24, 30, 1000, 630);
@@ -213,20 +225,31 @@ namespace Estreya.BlishHUD.EventTable
 
 		protected override void Update(GameTime gameTime)
 		{
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
 			CheckMumble();
 			Container.UpdatePosition(ModuleSettings.LocationX.get_Value(), ModuleSettings.LocationY.get_Value());
-			SettingComplianceExtensions.SetRange(ModuleSettings.LocationX, 0, (int)((float)GameService.Graphics.get_Resolution().X / GameService.Graphics.get_UIScaleMultiplier()));
-			SettingComplianceExtensions.SetRange(ModuleSettings.LocationY, 0, (int)((float)GameService.Graphics.get_Resolution().Y / GameService.Graphics.get_UIScaleMultiplier()));
-			SettingComplianceExtensions.SetRange(ModuleSettings.Width, 0, (int)((float)GameService.Graphics.get_Resolution().X / GameService.Graphics.get_UIScaleMultiplier()));
-			SettingComplianceExtensions.SetRange(ModuleSettings.Height, 0, (int)((float)GameService.Graphics.get_Resolution().Y / GameService.Graphics.get_UIScaleMultiplier()));
+			CheckContainerSizeAndPosition();
 			foreach (ManagedState state in States)
 			{
 				state.Update(gameTime);
 			}
+		}
+
+		private void CheckContainerSizeAndPosition()
+		{
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			bool buildFromBottom = ModuleSettings.BuildDirection.get_Value() == BuildDirection.Bottom;
+			int num = (int)((float)GameService.Graphics.get_Resolution().X / GameService.Graphics.get_UIScaleMultiplier());
+			int maxResY = (int)((float)GameService.Graphics.get_Resolution().Y / GameService.Graphics.get_UIScaleMultiplier());
+			int minLocationX = 0;
+			int maxLocationX = num - ((Control)Container).get_Width();
+			int minLocationY = (buildFromBottom ? ((Control)Container).get_Height() : 0);
+			int maxLocationY = (buildFromBottom ? maxResY : (maxResY - ((Control)Container).get_Height()));
+			int minWidth = 0;
+			int maxWidth = num - ModuleSettings.LocationX.get_Value();
+			SettingComplianceExtensions.SetRange(ModuleSettings.LocationX, minLocationX, maxLocationX);
+			SettingComplianceExtensions.SetRange(ModuleSettings.LocationY, minLocationY, maxLocationY);
+			SettingComplianceExtensions.SetRange(ModuleSettings.Width, minWidth, maxWidth);
 		}
 
 		private void CheckMumble()

@@ -480,7 +480,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 			{
 				eventWidth -= Math.Abs(x);
 			}
-			return Math.Min(eventWidth, (double)bounds.Width - x);
+			return Math.Min(eventWidth, bounds.Width);
 		}
 
 		public bool IsHovered(IEnumerable<EventCategory> eventCategories, EventCategory eventCategory, DateTime now, DateTime max, DateTime min, Rectangle bounds, Point relativeMousePosition, double pixelPerMinute, int eventHeight, bool debugEnabled)
