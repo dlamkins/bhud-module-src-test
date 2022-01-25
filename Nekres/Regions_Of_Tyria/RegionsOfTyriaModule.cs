@@ -268,8 +268,7 @@ namespace Nekres.Regions_Of_Tyria
 			}
 			catch (BadRequestException val)
 			{
-				BadRequestException val2 = val;
-				BadRequestException bre = val2;
+				BadRequestException bre = val;
 				Logger.Debug("{0} | The map id {1} does not exist on floor {2}.", new object[3]
 				{
 					((Exception)(object)bre).GetType().FullName,
@@ -278,10 +277,9 @@ namespace Nekres.Regions_Of_Tyria
 				});
 				return Enumerable.Empty<Sector>();
 			}
-			catch (UnexpectedStatusException val3)
+			catch (UnexpectedStatusException val2)
 			{
-				UnexpectedStatusException val4 = val3;
-				UnexpectedStatusException use = val4;
+				UnexpectedStatusException use = val2;
 				Logger.Debug(((Exception)(object)use).Message);
 				return Enumerable.Empty<Sector>();
 			}
@@ -291,19 +289,17 @@ namespace Nekres.Regions_Of_Tyria
 		{
 			try
 			{
-				return await ((IBulkExpandableClient<Map, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Maps()).GetAsync(id, default(CancellationToken)).ContinueWith((Task<Map> task) => (task.IsFaulted || !task.IsCompleted) ? null : task.Result);
+				return await ((IBulkExpandableClient<Map, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Maps()).GetAsync(id, default(CancellationToken)).ContinueWith((Task<Map> task) => (!task.IsFaulted && task.IsCompleted) ? task.Result : null);
 			}
 			catch (BadRequestException val)
 			{
-				BadRequestException val2 = val;
-				BadRequestException bre = val2;
+				BadRequestException bre = val;
 				Logger.Debug(((Exception)(object)bre).Message);
 				return null;
 			}
-			catch (UnexpectedStatusException val3)
+			catch (UnexpectedStatusException val2)
 			{
-				UnexpectedStatusException val4 = val3;
-				UnexpectedStatusException use = val4;
+				UnexpectedStatusException use = val2;
 				Logger.Debug(((Exception)(object)use).Message);
 				return null;
 			}

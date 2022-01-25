@@ -17,10 +17,10 @@ namespace Nekres.Regions_Of_Tyria
 			{
 				return new List<(Color, string)> { (regularTextColor.Value, input) };
 			}
-			Regex colorRegex = new Regex("<(c|color)=(#?((?'rgb'[a-fA-F0-9]{6})|(?'argb'[a-fA-F0-9]{8})))?>(?'text'.*?)<\\s*\\/\\s*\\1\\s*>", RegexOptions.Multiline);
+			Regex regex = new Regex("<(c|color)=(#?((?'rgb'[a-fA-F0-9]{6})|(?'argb'[a-fA-F0-9]{8})))?>(?'text'.*?)<\\s*\\/\\s*\\1\\s*>", RegexOptions.Multiline);
 			List<(Color, string)> lines = new List<(Color, string)>();
 			int startIndex = 0;
-			foreach (Match i in colorRegex.Matches(input))
+			foreach (Match i in regex.Matches(input))
 			{
 				if (startIndex != i.Index)
 				{
