@@ -1037,20 +1037,24 @@ namespace Manlaan.Mounts
 
 		protected void DoHotKey(SettingEntry<KeyBinding> setting)
 		{
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Invalid comparison between Unknown and I4
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f3: Invalid comparison between Unknown and I4
-			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0159: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Invalid comparison between Unknown and I4
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0103: Invalid comparison between Unknown and I4
+			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
+			if (setting == null)
+			{
+				return;
+			}
 			if (GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat())
 			{
 				InputQueuingKeybindSetting = setting;
