@@ -21,6 +21,9 @@
     <Reference Include="Sentry">
       <HintPath>..\..\working\Sentry.dll</HintPath>
     </Reference>
+    <Reference Include="Etm.Sdk">
+      <HintPath>..\..\working\Etm.Sdk.dll</HintPath>
+    </Reference>
     <Reference Include="NLog">
       <HintPath>..\..\working\NLog.dll</HintPath>
     </Reference>

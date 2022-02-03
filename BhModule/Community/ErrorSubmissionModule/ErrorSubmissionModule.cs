@@ -2,7 +2,6 @@ using System;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
@@ -11,6 +10,7 @@ using Microsoft.Xna.Framework;
 using NLog;
 using NLog.Config;
 using NLog.Layouts;
+using SemVer;
 using Sentry;
 using Sentry.NLog;
 
@@ -26,6 +26,8 @@ namespace BhModule.Community.ErrorSubmissionModule
 		private SettingEntry<string> _userDiscordId;
 
 		private SettingEntry<bool> _autoSubmit;
+
+		private ContextHandle<EtmContext> _etmContextHandle;
 
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
@@ -71,12 +73,17 @@ namespace BhModule.Community.ErrorSubmissionModule
 			sentry.Environment = (string.IsNullOrEmpty(Program.get_OverlayVersion().PreRelease) ? "Release" : Program.get_OverlayVersion().PreRelease);
 			sentry.Debug = true;
 			sentry.BreadcrumbLayout = (Layout)"${logger}: ${message}";
-			sentry.MaxBreadcrumbs = 20;
+			sentry.MaxBreadcrumbs = 10;
 			sentry.TracesSampleRate = 0.2;
 			sentry.AutoSessionTracking = true;
+			sentry.DetectStartupTime = StartupTimeDetectionMode.None;
+			sentry.ReportAssembliesMode = ReportAssembliesMode.None;
+			sentry.DisableTaskUnobservedTaskExceptionCapture();
+			sentry.DisableNetFxInstallationsIntegration();
+			sentry.MinimumBreadcrumbLevel = LogLevel.Debug;
 			sentry.BeforeSend = delegate(SentryEvent d)
 			{
-				d.SetExtra("launch-options", Environment.GetCommandLineArgs().ToArray());
+				d.SetExtra("launch-options", Environment.GetCommandLineArgs().Select(FilterUtil.FilterAll).ToArray());
 				try
 				{
 					if (GameService.Module == null)
@@ -104,20 +111,22 @@ namespace BhModule.Community.ErrorSubmissionModule
 					return d;
 				}
 			};
+			Logger.Info("Sentry hook enabled.");
+		}
+
+		private void EnableSdkContext()
+		{
+			_etmContextHandle = GameService.Contexts.RegisterContext<EtmContext>(new EtmContext());
+			Logger.Info("etm.sdk context registered.");
 		}
 
 		protected override void Initialize()
 		{
-			HookLogger();
-		}
-
-		protected override async Task LoadAsync()
-		{
-		}
-
-		protected override void OnModuleLoaded(EventArgs e)
-		{
-			((Module)this).OnModuleLoaded(e);
+			if (Program.get_OverlayVersion().BaseVersion() != new SemVer.Version(0, 0, 0))
+			{
+				HookLogger();
+				EnableSdkContext();
+			}
 		}
 
 		protected override void Update(GameTime gameTime)
@@ -126,6 +135,7 @@ namespace BhModule.Community.ErrorSubmissionModule
 
 		protected override void Unload()
 		{
+			_etmContextHandle.Expire();
 		}
 	}
 }
