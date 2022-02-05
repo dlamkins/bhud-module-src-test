@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 
 namespace Estreya.BlishHUD.EventTable.State
 {
-	internal abstract class ManagedState : IDisposable
+	public abstract class ManagedState : IDisposable
 	{
 		private int SaveInternal { get; set; }
 

@@ -6,10 +6,10 @@ using Blish_HUD;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
 using Estreya.BlishHUD.EventTable.Models;
-using Estreya.BlishHUD.EventTable.UI.Container;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework.Input;
+using Newtonsoft.Json;
 
 namespace Estreya.BlishHUD.EventTable
 {
@@ -21,6 +21,8 @@ namespace Estreya.BlishHUD.EventTable
 
 			public object Value { get; set; }
 		}
+
+		private static readonly Logger Logger = Logger.GetLogger<ModuleSettings>();
 
 		private const string GLOBAL_SETTINGS = "event-table-global-settings";
 
@@ -38,15 +40,21 @@ namespace Estreya.BlishHUD.EventTable
 
 		public SettingEntry<KeyBinding> GlobalEnabledHotkey { get; private set; }
 
+		public SettingEntry<bool> RegisterCornerIcon { get; private set; }
+
 		public SettingEntry<Color> BackgroundColor { get; private set; }
 
 		public SettingEntry<float> BackgroundColorOpacity { get; private set; }
 
 		public SettingEntry<bool> HideOnMissingMumbleTicks { get; private set; }
 
+		public SettingEntry<bool> HideInCombat { get; private set; }
+
 		public SettingEntry<bool> DebugEnabled { get; private set; }
 
 		public SettingEntry<bool> ShowTooltips { get; private set; }
+
+		public SettingEntry<TooltipTimeMode> TooltipTimeMode { get; private set; }
 
 		public SettingEntry<bool> CopyWaypointOnClick { get; private set; }
 
@@ -68,11 +76,13 @@ namespace Estreya.BlishHUD.EventTable
 
 		public SettingEntry<string> EventTimeSpan { get; private set; }
 
+		public SettingEntry<int> EventHistorySplit { get; private set; }
+
 		public SettingEntry<int> EventHeight { get; private set; }
 
 		public SettingEntry<bool> DrawEventBorder { get; private set; }
 
-		public SettingEntry<EventTableContainer.FontSize> EventFontSize { get; private set; }
+		public SettingEntry<FontSize> EventFontSize { get; private set; }
 
 		public SettingEntry<bool> UseFiller { get; private set; }
 
@@ -81,6 +91,8 @@ namespace Estreya.BlishHUD.EventTable
 		public SettingEntry<Color> TextColor { get; private set; }
 
 		public SettingEntry<Color> FillerTextColor { get; private set; }
+
+		public SettingEntry<WorldbossCompletedAction> WorldbossCompletedAcion { get; private set; }
 
 		public List<SettingEntry<bool>> AllEvents { get; private set; } = new List<SettingEntry<bool>>();
 
@@ -136,8 +148,12 @@ namespace Estreya.BlishHUD.EventTable
 				GlobalEnabled.set_Value(!GlobalEnabled.get_Value());
 			});
 			GlobalEnabledHotkey.get_Value().set_BlockSequenceFromGw2(true);
-			HideOnMissingMumbleTicks = GlobalSettings.DefineSetting<bool>("HideOnMissingMumbleTicks", true, (Func<string>)(() => "Hide on missing Mumble Tick"), (Func<string>)(() => "Whether the event table should hide when mumble ticks are missing."));
+			RegisterCornerIcon = GlobalSettings.DefineSetting<bool>("RegisterCornerIcon", true, (Func<string>)(() => "Register Corner Icon"), (Func<string>)(() => "Whether the event table should add it's own corner icon to access settings."));
+			RegisterCornerIcon.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+			HideOnMissingMumbleTicks = GlobalSettings.DefineSetting<bool>("HideOnMissingMumbleTicks", true, (Func<string>)(() => "Hide on Cutscenes"), (Func<string>)(() => "Whether the event table should hide when cutscenes are played."));
 			HideOnMissingMumbleTicks.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+			HideInCombat = GlobalSettings.DefineSetting<bool>("HideInCombat", false, (Func<string>)(() => "Hide in Combat"), (Func<string>)(() => "Whether the event table should hide when the player is in combat."));
+			HideInCombat.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
 			BackgroundColor = GlobalSettings.DefineSetting<Color>("BackgroundColor", ((IBulkExpandableClient<Color, int>)(object)EventTableModule.ModuleInstance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Colors()).GetAsync(1, default(CancellationToken)).Result, (Func<string>)(() => "Background Color"), (Func<string>)(() => "Defines the background color."));
 			BackgroundColor.add_SettingChanged((EventHandler<ValueChangedEventArgs<Color>>)SettingChanged<Color>);
 			BackgroundColorOpacity = GlobalSettings.DefineSetting<float>("BackgroundColorOpacity", 0f, (Func<string>)(() => "Background Color Opacity"), (Func<string>)(() => "Defines the opacity of the background."));
@@ -145,17 +161,22 @@ namespace Estreya.BlishHUD.EventTable
 			BackgroundColorOpacity.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)SettingChanged<float>);
 			EventTimeSpan = GlobalSettings.DefineSetting<string>("EventTimeSpan", "120", (Func<string>)(() => "Event Timespan"), (Func<string>)(() => "The timespan the event table should cover."));
 			EventTimeSpan.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)SettingChanged<string>);
+			EventHistorySplit = GlobalSettings.DefineSetting<int>("EventHistorySplit", 50, (Func<string>)(() => "Event History Split"), (Func<string>)(() => "Defines how much history the timespan should contain."));
+			SettingComplianceExtensions.SetRange(EventHistorySplit, 0, 75);
+			EventHistorySplit.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)SettingChanged<int>);
 			EventHeight = GlobalSettings.DefineSetting<int>("EventHeight", 20, (Func<string>)(() => "Event Height"), (Func<string>)(() => "Defines the height of a single event row."));
 			SettingComplianceExtensions.SetRange(EventHeight, 5, 50);
 			EventHeight.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)SettingChanged<int>);
-			EventFontSize = GlobalSettings.DefineSetting<EventTableContainer.FontSize>("EventFontSize", EventTableContainer.FontSize.Size16, (Func<string>)(() => "Event Font Size"), (Func<string>)(() => "Defines the size of the font used for events."));
-			EventFontSize.add_SettingChanged((EventHandler<ValueChangedEventArgs<EventTableContainer.FontSize>>)SettingChanged<EventTableContainer.FontSize>);
+			EventFontSize = GlobalSettings.DefineSetting<FontSize>("EventFontSize", (FontSize)16, (Func<string>)(() => "Event Font Size"), (Func<string>)(() => "Defines the size of the font used for events."));
+			EventFontSize.add_SettingChanged((EventHandler<ValueChangedEventArgs<FontSize>>)SettingChanged<FontSize>);
 			DrawEventBorder = GlobalSettings.DefineSetting<bool>("DrawEventBorder", true, (Func<string>)(() => "Draw Event Border"), (Func<string>)(() => "Whether the events should have a small border."));
 			DrawEventBorder.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
 			DebugEnabled = GlobalSettings.DefineSetting<bool>("DebugEnabled", false, (Func<string>)(() => "Debug Enabled"), (Func<string>)(() => "Whether the event table should be running in debug mode."));
 			DebugEnabled.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
 			ShowTooltips = GlobalSettings.DefineSetting<bool>("ShowTooltips", true, (Func<string>)(() => "Show Tooltips"), (Func<string>)(() => "Whether the event table should display event information on hover."));
-			DebugEnabled.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+			ShowTooltips.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+			TooltipTimeMode = GlobalSettings.DefineSetting<TooltipTimeMode>("TooltipTimeMode", Estreya.BlishHUD.EventTable.Models.TooltipTimeMode.Relative, (Func<string>)(() => "Tooltip Time Mode"), (Func<string>)(() => "Defines the mode in which the tooltip times are displayed."));
+			TooltipTimeMode.add_SettingChanged((EventHandler<ValueChangedEventArgs<TooltipTimeMode>>)SettingChanged<TooltipTimeMode>);
 			CopyWaypointOnClick = GlobalSettings.DefineSetting<bool>("CopyWaypointOnClick", true, (Func<string>)(() => "Copy Waypoints"), (Func<string>)(() => "Whether the event table should copy waypoints to clipboard if event has been left clicked."));
 			CopyWaypointOnClick.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
 			ShowContextMenuOnClick = GlobalSettings.DefineSetting<bool>("ShowContextMenuOnClick", true, (Func<string>)(() => "Show Context Menu"), (Func<string>)(() => "Whether the event table should show a context menu if an event has been right clicked."));
@@ -173,6 +194,8 @@ namespace Estreya.BlishHUD.EventTable
 			TextColor.add_SettingChanged((EventHandler<ValueChangedEventArgs<Color>>)SettingChanged<Color>);
 			FillerTextColor = GlobalSettings.DefineSetting<Color>("FillerTextColor", ((IBulkExpandableClient<Color, int>)(object)EventTableModule.ModuleInstance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Colors()).GetAsync(1, default(CancellationToken)).Result, (Func<string>)(() => "Filler Text Color"), (Func<string>)(() => "Defines the text color of filler events."));
 			FillerTextColor.add_SettingChanged((EventHandler<ValueChangedEventArgs<Color>>)SettingChanged<Color>);
+			WorldbossCompletedAcion = GlobalSettings.DefineSetting<WorldbossCompletedAction>("WorldbossCompletedAcion", WorldbossCompletedAction.Crossout, (Func<string>)(() => "Worldboss Completed Action"), (Func<string>)(() => "Defines the action when a worldboss has been completed."));
+			WorldbossCompletedAcion.add_SettingChanged((EventHandler<ValueChangedEventArgs<WorldbossCompletedAction>>)SettingChanged<WorldbossCompletedAction>);
 		}
 
 		private void InitializeLocationSettings(SettingCollection settings)
@@ -194,6 +217,9 @@ namespace Estreya.BlishHUD.EventTable
 		private void SettingChanged<T>(object sender, ValueChangedEventArgs<T> e)
 		{
 			SettingEntry<T> settingEntry = (SettingEntry<T>)sender;
+			string prevValue = JsonConvert.SerializeObject((object)e.get_PreviousValue());
+			string newValue = JsonConvert.SerializeObject((object)e.get_NewValue());
+			Logger.Debug("Changed setting \"" + ((SettingEntry)settingEntry).get_EntryKey() + "\" from \"" + prevValue + "\" to \"" + newValue + "\"");
 			this.ModuleSettingsChanged?.Invoke(this, new ModuleSettingsChangedEventArgs
 			{
 				Name = ((SettingEntry)settingEntry).get_EntryKey(),

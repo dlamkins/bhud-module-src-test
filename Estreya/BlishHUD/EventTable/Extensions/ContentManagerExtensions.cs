@@ -11,20 +11,24 @@ namespace Estreya.BlishHUD.EventTable.Extensions
 		private static Dictionary<string, AsyncTexture2D> IconCache { get; set; } = new Dictionary<string, AsyncTexture2D>();
 
 
-		public static AsyncTexture2D GetRenderIcon(this ContentsManager manager, string identifier)
+		public static AsyncTexture2D GetIcon(this ContentsManager manager, string identifier, bool checkRenderAPI = true)
 		{
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Expected O, but got Unknown
+			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Expected O, but got Unknown
+			if (string.IsNullOrWhiteSpace(identifier))
+			{
+				return null;
+			}
 			lock (IconCache)
 			{
 				if (IconCache.ContainsKey(identifier))
 				{
 					return IconCache[identifier];
 				}
-				AsyncTexture2D icon = new AsyncTexture2D(Texture2DExtension.Duplicate(Textures.get_TransparentPixel()));
+				AsyncTexture2D icon = null;
 				if (!string.IsNullOrWhiteSpace(identifier))
 				{
-					if (identifier.Contains("/"))
+					if (checkRenderAPI && identifier.Contains("/"))
 					{
 						icon = GameService.Content.GetRenderServiceTexture(identifier);
 					}
@@ -35,7 +39,7 @@ namespace Estreya.BlishHUD.EventTable.Extensions
 						{
 							texture = GameService.Content.GetTexture(identifier);
 						}
-						icon.SwapTexture(texture);
+						icon = new AsyncTexture2D(texture);
 					}
 				}
 				IconCache.Add(identifier, icon);

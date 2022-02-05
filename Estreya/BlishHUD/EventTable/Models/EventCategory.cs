@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Blish_HUD.Settings;
 using Newtonsoft.Json;
 
 namespace Estreya.BlishHUD.EventTable.Models
@@ -21,8 +20,12 @@ namespace Estreya.BlishHUD.EventTable.Models
 		[JsonProperty("events")]
 		public List<Event> Events { get; set; }
 
-		public List<KeyValuePair<DateTime, Event>> GetEventOccurences(List<SettingEntry<bool>> eventSettings, DateTime now, DateTime max, DateTime min, bool fillGaps)
+		public List<KeyValuePair<DateTime, Event>> GetEventOccurences(DateTime now, DateTime max, DateTime min, bool fillGaps)
 		{
+			if (IsDisabled())
+			{
+				return new List<KeyValuePair<DateTime, Event>>();
+			}
 			List<Event> activeEvents = Events.Where((Event e) => !e.IsDisabled()).ToList();
 			List<KeyValuePair<DateTime, Event>> activeEventStarts = new List<KeyValuePair<DateTime, Event>>();
 			foreach (Event activeEvent in activeEvents)
@@ -155,6 +158,18 @@ namespace Estreya.BlishHUD.EventTable.Models
 				modifiedEventStarts.Add(new KeyValuePair<DateTime, Event>(prevEnd, filler2));
 			}
 			return modifiedEventStarts.OrderBy((KeyValuePair<DateTime, Event> mes) => mes.Key).ToList();
+		}
+
+		public void Finish()
+		{
+			DateTime now = EventTableModule.ModuleInstance.DateTimeNow.ToUniversalTime();
+			DateTime until = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0).AddDays(1.0);
+			EventTableModule.ModuleInstance.HiddenState.Add(Name, until, isUTC: true);
+		}
+
+		public bool IsDisabled()
+		{
+			return EventTableModule.ModuleInstance.HiddenState.IsHidden(Name);
 		}
 	}
 }

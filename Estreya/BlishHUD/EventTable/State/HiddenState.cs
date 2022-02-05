@@ -4,13 +4,16 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Blish_HUD;
 using Estreya.BlishHUD.EventTable.Helpers;
 using Microsoft.Xna.Framework;
 
 namespace Estreya.BlishHUD.EventTable.State
 {
-	internal class HiddenState : ManagedState
+	public class HiddenState : ManagedState
 	{
+		private static readonly Logger Logger = Logger.GetLogger<HiddenState>();
+
 		private const string FILE_NAME = "hidden.txt";
 
 		private const string LINE_SPLIT = "<-->";
@@ -81,6 +84,7 @@ namespace Estreya.BlishHUD.EventTable.State
 				{
 					hideUntil = hideUntil.ToUniversalTime();
 				}
+				Logger.Info($"Add hidden state for \"{name}\" until {hideUntil} UTC.");
 				Instances.Add(name, hideUntil);
 				dirty = true;
 			}
@@ -92,9 +96,20 @@ namespace Estreya.BlishHUD.EventTable.State
 			{
 				if (Instances.ContainsKey(name))
 				{
+					Logger.Info("Remove hidden state for \"" + name + "\".");
 					Instances.Remove(name);
 					dirty = true;
 				}
+			}
+		}
+
+		public void Clear()
+		{
+			lock (Instances)
+			{
+				Logger.Info("Remove all hidden states.");
+				Instances.Clear();
+				dirty = true;
 			}
 		}
 

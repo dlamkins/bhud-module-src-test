@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
@@ -12,7 +13,7 @@ using Microsoft.Xna.Framework;
 
 namespace Estreya.BlishHUD.EventTable.State
 {
-	internal class WorldbossState : ManagedState
+	public class WorldbossState : ManagedState
 	{
 		private static readonly Logger Logger = Logger.GetLogger<WorldbossState>();
 
@@ -24,10 +25,11 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		private Gw2ApiManager ApiManager { get; set; }
 
+		public event EventHandler<string> WorldbossCompleted;
+
 		public WorldbossState(Gw2ApiManager apiManager)
 		{
 			ApiManager = apiManager;
-			ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)ApiManager_SubtokenUpdated);
 		}
 
 		private void ApiManager_SubtokenUpdated(object sender, ValueEventArgs<IEnumerable<TokenPermission>> e)
@@ -50,23 +52,42 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		private async Task UpdateCompletedWorldbosses(GameTime gameTime)
 		{
+			Logger.Info("Check for completed worldbosses.");
 			try
 			{
+				List<string> oldCompletedWorldbosses;
 				lock (completedWorldbosses)
 				{
+					oldCompletedWorldbosses = completedWorldbosses.ToArray().ToList();
 					completedWorldbosses.Clear();
 				}
-				if (ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
+				if (!ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
 				{
 					(TokenPermission)1,
 					(TokenPermission)6
 				}))
 				{
-					IApiV2ObjectList<string> bosses = await ((IBlobClient<IApiV2ObjectList<string>>)(object)ApiManager.get_Gw2ApiClient().get_V2().get_Account()
-						.get_WorldBosses()).GetAsync(default(CancellationToken));
-					lock (completedWorldbosses)
+					return;
+				}
+				IApiV2ObjectList<string> bosses = await ((IBlobClient<IApiV2ObjectList<string>>)(object)ApiManager.get_Gw2ApiClient().get_V2().get_Account()
+					.get_WorldBosses()).GetAsync(default(CancellationToken));
+				lock (completedWorldbosses)
+				{
+					completedWorldbosses.AddRange((IEnumerable<string>)bosses);
+				}
+				foreach (string boss in (IEnumerable<string>)bosses)
+				{
+					if (!oldCompletedWorldbosses.Contains(boss))
 					{
-						completedWorldbosses.AddRange((IEnumerable<string>)bosses);
+						Logger.Info("Completed worldboss: " + boss);
+						try
+						{
+							this.WorldbossCompleted?.Invoke(this, boss);
+						}
+						catch (Exception ex2)
+						{
+							Logger.Error("Error handling complete worldboss event: " + ex2.Message);
+						}
 					}
 				}
 			}
@@ -78,11 +99,13 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		protected override Task Initialize()
 		{
+			ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)ApiManager_SubtokenUpdated);
 			return Task.CompletedTask;
 		}
 
 		protected override Task InternalUnload()
 		{
+			ApiManager.remove_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)ApiManager_SubtokenUpdated);
 			lock (completedWorldbosses)
 			{
 				completedWorldbosses.Clear();

@@ -7,81 +7,49 @@ using Blish_HUD.Input;
 using Blish_HUD._Extensions;
 using Estreya.BlishHUD.EventTable.Input;
 using Estreya.BlishHUD.EventTable.Models;
+using Estreya.BlishHUD.EventTable.Utils;
 using Glide;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended.BitmapFonts;
+using MonoGame.Extended;
 
 namespace Estreya.BlishHUD.EventTable.UI.Container
 {
 	public class EventTableContainer : Container
 	{
-		public enum FontSize
-		{
-			Size8,
-			Size11,
-			Size12,
-			Size14,
-			Size16,
-			Size18,
-			Size20,
-			Size22,
-			Size24,
-			Size32,
-			Size34,
-			Size36
-		}
-
-		private BitmapFont _font;
-
-		private IEnumerable<EventCategory> _eventCategories;
+		private bool _currentVisibilityDirection;
 
 		private TimeSpan TimeSinceDraw { get; set; }
 
-		private BitmapFont Font
+		public bool Visible
 		{
 			get
 			{
-				//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-				//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-				if (_font == null)
+				if (_currentVisibilityDirection && CurrentVisibilityAnimation != null)
 				{
-					if (!Enum.TryParse<FontSize>(Enum.GetName(typeof(FontSize), Settings.EventFontSize.get_Value()), out FontSize size))
-					{
-						size = (FontSize)16;
-					}
-					_font = GameService.Content.GetFont((FontFace)0, size, (FontStyle)0);
+					return true;
 				}
-				return _font;
+				if (!_currentVisibilityDirection && CurrentVisibilityAnimation != null)
+				{
+					return false;
+				}
+				return ((Control)this).get_Visible();
+			}
+			set
+			{
+				((Control)this).set_Visible(value);
 			}
 		}
 
 		private double PixelPerMinute => (double)((Control)this).get_Size().X / EventTableModule.ModuleInstance.EventTimeSpan.TotalMinutes;
 
-		private IEnumerable<EventCategory> EventCategories
-		{
-			get
-			{
-				return _eventCategories;
-			}
-			set
-			{
-				_eventCategories = value;
-			}
-		}
-
 		private Tween CurrentVisibilityAnimation { get; set; }
-
-		private ModuleSettings Settings { get; set; }
 
 		private Texture2D Texture { get; set; }
 
-		public EventTableContainer(IEnumerable<EventCategory> eventCategories, ModuleSettings settings)
+		public EventTableContainer()
 			: this()
 		{
-			EventCategories = eventCategories;
-			Settings = settings;
-			Settings.ModuleSettingsChanged += Settings_ModuleSettingsChanged;
 			((Control)this).add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)EventTableContainer_Click);
 			((Control)this).add_RightMouseButtonPressed((EventHandler<MouseEventArgs>)EventTableContainer_Click);
 			((Control)this).add_MouseMoved((EventHandler<MouseEventArgs>)EventTableContainer_MouseMoved);
@@ -91,14 +59,14 @@ namespace Estreya.BlishHUD.EventTable.UI.Container
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
 			MouseEventArgs mouseEventArgs = new MouseEventArgs(((Control)this).get_RelativeMousePosition(), e.get_IsDoubleClick(), e.get_EventType());
-			foreach (EventCategory eventCategory in EventCategories)
+			foreach (EventCategory eventCategory in EventTableModule.ModuleInstance.EventCategories)
 			{
 				foreach (Event ev in eventCategory.Events)
 				{
-					if (ev.IsHovered(EventCategories, eventCategory, EventTableModule.ModuleInstance.DateTimeNow, EventTableModule.ModuleInstance.EventTimeMax, EventTableModule.ModuleInstance.EventTimeMin, ((Container)this).get_ContentRegion(), ((Control)this).get_RelativeMousePosition(), PixelPerMinute, EventTableModule.ModuleInstance.EventHeight, EventTableModule.ModuleInstance.Debug))
+					if (ev.IsHovered(EventTableModule.ModuleInstance.EventCategories, eventCategory, EventTableModule.ModuleInstance.DateTimeNow, EventTableModule.ModuleInstance.EventTimeMax, EventTableModule.ModuleInstance.EventTimeMin, ((Container)this).get_ContentRegion(), ((Control)this).get_RelativeMousePosition(), PixelPerMinute, EventTableModule.ModuleInstance.EventHeight, EventTableModule.ModuleInstance.Debug))
 					{
 						ev.HandleHover(sender, mouseEventArgs, PixelPerMinute);
 					}
@@ -110,23 +78,15 @@ namespace Estreya.BlishHUD.EventTable.UI.Container
 			}
 		}
 
-		private void Settings_ModuleSettingsChanged(object sender, ModuleSettings.ModuleSettingsChangedEventArgs e)
-		{
-			if (e.Name == "EventFontSize")
-			{
-				_font = null;
-			}
-		}
-
 		private void EventTableContainer_Click(object sender, MouseEventArgs e)
 		{
-			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			foreach (EventCategory eventCategory in EventCategories)
+			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			foreach (EventCategory eventCategory in EventTableModule.ModuleInstance.EventCategories)
 			{
 				foreach (Event ev in eventCategory.Events)
 				{
-					if (ev.IsHovered(EventCategories, eventCategory, EventTableModule.ModuleInstance.DateTimeNow, EventTableModule.ModuleInstance.EventTimeMax, EventTableModule.ModuleInstance.EventTimeMin, ((Container)this).get_ContentRegion(), ((Control)this).get_RelativeMousePosition(), PixelPerMinute, EventTableModule.ModuleInstance.EventHeight, EventTableModule.ModuleInstance.Debug))
+					if (ev.IsHovered(EventTableModule.ModuleInstance.EventCategories, eventCategory, EventTableModule.ModuleInstance.DateTimeNow, EventTableModule.ModuleInstance.EventTimeMax, EventTableModule.ModuleInstance.EventTimeMin, ((Container)this).get_ContentRegion(), ((Control)this).get_RelativeMousePosition(), PixelPerMinute, EventTableModule.ModuleInstance.EventHeight, EventTableModule.ModuleInstance.Debug))
 					{
 						ev.HandleClick(sender, e);
 						return;
@@ -142,56 +102,60 @@ namespace Estreya.BlishHUD.EventTable.UI.Container
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0217: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0226: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0230: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0235: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0210: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0228: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0233: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0265: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026a: Unknown result type (might be due to invalid IL or missing references)
 			spriteBatch.End();
 			SpriteBatchExtensions.Begin(spriteBatch, ((Control)this).get_SpriteBatchParameters());
 			InitializeBaseTexture(((GraphicsResource)spriteBatch).get_GraphicsDevice());
-			IEnumerable<EventCategory> eventCategories = EventCategories;
-			Color backgroundColor = ((Settings.BackgroundColor.get_Value().get_Id() == 1) ? Color.get_Transparent() : ColorExtensions.ToXnaColor(Settings.BackgroundColor.get_Value().get_Cloth()));
-			((Control)this).set_BackgroundColor(backgroundColor * Settings.BackgroundColorOpacity.get_Value());
+			List<EventCategory> eventCategories = EventTableModule.ModuleInstance.EventCategories;
+			Color backgroundColor = ((EventTableModule.ModuleInstance.ModuleSettings.BackgroundColor.get_Value().get_Id() == 1) ? Color.get_Transparent() : ColorExtensions.ToXnaColor(EventTableModule.ModuleInstance.ModuleSettings.BackgroundColor.get_Value().get_Cloth()));
+			((Control)this).set_BackgroundColor(backgroundColor * EventTableModule.ModuleInstance.ModuleSettings.BackgroundColorOpacity.get_Value());
 			int y = 0;
+			bool anyCategoryDrawn = false;
 			foreach (EventCategory eventCategory in eventCategories)
 			{
-				IEnumerable<IGrouping<Event, KeyValuePair<DateTime, Event>>> groups = from ev in eventCategory.GetEventOccurences(Settings.AllEvents, EventTableModule.ModuleInstance.DateTimeNow, EventTableModule.ModuleInstance.EventTimeMax, EventTableModule.ModuleInstance.EventTimeMin, Settings.UseFiller.get_Value())
+				IEnumerable<IGrouping<Event, KeyValuePair<DateTime, Event>>> groups = from ev in eventCategory.GetEventOccurences(EventTableModule.ModuleInstance.DateTimeNow, EventTableModule.ModuleInstance.EventTimeMax, EventTableModule.ModuleInstance.EventTimeMin, EventTableModule.ModuleInstance.ModuleSettings.UseFiller.get_Value())
 					group ev by ev.Value;
 				bool anyEventDrawn = false;
 				foreach (IGrouping<Event, KeyValuePair<DateTime, Event>> item in groups)
 				{
 					List<DateTime> starts = item.Select((KeyValuePair<DateTime, Event> g) => g.Key).ToList();
 					anyEventDrawn = starts.Count > 0;
-					item.Key.Draw(spriteBatch, bounds, (Control)(object)this, Texture, eventCategories.ToList(), eventCategory, PixelPerMinute, EventTableModule.ModuleInstance.EventHeight, EventTableModule.ModuleInstance.DateTimeNow, EventTableModule.ModuleInstance.EventTimeMin, EventTableModule.ModuleInstance.EventTimeMax, Font, starts);
+					item.Key.Draw(spriteBatch, bounds, (Control)(object)this, Texture, eventCategories.ToList(), eventCategory, PixelPerMinute, EventTableModule.ModuleInstance.EventHeight, EventTableModule.ModuleInstance.DateTimeNow, EventTableModule.ModuleInstance.EventTimeMin, EventTableModule.ModuleInstance.EventTimeMax, EventTableModule.ModuleInstance.Font, starts);
 				}
 				if (anyEventDrawn)
 				{
+					anyCategoryDrawn = true;
 					y = groups.ElementAt(0).Key.GetYPosition(eventCategories, eventCategory, EventTableModule.ModuleInstance.EventHeight, EventTableModule.ModuleInstance.Debug);
 				}
 			}
-			((Control)this).set_Size(new Point(bounds.Width, y + EventTableModule.ModuleInstance.EventHeight));
-			DrawLine(spriteBatch, new Rectangle(((Control)this).get_Size().X / 2, 0, 2, ((Control)this).get_Size().Y), Color.get_LightGray());
+			((Control)this).set_Size(new Point(bounds.Width, y + (anyCategoryDrawn ? EventTableModule.ModuleInstance.EventHeight : 0)));
+			float middleLineX = (float)((Control)this).get_Size().X * EventTableModule.ModuleInstance.EventTimeSpanRatio;
+			DrawLine(spriteBatch, new RectangleF(middleLineX, 0f, 2f, (float)((Control)this).get_Size().Y), Color.get_LightGray());
 			spriteBatch.End();
 			SpriteBatchExtensions.Begin(spriteBatch, ((Control)this).get_SpriteBatchParameters());
 		}
 
 		public void Show()
 		{
-			if (!((Control)this).get_Visible() || CurrentVisibilityAnimation != null)
+			if (!Visible || CurrentVisibilityAnimation != null)
 			{
 				if (CurrentVisibilityAnimation != null)
 				{
 					CurrentVisibilityAnimation.Cancel();
 				}
-				((Control)this).set_Visible(true);
+				_currentVisibilityDirection = true;
+				Visible = true;
 				CurrentVisibilityAnimation = ((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<EventTableContainer>(this, (object)new
 				{
 					Opacity = 1f
@@ -205,19 +169,20 @@ namespace Estreya.BlishHUD.EventTable.UI.Container
 
 		public void Hide()
 		{
-			if (((Control)this).get_Visible() || CurrentVisibilityAnimation != null)
+			if (Visible || CurrentVisibilityAnimation != null)
 			{
 				if (CurrentVisibilityAnimation != null)
 				{
 					CurrentVisibilityAnimation.Cancel();
 				}
+				_currentVisibilityDirection = false;
 				CurrentVisibilityAnimation = ((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<EventTableContainer>(this, (object)new
 				{
 					Opacity = 0f
 				}, 0.2f, 0f, true);
 				CurrentVisibilityAnimation.OnComplete((Action)delegate
 				{
-					((Control)this).set_Visible(false);
+					Visible = false;
 					CurrentVisibilityAnimation = null;
 				});
 			}
@@ -268,12 +233,12 @@ namespace Estreya.BlishHUD.EventTable.UI.Container
 			}
 		}
 
-		private void DrawLine(SpriteBatch spriteBatch, Rectangle coords, Color color)
+		private void DrawLine(SpriteBatch spriteBatch, RectangleF coords, Color color)
 		{
 			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 			InitializeBaseTexture(((GraphicsResource)spriteBatch).get_GraphicsDevice());
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Texture, coords, color);
+			spriteBatch.DrawOnCtrl((Control)(object)this, Texture, coords, color);
 		}
 
 		protected override void DisposeControl()

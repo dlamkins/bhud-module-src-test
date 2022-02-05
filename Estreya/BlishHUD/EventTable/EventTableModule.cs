@@ -9,6 +9,7 @@ using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
+using Blish_HUD.Input;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
@@ -17,7 +18,10 @@ using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.EventTable.State;
 using Estreya.BlishHUD.EventTable.UI.Container;
 using Estreya.BlishHUD.EventTable.UI.Views;
+using Estreya.BlishHUD.EventTable.UI.Views.Settings;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended.BitmapFonts;
 using Newtonsoft.Json;
 
 namespace Estreya.BlishHUD.EventTable
@@ -31,9 +35,11 @@ namespace Estreya.BlishHUD.EventTable
 
 		internal ModuleSettings ModuleSettings;
 
-		private bool visibleStateFromTick = true;
+		private BitmapFont _font;
 
 		private TimeSpan _eventTimeSpan = TimeSpan.Zero;
+
+		private List<EventCategory> _eventCategories;
 
 		private EventTableContainer Container { get; set; }
 
@@ -45,13 +51,24 @@ namespace Estreya.BlishHUD.EventTable
 
 		internal Gw2ApiManager Gw2ApiManager => base.ModuleParameters.get_Gw2ApiManager();
 
-		private WindowTab ManageEventTab { get; set; }
+		private CornerIcon CornerIcon { get; set; }
 
 		internal TabbedWindow2 SettingsWindow { get; private set; }
 
-		private IEnumerable<EventCategory> EventCategories { get; set; }
-
 		internal bool Debug => ModuleSettings.DebugEnabled.get_Value();
+
+		internal BitmapFont Font
+		{
+			get
+			{
+				//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+				if (_font == null)
+				{
+					_font = GameService.Content.GetFont((FontFace)0, ModuleSettings.EventFontSize.get_Value(), (FontStyle)0);
+				}
+				return _font;
+			}
+		}
 
 		internal int EventHeight => ModuleSettings?.EventHeight?.get_Value() ?? 30;
 
@@ -82,16 +99,44 @@ namespace Estreya.BlishHUD.EventTable
 			}
 		}
 
-		internal DateTime EventTimeMin => ModuleInstance.DateTimeNow.Subtract(EventTimeSpan.Subtract(TimeSpan.FromMilliseconds(EventTimeSpan.TotalMilliseconds / 2.0)));
+		internal float EventTimeSpanRatio => 0.5f + ((float)ModuleSettings.EventHistorySplit.get_Value() / 100f - 0.5f);
 
-		internal DateTime EventTimeMax => ModuleInstance.DateTimeNow.Add(EventTimeSpan.Subtract(TimeSpan.FromMilliseconds(EventTimeSpan.TotalMilliseconds / 2.0)));
+		internal DateTime EventTimeMin
+		{
+			get
+			{
+				TimeSpan timespan = TimeSpan.FromMilliseconds(EventTimeSpan.TotalMilliseconds * (double)EventTimeSpanRatio);
+				return ModuleInstance.DateTimeNow.Subtract(timespan);
+			}
+		}
+
+		internal DateTime EventTimeMax
+		{
+			get
+			{
+				TimeSpan timespan = TimeSpan.FromMilliseconds(EventTimeSpan.TotalMilliseconds * (double)(1f - EventTimeSpanRatio));
+				return ModuleInstance.DateTimeNow.Add(timespan);
+			}
+		}
+
+		internal List<EventCategory> EventCategories
+		{
+			get
+			{
+				return _eventCategories.Where((EventCategory ec) => !ec.IsDisabled()).ToList();
+			}
+			set
+			{
+				_eventCategories = value;
+			}
+		}
 
 		internal Collection<ManagedState> States { get; private set; } = new Collection<ManagedState>();
 
 
-		internal HiddenState HiddenState { get; private set; }
+		public HiddenState HiddenState { get; private set; }
 
-		internal WorldbossState WorldbossState { get; private set; }
+		public WorldbossState WorldbossState { get; private set; }
 
 		[ImportingConstructor]
 		public EventTableModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
@@ -115,13 +160,21 @@ namespace Estreya.BlishHUD.EventTable
 			{
 				EventCategories = JsonConvert.DeserializeObject<List<EventCategory>>(await eventsReader.ReadToEndAsync());
 			}
-			ModuleSettings.InitializeEventSettings(EventCategories);
+			_eventCategories.ForEach(delegate(EventCategory ec)
+			{
+				ec.Events.ForEach(delegate(Event e)
+				{
+					e.EventCategory = ec;
+				});
+			});
+			ModuleSettings.InitializeEventSettings(_eventCategories);
+			await InitializeStates();
 			EventTableModule eventTableModule = this;
-			EventTableContainer eventTableContainer = new EventTableContainer(EventCategories, ModuleSettings);
+			EventTableContainer eventTableContainer = new EventTableContainer();
 			((Control)eventTableContainer).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((Control)eventTableContainer).set_BackgroundColor(Color.get_Transparent());
 			((Control)eventTableContainer).set_Opacity(0f);
-			((Control)eventTableContainer).set_Visible(false);
+			eventTableContainer.Visible = false;
 			eventTableModule.Container = eventTableContainer;
 			ModuleSettings.ModuleSettingsChanged += delegate(object sender, ModuleSettings.ModuleSettingsChangedEventArgs eventArgs)
 			{
@@ -136,9 +189,14 @@ namespace Estreya.BlishHUD.EventTable
 				case "EventTimeSpan":
 					_eventTimeSpan = TimeSpan.Zero;
 					break;
+				case "EventFontSize":
+					_font = null;
+					break;
+				case "RegisterCornerIcon":
+					HandleCornerIcon(ModuleSettings.RegisterCornerIcon.get_Value());
+					break;
 				}
 			};
-			await InitializeStates();
 		}
 
 		private async Task InitializeStates()
@@ -146,6 +204,18 @@ namespace Estreya.BlishHUD.EventTable
 			string eventsDirectory = DirectoriesManager.GetFullDirectoryPath("events");
 			HiddenState = new HiddenState(eventsDirectory);
 			WorldbossState = new WorldbossState(Gw2ApiManager);
+			WorldbossState.WorldbossCompleted += delegate(object s, string e)
+			{
+				if (ModuleSettings.WorldbossCompletedAcion.get_Value() == WorldbossCompletedAction.Hide)
+				{
+					(from ev in _eventCategories.SelectMany((EventCategory ec) => ec.Events)
+						where ev.APICode == e
+						select ev).ToList().ForEach(delegate(Event ev)
+					{
+						ev.Finish();
+					});
+				}
+			};
 			lock (States)
 			{
 				States.Add(HiddenState);
@@ -157,13 +227,51 @@ namespace Estreya.BlishHUD.EventTable
 			}
 		}
 
+		private void HandleCornerIcon(bool show)
+		{
+			//IL_0004: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Expected O, but got Unknown
+			if (show)
+			{
+				CornerIcon val = new CornerIcon();
+				val.set_IconName("Event Table");
+				val.set_Icon(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("images\\event_boss_grey.png")));
+				CornerIcon = val;
+				((Control)CornerIcon).add_Click((EventHandler<MouseEventArgs>)delegate
+				{
+					((WindowBase2)SettingsWindow).ToggleWindow();
+				});
+			}
+			else if (CornerIcon != null)
+			{
+				((Control)CornerIcon).Dispose();
+				CornerIcon = null;
+			}
+		}
+
 		private void ToggleContainer(bool show)
 		{
-			if (ModuleSettings.GlobalEnabled.get_Value() && show)
+			if (Container == null)
 			{
-				Container.Show();
+				return;
 			}
-			else if (Container != null)
+			if (!ModuleSettings.GlobalEnabled.get_Value())
+			{
+				if (Container.Visible)
+				{
+					Container.Hide();
+				}
+			}
+			else if (show)
+			{
+				if (!Container.Visible)
+				{
+					Container.Show();
+				}
+			}
+			else if (Container.Visible)
 			{
 				Container.Hide();
 			}
@@ -171,56 +279,60 @@ namespace Estreya.BlishHUD.EventTable
 
 		public override IView GetSettingsView()
 		{
-			return (IView)(object)new ModuleSettingsView(ModuleSettings);
+			return (IView)(object)new ModuleSettingsView();
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0132: Expected O, but got Unknown
-			//IL_0167: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0171: Expected O, but got Unknown
+			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010c: Expected O, but got Unknown
+			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014d: Expected O, but got Unknown
+			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018e: Expected O, but got Unknown
+			//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cf: Expected O, but got Unknown
+			//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0210: Expected O, but got Unknown
 			((Module)this).OnModuleLoaded(e);
 			Container.UpdatePosition(ModuleSettings.LocationX.get_Value(), ModuleSettings.LocationY.get_Value());
 			Container.UpdateSize(ModuleSettings.Width.get_Value(), -1);
-			ManageEventTab = GameService.Overlay.get_BlishHudWindow().AddTab("Event Table", ContentsManager.GetRenderIcon("images\\event_boss.png"), (Func<IView>)(() => (IView)(object)new ManageEventsView(EventCategories, ModuleSettings.AllEvents)), 0);
+			Texture2D windowBackground = AsyncTexture2D.op_Implicit(ContentsManager.GetIcon("images\\502049.png", checkRenderAPI: false));
 			Rectangle settingsWindowSize = default(Rectangle);
-			((Rectangle)(ref settingsWindowSize))._002Ector(24, 30, 1000, 630);
-			TabbedWindow2 val = new TabbedWindow2(AsyncTexture2D.op_Implicit(ContentsManager.GetRenderIcon("images\\windowBackground.png")), settingsWindowSize, new Rectangle(settingsWindowSize.X + 46, settingsWindowSize.Y, settingsWindowSize.Width - 46, settingsWindowSize.Height));
+			((Rectangle)(ref settingsWindowSize))._002Ector(35, 26, 1100, 714);
+			int contentRegionPaddingY = settingsWindowSize.Y - 15;
+			int contentRegionPaddingX = settingsWindowSize.X + 46;
+			Rectangle contentRegion = default(Rectangle);
+			((Rectangle)(ref contentRegion))._002Ector(contentRegionPaddingX, contentRegionPaddingY, settingsWindowSize.Width - 46, settingsWindowSize.Height - contentRegionPaddingY);
+			TabbedWindow2 val = new TabbedWindow2(windowBackground, settingsWindowSize, contentRegion);
 			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((WindowBase2)val).set_Title("TabbedWindow");
-			((WindowBase2)val).set_Emblem(AsyncTexture2D.op_Implicit(ContentsManager.GetRenderIcon("images\\event_boss.png")));
-			((WindowBase2)val).set_Subtitle("Example Subtitle");
+			((WindowBase2)val).set_Title("Event Table");
+			((WindowBase2)val).set_Emblem(AsyncTexture2D.op_Implicit(ContentsManager.GetIcon("images\\event_boss.png")));
+			((WindowBase2)val).set_Subtitle("Settings");
 			((WindowBase2)val).set_SavesPosition(true);
 			((WindowBase2)val).set_Id("EventTableModule_6bd04be4-dc19-4914-a2c3-8160ce76818b");
 			SettingsWindow = val;
-			SettingsWindow.get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(((WindowBase2)SettingsWindow).get_Emblem()), (Func<IView>)(() => (IView)(object)new ManageEventsView(EventCategories, ModuleSettings.AllEvents)), "Events", (int?)null));
+			SettingsWindow.get_Tabs().Add(new Tab(ContentsManager.GetIcon("images\\event_boss_grey.png"), (Func<IView>)(() => (IView)(object)new ManageEventsView(_eventCategories, ModuleSettings.AllEvents)), "Manage Events", (int?)null));
+			SettingsWindow.get_Tabs().Add(new Tab(ContentsManager.GetIcon("156736"), (Func<IView>)(() => (IView)(object)new GeneralSettingsView(ModuleSettings)), "General Settings", (int?)null));
+			SettingsWindow.get_Tabs().Add(new Tab(ContentsManager.GetIcon("images\\graphics_settings.png"), (Func<IView>)(() => (IView)(object)new GraphicsSettingsView(ModuleSettings)), "Graphic Settings", (int?)null));
+			SettingsWindow.get_Tabs().Add(new Tab(ContentsManager.GetIcon("155052"), (Func<IView>)(() => (IView)(object)new EventSettingsView(ModuleSettings)), "Event Settings", (int?)null));
+			HandleCornerIcon(ModuleSettings.RegisterCornerIcon.get_Value());
 			if (ModuleSettings.GlobalEnabled.get_Value())
 			{
 				ToggleContainer(show: true);
 			}
-			GameService.Gw2Mumble.get_UI().add_IsMapOpenChanged((EventHandler<ValueEventArgs<bool>>)delegate(object s, ValueEventArgs<bool> eventArgs)
-			{
-				ToggleContainer(!eventArgs.get_Value());
-			});
-			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)delegate
-			{
-				//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0011: Invalid comparison between Unknown and I4
-				ToggleContainer((int)GameService.Gw2Mumble.get_CurrentMap().get_Type() != 1);
-			});
 		}
 
 		protected override void Update(GameTime gameTime)
@@ -254,23 +366,27 @@ namespace Estreya.BlishHUD.EventTable
 
 		private void CheckMumble()
 		{
-			if (Container != null && GameService.Gw2Mumble.get_IsAvailable() && ModuleSettings.HideOnMissingMumbleTicks.get_Value())
+			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009b: Invalid comparison between Unknown and I4
+			if (GameService.Gw2Mumble.get_IsAvailable() && Container != null)
 			{
-				bool tickState = GameService.Gw2Mumble.get_TimeSinceTick().TotalSeconds < 0.5;
-				if (tickState != visibleStateFromTick)
+				bool show = true;
+				show &= !GameService.Gw2Mumble.get_UI().get_IsMapOpen();
+				if (ModuleSettings.HideOnMissingMumbleTicks.get_Value())
 				{
-					visibleStateFromTick = tickState;
-					ToggleContainer(visibleStateFromTick);
+					show &= GameService.Gw2Mumble.get_TimeSinceTick().TotalSeconds < 0.5;
 				}
+				if (ModuleSettings.HideInCombat.get_Value())
+				{
+					show &= !GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat();
+				}
+				show &= (int)GameService.Gw2Mumble.get_CurrentMap().get_Type() != 1;
+				ToggleContainer(show);
 			}
 		}
 
 		protected override void Unload()
 		{
-			if (ManageEventTab != null)
-			{
-				GameService.Overlay.get_BlishHudWindow().RemoveTab(ManageEventTab);
-			}
 			if (Container != null)
 			{
 				((Control)Container).Dispose();
@@ -279,6 +395,7 @@ namespace Estreya.BlishHUD.EventTable
 			{
 				((Control)SettingsWindow).Hide();
 			}
+			HandleCornerIcon(show: false);
 			Logger.Debug("Unloading states...");
 			Task.WaitAll((from state in States.ToList()
 				select state.Unload()).ToArray());

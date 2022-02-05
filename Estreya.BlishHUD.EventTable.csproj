@@ -13,10 +13,10 @@
   <ItemGroup>
     <Reference Include="Blish HUD" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="MonoGame.Extended" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="Gw2Sharp" />
     <Reference Include="System.Core" />
-    <Reference Include="MonoGame.Extended" />
     <Reference Include="Newtonsoft.Json" />
     <Reference Include="AsyncClipboardService" />
   </ItemGroup>
