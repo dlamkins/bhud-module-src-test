@@ -29,6 +29,10 @@ namespace BhModule.Community.ErrorSubmissionModule
 
 		private ContextHandle<EtmContext> _etmContextHandle;
 
+		private const int MAXREPORTS = 10;
+
+		private int _reports;
+
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
 		internal ContentsManager ContentsManager => base.ModuleParameters.get_ContentsManager();
@@ -83,6 +87,10 @@ namespace BhModule.Community.ErrorSubmissionModule
 			sentry.MinimumBreadcrumbLevel = LogLevel.Debug;
 			sentry.BeforeSend = delegate(SentryEvent d)
 			{
+				if (_reports++ > 10)
+				{
+					return null;
+				}
 				d.SetExtra("launch-options", Environment.GetCommandLineArgs().Select(FilterUtil.FilterAll).ToArray());
 				try
 				{
