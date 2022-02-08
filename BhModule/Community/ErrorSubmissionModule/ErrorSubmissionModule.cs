@@ -1,12 +1,15 @@
 using System;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
-using Microsoft.Xna.Framework;
+using Flurl.Http;
 using NLog;
 using NLog.Config;
 using NLog.Layouts;
@@ -23,11 +26,15 @@ namespace BhModule.Community.ErrorSubmissionModule
 
 		private const string SENTRY_DSN = "https://a3aeb0597daa404199a7dedba9e6fe87@sentry.blishhud.com:2083/2";
 
+		private const string ETMCONFIG_URL = "https://etm.blishhud.com/config.json";
+
 		private SettingEntry<string> _userDiscordId;
 
 		private SettingEntry<bool> _autoSubmit;
 
 		private ContextHandle<EtmContext> _etmContextHandle;
+
+		private EtmConfig _config;
 
 		private const int MAXREPORTS = 10;
 
@@ -45,6 +52,19 @@ namespace BhModule.Community.ErrorSubmissionModule
 		public ErrorSubmissionModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
 			: this(moduleParameters)
 		{
+		}
+
+		protected override async Task LoadAsync()
+		{
+			try
+			{
+				_config = await GeneratedExtensions.GetJsonAsync<EtmConfig>("https://etm.blishhud.com/config.json", default(CancellationToken), (HttpCompletionOption)0);
+			}
+			catch (Exception ex)
+			{
+				Logger.Warn(ex, "Failed to download ETM config from {etmConfigUrl}. Using defaults.", new object[1] { "https://etm.blishhud.com/config.json" });
+				_config = new EtmConfig();
+			}
 		}
 
 		protected override void DefineSettings(SettingCollection settings)
@@ -67,7 +87,8 @@ namespace BhModule.Community.ErrorSubmissionModule
 
 		private void HookLogger()
 		{
-			(typeof(DebugService).GetField("_logConfiguration", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null) as LoggingConfiguration).AddSentry(new Action<SentryNLogOptions>(ConfigureSentry));
+			object value = typeof(DebugService).GetField("_logConfiguration", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
+			((LoggingConfiguration)((value is LoggingConfiguration) ? value : null)).AddSentry(new Action<SentryNLogOptions>(ConfigureSentry));
 			LogManager.ReconfigExistingLoggers();
 		}
 
@@ -76,7 +97,7 @@ namespace BhModule.Community.ErrorSubmissionModule
 			sentry.Dsn = "https://a3aeb0597daa404199a7dedba9e6fe87@sentry.blishhud.com:2083/2";
 			sentry.Environment = (string.IsNullOrEmpty(Program.get_OverlayVersion().PreRelease) ? "Release" : Program.get_OverlayVersion().PreRelease);
 			sentry.Debug = true;
-			sentry.BreadcrumbLayout = (Layout)"${logger}: ${message}";
+			sentry.BreadcrumbLayout = Layout.op_Implicit("${logger}: ${message}");
 			sentry.MaxBreadcrumbs = 10;
 			sentry.TracesSampleRate = 0.2;
 			sentry.AutoSessionTracking = true;
@@ -87,10 +108,14 @@ namespace BhModule.Community.ErrorSubmissionModule
 			sentry.MinimumBreadcrumbLevel = LogLevel.Debug;
 			sentry.BeforeSend = delegate(SentryEvent d)
 			{
-				if (_reports++ > 10)
+				ErrorSubmissionModule errorSubmissionModule = this;
+				int reports = _reports;
+				errorSubmissionModule._reports = reports + 1;
+				if (reports > 10)
 				{
 					return null;
 				}
+				sentry.Dsn = DsnAssocUtil.GetDsnFromEvent(d, _config);
 				d.SetExtra("launch-options", Environment.GetCommandLineArgs().Select(FilterUtil.FilterAll).ToArray());
 				try
 				{
@@ -137,13 +162,9 @@ namespace BhModule.Community.ErrorSubmissionModule
 			}
 		}
 
-		protected override void Update(GameTime gameTime)
-		{
-		}
-
 		protected override void Unload()
 		{
-			_etmContextHandle.Expire();
+			_etmContextHandle?.Expire();
 		}
 	}
 }
