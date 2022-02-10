@@ -16,6 +16,7 @@ using NLog.Layouts;
 using SemVer;
 using Sentry;
 using Sentry.NLog;
+using Sentry.Protocol;
 
 namespace BhModule.Community.ErrorSubmissionModule
 {
@@ -30,13 +31,13 @@ namespace BhModule.Community.ErrorSubmissionModule
 
 		private SettingEntry<string> _userDiscordId;
 
-		private SettingEntry<bool> _autoSubmit;
-
 		private ContextHandle<EtmContext> _etmContextHandle;
 
 		private EtmConfig _config;
 
-		private const int MAXREPORTS = 10;
+		private SentryNLogOptions _loggerOptions;
+
+		private int _maxReports = 10;
 
 		private int _reports;
 
@@ -65,6 +66,10 @@ namespace BhModule.Community.ErrorSubmissionModule
 				Logger.Warn(ex, "Failed to download ETM config from {etmConfigUrl}. Using defaults.", new object[1] { "https://etm.blishhud.com/config.json" });
 				_config = new EtmConfig();
 			}
+			if (_loggerOptions != null)
+			{
+				ApplyEtmConfig();
+			}
 		}
 
 		protected override void DefineSettings(SettingCollection settings)
@@ -92,8 +97,20 @@ namespace BhModule.Community.ErrorSubmissionModule
 			LogManager.ReconfigExistingLoggers();
 		}
 
+		private void ApplyEtmConfig()
+		{
+			_loggerOptions.Dsn = _config.BaseDsn;
+			_loggerOptions.TracesSampleRate = _config.TracesSampleRate;
+			if (_config.DisableTaskExceptions)
+			{
+				_loggerOptions.DisableTaskUnobservedTaskExceptionCapture();
+			}
+			_maxReports = _config.MaxReports;
+		}
+
 		private void ConfigureSentry(SentryNLogOptions sentry)
 		{
+			_loggerOptions = sentry;
 			sentry.Dsn = "https://a3aeb0597daa404199a7dedba9e6fe87@sentry.blishhud.com:2083/2";
 			sentry.Environment = (string.IsNullOrEmpty(Program.get_OverlayVersion().PreRelease) ? "Release" : Program.get_OverlayVersion().PreRelease);
 			sentry.Debug = true;
@@ -103,17 +120,39 @@ namespace BhModule.Community.ErrorSubmissionModule
 			sentry.AutoSessionTracking = true;
 			sentry.DetectStartupTime = StartupTimeDetectionMode.None;
 			sentry.ReportAssembliesMode = ReportAssembliesMode.None;
-			sentry.DisableTaskUnobservedTaskExceptionCapture();
 			sentry.DisableNetFxInstallationsIntegration();
 			sentry.MinimumBreadcrumbLevel = LogLevel.Debug;
 			sentry.BeforeSend = delegate(SentryEvent d)
 			{
+				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+				//IL_000c: Invalid comparison between Unknown and I4
+				if ((int)((Module)this).get_RunState() != 2)
+				{
+					return null;
+				}
 				ErrorSubmissionModule errorSubmissionModule = this;
 				int reports = _reports;
 				errorSubmissionModule._reports = reports + 1;
-				if (reports > 10)
+				if (reports > _maxReports)
 				{
 					return null;
+				}
+				if (_config != null && !Range.IsSatisfied(_config.SupportedBlishHUD, Program.get_OverlayVersion().BaseVersion().ToString()))
+				{
+					return null;
+				}
+				if (string.Equals(d.Message?.Message ?? "", "Blish HUD encountered a fatal crash!", StringComparison.InvariantCultureIgnoreCase))
+				{
+					foreach (SentryException current in (d.SentryExceptions ?? Enumerable.Empty<SentryException>())!)
+					{
+						if (current.Mechanism != null)
+						{
+							current.Mechanism!.Handled = false;
+							current.Mechanism!.Type = "AppDomain.UnhandledException";
+						}
+					}
+					d.SetTag("handled", "no");
+					d.SetTag("mechanism", "AppDomain.UnhandledException");
 				}
 				sentry.Dsn = DsnAssocUtil.GetDsnFromEvent(d, _config);
 				d.SetExtra("launch-options", Environment.GetCommandLineArgs().Select(FilterUtil.FilterAll).ToArray());
@@ -165,6 +204,10 @@ namespace BhModule.Community.ErrorSubmissionModule
 		protected override void Unload()
 		{
 			_etmContextHandle?.Expire();
+			if (_userDiscordId != null)
+			{
+				_userDiscordId.remove_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateUser);
+			}
 		}
 	}
 }

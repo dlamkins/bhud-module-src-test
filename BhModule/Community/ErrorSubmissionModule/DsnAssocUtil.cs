@@ -17,6 +17,7 @@ namespace BhModule.Community.ErrorSubmissionModule
 			{
 				return;
 			}
+			sentryEvent.SetTag("bh.release", Program.get_OverlayVersion().ToString());
 			foreach (ModuleManager module in GameService.Module.get_Modules())
 			{
 				if (string.Equals(module.get_Manifest().get_Namespace(), id, StringComparison.InvariantCultureIgnoreCase))

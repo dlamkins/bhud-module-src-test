@@ -16,6 +16,9 @@ namespace BhModule.Community.ErrorSubmissionModule
 		public string SupportedEtm { get; set; } = ">=0.0.0";
 
 
+		public bool DisableTaskExceptions { get; set; } = true;
+
+
 		public string SupportedBlishHUD { get; set; } = ">=0.7.0";
 
 
