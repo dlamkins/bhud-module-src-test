@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="Setting_PackFadeTrailsAroundCharacter"><value>Fade Trails Around Character</value></data>
+  <data name="Setting_MapShowMarkersOnCompass"><value>Show Markers on the Minimap</value></data>
+  <data name="Setting_MapShowTrailsOnFullscreen"><value>Show Trails on Fullscreen Map</value></data>
+  <data name="Setting_PackMaxOpacityOverride"><value>Max Opacity Override</value></data>
+  <data name="General_UiName"><value>Markers &amp; Trails</value></data>
+  <data name="Repo_Download"><value>Download</value></data>
+  <data name="Setting_PackMaxTrailAnimationSpeed"><value>Max Trail Animation Speed</value></data>
+  <data name="Setting_PackAllowMarkersToAnimate"><value>Allow Markers to Animate</value></data>
+  <data name="Setting_MapShowAboveBelowIndicators"><value>Show Above/Below Indicators</value></data>
+  <data name="Window_MapSettingsTab"><value>Map Options</value></data>
+  <data name="Window_MainSettingsTab"><value>Marker Options</value></data>
+  <data name="Window_DownloadMarkerPacks"><value>Download Marker Packs</value></data>
+  <data name="Repo_Categories"><value>Categories</value></data>
+  <data name="Repo_Info"><value>Info</value></data>
+  <data name="Setting_PackFadePathablesDuringCombat"><value>Fade Markers and Trails While in Combat</value></data>
+  <data name="Setting_PackAllowMarkersToAutomaticallyHide"><value>Allow Markers to Automatically Hide</value></data>
+  <data name="Setting_PackShowCategoriesFromAllMaps"><value>Show Categories From All Maps</value></data>
+  <data name="Setting_PackFadeMarkersBetweenCharacterAndCamera"><value>Fade Markers Between Character and Camera</value></data>
+  <data name="Setting_PackMarkerConsentToClipboard"><value>Allow Markers to Set Clipboard</value></data>
+  <data name="Setting_MapShowMarkersOnFullscreen"><value>Show Markers on Fullscreen Map</value></data>
+  <data name="Info_HiddenCategories"><value>Categories hidden because they are for markers on a different map.
+
+Click to view them or you can disable this filter by toggling:
+Pathing Module Settings &gt; Show Categories From All Maps.</value></data>
+  <data name="Window_KeyBindSettingsTab"><value>Key Bindings</value></data>
+  <data name="Setting_PackMaxViewDistance"><value>Max View Distance</value></data>
+  <data name="Setting_MapShowTrailsOnCompass"><value>Show Trails on the Minimap</value></data>
+  </root>
