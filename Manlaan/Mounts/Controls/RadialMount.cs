@@ -10,7 +10,7 @@ namespace Manlaan.Mounts.Controls
 
 		public Mount Mount { get; set; }
 
-		public Texture Texture { get; set; }
+		public Texture2D Texture { get; set; }
 
 		public int ImageX { get; set; }
 

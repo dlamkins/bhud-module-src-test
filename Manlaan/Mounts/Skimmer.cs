@@ -4,8 +4,8 @@ namespace Manlaan.Mounts
 {
 	public class Skimmer : Mount
 	{
-		public Skimmer(SettingCollection settingCollection)
-			: base(settingCollection, "Skimmer", "Skimmer", "skimmer", isUnderwaterMount: true, isWvWMount: false, 3)
+		public Skimmer(SettingCollection settingCollection, Helper helper)
+			: base(settingCollection, helper, "Skimmer", "Skimmer", "skimmer", isUnderwaterMount: true, isWvWMount: false, 3)
 		{
 		}
 	}

@@ -4,8 +4,8 @@ namespace Manlaan.Mounts
 {
 	public class Raptor : Mount
 	{
-		public Raptor(SettingCollection settingCollection)
-			: base(settingCollection, "Raptor", "Raptor", "raptor", isUnderwaterMount: false, isWvWMount: false, 1)
+		public Raptor(SettingCollection settingCollection, Helper helper)
+			: base(settingCollection, helper, "Raptor", "Raptor", "raptor", isUnderwaterMount: false, isWvWMount: false, 1)
 		{
 		}
 	}

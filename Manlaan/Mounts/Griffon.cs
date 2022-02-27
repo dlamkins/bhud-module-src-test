@@ -4,8 +4,8 @@ namespace Manlaan.Mounts
 {
 	public class Griffon : Mount
 	{
-		public Griffon(SettingCollection settingCollection)
-			: base(settingCollection, "Griffon", "Griffon", "griffon", isUnderwaterMount: false, isWvWMount: false, 4)
+		public Griffon(SettingCollection settingCollection, Helper helper)
+			: base(settingCollection, helper, "Griffon", "Griffon", "griffon", isUnderwaterMount: false, isWvWMount: false, 5)
 		{
 		}
 	}

@@ -4,8 +4,8 @@ namespace Manlaan.Mounts
 {
 	public class SiegeTurtle : Mount
 	{
-		public SiegeTurtle(SettingCollection settingCollection)
-			: base(settingCollection, "Turtle", "Siege Turtle", "turtle", isUnderwaterMount: true, isWvWMount: false, 8)
+		public SiegeTurtle(SettingCollection settingCollection, Helper helper)
+			: base(settingCollection, helper, "Turtle", "Siege Turtle", "turtle", isUnderwaterMount: true, isWvWMount: false, 9)
 		{
 		}
 	}

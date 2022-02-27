@@ -1,10 +1,8 @@
 using System;
-using System.Threading;
+using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
-using Blish_HUD.Controls.Extern;
-using Blish_HUD.Controls.Intern;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
 using Microsoft.Xna.Framework.Graphics;
@@ -14,13 +12,13 @@ namespace Manlaan.Mounts
 {
 	public abstract class Mount
 	{
+		private readonly Helper _helper;
+
 		public string Name { get; private set; }
 
 		public string DisplayName { get; private set; }
 
 		public string ImageFileName { get; private set; }
-
-		public bool IsDisabled { get; private set; }
 
 		public DateTime? QueuedTimestamp { get; internal set; }
 
@@ -36,74 +34,36 @@ namespace Manlaan.Mounts
 
 		public CornerIcon CornerIcon { get; private set; }
 
-		public Mount(SettingCollection settingCollection, string name, string displayName, string imageFileName, bool isUnderwaterMount, bool isWvWMount, int defaultOrderSettig)
+		public bool IsAvailable => OrderSetting.get_Value() != 0 && IsKeybindSet;
+
+		public bool IsKeybindSet => (int)KeybindingSetting.get_Value().get_ModifierKeys() != 0 || (int)KeybindingSetting.get_Value().get_PrimaryKey() > 0;
+
+		public Mount(SettingCollection settingCollection, Helper helper, string name, string displayName, string imageFileName, bool isUnderwaterMount, bool isWvWMount, int defaultOrderSetting)
 		{
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Expected O, but got Unknown
+			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00df: Expected O, but got Unknown
+			_helper = helper;
 			Name = name;
 			DisplayName = displayName;
 			ImageFileName = imageFileName;
 			IsWaterMount = isUnderwaterMount;
 			IsWvWMount = isWvWMount;
-			OrderSetting = settingCollection.DefineSetting<int>("Mount" + name + "Order2", defaultOrderSettig, displayName + " Order", "", (SettingTypeRendererDelegate)null);
-			KeybindingSetting = settingCollection.DefineSetting<KeyBinding>("Mount" + name + "Binding", new KeyBinding((Keys)0), displayName + " Binding", "", (SettingTypeRendererDelegate)null);
+			OrderSetting = settingCollection.DefineSetting<int>("Mount" + name + "Order2", defaultOrderSetting, (Func<string>)(() => displayName + " Order"), (Func<string>)(() => ""));
+			KeybindingSetting = settingCollection.DefineSetting<KeyBinding>("Mount" + name + "Binding", new KeyBinding((Keys)0), (Func<string>)(() => displayName + " Binding"), (Func<string>)(() => ""));
 		}
 
-		public void DoHotKey()
+		public async Task DoHotKey()
 		{
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Invalid comparison between Unknown and I4
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0112: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0134: Invalid comparison between Unknown and I4
-			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
 			if (GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat())
 			{
 				QueuedTimestamp = DateTime.UtcNow;
 				return;
 			}
-			LastUsedTimestamp = DateTime.UtcNow;
-			if ((int)KeybindingSetting.get_Value().get_ModifierKeys() > 0)
+			if ((int)GameService.Gw2Mumble.get_PlayerCharacter().get_CurrentMount() == 0)
 			{
-				if (((Enum)KeybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)2))
-				{
-					Keyboard.Press((VirtualKeyShort)18, true);
-				}
-				if (((Enum)KeybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)1))
-				{
-					Keyboard.Press((VirtualKeyShort)17, true);
-				}
-				if (((Enum)KeybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)4))
-				{
-					Keyboard.Press((VirtualKeyShort)16, true);
-				}
+				LastUsedTimestamp = DateTime.UtcNow;
 			}
-			Keyboard.Press(ToVirtualKey(KeybindingSetting.get_Value().get_PrimaryKey()), true);
-			Thread.Sleep(50);
-			Keyboard.Release(ToVirtualKey(KeybindingSetting.get_Value().get_PrimaryKey()), true);
-			if ((int)KeybindingSetting.get_Value().get_ModifierKeys() > 0)
-			{
-				if (((Enum)KeybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)4))
-				{
-					Keyboard.Release((VirtualKeyShort)16, true);
-				}
-				if (((Enum)KeybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)1))
-				{
-					Keyboard.Release((VirtualKeyShort)17, true);
-				}
-				if (((Enum)KeybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)2))
-				{
-					Keyboard.Release((VirtualKeyShort)18, true);
-				}
-			}
+			await _helper.TriggerKeybind(KeybindingSetting);
 		}
 
 		public void CreateCornerIcon(Texture2D img)
@@ -125,9 +85,9 @@ namespace Manlaan.Mounts
 			val.set_HoverIcon(AsyncTexture2D.op_Implicit(img));
 			val.set_Priority(10);
 			CornerIcon = val;
-			((Control)CornerIcon).add_Click((EventHandler<MouseEventArgs>)delegate
+			((Control)CornerIcon).add_Click((EventHandler<MouseEventArgs>)async delegate
 			{
-				DoHotKey();
+				await DoHotKey();
 			});
 		}
 
@@ -137,22 +97,6 @@ namespace Manlaan.Mounts
 			if (cornerIcon != null)
 			{
 				((Control)cornerIcon).Dispose();
-			}
-		}
-
-		private VirtualKeyShort ToVirtualKey(Keys key)
-		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0004: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			try
-			{
-				return (VirtualKeyShort)(short)key;
-			}
-			catch
-			{
-				return (VirtualKeyShort)0;
 			}
 		}
 	}

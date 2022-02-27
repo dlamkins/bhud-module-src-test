@@ -4,8 +4,8 @@ namespace Manlaan.Mounts
 {
 	public class Skyscale : Mount
 	{
-		public Skyscale(SettingCollection settingCollection)
-			: base(settingCollection, "Skyscale", "Skyscale", "skyscale", isUnderwaterMount: false, isWvWMount: false, 7)
+		public Skyscale(SettingCollection settingCollection, Helper helper)
+			: base(settingCollection, helper, "Skyscale", "Skyscale", "skyscale", isUnderwaterMount: false, isWvWMount: false, 8)
 		{
 		}
 	}

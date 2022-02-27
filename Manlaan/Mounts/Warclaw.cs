@@ -4,8 +4,8 @@ namespace Manlaan.Mounts
 {
 	public class Warclaw : Mount
 	{
-		public Warclaw(SettingCollection settingCollection)
-			: base(settingCollection, "Warclaw", "Warclaw", "warclaw", isUnderwaterMount: false, isWvWMount: true, 6)
+		public Warclaw(SettingCollection settingCollection, Helper helper)
+			: base(settingCollection, helper, "Warclaw", "Warclaw", "warclaw", isUnderwaterMount: false, isWvWMount: true, 7)
 		{
 		}
 	}
