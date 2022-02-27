@@ -9,11 +9,15 @@ namespace lk0001.CurrentTemplates.Controls
 {
 	internal class DrawTemplates : Container
 	{
-		public bool Drag;
-
 		public FontSize Font_Size = (FontSize)16;
 
 		public HorizontalAlignment Align;
+
+		public bool Drag;
+
+		public bool BuildPad;
+
+		public string BuildPadConfigPath = "";
 
 		public string buildName = "";
 
@@ -31,17 +35,17 @@ namespace lk0001.CurrentTemplates.Controls
 			: this()
 		{
 			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Expected O, but got Unknown
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008c: Expected O, but got Unknown
 			((Control)this).set_Location(new Point(0, 0));
 			((Control)this).set_Size(new Point(0, 0));
 			((Control)this).set_Visible(true);

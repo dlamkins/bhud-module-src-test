@@ -9,6 +9,8 @@ namespace lk0001.CurrentTemplates.Views
 {
 	public class SettingsView : View
 	{
+		private Label settingBuildPadPath_Warning;
+
 		protected override void Build(Container buildPanel)
 		{
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
@@ -53,6 +55,30 @@ namespace lk0001.CurrentTemplates.Views
 			//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
 			//IL_020a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0214: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021d: Expected O, but got Unknown
+			//IL_0238: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0244: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0250: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0263: Expected O, but got Unknown
+			//IL_027e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0283: Unknown result type (might be due to invalid IL or missing references)
+			//IL_028a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0296: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a9: Expected O, but got Unknown
+			//IL_02b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0307: Expected O, but got Unknown
 			Panel val = new Panel();
 			val.set_CanScroll(false);
 			((Control)val).set_Parent(buildPanel);
@@ -111,7 +137,52 @@ namespace lk0001.CurrentTemplates.Views
 			((Container)val6).set_WidthSizingMode((SizingMode)2);
 			((Control)val6).set_Location(new Point(10, ((Control)settingAlign_Label).get_Bottom() + 6));
 			((Control)val6).set_Parent((Container)(object)parentPanel);
-			val6.Show(settingDrag_View);
+			ViewContainer settingDrag_Container = val6;
+			settingDrag_Container.Show(settingDrag_View);
+			IView settingBuildPad_View = SettingView.FromType((SettingEntry)(object)Module._settingBuildPad, ((Control)buildPanel).get_Width());
+			ViewContainer val7 = new ViewContainer();
+			((Container)val7).set_WidthSizingMode((SizingMode)2);
+			((Control)val7).set_Location(new Point(10, ((Control)settingDrag_Container).get_Bottom() + 6));
+			((Control)val7).set_Parent((Container)(object)parentPanel);
+			ViewContainer settingBuildPad_Container = val7;
+			settingBuildPad_Container.Show(settingBuildPad_View);
+			IView settingBuildPadPath_View = SettingView.FromType((SettingEntry)(object)Module._settingBuildPadPath, ((Control)buildPanel).get_Width());
+			ViewContainer val8 = new ViewContainer();
+			((Container)val8).set_WidthSizingMode((SizingMode)2);
+			((Control)val8).set_Location(new Point(10, ((Control)settingBuildPad_Container).get_Bottom() + 6));
+			((Control)val8).set_Parent((Container)(object)parentPanel);
+			ViewContainer settingBuildPadPath_Container = val8;
+			settingBuildPadPath_Container.Show(settingBuildPadPath_View);
+			Label val9 = new Label();
+			((Control)val9).set_Location(new Point(10, ((Control)settingBuildPadPath_Container).get_Bottom() + 10));
+			((Control)val9).set_Width(100);
+			val9.set_AutoSizeHeight(false);
+			val9.set_WrapText(false);
+			((Control)val9).set_Parent((Container)(object)parentPanel);
+			val9.set_Text("Incorrect path");
+			val9.set_TextColor(Color.get_Red());
+			settingBuildPadPath_Warning = val9;
+			ToggleIncorrectPathWarning();
+		}
+
+		public void ToggleIncorrectPathWarning()
+		{
+			if (Module._hasBuildPad)
+			{
+				Label obj = settingBuildPadPath_Warning;
+				if (obj != null)
+				{
+					((Control)obj).Hide();
+				}
+			}
+			else
+			{
+				Label obj2 = settingBuildPadPath_Warning;
+				if (obj2 != null)
+				{
+					((Control)obj2).Show();
+				}
+			}
 		}
 
 		public SettingsView()
