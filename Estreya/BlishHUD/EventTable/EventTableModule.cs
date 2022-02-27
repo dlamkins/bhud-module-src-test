@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Blish_HUD;
@@ -15,6 +14,7 @@ using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Estreya.BlishHUD.EventTable.Extensions;
 using Estreya.BlishHUD.EventTable.Models;
+using Estreya.BlishHUD.EventTable.Models.Settings;
 using Estreya.BlishHUD.EventTable.State;
 using Estreya.BlishHUD.EventTable.UI.Container;
 using Estreya.BlishHUD.EventTable.UI.Views;
@@ -119,17 +119,7 @@ namespace Estreya.BlishHUD.EventTable
 			}
 		}
 
-		internal List<EventCategory> EventCategories
-		{
-			get
-			{
-				return _eventCategories.Where((EventCategory ec) => !ec.IsDisabled()).ToList();
-			}
-			set
-			{
-				_eventCategories = value;
-			}
-		}
+		internal List<EventCategory> EventCategories => _eventCategories.Where((EventCategory ec) => !ec.IsDisabled()).ToList();
 
 		internal Collection<ManagedState> States { get; private set; } = new Collection<ManagedState>();
 
@@ -137,6 +127,8 @@ namespace Estreya.BlishHUD.EventTable
 		public HiddenState HiddenState { get; private set; }
 
 		public WorldbossState WorldbossState { get; private set; }
+
+		public EventFileState EventFileState { get; private set; }
 
 		[ImportingConstructor]
 		public EventTableModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
@@ -156,10 +148,9 @@ namespace Estreya.BlishHUD.EventTable
 
 		protected override async Task LoadAsync()
 		{
-			using (StreamReader eventsReader = new StreamReader(ContentsManager.GetFileStream("events.json")))
-			{
-				EventCategories = JsonConvert.DeserializeObject<List<EventCategory>>(await eventsReader.ReadToEndAsync());
-			}
+			await ModuleSettings.Load();
+			await InitializeStates(beforeFileLoaded: true);
+			_eventCategories = JsonConvert.DeserializeObject<EventSettingsFile>(await EventFileState.GetExternalFileContent()).EventCategories ?? new List<EventCategory>();
 			_eventCategories.ForEach(delegate(EventCategory ec)
 			{
 				ec.Events.ForEach(delegate(Event e)
@@ -199,27 +190,41 @@ namespace Estreya.BlishHUD.EventTable
 			};
 		}
 
-		private async Task InitializeStates()
+		private async Task InitializeStates(bool beforeFileLoaded = false)
 		{
 			string eventsDirectory = DirectoriesManager.GetFullDirectoryPath("events");
-			HiddenState = new HiddenState(eventsDirectory);
-			WorldbossState = new WorldbossState(Gw2ApiManager);
-			WorldbossState.WorldbossCompleted += delegate(object s, string e)
+			if (!beforeFileLoaded)
 			{
-				if (ModuleSettings.WorldbossCompletedAcion.get_Value() == WorldbossCompletedAction.Hide)
+				HiddenState = new HiddenState(eventsDirectory);
+				WorldbossState = new WorldbossState(Gw2ApiManager);
+				WorldbossState.WorldbossCompleted += delegate(object s, string e)
 				{
-					(from ev in _eventCategories.SelectMany((EventCategory ec) => ec.Events)
-						where ev.APICode == e
-						select ev).ToList().ForEach(delegate(Event ev)
+					if (ModuleSettings.WorldbossCompletedAcion.get_Value() == WorldbossCompletedAction.Hide)
 					{
-						ev.Finish();
-					});
-				}
-			};
+						(from ev in _eventCategories.SelectMany((EventCategory ec) => ec.Events)
+							where ev.APICode == e
+							select ev).ToList().ForEach(delegate(Event ev)
+						{
+							ev.Finish();
+						});
+					}
+				};
+			}
+			else
+			{
+				EventFileState = new EventFileState(ContentsManager, eventsDirectory, "events.json");
+			}
 			lock (States)
 			{
-				States.Add(HiddenState);
-				States.Add(WorldbossState);
+				if (!beforeFileLoaded)
+				{
+					States.Add(HiddenState);
+					States.Add(WorldbossState);
+				}
+				else
+				{
+					States.Add(EventFileState);
+				}
 			}
 			foreach (ManagedState state in States)
 			{
@@ -366,12 +371,15 @@ namespace Estreya.BlishHUD.EventTable
 
 		private void CheckMumble()
 		{
-			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Invalid comparison between Unknown and I4
+			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ad: Invalid comparison between Unknown and I4
 			if (GameService.Gw2Mumble.get_IsAvailable() && Container != null)
 			{
 				bool show = true;
-				show &= !GameService.Gw2Mumble.get_UI().get_IsMapOpen();
+				if (ModuleSettings.HideOnOpenMap.get_Value())
+				{
+					show &= !GameService.Gw2Mumble.get_UI().get_IsMapOpen();
+				}
 				if (ModuleSettings.HideOnMissingMumbleTicks.get_Value())
 				{
 					show &= GameService.Gw2Mumble.get_TimeSinceTick().TotalSeconds < 0.5;

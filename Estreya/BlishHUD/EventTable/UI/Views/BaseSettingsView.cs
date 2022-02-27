@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
@@ -16,6 +17,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 {
 	public abstract class BaseSettingsView : View
 	{
+		private static readonly Logger Logger = Logger.GetLogger<BaseSettingsView>();
+
 		protected ModuleSettings ModuleSettings { get; set; }
 
 		private static IEnumerable<Color> Colors { get; set; }
@@ -37,7 +40,14 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			if (Colors == null)
 			{
 				progress.Report("Loading Colors...");
-				Colors = (IEnumerable<Color>)(await ((IAllExpandableClient<Color>)(object)EventTableModule.ModuleInstance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Colors()).AllAsync(default(CancellationToken)));
+				try
+				{
+					Colors = (IEnumerable<Color>)(await ((IAllExpandableClient<Color>)(object)EventTableModule.ModuleInstance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Colors()).AllAsync(default(CancellationToken)));
+				}
+				catch (Exception ex)
+				{
+					Logger.Warn("Could not load gw2 colors: " + ex.Message);
+				}
 			}
 			if (ColorPicker == null)
 			{
@@ -57,9 +67,12 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				((Control)val2).set_Visible(true);
 				ColorPicker = val2;
 				progress.Report("Adding Colors to ColorPicker...");
-				foreach (Color color2 in Colors.OrderBy((Color color) => color.get_Categories().FirstOrDefault()))
+				if (Colors != null)
 				{
-					ColorPicker.get_Colors().Add(color2);
+					foreach (Color color2 in Colors.OrderBy((Color color) => color.get_Categories().FirstOrDefault()))
+					{
+						ColorPicker.get_Colors().Add(color2);
+					}
 				}
 			}
 			progress.Report("");
@@ -137,7 +150,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			}
 		}
 
-		protected void RenderButton(Panel parent, string text, Action action)
+		protected void RenderButton(Panel parent, string text, Action action, Func<bool> disabledCallback = null)
 		{
 			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
@@ -149,6 +162,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 			ViewContainer val = new ViewContainer();
 			((Container)val).set_WidthSizingMode((SizingMode)2);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
@@ -158,6 +172,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Control)val2).set_Parent((Container)(object)settingContainer);
 			val2.set_Text(text);
 			((Control)val2).set_Width((int)EventTableModule.ModuleInstance.Font.MeasureString(text).Width);
+			((Control)val2).set_Enabled(disabledCallback == null || !disabledCallback());
 			((Control)val2).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				action();

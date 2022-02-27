@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Blish_HUD;
 using Blish_HUD.Content;
@@ -8,13 +9,15 @@ namespace Estreya.BlishHUD.EventTable.Extensions
 {
 	public static class ContentManagerExtensions
 	{
+		private static readonly Logger Logger = Logger.GetLogger(typeof(ContentManagerExtensions));
+
 		private static Dictionary<string, AsyncTexture2D> IconCache { get; set; } = new Dictionary<string, AsyncTexture2D>();
 
 
 		public static AsyncTexture2D GetIcon(this ContentsManager manager, string identifier, bool checkRenderAPI = true)
 		{
-			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Expected O, but got Unknown
+			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00af: Expected O, but got Unknown
 			if (string.IsNullOrWhiteSpace(identifier))
 			{
 				return null;
@@ -30,7 +33,14 @@ namespace Estreya.BlishHUD.EventTable.Extensions
 				{
 					if (checkRenderAPI && identifier.Contains("/"))
 					{
-						icon = GameService.Content.GetRenderServiceTexture(identifier);
+						try
+						{
+							icon = GameService.Content.GetRenderServiceTexture(identifier);
+						}
+						catch (Exception ex)
+						{
+							Logger.Warn("Could not load icon from render api: " + ex.Message);
+						}
 					}
 					else
 					{

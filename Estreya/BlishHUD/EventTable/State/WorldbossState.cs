@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.EventTable.Utils;
+using Gw2Sharp.WebApi.Exceptions;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
@@ -90,6 +91,16 @@ namespace Estreya.BlishHUD.EventTable.State
 						}
 					}
 				}
+			}
+			catch (MissingScopesException val)
+			{
+				MissingScopesException msex = val;
+				Logger.Warn("Could not update completed worldbosses due to missing scopes: " + ((Exception)(object)msex).Message);
+			}
+			catch (InvalidAccessTokenException val2)
+			{
+				InvalidAccessTokenException iatex = val2;
+				Logger.Warn("Could not update completed worldbosses due to invalid access token: " + ((Exception)(object)iatex).Message);
 			}
 			catch (Exception ex)
 			{

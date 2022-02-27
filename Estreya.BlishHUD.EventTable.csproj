@@ -18,6 +18,9 @@
     <Reference Include="Gw2Sharp" />
     <Reference Include="System.Core" />
     <Reference Include="Newtonsoft.Json" />
+    <Reference Include="SemanticVersioning">
+      <HintPath>..\..\working\SemanticVersioning.dll</HintPath>
+    </Reference>
     <Reference Include="AsyncClipboardService" />
   </ItemGroup>
 </Project>

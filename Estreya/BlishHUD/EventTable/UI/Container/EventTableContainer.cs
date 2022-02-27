@@ -21,6 +21,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Container
 
 		private TimeSpan TimeSinceDraw { get; set; }
 
+		private static bool CursorVisible => GameService.Input.get_Mouse().get_CursorIsVisible();
+
 		public bool Visible
 		{
 			get
@@ -57,10 +59,14 @@ namespace Estreya.BlishHUD.EventTable.UI.Container
 
 		private void EventTableContainer_MouseMoved(object sender, MouseEventArgs e)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+			if (!CursorVisible)
+			{
+				return;
+			}
 			MouseEventArgs mouseEventArgs = new MouseEventArgs(((Control)this).get_RelativeMousePosition(), e.get_IsDoubleClick(), e.get_EventType());
 			foreach (EventCategory eventCategory in EventTableModule.ModuleInstance.EventCategories)
 			{
@@ -80,8 +86,12 @@ namespace Estreya.BlishHUD.EventTable.UI.Container
 
 		private void EventTableContainer_Click(object sender, MouseEventArgs e)
 		{
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			if (!CursorVisible)
+			{
+				return;
+			}
 			foreach (EventCategory eventCategory in EventTableModule.ModuleInstance.EventCategories)
 			{
 				foreach (Event ev in eventCategory.Events)

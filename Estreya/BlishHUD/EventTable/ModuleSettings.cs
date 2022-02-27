@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
@@ -32,6 +33,8 @@ namespace Estreya.BlishHUD.EventTable
 
 		private const string EVENT_LIST_SETTINGS = "event-table-event-list-settings";
 
+		private Color DefaultGW2Color { get; set; }
+
 		public SettingCollection Settings { get; private set; }
 
 		public SettingCollection GlobalSettings { get; private set; }
@@ -42,6 +45,8 @@ namespace Estreya.BlishHUD.EventTable
 
 		public SettingEntry<bool> RegisterCornerIcon { get; private set; }
 
+		public SettingEntry<bool> AutomaticallyUpdateEventFile { get; private set; }
+
 		public SettingEntry<Color> BackgroundColor { get; private set; }
 
 		public SettingEntry<float> BackgroundColorOpacity { get; private set; }
@@ -49,6 +54,8 @@ namespace Estreya.BlishHUD.EventTable
 		public SettingEntry<bool> HideOnMissingMumbleTicks { get; private set; }
 
 		public SettingEntry<bool> HideInCombat { get; private set; }
+
+		public SettingEntry<bool> HideOnOpenMap { get; private set; }
 
 		public SettingEntry<bool> DebugEnabled { get; private set; }
 
@@ -106,30 +113,15 @@ namespace Estreya.BlishHUD.EventTable
 			InitializeLocationSettings(settings);
 		}
 
-		public void InitializeEventSettings(IEnumerable<EventCategory> eventCategories)
+		public async Task Load()
 		{
-			EventSettings = Settings.AddSubCollection("event-table-event-settings", false);
-			SettingCollection eventList = EventSettings.AddSubCollection("event-table-event-list-settings", false);
-			foreach (EventCategory category in eventCategories)
+			try
 			{
-				IEnumerable<Event> enumerable;
-				if (!category.ShowCombined)
-				{
-					IEnumerable<Event> events = category.Events;
-					enumerable = events;
-				}
-				else
-				{
-					enumerable = from e in category.Events
-						group e by e.Name into eg
-						select eg.First();
-				}
-				foreach (Event e2 in enumerable)
-				{
-					SettingEntry<bool> setting = eventList.DefineSetting<bool>(e2.Name, true, (Func<string>)null, (Func<string>)null);
-					setting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-					AllEvents.Add(setting);
-				}
+				DefaultGW2Color = await ((IBulkExpandableClient<Color, int>)(object)EventTableModule.ModuleInstance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Colors()).GetAsync(1, default(CancellationToken));
+			}
+			catch (Exception ex)
+			{
+				Logger.Warn("Could not load default gw2 color: " + ex.Message);
 			}
 		}
 
@@ -150,11 +142,15 @@ namespace Estreya.BlishHUD.EventTable
 			GlobalEnabledHotkey.get_Value().set_BlockSequenceFromGw2(true);
 			RegisterCornerIcon = GlobalSettings.DefineSetting<bool>("RegisterCornerIcon", true, (Func<string>)(() => "Register Corner Icon"), (Func<string>)(() => "Whether the event table should add it's own corner icon to access settings."));
 			RegisterCornerIcon.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+			AutomaticallyUpdateEventFile = GlobalSettings.DefineSetting<bool>("AutomaticallyUpdateEventFile", true, (Func<string>)(() => "Automatically Update Event File"), (Func<string>)(() => "Whether the event table should automatically update the exported event file to the newest version."));
+			AutomaticallyUpdateEventFile.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+			HideOnOpenMap = GlobalSettings.DefineSetting<bool>("HideOnOpenMap", true, (Func<string>)(() => "Hide on open Map"), (Func<string>)(() => "Whether the event table should hide when the map is open."));
+			HideOnOpenMap.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
 			HideOnMissingMumbleTicks = GlobalSettings.DefineSetting<bool>("HideOnMissingMumbleTicks", true, (Func<string>)(() => "Hide on Cutscenes"), (Func<string>)(() => "Whether the event table should hide when cutscenes are played."));
 			HideOnMissingMumbleTicks.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
 			HideInCombat = GlobalSettings.DefineSetting<bool>("HideInCombat", false, (Func<string>)(() => "Hide in Combat"), (Func<string>)(() => "Whether the event table should hide when the player is in combat."));
 			HideInCombat.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			BackgroundColor = GlobalSettings.DefineSetting<Color>("BackgroundColor", ((IBulkExpandableClient<Color, int>)(object)EventTableModule.ModuleInstance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Colors()).GetAsync(1, default(CancellationToken)).Result, (Func<string>)(() => "Background Color"), (Func<string>)(() => "Defines the background color."));
+			BackgroundColor = GlobalSettings.DefineSetting<Color>("BackgroundColor", DefaultGW2Color, (Func<string>)(() => "Background Color"), (Func<string>)(() => "Defines the background color."));
 			BackgroundColor.add_SettingChanged((EventHandler<ValueChangedEventArgs<Color>>)SettingChanged<Color>);
 			BackgroundColorOpacity = GlobalSettings.DefineSetting<float>("BackgroundColorOpacity", 0f, (Func<string>)(() => "Background Color Opacity"), (Func<string>)(() => "Defines the opacity of the background."));
 			SettingComplianceExtensions.SetRange(BackgroundColorOpacity, 0f, 1f);
@@ -190,9 +186,9 @@ namespace Estreya.BlishHUD.EventTable
 			UseFiller.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
 			UseFillerEventNames = GlobalSettings.DefineSetting<bool>("UseFillerEventNames", false, (Func<string>)(() => "Use Filler Event Names"), (Func<string>)(() => "Whether the event fillers should have names."));
 			UseFillerEventNames.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			TextColor = GlobalSettings.DefineSetting<Color>("TextColor", ((IBulkExpandableClient<Color, int>)(object)EventTableModule.ModuleInstance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Colors()).GetAsync(1, default(CancellationToken)).Result, (Func<string>)(() => "Text Color"), (Func<string>)(() => "Defines the text color of events."));
+			TextColor = GlobalSettings.DefineSetting<Color>("TextColor", DefaultGW2Color, (Func<string>)(() => "Text Color"), (Func<string>)(() => "Defines the text color of events."));
 			TextColor.add_SettingChanged((EventHandler<ValueChangedEventArgs<Color>>)SettingChanged<Color>);
-			FillerTextColor = GlobalSettings.DefineSetting<Color>("FillerTextColor", ((IBulkExpandableClient<Color, int>)(object)EventTableModule.ModuleInstance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Colors()).GetAsync(1, default(CancellationToken)).Result, (Func<string>)(() => "Filler Text Color"), (Func<string>)(() => "Defines the text color of filler events."));
+			FillerTextColor = GlobalSettings.DefineSetting<Color>("FillerTextColor", DefaultGW2Color, (Func<string>)(() => "Filler Text Color"), (Func<string>)(() => "Defines the text color of filler events."));
 			FillerTextColor.add_SettingChanged((EventHandler<ValueChangedEventArgs<Color>>)SettingChanged<Color>);
 			WorldbossCompletedAcion = GlobalSettings.DefineSetting<WorldbossCompletedAction>("WorldbossCompletedAcion", WorldbossCompletedAction.Crossout, (Func<string>)(() => "Worldboss Completed Action"), (Func<string>)(() => "Defines the action when a worldboss has been completed."));
 			WorldbossCompletedAcion.add_SettingChanged((EventHandler<ValueChangedEventArgs<WorldbossCompletedAction>>)SettingChanged<WorldbossCompletedAction>);
@@ -212,6 +208,33 @@ namespace Estreya.BlishHUD.EventTable
 			Width = LocationSettings.DefineSetting<int>("Width", (int)((double)width * 0.5), (Func<string>)(() => "Width"), (Func<string>)(() => "The width of the event table."));
 			SettingComplianceExtensions.SetRange(Width, 0, width);
 			Width.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)SettingChanged<int>);
+		}
+
+		public void InitializeEventSettings(IEnumerable<EventCategory> eventCategories)
+		{
+			EventSettings = Settings.AddSubCollection("event-table-event-settings", false);
+			SettingCollection eventList = EventSettings.AddSubCollection("event-table-event-list-settings", false);
+			foreach (EventCategory category in eventCategories)
+			{
+				IEnumerable<Event> enumerable;
+				if (!category.ShowCombined)
+				{
+					IEnumerable<Event> events = category.Events;
+					enumerable = events;
+				}
+				else
+				{
+					enumerable = from e in category.Events
+						group e by e.Name into eg
+						select eg.First();
+				}
+				foreach (Event e2 in enumerable)
+				{
+					SettingEntry<bool> setting = eventList.DefineSetting<bool>(e2.Name, true, (Func<string>)null, (Func<string>)null);
+					setting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+					AllEvents.Add(setting);
+				}
+			}
 		}
 
 		private void SettingChanged<T>(object sender, ValueChangedEventArgs<T> e)

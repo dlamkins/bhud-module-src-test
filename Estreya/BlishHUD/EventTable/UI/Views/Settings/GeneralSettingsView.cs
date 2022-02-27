@@ -18,6 +18,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views.Settings
 			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.GlobalEnabledHotkey);
 			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.RegisterCornerIcon);
 			RenderEmptyLine((Panel)(object)parent);
+			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.HideOnOpenMap);
 			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.HideOnMissingMumbleTicks);
 			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.HideInCombat);
 			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.ShowTooltips);

@@ -2,6 +2,8 @@ using System;
 using System.Threading.Tasks;
 using Blish_HUD.Controls;
 using Blish_HUD.Settings;
+using Estreya.BlishHUD.EventTable.Helpers;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Estreya.BlishHUD.EventTable.UI.Views.Settings
 {
@@ -21,6 +23,13 @@ namespace Estreya.BlishHUD.EventTable.UI.Views.Settings
 			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.DrawEventBorder);
 			RenderEmptyLine((Panel)(object)parent);
 			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.WorldbossCompletedAcion);
+			RenderEmptyLine((Panel)(object)parent);
+			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.AutomaticallyUpdateEventFile);
+			RenderButton((Panel)(object)parent, "Update Event File", delegate
+			{
+				AsyncHelper.RunSync(EventTableModule.ModuleInstance.EventFileState.ExportFile);
+				ScreenNotification.ShowNotification("Successfully updated!", (NotificationType)0, (Texture2D)null, 4);
+			});
 			RenderEmptyLine((Panel)(object)parent);
 			RenderButton((Panel)(object)parent, "Reset hidden states", delegate
 			{
