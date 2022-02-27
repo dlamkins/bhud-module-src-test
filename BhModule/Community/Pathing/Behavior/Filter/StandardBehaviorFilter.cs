@@ -41,7 +41,7 @@ namespace BhModule.Community.Pathing.Behavior.Filter
 
 		public static IBehavior BuildFromAttributes(AttributeCollection attributes, IPackState packState, StandardMarker marker)
 		{
-			return new StandardBehaviorFilter(attributes["behavior"].GetValueAsEnum<StandardPathableBehavior>(), packState, marker);
+			return new StandardBehaviorFilter((StandardPathableBehavior)attributes["behavior"].GetValueAsInt(), packState, marker);
 		}
 
 		public void Interact(bool autoTriggered)
