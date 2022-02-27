@@ -12,9 +12,13 @@
   <PropertyGroup />
   <ItemGroup />
   <ItemGroup>
-    <Reference Include="Blish HUD" />
+    <Reference Include="Blish HUD">
+      <HintPath>..\..\working\Blish HUD.exe</HintPath>
+    </Reference>
     <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="Gw2Sharp" />
+    <Reference Include="Gw2Sharp">
+      <HintPath>..\..\working\Gw2Sharp.dll</HintPath>
+    </Reference>
     <Reference Include="MonoGame.Framework" />
     <Reference Include="System.Core" />
     <Reference Include="Flurl.Http">

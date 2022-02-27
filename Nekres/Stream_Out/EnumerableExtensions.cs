@@ -8,7 +8,7 @@ namespace Nekres.Stream_Out
 	{
 		public static T MaxBy<T, U>(this IEnumerable<T> data, Func<T, U> f) where U : IComparable
 		{
-			return data.Aggregate((T i1, T i2) => (f(i1).CompareTo(f(i2)) > 0) ? i1 : i2);
+			return data.Aggregate((T i1, T i2) => (f(i1).CompareTo(f(i2)) <= 0) ? i2 : i1);
 		}
 
 		public static T MinBy<T, U>(this IEnumerable<T> data, Func<T, U> f) where U : IComparable
@@ -52,7 +52,11 @@ namespace Nekres.Stream_Out
 
 		public static bool IsNullOrEmpty<T>(this IEnumerable<T> data)
 		{
-			return data != null && data.Count() <= 0;
+			if (data != null)
+			{
+				return data.Count() <= 0;
+			}
+			return false;
 		}
 	}
 }

@@ -17,9 +17,9 @@ namespace Nekres.Stream_Out
 			};
 			char[] intArr = number.ToString().ToCharArray().Reverse()
 				.ToArray();
-			int len = intArr.Length - 1;
+			int num = intArr.Length - 1;
 			string romanNumeral = "";
-			for (int i = len; i >= 0; i--)
+			for (int i = num; i >= 0; i--)
 			{
 				romanNumeral += romanNumerals[i, int.Parse(intArr[i].ToString())];
 			}
@@ -28,7 +28,11 @@ namespace Nekres.Stream_Out
 
 		public static bool InRange(this int number, int[] range)
 		{
-			return number >= range.Min() && number <= range.Max();
+			if (number >= range.Min())
+			{
+				return number <= range.Max();
+			}
+			return false;
 		}
 	}
 }

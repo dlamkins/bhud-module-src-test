@@ -8,28 +8,16 @@ namespace Nekres.Stream_Out
 	{
 		public static CultureInfo CultureInfo(this OverlayService overlay)
 		{
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Expected I4, but got Unknown
-			Locale value = overlay.get_UserLocale().get_Value();
-			if (1 == 0)
+			return overlay.UserLocale.Value switch
 			{
-			}
-			CultureInfo result = (int)value switch
-			{
-				0 => new CultureInfo("en-US"), 
-				1 => new CultureInfo("es-ES"), 
-				2 => new CultureInfo("de-DE"), 
-				3 => new CultureInfo("fr-FR"), 
-				4 => new CultureInfo("ko-KR"), 
-				5 => new CultureInfo("zh-CN"), 
+				Locale.English => new CultureInfo("en-US"), 
+				Locale.Spanish => new CultureInfo("es-ES"), 
+				Locale.German => new CultureInfo("de-DE"), 
+				Locale.French => new CultureInfo("fr-FR"), 
+				Locale.Korean => new CultureInfo("ko-KR"), 
+				Locale.Chinese => new CultureInfo("zh-CN"), 
 				_ => System.Globalization.CultureInfo.CurrentCulture, 
 			};
-			if (1 == 0)
-			{
-			}
-			return result;
 		}
 	}
 }

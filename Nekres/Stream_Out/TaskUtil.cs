@@ -16,25 +16,21 @@ namespace Nekres.Stream_Out
 			{
 				return (true, JsonConvert.DeserializeObject<T>(await request.AllowHttpStatus(HttpStatusCode.NotFound).GetStringAsync(default(CancellationToken), (HttpCompletionOption)0)));
 			}
-			catch (FlurlHttpTimeoutException ex5)
+			catch (FlurlHttpTimeoutException ex4)
 			{
-				FlurlHttpTimeoutException ex4 = ex5;
-				StreamOutModule.Logger.Warn((Exception)ex4, "Request '" + request + "' timed out.");
+				StreamOutModule.Logger.Warn(ex4, "Request '" + request + "' timed out.");
 			}
-			catch (FlurlHttpException ex6)
+			catch (FlurlHttpException ex3)
 			{
-				FlurlHttpException ex3 = ex6;
-				StreamOutModule.Logger.Warn((Exception)ex3, "Request '" + request + "' was not successful.");
+				StreamOutModule.Logger.Warn(ex3, "Request '" + request + "' was not successful.");
 			}
 			catch (JsonReaderException val)
 			{
-				JsonReaderException val2 = val;
-				JsonReaderException ex2 = val2;
+				JsonReaderException ex2 = val;
 				StreamOutModule.Logger.Warn((Exception)(object)ex2, "Failed to read JSON response returned by request '" + request + "'.");
 			}
-			catch (Exception ex7)
+			catch (Exception ex)
 			{
-				Exception ex = ex7;
 				StreamOutModule.Logger.Error(ex, $"Unexpected error while requesting '{request}': '{ex.GetType()}'");
 			}
 			return (false, default(T));

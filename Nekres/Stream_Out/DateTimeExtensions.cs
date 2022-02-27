@@ -8,9 +8,17 @@ namespace Nekres.Stream_Out
 		{
 			if (start < end)
 			{
-				return start <= time && time <= end;
+				if (start <= time)
+				{
+					return time <= end;
+				}
+				return false;
 			}
-			return !(end < time) || !(time < start);
+			if (end < time)
+			{
+				return !(time < start);
+			}
+			return true;
 		}
 	}
 }

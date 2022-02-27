@@ -78,11 +78,9 @@ namespace Nekres.Stream_Out
 		public static Bitmap Merge(this Bitmap bmp1, Bitmap bmp2)
 		{
 			Bitmap result = new Bitmap(Math.Max(bmp1.Width, bmp2.Width), Math.Max(bmp1.Height, bmp2.Height));
-			using (Graphics g = Graphics.FromImage(result))
-			{
-				g.DrawImage(bmp1, Point.Empty);
-				g.DrawImage(bmp2, Point.Empty);
-			}
+			using Graphics g = Graphics.FromImage(result);
+			g.DrawImage(bmp1, Point.Empty);
+			g.DrawImage(bmp2, Point.Empty);
 			return result;
 		}
 
