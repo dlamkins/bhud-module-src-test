@@ -47,6 +47,11 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				catch (Exception ex)
 				{
 					Logger.Warn("Could not load gw2 colors: " + ex.Message);
+					if (ModuleSettings.DefaultGW2Color != null)
+					{
+						Logger.Debug("Adding default color: " + ModuleSettings.DefaultGW2Color.get_Name());
+						Colors = new List<Color> { ModuleSettings.DefaultGW2Color };
+					}
 				}
 			}
 			if (ColorPicker == null)

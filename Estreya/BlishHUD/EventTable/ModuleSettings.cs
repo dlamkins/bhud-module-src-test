@@ -25,6 +25,8 @@ namespace Estreya.BlishHUD.EventTable
 
 		private static readonly Logger Logger = Logger.GetLogger<ModuleSettings>();
 
+		private Color _defaultColor;
+
 		private const string GLOBAL_SETTINGS = "event-table-global-settings";
 
 		private const string LOCATION_SETTINGS = "event-table-location-settings";
@@ -33,7 +35,17 @@ namespace Estreya.BlishHUD.EventTable
 
 		private const string EVENT_LIST_SETTINGS = "event-table-event-list-settings";
 
-		private Color DefaultGW2Color { get; set; }
+		public Color DefaultGW2Color
+		{
+			get
+			{
+				return _defaultColor;
+			}
+			private set
+			{
+				_defaultColor = value;
+			}
+		}
 
 		public SettingCollection Settings { get; private set; }
 
@@ -109,8 +121,91 @@ namespace Estreya.BlishHUD.EventTable
 		public ModuleSettings(SettingCollection settings)
 		{
 			Settings = settings;
+			BuildDefaultColor();
 			InitializeGlobalSettings(settings);
 			InitializeLocationSettings(settings);
+		}
+
+		private void BuildDefaultColor()
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a9: Expected O, but got Unknown
+			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0114: Expected O, but got Unknown
+			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0147: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017e: Expected O, but got Unknown
+			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e9: Expected O, but got Unknown
+			//IL_01ee: Expected O, but got Unknown
+			Color val = new Color();
+			val.set_Name("Dye Remover");
+			val.set_Id(1);
+			val.set_BaseRgb((IReadOnlyList<int>)new List<int> { 128, 26, 26 });
+			ColorMaterial val2 = new ColorMaterial();
+			val2.set_Brightness(15);
+			val2.set_Contrast(1.25);
+			val2.set_Hue(38);
+			val2.set_Saturation(9.0 / 32.0);
+			val2.set_Lightness(1.44531);
+			val2.set_Rgb((IReadOnlyList<int>)new List<int> { 124, 108, 83 });
+			val.set_Cloth(val2);
+			ColorMaterial val3 = new ColorMaterial();
+			val3.set_Brightness(-8);
+			val3.set_Contrast(1.0);
+			val3.set_Hue(34);
+			val3.set_Saturation(0.3125);
+			val3.set_Lightness(1.09375);
+			val3.set_Rgb((IReadOnlyList<int>)new List<int> { 65, 49, 29 });
+			val.set_Leather(val3);
+			ColorMaterial val4 = new ColorMaterial();
+			val4.set_Brightness(5);
+			val4.set_Contrast(1.05469);
+			val4.set_Hue(38);
+			val4.set_Saturation(0.101563);
+			val4.set_Lightness(1.36719);
+			val4.set_Rgb((IReadOnlyList<int>)new List<int> { 96, 91, 83 });
+			val.set_Metal(val4);
+			ColorMaterial val5 = new ColorMaterial();
+			val5.set_Brightness(15);
+			val5.set_Contrast(1.25);
+			val5.set_Hue(38);
+			val5.set_Saturation(9.0 / 32.0);
+			val5.set_Lightness(1.44531);
+			val5.set_Rgb((IReadOnlyList<int>)new List<int> { 124, 108, 83 });
+			val.set_Fur(val5);
+			_defaultColor = val;
 		}
 
 		public async Task Load()

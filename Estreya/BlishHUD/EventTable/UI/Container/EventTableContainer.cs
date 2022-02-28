@@ -112,23 +112,27 @@ namespace Estreya.BlishHUD.EventTable.UI.Container
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0210: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0228: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0233: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0265: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0225: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0248: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027f: Unknown result type (might be due to invalid IL or missing references)
 			spriteBatch.End();
 			SpriteBatchExtensions.Begin(spriteBatch, ((Control)this).get_SpriteBatchParameters());
 			InitializeBaseTexture(((GraphicsResource)spriteBatch).get_GraphicsDevice());
 			List<EventCategory> eventCategories = EventTableModule.ModuleInstance.EventCategories;
-			Color backgroundColor = ((EventTableModule.ModuleInstance.ModuleSettings.BackgroundColor.get_Value().get_Id() == 1) ? Color.get_Transparent() : ColorExtensions.ToXnaColor(EventTableModule.ModuleInstance.ModuleSettings.BackgroundColor.get_Value().get_Cloth()));
+			Color backgroundColor = Color.get_Transparent();
+			if (EventTableModule.ModuleInstance.ModuleSettings.BackgroundColor.get_Value() != null && EventTableModule.ModuleInstance.ModuleSettings.BackgroundColor.get_Value().get_Id() != 1)
+			{
+				ColorExtensions.ToXnaColor(EventTableModule.ModuleInstance.ModuleSettings.BackgroundColor.get_Value().get_Cloth());
+			}
 			((Control)this).set_BackgroundColor(backgroundColor * EventTableModule.ModuleInstance.ModuleSettings.BackgroundColorOpacity.get_Value());
 			int y = 0;
 			bool anyCategoryDrawn = false;
