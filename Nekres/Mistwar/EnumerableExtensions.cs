@@ -8,7 +8,7 @@ namespace Nekres.Mistwar
 	{
 		public static T MaxBy<T, U>(this IEnumerable<T> data, Func<T, U> f) where U : IComparable
 		{
-			return data.Aggregate((T i1, T i2) => (f(i1).CompareTo(f(i2)) > 0) ? i1 : i2);
+			return data.Aggregate((T i1, T i2) => (f(i1).CompareTo(f(i2)) <= 0) ? i2 : i1);
 		}
 
 		public static T MinBy<T, U>(this IEnumerable<T> data, Func<T, U> f) where U : IComparable

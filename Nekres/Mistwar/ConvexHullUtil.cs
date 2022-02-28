@@ -24,25 +24,25 @@ namespace Nekres.Mistwar
 			int l = points.Count();
 			int k = 0;
 			List<PointF> H = new List<PointF>(new PointF[2 * l]);
-			points.Sort((PointF a, PointF b) => (a.X == b.X) ? a.Y.CompareTo(b.Y) : a.X.CompareTo(b.X));
-			for (int i = 0; i < l; i++)
+			points.Sort((PointF a, PointF b) => (a.X != b.X) ? a.X.CompareTo(b.X) : a.Y.CompareTo(b.Y));
+			for (int j = 0; j < l; j++)
 			{
-				while (k >= 2 && Cross(H[k - 2], H[k - 1], points[i]) <= 0.0)
-				{
-					k--;
-				}
-				H[k++] = points[i];
-			}
-			int j = l - 2;
-			int t = k + 1;
-			while (j >= 0)
-			{
-				while (k >= t && Cross(H[k - 2], H[k - 1], points[j]) <= 0.0)
+				while (k >= 2 && Cross(H[k - 2], H[k - 1], points[j]) <= 0.0)
 				{
 					k--;
 				}
 				H[k++] = points[j];
-				j--;
+			}
+			int i = l - 2;
+			int t = k + 1;
+			while (i >= 0)
+			{
+				while (k >= t && Cross(H[k - 2], H[k - 1], points[i]) <= 0.0)
+				{
+					k--;
+				}
+				H[k++] = points[i];
+				i--;
 			}
 			return H.Take(k - 1).ToList();
 		}

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
@@ -19,15 +20,17 @@ using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Nekres.Mistwar.Controls;
 using Nekres.Mistwar.Entities;
+using Nekres.Mistwar.UI.Controls;
+using Nekres.Mistwar.UI.Models;
+using Nekres.Mistwar.UI.Views;
 
 namespace Nekres.Mistwar
 {
 	[Export(typeof(Module))]
 	public class MistwarModule : Module
 	{
-		private static readonly Logger Logger = Logger.GetLogger<MistwarModule>();
+		internal static readonly Logger Logger = Logger.GetLogger<MistwarModule>();
 
 		internal static MistwarModule ModuleInstance;
 
@@ -74,8 +77,8 @@ namespace Nekres.Mistwar
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0052: Expected O, but got Unknown
+			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Expected O, but got Unknown
 			ToggleKeySetting = settings.DefineSetting<KeyBinding>("ToggleKey", new KeyBinding((Keys)78), (Func<string>)(() => "Toggle Key"), (Func<string>)(() => "Key used to show and hide the tactical map overlay."));
 			ColorTypeSetting = settings.DefineSetting<ColorType>("ColorType", ColorType.Normal, (Func<string>)(() => "Color Type"), (Func<string>)(() => "Select a different color type if you have a color deficiency."));
 			ColorIntensitySetting = settings.DefineSetting<float>("ColorIntensity", 80f, (Func<string>)(() => "Color Intensity"), (Func<string>)(() => "Intensity of the background color."));
@@ -86,10 +89,15 @@ namespace Nekres.Mistwar
 			UseCustomIconsSetting = settings.DefineSetting<bool>("UseCustomIcons", false, (Func<string>)(() => "Use Custom Icons"), (Func<string>)(() => "Indicates if icons provided by the module should be used for objective states."));
 		}
 
+		public override IView GetSettingsView()
+		{
+			return (IView)(object)new CustomSettingsView(new CustomSettingsModel(SettingsManager.get_ModuleSettings()));
+		}
+
 		protected override void Initialize()
 		{
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 			_wvwObjectiveCache = new Dictionary<int, IEnumerable<WvwObjectiveEntity>>();
 			MapImage mapImage = new MapImage();
 			((Control)mapImage).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
@@ -128,7 +136,11 @@ namespace Nekres.Mistwar
 
 		private bool IsUiAvailable()
 		{
-			return GameService.Gw2Mumble.get_IsAvailable() && GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && !GameService.Gw2Mumble.get_UI().get_IsMapOpen();
+			if (GameService.Gw2Mumble.get_IsAvailable() && GameService.GameIntegration.get_Gw2Instance().get_IsInGame())
+			{
+				return !GameService.Gw2Mumble.get_UI().get_IsMapOpen();
+			}
+			return false;
 		}
 
 		private void OnIsMapOpenChanged(object o, ValueEventArgs<bool> e)
@@ -146,7 +158,7 @@ namespace Nekres.Mistwar
 
 		private void OnToggleKeyActivated(object o, EventArgs e)
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			if (IsUiAvailable() && GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld())
 			{
 				ToggleMapControl(!_enabled, 0.1f);
@@ -224,6 +236,10 @@ namespace Nekres.Mistwar
 			ToggleKeySetting.get_Value().set_Enabled(true);
 			using (Stream imageStream = await MapUtil.DrawMapImage(e.get_Value(), removeBackground: true, string.Format("{0}/{1}.png", DirectoriesManager.GetFullDirectoryPath("mistwar"), e.get_Value())))
 			{
+				if (imageStream == null)
+				{
+					return;
+				}
 				Texture2D tex = Texture2D.FromStream(GameService.Graphics.get_GraphicsDevice(), imageStream);
 				_mapControl.Texture.SwapTexture(tex);
 			}
@@ -295,7 +311,7 @@ namespace Nekres.Mistwar
 					return null;
 				}
 				WvwMatchMap obj = task.Result.get_Maps().FirstOrDefault((WvwMatchMap x) => x.get_Id() == mapId);
-				return (obj != null) ? obj.get_Objectives() : null;
+				return (obj == null) ? null : obj.get_Objectives();
 			});
 		}
 

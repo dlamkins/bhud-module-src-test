@@ -117,15 +117,13 @@ namespace Nekres.Mistwar
 
 		public static Color GetColorBlindType(this Color color, ColorType type, int overwriteAlpha = -1)
 		{
-			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
 			float[][] i = ColorTypes[type];
-			float r = (float)(int)((Color)(ref color)).get_R() * i[0][0] + (float)(int)((Color)(ref color)).get_G() * i[0][1] + (float)(int)((Color)(ref color)).get_B() * i[0][2] + (float)(int)((Color)(ref color)).get_A() * i[0][3] + i[0][4];
+			float n = (float)(int)((Color)(ref color)).get_R() * i[0][0] + (float)(int)((Color)(ref color)).get_G() * i[0][1] + (float)(int)((Color)(ref color)).get_B() * i[0][2] + (float)(int)((Color)(ref color)).get_A() * i[0][3] + i[0][4];
 			float g = (float)(int)((Color)(ref color)).get_R() * i[1][0] + (float)(int)((Color)(ref color)).get_G() * i[1][1] + (float)(int)((Color)(ref color)).get_B() * i[1][2] + (float)(int)((Color)(ref color)).get_A() * i[1][3] + i[1][4];
 			float b = (float)(int)((Color)(ref color)).get_R() * i[2][0] + (float)(int)((Color)(ref color)).get_G() * i[2][1] + (float)(int)((Color)(ref color)).get_B() * i[2][2] + (float)(int)((Color)(ref color)).get_A() * i[2][3] + i[2][4];
 			float a = (float)(int)((Color)(ref color)).get_R() * i[3][0] + (float)(int)((Color)(ref color)).get_G() * i[3][1] + (float)(int)((Color)(ref color)).get_B() * i[3][2] + (float)(int)((Color)(ref color)).get_A() * i[3][3] + i[3][4];
-			return new Color(Clamp(r), Clamp(g), Clamp(b), Clamp((overwriteAlpha > -1) ? ((float)overwriteAlpha) : a));
+			return new Color(Clamp(n), Clamp(g), Clamp(b), Clamp((overwriteAlpha > -1) ? ((float)overwriteAlpha) : a));
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -137,9 +135,7 @@ namespace Nekres.Mistwar
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static Color ToMediaColor(this Color drawingColor)
 		{
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 			return new Color(drawingColor.R, drawingColor.G, drawingColor.B, drawingColor.A);
 		}
 	}

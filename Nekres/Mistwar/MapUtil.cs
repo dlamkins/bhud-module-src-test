@@ -10,7 +10,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Gw2Sharp.Models;
 using Gw2Sharp.WebApi.Exceptions;
-using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 
@@ -26,8 +25,8 @@ namespace Nekres.Mistwar
 
 		private static List<Point> GetAreaTileList(Rectangle rect)
 		{
-			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
 			Point topLeft = FromPixelToTileXY(((Rectangle)(ref rect)).get_TopLeft());
 			Point rightBottom = FromPixelToTileXY(((Rectangle)(ref rect)).get_BottomRight());
 			int x = Math.Max(0, topLeft.X);
@@ -52,8 +51,7 @@ namespace Nekres.Mistwar
 				return null;
 			}
 			string dns = ((dnsAlias > 0 && dnsAlias < 5) ? dnsAlias.ToString() : string.Empty);
-			WebRequest request = WebRequest.Create($"https://tiles{dns}.guildwars2.com/{continentId}/{floor}/{zoom}/{x}/{y}.jpg");
-			Stream responseStream = (await request.GetResponseAsync()).GetResponseStream();
+			Stream responseStream = (await WebRequest.Create($"https://tiles{dns}.guildwars2.com/{continentId}/{floor}/{zoom}/{x}/{y}.jpg").GetResponseAsync()).GetResponseStream();
 			if (responseStream == null)
 			{
 				return null;
@@ -107,14 +105,14 @@ namespace Nekres.Mistwar
 				gfx.Flush();
 				if (removeBackground)
 				{
-					IEnumerable<ContinentFloorRegionMapSector> sectors = await RequestSectorsForFloor(map.get_ContinentId(), map.get_DefaultFloor(), map.get_RegionId(), map.get_Id());
+					IEnumerable<ContinentFloorRegionMapSector> obj2 = await RequestSectorsForFloor(map.get_ContinentId(), map.get_DefaultFloor(), map.get_RegionId(), map.get_Id());
 					GraphicsPath polygonPath = new GraphicsPath
 					{
 						FillMode = FillMode.Alternate
 					};
-					foreach (ContinentFloorRegionMapSector sector in sectors)
+					foreach (ContinentFloorRegionMapSector item in obj2)
 					{
-						Point[] bbox = (from coord in sector.get_Bounds()
+						Point[] bbox = (from coord in item.get_Bounds()
 							select Refit(coord, topLeftPx, padding)).ToArray();
 						polygonPath.AddPolygon(bbox);
 					}
@@ -146,15 +144,16 @@ namespace Nekres.Mistwar
 
 		private static async Task<List<List<Point>>> GetSectors(Map map)
 		{
-			IEnumerable<IReadOnlyList<Coordinates2>> coords = (await RequestSectorsForFloor(map.get_ContinentId(), map.get_DefaultFloor(), map.get_RegionId(), map.get_Id())).Select((ContinentFloorRegionMapSector x) => x.get_Bounds());
-			return coords.Select((IReadOnlyList<Coordinates2> l) => l.Select((Coordinates2 coord) => new Point((int)((Coordinates2)(ref coord)).get_X(), (int)((Coordinates2)(ref coord)).get_Y())).ToList()).ToList();
+			return (from x in await RequestSectorsForFloor(map.get_ContinentId(), map.get_DefaultFloor(), map.get_RegionId(), map.get_Id())
+				select x.get_Bounds() into l
+				select l.Select((Coordinates2 coord) => new Point((int)((Coordinates2)(ref coord)).get_X(), (int)((Coordinates2)(ref coord)).get_Y())).ToList()).ToList();
 		}
 
 		public static async Task<IEnumerable<ContinentFloorRegionMapSector>> RequestSectorsForFloor(int continentId, int floor, int regionId, int mapId)
 		{
 			try
 			{
-				return await ((IAllExpandableClient<ContinentFloorRegionMapSector>)(object)MistwarModule.ModuleInstance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Continents()
+				return (IEnumerable<ContinentFloorRegionMapSector>)(await ((IAllExpandableClient<ContinentFloorRegionMapSector>)(object)MistwarModule.ModuleInstance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Continents()
 					.get_Item(continentId)
 					.get_Floors()
 					.get_Item(floor)
@@ -162,33 +161,34 @@ namespace Nekres.Mistwar
 					.get_Item(regionId)
 					.get_Maps()
 					.get_Item(mapId)
-					.get_Sectors()).AllAsync(default(CancellationToken)).ContinueWith(delegate(Task<IApiV2ObjectList<ContinentFloorRegionMapSector>> task)
-				{
-					HashSet<ContinentFloorRegionMapSector> hashSet = new HashSet<ContinentFloorRegionMapSector>();
-					if (task.IsFaulted)
-					{
-						return hashSet;
-					}
-					foreach (ContinentFloorRegionMapSector current in (IEnumerable<ContinentFloorRegionMapSector>)task.Result)
-					{
-						hashSet.Add(current);
-					}
-					return hashSet;
-				});
+					.get_Sectors()).AllAsync(default(CancellationToken)));
 			}
-			catch (BadRequestException)
+			catch (Exception ex) when (ex is BadRequestException || ex is NotFoundException)
 			{
 				return Enumerable.Empty<ContinentFloorRegionMapSector>();
 			}
 			catch (UnexpectedStatusException)
 			{
+				MistwarModule.Logger.Warn(CommonStrings.WebApiDown);
 				return Enumerable.Empty<ContinentFloorRegionMapSector>();
 			}
 		}
 
 		public static async Task<Map> RequestMap(int id)
 		{
-			return await ((IBulkExpandableClient<Map, int>)(object)MistwarModule.ModuleInstance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Maps()).GetAsync(id, default(CancellationToken)).ContinueWith((Task<Map> task) => task.IsFaulted ? null : task.Result);
+			try
+			{
+				return await ((IBulkExpandableClient<Map, int>)(object)MistwarModule.ModuleInstance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Maps()).GetAsync(id, default(CancellationToken));
+			}
+			catch (Exception ex) when (ex is BadRequestException || ex is NotFoundException)
+			{
+				return null;
+			}
+			catch (UnexpectedStatusException)
+			{
+				MistwarModule.Logger.Warn(CommonStrings.WebApiDown);
+				return null;
+			}
 		}
 	}
 }

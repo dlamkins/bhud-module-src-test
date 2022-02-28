@@ -81,11 +81,11 @@ namespace Nekres.Mistwar.Entities
 
 		public WvwObjectiveEntity(WvwObjective objective, Map map, ContinentFloorRegionMapSector sector)
 		{
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
 			_internalObjective = objective;
 			Icon = GetTexture(ApiEnum<WvwObjectiveType>.op_Implicit(objective.get_Type()));
 			MapId = map.get_Id();
@@ -107,16 +107,12 @@ namespace Nekres.Mistwar.Entities
 
 		private Texture2D GetTexture(WvwObjectiveType type)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0004: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0009: Invalid comparison between Unknown and I4
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000f: Invalid comparison between Unknown and I4
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0004: Invalid comparison between Unknown and I4
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0008: Invalid comparison between Unknown and I4
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 			if (type - 1 <= 2 || (int)type == 5)
 			{
 				return MistwarModule.ModuleInstance.ContentsManager.GetTexture($"{type}.png");
@@ -126,25 +122,17 @@ namespace Nekres.Mistwar.Entities
 
 		private Color GetColor()
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Expected I4, but got Unknown
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Expected I4, but got Unknown
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 			WvwOwner owner = Owner;
-			WvwOwner val = owner;
-			return (Color)((val - 2) switch
+			return (Color)((owner - 2) switch
 			{
 				0 => ColorRed, 
 				1 => ColorBlue, 
@@ -177,7 +165,31 @@ namespace Nekres.Mistwar.Entities
 
 		private Texture2D GetUpgradeTierTexture(bool useCustom = false)
 		{
-			return (YaksDelivered < 140) ? ((YaksDelivered < 60) ? ((YaksDelivered < 20) ? null : (useCustom ? CustomTextureSecured : TextureSecured)) : (useCustom ? CustomTextureReinforced : TextureReinforced)) : (useCustom ? CustomTextureFortified : TextureFortified);
+			if (YaksDelivered < 140)
+			{
+				if (YaksDelivered < 60)
+				{
+					if (YaksDelivered < 20)
+					{
+						return null;
+					}
+					if (!useCustom)
+					{
+						return TextureSecured;
+					}
+					return CustomTextureSecured;
+				}
+				if (!useCustom)
+				{
+					return TextureReinforced;
+				}
+				return CustomTextureReinforced;
+			}
+			if (!useCustom)
+			{
+				return TextureFortified;
+			}
+			return CustomTextureFortified;
 		}
 	}
 }
