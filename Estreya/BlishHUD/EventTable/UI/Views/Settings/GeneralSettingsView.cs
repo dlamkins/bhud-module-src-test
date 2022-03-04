@@ -12,20 +12,20 @@ namespace Estreya.BlishHUD.EventTable.UI.Views.Settings
 		{
 		}
 
-		protected override void InternalBuild(FlowPanel parent)
+		protected override void InternalBuild(Panel parent)
 		{
-			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.GlobalEnabled);
-			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.GlobalEnabledHotkey);
-			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.RegisterCornerIcon);
-			RenderEmptyLine((Panel)(object)parent);
-			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.HideOnOpenMap);
-			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.HideOnMissingMumbleTicks);
-			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.HideInCombat);
-			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.ShowTooltips);
-			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.TooltipTimeMode);
-			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.CopyWaypointOnClick);
-			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.ShowContextMenuOnClick);
-			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.BuildDirection);
+			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.GlobalEnabled);
+			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.GlobalEnabledHotkey);
+			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.RegisterCornerIcon);
+			RenderEmptyLine(parent);
+			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.HideOnOpenMap);
+			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.HideOnMissingMumbleTicks);
+			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.HideInCombat);
+			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.ShowTooltips);
+			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.TooltipTimeMode);
+			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.CopyWaypointOnClick);
+			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.ShowContextMenuOnClick);
+			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.BuildDirection);
 		}
 
 		protected override Task<bool> InternalLoad(IProgress<string> progress)

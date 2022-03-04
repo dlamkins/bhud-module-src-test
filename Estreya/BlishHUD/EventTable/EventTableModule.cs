@@ -320,7 +320,7 @@ namespace Estreya.BlishHUD.EventTable
 			int contentRegionPaddingY = settingsWindowSize.Y - 15;
 			int contentRegionPaddingX = settingsWindowSize.X + 46;
 			Rectangle contentRegion = default(Rectangle);
-			((Rectangle)(ref contentRegion))._002Ector(contentRegionPaddingX, contentRegionPaddingY, settingsWindowSize.Width - 46, settingsWindowSize.Height - contentRegionPaddingY);
+			((Rectangle)(ref contentRegion))._002Ector(contentRegionPaddingX, contentRegionPaddingY, settingsWindowSize.Width - 52, settingsWindowSize.Height - contentRegionPaddingY);
 			TabbedWindow2 val = new TabbedWindow2(windowBackground, settingsWindowSize, contentRegion);
 			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((WindowBase2)val).set_Title("Event Table");

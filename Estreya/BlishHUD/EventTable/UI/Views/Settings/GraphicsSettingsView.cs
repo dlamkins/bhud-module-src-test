@@ -12,16 +12,16 @@ namespace Estreya.BlishHUD.EventTable.UI.Views.Settings
 		{
 		}
 
-		protected override void InternalBuild(FlowPanel parent)
+		protected override void InternalBuild(Panel parent)
 		{
-			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.LocationX);
-			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.LocationY);
-			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.Width);
-			RenderEmptyLine((Panel)(object)parent);
-			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.Opacity);
-			RenderEmptyLine((Panel)(object)parent);
-			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.BackgroundColorOpacity);
-			RenderColorSetting((Panel)(object)parent, base.ModuleSettings.BackgroundColor);
+			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.LocationX);
+			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.LocationY);
+			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.Width);
+			RenderEmptyLine(parent);
+			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.Opacity);
+			RenderEmptyLine(parent);
+			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.BackgroundColorOpacity);
+			RenderColorSetting(parent, base.ModuleSettings.BackgroundColor);
 		}
 
 		protected override Task<bool> InternalLoad(IProgress<string> progress)

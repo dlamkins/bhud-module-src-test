@@ -47,7 +47,7 @@ namespace Estreya.BlishHUD.EventTable
 			}
 		}
 
-		public SettingCollection Settings { get; private set; }
+		private SettingCollection Settings { get; set; }
 
 		public SettingCollection GlobalSettings { get; private set; }
 
@@ -335,8 +335,8 @@ namespace Estreya.BlishHUD.EventTable
 		private void SettingChanged<T>(object sender, ValueChangedEventArgs<T> e)
 		{
 			SettingEntry<T> settingEntry = (SettingEntry<T>)sender;
-			string prevValue = JsonConvert.SerializeObject((object)e.get_PreviousValue());
-			string newValue = JsonConvert.SerializeObject((object)e.get_NewValue());
+			string prevValue = ((e.get_PreviousValue().GetType() == typeof(string)) ? e.get_PreviousValue().ToString() : JsonConvert.SerializeObject((object)e.get_PreviousValue()));
+			string newValue = ((e.get_NewValue().GetType() == typeof(string)) ? e.get_NewValue().ToString() : JsonConvert.SerializeObject((object)e.get_NewValue()));
 			Logger.Debug("Changed setting \"" + ((SettingEntry)settingEntry).get_EntryKey() + "\" from \"" + prevValue + "\" to \"" + newValue + "\"");
 			this.ModuleSettingsChanged?.Invoke(this, new ModuleSettingsChangedEventArgs
 			{

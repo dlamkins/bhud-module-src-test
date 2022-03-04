@@ -14,31 +14,31 @@ namespace Estreya.BlishHUD.EventTable.UI.Views.Settings
 		{
 		}
 
-		protected override void InternalBuild(FlowPanel parent)
+		protected override void InternalBuild(Panel parent)
 		{
-			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.EventHeight);
-			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.EventFontSize);
-			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.EventTimeSpan);
-			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.EventHistorySplit);
-			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.DrawEventBorder);
-			RenderEmptyLine((Panel)(object)parent);
-			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.WorldbossCompletedAcion);
-			RenderEmptyLine((Panel)(object)parent);
-			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.AutomaticallyUpdateEventFile);
-			RenderButton((Panel)(object)parent, "Update Event File", delegate
+			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.EventHeight);
+			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.EventFontSize);
+			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.EventTimeSpan);
+			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.EventHistorySplit);
+			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.DrawEventBorder);
+			RenderEmptyLine(parent);
+			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.WorldbossCompletedAcion);
+			RenderEmptyLine(parent);
+			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.AutomaticallyUpdateEventFile);
+			RenderButton(parent, "Update Event File", delegate
 			{
 				AsyncHelper.RunSync(EventTableModule.ModuleInstance.EventFileState.ExportFile);
 				ScreenNotification.ShowNotification("Successfully updated!", (NotificationType)0, (Texture2D)null, 4);
 			});
-			RenderEmptyLine((Panel)(object)parent);
-			RenderButton((Panel)(object)parent, "Reset hidden states", delegate
+			RenderEmptyLine(parent);
+			RenderButton(parent, "Reset hidden states", delegate
 			{
 				EventTableModule.ModuleInstance.HiddenState.Clear();
 			});
-			RenderEmptyLine((Panel)(object)parent);
-			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.UseFiller);
-			RenderSetting((Panel)(object)parent, (SettingEntry)(object)base.ModuleSettings.UseFillerEventNames);
-			RenderColorSetting((Panel)(object)parent, base.ModuleSettings.FillerTextColor);
+			RenderEmptyLine(parent);
+			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.UseFiller);
+			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.UseFillerEventNames);
+			RenderColorSetting(parent, base.ModuleSettings.FillerTextColor);
 		}
 
 		protected override Task<bool> InternalLoad(IProgress<string> progress)
