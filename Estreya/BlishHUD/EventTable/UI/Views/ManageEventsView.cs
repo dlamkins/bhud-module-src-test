@@ -8,8 +8,10 @@ using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
+using Estreya.BlishHUD.EventTable.Controls;
 using Estreya.BlishHUD.EventTable.Extensions;
 using Estreya.BlishHUD.EventTable.Models;
+using Estreya.BlishHUD.EventTable.Resources;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -109,33 +111,26 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_03b2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03ba: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_051c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0521: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0538: Unknown result type (might be due to invalid IL or missing references)
-			//IL_054f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0557: Unknown result type (might be due to invalid IL or missing references)
-			//IL_055e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_055f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_056b: Expected O, but got Unknown
-			//IL_0583: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0588: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0567: Unknown result type (might be due to invalid IL or missing references)
+			//IL_058b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0590: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0597: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05b6: Expected O, but got Unknown
-			//IL_05b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0600: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0605: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0598: Unknown result type (might be due to invalid IL or missing references)
+			//IL_059f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05be: Expected O, but got Unknown
+			//IL_05be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0608: Unknown result type (might be due to invalid IL or missing references)
 			//IL_060d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0614: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0629: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0633: Expected O, but got Unknown
-			//IL_0633: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0667: Unknown result type (might be due to invalid IL or missing references)
-			//IL_066c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0615: Unknown result type (might be due to invalid IL or missing references)
+			//IL_061c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0631: Unknown result type (might be due to invalid IL or missing references)
+			//IL_063b: Expected O, but got Unknown
+			//IL_063b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_066f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0674: Unknown result type (might be due to invalid IL or missing references)
 			//IL_067c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0688: Expected O, but got Unknown
+			//IL_0684: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0690: Expected O, but got Unknown
 			Panel = new Panel();
 			((Control)Panel).set_Parent(buildPanel);
 			((Control)Panel).set_Location(new Point(MAIN_PADDING.X, MAIN_PADDING.Y));
@@ -147,10 +142,10 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Control)val).set_Parent((Container)(object)Panel);
 			((Control)val).set_Width(((DesignStandard)(ref Panel.MenuStandard)).get_Size().X);
 			((Control)val).set_Location(new Point(0, contentRegion.Y));
-			((TextInputBase)val).set_PlaceholderText("Search");
+			((TextInputBase)val).set_PlaceholderText(Strings.ManageEventsView_SearchBox_Placeholder);
 			TextBox searchBox = val;
 			Panel val2 = new Panel();
-			val2.set_Title("Event Categories");
+			val2.set_Title(Strings.ManageEventsView_EventCategories_Title);
 			((Control)val2).set_Parent((Container)(object)Panel);
 			val2.set_CanScroll(true);
 			val2.set_ShowBorder(true);
@@ -173,14 +168,14 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Control)eventPanel).set_Size(new Point(contentRegion.Width - ((Control)eventPanel).get_Left(), contentRegion.Height - 32));
 			((TextInputBase)searchBox).add_TextChanged((EventHandler<EventArgs>)delegate
 			{
-				eventPanel.FilterChildren<DetailsButton>((Func<DetailsButton, bool>)((DetailsButton detailsButton) => detailsButton.get_Text().ToLowerInvariant().Contains(((TextInputBase)searchBox).get_Text().ToLowerInvariant())));
+				eventPanel.FilterChildren<EventDetailsButton>((Func<EventDetailsButton, bool>)((EventDetailsButton detailsButton) => ((DetailsButton)detailsButton).get_Text().ToLowerInvariant().Contains(((TextInputBase)searchBox).get_Text().ToLowerInvariant())));
 			});
 			Dictionary<string, MenuItem> menus = new Dictionary<string, MenuItem>();
-			MenuItem allEvents = eventCategories.AddMenuItem("All Events", (Texture2D)null);
+			MenuItem allEvents = eventCategories.AddMenuItem(Strings.ManageEventsView_AllEvents, (Texture2D)null);
 			allEvents.Select();
 			menus.Add("allEvents", allEvents);
 			foreach (EventCategory category2 in from ec in EventCategories
-				group ec by ec.Name into ec
+				group ec by ec.Key into ec
 				select ec.First())
 			{
 				menus.Add(category2.Key, eventCategories.AddMenuItem(category2.Name, (Texture2D)null));
@@ -190,11 +185,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				((Control)menuItemPair.Value).add_Click((EventHandler<MouseEventArgs>)delegate(object s, MouseEventArgs e)
 				{
 					MenuItem menuItem = (MenuItem)((s is MenuItem) ? s : null);
-					eventPanel.FilterChildren<DetailsButton>((Func<DetailsButton, bool>)delegate(DetailsButton detailsButton)
-					{
-						IEnumerable<EventCategory> source = EventCategories.Where((EventCategory ec) => ec.Events.Any((Event ev) => ev.Name == detailsButton.get_Text()));
-						return menuItem == menus["allEvents"] || source.Any((EventCategory ec) => ec.Name == menuItem.get_Text());
-					});
+					EventCategory category3 = EventCategories.Where((EventCategory ec) => ec.Name == menuItem.get_Text()).FirstOrDefault();
+					eventPanel.FilterChildren<EventDetailsButton>((Func<EventDetailsButton, bool>)((EventDetailsButton detailsButton) => menuItem == menus["allEvents"] || category3.Events.Any((Event ev) => ev.EventCategory.Key == detailsButton.Event.EventCategory.Key && ev.Key == detailsButton.Event.Key)));
 				});
 			});
 			Panel val5 = new Panel();
@@ -203,7 +195,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Control)val5).set_Size(new Point(((Control)eventPanel).get_Width(), 26));
 			Panel buttons = val5;
 			StandardButton val6 = new StandardButton();
-			val6.set_Text("Check all");
+			val6.set_Text(Strings.ManageEventsView_CheckAll);
 			((Control)val6).set_Parent((Container)(object)buttons);
 			((Control)val6).set_Right(((Control)buttons).get_Width());
 			((Control)val6).set_Bottom(((Control)buttons).get_Height());
@@ -213,16 +205,16 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				((Container)eventPanel).get_Children().ToList().ForEach(delegate(Control control)
 				{
 					menus["allEvents"].get_Selected();
-					DetailsButton val13 = (DetailsButton)(object)((control is DetailsButton) ? control : null);
-					if (((Control)val13).get_Visible())
+					EventDetailsButton eventDetailsButton2 = control as EventDetailsButton;
+					if (((Control)eventDetailsButton2).get_Visible())
 					{
-						Control obj2 = ((IEnumerable<Control>)((Container)val13).get_Children()).Last();
-						((GlowButton)((obj2 is GlowButton) ? obj2 : null)).set_Checked(true);
+						Control obj3 = ((IEnumerable<Control>)((Container)eventDetailsButton2).get_Children()).Last();
+						((GlowButton)((obj3 is GlowButton) ? obj3 : null)).set_Checked(true);
 					}
 				});
 			});
 			StandardButton val7 = new StandardButton();
-			val7.set_Text("Uncheck all");
+			val7.set_Text(Strings.ManageEventsView_UncheckAll);
 			((Control)val7).set_Parent((Container)(object)buttons);
 			((Control)val7).set_Right(((Control)checkAllButton).get_Left());
 			((Control)val7).set_Bottom(((Control)buttons).get_Height());
@@ -231,11 +223,11 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				((Container)eventPanel).get_Children().ToList().ForEach(delegate(Control control)
 				{
 					menus["allEvents"].get_Selected();
-					DetailsButton val12 = (DetailsButton)(object)((control is DetailsButton) ? control : null);
-					if (((Control)val12).get_Visible())
+					EventDetailsButton eventDetailsButton = control as EventDetailsButton;
+					if (((Control)eventDetailsButton).get_Visible())
 					{
-						Control obj = ((IEnumerable<Control>)((Container)val12).get_Children()).Last();
-						((GlowButton)((obj is GlowButton) ? obj : null)).set_Checked(false);
+						Control obj2 = ((IEnumerable<Control>)((Container)eventDetailsButton).get_Children()).Last();
+						((GlowButton)((obj2 is GlowButton) ? obj2 : null)).set_Checked(false);
 					}
 				});
 			});
@@ -250,7 +242,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				else
 				{
 					enumerable = from e in category.Events
-						group e by e.Name into eg
+						group e by e.Key into eg
 						select eg.First();
 				}
 				foreach (Event e2 in enumerable)
@@ -259,46 +251,49 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					{
 						continue;
 					}
-					IEnumerable<SettingEntry<bool>> settings = EventSettings.FindAll((SettingEntry<bool> eventSetting) => ((SettingEntry)eventSetting).get_EntryKey() == e2.Name);
+					IEnumerable<SettingEntry<bool>> settings = EventSettings.FindAll((SettingEntry<bool> eventSetting) => ((SettingEntry)eventSetting).get_EntryKey().ToLowerInvariant() == e2.GetSettingName().ToLowerInvariant());
 					SettingEntry<bool> setting = settings.First();
 					bool enabled = setting.get_Value();
 					AsyncTexture2D icon = EventTableModule.ModuleInstance.ContentsManager.GetIcon(e2.Icon);
-					DetailsButton val8 = new DetailsButton();
-					((Control)val8).set_Parent((Container)(object)eventPanel);
-					val8.set_Text(e2.Name);
-					val8.set_Icon(icon);
-					val8.set_ShowToggleButton(true);
-					val8.set_FillColor(Color.get_LightBlue());
-					DetailsButton button = val8;
+					EventDetailsButton obj = new EventDetailsButton
+					{
+						Event = e2
+					};
+					((Control)obj).set_Parent((Container)(object)eventPanel);
+					((DetailsButton)obj).set_Text(e2.Name);
+					((DetailsButton)obj).set_Icon(icon);
+					((DetailsButton)obj).set_ShowToggleButton(true);
+					((DetailsButton)obj).set_FillColor(Color.get_LightBlue());
+					EventDetailsButton button = obj;
 					if (!string.IsNullOrWhiteSpace(e2.Waypoint))
 					{
-						GlowButton val9 = new GlowButton();
-						((Control)val9).set_Parent((Container)(object)button);
-						val9.set_ToggleGlow(false);
-						((Control)val9).set_Tooltip(new Tooltip((ITooltipView)(object)new TooltipView("Waypoint", "Click to Copy", "images\\waypoint.png")));
-						val9.set_Icon(EventTableModule.ModuleInstance.ContentsManager.GetIcon("images\\waypoint.png"));
-						((Control)val9).add_Click((EventHandler<MouseEventArgs>)delegate
+						GlowButton val8 = new GlowButton();
+						((Control)val8).set_Parent((Container)(object)button);
+						val8.set_ToggleGlow(false);
+						((Control)val8).set_Tooltip(new Tooltip((ITooltipView)(object)new TooltipView(Strings.ManageEventsView_Waypoint_Title, Strings.ManageEventsView_Waypoint_Description, "images\\waypoint.png")));
+						val8.set_Icon(EventTableModule.ModuleInstance.ContentsManager.GetIcon("images\\waypoint.png"));
+						((Control)val8).add_Click((EventHandler<MouseEventArgs>)delegate
 						{
 							e2.CopyWaypoint();
 						});
 					}
 					if (!string.IsNullOrWhiteSpace(e2.Wiki))
 					{
-						GlowButton val10 = new GlowButton();
-						((Control)val10).set_Parent((Container)(object)button);
-						val10.set_ToggleGlow(false);
-						((Control)val10).set_Tooltip(new Tooltip((ITooltipView)(object)new TooltipView("Wiki", "Click to Open", "images\\wiki.png")));
-						val10.set_Icon(EventTableModule.ModuleInstance.ContentsManager.GetIcon("images\\wiki.png"));
-						((Control)val10).add_Click((EventHandler<MouseEventArgs>)delegate
+						GlowButton val9 = new GlowButton();
+						((Control)val9).set_Parent((Container)(object)button);
+						val9.set_ToggleGlow(false);
+						((Control)val9).set_Tooltip(new Tooltip((ITooltipView)(object)new TooltipView(Strings.ManageEventsView_Wiki_Title, Strings.ManageEventsView_Wiki_Description, "images\\wiki.png")));
+						val9.set_Icon(EventTableModule.ModuleInstance.ContentsManager.GetIcon("images\\wiki.png"));
+						((Control)val9).add_Click((EventHandler<MouseEventArgs>)delegate
 						{
 							e2.OpenWiki();
 						});
 					}
-					GlowButton val11 = new GlowButton();
-					((Control)val11).set_Parent((Container)(object)button);
-					val11.set_Checked(enabled);
-					val11.set_ToggleGlow(false);
-					GlowButton toggleButton = val11;
+					GlowButton val10 = new GlowButton();
+					((Control)val10).set_Parent((Container)(object)button);
+					val10.set_Checked(enabled);
+					val10.set_ToggleGlow(false);
+					GlowButton toggleButton = val10;
 					UpdateToggleButton(toggleButton);
 					toggleButton.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object s, CheckChangedEvent eventArgs)
 					{
@@ -306,10 +301,6 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 						{
 							setting.set_Value(eventArgs.get_Checked());
 							toggleButton.set_Checked(setting.get_Value());
-							settings.Where((SettingEntry<bool> x) => ((SettingEntry)x).get_EntryKey() != ((SettingEntry)setting).get_EntryKey()).ToList().ForEach(delegate(SettingEntry<bool> x)
-							{
-								x.set_Value(setting.get_Value());
-							});
 							UpdateToggleButton(toggleButton);
 						}
 					});

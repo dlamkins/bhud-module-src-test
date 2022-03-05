@@ -9,9 +9,11 @@ using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
 using Blish_HUD._Extensions;
+using Estreya.BlishHUD.EventTable.Controls;
 using Estreya.BlishHUD.EventTable.Helpers;
 using Estreya.BlishHUD.EventTable.Input;
 using Estreya.BlishHUD.EventTable.Json;
+using Estreya.BlishHUD.EventTable.Resources;
 using Estreya.BlishHUD.EventTable.UI.Views;
 using Estreya.BlishHUD.EventTable.Utils;
 using Gw2Sharp.WebApi.V2.Models;
@@ -33,6 +35,9 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		[JsonIgnore]
 		private ContextMenuStrip _contextMenuStrip;
+
+		[JsonProperty("key")]
+		public string Key { get; set; }
 
 		[JsonProperty("name")]
 		public string Name { get; set; }
@@ -121,35 +126,35 @@ namespace Estreya.BlishHUD.EventTable.Models
 				{
 					_contextMenuStrip = new ContextMenuStrip();
 					ContextMenuStripItem copyWaypoint = new ContextMenuStripItem();
-					copyWaypoint.set_Text("Copy Waypoint");
+					copyWaypoint.set_Text(Strings.Event_CopyWaypoint);
 					((Control)copyWaypoint).add_Click((EventHandler<MouseEventArgs>)delegate
 					{
 						CopyWaypoint();
 					});
 					_contextMenuStrip.AddMenuItem(copyWaypoint);
 					ContextMenuStripItem openWiki = new ContextMenuStripItem();
-					openWiki.set_Text("Open Wiki");
+					openWiki.set_Text(Strings.Event_OpenWiki);
 					((Control)openWiki).add_Click((EventHandler<MouseEventArgs>)delegate
 					{
 						OpenWiki();
 					});
 					_contextMenuStrip.AddMenuItem(openWiki);
 					ContextMenuStripItem hideCategory = new ContextMenuStripItem();
-					hideCategory.set_Text("Hide category until Reset");
+					hideCategory.set_Text(Strings.Event_HideCategory);
 					((Control)hideCategory).add_Click((EventHandler<MouseEventArgs>)delegate
 					{
 						FinishCategory();
 					});
 					_contextMenuStrip.AddMenuItem(hideCategory);
 					ContextMenuStripItem hideEvent = new ContextMenuStripItem();
-					hideEvent.set_Text("Hide event until Reset");
+					hideEvent.set_Text(Strings.Event_HideEvent);
 					((Control)hideEvent).add_Click((EventHandler<MouseEventArgs>)delegate
 					{
 						Finish();
 					});
 					_contextMenuStrip.AddMenuItem(hideEvent);
 					ContextMenuStripItem disable = new ContextMenuStripItem();
-					disable.set_Text("Disable");
+					disable.set_Text(Strings.Event_Disable);
 					((Control)disable).add_Click((EventHandler<MouseEventArgs>)delegate
 					{
 						Disable();
@@ -421,13 +426,19 @@ namespace Estreya.BlishHUD.EventTable.Models
 			if (!string.IsNullOrWhiteSpace(Waypoint))
 			{
 				ClipboardUtil.get_WindowsClipboardService().SetTextAsync(Waypoint);
-				ScreenNotification.ShowNotification("Waypoint copied to clipboard!", (NotificationType)0, (Texture2D)null, 4);
-				ScreenNotification.ShowNotification(Name ?? "", (NotificationType)0, (Texture2D)null, 4);
+				ScreenNotification.ShowNotification(new string[2]
+				{
+					Name ?? "",
+					Strings.Event_WaypointCopied
+				}, (NotificationType)0);
 			}
 			else
 			{
-				ScreenNotification.ShowNotification("No Waypoint found!", (NotificationType)0, (Texture2D)null, 4);
-				ScreenNotification.ShowNotification(Name ?? "", (NotificationType)0, (Texture2D)null, 4);
+				ScreenNotification.ShowNotification(new string[2]
+				{
+					Name ?? "",
+					Strings.Event_NoWaypointFound
+				}, (NotificationType)0);
 			}
 		}
 
@@ -504,7 +515,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 					if (!e.IsDisabled())
 					{
 						anyFromCategoryRendered = true;
-						if (((!e.Filler || !(category.Key == evc.Key)) && !(category.Key != evc.Key)) || (!e.Filler && !(e.Name != Name)))
+						if (((!e.Filler || !(category.Key == evc.Key)) && !(category.Key != evc.Key)) || (!e.Filler && !(e.GetSettingName() != GetSettingName())))
 						{
 							return y;
 						}
@@ -612,25 +623,25 @@ namespace Estreya.BlishHUD.EventTable.Models
 					description = Location + ((!string.IsNullOrWhiteSpace(Location)) ? "\n" : string.Empty) + "\n";
 					if (num)
 					{
-						description = description + "Finished since: " + FormatTime(EventTableModule.ModuleInstance.DateTimeNow - hoveredOccurence.AddMinutes(Duration));
+						description = description + Strings.Event_Tooltip_FinishedSince + ": " + FormatTime(EventTableModule.ModuleInstance.DateTimeNow - hoveredOccurence.AddMinutes(Duration));
 					}
 					else if (isNext)
 					{
-						description = description + "Starts in: " + FormatTime(hoveredOccurence - EventTableModule.ModuleInstance.DateTimeNow);
+						description = description + Strings.Event_Tooltip_StartsIn + ": " + FormatTime(hoveredOccurence - EventTableModule.ModuleInstance.DateTimeNow);
 					}
 					else if (isCurrent)
 					{
-						description = description + "Remaining: " + FormatTime(hoveredOccurence.AddMinutes(Duration) - EventTableModule.ModuleInstance.DateTimeNow);
+						description = description + Strings.Event_Tooltip_Remaining + ": " + FormatTime(hoveredOccurence.AddMinutes(Duration) - EventTableModule.ModuleInstance.DateTimeNow);
 					}
 				}
 				else
 				{
-					description = description + Location + ((!string.IsNullOrWhiteSpace(Location)) ? "\n" : string.Empty) + "\nStarts at: " + FormatTime(hoveredOccurence);
+					description = description + Location + ((!string.IsNullOrWhiteSpace(Location)) ? "\n" : string.Empty) + "\n" + Strings.Event_Tooltip_StartsAt + ": " + FormatTime(hoveredOccurence);
 				}
 			}
 			else
 			{
-				Logger.Error("Can't find hovered event: " + Name + " - " + string.Join(", ", occurences.Select((DateTime o) => o.ToString())));
+				Logger.Warn("Can't find hovered event: " + Name + " - " + string.Join(", ", occurences.Select((DateTime o) => o.ToString())));
 			}
 			UpdateTooltip(description);
 			Tooltip.Show(0, 0);
@@ -648,19 +659,17 @@ namespace Estreya.BlishHUD.EventTable.Models
 		{
 			DateTime now = EventTableModule.ModuleInstance.DateTimeNow.ToUniversalTime();
 			DateTime until = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0).AddDays(1.0);
-			EventTableModule.ModuleInstance.HiddenState.Add(Name, until, isUTC: true);
+			EventTableModule.ModuleInstance.HiddenState.Add(GetSettingName(), until, isUTC: true);
 		}
 
 		public void FinishCategory()
 		{
-			DateTime now = EventTableModule.ModuleInstance.DateTimeNow.ToUniversalTime();
-			DateTime until = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0).AddDays(1.0);
-			EventTableModule.ModuleInstance.HiddenState.Add(EventCategory.Name, until, isUTC: true);
+			EventCategory.Finish();
 		}
 
 		public void Disable()
 		{
-			IEnumerable<SettingEntry<bool>> eventSetting = EventTableModule.ModuleInstance.ModuleSettings.AllEvents.Where((SettingEntry<bool> e) => ((SettingEntry)e).get_EntryKey() == Name);
+			IEnumerable<SettingEntry<bool>> eventSetting = EventTableModule.ModuleInstance.ModuleSettings.AllEvents.Where((SettingEntry<bool> e) => ((SettingEntry)e).get_EntryKey().ToLowerInvariant() == GetSettingName().ToLowerInvariant());
 			if (eventSetting.Any())
 			{
 				eventSetting.First().set_Value(false);
@@ -669,12 +678,17 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		public bool IsDisabled()
 		{
-			IEnumerable<SettingEntry<bool>> eventSetting = EventTableModule.ModuleInstance.ModuleSettings.AllEvents.Where((SettingEntry<bool> e) => ((SettingEntry)e).get_EntryKey() == Name);
+			IEnumerable<SettingEntry<bool>> eventSetting = EventTableModule.ModuleInstance.ModuleSettings.AllEvents.Where((SettingEntry<bool> e) => ((SettingEntry)e).get_EntryKey().ToLowerInvariant() == GetSettingName().ToLowerInvariant());
 			if (eventSetting.Any())
 			{
-				return !eventSetting.First().get_Value() || EventTableModule.ModuleInstance.HiddenState.IsHidden(Name);
+				return !eventSetting.First().get_Value() || EventTableModule.ModuleInstance.HiddenState.IsHidden(GetSettingName());
 			}
 			return false;
+		}
+
+		public string GetSettingName()
+		{
+			return EventCategory.Key + "-" + Key;
 		}
 	}
 }

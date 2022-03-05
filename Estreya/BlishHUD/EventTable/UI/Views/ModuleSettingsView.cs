@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
+using Estreya.BlishHUD.EventTable.Resources;
 using Microsoft.Xna.Framework;
 
 namespace Estreya.BlishHUD.EventTable.UI.Views
@@ -60,7 +61,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Container)val2).set_HeightSizingMode((SizingMode)1);
 			((Control)val2).set_Parent((Container)(object)parentPanel);
 			ViewContainer settingContainer = val2;
-			string buttonText = "Open Settings";
+			string buttonText = Strings.SettingsView_OpenSettings;
 			StandardButton val3 = new StandardButton();
 			((Control)val3).set_Parent((Container)(object)settingContainer);
 			val3.set_Text(buttonText);

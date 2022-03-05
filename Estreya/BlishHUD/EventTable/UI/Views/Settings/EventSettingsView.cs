@@ -2,8 +2,8 @@ using System;
 using System.Threading.Tasks;
 using Blish_HUD.Controls;
 using Blish_HUD.Settings;
-using Estreya.BlishHUD.EventTable.Helpers;
-using Microsoft.Xna.Framework.Graphics;
+using Estreya.BlishHUD.EventTable.Controls;
+using Estreya.BlishHUD.EventTable.Resources;
 
 namespace Estreya.BlishHUD.EventTable.UI.Views.Settings
 {
@@ -21,19 +21,21 @@ namespace Estreya.BlishHUD.EventTable.UI.Views.Settings
 			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.EventTimeSpan);
 			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.EventHistorySplit);
 			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.DrawEventBorder);
+			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.UseEventTranslation);
 			RenderEmptyLine(parent);
 			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.WorldbossCompletedAcion);
 			RenderEmptyLine(parent);
 			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.AutomaticallyUpdateEventFile);
-			RenderButton(parent, "Update Event File", delegate
+			RenderButton(parent, Strings.EventSettingsView_UpdateEventFile_Title, async delegate
 			{
-				AsyncHelper.RunSync(EventTableModule.ModuleInstance.EventFileState.ExportFile);
-				ScreenNotification.ShowNotification("Successfully updated!", (NotificationType)0, (Texture2D)null, 4);
+				await EventTableModule.ModuleInstance.EventFileState.ExportFile();
+				ScreenNotification.ShowNotification(Strings.EventSettingsView_UpdateEventFile_Success, (NotificationType)0);
 			});
 			RenderEmptyLine(parent);
-			RenderButton(parent, "Reset hidden states", delegate
+			RenderButton(parent, Strings.EventSettingsView_ResetHiddenStates_Title, delegate
 			{
 				EventTableModule.ModuleInstance.HiddenState.Clear();
+				ScreenNotification.ShowNotification(Strings.EventSettingsView_ResetHiddenStates_Success, (NotificationType)0);
 			});
 			RenderEmptyLine(parent);
 			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.UseFiller);

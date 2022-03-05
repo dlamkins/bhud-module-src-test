@@ -53,7 +53,8 @@ namespace Estreya.BlishHUD.EventTable.Models
 					{
 						Name = currentEvent.Value.Name + " - " + nextEvent.Value.Name,
 						Duration = (int)gap.TotalMinutes,
-						Filler = true
+						Filler = true,
+						EventCategory = this
 					};
 					modifiedEventStarts.Insert(i + 1, new KeyValuePair<DateTime, Event>(currentEnd, filler));
 				}
@@ -75,6 +76,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 					{
 						Name = lastEvent.Value.Name + " - " + nextEventMapping3.Value.Name,
 						Filler = true,
+						EventCategory = this,
 						Duration = (int)(nextStart3 - lastEvent.Key).TotalMinutes
 					};
 					modifiedEventStarts.Add(new KeyValuePair<DateTime, Event>(lastEvent.Key + TimeSpan.FromMinutes(lastEvent.Value.Duration), filler6));
@@ -91,7 +93,8 @@ namespace Estreya.BlishHUD.EventTable.Models
 					{
 						Name = prevEventMapping3.Value.Name + " - " + firstEvent.Value.Name,
 						Filler = true,
-						Duration = (int)(firstEvent.Key - prevEnd3).TotalMinutes
+						Duration = (int)(firstEvent.Key - prevEnd3).TotalMinutes,
+						EventCategory = this
 					};
 					modifiedEventStarts.Add(new KeyValuePair<DateTime, Event>(prevEnd3, filler5));
 				}
@@ -114,7 +117,8 @@ namespace Estreya.BlishHUD.EventTable.Models
 					{
 						Name = currentEvent2.Value.Name + " - " + nextEventMapping2.Value.Name,
 						Filler = true,
-						Duration = (int)(nextStart2 - currentEnd2).TotalMinutes
+						Duration = (int)(nextStart2 - currentEnd2).TotalMinutes,
+						EventCategory = this
 					};
 					modifiedEventStarts.Add(new KeyValuePair<DateTime, Event>(currentEnd2, filler4));
 				}
@@ -130,7 +134,8 @@ namespace Estreya.BlishHUD.EventTable.Models
 					{
 						Name = prevEventMapping2.Value.Name + " - " + currentEvent2.Value.Name,
 						Filler = true,
-						Duration = (int)(currentStart - prevEnd2).TotalMinutes
+						Duration = (int)(currentStart - prevEnd2).TotalMinutes,
+						EventCategory = this
 					};
 					modifiedEventStarts.Add(new KeyValuePair<DateTime, Event>(prevEnd2, filler3));
 				}
@@ -153,7 +158,8 @@ namespace Estreya.BlishHUD.EventTable.Models
 				{
 					Name = prevEventMapping.Value.Name + " - " + nextEventMapping.Value.Name,
 					Duration = (int)(nextStart - prevEnd).TotalMinutes,
-					Filler = true
+					Filler = true,
+					EventCategory = this
 				};
 				modifiedEventStarts.Add(new KeyValuePair<DateTime, Event>(prevEnd, filler2));
 			}
@@ -164,12 +170,12 @@ namespace Estreya.BlishHUD.EventTable.Models
 		{
 			DateTime now = EventTableModule.ModuleInstance.DateTimeNow.ToUniversalTime();
 			DateTime until = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0).AddDays(1.0);
-			EventTableModule.ModuleInstance.HiddenState.Add(Name, until, isUTC: true);
+			EventTableModule.ModuleInstance.HiddenState.Add(Key, until, isUTC: true);
 		}
 
 		public bool IsDisabled()
 		{
-			return EventTableModule.ModuleInstance.HiddenState.IsHidden(Name);
+			return EventTableModule.ModuleInstance.HiddenState.IsHidden(Key);
 		}
 	}
 }

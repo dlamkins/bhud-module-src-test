@@ -15,6 +15,7 @@ using Blish_HUD.Settings;
 using Estreya.BlishHUD.EventTable.Extensions;
 using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.EventTable.Models.Settings;
+using Estreya.BlishHUD.EventTable.Resources;
 using Estreya.BlishHUD.EventTable.State;
 using Estreya.BlishHUD.EventTable.UI.Container;
 using Estreya.BlishHUD.EventTable.UI.Views;
@@ -150,12 +151,29 @@ namespace Estreya.BlishHUD.EventTable
 		{
 			await ModuleSettings.Load();
 			await InitializeStates(beforeFileLoaded: true);
-			_eventCategories = JsonConvert.DeserializeObject<EventSettingsFile>(await EventFileState.GetExternalFileContent()).EventCategories ?? new List<EventCategory>();
+			EventSettingsFile eventSettingsFile = JsonConvert.DeserializeObject<EventSettingsFile>(await EventFileState.GetExternalFileContent());
+			Logger.Info($"Loaded event file version: {eventSettingsFile.Version}");
+			_eventCategories = eventSettingsFile.EventCategories ?? new List<EventCategory>();
+			int eventCategoryCount = _eventCategories.Count;
+			int eventCount = _eventCategories.Sum((EventCategory ec) => ec.Events.Count);
+			Logger.Info($"Loaded {eventCategoryCount} Categories with {eventCount} Events.");
 			_eventCategories.ForEach(delegate(EventCategory ec)
 			{
+				if (ModuleSettings.UseEventTranslation.get_Value())
+				{
+					ec.Name = Strings.ResourceManager.GetString("eventCategory-" + ec.Key) ?? ec.Name;
+				}
 				ec.Events.ForEach(delegate(Event e)
 				{
 					e.EventCategory = ec;
+					if (string.IsNullOrWhiteSpace(e.Key))
+					{
+						e.Key = e.Name;
+					}
+					if (ModuleSettings.UseEventTranslation.get_Value())
+					{
+						e.Name = Strings.ResourceManager.GetString("event-" + e.GetSettingName()) ?? e.Name;
+					}
 				});
 			});
 			ModuleSettings.InitializeEventSettings(_eventCategories);
@@ -323,16 +341,16 @@ namespace Estreya.BlishHUD.EventTable
 			((Rectangle)(ref contentRegion))._002Ector(contentRegionPaddingX, contentRegionPaddingY, settingsWindowSize.Width - 52, settingsWindowSize.Height - contentRegionPaddingY);
 			TabbedWindow2 val = new TabbedWindow2(windowBackground, settingsWindowSize, contentRegion);
 			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((WindowBase2)val).set_Title("Event Table");
+			((WindowBase2)val).set_Title(Strings.SettingsWindow_Title);
 			((WindowBase2)val).set_Emblem(AsyncTexture2D.op_Implicit(ContentsManager.GetIcon("images\\event_boss.png")));
-			((WindowBase2)val).set_Subtitle("Settings");
+			((WindowBase2)val).set_Subtitle(Strings.SettingsWindow_Subtitle);
 			((WindowBase2)val).set_SavesPosition(true);
 			((WindowBase2)val).set_Id("EventTableModule_6bd04be4-dc19-4914-a2c3-8160ce76818b");
 			SettingsWindow = val;
-			SettingsWindow.get_Tabs().Add(new Tab(ContentsManager.GetIcon("images\\event_boss_grey.png"), (Func<IView>)(() => (IView)(object)new ManageEventsView(_eventCategories, ModuleSettings.AllEvents)), "Manage Events", (int?)null));
-			SettingsWindow.get_Tabs().Add(new Tab(ContentsManager.GetIcon("156736"), (Func<IView>)(() => (IView)(object)new GeneralSettingsView(ModuleSettings)), "General Settings", (int?)null));
-			SettingsWindow.get_Tabs().Add(new Tab(ContentsManager.GetIcon("images\\graphics_settings.png"), (Func<IView>)(() => (IView)(object)new GraphicsSettingsView(ModuleSettings)), "Graphic Settings", (int?)null));
-			SettingsWindow.get_Tabs().Add(new Tab(ContentsManager.GetIcon("155052"), (Func<IView>)(() => (IView)(object)new EventSettingsView(ModuleSettings)), "Event Settings", (int?)null));
+			SettingsWindow.get_Tabs().Add(new Tab(ContentsManager.GetIcon("images\\event_boss_grey.png"), (Func<IView>)(() => (IView)(object)new ManageEventsView(_eventCategories, ModuleSettings.AllEvents)), Strings.SettingsWindow_ManageEvents_Title, (int?)null));
+			SettingsWindow.get_Tabs().Add(new Tab(ContentsManager.GetIcon("156736"), (Func<IView>)(() => (IView)(object)new GeneralSettingsView(ModuleSettings)), Strings.SettingsWindow_GeneralSettings_Title, (int?)null));
+			SettingsWindow.get_Tabs().Add(new Tab(ContentsManager.GetIcon("images\\graphics_settings.png"), (Func<IView>)(() => (IView)(object)new GraphicsSettingsView(ModuleSettings)), Strings.SettingsWindow_GraphicSettings_Title, (int?)null));
+			SettingsWindow.get_Tabs().Add(new Tab(ContentsManager.GetIcon("155052"), (Func<IView>)(() => (IView)(object)new EventSettingsView(ModuleSettings)), Strings.SettingsWindow_EventSettings_Title, (int?)null));
 			HandleCornerIcon(ModuleSettings.RegisterCornerIcon.get_Value());
 			if (ModuleSettings.GlobalEnabled.get_Value())
 			{
