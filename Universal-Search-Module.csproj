@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>Universal Search Module</AssemblyName>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <TargetFramework>net472</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>Preview</LangVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace />
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Reference Include="Blish HUD" />
+    <Reference Include="Gw2Sharp">
+      <HintPath>..\..\working\Gw2Sharp.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Framework" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Core" />
+    <Reference Include="MonoGame.Extended">
+      <HintPath>..\..\working\MonoGame.Extended.dll</HintPath>
+    </Reference>
+    <Reference Include="AsyncClipboardService">
+      <HintPath>..\..\working\AsyncClipboardService.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>
