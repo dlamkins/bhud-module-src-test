@@ -14,7 +14,6 @@ using Events_Module.Properties;
 using Flurl;
 using Flurl.Http;
 using Humanizer;
-using Humanizer.Localisation;
 using Newtonsoft.Json;
 
 namespace Events_Module
@@ -161,7 +160,7 @@ namespace Events_Module
 				{
 					if (!e.HasAlerted && EventsModule.ModuleInstance.NotificationsEnabled)
 					{
-						EventNotification.ShowNotification(Resources.ResourceManager.GetString(e.Name) ?? e.Name, e.Texture, string.Format(Resources.Starts_in__0_, TimeSpanHumanizeExtensions.Humanize(NumberToTimeSpanExtensions.Minutes(timeUntil), 1, (CultureInfo)null, (TimeUnit)5, (TimeUnit)0, ", ", false)), 10f, e.Waypoint);
+						EventNotification.ShowNotification(Resources.ResourceManager.GetString(e.Name) ?? e.Name, e.Texture, string.Format(Resources.Starts_in__0_, timeUntil.Minutes().Humanize()), 10f, e.Waypoint);
 						e.HasAlerted = true;
 					}
 				}

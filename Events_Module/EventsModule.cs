@@ -27,15 +27,15 @@ namespace Events_Module
 	{
 		internal static EventsModule ModuleInstance;
 
-		private string _ddAlphabetical = Resources.Alphabetical;
+		private string _ddAlphabetical = Events_Module.Properties.Resources.Alphabetical;
 
-		private string _ddNextup = Resources.Next_Up;
+		private string _ddNextup = Events_Module.Properties.Resources.Next_Up;
 
-		private string _ecAllevents = Resources.All_Events;
+		private string _ecAllevents = Events_Module.Properties.Resources.All_Events;
 
-		private string _ecWatchedEvents = Resources.Watched_Events;
+		private string _ecWatchedEvents = Events_Module.Properties.Resources.Watched_Events;
 
-		private string _ecHidden = Resources.Hidden_Events;
+		private string _ecHidden = Events_Module.Properties.Resources.Hidden_Events;
 
 		private const int TIMER_RECALC_RATE = 5;
 
@@ -143,7 +143,7 @@ namespace Events_Module
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
-			_eventsTab = GameService.Overlay.get_BlishHudWindow().AddTab(Resources.Events_and_Metas, AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("textures\\1466345.png")), _tabPanel);
+			_eventsTab = GameService.Overlay.get_BlishHudWindow().AddTab(Events_Module.Properties.Resources.Events_and_Metas, AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("textures\\1466345.png")), _tabPanel);
 			((Module)this).OnModuleLoaded(e);
 		}
 
@@ -290,13 +290,13 @@ namespace Events_Module
 			((Control)val2).set_Parent((Container)(object)etPanel);
 			Dropdown ddSortMethod = val2;
 			Checkbox val3 = new Checkbox();
-			val3.set_Text(Resources.Enable_Notifications);
+			val3.set_Text(Events_Module.Properties.Resources.Enable_Notifications);
 			val3.set_Checked(NotificationsEnabled);
 			((Control)val3).set_Parent((Container)(object)etPanel);
 			Checkbox notificationToggle = val3;
 			((Control)notificationToggle).set_Location(new Point(((Control)ddSortMethod).get_Left() - ((Control)notificationToggle).get_Width() - 10, ((Control)ddSortMethod).get_Top() + 6));
 			Checkbox val4 = new Checkbox();
-			val4.set_Text(Resources.Mute_Notifications);
+			val4.set_Text(Events_Module.Properties.Resources.Mute_Notifications);
 			val4.set_Checked(!ChimeEnabled);
 			((Control)val4).set_Parent((Container)(object)etPanel);
 			((Control)val4).set_Top(((Control)notificationToggle).get_Top());
@@ -311,7 +311,7 @@ namespace Events_Module
 			});
 			int topOffset = ((Control)ddSortMethod).get_Bottom() + ((DesignStandard)(ref Panel.MenuStandard)).get_ControlOffset().Y;
 			Panel val5 = new Panel();
-			val5.set_Title(Resources.Event_Categories);
+			val5.set_Title(Events_Module.Properties.Resources.Event_Categories);
 			val5.set_ShowBorder(true);
 			((Control)val5).set_Size(((DesignStandard)(ref Panel.MenuStandard)).get_Size() - new Point(0, topOffset + ((DesignStandard)(ref Panel.MenuStandard)).get_ControlOffset().Y));
 			((Control)val5).set_Location(new Point(((DesignStandard)(ref Panel.MenuStandard)).get_PanelOffset().X, topOffset));
@@ -326,7 +326,7 @@ namespace Events_Module
 			((Control)val6).set_Parent((Container)(object)etPanel);
 			FlowPanel eventPanel = val6;
 			TextBox val7 = new TextBox();
-			((TextInputBase)val7).set_PlaceholderText(Resources.Event_Search);
+			((TextInputBase)val7).set_PlaceholderText(Events_Module.Properties.Resources.Event_Search);
 			((Control)val7).set_Width(((Control)menuSection).get_Width());
 			((Control)val7).set_Location(new Point(((Control)ddSortMethod).get_Top(), ((Control)menuSection).get_Left()));
 			((Control)val7).set_Parent((Container)(object)etPanel);
@@ -342,8 +342,8 @@ namespace Events_Module
 				meta.IsWatched = setting.get_Value();
 				DetailsButton val8 = new DetailsButton();
 				((Control)val8).set_Parent((Container)(object)eventPanel);
-				((Control)val8).set_BasicTooltipText(Resources.ResourceManager.GetString(meta.Category) ?? meta.Category);
-				val8.set_Text(Resources.ResourceManager.GetString(meta.Name) ?? meta.Name);
+				((Control)val8).set_BasicTooltipText(Events_Module.Properties.Resources.ResourceManager.GetString(meta.Category) ?? meta.Category);
+				val8.set_Text(Events_Module.Properties.Resources.ResourceManager.GetString(meta.Name) ?? meta.Name);
 				val8.set_IconSize((DetailsIconSize)0);
 				val8.set_ShowVignette(false);
 				val8.set_HighlightType((DetailsHighlightType)2);
@@ -366,7 +366,7 @@ namespace Events_Module
 					GlowButton val10 = new GlowButton();
 					val10.set_Icon(AsyncTexture2D.op_Implicit(GameService.Content.GetTexture("102530")));
 					val10.set_ActiveIcon(AsyncTexture2D.op_Implicit(GameService.Content.GetTexture("glow-wiki")));
-					((Control)val10).set_BasicTooltipText(Resources.Read_about_this_event_on_the_wiki_);
+					((Control)val10).set_BasicTooltipText(Events_Module.Properties.Resources.Read_about_this_event_on_the_wiki_);
 					((Control)val10).set_Parent((Container)(object)es2);
 					val10.set_GlowColor(Color.get_White() * 0.1f);
 					((Control)val10).add_Click((EventHandler<MouseEventArgs>)delegate
@@ -382,7 +382,7 @@ namespace Events_Module
 					GlowButton val11 = new GlowButton();
 					val11.set_Icon(AsyncTexture2D.op_Implicit(GameService.Content.GetTexture("waypoint")));
 					val11.set_ActiveIcon(AsyncTexture2D.op_Implicit(GameService.Content.GetTexture("glow-waypoint")));
-					((Control)val11).set_BasicTooltipText(string.Format(Resources.Nearby_waypoint___0_, meta.Waypoint));
+					((Control)val11).set_BasicTooltipText(string.Format(Events_Module.Properties.Resources.Nearby_waypoint___0_, meta.Waypoint));
 					((Control)val11).set_Parent((Container)(object)es2);
 					val11.set_GlowColor(Color.get_White() * 0.1f);
 					((Control)val11).add_Click((EventHandler<MouseEventArgs>)delegate
@@ -391,11 +391,11 @@ namespace Events_Module
 						{
 							if (clipboardResult.IsFaulted)
 							{
-								ScreenNotification.ShowNotification(Resources.Failed_to_copy_waypoint_to_clipboard__Try_again_, (NotificationType)6, (Texture2D)null, 2);
+								ScreenNotification.ShowNotification(Events_Module.Properties.Resources.Failed_to_copy_waypoint_to_clipboard__Try_again_, (NotificationType)6, (Texture2D)null, 2);
 							}
 							else
 							{
-								ScreenNotification.ShowNotification(Resources.Copied_waypoint_to_clipboard_, (NotificationType)0, (Texture2D)null, 2);
+								ScreenNotification.ShowNotification(Events_Module.Properties.Resources.Copied_waypoint_to_clipboard_, (NotificationType)0, (Texture2D)null, 2);
 							}
 						});
 					});
@@ -404,7 +404,7 @@ namespace Events_Module
 				GlowButton val12 = new GlowButton();
 				val12.set_Icon(AsyncTexture2D.op_Implicit(_textureWatch));
 				val12.set_ActiveIcon(AsyncTexture2D.op_Implicit(_textureWatchActive));
-				((Control)val12).set_BasicTooltipText(Resources.Click_to_toggle_tracking_for_this_event_);
+				((Control)val12).set_BasicTooltipText(Events_Module.Properties.Resources.Click_to_toggle_tracking_for_this_event_);
 				val12.set_ToggleGlow(true);
 				val12.set_Checked(meta.IsWatched);
 				((Control)val12).set_Parent((Container)(object)es2);
@@ -440,11 +440,11 @@ namespace Events_Module
 			});
 			((Control)eventCategories.AddMenuItem(_ecWatchedEvents, (Texture2D)null)).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				eventPanel.FilterChildren<DetailsButton>((Func<DetailsButton, bool>)((DetailsButton db) => Meta.Events.Find((Meta m) => db.get_Text() == (Resources.ResourceManager.GetString(m.Name) ?? m.Name)).IsWatched));
+				eventPanel.FilterChildren<DetailsButton>((Func<DetailsButton, bool>)((DetailsButton db) => Meta.Events.Find((Meta m) => db.get_Text() == (Events_Module.Properties.Resources.ResourceManager.GetString(m.Name) ?? m.Name)).IsWatched));
 			});
 			foreach (IGrouping<string, Meta> e2 in submetas)
 			{
-				string category = Resources.ResourceManager.GetString(e2.Key) ?? e2.Key;
+				string category = Events_Module.Properties.Resources.ResourceManager.GetString(e2.Key) ?? e2.Key;
 				((Control)eventCategories.AddMenuItem(category, (Texture2D)null)).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
 					eventPanel.FilterChildren<DetailsButton>((Func<DetailsButton, bool>)((DetailsButton db) => string.Equals(((Control)db).get_BasicTooltipText(), category)));
@@ -487,10 +487,10 @@ namespace Events_Module
 		{
 			TimeSpan timeUntil = assignedMeta.NextTime - DateTime.Now;
 			StringBuilder msg = new StringBuilder();
-			msg.AppendLine(string.Format(Resources.Starts_in__0_, TimeSpanHumanizeExtensions.Humanize(timeUntil, 2, (CultureInfo)null, (TimeUnit)3, (TimeUnit)2, (string)null, false)));
-			msg.Append(Environment.NewLine + Resources.Upcoming_Event_Times_);
+			msg.AppendLine(string.Format(Events_Module.Properties.Resources.Starts_in__0_, timeUntil.Humanize(2, null, TimeUnit.Hour, TimeUnit.Minute, null)));
+			msg.Append(Environment.NewLine + Events_Module.Properties.Resources.Upcoming_Event_Times_);
 			using (List<DateTime>.Enumerator enumerator = (from time in assignedMeta.Times
-				select (!(time > DateTime.UtcNow)) ? (time.ToLocalTime() + NumberToTimeSpanExtensions.Days(1)) : time.ToLocalTime() into time
+				select (!(time > DateTime.UtcNow)) ? (time.ToLocalTime() + 1.Days()) : time.ToLocalTime() into time
 				orderby time.Ticks
 				select time).ToList().GetEnumerator())
 			{
@@ -561,16 +561,16 @@ namespace Events_Module
 		{
 			return (from el in Meta.Events
 				orderby el.NextTime
-				select Resources.ResourceManager.GetString(el.Name) ?? el.Name).ToList();
+				select Events_Module.Properties.Resources.ResourceManager.GetString(el.Name) ?? el.Name).ToList();
 		}
 
 		private void ChangeLocalization(object sender, EventArgs e)
 		{
 			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			_ddAlphabetical = Resources.Alphabetical;
-			_ddNextup = Resources.Next_Up;
-			_ecAllevents = Resources.All_Events;
-			_ecHidden = Resources.Hidden_Events;
+			_ddAlphabetical = Events_Module.Properties.Resources.Alphabetical;
+			_ddNextup = Events_Module.Properties.Resources.Next_Up;
+			_ecAllevents = Events_Module.Properties.Resources.All_Events;
+			_ecHidden = Events_Module.Properties.Resources.Hidden_Events;
 			if (_tabPanel != null)
 			{
 				Panel tabPanel = _tabPanel;
@@ -583,7 +583,7 @@ namespace Events_Module
 				{
 					GameService.Overlay.get_BlishHudWindow().RemoveTab(_eventsTab);
 				}
-				_eventsTab = GameService.Overlay.get_BlishHudWindow().AddTab(Resources.Events_and_Metas, AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("textures\\1466345.png")), _tabPanel);
+				_eventsTab = GameService.Overlay.get_BlishHudWindow().AddTab(Events_Module.Properties.Resources.Events_and_Metas, AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("textures\\1466345.png")), _tabPanel);
 			}
 		}
 	}
