@@ -18,13 +18,13 @@ namespace Manlaan.Mounts.Controls
 
 		private List<RadialMount> RadialMounts = new List<RadialMount>();
 
-		private int radius = 0;
+		private int radius;
 
-		private int mountIconSize = 0;
+		private int mountIconSize;
 
-		private int _maxRadialDiameter = 0;
+		private int _maxRadialDiameter;
 
-		private Point SpawnPoint = default(Point);
+		private Point SpawnPoint;
 
 		private RadialMount SelectedMount => RadialMounts.SingleOrDefault((RadialMount m) => m.Selected);
 
@@ -45,8 +45,7 @@ namespace Manlaan.Mounts.Controls
 		public DrawRadial(Helper helper)
 			: this()
 		{
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).set_Visible(false);
 			((Control)this).set_Padding(Thickness.Zero);
 			_helper = helper;
@@ -62,32 +61,28 @@ namespace Manlaan.Mounts.Controls
 
 		protected override CaptureType CapturesInput()
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
 			return (CaptureType)4;
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0207: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0214: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0193: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0198: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0284: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0293: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b2: Unknown result type (might be due to invalid IL or missing references)
 			RadialMounts.Clear();
 			List<Mount> mounts = Module._availableOrderedMounts;
 			Mount mountToPutInCenter = _helper.GetCenterMount();
-			if (mountToPutInCenter?.IsAvailable ?? false)
+			if (mountToPutInCenter != null && mountToPutInCenter.IsAvailable)
 			{
 				if (Module._settingMountRadialRemoveCenterMount.get_Value())
 				{
@@ -124,8 +119,7 @@ namespace Manlaan.Mounts.Controls
 				});
 				currentAngle = angleEnd;
 			}
-			Point mousePos = Control.get_Input().get_Mouse().get_Position();
-			Point diff = mousePos - SpawnPoint;
+			Point diff = Control.get_Input().get_Mouse().get_Position() - SpawnPoint;
 			double angle = Math.Atan2(diff.Y, diff.X);
 			if (angle < 0.0)
 			{

@@ -34,14 +34,37 @@ namespace Manlaan.Mounts
 
 		public CornerIcon CornerIcon { get; private set; }
 
-		public bool IsAvailable => OrderSetting.get_Value() != 0 && IsKeybindSet;
+		public bool IsAvailable
+		{
+			get
+			{
+				if (OrderSetting.get_Value() != 0)
+				{
+					return IsKeybindSet;
+				}
+				return false;
+			}
+		}
 
-		public bool IsKeybindSet => (int)KeybindingSetting.get_Value().get_ModifierKeys() != 0 || (int)KeybindingSetting.get_Value().get_PrimaryKey() > 0;
+		public bool IsKeybindSet
+		{
+			get
+			{
+				//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0023: Invalid comparison between Unknown and I4
+				if ((int)KeybindingSetting.get_Value().get_ModifierKeys() == 0)
+				{
+					return (int)KeybindingSetting.get_Value().get_PrimaryKey() > 0;
+				}
+				return true;
+			}
+		}
 
 		public Mount(SettingCollection settingCollection, Helper helper, string name, string displayName, string imageFileName, bool isUnderwaterMount, bool isWvWMount, int defaultOrderSetting)
 		{
-			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00df: Expected O, but got Unknown
+			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d7: Expected O, but got Unknown
 			_helper = helper;
 			Name = name;
 			DisplayName = displayName;
@@ -68,12 +91,12 @@ namespace Manlaan.Mounts
 
 		public void CreateCornerIcon(Texture2D img)
 		{
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Expected O, but got Unknown
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Expected O, but got Unknown
 			CornerIcon cornerIcon = CornerIcon;
 			if (cornerIcon != null)
 			{

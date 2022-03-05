@@ -121,8 +121,8 @@ namespace Manlaan.Mounts
 
 		protected override void Initialize()
 		{
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Expected O, but got Unknown
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Expected O, but got Unknown
 			GameService.Gw2Mumble.get_PlayerCharacter().add_IsInCombatChanged((EventHandler<ValueEventArgs<bool>>)async delegate(object sender, ValueEventArgs<bool> e)
 			{
 				await HandleCombatChangeAsync(sender, e);
@@ -153,11 +153,11 @@ namespace Manlaan.Mounts
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0154: Expected O, but got Unknown
-			//IL_0510: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0558: Expected O, but got Unknown
-			//IL_06ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014a: Expected O, but got Unknown
+			//IL_0500: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0548: Expected O, but got Unknown
+			//IL_069c: Unknown result type (might be due to invalid IL or missing references)
 			_mounts = new Collection<Mount>
 			{
 				new Raptor(settings, _helper),
@@ -203,10 +203,10 @@ namespace Manlaan.Mounts
 			_settingOpacity = settings.DefineSetting<float>("MountOpacity", 1f, (Func<string>)(() => Strings.Setting_MountOpacity), (Func<string>)(() => ""));
 			SettingComplianceExtensions.SetRange(_settingOpacity, 0f, 1f);
 			MigrateDisplaySettings();
-			foreach (Mount i in _mounts)
+			foreach (Mount mount in _mounts)
 			{
-				i.OrderSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)UpdateSettings);
-				i.KeybindingSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<KeyBinding>>)UpdateSettings);
+				mount.OrderSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)UpdateSettings);
+				mount.KeybindingSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<KeyBinding>>)UpdateSettings);
 			}
 			_settingDefaultMountChoice.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateSettings);
 			_settingDefaultWaterMountChoice.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateSettings);
@@ -241,15 +241,15 @@ namespace Manlaan.Mounts
 
 		protected override void Update(GameTime gameTime)
 		{
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
 			if (_mountPanel != null)
 			{
 				if (GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && !GameService.Gw2Mumble.get_UI().get_IsMapOpen())
@@ -294,11 +294,11 @@ namespace Manlaan.Mounts
 			{
 				((Control)radial).Dispose();
 			}
-			foreach (Mount i in _mounts)
+			foreach (Mount mount in _mounts)
 			{
-				i.OrderSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)UpdateSettings);
-				i.KeybindingSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<KeyBinding>>)UpdateSettings);
-				i.DisposeCornerIcon();
+				mount.OrderSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)UpdateSettings);
+				mount.KeybindingSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<KeyBinding>>)UpdateSettings);
+				mount.DisposeCornerIcon();
 			}
 			_settingDefaultMountChoice.remove_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateSettings);
 			_settingDefaultWaterMountChoice.remove_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateSettings);
@@ -352,35 +352,34 @@ namespace Manlaan.Mounts
 
 		internal void DrawManualIcons()
 		{
-			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Expected O, but got Unknown
-			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010d: Expected O, but got Unknown
-			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0193: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e9: Expected O, but got Unknown
-			//IL_0249: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0274: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Expected O, but got Unknown
+			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0183: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0218: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023f: Unknown result type (might be due to invalid IL or missing references)
 			int curX = 0;
 			int curY = 0;
 			int totalMounts = 0;
@@ -399,8 +398,7 @@ namespace Manlaan.Mounts
 				((Control)val2).set_Location(new Point(curX, curY));
 				((Control)val2).set_Opacity(_settingOpacity.get_Value());
 				((Control)val2).set_BasicTooltipText(mount.DisplayName);
-				Image _btnMount = val2;
-				((Control)_btnMount).add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)async delegate
+				((Control)val2).add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)async delegate
 				{
 					await mount.DoHotKey();
 				});
@@ -422,17 +420,16 @@ namespace Manlaan.Mounts
 				((Control)val3).set_Size(new Point(_settingImgWidth.get_Value() / 2, _settingImgWidth.get_Value() / 2));
 				((Control)val3).set_BackgroundColor(Color.get_White());
 				((Control)val3).set_ZIndex(10);
-				Panel dragBox = val3;
-				((Control)dragBox).add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)delegate
+				((Control)val3).add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)delegate
 				{
-					//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 					_dragging = true;
 					_dragStart = GameService.Input.get_Mouse().get_Position();
 				});
-				((Control)dragBox).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
+				((Control)val3).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
 				{
-					//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 					_dragging = false;
 					_settingLoc.set_Value(((Control)_mountPanel).get_Location());
 				});
@@ -457,9 +454,9 @@ namespace Manlaan.Mounts
 
 		private void DrawUI()
 		{
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Expected O, but got Unknown
-			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Expected O, but got Unknown
+			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
 			Panel mountPanel = _mountPanel;
 			if (mountPanel != null)
 			{
@@ -498,7 +495,7 @@ namespace Manlaan.Mounts
 		private async Task DoDefaultMountActionAsync()
 		{
 			Logger.Debug("DoDefaultMountActionAsync entered");
-			if ((int)GameService.Gw2Mumble.get_PlayerCharacter().get_CurrentMount() > 0)
+			if ((int)GameService.Gw2Mumble.get_PlayerCharacter().get_CurrentMount() != 0)
 			{
 				await (_availableOrderedMounts.FirstOrDefault()?.DoHotKey() ?? Task.CompletedTask);
 				Logger.Debug("DoDefaultMountActionAsync dismounted");
@@ -512,11 +509,9 @@ namespace Manlaan.Mounts
 				return;
 			}
 			string value = _settingDefaultMountBehaviour.get_Value();
-			string text = value;
-			string text2 = text;
-			if (!(text2 == "DefaultMount"))
+			if (!(value == "DefaultMount"))
 			{
-				if (text2 == "Radial")
+				if (value == "Radial")
 				{
 					((Control)_radial).Show();
 					Logger.Debug("DoDefaultMountActionAsync radial");

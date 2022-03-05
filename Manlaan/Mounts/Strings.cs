@@ -23,7 +23,7 @@ namespace Manlaan.Mounts
 			{
 				if (resourceMan == null)
 				{
-					ResourceManager temp = (resourceMan = new ResourceManager("Manlaan.Mounts.Strings", typeof(Strings).Assembly));
+					resourceMan = new ResourceManager("Manlaan.Mounts.Strings", typeof(Strings).Assembly);
 				}
 				return resourceMan;
 			}
