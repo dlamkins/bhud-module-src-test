@@ -255,7 +255,9 @@ namespace Torlando.SquadTracker
 
 		protected override void Unload()
 		{
-			Console.WriteLine("unloaded");
+			_tabPanel?.Dispose();
+			GameService.Overlay.BlishHudWindow.RemoveTab(_windowTab);
+			_windowTab = null;
 		}
 
 		private AsyncTexture2D GetSpecializationIcon(uint professionCode, uint specializationCode)
