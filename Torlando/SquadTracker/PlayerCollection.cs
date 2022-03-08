@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using Blish_HUD.ArcDps.Common;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -34,7 +35,7 @@ namespace Torlando.SquadTracker
 		{
 			if (_players.TryGetValue(arcPlayer.AccountName, out var existingPlayer))
 			{
-				PlayerDisplay playerDisplay = GetPlayer(arcPlayer);
+				TryGetPlayer(arcPlayer, out var playerDisplay);
 				if (playerDisplay != null && playerDisplay.IsFormerSquadMember)
 				{
 					playerDisplay.MoveFormerSquadMemberToActivePanel();
@@ -68,7 +69,15 @@ namespace Torlando.SquadTracker
 
 		public void RemovePlayerFromActivePanel(CommonFields.Player arcPlayer)
 		{
-			GetPlayer(arcPlayer).RemovePlayerFromActivePanel();
+			for (int retries = 3; retries > 0; retries--)
+			{
+				if (TryGetPlayer(arcPlayer, out var playerToRemove))
+				{
+					playerToRemove.RemovePlayerFromActivePanel();
+					break;
+				}
+				Thread.Sleep(3000);
+			}
 		}
 
 		public void ClearFormerPlayers()
@@ -87,9 +96,10 @@ namespace Torlando.SquadTracker
 			return _arcPlayersInSquad.First((KeyValuePair<string, CommonFields.Player> x) => x.Value.CharacterName.Equals(characterName)).Value;
 		}
 
-		private PlayerDisplay GetPlayer(CommonFields.Player arcPlayer)
+		private bool TryGetPlayer(CommonFields.Player arcPlayer, out PlayerDisplay playerDisplay)
 		{
-			return _playerDisplays.First((PlayerDisplay x) => x.AccountName.Equals(arcPlayer.AccountName));
+			playerDisplay = _playerDisplays.FirstOrDefault((PlayerDisplay x) => x.AccountName.Equals(arcPlayer.AccountName));
+			return playerDisplay != null;
 		}
 	}
 }
