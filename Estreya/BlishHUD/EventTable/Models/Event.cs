@@ -30,11 +30,24 @@ namespace Estreya.BlishHUD.EventTable.Models
 	{
 		private static readonly Logger Logger = Logger.GetLogger<Event>();
 
+		private readonly TimeSpan updateInterval = TimeSpan.FromMinutes(15.0);
+
+		private double timeSinceUpdate;
+
 		[JsonIgnore]
 		private Tooltip _tooltip;
 
 		[JsonIgnore]
 		private ContextMenuStrip _contextMenuStrip;
+
+		[JsonIgnore]
+		private string _settingKey;
+
+		[JsonIgnore]
+		private Color? _backgroundColor;
+
+		[JsonIgnore]
+		private int _lastYPosition;
 
 		[JsonProperty("key")]
 		public string Key { get; set; }
@@ -81,7 +94,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 		public string Icon { get; set; }
 
 		[JsonProperty("color")]
-		public string Color { get; set; }
+		public string BackgroundColorCode { get; set; }
 
 		[JsonProperty("api")]
 		public string APICode { get; set; }
@@ -106,6 +119,19 @@ namespace Estreya.BlishHUD.EventTable.Models
 		}
 
 		[JsonIgnore]
+		public string SettingKey
+		{
+			get
+			{
+				if (_settingKey == null)
+				{
+					_settingKey = EventCategory.Key + "-" + (Key ?? Name);
+				}
+				return _settingKey;
+			}
+		}
+
+		[JsonIgnore]
 		private ContextMenuStrip ContextMenuStrip
 		{
 			get
@@ -113,48 +139,58 @@ namespace Estreya.BlishHUD.EventTable.Models
 				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0016: Expected O, but got Unknown
 				//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-				//IL_001c: Expected O, but got Unknown
+				//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0027: Expected O, but got Unknown
 				//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-				//IL_004c: Expected O, but got Unknown
+				//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0057: Expected O, but got Unknown
 				//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-				//IL_007c: Expected O, but got Unknown
+				//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0087: Expected O, but got Unknown
 				//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00ac: Expected O, but got Unknown
+				//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00b7: Expected O, but got Unknown
 				//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00dd: Expected O, but got Unknown
+				//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00e8: Expected O, but got Unknown
 				if (_contextMenuStrip == null)
 				{
 					_contextMenuStrip = new ContextMenuStrip();
-					ContextMenuStripItem copyWaypoint = new ContextMenuStripItem();
-					copyWaypoint.set_Text(Strings.Event_CopyWaypoint);
+					ContextMenuStripItem val = new ContextMenuStripItem();
+					val.set_Text(Strings.Event_CopyWaypoint);
+					ContextMenuStripItem copyWaypoint = val;
 					((Control)copyWaypoint).add_Click((EventHandler<MouseEventArgs>)delegate
 					{
 						CopyWaypoint();
 					});
 					_contextMenuStrip.AddMenuItem(copyWaypoint);
-					ContextMenuStripItem openWiki = new ContextMenuStripItem();
-					openWiki.set_Text(Strings.Event_OpenWiki);
+					ContextMenuStripItem val2 = new ContextMenuStripItem();
+					val2.set_Text(Strings.Event_OpenWiki);
+					ContextMenuStripItem openWiki = val2;
 					((Control)openWiki).add_Click((EventHandler<MouseEventArgs>)delegate
 					{
 						OpenWiki();
 					});
 					_contextMenuStrip.AddMenuItem(openWiki);
-					ContextMenuStripItem hideCategory = new ContextMenuStripItem();
-					hideCategory.set_Text(Strings.Event_HideCategory);
+					ContextMenuStripItem val3 = new ContextMenuStripItem();
+					val3.set_Text(Strings.Event_HideCategory);
+					ContextMenuStripItem hideCategory = val3;
 					((Control)hideCategory).add_Click((EventHandler<MouseEventArgs>)delegate
 					{
 						FinishCategory();
 					});
 					_contextMenuStrip.AddMenuItem(hideCategory);
-					ContextMenuStripItem hideEvent = new ContextMenuStripItem();
-					hideEvent.set_Text(Strings.Event_HideEvent);
+					ContextMenuStripItem val4 = new ContextMenuStripItem();
+					val4.set_Text(Strings.Event_HideEvent);
+					ContextMenuStripItem hideEvent = val4;
 					((Control)hideEvent).add_Click((EventHandler<MouseEventArgs>)delegate
 					{
 						Finish();
 					});
 					_contextMenuStrip.AddMenuItem(hideEvent);
-					ContextMenuStripItem disable = new ContextMenuStripItem();
-					disable.set_Text(Strings.Event_Disable);
+					ContextMenuStripItem val5 = new ContextMenuStripItem();
+					val5.set_Text(Strings.Event_Disable);
+					ContextMenuStripItem disable = val5;
 					((Control)disable).add_Click((EventHandler<MouseEventArgs>)delegate
 					{
 						Disable();
@@ -165,67 +201,90 @@ namespace Estreya.BlishHUD.EventTable.Models
 			}
 		}
 
-		public void Draw(SpriteBatch spriteBatch, Rectangle bounds, Control control, Texture2D baseTexture, List<EventCategory> allCategories, EventCategory currentCategory, double pixelPerMinute, int eventHeight, DateTime now, DateTime min, DateTime max, BitmapFont font, List<DateTime> startOccurences)
+		[JsonIgnore]
+		public Color BackgroundColor
 		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0227: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0245: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0252: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0261: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0279: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0306: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0310: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0317: Unknown result type (might be due to invalid IL or missing references)
-			//IL_032b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0353: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0362: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0372: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0374: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c7: Unknown result type (might be due to invalid IL or missing references)
+			get
+			{
+				//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+				if (!_backgroundColor.HasValue && !Filler)
+				{
+					Color colorFromEvent = (string.IsNullOrWhiteSpace(BackgroundColorCode) ? Color.White : ColorTranslator.FromHtml(BackgroundColorCode));
+					_backgroundColor = new Color((int)colorFromEvent.R, (int)colorFromEvent.G, (int)colorFromEvent.B);
+				}
+				return (Color)(((_003F?)_backgroundColor) ?? Color.get_Transparent());
+			}
+		}
+
+		[JsonIgnore]
+		public List<DateTime> Occurences { get; private set; } = new List<DateTime>();
+
+
+		public Event()
+		{
+			timeSinceUpdate = updateInterval.TotalMilliseconds;
+		}
+
+		public bool Draw(SpriteBatch spriteBatch, Rectangle bounds, Control control, Texture2D baseTexture, int y, double pixelPerMinute, DateTime now, DateTime min, DateTime max, BitmapFont font)
+		{
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0124: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0244: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0262: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0296: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0298: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0302: Unknown result type (might be due to invalid IL or missing references)
+			//IL_031d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0324: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0335: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0349: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0358: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0371: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0379: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0380: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0390: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0392: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e5: Unknown result type (might be due to invalid IL or missing references)
+			List<DateTime> occurences = new List<DateTime>();
+			lock (Occurences)
+			{
+				occurences.AddRange(Occurences.Where((DateTime oc) => (oc >= min || oc.AddMinutes(Duration) >= min) && oc <= max));
+			}
+			_lastYPosition = y;
 			RectangleF eventTexturePosition = default(RectangleF);
 			RectangleF eventTimeRemainingPosition = default(RectangleF);
-			foreach (DateTime eventStart in startOccurences)
+			foreach (DateTime eventStart in occurences)
 			{
 				float width = (float)GetWidth(eventStart, min, bounds, pixelPerMinute);
 				if (width <= 0f)
 				{
 					continue;
 				}
-				int y = GetYPosition(allCategories, currentCategory, eventHeight, EventTableModule.ModuleInstance.Debug);
 				float x = (float)GetXPosition(eventStart, min, pixelPerMinute);
 				x = Math.Max(x, 0f);
-				Color color = Color.get_Transparent();
-				if (!Filler)
-				{
-					Color colorFromEvent = (string.IsNullOrWhiteSpace(Color) ? System.Drawing.Color.White : ColorTranslator.FromHtml(Color));
-					((Color)(ref color))._002Ector((int)colorFromEvent.R, (int)colorFromEvent.G, (int)colorFromEvent.B);
-				}
-				((RectangleF)(ref eventTexturePosition))._002Ector(x, (float)y, width, (float)eventHeight);
+				((RectangleF)(ref eventTexturePosition))._002Ector(x, (float)y, width, (float)EventTableModule.ModuleInstance.EventHeight);
 				bool drawBorder = !Filler && EventTableModule.ModuleInstance.ModuleSettings.DrawEventBorder.get_Value();
-				DrawRectangle(spriteBatch, control, baseTexture, eventTexturePosition, color * EventTableModule.ModuleInstance.ModuleSettings.Opacity.get_Value(), drawBorder ? 1 : 0, Color.get_Black());
+				DrawRectangle(spriteBatch, control, baseTexture, eventTexturePosition, BackgroundColor * EventTableModule.ModuleInstance.ModuleSettings.Opacity.get_Value(), drawBorder ? 1 : 0, Color.get_Black());
 				Color textColor = Color.get_Black();
 				if (Filler)
 				{
@@ -275,6 +334,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 					DrawCrossOut(spriteBatch, control, baseTexture, eventTexturePosition, Color.get_Red());
 				}
 			}
+			return occurences.Any();
 		}
 
 		private void UpdateTooltip(string description)
@@ -282,19 +342,6 @@ namespace Estreya.BlishHUD.EventTable.Models
 			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001d: Expected O, but got Unknown
 			_tooltip = new Tooltip((ITooltipView)(object)new TooltipView(Name, description, Icon));
-		}
-
-		private string GetTimeRemaining(DateTime now, DateTime max, DateTime min)
-		{
-			IEnumerable<DateTime> filteredStartOccurences = from so in GetStartOccurences(now, max, min)
-				where so <= now && so.AddMinutes(Duration) > now
-				select so;
-			if (filteredStartOccurences.Any())
-			{
-				TimeSpan timeRemaining = filteredStartOccurences.First().AddMinutes(Duration).Subtract(now);
-				return FormatTime(timeRemaining);
-			}
-			return null;
 		}
 
 		private string FormatTime(TimeSpan ts)
@@ -450,13 +497,9 @@ namespace Estreya.BlishHUD.EventTable.Models
 			}
 		}
 
-		public List<DateTime> GetStartOccurences(DateTime now, DateTime max, DateTime min, bool addTimezoneOffset = true, bool limitsBetweenRanges = false)
+		private List<DateTime> GetStartOccurences(DateTime now, DateTime max, DateTime min, bool addTimezoneOffset = true, bool limitsBetweenRanges = false)
 		{
 			List<DateTime> startOccurences = new List<DateTime>();
-			if (IsDisabled())
-			{
-				return startOccurences;
-			}
 			DateTime zero = new DateTime(min.Year, min.Month, min.Day, 0, 0, 0).AddDays((Repeat.TotalMinutes != 0.0) ? (-1) : 0);
 			TimeSpan offset = Offset;
 			if (ConvertOffset && addTimezoneOffset)
@@ -483,52 +526,6 @@ namespace Estreya.BlishHUD.EventTable.Models
 			return start.Subtract(min).TotalMinutes * pixelPerMinute;
 		}
 
-		private int GetMinYPosition(IEnumerable<EventCategory> eventCategories, int eventHight, bool debugEnabled)
-		{
-			int minY = 0;
-			if (debugEnabled)
-			{
-				foreach (EventCategory eventCategory in eventCategories)
-				{
-					foreach (Event e in eventCategory.Events)
-					{
-						minY += eventHight;
-						if (this == e)
-						{
-							return minY;
-						}
-					}
-				}
-				return minY;
-			}
-			return minY;
-		}
-
-		public int GetYPosition(IEnumerable<EventCategory> eventCategories, EventCategory evc, int eventHeight, bool debugEnabled)
-		{
-			int y = GetMinYPosition(eventCategories, eventHeight, debugEnabled);
-			foreach (EventCategory category in eventCategories)
-			{
-				bool anyFromCategoryRendered = false;
-				foreach (Event e in category.Events)
-				{
-					if (!e.IsDisabled())
-					{
-						anyFromCategoryRendered = true;
-						if (((!e.Filler || !(category.Key == evc.Key)) && !(category.Key != evc.Key)) || (!e.Filler && !(e.GetSettingName() != GetSettingName())))
-						{
-							return y;
-						}
-					}
-				}
-				if (anyFromCategoryRendered)
-				{
-					y += eventHeight;
-				}
-			}
-			return y;
-		}
-
 		public double GetWidth(DateTime eventOccurence, DateTime min, Rectangle bounds, double pixelPerMinute)
 		{
 			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
@@ -546,20 +543,23 @@ namespace Estreya.BlishHUD.EventTable.Models
 			return eventWidth;
 		}
 
-		public bool IsHovered(IEnumerable<EventCategory> eventCategories, EventCategory eventCategory, DateTime now, DateTime max, DateTime min, Rectangle bounds, Point relativeMousePosition, double pixelPerMinute, int eventHeight, bool debugEnabled)
+		public bool IsHovered(DateTime min, Rectangle bounds, Point relativeMousePosition, double pixelPerMinute)
 		{
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			foreach (DateTime occurence in GetStartOccurences(now, max, min))
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			if (IsDisabled())
+			{
+				return false;
+			}
+			foreach (DateTime occurence in Occurences)
 			{
 				double x = GetXPosition(occurence, min, pixelPerMinute);
-				int eo_y = GetYPosition(eventCategories, eventCategory, eventHeight, debugEnabled);
 				double width = GetWidth(occurence, min, bounds, pixelPerMinute);
 				x = Math.Max(x, 0.0);
-				if ((double)relativeMousePosition.X >= x && (double)relativeMousePosition.X < x + width && relativeMousePosition.Y >= eo_y && relativeMousePosition.Y < eo_y + eventHeight)
+				if ((double)relativeMousePosition.X >= x && (double)relativeMousePosition.X < x + width && relativeMousePosition.Y >= _lastYPosition && relativeMousePosition.Y < _lastYPosition + EventTableModule.ModuleInstance.EventHeight)
 				{
 					return true;
 				}
@@ -569,17 +569,21 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		public void HandleClick(object sender, MouseEventArgs e)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000b: Invalid comparison between Unknown and I4
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Invalid comparison between Unknown and I4
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0014: Invalid comparison between Unknown and I4
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0041: Invalid comparison between Unknown and I4
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
+			if (Filler)
+			{
+				return;
+			}
 			if ((int)e.get_EventType() == 513)
 			{
 				if (EventTableModule.ModuleInstance.ModuleSettings.CopyWaypointOnClick.get_Value())
@@ -598,7 +602,11 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		public void HandleHover(object sender, MouseEventArgs e, double pixelPerMinute)
 		{
-			List<DateTime> occurences = GetStartOccurences(EventTableModule.ModuleInstance.DateTimeNow, EventTableModule.ModuleInstance.EventTimeMax, EventTableModule.ModuleInstance.EventTimeMin);
+			if (Filler)
+			{
+				return;
+			}
+			List<DateTime> occurences = Occurences;
 			IEnumerable<DateTime> hoveredOccurences = occurences.Where(delegate(DateTime eo)
 			{
 				//IL_0039: Unknown result type (might be due to invalid IL or missing references)
@@ -636,7 +644,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 				}
 				else
 				{
-					description = description + Location + ((!string.IsNullOrWhiteSpace(Location)) ? "\n" : string.Empty) + "\n" + Strings.Event_Tooltip_StartsAt + ": " + FormatTime(hoveredOccurence);
+					description = Location + ((!string.IsNullOrWhiteSpace(Location)) ? "\n" : string.Empty) + "\n" + Strings.Event_Tooltip_StartsAt + ": " + FormatTime(hoveredOccurence);
 				}
 			}
 			else
@@ -659,7 +667,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 		{
 			DateTime now = EventTableModule.ModuleInstance.DateTimeNow.ToUniversalTime();
 			DateTime until = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0).AddDays(1.0);
-			EventTableModule.ModuleInstance.HiddenState.Add(GetSettingName(), until, isUTC: true);
+			EventTableModule.ModuleInstance.HiddenState.Add(SettingKey, until, isUTC: true);
 		}
 
 		public void FinishCategory()
@@ -669,7 +677,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		public void Disable()
 		{
-			IEnumerable<SettingEntry<bool>> eventSetting = EventTableModule.ModuleInstance.ModuleSettings.AllEvents.Where((SettingEntry<bool> e) => ((SettingEntry)e).get_EntryKey().ToLowerInvariant() == GetSettingName().ToLowerInvariant());
+			IEnumerable<SettingEntry<bool>> eventSetting = EventTableModule.ModuleInstance.ModuleSettings.AllEvents.Where((SettingEntry<bool> e) => ((SettingEntry)e).get_EntryKey().ToLowerInvariant() == SettingKey.ToLowerInvariant());
 			if (eventSetting.Any())
 			{
 				eventSetting.First().set_Value(false);
@@ -678,17 +686,40 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		public bool IsDisabled()
 		{
-			IEnumerable<SettingEntry<bool>> eventSetting = EventTableModule.ModuleInstance.ModuleSettings.AllEvents.Where((SettingEntry<bool> e) => ((SettingEntry)e).get_EntryKey().ToLowerInvariant() == GetSettingName().ToLowerInvariant());
+			if (Filler)
+			{
+				return false;
+			}
+			IEnumerable<SettingEntry<bool>> eventSetting = EventTableModule.ModuleInstance.ModuleSettings.AllEvents.Where((SettingEntry<bool> e) => ((SettingEntry)e).get_EntryKey().ToLowerInvariant() == SettingKey.ToLowerInvariant());
 			if (eventSetting.Any())
 			{
-				return !eventSetting.First().get_Value() || EventTableModule.ModuleInstance.HiddenState.IsHidden(GetSettingName());
+				return !eventSetting.First().get_Value() || EventTableModule.ModuleInstance.HiddenState.IsHidden(SettingKey);
 			}
 			return false;
 		}
 
-		public string GetSettingName()
+		private void UpdateEventOccurences(GameTime gameTime)
 		{
-			return EventCategory.Key + "-" + Key;
+			if (!Filler)
+			{
+				lock (Occurences)
+				{
+					Occurences.Clear();
+				}
+				DateTime now = EventTableModule.ModuleInstance.DateTimeNow;
+				DateTime min = now.AddDays(-4.0);
+				DateTime max = now.AddDays(4.0);
+				List<DateTime> occurences = GetStartOccurences(now, max, min);
+				lock (Occurences)
+				{
+					Occurences.AddRange(occurences);
+				}
+			}
+		}
+
+		public void Update(GameTime gameTime)
+		{
+			UpdateCadenceUtil.UpdateWithCadence(UpdateEventOccurences, gameTime, updateInterval.TotalMilliseconds, ref timeSinceUpdate);
 		}
 	}
 }

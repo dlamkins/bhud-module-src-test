@@ -354,6 +354,10 @@ namespace Estreya.BlishHUD.EventTable.Resources
 
 		internal static string Setting_EventTimeSpan_Name => ResourceManager.GetString("Setting_EventTimeSpan_Name", resourceCulture);
 
+		internal static string Setting_EventTimeSpan_Validation_NoDouble => ResourceManager.GetString("Setting_EventTimeSpan_Validation_NoDouble", resourceCulture);
+
+		internal static string Setting_EventTimeSpan_Validation_OverLimit => ResourceManager.GetString("Setting_EventTimeSpan_Validation_OverLimit", resourceCulture);
+
 		internal static string Setting_FillerTextColor_Description => ResourceManager.GetString("Setting_FillerTextColor_Description", resourceCulture);
 
 		internal static string Setting_FillerTextColor_Name => ResourceManager.GetString("Setting_FillerTextColor_Name", resourceCulture);

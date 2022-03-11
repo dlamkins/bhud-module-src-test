@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Blish_HUD;
+using Estreya.BlishHUD.EventTable.Utils;
+using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 
 namespace Estreya.BlishHUD.EventTable.Models
@@ -8,6 +12,18 @@ namespace Estreya.BlishHUD.EventTable.Models
 	[Serializable]
 	public class EventCategory
 	{
+		private static readonly Logger Logger = Logger.GetLogger<EventCategory>();
+
+		private readonly TimeSpan updateInterval = TimeSpan.FromMinutes(15.0);
+
+		private double timeSinceUpdate;
+
+		[JsonProperty("events")]
+		private List<Event> _originalEvents = new List<Event>();
+
+		[JsonIgnore]
+		private List<Event> _fillerEvents = new List<Event>();
+
 		[JsonProperty("key")]
 		public string Key { get; set; }
 
@@ -17,29 +33,47 @@ namespace Estreya.BlishHUD.EventTable.Models
 		[JsonProperty("showCombined")]
 		public bool ShowCombined { get; set; }
 
-		[JsonProperty("events")]
-		public List<Event> Events { get; set; }
-
-		public List<KeyValuePair<DateTime, Event>> GetEventOccurences(DateTime now, DateTime max, DateTime min, bool fillGaps)
+		public List<Event> Events
 		{
-			if (IsDisabled())
+			get
 			{
-				return new List<KeyValuePair<DateTime, Event>>();
+				return _originalEvents.Concat(_fillerEvents).ToList();
 			}
-			List<Event> activeEvents = Events.Where((Event e) => !e.IsDisabled()).ToList();
+			set
+			{
+				_originalEvents = value;
+			}
+		}
+
+		public EventCategory()
+		{
+			timeSinceUpdate = updateInterval.TotalMilliseconds;
+		}
+
+		private void ModuleSettings_EventSettingChanged(object sender, ModuleSettings.EventSettingsChangedEventArgs e)
+		{
+			if (_originalEvents.Any((Event ev) => ev.SettingKey.ToLowerInvariant() == e.Name.ToLowerInvariant()))
+			{
+				UpdateEventOccurences(null);
+			}
+		}
+
+		private void UpdateEventOccurences(GameTime gameTime)
+		{
+			lock (_fillerEvents)
+			{
+				_fillerEvents.Clear();
+			}
+			List<Event> activeEvents = _originalEvents.Where((Event e) => !e.IsDisabled()).ToList();
 			List<KeyValuePair<DateTime, Event>> activeEventStarts = new List<KeyValuePair<DateTime, Event>>();
 			foreach (Event activeEvent in activeEvents)
 			{
-				activeEvent.GetStartOccurences(now, max, min).ForEach(delegate(DateTime eo)
+				activeEvent.Occurences.Where((DateTime oc) => (oc >= EventTableModule.ModuleInstance.EventTimeMin || oc.AddMinutes(activeEvent.Duration) >= EventTableModule.ModuleInstance.EventTimeMin) && oc <= EventTableModule.ModuleInstance.EventTimeMax).ToList().ForEach(delegate(DateTime eo)
 				{
 					activeEventStarts.Add(new KeyValuePair<DateTime, Event>(eo, activeEvent));
 				});
 			}
 			activeEventStarts = activeEventStarts.OrderBy((KeyValuePair<DateTime, Event> aes) => aes.Key).ToList();
-			if (!fillGaps)
-			{
-				return activeEventStarts.ToList();
-			}
 			List<KeyValuePair<DateTime, Event>> modifiedEventStarts = activeEventStarts.ToList();
 			for (int i = 0; i < activeEventStarts.Count - 1; i++)
 			{
@@ -64,7 +98,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 				KeyValuePair<DateTime, Event> firstEvent = activeEventStarts.FirstOrDefault();
 				KeyValuePair<DateTime, Event> lastEvent = activeEventStarts.LastOrDefault();
 				KeyValuePair<DateTime, Event> nextEvent4 = (from ae in activeEvents
-					select new KeyValuePair<DateTime, Event>(ae.GetStartOccurences(now, max.AddDays(2.0), lastEvent.Key, addTimezoneOffset: true, limitsBetweenRanges: true).FirstOrDefault(), ae) into aeo
+					select new KeyValuePair<DateTime, Event>(ae.Occurences.Where((DateTime oc) => oc > lastEvent.Key && oc < EventTableModule.ModuleInstance.EventTimeMax.AddDays(2.0)).FirstOrDefault(), ae) into aeo
 					orderby aeo.Key
 					select aeo).First();
 				KeyValuePair<DateTime, Event> nextEventMapping3 = new KeyValuePair<DateTime, Event>(nextEvent4.Key, nextEvent4.Value);
@@ -82,7 +116,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 					modifiedEventStarts.Add(new KeyValuePair<DateTime, Event>(lastEvent.Key + TimeSpan.FromMinutes(lastEvent.Value.Duration), filler6));
 				}
 				KeyValuePair<DateTime, Event> prevEvent3 = (from ae in activeEvents
-					select new KeyValuePair<DateTime, Event>(ae.GetStartOccurences(now, firstEvent.Key, min.AddDays(-2.0), addTimezoneOffset: true, limitsBetweenRanges: true).LastOrDefault(), ae) into aeo
+					select new KeyValuePair<DateTime, Event>(ae.Occurences.Where((DateTime oc) => oc > EventTableModule.ModuleInstance.EventTimeMin.AddDays(-2.0) && oc < firstEvent.Key).LastOrDefault(), ae) into aeo
 					orderby aeo.Key
 					select aeo).Last();
 				KeyValuePair<DateTime, Event> prevEventMapping3 = new KeyValuePair<DateTime, Event>(prevEvent3.Key, prevEvent3.Value);
@@ -105,7 +139,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 				DateTime currentStart = currentEvent2.Key;
 				DateTime currentEnd2 = currentStart + TimeSpan.FromMinutes(currentEvent2.Value.Duration);
 				KeyValuePair<DateTime, Event> nextEvent3 = (from ae in activeEvents
-					select new KeyValuePair<DateTime, Event>(ae.GetStartOccurences(now, max.AddDays(2.0), currentEnd2, addTimezoneOffset: true, limitsBetweenRanges: true).FirstOrDefault(), ae) into aeo
+					select new KeyValuePair<DateTime, Event>(ae.Occurences.Where((DateTime oc) => oc > currentEnd2 && oc < EventTableModule.ModuleInstance.EventTimeMax.AddDays(2.0)).FirstOrDefault(), ae) into aeo
 					orderby aeo.Key
 					select aeo).First();
 				KeyValuePair<DateTime, Event> nextEventMapping2 = new KeyValuePair<DateTime, Event>(nextEvent3.Key, nextEvent3.Value);
@@ -123,7 +157,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 					modifiedEventStarts.Add(new KeyValuePair<DateTime, Event>(currentEnd2, filler4));
 				}
 				KeyValuePair<DateTime, Event> prevEvent2 = (from ae in activeEvents
-					select new KeyValuePair<DateTime, Event>(ae.GetStartOccurences(now, currentStart, min.AddDays(-2.0), addTimezoneOffset: true, limitsBetweenRanges: true).LastOrDefault(), ae) into aeo
+					select new KeyValuePair<DateTime, Event>(ae.Occurences.Where((DateTime oc) => oc > EventTableModule.ModuleInstance.EventTimeMin.AddDays(-2.0) && oc < currentStart).LastOrDefault(), ae) into aeo
 					orderby aeo.Key
 					select aeo).Last();
 				KeyValuePair<DateTime, Event> prevEventMapping2 = new KeyValuePair<DateTime, Event>(prevEvent2.Key, prevEvent2.Value);
@@ -143,11 +177,11 @@ namespace Estreya.BlishHUD.EventTable.Models
 			else if (activeEventStarts.Count == 0 && activeEvents.Count >= 1)
 			{
 				KeyValuePair<DateTime, Event> prevEvent = (from ae in activeEvents
-					select new KeyValuePair<DateTime, Event>(ae.GetStartOccurences(now, now, min.AddDays(-2.0), addTimezoneOffset: true, limitsBetweenRanges: true).LastOrDefault(), ae) into aeo
+					select new KeyValuePair<DateTime, Event>(ae.Occurences.Where((DateTime oc) => oc > EventTableModule.ModuleInstance.EventTimeMin.AddDays(-2.0) && oc < EventTableModule.ModuleInstance.EventTimeMax).LastOrDefault(), ae) into aeo
 					orderby aeo.Key
 					select aeo).Last();
 				KeyValuePair<DateTime, Event> nextEvent2 = (from ae in activeEvents
-					select new KeyValuePair<DateTime, Event>(ae.GetStartOccurences(now, max.AddDays(2.0), now, addTimezoneOffset: true, limitsBetweenRanges: true).FirstOrDefault(), ae) into aeo
+					select new KeyValuePair<DateTime, Event>(ae.Occurences.Where((DateTime oc) => oc > EventTableModule.ModuleInstance.EventTimeMin && oc < EventTableModule.ModuleInstance.EventTimeMax.AddDays(2.0)).FirstOrDefault(), ae) into aeo
 					orderby aeo.Key
 					select aeo).First();
 				KeyValuePair<DateTime, Event> prevEventMapping = new KeyValuePair<DateTime, Event>(prevEvent.Key, prevEvent.Value);
@@ -163,7 +197,17 @@ namespace Estreya.BlishHUD.EventTable.Models
 				};
 				modifiedEventStarts.Add(new KeyValuePair<DateTime, Event>(prevEnd, filler2));
 			}
-			return modifiedEventStarts.OrderBy((KeyValuePair<DateTime, Event> mes) => mes.Key).ToList();
+			lock (_fillerEvents)
+			{
+				modifiedEventStarts.Where((KeyValuePair<DateTime, Event> e) => e.Value.Filler).ToList().ForEach(delegate(KeyValuePair<DateTime, Event> modEvent)
+				{
+					modEvent.Value.Occurences.Add(modEvent.Key);
+				});
+				IEnumerable<Event> modifiedEvents = from e in modifiedEventStarts
+					where e.Value.Filler
+					select e.Value;
+				_fillerEvents.AddRange(modifiedEvents);
+			}
 		}
 
 		public void Finish()
@@ -176,6 +220,21 @@ namespace Estreya.BlishHUD.EventTable.Models
 		public bool IsDisabled()
 		{
 			return EventTableModule.ModuleInstance.HiddenState.IsHidden(Key);
+		}
+
+		public Task LoadAsync()
+		{
+			EventTableModule.ModuleInstance.ModuleSettings.EventSettingChanged += ModuleSettings_EventSettingChanged;
+			return Task.CompletedTask;
+		}
+
+		public void Update(GameTime gameTime)
+		{
+			Events.ForEach(delegate(Event ev)
+			{
+				ev.Update(gameTime);
+			});
+			UpdateCadenceUtil.UpdateWithCadence(UpdateEventOccurences, gameTime, updateInterval.TotalMilliseconds, ref timeSinceUpdate);
 		}
 	}
 }

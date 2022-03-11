@@ -24,6 +24,13 @@ namespace Estreya.BlishHUD.EventTable
 			public object Value { get; set; }
 		}
 
+		public class EventSettingsChangedEventArgs
+		{
+			public string Name { get; set; }
+
+			public bool Enabled { get; set; }
+		}
+
 		private static readonly Logger Logger = Logger.GetLogger<ModuleSettings>();
 
 		private Color _defaultColor;
@@ -121,6 +128,8 @@ namespace Estreya.BlishHUD.EventTable
 
 		public event EventHandler<ModuleSettingsChangedEventArgs> ModuleSettingsChanged;
 
+		public event EventHandler<EventSettingsChangedEventArgs> EventSettingChanged;
+
 		public ModuleSettings(SettingCollection settings)
 		{
 			Settings = settings;
@@ -211,7 +220,7 @@ namespace Estreya.BlishHUD.EventTable
 			_defaultColor = val;
 		}
 
-		public async Task Load()
+		public async Task LoadAsync()
 		{
 			try
 			{
@@ -255,6 +264,27 @@ namespace Estreya.BlishHUD.EventTable
 			BackgroundColorOpacity.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)SettingChanged<float>);
 			EventTimeSpan = GlobalSettings.DefineSetting<string>("EventTimeSpan", "120", (Func<string>)(() => Strings.Setting_EventTimeSpan_Name), (Func<string>)(() => Strings.Setting_EventTimeSpan_Description));
 			EventTimeSpan.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)SettingChanged<string>);
+			SettingComplianceExtensions.SetValidation<string>(EventTimeSpan, (Func<string, SettingValidationResult>)delegate(string val)
+			{
+				//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+				bool flag = true;
+				string text = null;
+				double num = 1440.0;
+				if (double.TryParse(val, out var result))
+				{
+					if (result > num)
+					{
+						flag = false;
+						text = string.Format(Strings.Setting_EventTimeSpan_Validation_OverLimit, num);
+					}
+				}
+				else
+				{
+					flag = false;
+					text = string.Format(Strings.Setting_EventTimeSpan_Validation_NoDouble, val);
+				}
+				return new SettingValidationResult(flag, text);
+			});
 			EventHistorySplit = GlobalSettings.DefineSetting<int>("EventHistorySplit", 50, (Func<string>)(() => Strings.Setting_EventHistorySplit_Name), (Func<string>)(() => Strings.Setting_EventHistorySplit_Description));
 			SettingComplianceExtensions.SetRange(EventHistorySplit, 0, 75);
 			EventHistorySplit.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)SettingChanged<int>);
@@ -330,8 +360,17 @@ namespace Estreya.BlishHUD.EventTable
 				}
 				foreach (Event e2 in enumerable)
 				{
-					SettingEntry<bool> setting = eventList.DefineSetting<bool>(e2.GetSettingName(), true, (Func<string>)null, (Func<string>)null);
-					setting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+					SettingEntry<bool> setting = eventList.DefineSetting<bool>(e2.SettingKey, true, (Func<string>)null, (Func<string>)null);
+					setting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object s, ValueChangedEventArgs<bool> e)
+					{
+						SettingEntry<bool> val = (SettingEntry<bool>)s;
+						this.EventSettingChanged?.Invoke(s, new EventSettingsChangedEventArgs
+						{
+							Name = ((SettingEntry)val).get_EntryKey(),
+							Enabled = e.get_NewValue()
+						});
+						SettingChanged<bool>(s, e);
+					});
 					AllEvents.Add(setting);
 				}
 			}

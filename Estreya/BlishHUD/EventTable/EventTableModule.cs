@@ -149,7 +149,7 @@ namespace Estreya.BlishHUD.EventTable
 
 		protected override async Task LoadAsync()
 		{
-			await ModuleSettings.Load();
+			await ModuleSettings.LoadAsync();
 			await InitializeStates(beforeFileLoaded: true);
 			EventSettingsFile eventSettingsFile = JsonConvert.DeserializeObject<EventSettingsFile>(await EventFileState.GetExternalFileContent());
 			Logger.Info($"Loaded event file version: {eventSettingsFile.Version}");
@@ -172,7 +172,7 @@ namespace Estreya.BlishHUD.EventTable
 					}
 					if (ModuleSettings.UseEventTranslation.get_Value())
 					{
-						e.Name = Strings.ResourceManager.GetString("event-" + e.GetSettingName()) ?? e.Name;
+						e.Name = Strings.ResourceManager.GetString("event-" + e.SettingKey) ?? e.Name;
 					}
 				});
 			});
@@ -185,6 +185,7 @@ namespace Estreya.BlishHUD.EventTable
 			((Control)eventTableContainer).set_Opacity(0f);
 			eventTableContainer.Visible = false;
 			eventTableModule.Container = eventTableContainer;
+			await Container.LoadAsync();
 			ModuleSettings.ModuleSettingsChanged += delegate(object sender, ModuleSettings.ModuleSettingsChangedEventArgs eventArgs)
 			{
 				switch (eventArgs.Name)
@@ -204,8 +205,16 @@ namespace Estreya.BlishHUD.EventTable
 				case "RegisterCornerIcon":
 					HandleCornerIcon(ModuleSettings.RegisterCornerIcon.get_Value());
 					break;
+				case "BackgroundColor":
+				case "BackgroundColorOpacity":
+					Container.UpdateBackgroundColor();
+					break;
 				}
 			};
+			foreach (EventCategory eventCategory in _eventCategories)
+			{
+				await eventCategory.LoadAsync();
+			}
 		}
 
 		private async Task InitializeStates(bool beforeFileLoaded = false)
@@ -367,6 +376,10 @@ namespace Estreya.BlishHUD.EventTable
 			{
 				state.Update(gameTime);
 			}
+			_eventCategories.ForEach(delegate(EventCategory ec)
+			{
+				ec.Update(gameTime);
+			});
 		}
 
 		private void CheckContainerSizeAndPosition()
@@ -389,8 +402,6 @@ namespace Estreya.BlishHUD.EventTable
 
 		private void CheckMumble()
 		{
-			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ad: Invalid comparison between Unknown and I4
 			if (GameService.Gw2Mumble.get_IsAvailable() && Container != null)
 			{
 				bool show = true;
@@ -406,13 +417,13 @@ namespace Estreya.BlishHUD.EventTable
 				{
 					show &= !GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat();
 				}
-				show &= (int)GameService.Gw2Mumble.get_CurrentMap().get_Type() != 1;
 				ToggleContainer(show);
 			}
 		}
 
 		protected override void Unload()
 		{
+			((Module)this).Unload();
 			if (Container != null)
 			{
 				((Control)Container).Dispose();

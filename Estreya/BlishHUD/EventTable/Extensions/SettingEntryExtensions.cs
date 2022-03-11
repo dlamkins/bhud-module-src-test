@@ -92,5 +92,16 @@ namespace Estreya.BlishHUD.EventTable.Extensions
 		{
 			return SettingComplianceExtensions.GetComplianceRequisite(settingEntry)?.Any((IComplianceRequisite cr) => cr is SettingDisabledComplianceRequisite) ?? false;
 		}
+
+		public static bool HasValidation<T>(this SettingEntry<T> settingEntry)
+		{
+			return SettingComplianceExtensions.GetComplianceRequisite((SettingEntry)(object)settingEntry)?.Any((IComplianceRequisite cr) => cr is SettingValidationComplianceRequisite<T>) ?? false;
+		}
+
+		public static SettingValidationComplianceRequisite<T> GetValidation<T>(this SettingEntry<T> settingEntry)
+		{
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			return (SettingValidationComplianceRequisite<T>)(object)SettingComplianceExtensions.GetComplianceRequisite((SettingEntry)(object)settingEntry)?.First((IComplianceRequisite cr) => cr is SettingValidationComplianceRequisite<T>);
+		}
 	}
 }

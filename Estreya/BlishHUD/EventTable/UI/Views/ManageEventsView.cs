@@ -44,127 +44,133 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 		protected override void Build(Container buildPanel)
 		{
 			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Expected O, but got Unknown
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007f: Expected O, but got Unknown
+			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ed: Expected O, but got Unknown
-			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d4: Expected O, but got Unknown
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0129: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013f: Expected O, but got Unknown
-			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0170: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0179: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0126: Expected O, but got Unknown
+			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0136: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0160: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017c: Expected O, but got Unknown
+			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0195: Expected O, but got Unknown
-			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e8: Expected O, but got Unknown
-			//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0200: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0209: Unknown result type (might be due to invalid IL or missing references)
-			//IL_030f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0314: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0320: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0337: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0341: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035b: Expected O, but got Unknown
-			//IL_035b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0360: Unknown result type (might be due to invalid IL or missing references)
-			//IL_036b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0373: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0380: Unknown result type (might be due to invalid IL or missing references)
-			//IL_038f: Expected O, but got Unknown
-			//IL_03a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0567: Unknown result type (might be due to invalid IL or missing references)
-			//IL_058b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0590: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0598: Unknown result type (might be due to invalid IL or missing references)
-			//IL_059f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05be: Expected O, but got Unknown
-			//IL_05be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0608: Unknown result type (might be due to invalid IL or missing references)
-			//IL_060d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0615: Unknown result type (might be due to invalid IL or missing references)
-			//IL_061c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0631: Unknown result type (might be due to invalid IL or missing references)
-			//IL_063b: Expected O, but got Unknown
-			//IL_063b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_066f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0674: Unknown result type (might be due to invalid IL or missing references)
-			//IL_067c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0684: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0690: Expected O, but got Unknown
-			Panel = new Panel();
-			((Control)Panel).set_Parent(buildPanel);
-			((Control)Panel).set_Location(new Point(MAIN_PADDING.X, MAIN_PADDING.Y));
-			((Control)Panel).set_Width(buildPanel.get_ContentRegion().Width - MAIN_PADDING.Y * 2);
-			((Control)Panel).set_Height(buildPanel.get_ContentRegion().Height - MAIN_PADDING.X);
-			Panel.set_CanScroll(true);
+			//IL_0189: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cf: Expected O, but got Unknown
+			//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0307: Unknown result type (might be due to invalid IL or missing references)
+			//IL_031e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0328: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0336: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0342: Expected O, but got Unknown
+			//IL_0342: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0347: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0352: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0367: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0376: Expected O, but got Unknown
+			//IL_0389: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0399: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_054e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0572: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0577: Unknown result type (might be due to invalid IL or missing references)
+			//IL_057f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0586: Unknown result type (might be due to invalid IL or missing references)
+			//IL_059b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05a5: Expected O, but got Unknown
+			//IL_05a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0603: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0618: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0622: Expected O, but got Unknown
+			//IL_0622: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0656: Unknown result type (might be due to invalid IL or missing references)
+			//IL_065b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0663: Unknown result type (might be due to invalid IL or missing references)
+			//IL_066b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0677: Expected O, but got Unknown
+			Panel val = new Panel();
+			((Control)val).set_Parent(buildPanel);
+			((Control)val).set_Location(new Point(MAIN_PADDING.X, MAIN_PADDING.Y));
+			((Control)val).set_Width(buildPanel.get_ContentRegion().Width - MAIN_PADDING.Y * 2);
+			((Control)val).set_Height(buildPanel.get_ContentRegion().Height - MAIN_PADDING.X);
+			val.set_CanScroll(true);
+			Panel = val;
 			Rectangle contentRegion = ((Container)Panel).get_ContentRegion();
-			TextBox val = new TextBox();
-			((Control)val).set_Parent((Container)(object)Panel);
-			((Control)val).set_Width(((DesignStandard)(ref Panel.MenuStandard)).get_Size().X);
-			((Control)val).set_Location(new Point(0, contentRegion.Y));
-			((TextInputBase)val).set_PlaceholderText(Strings.ManageEventsView_SearchBox_Placeholder);
-			TextBox searchBox = val;
-			Panel val2 = new Panel();
-			val2.set_Title(Strings.ManageEventsView_EventCategories_Title);
+			TextBox val2 = new TextBox();
 			((Control)val2).set_Parent((Container)(object)Panel);
-			val2.set_CanScroll(true);
-			val2.set_ShowBorder(true);
-			((Control)val2).set_Location(new Point(0, ((Control)searchBox).get_Bottom() + ((DesignStandard)(ref Panel.MenuStandard)).get_ControlOffset().Y));
-			Panel eventCategoriesPanel = val2;
+			((Control)val2).set_Width(((DesignStandard)(ref Panel.MenuStandard)).get_Size().X);
+			((Control)val2).set_Location(new Point(0, contentRegion.Y));
+			((TextInputBase)val2).set_PlaceholderText(Strings.ManageEventsView_SearchBox_Placeholder);
+			TextBox searchBox = val2;
+			Panel val3 = new Panel();
+			val3.set_Title(Strings.ManageEventsView_EventCategories_Title);
+			((Control)val3).set_Parent((Container)(object)Panel);
+			val3.set_CanScroll(true);
+			val3.set_ShowBorder(true);
+			((Control)val3).set_Location(new Point(0, ((Control)searchBox).get_Bottom() + ((DesignStandard)(ref Panel.MenuStandard)).get_ControlOffset().Y));
+			Panel eventCategoriesPanel = val3;
 			((Control)eventCategoriesPanel).set_Size(new Point(((DesignStandard)(ref Panel.MenuStandard)).get_Size().X, contentRegion.Height - ((Control)eventCategoriesPanel).get_Location().Y));
-			Menu val3 = new Menu();
-			((Control)val3).set_Parent((Container)(object)eventCategoriesPanel);
+			Menu val4 = new Menu();
+			((Control)val4).set_Parent((Container)(object)eventCategoriesPanel);
 			Rectangle contentRegion2 = ((Container)eventCategoriesPanel).get_ContentRegion();
-			((Control)val3).set_Size(((Rectangle)(ref contentRegion2)).get_Size());
-			val3.set_MenuItemHeight(40);
-			Menu eventCategories = val3;
-			FlowPanel val4 = new FlowPanel();
-			val4.set_FlowDirection((ControlFlowDirection)0);
-			((Panel)val4).set_CanScroll(true);
-			((Panel)val4).set_ShowBorder(true);
-			((Control)val4).set_Parent((Container)(object)Panel);
-			((Control)val4).set_Location(new Point(((Control)eventCategoriesPanel).get_Right() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, contentRegion.Y));
-			FlowPanel eventPanel = val4;
+			((Control)val4).set_Size(((Rectangle)(ref contentRegion2)).get_Size());
+			val4.set_MenuItemHeight(40);
+			Menu eventCategories = val4;
+			FlowPanel val5 = new FlowPanel();
+			val5.set_FlowDirection((ControlFlowDirection)0);
+			((Panel)val5).set_CanScroll(true);
+			((Panel)val5).set_ShowBorder(true);
+			((Control)val5).set_Parent((Container)(object)Panel);
+			((Control)val5).set_Location(new Point(((Control)eventCategoriesPanel).get_Right() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, contentRegion.Y));
+			FlowPanel eventPanel = val5;
 			((Control)eventPanel).set_Size(new Point(contentRegion.Width - ((Control)eventPanel).get_Left(), contentRegion.Height - 32));
 			((TextInputBase)searchBox).add_TextChanged((EventHandler<EventArgs>)delegate
 			{
@@ -189,17 +195,17 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					eventPanel.FilterChildren<EventDetailsButton>((Func<EventDetailsButton, bool>)((EventDetailsButton detailsButton) => menuItem == menus["allEvents"] || category3.Events.Any((Event ev) => ev.EventCategory.Key == detailsButton.Event.EventCategory.Key && ev.Key == detailsButton.Event.Key)));
 				});
 			});
-			Panel val5 = new Panel();
-			((Control)val5).set_Parent((Container)(object)Panel);
-			((Control)val5).set_Location(new Point(((Control)eventPanel).get_Left(), ((Control)eventPanel).get_Bottom()));
-			((Control)val5).set_Size(new Point(((Control)eventPanel).get_Width(), 26));
-			Panel buttons = val5;
-			StandardButton val6 = new StandardButton();
-			val6.set_Text(Strings.ManageEventsView_CheckAll);
-			((Control)val6).set_Parent((Container)(object)buttons);
-			((Control)val6).set_Right(((Control)buttons).get_Width());
-			((Control)val6).set_Bottom(((Control)buttons).get_Height());
-			StandardButton checkAllButton = val6;
+			Panel val6 = new Panel();
+			((Control)val6).set_Parent((Container)(object)Panel);
+			((Control)val6).set_Location(new Point(((Control)eventPanel).get_Left(), ((Control)eventPanel).get_Bottom()));
+			((Control)val6).set_Size(new Point(((Control)eventPanel).get_Width(), 26));
+			Panel buttons = val6;
+			StandardButton val7 = new StandardButton();
+			val7.set_Text(Strings.ManageEventsView_CheckAll);
+			((Control)val7).set_Parent((Container)(object)buttons);
+			((Control)val7).set_Right(((Control)buttons).get_Width());
+			((Control)val7).set_Bottom(((Control)buttons).get_Height());
+			StandardButton checkAllButton = val7;
 			((Control)checkAllButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				((Container)eventPanel).get_Children().ToList().ForEach(delegate(Control control)
@@ -213,12 +219,12 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					}
 				});
 			});
-			StandardButton val7 = new StandardButton();
-			val7.set_Text(Strings.ManageEventsView_UncheckAll);
-			((Control)val7).set_Parent((Container)(object)buttons);
-			((Control)val7).set_Right(((Control)checkAllButton).get_Left());
-			((Control)val7).set_Bottom(((Control)buttons).get_Height());
-			((Control)val7).add_Click((EventHandler<MouseEventArgs>)delegate
+			StandardButton val8 = new StandardButton();
+			val8.set_Text(Strings.ManageEventsView_UncheckAll);
+			((Control)val8).set_Parent((Container)(object)buttons);
+			((Control)val8).set_Right(((Control)checkAllButton).get_Left());
+			((Control)val8).set_Bottom(((Control)buttons).get_Height());
+			((Control)val8).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				((Container)eventPanel).get_Children().ToList().ForEach(delegate(Control control)
 				{
@@ -251,7 +257,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					{
 						continue;
 					}
-					IEnumerable<SettingEntry<bool>> settings = EventSettings.FindAll((SettingEntry<bool> eventSetting) => ((SettingEntry)eventSetting).get_EntryKey().ToLowerInvariant() == e2.GetSettingName().ToLowerInvariant());
+					IEnumerable<SettingEntry<bool>> settings = EventSettings.FindAll((SettingEntry<bool> eventSetting) => ((SettingEntry)eventSetting).get_EntryKey().ToLowerInvariant() == e2.SettingKey.ToLowerInvariant());
 					SettingEntry<bool> setting = settings.First();
 					bool enabled = setting.get_Value();
 					AsyncTexture2D icon = EventTableModule.ModuleInstance.ContentsManager.GetIcon(e2.Icon);
@@ -267,33 +273,33 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					EventDetailsButton button = obj;
 					if (!string.IsNullOrWhiteSpace(e2.Waypoint))
 					{
-						GlowButton val8 = new GlowButton();
-						((Control)val8).set_Parent((Container)(object)button);
-						val8.set_ToggleGlow(false);
-						((Control)val8).set_Tooltip(new Tooltip((ITooltipView)(object)new TooltipView(Strings.ManageEventsView_Waypoint_Title, Strings.ManageEventsView_Waypoint_Description, "images\\waypoint.png")));
-						val8.set_Icon(EventTableModule.ModuleInstance.ContentsManager.GetIcon("images\\waypoint.png"));
-						((Control)val8).add_Click((EventHandler<MouseEventArgs>)delegate
+						GlowButton val9 = new GlowButton();
+						((Control)val9).set_Parent((Container)(object)button);
+						val9.set_ToggleGlow(false);
+						((Control)val9).set_Tooltip(new Tooltip((ITooltipView)(object)new TooltipView(Strings.ManageEventsView_Waypoint_Title, Strings.ManageEventsView_Waypoint_Description, "images\\waypoint.png")));
+						val9.set_Icon(EventTableModule.ModuleInstance.ContentsManager.GetIcon("images\\waypoint.png"));
+						((Control)val9).add_Click((EventHandler<MouseEventArgs>)delegate
 						{
 							e2.CopyWaypoint();
 						});
 					}
 					if (!string.IsNullOrWhiteSpace(e2.Wiki))
 					{
-						GlowButton val9 = new GlowButton();
-						((Control)val9).set_Parent((Container)(object)button);
-						val9.set_ToggleGlow(false);
-						((Control)val9).set_Tooltip(new Tooltip((ITooltipView)(object)new TooltipView(Strings.ManageEventsView_Wiki_Title, Strings.ManageEventsView_Wiki_Description, "images\\wiki.png")));
-						val9.set_Icon(EventTableModule.ModuleInstance.ContentsManager.GetIcon("images\\wiki.png"));
-						((Control)val9).add_Click((EventHandler<MouseEventArgs>)delegate
+						GlowButton val10 = new GlowButton();
+						((Control)val10).set_Parent((Container)(object)button);
+						val10.set_ToggleGlow(false);
+						((Control)val10).set_Tooltip(new Tooltip((ITooltipView)(object)new TooltipView(Strings.ManageEventsView_Wiki_Title, Strings.ManageEventsView_Wiki_Description, "images\\wiki.png")));
+						val10.set_Icon(EventTableModule.ModuleInstance.ContentsManager.GetIcon("images\\wiki.png"));
+						((Control)val10).add_Click((EventHandler<MouseEventArgs>)delegate
 						{
 							e2.OpenWiki();
 						});
 					}
-					GlowButton val10 = new GlowButton();
-					((Control)val10).set_Parent((Container)(object)button);
-					val10.set_Checked(enabled);
-					val10.set_ToggleGlow(false);
-					GlowButton toggleButton = val10;
+					GlowButton val11 = new GlowButton();
+					((Control)val11).set_Parent((Container)(object)button);
+					val11.set_Checked(enabled);
+					val11.set_ToggleGlow(false);
+					GlowButton toggleButton = val11;
 					UpdateToggleButton(toggleButton);
 					toggleButton.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object s, CheckChangedEvent eventArgs)
 					{
