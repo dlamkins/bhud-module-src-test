@@ -262,15 +262,22 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 						}
 						if (setting != null)
 						{
+							bool resetingValue = false;
 							dropdown.add_ValueChanged((EventHandler<ValueChangedEventArgs>)delegate(object s, ValueChangedEventArgs e)
 							{
-								if (HandleValidation(setting, e.get_CurrentValue()))
+								if (!resetingValue)
 								{
-									setting.Value = Enum.Parse(settingEntry.get_SettingType(), e.get_CurrentValue());
-								}
-								else
-								{
-									dropdown.set_SelectedItem(e.get_PreviousValue());
+									object obj = Enum.Parse(settingEntry.get_SettingType(), e.get_CurrentValue());
+									if (HandleValidation(setting, (dynamic)obj))
+									{
+										setting.Value = obj;
+									}
+									else
+									{
+										resetingValue = true;
+										dropdown.set_SelectedItem(e.get_PreviousValue());
+										resetingValue = false;
+									}
 								}
 							});
 						}
