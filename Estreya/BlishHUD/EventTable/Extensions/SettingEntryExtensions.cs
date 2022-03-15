@@ -103,5 +103,24 @@ namespace Estreya.BlishHUD.EventTable.Extensions
 			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 			return (SettingValidationComplianceRequisite<T>)(object)SettingComplianceExtensions.GetComplianceRequisite((SettingEntry)(object)settingEntry)?.First((IComplianceRequisite cr) => cr is SettingValidationComplianceRequisite<T>);
 		}
+
+		public static SettingValidationResult CheckValidation<T>(this SettingEntry<T> settingEntry, T value)
+		{
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			if (settingEntry == null)
+			{
+				return new SettingValidationResult(true, (string)null);
+			}
+			if (!settingEntry.HasValidation<T>())
+			{
+				return new SettingValidationResult(true, (string)null);
+			}
+			return (SettingValidationResult)(((_003F?)settingEntry.GetValidation<T>().get_ValidationFunc()?.Invoke(value)) ?? new SettingValidationResult(false, (string)null));
+		}
 	}
 }

@@ -23,7 +23,7 @@
     <Reference Include="SemanticVersioning">
       <HintPath>..\..\working\SemanticVersioning.dll</HintPath>
     </Reference>
-    <Reference Include="AsyncClipboardService" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="AsyncClipboardService" />
   </ItemGroup>
 </Project>

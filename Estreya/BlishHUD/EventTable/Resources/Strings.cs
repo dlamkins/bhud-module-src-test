@@ -96,6 +96,8 @@ namespace Estreya.BlishHUD.EventTable.Resources
 
 		internal static string event_dragonBash_wayfarerFoothills => ResourceManager.GetString("event-dragonBash-wayfarerFoothills", resourceCulture);
 
+		internal static string event_dragonsEnd_jadeMaw => ResourceManager.GetString("event-dragonsEnd-jadeMaw", resourceCulture);
+
 		internal static string event_dragonsEnd_preparations => ResourceManager.GetString("event-dragonsEnd-preparations", resourceCulture);
 
 		internal static string event_dragonsEnd_theBattleForTheJadeSea => ResourceManager.GetString("event-dragonsEnd-theBattleForTheJadeSea", resourceCulture);
@@ -169,6 +171,8 @@ namespace Estreya.BlishHUD.EventTable.Resources
 		internal static string event_serverReset_serverReset => ResourceManager.GetString("event-serverReset-serverReset", resourceCulture);
 
 		internal static string event_tangledDepth_chakGerent => ResourceManager.GetString("event-tangledDepth-chakGerent", resourceCulture);
+
+		internal static string event_theEchovaldWilds_aspenwood => ResourceManager.GetString("event-theEchovaldWilds-aspenwood", resourceCulture);
 
 		internal static string event_theEchovaldWilds_gangWar => ResourceManager.GetString("event-theEchovaldWilds-gangWar", resourceCulture);
 

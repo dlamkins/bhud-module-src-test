@@ -36,6 +36,7 @@
   <data name="event-desolation-jununduRising"><value>Junundu Rising</value></data>
   <data name="Setting_DebugEnabled_Description"><value>Whether the event table should be running in debug mode.</value></data>
   <data name="eventCategory-theEchovaldWilds"><value>The Echovald Wilds</value></data>
+  <data name="event-dragonsEnd-jadeMaw"><value>Jade Maw</value></data>
   <data name="eventCategory-vabbi"><value>Vabbi</value></data>
   <data name="eventCategory-istan"><value>Domain of Istan</value></data>
   <data name="eventCategory-auricBasin"><value>Auric Basin</value></data>
@@ -92,6 +93,7 @@
   <data name="Setting_LocationX_Description"><value>Where the event table should be displayed on the X axis.</value></data>
   <data name="event-vabbi-forgedWithFire"><value>Forged with Fire</value></data>
   <data name="eventCategory-elonRiverlands"><value>Elon Riverlands</value></data>
+  <data name="event-theEchovaldWilds-aspenwood"><value>Aspenwood</value></data>
   <data name="event-dayNightCycle-dusk"><value>Dusk</value></data>
   <data name="event-dayNightCycle-dawn"><value>Dawn</value></data>
   <data name="ManageEventsView_Wiki_Title"><value>Wiki</value></data>
