@@ -14,19 +14,21 @@ namespace Nekres.Stream_Out
 		{
 			try
 			{
-				return (true, JsonConvert.DeserializeObject<T>(await request.AllowHttpStatus(HttpStatusCode.NotFound).GetStringAsync(default(CancellationToken), (HttpCompletionOption)0)));
+				return (true, JsonConvert.DeserializeObject<T>(await GeneratedExtensions.GetStringAsync(GeneratedExtensions.AllowHttpStatus(request, new HttpStatusCode[1] { HttpStatusCode.NotFound }), default(CancellationToken), (HttpCompletionOption)0)));
 			}
-			catch (FlurlHttpTimeoutException ex4)
+			catch (FlurlHttpTimeoutException val)
 			{
-				StreamOutModule.Logger.Warn(ex4, "Request '" + request + "' timed out.");
+				FlurlHttpTimeoutException ex4 = val;
+				StreamOutModule.Logger.Warn((Exception)(object)ex4, "Request '" + request + "' timed out.");
 			}
-			catch (FlurlHttpException ex3)
+			catch (FlurlHttpException val2)
 			{
-				StreamOutModule.Logger.Warn(ex3, "Request '" + request + "' was not successful.");
+				FlurlHttpException ex3 = val2;
+				StreamOutModule.Logger.Warn((Exception)(object)ex3, "Request '" + request + "' was not successful.");
 			}
-			catch (JsonReaderException val)
+			catch (JsonReaderException val3)
 			{
-				JsonReaderException ex2 = val;
+				JsonReaderException ex2 = val3;
 				StreamOutModule.Logger.Warn((Exception)(object)ex2, "Failed to read JSON response returned by request '" + request + "'.");
 			}
 			catch (Exception ex)

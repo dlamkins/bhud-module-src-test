@@ -1,6 +1,8 @@
 using System;
 using System.Drawing;
-using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Runtime.InteropServices;
 
 namespace Nekres.Stream_Out
 {
@@ -22,10 +24,7 @@ namespace Nekres.Stream_Out
 			Bitmap newBitmap = new Bitmap(newWidth, newHeight);
 			using (Graphics gfx = Graphics.FromImage(newBitmap))
 			{
-				gfx.InterpolationMode = InterpolationMode.HighQualityBicubic;
-				gfx.SmoothingMode = SmoothingMode.HighQuality;
-				gfx.PixelOffsetMode = PixelOffsetMode.HighQuality;
-				gfx.CompositingQuality = CompositingQuality.HighQuality;
+				gfx.SetHighestQuality();
 				gfx.Clear(Color.Transparent);
 				gfx.DrawImage(source, 0, 0, newWidth, newHeight);
 				gfx.Flush();
@@ -45,16 +44,13 @@ namespace Nekres.Stream_Out
 			{
 				return source;
 			}
-			float scale = Math.Min(other.Width / source.Width, other.Height / source.Height);
+			float scale = Math.Min((float)other.Width / (float)source.Width, (float)other.Height / (float)source.Height);
 			int newHeight = Convert.ToInt32((float)source.Width * scale);
 			int newWidth = Convert.ToInt32((float)source.Height * scale);
 			Bitmap newBitmap = new Bitmap(newWidth, newHeight);
 			using (Graphics gfx = Graphics.FromImage(newBitmap))
 			{
-				gfx.InterpolationMode = InterpolationMode.HighQualityBicubic;
-				gfx.SmoothingMode = SmoothingMode.HighQuality;
-				gfx.PixelOffsetMode = PixelOffsetMode.HighQuality;
-				gfx.CompositingQuality = CompositingQuality.HighQuality;
+				gfx.SetHighestQuality();
 				gfx.Clear(Color.Transparent);
 				gfx.DrawImage(source, 0, 0, newWidth, newHeight);
 				gfx.Flush();
@@ -98,6 +94,22 @@ namespace Nekres.Stream_Out
 			if (yFlip)
 			{
 				source.RotateFlip(RotateFlipType.Rotate180FlipX);
+			}
+		}
+
+		public static void SaveOnNetworkShare(this Image image, string fileName, ImageFormat imageFormat)
+		{
+			try
+			{
+				using MemoryStream lMemoryStream = new MemoryStream();
+				image.Save(lMemoryStream, imageFormat);
+				using FileStream lFileStream = new FileStream(fileName, FileMode.Create);
+				lMemoryStream.Position = 0L;
+				lMemoryStream.CopyTo(lFileStream);
+			}
+			catch (Exception ex) when (ex is ExternalException || ex is UnauthorizedAccessException || ex is IOException)
+			{
+				StreamOutModule.Logger.Warn(ex, ex.Message);
 			}
 		}
 	}

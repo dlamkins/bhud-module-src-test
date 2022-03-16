@@ -16,18 +16,19 @@ namespace Nekres.Stream_Out.UI.Presenters
 
 		protected override Task<bool> Load(IProgress<string> progress)
 		{
-			base.View.SocialButtonClicked += View_SocialButtonClicked;
+			base.get_View().SocialButtonClicked += View_SocialButtonClicked;
 			return base.Load(progress);
 		}
 
 		protected override void Unload()
 		{
-			base.View.SocialButtonClicked -= View_SocialButtonClicked;
+			base.get_View().SocialButtonClicked -= View_SocialButtonClicked;
 		}
 
 		private void View_SocialButtonClicked(object sender, EventArgs e)
 		{
-			BrowserUtil.OpenInDefaultBrowser(((Control)sender).BasicTooltipText);
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			BrowserUtil.OpenInDefaultBrowser(((Control)sender).get_BasicTooltipText());
 		}
 	}
 }

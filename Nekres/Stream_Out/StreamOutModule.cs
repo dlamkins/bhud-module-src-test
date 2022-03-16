@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Graphics.UI;
@@ -18,6 +19,7 @@ using Gw2Sharp.Models;
 using Gw2Sharp.WebApi;
 using Gw2Sharp.WebApi.Exceptions;
 using Gw2Sharp.WebApi.V2;
+using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using Nekres.Stream_Out.UI.Models;
@@ -143,51 +145,51 @@ namespace Nekres.Stream_Out
 
 		private string _prevServerAddress = "";
 
-		internal SettingsManager SettingsManager => ModuleParameters.SettingsManager;
+		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
-		internal ContentsManager ContentsManager => ModuleParameters.ContentsManager;
+		internal ContentsManager ContentsManager => base.ModuleParameters.get_ContentsManager();
 
-		internal DirectoriesManager DirectoriesManager => ModuleParameters.DirectoriesManager;
+		internal DirectoriesManager DirectoriesManager => base.ModuleParameters.get_DirectoriesManager();
 
-		internal Gw2ApiManager Gw2ApiManager => ModuleParameters.Gw2ApiManager;
+		internal Gw2ApiManager Gw2ApiManager => base.ModuleParameters.get_Gw2ApiManager();
 
 		[ImportingConstructor]
 		public StreamOutModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
-			: base(moduleParameters)
+			: this(moduleParameters)
 		{
 			ModuleInstance = this;
 		}
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			_onlyLastDigitSettingEntry = settings.DefineSetting("OnlyLastDigits", defaultValue: true, () => "Only Output Last Digits of Server Address", () => "Only outputs the last digits of the server address you are currently connected to.\nThis is the address shown when entering \"/ip\" in chat.");
-			_addUnicodeSymbols = settings.DefineSetting("UnicodeSymbols", UnicodeSigning.Suffixed, () => "Numeric Value Signing", () => "The way numeric values should be signed with unicode symbols.");
-			_useCatmanderTag = settings.DefineSetting("CatmanderTag", defaultValue: false, () => "Use Catmander Tag", () => "Replaces the commander_icon.png with the Catmander icon if you tag up as Commander in-game.");
-			SettingCollection cache = settings.AddSubCollection("CachedValues");
-			cache.RenderInUi = false;
-			_accountGuid = cache.DefineSetting("AccountGuid", Guid.Empty);
-			_accountName = cache.DefineSetting("AccountName", string.Empty);
-			_resetTimeWvW = cache.DefineSetting<DateTime?>("ResetTimeWvW", null);
-			_resetTimeDaily = cache.DefineSetting<DateTime?>("ResetTimeDaily", null);
-			_sessionKillsWvW = cache.DefineSetting("SessionKillsWvW", 0);
-			_sessionKillsWvwDaily = cache.DefineSetting("SessionsKillsWvWDaily", 0);
-			_sessionKillsPvP = cache.DefineSetting("SessionKillsPvP", 0);
-			_sessionDeathsWvW = cache.DefineSetting("SessionDeathsWvW", 0);
-			_sessionDeathsDaily = cache.DefineSetting("SessionDeathsDaily", 0);
-			_totalKillsAtResetWvW = cache.DefineSetting("TotalKillsAtResetWvW", 0);
-			_totalKillsAtResetPvP = cache.DefineSetting("TotalKillsAtResetPvP", 0);
-			_totalDeathsAtResetWvW = cache.DefineSetting("TotalDeathsAtResetWvW", 0);
-			_totalDeathsAtResetDaily = cache.DefineSetting("TotalDeathsAtResetDaily", 0);
+			_onlyLastDigitSettingEntry = settings.DefineSetting<bool>("OnlyLastDigits", true, (Func<string>)(() => "Only Output Last Digits of Server Address"), (Func<string>)(() => "Only outputs the last digits of the server address you are currently connected to.\nThis is the address shown when entering \"/ip\" in chat."));
+			_addUnicodeSymbols = settings.DefineSetting<UnicodeSigning>("UnicodeSymbols", UnicodeSigning.Suffixed, (Func<string>)(() => "Numeric Value Signing"), (Func<string>)(() => "The way numeric values should be signed with unicode symbols."));
+			_useCatmanderTag = settings.DefineSetting<bool>("CatmanderTag", false, (Func<string>)(() => "Use Catmander Tag"), (Func<string>)(() => "Replaces the commander_icon.png with the Catmander icon if you tag up as Commander in-game."));
+			SettingCollection cache = settings.AddSubCollection("CachedValues", false);
+			cache.set_RenderInUi(false);
+			_accountGuid = cache.DefineSetting<Guid>("AccountGuid", Guid.Empty, (Func<string>)null, (Func<string>)null);
+			_accountName = cache.DefineSetting<string>("AccountName", string.Empty, (Func<string>)null, (Func<string>)null);
+			_resetTimeWvW = cache.DefineSetting<DateTime?>("ResetTimeWvW", (DateTime?)null, (Func<string>)null, (Func<string>)null);
+			_resetTimeDaily = cache.DefineSetting<DateTime?>("ResetTimeDaily", (DateTime?)null, (Func<string>)null, (Func<string>)null);
+			_sessionKillsWvW = cache.DefineSetting<int>("SessionKillsWvW", 0, (Func<string>)null, (Func<string>)null);
+			_sessionKillsWvwDaily = cache.DefineSetting<int>("SessionsKillsWvWDaily", 0, (Func<string>)null, (Func<string>)null);
+			_sessionKillsPvP = cache.DefineSetting<int>("SessionKillsPvP", 0, (Func<string>)null, (Func<string>)null);
+			_sessionDeathsWvW = cache.DefineSetting<int>("SessionDeathsWvW", 0, (Func<string>)null, (Func<string>)null);
+			_sessionDeathsDaily = cache.DefineSetting<int>("SessionDeathsDaily", 0, (Func<string>)null, (Func<string>)null);
+			_totalKillsAtResetWvW = cache.DefineSetting<int>("TotalKillsAtResetWvW", 0, (Func<string>)null, (Func<string>)null);
+			_totalKillsAtResetPvP = cache.DefineSetting<int>("TotalKillsAtResetPvP", 0, (Func<string>)null, (Func<string>)null);
+			_totalDeathsAtResetWvW = cache.DefineSetting<int>("TotalDeathsAtResetWvW", 0, (Func<string>)null, (Func<string>)null);
+			_totalDeathsAtResetDaily = cache.DefineSetting<int>("TotalDeathsAtResetDaily", 0, (Func<string>)null, (Func<string>)null);
 		}
 
 		public override IView GetSettingsView()
 		{
-			return new CustomSettingsView(new CustomSettingsModel(SettingsManager.ModuleSettings));
+			return (IView)(object)new CustomSettingsView(new CustomSettingsModel(SettingsManager.get_ModuleSettings()));
 		}
 
 		protected override void Initialize()
 		{
-			Gw2ApiManager.SubtokenUpdated += SubTokenUpdated;
+			Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)SubTokenUpdated);
 		}
 
 		private void SubTokenUpdated(object o, ValueEventArgs<IEnumerable<TokenPermission>> e)
@@ -221,8 +223,8 @@ namespace Nekres.Stream_Out
 			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wvw_rank.txt", "1 : Invader", overwrite: false);
 			string moduleDir = DirectoriesManager.GetFullDirectoryPath("stream_out");
 			ExtractIcons("1614804.png", moduleDir, "pvp_rank_icon.png");
-			ExtractIcons(_useCatmanderTag.Value ? "catmander_tag_white.png" : "commander_tag_white.png", moduleDir, "commander_icon.png");
-			if (!GameService.Gw2Mumble.PlayerCharacter.IsCommander)
+			ExtractIcons(_useCatmanderTag.get_Value() ? "catmander_tag_white.png" : "commander_tag_white.png", moduleDir, "commander_icon.png");
+			if (!GameService.Gw2Mumble.get_PlayerCharacter().get_IsCommander())
 			{
 				ClearImage(moduleDir + "/commander_icon.png");
 			}
@@ -238,7 +240,7 @@ namespace Nekres.Stream_Out
 				Directory.CreateDirectory(outputDir);
 			}
 			string fullname = outputDir + "/" + iconOutputName;
-			if (System.IO.File.Exists(fullname))
+			if (File.Exists(fullname))
 			{
 				return;
 			}
@@ -249,23 +251,23 @@ namespace Nekres.Stream_Out
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
-			GameService.Gw2Mumble.PlayerCharacter.NameChanged += OnNameChanged;
-			GameService.Gw2Mumble.PlayerCharacter.SpecializationChanged += OnSpecializationChanged;
-			GameService.Gw2Mumble.PlayerCharacter.IsCommanderChanged += OnIsCommanderChanged;
-			GameService.Gw2Mumble.CurrentMap.MapChanged += OnMapChanged;
-			_useCatmanderTag.SettingChanged += OnUseCatmanderTagSettingChanged;
-			OnNameChanged(null, new ValueEventArgs<string>(GameService.Gw2Mumble.PlayerCharacter.Name));
-			OnSpecializationChanged(null, new ValueEventArgs<int>(GameService.Gw2Mumble.PlayerCharacter.Specialization));
-			OnMapChanged(null, new ValueEventArgs<int>(GameService.Gw2Mumble.CurrentMap.Id));
-			base.OnModuleLoaded(e);
+			GameService.Gw2Mumble.get_PlayerCharacter().add_NameChanged((EventHandler<ValueEventArgs<string>>)OnNameChanged);
+			GameService.Gw2Mumble.get_PlayerCharacter().add_SpecializationChanged((EventHandler<ValueEventArgs<int>>)OnSpecializationChanged);
+			GameService.Gw2Mumble.get_PlayerCharacter().add_IsCommanderChanged((EventHandler<ValueEventArgs<bool>>)OnIsCommanderChanged);
+			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
+			_useCatmanderTag.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUseCatmanderTagSettingChanged);
+			OnNameChanged(null, new ValueEventArgs<string>(GameService.Gw2Mumble.get_PlayerCharacter().get_Name()));
+			OnSpecializationChanged(null, new ValueEventArgs<int>(GameService.Gw2Mumble.get_PlayerCharacter().get_Specialization()));
+			OnMapChanged(null, new ValueEventArgs<int>(GameService.Gw2Mumble.get_CurrentMap().get_Id()));
+			((Module)this).OnModuleLoaded(e);
 		}
 
 		protected override async void Update(GameTime gameTime)
 		{
-			if (GameService.Gw2Mumble.IsAvailable && !_prevServerAddress.Equals(GameService.Gw2Mumble.Info.ServerAddress, StringComparison.InvariantCultureIgnoreCase))
+			if (GameService.Gw2Mumble.get_IsAvailable() && !_prevServerAddress.Equals(GameService.Gw2Mumble.get_Info().get_ServerAddress(), StringComparison.InvariantCultureIgnoreCase))
 			{
-				_prevServerAddress = GameService.Gw2Mumble.Info.ServerAddress;
-				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/server_address.txt", string.IsNullOrEmpty(GameService.Gw2Mumble.Info.ServerAddress) ? string.Empty : (_onlyLastDigitSettingEntry.Value ? ("*" + GameService.Gw2Mumble.Info.ServerAddress.Substring(GameService.Gw2Mumble.Info.ServerAddress.LastIndexOf('.'))) : GameService.Gw2Mumble.Info.ServerAddress));
+				_prevServerAddress = GameService.Gw2Mumble.get_Info().get_ServerAddress();
+				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/server_address.txt", string.IsNullOrEmpty(GameService.Gw2Mumble.get_Info().get_ServerAddress()) ? string.Empty : (_onlyLastDigitSettingEntry.get_Value() ? ("*" + GameService.Gw2Mumble.get_Info().get_ServerAddress().Substring(GameService.Gw2Mumble.get_Info().get_ServerAddress().LastIndexOf('.'))) : GameService.Gw2Mumble.get_Info().get_ServerAddress()));
 			}
 			if (_hasSubToken && (!_prevApiRequestTime.HasValue || DateTime.UtcNow.Subtract(_prevApiRequestTime.Value).TotalSeconds > 300.0))
 			{
@@ -283,51 +285,51 @@ namespace Nekres.Stream_Out
 
 		private async Task UpdateKillsAndDeaths()
 		{
-			string prefixKills = ((_addUnicodeSymbols.Value == UnicodeSigning.Prefixed) ? "⚔" : string.Empty);
-			string suffixKills = ((_addUnicodeSymbols.Value == UnicodeSigning.Suffixed) ? "⚔" : string.Empty);
-			string prefixDeaths = ((_addUnicodeSymbols.Value == UnicodeSigning.Prefixed) ? "☠" : string.Empty);
-			string suffixDeaths = ((_addUnicodeSymbols.Value == UnicodeSigning.Suffixed) ? "☠" : string.Empty);
+			string prefixKills = ((_addUnicodeSymbols.get_Value() == UnicodeSigning.Prefixed) ? "⚔" : string.Empty);
+			string suffixKills = ((_addUnicodeSymbols.get_Value() == UnicodeSigning.Suffixed) ? "⚔" : string.Empty);
+			string prefixDeaths = ((_addUnicodeSymbols.get_Value() == UnicodeSigning.Prefixed) ? "☠" : string.Empty);
+			string suffixDeaths = ((_addUnicodeSymbols.get_Value() == UnicodeSigning.Suffixed) ? "☠" : string.Empty);
 			int totalKillsWvW = await RequestTotalKillsForWvW();
 			if (totalKillsWvW >= 0)
 			{
-				int currentKills = totalKillsWvW - _totalKillsAtResetWvW.Value;
-				_sessionKillsWvW.Value = currentKills;
-				_sessionKillsWvwDaily.Value = currentKills;
-				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wvw_kills_week.txt", $"{prefixKills}{_sessionKillsWvW.Value}{suffixKills}");
+				int currentKills = totalKillsWvW - _totalKillsAtResetWvW.get_Value();
+				_sessionKillsWvW.set_Value(currentKills);
+				_sessionKillsWvwDaily.set_Value(currentKills);
+				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wvw_kills_week.txt", $"{prefixKills}{_sessionKillsWvW.get_Value()}{suffixKills}");
 				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wvw_kills_total.txt", $"{prefixKills}{totalKillsWvW}{suffixKills}");
-				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wvw_kills_day.txt", $"{prefixKills}{_sessionKillsWvwDaily.Value}{suffixKills}");
+				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wvw_kills_day.txt", $"{prefixKills}{_sessionKillsWvwDaily.get_Value()}{suffixKills}");
 			}
 			int totalKillsPvP = await RequestTotalKillsForPvP();
 			if (totalKillsPvP >= 0)
 			{
-				_sessionKillsPvP.Value = totalKillsPvP - _totalKillsAtResetPvP.Value;
-				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_kills_day.txt", $"{prefixKills}{_sessionKillsPvP.Value}{suffixKills}");
+				_sessionKillsPvP.set_Value(totalKillsPvP - _totalKillsAtResetPvP.get_Value());
+				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_kills_day.txt", $"{prefixKills}{_sessionKillsPvP.get_Value()}{suffixKills}");
 				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_kills_total.txt", $"{prefixKills}{totalKillsPvP}{suffixKills}");
 			}
 			int totalDeaths = await RequestTotalDeaths();
 			if (totalDeaths >= 0)
 			{
-				_sessionDeathsDaily.Value = totalDeaths - _totalDeathsAtResetDaily.Value;
-				_sessionDeathsWvW.Value = totalDeaths - _totalDeathsAtResetWvW.Value;
-				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/deaths_week.txt", $"{prefixDeaths}{_sessionDeathsWvW.Value}{suffixDeaths}");
-				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/deaths_day.txt", $"{prefixDeaths}{_sessionDeathsDaily.Value}{suffixDeaths}");
+				_sessionDeathsDaily.set_Value(totalDeaths - _totalDeathsAtResetDaily.get_Value());
+				_sessionDeathsWvW.set_Value(totalDeaths - _totalDeathsAtResetWvW.get_Value());
+				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/deaths_week.txt", $"{prefixDeaths}{_sessionDeathsWvW.get_Value()}{suffixDeaths}");
+				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/deaths_day.txt", $"{prefixDeaths}{_sessionDeathsDaily.get_Value()}{suffixDeaths}");
 			}
 		}
 
 		protected override void Unload()
 		{
-			GameService.Gw2Mumble.PlayerCharacter.NameChanged -= OnNameChanged;
-			GameService.Gw2Mumble.PlayerCharacter.SpecializationChanged -= OnSpecializationChanged;
-			GameService.Gw2Mumble.CurrentMap.MapChanged -= OnMapChanged;
-			GameService.Gw2Mumble.PlayerCharacter.IsCommanderChanged -= OnIsCommanderChanged;
-			Gw2ApiManager.SubtokenUpdated -= SubTokenUpdated;
-			_useCatmanderTag.SettingChanged -= OnUseCatmanderTagSettingChanged;
+			GameService.Gw2Mumble.get_PlayerCharacter().remove_NameChanged((EventHandler<ValueEventArgs<string>>)OnNameChanged);
+			GameService.Gw2Mumble.get_PlayerCharacter().remove_SpecializationChanged((EventHandler<ValueEventArgs<int>>)OnSpecializationChanged);
+			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
+			GameService.Gw2Mumble.get_PlayerCharacter().remove_IsCommanderChanged((EventHandler<ValueEventArgs<bool>>)OnIsCommanderChanged);
+			Gw2ApiManager.remove_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)SubTokenUpdated);
+			_useCatmanderTag.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUseCatmanderTagSettingChanged);
 			ModuleInstance = null;
 		}
 
 		private async void OnMapChanged(object o, ValueEventArgs<int> e)
 		{
-			if (e.Value <= 0)
+			if (e.get_Value() <= 0)
 			{
 				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/map_name.txt", string.Empty);
 				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/map_type.txt", string.Empty);
@@ -336,7 +338,7 @@ namespace Nekres.Stream_Out
 			Map map;
 			try
 			{
-				map = await Gw2ApiManager.Gw2ApiClient.V2.Maps.GetAsync(e.Value);
+				map = await ((IBulkExpandableClient<Map, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Maps()).GetAsync(e.get_Value(), default(CancellationToken));
 				if (map == null)
 				{
 					throw new NullReferenceException("Unknown error.");
@@ -347,45 +349,46 @@ namespace Nekres.Stream_Out
 				Logger.Warn(CommonStrings.WebApiDown);
 				return;
 			}
-			string location = map.Name;
-			if (map.Name.Equals(map.RegionName, StringComparison.InvariantCultureIgnoreCase))
+			string location = map.get_Name();
+			if (map.get_Name().Equals(map.get_RegionName(), StringComparison.InvariantCultureIgnoreCase))
 			{
-				ContinentFloorRegionMapSector defaultSector = (await RequestSectors(map.ContinentId, map.DefaultFloor, map.RegionId, map.Id)).FirstOrDefault();
-				if (defaultSector != null && !string.IsNullOrEmpty(defaultSector.Name))
+				ContinentFloorRegionMapSector defaultSector = (await RequestSectors(map.get_ContinentId(), map.get_DefaultFloor(), map.get_RegionId(), map.get_Id())).FirstOrDefault();
+				if (defaultSector != null && !string.IsNullOrEmpty(defaultSector.get_Name()))
 				{
-					location = defaultSector.Name.Replace("<br>", " ");
+					location = defaultSector.get_Name().Replace("<br>", " ");
 				}
 			}
 			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/map_name.txt", location);
 			string type = string.Empty;
-			switch (map.Type.Value)
+			MapType value = map.get_Type().get_Value();
+			switch (value - 1)
 			{
-			case MapType.Center:
-			case MapType.BlueHome:
-			case MapType.GreenHome:
-			case MapType.RedHome:
-			case MapType.JumpPuzzle:
-			case MapType.EdgeOfTheMists:
-			case MapType.WvwLounge:
+			case 8:
+			case 9:
+			case 10:
+			case 11:
+			case 13:
+			case 14:
+			case 17:
 				type = "WvW";
 				break;
-			case MapType.Public:
-			case MapType.PublicMini:
-				type = ((map.Id != 350) ? "PvE" : "PvP");
+			case 4:
+			case 15:
+				type = ((map.get_Id() != 350) ? "PvE" : "PvP");
 				break;
-			case MapType.Pvp:
+			case 1:
 				type = "PvP";
 				break;
-			case MapType.Gvg:
+			case 2:
 				type = "GvG";
 				break;
-			case MapType.CharacterCreate:
-			case MapType.Instance:
-			case MapType.Tournament:
-			case MapType.Tutorial:
-			case MapType.UserTournament:
-			case MapType.FortunesVale:
-				type = map.Type.Value.ToDisplayString();
+			case 0:
+			case 3:
+			case 5:
+			case 6:
+			case 7:
+			case 12:
+				type = ((Enum)(object)map.get_Type().get_Value()).ToDisplayString();
 				break;
 			}
 			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/map_type.txt", type);
@@ -393,23 +396,23 @@ namespace Nekres.Stream_Out
 
 		private async void OnNameChanged(object o, ValueEventArgs<string> e)
 		{
-			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/character_name.txt", e.Value ?? string.Empty);
+			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/character_name.txt", e.get_Value() ?? string.Empty);
 		}
 
 		private async void OnSpecializationChanged(object o, ValueEventArgs<int> e)
 		{
-			if (e.Value <= 0)
+			if (e.get_Value() <= 0)
 			{
 				ClearImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/profession_icon.png");
 				return;
 			}
 			try
 			{
-				Specialization specialization = await Gw2ApiManager.Gw2ApiClient.V2.Specializations.GetAsync(e.Value);
-				Profession profession = await Gw2ApiManager.Gw2ApiClient.V2.Professions.GetAsync(GameService.Gw2Mumble.PlayerCharacter.Profession);
+				Specialization specialization = await ((IBulkExpandableClient<Specialization, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Specializations()).GetAsync(e.get_Value(), default(CancellationToken));
+				Profession profession = await ((IBulkAliasExpandableClient<Profession, ProfessionType>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Professions()).GetAsync(GameService.Gw2Mumble.get_PlayerCharacter().get_Profession(), default(CancellationToken));
 				StreamOutModule streamOutModule = this;
-				RenderUrl? renderUrl = (specialization.Elite ? specialization.ProfessionIconBig : new RenderUrl?(profession.IconBig));
-				await streamOutModule.SaveToImage(renderUrl.HasValue ? ((string)renderUrl.GetValueOrDefault()) : null, DirectoriesManager.GetFullDirectoryPath("stream_out") + "/profession_icon.png");
+				RenderUrl? val = (specialization.get_Elite() ? specialization.get_ProfessionIconBig() : new RenderUrl?(profession.get_IconBig()));
+				await streamOutModule.SaveToImage(val.HasValue ? RenderUrl.op_Implicit(val.GetValueOrDefault()) : null, DirectoriesManager.GetFullDirectoryPath("stream_out") + "/profession_icon.png");
 			}
 			catch (UnexpectedStatusException)
 			{
@@ -419,13 +422,13 @@ namespace Nekres.Stream_Out
 
 		private async void OnIsCommanderChanged(object o, ValueEventArgs<bool> e)
 		{
-			if (!e.Value)
+			if (!e.get_Value())
 			{
 				ClearImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/commander_icon.png");
 			}
 			else
 			{
-				SaveCommanderIcon(_useCatmanderTag.Value);
+				SaveCommanderIcon(_useCatmanderTag.get_Value());
 			}
 		}
 
@@ -453,75 +456,88 @@ namespace Nekres.Stream_Out
 
 		private void OnUseCatmanderTagSettingChanged(object o, ValueChangedEventArgs<bool> e)
 		{
-			if (GameService.Gw2Mumble.PlayerCharacter.IsCommander)
+			if (GameService.Gw2Mumble.get_PlayerCharacter().get_IsCommander())
 			{
-				SaveCommanderIcon(e.NewValue);
+				SaveCommanderIcon(e.get_NewValue());
 			}
 		}
 
 		private async Task SaveToImage(string renderUri, string path)
 		{
-			await Gw2ApiManager.Gw2ApiClient.Render.DownloadToByteArrayAsync(renderUri).ContinueWith(delegate(Task<byte[]> textureDataResponse)
-			{
-				if (textureDataResponse.IsFaulted)
+			await Gw2ApiManager.get_Gw2ApiClient().get_Render().DownloadToByteArrayAsync(renderUri, default(CancellationToken))
+				.ContinueWith(delegate(Task<byte[]> textureDataResponse)
 				{
-					Logger.Warn("Request to render service for " + renderUri + " failed.");
-				}
-				else
-				{
-					using MemoryStream stream = new MemoryStream(textureDataResponse.Result);
-					using Bitmap bitmap = new Bitmap(stream);
-					bitmap.Save(path, ImageFormat.Png);
-				}
-			});
+					if (textureDataResponse.IsFaulted)
+					{
+						Logger.Warn("Request to render service for " + renderUri + " failed.");
+					}
+					else
+					{
+						using MemoryStream stream = new MemoryStream(textureDataResponse.Result);
+						using Bitmap image = new Bitmap(stream);
+						image.SaveOnNetworkShare(path, ImageFormat.Png);
+					}
+				});
 		}
 
 		private void ClearImage(string path)
 		{
-			if (!System.IO.File.Exists(path))
+			if (!File.Exists(path))
 			{
 				return;
 			}
-			using MemoryStream stream = new MemoryStream(System.IO.File.ReadAllBytes(path));
+			using MemoryStream stream = new MemoryStream(File.ReadAllBytes(path));
 			using Bitmap bitmap = (Bitmap)Image.FromStream(stream);
 			using (Graphics gfx = Graphics.FromImage(bitmap))
 			{
-				gfx.Clear(System.Drawing.Color.Transparent);
+				gfx.Clear(Color.Transparent);
 				gfx.Flush();
 			}
-			bitmap.Save(path, ImageFormat.Png);
+			bitmap.SaveOnNetworkShare(path, ImageFormat.Png);
 		}
 
 		private async Task<IEnumerable<ContinentFloorRegionMapSector>> RequestSectors(int continentId, int floor, int regionId, int mapId)
 		{
-			return await Gw2ApiManager.Gw2ApiClient.V2.Continents[continentId].Floors[floor].Regions[regionId].Maps[mapId].Sectors.AllAsync().ContinueWith((Task<IApiV2ObjectList<ContinentFloorRegionMapSector>> task) => (!task.IsFaulted) ? task.Result : Enumerable.Empty<ContinentFloorRegionMapSector>());
+			return await ((IAllExpandableClient<ContinentFloorRegionMapSector>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Continents()
+				.get_Item(continentId)
+				.get_Floors()
+				.get_Item(floor)
+				.get_Regions()
+				.get_Item(regionId)
+				.get_Maps()
+				.get_Item(mapId)
+				.get_Sectors()).AllAsync(default(CancellationToken)).ContinueWith((Task<IApiV2ObjectList<ContinentFloorRegionMapSector>> task) => (!task.IsFaulted) ? ((IEnumerable<ContinentFloorRegionMapSector>)task.Result) : Enumerable.Empty<ContinentFloorRegionMapSector>());
 		}
 
 		private async Task<int> RequestTotalDeaths()
 		{
-			if (!Gw2ApiManager.HasPermissions(new TokenPermission[2]
+			if (!Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
 			{
-				TokenPermission.Account,
-				TokenPermission.Characters
+				(TokenPermission)1,
+				(TokenPermission)3
 			}))
 			{
 				return -1;
 			}
-			return await Gw2ApiManager.Gw2ApiClient.V2.Characters.AllAsync().ContinueWith((Task<IApiV2ObjectList<Character>> task) => (!task.IsFaulted) ? task.Result.Sum((Character x) => x.Deaths) : (-1));
+			return await ((IAllExpandableClient<Character>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Characters()).AllAsync(default(CancellationToken)).ContinueWith((Task<IApiV2ObjectList<Character>> task) => (!task.IsFaulted) ? ((IEnumerable<Character>)task.Result).Sum((Character x) => x.get_Deaths()) : (-1));
 		}
 
 		private async Task UpdateGuild()
 		{
-			if (!GameService.Gw2Mumble.IsAvailable || !Gw2ApiManager.HasPermissions(new TokenPermission[3]
-			{
-				TokenPermission.Account,
-				TokenPermission.Characters,
-				TokenPermission.Guilds
-			}))
+			if (!GameService.Gw2Mumble.get_IsAvailable())
 			{
 				return;
 			}
-			Guid guildId = await Gw2ApiManager.Gw2ApiClient.V2.Characters[GameService.Gw2Mumble.PlayerCharacter.Name].Core.GetAsync().ContinueWith((Task<CharactersCore> task) => (!task.IsFaulted) ? task.Result.Guild : Guid.Empty);
+			Gw2ApiManager gw2ApiManager = Gw2ApiManager;
+			TokenPermission[] array = new TokenPermission[3];
+			RuntimeHelpers.InitializeArray(array, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);
+			if (!gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)array))
+			{
+				return;
+			}
+			Guid guildId = await ((IBlobClient<CharactersCore>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Characters()
+				.get_Item(GameService.Gw2Mumble.get_PlayerCharacter().get_Name())
+				.get_Core()).GetAsync(default(CancellationToken)).ContinueWith((Task<CharactersCore> task) => (!task.IsFaulted) ? task.Result.get_Guild() : Guid.Empty);
 			if (guildId.Equals(Guid.Empty))
 			{
 				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_name.txt", string.Empty);
@@ -530,39 +546,43 @@ namespace Nekres.Stream_Out
 				ClearImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_emblem.png");
 				return;
 			}
-			await Gw2ApiManager.Gw2ApiClient.V2.Guild[guildId].GetAsync().ContinueWith((Func<Task<Guild>, Task>)async delegate(Task<Guild> task)
+			await ((IBlobClient<Guild>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Guild()
+				.get_Item(guildId)).GetAsync(default(CancellationToken)).ContinueWith((Func<Task<Guild>, Task>)async delegate(Task<Guild> task)
 			{
 				if (!task.IsFaulted)
 				{
-					string name = task.Result.Name;
-					string tag = task.Result.Tag;
-					string motd = task.Result.Motd ?? string.Empty;
+					string name = task.Result.get_Name();
+					string tag = task.Result.get_Tag();
+					string motd = task.Result.get_Motd() ?? string.Empty;
 					await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_name.txt", name);
 					await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_tag.txt", "[" + tag + "]");
 					await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_motd.txt", GUILD_MOTD_PUBLIC.Match(motd).Value);
-					GuildEmblem emblem = task.Result.Emblem;
+					GuildEmblem emblem = task.Result.get_Emblem();
 					if (emblem == null)
 					{
 						ClearImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_emblem.png");
 					}
 					else
 					{
-						Emblem bg = await Gw2ApiManager.Gw2ApiClient.V2.Emblem.Backgrounds.GetAsync(emblem.Background.Id);
-						Emblem fg = await Gw2ApiManager.Gw2ApiClient.V2.Emblem.Foregrounds.GetAsync(emblem.Foreground.Id);
+						Emblem bg = await ((IBulkExpandableClient<Emblem, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Emblem()
+							.get_Backgrounds()).GetAsync(emblem.get_Background().get_Id(), default(CancellationToken));
+						Emblem fg = await ((IBulkExpandableClient<Emblem, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Emblem()
+							.get_Foregrounds()).GetAsync(emblem.get_Foreground().get_Id(), default(CancellationToken));
 						List<RenderUrl> layersCombined = new List<RenderUrl>();
 						if (bg != null)
 						{
-							layersCombined.AddRange(bg.Layers);
+							layersCombined.AddRange(bg.get_Layers());
 						}
 						if (fg != null)
 						{
-							layersCombined.AddRange(fg.Layers.Skip(1));
+							layersCombined.AddRange(fg.get_Layers().Skip(1));
 						}
 						List<Bitmap> layers = new List<Bitmap>();
-						foreach (RenderUrl renderUrl in layersCombined)
+						foreach (RenderUrl item in layersCombined)
 						{
+							RenderUrl renderUrl = item;
 							using MemoryStream textureStream = new MemoryStream();
-							await renderUrl.DownloadToStreamAsync(textureStream);
+							await ((RenderUrl)(ref renderUrl)).DownloadToStreamAsync((Stream)textureStream, default(CancellationToken));
 							layers.Add(new Bitmap(textureStream));
 						}
 						if (!layers.Any())
@@ -572,13 +592,13 @@ namespace Nekres.Stream_Out
 						else
 						{
 							List<int> colorsCombined = new List<int>();
-							colorsCombined.AddRange(emblem.Background.Colors);
-							colorsCombined.AddRange(emblem.Foreground.Colors);
-							List<Gw2Sharp.WebApi.V2.Models.Color> colors = new List<Gw2Sharp.WebApi.V2.Models.Color>();
+							colorsCombined.AddRange(emblem.get_Background().get_Colors());
+							colorsCombined.AddRange(emblem.get_Foreground().get_Colors());
+							List<Color> colors = new List<Color>();
 							foreach (int color2 in colorsCombined)
 							{
-								List<Gw2Sharp.WebApi.V2.Models.Color> list = colors;
-								list.Add(await Gw2ApiManager.Gw2ApiClient.V2.Colors.GetAsync(color2));
+								List<Color> list = colors;
+								list.Add(await ((IBulkExpandableClient<Color, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Colors()).GetAsync(color2, default(CancellationToken)));
 							}
 							Bitmap result = new Bitmap(256, 256);
 							for (int i = 0; i < layers.Count; i++)
@@ -586,16 +606,16 @@ namespace Nekres.Stream_Out
 								Bitmap layer = layers[i].FitTo(result);
 								if (colors.Any())
 								{
-									System.Drawing.Color color = System.Drawing.Color.FromArgb(colors[i].Cloth.Rgb[0], colors[i].Cloth.Rgb[1], colors[i].Cloth.Rgb[2]);
+									Color color = Color.FromArgb(colors[i].get_Cloth().get_Rgb()[0], colors[i].get_Cloth().get_Rgb()[1], colors[i].get_Cloth().get_Rgb()[2]);
 									layer.Colorize(color);
 								}
-								if (bg != null && i < bg.Layers.Count)
+								if (bg != null && i < bg.get_Layers().Count)
 								{
-									layer.Flip(emblem.Flags.Any((ApiEnum<GuildEmblemFlag> x) => x == GuildEmblemFlag.FlipBackgroundHorizontal), emblem.Flags.Any((ApiEnum<GuildEmblemFlag> x) => x == GuildEmblemFlag.FlipBackgroundVertical));
+									layer.Flip(((IEnumerable<ApiEnum<GuildEmblemFlag>>)emblem.get_Flags()).Any((ApiEnum<GuildEmblemFlag> x) => x == ApiEnum<GuildEmblemFlag>.op_Implicit((GuildEmblemFlag)0)), ((IEnumerable<ApiEnum<GuildEmblemFlag>>)emblem.get_Flags()).Any((ApiEnum<GuildEmblemFlag> x) => x == ApiEnum<GuildEmblemFlag>.op_Implicit((GuildEmblemFlag)1)));
 								}
 								else
 								{
-									layer.Flip(emblem.Flags.Any((ApiEnum<GuildEmblemFlag> x) => x == GuildEmblemFlag.FlipForegroundHorizontal), emblem.Flags.Any((ApiEnum<GuildEmblemFlag> x) => x == GuildEmblemFlag.FlipForegroundVertical));
+									layer.Flip(((IEnumerable<ApiEnum<GuildEmblemFlag>>)emblem.get_Flags()).Any((ApiEnum<GuildEmblemFlag> x) => x == ApiEnum<GuildEmblemFlag>.op_Implicit((GuildEmblemFlag)2)), ((IEnumerable<ApiEnum<GuildEmblemFlag>>)emblem.get_Flags()).Any((ApiEnum<GuildEmblemFlag> x) => x == ApiEnum<GuildEmblemFlag>.op_Implicit((GuildEmblemFlag)3)));
 								}
 								Bitmap bitmap = result.Merge(layer);
 								result.Dispose();
@@ -611,70 +631,72 @@ namespace Nekres.Stream_Out
 
 		private async Task<int> RequestTotalKillsForWvW()
 		{
-			if (!Gw2ApiManager.HasPermissions(new TokenPermission[2]
+			if (!Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
 			{
-				TokenPermission.Account,
-				TokenPermission.Progression
+				(TokenPermission)1,
+				(TokenPermission)6
 			}))
 			{
 				return -1;
 			}
-			return await Gw2ApiManager.Gw2ApiClient.V2.Account.Achievements.GetAsync().ContinueWith((Task<IApiV2ObjectList<AccountAchievement>> response) => response.IsFaulted ? (-1) : response.Result.Single((AccountAchievement x) => x.Id == 283).Current);
+			return await ((IBlobClient<IApiV2ObjectList<AccountAchievement>>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
+				.get_Achievements()).GetAsync(default(CancellationToken)).ContinueWith((Task<IApiV2ObjectList<AccountAchievement>> response) => response.IsFaulted ? (-1) : ((IEnumerable<AccountAchievement>)response.Result).Single((AccountAchievement x) => x.get_Id() == 283).get_Current());
 		}
 
 		private async Task<int> RequestTotalKillsForPvP()
 		{
-			if (!Gw2ApiManager.HasPermissions(new TokenPermission[2]
+			if (!Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
 			{
-				TokenPermission.Account,
-				TokenPermission.Progression
+				(TokenPermission)1,
+				(TokenPermission)6
 			}))
 			{
 				return -1;
 			}
-			return await Gw2ApiManager.Gw2ApiClient.V2.Account.Achievements.GetAsync().ContinueWith((Task<IApiV2ObjectList<AccountAchievement>> response) => response.IsFaulted ? (-1) : response.Result.Single((AccountAchievement x) => x.Id == 239).Current);
+			return await ((IBlobClient<IApiV2ObjectList<AccountAchievement>>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
+				.get_Achievements()).GetAsync(default(CancellationToken)).ContinueWith((Task<IApiV2ObjectList<AccountAchievement>> response) => response.IsFaulted ? (-1) : ((IEnumerable<AccountAchievement>)response.Result).Single((AccountAchievement x) => x.get_Id() == 239).get_Current());
 		}
 
 		private async Task ResetWorldVersusWorld(int worldId, bool force = false)
 		{
-			if (!force && _resetTimeWvW.Value.HasValue)
+			if (!force && _resetTimeWvW.get_Value().HasValue)
 			{
 				DateTime utcNow = DateTime.UtcNow;
-				DateTime? value = _resetTimeWvW.Value;
+				DateTime? value = _resetTimeWvW.get_Value();
 				if (utcNow < value)
 				{
 					return;
 				}
 			}
 			SettingEntry<DateTime?> resetTimeWvW = _resetTimeWvW;
-			resetTimeWvW.Value = await GetWvWResetTime(worldId);
-			_sessionKillsWvW.Value = 0;
-			_sessionDeathsWvW.Value = 0;
+			resetTimeWvW.set_Value(await GetWvWResetTime(worldId));
+			_sessionKillsWvW.set_Value(0);
+			_sessionDeathsWvW.set_Value(0);
 			SettingEntry<int> totalKillsAtResetWvW = _totalKillsAtResetWvW;
-			totalKillsAtResetWvW.Value = await RequestTotalKillsForWvW();
+			totalKillsAtResetWvW.set_Value(await RequestTotalKillsForWvW());
 			totalKillsAtResetWvW = _totalDeathsAtResetWvW;
-			totalKillsAtResetWvW.Value = await RequestTotalDeaths();
+			totalKillsAtResetWvW.set_Value(await RequestTotalDeaths());
 		}
 
 		private async Task ResetDaily(bool force = false)
 		{
-			if (!force && _resetTimeDaily.Value.HasValue)
+			if (!force && _resetTimeDaily.get_Value().HasValue)
 			{
 				DateTime utcNow = DateTime.UtcNow;
-				DateTime? value = _resetTimeDaily.Value;
+				DateTime? value = _resetTimeDaily.get_Value();
 				if (utcNow < value)
 				{
 					return;
 				}
 			}
-			_resetTimeDaily.Value = GetDailyResetTime();
-			_sessionKillsPvP.Value = 0;
-			_sessionDeathsDaily.Value = 0;
-			_sessionKillsWvwDaily.Value = 0;
+			_resetTimeDaily.set_Value((DateTime?)GetDailyResetTime());
+			_sessionKillsPvP.set_Value(0);
+			_sessionDeathsDaily.set_Value(0);
+			_sessionKillsWvwDaily.set_Value(0);
 			SettingEntry<int> totalKillsAtResetPvP = _totalKillsAtResetPvP;
-			totalKillsAtResetPvP.Value = await RequestTotalKillsForPvP();
+			totalKillsAtResetPvP.set_Value(await RequestTotalKillsForPvP());
 			totalKillsAtResetPvP = _totalDeathsAtResetDaily;
-			totalKillsAtResetPvP.Value = await RequestTotalDeaths();
+			totalKillsAtResetPvP.set_Value(await RequestTotalDeaths());
 		}
 
 		private DateTime GetDailyResetTime()
@@ -685,23 +707,25 @@ namespace Nekres.Stream_Out
 
 		private async Task<DateTime?> GetWvWResetTime(int worldId)
 		{
-			return await Gw2ApiManager.Gw2ApiClient.V2.Wvw.Matches.World(worldId).GetAsync().ContinueWith((Task<WvwMatch> r) => r.IsFaulted ? null : new DateTime?(r.Result.EndTime.UtcDateTime));
+			return await ((IBlobClient<WvwMatch>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Wvw()
+				.get_Matches()
+				.World(worldId)).GetAsync(default(CancellationToken)).ContinueWith((Task<WvwMatch> r) => r.IsFaulted ? null : new DateTime?(r.Result.get_EndTime().UtcDateTime));
 		}
 
 		private async Task CheckForReset()
 		{
-			if (!Gw2ApiManager.HasPermission(TokenPermission.Account))
+			if (!Gw2ApiManager.HasPermission((TokenPermission)1))
 			{
 				return;
 			}
-			await Gw2ApiManager.Gw2ApiClient.V2.Account.GetAsync().ContinueWith((Func<Task<Account>, Task>)async delegate(Task<Account> response)
+			await ((IBlobClient<Account>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()).GetAsync(default(CancellationToken)).ContinueWith((Func<Task<Account>, Task>)async delegate(Task<Account> response)
 			{
 				if (!response.IsFaulted)
 				{
-					bool isNewAcc = !response.Result.Id.Equals(_accountGuid.Value);
-					_accountName.Value = response.Result.Name;
-					_accountGuid.Value = response.Result.Id;
-					await ResetWorldVersusWorld(response.Result.World, isNewAcc);
+					bool isNewAcc = !response.Result.get_Id().Equals(_accountGuid.get_Value());
+					_accountName.set_Value(response.Result.get_Name());
+					_accountGuid.set_Value(response.Result.get_Id());
+					await ResetWorldVersusWorld(response.Result.get_World(), isNewAcc);
 					await ResetDaily(isNewAcc);
 				}
 			});
@@ -709,27 +733,28 @@ namespace Nekres.Stream_Out
 
 		private async Task UpdateRankForWvw()
 		{
-			if (!Gw2ApiManager.HasPermissions(new TokenPermission[2]
+			if (!Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
 			{
-				TokenPermission.Account,
-				TokenPermission.Progression
+				(TokenPermission)1,
+				(TokenPermission)6
 			}))
 			{
 				return;
 			}
-			await Gw2ApiManager.Gw2ApiClient.V2.Account.GetAsync().ContinueWith((Func<Task<Account>, Task>)async delegate(Task<Account> response)
+			await ((IBlobClient<Account>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()).GetAsync(default(CancellationToken)).ContinueWith((Func<Task<Account>, Task>)async delegate(Task<Account> response)
 			{
 				if (!response.IsFaulted)
 				{
-					int? wvwRank = response.Result.WvwRank;
+					int? wvwRank = response.Result.get_WvwRank();
 					if (wvwRank.HasValue && !(wvwRank <= 0))
 					{
-						await Gw2ApiManager.Gw2ApiClient.V2.Wvw.Ranks.AllAsync().ContinueWith((Func<Task<IApiV2ObjectList<WvwRank>>, Task>)async delegate(Task<IApiV2ObjectList<WvwRank>> t)
+						await ((IAllExpandableClient<WvwRank>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Wvw()
+							.get_Ranks()).AllAsync(default(CancellationToken)).ContinueWith((Func<Task<IApiV2ObjectList<WvwRank>>, Task>)async delegate(Task<IApiV2ObjectList<WvwRank>> t)
 						{
 							if (!t.IsFaulted)
 							{
-								WvwRank wvwRankObj = t.Result.MaxBy((WvwRank y) => wvwRank >= y.MinRank);
-								await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wvw_rank.txt", $"{wvwRank:N0} : {wvwRankObj.Title}");
+								WvwRank wvwRankObj = ((IEnumerable<WvwRank>)t.Result).MaxBy((WvwRank y) => wvwRank >= y.get_MinRank());
+								await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wvw_rank.txt", $"{wvwRank:N0} : {wvwRankObj.get_Title()}");
 							}
 						});
 					}
@@ -739,42 +764,44 @@ namespace Nekres.Stream_Out
 
 		private async Task UpdateStandingsForPvP()
 		{
-			if (!Gw2ApiManager.HasPermissions(new TokenPermission[2]
+			if (!Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
 			{
-				TokenPermission.Account,
-				TokenPermission.Pvp
+				(TokenPermission)1,
+				(TokenPermission)7
 			}))
 			{
 				return;
 			}
-			await Gw2ApiManager.Gw2ApiClient.V2.Pvp.Seasons.AllAsync().ContinueWith((Func<Task<IApiV2ObjectList<PvpSeason>>, Task>)async delegate(Task<IApiV2ObjectList<PvpSeason>> task)
+			await ((IAllExpandableClient<PvpSeason>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Pvp()
+				.get_Seasons()).AllAsync(default(CancellationToken)).ContinueWith((Func<Task<IApiV2ObjectList<PvpSeason>>, Task>)async delegate(Task<IApiV2ObjectList<PvpSeason>> task)
 			{
 				if (!task.IsFaulted)
 				{
-					PvpSeason season = task.Result.OrderByDescending((PvpSeason x) => x.End).First();
-					await Gw2ApiManager.Gw2ApiClient.V2.Pvp.Standings.GetAsync().ContinueWith((Func<Task<ApiV2BaseObjectList<PvpStanding>>, Task>)async delegate(Task<ApiV2BaseObjectList<PvpStanding>> t)
+					PvpSeason season = ((IEnumerable<PvpSeason>)task.Result).OrderByDescending((PvpSeason x) => x.get_End()).First();
+					await ((IBlobClient<ApiV2BaseObjectList<PvpStanding>>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Pvp()
+						.get_Standings()).GetAsync(default(CancellationToken)).ContinueWith((Func<Task<ApiV2BaseObjectList<PvpStanding>>, Task>)async delegate(Task<ApiV2BaseObjectList<PvpStanding>> t)
 					{
 						if (!t.IsFaulted)
 						{
-							PvpStanding standing = t.Result.FirstOrDefault((PvpStanding x) => x.SeasonId.Equals(season.Id));
-							if (standing != null && standing.Current.Rating.HasValue)
+							PvpStanding standing = ((IEnumerable<PvpStanding>)t.Result).FirstOrDefault((PvpStanding x) => x.get_SeasonId().Equals(season.get_Id()));
+							if (standing != null && standing.get_Current().get_Rating().HasValue)
 							{
-								PvpSeasonRank rank = season.Ranks.First();
+								PvpSeasonRank rank = season.get_Ranks().First();
 								int tier = 1;
 								bool found = false;
-								int ranksTotal = season.Ranks.Count;
-								List<PvpSeasonRankTier> data = season.Ranks.SelectMany((PvpSeasonRank x) => x.Tiers).ToList();
-								int maxRating = data.MaxBy((PvpSeasonRankTier y) => y.Rating).Rating;
-								int rating = data.MinBy((PvpSeasonRankTier y) => y.Rating).Rating;
-								if (standing.Current.Rating > maxRating)
+								int ranksTotal = season.get_Ranks().Count;
+								List<PvpSeasonRankTier> data = season.get_Ranks().SelectMany((PvpSeasonRank x) => x.get_Tiers()).ToList();
+								int maxRating = data.MaxBy((PvpSeasonRankTier y) => y.get_Rating()).get_Rating();
+								int rating = data.MinBy((PvpSeasonRankTier y) => y.get_Rating()).get_Rating();
+								if (standing.get_Current().get_Rating() > maxRating)
 								{
-									rank = season.Ranks.Last();
-									tier = rank.Tiers.Count;
+									rank = season.get_Ranks().Last();
+									tier = rank.get_Tiers().Count;
 									found = true;
 								}
-								if (standing.Current.Rating < rating)
+								if (standing.get_Current().get_Rating() < rating)
 								{
-									rank = season.Ranks.First();
+									rank = season.get_Ranks().First();
 									tier = 1;
 									found = true;
 								}
@@ -784,12 +811,12 @@ namespace Nekres.Stream_Out
 									{
 										break;
 									}
-									PvpSeasonRank currentRank = season.Ranks[i];
-									int tiersTotal = currentRank.Tiers.Count;
+									PvpSeasonRank currentRank = season.get_Ranks()[i];
+									int tiersTotal = currentRank.get_Tiers().Count;
 									for (int j = 0; j < tiersTotal; j++)
 									{
-										int rating2 = currentRank.Tiers[j].Rating;
-										if (!(standing.Current.Rating > rating2))
+										int rating2 = currentRank.get_Tiers()[j].get_Rating();
+										if (!(standing.get_Current().get_Rating() > rating2))
 										{
 											tier = j + 1;
 											rank = currentRank;
@@ -800,10 +827,10 @@ namespace Nekres.Stream_Out
 								}
 								await Task.Run(delegate
 								{
-									Gw2Util.GeneratePvpTierImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_tier_icon.png", tier, rank.Tiers.Count);
+									Gw2Util.GeneratePvpTierImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_tier_icon.png", tier, rank.get_Tiers().Count);
 								});
-								await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_rank.txt", rank.Name + " " + tier.ToRomanNumeral());
-								await SaveToImage((string)rank.OverlaySmall, DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_rank_icon.png");
+								await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_rank.txt", rank.get_Name() + " " + tier.ToRomanNumeral());
+								await SaveToImage(RenderUrl.op_Implicit(rank.get_OverlaySmall()), DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_rank_icon.png");
 							}
 						}
 					});
@@ -813,23 +840,26 @@ namespace Nekres.Stream_Out
 
 		private async Task UpdateStatsForPvp()
 		{
-			if (!Gw2ApiManager.HasPermissions(new TokenPermission[2]
+			if (!Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
 			{
-				TokenPermission.Account,
-				TokenPermission.Pvp
+				(TokenPermission)1,
+				(TokenPermission)7
 			}))
 			{
 				return;
 			}
-			await Gw2ApiManager.Gw2ApiClient.V2.Pvp.Stats.GetAsync().ContinueWith((Func<Task<PvpStats>, Task>)async delegate(Task<PvpStats> task)
+			await ((IBlobClient<PvpStats>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Pvp()
+				.get_Stats()).GetAsync(default(CancellationToken)).ContinueWith((Func<Task<PvpStats>, Task>)async delegate(Task<PvpStats> task)
 			{
 				if (!task.IsFaulted)
 				{
-					KeyValuePair<string, PvpStatsAggregate>[] source = task.Result.Ladders.Where<KeyValuePair<string, PvpStatsAggregate>>((KeyValuePair<string, PvpStatsAggregate> x) => !x.Key.Contains("unranked") && x.Key.Contains("ranked")).ToArray();
-					int wins = source.Sum((KeyValuePair<string, PvpStatsAggregate> x) => x.Value.Wins);
-					int losses = source.Sum((KeyValuePair<string, PvpStatsAggregate> x) => x.Value.Losses);
-					int byes = source.Sum((KeyValuePair<string, PvpStatsAggregate> x) => x.Value.Byes);
-					int desertions = source.Sum((KeyValuePair<string, PvpStatsAggregate> x) => x.Value.Desertions);
+					KeyValuePair<string, PvpStatsAggregate>[] source = (from x in task.Result.get_Ladders()
+						where !x.Key.Contains("unranked") && x.Key.Contains("ranked")
+						select x).ToArray();
+					int wins = source.Sum((KeyValuePair<string, PvpStatsAggregate> x) => x.Value.get_Wins());
+					int losses = source.Sum((KeyValuePair<string, PvpStatsAggregate> x) => x.Value.get_Losses());
+					int byes = source.Sum((KeyValuePair<string, PvpStatsAggregate> x) => x.Value.get_Byes());
+					int desertions = source.Sum((KeyValuePair<string, PvpStatsAggregate> x) => x.Value.get_Desertions());
 					double totalGames = wins + losses + desertions + byes;
 					if (!(totalGames <= 0.0))
 					{
@@ -842,24 +872,25 @@ namespace Nekres.Stream_Out
 
 		private async Task UpdateWallet()
 		{
-			if (!Gw2ApiManager.HasPermissions(new TokenPermission[2]
+			if (!Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
 			{
-				TokenPermission.Account,
-				TokenPermission.Wallet
+				(TokenPermission)1,
+				(TokenPermission)10
 			}))
 			{
 				return;
 			}
-			await Gw2ApiManager.Gw2ApiClient.V2.Account.Wallet.GetAsync().ContinueWith((Func<Task<IApiV2ObjectList<AccountCurrency>>, Task>)async delegate(Task<IApiV2ObjectList<AccountCurrency>> task)
+			await ((IBlobClient<IApiV2ObjectList<AccountCurrency>>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
+				.get_Wallet()).GetAsync(default(CancellationToken)).ContinueWith((Func<Task<IApiV2ObjectList<AccountCurrency>>, Task>)async delegate(Task<IApiV2ObjectList<AccountCurrency>> task)
 			{
 				if (!task.IsFaulted)
 				{
-					int coins = task.Result.First((AccountCurrency x) => x.Id == 1).Value;
+					int coins = ((IEnumerable<AccountCurrency>)task.Result).First((AccountCurrency x) => x.get_Id() == 1).get_Value();
 					await Task.Run(delegate
 					{
 						Gw2Util.GenerateCoinsImage(ModuleInstance.DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wallet_coins.png", coins);
 					});
-					int karma = task.Result.First((AccountCurrency x) => x.Id == 2).Value;
+					int karma = ((IEnumerable<AccountCurrency>)task.Result).First((AccountCurrency x) => x.get_Id() == 2).get_Value();
 					await Task.Run(delegate
 					{
 						Gw2Util.GenerateKarmaImage(ModuleInstance.DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wallet_karma.png", karma);
@@ -870,7 +901,7 @@ namespace Nekres.Stream_Out
 
 		private unsafe async Task UpdateKillProofs()
 		{
-			await TaskUtil.GetJsonResponse<object>(string.Format("{0}{1}?lang={2}", "https://killproof.me/api/kp/", _accountName.Value, GameService.Overlay.UserLocale.Value)).ContinueWith((Func<Task<(bool, object)>, Task>)async delegate(Task<(bool, dynamic)> task)
+			await TaskUtil.GetJsonResponse<object>(string.Format("{0}{1}?lang={2}", "https://killproof.me/api/kp/", _accountName.get_Value(), GameService.Overlay.get_UserLocale().get_Value())).ContinueWith((Func<Task<(bool, object)>, Task>)async delegate(Task<(bool, dynamic)> task)
 			{
 				if (!task.IsFaulted && ((ValueTuple<bool, object>)task.Result).Item1)
 				{
