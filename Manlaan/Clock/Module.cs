@@ -50,8 +50,6 @@ namespace Manlaan.Clock
 
 		private DrawClock _clockImg;
 
-		private Point? lastWindowResolution = null;
-
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
 		internal ContentsManager ContentsManager => base.ModuleParameters.get_ContentsManager();
@@ -105,30 +103,6 @@ namespace Manlaan.Clock
 			UpdateClockSettings_Show();
 			UpdateClockSettings_Font();
 			UpdateClockSettings_Location();
-			((Control)GameService.Graphics.get_SpriteScreen()).add_Resized((EventHandler<ResizedEventArgs>)delegate
-			{
-				//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-				//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-				//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-				int num;
-				if (lastWindowResolution.HasValue)
-				{
-					Point resolution = GameService.Graphics.get_Resolution();
-					Point? val = lastWindowResolution;
-					num = ((!val.HasValue || resolution != val.GetValueOrDefault()) ? 1 : 0);
-				}
-				else
-				{
-					num = 0;
-				}
-				if (num != 0)
-				{
-					_clockImg.EnsureLocationIsInBounds();
-				}
-				lastWindowResolution = GameService.Graphics.get_Resolution();
-			});
 		}
 
 		protected override async Task LoadAsync()
@@ -202,7 +176,21 @@ namespace Manlaan.Clock
 
 		private void UpdateClockSettings_Location(object sender = null, ValueChangedEventArgs<Point> e = null)
 		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			if (_settingClockLoc.get_Value().X < 1)
+			{
+				_settingClockLoc.set_Value(new Point(1, _settingClockLoc.get_Value().Y));
+			}
+			if (_settingClockLoc.get_Value().Y < 1)
+			{
+				_settingClockLoc.set_Value(new Point(_settingClockLoc.get_Value().X, 1));
+			}
 			((Control)_clockImg).set_Location(_settingClockLoc.get_Value());
 		}
 
