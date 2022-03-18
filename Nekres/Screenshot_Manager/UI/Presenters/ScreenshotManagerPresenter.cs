@@ -47,7 +47,10 @@ namespace Nekres.Screenshot_Manager.UI.Presenters
 			if (FindThumbnailByFileName(e.get_Value(), out var ctrl))
 			{
 				((Container)base.get_View().ThumbnailFlowPanel).RemoveChild((Control)(object)ctrl);
-				((Control)ctrl).Dispose();
+				if (ctrl != null)
+				{
+					((Control)ctrl).Dispose();
+				}
 			}
 		}
 
