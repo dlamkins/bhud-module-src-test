@@ -108,6 +108,8 @@ namespace Estreya.BlishHUD.EventTable.Resources
 
 		internal static string event_dryTop_sandstorm => ResourceManager.GetString("event-dryTop-sandstorm", resourceCulture);
 
+		internal static string event_elonRiverlands_doppelganger => ResourceManager.GetString("event-elonRiverlands-doppelganger", resourceCulture);
+
 		internal static string event_elonRiverlands_thePathToAscension => ResourceManager.GetString("event-elonRiverlands-thePathToAscension", resourceCulture);
 
 		internal static string event_eotn_dragonstorm => ResourceManager.GetString("event-eotn-dragonstorm", resourceCulture);

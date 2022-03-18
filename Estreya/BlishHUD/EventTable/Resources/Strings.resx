@@ -160,6 +160,7 @@
   <data name="event-grothmar-oozePit"><value>The Ooze Pit Trials</value></data>
   <data name="event-canthaDayNight-day"><value>Day</value></data>
   <data name="EventSettingsView_ResetHiddenStates_Title"><value>Reset hidden states</value></data>
+  <data name="event-elonRiverlands-doppelganger"><value>Doppelganger</value></data>
   <data name="Setting_UseFiller_Name"><value>Use Filler Events</value></data>
   <data name="Setting_ShowContextMenuOnClick_Description"><value>Whether the event table should show a context menu if an event has been right clicked.</value></data>
   <data name="event-bjoraMarches-drakkar"><value>Drakkar, the Ice Dragon's Champion</value></data>
