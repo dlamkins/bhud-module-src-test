@@ -12,7 +12,6 @@ using Blish_HUD.Settings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Nekres.Screenshot_Manager.Core;
 using Nekres.Screenshot_Manager.Properties;
 using Nekres.Screenshot_Manager.UI.Models;
@@ -27,10 +26,6 @@ namespace Nekres.Screenshot_Manager
 
 		internal static ScreenshotManagerModule ModuleInstance;
 
-		private SettingEntry<KeyBinding> ScreenshotNormalBinding;
-
-		private SettingEntry<KeyBinding> ScreenshotStereoscopicBinding;
-
 		internal SettingEntry<bool> MuteSound;
 
 		internal SettingEntry<bool> DisableNotification;
@@ -38,6 +33,8 @@ namespace Nekres.Screenshot_Manager
 		internal SettingEntry<List<string>> Favorites;
 
 		private Texture2D _icon64;
+
+		private SoundEffect[] _deleteSfx;
 
 		private CornerIcon _moduleCornerIcon;
 
@@ -57,6 +54,8 @@ namespace Nekres.Screenshot_Manager
 
 		public SoundEffect ScreenShotSfx { get; private set; }
 
+		public SoundEffect DeleteSfx => _deleteSfx[RandomUtil.GetRandom(0, 1)];
+
 		[ImportingConstructor]
 		public ScreenshotManagerModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
 			: this(moduleParameters)
@@ -66,15 +65,8 @@ namespace Nekres.Screenshot_Manager
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ff: Expected O, but got Unknown
-			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0154: Expected O, but got Unknown
 			MuteSound = settings.DefineSetting<bool>("muteSound", false, (Func<string>)(() => Resources.Mute_Screenshot_Sound), (Func<string>)(() => Resources.Mutes_the_sound_alert_when_a_new_screenshot_has_been_captured_));
 			DisableNotification = settings.DefineSetting<bool>("disableNotification", false, (Func<string>)(() => Resources.Disable_Screenshot_Notification), (Func<string>)(() => Resources.Disables_the_notification_when_a_new_screenshot_has_been_captured_));
-			SettingCollection keyBindingCol = settings.AddSubCollection("Screenshot", true, false);
-			ScreenshotNormalBinding = keyBindingCol.DefineSetting<KeyBinding>("NormalKey", new KeyBinding((Keys)44), (Func<string>)(() => Resources.Normal), (Func<string>)(() => Resources.Take_a_normal_screenshot_));
-			ScreenshotStereoscopicBinding = keyBindingCol.DefineSetting<KeyBinding>("StereoscopicKey", new KeyBinding((Keys)0), (Func<string>)(() => Resources.Stereoscopic), (Func<string>)(() => Resources.Take_a_stereoscopic_screenshot_));
 			SettingCollection selfManagedSettings = settings.AddSubCollection("ManagedSettings", false, false);
 			Favorites = selfManagedSettings.DefineSetting<List<string>>("favorites", new List<string>(), (Func<string>)null, (Func<string>)null);
 		}
@@ -105,6 +97,11 @@ namespace Nekres.Screenshot_Manager
 		private void LoadTextures()
 		{
 			ScreenShotSfx = ContentsManager.GetSound("audio\\screenshot.wav");
+			_deleteSfx = (SoundEffect[])(object)new SoundEffect[2]
+			{
+				ContentsManager.GetSound("audio\\crumbling-paper-1.wav"),
+				ContentsManager.GetSound("audio\\crumbling-paper-2.wav")
+			};
 			_icon64 = ContentsManager.GetTexture("screenshots_icon_64x64.png");
 		}
 
@@ -123,6 +120,19 @@ namespace Nekres.Screenshot_Manager
 			((Control)_moduleCornerIcon).remove_Click((EventHandler<MouseEventArgs>)ModuleCornerIconClicked);
 			((Control)_moduleCornerIcon).Dispose();
 			GameService.Overlay.get_BlishHudWindow().RemoveTab(_moduleTab);
+			SoundEffect[] deleteSfx = _deleteSfx;
+			foreach (SoundEffect obj in deleteSfx)
+			{
+				if (obj != null)
+				{
+					obj.Dispose();
+				}
+			}
+			SoundEffect screenShotSfx = ScreenShotSfx;
+			if (screenShotSfx != null)
+			{
+				screenShotSfx.Dispose();
+			}
 			ModuleInstance = null;
 		}
 

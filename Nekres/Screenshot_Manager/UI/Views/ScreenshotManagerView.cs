@@ -59,6 +59,7 @@ namespace Nekres.Screenshot_Manager.UI.Views
 				AsyncTexture2D texture = new AsyncTexture2D();
 				base.get_Presenter().CreateThumbnail(ThumbnailFlowPanel, texture, fileName);
 				await base.get_Presenter().LoadTexture(texture, fileName);
+				ThumbnailFlowPanel.SortChildren<ResponsiveThumbnail>((Comparison<ResponsiveThumbnail>)base.get_Presenter().SortThumbnails);
 			}
 		}
 

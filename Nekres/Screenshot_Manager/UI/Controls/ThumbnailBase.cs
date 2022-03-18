@@ -1,7 +1,6 @@
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
-using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -18,16 +17,6 @@ namespace Nekres.Screenshot_Manager.UI.Controls
 		{
 			_texture = texture;
 			FileName = fileName;
-		}
-
-		protected override void OnMouseMoved(MouseEventArgs e)
-		{
-			((Control)this).OnMouseMoved(e);
-		}
-
-		protected override void OnClick(MouseEventArgs e)
-		{
-			((Control)this).OnClick(e);
 		}
 
 		protected override void DisposeControl()
