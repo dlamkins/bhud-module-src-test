@@ -46,11 +46,15 @@ namespace Nekres.Screenshot_Manager.Properties
 
 		internal static string Are_you_sure_ => ResourceManager.GetString("Are you sure?", resourceCulture);
 
+		internal static string By_default__screenshots_are_sent_to_the_Recycle_Bin_so_that_they_can_be_recovered_if_needed__nWhen_this_feature_is_disabled__deleted_screenshots_are_removed_from_the_hard_disk_and_their_space_is_marked_as_overwriteable_ => ResourceManager.GetString("By default, screenshots are sent to the Recycle Bin so that they can be recovered if needed.\\nWhen this feature is disabled, deleted screenshots are removed from the hard disk and their space is marked as overwriteable.", resourceCulture);
+
 		internal static string Cancel => ResourceManager.GetString("Cancel", resourceCulture);
 
 		internal static string Click_To_Zoom => ResourceManager.GetString("Click To Zoom", resourceCulture);
 
 		internal static string Delete_Image_ => ResourceManager.GetString("Delete Image?", resourceCulture);
+
+		internal static string Delete_sends_to_Recycle_Bin => ResourceManager.GetString("Delete sends to Recycle Bin", resourceCulture);
 
 		internal static string Disable_Screenshot_Notification => ResourceManager.GetString("Disable Screenshot Notification", resourceCulture);
 

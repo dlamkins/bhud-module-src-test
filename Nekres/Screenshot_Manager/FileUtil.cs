@@ -1,6 +1,8 @@
 using System;
 using System.IO;
+using System.Security;
 using System.Threading.Tasks;
+using Microsoft.VisualBasic.FileIO;
 
 namespace Nekres.Screenshot_Manager
 {
@@ -18,11 +20,11 @@ namespace Nekres.Screenshot_Manager
 						File.Move(oldFilePath, newFilePath);
 						return true;
 					}
-					catch (IOException ex)
+					catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is SecurityException)
 					{
 						if (!(DateTime.UtcNow < dateTime))
 						{
-							ScreenshotManagerModule.Logger.Error(ex.Message + ex.StackTrace);
+							ScreenshotManagerModule.Logger.Error(ex, ex.Message);
 						}
 					}
 				}
@@ -42,11 +44,35 @@ namespace Nekres.Screenshot_Manager
 						File.Delete(filePath);
 						return true;
 					}
-					catch (IOException ex)
+					catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is SecurityException)
 					{
 						if (!(DateTime.UtcNow < dateTime))
 						{
-							ScreenshotManagerModule.Logger.Error(ex.Message + ex.StackTrace);
+							ScreenshotManagerModule.Logger.Error(ex, ex.Message);
+						}
+					}
+				}
+				return false;
+			});
+		}
+
+		public static async Task<bool> SendToRecycleBinAsync(string filePath)
+		{
+			return await Task.Run(delegate
+			{
+				DateTime dateTime = DateTime.UtcNow.AddMilliseconds(10000.0);
+				while (DateTime.UtcNow < dateTime)
+				{
+					try
+					{
+						FileSystem.DeleteFile(filePath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin, UICancelOption.DoNothing);
+						return true;
+					}
+					catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is SecurityException)
+					{
+						if (!(DateTime.UtcNow < dateTime))
+						{
+							ScreenshotManagerModule.Logger.Error(ex, ex.Message);
 						}
 					}
 				}

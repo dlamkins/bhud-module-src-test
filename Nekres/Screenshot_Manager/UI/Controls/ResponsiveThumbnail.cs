@@ -73,6 +73,18 @@ namespace Nekres.Screenshot_Manager.UI.Controls
 
 		protected override void OnMouseMoved(MouseEventArgs e)
 		{
+			InvalidateMousePosition();
+			((Control)this).OnMouseMoved(e);
+		}
+
+		protected override void OnMoved(MovedEventArgs e)
+		{
+			InvalidateMousePosition();
+			((Control)this).OnMoved(e);
+		}
+
+		private void InvalidateMousePosition()
+		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
@@ -98,7 +110,6 @@ namespace Nekres.Screenshot_Manager.UI.Controls
 			{
 				((Control)this).set_BasicTooltipText(string.Empty);
 			}
-			((Control)this).OnMouseMoved(e);
 		}
 
 		protected override void OnClick(MouseEventArgs e)
@@ -107,7 +118,6 @@ namespace Nekres.Screenshot_Manager.UI.Controls
 			if (_mouseOverInspect)
 			{
 				this.OnInspect?.Invoke(this, EventArgs.Empty);
-				return;
 			}
 			if (_mouseOverFavButton)
 			{

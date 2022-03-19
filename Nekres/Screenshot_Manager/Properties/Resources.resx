@@ -49,10 +49,13 @@
   <data name="The image file is in use by another process."><value>The image is in use by another process.</value></data>
   <data name="Favourite"><value>Favourite</value></data>
   <data name="Mute Screenshot Sound"><value>Mute Screenshot Sound</value></data>
+  <data name="By default, screenshots are sent to the Recycle Bin so that they can be recovered if needed.\nWhen this feature is disabled, deleted screenshots are removed from the hard disk and their space is marked as overwriteable."><value>By default, screenshots are sent to the Recycle Bin so that they can be recovered if needed.
+When this feature is disabled, deleted screenshots are removed from the hard disk and their space is marked as overwriteable.</value></data>
   <data name="The following characters are not allowed: {0}"><value>The following characters are not allowed: {0}</value></data>
   <data name="You are about to permanently destroy {0}."><value>You are about to permanently destroy {0}.</value></data>
   <data name="The image file doesn't exist anymore!"><value>The image doesn't exist anymore!</value></data>
   <data name="Take a normal screenshot."><value>Take a normal screenshot.</value></data>
+  <data name="Delete sends to Recycle Bin"><value>Delete sends to Recycle Bin</value></data>
   <data name="Screenshot Created!"><value>Screenshot Created!</value></data>
   <data name="Screenshot"><value>Screenshot</value></data>
   <data name="Rename Image"><value>Rename Image</value></data>

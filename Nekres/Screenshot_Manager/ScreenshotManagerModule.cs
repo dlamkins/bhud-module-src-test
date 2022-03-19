@@ -30,6 +30,8 @@ namespace Nekres.Screenshot_Manager
 
 		internal SettingEntry<bool> DisableNotification;
 
+		internal SettingEntry<bool> SendToRecycleBin;
+
 		internal SettingEntry<List<string>> Favorites;
 
 		private Texture2D _icon64;
@@ -67,6 +69,7 @@ namespace Nekres.Screenshot_Manager
 		{
 			MuteSound = settings.DefineSetting<bool>("muteSound", false, (Func<string>)(() => Resources.Mute_Screenshot_Sound), (Func<string>)(() => Resources.Mutes_the_sound_alert_when_a_new_screenshot_has_been_captured_));
 			DisableNotification = settings.DefineSetting<bool>("disableNotification", false, (Func<string>)(() => Resources.Disable_Screenshot_Notification), (Func<string>)(() => Resources.Disables_the_notification_when_a_new_screenshot_has_been_captured_));
+			SendToRecycleBin = settings.DefineSetting<bool>("sendToRecycleBin", true, (Func<string>)(() => Resources.Delete_sends_to_Recycle_Bin), (Func<string>)(() => Resources.By_default__screenshots_are_sent_to_the_Recycle_Bin_so_that_they_can_be_recovered_if_needed__nWhen_this_feature_is_disabled__deleted_screenshots_are_removed_from_the_hard_disk_and_their_space_is_marked_as_overwriteable_));
 			SettingCollection selfManagedSettings = settings.AddSubCollection("ManagedSettings", false, false);
 			Favorites = selfManagedSettings.DefineSetting<List<string>>("favorites", new List<string>(), (Func<string>)null, (Func<string>)null);
 		}
@@ -138,6 +141,11 @@ namespace Nekres.Screenshot_Manager
 
 		private void ModuleCornerIconClicked(object o, MouseEventArgs e)
 		{
+			if (((Control)GameService.Overlay.get_BlishHudWindow()).get_Visible())
+			{
+				((Control)GameService.Overlay.get_BlishHudWindow()).Hide();
+				return;
+			}
 			((Control)GameService.Overlay.get_BlishHudWindow()).Show();
 			GameService.Overlay.get_BlishHudWindow().Navigate((IView)(object)new ScreenshotManagerView(new ScreenshotManagerModel(_fileWatcherFactory)), true);
 		}
