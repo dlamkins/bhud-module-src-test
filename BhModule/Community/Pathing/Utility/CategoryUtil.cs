@@ -16,7 +16,7 @@ namespace BhModule.Community.Pathing.Utility
 			{
 				pathingEntities = packState.Entities.ToArray();
 			}
-			if (string.IsNullOrWhiteSpace(category.DisplayName) || !packState.UserConfiguration.PackShowCategoriesFromAllMaps.get_Value() || !GetCategoryIsNotFiltered(category, Array.Empty<IPathingEntity>(), LoadedCategoryFilter))
+			if (string.IsNullOrWhiteSpace(category.DisplayName) || packState.UserConfiguration.PackEnableSmartCategoryFilter.get_Value() || !GetCategoryIsNotFiltered(category, Array.Empty<IPathingEntity>(), LoadedCategoryFilter))
 			{
 				return GetCategoryIsNotFiltered(category, pathingEntities, CurrentMapCategoryFilter);
 			}

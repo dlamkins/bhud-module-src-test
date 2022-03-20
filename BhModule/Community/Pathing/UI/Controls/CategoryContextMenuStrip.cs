@@ -5,6 +5,7 @@ using BhModule.Community.Pathing.State;
 using BhModule.Community.Pathing.Utility;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
+using Blish_HUD.Settings;
 using TmfLib.Pathable;
 
 namespace BhModule.Community.Pathing.UI.Controls
@@ -28,7 +29,7 @@ namespace BhModule.Community.Pathing.UI.Controls
 		private (IEnumerable<PathingCategory> SubCategories, int Skipped) GetSubCategories(bool forceShowAll = false)
 		{
 			IEnumerable<PathingCategory> subCategories = _pathingCategory.Where((PathingCategory cat) => cat.LoadedFromPack);
-			if (_packState.UserConfiguration.PackShowCategoriesFromAllMaps.get_Value() || forceShowAll)
+			if (!_packState.UserConfiguration.PackEnableSmartCategoryFilter.get_Value() || forceShowAll)
 			{
 				return (subCategories, 0);
 			}
@@ -64,12 +65,12 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		protected override void OnShown(EventArgs e)
 		{
-			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a7: Expected O, but got Unknown
+			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c4: Expected O, but got Unknown
 			var (subCategories, skipped) = GetSubCategories(_forceShowAll);
 			foreach (PathingCategory subCategory in subCategories)
 			{
@@ -81,7 +82,7 @@ namespace BhModule.Community.Pathing.UI.Controls
 				val.set_Text($"{skipped} Categories Are Hidden");
 				((Control)val).set_Enabled(false);
 				val.set_CanCheck(true);
-				((Control)val).set_BasicTooltipText(Strings.Info_HiddenCategories);
+				((Control)val).set_BasicTooltipText(string.Format(Strings.Info_HiddenCategories, ((SettingEntry)_packState.UserConfiguration.PackEnableSmartCategoryFilter).get_DisplayName()));
 				ContextMenuStripItem showAllSkippedCategories = val;
 				((ContextMenuStrip)this).AddMenuItem(showAllSkippedCategories);
 				((Control)showAllSkippedCategories).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)ShowAllSkippedCategories_LeftMouseButtonReleased);

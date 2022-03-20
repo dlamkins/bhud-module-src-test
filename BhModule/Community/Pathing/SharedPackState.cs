@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using BhModule.Community.Pathing.Content;
 using BhModule.Community.Pathing.Entity;
@@ -123,11 +124,12 @@ namespace BhModule.Community.Pathing
 
 		private static async Task PreloadTextures(IPointOfInterest pointOfInterest)
 		{
-			string texture = pointOfInterest.Type switch
+			PointOfInterestType type = pointOfInterest.Type;
+			string texture = type switch
 			{
 				PointOfInterestType.Marker => pointOfInterest.GetAggregatedAttributeValue("iconfile"), 
 				PointOfInterestType.Trail => pointOfInterest.GetAggregatedAttributeValue("texture"), 
-				_ => throw new InvalidOperationException(), 
+				_ => throw new SwitchExpressionException((object)type), 
 			};
 			if (texture != null)
 			{

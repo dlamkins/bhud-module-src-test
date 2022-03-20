@@ -41,7 +41,7 @@ namespace BhModule.Community.Pathing
 
 		public SettingEntry<bool> PackAllowMarkersToAnimate { get; private set; }
 
-		public SettingEntry<bool> PackShowCategoriesFromAllMaps { get; private set; }
+		public SettingEntry<bool> PackEnableSmartCategoryFilter { get; private set; }
 
 		public SettingEntry<bool> PackShowWhenCategoriesAreFiltered { get; private set; }
 
@@ -100,7 +100,7 @@ namespace BhModule.Community.Pathing
 			PackAllowMarkersToAutomaticallyHide = PackSettings.DefineSetting<bool>("PackAllowMarkersToAutomaticallyHide", true, (Func<string>)(() => Strings.Setting_PackAllowMarkersToAutomaticallyHide), (Func<string>)(() => ""));
 			PackMarkerConsentToClipboard = PackSettings.DefineSetting<MarkerClipboardConsentLevel>("PackMarkerConsentToClipboard", MarkerClipboardConsentLevel.Always, (Func<string>)(() => Strings.Setting_PackMarkerConsentToClipboard), (Func<string>)(() => ""));
 			PackAllowMarkersToAnimate = PackSettings.DefineSetting<bool>("PackAllowMarkersToAnimate", true, (Func<string>)(() => Strings.Setting_PackAllowMarkersToAnimate), (Func<string>)(() => ""));
-			PackShowCategoriesFromAllMaps = PackSettings.DefineSetting<bool>("PackShowCategoriesFromAllMaps", false, (Func<string>)(() => Strings.Setting_PackShowCategoriesFromAllMaps), (Func<string>)(() => ""));
+			PackEnableSmartCategoryFilter = PackSettings.DefineSetting<bool>("PackEnableSmartCategoryFilter", true, (Func<string>)(() => "Hide Irrelevant Categories"), (Func<string>)(() => "If a category doesn't contain markers or trails relevant to the current map, the category is hidden."));
 			PackShowWhenCategoriesAreFiltered = PackSettings.DefineSetting<bool>("PackShowWhenCategoriesAreFiltered", true, (Func<string>)(() => "Indicate when categories are hidden"), (Func<string>)(() => ""));
 			SettingComplianceExtensions.SetRange(PackMaxOpacityOverride, 0f, 1f);
 			SettingComplianceExtensions.SetRange(PackMaxViewDistance, 25f, 50000f);

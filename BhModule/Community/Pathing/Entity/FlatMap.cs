@@ -260,8 +260,8 @@ namespace BhModule.Community.Pathing.Entity
 			string tooltipTitle;
 			if (pathable != null && isAlternativeMenu)
 			{
-				tooltipTitle = string.Join("\n > ", from category in pathable.Category.GetParentsDesc()
-					select category.DisplayName.Trim());
+				tooltipTitle = ((pathable.Category != null) ? string.Join("\n > ", (from category in pathable.Category?.GetParentsDesc()
+					select category.DisplayName.Trim())) : "Unassigned Category");
 				tooltipDescription = null;
 			}
 			else

@@ -36,6 +36,7 @@
     <Reference Include="Flurl" />
     <Reference Include="SemVer" />
     <Reference Include="AsyncClipboardService" />
+    <Reference Include="Gapotchenko.FX" />
     <Reference Include="System.Net.Http" />
   </ItemGroup>
 </Project>
