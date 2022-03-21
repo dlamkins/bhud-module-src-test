@@ -24,7 +24,9 @@ namespace Nekres.Screenshot_Manager.Core
 
 		private List<FileSystemWatcher> _screensPathWatchers;
 
-		public List<string> Index { get; private set; }
+		private readonly List<string> _index;
+
+		public IReadOnlyList<string> Index => new List<string>(_index);
 
 		public event EventHandler<ValueEventArgs<string>> FileAdded;
 
@@ -34,7 +36,7 @@ namespace Nekres.Screenshot_Manager.Core
 
 		public FileWatcherFactory()
 		{
-			Index = new List<string>();
+			_index = new List<string>();
 			_screensPathWatchers = new List<FileSystemWatcher>();
 			_imageFilters = new string[3] { "*.bmp", "*.jpg", "*.png" };
 			string[] imageFilters = _imageFilters;
@@ -57,26 +59,26 @@ namespace Nekres.Screenshot_Manager.Core
 				where Array.Exists(_imageFilters, (string filter) => filter.Equals("*" + Path.GetExtension(s), StringComparison.InvariantCultureIgnoreCase))
 				select s into x
 				select Path.Combine(DirectoryUtil.get_ScreensPath(), x);
-			Index.AddRange(initialFiles);
+			_index.AddRange(initialFiles);
 		}
 
 		private async void OnScreenShotCreated(object sender, FileSystemEventArgs e)
 		{
-			Index.Add(e.FullPath);
+			_index.Add(e.FullPath);
 			await ScreenShotNotify(e.FullPath);
 			this.FileAdded?.Invoke(this, new ValueEventArgs<string>(e.FullPath));
 		}
 
 		private void OnScreenShotDeleted(object sender, FileSystemEventArgs e)
 		{
-			Index.Remove(e.FullPath);
+			_index.Remove(e.FullPath);
 			this.FileDeleted?.Invoke(this, new ValueEventArgs<string>(e.FullPath));
 		}
 
 		private void OnScreenShotRenamed(object sender, RenamedEventArgs e)
 		{
-			Index.Remove(e.OldFullPath);
-			Index.Add(e.FullPath);
+			_index.Remove(e.OldFullPath);
+			_index.Add(e.FullPath);
 			this.FileRenamed?.Invoke(this, new ValueChangedEventArgs<string>(e.OldFullPath, e.FullPath));
 		}
 
