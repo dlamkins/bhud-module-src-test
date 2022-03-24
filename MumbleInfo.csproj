@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>MumbleInfo</AssemblyName>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <TargetFramework>net472</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>Preview</LangVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemGroup />
+  <ItemGroup>
+    <Reference Include="Blish HUD" />
+    <Reference Include="MonoGame.Framework" />
+    <Reference Include="MonoGame.Extended" />
+    <Reference Include="Gw2Sharp" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Management" />
+    <Reference Include="AsyncClipboardService" />
+  </ItemGroup>
+</Project>
