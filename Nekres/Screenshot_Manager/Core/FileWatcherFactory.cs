@@ -130,14 +130,17 @@ namespace Nekres.Screenshot_Manager.Core
 			GameService.Overlay.get_BlishHudWindow().Navigate((IView)(object)new ScreenshotManagerView(new ScreenshotManagerModel(this)), true);
 		}
 
-		public async Task CreateInspectionPanel(string fileName)
+		public async Task CreateInspectionPanel(string filePath)
 		{
-			AsyncTexture2D texture = new AsyncTexture2D();
-			new InspectPanel(texture, Path.GetFileNameWithoutExtension(fileName));
-			await TextureUtil.GetScreenShot(fileName).ContinueWith(delegate(Task<Texture2D> t)
+			if (File.Exists(filePath))
 			{
-				texture.SwapTexture(t.Result);
-			});
+				AsyncTexture2D texture = new AsyncTexture2D();
+				new InspectPanel(texture, Path.GetFileNameWithoutExtension(filePath));
+				await TextureUtil.GetScreenShot(filePath).ContinueWith(delegate(Task<Texture2D> t)
+				{
+					texture.SwapTexture(t.Result);
+				});
+			}
 		}
 
 		public void Dispose()

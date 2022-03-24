@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Security;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Microsoft.WindowsAPICodePack.Shell;
@@ -34,10 +35,6 @@ namespace Nekres.Screenshot_Manager
 				DateTime dateTime = DateTime.UtcNow.AddMilliseconds(10000.0);
 				while (DateTime.UtcNow < dateTime)
 				{
-					if (!File.Exists(filePath))
-					{
-						return Textures.get_Pixel();
-					}
 					try
 					{
 						using FileStream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
@@ -56,11 +53,11 @@ namespace Nekres.Screenshot_Manager
 						memoryStream.Read(array, 0, array.Length);
 						return Texture2D.FromStream(GameService.Graphics.get_GraphicsDevice(), (Stream)memoryStream);
 					}
-					catch (IOException ex)
+					catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is SecurityException)
 					{
 						if (!(DateTime.UtcNow < dateTime))
 						{
-							ScreenshotManagerModule.Logger.Error(ex.Message);
+							ScreenshotManagerModule.Logger.Error(ex, ex.Message);
 							return Textures.get_Pixel();
 						}
 					}
