@@ -7,13 +7,11 @@ namespace Nekres.Mumble_Info_Module
 	{
 		public static Rectangle Union(this Rectangle value1, Rectangle value2)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
 			int x = Math.Min(value1.X, value2.X);
 			int y = Math.Min(value1.Y, value2.Y);
 			return new Rectangle(x, y, Math.Max(((Rectangle)(ref value1)).get_Right(), ((Rectangle)(ref value2)).get_Right()) - x, Math.Max(((Rectangle)(ref value1)).get_Bottom(), ((Rectangle)(ref value2)).get_Bottom()) - y);

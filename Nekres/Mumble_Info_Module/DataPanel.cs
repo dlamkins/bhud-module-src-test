@@ -1,4 +1,5 @@
 using System;
+using AsyncWindowsClipboard;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
@@ -46,13 +47,7 @@ namespace Nekres.Mumble_Info_Module
 
 		private const int _topMargin = 5;
 
-		private const int _strokeDist = 1;
-
 		private const int _borderSize = 1;
-
-		private const int _clipboardIndent = 4;
-
-		private const char _clipboardIndentChar = ' ';
 
 		private const string _clipboardMessage = "Copied!";
 
@@ -60,29 +55,31 @@ namespace Nekres.Mumble_Info_Module
 
 		private bool _isMousePressed;
 
-		private (string, bool) _gameInfo;
+		private Rectangle _avatarPositionBounds;
 
-		private (string, bool) _avatarInfo;
+		private bool _mouseOverAvatarPosition;
 
-		private (string, bool) _mapInfo;
+		private Rectangle _avatarFacingBounds;
 
-		private (string, bool) _cameraInfo;
+		private bool _mouseOverAvatarFacing;
 
-		private (string, bool) _userInterfaceInfo;
+		private Rectangle _mapCoordinatesBounds;
 
-		private (string, bool) _computerInfo;
+		private bool _mouseOverMapCoordinates;
 
-		private Rectangle _currentFocusBounds;
+		private Rectangle _cameraDirectionBounds;
 
-		private string _currentSingleInfo;
+		private bool _mouseOverCameraDirection;
+
+		private Rectangle _cameraPositionBounds;
+
+		private bool _mouseOverCameraPosition;
 
 		private float _memoryUsage => MumbleInfoModule.ModuleInstance.MemoryUsage;
 
 		private float _cpuUsage => MumbleInfoModule.ModuleInstance.CpuUsage;
 
 		private string _cpuName => MumbleInfoModule.ModuleInstance.CpuName;
-
-		private bool _captureMouseOnLCtrl => MumbleInfoModule.ModuleInstance.CaptureMouseOnLCtrl.get_Value();
 
 		private Map _currentMap => MumbleInfoModule.ModuleInstance.CurrentMap;
 
@@ -120,68 +117,91 @@ namespace Nekres.Mumble_Info_Module
 			_font = Control.get_Content().GetFont((FontFace)0, (FontSize)36, (FontStyle)0);
 			UpdateLocation(null, null);
 			((Control)Control.get_Graphics().get_SpriteScreen()).add_Resized((EventHandler<ResizedEventArgs>)UpdateLocation);
-			((Control)this).add_Disposed((EventHandler<EventArgs>)OnDisposed);
-			Control.get_Input().get_Mouse().add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)OnLeftMouseButtonReleased);
-			Control.get_Input().get_Mouse().add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)OnMousePressed);
 		}
 
-		private void OnLeftMouseButtonReleased(object o, MouseEventArgs e)
+		protected override void OnMouseMoved(MouseEventArgs e)
 		{
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			_isMousePressed = false;
-			if (Control.get_Input().get_Mouse().get_Position()
-				.IsInBounds(_currentFocusBounds))
-			{
-				ClipboardUtil.get_WindowsClipboardService().SetTextAsync(_currentSingleInfo);
-				ScreenNotification.ShowNotification("Copied!", (NotificationType)0, (Texture2D)null, 4);
-			}
-			else if (_gameInfo.Item2)
-			{
-				ClipboardUtil.get_WindowsClipboardService().SetTextAsync(_gameInfo.Item1);
-				ScreenNotification.ShowNotification("Copied!", (NotificationType)0, (Texture2D)null, 4);
-			}
-			else if (_avatarInfo.Item2)
-			{
-				ClipboardUtil.get_WindowsClipboardService().SetTextAsync(_avatarInfo.Item1);
-				ScreenNotification.ShowNotification("Copied!", (NotificationType)0, (Texture2D)null, 4);
-			}
-			else if (_mapInfo.Item2)
-			{
-				ClipboardUtil.get_WindowsClipboardService().SetTextAsync(_mapInfo.Item1);
-				ScreenNotification.ShowNotification("Copied!", (NotificationType)0, (Texture2D)null, 4);
-			}
-			else if (_cameraInfo.Item2)
-			{
-				ClipboardUtil.get_WindowsClipboardService().SetTextAsync(_cameraInfo.Item1);
-				ScreenNotification.ShowNotification("Copied!", (NotificationType)0, (Texture2D)null, 4);
-			}
-			else if (_userInterfaceInfo.Item2)
-			{
-				ClipboardUtil.get_WindowsClipboardService().SetTextAsync(_userInterfaceInfo.Item1);
-				ScreenNotification.ShowNotification("Copied!", (NotificationType)0, (Texture2D)null, 4);
-			}
-			else if (_computerInfo.Item2)
-			{
-				ClipboardUtil.get_WindowsClipboardService().SetTextAsync(_computerInfo.Item1);
-				ScreenNotification.ShowNotification("Copied!", (NotificationType)0, (Texture2D)null, 4);
-			}
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+			Point relPos = ((Control)this).get_RelativeMousePosition();
+			_mouseOverAvatarFacing = ((Rectangle)(ref _avatarFacingBounds)).Contains(relPos);
+			_mouseOverAvatarPosition = ((Rectangle)(ref _avatarPositionBounds)).Contains(relPos);
+			_mouseOverMapCoordinates = ((Rectangle)(ref _mapCoordinatesBounds)).Contains(relPos);
+			_mouseOverCameraDirection = ((Rectangle)(ref _cameraDirectionBounds)).Contains(relPos);
+			_mouseOverCameraPosition = ((Rectangle)(ref _cameraPositionBounds)).Contains(relPos);
+			((Control)this).OnMouseMoved(e);
 		}
 
-		private void OnMousePressed(object o, MouseEventArgs e)
+		protected override void OnLeftMouseButtonReleased(MouseEventArgs e)
+		{
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
+			_isMousePressed = false;
+			Vector3 val;
+			if (_mouseOverAvatarFacing)
+			{
+				WindowsClipboardService windowsClipboardService = ClipboardUtil.get_WindowsClipboardService();
+				val = GameService.Gw2Mumble.get_PlayerCharacter().get_Forward();
+				windowsClipboardService.SetTextAsync(((object)(Vector3)(ref val)).ToString());
+				ScreenNotification.ShowNotification("Copied!", (NotificationType)0, (Texture2D)null, 4);
+			}
+			else if (_mouseOverAvatarPosition)
+			{
+				WindowsClipboardService windowsClipboardService2 = ClipboardUtil.get_WindowsClipboardService();
+				val = GameService.Gw2Mumble.get_PlayerCharacter().get_Position();
+				windowsClipboardService2.SetTextAsync(((object)(Vector3)(ref val)).ToString());
+				ScreenNotification.ShowNotification("Copied!", (NotificationType)0, (Texture2D)null, 4);
+			}
+			else if (_mouseOverMapCoordinates)
+			{
+				WindowsClipboardService windowsClipboardService3 = ClipboardUtil.get_WindowsClipboardService();
+				Coordinates2 playerLocationMap = GameService.Gw2Mumble.get_RawClient().get_PlayerLocationMap();
+				object arg = ((Coordinates2)(ref playerLocationMap)).get_X();
+				playerLocationMap = GameService.Gw2Mumble.get_RawClient().get_PlayerLocationMap();
+				windowsClipboardService3.SetTextAsync($"{{X:{arg} Y:{((Coordinates2)(ref playerLocationMap)).get_Y()}}}");
+				ScreenNotification.ShowNotification("Copied!", (NotificationType)0, (Texture2D)null, 4);
+			}
+			else if (_mouseOverCameraDirection)
+			{
+				WindowsClipboardService windowsClipboardService4 = ClipboardUtil.get_WindowsClipboardService();
+				val = GameService.Gw2Mumble.get_PlayerCamera().get_Forward();
+				windowsClipboardService4.SetTextAsync(((object)(Vector3)(ref val)).ToString());
+				ScreenNotification.ShowNotification("Copied!", (NotificationType)0, (Texture2D)null, 4);
+			}
+			else if (_mouseOverCameraPosition)
+			{
+				WindowsClipboardService windowsClipboardService5 = ClipboardUtil.get_WindowsClipboardService();
+				val = GameService.Gw2Mumble.get_PlayerCamera().get_Position();
+				windowsClipboardService5.SetTextAsync(((object)(Vector3)(ref val)).ToString());
+				ScreenNotification.ShowNotification("Copied!", (NotificationType)0, (Texture2D)null, 4);
+			}
+			((Control)this).OnLeftMouseButtonReleased(e);
+		}
+
+		protected override void OnLeftMouseButtonPressed(MouseEventArgs e)
 		{
 			_isMousePressed = true;
+			((Control)this).OnLeftMouseButtonPressed(e);
 		}
 
 		protected override CaptureType CapturesInput()
 		{
-			return (CaptureType)((_captureMouseOnLCtrl && PInvoke.IsLControlPressed()) ? 4 : 22);
-		}
-
-		private void OnDisposed(object sender, EventArgs e)
-		{
-			Control.get_Input().get_Mouse().remove_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)OnLeftMouseButtonReleased);
-			Control.get_Input().get_Mouse().remove_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)OnMousePressed);
+			return (CaptureType)22;
 		}
 
 		private void UpdateLocation(object sender, EventArgs e)
@@ -192,1733 +212,1086 @@ namespace Nekres.Mumble_Info_Module
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0198: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0227: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0291: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_031e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0320: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0371: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0387: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0221: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0248: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0283: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0298: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0310: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0337: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0373: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0388: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03af: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0403: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0419: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0441: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0444: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0495: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_050b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0510: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0520: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0531: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0533: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0550: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0564: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0587: Unknown result type (might be due to invalid IL or missing references)
-			//IL_058a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_059a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_059c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_040d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0410: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0445: Unknown result type (might be due to invalid IL or missing references)
+			//IL_045c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_046f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0491: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0494: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0509: Unknown result type (might be due to invalid IL or missing references)
+			//IL_050c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0530: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0543: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0565: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0568: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0588: Unknown result type (might be due to invalid IL or missing references)
+			//IL_059d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_05c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0618: Unknown result type (might be due to invalid IL or missing references)
-			//IL_062f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0643: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0666: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0669: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0679: Unknown result type (might be due to invalid IL or missing references)
-			//IL_067b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0705: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0708: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0756: Unknown result type (might be due to invalid IL or missing references)
-			//IL_075b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_076b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_077c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_077e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0799: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0818: Unknown result type (might be due to invalid IL or missing references)
-			//IL_082e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0856: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0858: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0947: Unknown result type (might be due to invalid IL or missing references)
-			//IL_094c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_095c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_096d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_096f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_09c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_09dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_09ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a02: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a12: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a14: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a47: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a5d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a85: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a87: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ae2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0af8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0b20: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0b23: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0b84: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0b9a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0bc2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0bc5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c0e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c13: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c23: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c34: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c36: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c4f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c54: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c63: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c77: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0614: Unknown result type (might be due to invalid IL or missing references)
+			//IL_063b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_063e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_069c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0709: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0730: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0732: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0761: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0776: Unknown result type (might be due to invalid IL or missing references)
+			//IL_079d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0811: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0814: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0835: Unknown result type (might be due to invalid IL or missing references)
+			//IL_083a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0849: Unknown result type (might be due to invalid IL or missing references)
+			//IL_085c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_087e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0881: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0890: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0892: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_090f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0924: Unknown result type (might be due to invalid IL or missing references)
+			//IL_094b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_094e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0979: Unknown result type (might be due to invalid IL or missing references)
+			//IL_098e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a03: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a2a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a2d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a6e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a83: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0aaa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0aad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0aee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b03: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b2a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b2d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b56: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b72: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b77: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b86: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b99: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0bbb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0bbe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0bcd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0bcf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0be2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0bf7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c1e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c20: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c5b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c70: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c97: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0c9a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c9d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0cad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0caf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ce2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0cf8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d20: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d23: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d6f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d85: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0dad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0db0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0dfc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e12: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e3a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e3c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e9a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0eb0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ed8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0edb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cdf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cf4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d1b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d1e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d63: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d78: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d9f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0da2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0dcb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ddd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ddf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0e0a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0e1f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0e46: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0e49: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0e6f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0e82: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ea4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ea7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f04: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f19: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f40: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0f43: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0f59: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0f81: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0f84: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0fec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_102a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_102d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_107b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_108b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_109c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_109e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_10b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_10bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_10ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_10de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1101: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1104: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1114: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1116: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1149: Unknown result type (might be due to invalid IL or missing references)
-			//IL_115f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1187: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f67: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f7a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f9c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f9f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0fbf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0fd4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ffb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ffd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_102c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_103f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_109b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_10bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_10c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_10e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_10f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_111c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_111e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_114d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1162: Unknown result type (might be due to invalid IL or missing references)
 			//IL_1189: Unknown result type (might be due to invalid IL or missing references)
-			//IL_11eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1201: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1229: Unknown result type (might be due to invalid IL or missing references)
-			//IL_122c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1298: Unknown result type (might be due to invalid IL or missing references)
-			//IL_12ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_12d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_12d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1345: Unknown result type (might be due to invalid IL or missing references)
-			//IL_135b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1383: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1386: Unknown result type (might be due to invalid IL or missing references)
-			//IL_13cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_13d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_13e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_13f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_13f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1405: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1407: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1432: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1448: Unknown result type (might be due to invalid IL or missing references)
+			//IL_118c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_11b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_11c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_11e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_11e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1208: Unknown result type (might be due to invalid IL or missing references)
+			//IL_121d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1244: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1246: Unknown result type (might be due to invalid IL or missing references)
+			//IL_127f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1292: Unknown result type (might be due to invalid IL or missing references)
+			//IL_12b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_12b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_12db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_12ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1310: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1313: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1333: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1348: Unknown result type (might be due to invalid IL or missing references)
+			//IL_136f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1371: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1393: Unknown result type (might be due to invalid IL or missing references)
+			//IL_13c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_13dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1403: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1406: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1427: Unknown result type (might be due to invalid IL or missing references)
+			//IL_142c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_143b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_144e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_1470: Unknown result type (might be due to invalid IL or missing references)
 			//IL_1473: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1483: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1485: Unknown result type (might be due to invalid IL or missing references)
-			//IL_14b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_14b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_14c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1482: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1484: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1497: Unknown result type (might be due to invalid IL or missing references)
+			//IL_14ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_14d3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_14d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_14d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_14f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1509: Unknown result type (might be due to invalid IL or missing references)
-			//IL_152c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_152f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1501: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1516: Unknown result type (might be due to invalid IL or missing references)
+			//IL_153d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_153f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1541: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1569: Unknown result type (might be due to invalid IL or missing references)
-			//IL_156e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_158e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_15ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1602: Unknown result type (might be due to invalid IL or missing references)
-			//IL_162a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_162d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_157a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_158f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_15b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_15b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_15fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1613: Unknown result type (might be due to invalid IL or missing references)
+			//IL_163a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_163d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_163f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1681: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1686: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1696: Unknown result type (might be due to invalid IL or missing references)
-			//IL_16a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_16a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1666: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1687: Unknown result type (might be due to invalid IL or missing references)
+			//IL_169a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_16bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_16d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_16f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_16f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1706: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1708: Unknown result type (might be due to invalid IL or missing references)
+			//IL_16bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_16e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_16e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_16f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1707: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1729: Unknown result type (might be due to invalid IL or missing references)
+			//IL_172c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_173b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1751: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1779: Unknown result type (might be due to invalid IL or missing references)
-			//IL_177b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_17d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_17ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_180d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1810: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1866: Unknown result type (might be due to invalid IL or missing references)
-			//IL_186b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_187b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_188c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_188e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_18a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_18b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_18d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_18db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_18eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_18ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1920: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1936: Unknown result type (might be due to invalid IL or missing references)
-			//IL_195e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1960: Unknown result type (might be due to invalid IL or missing references)
-			//IL_19bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_19d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_19f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_19fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1a4a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1a4f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1a5f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_173d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1750: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1765: Unknown result type (might be due to invalid IL or missing references)
+			//IL_178c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_178e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_17c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_17da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1801: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1804: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1845: Unknown result type (might be due to invalid IL or missing references)
+			//IL_185a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1881: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1884: Unknown result type (might be due to invalid IL or missing references)
+			//IL_18c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_18da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1901: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1904: Unknown result type (might be due to invalid IL or missing references)
+			//IL_192d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_193f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1947: Unknown result type (might be due to invalid IL or missing references)
+			//IL_194f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1957: Unknown result type (might be due to invalid IL or missing references)
+			//IL_198b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_19a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_19c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_19ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_19eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_19f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_19ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1a12: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1a34: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1a37: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1a46: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1a48: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1a5b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_1a70: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1a72: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1a8e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1aa2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1ac5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1ac8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1ad8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1ada: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1b0d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1b23: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1b4b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1b4d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1bb2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1bc6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1be9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1bec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1c42: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1c47: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1a97: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1a99: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1ad0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1ae5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1b0c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1b0f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1b50: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1b65: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1b8c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1b8f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1bd0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1be5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1c0c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1c0f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1c38: Unknown result type (might be due to invalid IL or missing references)
 			//IL_1c57: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1c68: Unknown result type (might be due to invalid IL or missing references)
 			//IL_1c6a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1c7d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1c91: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1cb4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1cb7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1cc7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1cc9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1cfc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1d12: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1d3a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1d3c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1d8a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1c8c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1c8f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1caf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1cc4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1ceb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1ced: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1d26: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1d3b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1d62: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1d65: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1d89: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1d9c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_1dbe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1dd4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1dfc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1dff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1e55: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1e5a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1e6a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1e7b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1e7d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1e8d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1e92: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1ea1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1eb5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1ed8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1edb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1eeb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1eed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1f20: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1f36: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1f5e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1f61: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1fad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1fc3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1feb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1fed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_204f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_208d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2090: Unknown result type (might be due to invalid IL or missing references)
-			//IL_20fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2112: Unknown result type (might be due to invalid IL or missing references)
-			//IL_213a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_213d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_218b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1dc1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1de1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1df6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1e1d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1e1f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1e58: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1e6d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1e94: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1e97: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1ebb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1ece: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1ef0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1ef3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1f13: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1f28: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1f4f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1f51: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1f8a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1f9f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1fc6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1fc9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1fef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2027: Unknown result type (might be due to invalid IL or missing references)
+			//IL_204b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_205e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2080: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_20a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_20b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_20df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_20e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2103: Unknown result type (might be due to invalid IL or missing references)
+			//IL_211a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_212f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2156: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2159: Unknown result type (might be due to invalid IL or missing references)
+			//IL_217d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_2190: Unknown result type (might be due to invalid IL or missing references)
-			//IL_21a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_21b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_21b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_21d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_21e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2207: Unknown result type (might be due to invalid IL or missing references)
-			//IL_220a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_221a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_221c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2244: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2249: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2269: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2284: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2289: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2298: Unknown result type (might be due to invalid IL or missing references)
-			//IL_22ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_22cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_22d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_22e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_22e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2317: Unknown result type (might be due to invalid IL or missing references)
-			//IL_232d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2355: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2357: Unknown result type (might be due to invalid IL or missing references)
-			//IL_23b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_23cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_23f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_23f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_245e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2474: Unknown result type (might be due to invalid IL or missing references)
-			//IL_249c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_249f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2507: Unknown result type (might be due to invalid IL or missing references)
-			//IL_251d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2545: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2548: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2591: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2596: Unknown result type (might be due to invalid IL or missing references)
-			//IL_25a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_25b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_25b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_25c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_25cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_25d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_25df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2613: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2629: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2651: Unknown result type (might be due to invalid IL or missing references)
+			//IL_21b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_21b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_21d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_21ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2211: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2213: Unknown result type (might be due to invalid IL or missing references)
+			//IL_224c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2261: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2288: Unknown result type (might be due to invalid IL or missing references)
+			//IL_228b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_22da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_22ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_22fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_231e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2321: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2343: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2358: Unknown result type (might be due to invalid IL or missing references)
+			//IL_236d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_238e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2390: Unknown result type (might be due to invalid IL or missing references)
+			//IL_23b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_23c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_23dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_23fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2400: Unknown result type (might be due to invalid IL or missing references)
+			//IL_243a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_244d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_245d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_247e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2481: Unknown result type (might be due to invalid IL or missing references)
+			//IL_24a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_24b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_24cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_24ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_24f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2512: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2527: Unknown result type (might be due to invalid IL or missing references)
+			//IL_253c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_255d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2560: Unknown result type (might be due to invalid IL or missing references)
+			//IL_259e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_25b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_25c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_25e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_25e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2607: Unknown result type (might be due to invalid IL or missing references)
+			//IL_261c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2631: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2652: Unknown result type (might be due to invalid IL or missing references)
 			//IL_2654: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2664: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2666: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2676: Unknown result type (might be due to invalid IL or missing references)
+			//IL_268b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_26a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_26a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_26b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_26c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_26c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_26e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_26e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_26f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2708: Unknown result type (might be due to invalid IL or missing references)
-			//IL_272b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_272e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_273e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2740: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2773: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2789: Unknown result type (might be due to invalid IL or missing references)
-			//IL_27b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_27b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2811: Unknown result type (might be due to invalid IL or missing references)
+			//IL_26c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_26c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2701: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2714: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2724: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2745: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2748: Unknown result type (might be due to invalid IL or missing references)
+			//IL_276a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_277f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2794: Unknown result type (might be due to invalid IL or missing references)
+			//IL_27b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_27b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_27d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_27ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2803: Unknown result type (might be due to invalid IL or missing references)
+			//IL_2824: Unknown result type (might be due to invalid IL or missing references)
 			//IL_2827: Unknown result type (might be due to invalid IL or missing references)
-			//IL_284f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2852: Unknown result type (might be due to invalid IL or missing references)
-			//IL_28ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_28d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_28f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_28fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2963: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2979: Unknown result type (might be due to invalid IL or missing references)
-			//IL_29a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_29a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_29f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_29f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2a07: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2a18: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2a1a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2a35: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2a49: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2a6c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2a6f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2a7f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2a81: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2ab4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2aca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2af2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2af4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2b59: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2b6f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2b97: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2b9a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2be8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2bed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2bfd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2c0e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2c10: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2c2b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2c3f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2c62: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2c65: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2c75: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2c77: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2caa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2cc0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2ce8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2cea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2d4f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2d65: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2d8d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2d90: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2dde: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2de3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2df3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2e04: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2e06: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2e21: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2e35: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2e58: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2e5b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2e6b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2e6d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2ea0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2eb6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2ede: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2ee0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2f45: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2f5b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2f83: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2f86: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2fd4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2fd9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2fe9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2ffa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_2ffc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_302d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_308d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3092: Unknown result type (might be due to invalid IL or missing references)
-			//IL_30b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_30d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_30e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3107: Unknown result type (might be due to invalid IL or missing references)
-			//IL_310a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_311a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_311c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_314f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3165: Unknown result type (might be due to invalid IL or missing references)
-			//IL_318d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_318f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_31dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_31f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_320a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3232: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3235: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3283: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3288: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3298: Unknown result type (might be due to invalid IL or missing references)
-			//IL_32a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_32ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_32c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_32da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_32fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3300: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3310: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3312: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3345: Unknown result type (might be due to invalid IL or missing references)
-			//IL_335b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3383: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3385: Unknown result type (might be due to invalid IL or missing references)
-			//IL_33ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3400: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3428: Unknown result type (might be due to invalid IL or missing references)
-			//IL_342b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3479: Unknown result type (might be due to invalid IL or missing references)
-			//IL_347e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_348e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_349f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_34a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_34d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_34ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_34fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3520: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3523: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3533: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3535: Unknown result type (might be due to invalid IL or missing references)
-			//IL_355a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3570: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3585: Unknown result type (might be due to invalid IL or missing references)
-			//IL_35a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_35aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3600: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3616: Unknown result type (might be due to invalid IL or missing references)
-			//IL_362b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_364e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3651: Unknown result type (might be due to invalid IL or missing references)
-			//IL_36ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_36b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_36d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_36e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_36e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3716: Unknown result type (might be due to invalid IL or missing references)
-			//IL_372a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_373a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_375d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3760: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3770: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3772: Unknown result type (might be due to invalid IL or missing references)
-			//IL_37a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_37bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_37d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_37f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_37f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_384d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3863: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3878: Unknown result type (might be due to invalid IL or missing references)
-			//IL_389b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_389e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_38fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_38ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_391f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3930: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3932: Unknown result type (might be due to invalid IL or missing references)
-			//IL_396d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3981: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3991: Unknown result type (might be due to invalid IL or missing references)
-			//IL_39b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_39b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_39c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_39c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_39fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3a14: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3a29: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3a4c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3a4e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3aa4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3aba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3acf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3af2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3af5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3b51: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3b56: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3b76: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3b87: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3b89: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3bbd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3bd1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3be1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3c04: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3c07: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3c17: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3c19: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3c4e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3c64: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3c79: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3c9c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3c9e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3cf4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3d0a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3d1f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3d42: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3d45: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3da1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3da6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3dc6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3dd7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_3dd9: Unknown result type (might be due to invalid IL or missing references)
-			if (!GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() || !GameService.Gw2Mumble.get_IsAvailable() || !GameService.GameIntegration.get_Gw2Instance().get_IsInGame())
+			if (GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() && GameService.Gw2Mumble.get_IsAvailable() && GameService.GameIntegration.get_Gw2Instance().get_IsInGame())
 			{
-				return;
-			}
-			bool togglePressed = PInvoke.IsLControlPressed();
-			int calcTopMargin = 5;
-			int calcLeftMargin = 10;
-			string text = GameService.Gw2Mumble.get_RawClient().get_Name() + "  ";
-			int width = (int)_font.MeasureString(text).Width;
-			int height = (int)_font.MeasureString(text).Height;
-			Rectangle rect = default(Rectangle);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _brown, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			Rectangle infoBounds = rect;
-			_gameInfo.Item1 = text;
-			string focusedSingleInfo = text;
-			calcLeftMargin += width;
-			text = $"({GameService.Gw2Mumble.get_Info().get_BuildId()})/";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _green, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_gameInfo.Item1 += text;
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = $"(Mumble Link v{GameService.Gw2Mumble.get_Info().get_Version()})";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _green, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			ref string item = ref _gameInfo.Item1;
-			item = item + text + "\n";
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			focusedSingleInfo = focusedSingleInfo + text + "\n";
-			if (Control.get_Input().get_Mouse().get_Position()
-				.IsInBounds(infoBounds))
-			{
-				DrawBorder(spriteBatch, infoBounds);
-				_currentSingleInfo = focusedSingleInfo;
-				_currentFocusBounds = infoBounds;
-			}
-			calcTopMargin += height;
-			calcLeftMargin = 10;
-			text = GameService.Gw2Mumble.get_Info().get_ServerAddress() ?? "";
-			width = (int)_font.MeasureString(text).Width;
-			height = (int)_font.MeasureString(text).Height;
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _grey, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			infoBounds = rect;
-			focusedSingleInfo = text;
-			calcLeftMargin += width;
-			text = ":";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = $"{GameService.Gw2Mumble.get_Info().get_ServerPort()}  ";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _grey, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = $"- {GameService.Gw2Mumble.get_Info().get_ShardId()}  ";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _grey, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = $"({GameService.Gw2Mumble.get_RawClient().get_Instance()})";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _grey, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			focusedSingleInfo = focusedSingleInfo + text + "\n";
-			if (Control.get_Input().get_Mouse().get_Position()
-				.IsInBounds(infoBounds))
-			{
-				DrawBorder(spriteBatch, infoBounds);
-				_currentSingleInfo = focusedSingleInfo;
-				_currentFocusBounds = infoBounds;
-			}
-			calcTopMargin += height * 2;
-			calcLeftMargin = 10;
-			text = "Avatar";
-			width = (int)_font.MeasureString(text).Width;
-			height = (int)_font.MeasureString(text).Height;
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _red, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			infoBounds = rect;
-			_avatarInfo.Item1 = text + "\n";
-			_avatarInfo.Item2 = Control.get_Input().get_Mouse().get_Position()
-				.IsInBounds(infoBounds);
-			if (_avatarInfo.Item2)
-			{
-				DrawBorder(spriteBatch, infoBounds);
-			}
-			calcTopMargin += height;
-			calcLeftMargin = 30;
-			text = $"{GameService.Gw2Mumble.get_PlayerCharacter().get_Name()} - {GameService.Gw2Mumble.get_PlayerCharacter().get_Race()}";
-			width = (int)_font.MeasureString(text).Width;
-			height = (int)_font.MeasureString(text).Height;
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _softRed, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			infoBounds = rect;
-			ref string item2 = ref _avatarInfo.Item1;
-			item2 = item2 + new string(' ', 4) + text;
-			focusedSingleInfo = text;
-			calcLeftMargin += width;
-			text = $"  ({GameService.Gw2Mumble.get_PlayerCharacter().get_TeamColorId()})";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _softYellow, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			ref string item3 = ref _avatarInfo.Item1;
-			item3 = item3 + text + "\n";
-			focusedSingleInfo = focusedSingleInfo + text + "\n";
-			if (Control.get_Input().get_Mouse().get_Position()
-				.IsInBounds(infoBounds))
-			{
-				DrawBorder(spriteBatch, infoBounds);
-				_currentSingleInfo = focusedSingleInfo;
-				_currentFocusBounds = infoBounds;
-			}
-			calcTopMargin += height;
-			calcLeftMargin = 30;
-			text = "Profession";
-			width = (int)_font.MeasureString(text).Width;
-			height = (int)_font.MeasureString(text).Height;
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _red, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			infoBounds = rect;
-			ref string item4 = ref _avatarInfo.Item1;
-			item4 = item4 + new string(' ', 4) + text;
-			focusedSingleInfo = text;
-			calcLeftMargin += width;
-			text = ":  ";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_avatarInfo.Item1 += text;
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = $"{GameService.Gw2Mumble.get_PlayerCharacter().get_Profession()}";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _yellow, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			ref string item5 = ref _avatarInfo.Item1;
-			item5 = item5 + text + "\n";
-			focusedSingleInfo += text;
-			if (Control.get_Input().get_Mouse().get_Position()
-				.IsInBounds(infoBounds))
-			{
-				DrawBorder(spriteBatch, infoBounds);
-				_currentSingleInfo = focusedSingleInfo;
-				_currentFocusBounds = infoBounds;
-			}
-			if (_currentSpec != null && _currentSpec.get_Elite() && _currentSpec.get_Id() == GameService.Gw2Mumble.get_PlayerCharacter().get_Specialization())
-			{
+				int calcTopMargin = 5;
+				int calcLeftMargin = 10;
+				string text = GameService.Gw2Mumble.get_RawClient().get_Name() + "  ";
+				int width = (int)_font.MeasureString(text).Width;
+				int height = (int)_font.MeasureString(text).Height;
+				Rectangle rect = default(Rectangle);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _brown, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcLeftMargin += width;
+				text = $"({GameService.Gw2Mumble.get_Info().get_BuildId()})/";
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _green, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcLeftMargin += width;
+				text = $"(Mumble Link v{GameService.Gw2Mumble.get_Info().get_Version()})";
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _green, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
 				calcTopMargin += height;
-				calcLeftMargin = 30;
-				text = "Elite";
+				calcLeftMargin = 10;
+				text = GameService.Gw2Mumble.get_Info().get_ServerAddress() ?? "";
 				width = (int)_font.MeasureString(text).Width;
 				height = (int)_font.MeasureString(text).Height;
 				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _red, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-				infoBounds = rect;
-				ref string item6 = ref _avatarInfo.Item1;
-				item6 = item6 + new string(' ', 4) + text;
-				focusedSingleInfo = text;
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _grey, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcLeftMargin += width;
+				text = ":";
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcLeftMargin += width;
+				text = $"{GameService.Gw2Mumble.get_Info().get_ServerPort()}  ";
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _grey, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcLeftMargin += width;
+				text = $"- {GameService.Gw2Mumble.get_Info().get_ShardId()}  ";
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _grey, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcLeftMargin += width;
+				text = $"({GameService.Gw2Mumble.get_RawClient().get_Instance()})";
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _grey, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcTopMargin += height * 2;
+				calcLeftMargin = 10;
+				text = "Avatar";
+				width = (int)_font.MeasureString(text).Width;
+				height = (int)_font.MeasureString(text).Height;
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _red, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcTopMargin += height;
+				calcLeftMargin = 30;
+				text = $"{GameService.Gw2Mumble.get_PlayerCharacter().get_Name()} - {GameService.Gw2Mumble.get_PlayerCharacter().get_Race()}";
+				width = (int)_font.MeasureString(text).Width;
+				height = (int)_font.MeasureString(text).Height;
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _softRed, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcLeftMargin += width;
+				text = $"  ({GameService.Gw2Mumble.get_PlayerCharacter().get_TeamColorId()})";
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _softYellow, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcTopMargin += height;
+				calcLeftMargin = 30;
+				text = "Profession";
+				width = (int)_font.MeasureString(text).Width;
+				height = (int)_font.MeasureString(text).Height;
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _red, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
 				calcLeftMargin += width;
 				text = ":  ";
 				width = (int)_font.MeasureString(text).Width;
 				height = Math.Max(height, (int)_font.MeasureString(text).Height);
 				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-				RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-				_avatarInfo.Item1 += text;
-				focusedSingleInfo += text;
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
 				calcLeftMargin += width;
-				text = _currentSpec.get_Name() ?? "";
+				text = $"{GameService.Gw2Mumble.get_PlayerCharacter().get_Profession()}";
 				width = (int)_font.MeasureString(text).Width;
 				height = Math.Max(height, (int)_font.MeasureString(text).Height);
 				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _yellow, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-				RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-				_avatarInfo.Item1 += text;
-				focusedSingleInfo += text;
-				calcLeftMargin += width;
-				text = $"  ({_currentSpec.get_Id()})";
-				width = (int)_font.MeasureString(text).Width;
-				height = Math.Max(height, (int)_font.MeasureString(text).Height);
-				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _softYellow, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-				RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-				ref string item7 = ref _avatarInfo.Item1;
-				item7 = item7 + text + "\n";
-				focusedSingleInfo += text;
-				if (Control.get_Input().get_Mouse().get_Position()
-					.IsInBounds(infoBounds))
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _yellow, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				Specialization currentSpec = _currentSpec;
+				if (currentSpec != null && currentSpec.get_Elite() && _currentSpec.get_Id() == GameService.Gw2Mumble.get_PlayerCharacter().get_Specialization())
 				{
-					DrawBorder(spriteBatch, infoBounds);
-					_currentSingleInfo = focusedSingleInfo;
-					_currentFocusBounds = infoBounds;
+					calcTopMargin += height;
+					calcLeftMargin = 30;
+					text = "Elite";
+					width = (int)_font.MeasureString(text).Width;
+					height = (int)_font.MeasureString(text).Height;
+					((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _red, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+					calcLeftMargin += width;
+					text = ":  ";
+					width = (int)_font.MeasureString(text).Width;
+					height = Math.Max(height, (int)_font.MeasureString(text).Height);
+					((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+					calcLeftMargin += width;
+					text = _currentSpec.get_Name() ?? "";
+					width = (int)_font.MeasureString(text).Width;
+					height = Math.Max(height, (int)_font.MeasureString(text).Height);
+					((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _yellow, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+					calcLeftMargin += width;
+					text = $"  ({_currentSpec.get_Id()})";
+					width = (int)_font.MeasureString(text).Width;
+					height = Math.Max(height, (int)_font.MeasureString(text).Height);
+					((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _softYellow, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
 				}
-			}
-			calcTopMargin += height;
-			calcLeftMargin = 30;
-			Vector3 playerPos = GameService.Gw2Mumble.get_PlayerCharacter().get_Position();
-			text = "X";
-			width = (int)_font.MeasureString(text).Width;
-			height = (int)_font.MeasureString(text).Height;
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _red, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			infoBounds = rect;
-			ref string item8 = ref _avatarInfo.Item1;
-			item8 = item8 + new string(' ', 4) + text;
-			focusedSingleInfo = text;
-			calcLeftMargin += width;
-			text = "Y";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _lemonGreen, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_avatarInfo.Item1 += text;
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = "Z";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _cyan, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_avatarInfo.Item1 += text;
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = ":  ";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_avatarInfo.Item1 += text;
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = playerPos.X.ToString(togglePressed ? null : "0.###");
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _red, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_avatarInfo.Item1 += text;
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = "  " + playerPos.Y.ToString(togglePressed ? null : "0.###");
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _lemonGreen, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_avatarInfo.Item1 += text;
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = "  " + playerPos.Z.ToString(togglePressed ? null : "0.###");
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _cyan, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			ref string item9 = ref _avatarInfo.Item1;
-			item9 = item9 + text + "\n";
-			focusedSingleInfo += text;
-			if (Control.get_Input().get_Mouse().get_Position()
-				.IsInBounds(infoBounds))
-			{
-				DrawBorder(spriteBatch, infoBounds);
-				_currentSingleInfo = focusedSingleInfo;
-				_currentFocusBounds = infoBounds;
-			}
-			calcTopMargin += height;
-			calcLeftMargin = 30;
-			Coordinates3 playerFacing = GameService.Gw2Mumble.get_RawClient().get_AvatarFront();
-			text = "Facing";
-			width = (int)_font.MeasureString(text).Width;
-			height = (int)_font.MeasureString(text).Height;
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _red, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			infoBounds = rect;
-			ref string item10 = ref _avatarInfo.Item1;
-			item10 = item10 + new string(' ', 4) + text;
-			focusedSingleInfo = text;
-			calcLeftMargin += width;
-			text = ":  ";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_avatarInfo.Item1 += text;
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = ((Coordinates3)(ref playerFacing)).get_X().ToString(togglePressed ? null : "0.###");
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _red, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_avatarInfo.Item1 += text;
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = "  " + ((Coordinates3)(ref playerFacing)).get_Y().ToString(togglePressed ? null : "0.###");
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _lemonGreen, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_avatarInfo.Item1 += text;
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = "  " + ((Coordinates3)(ref playerFacing)).get_Z().ToString(togglePressed ? null : "0.###");
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _cyan, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			ref string item11 = ref _avatarInfo.Item1;
-			item11 = item11 + text + "\n";
-			focusedSingleInfo += text;
-			if (Control.get_Input().get_Mouse().get_Position()
-				.IsInBounds(infoBounds))
-			{
-				DrawBorder(spriteBatch, infoBounds);
-				_currentSingleInfo = focusedSingleInfo;
-				_currentFocusBounds = infoBounds;
-			}
-			calcTopMargin += height;
-			calcLeftMargin = 30;
-			text = DirectionUtil.IsFacing(playerFacing.SwapYZ()).ToString().SplitAtUpperCase()
-				.Trim();
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _softYellow, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			infoBounds = rect;
-			ref string item12 = ref _avatarInfo.Item1;
-			item12 = item12 + new string(' ', 4) + text;
-			focusedSingleInfo = text;
-			if (Control.get_Input().get_Mouse().get_Position()
-				.IsInBounds(infoBounds))
-			{
-				DrawBorder(spriteBatch, infoBounds);
-				_currentSingleInfo = focusedSingleInfo;
-				_currentFocusBounds = infoBounds;
-			}
-			calcTopMargin += height * 2;
-			calcLeftMargin = 10;
-			text = "Map";
-			width = (int)_font.MeasureString(text).Width;
-			height = (int)_font.MeasureString(text).Height;
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _blue, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			infoBounds = rect;
-			_mapInfo.Item1 = text + "\n";
-			_mapInfo.Item2 = Control.get_Input().get_Mouse().get_Position()
-				.IsInBounds(infoBounds);
-			if (_mapInfo.Item2)
-			{
-				DrawBorder(spriteBatch, infoBounds);
-			}
-			if (_currentMap != null && _currentMap.get_Id() == GameService.Gw2Mumble.get_CurrentMap().get_Id())
-			{
 				calcTopMargin += height;
 				calcLeftMargin = 30;
-				text = _currentMap.get_Name() ?? "";
-				width = (int)_font.MeasureString(text).Width;
-				height = Math.Max(height, (int)_font.MeasureString(text).Height);
-				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _cyan, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-				infoBounds = rect;
-				ref string item13 = ref _mapInfo.Item1;
-				item13 = item13 + new string(' ', 4) + text + "\n";
-				focusedSingleInfo = text + "\n";
-				calcTopMargin += height;
-				calcLeftMargin = 30;
-				if (Control.get_Input().get_Mouse().get_Position()
-					.IsInBounds(infoBounds))
-				{
-					DrawBorder(spriteBatch, infoBounds);
-					_currentSingleInfo = focusedSingleInfo;
-					_currentFocusBounds = infoBounds;
-				}
-				text = "Region";
+				Vector3 playerPos = GameService.Gw2Mumble.get_PlayerCharacter().get_Position();
+				text = "X";
 				width = (int)_font.MeasureString(text).Width;
 				height = (int)_font.MeasureString(text).Height;
 				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _blue, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-				infoBounds = rect;
-				ref string item14 = ref _mapInfo.Item1;
-				item14 = item14 + new string(' ', 4) + text;
-				focusedSingleInfo = text;
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _red, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				Rectangle infoBounds = rect;
+				calcLeftMargin += width;
+				text = "Y";
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _lemonGreen, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
+				calcLeftMargin += width;
+				text = "Z";
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _cyan, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
 				calcLeftMargin += width;
 				text = ":  ";
 				width = (int)_font.MeasureString(text).Width;
 				height = Math.Max(height, (int)_font.MeasureString(text).Height);
 				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
 				RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-				_mapInfo.Item1 += text;
-				focusedSingleInfo += text;
 				calcLeftMargin += width;
-				text = _currentMap.get_RegionName() ?? "";
+				text = playerPos.X.ToString("0.###");
 				width = (int)_font.MeasureString(text).Width;
-				height = (int)_font.MeasureString(text).Height;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
 				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _cyan, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _red, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
 				RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-				ref string item15 = ref _mapInfo.Item1;
-				item15 = item15 + text + "\n";
-				focusedSingleInfo = focusedSingleInfo + text + "\n";
+				calcLeftMargin += width;
+				text = "  " + playerPos.Y.ToString("0.###");
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _lemonGreen, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
+				calcLeftMargin += width;
+				text = "  " + playerPos.Z.ToString("0.###");
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _cyan, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				RectangleExtensions.Union(ref rect, ref infoBounds, out _avatarPositionBounds);
+				if (_mouseOverAvatarPosition)
+				{
+					DrawBorder(spriteBatch, _avatarPositionBounds);
+				}
 				calcTopMargin += height;
 				calcLeftMargin = 30;
-				if (Control.get_Input().get_Mouse().get_Position()
-					.IsInBounds(infoBounds))
-				{
-					DrawBorder(spriteBatch, infoBounds);
-					_currentSingleInfo = focusedSingleInfo;
-					_currentFocusBounds = infoBounds;
-				}
-				text = "Continent";
+				Coordinates3 playerFacing = GameService.Gw2Mumble.get_RawClient().get_AvatarFront();
+				text = "Facing";
 				width = (int)_font.MeasureString(text).Width;
 				height = (int)_font.MeasureString(text).Height;
 				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _blue, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _red, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
 				infoBounds = rect;
-				ref string item16 = ref _mapInfo.Item1;
-				item16 = item16 + new string(' ', 4) + text;
-				focusedSingleInfo = text;
 				calcLeftMargin += width;
 				text = ":  ";
 				width = (int)_font.MeasureString(text).Width;
 				height = Math.Max(height, (int)_font.MeasureString(text).Height);
 				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
 				RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-				_mapInfo.Item1 += text;
-				focusedSingleInfo += text;
 				calcLeftMargin += width;
-				text = _currentMap.get_ContinentName() ?? "";
+				text = ((Coordinates3)(ref playerFacing)).get_X().ToString("0.###");
 				width = (int)_font.MeasureString(text).Width;
 				height = Math.Max(height, (int)_font.MeasureString(text).Height);
 				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _cyan, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _red, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
 				RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-				ref string item17 = ref _mapInfo.Item1;
-				item17 = item17 + text + "\n";
-				focusedSingleInfo = focusedSingleInfo + text + "\n";
-				if (Control.get_Input().get_Mouse().get_Position()
-					.IsInBounds(infoBounds))
+				calcLeftMargin += width;
+				text = "  " + ((Coordinates3)(ref playerFacing)).get_Y().ToString("0.###");
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _lemonGreen, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
+				calcLeftMargin += width;
+				text = "  " + ((Coordinates3)(ref playerFacing)).get_Z().ToString("0.###");
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _cyan, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				RectangleExtensions.Union(ref rect, ref infoBounds, out _avatarFacingBounds);
+				if (_mouseOverAvatarFacing)
 				{
-					DrawBorder(spriteBatch, infoBounds);
-					_currentSingleInfo = focusedSingleInfo;
-					_currentFocusBounds = infoBounds;
+					DrawBorder(spriteBatch, _avatarFacingBounds);
 				}
-			}
-			calcTopMargin += height;
-			calcLeftMargin = 30;
-			text = "Id";
-			width = (int)_font.MeasureString(text).Width;
-			height = (int)_font.MeasureString(text).Height;
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _blue, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			infoBounds = rect;
-			ref string item18 = ref _mapInfo.Item1;
-			item18 = item18 + new string(' ', 4) + text;
-			focusedSingleInfo = text;
-			calcLeftMargin += width;
-			text = ":  ";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_mapInfo.Item1 += text;
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = $"{GameService.Gw2Mumble.get_CurrentMap().get_Id()}";
-			width = (int)_font.MeasureString(text).Width;
-			height = (int)_font.MeasureString(text).Height;
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _yellow, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			ref string item19 = ref _mapInfo.Item1;
-			item19 = item19 + text + "\n";
-			focusedSingleInfo = focusedSingleInfo + text + "\n";
-			calcTopMargin += height;
-			calcLeftMargin = 30;
-			if (Control.get_Input().get_Mouse().get_Position()
-				.IsInBounds(infoBounds))
-			{
-				DrawBorder(spriteBatch, infoBounds);
-				_currentSingleInfo = focusedSingleInfo;
-				_currentFocusBounds = infoBounds;
-			}
-			text = "Type";
-			width = (int)_font.MeasureString(text).Width;
-			height = (int)_font.MeasureString(text).Height;
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _blue, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			infoBounds = rect;
-			ref string item20 = ref _mapInfo.Item1;
-			item20 = item20 + new string(' ', 4) + text;
-			focusedSingleInfo = text;
-			calcLeftMargin += width;
-			text = ":  ";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_mapInfo.Item1 += text;
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = string.Format("{0} ({1})", GameService.Gw2Mumble.get_CurrentMap().get_Type(), GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode() ? "PvP" : "PvE");
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _cyan, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			ref string item21 = ref _mapInfo.Item1;
-			item21 = item21 + text + "\n";
-			focusedSingleInfo = focusedSingleInfo + text + "\n";
-			calcTopMargin += height;
-			calcLeftMargin = 30;
-			if (Control.get_Input().get_Mouse().get_Position()
-				.IsInBounds(infoBounds))
-			{
-				DrawBorder(spriteBatch, infoBounds);
-				_currentSingleInfo = focusedSingleInfo;
-				_currentFocusBounds = infoBounds;
-			}
-			Coordinates2 playerLocationMap = GameService.Gw2Mumble.get_RawClient().get_PlayerLocationMap();
-			text = "X";
-			width = (int)_font.MeasureString(text).Width;
-			height = (int)_font.MeasureString(text).Height;
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _red, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			infoBounds = rect;
-			ref string item22 = ref _mapInfo.Item1;
-			item22 = item22 + new string(' ', 4) + text;
-			focusedSingleInfo = text;
-			calcLeftMargin += width;
-			text = "Y";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _lemonGreen, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_mapInfo.Item1 += text;
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = ":  ";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_mapInfo.Item1 += text;
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = ((Coordinates2)(ref playerLocationMap)).get_X().ToString(togglePressed ? null : "0.###");
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _red, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_mapInfo.Item1 += text;
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = "  " + ((Coordinates2)(ref playerLocationMap)).get_X().ToString(togglePressed ? null : "0.###");
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _lemonGreen, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			ref string item23 = ref _mapInfo.Item1;
-			item23 = item23 + text + "\n";
-			focusedSingleInfo = focusedSingleInfo + text + "\n";
-			if (Control.get_Input().get_Mouse().get_Position()
-				.IsInBounds(infoBounds))
-			{
-				DrawBorder(spriteBatch, infoBounds);
-				_currentSingleInfo = focusedSingleInfo;
-				_currentFocusBounds = infoBounds;
-			}
-			calcTopMargin += height * 2;
-			calcLeftMargin = 10;
-			text = "Camera";
-			width = (int)_font.MeasureString(text).Width;
-			height = (int)_font.MeasureString(text).Height;
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _green, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			infoBounds = rect;
-			_cameraInfo.Item1 = text + "\n";
-			_cameraInfo.Item2 = Control.get_Input().get_Mouse().get_Position()
-				.IsInBounds(infoBounds);
-			if (_cameraInfo.Item2)
-			{
-				DrawBorder(spriteBatch, infoBounds);
-			}
-			calcTopMargin += height;
-			calcLeftMargin = 30;
-			Vector3 cameraForward = GameService.Gw2Mumble.get_PlayerCamera().get_Forward();
-			text = "Direction";
-			width = (int)_font.MeasureString(text).Width;
-			height = (int)_font.MeasureString(text).Height;
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _green, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			infoBounds = rect;
-			ref string item24 = ref _cameraInfo.Item1;
-			item24 = item24 + new string(' ', 4) + text;
-			focusedSingleInfo = text;
-			calcLeftMargin += width;
-			text = ":  ";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_cameraInfo.Item1 += text;
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = cameraForward.X.ToString(togglePressed ? null : "0.###");
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _red, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_cameraInfo.Item1 += text;
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = "  " + cameraForward.Y.ToString(togglePressed ? null : "0.###");
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _lemonGreen, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_cameraInfo.Item1 += text;
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = "  " + cameraForward.Z.ToString(togglePressed ? null : "0.###");
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _cyan, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			ref string item25 = ref _cameraInfo.Item1;
-			item25 = item25 + text + "\n";
-			focusedSingleInfo += text;
-			if (Control.get_Input().get_Mouse().get_Position()
-				.IsInBounds(infoBounds))
-			{
-				DrawBorder(spriteBatch, infoBounds);
-				_currentSingleInfo = focusedSingleInfo;
-				_currentFocusBounds = infoBounds;
-			}
-			calcTopMargin += height;
-			calcLeftMargin = 30;
-			text = DirectionUtil.IsFacing(new Coordinates3((double)cameraForward.X, (double)cameraForward.Y, (double)cameraForward.Z)).ToString().SplitAtUpperCase()
-				.Trim() ?? "";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _lemonGreen, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			infoBounds = rect;
-			ref string item26 = ref _cameraInfo.Item1;
-			item26 = item26 + new string(' ', 4) + text + "\n";
-			focusedSingleInfo = text + "\n";
-			if (Control.get_Input().get_Mouse().get_Position()
-				.IsInBounds(infoBounds))
-			{
-				DrawBorder(spriteBatch, infoBounds);
-				_currentSingleInfo = focusedSingleInfo;
-				_currentFocusBounds = infoBounds;
-			}
-			calcTopMargin += height;
-			calcLeftMargin = 30;
-			Vector3 cameraPosition = GameService.Gw2Mumble.get_PlayerCamera().get_Position();
-			text = "Position";
-			width = (int)_font.MeasureString(text).Width;
-			height = (int)_font.MeasureString(text).Height;
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _green, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			infoBounds = rect;
-			ref string item27 = ref _cameraInfo.Item1;
-			item27 = item27 + new string(' ', 4) + text;
-			focusedSingleInfo = text;
-			calcLeftMargin += width;
-			text = ":  ";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_cameraInfo.Item1 += text;
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = cameraPosition.X.ToString(togglePressed ? null : "0.###");
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _red, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_cameraInfo.Item1 += text;
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = "  " + cameraPosition.Y.ToString(togglePressed ? null : "0.###");
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _lemonGreen, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_cameraInfo.Item1 += text;
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = "  " + cameraPosition.Z.ToString(togglePressed ? null : "0.###");
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _cyan, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			ref string item28 = ref _cameraInfo.Item1;
-			item28 = item28 + text + "\n";
-			focusedSingleInfo = focusedSingleInfo + text + "\n";
-			if (Control.get_Input().get_Mouse().get_Position()
-				.IsInBounds(infoBounds))
-			{
-				DrawBorder(spriteBatch, infoBounds);
-				_currentSingleInfo = focusedSingleInfo;
-				_currentFocusBounds = infoBounds;
-			}
-			calcTopMargin += height;
-			calcLeftMargin = 30;
-			text = "Field of View";
-			width = (int)_font.MeasureString(text).Width;
-			height = (int)_font.MeasureString(text).Height;
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _green, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			infoBounds = rect;
-			ref string item29 = ref _cameraInfo.Item1;
-			item29 = item29 + new string(' ', 4) + text;
-			focusedSingleInfo = text;
-			calcLeftMargin += width;
-			text = ":  ";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_cameraInfo.Item1 += text;
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = $"{GameService.Gw2Mumble.get_PlayerCamera().get_FieldOfView()}";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _yellow, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			ref string item30 = ref _cameraInfo.Item1;
-			item30 = item30 + text + "\n";
-			focusedSingleInfo = focusedSingleInfo + text + "\n";
-			if (Control.get_Input().get_Mouse().get_Position()
-				.IsInBounds(infoBounds))
-			{
-				DrawBorder(spriteBatch, infoBounds);
-				_currentSingleInfo = focusedSingleInfo;
-				_currentFocusBounds = infoBounds;
-			}
-			calcTopMargin += height;
-			calcLeftMargin = 30;
-			text = "Near Plane Render Distance";
-			width = (int)_font.MeasureString(text).Width;
-			height = (int)_font.MeasureString(text).Height;
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _green, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			infoBounds = rect;
-			focusedSingleInfo = text;
-			ref string item31 = ref _cameraInfo.Item1;
-			item31 = item31 + new string(' ', 4) + text;
-			calcLeftMargin += width;
-			text = ":  ";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_cameraInfo.Item1 += text;
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = $"{GameService.Gw2Mumble.get_PlayerCamera().get_NearPlaneRenderDistance()}";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _yellow, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			ref string item32 = ref _cameraInfo.Item1;
-			item32 = item32 + text + "\n";
-			focusedSingleInfo = focusedSingleInfo + text + "\n";
-			if (Control.get_Input().get_Mouse().get_Position()
-				.IsInBounds(infoBounds))
-			{
-				DrawBorder(spriteBatch, infoBounds);
-				_currentSingleInfo = focusedSingleInfo;
-				_currentFocusBounds = infoBounds;
-			}
-			calcTopMargin += height;
-			calcLeftMargin = 30;
-			text = "Far Plane Render Distance";
-			width = (int)_font.MeasureString(text).Width;
-			height = (int)_font.MeasureString(text).Height;
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _green, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			infoBounds = rect;
-			focusedSingleInfo = text;
-			ref string item33 = ref _cameraInfo.Item1;
-			item33 = item33 + new string(' ', 4) + text;
-			calcLeftMargin += width;
-			text = ":  ";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_cameraInfo.Item1 += text;
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = $"{GameService.Gw2Mumble.get_PlayerCamera().get_FarPlaneRenderDistance()}";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _yellow, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			ref string item34 = ref _cameraInfo.Item1;
-			item34 = item34 + text + "\n";
-			focusedSingleInfo = focusedSingleInfo + text + "\n";
-			if (Control.get_Input().get_Mouse().get_Position()
-				.IsInBounds(infoBounds))
-			{
-				DrawBorder(spriteBatch, infoBounds);
-				_currentSingleInfo = focusedSingleInfo;
-				_currentFocusBounds = infoBounds;
-			}
-			calcTopMargin += height * 2;
-			calcLeftMargin = 10;
-			text = "User Interface";
-			width = (int)_font.MeasureString(text).Width;
-			height = (int)_font.MeasureString(text).Height;
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _orange, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			infoBounds = rect;
-			_userInterfaceInfo.Item1 = text + "\n";
-			_userInterfaceInfo.Item2 = Control.get_Input().get_Mouse().get_Position()
-				.IsInBounds(infoBounds);
-			if (_userInterfaceInfo.Item2)
-			{
-				DrawBorder(spriteBatch, infoBounds);
-			}
-			calcTopMargin += height;
-			calcLeftMargin = 30;
-			text = "Size";
-			width = (int)_font.MeasureString(text).Width;
-			height = (int)_font.MeasureString(text).Height;
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _orange, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			infoBounds = rect;
-			ref string item35 = ref _userInterfaceInfo.Item1;
-			item35 = item35 + new string(' ', 4) + text;
-			focusedSingleInfo = text;
-			calcLeftMargin += width;
-			text = ":  ";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_userInterfaceInfo.Item1 += text;
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = $"{GameService.Gw2Mumble.get_UI().get_UISize()}";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _yellow, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			ref string item36 = ref _userInterfaceInfo.Item1;
-			item36 = item36 + text + "\n";
-			focusedSingleInfo = focusedSingleInfo + text + "\n";
-			if (Control.get_Input().get_Mouse().get_Position()
-				.IsInBounds(infoBounds))
-			{
-				DrawBorder(spriteBatch, infoBounds);
-				_currentSingleInfo = focusedSingleInfo;
-				_currentFocusBounds = infoBounds;
-			}
-			calcTopMargin += height;
-			calcLeftMargin = 30;
-			text = "Text Input Focused";
-			width = (int)_font.MeasureString(text).Width;
-			height = (int)_font.MeasureString(text).Height;
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _orange, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			infoBounds = rect;
-			ref string item37 = ref _userInterfaceInfo.Item1;
-			item37 = item37 + new string(' ', 4) + text;
-			focusedSingleInfo = text;
-			calcLeftMargin += width;
-			text = ":  ";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_userInterfaceInfo.Item1 += text;
-			focusedSingleInfo += text;
-			calcLeftMargin += width;
-			text = $"{GameService.Gw2Mumble.get_UI().get_IsTextInputFocused()}";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _yellow, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			ref string item38 = ref _userInterfaceInfo.Item1;
-			item38 = item38 + text + "\n";
-			focusedSingleInfo = focusedSingleInfo + text + "\n";
-			if (Control.get_Input().get_Mouse().get_Position()
-				.IsInBounds(infoBounds))
-			{
-				DrawBorder(spriteBatch, infoBounds);
-				_currentSingleInfo = focusedSingleInfo;
-				_currentFocusBounds = infoBounds;
-			}
-			calcTopMargin = 5;
-			int calcRightMargin = 10;
-			text = _memoryUsage.ToString(togglePressed ? null : "0.###") + " MB";
-			width = (int)_font.MeasureString(text).Width;
-			height = (int)_font.MeasureString(text).Height;
-			((Rectangle)(ref rect))._002Ector(((Control)this).get_Size().X - width - calcRightMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _cyan, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			infoBounds = rect;
-			_computerInfo.Item1 = text;
-			focusedSingleInfo = text;
-			calcRightMargin += width;
-			text = ":  ";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(((Control)this).get_Size().X - width - calcRightMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_computerInfo.Item1 = text + _computerInfo.Item1;
-			focusedSingleInfo = text + focusedSingleInfo;
-			calcRightMargin += width;
-			text = "Memory Usage";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(((Control)this).get_Size().X - width - calcRightMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _orange, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_computerInfo.Item1 = "\n" + text + _computerInfo.Item1;
-			focusedSingleInfo = text + focusedSingleInfo + "\n";
-			_computerInfo.Item2 = Control.get_Input().get_Mouse().get_Position()
-				.IsInBounds(infoBounds);
-			if (_computerInfo.Item2)
-			{
-				DrawBorder(spriteBatch, infoBounds);
-				_currentSingleInfo = focusedSingleInfo;
-				_currentFocusBounds = infoBounds;
-			}
-			calcTopMargin += height;
-			calcRightMargin = 10;
-			text = $"{Environment.ProcessorCount}x {_cpuName}";
-			width = (int)_font.MeasureString(text).Width;
-			height = (int)_font.MeasureString(text).Height;
-			((Rectangle)(ref rect))._002Ector(((Control)this).get_Size().X - width - calcRightMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _cyan, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			infoBounds = rect;
-			_computerInfo.Item1 = text + _computerInfo.Item1;
-			focusedSingleInfo = text;
-			calcRightMargin += width;
-			text = ":  ";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(((Control)this).get_Size().X - width - calcRightMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_computerInfo.Item1 = text + _computerInfo.Item1;
-			focusedSingleInfo = text + focusedSingleInfo;
-			calcRightMargin += width;
-			text = "CPU";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(((Control)this).get_Size().X - width - calcRightMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _orange, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_computerInfo.Item1 = "\n" + text + _computerInfo.Item1;
-			focusedSingleInfo = text + focusedSingleInfo + "\n";
-			_computerInfo.Item2 = Control.get_Input().get_Mouse().get_Position()
-				.IsInBounds(infoBounds);
-			if (_computerInfo.Item2)
-			{
-				DrawBorder(spriteBatch, infoBounds);
-				_currentSingleInfo = focusedSingleInfo;
-				_currentFocusBounds = infoBounds;
-			}
-			calcTopMargin += height;
-			calcRightMargin = 10;
-			text = _cpuUsage.ToString(togglePressed ? null : "0.###") + "%";
-			width = (int)_font.MeasureString(text).Width;
-			height = (int)_font.MeasureString(text).Height;
-			((Rectangle)(ref rect))._002Ector(((Control)this).get_Size().X - width - calcRightMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _cyan, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			infoBounds = rect;
-			_computerInfo.Item1 = text + _computerInfo.Item1;
-			focusedSingleInfo = text;
-			calcRightMargin += width;
-			text = ":  ";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(((Control)this).get_Size().X - width - calcRightMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_computerInfo.Item1 = text + _computerInfo.Item1;
-			focusedSingleInfo = text + focusedSingleInfo;
-			calcRightMargin += width;
-			text = "CPU Usage";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(((Control)this).get_Size().X - width - calcRightMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _orange, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_computerInfo.Item1 = "\n" + text + _computerInfo.Item1;
-			focusedSingleInfo = text + focusedSingleInfo + "\n";
-			_computerInfo.Item2 = Control.get_Input().get_Mouse().get_Position()
-				.IsInBounds(infoBounds);
-			if (_computerInfo.Item2)
-			{
-				DrawBorder(spriteBatch, infoBounds);
-				_currentSingleInfo = focusedSingleInfo;
-				_currentFocusBounds = infoBounds;
-			}
-			calcTopMargin += height;
-			calcRightMargin = 10;
-			text = Control.get_Graphics().get_GraphicsDevice().get_Adapter()
-				.get_Description() ?? "";
-			width = (int)_font.MeasureString(text).Width;
-			height = (int)_font.MeasureString(text).Height;
-			((Rectangle)(ref rect))._002Ector(((Control)this).get_Size().X - width - calcRightMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _cyan, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			infoBounds = rect;
-			_computerInfo.Item1 = text + _computerInfo.Item1;
-			focusedSingleInfo = text;
-			calcRightMargin += width;
-			text = ":  ";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(((Control)this).get_Size().X - width - calcRightMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_computerInfo.Item1 = text + _computerInfo.Item1;
-			focusedSingleInfo = text + focusedSingleInfo;
-			calcRightMargin += width;
-			text = "GPU";
-			width = (int)_font.MeasureString(text).Width;
-			height = Math.Max(height, (int)_font.MeasureString(text).Height);
-			((Rectangle)(ref rect))._002Ector(((Control)this).get_Size().X - width - calcRightMargin, calcTopMargin, width, height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _orange, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
-			RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
-			_computerInfo.Item1 = "\n" + text + _computerInfo.Item1;
-			focusedSingleInfo = text + focusedSingleInfo + "\n";
-			_computerInfo.Item2 = Control.get_Input().get_Mouse().get_Position()
-				.IsInBounds(infoBounds);
-			if (_computerInfo.Item2)
-			{
-				DrawBorder(spriteBatch, infoBounds);
-				_currentSingleInfo = focusedSingleInfo;
-				_currentFocusBounds = infoBounds;
+				calcTopMargin += height;
+				calcLeftMargin = 30;
+				text = DirectionUtil.IsFacing(playerFacing.SwapYZ()).ToString().SplitAtUpperCase()
+					.Trim();
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _softYellow, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcTopMargin += height * 2;
+				calcLeftMargin = 10;
+				text = "Map";
+				width = (int)_font.MeasureString(text).Width;
+				height = (int)_font.MeasureString(text).Height;
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _blue, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				if (_currentMap != null && _currentMap.get_Id() == GameService.Gw2Mumble.get_CurrentMap().get_Id())
+				{
+					calcTopMargin += height;
+					calcLeftMargin = 30;
+					text = _currentMap.get_Name() ?? "";
+					width = (int)_font.MeasureString(text).Width;
+					height = Math.Max(height, (int)_font.MeasureString(text).Height);
+					((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _cyan, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+					calcTopMargin += height;
+					calcLeftMargin = 30;
+					text = "Region";
+					width = (int)_font.MeasureString(text).Width;
+					height = (int)_font.MeasureString(text).Height;
+					((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _blue, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+					calcLeftMargin += width;
+					text = ":  ";
+					width = (int)_font.MeasureString(text).Width;
+					height = Math.Max(height, (int)_font.MeasureString(text).Height);
+					((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+					calcLeftMargin += width;
+					text = _currentMap.get_RegionName() ?? "";
+					width = (int)_font.MeasureString(text).Width;
+					height = (int)_font.MeasureString(text).Height;
+					((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _cyan, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+					calcTopMargin += height;
+					calcLeftMargin = 30;
+					text = "Continent";
+					width = (int)_font.MeasureString(text).Width;
+					height = (int)_font.MeasureString(text).Height;
+					((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _blue, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+					calcLeftMargin += width;
+					text = ":  ";
+					width = (int)_font.MeasureString(text).Width;
+					height = Math.Max(height, (int)_font.MeasureString(text).Height);
+					((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+					calcLeftMargin += width;
+					text = _currentMap.get_ContinentName() ?? "";
+					width = (int)_font.MeasureString(text).Width;
+					height = Math.Max(height, (int)_font.MeasureString(text).Height);
+					((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _cyan, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				}
+				calcTopMargin += height;
+				calcLeftMargin = 30;
+				text = "Id";
+				width = (int)_font.MeasureString(text).Width;
+				height = (int)_font.MeasureString(text).Height;
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _blue, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcLeftMargin += width;
+				text = ":  ";
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcLeftMargin += width;
+				text = $"{GameService.Gw2Mumble.get_CurrentMap().get_Id()}";
+				width = (int)_font.MeasureString(text).Width;
+				height = (int)_font.MeasureString(text).Height;
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _yellow, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcTopMargin += height;
+				calcLeftMargin = 30;
+				text = "Type";
+				width = (int)_font.MeasureString(text).Width;
+				height = (int)_font.MeasureString(text).Height;
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _blue, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcLeftMargin += width;
+				text = ":  ";
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcLeftMargin += width;
+				text = string.Format("{0} ({1})", GameService.Gw2Mumble.get_CurrentMap().get_Type(), GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode() ? "PvP" : "PvE");
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _cyan, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcTopMargin += height;
+				calcLeftMargin = 30;
+				Coordinates2 playerLocationMap = GameService.Gw2Mumble.get_RawClient().get_PlayerLocationMap();
+				text = "X";
+				width = (int)_font.MeasureString(text).Width;
+				height = (int)_font.MeasureString(text).Height;
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _red, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				infoBounds = rect;
+				calcLeftMargin += width;
+				text = "Y";
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _lemonGreen, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
+				calcLeftMargin += width;
+				text = ":  ";
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
+				calcLeftMargin += width;
+				text = ((Coordinates2)(ref playerLocationMap)).get_X().ToString("0.###");
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _red, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
+				calcLeftMargin += width;
+				text = "  " + ((Coordinates2)(ref playerLocationMap)).get_Y().ToString("0.###");
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _lemonGreen, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				RectangleExtensions.Union(ref rect, ref infoBounds, out _mapCoordinatesBounds);
+				if (_mouseOverMapCoordinates)
+				{
+					DrawBorder(spriteBatch, _mapCoordinatesBounds);
+				}
+				calcTopMargin += height * 2;
+				calcLeftMargin = 10;
+				text = "Camera";
+				width = (int)_font.MeasureString(text).Width;
+				height = (int)_font.MeasureString(text).Height;
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _green, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcTopMargin += height;
+				calcLeftMargin = 30;
+				Vector3 cameraForward = GameService.Gw2Mumble.get_PlayerCamera().get_Forward();
+				text = "Direction";
+				width = (int)_font.MeasureString(text).Width;
+				height = (int)_font.MeasureString(text).Height;
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _green, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				infoBounds = rect;
+				calcLeftMargin += width;
+				text = ":  ";
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
+				calcLeftMargin += width;
+				text = cameraForward.X.ToString("0.###");
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _red, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
+				calcLeftMargin += width;
+				text = "  " + cameraForward.Y.ToString("0.###");
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _lemonGreen, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
+				calcLeftMargin += width;
+				text = "  " + cameraForward.Z.ToString("0.###");
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _cyan, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				RectangleExtensions.Union(ref rect, ref infoBounds, out _cameraDirectionBounds);
+				if (_mouseOverCameraDirection)
+				{
+					DrawBorder(spriteBatch, _cameraDirectionBounds);
+				}
+				calcTopMargin += height;
+				calcLeftMargin = 30;
+				text = DirectionUtil.IsFacing(new Coordinates3((double)cameraForward.X, (double)cameraForward.Y, (double)cameraForward.Z)).ToString().SplitAtUpperCase()
+					.Trim() ?? "";
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _lemonGreen, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcTopMargin += height;
+				calcLeftMargin = 30;
+				Vector3 cameraPosition = GameService.Gw2Mumble.get_PlayerCamera().get_Position();
+				text = "Position";
+				width = (int)_font.MeasureString(text).Width;
+				height = (int)_font.MeasureString(text).Height;
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _green, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				infoBounds = rect;
+				calcLeftMargin += width;
+				text = ":  ";
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
+				calcLeftMargin += width;
+				text = cameraPosition.X.ToString("0.###");
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _red, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
+				calcLeftMargin += width;
+				text = "  " + cameraPosition.Y.ToString("0.###");
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _lemonGreen, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				RectangleExtensions.Union(ref rect, ref infoBounds, out infoBounds);
+				calcLeftMargin += width;
+				text = "  " + cameraPosition.Z.ToString("0.###");
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _cyan, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				RectangleExtensions.Union(ref rect, ref infoBounds, out _cameraPositionBounds);
+				if (_mouseOverCameraPosition)
+				{
+					DrawBorder(spriteBatch, _cameraPositionBounds);
+				}
+				calcTopMargin += height;
+				calcLeftMargin = 30;
+				text = "Field of View";
+				width = (int)_font.MeasureString(text).Width;
+				height = (int)_font.MeasureString(text).Height;
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _green, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcLeftMargin += width;
+				text = ":  ";
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcLeftMargin += width;
+				text = $"{GameService.Gw2Mumble.get_PlayerCamera().get_FieldOfView()}";
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _yellow, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcTopMargin += height;
+				calcLeftMargin = 30;
+				text = "Near Plane Render Distance";
+				width = (int)_font.MeasureString(text).Width;
+				height = (int)_font.MeasureString(text).Height;
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _green, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcLeftMargin += width;
+				text = ":  ";
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcLeftMargin += width;
+				text = $"{GameService.Gw2Mumble.get_PlayerCamera().get_NearPlaneRenderDistance()}";
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _yellow, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcTopMargin += height;
+				calcLeftMargin = 30;
+				text = "Far Plane Render Distance";
+				width = (int)_font.MeasureString(text).Width;
+				height = (int)_font.MeasureString(text).Height;
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _green, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcLeftMargin += width;
+				text = ":  ";
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcLeftMargin += width;
+				text = $"{GameService.Gw2Mumble.get_PlayerCamera().get_FarPlaneRenderDistance()}";
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _yellow, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcTopMargin += height * 2;
+				calcLeftMargin = 10;
+				text = "User Interface";
+				width = (int)_font.MeasureString(text).Width;
+				height = (int)_font.MeasureString(text).Height;
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _orange, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcTopMargin += height;
+				calcLeftMargin = 30;
+				text = "Size";
+				width = (int)_font.MeasureString(text).Width;
+				height = (int)_font.MeasureString(text).Height;
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _orange, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcLeftMargin += width;
+				text = ":  ";
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcLeftMargin += width;
+				text = $"{GameService.Gw2Mumble.get_UI().get_UISize()}";
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _yellow, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcTopMargin += height;
+				calcLeftMargin = 30;
+				text = "Text Input Focused";
+				width = (int)_font.MeasureString(text).Width;
+				height = (int)_font.MeasureString(text).Height;
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _orange, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcLeftMargin += width;
+				text = ":  ";
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcLeftMargin += width;
+				text = $"{GameService.Gw2Mumble.get_UI().get_IsTextInputFocused()}";
+				width = (int)_font.MeasureString(text).Width;
+				height = Math.Max(height, (int)_font.MeasureString(text).Height);
+				((Rectangle)(ref rect))._002Ector(calcLeftMargin, calcTopMargin, width, height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _yellow, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				calcTopMargin = 5;
+				int calcRightMargin = 10;
+				if (MumbleInfoModule.ModuleInstance.EnablePerformanceCounters.get_Value())
+				{
+					text = _memoryUsage.ToString("0.###") + " MB";
+					width = (int)_font.MeasureString(text).Width;
+					height = (int)_font.MeasureString(text).Height;
+					((Rectangle)(ref rect))._002Ector(((Control)this).get_Size().X - width - calcRightMargin, calcTopMargin, width, height);
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _cyan, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+					calcRightMargin += width;
+					text = ":  ";
+					width = (int)_font.MeasureString(text).Width;
+					height = Math.Max(height, (int)_font.MeasureString(text).Height);
+					((Rectangle)(ref rect))._002Ector(((Control)this).get_Size().X - width - calcRightMargin, calcTopMargin, width, height);
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+					calcRightMargin += width;
+					text = "Memory Usage";
+					width = (int)_font.MeasureString(text).Width;
+					height = Math.Max(height, (int)_font.MeasureString(text).Height);
+					((Rectangle)(ref rect))._002Ector(((Control)this).get_Size().X - width - calcRightMargin, calcTopMargin, width, height);
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _orange, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+					calcTopMargin += height;
+					calcRightMargin = 10;
+					text = $"{Environment.ProcessorCount}x {_cpuName}";
+					width = (int)_font.MeasureString(text).Width;
+					height = (int)_font.MeasureString(text).Height;
+					((Rectangle)(ref rect))._002Ector(((Control)this).get_Size().X - width - calcRightMargin, calcTopMargin, width, height);
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _cyan, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+					calcRightMargin += width;
+					text = ":  ";
+					width = (int)_font.MeasureString(text).Width;
+					height = Math.Max(height, (int)_font.MeasureString(text).Height);
+					((Rectangle)(ref rect))._002Ector(((Control)this).get_Size().X - width - calcRightMargin, calcTopMargin, width, height);
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+					calcRightMargin += width;
+					text = "CPU";
+					width = (int)_font.MeasureString(text).Width;
+					height = Math.Max(height, (int)_font.MeasureString(text).Height);
+					((Rectangle)(ref rect))._002Ector(((Control)this).get_Size().X - width - calcRightMargin, calcTopMargin, width, height);
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _orange, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+					calcTopMargin += height;
+					calcRightMargin = 10;
+					text = _cpuUsage.ToString("0.###") + "%";
+					width = (int)_font.MeasureString(text).Width;
+					height = (int)_font.MeasureString(text).Height;
+					((Rectangle)(ref rect))._002Ector(((Control)this).get_Size().X - width - calcRightMargin, calcTopMargin, width, height);
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _cyan, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+					calcRightMargin += width;
+					text = ":  ";
+					width = (int)_font.MeasureString(text).Width;
+					height = Math.Max(height, (int)_font.MeasureString(text).Height);
+					((Rectangle)(ref rect))._002Ector(((Control)this).get_Size().X - width - calcRightMargin, calcTopMargin, width, height);
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+					calcRightMargin += width;
+					text = "CPU Usage";
+					width = (int)_font.MeasureString(text).Width;
+					height = Math.Max(height, (int)_font.MeasureString(text).Height);
+					((Rectangle)(ref rect))._002Ector(((Control)this).get_Size().X - width - calcRightMargin, calcTopMargin, width, height);
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _orange, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+					calcTopMargin += height;
+					calcRightMargin = 10;
+					text = Control.get_Graphics().get_GraphicsDevice().get_Adapter()
+						.get_Description() ?? "";
+					width = (int)_font.MeasureString(text).Width;
+					height = (int)_font.MeasureString(text).Height;
+					((Rectangle)(ref rect))._002Ector(((Control)this).get_Size().X - width - calcRightMargin, calcTopMargin, width, height);
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _cyan, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+					calcRightMargin += width;
+					text = ":  ";
+					width = (int)_font.MeasureString(text).Width;
+					height = Math.Max(height, (int)_font.MeasureString(text).Height);
+					((Rectangle)(ref rect))._002Ector(((Control)this).get_Size().X - width - calcRightMargin, calcTopMargin, width, height);
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, Color.get_LightGray(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+					calcRightMargin += width;
+					text = "GPU";
+					width = (int)_font.MeasureString(text).Width;
+					height = Math.Max(height, (int)_font.MeasureString(text).Height);
+					((Rectangle)(ref rect))._002Ector(((Control)this).get_Size().X - width - calcRightMargin, calcTopMargin, width, height);
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, rect, _orange, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				}
 			}
 		}
 
 		private void DrawBorder(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(bounds.X, bounds.Y, bounds.Width, 1), _isMousePressed ? _clickColor : _borderColor);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(bounds.X, bounds.Y, 1, bounds.Height), _isMousePressed ? _clickColor : _borderColor);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(bounds.X, bounds.Y + bounds.Height, bounds.Width, 1), _isMousePressed ? _clickColor : _borderColor);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(bounds.X + bounds.Width, bounds.Y, 1, bounds.Height), _isMousePressed ? _clickColor : _borderColor);
+			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(bounds.X, bounds.Y, bounds.Width + 1, 1), _isMousePressed ? _clickColor : _borderColor);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(bounds.X, bounds.Y, 1, bounds.Height + 1), _isMousePressed ? _clickColor : _borderColor);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(bounds.X, bounds.Y + bounds.Height + 1, bounds.Width + 1, 1), _isMousePressed ? _clickColor : _borderColor);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(bounds.X + bounds.Width + 1, bounds.Y, 1, bounds.Height + 1), _isMousePressed ? _clickColor : _borderColor);
 		}
 	}
 }

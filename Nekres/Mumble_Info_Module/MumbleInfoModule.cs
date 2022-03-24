@@ -29,6 +29,8 @@ namespace Nekres.Mumble_Info_Module
 
 		private SettingEntry<bool> _showCursorPosition;
 
+		internal SettingEntry<bool> EnablePerformanceCounters;
+
 		private DataPanel _dataPanel;
 
 		private Label _cursorPos;
@@ -40,8 +42,6 @@ namespace Nekres.Mumble_Info_Module
 		private DateTime _timeOutPc;
 
 		internal Gw2ApiManager Gw2ApiManager => base.ModuleParameters.get_Gw2ApiManager();
-
-		internal SettingEntry<bool> CaptureMouseOnLCtrl { get; private set; }
 
 		internal Map CurrentMap { get; private set; }
 
@@ -62,23 +62,26 @@ namespace Nekres.Mumble_Info_Module
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0055: Expected O, but got Unknown
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Expected O, but got Unknown
 			_toggleInfoBinding = settings.DefineSetting<KeyBinding>("ToggleInfoBinding", new KeyBinding((Keys)187), (Func<string>)(() => "Toggle display"), (Func<string>)(() => "Toggles the display of data."));
-			CaptureMouseOnLCtrl = settings.DefineSetting<bool>("ForceInterceptMouseOnCtrl", true, (Func<string>)(() => "Capture mouse on [Left Control]"), (Func<string>)(() => "Whether the mouse should be intercepted forcibly while [Left Control] is pressed."));
 			_showCursorPosition = settings.DefineSetting<bool>("ShowCursorPosition", false, (Func<string>)(() => "Show cursor position"), (Func<string>)(() => "Whether the cursor's current interface-relative position should be displayed.\nUse [Left Alt] to copy it."));
+			EnablePerformanceCounters = settings.DefineSetting<bool>("PerfCountersEnabled", false, (Func<string>)(() => "Show performance counters"), (Func<string>)(() => "Whether performance counters such as RAM and CPU utilization of the Guild Wars 2 process should be displayed."));
 		}
 
 		protected override void Initialize()
 		{
-			_timeOutPc = DateTime.Now;
+			_timeOutPc = DateTime.UtcNow;
 			CpuName = string.Empty;
 		}
 
 		protected override async Task LoadAsync()
 		{
-			await LoadPerformanceCounters();
-			await QueryManagementObjects();
+			if (EnablePerformanceCounters.get_Value())
+			{
+				await LoadPerformanceCounters();
+				await QueryManagementObjects();
+			}
 		}
 
 		protected override void Update(GameTime gameTime)
@@ -96,6 +99,7 @@ namespace Nekres.Mumble_Info_Module
 			GameService.Gw2Mumble.get_PlayerCharacter().add_SpecializationChanged((EventHandler<ValueEventArgs<int>>)OnSpecializationChanged);
 			GameService.GameIntegration.get_Gw2Instance().add_Gw2Closed((EventHandler<EventArgs>)OnGw2Closed);
 			GameService.GameIntegration.get_Gw2Instance().add_Gw2Started((EventHandler<EventArgs>)OnGw2Started);
+			EnablePerformanceCounters.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnEnablePerformanceCountersSettingChanged);
 			((Module)this).OnModuleLoaded(e);
 		}
 
@@ -128,16 +132,32 @@ namespace Nekres.Mumble_Info_Module
 			return Task.Run(delegate
 			{
 				using ManagementObjectSearcher managementObjectSearcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_Processor");
-				foreach (ManagementBaseObject current in managementObjectSearcher.Get())
+				foreach (ManagementObject item in managementObjectSearcher.Get())
 				{
-					ManagementObject managementObject = (ManagementObject)current;
-					string text = (string)managementObject["Name"];
+					string text = (string)item["Name"];
 					if (text.Length >= CpuName.Length)
 					{
 						CpuName = text.Trim();
 					}
 				}
 			});
+		}
+
+		private async void OnEnablePerformanceCountersSettingChanged(object sender, ValueChangedEventArgs<bool> e)
+		{
+			if (e.get_PreviousValue() != e.get_NewValue())
+			{
+				if (!e.get_NewValue())
+				{
+					_ramCounter?.Dispose();
+					_cpuCounter?.Dispose();
+				}
+				else
+				{
+					await LoadPerformanceCounters();
+					await QueryManagementObjects();
+				}
+			}
 		}
 
 		private void OnGw2Closed(object o, EventArgs e)
@@ -152,8 +172,8 @@ namespace Nekres.Mumble_Info_Module
 			{
 				((Control)cursorPos).Dispose();
 			}
-			_cpuCounter?.Dispose();
 			_ramCounter?.Dispose();
+			_cpuCounter?.Dispose();
 		}
 
 		private async void OnGw2Started(object o, EventArgs e)
@@ -163,9 +183,9 @@ namespace Nekres.Mumble_Info_Module
 
 		private void UpdateCounter()
 		{
-			if (GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() && _ramCounter != null && _cpuCounter != null && !(DateTime.Now < _timeOutPc))
+			if (GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() && _ramCounter != null && _cpuCounter != null && !(DateTime.UtcNow < _timeOutPc))
 			{
-				_timeOutPc = DateTime.Now.AddMilliseconds(250.0);
+				_timeOutPc = DateTime.UtcNow.AddMilliseconds(1000.0);
 				MemoryUsage = _ramCounter.NextValue() / 1024f / 1024f;
 				CpuUsage = _cpuCounter.NextValue() / (float)Environment.ProcessorCount;
 			}
@@ -173,13 +193,13 @@ namespace Nekres.Mumble_Info_Module
 
 		private void UpdateCursorPos()
 		{
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
 			if (GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() && _cursorPos != null)
 			{
 				((Control)_cursorPos).set_Visible(!GameService.Input.get_Mouse().get_CameraDragging());
@@ -231,19 +251,19 @@ namespace Nekres.Mumble_Info_Module
 
 		private void BuildCursorPosTooltip()
 		{
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Expected O, but got Unknown
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009f: Expected O, but got Unknown
 			if (_showCursorPosition.get_Value())
 			{
 				Label cursorPos = _cursorPos;
@@ -272,9 +292,9 @@ namespace Nekres.Mumble_Info_Module
 
 		private void OnKeyPressed(object o, KeyboardEventArgs e)
 		{
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Invalid comparison between Unknown and I4
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Invalid comparison between Unknown and I4
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 			if (_cursorPos != null && !GameService.Input.get_Mouse().get_CameraDragging() && (int)e.get_Key() == 164)
 			{
 				_cursorPos.set_TextColor(new Color(252, 252, 84));
@@ -283,9 +303,9 @@ namespace Nekres.Mumble_Info_Module
 
 		private void OnKeyReleased(object o, KeyboardEventArgs e)
 		{
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Invalid comparison between Unknown and I4
-			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Invalid comparison between Unknown and I4
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 			if (_cursorPos != null && !GameService.Input.get_Mouse().get_CameraDragging() && (int)e.get_Key() == 164)
 			{
 				_cursorPos.set_TextColor(Color.get_White());
@@ -296,8 +316,8 @@ namespace Nekres.Mumble_Info_Module
 
 		private void BuildDisplay()
 		{
-			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 			DataPanel dataPanel = _dataPanel;
 			if (dataPanel != null)
 			{
@@ -365,9 +385,7 @@ namespace Nekres.Mumble_Info_Module
 			{
 				((Control)cursorPos).Dispose();
 			}
-			_ramCounter?.Close();
 			_ramCounter?.Dispose();
-			_cpuCounter?.Close();
 			_cpuCounter?.Dispose();
 			_toggleInfoBinding.get_Value().remove_Activated((EventHandler<EventArgs>)OnToggleInfoBindingActivated);
 			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
