@@ -1,0 +1,33 @@
+{
+    "name": "Boneskinner",
+    "map": 1339,
+    "fights": [
+        {
+            "name": "Boneskinner",
+            "position": [ 15.468, -2.189, 179.712 ],
+            "radius": 40,
+            "phase": [
+                {
+                    "percent": 90,
+                    "color": "Black",
+                    "description": "Breakbar can begin"
+                },
+                {
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "Jumps up, extinguishes torches"
+                },
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Jumps up, extinguishes torches"
+                },
+                {
+                    "percent": 25,
+                    "color": "Black",
+                    "description": "Jumps up, extinguishes torches"
+                },
+            ]
+        }
+    ]
+}

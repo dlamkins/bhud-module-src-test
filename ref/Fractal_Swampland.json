@@ -1,0 +1,40 @@
+{
+    "name": "Swampland",
+    "map": 949,
+    "fights": [
+        {
+            "name": "Mossman",
+            "position": [ 13.327, -23.291, -0.355 ],
+            "radius": 20,
+            "phase": [
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Wolf Transform"
+                }
+            ]
+        },
+        {
+            "name": "Bloomhunger",
+            "position": [ -115.642, -129.372, 0.462 ],
+            "radius": 75,
+            "phase": [
+                {
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "Phase - Enemies Spawn"
+                },
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Phase - Enemies Spawn"
+                },
+                {
+                    "percent": 25,
+                    "color": "Black",
+                    "description": "Phase - Wisp Clefts"
+                }
+            ]
+        }
+    ]
+}

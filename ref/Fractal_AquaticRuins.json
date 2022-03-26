@@ -1,0 +1,28 @@
+{
+    "name": "Aquatic Ruins",
+    "map": 951,
+    "fights": [
+        {
+            "name": "Jellyfish Beast",
+            "position": [ -76.299, -20.194, -179.883 ],
+            "radius": 25,
+            "phase": [
+                {
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "Invulnerable - Kill 1 Elite Krait Diviner"
+                },
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Invulnerable - Kill 2 Elite Krait Diviners"
+                },
+                {
+                    "percent": 25,
+                    "color": "Black",
+                    "description": "Invulnerable - Kill 3 Elite Krait Diviners"
+                }
+            ]
+        }
+    ]
+}

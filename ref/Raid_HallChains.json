@@ -1,0 +1,45 @@
+{
+    "name": "Hall of Chains",
+    "map": 1264,
+    "fights": [
+        {
+            "name": "Soulless Horror",
+            "position": [ -269.516, 21.629, 20.762 ],
+            "radius": 45,
+            "phase": [
+                {
+                    "percent": 90,
+                    "color": "Black",
+                    "description": "Platform Shrinks, Golem in 20 seconds"
+                },
+                {
+                    "percent": 66,
+                    "color": "Black",
+                    "description": "Platform Shrinks, Breakbar begins"
+                },
+                {
+                    "percent": 33,
+                    "color": "Black",
+                    "description": "Platform Shrinks"
+                }
+            ]
+        },
+        {
+            "name": "Dhuum",
+            "position": [ 400.948, 16.892, 162.593 ],
+            "radius": 60,
+            "phase": [
+                {
+                    "percent": 60,
+                    "color": "Black",
+                    "description": "Soul Shackles begin"
+                },
+                {
+                    "percent": 10,
+                    "color": "Black",
+                    "description": "Phase - Ritual"
+                }
+            ]
+        }
+    ]
+}

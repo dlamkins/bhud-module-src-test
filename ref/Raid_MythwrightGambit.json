@@ -1,0 +1,40 @@
+{
+    "name": "Mythwright Gambit",
+    "map": 1303,
+    "fights": [
+        {
+            "name": "Twin Largos",
+            "position": [ 367.233, 35.508, 32.067 ],
+            "radius": 140,
+            "phase": [
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Move Platforms"
+                },
+                {
+                    "percent": 25,
+                    "color": "Black",
+                    "description": "Move Platforms"
+                }
+            ]
+        },
+        {
+            "name": "Qadim",
+            "position": [ -188.749, 306.659, 127.28 ],
+            "radius": 150,
+            "phase": [
+                {
+                    "percent": 66,
+                    "color": "Black",
+                    "description": "Phase - Destroyer begins"
+                },
+                {
+                    "percent": 33,
+                    "color": "Black",
+                    "description": "Phase - Wyverns begin"
+                }
+            ]
+        }
+    ]
+}

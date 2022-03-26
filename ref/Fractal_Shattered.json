@@ -1,0 +1,72 @@
+{
+    "name": "Shattered Observatory",
+    "map": 1205,
+    "fights": [
+        {
+            "name": "Skorvald",
+            "position": [ -497.117, 449.599, 80.870 ],
+            "radius": 30,
+            "phase": [
+                {
+                    "percent": 66,
+                    "color": "Black",
+                    "description": "Phase - Islands"
+                },
+                {
+                    "percent": 33,
+                    "color": "Black",
+                    "description": "Phase - Islands"
+                }
+            ]
+        },
+        {
+            "name": "Viirastra",
+            "position": [ 263.005, 37.131, 124.109 ],
+            "radius": 50,
+            "phase": [
+                {
+                    "percent": 66,
+                    "color": "Black",
+                    "description": "Phase - Breakbars"
+                },
+                {
+                    "percent": 33,
+                    "color": "Black",
+                    "description": "Phase - Breakbars"
+                }
+            ]
+        },
+        {
+            "name": "Arkk",
+            "position": [ -455.246, -429.537, 72.874 ],
+            "radius": 45,
+            "phase": [
+                {
+                    "percent": 80,
+                    "color": "Gray",
+                    "description": "Phase - Solar Blooms"
+                },
+                {
+                    "percent": 70,
+                    "color": "Black",
+                    "description": "Archdiviner Spawns"
+                },
+                {
+                    "percent": 50,
+                    "color": "Gray",
+                    "description": "Phase - Solar Blooms"
+                },
+                {
+                    "percent": 40,
+                    "color": "Black",
+                    "description": "Brazen Gladiator Spawns"
+                },
+                {
+                    "percent": 30,
+                    "color": "Gray",
+                    "description": "Phase - Solar Blooms"
+                }
+            ]
+        }
+    ]
+}

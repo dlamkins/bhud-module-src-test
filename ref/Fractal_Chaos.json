@@ -1,0 +1,50 @@
+{
+    "name": "Chaos",
+    "map": 1164,
+    "fights": [
+        {
+            "name": "Chaos Anomaly",
+            "position": [ 5.642, -147.007, 584.822 ],
+            "radius": 35,
+            "phase": [
+                {
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "Phase - 3 Golems Spawn"
+                },
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Phase - 2 Golems Spawn"
+                },
+                {
+                    "percent": 25,
+                    "color": "Black",
+                    "description": "Phase - 1 Golems Spawn"
+                }
+            ]
+        },
+        {
+            "name": "Gladiator",
+            "position": [ 61.314, 114.298, 500.299 ],
+            "radius": 33,
+            "phase": [
+                {
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "JT-Golems Spawn"
+                },
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Begin Spin/Pull Attacks, JT-Golems Spawn"
+                },
+                {
+                    "percent": 25,
+                    "color": "Black",
+                    "description": "JT-Golems Spawn"
+                }
+            ]
+        }
+    ]
+}

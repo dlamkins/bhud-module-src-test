@@ -1,0 +1,28 @@
+{
+    "name": "Cliffside",
+    "map": 952,
+    "fights": [
+        {
+            "name": "Archdiviner",
+            "position": [ 124.775, -10.849, 714.702 ],
+            "radius": 40,
+            "phase": [
+                {
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "Phase - Use Hammer"
+                },
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Phase - Use Hammer"
+                },
+                {
+                    "percent": 25,
+                    "color": "Black",
+                    "description": "Phase - Use Hammer"
+                }
+            ]
+        }
+    ]
+}

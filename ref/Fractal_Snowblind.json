@@ -1,0 +1,28 @@
+{
+    "name": "Snowblind",
+    "map": 948,
+    "fights": [
+        {
+            "name": "Shaman Lonarr Dragons",
+            "position": [ 182.792, -60.094, 22.161 ],
+            "radius": 25,
+            "phase": [
+                {
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "Effigy Spawn"
+                },
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Effigy Spawn"
+                },
+                {
+                    "percent": 25,
+                    "color": "Black",
+                    "description": "Bear Transform"
+                }
+            ]
+        }
+    ]
+}

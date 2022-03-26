@@ -1,0 +1,77 @@
+{
+    "name": "Nightmare",
+    "map": 1177,
+    "fights": [
+        {
+            "name": "Mama",
+            "position": [ 98.660, 155.054, 13.991 ],
+            "radius": 45,
+            "phase": [
+                {
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "East Knight"
+                },
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "North West Knight"
+                },
+                {
+                    "percent": 33,
+                    "color": "Black",
+                    "description": "Transforms, Begins Moving"
+                },
+                {
+                    "percent": 25,
+                    "color": "Black",
+                    "description": "South Knight"
+                }
+            ]
+        },
+        {
+            "name": "Siax",
+            "position": [ 43.329, -76.154, 44.344 ],
+            "radius": 35,
+            "phase": [
+                {
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "Toxin and Hallucinations Begins"
+                },
+                {
+                    "percent": 66,
+                    "color": "Black",
+                    "description": "Phase - Echos of the Unclean"
+                },
+                {
+                    "percent": 33,
+                    "color": "Black",
+                    "description": "Phase - Echos of the Unclean"
+                }
+            ]
+        },
+        {
+            "name": "Ensolyss",
+            "position": [ 40.281, 37.018, 44.637 ],
+            "radius": 30,
+            "phase": [
+                {
+                    "percent": 66,
+                    "color": "Black",
+                    "description": "Phase - Orbs"
+                },
+                {
+                    "percent": 33,
+                    "color": "Black",
+                    "description": "Phase - Orbs"
+                },
+                {
+                    "percent": 15,
+                    "color": "Black",
+                    "description": "Center"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,62 @@
+{
+    "name": "Sunqua Peak",
+    "map": 1384,
+    "fights": [
+        {
+            "name": "Voice of the Mountain",
+            "position": [ -102.111, -203.122, 78.678 ],
+            "radius": 30,
+            "phase": [
+                {
+                    "percent": 66,
+                    "color": "Black",
+                    "description": "Phase - Charged Leap"
+                },
+                {
+                    "percent": 33,
+                    "color": "Black",
+                    "description": "Phase - Charged Leap"
+                }
+            ]
+        },
+        {
+            "name": "Fury of the Moutain",
+            "position": [ -12.78, 97.35, 212.364 ],
+            "radius": 30,
+            "phase": [
+                {
+                    "percent": 66,
+                    "color": "Black",
+                    "description": "Phase - Meteors"
+                },
+                {
+                    "percent": 33,
+                    "color": "Black",
+                    "description": "Phase - Meteors"
+                }
+            ]
+        },
+        {
+            "name": "Sorrowful Spellcaster",
+            "position": [ 175.836, 35.352, 247.991 ],
+            "radius": 40,
+            "phase": [
+                {
+                    "percent": 100,
+                    "color": "Black",
+                    "description": "Air (CM: Fear)"
+                },
+                {
+                    "percent": 66,
+                    "color": "Black",
+                    "description": "Fire (CM: Sorrow)"
+                },
+                {
+                    "percent": 33,
+                    "color": "Black",
+                    "description": "Water (CM: Guilt)"
+                }
+            ]
+        }
+    ]
+}

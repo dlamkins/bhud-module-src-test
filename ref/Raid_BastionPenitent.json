@@ -1,0 +1,154 @@
+{
+    "name": "Bastion of the Penitent",
+    "map": 1188,
+    "fights": [
+        {
+            "name": "Cairn",
+            "position": [ 364.77, 51.245, 33.7205 ],
+            "radius": 50,
+            "phase": [
+                {
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "Rotation Reset, Greens change"
+                },
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Rotation Reset, Greens change"
+                },
+                {
+                    "percent": 25,
+                    "color": "Black",
+                    "description": "Rotation Reset, Greens change, Gravity Wave can begin"
+                }
+            ]
+        },
+        {
+            "name": "Musaat Overseer",
+            "position": [ 67.202, 101.103, 106.187 ],
+            "radius": 50,
+            "phase": [
+                {
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "Spike Pattern Changes"
+                },
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Spike Pattern Changes"
+                },
+                {
+                    "percent": 25,
+                    "color": "Black",
+                    "description": "Spike Pattern Changes"
+                }
+            ]
+        },
+        {
+            "name": "Samarog",
+            "position": [ -102.573, 77.347, 129.488 ],
+            "radius": 70,
+            "phase": [
+                {
+                    "percent": 90,
+                    "color": "Gray",
+                    "description": "Breakbar"
+                },
+                {
+                    "percent": 80,
+                    "color": "Gray",
+                    "description": "Breakbar"
+                },
+                {
+                    "percent": 70,
+                    "color": "Gray",
+                    "description": "Breakbar"
+                },
+                {
+                    "percent": 66,
+                    "color": "Black",
+                    "description": "Phase - Rigom and Guldhem, Inevitable Betrayal begins"
+                },
+                {
+                    "percent": 60,
+                    "color": "Gray",
+                    "description": "Breakbar"
+                },
+                {
+                    "percent": 50,
+                    "color": "Gray",
+                    "description": "Breakbar"
+                },
+                {
+                    "percent": 40,
+                    "color": "Gray",
+                    "description": "Breakbar"
+                },
+                {
+                    "percent": 33,
+                    "color": "Black",
+                    "description": "Phase - Rigom and Guldhem"
+                },
+                {
+                    "percent": 30,
+                    "color": "Gray",
+                    "description": "Breakbar"
+                },
+                {
+                    "percent": 20,
+                    "color": "Gray",
+                    "description": "Breakbar"
+                },
+                {
+                    "percent": 10,
+                    "color": "Gray",
+                    "description": "Breakbar"
+                }
+            ]
+        },
+        {
+            "name": "Deimos",
+            "position": [ -213.241, 77.496, 101.924 ],
+            "radius": 40,
+            "phase": [
+                {
+                    "percent": 90,
+                    "color": "Black",
+                    "description": "Mind Crush begins"
+                },
+                {
+                    "percent": 75,
+                    "color": "Green",
+                    "description": "Thief Teleport, Tears begins"
+                },
+                {
+                    "percent": 60,
+                    "color": "Black",
+                    "description": "Oil begins"
+                },
+                {
+                    "percent": 50,
+                    "color": "Green",
+                    "description": "Gambler Teleport"
+                },
+                {
+                    "percent": 40,
+                    "color": "Black",
+                    "description": "Greed and Pride begin spawning"
+                },
+                {
+                    "percent": 25,
+                    "color": "Green",
+                    "description": "Drunkard Teleport"
+                },
+                {
+                    "percent": 10,
+                    "color": "Green",
+                    "description": "All Teleport"
+                }
+            ]
+        }
+    ]
+}

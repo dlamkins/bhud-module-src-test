@@ -1,0 +1,62 @@
+{
+    "name": "Spirit Vale",
+    "map": 1062,
+    "fights": [
+        {
+            "name": "Vale Guardian",
+            "position": [ -121.367, -524, 61 ],
+            "radius": 45,
+            "phase": [
+                {
+                    "percent": 66,
+                    "color": "Black",
+                    "description": "Phase - Guardians spawn"
+                },
+                {
+                    "percent": 33,
+                    "color": "Black",
+                    "description": "Phase - Guardians spawn"
+                }
+            ]
+        },
+        {
+            "name": "Gorseval",
+            "position": [ 41, -113, 48 ],
+            "radius": 85,
+            "phase": [
+                {
+                    "percent": 66,
+                    "color": "Black",
+                    "description": "Phase - Charged Souls spawn"
+                },
+                {
+                    "percent": 33,
+                    "color": "Black",
+                    "description": "Phase - Charged Souls spawn"
+                }
+            ]
+        },
+        {
+            "name": "Sabetha",
+            "position": [ -129.058, 84.904, 62.411 ],
+            "radius": 90,
+            "phase": [
+                {
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "Kernan Spawns"
+                },
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Knuckles Spawns"
+                },
+                {
+                    "percent": 25,
+                    "color": "Black",
+                    "description": "Karde Spawns"
+                }
+            ]
+        }
+    ]
+}

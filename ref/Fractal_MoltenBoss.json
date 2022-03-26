@@ -1,0 +1,30 @@
+{
+    "name": "Molten Boss",
+    "map": 959,
+    "fights": [
+        /*{
+            "name": "Effigy",
+            "position": [ -82.627, 5.526, 128.377 ],
+            "radius": 25,
+            "phase": [
+                {
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "Can begin its movement attack"
+                }
+            ]
+        },*/
+        {
+            "name": "Boss Duo",
+            "position": [ 139.864, -113.692, 123.391 ],
+            "radius": 50,
+            "phase": [
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Enemies Spawn"
+                }
+            ]
+        }
+    ]
+}

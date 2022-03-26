@@ -1,0 +1,28 @@
+{
+    "name": "Captain Mai Trin",
+    "map": 960,
+    "fights": [
+        {
+            "name": "Mai Trin",
+            "position": [ -30.908, -68.189, 77.741 ],
+            "radius": 33,
+            "phase": [
+                {
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "Phase - Kill Horrik"
+                },
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Phase - Kill Horrik"
+                },
+                {
+                    "percent": 25,
+                    "color": "Black",
+                    "description": "Phase - Kill Horrik"
+                }
+            ]
+        }
+    ]
+}

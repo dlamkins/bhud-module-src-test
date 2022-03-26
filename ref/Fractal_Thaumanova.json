@@ -1,0 +1,50 @@
+{
+    "name": "Thuamanova",
+    "map": 957,
+    "fights": [
+        {
+            "name": "Subject 6",
+            "position": [ 116.209, 140.854, 21.683 ],
+            "radius": 40,
+            "phase": [
+                {
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "Golden Ooze spawns"
+                },
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Golden Ooze spawns"
+                },
+                {
+                    "percent": 25,
+                    "color": "Black",
+                    "description": "Golden Ooze spawns"
+                }
+            ]
+        },
+        {
+            "name": "Anomaly",
+            "position": [ 0.529, -0.447, 61.499 ],
+            "radius": 45,
+            "phase": [
+                {
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "Platform Shrinks"
+                },
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Platform Shrinks"
+                },
+                {
+                    "percent": 25,
+                    "color": "Black",
+                    "description": "Platform Shrinks"
+                }
+            ]
+        }
+    ]
+}

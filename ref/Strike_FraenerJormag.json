@@ -1,0 +1,23 @@
+{
+    "name": "Fraener of Jormag",
+    "map": 1341,
+    "fights": [
+        {
+            "name": "Fraener of Jormag",
+            "position": [ 16.300, -1.964, 179.825 ],
+            "radius": 30,
+            "phase": [
+                {
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "Phase - Icebrood Construct"
+                },
+                {
+                    "percent": 70,
+                    "color": "Black",
+                    "description": "Phase - Arm Lost"
+                }
+            ]
+        }
+    ]
+}

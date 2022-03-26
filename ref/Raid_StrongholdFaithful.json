@@ -1,0 +1,77 @@
+{
+    "name": "Strongholf od the Faithful",
+    "map": 1156,
+    "fights": [
+        {
+            "name": "McLeod",
+            "position": [ -100, 424, 135 ],
+            "radius": 40,
+            "phase": [
+                {
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "Splits"
+                },
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Splits"
+                },
+                {
+                    "percent": 25,
+                    "color": "Black",
+                    "description": "Splits"
+                }
+            ]
+        },
+        {
+            "name": "Keep Construct",
+            "position": [ -97.98, 237.25, 150.15 ],
+            "radius": 31,
+            "phase": [
+                {
+                    "percent": 66,
+                    "color": "Black",
+                    "description": "Phase - Orb Collection"
+                },
+                {
+                    "percent": 33,
+                    "color": "Black",
+                    "description": "Phase - Orb Collection"
+                }
+            ]
+        },
+        {
+            "name": "Xera",
+            "position": [ -77.061, -80.438, 512.354 ],
+            "radius": 100,
+            "phase": [
+                {
+                    "percent": 90,
+                    "color": "Gray",
+                    "description": "Breakbar"
+                },
+                /*{
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "Laser stops, Ambient Magic"
+                },*/
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Phase - Platforms"
+                },
+                {
+                    "percent": 40,
+                    "color": "Black",
+                    "description": "Teleport - Games (Rifts)"
+                },
+                {
+                    "percent": 20,
+                    "color": "Black",
+                    "description": "Teleport - Games (Buttons)"
+                }
+            ]
+        }
+    ]
+}

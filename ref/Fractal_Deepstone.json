@@ -1,0 +1,125 @@
+{
+    "name": "Deepstone",
+    "map": 1290,
+    "fights": [
+        /*
+        {
+            "name": "Spider",
+            "position": [ 220.066, -112.403, 266.834 ],
+            "radius": 50,
+            "phase": [
+                {
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "Enemies Spawn"
+                },
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Phase - Invulnerable, Enemies Spawn"
+                },
+                {
+                    "percent": 25,
+                    "color": "Black",
+                    "description": "Enemies Spawn"
+                },
+            ]
+        },*/
+        {
+            "name": "Spark",
+            "position": [ -65.355, 4.299, 266.843 ],
+            "radius": 35,
+            "phase": [
+                {
+                    "percent": 80,
+                    "color": "Black",
+                    "description": "Wind Sprites"
+                },
+                {
+                    "percent": 60,
+                    "color": "Black",
+                    "description": "Wind Sprites"
+                },
+                {
+                    "percent": 40,
+                    "color": "Black",
+                    "description": "Wind Sprites"
+                },
+                {
+                    "percent": 20,
+                    "color": "Black",
+                    "description": "Wind Sprites"
+                }
+            ]
+        },
+        /*{
+            "name": "Shadow Minotaur",
+            "position": [ 16.9738, -139.573, 266.833 ],
+            "radius": 25,
+            "phase": [
+                {
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "Enemies Spawn"
+                },
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Enemies Spawn"
+                },
+                {
+                    "percent": 25,
+                    "color": "Black",
+                    "description": "Enemies Spawn"
+                }
+            ]
+        },*/
+        {
+            "name": "Voice",
+            "position": [ 16.769, 311.667, 119.814 ],
+            "radius": 50,
+            "phase": [
+                /*{
+                    "percent": 90,
+                    "color": "Black",
+                    "description": "Teleports"
+                },*/
+                {
+                    "percent": 80,
+                    "color": "Gray",
+                    "description": "Teleports and Breakbar"
+                },
+                /*{
+                    "percent": 70,
+                    "color": "Black",
+                    "description": "Teleports"
+                },*/
+                {
+                    "percent": 60,
+                    "color": "Black",
+                    "description": "Teleports to Center, Spectral Flames"
+                },
+                /*{
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Teleports"
+                },*/
+                {
+                    "percent": 40,
+                    "color": "Gray",
+                    "description": "Teleports and Breakbar"
+                },
+                /*{
+                    "percent": 30,
+                    "color": "Black",
+                    "description": "Teleports"
+                },*/
+                {
+                    "percent": 20,
+                    "color": "Black",
+                    "description": "Teleports to Center, Spectral Flames"
+                }
+            ]
+        }
+    ]
+}

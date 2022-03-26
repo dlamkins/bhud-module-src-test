@@ -1,0 +1,28 @@
+{
+    "name": "Shiverpeaks Pass",
+    "map": 1332,
+    "fights": [
+        {
+            "name": "Icebrood Construct",
+            "position": [ -780.747, -247.616, 159.696 ],
+            "radius": 50,
+            "phase": [
+                {
+                    "percent": 85,
+                    "color": "Black",
+                    "description": "Whirlwind can begin"
+                },
+                {
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "Chill AoE's begin"
+                },
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Phase - Arm Lost"
+                }
+            ]
+        }
+    ]
+}

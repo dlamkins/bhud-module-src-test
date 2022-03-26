@@ -1,0 +1,176 @@
+{
+    "name": "Key of Ahdashim",
+    "map": 1323,
+    "fights": [
+        {
+            "name": "Sabir 1",
+            "position": [ -294.783, 96.448, 57.743 ],
+            "radius": 31,
+            "phase": [
+                {
+                    "percent": 90,
+                    "color": "Gray",
+                    "description": "Breakbar"
+                },
+                {
+                    "percent": 80,
+                    "color": "Black",
+                    "description": "Phase - Next Platform"
+                }
+            ]
+        },
+        {
+            "name": "Sabir 2",
+            "position": [ -337.489, 63.849, 101.658 ],
+            "radius": 31,
+            "phase": [
+                {
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "Unbridled Tempest"
+                },
+                {
+                    "percent": 70,
+                    "color": "Gray",
+                    "description": "Breakbar"
+                },
+                {
+                    "percent": 65,
+                    "color": "Black",
+                    "description": "Unbridled Tempest"
+                },
+                {
+                    "percent": 60,
+                    "color": "Black",
+                    "description": "Phase - Next Platform"
+                }
+            ]
+        },
+        {
+            "name": "Sabir 3",
+            "position": [ -307.353, 61.216, 166.229 ],
+            "radius": 45,
+            "phase": [
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Large Twister spawns"
+                },
+                {
+                    "percent": 40,
+                    "color": "Black",
+                    "description": "Wisp spawns"
+                },
+                {
+                    "percent": 30,
+                    "color": "Black",
+                    "description": "Wisp spawns"
+                },
+                {
+                    "percent": 20,
+                    "color": "Black",
+                    "description": "Wisps keep spawning"
+                }
+            ]
+        },
+        {
+            "name": "Adina",
+            "position": [ 378.666, -37.280, 7.752 ],
+            "radius": 30,
+            "phase": [
+                {
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "Phase - Sandwall and Hands"
+                },
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Phase - Sandwall and Hands"
+                },
+                {
+                    "percent": 25,
+                    "color": "Black",
+                    "description": "Phase - Sandwall and Hands"
+                }
+            ]
+        },
+        {
+            "name": "Qadim the Peerless",
+            "position": [ 42.0447, 251.145, 16.8169 ],
+            "radius": 100,
+            "phase": [
+                {
+                    "percent": 95,
+                    "color": "Gray",
+                    "description": "Orb"
+                },
+                {
+                    "percent": 90,
+                    "color": "Gray",
+                    "description": "Orb"
+                },
+                {
+                    "percent": 85,
+                    "color": "Gray",
+                    "description": "Orb"
+                },
+                {
+                    "percent": 80,
+                    "color": "Black",
+                    "description": "Phase - Drop Fire"
+                },
+                {
+                    "percent": 75,
+                    "color": "Gray",
+                    "description": "Orb"
+                },
+                {
+                    "percent": 70,
+                    "color": "Gray",
+                    "description": "Orb"
+                },
+                {
+                    "percent": 65,
+                    "color": "Gray",
+                    "description": "Orb"
+                },
+                {
+                    "percent": 60,
+                    "color": "Black",
+                    "description": "Phase - Drop Fire"
+                },
+                {
+                    "percent": 55,
+                    "color": "Gray",
+                    "description": "Orb"
+                },
+                {
+                    "percent": 50,
+                    "color": "Gray",
+                    "description": "Orb"
+                },
+                {
+                    "percent": 45,
+                    "color": "Gray",
+                    "description": "Orb"
+                },
+                {
+                    "percent": 40,
+                    "color": "Black",
+                    "description": "North Pylon Destroyed"
+                },
+                {
+                    "percent": 30,
+                    "color": "Black",
+                    "description": "SouthWest Pylon Destroyed"
+                },
+                {
+                    "percent": 20,
+                    "color": "Black",
+                    "description": "SouthEast Pylon Destroyed"
+                }
+            ]
+        }
+    ]
+}

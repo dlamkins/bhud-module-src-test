@@ -1,0 +1,40 @@
+{
+    "name": "Test - EotN",
+    "map": 1309,
+    "fights": [
+        {
+            "name": "Stonehead",
+            "position": [ 144.126, 200.437, 8.108 ],
+            "radius": 20,
+            "phase": [
+                {
+                    "percent": 25,
+                    "color": "Black",
+                    "description": "Dies"
+                }
+            ]
+        },
+        {
+            "name": "Ship Bosses",
+            "position": [ -171.814, 95.962, 5.916 ],
+            "radius": 20,
+            "phase": [
+                {
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "Enemies spawn, Wind 1 Starts"
+                },
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Enemies spawn, Wind 2 Starts"
+                },
+                {
+                    "percent": 25,
+                    "color": "Black",
+                    "description": "Enemies spawn"
+                }
+            ]
+        }
+    ]
+}

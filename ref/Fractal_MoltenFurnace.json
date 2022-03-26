@@ -1,0 +1,39 @@
+{
+    "name": "Molten Furnace",
+    "map": 955,
+    "fights": [
+        {
+            "name": "Thermal Core and Engineer",
+            "position": [ -235.77, 27.258, 226.41 ],
+            "radius": 40,
+            "phase": [
+                {
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "Engineer Moves"
+                },
+                {
+                    "percent": 66,
+                    "color": "Gray",
+                    "description": "Core Phase"
+                },
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Engineer Moves"
+                },
+                {
+                    "percent": 33,
+                    "color": "Gray",
+                    "description": "Core Phase"
+                },
+                {
+                    "percent": 25,
+                    "color": "Black",
+                    "description": "Engineer Moves"
+                }
+            ]
+        }
+    ]
+}
+

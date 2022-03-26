@@ -1,0 +1,91 @@
+{
+    "name": "Twilight Oasis",
+    "map": 1267,
+    "fights": [
+        /*{
+            "name": "Sandblinder 1",
+            "position": [ 19.320, 32.448, 10.657 ],
+            "radius": 22,
+            "phase": [
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Breakbar"
+                }
+            ]
+        },
+        {
+            "name": "Sandblinder 2",
+            "position": [ 25.465, 63.832, 42.756 ],
+            "radius": 22,
+            "phase": [
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Breakbar"
+                }
+            ]
+        },
+        {
+            "name": "Sandblinder 3",
+            "position": [ 147.424, 91.265, 45.918 ],
+            "radius": 22,
+            "phase": [
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Breakbar"
+                }
+            ]
+        },*/
+        {
+            "name": "Priestess Amala 1",
+            "position": [ 119.681, 42.326, 1.930 ],
+            "radius": 20,
+            "phase": [
+                {
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "Dies"
+                }
+            ]
+        },
+        {
+            "name": "Priestess Amala 2",
+            "position": [ 194.401, -31.913, 12.619 ],
+            "radius": 45,
+            "phase": [
+                {
+                    "percent": 100,
+                    "color": "Black",
+                    "description": "Lyssa Phase (Clones)"
+                },
+                {
+                    "percent": 85,
+                    "color": "Gray",
+                    "description": "Melandru Phase (Elemental)"
+                },
+                {
+                    "percent": 65,
+                    "color": "Gray",
+                    "description": "Dwayna Phase (Lightning)"
+                },
+                {
+                    "percent": 45,
+                    "color": "Gray",
+                    "description": "Grenth Phase (Necro)"
+                },
+                {
+                    "percent": 25,
+                    "color": "Gray",
+                    "description": "Balthazar Phase (Fire)"
+                },
+                {
+                    "percent": 5,
+                    "color": "Black",
+                    "description": "Amala Phase (Fire)"
+                }
+            ]
+        }
+    ]
+}

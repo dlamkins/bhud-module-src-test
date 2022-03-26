@@ -1,0 +1,30 @@
+/*
+{
+    "name": "Underground Facility",
+    "map": 953,
+    "fights": [
+        {
+            "name": "Rabsovich",
+            "position": [ 639.16, 121.697, 60.1219 ],
+            "radius": 25,
+            "phase": [
+                {
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "?"
+                },
+                {
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "?"
+                },
+                {
+                    "percent": 25,
+                    "color": "Black",
+                    "description": "?"
+                }
+            ]
+        }
+    ]
+}
+*/

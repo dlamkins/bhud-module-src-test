@@ -1,0 +1,70 @@
+{
+    "name": "Salvation Pass",
+    "map": 1149,
+    "fights": [
+        {
+            "name": "Slothasor",
+            "position": [ 197.181, -13.809, 0.604 ],
+            "radius": 60,
+            "phase": [
+                {
+                    "percent": 80,
+                    "color": "Gray",
+                    "description": "Narcolepsy - Breakbar"
+                },
+                {
+                    "percent": 60,
+                    "color": "Gray",
+                    "description": "Narcolepsy - Breakbar"
+                },
+                /*{
+                    "percent": 50,
+                    "color": "Black",
+                    "description": "Spores Start"
+                },*/
+                {
+                    "percent": 40,
+                    "color": "Gray",
+                    "description": "Narcolepsy - Breakbar"
+                },
+                {
+                    "percent": 20,
+                    "color": "Gray",
+                    "description": "Narcolepsy - Breakbar"
+                },
+                {
+                    "percent": 10,
+                    "color": "Gray",
+                    "description": "Narcolepsy - Breakbar"
+                }
+            ]
+        },
+        {
+            "name": "Matthias",
+            "position": [ -150.859, 149.735, 131.523 ],
+            "radius": 42,
+            "phase": [
+                {
+                    "percent": 100,
+                    "color": "Black",
+                    "description": "Ice"
+                },
+                {
+                    "percent": 80,
+                    "color": "Black",
+                    "description": "Fire"
+                },
+                {
+                    "percent": 60,
+                    "color": "Black",
+                    "description": "Storm"
+                },
+                {
+                    "percent": 40,
+                    "color": "Black",
+                    "description": "Phase - All Elements + Spirits"
+                }
+            ]
+        }
+    ]
+}

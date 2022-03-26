@@ -1,0 +1,23 @@
+{
+    "name": "Whisper of Jormag",
+    "map": 1359,
+    "fights": [
+        {
+            "name": "Whisper of Jormag",
+            "position": [ 0.137109, 39.1277, 54.2949 ],
+            "radius": 30,
+            "phase": [
+                {
+                    "percent": 75,
+                    "color": "Black",
+                    "description": "Phase - Doppelganger"
+                },
+                {
+                    "percent": 25,
+                    "color": "Black",
+                    "description": "Phase - Doppelganger"
+                }
+            ]
+        }
+    ]
+}
