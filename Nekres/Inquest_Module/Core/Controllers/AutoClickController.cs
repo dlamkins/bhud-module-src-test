@@ -109,7 +109,7 @@ namespace Nekres.Inquest_Module.Core.Controllers
 			}
 			if (!_toggleActive && AutoClickHoldKey.get_IsTriggering() && DateTime.UtcNow > _nextHoldClick)
 			{
-				if (InquestModule.ModuleInstance.AutoClickSoundEnabledSetting.get_Value())
+				if (!InquestModule.ModuleInstance.AutoClickSoundDisabledSetting.get_Value())
 				{
 					DoubleClickSfx.Play();
 				}
@@ -118,13 +118,15 @@ namespace Nekres.Inquest_Module.Core.Controllers
 			}
 			if (_toggleActive && DateTime.UtcNow > _nextToggleClick)
 			{
+				Point savePos = Mouse.GetPosition();
 				Mouse.SetPosition(_togglePos.X, _togglePos.Y, true);
-				if (InquestModule.ModuleInstance.AutoClickSoundEnabledSetting.get_Value())
+				if (!InquestModule.ModuleInstance.AutoClickSoundDisabledSetting.get_Value())
 				{
 					DoubleClickSfx.Play();
 				}
-				Mouse.DoubleClick((MouseButton)0, -1, -1, true);
+				Mouse.DoubleClick((MouseButton)0, _togglePos.X, _togglePos.Y, true);
 				_nextToggleClick = DateTime.UtcNow.AddMilliseconds(_toggleIntervalMs);
+				Mouse.SetPosition(savePos.X, savePos.Y, true);
 			}
 		}
 

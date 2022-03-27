@@ -27,7 +27,7 @@ namespace Nekres.Inquest_Module
 
 		internal SettingEntry<KeyBinding> AutoClickToggleKeySetting;
 
-		internal SettingEntry<bool> AutoClickSoundEnabledSetting;
+		internal SettingEntry<bool> AutoClickSoundDisabledSetting;
 
 		internal SettingEntry<KeyBinding> JumpKeyBindingSetting;
 
@@ -70,7 +70,7 @@ namespace Nekres.Inquest_Module
 			//IL_020a: Expected O, but got Unknown
 			AutoClickHoldKeySetting = settings.DefineSetting<KeyBinding>("autoClickHoldKeyBinding", new KeyBinding((Keys)188), (Func<string>)(() => "Hold Double Clicking"), (Func<string>)(() => "Perform Double Clicks at the current cursor position while the key is being held down."));
 			AutoClickToggleKeySetting = settings.DefineSetting<KeyBinding>("autoClickToggleKeyBinding", new KeyBinding((Keys)0), (Func<string>)(() => "Toggle Double Clicking"), (Func<string>)(() => "Perform Double Clicks in an interval at the current cursor position until the key is pressed again."));
-			AutoClickSoundEnabledSetting = settings.DefineSetting<bool>("autoClickSoundEnabled", true, (Func<string>)(() => "Disable Clicking Sounds"), (Func<string>)(() => "Disables the sound alert when an auto click is performed."));
+			AutoClickSoundDisabledSetting = settings.DefineSetting<bool>("autoClickSoundsDisabled", false, (Func<string>)(() => "Disable Clicking Sounds"), (Func<string>)(() => "Disables the sound alert when an auto click is performed."));
 			DodgeJumpKeyBindingSetting = settings.DefineSetting<KeyBinding>("dodgeJumpKeyBinding", new KeyBinding((ModifierKeys)4, (Keys)32), (Func<string>)(() => "Dodge-Jump"), (Func<string>)(() => "Perform a dodge roll and a jump simultaneously."));
 			SettingCollection controlOptions = settings.AddSubCollection("Movement", true, false);
 			DodgeKeyBindingSetting = controlOptions.DefineSetting<KeyBinding>("dodgeKeyBinding", new KeyBinding((Keys)86), (Func<string>)(() => "Dodge"), (Func<string>)(() => "Do an evasive dodge roll, negating damage, in the direction your character is moving (backward if stationary)."));
