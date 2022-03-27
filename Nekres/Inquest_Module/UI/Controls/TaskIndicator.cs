@@ -6,7 +6,7 @@ using MonoGame.Extended.BitmapFonts;
 
 namespace Nekres.Inquest_Module.UI.Controls
 {
-	internal class TaskIndicator : Control
+	internal sealed class TaskIndicator : Control
 	{
 		private static Texture2D _stopIcon = GameService.Content.GetTexture("common/154982");
 
@@ -47,7 +47,13 @@ namespace Nekres.Inquest_Module.UI.Controls
 		public TaskIndicator()
 			: this()
 		{
+			((Control)this).set_ZIndex(1000);
 			Update();
+		}
+
+		protected override CaptureType CapturesInput()
+		{
+			return (CaptureType)1;
 		}
 
 		private void Update()

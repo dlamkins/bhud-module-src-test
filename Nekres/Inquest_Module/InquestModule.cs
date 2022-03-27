@@ -60,19 +60,19 @@ namespace Nekres.Inquest_Module
 		{
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0054: Expected O, but got Unknown
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a9: Expected O, but got Unknown
-			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0150: Expected O, but got Unknown
-			//IL_016c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b4: Expected O, but got Unknown
-			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020a: Expected O, but got Unknown
+			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ad: Expected O, but got Unknown
+			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0154: Expected O, but got Unknown
+			//IL_0170: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b8: Expected O, but got Unknown
+			//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020e: Expected O, but got Unknown
 			AutoClickHoldKeySetting = settings.DefineSetting<KeyBinding>("autoClickHoldKeyBinding", new KeyBinding((Keys)188), (Func<string>)(() => "Hold Double Clicking"), (Func<string>)(() => "Perform Double Clicks at the current cursor position while the key is being held down."));
-			AutoClickToggleKeySetting = settings.DefineSetting<KeyBinding>("autoClickToggleKeyBinding", new KeyBinding((Keys)0), (Func<string>)(() => "Toggle Double Clicking"), (Func<string>)(() => "Perform Double Clicks in an interval at the current cursor position until the key is pressed again."));
+			AutoClickToggleKeySetting = settings.DefineSetting<KeyBinding>("autoClickToggleKeyBinding", new KeyBinding((Keys)219), (Func<string>)(() => "Toggle Double Clicking"), (Func<string>)(() => "Perform Double Clicks in an interval at the current cursor position until the key is pressed again."));
 			AutoClickSoundDisabledSetting = settings.DefineSetting<bool>("autoClickSoundsDisabled", false, (Func<string>)(() => "Disable Clicking Sounds"), (Func<string>)(() => "Disables the sound alert when an auto click is performed."));
-			DodgeJumpKeyBindingSetting = settings.DefineSetting<KeyBinding>("dodgeJumpKeyBinding", new KeyBinding((ModifierKeys)4, (Keys)32), (Func<string>)(() => "Dodge-Jump"), (Func<string>)(() => "Perform a dodge roll and a jump simultaneously."));
-			SettingCollection controlOptions = settings.AddSubCollection("Movement", true, false);
+			DodgeJumpKeyBindingSetting = settings.DefineSetting<KeyBinding>("dodgeJumpKeyBinding", new KeyBinding((ModifierKeys)1, (Keys)32), (Func<string>)(() => "Dodge-Jump"), (Func<string>)(() => "Perform a dodge roll and a jump simultaneously."));
+			SettingCollection controlOptions = settings.AddSubCollection("Movement Keys to Trigger on Dodge-Jump", true, false);
 			DodgeKeyBindingSetting = controlOptions.DefineSetting<KeyBinding>("dodgeKeyBinding", new KeyBinding((Keys)86), (Func<string>)(() => "Dodge"), (Func<string>)(() => "Do an evasive dodge roll, negating damage, in the direction your character is moving (backward if stationary)."));
 			JumpKeyBindingSetting = controlOptions.DefineSetting<KeyBinding>("jumpKeyBinding", new KeyBinding((Keys)32), (Func<string>)(() => "Jump"), (Func<string>)(() => "Press to jump over obstacles."));
 		}
@@ -92,32 +92,39 @@ namespace Nekres.Inquest_Module
 
 		private void OnDodgeJumpKeyActivated(object o, EventArgs e)
 		{
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0119: Unknown result type (might be due to invalid IL or missing references)
-			if (!(DateTime.UtcNow < _nextDodgeJump) && (int)DodgeKeyBindingSetting.get_Value().get_PrimaryKey() != 0 && (int)JumpKeyBindingSetting.get_Value().get_PrimaryKey() != 0)
+			if (DateTime.UtcNow < _nextDodgeJump)
 			{
-				if (DodgeKeyBindingSetting.get_Value().get_PrimaryKey() == DodgeJumpKeyBindingSetting.get_Value().get_PrimaryKey() && DodgeKeyBindingSetting.get_Value().get_ModifierKeys() == DodgeJumpKeyBindingSetting.get_Value().get_ModifierKeys())
-				{
-					ScreenNotification.ShowNotification("Endless Loop Error. Dodge-Jump key cannot be the same as Dodge.", (NotificationType)2, (Texture2D)null, 4);
-					return;
-				}
-				if (JumpKeyBindingSetting.get_Value().get_PrimaryKey() == DodgeJumpKeyBindingSetting.get_Value().get_PrimaryKey() && JumpKeyBindingSetting.get_Value().get_ModifierKeys() == DodgeJumpKeyBindingSetting.get_Value().get_ModifierKeys())
-				{
-					ScreenNotification.ShowNotification("Endless Loop Error. Dodge-Jump key cannot be the same as Jump.", (NotificationType)2, (Texture2D)null, 4);
-					return;
-				}
-				_nextDodgeJump = DateTime.UtcNow.AddMilliseconds(100.0);
+				return;
+			}
+			if (DodgeKeyBindingSetting.get_Value().get_PrimaryKey() == DodgeJumpKeyBindingSetting.get_Value().get_PrimaryKey() && DodgeKeyBindingSetting.get_Value().get_ModifierKeys() == DodgeJumpKeyBindingSetting.get_Value().get_ModifierKeys())
+			{
+				ScreenNotification.ShowNotification("Endless Loop Error. Dodge-Jump key cannot be the same as Dodge.", (NotificationType)2, (Texture2D)null, 4);
+				return;
+			}
+			if (JumpKeyBindingSetting.get_Value().get_PrimaryKey() == DodgeJumpKeyBindingSetting.get_Value().get_PrimaryKey() && JumpKeyBindingSetting.get_Value().get_ModifierKeys() == DodgeJumpKeyBindingSetting.get_Value().get_ModifierKeys())
+			{
+				ScreenNotification.ShowNotification("Endless Loop Error. Dodge-Jump key cannot be the same as Jump.", (NotificationType)2, (Texture2D)null, 4);
+				return;
+			}
+			_nextDodgeJump = DateTime.UtcNow.AddMilliseconds(80.0);
+			if ((int)DodgeKeyBindingSetting.get_Value().get_PrimaryKey() != 0)
+			{
 				Keyboard.Stroke((VirtualKeyShort)(short)DodgeKeyBindingSetting.get_Value().get_PrimaryKey(), true);
+			}
+			if ((int)JumpKeyBindingSetting.get_Value().get_PrimaryKey() != 0)
+			{
 				Keyboard.Stroke((VirtualKeyShort)(short)JumpKeyBindingSetting.get_Value().get_PrimaryKey(), true);
 			}
 		}
