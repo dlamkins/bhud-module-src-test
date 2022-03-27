@@ -27,6 +27,8 @@ namespace Nekres.Inquest_Module
 
 		internal SettingEntry<KeyBinding> AutoClickToggleKeySetting;
 
+		internal SettingEntry<bool> AutoClickSoundEnabledSetting;
+
 		internal SettingEntry<KeyBinding> JumpKeyBindingSetting;
 
 		internal SettingEntry<KeyBinding> DodgeKeyBindingSetting;
@@ -60,14 +62,15 @@ namespace Nekres.Inquest_Module
 			//IL_0054: Expected O, but got Unknown
 			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a9: Expected O, but got Unknown
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0100: Expected O, but got Unknown
-			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0164: Expected O, but got Unknown
-			//IL_0172: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ba: Expected O, but got Unknown
+			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0150: Expected O, but got Unknown
+			//IL_016c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b4: Expected O, but got Unknown
+			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020a: Expected O, but got Unknown
 			AutoClickHoldKeySetting = settings.DefineSetting<KeyBinding>("autoClickHoldKeyBinding", new KeyBinding((Keys)188), (Func<string>)(() => "Hold Double Clicking"), (Func<string>)(() => "Perform Double Clicks at the current cursor position while the key is being held down."));
 			AutoClickToggleKeySetting = settings.DefineSetting<KeyBinding>("autoClickToggleKeyBinding", new KeyBinding((Keys)0), (Func<string>)(() => "Toggle Double Clicking"), (Func<string>)(() => "Perform Double Clicks in an interval at the current cursor position until the key is pressed again."));
+			AutoClickSoundEnabledSetting = settings.DefineSetting<bool>("autoClickSoundEnabled", true, (Func<string>)(() => "Disable Clicking Sounds"), (Func<string>)(() => "Disables the sound alert when an auto click is performed."));
 			DodgeJumpKeyBindingSetting = settings.DefineSetting<KeyBinding>("dodgeJumpKeyBinding", new KeyBinding((ModifierKeys)4, (Keys)32), (Func<string>)(() => "Dodge-Jump"), (Func<string>)(() => "Perform a dodge roll and a jump simultaneously."));
 			SettingCollection controlOptions = settings.AddSubCollection("Movement", true, false);
 			DodgeKeyBindingSetting = controlOptions.DefineSetting<KeyBinding>("dodgeKeyBinding", new KeyBinding((Keys)86), (Func<string>)(() => "Dodge"), (Func<string>)(() => "Do an evasive dodge roll, negating damage, in the direction your character is moving (backward if stationary)."));
