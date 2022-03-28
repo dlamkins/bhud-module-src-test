@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="Armorsmith"><value>Armorsmith</value></data>
+  <data name="SearchFor"><value>Search for ...</value></data>
+  <data name="Updated"><value>Updated {0}</value></data>
+  <data name="ModuleDescription"><value>A tool to easily switch characters even with a lot of them!
+This will require an API-Key with permissions at least for the 'characters' endpoint!</value></data>
+  <data name="FilterDelay_DisplayName"><value>Filter Delay ({0} ms)</value></data>
+  <data name="Logout"><value>Logout</value></data>
+  <data name="Update"><value>Update {0}</value></data>
+  <data name="Unkown"><value>Unkown</value></data>
+  <data name="LoginAfterSelect"><value>Enter the game automatically after selecting the character in the character selection</value></data>
+  <data name="Tailor"><value>Tailor</value></data>
+  <data name="SwapDelay_DisplayName"><value>Loading Delay ({0} ms)</value></data>
+  <data name="Switch"><value>Switch to {0}</value></data>
+  <data name="Scribe"><value>Scribe</value></data>
+  <data name="Updating"><value>Updating {0}</value></data>
+  <data name="Jeweler"><value>Jeweler</value></data>
+  <data name="Specialization"><value>Specialization</value></data>
+  <data name="Leatherworker"><value>Leatherworker</value></data>
+  <data name="Map"><value>Map</value></data>
+  <data name="Clear"><value>Clear</value></data>
+  <data name="Level"><value>Level {0}</value></data>
+  <data name="Years"><value>Years</value></data>
+  <data name="Error_InvalidPermissions"><value>This API key does not have the required permissions.</value></data>
+  <data name="NoCraftingProfession"><value>No Crafting Profession</value></data>
+  <data name="FilterDelay_Description"><value>Average time in milliseconds waited between filtering your characters' panel.
+To get the current value you will have to swap module tabs once to update the settings page!</value></data>
+  <data name="Birthday"><value>Birthday</value></data>
+  <data name="Weaponsmith"><value>Weaponsmith</value></data>
+  <data name="SwapDelay_Description"><value>Avg. loading time from ingame to character selection.
+To get the current value you will have to swap module tabs once to update the settings page!</value></data>
+  <data name="Artificer"><value>Artificer</value></data>
+  <data name="Huntsman"><value>Huntsman</value></data>
+  <data name="Characters"><value>Characters</value></data>
+  <data name="Error_Competivive"><value>Character swapping is disabled in competition mode!</value></data>
+  <data name="LogoutDescription"><value>Key to Press to open the logout menu. Must be the same as the game keybind for 'Logout'!</value></data>
+  <data name="Profession"><value>Profession</value></data>
+  <data name="CraftingProfession"><value>Crafting Profession</value></data>
+  <data name="CustomTags"><value>Custom Tags</value></data>
+  <data name="Days"><value>Days</value></data>
+  <data name="Chef"><value>Chef</value></data>
+  <data name="Race"><value>Race</value></data>
+  </root>
