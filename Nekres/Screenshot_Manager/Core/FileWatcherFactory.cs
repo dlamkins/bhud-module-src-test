@@ -86,7 +86,7 @@ namespace Nekres.Screenshot_Manager.Core
 		{
 			if (!ScreenshotManagerModule.ModuleInstance.MuteSound.get_Value())
 			{
-				ScreenshotManagerModule.ModuleInstance.ScreenShotSfx.Play();
+				ScreenshotManagerModule.ModuleInstance.ScreenShotSfx.Play(GameService.GameIntegration.get_Audio().get_Volume(), 0f, 0f);
 			}
 			if (ScreenshotManagerModule.ModuleInstance.DisableNotification.get_Value())
 			{

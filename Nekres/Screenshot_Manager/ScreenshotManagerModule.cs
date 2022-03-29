@@ -32,6 +32,8 @@ namespace Nekres.Screenshot_Manager
 
 		internal SettingEntry<bool> SendToRecycleBin;
 
+		internal SettingEntry<bool> HideCornerIcon;
+
 		internal SettingEntry<List<string>> Favorites;
 
 		private Texture2D _icon64;
@@ -70,26 +72,48 @@ namespace Nekres.Screenshot_Manager
 			MuteSound = settings.DefineSetting<bool>("muteSound", false, (Func<string>)(() => Resources.Mute_Screenshot_Sound), (Func<string>)(() => Resources.Mutes_the_sound_alert_when_a_new_screenshot_has_been_captured_));
 			DisableNotification = settings.DefineSetting<bool>("disableNotification", false, (Func<string>)(() => Resources.Disable_Screenshot_Notification), (Func<string>)(() => Resources.Disables_the_notification_when_a_new_screenshot_has_been_captured_));
 			SendToRecycleBin = settings.DefineSetting<bool>("sendToRecycleBin", true, (Func<string>)(() => Resources.Delete_sends_to_Recycle_Bin), (Func<string>)(() => Resources.By_default__screenshots_are_sent_to_the_Recycle_Bin_so_that_they_can_be_recovered_if_needed__nWhen_this_feature_is_disabled__deleted_screenshots_are_removed_from_the_hard_disk_and_their_space_is_marked_as_overwriteable_));
+			HideCornerIcon = settings.DefineSetting<bool>("hideCornerIcon", false, (Func<string>)(() => Resources.Hide_Corner_Icon), (Func<string>)(() => Resources.Disables_the_corner_icon_in_the_navigation_menu_));
 			SettingCollection selfManagedSettings = settings.AddSubCollection("ManagedSettings", false, false);
 			Favorites = selfManagedSettings.DefineSetting<List<string>>("favorites", new List<string>(), (Func<string>)null, (Func<string>)null);
 		}
 
 		protected override void Initialize()
 		{
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007d: Expected O, but got Unknown
 			_fileWatcherFactory = new FileWatcherFactory();
 			LoadTextures();
 			_moduleTab = GameService.Overlay.get_BlishHudWindow().AddTab(((Module)this).get_Name(), AsyncTexture2D.op_Implicit(_icon64), (Func<IView>)(() => (IView)(object)new ScreenshotManagerView(new ScreenshotManagerModel(_fileWatcherFactory))), 0);
-			CornerIcon val = new CornerIcon();
-			val.set_IconName(((Module)this).get_Name());
-			val.set_Icon(AsyncTexture2D.op_Implicit(_icon64));
-			val.set_Priority(((Module)this).get_Name().GetHashCode());
-			_moduleCornerIcon = val;
-			((Control)_moduleCornerIcon).add_Click((EventHandler<MouseEventArgs>)ModuleCornerIconClicked);
+			CreateOrDisposeCornerIcon(HideCornerIcon.get_Value());
+		}
+
+		public void CreateOrDisposeCornerIcon(bool dispose)
+		{
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Expected O, but got Unknown
+			if (dispose)
+			{
+				CornerIcon moduleCornerIcon = _moduleCornerIcon;
+				if (moduleCornerIcon != null)
+				{
+					((Control)moduleCornerIcon).Dispose();
+				}
+			}
+			else
+			{
+				CornerIcon val = new CornerIcon();
+				val.set_IconName(((Module)this).get_Name());
+				val.set_Icon(AsyncTexture2D.op_Implicit(_icon64));
+				val.set_Priority(((Module)this).get_Name().GetHashCode());
+				_moduleCornerIcon = val;
+				((Control)_moduleCornerIcon).add_Click((EventHandler<MouseEventArgs>)ModuleCornerIconClicked);
+			}
+		}
+
+		private void OnHideCornerIconSettingChanged(object o, ValueChangedEventArgs<bool> e)
+		{
+			CreateOrDisposeCornerIcon(e.get_NewValue());
 		}
 
 		public override IView GetSettingsView()
@@ -110,6 +134,7 @@ namespace Nekres.Screenshot_Manager
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
+			HideCornerIcon.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnHideCornerIconSettingChanged);
 			((Module)this).OnModuleLoaded(e);
 		}
 
@@ -119,6 +144,7 @@ namespace Nekres.Screenshot_Manager
 
 		protected override void Unload()
 		{
+			HideCornerIcon.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnHideCornerIconSettingChanged);
 			_fileWatcherFactory.Dispose();
 			((Control)_moduleCornerIcon).remove_Click((EventHandler<MouseEventArgs>)ModuleCornerIconClicked);
 			((Control)_moduleCornerIcon).Dispose();

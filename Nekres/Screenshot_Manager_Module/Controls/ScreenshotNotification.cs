@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -16,6 +17,8 @@ namespace Nekres.Screenshot_Manager_Module.Controls
 		private static int _visibleNotifications;
 
 		private static readonly BitmapFont Font = GameService.Content.GetFont((FontFace)0, (FontSize)24, (FontStyle)0);
+
+		private static readonly BitmapFont TitleFont = GameService.Content.GetFont((FontFace)0, (FontSize)22, (FontStyle)0);
 
 		private readonly ThumbnailBase _thumbnail;
 
@@ -54,17 +57,24 @@ namespace Nekres.Screenshot_Manager_Module.Controls
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bound)
 		{
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			((Panel)this).PaintBeforeChildren(spriteBatch, bound);
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), bound, Color.get_Black() * 0.4f);
 			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, _message, Font, new Rectangle(0, 0, ((Control)this).get_Width(), 36), Color.get_White(), false, true, 2, (HorizontalAlignment)1, (VerticalAlignment)1);
 		}
 
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bound)
 		{
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			((Container)this).PaintAfterChildren(spriteBatch, bound);
+			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, "“" + Path.GetFileNameWithoutExtension(_thumbnail.FileName) + "”", TitleFont, new Rectangle(0, 38, ((Control)this).get_Width(), 36), Color.get_White(), false, true, 1, (HorizontalAlignment)1, (VerticalAlignment)1);
 		}
 
 		private void Show(float duration)

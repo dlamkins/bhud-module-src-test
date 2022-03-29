@@ -32,6 +32,7 @@
   <data name="Stereoscopic"><value>Stereoscopic</value></data>
   <data name="Cancel"><value>Cancel</value></data>
   <data name="Normal"><value>Normal</value></data>
+  <data name="Hide Corner Icon"><value>Hide Corner Icon</value></data>
   <data name="Image name cannot be empty."><value>Image name cannot be empty.</value></data>
   <data name="Please enter a different image name."><value>Please enter a different image name.</value></data>
   <data name="Click To Zoom"><value>Click To Zoom</value></data>
@@ -52,6 +53,7 @@
   <data name="By default, screenshots are sent to the Recycle Bin so that they can be recovered if needed.\nWhen this feature is disabled, deleted screenshots are removed from the hard disk and their space is marked as overwriteable."><value>By default, screenshots are sent to the Recycle Bin so that they can be recovered if needed.
 When this feature is disabled, deleted screenshots are removed from the hard disk and their space is marked as overwriteable.</value></data>
   <data name="The following characters are not allowed: {0}"><value>The following characters are not allowed: {0}</value></data>
+  <data name="Disables the corner icon in the navigation menu."><value>Disables the icon in the navigation menu.</value></data>
   <data name="You are about to permanently destroy {0}."><value>You are about to permanently destroy {0}.</value></data>
   <data name="The image file doesn't exist anymore!"><value>The image doesn't exist anymore!</value></data>
   <data name="Take a normal screenshot."><value>Take a normal screenshot.</value></data>

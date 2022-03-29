@@ -58,11 +58,15 @@ namespace Nekres.Screenshot_Manager.Properties
 
 		internal static string Disable_Screenshot_Notification => ResourceManager.GetString("Disable Screenshot Notification", resourceCulture);
 
+		internal static string Disables_the_corner_icon_in_the_navigation_menu_ => ResourceManager.GetString("Disables the corner icon in the navigation menu.", resourceCulture);
+
 		internal static string Disables_the_notification_when_a_new_screenshot_has_been_captured_ => ResourceManager.GetString("Disables the notification when a new screenshot has been captured.", resourceCulture);
 
 		internal static string Failed_to_delete_image__0__ => ResourceManager.GetString("Failed to delete image {0}.", resourceCulture);
 
 		internal static string Favourite => ResourceManager.GetString("Favourite", resourceCulture);
+
+		internal static string Hide_Corner_Icon => ResourceManager.GetString("Hide Corner Icon", resourceCulture);
 
 		internal static string Image_name_cannot_be_empty_ => ResourceManager.GetString("Image name cannot be empty.", resourceCulture);
 

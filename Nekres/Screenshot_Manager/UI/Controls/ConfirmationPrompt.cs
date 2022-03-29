@@ -120,7 +120,8 @@ namespace Nekres.Screenshot_Manager.UI.Controls
 			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Expected O, but got Unknown
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Expected O, but got Unknown
 			if (_challengeTextBox == null)
 			{
 				TextBox val = new TextBox();
@@ -128,6 +129,7 @@ namespace Nekres.Screenshot_Manager.UI.Controls
 				((Control)val).set_Size(((Rectangle)(ref _challengeTextBoxBounds)).get_Size());
 				((Control)val).set_Location(((Rectangle)(ref _challengeTextBoxBounds)).get_Location());
 				((TextInputBase)val).set_Font(_font);
+				((TextInputBase)val).set_Focused(true);
 				_challengeTextBox = val;
 				((TextInputBase)_challengeTextBox).add_TextChanged((EventHandler<EventArgs>)delegate(object o, EventArgs _)
 				{
