@@ -59,7 +59,7 @@ namespace Kenedia.Modules.Characters
 
 		public bool loginCharacter;
 
-		public bool include;
+		public bool include = true;
 
 		public bool visible = true;
 
@@ -119,7 +119,8 @@ namespace Kenedia.Modules.Characters
 				{
 					Parent = characterControl,
 					assignedCharacter = this
-				}
+				},
+				Visible = true
 			};
 			characterControl.Click += CharacterControl_Click;
 			characterControl.Click += delegate

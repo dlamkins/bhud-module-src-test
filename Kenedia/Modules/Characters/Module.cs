@@ -497,10 +497,7 @@ namespace Kenedia.Modules.Characters
 				TokenPermission.Characters
 			}))
 			{
-				Account account = await Gw2ApiManager.Gw2ApiClient.V2.Account.GetAsync();
-				Logger.Debug("Account Age: " + account.Age.TotalSeconds + " seconds");
-				Logger.Debug("LastModified: " + account.LastModified.ToString());
-				API_Account = account;
+				Account account = (API_Account = await Gw2ApiManager.Gw2ApiClient.V2.Account.GetAsync());
 				string path = DirectoriesManager.GetFullDirectoryPath("characters") + "\\" + API_Account.Name;
 				if (!Directory.Exists(path))
 				{
@@ -582,7 +579,6 @@ namespace Kenedia.Modules.Characters
 				PlayerCharacter player = GameService.Gw2Mumble.PlayerCharacter;
 				foreach (Character character in Characters)
 				{
-					Logger.Debug("Adding UI Elements for " + character.Name);
 					character.Create_UI_Elements();
 					if (player != null && player.Name == character.Name)
 					{
@@ -960,7 +956,10 @@ namespace Kenedia.Modules.Characters
 					character.Hide();
 				}
 			}
-			CharacterPanel.SortChildren((CharacterControl a, CharacterControl b) => b.assignedCharacter.LastModified.CompareTo(a.assignedCharacter.LastModified));
+			if (CharacterPanel != null)
+			{
+				CharacterPanel.SortChildren((CharacterControl a, CharacterControl b) => b.assignedCharacter.LastModified.CompareTo(a.assignedCharacter.LastModified));
+			}
 			bool matchingFilterString(Character c)
 			{
 				if (txt == "")
@@ -1755,16 +1754,28 @@ namespace Kenedia.Modules.Characters
 			filterWindow?.Dispose();
 			cornerButton?.Dispose();
 			Settings.ShortcutKey.Value.Activated -= OnKeyPressed_ToggleMenu;
-			ModuleInstance = null;
-			CharacterNames = null;
-			Characters = null;
-			Tags = null;
-			TagEntries = null;
+			Gw2ApiManager.SubtokenUpdated -= Gw2ApiManager_SubtokenUpdated;
+			CharacterNames = new List<string>();
+			Characters = new List<Character>();
+			Tags = new List<string>();
+			TagEntries = new List<TagEntry>();
 			userAccount = null;
 			swapCharacter = null;
 			API_Account = null;
 			Current.character = null;
 			Last.character = null;
+			Textures.Backgrounds = null;
+			Textures.Crafting = null;
+			Textures.CraftingDisabled = null;
+			Textures.Emblems = null;
+			Textures.Icons = null;
+			Textures.Professions = null;
+			Textures.ProfessionsDisabled = null;
+			Textures.Races = null;
+			Textures.RacesDisabled = null;
+			Textures.Specializations = null;
+			Textures.SpecializationsDisabled = null;
+			ModuleInstance = null;
 		}
 	}
 }
