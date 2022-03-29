@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Controls.Extern;
@@ -13,7 +12,6 @@ using Kenedia.Modules.Characters.Strings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Newtonsoft.Json;
 
 namespace Kenedia.Modules.Characters
 {
@@ -35,6 +33,8 @@ namespace Kenedia.Modules.Characters
 
 		public CharacterControl characterControl;
 
+		public FlowPanel craftingPanel;
+
 		public Tooltip tooltip;
 
 		public Image classImage;
@@ -53,7 +53,13 @@ namespace Kenedia.Modules.Characters
 
 		public DateTimeOffset Created;
 
+		public DateTime NextBirthday;
+
 		public int map;
+
+		public bool loginCharacter;
+
+		public bool include;
 
 		public bool visible = true;
 
@@ -115,6 +121,7 @@ namespace Kenedia.Modules.Characters
 					assignedCharacter = this
 				}
 			};
+			characterControl.Click += CharacterControl_Click;
 			characterControl.Click += delegate
 			{
 				if (Module.subWindow.Visible)
@@ -193,7 +200,7 @@ namespace Kenedia.Modules.Characters
 			};
 			if (Crafting.Count > 0)
 			{
-				FlowPanel craftingPanel = new FlowPanel
+				craftingPanel = new FlowPanel
 				{
 					Location = new Point(characterControl.Width - 45 - 48 - 10, 0),
 					Parent = characterControl,
@@ -214,7 +221,7 @@ namespace Kenedia.Modules.Characters
 							Parent = craftingPanel,
 							Enabled = false
 						});
-						ttp = ttp + Enum.GetName(typeof(Crafting), crafting.Id) + " (" + crafting.Rating + ")" + Environment.NewLine;
+						ttp = ttp + DataManager.getCraftingName(crafting.Id) + " (" + crafting.Rating + ")" + Environment.NewLine;
 					}
 				}
 				ttp = ttp.TrimEnd();
@@ -237,6 +244,14 @@ namespace Kenedia.Modules.Characters
 			switchButton.MouseLeft += SwitchButton_MouseLeft;
 			tooltp._Create();
 			loaded = true;
+		}
+
+		private void CharacterControl_Click(object sender, MouseEventArgs e)
+		{
+			if (e.IsDoubleClick && Module.Settings.DoubleClickToEnter.Value)
+			{
+				Swap();
+			}
 		}
 
 		private void SwitchButton_Click(object sender, MouseEventArgs e)
@@ -324,8 +339,26 @@ namespace Kenedia.Modules.Characters
 			}
 		}
 
-		public void UpdateTooltips()
+		public void UpdateLanguage()
 		{
+			if (craftingImages == null || Crafting.Count <= 0)
+			{
+				return;
+			}
+			string ttp = "";
+			foreach (CharacterCrafting crafting in Crafting)
+			{
+				if (crafting.Active)
+				{
+					ttp = ttp + DataManager.getCraftingName(crafting.Id) + " (" + crafting.Rating + ")" + Environment.NewLine;
+				}
+			}
+			ttp = ttp.TrimEnd();
+			foreach (Image craftingImage in craftingImages)
+			{
+				craftingImage.BasicTooltipText = ttp;
+			}
+			craftingPanel.BasicTooltipText = ttp;
 		}
 
 		public void Update_UI_Time()
@@ -335,7 +368,6 @@ namespace Kenedia.Modules.Characters
 				return;
 			}
 			seconds = Math.Round(DateTime.UtcNow.Subtract(lastLogin).TotalSeconds);
-			UpdateTooltips();
 			TimeSpan t = TimeSpan.FromSeconds(seconds);
 			if (timeLabel != null)
 			{
@@ -346,6 +378,11 @@ namespace Kenedia.Modules.Characters
 				for (int i = 1; i < 100; i++)
 				{
 					DateTime birthDay = Created.AddYears(i).DateTime;
+					_ = NextBirthday;
+					if (NextBirthday == Module.dateZero && birthDay >= DateTime.UtcNow)
+					{
+						NextBirthday = birthDay;
+					}
 					if (!(birthDay <= DateTime.UtcNow))
 					{
 						break;
@@ -442,32 +479,7 @@ namespace Kenedia.Modules.Characters
 
 		public void Save()
 		{
-			if (Module.API_Account == null)
-			{
-				return;
-			}
-			List<JsonCharacter> _data = new List<JsonCharacter>();
-			foreach (Character c in Module.Characters)
-			{
-				JsonCharacter jsonCharacter = new JsonCharacter
-				{
-					Name = c.Name,
-					Race = c.Race,
-					Specialization = c._Specialization,
-					Profession = c._Profession,
-					Crafting = c.Crafting,
-					lastLogin = c.lastLogin,
-					apiIndex = c.apiIndex,
-					Created = c.Created,
-					LastModified = c.LastModified,
-					map = c.map,
-					Level = c.Level,
-					Tags = string.Join("|", c.Tags)
-				};
-				_data.Add(jsonCharacter);
-			}
-			string json = JsonConvert.SerializeObject(_data.ToArray());
-			File.WriteAllText(Module.CharactersPath, json);
+			Module.saveCharacters = true;
 		}
 	}
 }

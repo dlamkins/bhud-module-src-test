@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Controls.Extern;
+using Blish_HUD.Controls.Intern;
 using Blish_HUD.Gw2Mumble;
 using Blish_HUD.Input;
 using Blish_HUD.Modules;
@@ -58,21 +59,23 @@ namespace Kenedia.Modules.Characters
 
 		public List<string> _SpecializationNames;
 
-		public static _Settings Settings = new _Settings();
+		internal static Module ModuleInstance;
 
-		private DateTime dateZero;
+		public static DateTime dateZero;
 
 		public static DateTime lastLogout;
 
 		private static bool requestAPI = true;
 
-		private static bool filterCharacterPanel = true;
+		public static bool filterCharacterPanel = true;
 
 		public ContentService contentService = new ContentService();
 
 		public static string CharactersPath;
 
 		public static string AccountPath;
+
+		public static _Settings Settings = new _Settings();
 
 		public static FlowPanel CharacterPanel;
 
@@ -84,23 +87,19 @@ namespace Kenedia.Modules.Characters
 
 		public static Image infoImage;
 
-		public static Image expandButton;
-
 		public static StandardButton refreshAPI;
 
 		public static CornerIcon cornerButton;
 
-		public static ToggleImage birthdayToggle;
+		public static List<ToggleIcon> filterProfessions = new List<ToggleIcon>();
 
-		public static ToggleImage[] filterProfessions;
+		public static List<ToggleIcon> filterCrafting = new List<ToggleIcon>();
 
-		public static ToggleImage[] filterCrafting;
+		public static List<ToggleIcon> filterRaces = new List<ToggleIcon>();
 
-		public static ToggleImage[] filterRaces;
+		public static List<ToggleIcon> filterSpecs = new List<ToggleIcon>();
 
-		public static ToggleImage[] filterSpecs;
-
-		public static ToggleImage[] filterBaseSpecs;
+		public static List<ToggleIcon> filterBaseSpecs = new List<ToggleIcon>();
 
 		public static Label racesLabel;
 
@@ -111,6 +110,14 @@ namespace Kenedia.Modules.Characters
 		public static FlowPanel filterTagsPanel;
 
 		public static bool charactersLoaded;
+
+		public static bool saveCharacters;
+
+		public static bool loginCharacter_Swapped;
+
+		public static bool showAllCharacters;
+
+		public static Character loginCharacter;
 
 		public static Account API_Account;
 
@@ -156,7 +163,7 @@ namespace Kenedia.Modules.Characters
 
 		public static StandardWindow MainWidow { get; private set; }
 
-		public static BasicContainer filterWindow { get; private set; }
+		public static FilterWindow filterWindow { get; private set; }
 
 		public static CharacterDetailWindow subWindow { get; private set; }
 
@@ -390,7 +397,10 @@ namespace Kenedia.Modules.Characters
 		protected override void DefineSettings(SettingCollection settings)
 		{
 			Settings.LogoutKey = settings.DefineSetting("LogoutKey", new KeyBinding(Keys.F12), () => common.Logout, () => common.LogoutDescription);
-			Settings.EnterOnSwap = settings.DefineSetting("EnterOnSwap", defaultValue: false, () => common.LoginAfterSelect, () => common.LoginAfterSelect);
+			Settings.ShortcutKey = settings.DefineSetting("ShortcutKey", new KeyBinding(ModifierKeys.Shift, Keys.C), () => common.ShortcutToggle_DisplayName, () => common.ShortcutToggle_Description);
+			Settings.EnterOnSwap = settings.DefineSetting("EnterOnSwap", defaultValue: false, () => common.EnterOnSwap_DisplayName, () => common.EnterOnSwap_Description);
+			Settings.AutoLogin = settings.DefineSetting("AutoLogin", defaultValue: false, () => common.AutoLogin_DisplayName, () => common.AutoLogin_Description);
+			Settings.DoubleClickToEnter = settings.DefineSetting("DoubleClickToEnter", defaultValue: false, () => common.DoubleClickToEnter_DisplayName, () => common.DoubleClickToEnter_Description);
 			Settings.SwapDelay = settings.DefineSetting("SwapDelay", 500, () => string.Format(common.SwapDelay_DisplayName, Settings.SwapDelay.Value), () => common.SwapDelay_Description);
 			Settings.SwapDelay.SetRange(0, 5000);
 			Settings.FilterDelay = settings.DefineSetting("FilterDelay", 150, () => string.Format(common.FilterDelay_DisplayName, Settings.FilterDelay.Value), () => common.FilterDelay_Description);
@@ -404,69 +414,77 @@ namespace Kenedia.Modules.Characters
 
 		public async void FetchAPI(bool force = false)
 		{
-			if (Gw2ApiManager.HasPermissions(new TokenPermission[2]
+			_ = 1;
+			try
 			{
-				TokenPermission.Account,
-				TokenPermission.Characters
-			}) && API_Account != null && userAccount != null)
-			{
-				Account account = await Gw2ApiManager.Gw2ApiClient.V2.Account.GetAsync();
-				userAccount.LastModified = account.LastModified;
-				userAccount.Save();
-				if (userAccount.CharacterUpdateNeeded() || force)
+				if (Gw2ApiManager.HasPermissions(new TokenPermission[2]
 				{
-					userAccount.LastBlishUpdate = ((userAccount.LastBlishUpdate > account.LastModified) ? userAccount.LastBlishUpdate : account.LastModified);
+					TokenPermission.Account,
+					TokenPermission.Characters
+				}) && API_Account != null && userAccount != null)
+				{
+					Account account = await Gw2ApiManager.Gw2ApiClient.V2.Account.GetAsync();
+					userAccount.LastModified = account.LastModified;
 					userAccount.Save();
-					IApiV2ObjectList<Gw2Sharp.WebApi.V2.Models.Character> obj = await Gw2ApiManager.Gw2ApiClient.V2.Characters.AllAsync();
-					Logger.Debug("Updating Characters ....");
-					Character last = null;
-					int i = 0;
-					foreach (Gw2Sharp.WebApi.V2.Models.Character c in obj)
+					if (userAccount.CharacterUpdateNeeded() || force)
 					{
-						Character character = getCharacter(c.Name);
-						character.Name = character.Name ?? c.Name;
-						character.Race = (RaceType)Enum.Parse(typeof(RaceType), c.Race);
-						character._Profession = (int)Enum.Parse(typeof(Professions), c.Profession.ToString());
-						character.Profession = (ProfessionType)Enum.Parse(typeof(ProfessionType), c.Profession.ToString());
-						character._Specialization = ((character._Specialization > -1) ? character._Specialization : (-1));
-						character.Level = c.Level;
-						character.Created = c.Created;
-						character.contentsManager = ContentsManager;
-						character.apiManager = Gw2ApiManager;
-						character.Crafting = new List<CharacterCrafting>();
-						foreach (CharacterCraftingDiscipline disc in c.Crafting.ToList())
+						userAccount.LastBlishUpdate = ((userAccount.LastBlishUpdate > account.LastModified) ? userAccount.LastBlishUpdate : account.LastModified);
+						userAccount.Save();
+						IApiV2ObjectList<Gw2Sharp.WebApi.V2.Models.Character> obj = await Gw2ApiManager.Gw2ApiClient.V2.Characters.AllAsync();
+						Logger.Debug("Updating Characters ....");
+						Character last = null;
+						int i = 0;
+						foreach (Gw2Sharp.WebApi.V2.Models.Character c in obj)
 						{
-							character.Crafting.Add(new CharacterCrafting
+							Character character = getCharacter(c.Name);
+							character.Name = character.Name ?? c.Name;
+							character.Race = (RaceType)Enum.Parse(typeof(RaceType), c.Race);
+							character._Profession = (int)Enum.Parse(typeof(Professions), c.Profession.ToString());
+							character.Profession = (ProfessionType)Enum.Parse(typeof(ProfessionType), c.Profession.ToString());
+							character._Specialization = ((character._Specialization > -1) ? character._Specialization : (-1));
+							character.Level = c.Level;
+							character.Created = c.Created;
+							character.contentsManager = ContentsManager;
+							character.apiManager = Gw2ApiManager;
+							character.Crafting = new List<CharacterCrafting>();
+							foreach (CharacterCraftingDiscipline disc in c.Crafting.ToList())
 							{
-								Id = (int)disc.Discipline.Value,
-								Rating = disc.Rating,
-								Active = disc.Active
-							});
+								character.Crafting.Add(new CharacterCrafting
+								{
+									Id = (int)disc.Discipline.Value,
+									Rating = disc.Rating,
+									Active = disc.Active
+								});
+							}
+							character.apiIndex = i;
+							if (character.LastModified == dateZero || character.LastModified < account.LastModified.UtcDateTime)
+							{
+								character.LastModified = account.LastModified.UtcDateTime.AddSeconds(-i);
+							}
+							if (character.lastLogin == dateZero)
+							{
+								character.lastLogin = c.LastModified.UtcDateTime;
+							}
+							last = character;
+							i++;
 						}
-						character.apiIndex = i;
-						if (character.LastModified == dateZero || character.LastModified < account.LastModified.UtcDateTime)
-						{
-							character.LastModified = account.LastModified.UtcDateTime.AddSeconds(-i);
-						}
-						if (character.lastLogin == dateZero)
-						{
-							character.lastLogin = c.LastModified.UtcDateTime;
-						}
-						last = character;
-						i++;
+						last?.Save();
+						filterCharacterPanel = true;
+						Logger.Debug("Characters Updated!");
 					}
-					last?.Save();
-					filterCharacterPanel = true;
-					Logger.Debug("Characters Updated!");
+					double lastModified = DateTimeOffset.UtcNow.Subtract(userAccount.LastModified).TotalSeconds;
+					double lastUpdate = DateTimeOffset.UtcNow.Subtract(userAccount.LastBlishUpdate).TotalSeconds;
+					infoImage.BasicTooltipText = "Last Modified: " + Math.Round(lastModified) + Environment.NewLine + "Last Blish Login: " + Math.Round(lastUpdate);
 				}
-				double lastModified = DateTimeOffset.UtcNow.Subtract(userAccount.LastModified).TotalSeconds;
-				double lastUpdate = DateTimeOffset.UtcNow.Subtract(userAccount.LastBlishUpdate).TotalSeconds;
-				infoImage.BasicTooltipText = "Last Modified: " + Math.Round(lastModified) + Environment.NewLine + "Last Blish Login: " + Math.Round(lastUpdate);
+				else
+				{
+					ScreenNotification.ShowNotification(common.Error_Competivive, ScreenNotification.NotificationType.Error);
+					Logger.Error("This API Token has not the required permissions!");
+				}
 			}
-			else
+			catch (Exception ex)
 			{
-				ScreenNotification.ShowNotification(common.Error_Competivive, ScreenNotification.NotificationType.Error);
-				Logger.Error("This API Token has not the required permissions!");
+				Logger.Warn(ex, "Failed to fetch characters from the API.");
 			}
 		}
 
@@ -588,6 +606,7 @@ namespace Kenedia.Modules.Characters
 		public Module([Import("ModuleParameters")] ModuleParameters moduleParameters)
 			: base(moduleParameters)
 		{
+			ModuleInstance = this;
 		}
 
 		protected override void Initialize()
@@ -602,6 +621,8 @@ namespace Kenedia.Modules.Characters
 			AccountPath = DirectoriesManager.GetFullDirectoryPath("characters") + "\\accounts.json";
 			DataManager.ContentsManager = ContentsManager;
 			DataManager.Load();
+			Settings.ShortcutKey.Value.Enabled = true;
+			Settings.ShortcutKey.Value.Activated += OnKeyPressed_ToggleMenu;
 		}
 
 		private void LoadTextures()
@@ -689,55 +710,60 @@ namespace Kenedia.Modules.Characters
 				c.switchButton.BasicTooltipText = string.Format(common.Switch, c.Name);
 			}
 			filterTextBox.PlaceholderText = common.SearchFor;
+			filterTextBox.BasicTooltipText = common.SearchGuide;
 			clearButton.Text = common.Clear;
-			racesLabel.Text = common.Race;
-			specializationLabel.Text = common.Specialization;
-			customTagsLabel.Text = common.CustomTags;
-			ToggleImage[] array = filterProfessions;
-			foreach (ToggleImage toggle in array)
+			subWindow.loginCharacter.Text = common.LoginCharacter;
+			filterWindow.CustomTags.Text = common.CustomTags;
+			filterWindow.Utility.Text = common.Utility;
+			filterWindow.Crafting.Text = common.CraftingProfession;
+			filterWindow.Profession.Text = common.Profession;
+			filterWindow.Specialization.Text = common.Specialization;
+			filterWindow.visibleToggle.BasicTooltipText = common.ToggleVisible;
+			filterWindow.birthdayToggle.BasicTooltipText = common.Birthday;
+			filterWindow.toggleSpecsButton.Text = common.ToggleAll;
+			foreach (Character character in Characters)
 			{
-				if (toggle != null)
+				character.UpdateLanguage();
+			}
+			foreach (ToggleIcon toggle5 in filterProfessions)
+			{
+				if (toggle5 != null)
 				{
-					toggle.BasicTooltipText = DataManager.getProfessionName(toggle.Id);
+					toggle5.BasicTooltipText = DataManager.getProfessionName(toggle5.Id);
 				}
 			}
-			array = filterBaseSpecs;
-			foreach (ToggleImage toggle2 in array)
+			foreach (ToggleIcon toggle4 in filterBaseSpecs)
 			{
-				if (toggle2 != null)
+				if (toggle4 != null)
 				{
-					toggle2.BasicTooltipText = DataManager.getProfessionName(toggle2.Id);
+					toggle4.BasicTooltipText = DataManager.getProfessionName(toggle4.Id);
 				}
 			}
-			array = filterCrafting;
-			foreach (ToggleImage toggle3 in array)
+			foreach (ToggleIcon toggle3 in filterCrafting)
 			{
 				if (toggle3 != null)
 				{
-					toggle3.BasicTooltipText = DataManager.getCraftingName(Enum.GetName(typeof(Crafting), toggle3.Id));
+					toggle3.BasicTooltipText = DataManager.getCraftingName(toggle3.Id);
 					if (toggle3.Id == 0)
 					{
 						toggle3.BasicTooltipText = common.NoCraftingProfession;
 					}
 				}
 			}
-			array = filterSpecs;
-			foreach (ToggleImage toggle4 in array)
+			foreach (ToggleIcon toggle2 in filterSpecs)
 			{
-				if (toggle4 != null)
+				if (toggle2 != null)
 				{
-					toggle4.BasicTooltipText = DataManager.getSpecName(toggle4.Id);
+					toggle2.BasicTooltipText = DataManager.getSpecName(toggle2.Id);
 				}
 			}
-			array = filterRaces;
-			foreach (ToggleImage toggle5 in array)
+			foreach (ToggleIcon toggle in filterRaces)
 			{
-				if (toggle5 != null)
+				if (toggle != null)
 				{
-					toggle5.BasicTooltipText = DataManager.getRaceName(toggle5.Id);
+					toggle.BasicTooltipText = DataManager.getRaceName(toggle.Id);
 				}
 			}
-			birthdayToggle.BasicTooltipText = common.Birthday;
 		}
 
 		private void LoadCharacterList()
@@ -765,6 +791,8 @@ namespace Kenedia.Modules.Characters
 				character2.map = c.map;
 				character2.Level = c.Level;
 				character2.Tags = ((c.Tags != null && c.Tags != "") ? c.Tags.Split('|').ToList() : new List<string>());
+				character2.loginCharacter = c.loginCharacter;
+				character2.include = c.include;
 				Character character = character2;
 				foreach (string tag in character.Tags)
 				{
@@ -775,6 +803,10 @@ namespace Kenedia.Modules.Characters
 				}
 				Characters.Add(character);
 				CharacterNames.Add(character.Name);
+				if (c.loginCharacter)
+				{
+					loginCharacter = character;
+				}
 			}
 			new Character();
 			foreach (string tag2 in Tags)
@@ -789,6 +821,38 @@ namespace Kenedia.Modules.Characters
 			}
 		}
 
+		public void SaveCharacters()
+		{
+			if (API_Account == null)
+			{
+				return;
+			}
+			List<JsonCharacter> _data = new List<JsonCharacter>();
+			foreach (Character c in Characters)
+			{
+				JsonCharacter jsonCharacter = new JsonCharacter
+				{
+					Name = c.Name,
+					Race = c.Race,
+					Specialization = c._Specialization,
+					Profession = c._Profession,
+					Crafting = c.Crafting,
+					lastLogin = c.lastLogin,
+					apiIndex = c.apiIndex,
+					Created = c.Created,
+					LastModified = c.LastModified,
+					map = c.map,
+					Level = c.Level,
+					Tags = string.Join("|", c.Tags),
+					loginCharacter = c.loginCharacter,
+					include = c.include
+				};
+				_data.Add(jsonCharacter);
+			}
+			string json = JsonConvert.SerializeObject(_data.ToArray());
+			System.IO.File.WriteAllText(CharactersPath, json);
+		}
+
 		protected override async Task LoadAsync()
 		{
 			cornerButton = new CornerIcon
@@ -801,8 +865,6 @@ namespace Kenedia.Modules.Characters
 			cornerButton.Click += delegate
 			{
 				MainWidow.ToggleWindow();
-				subWindow.Hide();
-				filterWindow.Hide();
 			};
 		}
 
@@ -889,7 +951,7 @@ namespace Kenedia.Modules.Characters
 			}
 			foreach (Character character in Characters)
 			{
-				if (matchingFilterString(character) && matchingToggles(character))
+				if ((character.include || showAllCharacters) && matchingFilterString(character) && matchingToggles(character))
 				{
 					character.Show();
 				}
@@ -909,7 +971,7 @@ namespace Kenedia.Modules.Characters
 				{
 					foreach (CharacterCrafting crafting2 in c.Crafting)
 					{
-						if (crafting2.Active && Enum.GetName(typeof(Crafting), crafting2.Id).ToLower().Contains(s12))
+						if (crafting2.Active && DataManager.getCraftingName(crafting2.Id).ToLower().Contains(s12))
 						{
 							return true;
 						}
@@ -978,58 +1040,53 @@ namespace Kenedia.Modules.Characters
 				bool birthdayMatch = false;
 				bool raceMatch = false;
 				bool specMatch = false;
-				ToggleImage[] array3 = filterProfessions;
-				foreach (ToggleImage toggle in array3)
+				foreach (ToggleIcon toggle5 in filterProfessions)
 				{
-					if (toggle != null && toggle._State == 1 && toggle.Id == c._Profession)
+					if (toggle5 != null && toggle5._State == 1 && toggle5.Id == c._Profession)
 					{
 						professionMatch = true;
 					}
 				}
-				array3 = filterSpecs;
-				foreach (ToggleImage toggle2 in array3)
+				foreach (ToggleIcon toggle4 in filterSpecs)
 				{
-					if (toggle2 != null && toggle2._State == 1 && toggle2.Id == c._Specialization)
+					if (toggle4 != null && toggle4._State == 1 && toggle4.Id == c._Specialization)
 					{
 						specMatch = true;
 					}
 				}
-				array3 = filterBaseSpecs;
-				foreach (ToggleImage toggle3 in array3)
+				foreach (ToggleIcon toggle3 in filterBaseSpecs)
 				{
 					if (toggle3 != null && toggle3._State == 1 && c._Specialization == 0 && toggle3.Id == c._Profession)
 					{
 						specMatch = true;
 					}
 				}
-				array3 = filterRaces;
-				foreach (ToggleImage toggle4 in array3)
+				foreach (ToggleIcon toggle2 in filterRaces)
 				{
-					if (toggle4 != null && toggle4._State == 1 && toggle4.Id == (int)c.Race)
+					if (toggle2 != null && toggle2._State == 1 && toggle2.Id == (int)c.Race)
 					{
 						raceMatch = true;
 					}
 				}
-				array3 = filterCrafting;
-				foreach (ToggleImage toggle5 in array3)
+				foreach (ToggleIcon toggle in filterCrafting)
 				{
-					if (toggle5 != null && toggle5._State == 1 && toggle5.Id == 0 && c.Crafting.Count == 0)
+					if (toggle != null && toggle._State == 1 && toggle.Id == 0 && c.Crafting.Count == 0)
 					{
 						craftingMatch = true;
 						break;
 					}
-					if (toggle5 != null && toggle5._State == 1)
+					if (toggle != null && toggle._State == 1)
 					{
 						foreach (CharacterCrafting crafting in c.Crafting)
 						{
-							if (crafting.Active && toggle5.Id == crafting.Id)
+							if (crafting.Active && toggle.Id == crafting.Id)
 							{
 								craftingMatch = true;
 							}
 						}
 					}
 				}
-				switch (birthdayToggle._State)
+				switch (filterWindow.birthdayToggle._State)
 				{
 				case 0:
 					birthdayMatch = true;
@@ -1069,7 +1126,8 @@ namespace Kenedia.Modules.Characters
 			CreateWindow();
 			CreateFilterWindow();
 			CreateSubWindow();
-			GameService.Gw2Mumble.PlayerCharacter.SpecializationChanged += delegate
+			PlayerCharacter player = GameService.Gw2Mumble.PlayerCharacter;
+			player.SpecializationChanged += delegate
 			{
 				if (Current.character != null)
 				{
@@ -1082,6 +1140,10 @@ namespace Kenedia.Modules.Characters
 				Load_UserLocale();
 			};
 			Load_UserLocale();
+			if (Settings.AutoLogin.Value && (player == null || player.Name == ""))
+			{
+				Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.RETURN);
+			}
 		}
 
 		private void CreateWindow()
@@ -1095,12 +1157,23 @@ namespace Kenedia.Modules.Characters
 				SavesPosition = true,
 				Id = "CharactersWindow"
 			};
+			MainWidow.Hidden += delegate
+			{
+				subWindow.Hide();
+				filterWindow.Hide();
+			};
+			MainWidow.Shown += delegate
+			{
+				subWindow.Hide();
+				filterWindow.Hide();
+			};
 			infoImage = new Image
 			{
 				Texture = Textures.Icons[2],
 				Size = new Point(28, 28),
 				Location = new Point(MainWidow.Width - 25, -5),
-				Parent = MainWidow
+				Parent = MainWidow,
+				Visible = false
 			};
 			refreshAPI = new StandardButton
 			{
@@ -1116,9 +1189,9 @@ namespace Kenedia.Modules.Characters
 			};
 			TextBox textBox = new TextBox();
 			textBox.PlaceholderText = "Search for ...";
-			textBox.Size = new Point(282, 30);
+			textBox.Size = new Point(287, 30);
 			textBox.Font = GameService.Content.DefaultFont16;
-			textBox.Location = new Point(10, 20);
+			textBox.Location = new Point(5, 20);
 			textBox.Parent = MainWidow;
 			textBox.BasicTooltipText = "'-c CraftingDiscipline'" + Environment.NewLine + "'-p Profession/Specialization'" + Environment.NewLine + "'-r Race'" + Environment.NewLine + "'-b(irthday)'" + Environment.NewLine + "'-c Chef; -p Warrior' will show all warriors and all chefs";
 			filterTextBox = textBox;
@@ -1126,6 +1199,20 @@ namespace Kenedia.Modules.Characters
 			filterTextBox.TextChanged += delegate
 			{
 				filterCharacterPanel = true;
+			};
+			filterTextBox.Click += delegate
+			{
+				if (filterWindow.Visible)
+				{
+					filterWindow.Hide();
+				}
+				else
+				{
+					filterWindow.Show();
+				}
+			};
+			filterTextBox.EnterPressed += delegate
+			{
 			};
 			clearButton = new StandardButton
 			{
@@ -1139,157 +1226,21 @@ namespace Kenedia.Modules.Characters
 			{
 				reset();
 			};
-			filterPanel = new FlowPanel
-			{
-				Parent = MainWidow,
-				Size = new Point(329, 60),
-				Location = new Point(10, 55),
-				FlowDirection = ControlFlowDirection.LeftToRight
-			};
-			filterProfessions = new ToggleImage[Textures.Professions.Length];
-			foreach (Professions profession in Enum.GetValues(typeof(Professions)))
-			{
-				filterProfessions[(int)profession] = new ToggleImage
-				{
-					_State = 1,
-					_MaxState = 2,
-					Size = new Point(32, 32),
-					Texture = Textures.Professions[(int)profession],
-					Parent = filterPanel,
-					Id = (int)profession
-				};
-				filterProfessions[(int)profession]._Textures = new Texture2D[2];
-				filterProfessions[(int)profession]._Textures[0] = Textures.ProfessionsDisabled[(int)profession];
-				filterProfessions[(int)profession]._Textures[1] = Textures.Professions[(int)profession];
-				filterProfessions[(int)profession].Click += delegate
-				{
-					filterProfessions[(int)profession].Toggle();
-					filterCharacterPanel = true;
-				};
-			}
-			birthdayToggle = new ToggleImage
-			{
-				isActive = false,
-				Size = new Point(32, 32),
-				Texture = Textures.Icons[24],
-				Parent = filterPanel,
-				_State = 0,
-				_MaxState = 3
-			};
-			birthdayToggle._Textures = new Texture2D[3];
-			birthdayToggle._Textures[0] = Textures.Icons[24];
-			birthdayToggle._Textures[1] = Textures.Icons[17];
-			birthdayToggle._Textures[2] = Textures.Icons[25];
-			birthdayToggle.Click += delegate
-			{
-				birthdayToggle.Toggle();
-				filterCharacterPanel = true;
-			};
-			new Label
-			{
-				Text = "",
-				Size = new Point(16, 32),
-				Parent = filterPanel,
-				Visible = false
-			};
-			filterCrafting = new ToggleImage[Textures.Crafting.Length];
-			foreach (Crafting crafting in Enum.GetValues(typeof(Crafting)))
-			{
-				if (crafting != 0)
-				{
-					filterCrafting[(int)crafting] = new ToggleImage
-					{
-						_State = 1,
-						_MaxState = 2,
-						Size = new Point(32, 32),
-						Texture = Textures.Crafting[(int)crafting],
-						Parent = filterPanel,
-						Id = (int)crafting
-					};
-					filterCrafting[(int)crafting]._Textures = new Texture2D[2];
-					filterCrafting[(int)crafting]._Textures[0] = Textures.CraftingDisabled[(int)crafting];
-					filterCrafting[(int)crafting]._Textures[1] = Textures.Crafting[(int)crafting];
-					filterCrafting[(int)crafting].Click += delegate
-					{
-						filterCrafting[(int)crafting].Toggle();
-						filterCharacterPanel = true;
-					};
-				}
-			}
-			filterCrafting[0] = new ToggleImage
-			{
-				_State = 1,
-				_MaxState = 2,
-				Size = new Point(32, 32),
-				Texture = Textures.Crafting[0],
-				Parent = filterPanel,
-				Id = 0
-			};
-			filterCrafting[0]._Textures = new Texture2D[2];
-			filterCrafting[0]._Textures[0] = Textures.CraftingDisabled[0];
-			filterCrafting[0]._Textures[1] = Textures.Crafting[0];
-			filterCrafting[0].Click += delegate
-			{
-				filterCrafting[0].Toggle();
-				filterCharacterPanel = true;
-			};
-			expandButton = new Image
-			{
-				Texture = Textures.Icons[33],
-				Size = new Point(26, 64),
-				Location = new Point(334, 57),
-				Parent = MainWidow
-			};
-			expandButton.MouseEntered += delegate
-			{
-				if (filterWindow.Visible)
-				{
-					expandButton.Texture = Textures.Icons[38];
-				}
-				else
-				{
-					expandButton.Texture = Textures.Icons[34];
-				}
-			};
-			expandButton.MouseLeft += delegate
-			{
-				if (filterWindow.Visible)
-				{
-					expandButton.Texture = Textures.Icons[37];
-				}
-				else
-				{
-					expandButton.Texture = Textures.Icons[33];
-				}
-			};
-			expandButton.Click += delegate
-			{
-				if (filterWindow.Visible)
-				{
-					filterWindow.Hide();
-					expandButton.Texture = Textures.Icons[34];
-				}
-				else
-				{
-					filterWindow.Show();
-					subWindow.Hide();
-					expandButton.Texture = Textures.Icons[38];
-				}
-			};
 			CharacterPanel = new FlowPanel
 			{
 				CanScroll = true,
 				ShowBorder = true,
 				Parent = MainWidow,
-				Size = new Point(MainWidow.Width, MainWidow.Height - 161),
-				Location = new Point(0, 119),
+				Width = MainWidow.Width,
+				HeightSizingMode = SizingMode.Fill,
+				Location = new Point(0, clearButton.Location.Y + clearButton.Height + 5),
 				FlowDirection = ControlFlowDirection.SingleTopToBottom
 			};
 			static void reset()
 			{
-				foreach (ToggleImage[] item in new List<ToggleImage[]> { filterCrafting, filterProfessions, filterSpecs, filterRaces, filterBaseSpecs })
+				foreach (List<ToggleIcon> item in new List<List<ToggleIcon>> { filterCrafting, filterProfessions, filterSpecs, filterRaces, filterBaseSpecs })
 				{
-					foreach (ToggleImage toggle in item)
+					foreach (ToggleIcon toggle in item)
 					{
 						if (toggle != null)
 						{
@@ -1297,7 +1248,7 @@ namespace Kenedia.Modules.Characters
 						}
 					}
 				}
-				birthdayToggle._State = 0;
+				filterWindow.birthdayToggle._State = 0;
 				filterTextBox.Text = null;
 				filterCharacterPanel = true;
 			}
@@ -1305,117 +1256,7 @@ namespace Kenedia.Modules.Characters
 
 		private void CreateFilterWindow()
 		{
-			ContentService contentService = new ContentService();
-			filterWindow = new BasicContainer
-			{
-				HeightSizingMode = SizingMode.AutoSize,
-				Width = 300,
-				Location = new Point(MainWidow.Location.X + 385 - 25, MainWidow.Location.Y + 60),
-				Parent = GameService.Graphics.SpriteScreen,
-				Texture = Textures.Backgrounds[3],
-				AutoSizePadding = new Point(5, 5)
-			};
-			MainWidow.Moved += delegate
-			{
-				filterWindow.Location = new Point(MainWidow.Location.X + 385 - 25, MainWidow.Location.Y + 60);
-			};
-			Image closeButton = new Image
-			{
-				Texture = Textures.Icons[35],
-				Parent = filterWindow,
-				Location = new Point(filterWindow.Width - 23, 2),
-				Size = new Point(21, 23)
-			};
-			closeButton.MouseEntered += delegate
-			{
-				closeButton.Texture = Textures.Icons[36];
-			};
-			closeButton.MouseLeft += delegate
-			{
-				closeButton.Texture = Textures.Icons[35];
-			};
-			closeButton.Click += delegate
-			{
-				filterWindow.Hide();
-				expandButton.Texture = Textures.Icons[33];
-			};
-			racesLabel = new Label
-			{
-				Text = "Races",
-				Parent = filterWindow,
-				Location = new Point(10, 5),
-				Visible = true,
-				Width = 200,
-				Font = contentService.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size18, ContentService.FontStyle.Regular),
-				Height = 27
-			};
-			new Image
-			{
-				Texture = Textures.Icons[19],
-				Parent = filterWindow,
-				Location = new Point(0, 30),
-				Size = new Point(filterWindow.Width, 4)
-			};
-			FlowPanel racePanel = new FlowPanel
-			{
-				Parent = filterWindow,
-				Size = new Point(filterWindow.Width - 10, 30),
-				Location = new Point(5, 45),
-				FlowDirection = ControlFlowDirection.LeftToRight
-			};
-			filterRaces = new ToggleImage[Textures.Races.Length];
-			foreach (RaceType race in Enum.GetValues(typeof(RaceType)))
-			{
-				int index3 = (int)race;
-				filterRaces[index3] = new ToggleImage
-				{
-					_State = 1,
-					_MaxState = 2,
-					Size = new Point(24, 24),
-					Texture = Textures.Races[index3],
-					Parent = racePanel,
-					Id = index3
-				};
-				filterRaces[index3]._Textures = new Texture2D[2];
-				filterRaces[index3]._Textures[0] = Textures.RacesDisabled[index3];
-				filterRaces[index3]._Textures[1] = Textures.Races[index3];
-				filterRaces[index3].Click += delegate
-				{
-					filterRaces[index3].Toggle();
-					filterCharacterPanel = true;
-				};
-				new Label
-				{
-					Text = "",
-					Parent = racePanel,
-					Visible = true,
-					Width = 5
-				};
-			}
-			specializationLabel = new Label
-			{
-				Text = "Specializations",
-				Parent = filterWindow,
-				Location = new Point(10, 85),
-				Visible = true,
-				Width = 200,
-				Height = 27,
-				Font = contentService.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size18, ContentService.FontStyle.Regular)
-			};
-			new Image
-			{
-				Texture = Textures.Icons[19],
-				Parent = filterWindow,
-				Location = new Point(0, 110),
-				Size = new Point(filterWindow.Width, 4)
-			};
-			FlowPanel specPanel = new FlowPanel
-			{
-				Parent = filterWindow,
-				Size = new Point(filterWindow.Width - 10, 128),
-				Location = new Point(5, 120),
-				FlowDirection = ControlFlowDirection.LeftToRight
-			};
+			new ContentService();
 			Specializations[] specs = new Specializations[27]
 			{
 				Specializations.Dragonhunter,
@@ -1446,100 +1287,240 @@ namespace Kenedia.Modules.Characters
 				Specializations.Harbinger,
 				Specializations.Vindicator
 			};
-			filterBaseSpecs = new ToggleImage[Textures.Professions.Length];
-			foreach (Professions profession in Enum.GetValues(typeof(Professions)))
+			Point windowPadding = new Point(5, 5);
+			filterWindow = new FilterWindow
 			{
-				int index2 = (int)profession;
-				filterBaseSpecs[index2] = new ToggleImage
-				{
-					_State = 1,
-					_MaxState = 2,
-					Size = new Point(32, 32),
-					Texture = Textures.Professions[index2],
-					Parent = specPanel,
-					Id = index2
-				};
-				filterBaseSpecs[index2]._Textures = new Texture2D[2];
-				filterBaseSpecs[index2]._Textures[0] = Textures.ProfessionsDisabled[index2];
-				filterBaseSpecs[index2]._Textures[1] = Textures.Professions[index2];
-				filterBaseSpecs[index2].Click += delegate
-				{
-					filterBaseSpecs[index2].Toggle();
-					filterCharacterPanel = true;
-				};
-			}
-			filterSpecs = new ToggleImage[Textures.Specializations.Length];
-			Specializations[] array = specs;
-			foreach (Specializations spec in array)
-			{
-				int index = (int)spec;
-				filterSpecs[index] = new ToggleImage
-				{
-					_State = 1,
-					_MaxState = 2,
-					Size = new Point(32, 32),
-					Texture = Textures.Specializations[index],
-					Parent = specPanel,
-					Id = index
-				};
-				filterSpecs[index]._Textures = new Texture2D[2];
-				filterSpecs[index]._Textures[0] = Textures.SpecializationsDisabled[index];
-				filterSpecs[index]._Textures[1] = Textures.Specializations[index];
-				filterSpecs[index].Click += delegate
-				{
-					filterSpecs[index].Toggle();
-					filterCharacterPanel = true;
-				};
-			}
-			StandardButton btn = new StandardButton
-			{
-				Text = "Toggle all",
-				Parent = filterWindow,
-				Location = new Point(5, specPanel.Location.Y + specPanel.Height + 5),
-				Size = new Point(specPanel.Width, 25)
+				Height = 500,
+				HeightSizingMode = SizingMode.AutoSize,
+				Width = 300,
+				Location = new Point(MainWidow.Location.X + 385 - 25, MainWidow.Location.Y + 60),
+				Parent = GameService.Graphics.SpriteScreen,
+				Texture = Textures.Backgrounds[3],
+				AutoSizePadding = new Point(windowPadding.X, windowPadding.Y)
 			};
-			btn.Click += delegate
+			filterWindow.Shown += delegate
+			{
+				subWindow.Hide();
+			};
+			MainWidow.Moved += delegate
+			{
+				filterWindow.Location = new Point(MainWidow.Location.X + 385 - 25, MainWidow.Location.Y + 60);
+			};
+			FlowPanel mainPanel = new FlowPanel
+			{
+				HeightSizingMode = SizingMode.AutoSize,
+				WidthSizingMode = SizingMode.Fill,
+				Parent = filterWindow,
+				ControlPadding = new Vector2(2f, 5f)
+			};
+			Image closeButton = new Image
+			{
+				Texture = Textures.Icons[35],
+				Parent = filterWindow,
+				Location = new Point(filterWindow.Width - 23, 2),
+				Size = new Point(21, 23)
+			};
+			closeButton.MouseEntered += delegate
+			{
+				closeButton.Texture = Textures.Icons[36];
+			};
+			closeButton.MouseLeft += delegate
+			{
+				closeButton.Texture = Textures.Icons[35];
+			};
+			closeButton.Click += delegate
+			{
+				filterWindow.Hide();
+			};
+			filterWindow.Utility = new HeadedFlowRegion
+			{
+				WidthSizingMode = SizingMode.Fill,
+				Text = "Utility",
+				Width = filterWindow.Width - windowPadding.X * 2,
+				Parent = mainPanel
+			};
+			FlowPanel region = filterWindow.Utility.contentFlowPanel;
+			region.OuterControlPadding = new Vector2(0f, 0f);
+			filterWindow.visibleToggle = new ToggleIcon
+			{
+				Texture = Textures.Icons[43],
+				Parent = region,
+				_State = 0,
+				_MaxState = 2,
+				_Textures = 
+				{
+					Textures.Icons[43],
+					Textures.Icons[42]
+				}
+			};
+			filterWindow.visibleToggle.Click += delegate
+			{
+				showAllCharacters = filterWindow.visibleToggle._State == 1;
+			};
+			filterWindow.birthdayToggle = new ToggleIcon
+			{
+				Parent = region,
+				_Textures = 
+				{
+					Textures.Icons[24],
+					Textures.Icons[17],
+					Textures.Icons[25]
+				},
+				_MaxState = 3,
+				_State = 0
+			};
+			foreach (RaceType index5 in Enum.GetValues(typeof(RaceType)))
+			{
+				filterRaces.Insert((int)index5, new ToggleIcon
+				{
+					_Textures = 
+					{
+						Textures.RacesDisabled[(uint)index5],
+						Textures.Races[(uint)index5]
+					},
+					_State = 1,
+					_MaxState = 2,
+					Size = new Point(24, 24),
+					Texture = Textures.Races[(uint)index5],
+					Parent = region,
+					Id = (int)index5
+				});
+				new Label
+				{
+					Text = "",
+					Parent = region,
+					Visible = true,
+					Width = 5
+				};
+			}
+			filterWindow.Crafting = new HeadedFlowRegion
+			{
+				WidthSizingMode = SizingMode.Fill,
+				Text = common.CraftingProfession,
+				Width = filterWindow.Width - windowPadding.X * 2,
+				Parent = mainPanel
+			};
+			region = filterWindow.Crafting.contentFlowPanel;
+			filterCrafting = new List<ToggleIcon>(new ToggleIcon[Textures.Crafting.Length]);
+			foreach (Crafting index4 in Enum.GetValues(typeof(Crafting)))
+			{
+				filterCrafting.Insert((int)index4, new ToggleIcon
+				{
+					Size = new Point(28, 28),
+					_Textures = 
+					{
+						Textures.CraftingDisabled[(int)index4],
+						Textures.Crafting[(int)index4]
+					},
+					_State = 1,
+					_MaxState = 2,
+					Parent = region,
+					Id = (int)index4
+				});
+			}
+			filterWindow.Profession = new HeadedFlowRegion
+			{
+				WidthSizingMode = SizingMode.Fill,
+				Text = common.Profession,
+				Width = filterWindow.Width - windowPadding.X * 2,
+				Parent = mainPanel
+			};
+			region = filterWindow.Profession.contentFlowPanel;
+			filterProfessions = new List<ToggleIcon>(new ToggleIcon[Textures.Professions.Length]);
+			foreach (Professions index3 in Enum.GetValues(typeof(Professions)))
+			{
+				filterProfessions.Insert((int)index3, new ToggleIcon
+				{
+					_Textures = 
+					{
+						Textures.ProfessionsDisabled[(int)index3],
+						Textures.Professions[(int)index3]
+					},
+					_State = 1,
+					_MaxState = 2,
+					Parent = region,
+					Id = (int)index3
+				});
+			}
+			filterWindow.Specialization = new HeadedFlowRegion
+			{
+				WidthSizingMode = SizingMode.Fill,
+				Text = common.Specialization,
+				Width = filterWindow.Width - windowPadding.X * 2,
+				Parent = mainPanel
+			};
+			region = filterWindow.Specialization.contentFlowPanel;
+			filterBaseSpecs = new List<ToggleIcon>(new ToggleIcon[Textures.Professions.Length]);
+			foreach (Professions index2 in Enum.GetValues(typeof(Professions)))
+			{
+				filterBaseSpecs.Insert((int)index2, new ToggleIcon
+				{
+					_Textures = 
+					{
+						Textures.ProfessionsDisabled[(int)index2],
+						Textures.Professions[(int)index2]
+					},
+					_State = 1,
+					_MaxState = 2,
+					Parent = region,
+					Id = (int)index2
+				});
+			}
+			filterSpecs = new List<ToggleIcon>(new ToggleIcon[Textures.Specializations.Length]);
+			Specializations[] array = specs;
+			for (int i = 0; i < array.Length; i++)
+			{
+				int index = (int)array[i];
+				filterSpecs.Insert(index, new ToggleIcon
+				{
+					_Textures = 
+					{
+						Textures.SpecializationsDisabled[index],
+						Textures.Specializations[index]
+					},
+					_State = 1,
+					_MaxState = 2,
+					Parent = region,
+					Id = index
+				});
+			}
+			filterWindow.toggleSpecsButton = new StandardButton
+			{
+				Text = common.ToggleAll,
+				Parent = region,
+				Size = new Point(region.Width - 10, 25),
+				Padding = new Thickness(0f, 3f)
+			};
+			region.Resized += delegate
+			{
+				filterWindow.toggleSpecsButton.Width = region.Width - 10;
+			};
+			filterWindow.toggleSpecsButton.Click += delegate
 			{
 				int state = ((filterBaseSpecs[1]._State != 1) ? 1 : 0);
-				foreach (ToggleImage[] item in new List<ToggleImage[]> { filterSpecs, filterBaseSpecs })
+				foreach (List<ToggleIcon> item in new List<List<ToggleIcon>> { filterSpecs, filterBaseSpecs })
 				{
-					foreach (ToggleImage toggleImage in item)
+					foreach (ToggleIcon current in item)
 					{
-						if (toggleImage != null)
+						if (current != null)
 						{
-							toggleImage._State = state;
+							current._State = state;
 						}
 					}
 				}
-				birthdayToggle._State = 0;
+				filterWindow.birthdayToggle._State = 0;
 				filterCharacterPanel = true;
 			};
-			customTagsLabel = new Label
+			filterWindow.CustomTags = new HeadedFlowRegion
 			{
+				WidthSizingMode = SizingMode.Fill,
 				Text = common.CustomTags,
-				Parent = filterWindow,
-				Location = new Point(10, btn.Location.Y + btn.Height + 10),
-				Visible = true,
-				Width = 200,
-				Height = 27,
-				Font = contentService.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size18, ContentService.FontStyle.Regular)
+				Width = filterWindow.Width - windowPadding.X * 2,
+				Parent = mainPanel
 			};
-			new Image
-			{
-				Texture = Textures.Icons[19],
-				Parent = filterWindow,
-				Location = new Point(0, btn.Location.Y + btn.Height + 10 + 25),
-				Size = new Point(filterWindow.Width, 4)
-			};
-			filterTagsPanel = new FlowPanel
-			{
-				Parent = filterWindow,
-				Location = new Point(5, btn.Location.Y + btn.Height + 10 + 25 + 8),
-				Width = filterWindow.Width,
-				OuterControlPadding = new Vector2(2f, 2f),
-				ControlPadding = new Vector2(5f, 2f),
-				HeightSizingMode = SizingMode.AutoSize
-			};
+			region = filterWindow.CustomTags.contentFlowPanel;
+			region.ControlPadding = new Vector2(3f, 2f);
+			filterTagsPanel = region;
 			filterWindow.Hide();
 		}
 
@@ -1554,6 +1535,10 @@ namespace Kenedia.Modules.Characters
 				Texture = Textures.Backgrounds[3],
 				Width = 350,
 				HeightSizingMode = SizingMode.AutoSize
+			};
+			subWindow.Shown += delegate
+			{
+				filterWindow.Hide();
 			};
 			MainWidow.Moved += delegate
 			{
@@ -1572,9 +1557,22 @@ namespace Kenedia.Modules.Characters
 				Text = "py" + base.Name + "yq",
 				Parent = subWindow,
 				Height = 25,
-				Width = subWindow.Width - 165,
+				Width = subWindow.Width - 60 - 32 - 5,
 				Font = contentService.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size18, ContentService.FontStyle.Regular),
 				VerticalAlignment = VerticalAlignment.Middle
+			};
+			subWindow.include_Image = new Image
+			{
+				Location = new Point(subWindow.name_Label.Location.X + subWindow.name_Label.Width + 5, 0),
+				Texture = Textures.Icons[42],
+				Size = new Point(32, 32),
+				Parent = subWindow
+			};
+			subWindow.include_Image.Click += delegate
+			{
+				subWindow.assignedCharacter.include = !subWindow.assignedCharacter.include;
+				subWindow.assignedCharacter.Save();
+				subWindow.include_Image.Texture = (subWindow.assignedCharacter.include ? Textures.Icons[42] : Textures.Icons[43]);
 			};
 			new Image
 			{
@@ -1591,7 +1589,31 @@ namespace Kenedia.Modules.Characters
 				Height = 25,
 				Width = subWindow.Width - 165,
 				Font = contentService.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size18, ContentService.FontStyle.Regular),
-				VerticalAlignment = VerticalAlignment.Middle
+				VerticalAlignment = VerticalAlignment.Middle,
+				Visible = false
+			};
+			subWindow.loginCharacter = new Checkbox
+			{
+				Location = new Point(60, 33),
+				Text = common.LoginCharacter,
+				Parent = subWindow,
+				Height = 25,
+				Width = subWindow.Width - 165
+			};
+			subWindow.loginCharacter.Click += delegate
+			{
+				if (subWindow.loginCharacter.Checked)
+				{
+					foreach (Character character in Characters)
+					{
+						character.loginCharacter = character == subWindow.assignedCharacter && subWindow.loginCharacter.Checked;
+					}
+				}
+				else
+				{
+					subWindow.assignedCharacter.loginCharacter = subWindow.loginCharacter.Checked;
+				}
+				subWindow.assignedCharacter.Save();
 			};
 			subWindow.tag_TextBox = new TextBox
 			{
@@ -1628,27 +1650,11 @@ namespace Kenedia.Modules.Characters
 			};
 			subWindow.addTag_Button.Click += delegate
 			{
-				string txt = ((subWindow.tag_TextBox != null && subWindow.tag_TextBox.Text.Trim() != "") ? subWindow.tag_TextBox.Text : null);
-				if (txt != null && subWindow.assignedCharacter != null && !subWindow.assignedCharacter.Tags.Contains(txt))
-				{
-					new TagEntry(txt, subWindow.assignedCharacter, subWindow.customTags_Panel);
-					subWindow.assignedCharacter.Tags.Add(txt);
-					subWindow.assignedCharacter.Save();
-					if (!Tags.Contains(txt))
-					{
-						Tags.Add(txt);
-						TagEntry tagEntry = new TagEntry(txt, new Character(), filterTagsPanel, showButton: false, contentService.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size14, ContentService.FontStyle.Regular));
-						tagEntry.Click += delegate
-						{
-							TextBox textBox = filterTextBox;
-							textBox.Text = textBox.Text + ((filterTextBox.Text.Trim().EndsWith(";") || filterTextBox.Text.Trim() == "") ? " " : "; ") + "-t " + txt;
-						};
-						TagEntries.Add(tagEntry);
-					}
-					subWindow.tag_TextBox.Text = null;
-					subWindow.customTags_Panel.SortChildren((TagEntry a, TagEntry b) => a.textLabel.Text.CompareTo(b.textLabel.Text));
-					subWindow.Invalidate();
-				}
+				addTag();
+			};
+			subWindow.tag_TextBox.EnterPressed += delegate
+			{
+				addTag();
 			};
 			subWindow.customTags_Panel = new FlowPanel
 			{
@@ -1661,6 +1667,38 @@ namespace Kenedia.Modules.Characters
 				HeightSizingMode = SizingMode.AutoSize
 			};
 			subWindow.Hide();
+			void addTag()
+			{
+				string txt = ((subWindow.tag_TextBox != null && subWindow.tag_TextBox.Text.Trim() != "") ? subWindow.tag_TextBox.Text : null);
+				if (txt != null && subWindow.assignedCharacter != null && !subWindow.assignedCharacter.Tags.Contains(txt.Trim()))
+				{
+					new TagEntry(txt, subWindow.assignedCharacter, subWindow.customTags_Panel);
+					subWindow.assignedCharacter.Tags.Add(txt);
+					subWindow.assignedCharacter.Save();
+					if (!Tags.Contains(txt))
+					{
+						Tags.Add(txt);
+						TagEntry entry = new TagEntry(txt, new Character(), filterTagsPanel, showButton: false, contentService.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size14, ContentService.FontStyle.Regular));
+						entry.Click += delegate
+						{
+							TextBox textBox = filterTextBox;
+							textBox.Text = textBox.Text + ((filterTextBox.Text.Trim().EndsWith(";") || filterTextBox.Text.Trim() == "") ? " " : "; ") + "-t " + txt;
+						};
+						TagEntries.Add(entry);
+					}
+					subWindow.tag_TextBox.Text = null;
+					subWindow.customTags_Panel.SortChildren((TagEntry a, TagEntry b) => a.textLabel.Text.CompareTo(b.textLabel.Text));
+					subWindow.Invalidate();
+				}
+			}
+		}
+
+		private void OnKeyPressed_ToggleMenu(object o, EventArgs e)
+		{
+			if (!(Control.ActiveControl is TextBox))
+			{
+				MainWidow?.ToggleWindow();
+			}
 		}
 
 		protected override void Update(GameTime gameTime)
@@ -1680,6 +1718,11 @@ namespace Kenedia.Modules.Characters
 						character.Update_UI_Time();
 					}
 				}
+				if (Settings.AutoLogin.Value && !loginCharacter_Swapped && loginCharacter != null && swapCharacter == null)
+				{
+					loginCharacter_Swapped = true;
+					loginCharacter.Swap();
+				}
 				if (swapCharacter != null && !GameService.GameIntegration.Gw2Instance.IsInGame && DateTime.UtcNow.Subtract(lastLogout).TotalMilliseconds >= (double)Settings.SwapDelay.Value)
 				{
 					swapCharacter.Swap();
@@ -1695,9 +1738,10 @@ namespace Kenedia.Modules.Characters
 					UpdateCharacterPanel();
 				}
 			}
-			if (Last.Tick_Save > 15000.0 && userAccount != null)
+			if (Last.Tick_Save > 250.0 && saveCharacters)
 			{
-				Last.Tick_Save = -15000.0;
+				Last.Tick_Save = -250.0;
+				SaveCharacters();
 			}
 			if (Last.Tick_APIUpdate > 30000.0 && userAccount != null)
 			{
@@ -1709,6 +1753,12 @@ namespace Kenedia.Modules.Characters
 
 		protected override void Unload()
 		{
+			MainWidow?.Dispose();
+			subWindow?.Dispose();
+			filterWindow?.Dispose();
+			cornerButton?.Dispose();
+			Settings.ShortcutKey.Value.Activated -= OnKeyPressed_ToggleMenu;
+			ModuleInstance = null;
 		}
 	}
 }

@@ -32,6 +32,10 @@ namespace Kenedia.Modules.Characters
 
 		public Label _createdLabel;
 
+		public Image _nextBirthdayTexture;
+
+		public Label _nextBirthdayLabel;
+
 		public Image _ageTexture;
 
 		public Label _ageLabel;
@@ -130,7 +134,7 @@ namespace Kenedia.Modules.Characters
 				index++;
 				_createdTexture = new Image
 				{
-					Texture = Textures.Icons[17],
+					Texture = Textures.Icons[26],
 					Parent = this,
 					Location = new Point(0, 40 + index * 25),
 					Size = new Point(20, 20),
@@ -139,6 +143,24 @@ namespace Kenedia.Modules.Characters
 				_createdLabel = new Label
 				{
 					Text = c.Created.ToString("G") + " (" + ((zeroTime + span).Year - 1) + " " + common.Years + ")",
+					Parent = this,
+					Location = new Point(30, 40 + index * 25),
+					Visible = true,
+					AutoSizeWidth = true
+				};
+				span = c.NextBirthday - DateTime.UtcNow;
+				index++;
+				_nextBirthdayTexture = new Image
+				{
+					Texture = Textures.Icons[17],
+					Parent = this,
+					Location = new Point(0, 40 + index * 25),
+					Size = new Point(20, 20),
+					Visible = true
+				};
+				_nextBirthdayLabel = new Label
+				{
+					Text = string.Format("{3} " + common.Days + " {0:00}:{1:00}:{2:00} " + common.UntilBirthday, span.Hours, span.Minutes, span.Seconds, span.Days),
 					Parent = this,
 					Location = new Point(30, 40 + index * 25),
 					Visible = true,
@@ -190,6 +212,8 @@ namespace Kenedia.Modules.Characters
 			DateTime zeroTime = new DateTime(1, 1, 1);
 			TimeSpan span = DateTime.UtcNow - c.Created.UtcDateTime;
 			_createdLabel.Text = c.Created.ToString("G") + " (" + ((zeroTime + span).Year - 1) + " " + common.Years + ")";
+			span = c.NextBirthday - DateTime.UtcNow;
+			_nextBirthdayLabel.Text = string.Format("{3} " + common.Days + " {0:00}:{1:00}:{2:00} " + common.UntilBirthday, span.Hours, span.Minutes, span.Seconds, span.Days);
 			_levelLabel.Text = string.Format(common.Level, c.Level);
 			_mapLabel.Text = DataManager.getMapName(c.map);
 			if (c.Tags == null || (_Tags != null && _Tags.SequenceEqual(c.Tags)))

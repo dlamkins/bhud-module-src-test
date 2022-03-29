@@ -28,8 +28,12 @@
     </xsd:element>
   </xsd:schema>
 <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="Armorsmith"><value>Armorsmith</value></data>
+  <data name="EnterOnSwap_DisplayName"><value>Login after selecting the character</value></data>
   <data name="SearchFor"><value>Search for ...</value></data>
   <data name="Updated"><value>Updated {0}</value></data>
+  <data name="ShortcutToggle_Description"><value>Key to Press to toggle the characters menu.</value></data>
+  <data name="Utility"><value>Utility</value></data>
+  <data name="AutoLogin_DisplayName"><value>Auto Login to selected Character</value></data>
   <data name="ModuleDescription"><value>A tool to easily switch characters even with a lot of them!
 This will require an API-Key with permissions at least for the 'characters' endpoint!</value></data>
   <data name="FilterDelay_DisplayName"><value>Filter Delay ({0} ms)</value></data>
@@ -37,13 +41,22 @@ This will require an API-Key with permissions at least for the 'characters' endp
   <data name="Update"><value>Update {0}</value></data>
   <data name="Unkown"><value>Unkown</value></data>
   <data name="LoginAfterSelect"><value>Enter the game automatically after selecting the character in the character selection</value></data>
+  <data name="ShortcutToggle_DisplayName"><value>Toggle Menu</value></data>
   <data name="Tailor"><value>Tailor</value></data>
   <data name="SwapDelay_DisplayName"><value>Loading Delay ({0} ms)</value></data>
   <data name="Switch"><value>Switch to {0}</value></data>
   <data name="Scribe"><value>Scribe</value></data>
+  <data name="SearchGuide"><value>-c Crafting Profession
+-p Profession/Specialization
+-r Race
+-b Birthday
+-m MapName
+-t CustomTag
+-c Chef; -p Warrior will show all warriors and all chefs</value></data>
   <data name="Updating"><value>Updating {0}</value></data>
   <data name="Jeweler"><value>Jeweler</value></data>
   <data name="Specialization"><value>Specialization</value></data>
+  <data name="EnterOnSwap_Description"><value>Enter the game automatically after selecting the character in the character selection</value></data>
   <data name="Leatherworker"><value>Leatherworker</value></data>
   <data name="Map"><value>Map</value></data>
   <data name="Clear"><value>Clear</value></data>
@@ -61,11 +74,19 @@ To get the current value you will have to swap module tabs once to update the se
   <data name="Huntsman"><value>Huntsman</value></data>
   <data name="Characters"><value>Characters</value></data>
   <data name="Error_Competivive"><value>Character swapping is disabled in competition mode!</value></data>
+  <data name="UntilBirthday"><value>until Birthday</value></data>
+  <data name="ToggleVisible"><value>Show/Hide hidden Characters</value></data>
+  <data name="LoginCharacter"><value>Log in character</value></data>
+  <data name="ToggleAll"><value>Toggle All</value></data>
+  <data name="DoubleClickToEnter_DisplayName"><value>Double Click to Swap</value></data>
   <data name="LogoutDescription"><value>Key to Press to open the logout menu. Must be the same as the game keybind for 'Logout'!</value></data>
+  <data name="AutoLogin_Description"><value>If enabled on the first load of Blish and beeing in character selection the module enters the game. After entering the game it will wait until the MumbleLink and API Token is fully loaded.
+Once fully loaded it will switch to the character which is set to be the "Login Character".</value></data>
   <data name="Profession"><value>Profession</value></data>
   <data name="CraftingProfession"><value>Crafting Profession</value></data>
   <data name="CustomTags"><value>Custom Tags</value></data>
   <data name="Days"><value>Days</value></data>
   <data name="Chef"><value>Chef</value></data>
   <data name="Race"><value>Race</value></data>
+  <data name="DoubleClickToEnter_Description"><value>Enables double clicking the character in the character list to login to that character.</value></data>
   </root>

@@ -7,7 +7,13 @@ namespace Kenedia.Modules.Characters
 	{
 		public SettingEntry<KeyBinding> LogoutKey;
 
+		public SettingEntry<KeyBinding> ShortcutKey;
+
 		public SettingEntry<bool> EnterOnSwap;
+
+		public SettingEntry<bool> AutoLogin;
+
+		public SettingEntry<bool> DoubleClickToEnter;
 
 		public SettingEntry<int> SwapDelay;
 

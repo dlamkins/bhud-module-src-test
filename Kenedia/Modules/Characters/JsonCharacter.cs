@@ -18,6 +18,10 @@ namespace Kenedia.Modules.Characters
 
 		public string Tags;
 
+		public bool loginCharacter;
+
+		public bool include = true;
+
 		public string Name { get; set; }
 
 		public RaceType Race { get; set; }

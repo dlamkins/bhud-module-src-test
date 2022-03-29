@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using Blish_HUD.Controls;
 
 namespace Kenedia.Modules.Characters
@@ -12,11 +14,17 @@ namespace Kenedia.Modules.Characters
 
 		public Image spec_Image;
 
+		public Image include_Image;
+
 		public Label spec_Label;
 
 		public Image separator_Image;
 
 		public FlowPanel customTags_Panel;
+
+		public Checkbox loginCharacter;
+
+		private List<string> Tags = new List<string>();
 
 		public Character assignedCharacter;
 
@@ -26,10 +34,21 @@ namespace Kenedia.Modules.Characters
 			name_Label.Text = c.Name;
 			spec_Label.Text = DataManager.getProfessionName(c._Profession);
 			spec_Image.Texture = Textures.Professions[c._Profession];
-			customTags_Panel.ClearChildren();
-			foreach (string tag in c.Tags)
+			loginCharacter.Checked = c.loginCharacter;
+			include_Image.Texture = (c.include ? Textures.Icons[42] : Textures.Icons[43]);
+			if (!Tags.SequenceEqual(Module.Tags))
 			{
-				new TagEntry(tag, c, customTags_Panel);
+				customTags_Panel.ClearChildren();
+				Tags = new List<string>(Module.Tags);
+				foreach (string tag2 in Module.Tags)
+				{
+					new TagEntry(tag2, c, customTags_Panel);
+				}
+			}
+			foreach (TagEntry tag in customTags_Panel)
+			{
+				tag.Highlighted = c.Tags.Contains(tag.Text);
+				tag.assignedCharacter = c;
 			}
 		}
 	}

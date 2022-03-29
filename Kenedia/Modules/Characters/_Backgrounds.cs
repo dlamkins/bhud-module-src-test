@@ -5,6 +5,7 @@ namespace Kenedia.Modules.Characters
 		MainWindow = 1,
 		Tooltip,
 		ExpandWindow,
-		Tag
+		Tag,
+		TagDisabled
 	}
 }

@@ -46,6 +46,10 @@ namespace Kenedia.Modules.Characters.Strings
 
 		internal static string Artificer => ResourceManager.GetString("Artificer", resourceCulture);
 
+		internal static string AutoLogin_Description => ResourceManager.GetString("AutoLogin_Description", resourceCulture);
+
+		internal static string AutoLogin_DisplayName => ResourceManager.GetString("AutoLogin_DisplayName", resourceCulture);
+
 		internal static string Birthday => ResourceManager.GetString("Birthday", resourceCulture);
 
 		internal static string Characters => ResourceManager.GetString("Characters", resourceCulture);
@@ -59,6 +63,14 @@ namespace Kenedia.Modules.Characters.Strings
 		internal static string CustomTags => ResourceManager.GetString("CustomTags", resourceCulture);
 
 		internal static string Days => ResourceManager.GetString("Days", resourceCulture);
+
+		internal static string DoubleClickToEnter_Description => ResourceManager.GetString("DoubleClickToEnter_Description", resourceCulture);
+
+		internal static string DoubleClickToEnter_DisplayName => ResourceManager.GetString("DoubleClickToEnter_DisplayName", resourceCulture);
+
+		internal static string EnterOnSwap_Description => ResourceManager.GetString("EnterOnSwap_Description", resourceCulture);
+
+		internal static string EnterOnSwap_DisplayName => ResourceManager.GetString("EnterOnSwap_DisplayName", resourceCulture);
 
 		internal static string Error_Competivive => ResourceManager.GetString("Error_Competivive", resourceCulture);
 
@@ -78,6 +90,8 @@ namespace Kenedia.Modules.Characters.Strings
 
 		internal static string LoginAfterSelect => ResourceManager.GetString("LoginAfterSelect", resourceCulture);
 
+		internal static string LoginCharacter => ResourceManager.GetString("LoginCharacter", resourceCulture);
+
 		internal static string Logout => ResourceManager.GetString("Logout", resourceCulture);
 
 		internal static string LogoutDescription => ResourceManager.GetString("LogoutDescription", resourceCulture);
@@ -96,6 +110,12 @@ namespace Kenedia.Modules.Characters.Strings
 
 		internal static string SearchFor => ResourceManager.GetString("SearchFor", resourceCulture);
 
+		internal static string SearchGuide => ResourceManager.GetString("SearchGuide", resourceCulture);
+
+		internal static string ShortcutToggle_Description => ResourceManager.GetString("ShortcutToggle_Description", resourceCulture);
+
+		internal static string ShortcutToggle_DisplayName => ResourceManager.GetString("ShortcutToggle_DisplayName", resourceCulture);
+
 		internal static string Specialization => ResourceManager.GetString("Specialization", resourceCulture);
 
 		internal static string SwapDelay_Description => ResourceManager.GetString("SwapDelay_Description", resourceCulture);
@@ -106,13 +126,21 @@ namespace Kenedia.Modules.Characters.Strings
 
 		internal static string Tailor => ResourceManager.GetString("Tailor", resourceCulture);
 
+		internal static string ToggleAll => ResourceManager.GetString("ToggleAll", resourceCulture);
+
+		internal static string ToggleVisible => ResourceManager.GetString("ToggleVisible", resourceCulture);
+
 		internal static string Unkown => ResourceManager.GetString("Unkown", resourceCulture);
+
+		internal static string UntilBirthday => ResourceManager.GetString("UntilBirthday", resourceCulture);
 
 		internal static string Update => ResourceManager.GetString("Update", resourceCulture);
 
 		internal static string Updated => ResourceManager.GetString("Updated", resourceCulture);
 
 		internal static string Updating => ResourceManager.GetString("Updating", resourceCulture);
+
+		internal static string Utility => ResourceManager.GetString("Utility", resourceCulture);
 
 		internal static string Weaponsmith => ResourceManager.GetString("Weaponsmith", resourceCulture);
 

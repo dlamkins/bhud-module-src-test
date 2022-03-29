@@ -164,6 +164,40 @@ namespace Kenedia.Modules.Characters
 			}
 		}
 
+		public class _jsonCrafting
+		{
+			public _Names _Names = new _Names();
+
+			public int Id { get; set; }
+
+			public string API_Id { get; set; }
+
+			public _Crafting[] Load()
+			{
+				string path = "data\\crafting_professions.json";
+				_Crafting[] disciplines = new _Crafting[1];
+				string jsonString = new StreamReader(ContentsManager.GetFileStream(path)).ReadToEnd();
+				if (jsonString != null && jsonString != "")
+				{
+					List<_jsonCrafting>? list = JsonConvert.DeserializeObject<List<_jsonCrafting>>(jsonString);
+					disciplines = new _Crafting[list.Aggregate((_jsonCrafting i1, _jsonCrafting i2) => (i1.Id <= i2.Id) ? i2 : i1).Id + 1];
+					{
+						foreach (_jsonCrafting entry in list!)
+						{
+							disciplines[entry.Id] = new _Crafting
+							{
+								_Names = entry._Names,
+								API_Id = entry.Id,
+								Id = entry.Id
+							};
+						}
+						return disciplines;
+					}
+				}
+				return disciplines;
+			}
+		}
+
 		public class _Profession : _jsonProfession
 		{
 			public string Name
@@ -304,6 +338,41 @@ namespace Kenedia.Modules.Characters
 			}
 		}
 
+		public class _Crafting : _jsonMap
+		{
+			public string Name
+			{
+				get
+				{
+					return GameService.Overlay.UserLocale.Value switch
+					{
+						Locale.German => _Names.de, 
+						Locale.French => _Names.fr, 
+						Locale.Spanish => _Names.es, 
+						_ => _Names.en, 
+					};
+				}
+				set
+				{
+					switch (GameService.Overlay.UserLocale.Value)
+					{
+					case Locale.German:
+						_Names.de = value;
+						break;
+					case Locale.French:
+						_Names.fr = value;
+						break;
+					case Locale.Spanish:
+						_Names.es = value;
+						break;
+					default:
+						_Names.en = value;
+						break;
+					}
+				}
+			}
+		}
+
 		public static ContentsManager ContentsManager;
 
 		private static readonly Logger Logger = Logger.GetLogger<Module>();
@@ -316,12 +385,15 @@ namespace Kenedia.Modules.Characters
 
 		public static _Map[] _Maps { get; set; }
 
+		public static _Crafting[] _Craftings { get; set; }
+
 		public static void Load()
 		{
 			_Professions = new _jsonProfession().Load();
 			_Specializations = new _jsonSpecialization().Load();
 			_Races = new _jsonRace().Load();
 			_Maps = new _jsonMap().Load();
+			_Craftings = new _jsonCrafting().Load();
 		}
 
 		public static string getMapName(int id)
@@ -427,6 +499,15 @@ namespace Kenedia.Modules.Characters
 				"Weaponsmith" => common.Weaponsmith, 
 				_ => common.Unkown + " " + common.CraftingProfession, 
 			};
+		}
+
+		public static string getCraftingName(int id)
+		{
+			if (_Craftings.Length <= id || _Craftings[id] == null)
+			{
+				return common.Unkown + " " + common.CraftingProfession;
+			}
+			return _Craftings[id].Name;
 		}
 	}
 }

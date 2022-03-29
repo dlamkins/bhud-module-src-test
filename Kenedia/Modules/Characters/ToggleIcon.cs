@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using Blish_HUD.Controls;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Kenedia.Modules.Characters
 {
-	public class ToggleImage : Image
+	public class ToggleIcon : Image
 	{
 		public bool isActive;
 
@@ -12,7 +14,7 @@ namespace Kenedia.Modules.Characters
 
 		private int __State;
 
-		public Texture2D[] _Textures;
+		public List<Texture2D> _Textures = new List<Texture2D>();
 
 		public int _State
 		{
@@ -31,17 +33,20 @@ namespace Kenedia.Modules.Characters
 
 		public event EventHandler _StateChanged;
 
-		public ToggleImage()
+		public ToggleIcon()
 		{
 			base.Click += delegate
 			{
 				Toggle();
+				Module.filterCharacterPanel = true;
 			};
+			base.Size = new Point(32, 32);
+			base.Texture = Textures.Icons[1];
 		}
 
 		private void _OnStateChanged()
 		{
-			if (_Textures != null && _Textures.Length > __State)
+			if (_Textures != null && _Textures.Count > __State)
 			{
 				base.Texture = _Textures[__State];
 			}

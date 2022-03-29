@@ -42,6 +42,9 @@ namespace Kenedia.Modules.Characters
 		CollapseHovered,
 		Add,
 		AddDisabled,
-		AddHovered
+		AddHovered,
+		Visible,
+		Hide,
+		CloseDisabled
 	}
 }
