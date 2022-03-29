@@ -117,32 +117,30 @@ namespace Nekres.Inquest_Module.Core.Controllers
 				_nextToggleClick = DateTime.UtcNow.Add(_pausedRemainingTime);
 				return;
 			}
-			if (!_toggleActive && AutoClickHoldKey.get_IsTriggering() && DateTime.UtcNow > _nextHoldClick)
+			if (!_toggleActive && AutoClickHoldKey.get_IsTriggering() && DateTime.UtcNow > _nextHoldClick && GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus())
 			{
 				if (!InquestModule.ModuleInstance.AutoClickSoundDisabledSetting.get_Value())
 				{
-					DoubleClickSfx.Play();
+					DoubleClickSfx.Play(GameService.GameIntegration.get_Audio().get_Volume(), 0f, 0f);
 				}
 				Mouse.DoubleClick((MouseButton)0, -1, -1, true);
 				_nextHoldClick = DateTime.UtcNow.AddMilliseconds(50.0);
 			}
 			if (_toggleActive && DateTime.UtcNow > _nextToggleClick)
 			{
-				Point savePos = Mouse.GetPosition();
-				Mouse.SetPosition(_togglePos.X, _togglePos.Y, true);
 				if (!InquestModule.ModuleInstance.AutoClickSoundDisabledSetting.get_Value())
 				{
-					DoubleClickSfx.Play();
+					DoubleClickSfx.Play(GameService.GameIntegration.get_Audio().get_Volume(), 0f, 0f);
 				}
-				Mouse.DoubleClick((MouseButton)0, _togglePos.X, _togglePos.Y, true);
+				Mouse.DoubleClick((MouseButton)0, _togglePos.X, _togglePos.Y, false);
+				Mouse.Click((MouseButton)0, _togglePos.X, _togglePos.Y, false);
 				_nextToggleClick = DateTime.UtcNow.AddMilliseconds(_toggleIntervalMs);
-				Mouse.SetPosition(savePos.X, savePos.Y, true);
 			}
 		}
 
 		private bool IsBusy()
 		{
-			if (!GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() || !GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus() || !GameService.Gw2Mumble.get_IsAvailable() || GameService.Gw2Mumble.get_UI().get_IsTextInputFocused() || GameService.Input.get_Mouse().get_CameraDragging())
+			if (!GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() || !GameService.Gw2Mumble.get_IsAvailable() || GameService.Gw2Mumble.get_UI().get_IsTextInputFocused() || GameService.Input.get_Mouse().get_CameraDragging())
 			{
 				if (_paused)
 				{
