@@ -14,7 +14,7 @@ namespace BhModule.Community.Pathing.Behavior
 
 		public AchievementStatus(AccountAchievement accountAchievement)
 		{
-			Done = accountAchievement.get_Done() && accountAchievement.get_Repeated().HasValue;
+			Done = accountAchievement.get_Done() && !accountAchievement.get_Repeated().HasValue;
 			IEnumerable<int> bits = accountAchievement.get_Bits();
 			AchievementBits = new HashSet<int>(bits ?? Enumerable.Empty<int>());
 			Unlocked = accountAchievement.get_Unlocked() ?? true;
