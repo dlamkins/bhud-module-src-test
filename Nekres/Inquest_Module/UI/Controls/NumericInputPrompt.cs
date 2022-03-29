@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
@@ -29,7 +30,7 @@ namespace Nekres.Inquest_Module.UI.Controls
 
 		private TextBox _inputTextBox;
 
-		private readonly Action<bool, int> _callback;
+		private readonly Action<bool, double> _callback;
 
 		private readonly string _text;
 
@@ -37,7 +38,7 @@ namespace Nekres.Inquest_Module.UI.Controls
 
 		private readonly string _cancelButtonButtonText;
 
-		private NumericInputPrompt(Action<bool, int> callback, string text, string confirmButtonText, string cancelButtonText)
+		private NumericInputPrompt(Action<bool, double> callback, string text, string confirmButtonText, string cancelButtonText)
 			: this()
 		{
 			_callback = callback;
@@ -47,7 +48,7 @@ namespace Nekres.Inquest_Module.UI.Controls
 			((Control)this).set_ZIndex(999);
 		}
 
-		public static void ShowPrompt(Action<bool, int> callback, string text, string confirmButtonText = "Confirm", string cancelButtonText = "Cancel")
+		public static void ShowPrompt(Action<bool, double> callback, string text, string confirmButtonText = "Confirm", string cancelButtonText = "Cancel")
 		{
 			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
@@ -93,7 +94,7 @@ namespace Nekres.Inquest_Module.UI.Controls
 				((Control)_confirmButton).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
 					GameService.Content.PlaySoundEffectByName("button-click");
-					_callback(arg1: true, int.Parse(((TextInputBase)_inputTextBox).get_Text()));
+					_callback(arg1: true, double.Parse(((TextInputBase)_inputTextBox).get_Text(), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture));
 					_singleton = null;
 					((Control)this).Dispose();
 				});
@@ -109,7 +110,7 @@ namespace Nekres.Inquest_Module.UI.Controls
 				((Control)_cancelButton).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
 					GameService.Content.PlaySoundEffectByName("button-click");
-					_callback(arg1: false, 0);
+					_callback(arg1: false, 0.0);
 					_singleton = null;
 					((Control)this).Dispose();
 				});
@@ -141,7 +142,7 @@ namespace Nekres.Inquest_Module.UI.Controls
 				((TextInputBase)_inputTextBox).add_TextChanged((EventHandler<EventArgs>)delegate(object o, EventArgs _)
 				{
 					//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-					((Control)_confirmButton).set_Enabled(((TextInputBase)(TextBox)o).get_Text().IsDigitsOnly());
+					((Control)_confirmButton).set_Enabled(double.TryParse(((TextInputBase)(TextBox)o).get_Text(), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var _));
 				});
 			}
 		}

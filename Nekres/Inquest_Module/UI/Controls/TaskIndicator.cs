@@ -14,9 +14,11 @@ namespace Nekres.Inquest_Module.UI.Controls
 
 		private static BitmapFont _font = GameService.Content.GetFont((FontFace)0, (FontSize)24, (FontStyle)0);
 
-		public bool _paused;
+		private bool _paused;
 
-		public string _text;
+		private string _text;
+
+		private Color _textColor;
 
 		private Point _mousePos => GameService.Input.get_Mouse().get_Position();
 
@@ -44,9 +46,26 @@ namespace Nekres.Inquest_Module.UI.Controls
 			}
 		}
 
+		public Color TextColor
+		{
+			get
+			{
+				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+				return _textColor;
+			}
+			set
+			{
+				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+				((Control)this).SetProperty<Color>(ref _textColor, value, false, "TextColor");
+			}
+		}
+
 		public TaskIndicator()
 			: this()
 		{
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			_textColor = Color.get_White();
 			((Control)this).set_ZIndex(1000);
 			Update();
 		}
@@ -78,17 +97,17 @@ namespace Nekres.Inquest_Module.UI.Controls
 			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
 			Update();
 			if (_paused)
 			{
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _mouseIcon, new Rectangle((bounds.Width - _mouseIcon.get_Width()) / 2, (bounds.Height - _mouseIcon.get_Height()) / 2, _mouseIcon.get_Width(), _mouseIcon.get_Height()), (Rectangle?)_mouseIcon.get_Bounds());
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _stopIcon, new Rectangle((bounds.Width - _stopIcon.get_Width()) / 2, (bounds.Height - _stopIcon.get_Height()) / 2, _stopIcon.get_Width(), _stopIcon.get_Height()), (Rectangle?)_stopIcon.get_Bounds(), Color.get_White() * 0.5f);
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _stopIcon, new Rectangle((bounds.Width - _stopIcon.get_Width()) / 2, (bounds.Height - _stopIcon.get_Height()) / 2, _stopIcon.get_Width(), _stopIcon.get_Height()), (Rectangle?)_stopIcon.get_Bounds(), Color.get_White() * 0.65f);
 			}
 			else
 			{
 				LoadingSpinnerUtil.DrawLoadingSpinner((Control)(object)this, spriteBatch, bounds);
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, _text, _font, bounds, Color.get_White(), false, true, 1, (HorizontalAlignment)1, (VerticalAlignment)1);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, _text, _font, bounds, _textColor, false, true, 1, (HorizontalAlignment)1, (VerticalAlignment)1);
 			}
 		}
 	}

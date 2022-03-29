@@ -28,6 +28,8 @@ namespace Nekres.Inquest_Module.Core.Controllers
 
 		private bool _toggleActive;
 
+		private Color _redShift;
+
 		private TaskIndicator _indicator;
 
 		private KeyBinding AutoClickHoldKey => InquestModule.ModuleInstance.AutoClickHoldKeySetting.get_Value();
@@ -38,6 +40,9 @@ namespace Nekres.Inquest_Module.Core.Controllers
 
 		public AutoClickController()
 		{
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			_redShift = new Color(255, 105, 105);
 			AutoClickHoldKey.set_Enabled(true);
 			AutoClickToggleKey.set_Enabled(true);
 			AutoClickToggleKey.add_Activated((EventHandler<EventArgs>)OnToggleActivate);
@@ -68,25 +73,30 @@ namespace Nekres.Inquest_Module.Core.Controllers
 			}
 		}
 
-		private void OnToggleInputPromptCallback(bool confirmed, int input)
+		private void OnToggleInputPromptCallback(bool confirmed, double input)
 		{
 			if (confirmed)
 			{
 				_toggleActive = true;
-				_toggleIntervalMs = Math.Min(300000, Math.Max(75, input * 1000));
+				_toggleIntervalMs = Math.Min(300000, Math.Max(250, (int)(input * 1000.0)));
 				_nextToggleClick = DateTime.UtcNow;
 			}
 		}
 
 		public void UpdateIndicator()
 		{
-			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
 			if (_toggleActive)
 			{
 				if (_indicator != null)
 				{
+					TimeSpan remainingTime = DateTime.UtcNow.Subtract(_nextToggleClick);
 					_indicator.Paused = IsBusy();
-					_indicator.Text = DateTime.UtcNow.Subtract(_nextToggleClick).ToString("m\\:ss");
+					_indicator.Text = remainingTime.ToString((remainingTime.TotalSeconds > -1.0) ? "\\.ff" : ((remainingTime.TotalMinutes > -1.0) ? "ss" : "m\\:ss")).TrimStart('0');
+					_indicator.TextColor = Color.Lerp(Color.get_White(), _redShift, 1f + (float)remainingTime.TotalMilliseconds / (float)_toggleIntervalMs);
 					((Control)_indicator).set_Visible(!GameService.Input.get_Mouse().get_CameraDragging());
 				}
 				else
@@ -132,7 +142,7 @@ namespace Nekres.Inquest_Module.Core.Controllers
 
 		private bool IsBusy()
 		{
-			if (!GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() || !GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus() || GameService.Gw2Mumble.get_UI().get_IsTextInputFocused() || GameService.Input.get_Mouse().get_CameraDragging())
+			if (!GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() || !GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus() || !GameService.Gw2Mumble.get_IsAvailable() || GameService.Gw2Mumble.get_UI().get_IsTextInputFocused() || GameService.Input.get_Mouse().get_CameraDragging())
 			{
 				if (_paused)
 				{

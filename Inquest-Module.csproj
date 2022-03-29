@@ -16,6 +16,5 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="MonoGame.Extended" />
-    <Reference Include="Microsoft.VisualBasic" />
   </ItemGroup>
 </Project>
