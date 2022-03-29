@@ -12,7 +12,7 @@ namespace BhModule.Community.Pathing.Utility
 
 		public static async Task<byte[]> ReadAsync(string path)
 		{
-			using FileStream stream = File.Open(path, FileMode.Open);
+			using FileStream stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 			byte[] result = new byte[(int)stream.Length];
 			int readIndex = 0;
 			while (readIndex < result.Length)

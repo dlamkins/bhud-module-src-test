@@ -28,13 +28,16 @@
     <Reference Include="Cronos">
       <HintPath>..\..\working\Cronos.dll</HintPath>
     </Reference>
-    <Reference Include="Flurl.Http" />
     <Reference Include="YamlDotNet">
       <HintPath>..\..\working\YamlDotNet.dll</HintPath>
     </Reference>
+    <Reference Include="Flurl.Http" />
     <Reference Include="Newtonsoft.Json" />
     <Reference Include="Flurl" />
     <Reference Include="SemVer" />
+    <Reference Include="Humanizer">
+      <HintPath>..\..\working\Humanizer.dll</HintPath>
+    </Reference>
     <Reference Include="AsyncClipboardService" />
     <Reference Include="Gapotchenko.FX" />
     <Reference Include="System.Net.Http" />

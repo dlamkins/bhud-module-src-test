@@ -35,9 +35,9 @@ namespace BhModule.Community.Pathing
 
 		private readonly PackReaderSettings _packReaderSettings;
 
-		private bool _isLoading;
-
 		private int _lastMap = -1;
+
+		public bool IsLoading { get; private set; }
 
 		public PackInitiator(string watchPath, ModuleSettings moduleSettings, IProgress<string> loadingIndicator)
 		{
@@ -49,9 +49,18 @@ namespace BhModule.Community.Pathing
 			_packState = new SharedPackState(moduleSettings);
 		}
 
+		public void ReloadPacks()
+		{
+			if (_packState.CurrentMapId >= 0)
+			{
+				_lastMap = -1;
+				LoadMapFromEachPackInBackground(_packState.CurrentMapId);
+			}
+		}
+
 		public IEnumerable<ContextMenuStripItem> GetPackMenuItems()
 		{
-			bool isAnyMarkers = !_isLoading && _sharedPackCollection != null && _sharedPackCollection.Categories != null && _sharedPackCollection.Categories.Any((PathingCategory category) => !string.IsNullOrWhiteSpace(category.DisplayName));
+			bool isAnyMarkers = !IsLoading && _sharedPackCollection != null && _sharedPackCollection.Categories != null && _sharedPackCollection.Categories.Any((PathingCategory category) => !string.IsNullOrWhiteSpace(category.DisplayName));
 			ContextMenuStripItem val = new ContextMenuStripItem();
 			val.set_Text("All Markers");
 			val.set_CanCheck(true);
@@ -64,19 +73,15 @@ namespace BhModule.Community.Pathing
 			});
 			ContextMenuStripItem val2 = new ContextMenuStripItem();
 			val2.set_Text("Reload Markers");
-			((Control)val2).set_Enabled(!_isLoading && _packState.CurrentMapId > 0);
+			((Control)val2).set_Enabled(!IsLoading && _packState.CurrentMapId > 0);
 			ContextMenuStripItem reloadMarkers = val2;
 			((Control)reloadMarkers).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				if (_packState.CurrentMapId >= 0)
-				{
-					_lastMap = -1;
-					LoadMapFromEachPackInBackground(_packState.CurrentMapId);
-				}
+				ReloadPacks();
 			});
 			ContextMenuStripItem val3 = new ContextMenuStripItem();
 			val3.set_Text("Unload Markers");
-			((Control)val3).set_Enabled(!_isLoading && _packState.CurrentMapId > 0);
+			((Control)val3).set_Enabled(!IsLoading && _packState.CurrentMapId > 0);
 			ContextMenuStripItem unloadMarkers = val3;
 			((Control)unloadMarkers).add_Click((EventHandler<MouseEventArgs>)async delegate
 			{
@@ -96,13 +101,13 @@ namespace BhModule.Community.Pathing
 			await LoadAllPacks();
 		}
 
-		private async Task LoadUnpackedPackFiles(string unpackedDir)
+		public async Task LoadUnpackedPackFiles(string unpackedDir)
 		{
 			Pack newPack = Pack.FromDirectoryMarkerPack(unpackedDir);
 			_packs.Add(newPack);
 		}
 
-		private async Task LoadPackedPackFiles(IEnumerable<string> zipPackFiles)
+		public async Task LoadPackedPackFiles(IEnumerable<string> zipPackFiles)
 		{
 			foreach (Pack newPack in zipPackFiles.Select(Pack.FromArchivedMarkerPack))
 			{
@@ -159,7 +164,7 @@ namespace BhModule.Community.Pathing
 
 		private async Task LoadMapFromEachPack(int mapId)
 		{
-			_isLoading = true;
+			IsLoading = true;
 			Stopwatch loadTimer = Stopwatch.StartNew();
 			_loadingIndicator.Report("Loading marker packs...");
 			await PrepareState(mapId);
@@ -198,7 +203,7 @@ namespace BhModule.Community.Pathing
 				array2[j].ReleaseLocks();
 			}
 			_loadingIndicator.Report("");
-			_isLoading = false;
+			IsLoading = false;
 			loadTimer.Stop();
 			Logger.Info(string.Format("Finished loading packs {0} in {1} ms for map {2}.", string.Join(", ", _packs.Select((Pack pack) => pack.Name)), loadTimer.ElapsedMilliseconds, mapId));
 		}

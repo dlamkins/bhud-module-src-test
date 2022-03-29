@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using BhModule.Community.Pathing.MarkerPackRepo;
 using BhModule.Community.Pathing.UI.Views;
 using Blish_HUD;
 using Blish_HUD.Content;
@@ -32,8 +33,6 @@ namespace BhModule.Community.Pathing
 
 		private bool _packsLoading;
 
-		private PackInitiator _watcher;
-
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
 		internal ContentsManager ContentsManager => base.ModuleParameters.get_ContentsManager();
@@ -43,6 +42,10 @@ namespace BhModule.Community.Pathing
 		internal Gw2ApiManager Gw2ApiManager => base.ModuleParameters.get_Gw2ApiManager();
 
 		internal static PathingModule Instance { get; private set; }
+
+		public PackInitiator PackInitiator { get; private set; }
+
+		public BhModule.Community.Pathing.MarkerPackRepo.MarkerPackRepo MarkerPackRepo { get; private set; }
 
 		[ImportingConstructor]
 		public PathingModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
@@ -58,9 +61,9 @@ namespace BhModule.Community.Pathing
 
 		private IEnumerable<ContextMenuStripItem> GetPathingMenuItems()
 		{
-			if (_watcher != null)
+			if (PackInitiator != null)
 			{
-				foreach (ContextMenuStripItem menuItem in _watcher.GetPackMenuItems())
+				foreach (ContextMenuStripItem menuItem in PackInitiator.GetPackMenuItems())
 				{
 					((Control)menuItem).set_Enabled(((Control)menuItem).get_Enabled() && !_packsLoading);
 					yield return menuItem;
@@ -101,6 +104,8 @@ namespace BhModule.Community.Pathing
 			//IL_017e: Expected O, but got Unknown
 			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01c2: Expected O, but got Unknown
+			//IL_020f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0219: Expected O, but got Unknown
 			CornerIcon val = new CornerIcon();
 			val.set_IconName(Strings.General_UiName);
 			val.set_Icon(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\pathing-icon.png")));
@@ -116,6 +121,7 @@ namespace BhModule.Community.Pathing
 			_settingsWindow.get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156740+155150.png")), (Func<IView>)(() => (IView)new SettingsView(_moduleSettings.PackSettings, -1)), Strings.Window_MainSettingsTab, (int?)null));
 			_settingsWindow.get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\157123+155150.png")), (Func<IView>)(() => (IView)new SettingsView(_moduleSettings.MapSettings, -1)), Strings.Window_MapSettingsTab, (int?)null));
 			_settingsWindow.get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156734+155150.png")), (Func<IView>)(() => (IView)new SettingsView(_moduleSettings.KeyBindSettings, -1)), Strings.Window_KeyBindSettingsTab, (int?)null));
+			_settingsWindow.get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156909.png")), (Func<IView>)(() => (IView)(object)new PackRepoView()), Strings.Window_DownloadMarkerPacks, (int?)null));
 			((Control)_pathingIcon).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				//IL_000a: Unknown result type (might be due to invalid IL or missing references)
@@ -160,25 +166,27 @@ namespace BhModule.Community.Pathing
 		protected override async Task LoadAsync()
 		{
 			Stopwatch sw = Stopwatch.StartNew();
-			_watcher = new PackInitiator(DirectoriesManager.GetFullDirectoryPath("markers"), _moduleSettings, GetModuleProgressHandler());
-			await _watcher.Init();
+			MarkerPackRepo = new BhModule.Community.Pathing.MarkerPackRepo.MarkerPackRepo();
+			MarkerPackRepo.Init();
+			PackInitiator = new PackInitiator(DirectoriesManager.GetFullDirectoryPath("markers"), _moduleSettings, GetModuleProgressHandler());
+			await PackInitiator.Init();
 			sw.Stop();
 			Logger.Debug($"Took {sw.ElapsedMilliseconds} ms to complete loading Pathing module...");
 		}
 
 		public override IView GetSettingsView()
 		{
-			return (IView)(object)new SettingsHintView(((Action)((Control)_settingsWindow).Show, _watcher));
+			return (IView)(object)new SettingsHintView(((Action)((Control)_settingsWindow).Show, PackInitiator));
 		}
 
 		protected override void Update(GameTime gameTime)
 		{
-			_watcher?.Update(gameTime);
+			PackInitiator?.Update(gameTime);
 		}
 
 		protected override void Unload()
 		{
-			_watcher?.Unload();
+			PackInitiator?.Unload();
 			CornerIcon pathingIcon = _pathingIcon;
 			if (pathingIcon != null)
 			{

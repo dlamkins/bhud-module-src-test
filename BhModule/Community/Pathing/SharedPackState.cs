@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -8,7 +7,6 @@ using BhModule.Community.Pathing.Content;
 using BhModule.Community.Pathing.Entity;
 using BhModule.Community.Pathing.Entity.Effects;
 using BhModule.Community.Pathing.State;
-using BhModule.Community.Pathing.Utility;
 using Blish_HUD;
 using Blish_HUD.Common.Gw2;
 using Blish_HUD.Entities;
@@ -139,11 +137,14 @@ namespace BhModule.Community.Pathing
 
 		private async Task InitPointsOfInterest(IList<PointOfInterest> pois)
 		{
-			ConcurrentBag<IPathingEntity> poiBag = new ConcurrentBag<IPathingEntity>();
-			await pois.AsParallel().ParallelForEachAsync(PreloadTextures, Math.Max(1, (Environment.ProcessorCount > 8) ? (Environment.ProcessorCount - 2) : (Environment.ProcessorCount / 2)));
-			pois.AsParallel().Select(BuildEntity).ForAll(poiBag.Add);
-			Entities.AddRange(poiBag);
-			GameService.Graphics.get_World().AddEntities((IEnumerable<IEntity>)poiBag);
+			new List<IPathingEntity>(pois.Count);
+			foreach (PointOfInterest poi in pois)
+			{
+				await PreloadTextures(poi);
+				IPathingEntity entity = BuildEntity(poi);
+				Entities.Add(entity);
+				GameService.Graphics.get_World().AddEntity((IEntity)entity);
+			}
 			await Task.CompletedTask;
 		}
 

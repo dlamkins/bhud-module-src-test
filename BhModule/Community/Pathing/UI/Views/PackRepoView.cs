@@ -12,7 +12,7 @@ namespace BhModule.Community.Pathing.UI.Views
 		public PackRepoView()
 			: this()
 		{
-			((View)this).WithPresenter((IPresenter)(object)new PackRepoPresenter(this, 0));
+			((View)this).WithPresenter((IPresenter)(object)new PackRepoPresenter(this, PathingModule.Instance.MarkerPackRepo));
 		}
 
 		protected override void Build(Container buildPanel)

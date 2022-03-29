@@ -86,7 +86,7 @@ namespace BhModule.Community.Pathing.State
 			}
 			catch (Exception e)
 			{
-				Logger.Error(e, "Failed to write " + stateFileName + " (" + categoryStatePath + ").");
+				Logger.Warn(e, "Failed to write " + stateFileName + " (" + categoryStatePath + ").");
 			}
 		}
 

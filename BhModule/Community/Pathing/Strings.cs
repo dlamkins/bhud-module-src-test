@@ -74,6 +74,8 @@ namespace BhModule.Community.Pathing
 
 		internal static string Setting_PackMarkerConsentToClipboard => ResourceManager.GetString("Setting_PackMarkerConsentToClipboard", resourceCulture);
 
+		internal static string Setting_PackMarkerConsentToClipboardDescription => ResourceManager.GetString("Setting_PackMarkerConsentToClipboardDescription", resourceCulture);
+
 		internal static string Setting_PackMaxOpacityOverride => ResourceManager.GetString("Setting_PackMaxOpacityOverride", resourceCulture);
 
 		internal static string Setting_PackMaxTrailAnimationSpeed => ResourceManager.GetString("Setting_PackMaxTrailAnimationSpeed", resourceCulture);
