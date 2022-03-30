@@ -20,6 +20,8 @@ namespace Nekres.Inquest_Module.UI.Controls
 
 		private Color _textColor;
 
+		private bool _attachToCursor;
+
 		private Point _mousePos => GameService.Input.get_Mouse().get_Position();
 
 		public bool Paused
@@ -60,6 +62,18 @@ namespace Nekres.Inquest_Module.UI.Controls
 			}
 		}
 
+		public bool AttachToCursor
+		{
+			get
+			{
+				return _attachToCursor;
+			}
+			set
+			{
+				((Control)this).SetProperty<bool>(ref _attachToCursor, value, false, "AttachToCursor");
+			}
+		}
+
 		public TaskIndicator()
 			: this()
 		{
@@ -67,7 +81,6 @@ namespace Nekres.Inquest_Module.UI.Controls
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			_textColor = Color.get_White();
 			((Control)this).set_ZIndex(1000);
-			Update();
 		}
 
 		protected override CaptureType CapturesInput()
@@ -77,10 +90,13 @@ namespace Nekres.Inquest_Module.UI.Controls
 
 		private void Update()
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).set_Location(new Point(_mousePos.X + ((Control)this).get_Width() / 2, _mousePos.Y - ((Control)this).get_Height() / 2));
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			if (_attachToCursor)
+			{
+				((Control)this).set_Location(new Point(_mousePos.X + ((Control)this).get_Width() / 2, _mousePos.Y - ((Control)this).get_Height() / 2));
+			}
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)

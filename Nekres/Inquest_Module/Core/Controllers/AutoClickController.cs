@@ -32,6 +32,8 @@ namespace Nekres.Inquest_Module.Core.Controllers
 
 		private TaskIndicator _indicator;
 
+		private ClickIndicator _clickIndicator;
+
 		private KeyBinding AutoClickHoldKey => InquestModule.ModuleInstance.AutoClickHoldKeySetting.get_Value();
 
 		private KeyBinding AutoClickToggleKey => InquestModule.ModuleInstance.AutoClickToggleKeySetting.get_Value();
@@ -42,8 +44,9 @@ namespace Nekres.Inquest_Module.Core.Controllers
 		{
 			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			_redShift = new Color(255, 105, 105);
+			_redShift = new Color(255, 57, 57);
 			AutoClickHoldKey.set_Enabled(true);
+			AutoClickHoldKey.add_Activated((EventHandler<EventArgs>)OnHoldActivated);
 			AutoClickToggleKey.set_Enabled(true);
 			AutoClickToggleKey.add_Activated((EventHandler<EventArgs>)OnToggleActivate);
 			_doubleClickSfx = (SoundEffect[])(object)new SoundEffect[3]
@@ -52,60 +55,119 @@ namespace Nekres.Inquest_Module.Core.Controllers
 				InquestModule.ModuleInstance.ContentsManager.GetSound("audio\\double-click-2.wav"),
 				InquestModule.ModuleInstance.ContentsManager.GetSound("audio\\double-click-3.wav")
 			};
+			GameService.Gw2Mumble.get_PlayerCharacter().add_IsInCombatChanged((EventHandler<ValueEventArgs<bool>>)OnIsInCombatChanged);
+			GameService.GameIntegration.get_Gw2Instance().add_IsInGameChanged((EventHandler<ValueEventArgs<bool>>)OnIsInGameChanged);
+		}
+
+		private void OnIsInCombatChanged(object o, ValueEventArgs<bool> e)
+		{
+			if (e.get_Value())
+			{
+				DeactivateToggle();
+			}
+		}
+
+		private void OnIsInGameChanged(object o, ValueEventArgs<bool> e)
+		{
+			if (!e.get_Value())
+			{
+				DeactivateToggle();
+			}
+		}
+
+		private void OnHoldActivated(object o, EventArgs e)
+		{
+			if (_toggleActive)
+			{
+				DeactivateToggle();
+			}
+		}
+
+		private void SaveTogglePosition()
+		{
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			_togglePos = Mouse.GetPosition();
+			if (_clickIndicator == null)
+			{
+				ClickIndicator clickIndicator = new ClickIndicator();
+				((Control)clickIndicator).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+				((Control)clickIndicator).set_Size(new Point(32, 32));
+				((Control)clickIndicator).set_Location(new Point(GameService.Input.get_Mouse().get_Position().X - 14, GameService.Input.get_Mouse().get_Position().Y - 14));
+				((Control)clickIndicator).set_ZIndex(1000);
+				_clickIndicator = clickIndicator;
+			}
 		}
 
 		private void OnToggleActivate(object o, EventArgs e)
 		{
-			if (_toggleActive)
+			if (_toggleActive || IsBusy())
 			{
-				_toggleActive = false;
-				TaskIndicator indicator = _indicator;
-				if (indicator != null)
-				{
-					((Control)indicator).Dispose();
-				}
-				_indicator = null;
+				DeactivateToggle();
+				return;
 			}
-			else
+			SaveTogglePosition();
+			NumericInputPrompt.ShowPrompt(OnToggleInputPromptCallback, "Enter an interval in seconds:");
+		}
+
+		private void DeactivateToggle()
+		{
+			_toggleActive = false;
+			ClickIndicator clickIndicator = _clickIndicator;
+			if (clickIndicator != null)
 			{
-				_togglePos = Mouse.GetPosition();
-				NumericInputPrompt.ShowPrompt(OnToggleInputPromptCallback, "Enter an interval in seconds:");
+				((Control)clickIndicator).Dispose();
 			}
+			_clickIndicator = null;
+			TaskIndicator indicator = _indicator;
+			if (indicator != null)
+			{
+				((Control)indicator).Dispose();
+			}
+			_indicator = null;
 		}
 
 		private void OnToggleInputPromptCallback(bool confirmed, double input)
 		{
-			if (confirmed)
+			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+			if (!confirmed)
 			{
-				_toggleActive = true;
-				_toggleIntervalMs = Math.Min(300000, Math.Max(250, (int)(input * 1000.0)));
-				_nextToggleClick = DateTime.UtcNow;
+				DeactivateToggle();
+				return;
+			}
+			_toggleActive = true;
+			_toggleIntervalMs = Math.Min(300000, Math.Max(250, (int)(input * 1000.0)));
+			_nextToggleClick = DateTime.UtcNow;
+			if (_indicator == null)
+			{
+				TaskIndicator taskIndicator = new TaskIndicator();
+				((Control)taskIndicator).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+				((Control)taskIndicator).set_Size(new Point(50, 50));
+				taskIndicator.AttachToCursor = false;
+				((Control)taskIndicator).set_Location(new Point(((Control)_clickIndicator).get_Location().X + 25, ((Control)_clickIndicator).get_Location().Y - 32));
+				_indicator = taskIndicator;
 			}
 		}
 
 		public void UpdateIndicator()
 		{
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
 			if (_toggleActive)
 			{
-				if (_indicator != null)
-				{
-					TimeSpan remainingTime = DateTime.UtcNow.Subtract(_nextToggleClick);
-					_indicator.Paused = IsBusy();
-					_indicator.Text = remainingTime.ToString((remainingTime.TotalSeconds > -1.0) ? "\\.ff" : ((remainingTime.TotalMinutes > -1.0) ? "ss" : "m\\:ss")).TrimStart('0');
-					_indicator.TextColor = Color.Lerp(Color.get_White(), _redShift, 1f + (float)remainingTime.TotalMilliseconds / (float)_toggleIntervalMs);
-					((Control)_indicator).set_Visible(!GameService.Input.get_Mouse().get_CameraDragging());
-				}
-				else
-				{
-					TaskIndicator taskIndicator = new TaskIndicator();
-					((Control)taskIndicator).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-					((Control)taskIndicator).set_Size(new Point(50, 50));
-					_indicator = taskIndicator;
-				}
+				bool isBusy = IsBusy();
+				_clickIndicator.Paused = isBusy;
+				_indicator.Paused = isBusy;
+				((Control)_indicator).set_Visible(!isBusy);
+				TimeSpan remainingTime = DateTime.UtcNow.Subtract(_nextToggleClick);
+				_indicator.Text = remainingTime.ToString((remainingTime.TotalSeconds > -1.0) ? "\\.ff" : ((remainingTime.TotalMinutes > -1.0) ? "ss" : "m\\:ss")).TrimStart('0');
+				_indicator.TextColor = Color.Lerp(Color.get_White(), _redShift, 1f + (float)remainingTime.TotalMilliseconds / (float)_toggleIntervalMs);
 			}
 		}
 
@@ -128,6 +190,7 @@ namespace Nekres.Inquest_Module.Core.Controllers
 			}
 			if (_toggleActive && DateTime.UtcNow > _nextToggleClick)
 			{
+				_clickIndicator.LeftClick();
 				if (!InquestModule.ModuleInstance.AutoClickSoundDisabledSetting.get_Value())
 				{
 					DoubleClickSfx.Play(GameService.GameIntegration.get_Audio().get_Volume(), 0f, 0f);
@@ -140,7 +203,7 @@ namespace Nekres.Inquest_Module.Core.Controllers
 
 		private bool IsBusy()
 		{
-			if (!GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() || !GameService.Gw2Mumble.get_IsAvailable() || GameService.Gw2Mumble.get_UI().get_IsTextInputFocused() || GameService.Input.get_Mouse().get_CameraDragging())
+			if (!GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() || !GameService.GameIntegration.get_Gw2Instance().get_IsInGame() || GameService.Gw2Mumble.get_UI().get_IsTextInputFocused() || GameService.Input.get_Mouse().get_CameraDragging() || GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat())
 			{
 				if (_paused)
 				{
@@ -159,6 +222,7 @@ namespace Nekres.Inquest_Module.Core.Controllers
 
 		public void Dispose()
 		{
+			DeactivateToggle();
 			SoundEffect[] doubleClickSfx = _doubleClickSfx;
 			foreach (SoundEffect obj in doubleClickSfx)
 			{
@@ -168,6 +232,8 @@ namespace Nekres.Inquest_Module.Core.Controllers
 				}
 			}
 			AutoClickToggleKey.remove_Activated((EventHandler<EventArgs>)OnToggleActivate);
+			GameService.Gw2Mumble.get_PlayerCharacter().remove_IsInCombatChanged((EventHandler<ValueEventArgs<bool>>)OnIsInCombatChanged);
+			GameService.GameIntegration.get_Gw2Instance().remove_IsInGameChanged((EventHandler<ValueEventArgs<bool>>)OnIsInGameChanged);
 		}
 	}
 }
