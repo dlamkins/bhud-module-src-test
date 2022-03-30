@@ -12,6 +12,8 @@ namespace Nekres.Inquest_Module.Core.Controllers
 {
 	internal class AutoClickController : IDisposable
 	{
+		private float _soundVolume;
+
 		private SoundEffect[] _doubleClickSfx;
 
 		private DateTime _nextHoldClick = DateTime.UtcNow;
@@ -34,6 +36,18 @@ namespace Nekres.Inquest_Module.Core.Controllers
 
 		private ClickIndicator _clickIndicator;
 
+		public float SoundVolume
+		{
+			get
+			{
+				return Math.Min(GameService.GameIntegration.get_Audio().get_Volume(), _soundVolume);
+			}
+			set
+			{
+				_soundVolume = value;
+			}
+		}
+
 		private KeyBinding AutoClickHoldKey => InquestModule.ModuleInstance.AutoClickHoldKeySetting.get_Value();
 
 		private KeyBinding AutoClickToggleKey => InquestModule.ModuleInstance.AutoClickToggleKeySetting.get_Value();
@@ -42,8 +56,9 @@ namespace Nekres.Inquest_Module.Core.Controllers
 
 		public AutoClickController()
 		{
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			SoundVolume = 1f;
 			_redShift = new Color(255, 57, 57);
 			AutoClickHoldKey.set_Enabled(true);
 			AutoClickHoldKey.add_Activated((EventHandler<EventArgs>)OnHoldActivated);
@@ -85,18 +100,17 @@ namespace Nekres.Inquest_Module.Core.Controllers
 
 		private void SaveTogglePosition()
 		{
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
 			_togglePos = Mouse.GetPosition();
 			if (_clickIndicator == null)
 			{
-				ClickIndicator clickIndicator = new ClickIndicator();
+				ClickIndicator clickIndicator = new ClickIndicator(attachToCursor: false);
 				((Control)clickIndicator).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 				((Control)clickIndicator).set_Size(new Point(32, 32));
 				((Control)clickIndicator).set_Location(new Point(GameService.Input.get_Mouse().get_Position().X - 14, GameService.Input.get_Mouse().get_Position().Y - 14));
-				((Control)clickIndicator).set_ZIndex(1000);
 				_clickIndicator = clickIndicator;
 			}
 		}
@@ -131,10 +145,10 @@ namespace Nekres.Inquest_Module.Core.Controllers
 
 		private void OnToggleInputPromptCallback(bool confirmed, double input)
 		{
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
 			if (!confirmed)
 			{
 				DeactivateToggle();
@@ -145,10 +159,9 @@ namespace Nekres.Inquest_Module.Core.Controllers
 			_nextToggleClick = DateTime.UtcNow;
 			if (_indicator == null)
 			{
-				TaskIndicator taskIndicator = new TaskIndicator();
+				TaskIndicator taskIndicator = new TaskIndicator(attachToCursor: false);
 				((Control)taskIndicator).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 				((Control)taskIndicator).set_Size(new Point(50, 50));
-				taskIndicator.AttachToCursor = false;
 				((Control)taskIndicator).set_Location(new Point(((Control)_clickIndicator).get_Location().X + 25, ((Control)_clickIndicator).get_Location().Y - 32));
 				_indicator = taskIndicator;
 			}
@@ -183,7 +196,7 @@ namespace Nekres.Inquest_Module.Core.Controllers
 			{
 				if (!InquestModule.ModuleInstance.AutoClickSoundDisabledSetting.get_Value())
 				{
-					DoubleClickSfx.Play(GameService.GameIntegration.get_Audio().get_Volume(), 0f, 0f);
+					DoubleClickSfx.Play(SoundVolume, 0f, 0f);
 				}
 				Mouse.DoubleClick((MouseButton)0, -1, -1, true);
 				_nextHoldClick = DateTime.UtcNow.AddMilliseconds(50.0);
@@ -193,7 +206,7 @@ namespace Nekres.Inquest_Module.Core.Controllers
 				_clickIndicator.LeftClick();
 				if (!InquestModule.ModuleInstance.AutoClickSoundDisabledSetting.get_Value())
 				{
-					DoubleClickSfx.Play(GameService.GameIntegration.get_Audio().get_Volume(), 0f, 0f);
+					DoubleClickSfx.Play(SoundVolume, 0f, 0f);
 				}
 				Mouse.DoubleClick((MouseButton)0, _togglePos.X, _togglePos.Y, false);
 				Mouse.Click((MouseButton)0, _togglePos.X, _togglePos.Y, false);

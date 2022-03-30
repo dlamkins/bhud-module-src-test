@@ -5,6 +5,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using MonoGame.Extended.BitmapFonts;
 
@@ -46,6 +47,7 @@ namespace Nekres.Inquest_Module.UI.Controls
 			_confirmButtonText = confirmButtonText;
 			_cancelButtonButtonText = cancelButtonText;
 			((Control)this).set_ZIndex(999);
+			GameService.Input.get_Keyboard().add_KeyPressed((EventHandler<KeyboardEventArgs>)OnKeyPressed);
 		}
 
 		public static void ShowPrompt(Action<bool, double> callback, string text, string confirmButtonText = "Confirm", string cancelButtonText = "Cancel")
@@ -93,10 +95,7 @@ namespace Nekres.Inquest_Module.UI.Controls
 				_confirmButton = val;
 				((Control)_confirmButton).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
-					GameService.Content.PlaySoundEffectByName("button-click");
-					_callback(arg1: true, double.Parse(((TextInputBase)_inputTextBox).get_Text(), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture));
-					_singleton = null;
-					((Control)this).Dispose();
+					Confirm();
 				});
 			}
 			if (_cancelButton == null)
@@ -109,11 +108,48 @@ namespace Nekres.Inquest_Module.UI.Controls
 				_cancelButton = val2;
 				((Control)_cancelButton).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
-					GameService.Content.PlaySoundEffectByName("button-click");
-					_callback(arg1: false, 0.0);
-					_singleton = null;
-					((Control)this).Dispose();
+					Cancel();
 				});
+			}
+		}
+
+		private void Confirm()
+		{
+			GameService.Input.get_Keyboard().remove_KeyPressed((EventHandler<KeyboardEventArgs>)OnKeyPressed);
+			GameService.Content.PlaySoundEffectByName("button-click");
+			_callback(arg1: true, double.Parse(((TextInputBase)_inputTextBox).get_Text(), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture));
+			_singleton = null;
+			((Control)this).Dispose();
+		}
+
+		private void Cancel()
+		{
+			GameService.Input.get_Keyboard().remove_KeyPressed((EventHandler<KeyboardEventArgs>)OnKeyPressed);
+			GameService.Content.PlaySoundEffectByName("button-click");
+			_callback(arg1: false, 0.0);
+			_singleton = null;
+			((Control)this).Dispose();
+		}
+
+		private void OnKeyPressed(object o, KeyboardEventArgs e)
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000a: Invalid comparison between Unknown and I4
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000f: Invalid comparison between Unknown and I4
+			Keys key = e.get_Key();
+			if ((int)key != 13)
+			{
+				if ((int)key == 27)
+				{
+					Cancel();
+				}
+			}
+			else if (((Control)_confirmButton).get_Enabled())
+			{
+				Confirm();
 			}
 		}
 
