@@ -15,6 +15,10 @@ namespace Kenedia.Modules.Characters
 
 		public SettingEntry<bool> DoubleClickToEnter;
 
+		public SettingEntry<bool> FadeSubWindows;
+
+		public SettingEntry<bool> FocusFilter;
+
 		public SettingEntry<int> SwapDelay;
 
 		public SettingEntry<int> FilterDelay;

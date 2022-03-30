@@ -46,6 +46,7 @@ This will require an API-Key with permissions at least for the 'characters' endp
   <data name="SwapDelay_DisplayName"><value>Loading Delay ({0} ms)</value></data>
   <data name="Switch"><value>Switch to {0}</value></data>
   <data name="Scribe"><value>Scribe</value></data>
+  <data name="FocusFilter_Description"><value>When toggling the main menu to show, automatically focus the search field</value></data>
   <data name="SearchGuide"><value>-c Crafting Profession
 -p Profession/Specialization
 -r Race
@@ -60,18 +61,21 @@ This will require an API-Key with permissions at least for the 'characters' endp
   <data name="Leatherworker"><value>Leatherworker</value></data>
   <data name="Map"><value>Map</value></data>
   <data name="Clear"><value>Clear</value></data>
+  <data name="FocusFilter_DisplayName"><value>Focus search field</value></data>
   <data name="Level"><value>Level {0}</value></data>
   <data name="Years"><value>Years</value></data>
   <data name="Error_InvalidPermissions"><value>This API key does not have the required permissions.</value></data>
   <data name="NoCraftingProfession"><value>No Crafting Profession</value></data>
   <data name="FilterDelay_Description"><value>Average time in milliseconds waited between filtering your characters' panel.
 To get the current value you will have to swap module tabs once to update the settings page!</value></data>
+  <data name="FadeOut_DisplayName"><value>Fade extra window</value></data>
   <data name="Birthday"><value>Birthday</value></data>
   <data name="Weaponsmith"><value>Weaponsmith</value></data>
   <data name="SwapDelay_Description"><value>Avg. loading time from ingame to character selection.
 To get the current value you will have to swap module tabs once to update the settings page!</value></data>
   <data name="Artificer"><value>Artificer</value></data>
   <data name="Huntsman"><value>Huntsman</value></data>
+  <data name="FadeOut_Description"><value>Fade the filter and character window automatically after 2500 ms</value></data>
   <data name="Characters"><value>Characters</value></data>
   <data name="Error_Competivive"><value>Character swapping is disabled in competition mode!</value></data>
   <data name="UntilBirthday"><value>until Birthday</value></data>

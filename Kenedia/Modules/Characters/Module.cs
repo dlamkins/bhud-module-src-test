@@ -37,6 +37,8 @@ namespace Kenedia.Modules.Characters
 
 			public static double Tick_APIUpdate;
 
+			public static double Tick_FadeEffect;
+
 			public static Character character { get; set; }
 
 			public static string CharName { get; set; }
@@ -396,13 +398,11 @@ namespace Kenedia.Modules.Characters
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			Settings.LogoutKey = settings.DefineSetting("LogoutKey", new KeyBinding(Keys.F12), () => common.Logout, () => common.LogoutDescription);
-			Settings.ShortcutKey = settings.DefineSetting("ShortcutKey", new KeyBinding(ModifierKeys.Shift, Keys.C), () => common.ShortcutToggle_DisplayName, () => common.ShortcutToggle_Description);
-			Settings.EnterOnSwap = settings.DefineSetting("EnterOnSwap", defaultValue: false, () => common.EnterOnSwap_DisplayName, () => common.EnterOnSwap_Description);
 			Settings.AutoLogin = settings.DefineSetting("AutoLogin", defaultValue: false, () => common.AutoLogin_DisplayName, () => common.AutoLogin_Description);
+			Settings.EnterOnSwap = settings.DefineSetting("EnterOnSwap", defaultValue: false, () => common.EnterOnSwap_DisplayName, () => common.EnterOnSwap_Description);
 			Settings.DoubleClickToEnter = settings.DefineSetting("DoubleClickToEnter", defaultValue: false, () => common.DoubleClickToEnter_DisplayName, () => common.DoubleClickToEnter_Description);
-			Settings.SwapDelay = settings.DefineSetting("SwapDelay", 500, () => string.Format(common.SwapDelay_DisplayName, Settings.SwapDelay.Value), () => common.SwapDelay_Description);
-			Settings.SwapDelay.SetRange(0, 5000);
+			Settings.FadeSubWindows = settings.DefineSetting("FadeSubWindows", defaultValue: false, () => common.FadeOut_DisplayName, () => common.FadeOut_Description);
+			Settings.FocusFilter = settings.DefineSetting("FocusFilter", defaultValue: false, () => common.FocusFilter_DisplayName, () => common.FocusFilter_Description);
 			Settings.FilterDelay = settings.DefineSetting("FilterDelay", 150, () => string.Format(common.FilterDelay_DisplayName, Settings.FilterDelay.Value), () => common.FilterDelay_Description);
 			Settings.FilterDelay.SetRange(0, 500);
 			Settings.FilterDelay.SettingChanged += delegate
@@ -410,6 +410,10 @@ namespace Kenedia.Modules.Characters
 				Settings._FilterDelay = Settings.FilterDelay.Value / 2;
 			};
 			Settings._FilterDelay = Settings.FilterDelay.Value / 2;
+			Settings.SwapDelay = settings.DefineSetting("SwapDelay", 500, () => string.Format(common.SwapDelay_DisplayName, Settings.SwapDelay.Value), () => common.SwapDelay_Description);
+			Settings.SwapDelay.SetRange(0, 5000);
+			Settings.LogoutKey = settings.DefineSetting("LogoutKey", new KeyBinding(Keys.F12), () => common.Logout, () => common.LogoutDescription);
+			Settings.ShortcutKey = settings.DefineSetting("ShortcutKey", new KeyBinding(ModifierKeys.Shift, Keys.C), () => common.ShortcutToggle_DisplayName, () => common.ShortcutToggle_Description);
 		}
 
 		public async void FetchAPI(bool force = false)
@@ -490,111 +494,119 @@ namespace Kenedia.Modules.Characters
 
 		private async void Gw2ApiManager_SubtokenUpdated(object sender, ValueEventArgs<IEnumerable<TokenPermission>> e)
 		{
-			Logger.Debug("API Subtoken Updated!");
-			if (Gw2ApiManager.HasPermissions(new TokenPermission[2]
+			_ = 1;
+			try
 			{
-				TokenPermission.Account,
-				TokenPermission.Characters
-			}))
-			{
-				Account account = (API_Account = await Gw2ApiManager.Gw2ApiClient.V2.Account.GetAsync());
-				string path = DirectoriesManager.GetFullDirectoryPath("characters") + "\\" + API_Account.Name;
-				if (!Directory.Exists(path))
+				Logger.Debug("API Subtoken Updated!");
+				if (Gw2ApiManager.HasPermissions(new TokenPermission[2]
 				{
-					Directory.CreateDirectory(path);
-				}
-				CharactersPath = path + "\\characters.json";
-				AccountPath = path + "\\account.json";
-				if (userAccount == null)
+					TokenPermission.Account,
+					TokenPermission.Characters
+				}))
 				{
-					userAccount = new AccountInfo
+					Account account = (API_Account = await Gw2ApiManager.Gw2ApiClient.V2.Account.GetAsync());
+					string path = DirectoriesManager.GetFullDirectoryPath("characters") + "\\" + API_Account.Name;
+					if (!Directory.Exists(path))
 					{
-						Name = account.Name,
-						LastModified = account.LastModified
-					};
-				}
-				if (System.IO.File.Exists(AccountPath))
-				{
-					requestAPI = false;
-					foreach (AccountInfo acc in JsonConvert.DeserializeObject<List<AccountInfo>>(System.IO.File.ReadAllText(AccountPath))!)
-					{
-						if (acc.Name == account.Name)
-						{
-							userAccount.LastBlishUpdate = acc.LastBlishUpdate;
-							break;
-						}
+						Directory.CreateDirectory(path);
 					}
-				}
-				LoadCharacterList();
-				if (userAccount.CharacterUpdateNeeded())
-				{
-					userAccount.LastBlishUpdate = account.LastModified;
-					userAccount.Save();
-					Logger.Debug("Updating Characters ....");
-					Logger.Debug("The last API modification is more recent than our last local data track.");
-					IApiV2ObjectList<Gw2Sharp.WebApi.V2.Models.Character> obj = await Gw2ApiManager.Gw2ApiClient.V2.Characters.AllAsync();
-					Character last = null;
-					int i = 0;
-					foreach (Gw2Sharp.WebApi.V2.Models.Character c in obj)
+					CharactersPath = path + "\\characters.json";
+					AccountPath = path + "\\account.json";
+					if (userAccount == null)
 					{
-						Character character2 = getCharacter(c.Name);
-						character2.Name = character2.Name ?? c.Name;
-						character2.Race = (RaceType)Enum.Parse(typeof(RaceType), c.Race);
-						character2._Profession = (int)Enum.Parse(typeof(Professions), c.Profession.ToString());
-						character2.Profession = (ProfessionType)Enum.Parse(typeof(ProfessionType), c.Profession.ToString());
-						character2._Specialization = ((character2._Specialization > -1) ? character2._Specialization : (-1));
-						character2.Level = c.Level;
-						character2.Created = c.Created;
-						character2.apiIndex = i;
-						if (character2.LastModified == dateZero || character2.LastModified < account.LastModified.UtcDateTime)
+						userAccount = new AccountInfo
 						{
-							character2.LastModified = account.LastModified.UtcDateTime.AddSeconds(-i);
-						}
-						if (character2.lastLogin == dateZero)
+							Name = account.Name,
+							LastModified = account.LastModified
+						};
+					}
+					if (System.IO.File.Exists(AccountPath))
+					{
+						requestAPI = false;
+						foreach (AccountInfo acc in JsonConvert.DeserializeObject<List<AccountInfo>>(System.IO.File.ReadAllText(AccountPath))!)
 						{
-							character2.lastLogin = c.LastModified.UtcDateTime;
-						}
-						character2.contentsManager = ContentsManager;
-						character2.apiManager = Gw2ApiManager;
-						character2.Crafting = new List<CharacterCrafting>();
-						foreach (CharacterCraftingDiscipline disc in c.Crafting.ToList())
-						{
-							character2.Crafting.Add(new CharacterCrafting
+							if (acc.Name == account.Name)
 							{
-								Id = (int)disc.Discipline.Value,
-								Rating = disc.Rating,
-								Active = disc.Active
-							});
+								userAccount.LastBlishUpdate = acc.LastBlishUpdate;
+								break;
+							}
 						}
-						if (!CharacterNames.Contains(c.Name))
-						{
-							CharacterNames.Add(c.Name);
-							Characters.Add(character2);
-						}
-						last = character2;
-						i++;
 					}
-					last?.Save();
-				}
-				PlayerCharacter player = GameService.Gw2Mumble.PlayerCharacter;
-				foreach (Character character in Characters)
-				{
-					character.Create_UI_Elements();
-					if (player != null && player.Name == character.Name)
+					LoadCharacterList();
+					if (userAccount.CharacterUpdateNeeded())
 					{
-						Current.character = character;
+						userAccount.LastBlishUpdate = account.LastModified;
+						userAccount.Save();
+						Logger.Debug("Updating Characters ....");
+						Logger.Debug("The last API modification is more recent than our last local data track.");
+						IApiV2ObjectList<Gw2Sharp.WebApi.V2.Models.Character> obj = await Gw2ApiManager.Gw2ApiClient.V2.Characters.AllAsync();
+						Character last = null;
+						int i = 0;
+						foreach (Gw2Sharp.WebApi.V2.Models.Character c in obj)
+						{
+							Character character2 = getCharacter(c.Name);
+							character2.Name = character2.Name ?? c.Name;
+							character2.Race = (RaceType)Enum.Parse(typeof(RaceType), c.Race);
+							character2._Profession = (int)Enum.Parse(typeof(Professions), c.Profession.ToString());
+							character2.Profession = (ProfessionType)Enum.Parse(typeof(ProfessionType), c.Profession.ToString());
+							character2._Specialization = ((character2._Specialization > -1) ? character2._Specialization : (-1));
+							character2.Level = c.Level;
+							character2.Created = c.Created;
+							character2.apiIndex = i;
+							if (character2.LastModified == dateZero || character2.LastModified < account.LastModified.UtcDateTime)
+							{
+								character2.LastModified = account.LastModified.UtcDateTime.AddSeconds(-i);
+							}
+							if (character2.lastLogin == dateZero)
+							{
+								character2.lastLogin = c.LastModified.UtcDateTime;
+							}
+							character2.contentsManager = ContentsManager;
+							character2.apiManager = Gw2ApiManager;
+							character2.Crafting = new List<CharacterCrafting>();
+							foreach (CharacterCraftingDiscipline disc in c.Crafting.ToList())
+							{
+								character2.Crafting.Add(new CharacterCrafting
+								{
+									Id = (int)disc.Discipline.Value,
+									Rating = disc.Rating,
+									Active = disc.Active
+								});
+							}
+							if (!CharacterNames.Contains(c.Name))
+							{
+								CharacterNames.Add(c.Name);
+								Characters.Add(character2);
+							}
+							last = character2;
+							i++;
+						}
+						last?.Save();
 					}
+					PlayerCharacter player = GameService.Gw2Mumble.PlayerCharacter;
+					foreach (Character character in Characters)
+					{
+						character.Create_UI_Elements();
+						if (player != null && player.Name == character.Name)
+						{
+							Current.character = character;
+						}
+					}
+					charactersLoaded = true;
+					filterCharacterPanel = true;
+					double lastModified = DateTimeOffset.UtcNow.Subtract(userAccount.LastModified).TotalSeconds;
+					double lastUpdate = DateTimeOffset.UtcNow.Subtract(userAccount.LastBlishUpdate).TotalSeconds;
+					infoImage.BasicTooltipText = "Last Modified: " + Math.Round(lastModified) + Environment.NewLine + "Last Blish Login: " + Math.Round(lastUpdate);
 				}
-				charactersLoaded = true;
-				filterCharacterPanel = true;
-				double lastModified = DateTimeOffset.UtcNow.Subtract(userAccount.LastModified).TotalSeconds;
-				double lastUpdate = DateTimeOffset.UtcNow.Subtract(userAccount.LastBlishUpdate).TotalSeconds;
-				infoImage.BasicTooltipText = "Last Modified: " + Math.Round(lastModified) + Environment.NewLine + "Last Blish Login: " + Math.Round(lastUpdate);
+				else
+				{
+					ScreenNotification.ShowNotification(common.Error_InvalidPermissions, ScreenNotification.NotificationType.Error);
+					Logger.Error("This API Token has not the required permissions!");
+				}
 			}
-			else
+			catch (Exception ex)
 			{
-				ScreenNotification.ShowNotification(common.Error_InvalidPermissions, ScreenNotification.NotificationType.Error);
-				Logger.Error("This API Token has not the required permissions!");
+				Logger.Warn(ex, "Failed to fetch characters from the API.");
 			}
 		}
 
@@ -762,58 +774,66 @@ namespace Kenedia.Modules.Characters
 			}
 		}
 
-		private void LoadCharacterList()
+		private bool LoadCharacterList()
 		{
-			Logger.Debug("Character File exists: " + System.IO.File.Exists(CharactersPath));
-			if (!System.IO.File.Exists(CharactersPath))
+			try
 			{
-				return;
-			}
-			requestAPI = false;
-			foreach (JsonCharacter c in JsonConvert.DeserializeObject<List<JsonCharacter>>(System.IO.File.ReadAllText(CharactersPath))!)
-			{
-				Character character2 = new Character();
-				character2.contentsManager = ContentsManager;
-				character2.apiManager = Gw2ApiManager;
-				character2.Race = c.Race;
-				character2.Name = c.Name;
-				character2.lastLogin = c.lastLogin;
-				character2._Profession = c.Profession;
-				character2._Specialization = c.Specialization;
-				character2.Crafting = c.Crafting;
-				character2.apiIndex = c.apiIndex;
-				character2.Created = c.Created;
-				character2.LastModified = c.LastModified;
-				character2.map = c.map;
-				character2.Level = c.Level;
-				character2.Tags = ((c.Tags != null && c.Tags != "") ? c.Tags.Split('|').ToList() : new List<string>());
-				character2.loginCharacter = c.loginCharacter;
-				character2.include = c.include;
-				Character character = character2;
-				foreach (string tag in character.Tags)
+				Logger.Debug("Character File exists: " + System.IO.File.Exists(CharactersPath));
+				if (System.IO.File.Exists(CharactersPath))
 				{
-					if (!Tags.Contains(tag))
+					requestAPI = false;
+					foreach (JsonCharacter c in JsonConvert.DeserializeObject<List<JsonCharacter>>(System.IO.File.ReadAllText(CharactersPath))!)
 					{
-						Tags.Add(tag);
+						Character character2 = new Character();
+						character2.contentsManager = ContentsManager;
+						character2.apiManager = Gw2ApiManager;
+						character2.Race = c.Race;
+						character2.Name = c.Name;
+						character2.lastLogin = c.lastLogin;
+						character2._Profession = c.Profession;
+						character2._Specialization = c.Specialization;
+						character2.Crafting = c.Crafting;
+						character2.apiIndex = c.apiIndex;
+						character2.Created = c.Created;
+						character2.LastModified = c.LastModified;
+						character2.map = c.map;
+						character2.Level = c.Level;
+						character2.Tags = ((c.Tags != null && c.Tags != "") ? c.Tags.Split('|').ToList() : new List<string>());
+						character2.loginCharacter = c.loginCharacter;
+						character2.include = c.include;
+						Character character = character2;
+						foreach (string tag2 in character.Tags)
+						{
+							if (!Tags.Contains(tag2))
+							{
+								Tags.Add(tag2);
+							}
+						}
+						Characters.Add(character);
+						CharacterNames.Add(character.Name);
+						if (c.loginCharacter)
+						{
+							loginCharacter = character;
+						}
+					}
+					new Character();
+					foreach (string tag in Tags)
+					{
+						TagEntry entry = new TagEntry(tag, new Character(), filterTagsPanel, showButton: false, contentService.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size14, ContentService.FontStyle.Regular));
+						entry.Click += delegate
+						{
+							TextBox textBox = filterTextBox;
+							textBox.Text = textBox.Text + ((filterTextBox.Text.Trim().EndsWith(";") || filterTextBox.Text.Trim() == "") ? " " : "; ") + "-t " + tag;
+						};
+						TagEntries.Add(entry);
 					}
 				}
-				Characters.Add(character);
-				CharacterNames.Add(character.Name);
-				if (c.loginCharacter)
-				{
-					loginCharacter = character;
-				}
+				return true;
 			}
-			new Character();
-			foreach (string tag2 in Tags)
+			catch (Exception ex)
 			{
-				TagEntry entry = new TagEntry(tag2, new Character(), filterTagsPanel, showButton: false, contentService.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size14, ContentService.FontStyle.Regular));
-				entry.Click += delegate
-				{
-					TextBox textBox = filterTextBox;
-					textBox.Text = textBox.Text + ((filterTextBox.Text.Trim().EndsWith(";") || filterTextBox.Text.Trim() == "") ? " " : "; ") + "-t " + tag2;
-				};
-				TagEntries.Add(entry);
+				Logger.Warn(ex, "Failed to load the local characters from file '" + CharactersPath + "'.");
+				return false;
 			}
 		}
 
@@ -1165,6 +1185,11 @@ namespace Kenedia.Modules.Characters
 			{
 				subWindow.Hide();
 				filterWindow.Hide();
+				if (Settings.FocusFilter.Value)
+				{
+					Control.ActiveControl = filterTextBox;
+					filterTextBox.Focused = true;
+				}
 			};
 			infoImage = new Image
 			{
@@ -1703,6 +1728,7 @@ namespace Kenedia.Modules.Characters
 			Last.Tick_Update += gameTime.ElapsedGameTime.TotalMilliseconds;
 			Last.Tick_APIUpdate += gameTime.ElapsedGameTime.TotalMilliseconds;
 			Last.Tick_PanelUpdate += gameTime.ElapsedGameTime.TotalMilliseconds;
+			Last.Tick_FadeEffect += gameTime.ElapsedGameTime.TotalMilliseconds;
 			if (charactersLoaded && Last.Tick_Update > 250.0)
 			{
 				Last.Tick_Update = -250.0;
@@ -1723,6 +1749,18 @@ namespace Kenedia.Modules.Characters
 				{
 					swapCharacter.Swap();
 					swapCharacter = null;
+				}
+			}
+			if (Settings.FadeSubWindows.Value && Last.Tick_FadeEffect > 30.0)
+			{
+				Last.Tick_FadeEffect = -30.0;
+				if (filterWindow.Visible && DateTime.Now.Subtract(filterWindow.lastInput).TotalMilliseconds >= 2500.0)
+				{
+					filterWindow.Opacity -= 0.1f;
+					if (filterWindow.Opacity <= 0f)
+					{
+						filterWindow.Hide();
+					}
 				}
 			}
 			if (charactersLoaded && Last.Tick_PanelUpdate > (double)Settings._FilterDelay)

@@ -76,9 +76,17 @@ namespace Kenedia.Modules.Characters.Strings
 
 		internal static string Error_InvalidPermissions => ResourceManager.GetString("Error_InvalidPermissions", resourceCulture);
 
+		internal static string FadeOut_Description => ResourceManager.GetString("FadeOut_Description", resourceCulture);
+
+		internal static string FadeOut_DisplayName => ResourceManager.GetString("FadeOut_DisplayName", resourceCulture);
+
 		internal static string FilterDelay_Description => ResourceManager.GetString("FilterDelay_Description", resourceCulture);
 
 		internal static string FilterDelay_DisplayName => ResourceManager.GetString("FilterDelay_DisplayName", resourceCulture);
+
+		internal static string FocusFilter_Description => ResourceManager.GetString("FocusFilter_Description", resourceCulture);
+
+		internal static string FocusFilter_DisplayName => ResourceManager.GetString("FocusFilter_DisplayName", resourceCulture);
 
 		internal static string Huntsman => ResourceManager.GetString("Huntsman", resourceCulture);
 
