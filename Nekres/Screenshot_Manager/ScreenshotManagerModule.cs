@@ -146,8 +146,11 @@ namespace Nekres.Screenshot_Manager
 		{
 			HideCornerIcon.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnHideCornerIconSettingChanged);
 			_fileWatcherFactory.Dispose();
-			((Control)_moduleCornerIcon).remove_Click((EventHandler<MouseEventArgs>)ModuleCornerIconClicked);
-			((Control)_moduleCornerIcon).Dispose();
+			if (_moduleCornerIcon != null)
+			{
+				((Control)_moduleCornerIcon).remove_Click((EventHandler<MouseEventArgs>)ModuleCornerIconClicked);
+				((Control)_moduleCornerIcon).Dispose();
+			}
 			GameService.Overlay.get_BlishHudWindow().RemoveTab(_moduleTab);
 			SoundEffect[] deleteSfx = _deleteSfx;
 			foreach (SoundEffect obj in deleteSfx)

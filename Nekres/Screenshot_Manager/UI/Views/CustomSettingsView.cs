@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Content;
@@ -111,20 +110,6 @@ namespace Nekres.Screenshot_Manager.UI.Views
 			//IL_026d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0274: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0285: Expected O, but got Unknown
-			//IL_02be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0310: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0315: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0321: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0329: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0333: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033f: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Size(new Point(((Control)buildPanel).get_Width(), 78));
 			((Control)val).set_Location(new Point(0, 0));
@@ -177,28 +162,6 @@ namespace Nekres.Screenshot_Manager.UI.Views
 					}
 				}
 			}
-			Label val5 = new Label();
-			((Control)val5).set_Parent((Container)(object)_settingFlowPanel);
-			((Control)val5).set_Size(new Point(((Control)_settingFlowPanel).get_Width() / 2, 100));
-			val5.set_Text("Troubleshooting:\nIf you only see file icons (ie. symbols) instead of thumbnail previews (ie. miniature image previews), please disable \"Always show icons, never thumbnails\" in the File Explorer Options dialogue.");
-			val5.set_WrapText(true);
-			val5.set_Font(GameService.Content.GetFont((FontFace)0, (FontSize)14, (FontStyle)0));
-			StandardButton val6 = new StandardButton();
-			((Control)val6).set_Parent((Container)(object)_settingFlowPanel);
-			((Control)val6).set_Size(new Point(200, 60));
-			val6.set_Text("Open File Explorer Options");
-			((Control)val6).set_BackgroundColor(Color.get_LightBlue());
-			((Control)val6).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
-				Process process = new Process();
-				ProcessStartInfo processStartInfo2 = (process.StartInfo = new ProcessStartInfo
-				{
-					WindowStyle = ProcessWindowStyle.Hidden,
-					FileName = "cmd.exe",
-					Arguments = "/C rundll32.exe shell32.dll,Options_RunDLL 7"
-				});
-				process.Start();
-			});
 		}
 
 		private void _bttn_Click(object sender, MouseEventArgs e)
