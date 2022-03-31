@@ -133,15 +133,15 @@ namespace Nekres.Inquest_Module.Core.Controllers
 			_inTogglePrompt = true;
 			_togglePos = Mouse.GetPosition();
 			CreateClickIndicator(attachToCursor: false, forceRecreation: true);
-			NumericInputPrompt.ShowPrompt(OnToggleInputPromptCallback, "Enter an interval in seconds:");
+			NumericInputPrompt.ShowPrompt(OnToggleInputPromptCallback, "Enter an interval in seconds:", InquestModule.ModuleInstance.AutoClickToggleInterval.get_Value());
 		}
 
 		private void OnToggleInputPromptCallback(bool confirmed, double input)
 		{
-			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
 			_inTogglePrompt = false;
 			if (!confirmed)
 			{
@@ -151,6 +151,7 @@ namespace Nekres.Inquest_Module.Core.Controllers
 			_toggleActive = true;
 			_toggleIntervalMs = Math.Min(300000, Math.Max(250, (int)(input * 1000.0)));
 			_nextToggleClick = DateTime.UtcNow;
+			InquestModule.ModuleInstance.AutoClickToggleInterval.set_Value((double)_toggleIntervalMs / 1000.0);
 			if (_indicator == null)
 			{
 				TaskIndicator taskIndicator = new TaskIndicator(attachToCursor: false);

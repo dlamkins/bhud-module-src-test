@@ -39,24 +39,27 @@ namespace Nekres.Inquest_Module.UI.Controls
 
 		private readonly string _cancelButtonButtonText;
 
-		private NumericInputPrompt(Action<bool, double> callback, string text, string confirmButtonText, string cancelButtonText)
+		private readonly double _defaultValue;
+
+		private NumericInputPrompt(Action<bool, double> callback, string text, double defaultValue, string confirmButtonText, string cancelButtonText)
 			: this()
 		{
 			_callback = callback;
 			_text = text;
+			_defaultValue = defaultValue;
 			_confirmButtonText = confirmButtonText;
 			_cancelButtonButtonText = cancelButtonText;
 			((Control)this).set_ZIndex(999);
 			GameService.Input.get_Keyboard().add_KeyPressed((EventHandler<KeyboardEventArgs>)OnKeyPressed);
 		}
 
-		public static void ShowPrompt(Action<bool, double> callback, string text, string confirmButtonText = "Confirm", string cancelButtonText = "Cancel")
+		public static void ShowPrompt(Action<bool, double> callback, string text, double defaultValue = 0.0, string confirmButtonText = "Confirm", string cancelButtonText = "Cancel")
 		{
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 			if (_singleton == null)
 			{
-				NumericInputPrompt numericInputPrompt = new NumericInputPrompt(callback, text, confirmButtonText, cancelButtonText);
+				NumericInputPrompt numericInputPrompt = new NumericInputPrompt(callback, text, defaultValue, confirmButtonText, cancelButtonText);
 				((Control)numericInputPrompt).set_Parent((Container)(object)Control.get_Graphics().get_SpriteScreen());
 				((Control)numericInputPrompt).set_Location(Point.get_Zero());
 				((Control)numericInputPrompt).set_Size(((Control)Control.get_Graphics().get_SpriteScreen()).get_Size());
@@ -75,15 +78,15 @@ namespace Nekres.Inquest_Module.UI.Controls
 			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Expected O, but got Unknown
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ae: Expected O, but got Unknown
+			//IL_005f: Expected O, but got Unknown
+			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00be: Expected O, but got Unknown
 			if (_confirmButton == null)
 			{
 				StandardButton val = new StandardButton();
@@ -91,7 +94,7 @@ namespace Nekres.Inquest_Module.UI.Controls
 				val.set_Text(_confirmButtonText);
 				((Control)val).set_Size(((Rectangle)(ref _confirmButtonBounds)).get_Size());
 				((Control)val).set_Location(((Rectangle)(ref _confirmButtonBounds)).get_Location());
-				((Control)val).set_Enabled(false);
+				((Control)val).set_Enabled(_defaultValue > 0.0);
 				_confirmButton = val;
 				((Control)_confirmButton).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
@@ -155,18 +158,21 @@ namespace Nekres.Inquest_Module.UI.Controls
 
 		private void CreateTextInput()
 		{
-			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Expected O, but got Unknown
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0095: Expected O, but got Unknown
 			if (_inputTextBox == null)
 			{
+				string defaultText = ((_defaultValue > 0.0) ? _defaultValue.ToString(CultureInfo.InvariantCulture) : string.Empty);
 				TextBox val = new TextBox();
 				((Control)val).set_Parent((Container)(object)this);
 				((Control)val).set_Size(((Rectangle)(ref _inputTextBoxBounds)).get_Size());
@@ -174,6 +180,8 @@ namespace Nekres.Inquest_Module.UI.Controls
 				((TextInputBase)val).set_Font(_font);
 				((TextInputBase)val).set_Focused(true);
 				val.set_HorizontalAlignment((HorizontalAlignment)1);
+				((TextInputBase)val).set_Text(defaultText);
+				((TextInputBase)val).set_CursorIndex(defaultText.Length);
 				_inputTextBox = val;
 				((TextInputBase)_inputTextBox).add_TextChanged((EventHandler<EventArgs>)delegate(object o, EventArgs _)
 				{

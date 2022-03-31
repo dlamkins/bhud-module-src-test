@@ -42,6 +42,8 @@ namespace Nekres.Inquest_Module
 
 		internal SettingEntry<KeyBinding> DodgeJumpKeyBindingSetting;
 
+		internal SettingEntry<double> AutoClickToggleInterval;
+
 		private CornerIcon _moduleIcon;
 
 		private AutoClickController _autoClickController;
@@ -84,6 +86,8 @@ namespace Nekres.Inquest_Module
 			SettingCollection controlOptions = settings.AddSubCollection("Movement Keys to Trigger on Dodge-Jump", true, false);
 			DodgeKeyBindingSetting = controlOptions.DefineSetting<KeyBinding>("dodgeKeyBinding", new KeyBinding((Keys)86), (Func<string>)(() => "Dodge"), (Func<string>)(() => "Do an evasive dodge roll, negating damage, in the direction your character is moving (backward if stationary)."));
 			JumpKeyBindingSetting = controlOptions.DefineSetting<KeyBinding>("jumpKeyBinding", new KeyBinding((Keys)32), (Func<string>)(() => "Jump"), (Func<string>)(() => "Press to jump over obstacles."));
+			SettingCollection hiddenSettingsCache = settings.AddSubCollection("hiddenSettingsCache", false, false);
+			AutoClickToggleInterval = hiddenSettingsCache.DefineSetting<double>("autoClickToggleInterval", 0.0, (Func<string>)null, (Func<string>)null);
 		}
 
 		protected override void Initialize()
