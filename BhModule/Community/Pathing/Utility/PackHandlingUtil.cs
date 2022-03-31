@@ -1,10 +1,11 @@
 using System;
 using System.IO;
+using System.IO.Compression;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using BhModule.Community.Pathing.MarkerPackRepo;
 using Blish_HUD;
-using Flurl.Http;
 
 namespace BhModule.Community.Pathing.Utility
 {
@@ -27,17 +28,25 @@ namespace BhModule.Community.Pathing.Utility
 		private static async Task BeginPackDownload(MarkerPackPkg markerPackPkg, IProgress<string> progress, Action<MarkerPackPkg, bool> funcOnComplete)
 		{
 			Logger.Info("Updating pack '" + markerPackPkg.Name + "'...");
-			progress.Report("Updating pack '" + markerPackPkg.Name + "'...");
+			progress.Report("Downloading pack '" + markerPackPkg.Name + "'...");
 			markerPackPkg.IsDownloading = true;
+			markerPackPkg.DownloadError = null;
 			string tempPackDownloadDestination = Path.GetTempFileName();
 			try
 			{
 				File.Delete(tempPackDownloadDestination);
-				await DownloadExtensions.DownloadFileAsync(GeneratedExtensions.WithHeader(markerPackPkg.Download, "user-agent", (object)"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"), Path.GetDirectoryName(tempPackDownloadDestination), Path.GetFileName(tempPackDownloadDestination), 4096, default(CancellationToken));
+				using WebClient webClient = new WebClient();
+				webClient.Headers.Add("user-agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36");
+				webClient.DownloadProgressChanged += delegate(object s, DownloadProgressChangedEventArgs e)
+				{
+					markerPackPkg.DownloadProgress = e.ProgressPercentage;
+				};
+				await webClient.DownloadFileTaskAsync(markerPackPkg.Download, tempPackDownloadDestination);
 			}
-			catch (Exception ex2)
+			catch (Exception ex3)
 			{
-				Logger.Error(ex2, "Failed to update marker pack " + markerPackPkg.Name + " from " + markerPackPkg.Download + " to " + tempPackDownloadDestination + ".");
+				markerPackPkg.DownloadError = "Marker pack download failed.";
+				Logger.Error(ex3, "Failed to download marker pack " + markerPackPkg.Name + " from " + markerPackPkg.Download + " to " + tempPackDownloadDestination + ".");
 				funcOnComplete(markerPackPkg, arg2: false);
 				return;
 			}
@@ -46,6 +55,13 @@ namespace BhModule.Community.Pathing.Utility
 			try
 			{
 				bool needsInit = true;
+				using (FileStream packStream = File.Open(tempPackDownloadDestination, FileMode.Open, FileAccess.Read, FileShare.Read))
+				{
+					if (new ZipArchive((Stream)packStream).get_Entries().Count <= 0)
+					{
+						throw new InvalidDataException();
+					}
+				}
 				if (File.Exists(finalPath))
 				{
 					needsInit = false;
@@ -61,14 +77,18 @@ namespace BhModule.Community.Pathing.Utility
 					await PathingModule.Instance.PackInitiator.LoadPackedPackFiles(new string[1] { finalPath });
 				}
 			}
+			catch (InvalidDataException ex2)
+			{
+				markerPackPkg.DownloadError = "Marker pack download is corrupt.";
+				Logger.Warn((Exception)ex2, "Failed downloading marker pack " + markerPackPkg.Name + " from " + tempPackDownloadDestination + " (it appears to be corrupt).");
+			}
 			catch (Exception ex)
 			{
+				markerPackPkg.DownloadError = "Failed to import the new marker pack.";
 				Logger.Warn(ex, "Failed moving marker pack " + markerPackPkg.Name + " from " + tempPackDownloadDestination + " to " + finalPath + ".");
-				funcOnComplete(markerPackPkg, arg2: false);
-				return;
 			}
 			progress.Report(string.Empty);
-			funcOnComplete(markerPackPkg, arg2: true);
+			funcOnComplete(markerPackPkg, markerPackPkg.DownloadError == null);
 		}
 	}
 }

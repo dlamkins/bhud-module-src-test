@@ -31,15 +31,20 @@
     <Reference Include="YamlDotNet">
       <HintPath>..\..\working\YamlDotNet.dll</HintPath>
     </Reference>
-    <Reference Include="Flurl.Http" />
+    <Reference Include="Flurl.Http">
+      <HintPath>..\..\working\Flurl.Http.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json" />
-    <Reference Include="Flurl" />
+    <Reference Include="Flurl">
+      <HintPath>..\..\working\Flurl.dll</HintPath>
+    </Reference>
     <Reference Include="SemVer" />
     <Reference Include="Humanizer">
       <HintPath>..\..\working\Humanizer.dll</HintPath>
     </Reference>
     <Reference Include="AsyncClipboardService" />
     <Reference Include="Gapotchenko.FX" />
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.Net.Http" />
   </ItemGroup>
 </Project>

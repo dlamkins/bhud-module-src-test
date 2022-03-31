@@ -34,11 +34,11 @@ namespace BhModule.Community.Pathing.Content
 
 		private async Task<HashSet<string>> GetEntries()
 		{
-			Url entriesUrl = StringExtensions.AppendPathSegment(_baseUrl, (object)"entries.json", false);
+			Url entriesUrl = _baseUrl.AppendPathSegment("entries.json");
 			HashSet<string> entrySet = new HashSet<string>();
 			try
 			{
-				string[] array = await GeneratedExtensions.GetJsonAsync<string[]>(entriesUrl, default(CancellationToken), (HttpCompletionOption)0);
+				string[] array = await entriesUrl.GetJsonAsync<string[]>(default(CancellationToken), (HttpCompletionOption)0);
 				foreach (string entry in array)
 				{
 					entrySet.Add(entry.Replace('\\', '/'));
@@ -58,16 +58,12 @@ namespace BhModule.Community.Pathing.Content
 
 		public IDataReader GetSubPath(string subPath)
 		{
-			return new WebReader(Url.Combine(new string[2] { _baseUrl, subPath }));
+			return new WebReader(Url.Combine(_baseUrl, subPath));
 		}
 
 		public string GetPathRepresentation(string relativeFilePath = null)
 		{
-			return Url.Combine(new string[2]
-			{
-				_baseUrl,
-				relativeFilePath ?? string.Empty
-			});
+			return Url.Combine(_baseUrl, relativeFilePath ?? string.Empty);
 		}
 
 		private void ThrowIfNoInit()
@@ -123,11 +119,7 @@ namespace BhModule.Community.Pathing.Content
 		{
 			try
 			{
-				return await GeneratedExtensions.GetStreamAsync(Url.Combine(new string[2]
-				{
-					_baseUrl,
-					GetCaseSensitiveEntryUri(filePath)
-				}), default(CancellationToken), (HttpCompletionOption)0);
+				return await Url.Combine(_baseUrl, GetCaseSensitiveEntryUri(filePath)).GetStreamAsync(default(CancellationToken), (HttpCompletionOption)0);
 			}
 			catch (Exception ex)
 			{

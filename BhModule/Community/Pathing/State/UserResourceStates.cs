@@ -23,6 +23,8 @@ namespace BhModule.Community.Pathing.State
 
 		public StaticValues Static { get; set; }
 
+		public TextureDefaults Textures { get; set; }
+
 		public UserResourceStates(IRootPackState rootPackState)
 			: base(rootPackState)
 		{
@@ -32,7 +34,15 @@ namespace BhModule.Community.Pathing.State
 		{
 			await ExportAllDefault();
 			await LoadAllStates();
+			await LoadNonConfigs();
 			return true;
+		}
+
+		private async Task LoadNonConfigs()
+		{
+			string userResourceDir = DataDirUtil.GetSafeDataDir("user");
+			Textures = new TextureDefaults();
+			await Textures.Load(userResourceDir);
 		}
 
 		private async Task ExportDefaultState<T>(string statePath, ISerializer yamlSerializer, T defaultExport)

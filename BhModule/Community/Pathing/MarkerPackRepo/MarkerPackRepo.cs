@@ -102,13 +102,12 @@ namespace BhModule.Community.Pathing.MarkerPackRepo
 		{
 			try
 			{
-				return (await GeneratedExtensions.GetJsonAsync<MarkerPackPkg[]>(GeneratedExtensions.WithHeader(_repoUrl, "User-Agent", (object)"Blish-HUD"), default(CancellationToken), (HttpCompletionOption)0), null);
+				return (await _repoUrl.WithHeader("User-Agent", "Blish-HUD").GetJsonAsync<MarkerPackPkg[]>(default(CancellationToken), (HttpCompletionOption)0), null);
 			}
-			catch (FlurlHttpException val)
+			catch (FlurlHttpException ex)
 			{
-				FlurlHttpException ex = val;
-				Logger.Warn((Exception)(object)ex, "Failed to get list of marker packs");
-				return (Array.Empty<MarkerPackPkg>(), (Exception)(object)ex);
+				Logger.Warn((Exception)ex, "Failed to get list of marker packs");
+				return (Array.Empty<MarkerPackPkg>(), ex);
 			}
 		}
 	}

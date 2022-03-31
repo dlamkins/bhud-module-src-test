@@ -12,6 +12,7 @@ using BhModule.Community.Pathing.State;
 using BhModule.Community.Pathing.Utility;
 using BhModule.Community.Pathing.Utility.ColorThief;
 using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Entities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -511,11 +512,15 @@ namespace BhModule.Community.Pathing.Entity
 					{
 						Texture = textureTaskResult.Result;
 					}
+					else
+					{
+						Logger.Warn("Trail failed to load texture '{trailTexture}'", new object[1] { attribute });
+					}
 				});
 			}
 			else
 			{
-				Texture = Textures.get_Error();
+				Texture = AsyncTexture2D.op_Implicit(_packState.UserResourceStates.Textures.DefaultTrailTexture);
 				Logger.Warn("Trail is missing 'texture' attribute.");
 			}
 		}

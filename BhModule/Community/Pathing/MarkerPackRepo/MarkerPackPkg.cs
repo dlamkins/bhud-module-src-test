@@ -31,5 +31,9 @@ namespace BhModule.Community.Pathing.MarkerPackRepo
 		public DateTime CurrentDownloadDate { get; set; }
 
 		public bool IsDownloading { get; set; }
+
+		public string DownloadError { get; set; }
+
+		public int DownloadProgress { get; set; }
 	}
 }

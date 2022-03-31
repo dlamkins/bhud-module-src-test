@@ -40,8 +40,14 @@ namespace BhModule.Community.Pathing.Utility
 
 		public static async Task WriteBytesAsync(string path, byte[] data)
 		{
-			using FileStream stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.Write, 4096, FileOptions.Asynchronous);
-			await stream.WriteAsync(data, 0, data.Length);
+			using FileStream fileStream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.Write, 4096, FileOptions.Asynchronous);
+			await fileStream.WriteAsync(data, 0, data.Length);
+		}
+
+		public static async Task WriteStreamAsync(string path, Stream stream)
+		{
+			using FileStream fileStream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.Write, 4096, FileOptions.Asynchronous);
+			await stream.CopyToAsync(fileStream);
 		}
 
 		public static async Task WriteTextAsync(string path, string text, Encoding encoding = null)

@@ -33,11 +33,13 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		private readonly Checkbox _keepUpdatedCheckbox;
 
-		private readonly SettingEntry<bool> DoAutoUpdate;
+		private readonly SettingEntry<bool> _doAutoUpdate;
 
 		private readonly string _lastUpdateStr = "";
 
 		private double _hoverTick;
+
+		private bool _isUpToDate;
 
 		static MarkerPackHero()
 		{
@@ -54,9 +56,9 @@ namespace BhModule.Community.Pathing.UI.Controls
 			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00cc: Expected O, but got Unknown
-			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
-			DoAutoUpdate = settings.DefineSetting<bool>(markerPackPkg.Name + "_AutoUpdate", true, (Func<string>)null, (Func<string>)null);
+			//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0212: Unknown result type (might be due to invalid IL or missing references)
+			_doAutoUpdate = settings.DefineSetting<bool>(markerPackPkg.Name + "_AutoUpdate", true, (Func<string>)null, (Func<string>)null);
 			_markerPackPkg = markerPackPkg;
 			if (markerPackPkg.LastUpdate != default(DateTime))
 			{
@@ -67,7 +69,7 @@ namespace BhModule.Community.Pathing.UI.Controls
 			val.set_Text("Keep Updated");
 			((Control)val).set_BasicTooltipText("If checked, new pack versions will be automatically downloaded on launch.");
 			((Control)val).set_Parent((Container)(object)this);
-			val.set_Checked(DoAutoUpdate.get_Value());
+			val.set_Checked(_doAutoUpdate.get_Value());
 			((Control)val).set_Enabled(markerPackPkg.CurrentDownloadDate != default(DateTime));
 			_keepUpdatedCheckbox = val;
 			BlueButton obj = new BlueButton
@@ -75,9 +77,12 @@ namespace BhModule.Community.Pathing.UI.Controls
 				Text = Strings.Repo_Download
 			};
 			((Control)obj).set_Width(90);
-			((Control)obj).set_BasicTooltipText(Math.Round(_markerPackPkg.Size, 2).Megabytes().Humanize());
 			((Control)obj).set_Parent((Container)(object)this);
 			_downloadButton = obj;
+			if (_markerPackPkg.Size > 0f)
+			{
+				((Control)_downloadButton).set_BasicTooltipText(Math.Round(_markerPackPkg.Size, 2).Megabytes().Humanize());
+			}
 			BlueButton obj2 = new BlueButton
 			{
 				Text = Strings.Repo_Info
@@ -87,6 +92,10 @@ namespace BhModule.Community.Pathing.UI.Controls
 			((Control)obj2).set_BasicTooltipText(_markerPackPkg.Info);
 			((Control)obj2).set_Parent((Container)(object)this);
 			_infoButton = obj2;
+			if (_markerPackPkg.TotalDownloads > 0)
+			{
+				((Control)this).set_BasicTooltipText($"Approx. {_markerPackPkg.TotalDownloads:n0} Downloads");
+			}
 			((Control)_downloadButton).add_Click((EventHandler<MouseEventArgs>)DownloadButtonOnClick);
 			((Control)_infoButton).add_Click((EventHandler<MouseEventArgs>)InfoButtonOnClick);
 			_keepUpdatedCheckbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)KeepUpdatedCheckbox_CheckedChanged);
@@ -97,7 +106,7 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		private void KeepUpdatedCheckbox_CheckedChanged(object sender, CheckChangedEvent e)
 		{
-			DoAutoUpdate.set_Value(e.get_Checked());
+			_doAutoUpdate.set_Value(e.get_Checked());
 		}
 
 		private void DownloadButtonOnClick(object sender, MouseEventArgs e)
@@ -119,6 +128,7 @@ namespace BhModule.Community.Pathing.UI.Controls
 		{
 			string downloadText = "Download";
 			bool downloadEnabled = true;
+			_isUpToDate = false;
 			if (_markerPackPkg.CurrentDownloadDate != default(DateTime))
 			{
 				downloadEnabled = false;
@@ -134,6 +144,7 @@ namespace BhModule.Community.Pathing.UI.Controls
 				else
 				{
 					downloadText = "Up to Date";
+					_isUpToDate = true;
 				}
 			}
 			if (_markerPackPkg.IsDownloading)
@@ -143,6 +154,7 @@ namespace BhModule.Community.Pathing.UI.Controls
 			}
 			_downloadButton.Text = downloadText;
 			((Control)_downloadButton).set_Enabled(downloadEnabled);
+			((Control)_downloadButton).set_Visible(!_markerPackPkg.IsDownloading && !_isUpToDate);
 		}
 
 		public override void UpdateContainer(GameTime gameTime)
@@ -211,15 +223,37 @@ namespace BhModule.Community.Pathing.UI.Controls
 			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0183: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0188: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0223: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0250: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0255: Unknown result type (might be due to invalid IL or missing references)
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _textureHeroBackground, new Rectangle(-9, -13, _textureHeroBackground.get_Width(), _textureHeroBackground.get_Height()), Color.get_White() * GetHoverFade());
 			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, _markerPackPkg.Name.Replace(" ", "  "), GameService.Content.get_DefaultFont18(), new Rectangle(20, 10, bounds.Width - 40, 40), Colors.Chardonnay, false, (HorizontalAlignment)0, (VerticalAlignment)1);
 			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, _markerPackPkg.Description.Replace("\\n", "\n"), GameService.Content.get_DefaultFont14(), new Rectangle(20, 50, bounds.Width - 20, bounds.Height - 200), StandardColors.get_Default(), true, (HorizontalAlignment)0, (VerticalAlignment)0);
 			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, _lastUpdateStr, GameService.Content.get_DefaultFont14(), new Rectangle(20, 10, ((Control)_keepUpdatedCheckbox).get_Left() - 40, 35), Colors.Chardonnay, false, (HorizontalAlignment)2, (VerticalAlignment)1);
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(0, bounds.Height - 40, bounds.Width, 40), Color.get_Black() * 0.8f);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, Strings.Repo_Categories + ": " + _markerPackPkg.Categories, GameService.Content.get_DefaultFont12(), new Rectangle(20, bounds.Height - 40, ((Control)_infoButton).get_Left() - 10, 40), StandardColors.get_Default(), false, (HorizontalAlignment)0, (VerticalAlignment)1);
+			if (_markerPackPkg.DownloadError == null)
+			{
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, _markerPackPkg.Categories ?? "", GameService.Content.get_DefaultFont12(), new Rectangle(20, bounds.Height - 40, ((Control)_infoButton).get_Left() - 10, 40), StandardColors.get_Default(), false, (HorizontalAlignment)0, (VerticalAlignment)1);
+			}
+			else
+			{
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, "Download Error: " + _markerPackPkg.DownloadError, GameService.Content.get_DefaultFont12(), new Rectangle(20, bounds.Height - 40, ((Control)_infoButton).get_Left() - 10, 40), StandardColors.get_Red(), false, (HorizontalAlignment)0, (VerticalAlignment)1);
+			}
+			if (_markerPackPkg.IsDownloading)
+			{
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, $"{_markerPackPkg.DownloadProgress}%", GameService.Content.get_DefaultFont14(), ((Control)_downloadButton).get_LocalBounds(), StandardColors.get_Default(), false, (HorizontalAlignment)1, (VerticalAlignment)1);
+			}
+			else if (_isUpToDate)
+			{
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, "Up to Date", GameService.Content.get_DefaultFont14(), ((Control)_downloadButton).get_LocalBounds(), StandardColors.get_Default(), false, (HorizontalAlignment)1, (VerticalAlignment)1);
+			}
 		}
 	}
 }

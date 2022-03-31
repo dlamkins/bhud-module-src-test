@@ -109,9 +109,21 @@ namespace BhModule.Community.Pathing
 
 		public async Task LoadPackedPackFiles(IEnumerable<string> zipPackFiles)
 		{
-			foreach (Pack newPack in zipPackFiles.Select(Pack.FromArchivedMarkerPack))
+			foreach (string packArchive in zipPackFiles)
 			{
-				_packs.Add(newPack);
+				try
+				{
+					Pack newPack = Pack.FromArchivedMarkerPack(packArchive);
+					_packs.Add(newPack);
+				}
+				catch (InvalidDataException)
+				{
+					Logger.Warn("Pack " + packArchive + " appears to be corrupt.  Please remove it and download it again.");
+				}
+				catch (Exception ex)
+				{
+					Logger.Warn(ex, "Pack " + packArchive + " failed to load.");
+				}
 			}
 		}
 
@@ -168,31 +180,23 @@ namespace BhModule.Community.Pathing
 			Stopwatch loadTimer = Stopwatch.StartNew();
 			_loadingIndicator.Report("Loading marker packs...");
 			await PrepareState(mapId);
-			Pack lastPack = null;
-			try
+			Pack[] array = _packs.ToArray();
+			foreach (Pack pack2 in array)
 			{
-				Pack[] array = _packs.ToArray();
-				foreach (Pack pack2 in array)
+				try
 				{
-					lastPack = pack2;
 					_loadingIndicator.Report("Loading " + pack2.Name + "...");
 					await pack2.LoadMapAsync(mapId, _sharedPackCollection, _packReaderSettings);
 				}
-			}
-			catch (FileNotFoundException e2)
-			{
-				Logger.Warn("Pack file '{packPath}' failed to load because it could not be found.", new object[1] { e2.FileName });
-				if (lastPack != null)
+				catch (FileNotFoundException e2)
 				{
-					_packs.Remove(lastPack);
+					Logger.Warn("Pack file '{packPath}' failed to load because it could not be found.", new object[1] { e2.FileName });
+					_packs.Remove(pack2);
 				}
-			}
-			catch (Exception e)
-			{
-				Logger.Warn(e, "Loading pack failed.");
-				if (lastPack != null)
+				catch (Exception e)
 				{
-					_packs.Remove(lastPack);
+					Logger.Warn(e, "Loading pack '" + pack2.Name + "' failed.");
+					_packs.Remove(pack2);
 				}
 			}
 			_loadingIndicator.Report("Finalizing marker collection...");
@@ -202,7 +206,7 @@ namespace BhModule.Community.Pathing
 			{
 				array2[j].ReleaseLocks();
 			}
-			_loadingIndicator.Report("");
+			_loadingIndicator.Report(null);
 			IsLoading = false;
 			loadTimer.Stop();
 			Logger.Info(string.Format("Finished loading packs {0} in {1} ms for map {2}.", string.Join(", ", _packs.Select((Pack pack) => pack.Name)), loadTimer.ElapsedMilliseconds, mapId));
