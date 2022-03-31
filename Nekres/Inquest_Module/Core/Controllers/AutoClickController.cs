@@ -39,6 +39,8 @@ namespace Nekres.Inquest_Module.Core.Controllers
 
 		private ClickIndicator _clickIndicator;
 
+		private bool _isDisposing;
+
 		public float SoundVolume
 		{
 			get
@@ -179,9 +181,9 @@ namespace Nekres.Inquest_Module.Core.Controllers
 			{
 				num = 0;
 			}
-			if (num != 0)
+			if (num != 0 && !_inTogglePrompt)
 			{
-				return !_inTogglePrompt;
+				return !_isDisposing;
 			}
 			return false;
 		}
@@ -276,6 +278,10 @@ namespace Nekres.Inquest_Module.Core.Controllers
 
 		public void Dispose()
 		{
+			_isDisposing = true;
+			AutoClickToggleKey.remove_Activated((EventHandler<EventArgs>)OnToggleActivate);
+			GameService.Gw2Mumble.get_PlayerCharacter().remove_IsInCombatChanged((EventHandler<ValueEventArgs<bool>>)OnIsInCombatChanged);
+			GameService.GameIntegration.get_Gw2Instance().remove_IsInGameChanged((EventHandler<ValueEventArgs<bool>>)OnIsInGameChanged);
 			Deactivate();
 			SoundEffect[] doubleClickSfx = _doubleClickSfx;
 			foreach (SoundEffect obj in doubleClickSfx)
@@ -285,9 +291,6 @@ namespace Nekres.Inquest_Module.Core.Controllers
 					obj.Dispose();
 				}
 			}
-			AutoClickToggleKey.remove_Activated((EventHandler<EventArgs>)OnToggleActivate);
-			GameService.Gw2Mumble.get_PlayerCharacter().remove_IsInCombatChanged((EventHandler<ValueEventArgs<bool>>)OnIsInCombatChanged);
-			GameService.GameIntegration.get_Gw2Instance().remove_IsInGameChanged((EventHandler<ValueEventArgs<bool>>)OnIsInGameChanged);
 		}
 	}
 }
