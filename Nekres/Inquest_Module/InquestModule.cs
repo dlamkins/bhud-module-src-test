@@ -28,6 +28,8 @@ namespace Nekres.Inquest_Module
 
 		internal SettingEntry<KeyBinding> AutoClickHoldKeySetting;
 
+		internal SettingEntry<bool> HoldKeyWithLeftClickEnabledSetting;
+
 		internal SettingEntry<KeyBinding> AutoClickToggleKeySetting;
 
 		internal SettingEntry<bool> AutoClickSoundDisabledSetting;
@@ -65,18 +67,19 @@ namespace Nekres.Inquest_Module
 		{
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0054: Expected O, but got Unknown
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ad: Expected O, but got Unknown
-			//IL_0160: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a8: Expected O, but got Unknown
-			//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020c: Expected O, but got Unknown
-			//IL_021a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0262: Expected O, but got Unknown
-			AutoClickHoldKeySetting = settings.DefineSetting<KeyBinding>("autoClickHoldKeyBinding", new KeyBinding((Keys)188), (Func<string>)(() => "Hold Double Clicking"), (Func<string>)(() => "Perform Double Clicks at the current cursor position while the key is being held down."));
+			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fd: Expected O, but got Unknown
+			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f8: Expected O, but got Unknown
+			//IL_0214: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025c: Expected O, but got Unknown
+			//IL_026a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b2: Expected O, but got Unknown
+			AutoClickHoldKeySetting = settings.DefineSetting<KeyBinding>("autoClickHoldKeyBinding", new KeyBinding((Keys)188), (Func<string>)(() => "Hold Double Clicking"), (Func<string>)(() => "Perform Double Clicks at the current cursor position while the key is being pressed."));
+			HoldKeyWithLeftClickEnabledSetting = settings.DefineSetting<bool>("holdKeyWithLeftClick", false, (Func<string>)(() => "Hold Double Clicking + Left Mouse Button"), (Func<string>)(() => "Perform Double clicks at the current cursor position while Hold Double Clicking and Left Mouse Button is being pressed."));
 			AutoClickToggleKeySetting = settings.DefineSetting<KeyBinding>("autoClickToggleKeyBinding", new KeyBinding((Keys)219), (Func<string>)(() => "Toggle Double Clicking"), (Func<string>)(() => "Perform Double Clicks in an interval at the position of the cursor at the time of pressing the key."));
 			AutoClickSoundDisabledSetting = settings.DefineSetting<bool>("autoClickSoundsDisabled", false, (Func<string>)(() => "Disable Clicking Sounds"), (Func<string>)(() => "Disables the sound alert when an auto click is performed."));
-			AutoClickSoundVolume = settings.DefineSetting<float>("autoClickSoundsVolume", 0.8f, (Func<string>)(() => "Clicking Sounds Volume"), (Func<string>)(() => "Sets the audio volume of the clicking alerts."));
+			AutoClickSoundVolume = settings.DefineSetting<float>("autoClickSoundsVolume", 80f, (Func<string>)(() => "Clicking Sounds Volume"), (Func<string>)(() => "Sets the audio volume of the clicking alerts."));
 			DodgeJumpKeyBindingSetting = settings.DefineSetting<KeyBinding>("dodgeJumpKeyBinding", new KeyBinding((ModifierKeys)1, (Keys)32), (Func<string>)(() => "Dodge-Jump"), (Func<string>)(() => "Perform a dodge roll and a jump simultaneously."));
 			SettingCollection controlOptions = settings.AddSubCollection("Movement Keys to Trigger on Dodge-Jump", true, false);
 			DodgeKeyBindingSetting = controlOptions.DefineSetting<KeyBinding>("dodgeKeyBinding", new KeyBinding((Keys)86), (Func<string>)(() => "Dodge"), (Func<string>)(() => "Do an evasive dodge roll, negating damage, in the direction your character is moving (backward if stationary)."));

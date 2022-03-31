@@ -19,9 +19,9 @@ namespace Nekres.Inquest_Module.UI.Controls
 		{
 		}
 
-		public void LeftClick()
+		public void LeftClick(int durationMs = 150)
 		{
-			_clickEnd = DateTime.UtcNow.AddMilliseconds(150.0);
+			_clickEnd = DateTime.UtcNow.AddMilliseconds(durationMs);
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
