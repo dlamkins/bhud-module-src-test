@@ -15,9 +15,7 @@
     <Reference Include="Blish HUD" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="Gw2Sharp" />
-    <Reference Include="RBush">
-      <HintPath>..\..\working\RBush.dll</HintPath>
-    </Reference>
+    <Reference Include="RBush" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="System.Core" />
     <Reference Include="MonoGame.Extended" />

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Blish_HUD.Graphics.UI;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
@@ -15,9 +16,10 @@ using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
-using Nekres.Regions_Of_Tyria.Controls;
 using Nekres.Regions_Of_Tyria.Geometry;
-using Nekres.Regions_Of_Tyria.Utils;
+using Nekres.Regions_Of_Tyria.UI.Controls;
+using Nekres.Regions_Of_Tyria.UI.Models;
+using Nekres.Regions_Of_Tyria.UI.Views;
 using RBush;
 
 namespace Nekres.Regions_Of_Tyria
@@ -25,7 +27,7 @@ namespace Nekres.Regions_Of_Tyria
 	[Export(typeof(Module))]
 	public class RegionsOfTyriaModule : Module
 	{
-		private static readonly Logger Logger = Logger.GetLogger(typeof(RegionsOfTyriaModule));
+		internal static readonly Logger Logger = Logger.GetLogger(typeof(RegionsOfTyriaModule));
 
 		internal static RegionsOfTyriaModule ModuleInstance;
 
@@ -109,6 +111,11 @@ namespace Nekres.Regions_Of_Tyria
 		{
 			_mapRepository = new AsyncCache<int, Map>(RequestMap);
 			_sectorRepository = new AsyncCache<int, RBush<Sector>>(RequestSectors);
+		}
+
+		public override IView GetSettingsView()
+		{
+			return (IView)(object)new CustomSettingsView(new CustomSettingsModel(SettingsManager.get_ModuleSettings()));
 		}
 
 		protected override async void Update(GameTime gameTime)
@@ -205,8 +212,8 @@ namespace Nekres.Regions_Of_Tyria
 				.SwapYZ()
 				.ToPlane();
 			RBush<Sector> obj = await _sectorRepository.GetItem(GameService.Gw2Mumble.get_CurrentMap().get_Id());
-			Envelope boundingBox = new Envelope(((Coordinates2)(ref playerLocation)).get_X(), ((Coordinates2)(ref playerLocation)).get_Y(), ((Coordinates2)(ref playerLocation)).get_X(), ((Coordinates2)(ref playerLocation)).get_Y());
-			IReadOnlyList<Sector> foundPoints = obj.Search(in boundingBox);
+			Envelope val = new Envelope(((Coordinates2)(ref playerLocation)).get_X(), ((Coordinates2)(ref playerLocation)).get_Y(), ((Coordinates2)(ref playerLocation)).get_X(), ((Coordinates2)(ref playerLocation)).get_Y());
+			IReadOnlyList<Sector> foundPoints = obj.Search(ref val);
 			if (foundPoints == null || foundPoints.Count == 0 || _prevSectorId.Equals(foundPoints[0].Id))
 			{
 				return null;
@@ -217,7 +224,7 @@ namespace Nekres.Regions_Of_Tyria
 
 		private async Task<RBush<Sector>> RequestSectors(int mapId)
 		{
-			return await (await _mapRepository.GetItem(mapId).ContinueWith(async delegate(Task<Map> result)
+			return await (await _mapRepository.GetItem(mapId).ContinueWith((Func<Task<Map>, Task<RBush<Sector>>>)async delegate(Task<Map> result)
 			{
 				if (result.IsFaulted)
 				{
