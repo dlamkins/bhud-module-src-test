@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -44,7 +45,16 @@ namespace Nekres.Stream_Out
 			{
 				WorkingDirectory = (Path.GetDirectoryName(exe) ?? Directory.GetCurrentDirectory())
 			};
-			Process.Start(psi);
+			try
+			{
+				Process.Start(psi);
+			}
+			catch (Exception ex) when (ex is IOException || ex is Win32Exception)
+			{
+				StreamOutModule.Logger.Warn("Failed to run '" + exe + "' with arguments '" + argString + "': " + ex.Message);
+				Process.Start(url);
+				return;
+			}
 			string title = await TryFetchWebPageTitle(url);
 			await Task.Delay(200).ContinueWith(delegate
 			{
