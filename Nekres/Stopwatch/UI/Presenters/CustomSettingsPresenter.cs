@@ -40,12 +40,12 @@ namespace Nekres.Stopwatch.UI.Presenters
 
 		private void View_PositionButtonClicked(object o, EventArgs e)
 		{
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
 			SettingEntry<Point> obj = new SettingEntry<Point>();
-			obj.set_Value(new Point(300, 250));
+			obj.set_Value(new Point(400, 100));
 			SettingEntry<Point> tempSizeSetting = obj;
 			SpriteScreenMover spriteScreenMover = new SpriteScreenMover(new ScreenRegion("Stopwatch", StopwatchModule.ModuleInstance.Position, tempSizeSetting));
 			((Control)spriteScreenMover).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
