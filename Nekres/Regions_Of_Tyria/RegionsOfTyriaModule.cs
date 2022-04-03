@@ -212,8 +212,8 @@ namespace Nekres.Regions_Of_Tyria
 				.SwapYZ()
 				.ToPlane();
 			RBush<Sector> obj = await _sectorRepository.GetItem(GameService.Gw2Mumble.get_CurrentMap().get_Id());
-			Envelope val = new Envelope(((Coordinates2)(ref playerLocation)).get_X(), ((Coordinates2)(ref playerLocation)).get_Y(), ((Coordinates2)(ref playerLocation)).get_X(), ((Coordinates2)(ref playerLocation)).get_Y());
-			IReadOnlyList<Sector> foundPoints = obj.Search(ref val);
+			Envelope boundingBox = new Envelope(((Coordinates2)(ref playerLocation)).get_X(), ((Coordinates2)(ref playerLocation)).get_Y(), ((Coordinates2)(ref playerLocation)).get_X(), ((Coordinates2)(ref playerLocation)).get_Y());
+			IReadOnlyList<Sector> foundPoints = obj.Search(in boundingBox);
 			if (foundPoints == null || foundPoints.Count == 0 || _prevSectorId.Equals(foundPoints[0].Id))
 			{
 				return null;
@@ -224,7 +224,7 @@ namespace Nekres.Regions_Of_Tyria
 
 		private async Task<RBush<Sector>> RequestSectors(int mapId)
 		{
-			return await (await _mapRepository.GetItem(mapId).ContinueWith((Func<Task<Map>, Task<RBush<Sector>>>)async delegate(Task<Map> result)
+			return await (await _mapRepository.GetItem(mapId).ContinueWith(async delegate(Task<Map> result)
 			{
 				if (result.IsFaulted)
 				{
