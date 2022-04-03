@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using BhModule.Community.Pathing.Editor.Entity;
@@ -7,6 +8,7 @@ using BhModule.Community.Pathing.Utility;
 using Blish_HUD;
 using Blish_HUD.Entities;
 using Blish_HUD.Input;
+using LiteDB;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
@@ -14,9 +16,13 @@ namespace BhModule.Community.Pathing.State
 {
 	public class EditorStates : ManagedState
 	{
+		private const string DIFFDB_FILE = "changes.ddb";
+
 		private const ModifierKeys EDITOR_MODIFIERKEY = 4;
 
 		private const Keys EDITOR_KEYKEY = 161;
+
+		private ILiteDatabase _editorDatabase;
 
 		private bool _multiSelect;
 
@@ -30,6 +36,8 @@ namespace BhModule.Community.Pathing.State
 
 		protected override Task<bool> Initialize()
 		{
+			string diffDbPath = Path.Combine(DataDirUtil.GetSafeDataDir("user"), "changes.ddb");
+			_editorDatabase = new LiteDatabase(diffDbPath);
 			return Task.FromResult(result: true);
 		}
 
@@ -112,6 +120,7 @@ namespace BhModule.Community.Pathing.State
 		public override Task Unload()
 		{
 			SelectedPathingEntities = new SafeList<IPathingEntity>();
+			_editorDatabase?.Dispose();
 			return Task.CompletedTask;
 		}
 	}

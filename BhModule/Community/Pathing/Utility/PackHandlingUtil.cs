@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BhModule.Community.Pathing.MarkerPackRepo;
 using Blish_HUD;
+using TmfLib;
 
 namespace BhModule.Community.Pathing.Utility
 {
@@ -25,12 +26,43 @@ namespace BhModule.Community.Pathing.Utility
 			thread.Start();
 		}
 
+		public static void DeletePack(MarkerPackPkg markerPackPkg)
+		{
+			markerPackPkg.IsDownloading = true;
+			markerPackPkg.DownloadError = null;
+			string mpPath = Path.Combine(DataDirUtil.MarkerDir, markerPackPkg.FileName);
+			try
+			{
+				if (File.Exists(mpPath))
+				{
+					while (PathingModule.Instance.PackInitiator.IsLoading)
+					{
+						Thread.Sleep(1000);
+					}
+					File.Delete(mpPath);
+					Logger.Info("Deleted marker pack '{packPath}'.", new object[1] { mpPath });
+				}
+				else
+				{
+					Logger.Warn("Attempted to delete pack '{packPath}' that doesn't exist.", new object[1] { mpPath });
+				}
+				markerPackPkg.CurrentDownloadDate = default(DateTime);
+			}
+			catch (Exception ex)
+			{
+				Logger.Warn(ex, "Failed to delete marker pack '{packPath}'", new object[1] { mpPath });
+				markerPackPkg.DownloadError = "Failed to delete marker pack.";
+			}
+			markerPackPkg.IsDownloading = false;
+		}
+
 		private static async Task BeginPackDownload(MarkerPackPkg markerPackPkg, IProgress<string> progress, Action<MarkerPackPkg, bool> funcOnComplete)
 		{
 			Logger.Info("Updating pack '" + markerPackPkg.Name + "'...");
 			progress.Report("Downloading pack '" + markerPackPkg.Name + "'...");
 			markerPackPkg.IsDownloading = true;
 			markerPackPkg.DownloadError = null;
+			markerPackPkg.DownloadProgress = 0;
 			string tempPackDownloadDestination = Path.GetTempFileName();
 			try
 			{
@@ -43,10 +75,11 @@ namespace BhModule.Community.Pathing.Utility
 				};
 				await webClient.DownloadFileTaskAsync(markerPackPkg.Download, tempPackDownloadDestination);
 			}
-			catch (Exception ex3)
+			catch (Exception ex2)
 			{
 				markerPackPkg.DownloadError = "Marker pack download failed.";
-				Logger.Error(ex3, "Failed to download marker pack " + markerPackPkg.Name + " from " + markerPackPkg.Download + " to " + tempPackDownloadDestination + ".");
+				Logger.Error(ex2, "Failed to download marker pack " + markerPackPkg.Name + " from " + markerPackPkg.Download + " to " + tempPackDownloadDestination + ".");
+				progress.Report(null);
 				funcOnComplete(markerPackPkg, arg2: false);
 				return;
 			}
@@ -57,10 +90,12 @@ namespace BhModule.Community.Pathing.Utility
 				bool needsInit = true;
 				using (FileStream packStream = File.Open(tempPackDownloadDestination, FileMode.Open, FileAccess.Read, FileShare.Read))
 				{
-					if (new ZipArchive((Stream)packStream).get_Entries().Count <= 0)
+					ZipArchive val = new ZipArchive((Stream)packStream);
+					if (val.get_Entries().Count <= 0)
 					{
 						throw new InvalidDataException();
 					}
+					val.Dispose();
 				}
 				if (File.Exists(finalPath))
 				{
@@ -74,20 +109,22 @@ namespace BhModule.Community.Pathing.Utility
 				File.Move(tempPackDownloadDestination, finalPath);
 				if (needsInit)
 				{
-					await PathingModule.Instance.PackInitiator.LoadPackedPackFiles(new string[1] { finalPath });
+					Pack newPack = Pack.FromArchivedMarkerPack(finalPath);
+					await PathingModule.Instance.PackInitiator.LoadPack(newPack);
+					newPack.ReleaseLocks();
 				}
 			}
-			catch (InvalidDataException ex2)
+			catch (InvalidDataException ex3)
 			{
 				markerPackPkg.DownloadError = "Marker pack download is corrupt.";
-				Logger.Warn((Exception)ex2, "Failed downloading marker pack " + markerPackPkg.Name + " from " + tempPackDownloadDestination + " (it appears to be corrupt).");
+				Logger.Warn((Exception)ex3, "Failed downloading marker pack " + markerPackPkg.Name + " from " + tempPackDownloadDestination + " (it appears to be corrupt).");
 			}
 			catch (Exception ex)
 			{
 				markerPackPkg.DownloadError = "Failed to import the new marker pack.";
 				Logger.Warn(ex, "Failed moving marker pack " + markerPackPkg.Name + " from " + tempPackDownloadDestination + " to " + finalPath + ".");
 			}
-			progress.Report(string.Empty);
+			progress.Report(null);
 			funcOnComplete(markerPackPkg, markerPackPkg.DownloadError == null);
 		}
 	}

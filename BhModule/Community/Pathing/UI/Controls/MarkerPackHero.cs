@@ -31,6 +31,8 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		private readonly BlueButton _infoButton;
 
+		private readonly BlueButton _deleteButton;
+
 		private readonly Checkbox _keepUpdatedCheckbox;
 
 		private readonly SettingEntry<bool> _doAutoUpdate;
@@ -56,8 +58,8 @@ namespace BhModule.Community.Pathing.UI.Controls
 			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00cc: Expected O, but got Unknown
-			//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0212: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024e: Unknown result type (might be due to invalid IL or missing references)
 			_doAutoUpdate = settings.DefineSetting<bool>(markerPackPkg.Name + "_AutoUpdate", true, (Func<string>)null, (Func<string>)null);
 			_markerPackPkg = markerPackPkg;
 			if (markerPackPkg.LastUpdate != default(DateTime))
@@ -92,19 +94,32 @@ namespace BhModule.Community.Pathing.UI.Controls
 			((Control)obj2).set_BasicTooltipText(_markerPackPkg.Info);
 			((Control)obj2).set_Parent((Container)(object)this);
 			_infoButton = obj2;
+			BlueButton obj3 = new BlueButton
+			{
+				Text = "Delete"
+			};
+			((Control)obj3).set_Width(90);
+			((Control)obj3).set_Parent((Container)(object)this);
+			_deleteButton = obj3;
 			if (_markerPackPkg.TotalDownloads > 0)
 			{
 				((Control)this).set_BasicTooltipText($"Approx. {_markerPackPkg.TotalDownloads:n0} Downloads");
 			}
 			((Control)_downloadButton).add_Click((EventHandler<MouseEventArgs>)DownloadButtonOnClick);
 			((Control)_infoButton).add_Click((EventHandler<MouseEventArgs>)InfoButtonOnClick);
-			_keepUpdatedCheckbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)KeepUpdatedCheckbox_CheckedChanged);
+			((Control)_deleteButton).add_Click((EventHandler<MouseEventArgs>)DeleteButtonOnClick);
+			_keepUpdatedCheckbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)KeepUpdatedCheckboxOnChecked);
 			((Control)this).set_Size(new Point(500, 170));
 			((Control)this).set_Padding(new Thickness(13f, 0f, 0f, 9f));
 			((Control)this).ResumeLayout(true);
 		}
 
-		private void KeepUpdatedCheckbox_CheckedChanged(object sender, CheckChangedEvent e)
+		private void DeleteButtonOnClick(object sender, MouseEventArgs e)
+		{
+			PackHandlingUtil.DeletePack(_markerPackPkg);
+		}
+
+		private void KeepUpdatedCheckboxOnChecked(object sender, CheckChangedEvent e)
 		{
 			_doAutoUpdate.set_Value(e.get_Checked());
 		}
@@ -124,7 +139,7 @@ namespace BhModule.Community.Pathing.UI.Controls
 			}
 		}
 
-		private void UpdateDownloadButtonState()
+		private void UpdateControlStates()
 		{
 			string downloadText = "Download";
 			bool downloadEnabled = true;
@@ -132,6 +147,8 @@ namespace BhModule.Community.Pathing.UI.Controls
 			if (_markerPackPkg.CurrentDownloadDate != default(DateTime))
 			{
 				downloadEnabled = false;
+				((Control)_deleteButton).set_Visible(true);
+				((Control)_deleteButton).set_Enabled(true);
 				if (PathingModule.Instance.PackInitiator.IsLoading)
 				{
 					downloadText = "Loading...";
@@ -147,10 +164,15 @@ namespace BhModule.Community.Pathing.UI.Controls
 					_isUpToDate = true;
 				}
 			}
+			else
+			{
+				((Control)_deleteButton).set_Visible(false);
+			}
 			if (_markerPackPkg.IsDownloading)
 			{
 				downloadText = "Downloading...";
 				downloadEnabled = false;
+				((Control)_deleteButton).set_Enabled(false);
 			}
 			_downloadButton.Text = downloadText;
 			((Control)_downloadButton).set_Enabled(downloadEnabled);
@@ -159,7 +181,7 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		public override void UpdateContainer(GameTime gameTime)
 		{
-			UpdateDownloadButtonState();
+			UpdateControlStates();
 			((Container)this).UpdateContainer(gameTime);
 		}
 
@@ -198,9 +220,11 @@ namespace BhModule.Community.Pathing.UI.Controls
 		{
 			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
 			((Control)_downloadButton).set_Location(new Point(((Control)this).get_Width() - ((Control)_downloadButton).get_Width() - 10, ((Control)this).get_Height() - 20 - ((Control)_downloadButton).get_Height() / 2));
 			((Control)_infoButton).set_Location(new Point(((Control)_downloadButton).get_Left() - ((Control)_infoButton).get_Width() - 5, ((Control)this).get_Height() - 20 - ((Control)_downloadButton).get_Height() / 2));
+			((Control)_deleteButton).set_Location(new Point(((Control)_infoButton).get_Left() - ((Control)_deleteButton).get_Width() - 5, ((Control)this).get_Height() - 20 - ((Control)_downloadButton).get_Height() / 2));
 			((Control)_keepUpdatedCheckbox).set_Location(new Point(((Control)this).get_Width() - ((Control)_keepUpdatedCheckbox).get_Width() - 20, 20));
 		}
 
@@ -244,7 +268,7 @@ namespace BhModule.Community.Pathing.UI.Controls
 			}
 			else
 			{
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, "Download Error: " + _markerPackPkg.DownloadError, GameService.Content.get_DefaultFont12(), new Rectangle(20, bounds.Height - 40, ((Control)_infoButton).get_Left() - 10, 40), StandardColors.get_Red(), false, (HorizontalAlignment)0, (VerticalAlignment)1);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, "Error: " + _markerPackPkg.DownloadError, GameService.Content.get_DefaultFont12(), new Rectangle(20, bounds.Height - 40, ((Control)_infoButton).get_Left() - 10, 40), StandardColors.get_Red(), false, (HorizontalAlignment)0, (VerticalAlignment)1);
 			}
 			if (_markerPackPkg.IsDownloading)
 			{

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using BhModule.Community.Pathing.LocalHttp;
 using BhModule.Community.Pathing.MarkerPackRepo;
 using BhModule.Community.Pathing.UI.Views;
 using Blish_HUD;
@@ -40,6 +41,8 @@ namespace BhModule.Community.Pathing
 		private Tab _keybindSettingsTab;
 
 		private Tab _markerRepoTab;
+
+		private HttpHost _apiHost;
 
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
@@ -215,6 +218,7 @@ namespace BhModule.Community.Pathing
 
 		protected override void Unload()
 		{
+			_apiHost?.Close();
 			PackInitiator?.Unload();
 			CornerIcon pathingIcon = _pathingIcon;
 			if (pathingIcon != null)

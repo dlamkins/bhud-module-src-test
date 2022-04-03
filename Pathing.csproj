@@ -28,6 +28,9 @@
     <Reference Include="Cronos">
       <HintPath>..\..\working\Cronos.dll</HintPath>
     </Reference>
+    <Reference Include="LiteDB">
+      <HintPath>..\..\working\LiteDB.dll</HintPath>
+    </Reference>
     <Reference Include="YamlDotNet">
       <HintPath>..\..\working\YamlDotNet.dll</HintPath>
     </Reference>
