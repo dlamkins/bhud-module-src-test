@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
@@ -9,7 +8,6 @@ using Blish_HUD.Input;
 using Blish_HUD.Settings;
 using Blish_HUD.Settings.UI.Views;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Nekres.Mistwar.UI.Models;
 using Nekres.Mistwar.UI.Presenters;
 
@@ -41,7 +39,7 @@ namespace Nekres.Mistwar.UI.Views
 			}
 		}
 
-		public event EventHandler<EventArgs> SocialButtonClicked;
+		public event EventHandler<EventArgs> BrowserButtonClick;
 
 		private void UpdateBoundsLocking(bool locked)
 		{
@@ -77,39 +75,35 @@ namespace Nekres.Mistwar.UI.Views
 			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0071: Expected O, but got Unknown
-			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
 			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0183: Expected O, but got Unknown
+			//IL_01da: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01df: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01e6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0207: Expected O, but got Unknown
-			//IL_0261: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0266: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0274: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0285: Expected O, but got Unknown
+			//IL_01fe: Expected O, but got Unknown
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Size(new Point(((Control)buildPanel).get_Width(), 78));
 			((Control)val).set_Location(new Point(0, 0));
@@ -120,19 +114,14 @@ namespace Nekres.Mistwar.UI.Views
 			((Panel)val).set_ShowBorder(true);
 			((Control)val).set_Parent(buildPanel);
 			_socialFlowPanel = val;
-			foreach (CustomSettingsModel.Social social in Enum.GetValues(typeof(CustomSettingsModel.Social)))
-			{
-				Texture2D tex = ((Presenter<CustomSettingsView, CustomSettingsModel>)base.get_Presenter()).get_Model().GetSocialLogo(social);
-				Image val2 = new Image();
-				((Control)val2).set_Parent((Container)(object)_socialFlowPanel);
-				val2.set_Texture(AsyncTexture2D.op_Implicit(tex));
-				Rectangle bounds = tex.get_Bounds();
-				((Control)val2).set_Size(PointExtensions.ResizeKeepAspect(((Rectangle)(ref bounds)).get_Size(), 54, ((Control)_socialFlowPanel).get_Height() - (int)_socialFlowPanel.get_ControlPadding().Y * 2, false));
-				((Control)val2).set_BasicTooltipText(((Presenter<CustomSettingsView, CustomSettingsModel>)base.get_Presenter()).get_Model().GetSocialUrl(social));
-				((Control)val2).add_Click((EventHandler<MouseEventArgs>)_bttn_Click);
-				((Control)val2).add_MouseEntered((EventHandler<MouseEventArgs>)_bttn_MouseEntered);
-				((Control)val2).add_MouseLeft((EventHandler<MouseEventArgs>)_bttn_MouseLeft);
-			}
+			StandardButton val2 = new StandardButton();
+			((Control)val2).set_Parent((Container)(object)_socialFlowPanel);
+			((Control)val2).set_Size(new Point(160, 46));
+			val2.set_Text("Support Me on Ko-Fi");
+			val2.set_Icon(AsyncTexture2D.op_Implicit(((Presenter<CustomSettingsView, CustomSettingsModel>)base.get_Presenter()).get_Model().GetSocialLogo(CustomSettingsModel.Social.KoFi)));
+			val2.set_ResizeIcon(true);
+			((Control)val2).set_BasicTooltipText(((Presenter<CustomSettingsView, CustomSettingsModel>)base.get_Presenter()).get_Model().GetSocialUrl(CustomSettingsModel.Social.KoFi));
+			((Control)val2).add_Click((EventHandler<MouseEventArgs>)OnBrowserButtonClick);
 			FlowPanel val3 = new FlowPanel();
 			((Control)val3).set_Size(new Point(((Control)buildPanel).get_Width(), ((Control)buildPanel).get_Height() - ((Control)_socialFlowPanel).get_Height()));
 			((Control)val3).set_Location(new Point(0, ((Control)_socialFlowPanel).get_Height()));
@@ -164,33 +153,13 @@ namespace Nekres.Mistwar.UI.Views
 			}
 		}
 
-		private void _bttn_Click(object sender, MouseEventArgs e)
+		private void OnBrowserButtonClick(object sender, MouseEventArgs e)
 		{
-			this.SocialButtonClicked?.Invoke(sender, (EventArgs)(object)e);
-		}
-
-		private void _bttn_MouseEntered(object sender, MouseEventArgs e)
-		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			((Image)sender).set_Tint(Color.get_Gray());
-		}
-
-		private void _bttn_MouseLeft(object sender, MouseEventArgs e)
-		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			((Image)sender).set_Tint(Color.get_White());
+			this.BrowserButtonClick?.Invoke(sender, (EventArgs)(object)e);
 		}
 
 		protected override void Unload()
 		{
-			foreach (Control child in ((Container)_socialFlowPanel).get_Children())
-			{
-				child.remove_Click((EventHandler<MouseEventArgs>)_bttn_Click);
-				child.remove_MouseEntered((EventHandler<MouseEventArgs>)_bttn_MouseEntered);
-				child.remove_MouseLeft((EventHandler<MouseEventArgs>)_bttn_MouseLeft);
-			}
 		}
 	}
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Nekres.Mistwar.UI.Models;
@@ -16,19 +17,20 @@ namespace Nekres.Mistwar.UI.Presenters
 
 		protected override Task<bool> Load(IProgress<string> progress)
 		{
-			base.get_View().SocialButtonClicked += View_SocialButtonClicked;
+			base.get_View().BrowserButtonClick += View_BrowserButtonClicked;
 			return base.Load(progress);
 		}
 
 		protected override void Unload()
 		{
-			base.get_View().SocialButtonClicked -= View_SocialButtonClicked;
+			base.get_View().BrowserButtonClick -= View_BrowserButtonClicked;
 		}
 
-		private void View_SocialButtonClicked(object sender, EventArgs e)
+		private void View_BrowserButtonClicked(object o, EventArgs e)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			BrowserUtil.OpenInDefaultBrowser(((Control)sender).get_BasicTooltipText());
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			((Control)GameService.Overlay.get_BlishHudWindow()).Hide();
+			BrowserUtil.OpenInDefaultBrowser(((Control)o).get_BasicTooltipText());
 		}
 	}
 }

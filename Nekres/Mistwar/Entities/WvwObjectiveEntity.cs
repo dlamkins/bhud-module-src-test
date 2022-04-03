@@ -169,10 +169,6 @@ namespace Nekres.Mistwar.Entities
 			{
 				if (YaksDelivered < 60)
 				{
-					if (YaksDelivered < 20)
-					{
-						return null;
-					}
 					if (!useCustom)
 					{
 						return TextureSecured;
