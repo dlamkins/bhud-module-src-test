@@ -18,15 +18,19 @@ namespace Stopwatch
 	[Export(typeof(Module))]
 	public class StopwatchModule : Module
 	{
-		private static readonly Logger Logger = Logger.GetLogger<StopwatchModule>();
+		internal static readonly Logger Logger = Logger.GetLogger<StopwatchModule>();
 
 		internal SettingEntry<KeyBinding> Toggle;
+
+		internal SettingEntry<bool> StartOnMovementEnabled;
 
 		internal SettingEntry<KeyBinding> Reset;
 
 		internal SettingEntry<KeyBinding> SetStartTime;
 
 		internal SettingEntry<FontSize> FontSize;
+
+		internal SettingEntry<float> BackgroundOpacity;
 
 		internal SettingEntry<float> SoundVolume;
 
@@ -61,19 +65,21 @@ namespace Stopwatch
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0052: Expected O, but got Unknown
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a9: Expected O, but got Unknown
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0100: Expected O, but got Unknown
-			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ba: Unknown result type (might be due to invalid IL or missing references)
-			Toggle = settings.DefineSetting<KeyBinding>("toggleKey", new KeyBinding((ModifierKeys)1, (Keys)83), (Func<string>)(() => "Toggle"), (Func<string>)(() => "Starts or pauses the stopwatch."));
-			Reset = settings.DefineSetting<KeyBinding>("resetKey", new KeyBinding((ModifierKeys)1, (Keys)82), (Func<string>)(() => "Reset"), (Func<string>)(() => "Rewinds and stops the stopwatch."));
-			SetStartTime = settings.DefineSetting<KeyBinding>("setStartTimeKey", new KeyBinding((ModifierKeys)1, (Keys)67), (Func<string>)(() => "Set Goal Time"), (Func<string>)(() => "Set a goal time and make the stopwatch count down into the negative."));
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Expected O, but got Unknown
+			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fb: Expected O, but got Unknown
+			//IL_010a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0152: Expected O, but got Unknown
+			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0360: Unknown result type (might be due to invalid IL or missing references)
+			Toggle = settings.DefineSetting<KeyBinding>("toggleKey", new KeyBinding((Keys)164), (Func<string>)(() => "Toggle"), (Func<string>)(() => "Starts or pauses the stopwatch."));
+			StartOnMovementEnabled = settings.DefineSetting<bool>("startOnMovement", false, (Func<string>)(() => "Wait for Character Movement"), (Func<string>)(() => "When you activate the stopwatch it will delay its start until the moment you move from where you toggled it."));
+			Reset = settings.DefineSetting<KeyBinding>("resetKey", new KeyBinding((ModifierKeys)2, (Keys)82), (Func<string>)(() => "Reset"), (Func<string>)(() => "Rewinds and stops the stopwatch."));
+			SetStartTime = settings.DefineSetting<KeyBinding>("setStartTimeKey", new KeyBinding((ModifierKeys)2, (Keys)67), (Func<string>)(() => "Set Goal Time"), (Func<string>)(() => "Set a goal time and make the stopwatch count down into the negative."));
 			FontSize = settings.DefineSetting<FontSize>("fontSize", (FontSize)36, (Func<string>)(() => "Font Size"), (Func<string>)(() => "Sets the font size of the timer."));
 			FontColor = settings.DefineSetting<Color>("fontColor", Color.get_White(), (Func<string>)(() => "Font Color"), (Func<string>)(() => "Sets the font color of the timer."));
+			BackgroundOpacity = settings.DefineSetting<float>("backgroundOpacity", 30f, (Func<string>)(() => "Background Opacity"), (Func<string>)(() => "Sets the transparency of the background."));
 			SoundVolume = settings.DefineSetting<float>("soundVolume", 80f, (Func<string>)(() => "Audio Volume"), (Func<string>)(() => "Sets the volume of the audio effects"));
 			TickingSoundDisabledSetting = settings.DefineSetting<bool>("tickingSfxDisabled", false, (Func<string>)(() => "Disable Ticking Sound"), (Func<string>)(() => "Disables the ticking sounds"));
 			BeepSoundDisabledSetting = settings.DefineSetting<bool>("beepSfxDisabled", false, (Func<string>)(() => "Disable Beep Alerts"), (Func<string>)(() => "Disables the beeping alerts during a count from three to zero."));
@@ -86,11 +92,12 @@ namespace Stopwatch
 		{
 			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
 			_stopwatchController = new StopwatchController
 			{
 				FontColor = FontColor.get_Value(),
 				FontSize = FontSize.get_Value(),
+				BackgroundOpacity = BackgroundOpacity.get_Value() / 100f,
 				AudioVolume = Math.Min(1f, SoundVolume.get_Value() / 1000f),
 				Position = Position.get_Value()
 			};
@@ -116,6 +123,7 @@ namespace Stopwatch
 			SoundVolume.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnSoundVolumeSettingChanged);
 			FontSize.add_SettingChanged((EventHandler<ValueChangedEventArgs<FontSize>>)OnFontSizeSettingChanged);
 			FontColor.add_SettingChanged((EventHandler<ValueChangedEventArgs<Color>>)OnFontColorSettingChanged);
+			BackgroundOpacity.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnBackgroundOpacitySettingChanged);
 			Position.add_SettingChanged((EventHandler<ValueChangedEventArgs<Point>>)OnPositionSettingChanged);
 			((Module)this).OnModuleLoaded(e);
 		}
@@ -158,6 +166,11 @@ namespace Stopwatch
 			_stopwatchController.FontColor = e.get_NewValue();
 		}
 
+		private void OnBackgroundOpacitySettingChanged(object o, ValueChangedEventArgs<float> e)
+		{
+			_stopwatchController.BackgroundOpacity = e.get_NewValue() / 100f;
+		}
+
 		private void OnPositionSettingChanged(object o, ValueChangedEventArgs<Point> e)
 		{
 			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
@@ -177,6 +190,7 @@ namespace Stopwatch
 			SoundVolume.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnSoundVolumeSettingChanged);
 			FontSize.remove_SettingChanged((EventHandler<ValueChangedEventArgs<FontSize>>)OnFontSizeSettingChanged);
 			FontColor.remove_SettingChanged((EventHandler<ValueChangedEventArgs<Color>>)OnFontColorSettingChanged);
+			BackgroundOpacity.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnBackgroundOpacitySettingChanged);
 			Position.remove_SettingChanged((EventHandler<ValueChangedEventArgs<Point>>)OnPositionSettingChanged);
 			_stopwatchController?.Dispose();
 			ModuleInstance = null;
