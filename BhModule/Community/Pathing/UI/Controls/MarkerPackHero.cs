@@ -5,7 +5,6 @@ using BhModule.Community.Pathing.Utility;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
-using Blish_HUD.Settings;
 using Flurl;
 using Humanizer;
 using Microsoft.Xna.Framework;
@@ -35,8 +34,6 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		private readonly Checkbox _keepUpdatedCheckbox;
 
-		private readonly SettingEntry<bool> _doAutoUpdate;
-
 		private readonly string _lastUpdateStr = "";
 
 		private double _hoverTick;
@@ -48,19 +45,18 @@ namespace BhModule.Community.Pathing.UI.Controls
 			_textureHeroBackground = PathingModule.Instance.ContentsManager.GetTexture("png\\controls\\155209.png");
 		}
 
-		public MarkerPackHero(MarkerPackPkg markerPackPkg, SettingCollection settings)
+		public MarkerPackHero(MarkerPackPkg markerPackPkg)
 			: this()
 		{
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cc: Expected O, but got Unknown
-			//IL_022f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024e: Unknown result type (might be due to invalid IL or missing references)
-			_doAutoUpdate = settings.DefineSetting<bool>(markerPackPkg.Name + "_AutoUpdate", true, (Func<string>)null, (Func<string>)null);
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ad: Expected O, but got Unknown
+			//IL_0227: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0246: Unknown result type (might be due to invalid IL or missing references)
 			_markerPackPkg = markerPackPkg;
 			if (markerPackPkg.LastUpdate != default(DateTime))
 			{
@@ -71,7 +67,7 @@ namespace BhModule.Community.Pathing.UI.Controls
 			val.set_Text("Keep Updated");
 			((Control)val).set_BasicTooltipText("If checked, new pack versions will be automatically downloaded on launch.");
 			((Control)val).set_Parent((Container)(object)this);
-			val.set_Checked(_doAutoUpdate.get_Value());
+			val.set_Checked(markerPackPkg.AutoUpdate.get_Value());
 			((Control)val).set_Enabled(markerPackPkg.CurrentDownloadDate != default(DateTime));
 			_keepUpdatedCheckbox = val;
 			BlueButton obj = new BlueButton
@@ -109,9 +105,15 @@ namespace BhModule.Community.Pathing.UI.Controls
 			((Control)_infoButton).add_Click((EventHandler<MouseEventArgs>)InfoButtonOnClick);
 			((Control)_deleteButton).add_Click((EventHandler<MouseEventArgs>)DeleteButtonOnClick);
 			_keepUpdatedCheckbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)KeepUpdatedCheckboxOnChecked);
+			markerPackPkg.AutoUpdate.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)AutoUpdateOnSettingChanged);
 			((Control)this).set_Size(new Point(500, 170));
 			((Control)this).set_Padding(new Thickness(13f, 0f, 0f, 9f));
 			((Control)this).ResumeLayout(true);
+		}
+
+		private void AutoUpdateOnSettingChanged(object sender, ValueChangedEventArgs<bool> e)
+		{
+			_keepUpdatedCheckbox.set_Checked(e.get_NewValue());
 		}
 
 		private void DeleteButtonOnClick(object sender, MouseEventArgs e)
@@ -121,7 +123,7 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		private void KeepUpdatedCheckboxOnChecked(object sender, CheckChangedEvent e)
 		{
-			_doAutoUpdate.set_Value(e.get_Checked());
+			_markerPackPkg.AutoUpdate.set_Value(e.get_Checked());
 		}
 
 		private void DownloadButtonOnClick(object sender, MouseEventArgs e)
@@ -278,6 +280,12 @@ namespace BhModule.Community.Pathing.UI.Controls
 			{
 				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, "Up to Date", GameService.Content.get_DefaultFont14(), ((Control)_downloadButton).get_LocalBounds(), StandardColors.get_Default(), false, (HorizontalAlignment)1, (VerticalAlignment)1);
 			}
+		}
+
+		protected override void DisposeControl()
+		{
+			_markerPackPkg.AutoUpdate.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)AutoUpdateOnSettingChanged);
+			((Container)this).DisposeControl();
 		}
 	}
 }

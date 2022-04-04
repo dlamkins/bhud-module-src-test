@@ -39,6 +39,8 @@ namespace BhModule.Community.Pathing
 
 		public bool IsLoading { get; private set; }
 
+		public IRootPackState PackState => _packState;
+
 		public PackInitiator(string watchPath, ModuleSettings moduleSettings, IProgress<string> loadingIndicator)
 		{
 			_watchPath = watchPath;

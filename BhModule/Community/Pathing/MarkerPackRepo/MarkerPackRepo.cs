@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BhModule.Community.Pathing.Utility;
 using Blish_HUD;
+using Blish_HUD.Settings;
 using Flurl.Http;
 
 namespace BhModule.Community.Pathing.MarkerPackRepo
@@ -18,7 +19,11 @@ namespace BhModule.Community.Pathing.MarkerPackRepo
 
 		private const string PUBLIC_REPOURL = "https://mp-repo.blishhud.com/repo.json";
 
+		private const string MPREPO_SETTINGS = "MarkerRepoSettings";
+
 		private string _repoUrl;
+
+		private SettingCollection _markerPackSettings;
 
 		public MarkerPackPkg[] MarkerPackages { get; private set; } = Array.Empty<MarkerPackPkg>();
 
@@ -45,6 +50,7 @@ namespace BhModule.Community.Pathing.MarkerPackRepo
 		private void DefineRepoSettings()
 		{
 			_repoUrl = PathingModule.Instance.SettingsManager.get_ModuleSettings().DefineSetting<string>("PackRepoUrl", "https://mp-repo.blishhud.com/repo.json", (Func<string>)null, (Func<string>)null).get_Value();
+			_markerPackSettings = PathingModule.Instance.SettingsManager.get_ModuleSettings().AddSubCollection("MarkerRepoSettings", false);
 		}
 
 		private void LoadLocalPackInfo()
@@ -70,7 +76,7 @@ namespace BhModule.Community.Pathing.MarkerPackRepo
 				if (associatedLocalPack != null)
 				{
 					pack.CurrentDownloadDate = File.GetLastWriteTimeUtc(associatedLocalPack);
-					if (pack.CurrentDownloadDate != default(DateTime) && pack.LastUpdate > pack.CurrentDownloadDate)
+					if (pack.AutoUpdate.get_Value() && pack.CurrentDownloadDate != default(DateTime) && pack.LastUpdate > pack.CurrentDownloadDate)
 					{
 						PackHandlingUtil.DownloadPack(pack, OnUpdateComplete);
 					}
@@ -94,6 +100,11 @@ namespace BhModule.Community.Pathing.MarkerPackRepo
 			if (exception != null)
 			{
 				progress.Report("Failed to get a list of marker packs.\r\n" + exception.Message);
+			}
+			MarkerPackPkg[] array = releases;
+			foreach (MarkerPackPkg pack in array)
+			{
+				pack.AutoUpdate = _markerPackSettings.DefineSetting<bool>(pack.Name + "_AutoUpdate", true, (Func<string>)null, (Func<string>)null);
 			}
 			return releases;
 		}

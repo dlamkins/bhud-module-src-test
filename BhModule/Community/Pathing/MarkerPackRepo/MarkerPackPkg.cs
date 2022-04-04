@@ -1,4 +1,5 @@
 using System;
+using Blish_HUD.Settings;
 
 namespace BhModule.Community.Pathing.MarkerPackRepo
 {
@@ -35,5 +36,7 @@ namespace BhModule.Community.Pathing.MarkerPackRepo
 		public string DownloadError { get; set; }
 
 		public int DownloadProgress { get; set; }
+
+		public SettingEntry<bool> AutoUpdate { get; set; }
 	}
 }
