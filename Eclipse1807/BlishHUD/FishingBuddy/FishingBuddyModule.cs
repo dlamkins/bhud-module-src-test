@@ -38,7 +38,23 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 
 		private Texture2D _imgNight;
 
-		private Texture2D _imgBorder;
+		private Texture2D _imgBorderBlack;
+
+		private Texture2D _imgBorderJunk;
+
+		private Texture2D _imgBorderBasic;
+
+		private Texture2D _imgBorderFine;
+
+		private Texture2D _imgBorderMasterwork;
+
+		private Texture2D _imgBorderRare;
+
+		private Texture2D _imgBorderExotic;
+
+		private Texture2D _imgBorderAscended;
+
+		private Texture2D _imgBorderLegendary;
 
 		private ClickThroughImage _dawn;
 
@@ -85,6 +101,8 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 		private FishingMaps fishingMaps;
 
 		private IEnumerable<AccountAchievement> accountFishingAchievements;
+
+		public static SettingEntry<bool> _showRarityBorder;
 
 		private List<Fish> _allFishList;
 
@@ -159,6 +177,8 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			_timeOfDayImgWidth = settings.DefineSetting<int>("TimeImgWidth", 64, (Func<string>)(() => "Time of Day Size"), (Func<string>)(() => ""));
 			SettingComplianceExtensions.SetRange(_timeOfDayImgWidth, 16, 96);
 			_timeOfDayImgWidth.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)OnUpdateSettings);
+			_showRarityBorder = settings.DefineSetting<bool>("ShowRarityBorder", true, (Func<string>)(() => "Show Fish Rarity"), (Func<string>)(() => ""));
+			_showRarityBorder.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateFish);
 		}
 
 		protected override void Initialize()
@@ -171,7 +191,15 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			_imgDay = ContentsManager.GetTexture("day.png");
 			_imgDusk = ContentsManager.GetTexture("dusk.png");
 			_imgNight = ContentsManager.GetTexture("night.png");
-			_imgBorder = ContentsManager.GetTexture("border.png");
+			_imgBorderBlack = ContentsManager.GetTexture("border_black.png");
+			_imgBorderJunk = ContentsManager.GetTexture("border_junk.png");
+			_imgBorderBasic = ContentsManager.GetTexture("border_basic.png");
+			_imgBorderFine = ContentsManager.GetTexture("border_fine.png");
+			_imgBorderMasterwork = ContentsManager.GetTexture("border_masterwork.png");
+			_imgBorderRare = ContentsManager.GetTexture("border_rare.png");
+			_imgBorderExotic = ContentsManager.GetTexture("border_exotic.png");
+			_imgBorderAscended = ContentsManager.GetTexture("border_ascended.png");
+			_imgBorderLegendary = ContentsManager.GetTexture("border_legendary.png");
 			_dawn = new ClickThroughImage();
 			_day = new ClickThroughImage();
 			_dusk = new ClickThroughImage();
@@ -251,6 +279,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			_ignoreCaughtFish.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateFish);
 			_includeSaltwater.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateFish);
 			_includeWorldClass.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateFish);
+			_showRarityBorder.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateFish);
 			Gw2ApiManager.remove_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)OnApiSubTokenUpdated);
 			ModuleInstance = null;
 		}
@@ -283,22 +312,22 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 		{
 			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0216: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0290: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0316: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0322: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0186: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0200: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0286: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0292: Unknown result type (might be due to invalid IL or missing references)
+			//IL_030c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0318: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0450: Unknown result type (might be due to invalid IL or missing references)
+			//IL_046a: Unknown result type (might be due to invalid IL or missing references)
 			ClickThroughPanel timeOfDayPanel = _timeOfDayPanel;
 			if (timeOfDayPanel != null)
 			{
@@ -315,7 +344,6 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			((Control)clickThroughPanel).set_Size(new Point(_timeOfDayImgWidth.get_Value()));
 			clickThroughPanel.capture = _dragTimeOfDayPanel.get_Value();
 			_timeOfDayPanel = clickThroughPanel;
-			int imgPadding = 3;
 			int fishPanelRows = Clamp((int)Math.Ceiling((double)catchableFish.Count() / 2.0), 1, 7);
 			int fishPanelColumns = Clamp((int)Math.Ceiling((double)catchableFish.Count() / (double)fishPanelRows), 1, 7);
 			if (fishPanelRows < fishPanelColumns)
@@ -327,7 +355,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			ClickThroughPanel clickThroughPanel2 = new ClickThroughPanel();
 			((Control)clickThroughPanel2).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((Control)clickThroughPanel2).set_Location(_fishPanelLoc.get_Value());
-			((Control)clickThroughPanel2).set_Size(new Point(fishPanelColumns * (_fishImgWidth.get_Value() + imgPadding * 2), fishPanelRows * (_fishImgWidth.get_Value() + imgPadding * 2)));
+			((Control)clickThroughPanel2).set_Size(new Point(fishPanelColumns * _fishImgWidth.get_Value(), fishPanelRows * _fishImgWidth.get_Value()));
 			clickThroughPanel2.capture = _dragFishPanel.get_Value();
 			_fishPanel = clickThroughPanel2;
 			Logger.Debug($"Fish Panel Size; Rows: {fishPanelRows} Columns: {fishPanelColumns}, {((Control)_fishPanel).get_Size()}");
@@ -371,8 +399,8 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			((Control)clickThroughImage4).set_Visible(timeOfDay == "Night");
 			clickThroughImage4.capture = _dragTimeOfDayPanel.get_Value();
 			_night = clickThroughImage4;
-			int x = imgPadding;
-			int y = imgPadding;
+			int x = 0;
+			int y = 0;
 			int count = 1;
 			foreach (Fish fish in catchableFish)
 			{
@@ -382,21 +410,22 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 				((Image)clickThroughImage5).set_Texture(GameService.Content.GetRenderServiceTexture(RenderUrl.op_Implicit(fish.icon)));
 				((Control)clickThroughImage5).set_Size(new Point(_fishImgWidth.get_Value()));
 				((Control)clickThroughImage5).set_Location(new Point(x, y));
-				((Control)clickThroughImage5).set_BasicTooltipText(fish.name + "\nFishing Hole: " + fish.fishingHole + openWater + "\nFavored Bait: " + fish.bait + "\nTime of Day: " + ((fish.timeOfDay == Fish.TimeOfDay.DawnDusk) ? "Dusk/Dawn" : fish.timeOfDay.ToString()) + "\nAchievement: " + fish.achievement);
-				((Control)clickThroughImage5).set_ZIndex(1);
+				((Control)clickThroughImage5).set_ZIndex(0);
 				clickThroughImage5.capture = _dragFishPanel.get_Value();
 				ClickThroughImage clickThroughImage6 = new ClickThroughImage();
 				((Control)clickThroughImage6).set_Parent((Container)(object)_fishPanel);
-				((Image)clickThroughImage6).set_Texture(GetImageBorder(fish.rarity));
-				((Control)clickThroughImage6).set_Size(new Point(_fishImgWidth.get_Value() + imgPadding * 2));
-				((Control)clickThroughImage6).set_Location(new Point(x - imgPadding, y - imgPadding));
-				((Control)clickThroughImage6).set_ZIndex(0);
+				((Image)clickThroughImage6).set_Texture(AsyncTexture2D.op_Implicit(_showRarityBorder.get_Value() ? GetImageBorder(fish.rarity) : _imgBorderBlack));
+				((Control)clickThroughImage6).set_Size(new Point(_fishImgWidth.get_Value()));
+				((Control)clickThroughImage6).set_Opacity(0.8f);
+				((Control)clickThroughImage6).set_Location(new Point(x, y));
+				((Control)clickThroughImage6).set_BasicTooltipText(fish.name + "\nFishing Hole: " + fish.fishingHole + openWater + "\nFavored Bait: " + fish.bait + "\nTime of Day: " + ((fish.timeOfDay == Fish.TimeOfDay.DawnDusk) ? "Dusk/Dawn" : fish.timeOfDay.ToString()) + "\nAchievement: " + fish.achievement + "\nRarity: " + fish.rarity);
+				((Control)clickThroughImage6).set_ZIndex(1);
 				clickThroughImage6.capture = _dragFishPanel.get_Value();
-				x += _fishImgWidth.get_Value() + imgPadding;
+				x += _fishImgWidth.get_Value();
 				if (count == fishPanelColumns)
 				{
-					x = imgPadding;
-					y += _fishImgWidth.get_Value() + imgPadding;
+					x = 0;
+					y += _fishImgWidth.get_Value();
 					count = 0;
 				}
 				count++;
@@ -441,9 +470,21 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			}
 		}
 
-		private AsyncTexture2D GetImageBorder(string rarity)
+		private Texture2D GetImageBorder(string rarity)
 		{
-			return AsyncTexture2D.op_Implicit(_imgBorder);
+			Logger.Debug("Rarity " + rarity);
+			return (Texture2D)(rarity switch
+			{
+				"Junk" => _imgBorderJunk, 
+				"Basic" => _imgBorderBasic, 
+				"Fine" => _imgBorderFine, 
+				"Masterwork" => _imgBorderMasterwork, 
+				"Rare" => _imgBorderRare, 
+				"Exotic" => _imgBorderExotic, 
+				"Ascended" => _imgBorderAscended, 
+				"Legendary" => _imgBorderLegendary, 
+				_ => _imgBorderBlack, 
+			});
 		}
 
 		public static int Clamp(int n, int min, int max)
