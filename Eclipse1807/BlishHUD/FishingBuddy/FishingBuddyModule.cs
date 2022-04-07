@@ -118,6 +118,30 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 
 		private string _timeOfDay = "";
 
+		private bool MumbleIsAvailable
+		{
+			get
+			{
+				if (GameService.Gw2Mumble.get_IsAvailable())
+				{
+					return GameService.GameIntegration.get_Gw2Instance().get_IsInGame();
+				}
+				return false;
+			}
+		}
+
+		private bool uiIsAvailable
+		{
+			get
+			{
+				if (MumbleIsAvailable)
+				{
+					return !GameService.Gw2Mumble.get_UI().get_IsMapOpen();
+				}
+				return false;
+			}
+		}
+
 		internal Gw2ApiManager Gw2ApiManager => base.ModuleParameters.get_Gw2ApiManager();
 
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
@@ -231,9 +255,9 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 				await getCurrentMapsFish();
 				DrawIcons();
 			}
-			GetCurrentMapTime();
-			if (GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && !GameService.Gw2Mumble.get_UI().get_IsMapOpen())
+			if (uiIsAvailable)
 			{
+				GetCurrentMapTime();
 				((Control)_timeOfDayPanel).Show();
 				((Control)_fishPanel).Show();
 			}
@@ -280,32 +304,38 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			_includeSaltwater.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateFish);
 			_includeWorldClass.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateFish);
 			_showRarityBorder.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateFish);
+			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
 			Gw2ApiManager.remove_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)OnApiSubTokenUpdated);
 			ModuleInstance = null;
 		}
 
 		protected virtual void OnUpdateSettings(object sender = null, ValueChangedEventArgs<Point> e = null)
 		{
+			Logger.Debug("Settings updated");
 			GetCurrentMapTime();
 			DrawIcons();
 		}
 
 		protected virtual void OnUpdateSettings(object sender = null, ValueChangedEventArgs<bool> e = null)
 		{
+			Logger.Debug("Settings updated");
 			GetCurrentMapTime();
 			DrawIcons();
 		}
 
 		protected virtual void OnUpdateSettings(object sender = null, ValueChangedEventArgs<int> e = null)
 		{
+			Logger.Debug("Settings updated");
 			GetCurrentMapTime();
 			DrawIcons();
 		}
 
 		protected virtual async void OnUpdateFish(object sender = null, ValueChangedEventArgs<bool> e = null)
 		{
+			Logger.Debug("Fish settings updated");
+			GetCurrentMapTime();
 			await getCurrentMapsFish();
-			OnUpdateSettings(sender, e);
+			DrawIcons();
 		}
 
 		protected void DrawIcons()
@@ -472,7 +502,6 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 
 		private Texture2D GetImageBorder(string rarity)
 		{
-			Logger.Debug("Rarity " + rarity);
 			return (Texture2D)(rarity switch
 			{
 				"Junk" => _imgBorderJunk, 
@@ -541,7 +570,10 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 
 		private void GetCurrentMapTime()
 		{
-			timeOfDay = TyriaTime.CurrentMapTime(GameService.Gw2Mumble.get_CurrentMap().get_Id());
+			if (MumbleIsAvailable)
+			{
+				timeOfDay = TyriaTime.CurrentMapTime(GameService.Gw2Mumble.get_CurrentMap().get_Id());
+			}
 		}
 
 		private async void OnApiSubTokenUpdated(object sender, ValueEventArgs<IEnumerable<TokenPermission>> e)
@@ -574,14 +606,14 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 					if (Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)Gw2ApiManager.get_Permissions()))
 					{
 						accountFishingAchievements = ((IEnumerable<AccountAchievement>)(await ((IBlobClient<IApiV2ObjectList<AccountAchievement>>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
-							.get_Achievements()).GetAsync(default(CancellationToken)))).Where((AccountAchievement achievement) => FishingMaps.FISHER_ACHIEVEMENT_IDS.Contains(achievement.get_Id()) && !achievement.get_Done());
+							.get_Achievements()).GetAsync(default(CancellationToken)))).Where((AccountAchievement achievement) => FishingMaps.FISHER_ACHIEVEMENT_IDS.Contains(achievement.get_Id()) && (!achievement.get_Done() || achievement.get_Repeated().HasValue));
 						_useAPIToken = true;
 						IEnumerable<int> currentAchievementIds = accountFishingAchievements.Select((AccountAchievement achievement) => achievement.get_Id());
 						IEnumerable<int> first = accountFishingAchievements.Select((AccountAchievement achievement) => achievement.get_Current());
 						IEnumerable<int> progressMax = accountFishingAchievements.Select((AccountAchievement achievement) => achievement.get_Max());
 						IEnumerable<string> currentOfMax = first.Zip(progressMax, (int current, int max) => current + "/" + max);
-						Logger.Debug("Fishing achievement Ids: " + string.Join(", ", currentAchievementIds));
-						Logger.Debug("Fishing achievement progress: " + string.Join(", ", currentOfMax));
+						Logger.Debug("All account fishing achievement Ids: " + string.Join(", ", currentAchievementIds));
+						Logger.Debug("Account fishing achievement progress: " + string.Join(", ", currentOfMax));
 					}
 					else
 					{
@@ -589,9 +621,9 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 						_useAPIToken = false;
 					}
 				}
-				catch (Exception ex2)
+				catch (Exception ex3)
 				{
-					Logger.Debug(ex2, "Failed to query Guild Wars 2 API.");
+					Logger.Debug(ex3, "Failed to query Guild Wars 2 API.");
 					_useAPIToken = false;
 				}
 				catchableFish.Clear();
@@ -602,17 +634,19 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 					{
 						_currentMap = await _mapRepository.GetItem(GameService.Gw2Mumble.get_CurrentMap().get_Id());
 					}
-					catch (Exception ex)
+					catch (Exception ex2)
 					{
-						Logger.Debug(ex, "Couldn't get player's current map.");
-						return;
+						Logger.Debug(ex2, "Couldn't get player's current map.");
 					}
 				}
-				if (!fishingMaps.mapAchievements.ContainsKey(_currentMap.get_Id()))
+				if (_currentMap != null && fishingMaps.mapAchievements.ContainsKey(_currentMap.get_Id()))
 				{
-					return;
+					achievementsInMap.AddRange(fishingMaps.mapAchievements[_currentMap.get_Id()]);
 				}
-				achievementsInMap.AddRange(fishingMaps.mapAchievements[_currentMap.get_Id()]);
+				else
+				{
+					Logger.Debug("Couldn't get player's current map, skipping current map fish.");
+				}
 				if (_includeSaltwater.get_Value())
 				{
 					achievementsInMap.AddRange(FishingMaps.SaltwaterFisher);
@@ -620,6 +654,11 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 				if (_includeWorldClass.get_Value())
 				{
 					achievementsInMap.AddRange(FishingMaps.WorldClassFisher);
+				}
+				if (achievementsInMap.Count == 0)
+				{
+					Logger.Debug("No achieveable fish in map.");
+					return;
 				}
 				Logger.Debug("All map achievements: " + string.Join(", ", achievementsInMap));
 				if (_ignoreCaughtFish.get_Value() && _useAPIToken)
@@ -694,7 +733,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 							Fish ghoti = ((fishNameMatch.Count() != 0) ? fishNameMatch.First() : null);
 							if (ghoti == null)
 							{
-								Logger.Debug("Missing fish from all fish list: " + fish.get_Name());
+								Logger.Warn("Missing fish from all fish list: " + fish.get_Name());
 							}
 							else if (ghoti.timeOfDay == Fish.TimeOfDay.Any || timeOfDay.Equals("Dawn") || timeOfDay.Equals("Dusk") || object.Equals(ghoti.timeOfDay.ToString(), timeOfDay))
 							{
@@ -708,9 +747,9 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 				}
 				Logger.Debug("Shown catchable fish in current map count: " + catchableFish.Count());
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				throw;
+				Logger.Error(ex, "Unknown exception getting current map fish");
 			}
 			finally
 			{
