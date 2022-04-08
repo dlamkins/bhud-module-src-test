@@ -32,8 +32,11 @@
   <data name="SearchFor"><value>Search for ...</value></data>
   <data name="Updated"><value>Updated {0}</value></data>
   <data name="ShortcutToggle_Description"><value>Key to Press to toggle the characters menu.</value></data>
+  <data name="CreateImages"><value>Create Images</value></data>
   <data name="Utility"><value>Utility</value></data>
   <data name="AutoLogin_DisplayName"><value>Auto Login to selected Character</value></data>
+  <data name="Cancel"><value>Cancel</value></data>
+  <data name="CaptureAll"><value>Capture All</value></data>
   <data name="ModuleDescription"><value>A tool to easily switch characters even with a lot of them!
 This will require an API-Key with permissions at least for the 'characters' endpoint!</value></data>
   <data name="FilterDelay_DisplayName"><value>Filter Delay ({0} ms)</value></data>
@@ -42,11 +45,15 @@ This will require an API-Key with permissions at least for the 'characters' endp
   <data name="Unkown"><value>Unkown</value></data>
   <data name="LoginAfterSelect"><value>Enter the game automatically after selecting the character in the character selection</value></data>
   <data name="ShortcutToggle_DisplayName"><value>Toggle Menu</value></data>
+  <data name="UISizeDisclaimer"><value>You will have to set the games Interface Size to 'Larger' to get the correct cut outs!</value></data>
   <data name="Tailor"><value>Tailor</value></data>
   <data name="SwapDelay_DisplayName"><value>Loading Delay ({0} ms)</value></data>
   <data name="Switch"><value>Switch to {0}</value></data>
   <data name="Scribe"><value>Scribe</value></data>
+  <data name="DoubleClickToSwap"><value>Doubleclick to swap to {0}!</value></data>
+  <data name="SelectImage"><value>Choose a picture</value></data>
   <data name="FocusFilter_Description"><value>When toggling the main menu to show, automatically focus the search field</value></data>
+  <data name="Capture"><value>Capture</value></data>
   <data name="SearchGuide"><value>-c Crafting Profession
 -p Profession/Specialization
 -r Race
@@ -54,12 +61,17 @@ This will require an API-Key with permissions at least for the 'characters' endp
 -m MapName
 -t CustomTag
 -c Chef; -p Warrior will show all warriors and all chefs</value></data>
+  <data name="EnterToLogin_DisplayName"><value>Press Enter to swap</value></data>
   <data name="Updating"><value>Updating {0}</value></data>
   <data name="Jeweler"><value>Jeweler</value></data>
+  <data name="SwapModifier_Description"><value>Only if the Modifier is pressed trigger character swapping. This will prevent accidientally swapping!</value></data>
+  <data name="EnterToLogin_Description"><value>If the searchbox is focused pressing 'RETURN' will log to the first character in the list.</value></data>
   <data name="Specialization"><value>Specialization</value></data>
   <data name="EnterOnSwap_Description"><value>Enter the game automatically after selecting the character in the character selection</value></data>
   <data name="Leatherworker"><value>Leatherworker</value></data>
+  <data name="SwapModifier_DisplayName"><value>Require Modifier to swap</value></data>
   <data name="Map"><value>Map</value></data>
+  <data name="Close"><value>Close</value></data>
   <data name="Clear"><value>Clear</value></data>
   <data name="FocusFilter_DisplayName"><value>Focus search field</value></data>
   <data name="Level"><value>Level {0}</value></data>
@@ -68,9 +80,13 @@ This will require an API-Key with permissions at least for the 'characters' endp
   <data name="NoCraftingProfession"><value>No Crafting Profession</value></data>
   <data name="FilterDelay_Description"><value>Average time in milliseconds waited between filtering your characters' panel.
 To get the current value you will have to swap module tabs once to update the settings page!</value></data>
+  <data name="OnlyMaxCrafting_Description"><value>Show only crafts that are at a 500 rank (Jeweler &amp; Scribe at 400).</value></data>
   <data name="FadeOut_DisplayName"><value>Fade extra window</value></data>
+  <data name="OnlyMaxCrafting_DisplayName"><value>Show only maxed out crafting Professions</value></data>
   <data name="Birthday"><value>Birthday</value></data>
+  <data name="RefreshImages"><value>Refresh Images</value></data>
   <data name="Weaponsmith"><value>Weaponsmith</value></data>
+  <data name="ShowHide_Tooltip"><value>Show/Hides {0} in the character list.</value></data>
   <data name="SwapDelay_Description"><value>Avg. loading time from ingame to character selection.
 To get the current value you will have to swap module tabs once to update the settings page!</value></data>
   <data name="Artificer"><value>Artificer</value></data>
@@ -78,6 +94,7 @@ To get the current value you will have to swap module tabs once to update the se
   <data name="FadeOut_Description"><value>Fade the filter and character window automatically after 2500 ms</value></data>
   <data name="Characters"><value>Characters</value></data>
   <data name="Error_Competivive"><value>Character swapping is disabled in competition mode!</value></data>
+  <data name="UseDefault"><value>Use Spec Icon</value></data>
   <data name="UntilBirthday"><value>until Birthday</value></data>
   <data name="ToggleVisible"><value>Show/Hide hidden Characters</value></data>
   <data name="LoginCharacter"><value>Log in character</value></data>
@@ -92,5 +109,6 @@ Once fully loaded it will switch to the character which is set to be the "Login 
   <data name="Days"><value>Days</value></data>
   <data name="Chef"><value>Chef</value></data>
   <data name="Race"><value>Race</value></data>
+  <data name="Save"><value>Save</value></data>
   <data name="DoubleClickToEnter_Description"><value>Enables double clicking the character in the character list to login to that character.</value></data>
   </root>

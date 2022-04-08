@@ -6,6 +6,18 @@ namespace Kenedia.Modules.Characters
 		Tooltip,
 		ExpandWindow,
 		Tag,
-		TagDisabled
+		TagDisabled,
+		BorderBottomLeft,
+		BorderTopRight,
+		GrayFullFrame,
+		WhiteFrame,
+		RectanlgeFrame,
+		BorderTop,
+		BorderBottom,
+		BorderSimple,
+		BorderSimpleThinner,
+		BigGray_StyledBorder,
+		BigGray_PlainBorder,
+		Selector
 	}
 }

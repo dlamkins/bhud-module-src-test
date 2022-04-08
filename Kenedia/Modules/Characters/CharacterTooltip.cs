@@ -10,35 +10,29 @@ namespace Kenedia.Modules.Characters
 {
 	public class CharacterTooltip : Tooltip
 	{
+		public static ContentService ContentService = new ContentService();
+
 		public Character assignedCharacter;
 
-		public Image _nameTexture;
+		public IconLabel _Name;
 
-		public Label _nameLabel;
+		public IconLabel _Race;
 
-		public Image _levelTexture;
+		public IconLabel _Level;
 
-		public Label _levelLabel;
+		public IconLabel _Map;
 
-		public Image _raceTexture;
+		public IconLabel _Created;
 
-		public Label _raceLabel;
+		public IconLabel _NextBirthday;
 
-		public Image _mapTexture;
+		public IconLabel _LastLogin;
 
-		public Label _mapLabel;
+		public List<IconLabel> _CraftingProfessions = new List<IconLabel>();
 
-		public Image _createdTexture;
+		public Separator _Separator;
 
-		public Label _createdLabel;
-
-		public Image _nextBirthdayTexture;
-
-		public Label _nextBirthdayLabel;
-
-		public Image _ageTexture;
-
-		public Label _ageLabel;
+		public new FlowPanel ContentRegion;
 
 		public FlowPanel Tags;
 
@@ -46,157 +40,119 @@ namespace Kenedia.Modules.Characters
 
 		public WindowBase _Parent;
 
-		public void _Create()
+		public Label _switchInfoLabel;
+
+		public CharacterTooltip(Character character)
 		{
-			if (assignedCharacter != null && assignedCharacter.characterControl != null)
+			assignedCharacter = character;
+			Character c = assignedCharacter;
+			base.Shown += delegate
 			{
-				ContentService contentService = new ContentService();
-				Character c = assignedCharacter;
-				_ = assignedCharacter.characterControl;
-				int index = 0;
-				_nameTexture = new Image
-				{
-					Texture = Textures.Icons[26],
-					Parent = this,
-					Location = new Point(0, index * 25),
-					Size = new Point(20, 20),
-					Visible = false
-				};
-				_nameLabel = new Label
-				{
-					Text = c.Name,
-					Parent = this,
-					Location = new Point(0, index * 25),
-					Visible = true,
-					Width = 200,
-					Font = contentService.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size20, ContentService.FontStyle.Regular),
-					HorizontalAlignment = HorizontalAlignment.Center
-				};
-				new Image
-				{
-					Texture = Textures.Icons[19],
-					Parent = this,
-					Location = new Point(0, 25 + index * 25),
-					Size = new Point(base.Width, 4)
-				};
-				_raceTexture = new Image
-				{
-					Texture = Textures.Races[(uint)c.Race],
-					Parent = this,
-					Location = new Point(0, 40 + index * 25),
-					Size = new Point(20, 20),
-					Visible = true
-				};
-				_raceLabel = new Label
-				{
-					Text = DataManager.getRaceName(c.Race.ToString()),
-					Parent = this,
-					Location = new Point(30, 40 + index * 25),
-					Visible = true,
-					AutoSizeWidth = true
-				};
-				index++;
-				_levelTexture = new Image
-				{
-					Texture = Textures.Icons[32],
-					Parent = this,
-					Location = new Point(0, 40 + index * 25),
-					Size = new Point(20, 20),
-					Visible = true
-				};
-				_levelLabel = new Label
-				{
-					Text = string.Format(common.Level, c.Level),
-					Parent = this,
-					Location = new Point(30, 40 + index * 25),
-					Visible = true,
-					AutoSizeWidth = true
-				};
-				index++;
-				_mapTexture = new Image
-				{
-					Texture = Textures.Icons[29],
-					Parent = this,
-					Location = new Point(0, 40 + index * 25),
-					Size = new Point(20, 20),
-					Visible = true
-				};
-				_mapLabel = new Label
-				{
-					Text = DataManager.getMapName(c.map),
-					Parent = this,
-					Location = new Point(30, 40 + index * 25),
-					Visible = true,
-					AutoSizeWidth = true
-				};
-				DateTime zeroTime = new DateTime(1, 1, 1);
-				TimeSpan span = DateTime.UtcNow - c.Created.UtcDateTime;
-				index++;
-				_createdTexture = new Image
-				{
-					Texture = Textures.Icons[26],
-					Parent = this,
-					Location = new Point(0, 40 + index * 25),
-					Size = new Point(20, 20),
-					Visible = true
-				};
-				_createdLabel = new Label
-				{
-					Text = c.Created.ToString("G") + " (" + ((zeroTime + span).Year - 1) + " " + common.Years + ")",
-					Parent = this,
-					Location = new Point(30, 40 + index * 25),
-					Visible = true,
-					AutoSizeWidth = true
-				};
-				span = c.NextBirthday - DateTime.UtcNow;
-				index++;
-				_nextBirthdayTexture = new Image
-				{
-					Texture = Textures.Icons[17],
-					Parent = this,
-					Location = new Point(0, 40 + index * 25),
-					Size = new Point(20, 20),
-					Visible = true
-				};
-				_nextBirthdayLabel = new Label
-				{
-					Text = string.Format("{3} " + common.Days + " {0:00}:{1:00}:{2:00} " + common.UntilBirthday, span.Hours, span.Minutes, span.Seconds, span.Days),
-					Parent = this,
-					Location = new Point(30, 40 + index * 25),
-					Visible = true,
-					AutoSizeWidth = true
-				};
-				TimeSpan t = TimeSpan.FromSeconds(c.seconds);
-				index++;
-				_ageTexture = new Image
-				{
-					Texture = Textures.Icons[31],
-					Parent = this,
-					Location = new Point(0, 40 + index * 25),
-					Size = new Point(20, 20),
-					Visible = true
-				};
-				_ageLabel = new Label
-				{
-					Text = string.Format("{3} " + common.Days + " {0:00}:{1:00}:{2:00}", t.Hours, t.Minutes, t.Seconds, t.Days),
-					Parent = this,
-					Location = new Point(30, 40 + index * 25),
-					Visible = true,
-					AutoSizeWidth = true
-				};
-				index++;
-				Tags = new FlowPanel
-				{
-					Parent = this,
-					Location = new Point(0, 40 + index * 25),
-					Width = base.Width,
-					OuterControlPadding = new Vector2(2f, 2f),
-					ControlPadding = new Vector2(5f, 2f),
-					HeightSizingMode = SizingMode.AutoSize
-				};
-				Invalidate();
 				_Update();
+			};
+			base.Resized += delegate
+			{
+			};
+			ContentRegion = new FlowPanel
+			{
+				Location = new Point(0, 0),
+				HeightSizingMode = SizingMode.AutoSize,
+				WidthSizingMode = SizingMode.AutoSize,
+				FlowDirection = ControlFlowDirection.SingleTopToBottom,
+				Parent = this
+			};
+			_Name = new IconLabel
+			{
+				Texture = Textures.Icons[22],
+				Parent = ContentRegion,
+				Text = c.Name,
+				Font = new ContentService().GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size20, ContentService.FontStyle.Regular),
+				Gap = 4
+			};
+			_Separator = new Separator
+			{
+				Parent = ContentRegion
+			};
+			_Race = new IconLabel
+			{
+				Texture = Textures.Races[(uint)c.Race],
+				Text = DataManager.getRaceName(c.Race.ToString()),
+				Parent = ContentRegion
+			};
+			_Level = new IconLabel
+			{
+				Texture = Textures.Icons[32],
+				Text = string.Format(common.Level, c.Level),
+				Parent = ContentRegion
+			};
+			_Map = new IconLabel
+			{
+				Texture = Textures.Icons[29],
+				Text = DataManager.getMapName(c.Map),
+				Parent = ContentRegion
+			};
+			DateTime zeroTime = new DateTime(1, 1, 1);
+			TimeSpan span = DateTime.UtcNow - c.Created.UtcDateTime;
+			_Created = new IconLabel
+			{
+				Texture = Textures.Icons[26],
+				Text = c.Created.ToString("G") + " (" + ((zeroTime + span).Year - 1) + " " + common.Years + ")",
+				Parent = ContentRegion
+			};
+			span = c.NextBirthday - DateTime.UtcNow;
+			_NextBirthday = new IconLabel
+			{
+				Texture = Textures.Icons[17],
+				Text = string.Format("{3} " + common.Days + " {0:00}:{1:00}:{2:00} " + common.UntilBirthday, span.Hours, span.Minutes, span.Seconds, span.Days),
+				Parent = ContentRegion
+			};
+			foreach (CharacterCrafting crafting in c.Crafting)
+			{
+				IconLabel ctrl = new IconLabel
+				{
+					Parent = ContentRegion,
+					Text = DataManager.getCraftingName(crafting.Id) + " (" + crafting.Rating + "/" + ((crafting.Id == 4 || crafting.Id == 7) ? 400 : 500) + ")",
+					Texture = (crafting.Active ? Textures.Crafting[crafting.Id] : Textures.CraftingDisabled[crafting.Id]),
+					_Crafting = crafting
+				};
+				ctrl.Label.TextColor = ((!crafting.Active) ? Color.LightGray : ctrl.Label.TextColor);
+				_CraftingProfessions.Add(ctrl);
 			}
+			TimeSpan t = TimeSpan.FromSeconds(c.seconds);
+			_LastLogin = new IconLabel
+			{
+				Texture = Textures.Icons[31],
+				Text = string.Format("{3} " + common.Days + " {0:00}:{1:00}:{2:00}", t.Hours, t.Minutes, t.Seconds, t.Days),
+				Parent = ContentRegion
+			};
+			Panel p = new Panel
+			{
+				WidthSizingMode = SizingMode.Fill,
+				Parent = ContentRegion
+			};
+			_switchInfoLabel = new Label
+			{
+				Text = "- " + string.Format(common.DoubleClickToSwap, assignedCharacter.Name) + " -",
+				Parent = p,
+				Font = ContentService.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size12, ContentService.FontStyle.Regular),
+				HorizontalAlignment = HorizontalAlignment.Center,
+				TextColor = Color.LightGray
+			};
+			p.Resized += delegate
+			{
+				_switchInfoLabel.Width = p.Width;
+				p.Height = _switchInfoLabel.Height + 5;
+			};
+			Tags = new FlowPanel
+			{
+				Parent = ContentRegion,
+				OuterControlPadding = new Vector2(2f, 2f),
+				ControlPadding = new Vector2(5f, 2f),
+				WidthSizingMode = SizingMode.Fill,
+				HeightSizingMode = SizingMode.AutoSize
+			};
+			Invalidate();
+			_Update();
 		}
 
 		public void _Update()
@@ -208,14 +164,21 @@ namespace Kenedia.Modules.Characters
 			ContentService contentService = new ContentService();
 			Character c = assignedCharacter;
 			TimeSpan t = TimeSpan.FromSeconds(c.seconds);
-			_ageLabel.Text = string.Format("{3} " + common.Days + " {0:00}:{1:00}:{2:00}", t.Hours, t.Minutes, t.Seconds, t.Days);
+			_LastLogin.Text = string.Format("{3} " + common.Days + " {0:00}:{1:00}:{2:00}", t.Hours, t.Minutes, t.Seconds, t.Days);
 			DateTime zeroTime = new DateTime(1, 1, 1);
 			TimeSpan span = DateTime.UtcNow - c.Created.UtcDateTime;
-			_createdLabel.Text = c.Created.ToString("G") + " (" + ((zeroTime + span).Year - 1) + " " + common.Years + ")";
+			_Created.Text = c.Created.ToString("G") + " (" + ((zeroTime + span).Year - 1) + " " + common.Years + ")";
 			span = c.NextBirthday - DateTime.UtcNow;
-			_nextBirthdayLabel.Text = string.Format("{3} " + common.Days + " {0:00}:{1:00}:{2:00} " + common.UntilBirthday, span.Hours, span.Minutes, span.Seconds, span.Days);
-			_levelLabel.Text = string.Format(common.Level, c.Level);
-			_mapLabel.Text = DataManager.getMapName(c.map);
+			_NextBirthday.Text = string.Format("{3} " + common.Days + " {0:00}:{1:00}:{2:00} " + common.UntilBirthday, span.Hours, span.Minutes, span.Seconds, span.Days);
+			_Level.Text = string.Format(common.Level, c.Level);
+			_Map.Text = DataManager.getMapName(c.Map);
+			if (assignedCharacter.Crafting.Count > 0)
+			{
+				foreach (IconLabel iconLabel in _CraftingProfessions)
+				{
+					iconLabel.Text = DataManager.getCraftingName(iconLabel._Crafting.Id) + " (" + iconLabel._Crafting.Rating + "/" + ((iconLabel._Crafting.Id == 4 || iconLabel._Crafting.Id == 7) ? 400 : 500) + ")";
+				}
+			}
 			if (c.Tags == null || (_Tags != null && _Tags.SequenceEqual(c.Tags)))
 			{
 				return;

@@ -52,13 +52,23 @@ namespace Kenedia.Modules.Characters.Strings
 
 		internal static string Birthday => ResourceManager.GetString("Birthday", resourceCulture);
 
+		internal static string Cancel => ResourceManager.GetString("Cancel", resourceCulture);
+
+		internal static string Capture => ResourceManager.GetString("Capture", resourceCulture);
+
+		internal static string CaptureAll => ResourceManager.GetString("CaptureAll", resourceCulture);
+
 		internal static string Characters => ResourceManager.GetString("Characters", resourceCulture);
 
 		internal static string Chef => ResourceManager.GetString("Chef", resourceCulture);
 
 		internal static string Clear => ResourceManager.GetString("Clear", resourceCulture);
 
+		internal static string Close => ResourceManager.GetString("Close", resourceCulture);
+
 		internal static string CraftingProfession => ResourceManager.GetString("CraftingProfession", resourceCulture);
+
+		internal static string CreateImages => ResourceManager.GetString("CreateImages", resourceCulture);
 
 		internal static string CustomTags => ResourceManager.GetString("CustomTags", resourceCulture);
 
@@ -68,9 +78,15 @@ namespace Kenedia.Modules.Characters.Strings
 
 		internal static string DoubleClickToEnter_DisplayName => ResourceManager.GetString("DoubleClickToEnter_DisplayName", resourceCulture);
 
+		internal static string DoubleClickToSwap => ResourceManager.GetString("DoubleClickToSwap", resourceCulture);
+
 		internal static string EnterOnSwap_Description => ResourceManager.GetString("EnterOnSwap_Description", resourceCulture);
 
 		internal static string EnterOnSwap_DisplayName => ResourceManager.GetString("EnterOnSwap_DisplayName", resourceCulture);
+
+		internal static string EnterToLogin_Description => ResourceManager.GetString("EnterToLogin_Description", resourceCulture);
+
+		internal static string EnterToLogin_DisplayName => ResourceManager.GetString("EnterToLogin_DisplayName", resourceCulture);
 
 		internal static string Error_Competivive => ResourceManager.GetString("Error_Competivive", resourceCulture);
 
@@ -110,9 +126,17 @@ namespace Kenedia.Modules.Characters.Strings
 
 		internal static string NoCraftingProfession => ResourceManager.GetString("NoCraftingProfession", resourceCulture);
 
+		internal static string OnlyMaxCrafting_Description => ResourceManager.GetString("OnlyMaxCrafting_Description", resourceCulture);
+
+		internal static string OnlyMaxCrafting_DisplayName => ResourceManager.GetString("OnlyMaxCrafting_DisplayName", resourceCulture);
+
 		internal static string Profession => ResourceManager.GetString("Profession", resourceCulture);
 
 		internal static string Race => ResourceManager.GetString("Race", resourceCulture);
+
+		internal static string RefreshImages => ResourceManager.GetString("RefreshImages", resourceCulture);
+
+		internal static string Save => ResourceManager.GetString("Save", resourceCulture);
 
 		internal static string Scribe => ResourceManager.GetString("Scribe", resourceCulture);
 
@@ -120,15 +144,23 @@ namespace Kenedia.Modules.Characters.Strings
 
 		internal static string SearchGuide => ResourceManager.GetString("SearchGuide", resourceCulture);
 
+		internal static string SelectImage => ResourceManager.GetString("SelectImage", resourceCulture);
+
 		internal static string ShortcutToggle_Description => ResourceManager.GetString("ShortcutToggle_Description", resourceCulture);
 
 		internal static string ShortcutToggle_DisplayName => ResourceManager.GetString("ShortcutToggle_DisplayName", resourceCulture);
+
+		internal static string ShowHide_Tooltip => ResourceManager.GetString("ShowHide_Tooltip", resourceCulture);
 
 		internal static string Specialization => ResourceManager.GetString("Specialization", resourceCulture);
 
 		internal static string SwapDelay_Description => ResourceManager.GetString("SwapDelay_Description", resourceCulture);
 
 		internal static string SwapDelay_DisplayName => ResourceManager.GetString("SwapDelay_DisplayName", resourceCulture);
+
+		internal static string SwapModifier_Description => ResourceManager.GetString("SwapModifier_Description", resourceCulture);
+
+		internal static string SwapModifier_DisplayName => ResourceManager.GetString("SwapModifier_DisplayName", resourceCulture);
 
 		internal static string Switch => ResourceManager.GetString("Switch", resourceCulture);
 
@@ -137,6 +169,8 @@ namespace Kenedia.Modules.Characters.Strings
 		internal static string ToggleAll => ResourceManager.GetString("ToggleAll", resourceCulture);
 
 		internal static string ToggleVisible => ResourceManager.GetString("ToggleVisible", resourceCulture);
+
+		internal static string UISizeDisclaimer => ResourceManager.GetString("UISizeDisclaimer", resourceCulture);
 
 		internal static string Unkown => ResourceManager.GetString("Unkown", resourceCulture);
 
@@ -147,6 +181,8 @@ namespace Kenedia.Modules.Characters.Strings
 		internal static string Updated => ResourceManager.GetString("Updated", resourceCulture);
 
 		internal static string Updating => ResourceManager.GetString("Updating", resourceCulture);
+
+		internal static string UseDefault => ResourceManager.GetString("UseDefault", resourceCulture);
 
 		internal static string Utility => ResourceManager.GetString("Utility", resourceCulture);
 

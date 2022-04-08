@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
@@ -27,6 +28,17 @@ namespace Kenedia.Modules.Characters
 	[Export(typeof(Blish_HUD.Modules.Module))]
 	public class Module : Blish_HUD.Modules.Module
 	{
+		public struct RECT
+		{
+			public int Left;
+
+			public int Top;
+
+			public int Right;
+
+			public int Bottom;
+		}
+
 		private static class Last
 		{
 			public static double Tick_PanelUpdate;
@@ -39,6 +51,8 @@ namespace Kenedia.Modules.Characters
 
 			public static double Tick_FadeEffect;
 
+			public static DateTime Tick_ImageSave;
+
 			public static Character character { get; set; }
 
 			public static string CharName { get; set; }
@@ -49,6 +63,40 @@ namespace Kenedia.Modules.Characters
 		private static class Current
 		{
 			public static Character character { get; set; }
+		}
+
+		private class Match
+		{
+			public List<ToggleIcon> toggleIcons = new List<ToggleIcon>();
+
+			public bool match;
+
+			public bool disabled
+			{
+				get
+				{
+					foreach (ToggleIcon toggleIcon in toggleIcons)
+					{
+						if (toggleIcon != null && toggleIcon._State == 1)
+						{
+							return false;
+						}
+					}
+					return true;
+				}
+			}
+
+			public bool isMatching
+			{
+				get
+				{
+					if (!disabled)
+					{
+						return match;
+					}
+					return true;
+				}
+			}
 		}
 
 		public localMapModel[] __Maps;
@@ -77,7 +125,13 @@ namespace Kenedia.Modules.Characters
 
 		public static string AccountPath;
 
+		public static string AccountImagesPath;
+
+		public static string GlobalImagesPath;
+
 		public static _Settings Settings = new _Settings();
+
+		public static RECT GameWindow_Rectangle;
 
 		public static FlowPanel CharacterPanel;
 
@@ -111,6 +165,8 @@ namespace Kenedia.Modules.Characters
 
 		public static FlowPanel filterTagsPanel;
 
+		public static BasicContainer captureBox;
+
 		public static bool charactersLoaded;
 
 		public static bool saveCharacters;
@@ -118,6 +174,8 @@ namespace Kenedia.Modules.Characters
 		public static bool loginCharacter_Swapped;
 
 		public static bool showAllCharacters;
+
+		public static bool screenCapture;
 
 		public static Character loginCharacter;
 
@@ -168,6 +226,10 @@ namespace Kenedia.Modules.Characters
 		public static FilterWindow filterWindow { get; private set; }
 
 		public static CharacterDetailWindow subWindow { get; private set; }
+
+		public static ImageSelector ImageSelectorWindow { get; private set; }
+
+		public static ScreenCaptureWindow screenCaptureWindow { get; private set; }
 
 		public static AccountInfo userAccount { get; set; }
 
@@ -401,7 +463,23 @@ namespace Kenedia.Modules.Characters
 			Settings.AutoLogin = settings.DefineSetting("AutoLogin", defaultValue: false, () => common.AutoLogin_DisplayName, () => common.AutoLogin_Description);
 			Settings.EnterOnSwap = settings.DefineSetting("EnterOnSwap", defaultValue: false, () => common.EnterOnSwap_DisplayName, () => common.EnterOnSwap_Description);
 			Settings.DoubleClickToEnter = settings.DefineSetting("DoubleClickToEnter", defaultValue: false, () => common.DoubleClickToEnter_DisplayName, () => common.DoubleClickToEnter_Description);
+			Settings.EnterToLogin = settings.DefineSetting("EnterToLogin", defaultValue: false, () => common.EnterToLogin_DisplayName, () => common.EnterToLogin_Description);
 			Settings.FadeSubWindows = settings.DefineSetting("FadeSubWindows", defaultValue: false, () => common.FadeOut_DisplayName, () => common.FadeOut_Description);
+			Settings.OnlyMaxCrafting = settings.DefineSetting("OnlyMaxCrafting", defaultValue: true, () => common.OnlyMaxCrafting_DisplayName, () => common.OnlyMaxCrafting_Description);
+			Settings.OnlyMaxCrafting.SettingChanged += delegate
+			{
+				foreach (Character current in Characters)
+				{
+					if (current.loaded && current.Crafting.Count > 0)
+					{
+						foreach (DataImage current2 in current.characterControl.crafting_Images)
+						{
+							current2.Visible = !Settings.OnlyMaxCrafting.Value || (current2.Crafting.Id == 4 && current2.Crafting.Rating == 400) || current2.Crafting.Rating == 500;
+						}
+						current.characterControl.crafting_Panel.Invalidate();
+					}
+				}
+			};
 			Settings.FocusFilter = settings.DefineSetting("FocusFilter", defaultValue: false, () => common.FocusFilter_DisplayName, () => common.FocusFilter_Description);
 			Settings.FilterDelay = settings.DefineSetting("FilterDelay", 150, () => string.Format(common.FilterDelay_DisplayName, Settings.FilterDelay.Value), () => common.FilterDelay_Description);
 			Settings.FilterDelay.SetRange(0, 500);
@@ -414,6 +492,7 @@ namespace Kenedia.Modules.Characters
 			Settings.SwapDelay.SetRange(0, 5000);
 			Settings.LogoutKey = settings.DefineSetting("LogoutKey", new KeyBinding(Keys.F12), () => common.Logout, () => common.LogoutDescription);
 			Settings.ShortcutKey = settings.DefineSetting("ShortcutKey", new KeyBinding(ModifierKeys.Shift, Keys.C), () => common.ShortcutToggle_DisplayName, () => common.ShortcutToggle_Description);
+			Settings.SwapModifier = settings.DefineSetting("SwapModifier", new KeyBinding(Keys.None), () => common.SwapModifier_DisplayName, () => common.SwapModifier_Description);
 		}
 
 		public async void FetchAPI(bool force = false)
@@ -512,6 +591,7 @@ namespace Kenedia.Modules.Characters
 					}
 					CharactersPath = path + "\\characters.json";
 					AccountPath = path + "\\account.json";
+					AccountImagesPath = path + "\\images\\";
 					if (userAccount == null)
 					{
 						userAccount = new AccountInfo
@@ -617,6 +697,18 @@ namespace Kenedia.Modules.Characters
 			ModuleInstance = this;
 		}
 
+		[DllImport("user32.dll", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool GetWindowRect(IntPtr hWnd, ref RECT lpRect);
+
+		[DllImport("user32.dll", SetLastError = true)]
+		public static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int Width, int Height, bool Repaint);
+
+		public static void ResetGameWindow()
+		{
+			MoveWindow(GameService.GameIntegration.Gw2Instance.Gw2WindowHandle, GameWindow_Rectangle.Left, GameWindow_Rectangle.Top, GameWindow_Rectangle.Right - GameWindow_Rectangle.Left, GameWindow_Rectangle.Bottom - GameWindow_Rectangle.Top, Repaint: false);
+		}
+
 		protected override void Initialize()
 		{
 			Logger.Debug("Initializing ...");
@@ -627,10 +719,39 @@ namespace Kenedia.Modules.Characters
 			LoadTextures();
 			Gw2ApiManager.SubtokenUpdated += Gw2ApiManager_SubtokenUpdated;
 			AccountPath = DirectoriesManager.GetFullDirectoryPath("characters") + "\\accounts.json";
+			GlobalImagesPath = DirectoriesManager.GetFullDirectoryPath("characters") + "\\images\\";
+			LoadCustomImages();
 			DataManager.ContentsManager = ContentsManager;
 			DataManager.Load();
 			Settings.ShortcutKey.Value.Enabled = true;
 			Settings.ShortcutKey.Value.Activated += OnKeyPressed_ToggleMenu;
+			Settings.SwapModifier.Value.Enabled = true;
+			Settings.SwapModifier.Value.Activated += OnKeyPressed_LogoutMod;
+			RECT pos = default(RECT);
+			GetWindowRect(GameService.GameIntegration.Gw2Instance.Gw2WindowHandle, ref pos);
+			GameWindow_Rectangle = pos;
+		}
+
+		private void LoadCustomImages()
+		{
+			List<string> global_images = Directory.GetFiles(GlobalImagesPath, "*.png", SearchOption.AllDirectories).ToList();
+			Textures.CustomImages = new Texture2D[global_images.Count + 100];
+			Textures.CustomImageNames = new List<string>();
+			GameService.Graphics.QueueMainThreadRender(delegate(GraphicsDevice graphicsDevice)
+			{
+				Logger.Debug("Loading all custom Images ... ");
+				string fullDirectoryPath = DirectoriesManager.GetFullDirectoryPath("characters");
+				int num = 0;
+				foreach (string current in global_images)
+				{
+					Textures.CustomImages[num] = TextureUtil.FromStreamPremultiplied(graphicsDevice, new FileStream(current, FileMode.Open));
+					Textures.CustomImages[num].Name = current.Replace(fullDirectoryPath, "");
+					Textures.CustomImageNames.Add(Textures.CustomImages[num].Name);
+					num++;
+				}
+				Textures.Loaded = true;
+				ImageSelectorWindow.LoadImages();
+			});
 		}
 
 		private void LoadTextures()
@@ -669,6 +790,7 @@ namespace Kenedia.Modules.Characters
 			}
 			Textures.Professions = new Texture2D[Enum.GetValues(typeof(Professions)).Cast<int>().Max() + 1];
 			Textures.ProfessionsDisabled = new Texture2D[Enum.GetValues(typeof(Professions)).Cast<int>().Max() + 1];
+			Textures.ProfessionsWhite = new Texture2D[Enum.GetValues(typeof(Professions)).Cast<int>().Max() + 1];
 			foreach (Professions profession in Enum.GetValues(typeof(Professions)))
 			{
 				Texture2D[] professions = Textures.Professions;
@@ -679,43 +801,57 @@ namespace Kenedia.Modules.Characters
 				ContentsManager contentsManager5 = ContentsManager;
 				num = (int)profession;
 				professionsDisabled[(int)profession] = contentsManager5.GetTexture("textures\\professions gray\\" + num + ".png");
+				Texture2D[] professionsWhite = Textures.ProfessionsWhite;
+				ContentsManager contentsManager6 = ContentsManager;
+				num = (int)profession;
+				professionsWhite[(int)profession] = contentsManager6.GetTexture("textures\\professions white\\" + num + ".png");
 			}
 			Textures.Specializations = new Texture2D[Enum.GetValues(typeof(Specializations)).Cast<int>().Max() + 1];
 			Textures.SpecializationsDisabled = new Texture2D[Enum.GetValues(typeof(Specializations)).Cast<int>().Max() + 1];
+			Textures.SpecializationsWhite = new Texture2D[Enum.GetValues(typeof(Specializations)).Cast<int>().Max() + 1];
 			foreach (Specializations specialization in Enum.GetValues(typeof(Specializations)))
 			{
 				Texture2D[] specializations = Textures.Specializations;
-				ContentsManager contentsManager6 = ContentsManager;
-				int num = (int)specialization;
-				specializations[(int)specialization] = contentsManager6.GetTexture("textures\\specializations\\" + num + ".png");
-				Texture2D[] specializationsDisabled = Textures.SpecializationsDisabled;
 				ContentsManager contentsManager7 = ContentsManager;
+				int num = (int)specialization;
+				specializations[(int)specialization] = contentsManager7.GetTexture("textures\\specializations\\" + num + ".png");
+				Texture2D[] specializationsDisabled = Textures.SpecializationsDisabled;
+				ContentsManager contentsManager8 = ContentsManager;
 				num = (int)specialization;
-				specializationsDisabled[(int)specialization] = contentsManager7.GetTexture("textures\\specializations gray\\" + num + ".png");
+				specializationsDisabled[(int)specialization] = contentsManager8.GetTexture("textures\\specializations gray\\" + num + ".png");
+				Texture2D[] specializationsWhite = Textures.SpecializationsWhite;
+				ContentsManager contentsManager9 = ContentsManager;
+				num = (int)specialization;
+				specializationsWhite[(int)specialization] = contentsManager9.GetTexture("textures\\specializations white\\" + num + ".png");
 			}
 			Textures.Crafting = new Texture2D[Enum.GetValues(typeof(Crafting)).Cast<int>().Max() + 1];
 			Textures.CraftingDisabled = new Texture2D[Enum.GetValues(typeof(Crafting)).Cast<int>().Max() + 1];
 			foreach (Crafting crafting in Enum.GetValues(typeof(Crafting)))
 			{
 				Texture2D[] crafting2 = Textures.Crafting;
-				ContentsManager contentsManager8 = ContentsManager;
+				ContentsManager contentsManager10 = ContentsManager;
 				int num = (int)crafting;
-				crafting2[(int)crafting] = contentsManager8.GetTexture("textures\\crafting\\" + num + ".png");
+				crafting2[(int)crafting] = contentsManager10.GetTexture("textures\\crafting\\" + num + ".png");
 				Texture2D[] craftingDisabled = Textures.CraftingDisabled;
-				ContentsManager contentsManager9 = ContentsManager;
+				ContentsManager contentsManager11 = ContentsManager;
 				num = (int)crafting;
-				craftingDisabled[(int)crafting] = contentsManager9.GetTexture("textures\\crafting gray\\" + num + ".png");
+				craftingDisabled[(int)crafting] = contentsManager11.GetTexture("textures\\crafting gray\\" + num + ".png");
 			}
 		}
 
 		private void Load_UserLocale()
 		{
+			ImageSelectorWindow.UpdateLanguage();
+			if (screenCaptureWindow != null)
+			{
+				screenCaptureWindow.UpdateLanguage();
+			}
 			foreach (Character c in Characters)
 			{
 				CharacterTooltip obj = (CharacterTooltip)c.characterControl.Tooltip;
-				obj._mapLabel.Text = DataManager.getMapName(c.map);
-				obj._raceLabel.Text = DataManager.getRaceName(c.Race.ToString());
-				c.switchButton.BasicTooltipText = string.Format(common.Switch, c.Name);
+				obj._Map.Text = DataManager.getMapName(c.Map);
+				obj._Race.Text = DataManager.getRaceName(c.Race.ToString());
+				obj._switchInfoLabel.Text = string.Format(common.DoubleClickToSwap, c.Name);
 			}
 			filterTextBox.PlaceholderText = common.SearchFor;
 			filterTextBox.BasicTooltipText = common.SearchGuide;
@@ -778,57 +914,76 @@ namespace Kenedia.Modules.Characters
 		{
 			try
 			{
-				Logger.Debug("Character File exists: " + System.IO.File.Exists(CharactersPath));
 				if (System.IO.File.Exists(CharactersPath))
 				{
 					requestAPI = false;
-					foreach (JsonCharacter c in JsonConvert.DeserializeObject<List<JsonCharacter>>(System.IO.File.ReadAllText(CharactersPath))!)
+					List<JsonCharacter> characters = JsonConvert.DeserializeObject<List<JsonCharacter>>(System.IO.File.ReadAllText(CharactersPath));
+					if (characters != null)
 					{
-						Character character2 = new Character();
-						character2.contentsManager = ContentsManager;
-						character2.apiManager = Gw2ApiManager;
-						character2.Race = c.Race;
-						character2.Name = c.Name;
-						character2.lastLogin = c.lastLogin;
-						character2._Profession = c.Profession;
-						character2._Specialization = c.Specialization;
-						character2.Crafting = c.Crafting;
-						character2.apiIndex = c.apiIndex;
-						character2.Created = c.Created;
-						character2.LastModified = c.LastModified;
-						character2.map = c.map;
-						character2.Level = c.Level;
-						character2.Tags = ((c.Tags != null && c.Tags != "") ? c.Tags.Split('|').ToList() : new List<string>());
-						character2.loginCharacter = c.loginCharacter;
-						character2.include = c.include;
-						Character character = character2;
-						foreach (string tag2 in character.Tags)
+						foreach (JsonCharacter c in characters)
 						{
-							if (!Tags.Contains(tag2))
+							Character character2 = new Character();
+							character2.contentsManager = ContentsManager;
+							character2.apiManager = Gw2ApiManager;
+							character2.Race = c.Race;
+							character2.Name = c.Name;
+							character2.lastLogin = c.lastLogin;
+							character2._Profession = c.Profession;
+							character2._Specialization = c.Specialization;
+							character2.Crafting = c.Crafting;
+							character2.apiIndex = c.apiIndex;
+							character2.Created = c.Created;
+							character2.LastModified = c.LastModified;
+							character2.Map = c.Map;
+							character2.Level = c.Level;
+							character2.Tags = ((c.Tags != null && c.Tags != "") ? c.Tags.Split('|').ToList() : new List<string>());
+							character2.loginCharacter = c.loginCharacter;
+							character2.include = c.include;
+							character2.Icon = c.Icon;
+							Character character = character2;
+							if (CharacterNames.Contains(character.Name))
 							{
-								Tags.Add(tag2);
+								continue;
+							}
+							foreach (string tag in character.Tags)
+							{
+								if (!Tags.Contains(tag))
+								{
+									Tags.Add(tag);
+								}
+							}
+							Characters.Add(character);
+							CharacterNames.Add(character.Name);
+							if (c.loginCharacter)
+							{
+								loginCharacter = character;
 							}
 						}
-						Characters.Add(character);
-						CharacterNames.Add(character.Name);
-						if (c.loginCharacter)
+						foreach (string txt in Tags)
 						{
-							loginCharacter = character;
+							TagEntry entry = new TagEntry(txt, new Character(), filterTagsPanel, showButton: false, contentService.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size14, ContentService.FontStyle.Regular));
+							entry.Click += delegate
+							{
+								if (filterTextBox.Text.ToLower().Contains(txt.ToLower()))
+								{
+									_ = filterTextBox.Text;
+									txt.Replace("; -t " + txt + ";", "");
+									txt.Replace("; -t " + txt, "");
+									txt.Replace("-t " + txt + ";", "");
+									txt.Replace("-t " + txt, "");
+									filterTextBox.Text = txt.Trim();
+								}
+								else
+								{
+									filterTextBox.Text += (((filterTextBox.Text.Trim().EndsWith(";") || filterTextBox.Text.Trim() == "") ? " " : "; ") + "-t " + txt).Trim();
+								}
+							};
+							TagEntries.Add(entry);
 						}
-					}
-					new Character();
-					foreach (string tag in Tags)
-					{
-						TagEntry entry = new TagEntry(tag, new Character(), filterTagsPanel, showButton: false, contentService.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size14, ContentService.FontStyle.Regular));
-						entry.Click += delegate
-						{
-							TextBox textBox = filterTextBox;
-							textBox.Text = textBox.Text + ((filterTextBox.Text.Trim().EndsWith(";") || filterTextBox.Text.Trim() == "") ? " " : "; ") + "-t " + tag;
-						};
-						TagEntries.Add(entry);
+						return true;
 					}
 				}
-				return true;
+				return false;
 			}
 			catch (Exception ex)
 			{
@@ -857,11 +1012,12 @@ namespace Kenedia.Modules.Characters
 					apiIndex = c.apiIndex,
 					Created = c.Created,
 					LastModified = c.LastModified,
-					map = c.map,
+					Map = c.Map,
 					Level = c.Level,
 					Tags = string.Join("|", c.Tags),
 					loginCharacter = c.loginCharacter,
-					include = c.include
+					include = c.include,
+					Icon = c.Icon
 				};
 				_data.Add(jsonCharacter);
 			}
@@ -1022,7 +1178,7 @@ namespace Kenedia.Modules.Characters
 				foreach (string item in birthdayFilters)
 				{
 					_ = item;
-					if (c.birthdayImage.Visible)
+					if (c.characterControl.birthday_Image.Visible)
 					{
 						return true;
 					}
@@ -1037,7 +1193,7 @@ namespace Kenedia.Modules.Characters
 				}
 				foreach (string s8 in mapFilters)
 				{
-					string map = DataManager.getMapName(c.map);
+					string map = DataManager.getMapName(c.Map);
 					if (map != null && map.ToLower().Contains(s8))
 					{
 						return true;
@@ -1054,53 +1210,69 @@ namespace Kenedia.Modules.Characters
 			}
 			static bool matchingToggles(Character c)
 			{
-				bool professionMatch = false;
-				bool craftingMatch = false;
-				bool birthdayMatch = false;
-				bool raceMatch = false;
-				bool specMatch = false;
+				Match professionMatch = new Match
+				{
+					toggleIcons = filterProfessions
+				};
+				Match craftingMatch = new Match
+				{
+					toggleIcons = filterCrafting
+				};
+				Match raceMatch = new Match
+				{
+					toggleIcons = filterRaces
+				};
+				Match specMatch = new Match
+				{
+					toggleIcons = filterSpecs
+				};
+				specMatch.toggleIcons.AddRange(filterBaseSpecs);
+				Match birthdayMatch = new Match
+				{
+					toggleIcons = { filterWindow.birthdayToggle }
+				};
 				foreach (ToggleIcon toggle5 in filterProfessions)
 				{
-					if (toggle5 != null && toggle5._State == 1 && toggle5.Id == c._Profession)
+					if (toggle5 != null && toggle5._State == 1 && toggle5 != null && toggle5._State == 1 && toggle5.Id == c._Profession)
 					{
-						professionMatch = true;
+						professionMatch.match = true;
 					}
 				}
 				foreach (ToggleIcon toggle4 in filterSpecs)
 				{
 					if (toggle4 != null && toggle4._State == 1 && toggle4.Id == c._Specialization)
 					{
-						specMatch = true;
+						specMatch.match = true;
 					}
 				}
 				foreach (ToggleIcon toggle3 in filterBaseSpecs)
 				{
 					if (toggle3 != null && toggle3._State == 1 && c._Specialization == 0 && toggle3.Id == c._Profession)
 					{
-						specMatch = true;
+						specMatch.match = true;
 					}
 				}
 				foreach (ToggleIcon toggle2 in filterRaces)
 				{
 					if (toggle2 != null && toggle2._State == 1 && toggle2.Id == (int)c.Race)
 					{
-						raceMatch = true;
+						raceMatch.match = true;
 					}
 				}
 				foreach (ToggleIcon toggle in filterCrafting)
 				{
 					if (toggle != null && toggle._State == 1 && toggle.Id == 0 && c.Crafting.Count == 0)
 					{
-						craftingMatch = true;
+						craftingMatch.match = true;
 						break;
 					}
 					if (toggle != null && toggle._State == 1)
 					{
 						foreach (CharacterCrafting crafting in c.Crafting)
 						{
-							if (crafting.Active && toggle.Id == crafting.Id)
+							if (crafting.Active && toggle.Id == crafting.Id && (!Settings.OnlyMaxCrafting.Value || crafting.Rating == 500 || ((crafting.Id == 4 || crafting.Id == 7) && crafting.Rating == 400)))
 							{
-								craftingMatch = true;
+								craftingMatch.match = true;
 							}
 						}
 					}
@@ -1108,16 +1280,20 @@ namespace Kenedia.Modules.Characters
 				switch (filterWindow.birthdayToggle._State)
 				{
 				case 0:
-					birthdayMatch = true;
+					birthdayMatch.match = true;
 					break;
 				case 1:
-					birthdayMatch = c.birthdayImage.Visible;
+					birthdayMatch.match = c.characterControl.birthday_Image.Visible;
 					break;
 				case 2:
-					birthdayMatch = !c.birthdayImage.Visible;
+					birthdayMatch.match = !c.characterControl.birthday_Image.Visible;
 					break;
 				}
-				return craftingMatch && professionMatch && birthdayMatch && raceMatch && specMatch;
+				if (craftingMatch.isMatching && professionMatch.isMatching && birthdayMatch.isMatching && raceMatch.isMatching)
+				{
+					return specMatch.isMatching;
+				}
+				return false;
 			}
 		}
 
@@ -1145,6 +1321,20 @@ namespace Kenedia.Modules.Characters
 			CreateWindow();
 			CreateFilterWindow();
 			CreateSubWindow();
+			CreateImageSelector();
+			Settings.SwapModifier.Value.Activated += delegate
+			{
+				ImageSelectorWindow.Dispose();
+				CreateImageSelector();
+			};
+			GameService.Graphics.SpriteScreen.Resized += delegate
+			{
+				if (GameService.Graphics.Resolution.X == 1084 && GameService.Graphics.Resolution.Y == 761)
+				{
+					screenCaptureWindow.Dispose();
+					CreateScreenCapture();
+				}
+			};
 			PlayerCharacter player = GameService.Gw2Mumble.PlayerCharacter;
 			player.SpecializationChanged += delegate
 			{
@@ -1165,6 +1355,23 @@ namespace Kenedia.Modules.Characters
 			}
 		}
 
+		private void ResetFilters()
+		{
+			foreach (List<ToggleIcon> item in new List<List<ToggleIcon>> { filterCrafting, filterProfessions, filterSpecs, filterRaces, filterBaseSpecs })
+			{
+				foreach (ToggleIcon toggle in item)
+				{
+					if (toggle != null)
+					{
+						toggle._State = 0;
+					}
+				}
+			}
+			filterWindow.birthdayToggle._State = 0;
+			filterTextBox.Text = null;
+			filterCharacterPanel = true;
+		}
+
 		private void CreateWindow()
 		{
 			MainWidow = new StandardWindow(Textures.Backgrounds[1], new Microsoft.Xna.Framework.Rectangle(15, 45, 365, 920), new Microsoft.Xna.Framework.Rectangle(10, 15, 385, 920))
@@ -1180,11 +1387,13 @@ namespace Kenedia.Modules.Characters
 			{
 				subWindow.Hide();
 				filterWindow.Hide();
+				ImageSelectorWindow.Hide();
 			};
 			MainWidow.Shown += delegate
 			{
 				subWindow.Hide();
 				filterWindow.Hide();
+				ImageSelectorWindow.Hide();
 				if (Settings.FocusFilter.Value)
 				{
 					Control.ActiveControl = filterTextBox;
@@ -1224,6 +1433,20 @@ namespace Kenedia.Modules.Characters
 			{
 				filterCharacterPanel = true;
 			};
+			filterTextBox.EnterPressed += delegate
+			{
+				if (Settings.EnterToLogin.Value)
+				{
+					foreach (CharacterControl characterControl in CharacterPanel.Children)
+					{
+						if (characterControl.Visible)
+						{
+							characterControl.assignedCharacter.Swap();
+							break;
+						}
+					}
+				}
+			};
 			filterTextBox.Click += delegate
 			{
 				if (filterWindow.Visible)
@@ -1245,7 +1468,7 @@ namespace Kenedia.Modules.Characters
 			};
 			clearButton.Click += delegate
 			{
-				reset();
+				ResetFilters();
 			};
 			CharacterPanel = new FlowPanel
 			{
@@ -1257,22 +1480,6 @@ namespace Kenedia.Modules.Characters
 				Location = new Point(0, clearButton.Location.Y + clearButton.Height + 5),
 				FlowDirection = ControlFlowDirection.SingleTopToBottom
 			};
-			static void reset()
-			{
-				foreach (List<ToggleIcon> item in new List<List<ToggleIcon>> { filterCrafting, filterProfessions, filterSpecs, filterRaces, filterBaseSpecs })
-				{
-					foreach (ToggleIcon toggle in item)
-					{
-						if (toggle != null)
-						{
-							toggle._State = 1;
-						}
-					}
-				}
-				filterWindow.birthdayToggle._State = 0;
-				filterTextBox.Text = null;
-				filterCharacterPanel = true;
-			}
 		}
 
 		private void CreateFilterWindow()
@@ -1399,10 +1606,10 @@ namespace Kenedia.Modules.Characters
 						Textures.RacesDisabled[(uint)index5],
 						Textures.Races[(uint)index5]
 					},
-					_State = 1,
+					_State = 0,
 					_MaxState = 2,
 					Size = new Point(24, 24),
-					Texture = Textures.Races[(uint)index5],
+					Texture = Textures.RacesDisabled[(uint)index5],
 					Parent = region,
 					Id = (int)index5
 				});
@@ -1433,7 +1640,7 @@ namespace Kenedia.Modules.Characters
 						Textures.CraftingDisabled[(int)index4],
 						Textures.Crafting[(int)index4]
 					},
-					_State = 1,
+					_State = 0,
 					_MaxState = 2,
 					Parent = region,
 					Id = (int)index4
@@ -1457,7 +1664,7 @@ namespace Kenedia.Modules.Characters
 						Textures.ProfessionsDisabled[(int)index3],
 						Textures.Professions[(int)index3]
 					},
-					_State = 1,
+					_State = 0,
 					_MaxState = 2,
 					Parent = region,
 					Id = (int)index3
@@ -1481,7 +1688,7 @@ namespace Kenedia.Modules.Characters
 						Textures.ProfessionsDisabled[(int)index2],
 						Textures.Professions[(int)index2]
 					},
-					_State = 1,
+					_State = 0,
 					_MaxState = 2,
 					Parent = region,
 					Id = (int)index2
@@ -1499,7 +1706,7 @@ namespace Kenedia.Modules.Characters
 						Textures.SpecializationsDisabled[index],
 						Textures.Specializations[index]
 					},
-					_State = 1,
+					_State = 0,
 					_MaxState = 2,
 					Parent = region,
 					Id = index
@@ -1548,7 +1755,7 @@ namespace Kenedia.Modules.Characters
 		private void CreateSubWindow()
 		{
 			ContentService contentService = new ContentService();
-			int offset = 169;
+			int offset = 105;
 			subWindow = new CharacterDetailWindow
 			{
 				Location = new Point(MainWidow.Location.X + 385 - 25, MainWidow.Location.Y + offset),
@@ -1565,12 +1772,44 @@ namespace Kenedia.Modules.Characters
 			{
 				subWindow.Location = new Point(MainWidow.Location.X + 385 - 25, MainWidow.Location.Y + offset);
 			};
+			subWindow.border_TopRight = new Image
+			{
+				Parent = subWindow,
+				Location = new Point(0, 0),
+				Size = new Point(58, 58),
+				Texture = Textures.Backgrounds[7],
+				Visible = false
+			};
+			subWindow.border_BottomLeft = new Image
+			{
+				Parent = subWindow,
+				Location = new Point(0, 0),
+				Size = new Point(58, 58),
+				Texture = Textures.Backgrounds[6],
+				Visible = false
+			};
 			subWindow.spec_Image = new Image
 			{
 				Location = new Point(0, 0),
 				Texture = Textures.Professions[1],
 				Size = new Point(58, 58),
 				Parent = subWindow
+			};
+			subWindow.spec_Image.MouseEntered += delegate
+			{
+				if (!GameService.GameIntegration.Gw2Instance.IsInGame)
+				{
+					subWindow.spec_Image.Texture = Textures.Icons[45];
+				}
+			};
+			subWindow.spec_Image.MouseLeft += delegate
+			{
+				subWindow.spec_Image.Texture = subWindow.assignedCharacter.getProfessionTexture();
+			};
+			subWindow.spec_Image.Click += delegate
+			{
+				ImageSelectorWindow.assignedCharacter = subWindow.assignedCharacter;
+				ImageSelectorWindow.Visible = true;
 			};
 			subWindow.name_Label = new Label
 			{
@@ -1587,7 +1826,8 @@ namespace Kenedia.Modules.Characters
 				Location = new Point(subWindow.name_Label.Location.X + subWindow.name_Label.Width + 5, 0),
 				Texture = Textures.Icons[42],
 				Size = new Point(32, 32),
-				Parent = subWindow
+				Parent = subWindow,
+				BasicTooltipText = string.Format(common.ShowHide_Tooltip, "Name")
 			};
 			subWindow.include_Image.Click += delegate
 			{
@@ -1702,8 +1942,19 @@ namespace Kenedia.Modules.Characters
 						TagEntry entry = new TagEntry(txt, new Character(), filterTagsPanel, showButton: false, contentService.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size14, ContentService.FontStyle.Regular));
 						entry.Click += delegate
 						{
-							TextBox textBox = filterTextBox;
-							textBox.Text = textBox.Text + ((filterTextBox.Text.Trim().EndsWith(";") || filterTextBox.Text.Trim() == "") ? " " : "; ") + "-t " + txt;
+							if (filterTextBox.Text.ToLower().Contains(txt.ToLower()))
+							{
+								_ = filterTextBox.Text;
+								txt.Replace("; -t " + txt + ";", "");
+								txt.Replace("; -t " + txt, "");
+								txt.Replace("-t " + txt + ";", "");
+								txt.Replace("-t " + txt, "");
+								filterTextBox.Text = txt.Trim();
+							}
+							else
+							{
+								filterTextBox.Text += (((filterTextBox.Text.Trim().EndsWith(";") || filterTextBox.Text.Trim() == "") ? " " : "; ") + "-t " + txt).Trim();
+							}
 						};
 						TagEntries.Add(entry);
 					}
@@ -1712,6 +1963,45 @@ namespace Kenedia.Modules.Characters
 					subWindow.Invalidate();
 				}
 			}
+		}
+
+		private void CreateScreenCapture()
+		{
+			Point resolution = GameService.Graphics.Resolution;
+			int sidePadding = 255;
+			int bottomPadding = 100;
+			int topMenuHeight = 60;
+			screenCaptureWindow = new ScreenCaptureWindow(new Point(resolution.X - (sidePadding - 90), topMenuHeight))
+			{
+				showBackground = false,
+				FrameColor = Microsoft.Xna.Framework.Color.Transparent,
+				Parent = GameService.Graphics.SpriteScreen,
+				Location = new Point(sidePadding, resolution.Y - bottomPadding - topMenuHeight),
+				Visible = screenCapture,
+				LoadCustomImages = LoadCustomImages
+			};
+		}
+
+		private void CreateImageSelector()
+		{
+			int offset = 105;
+			ImageSelectorWindow = new ImageSelector(987, MainWidow.Height - offset - 10)
+			{
+				Location = new Point(MainWidow.Location.X + 385 - 25, MainWidow.Location.Y + offset),
+				Parent = GameService.Graphics.SpriteScreen,
+				Texture = Textures.Backgrounds[16],
+				FrameColor = Microsoft.Xna.Framework.Color.AliceBlue,
+				Visible = false
+			};
+			MainWidow.Moved += delegate
+			{
+				ImageSelectorWindow.Location = new Point(MainWidow.Location.X + 385 - 25, MainWidow.Location.Y + offset);
+			};
+		}
+
+		private void OnKeyPressed_LogoutMod(object o, EventArgs e)
+		{
+			Settings.SwapModifierPressed = DateTime.Now;
 		}
 
 		private void OnKeyPressed_ToggleMenu(object o, EventArgs e)
@@ -1733,6 +2023,10 @@ namespace Kenedia.Modules.Characters
 			{
 				Last.Tick_Update = -250.0;
 				Update_CurrentCharacter();
+				if (screenCaptureWindow == null)
+				{
+					CreateScreenCapture();
+				}
 				foreach (Character character in Characters)
 				{
 					if (character.characterControl != null && character.characterControl.Visible)
@@ -1760,6 +2054,14 @@ namespace Kenedia.Modules.Characters
 					if (filterWindow.Opacity <= 0f)
 					{
 						filterWindow.Hide();
+					}
+				}
+				if (subWindow.Visible && DateTime.Now.Subtract(subWindow.lastInput).TotalMilliseconds >= 3500.0)
+				{
+					subWindow.Opacity -= 0.1f;
+					if (subWindow.Opacity <= 0f)
+					{
+						subWindow.Hide();
 					}
 				}
 			}
@@ -1791,6 +2093,7 @@ namespace Kenedia.Modules.Characters
 			subWindow?.Dispose();
 			filterWindow?.Dispose();
 			cornerButton?.Dispose();
+			screenCaptureWindow?.Dispose();
 			Settings.ShortcutKey.Value.Activated -= OnKeyPressed_ToggleMenu;
 			Gw2ApiManager.SubtokenUpdated -= Gw2ApiManager_SubtokenUpdated;
 			CharacterNames = new List<string>();
@@ -1809,10 +2112,12 @@ namespace Kenedia.Modules.Characters
 			Textures.Icons = null;
 			Textures.Professions = null;
 			Textures.ProfessionsDisabled = null;
+			Textures.ProfessionsWhite = null;
 			Textures.Races = null;
 			Textures.RacesDisabled = null;
 			Textures.Specializations = null;
 			Textures.SpecializationsDisabled = null;
+			Textures.SpecializationsWhite = null;
 			ModuleInstance = null;
 		}
 	}

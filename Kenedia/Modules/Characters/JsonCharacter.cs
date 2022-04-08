@@ -14,7 +14,7 @@ namespace Kenedia.Modules.Characters
 
 		public List<CharacterCrafting> Crafting;
 
-		public int map;
+		public int Map;
 
 		public string Tags;
 
@@ -23,6 +23,8 @@ namespace Kenedia.Modules.Characters
 		public bool include = true;
 
 		public string Name { get; set; }
+
+		public string Icon { get; set; }
 
 		public RaceType Race { get; set; }
 

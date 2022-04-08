@@ -45,6 +45,7 @@ namespace Kenedia.Modules.Characters
 		AddHovered,
 		Visible,
 		Hide,
-		CloseDisabled
+		CloseDisabled,
+		CogBig
 	}
 }
