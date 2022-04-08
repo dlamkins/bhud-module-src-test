@@ -24,6 +24,8 @@ namespace BhModule.Community.Pathing.Entity
 
 		bool DebugRender { get; }
 
+		int? EditTag { get; }
+
 		float AnimatedFadeOpacity { get; }
 
 		RectangleF? RenderToMiniMap(SpriteBatch spriteBatch, Rectangle bounds, (double X, double Y) offsets, double scale, float opacity);

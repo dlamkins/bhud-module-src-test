@@ -38,7 +38,7 @@ namespace BhModule.Community.Pathing.Content
 			HashSet<string> entrySet = new HashSet<string>();
 			try
 			{
-				string[] array = await entriesUrl.GetJsonAsync<string[]>(default(CancellationToken), (HttpCompletionOption)0);
+				string[] array = await GeneratedExtensions.GetJsonAsync<string[]>(entriesUrl, default(CancellationToken), (HttpCompletionOption)0);
 				foreach (string entry in array)
 				{
 					entrySet.Add(entry.Replace('\\', '/'));
@@ -102,7 +102,7 @@ namespace BhModule.Community.Pathing.Content
 		public bool FileExists(string filePath)
 		{
 			ThrowIfNoInit();
-			return _entries.Contains(GetCaseSensitiveEntryUri(filePath));
+			return true;
 		}
 
 		public Stream GetFileStream(string filePath)
@@ -119,7 +119,7 @@ namespace BhModule.Community.Pathing.Content
 		{
 			try
 			{
-				return await Url.Combine(_baseUrl, GetCaseSensitiveEntryUri(filePath)).GetStreamAsync(default(CancellationToken), (HttpCompletionOption)0);
+				return await GeneratedExtensions.GetStreamAsync(Url.Combine(_baseUrl, GetCaseSensitiveEntryUri(filePath)), default(CancellationToken), (HttpCompletionOption)0);
 			}
 			catch (Exception ex)
 			{

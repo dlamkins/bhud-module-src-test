@@ -34,7 +34,17 @@ namespace BhModule.Community.Pathing.Entity
 		public abstract float TriggerRange { get; set; }
 
 		[Browsable(false)]
-		public bool DebugRender => _packState.EditorStates.SelectedPathingEntities.Contains(this);
+		public bool DebugRender
+		{
+			get
+			{
+				if (EditTag.HasValue)
+				{
+					return _packState.EditorStates.SelectedPathingEntities.Contains(this);
+				}
+				return false;
+			}
+		}
 
 		[Description("Indicates the distance the entity is from the player.")]
 		[Category("State Debug")]
@@ -47,6 +57,9 @@ namespace BhModule.Community.Pathing.Entity
 		[Description("Indicates if the entity is currently filtered.")]
 		[Category("State Debug")]
 		public bool BehaviorFiltered { get; private set; }
+
+		[Browsable(false)]
+		public int? EditTag { get; protected set; }
 
 		[Browsable(false)]
 		public int MapId { get; set; }

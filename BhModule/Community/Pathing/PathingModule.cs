@@ -26,8 +26,6 @@ namespace BhModule.Community.Pathing
 	{
 		private static readonly Logger Logger = Logger.GetLogger<PathingModule>();
 
-		private ModuleSettings _moduleSettings;
-
 		private CornerIcon _pathingIcon;
 
 		private TabbedWindow2 _settingsWindow;
@@ -54,6 +52,8 @@ namespace BhModule.Community.Pathing
 
 		internal static PathingModule Instance { get; private set; }
 
+		public ModuleSettings ModuleSettings { get; private set; }
+
 		public PackInitiator PackInitiator { get; private set; }
 
 		public BhModule.Community.Pathing.MarkerPackRepo.MarkerPackRepo MarkerPackRepo { get; private set; }
@@ -67,7 +67,7 @@ namespace BhModule.Community.Pathing
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			_moduleSettings = new ModuleSettings(settings);
+			ModuleSettings = new ModuleSettings(settings);
 		}
 
 		private IEnumerable<ContextMenuStripItem> GetPathingMenuItems()
@@ -146,9 +146,9 @@ namespace BhModule.Community.Pathing
 			((Control)val2).set_ClipsBounds(Program.get_OverlayVersion() == new Version(0, 11, 2, (string)null, (string)null) && GameService.Graphics.GetDpiScaleRatio() != 1f);
 			((WindowBase2)val2).set_Emblem(ContentsManager.GetTexture("png\\controls\\1615829.png"));
 			_settingsWindow = val2;
-			_packSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156740+155150.png")), (Func<IView>)(() => (IView)new SettingsView(_moduleSettings.PackSettings, -1)), Strings.Window_MainSettingsTab, (int?)null);
-			_mapSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\157123+155150.png")), (Func<IView>)(() => (IView)new SettingsView(_moduleSettings.MapSettings, -1)), Strings.Window_MapSettingsTab, (int?)null);
-			_keybindSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156734+155150.png")), (Func<IView>)(() => (IView)new SettingsView(_moduleSettings.KeyBindSettings, -1)), Strings.Window_KeyBindSettingsTab, (int?)null);
+			_packSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156740+155150.png")), (Func<IView>)(() => (IView)new SettingsView(ModuleSettings.PackSettings, -1)), Strings.Window_MainSettingsTab, (int?)null);
+			_mapSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\157123+155150.png")), (Func<IView>)(() => (IView)new SettingsView(ModuleSettings.MapSettings, -1)), Strings.Window_MapSettingsTab, (int?)null);
+			_keybindSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156734+155150.png")), (Func<IView>)(() => (IView)new SettingsView(ModuleSettings.KeyBindSettings, -1)), Strings.Window_KeyBindSettingsTab, (int?)null);
 			_markerRepoTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156909.png")), (Func<IView>)(() => (IView)(object)new PackRepoView()), Strings.Window_DownloadMarkerPacks, (int?)null);
 			_settingsWindow.get_Tabs().Add(_packSettingsTab);
 			_settingsWindow.get_Tabs().Add(_mapSettingsTab);
@@ -159,7 +159,7 @@ namespace BhModule.Community.Pathing
 				//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 				if (((Enum)GameService.Input.get_Keyboard().get_ActiveModifiers()).HasFlag((Enum)(object)(ModifierKeys)1))
 				{
-					_moduleSettings.GlobalPathablesEnabled.set_Value(!_moduleSettings.GlobalPathablesEnabled.get_Value());
+					ModuleSettings.GlobalPathablesEnabled.set_Value(!ModuleSettings.GlobalPathablesEnabled.get_Value());
 				}
 				else
 				{
@@ -200,7 +200,7 @@ namespace BhModule.Community.Pathing
 			Stopwatch sw = Stopwatch.StartNew();
 			MarkerPackRepo = new BhModule.Community.Pathing.MarkerPackRepo.MarkerPackRepo();
 			MarkerPackRepo.Init();
-			PackInitiator = new PackInitiator(DirectoriesManager.GetFullDirectoryPath("markers"), _moduleSettings, GetModuleProgressHandler());
+			PackInitiator = new PackInitiator(DirectoriesManager.GetFullDirectoryPath("markers"), ModuleSettings, GetModuleProgressHandler());
 			await PackInitiator.Init();
 			sw.Stop();
 			Logger.Debug($"Took {sw.ElapsedMilliseconds} ms to complete loading Pathing module...");

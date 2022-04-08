@@ -19,6 +19,8 @@ namespace BhModule.Community.Pathing.Behavior.Modifier
 
 		private readonly IPackState _packState;
 
+		private double _lastTrigger;
+
 		public string CopyValue { get; set; }
 
 		public string CopyMessage { get; set; }
@@ -40,10 +42,11 @@ namespace BhModule.Community.Pathing.Behavior.Modifier
 
 		public void Interact(bool autoTriggered)
 		{
-			if (_packState.UserConfiguration.PackMarkerConsentToClipboard.get_Value() == MarkerClipboardConsentLevel.Never || (_packState.UserConfiguration.PackMarkerConsentToClipboard.get_Value() == MarkerClipboardConsentLevel.OnlyWhenInteractedWith && autoTriggered) || _pathingEntity.BehaviorFiltered)
+			if (_packState.UserConfiguration.PackMarkerConsentToClipboard.get_Value() == MarkerClipboardConsentLevel.Never || (_packState.UserConfiguration.PackMarkerConsentToClipboard.get_Value() == MarkerClipboardConsentLevel.OnlyWhenInteractedWith && autoTriggered) || _pathingEntity.BehaviorFiltered || (autoTriggered && GameService.Overlay.get_CurrentGameTime().get_TotalGameTime().TotalMilliseconds - _lastTrigger < _packState.UserResourceStates.Advanced.CopyAttributeRechargeMs))
 			{
 				return;
 			}
+			_lastTrigger = GameService.Overlay.get_CurrentGameTime().get_TotalGameTime().TotalMilliseconds;
 			ClipboardUtil.get_WindowsClipboardService().SetTextAsync(CopyValue).ContinueWith(delegate(Task<bool> t)
 			{
 				if (t.IsCompleted && t.Result)

@@ -41,6 +41,8 @@ namespace BhModule.Community.Pathing.Entity
 
 		private const string ATTR_CULL = "cull";
 
+		private const string ATTR_EDITTAG = "edittag";
+
 		private const string ATTR_FADENEAR = "fadenear";
 
 		private const string ATTR_FADEFAR = "fadefar";
@@ -467,6 +469,15 @@ namespace BhModule.Community.Pathing.Entity
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private void Populate_EditTag(AttributeCollection collection, IPackResourceManager resourceManager)
+		{
+			if (collection.TryPopAttribute("edittag", out var attribute))
+			{
+				base.EditTag = attribute.GetValueAsInt();
+			}
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private void Populate_FadeNearAndFar(AttributeCollection collection, IPackResourceManager resourceManager)
 		{
 			FadeNear = _packState.UserResourceStates.Population.TrailPopulationDefaults.FadeNear;
@@ -671,7 +682,7 @@ namespace BhModule.Community.Pathing.Entity
 			Vector3 val;
 			Vector3 prevPoint = (val = pointsArr[0]);
 			yield return val;
-			_003C_003Ec__DisplayClass94_0 CS_0024_003C_003E8__locals0 = default(_003C_003Ec__DisplayClass94_0);
+			_003C_003Ec__DisplayClass96_0 CS_0024_003C_003E8__locals0 = default(_003C_003Ec__DisplayClass96_0);
 			for (int j = 0; j < pointsArr.Length - 1; j++)
 			{
 				Vector3 p0 = pointsArr[j];
@@ -952,6 +963,7 @@ namespace BhModule.Community.Pathing.Entity
 			Populate_CanFade(collection, resourceManager);
 			Populate_IsWall(collection, resourceManager);
 			Populate_Behaviors(collection, resourceManager);
+			Populate_EditTag(collection, resourceManager);
 		}
 
 		private void Initialize(ITrail trail)

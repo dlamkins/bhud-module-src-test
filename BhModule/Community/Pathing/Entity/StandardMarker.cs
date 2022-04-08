@@ -56,6 +56,8 @@ namespace BhModule.Community.Pathing.Entity
 
 		private const string ATTR_CULL = "cull";
 
+		private const string ATTR_EDITTAG = "edittag";
+
 		private const string ATTR_FADENEAR = "fadenear";
 
 		private const string ATTR_FADEFAR = "fadefar";
@@ -562,6 +564,15 @@ namespace BhModule.Community.Pathing.Entity
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private void Populate_EditTag(TmfLib.Prototype.AttributeCollection collection, IPackResourceManager resourceManager)
+		{
+			if (collection.TryPopAttribute("edittag", out var attribute))
+			{
+				base.EditTag = attribute.GetValueAsInt();
+			}
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private void Populate_FadeNearAndFar(TmfLib.Prototype.AttributeCollection collection, IPackResourceManager resourceManager)
 		{
 			FadeNear = _packState.UserResourceStates.Population.MarkerPopulationDefaults.FadeNear;
@@ -960,6 +971,7 @@ namespace BhModule.Community.Pathing.Entity
 			Populate_InvertBehavior(collection, resourceManager);
 			Populate_TacOMisc(collection, resourceManager);
 			Populate_Behaviors(collection, resourceManager);
+			Populate_EditTag(collection, resourceManager);
 		}
 
 		public override void Update(GameTime gameTime)

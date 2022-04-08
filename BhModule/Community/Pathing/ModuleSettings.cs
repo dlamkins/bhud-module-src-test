@@ -40,6 +40,8 @@ namespace BhModule.Community.Pathing
 
 		public SettingEntry<MarkerClipboardConsentLevel> PackMarkerConsentToClipboard { get; private set; }
 
+		public SettingEntry<bool> PackAllowInfoText { get; private set; }
+
 		public SettingEntry<bool> PackAllowMarkersToAnimate { get; private set; }
 
 		public SettingEntry<bool> PackEnableSmartCategoryFilter { get; private set; }
@@ -102,6 +104,7 @@ namespace BhModule.Community.Pathing
 			PackFadeMarkersBetweenCharacterAndCamera = PackSettings.DefineSetting<bool>("PackFadeMarkersBetweenCharacterAndCamera", true, (Func<string>)(() => Strings.Setting_PackFadeMarkersBetweenCharacterAndCamera), (Func<string>)(() => "If enabled, markers will be drawn with less opacity if they are directly between your character and the camera to avoid obscuring your vision."));
 			PackAllowMarkersToAutomaticallyHide = PackSettings.DefineSetting<bool>("PackAllowMarkersToAutomaticallyHide", true, (Func<string>)(() => Strings.Setting_PackAllowMarkersToAutomaticallyHide), (Func<string>)(() => "If enabled, markers and trails may hide themselves as a result of interactions, API data, current festival, etc.  Disabling this feature forces all markers on the map to be shown."));
 			PackMarkerConsentToClipboard = PackSettings.DefineSetting<MarkerClipboardConsentLevel>("PackMarkerConsentToClipboard", MarkerClipboardConsentLevel.Always, (Func<string>)(() => Strings.Setting_PackMarkerConsentToClipboard), (Func<string>)(() => string.Format(Strings.Setting_PackMarkerConsentToClipboardDescription, KeyBindings.Interact.GetBindingDisplayText())));
+			PackAllowInfoText = PackSettings.DefineSetting<bool>("PackAllowInfoText", true, (Func<string>)(() => "Allow Markers to Show Info Text On-Screen"), (Func<string>)(() => "If enabled, certain markers will be able to show information when your character is nearby to the marker."));
 			PackAllowMarkersToAnimate = PackSettings.DefineSetting<bool>("PackAllowMarkersToAnimate", true, (Func<string>)(() => Strings.Setting_PackAllowMarkersToAnimate), (Func<string>)(() => "Allows animations such as 'bounce' and trail movements."));
 			PackEnableSmartCategoryFilter = PackSettings.DefineSetting<bool>("PackEnableSmartCategoryFilter", true, (Func<string>)(() => "Enable Smart Categories"), (Func<string>)(() => "If a category doesn't contain markers or trails relevant to the current map, the category is hidden."));
 			PackShowWhenCategoriesAreFiltered = PackSettings.DefineSetting<bool>("PackShowWhenCategoriesAreFiltered", true, (Func<string>)(() => "Indicate when categories are hidden"), (Func<string>)(() => "Shows a note at the bottom of the menu indicating if categories have been hidden.  Clicking the note will show the hidden categories temporarily."));

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -14,9 +13,7 @@ namespace BhModule.Community.Pathing.LocalHttp.Routes.API.Edit
 		{
 			if (context.Request.HttpMethod == "GET")
 			{
-				IEnumerable<Guid> selected = from entity in PathingModule.Instance.PackInitiator.PackState.EditorStates.SelectedPathingEntities
-					where entity is StandardMarker
-					select (entity as StandardMarker).Guid;
+				IEnumerable<int?> selected = PathingModule.Instance.PackInitiator.PackState.EditorStates.SelectedPathingEntities.Select((IPathingEntity entity) => entity.EditTag);
 				await Respond(selected, context);
 			}
 			else

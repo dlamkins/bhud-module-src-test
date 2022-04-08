@@ -34,9 +34,7 @@
     <Reference Include="YamlDotNet">
       <HintPath>..\..\working\YamlDotNet.dll</HintPath>
     </Reference>
-    <Reference Include="Flurl.Http">
-      <HintPath>..\..\working\Flurl.Http.dll</HintPath>
-    </Reference>
+    <Reference Include="Flurl.Http" />
     <Reference Include="Newtonsoft.Json" />
     <Reference Include="Flurl">
       <HintPath>..\..\working\Flurl.dll</HintPath>
