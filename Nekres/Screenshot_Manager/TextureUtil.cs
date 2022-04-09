@@ -36,7 +36,7 @@ namespace Nekres.Screenshot_Manager
 						await textureStream.ReadAsync(buffer, 0, buffer.Length);
 						return Texture2D.FromStream(GameService.Graphics.get_GraphicsDevice(), (Stream)textureStream);
 					}
-					catch (Exception ex) when (ex is ShellException || ex is IOException || ex is UnauthorizedAccessException || ex is SecurityException)
+					catch (Exception ex) when (ex is ShellException || ex is IOException || ex is UnauthorizedAccessException || ex is SecurityException || ex is InvalidOperationException)
 					{
 						if (!(DateTime.UtcNow < timeout))
 						{
@@ -74,7 +74,7 @@ namespace Nekres.Screenshot_Manager
 						await textureStream.ReadAsync(buffer, 0, buffer.Length);
 						return Texture2D.FromStream(GameService.Graphics.get_GraphicsDevice(), (Stream)textureStream);
 					}
-					catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is SecurityException)
+					catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is SecurityException || ex is InvalidOperationException)
 					{
 						if (!(DateTime.UtcNow < timeout))
 						{
