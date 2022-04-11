@@ -97,6 +97,7 @@ namespace Nekres.Inquest_Module
 			JumpKeyBindingSetting.get_Value().set_Enabled(false);
 			DodgeKeyBindingSetting.get_Value().set_Enabled(false);
 			DodgeJumpKeyBindingSetting.get_Value().set_Enabled(true);
+			DodgeJumpKeyBindingSetting.get_Value().set_BlockSequenceFromGw2(true);
 			DodgeJumpKeyBindingSetting.get_Value().add_Activated((EventHandler<EventArgs>)OnDodgeJumpKeyActivated);
 			AutoClickSoundVolume.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnAutoClickSoundVolumeSettingChanged);
 		}
@@ -146,11 +147,11 @@ namespace Nekres.Inquest_Module
 			_nextDodgeJump = DateTime.UtcNow.AddMilliseconds(80.0);
 			if ((int)DodgeKeyBindingSetting.get_Value().get_PrimaryKey() != 0)
 			{
-				Keyboard.Stroke((VirtualKeyShort)(short)DodgeKeyBindingSetting.get_Value().get_PrimaryKey(), true);
+				Keyboard.Stroke((VirtualKeyShort)(short)DodgeKeyBindingSetting.get_Value().get_PrimaryKey(), false);
 			}
 			if ((int)JumpKeyBindingSetting.get_Value().get_PrimaryKey() != 0)
 			{
-				Keyboard.Stroke((VirtualKeyShort)(short)JumpKeyBindingSetting.get_Value().get_PrimaryKey(), true);
+				Keyboard.Stroke((VirtualKeyShort)(short)JumpKeyBindingSetting.get_Value().get_PrimaryKey(), false);
 			}
 		}
 
