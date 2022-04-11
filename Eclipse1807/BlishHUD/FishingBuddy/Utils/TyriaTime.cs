@@ -26,9 +26,21 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 
 		public static readonly List<int> CanthaMaps = new List<int> { 1442, 1419, 1444, 1462, 1438, 1452, 1428, 1422 };
 
-		public static string CurrentMapTime(int MapId)
+		public static readonly List<int> AlwaysDayMaps = new List<int> { 1195, 1465 };
+
+		public static readonly List<int> AlwaysNightMaps = new List<int> { 0 };
+
+		public static string CurrentMapPhase(int MapId)
 		{
 			DateTime TyriaTime = CalcTyriaTime();
+			if (AlwaysDayMaps.Contains(MapId))
+			{
+				return "Day";
+			}
+			if (AlwaysDayMaps.Contains(MapId))
+			{
+				return "Night";
+			}
 			if (CanthaMaps.Contains(MapId))
 			{
 				if (TyriaTime >= canthaDawnStart && TyriaTime < canthaDayStart)
@@ -77,6 +89,48 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 			{
 				return new DateTime(2000, 1, 1, 0, 0, 0);
 			}
+		}
+
+		public static TimeSpan CalcTimeTilNextPhase(int MapId)
+		{
+			DateTime TyriaTime = CalcTyriaTime();
+			if (AlwaysDayMaps.Contains(MapId))
+			{
+				return TimeSpan.Zero;
+			}
+			if (AlwaysDayMaps.Contains(MapId))
+			{
+				return TimeSpan.Zero;
+			}
+			if (CanthaMaps.Contains(MapId))
+			{
+				if (TyriaTime >= canthaDawnStart && TyriaTime < canthaDayStart)
+				{
+					return canthaDayStart - TyriaTime;
+				}
+				if (TyriaTime >= canthaDayStart && TyriaTime < canthaDuskStart)
+				{
+					return canthaDuskStart - TyriaTime;
+				}
+				if (TyriaTime >= canthaDuskStart && TyriaTime < canthaNightStart)
+				{
+					return canthaNightStart - TyriaTime;
+				}
+				return canthaDawnStart - TyriaTime;
+			}
+			if (TyriaTime >= centralDawnStart && TyriaTime < centralDayStart)
+			{
+				return centralDayStart - TyriaTime;
+			}
+			if (TyriaTime >= centralDayStart && TyriaTime < centralDuskStart)
+			{
+				return centralDuskStart - TyriaTime;
+			}
+			if (TyriaTime >= centralDuskStart && TyriaTime < centralNightStart)
+			{
+				return centralNightStart - TyriaTime;
+			}
+			return centralDawnStart - TyriaTime;
 		}
 	}
 }

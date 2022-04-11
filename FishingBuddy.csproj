@@ -1,7 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <AssemblyName>FishingBuddy</AssemblyName>
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <UseWindowsForms>True</UseWindowsForms>
     <TargetFramework>net48</TargetFramework>
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
@@ -16,6 +17,7 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="Gw2Sharp" />
+    <Reference Include="MonoGame.Extended" />
     <Reference Include="Newtonsoft.Json" />
     <Reference Include="System.Core" />
   </ItemGroup>
