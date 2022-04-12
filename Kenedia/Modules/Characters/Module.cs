@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Controls.Extern;
 using Blish_HUD.Controls.Intern;
@@ -25,8 +27,8 @@ using Newtonsoft.Json;
 
 namespace Kenedia.Modules.Characters
 {
-	[Export(typeof(Blish_HUD.Modules.Module))]
-	public class Module : Blish_HUD.Modules.Module
+	[Export(typeof(Module))]
+	public class Module : Module
 	{
 		public struct RECT
 		{
@@ -213,13 +215,13 @@ namespace Kenedia.Modules.Characters
 			}
 		}
 
-		public SettingsManager SettingsManager => ModuleParameters.SettingsManager;
+		public SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
-		public ContentsManager ContentsManager => ModuleParameters.ContentsManager;
+		public ContentsManager ContentsManager => base.ModuleParameters.get_ContentsManager();
 
-		public DirectoriesManager DirectoriesManager => ModuleParameters.DirectoriesManager;
+		public DirectoriesManager DirectoriesManager => base.ModuleParameters.get_DirectoriesManager();
 
-		public Gw2ApiManager Gw2ApiManager => ModuleParameters.Gw2ApiManager;
+		public Gw2ApiManager Gw2ApiManager => base.ModuleParameters.get_Gw2ApiManager();
 
 		public static StandardWindow MainWidow { get; private set; }
 
@@ -243,7 +245,7 @@ namespace Kenedia.Modules.Characters
 
 		public async Task _Fetch_Maps()
 		{
-			IApiV2ObjectList<Map> maps = await Gw2ApiManager.Gw2ApiClient.V2.Maps.AllAsync();
+			IApiV2ObjectList<Map> maps = await Gw2ApiManager.get_Gw2ApiClient().V2.Maps.AllAsync();
 			localMapModel[] mapArray = new localMapModel[maps[maps.Count - 1].Id + 1];
 			string path = "C:\\maps.json";
 			if (System.IO.File.Exists(path))
@@ -286,7 +288,7 @@ namespace Kenedia.Modules.Characters
 
 		public async Task _Fetch_Professions()
 		{
-			IApiV2ObjectList<Profession> professions = await Gw2ApiManager.Gw2ApiClient.V2.Professions.AllAsync();
+			IApiV2ObjectList<Profession> professions = await Gw2ApiManager.get_Gw2ApiClient().V2.Professions.AllAsync();
 			_Professions[] resultArray = new _Professions[Enum.GetValues(typeof(Professions)).Cast<int>().Max() + 1];
 			string path = "C:\\professions.json";
 			if (System.IO.File.Exists(path))
@@ -328,7 +330,7 @@ namespace Kenedia.Modules.Characters
 
 		public async Task _Fetch_Specializations()
 		{
-			IApiV2ObjectList<Specialization> specs = await Gw2ApiManager.Gw2ApiClient.V2.Specializations.AllAsync();
+			IApiV2ObjectList<Specialization> specs = await Gw2ApiManager.get_Gw2ApiClient().V2.Specializations.AllAsync();
 			_Specializations[] resultArray = new _Specializations[Enum.GetValues(typeof(Specializations)).Cast<int>().Max() + 1];
 			string path = "C:\\specialization.json";
 			if (System.IO.File.Exists(path))
@@ -373,7 +375,7 @@ namespace Kenedia.Modules.Characters
 
 		public async Task _Fetch_Races()
 		{
-			IApiV2ObjectList<Race> races = await Gw2ApiManager.Gw2ApiClient.V2.Races.AllAsync();
+			IApiV2ObjectList<Race> races = await Gw2ApiManager.get_Gw2ApiClient().V2.Races.AllAsync();
 			_Race[] resultArray = new _Race[Enum.GetValues(typeof(RaceEnum)).Cast<int>().Max() + 1];
 			string path = "C:\\races.json";
 			if (System.IO.File.Exists(path))
@@ -430,7 +432,7 @@ namespace Kenedia.Modules.Characters
 
 		public async Task<string> getRace(string id)
 		{
-			Race result = await Gw2ApiManager.Gw2ApiClient.V2.Races.GetAsync(id);
+			Race result = await Gw2ApiManager.get_Gw2ApiClient().V2.Races.GetAsync(id);
 			if (result != null)
 			{
 				return result.Name;
@@ -440,7 +442,7 @@ namespace Kenedia.Modules.Characters
 
 		public async Task<string> getProfession(string id)
 		{
-			Profession result = await Gw2ApiManager.Gw2ApiClient.V2.Professions.GetAsync(id);
+			Profession result = await Gw2ApiManager.get_Gw2ApiClient().V2.Professions.GetAsync(id);
 			if (result != null)
 			{
 				return result.Name;
@@ -450,7 +452,7 @@ namespace Kenedia.Modules.Characters
 
 		public async Task<string> getSpecialization(int id)
 		{
-			Specialization result = await Gw2ApiManager.Gw2ApiClient.V2.Specializations.GetAsync(id);
+			Specialization result = await Gw2ApiManager.get_Gw2ApiClient().V2.Specializations.GetAsync(id);
 			if (result != null)
 			{
 				return result.Name;
@@ -460,13 +462,19 @@ namespace Kenedia.Modules.Characters
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			Settings.AutoLogin = settings.DefineSetting("AutoLogin", defaultValue: false, () => common.AutoLogin_DisplayName, () => common.AutoLogin_Description);
-			Settings.EnterOnSwap = settings.DefineSetting("EnterOnSwap", defaultValue: false, () => common.EnterOnSwap_DisplayName, () => common.EnterOnSwap_Description);
-			Settings.DoubleClickToEnter = settings.DefineSetting("DoubleClickToEnter", defaultValue: false, () => common.DoubleClickToEnter_DisplayName, () => common.DoubleClickToEnter_Description);
-			Settings.EnterToLogin = settings.DefineSetting("EnterToLogin", defaultValue: false, () => common.EnterToLogin_DisplayName, () => common.EnterToLogin_Description);
-			Settings.FadeSubWindows = settings.DefineSetting("FadeSubWindows", defaultValue: false, () => common.FadeOut_DisplayName, () => common.FadeOut_Description);
-			Settings.OnlyMaxCrafting = settings.DefineSetting("OnlyMaxCrafting", defaultValue: true, () => common.OnlyMaxCrafting_DisplayName, () => common.OnlyMaxCrafting_Description);
-			Settings.OnlyMaxCrafting.SettingChanged += delegate
+			//IL_03aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f2: Expected O, but got Unknown
+			//IL_0405: Unknown result type (might be due to invalid IL or missing references)
+			//IL_044d: Expected O, but got Unknown
+			//IL_045e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a6: Expected O, but got Unknown
+			Settings.AutoLogin = settings.DefineSetting<bool>("AutoLogin", false, (Func<string>)(() => common.AutoLogin_DisplayName), (Func<string>)(() => common.AutoLogin_Description));
+			Settings.EnterOnSwap = settings.DefineSetting<bool>("EnterOnSwap", false, (Func<string>)(() => common.EnterOnSwap_DisplayName), (Func<string>)(() => common.EnterOnSwap_Description));
+			Settings.DoubleClickToEnter = settings.DefineSetting<bool>("DoubleClickToEnter", false, (Func<string>)(() => common.DoubleClickToEnter_DisplayName), (Func<string>)(() => common.DoubleClickToEnter_Description));
+			Settings.EnterToLogin = settings.DefineSetting<bool>("EnterToLogin", false, (Func<string>)(() => common.EnterToLogin_DisplayName), (Func<string>)(() => common.EnterToLogin_Description));
+			Settings.FadeSubWindows = settings.DefineSetting<bool>("FadeSubWindows", false, (Func<string>)(() => common.FadeOut_DisplayName), (Func<string>)(() => common.FadeOut_Description));
+			Settings.OnlyMaxCrafting = settings.DefineSetting<bool>("OnlyMaxCrafting", true, (Func<string>)(() => common.OnlyMaxCrafting_DisplayName), (Func<string>)(() => common.OnlyMaxCrafting_Description));
+			Settings.OnlyMaxCrafting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate
 			{
 				foreach (Character current in Characters)
 				{
@@ -474,25 +482,25 @@ namespace Kenedia.Modules.Characters
 					{
 						foreach (DataImage current2 in current.characterControl.crafting_Images)
 						{
-							current2.Visible = !Settings.OnlyMaxCrafting.Value || (current2.Crafting.Id == 4 && current2.Crafting.Rating == 400) || current2.Crafting.Rating == 500;
+							((Control)current2).set_Visible(!Settings.OnlyMaxCrafting.get_Value() || (current2.Crafting.Id == 4 && current2.Crafting.Rating == 400) || current2.Crafting.Rating == 500);
 						}
-						current.characterControl.crafting_Panel.Invalidate();
+						((Control)current.characterControl.crafting_Panel).Invalidate();
 					}
 				}
-			};
-			Settings.FocusFilter = settings.DefineSetting("FocusFilter", defaultValue: false, () => common.FocusFilter_DisplayName, () => common.FocusFilter_Description);
-			Settings.FilterDelay = settings.DefineSetting("FilterDelay", 150, () => string.Format(common.FilterDelay_DisplayName, Settings.FilterDelay.Value), () => common.FilterDelay_Description);
-			Settings.FilterDelay.SetRange(0, 500);
-			Settings.FilterDelay.SettingChanged += delegate
+			});
+			Settings.FocusFilter = settings.DefineSetting<bool>("FocusFilter", false, (Func<string>)(() => common.FocusFilter_DisplayName), (Func<string>)(() => common.FocusFilter_Description));
+			Settings.FilterDelay = settings.DefineSetting<int>("FilterDelay", 150, (Func<string>)(() => string.Format(common.FilterDelay_DisplayName, Settings.FilterDelay.get_Value())), (Func<string>)(() => common.FilterDelay_Description));
+			SettingComplianceExtensions.SetRange(Settings.FilterDelay, 0, 500);
+			Settings.FilterDelay.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)delegate
 			{
-				Settings._FilterDelay = Settings.FilterDelay.Value / 2;
-			};
-			Settings._FilterDelay = Settings.FilterDelay.Value / 2;
-			Settings.SwapDelay = settings.DefineSetting("SwapDelay", 500, () => string.Format(common.SwapDelay_DisplayName, Settings.SwapDelay.Value), () => common.SwapDelay_Description);
-			Settings.SwapDelay.SetRange(0, 5000);
-			Settings.LogoutKey = settings.DefineSetting("LogoutKey", new KeyBinding(Keys.F12), () => common.Logout, () => common.LogoutDescription);
-			Settings.ShortcutKey = settings.DefineSetting("ShortcutKey", new KeyBinding(ModifierKeys.Shift, Keys.C), () => common.ShortcutToggle_DisplayName, () => common.ShortcutToggle_Description);
-			Settings.SwapModifier = settings.DefineSetting("SwapModifier", new KeyBinding(Keys.None), () => common.SwapModifier_DisplayName, () => common.SwapModifier_Description);
+				Settings._FilterDelay = Settings.FilterDelay.get_Value() / 2;
+			});
+			Settings._FilterDelay = Settings.FilterDelay.get_Value() / 2;
+			Settings.SwapDelay = settings.DefineSetting<int>("SwapDelay", 500, (Func<string>)(() => string.Format(common.SwapDelay_DisplayName, Settings.SwapDelay.get_Value())), (Func<string>)(() => common.SwapDelay_Description));
+			SettingComplianceExtensions.SetRange(Settings.SwapDelay, 0, 5000);
+			Settings.LogoutKey = settings.DefineSetting<KeyBinding>("LogoutKey", new KeyBinding(Keys.F12), (Func<string>)(() => common.Logout), (Func<string>)(() => common.LogoutDescription));
+			Settings.ShortcutKey = settings.DefineSetting<KeyBinding>("ShortcutKey", new KeyBinding((ModifierKeys)4, Keys.C), (Func<string>)(() => common.ShortcutToggle_DisplayName), (Func<string>)(() => common.ShortcutToggle_Description));
+			Settings.SwapModifier = settings.DefineSetting<KeyBinding>("SwapModifier", new KeyBinding(Keys.None), (Func<string>)(() => common.SwapModifier_DisplayName), (Func<string>)(() => common.SwapModifier_Description));
 		}
 
 		public async void FetchAPI(bool force = false)
@@ -500,20 +508,20 @@ namespace Kenedia.Modules.Characters
 			_ = 1;
 			try
 			{
-				if (Gw2ApiManager.HasPermissions(new TokenPermission[2]
+				if (Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)new TokenPermission[2]
 				{
 					TokenPermission.Account,
 					TokenPermission.Characters
 				}) && API_Account != null && userAccount != null)
 				{
-					Account account = await Gw2ApiManager.Gw2ApiClient.V2.Account.GetAsync();
+					Account account = await Gw2ApiManager.get_Gw2ApiClient().V2.Account.GetAsync();
 					userAccount.LastModified = account.LastModified;
 					userAccount.Save();
 					if (userAccount.CharacterUpdateNeeded() || force)
 					{
 						userAccount.LastBlishUpdate = ((userAccount.LastBlishUpdate > account.LastModified) ? userAccount.LastBlishUpdate : account.LastModified);
 						userAccount.Save();
-						IApiV2ObjectList<Gw2Sharp.WebApi.V2.Models.Character> obj = await Gw2ApiManager.Gw2ApiClient.V2.Characters.AllAsync();
+						IApiV2ObjectList<Gw2Sharp.WebApi.V2.Models.Character> obj = await Gw2ApiManager.get_Gw2ApiClient().V2.Characters.AllAsync();
 						Logger.Debug("Updating Characters ....");
 						Character last = null;
 						int i = 0;
@@ -557,11 +565,11 @@ namespace Kenedia.Modules.Characters
 					}
 					double lastModified = DateTimeOffset.UtcNow.Subtract(userAccount.LastModified).TotalSeconds;
 					double lastUpdate = DateTimeOffset.UtcNow.Subtract(userAccount.LastBlishUpdate).TotalSeconds;
-					infoImage.BasicTooltipText = "Last Modified: " + Math.Round(lastModified) + Environment.NewLine + "Last Blish Login: " + Math.Round(lastUpdate);
+					((Control)infoImage).set_BasicTooltipText("Last Modified: " + Math.Round(lastModified) + Environment.NewLine + "Last Blish Login: " + Math.Round(lastUpdate));
 				}
 				else
 				{
-					ScreenNotification.ShowNotification(common.Error_Competivive, ScreenNotification.NotificationType.Error);
+					ScreenNotification.ShowNotification(common.Error_Competivive, (NotificationType)2, (Texture2D)null, 4);
 					Logger.Error("This API Token has not the required permissions!");
 				}
 			}
@@ -577,13 +585,13 @@ namespace Kenedia.Modules.Characters
 			try
 			{
 				Logger.Debug("API Subtoken Updated!");
-				if (Gw2ApiManager.HasPermissions(new TokenPermission[2]
+				if (Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)new TokenPermission[2]
 				{
 					TokenPermission.Account,
 					TokenPermission.Characters
 				}))
 				{
-					Account account = (API_Account = await Gw2ApiManager.Gw2ApiClient.V2.Account.GetAsync());
+					Account account = (API_Account = await Gw2ApiManager.get_Gw2ApiClient().V2.Account.GetAsync());
 					string path = DirectoriesManager.GetFullDirectoryPath("characters") + "\\" + API_Account.Name;
 					if (!Directory.Exists(path))
 					{
@@ -592,6 +600,10 @@ namespace Kenedia.Modules.Characters
 					CharactersPath = path + "\\characters.json";
 					AccountPath = path + "\\account.json";
 					AccountImagesPath = path + "\\images\\";
+					if (!Directory.Exists(AccountImagesPath))
+					{
+						Directory.CreateDirectory(AccountImagesPath);
+					}
 					if (userAccount == null)
 					{
 						userAccount = new AccountInfo
@@ -619,7 +631,7 @@ namespace Kenedia.Modules.Characters
 						userAccount.Save();
 						Logger.Debug("Updating Characters ....");
 						Logger.Debug("The last API modification is more recent than our last local data track.");
-						IApiV2ObjectList<Gw2Sharp.WebApi.V2.Models.Character> obj = await Gw2ApiManager.Gw2ApiClient.V2.Characters.AllAsync();
+						IApiV2ObjectList<Gw2Sharp.WebApi.V2.Models.Character> obj = await Gw2ApiManager.get_Gw2ApiClient().V2.Characters.AllAsync();
 						Character last = null;
 						int i = 0;
 						foreach (Gw2Sharp.WebApi.V2.Models.Character c in obj)
@@ -663,11 +675,11 @@ namespace Kenedia.Modules.Characters
 						}
 						last?.Save();
 					}
-					PlayerCharacter player = GameService.Gw2Mumble.PlayerCharacter;
+					PlayerCharacter player = GameService.Gw2Mumble.get_PlayerCharacter();
 					foreach (Character character in Characters)
 					{
 						character.Create_UI_Elements();
-						if (player != null && player.Name == character.Name)
+						if (player != null && player.get_Name() == character.Name)
 						{
 							Current.character = character;
 						}
@@ -676,11 +688,11 @@ namespace Kenedia.Modules.Characters
 					filterCharacterPanel = true;
 					double lastModified = DateTimeOffset.UtcNow.Subtract(userAccount.LastModified).TotalSeconds;
 					double lastUpdate = DateTimeOffset.UtcNow.Subtract(userAccount.LastBlishUpdate).TotalSeconds;
-					infoImage.BasicTooltipText = "Last Modified: " + Math.Round(lastModified) + Environment.NewLine + "Last Blish Login: " + Math.Round(lastUpdate);
+					((Control)infoImage).set_BasicTooltipText("Last Modified: " + Math.Round(lastModified) + Environment.NewLine + "Last Blish Login: " + Math.Round(lastUpdate));
 				}
 				else
 				{
-					ScreenNotification.ShowNotification(common.Error_InvalidPermissions, ScreenNotification.NotificationType.Error);
+					ScreenNotification.ShowNotification(common.Error_InvalidPermissions, (NotificationType)2, (Texture2D)null, 4);
 					Logger.Error("This API Token has not the required permissions!");
 				}
 			}
@@ -692,8 +704,10 @@ namespace Kenedia.Modules.Characters
 
 		[ImportingConstructor]
 		public Module([Import("ModuleParameters")] ModuleParameters moduleParameters)
-			: base(moduleParameters)
+			: this(moduleParameters)
 		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000b: Expected O, but got Unknown
 			ModuleInstance = this;
 		}
 
@@ -704,53 +718,81 @@ namespace Kenedia.Modules.Characters
 		[DllImport("user32.dll", SetLastError = true)]
 		public static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int Width, int Height, bool Repaint);
 
+		[DllImport("user32.dll", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool GetClientRect(IntPtr hWnd, out RECT lpRect);
+
 		public static void ResetGameWindow()
 		{
-			MoveWindow(GameService.GameIntegration.Gw2Instance.Gw2WindowHandle, GameWindow_Rectangle.Left, GameWindow_Rectangle.Top, GameWindow_Rectangle.Right - GameWindow_Rectangle.Left, GameWindow_Rectangle.Bottom - GameWindow_Rectangle.Top, Repaint: false);
+			MoveWindow(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle(), GameWindow_Rectangle.Left, GameWindow_Rectangle.Top, GameWindow_Rectangle.Right - GameWindow_Rectangle.Left, GameWindow_Rectangle.Bottom - GameWindow_Rectangle.Top, Repaint: false);
 		}
 
 		protected override void Initialize()
 		{
 			Logger.Debug("Initializing ...");
-			ModKeyMapping = new VirtualKeyShort[5];
-			ModKeyMapping[1] = VirtualKeyShort.CONTROL;
-			ModKeyMapping[2] = VirtualKeyShort.MENU;
-			ModKeyMapping[4] = VirtualKeyShort.LSHIFT;
+			Item item = new Item();
+			item.Name = "APFELSINE";
+			Logger.Debug(item.Name.ToString());
+			ApiV2BaseObject baseobj = item;
+			Logger.Debug(item.Name.ToString() + "casted to Base: " + (baseobj != null));
+			ModKeyMapping = (VirtualKeyShort[])(object)new VirtualKeyShort[5];
+			ModKeyMapping[1] = (VirtualKeyShort)17;
+			ModKeyMapping[2] = (VirtualKeyShort)18;
+			ModKeyMapping[4] = (VirtualKeyShort)160;
 			LoadTextures();
-			Gw2ApiManager.SubtokenUpdated += Gw2ApiManager_SubtokenUpdated;
+			Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
 			AccountPath = DirectoriesManager.GetFullDirectoryPath("characters") + "\\accounts.json";
 			GlobalImagesPath = DirectoriesManager.GetFullDirectoryPath("characters") + "\\images\\";
 			LoadCustomImages();
 			DataManager.ContentsManager = ContentsManager;
 			DataManager.Load();
-			Settings.ShortcutKey.Value.Enabled = true;
-			Settings.ShortcutKey.Value.Activated += OnKeyPressed_ToggleMenu;
-			Settings.SwapModifier.Value.Enabled = true;
-			Settings.SwapModifier.Value.Activated += OnKeyPressed_LogoutMod;
+			Settings.ShortcutKey.get_Value().set_Enabled(true);
+			Settings.ShortcutKey.get_Value().add_Activated((EventHandler<EventArgs>)OnKeyPressed_ToggleMenu);
+			Settings.SwapModifier.get_Value().set_Enabled(true);
+			Settings.SwapModifier.get_Value().add_Activated((EventHandler<EventArgs>)OnKeyPressed_LogoutMod);
 			RECT pos = default(RECT);
-			GetWindowRect(GameService.GameIntegration.Gw2Instance.Gw2WindowHandle, ref pos);
+			GetWindowRect(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle(), ref pos);
 			GameWindow_Rectangle = pos;
+		}
+
+		private void CreateFolders()
+		{
+			string basePath = DirectoriesManager.GetFullDirectoryPath("characters");
+			foreach (string Path in new List<string> { "\\images" })
+			{
+				if (!Directory.Exists(basePath + Path))
+				{
+					Directory.CreateDirectory(basePath + Path);
+				}
+			}
 		}
 
 		private void LoadCustomImages()
 		{
+			if (!Directory.Exists(GlobalImagesPath))
+			{
+				return;
+			}
 			List<string> global_images = Directory.GetFiles(GlobalImagesPath, "*.png", SearchOption.AllDirectories).ToList();
 			Textures.CustomImages = new Texture2D[global_images.Count + 100];
 			Textures.CustomImageNames = new List<string>();
-			GameService.Graphics.QueueMainThreadRender(delegate(GraphicsDevice graphicsDevice)
+			GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate(GraphicsDevice graphicsDevice)
 			{
 				Logger.Debug("Loading all custom Images ... ");
 				string fullDirectoryPath = DirectoriesManager.GetFullDirectoryPath("characters");
 				int num = 0;
 				foreach (string current in global_images)
 				{
-					Textures.CustomImages[num] = TextureUtil.FromStreamPremultiplied(graphicsDevice, new FileStream(current, FileMode.Open));
+					Textures.CustomImages[num] = TextureUtil.FromStreamPremultiplied(graphicsDevice, (Stream)new FileStream(current, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
 					Textures.CustomImages[num].Name = current.Replace(fullDirectoryPath, "");
 					Textures.CustomImageNames.Add(Textures.CustomImages[num].Name);
 					num++;
 				}
 				Textures.Loaded = true;
-				ImageSelectorWindow.LoadImages();
+				if (ImageSelectorWindow != null)
+				{
+					ImageSelectorWindow.LoadImages();
+				}
 			});
 		}
 
@@ -848,23 +890,23 @@ namespace Kenedia.Modules.Characters
 			}
 			foreach (Character c in Characters)
 			{
-				CharacterTooltip obj = (CharacterTooltip)c.characterControl.Tooltip;
+				CharacterTooltip obj = (CharacterTooltip)(object)((Control)c.characterControl).get_Tooltip();
 				obj._Map.Text = DataManager.getMapName(c.Map);
 				obj._Race.Text = DataManager.getRaceName(c.Race.ToString());
-				obj._switchInfoLabel.Text = string.Format(common.DoubleClickToSwap, c.Name);
+				obj._switchInfoLabel.set_Text(string.Format(common.DoubleClickToSwap, c.Name));
 			}
-			filterTextBox.PlaceholderText = common.SearchFor;
-			filterTextBox.BasicTooltipText = common.SearchGuide;
-			clearButton.Text = common.Clear;
-			subWindow.loginCharacter.Text = common.LoginCharacter;
+			((TextInputBase)filterTextBox).set_PlaceholderText(common.SearchFor);
+			((Control)filterTextBox).set_BasicTooltipText(common.SearchGuide);
+			clearButton.set_Text(common.Clear);
+			subWindow.loginCharacter.set_Text(common.LoginCharacter);
 			filterWindow.CustomTags.Text = common.CustomTags;
 			filterWindow.Utility.Text = common.Utility;
 			filterWindow.Crafting.Text = common.CraftingProfession;
 			filterWindow.Profession.Text = common.Profession;
 			filterWindow.Specialization.Text = common.Specialization;
-			filterWindow.visibleToggle.BasicTooltipText = common.ToggleVisible;
-			filterWindow.birthdayToggle.BasicTooltipText = common.Birthday;
-			filterWindow.toggleSpecsButton.Text = common.ToggleAll;
+			((Control)filterWindow.visibleToggle).set_BasicTooltipText(common.ToggleVisible);
+			((Control)filterWindow.birthdayToggle).set_BasicTooltipText(common.Birthday);
+			filterWindow.toggleSpecsButton.set_Text(common.ToggleAll);
 			foreach (Character character in Characters)
 			{
 				character.UpdateLanguage();
@@ -873,24 +915,24 @@ namespace Kenedia.Modules.Characters
 			{
 				if (toggle5 != null)
 				{
-					toggle5.BasicTooltipText = DataManager.getProfessionName(toggle5.Id);
+					((Control)toggle5).set_BasicTooltipText(DataManager.getProfessionName(toggle5.Id));
 				}
 			}
 			foreach (ToggleIcon toggle4 in filterBaseSpecs)
 			{
 				if (toggle4 != null)
 				{
-					toggle4.BasicTooltipText = DataManager.getProfessionName(toggle4.Id);
+					((Control)toggle4).set_BasicTooltipText(DataManager.getProfessionName(toggle4.Id));
 				}
 			}
 			foreach (ToggleIcon toggle3 in filterCrafting)
 			{
 				if (toggle3 != null)
 				{
-					toggle3.BasicTooltipText = DataManager.getCraftingName(toggle3.Id);
+					((Control)toggle3).set_BasicTooltipText(DataManager.getCraftingName(toggle3.Id));
 					if (toggle3.Id == 0)
 					{
-						toggle3.BasicTooltipText = common.NoCraftingProfession;
+						((Control)toggle3).set_BasicTooltipText(common.NoCraftingProfession);
 					}
 				}
 			}
@@ -898,14 +940,14 @@ namespace Kenedia.Modules.Characters
 			{
 				if (toggle2 != null)
 				{
-					toggle2.BasicTooltipText = DataManager.getSpecName(toggle2.Id);
+					((Control)toggle2).set_BasicTooltipText(DataManager.getSpecName(toggle2.Id));
 				}
 			}
 			foreach (ToggleIcon toggle in filterRaces)
 			{
 				if (toggle != null)
 				{
-					toggle.BasicTooltipText = DataManager.getRaceName(toggle.Id);
+					((Control)toggle).set_BasicTooltipText(DataManager.getRaceName(toggle.Id));
 				}
 			}
 		}
@@ -961,23 +1003,24 @@ namespace Kenedia.Modules.Characters
 						}
 						foreach (string txt in Tags)
 						{
-							TagEntry entry = new TagEntry(txt, new Character(), filterTagsPanel, showButton: false, contentService.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size14, ContentService.FontStyle.Regular));
-							entry.Click += delegate
+							TagEntry entry = new TagEntry(txt, new Character(), filterTagsPanel, showButton: false, contentService.GetFont((FontFace)0, (FontSize)14, (FontStyle)0));
+							((Control)entry).add_Click((EventHandler<MouseEventArgs>)delegate
 							{
-								if (filterTextBox.Text.ToLower().Contains(txt.ToLower()))
+								if (((TextInputBase)filterTextBox).get_Text().ToLower().Contains(txt.ToLower()))
 								{
-									_ = filterTextBox.Text;
+									((TextInputBase)filterTextBox).get_Text();
 									txt.Replace("; -t " + txt + ";", "");
 									txt.Replace("; -t " + txt, "");
 									txt.Replace("-t " + txt + ";", "");
 									txt.Replace("-t " + txt, "");
-									filterTextBox.Text = txt.Trim();
+									((TextInputBase)filterTextBox).set_Text(txt.Trim());
 								}
 								else
 								{
-									filterTextBox.Text += (((filterTextBox.Text.Trim().EndsWith(";") || filterTextBox.Text.Trim() == "") ? " " : "; ") + "-t " + txt).Trim();
+									TextBox obj = filterTextBox;
+									((TextInputBase)obj).set_Text(((TextInputBase)obj).get_Text() + (((((TextInputBase)filterTextBox).get_Text().Trim().EndsWith(";") || ((TextInputBase)filterTextBox).get_Text().Trim() == "") ? " " : "; ") + "-t " + txt).Trim());
 								}
-							};
+							});
 							TagEntries.Add(entry);
 						}
 						return true;
@@ -1027,17 +1070,16 @@ namespace Kenedia.Modules.Characters
 
 		protected override async Task LoadAsync()
 		{
-			cornerButton = new CornerIcon
+			CornerIcon val = new CornerIcon();
+			val.set_IconName("Characters");
+			val.set_Icon(AsyncTexture2D.op_Implicit(Textures.Icons[22]));
+			val.set_HoverIcon(AsyncTexture2D.op_Implicit(Textures.Icons[23]));
+			val.set_Priority(4);
+			cornerButton = val;
+			((Control)cornerButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				IconName = "Characters",
-				Icon = Textures.Icons[22],
-				HoverIcon = Textures.Icons[23],
-				Priority = 4
-			};
-			cornerButton.Click += delegate
-			{
-				MainWidow.ToggleWindow();
-			};
+				((WindowBase2)MainWidow).ToggleWindow();
+			});
 		}
 
 		private Character getCharacter(string name)
@@ -1059,7 +1101,7 @@ namespace Kenedia.Modules.Characters
 				return;
 			}
 			Characters.Sort((Character a, Character b) => b.LastModified.CompareTo(a.LastModified));
-			string txt = filterTextBox.Text.ToLower();
+			string txt = ((TextInputBase)filterTextBox).get_Text().ToLower();
 			string[] array = txt.Split(';');
 			List<string> mapFilters = new List<string>();
 			List<string> craftingFilters = new List<string>();
@@ -1134,7 +1176,7 @@ namespace Kenedia.Modules.Characters
 			}
 			if (CharacterPanel != null)
 			{
-				CharacterPanel.SortChildren((CharacterControl a, CharacterControl b) => b.assignedCharacter.LastModified.CompareTo(a.assignedCharacter.LastModified));
+				CharacterPanel.SortChildren<CharacterControl>((Comparison<CharacterControl>)((CharacterControl a, CharacterControl b) => b.assignedCharacter.LastModified.CompareTo(a.assignedCharacter.LastModified)));
 			}
 			bool matchingFilterString(Character c)
 			{
@@ -1178,7 +1220,7 @@ namespace Kenedia.Modules.Characters
 				foreach (string item in birthdayFilters)
 				{
 					_ = item;
-					if (c.characterControl.birthday_Image.Visible)
+					if (((Control)c.characterControl.birthday_Image).get_Visible())
 					{
 						return true;
 					}
@@ -1270,7 +1312,7 @@ namespace Kenedia.Modules.Characters
 					{
 						foreach (CharacterCrafting crafting in c.Crafting)
 						{
-							if (crafting.Active && toggle.Id == crafting.Id && (!Settings.OnlyMaxCrafting.Value || crafting.Rating == 500 || ((crafting.Id == 4 || crafting.Id == 7) && crafting.Rating == 400)))
+							if (crafting.Active && toggle.Id == crafting.Id && (!Settings.OnlyMaxCrafting.get_Value() || crafting.Rating == 500 || ((crafting.Id == 4 || crafting.Id == 7) && crafting.Rating == 400)))
 							{
 								craftingMatch.match = true;
 							}
@@ -1283,10 +1325,10 @@ namespace Kenedia.Modules.Characters
 					birthdayMatch.match = true;
 					break;
 				case 1:
-					birthdayMatch.match = c.characterControl.birthday_Image.Visible;
+					birthdayMatch.match = ((Control)c.characterControl.birthday_Image).get_Visible();
 					break;
 				case 2:
-					birthdayMatch.match = !c.characterControl.birthday_Image.Visible;
+					birthdayMatch.match = !((Control)c.characterControl.birthday_Image).get_Visible();
 					break;
 				}
 				if (craftingMatch.isMatching && professionMatch.isMatching && birthdayMatch.isMatching && raceMatch.isMatching)
@@ -1299,11 +1341,11 @@ namespace Kenedia.Modules.Characters
 
 		private void Update_CurrentCharacter()
 		{
-			if (GameService.GameIntegration.Gw2Instance.IsInGame && charactersLoaded)
+			if (GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && charactersLoaded)
 			{
-				PlayerCharacter player = GameService.Gw2Mumble.PlayerCharacter;
+				PlayerCharacter player = GameService.Gw2Mumble.get_PlayerCharacter();
 				Last.character = Current.character;
-				Current.character = getCharacter(player.Name);
+				Current.character = getCharacter(player.get_Name());
 				Current.character.UpdateCharacter();
 				if (Last.character != Current.character && userAccount != null)
 				{
@@ -1317,41 +1359,36 @@ namespace Kenedia.Modules.Characters
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
-			base.OnModuleLoaded(e);
+			((Module)this).OnModuleLoaded(e);
 			CreateWindow();
 			CreateFilterWindow();
 			CreateSubWindow();
 			CreateImageSelector();
-			Settings.SwapModifier.Value.Activated += delegate
+			((Control)GameService.Graphics.get_SpriteScreen()).add_Resized((EventHandler<ResizedEventArgs>)delegate
 			{
-				ImageSelectorWindow.Dispose();
-				CreateImageSelector();
-			};
-			GameService.Graphics.SpriteScreen.Resized += delegate
-			{
-				if (GameService.Graphics.Resolution.X == 1084 && GameService.Graphics.Resolution.Y == 761)
+				if (GameService.Graphics.get_Resolution().X == 1084 && GameService.Graphics.get_Resolution().Y == 761)
 				{
-					screenCaptureWindow.Dispose();
+					((Control)screenCaptureWindow).Dispose();
 					CreateScreenCapture();
 				}
-			};
-			PlayerCharacter player = GameService.Gw2Mumble.PlayerCharacter;
-			player.SpecializationChanged += delegate
+			});
+			PlayerCharacter player = GameService.Gw2Mumble.get_PlayerCharacter();
+			player.add_SpecializationChanged((EventHandler<ValueEventArgs<int>>)delegate
 			{
 				if (Current.character != null)
 				{
 					Current.character.UpdateProfession();
 					filterCharacterPanel = true;
 				}
-			};
-			GameService.Overlay.UserLocaleChanged += delegate
+			});
+			GameService.Overlay.add_UserLocaleChanged((EventHandler<ValueEventArgs<CultureInfo>>)delegate
 			{
 				Load_UserLocale();
-			};
+			});
 			Load_UserLocale();
-			if (Settings.AutoLogin.Value && (player == null || player.Name == ""))
+			if (Settings.AutoLogin.get_Value() && (player == null || player.get_Name() == ""))
 			{
-				Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.RETURN);
+				Keyboard.Stroke((VirtualKeyShort)13, false);
 			}
 		}
 
@@ -1368,122 +1405,182 @@ namespace Kenedia.Modules.Characters
 				}
 			}
 			filterWindow.birthdayToggle._State = 0;
-			filterTextBox.Text = null;
+			((TextInputBase)filterTextBox).set_Text((string)null);
 			filterCharacterPanel = true;
 		}
 
 		private void CreateWindow()
 		{
-			MainWidow = new StandardWindow(Textures.Backgrounds[1], new Microsoft.Xna.Framework.Rectangle(15, 45, 365, 920), new Microsoft.Xna.Framework.Rectangle(10, 15, 385, 920))
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007c: Expected O, but got Unknown
+			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0119: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0125: Expected O, but got Unknown
+			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0158: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016f: Expected O, but got Unknown
+			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018b: Expected O, but got Unknown
+			//IL_0231: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fa: Expected O, but got Unknown
+			//IL_0310: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0315: Unknown result type (might be due to invalid IL or missing references)
+			//IL_031c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0323: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0396: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a2: Expected O, but got Unknown
+			StandardWindow val = new StandardWindow(Textures.Backgrounds[1], new Microsoft.Xna.Framework.Rectangle(15, 45, 365, 920), new Microsoft.Xna.Framework.Rectangle(10, 15, 385, 920));
+			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			((WindowBase2)val).set_Title("Characters");
+			((WindowBase2)val).set_Emblem(Textures.Emblems[1]);
+			((WindowBase2)val).set_Subtitle("❤");
+			((WindowBase2)val).set_SavesPosition(true);
+			((WindowBase2)val).set_Id("CharactersWindow");
+			MainWidow = val;
+			((Control)MainWidow).add_Hidden((EventHandler<EventArgs>)delegate
 			{
-				Parent = GameService.Graphics.SpriteScreen,
-				Title = "Characters",
-				Emblem = Textures.Emblems[1],
-				Subtitle = "❤",
-				SavesPosition = true,
-				Id = "CharactersWindow"
-			};
-			MainWidow.Hidden += delegate
+				((Control)subWindow).Hide();
+				((Control)filterWindow).Hide();
+				((Control)ImageSelectorWindow).Hide();
+			});
+			((Control)MainWidow).add_Shown((EventHandler<EventArgs>)delegate
 			{
-				subWindow.Hide();
-				filterWindow.Hide();
-				ImageSelectorWindow.Hide();
-			};
-			MainWidow.Shown += delegate
-			{
-				subWindow.Hide();
-				filterWindow.Hide();
-				ImageSelectorWindow.Hide();
-				if (Settings.FocusFilter.Value)
+				((Control)subWindow).Hide();
+				((Control)filterWindow).Hide();
+				((Control)ImageSelectorWindow).Hide();
+				if (Settings.FocusFilter.get_Value())
 				{
-					Control.ActiveControl = filterTextBox;
-					filterTextBox.Focused = true;
+					Control.set_ActiveControl((Control)(object)filterTextBox);
+					((TextInputBase)filterTextBox).set_Focused(true);
 				}
-			};
-			infoImage = new Image
-			{
-				Texture = Textures.Icons[2],
-				Size = new Point(28, 28),
-				Location = new Point(MainWidow.Width - 25, -5),
-				Parent = MainWidow,
-				Visible = false
-			};
-			refreshAPI = new StandardButton
-			{
-				Size = new Point(185, 25),
-				Location = new Point(175, 0),
-				Parent = MainWidow,
-				Text = "Refresh API Data",
-				Visible = false
-			};
-			refreshAPI.Click += delegate
+			});
+			Image val2 = new Image();
+			val2.set_Texture(AsyncTexture2D.op_Implicit(Textures.Icons[2]));
+			((Control)val2).set_Size(new Point(28, 28));
+			((Control)val2).set_Location(new Point(((Control)MainWidow).get_Width() - 25, -5));
+			((Control)val2).set_Parent((Container)(object)MainWidow);
+			((Control)val2).set_Visible(false);
+			infoImage = val2;
+			StandardButton val3 = new StandardButton();
+			((Control)val3).set_Size(new Point(185, 25));
+			((Control)val3).set_Location(new Point(175, 0));
+			((Control)val3).set_Parent((Container)(object)MainWidow);
+			val3.set_Text("Refresh API Data");
+			((Control)val3).set_Visible(false);
+			refreshAPI = val3;
+			((Control)refreshAPI).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				FetchAPI(force: true);
-			};
-			TextBox textBox = new TextBox();
-			textBox.PlaceholderText = "Search for ...";
-			textBox.Size = new Point(287, 30);
-			textBox.Font = GameService.Content.DefaultFont16;
-			textBox.Location = new Point(5, 20);
-			textBox.Parent = MainWidow;
-			textBox.BasicTooltipText = "'-c CraftingDiscipline'" + Environment.NewLine + "'-p Profession/Specialization'" + Environment.NewLine + "'-r Race'" + Environment.NewLine + "'-b(irthday)'" + Environment.NewLine + "'-c Chef; -p Warrior' will show all warriors and all chefs";
-			filterTextBox = textBox;
+			});
+			TextBox val4 = new TextBox();
+			((TextInputBase)val4).set_PlaceholderText("Search for ...");
+			((Control)val4).set_Size(new Point(287, 30));
+			((TextInputBase)val4).set_Font(GameService.Content.get_DefaultFont16());
+			((Control)val4).set_Location(new Point(5, 20));
+			((Control)val4).set_Parent((Container)(object)MainWidow);
+			((Control)val4).set_BasicTooltipText("'-c CraftingDiscipline'" + Environment.NewLine + "'-p Profession/Specialization'" + Environment.NewLine + "'-r Race'" + Environment.NewLine + "'-b(irthday)'" + Environment.NewLine + "'-c Chef; -p Warrior' will show all warriors and all chefs");
+			filterTextBox = val4;
 			new Tooltip();
-			filterTextBox.TextChanged += delegate
+			((TextInputBase)filterTextBox).add_TextChanged((EventHandler<EventArgs>)delegate
 			{
 				filterCharacterPanel = true;
-			};
-			filterTextBox.EnterPressed += delegate
+			});
+			filterTextBox.add_EnterPressed((EventHandler<EventArgs>)delegate
 			{
-				if (Settings.EnterToLogin.Value)
+				if (Settings.EnterToLogin.get_Value())
 				{
-					foreach (CharacterControl characterControl in CharacterPanel.Children)
+					foreach (CharacterControl characterControl in ((Container)CharacterPanel).get_Children())
 					{
-						if (characterControl.Visible)
+						if (((Control)characterControl).get_Visible())
 						{
 							characterControl.assignedCharacter.Swap();
 							break;
 						}
 					}
 				}
-			};
-			filterTextBox.Click += delegate
+			});
+			((Control)filterTextBox).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				if (filterWindow.Visible)
+				if (((Control)filterWindow).get_Visible())
 				{
-					filterWindow.Hide();
+					((Control)filterWindow).Hide();
 				}
 				else
 				{
-					filterWindow.Show();
+					((Control)filterWindow).Show();
 				}
-			};
-			clearButton = new StandardButton
-			{
-				Text = "Clear",
-				Location = new Point(292, 19),
-				Size = new Point(73, 32),
-				Parent = MainWidow,
-				ResizeIcon = true
-			};
-			clearButton.Click += delegate
+			});
+			StandardButton val5 = new StandardButton();
+			val5.set_Text("Clear");
+			((Control)val5).set_Location(new Point(292, 19));
+			((Control)val5).set_Size(new Point(73, 32));
+			((Control)val5).set_Parent((Container)(object)MainWidow);
+			val5.set_ResizeIcon(true);
+			clearButton = val5;
+			((Control)clearButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				ResetFilters();
-			};
-			CharacterPanel = new FlowPanel
-			{
-				CanScroll = true,
-				ShowBorder = true,
-				Parent = MainWidow,
-				Width = MainWidow.Width,
-				Height = MainWidow.Height - (clearButton.Location.Y + clearButton.Height + 5 + 50),
-				Location = new Point(0, clearButton.Location.Y + clearButton.Height + 5),
-				FlowDirection = ControlFlowDirection.SingleTopToBottom
-			};
+			});
+			FlowPanel val6 = new FlowPanel();
+			((Panel)val6).set_CanScroll(true);
+			((Panel)val6).set_ShowBorder(true);
+			((Control)val6).set_Parent((Container)(object)MainWidow);
+			((Control)val6).set_Width(((Control)MainWidow).get_Width());
+			((Control)val6).set_Height(((Control)MainWidow).get_Height() - (((Control)clearButton).get_Location().Y + ((Control)clearButton).get_Height() + 5 + 50));
+			((Control)val6).set_Location(new Point(0, ((Control)clearButton).get_Location().Y + ((Control)clearButton).get_Height() + 5));
+			val6.set_FlowDirection((ControlFlowDirection)3);
+			CharacterPanel = val6;
 		}
 
 		private void CreateFilterWindow()
 		{
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013e: Expected O, but got Unknown
+			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018f: Expected O, but got Unknown
+			//IL_03ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0409: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_080a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0816: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0831: Unknown result type (might be due to invalid IL or missing references)
+			//IL_083c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_084b: Expected O, but got Unknown
 			new ContentService();
 			Specializations[] specs = new Specializations[27]
 			{
@@ -1516,90 +1613,82 @@ namespace Kenedia.Modules.Characters
 				Specializations.Vindicator
 			};
 			Point windowPadding = new Point(5, 5);
-			filterWindow = new FilterWindow
+			FilterWindow obj = new FilterWindow();
+			((Control)obj).set_Height(500);
+			((Container)obj).set_HeightSizingMode((SizingMode)1);
+			((Control)obj).set_Width(300);
+			((Control)obj).set_Location(new Point(((Control)MainWidow).get_Location().X + 385 - 25, ((Control)MainWidow).get_Location().Y + 60));
+			((Control)obj).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			obj.Texture = Textures.Backgrounds[3];
+			((Container)obj).set_AutoSizePadding(new Point(windowPadding.X, windowPadding.Y));
+			filterWindow = obj;
+			((Control)filterWindow).add_Shown((EventHandler<EventArgs>)delegate
 			{
-				Height = 500,
-				HeightSizingMode = SizingMode.AutoSize,
-				Width = 300,
-				Location = new Point(MainWidow.Location.X + 385 - 25, MainWidow.Location.Y + 60),
-				Parent = GameService.Graphics.SpriteScreen,
-				Texture = Textures.Backgrounds[3],
-				AutoSizePadding = new Point(windowPadding.X, windowPadding.Y)
-			};
-			filterWindow.Shown += delegate
+				((Control)subWindow).Hide();
+			});
+			((Control)MainWidow).add_Moved((EventHandler<MovedEventArgs>)delegate
 			{
-				subWindow.Hide();
-			};
-			MainWidow.Moved += delegate
+				((Control)filterWindow).set_Location(new Point(((Control)MainWidow).get_Location().X + 385 - 25, ((Control)MainWidow).get_Location().Y + 60));
+			});
+			FlowPanel val = new FlowPanel();
+			((Container)val).set_HeightSizingMode((SizingMode)1);
+			((Container)val).set_WidthSizingMode((SizingMode)2);
+			((Control)val).set_Parent((Container)(object)filterWindow);
+			val.set_ControlPadding(new Vector2(2f, 5f));
+			FlowPanel mainPanel = val;
+			Image val2 = new Image();
+			val2.set_Texture(AsyncTexture2D.op_Implicit(Textures.Icons[35]));
+			((Control)val2).set_Parent((Container)(object)filterWindow);
+			((Control)val2).set_Location(new Point(((Control)filterWindow).get_Width() - 23, 2));
+			((Control)val2).set_Size(new Point(21, 23));
+			Image closeButton = val2;
+			((Control)closeButton).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
 			{
-				filterWindow.Location = new Point(MainWidow.Location.X + 385 - 25, MainWidow.Location.Y + 60);
-			};
-			FlowPanel mainPanel = new FlowPanel
+				closeButton.set_Texture(AsyncTexture2D.op_Implicit(Textures.Icons[36]));
+			});
+			((Control)closeButton).add_MouseLeft((EventHandler<MouseEventArgs>)delegate
 			{
-				HeightSizingMode = SizingMode.AutoSize,
-				WidthSizingMode = SizingMode.Fill,
-				Parent = filterWindow,
-				ControlPadding = new Vector2(2f, 5f)
-			};
-			Image closeButton = new Image
+				closeButton.set_Texture(AsyncTexture2D.op_Implicit(Textures.Icons[35]));
+			});
+			((Control)closeButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				Texture = Textures.Icons[35],
-				Parent = filterWindow,
-				Location = new Point(filterWindow.Width - 23, 2),
-				Size = new Point(21, 23)
-			};
-			closeButton.MouseEntered += delegate
-			{
-				closeButton.Texture = Textures.Icons[36];
-			};
-			closeButton.MouseLeft += delegate
-			{
-				closeButton.Texture = Textures.Icons[35];
-			};
-			closeButton.Click += delegate
-			{
-				filterWindow.Hide();
-			};
-			filterWindow.Utility = new HeadedFlowRegion
-			{
-				WidthSizingMode = SizingMode.Fill,
-				Text = "Utility",
-				Width = filterWindow.Width - windowPadding.X * 2,
-				Parent = mainPanel
-			};
+				((Control)filterWindow).Hide();
+			});
+			FilterWindow obj2 = filterWindow;
+			HeadedFlowRegion headedFlowRegion = new HeadedFlowRegion();
+			((Container)headedFlowRegion).set_WidthSizingMode((SizingMode)2);
+			headedFlowRegion.Text = "Utility";
+			((Control)headedFlowRegion).set_Width(((Control)filterWindow).get_Width() - windowPadding.X * 2);
+			((Control)headedFlowRegion).set_Parent((Container)(object)mainPanel);
+			obj2.Utility = headedFlowRegion;
 			FlowPanel region = filterWindow.Utility.contentFlowPanel;
-			region.OuterControlPadding = new Vector2(0f, 0f);
-			filterWindow.visibleToggle = new ToggleIcon
-			{
-				Texture = Textures.Icons[43],
-				Parent = region,
-				_State = 0,
-				_MaxState = 2,
-				_Textures = 
-				{
-					Textures.Icons[43],
-					Textures.Icons[42]
-				}
-			};
-			filterWindow.visibleToggle.Click += delegate
+			region.set_OuterControlPadding(new Vector2(0f, 0f));
+			FilterWindow obj3 = filterWindow;
+			ToggleIcon toggleIcon = new ToggleIcon();
+			((Image)toggleIcon).set_Texture(AsyncTexture2D.op_Implicit(Textures.Icons[43]));
+			((Control)toggleIcon).set_Parent((Container)(object)region);
+			toggleIcon._State = 0;
+			toggleIcon._MaxState = 2;
+			toggleIcon._Textures.Add(Textures.Icons[43]);
+			toggleIcon._Textures.Add(Textures.Icons[42]);
+			obj3.visibleToggle = toggleIcon;
+			((Control)filterWindow.visibleToggle).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				showAllCharacters = filterWindow.visibleToggle._State == 1;
-			};
-			filterWindow.birthdayToggle = new ToggleIcon
-			{
-				Parent = region,
-				_Textures = 
-				{
-					Textures.Icons[24],
-					Textures.Icons[17],
-					Textures.Icons[25]
-				},
-				_MaxState = 3,
-				_State = 0
-			};
+			});
+			FilterWindow obj4 = filterWindow;
+			ToggleIcon toggleIcon2 = new ToggleIcon();
+			((Control)toggleIcon2).set_Parent((Container)(object)region);
+			toggleIcon2._Textures.Add(Textures.Icons[24]);
+			toggleIcon2._Textures.Add(Textures.Icons[17]);
+			toggleIcon2._Textures.Add(Textures.Icons[25]);
+			toggleIcon2._MaxState = 3;
+			toggleIcon2._State = 0;
+			obj4.birthdayToggle = toggleIcon2;
 			foreach (RaceType index5 in Enum.GetValues(typeof(RaceType)))
 			{
-				filterRaces.Insert((int)index5, new ToggleIcon
+				List<ToggleIcon> list = filterRaces;
+				ToggleIcon obj5 = new ToggleIcon
 				{
 					_Textures = 
 					{
@@ -1607,57 +1696,54 @@ namespace Kenedia.Modules.Characters
 						Textures.Races[(uint)index5]
 					},
 					_State = 0,
-					_MaxState = 2,
-					Size = new Point(24, 24),
-					Texture = Textures.RacesDisabled[(uint)index5],
-					Parent = region,
-					Id = (int)index5
-				});
-				new Label
-				{
-					Text = "",
-					Parent = region,
-					Visible = true,
-					Width = 5
+					_MaxState = 2
 				};
+				((Control)obj5).set_Size(new Point(24, 24));
+				((Image)obj5).set_Texture(AsyncTexture2D.op_Implicit(Textures.RacesDisabled[(uint)index5]));
+				((Control)obj5).set_Parent((Container)(object)region);
+				obj5.Id = (int)index5;
+				list.Insert((int)index5, obj5);
+				Label val3 = new Label();
+				val3.set_Text("");
+				((Control)val3).set_Parent((Container)(object)region);
+				((Control)val3).set_Visible(true);
+				((Control)val3).set_Width(5);
 			}
-			filterWindow.Crafting = new HeadedFlowRegion
-			{
-				WidthSizingMode = SizingMode.Fill,
-				Text = common.CraftingProfession,
-				Width = filterWindow.Width - windowPadding.X * 2,
-				Parent = mainPanel
-			};
+			FilterWindow obj6 = filterWindow;
+			HeadedFlowRegion headedFlowRegion2 = new HeadedFlowRegion();
+			((Container)headedFlowRegion2).set_WidthSizingMode((SizingMode)2);
+			headedFlowRegion2.Text = common.CraftingProfession;
+			((Control)headedFlowRegion2).set_Width(((Control)filterWindow).get_Width() - windowPadding.X * 2);
+			((Control)headedFlowRegion2).set_Parent((Container)(object)mainPanel);
+			obj6.Crafting = headedFlowRegion2;
 			region = filterWindow.Crafting.contentFlowPanel;
 			filterCrafting = new List<ToggleIcon>(new ToggleIcon[Textures.Crafting.Length]);
 			foreach (Crafting index4 in Enum.GetValues(typeof(Crafting)))
 			{
-				filterCrafting.Insert((int)index4, new ToggleIcon
-				{
-					Size = new Point(28, 28),
-					_Textures = 
-					{
-						Textures.CraftingDisabled[(int)index4],
-						Textures.Crafting[(int)index4]
-					},
-					_State = 0,
-					_MaxState = 2,
-					Parent = region,
-					Id = (int)index4
-				});
+				List<ToggleIcon> list2 = filterCrafting;
+				ToggleIcon toggleIcon3 = new ToggleIcon();
+				((Control)toggleIcon3).set_Size(new Point(28, 28));
+				toggleIcon3._Textures.Add(Textures.CraftingDisabled[(int)index4]);
+				toggleIcon3._Textures.Add(Textures.Crafting[(int)index4]);
+				toggleIcon3._State = 0;
+				toggleIcon3._MaxState = 2;
+				((Control)toggleIcon3).set_Parent((Container)(object)region);
+				toggleIcon3.Id = (int)index4;
+				list2.Insert((int)index4, toggleIcon3);
 			}
-			filterWindow.Profession = new HeadedFlowRegion
-			{
-				WidthSizingMode = SizingMode.Fill,
-				Text = common.Profession,
-				Width = filterWindow.Width - windowPadding.X * 2,
-				Parent = mainPanel
-			};
+			FilterWindow obj7 = filterWindow;
+			HeadedFlowRegion headedFlowRegion3 = new HeadedFlowRegion();
+			((Container)headedFlowRegion3).set_WidthSizingMode((SizingMode)2);
+			headedFlowRegion3.Text = common.Profession;
+			((Control)headedFlowRegion3).set_Width(((Control)filterWindow).get_Width() - windowPadding.X * 2);
+			((Control)headedFlowRegion3).set_Parent((Container)(object)mainPanel);
+			obj7.Profession = headedFlowRegion3;
 			region = filterWindow.Profession.contentFlowPanel;
 			filterProfessions = new List<ToggleIcon>(new ToggleIcon[Textures.Professions.Length]);
 			foreach (Professions index3 in Enum.GetValues(typeof(Professions)))
 			{
-				filterProfessions.Insert((int)index3, new ToggleIcon
+				List<ToggleIcon> list3 = filterProfessions;
+				ToggleIcon obj8 = new ToggleIcon
 				{
 					_Textures = 
 					{
@@ -1665,23 +1751,25 @@ namespace Kenedia.Modules.Characters
 						Textures.Professions[(int)index3]
 					},
 					_State = 0,
-					_MaxState = 2,
-					Parent = region,
-					Id = (int)index3
-				});
+					_MaxState = 2
+				};
+				((Control)obj8).set_Parent((Container)(object)region);
+				obj8.Id = (int)index3;
+				list3.Insert((int)index3, obj8);
 			}
-			filterWindow.Specialization = new HeadedFlowRegion
-			{
-				WidthSizingMode = SizingMode.Fill,
-				Text = common.Specialization,
-				Width = filterWindow.Width - windowPadding.X * 2,
-				Parent = mainPanel
-			};
+			FilterWindow obj9 = filterWindow;
+			HeadedFlowRegion headedFlowRegion4 = new HeadedFlowRegion();
+			((Container)headedFlowRegion4).set_WidthSizingMode((SizingMode)2);
+			headedFlowRegion4.Text = common.Specialization;
+			((Control)headedFlowRegion4).set_Width(((Control)filterWindow).get_Width() - windowPadding.X * 2);
+			((Control)headedFlowRegion4).set_Parent((Container)(object)mainPanel);
+			obj9.Specialization = headedFlowRegion4;
 			region = filterWindow.Specialization.contentFlowPanel;
 			filterBaseSpecs = new List<ToggleIcon>(new ToggleIcon[Textures.Professions.Length]);
 			foreach (Professions index2 in Enum.GetValues(typeof(Professions)))
 			{
-				filterBaseSpecs.Insert((int)index2, new ToggleIcon
+				List<ToggleIcon> list4 = filterBaseSpecs;
+				ToggleIcon obj10 = new ToggleIcon
 				{
 					_Textures = 
 					{
@@ -1689,17 +1777,19 @@ namespace Kenedia.Modules.Characters
 						Textures.Professions[(int)index2]
 					},
 					_State = 0,
-					_MaxState = 2,
-					Parent = region,
-					Id = (int)index2
-				});
+					_MaxState = 2
+				};
+				((Control)obj10).set_Parent((Container)(object)region);
+				obj10.Id = (int)index2;
+				list4.Insert((int)index2, obj10);
 			}
 			filterSpecs = new List<ToggleIcon>(new ToggleIcon[Textures.Specializations.Length]);
 			Specializations[] array = specs;
 			for (int i = 0; i < array.Length; i++)
 			{
 				int index = (int)array[i];
-				filterSpecs.Insert(index, new ToggleIcon
+				List<ToggleIcon> list5 = filterSpecs;
+				ToggleIcon obj11 = new ToggleIcon
 				{
 					_Textures = 
 					{
@@ -1707,23 +1797,24 @@ namespace Kenedia.Modules.Characters
 						Textures.Specializations[index]
 					},
 					_State = 0,
-					_MaxState = 2,
-					Parent = region,
-					Id = index
-				});
+					_MaxState = 2
+				};
+				((Control)obj11).set_Parent((Container)(object)region);
+				obj11.Id = index;
+				list5.Insert(index, obj11);
 			}
-			filterWindow.toggleSpecsButton = new StandardButton
+			FilterWindow obj12 = filterWindow;
+			StandardButton val4 = new StandardButton();
+			val4.set_Text(common.ToggleAll);
+			((Control)val4).set_Parent((Container)(object)region);
+			((Control)val4).set_Size(new Point(((Control)region).get_Width() - 10, 25));
+			((Control)val4).set_Padding(new Thickness(0f, 3f));
+			obj12.toggleSpecsButton = val4;
+			((Control)region).add_Resized((EventHandler<ResizedEventArgs>)delegate
 			{
-				Text = common.ToggleAll,
-				Parent = region,
-				Size = new Point(region.Width - 10, 25),
-				Padding = new Thickness(0f, 3f)
-			};
-			region.Resized += delegate
-			{
-				filterWindow.toggleSpecsButton.Width = region.Width - 10;
-			};
-			filterWindow.toggleSpecsButton.Click += delegate
+				((Control)filterWindow.toggleSpecsButton).set_Width(((Control)region).get_Width() - 10);
+			});
+			((Control)filterWindow.toggleSpecsButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				int state = ((filterBaseSpecs[1]._State != 1) ? 1 : 0);
 				foreach (List<ToggleIcon> item in new List<List<ToggleIcon>> { filterSpecs, filterBaseSpecs })
@@ -1738,199 +1829,276 @@ namespace Kenedia.Modules.Characters
 				}
 				filterWindow.birthdayToggle._State = 0;
 				filterCharacterPanel = true;
-			};
-			filterWindow.CustomTags = new HeadedFlowRegion
-			{
-				WidthSizingMode = SizingMode.Fill,
-				Text = common.CustomTags,
-				Width = filterWindow.Width - windowPadding.X * 2,
-				Parent = mainPanel
-			};
+			});
+			FilterWindow obj13 = filterWindow;
+			HeadedFlowRegion headedFlowRegion5 = new HeadedFlowRegion();
+			((Container)headedFlowRegion5).set_WidthSizingMode((SizingMode)2);
+			headedFlowRegion5.Text = common.CustomTags;
+			((Control)headedFlowRegion5).set_Width(((Control)filterWindow).get_Width() - windowPadding.X * 2);
+			((Control)headedFlowRegion5).set_Parent((Container)(object)mainPanel);
+			obj13.CustomTags = headedFlowRegion5;
 			region = filterWindow.CustomTags.contentFlowPanel;
-			region.ControlPadding = new Vector2(3f, 2f);
+			region.set_ControlPadding(new Vector2(3f, 2f));
 			filterTagsPanel = region;
-			filterWindow.Hide();
+			((Control)filterWindow).Hide();
 		}
 
 		private void CreateSubWindow()
 		{
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Expected O, but got Unknown
+			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0119: Expected O, but got Unknown
+			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0168: Expected O, but got Unknown
+			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0172: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0191: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b0: Expected O, but got Unknown
+			//IL_023f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0244: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0252: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0278: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0280: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0298: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b9: Expected O, but got Unknown
+			//IL_02be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0308: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0317: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0322: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033c: Expected O, but got Unknown
+			//IL_036a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0382: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0405: Unknown result type (might be due to invalid IL or missing references)
+			//IL_041a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0421: Unknown result type (might be due to invalid IL or missing references)
+			//IL_042d: Expected O, but got Unknown
+			//IL_0432: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0437: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0446: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0451: Unknown result type (might be due to invalid IL or missing references)
+			//IL_045c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0464: Unknown result type (might be due to invalid IL or missing references)
+			//IL_047f: Expected O, but got Unknown
+			//IL_04b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04fe: Expected O, but got Unknown
+			//IL_0531: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0536: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0549: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0554: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0570: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0584: Expected O, but got Unknown
+			//IL_061b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0620: Unknown result type (might be due to invalid IL or missing references)
+			//IL_062b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0639: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0644: Unknown result type (might be due to invalid IL or missing references)
+			//IL_064b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0660: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0675: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0681: Expected O, but got Unknown
 			ContentService contentService = new ContentService();
 			int offset = 105;
-			subWindow = new CharacterDetailWindow
+			CharacterDetailWindow characterDetailWindow = new CharacterDetailWindow();
+			((Control)characterDetailWindow).set_Location(new Point(((Control)MainWidow).get_Location().X + 385 - 25, ((Control)MainWidow).get_Location().Y + offset));
+			((Control)characterDetailWindow).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			characterDetailWindow.Texture = Textures.Backgrounds[3];
+			((Control)characterDetailWindow).set_Width(350);
+			((Container)characterDetailWindow).set_HeightSizingMode((SizingMode)1);
+			subWindow = characterDetailWindow;
+			((Control)subWindow).add_Shown((EventHandler<EventArgs>)delegate
 			{
-				Location = new Point(MainWidow.Location.X + 385 - 25, MainWidow.Location.Y + offset),
-				Parent = GameService.Graphics.SpriteScreen,
-				Texture = Textures.Backgrounds[3],
-				Width = 350,
-				HeightSizingMode = SizingMode.AutoSize
-			};
-			subWindow.Shown += delegate
+				((Control)filterWindow).Hide();
+			});
+			((Control)MainWidow).add_Moved((EventHandler<MovedEventArgs>)delegate
 			{
-				filterWindow.Hide();
-			};
-			MainWidow.Moved += delegate
+				((Control)subWindow).set_Location(new Point(((Control)MainWidow).get_Location().X + 385 - 25, ((Control)MainWidow).get_Location().Y + offset));
+			});
+			CharacterDetailWindow characterDetailWindow2 = subWindow;
+			Image val = new Image();
+			((Control)val).set_Parent((Container)(object)subWindow);
+			((Control)val).set_Location(new Point(0, 0));
+			((Control)val).set_Size(new Point(58, 58));
+			val.set_Texture(AsyncTexture2D.op_Implicit(Textures.Backgrounds[7]));
+			((Control)val).set_Visible(false);
+			characterDetailWindow2.border_TopRight = val;
+			CharacterDetailWindow characterDetailWindow3 = subWindow;
+			Image val2 = new Image();
+			((Control)val2).set_Parent((Container)(object)subWindow);
+			((Control)val2).set_Location(new Point(0, 0));
+			((Control)val2).set_Size(new Point(58, 58));
+			val2.set_Texture(AsyncTexture2D.op_Implicit(Textures.Backgrounds[6]));
+			((Control)val2).set_Visible(false);
+			characterDetailWindow3.border_BottomLeft = val2;
+			CharacterDetailWindow characterDetailWindow4 = subWindow;
+			Image val3 = new Image();
+			((Control)val3).set_Location(new Point(0, 0));
+			val3.set_Texture(AsyncTexture2D.op_Implicit(Textures.Professions[1]));
+			((Control)val3).set_Size(new Point(58, 58));
+			((Control)val3).set_Parent((Container)(object)subWindow);
+			characterDetailWindow4.spec_Image = val3;
+			((Control)subWindow.spec_Image).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
 			{
-				subWindow.Location = new Point(MainWidow.Location.X + 385 - 25, MainWidow.Location.Y + offset);
-			};
-			subWindow.border_TopRight = new Image
-			{
-				Parent = subWindow,
-				Location = new Point(0, 0),
-				Size = new Point(58, 58),
-				Texture = Textures.Backgrounds[7],
-				Visible = false
-			};
-			subWindow.border_BottomLeft = new Image
-			{
-				Parent = subWindow,
-				Location = new Point(0, 0),
-				Size = new Point(58, 58),
-				Texture = Textures.Backgrounds[6],
-				Visible = false
-			};
-			subWindow.spec_Image = new Image
-			{
-				Location = new Point(0, 0),
-				Texture = Textures.Professions[1],
-				Size = new Point(58, 58),
-				Parent = subWindow
-			};
-			subWindow.spec_Image.MouseEntered += delegate
-			{
-				if (!GameService.GameIntegration.Gw2Instance.IsInGame)
+				if (!GameService.GameIntegration.get_Gw2Instance().get_IsInGame())
 				{
-					subWindow.spec_Image.Texture = Textures.Icons[45];
+					subWindow.spec_Image.set_Texture(AsyncTexture2D.op_Implicit(Textures.Icons[45]));
 				}
-			};
-			subWindow.spec_Image.MouseLeft += delegate
+			});
+			((Control)subWindow.spec_Image).add_MouseLeft((EventHandler<MouseEventArgs>)delegate
 			{
-				subWindow.spec_Image.Texture = subWindow.assignedCharacter.getProfessionTexture();
-			};
-			subWindow.spec_Image.Click += delegate
+				subWindow.spec_Image.set_Texture(AsyncTexture2D.op_Implicit(subWindow.assignedCharacter.getProfessionTexture()));
+			});
+			((Control)subWindow.spec_Image).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				ImageSelectorWindow.assignedCharacter = subWindow.assignedCharacter;
-				ImageSelectorWindow.Visible = true;
-			};
-			subWindow.name_Label = new Label
-			{
-				Location = new Point(60, 0),
-				Text = "py" + base.Name + "yq",
-				Parent = subWindow,
-				Height = 25,
-				Width = subWindow.Width - 60 - 32 - 5,
-				Font = contentService.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size18, ContentService.FontStyle.Regular),
-				VerticalAlignment = VerticalAlignment.Middle
-			};
-			subWindow.include_Image = new Image
-			{
-				Location = new Point(subWindow.name_Label.Location.X + subWindow.name_Label.Width + 5, 0),
-				Texture = Textures.Icons[42],
-				Size = new Point(32, 32),
-				Parent = subWindow,
-				BasicTooltipText = string.Format(common.ShowHide_Tooltip, "Name")
-			};
-			subWindow.include_Image.Click += delegate
+				((Control)ImageSelectorWindow).set_Visible(true);
+			});
+			CharacterDetailWindow characterDetailWindow5 = subWindow;
+			Label val4 = new Label();
+			((Control)val4).set_Location(new Point(60, 0));
+			val4.set_Text("py" + ((Module)this).get_Name() + "yq");
+			((Control)val4).set_Parent((Container)(object)subWindow);
+			((Control)val4).set_Height(25);
+			((Control)val4).set_Width(((Control)subWindow).get_Width() - 60 - 32 - 5);
+			val4.set_Font(contentService.GetFont((FontFace)0, (FontSize)18, (FontStyle)0));
+			val4.set_VerticalAlignment((VerticalAlignment)1);
+			characterDetailWindow5.name_Label = val4;
+			CharacterDetailWindow characterDetailWindow6 = subWindow;
+			Image val5 = new Image();
+			((Control)val5).set_Location(new Point(((Control)subWindow.name_Label).get_Location().X + ((Control)subWindow.name_Label).get_Width() + 5, 0));
+			val5.set_Texture(AsyncTexture2D.op_Implicit(Textures.Icons[42]));
+			((Control)val5).set_Size(new Point(32, 32));
+			((Control)val5).set_Parent((Container)(object)subWindow);
+			((Control)val5).set_BasicTooltipText(string.Format(common.ShowHide_Tooltip, "Name"));
+			characterDetailWindow6.include_Image = val5;
+			((Control)subWindow.include_Image).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				subWindow.assignedCharacter.include = !subWindow.assignedCharacter.include;
 				subWindow.assignedCharacter.Save();
-				subWindow.include_Image.Texture = (subWindow.assignedCharacter.include ? Textures.Icons[42] : Textures.Icons[43]);
-			};
-			new Image
+				subWindow.include_Image.set_Texture(AsyncTexture2D.op_Implicit(subWindow.assignedCharacter.include ? Textures.Icons[42] : Textures.Icons[43]));
+			});
+			Image val6 = new Image();
+			val6.set_Texture(AsyncTexture2D.op_Implicit(Textures.Icons[19]));
+			((Control)val6).set_Parent((Container)(object)subWindow);
+			((Control)val6).set_Location(new Point(55, 27));
+			((Control)val6).set_Size(new Point(((Control)subWindow).get_Width() - 165, 4));
+			CharacterDetailWindow characterDetailWindow7 = subWindow;
+			Label val7 = new Label();
+			((Control)val7).set_Location(new Point(60, 33));
+			val7.set_Text(DataManager.getProfessionName(1));
+			((Control)val7).set_Parent((Container)(object)subWindow);
+			((Control)val7).set_Height(25);
+			((Control)val7).set_Width(((Control)subWindow).get_Width() - 165);
+			val7.set_Font(contentService.GetFont((FontFace)0, (FontSize)18, (FontStyle)0));
+			val7.set_VerticalAlignment((VerticalAlignment)1);
+			((Control)val7).set_Visible(false);
+			characterDetailWindow7.spec_Label = val7;
+			CharacterDetailWindow characterDetailWindow8 = subWindow;
+			Checkbox val8 = new Checkbox();
+			((Control)val8).set_Location(new Point(60, 33));
+			val8.set_Text(common.LoginCharacter);
+			((Control)val8).set_Parent((Container)(object)subWindow);
+			((Control)val8).set_Height(25);
+			((Control)val8).set_Width(((Control)subWindow).get_Width() - 165);
+			characterDetailWindow8.loginCharacter = val8;
+			((Control)subWindow.loginCharacter).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				Texture = Textures.Icons[19],
-				Parent = subWindow,
-				Location = new Point(55, 27),
-				Size = new Point(subWindow.Width - 165, 4)
-			};
-			subWindow.spec_Label = new Label
-			{
-				Location = new Point(60, 33),
-				Text = DataManager.getProfessionName(1),
-				Parent = subWindow,
-				Height = 25,
-				Width = subWindow.Width - 165,
-				Font = contentService.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size18, ContentService.FontStyle.Regular),
-				VerticalAlignment = VerticalAlignment.Middle,
-				Visible = false
-			};
-			subWindow.loginCharacter = new Checkbox
-			{
-				Location = new Point(60, 33),
-				Text = common.LoginCharacter,
-				Parent = subWindow,
-				Height = 25,
-				Width = subWindow.Width - 165
-			};
-			subWindow.loginCharacter.Click += delegate
-			{
-				if (subWindow.loginCharacter.Checked)
+				if (subWindow.loginCharacter.get_Checked())
 				{
 					foreach (Character character in Characters)
 					{
-						character.loginCharacter = character == subWindow.assignedCharacter && subWindow.loginCharacter.Checked;
+						character.loginCharacter = character == subWindow.assignedCharacter && subWindow.loginCharacter.get_Checked();
 					}
 				}
 				else
 				{
-					subWindow.assignedCharacter.loginCharacter = subWindow.loginCharacter.Checked;
+					subWindow.assignedCharacter.loginCharacter = subWindow.loginCharacter.get_Checked();
 				}
 				subWindow.assignedCharacter.Save();
-			};
-			subWindow.tag_TextBox = new TextBox
+			});
+			CharacterDetailWindow characterDetailWindow9 = subWindow;
+			TextBox val9 = new TextBox();
+			((Control)val9).set_Parent((Container)(object)subWindow);
+			((Control)val9).set_Location(new Point(5, 75));
+			((Control)val9).set_Size(new Point(((Control)subWindow).get_Width() - 5 - 25 - 5, 25));
+			((TextInputBase)val9).set_PlaceholderText("PvE, WvW, PvP, Raiding, ERP ...");
+			characterDetailWindow9.tag_TextBox = val9;
+			((TextInputBase)subWindow.tag_TextBox).add_TextChanged((EventHandler<EventArgs>)delegate
 			{
-				Parent = subWindow,
-				Location = new Point(5, 75),
-				Size = new Point(subWindow.Width - 5 - 25 - 5, 25),
-				PlaceholderText = "PvE, WvW, PvP, Raiding, ERP ..."
-			};
-			subWindow.tag_TextBox.TextChanged += delegate
-			{
-				if (subWindow.tag_TextBox.Text != null && subWindow.tag_TextBox.Text.Trim() != "")
+				if (((TextInputBase)subWindow.tag_TextBox).get_Text() != null && ((TextInputBase)subWindow.tag_TextBox).get_Text().Trim() != "")
 				{
-					subWindow.addTag_Button.Texture = Textures.Icons[39];
+					subWindow.addTag_Button.set_Texture(AsyncTexture2D.op_Implicit(Textures.Icons[39]));
 				}
 				else
 				{
-					subWindow.addTag_Button.Texture = Textures.Icons[40];
+					subWindow.addTag_Button.set_Texture(AsyncTexture2D.op_Implicit(Textures.Icons[40]));
 				}
-			};
-			subWindow.addTag_Button = new Image
+			});
+			CharacterDetailWindow characterDetailWindow10 = subWindow;
+			Image val10 = new Image();
+			val10.set_Texture(AsyncTexture2D.op_Implicit(Textures.Icons[40]));
+			((Control)val10).set_Parent((Container)(object)subWindow);
+			((Control)val10).set_Location(new Point(((Control)subWindow).get_Width() - 25 - 5, 73));
+			((Control)val10).set_Size(new Point(29, 29));
+			characterDetailWindow10.addTag_Button = val10;
+			((Control)subWindow.addTag_Button).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
 			{
-				Texture = Textures.Icons[40],
-				Parent = subWindow,
-				Location = new Point(subWindow.Width - 25 - 5, 73),
-				Size = new Point(29, 29)
-			};
-			subWindow.addTag_Button.MouseEntered += delegate
+				subWindow.addTag_Button.set_Texture(AsyncTexture2D.op_Implicit(Textures.Icons[41]));
+			});
+			((Control)subWindow.addTag_Button).add_MouseLeft((EventHandler<MouseEventArgs>)delegate
 			{
-				subWindow.addTag_Button.Texture = Textures.Icons[41];
-			};
-			subWindow.addTag_Button.MouseLeft += delegate
-			{
-				subWindow.addTag_Button.Texture = Textures.Icons[40];
-			};
-			subWindow.addTag_Button.Click += delegate
-			{
-				addTag();
-			};
-			subWindow.tag_TextBox.EnterPressed += delegate
+				subWindow.addTag_Button.set_Texture(AsyncTexture2D.op_Implicit(Textures.Icons[40]));
+			});
+			((Control)subWindow.addTag_Button).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				addTag();
-			};
-			subWindow.customTags_Panel = new FlowPanel
+			});
+			subWindow.tag_TextBox.add_EnterPressed((EventHandler<EventArgs>)delegate
 			{
-				Parent = subWindow,
-				Location = new Point(5, 95),
-				Width = 330,
-				ShowBorder = true,
-				OuterControlPadding = new Vector2(2f, 2f),
-				ControlPadding = new Vector2(5f, 2f),
-				HeightSizingMode = SizingMode.AutoSize
-			};
-			subWindow.Hide();
+				addTag();
+			});
+			CharacterDetailWindow characterDetailWindow11 = subWindow;
+			FlowPanel val11 = new FlowPanel();
+			((Control)val11).set_Parent((Container)(object)subWindow);
+			((Control)val11).set_Location(new Point(5, 95));
+			((Control)val11).set_Width(330);
+			((Panel)val11).set_ShowBorder(true);
+			val11.set_OuterControlPadding(new Vector2(2f, 2f));
+			val11.set_ControlPadding(new Vector2(5f, 2f));
+			((Container)val11).set_HeightSizingMode((SizingMode)1);
+			characterDetailWindow11.customTags_Panel = val11;
+			((Control)subWindow).Hide();
 			void addTag()
 			{
-				string txt = ((subWindow.tag_TextBox != null && subWindow.tag_TextBox.Text.Trim() != "") ? subWindow.tag_TextBox.Text : null);
+				string txt = ((subWindow.tag_TextBox != null && ((TextInputBase)subWindow.tag_TextBox).get_Text().Trim() != "") ? ((TextInputBase)subWindow.tag_TextBox).get_Text() : null);
 				if (txt != null && subWindow.assignedCharacter != null && !subWindow.assignedCharacter.Tags.Contains(txt.Trim()))
 				{
 					new TagEntry(txt, subWindow.assignedCharacter, subWindow.customTags_Panel);
@@ -1939,64 +2107,65 @@ namespace Kenedia.Modules.Characters
 					if (!Tags.Contains(txt))
 					{
 						Tags.Add(txt);
-						TagEntry entry = new TagEntry(txt, new Character(), filterTagsPanel, showButton: false, contentService.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size14, ContentService.FontStyle.Regular));
-						entry.Click += delegate
+						TagEntry entry = new TagEntry(txt, new Character(), filterTagsPanel, showButton: false, contentService.GetFont((FontFace)0, (FontSize)14, (FontStyle)0));
+						((Control)entry).add_Click((EventHandler<MouseEventArgs>)delegate
 						{
-							if (filterTextBox.Text.ToLower().Contains(txt.ToLower()))
+							if (((TextInputBase)filterTextBox).get_Text().ToLower().Contains(txt.ToLower()))
 							{
-								_ = filterTextBox.Text;
+								((TextInputBase)filterTextBox).get_Text();
 								txt.Replace("; -t " + txt + ";", "");
 								txt.Replace("; -t " + txt, "");
 								txt.Replace("-t " + txt + ";", "");
 								txt.Replace("-t " + txt, "");
-								filterTextBox.Text = txt.Trim();
+								((TextInputBase)filterTextBox).set_Text(txt.Trim());
 							}
 							else
 							{
-								filterTextBox.Text += (((filterTextBox.Text.Trim().EndsWith(";") || filterTextBox.Text.Trim() == "") ? " " : "; ") + "-t " + txt).Trim();
+								TextBox obj = filterTextBox;
+								((TextInputBase)obj).set_Text(((TextInputBase)obj).get_Text() + (((((TextInputBase)filterTextBox).get_Text().Trim().EndsWith(";") || ((TextInputBase)filterTextBox).get_Text().Trim() == "") ? " " : "; ") + "-t " + txt).Trim());
 							}
-						};
+						});
 						TagEntries.Add(entry);
 					}
-					subWindow.tag_TextBox.Text = null;
-					subWindow.customTags_Panel.SortChildren((TagEntry a, TagEntry b) => a.textLabel.Text.CompareTo(b.textLabel.Text));
-					subWindow.Invalidate();
+					((TextInputBase)subWindow.tag_TextBox).set_Text((string)null);
+					subWindow.customTags_Panel.SortChildren<TagEntry>((Comparison<TagEntry>)((TagEntry a, TagEntry b) => a.textLabel.get_Text().CompareTo(b.textLabel.get_Text())));
+					((Control)subWindow).Invalidate();
 				}
 			}
 		}
 
 		private void CreateScreenCapture()
 		{
-			Point resolution = GameService.Graphics.Resolution;
+			Point resolution = GameService.Graphics.get_Resolution();
 			int sidePadding = 255;
 			int bottomPadding = 100;
 			int topMenuHeight = 60;
-			screenCaptureWindow = new ScreenCaptureWindow(new Point(resolution.X - (sidePadding - 90), topMenuHeight))
+			ScreenCaptureWindow obj = new ScreenCaptureWindow(new Point(resolution.X - (sidePadding - 90), topMenuHeight))
 			{
 				showBackground = false,
-				FrameColor = Microsoft.Xna.Framework.Color.Transparent,
-				Parent = GameService.Graphics.SpriteScreen,
-				Location = new Point(sidePadding, resolution.Y - bottomPadding - topMenuHeight),
-				Visible = screenCapture,
-				LoadCustomImages = LoadCustomImages
+				FrameColor = Microsoft.Xna.Framework.Color.Transparent
 			};
+			((Control)obj).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			((Control)obj).set_Location(new Point(sidePadding, resolution.Y - bottomPadding - topMenuHeight));
+			((Control)obj).set_Visible(screenCapture);
+			obj.LoadCustomImages = LoadCustomImages;
+			screenCaptureWindow = obj;
 		}
 
 		private void CreateImageSelector()
 		{
 			int offset = 105;
-			ImageSelectorWindow = new ImageSelector(987, MainWidow.Height - offset - 10)
+			ImageSelector imageSelector = new ImageSelector(987, ((Control)MainWidow).get_Height() - offset - 10);
+			((Control)imageSelector).set_Location(new Point(((Control)MainWidow).get_Location().X + 385 - 25, ((Control)MainWidow).get_Location().Y + offset));
+			((Control)imageSelector).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			imageSelector.Texture = Textures.Backgrounds[16];
+			imageSelector.FrameColor = Microsoft.Xna.Framework.Color.AliceBlue;
+			((Control)imageSelector).set_Visible(false);
+			ImageSelectorWindow = imageSelector;
+			((Control)MainWidow).add_Moved((EventHandler<MovedEventArgs>)delegate
 			{
-				Location = new Point(MainWidow.Location.X + 385 - 25, MainWidow.Location.Y + offset),
-				Parent = GameService.Graphics.SpriteScreen,
-				Texture = Textures.Backgrounds[16],
-				FrameColor = Microsoft.Xna.Framework.Color.AliceBlue,
-				Visible = false
-			};
-			MainWidow.Moved += delegate
-			{
-				ImageSelectorWindow.Location = new Point(MainWidow.Location.X + 385 - 25, MainWidow.Location.Y + offset);
-			};
+				((Control)ImageSelectorWindow).set_Location(new Point(((Control)MainWidow).get_Location().X + 385 - 25, ((Control)MainWidow).get_Location().Y + offset));
+			});
 		}
 
 		private void OnKeyPressed_LogoutMod(object o, EventArgs e)
@@ -2006,9 +2175,13 @@ namespace Kenedia.Modules.Characters
 
 		private void OnKeyPressed_ToggleMenu(object o, EventArgs e)
 		{
-			if (!(Control.ActiveControl is TextBox))
+			if (!(Control.get_ActiveControl() is TextBox))
 			{
-				MainWidow?.ToggleWindow();
+				StandardWindow mainWidow = MainWidow;
+				if (mainWidow != null)
+				{
+					((WindowBase2)mainWidow).ToggleWindow();
+				}
 			}
 		}
 
@@ -2029,39 +2202,39 @@ namespace Kenedia.Modules.Characters
 				}
 				foreach (Character character in Characters)
 				{
-					if (character.characterControl != null && character.characterControl.Visible)
+					if (character.characterControl != null && ((Control)character.characterControl).get_Visible())
 					{
 						character.Update_UI_Time();
 					}
 				}
-				if (Settings.AutoLogin.Value && !loginCharacter_Swapped && loginCharacter != null && swapCharacter == null)
+				if (Settings.AutoLogin.get_Value() && !loginCharacter_Swapped && loginCharacter != null && swapCharacter == null)
 				{
 					loginCharacter_Swapped = true;
 					loginCharacter.Swap();
 				}
-				if (swapCharacter != null && !GameService.GameIntegration.Gw2Instance.IsInGame && DateTime.UtcNow.Subtract(lastLogout).TotalMilliseconds >= (double)Settings.SwapDelay.Value)
+				if (swapCharacter != null && !GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && DateTime.UtcNow.Subtract(lastLogout).TotalMilliseconds >= (double)Settings.SwapDelay.get_Value())
 				{
 					swapCharacter.Swap();
 					swapCharacter = null;
 				}
 			}
-			if (Settings.FadeSubWindows.Value && Last.Tick_FadeEffect > 30.0)
+			if (Settings.FadeSubWindows.get_Value() && Last.Tick_FadeEffect > 30.0)
 			{
 				Last.Tick_FadeEffect = -30.0;
-				if (filterWindow.Visible && DateTime.Now.Subtract(filterWindow.lastInput).TotalMilliseconds >= 2500.0)
+				if (((Control)filterWindow).get_Visible() && DateTime.Now.Subtract(filterWindow.lastInput).TotalMilliseconds >= 2500.0)
 				{
-					filterWindow.Opacity -= 0.1f;
-					if (filterWindow.Opacity <= 0f)
+					((Control)filterWindow).set_Opacity(((Control)filterWindow).get_Opacity() - 0.1f);
+					if (((Control)filterWindow).get_Opacity() <= 0f)
 					{
-						filterWindow.Hide();
+						((Control)filterWindow).Hide();
 					}
 				}
-				if (subWindow.Visible && DateTime.Now.Subtract(subWindow.lastInput).TotalMilliseconds >= 3500.0)
+				if (((Control)subWindow).get_Visible() && DateTime.Now.Subtract(subWindow.lastInput).TotalMilliseconds >= 3500.0)
 				{
-					subWindow.Opacity -= 0.1f;
-					if (subWindow.Opacity <= 0f)
+					((Control)subWindow).set_Opacity(((Control)subWindow).get_Opacity() - 0.1f);
+					if (((Control)subWindow).get_Opacity() <= 0f)
 					{
-						subWindow.Hide();
+						((Control)subWindow).Hide();
 					}
 				}
 			}
@@ -2089,13 +2262,33 @@ namespace Kenedia.Modules.Characters
 
 		protected override void Unload()
 		{
-			MainWidow?.Dispose();
-			subWindow?.Dispose();
-			filterWindow?.Dispose();
-			cornerButton?.Dispose();
-			screenCaptureWindow?.Dispose();
-			Settings.ShortcutKey.Value.Activated -= OnKeyPressed_ToggleMenu;
-			Gw2ApiManager.SubtokenUpdated -= Gw2ApiManager_SubtokenUpdated;
+			StandardWindow mainWidow = MainWidow;
+			if (mainWidow != null)
+			{
+				((Control)mainWidow).Dispose();
+			}
+			CharacterDetailWindow characterDetailWindow = subWindow;
+			if (characterDetailWindow != null)
+			{
+				((Control)characterDetailWindow).Dispose();
+			}
+			FilterWindow obj = filterWindow;
+			if (obj != null)
+			{
+				((Control)obj).Dispose();
+			}
+			CornerIcon obj2 = cornerButton;
+			if (obj2 != null)
+			{
+				((Control)obj2).Dispose();
+			}
+			ScreenCaptureWindow obj3 = screenCaptureWindow;
+			if (obj3 != null)
+			{
+				((Control)obj3).Dispose();
+			}
+			Settings.ShortcutKey.get_Value().remove_Activated((EventHandler<EventArgs>)OnKeyPressed_ToggleMenu);
+			Gw2ApiManager.remove_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
 			CharacterNames = new List<string>();
 			Characters = new List<Character>();
 			Tags = new List<string>();

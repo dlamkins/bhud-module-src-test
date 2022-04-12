@@ -1,5 +1,6 @@
 using System;
 using Blish_HUD.Controls;
+using Blish_HUD.Input;
 
 namespace Kenedia.Modules.Characters
 {
@@ -27,36 +28,36 @@ namespace Kenedia.Modules.Characters
 
 		public FilterWindow()
 		{
-			base.Click += delegate
+			((Control)this).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				lastInput = DateTime.Now;
-				base.Opacity = 1f;
-			};
-			base.MouseMoved += delegate
+				((Control)this).set_Opacity(1f);
+			});
+			((Control)this).add_MouseMoved((EventHandler<MouseEventArgs>)delegate
 			{
 				lastInput = DateTime.Now;
-				base.Opacity = 1f;
+				((Control)this).set_Opacity(1f);
 				Module.Logger.Debug("Mouse Moved!");
-			};
-			base.MouseEntered += delegate
+			});
+			((Control)this).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
 			{
 				lastInput = DateTime.Now;
-				base.Opacity = 1f;
-			};
-			base.MouseLeft += delegate
+				((Control)this).set_Opacity(1f);
+			});
+			((Control)this).add_MouseLeft((EventHandler<MouseEventArgs>)delegate
 			{
 				lastInput = DateTime.Now;
-				base.Opacity = 1f;
-			};
-			base.Shown += delegate
+				((Control)this).set_Opacity(1f);
+			});
+			((Control)this).add_Shown((EventHandler<EventArgs>)delegate
 			{
 				lastInput = DateTime.Now;
-				base.Opacity = 1f;
-			};
-			base.Hidden += delegate
+				((Control)this).set_Opacity(1f);
+			});
+			((Control)this).add_Hidden((EventHandler<EventArgs>)delegate
 			{
-				base.Opacity = 1f;
-			};
+				((Control)this).set_Opacity(1f);
+			});
 		}
 	}
 }

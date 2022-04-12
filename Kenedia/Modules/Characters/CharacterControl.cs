@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Kenedia.Modules.Characters.Strings;
@@ -43,7 +44,7 @@ namespace Kenedia.Modules.Characters
 
 		private int _Padding = 4;
 
-		public new int Padding
+		public int Padding
 		{
 			get
 			{
@@ -57,219 +58,303 @@ namespace Kenedia.Modules.Characters
 		}
 
 		public CharacterControl(Character c)
+			: this()
 		{
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Expected O, but got Unknown
+			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010e: Expected O, but got Unknown
+			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0183: Expected O, but got Unknown
+			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0189: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0253: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026b: Expected O, but got Unknown
+			//IL_026c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0271: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0305: Expected O, but got Unknown
+			//IL_0306: Unknown result type (might be due to invalid IL or missing references)
+			//IL_030b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0312: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0319: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0355: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0365: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b3: Expected O, but got Unknown
+			//IL_03b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_040b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_041a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0421: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0432: Expected O, but got Unknown
+			//IL_0433: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0438: Unknown result type (might be due to invalid IL or missing references)
+			//IL_043f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0446: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0483: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0493: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d8: Expected O, but got Unknown
+			//IL_04d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0541: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0554: Unknown result type (might be due to invalid IL or missing references)
+			//IL_055b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05b4: Expected O, but got Unknown
+			//IL_05b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_061d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0628: Unknown result type (might be due to invalid IL or missing references)
+			//IL_062f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_064b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0652: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0662: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0669: Unknown result type (might be due to invalid IL or missing references)
+			//IL_067a: Expected O, but got Unknown
+			//IL_067b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0680: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0693: Unknown result type (might be due to invalid IL or missing references)
+			//IL_069a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06db: Expected O, but got Unknown
+			//IL_072b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0730: Unknown result type (might be due to invalid IL or missing references)
+			//IL_074f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0756: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0767: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07ba: Expected O, but got Unknown
+			//IL_08b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0910: Unknown result type (might be due to invalid IL or missing references)
+			//IL_091c: Expected O, but got Unknown
 			CharacterControl characterControl = this;
 			ContentService contentService = new ContentService();
 			assignedCharacter = c;
-			base.Height = 76;
-			WidthSizingMode = SizingMode.Fill;
-			base.ShowBorder = false;
-			base.Tooltip = new CharacterTooltip(assignedCharacter)
-			{
-				Parent = this
-			};
+			((Control)this).set_Height(76);
+			((Container)this).set_WidthSizingMode((SizingMode)2);
+			((Panel)this).set_ShowBorder(false);
+			CharacterTooltip characterTooltip = new CharacterTooltip(assignedCharacter);
+			((Control)characterTooltip).set_Parent((Container)(object)this);
+			((Control)this).set_Tooltip((Tooltip)(object)characterTooltip);
 			bool defaultIcon = assignedCharacter.Icon == null || assignedCharacter.Icon == "";
-			border_TopRight = new Image
-			{
-				Parent = this,
-				Location = new Point(_Padding, _Padding),
-				Size = new Point(base.ContentRegion.Height - _Padding * 2, base.ContentRegion.Height - _Padding * 2),
-				Texture = Textures.Backgrounds[7],
-				Visible = defaultIcon
-			};
-			border_BottomLeft = new Image
-			{
-				Parent = this,
-				Location = new Point(_Padding, _Padding),
-				Size = new Point(base.ContentRegion.Height - _Padding * 2, base.ContentRegion.Height - _Padding * 2),
-				Texture = Textures.Backgrounds[6],
-				Visible = defaultIcon
-			};
-			character_Image = new Image
-			{
-				Texture = c.getProfessionTexture(),
-				Location = (defaultIcon ? new Point(_Padding + _FramePadding, _Padding + _FramePadding) : new Point(_Padding, _Padding)),
-				Size = (defaultIcon ? new Point(base.ContentRegion.Height - _Padding * 2 - _FramePadding * 2, base.ContentRegion.Height - _Padding * 2 - _FramePadding * 2) : new Point(base.ContentRegion.Height - _Padding * 2, base.ContentRegion.Height - _Padding * 2)),
-				Parent = this,
-				Tooltip = base.Tooltip
-			};
-			background_Panel = new Panel
-			{
-				Location = new Point(character_Image.Location.X, character_Image.Location.Y + character_Image.Height - 38),
-				Size = new Point(22, character_Image.Height - (character_Image.Location.Y + character_Image.Height - 38)),
-				Parent = this,
-				BackgroundColor = new Color(43, 43, 43, 255)
-			};
-			level_Label = new Label
-			{
-				Parent = this,
-				AutoSizeWidth = true,
-				Location = new Point(character_Image.Location.X + 5, character_Image.Location.Y + character_Image.Height - 12),
-				Font = contentService.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size11, ContentService.FontStyle.Regular),
-				Text = c.Level.ToString(),
-				Tooltip = base.Tooltip,
-				Height = (base.ContentRegion.Height - _Padding * 2) / 2,
-				VerticalAlignment = VerticalAlignment.Middle
-			};
-			profession_Image = new Image
-			{
-				Texture = c.getProfessionTexture(includeCustom: false, baseIcons: true),
-				Location = new Point(character_Image.Location.X, character_Image.Location.Y + character_Image.Height - 36),
-				Size = new Point(24, 24),
-				Parent = this,
-				Tooltip = base.Tooltip
-			};
-			name_Label = new Label
-			{
-				Parent = this,
-				AutoSizeWidth = true,
-				Location = new Point(character_Image.Location.X + character_Image.Width + _Padding * 2 + _FramePadding, _Padding),
-				Font = contentService.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size18, ContentService.FontStyle.Regular),
-				Text = c.Name,
-				Tooltip = base.Tooltip,
-				Height = (base.ContentRegion.Height - _Padding * 2) / 2,
-				VerticalAlignment = VerticalAlignment.Middle
-			};
-			separator_Image = new Image
-			{
-				Location = new Point(character_Image.Location.X + character_Image.Width + _Padding + _FramePadding, base.ContentRegion.Height / 2 - (int)Math.Ceiling((decimal)_Padding / 2m)),
-				Texture = Textures.Icons[19],
-				Parent = this,
-				Size = new Point(base.Width - character_Image.Width - 2 - _Padding * 3, (int)Math.Ceiling((decimal)_Padding / 2m)),
-				Tooltip = base.Tooltip
-			};
-			time_Label = new Label
-			{
-				Location = new Point(character_Image.Location.X + character_Image.Width + _Padding * 2 + _FramePadding, base.ContentRegion.Height / 2 + _Padding - (contentService.DefaultFont18.LineHeight - contentService.DefaultFont12.LineHeight)),
-				Text = "00:00:00",
-				Parent = this,
-				Height = (base.ContentRegion.Height - _Padding * 2) / 2,
-				AutoSizeWidth = true,
-				Font = contentService.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size12, ContentService.FontStyle.Regular),
-				VerticalAlignment = VerticalAlignment.Middle,
-				Tooltip = base.Tooltip
-			};
-			birthday_Image = new Image
-			{
-				Texture = Textures.Icons[17],
-				Parent = this,
-				Location = new Point(base.Width - 150, base.ContentRegion.Height / 2 - 2),
-				Size = new Point(32, 32),
-				Visible = true
-			};
-			int iBegin = character_Image.Location.X + character_Image.Width + _Padding * 3 + _FramePadding;
-			int iWidth = (base.Width - iBegin) / 2;
+			Image val = new Image();
+			((Control)val).set_Parent((Container)(object)this);
+			((Control)val).set_Location(new Point(_Padding, _Padding));
+			((Control)val).set_Size(new Point(((Container)this).get_ContentRegion().Height - _Padding * 2, ((Container)this).get_ContentRegion().Height - _Padding * 2));
+			val.set_Texture(AsyncTexture2D.op_Implicit(Textures.Backgrounds[7]));
+			((Control)val).set_Visible(defaultIcon);
+			border_TopRight = val;
+			Image val2 = new Image();
+			((Control)val2).set_Parent((Container)(object)this);
+			((Control)val2).set_Location(new Point(_Padding, _Padding));
+			((Control)val2).set_Size(new Point(((Container)this).get_ContentRegion().Height - _Padding * 2, ((Container)this).get_ContentRegion().Height - _Padding * 2));
+			val2.set_Texture(AsyncTexture2D.op_Implicit(Textures.Backgrounds[6]));
+			((Control)val2).set_Visible(defaultIcon);
+			border_BottomLeft = val2;
+			Image val3 = new Image();
+			val3.set_Texture(AsyncTexture2D.op_Implicit(c.getProfessionTexture()));
+			((Control)val3).set_Location(defaultIcon ? new Point(_Padding + _FramePadding, _Padding + _FramePadding) : new Point(_Padding, _Padding));
+			((Control)val3).set_Size(defaultIcon ? new Point(((Container)this).get_ContentRegion().Height - _Padding * 2 - _FramePadding * 2, ((Container)this).get_ContentRegion().Height - _Padding * 2 - _FramePadding * 2) : new Point(((Container)this).get_ContentRegion().Height - _Padding * 2, ((Container)this).get_ContentRegion().Height - _Padding * 2));
+			((Control)val3).set_Parent((Container)(object)this);
+			((Control)val3).set_Tooltip(((Control)this).get_Tooltip());
+			character_Image = val3;
+			Panel val4 = new Panel();
+			((Control)val4).set_Location(new Point(((Control)character_Image).get_Location().X, ((Control)character_Image).get_Location().Y + ((Control)character_Image).get_Height() - 38));
+			((Control)val4).set_Size(new Point(22, ((Control)character_Image).get_Height() - (((Control)character_Image).get_Location().Y + ((Control)character_Image).get_Height() - 38)));
+			((Control)val4).set_Parent((Container)(object)this);
+			((Control)val4).set_BackgroundColor(new Color(43, 43, 43, 255));
+			background_Panel = val4;
+			Label val5 = new Label();
+			((Control)val5).set_Parent((Container)(object)this);
+			val5.set_AutoSizeWidth(true);
+			((Control)val5).set_Location(new Point(((Control)character_Image).get_Location().X + 5, ((Control)character_Image).get_Location().Y + ((Control)character_Image).get_Height() - 12));
+			val5.set_Font(contentService.GetFont((FontFace)0, (FontSize)11, (FontStyle)0));
+			val5.set_Text(c.Level.ToString());
+			((Control)val5).set_Tooltip(((Control)this).get_Tooltip());
+			((Control)val5).set_Height((((Container)this).get_ContentRegion().Height - _Padding * 2) / 2);
+			val5.set_VerticalAlignment((VerticalAlignment)1);
+			level_Label = val5;
+			Image val6 = new Image();
+			val6.set_Texture(AsyncTexture2D.op_Implicit(c.getProfessionTexture(includeCustom: false, baseIcons: true)));
+			((Control)val6).set_Location(new Point(((Control)character_Image).get_Location().X, ((Control)character_Image).get_Location().Y + ((Control)character_Image).get_Height() - 36));
+			((Control)val6).set_Size(new Point(24, 24));
+			((Control)val6).set_Parent((Container)(object)this);
+			((Control)val6).set_Tooltip(((Control)this).get_Tooltip());
+			profession_Image = val6;
+			Label val7 = new Label();
+			((Control)val7).set_Parent((Container)(object)this);
+			val7.set_AutoSizeWidth(true);
+			((Control)val7).set_Location(new Point(((Control)character_Image).get_Location().X + ((Control)character_Image).get_Width() + _Padding * 2 + _FramePadding, _Padding));
+			val7.set_Font(contentService.GetFont((FontFace)0, (FontSize)18, (FontStyle)0));
+			val7.set_Text(c.Name);
+			((Control)val7).set_Tooltip(((Control)this).get_Tooltip());
+			((Control)val7).set_Height((((Container)this).get_ContentRegion().Height - _Padding * 2) / 2);
+			val7.set_VerticalAlignment((VerticalAlignment)1);
+			name_Label = val7;
+			Image val8 = new Image();
+			((Control)val8).set_Location(new Point(((Control)character_Image).get_Location().X + ((Control)character_Image).get_Width() + _Padding + _FramePadding, ((Container)this).get_ContentRegion().Height / 2 - (int)Math.Ceiling((decimal)_Padding / 2m)));
+			val8.set_Texture(AsyncTexture2D.op_Implicit(Textures.Icons[19]));
+			((Control)val8).set_Parent((Container)(object)this);
+			((Control)val8).set_Size(new Point(((Control)this).get_Width() - ((Control)character_Image).get_Width() - 2 - _Padding * 3, (int)Math.Ceiling((decimal)_Padding / 2m)));
+			((Control)val8).set_Tooltip(((Control)this).get_Tooltip());
+			separator_Image = val8;
+			Label val9 = new Label();
+			((Control)val9).set_Location(new Point(((Control)character_Image).get_Location().X + ((Control)character_Image).get_Width() + _Padding * 2 + _FramePadding, ((Container)this).get_ContentRegion().Height / 2 + _Padding - (contentService.get_DefaultFont18().LineHeight - contentService.get_DefaultFont12().LineHeight)));
+			val9.set_Text("00:00:00");
+			((Control)val9).set_Parent((Container)(object)this);
+			((Control)val9).set_Height((((Container)this).get_ContentRegion().Height - _Padding * 2) / 2);
+			val9.set_AutoSizeWidth(true);
+			val9.set_Font(contentService.GetFont((FontFace)0, (FontSize)12, (FontStyle)0));
+			val9.set_VerticalAlignment((VerticalAlignment)1);
+			((Control)val9).set_Tooltip(((Control)this).get_Tooltip());
+			time_Label = val9;
+			Image val10 = new Image();
+			val10.set_Texture(AsyncTexture2D.op_Implicit(Textures.Icons[17]));
+			((Control)val10).set_Parent((Container)(object)this);
+			((Control)val10).set_Location(new Point(((Control)this).get_Width() - 150, ((Container)this).get_ContentRegion().Height / 2 - 2));
+			((Control)val10).set_Size(new Point(32, 32));
+			((Control)val10).set_Visible(true);
+			birthday_Image = val10;
+			int iBegin = ((Control)character_Image).get_Location().X + ((Control)character_Image).get_Width() + _Padding * 3 + _FramePadding;
+			int iWidth = (((Control)this).get_Width() - iBegin) / 2;
 			if (c.Crafting.Count > 0)
 			{
-				crafting_Panel = new FlowPanel
-				{
-					Location = new Point(iBegin + iWidth, time_Label.Location.Y),
-					Parent = this,
-					Height = base.ContentRegion.Height,
-					Width = (base.Width - (character_Image.Location.X + character_Image.Width + _Padding * 2 + _FramePadding)) / 2,
-					FlowDirection = ControlFlowDirection.SingleLeftToRight,
-					Tooltip = base.Tooltip
-				};
+				FlowPanel val11 = new FlowPanel();
+				((Control)val11).set_Location(new Point(iBegin + iWidth, ((Control)time_Label).get_Location().Y));
+				((Control)val11).set_Parent((Container)(object)this);
+				((Control)val11).set_Height(((Container)this).get_ContentRegion().Height);
+				((Control)val11).set_Width((((Control)this).get_Width() - (((Control)character_Image).get_Location().X + ((Control)character_Image).get_Width() + _Padding * 2 + _FramePadding)) / 2);
+				val11.set_FlowDirection((ControlFlowDirection)2);
+				((Control)val11).set_Tooltip(((Control)this).get_Tooltip());
+				crafting_Panel = val11;
 				foreach (CharacterCrafting crafting in c.Crafting)
 				{
 					if (crafting.Active)
 					{
-						crafting_Images.Add(new DataImage
-						{
-							Texture = Textures.Crafting[crafting.Id],
-							Size = new Point(24, 24),
-							Parent = crafting_Panel,
-							Visible = (!Module.Settings.OnlyMaxCrafting.Value || crafting.Id == 4 || (crafting.Id == 7 && crafting.Rating == 400) || crafting.Rating == 500),
-							Id = crafting.Id,
-							Crafting = crafting,
-							Tooltip = base.Tooltip
-						});
+						List<DataImage> list = crafting_Images;
+						DataImage dataImage = new DataImage();
+						((Image)dataImage).set_Texture(AsyncTexture2D.op_Implicit(Textures.Crafting[crafting.Id]));
+						((Control)dataImage).set_Size(new Point(24, 24));
+						((Control)dataImage).set_Parent((Container)(object)crafting_Panel);
+						((Control)dataImage).set_Visible(!Module.Settings.OnlyMaxCrafting.get_Value() || crafting.Id == 4 || (crafting.Id == 7 && crafting.Rating == 400) || crafting.Rating == 500);
+						dataImage.Id = crafting.Id;
+						dataImage.Crafting = crafting;
+						((Control)dataImage).set_Tooltip(((Control)this).get_Tooltip());
+						list.Add(dataImage);
 					}
 				}
 			}
-			switch_Image = new Image
+			Image val12 = new Image();
+			((Control)val12).set_Location(new Point(((Control)this).get_Width() - 45, 10));
+			val12.set_Texture(AsyncTexture2D.op_Implicit(Textures.Icons[12]));
+			((Control)val12).set_Size(new Point(32, 32));
+			((Control)val12).set_Parent((Container)(object)this);
+			((Control)val12).set_BasicTooltipText(string.Format(common.Switch, c.Name));
+			((Control)val12).set_Visible(false);
+			switch_Image = val12;
+			((Control)switch_Image).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				Location = new Point(base.Width - 45, 10),
-				Texture = Textures.Icons[12],
-				Size = new Point(32, 32),
-				Parent = this,
-				BasicTooltipText = string.Format(common.Switch, c.Name),
-				Visible = false
-			};
-			switch_Image.Click += delegate
-			{
-				if (Module.Settings.SwapModifier.Value.PrimaryKey == Keys.None || Module.Settings.SwapModifier.Value.IsTriggering)
+				if (Module.Settings.SwapModifier.get_Value().get_PrimaryKey() == Keys.None || Module.Settings.SwapModifier.get_Value().get_IsTriggering())
 				{
 					c.Swap();
 				}
-			};
-			switch_Image.MouseEntered += delegate
+			});
+			((Control)switch_Image).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
 			{
-				if (Module.Settings.SwapModifier.Value.PrimaryKey == Keys.None || Module.Settings.SwapModifier.Value.IsTriggering)
+				if (Module.Settings.SwapModifier.get_Value().get_PrimaryKey() == Keys.None || Module.Settings.SwapModifier.get_Value().get_IsTriggering())
 				{
-					characterControl.switch_Image.Texture = Textures.Icons[21];
+					characterControl.switch_Image.set_Texture(AsyncTexture2D.op_Implicit(Textures.Icons[21]));
 				}
-			};
-			switch_Image.MouseLeft += delegate
+			});
+			((Control)switch_Image).add_MouseLeft((EventHandler<MouseEventArgs>)delegate
 			{
-				characterControl.switch_Image.Texture = Textures.Icons[12];
-			};
-			base.MouseEntered += delegate
+				characterControl.switch_Image.set_Texture(AsyncTexture2D.op_Implicit(Textures.Icons[12]));
+			});
+			((Control)this).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
 			{
-				characterControl.BackgroundTexture = Textures.Icons[20];
-				characterControl.switch_Image.Visible = Module.Settings.SwapModifier.Value.PrimaryKey == Keys.None || Module.Settings.SwapModifier.Value.IsTriggering;
-			};
-			base.MouseMoved += delegate
+				((Panel)characterControl).set_BackgroundTexture(AsyncTexture2D.op_Implicit(Textures.Icons[20]));
+				((Control)characterControl.switch_Image).set_Visible(Module.Settings.SwapModifier.get_Value().get_PrimaryKey() == Keys.None || Module.Settings.SwapModifier.get_Value().get_IsTriggering());
+			});
+			((Control)this).add_MouseMoved((EventHandler<MouseEventArgs>)delegate
 			{
-				characterControl.BackgroundTexture = Textures.Icons[20];
-				characterControl.switch_Image.Visible = Module.Settings.SwapModifier.Value.PrimaryKey == Keys.None || Module.Settings.SwapModifier.Value.IsTriggering;
-			};
-			base.MouseLeft += delegate
+				((Panel)characterControl).set_BackgroundTexture(AsyncTexture2D.op_Implicit(Textures.Icons[20]));
+				((Control)characterControl.switch_Image).set_Visible(Module.Settings.SwapModifier.get_Value().get_PrimaryKey() == Keys.None || Module.Settings.SwapModifier.get_Value().get_IsTriggering());
+			});
+			((Control)this).add_MouseLeft((EventHandler<MouseEventArgs>)delegate
 			{
-				characterControl.BackgroundTexture = null;
-				characterControl.switch_Image.Visible = false;
-			};
-			base.Click += delegate
+				((Panel)characterControl).set_BackgroundTexture((AsyncTexture2D)null);
+				((Control)characterControl.switch_Image).set_Visible(false);
+			});
+			((Control)this).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				if (Module.subWindow.Visible)
+				if (((Control)Module.subWindow).get_Visible())
 				{
-					if (!characterControl.switch_Image.MouseOver && Module.subWindow.assignedCharacter == characterControl.assignedCharacter)
+					if (!((Control)characterControl.switch_Image).get_MouseOver() && Module.subWindow.assignedCharacter == characterControl.assignedCharacter)
 					{
-						Module.subWindow.Hide();
+						((Control)Module.subWindow).Hide();
 					}
 					if (Module.subWindow.assignedCharacter != characterControl.assignedCharacter)
 					{
 						Module.subWindow.setCharacter(characterControl.assignedCharacter);
 					}
-					if (Module.ImageSelectorWindow.Visible)
+					if (((Control)Module.ImageSelectorWindow).get_Visible())
 					{
 						Module.ImageSelectorWindow.assignedCharacter = characterControl.assignedCharacter;
 					}
 				}
-				else if (!characterControl.switch_Image.MouseOver)
+				else if (!((Control)characterControl.switch_Image).get_MouseOver())
 				{
-					Module.subWindow.Show();
-					Module.filterWindow.Hide();
+					((Control)Module.subWindow).Show();
+					((Control)Module.filterWindow).Hide();
 					if (Module.subWindow.assignedCharacter != characterControl.assignedCharacter)
 					{
 						Module.subWindow.setCharacter(characterControl.assignedCharacter);
 					}
-					if (Module.ImageSelectorWindow.Visible)
+					if (((Control)Module.ImageSelectorWindow).get_Visible())
 					{
 						Module.ImageSelectorWindow.assignedCharacter = characterControl.assignedCharacter;
 					}
 				}
-			};
-			base.Click += isDoubleClicked;
-			base.Resized += delegate
+			});
+			((Control)this).add_Click((EventHandler<MouseEventArgs>)isDoubleClicked);
+			((Control)this).add_Resized((EventHandler<ResizedEventArgs>)delegate
 			{
 				characterControl.AdjustLayout();
-			};
+			});
 		}
 
 		private void isDoubleClicked(object sender, MouseEventArgs e)
 		{
-			if (e.IsDoubleClick && Module.Settings.DoubleClickToEnter.Value && (Module.Settings.SwapModifier.Value.PrimaryKey == Keys.None || Module.Settings.SwapModifier.Value.IsTriggering))
+			if (e.get_IsDoubleClick() && Module.Settings.DoubleClickToEnter.get_Value() && (Module.Settings.SwapModifier.get_Value().get_PrimaryKey() == Keys.None || Module.Settings.SwapModifier.get_Value().get_IsTriggering()))
 			{
 				assignedCharacter.Swap();
 			}
@@ -277,27 +362,27 @@ namespace Kenedia.Modules.Characters
 
 		public void UpdateLanguage()
 		{
-			((CharacterTooltip)base.Tooltip)._Update();
+			((CharacterTooltip)(object)((Control)this).get_Tooltip())._Update();
 		}
 
 		public void UpdateUI()
 		{
 			if (assignedCharacter.hadBirthdaySinceLogin())
 			{
-				birthday_Image.Visible = true;
-				birthday_Image.BasicTooltipText = assignedCharacter.Name + " had Birthday! They are now " + assignedCharacter.Years + " years old.";
+				((Control)birthday_Image).set_Visible(true);
+				((Control)birthday_Image).set_BasicTooltipText(assignedCharacter.Name + " had Birthday! They are now " + assignedCharacter.Years + " years old.");
 			}
 			else
 			{
-				birthday_Image.Visible = false;
+				((Control)birthday_Image).set_Visible(false);
 			}
-			character_Image.Texture = assignedCharacter.getProfessionTexture();
-			profession_Image.Texture = assignedCharacter.getProfessionTexture(includeCustom: false, baseIcons: true);
+			character_Image.set_Texture(AsyncTexture2D.op_Implicit(assignedCharacter.getProfessionTexture()));
+			profession_Image.set_Texture(AsyncTexture2D.op_Implicit(assignedCharacter.getProfessionTexture(includeCustom: false, baseIcons: true)));
 			TimeSpan t = TimeSpan.FromSeconds(assignedCharacter.seconds);
-			time_Label.Text = string.Format("{3} " + common.Days + " {0:00}:{1:00}:{2:00}", t.Hours, t.Minutes, t.Seconds, t.Days);
-			if (base.Tooltip.Visible)
+			time_Label.set_Text(string.Format("{3} " + common.Days + " {0:00}:{1:00}:{2:00}", t.Hours, t.Minutes, t.Seconds, t.Days));
+			if (((Control)((Control)this).get_Tooltip()).get_Visible())
 			{
-				((CharacterTooltip)base.Tooltip)._Update();
+				((CharacterTooltip)(object)((Control)this).get_Tooltip())._Update();
 			}
 			AdjustLayout();
 		}
@@ -305,28 +390,28 @@ namespace Kenedia.Modules.Characters
 		private void AdjustLayout()
 		{
 			bool defaultIcon = assignedCharacter.Icon == null || assignedCharacter.Icon == "";
-			character_Image.Location = (defaultIcon ? new Point(_Padding + _FramePadding, _Padding + _FramePadding) : new Point(_Padding, _Padding));
-			character_Image.Size = (defaultIcon ? new Point(base.ContentRegion.Height - _Padding * 2 - _FramePadding * 2, base.ContentRegion.Height - _Padding * 2 - _FramePadding * 2) : new Point(base.ContentRegion.Height - _Padding * 2, base.ContentRegion.Height - _Padding * 2));
-			border_BottomLeft.Visible = defaultIcon;
-			border_TopRight.Visible = defaultIcon;
+			((Control)character_Image).set_Location(defaultIcon ? new Point(_Padding + _FramePadding, _Padding + _FramePadding) : new Point(_Padding, _Padding));
+			((Control)character_Image).set_Size(defaultIcon ? new Point(((Container)this).get_ContentRegion().Height - _Padding * 2 - _FramePadding * 2, ((Container)this).get_ContentRegion().Height - _Padding * 2 - _FramePadding * 2) : new Point(((Container)this).get_ContentRegion().Height - _Padding * 2, ((Container)this).get_ContentRegion().Height - _Padding * 2));
+			((Control)border_BottomLeft).set_Visible(defaultIcon);
+			((Control)border_TopRight).set_Visible(defaultIcon);
 			Image referenceImage = (defaultIcon ? border_TopRight : character_Image);
-			separator_Image.Location = new Point(referenceImage.Location.X + referenceImage.Width + _Padding, base.ContentRegion.Height / 2 - (int)Math.Ceiling((decimal)_Padding / 2m));
-			separator_Image.Size = new Point(base.Width - referenceImage.Width - _Padding * 3, 4);
-			birthday_Image.Location = new Point(referenceImage.Location.X + referenceImage.Width - birthday_Image.Width + 4, referenceImage.Location.Y + referenceImage.Height - birthday_Image.Height + 4);
-			switch_Image.Location = new Point(base.Width - switch_Image.Width - _Padding, (base.Height - switch_Image.Height - _Padding) / 2 + 2);
+			((Control)separator_Image).set_Location(new Point(((Control)referenceImage).get_Location().X + ((Control)referenceImage).get_Width() + _Padding, ((Container)this).get_ContentRegion().Height / 2 - (int)Math.Ceiling((decimal)_Padding / 2m)));
+			((Control)separator_Image).set_Size(new Point(((Control)this).get_Width() - ((Control)referenceImage).get_Width() - _Padding * 3, 4));
+			((Control)birthday_Image).set_Location(new Point(((Control)referenceImage).get_Location().X + ((Control)referenceImage).get_Width() - ((Control)birthday_Image).get_Width() + 4, ((Control)referenceImage).get_Location().Y + ((Control)referenceImage).get_Height() - ((Control)birthday_Image).get_Height() + 4));
+			((Control)switch_Image).set_Location(new Point(((Control)this).get_Width() - ((Control)switch_Image).get_Width() - _Padding, (((Control)this).get_Height() - ((Control)switch_Image).get_Height() - _Padding) / 2 + 2));
 			if (assignedCharacter.Crafting.Count > 0)
 			{
-				int iBegin = character_Image.Location.X + character_Image.Width + _Padding * 3 + _FramePadding;
-				int iWidth = (base.Width - iBegin) / 2;
-				crafting_Panel.Location = new Point(iBegin + iWidth, time_Label.Location.Y + (time_Label.Height - 24) / 2);
-				crafting_Panel.WidthSizingMode = SizingMode.Fill;
+				int iBegin = ((Control)character_Image).get_Location().X + ((Control)character_Image).get_Width() + _Padding * 3 + _FramePadding;
+				int iWidth = (((Control)this).get_Width() - iBegin) / 2;
+				((Control)crafting_Panel).set_Location(new Point(iBegin + iWidth, ((Control)time_Label).get_Location().Y + (((Control)time_Label).get_Height() - 24) / 2));
+				((Container)crafting_Panel).set_WidthSizingMode((SizingMode)2);
 			}
-			level_Label.Location = new Point(character_Image.Location.X + 3, character_Image.Location.Y + character_Image.Height - 10 - level_Label.Font.LineHeight);
-			profession_Image.Location = new Point(character_Image.Location.X - 2, character_Image.Location.Y + character_Image.Height - 38);
-			profession_Image.Visible = !defaultIcon;
-			background_Panel.Location = new Point(character_Image.Location.X, character_Image.Location.Y + character_Image.Height - 38);
-			background_Panel.Size = new Point(22, character_Image.Height - (character_Image.Location.Y + character_Image.Height - 41));
-			background_Panel.Visible = !defaultIcon;
+			((Control)level_Label).set_Location(new Point(((Control)character_Image).get_Location().X + 3, ((Control)character_Image).get_Location().Y + ((Control)character_Image).get_Height() - 10 - level_Label.get_Font().LineHeight));
+			((Control)profession_Image).set_Location(new Point(((Control)character_Image).get_Location().X - 2, ((Control)character_Image).get_Location().Y + ((Control)character_Image).get_Height() - 38));
+			((Control)profession_Image).set_Visible(!defaultIcon);
+			((Control)background_Panel).set_Location(new Point(((Control)character_Image).get_Location().X, ((Control)character_Image).get_Location().Y + ((Control)character_Image).get_Height() - 38));
+			((Control)background_Panel).set_Size(new Point(22, ((Control)character_Image).get_Height() - (((Control)character_Image).get_Location().Y + ((Control)character_Image).get_Height() - 41)));
+			((Control)background_Panel).set_Visible(!defaultIcon);
 		}
 	}
 }

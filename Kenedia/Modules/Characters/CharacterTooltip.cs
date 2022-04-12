@@ -32,7 +32,7 @@ namespace Kenedia.Modules.Characters
 
 		public Separator _Separator;
 
-		public new FlowPanel ContentRegion;
+		public FlowPanel ContentRegion;
 
 		public FlowPanel Tags;
 
@@ -43,120 +43,150 @@ namespace Kenedia.Modules.Characters
 		public Label _switchInfoLabel;
 
 		public CharacterTooltip(Character character)
+			: this()
 		{
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0097: Expected O, but got Unknown
+			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f3: Expected O, but got Unknown
+			//IL_04f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0523: Unknown result type (might be due to invalid IL or missing references)
+			//IL_052f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0543: Unknown result type (might be due to invalid IL or missing references)
+			//IL_054a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_055a: Expected O, but got Unknown
+			//IL_0572: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0577: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0583: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0598: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05c0: Expected O, but got Unknown
 			assignedCharacter = character;
 			Character c = assignedCharacter;
-			base.Shown += delegate
+			((Control)this).add_Shown((EventHandler<EventArgs>)delegate
 			{
 				_Update();
-			};
-			base.Resized += delegate
+			});
+			((Control)this).add_Resized((EventHandler<ResizedEventArgs>)delegate
 			{
-			};
-			ContentRegion = new FlowPanel
+			});
+			FlowPanel val = new FlowPanel();
+			((Control)val).set_Location(new Point(0, 0));
+			((Container)val).set_HeightSizingMode((SizingMode)1);
+			((Container)val).set_WidthSizingMode((SizingMode)1);
+			val.set_FlowDirection((ControlFlowDirection)3);
+			((Control)val).set_Parent((Container)(object)this);
+			ContentRegion = val;
+			IconLabel obj = new IconLabel
 			{
-				Location = new Point(0, 0),
-				HeightSizingMode = SizingMode.AutoSize,
-				WidthSizingMode = SizingMode.AutoSize,
-				FlowDirection = ControlFlowDirection.SingleTopToBottom,
-				Parent = this
+				Texture = Textures.Icons[22]
 			};
-			_Name = new IconLabel
-			{
-				Texture = Textures.Icons[22],
-				Parent = ContentRegion,
-				Text = c.Name,
-				Font = new ContentService().GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size20, ContentService.FontStyle.Regular),
-				Gap = 4
-			};
-			_Separator = new Separator
-			{
-				Parent = ContentRegion
-			};
-			_Race = new IconLabel
+			((Control)obj).set_Parent((Container)(object)ContentRegion);
+			obj.Text = c.Name;
+			obj.Font = new ContentService().GetFont((FontFace)0, (FontSize)20, (FontStyle)0);
+			obj.Gap = 4;
+			_Name = obj;
+			Separator separator = new Separator();
+			((Control)separator).set_Parent((Container)(object)ContentRegion);
+			_Separator = separator;
+			IconLabel obj2 = new IconLabel
 			{
 				Texture = Textures.Races[(uint)c.Race],
-				Text = DataManager.getRaceName(c.Race.ToString()),
-				Parent = ContentRegion
+				Text = DataManager.getRaceName(c.Race.ToString())
 			};
-			_Level = new IconLabel
+			((Control)obj2).set_Parent((Container)(object)ContentRegion);
+			_Race = obj2;
+			IconLabel obj3 = new IconLabel
 			{
 				Texture = Textures.Icons[32],
-				Text = string.Format(common.Level, c.Level),
-				Parent = ContentRegion
+				Text = string.Format(common.Level, c.Level)
 			};
-			_Map = new IconLabel
+			((Control)obj3).set_Parent((Container)(object)ContentRegion);
+			_Level = obj3;
+			IconLabel obj4 = new IconLabel
 			{
 				Texture = Textures.Icons[29],
-				Text = DataManager.getMapName(c.Map),
-				Parent = ContentRegion
+				Text = DataManager.getMapName(c.Map)
 			};
+			((Control)obj4).set_Parent((Container)(object)ContentRegion);
+			_Map = obj4;
 			DateTime zeroTime = new DateTime(1, 1, 1);
 			TimeSpan span = DateTime.UtcNow - c.Created.UtcDateTime;
-			_Created = new IconLabel
+			IconLabel iconLabel = new IconLabel
 			{
 				Texture = Textures.Icons[26],
-				Text = c.Created.ToString("G") + " (" + ((zeroTime + span).Year - 1) + " " + common.Years + ")",
-				Parent = ContentRegion
+				Text = c.Created.ToString("G") + " (" + ((zeroTime + span).Year - 1) + " " + common.Years + ")"
 			};
+			((Control)iconLabel).set_Parent((Container)(object)ContentRegion);
+			_Created = iconLabel;
 			span = c.NextBirthday - DateTime.UtcNow;
-			_NextBirthday = new IconLabel
+			iconLabel = new IconLabel
 			{
 				Texture = Textures.Icons[17],
-				Text = string.Format("{3} " + common.Days + " {0:00}:{1:00}:{2:00} " + common.UntilBirthday, span.Hours, span.Minutes, span.Seconds, span.Days),
-				Parent = ContentRegion
+				Text = string.Format("{3} " + common.Days + " {0:00}:{1:00}:{2:00} " + common.UntilBirthday, span.Hours, span.Minutes, span.Seconds, span.Days)
 			};
+			((Control)iconLabel).set_Parent((Container)(object)ContentRegion);
+			_NextBirthday = iconLabel;
 			foreach (CharacterCrafting crafting in c.Crafting)
 			{
-				IconLabel ctrl = new IconLabel
-				{
-					Parent = ContentRegion,
-					Text = DataManager.getCraftingName(crafting.Id) + " (" + crafting.Rating + "/" + ((crafting.Id == 4 || crafting.Id == 7) ? 400 : 500) + ")",
-					Texture = (crafting.Active ? Textures.Crafting[crafting.Id] : Textures.CraftingDisabled[crafting.Id]),
-					_Crafting = crafting
-				};
-				ctrl.Label.TextColor = ((!crafting.Active) ? Color.LightGray : ctrl.Label.TextColor);
+				iconLabel = new IconLabel();
+				((Control)iconLabel).set_Parent((Container)(object)ContentRegion);
+				iconLabel.Text = DataManager.getCraftingName(crafting.Id) + " (" + crafting.Rating + "/" + ((crafting.Id == 4 || crafting.Id == 7) ? 400 : 500) + ")";
+				iconLabel.Texture = (crafting.Active ? Textures.Crafting[crafting.Id] : Textures.CraftingDisabled[crafting.Id]);
+				iconLabel._Crafting = crafting;
+				IconLabel ctrl = iconLabel;
+				ctrl.Label.set_TextColor((!crafting.Active) ? Color.LightGray : ctrl.Label.get_TextColor());
 				_CraftingProfessions.Add(ctrl);
 			}
 			TimeSpan t = TimeSpan.FromSeconds(c.seconds);
-			_LastLogin = new IconLabel
+			iconLabel = new IconLabel
 			{
 				Texture = Textures.Icons[31],
-				Text = string.Format("{3} " + common.Days + " {0:00}:{1:00}:{2:00}", t.Hours, t.Minutes, t.Seconds, t.Days),
-				Parent = ContentRegion
+				Text = string.Format("{3} " + common.Days + " {0:00}:{1:00}:{2:00}", t.Hours, t.Minutes, t.Seconds, t.Days)
 			};
-			Panel p = new Panel
+			((Control)iconLabel).set_Parent((Container)(object)ContentRegion);
+			_LastLogin = iconLabel;
+			Panel val2 = new Panel();
+			((Container)val2).set_WidthSizingMode((SizingMode)2);
+			((Control)val2).set_Parent((Container)(object)ContentRegion);
+			Panel p = val2;
+			Label val3 = new Label();
+			val3.set_Text("- " + string.Format(common.DoubleClickToSwap, assignedCharacter.Name) + " -");
+			((Control)val3).set_Parent((Container)(object)p);
+			val3.set_Font(ContentService.GetFont((FontFace)0, (FontSize)12, (FontStyle)0));
+			val3.set_HorizontalAlignment((HorizontalAlignment)1);
+			val3.set_TextColor(Color.LightGray);
+			_switchInfoLabel = val3;
+			((Control)p).add_Resized((EventHandler<ResizedEventArgs>)delegate
 			{
-				WidthSizingMode = SizingMode.Fill,
-				Parent = ContentRegion
-			};
-			_switchInfoLabel = new Label
-			{
-				Text = "- " + string.Format(common.DoubleClickToSwap, assignedCharacter.Name) + " -",
-				Parent = p,
-				Font = ContentService.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size12, ContentService.FontStyle.Regular),
-				HorizontalAlignment = HorizontalAlignment.Center,
-				TextColor = Color.LightGray
-			};
-			p.Resized += delegate
-			{
-				_switchInfoLabel.Width = p.Width;
-				p.Height = _switchInfoLabel.Height + 5;
-			};
-			Tags = new FlowPanel
-			{
-				Parent = ContentRegion,
-				OuterControlPadding = new Vector2(2f, 2f),
-				ControlPadding = new Vector2(5f, 2f),
-				WidthSizingMode = SizingMode.Fill,
-				HeightSizingMode = SizingMode.AutoSize
-			};
-			Invalidate();
+				((Control)_switchInfoLabel).set_Width(((Control)p).get_Width());
+				((Control)p).set_Height(((Control)_switchInfoLabel).get_Height() + 5);
+			});
+			FlowPanel val4 = new FlowPanel();
+			((Control)val4).set_Parent((Container)(object)ContentRegion);
+			val4.set_OuterControlPadding(new Vector2(2f, 2f));
+			val4.set_ControlPadding(new Vector2(5f, 2f));
+			((Container)val4).set_WidthSizingMode((SizingMode)2);
+			((Container)val4).set_HeightSizingMode((SizingMode)1);
+			Tags = val4;
+			((Control)this).Invalidate();
 			_Update();
 		}
 
 		public void _Update()
 		{
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Expected O, but got Unknown
 			if (assignedCharacter == null || assignedCharacter.characterControl == null)
 			{
 				return;
@@ -184,10 +214,10 @@ namespace Kenedia.Modules.Characters
 				return;
 			}
 			_Tags = new List<string>(c.Tags);
-			Tags.ClearChildren();
+			((Container)Tags).ClearChildren();
 			foreach (string tag in c.Tags)
 			{
-				new TagEntry(tag, c, Tags, showButton: false, contentService.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size12, ContentService.FontStyle.Regular));
+				new TagEntry(tag, c, Tags, showButton: false, contentService.GetFont((FontFace)0, (FontSize)12, (FontStyle)0));
 			}
 		}
 	}

@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
 using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended.BitmapFonts;
 
@@ -36,12 +39,12 @@ namespace Kenedia.Modules.Characters
 				if (value)
 				{
 					panel.Texture = Textures.Backgrounds[4];
-					deleteButton.Texture = Textures.Icons[35];
+					deleteButton.set_Texture(AsyncTexture2D.op_Implicit(Textures.Icons[35]));
 				}
 				else
 				{
 					panel.Texture = Textures.Backgrounds[5];
-					deleteButton.Texture = Textures.Icons[44];
+					deleteButton.set_Texture(AsyncTexture2D.op_Implicit(Textures.Icons[44]));
 				}
 			}
 		}
@@ -57,7 +60,7 @@ namespace Kenedia.Modules.Characters
 				_showDeleteButton = value;
 				if (deleteButton != null)
 				{
-					deleteButton.Visible = value;
+					((Control)deleteButton).set_Visible(value);
 				}
 			}
 		}
@@ -71,52 +74,67 @@ namespace Kenedia.Modules.Characters
 			set
 			{
 				_Text = value;
-				textLabel.Text = " " + value + " ";
+				textLabel.set_Text(" " + value + " ");
 			}
 		}
 
 		public TagEntry(string txt, Character character, FlowPanel parent, bool showButton = true, BitmapFont font = null)
+			: this()
 		{
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Expected O, but got Unknown
+			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fc: Expected O, but got Unknown
+			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0147: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0189: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019c: Expected O, but got Unknown
 			ContentService contentService = new ContentService();
-			BitmapFont textFont = ((font == null) ? contentService.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size14, ContentService.FontStyle.Regular) : font);
+			BitmapFont textFont = ((font == null) ? contentService.GetFont((FontFace)0, (FontSize)14, (FontStyle)0) : font);
 			assignedCharacter = character;
-			base.Parent = parent;
-			WidthSizingMode = SizingMode.AutoSize;
-			HeightSizingMode = SizingMode.AutoSize;
-			panel = new TagPanel
-			{
-				Parent = this,
-				WidthSizingMode = SizingMode.AutoSize,
-				HeightSizingMode = SizingMode.AutoSize,
-				FlowDirection = ControlFlowDirection.SingleLeftToRight,
-				OuterControlPadding = new Vector2(5f, 3f),
-				ControlPadding = new Vector2(3f, 0f),
-				AutoSizePadding = new Point(5, 2)
-			};
-			panel.Click += delegate
+			((Control)this).set_Parent((Container)(object)parent);
+			((Container)this).set_WidthSizingMode((SizingMode)1);
+			((Container)this).set_HeightSizingMode((SizingMode)1);
+			TagPanel tagPanel = new TagPanel();
+			((Control)tagPanel).set_Parent((Container)(object)this);
+			((Container)tagPanel).set_WidthSizingMode((SizingMode)1);
+			((Container)tagPanel).set_HeightSizingMode((SizingMode)1);
+			((FlowPanel)tagPanel).set_FlowDirection((ControlFlowDirection)2);
+			((FlowPanel)tagPanel).set_OuterControlPadding(new Vector2(5f, 3f));
+			((FlowPanel)tagPanel).set_ControlPadding(new Vector2(3f, 0f));
+			((Container)tagPanel).set_AutoSizePadding(new Point(5, 2));
+			panel = tagPanel;
+			((Control)panel).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				if (!Highlighted)
 				{
 					Highlighted = true;
 					assignedCharacter.Tags.Add(Text);
 				}
-			};
-			deleteButton = new Image
+			});
+			Image val = new Image();
+			val.set_Texture(AsyncTexture2D.op_Implicit(Textures.Icons[35]));
+			((Control)val).set_Parent((Container)(object)panel);
+			((Control)val).set_Size(new Point(21, 23));
+			((Control)val).set_Visible(showDeleteButton);
+			deleteButton = val;
+			((Control)deleteButton).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
 			{
-				Texture = Textures.Icons[35],
-				Parent = panel,
-				Size = new Point(21, 23),
-				Visible = showDeleteButton
-			};
-			deleteButton.MouseEntered += delegate
+				deleteButton.set_Texture(AsyncTexture2D.op_Implicit(_Highlighted ? Textures.Icons[36] : Textures.Icons[44]));
+			});
+			((Control)deleteButton).add_MouseLeft((EventHandler<MouseEventArgs>)delegate
 			{
-				deleteButton.Texture = (_Highlighted ? Textures.Icons[36] : Textures.Icons[44]);
-			};
-			deleteButton.MouseLeft += delegate
-			{
-				deleteButton.Texture = (_Highlighted ? Textures.Icons[35] : Textures.Icons[44]);
-			};
-			deleteButton.Click += delegate
+				deleteButton.set_Texture(AsyncTexture2D.op_Implicit(_Highlighted ? Textures.Icons[35] : Textures.Icons[44]));
+			});
+			((Control)deleteButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				Highlighted = false;
 				assignedCharacter.Tags.Remove(Text);
@@ -139,7 +157,7 @@ namespace Kenedia.Modules.Characters
 						}
 					}
 					List<TagEntry> list2 = new List<TagEntry>();
-					foreach (TagEntry tagEntry in Module.filterTagsPanel)
+					foreach (TagEntry tagEntry in (Container)Module.filterTagsPanel)
 					{
 						if (list.Contains(tagEntry.Text))
 						{
@@ -151,26 +169,25 @@ namespace Kenedia.Modules.Characters
 					{
 						if (item.Text == Text)
 						{
-							Dispose();
+							((Control)this).Dispose();
 						}
-						item.Dispose();
+						((Control)item).Dispose();
 					}
 				}
 				if (Discardable)
 				{
-					Dispose();
+					((Control)this).Dispose();
 				}
-			};
-			textLabel = new Label
-			{
-				Text = txt,
-				Parent = panel,
-				AutoSizeWidth = true,
-				Height = (showDeleteButton ? deleteButton.Size.Y : (textFont.LineHeight + 4)),
-				Font = textFont,
-				VerticalAlignment = VerticalAlignment.Middle
-			};
-			panel.Invalidate();
+			});
+			Label val2 = new Label();
+			val2.set_Text(txt);
+			((Control)val2).set_Parent((Container)(object)panel);
+			val2.set_AutoSizeWidth(true);
+			((Control)val2).set_Height(showDeleteButton ? ((Control)deleteButton).get_Size().Y : (textFont.LineHeight + 4));
+			val2.set_Font(textFont);
+			val2.set_VerticalAlignment((VerticalAlignment)1);
+			textLabel = val2;
+			((Control)panel).Invalidate();
 			_Text = txt;
 			showDeleteButton = showButton;
 		}
@@ -196,7 +213,7 @@ namespace Kenedia.Modules.Characters
 					}
 				}
 				List<TagEntry> deleteList = new List<TagEntry>();
-				foreach (TagEntry tag in Module.filterTagsPanel)
+				foreach (TagEntry tag in (Container)Module.filterTagsPanel)
 				{
 					if (tempList.Contains(tag.Text))
 					{
@@ -206,10 +223,10 @@ namespace Kenedia.Modules.Characters
 				}
 				foreach (TagEntry item in deleteList)
 				{
-					item.Dispose();
+					((Control)item).Dispose();
 				}
 			}
-			Dispose();
+			((Control)this).Dispose();
 		}
 	}
 }

@@ -7,5 +7,10 @@ namespace Kenedia.Modules.Characters
 		public int Id;
 
 		public CharacterCrafting Crafting;
+
+		public DataImage()
+			: this()
+		{
+		}
 	}
 }

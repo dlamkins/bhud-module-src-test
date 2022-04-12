@@ -1,4 +1,5 @@
 using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -31,8 +32,8 @@ namespace Kenedia.Modules.Characters
 			set
 			{
 				_Gap = value;
-				Label.Location = new Point(Font.LineHeight + 4 + _Gap, 0);
-				Invalidate();
+				((Control)Label).set_Location(new Point(Font.LineHeight + 4 + _Gap, 0));
+				((Control)this).Invalidate();
 			}
 		}
 
@@ -47,7 +48,7 @@ namespace Kenedia.Modules.Characters
 				_Texture = value;
 				if (Image != null)
 				{
-					Image.Texture = _Texture;
+					Image.set_Texture(AsyncTexture2D.op_Implicit(_Texture));
 				}
 			}
 		}
@@ -63,8 +64,8 @@ namespace Kenedia.Modules.Characters
 				_Text = value;
 				if (Label != null)
 				{
-					Label.Text = _Text;
-					Invalidate();
+					Label.set_Text(_Text);
+					((Control)this).Invalidate();
 				}
 			}
 		}
@@ -80,34 +81,46 @@ namespace Kenedia.Modules.Characters
 				_Font = value;
 				if (Label != null)
 				{
-					Label.Font = _Font;
-					Label.Height = Font.LineHeight + 4;
-					Image.Size = new Point(Font.LineHeight + 4, Font.LineHeight + 4);
-					Label.Location = new Point(Font.LineHeight + 4 + _Gap, 0);
-					Invalidate();
+					Label.set_Font(_Font);
+					((Control)Label).set_Height(Font.LineHeight + 4);
+					((Control)Image).set_Size(new Point(Font.LineHeight + 4, Font.LineHeight + 4));
+					((Control)Label).set_Location(new Point(Font.LineHeight + 4 + _Gap, 0));
+					((Control)this).Invalidate();
 				}
 			}
 		}
 
 		public IconLabel()
+			: this()
 		{
-			HeightSizingMode = SizingMode.AutoSize;
-			WidthSizingMode = SizingMode.AutoSize;
-			_Font = new ContentService().GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size18, ContentService.FontStyle.Regular);
-			Image = new Image
-			{
-				Size = new Point(Font.LineHeight + 4, Font.LineHeight + 4),
-				Location = new Point(0, 0),
-				Parent = this
-			};
-			Label = new Label
-			{
-				Height = Font.LineHeight + 4,
-				VerticalAlignment = VerticalAlignment.Middle,
-				Location = new Point(Image.Size.X + _Gap, 0),
-				Parent = this,
-				AutoSizeWidth = true
-			};
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Expected O, but got Unknown
+			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c9: Expected O, but got Unknown
+			((Container)this).set_HeightSizingMode((SizingMode)1);
+			((Container)this).set_WidthSizingMode((SizingMode)1);
+			_Font = new ContentService().GetFont((FontFace)0, (FontSize)18, (FontStyle)0);
+			Image val = new Image();
+			((Control)val).set_Size(new Point(Font.LineHeight + 4, Font.LineHeight + 4));
+			((Control)val).set_Location(new Point(0, 0));
+			((Control)val).set_Parent((Container)(object)this);
+			Image = val;
+			Label val2 = new Label();
+			((Control)val2).set_Height(Font.LineHeight + 4);
+			val2.set_VerticalAlignment((VerticalAlignment)1);
+			((Control)val2).set_Location(new Point(((Control)Image).get_Size().X + _Gap, 0));
+			((Control)val2).set_Parent((Container)(object)this);
+			val2.set_AutoSizeWidth(true);
+			Label = val2;
 		}
 	}
 }

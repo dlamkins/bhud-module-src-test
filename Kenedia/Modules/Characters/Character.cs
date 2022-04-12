@@ -109,12 +109,11 @@ namespace Kenedia.Modules.Characters
 		{
 			if (!loaded)
 			{
-				characterControl = new CharacterControl(this)
-				{
-					WidthSizingMode = SizingMode.Standard,
-					Parent = Module.CharacterPanel,
-					Width = Module.CharacterPanel.Width - 25
-				};
+				CharacterControl obj = new CharacterControl(this);
+				((Container)obj).set_WidthSizingMode((SizingMode)0);
+				((Control)obj).set_Parent((Container)(object)Module.CharacterPanel);
+				((Control)obj).set_Width(((Control)Module.CharacterPanel).get_Width() - 25);
+				characterControl = obj;
 			}
 			loaded = true;
 		}
@@ -125,20 +124,20 @@ namespace Kenedia.Modules.Characters
 			{
 				return;
 			}
-			PlayerCharacter player = GameService.Gw2Mumble.PlayerCharacter;
-			if (Name == player.Name)
+			PlayerCharacter player = GameService.Gw2Mumble.get_PlayerCharacter();
+			if (Name == player.get_Name())
 			{
-				_mapid = GameService.Gw2Mumble.CurrentMap.Id;
+				_mapid = GameService.Gw2Mumble.get_CurrentMap().get_Id();
 				if (_mapid > 0 && _mapid != _lastmapid)
 				{
 					_lastmapid = _mapid;
 					Map = _mapid;
-					((CharacterTooltip)characterControl.Tooltip)._Update();
+					((CharacterTooltip)(object)((Control)characterControl).get_Tooltip())._Update();
 					Save();
 				}
 				lastLogin = DateTime.UtcNow.AddSeconds(0.0);
 				LastModified = DateTime.UtcNow.AddSeconds(1.0);
-				Race = player.Race;
+				Race = player.get_Race();
 				characterControl.UpdateUI();
 				Update_UI_Time();
 				UpdateProfession();
@@ -160,7 +159,7 @@ namespace Kenedia.Modules.Characters
 			}
 			else
 			{
-				if (includeCustom && Icon != null && Icon != "")
+				if (includeCustom && Icon != null && Icon != "" && Textures.CustomImages != null)
 				{
 					Texture2D[] customImages = Textures.CustomImages;
 					foreach (Texture2D Texture in customImages)
@@ -194,21 +193,21 @@ namespace Kenedia.Modules.Characters
 
 		public void UpdateProfession()
 		{
-			PlayerCharacter player = GameService.Gw2Mumble.PlayerCharacter;
-			if (Name == player.Name && (_Specialization != player.Specialization || Profession != player.Profession))
+			PlayerCharacter player = GameService.Gw2Mumble.get_PlayerCharacter();
+			if (Name == player.get_Name() && (_Specialization != player.get_Specialization() || Profession != player.get_Profession()))
 			{
-				if (DataManager._Specializations.Length > player.Specialization && DataManager._Specializations[player.Specialization] != null)
+				if (DataManager._Specializations.Length > player.get_Specialization() && DataManager._Specializations[player.get_Specialization()] != null)
 				{
-					Specialization = (Specializations)player.Specialization;
-					_Specialization = player.Specialization;
+					Specialization = (Specializations)player.get_Specialization();
+					_Specialization = player.get_Specialization();
 				}
 				else
 				{
 					Specialization = (Specializations)0;
 					_Specialization = 0;
 				}
-				Profession = player.Profession;
-				_Profession = (int)player.Profession;
+				Profession = player.get_Profession();
+				_Profession = (int)player.get_Profession();
 				characterControl.UpdateUI();
 				Save();
 			}
@@ -233,7 +232,7 @@ namespace Kenedia.Modules.Characters
 			if (loaded)
 			{
 				visible = true;
-				characterControl.Show();
+				((Control)characterControl).Show();
 			}
 		}
 
@@ -242,35 +241,51 @@ namespace Kenedia.Modules.Characters
 			if (loaded)
 			{
 				visible = false;
-				characterControl.Hide();
+				((Control)characterControl).Hide();
 			}
 		}
 
 		public void Swap()
 		{
-			if (!(GameService.Gw2Mumble.PlayerCharacter.Name != Name) && GameService.GameIntegration.Gw2Instance.IsInGame)
+			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0170: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0195: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020a: Unknown result type (might be due to invalid IL or missing references)
+			if (!(GameService.Gw2Mumble.get_PlayerCharacter().get_Name() != Name) && GameService.GameIntegration.get_Gw2Instance().get_IsInGame())
 			{
 				return;
 			}
-			if (!GameService.Gw2Mumble.CurrentMap.Type.IsCompetitive())
+			if (!GameService.Gw2Mumble.get_CurrentMap().get_Type().IsCompetitive())
 			{
-				ScreenNotification.ShowNotification(string.Format(common.Switch, Name), ScreenNotification.NotificationType.Warning);
-				if (!GameService.GameIntegration.Gw2Instance.IsInGame)
+				ScreenNotification.ShowNotification(string.Format(common.Switch, Name), (NotificationType)1, (Texture2D)null, 4);
+				if (!GameService.GameIntegration.get_Gw2Instance().get_IsInGame())
 				{
 					for (int i = 0; i < Module.Characters.Count; i++)
 					{
-						Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.LEFT);
+						Keyboard.Stroke((VirtualKeyShort)37, false);
 					}
 					foreach (Character character in Module.Characters)
 					{
 						if (character.Name != Name)
 						{
-							Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.RIGHT);
+							Keyboard.Stroke((VirtualKeyShort)39, false);
 							continue;
 						}
-						if (Module.Settings.EnterOnSwap.Value)
+						if (Module.Settings.EnterOnSwap.get_Value())
 						{
-							Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.RETURN);
+							Keyboard.Stroke((VirtualKeyShort)13, false);
 						}
 						break;
 					}
@@ -281,31 +296,31 @@ namespace Kenedia.Modules.Characters
 					{
 						return;
 					}
-					ModifierKeys mods = Module.Settings.LogoutKey.Value.ModifierKeys;
-					VirtualKeyShort primary = (VirtualKeyShort)Module.Settings.LogoutKey.Value.PrimaryKey;
+					ModifierKeys mods = Module.Settings.LogoutKey.get_Value().get_ModifierKeys();
+					VirtualKeyShort primary = (VirtualKeyShort)(short)Module.Settings.LogoutKey.get_Value().get_PrimaryKey();
 					foreach (ModifierKeys mod2 in Enum.GetValues(typeof(ModifierKeys)))
 					{
-						if (mod2 != 0 && mods.HasFlag(mod2))
+						if ((int)mod2 != 0 && ((Enum)mods).HasFlag((Enum)(object)mod2))
 						{
-							Blish_HUD.Controls.Intern.Keyboard.Press(Module.ModKeyMapping[(int)mod2]);
+							Keyboard.Press(Module.ModKeyMapping[mod2], false);
 						}
 					}
-					Blish_HUD.Controls.Intern.Keyboard.Stroke(primary);
+					Keyboard.Stroke(primary, false);
 					foreach (ModifierKeys mod in Enum.GetValues(typeof(ModifierKeys)))
 					{
-						if (mod != 0 && mods.HasFlag(mod))
+						if ((int)mod != 0 && ((Enum)mods).HasFlag((Enum)(object)mod))
 						{
-							Blish_HUD.Controls.Intern.Keyboard.Release(Module.ModKeyMapping[(int)mod]);
+							Keyboard.Release(Module.ModKeyMapping[mod], false);
 						}
 					}
-					Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.RETURN);
+					Keyboard.Stroke((VirtualKeyShort)13, false);
 					Module.lastLogout = DateTime.UtcNow;
 					Module.swapCharacter = this;
 				}
 			}
 			else
 			{
-				ScreenNotification.ShowNotification(common.Error_Competivive, ScreenNotification.NotificationType.Error);
+				ScreenNotification.ShowNotification(common.Error_Competivive, (NotificationType)2, (Texture2D)null, 4);
 			}
 		}
 

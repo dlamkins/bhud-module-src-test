@@ -204,7 +204,7 @@ namespace Kenedia.Modules.Characters
 			{
 				get
 				{
-					return GameService.Overlay.UserLocale.Value switch
+					return GameService.Overlay.get_UserLocale().get_Value() switch
 					{
 						Locale.German => _Names.de, 
 						Locale.French => _Names.fr, 
@@ -214,7 +214,7 @@ namespace Kenedia.Modules.Characters
 				}
 				set
 				{
-					switch (GameService.Overlay.UserLocale.Value)
+					switch (GameService.Overlay.get_UserLocale().get_Value())
 					{
 					case Locale.German:
 						_Names.de = value;
@@ -239,7 +239,7 @@ namespace Kenedia.Modules.Characters
 			{
 				get
 				{
-					return GameService.Overlay.UserLocale.Value switch
+					return GameService.Overlay.get_UserLocale().get_Value() switch
 					{
 						Locale.German => _Names.de, 
 						Locale.French => _Names.fr, 
@@ -249,7 +249,7 @@ namespace Kenedia.Modules.Characters
 				}
 				set
 				{
-					switch (GameService.Overlay.UserLocale.Value)
+					switch (GameService.Overlay.get_UserLocale().get_Value())
 					{
 					case Locale.German:
 						_Names.de = value;
@@ -274,7 +274,7 @@ namespace Kenedia.Modules.Characters
 			{
 				get
 				{
-					return GameService.Overlay.UserLocale.Value switch
+					return GameService.Overlay.get_UserLocale().get_Value() switch
 					{
 						Locale.German => _Names.de, 
 						Locale.French => _Names.fr, 
@@ -284,7 +284,7 @@ namespace Kenedia.Modules.Characters
 				}
 				set
 				{
-					switch (GameService.Overlay.UserLocale.Value)
+					switch (GameService.Overlay.get_UserLocale().get_Value())
 					{
 					case Locale.German:
 						_Names.de = value;
@@ -309,7 +309,7 @@ namespace Kenedia.Modules.Characters
 			{
 				get
 				{
-					return GameService.Overlay.UserLocale.Value switch
+					return GameService.Overlay.get_UserLocale().get_Value() switch
 					{
 						Locale.German => _Names.de, 
 						Locale.French => _Names.fr, 
@@ -319,7 +319,7 @@ namespace Kenedia.Modules.Characters
 				}
 				set
 				{
-					switch (GameService.Overlay.UserLocale.Value)
+					switch (GameService.Overlay.get_UserLocale().get_Value())
 					{
 					case Locale.German:
 						_Names.de = value;
@@ -344,7 +344,7 @@ namespace Kenedia.Modules.Characters
 			{
 				get
 				{
-					return GameService.Overlay.UserLocale.Value switch
+					return GameService.Overlay.get_UserLocale().get_Value() switch
 					{
 						Locale.German => _Names.de, 
 						Locale.French => _Names.fr, 
@@ -354,7 +354,7 @@ namespace Kenedia.Modules.Characters
 				}
 				set
 				{
-					switch (GameService.Overlay.UserLocale.Value)
+					switch (GameService.Overlay.get_UserLocale().get_Value())
 					{
 					case Locale.German:
 						_Names.de = value;

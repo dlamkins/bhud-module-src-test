@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -34,21 +36,22 @@ namespace Kenedia.Modules.Characters
 		public event EventHandler _StateChanged;
 
 		public ToggleIcon()
+			: this()
 		{
-			base.Click += delegate
+			((Control)this).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				Toggle();
 				Module.filterCharacterPanel = true;
-			};
-			base.Size = new Point(32, 32);
-			base.Texture = Textures.Icons[1];
+			});
+			((Control)this).set_Size(new Point(32, 32));
+			((Image)this).set_Texture(AsyncTexture2D.op_Implicit(Textures.Icons[1]));
 		}
 
 		private void _OnStateChanged()
 		{
 			if (_Textures != null && _Textures.Count > __State)
 			{
-				base.Texture = _Textures[__State];
+				((Image)this).set_Texture(AsyncTexture2D.op_Implicit(_Textures[__State]));
 			}
 		}
 

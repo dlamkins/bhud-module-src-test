@@ -58,6 +58,8 @@ namespace Kenedia.Modules.Characters.Strings
 
 		internal static string CaptureAll => ResourceManager.GetString("CaptureAll", resourceCulture);
 
+		internal static string CaptureNotification => ResourceManager.GetString("CaptureNotification", resourceCulture);
+
 		internal static string Characters => ResourceManager.GetString("Characters", resourceCulture);
 
 		internal static string Chef => ResourceManager.GetString("Chef", resourceCulture);
@@ -169,6 +171,8 @@ namespace Kenedia.Modules.Characters.Strings
 		internal static string ToggleAll => ResourceManager.GetString("ToggleAll", resourceCulture);
 
 		internal static string ToggleVisible => ResourceManager.GetString("ToggleVisible", resourceCulture);
+
+		internal static string UIScale_Error => ResourceManager.GetString("UIScale_Error", resourceCulture);
 
 		internal static string UISizeDisclaimer => ResourceManager.GetString("UISizeDisclaimer", resourceCulture);
 

@@ -1,5 +1,7 @@
 using System;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.Input;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Kenedia.Modules.Characters
@@ -32,18 +34,19 @@ namespace Kenedia.Modules.Characters
 		public event EventHandler _StateChanged;
 
 		public ToggleImage()
+			: this()
 		{
-			base.Click += delegate
+			((Control)this).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				Toggle();
-			};
+			});
 		}
 
 		private void _OnStateChanged()
 		{
 			if (_Textures != null && _Textures.Length > __State)
 			{
-				base.Texture = _Textures[__State];
+				((Image)this).set_Texture(AsyncTexture2D.op_Implicit(_Textures[__State]));
 			}
 		}
 

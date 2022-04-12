@@ -34,6 +34,7 @@
   <data name="ShortcutToggle_Description"><value>Key to Press to toggle the characters menu.</value></data>
   <data name="CreateImages"><value>Create Images</value></data>
   <data name="Utility"><value>Utility</value></data>
+  <data name="CaptureNotification"><value>Saved as {0}!</value></data>
   <data name="AutoLogin_DisplayName"><value>Auto Login to selected Character</value></data>
   <data name="Cancel"><value>Cancel</value></data>
   <data name="CaptureAll"><value>Capture All</value></data>
@@ -104,6 +105,7 @@ To get the current value you will have to swap module tabs once to update the se
   <data name="AutoLogin_Description"><value>If enabled on the first load of Blish and beeing in character selection the module enters the game. After entering the game it will wait until the MumbleLink and API Token is fully loaded.
 Once fully loaded it will switch to the character which is set to be the "Login Character".</value></data>
   <data name="Profession"><value>Profession</value></data>
+  <data name="UIScale_Error"><value>Please set the game to 'WINDOWED' {0} and the UI Scale to 'Larger'!</value></data>
   <data name="CraftingProfession"><value>Crafting Profession</value></data>
   <data name="CustomTags"><value>Custom Tags</value></data>
   <data name="Days"><value>Days</value></data>
