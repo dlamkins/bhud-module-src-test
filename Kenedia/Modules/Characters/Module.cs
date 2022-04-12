@@ -730,11 +730,6 @@ namespace Kenedia.Modules.Characters
 		protected override void Initialize()
 		{
 			Logger.Debug("Initializing ...");
-			Item item = new Item();
-			item.Name = "APFELSINE";
-			Logger.Debug(item.Name.ToString());
-			ApiV2BaseObject baseobj = item;
-			Logger.Debug(item.Name.ToString() + "casted to Base: " + (baseobj != null));
 			ModKeyMapping = (VirtualKeyShort[])(object)new VirtualKeyShort[5];
 			ModKeyMapping[1] = (VirtualKeyShort)17;
 			ModKeyMapping[2] = (VirtualKeyShort)18;
@@ -753,6 +748,7 @@ namespace Kenedia.Modules.Characters
 			RECT pos = default(RECT);
 			GetWindowRect(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle(), ref pos);
 			GameWindow_Rectangle = pos;
+			CreateFolders();
 		}
 
 		private void CreateFolders()
