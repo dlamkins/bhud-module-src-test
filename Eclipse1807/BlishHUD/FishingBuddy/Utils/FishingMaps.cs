@@ -7,7 +7,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 	{
 		private static readonly Logger Logger = Logger.GetLogger(typeof(FishingMaps));
 
-		private Dictionary<int, List<int>> _mapAchievements;
+		private readonly Dictionary<int, List<int>> _mapAchievements;
 
 		public static readonly int FISHING_ACHIEVEMENT_CATEGORY_ID = 317;
 

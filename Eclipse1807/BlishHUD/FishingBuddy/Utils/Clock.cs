@@ -50,33 +50,12 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 				if (!object.Equals(TimePhase, value))
 				{
 					Logger.Debug("Time of day changed " + TimePhase + " -> " + value);
-					_timePhase = value;
-					switch (TimePhase)
-					{
-					case "Dawn":
-						((Control)_currentTime).set_Visible(false);
-						_currentTime = _dawn;
-						((Control)_currentTime).set_Visible(true);
-						break;
-					case "Day":
-						((Control)_currentTime).set_Visible(false);
-						_currentTime = _day;
-						((Control)_currentTime).set_Visible(true);
-						break;
-					case "Dusk":
-						((Control)_currentTime).set_Visible(false);
-						_currentTime = _dusk;
-						((Control)_currentTime).set_Visible(true);
-						break;
-					case "Night":
-						((Control)_currentTime).set_Visible(false);
-						_currentTime = _night;
-						((Control)_currentTime).set_Visible(true);
-						break;
-					}
+					OnTimeOfDayChanged(new ValueChangedEventArgs<string>(TimePhase, value));
 				}
 			}
 		}
+
+		public event EventHandler<ValueChangedEventArgs<string>> TimeOfDayChanged;
 
 		public Clock()
 			: this()
@@ -263,6 +242,35 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 			{
 				_font = GameService.Content.GetFont((FontFace)0, Font_Size, (FontStyle)0);
 			}
+		}
+
+		protected virtual void OnTimeOfDayChanged(ValueChangedEventArgs<string> e)
+		{
+			_timePhase = e.get_NewValue();
+			switch (TimePhase)
+			{
+			case "Dawn":
+				((Control)_currentTime).set_Visible(false);
+				_currentTime = _dawn;
+				((Control)_currentTime).set_Visible(true);
+				break;
+			case "Day":
+				((Control)_currentTime).set_Visible(false);
+				_currentTime = _day;
+				((Control)_currentTime).set_Visible(true);
+				break;
+			case "Dusk":
+				((Control)_currentTime).set_Visible(false);
+				_currentTime = _dusk;
+				((Control)_currentTime).set_Visible(true);
+				break;
+			case "Night":
+				((Control)_currentTime).set_Visible(false);
+				_currentTime = _night;
+				((Control)_currentTime).set_Visible(true);
+				break;
+			}
+			this.TimeOfDayChanged?.Invoke(this, e);
 		}
 	}
 }

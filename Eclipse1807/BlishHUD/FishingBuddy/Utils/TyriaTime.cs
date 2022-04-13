@@ -26,9 +26,9 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 
 		public static readonly List<int> CanthaMaps = new List<int> { 1442, 1419, 1444, 1462, 1438, 1452, 1428, 1422 };
 
-		public static readonly List<int> AlwaysDayMaps = new List<int> { 1195, 1465 };
+		public static readonly List<int> AlwaysDayMaps = new List<int> { 1195, 1465, 1206, 968 };
 
-		public static readonly List<int> AlwaysNightMaps = new List<int> { 0 };
+		public static readonly List<int> AlwaysNightMaps = new List<int> { 1361, 1413, 1414, 862, 863, 864, 865, 866, 1304, 1316 };
 
 		public static string CurrentMapPhase(int MapId)
 		{

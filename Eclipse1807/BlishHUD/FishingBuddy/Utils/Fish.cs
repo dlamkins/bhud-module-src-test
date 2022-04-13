@@ -25,32 +25,32 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 
 		private static readonly Logger Logger = Logger.GetLogger(typeof(Fish));
 
-		public string name { get; set; }
+		public string Name { get; set; }
 
-		public int itemId { get; set; }
+		public int ItemId { get; set; }
 
-		public string rarity { get; set; }
+		public string Rarity { get; set; }
 
-		public string fishingHole { get; set; }
+		public string FishingHole { get; set; }
 
-		public string bait { get; set; }
+		public string Bait { get; set; }
 
-		public TimeOfDay timeOfDay { get; set; }
+		public TimeOfDay Time { get; set; }
 
-		public bool openWater { get; set; }
+		public bool OpenWater { get; set; }
 
-		public string location { get; set; }
+		public string Location { get; set; }
 
-		public string achievement { get; set; }
+		public string Achievement { get; set; }
 
-		public int achievementId { get; set; }
+		public int AchievementId { get; set; }
 
-		public string notes { get; set; }
+		public string Notes { get; set; }
 
-		public RenderUrl icon { get; set; }
+		public RenderUrl Icon { get; set; }
 
 		public bool Visible { get; set; }
 
-		public AsyncTexture2D iconImg { get; set; }
+		public AsyncTexture2D IconImg { get; set; }
 	}
 }

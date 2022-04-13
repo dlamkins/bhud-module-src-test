@@ -12,7 +12,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 
 		public Action CountdownFinished;
 
-		private Timer timer = new Timer();
+		private readonly Timer timer = new Timer();
 
 		private TimeSpan _max = TimeSpan.FromMilliseconds(30000.0);
 
