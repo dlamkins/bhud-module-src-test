@@ -46,8 +46,6 @@ namespace Estreya.BlishHUD.EventTable.UI.Container
 
 		private Tween CurrentVisibilityAnimation { get; set; }
 
-		private Texture2D Texture { get; set; }
-
 		public EventTableContainer()
 			: this()
 		{
@@ -111,16 +109,15 @@ namespace Estreya.BlishHUD.EventTable.UI.Container
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0171: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0159: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
 			spriteBatch.End();
 			SpriteBatchExtensions.Begin(spriteBatch, ((Control)this).get_SpriteBatchParameters());
-			InitializeBaseTexture(((GraphicsResource)spriteBatch).get_GraphicsDevice());
 			List<EventCategory> eventCategories = EventTableModule.ModuleInstance.EventCategories;
 			int y = 0;
 			DateTime now = EventTableModule.ModuleInstance.DateTimeNow;
@@ -134,7 +131,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Container
 					categoryHasEvents = true;
 					if (EventTableModule.ModuleInstance.ModuleSettings.UseFiller.get_Value() || !ev2.Filler)
 					{
-						ev2.Draw(spriteBatch, bounds, (Control)(object)this, Texture, y, PixelPerMinute, now, min, max, EventTableModule.ModuleInstance.Font);
+						ev2.Draw(spriteBatch, bounds, (Control)(object)this, Textures.get_Pixel(), y, PixelPerMinute, now, min, max, EventTableModule.ModuleInstance.Font);
 					}
 				}
 				if (categoryHasEvents)
@@ -144,7 +141,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Container
 			}
 			((Control)this).set_Size(new Point(bounds.Width, y));
 			float middleLineX = (float)((Control)this).get_Size().X * EventTableModule.ModuleInstance.EventTimeSpanRatio;
-			DrawLine(spriteBatch, new RectangleF(middleLineX, 0f, 2f, (float)((Control)this).get_Size().Y), Color.get_LightGray());
+			SpriteBatchUtil.DrawLine(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new RectangleF(middleLineX, 0f, 2f, (float)((Control)this).get_Size().Y), Color.get_LightGray());
 			spriteBatch.End();
 			SpriteBatchExtensions.Begin(spriteBatch, ((Control)this).get_SpriteBatchParameters());
 		}
@@ -193,16 +190,10 @@ namespace Estreya.BlishHUD.EventTable.UI.Container
 
 		public void UpdatePosition(int x, int y)
 		{
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			if (EventTableModule.ModuleInstance.ModuleSettings.BuildDirection.get_Value() == BuildDirection.Bottom)
-			{
-				((Control)this).set_Location(new Point(x, y - ((Control)this).get_Height()));
-			}
-			else
-			{
-				((Control)this).set_Location(new Point(x, y));
-			}
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			bool buildFromBottom = EventTableModule.ModuleInstance.ModuleSettings.BuildDirection.get_Value() == BuildDirection.Bottom;
+			((Control)this).set_Location(buildFromBottom ? new Point(x, y - ((Control)this).get_Height()) : new Point(x, y));
 		}
 
 		public void UpdateSize(int width, int height, bool overrideHeight = false)
@@ -222,35 +213,9 @@ namespace Estreya.BlishHUD.EventTable.UI.Container
 			((Container)this).UpdateContainer(gameTime);
 		}
 
-		private void InitializeBaseTexture(GraphicsDevice graphicsDevice)
-		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0016: Expected O, but got Unknown
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			if (Texture == null)
-			{
-				Texture = new Texture2D(graphicsDevice, 1, 1);
-				Texture.SetData<Color>((Color[])(object)new Color[1] { Color.get_White() });
-			}
-		}
-
-		private void DrawLine(SpriteBatch spriteBatch, RectangleF coords, Color color)
-		{
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			InitializeBaseTexture(((GraphicsResource)spriteBatch).get_GraphicsDevice());
-			spriteBatch.DrawOnCtrl((Control)(object)this, Texture, coords, color);
-		}
-
 		protected override void DisposeControl()
 		{
 			Hide();
-			if (Texture != null)
-			{
-				((GraphicsResource)Texture).Dispose();
-				Texture = null;
-			}
 			((Container)this).DisposeControl();
 		}
 

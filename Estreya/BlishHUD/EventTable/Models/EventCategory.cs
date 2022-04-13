@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Estreya.BlishHUD.EventTable.Resources;
 using Estreya.BlishHUD.EventTable.Utils;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
@@ -24,15 +25,22 @@ namespace Estreya.BlishHUD.EventTable.Models
 		[JsonIgnore]
 		private List<Event> _fillerEvents = new List<Event>();
 
+		[JsonIgnore]
+		private AsyncLock _eventLock = new AsyncLock();
+
 		[JsonProperty("key")]
 		public string Key { get; set; }
 
 		[JsonProperty("name")]
 		public string Name { get; set; }
 
+		[JsonProperty("icon")]
+		public string Icon { get; set; }
+
 		[JsonProperty("showCombined")]
 		public bool ShowCombined { get; set; }
 
+		[JsonIgnore]
 		public List<Event> Events
 		{
 			get
@@ -222,10 +230,37 @@ namespace Estreya.BlishHUD.EventTable.Models
 			return EventTableModule.ModuleInstance.HiddenState.IsHidden(Key);
 		}
 
-		public Task LoadAsync()
+		public async Task LoadAsync()
 		{
+			Logger.Debug("Load event category: {0}", new object[1] { Key });
+			lock (_originalEvents)
+			{
+				foreach (Event originalEvent in _originalEvents)
+				{
+					originalEvent.EventCategory = this;
+				}
+			}
+			if (EventTableModule.ModuleInstance.ModuleSettings.UseEventTranslation.get_Value())
+			{
+				Name = Strings.ResourceManager.GetString("eventCategory-" + Key) ?? Name;
+			}
 			EventTableModule.ModuleInstance.ModuleSettings.EventSettingChanged += ModuleSettings_EventSettingChanged;
-			return Task.CompletedTask;
+			using (await _eventLock.LockAsync())
+			{
+				await Task.WhenAll(Events.Select((Event ev) => ev.LoadAsync()));
+			}
+			Logger.Debug("Loaded event category: {0}", new object[1] { Key });
+		}
+
+		public void Unload()
+		{
+			Logger.Debug("Unload event category: {0}", new object[1] { Key });
+			EventTableModule.ModuleInstance.ModuleSettings.EventSettingChanged -= ModuleSettings_EventSettingChanged;
+			Events.ForEach(delegate(Event ev)
+			{
+				ev.Unload();
+			});
+			Logger.Debug("Unloaded event category: {0}", new object[1] { Key });
 		}
 
 		public void Update(GameTime gameTime)

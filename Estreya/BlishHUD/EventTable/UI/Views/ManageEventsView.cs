@@ -9,7 +9,6 @@ using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
 using Estreya.BlishHUD.EventTable.Controls;
-using Estreya.BlishHUD.EventTable.Extensions;
 using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.EventTable.Resources;
 using Microsoft.Xna.Framework;
@@ -25,20 +24,12 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		public Panel Panel { get; private set; }
 
-		private IEnumerable<EventCategory> EventCategories { get; set; }
-
-		private List<SettingEntry<bool>> EventSettings { get; set; }
-
-		public ManageEventsView(IEnumerable<EventCategory> categories, List<SettingEntry<bool>> settings)
-			: this()
-		{
-			EventCategories = categories;
-			EventSettings = settings;
-		}
-
 		private void UpdateToggleButton(GlowButton button)
 		{
-			button.set_Icon(button.get_Checked() ? EventTableModule.ModuleInstance.ContentsManager.GetIcon("images\\minus.png") : EventTableModule.ModuleInstance.ContentsManager.GetIcon("images\\plus.png"));
+			GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
+			{
+				button.set_Icon(AsyncTexture2D.op_Implicit(button.get_Checked() ? EventTableModule.ModuleInstance.IconState.GetIcon("images\\minus.png") : EventTableModule.ModuleInstance.IconState.GetIcon("images\\plus.png")));
+			});
 		}
 
 		protected override void Build(Container buildPanel)
@@ -98,44 +89,38 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0307: Unknown result type (might be due to invalid IL or missing references)
-			//IL_031e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0328: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0336: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0342: Expected O, but got Unknown
-			//IL_0342: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0347: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0352: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0367: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0376: Expected O, but got Unknown
-			//IL_0389: Unknown result type (might be due to invalid IL or missing references)
-			//IL_038e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0399: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_054e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0572: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0577: Unknown result type (might be due to invalid IL or missing references)
-			//IL_057f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0586: Unknown result type (might be due to invalid IL or missing references)
-			//IL_059b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05a5: Expected O, but got Unknown
-			//IL_05a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_030b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0322: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0346: Expected O, but got Unknown
+			//IL_0346: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0356: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037a: Expected O, but got Unknown
+			//IL_038d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0392: Unknown result type (might be due to invalid IL or missing references)
+			//IL_039d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0536: Unknown result type (might be due to invalid IL or missing references)
+			//IL_057d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0582: Unknown result type (might be due to invalid IL or missing references)
+			//IL_058f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_059b: Expected O, but got Unknown
+			//IL_05f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05f6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0603: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0618: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0622: Expected O, but got Unknown
-			//IL_0622: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0656: Unknown result type (might be due to invalid IL or missing references)
-			//IL_065b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0663: Unknown result type (might be due to invalid IL or missing references)
-			//IL_066b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0677: Expected O, but got Unknown
+			//IL_060f: Expected O, but got Unknown
+			//IL_0646: Unknown result type (might be due to invalid IL or missing references)
+			//IL_064b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0658: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0660: Unknown result type (might be due to invalid IL or missing references)
+			//IL_066c: Expected O, but got Unknown
 			Panel val = new Panel();
 			((Control)val).set_Parent(buildPanel);
 			((Control)val).set_Location(new Point(MAIN_PADDING.X, MAIN_PADDING.Y));
@@ -180,7 +165,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			MenuItem allEvents = eventCategories.AddMenuItem(Strings.ManageEventsView_AllEvents, (Texture2D)null);
 			allEvents.Select();
 			menus.Add("allEvents", allEvents);
-			foreach (EventCategory category2 in from ec in EventCategories
+			foreach (EventCategory category2 in from ec in EventTableModule.ModuleInstance.EventCategories
 				group ec by ec.Key into ec
 				select ec.First())
 			{
@@ -191,7 +176,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				((Control)menuItemPair.Value).add_Click((EventHandler<MouseEventArgs>)delegate(object s, MouseEventArgs e)
 				{
 					MenuItem menuItem = (MenuItem)((s is MenuItem) ? s : null);
-					EventCategory category3 = EventCategories.Where((EventCategory ec) => ec.Name == menuItem.get_Text()).FirstOrDefault();
+					EventCategory category3 = EventTableModule.ModuleInstance.EventCategories.Where((EventCategory ec) => ec.Name == menuItem.get_Text()).FirstOrDefault();
 					eventPanel.FilterChildren<EventDetailsButton>((Func<EventDetailsButton, bool>)((EventDetailsButton detailsButton) => menuItem == menus["allEvents"] || category3.Events.Any((Event ev) => ev.EventCategory.Key == detailsButton.Event.EventCategory.Key && ev.Key == detailsButton.Event.Key)));
 				});
 			});
@@ -237,7 +222,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					}
 				});
 			});
-			foreach (EventCategory category in EventCategories)
+			foreach (EventCategory category in EventTableModule.ModuleInstance.EventCategories)
 			{
 				IEnumerable<Event> enumerable;
 				if (!category.ShowCombined)
@@ -257,28 +242,36 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					{
 						continue;
 					}
-					IEnumerable<SettingEntry<bool>> settings = EventSettings.FindAll((SettingEntry<bool> eventSetting) => ((SettingEntry)eventSetting).get_EntryKey().ToLowerInvariant() == e2.SettingKey.ToLowerInvariant());
+					IEnumerable<SettingEntry<bool>> settings = EventTableModule.ModuleInstance.ModuleSettings.AllEvents.FindAll((SettingEntry<bool> eventSetting) => ((SettingEntry)eventSetting).get_EntryKey().ToLowerInvariant() == e2.SettingKey.ToLowerInvariant());
 					SettingEntry<bool> setting = settings.First();
 					bool enabled = setting.get_Value();
-					AsyncTexture2D icon = EventTableModule.ModuleInstance.ContentsManager.GetIcon(e2.Icon);
 					EventDetailsButton obj = new EventDetailsButton
 					{
 						Event = e2
 					};
 					((Control)obj).set_Parent((Container)(object)eventPanel);
 					((DetailsButton)obj).set_Text(e2.Name);
-					((DetailsButton)obj).set_Icon(icon);
 					((DetailsButton)obj).set_ShowToggleButton(true);
 					((DetailsButton)obj).set_FillColor(Color.get_LightBlue());
 					EventDetailsButton button = obj;
+					GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
+					{
+						((DetailsButton)button).set_Icon(AsyncTexture2D.op_Implicit(EventTableModule.ModuleInstance.IconState.GetIcon(e2.Icon)));
+					});
 					if (!string.IsNullOrWhiteSpace(e2.Waypoint))
 					{
 						GlowButton val9 = new GlowButton();
 						((Control)val9).set_Parent((Container)(object)button);
 						val9.set_ToggleGlow(false);
-						((Control)val9).set_Tooltip(new Tooltip((ITooltipView)(object)new TooltipView(Strings.ManageEventsView_Waypoint_Title, Strings.ManageEventsView_Waypoint_Description, "images\\waypoint.png")));
-						val9.set_Icon(EventTableModule.ModuleInstance.ContentsManager.GetIcon("images\\waypoint.png"));
-						((Control)val9).add_Click((EventHandler<MouseEventArgs>)delegate
+						GlowButton waypointButton = val9;
+						GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
+						{
+							//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+							//IL_0024: Expected O, but got Unknown
+							((Control)waypointButton).set_Tooltip(new Tooltip((ITooltipView)(object)new TooltipView(Strings.ManageEventsView_Waypoint_Title, Strings.ManageEventsView_Waypoint_Description, "images\\waypoint.png")));
+							waypointButton.set_Icon(AsyncTexture2D.op_Implicit(EventTableModule.ModuleInstance.IconState.GetIcon("images\\waypoint.png")));
+						});
+						((Control)waypointButton).add_Click((EventHandler<MouseEventArgs>)delegate
 						{
 							e2.CopyWaypoint();
 						});
@@ -288,9 +281,15 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 						GlowButton val10 = new GlowButton();
 						((Control)val10).set_Parent((Container)(object)button);
 						val10.set_ToggleGlow(false);
-						((Control)val10).set_Tooltip(new Tooltip((ITooltipView)(object)new TooltipView(Strings.ManageEventsView_Wiki_Title, Strings.ManageEventsView_Wiki_Description, "images\\wiki.png")));
-						val10.set_Icon(EventTableModule.ModuleInstance.ContentsManager.GetIcon("images\\wiki.png"));
-						((Control)val10).add_Click((EventHandler<MouseEventArgs>)delegate
+						GlowButton wikiButton = val10;
+						GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
+						{
+							//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+							//IL_0024: Expected O, but got Unknown
+							((Control)wikiButton).set_Tooltip(new Tooltip((ITooltipView)(object)new TooltipView(Strings.ManageEventsView_Wiki_Title, Strings.ManageEventsView_Wiki_Description, "images\\wiki.png")));
+							wikiButton.set_Icon(AsyncTexture2D.op_Implicit(EventTableModule.ModuleInstance.IconState.GetIcon("images\\wiki.png")));
+						});
+						((Control)wikiButton).add_Click((EventHandler<MouseEventArgs>)delegate
 						{
 							e2.OpenWiki();
 						});
@@ -316,6 +315,11 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					});
 				}
 			}
+		}
+
+		public ManageEventsView()
+			: this()
+		{
 		}
 	}
 }

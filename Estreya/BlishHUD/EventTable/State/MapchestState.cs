@@ -14,21 +14,21 @@ using Microsoft.Xna.Framework;
 
 namespace Estreya.BlishHUD.EventTable.State
 {
-	public class WorldbossState : ManagedState
+	public class MapchestState : ManagedState
 	{
-		private static readonly Logger Logger = Logger.GetLogger<WorldbossState>();
+		private static readonly Logger Logger = Logger.GetLogger<MapchestState>();
 
 		private TimeSpan updateInterval = TimeSpan.FromMinutes(5.0).Add(TimeSpan.FromMilliseconds(100.0));
 
 		private double timeSinceUpdate;
 
-		private List<string> completedWorldbosses = new List<string>();
+		private List<string> completedMapchests = new List<string>();
 
 		private Gw2ApiManager ApiManager { get; set; }
 
-		public event EventHandler<string> WorldbossCompleted;
+		public event EventHandler<string> MapchestCompleted;
 
-		public WorldbossState(Gw2ApiManager apiManager)
+		public MapchestState(Gw2ApiManager apiManager)
 		{
 			ApiManager = apiManager;
 		}
@@ -43,24 +43,24 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		public bool IsCompleted(string apiCode)
 		{
-			return completedWorldbosses.Contains(apiCode);
+			return completedMapchests.Contains(apiCode);
 		}
 
 		public override async Task Reload()
 		{
-			await UpdateCompletedWorldbosses(null);
+			await UpdatedCompletedMapchests(null);
 		}
 
-		private async Task UpdateCompletedWorldbosses(GameTime gameTime)
+		private async Task UpdatedCompletedMapchests(GameTime gameTime)
 		{
-			Logger.Info("Check for completed worldbosses.");
+			Logger.Info("Check for completed mapchests.");
 			try
 			{
-				List<string> oldCompletedWorldbosses;
-				lock (completedWorldbosses)
+				List<string> oldCompletedMapchests;
+				lock (completedMapchests)
 				{
-					oldCompletedWorldbosses = completedWorldbosses.ToArray().ToList();
-					completedWorldbosses.Clear();
+					oldCompletedMapchests = completedMapchests.ToArray().ToList();
+					completedMapchests.Clear();
 				}
 				if (!ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
 				{
@@ -70,24 +70,24 @@ namespace Estreya.BlishHUD.EventTable.State
 				{
 					return;
 				}
-				IApiV2ObjectList<string> bosses = await ((IBlobClient<IApiV2ObjectList<string>>)(object)ApiManager.get_Gw2ApiClient().get_V2().get_Account()
-					.get_WorldBosses()).GetAsync(default(CancellationToken));
-				lock (completedWorldbosses)
+				IApiV2ObjectList<string> mapchests = await ((IBlobClient<IApiV2ObjectList<string>>)(object)ApiManager.get_Gw2ApiClient().get_V2().get_Account()
+					.get_MapChests()).GetAsync(default(CancellationToken));
+				lock (completedMapchests)
 				{
-					completedWorldbosses.AddRange((IEnumerable<string>)bosses);
+					completedMapchests.AddRange((IEnumerable<string>)mapchests);
 				}
-				foreach (string boss in (IEnumerable<string>)bosses)
+				foreach (string mapchest in (IEnumerable<string>)mapchests)
 				{
-					if (!oldCompletedWorldbosses.Contains(boss))
+					if (!oldCompletedMapchests.Contains(mapchest))
 					{
-						Logger.Info("Completed worldboss: " + boss);
+						Logger.Info("Completed mapchest: " + mapchest);
 						try
 						{
-							this.WorldbossCompleted?.Invoke(this, boss);
+							this.MapchestCompleted?.Invoke(this, mapchest);
 						}
 						catch (Exception ex2)
 						{
-							Logger.Error("Error handling complete worldboss event: " + ex2.Message);
+							Logger.Error("Error handling complete mapchest event: " + ex2.Message);
 						}
 					}
 				}
@@ -95,16 +95,16 @@ namespace Estreya.BlishHUD.EventTable.State
 			catch (MissingScopesException val)
 			{
 				MissingScopesException msex = val;
-				Logger.Warn("Could not update completed worldbosses due to missing scopes: " + ((Exception)(object)msex).Message);
+				Logger.Warn("Could not update completed mapchests due to missing scopes: " + ((Exception)(object)msex).Message);
 			}
 			catch (InvalidAccessTokenException val2)
 			{
 				InvalidAccessTokenException iatex = val2;
-				Logger.Warn("Could not update completed worldbosses due to invalid access token: " + ((Exception)(object)iatex).Message);
+				Logger.Warn("Could not update completed mapchests due to invalid access token: " + ((Exception)(object)iatex).Message);
 			}
 			catch (Exception ex)
 			{
-				Logger.Error("Error updating completed worldbosses: " + ex.Message);
+				Logger.Error("Error updating completed mapchests: " + ex.Message);
 			}
 		}
 
@@ -117,20 +117,20 @@ namespace Estreya.BlishHUD.EventTable.State
 		protected override void InternalUnload()
 		{
 			ApiManager.remove_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)ApiManager_SubtokenUpdated);
-			lock (completedWorldbosses)
+			lock (completedMapchests)
 			{
-				completedWorldbosses.Clear();
+				completedMapchests.Clear();
 			}
 		}
 
 		protected override void InternalUpdate(GameTime gameTime)
 		{
-			UpdateCadenceUtil.UpdateAsyncWithCadence(UpdateCompletedWorldbosses, gameTime, updateInterval.TotalMilliseconds, ref timeSinceUpdate);
+			UpdateCadenceUtil.UpdateAsyncWithCadence(UpdatedCompletedMapchests, gameTime, updateInterval.TotalMilliseconds, ref timeSinceUpdate);
 		}
 
 		protected override async Task Load()
 		{
-			await UpdateCompletedWorldbosses(null);
+			await UpdatedCompletedMapchests(null);
 		}
 
 		protected override Task Save()

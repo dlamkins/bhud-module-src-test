@@ -119,7 +119,7 @@ namespace Estreya.BlishHUD.EventTable
 
 		public SettingEntry<Color> FillerTextColor { get; private set; }
 
-		public SettingEntry<WorldbossCompletedAction> WorldbossCompletedAcion { get; private set; }
+		public SettingEntry<EventCompletedAction> EventCompletedAcion { get; private set; }
 
 		public SettingEntry<bool> UseEventTranslation { get; private set; }
 
@@ -318,8 +318,8 @@ namespace Estreya.BlishHUD.EventTable
 			TextColor.add_SettingChanged((EventHandler<ValueChangedEventArgs<Color>>)SettingChanged<Color>);
 			FillerTextColor = GlobalSettings.DefineSetting<Color>("FillerTextColor", DefaultGW2Color, (Func<string>)(() => Strings.Setting_FillerTextColor_Name), (Func<string>)(() => Strings.Setting_FillerTextColor_Description));
 			FillerTextColor.add_SettingChanged((EventHandler<ValueChangedEventArgs<Color>>)SettingChanged<Color>);
-			WorldbossCompletedAcion = GlobalSettings.DefineSetting<WorldbossCompletedAction>("WorldbossCompletedAcion", WorldbossCompletedAction.Crossout, (Func<string>)(() => Strings.Setting_WorldbossCompletedAction_Name), (Func<string>)(() => Strings.Setting_WorldbossCompletedAction_Description));
-			WorldbossCompletedAcion.add_SettingChanged((EventHandler<ValueChangedEventArgs<WorldbossCompletedAction>>)SettingChanged<WorldbossCompletedAction>);
+			EventCompletedAcion = GlobalSettings.DefineSetting<EventCompletedAction>("EventCompletedAcion", EventCompletedAction.Crossout, (Func<string>)(() => Strings.Setting_EventCompletedAction_Name), (Func<string>)(() => Strings.Setting_EventCompletedAction_Description));
+			EventCompletedAcion.add_SettingChanged((EventHandler<ValueChangedEventArgs<EventCompletedAction>>)SettingChanged<EventCompletedAction>);
 			UseEventTranslation = GlobalSettings.DefineSetting<bool>("UseEventTranslation", true, (Func<string>)(() => Strings.Setting_UseEventTranslation_Name), (Func<string>)(() => Strings.Setting_UseEventTranslation_Description));
 			UseEventTranslation.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
 		}

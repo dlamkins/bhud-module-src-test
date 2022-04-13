@@ -1,9 +1,9 @@
 using System;
 using Blish_HUD;
 using Blish_HUD.Common.UI.Views;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
-using Estreya.BlishHUD.EventTable.Extensions;
 using Microsoft.Xna.Framework;
 
 namespace Estreya.BlishHUD.EventTable.UI.Views
@@ -38,43 +38,43 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Expected O, but got Unknown
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0058: Expected O, but got Unknown
 			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00de: Expected O, but got Unknown
-			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e3: Expected O, but got Unknown
 			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0154: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0155: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0166: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0172: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0159: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
 			buildPanel.set_HeightSizingMode((SizingMode)1);
 			buildPanel.set_WidthSizingMode((SizingMode)1);
 			Image val = new Image();
 			((Control)val).set_Size(new Point(48, 48));
 			((Control)val).set_Location(new Point(8, 8));
 			((Control)val).set_Parent(buildPanel);
-			val.set_Texture(EventTableModule.ModuleInstance.ContentsManager.GetIcon(Icon));
+			val.set_Texture(AsyncTexture2D.op_Implicit(EventTableModule.ModuleInstance.IconState.GetIcon(Icon)));
 			Image image = val;
 			Label val2 = new Label();
 			val2.set_AutoSizeHeight(false);

@@ -1,21 +1,21 @@
 using System;
 using Newtonsoft.Json;
-using SemanticVersioning;
+using SemVer;
 
 namespace Estreya.BlishHUD.EventTable.Json
 {
-	public class SemanticVersionConverter : JsonConverter<SemanticVersioning.Version>
+	public class SemanticVersionConverter : JsonConverter<SemVer.Version>
 	{
-		public override SemanticVersioning.Version ReadJson(JsonReader reader, Type objectType, SemanticVersioning.Version existingValue, bool hasExistingValue, JsonSerializer serializer)
+		public override SemVer.Version ReadJson(JsonReader reader, Type objectType, SemVer.Version existingValue, bool hasExistingValue, JsonSerializer serializer)
 		{
-			if (objectType != typeof(SemanticVersioning.Version))
+			if (objectType != typeof(SemVer.Version))
 			{
-				return new SemanticVersioning.Version(0, 0, 0);
+				return new SemVer.Version(0, 0, 0);
 			}
-			return SemanticVersioning.Version.Parse((string)reader.get_Value());
+			return new SemVer.Version((string)reader.get_Value());
 		}
 
-		public override void WriteJson(JsonWriter writer, SemanticVersioning.Version value, JsonSerializer serializer)
+		public override void WriteJson(JsonWriter writer, SemVer.Version value, JsonSerializer serializer)
 		{
 			writer.WriteValue(value.ToString());
 		}

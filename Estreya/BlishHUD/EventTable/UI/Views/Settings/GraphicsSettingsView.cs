@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using Blish_HUD.Controls;
-using Blish_HUD.Settings;
 
 namespace Estreya.BlishHUD.EventTable.UI.Views.Settings
 {
@@ -14,13 +13,13 @@ namespace Estreya.BlishHUD.EventTable.UI.Views.Settings
 
 		protected override void InternalBuild(Panel parent)
 		{
-			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.LocationX);
-			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.LocationY);
-			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.Width);
+			RenderSetting<int>(parent, base.ModuleSettings.LocationX);
+			RenderSetting<int>(parent, base.ModuleSettings.LocationY);
+			RenderSetting<int>(parent, base.ModuleSettings.Width);
 			RenderEmptyLine(parent);
-			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.Opacity);
+			RenderSetting<float>(parent, base.ModuleSettings.Opacity);
 			RenderEmptyLine(parent);
-			RenderSetting(parent, (SettingEntry)(object)base.ModuleSettings.BackgroundColorOpacity);
+			RenderSetting<float>(parent, base.ModuleSettings.BackgroundColorOpacity);
 			RenderColorSetting(parent, base.ModuleSettings.BackgroundColor);
 		}
 

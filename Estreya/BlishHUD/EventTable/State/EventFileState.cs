@@ -63,9 +63,8 @@ namespace Estreya.BlishHUD.EventTable.State
 			timeSinceUpdate = updateInterval.TotalMilliseconds;
 		}
 
-		protected override Task InternalUnload()
+		protected override void InternalUnload()
 		{
-			return Task.CompletedTask;
 		}
 
 		protected override void InternalUpdate(GameTime gameTime)
@@ -118,14 +117,39 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		private async Task<string> GetInternalFileContent()
 		{
-			using StreamReader eventsReader = new StreamReader(ContentsManager.GetFileStream("events.json"));
-			return await eventsReader.ReadToEndAsync();
+			using Stream stream = ContentsManager.GetFileStream("events.json");
+			return await FileUtil.ReadStringAsync(stream);
 		}
 
-		public async Task<string> GetExternalFileContent()
+		private async Task<string> GetExternalFileContent()
 		{
-			using StreamReader eventsReader = new StreamReader(FilePath);
-			return await eventsReader.ReadToEndAsync();
+			return await FileUtil.ReadStringAsync(FilePath);
+		}
+
+		public async Task<EventSettingsFile> GetInternalFile()
+		{
+			try
+			{
+				return JsonConvert.DeserializeObject<EventSettingsFile>(await GetInternalFileContent());
+			}
+			catch (Exception ex)
+			{
+				Logger.Error(ex, "Could not load internal file.");
+			}
+			return null;
+		}
+
+		public async Task<EventSettingsFile> GetExternalFile()
+		{
+			try
+			{
+				return JsonConvert.DeserializeObject<EventSettingsFile>(await GetExternalFileContent());
+			}
+			catch (Exception ex)
+			{
+				Logger.Error(ex, "Could not load external file.");
+			}
+			return null;
 		}
 
 		private async Task<bool> IsNewFileVersionAvaiable()
@@ -133,9 +157,9 @@ namespace Estreya.BlishHUD.EventTable.State
 			_ = 1;
 			try
 			{
-				EventSettingsFile internalEventFile = JsonConvert.DeserializeObject<EventSettingsFile>(await GetInternalFileContent());
-				EventSettingsFile externalEventFile = JsonConvert.DeserializeObject<EventSettingsFile>(await GetExternalFileContent());
-				return internalEventFile.Version > externalEventFile.Version;
+				EventSettingsFile internalEventFile = await GetInternalFile();
+				EventSettingsFile externalEventFile = await GetExternalFile();
+				return internalEventFile?.Version > externalEventFile?.Version;
 			}
 			catch (Exception ex)
 			{
@@ -144,10 +168,15 @@ namespace Estreya.BlishHUD.EventTable.State
 			}
 		}
 
+		internal async Task ExportFile(EventSettingsFile eventSettingsFile)
+		{
+			string content = JsonConvert.SerializeObject((object)eventSettingsFile, (Formatting)1);
+			await FileUtil.WriteStringAsync(FilePath, content);
+		}
+
 		public async Task ExportFile()
 		{
-			string json = await GetInternalFileContent();
-			File.WriteAllText(FilePath, json);
+			await ExportFile(await GetInternalFile());
 		}
 	}
 }

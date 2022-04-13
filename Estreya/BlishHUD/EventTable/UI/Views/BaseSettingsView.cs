@@ -8,10 +8,9 @@ using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
-using Estreya.BlishHUD.EventTable.Controls;
 using Estreya.BlishHUD.EventTable.Extensions;
-using Estreya.BlishHUD.EventTable.Helpers;
 using Estreya.BlishHUD.EventTable.Resources;
+using Estreya.BlishHUD.EventTable.UI.Views.Settings.Controls;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
@@ -33,8 +32,6 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private CancellationTokenSource ErrorCancellationTokenSource = new CancellationTokenSource();
 
-		private Dictionary<Type, Func<SettingEntry, int, int, Control>> _typeLookup;
-
 		protected ModuleSettings ModuleSettings { get; set; }
 
 		private static IEnumerable<Color> Colors { get; set; }
@@ -53,238 +50,6 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			: this()
 		{
 			ModuleSettings = settings;
-			LoadTypeLookup();
-		}
-
-		private void LoadTypeLookup()
-		{
-			_typeLookup = new Dictionary<Type, Func<SettingEntry, int, int, Control>>
-			{
-				{
-					typeof(bool),
-					delegate(SettingEntry settingEntry, int definedWidth, int xPos)
-					{
-						//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-						//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-						//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-						//IL_005f: Expected O, but got Unknown
-						SettingEntry<bool> setting6 = settingEntry as SettingEntry<bool>;
-						Checkbox val6 = new Checkbox();
-						((Control)val6).set_Width(definedWidth);
-						((Control)val6).set_Location(new Point(xPos, 0));
-						val6.set_Checked(setting6?.get_Value() ?? false);
-						((Control)val6).set_Enabled(!settingEntry.IsDisabled());
-						Checkbox checkbox = val6;
-						if (setting6 != null)
-						{
-							checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object s, CheckChangedEvent e)
-							{
-								if (HandleValidation(setting6, e.get_Checked()))
-								{
-									setting6.set_Value(e.get_Checked());
-								}
-								else
-								{
-									checkbox.set_Checked(!e.get_Checked());
-								}
-							});
-						}
-						return (Control)(object)checkbox;
-					}
-				},
-				{
-					typeof(string),
-					delegate(SettingEntry settingEntry, int definedWidth, int xPos)
-					{
-						//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-						//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0068: Expected O, but got Unknown
-						SettingEntry<string> setting5 = settingEntry as SettingEntry<string>;
-						TextBox val4 = new TextBox();
-						((Control)val4).set_Width(definedWidth);
-						((Control)val4).set_Location(new Point(xPos, 0));
-						((TextInputBase)val4).set_Text(setting5?.get_Value() ?? string.Empty);
-						((Control)val4).set_Enabled(!settingEntry.IsDisabled());
-						TextBox textBox = val4;
-						if (setting5 != null)
-						{
-							((TextInputBase)textBox).add_TextChanged((EventHandler<EventArgs>)delegate(object s, EventArgs e)
-							{
-								ValueChangedEventArgs<string> val5 = (ValueChangedEventArgs<string>)(object)e;
-								if (HandleValidation(setting5, val5.get_NewValue()))
-								{
-									setting5.set_Value(val5.get_NewValue());
-								}
-								else
-								{
-									((TextInputBase)textBox).set_Text(val5.get_PreviousValue());
-								}
-							});
-						}
-						return (Control)(object)textBox;
-					}
-				},
-				{
-					typeof(float),
-					delegate(SettingEntry settingEntry, int definedWidth, int xPos)
-					{
-						//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-						//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-						//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-						//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-						//IL_00df: Expected O, but got Unknown
-						SettingEntry<float> setting4 = settingEntry as SettingEntry<float>;
-						(float, float)? tuple2 = setting4?.GetRange() ?? null;
-						TrackBar val3 = new TrackBar();
-						((Control)val3).set_Width(definedWidth);
-						((Control)val3).set_Location(new Point(xPos, 0));
-						((Control)val3).set_Enabled(!settingEntry.IsDisabled());
-						val3.set_MinValue(tuple2.HasValue ? tuple2.Value.Item1 : 0f);
-						val3.set_MaxValue(tuple2.HasValue ? tuple2.Value.Item2 : 100f);
-						val3.set_SmallStep(true);
-						val3.set_Value(setting4?.GetValue() ?? 50f);
-						TrackBar trackBar2 = val3;
-						if (setting4 != null)
-						{
-							trackBar2.add_ValueChanged((EventHandler<ValueEventArgs<float>>)delegate(object s, ValueEventArgs<float> e)
-							{
-								if (HandleValidation(setting4, e.get_Value()))
-								{
-									setting4.set_Value(e.get_Value());
-								}
-								else
-								{
-									trackBar2.set_Value(setting4.get_Value());
-								}
-							});
-						}
-						return (Control)(object)trackBar2;
-					}
-				},
-				{
-					typeof(int),
-					delegate(SettingEntry settingEntry, int definedWidth, int xPos)
-					{
-						//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-						//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-						//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-						//IL_00d1: Expected O, but got Unknown
-						SettingEntry<int> setting3 = settingEntry as SettingEntry<int>;
-						(int, int)? tuple = setting3?.GetRange() ?? null;
-						TrackBar val2 = new TrackBar();
-						((Control)val2).set_Width(definedWidth);
-						((Control)val2).set_Location(new Point(xPos, 0));
-						((Control)val2).set_Enabled(!settingEntry.IsDisabled());
-						val2.set_MinValue((float)(tuple.HasValue ? tuple.Value.Item1 : 0));
-						val2.set_MaxValue((float)(tuple.HasValue ? tuple.Value.Item2 : 100));
-						val2.set_Value((float)(setting3?.GetValue() ?? 50));
-						TrackBar trackBar = val2;
-						if (setting3 != null)
-						{
-							trackBar.add_ValueChanged((EventHandler<ValueEventArgs<float>>)delegate(object s, ValueEventArgs<float> e)
-							{
-								if (HandleValidation(setting3, (int)e.get_Value()))
-								{
-									setting3.set_Value((int)e.get_Value());
-								}
-								else
-								{
-									trackBar.set_Value((float)setting3.get_Value());
-								}
-							});
-						}
-						return (Control)(object)trackBar;
-					}
-				},
-				{
-					typeof(KeyBinding),
-					delegate(SettingEntry settingEntry, int definedWidth, int xPos)
-					{
-						//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-						SettingEntry<KeyBinding> setting2 = settingEntry as SettingEntry<KeyBinding>;
-						KeybindingAssigner keybindingAssigner2 = new KeybindingAssigner(setting2.get_Value(), withName: false);
-						((Control)keybindingAssigner2).set_Width(definedWidth);
-						((Control)keybindingAssigner2).set_Location(new Point(xPos, 0));
-						((Control)keybindingAssigner2).set_Enabled(!settingEntry.IsDisabled());
-						KeybindingAssigner keybindingAssigner = keybindingAssigner2;
-						if (setting2 != null)
-						{
-							keybindingAssigner.BindingChanged += delegate
-							{
-								if (HandleValidation<KeyBinding>(setting2, keybindingAssigner.KeyBinding))
-								{
-									setting2.set_Value(keybindingAssigner.KeyBinding);
-								}
-								else
-								{
-									keybindingAssigner.KeyBinding = setting2.get_Value();
-								}
-							};
-						}
-						return (Control)(object)keybindingAssigner;
-					}
-				},
-				{
-					typeof(Enum),
-					delegate(SettingEntry settingEntry, int definedWidth, int xPos)
-					{
-						//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0027: Expected O, but got Unknown
-						//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-						dynamic setting = settingEntry;
-						Dropdown val = new Dropdown();
-						((Control)val).set_Width(definedWidth);
-						((Control)val).set_Location(new Point(xPos, 0));
-						val.set_SelectedItem((string)setting?.Value.ToString());
-						((Control)val).set_Enabled(!settingEntry.IsDisabled());
-						Dropdown dropdown = val;
-						string[] names = Enum.GetNames(settingEntry.get_SettingType());
-						foreach (string item in names)
-						{
-							dropdown.get_Items().Add(item);
-						}
-						if (setting != null)
-						{
-							bool resetingValue = false;
-							dropdown.add_ValueChanged((EventHandler<ValueChangedEventArgs>)delegate(object s, ValueChangedEventArgs e)
-							{
-								if (!resetingValue)
-								{
-									object obj = Enum.Parse(settingEntry.get_SettingType(), e.get_CurrentValue());
-									if (HandleValidation(setting, (dynamic)obj))
-									{
-										setting.Value = obj;
-									}
-									else
-									{
-										resetingValue = true;
-										dropdown.set_SelectedItem(e.get_PreviousValue());
-										resetingValue = false;
-									}
-								}
-							});
-						}
-						return (Control)(object)dropdown;
-					}
-				}
-			};
 		}
 
 		protected override async Task<bool> Load(IProgress<string> progress)
@@ -386,29 +151,26 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			val.Show((IView)(object)new EmptySettingsLineView(25));
 		}
 
-		protected Panel RenderSetting(Panel parent, SettingEntry setting)
+		protected Panel RenderSetting<T>(Panel parent, SettingEntry<T> setting)
 		{
 			Panel panel = GetPanel((Container)(object)parent);
-			Label label = GetLabel(panel, setting.get_DisplayName());
-			Type type = setting.get_SettingType();
-			if (setting.get_SettingType().IsEnum)
+			Label label = GetLabel(panel, ((SettingEntry)setting).get_DisplayName());
+			((SettingEntry)setting).get_SettingType();
+			try
 			{
-				type = typeof(Enum);
-			}
-			if (_typeLookup.TryGetValue(type, out var controlBuilder))
-			{
-				Control obj = controlBuilder(setting, 170, ((Control)label).get_Right() + 20);
+				Control obj = ControlProvider.Create<T>(setting, HandleValidation, 170, -1, ((Control)label).get_Right() + 20, 0);
 				obj.set_Parent((Container)(object)panel);
-				obj.set_BasicTooltipText(setting.get_Description());
+				obj.set_BasicTooltipText(((SettingEntry)setting).get_Description());
+				return panel;
 			}
-			else
+			catch (Exception ex)
 			{
-				Logger.Warn("Type \"" + setting.get_SettingType().FullName + "\" could not be found in internal type lookup.");
+				Logger.Error(ex, "Type \"" + ((SettingEntry)setting).get_SettingType().FullName + "\" could not be found in internal type lookup:");
+				return panel;
 			}
-			return panel;
 		}
 
-		private Panel GetPanel(Container parent)
+		protected Panel GetPanel(Container parent)
 		{
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
@@ -422,7 +184,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			return val;
 		}
 
-		private Label GetLabel(Panel parent, string text)
+		protected Label GetLabel(Panel parent, string text)
 		{
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
@@ -449,12 +211,12 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		protected void RenderButton(Panel parent, string text, Func<Task> action, Func<bool> disabledCallback = null)
 		{
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
 			Panel panel = GetPanel((Container)(object)parent);
 			StandardButton val = new StandardButton();
 			((Control)val).set_Parent((Container)(object)panel);
@@ -463,8 +225,25 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Control)val).set_Enabled(disabledCallback == null || !disabledCallback());
 			((Control)val).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				AsyncHelper.RunSync(action.Invoke);
+				Task.Run(async delegate
+				{
+					try
+					{
+						await action();
+					}
+					catch (Exception ex)
+					{
+						ShowError(ex.Message);
+					}
+				});
 			});
+		}
+
+		protected void RenderLabel(Panel parent, string title, string value)
+		{
+			Panel panel = GetPanel((Container)(object)parent);
+			Label titleLabel = GetLabel(panel, title);
+			((Control)GetLabel(panel, value)).set_Left(((Control)titleLabel).get_Right() + 20);
 		}
 
 		protected void RenderColorSetting(Panel parent, SettingEntry<Color> setting)

@@ -290,6 +290,18 @@ namespace Estreya.BlishHUD.EventTable.Resources
 
 		internal static string eventCategory_worldBossesHardcore => ResourceManager.GetString("eventCategory-worldBossesHardcore", resourceCulture);
 
+		internal static string EventSettingsView_CurrentVersion_Title => ResourceManager.GetString("EventSettingsView_CurrentVersion_Title", resourceCulture);
+
+		internal static string EventSettingsView_CurrentVersion_Unknown => ResourceManager.GetString("EventSettingsView_CurrentVersion_Unknown", resourceCulture);
+
+		internal static string EventSettingsView_NewestVersion_Title => ResourceManager.GetString("EventSettingsView_NewestVersion_Title", resourceCulture);
+
+		internal static string EventSettingsView_NewestVersion_Unknown => ResourceManager.GetString("EventSettingsView_NewestVersion_Unknown", resourceCulture);
+
+		internal static string EventSettingsView_ReloadEvents_Success => ResourceManager.GetString("EventSettingsView_ReloadEvents_Success", resourceCulture);
+
+		internal static string EventSettingsView_ReloadEvents_Title => ResourceManager.GetString("EventSettingsView_ReloadEvents_Title", resourceCulture);
+
 		internal static string EventSettingsView_ResetHiddenStates_Success => ResourceManager.GetString("EventSettingsView_ResetHiddenStates_Success", resourceCulture);
 
 		internal static string EventSettingsView_ResetHiddenStates_Title => ResourceManager.GetString("EventSettingsView_ResetHiddenStates_Title", resourceCulture);
@@ -315,6 +327,12 @@ namespace Estreya.BlishHUD.EventTable.Resources
 		internal static string ManageEventsView_Wiki_Description => ResourceManager.GetString("ManageEventsView_Wiki_Description", resourceCulture);
 
 		internal static string ManageEventsView_Wiki_Title => ResourceManager.GetString("ManageEventsView_Wiki_Title", resourceCulture);
+
+		internal static string ReorderEventsView_Reset => ResourceManager.GetString("ReorderEventsView_Reset", resourceCulture);
+
+		internal static string ReorderEventsView_Save => ResourceManager.GetString("ReorderEventsView_Save", resourceCulture);
+
+		internal static string ReorderEventsView_Save_Success => ResourceManager.GetString("ReorderEventsView_Save_Success", resourceCulture);
 
 		internal static string Setting_AutomaticallyUpdateEventFile_Description => ResourceManager.GetString("Setting_AutomaticallyUpdateEventFile_Description", resourceCulture);
 
@@ -343,6 +361,10 @@ namespace Estreya.BlishHUD.EventTable.Resources
 		internal static string Setting_DrawEventBorder_Description => ResourceManager.GetString("Setting_DrawEventBorder_Description", resourceCulture);
 
 		internal static string Setting_DrawEventBorder_Name => ResourceManager.GetString("Setting_DrawEventBorder_Name", resourceCulture);
+
+		internal static string Setting_EventCompletedAction_Description => ResourceManager.GetString("Setting_EventCompletedAction_Description", resourceCulture);
+
+		internal static string Setting_EventCompletedAction_Name => ResourceManager.GetString("Setting_EventCompletedAction_Name", resourceCulture);
 
 		internal static string Setting_EventFontSize_Description => ResourceManager.GetString("Setting_EventFontSize_Description", resourceCulture);
 
@@ -436,10 +458,6 @@ namespace Estreya.BlishHUD.EventTable.Resources
 
 		internal static string Setting_Width_Name => ResourceManager.GetString("Setting_Width_Name", resourceCulture);
 
-		internal static string Setting_WorldbossCompletedAction_Description => ResourceManager.GetString("Setting_WorldbossCompletedAction_Description", resourceCulture);
-
-		internal static string Setting_WorldbossCompletedAction_Name => ResourceManager.GetString("Setting_WorldbossCompletedAction_Name", resourceCulture);
-
 		internal static string SettingsView_OpenSettings => ResourceManager.GetString("SettingsView_OpenSettings", resourceCulture);
 
 		internal static string SettingsWindow_EventSettings_Title => ResourceManager.GetString("SettingsWindow_EventSettings_Title", resourceCulture);
@@ -449,6 +467,8 @@ namespace Estreya.BlishHUD.EventTable.Resources
 		internal static string SettingsWindow_GraphicSettings_Title => ResourceManager.GetString("SettingsWindow_GraphicSettings_Title", resourceCulture);
 
 		internal static string SettingsWindow_ManageEvents_Title => ResourceManager.GetString("SettingsWindow_ManageEvents_Title", resourceCulture);
+
+		internal static string SettingsWindow_ReorderSettings_Title => ResourceManager.GetString("SettingsWindow_ReorderSettings_Title", resourceCulture);
 
 		internal static string SettingsWindow_Subtitle => ResourceManager.GetString("SettingsWindow_Subtitle", resourceCulture);
 

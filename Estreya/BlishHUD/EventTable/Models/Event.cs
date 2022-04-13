@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Common.UI.Views;
 using Blish_HUD.Controls;
@@ -10,7 +11,6 @@ using Blish_HUD.Input;
 using Blish_HUD.Settings;
 using Blish_HUD._Extensions;
 using Estreya.BlishHUD.EventTable.Controls;
-using Estreya.BlishHUD.EventTable.Helpers;
 using Estreya.BlishHUD.EventTable.Input;
 using Estreya.BlishHUD.EventTable.Json;
 using Estreya.BlishHUD.EventTable.Resources;
@@ -59,7 +59,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 		[JsonConverter(typeof(TimeSpanJsonConverter), new object[]
 		{
 			"dd\\.hh\\:mm",
-			new string[] { "hh\\:mm" }
+			new string[] { "dd\\.hh\\:mm", "hh\\:mm" }
 		})]
 		public TimeSpan Offset { get; set; }
 
@@ -74,9 +74,6 @@ namespace Estreya.BlishHUD.EventTable.Models
 			new string[] { "dd\\.hh\\:mm", "hh\\:mm" }
 		})]
 		public TimeSpan Repeat { get; set; }
-
-		[JsonProperty("diffculty")]
-		public EventDifficulty Difficulty { get; set; }
 
 		[JsonProperty("location")]
 		public string Location { get; set; }
@@ -95,6 +92,9 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		[JsonProperty("color")]
 		public string BackgroundColorCode { get; set; }
+
+		[JsonProperty("apiType")]
+		public APICodeType APICodeType { get; set; }
 
 		[JsonProperty("api")]
 		public string APICode { get; set; }
@@ -230,41 +230,41 @@ namespace Estreya.BlishHUD.EventTable.Models
 		public bool Draw(SpriteBatch spriteBatch, Rectangle bounds, Control control, Texture2D baseTexture, int y, double pixelPerMinute, DateTime now, DateTime min, DateTime max, BitmapFont font)
 		{
 			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0124: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0206: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0244: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0262: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0296: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0298: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0302: Unknown result type (might be due to invalid IL or missing references)
-			//IL_031d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0324: Unknown result type (might be due to invalid IL or missing references)
-			//IL_032e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0335: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0349: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0358: Unknown result type (might be due to invalid IL or missing references)
-			//IL_036a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0371: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0379: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0380: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0390: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0392: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0199: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0200: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0205: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0243: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0261: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0295: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0297: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0301: Unknown result type (might be due to invalid IL or missing references)
+			//IL_031c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0323: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0334: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0348: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0357: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0369: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0370: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0378: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0391: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d4: Unknown result type (might be due to invalid IL or missing references)
 			List<DateTime> occurences = new List<DateTime>();
 			lock (Occurences)
 			{
@@ -284,7 +284,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 				x = Math.Max(x, 0f);
 				((RectangleF)(ref eventTexturePosition))._002Ector(x, (float)y, width, (float)EventTableModule.ModuleInstance.EventHeight);
 				bool drawBorder = !Filler && EventTableModule.ModuleInstance.ModuleSettings.DrawEventBorder.get_Value();
-				DrawRectangle(spriteBatch, control, baseTexture, eventTexturePosition, BackgroundColor * EventTableModule.ModuleInstance.ModuleSettings.Opacity.get_Value(), drawBorder ? 1 : 0, Color.get_Black());
+				spriteBatch.DrawRectangle(control, baseTexture, eventTexturePosition, BackgroundColor * EventTableModule.ModuleInstance.ModuleSettings.Opacity.get_Value(), drawBorder ? 1 : 0, Color.get_Black());
 				Color textColor = Color.get_Black();
 				if (Filler)
 				{
@@ -329,12 +329,30 @@ namespace Estreya.BlishHUD.EventTable.Models
 						spriteBatch.DrawStringOnCtrl(control, timeRemainingString, font, eventTimeRemainingPosition, textColor, wrap: false, (HorizontalAlignment)0, (VerticalAlignment)1);
 					}
 				}
-				if (EventTableModule.ModuleInstance.ModuleSettings.WorldbossCompletedAcion.get_Value() == WorldbossCompletedAction.Crossout && !Filler && !string.IsNullOrWhiteSpace(APICode) && EventTableModule.ModuleInstance.WorldbossState.IsCompleted(APICode))
+				if (EventTableModule.ModuleInstance.ModuleSettings.EventCompletedAcion.get_Value() == EventCompletedAction.Crossout && !Filler && !string.IsNullOrWhiteSpace(APICode) && IsCompleted())
 				{
-					DrawCrossOut(spriteBatch, control, baseTexture, eventTexturePosition, Color.get_Red());
+					spriteBatch.DrawCrossOut(control, baseTexture, eventTexturePosition, Color.get_Red());
 				}
 			}
 			return occurences.Any();
+		}
+
+		public bool IsCompleted()
+		{
+			bool completed = false;
+			switch (APICodeType)
+			{
+			case APICodeType.Worldboss:
+				completed |= EventTableModule.ModuleInstance.WorldbossState.IsCompleted(APICode);
+				break;
+			case APICodeType.Mapchest:
+				completed |= EventTableModule.ModuleInstance.MapchestState.IsCompleted(APICode);
+				break;
+			default:
+				Logger.Warn($"Unsupported api code type: {APICodeType}");
+				break;
+			}
+			return completed;
 		}
 
 		private void UpdateTooltip(string description)
@@ -389,85 +407,6 @@ namespace Estreya.BlishHUD.EventTable.Models
 			return font.MeasureString(text).Width + 10f;
 		}
 
-		private void DrawRectangle(SpriteBatch spriteBatch, Control control, Texture2D baseTexture, RectangleF coords, Color color)
-		{
-			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			spriteBatch.DrawOnCtrl(control, baseTexture, coords, color);
-		}
-
-		private void DrawLine(SpriteBatch spriteBatch, Control control, Texture2D baseTexture, Rectangle coords, Color color)
-		{
-			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, control, baseTexture, coords, color);
-		}
-
-		private void DrawCrossOut(SpriteBatch spriteBatch, Control control, Texture2D baseTexture, RectangleF coords, Color color)
-		{
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			Point2 topLeft = default(Point2);
-			((Point2)(ref topLeft))._002Ector(((RectangleF)(ref coords)).get_Left(), ((RectangleF)(ref coords)).get_Top());
-			Point2 topRight = default(Point2);
-			((Point2)(ref topRight))._002Ector(((RectangleF)(ref coords)).get_Right(), ((RectangleF)(ref coords)).get_Top());
-			Point2 bottomLeft = default(Point2);
-			((Point2)(ref bottomLeft))._002Ector(((RectangleF)(ref coords)).get_Left(), ((RectangleF)(ref coords)).get_Bottom());
-			Point2 bottomRight = default(Point2);
-			((Point2)(ref bottomRight))._002Ector(((RectangleF)(ref coords)).get_Right(), ((RectangleF)(ref coords)).get_Bottom());
-			DrawAngledLine(spriteBatch, control, baseTexture, topLeft, bottomRight, color);
-			DrawAngledLine(spriteBatch, control, baseTexture, bottomLeft, topRight, color);
-		}
-
-		private void DrawAngledLine(SpriteBatch spriteBatch, Control control, Texture2D baseTexture, Point2 start, Point2 end, Color color)
-		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			float length = MathHelper.CalculeDistance(start, end);
-			RectangleF lineRectangle = default(RectangleF);
-			((RectangleF)(ref lineRectangle))._002Ector(start.X, start.Y, length, 1f);
-			float angle = MathHelper.CalculeAngle(start, end);
-			spriteBatch.DrawOnCtrl(control, baseTexture, lineRectangle, color, angle);
-		}
-
-		private void DrawRectangle(SpriteBatch spriteBatch, Control control, Texture2D baseTexture, RectangleF coords, Color color, int borderSize, Color borderColor)
-		{
-			//IL_0004: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			DrawRectangle(spriteBatch, control, baseTexture, coords, color);
-			if (borderSize > 0 && borderColor != Color.get_Transparent())
-			{
-				DrawRectangle(spriteBatch, control, baseTexture, new RectangleF(((RectangleF)(ref coords)).get_Left(), ((RectangleF)(ref coords)).get_Top(), coords.Width - (float)borderSize, (float)borderSize), borderColor);
-				DrawRectangle(spriteBatch, control, baseTexture, new RectangleF(((RectangleF)(ref coords)).get_Right() - (float)borderSize, ((RectangleF)(ref coords)).get_Top(), (float)borderSize, coords.Height), borderColor);
-				DrawRectangle(spriteBatch, control, baseTexture, new RectangleF(((RectangleF)(ref coords)).get_Left(), ((RectangleF)(ref coords)).get_Bottom() - (float)borderSize, coords.Width, (float)borderSize), borderColor);
-				DrawRectangle(spriteBatch, control, baseTexture, new RectangleF(((RectangleF)(ref coords)).get_Left(), ((RectangleF)(ref coords)).get_Top(), (float)borderSize, coords.Height), borderColor);
-			}
-		}
-
 		public void CopyWaypoint()
 		{
 			if (!string.IsNullOrWhiteSpace(Waypoint))
@@ -504,7 +443,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 			TimeSpan offset = Offset;
 			if (ConvertOffset && addTimezoneOffset)
 			{
-				offset = offset.Add(TimeZone.CurrentTimeZone.GetUtcOffset(DateTime.Now));
+				offset = offset.Add(TimeZone.CurrentTimeZone.GetUtcOffset(now));
 			}
 			DateTime eventStart = zero.Add(offset);
 			while (eventStart < max)
@@ -516,7 +455,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 				{
 					startOccurences.Add(eventStart);
 				}
-				eventStart = ((Repeat.TotalMinutes != 0.0) ? eventStart.Add(Repeat) : eventStart.Add(TimeSpan.FromDays(1.0)));
+				eventStart = ((Repeat.TotalMinutes == 0.0) ? eventStart.Add(TimeSpan.FromDays(1.0)) : eventStart.Add(Repeat));
 			}
 			return startOccurences;
 		}
@@ -672,7 +611,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		public void FinishCategory()
 		{
-			EventCategory.Finish();
+			EventCategory?.Finish();
 		}
 
 		public void Disable()
@@ -715,6 +654,41 @@ namespace Estreya.BlishHUD.EventTable.Models
 					Occurences.AddRange(occurences);
 				}
 			}
+		}
+
+		public Task LoadAsync()
+		{
+			if (string.IsNullOrWhiteSpace(Key))
+			{
+				Key = Name;
+			}
+			if (EventTableModule.ModuleInstance.ModuleSettings.UseEventTranslation.get_Value())
+			{
+				Name = Strings.ResourceManager.GetString("event-" + SettingKey) ?? Name;
+			}
+			if (string.IsNullOrWhiteSpace(Icon))
+			{
+				Icon = EventCategory.Icon;
+			}
+			return Task.CompletedTask;
+		}
+
+		public void Unload()
+		{
+			Logger.Debug("Unload event: {0}", new object[1] { Key });
+			Tooltip tooltip = _tooltip;
+			if (tooltip != null)
+			{
+				((Control)tooltip).Dispose();
+			}
+			_tooltip = null;
+			ContextMenuStrip contextMenuStrip = _contextMenuStrip;
+			if (contextMenuStrip != null)
+			{
+				((Control)contextMenuStrip).Dispose();
+			}
+			_contextMenuStrip = null;
+			Logger.Debug("Unloaded event: {0}", new object[1] { Key });
 		}
 
 		public void Update(GameTime gameTime)

@@ -1,11 +1,17 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
+using Blish_HUD;
 using Microsoft.Xna.Framework;
 
 namespace Estreya.BlishHUD.EventTable.State
 {
 	public abstract class ManagedState : IDisposable
 	{
+		private static readonly Logger Logger = Logger.GetLogger<ManagedState>();
+
+		private SemaphoreSlim _saveSemaphore = new SemaphoreSlim(1, 1);
+
 		private int SaveInternal { get; set; }
 
 		private TimeSpan TimeSinceSave { get; set; } = TimeSpan.Zero;
@@ -45,11 +51,27 @@ namespace Estreya.BlishHUD.EventTable.State
 			TimeSinceSave += gameTime.get_ElapsedGameTime();
 			if (TimeSinceSave.TotalMilliseconds >= (double)SaveInternal)
 			{
-				Task.Run(async delegate
+				if (_saveSemaphore.CurrentCount > 0)
 				{
-					await Save();
-					TimeSinceSave = TimeSpan.Zero;
-				});
+					Task.Run(async delegate
+					{
+						_ = 1;
+						try
+						{
+							await _saveSemaphore.WaitAsync();
+							await Save();
+							TimeSinceSave = TimeSpan.Zero;
+						}
+						finally
+						{
+							_saveSemaphore.Release();
+						}
+					});
+				}
+				else
+				{
+					Logger.Debug("Another thread is already running Save()");
+				}
 			}
 			InternalUpdate(gameTime);
 		}
@@ -61,7 +83,7 @@ namespace Estreya.BlishHUD.EventTable.State
 			await Save();
 		}
 
-		protected abstract Task InternalUnload();
+		protected abstract void InternalUnload();
 
 		protected abstract Task Initialize();
 
@@ -74,6 +96,7 @@ namespace Estreya.BlishHUD.EventTable.State
 		public void Dispose()
 		{
 			Stop();
+			InternalUnload();
 		}
 	}
 }

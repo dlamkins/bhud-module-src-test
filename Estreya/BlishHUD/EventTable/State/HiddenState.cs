@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Blish_HUD;
-using Estreya.BlishHUD.EventTable.Helpers;
+using Estreya.BlishHUD.EventTable.Utils;
 using Microsoft.Xna.Framework;
 
 namespace Estreya.BlishHUD.EventTable.State
@@ -168,9 +168,8 @@ namespace Estreya.BlishHUD.EventTable.State
 			dirty = false;
 		}
 
-		protected override Task InternalUnload()
+		protected override void InternalUnload()
 		{
-			return Task.CompletedTask;
 		}
 	}
 }

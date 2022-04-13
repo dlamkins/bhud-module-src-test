@@ -19,11 +19,10 @@
     <Reference Include="MonoGame.Framework" />
     <Reference Include="Gw2Sharp" />
     <Reference Include="System.Core" />
-    <Reference Include="Newtonsoft.Json" />
-    <Reference Include="SemanticVersioning">
-      <HintPath>..\..\working\SemanticVersioning.dll</HintPath>
+    <Reference Include="SemVer">
+      <HintPath>..\..\working\SemVer.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json" />
     <Reference Include="AsyncClipboardService" />
   </ItemGroup>
 </Project>

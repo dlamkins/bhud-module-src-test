@@ -1,6 +1,6 @@
 namespace Estreya.BlishHUD.EventTable.Models
 {
-	public enum WorldbossCompletedAction
+	public enum EventCompletedAction
 	{
 		Crossout,
 		Hide

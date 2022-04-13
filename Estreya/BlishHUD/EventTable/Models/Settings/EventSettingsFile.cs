@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Estreya.BlishHUD.EventTable.Json;
 using Newtonsoft.Json;
-using SemanticVersioning;
+using SemVer;
 
 namespace Estreya.BlishHUD.EventTable.Models.Settings
 {
