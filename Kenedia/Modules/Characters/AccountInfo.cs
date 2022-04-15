@@ -18,7 +18,7 @@ namespace Kenedia.Modules.Characters
 			if (Module.API_Account != null)
 			{
 				string json = JsonConvert.SerializeObject(new List<AccountInfo> { Module.userAccount }.ToArray());
-				File.WriteAllText(Module.AccountPath, json);
+				File.WriteAllText(Module.AccountInfoPath, json);
 			}
 		}
 

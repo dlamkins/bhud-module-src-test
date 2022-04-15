@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.GameIntegration.GfxSettings;
@@ -133,7 +134,10 @@ namespace Kenedia.Modules.Characters
 					ScreenModeSetting? screenMode = GameService.GameIntegration.get_GfxSettings().get_ScreenMode();
 					if ((screenMode.HasValue ? ScreenModeSetting.op_Implicit(screenMode.GetValueOrDefault()) : null) == ScreenModeSetting.op_Implicit(ScreenModeSetting.get_Windowed()))
 					{
-						List<string> images = Directory.GetFiles(Module.GlobalImagesPath, "*.png", SearchOption.AllDirectories).ToList();
+						Regex regex = new Regex("Image.*[0-9].png");
+						List<string> images = (from path in Directory.GetFiles(Module.GlobalImagesPath, "*.png", SearchOption.AllDirectories)
+							where regex.IsMatch(path)
+							select path).ToList();
 						CharacterImageSize = 110;
 						IntPtr gw2WindowHandle = GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle();
 						Module.RECT wndBounds = default(Module.RECT);

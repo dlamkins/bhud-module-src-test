@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
@@ -125,11 +126,13 @@ namespace Kenedia.Modules.Characters
 
 		public static string CharactersPath;
 
-		public static string AccountPath;
+		public static string AccountInfoPath;
 
 		public static string AccountImagesPath;
 
 		public static string GlobalImagesPath;
+
+		public static string AccountPath;
 
 		public static _Settings Settings = new _Settings();
 
@@ -597,8 +600,9 @@ namespace Kenedia.Modules.Characters
 					{
 						Directory.CreateDirectory(path);
 					}
+					AccountPath = path;
 					CharactersPath = path + "\\characters.json";
-					AccountPath = path + "\\account.json";
+					AccountInfoPath = path + "\\account.json";
 					AccountImagesPath = path + "\\images\\";
 					if (!Directory.Exists(AccountImagesPath))
 					{
@@ -612,10 +616,10 @@ namespace Kenedia.Modules.Characters
 							LastModified = account.LastModified
 						};
 					}
-					if (System.IO.File.Exists(AccountPath))
+					if (System.IO.File.Exists(AccountInfoPath))
 					{
 						requestAPI = false;
-						foreach (AccountInfo acc in JsonConvert.DeserializeObject<List<AccountInfo>>(System.IO.File.ReadAllText(AccountPath))!)
+						foreach (AccountInfo acc in JsonConvert.DeserializeObject<List<AccountInfo>>(System.IO.File.ReadAllText(AccountInfoPath))!)
 						{
 							if (acc.Name == account.Name)
 							{
@@ -736,7 +740,7 @@ namespace Kenedia.Modules.Characters
 			ModKeyMapping[4] = (VirtualKeyShort)160;
 			LoadTextures();
 			Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
-			AccountPath = DirectoriesManager.GetFullDirectoryPath("characters") + "\\accounts.json";
+			AccountInfoPath = DirectoriesManager.GetFullDirectoryPath("characters") + "\\accounts.json";
 			GlobalImagesPath = DirectoriesManager.GetFullDirectoryPath("characters") + "\\images\\";
 			LoadCustomImages();
 			DataManager.ContentsManager = ContentsManager;
@@ -954,72 +958,89 @@ namespace Kenedia.Modules.Characters
 			{
 				if (System.IO.File.Exists(CharactersPath))
 				{
-					requestAPI = false;
-					List<JsonCharacter> characters = JsonConvert.DeserializeObject<List<JsonCharacter>>(System.IO.File.ReadAllText(CharactersPath));
-					if (characters != null)
+					FileInfo infos = new FileInfo(CharactersPath);
+					string content = System.IO.File.ReadAllText(CharactersPath);
+					PlayerCharacter player = GameService.Gw2Mumble.get_PlayerCharacter();
+					int duplicate_amount = new Regex("\"" + player.get_Name() + "\"").Matches(content).Count;
+					if (duplicate_amount == 1)
 					{
-						foreach (JsonCharacter c in characters)
+						requestAPI = false;
+						List<JsonCharacter> characters = JsonConvert.DeserializeObject<List<JsonCharacter>>(content);
+						if (characters != null)
 						{
-							Character character2 = new Character();
-							character2.contentsManager = ContentsManager;
-							character2.apiManager = Gw2ApiManager;
-							character2.Race = c.Race;
-							character2.Name = c.Name;
-							character2.lastLogin = c.lastLogin;
-							character2._Profession = c.Profession;
-							character2._Specialization = c.Specialization;
-							character2.Crafting = c.Crafting;
-							character2.apiIndex = c.apiIndex;
-							character2.Created = c.Created;
-							character2.LastModified = c.LastModified;
-							character2.Map = c.Map;
-							character2.Level = c.Level;
-							character2.Tags = ((c.Tags != null && c.Tags != "") ? c.Tags.Split('|').ToList() : new List<string>());
-							character2.loginCharacter = c.loginCharacter;
-							character2.include = c.include;
-							character2.Icon = c.Icon;
-							Character character = character2;
-							if (CharacterNames.Contains(character.Name))
+							foreach (JsonCharacter c in characters)
 							{
-								continue;
-							}
-							foreach (string tag in character.Tags)
-							{
-								if (!Tags.Contains(tag))
+								Character character2 = new Character();
+								character2.contentsManager = ContentsManager;
+								character2.apiManager = Gw2ApiManager;
+								character2.Race = c.Race;
+								character2.Name = c.Name;
+								character2.lastLogin = c.lastLogin;
+								character2._Profession = c.Profession;
+								character2._Specialization = c.Specialization;
+								character2.Crafting = c.Crafting;
+								character2.apiIndex = c.apiIndex;
+								character2.Created = c.Created;
+								character2.LastModified = c.LastModified;
+								character2.Map = c.Map;
+								character2.Level = c.Level;
+								character2.Tags = ((c.Tags != null && c.Tags != "") ? c.Tags.Split('|').ToList() : new List<string>());
+								character2.loginCharacter = c.loginCharacter;
+								character2.include = c.include;
+								character2.Icon = c.Icon;
+								Character character = character2;
+								if (CharacterNames.Contains(character.Name))
 								{
-									Tags.Add(tag);
+									continue;
+								}
+								foreach (string tag in character.Tags)
+								{
+									if (!Tags.Contains(tag))
+									{
+										Tags.Add(tag);
+									}
+								}
+								Characters.Add(character);
+								CharacterNames.Add(character.Name);
+								if (c.loginCharacter)
+								{
+									loginCharacter = character;
 								}
 							}
-							Characters.Add(character);
-							CharacterNames.Add(character.Name);
-							if (c.loginCharacter)
+							foreach (string txt in Tags)
 							{
-								loginCharacter = character;
+								TagEntry entry = new TagEntry(txt, new Character(), filterTagsPanel, showButton: false, contentService.GetFont((FontFace)0, (FontSize)14, (FontStyle)0));
+								((Control)entry).add_Click((EventHandler<MouseEventArgs>)delegate
+								{
+									if (((TextInputBase)filterTextBox).get_Text().ToLower().Contains(txt.ToLower()))
+									{
+										((TextInputBase)filterTextBox).get_Text();
+										txt.Replace("; -t " + txt + ";", "");
+										txt.Replace("; -t " + txt, "");
+										txt.Replace("-t " + txt + ";", "");
+										txt.Replace("-t " + txt, "");
+										((TextInputBase)filterTextBox).set_Text(txt.Trim());
+									}
+									else
+									{
+										TextBox obj = filterTextBox;
+										((TextInputBase)obj).set_Text(((TextInputBase)obj).get_Text() + (((((TextInputBase)filterTextBox).get_Text().Trim().EndsWith(";") || ((TextInputBase)filterTextBox).get_Text().Trim() == "") ? " " : "; ") + "-t " + txt).Trim());
+									}
+								});
+								TagEntries.Add(entry);
 							}
+							return true;
 						}
-						foreach (string txt in Tags)
-						{
-							TagEntry entry = new TagEntry(txt, new Character(), filterTagsPanel, showButton: false, contentService.GetFont((FontFace)0, (FontSize)14, (FontStyle)0));
-							((Control)entry).add_Click((EventHandler<MouseEventArgs>)delegate
-							{
-								if (((TextInputBase)filterTextBox).get_Text().ToLower().Contains(txt.ToLower()))
-								{
-									((TextInputBase)filterTextBox).get_Text();
-									txt.Replace("; -t " + txt + ";", "");
-									txt.Replace("; -t " + txt, "");
-									txt.Replace("-t " + txt + ";", "");
-									txt.Replace("-t " + txt, "");
-									((TextInputBase)filterTextBox).set_Text(txt.Trim());
-								}
-								else
-								{
-									TextBox obj = filterTextBox;
-									((TextInputBase)obj).set_Text(((TextInputBase)obj).get_Text() + (((((TextInputBase)filterTextBox).get_Text().Trim().EndsWith(";") || ((TextInputBase)filterTextBox).get_Text().Trim() == "") ? " " : "; ") + "-t " + txt).Trim());
-								}
-							});
-							TagEntries.Add(entry);
-						}
-						return true;
+					}
+					else
+					{
+						Logger.Error("Your 'character.json' file is corrupt. It has {0} duplicates of your character in it. We have to create a new one!", new object[1] { duplicate_amount });
+						Regex regex = new Regex(".*_CORRUPTED.*.json");
+						List<string> corrupted_files = (from path in Directory.GetFiles(AccountPath, "*.json", SearchOption.AllDirectories)
+							where regex.IsMatch(path)
+							select path).ToList();
+						string name = infos.Name.Substring(0, infos.Name.Length - 5);
+						System.IO.File.Move(CharactersPath, CharactersPath.Replace(infos.Name, name + "_CORRUPTED (" + (corrupted_files.Count + 1) + ").json"));
 					}
 				}
 				return false;
@@ -1040,25 +1061,28 @@ namespace Kenedia.Modules.Characters
 			List<JsonCharacter> _data = new List<JsonCharacter>();
 			foreach (Character c in Characters)
 			{
-				JsonCharacter jsonCharacter = new JsonCharacter
+				if (_data.Find((JsonCharacter e) => e.Name == c.Name) == null)
 				{
-					Name = c.Name,
-					Race = c.Race,
-					Specialization = c._Specialization,
-					Profession = c._Profession,
-					Crafting = c.Crafting,
-					lastLogin = c.lastLogin,
-					apiIndex = c.apiIndex,
-					Created = c.Created,
-					LastModified = c.LastModified,
-					Map = c.Map,
-					Level = c.Level,
-					Tags = string.Join("|", c.Tags),
-					loginCharacter = c.loginCharacter,
-					include = c.include,
-					Icon = c.Icon
-				};
-				_data.Add(jsonCharacter);
+					JsonCharacter jsonCharacter = new JsonCharacter
+					{
+						Name = c.Name,
+						Race = c.Race,
+						Specialization = c._Specialization,
+						Profession = c._Profession,
+						Crafting = c.Crafting,
+						lastLogin = c.lastLogin,
+						apiIndex = c.apiIndex,
+						Created = c.Created,
+						LastModified = c.LastModified,
+						Map = c.Map,
+						Level = c.Level,
+						Tags = string.Join("|", c.Tags),
+						loginCharacter = c.loginCharacter,
+						include = c.include,
+						Icon = c.Icon
+					};
+					_data.Add(jsonCharacter);
+				}
 			}
 			string json = JsonConvert.SerializeObject(_data.ToArray());
 			System.IO.File.WriteAllText(CharactersPath, json);
@@ -2095,7 +2119,7 @@ namespace Kenedia.Modules.Characters
 			void addTag()
 			{
 				string txt = ((subWindow.tag_TextBox != null && ((TextInputBase)subWindow.tag_TextBox).get_Text().Trim() != "") ? ((TextInputBase)subWindow.tag_TextBox).get_Text() : null);
-				if (txt != null && subWindow.assignedCharacter != null && !subWindow.assignedCharacter.Tags.Contains(txt.Trim()))
+				if (txt != null && subWindow.assignedCharacter != null && !subWindow.assignedCharacter.Tags.Contains(txt.Trim()) && !CharacterNames.Contains(txt))
 				{
 					new TagEntry(txt, subWindow.assignedCharacter, subWindow.customTags_Panel);
 					subWindow.assignedCharacter.Tags.Add(txt);
@@ -2188,71 +2212,75 @@ namespace Kenedia.Modules.Characters
 			Last.Tick_APIUpdate += gameTime.ElapsedGameTime.TotalMilliseconds;
 			Last.Tick_PanelUpdate += gameTime.ElapsedGameTime.TotalMilliseconds;
 			Last.Tick_FadeEffect += gameTime.ElapsedGameTime.TotalMilliseconds;
-			if (charactersLoaded && Last.Tick_Update > 250.0)
+			if (charactersLoaded)
 			{
-				Last.Tick_Update = -250.0;
-				Update_CurrentCharacter();
-				if (screenCaptureWindow == null)
+				if (Last.Tick_Update > 250.0)
 				{
-					CreateScreenCapture();
-				}
-				foreach (Character character in Characters)
-				{
-					if (character.characterControl != null && ((Control)character.characterControl).get_Visible())
+					Last.Tick_Update = -250.0;
+					Update_CurrentCharacter();
+					if (screenCaptureWindow == null)
 					{
-						character.Update_UI_Time();
+						CreateScreenCapture();
+					}
+					foreach (Character character in Characters)
+					{
+						if (character.characterControl != null && ((Control)character.characterControl).get_Visible())
+						{
+							character.Update_UI_Time();
+						}
+					}
+					if (Settings.AutoLogin.get_Value() && !loginCharacter_Swapped && loginCharacter != null && swapCharacter == null)
+					{
+						loginCharacter_Swapped = true;
+						loginCharacter.Swap();
+					}
+					if (swapCharacter != null && !GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && DateTime.UtcNow.Subtract(lastLogout).TotalMilliseconds >= (double)Settings.SwapDelay.get_Value())
+					{
+						swapCharacter.Swap();
+						swapCharacter = null;
 					}
 				}
-				if (Settings.AutoLogin.get_Value() && !loginCharacter_Swapped && loginCharacter != null && swapCharacter == null)
+				if (Last.Tick_Save > 250.0 && saveCharacters)
 				{
-					loginCharacter_Swapped = true;
-					loginCharacter.Swap();
+					Last.Tick_Save = -250.0;
+					SaveCharacters();
 				}
-				if (swapCharacter != null && !GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && DateTime.UtcNow.Subtract(lastLogout).TotalMilliseconds >= (double)Settings.SwapDelay.get_Value())
+				if (Last.Tick_APIUpdate > 30000.0 && userAccount != null)
 				{
-					swapCharacter.Swap();
-					swapCharacter = null;
+					Logger.Debug("Check GW2 API for Updates.");
+					Last.Tick_APIUpdate = -30000.0;
+					FetchAPI();
 				}
-			}
-			if (Settings.FadeSubWindows.get_Value() && Last.Tick_FadeEffect > 30.0)
-			{
-				Last.Tick_FadeEffect = -30.0;
-				if (((Control)filterWindow).get_Visible() && DateTime.Now.Subtract(filterWindow.lastInput).TotalMilliseconds >= 2500.0)
+				if (Last.Tick_PanelUpdate > (double)Settings._FilterDelay)
 				{
-					((Control)filterWindow).set_Opacity(((Control)filterWindow).get_Opacity() - 0.1f);
-					if (((Control)filterWindow).get_Opacity() <= 0f)
+					Last.Tick_PanelUpdate = -Settings._FilterDelay;
+					if (filterCharacterPanel)
 					{
-						((Control)filterWindow).Hide();
-					}
-				}
-				if (((Control)subWindow).get_Visible() && DateTime.Now.Subtract(subWindow.lastInput).TotalMilliseconds >= 3500.0)
-				{
-					((Control)subWindow).set_Opacity(((Control)subWindow).get_Opacity() - 0.1f);
-					if (((Control)subWindow).get_Opacity() <= 0f)
-					{
-						((Control)subWindow).Hide();
+						filterCharacterPanel = false;
+						UpdateCharacterPanel();
 					}
 				}
 			}
-			if (charactersLoaded && Last.Tick_PanelUpdate > (double)Settings._FilterDelay)
+			if (!Settings.FadeSubWindows.get_Value() || !(Last.Tick_FadeEffect > 30.0))
 			{
-				Last.Tick_PanelUpdate = -Settings._FilterDelay;
-				if (filterCharacterPanel)
+				return;
+			}
+			Last.Tick_FadeEffect = -30.0;
+			if (((Control)filterWindow).get_Visible() && DateTime.Now.Subtract(filterWindow.lastInput).TotalMilliseconds >= 2500.0)
+			{
+				((Control)filterWindow).set_Opacity(((Control)filterWindow).get_Opacity() - 0.1f);
+				if (((Control)filterWindow).get_Opacity() <= 0f)
 				{
-					filterCharacterPanel = false;
-					UpdateCharacterPanel();
+					((Control)filterWindow).Hide();
 				}
 			}
-			if (Last.Tick_Save > 250.0 && saveCharacters)
+			if (((Control)subWindow).get_Visible() && DateTime.Now.Subtract(subWindow.lastInput).TotalMilliseconds >= 3500.0)
 			{
-				Last.Tick_Save = -250.0;
-				SaveCharacters();
-			}
-			if (Last.Tick_APIUpdate > 30000.0 && userAccount != null)
-			{
-				Logger.Debug("Check GW2 API for Updates.");
-				Last.Tick_APIUpdate = -30000.0;
-				FetchAPI();
+				((Control)subWindow).set_Opacity(((Control)subWindow).get_Opacity() - 0.1f);
+				if (((Control)subWindow).get_Opacity() <= 0f)
+				{
+					((Control)subWindow).Hide();
+				}
 			}
 		}
 
