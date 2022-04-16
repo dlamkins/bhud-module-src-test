@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Modules.Managers;
+using Estreya.BlishHUD.EventTable.Helpers;
 using Estreya.BlishHUD.EventTable.Utils;
 using Gw2Sharp.WebApi.Exceptions;
 using Gw2Sharp.WebApi.V2;
@@ -70,13 +71,13 @@ namespace Estreya.BlishHUD.EventTable.State
 				{
 					return;
 				}
-				IApiV2ObjectList<string> bosses = await ((IBlobClient<IApiV2ObjectList<string>>)(object)ApiManager.get_Gw2ApiClient().get_V2().get_Account()
-					.get_WorldBosses()).GetAsync(default(CancellationToken));
+				List<string> bosses = ((IEnumerable<string>)(await ((IBlobClient<IApiV2ObjectList<string>>)(object)ApiManager.get_Gw2ApiClient().get_V2().get_Account()
+					.get_WorldBosses()).GetAsync(default(CancellationToken)))).ToList();
 				lock (completedWorldbosses)
 				{
-					completedWorldbosses.AddRange((IEnumerable<string>)bosses);
+					completedWorldbosses.AddRange(bosses);
 				}
-				foreach (string boss in (IEnumerable<string>)bosses)
+				foreach (string boss in bosses)
 				{
 					if (!oldCompletedWorldbosses.Contains(boss))
 					{
@@ -117,10 +118,7 @@ namespace Estreya.BlishHUD.EventTable.State
 		protected override void InternalUnload()
 		{
 			ApiManager.remove_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)ApiManager_SubtokenUpdated);
-			lock (completedWorldbosses)
-			{
-				completedWorldbosses.Clear();
-			}
+			AsyncHelper.RunSync(Clear);
 		}
 
 		protected override void InternalUpdate(GameTime gameTime)
@@ -135,6 +133,15 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		protected override Task Save()
 		{
+			return Task.CompletedTask;
+		}
+
+		public override Task Clear()
+		{
+			lock (completedWorldbosses)
+			{
+				completedWorldbosses.Clear();
+			}
 			return Task.CompletedTask;
 		}
 	}

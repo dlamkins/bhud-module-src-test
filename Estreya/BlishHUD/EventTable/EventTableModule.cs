@@ -308,18 +308,17 @@ namespace Estreya.BlishHUD.EventTable
 			}
 			using (await _stateLock.LockAsync())
 			{
-				_ = 1;
-				try
+				foreach (ManagedState state in States)
 				{
-					foreach (ManagedState state in States)
+					Logger.Debug("Starting managed state: {0}", new object[1] { state.GetType().Name });
+					try
 					{
-						Logger.Debug("Starting managed state: {0}", new object[1] { state.GetType().Name });
 						await state.Start();
 					}
-				}
-				catch (Exception ex)
-				{
-					Logger.Error(ex, "Failed starting states.");
+					catch (Exception ex)
+					{
+						Logger.Error(ex, "Failed starting state \"{0}\"", new object[1] { state.GetType().Name });
+					}
 				}
 			}
 		}
@@ -530,6 +529,22 @@ namespace Estreya.BlishHUD.EventTable
 					select state.Unload()).ToArray());
 			}
 			Logger.Debug("Finished unloading states.");
+		}
+
+		internal async Task ReloadStates()
+		{
+			using (await _stateLock.LockAsync())
+			{
+				await Task.WhenAll(States.Select((ManagedState state) => state.Reload()));
+			}
+		}
+
+		internal async Task ClearStates()
+		{
+			using (await _stateLock.LockAsync())
+			{
+				await Task.WhenAll(States.Select((ManagedState state) => state.Clear()));
+			}
 		}
 	}
 }

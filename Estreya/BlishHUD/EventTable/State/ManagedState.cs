@@ -83,6 +83,8 @@ namespace Estreya.BlishHUD.EventTable.State
 			await Save();
 		}
 
+		public abstract Task Clear();
+
 		protected abstract void InternalUnload();
 
 		protected abstract Task Initialize();

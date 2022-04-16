@@ -170,6 +170,41 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			}
 		}
 
+		protected Panel RenderSetting<T>(Panel parent, SettingEntry<T> setting, Action<T> onChangeAction)
+		{
+			Panel result = RenderSetting<T>(parent, setting);
+			setting.add_SettingChanged((EventHandler<ValueChangedEventArgs<T>>)delegate(object s, ValueChangedEventArgs<T> e)
+			{
+				onChangeAction?.Invoke(e.get_NewValue());
+			});
+			return result;
+		}
+
+		protected Panel RenderTextbox(Panel parent, string description, string placeholder, Action<string> onEnterAction)
+		{
+			Panel panel = GetPanel((Container)(object)parent);
+			Label label = GetLabel(panel, description);
+			try
+			{
+				Control ctrl = ControlProvider.Create<string>(170, -1, ((Control)label).get_Right() + 20, 0);
+				ctrl.set_Parent((Container)(object)panel);
+				ctrl.set_BasicTooltipText(description);
+				TextBox textBox = (TextBox)(object)((ctrl is TextBox) ? ctrl : null);
+				((TextInputBase)textBox).set_PlaceholderText(placeholder);
+				textBox.add_EnterPressed((EventHandler<EventArgs>)delegate
+				{
+					onEnterAction?.Invoke(((TextInputBase)textBox).get_Text());
+					((TextInputBase)textBox).set_Text(string.Empty);
+				});
+				return panel;
+			}
+			catch (Exception ex)
+			{
+				Logger.Error(ex, "Type \"" + typeof(string).FullName + "\" could not be found in internal type lookup:");
+				return panel;
+			}
+		}
+
 		protected Panel GetPanel(Container parent)
 		{
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)

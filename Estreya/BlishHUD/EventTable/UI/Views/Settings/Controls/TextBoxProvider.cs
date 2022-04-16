@@ -17,12 +17,13 @@ namespace Estreya.BlishHUD.EventTable.UI.Views.Settings.Controls
 			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Expected O, but got Unknown
+			//IL_0071: Expected O, but got Unknown
 			TextBox val = new TextBox();
 			((Control)val).set_Width(width);
 			((Control)val).set_Location(new Point(x, y));
 			((TextInputBase)val).set_Text(settingEntry?.get_Value() ?? string.Empty);
-			((Control)val).set_Enabled(!((SettingEntry)(object)settingEntry).IsDisabled());
+			SettingEntry<string> obj = settingEntry;
+			((Control)val).set_Enabled(obj == null || !((SettingEntry)(object)obj).IsDisabled());
 			TextBox textBox = val;
 			if (settingEntry != null)
 			{

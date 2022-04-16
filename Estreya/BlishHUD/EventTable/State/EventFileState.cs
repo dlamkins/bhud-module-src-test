@@ -178,5 +178,14 @@ namespace Estreya.BlishHUD.EventTable.State
 		{
 			await ExportFile(await GetInternalFile());
 		}
+
+		public override Task Clear()
+		{
+			lock (_lockObject)
+			{
+				_notified = false;
+			}
+			return Task.CompletedTask;
+		}
 	}
 }

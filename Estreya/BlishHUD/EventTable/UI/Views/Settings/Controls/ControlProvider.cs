@@ -46,7 +46,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views.Settings.Controls
 			}).ToList();
 			if (providers.Count == 0)
 			{
-				if (((SettingEntry)settingEntry).get_SettingType().IsEnum)
+				SettingEntry<T> obj = settingEntry;
+				if (obj != null && ((SettingEntry)obj).get_SettingType().IsEnum)
 				{
 					Register((ControlProvider<T>)Activator.CreateInstance(typeof(EnumProvider<>).MakeGenericType(typeof(T))));
 					return Create(settingEntry, validationFunction, width, heigth, x, y);
@@ -54,6 +55,25 @@ namespace Estreya.BlishHUD.EventTable.UI.Views.Settings.Controls
 				throw new NotSupportedException($"Control Type \"{((SettingEntry)settingEntry).get_SettingType()}\" is not supported.");
 			}
 			return (providers.First() as ControlProvider<T>).CreateControl(settingEntry, validationFunction, width, heigth, x, y);
+		}
+
+		public static Control Create<T>(int width, int heigth, int x, int y)
+		{
+			List<ControlProvider> providers = Provider.Where(delegate(ControlProvider p)
+			{
+				ControlProvider<T> controlProvider = p as ControlProvider<T>;
+				return controlProvider != null && controlProvider.Type == typeof(T);
+			}).ToList();
+			if (providers.Count == 0)
+			{
+				if (typeof(T).IsEnum)
+				{
+					Register((ControlProvider<T>)Activator.CreateInstance(typeof(EnumProvider<>).MakeGenericType(typeof(T))));
+					return Create<T>(width, heigth, x, y);
+				}
+				throw new NotSupportedException($"Control Type \"{typeof(T)}\" is not supported.");
+			}
+			return (providers.First() as ControlProvider<T>).CreateControl(null, null, width, heigth, x, y);
 		}
 	}
 	public abstract class ControlProvider<T> : ControlProvider

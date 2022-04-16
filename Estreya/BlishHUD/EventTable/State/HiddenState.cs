@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Estreya.BlishHUD.EventTable.Helpers;
 using Estreya.BlishHUD.EventTable.Utils;
 using Microsoft.Xna.Framework;
 
@@ -103,7 +104,7 @@ namespace Estreya.BlishHUD.EventTable.State
 			}
 		}
 
-		public void Clear()
+		public override Task Clear()
 		{
 			lock (Instances)
 			{
@@ -111,6 +112,7 @@ namespace Estreya.BlishHUD.EventTable.State
 				Instances.Clear();
 				dirty = true;
 			}
+			return Task.CompletedTask;
 		}
 
 		public bool IsHidden(string name)
@@ -170,6 +172,8 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		protected override void InternalUnload()
 		{
+			AsyncHelper.RunSync(Save);
+			AsyncHelper.RunSync(Clear);
 		}
 	}
 }

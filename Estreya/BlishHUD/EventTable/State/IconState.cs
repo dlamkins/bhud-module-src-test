@@ -131,28 +131,35 @@ namespace Estreya.BlishHUD.EventTable.State
 			return Regex.Replace(fileName, invalidRegStr, "_");
 		}
 
-		private async Task LoadImages()
+		private Task LoadImages()
 		{
+			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0079: Expected O, but got Unknown
 			Logger.Info("Load cached images from filesystem.");
-			using (await _textureLock.LockAsync())
+			using (_textureLock.Lock())
 			{
 				_loadedTextures.Clear();
 				if (!Directory.Exists(Path))
 				{
-					return;
+					return Task.CompletedTask;
 				}
 				string[] files = GetFiles();
+				FileStream fileStream;
+				AsyncTexture2D asyncTexture;
 				foreach (string filePath in files)
 				{
 					try
 					{
-						using FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-						Texture2D texture = TextureUtil.FromStreamPremultiplied((Stream)fileStream);
-						if (texture != null)
+						fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+						asyncTexture = new AsyncTexture2D(Textures.get_Pixel());
+						GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate(GraphicsDevice device)
 						{
-							string fileName = SanitizeFileName(System.IO.Path.GetFileNameWithoutExtension(filePath));
-							_loadedTextures.Add(fileName, texture);
-						}
+							Texture2D val = TextureUtil.FromStreamPremultiplied(device, (Stream)fileStream);
+							fileStream.Dispose();
+							asyncTexture.SwapTexture(val);
+						});
+						string fileName = SanitizeFileName(System.IO.Path.GetFileNameWithoutExtension(filePath));
+						HandleAsyncTextureSwap(asyncTexture, fileName);
 					}
 					catch (Exception ex)
 					{
@@ -160,6 +167,19 @@ namespace Estreya.BlishHUD.EventTable.State
 					}
 				}
 			}
+			return Task.CompletedTask;
+		}
+
+		private void HandleAsyncTextureSwap(AsyncTexture2D asyncTexture2D, string identifier)
+		{
+			asyncTexture2D.add_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)delegate(object s, ValueChangedEventArgs<Texture2D> e)
+			{
+				using (_textureLock.Lock())
+				{
+					_loadedTextures[identifier] = e.get_NewValue();
+				}
+				Logger.Debug("Async texture \"{0}\" was swapped in cache.", new object[1] { identifier });
+			});
 		}
 
 		private string[] GetFiles()
@@ -193,16 +213,9 @@ namespace Estreya.BlishHUD.EventTable.State
 					{
 						try
 						{
-							AsyncTexture2D renderServiceTexture = GameService.Content.GetRenderServiceTexture(identifier);
-							renderServiceTexture.add_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)delegate(object s, ValueChangedEventArgs<Texture2D> e)
-							{
-								using (_textureLock.Lock())
-								{
-									_loadedTextures[sanitizedIdentifier] = e.get_NewValue();
-								}
-								Logger.Debug("Async texture \"{0}\" was swapped in cache.", new object[1] { identifier });
-							});
-							icon = AsyncTexture2D.op_Implicit(renderServiceTexture);
+							AsyncTexture2D asyncTexture = GameService.Content.GetRenderServiceTexture(identifier);
+							HandleAsyncTextureSwap(asyncTexture, sanitizedIdentifier);
+							icon = AsyncTexture2D.op_Implicit(asyncTexture);
 						}
 						catch (Exception ex)
 						{
@@ -227,6 +240,11 @@ namespace Estreya.BlishHUD.EventTable.State
 		public Task<Texture2D> GetIconAsync(string identifier, bool checkRenderAPI = true)
 		{
 			return Task.Run(() => GetIcon(identifier, checkRenderAPI));
+		}
+
+		public override Task Clear()
+		{
+			return Task.CompletedTask;
 		}
 	}
 }
