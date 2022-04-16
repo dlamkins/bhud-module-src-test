@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace Nekres.Stream_Out
 {
@@ -97,7 +98,7 @@ namespace Nekres.Stream_Out
 			}
 		}
 
-		public static void SaveOnNetworkShare(this Image image, string fileName, ImageFormat imageFormat)
+		public static async Task SaveOnNetworkShare(this Image image, string fileName, ImageFormat imageFormat)
 		{
 			try
 			{
@@ -105,7 +106,7 @@ namespace Nekres.Stream_Out
 				image.Save(lMemoryStream, imageFormat);
 				using FileStream lFileStream = new FileStream(fileName, FileMode.Create);
 				lMemoryStream.Position = 0L;
-				lMemoryStream.CopyTo(lFileStream);
+				await lMemoryStream.CopyToAsync(lFileStream);
 			}
 			catch (Exception ex) when (ex is ExternalException || ex is UnauthorizedAccessException || ex is IOException)
 			{

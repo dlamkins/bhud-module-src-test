@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Threading.Tasks;
 using Blish_HUD;
 
 namespace Nekres.Stream_Out
@@ -16,7 +17,7 @@ namespace Nekres.Stream_Out
 
 		private static readonly Color Karma = Color.FromArgb(220, 80, 190);
 
-		public static void GenerateCoinsImage(string filePath, int coins, bool overwrite = true)
+		public static async Task GenerateCoinsImage(string filePath, int coins, bool overwrite = true)
 		{
 			if (!overwrite && File.Exists(filePath))
 			{
@@ -103,7 +104,7 @@ namespace Nekres.Stream_Out
 					canvas.Flush();
 					canvas.Save();
 				}
-				bitmap.SaveOnNetworkShare(filePath, ImageFormat.Png);
+				await bitmap.SaveOnNetworkShare(filePath, ImageFormat.Png);
 			}
 			copperIcon.Dispose();
 			copperIconStream.Close();
@@ -114,7 +115,7 @@ namespace Nekres.Stream_Out
 			font.Dispose();
 		}
 
-		public static void GenerateKarmaImage(string filePath, int karma, bool overwrite = true)
+		public static async Task GenerateKarmaImage(string filePath, int karma, bool overwrite = true)
 		{
 			if (!overwrite && File.Exists(filePath))
 			{
@@ -139,14 +140,14 @@ namespace Nekres.Stream_Out
 					canvas.Flush();
 					canvas.Save();
 				}
-				bitmap.SaveOnNetworkShare(filePath, ImageFormat.Png);
+				await bitmap.SaveOnNetworkShare(filePath, ImageFormat.Png);
 			}
 			karmaIcon.Dispose();
 			karmaIconStream.Close();
 			font.Dispose();
 		}
 
-		public static void GeneratePvpTierImage(string filePath, int tier, int maxTiers, bool overwrite = true)
+		public static async Task GeneratePvpTierImage(string filePath, int tier, int maxTiers, bool overwrite = true)
 		{
 			if (!overwrite && File.Exists(filePath))
 			{
@@ -172,12 +173,18 @@ namespace Nekres.Stream_Out
 					canvas.Flush();
 					canvas.Save();
 				}
-				bitmap.SaveOnNetworkShare(filePath, ImageFormat.Png);
+				await bitmap.SaveOnNetworkShare(filePath, ImageFormat.Png);
 			}
 			tierIconFilled.Dispose();
 			tierIconFilledStream.Close();
 			tierIconEmpty.Dispose();
 			tierIconEmptyStream.Close();
+		}
+
+		public static DateTime GetDailyResetTime()
+		{
+			DateTime nextDay = DateTime.UtcNow.AddDays(1.0);
+			return new DateTime(nextDay.Year, nextDay.Month, nextDay.Day, 2, 0, 0).ToUniversalTime();
 		}
 	}
 }
