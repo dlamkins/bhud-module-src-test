@@ -23,25 +23,19 @@ namespace Nekres.Stream_Out.Core.Services
 
 		private DirectoriesManager DirectoriesManager => StreamOutModule.ModuleInstance?.DirectoriesManager;
 
-		public WalletService()
-		{
-			Task.Run(() => Gw2Util.GenerateCoinsImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wallet_coins.png", 10000000, overwrite: false));
-			Task.Run(() => Gw2Util.GenerateKarmaImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wallet_karma.png", 10000000, overwrite: false));
-		}
-
 		public async Task Update()
 		{
 			await UpdateWallet();
 		}
 
-		public Task Initialize()
+		public async Task Initialize()
 		{
-			return Task.CompletedTask;
+			await Gw2Util.GenerateCoinsImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wallet_coins.png", 10000000, overwrite: false);
+			await Gw2Util.GenerateKarmaImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wallet_karma.png", 10000000, overwrite: false);
 		}
 
-		public Task ResetDaily()
+		public async Task ResetDaily()
 		{
-			return Task.CompletedTask;
 		}
 
 		private async Task UpdateWallet()
@@ -60,9 +54,9 @@ namespace Nekres.Stream_Out.Core.Services
 				if (!task.IsFaulted)
 				{
 					int coins = ((IEnumerable<AccountCurrency>)task.Result).First((AccountCurrency x) => x.get_Id() == 1).get_Value();
-					await Task.Run(() => Gw2Util.GenerateCoinsImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wallet_coins.png", coins));
+					await Gw2Util.GenerateCoinsImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wallet_coins.png", coins);
 					int karma = ((IEnumerable<AccountCurrency>)task.Result).First((AccountCurrency x) => x.get_Id() == 2).get_Value();
-					await Task.Run(() => Gw2Util.GenerateKarmaImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wallet_karma.png", karma));
+					await Gw2Util.GenerateKarmaImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wallet_karma.png", karma);
 				}
 			});
 		}

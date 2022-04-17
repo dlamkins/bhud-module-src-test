@@ -1,3 +1,4 @@
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -8,7 +9,7 @@ namespace Nekres.Stream_Out
 {
 	internal static class TextureUtil
 	{
-		public static void ClearImage(string path)
+		public static async Task ClearImage(string path)
 		{
 			if (!File.Exists(path))
 			{
@@ -21,13 +22,13 @@ namespace Nekres.Stream_Out
 				gfx.Clear(Color.Transparent);
 				gfx.Flush();
 			}
-			bitmap.SaveOnNetworkShare(path, ImageFormat.Png);
+			await bitmap.SaveOnNetworkShare(path, ImageFormat.Png);
 		}
 
 		public static async Task SaveToImage(string renderUri, string path)
 		{
 			await StreamOutModule.ModuleInstance.Gw2ApiManager.get_Gw2ApiClient().get_Render().DownloadToByteArrayAsync(renderUri, default(CancellationToken))
-				.ContinueWith(delegate(Task<byte[]> textureDataResponse)
+				.ContinueWith((Func<Task<byte[]>, Task>)async delegate(Task<byte[]> textureDataResponse)
 				{
 					if (textureDataResponse.IsFaulted)
 					{
@@ -35,9 +36,9 @@ namespace Nekres.Stream_Out
 					}
 					else
 					{
-						using MemoryStream stream = new MemoryStream(textureDataResponse.Result);
-						using Bitmap image = new Bitmap(stream);
-						image.SaveOnNetworkShare(path, ImageFormat.Png);
+						using MemoryStream textureStream = new MemoryStream(textureDataResponse.Result);
+						using Bitmap bitmap = new Bitmap(textureStream);
+						await bitmap.SaveOnNetworkShare(path, ImageFormat.Png);
 					}
 				});
 		}

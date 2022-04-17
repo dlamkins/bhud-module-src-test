@@ -111,19 +111,16 @@ namespace Nekres.Stream_Out.Core.Services
 			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/map_type.txt", type);
 		}
 
-		public Task Update()
+		public async Task Update()
 		{
-			return Task.CompletedTask;
 		}
 
-		public Task Initialize()
+		public async Task Initialize()
 		{
-			return Task.CompletedTask;
 		}
 
-		public Task ResetDaily()
+		public async Task ResetDaily()
 		{
-			return Task.CompletedTask;
 		}
 
 		public void Dispose()

@@ -150,7 +150,7 @@ namespace Nekres.Stream_Out
 				return;
 			}
 			await ResetDaily();
-			if (!HasSubToken || (_prevApiRequestTime.HasValue && DateTime.UtcNow.Subtract(_prevApiRequestTime.Value).TotalSeconds < 300.0))
+			if (_prevApiRequestTime.HasValue && DateTime.UtcNow.Subtract(_prevApiRequestTime.Value).TotalSeconds < 300.0)
 			{
 				return;
 			}
@@ -159,16 +159,6 @@ namespace Nekres.Stream_Out
 			{
 				await allExportService.Update();
 			}
-		}
-
-		protected override void Unload()
-		{
-			Gw2ApiManager.remove_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)SubTokenUpdated);
-			foreach (IExportService allExportService in _allExportServices)
-			{
-				allExportService?.Dispose();
-			}
-			ModuleInstance = null;
 		}
 
 		private async Task ResetDaily()
@@ -182,11 +172,21 @@ namespace Nekres.Stream_Out
 					return;
 				}
 			}
+			ResetTimeDaily.set_Value((DateTime?)Gw2Util.GetDailyResetTime());
 			foreach (IExportService allExportService in _allExportServices)
 			{
 				await allExportService.ResetDaily();
 			}
-			ResetTimeDaily.set_Value((DateTime?)Gw2Util.GetDailyResetTime());
+		}
+
+		protected override void Unload()
+		{
+			Gw2ApiManager.remove_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)SubTokenUpdated);
+			foreach (IExportService allExportService in _allExportServices)
+			{
+				allExportService?.Dispose();
+			}
+			ModuleInstance = null;
 		}
 	}
 }

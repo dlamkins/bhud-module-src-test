@@ -34,9 +34,8 @@ namespace Nekres.Stream_Out.Core.Services
 			ContentsManager.ExtractIcons("unstable_fractal_essence.png", Path.Combine(moduleDir + "\\static", "unstable_fractal_essence.png"));
 		}
 
-		public Task ResetDaily()
+		public async Task ResetDaily()
 		{
-			return Task.CompletedTask;
 		}
 
 		public async Task Update()

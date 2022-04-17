@@ -32,14 +32,12 @@ namespace Nekres.Stream_Out.Core.Services
 			}
 		}
 
-		public Task Initialize()
+		public async Task Initialize()
 		{
-			return Task.CompletedTask;
 		}
 
-		public Task ResetDaily()
+		public async Task ResetDaily()
 		{
-			return Task.CompletedTask;
 		}
 
 		public void Dispose()

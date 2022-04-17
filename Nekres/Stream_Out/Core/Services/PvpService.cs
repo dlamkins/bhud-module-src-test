@@ -58,6 +58,14 @@ namespace Nekres.Stream_Out.Core.Services
 
 		private async Task<int> RequestTotalKillsForPvP()
 		{
+			if (!Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
+			{
+				(TokenPermission)1,
+				(TokenPermission)6
+			}))
+			{
+				return -1;
+			}
 			return await ((IBlobClient<IApiV2ObjectList<AccountAchievement>>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
 				.get_Achievements()).GetAsync(default(CancellationToken)).ContinueWith((Task<IApiV2ObjectList<AccountAchievement>> response) => response.IsFaulted ? (-1) : ((IEnumerable<AccountAchievement>)response.Result).Single((AccountAchievement x) => x.get_Id() == 239).get_Current());
 		}
@@ -178,21 +186,14 @@ namespace Nekres.Stream_Out.Core.Services
 		{
 			await UpdateStandingsForPvP();
 			await UpdateStatsForPvp();
-			if (Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
+			string prefixKills = ((UnicodeSigning == StreamOutModule.UnicodeSigning.Prefixed) ? "⚔" : string.Empty);
+			string suffixKills = ((UnicodeSigning == StreamOutModule.UnicodeSigning.Suffixed) ? "⚔" : string.Empty);
+			int totalKillsPvP = await RequestTotalKillsForPvP();
+			if (totalKillsPvP >= 0)
 			{
-				(TokenPermission)1,
-				(TokenPermission)6
-			}))
-			{
-				string prefixKills = ((UnicodeSigning == StreamOutModule.UnicodeSigning.Prefixed) ? "⚔" : string.Empty);
-				string suffixKills = ((UnicodeSigning == StreamOutModule.UnicodeSigning.Suffixed) ? "⚔" : string.Empty);
-				int totalKillsPvP = await RequestTotalKillsForPvP();
-				if (totalKillsPvP >= 0)
-				{
-					SessionKillsPvP.set_Value(totalKillsPvP - TotalKillsAtResetPvP.get_Value());
-					await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_kills_day.txt", $"{prefixKills}{SessionKillsPvP.get_Value()}{suffixKills}");
-					await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_kills_total.txt", $"{prefixKills}{totalKillsPvP}{suffixKills}");
-				}
+				SessionKillsPvP.set_Value(totalKillsPvP - TotalKillsAtResetPvP.get_Value());
+				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_kills_day.txt", $"{prefixKills}{SessionKillsPvP.get_Value()}{suffixKills}");
+				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_kills_total.txt", $"{prefixKills}{totalKillsPvP}{suffixKills}");
 			}
 		}
 

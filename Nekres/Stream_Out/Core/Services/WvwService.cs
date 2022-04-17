@@ -145,7 +145,7 @@ namespace Nekres.Stream_Out.Core.Services
 		{
 			return await ((IBlobClient<WvwMatch>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Wvw()
 				.get_Matches()
-				.World(worldId)).GetAsync(default(CancellationToken)).ContinueWith((Task<WvwMatch> r) => r.IsFaulted ? null : new DateTime?(r.Result.get_EndTime().UtcDateTime));
+				.World(worldId)).GetAsync(default(CancellationToken)).ContinueWith((Task<WvwMatch> r) => (!r.IsFaulted) ? new DateTime?(r.Result.get_EndTime().UtcDateTime) : null);
 		}
 
 		public async Task ResetDaily()

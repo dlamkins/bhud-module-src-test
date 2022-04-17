@@ -38,21 +38,21 @@ namespace Nekres.Stream_Out.Core.Services
 
 		private Logger Logger => StreamOutModule.Logger;
 
-		private static Gw2ApiManager Gw2ApiManager => StreamOutModule.ModuleInstance.Gw2ApiManager;
+		private static Gw2ApiManager Gw2ApiManager => StreamOutModule.ModuleInstance?.Gw2ApiManager;
 
-		private DirectoriesManager DirectoriesManager => StreamOutModule.ModuleInstance.DirectoriesManager;
+		private DirectoriesManager DirectoriesManager => StreamOutModule.ModuleInstance?.DirectoriesManager;
 
-		private ContentsManager ContentsManager => StreamOutModule.ModuleInstance.ContentsManager;
+		private ContentsManager ContentsManager => StreamOutModule.ModuleInstance?.ContentsManager;
 
-		private SettingEntry<int> SessionDeathsWvW => StreamOutModule.ModuleInstance.SessionDeathsWvW;
+		private SettingEntry<int> SessionDeathsWvW => StreamOutModule.ModuleInstance?.SessionDeathsWvW;
 
-		private SettingEntry<int> TotalDeathsAtResetWvW => StreamOutModule.ModuleInstance.TotalDeathsAtResetWvW;
+		private SettingEntry<int> TotalDeathsAtResetWvW => StreamOutModule.ModuleInstance?.TotalDeathsAtResetWvW;
 
-		private SettingEntry<int> SessionDeathsDaily => StreamOutModule.ModuleInstance.SessionDeathsDaily;
+		private SettingEntry<int> SessionDeathsDaily => StreamOutModule.ModuleInstance?.SessionDeathsDaily;
 
-		private SettingEntry<int> TotalDeathsAtResetDaily => StreamOutModule.ModuleInstance.TotalDeathsAtResetDaily;
+		private SettingEntry<int> TotalDeathsAtResetDaily => StreamOutModule.ModuleInstance?.TotalDeathsAtResetDaily;
 
-		private StreamOutModule.UnicodeSigning UnicodeSigning => StreamOutModule.ModuleInstance.AddUnicodeSymbols.get_Value();
+		private StreamOutModule.UnicodeSigning UnicodeSigning => StreamOutModule.ModuleInstance?.AddUnicodeSymbols.get_Value() ?? StreamOutModule.UnicodeSigning.Suffixed;
 
 		private SettingEntry<bool> UseCatmanderTag => StreamOutModule.ModuleInstance.UseCatmanderTag;
 
@@ -74,7 +74,7 @@ namespace Nekres.Stream_Out.Core.Services
 			ContentsManager.ExtractIcons(UseCatmanderTag.get_Value() ? "catmander_tag_white.png" : "commander_tag_white.png", Path.Combine(moduleDir, "commander_icon.png"));
 			if (!GameService.Gw2Mumble.get_PlayerCharacter().get_IsCommander())
 			{
-				TextureUtil.ClearImage(moduleDir + "/commander_icon.png");
+				await TextureUtil.ClearImage(moduleDir + "/commander_icon.png");
 			}
 		}
 
@@ -87,7 +87,7 @@ namespace Nekres.Stream_Out.Core.Services
 		{
 			if (e.get_Value() <= 0)
 			{
-				TextureUtil.ClearImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/profession_icon.png");
+				await TextureUtil.ClearImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/profession_icon.png");
 				return;
 			}
 			try
@@ -107,7 +107,7 @@ namespace Nekres.Stream_Out.Core.Services
 		{
 			if (!e.get_Value())
 			{
-				TextureUtil.ClearImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/commander_icon.png");
+				await TextureUtil.ClearImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/commander_icon.png");
 			}
 			else
 			{

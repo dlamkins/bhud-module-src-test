@@ -55,7 +55,7 @@ namespace Nekres.Stream_Out.Core.Services
 				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_name.txt", string.Empty);
 				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_tag.txt", string.Empty);
 				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_motd.txt", string.Empty);
-				TextureUtil.ClearImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_emblem.png");
+				await TextureUtil.ClearImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_emblem.png");
 				return;
 			}
 			await ((IBlobClient<Guild>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Guild()
@@ -72,7 +72,7 @@ namespace Nekres.Stream_Out.Core.Services
 					GuildEmblem emblem = task.Result.get_Emblem();
 					if (emblem == null)
 					{
-						TextureUtil.ClearImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_emblem.png");
+						await TextureUtil.ClearImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_emblem.png");
 					}
 					else
 					{
@@ -99,7 +99,7 @@ namespace Nekres.Stream_Out.Core.Services
 						}
 						if (!layers.Any())
 						{
-							TextureUtil.ClearImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_emblem.png");
+							await TextureUtil.ClearImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_emblem.png");
 						}
 						else
 						{
@@ -141,19 +141,17 @@ namespace Nekres.Stream_Out.Core.Services
 			});
 		}
 
-		public Task Update()
+		public async Task Update()
 		{
-			return Task.CompletedTask;
+			await UpdateGuild();
 		}
 
-		public Task Initialize()
+		public async Task Initialize()
 		{
-			return Task.CompletedTask;
 		}
 
-		public Task ResetDaily()
+		public async Task ResetDaily()
 		{
-			return Task.CompletedTask;
 		}
 
 		public void Dispose()
