@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>Musician Module</AssemblyName>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <TargetFramework>net472</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>Preview</LangVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemGroup />
+  <ItemGroup>
+    <Reference Include="Blish HUD" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="MonoGame.Framework">
+      <HintPath>..\..\working\MonoGame.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="CSCore">
+      <HintPath>..\..\working\CSCore.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="CSCore.Codecs.OGG">
+      <HintPath>..\..\working\CSCore.Codecs.OGG.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core" />
+    <Reference Include="MonoGame.Extended">
+      <HintPath>..\..\working\MonoGame.Extended.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>
