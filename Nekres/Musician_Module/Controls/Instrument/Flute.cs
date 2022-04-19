@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using Blish_HUD.Controls.Extern;
 using Blish_HUD.Controls.Intern;
 using Nekres.Musician_Module.Domain.Values;
 
@@ -156,11 +157,8 @@ namespace Nekres.Musician_Module.Controls.Instrument
 			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0011: Invalid comparison between Unknown and I4
 			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
 			if (base.Mode == InstrumentMode.Practice)
 			{
 				InstrumentSkillType noteType = (((int)key == 10) ? ((CurrentOctave == FluteNote.Octaves.Low) ? InstrumentSkillType.IncreaseOctave : InstrumentSkillType.DecreaseOctave) : (((int)key != 11) ? InstrumentSkillType.Note : InstrumentSkillType.StopPlaying));
@@ -168,8 +166,7 @@ namespace Nekres.Musician_Module.Controls.Instrument
 			}
 			else if (base.Mode == InstrumentMode.Emulate)
 			{
-				Keyboard.Press(Instrument.VirtualKeyShorts[key], false);
-				Keyboard.Release(Instrument.VirtualKeyShorts[key], false);
+				Keyboard.Stroke((VirtualKeyShort)(short)GetKeyBinding(key), false);
 			}
 			else if (base.Mode == InstrumentMode.Preview)
 			{

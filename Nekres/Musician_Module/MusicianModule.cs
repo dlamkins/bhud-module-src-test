@@ -12,6 +12,7 @@ using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Nekres.Musician_Module.Controls;
 using Nekres.Musician_Module.Controls.Instrument;
 using Nekres.Musician_Module.Notation.Persistance;
@@ -72,6 +73,28 @@ namespace Nekres.Musician_Module
 
 		private SettingEntry<bool> settingBackgroundPlayback;
 
+		internal SettingEntry<KeyBinding> keySwapWeapons;
+
+		internal SettingEntry<KeyBinding> keyWeaponSkill1;
+
+		internal SettingEntry<KeyBinding> keyWeaponSkill2;
+
+		internal SettingEntry<KeyBinding> keyWeaponSkill3;
+
+		internal SettingEntry<KeyBinding> keyWeaponSkill4;
+
+		internal SettingEntry<KeyBinding> keyWeaponSkill5;
+
+		internal SettingEntry<KeyBinding> keyHealingSkill;
+
+		internal SettingEntry<KeyBinding> keyUtilitySkill1;
+
+		internal SettingEntry<KeyBinding> keyUtilitySkill2;
+
+		internal SettingEntry<KeyBinding> keyUtilitySkill3;
+
+		internal SettingEntry<KeyBinding> keyEliteSkill;
+
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
 		internal ContentsManager ContentsManager => base.ModuleParameters.get_ContentsManager();
@@ -93,7 +116,41 @@ namespace Nekres.Musician_Module
 
 		protected override void DefineSettings(SettingCollection settingsManager)
 		{
-			settingBackgroundPlayback = settingsManager.DefineSetting<bool>("backgroundPlayback", false, "No background playback", "Stop key emulation when GW2 is in the background", (SettingTypeRendererDelegate)null);
+			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0094: Expected O, but got Unknown
+			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cc: Expected O, but got Unknown
+			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0104: Expected O, but got Unknown
+			//IL_0112: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013c: Expected O, but got Unknown
+			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0174: Expected O, but got Unknown
+			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ac: Expected O, but got Unknown
+			//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e4: Expected O, but got Unknown
+			//IL_01f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021c: Expected O, but got Unknown
+			//IL_022a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0254: Expected O, but got Unknown
+			//IL_0262: Unknown result type (might be due to invalid IL or missing references)
+			//IL_028c: Expected O, but got Unknown
+			//IL_029a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c4: Expected O, but got Unknown
+			settingBackgroundPlayback = settingsManager.DefineSetting<bool>("backgroundPlayback", false, (Func<string>)(() => "No background playback"), (Func<string>)(() => "Stop key emulation when GW2 is in the background"));
+			SettingCollection skillKeyBindingsCollection = settingsManager.AddSubCollection("Skills", true, false);
+			keySwapWeapons = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keySwapWeapons", new KeyBinding(Keys.OemPipe), (Func<string>)(() => "Swap Weapons"), (Func<string>)null);
+			keyWeaponSkill1 = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyWeaponSkill1", new KeyBinding(Keys.D1), (Func<string>)(() => "Weapon Skill 1"), (Func<string>)null);
+			keyWeaponSkill2 = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyWeaponSkill2", new KeyBinding(Keys.D2), (Func<string>)(() => "Weapon Skill 2"), (Func<string>)null);
+			keyWeaponSkill3 = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyWeaponSkill3", new KeyBinding(Keys.D3), (Func<string>)(() => "Weapon Skill 3"), (Func<string>)null);
+			keyWeaponSkill4 = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyWeaponSkill4", new KeyBinding(Keys.D4), (Func<string>)(() => "Weapon Skill 4"), (Func<string>)null);
+			keyWeaponSkill5 = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyWeaponSkill5", new KeyBinding(Keys.D5), (Func<string>)(() => "Weapon Skill 5"), (Func<string>)null);
+			keyHealingSkill = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyHealingSkill", new KeyBinding(Keys.D6), (Func<string>)(() => "Healing Skill"), (Func<string>)null);
+			keyUtilitySkill1 = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyUtilitySkill1", new KeyBinding(Keys.D7), (Func<string>)(() => "Utility Skill 1"), (Func<string>)null);
+			keyUtilitySkill2 = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyUtilitySkill2", new KeyBinding(Keys.D8), (Func<string>)(() => "Utility Skill 2"), (Func<string>)null);
+			keyUtilitySkill3 = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyUtilitySkill3", new KeyBinding(Keys.D9), (Func<string>)(() => "Utility Skill 3"), (Func<string>)null);
+			keyEliteSkill = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyEliteSkill", new KeyBinding(Keys.D0), (Func<string>)(() => "Elite Skill"), (Func<string>)null);
 		}
 
 		public override IView GetSettingsView()
