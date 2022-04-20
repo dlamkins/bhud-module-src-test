@@ -2,6 +2,7 @@ using System;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Gw2Sharp.WebApi;
+using Gw2Sharp.WebApi.V2.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -29,7 +30,8 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 
 		public int ItemId { get; set; }
 
-		public string Rarity { get; set; }
+		[JsonConverter(typeof(StringEnumConverter))]
+		public ItemRarity Rarity { get; set; }
 
 		public string FishingHole { get; set; }
 
@@ -49,7 +51,10 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 
 		public RenderUrl Icon { get; set; }
 
-		public bool Visible { get; set; }
+		public bool Visible { get; set; } = true;
+
+
+		public bool Caught { get; set; }
 
 		public AsyncTexture2D IconImg { get; set; }
 	}

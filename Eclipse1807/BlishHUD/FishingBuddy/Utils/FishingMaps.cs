@@ -29,7 +29,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 
 		public static readonly List<int> ShiverpeaksFisher = new List<int> { 6179, 6153 };
 
-		public static readonly List<int> ShiverpeaksMaps = new List<int> { 30, 1371, 1310, 29, 27, 31, 28 };
+		public static readonly List<int> ShiverpeaksMaps = new List<int> { 30, 1371, 1310, 29, 27, 31, 28, 1178 };
 
 		public static readonly List<int> OrrianFisher = new List<int> { 6363, 6227 };
 
@@ -68,6 +68,10 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 		public static readonly List<int> DragonsEndFisher = new List<int> { 6506, 6402 };
 
 		public static readonly List<int> DragonsEndMaps = new List<int> { 1422 };
+
+		public static readonly List<int> ThousandSeasPavilionFisher = new List<int> { 6336, 6264, 6342, 6192 };
+
+		public static readonly List<int> ThousandSeasPavilion = new List<int> { 1465 };
 
 		public static readonly List<int> WorldClassFisher = new List<int> { 6224, 6110 };
 
