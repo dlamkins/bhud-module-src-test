@@ -55,7 +55,7 @@ namespace BhModule.Community.Pathing.Entity
 
 		private const string ATTR_TEXTURE = "texture";
 
-		private Texture2D _texture;
+		private AsyncTexture2D _texture;
 
 		private const string ATTR_TRAILSCALE = "trailscale";
 
@@ -93,7 +93,7 @@ namespace BhModule.Community.Pathing.Entity
 
 		public bool InGameVisibility { get; set; }
 
-		public Texture2D Texture
+		public AsyncTexture2D Texture
 		{
 			get
 			{
@@ -101,26 +101,17 @@ namespace BhModule.Community.Pathing.Entity
 			}
 			set
 			{
-				//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-				//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+				if (_texture != null)
+				{
+					_texture.remove_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)ResampleTexture);
+				}
 				_texture = value;
-				if (_texture == null)
+				if (_texture != null)
 				{
-					return;
+					_texture.add_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)ResampleTexture);
+					ResampleTexture(null, null);
+					FadeIn();
 				}
-				if (Texture != null && TrailSampleColor == Color.get_White())
-				{
-					List<QuantizedColor> palette = ColorThief.GetPalette(Texture);
-					palette.Sort((QuantizedColor color, QuantizedColor color2) => color2.Population.CompareTo(color.Population));
-					Color? dominantColor = palette.FirstOrDefault()?.Color;
-					if (dominantColor.HasValue)
-					{
-						TrailSampleColor = dominantColor.Value;
-					}
-				}
-				FadeIn();
 			}
 		}
 
@@ -365,16 +356,21 @@ namespace BhModule.Community.Pathing.Entity
 
 		public override void Render(GraphicsDevice graphicsDevice, IWorld world, ICamera camera)
 		{
-			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
-			if (IsFiltered(EntityRenderTarget.World) || Texture == null || ((GraphicsResource)_texture).get_IsDisposed() || _sectionBuffers.Length == 0 || !InGameVisibility)
+			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
+			if (IsFiltered(EntityRenderTarget.World))
+			{
+				return;
+			}
+			AsyncTexture2D texture = _texture;
+			if (texture == null || !texture.get_HasTexture() || ((GraphicsResource)_texture.get_Texture()).get_IsDisposed() || _sectionBuffers.Length == 0 || !InGameVisibility)
 			{
 				return;
 			}
 			graphicsDevice.set_RasterizerState(CullDirection);
-			_packState.SharedTrailEffect.SetEntityState(Texture, Math.Min(AnimationSpeed, _packState.UserConfiguration.PackMaxTrailAnimationSpeed.get_Value()), Math.Min(FadeNear, _packState.UserConfiguration.PackMaxViewDistance.get_Value() - (FadeFar - FadeNear)), Math.Min(FadeFar, _packState.UserConfiguration.PackMaxViewDistance.get_Value()), GetOpacity(), 0.25f, CanFade && _packState.UserConfiguration.PackFadeTrailsAroundCharacter.get_Value(), base.DebugRender ? Color.get_Red() : Tint);
+			_packState.SharedTrailEffect.SetEntityState(AsyncTexture2D.op_Implicit(Texture), Math.Min(AnimationSpeed, _packState.UserConfiguration.PackMaxTrailAnimationSpeed.get_Value()), Math.Min(FadeNear, _packState.UserConfiguration.PackMaxViewDistance.get_Value() - (FadeFar - FadeNear)), Math.Min(FadeFar, _packState.UserConfiguration.PackMaxViewDistance.get_Value()), GetOpacity(), 0.25f, CanFade && _packState.UserConfiguration.PackFadeTrailsAroundCharacter.get_Value(), base.DebugRender ? Color.get_Red() : Tint);
 			for (int i = 0; i < _sectionBuffers.Length; i++)
 			{
 				ref VertexBuffer vertexBuffer = ref _sectionBuffers[i];
@@ -512,6 +508,24 @@ namespace BhModule.Community.Pathing.Entity
 			}
 		}
 
+		private void ResampleTexture(object sender, ValueChangedEventArgs<Texture2D> e)
+		{
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			if (Texture != null && TrailSampleColor == Color.get_White())
+			{
+				List<QuantizedColor> palette = ColorThief.GetPalette(AsyncTexture2D.op_Implicit(Texture));
+				palette.Sort((QuantizedColor color, QuantizedColor color2) => color2.Population.CompareTo(color.Population));
+				Color? dominantColor = palette.FirstOrDefault()?.Color;
+				if (dominantColor.HasValue)
+				{
+					TrailSampleColor = dominantColor.Value;
+				}
+			}
+		}
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private void Populate_Texture(AttributeCollection collection, TextureResourceManager resourceManager)
 		{
@@ -521,7 +535,7 @@ namespace BhModule.Community.Pathing.Entity
 				{
 					if (!textureTaskResult.IsFaulted && textureTaskResult.Result != null)
 					{
-						Texture = textureTaskResult.Result;
+						Texture = AsyncTexture2D.op_Implicit(textureTaskResult.Result);
 					}
 					else
 					{
@@ -531,7 +545,7 @@ namespace BhModule.Community.Pathing.Entity
 			}
 			else
 			{
-				Texture = AsyncTexture2D.op_Implicit(_packState.UserResourceStates.Textures.DefaultTrailTexture);
+				Texture = _packState.UserResourceStates.Textures.DefaultTrailTexture;
 				Logger.Warn("Trail is missing 'texture' attribute.");
 			}
 		}
@@ -682,7 +696,7 @@ namespace BhModule.Community.Pathing.Entity
 			Vector3 val;
 			Vector3 prevPoint = (val = pointsArr[0]);
 			yield return val;
-			_003C_003Ec__DisplayClass96_0 CS_0024_003C_003E8__locals0 = default(_003C_003Ec__DisplayClass96_0);
+			_003C_003Ec__DisplayClass97_0 CS_0024_003C_003E8__locals0 = default(_003C_003Ec__DisplayClass97_0);
 			for (int j = 0; j < pointsArr.Length - 1; j++)
 			{
 				Vector3 p0 = pointsArr[j];

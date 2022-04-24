@@ -30,6 +30,8 @@ namespace BhModule.Community.Pathing
 
 		public SettingEntry<float> PackMaxTrailAnimationSpeed { get; private set; }
 
+		public SettingEntry<float> PackMarkerScale { get; private set; }
+
 		public SettingEntry<bool> PackFadeTrailsAroundCharacter { get; private set; }
 
 		public SettingEntry<bool> PackFadePathablesDuringCombat { get; private set; }
@@ -99,6 +101,7 @@ namespace BhModule.Community.Pathing
 			PackMaxOpacityOverride = PackSettings.DefineSetting<float>("PackMaxOpacityOverride", 1f, (Func<string>)(() => Strings.Setting_PackMaxOpacityOverride), (Func<string>)(() => ""));
 			PackMaxViewDistance = PackSettings.DefineSetting<float>("PackMaxViewDistance", 25000f, (Func<string>)(() => Strings.Setting_PackMaxViewDistance), (Func<string>)(() => ""));
 			PackMaxTrailAnimationSpeed = PackSettings.DefineSetting<float>("PackMaxTrailAnimationSpeed", 10f, (Func<string>)(() => Strings.Setting_PackMaxTrailAnimationSpeed), (Func<string>)(() => ""));
+			PackMarkerScale = PackSettings.DefineSetting<float>("PackMarkerScale", 1f, (Func<string>)(() => "Marker Scale"), (Func<string>)(() => $"Modifies the size of markers in the world.  Current value: {PackMarkerScale.get_Value():0.00}"));
 			PackFadeTrailsAroundCharacter = PackSettings.DefineSetting<bool>("PackFadeTrailsAroundCharacter", true, (Func<string>)(() => Strings.Setting_PackFadeTrailsAroundCharacter), (Func<string>)(() => "If enabled, trails will be faded out around your character to make it easier to see your character."));
 			PackFadePathablesDuringCombat = PackSettings.DefineSetting<bool>("PackFadePathablesDuringCombat", true, (Func<string>)(() => Strings.Setting_PackFadePathablesDuringCombat), (Func<string>)(() => "If enabled, markers and trails will be hidden while you're in combat to avoid obscuring the fight."));
 			PackFadeMarkersBetweenCharacterAndCamera = PackSettings.DefineSetting<bool>("PackFadeMarkersBetweenCharacterAndCamera", true, (Func<string>)(() => Strings.Setting_PackFadeMarkersBetweenCharacterAndCamera), (Func<string>)(() => "If enabled, markers will be drawn with less opacity if they are directly between your character and the camera to avoid obscuring your vision."));
@@ -111,6 +114,7 @@ namespace BhModule.Community.Pathing
 			SettingComplianceExtensions.SetRange(PackMaxOpacityOverride, 0f, 1f);
 			SettingComplianceExtensions.SetRange(PackMaxViewDistance, 25f, 50000f);
 			SettingComplianceExtensions.SetRange(PackMaxTrailAnimationSpeed, 0f, 10f);
+			SettingComplianceExtensions.SetRange(PackMarkerScale, 0.1f, 4f);
 		}
 
 		private void InitMapSettings(SettingCollection settings)

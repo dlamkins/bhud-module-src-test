@@ -2,6 +2,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Modules;
+using Gw2Sharp.Models;
 
 namespace BhModule.Community.Pathing.LocalHttp.Routes.API
 {
@@ -12,10 +13,18 @@ namespace BhModule.Community.Pathing.LocalHttp.Routes.API
 		{
 			if (context.Request.HttpMethod == "GET")
 			{
-				await Respond(new
+				Status status = this;
+				string overlayVersion = ((object)Program.get_OverlayVersion()).ToString();
+				string pathingVersion = ((object)((Module)PathingModule.Instance).get_Version()).ToString();
+				Coordinates2 mapCenter = GameService.Gw2Mumble.get_UI().get_MapCenter();
+				double x = ((Coordinates2)(ref mapCenter)).get_X();
+				mapCenter = GameService.Gw2Mumble.get_UI().get_MapCenter();
+				await status.Respond(new
 				{
-					OverlayVersion = ((object)Program.get_OverlayVersion()).ToString(),
-					PathingVersion = ((object)((Module)PathingModule.Instance).get_Version()).ToString()
+					OverlayVersion = overlayVersion,
+					PathingVersion = pathingVersion,
+					PlayerMapX = x,
+					PlayerMapY = ((Coordinates2)(ref mapCenter)).get_Y()
 				}, context);
 			}
 			else
