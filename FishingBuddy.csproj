@@ -20,5 +20,6 @@
     <Reference Include="System.Core" />
     <Reference Include="MonoGame.Extended" />
     <Reference Include="Newtonsoft.Json" />
+    <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
 </Project>
