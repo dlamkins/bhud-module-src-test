@@ -12,9 +12,9 @@ namespace Nekres.Musician.Core.Domain
 
 		public override Metronome ReadJson(JsonReader reader, Type objectType, Metronome existingValue, bool hasExistingValue, JsonSerializer serializer)
 		{
-			if (reader.Value != null)
+			if (reader.get_Value() != null)
 			{
-				return Metronome.FromString((string)reader.Value);
+				return Metronome.FromString((string)reader.get_Value());
 			}
 			return null;
 		}

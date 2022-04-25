@@ -20,9 +20,9 @@ namespace Nekres.Musician.Core.Domain.Converters
 
 		public override IEnumerable<ChordOffset> ReadJson(JsonReader reader, Type objectType, IEnumerable<ChordOffset> existingValue, bool hasExistingValue, JsonSerializer serializer)
 		{
-			if (reader.Value != null)
+			if (reader.get_Value() != null)
 			{
-				return ChordOffset.MelodyFromString((string)reader.Value);
+				return ChordOffset.MelodyFromString((string)reader.get_Value());
 			}
 			return null;
 		}

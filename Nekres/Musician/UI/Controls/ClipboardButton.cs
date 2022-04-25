@@ -33,8 +33,8 @@ namespace Nekres.Musician.UI.Controls
 
 		protected override void DisposeControl()
 		{
-			_clipboard.Dispose();
-			_clipboardHover.Dispose();
+			((GraphicsResource)_clipboard).Dispose();
+			((GraphicsResource)_clipboardHover).Dispose();
 			((Control)this).DisposeControl();
 		}
 	}

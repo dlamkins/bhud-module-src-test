@@ -126,7 +126,11 @@ namespace Nekres.Musician.Core.Instrument
 			}
 			foreach (KeyValuePair<string, SoundEffectInstance> item in _sound)
 			{
-				item.Value?.Dispose();
+				SoundEffectInstance value = item.Value;
+				if (value != null)
+				{
+					value.Dispose();
+				}
 			}
 		}
 

@@ -18,6 +18,8 @@ namespace Nekres.Musician.Core.Player.Algorithms
 
 		protected PlayAlgorithmBase(InstrumentBase instrument)
 		{
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 			Instrument = instrument;
 			_stopwatch = new Stopwatch();
 			CharacterPosition = GameService.Gw2Mumble.get_PlayerCharacter().get_Position();
@@ -33,9 +35,13 @@ namespace Nekres.Musician.Core.Player.Algorithms
 
 		protected bool CharacterMoved()
 		{
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 			if (MusicianModule.ModuleInstance.stopWhenMoving.get_Value())
 			{
-				return !CharacterPosition.Equals(GameService.Gw2Mumble.get_PlayerCharacter().get_Position());
+				Vector3 characterPosition = CharacterPosition;
+				return !((Vector3)(ref characterPosition)).Equals(GameService.Gw2Mumble.get_PlayerCharacter().get_Position());
 			}
 			return false;
 		}

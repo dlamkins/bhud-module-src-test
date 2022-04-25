@@ -105,17 +105,17 @@ namespace Nekres.Musician
 			audioVolume = settingsManager.DefineSetting<float>("audioVolume", 80f, (Func<string>)(() => "Audio Volume"), (Func<string>)null);
 			stopWhenMoving = settingsManager.DefineSetting<bool>("stopWhenMoving", true, (Func<string>)(() => "Stop When Moving"), (Func<string>)(() => "Stops any playback when you start moving."));
 			SettingCollection skillKeyBindingsCollection = settingsManager.AddSubCollection("Skills", true, false);
-			keySwapWeapons = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keySwapWeapons", new KeyBinding(Keys.OemPipe), (Func<string>)(() => "Swap Weapons"), (Func<string>)null);
-			keyWeaponSkill1 = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyWeaponSkill1", new KeyBinding(Keys.D1), (Func<string>)(() => "Weapon Skill 1"), (Func<string>)null);
-			keyWeaponSkill2 = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyWeaponSkill2", new KeyBinding(Keys.D2), (Func<string>)(() => "Weapon Skill 2"), (Func<string>)null);
-			keyWeaponSkill3 = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyWeaponSkill3", new KeyBinding(Keys.D3), (Func<string>)(() => "Weapon Skill 3"), (Func<string>)null);
-			keyWeaponSkill4 = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyWeaponSkill4", new KeyBinding(Keys.D4), (Func<string>)(() => "Weapon Skill 4"), (Func<string>)null);
-			keyWeaponSkill5 = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyWeaponSkill5", new KeyBinding(Keys.D5), (Func<string>)(() => "Weapon Skill 5"), (Func<string>)null);
-			keyHealingSkill = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyHealingSkill", new KeyBinding(Keys.D6), (Func<string>)(() => "Healing Skill"), (Func<string>)null);
-			keyUtilitySkill1 = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyUtilitySkill1", new KeyBinding(Keys.D7), (Func<string>)(() => "Utility Skill 1"), (Func<string>)null);
-			keyUtilitySkill2 = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyUtilitySkill2", new KeyBinding(Keys.D8), (Func<string>)(() => "Utility Skill 2"), (Func<string>)null);
-			keyUtilitySkill3 = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyUtilitySkill3", new KeyBinding(Keys.D9), (Func<string>)(() => "Utility Skill 3"), (Func<string>)null);
-			keyEliteSkill = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyEliteSkill", new KeyBinding(Keys.D0), (Func<string>)(() => "Elite Skill"), (Func<string>)null);
+			keySwapWeapons = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keySwapWeapons", new KeyBinding((Keys)220), (Func<string>)(() => "Swap Weapons"), (Func<string>)null);
+			keyWeaponSkill1 = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyWeaponSkill1", new KeyBinding((Keys)49), (Func<string>)(() => "Weapon Skill 1"), (Func<string>)null);
+			keyWeaponSkill2 = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyWeaponSkill2", new KeyBinding((Keys)50), (Func<string>)(() => "Weapon Skill 2"), (Func<string>)null);
+			keyWeaponSkill3 = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyWeaponSkill3", new KeyBinding((Keys)51), (Func<string>)(() => "Weapon Skill 3"), (Func<string>)null);
+			keyWeaponSkill4 = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyWeaponSkill4", new KeyBinding((Keys)52), (Func<string>)(() => "Weapon Skill 4"), (Func<string>)null);
+			keyWeaponSkill5 = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyWeaponSkill5", new KeyBinding((Keys)53), (Func<string>)(() => "Weapon Skill 5"), (Func<string>)null);
+			keyHealingSkill = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyHealingSkill", new KeyBinding((Keys)54), (Func<string>)(() => "Healing Skill"), (Func<string>)null);
+			keyUtilitySkill1 = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyUtilitySkill1", new KeyBinding((Keys)55), (Func<string>)(() => "Utility Skill 1"), (Func<string>)null);
+			keyUtilitySkill2 = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyUtilitySkill2", new KeyBinding((Keys)56), (Func<string>)(() => "Utility Skill 2"), (Func<string>)null);
+			keyUtilitySkill3 = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyUtilitySkill3", new KeyBinding((Keys)57), (Func<string>)(() => "Utility Skill 3"), (Func<string>)null);
+			keyEliteSkill = skillKeyBindingsCollection.DefineSetting<KeyBinding>("keyEliteSkill", new KeyBinding((Keys)48), (Func<string>)(() => "Elite Skill"), (Func<string>)null);
 			SettingCollection selfManagedSettings = settingsManager.AddSubCollection("selfManaged", false, false);
 			SheetFilter = selfManagedSettings.DefineSetting<string>("sheetFilter", "Title", (Func<string>)null, (Func<string>)null);
 			GameService.GameIntegration.get_Gw2Instance().add_IsInGameChanged((EventHandler<ValueEventArgs<bool>>)OnIsInGameChanged);
@@ -162,16 +162,23 @@ namespace Nekres.Musician
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d4: Expected O, but got Unknown
-			Rectangle windowRegion = new Rectangle(40, 26, 423, 724);
-			Rectangle contentRegion = new Rectangle(70, 41, 380, 738);
+			Rectangle windowRegion = default(Rectangle);
+			((Rectangle)(ref windowRegion))._002Ector(40, 26, 423, 724);
+			Rectangle contentRegion = default(Rectangle);
+			((Rectangle)(ref contentRegion))._002Ector(70, 41, 380, 738);
 			StandardWindow val = new StandardWindow(ContentsManager.GetTexture("background.png"), windowRegion, contentRegion);
 			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((WindowBase2)val).set_Emblem(ContentsManager.GetTexture("musician_icon.png"));

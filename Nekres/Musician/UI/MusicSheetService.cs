@@ -24,7 +24,7 @@ namespace Nekres.Musician.UI
 
 		public MusicSheetService(string cacheDir)
 		{
-			_deleteSfx = new SoundEffect[2]
+			_deleteSfx = (SoundEffect[])(object)new SoundEffect[2]
 			{
 				MusicianModule.ModuleInstance.ContentsManager.GetSound("audio\\crumbling-paper-1.wav"),
 				MusicianModule.ModuleInstance.ContentsManager.GetSound("audio\\crumbling-paper-2.wav")
@@ -71,9 +71,12 @@ namespace Nekres.Musician.UI
 		public void Dispose()
 		{
 			SoundEffect[] deleteSfx = _deleteSfx;
-			for (int i = 0; i < deleteSfx.Length; i++)
+			foreach (SoundEffect obj in deleteSfx)
 			{
-				deleteSfx[i]?.Dispose();
+				if (obj != null)
+				{
+					obj.Dispose();
+				}
 			}
 		}
 

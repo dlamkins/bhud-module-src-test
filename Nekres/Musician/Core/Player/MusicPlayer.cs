@@ -71,16 +71,20 @@ namespace Nekres.Musician.Core.Player
 			if (loops)
 			{
 				StopSound();
-				sfx.IsLooped = true;
+				sfx.set_IsLooped(true);
 			}
 			_activeSfx = sfx;
-			sfx.Volume = _audioVolume;
+			sfx.set_Volume(_audioVolume);
 			sfx.Play();
 		}
 
 		public void StopSound()
 		{
-			_activeSfx?.Stop();
+			SoundEffectInstance activeSfx = _activeSfx;
+			if (activeSfx != null)
+			{
+				activeSfx.Stop();
+			}
 		}
 
 		public bool IsMySongPlaying(Guid id)

@@ -13,22 +13,17 @@
   <ItemGroup>
     <Reference Include="Blish HUD" />
     <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="MonoGame.Framework">
-      <HintPath>..\..\working\MonoGame.Framework.dll</HintPath>
-    </Reference>
+    <Reference Include="MonoGame.Framework" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\working\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json" />
+    <Reference Include="SQLite-net">
+      <HintPath>..\..\working\SQLite-net.dll</HintPath>
     </Reference>
     <Reference Include="System.Core" />
-    <Reference Include="MonoGame.Extended">
-      <HintPath>..\..\working\MonoGame.Extended.dll</HintPath>
-    </Reference>
+    <Reference Include="MonoGame.Extended" />
     <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="AsyncClipboardService">
-      <HintPath>..\..\working\AsyncClipboardService.dll</HintPath>
-    </Reference>
+    <Reference Include="AsyncClipboardService" />
   </ItemGroup>
 </Project>

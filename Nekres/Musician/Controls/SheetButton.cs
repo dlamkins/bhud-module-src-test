@@ -117,6 +117,7 @@ namespace Nekres.Musician.Controls
 		public SheetButton(MusicSheetModel sheet)
 			: this()
 		{
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
 			Id = sheet.Id;
 			Artist = sheet.Artist;
 			User = sheet.User;
@@ -176,11 +177,17 @@ namespace Nekres.Musician.Controls
 
 		private void InvalidateMousePosition()
 		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 			Point relPos = ((Control)this).get_RelativeMousePosition();
-			_mouseOverPractice = _practiceButtonBounds.Contains(relPos);
-			_mouseOverEmulate = _emulateButtonBounds.Contains(relPos);
-			_mouseOverPreview = _previewButtonBounds.Contains(relPos);
-			_mouseOverDelete = _deleteButtonBounds.Contains(relPos);
+			_mouseOverPractice = ((Rectangle)(ref _practiceButtonBounds)).Contains(relPos);
+			_mouseOverEmulate = ((Rectangle)(ref _emulateButtonBounds)).Contains(relPos);
+			_mouseOverPreview = ((Rectangle)(ref _previewButtonBounds)).Contains(relPos);
+			_mouseOverDelete = ((Rectangle)(ref _deleteButtonBounds)).Contains(relPos);
 			if (_mouseOverPractice)
 			{
 				((Control)((Control)this).get_Parent()).set_BasicTooltipText("Practice mode (Synthesia)");
@@ -203,57 +210,109 @@ namespace Nekres.Musician.Controls
 		{
 			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0022: Invalid comparison between Unknown and I4
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0112: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0155: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0188: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0211: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0216: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0238: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0303: Unknown result type (might be due to invalid IL or missing references)
 			_isPreviewing = MusicianModule.ModuleInstance.MusicPlayer.IsMySongPlaying(Id);
 			int iconSize = (((int)((DetailsButton)this).get_IconSize() == 1) ? 100 : 65);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), bounds, Color.Black * 0.25f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(0, bounds.Height - 35, bounds.Width - 35, 35), Color.Black * 0.1f);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), bounds, Color.get_Black() * 0.25f);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(0, bounds.Height - 35, bounds.Width - 35, 35), Color.get_Black() * 0.1f);
 			_previewButtonBounds = new Rectangle(309, bounds.Height - 35 + 1, 32, 32);
 			if (_isPreviewing)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _playSprite, _previewButtonBounds, Color.White);
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _playSprite, _previewButtonBounds, Color.get_White());
 			}
 			else
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _stopSprite, _previewButtonBounds, Color.White);
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _stopSprite, _previewButtonBounds, Color.get_White());
 			}
-			_practiceButtonBounds = new Rectangle(_previewButtonBounds.Left - 4 - 32, bounds.Height - 35 + 1, 32, 32);
+			_practiceButtonBounds = new Rectangle(((Rectangle)(ref _previewButtonBounds)).get_Left() - 4 - 32, bounds.Height - 35 + 1, 32, 32);
 			if (_mouseOverPractice)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _glowBeatManiaSprite, _practiceButtonBounds, Color.White);
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _glowBeatManiaSprite, _practiceButtonBounds, Color.get_White());
 			}
 			else
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _beatManiaSprite, _practiceButtonBounds, Color.White);
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _beatManiaSprite, _practiceButtonBounds, Color.get_White());
 			}
-			_emulateButtonBounds = new Rectangle(_practiceButtonBounds.Left - 4 - 32, bounds.Height - 35 + 1, 32, 32);
+			_emulateButtonBounds = new Rectangle(((Rectangle)(ref _practiceButtonBounds)).get_Left() - 4 - 32, bounds.Height - 35 + 1, 32, 32);
 			if (_mouseOverEmulate)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _glowAutoplaySprite, _emulateButtonBounds, Color.White);
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _glowAutoplaySprite, _emulateButtonBounds, Color.get_White());
 			}
 			else
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _autoplaySprite, _emulateButtonBounds, Color.White);
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _autoplaySprite, _emulateButtonBounds, Color.get_White());
 			}
-			_deleteButtonBounds = new Rectangle(_emulateButtonBounds.Left - 4 - 32, bounds.Height - 35 + 1, 32, 32);
+			_deleteButtonBounds = new Rectangle(((Rectangle)(ref _emulateButtonBounds)).get_Left() - 4 - 32, bounds.Height - 35 + 1, 32, 32);
 			if (_mouseOverDelete)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _trashCanOpen, _deleteButtonBounds, Color.White);
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _trashCanOpen, _deleteButtonBounds, Color.get_White());
 			}
 			else
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _trashCanClosed, _deleteButtonBounds, Color.White);
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _trashCanClosed, _deleteButtonBounds, Color.get_White());
 			}
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _dividerSprite, new Rectangle(0, bounds.Height - 40, bounds.Width, 8), Color.White);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _dividerSprite, new Rectangle(0, bounds.Height - 40, bounds.Width, 8), Color.get_White());
 			if (((DetailsButton)this).get_Icon() != null)
 			{
-				Rectangle iconBounds = new Rectangle((bounds.Height - 35) / 2 - 32, (bounds.Height - 35) / 2 - 32, 64, 64);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(((DetailsButton)this).get_Icon()), iconBounds, Color.White);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _iconBoxSprite, iconBounds, Color.White);
+				Rectangle iconBounds = default(Rectangle);
+				((Rectangle)(ref iconBounds))._002Ector((bounds.Height - 35) / 2 - 32, (bounds.Height - 35) / 2 - 32, 64, 64);
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(((DetailsButton)this).get_Icon()), iconBounds, Color.get_White());
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _iconBoxSprite, iconBounds, Color.get_White());
 			}
 			string track = ((Panel)this).get_Title() + " - " + Artist;
 			string wrappedText = DrawUtil.WrapText(Control.get_Content().get_DefaultFont14(), track, (float)(305 - iconSize - 20));
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, wrappedText, Control.get_Content().get_DefaultFont14(), new Rectangle(89, 0, 216, ((Control)this).get_Height() - 35), Color.White, false, true, 2, (HorizontalAlignment)0, (VerticalAlignment)1);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, User, Control.get_Content().get_DefaultFont14(), new Rectangle(5, bounds.Height - 35, 75, 35), Color.White, false, false, 0, (HorizontalAlignment)0, (VerticalAlignment)1);
+			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, wrappedText, Control.get_Content().get_DefaultFont14(), new Rectangle(89, 0, 216, ((Control)this).get_Height() - 35), Color.get_White(), false, true, 2, (HorizontalAlignment)0, (VerticalAlignment)1);
+			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, User, Control.get_Content().get_DefaultFont14(), new Rectangle(5, bounds.Height - 35, 75, 35), Color.get_White(), false, false, 0, (HorizontalAlignment)0, (VerticalAlignment)1);
 		}
 	}
 }
