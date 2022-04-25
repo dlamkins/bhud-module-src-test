@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD.Modules.Managers;
-using Gw2Sharp;
 using Gw2Sharp.WebApi;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
@@ -26,7 +24,7 @@ namespace GatheringTools.ToolSearch
 				characterAndTools.GatheringTools.AddRange(gatheringTools);
 				charactersAndTools.Add(characterAndTools);
 			}
-			await UpdateGatheringToolsNameEtc(charactersAndTools);
+			await UpdateGatheringToolsNameEtc(charactersAndTools, gw2ApiManager);
 			return charactersAndTools;
 		}
 
@@ -46,27 +44,19 @@ namespace GatheringTools.ToolSearch
 			}
 		}
 
-		private static async Task UpdateGatheringToolsNameEtc(List<CharacterAndTools> characterAndTools)
+		private static async Task UpdateGatheringToolsNameEtc(List<CharacterAndTools> characterAndTools, Gw2ApiManager gw2ApiManager)
 		{
 			IEnumerable<int> gatheringToolIds = (from g in characterAndTools.SelectMany((CharacterAndTools c) => c.GatheringTools)
 				select g.Id).Distinct();
-			Gw2Client gw2Client = new Gw2Client((IConnection)new Connection((Locale)0));
-			try
+			IReadOnlyList<Item> gatheringToolItems = await ((IBulkExpandableClient<Item, int>)(object)gw2ApiManager.get_Gw2ApiClient().get_V2().get_Items()).ManyAsync(gatheringToolIds, default(CancellationToken));
+			foreach (GatheringTool gatheringTool in characterAndTools.SelectMany((CharacterAndTools c) => c.GatheringTools))
 			{
-				IReadOnlyList<Item> gatheringToolItems = await ((IBulkExpandableClient<Item, int>)(object)gw2Client.get_WebApi().get_V2().get_Items()).ManyAsync(gatheringToolIds, default(CancellationToken));
-				foreach (GatheringTool gatheringTool in characterAndTools.SelectMany((CharacterAndTools c) => c.GatheringTools))
-				{
-					Item matchingGatheringToolItem = gatheringToolItems.First((Item i) => i.get_Id() == gatheringTool.Id);
-					gatheringTool.Name = matchingGatheringToolItem.get_Name();
-					GatheringTool gatheringTool2 = gatheringTool;
-					RenderUrl icon = matchingGatheringToolItem.get_Icon();
-					gatheringTool2.IconUrl = ((RenderUrl)(ref icon)).get_Url().ToString();
-					gatheringTool.IsUnlimited = matchingGatheringToolItem.get_Description()?.ToLowerInvariant().Contains("unlimited use") ?? false;
-				}
-			}
-			finally
-			{
-				((IDisposable)gw2Client)?.Dispose();
+				Item matchingGatheringToolItem = gatheringToolItems.First((Item i) => i.get_Id() == gatheringTool.Id);
+				gatheringTool.Name = matchingGatheringToolItem.get_Name();
+				GatheringTool gatheringTool2 = gatheringTool;
+				RenderUrl icon = matchingGatheringToolItem.get_Icon();
+				gatheringTool2.IconUrl = ((RenderUrl)(ref icon)).get_Url().ToString();
+				gatheringTool.IsUnlimited = matchingGatheringToolItem.get_Rarity() == ApiEnum<ItemRarity>.op_Implicit((ItemRarity)5);
 			}
 		}
 	}
