@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Blish_HUD.Modules;
 using Nekres.Musician.Core.Models;
 using Nekres.Musician.UI;
 
@@ -27,7 +29,7 @@ namespace Nekres.Musician
 			_loadingIndicator = loadingIndicator;
 			_xmlWatcher = new FileSystemWatcher(sheetService.CacheDir)
 			{
-				NotifyFilter = (NotifyFilters.FileName | NotifyFilters.LastWrite),
+				NotifyFilter = NotifyFilters.LastWrite,
 				Filter = "*.xml",
 				EnableRaisingEvents = true
 			};
@@ -36,7 +38,7 @@ namespace Nekres.Musician
 
 		private async void OnXmlCreated(object sender, FileSystemEventArgs e)
 		{
-			await ConvertXml(e.FullPath);
+			await ImportFromFile(e.FullPath);
 		}
 
 		public void Init()
@@ -54,34 +56,57 @@ namespace Nekres.Musician
 				select s;
 			foreach (string filePath in initialFiles)
 			{
-				await ConvertXml(filePath, silent: true);
+				if (!((Module)MusicianModule.ModuleInstance).get_Loaded())
+				{
+					break;
+				}
+				await ImportFromFile(filePath, silent: true);
 			}
 			IsLoading = false;
 			Log = null;
 			_loadingIndicator.Report(null);
 		}
 
-		private async Task ConvertXml(string filePath, bool silent = false)
+		private async Task ImportFromFile(string filePath, bool silent = false)
 		{
 			string log = "Importing " + Path.GetFileName(filePath) + "..";
 			MusicianModule.Logger.Info(log);
 			Log = log;
 			_loadingIndicator.Report(log);
-			MusicSheet musicSheet = MusicSheet.FromXml(filePath);
-			if (musicSheet != null)
+			MusicSheet sheet = MusicSheet.FromXml(filePath);
+			if (sheet != null)
 			{
 				await FileUtil.DeleteAsync(filePath);
-				await _sheetService.AddOrUpdate(musicSheet, silent);
+				await AddToDatabase(sheet, silent);
+			}
+		}
+
+		internal async Task ImportFromStream(Stream stream, bool silent = false)
+		{
+			byte[] buffer = new byte[stream.Length];
+			await stream.ReadAsync(buffer, 0, buffer.Length);
+			if (MusicSheet.TryParseXml(Encoding.UTF8.GetString(buffer), out var sheet))
+			{
+				await AddToDatabase(sheet, silent);
+				stream.Dispose();
+			}
+		}
+
+		private async Task AddToDatabase(MusicSheet sheet, bool silent)
+		{
+			try
+			{
+				await _sheetService.AddOrUpdate(sheet, silent);
+			}
+			catch (ObjectDisposedException)
+			{
 			}
 		}
 
 		public void Dispose()
 		{
 			_xmlWatcher.Created -= OnXmlCreated;
-			_xmlWatcher.Changed -= OnXmlCreated;
-			_xmlWatcher.Dispose();
 			_xmlWatcher?.Dispose();
-			_sheetService?.Dispose();
 		}
 	}
 }

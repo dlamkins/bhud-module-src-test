@@ -117,12 +117,12 @@ namespace Nekres.Musician.Controls
 		public SheetButton(MusicSheetModel sheet)
 			: this()
 		{
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
 			Id = sheet.Id;
 			Artist = sheet.Artist;
 			User = sheet.User;
 			((Panel)this).set_Title(sheet.Title);
-			((DetailsButton)this).set_Icon(AsyncTexture2D.op_Implicit(sheet.Instrument.GetIcon()));
+			((DetailsButton)this).set_Icon(MusicianModule.ModuleInstance.InstrumentIcons[sheet.Instrument]);
 			Instrument = sheet.Instrument;
 			((Control)this).set_Size(new Point(345, 100));
 		}
@@ -136,13 +136,7 @@ namespace Nekres.Musician.Controls
 		protected override void OnClick(MouseEventArgs e)
 		{
 			((Panel)this).OnClick(e);
-			if (_mouseOverPractice)
-			{
-				this.OnPracticeClick?.Invoke(this, EventArgs.Empty);
-				GameService.Content.PlaySoundEffectByName("error");
-				ScreenNotification.ShowNotification("Not yet implemented!", (NotificationType)0, (Texture2D)null, 4);
-			}
-			else if (_mouseOverEmulate)
+			if (_mouseOverEmulate)
 			{
 				this.OnEmulateClick?.Invoke(this, EventArgs.Empty);
 				GameService.Content.PlaySoundEffectByName("button-click");
@@ -200,6 +194,10 @@ namespace Nekres.Musician.Controls
 			{
 				((Control)((Control)this).get_Parent()).set_BasicTooltipText("Preview");
 			}
+			else if (_mouseOverDelete)
+			{
+				((Control)((Control)this).get_Parent()).set_BasicTooltipText("Delete");
+			}
 			else
 			{
 				((Control)((Control)this).get_Parent()).set_BasicTooltipText(string.Empty);
@@ -239,28 +237,21 @@ namespace Nekres.Musician.Controls
 			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0188: Unknown result type (might be due to invalid IL or missing references)
 			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0211: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0216: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0238: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0303: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0268: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_028f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a1: Unknown result type (might be due to invalid IL or missing references)
 			_isPreviewing = MusicianModule.ModuleInstance.MusicPlayer.IsMySongPlaying(Id);
 			int iconSize = (((int)((DetailsButton)this).get_IconSize() == 1) ? 100 : 65);
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), bounds, Color.get_Black() * 0.25f);
@@ -274,16 +265,7 @@ namespace Nekres.Musician.Controls
 			{
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _stopSprite, _previewButtonBounds, Color.get_White());
 			}
-			_practiceButtonBounds = new Rectangle(((Rectangle)(ref _previewButtonBounds)).get_Left() - 4 - 32, bounds.Height - 35 + 1, 32, 32);
-			if (_mouseOverPractice)
-			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _glowBeatManiaSprite, _practiceButtonBounds, Color.get_White());
-			}
-			else
-			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _beatManiaSprite, _practiceButtonBounds, Color.get_White());
-			}
-			_emulateButtonBounds = new Rectangle(((Rectangle)(ref _practiceButtonBounds)).get_Left() - 4 - 32, bounds.Height - 35 + 1, 32, 32);
+			_emulateButtonBounds = new Rectangle(((Rectangle)(ref _previewButtonBounds)).get_Left() - 4 - 32, bounds.Height - 35 + 1, 32, 32);
 			if (_mouseOverEmulate)
 			{
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _glowAutoplaySprite, _emulateButtonBounds, Color.get_White());

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
@@ -26,8 +25,6 @@ namespace Nekres.Musician.UI.Views
 
 		private string _activeFilter;
 
-		private IEnumerable<MusicSheetModel> _initialSheets;
-
 		public FlowPanel MelodyFlowPanel { get; private set; }
 
 		internal event EventHandler<ValueEventArgs<string>> OnSelectedSortChanged;
@@ -42,18 +39,11 @@ namespace Nekres.Musician.UI.Views
 
 		protected override async Task<bool> Load(IProgress<string> progress)
 		{
-			return await Task.Run(async delegate
+			return await Task.Run(delegate
 			{
 				progress.Report(MusicianModule.ModuleInstance.MusicSheetImporter.Log);
-				IEnumerable<MusicSheetModel> initialSheets = await MusicianModule.ModuleInstance.MusicSheetService.GetAll();
-				_initialSheets = initialSheets;
 				return !MusicianModule.ModuleInstance.MusicSheetImporter.IsLoading;
 			});
-		}
-
-		protected override void Unload()
-		{
-			base.Unload();
 		}
 
 		protected override async void Build(Container buildPanel)
@@ -64,12 +54,15 @@ namespace Nekres.Musician.UI.Views
 			((Control)val).set_Location(new Point(0, 0));
 			((Control)val).set_Size(new Point(150, 32));
 			((TextInputBase)val).set_PlaceholderText("Search...");
-			((TextInputBase)val).add_TextChanged((EventHandler<EventArgs>)OnSearchFilterChanged);
+			TextBox searchBar = val;
+			((Control)searchBar).Hide();
+			searchBar.add_EnterPressed((EventHandler<EventArgs>)OnSearchFilterChanged);
 			Dropdown val2 = new Dropdown();
 			((Control)val2).set_Parent(buildPanel);
 			((Control)val2).set_Location(new Point(buildPanel.get_ContentRegion().Width - 5 - 150, 0));
 			((Control)val2).set_Width(150);
 			Dropdown ddSortMethod = val2;
+			((Control)ddSortMethod).Hide();
 			ddSortMethod.get_Items().Add(((Presenter<LibraryView, LibraryModel>)base.get_Presenter()).get_Model().DD_TITLE);
 			ddSortMethod.get_Items().Add(((Presenter<LibraryView, LibraryModel>)base.get_Presenter()).get_Model().DD_ARTIST);
 			ddSortMethod.get_Items().Add(((Presenter<LibraryView, LibraryModel>)base.get_Presenter()).get_Model().DD_USER);
@@ -80,7 +73,6 @@ namespace Nekres.Musician.UI.Views
 				ddSortMethod.get_Items().Add(instrument);
 			}
 			ddSortMethod.add_ValueChanged((EventHandler<ValueChangedEventArgs>)OnSortChanged);
-			OnSortChanged(ddSortMethod, new ValueChangedEventArgs(string.Empty, ddSortMethod.get_SelectedItem()));
 			LibraryView libraryView = this;
 			FlowPanel val3 = new FlowPanel();
 			((Control)val3).set_Parent(buildPanel);
@@ -94,10 +86,21 @@ namespace Nekres.Musician.UI.Views
 			((Panel)val3).set_ShowTint(true);
 			((Panel)val3).set_ShowBorder(true);
 			libraryView.MelodyFlowPanel = val3;
-			foreach (MusicSheetModel sheet in _initialSheets)
+			((Control)MelodyFlowPanel).Hide();
+			LoadingSpinner val4 = new LoadingSpinner();
+			((Control)val4).set_Parent(buildPanel);
+			((Control)val4).set_Size(new Point(64, 64));
+			((Control)val4).set_Location(new Point((buildPanel.get_ContentRegion().Width - 64) / 2, (buildPanel.get_ContentRegion().Height - 64) / 2));
+			LoadingSpinner loading = val4;
+			foreach (MusicSheetModel sheet in await MusicianModule.ModuleInstance.MusicSheetService.GetAll())
 			{
+				((Control)loading).set_BasicTooltipText("Loading " + sheet.Title);
 				CreateSheetButton(sheet);
 			}
+			((Control)loading).Dispose();
+			((Control)MelodyFlowPanel).Show();
+			((Control)searchBar).Show();
+			((Control)ddSortMethod).Show();
 			ClipboardButton clipboardButton = new ClipboardButton();
 			((Control)clipboardButton).set_Parent(buildPanel);
 			((Control)clipboardButton).set_Size(new Point(42, 42));
@@ -107,19 +110,14 @@ namespace Nekres.Musician.UI.Views
 			ddSortMethod.set_SelectedItem(_activeFilter);
 		}
 
-		public void CreateSheetButton(MusicSheetModel model)
+		public SheetButton CreateSheetButton(MusicSheetModel model)
 		{
 			SheetButton sheetButton = new SheetButton(model);
 			((Control)sheetButton).set_Parent((Container)(object)MelodyFlowPanel);
 			sheetButton.OnPreviewClick += OnPreviewClick;
 			sheetButton.OnEmulateClick += OnEmulateClick;
 			sheetButton.OnDelete += OnDeleteClick;
-		}
-
-		private void OnSortChanged(object o, ValueChangedEventArgs e)
-		{
-			MusicianModule.ModuleInstance.SheetFilter.set_Value(e.get_CurrentValue());
-			this.OnSelectedSortChanged?.Invoke(o, new ValueEventArgs<string>(e.get_CurrentValue()));
+			return sheetButton;
 		}
 
 		private async void OnPreviewClick(object o, ValueEventArgs<bool> e)
@@ -171,6 +169,41 @@ namespace Nekres.Musician.UI.Views
 					return string.Compare(x.Artist, y.Artist, StringComparison.InvariantCultureIgnoreCase);
 				}
 				return MusicianModule.ModuleInstance.SheetFilter.get_Value().Equals(((Presenter<LibraryView, LibraryModel>)base.get_Presenter()).get_Model().DD_TITLE) ? string.Compare(((Panel)x).get_Title(), ((Panel)y).get_Title(), StringComparison.InvariantCultureIgnoreCase) : string.Compare(x.User, y.User, StringComparison.InvariantCultureIgnoreCase);
+			});
+		}
+
+		private void OnSortChanged(object o, ValueChangedEventArgs e)
+		{
+			MusicianModule.ModuleInstance.SheetFilter.set_Value(e.get_CurrentValue());
+			SortSheetButtons(e.get_CurrentValue());
+		}
+
+		private void SortSheetButtons(string filter)
+		{
+			FlowPanel melodyFlowPanel = MelodyFlowPanel;
+			if (melodyFlowPanel == null)
+			{
+				return;
+			}
+			melodyFlowPanel.SortChildren<SheetButton>((Comparison<SheetButton>)delegate(SheetButton x, SheetButton y)
+			{
+				Instrument result;
+				bool flag = Enum.TryParse<Instrument>(filter, ignoreCase: true, out result);
+				((Control)x).set_Visible(!flag || x.Instrument.ToString().Equals(filter, StringComparison.InvariantCultureIgnoreCase));
+				((Control)y).set_Visible(!flag || y.Instrument.ToString().Equals(filter, StringComparison.InvariantCultureIgnoreCase));
+				if (!((Control)x).get_Visible() || !((Control)y).get_Visible())
+				{
+					return 0;
+				}
+				if (((Presenter<LibraryView, LibraryModel>)base.get_Presenter()).get_Model().DD_TITLE.Equals(filter))
+				{
+					return string.Compare(((Panel)x).get_Title(), ((Panel)y).get_Title(), StringComparison.InvariantCulture);
+				}
+				if (((Presenter<LibraryView, LibraryModel>)base.get_Presenter()).get_Model().DD_ARTIST.Equals(filter))
+				{
+					return string.Compare(x.Artist, y.Artist, StringComparison.InvariantCulture);
+				}
+				return ((Presenter<LibraryView, LibraryModel>)base.get_Presenter()).get_Model().DD_USER.Equals(filter) ? string.Compare(x.User, y.User, StringComparison.InvariantCulture) : 0;
 			});
 		}
 	}
