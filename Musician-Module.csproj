@@ -16,16 +16,19 @@
     <Reference Include="MonoGame.Framework">
       <HintPath>..\..\working\MonoGame.Framework.dll</HintPath>
     </Reference>
-    <Reference Include="CSCore">
-      <HintPath>..\..\working\CSCore.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="CSCore.Codecs.OGG">
-      <HintPath>..\..\working\CSCore.Codecs.OGG.dll</HintPath>
+    <Reference Include="System.Xml" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\working\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System.Core" />
     <Reference Include="MonoGame.Extended">
       <HintPath>..\..\working\MonoGame.Extended.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="AsyncClipboardService">
+      <HintPath>..\..\working\AsyncClipboardService.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>
