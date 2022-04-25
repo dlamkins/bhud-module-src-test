@@ -148,14 +148,9 @@ namespace Nekres.Musician.Controls
 			}
 			else if (_mouseOverDelete)
 			{
+				this.OnDelete?.Invoke(this, new ValueEventArgs<Guid>(Id));
 				((Control)this).Dispose();
 			}
-		}
-
-		protected override void DisposeControl()
-		{
-			this.OnDelete?.Invoke(this, new ValueEventArgs<Guid>(Id));
-			((Panel)this).DisposeControl();
 		}
 
 		protected override CaptureType CapturesInput()
