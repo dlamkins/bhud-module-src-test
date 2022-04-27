@@ -100,23 +100,27 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 
 		public static SettingEntry<bool> _displayUncatchableFish;
 
-		public static SettingEntry<bool> _hideInCombat;
-
 		public static SettingEntry<bool> _hideTimeOfDay;
+
+		public static SettingEntry<bool> _settingClockLabel;
+
+		public static SettingEntry<bool> _hideInCombat;
 
 		private List<Fish> catchableFish;
 
-		private FishingMaps fishingMaps;
+		private FishingMaps _fishingMaps;
 
 		private IEnumerable<AccountAchievement> accountFishingAchievements;
 
 		public static SettingEntry<bool> _showRarityBorder;
 
+		public static SettingEntry<int> _settingClockAlign;
+
 		private Clock _timeOfDayClock;
 
 		private List<Fish> _allFishList;
 
-		private Map _currentMap;
+		internal static Map _currentMap;
 
 		private bool _useAPIToken;
 
@@ -205,18 +209,23 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			SettingComplianceExtensions.SetRange(_fishImgSize, 16, 96);
 			_fishPanelOrientation.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)OnUpdateSettings<string>);
 			_fishPanelDirection.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)OnUpdateSettings<string>);
-			_fishPanelTooltipDisplay = settings.DefineSetting<string>("FishPanelTooltipDisplay", "#1\n@2\n@3\n@4\n@5\n@6\n@7", (Func<string>)(() => "Tooltip Display"), (Func<string>)(() => "Default: #1\\n@2\\n@3\\n@4\\n@5\\n@6\\n@7\nSimple: #1\\nBait: #2\\nHole: #4\\n@7\nCompact: #1 [#6]\\nBait: #2\\nHole: #4 (#3)\\n@7\n@number uses default string, #number allows for more customization\n@#1: Name\n@#2: Favored Bait\n@#3: Time of Day\n@#4: Fishing Hole\n@#5: Achievement\n@#6: Rarity\n@7:  Reason for Hiding\n(\\n adds new line)"));
+			_fishPanelTooltipDisplay = settings.DefineSetting<string>("FishPanelTooltipDisplay", "#1\n@2\n@3\n@4\n@5\n@6\n@7@8", (Func<string>)(() => "Tooltip Display"), (Func<string>)(() => "Default: #1\\n@2\\n@3\\n@4\\n@5\\n@6\\n@7@8\nSimple: #1\\nBait: #2\\nHole: #4\\n@7\nCompact: #1 [#6]\\nBait: #2\\nHole: #4 (#3)\\n@7\n@number uses default string, #number allows for more customization\n@#1: Name\n@#2: Favored Bait\n@#3: Time of Day\n@#4: Fishing Hole\n@#5: Achievement\n@#6: Rarity\n@7:  Reason for Hiding\n@#8: Fishy Notes (@ can't use \\n)\n(\\n adds new line)"));
 			_fishPanelTooltipDisplay.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)OnUpdateSettings<string>);
 			_timeOfDayPanelLoc = settings.DefineSetting<Point>("TimeOfDayPanelLoc", new Point(100, 100), (Func<string>)(() => "Time of Day Details Location"), (Func<string>)(() => ""));
 			_dragTimeOfDayClock = settings.DefineSetting<bool>("TimeOfDayPanelDrag", false, (Func<string>)(() => "Drag Time Display"), (Func<string>)(() => "Drag time of day display"));
 			_timeOfDayImgSize = settings.DefineSetting<int>("TimeImgWidth", 64, (Func<string>)(() => "Time of Day Size"), (Func<string>)(() => ""));
-			_hideTimeOfDay = settings.DefineSetting<bool>("HideTimeOfDay", false, (Func<string>)(() => "Hide Time Display"), (Func<string>)(() => "Opption to hide time display"));
+			_settingClockLabel = settings.DefineSetting<bool>("ClockLabel", false, (Func<string>)(() => "Hide Time Label"), (Func<string>)(() => "Show/Hide clock time label display"));
+			_settingClockAlign = settings.DefineSetting<int>("ClockTimeAlign", 0, (Func<string>)(() => "Time Label Position"), (Func<string>)(() => "Clock time label position"));
+			_hideTimeOfDay = settings.DefineSetting<bool>("HideTimeOfDay", false, (Func<string>)(() => "Hide Time Display"), (Func<string>)(() => "Option to hide time display"));
 			_timeOfDayPanelLoc.add_SettingChanged((EventHandler<ValueChangedEventArgs<Point>>)OnUpdateClockLocation);
 			_dragTimeOfDayClock.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateClockSettings);
 			SettingComplianceExtensions.SetRange(_timeOfDayImgSize, 16, 96);
 			_timeOfDayImgSize.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)OnUpdateClockSize);
 			_dragTimeOfDayClock.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateClockSettings);
 			_hideTimeOfDay.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateClockSettings);
+			SettingComplianceExtensions.SetRange(_settingClockAlign, 0, 120);
+			_settingClockAlign.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)OnUpdateClockLabelAlign);
+			_settingClockLabel.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateHideClockLabel);
 			_hideInCombat = settings.DefineSetting<bool>("HideInCombat", false, (Func<string>)(() => "Hide In Combat"), (Func<string>)(() => "Hide all fishing info in combat"));
 			_hideInCombat.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateFishSettings<bool>);
 		}
@@ -225,7 +234,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 		{
 			Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)OnApiSubTokenUpdated);
 			catchableFish = new List<Fish>();
-			fishingMaps = new FishingMaps();
+			_fishingMaps = new FishingMaps();
 			_mapRepository = new AsyncCache<int, Map>(RequestMap);
 			_imgBorderBlack = ContentsManager.GetTexture("border_black.png");
 			_imgBorderJunk = ContentsManager.GetTexture("border_junk.png");
@@ -254,14 +263,19 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 			((Module)this).OnModuleLoaded(e);
 			Clock clock = new Clock();
 			((Control)clock).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			clock.HideLabel = _settingClockLabel.get_Value();
+			((Control)clock).set_Visible(_hideTimeOfDay.get_Value());
+			((Control)clock).set_Location(_timeOfDayPanelLoc.get_Value());
 			_timeOfDayClock = clock;
 			OnUpdateClockSettings();
+			OnUpdateClockLabelAlign();
+			OnUpdateHideClockLabel();
 			OnUpdateClockLocation();
 			OnUpdateClockSize();
-			GetCurrentMapTime();
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
 			DrawIcons();
 			_timeOfDayClock.TimeOfDayChanged += OnTimeOfDayChanged;
@@ -328,6 +342,8 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			_timeOfDayPanelLoc.remove_SettingChanged((EventHandler<ValueChangedEventArgs<Point>>)OnUpdateClockLocation);
 			_dragTimeOfDayClock.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateClockSettings);
 			_timeOfDayImgSize.remove_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)OnUpdateClockSize);
+			_settingClockAlign.remove_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)OnUpdateClockLabelAlign);
+			_settingClockLabel.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateHideClockLabel);
 			_hideTimeOfDay.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateClockSettings);
 			Clock timeOfDayClock = _timeOfDayClock;
 			if (timeOfDayClock != null)
@@ -427,6 +443,16 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 				((Control)_timeOfDayClock).Show();
 				_timeOfDayClock.Drag = _dragTimeOfDayClock.get_Value();
 			}
+		}
+
+		private void OnUpdateClockLabelAlign(object sender = null, ValueChangedEventArgs<int> e = null)
+		{
+			_timeOfDayClock.LabelVerticalAlignment = _settingClockAlign.get_Value();
+		}
+
+		private void OnUpdateHideClockLabel(object sender = null, ValueChangedEventArgs<bool> e = null)
+		{
+			_timeOfDayClock.HideLabel = _settingClockLabel.get_Value();
 		}
 
 		private void OnUpdateClockLocation(object sender = null, ValueChangedEventArgs<Point> e = null)
@@ -609,8 +635,8 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 		private string BuildTooltip(Fish fish)
 		{
 			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
 			string name = "Name: " + fish.Name;
 			string bait = "Favored Bait: " + fish.Bait.GetEnumMemberValue();
 			string time = "Time of Day: " + fish.Time.GetEnumMemberValue();
@@ -633,19 +659,22 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 					hiddenReason = "Hidden: Already Caught";
 				}
 			}
+			string notes = ((!string.IsNullOrWhiteSpace(fish.Notes)) ? ("Notes: " + fish.Notes) : "");
 			string text = _fishPanelTooltipDisplay.get_Value().Replace("@1", name).Replace("@2", bait)
 				.Replace("@3", time)
 				.Replace("@4", hole)
 				.Replace("@5", achieve)
 				.Replace("@6", rarity)
 				.Replace("@7", hiddenReason)
+				.Replace("@8", notes)
 				.Replace("#1", fish.Name)
 				.Replace("#2", fish.Bait.GetEnumMemberValue())
 				.Replace("#3", fish.Time.GetEnumMemberValue())
 				.Replace("#4", fish.FishingHole + (fish.OpenWater ? ", Open Water" : ""))
 				.Replace("#5", fish.Achievement);
 			ItemRarity rarity2 = fish.Rarity;
-			return text.Replace("#6", ((object)(ItemRarity)(ref rarity2)).ToString()).Replace("\\n", "\n").Trim();
+			return text.Replace("#6", ((object)(ItemRarity)(ref rarity2)).ToString()).Replace("#8", fish.Notes).Replace("\\n", "\n")
+				.Trim();
 		}
 
 		private Texture2D GetImageBorder(ItemRarity rarity)
@@ -703,9 +732,13 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 
 		private void GetCurrentMapTime()
 		{
-			if (MumbleIsAvailable)
+			if (MumbleIsAvailable && _currentMap != null)
 			{
-				_timeOfDayClock.TimePhase = TyriaTime.CurrentMapPhase(GameService.Gw2Mumble.get_CurrentMap().get_Id());
+				_timeOfDayClock.TimePhase = TyriaTime.CurrentMapPhase(_currentMap);
+			}
+			else
+			{
+				((Control)_timeOfDayClock).Hide();
 			}
 		}
 
@@ -767,6 +800,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 				}
 				catchableFish.Clear();
 				List<int> achievementsInMap = new List<int>();
+				List<int> verifyMapAchievable = new List<int>();
 				if (_currentMap == null)
 				{
 					try
@@ -778,9 +812,10 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 						Logger.Debug(ex3, "Couldn't get player's current map.");
 					}
 				}
-				if (_currentMap != null && fishingMaps.mapAchievements.ContainsKey(_currentMap.get_Id()))
+				if (_currentMap != null && _fishingMaps.MapAchievements.ContainsKey(_currentMap.get_Id()))
 				{
-					achievementsInMap.AddRange(fishingMaps.mapAchievements[_currentMap.get_Id()]);
+					achievementsInMap.AddRange(_fishingMaps.MapAchievements[_currentMap.get_Id()]);
+					verifyMapAchievable.AddRange(_fishingMaps.MapAchievements[_currentMap.get_Id()]);
 				}
 				else
 				{
@@ -796,78 +831,109 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 				}
 				if (achievementsInMap.Count == 0)
 				{
-					Logger.Debug("No achieveable fish in map.");
+					Logger.Debug("No achievable fish in map.");
 					return;
 				}
 				Logger.Debug("All map achievements: " + string.Join(", ", achievementsInMap));
 				if (_useAPIToken)
 				{
-					IEnumerable<AccountAchievement> currentMapAchievable = accountFishingAchievements.Where((AccountAchievement achievement) => achievementsInMap.Contains(achievement.get_Id()));
-					Logger.Debug("Current map achieveable: " + string.Join(", ", currentMapAchievable.Select((AccountAchievement achievement) => $"id: {achievement.get_Id()} current: {achievement.get_Current()} done: {achievement.get_Done()}")));
-					int bitsCounter = 0;
+					Logger.Debug("Using API");
+					List<AccountAchievement> currentMapAchievable = accountFishingAchievements.Where((AccountAchievement achievement) => achievementsInMap.Contains(achievement.get_Id())).ToList();
+					if (!currentMapAchievable.Any((AccountAchievement a) => verifyMapAchievable.Contains(a.get_Id())))
+					{
+						AccountAchievement val = new AccountAchievement();
+						val.set_Id(_fishingMaps.MapAchievements[_currentMap.get_Id()].First());
+						val.set_Current(0);
+						val.set_Done(false);
+						currentMapAchievable.Add(val);
+					}
+					if (_includeSaltwater.get_Value() && !currentMapAchievable.Any((AccountAchievement a) => FishingMaps.SaltwaterFisher.Contains(a.get_Id())))
+					{
+						AccountAchievement val2 = new AccountAchievement();
+						val2.set_Id(FishingMaps.SaltwaterFisher.First());
+						val2.set_Current(0);
+						val2.set_Done(false);
+						currentMapAchievable.Add(val2);
+					}
+					if (_includeWorldClass.get_Value() && !currentMapAchievable.Any((AccountAchievement a) => FishingMaps.WorldClassFisher.Contains(a.get_Id())))
+					{
+						AccountAchievement val3 = new AccountAchievement();
+						val3.set_Id(FishingMaps.WorldClassFisher.First());
+						val3.set_Current(0);
+						val3.set_Done(false);
+						currentMapAchievable.Add(val3);
+					}
+					Logger.Debug("Current map achievable: " + string.Join(", ", currentMapAchievable.Select((AccountAchievement achievement) => $"id: {achievement.get_Id()} current: {achievement.get_Current()} done: {achievement.get_Done()}")));
+					int bitsCounter2 = 0;
 					foreach (AccountAchievement accountAchievement in currentMapAchievable)
 					{
 						Achievement currentAccountAchievement2 = await RequestAchievement(accountAchievement.get_Id());
-						if (currentAccountAchievement2 == null || currentAccountAchievement2.get_Bits() == null)
+						if (currentAccountAchievement2 == null)
 						{
-							continue;
+							Logger.Debug($"Requested achievement by id is null, id: {accountAchievement.get_Id()}");
 						}
-						foreach (AchievementBit bit2 in currentAccountAchievement2.get_Bits())
+						else
 						{
-							if (bit2 == null)
+							if (currentAccountAchievement2.get_Bits() == null)
 							{
-								Logger.Debug($"Bit in {currentAccountAchievement2.get_Id()} is null");
 								continue;
 							}
-							if (_ignoreCaughtFish.get_Value() && accountAchievement.get_Bits() != null && accountAchievement.get_Bits().Contains(bitsCounter))
+							foreach (AchievementBit bit2 in currentAccountAchievement2.get_Bits())
 							{
-								bitsCounter++;
-								continue;
+								if (bit2 == null)
+								{
+									Logger.Debug($"Bit in {currentAccountAchievement2.get_Id()} is null");
+									continue;
+								}
+								if (_ignoreCaughtFish.get_Value() && accountAchievement.get_Bits() != null && accountAchievement.get_Bits().Contains(bitsCounter2))
+								{
+									bitsCounter2++;
+									continue;
+								}
+								int itemId2 = ((AchievementItemBit)bit2).get_Id();
+								Item fish2 = await RequestItem(itemId2);
+								Logger.Debug($"Found Fish '{fish2.get_Name()}' id: '{fish2.get_Id()}'");
+								IEnumerable<Fish> fishIdMatch2 = _allFishList.Where((Fish phish) => phish.ItemId == fish2.get_Id());
+								Fish ghoti2 = ((fishIdMatch2.Count() != 0) ? fishIdMatch2.First() : null);
+								if (ghoti2 == null)
+								{
+									Logger.Warn($"Missing fish from all fish list: name: '{fish2.get_Name()}' id: '{fish2.get_Id()}' (This may be caused by language)");
+									continue;
+								}
+								if (accountAchievement.get_Bits() != null && accountAchievement.get_Bits().Contains(bitsCounter2))
+								{
+									ghoti2.Caught = true;
+								}
+								ghoti2.Visible = ghoti2.Time == Fish.TimeOfDay.Any || _timeOfDayClock.TimePhase.Equals("Dawn") || _timeOfDayClock.TimePhase.Equals("Dusk") || object.Equals(ghoti2.Time.ToString(), _timeOfDayClock.TimePhase);
+								ghoti2.Icon = fish2.get_Icon();
+								ghoti2.ItemId = fish2.get_Id();
+								ghoti2.AchievementId = currentAccountAchievement2.get_Id();
+								ghoti2.IconImg = RequestItemIcon(fish2);
+								if (ghoti2.Locations == null || ghoti2.Locations.Contains(_currentMap.get_Id()))
+								{
+									catchableFish.Add(ghoti2);
+								}
+								else
+								{
+									Logger.Debug($"Skipping {fish2.get_Name()} {fish2.get_Id()}, not available in current map.");
+								}
+								bitsCounter2++;
 							}
-							int itemId2 = ((AchievementItemBit)bit2).get_Id();
-							Item fish2 = await RequestItem(itemId2);
-							Logger.Debug($"Found Fish '{fish2.get_Name()}' id: '{fish2.get_Id()}'");
-							IEnumerable<Fish> fishIdMatch2 = _allFishList.Where((Fish phish) => phish.ItemId == fish2.get_Id());
-							Fish ghoti2 = ((fishIdMatch2.Count() != 0) ? fishIdMatch2.First() : null);
-							if (ghoti2 == null)
-							{
-								Logger.Warn($"Missing fish from all fish list: name: '{fish2.get_Name()}' id: '{fish2.get_Id()}' (This may be caused by language)");
-								continue;
-							}
-							if (accountAchievement.get_Bits() != null && accountAchievement.get_Bits().Contains(bitsCounter))
-							{
-								ghoti2.Caught = true;
-							}
-							if (ghoti2.Time != Fish.TimeOfDay.Any && !_timeOfDayClock.TimePhase.Equals("Dawn") && !_timeOfDayClock.TimePhase.Equals("Dusk") && !object.Equals(ghoti2.Time.ToString(), _timeOfDayClock.TimePhase))
-							{
-								ghoti2.Visible = false;
-							}
-							ghoti2.Icon = fish2.get_Icon();
-							ghoti2.ItemId = fish2.get_Id();
-							ghoti2.AchievementId = currentAccountAchievement2.get_Id();
-							ghoti2.IconImg = RequestItemIcon(fish2);
-							if (ghoti2.Locations == null || ghoti2.Locations.Contains(_currentMap.get_Id()))
-							{
-								catchableFish.Add(ghoti2);
-							}
-							else
-							{
-								Logger.Debug($"Skipping {fish2.get_Name()} {fish2.get_Id()}, not available in current map.");
-							}
-							bitsCounter++;
+							bitsCounter2 = 0;
 						}
-						bitsCounter = 0;
 					}
 				}
 				else
 				{
+					Logger.Debug("Not using API");
 					IEnumerable<int> currentMapAchievableIds = FishingMaps.BASE_FISHER_ACHIEVEMENT_IDS.Where((int achievementId) => achievementsInMap.Contains(achievementId));
-					Logger.Debug("Current map achieveable: " + string.Join(", ", currentMapAchievableIds));
-					foreach (int achievementId2 in currentMapAchievableIds)
+					Logger.Debug("Current map achievable: " + string.Join(", ", currentMapAchievableIds));
+					foreach (int bitsCounter2 in currentMapAchievableIds)
 					{
-						Achievement currentAccountAchievement2 = await RequestAchievement(achievementId2);
+						Achievement currentAccountAchievement2 = await RequestAchievement(bitsCounter2);
 						if (currentAccountAchievement2 == null)
 						{
+							Logger.Debug($"Requested achievement by id is null, id: {bitsCounter2}");
 							continue;
 						}
 						foreach (AchievementBit bit in currentAccountAchievement2.get_Bits())
@@ -887,14 +953,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 								Logger.Warn($"Missing fish from all fish list: '{fish.get_Name()}' id: '{fish.get_Id()}' (This may be caused by language)");
 								continue;
 							}
-							if (ghoti.Time != Fish.TimeOfDay.Any && !_timeOfDayClock.TimePhase.Equals("Dawn") && !_timeOfDayClock.TimePhase.Equals("Dusk") && !object.Equals(ghoti.Time.ToString(), _timeOfDayClock.TimePhase))
-							{
-								ghoti.Visible = false;
-							}
-							else
-							{
-								ghoti.Visible = true;
-							}
+							ghoti.Visible = ghoti.Time == Fish.TimeOfDay.Any || _timeOfDayClock.TimePhase.Equals("Dawn") || _timeOfDayClock.TimePhase.Equals("Dusk") || object.Equals(ghoti.Time.ToString(), _timeOfDayClock.TimePhase);
 							ghoti.Name = fish.get_Name();
 							ghoti.Icon = fish.get_Icon();
 							ghoti.ItemId = fish.get_Id();

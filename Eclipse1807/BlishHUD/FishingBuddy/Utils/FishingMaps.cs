@@ -7,8 +7,6 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 	{
 		private static readonly Logger Logger = Logger.GetLogger(typeof(FishingMaps));
 
-		private readonly Dictionary<int, List<int>> _mapAchievements;
-
 		public static readonly int FISHING_ACHIEVEMENT_CATEGORY_ID = 317;
 
 		public static readonly List<int> AscalonianFisher = new List<int> { 6330, 6484 };
@@ -96,58 +94,62 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 			6466, 6402, 6110, 6393
 		};
 
-		public Dictionary<int, List<int>> mapAchievements => _mapAchievements;
+		public Dictionary<int, List<int>> MapAchievements { get; }
 
 		public FishingMaps()
 		{
-			_mapAchievements = new Dictionary<int, List<int>>();
-			foreach (int mapId12 in AscalonianMaps)
+			MapAchievements = new Dictionary<int, List<int>>();
+			foreach (int mapId13 in AscalonianMaps)
 			{
-				_mapAchievements.Add(mapId12, AscalonianFisher);
+				MapAchievements.Add(mapId13, AscalonianFisher);
 			}
-			foreach (int mapId11 in KrytanMaps)
+			foreach (int mapId12 in KrytanMaps)
 			{
-				_mapAchievements.Add(mapId11, KrytanFisher);
+				MapAchievements.Add(mapId12, KrytanFisher);
 			}
-			foreach (int mapId10 in MaguumaMaps)
+			foreach (int mapId11 in MaguumaMaps)
 			{
-				_mapAchievements.Add(mapId10, MaguumaFisher);
+				MapAchievements.Add(mapId11, MaguumaFisher);
 			}
-			foreach (int mapId9 in ShiverpeaksMaps)
+			foreach (int mapId10 in ShiverpeaksMaps)
 			{
-				_mapAchievements.Add(mapId9, ShiverpeaksFisher);
+				MapAchievements.Add(mapId10, ShiverpeaksFisher);
 			}
-			foreach (int mapId8 in OrrianMaps)
+			foreach (int mapId9 in OrrianMaps)
 			{
-				_mapAchievements.Add(mapId8, OrrianFisher);
+				MapAchievements.Add(mapId9, OrrianFisher);
 			}
-			foreach (int mapId7 in DesertMaps)
+			foreach (int mapId8 in DesertMaps)
 			{
-				_mapAchievements.Add(mapId7, DesertFisher);
+				MapAchievements.Add(mapId8, DesertFisher);
 			}
-			foreach (int mapId6 in DesertIslesMaps)
+			foreach (int mapId7 in DesertIslesMaps)
 			{
-				_mapAchievements.Add(mapId6, DesertIslesFisher);
+				MapAchievements.Add(mapId7, DesertIslesFisher);
 			}
-			foreach (int mapId5 in RingOfFireMaps)
+			foreach (int mapId6 in RingOfFireMaps)
 			{
-				_mapAchievements.Add(mapId5, RingOfFireFisher);
+				MapAchievements.Add(mapId6, RingOfFireFisher);
 			}
-			foreach (int mapId4 in SeitungProvinceMaps)
+			foreach (int mapId5 in SeitungProvinceMaps)
 			{
-				_mapAchievements.Add(mapId4, SeitungProvinceFisher);
+				MapAchievements.Add(mapId5, SeitungProvinceFisher);
 			}
-			foreach (int mapId3 in KainengMaps)
+			foreach (int mapId4 in KainengMaps)
 			{
-				_mapAchievements.Add(mapId3, KainengFisher);
+				MapAchievements.Add(mapId4, KainengFisher);
 			}
-			foreach (int mapId2 in EchovaldWildsMaps)
+			foreach (int mapId3 in EchovaldWildsMaps)
 			{
-				_mapAchievements.Add(mapId2, EchovaldWildsFisher);
+				MapAchievements.Add(mapId3, EchovaldWildsFisher);
 			}
-			foreach (int mapId in DragonsEndMaps)
+			foreach (int mapId2 in DragonsEndMaps)
 			{
-				_mapAchievements.Add(mapId, DragonsEndFisher);
+				MapAchievements.Add(mapId2, DragonsEndFisher);
+			}
+			foreach (int mapId in ThousandSeasPavilion)
+			{
+				MapAchievements.Add(mapId, ThousandSeasPavilionFisher);
 			}
 		}
 	}

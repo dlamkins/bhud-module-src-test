@@ -15,13 +15,13 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 
 		private string _timePhase = "";
 
-		public bool HideLabel = true;
+		public bool HideLabel;
 
 		public bool Drag;
 
 		public FontSize Font_Size = (FontSize)14;
 
-		public VerticalAlignment LabelAlign;
+		public int LabelVerticalAlignment;
 
 		private static BitmapFont _font;
 
@@ -38,6 +38,12 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 		internal ClickThroughImage _night;
 
 		internal ClickThroughImage _currentTime;
+
+		public DateTime NextPhaseTime = DateTime.Now;
+
+		private readonly TimeSpan updateInterval = TimeSpan.FromMinutes(5.0);
+
+		private double timeSinceUpdate;
 
 		public string TimePhase
 		{
@@ -60,29 +66,30 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 		public Clock()
 			: this()
 		{
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0238: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).set_Location(new Point(50, 50));
-			((Control)this).set_Size(new Point(0, 0));
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0258: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0266: Unknown result type (might be due to invalid IL or missing references)
+			((Control)this).set_Location(new Point(50));
+			((Control)this).set_Size(new Point(0));
 			((Control)this).set_Visible(true);
 			((Control)this).set_Padding(Thickness.Zero);
+			timeSinceUpdate = updateInterval.TotalMilliseconds;
 			ClickThroughImage clickThroughImage = new ClickThroughImage();
 			((Control)clickThroughImage).set_Parent((Container)(object)this);
 			((Image)clickThroughImage).set_Texture(AsyncTexture2D.op_Implicit(FishingBuddyModule._imgDawn));
 			((Control)clickThroughImage).set_Size(new Point(FishingBuddyModule._timeOfDayImgSize.get_Value()));
-			((Control)clickThroughImage).set_Location(new Point(0));
+			((Control)clickThroughImage).set_Location(new Point(0, 20));
 			((Control)clickThroughImage).set_Opacity(1f);
 			((Control)clickThroughImage).set_BasicTooltipText("Dawn");
 			((Control)clickThroughImage).set_Visible(TimePhase == "Dawn");
@@ -98,7 +105,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 			((Control)clickThroughImage2).set_Parent((Container)(object)this);
 			((Image)clickThroughImage2).set_Texture(AsyncTexture2D.op_Implicit(FishingBuddyModule._imgDay));
 			((Control)clickThroughImage2).set_Size(new Point(FishingBuddyModule._timeOfDayImgSize.get_Value()));
-			((Control)clickThroughImage2).set_Location(new Point(0));
+			((Control)clickThroughImage2).set_Location(new Point(0, 20));
 			((Control)clickThroughImage2).set_Opacity(1f);
 			((Control)clickThroughImage2).set_BasicTooltipText("Day");
 			((Control)clickThroughImage2).set_Visible(TimePhase == "Day");
@@ -114,7 +121,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 			((Control)clickThroughImage3).set_Parent((Container)(object)this);
 			((Image)clickThroughImage3).set_Texture(AsyncTexture2D.op_Implicit(FishingBuddyModule._imgDusk));
 			((Control)clickThroughImage3).set_Size(new Point(FishingBuddyModule._timeOfDayImgSize.get_Value()));
-			((Control)clickThroughImage3).set_Location(new Point(0));
+			((Control)clickThroughImage3).set_Location(new Point(0, 20));
 			((Control)clickThroughImage3).set_Opacity(1f);
 			((Control)clickThroughImage3).set_BasicTooltipText("Dusk");
 			((Control)clickThroughImage3).set_Visible(TimePhase == "Dusk");
@@ -130,7 +137,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 			((Control)clickThroughImage4).set_Parent((Container)(object)this);
 			((Image)clickThroughImage4).set_Texture(AsyncTexture2D.op_Implicit(FishingBuddyModule._imgNight));
 			((Control)clickThroughImage4).set_Size(new Point(FishingBuddyModule._timeOfDayImgSize.get_Value()));
-			((Control)clickThroughImage4).set_Location(new Point(0));
+			((Control)clickThroughImage4).set_Location(new Point(0, 20));
 			((Control)clickThroughImage4).set_Opacity(1f);
 			((Control)clickThroughImage4).set_BasicTooltipText("Night");
 			((Control)clickThroughImage4).set_Visible(TimePhase == "Night");
@@ -143,6 +150,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 				((Control)_night).set_Size(new Point(((Control)this).get_Size().X));
 			});
 			_currentTime = _day;
+			CalcTimeTilNextPhase();
 		}
 
 		protected override CaptureType CapturesInput()
@@ -197,17 +205,18 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 
 		public override void UpdateContainer(GameTime gameTime)
 		{
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+			UpdateCadenceUtil.UpdateWithCadence(CalcTimeTilNextPhase, gameTime, updateInterval.TotalMilliseconds, ref timeSinceUpdate);
 			if (_dragging)
 			{
 				_dawn.Capture = Drag;
@@ -237,11 +246,31 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
 			if (!HideLabel)
 			{
 				_font = GameService.Content.GetFont((FontFace)0, Font_Size, (FontStyle)0);
+				TimeSpan timeTilNextPhase = TyriaTime.TimeTilNextPhase(FishingBuddyModule._currentMap);
+				if (!(timeTilNextPhase <= TimeSpan.Zero))
+				{
+					string timeStr = $"{(int)timeTilNextPhase.TotalMinutes:D2}:{timeTilNextPhase:ss}";
+					((Control)this).set_Size(new Point(Math.Max((int)_font.MeasureString(timeStr).Width, ((Control)this).get_Size().X), (int)_font.MeasureString(timeStr).Height + FishingBuddyModule._timeOfDayImgSize.get_Value() + 40));
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, timeStr, _font, new Rectangle(0, LabelVerticalAlignment, ((Control)this).get_Width(), ((Control)this).get_Height()), Color.get_White(), false, true, 1, (HorizontalAlignment)1, (VerticalAlignment)0);
+				}
 			}
+		}
+
+		public void CalcTimeTilNextPhase(GameTime gameTime = null)
+		{
+			Logger.Debug("Calculating time til next phase; currently: " + TimePhase);
+			NextPhaseTime = TyriaTime.NextPhaseTime(FishingBuddyModule._currentMap);
+			Logger.Debug($"Next phase time: {DateTime.Now}->{NextPhaseTime}");
 		}
 
 		protected virtual void OnTimeOfDayChanged(ValueChangedEventArgs<string> e)
@@ -270,6 +299,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 				((Control)_currentTime).set_Visible(true);
 				break;
 			}
+			CalcTimeTilNextPhase();
 			this.TimeOfDayChanged?.Invoke(this, e);
 		}
 	}
