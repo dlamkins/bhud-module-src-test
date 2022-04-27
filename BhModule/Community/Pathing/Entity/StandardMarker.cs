@@ -265,28 +265,28 @@ namespace BhModule.Community.Pathing.Entity
 
 		public override float DrawOrder => Vector3.DistanceSquared(Position, GameService.Gw2Mumble.get_PlayerCamera().get_Position());
 
-		public override RectangleF? RenderToMiniMap(SpriteBatch spriteBatch, Rectangle bounds, (double X, double Y) offsets, double scale, float opacity)
+		public override RectangleF? RenderToMiniMap(SpriteBatch spriteBatch, Rectangle bounds, double offsetX, double offsetY, double scale, float opacity)
 		{
 			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0166: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0227: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0129: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0168: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0229: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0230: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0232: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023c: Unknown result type (might be due to invalid IL or missing references)
 			if (IsFiltered(EntityRenderTarget.Map) || Texture == null)
 			{
 				return null;
@@ -304,7 +304,7 @@ namespace BhModule.Community.Pathing.Entity
 			{
 				return null;
 			}
-			Vector2 location = GetScaledLocation(Position.X, Position.Y, scale, offsets);
+			Vector2 location = GetScaledLocation(Position.X, Position.Y, scale, offsetX, offsetY);
 			if (!((Rectangle)(ref bounds)).Contains(location))
 			{
 				return null;
@@ -626,11 +626,11 @@ namespace BhModule.Community.Pathing.Entity
 		{
 			if (collection.TryPopAttribute("iconfile", out var attribute))
 			{
-				attribute.GetValueAsTextureAsync(resourceManager).ContinueWith(delegate(Task<Texture2D> textureTaskResult)
+				attribute.GetValueAsTextureAsync(resourceManager).ContinueWith(delegate(Task<(Texture2D Texture, Color Sample)> textureTaskResult)
 				{
-					if (!textureTaskResult.IsFaulted && textureTaskResult.Result != null)
+					if (!textureTaskResult.IsFaulted && textureTaskResult.Result.Texture != null)
 					{
-						Texture = AsyncTexture2D.op_Implicit(textureTaskResult.Result);
+						Texture = AsyncTexture2D.op_Implicit(textureTaskResult.Result.Texture);
 					}
 					else
 					{

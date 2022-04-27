@@ -11,13 +11,13 @@ namespace BhModule.Community.Pathing.State
 {
 	public class UiStates : ManagedState
 	{
-		private FlatMap _map;
-
 		private InfoWindow _info;
 
 		private Label _infoLabel;
 
 		private SafeList<string> _infoList;
+
+		public FlatMap Map { get; private set; }
 
 		public UiStates(IRootPackState rootPackState)
 			: base(rootPackState)
@@ -34,19 +34,19 @@ namespace BhModule.Community.Pathing.State
 		{
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)CurrentMapChanged);
 			GameService.Gw2Mumble.get_UI().add_IsMapOpenChanged((EventHandler<ValueEventArgs<bool>>)MapOpenedChanged);
-			if (_map == null)
+			if (Map == null)
 			{
 				FlatMap flatMap = new FlatMap(_rootPackState);
 				((Control)flatMap).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-				_map = flatMap;
+				Map = flatMap;
 			}
 		}
 
 		private void UpdateMapState()
 		{
-			if (_map != null)
+			if (Map != null)
 			{
-				((Control)_map).set_Visible(!(GameService.Gw2Mumble.get_UI().get_IsMapOpen() ? _rootPackState.UserResourceStates.Ignore.Map : _rootPackState.UserResourceStates.Ignore.Compass).Contains(GameService.Gw2Mumble.get_CurrentMap().get_Id()));
+				((Control)Map).set_Visible(!(GameService.Gw2Mumble.get_UI().get_IsMapOpen() ? _rootPackState.UserResourceStates.Ignore.Map : _rootPackState.UserResourceStates.Ignore.Compass).Contains(GameService.Gw2Mumble.get_CurrentMap().get_Id()));
 			}
 		}
 

@@ -5,7 +5,6 @@ using BhModule.Community.Pathing.State;
 using Blish_HUD;
 using Blish_HUD.Entities;
 using Blish_HUD.Graphics;
-using Gw2Sharp.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -74,7 +73,7 @@ namespace BhModule.Community.Pathing.Entity
 			Category = pointOfInterest.ParentPathingCategory ?? _packState.RootCategory;
 		}
 
-		public abstract RectangleF? RenderToMiniMap(SpriteBatch spriteBatch, Rectangle bounds, (double X, double Y) offsets, double scale, float opacity);
+		public abstract RectangleF? RenderToMiniMap(SpriteBatch spriteBatch, Rectangle bounds, double offsetX, double offsetY, double scale, float opacity);
 
 		public abstract void Render(GraphicsDevice graphicsDevice, IWorld world, ICamera camera);
 
@@ -177,34 +176,25 @@ namespace BhModule.Community.Pathing.Entity
 			return BehaviorFiltered;
 		}
 
-		protected Vector2 GetScaledLocation(double x, double y, double scale, (double X, double Y) offsets)
+		protected Vector2 GetScaledLocation(double x, double y, double scale, double offsetX, double offsetY)
 		{
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-			(double X, double Y) tuple = _packState.MapStates.EventCoordsToMapCoords(x, y, MapId);
-			double mapX = tuple.X;
-			double mapY = tuple.Y;
-			Coordinates2 mapCenter = GameService.Gw2Mumble.get_UI().get_MapCenter();
-			float num = (float)((mapX - ((Coordinates2)(ref mapCenter)).get_X()) / scale);
-			mapCenter = GameService.Gw2Mumble.get_UI().get_MapCenter();
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+			_packState.MapStates.EventCoordsToMapCoords(x, y, out var mapX, out var mapY);
 			Vector2 scaledLocation = default(Vector2);
-			((Vector2)(ref scaledLocation))._002Ector(num, (float)((mapY - ((Coordinates2)(ref mapCenter)).get_Y()) / scale));
-			if (!GameService.Gw2Mumble.get_UI().get_IsMapOpen() && GameService.Gw2Mumble.get_UI().get_IsCompassRotationEnabled())
+			((Vector2)(ref scaledLocation))._002Ector((float)((mapX - _packState.CachedMumbleStates.MapCenterX) / scale), (float)((mapY - _packState.CachedMumbleStates.MapCenterY) / scale));
+			if (!_packState.CachedMumbleStates.IsMapOpen && _packState.CachedMumbleStates.IsCompassRotationEnabled)
 			{
-				scaledLocation = Vector2.Transform(scaledLocation, Matrix.CreateRotationZ((float)GameService.Gw2Mumble.get_UI().get_CompassRotation()));
+				scaledLocation = Vector2.Transform(scaledLocation, Matrix.CreateRotationZ((float)_packState.CachedMumbleStates.CompassRotation));
 			}
-			scaledLocation += new Vector2((float)offsets.X, (float)offsets.Y);
+			scaledLocation += new Vector2((float)offsetX, (float)offsetY);
 			return scaledLocation;
 		}
 

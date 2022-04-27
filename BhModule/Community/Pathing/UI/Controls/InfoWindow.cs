@@ -134,9 +134,9 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		public override void Draw(SpriteBatch spriteBatch, Rectangle drawBounds, Rectangle scissor)
 		{
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			if (GameService.GameIntegration.get_Gw2Instance().get_IsInGame())
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			if (PathingModule.Instance != null && GameService.GameIntegration.get_Gw2Instance().get_IsInGame())
 			{
 				((Control)this).Draw(spriteBatch, drawBounds, scissor);
 			}
@@ -152,11 +152,11 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			if (GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && PathingModule.Instance.ModuleSettings.PackAllowInfoText.get_Value())
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+			if (PathingModule.Instance != null && GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && PathingModule.Instance.ModuleSettings.PackAllowInfoText.get_Value())
 			{
 				AlphaMaskEffect.SharedInstance.SetEffectState(_croppedMask);
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _croppedWindow, bounds, Color.get_White() * 0.9f);

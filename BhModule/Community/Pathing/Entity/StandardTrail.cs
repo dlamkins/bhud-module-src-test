@@ -10,7 +10,6 @@ using BhModule.Community.Pathing.Behavior.Filter;
 using BhModule.Community.Pathing.Content;
 using BhModule.Community.Pathing.State;
 using BhModule.Community.Pathing.Utility;
-using BhModule.Community.Pathing.Utility.ColorThief;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Entities;
@@ -101,15 +100,9 @@ namespace BhModule.Community.Pathing.Entity
 			}
 			set
 			{
-				if (_texture != null)
-				{
-					_texture.remove_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)ResampleTexture);
-				}
 				_texture = value;
 				if (_texture != null)
 				{
-					_texture.add_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)ResampleTexture);
-					ResampleTexture(null, null);
 					FadeIn();
 				}
 			}
@@ -128,23 +121,23 @@ namespace BhModule.Community.Pathing.Entity
 
 		public override float DrawOrder => float.MaxValue;
 
-		public override RectangleF? RenderToMiniMap(SpriteBatch spriteBatch, Rectangle bounds, (double X, double Y) offsets, double scale, float opacity)
+		public override RectangleF? RenderToMiniMap(SpriteBatch spriteBatch, Rectangle bounds, double offsetX, double offsetY, double scale, float opacity)
 		{
-			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0129: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0124: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
 			if (IsFiltered(EntityRenderTarget.Map) || Texture == null)
 			{
 				return null;
@@ -168,8 +161,8 @@ namespace BhModule.Community.Pathing.Entity
 			{
 				for (int i = 0; i < trailSection.Length - 1; i++)
 				{
-					Vector2 thisPoint = GetScaledLocation(trailSection[i].X, trailSection[i].Y, scale, offsets);
-					Vector2 nextPoint = GetScaledLocation(trailSection[i + 1].X, trailSection[i + 1].Y, scale, offsets);
+					Vector2 thisPoint = GetScaledLocation(trailSection[i].X, trailSection[i].Y, scale, offsetX, offsetY);
+					Vector2 nextPoint = GetScaledLocation(trailSection[i + 1].X, trailSection[i + 1].Y, scale, offsetX, offsetY);
 					bool inBounds = false;
 					if (lastPointInBounds | (inBounds = ((Rectangle)(ref bounds)).Contains(nextPoint)))
 					{
@@ -508,34 +501,23 @@ namespace BhModule.Community.Pathing.Entity
 			}
 		}
 
-		private void ResampleTexture(object sender, ValueChangedEventArgs<Texture2D> e)
-		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			if (Texture != null && TrailSampleColor == Color.get_White())
-			{
-				List<QuantizedColor> palette = ColorThief.GetPalette(AsyncTexture2D.op_Implicit(Texture));
-				palette.Sort((QuantizedColor color, QuantizedColor color2) => color2.Population.CompareTo(color.Population));
-				Color? dominantColor = palette.FirstOrDefault()?.Color;
-				if (dominantColor.HasValue)
-				{
-					TrailSampleColor = dominantColor.Value;
-				}
-			}
-		}
-
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private void Populate_Texture(AttributeCollection collection, TextureResourceManager resourceManager)
 		{
 			if (collection.TryGetAttribute("texture", out var attribute))
 			{
-				attribute.GetValueAsTextureAsync(resourceManager).ContinueWith(delegate(Task<Texture2D> textureTaskResult)
+				attribute.GetValueAsTextureAsync(resourceManager).ContinueWith(delegate(Task<(Texture2D Texture, Color Sample)> textureTaskResult)
 				{
-					if (!textureTaskResult.IsFaulted && textureTaskResult.Result != null)
+					//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+					//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+					if (!textureTaskResult.IsFaulted && textureTaskResult.Result.Texture != null)
 					{
-						Texture = AsyncTexture2D.op_Implicit(textureTaskResult.Result);
+						Texture = AsyncTexture2D.op_Implicit(textureTaskResult.Result.Texture);
+						if (TrailSampleColor == Color.get_White())
+						{
+							TrailSampleColor = textureTaskResult.Result.Sample;
+						}
 					}
 					else
 					{
@@ -696,7 +678,7 @@ namespace BhModule.Community.Pathing.Entity
 			Vector3 val;
 			Vector3 prevPoint = (val = pointsArr[0]);
 			yield return val;
-			_003C_003Ec__DisplayClass97_0 CS_0024_003C_003E8__locals0 = default(_003C_003Ec__DisplayClass97_0);
+			_003C_003Ec__DisplayClass96_0 CS_0024_003C_003E8__locals0 = default(_003C_003Ec__DisplayClass96_0);
 			for (int j = 0; j < pointsArr.Length - 1; j++)
 			{
 				Vector3 p0 = pointsArr[j];

@@ -37,6 +37,8 @@ namespace BhModule.Community.Pathing.State
 
 		private const double METERCONVERSION = 39.37007874015748;
 
+		private MapDetails? _currentMapDetails;
+
 		public MapStates(IRootPackState rootPackState)
 			: base(rootPackState)
 		{
@@ -84,71 +86,81 @@ namespace BhModule.Community.Pathing.State
 					_mapDetails[map.get_Id()] = new MapDetails(map.get_ContinentRect(), map.get_MapRect());
 				}
 			}
+			await Reload();
 		}
 
-		public (double X, double Y) EventCoordsToMapCoords(double eventCoordsX, double eventCoordsY, int map = -1)
+		public void EventCoordsToMapCoords(double eventCoordsX, double eventCoordsY, out double outX, out double outY)
 		{
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-			if (map < 0)
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
+			if (_currentMapDetails.HasValue)
 			{
-				map = _rootPackState.CurrentMapId;
+				Rectangle val = _currentMapDetails.Value.ContinentRect;
+				Coordinates2 topLeft = ((Rectangle)(ref val)).get_TopLeft();
+				double x = ((Coordinates2)(ref topLeft)).get_X();
+				double num = eventCoordsX * 39.37007874015748;
+				val = _currentMapDetails.Value.MapRect;
+				topLeft = ((Rectangle)(ref val)).get_TopLeft();
+				double num2 = num - ((Coordinates2)(ref topLeft)).get_X();
+				val = _currentMapDetails.Value.MapRect;
+				double num3 = num2 / ((Rectangle)(ref val)).get_Width();
+				val = _currentMapDetails.Value.ContinentRect;
+				outX = x + num3 * ((Rectangle)(ref val)).get_Width();
+				val = _currentMapDetails.Value.ContinentRect;
+				topLeft = ((Rectangle)(ref val)).get_TopLeft();
+				double y = ((Coordinates2)(ref topLeft)).get_Y();
+				double num4 = eventCoordsY * 39.37007874015748;
+				val = _currentMapDetails.Value.MapRect;
+				topLeft = ((Rectangle)(ref val)).get_TopLeft();
+				double num5 = 0.0 - (num4 - ((Coordinates2)(ref topLeft)).get_Y());
+				val = _currentMapDetails.Value.MapRect;
+				double num6 = num5 / ((Rectangle)(ref val)).get_Height();
+				val = _currentMapDetails.Value.ContinentRect;
+				outY = y + num6 * ((Rectangle)(ref val)).get_Height();
 			}
+			else
+			{
+				outX = 0.0;
+				outY = 0.0;
+			}
+		}
+
+		public override Task Reload()
+		{
 			lock (_mapDetails)
 			{
-				if (_mapDetails.TryGetValue(map, out var mapDetails))
+				if (_mapDetails.TryGetValue(_rootPackState.CurrentMapId, out var mapDetails))
 				{
-					Rectangle val = mapDetails.ContinentRect;
-					Coordinates2 topLeft = ((Rectangle)(ref val)).get_TopLeft();
-					double x = ((Coordinates2)(ref topLeft)).get_X();
-					double num = eventCoordsX * 39.37007874015748;
-					val = mapDetails.MapRect;
-					topLeft = ((Rectangle)(ref val)).get_TopLeft();
-					double num2 = num - ((Coordinates2)(ref topLeft)).get_X();
-					val = mapDetails.MapRect;
-					double num3 = num2 / ((Rectangle)(ref val)).get_Width();
-					val = mapDetails.ContinentRect;
-					double item = x + num3 * ((Rectangle)(ref val)).get_Width();
-					val = mapDetails.ContinentRect;
-					topLeft = ((Rectangle)(ref val)).get_TopLeft();
-					double y = ((Coordinates2)(ref topLeft)).get_Y();
-					double num4 = eventCoordsY * 39.37007874015748;
-					val = mapDetails.MapRect;
-					topLeft = ((Rectangle)(ref val)).get_TopLeft();
-					double num5 = 0.0 - (num4 - ((Coordinates2)(ref topLeft)).get_Y());
-					val = mapDetails.MapRect;
-					double num6 = num5 / ((Rectangle)(ref val)).get_Height();
-					val = mapDetails.ContinentRect;
-					return (item, y + num6 * ((Rectangle)(ref val)).get_Height());
+					_currentMapDetails = mapDetails;
+				}
+				else
+				{
+					_currentMapDetails = null;
 				}
 			}
-			return (0.0, 0.0);
-		}
-
-		public override async Task Reload()
-		{
+			return Task.CompletedTask;
 		}
 
 		public override void Update(GameTime gameTime)
@@ -157,6 +169,7 @@ namespace BhModule.Community.Pathing.State
 
 		public override Task Unload()
 		{
+			_currentMapDetails = null;
 			return Task.CompletedTask;
 		}
 	}

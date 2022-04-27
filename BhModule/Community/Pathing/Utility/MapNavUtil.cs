@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Blish_HUD.Controls.Extern;
 using Blish_HUD.Controls.Intern;
 using Gw2Sharp.Models;
 using Microsoft.Xna.Framework;
@@ -28,6 +29,24 @@ namespace BhModule.Community.Pathing.Utility
 			while (GameService.Gw2Mumble.get_Tick() - tick < 2)
 			{
 				await Task.Delay(10);
+			}
+		}
+
+		public static bool OpenFullscreenMap()
+		{
+			if (GameService.Gw2Mumble.get_UI().get_IsMapOpen())
+			{
+				return false;
+			}
+			Keyboard.Press((VirtualKeyShort)77, false);
+			return true;
+		}
+
+		public static void CloseFullscreenMap()
+		{
+			if (GameService.Gw2Mumble.get_UI().get_IsMapOpen())
+			{
+				Keyboard.Press((VirtualKeyShort)27, false);
 			}
 		}
 

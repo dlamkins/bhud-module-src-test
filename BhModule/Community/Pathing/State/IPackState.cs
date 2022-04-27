@@ -30,6 +30,8 @@ namespace BhModule.Community.Pathing.State
 
 		EditorStates EditorStates { get; }
 
+		CachedMumbleStates CachedMumbleStates { get; }
+
 		SafeList<IPathingEntity> Entities { get; }
 	}
 }

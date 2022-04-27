@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using BhModule.Community.Pathing.Entity;
 using BhModule.Community.Pathing.LocalHttp;
 using BhModule.Community.Pathing.MarkerPackRepo;
 using BhModule.Community.Pathing.UI.Views;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.Entities;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Blish_HUD.Modules;
@@ -216,6 +218,18 @@ namespace BhModule.Community.Pathing
 			PackInitiator?.Update(gameTime);
 		}
 
+		private void UnloadPathingElements()
+		{
+			IEntity[] array = GameService.Graphics.get_World().get_Entities() as IEntity[];
+			foreach (IEntity entity in array)
+			{
+				if (entity is IPathingEntity)
+				{
+					GameService.Graphics.get_World().RemoveEntity(entity);
+				}
+			}
+		}
+
 		protected override void Unload()
 		{
 			_apiHost?.Close();
@@ -230,6 +244,7 @@ namespace BhModule.Community.Pathing
 			{
 				((Control)settingsWindow).Dispose();
 			}
+			UnloadPathingElements();
 			Instance = null;
 		}
 	}

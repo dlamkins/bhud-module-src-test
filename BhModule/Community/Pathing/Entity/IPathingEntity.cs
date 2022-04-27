@@ -28,7 +28,7 @@ namespace BhModule.Community.Pathing.Entity
 
 		float AnimatedFadeOpacity { get; }
 
-		RectangleF? RenderToMiniMap(SpriteBatch spriteBatch, Rectangle bounds, (double X, double Y) offsets, double scale, float opacity);
+		RectangleF? RenderToMiniMap(SpriteBatch spriteBatch, Rectangle bounds, double offsetX, double offsetY, double scale, float opacity);
 
 		void Focus();
 

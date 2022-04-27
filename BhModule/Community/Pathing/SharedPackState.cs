@@ -51,6 +51,8 @@ namespace BhModule.Community.Pathing
 
 		public EditorStates EditorStates { get; private set; }
 
+		public CachedMumbleStates CachedMumbleStates { get; private set; }
+
 		public SafeList<IPathingEntity> Entities { get; private set; } = new SafeList<IPathingEntity>();
 
 
@@ -92,7 +94,9 @@ namespace BhModule.Community.Pathing
 			ManagedState managedState6 = await uiStates2.Start();
 			EditorStates editorStates2 = (EditorStates = new EditorStates(this));
 			ManagedState managedState7 = await editorStates2.Start();
-			_managedStates = new ManagedState[7] { managedState, managedState2, managedState3, managedState4, managedState5, managedState6, managedState7 };
+			CachedMumbleStates cachedMumbleStates2 = (CachedMumbleStates = new CachedMumbleStates(this));
+			ManagedState managedState8 = await cachedMumbleStates2.Start();
+			_managedStates = new ManagedState[8] { managedState, managedState2, managedState3, managedState4, managedState5, managedState6, managedState7, managedState8 };
 			_initialized = true;
 		}
 
@@ -123,22 +127,24 @@ namespace BhModule.Community.Pathing
 		private static async Task PreloadTextures(IPointOfInterest pointOfInterest)
 		{
 			PointOfInterestType type = pointOfInterest.Type;
-			string texture = type switch
+			var (texture, shouldSample) = type switch
 			{
-				PointOfInterestType.Marker => pointOfInterest.GetAggregatedAttributeValue("iconfile"), 
-				PointOfInterestType.Trail => pointOfInterest.GetAggregatedAttributeValue("texture"), 
+				PointOfInterestType.Marker => (pointOfInterest.GetAggregatedAttributeValue("iconfile"), false), 
+				PointOfInterestType.Trail => (pointOfInterest.GetAggregatedAttributeValue("texture"), true), 
 				_ => throw new SwitchExpressionException((object)type), 
 			};
 			if (texture != null)
 			{
-				await TextureResourceManager.GetTextureResourceManager(pointOfInterest.ResourceManager).PreloadTexture(texture);
+				await TextureResourceManager.GetTextureResourceManager(pointOfInterest.ResourceManager).PreloadTexture(texture, shouldSample);
 			}
 		}
 
-		private async Task InitPointsOfInterest(IList<PointOfInterest> pois)
+		private async Task InitPointsOfInterest(IEnumerable<PointOfInterest> pointsOfInterest)
 		{
-			new List<IPathingEntity>(pois.Count);
-			foreach (PointOfInterest poi in pois)
+			PointOfInterest[] pois = pointsOfInterest.ToArray();
+			new List<IPathingEntity>(pois.Length);
+			PointOfInterest[] array = pois;
+			foreach (PointOfInterest poi in array)
 			{
 				await PreloadTextures(poi);
 				IPathingEntity entity = BuildEntity(poi);

@@ -32,6 +32,8 @@ namespace BhModule.Community.Pathing.State
 
 		public EditorStates EditorStates => _referencePackState.EditorStates;
 
+		public CachedMumbleStates CachedMumbleStates => _referencePackState.CachedMumbleStates;
+
 		public SafeList<IPathingEntity> Entities => _referencePackState.Entities;
 
 		public OverridingPackState(IPackState referencePackState)

@@ -37,7 +37,7 @@ namespace BhModule.Community.Pathing.State
 		protected override Task<bool> Initialize()
 		{
 			string diffDbPath = Path.Combine(DataDirUtil.GetSafeDataDir("user"), "changes.ddb");
-			_editorDatabase = new LiteDatabase(diffDbPath);
+			_editorDatabase = new LiteDatabase("Filename=" + diffDbPath + ";Connection=shared");
 			return Task.FromResult(result: true);
 		}
 
