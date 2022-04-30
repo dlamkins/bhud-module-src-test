@@ -2,9 +2,9 @@ using System;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
-using Blish_HUD.Modules.Managers;
+using GatheringTools.Services;
+using GatheringTools.ToolSearch.Services;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace GatheringTools.LogoutOverlay
 {
@@ -14,14 +14,6 @@ namespace GatheringTools.LogoutOverlay
 
 		private readonly Image _reminderBackgroundImage;
 
-		private readonly Texture2D _reminderBackgroundTexture;
-
-		private readonly Texture2D _tool1Texture;
-
-		private readonly Texture2D _tool2Texture;
-
-		private readonly Texture2D _tool3Texture;
-
 		private readonly Label _reminderTextLabel;
 
 		private readonly Image _tool1Image;
@@ -30,53 +22,49 @@ namespace GatheringTools.LogoutOverlay
 
 		private readonly Image _tool3Image;
 
-		public ReminderContainer(ContentsManager contentsManager)
+		public ReminderContainer(TextureService textureService, SettingService settingService)
 			: this()
 		{
-			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003f: Expected O, but got Unknown
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0063: Expected O, but got Unknown
+			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Expected O, but got Unknown
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a7: Expected O, but got Unknown
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Expected O, but got Unknown
-			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ef: Expected O, but got Unknown
-			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0128: Expected O, but got Unknown
+			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0087: Expected O, but got Unknown
+			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ab: Expected O, but got Unknown
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e4: Expected O, but got Unknown
 			((Control)this).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			_reminderBackgroundTexture = contentsManager.GetTexture("logoutDialogTextArea.png");
-			_tool1Texture = contentsManager.GetTexture("1998933.png");
-			_tool2Texture = contentsManager.GetTexture("1998934.png");
-			_tool3Texture = contentsManager.GetTexture("1998935.png");
-			Image val = new Image(AsyncTexture2D.op_Implicit(_reminderBackgroundTexture));
+			Image val = new Image(AsyncTexture2D.op_Implicit(textureService.ReminderBackgroundTexture));
 			((Control)val).set_Parent((Container)(object)this);
 			((Control)val).set_Size(((Control)this).get_Size());
 			_reminderBackgroundImage = val;
-			Image val2 = new Image(AsyncTexture2D.op_Implicit(_tool1Texture));
+			Image val2 = new Image(AsyncTexture2D.op_Implicit(textureService.Tool1Texture));
 			((Control)val2).set_Parent((Container)(object)this);
 			((Control)val2).set_ClipsBounds(false);
 			_tool1Image = val2;
-			Image val3 = new Image(AsyncTexture2D.op_Implicit(_tool2Texture));
+			Image val3 = new Image(AsyncTexture2D.op_Implicit(textureService.Tool2Texture));
 			((Control)val3).set_Parent((Container)(object)this);
 			((Control)val3).set_ClipsBounds(false);
 			_tool2Image = val3;
-			Image val4 = new Image(AsyncTexture2D.op_Implicit(_tool3Texture));
+			Image val4 = new Image(AsyncTexture2D.op_Implicit(textureService.Tool3Texture));
 			((Control)val4).set_Parent((Container)(object)this);
 			((Control)val4).set_ClipsBounds(false);
 			_tool3Image = val4;
@@ -88,39 +76,35 @@ namespace GatheringTools.LogoutOverlay
 			((Control)val5).set_ClipsBounds(false);
 			((Control)val5).set_Parent((Container)(object)this);
 			_reminderTextLabel = val5;
-			((Control)this).add_Resized((EventHandler<ResizedEventArgs>)delegate
+			UpdateReminderText(settingService.ReminderTextSetting.get_Value());
+			UpdateReminderTextFontSize(settingService.ReminderTextFontSizeIndexSetting.get_Value());
+			UpdateIconSize(settingService.ReminderIconSizeSetting.get_Value());
+			UpdateContainerSizeAndMoveAboveLogoutDialog(settingService.ReminderWindowSizeSetting.get_Value());
+			settingService.ReminderTextFontSizeIndexSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)delegate(object s, ValueChangedEventArgs<int> e)
 			{
-				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-				((Control)_reminderBackgroundImage).set_Size(((Control)this).get_Size());
+				UpdateReminderTextFontSize(e.get_NewValue());
 			});
+			settingService.ReminderTextSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)delegate(object s, ValueChangedEventArgs<string> e)
+			{
+				UpdateReminderText(e.get_NewValue());
+			});
+			settingService.ReminderWindowSizeSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)delegate(object s, ValueChangedEventArgs<int> e)
+			{
+				UpdateContainerSizeAndMoveAboveLogoutDialog(e.get_NewValue());
+			});
+			settingService.ReminderIconSizeSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)delegate(object s, ValueChangedEventArgs<int> e)
+			{
+				UpdateIconSize(e.get_NewValue());
+			});
+			((Control)GameService.Graphics.get_SpriteScreen()).add_Resized((EventHandler<ResizedEventArgs>)OnSpriteScreenResized);
 		}
 
-		protected override void DisposeControl()
+		private void OnSpriteScreenResized(object sender, ResizedEventArgs e)
 		{
-			Texture2D tool1Texture = _tool1Texture;
-			if (tool1Texture != null)
-			{
-				((GraphicsResource)tool1Texture).Dispose();
-			}
-			Texture2D tool3Texture = _tool3Texture;
-			if (tool3Texture != null)
-			{
-				((GraphicsResource)tool3Texture).Dispose();
-			}
-			Texture2D tool2Texture = _tool2Texture;
-			if (tool2Texture != null)
-			{
-				((GraphicsResource)tool2Texture).Dispose();
-			}
-			Texture2D reminderBackgroundTexture = _reminderBackgroundTexture;
-			if (reminderBackgroundTexture != null)
-			{
-				((GraphicsResource)reminderBackgroundTexture).Dispose();
-			}
-			((Container)this).DisposeControl();
+			MoveAboveLogoutDialog();
 		}
 
-		public void MoveAboveLogoutDialog()
+		private void MoveAboveLogoutDialog()
 		{
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
@@ -137,27 +121,29 @@ namespace GatheringTools.LogoutOverlay
 			((Control)this).set_Location(logoutDialogTextCenter - containerCenterToTopLeftCornerOffset);
 		}
 
-		public void UpdateReminderText(string reminderText)
+		private void UpdateReminderText(string reminderText)
 		{
 			_reminderTextLabel.set_Text(reminderText);
 			UpdateChildLocations();
 		}
 
-		public void UpdateContainerSizeAndMoveAboveLogoutDialog(int size)
+		private void UpdateContainerSizeAndMoveAboveLogoutDialog(int size)
 		{
 			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).set_Size(new Point(670 * (5 + size) / 40, 75 * (5 + size) / 40));
+			((Control)_reminderBackgroundImage).set_Size(((Control)this).get_Size());
 			UpdateChildLocations();
 			MoveAboveLogoutDialog();
 		}
 
-		public void UpdateReminderTextFontSize(int fontSizeIndex)
+		private void UpdateReminderTextFontSize(int fontSizeIndex)
 		{
 			_reminderTextLabel.set_Font(FontService.Fonts[fontSizeIndex]);
 			UpdateChildLocations();
 		}
 
-		public void UpdateIconSize(int iconSize)
+		private void UpdateIconSize(int iconSize)
 		{
 			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
@@ -189,12 +175,18 @@ namespace GatheringTools.LogoutOverlay
 			((Control)_tool3Image).set_Location(new Point(tool3OffsetX, toolOffsetY));
 		}
 
-		public static Point GetLogoutDialogTextCenter(int screenWidth, int screenHeight)
+		private static Point GetLogoutDialogTextCenter(int screenWidth, int screenHeight)
 		{
 			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 			int num = (int)((float)screenWidth * 0.5f);
 			int y = (int)((float)screenHeight * 0.505f);
 			return new Point(num, y);
+		}
+
+		protected override void DisposeControl()
+		{
+			((Control)GameService.Graphics.get_SpriteScreen()).remove_Resized((EventHandler<ResizedEventArgs>)OnSpriteScreenResized);
+			((Container)this).DisposeControl();
 		}
 	}
 }
