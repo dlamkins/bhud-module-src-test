@@ -981,7 +981,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			}
 			catch (Exception ex)
 			{
-				Logger.Error(ex, "Unknown exception getting current map fish");
+				Logger.Warn(ex, "Unknown exception getting current map fish");
 			}
 			finally
 			{

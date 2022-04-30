@@ -247,20 +247,20 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
 			if (!HideLabel)
 			{
 				_font = GameService.Content.GetFont((FontFace)0, Font_Size, (FontStyle)0);
 				TimeSpan timeTilNextPhase = TyriaTime.TimeTilNextPhase(FishingBuddyModule._currentMap);
+				string timeStr = $"{(int)timeTilNextPhase.TotalMinutes:D2}:{timeTilNextPhase:ss}";
+				((Control)this).set_Size(new Point(Math.Max((int)_font.MeasureString(timeStr).Width, ((Control)this).get_Size().X), (int)_font.MeasureString(timeStr).Height + FishingBuddyModule._timeOfDayImgSize.get_Value() + 40));
 				if (!(timeTilNextPhase <= TimeSpan.Zero))
 				{
-					string timeStr = $"{(int)timeTilNextPhase.TotalMinutes:D2}:{timeTilNextPhase:ss}";
-					((Control)this).set_Size(new Point(Math.Max((int)_font.MeasureString(timeStr).Width, ((Control)this).get_Size().X), (int)_font.MeasureString(timeStr).Height + FishingBuddyModule._timeOfDayImgSize.get_Value() + 40));
 					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, timeStr, _font, new Rectangle(0, LabelVerticalAlignment, ((Control)this).get_Width(), ((Control)this).get_Height()), Color.get_White(), false, true, 1, (HorizontalAlignment)1, (VerticalAlignment)0);
 				}
 			}

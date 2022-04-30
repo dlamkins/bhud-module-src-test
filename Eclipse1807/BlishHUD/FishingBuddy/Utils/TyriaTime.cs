@@ -41,10 +41,6 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 
 		public static readonly DateTime centralNightStartUTC = new DateTime(2000, 1, 1, 0, 45, 0);
 
-		public static readonly DateTime _0h = new DateTime(2000, 1, 1, 0, 0, 0);
-
-		public static readonly DateTime _1h = new DateTime(2000, 1, 1, 1, 0, 0);
-
 		public static readonly List<int> CanthaMaps = new List<int> { 1442, 1419, 1444, 1462, 1438, 1452, 1428, 1422 };
 
 		public static readonly int CanthaRegionId = 37;
@@ -136,23 +132,13 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 				}
 				if (TyriaTime >= canthaDayStart && TyriaTime < canthaDuskStart)
 				{
-					if (nowish >= canthaDayStartUTC && nowish < _1h)
-					{
-						timeTilNextPhase = _1h.Subtract(nowish);
-						return timeTilNextPhase + canthaDuskStartUTC.Subtract(_0h);
-					}
-					return canthaDuskStartUTC.Subtract(nowish);
+					return (nowish >= canthaDayStartUTC && nowish < canthaDayStartUTC.AddMinutes(20.0)) ? canthaDayStartUTC.AddMinutes(55.0).Subtract(nowish) : canthaDuskStartUTC.Subtract(nowish);
 				}
 				if (TyriaTime >= canthaDuskStart && TyriaTime < canthaNightStart)
 				{
 					return canthaNightStartUTC.Subtract(nowish);
 				}
-				if (nowish >= canthaNightStartUTC && nowish < _1h)
-				{
-					timeTilNextPhase = _1h.Subtract(nowish);
-					return timeTilNextPhase + canthaDawnStartUTC.Subtract(_0h);
-				}
-				return canthaDuskStartUTC.Subtract(nowish);
+				return (nowish >= canthaNightStartUTC && nowish < canthaNightStartUTC.AddMinutes(20.0)) ? canthaNightStartUTC.AddMinutes(55.0).Subtract(nowish) : canthaDuskStartUTC.Subtract(nowish);
 			}
 			if (TyriaTime >= centralDawnStart && TyriaTime < centralDayStart)
 			{
@@ -160,23 +146,13 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 			}
 			if (TyriaTime >= centralDayStart && TyriaTime < centralDuskStart)
 			{
-				if (nowish >= centralDayStartUTC && nowish < _1h)
-				{
-					timeTilNextPhase = _1h.Subtract(nowish);
-					return timeTilNextPhase + centralDuskStartUTC.Subtract(_0h);
-				}
-				return centralDuskStartUTC.Subtract(nowish);
+				return (nowish >= centralDayStartUTC && nowish < centralDayStartUTC.AddMinutes(30.0)) ? centralDayStartUTC.AddMinutes(70.0).Subtract(nowish) : centralDuskStartUTC.Subtract(nowish);
 			}
 			if (TyriaTime >= centralDuskStart && TyriaTime < centralNightStart)
 			{
 				return centralNightStartUTC.Subtract(nowish);
 			}
-			if (nowish >= centralNightStartUTC && nowish < _1h)
-			{
-				timeTilNextPhase = _1h.Subtract(nowish);
-				return timeTilNextPhase + centralDawnStartUTC.Subtract(_0h);
-			}
-			return centralDawnStartUTC.Subtract(nowish);
+			return (nowish >= centralNightStartUTC && nowish < centralNightStartUTC.AddMinutes(15.0)) ? centralNightStartUTC.AddMinutes(40.0).Subtract(nowish) : centralDawnStartUTC.Subtract(nowish);
 		}
 	}
 }
