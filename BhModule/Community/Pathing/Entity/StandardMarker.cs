@@ -867,11 +867,11 @@ namespace BhModule.Community.Pathing.Entity
 			}
 			if (collection.TryGetSubset("behavior", out var attributes8))
 			{
-				AddBehavior(StandardBehaviorFilter.BuildFromAttributes(attributes8, _packState, this));
+				AddBehavior(StandardBehaviorFilter.BuildFromAttributes(attributes8, this, _packState));
 			}
 			if (collection.TryGetSubset("achievement", out var attributes7))
 			{
-				AddBehavior(AchievementFilter.BuildFromAttributes(attributes7, _packState));
+				AddBehavior(AchievementFilter.BuildFromAttributes(attributes7, this, _packState));
 			}
 			if (collection.TryGetSubset("info", out var attributes6))
 			{

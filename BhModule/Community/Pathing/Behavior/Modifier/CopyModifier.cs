@@ -9,7 +9,7 @@ using TmfLib.Prototype;
 
 namespace BhModule.Community.Pathing.Behavior.Modifier
 {
-	public class CopyModifier : Behavior<StandardMarker>, ICanInteract
+	public class CopyModifier : Behavior<StandardMarker>, ICanInteract, ICanFocus
 	{
 		public const string PRIMARY_ATTR_NAME = "copy";
 
@@ -54,6 +54,16 @@ namespace BhModule.Community.Pathing.Behavior.Modifier
 					ScreenNotification.ShowNotification(string.Format(CopyMessage, CopyValue), (NotificationType)0, (Texture2D)null, 2);
 				}
 			});
+		}
+
+		public void Focus()
+		{
+			_packState.UiStates.Interact.ShowInteract(_pathingEntity, "Copy '" + CopyValue + "' to clipboard {0}");
+		}
+
+		public void Unfocus()
+		{
+			_packState.UiStates.Interact.DisconnectInteract(_pathingEntity);
 		}
 	}
 }

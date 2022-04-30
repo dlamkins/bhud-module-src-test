@@ -102,20 +102,20 @@ namespace BhModule.Community.Pathing.UI.Tooltips
 			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
 			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0186: Expected O, but got Unknown
+			//IL_0176: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0187: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0193: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d7: Expected O, but got Unknown
+			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019a: Expected O, but got Unknown
+			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01eb: Expected O, but got Unknown
 			buildPanel.set_HeightSizingMode((SizingMode)1);
 			buildPanel.set_WidthSizingMode((SizingMode)1);
 			Image val = new Image();
@@ -143,7 +143,7 @@ namespace BhModule.Community.Pathing.UI.Tooltips
 			((Control)val3).set_Padding(new Thickness(0f, 8f, 0f, 0f));
 			val3.set_HorizontalAlignment((HorizontalAlignment)0);
 			val3.set_VerticalAlignment((VerticalAlignment)1);
-			val3.set_TextColor(StandardColors.get_DisabledText());
+			val3.set_TextColor(Color.FromNonPremultiplied(204, 204, 204, 255));
 			val3.set_ShowShadow(true);
 			val3.set_WrapText(true);
 			((Control)val3).set_Parent(buildPanel);

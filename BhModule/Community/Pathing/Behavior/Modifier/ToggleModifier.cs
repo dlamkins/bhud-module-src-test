@@ -6,18 +6,18 @@ using TmfLib.Prototype;
 
 namespace BhModule.Community.Pathing.Behavior.Modifier
 {
-	public class ToggleModifier : Behavior<StandardMarker>, ICanInteract
+	public class ToggleModifier : Behavior<StandardMarker>, ICanInteract, ICanFocus
 	{
 		public const string PRIMARY_ATTR_NAME = "toggle";
 
-		private readonly IPackState _packstate;
+		private readonly IPackState _packState;
 
 		public PathingCategory Category { get; set; }
 
 		public ToggleModifier(PathingCategory category, StandardMarker marker, IPackState packState)
 			: base(marker)
 		{
-			_packstate = packState;
+			_packState = packState;
 			Category = category;
 		}
 
@@ -34,8 +34,23 @@ namespace BhModule.Community.Pathing.Behavior.Modifier
 		{
 			if (!_pathingEntity.BehaviorFiltered)
 			{
-				_packstate.CategoryStates.SetInactive(Category, !_packstate.CategoryStates.GetCategoryInactive(Category));
+				_packState.CategoryStates.SetInactive(Category, !_packState.CategoryStates.GetCategoryInactive(Category));
 			}
+		}
+
+		public void Focus()
+		{
+			_packState.UiStates.Interact.ShowInteract(_pathingEntity, "Toggle '" + Category.Namespace + "' category {0}");
+		}
+
+		public void Unfocus()
+		{
+			_packState.UiStates.Interact.DisconnectInteract(_pathingEntity);
+		}
+
+		public override void Unload()
+		{
+			_packState.UiStates.Interact.DisconnectInteract(_pathingEntity);
 		}
 	}
 }

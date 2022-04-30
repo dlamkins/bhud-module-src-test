@@ -63,6 +63,7 @@ namespace BhModule.Community.Pathing.Utility
 			markerPackPkg.IsDownloading = true;
 			markerPackPkg.DownloadError = null;
 			markerPackPkg.DownloadProgress = 0;
+			string finalPath = Path.Combine(DataDirUtil.MarkerDir, markerPackPkg.FileName);
 			string tempPackDownloadDestination = Path.GetTempFileName();
 			try
 			{
@@ -75,16 +76,22 @@ namespace BhModule.Community.Pathing.Utility
 				};
 				await webClient.DownloadFileTaskAsync(markerPackPkg.Download, tempPackDownloadDestination);
 			}
-			catch (Exception ex2)
+			catch (Exception ex3)
 			{
 				markerPackPkg.DownloadError = "Marker pack download failed.";
-				Logger.Error(ex2, "Failed to download marker pack " + markerPackPkg.Name + " from " + markerPackPkg.Download + " to " + tempPackDownloadDestination + ".");
+				if (ex3 is WebException)
+				{
+					Logger.Warn(ex3, "Failed to download marker pack " + markerPackPkg.Name + " from " + markerPackPkg.Download + " to " + tempPackDownloadDestination + ".");
+				}
+				else
+				{
+					Logger.Error(ex3, "Failed to download marker pack " + markerPackPkg.Name + " from " + markerPackPkg.Download + " to " + tempPackDownloadDestination + ".");
+				}
 				progress.Report(null);
 				funcOnComplete(markerPackPkg, arg2: false);
 				return;
 			}
 			progress.Report("Finalizing new pack download...");
-			string finalPath = Path.Combine(DataDirUtil.MarkerDir, markerPackPkg.FileName);
 			try
 			{
 				bool needsInit = true;
@@ -114,10 +121,10 @@ namespace BhModule.Community.Pathing.Utility
 					newPack.ReleaseLocks();
 				}
 			}
-			catch (InvalidDataException ex3)
+			catch (InvalidDataException ex2)
 			{
 				markerPackPkg.DownloadError = "Marker pack download is corrupt.";
-				Logger.Warn((Exception)ex3, "Failed downloading marker pack " + markerPackPkg.Name + " from " + tempPackDownloadDestination + " (it appears to be corrupt).");
+				Logger.Warn((Exception)ex2, "Failed downloading marker pack " + markerPackPkg.Name + " from " + tempPackDownloadDestination + " (it appears to be corrupt).");
 			}
 			catch (Exception ex)
 			{

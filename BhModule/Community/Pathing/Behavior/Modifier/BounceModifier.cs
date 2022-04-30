@@ -10,6 +10,12 @@ namespace BhModule.Community.Pathing.Behavior.Modifier
 {
 	public class BounceModifier : Behavior<StandardMarker>, ICanFocus
 	{
+		public enum BounceBehavior
+		{
+			Bounce,
+			Rise
+		}
+
 		public const string PRIMARY_ATTR_NAME = "bounce";
 
 		private const string ATTR_DELAY = "bounce-delay";
@@ -22,6 +28,8 @@ namespace BhModule.Community.Pathing.Behavior.Modifier
 
 		private readonly float _originalVerticalOffset;
 
+		private const BounceBehavior DEFAULT_BOUNCEBEHAVIOR = BounceBehavior.Bounce;
+
 		private const float DEFAULT_BOUNCEDELAY = 0f;
 
 		private const float DEFAULT_BOUNCEHEIGHT = 2f;
@@ -30,16 +38,19 @@ namespace BhModule.Community.Pathing.Behavior.Modifier
 
 		private Tween _bounceAnimation;
 
+		public BounceBehavior Behavior { get; set; }
+
 		public float BounceDelay { get; set; }
 
 		public float BounceHeight { get; set; }
 
 		public float BounceDuration { get; set; }
 
-		public BounceModifier(float delay, float height, float duration, StandardMarker marker, IPackState packState)
+		public BounceModifier(BounceBehavior bounceBehavior, float delay, float height, float duration, StandardMarker marker, IPackState packState)
 			: base(marker)
 		{
 			_packState = packState;
+			Behavior = bounceBehavior;
 			BounceDelay = delay;
 			BounceHeight = height;
 			BounceDuration = duration;
@@ -48,32 +59,41 @@ namespace BhModule.Community.Pathing.Behavior.Modifier
 
 		public static IBehavior BuildFromAttributes(AttributeCollection attributes, StandardMarker marker, IPackState packState)
 		{
+			IAttribute behaviorAttr;
 			IAttribute delayAttr;
 			IAttribute heightAttr;
 			IAttribute durationAttr;
-			return new BounceModifier(attributes.TryGetAttribute("bounce-delay", out delayAttr) ? delayAttr.GetValueAsFloat() : 0f, attributes.TryGetAttribute("bounce-height", out heightAttr) ? heightAttr.GetValueAsFloat(2f) : 2f, attributes.TryGetAttribute("bounce-duration", out durationAttr) ? durationAttr.GetValueAsFloat(1f) : 1f, marker, packState);
+			return new BounceModifier(attributes.TryGetAttribute("bounce", out behaviorAttr) ? behaviorAttr.GetValueAsEnum<BounceBehavior>() : BounceBehavior.Bounce, attributes.TryGetAttribute("bounce-delay", out delayAttr) ? delayAttr.GetValueAsFloat() : 0f, attributes.TryGetAttribute("bounce-height", out heightAttr) ? heightAttr.GetValueAsFloat(2f) : 2f, attributes.TryGetAttribute("bounce-duration", out durationAttr) ? durationAttr.GetValueAsFloat(1f) : 1f, marker, packState);
 		}
 
 		public void Focus()
 		{
-			if (_packState.UserConfiguration.PackAllowMarkersToAnimate.get_Value())
+			if (!_packState.UserConfiguration.PackAllowMarkersToAnimate.get_Value())
 			{
-				Tween bounceAnimation = _bounceAnimation;
-				if (bounceAnimation != null)
+				return;
+			}
+			Tween bounceAnimation = _bounceAnimation;
+			if (bounceAnimation != null)
+			{
+				bounceAnimation.CancelAndComplete();
+			}
+			if (!_pathingEntity.BehaviorFiltered)
+			{
+				_bounceAnimation = ((TweenerImpl)GameService.Animation.get_Tweener()).Tween<StandardMarker>(_pathingEntity, (object)new
 				{
-					bounceAnimation.CancelAndComplete();
-				}
-				if (!_pathingEntity.BehaviorFiltered)
+					HeightOffset = _originalVerticalOffset + BounceHeight
+				}, BounceDuration, BounceDelay, true).From((object)new
 				{
-					_bounceAnimation = ((TweenerImpl)GameService.Animation.get_Tweener()).Tween<StandardMarker>(_pathingEntity, (object)new
-					{
-						HeightOffset = _originalVerticalOffset + BounceHeight
-					}, BounceDuration, BounceDelay, true).From((object)new
-					{
-						HeightOffset = _originalVerticalOffset
-					}).Ease((Func<float, float>)Ease.QuadInOut)
-						.Repeat(-1)
-						.Reflect();
+					HeightOffset = _originalVerticalOffset
+				});
+				switch (Behavior)
+				{
+				case BounceBehavior.Bounce:
+					_bounceAnimation = _bounceAnimation.Ease((Func<float, float>)Ease.QuadInOut).Repeat(-1).Reflect();
+					break;
+				case BounceBehavior.Rise:
+					_bounceAnimation = _bounceAnimation.Ease((Func<float, float>)Ease.QuartInOut);
+					break;
 				}
 			}
 		}

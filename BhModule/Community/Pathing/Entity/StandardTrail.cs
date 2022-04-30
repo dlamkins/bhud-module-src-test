@@ -253,26 +253,28 @@ namespace BhModule.Community.Pathing.Entity
 			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
 			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0155: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0187: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cd: Expected O, but got Unknown
+			//IL_015c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0189: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e3: Expected O, but got Unknown
 			Vector3[] pointsArr = (points as Vector3[]) ?? points.ToArray();
 			VertexPositionColorTexture[] verts = (VertexPositionColorTexture[])(object)new VertexPositionColorTexture[pointsArr.Length * 2];
 			float pastDistance = distance;
@@ -290,8 +292,8 @@ namespace BhModule.Community.Pathing.Entity
 				pastDistance -= Vector3.Distance(curPoint, nextPoint);
 				curPoint = nextPoint;
 			}
-			Vector3 fleftPoint = curPoint + offset * 0.508f;
-			Vector3 frightPoint = curPoint + offset * -0.508f;
+			Vector3 fleftPoint = curPoint + offset * 0.508f * TrailScale;
+			Vector3 frightPoint = curPoint + offset * -0.508f * TrailScale;
 			verts[pointsArr.Length * 2 - 1] = new VertexPositionColorTexture(fleftPoint, Color.get_White(), new Vector2(0f, pastDistance / 1.016f - 1f));
 			verts[pointsArr.Length * 2 - 2] = new VertexPositionColorTexture(frightPoint, Color.get_White(), new Vector2(1f, pastDistance / 1.016f - 1f));
 			VertexBuffer val = new VertexBuffer(GameService.Graphics.get_GraphicsDevice(), VertexPositionColorTexture.VertexDeclaration, verts.Length, (BufferUsage)1);
@@ -594,7 +596,7 @@ namespace BhModule.Community.Pathing.Entity
 			}
 			if (collection.TryGetSubset("achievement", out var attributes))
 			{
-				AddBehavior(AchievementFilter.BuildFromAttributes(attributes, _packState));
+				AddBehavior(AchievementFilter.BuildFromAttributes(attributes, this, _packState));
 			}
 		}
 

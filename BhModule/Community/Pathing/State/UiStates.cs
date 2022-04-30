@@ -19,6 +19,8 @@ namespace BhModule.Community.Pathing.State
 
 		public FlatMap Map { get; private set; }
 
+		public SmallInteract Interact { get; private set; }
+
 		public UiStates(IRootPackState rootPackState)
 			: base(rootPackState)
 		{
@@ -118,10 +120,18 @@ namespace BhModule.Community.Pathing.State
 			UpdateInfoText();
 		}
 
+		private void InitInteract()
+		{
+			SmallInteract smallInteract = new SmallInteract(_rootPackState);
+			((Control)smallInteract).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			Interact = smallInteract;
+		}
+
 		protected override Task<bool> Initialize()
 		{
 			InitInfo();
 			InitMap();
+			InitInteract();
 			return Task.FromResult(result: true);
 		}
 
@@ -136,6 +146,11 @@ namespace BhModule.Community.Pathing.State
 			}
 			_infoList.ToList().ForEach(RemoveInfoString);
 			_infoList.Clear();
+			SmallInteract interact = Interact;
+			if (interact != null)
+			{
+				((Control)interact).Dispose();
+			}
 			return Task.CompletedTask;
 		}
 
