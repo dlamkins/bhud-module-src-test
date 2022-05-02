@@ -13,10 +13,12 @@
   <ItemGroup />
   <ItemGroup>
     <Reference Include="Blish HUD" />
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="Newtonsoft.Json" />
     <Reference Include="System.Core" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="MonoGame.Extended" />
+    <Reference Include="System.IO.Compression.FileSystem" />
   </ItemGroup>
 </Project>

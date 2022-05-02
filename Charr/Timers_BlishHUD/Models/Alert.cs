@@ -4,6 +4,7 @@ using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Charr.Timers_BlishHUD.Controls;
+using Charr.Timers_BlishHUD.Controls.BigWigs;
 using Charr.Timers_BlishHUD.Pathing.Content;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
@@ -78,7 +79,7 @@ namespace Charr.Timers_BlishHUD.Models
 			{
 				if (activePanels != null)
 				{
-					foreach (KeyValuePair<float, AlertPanel> activePanel in activePanels)
+					foreach (KeyValuePair<float, IAlertPanel> activePanel in activePanels)
 					{
 						activePanel.Value.ShouldShow = value;
 					}
@@ -98,7 +99,7 @@ namespace Charr.Timers_BlishHUD.Models
 
 		public AsyncTexture2D Icon { get; set; }
 
-		public Dictionary<float, AlertPanel> activePanels { get; set; }
+		public Dictionary<float, IAlertPanel> activePanels { get; set; }
 
 		public string Initialize(PathableResourceManager resourceManager)
 		{
@@ -128,7 +129,7 @@ namespace Charr.Timers_BlishHUD.Models
 			{
 				Icon = AsyncTexture2D.op_Implicit(resourceManager.LoadTexture(IconString));
 			}
-			activePanels = new Dictionary<float, AlertPanel>();
+			activePanels = new Dictionary<float, IAlertPanel>();
 			return null;
 		}
 
@@ -157,26 +158,38 @@ namespace Charr.Timers_BlishHUD.Models
 			}
 		}
 
-		private AlertPanel CreatePanel()
+		private IAlertPanel CreatePanel()
 		{
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-			AlertPanel alertPanel = new AlertPanel();
-			((Control)alertPanel).set_Parent((Container)(object)TimersModule.ModuleInstance._alertContainer);
-			((FlowPanel)alertPanel).set_ControlPadding(new Vector2(8f, 8f));
-			((FlowPanel)alertPanel).set_PadLeftBeforeControl(true);
-			((FlowPanel)alertPanel).set_PadTopBeforeControl(true);
-			alertPanel.Text = (string.IsNullOrEmpty(WarningText) ? AlertText : WarningText);
-			alertPanel.TextColor = (string.IsNullOrEmpty(WarningText) ? AlertColor : WarningColor);
-			alertPanel.Icon = AsyncTexture2D.op_Implicit(Texture2DExtension.Duplicate(AsyncTexture2D.op_Implicit(Icon)));
-			alertPanel.FillColor = Fill;
-			alertPanel.MaxFill = (string.IsNullOrEmpty(WarningText) ? 0f : WarningDuration);
-			alertPanel.CurrentFill = 0f;
-			alertPanel.ShouldShow = ShowAlert;
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			IAlertPanel alertPanel3;
+			if (TimersModule.ModuleInstance._alertSizeSetting.get_Value() != AlertType.BigWigStyle)
+			{
+				AlertPanel alertPanel = new AlertPanel();
+				((FlowPanel)alertPanel).set_ControlPadding(new Vector2(8f, 8f));
+				((FlowPanel)alertPanel).set_PadLeftBeforeControl(true);
+				((FlowPanel)alertPanel).set_PadTopBeforeControl(true);
+				IAlertPanel alertPanel2 = alertPanel;
+				alertPanel3 = alertPanel2;
+			}
+			else
+			{
+				IAlertPanel alertPanel2 = new BigWigAlert();
+				alertPanel3 = alertPanel2;
+			}
+			alertPanel3.Text = (string.IsNullOrEmpty(WarningText) ? AlertText : WarningText);
+			alertPanel3.TextColor = (string.IsNullOrEmpty(WarningText) ? AlertColor : WarningColor);
+			alertPanel3.Icon = AsyncTexture2D.op_Implicit(Texture2DExtension.Duplicate(AsyncTexture2D.op_Implicit(Icon)));
+			alertPanel3.FillColor = Fill;
+			alertPanel3.MaxFill = (string.IsNullOrEmpty(WarningText) ? 0f : WarningDuration);
+			alertPanel3.CurrentFill = 0f;
+			alertPanel3.ShouldShow = ShowAlert;
+			((Control)alertPanel3).set_Parent((Container)(object)TimersModule.ModuleInstance._alertContainer);
 			TimersModule.ModuleInstance._alertContainer.UpdateDisplay();
-			return alertPanel;
+			return alertPanel3;
 		}
 
 		public void Update(float elapsedTime)
@@ -239,7 +252,7 @@ namespace Charr.Timers_BlishHUD.Models
 			{
 				return;
 			}
-			foreach (KeyValuePair<float, AlertPanel> activePanel in activePanels)
+			foreach (KeyValuePair<float, IAlertPanel> activePanel in activePanels)
 			{
 				activePanel.Value.Dispose();
 			}
