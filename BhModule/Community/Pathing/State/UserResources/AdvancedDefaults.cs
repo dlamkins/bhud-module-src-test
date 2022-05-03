@@ -20,5 +20,11 @@ namespace BhModule.Community.Pathing.State.UserResources
 
 		public bool InteractGearAnimation { get; set; } = true;
 
+
+		public int InfoWindowXOffsetPixels { get; set; } = 300;
+
+
+		public int InfoWindowYOffsetPixels { get; set; } = 200;
+
 	}
 }

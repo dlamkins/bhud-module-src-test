@@ -255,10 +255,10 @@ namespace BhModule.Community.Pathing.UI.Controls
 			//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0223: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0250: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0255: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0225: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0257: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025c: Unknown result type (might be due to invalid IL or missing references)
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _textureHeroBackground, new Rectangle(-9, -13, _textureHeroBackground.get_Width(), _textureHeroBackground.get_Height()), Color.get_White() * GetHoverFade());
 			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, _markerPackPkg.Name.Replace(" ", "  "), GameService.Content.get_DefaultFont18(), new Rectangle(20, 10, bounds.Width - 40, 40), Colors.Chardonnay, false, (HorizontalAlignment)0, (VerticalAlignment)1);
 			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, _markerPackPkg.Description.Replace("\\n", "\n"), GameService.Content.get_DefaultFont14(), new Rectangle(20, 50, bounds.Width - 20, bounds.Height - 200), StandardColors.get_Default(), true, (HorizontalAlignment)0, (VerticalAlignment)0);
@@ -274,7 +274,7 @@ namespace BhModule.Community.Pathing.UI.Controls
 			}
 			if (_markerPackPkg.IsDownloading)
 			{
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, $"{_markerPackPkg.DownloadProgress}%", GameService.Content.get_DefaultFont14(), ((Control)_downloadButton).get_LocalBounds(), StandardColors.get_Default(), false, (HorizontalAlignment)1, (VerticalAlignment)1);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, $"{Math.Min(_markerPackPkg.DownloadProgress, 99)}%", GameService.Content.get_DefaultFont14(), ((Control)_downloadButton).get_LocalBounds(), StandardColors.get_Default(), false, (HorizontalAlignment)1, (VerticalAlignment)1);
 			}
 			else if (_isUpToDate)
 			{

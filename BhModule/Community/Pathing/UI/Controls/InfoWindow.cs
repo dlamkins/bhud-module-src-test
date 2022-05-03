@@ -1,4 +1,5 @@
 using System;
+using BhModule.Community.Pathing.State;
 using BhModule.Community.Pathing.UI.Effects;
 using Blish_HUD;
 using Blish_HUD.Controls;
@@ -23,6 +24,8 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		private double _fadeCompletion;
 
+		private readonly IPackState _packState;
+
 		private Texture2D _croppedWindow = _windowTexture;
 
 		private Texture2D _croppedMask = _windowMask;
@@ -36,16 +39,17 @@ namespace BhModule.Community.Pathing.UI.Controls
 			_windowClose = PathingModule.Instance.ContentsManager.GetTexture("png\\controls\\156106.png");
 		}
 
-		public InfoWindow()
+		public InfoWindow(IPackState packState)
 			: this()
 		{
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Expected O, but got Unknown
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a5: Expected O, but got Unknown
+			_packState = packState;
 			((Control)this).set_Size(new Point(512, 512));
-			((Control)this).set_Location(new Point(300, 200));
+			((Control)this).set_Location(new Point(_packState.UserResourceStates.Advanced.InfoWindowXOffsetPixels, _packState.UserResourceStates.Advanced.InfoWindowYOffsetPixels));
 			((Container)this).set_HeightSizingMode((SizingMode)1);
 			((Container)this).set_AutoSizePadding(new Point(40, 70));
 			((Control)this).set_SpriteBatchParameters(new SpriteBatchParameters((SpriteSortMode)1, BlendState.Additive, (SamplerState)null, (DepthStencilState)null, (RasterizerState)null, (Effect)(object)AlphaMaskEffect.SharedInstance, (Matrix?)null));

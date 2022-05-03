@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using BhModule.Community.Pathing.MarkerPackRepo;
 using Blish_HUD;
 using TmfLib;
+using TmfLib.Writer;
 
 namespace BhModule.Community.Pathing.Utility
 {
@@ -54,6 +55,29 @@ namespace BhModule.Community.Pathing.Utility
 				markerPackPkg.DownloadError = "Failed to delete marker pack.";
 			}
 			markerPackPkg.IsDownloading = false;
+		}
+
+		private static async Task<string> OptimizePack(string downloadedPack)
+		{
+			string dir = Path.GetDirectoryName(downloadedPack);
+			string file = "optimized-" + Path.GetFileName(downloadedPack);
+			try
+			{
+				Pack pack = Pack.FromArchivedMarkerPack(downloadedPack);
+				IPackCollection packCollection = await pack.LoadAllAsync();
+				await new PackWriter(new PackWriterSettings
+				{
+					PackOutputMethod = PackWriterSettings.OutputMethod.Archive
+				}).WriteAsync(pack, packCollection, dir, file);
+				pack.ReleaseLocks();
+			}
+			catch (Exception e)
+			{
+				Logger.Error(e, "Failed to optimize marker pack.");
+				return downloadedPack;
+			}
+			File.Delete(downloadedPack);
+			return Path.Combine(dir, file);
 		}
 
 		private static async Task BeginPackDownload(MarkerPackPkg markerPackPkg, IProgress<string> progress, Action<MarkerPackPkg, bool> funcOnComplete)
@@ -104,6 +128,8 @@ namespace BhModule.Community.Pathing.Utility
 					}
 					val.Dispose();
 				}
+				progress.Report("Optimizing the pack...");
+				tempPackDownloadDestination = await OptimizePack(tempPackDownloadDestination);
 				if (File.Exists(finalPath))
 				{
 					needsInit = false;
