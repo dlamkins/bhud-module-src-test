@@ -47,7 +47,7 @@ namespace Estreya.BlishHUD.EventTable.State
 			return completedWorldbosses.Contains(apiCode);
 		}
 
-		public override async Task Reload()
+		public override async Task InternalReload()
 		{
 			await UpdateCompletedWorldbosses(null);
 		}
@@ -123,7 +123,7 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		protected override void InternalUpdate(GameTime gameTime)
 		{
-			UpdateCadenceUtil.UpdateAsyncWithCadence(UpdateCompletedWorldbosses, gameTime, updateInterval.TotalMilliseconds, ref timeSinceUpdate);
+			UpdateUtil.UpdateAsync(UpdateCompletedWorldbosses, gameTime, updateInterval.TotalMilliseconds, ref timeSinceUpdate);
 		}
 
 		protected override async Task Load()

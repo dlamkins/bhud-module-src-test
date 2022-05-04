@@ -5,20 +5,18 @@ using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
-using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
 using Estreya.BlishHUD.EventTable.Extensions;
 using Estreya.BlishHUD.EventTable.Resources;
-using Estreya.BlishHUD.EventTable.UI.Views.Settings.Controls;
+using Estreya.BlishHUD.EventTable.UI.Views.Controls;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
-using MonoGame.Extended.BitmapFonts;
 
 namespace Estreya.BlishHUD.EventTable.UI.Views
 {
-	public abstract class BaseSettingsView : View
+	public abstract class BaseSettingsView : BaseView
 	{
 		private const int LEFT_PADDING = 20;
 
@@ -30,8 +28,6 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private static readonly Logger Logger = Logger.GetLogger<BaseSettingsView>();
 
-		private CancellationTokenSource ErrorCancellationTokenSource = new CancellationTokenSource();
-
 		protected ModuleSettings ModuleSettings { get; set; }
 
 		private static IEnumerable<Color> Colors { get; set; }
@@ -42,12 +38,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private static ColorPicker ColorPicker { get; set; }
 
-		private Container BuildPanel { get; set; }
-
-		private Panel ErrorPanel { get; set; }
-
 		public BaseSettingsView(ModuleSettings settings)
-			: this()
 		{
 			ModuleSettings = settings;
 		}
@@ -101,7 +92,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			return await InternalLoad(progress);
 		}
 
-		protected override void Build(Container buildPanel)
+		protected sealed override void InternalBuild(Panel parent)
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
@@ -119,7 +110,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006e: Expected O, but got Unknown
-			Rectangle bounds = buildPanel.get_ContentRegion();
+			Rectangle bounds = ((Container)parent).get_ContentRegion();
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Size(((Rectangle)(ref bounds)).get_Size());
 			val.set_FlowDirection((ControlFlowDirection)3);
@@ -128,28 +119,12 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Container)val).set_WidthSizingMode((SizingMode)2);
 			((Container)val).set_HeightSizingMode((SizingMode)2);
 			((Container)val).set_AutoSizePadding(new Point(0, 15));
-			((Control)val).set_Parent(buildPanel);
-			FlowPanel parentPanel = (FlowPanel)(object)(BuildPanel = (Container)val);
-			RegisterErrorPanel(buildPanel);
-			InternalBuild((Panel)(object)parentPanel);
-		}
-
-		protected abstract Task<bool> InternalLoad(IProgress<string> progress);
-
-		protected abstract void InternalBuild(Panel parent);
-
-		protected void RenderEmptyLine(Panel parent)
-		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			ViewContainer val = new ViewContainer();
-			((Container)val).set_WidthSizingMode((SizingMode)2);
-			((Container)val).set_HeightSizingMode((SizingMode)1);
 			((Control)val).set_Parent((Container)(object)parent);
-			val.Show((IView)(object)new EmptySettingsLineView(25));
+			FlowPanel parentPanel = val;
+			BuildView((Panel)(object)parentPanel);
 		}
+
+		protected abstract void BuildView(Panel parent);
 
 		protected Panel RenderSetting<T>(Panel parent, SettingEntry<T> setting)
 		{
@@ -158,7 +133,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((SettingEntry)setting).get_SettingType();
 			try
 			{
-				Control obj = ControlProvider.Create<T>(setting, HandleValidation, 170, -1, ((Control)label).get_Right() + 20, 0);
+				Control obj = ControlHandler.CreateFromSetting<T>(setting, HandleValidation, 170, -1, ((Control)label).get_Right() + 20, 0);
 				obj.set_Parent((Container)(object)panel);
 				obj.set_BasicTooltipText(((SettingEntry)setting).get_Description());
 				return panel;
@@ -178,107 +153,6 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				onChangeAction?.Invoke(e.get_NewValue());
 			});
 			return result;
-		}
-
-		protected Panel RenderTextbox(Panel parent, string description, string placeholder, Action<string> onEnterAction)
-		{
-			Panel panel = GetPanel((Container)(object)parent);
-			Label label = GetLabel(panel, description);
-			try
-			{
-				Control ctrl = ControlProvider.Create<string>(170, -1, ((Control)label).get_Right() + 20, 0);
-				ctrl.set_Parent((Container)(object)panel);
-				ctrl.set_BasicTooltipText(description);
-				TextBox textBox = (TextBox)(object)((ctrl is TextBox) ? ctrl : null);
-				((TextInputBase)textBox).set_PlaceholderText(placeholder);
-				textBox.add_EnterPressed((EventHandler<EventArgs>)delegate
-				{
-					onEnterAction?.Invoke(((TextInputBase)textBox).get_Text());
-					((TextInputBase)textBox).set_Text(string.Empty);
-				});
-				return panel;
-			}
-			catch (Exception ex)
-			{
-				Logger.Error(ex, "Type \"" + typeof(string).FullName + "\" could not be found in internal type lookup:");
-				return panel;
-			}
-		}
-
-		protected Panel GetPanel(Container parent)
-		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Expected O, but got Unknown
-			Panel val = new Panel();
-			((Container)val).set_HeightSizingMode((SizingMode)1);
-			((Container)val).set_WidthSizingMode((SizingMode)1);
-			((Control)val).set_Parent(parent);
-			return val;
-		}
-
-		protected Label GetLabel(Panel parent, string text)
-		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Expected O, but got Unknown
-			Label val = new Label();
-			((Control)val).set_Parent((Container)(object)parent);
-			val.set_Text(text);
-			val.set_AutoSizeHeight(true);
-			((Control)val).set_Width(250);
-			return val;
-		}
-
-		protected void RenderButton(Panel parent, string text, Action action, Func<bool> disabledCallback = null)
-		{
-			RenderButton(parent, text, delegate
-			{
-				action();
-				return Task.CompletedTask;
-			}, disabledCallback);
-		}
-
-		protected void RenderButton(Panel parent, string text, Func<Task> action, Func<bool> disabledCallback = null)
-		{
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-			Panel panel = GetPanel((Container)(object)parent);
-			StandardButton val = new StandardButton();
-			((Control)val).set_Parent((Container)(object)panel);
-			val.set_Text(text);
-			((Control)val).set_Width((int)EventTableModule.ModuleInstance.Font.MeasureString(text).Width);
-			((Control)val).set_Enabled(disabledCallback == null || !disabledCallback());
-			((Control)val).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
-				Task.Run(async delegate
-				{
-					try
-					{
-						await action();
-					}
-					catch (Exception ex)
-					{
-						ShowError(ex.Message);
-					}
-				});
-			});
-		}
-
-		protected void RenderLabel(Panel parent, string title, string value)
-		{
-			Panel panel = GetPanel((Container)(object)parent);
-			Label titleLabel = GetLabel(panel, title);
-			((Control)GetLabel(panel, value)).set_Left(((Control)titleLabel).get_Right() + 20);
 		}
 
 		protected void RenderColorSetting(Panel parent, SettingEntry<Color> setting)
@@ -335,55 +209,6 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			});
 		}
 
-		private void RegisterErrorPanel(Container parent)
-		{
-			Panel panel = GetPanel(parent);
-			((Control)panel).set_ZIndex(1000);
-			((Container)panel).set_WidthSizingMode((SizingMode)2);
-			((Control)panel).set_Visible(false);
-			ErrorPanel = panel;
-		}
-
-		public async void ShowError(string message)
-		{
-			lock (ErrorPanel)
-			{
-				if (((Control)ErrorPanel).get_Visible())
-				{
-					ErrorCancellationTokenSource.Cancel();
-					ErrorCancellationTokenSource = new CancellationTokenSource();
-				}
-			}
-			((Container)ErrorPanel).ClearChildren();
-			BitmapFont font = GameService.Content.get_DefaultFont32();
-			message = DrawUtil.WrapText(font, message, (float)((Control)ErrorPanel).get_Width() * 0.75f);
-			Label label = GetLabel(ErrorPanel, message);
-			((Control)label).set_Width(((Control)ErrorPanel).get_Width());
-			label.set_Font(font);
-			label.set_HorizontalAlignment((HorizontalAlignment)1);
-			label.set_TextColor(Color.get_Red());
-			((Control)ErrorPanel).set_Height(((Control)label).get_Height());
-			Panel errorPanel = ErrorPanel;
-			Rectangle contentRegion = BuildPanel.get_ContentRegion();
-			((Control)errorPanel).set_Bottom(((Rectangle)(ref contentRegion)).get_Bottom());
-			lock (ErrorPanel)
-			{
-				((Control)ErrorPanel).Show();
-			}
-			try
-			{
-				await Task.Delay(5000, ErrorCancellationTokenSource.Token);
-			}
-			catch (TaskCanceledException)
-			{
-				Logger.Debug("Task was canceled to show new error:");
-			}
-			lock (ErrorPanel)
-			{
-				((Control)ErrorPanel).Hide();
-			}
-		}
-
 		private bool HandleValidation<T>(SettingEntry<T> settingEntry, T value)
 		{
 			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
@@ -399,8 +224,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		protected override void Unload()
 		{
-			((View<IPresenter>)this).Unload();
-			((Control)ErrorPanel).Dispose();
+			base.Unload();
 		}
 	}
 }

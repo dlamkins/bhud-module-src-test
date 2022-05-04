@@ -37,7 +37,7 @@ namespace Estreya.BlishHUD.EventTable.Helpers
 				{
 					obj = "";
 				}
-				Process.Start((string)obj, "--diff \"" + filePath1 + "\" \"" + filePath2 + "\"").WaitForExit();
+				Process.Start((string)obj, "--wait --diff \"" + filePath1 + "\" \"" + filePath2 + "\"").WaitForExit();
 			});
 		}
 

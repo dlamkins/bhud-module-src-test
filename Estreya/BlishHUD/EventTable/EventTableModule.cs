@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,11 +14,12 @@ using Blish_HUD.Input;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
+using Estreya.BlishHUD.EventTable.Controls;
+using Estreya.BlishHUD.EventTable.Helpers;
 using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.EventTable.Models.Settings;
 using Estreya.BlishHUD.EventTable.Resources;
 using Estreya.BlishHUD.EventTable.State;
-using Estreya.BlishHUD.EventTable.UI.Container;
 using Estreya.BlishHUD.EventTable.UI.Views;
 using Estreya.BlishHUD.EventTable.UI.Views.Settings;
 using Estreya.BlishHUD.EventTable.Utils;
@@ -31,6 +33,10 @@ namespace Estreya.BlishHUD.EventTable
 	public class EventTableModule : Module
 	{
 		private static readonly Logger Logger = Logger.GetLogger<EventTableModule>();
+
+		public const string WEBSITE_ROOT_URL = "https://blishhud.estreya.de";
+
+		public const string WEBSITE_MODULE_URL = "https://blishhud.estreya.de/modules/event-table";
 
 		internal static EventTableModule ModuleInstance;
 
@@ -46,7 +52,7 @@ namespace Estreya.BlishHUD.EventTable
 
 		public bool IsPrerelease => !string.IsNullOrWhiteSpace(((Module)this).get_Version()?.PreRelease);
 
-		private EventTableContainer Container { get; set; }
+		private EventTableDrawer Drawer { get; set; }
 
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
@@ -126,12 +132,12 @@ namespace Estreya.BlishHUD.EventTable
 			}
 		}
 
-		public List<EventCategory> EventCategories => _eventCategories.Where((EventCategory ec) => !ec.IsDisabled()).ToList();
+		public List<EventCategory> EventCategories => _eventCategories.Where((EventCategory ec) => !ec.IsDisabled).ToList();
 
 		private Collection<ManagedState> States { get; set; } = new Collection<ManagedState>();
 
 
-		public HiddenState HiddenState { get; private set; }
+		public EventState EventState { get; private set; }
 
 		public WorldbossState WorldbossState { get; private set; }
 
@@ -156,12 +162,16 @@ namespace Estreya.BlishHUD.EventTable
 		protected override void Initialize()
 		{
 			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			EventTableContainer eventTableContainer = new EventTableContainer();
-			((Control)eventTableContainer).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)eventTableContainer).set_BackgroundColor(Color.get_Transparent());
-			((Control)eventTableContainer).set_Opacity(0f);
-			eventTableContainer.Visible = false;
-			Container = eventTableContainer;
+			EventTableDrawer eventTableDrawer = new EventTableDrawer();
+			((Control)eventTableDrawer).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			((Control)eventTableDrawer).set_BackgroundColor(Color.get_Transparent());
+			((Control)eventTableDrawer).set_Opacity(0f);
+			eventTableDrawer.Visible = false;
+			Drawer = eventTableDrawer;
+			GameService.Overlay.add_UserLocaleChanged((EventHandler<ValueEventArgs<CultureInfo>>)delegate
+			{
+				AsyncHelper.RunSync(LoadEvents);
+			});
 		}
 
 		protected override async Task LoadAsync()
@@ -178,13 +188,13 @@ namespace Estreya.BlishHUD.EventTable
 			}
 			Logger.Debug("Initialize states (after event file loading)");
 			await InitializeStates();
-			await Container.LoadAsync();
+			await Drawer.LoadAsync();
 			ModuleSettings.ModuleSettingsChanged += delegate(object sender, ModuleSettings.ModuleSettingsChangedEventArgs eventArgs)
 			{
 				switch (eventArgs.Name)
 				{
 				case "Width":
-					Container.UpdateSize(ModuleSettings.Width.get_Value(), -1);
+					Drawer.UpdateSize(ModuleSettings.Width.get_Value(), -1);
 					break;
 				case "GlobalEnabled":
 					ToggleContainer(ModuleSettings.GlobalEnabled.get_Value());
@@ -200,7 +210,7 @@ namespace Estreya.BlishHUD.EventTable
 					break;
 				case "BackgroundColor":
 				case "BackgroundColorOpacity":
-					Container.UpdateBackgroundColor();
+					Drawer.UpdateBackgroundColor();
 					break;
 				}
 			};
@@ -237,6 +247,16 @@ namespace Estreya.BlishHUD.EventTable
 				int eventCount = categories.Sum((EventCategory ec) => ec.Events.Count);
 				Logger.Info($"Loaded {eventCategoryCount} Categories with {eventCount} Events.");
 				await Task.WhenAll(categories.Select((EventCategory ec) => ec.LoadAsync()));
+				categories.ForEach(delegate(EventCategory ec)
+				{
+					ec.Events.ForEach(delegate(Event ev)
+					{
+						if (!ev.Filler)
+						{
+							ev.Edited += EventEdited;
+						}
+					});
+				});
 				lock (_eventCategories)
 				{
 					Logger.Debug("Overwrite current categories with newly loaded.");
@@ -255,70 +275,87 @@ namespace Estreya.BlishHUD.EventTable
 			}
 		}
 
+		private void EventEdited(object sender, EventArgs e)
+		{
+			Event ev = sender as Event;
+			Logger.Debug("Event \"" + ev.Key + "\" edited.");
+			lock (_eventCategories)
+			{
+				EventSettingsFile eventSettingsFile = AsyncHelper.RunSync(EventFileState.GetExternalFile);
+				eventSettingsFile.EventCategories = _eventCategories;
+				Logger.Debug("Export updated file.");
+				AsyncHelper.RunSync(() => EventFileState.ExportFile(eventSettingsFile));
+			}
+		}
+
 		private async Task InitializeStates(bool beforeFileLoaded = false)
 		{
 			string eventsDirectory = DirectoriesManager.GetFullDirectoryPath("events");
-			Action<string> hideEventAction = delegate(string apiCode)
-			{
-				if (ModuleSettings.EventCompletedAcion.get_Value() == EventCompletedAction.Hide)
-				{
-					lock (_eventCategories)
-					{
-						(from ev in _eventCategories.SelectMany((EventCategory ec) => ec.Events)
-							where ev.APICode == apiCode
-							select ev).ToList().ForEach(delegate(Event ev)
-						{
-							ev.Finish();
-						});
-					}
-				}
-			};
-			if (!beforeFileLoaded)
-			{
-				HiddenState = new HiddenState(eventsDirectory);
-				WorldbossState = new WorldbossState(Gw2ApiManager);
-				WorldbossState.WorldbossCompleted += delegate(object s, string e)
-				{
-					hideEventAction(e);
-				};
-				MapchestState = new MapchestState(Gw2ApiManager);
-				MapchestState.MapchestCompleted += delegate(object s, string e)
-				{
-					hideEventAction(e);
-				};
-			}
-			else
-			{
-				EventFileState = new EventFileState(ContentsManager, eventsDirectory, "events.json");
-				IconState = new IconState(ContentsManager, eventsDirectory);
-			}
-			lock (States)
+			using (await _stateLock.LockAsync())
 			{
 				if (!beforeFileLoaded)
 				{
-					States.Add(HiddenState);
+					WorldbossState = new WorldbossState(Gw2ApiManager);
+					WorldbossState.WorldbossCompleted += delegate(object s, string e)
+					{
+						CompleteEventAction(e);
+					};
+					MapchestState = new MapchestState(Gw2ApiManager);
+					MapchestState.MapchestCompleted += delegate(object s, string e)
+					{
+						CompleteEventAction(e);
+					};
+				}
+				else
+				{
+					EventFileState = new EventFileState(ContentsManager, eventsDirectory, "events.json");
+					EventState = new EventState(eventsDirectory);
+					IconState = new IconState(ContentsManager, eventsDirectory);
+				}
+				if (!beforeFileLoaded)
+				{
 					States.Add(WorldbossState);
 					States.Add(MapchestState);
 				}
 				else
 				{
 					States.Add(EventFileState);
+					States.Add(EventState);
 					States.Add(IconState);
 				}
-			}
-			using (await _stateLock.LockAsync())
-			{
-				foreach (ManagedState state in States)
+				foreach (ManagedState state2 in States.Where((ManagedState state) => !state.Running))
 				{
-					Logger.Debug("Starting managed state: {0}", new object[1] { state.GetType().Name });
 					try
 					{
-						await state.Start();
+						await state2.Start();
 					}
 					catch (Exception ex)
 					{
-						Logger.Error(ex, "Failed starting state \"{0}\"", new object[1] { state.GetType().Name });
+						Logger.Error(ex, "Failed starting state \"{0}\"", new object[1] { state2.GetType().Name });
 					}
+				}
+			}
+			void CompleteEventAction(string apiCode)
+			{
+				lock (_eventCategories)
+				{
+					(from ev in _eventCategories.SelectMany((EventCategory ec) => ec.Events)
+						where ev.APICode == apiCode
+						select ev).ToList().ForEach(delegate(Event ev)
+					{
+						switch (ModuleSettings.EventCompletedAcion.get_Value())
+						{
+						case EventCompletedAction.Crossout:
+							ev.Finish();
+							break;
+						case EventCompletedAction.Hide:
+							ev.Hide();
+							break;
+						default:
+							Logger.Warn("Unsupported event completion action: {0}", new object[1] { ModuleSettings.EventCompletedAcion.get_Value() });
+							break;
+						}
+					});
 				}
 			}
 		}
@@ -349,27 +386,27 @@ namespace Estreya.BlishHUD.EventTable
 
 		private void ToggleContainer(bool show)
 		{
-			if (Container == null)
+			if (Drawer == null)
 			{
 				return;
 			}
 			if (!ModuleSettings.GlobalEnabled.get_Value())
 			{
-				if (Container.Visible)
+				if (Drawer.Visible)
 				{
-					Container.Hide();
+					Drawer.Hide();
 				}
 			}
 			else if (show)
 			{
-				if (!Container.Visible)
+				if (!Drawer.Visible)
 				{
-					Container.Show();
+					Drawer.Show();
 				}
 			}
-			else if (Container.Visible)
+			else if (Drawer.Visible)
 			{
-				Container.Hide();
+				Drawer.Hide();
 			}
 		}
 
@@ -405,8 +442,8 @@ namespace Estreya.BlishHUD.EventTable
 			//IL_028b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0295: Expected O, but got Unknown
 			((Module)this).OnModuleLoaded(e);
-			Container.UpdatePosition(ModuleSettings.LocationX.get_Value(), ModuleSettings.LocationY.get_Value());
-			Container.UpdateSize(ModuleSettings.Width.get_Value(), -1);
+			Drawer.UpdatePosition(ModuleSettings.LocationX.get_Value(), ModuleSettings.LocationY.get_Value());
+			Drawer.UpdateSize(ModuleSettings.Width.get_Value(), -1);
 			Logger.Debug("Start building settings window.");
 			Texture2D windowBackground = IconState.GetIcon("images\\502049.png", checkRenderAPI: false);
 			Rectangle settingsWindowSize = default(Rectangle);
@@ -439,7 +476,7 @@ namespace Estreya.BlishHUD.EventTable
 		protected override void Update(GameTime gameTime)
 		{
 			CheckMumble();
-			Container.UpdatePosition(ModuleSettings.LocationX.get_Value(), ModuleSettings.LocationY.get_Value());
+			Drawer.UpdatePosition(ModuleSettings.LocationX.get_Value(), ModuleSettings.LocationY.get_Value());
 			CheckContainerSizeAndPosition();
 			using (_stateLock.Lock())
 			{
@@ -465,9 +502,9 @@ namespace Estreya.BlishHUD.EventTable
 			int num = (int)((float)GameService.Graphics.get_Resolution().X / GameService.Graphics.get_UIScaleMultiplier());
 			int maxResY = (int)((float)GameService.Graphics.get_Resolution().Y / GameService.Graphics.get_UIScaleMultiplier());
 			int minLocationX = 0;
-			int maxLocationX = num - ((Control)Container).get_Width();
-			int minLocationY = (buildFromBottom ? ((Control)Container).get_Height() : 0);
-			int maxLocationY = (buildFromBottom ? maxResY : (maxResY - ((Control)Container).get_Height()));
+			int maxLocationX = num - ((Control)Drawer).get_Width();
+			int minLocationY = (buildFromBottom ? ((Control)Drawer).get_Height() : 0);
+			int maxLocationY = (buildFromBottom ? maxResY : (maxResY - ((Control)Drawer).get_Height()));
 			int minWidth = 0;
 			int maxWidth = num - ModuleSettings.LocationX.get_Value();
 			SettingComplianceExtensions.SetRange(ModuleSettings.LocationX, minLocationX, maxLocationX);
@@ -477,7 +514,7 @@ namespace Estreya.BlishHUD.EventTable
 
 		private void CheckMumble()
 		{
-			if (GameService.Gw2Mumble.get_IsAvailable() && Container != null)
+			if (GameService.Gw2Mumble.get_IsAvailable() && Drawer != null)
 			{
 				bool show = true;
 				if (ModuleSettings.HideOnOpenMap.get_Value())
@@ -504,13 +541,20 @@ namespace Estreya.BlishHUD.EventTable
 			Logger.Debug("Unload event categories.");
 			foreach (EventCategory eventCategory in _eventCategories)
 			{
+				eventCategory.Events.ForEach(delegate(Event ev)
+				{
+					if (!ev.Filler)
+					{
+						ev.Edited -= EventEdited;
+					}
+				});
 				eventCategory.Unload();
 			}
 			Logger.Debug("Unloaded event categories.");
 			Logger.Debug("Unload event container.");
-			if (Container != null)
+			if (Drawer != null)
 			{
-				((Control)Container).Dispose();
+				((Control)Drawer).Dispose();
 			}
 			Logger.Debug("Unloaded event container.");
 			Logger.Debug("Unload settings window.");
@@ -525,8 +569,10 @@ namespace Estreya.BlishHUD.EventTable
 			Logger.Debug("Unloading states...");
 			using (_stateLock.Lock())
 			{
-				Task.WaitAll((from state in States.ToList()
-					select state.Unload()).ToArray());
+				States.ToList().ForEach(delegate(ManagedState state)
+				{
+					state.Dispose();
+				});
 			}
 			Logger.Debug("Finished unloading states.");
 		}

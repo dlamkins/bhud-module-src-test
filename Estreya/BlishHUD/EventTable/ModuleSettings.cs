@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
+using Estreya.BlishHUD.EventTable.Extensions;
 using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.EventTable.Resources;
 using Gw2Sharp.WebApi.V2.Clients;
@@ -64,6 +65,8 @@ namespace Estreya.BlishHUD.EventTable
 		public SettingEntry<KeyBinding> GlobalEnabledHotkey { get; private set; }
 
 		public SettingEntry<bool> RegisterCornerIcon { get; private set; }
+
+		public SettingEntry<int> RefreshRate { get; private set; }
 
 		public SettingEntry<bool> AutomaticallyUpdateEventFile { get; private set; }
 
@@ -249,6 +252,9 @@ namespace Estreya.BlishHUD.EventTable
 			GlobalEnabledHotkey.get_Value().set_BlockSequenceFromGw2(true);
 			RegisterCornerIcon = GlobalSettings.DefineSetting<bool>("RegisterCornerIcon", true, (Func<string>)(() => Strings.Setting_RegisterCornerIcon_Name), (Func<string>)(() => Strings.Setting_RegisterCornerIcon_Description));
 			RegisterCornerIcon.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+			RefreshRate = GlobalSettings.DefineSetting<int>("RefreshRate", 900, (Func<string>)(() => Strings.Setting_RefreshRate_Title), (Func<string>)(() => string.Format(Strings.Setting_RefreshRate_Description, RefreshRate.GetRange<int>().Value.Min, RefreshRate.GetRange<int>().Value.Max)));
+			RefreshRate.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)SettingChanged<int>);
+			SettingComplianceExtensions.SetRange(RefreshRate, 0, 900);
 			AutomaticallyUpdateEventFile = GlobalSettings.DefineSetting<bool>("AutomaticallyUpdateEventFile", true, (Func<string>)(() => Strings.Setting_AutomaticallyUpdateEventFile_Name), (Func<string>)(() => Strings.Setting_AutomaticallyUpdateEventFile_Description));
 			AutomaticallyUpdateEventFile.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
 			HideOnOpenMap = GlobalSettings.DefineSetting<bool>("HideOnOpenMap", true, (Func<string>)(() => Strings.Setting_HideOnMap_Name), (Func<string>)(() => Strings.Setting_HideOnMap_Description));

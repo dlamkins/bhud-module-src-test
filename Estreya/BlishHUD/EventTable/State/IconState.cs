@@ -49,7 +49,7 @@ namespace Estreya.BlishHUD.EventTable.State
 			_basePath = basePath;
 		}
 
-		public override async Task Reload()
+		public override async Task InternalReload()
 		{
 			await LoadImages();
 		}
@@ -109,7 +109,7 @@ namespace Estreya.BlishHUD.EventTable.State
 						Texture2D newTexture = _loadedTextures[newTextureIdentifier];
 						if (newTexture == Textures.get_Error())
 						{
-							Logger.Warn("Texture \"{0}\" is erroneous. Skipping saving.", new object[1] { newTextureIdentifier });
+							Logger.Warn("Texture \"{0}\" is errorneous. Skipping saving.", new object[1] { newTextureIdentifier });
 						}
 						else
 						{
@@ -133,8 +133,8 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		private Task LoadImages()
 		{
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0079: Expected O, but got Unknown
+			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a3: Expected O, but got Unknown
 			Logger.Info("Load cached images from filesystem.");
 			using (_textureLock.Lock())
 			{
@@ -151,6 +151,11 @@ namespace Estreya.BlishHUD.EventTable.State
 					try
 					{
 						fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+						if (fileStream.Length == 0L)
+						{
+							Logger.Warn("Image is empty: {0}", new object[1] { filePath });
+							continue;
+						}
 						asyncTexture = new AsyncTexture2D(Textures.get_Pixel());
 						GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate(GraphicsDevice device)
 						{

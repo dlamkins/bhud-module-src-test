@@ -302,9 +302,9 @@ namespace Estreya.BlishHUD.EventTable.Resources
 
 		internal static string EventSettingsView_ReloadEvents_Title => ResourceManager.GetString("EventSettingsView_ReloadEvents_Title", resourceCulture);
 
-		internal static string EventSettingsView_ResetHiddenStates_Success => ResourceManager.GetString("EventSettingsView_ResetHiddenStates_Success", resourceCulture);
+		internal static string EventSettingsView_ResetEventStates_Success => ResourceManager.GetString("EventSettingsView_ResetEventStates_Success", resourceCulture);
 
-		internal static string EventSettingsView_ResetHiddenStates_Title => ResourceManager.GetString("EventSettingsView_ResetHiddenStates_Title", resourceCulture);
+		internal static string EventSettingsView_ResetEventStates_Title => ResourceManager.GetString("EventSettingsView_ResetEventStates_Title", resourceCulture);
 
 		internal static string EventSettingsView_UpdateEventFile_Success => ResourceManager.GetString("EventSettingsView_UpdateEventFile_Success", resourceCulture);
 
@@ -421,6 +421,10 @@ namespace Estreya.BlishHUD.EventTable.Resources
 		internal static string Setting_Opacity_Description => ResourceManager.GetString("Setting_Opacity_Description", resourceCulture);
 
 		internal static string Setting_Opacity_Name => ResourceManager.GetString("Setting_Opacity_Name", resourceCulture);
+
+		internal static string Setting_RefreshRate_Description => ResourceManager.GetString("Setting_RefreshRate_Description", resourceCulture);
+
+		internal static string Setting_RefreshRate_Title => ResourceManager.GetString("Setting_RefreshRate_Title", resourceCulture);
 
 		internal static string Setting_RegisterCornerIcon_Description => ResourceManager.GetString("Setting_RegisterCornerIcon_Description", resourceCulture);
 

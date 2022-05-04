@@ -119,8 +119,12 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_0646: Unknown result type (might be due to invalid IL or missing references)
 			//IL_064b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0658: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0660: Unknown result type (might be due to invalid IL or missing references)
-			//IL_066c: Expected O, but got Unknown
+			//IL_0664: Expected O, but got Unknown
+			//IL_069b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06c1: Expected O, but got Unknown
 			Panel val = new Panel();
 			((Control)val).set_Parent(buildPanel);
 			((Control)val).set_Location(new Point(MAIN_PADDING.X, MAIN_PADDING.Y));
@@ -296,9 +300,24 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					}
 					GlowButton val11 = new GlowButton();
 					((Control)val11).set_Parent((Container)(object)button);
-					val11.set_Checked(enabled);
 					val11.set_ToggleGlow(false);
-					GlowButton toggleButton = val11;
+					GlowButton editButton = val11;
+					GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
+					{
+						//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+						//IL_0024: Expected O, but got Unknown
+						((Control)editButton).set_Tooltip(new Tooltip((ITooltipView)(object)new TooltipView("Edit", "Edit Description", "156684")));
+						editButton.set_Icon(AsyncTexture2D.op_Implicit(EventTableModule.ModuleInstance.IconState.GetIcon("156684", checkRenderAPI: false)));
+					});
+					((Control)editButton).add_Click((EventHandler<MouseEventArgs>)delegate
+					{
+						e2.Edit();
+					});
+					GlowButton val12 = new GlowButton();
+					((Control)val12).set_Parent((Container)(object)button);
+					val12.set_Checked(enabled);
+					val12.set_ToggleGlow(false);
+					GlowButton toggleButton = val12;
 					UpdateToggleButton(toggleButton);
 					toggleButton.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object s, CheckChangedEvent eventArgs)
 					{

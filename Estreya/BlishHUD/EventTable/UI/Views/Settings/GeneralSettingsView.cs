@@ -15,7 +15,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views.Settings
 		{
 		}
 
-		protected override void InternalBuild(Panel parent)
+		protected override void BuildView(Panel parent)
 		{
 			RenderSetting<bool>(parent, base.ModuleSettings.GlobalEnabled);
 			RenderSetting<KeyBinding>(parent, base.ModuleSettings.GlobalEnabledHotkey);
@@ -42,14 +42,14 @@ namespace Estreya.BlishHUD.EventTable.UI.Views.Settings
 			{
 				EventTableModule.ModuleInstance.EventCategories.SelectMany((EventCategory ec) => ec.Events.Where((Event ev) => ev.Key == val)).ToList().ForEach(delegate(Event ev)
 				{
-					ev.Finish();
+					ev.Hide();
 				});
 			});
 			RenderTextbox(parent, "Finish Category", "EventCategory.Key", delegate(string val)
 			{
 				EventTableModule.ModuleInstance.EventCategories.Where((EventCategory ec) => ec.Key == val).ToList().ForEach(delegate(EventCategory ev)
 				{
-					ev.Finish();
+					ev.Hide();
 				});
 			});
 			RenderEmptyLine(parent);

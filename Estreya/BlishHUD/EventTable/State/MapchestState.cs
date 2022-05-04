@@ -47,7 +47,7 @@ namespace Estreya.BlishHUD.EventTable.State
 			return completedMapchests.Contains(apiCode);
 		}
 
-		public override async Task Reload()
+		public override async Task InternalReload()
 		{
 			await UpdatedCompletedMapchests(null);
 		}
@@ -123,7 +123,7 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		protected override void InternalUpdate(GameTime gameTime)
 		{
-			UpdateCadenceUtil.UpdateAsyncWithCadence(UpdatedCompletedMapchests, gameTime, updateInterval.TotalMilliseconds, ref timeSinceUpdate);
+			UpdateUtil.UpdateAsync(UpdatedCompletedMapchests, gameTime, updateInterval.TotalMilliseconds, ref timeSinceUpdate);
 		}
 
 		protected override async Task Load()

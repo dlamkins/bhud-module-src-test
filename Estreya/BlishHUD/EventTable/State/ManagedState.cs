@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Estreya.BlishHUD.EventTable.Helpers;
 using Microsoft.Xna.Framework;
 
 namespace Estreya.BlishHUD.EventTable.State
@@ -26,18 +27,26 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		public async Task Start()
 		{
-			if (!Running)
+			if (Running)
 			{
-				await Initialize();
-				await Load();
-				Running = true;
+				Logger.Warn("Trying to start state \"{0}\" which is already running.", new object[1] { GetType().Name });
+				return;
 			}
+			Logger.Debug("Starting managed state: {0}", new object[1] { GetType().Name });
+			await Initialize();
+			await Load();
+			Running = true;
 		}
 
 		public void Stop()
 		{
-			if (Running)
+			if (!Running)
 			{
+				Logger.Warn("Trying to stop state \"{0}\" which is not running.", new object[1] { GetType().Name });
+			}
+			else
+			{
+				Logger.Debug("Stopping managed state: {0}", new object[1] { GetType().Name });
 				Running = false;
 			}
 		}
@@ -76,11 +85,32 @@ namespace Estreya.BlishHUD.EventTable.State
 			InternalUpdate(gameTime);
 		}
 
-		public abstract Task Reload();
-
-		public async Task Unload()
+		public async Task Reload()
 		{
-			await Save();
+			if (!Running)
+			{
+				Logger.Warn("Trying to reload state \"{0}\" which is not running.", new object[1] { GetType().Name });
+			}
+			else
+			{
+				Logger.Debug("Reloading state: {0}", new object[1] { GetType().Name });
+				await InternalReload();
+			}
+		}
+
+		public abstract Task InternalReload();
+
+		private async Task Unload()
+		{
+			if (!Running)
+			{
+				Logger.Warn("Trying to unload state \"{0}\" which is not running.", new object[1] { GetType().Name });
+			}
+			else
+			{
+				Logger.Debug("Unloading state: {0}", new object[1] { GetType().Name });
+				await Save();
+			}
 		}
 
 		public abstract Task Clear();
@@ -97,8 +127,8 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		public void Dispose()
 		{
+			AsyncHelper.RunSync(Unload);
 			Stop();
-			InternalUnload();
 		}
 	}
 }

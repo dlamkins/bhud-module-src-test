@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Common.UI.Views;
 using Blish_HUD.Controls;
+using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
 using Blish_HUD._Extensions;
@@ -14,7 +16,9 @@ using Estreya.BlishHUD.EventTable.Controls;
 using Estreya.BlishHUD.EventTable.Input;
 using Estreya.BlishHUD.EventTable.Json;
 using Estreya.BlishHUD.EventTable.Resources;
+using Estreya.BlishHUD.EventTable.State;
 using Estreya.BlishHUD.EventTable.UI.Views;
+using Estreya.BlishHUD.EventTable.UI.Views.Edit;
 using Estreya.BlishHUD.EventTable.Utils;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
@@ -34,6 +38,11 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		private double timeSinceUpdate;
 
+		private bool _editing;
+
+		[JsonIgnore]
+		private string _backgroundColorCode;
+
 		[JsonIgnore]
 		private Tooltip _tooltip;
 
@@ -47,8 +56,12 @@ namespace Estreya.BlishHUD.EventTable.Models
 		private Color? _backgroundColor;
 
 		[JsonIgnore]
+		private bool? _isDisabled;
+
+		[JsonIgnore]
 		private int _lastYPosition;
 
+		[Description("Specifies the key of the event. Should be unique for a event category. Avoid changing it, as it resets saved settings and states.")]
 		[JsonProperty("key")]
 		public string Key { get; set; }
 
@@ -91,7 +104,18 @@ namespace Estreya.BlishHUD.EventTable.Models
 		public string Icon { get; set; }
 
 		[JsonProperty("color")]
-		public string BackgroundColorCode { get; set; }
+		public string BackgroundColorCode
+		{
+			get
+			{
+				return _backgroundColorCode;
+			}
+			set
+			{
+				_backgroundColorCode = value;
+				_backgroundColor = null;
+			}
+		}
 
 		[JsonProperty("apiType")]
 		public APICodeType APICodeType { get; set; }
@@ -99,8 +123,10 @@ namespace Estreya.BlishHUD.EventTable.Models
 		[JsonProperty("api")]
 		public string APICode { get; set; }
 
+		[JsonIgnore]
 		internal bool Filler { get; set; }
 
+		[JsonIgnore]
 		internal EventCategory EventCategory { get; set; }
 
 		[JsonIgnore]
@@ -136,66 +162,11 @@ namespace Estreya.BlishHUD.EventTable.Models
 		{
 			get
 			{
-				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0016: Expected O, but got Unknown
-				//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-				//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0027: Expected O, but got Unknown
-				//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-				//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0057: Expected O, but got Unknown
-				//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-				//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0087: Expected O, but got Unknown
-				//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00b7: Expected O, but got Unknown
-				//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00e8: Expected O, but got Unknown
+				//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+				//IL_001f: Expected O, but got Unknown
 				if (_contextMenuStrip == null)
 				{
-					_contextMenuStrip = new ContextMenuStrip();
-					ContextMenuStripItem val = new ContextMenuStripItem();
-					val.set_Text(Strings.Event_CopyWaypoint);
-					ContextMenuStripItem copyWaypoint = val;
-					((Control)copyWaypoint).add_Click((EventHandler<MouseEventArgs>)delegate
-					{
-						CopyWaypoint();
-					});
-					_contextMenuStrip.AddMenuItem(copyWaypoint);
-					ContextMenuStripItem val2 = new ContextMenuStripItem();
-					val2.set_Text(Strings.Event_OpenWiki);
-					ContextMenuStripItem openWiki = val2;
-					((Control)openWiki).add_Click((EventHandler<MouseEventArgs>)delegate
-					{
-						OpenWiki();
-					});
-					_contextMenuStrip.AddMenuItem(openWiki);
-					ContextMenuStripItem val3 = new ContextMenuStripItem();
-					val3.set_Text(Strings.Event_HideCategory);
-					ContextMenuStripItem hideCategory = val3;
-					((Control)hideCategory).add_Click((EventHandler<MouseEventArgs>)delegate
-					{
-						FinishCategory();
-					});
-					_contextMenuStrip.AddMenuItem(hideCategory);
-					ContextMenuStripItem val4 = new ContextMenuStripItem();
-					val4.set_Text(Strings.Event_HideEvent);
-					ContextMenuStripItem hideEvent = val4;
-					((Control)hideEvent).add_Click((EventHandler<MouseEventArgs>)delegate
-					{
-						Finish();
-					});
-					_contextMenuStrip.AddMenuItem(hideEvent);
-					ContextMenuStripItem val5 = new ContextMenuStripItem();
-					val5.set_Text(Strings.Event_Disable);
-					ContextMenuStripItem disable = val5;
-					((Control)disable).add_Click((EventHandler<MouseEventArgs>)delegate
-					{
-						Disable();
-					});
-					_contextMenuStrip.AddMenuItem(disable);
+					_contextMenuStrip = new ContextMenuStrip((Func<IEnumerable<ContextMenuStripItem>>)GetContextMenu);
 				}
 				return _contextMenuStrip;
 			}
@@ -207,20 +178,169 @@ namespace Estreya.BlishHUD.EventTable.Models
 			get
 			{
 				//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+				//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+				//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0097: Unknown result type (might be due to invalid IL or missing references)
 				if (!_backgroundColor.HasValue && !Filler)
 				{
-					Color colorFromEvent = (string.IsNullOrWhiteSpace(BackgroundColorCode) ? Color.White : ColorTranslator.FromHtml(BackgroundColorCode));
-					_backgroundColor = new Color((int)colorFromEvent.R, (int)colorFromEvent.G, (int)colorFromEvent.B);
+					try
+					{
+						Color colorFromEvent = (string.IsNullOrWhiteSpace(BackgroundColorCode) ? Color.White : ColorTranslator.FromHtml(BackgroundColorCode));
+						_backgroundColor = new Color((int)colorFromEvent.R, (int)colorFromEvent.G, (int)colorFromEvent.B);
+					}
+					catch (Exception ex)
+					{
+						Logger.Error(ex, "Failed generating background color:");
+						_backgroundColor = Color.get_Transparent();
+					}
 				}
 				return (Color)(((_003F?)_backgroundColor) ?? Color.get_Transparent());
 			}
 		}
 
 		[JsonIgnore]
+		public bool IsDisabled
+		{
+			get
+			{
+				if (!_isDisabled.HasValue)
+				{
+					if (Filler)
+					{
+						_isDisabled = false;
+					}
+					IEnumerable<SettingEntry<bool>> eventSetting = EventTableModule.ModuleInstance.ModuleSettings.AllEvents.Where((SettingEntry<bool> e) => ((SettingEntry)e).get_EntryKey().ToLowerInvariant() == SettingKey.ToLowerInvariant());
+					if (eventSetting.Any())
+					{
+						bool enabled = eventSetting.First().get_Value() && !EventTableModule.ModuleInstance.EventState.Contains(SettingKey, EventState.EventStates.Hidden);
+						_isDisabled = !enabled;
+					}
+					if (!_isDisabled.HasValue)
+					{
+						_isDisabled = false;
+					}
+				}
+				return _isDisabled.Value;
+			}
+		}
+
+		[JsonIgnore]
 		public List<DateTime> Occurences { get; private set; } = new List<DateTime>();
 
+
+		public event EventHandler Edited;
+
+		private IEnumerable<ContextMenuStripItem> GetContextMenu()
+		{
+			ContextMenuStripItem val = new ContextMenuStripItem();
+			val.set_Text(Strings.Event_CopyWaypoint);
+			((Control)val).set_BasicTooltipText("Copies the waypoint to the clipboard.");
+			ContextMenuStripItem copyWaypoint = val;
+			((Control)copyWaypoint).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				CopyWaypoint();
+			});
+			yield return copyWaypoint;
+			ContextMenuStripItem val2 = new ContextMenuStripItem();
+			val2.set_Text(Strings.Event_OpenWiki);
+			((Control)val2).set_BasicTooltipText("Open the wiki in the default browser.");
+			ContextMenuStripItem openWiki = val2;
+			((Control)openWiki).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				OpenWiki();
+			});
+			yield return openWiki;
+			ContextMenuStrip hideMenuStrip = new ContextMenuStrip((Func<IEnumerable<ContextMenuStripItem>>)delegate
+			{
+				//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+				//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0021: Expected O, but got Unknown
+				//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0056: Expected O, but got Unknown
+				List<ContextMenuStripItem> list2 = new List<ContextMenuStripItem>();
+				ContextMenuStripItem val11 = new ContextMenuStripItem();
+				val11.set_Text(Strings.Event_HideCategory);
+				((Control)val11).set_BasicTooltipText("Hides the event category until reset.");
+				ContextMenuStripItem val12 = val11;
+				((Control)val12).add_Click((EventHandler<MouseEventArgs>)delegate
+				{
+					HideCategory();
+				});
+				list2.Add(val12);
+				ContextMenuStripItem val13 = new ContextMenuStripItem();
+				val13.set_Text(Strings.Event_HideEvent);
+				((Control)val13).set_BasicTooltipText("Hides the event until reset.");
+				ContextMenuStripItem val14 = val13;
+				((Control)val14).add_Click((EventHandler<MouseEventArgs>)delegate
+				{
+					Hide();
+				});
+				list2.Add(val14);
+				return list2;
+			});
+			ContextMenuStripItem val3 = new ContextMenuStripItem();
+			val3.set_Text("Hide");
+			val3.set_Submenu(hideMenuStrip);
+			((Control)val3).set_BasicTooltipText("Adds options for hiding events.");
+			yield return val3;
+			ContextMenuStrip finishMenuStrip = new ContextMenuStrip((Func<IEnumerable<ContextMenuStripItem>>)delegate
+			{
+				//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+				//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0021: Expected O, but got Unknown
+				//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0056: Expected O, but got Unknown
+				List<ContextMenuStripItem> list = new List<ContextMenuStripItem>();
+				ContextMenuStripItem val7 = new ContextMenuStripItem();
+				val7.set_Text("Finish Category");
+				((Control)val7).set_BasicTooltipText("Completes the event category until reset.");
+				ContextMenuStripItem val8 = val7;
+				((Control)val8).add_Click((EventHandler<MouseEventArgs>)delegate
+				{
+					FinishCategory();
+				});
+				list.Add(val8);
+				ContextMenuStripItem val9 = new ContextMenuStripItem();
+				val9.set_Text("Finish Event");
+				((Control)val9).set_BasicTooltipText("Completes the event until reset.");
+				ContextMenuStripItem val10 = val9;
+				((Control)val10).add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)delegate
+				{
+					Finish();
+				});
+				list.Add(val10);
+				return list;
+			});
+			ContextMenuStripItem val4 = new ContextMenuStripItem();
+			val4.set_Text("Finish");
+			val4.set_Submenu(finishMenuStrip);
+			((Control)val4).set_BasicTooltipText("Adds options for finishing events.");
+			yield return val4;
+			ContextMenuStripItem val5 = new ContextMenuStripItem();
+			val5.set_Text("Edit");
+			((Control)val5).set_BasicTooltipText("Opens the edit window.");
+			ContextMenuStripItem edit = val5;
+			((Control)edit).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				Edit();
+			});
+			yield return edit;
+			ContextMenuStripItem val6 = new ContextMenuStripItem();
+			val6.set_Text(Strings.Event_Disable);
+			((Control)val6).set_BasicTooltipText("Disables the event completely.");
+			ContextMenuStripItem disable = val6;
+			((Control)disable).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				Disable();
+			});
+			yield return disable;
+		}
 
 		public Event()
 		{
@@ -263,8 +383,8 @@ namespace Estreya.BlishHUD.EventTable.Models
 			//IL_037f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_038f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0391: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03bd: Unknown result type (might be due to invalid IL or missing references)
 			List<DateTime> occurences = new List<DateTime>();
 			lock (Occurences)
 			{
@@ -329,30 +449,12 @@ namespace Estreya.BlishHUD.EventTable.Models
 						spriteBatch.DrawStringOnCtrl(control, timeRemainingString, font, eventTimeRemainingPosition, textColor, wrap: false, (HorizontalAlignment)0, (VerticalAlignment)1);
 					}
 				}
-				if (EventTableModule.ModuleInstance.ModuleSettings.EventCompletedAcion.get_Value() == EventCompletedAction.Crossout && !Filler && !string.IsNullOrWhiteSpace(APICode) && IsCompleted())
+				if ((EventCategory?.IsFinished() ?? false) || IsFinished())
 				{
 					spriteBatch.DrawCrossOut(control, baseTexture, eventTexturePosition, Color.get_Red());
 				}
 			}
 			return occurences.Any();
-		}
-
-		public bool IsCompleted()
-		{
-			bool completed = false;
-			switch (APICodeType)
-			{
-			case APICodeType.Worldboss:
-				completed |= EventTableModule.ModuleInstance.WorldbossState.IsCompleted(APICode);
-				break;
-			case APICodeType.Mapchest:
-				completed |= EventTableModule.ModuleInstance.MapchestState.IsCompleted(APICode);
-				break;
-			default:
-				Logger.Warn($"Unsupported api code type: {APICodeType}");
-				break;
-			}
-			return completed;
 		}
 
 		private void UpdateTooltip(string description)
@@ -489,7 +591,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-			if (IsDisabled())
+			if (IsDisabled)
 			{
 				return false;
 			}
@@ -602,16 +704,16 @@ namespace Estreya.BlishHUD.EventTable.Models
 			}
 		}
 
-		public void Finish()
+		public void Hide()
 		{
 			DateTime now = EventTableModule.ModuleInstance.DateTimeNow.ToUniversalTime();
-			DateTime until = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0).AddDays(1.0);
-			EventTableModule.ModuleInstance.HiddenState.Add(SettingKey, until, isUTC: true);
+			DateTime until = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0, DateTimeKind.Utc).AddDays(1.0);
+			EventTableModule.ModuleInstance.EventState.Add(SettingKey, until, EventState.EventStates.Hidden);
 		}
 
-		public void FinishCategory()
+		private void HideCategory()
 		{
-			EventCategory?.Finish();
+			EventCategory?.Hide();
 		}
 
 		public void Disable()
@@ -623,18 +725,25 @@ namespace Estreya.BlishHUD.EventTable.Models
 			}
 		}
 
-		public bool IsDisabled()
+		public void Finish()
+		{
+			DateTime now = EventTableModule.ModuleInstance.DateTimeNow.ToUniversalTime();
+			DateTime until = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0, DateTimeKind.Utc).AddDays(1.0);
+			EventTableModule.ModuleInstance.EventState.Add(SettingKey, until, EventState.EventStates.Completed);
+		}
+
+		private void FinishCategory()
+		{
+			EventCategory?.Finish();
+		}
+
+		public bool IsFinished()
 		{
 			if (Filler)
 			{
 				return false;
 			}
-			IEnumerable<SettingEntry<bool>> eventSetting = EventTableModule.ModuleInstance.ModuleSettings.AllEvents.Where((SettingEntry<bool> e) => ((SettingEntry)e).get_EntryKey().ToLowerInvariant() == SettingKey.ToLowerInvariant());
-			if (eventSetting.Any())
-			{
-				return !eventSetting.First().get_Value() || EventTableModule.ModuleInstance.HiddenState.IsHidden(SettingKey);
-			}
-			return false;
+			return EventTableModule.ModuleInstance.EventState.Contains(SettingKey, EventState.EventStates.Completed);
 		}
 
 		private void UpdateEventOccurences(GameTime gameTime)
@@ -646,8 +755,8 @@ namespace Estreya.BlishHUD.EventTable.Models
 					Occurences.Clear();
 				}
 				DateTime now = EventTableModule.ModuleInstance.DateTimeNow;
-				DateTime min = now.AddDays(-4.0);
-				DateTime max = now.AddDays(4.0);
+				DateTime min = now.AddDays(-2.0);
+				DateTime max = now.AddDays(2.0);
 				List<DateTime> occurences = GetStartOccurences(now, max, min);
 				lock (Occurences)
 				{
@@ -658,6 +767,9 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		public Task LoadAsync()
 		{
+			EventTableModule.ModuleInstance.ModuleSettings.EventSettingChanged += ModuleSettings_EventSettingChanged;
+			EventTableModule.ModuleInstance.EventState.StateAdded += EventState_StateAdded;
+			EventTableModule.ModuleInstance.EventState.StateRemoved += EventState_StateRemoved;
 			if (string.IsNullOrWhiteSpace(Key))
 			{
 				Key = Name;
@@ -673,9 +785,36 @@ namespace Estreya.BlishHUD.EventTable.Models
 			return Task.CompletedTask;
 		}
 
+		private void EventState_StateRemoved(object sender, ValueEventArgs<string> e)
+		{
+			if (SettingKey == e.get_Value())
+			{
+				_isDisabled = null;
+			}
+		}
+
+		private void EventState_StateAdded(object sender, ValueEventArgs<EventState.VisibleStateInfo> e)
+		{
+			if (SettingKey == e.get_Value().Key && e.get_Value().State == EventState.EventStates.Hidden)
+			{
+				_isDisabled = null;
+			}
+		}
+
+		private void ModuleSettings_EventSettingChanged(object sender, ModuleSettings.EventSettingsChangedEventArgs e)
+		{
+			if (SettingKey.ToLowerInvariant() == e.Name.ToLowerInvariant())
+			{
+				_isDisabled = null;
+			}
+		}
+
 		public void Unload()
 		{
 			Logger.Debug("Unload event: {0}", new object[1] { Key });
+			EventTableModule.ModuleInstance.ModuleSettings.EventSettingChanged -= ModuleSettings_EventSettingChanged;
+			EventTableModule.ModuleInstance.EventState.StateAdded -= EventState_StateAdded;
+			EventTableModule.ModuleInstance.EventState.StateRemoved -= EventState_StateRemoved;
 			Tooltip tooltip = _tooltip;
 			if (tooltip != null)
 			{
@@ -693,7 +832,77 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		public void Update(GameTime gameTime)
 		{
-			UpdateCadenceUtil.UpdateWithCadence(UpdateEventOccurences, gameTime, updateInterval.TotalMilliseconds, ref timeSinceUpdate);
+			UpdateUtil.Update(UpdateEventOccurences, gameTime, updateInterval.TotalMilliseconds, ref timeSinceUpdate);
+		}
+
+		public void Edit()
+		{
+			lock (this)
+			{
+				if (_editing)
+				{
+					return;
+				}
+				_editing = true;
+			}
+			Task.Run(async delegate
+			{
+				Texture2D backgroundTexture = await EventTableModule.ModuleInstance.IconState.GetIconAsync("controls/window/502049", checkRenderAPI: false);
+				Rectangle settingsWindowSize = default(Rectangle);
+				((Rectangle)(ref settingsWindowSize))._002Ector(35, 50, 913, 691);
+				int contentRegionPaddingY = settingsWindowSize.Y - 15;
+				int contentRegionPaddingX = settingsWindowSize.X + 46;
+				Rectangle contentRegion = default(Rectangle);
+				((Rectangle)(ref contentRegion))._002Ector(contentRegionPaddingX, contentRegionPaddingY, settingsWindowSize.Width - 52, settingsWindowSize.Height - contentRegionPaddingY);
+				StandardWindow val = new StandardWindow(backgroundTexture, settingsWindowSize, contentRegion);
+				((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+				((WindowBase2)val).set_Title("Edit");
+				StandardWindow val2 = val;
+				((WindowBase2)val2).set_Emblem(await EventTableModule.ModuleInstance.IconState.GetIconAsync("156684", checkRenderAPI: false));
+				((WindowBase2)val).set_Subtitle(Name);
+				((WindowBase2)val).set_SavesPosition(true);
+				((WindowBase2)val).set_CanClose(false);
+				((WindowBase2)val).set_Id("EventTableModule_f925849b-44bd-4c9f-aaac-76826d93ba6f");
+				StandardWindow window = val;
+				EditEventView editView = new EditEventView(Clone());
+				editView.SavePressed += delegate(object s, ValueEventArgs<Event> e)
+				{
+					((Control)window).Hide();
+					((Control)window).Dispose();
+					lock (this)
+					{
+						Name = e.get_Value().Name;
+						Offset = e.get_Value().Offset;
+						Repeat = e.get_Value().Repeat;
+						Location = e.get_Value().Location;
+						Waypoint = e.get_Value().Waypoint;
+						Wiki = e.get_Value().Wiki;
+						Duration = e.get_Value().Duration;
+						Icon = e.get_Value().Icon;
+						BackgroundColorCode = e.get_Value().BackgroundColorCode;
+						APICodeType = e.get_Value().APICodeType;
+						APICode = e.get_Value().APICode;
+						timeSinceUpdate = updateInterval.TotalMilliseconds;
+						_editing = false;
+					}
+					this.Edited?.Invoke(this, EventArgs.Empty);
+				};
+				editView.CancelPressed += delegate
+				{
+					((Control)window).Hide();
+					((Control)window).Dispose();
+					lock (this)
+					{
+						_editing = false;
+					}
+				};
+				window.Show((IView)(object)editView);
+			});
+		}
+
+		public Event Clone()
+		{
+			return (Event)MemberwiseClone();
 		}
 	}
 }

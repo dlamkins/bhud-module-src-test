@@ -12,7 +12,7 @@ namespace Estreya.BlishHUD.EventTable.Extensions
 			{
 				return 0f;
 			}
-			(float, float)? range = settingEntry.GetRange();
+			(float, float)? range = settingEntry.GetRange<float>();
 			if (!range.HasValue)
 			{
 				return settingEntry.get_Value();
@@ -34,55 +34,46 @@ namespace Estreya.BlishHUD.EventTable.Extensions
 			{
 				return 0;
 			}
-			(int, int)? range = settingEntry.GetRange();
+			(float, float)? range = settingEntry.GetRange<int>();
 			if (!range.HasValue)
 			{
 				return settingEntry.get_Value();
 			}
-			if (settingEntry.get_Value() > range.Value.Item2)
+			if ((float)settingEntry.get_Value() > range.Value.Item2)
 			{
-				return range.Value.Item2;
+				return (int)range.Value.Item2;
 			}
-			if (settingEntry.get_Value() < range.Value.Item1)
+			if ((float)settingEntry.get_Value() < range.Value.Item1)
 			{
-				return range.Value.Item1;
+				return (int)range.Value.Item1;
 			}
 			return settingEntry.get_Value();
 		}
 
-		public static (int Min, int Max)? GetRange(this SettingEntry<int> settingEntry)
+		public static (float Min, float Max)? GetRange<T>(this SettingEntry<T> settingEntry)
 		{
 			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
 			if (settingEntry == null)
 			{
 				return null;
 			}
-			List<IComplianceRequisite> crList = (from cr in SettingComplianceExtensions.GetComplianceRequisite((SettingEntry)(object)settingEntry)
+			List<IComplianceRequisite> intRangeList = (from cr in SettingComplianceExtensions.GetComplianceRequisite((SettingEntry)(object)settingEntry)
 				where cr is IntRangeRangeComplianceRequisite
 				select cr).ToList();
-			if (crList.Count > 0)
+			if (intRangeList.Count > 0)
 			{
-				IntRangeRangeComplianceRequisite intRangeCr = (IntRangeRangeComplianceRequisite)(object)crList[0];
-				return new(int, int)?((((IntRangeRangeComplianceRequisite)(ref intRangeCr)).get_MinValue(), ((IntRangeRangeComplianceRequisite)(ref intRangeCr)).get_MaxValue()));
+				IntRangeRangeComplianceRequisite intRangeCr = (IntRangeRangeComplianceRequisite)(object)intRangeList[0];
+				return new(float, float)?((((IntRangeRangeComplianceRequisite)(ref intRangeCr)).get_MinValue(), ((IntRangeRangeComplianceRequisite)(ref intRangeCr)).get_MaxValue()));
 			}
-			return null;
-		}
-
-		public static (float Min, float Max)? GetRange(this SettingEntry<float> settingEntry)
-		{
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			if (settingEntry == null)
-			{
-				return null;
-			}
-			List<IComplianceRequisite> crList = (from cr in SettingComplianceExtensions.GetComplianceRequisite((SettingEntry)(object)settingEntry)
+			List<IComplianceRequisite> floatList = (from cr in SettingComplianceExtensions.GetComplianceRequisite((SettingEntry)(object)settingEntry)
 				where cr is FloatRangeRangeComplianceRequisite
 				select cr).ToList();
-			if (crList.Count > 0)
+			if (floatList.Count > 0)
 			{
-				FloatRangeRangeComplianceRequisite floatRangeCr = (FloatRangeRangeComplianceRequisite)(object)crList[0];
+				FloatRangeRangeComplianceRequisite floatRangeCr = (FloatRangeRangeComplianceRequisite)(object)floatList[0];
 				return new(float, float)?((((FloatRangeRangeComplianceRequisite)(ref floatRangeCr)).get_MinValue(), ((FloatRangeRangeComplianceRequisite)(ref floatRangeCr)).get_MaxValue()));
 			}
 			return null;

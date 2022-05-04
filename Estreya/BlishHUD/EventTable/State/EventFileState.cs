@@ -1,13 +1,14 @@
 using System;
 using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Modules.Managers;
+using Estreya.BlishHUD.EventTable.Controls;
 using Estreya.BlishHUD.EventTable.Models.Settings;
 using Estreya.BlishHUD.EventTable.Utils;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
 
 namespace Estreya.BlishHUD.EventTable.State
@@ -15,6 +16,8 @@ namespace Estreya.BlishHUD.EventTable.State
 	public class EventFileState : ManagedState
 	{
 		private static readonly Logger Logger = Logger.GetLogger<EventFileState>();
+
+		private const string WEB_SOURCE_URL = "https://blishhud.estreya.de/files/event-table/events.json";
 
 		private TimeSpan updateInterval = TimeSpan.FromHours(1.0);
 
@@ -39,7 +42,7 @@ namespace Estreya.BlishHUD.EventTable.State
 			FileName = fileName;
 		}
 
-		public override async Task Reload()
+		public override async Task InternalReload()
 		{
 			await CheckAndNotify(null);
 		}
@@ -69,7 +72,7 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		protected override void InternalUpdate(GameTime gameTime)
 		{
-			UpdateCadenceUtil.UpdateAsyncWithCadence(CheckAndNotify, gameTime, updateInterval.TotalMilliseconds, ref timeSinceUpdate);
+			UpdateUtil.UpdateAsync(CheckAndNotify, gameTime, updateInterval.TotalMilliseconds, ref timeSinceUpdate);
 		}
 
 		protected override Task Load()
@@ -93,8 +96,7 @@ namespace Estreya.BlishHUD.EventTable.State
 			}
 			if (await IsNewFileVersionAvaiable())
 			{
-				ScreenNotification.ShowNotification("Please update it from the settings window.", (NotificationType)0, (Texture2D)null, 10);
-				ScreenNotification.ShowNotification("A new version of the event file is available.", (NotificationType)0, (Texture2D)null, 10);
+				ScreenNotification.ShowNotification(new string[2] { "A new version of the event file is available.", "Please update it from the settings window." }, (NotificationType)0, null, 10);
 				lock (_lockObject)
 				{
 					_notified = true;
@@ -117,6 +119,21 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		private async Task<string> GetInternalFileContent()
 		{
+			try
+			{
+				Logger.Debug("Loading json from web source.");
+				string webJson = await new WebClient().DownloadStringTaskAsync(new Uri("https://blishhud.estreya.de/files/event-table/events.json"));
+				Logger.Debug($"Got content (length): {webJson?.Length ?? 0}");
+				if (!string.IsNullOrWhiteSpace(webJson))
+				{
+					return webJson;
+				}
+			}
+			catch (Exception ex)
+			{
+				Logger.Error(ex, "Could not read json from web source.");
+			}
+			Logger.Debug("Load json from internal ref.");
 			using Stream stream = ContentsManager.GetFileStream("events.json");
 			return await FileUtil.ReadStringAsync(stream);
 		}
@@ -172,6 +189,7 @@ namespace Estreya.BlishHUD.EventTable.State
 		{
 			string content = JsonConvert.SerializeObject((object)eventSettingsFile, (Formatting)1);
 			await FileUtil.WriteStringAsync(FilePath, content);
+			await Clear();
 		}
 
 		public async Task ExportFile()

@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Blish_HUD;
 using Blish_HUD.Controls;
 using Estreya.BlishHUD.EventTable.Controls;
 using Estreya.BlishHUD.EventTable.Helpers;
@@ -24,10 +23,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views.Settings
 		{
 		}
 
-		protected override void InternalBuild(Panel parent)
+		protected override void BuildView(Panel parent)
 		{
-			RenderSetting<int>(parent, base.ModuleSettings.EventHeight);
-			RenderSetting<FontSize>(parent, base.ModuleSettings.EventFontSize);
 			RenderSetting<string>(parent, base.ModuleSettings.EventTimeSpan);
 			RenderSetting<int>(parent, base.ModuleSettings.EventHistorySplit);
 			RenderSetting<bool>(parent, base.ModuleSettings.DrawEventBorder);
@@ -61,10 +58,10 @@ namespace Estreya.BlishHUD.EventTable.UI.Views.Settings
 				File.Delete(filePath2);
 			});
 			RenderEmptyLine(parent);
-			RenderButton(parent, Strings.EventSettingsView_ResetHiddenStates_Title, delegate
+			RenderButton(parent, Strings.EventSettingsView_ResetEventStates_Title, async delegate
 			{
-				EventTableModule.ModuleInstance.HiddenState.Clear();
-				ScreenNotification.ShowNotification(Strings.EventSettingsView_ResetHiddenStates_Success, (NotificationType)0);
+				await EventTableModule.ModuleInstance.EventState.Clear();
+				ScreenNotification.ShowNotification(Strings.EventSettingsView_ResetEventStates_Success, (NotificationType)0);
 			});
 			RenderEmptyLine(parent);
 			RenderSetting<bool>(parent, base.ModuleSettings.UseFiller);

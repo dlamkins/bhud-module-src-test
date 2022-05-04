@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Estreya.BlishHUD.EventTable.Resources;
+using Estreya.BlishHUD.EventTable.State;
 using Estreya.BlishHUD.EventTable.Utils;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
@@ -27,6 +28,9 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		[JsonIgnore]
 		private AsyncLock _eventLock = new AsyncLock();
+
+		[JsonIgnore]
+		private bool? _isDisabled;
 
 		[JsonProperty("key")]
 		public string Key { get; set; }
@@ -53,6 +57,19 @@ namespace Estreya.BlishHUD.EventTable.Models
 			}
 		}
 
+		[JsonIgnore]
+		public bool IsDisabled
+		{
+			get
+			{
+				if (!_isDisabled.HasValue)
+				{
+					_isDisabled = EventTableModule.ModuleInstance.EventState.Contains(Key, EventState.EventStates.Hidden);
+				}
+				return _isDisabled.Value;
+			}
+		}
+
 		public EventCategory()
 		{
 			timeSinceUpdate = updateInterval.TotalMilliseconds;
@@ -72,7 +89,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 			{
 				_fillerEvents.Clear();
 			}
-			List<Event> activeEvents = _originalEvents.Where((Event e) => !e.IsDisabled()).ToList();
+			List<Event> activeEvents = _originalEvents.Where((Event e) => !e.IsDisabled).ToList();
 			List<KeyValuePair<DateTime, Event>> activeEventStarts = new List<KeyValuePair<DateTime, Event>>();
 			foreach (Event activeEvent in activeEvents)
 			{
@@ -218,16 +235,23 @@ namespace Estreya.BlishHUD.EventTable.Models
 			}
 		}
 
+		public void Hide()
+		{
+			DateTime now = EventTableModule.ModuleInstance.DateTimeNow.ToUniversalTime();
+			DateTime until = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0).AddDays(1.0);
+			EventTableModule.ModuleInstance.EventState.Add(Key, until, EventState.EventStates.Hidden);
+		}
+
 		public void Finish()
 		{
 			DateTime now = EventTableModule.ModuleInstance.DateTimeNow.ToUniversalTime();
 			DateTime until = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0).AddDays(1.0);
-			EventTableModule.ModuleInstance.HiddenState.Add(Key, until, isUTC: true);
+			EventTableModule.ModuleInstance.EventState.Add(Key, until, EventState.EventStates.Completed);
 		}
 
-		public bool IsDisabled()
+		public bool IsFinished()
 		{
-			return EventTableModule.ModuleInstance.HiddenState.IsHidden(Key);
+			return EventTableModule.ModuleInstance.EventState.Contains(Key, EventState.EventStates.Completed);
 		}
 
 		public async Task LoadAsync()
@@ -245,11 +269,29 @@ namespace Estreya.BlishHUD.EventTable.Models
 				Name = Strings.ResourceManager.GetString("eventCategory-" + Key) ?? Name;
 			}
 			EventTableModule.ModuleInstance.ModuleSettings.EventSettingChanged += ModuleSettings_EventSettingChanged;
+			EventTableModule.ModuleInstance.EventState.StateAdded += EventState_StateAdded;
+			EventTableModule.ModuleInstance.EventState.StateRemoved += EventState_StateRemoved;
 			using (await _eventLock.LockAsync())
 			{
 				await Task.WhenAll(Events.Select((Event ev) => ev.LoadAsync()));
 			}
 			Logger.Debug("Loaded event category: {0}", new object[1] { Key });
+		}
+
+		private void EventState_StateRemoved(object sender, ValueEventArgs<string> e)
+		{
+			if (e.get_Value() == Key)
+			{
+				_isDisabled = null;
+			}
+		}
+
+		private void EventState_StateAdded(object sender, ValueEventArgs<EventState.VisibleStateInfo> e)
+		{
+			if (e.get_Value().Key == Key && e.get_Value().State == EventState.EventStates.Hidden)
+			{
+				_isDisabled = null;
+			}
 		}
 
 		public void Unload()
@@ -269,7 +311,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 			{
 				ev.Update(gameTime);
 			});
-			UpdateCadenceUtil.UpdateWithCadence(UpdateEventOccurences, gameTime, updateInterval.TotalMilliseconds, ref timeSinceUpdate);
+			UpdateUtil.Update(UpdateEventOccurences, gameTime, updateInterval.TotalMilliseconds, ref timeSinceUpdate);
 		}
 	}
 }
