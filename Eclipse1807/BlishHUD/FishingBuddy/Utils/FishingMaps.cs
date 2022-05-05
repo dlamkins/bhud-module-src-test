@@ -49,6 +49,8 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 
 		public static readonly List<int> RingOfFireMaps = new List<int> { 1175, 1195 };
 
+		public static readonly int CanthaRegionId = 37;
+
 		public static readonly List<int> CanthaMaps = new List<int> { 1442, 1419, 1444, 1462, 1438, 1452, 1428, 1422 };
 
 		public static readonly List<int> SeitungProvinceFisher = new List<int> { 6336, 6264 };

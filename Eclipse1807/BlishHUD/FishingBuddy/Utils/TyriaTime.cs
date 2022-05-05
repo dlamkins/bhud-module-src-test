@@ -9,6 +9,16 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 	{
 		private static readonly Logger Logger = Logger.GetLogger(typeof(TyriaTime));
 
+		public static int canthaDayLength = 55;
+
+		public static int canthaNightLength = 55;
+
+		public static int centralDayLength = 70;
+
+		public static int centralNightLength = 40;
+
+		public static int DuskDawnLength = 5;
+
 		public static readonly DateTime canthaDawnStart = new DateTime(2000, 1, 1, 7, 0, 0);
 
 		public static readonly DateTime canthaDayStart = new DateTime(2000, 1, 1, 8, 0, 0);
@@ -29,21 +39,17 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 
 		public static readonly DateTime canthaDayStartUTC = new DateTime(2000, 1, 1, 0, 40, 0);
 
-		public static readonly DateTime canthaDuskStartUTC = new DateTime(2000, 1, 1, 0, 35, 0);
+		public static readonly DateTime canthaDuskStartUTC = new DateTime(2000, 1, 1, 1, 35, 0);
 
-		public static readonly DateTime canthaNightStartUTC = new DateTime(2000, 1, 1, 0, 40, 0);
+		public static readonly DateTime canthaNightStartUTC = new DateTime(2000, 1, 1, 1, 40, 0);
 
 		public static readonly DateTime centralDawnStartUTC = new DateTime(2000, 1, 1, 0, 25, 0);
 
 		public static readonly DateTime centralDayStartUTC = new DateTime(2000, 1, 1, 0, 30, 0);
 
-		public static readonly DateTime centralDuskStartUTC = new DateTime(2000, 1, 1, 0, 40, 0);
+		public static readonly DateTime centralDuskStartUTC = new DateTime(2000, 1, 1, 1, 40, 0);
 
-		public static readonly DateTime centralNightStartUTC = new DateTime(2000, 1, 1, 0, 45, 0);
-
-		public static readonly List<int> CanthaMaps = new List<int> { 1442, 1419, 1444, 1462, 1438, 1452, 1428, 1422 };
-
-		public static readonly int CanthaRegionId = 37;
+		public static readonly DateTime centralNightStartUTC = new DateTime(2000, 1, 1, 1, 45, 0);
 
 		public static readonly List<int> AlwaysDayMaps = new List<int> { 1195, 1465, 1206, 968 };
 
@@ -60,7 +66,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 			{
 				return "Night";
 			}
-			if (map.get_RegionId() == CanthaRegionId)
+			if (map.get_RegionId() == FishingMaps.CanthaRegionId)
 			{
 				if (TyriaTime >= canthaDawnStart && TyriaTime < canthaDayStart)
 				{
@@ -112,47 +118,62 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 
 		public static DateTime NextPhaseTime(Map map)
 		{
-			return DateTime.Now + TimeTilNextPhase(map);
+			return DateTime.UtcNow + TimeTilNextPhase(map);
 		}
 
 		public static TimeSpan TimeTilNextPhase(Map map)
 		{
 			DateTime TyriaTime = CalcTyriaTime();
-			DateTime nowish = new DateTime(2000, 1, 1, 0, DateTime.Now.Minute, DateTime.Now.Second);
-			TimeSpan timeTilNextPhase = TimeSpan.Zero;
+			DateTime nowish = new DateTime(2000, 1, 1, DateTime.UtcNow.Hour % 2, DateTime.UtcNow.Minute, DateTime.UtcNow.Second);
 			if (map == null || AlwaysDayMaps.Contains(map.get_Id()) || AlwaysNightMaps.Contains(map.get_Id()))
 			{
 				return TimeSpan.Zero;
 			}
-			if (map.get_RegionId() == CanthaRegionId)
+			DateTime currentPhaseEnd;
+			if (map.get_RegionId() == FishingMaps.CanthaRegionId)
 			{
 				if (TyriaTime >= canthaDawnStart && TyriaTime < canthaDayStart)
 				{
-					return canthaDayStartUTC.Subtract(nowish);
+					currentPhaseEnd = canthaDawnStartUTC.AddMinutes(DuskDawnLength);
 				}
-				if (TyriaTime >= canthaDayStart && TyriaTime < canthaDuskStart)
+				else if (TyriaTime >= canthaDayStart && TyriaTime < canthaDuskStart)
 				{
-					return (nowish >= canthaDayStartUTC && nowish < canthaDayStartUTC.AddMinutes(20.0)) ? canthaDayStartUTC.AddMinutes(55.0).Subtract(nowish) : canthaDuskStartUTC.Subtract(nowish);
+					currentPhaseEnd = canthaDayStartUTC.AddMinutes(canthaDayLength);
 				}
-				if (TyriaTime >= canthaDuskStart && TyriaTime < canthaNightStart)
+				else if (TyriaTime >= canthaDuskStart && TyriaTime < canthaNightStart)
 				{
-					return canthaNightStartUTC.Subtract(nowish);
+					currentPhaseEnd = canthaDuskStartUTC.AddMinutes(DuskDawnLength);
 				}
-				return (nowish >= canthaNightStartUTC && nowish < canthaNightStartUTC.AddMinutes(20.0)) ? canthaNightStartUTC.AddMinutes(55.0).Subtract(nowish) : canthaDuskStartUTC.Subtract(nowish);
+				else
+				{
+					currentPhaseEnd = canthaNightStartUTC.AddMinutes(canthaNightLength);
+					if (nowish.Hour == 0)
+					{
+						nowish = nowish.AddHours(2.0);
+					}
+				}
 			}
-			if (TyriaTime >= centralDawnStart && TyriaTime < centralDayStart)
+			else if (TyriaTime >= centralDawnStart && TyriaTime < centralDayStart)
 			{
-				return centralDayStartUTC.Subtract(nowish);
+				currentPhaseEnd = centralDawnStartUTC.AddMinutes(DuskDawnLength);
 			}
-			if (TyriaTime >= centralDayStart && TyriaTime < centralDuskStart)
+			else if (TyriaTime >= centralDayStart && TyriaTime < centralDuskStart)
 			{
-				return (nowish >= centralDayStartUTC && nowish < centralDayStartUTC.AddMinutes(30.0)) ? centralDayStartUTC.AddMinutes(70.0).Subtract(nowish) : centralDuskStartUTC.Subtract(nowish);
+				currentPhaseEnd = centralDayStartUTC.AddMinutes(centralDayLength);
 			}
-			if (TyriaTime >= centralDuskStart && TyriaTime < centralNightStart)
+			else if (TyriaTime >= centralDuskStart && TyriaTime < centralNightStart)
 			{
-				return centralNightStartUTC.Subtract(nowish);
+				currentPhaseEnd = centralDuskStartUTC.AddMinutes(DuskDawnLength);
 			}
-			return (nowish >= centralNightStartUTC && nowish < centralNightStartUTC.AddMinutes(15.0)) ? centralNightStartUTC.AddMinutes(40.0).Subtract(nowish) : centralDawnStartUTC.Subtract(nowish);
+			else
+			{
+				currentPhaseEnd = centralNightStartUTC.AddMinutes(centralNightLength);
+				if (nowish.Hour == 0)
+				{
+					nowish = nowish.AddHours(2.0);
+				}
+			}
+			return currentPhaseEnd.Subtract(nowish);
 		}
 	}
 }
