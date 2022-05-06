@@ -41,7 +41,7 @@ namespace GatheringTools.ToolSearch.Controls
 
 		private const int SPACING_BETWEEN_EQUIPPED_AND_INVENTORY_TOOLS = 5;
 
-		private const string API_KEY_ERROR_MESSAGE = "Error: API key problem.\nPossible Reasons:\n- After starting GW2 you have to log into a character once for Blish to know which API key to use.\n- Blish needs a few more seconds to give an API token to the module. You may have to reopen window to update.\n- API key is missing in Blish. Add API key to Blish.\n- API key exists but is missing permissions. Add API key with necessary permissions to Blish.\n- API is down or has issues or something else went wrong. Check Blish log file.";
+		private const string API_KEY_ERROR_MESSAGE = "Error: API problem.\nPossible Reasons:\n- After starting GW2 you have to log into a character once for Blish to know which API key to use.\n- Blish needs a few more seconds to give an API token to the module. You have to reopen window to update.\n- API key is missing in Blish. Add API key to Blish.\n- API key exists but is missing permissions. Add API key with necessary permissions to Blish.\n- If the API key has all permissions, disable and enable the module again. This can fix issues especially right after a module update.\n- API is down or has issues or something else went wrong. Check Blish log file.";
 
 		public ToolSearchStandardWindow(TextureService textureService, SettingService settingService, List<GatheringTool> allGatheringTools, Gw2ApiManager gw2ApiManager, Logger logger)
 			: this(textureService.WindowBackgroundTexture, new Rectangle(10, 30, 235, 610), new Rectangle(30, 30, 230, 600))
@@ -187,53 +187,53 @@ namespace GatheringTools.ToolSearch.Controls
 			((Container)_toolLocationsFlowPanel).ClearChildren();
 			_infoLabel.set_Text("Getting API data...");
 			((Control)_loadingSpinnerContainer).Show();
-			var (accountTools, flag) = await FindGatheringToolsService.GetToolsFromApi(_allGatheringTools, _gw2ApiManager, _logger);
+			var (account, flag) = await FindGatheringToolsService.GetToolsFromApi(_allGatheringTools, _gw2ApiManager, _logger);
 			_infoLabel.set_Text(string.Empty);
 			((Control)_loadingSpinnerContainer).Hide();
 			if (flag)
 			{
-				_infoLabel.set_Text("Error: API key problem.\nPossible Reasons:\n- After starting GW2 you have to log into a character once for Blish to know which API key to use.\n- Blish needs a few more seconds to give an API token to the module. You may have to reopen window to update.\n- API key is missing in Blish. Add API key to Blish.\n- API key exists but is missing permissions. Add API key with necessary permissions to Blish.\n- API is down or has issues or something else went wrong. Check Blish log file.");
+				_infoLabel.set_Text("Error: API problem.\nPossible Reasons:\n- After starting GW2 you have to log into a character once for Blish to know which API key to use.\n- Blish needs a few more seconds to give an API token to the module. You have to reopen window to update.\n- API key is missing in Blish. Add API key to Blish.\n- API key exists but is missing permissions. Add API key with necessary permissions to Blish.\n- If the API key has all permissions, disable and enable the module again. This can fix issues especially right after a module update.\n- API is down or has issues or something else went wrong. Check Blish log file.");
 				return;
 			}
-			FilterGatheringToolsService.FilterTools(accountTools, _showOnlyUnlimitedToolsCheckbox.get_Checked(), _showBankCheckbox.get_Checked(), _showSharedInventoryCheckbox.get_Checked());
-			if (accountTools.HasTools())
+			FilterGatheringToolsService.FilterTools(account, _showOnlyUnlimitedToolsCheckbox.get_Checked(), _showBankCheckbox.get_Checked(), _showSharedInventoryCheckbox.get_Checked());
+			if (account.HasTools())
 			{
-				ShowToolsInUi(accountTools, _toolLocationsFlowPanel, _textureService, _logger);
+				ShowToolsInUi(account, _toolLocationsFlowPanel, _textureService, _logger);
 			}
 			else
 			{
-				_infoLabel.set_Text("No tools found with current search filter or no character has tools equipped!");
+				_infoLabel.set_Text("No tools found with current search filter!");
 			}
 		}
 
-		private static void ShowToolsInUi(AccountTools accountTools, FlowPanel toolLocationsFlowPanel, TextureService textureService, Logger logger)
+		private static void ShowToolsInUi(Account account, FlowPanel toolLocationsFlowPanel, TextureService textureService, Logger logger)
 		{
-			if (accountTools.BankGatheringTools.Any())
+			if (account.BankGatheringTools.Any())
 			{
-				HeaderWithToolsFlowPanel headerWithToolsFlowPanel = new HeaderWithToolsFlowPanel("Bank", textureService.BankTexture, accountTools.BankGatheringTools, logger);
+				HeaderWithToolsFlowPanel headerWithToolsFlowPanel = new HeaderWithToolsFlowPanel("Bank", account.BankGatheringTools, textureService.BankTexture, textureService.UnknownToolTexture, logger);
 				((Container)headerWithToolsFlowPanel).set_WidthSizingMode((SizingMode)1);
 				((Container)headerWithToolsFlowPanel).set_HeightSizingMode((SizingMode)1);
 				((Panel)headerWithToolsFlowPanel).set_ShowBorder(true);
 				((Control)headerWithToolsFlowPanel).set_Parent((Container)(object)toolLocationsFlowPanel);
 			}
-			if (accountTools.SharedInventoryGatheringTools.Any())
+			if (account.SharedInventoryGatheringTools.Any())
 			{
-				HeaderWithToolsFlowPanel headerWithToolsFlowPanel2 = new HeaderWithToolsFlowPanel("Shared inventory", textureService.SharedInventoryTexture, accountTools.SharedInventoryGatheringTools, logger);
+				HeaderWithToolsFlowPanel headerWithToolsFlowPanel2 = new HeaderWithToolsFlowPanel("Shared inventory", account.SharedInventoryGatheringTools, textureService.SharedInventoryTexture, textureService.UnknownToolTexture, logger);
 				((Container)headerWithToolsFlowPanel2).set_WidthSizingMode((SizingMode)1);
 				((Container)headerWithToolsFlowPanel2).set_HeightSizingMode((SizingMode)1);
 				((Panel)headerWithToolsFlowPanel2).set_ShowBorder(true);
 				((Control)headerWithToolsFlowPanel2).set_Parent((Container)(object)toolLocationsFlowPanel);
 			}
-			foreach (CharacterTools character in accountTools.Characters)
+			foreach (Character character in account.Characters)
 			{
 				if (character.HasTools())
 				{
-					ShowCharacterTools(character, toolLocationsFlowPanel, textureService, logger);
+					ShowCharacter(character, toolLocationsFlowPanel, textureService, logger);
 				}
 			}
 		}
 
-		private static void ShowCharacterTools(CharacterTools character, FlowPanel rootFlowPanel, TextureService textureService, Logger logger)
+		private static void ShowCharacter(Character character, FlowPanel rootFlowPanel, TextureService textureService, Logger logger)
 		{
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
@@ -260,7 +260,7 @@ namespace GatheringTools.ToolSearch.Controls
 			FlowPanel characterFlowPanel = val;
 			if (character.EquippedGatheringTools.Any())
 			{
-				HeaderWithToolsFlowPanel headerWithToolsFlowPanel = new HeaderWithToolsFlowPanel("Equipped tools", textureService.EquipmentTexture, character.EquippedGatheringTools, logger);
+				HeaderWithToolsFlowPanel headerWithToolsFlowPanel = new HeaderWithToolsFlowPanel("Equipped tools", character.EquippedGatheringTools, textureService.EquipmentTexture, textureService.UnknownToolTexture, logger);
 				((Container)headerWithToolsFlowPanel).set_WidthSizingMode((SizingMode)1);
 				((Container)headerWithToolsFlowPanel).set_HeightSizingMode((SizingMode)1);
 				((Panel)headerWithToolsFlowPanel).set_ShowBorder(false);
@@ -268,7 +268,7 @@ namespace GatheringTools.ToolSearch.Controls
 			}
 			if (character.InventoryGatheringTools.Any())
 			{
-				HeaderWithToolsFlowPanel headerWithToolsFlowPanel2 = new HeaderWithToolsFlowPanel("Inventory", textureService.CharacterInventoryTexture, character.InventoryGatheringTools, logger);
+				HeaderWithToolsFlowPanel headerWithToolsFlowPanel2 = new HeaderWithToolsFlowPanel("Inventory", character.InventoryGatheringTools, textureService.CharacterInventoryTexture, textureService.UnknownToolTexture, logger);
 				((Container)headerWithToolsFlowPanel2).set_WidthSizingMode((SizingMode)1);
 				((Container)headerWithToolsFlowPanel2).set_HeightSizingMode((SizingMode)1);
 				((Panel)headerWithToolsFlowPanel2).set_ShowBorder(false);

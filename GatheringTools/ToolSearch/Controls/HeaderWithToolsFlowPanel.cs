@@ -17,21 +17,20 @@ namespace GatheringTools.ToolSearch.Controls
 
 		private const int PADDING_TO_PREVENT_LINE_BREAK = 5;
 
-		public HeaderWithToolsFlowPanel(string headerText, Texture2D headerTexture, List<GatheringTool> gatheringTools, Logger logger)
+		public HeaderWithToolsFlowPanel(string headerText, List<GatheringTool> gatheringTools, Texture2D headerTexture, Texture2D unknownToolTexture, Logger logger)
 			: this()
 		{
 			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Expected O, but got Unknown
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Expected O, but got Unknown
 			((FlowPanel)this).set_FlowDirection((ControlFlowDirection)2);
 			Image val = new Image(AsyncTexture2D.op_Implicit(headerTexture));
 			((Control)val).set_BasicTooltipText(headerText);
@@ -45,42 +44,49 @@ namespace GatheringTools.ToolSearch.Controls
 			FlowPanel toolsFlowPanel = val2;
 			foreach (GatheringTool gatheringTool in gatheringTools)
 			{
-				ShowGatheringToolImageOrFallbackLabel(logger, gatheringTool, toolsFlowPanel);
+				ShowGatheringToolImageOrFallbackControl(gatheringTool, unknownToolTexture, toolsFlowPanel, logger);
 			}
 		}
 
-		private static void ShowGatheringToolImageOrFallbackLabel(Logger logger, GatheringTool gatheringTool, FlowPanel toolsFlowPanel)
+		private static void ShowGatheringToolImageOrFallbackControl(GatheringTool gatheringTool, Texture2D unknownToolTexture, FlowPanel toolsFlowPanel, Logger logger)
 		{
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			AsyncTexture2D obj = DetermineToolTexture(gatheringTool, unknownToolTexture, logger);
+			string tooltipText = DetermineTooltipText(gatheringTool);
+			Image val = new Image(obj);
+			((Control)val).set_BasicTooltipText(tooltipText);
+			((Control)val).set_Size(new Point(50, 50));
+			((Control)val).set_Parent((Container)(object)toolsFlowPanel);
+		}
+
+		private static string DetermineTooltipText(GatheringTool gatheringTool)
+		{
+			return gatheringTool.ToolType switch
+			{
+				ToolType.Normal => gatheringTool.Name, 
+				ToolType.UnknownId => $"No data in the API for this item ID: {gatheringTool.Id}. :(\n" + "Could be a very new or very old item. Or a bug in the API.", 
+				ToolType.InventoryCanNotBeAccessedPlaceHolder => "Can not access inventory for this character. :(\nCould be an API error or API key has no 'inventories' permission.", 
+				_ => $"Bug in module code. ToolType {gatheringTool.ToolType} is not handled. :(", 
+			};
+		}
+
+		private static AsyncTexture2D DetermineToolTexture(GatheringTool gatheringTool, Texture2D unknownToolTexture, Logger logger)
+		{
+			if (gatheringTool.ToolType != 0)
+			{
+				return AsyncTexture2D.op_Implicit(unknownToolTexture);
+			}
 			try
 			{
-				Image val = new Image(GameService.Content.GetRenderServiceTexture(gatheringTool.IconUrl));
-				((Control)val).set_BasicTooltipText(gatheringTool.Name);
-				((Control)val).set_Size(new Point(50, 50));
-				((Control)val).set_Parent((Container)(object)toolsFlowPanel);
+				return GameService.Content.GetRenderServiceTexture(gatheringTool.IconUrl);
 			}
 			catch (Exception e)
 			{
-				Label val2 = new Label();
-				val2.set_Text(gatheringTool.Name);
-				((Control)val2).set_BasicTooltipText(gatheringTool.Name);
-				val2.set_Font(GameService.Content.get_DefaultFont18());
-				val2.set_ShowShadow(true);
-				val2.set_AutoSizeHeight(true);
-				val2.set_AutoSizeWidth(true);
-				((Control)val2).set_Parent((Container)(object)toolsFlowPanel);
-				logger.Error(e, "Could not get gathering tool icon from API. Show gathering tool name instead.");
+				logger.Error(e, "Could not get gathering tool icon from API. Show placeholder icon instead.");
+				return AsyncTexture2D.op_Implicit(unknownToolTexture);
 			}
 		}
 	}

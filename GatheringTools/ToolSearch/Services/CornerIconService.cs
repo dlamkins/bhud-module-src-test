@@ -15,12 +15,15 @@ namespace GatheringTools.ToolSearch.Services
 
 		private readonly Texture2D _cornerIconTexture;
 
+		private readonly Texture2D _hoverCornerIconTexture;
+
 		private CornerIcon _toolSearchCornerIcon;
 
-		public CornerIconService(SettingEntry<bool> showToolSearchCornerIconSetting, ToolSearchStandardWindow toolSearchStandardWindow, Texture2D cornerIconTexture)
+		public CornerIconService(SettingEntry<bool> showToolSearchCornerIconSetting, ToolSearchStandardWindow toolSearchStandardWindow, TextureService textureService)
 		{
 			_toolSearchStandardWindow = toolSearchStandardWindow;
-			_cornerIconTexture = cornerIconTexture;
+			_cornerIconTexture = textureService.CornerIconTexture;
+			_hoverCornerIconTexture = textureService.HoverCornerIconTexture;
 			if (showToolSearchCornerIconSetting.get_Value())
 			{
 				CreateCornerIcon();
@@ -53,10 +56,12 @@ namespace GatheringTools.ToolSearch.Services
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Expected O, but got Unknown
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Expected O, but got Unknown
 			CornerIcon val = new CornerIcon();
 			val.set_Icon(AsyncTexture2D.op_Implicit(_cornerIconTexture));
+			val.set_HoverIcon(AsyncTexture2D.op_Implicit(_hoverCornerIconTexture));
 			((Control)val).set_BasicTooltipText("Click to show/hide which character has gathering tools equipped.\nIcon can be hidden by module settings.");
 			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			_toolSearchCornerIcon = val;

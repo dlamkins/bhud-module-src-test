@@ -14,24 +14,33 @@ namespace GatheringTools.ToolSearch.Services
 {
 	public static class FindGatheringToolsService
 	{
-		public static async Task<(AccountTools, bool apiAccessFailed)> GetToolsFromApi(List<GatheringTool> allGatheringTools, Gw2ApiManager gw2ApiManager, Logger logger)
+		private static readonly List<TokenPermission> NECESSARY_API_TOKEN_PERMISSIONS = new List<TokenPermission>
 		{
-			if (!gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)gw2ApiManager.get_Permissions()))
+			(TokenPermission)1,
+			(TokenPermission)3,
+			(TokenPermission)5,
+			(TokenPermission)2
+		};
+
+		public static async Task<(Account, bool apiAccessFailed)> GetToolsFromApi(List<GatheringTool> allGatheringTools, Gw2ApiManager gw2ApiManager, Logger logger)
+		{
+			if (!gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)NECESSARY_API_TOKEN_PERMISSIONS))
 			{
-				return (new AccountTools(), true);
+				logger.Warn("HasPermissions() returned false. Possible reasons: API subToken does not have the necessary permissions: " + string.Join(", ", NECESSARY_API_TOKEN_PERMISSIONS) + ". Or module did not get API subToken from Blish yet. Or API key is missing.");
+				return (new Account(), true);
 			}
 			try
 			{
-				return (await Task.Run(() => GetToolsOnAccount(allGatheringTools, gw2ApiManager)), false);
+				return (await Task.Run(() => GetToolsOnAccount(allGatheringTools, gw2ApiManager, logger)), false);
 			}
 			catch (Exception e)
 			{
 				logger.Error(e, "Could not get gathering tools from API");
-				return (new AccountTools(), true);
+				return (new Account(), true);
 			}
 		}
 
-		private static async Task<AccountTools> GetToolsOnAccount(List<GatheringTool> allGatheringTools, Gw2ApiManager gw2ApiManager)
+		private static async Task<Account> GetToolsOnAccount(List<GatheringTool> allGatheringTools, Gw2ApiManager gw2ApiManager, Logger logger)
 		{
 			Task<IApiV2ObjectList<AccountItem>> sharedInventoryTask = ((IBlobClient<IApiV2ObjectList<AccountItem>>)(object)gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
 				.get_Inventory()).GetAsync(default(CancellationToken));
@@ -41,20 +50,25 @@ namespace GatheringTools.ToolSearch.Services
 			await Task.WhenAll(sharedInventoryTask, bankTask, charactersTask);
 			List<GatheringTool> bankGatheringTools = FindGatheringTools((IEnumerable<AccountItem>)bankTask.Result, allGatheringTools).ToList();
 			List<GatheringTool> sharedInventoryGatheringTools = FindGatheringTools((IEnumerable<AccountItem>)sharedInventoryTask.Result, allGatheringTools).ToList();
-			AccountTools accountTools = new AccountTools(bankGatheringTools, sharedInventoryGatheringTools);
+			Account account = new Account(bankGatheringTools, sharedInventoryGatheringTools);
 			foreach (Character characterResponse in (IEnumerable<Character>)charactersTask.Result)
 			{
-				List<GatheringTool> inventoryGatheringTools = FindInventoryGatheringTools(characterResponse, allGatheringTools);
+				List<GatheringTool> inventoryGatheringTools = FindInventoryGatheringTools(characterResponse, allGatheringTools, logger);
 				List<GatheringTool> equippedGatheringTools = FindEquippedGatheringTools(allGatheringTools, characterResponse).ToList();
-				CharacterTools character = new CharacterTools(characterResponse.get_Name(), inventoryGatheringTools, equippedGatheringTools);
-				accountTools.Characters.Add(character);
+				Character character = new Character(characterResponse.get_Name(), inventoryGatheringTools, equippedGatheringTools);
+				account.Characters.Add(character);
 			}
-			await UnknownGatheringToolsService.UpdateUnknownEquippedGatheringTools(accountTools.Characters, gw2ApiManager);
-			return accountTools;
+			await UnknownGatheringToolsService.UpdateUnknownEquippedGatheringTools(account.Characters, gw2ApiManager, logger);
+			return account;
 		}
 
-		private static List<GatheringTool> FindInventoryGatheringTools(Character characterResponse, List<GatheringTool> allGatheringTools)
+		private static List<GatheringTool> FindInventoryGatheringTools(Character characterResponse, List<GatheringTool> allGatheringTools, Logger logger)
 		{
+			if (characterResponse.get_Bags() == null)
+			{
+				logger.Error("Character.Bags is NULL for a character (Name: " + characterResponse.get_Name() + "). This can happen when api key is missing inventory permission.");
+				return new List<GatheringTool> { UnknownGatheringToolsService.CreateNoInventoryAccessPlaceholderTool() };
+			}
 			return FindGatheringTools((from b in characterResponse.get_Bags().Where(IsNotEmptyBagSlot)
 				select b.get_Inventory()).SelectMany((IReadOnlyList<AccountItem> i) => i), allGatheringTools).ToList();
 		}

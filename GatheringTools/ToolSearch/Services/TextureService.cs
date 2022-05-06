@@ -16,7 +16,11 @@ namespace GatheringTools.ToolSearch.Services
 
 		public Texture2D WindowBackgroundTexture { get; }
 
-		public Texture2D SickleTexture { get; }
+		public Texture2D ToolSearchWindowEmblem { get; }
+
+		public Texture2D CornerIconTexture { get; }
+
+		public Texture2D HoverCornerIconTexture { get; }
 
 		public Texture2D BankTexture { get; }
 
@@ -26,18 +30,23 @@ namespace GatheringTools.ToolSearch.Services
 
 		public Texture2D EquipmentTexture { get; }
 
+		public Texture2D UnknownToolTexture { get; }
+
 		public TextureService(ContentsManager contentsManager)
 		{
 			ReminderBackgroundTexture = contentsManager.GetTexture("logoutOverlay\\logoutDialogTextArea.png");
 			Tool1Texture = contentsManager.GetTexture("logoutOverlay\\tool1_1998933.png");
 			Tool2Texture = contentsManager.GetTexture("logoutOverlay\\tool2_1998934.png");
 			Tool3Texture = contentsManager.GetTexture("logoutOverlay\\tool3_1998935.png");
-			WindowBackgroundTexture = contentsManager.GetTexture("toolSearch\\windowsBackground_155985.png");
-			SickleTexture = contentsManager.GetTexture("toolSearch\\sickle.png");
-			BankTexture = contentsManager.GetTexture("toolSearch\\bank_156670.png");
-			CharacterInventoryTexture = contentsManager.GetTexture("toolSearch\\inventory_157098.png");
-			SharedInventoryTexture = contentsManager.GetTexture("toolSearch\\sharedInventory.png");
-			EquipmentTexture = contentsManager.GetTexture("toolSearch\\equipment_156714.png");
+			WindowBackgroundTexture = contentsManager.GetTexture("toolSearch\\textures\\windowsBackground_155985.png");
+			ToolSearchWindowEmblem = contentsManager.GetTexture("toolSearch\\textures\\toolSearchWindowEmblem.png");
+			CornerIconTexture = contentsManager.GetTexture("toolSearch\\textures\\cornerIcon.png");
+			HoverCornerIconTexture = contentsManager.GetTexture("toolSearch\\textures\\cornerIcon_hover.png");
+			BankTexture = contentsManager.GetTexture("toolSearch\\textures\\bank_156670.png");
+			CharacterInventoryTexture = contentsManager.GetTexture("toolSearch\\textures\\inventory_157098.png");
+			SharedInventoryTexture = contentsManager.GetTexture("toolSearch\\textures\\sharedInventory.png");
+			EquipmentTexture = contentsManager.GetTexture("toolSearch\\textures\\equipment_156714.png");
+			UnknownToolTexture = contentsManager.GetTexture("toolSearch\\textures\\unknownTool_66591.png");
 		}
 
 		public void Dispose()
@@ -67,10 +76,20 @@ namespace GatheringTools.ToolSearch.Services
 			{
 				((GraphicsResource)windowBackgroundTexture).Dispose();
 			}
-			Texture2D sickleTexture = SickleTexture;
-			if (sickleTexture != null)
+			Texture2D toolSearchWindowEmblem = ToolSearchWindowEmblem;
+			if (toolSearchWindowEmblem != null)
 			{
-				((GraphicsResource)sickleTexture).Dispose();
+				((GraphicsResource)toolSearchWindowEmblem).Dispose();
+			}
+			Texture2D cornerIconTexture = CornerIconTexture;
+			if (cornerIconTexture != null)
+			{
+				((GraphicsResource)cornerIconTexture).Dispose();
+			}
+			Texture2D hoverCornerIconTexture = HoverCornerIconTexture;
+			if (hoverCornerIconTexture != null)
+			{
+				((GraphicsResource)hoverCornerIconTexture).Dispose();
 			}
 			Texture2D bankTexture = BankTexture;
 			if (bankTexture != null)
@@ -91,6 +110,11 @@ namespace GatheringTools.ToolSearch.Services
 			if (equipmentTexture != null)
 			{
 				((GraphicsResource)equipmentTexture).Dispose();
+			}
+			Texture2D unknownToolTexture = UnknownToolTexture;
+			if (unknownToolTexture != null)
+			{
+				((GraphicsResource)unknownToolTexture).Dispose();
 			}
 		}
 	}

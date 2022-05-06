@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace GatheringTools.ToolSearch.Model
 {
-	public class AccountTools
+	public class Account
 	{
 		public List<GatheringTool> SharedInventoryGatheringTools { get; } = new List<GatheringTool>();
 
@@ -11,14 +11,14 @@ namespace GatheringTools.ToolSearch.Model
 		public List<GatheringTool> BankGatheringTools { get; } = new List<GatheringTool>();
 
 
-		public List<CharacterTools> Characters { get; } = new List<CharacterTools>();
+		public List<Character> Characters { get; } = new List<Character>();
 
 
-		public AccountTools()
+		public Account()
 		{
 		}
 
-		public AccountTools(List<GatheringTool> bankGatheringTools, List<GatheringTool> sharedInventoryGatheringTools)
+		public Account(List<GatheringTool> bankGatheringTools, List<GatheringTool> sharedInventoryGatheringTools)
 		{
 			BankGatheringTools = bankGatheringTools;
 			SharedInventoryGatheringTools = sharedInventoryGatheringTools;
@@ -28,7 +28,7 @@ namespace GatheringTools.ToolSearch.Model
 		{
 			if (!SharedInventoryGatheringTools.Any() && !BankGatheringTools.Any())
 			{
-				return Characters.Any((CharacterTools c) => c.HasTools());
+				return Characters.Any((Character c) => c.HasTools());
 			}
 			return true;
 		}

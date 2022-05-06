@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace GatheringTools.ToolSearch.Model
 {
-	public class CharacterTools
+	public class Character
 	{
 		public string CharacterName { get; }
 
@@ -11,7 +11,7 @@ namespace GatheringTools.ToolSearch.Model
 
 		public List<GatheringTool> InventoryGatheringTools { get; }
 
-		public CharacterTools(string characterName, List<GatheringTool> inventoryGatheringTools, List<GatheringTool> equippedGatheringTools)
+		public Character(string characterName, List<GatheringTool> inventoryGatheringTools, List<GatheringTool> equippedGatheringTools)
 		{
 			CharacterName = characterName;
 			InventoryGatheringTools = inventoryGatheringTools;

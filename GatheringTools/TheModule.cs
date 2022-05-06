@@ -93,11 +93,11 @@ namespace GatheringTools
 			_enterKeyBinding.set_Enabled(true);
 			_settingService.LogoutKeyBindingSetting.get_Value().add_Activated((EventHandler<EventArgs>)OnLogoutKeyBindingActivated);
 			_settingService.LogoutKeyBindingSetting.get_Value().set_Enabled(true);
-			List<GatheringTool> allGatheringTools = await FileService.GetAllGatheringToolsFromFile(ContentsManager, Logger);
+			IEnumerable<GatheringTool> allGatheringTools = await FileService.GetAllGatheringToolsFromFiles(ContentsManager, Logger);
 			_allGatheringTools.AddRange(allGatheringTools);
 			TheModule theModule = this;
 			ToolSearchStandardWindow toolSearchStandardWindow = new ToolSearchStandardWindow(_textureService, _settingService, _allGatheringTools, Gw2ApiManager, Logger);
-			((WindowBase2)toolSearchStandardWindow).set_Emblem(_textureService.SickleTexture);
+			((WindowBase2)toolSearchStandardWindow).set_Emblem(_textureService.ToolSearchWindowEmblem);
 			((WindowBase2)toolSearchStandardWindow).set_Title("Tools");
 			((Control)toolSearchStandardWindow).set_Location(new Point(300, 300));
 			((WindowBase2)toolSearchStandardWindow).set_SavesPosition(true);
@@ -109,7 +109,7 @@ namespace GatheringTools
 				await _toolSearchStandardWindow.ToggleVisibility();
 			});
 			_settingService.ToolSearchKeyBindingSetting.get_Value().set_Enabled(true);
-			_cornerIconService = new CornerIconService(_settingService.ShowToolSearchCornerIconSetting, _toolSearchStandardWindow, _textureService.SickleTexture);
+			_cornerIconService = new CornerIconService(_settingService.ShowToolSearchCornerIconSetting, _toolSearchStandardWindow, _textureService);
 		}
 
 		protected override void Update(GameTime gameTime)

@@ -1,4 +1,4 @@
-using Gw2Sharp.WebApi.V2.Models;
+using Newtonsoft.Json;
 
 namespace GatheringTools.ToolSearch.Model
 {
@@ -11,8 +11,9 @@ namespace GatheringTools.ToolSearch.Model
 
 		public bool IsUnlimited { get; set; }
 
-		public ItemEquipmentSlotType Type { get; set; }
-
 		public string IconUrl { get; set; }
+
+		[JsonIgnore]
+		public ToolType ToolType { get; set; }
 	}
 }
