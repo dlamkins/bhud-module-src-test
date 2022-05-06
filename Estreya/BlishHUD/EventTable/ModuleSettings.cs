@@ -66,7 +66,7 @@ namespace Estreya.BlishHUD.EventTable
 
 		public SettingEntry<bool> RegisterCornerIcon { get; private set; }
 
-		public SettingEntry<int> RefreshRate { get; private set; }
+		public SettingEntry<int> RefreshRateDelay { get; private set; }
 
 		public SettingEntry<bool> AutomaticallyUpdateEventFile { get; private set; }
 
@@ -86,13 +86,17 @@ namespace Estreya.BlishHUD.EventTable
 
 		public SettingEntry<TooltipTimeMode> TooltipTimeMode { get; private set; }
 
-		public SettingEntry<bool> CopyWaypointOnClick { get; private set; }
+		public SettingEntry<bool> HandleLeftClick { get; private set; }
+
+		public SettingEntry<LeftClickAction> LeftClickAction { get; private set; }
 
 		public SettingEntry<bool> ShowContextMenuOnClick { get; private set; }
 
 		public SettingEntry<BuildDirection> BuildDirection { get; private set; }
 
-		public SettingEntry<float> Opacity { get; set; }
+		public SettingEntry<float> Opacity { get; private set; }
+
+		public SettingEntry<bool> DirectlyTeleportToWaypoint { get; private set; }
 
 		public SettingCollection LocationSettings { get; private set; }
 
@@ -252,9 +256,9 @@ namespace Estreya.BlishHUD.EventTable
 			GlobalEnabledHotkey.get_Value().set_BlockSequenceFromGw2(true);
 			RegisterCornerIcon = GlobalSettings.DefineSetting<bool>("RegisterCornerIcon", true, (Func<string>)(() => Strings.Setting_RegisterCornerIcon_Name), (Func<string>)(() => Strings.Setting_RegisterCornerIcon_Description));
 			RegisterCornerIcon.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			RefreshRate = GlobalSettings.DefineSetting<int>("RefreshRate", 900, (Func<string>)(() => Strings.Setting_RefreshRate_Title), (Func<string>)(() => string.Format(Strings.Setting_RefreshRate_Description, RefreshRate.GetRange<int>().Value.Min, RefreshRate.GetRange<int>().Value.Max)));
-			RefreshRate.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)SettingChanged<int>);
-			SettingComplianceExtensions.SetRange(RefreshRate, 0, 900);
+			RefreshRateDelay = GlobalSettings.DefineSetting<int>("RefreshRateDelay", 900, (Func<string>)(() => Strings.Setting_RefreshRateDelay_Title), (Func<string>)(() => string.Format(Strings.Setting_RefreshRateDelay_Description, RefreshRateDelay.GetRange<int>().Value.Min, RefreshRateDelay.GetRange<int>().Value.Max)));
+			RefreshRateDelay.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)SettingChanged<int>);
+			SettingComplianceExtensions.SetRange(RefreshRateDelay, 0, 900);
 			AutomaticallyUpdateEventFile = GlobalSettings.DefineSetting<bool>("AutomaticallyUpdateEventFile", true, (Func<string>)(() => Strings.Setting_AutomaticallyUpdateEventFile_Name), (Func<string>)(() => Strings.Setting_AutomaticallyUpdateEventFile_Description));
 			AutomaticallyUpdateEventFile.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
 			HideOnOpenMap = GlobalSettings.DefineSetting<bool>("HideOnOpenMap", true, (Func<string>)(() => Strings.Setting_HideOnMap_Name), (Func<string>)(() => Strings.Setting_HideOnMap_Description));
@@ -307,8 +311,12 @@ namespace Estreya.BlishHUD.EventTable
 			ShowTooltips.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
 			TooltipTimeMode = GlobalSettings.DefineSetting<TooltipTimeMode>("TooltipTimeMode", Estreya.BlishHUD.EventTable.Models.TooltipTimeMode.Relative, (Func<string>)(() => Strings.Setting_TooltipTimeMode_Name), (Func<string>)(() => Strings.Setting_TooltipTimeMode_Description));
 			TooltipTimeMode.add_SettingChanged((EventHandler<ValueChangedEventArgs<TooltipTimeMode>>)SettingChanged<TooltipTimeMode>);
-			CopyWaypointOnClick = GlobalSettings.DefineSetting<bool>("CopyWaypointOnClick", true, (Func<string>)(() => Strings.Setting_CopyWaypointOnClick_Name), (Func<string>)(() => Strings.Setting_CopyWaypointOnClick_Description));
-			CopyWaypointOnClick.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+			HandleLeftClick = GlobalSettings.DefineSetting<bool>("HandleLeftClick", true, (Func<string>)(() => Strings.Setting_HandleLeftClick_Name), (Func<string>)(() => Strings.Setting_HandleLeftClick_Description));
+			HandleLeftClick.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+			LeftClickAction = GlobalSettings.DefineSetting<LeftClickAction>("LeftClickAction", Estreya.BlishHUD.EventTable.Models.LeftClickAction.CopyWaypoint, (Func<string>)(() => Strings.Setting_LeftClickAction_Title), (Func<string>)(() => Strings.Setting_LeftClickAction_Description));
+			LeftClickAction.add_SettingChanged((EventHandler<ValueChangedEventArgs<LeftClickAction>>)SettingChanged<LeftClickAction>);
+			DirectlyTeleportToWaypoint = GlobalSettings.DefineSetting<bool>("DirectlyTeleportToWaypoint", false, (Func<string>)(() => Strings.Setting_DirectlyTeleportToWaypoint_Title), (Func<string>)(() => Strings.Setting_DirectlyTeleportToWaypoint_Description));
+			DirectlyTeleportToWaypoint.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
 			ShowContextMenuOnClick = GlobalSettings.DefineSetting<bool>("ShowContextMenuOnClick", true, (Func<string>)(() => Strings.Setting_ShowContextMenuOnClick_Name), (Func<string>)(() => Strings.Setting_ShowContextMenuOnClick_Description));
 			ShowContextMenuOnClick.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
 			BuildDirection = GlobalSettings.DefineSetting<BuildDirection>("BuildDirection", Estreya.BlishHUD.EventTable.Models.BuildDirection.Top, (Func<string>)(() => Strings.Setting_BuildDirection_Name), (Func<string>)(() => Strings.Setting_BuildDirection_Description));

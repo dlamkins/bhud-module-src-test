@@ -105,7 +105,7 @@ namespace Estreya.BlishHUD.EventTable.State
 			}
 			catch (Exception ex)
 			{
-				Logger.Error("Error updating completed worldbosses: " + ex.Message);
+				Logger.Warn("Error updating completed worldbosses: " + ex.Message);
 			}
 		}
 

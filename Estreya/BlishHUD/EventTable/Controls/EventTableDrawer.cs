@@ -111,16 +111,16 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		protected override CaptureType CapturesInput()
 		{
-			return (CaptureType)22;
+			return (CaptureType)4;
 		}
 
 		private void CreateRenderTarget()
 		{
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0095: Expected O, but got Unknown
-			int width = (int)((float)((Control)this).get_Width() * GameService.Graphics.get_UIScaleMultiplier());
-			int height = (int)((float)((Control)this).get_Height() * GameService.Graphics.get_UIScaleMultiplier());
+			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0087: Expected O, but got Unknown
+			int width = Math.Max(((Control)this).get_Width(), 1);
+			int height = Math.Max(((Control)this).get_Height(), 1);
 			if (_renderTarget != null && (((Texture2D)_renderTarget).get_Width() != width || ((Texture2D)_renderTarget).get_Height() != height))
 			{
 				((GraphicsResource)_renderTarget).Dispose();
@@ -137,16 +137,16 @@ namespace Estreya.BlishHUD.EventTable.Controls
 		{
 			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0188: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0187: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0195: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0212: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0213: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0218: Unknown result type (might be due to invalid IL or missing references)
 			((GraphicsResource)spriteBatch).get_GraphicsDevice().get_PresentationParameters().set_RenderTargetUsage((RenderTargetUsage)1);
 			spriteBatch.End();
-			int refreshInterval = EventTableModule.ModuleInstance.ModuleSettings.RefreshRate.get_Value();
+			int refreshInterval = EventTableModule.ModuleInstance.ModuleSettings.RefreshRateDelay.get_Value();
 			if (_renderTargetIsEmpty || _lastDraw.TotalMilliseconds > (double)refreshInterval)
 			{
 				((GraphicsResource)spriteBatch).get_GraphicsDevice().SetRenderTarget(_renderTarget);
@@ -165,7 +165,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 						categoryHasEvents = true;
 						if (EventTableModule.ModuleInstance.ModuleSettings.UseFiller.get_Value() || !ev2.Filler)
 						{
-							ev2.Draw(spriteBatch, bounds, (Control)(object)this, Textures.get_Pixel(), y, PixelPerMinute, now, min, max, EventTableModule.ModuleInstance.Font);
+							ev2.Draw(spriteBatch, bounds, Textures.get_Pixel(), y, PixelPerMinute, now, min, max, EventTableModule.ModuleInstance.Font);
 						}
 					}
 					if (categoryHasEvents)
@@ -175,14 +175,14 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				}
 				UpdateSize(bounds.Width, y, overrideHeight: true);
 				float middleLineX = (float)((Control)this).get_Size().X * EventTableModule.ModuleInstance.EventTimeSpanRatio;
-				SpriteBatchUtil.DrawLine(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new RectangleF(middleLineX, 0f, 2f, (float)((Control)this).get_Size().Y), Color.get_LightGray());
+				SpriteBatchUtil.DrawLine(spriteBatch, Textures.get_Pixel(), new RectangleF(middleLineX, 0f, 2f, (float)((Control)this).get_Size().Y), Color.get_LightGray());
 				spriteBatch.End();
 				((GraphicsResource)spriteBatch).get_GraphicsDevice().SetRenderTarget((RenderTarget2D)null);
 				_renderTargetIsEmpty = false;
 				_lastDraw = TimeSpan.Zero;
 			}
 			SpriteBatchExtensions.Begin(spriteBatch, ((Control)this).get_SpriteBatchParameters());
-			spriteBatch.Draw((Texture2D)(object)_renderTarget, Vector2.get_Zero(), Color.get_White());
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, (Texture2D)(object)_renderTarget, bounds, Color.get_White());
 			spriteBatch.End();
 			SpriteBatchExtensions.Begin(spriteBatch, ((Control)this).get_SpriteBatchParameters());
 		}

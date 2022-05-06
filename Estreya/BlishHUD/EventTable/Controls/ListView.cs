@@ -139,7 +139,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 					ListEntry<T> draggedOnEntry = ((Container)this).get_Children().get_Item(addedLast ? (draggedOnIndex - 1) : draggedOnIndex) as ListEntry<T>;
 					RectangleF lineRectangle = default(RectangleF);
 					((RectangleF)(ref lineRectangle))._002Ector((float)((Control)draggedOnEntry).get_Left(), (float)((addedLast ? ((Control)draggedOnEntry).get_Bottom() : ((Control)draggedOnEntry).get_Top()) - ((Container)this).get_VerticalScrollOffset()), (float)((Control)draggedOnEntry).get_Width(), 2f);
-					spriteBatch.DrawLine((Control)(object)this, Textures.get_Pixel(), lineRectangle, Color.get_White());
+					spriteBatch.DrawLineOnCtrl((Control)(object)this, Textures.get_Pixel(), lineRectangle, Color.get_White());
 				}
 			}
 		}

@@ -43,7 +43,7 @@ namespace Estreya.BlishHUD.EventTable.State
 		}
 
 		public IconState(ContentsManager contentsManager, string basePath)
-			: base((int)_saveInterval.TotalMilliseconds)
+			: base(awaitLoad: true, (int)_saveInterval.TotalMilliseconds)
 		{
 			_contentsManager = contentsManager;
 			_basePath = basePath;

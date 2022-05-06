@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Net;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
@@ -122,7 +121,7 @@ namespace Estreya.BlishHUD.EventTable.State
 			try
 			{
 				Logger.Debug("Loading json from web source.");
-				string webJson = await new WebClient().DownloadStringTaskAsync(new Uri("https://blishhud.estreya.de/files/event-table/events.json"));
+				string webJson = await EventTableModule.ModuleInstance.GetWebClient().DownloadStringTaskAsync(new Uri("https://blishhud.estreya.de/files/event-table/events.json"));
 				Logger.Debug($"Got content (length): {webJson?.Length ?? 0}");
 				if (!string.IsNullOrWhiteSpace(webJson))
 				{

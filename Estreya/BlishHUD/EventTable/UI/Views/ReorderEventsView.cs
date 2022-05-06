@@ -30,40 +30,40 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Expected O, but got Unknown
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Expected O, but got Unknown
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0146: Expected O, but got Unknown
-			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0176: Expected O, but got Unknown
-			//IL_0188: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0198: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0136: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014f: Expected O, but got Unknown
+			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0154: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0166: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0172: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017f: Expected O, but got Unknown
+			//IL_0191: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
 			Panel val = new Panel();
 			((Control)val).set_Parent(buildPanel);
 			((Control)val).set_Location(new Point(MAIN_PADDING.X, MAIN_PADDING.Y));
-			((Control)val).set_Width(buildPanel.get_ContentRegion().Width - MAIN_PADDING.Y * 2);
+			((Control)val).set_Width(buildPanel.get_ContentRegion().Width - MAIN_PADDING.Y);
 			((Control)val).set_Height(buildPanel.get_ContentRegion().Height - MAIN_PADDING.X);
 			val.set_CanScroll(true);
 			Panel = val;
@@ -74,7 +74,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Container)listView2).set_WidthSizingMode((SizingMode)0);
 			((Container)listView2).set_HeightSizingMode((SizingMode)0);
 			ListView<EventCategory> listView = listView2;
-			((Control)listView).set_Size(new Point(contentRegion.Width - ((Control)listView).get_Left(), contentRegion.Height - 32));
+			((Control)listView).set_Size(new Point(contentRegion.Width - ((Control)listView).get_Left() - MAIN_PADDING.X, contentRegion.Height - 32));
 			Panel val2 = new Panel();
 			((Control)val2).set_Parent((Container)(object)Panel);
 			((Control)val2).set_Location(new Point(((Control)listView).get_Left(), ((Control)listView).get_Bottom()));

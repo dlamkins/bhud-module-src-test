@@ -350,13 +350,13 @@ namespace Estreya.BlishHUD.EventTable.Resources
 
 		internal static string Setting_BuildDirection_Name => ResourceManager.GetString("Setting_BuildDirection_Name", resourceCulture);
 
-		internal static string Setting_CopyWaypointOnClick_Description => ResourceManager.GetString("Setting_CopyWaypointOnClick_Description", resourceCulture);
-
-		internal static string Setting_CopyWaypointOnClick_Name => ResourceManager.GetString("Setting_CopyWaypointOnClick_Name", resourceCulture);
-
 		internal static string Setting_DebugEnabled_Description => ResourceManager.GetString("Setting_DebugEnabled_Description", resourceCulture);
 
 		internal static string Setting_DebugEnabled_Name => ResourceManager.GetString("Setting_DebugEnabled_Name", resourceCulture);
+
+		internal static string Setting_DirectlyTeleportToWaypoint_Description => ResourceManager.GetString("Setting_DirectlyTeleportToWaypoint_Description", resourceCulture);
+
+		internal static string Setting_DirectlyTeleportToWaypoint_Title => ResourceManager.GetString("Setting_DirectlyTeleportToWaypoint_Title", resourceCulture);
 
 		internal static string Setting_DrawEventBorder_Description => ResourceManager.GetString("Setting_DrawEventBorder_Description", resourceCulture);
 
@@ -398,6 +398,10 @@ namespace Estreya.BlishHUD.EventTable.Resources
 
 		internal static string Setting_GlobalEnabledHotkey_Name => ResourceManager.GetString("Setting_GlobalEnabledHotkey_Name", resourceCulture);
 
+		internal static string Setting_HandleLeftClick_Description => ResourceManager.GetString("Setting_HandleLeftClick_Description", resourceCulture);
+
+		internal static string Setting_HandleLeftClick_Name => ResourceManager.GetString("Setting_HandleLeftClick_Name", resourceCulture);
+
 		internal static string Setting_HideInCombat_Description => ResourceManager.GetString("Setting_HideInCombat_Description", resourceCulture);
 
 		internal static string Setting_HideInCombat_Name => ResourceManager.GetString("Setting_HideInCombat_Name", resourceCulture);
@@ -409,6 +413,10 @@ namespace Estreya.BlishHUD.EventTable.Resources
 		internal static string Setting_HideOnMissingMumbleTicks_Description => ResourceManager.GetString("Setting_HideOnMissingMumbleTicks_Description", resourceCulture);
 
 		internal static string Setting_HideOnMissingMumbleTicks_Name => ResourceManager.GetString("Setting_HideOnMissingMumbleTicks_Name", resourceCulture);
+
+		internal static string Setting_LeftClickAction_Description => ResourceManager.GetString("Setting_LeftClickAction_Description", resourceCulture);
+
+		internal static string Setting_LeftClickAction_Title => ResourceManager.GetString("Setting_LeftClickAction_Title", resourceCulture);
 
 		internal static string Setting_LocationX_Description => ResourceManager.GetString("Setting_LocationX_Description", resourceCulture);
 
@@ -422,9 +430,9 @@ namespace Estreya.BlishHUD.EventTable.Resources
 
 		internal static string Setting_Opacity_Name => ResourceManager.GetString("Setting_Opacity_Name", resourceCulture);
 
-		internal static string Setting_RefreshRate_Description => ResourceManager.GetString("Setting_RefreshRate_Description", resourceCulture);
+		internal static string Setting_RefreshRateDelay_Description => ResourceManager.GetString("Setting_RefreshRateDelay_Description", resourceCulture);
 
-		internal static string Setting_RefreshRate_Title => ResourceManager.GetString("Setting_RefreshRate_Title", resourceCulture);
+		internal static string Setting_RefreshRateDelay_Title => ResourceManager.GetString("Setting_RefreshRateDelay_Title", resourceCulture);
 
 		internal static string Setting_RegisterCornerIcon_Description => ResourceManager.GetString("Setting_RegisterCornerIcon_Description", resourceCulture);
 

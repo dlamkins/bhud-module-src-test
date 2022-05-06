@@ -81,6 +81,7 @@
   <data name="eventCategory-serverReset"><value>Server Reset</value></data>
   <data name="event-serverReset-serverReset"><value>Server Reset</value></data>
   <data name="event-dragonBash-dredgehauntCliffs"><value>Dredgehaunt Cliffs</value></data>
+  <data name="Setting_LeftClickAction_Title"><value>Left Click Action</value></data>
   <data name="event-worldBosses-megadestoryer"><value>Megadestroyer</value></data>
   <data name="eventCategory-seitungProvince"><value>Seitung Province</value></data>
   <data name="Event_WaypointCopied"><value>Waypoint copied to clipboard!</value></data>
@@ -100,9 +101,12 @@
   <data name="event-dayNightCycle-dawn"><value>Dawn</value></data>
   <data name="ManageEventsView_Wiki_Title"><value>Wiki</value></data>
   <data name="event-worldBosses-shadowBehemoth"><value>Shadow Behemoth</value></data>
+  <data name="Setting_HandleLeftClick_Name"><value>Handle Left Click</value></data>
   <data name="event-newKainengCity-kainengBlackout"><value>Kaineng Blackout</value></data>
   <data name="event-thunderheadPeaks-thunderheadKeep"><value>Thunderhead Keep</value></data>
-  <data name="Setting_CopyWaypointOnClick_Description"><value>Whether the event table should copy waypoints to clipboard if event has been left clicked.</value></data>
+  <data name="Setting_RefreshRateDelay_Description"><value>Defines the delay for refreshing the event table drawings.
+Min: {0}ms
+Max: {1}ms</value></data>
   <data name="event-desolation-mawsOfTorment"><value>Maws of Torment</value></data>
   <data name="Setting_Width_Description"><value>The width of the event table.</value></data>
   <data name="event-dragonStand-advancingOnTheBlightingTowers"><value>Advancing on the Blighting Towers</value></data>
@@ -132,12 +136,14 @@
   <data name="EventSettingsView_UpdateEventFile_Title"><value>Update Event File</value></data>
   <data name="event-eotn-twistedMarionette"><value>The Twisted Marionette</value></data>
   <data name="event-grothmar-doomloreShrine"><value>The Haunting of Doomlore Shrine</value></data>
+  <data name="Setting_DirectlyTeleportToWaypoint_Title"><value>Directly Teleport to Waypoint</value></data>
   <data name="EventSettingsView_ResetEventStates_Success"><value>Event states cleared!</value></data>
   <data name="Setting_Width_Name"><value>Width</value></data>
   <data name="event-festivalOfTheFourWinds-skimmerRace"><value>Skimmer Race</value></data>
   <data name="Event_OpenWiki"><value>Open Wiki</value></data>
   <data name="SettingsWindow_EventSettings_Title"><value>Event Settings</value></data>
   <data name="Setting_HideInCombat_Name"><value>Hide in Combat</value></data>
+  <data name="Setting_HandleLeftClick_Description"><value>Whether the event table should execute the specified action on left click.</value></data>
   <data name="event-dragonBash-lornarsPass"><value>Lornar's Pass</value></data>
   <data name="Setting_TextColor_Description"><value>Defines the text color of events.</value></data>
   <data name="event-lakeDoric-newLoamhurst"><value>New Loamhurst</value></data>
@@ -148,6 +154,7 @@
   <data name="event-worldBosses-theShatterer"><value>The Shatterer</value></data>
   <data name="Setting_FillerTextColor_Name"><value>Filler Text Color</value></data>
   <data name="Setting_Opacity_Name"><value>Opacity</value></data>
+  <data name="Setting_RefreshRateDelay_Title"><value>Refresh Rate Delay</value></data>
   <data name="Setting_DebugEnabled_Name"><value>Debug Enabled</value></data>
   <data name="Setting_GlobalEnabledHotkey_Name"><value>Event Table Hotkey</value></data>
   <data name="event-worldBosses-fireElemental"><value>Fire Elemental</value></data>
@@ -169,7 +176,6 @@
   <data name="event-elonRiverlands-doppelganger"><value>Doppelganger</value></data>
   <data name="Setting_UseFiller_Name"><value>Use Filler Events</value></data>
   <data name="Setting_ShowContextMenuOnClick_Description"><value>Whether the event table should show a context menu if an event has been right clicked.</value></data>
-  <data name="Setting_RefreshRate_Description"><value>Defines the rate at which the event table is refreshing its drawings.\nMin: {0}ms\nMax: {1}ms</value></data>
   <data name="event-bjoraMarches-drakkar"><value>Drakkar, the Ice Dragon's Champion</value></data>
   <data name="ManageEventsView_SearchBox_Placeholder"><value>Search</value></data>
   <data name="event-canthaDayNight-night"><value>Cantha: Night</value></data>
@@ -217,15 +223,16 @@
   <data name="Setting_EventCompletedAction_Description"><value>Defines the action when an event has been completed.</value></data>
   <data name="Setting_EventHeight_Name"><value>Event Height</value></data>
   <data name="Setting_EventHeight_Description"><value>Defines the height of a single event row.</value></data>
-  <data name="Setting_CopyWaypointOnClick_Name"><value>Copy Waypoints</value></data>
   <data name="event-pvpTournaments-grenthsGame"><value>Grenth's Game</value></data>
   <data name="event-vabbi-serpentsIre"><value>Serpents' Ire</value></data>
   <data name="eventCategory-thunderheadPeaks"><value>Thunderhead Peaks</value></data>
   <data name="event-pvpTournaments-balthazarsBrawl"><value>Balthazar's Brawl</value></data>
   <data name="EventSettingsView_NewestVersion_Unknown"><value>Unknown</value></data>
   <data name="Setting_GlobalEnabled_Description"><value>Whether the event table should be displayed.</value></data>
+  <data name="Setting_LeftClickAction_Description"><value>Specifies the action, which is executed on left clicks.</value></data>
   <data name="Setting_TextColor_Name"><value>Text Color</value></data>
   <data name="Setting_UseEventTranslation_Name"><value>Use Event Translation</value></data>
+  <data name="Setting_DirectlyTeleportToWaypoint_Description"><value>Whether the event table should directly teleport to the selected waypoint after navigating to it.</value></data>
   <data name="event-tangledDepth-chakGerent"><value>Chak Gerent</value></data>
   <data name="event-verdantBrink-nightBosses"><value>Night Bosses</value></data>
   <data name="event-worldBosses-modniirUlgoth"><value>Modniir Ulgoth</value></data>
@@ -241,7 +248,6 @@
   <data name="eventCategory-crystalOasis"><value>Crystal Oasis</value></data>
   <data name="Event_HideCategory"><value>Hide Category</value></data>
   <data name="event-dragonsEnd-theBattleForTheJadeSea"><value>The Battle for the Jade Sea</value></data>
-  <data name="Setting_RefreshRate_Title"><value>Refresh Rate</value></data>
   <data name="Setting_BackgroundColorOpacity_Description"><value>Defines the opacity of the background.</value></data>
   <data name="event-worldBosses-taidha"><value>Admiral Taidha Covington</value></data>
   <data name="event-dayNightCycle-night"><value>Night</value></data>

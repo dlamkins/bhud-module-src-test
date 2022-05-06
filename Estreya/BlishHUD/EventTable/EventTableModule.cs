@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
@@ -39,6 +40,8 @@ namespace Estreya.BlishHUD.EventTable
 		public const string WEBSITE_MODULE_URL = "https://blishhud.estreya.de/modules/event-table";
 
 		internal static EventTableModule ModuleInstance;
+
+		private WebClient _webclient;
 
 		private BitmapFont _font;
 
@@ -146,6 +149,8 @@ namespace Estreya.BlishHUD.EventTable
 		public EventFileState EventFileState { get; private set; }
 
 		public IconState IconState { get; private set; }
+
+		public PointOfInterestState PointOfInterestState { get; private set; }
 
 		[ImportingConstructor]
 		public EventTableModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
@@ -295,6 +300,7 @@ namespace Estreya.BlishHUD.EventTable
 			{
 				if (!beforeFileLoaded)
 				{
+					PointOfInterestState = new PointOfInterestState(Gw2ApiManager);
 					WorldbossState = new WorldbossState(Gw2ApiManager);
 					WorldbossState.WorldbossCompleted += delegate(object s, string e)
 					{
@@ -314,6 +320,7 @@ namespace Estreya.BlishHUD.EventTable
 				}
 				if (!beforeFileLoaded)
 				{
+					States.Add(PointOfInterestState);
 					States.Add(WorldbossState);
 					States.Add(MapchestState);
 				}
@@ -327,7 +334,14 @@ namespace Estreya.BlishHUD.EventTable
 				{
 					try
 					{
-						await state2.Start();
+						if (state2.AwaitLoad)
+						{
+							await state2.Start();
+						}
+						else
+						{
+							state2.Start();
+						}
 					}
 					catch (Exception ex)
 					{
@@ -531,6 +545,16 @@ namespace Estreya.BlishHUD.EventTable
 				}
 				ToggleContainer(show);
 			}
+		}
+
+		public WebClient GetWebClient()
+		{
+			if (_webclient == null)
+			{
+				_webclient = new WebClient();
+				_webclient.Headers.Add("user-agent", $"Event Table {((Module)this).get_Version()}");
+			}
+			return _webclient;
 		}
 
 		protected override void Unload()

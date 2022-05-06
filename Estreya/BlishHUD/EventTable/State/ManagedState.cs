@@ -20,8 +20,11 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		public bool Running { get; private set; }
 
-		protected ManagedState(int saveInterval = 60000)
+		public bool AwaitLoad { get; }
+
+		protected ManagedState(bool awaitLoad = true, int saveInterval = 60000)
 		{
+			AwaitLoad = awaitLoad;
 			SaveInternal = saveInterval;
 		}
 

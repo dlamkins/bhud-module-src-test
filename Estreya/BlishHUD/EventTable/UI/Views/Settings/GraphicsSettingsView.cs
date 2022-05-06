@@ -25,7 +25,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views.Settings
 			RenderSetting<float>(parent, base.ModuleSettings.BackgroundColorOpacity);
 			RenderColorSetting(parent, base.ModuleSettings.BackgroundColor);
 			RenderEmptyLine(parent);
-			RenderSetting<int>(parent, base.ModuleSettings.RefreshRate);
+			RenderSetting<int>(parent, base.ModuleSettings.RefreshRateDelay);
 		}
 
 		protected override Task<bool> InternalLoad(IProgress<string> progress)

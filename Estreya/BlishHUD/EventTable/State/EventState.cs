@@ -60,7 +60,7 @@ namespace Estreya.BlishHUD.EventTable.State
 		public event EventHandler<ValueEventArgs<string>> StateRemoved;
 
 		public EventState(string basePath)
-			: base(30000)
+			: base(awaitLoad: true, 30000)
 		{
 			BasePath = basePath;
 		}
