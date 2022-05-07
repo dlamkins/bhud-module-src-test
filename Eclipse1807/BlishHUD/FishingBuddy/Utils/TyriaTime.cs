@@ -5,19 +5,9 @@ using Gw2Sharp.WebApi.V2.Models;
 
 namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 {
-	internal class TyriaTime
+	public static class TyriaTime
 	{
 		private static readonly Logger Logger = Logger.GetLogger(typeof(TyriaTime));
-
-		public static int canthaDayLength = 55;
-
-		public static int canthaNightLength = 55;
-
-		public static int centralDayLength = 70;
-
-		public static int centralNightLength = 40;
-
-		public static int DuskDawnLength = 5;
 
 		public static readonly DateTime canthaDawnStart = new DateTime(2000, 1, 1, 7, 0, 0);
 
@@ -34,6 +24,16 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 		public static readonly DateTime centralDuskStart = new DateTime(2000, 1, 1, 20, 0, 0);
 
 		public static readonly DateTime centralNightStart = new DateTime(2000, 1, 1, 21, 0, 0);
+
+		public static readonly int canthaDayLength = 55;
+
+		public static readonly int canthaNightLength = 55;
+
+		public static readonly int centralDayLength = 70;
+
+		public static readonly int centralNightLength = 40;
+
+		public static readonly int DuskDawnLength = 5;
 
 		public static readonly DateTime canthaDawnStartUTC = new DateTime(2000, 1, 1, 0, 35, 0);
 
@@ -116,15 +116,11 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 			}
 		}
 
-		public static DateTime NextPhaseTime(Map map)
-		{
-			return DateTime.UtcNow + TimeTilNextPhase(map);
-		}
-
 		public static TimeSpan TimeTilNextPhase(Map map)
 		{
 			DateTime TyriaTime = CalcTyriaTime();
-			DateTime nowish = new DateTime(2000, 1, 1, DateTime.UtcNow.Hour % 2, DateTime.UtcNow.Minute, DateTime.UtcNow.Second);
+			DateTime now = DateTime.UtcNow;
+			DateTime nowish = new DateTime(2000, 1, 1, now.Hour % 2, now.Minute, now.Second);
 			if (map == null || AlwaysDayMaps.Contains(map.get_Id()) || AlwaysNightMaps.Contains(map.get_Id()))
 			{
 				return TimeSpan.Zero;

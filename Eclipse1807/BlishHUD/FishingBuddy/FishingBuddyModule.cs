@@ -114,7 +114,9 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 
 		public static SettingEntry<bool> _showRarityBorder;
 
-		public static SettingEntry<int> _settingClockAlign;
+		public static readonly string[] _verticalAlignmentOptions = new string[3] { "Top", "Middle", "Bottom" };
+
+		public static SettingEntry<string> _settingClockAlign;
 
 		private Clock _timeOfDayClock;
 
@@ -209,13 +211,13 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			SettingComplianceExtensions.SetRange(_fishImgSize, 16, 96);
 			_fishPanelOrientation.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)OnUpdateSettings<string>);
 			_fishPanelDirection.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)OnUpdateSettings<string>);
-			_fishPanelTooltipDisplay = settings.DefineSetting<string>("FishPanelTooltipDisplay", "#1\n@2\n@3\n@4\n@5\n@6\n@7@8", (Func<string>)(() => "Tooltip Display"), (Func<string>)(() => "Default: #1\\n@2\\n@3\\n@4\\n@5\\n@6\\n@7@8\nSimple: #1\\nBait: #2\\nHole: #4\\n@7\nCompact: #1 [#6]\\nBait: #2\\nHole: #4 (#3)\\n@7\n@number uses default string, #number allows for more customization\n@#1: Name\n@#2: Favored Bait\n@#3: Time of Day\n@#4: Fishing Hole\n@#5: Achievement\n@#6: Rarity\n@7:  Reason for Hiding\n@#8: Fishy Notes (@ can't use \\n)\n(\\n adds new line)"));
+			_fishPanelTooltipDisplay = settings.DefineSetting<string>("FishPanelTooltipDisplay", "#1\n@2\n@3\n@4\n@5\n@6\n@7@8", (Func<string>)(() => "Tooltip Display"), (Func<string>)(() => "Default: #1\\n@2\\n@3\\n@4\\n@5\\n@6\\n@7@8\nSimple: #1\\nBait: #2\\nHole: #4\\n@7\nCompact: #1 [#6]\\nBait: #2\\nHole: #4 (#3)\\n@7\n@number uses default string, #number allows for more customization\n@#1: Name\n@#2: Favored Bait\n@#3: Time of Day\n@#4: Fishing Hole\n@#5: Achievement\n@#6: Rarity\n@7:  Reason for Hiding\n@#8: Fishy Notes\n(\\n adds new line)"));
 			_fishPanelTooltipDisplay.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)OnUpdateSettings<string>);
 			_timeOfDayPanelLoc = settings.DefineSetting<Point>("TimeOfDayPanelLoc", new Point(100, 100), (Func<string>)(() => "Time of Day Details Location"), (Func<string>)(() => ""));
 			_dragTimeOfDayClock = settings.DefineSetting<bool>("TimeOfDayPanelDrag", false, (Func<string>)(() => "Drag Time Display"), (Func<string>)(() => "Drag time of day display"));
 			_timeOfDayImgSize = settings.DefineSetting<int>("TimeImgWidth", 64, (Func<string>)(() => "Time of Day Size"), (Func<string>)(() => ""));
 			_settingClockLabel = settings.DefineSetting<bool>("ClockLabel", false, (Func<string>)(() => "Hide Time Label"), (Func<string>)(() => "Show/Hide clock time label display"));
-			_settingClockAlign = settings.DefineSetting<int>("ClockTimeAlign", 0, (Func<string>)(() => "Time Label Position"), (Func<string>)(() => "Clock time label position"));
+			_settingClockAlign = settings.DefineSetting<string>("TimeLabelAlign", "Bottom", (Func<string>)(() => "Time Label Position"), (Func<string>)(() => "Clock display label alignment"));
 			_hideTimeOfDay = settings.DefineSetting<bool>("HideTimeOfDay", false, (Func<string>)(() => "Hide Time Display"), (Func<string>)(() => "Option to hide time display"));
 			_timeOfDayPanelLoc.add_SettingChanged((EventHandler<ValueChangedEventArgs<Point>>)OnUpdateClockLocation);
 			_dragTimeOfDayClock.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateClockSettings);
@@ -223,8 +225,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			_timeOfDayImgSize.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)OnUpdateClockSize);
 			_dragTimeOfDayClock.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateClockSettings);
 			_hideTimeOfDay.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateClockSettings);
-			SettingComplianceExtensions.SetRange(_settingClockAlign, 0, 120);
-			_settingClockAlign.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)OnUpdateClockLabelAlign);
+			_settingClockAlign.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)OnUpdateClockLabelAlign);
 			_settingClockLabel.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateHideClockLabel);
 			_hideInCombat = settings.DefineSetting<bool>("HideInCombat", false, (Func<string>)(() => "Hide In Combat"), (Func<string>)(() => "Hide all fishing info in combat"));
 			_hideInCombat.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateFishSettings<bool>);
@@ -256,26 +257,27 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			{
 				string json = r.ReadToEnd();
 				_allFishList.AddRange(JsonConvert.DeserializeObject<List<Fish>>(json));
-				Logger.Debug("fish list: " + string.Join(", ", _allFishList.Select((Fish fish) => fish.Name)));
+				Logger.Debug("Fish list: " + string.Join(", ", _allFishList.Select((Fish fish) => fish.Name)));
 			}
 			_useAPIToken = true;
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
 			((Module)this).OnModuleLoaded(e);
 			Clock clock = new Clock();
 			((Control)clock).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			clock.HideLabel = _settingClockLabel.get_Value();
 			((Control)clock).set_Visible(_hideTimeOfDay.get_Value());
 			((Control)clock).set_Location(_timeOfDayPanelLoc.get_Value());
+			((Control)clock).set_Size(new Point(_timeOfDayImgSize.get_Value(), _timeOfDayImgSize.get_Value() + 40));
+			clock.Drag = _dragTimeOfDayClock.get_Value();
+			clock.HideLabel = _settingClockLabel.get_Value();
+			clock.LabelVerticalAlignment = (VerticalAlignment)Enum.Parse(typeof(VerticalAlignment), _settingClockAlign.get_Value());
 			_timeOfDayClock = clock;
-			OnUpdateClockSettings();
-			OnUpdateClockLabelAlign();
-			OnUpdateHideClockLabel();
-			OnUpdateClockLocation();
-			OnUpdateClockSize();
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
 			DrawIcons();
 			_timeOfDayClock.TimeOfDayChanged += OnTimeOfDayChanged;
@@ -342,7 +344,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			_timeOfDayPanelLoc.remove_SettingChanged((EventHandler<ValueChangedEventArgs<Point>>)OnUpdateClockLocation);
 			_dragTimeOfDayClock.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateClockSettings);
 			_timeOfDayImgSize.remove_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)OnUpdateClockSize);
-			_settingClockAlign.remove_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)OnUpdateClockLabelAlign);
+			_settingClockAlign.remove_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)OnUpdateClockLabelAlign);
 			_settingClockLabel.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateHideClockLabel);
 			_hideTimeOfDay.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateClockSettings);
 			Clock timeOfDayClock = _timeOfDayClock;
@@ -352,6 +354,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			}
 			_hideInCombat.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateFishSettings<bool>);
 			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
+			_timeOfDayClock.TimeOfDayChanged -= OnTimeOfDayChanged;
 			Gw2ApiManager.remove_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)OnApiSubTokenUpdated);
 			Texture2D imgBorderBlack = _imgBorderBlack;
 			if (imgBorderBlack != null)
@@ -445,9 +448,11 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			}
 		}
 
-		private void OnUpdateClockLabelAlign(object sender = null, ValueChangedEventArgs<int> e = null)
+		private void OnUpdateClockLabelAlign(object sender = null, ValueChangedEventArgs<string> e = null)
 		{
-			_timeOfDayClock.LabelVerticalAlignment = _settingClockAlign.get_Value();
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			_timeOfDayClock.LabelVerticalAlignment = (VerticalAlignment)Enum.Parse(typeof(VerticalAlignment), _settingClockAlign.get_Value());
 		}
 
 		private void OnUpdateHideClockLabel(object sender = null, ValueChangedEventArgs<bool> e = null)
@@ -674,6 +679,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 				.Replace("#5", fish.Achievement);
 			ItemRarity rarity2 = fish.Rarity;
 			return text.Replace("#6", ((object)(ItemRarity)(ref rarity2)).ToString()).Replace("#8", fish.Notes).Replace("\\n", "\n")
+				.Replace("\n\n", "\n")
 				.Trim();
 		}
 
@@ -900,10 +906,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 									Logger.Warn($"Missing fish from all fish list: name: '{fish2.get_Name()}' id: '{fish2.get_Id()}' (This may be caused by language)");
 									continue;
 								}
-								if (accountAchievement.get_Bits() != null && accountAchievement.get_Bits().Contains(bitsCounter2))
-								{
-									ghoti2.Caught = true;
-								}
+								ghoti2.Caught = accountAchievement.get_Bits() != null && accountAchievement.get_Bits().Contains(bitsCounter2);
 								ghoti2.Visible = ghoti2.Time == Fish.TimeOfDay.Any || _timeOfDayClock.TimePhase.Equals("Dawn") || _timeOfDayClock.TimePhase.Equals("Dusk") || object.Equals(ghoti2.Time.ToString(), _timeOfDayClock.TimePhase);
 								ghoti2.Icon = fish2.get_Icon();
 								ghoti2.ItemId = fish2.get_Id();
@@ -945,30 +948,37 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 							}
 							int itemId = ((AchievementItemBit)bit).get_Id();
 							Item fish = await RequestItem(itemId);
-							Logger.Debug($"Found Fish '{fish.get_Name()}' id: '{fish.get_Id()}'");
-							IEnumerable<Fish> fishIdMatch = _allFishList.Where((Fish phish) => phish.ItemId == fish.get_Id());
-							Fish ghoti = ((fishIdMatch.Count() != 0) ? fishIdMatch.First() : null);
-							if (ghoti == null)
+							if (fish != null)
 							{
-								Logger.Warn($"Missing fish from all fish list: '{fish.get_Name()}' id: '{fish.get_Id()}' (This may be caused by language)");
-								continue;
-							}
-							ghoti.Visible = ghoti.Time == Fish.TimeOfDay.Any || _timeOfDayClock.TimePhase.Equals("Dawn") || _timeOfDayClock.TimePhase.Equals("Dusk") || object.Equals(ghoti.Time.ToString(), _timeOfDayClock.TimePhase);
-							ghoti.Name = fish.get_Name();
-							ghoti.Icon = fish.get_Icon();
-							ghoti.ItemId = fish.get_Id();
-							ghoti.Achievement = currentAccountAchievement2.get_Name();
-							ghoti.AchievementId = currentAccountAchievement2.get_Id();
-							ghoti.Rarity = ApiEnum<ItemRarity>.op_Implicit(fish.get_Rarity());
-							ghoti.ChatLink = fish.get_ChatLink();
-							ghoti.IconImg = RequestItemIcon(fish);
-							if (ghoti.Locations == null || ghoti.Locations.Contains(_currentMap.get_Id()))
-							{
-								catchableFish.Add(ghoti);
+								Logger.Debug($"Found Fish '{fish.get_Name()}' id: '{fish.get_Id()}'");
+								IEnumerable<Fish> fishIdMatch = _allFishList.Where((Fish phish) => phish.ItemId == fish.get_Id());
+								Fish ghoti = ((fishIdMatch.Count() != 0) ? fishIdMatch.First() : null);
+								if (ghoti == null)
+								{
+									Logger.Warn($"Missing fish from all fish list: '{fish.get_Name()}' id: '{fish.get_Id()}'");
+									continue;
+								}
+								ghoti.Visible = ghoti.Time == Fish.TimeOfDay.Any || _timeOfDayClock.TimePhase.Equals("Dawn") || _timeOfDayClock.TimePhase.Equals("Dusk") || object.Equals(ghoti.Time.ToString(), _timeOfDayClock.TimePhase);
+								ghoti.Name = fish.get_Name();
+								ghoti.Icon = fish.get_Icon();
+								ghoti.ItemId = fish.get_Id();
+								ghoti.Achievement = currentAccountAchievement2.get_Name();
+								ghoti.AchievementId = currentAccountAchievement2.get_Id();
+								ghoti.Rarity = ApiEnum<ItemRarity>.op_Implicit(fish.get_Rarity());
+								ghoti.ChatLink = fish.get_ChatLink();
+								ghoti.IconImg = RequestItemIcon(fish);
+								if (ghoti.Locations == null || ghoti.Locations.Contains(_currentMap.get_Id()))
+								{
+									catchableFish.Add(ghoti);
+								}
+								else
+								{
+									Logger.Debug($"Skipping {fish.get_Name()} {fish.get_Id()}, not available in current map.");
+								}
 							}
 							else
 							{
-								Logger.Debug($"Skipping {fish.get_Name()} {fish.get_Id()}, not available in current map.");
+								Logger.Warn($"Skipping fish due to API issue. id: '{itemId}'");
 							}
 						}
 					}
@@ -981,7 +991,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			}
 			catch (Exception ex)
 			{
-				Logger.Warn(ex, "Unknown exception getting current map fish");
+				Logger.Warn(ex, $"Unknown exception getting current map ({_currentMap.get_Name()} {_currentMap.get_Id()}) fish");
 			}
 			finally
 			{

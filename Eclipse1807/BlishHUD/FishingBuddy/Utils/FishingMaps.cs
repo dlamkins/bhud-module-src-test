@@ -37,8 +37,8 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 
 		public static readonly List<int> DesertMaps = new List<int>
 		{
-			1210, 1288, 1226, 1228, 1211, 1214, 1215, 1224, 1232, 1243,
-			1250
+			1210, 1288, 1226, 1228, 1211, 1248, 1214, 1215, 1224, 1232,
+			1243, 1250
 		};
 
 		public static readonly List<int> DesertIslesFisher = new List<int> { 6106, 6250 };
