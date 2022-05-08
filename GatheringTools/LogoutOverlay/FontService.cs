@@ -25,7 +25,7 @@ namespace GatheringTools.LogoutOverlay
 
 		public static SettingEntry<int> CreateFontSizeIndexSetting(SettingCollection settings)
 		{
-			SettingEntry<int> obj = settings.DefineSetting<int>("font size index (logout overlay)", Fonts.Count - 1, (Func<string>)(() => "font size"), (Func<string>)(() => "Change font size of the reminder text"));
+			SettingEntry<int> obj = settings.DefineSetting<int>("font size index (logout overlay)", Fonts.Count - 1, (Func<string>)(() => "reminder font size"), (Func<string>)(() => "Change font size of the reminder text"));
 			SettingComplianceExtensions.SetRange(obj, 0, Fonts.Count - 1);
 			return obj;
 		}

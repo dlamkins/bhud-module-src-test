@@ -176,7 +176,10 @@ namespace GatheringTools
 		{
 			_runningTime = 0.0;
 			((Control)_reminderContainer).Show();
-			ScreenNotification.ShowNotification(_settingService.ReminderTextSetting.get_Value(), (NotificationType)2, (Texture2D)null, 4);
+			if (_settingService.ReminderScreenNotificationIsEnabled.get_Value())
+			{
+				ScreenNotification.ShowNotification(_settingService.ReminderTextSetting.get_Value(), (NotificationType)2, (Texture2D)null, (int)_settingService.ReminderDisplayDurationInSecondsSetting.get_Value());
+			}
 		}
 	}
 }

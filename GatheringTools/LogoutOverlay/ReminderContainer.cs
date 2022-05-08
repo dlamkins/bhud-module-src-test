@@ -10,6 +10,8 @@ namespace GatheringTools.LogoutOverlay
 {
 	public class ReminderContainer : Container
 	{
+		private readonly SettingService _settingService;
+
 		private const float RELATIVE_Y_OFFSET_FROM_SCREEN_CENTER = 0.005f;
 
 		private readonly Image _reminderBackgroundImage;
@@ -25,33 +27,34 @@ namespace GatheringTools.LogoutOverlay
 		public ReminderContainer(TextureService textureService, SettingService settingService)
 			: this()
 		{
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Expected O, but got Unknown
-			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Expected O, but got Unknown
+			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Expected O, but got Unknown
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006a: Expected O, but got Unknown
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
 			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0087: Expected O, but got Unknown
-			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Expected O, but got Unknown
+			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ab: Expected O, but got Unknown
-			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b2: Expected O, but got Unknown
+			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e4: Expected O, but got Unknown
+			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00eb: Expected O, but got Unknown
 			((Control)this).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			_settingService = settingService;
 			Image val = new Image(AsyncTexture2D.op_Implicit(textureService.ReminderBackgroundTexture));
 			((Control)val).set_Parent((Container)(object)this);
 			((Control)val).set_Size(((Control)this).get_Size());
@@ -76,17 +79,18 @@ namespace GatheringTools.LogoutOverlay
 			((Control)val5).set_ClipsBounds(false);
 			((Control)val5).set_Parent((Container)(object)this);
 			_reminderTextLabel = val5;
-			UpdateReminderText(settingService.ReminderTextSetting.get_Value());
-			UpdateReminderTextFontSize(settingService.ReminderTextFontSizeIndexSetting.get_Value());
+			UpdateText(settingService.ReminderTextSetting.get_Value());
+			UpdateTextFontSize(settingService.ReminderTextFontSizeIndexSetting.get_Value());
 			UpdateIconSize(settingService.ReminderIconSizeSetting.get_Value());
+			UpdateIconsVisibility(settingService.ReminderIconsAreVisibleSettings.get_Value());
 			UpdateContainerSizeAndMoveAboveLogoutDialog(settingService.ReminderWindowSizeSetting.get_Value());
 			settingService.ReminderTextFontSizeIndexSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)delegate(object s, ValueChangedEventArgs<int> e)
 			{
-				UpdateReminderTextFontSize(e.get_NewValue());
+				UpdateTextFontSize(e.get_NewValue());
 			});
 			settingService.ReminderTextSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)delegate(object s, ValueChangedEventArgs<string> e)
 			{
-				UpdateReminderText(e.get_NewValue());
+				UpdateText(e.get_NewValue());
 			});
 			settingService.ReminderWindowSizeSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)delegate(object s, ValueChangedEventArgs<int> e)
 			{
@@ -96,15 +100,27 @@ namespace GatheringTools.LogoutOverlay
 			{
 				UpdateIconSize(e.get_NewValue());
 			});
+			settingService.ReminderIconsAreVisibleSettings.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object s, ValueChangedEventArgs<bool> e)
+			{
+				UpdateIconsVisibility(e.get_NewValue());
+			});
+			settingService.ReminderWindowOffsetXSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)delegate
+			{
+				MoveAboveLogoutDialogAndApplyOffsetFromSettings();
+			});
+			settingService.ReminderWindowOffsetYSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)delegate
+			{
+				MoveAboveLogoutDialogAndApplyOffsetFromSettings();
+			});
 			((Control)GameService.Graphics.get_SpriteScreen()).add_Resized((EventHandler<ResizedEventArgs>)OnSpriteScreenResized);
 		}
 
 		private void OnSpriteScreenResized(object sender, ResizedEventArgs e)
 		{
-			MoveAboveLogoutDialog();
+			MoveAboveLogoutDialogAndApplyOffsetFromSettings();
 		}
 
-		private void MoveAboveLogoutDialog()
+		private void MoveAboveLogoutDialogAndApplyOffsetFromSettings()
 		{
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
@@ -112,16 +128,20 @@ namespace GatheringTools.LogoutOverlay
 			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
 			Point logoutDialogTextCenter = GetLogoutDialogTextCenter(((Control)GameService.Graphics.get_SpriteScreen()).get_Size().X, ((Control)GameService.Graphics.get_SpriteScreen()).get_Size().Y);
 			Point containerCenterToTopLeftCornerOffset = default(Point);
 			((Point)(ref containerCenterToTopLeftCornerOffset))._002Ector(((Control)this).get_Size().X / 2, ((Control)this).get_Size().Y / 2);
-			((Control)this).set_Location(logoutDialogTextCenter - containerCenterToTopLeftCornerOffset);
+			Point offsetFromSettings = default(Point);
+			((Point)(ref offsetFromSettings))._002Ector(_settingService.ReminderWindowOffsetX, _settingService.ReminderWindowOffsetY);
+			((Control)this).set_Location(logoutDialogTextCenter - containerCenterToTopLeftCornerOffset + offsetFromSettings);
 		}
 
-		private void UpdateReminderText(string reminderText)
+		private void UpdateText(string reminderText)
 		{
 			_reminderTextLabel.set_Text(reminderText);
 			UpdateChildLocations();
@@ -134,10 +154,10 @@ namespace GatheringTools.LogoutOverlay
 			((Control)this).set_Size(new Point(670 * (5 + size) / 40, 75 * (5 + size) / 40));
 			((Control)_reminderBackgroundImage).set_Size(((Control)this).get_Size());
 			UpdateChildLocations();
-			MoveAboveLogoutDialog();
+			MoveAboveLogoutDialogAndApplyOffsetFromSettings();
 		}
 
-		private void UpdateReminderTextFontSize(int fontSizeIndex)
+		private void UpdateTextFontSize(int fontSizeIndex)
 		{
 			_reminderTextLabel.set_Font(FontService.Fonts[fontSizeIndex]);
 			UpdateChildLocations();
@@ -156,13 +176,21 @@ namespace GatheringTools.LogoutOverlay
 			UpdateChildLocations();
 		}
 
+		private void UpdateIconsVisibility(bool areVisible)
+		{
+			((Control)_tool1Image).set_Visible(areVisible);
+			((Control)_tool2Image).set_Visible(areVisible);
+			((Control)_tool3Image).set_Visible(areVisible);
+			UpdateChildLocations();
+		}
+
 		private void UpdateChildLocations()
 		{
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-			int labelAndToolWidth = ((Control)_reminderTextLabel).get_Width() + 3 * ((Control)_tool1Image).get_Width();
+			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			int labelAndToolWidth = (((Control)_tool1Image).get_Visible() ? (((Control)_reminderTextLabel).get_Width() + 3 * ((Control)_tool1Image).get_Width()) : ((Control)_reminderTextLabel).get_Width());
 			int labelLocationOffsetX = (((Control)this).get_Width() - labelAndToolWidth) / 2;
 			int labelLocationOffsetY = (((Control)this).get_Height() - ((Control)_reminderTextLabel).get_Height()) / 2;
 			int toolOffsetY = (((Control)this).get_Height() - ((Control)_tool1Image).get_Height()) / 2;
