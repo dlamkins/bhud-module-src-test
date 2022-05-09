@@ -15,8 +15,6 @@ namespace Kenedia.Modules.BuildsManager
 
 		public bool Elite;
 
-		private Template _Template;
-
 		private API.Specialization _Specialization;
 
 		public API.Specialization Specialization
@@ -59,7 +57,6 @@ namespace Kenedia.Modules.BuildsManager
 						{
 							Template.Build.SpecLines[Index].Specialization = sp.Specialization;
 							Template.Build.SpecLines[Index].Traits = sp.Traits;
-							Template.Build.SpecLines[Index].Control.UpdateLayout();
 							Template.SetChanged();
 							sp.Specialization = null;
 							sp.Traits = new List<API.Trait>();
@@ -74,8 +71,11 @@ namespace Kenedia.Modules.BuildsManager
 									specLine.Traits = new List<API.Trait>();
 								}
 							}
-							Template.Build.SpecLines[Index].Specialization = spec;
-							Template.SetChanged();
+							if (Template.Build.SpecLines[Index].Specialization != spec)
+							{
+								Template.Build.SpecLines[Index].Specialization = spec;
+								Template.SetChanged();
+							}
 						}
 						((Control)this).Hide();
 						return;
@@ -94,19 +94,21 @@ namespace Kenedia.Modules.BuildsManager
 			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)((Control)this).get_Parent(), Textures.get_Pixel(), bounds.Add(((Control)this).get_Location()), (Rectangle?)bounds, new Color(0, 0, 0, 205), 0f, Vector2.get_Zero(), (SpriteEffects)0);
 			if (Template.Build.Profession == null)
 			{
 				return;
 			}
+			string text = "";
 			int i = 0;
 			int size = 64;
 			Rectangle rect = default(Rectangle);
@@ -115,9 +117,21 @@ namespace Kenedia.Modules.BuildsManager
 				if (!spec.Elite || Elite)
 				{
 					((Rectangle)(ref rect))._002Ector(20 + i * size, (((Control)this).get_Height() - size) / 2, size, size);
+					if (((Rectangle)(ref rect)).Contains(((Control)this).get_RelativeMousePosition()))
+					{
+						text = spec.Name;
+					}
 					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)((Control)this).get_Parent(), spec.Icon.Texture, rect.Add(((Control)this).get_Location()), (Rectangle?)spec.Icon.Texture.get_Bounds(), (Specialization == spec || ((Rectangle)(ref rect)).Contains(((Control)this).get_RelativeMousePosition())) ? Color.get_White() : Color.get_Gray(), 0f, Vector2.get_Zero(), (SpriteEffects)0);
 					i++;
 				}
+			}
+			if (text != "")
+			{
+				((Control)this).set_BasicTooltipText(text);
+			}
+			else
+			{
+				((Control)this).set_BasicTooltipText((string)null);
 			}
 		}
 

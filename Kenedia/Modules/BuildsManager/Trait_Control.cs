@@ -19,8 +19,6 @@ namespace Kenedia.Modules.BuildsManager
 
 		private Texture2D _Line;
 
-		private Template _Template;
-
 		public int Index;
 
 		public int TraitIndex;
@@ -106,7 +104,7 @@ namespace Kenedia.Modules.BuildsManager
 			}
 		}
 
-		public Trait_Control(Container parent, Point p, API.Trait trait, CustomTooltip customTooltip, Specialization_Control specialization_Control, Template template)
+		public Trait_Control(Container parent, Point p, API.Trait trait, CustomTooltip customTooltip, Specialization_Control specialization_Control)
 			: this()
 		{
 			//IL_003a: Unknown result type (might be due to invalid IL or missing references)

@@ -17,8 +17,6 @@ namespace Kenedia.Modules.BuildsManager
 {
 	public class Control_Equipment : Control
 	{
-		private Template _Template;
-
 		public double Scale;
 
 		private Texture2D _RuneTexture;
@@ -51,28 +49,12 @@ namespace Kenedia.Modules.BuildsManager
 
 		public EventHandler Changed;
 
-		public Template Template
-		{
-			get
-			{
-				return BuildsManager.ModuleInstance.Selected_Template;
-			}
-			set
-			{
-				if (value != null)
-				{
-					_Template = value;
-					UpdateTemplate();
-					UpdateLayout();
-				}
-			}
-		}
+		public Template Template => BuildsManager.ModuleInstance.Selected_Template;
 
-		public Control_Equipment(Container parent, Template template)
+		public Control_Equipment(Container parent)
 			: this()
 		{
 			((Control)this).set_Parent(parent);
-			_Template = template;
 			_RuneTexture = Texture2DExtension.GetRegion(BuildsManager.TextureManager.getEquipTexture(_EquipmentTextures.Rune), 37, 37, 54, 54);
 			Trinkets = new List<API.TrinketItem>();
 			foreach (API.TrinketItem item5 in BuildsManager.Data.Trinkets)
@@ -104,8 +86,7 @@ namespace Kenedia.Modules.BuildsManager
 			CustomTooltip = customTooltip;
 			SelectionPopUp = new SelectionPopUp((Container)(object)GameService.Graphics.get_SpriteScreen())
 			{
-				CustomTooltip = CustomTooltip,
-				Template = Template
+				CustomTooltip = CustomTooltip
 			};
 			SelectionPopUp selectionPopUp = SelectionPopUp;
 			selectionPopUp.Changed = (EventHandler)Delegate.Combine(selectionPopUp.Changed, (EventHandler)delegate
@@ -175,8 +156,7 @@ namespace Kenedia.Modules.BuildsManager
 
 		private void OnChanged()
 		{
-			BuildsManager.ModuleInstance.Selected_Template.Save();
-			Changed?.Invoke(this, EventArgs.Empty);
+			BuildsManager.ModuleInstance.Selected_Template.SetChanged();
 		}
 
 		private void OnGlobalClick(object sender, MouseEventArgs m)
@@ -575,10 +555,9 @@ namespace Kenedia.Modules.BuildsManager
 					Armors[(int)armor.Slot] = armor;
 				}
 			}
-			SelectionPopUp.Template = Template;
 		}
 
-		private void UpdateLayout()
+		public void UpdateLayout()
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
@@ -688,7 +667,7 @@ namespace Kenedia.Modules.BuildsManager
 			//IL_07b1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_07b6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_07ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_087a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0889: Unknown result type (might be due to invalid IL or missing references)
 			Point mPos = ((Control)this).get_RelativeMousePosition();
 			int offset = 1;
 			_ = 48.0 / 1.5;
@@ -829,7 +808,7 @@ namespace Kenedia.Modules.BuildsManager
 							((Control)CustomTooltip).set_Visible(true);
 							if (CustomTooltip.CurrentObject != item.Sigils[j])
 							{
-								CustomTooltip.CurrentObject = item;
+								CustomTooltip.CurrentObject = item.Sigils[j];
 								CustomTooltip.Header = item.Sigils[j].Name;
 								CustomTooltip.Content = new List<string> { item.Sigils[j].Description };
 							}

@@ -15,6 +15,8 @@ namespace Kenedia.Modules.BuildsManager
 
 		public string BuildCode;
 
+		public string GearCode;
+
 		public Template_json(string path = null)
 		{
 			if (path != null && File.Exists(path))

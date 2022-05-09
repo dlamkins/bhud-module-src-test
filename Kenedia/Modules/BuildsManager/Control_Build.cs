@@ -10,8 +10,6 @@ namespace Kenedia.Modules.BuildsManager
 {
 	public class Control_Build : Control
 	{
-		private Template _Template;
-
 		private Texture2D _Background;
 
 		private Texture2D _SpecFrame;
@@ -62,7 +60,7 @@ namespace Kenedia.Modules.BuildsManager
 
 		private List<Specialization_Control> Specializations;
 
-		private SkillBar_Control SkillBar;
+		public SkillBar_Control SkillBar;
 
 		private CustomTooltip CustomTooltip;
 
@@ -103,24 +101,22 @@ namespace Kenedia.Modules.BuildsManager
 			}
 		}
 
-		public Control_Build(Container parent, Template template)
+		public Control_Build(Container parent)
 			: this()
 		{
-			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0203: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0233: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0210: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0227: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0263: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).set_Parent(parent);
-			_Template = template;
 			((Control)this).set_Size(new Point((int)((double)_Width * Scale), (int)((double)_Height * Scale)));
 			CustomTooltip customTooltip = new CustomTooltip(((Control)this).get_Parent());
 			((Control)customTooltip).set_ClipsBounds(false);
 			customTooltip.HeaderColor = new Color(255, 204, 119, 255);
 			CustomTooltip = customTooltip;
-			BuildsManager.ModuleInstance.Selected_Template_Changed += ModuleInstance_Selected_Template_Changed;
 			((Control)this).add_Click((EventHandler<MouseEventArgs>)OnClick);
 			_SpecSideSelector_Hovered = BuildsManager.TextureManager.getControlTexture(_Controls.SpecSideSelector_Hovered);
 			_SpecSideSelector = BuildsManager.TextureManager.getControlTexture(_Controls.SpecSideSelector);
@@ -132,7 +128,7 @@ namespace Kenedia.Modules.BuildsManager
 			_EmptyTexture = BuildsManager.TextureManager._Icons[0];
 			_Line = Texture2DExtension.GetRegion(BuildsManager.TextureManager.getControlTexture(_Controls.Line), new Rectangle(22, 15, 85, 5));
 			_Background = _EmptyTraitLine;
-			SkillBar_Control skillBar_Control = new SkillBar_Control(((Control)this).get_Parent(), Template);
+			SkillBar_Control skillBar_Control = new SkillBar_Control(((Control)this).get_Parent());
 			((Control)skillBar_Control).set_Location(new Point(0, 0));
 			((Control)skillBar_Control).set_Size(new Point(_Width, Skillbar_Height));
 			SkillBar = skillBar_Control;
@@ -140,7 +136,7 @@ namespace Kenedia.Modules.BuildsManager
 			for (int i = 0; i < Template.Build.SpecLines.Count; i++)
 			{
 				List<Specialization_Control> specializations = Specializations;
-				Specialization_Control specialization_Control = new Specialization_Control(((Control)this).get_Parent(), Template, i, new Point(0, 5 + Skillbar_Height + i * 134), CustomTooltip);
+				Specialization_Control specialization_Control = new Specialization_Control(((Control)this).get_Parent(), i, new Point(0, 5 + Skillbar_Height + i * 134), CustomTooltip);
 				((Control)specialization_Control).set_ZIndex(((Control)this).get_ZIndex() + 1);
 				specialization_Control.Elite = i == 2;
 				specializations.Add(specialization_Control);
@@ -152,18 +148,8 @@ namespace Kenedia.Modules.BuildsManager
 			UpdateTemplate();
 		}
 
-		private void ModuleInstance_Selected_Template_Changed(object sender, EventArgs e)
-		{
-			Template selected_Template = BuildsManager.ModuleInstance.Selected_Template;
-			selected_Template.Changed = (EventHandler)Delegate.Combine(selected_Template.Changed, (EventHandler)delegate
-			{
-				UpdateTemplate();
-			});
-		}
-
 		protected override void DisposeControl()
 		{
-			BuildsManager.ModuleInstance.Selected_Template_Changed -= ModuleInstance_Selected_Template_Changed;
 			((Control)this).DisposeControl();
 		}
 
@@ -181,21 +167,15 @@ namespace Kenedia.Modules.BuildsManager
 			for (int i = 0; i < Template.Build.SpecLines.Count; i++)
 			{
 				Template.Build.SpecLines[i].Control = Specializations[i];
-				SkillBar.Template = Template;
 			}
 		}
 
 		private void UpdateLayout()
 		{
-			_ = _Template;
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			if (_Template != null)
-			{
-				UpdateLayout();
-			}
 		}
 
 		public void SetTemplate()

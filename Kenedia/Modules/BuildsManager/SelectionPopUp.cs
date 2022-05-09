@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
@@ -67,8 +68,6 @@ namespace Kenedia.Modules.BuildsManager
 
 		private object _SelectionTarget;
 
-		public Template Template;
-
 		public _EquipmentSlots Slot = _EquipmentSlots.Unkown;
 
 		public int UpgradeIndex;
@@ -106,6 +105,8 @@ namespace Kenedia.Modules.BuildsManager
 				UpdateLayouts = true;
 			}
 		}
+
+		public Template Template => BuildsManager.ModuleInstance.Selected_Template;
 
 		public SelectionPopUp(Container parent)
 			: this()
@@ -192,32 +193,33 @@ namespace Kenedia.Modules.BuildsManager
 				{
 					API.RuneItem rune = (API.RuneItem)entry.Object;
 					((Armor_TemplateItem)SelectionTarget).Rune = rune;
-					Template.Save();
+					Changed?.Invoke(this, EventArgs.Empty);
 					break;
 				}
 				case selectionType.Sigils:
 				{
 					API.SigilItem sigil = (API.SigilItem)entry.Object;
 					((Weapon_TemplateItem)SelectionTarget).Sigil = sigil;
-					Template.Save();
+					Changed?.Invoke(this, EventArgs.Empty);
 					break;
 				}
 				case selectionType.AquaticSigils:
 				{
 					API.SigilItem aquaSigil = (API.SigilItem)entry.Object;
 					((AquaticWeapon_TemplateItem)SelectionTarget).Sigils[UpgradeIndex] = aquaSigil;
-					Template.Save();
+					Changed?.Invoke(this, EventArgs.Empty);
 					break;
 				}
 				case selectionType.Profession:
 					SelectedProfession = (API.Profession)entry.Object;
 					((TextInputBase)FilterBox).set_Text((string)null);
+					Changed?.Invoke(this, EventArgs.Empty);
 					break;
 				case selectionType.Stats:
 				{
 					API.Stat stat = (API.Stat)entry.Object;
 					((TemplateItem)SelectionTarget).Stat = stat;
-					Template.Save();
+					Changed?.Invoke(this, EventArgs.Empty);
 					break;
 				}
 				case selectionType.Weapons:
@@ -239,14 +241,14 @@ namespace Kenedia.Modules.BuildsManager
 						}
 						break;
 					}
-					Template.Save();
+					Changed?.Invoke(this, EventArgs.Empty);
 					break;
 				}
 				case selectionType.AquaticWeapons:
 				{
 					API.WeaponItem selectedAquaWeapon = (API.WeaponItem)entry.Object;
 					((AquaticWeapon_TemplateItem)SelectionTarget).WeaponType = selectedAquaWeapon.WeaponType;
-					Template.Save();
+					Changed?.Invoke(this, EventArgs.Empty);
 					break;
 				}
 				}
@@ -257,7 +259,6 @@ namespace Kenedia.Modules.BuildsManager
 				((Control)this).Hide();
 				break;
 			}
-			Changed?.Invoke(this, EventArgs.Empty);
 		}
 
 		private void UpdateLayout()
@@ -266,9 +267,9 @@ namespace Kenedia.Modules.BuildsManager
 			//IL_0499: Unknown result type (might be due to invalid IL or missing references)
 			//IL_04b6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_04bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0563: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0565: Unknown result type (might be due to invalid IL or missing references)
 			if (List == null || List.Count == 0)
 			{
 				return;
@@ -357,8 +358,8 @@ namespace Kenedia.Modules.BuildsManager
 			foreach (SelectionEntry entry in FilteredList)
 			{
 				entry.AbsolutBounds = new Rectangle(0, ((Control)FilterBox).get_Height() + 5 + i * (size + 5), ((Control)this).get_Width(), size);
-				entry.TextureBounds = new Rectangle(0, ((Control)FilterBox).get_Height() + 5 + i * (size + 5), size, size);
-				entry.TextBounds = new Rectangle(size + 5, ((Control)FilterBox).get_Height() + i * (size + 5), size, size);
+				entry.TextureBounds = new Rectangle(2, ((Control)FilterBox).get_Height() + 5 + i * (size + 5), size, size);
+				entry.TextBounds = new Rectangle(2 + size + 5, ((Control)FilterBox).get_Height() + i * (size + 5), size, size);
 				entry.ContentBounds = new List<Rectangle>();
 				int j = 0;
 				int statSize = Font.get_LineHeight();
@@ -404,65 +405,65 @@ namespace Kenedia.Modules.BuildsManager
 			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
 			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0119: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0135: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0172: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0198: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0210: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0215: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0225: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0247: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0252: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0262: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0297: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0363: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0376: Unknown result type (might be due to invalid IL or missing references)
-			//IL_037d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0389: Unknown result type (might be due to invalid IL or missing references)
-			//IL_038f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0176: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0310: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0315: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0332: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0337: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0341: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0347: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0366: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0372: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0382: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_041c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0422: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0427: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0431: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0437: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0457: Unknown result type (might be due to invalid IL or missing references)
+			//IL_045d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0462: Unknown result type (might be due to invalid IL or missing references)
+			//IL_046c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0472: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0494: Unknown result type (might be due to invalid IL or missing references)
+			//IL_049a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_049f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ec: Unknown result type (might be due to invalid IL or missing references)
 			Clicked = false;
 			if (UpdateLayouts)
 			{
@@ -472,15 +473,6 @@ namespace Kenedia.Modules.BuildsManager
 			UpdateStates();
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), bounds, (Rectangle?)bounds, new Color(75, 75, 75, 255), 0f, default(Vector2), (SpriteEffects)0);
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Background, RectangleExtension.Add(bounds, -2, 0, 0, 0), (Rectangle?)bounds, Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
-			Color color = Color.get_Black();
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, 2), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, 1), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Bottom() - 2, bounds.Width, 2), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Bottom() - 1, bounds.Width, 1), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), 2, bounds.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), 1, bounds.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Right() - 2, ((Rectangle)(ref bounds)).get_Top(), 2, bounds.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Right() - 1, ((Rectangle)(ref bounds)).get_Top(), 1, bounds.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
 			int i = 0;
 			int size = 42;
 			foreach (SelectionEntry entry in FilteredList)
@@ -499,10 +491,32 @@ namespace Kenedia.Modules.BuildsManager
 				}
 				else
 				{
-					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, string.Join("; ", entry.Content), Font, new Rectangle(size + 5, Font.get_LineHeight() + ((Control)FilterBox).get_Height() + i * (size + 5), size, size), Color.get_LightGray(), false, (HorizontalAlignment)0, (VerticalAlignment)1);
+					List<string> strings = new List<string>();
+					foreach (string s in entry.Content)
+					{
+						string ss = s;
+						if (s.Contains("<c=@reminder>"))
+						{
+							ss = Regex.Replace(s, "<c=@reminder>", Environment.NewLine + Environment.NewLine);
+						}
+						ss = Regex.Replace(ss, "<c=@abilitytype>", "");
+						ss = Regex.Replace(ss, "</c>", "");
+						ss = Regex.Replace(ss, "<br>", "");
+						strings.Add(ss);
+					}
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, string.Join("; ", strings).Replace(Environment.NewLine, ""), Font, new Rectangle(2 + size + 5, Font.get_LineHeight() + ((Control)FilterBox).get_Height() + i * (size + 5) + Font.get_LineHeight() - 5, size, Font.get_LineHeight()), Color.get_LightGray(), false, (HorizontalAlignment)0, (VerticalAlignment)0);
 				}
 				i++;
 			}
+			Color color = Color.get_Black();
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, 2), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, 1), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Bottom() - 2, bounds.Width, 2), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Bottom() - 1, bounds.Width, 1), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), 2, bounds.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), 1, bounds.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Right() - 2, ((Rectangle)(ref bounds)).get_Top(), 2, bounds.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Right() - 1, ((Rectangle)(ref bounds)).get_Top(), 1, bounds.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
 		}
 	}
 }

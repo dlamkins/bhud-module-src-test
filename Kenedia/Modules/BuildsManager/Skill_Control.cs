@@ -10,8 +10,6 @@ namespace Kenedia.Modules.BuildsManager
 {
 	public class Skill_Control : Control
 	{
-		private Template _Template;
-
 		private API.Skill _Skill;
 
 		private int _SkillSize = 55;
@@ -59,14 +57,13 @@ namespace Kenedia.Modules.BuildsManager
 			}
 		}
 
-		public Skill_Control(Container parent, Template template)
+		public Skill_Control(Container parent)
 			: this()
 		{
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).set_Parent(parent);
-			_Template = template;
 			((Control)this).set_Size(new Point(_SkillSize, _SkillSize + 15));
 			_SelectorTexture = Texture2DExtension.GetRegion(BuildsManager.TextureManager.getControlTexture(_Controls.SkillSelector), 0, 2, 64, 12);
 			_SelectorTextureHovered = BuildsManager.TextureManager.getControlTexture(_Controls.SkillSelector_Hovered);

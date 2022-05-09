@@ -32,8 +32,6 @@ namespace Kenedia.Modules.BuildsManager
 
 		public bool Elite;
 
-		private Template _Template;
-
 		public int Index;
 
 		private API.Specialization _Specialization;
@@ -80,6 +78,8 @@ namespace Kenedia.Modules.BuildsManager
 
 		private bool _Created;
 
+		private bool SpecHovered;
+
 		public double Scale
 		{
 			get
@@ -121,61 +121,56 @@ namespace Kenedia.Modules.BuildsManager
 			}
 		}
 
-		public Specialization_Control(Container parent, Template template, int index, Point p, CustomTooltip customTooltip)
+		public Specialization_Control(Container parent, int index, Point p, CustomTooltip customTooltip)
 			: this()
 		{
-			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0176: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0199: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0212: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0218: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0291: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0296: Unknown result type (might be due to invalid IL or missing references)
-			//IL_030e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0314: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0319: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0387: Unknown result type (might be due to invalid IL or missing references)
-			//IL_038d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0392: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0400: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0406: Unknown result type (might be due to invalid IL or missing references)
-			//IL_040b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0478: Unknown result type (might be due to invalid IL or missing references)
-			//IL_047e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0483: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0242: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0247: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0332: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0337: Unknown result type (might be due to invalid IL or missing references)
+			//IL_039f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0411: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0417: Unknown result type (might be due to invalid IL or missing references)
+			//IL_041c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0484: Unknown result type (might be due to invalid IL or missing references)
+			//IL_048a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_048f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_04f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_056a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0570: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0575: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0502: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0569: Unknown result type (might be due to invalid IL or missing references)
+			//IL_056f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0574: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05dc: Unknown result type (might be due to invalid IL or missing references)
 			//IL_05e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_065b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0661: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0666: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_064f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0655: Unknown result type (might be due to invalid IL or missing references)
+			//IL_065a: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).set_Parent(parent);
-			_Template = template;
 			CustomTooltip = customTooltip;
 			Index = index;
 			((Control)this).set_Size(new Point(643, 133));
 			DefaultLocation = p;
 			((Control)this).set_Location(p);
-			Template template2 = _Template;
-			template2.Changed = (EventHandler)Delegate.Combine(template2.Changed, (EventHandler)delegate
-			{
-			});
 			_SpecSideSelector_Hovered = BuildsManager.TextureManager.getControlTexture(_Controls.SpecSideSelector_Hovered);
 			_SpecSideSelector = BuildsManager.TextureManager.getControlTexture(_Controls.SpecSideSelector);
 			_EliteFrame = Texture2DExtension.GetRegion(BuildsManager.TextureManager.getControlTexture(_Controls.EliteFrame), 0, 4, 625, 130);
@@ -184,19 +179,19 @@ namespace Kenedia.Modules.BuildsManager
 			_EmptyTraitLine = Texture2DExtension.GetRegion(BuildsManager.TextureManager.getControlTexture(_Controls.PlaceHolder_Traitline), 0, 0, 647, 136);
 			_Line = Texture2DExtension.GetRegion(BuildsManager.TextureManager.getControlTexture(_Controls.Line), new Rectangle(22, 15, 85, 5));
 			List<Trait_Control> list = new List<Trait_Control>();
-			Trait_Control trait_Control = new Trait_Control(((Control)this).get_Parent(), ClassExtensions.Add(new Point(215, 47), ((Control)this).get_Location()), (Specialization != null) ? Specialization.MinorTraits[0] : null, CustomTooltip, this, Template);
+			Trait_Control trait_Control = new Trait_Control(((Control)this).get_Parent(), ClassExtensions.Add(new Point(215, 47), ((Control)this).get_Location()), (Specialization != null) ? Specialization.MinorTraits[0] : null, CustomTooltip, this);
 			((Control)trait_Control).set_ZIndex(((Control)this).get_ZIndex() + 1);
 			trait_Control.TraitIndex = 0;
 			trait_Control.SpecIndex = Index;
 			trait_Control.TraitType = API.traitType.Minor;
 			list.Add(trait_Control);
-			Trait_Control trait_Control2 = new Trait_Control(((Control)this).get_Parent(), ClassExtensions.Add(new Point(360, 47), ((Control)this).get_Location()), (Specialization != null) ? Specialization.MinorTraits[1] : null, CustomTooltip, this, Template);
+			Trait_Control trait_Control2 = new Trait_Control(((Control)this).get_Parent(), ClassExtensions.Add(new Point(360, 47), ((Control)this).get_Location()), (Specialization != null) ? Specialization.MinorTraits[1] : null, CustomTooltip, this);
 			((Control)trait_Control2).set_ZIndex(((Control)this).get_ZIndex() + 1);
 			trait_Control2.TraitIndex = 1;
 			trait_Control2.SpecIndex = Index;
 			trait_Control2.TraitType = API.traitType.Minor;
 			list.Add(trait_Control2);
-			Trait_Control trait_Control3 = new Trait_Control(((Control)this).get_Parent(), ClassExtensions.Add(new Point(505, 47), ((Control)this).get_Location()), (Specialization != null) ? Specialization.MinorTraits[2] : null, CustomTooltip, this, Template);
+			Trait_Control trait_Control3 = new Trait_Control(((Control)this).get_Parent(), ClassExtensions.Add(new Point(505, 47), ((Control)this).get_Location()), (Specialization != null) ? Specialization.MinorTraits[2] : null, CustomTooltip, this);
 			((Control)trait_Control3).set_ZIndex(((Control)this).get_ZIndex() + 1);
 			trait_Control3.TraitIndex = 2;
 			trait_Control3.SpecIndex = Index;
@@ -204,55 +199,55 @@ namespace Kenedia.Modules.BuildsManager
 			list.Add(trait_Control3);
 			_MinorTraits = list;
 			List<Trait_Control> list2 = new List<Trait_Control>();
-			Trait_Control trait_Control4 = new Trait_Control(((Control)this).get_Parent(), ClassExtensions.Add(new Point(285, 6), ((Control)this).get_Location()), (Specialization != null) ? Specialization.MajorTraits[0] : null, CustomTooltip, this, Template);
+			Trait_Control trait_Control4 = new Trait_Control(((Control)this).get_Parent(), ClassExtensions.Add(new Point(285, 6), ((Control)this).get_Location()), (Specialization != null) ? Specialization.MajorTraits[0] : null, CustomTooltip, this);
 			((Control)trait_Control4).set_ZIndex(((Control)this).get_ZIndex() + 1);
 			trait_Control4.TraitIndex = 0;
 			trait_Control4.SpecIndex = Index;
 			trait_Control4.TraitType = API.traitType.Major;
 			list2.Add(trait_Control4);
-			Trait_Control trait_Control5 = new Trait_Control(((Control)this).get_Parent(), ClassExtensions.Add(new Point(285, 47), ((Control)this).get_Location()), (Specialization != null) ? Specialization.MajorTraits[1] : null, CustomTooltip, this, Template);
+			Trait_Control trait_Control5 = new Trait_Control(((Control)this).get_Parent(), ClassExtensions.Add(new Point(285, 47), ((Control)this).get_Location()), (Specialization != null) ? Specialization.MajorTraits[1] : null, CustomTooltip, this);
 			((Control)trait_Control5).set_ZIndex(((Control)this).get_ZIndex() + 1);
 			trait_Control5.TraitIndex = 1;
 			trait_Control5.SpecIndex = Index;
 			trait_Control5.TraitType = API.traitType.Major;
 			list2.Add(trait_Control5);
-			Trait_Control trait_Control6 = new Trait_Control(((Control)this).get_Parent(), ClassExtensions.Add(new Point(285, 88), ((Control)this).get_Location()), (Specialization != null) ? Specialization.MajorTraits[2] : null, CustomTooltip, this, Template);
+			Trait_Control trait_Control6 = new Trait_Control(((Control)this).get_Parent(), ClassExtensions.Add(new Point(285, 88), ((Control)this).get_Location()), (Specialization != null) ? Specialization.MajorTraits[2] : null, CustomTooltip, this);
 			((Control)trait_Control6).set_ZIndex(((Control)this).get_ZIndex() + 1);
 			trait_Control6.TraitIndex = 2;
 			trait_Control6.SpecIndex = Index;
 			trait_Control6.TraitType = API.traitType.Major;
 			list2.Add(trait_Control6);
-			Trait_Control trait_Control7 = new Trait_Control(((Control)this).get_Parent(), ClassExtensions.Add(new Point(430, 6), ((Control)this).get_Location()), (Specialization != null) ? Specialization.MajorTraits[3] : null, CustomTooltip, this, Template);
+			Trait_Control trait_Control7 = new Trait_Control(((Control)this).get_Parent(), ClassExtensions.Add(new Point(430, 6), ((Control)this).get_Location()), (Specialization != null) ? Specialization.MajorTraits[3] : null, CustomTooltip, this);
 			((Control)trait_Control7).set_ZIndex(((Control)this).get_ZIndex() + 1);
 			trait_Control7.TraitIndex = 3;
 			trait_Control7.SpecIndex = Index;
 			trait_Control7.TraitType = API.traitType.Major;
 			list2.Add(trait_Control7);
-			Trait_Control trait_Control8 = new Trait_Control(((Control)this).get_Parent(), ClassExtensions.Add(new Point(430, 47), ((Control)this).get_Location()), (Specialization != null) ? Specialization.MajorTraits[4] : null, CustomTooltip, this, Template);
+			Trait_Control trait_Control8 = new Trait_Control(((Control)this).get_Parent(), ClassExtensions.Add(new Point(430, 47), ((Control)this).get_Location()), (Specialization != null) ? Specialization.MajorTraits[4] : null, CustomTooltip, this);
 			((Control)trait_Control8).set_ZIndex(((Control)this).get_ZIndex() + 1);
 			trait_Control8.TraitIndex = 4;
 			trait_Control8.SpecIndex = Index;
 			trait_Control8.TraitType = API.traitType.Major;
 			list2.Add(trait_Control8);
-			Trait_Control trait_Control9 = new Trait_Control(((Control)this).get_Parent(), ClassExtensions.Add(new Point(430, 88), ((Control)this).get_Location()), (Specialization != null) ? Specialization.MajorTraits[5] : null, CustomTooltip, this, Template);
+			Trait_Control trait_Control9 = new Trait_Control(((Control)this).get_Parent(), ClassExtensions.Add(new Point(430, 88), ((Control)this).get_Location()), (Specialization != null) ? Specialization.MajorTraits[5] : null, CustomTooltip, this);
 			((Control)trait_Control9).set_ZIndex(((Control)this).get_ZIndex() + 1);
 			trait_Control9.TraitIndex = 5;
 			trait_Control9.SpecIndex = Index;
 			trait_Control9.TraitType = API.traitType.Major;
 			list2.Add(trait_Control9);
-			Trait_Control trait_Control10 = new Trait_Control(((Control)this).get_Parent(), ClassExtensions.Add(new Point(575, 6), ((Control)this).get_Location()), (Specialization != null) ? Specialization.MajorTraits[6] : null, CustomTooltip, this, Template);
+			Trait_Control trait_Control10 = new Trait_Control(((Control)this).get_Parent(), ClassExtensions.Add(new Point(575, 6), ((Control)this).get_Location()), (Specialization != null) ? Specialization.MajorTraits[6] : null, CustomTooltip, this);
 			((Control)trait_Control10).set_ZIndex(((Control)this).get_ZIndex() + 1);
 			trait_Control10.TraitIndex = 6;
 			trait_Control10.SpecIndex = Index;
 			trait_Control10.TraitType = API.traitType.Major;
 			list2.Add(trait_Control10);
-			Trait_Control trait_Control11 = new Trait_Control(((Control)this).get_Parent(), ClassExtensions.Add(new Point(575, 47), ((Control)this).get_Location()), (Specialization != null) ? Specialization.MajorTraits[7] : null, CustomTooltip, this, Template);
+			Trait_Control trait_Control11 = new Trait_Control(((Control)this).get_Parent(), ClassExtensions.Add(new Point(575, 47), ((Control)this).get_Location()), (Specialization != null) ? Specialization.MajorTraits[7] : null, CustomTooltip, this);
 			((Control)trait_Control11).set_ZIndex(((Control)this).get_ZIndex() + 1);
 			trait_Control11.TraitIndex = 7;
 			trait_Control11.SpecIndex = Index;
 			trait_Control11.TraitType = API.traitType.Major;
 			list2.Add(trait_Control11);
-			Trait_Control trait_Control12 = new Trait_Control(((Control)this).get_Parent(), ClassExtensions.Add(new Point(575, 88), ((Control)this).get_Location()), (Specialization != null) ? Specialization.MajorTraits[8] : null, CustomTooltip, this, Template);
+			Trait_Control trait_Control12 = new Trait_Control(((Control)this).get_Parent(), ClassExtensions.Add(new Point(575, 88), ((Control)this).get_Location()), (Specialization != null) ? Specialization.MajorTraits[8] : null, CustomTooltip, this);
 			((Control)trait_Control12).set_ZIndex(((Control)this).get_ZIndex() + 1);
 			trait_Control12.TraitIndex = 8;
 			trait_Control12.SpecIndex = Index;
@@ -296,25 +291,51 @@ namespace Kenedia.Modules.BuildsManager
 
 		private void Control_Click(object sender, MouseEventArgs e)
 		{
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			if (((Control)this).get_MouseOver())
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+			if (!((Control)this).get_MouseOver())
 			{
+				return;
+			}
+			Rectangle val = HighlightBounds.Add(new Point(-((Control)this).get_Location().X, -((Control)this).get_Location().Y));
+			bool highlight = ((Rectangle)(ref val)).Contains(((Control)this).get_RelativeMousePosition());
+			val = SelectorBounds.Add(new Point(-((Control)this).get_Location().X, -((Control)this).get_Location().Y));
+			if (((Rectangle)(ref val)).Contains(((Control)this).get_RelativeMousePosition()) || highlight)
+			{
+				if (((Control)Selector).get_Visible())
+				{
+					((Control)Selector).set_Visible(false);
+					return;
+				}
 				((Control)Selector).set_Visible(true);
 				SpecializationSelector_Control selector = Selector;
-				Rectangle localBounds = ((Control)this).get_LocalBounds();
-				((Control)selector).set_Location(((Rectangle)(ref localBounds)).get_Location().Add(new Point(SelectorBounds.Width, 0)));
+				val = ((Control)this).get_LocalBounds();
+				((Control)selector).set_Location(((Rectangle)(ref val)).get_Location().Add(new Point(SelectorBounds.Width, 0)));
 				SpecializationSelector_Control selector2 = Selector;
-				localBounds = ((Control)this).get_LocalBounds();
-				((Control)selector2).set_Size(((Rectangle)(ref localBounds)).get_Size().Add(new Point(-SelectorBounds.Width, 0)));
+				val = ((Control)this).get_LocalBounds();
+				((Control)selector2).set_Size(((Rectangle)(ref val)).get_Size().Add(new Point(-SelectorBounds.Width, 0)));
 				Selector.Elite = Elite;
 				Selector.Specialization = Specialization;
 			}
@@ -355,34 +376,41 @@ namespace Kenedia.Modules.BuildsManager
 			//IL_018f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0199: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0233: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0238: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0241: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0244: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0249: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0252: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0261: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0269: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0272: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0278: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0281: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0297: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0314: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0319: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0303: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0345: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0352: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0355: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0360: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0363: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0379: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037e: Unknown result type (might be due to invalid IL or missing references)
 			AbsoluteBounds = ClassExtensions.Scale(new Rectangle(0, 0, 645, 135), Scale).Add(((Control)this).get_Location());
 			ContentBounds = ClassExtensions.Scale(new Rectangle(1, 1, 643, 133), Scale).Add(((Control)this).get_Location());
 			SelectorBounds = ClassExtensions.Scale(new Rectangle(1, 1, 15, 133), Scale).Add(((Control)this).get_Location());
@@ -390,6 +418,16 @@ namespace Kenedia.Modules.BuildsManager
 			SpecSelectorBounds = ClassExtensions.Scale(new Rectangle(1, 1, 643, 133), Scale).Add(((Control)this).get_Location());
 			FirstLine.Bounds = new Rectangle(((Rectangle)(ref HighlightBounds)).get_Right() - 5.Scale(_Scale), ((Rectangle)(ref HighlightBounds)).get_Center().Y, 225 - ((Rectangle)(ref HighlightBounds)).get_Right(), 5.Scale(_Scale));
 			WeaponTraitBounds = ClassExtensions.Scale(new Rectangle(((Rectangle)(ref HighlightBounds)).get_Right() - 38 - 6, 133 + HighlightBounds.Height - 165, 38, 38), Scale).Add(((Control)this).get_Location());
+			Rectangle val = HighlightBounds.Add(new Point(-((Control)this).get_Location().X, -((Control)this).get_Location().Y));
+			SpecHovered = ((Rectangle)(ref val)).Contains(((Control)this).get_RelativeMousePosition());
+			if (SpecHovered)
+			{
+				((Control)this).set_BasicTooltipText(Specialization?.Name);
+			}
+			else
+			{
+				((Control)this).set_BasicTooltipText((string)null);
+			}
 			foreach (Trait_Control trait in _MajorTraits)
 			{
 				if (trait.Selected)
@@ -410,7 +448,7 @@ namespace Kenedia.Modules.BuildsManager
 					}
 					trait.PreLine.Rotation = rotation;
 					trait.PostLine.Rotation = 0f - rotation;
-					Rectangle val = ((Control)minor).get_LocalBounds();
+					val = ((Control)minor).get_LocalBounds();
 					Point minor_Pos = ((Rectangle)(ref val)).get_Center();
 					val = ((Control)trait).get_LocalBounds();
 					Point majorPos = ((Rectangle)(ref val)).get_Center();

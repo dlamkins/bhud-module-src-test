@@ -80,7 +80,8 @@ namespace Kenedia.Modules.BuildsManager
 			{
 				RefreshList();
 			});
-			BuildsManager.ModuleInstance.Template_Deleted += ModuleInstance_Template_Deleted;
+			BuildsManager.ModuleInstance.Templates_Loaded += ModuleInstance_Templates_Loaded;
+			BuildsManager.ModuleInstance.Template_Deleted += ModuleInstance_Templates_Loaded;
 			((Container)ContentPanel).add_ChildAdded((EventHandler<ChildChangedEventArgs>)ContentPanel_ChildsChanged);
 			((Container)ContentPanel).add_ChildRemoved((EventHandler<ChildChangedEventArgs>)ContentPanel_ChildsChanged);
 		}
@@ -94,7 +95,7 @@ namespace Kenedia.Modules.BuildsManager
 			}
 		}
 
-		private void ModuleInstance_Template_Deleted(object sender, EventArgs e)
+		private void ModuleInstance_Templates_Loaded(object sender, EventArgs e)
 		{
 			Refresh();
 		}

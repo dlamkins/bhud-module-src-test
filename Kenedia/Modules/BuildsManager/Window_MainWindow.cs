@@ -82,29 +82,29 @@ namespace Kenedia.Modules.BuildsManager
 			//IL_02ea: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02f6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0302: Expected O, but got Unknown
-			//IL_03a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_041f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0468: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0478: Unknown result type (might be due to invalid IL or missing references)
-			//IL_047d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0484: Unknown result type (might be due to invalid IL or missing references)
-			//IL_048b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_039e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_040b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_047f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_048f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0494: Unknown result type (might be due to invalid IL or missing references)
 			//IL_049b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04d9: Expected O, but got Unknown
-			//IL_04f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0501: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f0: Expected O, but got Unknown
 			//IL_0508: Unknown result type (might be due to invalid IL or missing references)
-			//IL_050f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_050d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0518: Unknown result type (might be due to invalid IL or missing references)
 			//IL_051f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0529: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0531: Unknown result type (might be due to invalid IL or missing references)
-			//IL_054a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0556: Expected O, but got Unknown
+			//IL_0526: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0536: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0540: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0548: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0561: Unknown result type (might be due to invalid IL or missing references)
+			//IL_056d: Expected O, but got Unknown
 			_EmptyTraitLine = Texture2DExtension.GetRegion(BuildsManager.TextureManager.getControlTexture(_Controls.PlaceHolder_Traitline), 0, 0, 647, 136);
 			_Delete = BuildsManager.TextureManager.getControlTexture(_Controls.Delete);
 			_DeleteHovered = BuildsManager.TextureManager.getControlTexture(_Controls.Delete_Hovered);
@@ -187,21 +187,22 @@ namespace Kenedia.Modules.BuildsManager
 			((Control)Detail_Panel.Tabs[0].Panel).add_Resized((EventHandler<ResizedEventArgs>)delegate
 			{
 				//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-				((Control)Gear).set_Size(((Control)Detail_Panel.Tabs[0].Panel).get_Size().Add(new Point(0, -25)));
+				//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+				//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+				((Control)Gear).set_Size(((Control)Detail_Panel.Tabs[0].Panel).get_Size().Add(new Point(0, -((Control)Detail_Panel.GearBox).get_Bottom() + 30)));
 			});
-			Control_Build control_Build = new Control_Build((Container)(object)Detail_Panel.Tabs[0].Panel, BuildsManager.ModuleInstance.Selected_Template);
+			Control_Build control_Build = new Control_Build((Container)(object)Detail_Panel.Tabs[0].Panel);
 			((Control)control_Build).set_Parent((Container)(object)Detail_Panel.Tabs[0].Panel);
 			((Control)control_Build).set_Size(((Control)Detail_Panel.Tabs[0].Panel).get_Size());
 			control_Build.Scale = 1.0;
 			Build = control_Build;
-			Control_Equipment control_Equipment = new Control_Equipment((Container)(object)Detail_Panel.Tabs[1].Panel, BuildsManager.ModuleInstance.Selected_Template);
+			Control_Equipment control_Equipment = new Control_Equipment((Container)(object)Detail_Panel.Tabs[1].Panel);
 			((Control)control_Equipment).set_Parent((Container)(object)Detail_Panel.Tabs[1].Panel);
 			((Control)control_Equipment).set_Size(((Control)Detail_Panel.Tabs[1].Panel).get_Size());
 			control_Equipment.Scale = 1.0;
 			Gear = control_Equipment;
 			((TextInputBase)Detail_Panel.TemplateBox).set_Text(BuildsManager.ModuleInstance.Selected_Template?.Build.ParseBuildCode());
+			((TextInputBase)Detail_Panel.GearBox).set_Text(BuildsManager.ModuleInstance.Selected_Template?.Gear.TemplateCode);
 			BitmapFont Font = new ContentService().GetFont((FontFace)0, (FontSize)18, (FontStyle)0);
 			TextBox val4 = new TextBox();
 			((Control)val4).set_Parent((Container)(object)this);
@@ -221,9 +222,39 @@ namespace Kenedia.Modules.BuildsManager
 			val5.set_Font(Font);
 			NameLabel = val5;
 			((Control)NameLabel).add_Click((EventHandler<MouseEventArgs>)NameLabel_Click);
+			BuildsManager.ModuleInstance.Selected_Template_Edit += Selected_Template_Edit;
 			BuildsManager.ModuleInstance.Selected_Template_Changed += ModuleInstance_Selected_Template_Changed;
-			BuildsManager.ModuleInstance.Template_Deleted += ModuleInstance_Template_Deleted;
+			BuildsManager.ModuleInstance.Templates_Loaded += Templates_Loaded;
+			BuildsManager.ModuleInstance.Selected_Template_Redraw += Selected_Template_Redraw;
 			Detail_Panel.TemplateBox.add_EnterPressed((EventHandler<EventArgs>)TemplateBox_EnterPressed);
+			Detail_Panel.GearBox.add_EnterPressed((EventHandler<EventArgs>)GearBox_EnterPressed);
+			Control.get_Input().get_Mouse().add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)GlobalClick);
+		}
+
+		private void GlobalClick(object sender, MouseEventArgs e)
+		{
+			if (!((Control)NameBox).get_MouseOver())
+			{
+				((Control)NameBox).set_Visible(false);
+				((Control)NameLabel).set_Visible(true);
+			}
+		}
+
+		private void Selected_Template_Redraw(object sender, EventArgs e)
+		{
+			Build.SkillBar.ApplyBuild(sender, e);
+			Gear.UpdateLayout();
+		}
+
+		private void GearBox_EnterPressed(object sender, EventArgs e)
+		{
+			GearTemplate gear = new GearTemplate(((TextInputBase)Detail_Panel.GearBox).get_Text());
+			if (gear != null)
+			{
+				BuildsManager.ModuleInstance.Selected_Template.Gear = gear;
+				BuildsManager.ModuleInstance.Selected_Template.SetChanged();
+				BuildsManager.ModuleInstance.OnSelected_Template_Redraw(null, null);
+			}
 		}
 
 		private void TemplateBox_EnterPressed(object sender, EventArgs e)
@@ -244,6 +275,7 @@ namespace Kenedia.Modules.BuildsManager
 				}
 			}
 			BuildsManager.ModuleInstance.Selected_Template.SetChanged();
+			BuildsManager.ModuleInstance.OnSelected_Template_Redraw(null, null);
 		}
 
 		private void NameBox_TextChanged(object sender, EventArgs e)
@@ -279,7 +311,7 @@ namespace Kenedia.Modules.BuildsManager
 			ProfessionSelection.List = _Professions;
 		}
 
-		private void ModuleInstance_Template_Deleted(object sender, EventArgs e)
+		private void Templates_Loaded(object sender, EventArgs e)
 		{
 			((Control)_TemplateSelection).Invalidate();
 		}
@@ -288,20 +320,22 @@ namespace Kenedia.Modules.BuildsManager
 		{
 			NameLabel.set_Text(BuildsManager.ModuleInstance.Selected_Template.Name);
 			((TextInputBase)Detail_Panel.TemplateBox).set_Text(BuildsManager.ModuleInstance.Selected_Template.Build.TemplateCode);
-			Template selected_Template = BuildsManager.ModuleInstance.Selected_Template;
-			selected_Template.Changed = (EventHandler)Delegate.Combine(selected_Template.Changed, (EventHandler)delegate
+			((TextInputBase)Detail_Panel.GearBox).set_Text(BuildsManager.ModuleInstance.Selected_Template.Gear.TemplateCode);
+		}
+
+		private void Selected_Template_Edit(object sender, EventArgs e)
+		{
+			BuildsManager.ModuleInstance.Selected_Template.Specialization = null;
+			foreach (SpecLine spec in BuildsManager.ModuleInstance.Selected_Template.Build.SpecLines)
 			{
-				BuildsManager.ModuleInstance.Selected_Template.Specialization = null;
-				foreach (SpecLine current in BuildsManager.ModuleInstance.Selected_Template.Build.SpecLines)
+				if (spec.Specialization?.Elite ?? false)
 				{
-					if (current.Specialization?.Elite ?? false)
-					{
-						BuildsManager.ModuleInstance.Selected_Template.Specialization = current.Specialization;
-						break;
-					}
+					BuildsManager.ModuleInstance.Selected_Template.Specialization = spec.Specialization;
+					break;
 				}
-				((TextInputBase)Detail_Panel.TemplateBox).set_Text(BuildsManager.ModuleInstance.Selected_Template.Build.ParseBuildCode());
-			});
+			}
+			((TextInputBase)Detail_Panel.TemplateBox).set_Text(BuildsManager.ModuleInstance.Selected_Template.Build.ParseBuildCode());
+			((TextInputBase)Detail_Panel.GearBox).set_Text(BuildsManager.ModuleInstance.Selected_Template?.Gear.TemplateCode);
 		}
 
 		protected override void OnClick(MouseEventArgs e)
@@ -318,6 +352,7 @@ namespace Kenedia.Modules.BuildsManager
 				BuildsManager.ModuleInstance.Selected_Template.Delete();
 				BuildsManager.ModuleInstance.Selected_Template = new Template();
 			}
+			((Control)ProfessionSelection).Hide();
 		}
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)

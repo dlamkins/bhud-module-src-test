@@ -1,8 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>BuildsManager</AssemblyName>
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
-    <UseWindowsForms>True</UseWindowsForms>
     <TargetFramework>net48</TargetFramework>
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
@@ -18,6 +17,7 @@
     <Reference Include="MonoGame.Framework" />
     <Reference Include="Gw2Sharp" />
     <Reference Include="MonoGame.Extended" />
+    <Reference Include="SemVer" />
     <Reference Include="System.Core" />
     <Reference Include="Newtonsoft.Json" />
     <Reference Include="AsyncClipboardService" />

@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Blish_HUD;
+using Blish_HUD.Controls;
 using Blish_HUD.Gw2Mumble;
 using Gw2Sharp.Models;
+using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
 
 namespace Kenedia.Modules.BuildsManager
@@ -59,7 +61,7 @@ namespace Kenedia.Modules.BuildsManager
 
 		public BuildTemplate Build;
 
-		public EventHandler Changed;
+		public event EventHandler Edit;
 
 		public Template(string path = null)
 		{
@@ -132,8 +134,6 @@ namespace Kenedia.Modules.BuildsManager
 					}
 				}
 				Build = new BuildTemplate(Template_json.BuildCode);
-				BuildTemplate build = Build;
-				build.Changed = (EventHandler)Delegate.Combine(build.Changed, new EventHandler(OnChanged));
 				return;
 			}
 			Gear = new GearTemplate();
@@ -210,6 +210,26 @@ namespace Kenedia.Modules.BuildsManager
 		{
 			if (Path != null && !(Name == "[No Name Set]"))
 			{
+				string path = Path + Name + ".json";
+				FileInfo fi = null;
+				try
+				{
+					fi = new FileInfo(path);
+				}
+				catch (ArgumentException)
+				{
+				}
+				catch (PathTooLongException)
+				{
+				}
+				catch (NotSupportedException)
+				{
+				}
+				if (Name.Contains("/") || Name.Contains("\\") || fi == null)
+				{
+					ScreenNotification.ShowNotification(Name + " is not a valid Name!", (NotificationType)2, (Texture2D)null, 4);
+					return;
+				}
 				File.Delete(Path + Name + ".json");
 				BuildsManager.ModuleInstance.OnTemplate_Deleted();
 			}
@@ -221,6 +241,27 @@ namespace Kenedia.Modules.BuildsManager
 			{
 				return;
 			}
+			string path = Path + Name + ".json";
+			FileInfo fi = null;
+			try
+			{
+				fi = new FileInfo(path);
+			}
+			catch (ArgumentException)
+			{
+			}
+			catch (PathTooLongException)
+			{
+			}
+			catch (NotSupportedException)
+			{
+			}
+			if (Name.Contains("/") || Name.Contains("\\") || fi == null)
+			{
+				ScreenNotification.ShowNotification(Name + " is not a valid Name!", (NotificationType)2, (Texture2D)null, 4);
+				return;
+			}
+			bool existsAlready = File.Exists(Path + Name + ".json") || File.Exists(Path + Template_json.Name + ".json");
 			if (Template_json.Name != Name)
 			{
 				File.Delete(Path + Template_json.Name + ".json");
@@ -255,23 +296,23 @@ namespace Kenedia.Modules.BuildsManager
 				Template_json.Gear.AquaticWeapons[i]._WeaponType = item4.WeaponType.ToString();
 			}
 			Template_json.BuildCode = Build.ParseBuildCode();
-			bool num = File.Exists(Path + Name + ".json");
+			Template_json.GearCode = BuildsManager.ModuleInstance.Selected_Template?.Gear.TemplateCode;
 			File.WriteAllText(Path + Name + ".json", JsonConvert.SerializeObject((object)Template_json));
-			if (!num)
+			if (!existsAlready)
 			{
-				BuildsManager.ModuleInstance.OnTemplate_Deleted();
+				BuildsManager.ModuleInstance.OnTemplates_Loaded();
 			}
 		}
 
-		private void OnChanged(object sender, EventArgs e)
+		private void OnEdit(object sender, EventArgs e)
 		{
-			Changed?.Invoke(this, EventArgs.Empty);
+			this.Edit?.Invoke(this, EventArgs.Empty);
 			Save();
 		}
 
 		public void SetChanged()
 		{
-			OnChanged(null, EventArgs.Empty);
+			OnEdit(null, EventArgs.Empty);
 		}
 	}
 }
