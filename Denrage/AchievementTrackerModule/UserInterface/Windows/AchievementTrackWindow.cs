@@ -53,6 +53,7 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Windows
 				if (trackedAchievements.TryGetValue(achievement, out var value))
 				{
 					trackedAchievements.Remove(achievement);
+					this.achievementControlManager.RemoveParent(achievement);
 					((Control)value).Dispose();
 				}
 			};
