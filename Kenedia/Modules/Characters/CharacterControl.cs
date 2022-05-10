@@ -265,7 +265,7 @@ namespace Kenedia.Modules.Characters
 						((Image)dataImage).set_Texture(AsyncTexture2D.op_Implicit(Textures.Crafting[crafting.Id]));
 						((Control)dataImage).set_Size(new Point(24, 24));
 						((Control)dataImage).set_Parent((Container)(object)crafting_Panel);
-						((Control)dataImage).set_Visible(!Module.Settings.OnlyMaxCrafting.get_Value() || crafting.Id == 4 || (crafting.Id == 7 && crafting.Rating == 400) || crafting.Rating == 500);
+						((Control)dataImage).set_Visible(!Module.Settings.OnlyMaxCrafting.get_Value() || ((crafting.Id == 4 || crafting.Id == 7) && crafting.Rating == 400) || crafting.Rating == 500);
 						dataImage.Id = crafting.Id;
 						dataImage.Crafting = crafting;
 						((Control)dataImage).set_Tooltip(((Control)this).get_Tooltip());

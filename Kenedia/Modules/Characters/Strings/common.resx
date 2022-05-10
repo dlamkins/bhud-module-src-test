@@ -68,9 +68,11 @@ This will require an API-Key with permissions at least for the 'characters' endp
   <data name="SwapModifier_Description"><value>Only if the Modifier is pressed trigger character swapping. This will prevent accidientally swapping!</value></data>
   <data name="EnterToLogin_Description"><value>If the searchbox is focused pressing 'RETURN' will log to the first character in the list.</value></data>
   <data name="Specialization"><value>Specialization</value></data>
+  <data name="ShowCornerIcon_DisplayName"><value>Show Corner Icon</value></data>
   <data name="EnterOnSwap_Description"><value>Enter the game automatically after selecting the character in the character selection</value></data>
   <data name="Leatherworker"><value>Leatherworker</value></data>
   <data name="SwapModifier_DisplayName"><value>Require Modifier to swap</value></data>
+  <data name="ShowCornerIcon_Description"><value>Show/Hide Corner Icon</value></data>
   <data name="Map"><value>Map</value></data>
   <data name="Close"><value>Close</value></data>
   <data name="Clear"><value>Clear</value></data>

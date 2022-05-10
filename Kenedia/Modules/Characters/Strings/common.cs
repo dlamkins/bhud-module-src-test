@@ -152,6 +152,10 @@ namespace Kenedia.Modules.Characters.Strings
 
 		internal static string ShortcutToggle_DisplayName => ResourceManager.GetString("ShortcutToggle_DisplayName", resourceCulture);
 
+		internal static string ShowCornerIcon_Description => ResourceManager.GetString("ShowCornerIcon_Description", resourceCulture);
+
+		internal static string ShowCornerIcon_DisplayName => ResourceManager.GetString("ShowCornerIcon_DisplayName", resourceCulture);
+
 		internal static string ShowHide_Tooltip => ResourceManager.GetString("ShowHide_Tooltip", resourceCulture);
 
 		internal static string Specialization => ResourceManager.GetString("Specialization", resourceCulture);

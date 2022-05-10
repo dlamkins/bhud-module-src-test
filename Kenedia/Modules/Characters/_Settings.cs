@@ -12,6 +12,8 @@ namespace Kenedia.Modules.Characters
 
 		public SettingEntry<KeyBinding> SwapModifier;
 
+		public SettingEntry<bool> ShowCornerIcon;
+
 		public SettingEntry<bool> EnterOnSwap;
 
 		public SettingEntry<bool> AutoLogin;

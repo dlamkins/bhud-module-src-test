@@ -174,6 +174,8 @@ namespace Kenedia.Modules.Characters
 
 		public static bool charactersLoaded;
 
+		public static bool charactersLoaded_Failed;
+
 		public static bool saveCharacters;
 
 		public static bool loginCharacter_Swapped;
@@ -465,12 +467,12 @@ namespace Kenedia.Modules.Characters
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			//IL_03aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f2: Expected O, but got Unknown
-			//IL_0405: Unknown result type (might be due to invalid IL or missing references)
-			//IL_044d: Expected O, but got Unknown
-			//IL_045e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04a6: Expected O, but got Unknown
+			//IL_03fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0446: Expected O, but got Unknown
+			//IL_0459: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a1: Expected O, but got Unknown
+			//IL_04b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04fa: Expected O, but got Unknown
 			Settings.AutoLogin = settings.DefineSetting<bool>("AutoLogin", false, (Func<string>)(() => common.AutoLogin_DisplayName), (Func<string>)(() => common.AutoLogin_Description));
 			Settings.EnterOnSwap = settings.DefineSetting<bool>("EnterOnSwap", false, (Func<string>)(() => common.EnterOnSwap_DisplayName), (Func<string>)(() => common.EnterOnSwap_Description));
 			Settings.DoubleClickToEnter = settings.DefineSetting<bool>("DoubleClickToEnter", false, (Func<string>)(() => common.DoubleClickToEnter_DisplayName), (Func<string>)(() => common.DoubleClickToEnter_Description));
@@ -485,13 +487,14 @@ namespace Kenedia.Modules.Characters
 					{
 						foreach (DataImage current2 in current.characterControl.crafting_Images)
 						{
-							((Control)current2).set_Visible(!Settings.OnlyMaxCrafting.get_Value() || (current2.Crafting.Id == 4 && current2.Crafting.Rating == 400) || current2.Crafting.Rating == 500);
+							((Control)current2).set_Visible(!Settings.OnlyMaxCrafting.get_Value() || ((current2.Crafting.Id == 4 || current2.Crafting.Id == 7) && current2.Crafting.Rating == 400) || current2.Crafting.Rating == 500);
 						}
 						((Control)current.characterControl.crafting_Panel).Invalidate();
 					}
 				}
 			});
 			Settings.FocusFilter = settings.DefineSetting<bool>("FocusFilter", false, (Func<string>)(() => common.FocusFilter_DisplayName), (Func<string>)(() => common.FocusFilter_Description));
+			Settings.ShowCornerIcon = settings.DefineSetting<bool>("ShowCornerIcon", true, (Func<string>)(() => common.ShowCornerIcon_DisplayName), (Func<string>)(() => common.ShowCornerIcon_Description));
 			Settings.FilterDelay = settings.DefineSetting<int>("FilterDelay", 150, (Func<string>)(() => string.Format(common.FilterDelay_DisplayName, Settings.FilterDelay.get_Value())), (Func<string>)(() => common.FilterDelay_Description));
 			SettingComplianceExtensions.SetRange(Settings.FilterDelay, 0, 500);
 			Settings.FilterDelay.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)delegate
@@ -504,6 +507,37 @@ namespace Kenedia.Modules.Characters
 			Settings.LogoutKey = settings.DefineSetting<KeyBinding>("LogoutKey", new KeyBinding(Keys.F12), (Func<string>)(() => common.Logout), (Func<string>)(() => common.LogoutDescription));
 			Settings.ShortcutKey = settings.DefineSetting<KeyBinding>("ShortcutKey", new KeyBinding((ModifierKeys)4, Keys.C), (Func<string>)(() => common.ShortcutToggle_DisplayName), (Func<string>)(() => common.ShortcutToggle_Description));
 			Settings.SwapModifier = settings.DefineSetting<KeyBinding>("SwapModifier", new KeyBinding(Keys.None), (Func<string>)(() => common.SwapModifier_DisplayName), (Func<string>)(() => common.SwapModifier_Description));
+		}
+
+		private string LoadFile(string path, List<string> filesToDelete)
+		{
+			string txt = "";
+			try
+			{
+				txt = System.IO.File.ReadAllText(path);
+				return txt;
+			}
+			catch (InvalidOperationException)
+			{
+				if (System.IO.File.Exists(path))
+				{
+					filesToDelete.Add(path);
+					return txt;
+				}
+				return txt;
+			}
+			catch (UnauthorizedAccessException)
+			{
+				return txt;
+			}
+			catch (FileNotFoundException)
+			{
+				return txt;
+			}
+			catch (FileLoadException)
+			{
+				return txt;
+			}
 		}
 
 		public async void FetchAPI(bool force = false)
@@ -588,13 +622,14 @@ namespace Kenedia.Modules.Characters
 			try
 			{
 				Logger.Debug("API Subtoken Updated!");
+				Account account;
 				if (Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)new TokenPermission[2]
 				{
 					TokenPermission.Account,
 					TokenPermission.Characters
 				}))
 				{
-					Account account = (API_Account = await Gw2ApiManager.get_Gw2ApiClient().V2.Account.GetAsync());
+					account = (API_Account = await Gw2ApiManager.get_Gw2ApiClient().V2.Account.GetAsync());
 					string path = DirectoriesManager.GetFullDirectoryPath("characters") + "\\" + API_Account.Name;
 					if (!Directory.Exists(path))
 					{
@@ -616,10 +651,36 @@ namespace Kenedia.Modules.Characters
 							LastModified = account.LastModified
 						};
 					}
-					if (System.IO.File.Exists(AccountInfoPath))
+					List<string> filesToDelete = new List<string>();
+					if (!System.IO.File.Exists(AccountInfoPath))
 					{
-						requestAPI = false;
-						foreach (AccountInfo acc in JsonConvert.DeserializeObject<List<AccountInfo>>(System.IO.File.ReadAllText(AccountInfoPath))!)
+						goto IL_02bf;
+					}
+					requestAPI = false;
+					string text = LoadFile(AccountInfoPath, filesToDelete);
+					if (!(text == "") && text.IsValidJson())
+					{
+						new List<AccountInfo>();
+						List<AccountInfo> accountInfos;
+						try
+						{
+							accountInfos = JsonConvert.DeserializeObject<List<AccountInfo>>(text);
+						}
+						catch (Exception ex2)
+						{
+							ScreenNotification.ShowNotification("Failed to load the account information file. Retry in 1 minute!", (NotificationType)2, (Texture2D)null, 4);
+							Logger.Warn(ex2, "The file '{0}' could not be loaded. Deleting it.");
+							try
+							{
+								System.IO.File.Delete(AccountInfoPath);
+							}
+							catch (IOException)
+							{
+							}
+							charactersLoaded_Failed = true;
+							return;
+						}
+						foreach (AccountInfo acc in accountInfos)
 						{
 							if (acc.Name == account.Name)
 							{
@@ -627,78 +688,92 @@ namespace Kenedia.Modules.Characters
 								break;
 							}
 						}
+						goto IL_02bf;
 					}
-					LoadCharacterList();
-					if (userAccount.CharacterUpdateNeeded())
+					ScreenNotification.ShowNotification("Failed to load the account information file. Retry in 1 minute!", (NotificationType)2, (Texture2D)null, 4);
+					Logger.Warn("The file '{0}' could not be loaded. Deleting it.", new object[1] { AccountInfoPath });
+					try
 					{
-						userAccount.LastBlishUpdate = account.LastModified;
-						userAccount.Save();
-						Logger.Debug("Updating Characters ....");
-						Logger.Debug("The last API modification is more recent than our last local data track.");
-						IApiV2ObjectList<Gw2Sharp.WebApi.V2.Models.Character> obj = await Gw2ApiManager.get_Gw2ApiClient().V2.Characters.AllAsync();
-						Character last = null;
-						int i = 0;
-						foreach (Gw2Sharp.WebApi.V2.Models.Character c in obj)
-						{
-							Character character2 = getCharacter(c.Name);
-							character2.Name = character2.Name ?? c.Name;
-							character2.Race = (RaceType)Enum.Parse(typeof(RaceType), c.Race);
-							character2._Profession = (int)Enum.Parse(typeof(Professions), c.Profession.ToString());
-							character2.Profession = (ProfessionType)Enum.Parse(typeof(ProfessionType), c.Profession.ToString());
-							character2._Specialization = ((character2._Specialization > -1) ? character2._Specialization : (-1));
-							character2.Level = c.Level;
-							character2.Created = c.Created;
-							character2.apiIndex = i;
-							if (character2.LastModified == dateZero || character2.LastModified < account.LastModified.UtcDateTime)
-							{
-								character2.LastModified = account.LastModified.UtcDateTime.AddSeconds(-i);
-							}
-							if (character2.lastLogin == dateZero)
-							{
-								character2.lastLogin = c.LastModified.UtcDateTime;
-							}
-							character2.contentsManager = ContentsManager;
-							character2.apiManager = Gw2ApiManager;
-							character2.Crafting = new List<CharacterCrafting>();
-							foreach (CharacterCraftingDiscipline disc in c.Crafting.ToList())
-							{
-								character2.Crafting.Add(new CharacterCrafting
-								{
-									Id = (int)disc.Discipline.Value,
-									Rating = disc.Rating,
-									Active = disc.Active
-								});
-							}
-							if (!CharacterNames.Contains(c.Name))
-							{
-								CharacterNames.Add(c.Name);
-								Characters.Add(character2);
-							}
-							last = character2;
-							i++;
-						}
-						last?.Save();
+						System.IO.File.Delete(AccountInfoPath);
 					}
-					PlayerCharacter player = GameService.Gw2Mumble.get_PlayerCharacter();
-					foreach (Character character in Characters)
+					catch (IOException)
 					{
-						character.Create_UI_Elements();
-						if (player != null && player.get_Name() == character.Name)
-						{
-							Current.character = character;
-						}
 					}
-					charactersLoaded = true;
-					filterCharacterPanel = true;
-					double lastModified = DateTimeOffset.UtcNow.Subtract(userAccount.LastModified).TotalSeconds;
-					double lastUpdate = DateTimeOffset.UtcNow.Subtract(userAccount.LastBlishUpdate).TotalSeconds;
-					((Control)infoImage).set_BasicTooltipText("Last Modified: " + Math.Round(lastModified) + Environment.NewLine + "Last Blish Login: " + Math.Round(lastUpdate));
+					charactersLoaded_Failed = true;
 				}
 				else
 				{
 					ScreenNotification.ShowNotification(common.Error_InvalidPermissions, (NotificationType)2, (Texture2D)null, 4);
 					Logger.Error("This API Token has not the required permissions!");
 				}
+				goto end_IL_0020;
+				IL_02bf:
+				LoadCharacterList();
+				if (userAccount.CharacterUpdateNeeded())
+				{
+					userAccount.LastBlishUpdate = account.LastModified;
+					userAccount.Save();
+					Logger.Debug("Updating Characters ....");
+					Logger.Debug("The last API modification is more recent than our last local data track.");
+					IApiV2ObjectList<Gw2Sharp.WebApi.V2.Models.Character> obj = await Gw2ApiManager.get_Gw2ApiClient().V2.Characters.AllAsync();
+					Character last = null;
+					int i = 0;
+					foreach (Gw2Sharp.WebApi.V2.Models.Character c in obj)
+					{
+						Character character2 = getCharacter(c.Name);
+						character2.Name = character2.Name ?? c.Name;
+						character2.Race = (RaceType)Enum.Parse(typeof(RaceType), c.Race);
+						character2._Profession = (int)Enum.Parse(typeof(Professions), c.Profession.ToString());
+						character2.Profession = (ProfessionType)Enum.Parse(typeof(ProfessionType), c.Profession.ToString());
+						character2._Specialization = ((character2._Specialization > -1) ? character2._Specialization : (-1));
+						character2.Level = c.Level;
+						character2.Created = c.Created;
+						character2.apiIndex = i;
+						if (character2.LastModified == dateZero || character2.LastModified < account.LastModified.UtcDateTime)
+						{
+							character2.LastModified = account.LastModified.UtcDateTime.AddSeconds(-i);
+						}
+						if (character2.lastLogin == dateZero)
+						{
+							character2.lastLogin = c.LastModified.UtcDateTime;
+						}
+						character2.contentsManager = ContentsManager;
+						character2.apiManager = Gw2ApiManager;
+						character2.Crafting = new List<CharacterCrafting>();
+						foreach (CharacterCraftingDiscipline disc in c.Crafting.ToList())
+						{
+							character2.Crafting.Add(new CharacterCrafting
+							{
+								Id = (int)disc.Discipline.Value,
+								Rating = disc.Rating,
+								Active = disc.Active
+							});
+						}
+						if (!CharacterNames.Contains(c.Name))
+						{
+							CharacterNames.Add(c.Name);
+							Characters.Add(character2);
+						}
+						last = character2;
+						i++;
+					}
+					last?.Save();
+				}
+				PlayerCharacter player = GameService.Gw2Mumble.get_PlayerCharacter();
+				foreach (Character character in Characters)
+				{
+					character.Create_UI_Elements();
+					if (player != null && player.get_Name() == character.Name)
+					{
+						Current.character = character;
+					}
+				}
+				charactersLoaded = true;
+				filterCharacterPanel = true;
+				double lastModified = DateTimeOffset.UtcNow.Subtract(userAccount.LastModified).TotalSeconds;
+				double lastUpdate = DateTimeOffset.UtcNow.Subtract(userAccount.LastBlishUpdate).TotalSeconds;
+				((Control)infoImage).set_BasicTooltipText("Last Modified: " + Math.Round(lastModified) + Environment.NewLine + "Last Blish Login: " + Math.Round(lastUpdate));
+				end_IL_0020:;
 			}
 			catch (Exception ex)
 			{
@@ -749,10 +824,19 @@ namespace Kenedia.Modules.Characters
 			Settings.ShortcutKey.get_Value().add_Activated((EventHandler<EventArgs>)OnKeyPressed_ToggleMenu);
 			Settings.SwapModifier.get_Value().set_Enabled(true);
 			Settings.SwapModifier.get_Value().add_Activated((EventHandler<EventArgs>)OnKeyPressed_LogoutMod);
+			Settings.ShowCornerIcon.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowCornerIcon_SettingChanged);
 			RECT pos = default(RECT);
 			GetWindowRect(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle(), ref pos);
 			GameWindow_Rectangle = pos;
 			CreateFolders();
+		}
+
+		private void ShowCornerIcon_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
+		{
+			if (cornerButton != null)
+			{
+				((Control)cornerButton).set_Visible(e.get_NewValue());
+			}
 		}
 
 		private void CreateFolders()
@@ -1095,6 +1179,7 @@ namespace Kenedia.Modules.Characters
 			val.set_Icon(AsyncTexture2D.op_Implicit(Textures.Icons[22]));
 			val.set_HoverIcon(AsyncTexture2D.op_Implicit(Textures.Icons[23]));
 			val.set_Priority(4);
+			((Control)val).set_Visible(Settings.ShowCornerIcon.get_Value());
 			cornerButton = val;
 			((Control)cornerButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
@@ -2260,6 +2345,13 @@ namespace Kenedia.Modules.Characters
 						UpdateCharacterPanel();
 					}
 				}
+			}
+			else if (charactersLoaded_Failed && Last.Tick_APIUpdate > 30000.0 && userAccount != null)
+			{
+				charactersLoaded_Failed = false;
+				Logger.Debug("Starting another Loading attempt!");
+				Last.Tick_APIUpdate = -30000.0;
+				Gw2ApiManager_SubtokenUpdated(null, null);
 			}
 			if (!Settings.FadeSubWindows.get_Value() || !(Last.Tick_FadeEffect > 30.0))
 			{
