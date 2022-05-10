@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Blish_HUD;
 using Blish_HUD.Controls;
@@ -33,6 +34,21 @@ namespace Kenedia.Modules.BuildsManager
 		}
 
 		public Template Template => BuildsManager.ModuleInstance.Selected_Template;
+
+		public SpecializationSelector_Control()
+			: this()
+		{
+			BuildsManager.ModuleInstance.Selected_Template_Changed += ClosePopUp;
+			Control.get_Input().get_Mouse().add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)ClosePopUp);
+		}
+
+		private void ClosePopUp(object sender, EventArgs e)
+		{
+			if (!((Control)this).get_MouseOver())
+			{
+				((Control)this).Hide();
+			}
+		}
 
 		protected override void OnClick(MouseEventArgs e)
 		{
@@ -135,14 +151,11 @@ namespace Kenedia.Modules.BuildsManager
 			}
 		}
 
-		public void SetTemplate()
+		protected override void DisposeControl()
 		{
-			_ = BuildsManager.ModuleInstance.Selected_Template;
-		}
-
-		public SpecializationSelector_Control()
-			: this()
-		{
+			((Control)this).DisposeControl();
+			BuildsManager.ModuleInstance.Selected_Template_Changed -= ClosePopUp;
+			Control.get_Input().get_Mouse().remove_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)ClosePopUp);
 		}
 	}
 }

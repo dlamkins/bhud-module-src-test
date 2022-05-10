@@ -167,6 +167,24 @@ namespace Kenedia.Modules.BuildsManager
 			}
 		}
 
+		private void SetClipboard(string text)
+		{
+			if (text != "" && text != null)
+			{
+				try
+				{
+					ClipboardUtil.get_WindowsClipboardService().SetTextAsync(text);
+				}
+				catch (ArgumentException)
+				{
+					ScreenNotification.ShowNotification("Failed to set the clipboard text!", (NotificationType)2, (Texture2D)null, 4);
+				}
+				catch
+				{
+				}
+			}
+		}
+
 		private void OnRightClick(object sender, MouseEventArgs mouse)
 		{
 			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
@@ -180,11 +198,11 @@ namespace Kenedia.Modules.BuildsManager
 			//IL_02b4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02bf: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0481: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0486: Unknown result type (might be due to invalid IL or missing references)
-			//IL_048b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0560: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_046f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0474: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0479: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0541: Unknown result type (might be due to invalid IL or missing references)
 			if (DateTime.Now.Subtract(SelectionPopUp.LastClick).TotalMilliseconds < 250.0)
 			{
 				return;
@@ -239,12 +257,12 @@ namespace Kenedia.Modules.BuildsManager
 			{
 				if (item4.Hovered && item4.Stat != null)
 				{
-					ClipboardUtil.get_WindowsClipboardService().SetTextAsync(item4.Stat.Name);
+					SetClipboard(item4.Stat.Name);
 					text = item4.Stat.Name;
 				}
 				if (((Rectangle)(ref item4.UpgradeBounds)).Contains(((Control)this).get_RelativeMousePosition()) && item4.Sigil != null)
 				{
-					ClipboardUtil.get_WindowsClipboardService().SetTextAsync(item4.Sigil.Name);
+					SetClipboard(item4.Sigil.Name);
 					text = item4.Sigil.Name;
 				}
 			}
@@ -252,7 +270,7 @@ namespace Kenedia.Modules.BuildsManager
 			{
 				if (item3.Hovered && item3.Stat != null)
 				{
-					ClipboardUtil.get_WindowsClipboardService().SetTextAsync(item3.Stat.Name);
+					SetClipboard(item3.Stat.Name);
 					text = item3.Stat.Name;
 				}
 				if (item3.Sigils == null)
@@ -266,7 +284,7 @@ namespace Kenedia.Modules.BuildsManager
 						Rectangle val = item3.SigilsBounds[i];
 						if (((Rectangle)(ref val)).Contains(((Control)this).get_RelativeMousePosition()))
 						{
-							ClipboardUtil.get_WindowsClipboardService().SetTextAsync(item3.Sigils[i].Name);
+							SetClipboard(item3.Sigils[i].Name);
 							text = item3.Sigils[i].Name;
 						}
 					}
@@ -276,12 +294,12 @@ namespace Kenedia.Modules.BuildsManager
 			{
 				if (item2.Hovered && item2.Stat != null)
 				{
-					ClipboardUtil.get_WindowsClipboardService().SetTextAsync(item2.Stat.Name);
+					SetClipboard(item2.Stat.Name);
 					text = item2.Stat.Name;
 				}
 				if (((Rectangle)(ref item2.UpgradeBounds)).Contains(((Control)this).get_RelativeMousePosition()) && item2.Rune != null)
 				{
-					ClipboardUtil.get_WindowsClipboardService().SetTextAsync(item2.Rune.Name);
+					SetClipboard(item2.Rune.Name);
 					text = item2.Rune.Name;
 				}
 			}
@@ -289,7 +307,7 @@ namespace Kenedia.Modules.BuildsManager
 			{
 				if (item.Hovered && item.Stat != null)
 				{
-					ClipboardUtil.get_WindowsClipboardService().SetTextAsync(item.Stat.Name);
+					SetClipboard(item.Stat.Name);
 					text = item.Stat.Name;
 				}
 			}

@@ -109,12 +109,26 @@ namespace Kenedia.Modules.BuildsManager
 			for (int i = 0; i < 2; i++)
 			{
 				((Rectangle)(ref rect))._002Ector(((Control)this).get_LocalBounds().Width - ((Control)TemplateBox).get_Height() - 6, ((Control)TemplateBox).get_LocalBounds().Y + i * (((Control)TemplateBox).get_Height() + 5), ((Control)TemplateBox).get_Height(), ((Control)TemplateBox).get_Height());
-				if (((Rectangle)(ref rect)).Contains(((Control)this).get_RelativeMousePosition()))
+				if (!((Rectangle)(ref rect)).Contains(((Control)this).get_RelativeMousePosition()))
 				{
-					string text = ((i == 0) ? ((TextInputBase)TemplateBox).get_Text() : ((TextInputBase)GearBox).get_Text());
-					ClipboardUtil.get_WindowsClipboardService().SetTextAsync(text);
-					return;
+					continue;
 				}
+				string text = ((i == 0) ? ((TextInputBase)TemplateBox).get_Text() : ((TextInputBase)GearBox).get_Text());
+				if (text != "" && text != null)
+				{
+					try
+					{
+						ClipboardUtil.get_WindowsClipboardService().SetTextAsync(text);
+					}
+					catch (ArgumentException)
+					{
+						ScreenNotification.ShowNotification("Failed to set the clipboard text!", (NotificationType)2, (Texture2D)null, 4);
+					}
+					catch
+					{
+					}
+				}
+				return;
 			}
 			foreach (Tab tab in Tabs)
 			{

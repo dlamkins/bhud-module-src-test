@@ -203,8 +203,6 @@ namespace Kenedia.Modules.BuildsManager
 				30697, 30695, 30684, 30702, 30687, 30690, 30685, 30701, 30691, 30688,
 				30692, 30694, 30693, 30700, 30689
 			});
-			ReloadKey.get_Value().set_Enabled(true);
-			ReloadKey.get_Value().add_Activated((EventHandler<EventArgs>)ReloadKey_Activated);
 			ToggleWindow.get_Value().set_Enabled(true);
 			ToggleWindow.get_Value().add_Activated((EventHandler<EventArgs>)ToggleWindow_Activated);
 			DataLoaded = false;
@@ -354,6 +352,8 @@ namespace Kenedia.Modules.BuildsManager
 			Data = null;
 			TextureManager = null;
 			((Control)cornerIcon).Dispose();
+			ToggleWindow.get_Value().set_Enabled(false);
+			ToggleWindow.get_Value().remove_Activated((EventHandler<EventArgs>)ToggleWindow_Activated);
 			ModuleInstance = null;
 		}
 
