@@ -27,7 +27,7 @@ namespace Nekres.Stream_Out
 
 		public static async Task SaveToImage(string renderUri, string path)
 		{
-			await StreamOutModule.ModuleInstance.Gw2ApiManager.get_Gw2ApiClient().get_Render().DownloadToByteArrayAsync(renderUri, default(CancellationToken))
+			await StreamOutModule.Instance.Gw2ApiManager.get_Gw2ApiClient().get_Render().DownloadToByteArrayAsync(renderUri, default(CancellationToken))
 				.ContinueWith((Func<Task<byte[]>, Task>)async delegate(Task<byte[]> textureDataResponse)
 				{
 					if (textureDataResponse.IsFaulted)

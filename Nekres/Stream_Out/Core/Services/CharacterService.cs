@@ -18,7 +18,7 @@ using Gw2Sharp.WebApi.V2.Models;
 
 namespace Nekres.Stream_Out.Core.Services
 {
-	internal class CharacterService : IExportService, IDisposable
+	internal class CharacterService : ExportService
 	{
 		private const string CHARACTER_NAME = "character_name.txt";
 
@@ -36,25 +36,23 @@ namespace Nekres.Stream_Out.Core.Services
 
 		private Bitmap _catmanderIcon;
 
-		private Logger Logger => StreamOutModule.Logger;
+		private static Gw2ApiManager Gw2ApiManager => StreamOutModule.Instance?.Gw2ApiManager;
 
-		private static Gw2ApiManager Gw2ApiManager => StreamOutModule.ModuleInstance?.Gw2ApiManager;
+		private DirectoriesManager DirectoriesManager => StreamOutModule.Instance?.DirectoriesManager;
 
-		private DirectoriesManager DirectoriesManager => StreamOutModule.ModuleInstance?.DirectoriesManager;
+		private ContentsManager ContentsManager => StreamOutModule.Instance?.ContentsManager;
 
-		private ContentsManager ContentsManager => StreamOutModule.ModuleInstance?.ContentsManager;
+		private SettingEntry<int> SessionDeathsWvW => StreamOutModule.Instance?.SessionDeathsWvW;
 
-		private SettingEntry<int> SessionDeathsWvW => StreamOutModule.ModuleInstance?.SessionDeathsWvW;
+		private SettingEntry<int> TotalDeathsAtResetWvW => StreamOutModule.Instance?.TotalDeathsAtResetWvW;
 
-		private SettingEntry<int> TotalDeathsAtResetWvW => StreamOutModule.ModuleInstance?.TotalDeathsAtResetWvW;
+		private SettingEntry<int> SessionDeathsDaily => StreamOutModule.Instance?.SessionDeathsDaily;
 
-		private SettingEntry<int> SessionDeathsDaily => StreamOutModule.ModuleInstance?.SessionDeathsDaily;
+		private SettingEntry<int> TotalDeathsAtResetDaily => StreamOutModule.Instance?.TotalDeathsAtResetDaily;
 
-		private SettingEntry<int> TotalDeathsAtResetDaily => StreamOutModule.ModuleInstance?.TotalDeathsAtResetDaily;
+		private StreamOutModule.UnicodeSigning UnicodeSigning => StreamOutModule.Instance?.AddUnicodeSymbols.get_Value() ?? StreamOutModule.UnicodeSigning.Suffixed;
 
-		private StreamOutModule.UnicodeSigning UnicodeSigning => StreamOutModule.ModuleInstance?.AddUnicodeSymbols.get_Value() ?? StreamOutModule.UnicodeSigning.Suffixed;
-
-		private SettingEntry<bool> UseCatmanderTag => StreamOutModule.ModuleInstance.UseCatmanderTag;
+		private SettingEntry<bool> UseCatmanderTag => StreamOutModule.Instance.UseCatmanderTag;
 
 		public CharacterService()
 		{
@@ -66,7 +64,7 @@ namespace Nekres.Stream_Out.Core.Services
 			OnSpecializationChanged(null, new ValueEventArgs<int>(GameService.Gw2Mumble.get_PlayerCharacter().get_Specialization()));
 		}
 
-		public async Task Initialize()
+		public override async Task Initialize()
 		{
 			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/deaths_week.txt", "0☠", overwrite: false);
 			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/deaths_day.txt", "0☠", overwrite: false);
@@ -99,7 +97,7 @@ namespace Nekres.Stream_Out.Core.Services
 			}
 			catch (UnexpectedStatusException)
 			{
-				Logger.Warn(CommonStrings.WebApiDown);
+				StreamOutModule.Logger.Warn(StreamOutModule.Instance.WebApiDown);
 			}
 		}
 
@@ -158,14 +156,14 @@ namespace Nekres.Stream_Out.Core.Services
 			return await ((IAllExpandableClient<Character>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Characters()).AllAsync(default(CancellationToken)).ContinueWith((Task<IApiV2ObjectList<Character>> task) => (!task.IsFaulted) ? ((IEnumerable<Character>)task.Result).Sum((Character x) => x.get_Deaths()) : (-1));
 		}
 
-		public async Task ResetDaily()
+		protected override async Task ResetDaily()
 		{
 			SessionDeathsDaily.set_Value(0);
 			SettingEntry<int> totalDeathsAtResetDaily = TotalDeathsAtResetDaily;
 			totalDeathsAtResetDaily.set_Value(await RequestTotalDeaths());
 		}
 
-		public async Task Update()
+		protected override async Task Update()
 		{
 			string prefixDeaths = ((UnicodeSigning == StreamOutModule.UnicodeSigning.Prefixed) ? "☠" : string.Empty);
 			string suffixDeaths = ((UnicodeSigning == StreamOutModule.UnicodeSigning.Suffixed) ? "☠" : string.Empty);
@@ -179,7 +177,7 @@ namespace Nekres.Stream_Out.Core.Services
 			}
 		}
 
-		public void Dispose()
+		public override void Dispose()
 		{
 			_commanderIcon?.Dispose();
 			_catmanderIcon?.Dispose();

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Blish_HUD;
 using Blish_HUD.Modules.Managers;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
@@ -11,30 +10,28 @@ using Gw2Sharp.WebApi.V2.Models;
 
 namespace Nekres.Stream_Out.Core.Services
 {
-	internal class WalletService : IExportService, IDisposable
+	internal class WalletService : ExportService
 	{
 		private const string WALLET_COINS = "wallet_coins.png";
 
 		private const string WALLET_KARMA = "wallet_karma.png";
 
-		private Logger Logger => StreamOutModule.Logger;
+		private Gw2ApiManager Gw2ApiManager => StreamOutModule.Instance?.Gw2ApiManager;
 
-		private Gw2ApiManager Gw2ApiManager => StreamOutModule.ModuleInstance?.Gw2ApiManager;
+		private DirectoriesManager DirectoriesManager => StreamOutModule.Instance?.DirectoriesManager;
 
-		private DirectoriesManager DirectoriesManager => StreamOutModule.ModuleInstance?.DirectoriesManager;
-
-		public async Task Update()
+		protected override async Task Update()
 		{
 			await UpdateWallet();
 		}
 
-		public async Task Initialize()
+		public override async Task Initialize()
 		{
 			await Gw2Util.GenerateCoinsImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wallet_coins.png", 10000000, overwrite: false);
 			await Gw2Util.GenerateKarmaImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wallet_karma.png", 10000000, overwrite: false);
 		}
 
-		public async Task ResetDaily()
+		protected override async Task ResetDaily()
 		{
 		}
 
@@ -61,7 +58,7 @@ namespace Nekres.Stream_Out.Core.Services
 			});
 		}
 
-		public void Dispose()
+		public override void Dispose()
 		{
 		}
 	}

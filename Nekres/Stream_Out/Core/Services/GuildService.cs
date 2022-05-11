@@ -16,7 +16,7 @@ using Gw2Sharp.WebApi.V2.Models;
 
 namespace Nekres.Stream_Out.Core.Services
 {
-	internal class GuildService : IExportService, IDisposable
+	internal class GuildService : ExportService
 	{
 		private const string GUILD_NAME = "guild_name.txt";
 
@@ -28,11 +28,9 @@ namespace Nekres.Stream_Out.Core.Services
 
 		private Regex GUILD_MOTD_PUBLIC = new Regex("(?<=\\[public\\]).*(?=\\[\\/public\\])", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Singleline);
 
-		private Logger Logger => StreamOutModule.Logger;
+		private Gw2ApiManager Gw2ApiManager => StreamOutModule.Instance?.Gw2ApiManager;
 
-		private Gw2ApiManager Gw2ApiManager => StreamOutModule.ModuleInstance?.Gw2ApiManager;
-
-		private DirectoriesManager DirectoriesManager => StreamOutModule.ModuleInstance?.DirectoriesManager;
+		private DirectoriesManager DirectoriesManager => StreamOutModule.Instance?.DirectoriesManager;
 
 		private async Task UpdateGuild()
 		{
@@ -141,20 +139,20 @@ namespace Nekres.Stream_Out.Core.Services
 			});
 		}
 
-		public async Task Update()
+		protected override async Task Update()
 		{
 			await UpdateGuild();
 		}
 
-		public async Task Initialize()
+		public override async Task Initialize()
 		{
 		}
 
-		public async Task ResetDaily()
+		protected override async Task ResetDaily()
 		{
 		}
 
-		public void Dispose()
+		public override void Dispose()
 		{
 		}
 	}

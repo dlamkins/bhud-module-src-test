@@ -33,11 +33,11 @@ namespace Nekres.Stream_Out
 			Size silverSize = silver.ToString().Measure(font);
 			Size goldSize = gold.ToString().Measure(font);
 			int fontHeight = Math.Max(Math.Max(silverSize.Height, goldSize.Height), copperSize.Height);
-			Stream copperIconStream = StreamOutModule.ModuleInstance.ContentsManager.GetFileStream("copper_coin.png");
+			Stream copperIconStream = StreamOutModule.Instance.ContentsManager.GetFileStream("copper_coin.png");
 			Bitmap copperIcon = new Bitmap(copperIconStream).FitToHeight(fontHeight - 5);
-			Stream silverIconStream = StreamOutModule.ModuleInstance.ContentsManager.GetFileStream("silver_coin.png");
+			Stream silverIconStream = StreamOutModule.Instance.ContentsManager.GetFileStream("silver_coin.png");
 			Bitmap silverIcon = new Bitmap(silverIconStream).FitToHeight(fontHeight - 5);
-			Stream goldIconStream = StreamOutModule.ModuleInstance.ContentsManager.GetFileStream("gold_coin.png");
+			Stream goldIconStream = StreamOutModule.Instance.ContentsManager.GetFileStream("gold_coin.png");
 			Bitmap goldIcon = new Bitmap(goldIconStream).FitToHeight(fontHeight - 5);
 			int margin = 5;
 			int width = copperSize.Width + copperIcon.Width;
@@ -124,7 +124,7 @@ namespace Nekres.Stream_Out
 			Font font = new Font("Arial", 12f);
 			string karmaStr = karma.ToString("N0", GameService.Overlay.CultureInfo());
 			Size karmaSize = karmaStr.Measure(font);
-			Stream karmaIconStream = StreamOutModule.ModuleInstance.ContentsManager.GetFileStream("karma.png");
+			Stream karmaIconStream = StreamOutModule.Instance.ContentsManager.GetFileStream("karma.png");
 			Bitmap karmaIcon = new Bitmap(karmaIconStream).FitToHeight(karmaSize.Height);
 			int height = Math.Max(karmaSize.Height, karmaIcon.Height);
 			using (Bitmap bitmap = new Bitmap(karmaSize.Width + karmaIcon.Width, height))
@@ -153,9 +153,9 @@ namespace Nekres.Stream_Out
 			{
 				return;
 			}
-			Stream tierIconFilledStream = StreamOutModule.ModuleInstance.ContentsManager.GetFileStream("1495585.png");
+			Stream tierIconFilledStream = StreamOutModule.Instance.ContentsManager.GetFileStream("1495585.png");
 			Bitmap tierIconFilled = new Bitmap(tierIconFilledStream);
-			Stream tierIconEmptyStream = StreamOutModule.ModuleInstance.ContentsManager.GetFileStream("1495584.png");
+			Stream tierIconEmptyStream = StreamOutModule.Instance.ContentsManager.GetFileStream("1495584.png");
 			Bitmap tierIconEmpty = new Bitmap(tierIconEmptyStream);
 			int width = maxTiers * (Math.Max(tierIconFilled.Width, tierIconEmpty.Width) + 2);
 			int height = Math.Max(tierIconFilled.Height, tierIconEmpty.Height);

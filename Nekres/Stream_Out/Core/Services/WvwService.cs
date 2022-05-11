@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Blish_HUD;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Gw2Sharp.WebApi.V2;
@@ -12,7 +11,7 @@ using Gw2Sharp.WebApi.V2.Models;
 
 namespace Nekres.Stream_Out.Core.Services
 {
-	internal class WvwService : IExportService, IDisposable
+	internal class WvwService : ExportService
 	{
 		private const string WVW_KILLS_WEEK = "wvw_kills_week.txt";
 
@@ -24,55 +23,34 @@ namespace Nekres.Stream_Out.Core.Services
 
 		private const string SWORDS = "⚔";
 
-		private Logger Logger => StreamOutModule.Logger;
+		private Gw2ApiManager Gw2ApiManager => StreamOutModule.Instance?.Gw2ApiManager;
 
-		private Gw2ApiManager Gw2ApiManager => StreamOutModule.ModuleInstance?.Gw2ApiManager;
+		private DirectoriesManager DirectoriesManager => StreamOutModule.Instance?.DirectoriesManager;
 
-		private DirectoriesManager DirectoriesManager => StreamOutModule.ModuleInstance?.DirectoriesManager;
+		private StreamOutModule.UnicodeSigning UnicodeSigning => StreamOutModule.Instance?.AddUnicodeSymbols.get_Value() ?? StreamOutModule.UnicodeSigning.Suffixed;
 
-		private StreamOutModule.UnicodeSigning UnicodeSigning => StreamOutModule.ModuleInstance?.AddUnicodeSymbols.get_Value() ?? StreamOutModule.UnicodeSigning.Suffixed;
+		private SettingEntry<string> AccountName => StreamOutModule.Instance?.AccountName;
 
-		private SettingEntry<string> AccountName => StreamOutModule.ModuleInstance?.AccountName;
+		private SettingEntry<Guid> AccountGuid => StreamOutModule.Instance?.AccountGuid;
 
-		private SettingEntry<Guid> AccountGuid => StreamOutModule.ModuleInstance?.AccountGuid;
+		private SettingEntry<DateTime> ResetTimeWvW => StreamOutModule.Instance.ResetTimeWvW;
 
-		private SettingEntry<DateTime?> ResetTimeWvW => StreamOutModule.ModuleInstance?.ResetTimeWvW;
+		private SettingEntry<int> SessionKillsWvW => StreamOutModule.Instance?.SessionKillsWvW;
 
-		private SettingEntry<int> SessionKillsWvW => StreamOutModule.ModuleInstance?.SessionKillsWvW;
+		private SettingEntry<int> SessionDeathsWvW => StreamOutModule.Instance?.SessionDeathsWvW;
 
-		private SettingEntry<int> SessionDeathsWvW => StreamOutModule.ModuleInstance?.SessionDeathsWvW;
+		private SettingEntry<int> SessionKillsWvwDaily => StreamOutModule.Instance?.SessionKillsWvwDaily;
 
-		private SettingEntry<int> SessionKillsWvwDaily => StreamOutModule.ModuleInstance?.SessionKillsWvwDaily;
+		private SettingEntry<int> TotalKillsAtResetWvW => StreamOutModule.Instance?.TotalKillsAtResetWvW;
 
-		private SettingEntry<int> TotalKillsAtResetWvW => StreamOutModule.ModuleInstance?.TotalKillsAtResetWvW;
+		private SettingEntry<int> TotalDeathsAtResetWvW => StreamOutModule.Instance?.TotalDeathsAtResetWvW;
 
-		private SettingEntry<int> TotalDeathsAtResetWvW => StreamOutModule.ModuleInstance?.TotalDeathsAtResetWvW;
-
-		public async Task Initialize()
+		public override async Task Initialize()
 		{
 			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wvw_kills_week.txt", "0⚔", overwrite: false);
 			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wvw_kills_total.txt", "0⚔", overwrite: false);
 			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wvw_kills_day.txt", "0⚔", overwrite: false);
 			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wvw_rank.txt", "1 : Invader", overwrite: false);
-		}
-
-		private async Task CheckForReset()
-		{
-			if (!Gw2ApiManager.HasPermission((TokenPermission)1))
-			{
-				return;
-			}
-			await ((IBlobClient<Account>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()).GetAsync(default(CancellationToken)).ContinueWith((Func<Task<Account>, Task>)async delegate(Task<Account> response)
-			{
-				if (!response.IsFaulted)
-				{
-					bool isNewAcc = !response.Result.get_Id().Equals(AccountGuid.get_Value());
-					AccountName.set_Value(response.Result.get_Name());
-					AccountGuid.set_Value(response.Result.get_Id());
-					await ResetWorldVersusWorld(response.Result.get_World(), isNewAcc);
-					await ResetDaily();
-				}
-			});
 		}
 
 		private async Task UpdateRankForWvw()
@@ -122,56 +100,65 @@ namespace Nekres.Stream_Out.Core.Services
 
 		private async Task ResetWorldVersusWorld(int worldId, bool force = false)
 		{
-			if (!force && ResetTimeWvW.get_Value().HasValue)
+			if (force || !(DateTime.UtcNow < ResetTimeWvW.get_Value()))
 			{
-				DateTime utcNow = DateTime.UtcNow;
-				DateTime? value = ResetTimeWvW.get_Value();
-				if (utcNow < value)
-				{
-					return;
-				}
+				SettingEntry<DateTime> resetTimeWvW = ResetTimeWvW;
+				resetTimeWvW.set_Value(await GetWvWResetTime(worldId));
+				SessionKillsWvW.set_Value(0);
+				SessionDeathsWvW.set_Value(0);
+				SettingEntry<int> totalKillsAtResetWvW = TotalKillsAtResetWvW;
+				totalKillsAtResetWvW.set_Value(await RequestTotalKillsForWvW());
+				totalKillsAtResetWvW = TotalDeathsAtResetWvW;
+				totalKillsAtResetWvW.set_Value(await CharacterService.RequestTotalDeaths());
 			}
-			SettingEntry<DateTime?> resetTimeWvW = ResetTimeWvW;
-			resetTimeWvW.set_Value(await GetWvWResetTime(worldId));
-			SessionKillsWvW.set_Value(0);
-			SessionDeathsWvW.set_Value(0);
-			SettingEntry<int> totalKillsAtResetWvW = TotalKillsAtResetWvW;
-			totalKillsAtResetWvW.set_Value(await RequestTotalKillsForWvW());
-			totalKillsAtResetWvW = TotalDeathsAtResetWvW;
-			totalKillsAtResetWvW.set_Value(await CharacterService.RequestTotalDeaths());
 		}
 
-		private async Task<DateTime?> GetWvWResetTime(int worldId)
+		private async Task<DateTime> GetWvWResetTime(int worldId)
 		{
 			return await ((IBlobClient<WvwMatch>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Wvw()
 				.get_Matches()
-				.World(worldId)).GetAsync(default(CancellationToken)).ContinueWith((Task<WvwMatch> r) => (!r.IsFaulted) ? new DateTime?(r.Result.get_EndTime().UtcDateTime) : null);
+				.World(worldId)).GetAsync(default(CancellationToken)).ContinueWith((Task<WvwMatch> r) => (!r.IsFaulted) ? r.Result.get_EndTime().UtcDateTime : DateTime.UtcNow);
 		}
 
-		public async Task ResetDaily()
+		protected override async Task ResetDaily()
 		{
 			SessionKillsWvwDaily.set_Value(0);
 		}
 
-		public async Task Update()
+		protected override async Task Update()
 		{
-			await CheckForReset();
-			await UpdateRankForWvw();
-			string prefixKills = ((UnicodeSigning == StreamOutModule.UnicodeSigning.Prefixed) ? "⚔" : string.Empty);
-			string suffixKills = ((UnicodeSigning == StreamOutModule.UnicodeSigning.Suffixed) ? "⚔" : string.Empty);
-			int totalKillsWvW = await RequestTotalKillsForWvW();
-			if (totalKillsWvW >= 0)
+			if (!Gw2ApiManager.HasPermission((TokenPermission)1))
 			{
-				int currentKills = totalKillsWvW - TotalKillsAtResetWvW.get_Value();
-				SessionKillsWvW.set_Value(currentKills);
-				SessionKillsWvwDaily.set_Value(currentKills);
-				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wvw_kills_week.txt", $"{prefixKills}{SessionKillsWvW.get_Value()}{suffixKills}");
-				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wvw_kills_total.txt", $"{prefixKills}{totalKillsWvW}{suffixKills}");
-				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wvw_kills_day.txt", $"{prefixKills}{SessionKillsWvwDaily.get_Value()}{suffixKills}");
+				return;
 			}
+			await UpdateRankForWvw();
+			await ((IBlobClient<Account>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()).GetAsync(default(CancellationToken)).ContinueWith((Func<Task<Account>, Task>)async delegate(Task<Account> response)
+			{
+				if (!response.IsFaulted)
+				{
+					bool isNewAcc = !response.Result.get_Id().Equals(AccountGuid.get_Value());
+					AccountName.set_Value(response.Result.get_Name());
+					AccountGuid.set_Value(response.Result.get_Id());
+					await ResetWorldVersusWorld(response.Result.get_World(), isNewAcc).ContinueWith((Func<Task, Task>)async delegate
+					{
+						string prefixKills = ((UnicodeSigning == StreamOutModule.UnicodeSigning.Prefixed) ? "⚔" : string.Empty);
+						string suffixKills = ((UnicodeSigning == StreamOutModule.UnicodeSigning.Suffixed) ? "⚔" : string.Empty);
+						int totalKillsWvW = await RequestTotalKillsForWvW();
+						if (totalKillsWvW >= 0)
+						{
+							int currentKills = totalKillsWvW - TotalKillsAtResetWvW.get_Value();
+							SessionKillsWvW.set_Value(currentKills);
+							SessionKillsWvwDaily.set_Value(currentKills);
+							await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wvw_kills_week.txt", $"{prefixKills}{SessionKillsWvW.get_Value()}{suffixKills}");
+							await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wvw_kills_total.txt", $"{prefixKills}{totalKillsWvW}{suffixKills}");
+							await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wvw_kills_day.txt", $"{prefixKills}{SessionKillsWvwDaily.get_Value()}{suffixKills}");
+						}
+					});
+				}
+			});
 		}
 
-		public void Dispose()
+		public override void Dispose()
 		{
 		}
 	}

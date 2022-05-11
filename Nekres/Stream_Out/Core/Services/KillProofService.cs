@@ -8,7 +8,7 @@ using Blish_HUD.Modules.Managers;
 
 namespace Nekres.Stream_Out.Core.Services
 {
-	internal class KillProofService : IExportService, IDisposable
+	internal class KillProofService : ExportService
 	{
 		private const string KILLPROOF_ME_UNSTABLE_FRACTAL_ESSENCE = "unstable_fractal_essence.txt";
 
@@ -18,15 +18,13 @@ namespace Nekres.Stream_Out.Core.Services
 
 		private const string KILLPROOF_API_URL = "https://killproof.me/api/kp/";
 
-		private Logger Logger => StreamOutModule.Logger;
+		private DirectoriesManager DirectoriesManager => StreamOutModule.Instance?.DirectoriesManager;
 
-		private DirectoriesManager DirectoriesManager => StreamOutModule.ModuleInstance?.DirectoriesManager;
+		private ContentsManager ContentsManager => StreamOutModule.Instance?.ContentsManager;
 
-		private ContentsManager ContentsManager => StreamOutModule.ModuleInstance?.ContentsManager;
+		private string AccountName => StreamOutModule.Instance?.AccountName.get_Value();
 
-		private string AccountName => StreamOutModule.ModuleInstance?.AccountName.get_Value();
-
-		public async Task Initialize()
+		public override async Task Initialize()
 		{
 			string moduleDir = DirectoriesManager.GetFullDirectoryPath("stream_out");
 			ContentsManager.ExtractIcons("legendary_divination.png", Path.Combine(moduleDir + "\\static", "legendary_divination.png"));
@@ -34,11 +32,11 @@ namespace Nekres.Stream_Out.Core.Services
 			ContentsManager.ExtractIcons("unstable_fractal_essence.png", Path.Combine(moduleDir + "\\static", "unstable_fractal_essence.png"));
 		}
 
-		public async Task ResetDaily()
+		protected override async Task ResetDaily()
 		{
 		}
 
-		public async Task Update()
+		protected override async Task Update()
 		{
 			await UpdateKillProofs();
 		}
@@ -72,11 +70,11 @@ namespace Nekres.Stream_Out.Core.Services
 									if (awaiter2 == null)
 									{
 										INotifyCompletion awaiter3 = (INotifyCompletion)awaiter;
-										asyncTaskMethodBuilder.AwaitOnCompleted(ref awaiter3, ref *(_003C_003CUpdateKillProofs_003Eb__16_0_003Ed*)/*Error near IL_041c: stateMachine*/);
+										asyncTaskMethodBuilder.AwaitOnCompleted(ref awaiter3, ref *(_003C_003CUpdateKillProofs_003Eb__14_0_003Ed*)/*Error near IL_041c: stateMachine*/);
 									}
 									else
 									{
-										asyncTaskMethodBuilder.AwaitUnsafeOnCompleted(ref awaiter2, ref *(_003C_003CUpdateKillProofs_003Eb__16_0_003Ed*)/*Error near IL_042f: stateMachine*/);
+										asyncTaskMethodBuilder.AwaitUnsafeOnCompleted(ref awaiter2, ref *(_003C_003CUpdateKillProofs_003Eb__14_0_003Ed*)/*Error near IL_042f: stateMachine*/);
 									}
 									/*Error near IL_0438: leave MoveNext - await not detected correctly*/;
 								}
@@ -93,11 +91,11 @@ namespace Nekres.Stream_Out.Core.Services
 									if (awaiter2 == null)
 									{
 										INotifyCompletion awaiter3 = (INotifyCompletion)awaiter;
-										asyncTaskMethodBuilder.AwaitOnCompleted(ref awaiter3, ref *(_003C_003CUpdateKillProofs_003Eb__16_0_003Ed*)/*Error near IL_06d7: stateMachine*/);
+										asyncTaskMethodBuilder.AwaitOnCompleted(ref awaiter3, ref *(_003C_003CUpdateKillProofs_003Eb__14_0_003Ed*)/*Error near IL_06d7: stateMachine*/);
 									}
 									else
 									{
-										asyncTaskMethodBuilder.AwaitUnsafeOnCompleted(ref awaiter2, ref *(_003C_003CUpdateKillProofs_003Eb__16_0_003Ed*)/*Error near IL_06ea: stateMachine*/);
+										asyncTaskMethodBuilder.AwaitUnsafeOnCompleted(ref awaiter2, ref *(_003C_003CUpdateKillProofs_003Eb__14_0_003Ed*)/*Error near IL_06ea: stateMachine*/);
 									}
 									/*Error near IL_06f3: leave MoveNext - await not detected correctly*/;
 								}
@@ -114,11 +112,11 @@ namespace Nekres.Stream_Out.Core.Services
 									if (awaiter2 == null)
 									{
 										INotifyCompletion awaiter3 = (INotifyCompletion)awaiter;
-										asyncTaskMethodBuilder.AwaitOnCompleted(ref awaiter3, ref *(_003C_003CUpdateKillProofs_003Eb__16_0_003Ed*)/*Error near IL_0992: stateMachine*/);
+										asyncTaskMethodBuilder.AwaitOnCompleted(ref awaiter3, ref *(_003C_003CUpdateKillProofs_003Eb__14_0_003Ed*)/*Error near IL_0992: stateMachine*/);
 									}
 									else
 									{
-										asyncTaskMethodBuilder.AwaitUnsafeOnCompleted(ref awaiter2, ref *(_003C_003CUpdateKillProofs_003Eb__16_0_003Ed*)/*Error near IL_09a5: stateMachine*/);
+										asyncTaskMethodBuilder.AwaitUnsafeOnCompleted(ref awaiter2, ref *(_003C_003CUpdateKillProofs_003Eb__14_0_003Ed*)/*Error near IL_09a5: stateMachine*/);
 									}
 									/*Error near IL_09ae: leave MoveNext - await not detected correctly*/;
 								}
@@ -137,7 +135,7 @@ namespace Nekres.Stream_Out.Core.Services
 			});
 		}
 
-		public void Dispose()
+		public override void Dispose()
 		{
 		}
 	}

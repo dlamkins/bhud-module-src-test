@@ -6,24 +6,22 @@ using Blish_HUD.Settings;
 
 namespace Nekres.Stream_Out.Core.Services
 {
-	internal class ClientService : IExportService, IDisposable
+	internal class ClientService : ExportService
 	{
 		private const string SERVER_ADDRESS = "server_address.txt";
 
 		private string _prevServerAddress;
 
-		private Logger Logger => StreamOutModule.Logger;
+		private DirectoriesManager DirectoriesManager => StreamOutModule.Instance?.DirectoriesManager;
 
-		private DirectoriesManager DirectoriesManager => StreamOutModule.ModuleInstance?.DirectoriesManager;
-
-		private SettingEntry<bool> OnlyLastDigitSettingEntry => StreamOutModule.ModuleInstance?.OnlyLastDigitSettingEntry;
+		private SettingEntry<bool> OnlyLastDigitSettingEntry => StreamOutModule.Instance?.OnlyLastDigitSettingEntry;
 
 		public ClientService()
 		{
 			_prevServerAddress = string.Empty;
 		}
 
-		public async Task Update()
+		protected override async Task Update()
 		{
 			if (GameService.Gw2Mumble.get_IsAvailable() && !_prevServerAddress.Equals(GameService.Gw2Mumble.get_Info().get_ServerAddress(), StringComparison.InvariantCultureIgnoreCase))
 			{
@@ -32,15 +30,15 @@ namespace Nekres.Stream_Out.Core.Services
 			}
 		}
 
-		public async Task Initialize()
+		public override async Task Initialize()
 		{
 		}
 
-		public async Task ResetDaily()
+		protected override async Task ResetDaily()
 		{
 		}
 
-		public void Dispose()
+		public override void Dispose()
 		{
 		}
 	}

@@ -13,17 +13,15 @@ using Gw2Sharp.WebApi.V2.Models;
 
 namespace Nekres.Stream_Out.Core.Services
 {
-	internal class MapService : IExportService, IDisposable
+	internal class MapService : ExportService
 	{
 		private const string MAP_TYPE = "map_type.txt";
 
 		private const string MAP_NAME = "map_name.txt";
 
-		private Logger Logger => StreamOutModule.Logger;
+		private Gw2ApiManager Gw2ApiManager => StreamOutModule.Instance?.Gw2ApiManager;
 
-		private Gw2ApiManager Gw2ApiManager => StreamOutModule.ModuleInstance?.Gw2ApiManager;
-
-		private DirectoriesManager DirectoriesManager => StreamOutModule.ModuleInstance?.DirectoriesManager;
+		private DirectoriesManager DirectoriesManager => StreamOutModule.Instance?.DirectoriesManager;
 
 		public MapService()
 		{
@@ -63,7 +61,7 @@ namespace Nekres.Stream_Out.Core.Services
 			}
 			catch (Exception ex) when (ex is UnexpectedStatusException || ex is NullReferenceException)
 			{
-				Logger.Warn(CommonStrings.WebApiDown);
+				StreamOutModule.Logger.Warn(StreamOutModule.Instance.WebApiDown);
 				return;
 			}
 			string location = map.get_Name();
@@ -111,19 +109,19 @@ namespace Nekres.Stream_Out.Core.Services
 			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/map_type.txt", type);
 		}
 
-		public async Task Update()
+		protected override async Task Update()
 		{
 		}
 
-		public async Task Initialize()
+		public override async Task Initialize()
 		{
 		}
 
-		public async Task ResetDaily()
+		protected override async Task ResetDaily()
 		{
 		}
 
-		public void Dispose()
+		public override void Dispose()
 		{
 		}
 	}

@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Blish_HUD;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Gw2Sharp.WebApi;
@@ -15,7 +14,7 @@ using Gw2Sharp.WebApi.V2.Models;
 
 namespace Nekres.Stream_Out.Core.Services
 {
-	internal class PvpService : IExportService, IDisposable
+	internal class PvpService : ExportService
 	{
 		private const string PVP_KILLS_TOTAL = "pvp_kills_total.txt";
 
@@ -31,21 +30,19 @@ namespace Nekres.Stream_Out.Core.Services
 
 		private const string SWORDS = "⚔";
 
-		private Logger Logger => StreamOutModule.Logger;
+		private Gw2ApiManager Gw2ApiManager => StreamOutModule.Instance?.Gw2ApiManager;
 
-		private Gw2ApiManager Gw2ApiManager => StreamOutModule.ModuleInstance?.Gw2ApiManager;
+		private DirectoriesManager DirectoriesManager => StreamOutModule.Instance?.DirectoriesManager;
 
-		private DirectoriesManager DirectoriesManager => StreamOutModule.ModuleInstance?.DirectoriesManager;
+		private ContentsManager ContentsManager => StreamOutModule.Instance?.ContentsManager;
 
-		private ContentsManager ContentsManager => StreamOutModule.ModuleInstance?.ContentsManager;
+		private StreamOutModule.UnicodeSigning UnicodeSigning => StreamOutModule.Instance?.AddUnicodeSymbols.get_Value() ?? StreamOutModule.UnicodeSigning.Suffixed;
 
-		private StreamOutModule.UnicodeSigning UnicodeSigning => StreamOutModule.ModuleInstance?.AddUnicodeSymbols.get_Value() ?? StreamOutModule.UnicodeSigning.Suffixed;
+		private SettingEntry<int> SessionKillsPvP => StreamOutModule.Instance?.SessionKillsPvP;
 
-		private SettingEntry<int> SessionKillsPvP => StreamOutModule.ModuleInstance?.SessionKillsPvP;
+		private SettingEntry<int> TotalKillsAtResetPvP => StreamOutModule.Instance?.TotalKillsAtResetPvP;
 
-		private SettingEntry<int> TotalKillsAtResetPvP => StreamOutModule.ModuleInstance?.TotalKillsAtResetPvP;
-
-		public async Task Initialize()
+		public override async Task Initialize()
 		{
 			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_rank.txt", "Bronze I", overwrite: false);
 			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_winrate.txt", "50%", overwrite: false);
@@ -175,14 +172,14 @@ namespace Nekres.Stream_Out.Core.Services
 			});
 		}
 
-		public async Task ResetDaily()
+		protected override async Task ResetDaily()
 		{
 			SessionKillsPvP.set_Value(0);
 			SettingEntry<int> totalKillsAtResetPvP = TotalKillsAtResetPvP;
 			totalKillsAtResetPvP.set_Value(await RequestTotalKillsForPvP());
 		}
 
-		public async Task Update()
+		protected override async Task Update()
 		{
 			await UpdateStandingsForPvP();
 			await UpdateStatsForPvp();
@@ -197,7 +194,7 @@ namespace Nekres.Stream_Out.Core.Services
 			}
 		}
 
-		public void Dispose()
+		public override void Dispose()
 		{
 		}
 	}
