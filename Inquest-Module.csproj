@@ -14,6 +14,7 @@
   <ItemGroup>
     <Reference Include="Blish HUD" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="Gw2Sharp" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="MonoGame.Extended" />
     <Reference Include="System.Core" />

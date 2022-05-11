@@ -10,6 +10,7 @@ using Blish_HUD.Input;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
+using Gw2Sharp.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -92,14 +93,21 @@ namespace Nekres.Inquest_Module
 
 		protected override void Initialize()
 		{
+			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Invalid comparison between Unknown and I4
 			_autoClickController = new AutoClickController();
 			_autoClickController.SoundVolume = AutoClickSoundVolume.get_Value() / 1000f;
 			JumpKeyBindingSetting.get_Value().set_Enabled(false);
 			DodgeKeyBindingSetting.get_Value().set_Enabled(false);
 			DodgeJumpKeyBindingSetting.get_Value().set_Enabled(true);
-			DodgeJumpKeyBindingSetting.get_Value().set_BlockSequenceFromGw2(true);
-			DodgeJumpKeyBindingSetting.get_Value().add_Activated((EventHandler<EventArgs>)OnDodgeJumpKeyActivated);
+			ToggleDodgeJump((int)GameService.Gw2Mumble.get_PlayerCharacter().get_CurrentMount() == 0);
+			AutoClickToggleKeySetting.get_Value().set_Enabled(true);
+			AutoClickHoldKeySetting.get_Value().set_Enabled(true);
 			AutoClickSoundVolume.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnAutoClickSoundVolumeSettingChanged);
+			GameService.Gw2Mumble.get_PlayerCharacter().add_CurrentMountChanged((EventHandler<ValueEventArgs<MountType>>)OnCurrentMountChanged);
+			GameService.Gw2Mumble.get_UI().add_IsTextInputFocusedChanged((EventHandler<ValueEventArgs<bool>>)OnIsTextInputFocusChanged);
+			GameService.Gw2Mumble.get_UI().add_IsMapOpenChanged((EventHandler<ValueEventArgs<bool>>)OnIsMapOpenChanged);
+			GameService.GameIntegration.get_Gw2Instance().add_IsInGameChanged((EventHandler<ValueEventArgs<bool>>)OnIsInGameChanged);
 		}
 
 		public override IView GetSettingsView()
@@ -118,19 +126,20 @@ namespace Nekres.Inquest_Module
 
 		private void OnDodgeJumpKeyActivated(object o, EventArgs e)
 		{
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0119: Unknown result type (might be due to invalid IL or missing references)
-			if (DateTime.UtcNow < _nextDodgeJump)
+			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
+			if ((int)GameService.Gw2Mumble.get_PlayerCharacter().get_CurrentMount() != 0 || DateTime.UtcNow < _nextDodgeJump)
 			{
 				return;
 			}
@@ -155,6 +164,41 @@ namespace Nekres.Inquest_Module
 			}
 		}
 
+		private void OnCurrentMountChanged(object o, ValueEventArgs<MountType> e)
+		{
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0008: Invalid comparison between Unknown and I4
+			ToggleDodgeJump((int)e.get_Value() == 0);
+		}
+
+		private void OnIsInGameChanged(object o, ValueEventArgs<bool> e)
+		{
+			ToggleDodgeJump(e.get_Value());
+		}
+
+		private void OnIsTextInputFocusChanged(object o, ValueEventArgs<bool> e)
+		{
+			ToggleDodgeJump(!e.get_Value());
+		}
+
+		private void OnIsMapOpenChanged(object o, ValueEventArgs<bool> e)
+		{
+			ToggleDodgeJump(!e.get_Value());
+		}
+
+		private void ToggleDodgeJump(bool enabled)
+		{
+			DodgeJumpKeyBindingSetting.get_Value().set_BlockSequenceFromGw2(enabled);
+			if (enabled)
+			{
+				DodgeJumpKeyBindingSetting.get_Value().add_Activated((EventHandler<EventArgs>)OnDodgeJumpKeyActivated);
+			}
+			else
+			{
+				DodgeJumpKeyBindingSetting.get_Value().remove_Activated((EventHandler<EventArgs>)OnDodgeJumpKeyActivated);
+			}
+		}
+
 		protected override void OnModuleLoaded(EventArgs e)
 		{
 			((Module)this).OnModuleLoaded(e);
@@ -167,6 +211,14 @@ namespace Nekres.Inquest_Module
 
 		protected override void Unload()
 		{
+			AutoClickToggleKeySetting.get_Value().set_Enabled(false);
+			AutoClickHoldKeySetting.get_Value().set_Enabled(false);
+			GameService.Gw2Mumble.get_PlayerCharacter().remove_CurrentMountChanged((EventHandler<ValueEventArgs<MountType>>)OnCurrentMountChanged);
+			GameService.GameIntegration.get_Gw2Instance().remove_IsInGameChanged((EventHandler<ValueEventArgs<bool>>)OnIsInGameChanged);
+			GameService.Gw2Mumble.get_UI().remove_IsTextInputFocusedChanged((EventHandler<ValueEventArgs<bool>>)OnIsTextInputFocusChanged);
+			GameService.Gw2Mumble.get_UI().remove_IsMapOpenChanged((EventHandler<ValueEventArgs<bool>>)OnIsMapOpenChanged);
+			DodgeJumpKeyBindingSetting.get_Value().set_Enabled(false);
+			DodgeJumpKeyBindingSetting.get_Value().set_BlockSequenceFromGw2(false);
 			_autoClickController?.Dispose();
 			DodgeJumpKeyBindingSetting.get_Value().remove_Activated((EventHandler<EventArgs>)OnDodgeJumpKeyActivated);
 			AutoClickSoundVolume.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnAutoClickSoundVolumeSettingChanged);
