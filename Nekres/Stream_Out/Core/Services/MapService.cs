@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -109,16 +110,11 @@ namespace Nekres.Stream_Out.Core.Services
 			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/map_type.txt", type);
 		}
 
-		protected override async Task Update()
+		public override async Task Clear()
 		{
-		}
-
-		public override async Task Initialize()
-		{
-		}
-
-		protected override async Task ResetDaily()
-		{
+			string dir = DirectoriesManager.GetFullDirectoryPath("stream_out");
+			await FileUtil.DeleteAsync(Path.Combine(dir, "map_name.txt"));
+			await FileUtil.DeleteAsync(Path.Combine(dir, "map_type.txt"));
 		}
 
 		public override void Dispose()

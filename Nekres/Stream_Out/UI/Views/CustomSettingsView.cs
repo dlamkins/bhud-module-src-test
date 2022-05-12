@@ -83,27 +83,35 @@ namespace Nekres.Stream_Out.UI.Views
 			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0183: Expected O, but got Unknown
-			//IL_01da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0166: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0189: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fe: Expected O, but got Unknown
+			//IL_01f9: Expected O, but got Unknown
+			//IL_0250: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0255: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0263: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0274: Expected O, but got Unknown
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Size(new Point(((Control)buildPanel).get_Width(), 78));
 			((Control)val).set_Location(new Point(0, 0));
@@ -122,27 +130,35 @@ namespace Nekres.Stream_Out.UI.Views
 			val2.set_ResizeIcon(true);
 			((Control)val2).set_BasicTooltipText(((Presenter<CustomSettingsView, CustomSettingsModel>)base.get_Presenter()).get_Model().GetSocialUrl(CustomSettingsModel.Social.KoFi));
 			((Control)val2).add_Click((EventHandler<MouseEventArgs>)OnBrowserButtonClick);
-			FlowPanel val3 = new FlowPanel();
-			((Control)val3).set_Size(new Point(((Control)buildPanel).get_Width(), ((Control)buildPanel).get_Height() - ((Control)_socialFlowPanel).get_Height()));
-			((Control)val3).set_Location(new Point(0, ((Control)_socialFlowPanel).get_Height()));
-			val3.set_FlowDirection((ControlFlowDirection)3);
-			val3.set_ControlPadding(new Vector2(5f, 2f));
-			val3.set_OuterControlPadding(new Vector2(10f, 15f));
-			((Container)val3).set_WidthSizingMode((SizingMode)2);
-			((Container)val3).set_HeightSizingMode((SizingMode)1);
-			((Container)val3).set_AutoSizePadding(new Point(0, 15));
-			((Control)val3).set_Parent(buildPanel);
-			_settingFlowPanel = val3;
+			StandardButton val3 = new StandardButton();
+			((Control)val3).set_Parent((Container)(object)_socialFlowPanel);
+			((Control)val3).set_Size(new Point(100, 46));
+			val3.set_Text("twitch");
+			val3.set_Icon(AsyncTexture2D.op_Implicit(((Presenter<CustomSettingsView, CustomSettingsModel>)base.get_Presenter()).get_Model().GetSocialLogo(CustomSettingsModel.Social.Twitch)));
+			val3.set_ResizeIcon(true);
+			((Control)val3).set_BasicTooltipText(((Presenter<CustomSettingsView, CustomSettingsModel>)base.get_Presenter()).get_Model().GetSocialUrl(CustomSettingsModel.Social.Twitch));
+			((Control)val3).add_Click((EventHandler<MouseEventArgs>)OnBrowserButtonClick);
+			FlowPanel val4 = new FlowPanel();
+			((Control)val4).set_Size(new Point(((Control)buildPanel).get_Width(), ((Control)buildPanel).get_Height() - ((Control)_socialFlowPanel).get_Height()));
+			((Control)val4).set_Location(new Point(0, ((Control)_socialFlowPanel).get_Height()));
+			val4.set_FlowDirection((ControlFlowDirection)3);
+			val4.set_ControlPadding(new Vector2(5f, 2f));
+			val4.set_OuterControlPadding(new Vector2(10f, 15f));
+			((Container)val4).set_WidthSizingMode((SizingMode)2);
+			((Container)val4).set_HeightSizingMode((SizingMode)1);
+			((Container)val4).set_AutoSizePadding(new Point(0, 15));
+			((Control)val4).set_Parent(buildPanel);
+			_settingFlowPanel = val4;
 			foreach (SettingEntry item in ((IEnumerable<SettingEntry>)((Presenter<CustomSettingsView, CustomSettingsModel>)base.get_Presenter()).get_Model().Settings).Where((SettingEntry s) => s.get_SessionDefined()))
 			{
 				IView settingView;
 				if ((settingView = SettingView.FromType(item, ((Control)_settingFlowPanel).get_Width())) != null)
 				{
-					ViewContainer val4 = new ViewContainer();
-					((Container)val4).set_WidthSizingMode((SizingMode)2);
-					((Container)val4).set_HeightSizingMode((SizingMode)1);
-					((Control)val4).set_Parent((Container)(object)_settingFlowPanel);
-					_lastSettingContainer = val4;
+					ViewContainer val5 = new ViewContainer();
+					((Container)val5).set_WidthSizingMode((SizingMode)2);
+					((Container)val5).set_HeightSizingMode((SizingMode)1);
+					((Control)val5).set_Parent((Container)(object)_settingFlowPanel);
+					_lastSettingContainer = val5;
 					_lastSettingContainer.Show(settingView);
 					SettingsView subSettingsView = (SettingsView)(object)((settingView is SettingsView) ? settingView : null);
 					if (subSettingsView != null)

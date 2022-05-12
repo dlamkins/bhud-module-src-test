@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -156,6 +157,15 @@ namespace Nekres.Stream_Out.Core.Services
 					});
 				}
 			});
+		}
+
+		public override async Task Clear()
+		{
+			string dir = DirectoriesManager.GetFullDirectoryPath("stream_out");
+			await FileUtil.DeleteAsync(Path.Combine(dir, "wvw_kills_week.txt"));
+			await FileUtil.DeleteAsync(Path.Combine(dir, "wvw_kills_day.txt"));
+			await FileUtil.DeleteAsync(Path.Combine(dir, "wvw_kills_total.txt"));
+			await FileUtil.DeleteAsync(Path.Combine(dir, "wvw_rank.txt"));
 		}
 
 		public override void Dispose()

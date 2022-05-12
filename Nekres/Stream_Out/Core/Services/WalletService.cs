@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -56,6 +57,13 @@ namespace Nekres.Stream_Out.Core.Services
 					await Gw2Util.GenerateKarmaImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wallet_karma.png", karma);
 				}
 			});
+		}
+
+		public override async Task Clear()
+		{
+			string dir = DirectoriesManager.GetFullDirectoryPath("stream_out");
+			await FileUtil.DeleteAsync(Path.Combine(dir, "wallet_coins.png"));
+			await FileUtil.DeleteAsync(Path.Combine(dir, "wallet_karma.png"));
 		}
 
 		public override void Dispose()

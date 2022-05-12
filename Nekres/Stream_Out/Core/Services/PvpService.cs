@@ -194,6 +194,17 @@ namespace Nekres.Stream_Out.Core.Services
 			}
 		}
 
+		public override async Task Clear()
+		{
+			string dir = DirectoriesManager.GetFullDirectoryPath("stream_out");
+			await FileUtil.DeleteAsync(Path.Combine(dir, "pvp_kills_total.txt"));
+			await FileUtil.DeleteAsync(Path.Combine(dir, "pvp_kills_day.txt"));
+			await FileUtil.DeleteAsync(Path.Combine(dir, "pvp_rank.txt"));
+			await FileUtil.DeleteAsync(Path.Combine(dir, "pvp_rank_icon.png"));
+			await FileUtil.DeleteAsync(Path.Combine(dir, "pvp_tier_icon.png"));
+			await FileUtil.DeleteAsync(Path.Combine(dir, "pvp_winrate.txt"));
+		}
+
 		public override void Dispose()
 		{
 		}

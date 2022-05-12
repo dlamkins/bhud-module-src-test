@@ -32,10 +32,6 @@ namespace Nekres.Stream_Out.Core.Services
 			ContentsManager.ExtractIcons("unstable_fractal_essence.png", Path.Combine(moduleDir + "\\static", "unstable_fractal_essence.png"));
 		}
 
-		protected override async Task ResetDaily()
-		{
-		}
-
 		protected override async Task Update()
 		{
 			await UpdateKillProofs();
@@ -70,11 +66,11 @@ namespace Nekres.Stream_Out.Core.Services
 									if (awaiter2 == null)
 									{
 										INotifyCompletion awaiter3 = (INotifyCompletion)awaiter;
-										asyncTaskMethodBuilder.AwaitOnCompleted(ref awaiter3, ref *(_003C_003CUpdateKillProofs_003Eb__14_0_003Ed*)/*Error near IL_041c: stateMachine*/);
+										asyncTaskMethodBuilder.AwaitOnCompleted(ref awaiter3, ref *(_003C_003CUpdateKillProofs_003Eb__13_0_003Ed*)/*Error near IL_041c: stateMachine*/);
 									}
 									else
 									{
-										asyncTaskMethodBuilder.AwaitUnsafeOnCompleted(ref awaiter2, ref *(_003C_003CUpdateKillProofs_003Eb__14_0_003Ed*)/*Error near IL_042f: stateMachine*/);
+										asyncTaskMethodBuilder.AwaitUnsafeOnCompleted(ref awaiter2, ref *(_003C_003CUpdateKillProofs_003Eb__13_0_003Ed*)/*Error near IL_042f: stateMachine*/);
 									}
 									/*Error near IL_0438: leave MoveNext - await not detected correctly*/;
 								}
@@ -91,11 +87,11 @@ namespace Nekres.Stream_Out.Core.Services
 									if (awaiter2 == null)
 									{
 										INotifyCompletion awaiter3 = (INotifyCompletion)awaiter;
-										asyncTaskMethodBuilder.AwaitOnCompleted(ref awaiter3, ref *(_003C_003CUpdateKillProofs_003Eb__14_0_003Ed*)/*Error near IL_06d7: stateMachine*/);
+										asyncTaskMethodBuilder.AwaitOnCompleted(ref awaiter3, ref *(_003C_003CUpdateKillProofs_003Eb__13_0_003Ed*)/*Error near IL_06d7: stateMachine*/);
 									}
 									else
 									{
-										asyncTaskMethodBuilder.AwaitUnsafeOnCompleted(ref awaiter2, ref *(_003C_003CUpdateKillProofs_003Eb__14_0_003Ed*)/*Error near IL_06ea: stateMachine*/);
+										asyncTaskMethodBuilder.AwaitUnsafeOnCompleted(ref awaiter2, ref *(_003C_003CUpdateKillProofs_003Eb__13_0_003Ed*)/*Error near IL_06ea: stateMachine*/);
 									}
 									/*Error near IL_06f3: leave MoveNext - await not detected correctly*/;
 								}
@@ -112,11 +108,11 @@ namespace Nekres.Stream_Out.Core.Services
 									if (awaiter2 == null)
 									{
 										INotifyCompletion awaiter3 = (INotifyCompletion)awaiter;
-										asyncTaskMethodBuilder.AwaitOnCompleted(ref awaiter3, ref *(_003C_003CUpdateKillProofs_003Eb__14_0_003Ed*)/*Error near IL_0992: stateMachine*/);
+										asyncTaskMethodBuilder.AwaitOnCompleted(ref awaiter3, ref *(_003C_003CUpdateKillProofs_003Eb__13_0_003Ed*)/*Error near IL_0992: stateMachine*/);
 									}
 									else
 									{
-										asyncTaskMethodBuilder.AwaitUnsafeOnCompleted(ref awaiter2, ref *(_003C_003CUpdateKillProofs_003Eb__14_0_003Ed*)/*Error near IL_09a5: stateMachine*/);
+										asyncTaskMethodBuilder.AwaitUnsafeOnCompleted(ref awaiter2, ref *(_003C_003CUpdateKillProofs_003Eb__13_0_003Ed*)/*Error near IL_09a5: stateMachine*/);
 									}
 									/*Error near IL_09ae: leave MoveNext - await not detected correctly*/;
 								}
@@ -133,6 +129,15 @@ namespace Nekres.Stream_Out.Core.Services
 					}
 				}
 			});
+		}
+
+		public override async Task Clear()
+		{
+			string dir = DirectoriesManager.GetFullDirectoryPath("stream_out");
+			await FileUtil.DeleteAsync(Path.Combine(dir, "unstable_fractal_essence.txt"));
+			await FileUtil.DeleteAsync(Path.Combine(dir, "legendary_divination.txt"));
+			await FileUtil.DeleteAsync(Path.Combine(dir, "legendary_insight.txt"));
+			await FileUtil.DeleteDirectoryAsync(Path.Combine(Path.Combine(dir, "static")));
 		}
 
 		public override void Dispose()

@@ -33,11 +33,19 @@ namespace Nekres.Stream_Out.Core.Services
 			}
 		}
 
-		public abstract Task Initialize();
+		public virtual async Task Initialize()
+		{
+		}
 
-		protected abstract Task Update();
+		protected virtual async Task Update()
+		{
+		}
 
-		protected abstract Task ResetDaily();
+		protected virtual async Task ResetDaily()
+		{
+		}
+
+		public abstract Task Clear();
 
 		public abstract void Dispose();
 	}

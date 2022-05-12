@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Modules.Managers;
@@ -30,12 +31,9 @@ namespace Nekres.Stream_Out.Core.Services
 			}
 		}
 
-		public override async Task Initialize()
+		public override async Task Clear()
 		{
-		}
-
-		protected override async Task ResetDaily()
-		{
+			await FileUtil.DeleteAsync(Path.Combine(DirectoriesManager.GetFullDirectoryPath("stream_out"), "server_address.txt"));
 		}
 
 		public override void Dispose()

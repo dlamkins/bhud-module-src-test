@@ -177,6 +177,16 @@ namespace Nekres.Stream_Out.Core.Services
 			}
 		}
 
+		public override async Task Clear()
+		{
+			string dir = DirectoriesManager.GetFullDirectoryPath("stream_out");
+			await FileUtil.DeleteAsync(Path.Combine(dir, "deaths_day.txt"));
+			await FileUtil.DeleteAsync(Path.Combine(dir, "deaths_week.txt"));
+			await FileUtil.DeleteAsync(Path.Combine(dir, "character_name.txt"));
+			await FileUtil.DeleteAsync(Path.Combine(dir, "profession_icon.png"));
+			await FileUtil.DeleteAsync(Path.Combine(dir, "commander_icon.png"));
+		}
+
 		public override void Dispose()
 		{
 			_commanderIcon?.Dispose();
