@@ -198,9 +198,18 @@ namespace Nekres.Stream_Out
 			{
 				return;
 			}
-			foreach (ExportService allExportService in _allExportServices)
+			try
 			{
-				await allExportService.DoUpdate();
+				foreach (ExportService service in _allExportServices.ToList())
+				{
+					if (service != null)
+					{
+						await service.DoUpdate();
+					}
+				}
+			}
+			catch (Exception ex) when (ex is InvalidOperationException || ex is NullReferenceException)
+			{
 			}
 		}
 
