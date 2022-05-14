@@ -3,6 +3,7 @@ using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
+using Eclipse1807.BlishHUD.FishingBuddy.Properties;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.BitmapFonts;
@@ -13,7 +14,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 	{
 		private static readonly Logger Logger = Logger.GetLogger(typeof(Clock));
 
-		private string _timePhase = "";
+		private string _timePhase = string.Empty;
 
 		public bool HideLabel;
 
@@ -85,8 +86,8 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 			((Control)clickThroughImage).set_Size(new Point(FishingBuddyModule._timeOfDayImgSize.get_Value()));
 			((Control)clickThroughImage).set_Location(new Point(0, _font.get_LineHeight()));
 			((Control)clickThroughImage).set_Opacity(1f);
-			((Control)clickThroughImage).set_BasicTooltipText("Dawn");
-			((Control)clickThroughImage).set_Visible(TimePhase == "Dawn");
+			((Control)clickThroughImage).set_BasicTooltipText(Strings.Dawn);
+			((Control)clickThroughImage).set_Visible(TimePhase == Strings.Dawn);
 			clickThroughImage.Capture = Drag;
 			_dawn = clickThroughImage;
 			((Control)this).add_Resized((EventHandler<ResizedEventArgs>)delegate
@@ -100,8 +101,8 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 			((Control)clickThroughImage2).set_Size(new Point(FishingBuddyModule._timeOfDayImgSize.get_Value()));
 			((Control)clickThroughImage2).set_Location(new Point(0, _font.get_LineHeight()));
 			((Control)clickThroughImage2).set_Opacity(1f);
-			((Control)clickThroughImage2).set_BasicTooltipText("Day");
-			((Control)clickThroughImage2).set_Visible(TimePhase == "Day");
+			((Control)clickThroughImage2).set_BasicTooltipText(Strings.Day);
+			((Control)clickThroughImage2).set_Visible(TimePhase == Strings.Day);
 			clickThroughImage2.Capture = Drag;
 			_day = clickThroughImage2;
 			((Control)this).add_Resized((EventHandler<ResizedEventArgs>)delegate
@@ -115,8 +116,8 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 			((Control)clickThroughImage3).set_Size(new Point(FishingBuddyModule._timeOfDayImgSize.get_Value()));
 			((Control)clickThroughImage3).set_Location(new Point(0, _font.get_LineHeight()));
 			((Control)clickThroughImage3).set_Opacity(1f);
-			((Control)clickThroughImage3).set_BasicTooltipText("Dusk");
-			((Control)clickThroughImage3).set_Visible(TimePhase == "Dusk");
+			((Control)clickThroughImage3).set_BasicTooltipText(Strings.Dusk);
+			((Control)clickThroughImage3).set_Visible(TimePhase == Strings.Dusk);
 			clickThroughImage3.Capture = Drag;
 			_dusk = clickThroughImage3;
 			((Control)this).add_Resized((EventHandler<ResizedEventArgs>)delegate
@@ -130,8 +131,8 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 			((Control)clickThroughImage4).set_Size(new Point(FishingBuddyModule._timeOfDayImgSize.get_Value()));
 			((Control)clickThroughImage4).set_Location(new Point(0, _font.get_LineHeight()));
 			((Control)clickThroughImage4).set_Opacity(1f);
-			((Control)clickThroughImage4).set_BasicTooltipText("Night");
-			((Control)clickThroughImage4).set_Visible(TimePhase == "Night");
+			((Control)clickThroughImage4).set_BasicTooltipText(Strings.Night);
+			((Control)clickThroughImage4).set_Visible(TimePhase == Strings.Night);
 			clickThroughImage4.Capture = Drag;
 			_night = clickThroughImage4;
 			((Control)this).add_Resized((EventHandler<ResizedEventArgs>)delegate
@@ -254,28 +255,29 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 		protected virtual void OnTimeOfDayChanged(ValueChangedEventArgs<string> e)
 		{
 			_timePhase = e.get_NewValue();
-			switch (TimePhase)
+			if (TimePhase == Strings.Dawn)
 			{
-			case "Dawn":
 				((Control)_currentTime).set_Visible(false);
 				_currentTime = _dawn;
 				((Control)_currentTime).set_Visible(true);
-				break;
-			case "Day":
+			}
+			else if (TimePhase == Strings.Day)
+			{
 				((Control)_currentTime).set_Visible(false);
 				_currentTime = _day;
 				((Control)_currentTime).set_Visible(true);
-				break;
-			case "Dusk":
+			}
+			else if (TimePhase == Strings.Dusk)
+			{
 				((Control)_currentTime).set_Visible(false);
 				_currentTime = _dusk;
 				((Control)_currentTime).set_Visible(true);
-				break;
-			case "Night":
+			}
+			else if (TimePhase == Strings.Night)
+			{
 				((Control)_currentTime).set_Visible(false);
 				_currentTime = _night;
 				((Control)_currentTime).set_Visible(true);
-				break;
 			}
 			this.TimeOfDayChanged?.Invoke(this, e);
 		}

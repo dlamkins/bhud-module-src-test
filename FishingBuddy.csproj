@@ -9,7 +9,9 @@
     <LangVersion>Preview</LangVersion>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup />
+  <PropertyGroup>
+    <RootNamespace />
+  </PropertyGroup>
   <ItemGroup />
   <ItemGroup>
     <Reference Include="Blish HUD" />

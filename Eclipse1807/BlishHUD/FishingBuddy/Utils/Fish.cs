@@ -55,7 +55,58 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 			SparkflyLarvae
 		}
 
-		private static readonly Logger Logger = Logger.GetLogger(typeof(Fish));
+		[JsonConverter(typeof(StringEnumConverter))]
+		public enum FishingHole
+		{
+			None,
+			Any,
+			[EnumMember(Value = "Boreal Fish")]
+			BorealFish,
+			[EnumMember(Value = "Cavern Fish")]
+			CavernFish,
+			[EnumMember(Value = "Channel Fish")]
+			ChannelFish,
+			[EnumMember(Value = "Coastal Fish")]
+			CoastalFish,
+			[EnumMember(Value = "Deep Fishing Hole")]
+			DeepFishingHole,
+			[EnumMember(Value = "Desert Fish")]
+			DesertFish,
+			[EnumMember(Value = "Freshwater Fish")]
+			FreshwaterFish,
+			[EnumMember(Value = "Grotto Fish")]
+			GrottoFish,
+			[EnumMember(Value = "Lake Fish")]
+			LakeFish,
+			[EnumMember(Value = "Lutgardis Trout")]
+			LutgardisTrout,
+			[EnumMember(Value = "Mysterious Waters Fish")]
+			MysteriousWatersFish,
+			[EnumMember(Value = "Noxious Water Fish")]
+			NoxiousWaterFish,
+			[EnumMember(Value = "Offshore Fish")]
+			OffshoreFish,
+			[EnumMember(Value = "Polluted Lake Fish")]
+			PollutedLakeFish,
+			[EnumMember(Value = "Quarry Fish")]
+			QuarryFish,
+			[EnumMember(Value = "Rare Fish")]
+			RareFish,
+			[EnumMember(Value = "River Fish")]
+			RiverFish,
+			[EnumMember(Value = "Saltwater Fish")]
+			SaltwaterFish,
+			[EnumMember(Value = "Special Fishing Hole")]
+			SpecialFishingHole,
+			[EnumMember(Value = "Shore Fish")]
+			ShoreFish,
+			[EnumMember(Value = "Volcanic Fish")]
+			VolcanicFish,
+			[EnumMember(Value = "Wreckage Site")]
+			WreckageSite
+		}
+
+		internal static readonly Logger Logger = Logger.GetLogger(typeof(Fish));
 
 		public string Name { get; set; }
 
@@ -64,7 +115,8 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 		[JsonConverter(typeof(StringEnumConverter))]
 		public ItemRarity Rarity { get; set; }
 
-		public string FishingHole { get; set; }
+		[JsonProperty("FishingHole")]
+		public FishingHole Hole { get; set; }
 
 		public FishBait Bait { get; set; }
 

@@ -1,0 +1,128 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="RarityDescription"><value>Display fish rarity border</value></data>
+  <data name="Wreckage Site"><value>Wreckage Site</value></data>
+  <data name="SettingsDirection"><value>Direction</value></data>
+  <data name="Top-left"><value>Top-left</value></data>
+  <data name="Cavern Fish"><value>Cavern Fish</value></data>
+  <data name="Shrimplings"><value>Shrimplings</value></data>
+  <data name="OpenWater"><value>Open Water</value></data>
+  <data name="TimeOfDayPanelDragDescription"><value>Drag time of day display</value></data>
+  <data name="Saltwater Fish"><value>Saltwater Fish</value></data>
+  <data name="Scorpions"><value>Scorpions</value></data>
+  <data name="TimeOfDayHideDescription"><value>Option to hide time display</value></data>
+  <data name="Deep Fishing Hole"><value>Deep Fishing Hole</value></data>
+  <data name="River Fish"><value>River Fish</value></data>
+  <data name="Glow Worms"><value>Glow Worms</value></data>
+  <data name="Lightning Bugs"><value>Lightning Bugs</value></data>
+  <data name="Shore Fish"><value>Shore Fish</value></data>
+  <data name="Sparkfly Larvae"><value>Sparkfly Larvae</value></data>
+  <data name="FishPanelLocation"><value>Fish Panel Location</value></data>
+  <data name="SettingsDisplayUncatchable"><value>Display Uncatchable</value></data>
+  <data name="Hidden"><value>Hidden</value></data>
+  <data name="ReasonForHiding"><value>Reason for Hiding</value></data>
+  <data name="SettingsDisplayUncatchableDescription"><value>Display fish that cannot be caught at this time of day</value></data>
+  <data name="Freshwater Fish"><value>Freshwater Fish</value></data>
+  <data name="TimeOfDayPanelLoc"><value>Time of Day Details Location</value></data>
+  <data name="TimeOfDayHideLabelDescription"><value>Show/Hide clock time label display</value></data>
+  <data name="Vertical"><value>Vertical</value></data>
+  <data name="Rarity"><value>Rarity</value></data>
+  <data name="Special Fishing Hole"><value>Special Fishing Hole</value></data>
+  <data name="SettingsRarity"><value>Show Rarity</value></data>
+  <data name="Dusk/Dawn"><value>Dusk/Dawn</value></data>
+  <data name="HideInCombatDescription"><value>Hide all fishing info in combat</value></data>
+  <data name="Haiju Minnows"><value>Haiju Minnows</value></data>
+  <data name="SettingsDisplayWorldClassDescription"><value>Include World Class Fisher fish</value></data>
+  <data name="Lava Beetles"><value>Lava Beetles</value></data>
+  <data name="FishFavoredBait"><value>Favored Bait</value></data>
+  <data name="FishPanelDrag"><value>Drag Fish</value></data>
+  <data name="FishPanelSize"><value>Fish Size</value></data>
+  <data name="Achievement"><value>Achievement</value></data>
+  <data name="Offshore Fish"><value>Offshore Fish</value></data>
+  <data name="Boreal Fish"><value>Boreal Fish</value></data>
+  <data name="FishTimeOfDay"><value>Time of Day</value></data>
+  <data name="Default"><value>Default</value></data>
+  <data name="Fish Eggs"><value>Fish Eggs</value></data>
+  <data name="Desert Fish"><value>Desert Fish</value></data>
+  <data name="Grotto Fish"><value>Grotto Fish</value></data>
+  <data name="Coastal Fish"><value>Coastal Fish</value></data>
+  <data name="Lutgardis Trout"><value>Lutgardis Trout</value></data>
+  <data name="Any"><value>Any</value></data>
+  <data name="Day"><value>Day</value></data>
+  <data name="TimeOfDay"><value>Time of Day</value></data>
+  <data name="Night"><value>Night</value></data>
+  <data name="Notes"><value>Notes</value></data>
+  <data name="Noxious Water Fish"><value>Noxious Water Fish</value></data>
+  <data name="AddsNewLines"><value>adds new line</value></data>
+  <data name="TimeOfDayPanelDrag"><value>Drag Time Display</value></data>
+  <data name="Mackerel"><value>Mackerel</value></data>
+  <data name="SettingsIgnoreCaughtDescription"><value>Ignore fish already counted towards achievements</value></data>
+  <data name="Horizontal"><value>Horizontal</value></data>
+  <data name="Dawn/Dusk"><value>Dawn/Dusk</value></data>
+  <data name="HideInCombat"><value>Hide In Combat</value></data>
+  <data name="SettingsDisplaySaltwater"><value>Display Saltwater</value></data>
+  <data name="Bottom-left"><value>Bottom-left</value></data>
+  <data name="Volcanic Fish"><value>Volcanic Fish</value></data>
+  <data name="Top-right"><value>Top-right</value></data>
+  <data name="SettingsDisplayWorldClass"><value>Display World Class</value></data>
+  <data name="SimpleTooltip"><value>Simple: #1\\nBait: #2\\nHole: #4\\n@7\n</value></data>
+  <data name="CompactTooltip"><value>Compact: #1 [#6]\\nBait: #2\\nHole: #4 (#3)\\n@7\n</value></data>
+  <data name="SettingsIgnoreCaught"><value>Ignore Caught</value></data>
+  <data name="FishPanelTooltipDescription"><value>@number uses default string, #number allows for more customization\n</value></data>
+  <data name="TimeOfDayHideLabel"><value>Hide Time Label</value></data>
+  <data name="TimeOfDayLabelPositionDescription"><value>Clock display label alignment</value></data>
+  <data name="SettingsDisplaySaltwaterDescription"><value>Include Saltwater Fisher fish</value></data>
+  <data name="Channel Fish"><value>Channel Fish</value></data>
+  <data name="Minnows"><value>Minnows</value></data>
+  <data name="TimeOfDayLabelPosition"><value>Time Label Position</value></data>
+  <data name="Ramshorn Snails"><value>Ramshorn Snails</value></data>
+  <data name="Sardines"><value>Sardines</value></data>
+  <data name="Quarry Fish"><value>Quarry Fish</value></data>
+  <data name="Orientation"><value>Orientation</value></data>
+  <data name="Nightcrawlers"><value>Nightcrawlers</value></data>
+  <data name="OrientationDescription"><value>Fish panel orientation</value></data>
+  <data name="Leeches"><value>Leeches</value></data>
+  <data name="FishyNotes"><value>Fishy Notes</value></data>
+  <data name="Polluted Lake Fish"><value>Polluted Lake Fish</value></data>
+  <data name="Lake Fish"><value>Lake Fish</value></data>
+  <data name="HiddenCaught"><value>Already Caught</value></data>
+  <data name="Rare Fish"><value>Rare Fish</value></data>
+  <data name="TooltipDisplay"><value>Tooltip Display</value></data>
+  <data name="TimeOfDayHide"><value>Hide Time Display</value></data>
+  <data name="TimeOfDaySize"><value>Time of Day Size</value></data>
+  <data name="SettingsDirectionDescription"><value>Fish panel direction</value></data>
+  <data name="Bottom-right"><value>Bottom-right</value></data>
+  <data name="FishFishingHole"><value>Fishing Hole</value></data>
+  <data name="Mysterious Waters Fish"><value>Mysterious Waters Fish</value></data>
+  <data name="FishName"><value>Name</value></data>
+  <data name="Dawn"><value>Dawn</value></data>
+  <data name="Dusk"><value>Dusk</value></data>
+  <data name="None"><value>None</value></data>
+  </root>

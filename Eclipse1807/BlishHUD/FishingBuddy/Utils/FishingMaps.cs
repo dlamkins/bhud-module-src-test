@@ -21,8 +21,8 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 
 		public static readonly List<int> MaguumaMaps = new List<int>
 		{
-			53, 39, 34, 35, 54, 139, 1068, 1101, 1107, 1108,
-			1121, 1069, 1071, 1076, 1104, 1124
+			53, 39, 34, 35, 54, 139, 1045, 1068, 1101, 1107,
+			1108, 1121, 1069, 1071, 1076, 1104, 1124
 		};
 
 		public static readonly List<int> ShiverpeaksFisher = new List<int> { 6179, 6153 };
