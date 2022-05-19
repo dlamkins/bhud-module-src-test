@@ -257,12 +257,13 @@ namespace Kenedia.Modules.Characters
 			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0195: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0212: Unknown result type (might be due to invalid IL or missing references)
 			if (!(GameService.Gw2Mumble.get_PlayerCharacter().get_Name() != Name) && GameService.GameIntegration.get_Gw2Instance().get_IsInGame())
 			{
 				return;
@@ -306,6 +307,7 @@ namespace Kenedia.Modules.Characters
 						}
 					}
 					Keyboard.Stroke(primary, false);
+					Keyboard.Stroke(primary, true);
 					foreach (ModifierKeys mod in Enum.GetValues(typeof(ModifierKeys)))
 					{
 						if ((int)mod != 0 && ((Enum)mods).HasFlag((Enum)(object)mod))

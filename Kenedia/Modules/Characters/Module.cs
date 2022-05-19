@@ -1580,6 +1580,8 @@ namespace Kenedia.Modules.Characters
 				{
 					Control.set_ActiveControl((Control)(object)filterTextBox);
 					((TextInputBase)filterTextBox).set_Focused(true);
+					((TextInputBase)filterTextBox).set_SelectionStart(0);
+					((TextInputBase)filterTextBox).set_SelectionEnd(((TextInputBase)filterTextBox).get_Length());
 				}
 			});
 			Image val2 = new Image();
