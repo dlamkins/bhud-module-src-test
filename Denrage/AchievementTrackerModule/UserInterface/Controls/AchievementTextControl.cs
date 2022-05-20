@@ -1,23 +1,27 @@
 using Blish_HUD.Controls;
 using Denrage.AchievementTrackerModule.Interfaces;
-using Denrage.AchievementTrackerModule.Models.Achievement;
+using Denrage.AchievementTrackerModule.Libs.Achievement;
+using Denrage.AchievementTrackerModule.UserInterface.Controls.FormattedLabel;
 using Microsoft.Xna.Framework;
 
 namespace Denrage.AchievementTrackerModule.UserInterface.Controls
 {
 	public class AchievementTextControl : FlowPanel, IAchievementControl
 	{
+		private readonly IFormattedLabelHtmlService formattedLabelHtmlService;
+
 		private readonly AchievementTableEntry achievement;
 
 		private readonly StringDescription description;
 
-		private Label gameTextLabel;
+		private Denrage.AchievementTrackerModule.UserInterface.Controls.FormattedLabel.FormattedLabel gameTextLabel;
 
-		private Label gameHintLabel;
+		private Denrage.AchievementTrackerModule.UserInterface.Controls.FormattedLabel.FormattedLabel gameHintLabel;
 
-		public AchievementTextControl(AchievementTableEntry achievement, StringDescription description)
+		public AchievementTextControl(IFormattedLabelHtmlService formattedLabelHtmlService, AchievementTableEntry achievement, StringDescription description)
 			: this()
 		{
+			this.formattedLabelHtmlService = formattedLabelHtmlService;
 			this.achievement = achievement;
 			this.description = description;
 			((FlowPanel)this).set_FlowDirection((ControlFlowDirection)1);
@@ -25,44 +29,21 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls
 
 		public void BuildControl()
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Expected O, but got Unknown
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bd: Expected O, but got Unknown
 			if (!string.IsNullOrEmpty(description.GameText))
 			{
-				Label val = new Label();
-				((Control)val).set_Parent((Container)(object)this);
-				val.set_Text(StringUtils.SanitizeHtml(description.GameText));
-				val.set_AutoSizeHeight(true);
-				((Control)val).set_Width(((Container)this).get_ContentRegion().Width);
-				val.set_WrapText(true);
-				gameTextLabel = val;
+				FormattedLabelBuilder labelBuilder2 = formattedLabelHtmlService.CreateLabel(description.GameText).AutoSizeHeight().SetWidth(((Container)this).get_ContentRegion().Width)
+					.Wrap();
+				gameTextLabel = labelBuilder2.Build();
+				((Control)gameTextLabel).set_Parent((Container)(object)this);
 			}
 			if (!string.IsNullOrEmpty(description.GameHint))
 			{
-				Label val2 = new Label();
-				((Control)val2).set_Parent((Container)(object)this);
-				((Control)val2).set_Width(((Container)this).get_ContentRegion().Width);
-				val2.set_Text(StringUtils.SanitizeHtml(description.GameHint));
-				val2.set_TextColor(Color.get_LightGray());
-				val2.set_AutoSizeHeight(true);
-				val2.set_WrapText(true);
-				gameHintLabel = val2;
+				FormattedLabelBuilder labelBuilder = formattedLabelHtmlService.CreateLabel(description.GameHint).AutoSizeHeight().SetWidth(((Container)this).get_ContentRegion().Width)
+					.Wrap();
+				gameHintLabel = labelBuilder.Build();
+				((Control)gameHintLabel).set_Parent((Container)(object)this);
 			}
 		}
 

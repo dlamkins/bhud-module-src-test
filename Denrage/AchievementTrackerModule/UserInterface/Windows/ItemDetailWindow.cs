@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using Blish_HUD;
 using Blish_HUD.Controls;
-using Blish_HUD.Input;
 using Blish_HUD.Modules.Managers;
 using Denrage.AchievementTrackerModule.Interfaces;
-using Denrage.AchievementTrackerModule.Models.Achievement;
+using Denrage.AchievementTrackerModule.Libs.Achievement;
+using Denrage.AchievementTrackerModule.UserInterface.Controls.FormattedLabel;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -22,6 +22,8 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Windows
 
 		private readonly IAchievementTableEntryProvider achievementTableEntryProvider;
 
+		private readonly ISubPageInformationWindowManager subPageInformationWindowManager;
+
 		private readonly string achievementLink;
 
 		private readonly string name;
@@ -32,12 +34,13 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Windows
 
 		private readonly Texture2D texture;
 
-		public ItemDetailWindow(ContentsManager contentsManager, IAchievementService achievementService, IAchievementTableEntryProvider achievementTableEntryProvider, string achievementLink, string name, string[] columns, List<CollectionAchievementTable.CollectionAchievementTableEntry> item)
+		public ItemDetailWindow(ContentsManager contentsManager, IAchievementService achievementService, IAchievementTableEntryProvider achievementTableEntryProvider, ISubPageInformationWindowManager subPageInformationWindowManager, string achievementLink, string name, string[] columns, List<CollectionAchievementTable.CollectionAchievementTableEntry> item)
 			: this()
 		{
 			this.contentsManager = contentsManager;
 			this.achievementService = achievementService;
 			this.achievementTableEntryProvider = achievementTableEntryProvider;
+			this.subPageInformationWindowManager = subPageInformationWindowManager;
 			this.achievementLink = achievementLink;
 			texture = this.contentsManager.GetTexture("item_detail_background.png");
 			this.name = name;
@@ -48,49 +51,41 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Windows
 
 		private void BuildWindow()
 		{
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b2: Expected O, but got Unknown
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ff: Expected O, but got Unknown
-			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c2: Expected O, but got Unknown
-			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0208: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0211: Expected O, but got Unknown
-			//IL_025b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ad: Expected O, but got Unknown
+			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fa: Expected O, but got Unknown
+			//IL_01fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0207: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0213: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0239: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0240: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0249: Expected O, but got Unknown
+			//IL_0293: Unknown result type (might be due to invalid IL or missing references)
 			((WindowBase2)this).set_Title("Item Details");
 			((WindowBase2)this).ConstructWindow(texture, new Rectangle(0, 0, 600, 400), new Rectangle(0, 30, 600, 370));
 			FlowPanel val = new FlowPanel();
@@ -104,58 +99,53 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Windows
 			val.set_ControlPadding(new Vector2(10f));
 			((Panel)val).set_CanScroll(true);
 			FlowPanel panel = val;
-			Label val2 = new Label();
-			((Control)val2).set_Parent((Container)(object)panel);
-			((Control)val2).set_Width(((Container)panel).get_ContentRegion().Width);
-			val2.set_Text(name);
-			val2.set_AutoSizeHeight(true);
-			val2.set_WrapText(true);
-			val2.set_Font(Control.get_Content().get_DefaultFont18());
-			Label itemTitle = val2;
 			CollectionAchievementTable.CollectionAchievementTableItemEntry item = this.item.OfType<CollectionAchievementTable.CollectionAchievementTableItemEntry>().FirstOrDefault();
 			string link = achievementLink;
 			if (item != null)
 			{
 				link = item.Link;
 			}
+			FormattedLabelBuilder itemTitleBuilder = new FormattedLabelBuilder().SetWidth(((Container)panel).get_ContentRegion().Width).AutoSizeHeight().Wrap();
+			FormattedLabelPartBuilder itemTitlePart = itemTitleBuilder.CreatePart(name);
+			itemTitlePart.SetFontSize((FontSize)18);
 			if (!string.IsNullOrEmpty(link))
 			{
-				((Control)itemTitle).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
+				bool inSubpages = false;
+				foreach (SubPageInformation subPage in achievementService.Subpages)
 				{
-					//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-					itemTitle.set_TextColor(Color.get_LightBlue());
-				});
-				((Control)itemTitle).add_MouseLeft((EventHandler<MouseEventArgs>)delegate
+					if (subPage.Link.Contains(link))
+					{
+						inSubpages = true;
+						itemTitlePart.SetLink(delegate
+						{
+							subPageInformationWindowManager.Create(subPage);
+						}).MakeUnderlined();
+					}
+				}
+				if (!inSubpages)
 				{
-					//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-					itemTitle.set_TextColor(Color.get_White());
-				});
-				((Control)itemTitle).add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)delegate
-				{
-					//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-					itemTitle.set_TextColor(new Color(206, 174, 250));
-				});
-				((Control)itemTitle).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
-				{
-					//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-					itemTitle.set_TextColor(Color.get_LightBlue());
-					Process.Start("https://wiki.guildwars2.com" + link);
-				});
+					if (link.StartsWith("/"))
+					{
+						link = "https://wiki.guildwars2.com/" + link;
+					}
+					itemTitlePart.SetHyperLink(link).MakeUnderlined();
+				}
 			}
+			((Control)itemTitleBuilder.CreatePart(itemTitlePart).Build()).set_Parent((Container)(object)panel);
 			for (int i = 0; i < this.item.Count; i++)
 			{
-				Panel val3 = new Panel();
-				((Control)val3).set_Parent((Container)(object)panel);
-				((Control)val3).set_Width(((Container)panel).get_ContentRegion().Width);
-				((Container)val3).set_HeightSizingMode((SizingMode)1);
-				Panel innerPannel = val3;
-				Label val4 = new Label();
-				((Control)val4).set_Parent((Container)(object)innerPannel);
-				((Control)val4).set_Width((int)Math.Floor(0.15 * (double)((Container)innerPannel).get_ContentRegion().Width));
-				val4.set_Text(columns[i]);
-				val4.set_WrapText(true);
-				val4.set_AutoSizeHeight(true);
-				Label label = val4;
+				Panel val2 = new Panel();
+				((Control)val2).set_Parent((Container)(object)panel);
+				((Control)val2).set_Width(((Container)panel).get_ContentRegion().Width);
+				((Container)val2).set_HeightSizingMode((SizingMode)1);
+				Panel innerPannel = val2;
+				Label val3 = new Label();
+				((Control)val3).set_Parent((Container)(object)innerPannel);
+				((Control)val3).set_Width((int)Math.Floor(0.15 * (double)((Container)innerPannel).get_ContentRegion().Width));
+				val3.set_Text(columns[i]);
+				val3.set_WrapText(true);
+				val3.set_AutoSizeHeight(true);
+				Label label = val3;
 				Control control = achievementTableEntryProvider.GetTableEntryControl(this.item[i]);
 				if (control != null)
 				{

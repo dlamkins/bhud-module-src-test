@@ -11,7 +11,7 @@ using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Modules.Managers;
 using Denrage.AchievementTrackerModule.Interfaces;
-using Denrage.AchievementTrackerModule.Models.Achievement;
+using Denrage.AchievementTrackerModule.Libs.Achievement;
 using Flurl.Http;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
@@ -42,6 +42,8 @@ namespace Denrage.AchievementTrackerModule.Services
 
 		public IEnumerable<AchievementCategory> AchievementCategories { get; private set; }
 
+		public IReadOnlyList<SubPageInformation> Subpages { get; private set; }
+
 		public event Action PlayerAchievementsLoaded;
 
 		public event Action ApiAchievementsLoaded;
@@ -56,19 +58,28 @@ namespace Denrage.AchievementTrackerModule.Services
 		public async Task LoadAsync(CancellationToken cancellationToken = default(CancellationToken))
 		{
 			logger.Info("Reading saved achievement information");
-			JsonSerializerOptions val = new JsonSerializerOptions();
-			val.get_Converters().Add((JsonConverter)(object)new RewardConverter());
-			val.get_Converters().Add((JsonConverter)(object)new AchievementTableEntryDescriptionConverter());
-			val.get_Converters().Add((JsonConverter)(object)new CollectionAchievementTableEntryConverter());
-			JsonSerializerOptions serializerOptions = val;
+			JsonSerializerOptions serializerOptions = new JsonSerializerOptions
+			{
+				Converters = 
+				{
+					(JsonConverter)new RewardConverter(),
+					(JsonConverter)new AchievementTableEntryDescriptionConverter(),
+					(JsonConverter)new CollectionAchievementTableEntryConverter(),
+					(JsonConverter)new SubPageInformationConverter()
+				}
+			};
 			try
 			{
-				using (Stream stream = contentsManager.GetFileStream("achievement_data.json"))
+				using (Stream utf8Json = contentsManager.GetFileStream("achievement_data.json"))
 				{
-					Achievements = (await JsonSerializer.DeserializeAsync<List<AchievementTableEntry>>(stream, serializerOptions, cancellationToken)).AsReadOnly();
+					Achievements = (await JsonSerializer.DeserializeAsync<List<AchievementTableEntry>>(utf8Json, serializerOptions, cancellationToken)).AsReadOnly();
 				}
-				using Stream stream = contentsManager.GetFileStream("achievement_tables.json");
-				AchievementDetails = (await JsonSerializer.DeserializeAsync<List<CollectionAchievementTable>>(stream, serializerOptions, default(CancellationToken))).AsReadOnly();
+				using (Stream utf8Json = contentsManager.GetFileStream("achievement_tables.json"))
+				{
+					AchievementDetails = (await JsonSerializer.DeserializeAsync<List<CollectionAchievementTable>>(utf8Json, serializerOptions)).AsReadOnly();
+				}
+				using Stream utf8Json = contentsManager.GetFileStream("subpages.json");
+				Subpages = (await JsonSerializer.DeserializeAsync<List<SubPageInformation>>(utf8Json, serializerOptions)).AsReadOnly();
 			}
 			catch (Exception ex)
 			{
@@ -196,7 +207,7 @@ namespace Denrage.AchievementTrackerModule.Services
 
 		public AsyncTexture2D GetImage(string imageUrl, Action beforeSwap)
 		{
-			return GetImageInternal(async () => await GeneratedExtensions.GetStreamAsync(DownloadWikiContent(imageUrl), default(CancellationToken), (HttpCompletionOption)0), beforeSwap);
+			return GetImageInternal((async () => await GeneratedExtensions.GetStreamAsync(DownloadWikiContent(imageUrl), default(CancellationToken), (HttpCompletionOption)0), imageUrl), beforeSwap);
 		}
 
 		public async Task<string> GetDirectImageLink(string imagePath, CancellationToken cancellationToken = default(CancellationToken))
@@ -223,14 +234,14 @@ namespace Denrage.AchievementTrackerModule.Services
 
 		public AsyncTexture2D GetImageFromIndirectLink(string imagePath, Action beforeSwap)
 		{
-			return GetImageInternal(async delegate
+			return GetImageInternal((async delegate
 			{
 				string url = await GetDirectImageLink(imagePath);
 				return await GeneratedExtensions.GetStreamAsync(DownloadWikiContent(url), default(CancellationToken), (HttpCompletionOption)0);
-			}, beforeSwap);
+			}, imagePath), beforeSwap);
 		}
 
-		private AsyncTexture2D GetImageInternal(Func<Task<Stream>> getImageStream, Action beforeSwap)
+		private AsyncTexture2D GetImageInternal((Func<Task<Stream>> GetStream, string Url) getImageStream, Action beforeSwap)
 		{
 			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002a: Expected O, but got Unknown
@@ -240,17 +251,28 @@ namespace Denrage.AchievementTrackerModule.Services
 			{
 				try
 				{
-					imageStream = await getImageStream();
-					beforeSwap();
+					imageStream = await getImageStream.GetStream();
+					beforeSwap?.Invoke();
 					GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate(GraphicsDevice device)
 					{
-						texture.SwapTexture(TextureUtil.FromStreamPremultiplied(device, imageStream));
-						imageStream.Close();
+						try
+						{
+							texture.SwapTexture(TextureUtil.FromStreamPremultiplied(device, imageStream));
+							imageStream.Close();
+						}
+						catch (Exception ex2)
+						{
+							logger.Error(ex2, "Exception occured on downloading/swapping image. URL: " + getImageStream.Url);
+							GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
+							{
+								texture.SwapTexture(Textures.get_Error());
+							});
+						}
 					});
 				}
 				catch (Exception ex)
 				{
-					logger.Error(ex, "Exception occured on downloading/swapping image");
+					logger.Error(ex, "Exception occured on downloading/swapping image. URL: " + getImageStream.Url);
 					GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
 					{
 						texture.SwapTexture(Textures.get_Error());

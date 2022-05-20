@@ -1,5 +1,5 @@
 using System;
-using Denrage.AchievementTrackerModule.Models.Achievement;
+using Denrage.AchievementTrackerModule.Libs.Achievement;
 
 namespace Denrage.AchievementTrackerModule.Interfaces
 {

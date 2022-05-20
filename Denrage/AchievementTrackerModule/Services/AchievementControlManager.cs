@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Blish_HUD.Controls;
 using Denrage.AchievementTrackerModule.Interfaces;
-using Denrage.AchievementTrackerModule.Models.Achievement;
+using Denrage.AchievementTrackerModule.Libs.Achievement;
 
 namespace Denrage.AchievementTrackerModule.Services
 {

@@ -8,7 +8,8 @@ using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Blish_HUD.Modules.Managers;
 using Denrage.AchievementTrackerModule.Interfaces;
-using Denrage.AchievementTrackerModule.Models.Achievement;
+using Denrage.AchievementTrackerModule.Libs.Achievement;
+using Denrage.AchievementTrackerModule.UserInterface.Controls.FormattedLabel;
 using Microsoft.Xna.Framework;
 
 namespace Denrage.AchievementTrackerModule.UserInterface.Controls
@@ -16,6 +17,8 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls
 	public abstract class AchievementListControl<T, TEntry> : FlowPanel, IAchievementControl where T : AchievementTableEntryDescription
 	{
 		private readonly IItemDetailWindowManager itemDetailWindowManager;
+
+		private readonly IFormattedLabelHtmlService formattedLabelHtmlService;
 
 		private readonly ContentsManager contentsManager;
 
@@ -27,20 +30,21 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls
 
 		private readonly List<Control> itemControls = new List<Control>();
 
-		private Label gameTextLabel;
+		private Denrage.AchievementTrackerModule.UserInterface.Controls.FormattedLabel.FormattedLabel gameTextLabel;
 
-		private Label gameHintLabel;
+		private Denrage.AchievementTrackerModule.UserInterface.Controls.FormattedLabel.FormattedLabel gameHintLabel;
 
 		private FlowPanel panel;
 
 		protected IAchievementService AchievementService { get; }
 
-		public AchievementListControl(IItemDetailWindowManager itemDetailWindowManager, IAchievementService achievementService, ContentsManager contentsManager, AchievementTableEntry achievement, T description)
+		public AchievementListControl(IItemDetailWindowManager itemDetailWindowManager, IAchievementService achievementService, IFormattedLabelHtmlService formattedLabelHtmlService, ContentsManager contentsManager, AchievementTableEntry achievement, T description)
 			: this()
 		{
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
 			this.itemDetailWindowManager = itemDetailWindowManager;
 			AchievementService = achievementService;
+			this.formattedLabelHtmlService = formattedLabelHtmlService;
 			this.contentsManager = contentsManager;
 			this.achievement = achievement;
 			this.description = description;
@@ -61,61 +65,38 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls
 
 		public void BuildControl()
 		{
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Expected O, but got Unknown
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Expected O, but got Unknown
-			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0112: Expected O, but got Unknown
+			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010b: Expected O, but got Unknown
 			if (!string.IsNullOrEmpty(description.GameText))
 			{
-				Label val = new Label();
-				((Control)val).set_Parent((Container)(object)this);
-				val.set_Text(StringUtils.SanitizeHtml(description.GameText));
-				val.set_AutoSizeHeight(true);
-				((Control)val).set_Width(((Container)this).get_ContentRegion().Width);
-				val.set_WrapText(true);
-				gameTextLabel = val;
+				FormattedLabelBuilder labelBuilder2 = formattedLabelHtmlService.CreateLabel(description.GameText).AutoSizeHeight().SetWidth(((Container)this).get_ContentRegion().Width)
+					.Wrap();
+				gameTextLabel = labelBuilder2.Build();
+				((Control)gameTextLabel).set_Parent((Container)(object)this);
 			}
 			if (!string.IsNullOrEmpty(description.GameHint))
 			{
-				Label val2 = new Label();
-				((Control)val2).set_Parent((Container)(object)this);
-				val2.set_Text(StringUtils.SanitizeHtml(description.GameHint));
-				val2.set_TextColor(Color.get_LightGray());
-				((Control)val2).set_Width(((Container)this).get_ContentRegion().Width);
-				val2.set_AutoSizeHeight(true);
-				val2.set_WrapText(true);
-				gameHintLabel = val2;
+				FormattedLabelBuilder labelBuilder = formattedLabelHtmlService.CreateLabel(description.GameHint).AutoSizeHeight().SetWidth(((Container)this).get_ContentRegion().Width)
+					.Wrap();
+				gameHintLabel = labelBuilder.Build();
+				((Control)gameHintLabel).set_Parent((Container)(object)this);
 			}
-			FlowPanel val3 = new FlowPanel();
-			((Control)val3).set_Parent((Container)(object)this);
-			val3.set_FlowDirection((ControlFlowDirection)0);
-			((Control)val3).set_Width(((Container)this).get_ContentRegion().Width);
-			val3.set_ControlPadding(new Vector2(7f));
-			((Container)val3).set_HeightSizingMode((SizingMode)1);
-			panel = val3;
+			FlowPanel val = new FlowPanel();
+			((Control)val).set_Parent((Container)(object)this);
+			val.set_FlowDirection((ControlFlowDirection)0);
+			((Control)val).set_Width(((Container)this).get_ContentRegion().Width);
+			val.set_ControlPadding(new Vector2(7f));
+			((Container)val).set_HeightSizingMode((SizingMode)1);
+			panel = val;
 			Task.Run(delegate
 			{
 				//IL_0042: Unknown result type (might be due to invalid IL or missing references)
@@ -132,33 +113,50 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls
 				//IL_00db: Unknown result type (might be due to invalid IL or missing references)
 				//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
 				//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0105: Expected O, but got Unknown
+				//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+				//IL_010a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0112: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0124: Unknown result type (might be due to invalid IL or missing references)
+				//IL_012b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0132: Unknown result type (might be due to invalid IL or missing references)
 				bool flag = AchievementService.HasFinishedAchievement(achievement.Id);
 				TEntry[] entries = GetEntries(description).ToArray();
 				for (int i = 0; i < entries.Length; i++)
 				{
-					Panel val4 = new Panel();
-					((Control)val4).set_Parent((Container)(object)panel);
-					val4.set_BackgroundTexture(AsyncTexture2D.op_Implicit(contentsManager.GetTexture("collection_item_background.png")));
-					((Control)val4).set_Width(39);
-					((Control)val4).set_Height(39);
-					Panel val5 = val4;
-					Control val6 = CreateEntryControl(i, entries[i], (Container)(object)val5);
-					val6.set_Location(new Point((((Control)val5).get_Width() - val6.get_Width()) / 2, (((Control)val5).get_Height() - val6.get_Height()) / 2));
-					Tooltip val7 = new Tooltip();
-					((Container)val7).set_HeightSizingMode((SizingMode)1);
-					((Container)val7).set_WidthSizingMode((SizingMode)1);
-					val6.set_Tooltip(val7);
+					Panel val2 = new Panel();
+					((Control)val2).set_Parent((Container)(object)panel);
+					val2.set_BackgroundTexture(AsyncTexture2D.op_Implicit(contentsManager.GetTexture("collection_item_background.png")));
+					((Control)val2).set_Width(39);
+					((Control)val2).set_Height(39);
+					Panel val3 = val2;
+					Control val4 = CreateEntryControl(i, entries[i], (Container)(object)val3);
+					val4.set_Location(new Point((((Control)val3).get_Width() - val4.get_Width()) / 2, (((Control)val3).get_Height() - val4.get_Height()) / 2));
+					Tooltip val5 = new Tooltip();
+					((Container)val5).set_HeightSizingMode((SizingMode)1);
+					((Container)val5).set_WidthSizingMode((SizingMode)1);
+					val4.set_Tooltip(val5);
+					FlowPanel val6 = new FlowPanel();
+					((Control)val6).set_Parent((Container)(object)val4.get_Tooltip());
+					((Control)val6).set_Width(100);
+					((Container)val6).set_HeightSizingMode((SizingMode)1);
+					val6.set_FlowDirection((ControlFlowDirection)3);
+					FlowPanel val7 = val6;
 					Label val8 = new Label();
-					((Control)val8).set_Parent((Container)(object)val6.get_Tooltip());
-					val8.set_AutoSizeWidth(true);
+					((Control)val8).set_Parent((Container)(object)val7);
+					((Control)val8).set_Width(((Container)val7).get_ContentRegion().Width);
+					val8.set_WrapText(true);
 					val8.set_AutoSizeHeight(true);
+					val8.set_Font(Control.get_Content().get_DefaultFont18());
 					val8.set_Text(GetDisplayName(entries[i]));
-					ColorControl(val6, flag || AchievementService.HasFinishedAchievementBit(achievement.Id, i));
+					ColorControl(val4, flag || AchievementService.HasFinishedAchievementBit(achievement.Id, i));
 					if (achievementDetails != null)
 					{
 						int index = i;
-						val6.add_Click((EventHandler<MouseEventArgs>)delegate
+						val4.add_Click((EventHandler<MouseEventArgs>)delegate
 						{
 							itemDetailWindowManager.CreateAndShowWindow(GetDisplayName(entries[index]), achievementDetails.ColumnNames, achievementDetails.Entries[index], achievementDetails.Link, achievementDetails.Id, index);
 						});
@@ -169,13 +167,13 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls
 						ILinkEntry linkEntry = val9 as ILinkEntry;
 						if (linkEntry != null)
 						{
-							val6.add_Click((EventHandler<MouseEventArgs>)delegate
+							val4.add_Click((EventHandler<MouseEventArgs>)delegate
 							{
 								Process.Start("https://wiki.guildwars2.com" + linkEntry.Link);
 							});
 						}
 					}
-					itemControls.Add(val6);
+					itemControls.Add(val4);
 				}
 			});
 		}

@@ -5,7 +5,7 @@ using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Denrage.AchievementTrackerModule.Interfaces;
-using Denrage.AchievementTrackerModule.Models.Achievement;
+using Denrage.AchievementTrackerModule.Libs.Achievement;
 using Microsoft.Xna.Framework;
 
 namespace Denrage.AchievementTrackerModule.Services.Factories.ItemDetails

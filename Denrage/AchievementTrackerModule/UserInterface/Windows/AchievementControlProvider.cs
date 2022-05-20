@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Blish_HUD.Controls;
 using Blish_HUD.Modules.Managers;
 using Denrage.AchievementTrackerModule.Interfaces;
-using Denrage.AchievementTrackerModule.Models.Achievement;
+using Denrage.AchievementTrackerModule.Libs.Achievement;
 using Denrage.AchievementTrackerModule.Services.Factories.AchievementControl;
 
 namespace Denrage.AchievementTrackerModule.UserInterface.Windows
@@ -12,11 +12,11 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Windows
 	{
 		private readonly Dictionary<Type, AchievementControlFactory> mapping = new Dictionary<Type, AchievementControlFactory>();
 
-		public AchievementControlProvider(IAchievementService achievementService, IItemDetailWindowManager itemDetailWindowManager, ContentsManager contentsManager)
+		public AchievementControlProvider(IAchievementService achievementService, IItemDetailWindowManager itemDetailWindowManager, IFormattedLabelHtmlService formattedLabelHtmlService, ContentsManager contentsManager)
 		{
-			mapping.Add(typeof(StringDescription), new AchievementTextControlFactory());
-			mapping.Add(typeof(CollectionDescription), new AchievementCollectionControlFactory(achievementService, itemDetailWindowManager, contentsManager));
-			mapping.Add(typeof(ObjectivesDescription), new AchievementObjectiveControlFactory(achievementService, itemDetailWindowManager, contentsManager));
+			mapping.Add(typeof(StringDescription), new AchievementTextControlFactory(formattedLabelHtmlService));
+			mapping.Add(typeof(CollectionDescription), new AchievementCollectionControlFactory(achievementService, itemDetailWindowManager, formattedLabelHtmlService, contentsManager));
+			mapping.Add(typeof(ObjectivesDescription), new AchievementObjectiveControlFactory(achievementService, itemDetailWindowManager, contentsManager, formattedLabelHtmlService));
 		}
 
 		public Control GetAchievementControl(AchievementTableEntry achievement, AchievementTableEntryDescription description)

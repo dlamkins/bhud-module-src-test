@@ -2,15 +2,15 @@ using System.Collections.Generic;
 using Blish_HUD.Controls;
 using Blish_HUD.Modules.Managers;
 using Denrage.AchievementTrackerModule.Interfaces;
-using Denrage.AchievementTrackerModule.Models.Achievement;
+using Denrage.AchievementTrackerModule.Libs.Achievement;
 using Microsoft.Xna.Framework;
 
 namespace Denrage.AchievementTrackerModule.UserInterface.Controls
 {
 	public class AchievementObjectivesControl : AchievementListControl<ObjectivesDescription, TableDescriptionEntry>
 	{
-		public AchievementObjectivesControl(IItemDetailWindowManager itemDetailWindowManager, IAchievementService achievementService, ContentsManager contentsManager, AchievementTableEntry achievement, ObjectivesDescription description)
-			: base(itemDetailWindowManager, achievementService, contentsManager, achievement, description)
+		public AchievementObjectivesControl(IItemDetailWindowManager itemDetailWindowManager, IAchievementService achievementService, IFormattedLabelHtmlService formattedLabelHtmlService, ContentsManager contentsManager, AchievementTableEntry achievement, ObjectivesDescription description)
+			: base(itemDetailWindowManager, achievementService, formattedLabelHtmlService, contentsManager, achievement, description)
 		{
 		}
 

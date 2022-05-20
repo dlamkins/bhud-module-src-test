@@ -78,7 +78,7 @@ namespace Denrage.AchievementTrackerModule.Services
 			{
 				string fullDirectoryPath = directoriesManager.GetFullDirectoryPath("achievement_module");
 				Directory.CreateDirectory(fullDirectoryPath);
-				File.WriteAllText(Path.Combine(fullDirectoryPath, "persistanceStorage.json"), JsonSerializer.Serialize<Storage>(storage, (JsonSerializerOptions)null));
+				File.WriteAllText(Path.Combine(fullDirectoryPath, "persistanceStorage.json"), JsonSerializer.Serialize(storage));
 			}
 			catch (Exception ex)
 			{
@@ -93,7 +93,7 @@ namespace Denrage.AchievementTrackerModule.Services
 				string file = Path.Combine(directoriesManager.GetFullDirectoryPath("achievement_module"), "persistanceStorage.json");
 				if (storage == null)
 				{
-					storage = (File.Exists(file) ? JsonSerializer.Deserialize<Storage>(File.ReadAllText(file), (JsonSerializerOptions)null) : new Storage());
+					storage = (File.Exists(file) ? JsonSerializer.Deserialize<Storage>(File.ReadAllText(file)) : new Storage());
 				}
 				return storage;
 			}

@@ -15,11 +15,21 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="Gw2Sharp" />
-    <Reference Include="Flurl.Http" />
-    <Reference Include="System.Threading.Tasks.Extensions" />
-    <Reference Include="System.Text.Json" />
-    <Reference Include="System.Core" />
+    <Reference Include="Denrage.AchievementTrackerModule.Libs">
+      <HintPath>..\..\working\Denrage.AchievementTrackerModule.Libs.dll</HintPath>
+    </Reference>
     <Reference Include="MonoGame.Extended" />
+    <Reference Include="Flurl.Http" />
+    <Reference Include="System.Text.Json">
+      <HintPath>..\..\working\System.Text.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core" />
+    <Reference Include="System.Threading.Tasks.Extensions">
+      <HintPath>..\..\working\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlAgilityPack">
+      <HintPath>..\..\working\HtmlAgilityPack.dll</HintPath>
+    </Reference>
     <Reference Include="System.Net.Http" />
   </ItemGroup>
 </Project>

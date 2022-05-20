@@ -1,4 +1,4 @@
-using Denrage.AchievementTrackerModule.Models.Achievement;
+using Denrage.AchievementTrackerModule.Libs.Achievement;
 using Denrage.AchievementTrackerModule.UserInterface.Windows;
 
 namespace Denrage.AchievementTrackerModule.Interfaces

@@ -29,6 +29,8 @@ namespace Denrage.AchievementTrackerModule
 
 		private readonly Logger logger;
 
+		private Func<IView> achievementOverviewView;
+
 		private AchievementTrackWindow window;
 
 		private CornerIcon cornerIcon;
@@ -71,6 +73,7 @@ namespace Denrage.AchievementTrackerModule
 		{
 			Task.Run(async delegate
 			{
+				achievementOverviewView = () => (IView)(object)new AchievementTrackerView(dependencyInjectionContainer.AchievementItemOverviewFactory, dependencyInjectionContainer.AchievementService);
 				await Task.Delay(TimeSpan.FromSeconds(3.0));
 				await dependencyInjectionContainer.InitializeAsync();
 				dependencyInjectionContainer.AchievementTrackerService.AchievementTracked += AchievementTrackerService_AchievementTracked;
@@ -79,7 +82,7 @@ namespace Denrage.AchievementTrackerModule
 					InitializeWindow();
 					((Control)window).Show();
 				}
-				GameService.Overlay.get_BlishHudWindow().AddTab("Achievement Tracker", AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("achievement_icon.png")), (Func<IView>)(() => (IView)(object)new AchievementTrackerView(dependencyInjectionContainer.AchievementItemOverviewFactory, dependencyInjectionContainer.AchievementService)), 0);
+				GameService.Overlay.get_BlishHudWindow().AddTab("Achievement Tracker", AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("achievement_icon.png")), achievementOverviewView, 0);
 				CornerIcon val = new CornerIcon();
 				val.set_IconName("Open Achievement Panel");
 				val.set_Icon(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("corner_icon_inactive.png")));
@@ -98,19 +101,19 @@ namespace Denrage.AchievementTrackerModule
 
 		private void InitializeWindow()
 		{
-			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0119: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
 			if (window == null)
 			{
-				AchievementTrackWindow achievementTrackWindow = new AchievementTrackWindow(ContentsManager, dependencyInjectionContainer.AchievementTrackerService, dependencyInjectionContainer.AchievementControlProvider, dependencyInjectionContainer.AchievementService, dependencyInjectionContainer.AchievementDetailsWindowManager, dependencyInjectionContainer.AchievementControlManager);
+				AchievementTrackWindow achievementTrackWindow = new AchievementTrackWindow(ContentsManager, dependencyInjectionContainer.AchievementTrackerService, dependencyInjectionContainer.AchievementControlProvider, dependencyInjectionContainer.AchievementService, dependencyInjectionContainer.AchievementDetailsWindowManager, dependencyInjectionContainer.AchievementControlManager, dependencyInjectionContainer.SubPageInformationWindowManager, GameService.Overlay, dependencyInjectionContainer.FormattedLabelHtmlService, achievementOverviewView);
 				((Control)achievementTrackWindow).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 				window = achievementTrackWindow;
 				Storage savedWindowLocation = dependencyInjectionContainer.PersistanceService.Get();
@@ -162,15 +165,18 @@ namespace Denrage.AchievementTrackerModule
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 			AchievementTrackWindow achievementTrackWindow = window;
 			Point location = (Point)((achievementTrackWindow != null) ? ((Control)achievementTrackWindow).get_Location() : new Point(-1, -1));
 			IPersistanceService persistanceService = dependencyInjectionContainer.PersistanceService;
-			int x = location.X;
-			int y = location.Y;
-			AchievementTrackWindow achievementTrackWindow2 = window;
-			persistanceService.Save(x, y, achievementTrackWindow2 != null && ((Control)achievementTrackWindow2).get_Visible());
+			if (persistanceService != null)
+			{
+				int x = location.X;
+				int y = location.Y;
+				AchievementTrackWindow achievementTrackWindow2 = window;
+				persistanceService.Save(x, y, achievementTrackWindow2 != null && ((Control)achievementTrackWindow2).get_Visible());
+			}
 			CornerIcon obj = cornerIcon;
 			if (obj != null)
 			{

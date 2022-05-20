@@ -1,6 +1,6 @@
 using Blish_HUD.Modules.Managers;
 using Denrage.AchievementTrackerModule.Interfaces;
-using Denrage.AchievementTrackerModule.Models.Achievement;
+using Denrage.AchievementTrackerModule.Libs.Achievement;
 using Denrage.AchievementTrackerModule.UserInterface.Controls;
 
 namespace Denrage.AchievementTrackerModule.Services.Factories.AchievementControl
@@ -13,16 +13,19 @@ namespace Denrage.AchievementTrackerModule.Services.Factories.AchievementControl
 
 		private readonly ContentsManager contentsManager;
 
-		public AchievementObjectiveControlFactory(IAchievementService achievementService, IItemDetailWindowManager itemDetailWindowManager, ContentsManager contentsManager)
+		private readonly IFormattedLabelHtmlService formattedLabelHtmlService;
+
+		public AchievementObjectiveControlFactory(IAchievementService achievementService, IItemDetailWindowManager itemDetailWindowManager, ContentsManager contentsManager, IFormattedLabelHtmlService formattedLabelHtmlService)
 		{
 			this.achievementService = achievementService;
 			itemDetailWindowFactory = itemDetailWindowManager;
 			this.contentsManager = contentsManager;
+			this.formattedLabelHtmlService = formattedLabelHtmlService;
 		}
 
 		protected override AchievementObjectivesControl CreateInternal(AchievementTableEntry achievement, ObjectivesDescription description)
 		{
-			return new AchievementObjectivesControl(itemDetailWindowFactory, achievementService, contentsManager, achievement, description);
+			return new AchievementObjectivesControl(itemDetailWindowFactory, achievementService, formattedLabelHtmlService, contentsManager, achievement, description);
 		}
 	}
 }

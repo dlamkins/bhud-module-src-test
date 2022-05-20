@@ -45,6 +45,10 @@ namespace Denrage.AchievementTrackerModule.Services
 
 		public IAchievementDetailsWindowManager AchievementDetailsWindowManager { get; set; }
 
+		public ISubPageInformationWindowManager SubPageInformationWindowManager { get; set; }
+
+		public IFormattedLabelHtmlService FormattedLabelHtmlService { get; set; }
+
 		public DependencyInjectionContainer(Gw2ApiManager gw2ApiManager, ContentsManager contentsManager, ContentService contentService, DirectoriesManager directoriesManager, Logger logger)
 		{
 			this.gw2ApiManager = gw2ApiManager;
@@ -57,13 +61,15 @@ namespace Denrage.AchievementTrackerModule.Services
 		public async Task InitializeAsync(CancellationToken cancellationToken = default(CancellationToken))
 		{
 			AchievementService achievementService = (AchievementService)(AchievementService = new AchievementService(contentsManager, gw2ApiManager, logger));
+			SubPageInformationWindowManager = new SubPageInformationWindowManager(GameService.Graphics, contentsManager, AchievementService, () => FormattedLabelHtmlService);
+			FormattedLabelHtmlService = new FormattedLabelHtmlService(contentsManager, AchievementService, SubPageInformationWindowManager);
 			AchievementTrackerService achievementTrackerService = (AchievementTrackerService)(AchievementTrackerService = new AchievementTrackerService(logger));
 			AchievementListItemFactory = new AchievementListItemFactory(AchievementTrackerService, contentService, AchievementService);
 			AchievementItemOverviewFactory = new AchievementItemOverviewFactory(AchievementListItemFactory, AchievementService);
-			AchievementTableEntryProvider = new AchievementTableEntryProvider(AchievementService, logger);
-			ItemDetailWindowFactory = new ItemDetailWindowFactory(contentsManager, AchievementService, AchievementTableEntryProvider);
+			AchievementTableEntryProvider = new AchievementTableEntryProvider(AchievementService, FormattedLabelHtmlService, logger);
+			ItemDetailWindowFactory = new ItemDetailWindowFactory(contentsManager, AchievementService, AchievementTableEntryProvider, SubPageInformationWindowManager);
 			ItemDetailWindowManager itemDetailWindowManager = (ItemDetailWindowManager)(ItemDetailWindowManager = new ItemDetailWindowManager(ItemDetailWindowFactory, AchievementService, logger));
-			AchievementControlProvider = new AchievementControlProvider(AchievementService, ItemDetailWindowManager, contentsManager);
+			AchievementControlProvider = new AchievementControlProvider(AchievementService, ItemDetailWindowManager, FormattedLabelHtmlService, contentsManager);
 			AchievementControlManager = new AchievementControlManager(AchievementControlProvider);
 			AchievementDetailsWindowFactory = new AchievementDetailsWindowFactory(contentsManager, AchievementService, AchievementControlProvider, AchievementControlManager);
 			AchievementDetailsWindowManager achievementDetailsWindowManager = (AchievementDetailsWindowManager)(AchievementDetailsWindowManager = new AchievementDetailsWindowManager(AchievementDetailsWindowFactory, AchievementControlManager, AchievementService, logger));

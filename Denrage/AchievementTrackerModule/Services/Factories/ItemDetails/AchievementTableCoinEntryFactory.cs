@@ -1,5 +1,5 @@
 using Blish_HUD.Controls;
-using Denrage.AchievementTrackerModule.Models.Achievement;
+using Denrage.AchievementTrackerModule.Libs.Achievement;
 
 namespace Denrage.AchievementTrackerModule.Services.Factories.ItemDetails
 {
