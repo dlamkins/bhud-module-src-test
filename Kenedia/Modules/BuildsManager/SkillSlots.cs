@@ -6,6 +6,10 @@ namespace Kenedia.Modules.BuildsManager
 		Utility1,
 		Utility2,
 		Utility3,
-		Elite
+		Elite,
+		AquaticLegend1,
+		AquaticLegend2,
+		TerrestrialLegend1,
+		TerrestrialLegend2
 	}
 }

@@ -10,11 +10,13 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.Gw2Mumble;
 using Blish_HUD.Input;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Gw2Sharp;
+using Gw2Sharp.Models;
 using Gw2Sharp.WebApi;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
@@ -51,6 +53,10 @@ namespace Kenedia.Modules.BuildsManager
 
 		public SettingEntry<bool> ShowCornerIcon;
 
+		public SettingEntry<bool> IncludeDefaultBuilds;
+
+		public SettingEntry<bool> ShowCurrentProfession;
+
 		public SettingEntry<KeyBinding> ReloadKey;
 
 		public SettingEntry<KeyBinding> ToggleWindow;
@@ -58,6 +64,8 @@ namespace Kenedia.Modules.BuildsManager
 		public SettingEntry<int> GameVersion;
 
 		public SettingEntry<string> ModuleVersion;
+
+		public string CultureString;
 
 		public List<Template> Templates = new List<Template>();
 
@@ -72,6 +80,10 @@ namespace Kenedia.Modules.BuildsManager
 		private CornerIcon cornerIcon;
 
 		private static bool _DataLoaded;
+
+		public API.Profession CurrentProfession;
+
+		public API.Specialization CurrentSpecialization;
 
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
@@ -120,6 +132,8 @@ namespace Kenedia.Modules.BuildsManager
 
 		public event EventHandler Selected_Template_Redraw;
 
+		public event EventHandler LanguageChanged;
+
 		public event EventHandler Selected_Template_Edit;
 
 		public event EventHandler Selected_Template_Changed;
@@ -148,8 +162,14 @@ namespace Kenedia.Modules.BuildsManager
 			this.Selected_Template_Redraw?.Invoke(this, EventArgs.Empty);
 		}
 
+		public void OnLanguageChanged(object sender, EventArgs e)
+		{
+			this.LanguageChanged?.Invoke(this, EventArgs.Empty);
+		}
+
 		public void OnSelected_Template_Edit(object sender, EventArgs e)
 		{
+			MainWindow._TemplateSelection.RefreshList();
 			this.Selected_Template_Edit?.Invoke(this, EventArgs.Empty);
 		}
 
@@ -161,7 +181,6 @@ namespace Kenedia.Modules.BuildsManager
 		public void OnTemplate_Deleted()
 		{
 			Selected_Template = new Template();
-			LoadTemplates();
 			this.Template_Deleted?.Invoke(this, EventArgs.Empty);
 		}
 
@@ -178,21 +197,24 @@ namespace Kenedia.Modules.BuildsManager
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Expected O, but got Unknown
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a7: Expected O, but got Unknown
-			ReloadKey = settings.DefineSetting<KeyBinding>("ReloadKey", new KeyBinding((Keys)0), (Func<string>)(() => "Reload Button"), (Func<string>)(() => ""));
+			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0052: Expected O, but got Unknown
+			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0220: Expected O, but got Unknown
 			ToggleWindow = settings.DefineSetting<KeyBinding>("ToggleWindow", new KeyBinding((ModifierKeys)1, (Keys)66), (Func<string>)(() => "Toggle Window"), (Func<string>)(() => "Show / Hide the UI"));
 			PasteOnCopy = settings.DefineSetting<bool>("PasteOnCopy", false, (Func<string>)(() => "Paste Stat/Upgrade Name"), (Func<string>)(() => "Paste Stat/Upgrade Name after copying it."));
 			ShowCornerIcon = settings.DefineSetting<bool>("ShowCornerIcon", true, (Func<string>)(() => "Show Corner Icon"), (Func<string>)(() => "Show / Hide the Corner Icon of this module."));
+			IncludeDefaultBuilds = settings.DefineSetting<bool>("IncludeDefaultBuilds", true, (Func<string>)(() => "Incl. Default Builds"), (Func<string>)(() => "Load the default builds from within the module."));
+			ShowCurrentProfession = settings.DefineSetting<bool>("ShowCurrentProfession", true, (Func<string>)(() => "Filter Current Profession"), (Func<string>)(() => "Always set the current Profession as an active filter."));
 			SettingCollection internal_settings = settings.AddSubCollection("Internal Settings", false);
 			GameVersion = internal_settings.DefineSetting<int>("GameVersion", 0, (Func<string>)null, (Func<string>)null);
 			ModuleVersion = internal_settings.DefineSetting<string>("ModuleVersion", "0.0.0", (Func<string>)null, (Func<string>)null);
+			ReloadKey = internal_settings.DefineSetting<KeyBinding>("ReloadKey", new KeyBinding((Keys)0), (Func<string>)(() => "Reload Button"), (Func<string>)(() => ""));
 		}
 
 		protected override void Initialize()
 		{
+			CultureString = getCultureString();
 			Logger.Info("Starting Builds Manager v." + (object)((Module)this).get_Version().BaseVersion());
 			Paths = new iPaths(DirectoriesManager.GetFullDirectoryPath("builds-manager"));
 			ArmoryItems.AddRange(new int[45]
@@ -203,9 +225,36 @@ namespace Kenedia.Modules.BuildsManager
 				30697, 30695, 30684, 30702, 30687, 30690, 30685, 30701, 30691, 30688,
 				30692, 30694, 30693, 30700, 30689
 			});
+			ReloadKey.get_Value().set_Enabled(true);
+			ReloadKey.get_Value().add_Activated((EventHandler<EventArgs>)ReloadKey_Activated);
 			ToggleWindow.get_Value().set_Enabled(true);
 			ToggleWindow.get_Value().add_Activated((EventHandler<EventArgs>)ToggleWindow_Activated);
 			DataLoaded = false;
+			GameService.Gw2Mumble.get_PlayerCharacter().add_SpecializationChanged((EventHandler<ValueEventArgs<int>>)PlayerCharacter_SpecializationChanged);
+		}
+
+		private void PlayerCharacter_SpecializationChanged(object sender, ValueEventArgs<int> eventArgs)
+		{
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002d: Invalid comparison between Unknown and I4
+			PlayerCharacter player = GameService.Gw2Mumble.get_PlayerCharacter();
+			if (player != null && (int)player.get_Profession() > 0 && Data != null && MainWindow != null)
+			{
+				CurrentProfession = Data.Professions.Find(delegate(API.Profession e)
+				{
+					//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+					string id = e.Id;
+					ProfessionType profession = player.get_Profession();
+					return id == ((object)(ProfessionType)(ref profession)).ToString();
+				});
+				CurrentSpecialization = CurrentProfession?.Specializations.Find((API.Specialization e) => e.Id == player.get_Specialization());
+				MainWindow.PlayerCharacter_NameChanged(null, null);
+				Templates = (from a in Templates
+					orderby a.Build?.Profession != ModuleInstance.CurrentProfession, a.Profession.Id
+					select a).ThenBy((Template b) => b.Specialization?.Id).ThenBy((Template b) => b.Name).ToList();
+				MainWindow._TemplateSelection.RefreshList();
+			}
 		}
 
 		private void ToggleWindow_Activated(object sender, EventArgs e)
@@ -233,19 +282,119 @@ namespace Kenedia.Modules.BuildsManager
 		{
 		}
 
+		public void ImportTemplates()
+		{
+			Template saveTemplate = null;
+			if (File.Exists(Paths.builds + "config.ini"))
+			{
+				string text = File.ReadAllText(Paths.builds + "config.ini");
+				bool started = false;
+				string[] array = text.Split('\n');
+				foreach (string s in array)
+				{
+					if (!(s.Trim() != ""))
+					{
+						continue;
+					}
+					if (started && s.StartsWith("["))
+					{
+						break;
+					}
+					if (started)
+					{
+						string[] buildpadBuild = s.Trim().Split('|');
+						Template template2 = new Template();
+						template2.Template_json = new Template_json
+						{
+							Name = buildpadBuild[5],
+							BuildCode = buildpadBuild[1]
+						};
+						if (Templates.Find((Template e) => e.Template_json.Name == template2.Template_json.Name && e.Template_json.BuildCode == template2.Template_json.BuildCode) == null)
+						{
+							template2.Build = new BuildTemplate(buildpadBuild[1]);
+							template2.Name = buildpadBuild[5];
+							template2.Profession = template2.Build.Profession;
+							template2.Specialization = template2.Build.SpecLines.Find((SpecLine e) => e.Specialization?.Elite ?? false)?.Specialization;
+							Logger.Debug("Adding new template: '{0}'", new object[1] { template2.Template_json.Name });
+							Templates.Add(template2);
+							saveTemplate = template2;
+						}
+					}
+					if (!started && s.StartsWith("[Builds]"))
+					{
+						started = true;
+					}
+				}
+				File.Delete(Paths.builds + "config.ini");
+			}
+			List<string> files = Directory.GetFiles(Paths.builds, "*.json", SearchOption.TopDirectoryOnly).ToList();
+			if (files.Contains(Paths.builds + "Builds.json"))
+			{
+				files.Remove(Paths.builds + "Builds.json");
+			}
+			foreach (string item in files)
+			{
+				Template template = new Template(item);
+				File.Delete(item);
+				Templates.Add(template);
+				saveTemplate = template;
+				if (item == files[files.Count - 1])
+				{
+					template.Save();
+				}
+			}
+			Logger.Debug("Saving {0} Templates.", new object[1] { Templates.Count });
+			saveTemplate?.Save();
+		}
+
 		public void LoadTemplates()
 		{
 			string currentTemplate = _Selected_Template?.Name;
+			ImportTemplates();
 			Templates = new List<Template>();
-			List<string> list = Directory.GetFiles(Paths.builds, "*.json", SearchOption.AllDirectories).ToList();
-			list.Sort((string a, string b) => a.CompareTo(b));
-			foreach (string item in list)
+			foreach (string path in new List<string> { Paths.builds + "Builds.json" })
 			{
-				Template template = new Template(item);
-				Templates.Add(template);
-				if (template.Name == currentTemplate)
+				string content = "";
+				try
 				{
-					_Selected_Template = template;
+					if (File.Exists(path))
+					{
+						content = File.ReadAllText(path);
+					}
+					if (content == null || !(content != ""))
+					{
+						continue;
+					}
+					foreach (Template_json jsonTemplate2 in JsonConvert.DeserializeObject<List<Template_json>>(content))
+					{
+						Template template2 = new Template(jsonTemplate2.Name, jsonTemplate2.BuildCode, jsonTemplate2.GearCode);
+						template2.Path = path;
+						Templates.Add(template2);
+						if (template2.Name == currentTemplate)
+						{
+							_Selected_Template = template2;
+						}
+					}
+				}
+				catch
+				{
+				}
+			}
+			if (IncludeDefaultBuilds.get_Value())
+			{
+				List<Template_json> defaultTemps = JsonConvert.DeserializeObject<List<Template_json>>(new StreamReader(ContentsManager.GetFileStream("data\\builds.json")).ReadToEnd());
+				if (defaultTemps != null)
+				{
+					foreach (Template_json jsonTemplate in defaultTemps)
+					{
+						Template template = new Template(jsonTemplate.Name, jsonTemplate.BuildCode, jsonTemplate.GearCode);
+						template.Path = null;
+						Templates.Add(template);
+						if (template.Name == currentTemplate)
+						{
+							_Selected_Template = template;
+						}
+					}
 				}
 			}
 			_Selected_Template?.SetChanged();
@@ -340,9 +489,18 @@ namespace Kenedia.Modules.BuildsManager
 		protected override void Update(GameTime gameTime)
 		{
 			Ticks.global += gameTime.get_ElapsedGameTime().TotalMilliseconds;
-			if (Ticks.global > 250.0)
+			if (Ticks.global > 1250.0)
 			{
-				Ticks.global -= 250.0;
+				Ticks.global -= 1250.0;
+				if (CurrentProfession == null || CurrentSpecialization == null)
+				{
+					PlayerCharacter_SpecializationChanged(null, null);
+				}
+				Window_MainWindow mainWindow = MainWindow;
+				if (mainWindow != null && ((Control)mainWindow).get_Visible())
+				{
+					((Control)MainWindow.Import_Button).set_Visible(File.Exists(Paths.builds + "config.ini"));
+				}
 			}
 		}
 
@@ -354,6 +512,8 @@ namespace Kenedia.Modules.BuildsManager
 			((Control)cornerIcon).Dispose();
 			ToggleWindow.get_Value().set_Enabled(false);
 			ToggleWindow.get_Value().remove_Activated((EventHandler<EventArgs>)ToggleWindow_Activated);
+			ReloadKey.get_Value().set_Enabled(false);
+			ReloadKey.get_Value().remove_Activated((EventHandler<EventArgs>)ReloadKey_Activated);
 			ModuleInstance = null;
 		}
 
@@ -388,63 +548,91 @@ namespace Kenedia.Modules.BuildsManager
 			double progress = 0.0;
 			List<int> _runes = JsonConvert.DeserializeObject<List<int>>(new StreamReader(ContentsManager.GetFileStream("data\\runes.json")).ReadToEnd());
 			List<int> _sigils = JsonConvert.DeserializeObject<List<int>>(new StreamReader(ContentsManager.GetFileStream("data\\sigils.json")).ReadToEnd());
+			int totalFetches = 9;
 			Logger.Debug("Fetching all required Data from the API!");
 			((Control)loadingSpinner).set_Visible(true);
 			((Control)downloadBar).set_Visible(true);
 			downloadBar.Progress = progress;
-			downloadBar.Text = $"{completed2} / 9";
+			downloadBar.Text = $"{completed2} / {totalFetches}";
 			IReadOnlyList<Item> sigils = await ((IBulkExpandableClient<Item, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Items()).ManyAsync((IEnumerable<int>)_sigils, default(CancellationToken));
 			completed2 += 1.0;
-			downloadBar.Progress = completed2 / 9.0;
-			downloadBar.Text = $"{completed2} / 9";
+			downloadBar.Progress = completed2 / (double)totalFetches;
+			downloadBar.Text = $"{completed2} / {totalFetches}";
 			Logger.Debug(string.Format("Fetched {0}", "Sigils"));
 			IReadOnlyList<Item> runes = await ((IBulkExpandableClient<Item, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Items()).ManyAsync((IEnumerable<int>)_runes, default(CancellationToken));
 			completed2 += 1.0;
-			downloadBar.Progress = completed2 / 9.0;
-			downloadBar.Text = $"{completed2} / 9";
+			downloadBar.Progress = completed2 / (double)totalFetches;
+			downloadBar.Text = $"{completed2} / {totalFetches}";
 			Logger.Debug(string.Format("Fetched {0}", "Runes"));
 			IReadOnlyList<Item> armory_items = await ((IBulkExpandableClient<Item, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Items()).ManyAsync((IEnumerable<int>)ArmoryItems, default(CancellationToken));
 			completed2 += 1.0;
-			downloadBar.Progress = completed2 / 9.0;
-			downloadBar.Text = $"{completed2} / 9";
+			downloadBar.Progress = completed2 / (double)totalFetches;
+			downloadBar.Text = $"{completed2} / {totalFetches}";
 			Logger.Debug(string.Format("Fetched {0}", "Armory"));
 			IApiV2ObjectList<Profession> professions = await ((IAllExpandableClient<Profession>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Professions()).AllAsync(default(CancellationToken));
 			completed2 += 1.0;
-			downloadBar.Progress = completed2 / 9.0;
-			downloadBar.Text = $"{completed2} / 9";
+			downloadBar.Progress = completed2 / (double)totalFetches;
+			downloadBar.Text = $"{completed2} / {totalFetches}";
 			Logger.Debug(string.Format("Fetched {0}", "Professions"));
 			IApiV2ObjectList<Specialization> specs = await ((IAllExpandableClient<Specialization>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Specializations()).AllAsync(default(CancellationToken));
 			completed2 += 1.0;
-			downloadBar.Progress = completed2 / 9.0;
-			downloadBar.Text = $"{completed2} / 9";
+			downloadBar.Progress = completed2 / (double)totalFetches;
+			downloadBar.Text = $"{completed2} / {totalFetches}";
 			Logger.Debug(string.Format("Fetched {0}", "Specs"));
 			IApiV2ObjectList<Trait> traits = await ((IAllExpandableClient<Trait>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Traits()).AllAsync(default(CancellationToken));
 			completed2 += 1.0;
-			downloadBar.Progress = completed2 / 9.0;
-			downloadBar.Text = $"{completed2} / 9";
+			downloadBar.Progress = completed2 / (double)totalFetches;
+			downloadBar.Text = $"{completed2} / {totalFetches}";
 			Logger.Debug(string.Format("Fetched {0}", "Traits"));
 			List<int> Skill_Ids = new List<int>();
+			List<iData._Legend> legends = JsonConvert.DeserializeObject<List<iData._Legend>>(new StreamReader(ContentsManager.GetFileStream("data\\legends.json")).ReadToEnd());
+			foreach (iData._Legend legend2 in legends)
+			{
+				if (!Skill_Ids.Contains(legend2.Skill))
+				{
+					Skill_Ids.Add(legend2.Skill);
+				}
+				if (!Skill_Ids.Contains(legend2.Swap))
+				{
+					Skill_Ids.Add(legend2.Swap);
+				}
+				if (!Skill_Ids.Contains(legend2.Heal))
+				{
+					Skill_Ids.Add(legend2.Heal);
+				}
+				if (!Skill_Ids.Contains(legend2.Elite))
+				{
+					Skill_Ids.Add(legend2.Elite);
+				}
+				foreach (int id5 in legend2.Utilities)
+				{
+					if (!Skill_Ids.Contains(id5))
+					{
+						Skill_Ids.Add(id5);
+					}
+				}
+			}
 			foreach (Profession profession2 in (IEnumerable<Profession>)professions)
 			{
 				Logger.Debug($"Checking {profession2.get_Name()} Skills");
-				foreach (ProfessionSkill skill4 in profession2.get_Skills())
+				foreach (ProfessionSkill skill6 in profession2.get_Skills())
 				{
-					if (!Skill_Ids.Contains(skill4.get_Id()))
+					if (!Skill_Ids.Contains(skill6.get_Id()))
 					{
-						Skill_Ids.Add(skill4.get_Id());
+						Skill_Ids.Add(skill6.get_Id());
 					}
 				}
 			}
 			Logger.Debug($"Fetching a total of {Skill_Ids.Count} Skills");
-			IReadOnlyList<Skill> skills = await ((IBulkExpandableClient<Skill, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Skills()).ManyAsync((IEnumerable<int>)Skill_Ids, default(CancellationToken));
+			IApiV2ObjectList<Skill> skills = await ((IAllExpandableClient<Skill>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Skills()).AllAsync(default(CancellationToken));
 			completed2 += 1.0;
-			downloadBar.Progress = completed2 / 9.0;
-			downloadBar.Text = $"{completed2} / 9";
+			downloadBar.Progress = completed2 / (double)totalFetches;
+			downloadBar.Text = $"{completed2} / {totalFetches}";
 			Logger.Debug(string.Format("Fetched {0}", "Skills"));
 			IApiV2ObjectList<Itemstat> stats = await ((IAllExpandableClient<Itemstat>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Itemstats()).AllAsync(default(CancellationToken));
 			completed2 += 1.0;
-			downloadBar.Progress = completed2 / 9.0;
-			downloadBar.Text = $"{completed2} / 9";
+			downloadBar.Progress = completed2 / (double)totalFetches;
+			downloadBar.Text = $"{completed2} / {totalFetches}";
 			Logger.Debug(string.Format("Fetched {0}", "Itemstats"));
 			List<API.RuneItem> Runes = new List<API.RuneItem>();
 			RenderUrl val;
@@ -600,24 +788,24 @@ namespace Kenedia.Modules.BuildsManager
 				}
 				if (i.get_Type().get_RawValue() == "Weapon")
 				{
-					ItemWeapon item2 = (ItemWeapon)i;
-					if (item2 != null)
+					ItemWeapon item3 = (ItemWeapon)i;
+					if (item3 != null)
 					{
 						API.WeaponItem obj4 = new API.WeaponItem
 						{
-							Name = ((Item)item2).get_Name(),
-							Id = ((Item)item2).get_Id(),
-							ChatLink = ((Item)item2).get_ChatLink()
+							Name = ((Item)item3).get_Name(),
+							Id = ((Item)item3).get_Id(),
+							ChatLink = ((Item)item3).get_ChatLink()
 						};
 						API.Icon icon4 = new API.Icon();
-						val = ((Item)item2).get_Icon();
+						val = ((Item)item3).get_Icon();
 						icon4.Url = ((RenderUrl)(ref val)).get_Url().ToString();
-						icon4.Path = Paths.armory_icons.Replace(Paths.BasePath, "") + Regex.Match(RenderUrl.op_Implicit(((Item)item2).get_Icon()), "[0-9]*.png");
+						icon4.Path = Paths.armory_icons.Replace(Paths.BasePath, "") + Regex.Match(RenderUrl.op_Implicit(((Item)item3).get_Icon()), "[0-9]*.png");
 						obj4.Icon = icon4;
-						obj4.AttributeAdjustment = item2.get_Details().get_AttributeAdjustment();
+						obj4.AttributeAdjustment = item3.get_Details().get_AttributeAdjustment();
 						API.WeaponItem temp9 = obj4;
-						Enum.TryParse<API.weaponSlot>(item2.get_Details().get_Type().get_RawValue(), out temp9.Slot);
-						Enum.TryParse<API.weaponType>(item2.get_Details().get_Type().get_RawValue(), out temp9.WeaponType);
+						Enum.TryParse<API.weaponSlot>(item3.get_Details().get_Type().get_RawValue(), out temp9.Slot);
+						Enum.TryParse<API.weaponType>(item3.get_Details().get_Type().get_RawValue(), out temp9.WeaponType);
 						Weapons.Add(temp9);
 					}
 				}
@@ -645,22 +833,22 @@ namespace Kenedia.Modules.BuildsManager
 				}
 				if (i.get_Type().get_RawValue() == "Back")
 				{
-					ItemBack item3 = (ItemBack)i;
-					if (item3 != null)
+					ItemBack item2 = (ItemBack)i;
+					if (item2 != null)
 					{
 						API.TrinketItem obj6 = new API.TrinketItem
 						{
-							Name = ((Item)item3).get_Name(),
-							Id = ((Item)item3).get_Id(),
-							ChatLink = ((Item)item3).get_ChatLink()
+							Name = ((Item)item2).get_Name(),
+							Id = ((Item)item2).get_Id(),
+							ChatLink = ((Item)item2).get_ChatLink()
 						};
 						API.Icon icon6 = new API.Icon();
-						val = ((Item)item3).get_Icon();
+						val = ((Item)item2).get_Icon();
 						icon6.Url = ((RenderUrl)(ref val)).get_Url().ToString();
-						icon6.Path = Paths.armory_icons.Replace(Paths.BasePath, "") + Regex.Match(RenderUrl.op_Implicit(((Item)item3).get_Icon()), "[0-9]*.png");
+						icon6.Path = Paths.armory_icons.Replace(Paths.BasePath, "") + Regex.Match(RenderUrl.op_Implicit(((Item)item2).get_Icon()), "[0-9]*.png");
 						obj6.Icon = icon6;
 						obj6.TrinketType = API.trinketType.Back;
-						obj6.AttributeAdjustment = item3.get_Details().get_AttributeAdjustment();
+						obj6.AttributeAdjustment = item2.get_Details().get_AttributeAdjustment();
 						Trinkets.Add(obj6);
 					}
 				}
@@ -782,9 +970,9 @@ namespace Kenedia.Modules.BuildsManager
 						path = Paths.BasePath + temp3.WeaponTrait.Icon.Path
 					});
 				}
-				foreach (int id3 in spec.get_MinorTraits())
+				foreach (int id4 in spec.get_MinorTraits())
 				{
-					API.Trait trait2 = Traits.Find((API.Trait e) => e.Id == id3);
+					API.Trait trait2 = Traits.Find((API.Trait e) => e.Id == id4);
 					if (trait2 != null)
 					{
 						temp3.MinorTraits.Add(trait2);
@@ -799,9 +987,9 @@ namespace Kenedia.Modules.BuildsManager
 						}
 					}
 				}
-				foreach (int id2 in spec.get_MajorTraits())
+				foreach (int id3 in spec.get_MajorTraits())
 				{
-					API.Trait trait = Traits.Find((API.Trait e) => e.Id == id2);
+					API.Trait trait = Traits.Find((API.Trait e) => e.Id == id3);
 					if (trait != null)
 					{
 						temp3.MajorTraits.Add(trait);
@@ -820,43 +1008,43 @@ namespace Kenedia.Modules.BuildsManager
 			}
 			Logger.Debug("Preparing Skills ....");
 			List<API.Skill> Skills = new List<API.Skill>();
-			foreach (Skill skill3 in skills)
+			foreach (Skill skill5 in (IEnumerable<Skill>)skills)
 			{
-				if (skill3 == null)
+				if (skill5 == null)
 				{
 					continue;
 				}
-				skill3.get_Icon();
-				val = skill3.get_Icon();
-				if (!(((RenderUrl)(ref val)).get_Url() != null) || skill3.get_Professions().Count != 1)
+				skill5.get_Icon();
+				val = skill5.get_Icon();
+				if (!(((RenderUrl)(ref val)).get_Url() != null) || skill5.get_Professions().Count != 1)
 				{
 					continue;
 				}
 				API.Skill obj13 = new API.Skill
 				{
-					Name = skill3.get_Name(),
-					Id = skill3.get_Id()
+					Name = skill5.get_Name(),
+					Id = skill5.get_Id()
 				};
 				API.Icon icon10 = new API.Icon();
-				val = skill3.get_Icon();
+				val = skill5.get_Icon();
 				icon10.Url = ((RenderUrl)(ref val)).get_Url().ToString();
-				icon10.Path = Paths.skill_icons.Replace(Paths.BasePath, "") + Regex.Match(RenderUrl.op_Implicit(skill3.get_Icon()), "[0-9]*.png");
+				icon10.Path = Paths.skill_icons.Replace(Paths.BasePath, "") + Regex.Match(RenderUrl.op_Implicit(skill5.get_Icon()), "[0-9]*.png");
 				obj13.Icon = icon10;
-				obj13.ChatLink = skill3.get_ChatLink();
-				obj13.Description = skill3.get_Description();
-				obj13.Specialization = (skill3.get_Specialization().HasValue ? skill3.get_Specialization().Value : 0);
-				obj13.Flags = (from e in skill3.get_Flags().ToList()
+				obj13.ChatLink = skill5.get_ChatLink();
+				obj13.Description = skill5.get_Description();
+				obj13.Specialization = (skill5.get_Specialization().HasValue ? skill5.get_Specialization().Value : 0);
+				obj13.Flags = (from e in skill5.get_Flags().ToList()
 					select e.get_RawValue()).ToList();
 				obj13.Categories = new List<string>();
 				API.Skill temp2 = obj13;
-				if (skill3.get_Categories() != null)
+				if (skill5.get_Categories() != null)
 				{
-					foreach (string category in skill3.get_Categories())
+					foreach (string category in skill5.get_Categories())
 					{
 						temp2.Categories.Add(category);
 					}
 				}
-				Enum.TryParse<API.skillSlot>(skill3.get_Slot().get_RawValue(), out temp2.Slot);
+				Enum.TryParse<API.skillSlot>(skill5.get_Slot().get_RawValue(), out temp2.Slot);
 				Skills.Add(temp2);
 			}
 			Logger.Debug("Preparing Professions ....");
@@ -890,9 +1078,9 @@ namespace Kenedia.Modules.BuildsManager
 				obj14.IconBig = icon12;
 				API.Profession temp = obj14;
 				Logger.Debug("Adding Specs ....");
-				foreach (int id in profession.get_Specializations())
+				foreach (int id2 in profession.get_Specializations())
 				{
-					API.Specialization spec2 = Specializations.Find((API.Specialization e) => e.Id == id);
+					API.Specialization spec2 = Specializations.Find((API.Specialization e) => e.Id == id2);
 					if (spec2 != null)
 					{
 						temp.Specializations.Add(spec2);
@@ -949,13 +1137,94 @@ namespace Kenedia.Modules.BuildsManager
 				List<iData.SkillID_Pair> SkillID_Pairs = JsonConvert.DeserializeObject<List<iData.SkillID_Pair>>(new StreamReader(ContentsManager.GetFileStream("data\\skillpalettes.json")).ReadToEnd());
 				if (profession.get_Id() == "Revenant")
 				{
+					foreach (iData._Legend legend in legends)
+					{
+						API.Legend tempLegend = new API.Legend();
+						tempLegend.Name = Skills.Find((API.Skill e) => e.Id == legend.Skill).Name;
+						tempLegend.Skill = Skills.Find((API.Skill e) => e.Id == legend.Skill);
+						tempLegend.Id = legend.Id;
+						tempLegend.Specialization = legend.Specialization;
+						tempLegend.Swap = Skills.Find((API.Skill e) => e.Id == legend.Swap);
+						tempLegend.Heal = Skills.Find((API.Skill e) => e.Id == legend.Heal);
+						tempLegend.Elite = Skills.Find((API.Skill e) => e.Id == legend.Elite);
+						if (!File.Exists(Paths.BasePath + tempLegend.Skill.Icon.Path))
+						{
+							downloadList.Add(new APIDownload_Image
+							{
+								display_text = $"Downloading Skill Icon '{tempLegend.Skill.Name}'",
+								url = tempLegend.Skill.Icon.Url,
+								path = Paths.BasePath + tempLegend.Skill.Icon.Path
+							});
+						}
+						if (!File.Exists(Paths.BasePath + tempLegend.Swap.Icon.Path))
+						{
+							downloadList.Add(new APIDownload_Image
+							{
+								display_text = $"Downloading Skill Icon '{tempLegend.Swap.Name}'",
+								url = tempLegend.Swap.Icon.Url,
+								path = Paths.BasePath + tempLegend.Swap.Icon.Path
+							});
+						}
+						if (!File.Exists(Paths.BasePath + tempLegend.Heal.Icon.Path))
+						{
+							downloadList.Add(new APIDownload_Image
+							{
+								display_text = $"Downloading Skill Icon '{tempLegend.Heal.Name}'",
+								url = tempLegend.Heal.Icon.Url,
+								path = Paths.BasePath + tempLegend.Heal.Icon.Path
+							});
+						}
+						if (!File.Exists(Paths.BasePath + tempLegend.Heal.Icon.Path))
+						{
+							downloadList.Add(new APIDownload_Image
+							{
+								display_text = $"Downloading Skill Icon '{tempLegend.Elite.Name}'",
+								url = tempLegend.Elite.Icon.Url,
+								path = Paths.BasePath + tempLegend.Elite.Icon.Path
+							});
+						}
+						tempLegend.Utilities = new List<API.Skill>();
+						foreach (int id in legend.Utilities)
+						{
+							API.Skill skill4 = Skills.Find((API.Skill e) => e.Id == id);
+							tempLegend.Utilities.Add(skill4);
+							if (!File.Exists(Paths.BasePath + skill4.Icon.Path))
+							{
+								downloadList.Add(new APIDownload_Image
+								{
+									display_text = $"Downloading Skill Icon '{skill4.Name}'",
+									url = skill4.Icon.Url,
+									path = Paths.BasePath + skill4.Icon.Path
+								});
+							}
+						}
+						temp.Legends.Add(tempLegend);
+					}
 					foreach (ProfessionSkill iSkill in profession.get_Skills())
 					{
-						API.Skill skill2 = Skills.Find((API.Skill e) => e.Id == iSkill.get_Id());
+						API.Skill skill3 = Skills.Find((API.Skill e) => e.Id == iSkill.get_Id());
 						iData.SkillID_Pair paletteID = SkillID_Pairs.Find((iData.SkillID_Pair e) => e.ID == iSkill.get_Id());
-						if (skill2 != null && paletteID != null)
+						if (skill3 != null && paletteID != null)
 						{
-							skill2.PaletteId = paletteID.PaletteID;
+							skill3.PaletteId = paletteID.PaletteID;
+							temp.Skills.Add(skill3);
+							if (!File.Exists(Paths.BasePath + skill3.Icon.Path))
+							{
+								downloadList.Add(new APIDownload_Image
+								{
+									display_text = $"Downloading Skill Icon '{skill3.Name}'",
+									url = skill3.Icon.Url,
+									path = Paths.BasePath + skill3.Icon.Path
+								});
+							}
+						}
+					}
+					foreach (KeyValuePair<int, int> skillIDs2 in profession.get_SkillsByPalette())
+					{
+						API.Skill skill2 = Skills.Find((API.Skill e) => e.Id == skillIDs2.Value);
+						if (skill2 != null && !temp.Skills.Contains(skill2))
+						{
+							skill2.PaletteId = skillIDs2.Key;
 							temp.Skills.Add(skill2);
 							if (!File.Exists(Paths.BasePath + skill2.Icon.Path))
 							{
@@ -1035,12 +1304,30 @@ namespace Kenedia.Modules.BuildsManager
 			((Control)downloadBar).set_Visible(false);
 			GameVersion.set_Value(GameService.Gw2Mumble.get_Info().get_Version());
 			ModuleVersion.set_Value(((object)((Module)this).get_Version().BaseVersion()).ToString());
+			Logger.Debug("API Data sucessfully fetched!");
 		}
 
 		private async Task LoadData()
 		{
-			await Fetch_APIData();
-			Data = new iData(ContentsManager, DirectoriesManager);
+			string culture = getCultureString();
+			await Fetch_APIData(!File.Exists(Paths.professions + "professions [" + culture + "].json"));
+			if (Data == null)
+			{
+				Data = new iData(ContentsManager, DirectoriesManager);
+			}
+			else
+			{
+				Data.UpdateLanguage();
+			}
+			GameService.Overlay.get_UserLocale().add_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)UserLocale_SettingChanged);
+		}
+
+		private async void UserLocale_SettingChanged(object sender, ValueChangedEventArgs<Locale> e)
+		{
+			CultureString = getCultureString();
+			GameService.Overlay.get_UserLocale().remove_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)UserLocale_SettingChanged);
+			await LoadData();
+			OnLanguageChanged(null, null);
 		}
 
 		private void CreateUI()

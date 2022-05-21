@@ -23,6 +23,7 @@ namespace Kenedia.Modules.BuildsManager
 		Edit_Feather,
 		Edit_Feather_Highlight,
 		Edit_Feather_Pressed,
-		Mouse
+		Mouse,
+		Lock_Locked
 	}
 }

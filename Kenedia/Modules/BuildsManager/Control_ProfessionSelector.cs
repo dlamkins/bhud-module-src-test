@@ -10,20 +10,9 @@ namespace Kenedia.Modules.BuildsManager
 {
 	public class Control_ProfessionSelector : Control
 	{
-		private class ProfessionSelection
-		{
-			public API.Profession Profession;
-
-			public Rectangle Bounds;
-
-			public bool Hovered;
-
-			public int Index;
-		}
-
 		public List<API.Profession> Professions = new List<API.Profession>();
 
-		private List<ProfessionSelection> _Professions;
+		public List<ProfessionSelection> _Professions;
 
 		public Texture2D ClearTexture;
 

@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
+using Kenedia.Modules.BuildsManager.Strings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.BitmapFonts;
@@ -90,8 +91,6 @@ namespace Kenedia.Modules.BuildsManager
 
 		public API.Profession SelectedProfession;
 
-		public EventHandler Changed;
-
 		public object SelectionTarget
 		{
 			get
@@ -108,6 +107,8 @@ namespace Kenedia.Modules.BuildsManager
 
 		public Template Template => BuildsManager.ModuleInstance.Selected_Template;
 
+		public event EventHandler Changed;
+
 		public SelectionPopUp(Container parent)
 			: this()
 		{
@@ -115,12 +116,12 @@ namespace Kenedia.Modules.BuildsManager
 			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b4: Expected O, but got Unknown
-			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d6: Expected O, but got Unknown
+			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00be: Expected O, but got Unknown
+			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f6: Expected O, but got Unknown
 			((Control)this).set_Parent(parent);
 			((Control)this).set_Visible(false);
 			((Control)this).set_ZIndex(997);
@@ -128,12 +129,13 @@ namespace Kenedia.Modules.BuildsManager
 			Background = BuildsManager.TextureManager._Backgrounds[2];
 			TextBox val = new TextBox();
 			((Control)val).set_Parent(((Control)this).get_Parent());
-			((TextInputBase)val).set_PlaceholderText("Search ...");
+			((TextInputBase)val).set_PlaceholderText(common.Search + " ...");
 			((Control)val).set_Width(((Control)this).get_Width() - 6);
 			((Control)val).set_ZIndex(998);
 			((Control)val).set_Visible(false);
 			FilterBox = val;
 			((TextInputBase)FilterBox).add_TextChanged((EventHandler<EventArgs>)FilterBox_TextChanged);
+			BuildsManager.ModuleInstance.LanguageChanged += ModuleInstance_LanguageChanged;
 			ContentService = new ContentService();
 			Font = ContentService.GetFont((FontFace)0, (FontSize)14, (FontStyle)0);
 			HeaderFont = ContentService.GetFont((FontFace)0, (FontSize)18, (FontStyle)0);
@@ -170,6 +172,11 @@ namespace Kenedia.Modules.BuildsManager
 			});
 		}
 
+		private void ModuleInstance_LanguageChanged(object sender, EventArgs e)
+		{
+			((TextInputBase)FilterBox).set_PlaceholderText(common.Search + " ...");
+		}
+
 		private void FilterBox_TextChanged(object sender, EventArgs e)
 		{
 			UpdateLayout();
@@ -193,33 +200,33 @@ namespace Kenedia.Modules.BuildsManager
 				{
 					API.RuneItem rune = (API.RuneItem)entry.Object;
 					((Armor_TemplateItem)SelectionTarget).Rune = rune;
-					Changed?.Invoke(this, EventArgs.Empty);
+					this.Changed?.Invoke(this, EventArgs.Empty);
 					break;
 				}
 				case selectionType.Sigils:
 				{
 					API.SigilItem sigil = (API.SigilItem)entry.Object;
 					((Weapon_TemplateItem)SelectionTarget).Sigil = sigil;
-					Changed?.Invoke(this, EventArgs.Empty);
+					this.Changed?.Invoke(this, EventArgs.Empty);
 					break;
 				}
 				case selectionType.AquaticSigils:
 				{
 					API.SigilItem aquaSigil = (API.SigilItem)entry.Object;
 					((AquaticWeapon_TemplateItem)SelectionTarget).Sigils[UpgradeIndex] = aquaSigil;
-					Changed?.Invoke(this, EventArgs.Empty);
+					this.Changed?.Invoke(this, EventArgs.Empty);
 					break;
 				}
 				case selectionType.Profession:
 					SelectedProfession = (API.Profession)entry.Object;
 					((TextInputBase)FilterBox).set_Text((string)null);
-					Changed?.Invoke(this, EventArgs.Empty);
+					this.Changed?.Invoke(this, EventArgs.Empty);
 					break;
 				case selectionType.Stats:
 				{
 					API.Stat stat = (API.Stat)entry.Object;
 					((TemplateItem)SelectionTarget).Stat = stat;
-					Changed?.Invoke(this, EventArgs.Empty);
+					this.Changed?.Invoke(this, EventArgs.Empty);
 					break;
 				}
 				case selectionType.Weapons:
@@ -241,14 +248,14 @@ namespace Kenedia.Modules.BuildsManager
 						}
 						break;
 					}
-					Changed?.Invoke(this, EventArgs.Empty);
+					this.Changed?.Invoke(this, EventArgs.Empty);
 					break;
 				}
 				case selectionType.AquaticWeapons:
 				{
 					API.WeaponItem selectedAquaWeapon = (API.WeaponItem)entry.Object;
 					((AquaticWeapon_TemplateItem)SelectionTarget).WeaponType = selectedAquaWeapon.WeaponType;
-					Changed?.Invoke(this, EventArgs.Empty);
+					this.Changed?.Invoke(this, EventArgs.Empty);
 					break;
 				}
 				}

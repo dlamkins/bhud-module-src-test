@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
+using Kenedia.Modules.BuildsManager.Strings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.BitmapFonts;
@@ -306,50 +307,50 @@ namespace Kenedia.Modules.BuildsManager
 			//IL_03d1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03dd: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0402: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0403: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0404: Unknown result type (might be due to invalid IL or missing references)
-			//IL_041a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0421: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0426: Unknown result type (might be due to invalid IL or missing references)
+			//IL_040c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0411: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0412: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0413: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0429: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0430: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0436: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0455: Unknown result type (might be due to invalid IL or missing references)
-			//IL_045c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0461: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0435: Unknown result type (might be due to invalid IL or missing references)
+			//IL_043f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0445: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0464: Unknown result type (might be due to invalid IL or missing references)
 			//IL_046b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0471: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0492: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0499: Unknown result type (might be due to invalid IL or missing references)
-			//IL_049e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0470: Unknown result type (might be due to invalid IL or missing references)
+			//IL_047a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0480: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_04a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04de: Unknown result type (might be due to invalid IL or missing references)
 			//IL_04e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_050b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0511: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0516: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_051a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0520: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0526: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0546: Unknown result type (might be due to invalid IL or missing references)
-			//IL_054c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0551: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0525: Unknown result type (might be due to invalid IL or missing references)
+			//IL_052f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0535: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0555: Unknown result type (might be due to invalid IL or missing references)
 			//IL_055b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0561: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0583: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0589: Unknown result type (might be due to invalid IL or missing references)
-			//IL_058e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0560: Unknown result type (might be due to invalid IL or missing references)
+			//IL_056a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0570: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0592: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0598: Unknown result type (might be due to invalid IL or missing references)
-			//IL_059e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_059d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05cf: Unknown result type (might be due to invalid IL or missing references)
 			//IL_05d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05ea: Unknown result type (might be due to invalid IL or missing references)
 			((Container)this).PaintBeforeChildren(spriteBatch, bounds);
 			UpdateLayout();
 			BitmapFont font = new ContentService().GetFont((FontFace)0, (FontSize)16, (FontStyle)0);
@@ -380,7 +381,7 @@ namespace Kenedia.Modules.BuildsManager
 				((Rectangle)(ref rect))._002Ector(bounds.Width - ((Control)TemplateBox).get_Height() - 6, ((Control)TemplateBox).get_LocalBounds().Y + i * (((Control)TemplateBox).get_Height() + 5), ((Control)TemplateBox).get_Height(), ((Control)TemplateBox).get_Height());
 				bool hovered = ((Rectangle)(ref rect)).Contains(((Control)this).get_RelativeMousePosition());
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, hovered ? _CopyHovered : _Copy, rect, (Rectangle?)_Copy.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
-				((Control)this).set_BasicTooltipText(hovered ? "Copy Template" : null);
+				((Control)this).set_BasicTooltipText(hovered ? (common.Copy + " " + common.Template) : null);
 				Color color = Color.get_Black();
 				rect = bounds;
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref rect)).get_Left(), ((Rectangle)(ref rect)).get_Top(), rect.Width, 2), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);

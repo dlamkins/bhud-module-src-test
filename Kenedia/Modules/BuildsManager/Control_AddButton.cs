@@ -8,9 +8,9 @@ namespace Kenedia.Modules.BuildsManager
 {
 	public class Control_AddButton : Control
 	{
-		private Texture2D Add;
+		public Texture2D Texture;
 
-		private Texture2D AddHovered;
+		public Texture2D TextureHovered;
 
 		private Texture2D _EmptyTraitLine;
 
@@ -37,8 +37,8 @@ namespace Kenedia.Modules.BuildsManager
 		{
 			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0065: Expected O, but got Unknown
-			Add = BuildsManager.TextureManager.getControlTexture(_Controls.Add);
-			AddHovered = BuildsManager.TextureManager.getControlTexture(_Controls.Add_Hovered);
+			Texture = BuildsManager.TextureManager.getControlTexture(_Controls.Add);
+			TextureHovered = BuildsManager.TextureManager.getControlTexture(_Controls.Add_Hovered);
 			_EmptyTraitLine = Texture2DExtension.GetRegion(BuildsManager.TextureManager.getControlTexture(_Controls.PlaceHolder_Traitline), 0, 0, 647, 136);
 			_Template_Border = BuildsManager.TextureManager.getControlTexture(_Controls.Template_Border);
 			ContentService cnt = new ContentService();
@@ -136,7 +136,7 @@ namespace Kenedia.Modules.BuildsManager
 			bounds = RectangleExtension.Add(bounds, 1, 1, -2, -2);
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _EmptyTraitLine, RectangleExtension.Add(bounds, 2, 2, -4, -6), (Rectangle?)_EmptyTraitLine.get_Bounds(), ((Control)this).get_MouseOver() ? new Color(135, 135, 135, 255) : new Color(105, 105, 105, 255), 0f, Vector2.get_Zero(), (SpriteEffects)0);
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _Template_Border, bounds, (Rectangle?)_Template_Border.get_Bounds(), ((Control)this).get_MouseOver() ? Color.get_Gray() : Color.get_Black(), 0f, Vector2.get_Zero(), (SpriteEffects)0);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, ((Control)this).get_MouseOver() ? AddHovered : Add, new Rectangle(6, 6, ((Control)this).get_Height() - 12, ((Control)this).get_Height() - 12), (Rectangle?)(((Control)this).get_MouseOver() ? AddHovered.get_Bounds() : Add.get_Bounds()), Color.get_White(), 0f, Vector2.get_Zero(), (SpriteEffects)0);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, ((Control)this).get_MouseOver() ? TextureHovered : Texture, new Rectangle(6, 6, ((Control)this).get_Height() - 12, ((Control)this).get_Height() - 12), (Rectangle?)(((Control)this).get_MouseOver() ? TextureHovered.get_Bounds() : Texture.get_Bounds()), Color.get_White(), 0f, Vector2.get_Zero(), (SpriteEffects)0);
 			Rectangle textBounds = default(Rectangle);
 			((Rectangle)(ref textBounds))._002Ector(12 + (((Control)this).get_Height() - 12), 6, ((Control)this).get_Width() - (12 + (((Control)this).get_Height() - 12)), ((Control)this).get_Height() - 12);
 			rect = Font.CalculateTextRectangle(Text, textBounds);

@@ -33,6 +33,8 @@ namespace Kenedia.Modules.BuildsManager
 		Add,
 		Add_Hovered,
 		Copy,
-		Copy_Hovered
+		Copy_Hovered,
+		Import,
+		Import_Hovered
 	}
 }

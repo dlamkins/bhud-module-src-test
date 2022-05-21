@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Kenedia.Modules.BuildsManager.Strings;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Kenedia.Modules.BuildsManager
@@ -201,6 +202,25 @@ namespace Kenedia.Modules.BuildsManager
 			public List<string> Categories;
 		}
 
+		public class Legend
+		{
+			public string Name;
+
+			public int Id;
+
+			public List<Skill> Utilities;
+
+			public Skill Heal;
+
+			public Skill Elite;
+
+			public Skill Swap;
+
+			public Skill Skill;
+
+			public int Specialization;
+		}
+
 		public class Trait
 		{
 			public string Name;
@@ -269,6 +289,8 @@ namespace Kenedia.Modules.BuildsManager
 			public List<ProfessionWeapon> Weapons = new List<ProfessionWeapon>();
 
 			public List<Skill> Skills = new List<Skill>();
+
+			public List<Legend> Legends = new List<Legend>();
 		}
 
 		public class StatAttribute
@@ -282,6 +304,27 @@ namespace Kenedia.Modules.BuildsManager
 			public int Value;
 
 			public Icon Icon;
+
+			public string getLocalName
+			{
+				get
+				{
+					string text = Name;
+					return Id switch
+					{
+						7 => common.Power, 
+						8 => common.Precision, 
+						9 => common.Toughness, 
+						10 => common.Vitality, 
+						5 => common.Ferocity, 
+						6 => common.HealingPower, 
+						3 => common.ConditionDamage, 
+						2 => common.Concentration, 
+						4 => common.Expertise, 
+						_ => text, 
+					};
+				}
+			}
 		}
 
 		public class Stat

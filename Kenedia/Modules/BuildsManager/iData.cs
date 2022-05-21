@@ -12,6 +12,25 @@ namespace Kenedia.Modules.BuildsManager
 {
 	public class iData
 	{
+		public class _Legend
+		{
+			public string Name;
+
+			public int Id;
+
+			public int Skill;
+
+			public List<int> Utilities;
+
+			public int Heal;
+
+			public int Elite;
+
+			public int Swap;
+
+			public int Specialization;
+		}
+
 		public class SkillID_Pair
 		{
 			public int PaletteID;
@@ -39,9 +58,141 @@ namespace Kenedia.Modules.BuildsManager
 
 		public List<SkillID_Pair> SkillID_Pairs = new List<SkillID_Pair>();
 
+		public List<API.Legend> Legends = new List<API.Legend>();
+
 		private bool fetchAPI;
 
 		private static Texture2D PlaceHolder;
+
+		public void UpdateLanguage()
+		{
+			string culture = BuildsManager.getCultureString();
+			List<string> filesToDelete = new List<string>();
+			string file_path = BuildsManager.Paths.professions + "professions [" + culture + "].json";
+			if (!File.Exists(file_path))
+			{
+				return;
+			}
+			foreach (API.Profession entry in JsonConvert.DeserializeObject<List<API.Profession>>(LoadFile(file_path, filesToDelete)))
+			{
+				API.Profession target = Professions.Find((API.Profession e) => e.Id == entry.Id);
+				if (target == null)
+				{
+					continue;
+				}
+				target.Name = entry.Name;
+				foreach (API.Specialization specialization in entry.Specializations)
+				{
+					API.Specialization targetSpecialization = target.Specializations.Find((API.Specialization e) => e.Id == specialization.Id);
+					if (targetSpecialization == null)
+					{
+						continue;
+					}
+					targetSpecialization.Name = specialization.Name;
+					foreach (API.Trait trait in specialization.MajorTraits)
+					{
+						API.Trait targetTrait2 = targetSpecialization.MajorTraits.Find((API.Trait e) => e.Id == trait.Id);
+						if (targetTrait2 != null)
+						{
+							targetTrait2.Name = trait.Name;
+							targetTrait2.Description = trait.Description;
+						}
+					}
+					foreach (API.Trait trait2 in specialization.MinorTraits)
+					{
+						API.Trait targetTrait = targetSpecialization.MinorTraits.Find((API.Trait e) => e.Id == trait2.Id);
+						if (targetTrait != null)
+						{
+							targetTrait.Name = trait2.Name;
+							targetTrait.Description = trait2.Description;
+						}
+					}
+					if (specialization.WeaponTrait != null)
+					{
+						targetSpecialization.WeaponTrait.Name = specialization.WeaponTrait.Name;
+						targetSpecialization.WeaponTrait.Description = specialization.WeaponTrait.Description;
+					}
+				}
+				foreach (API.Skill skill in entry.Skills)
+				{
+					API.Skill targetSkill = target.Skills.Find((API.Skill e) => e.Id == skill.Id);
+					if (targetSkill != null)
+					{
+						targetSkill.Name = skill.Name;
+						targetSkill.Description = skill.Description;
+					}
+				}
+				foreach (API.Legend legend in entry.Legends)
+				{
+					API.Legend targetLegend = target.Legends.Find((API.Legend e) => e.Id == legend.Id);
+					if (targetLegend != null)
+					{
+						targetLegend.Name = legend.Name;
+					}
+				}
+			}
+			file_path = BuildsManager.Paths.stats + "stats [" + culture + "].json";
+			foreach (API.Stat tStat in JsonConvert.DeserializeObject<List<API.Stat>>(LoadFile(file_path, filesToDelete)))
+			{
+				API.Stat stat = Stats.Find((API.Stat e) => e.Id == tStat.Id);
+				if (stat == null)
+				{
+					continue;
+				}
+				stat.Name = tStat.Name;
+				foreach (API.StatAttribute attribute in stat.Attributes)
+				{
+					attribute.Name = attribute.getLocalName;
+				}
+			}
+			file_path = BuildsManager.Paths.runes + "runes [" + culture + "].json";
+			foreach (API.RuneItem tRune in JsonConvert.DeserializeObject<List<API.RuneItem>>(LoadFile(file_path, filesToDelete)))
+			{
+				API.RuneItem rune = Runes.Find((API.RuneItem e) => e.Id == tRune.Id);
+				if (rune != null)
+				{
+					rune.Name = tRune.Name;
+					rune.Bonuses = tRune.Bonuses;
+				}
+			}
+			file_path = BuildsManager.Paths.sigils + "sigils [" + culture + "].json";
+			foreach (API.SigilItem tSigil in JsonConvert.DeserializeObject<List<API.SigilItem>>(LoadFile(file_path, filesToDelete)))
+			{
+				API.SigilItem sigil = Sigils.Find((API.SigilItem e) => e.Id == tSigil.Id);
+				if (sigil != null)
+				{
+					sigil.Name = tSigil.Name;
+					sigil.Description = tSigil.Description;
+				}
+			}
+			file_path = BuildsManager.Paths.armory + "armors [" + culture + "].json";
+			foreach (API.ArmorItem tArmor in JsonConvert.DeserializeObject<List<API.ArmorItem>>(LoadFile(file_path, filesToDelete)))
+			{
+				API.ArmorItem armor = Armors.Find((API.ArmorItem e) => e.Id == tArmor.Id);
+				if (armor != null)
+				{
+					armor.Name = tArmor.Name;
+				}
+			}
+			file_path = BuildsManager.Paths.armory + "weapons [" + culture + "].json";
+			foreach (API.WeaponItem tWeapon in JsonConvert.DeserializeObject<List<API.WeaponItem>>(LoadFile(file_path, filesToDelete)))
+			{
+				API.WeaponItem weapon = Weapons.Find((API.WeaponItem e) => e.Id == tWeapon.Id);
+				if (weapon != null)
+				{
+					weapon.Name = tWeapon.Name;
+				}
+			}
+			file_path = BuildsManager.Paths.armory + "trinkets [" + culture + "].json";
+			foreach (API.TrinketItem tTrinket in JsonConvert.DeserializeObject<List<API.TrinketItem>>(LoadFile(file_path, filesToDelete)))
+			{
+				API.TrinketItem trinket = Trinkets.Find((API.TrinketItem e) => e.Id == tTrinket.Id);
+				if (trinket != null)
+				{
+					trinket.Name = tTrinket.Name;
+				}
+			}
+		}
 
 		private Texture2D LoadImage(string path, GraphicsDevice graphicsDevice, List<string> filesToDelete, Rectangle region = default(Rectangle), Rectangle default_Bounds = default(Rectangle))
 		{
@@ -90,6 +241,7 @@ namespace Kenedia.Modules.BuildsManager
 					filesToDelete.Add(path);
 				}
 				texture = BuildsManager.TextureManager.getIcon(_Icons.Bug);
+				BuildsManager.Logger.Debug("InvalidOperationException: Failed to load {0}. Fetching the API again.", new object[1] { path });
 				fetchAPI = true;
 				return texture;
 			}
@@ -100,12 +252,14 @@ namespace Kenedia.Modules.BuildsManager
 			catch (FileNotFoundException)
 			{
 				texture = BuildsManager.TextureManager.getIcon(_Icons.Bug);
+				BuildsManager.Logger.Debug("FileNotFoundException: Failed to load {0}. Fetching the API again.", new object[1] { path });
 				fetchAPI = true;
 				return texture;
 			}
 			catch (FileLoadException)
 			{
 				texture = BuildsManager.TextureManager.getIcon(_Icons.Bug);
+				BuildsManager.Logger.Debug("FileLoadException: Failed to load {0}. Fetching the API again.", new object[1] { path });
 				fetchAPI = true;
 				return texture;
 			}
@@ -171,6 +325,7 @@ namespace Kenedia.Modules.BuildsManager
 				stat.Attributes.Sort((API.StatAttribute a, API.StatAttribute b) => b.Multiplier.CompareTo(a.Multiplier));
 				foreach (API.StatAttribute attri in stat.Attributes)
 				{
+					attri.Name = attri.getLocalName;
 					attri.Icon.Texture = ContentsManager.GetTexture(attri.Icon.Path);
 				}
 			}
@@ -262,6 +417,21 @@ namespace Kenedia.Modules.BuildsManager
 				//IL_0664: Unknown result type (might be due to invalid IL or missing references)
 				//IL_066b: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0671: Unknown result type (might be due to invalid IL or missing references)
+				//IL_074a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0751: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0757: Unknown result type (might be due to invalid IL or missing references)
+				//IL_07ce: Unknown result type (might be due to invalid IL or missing references)
+				//IL_07d5: Unknown result type (might be due to invalid IL or missing references)
+				//IL_07db: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0852: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0859: Unknown result type (might be due to invalid IL or missing references)
+				//IL_085f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_08d6: Unknown result type (might be due to invalid IL or missing references)
+				//IL_08dd: Unknown result type (might be due to invalid IL or missing references)
+				//IL_08e3: Unknown result type (might be due to invalid IL or missing references)
+				//IL_097a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0981: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0987: Unknown result type (might be due to invalid IL or missing references)
 				foreach (API.TrinketItem current in iData2.Trinkets)
 				{
 					current.Icon.Texture = iData2.LoadImage(BuildsManager.Paths.BasePath + current.Icon.Path, graphicsDevice, filesToDelete);
@@ -315,12 +485,43 @@ namespace Kenedia.Modules.BuildsManager
 					{
 						current10.Icon.Texture = iData2.LoadImage(BuildsManager.Paths.BasePath + current10.Icon.Path, graphicsDevice, filesToDelete, new Rectangle(12, 12, 104, 104));
 					}
+					if (current6.Legends.Count > 0)
+					{
+						foreach (API.Legend current11 in current6.Legends)
+						{
+							BuildsManager.Logger.Debug("Loading " + current11.Name);
+							if (current11.Heal.Icon != null && current11.Heal.Icon.Path != "")
+							{
+								current11.Heal.Icon.Texture = iData2.LoadImage(BuildsManager.Paths.BasePath + current11.Heal.Icon.Path, graphicsDevice, filesToDelete, new Rectangle(12, 12, 104, 104));
+							}
+							if (current11.Elite.Icon != null && current11.Elite.Icon.Path != "")
+							{
+								current11.Elite.Icon.Texture = iData2.LoadImage(BuildsManager.Paths.BasePath + current11.Elite.Icon.Path, graphicsDevice, filesToDelete, new Rectangle(12, 12, 104, 104));
+							}
+							if (current11.Swap.Icon != null && current11.Swap.Icon.Path != "")
+							{
+								current11.Swap.Icon.Texture = iData2.LoadImage(BuildsManager.Paths.BasePath + current11.Swap.Icon.Path, graphicsDevice, filesToDelete, new Rectangle(12, 12, 104, 104));
+							}
+							if (current11.Skill.Icon != null && current11.Skill.Icon.Path != "")
+							{
+								current11.Skill.Icon.Texture = iData2.LoadImage(BuildsManager.Paths.BasePath + current11.Skill.Icon.Path, graphicsDevice, filesToDelete, new Rectangle(12, 12, 104, 104));
+							}
+							BuildsManager.Logger.Debug("Loading Utility of " + current11.Name);
+							foreach (API.Skill current12 in current11.Utilities)
+							{
+								if (current12.Icon != null && current12.Icon.Path != "")
+								{
+									current12.Icon.Texture = iData2.LoadImage(BuildsManager.Paths.BasePath + current12.Icon.Path, graphicsDevice, filesToDelete, new Rectangle(12, 12, 104, 104));
+								}
+							}
+						}
+					}
 				}
-				foreach (string current11 in filesToDelete)
+				foreach (string current13 in filesToDelete)
 				{
 					try
 					{
-						File.Delete(current11);
+						File.Delete(current13);
 					}
 					catch (IOException)
 					{

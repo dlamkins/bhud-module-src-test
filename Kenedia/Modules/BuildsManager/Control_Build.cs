@@ -52,7 +52,7 @@ namespace Kenedia.Modules.BuildsManager
 
 		private int Build_Width = 900;
 
-		private int Skillbar_Height = 75;
+		private int Skillbar_Height = 130;
 
 		private int Build_Height = 575;
 
@@ -104,13 +104,13 @@ namespace Kenedia.Modules.BuildsManager
 		public Control_Build(Container parent)
 			: this()
 		{
-			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0210: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0227: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0263: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0213: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0266: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).set_Parent(parent);
 			((Control)this).set_Size(new Point((int)((double)_Width * Scale), (int)((double)_Height * Scale)));
 			CustomTooltip customTooltip = new CustomTooltip(((Control)this).get_Parent());
@@ -128,10 +128,12 @@ namespace Kenedia.Modules.BuildsManager
 			_EmptyTexture = BuildsManager.TextureManager._Icons[0];
 			_Line = Texture2DExtension.GetRegion(BuildsManager.TextureManager.getControlTexture(_Controls.Line), new Rectangle(22, 15, 85, 5));
 			_Background = _EmptyTraitLine;
-			SkillBar_Control skillBar_Control = new SkillBar_Control(((Control)this).get_Parent());
-			((Control)skillBar_Control).set_Location(new Point(0, 0));
-			((Control)skillBar_Control).set_Size(new Point(_Width, Skillbar_Height));
-			SkillBar = skillBar_Control;
+			SkillBar_Control obj = new SkillBar_Control(((Control)this).get_Parent())
+			{
+				_Location = new Point(0, 0)
+			};
+			((Control)obj).set_Size(new Point(_Width, Skillbar_Height));
+			SkillBar = obj;
 			Specializations = new List<Specialization_Control>();
 			for (int i = 0; i < Template.Build.SpecLines.Count; i++)
 			{

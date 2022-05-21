@@ -50,9 +50,12 @@ namespace Kenedia.Modules.BuildsManager
 			}
 			set
 			{
-				//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+				//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+				//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 				_Scale = value;
+				((Control)this).set_Size(ClassExtensions.Scale(new Point(_SkillSize, _SkillSize + 15), value));
 				((Control)this).set_Location(((Control)this).get_Location().Scale(value));
 			}
 		}

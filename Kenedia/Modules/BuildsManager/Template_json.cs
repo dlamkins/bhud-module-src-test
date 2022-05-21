@@ -5,13 +5,7 @@ namespace Kenedia.Modules.BuildsManager
 {
 	public class Template_json
 	{
-		public string Profession;
-
-		public int Specialization;
-
 		public string Name;
-
-		public GearTemplate_json Gear;
 
 		public string BuildCode;
 
@@ -25,13 +19,14 @@ namespace Kenedia.Modules.BuildsManager
 				if (template != null)
 				{
 					Name = template.Name;
-					Gear = template.Gear;
 					BuildCode = template.BuildCode;
+					GearCode = template.GearCode;
 				}
 			}
 			else
 			{
-				Gear = new GearTemplate_json();
+				Name = "Empty Build";
+				GearCode = "[0][0][0][0][0][0][0|0][0|0][0|0][0|0][0|0][0|0][0|-1|0][0|-1|0][0|-1|0][0|-1|0][0|-1|0|0][0|-1|0|0]";
 				BuildCode = "[&DQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=]";
 			}
 		}

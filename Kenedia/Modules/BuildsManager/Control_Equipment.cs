@@ -8,6 +8,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Controls.Extern;
 using Blish_HUD.Controls.Intern;
 using Blish_HUD.Input;
+using Kenedia.Modules.BuildsManager.Strings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -88,11 +89,10 @@ namespace Kenedia.Modules.BuildsManager
 			{
 				CustomTooltip = CustomTooltip
 			};
-			SelectionPopUp selectionPopUp = SelectionPopUp;
-			selectionPopUp.Changed = (EventHandler)Delegate.Combine(selectionPopUp.Changed, (EventHandler)delegate
+			SelectionPopUp.Changed += delegate
 			{
 				OnChanged();
-			});
+			};
 			((Control)this).add_Disposed((EventHandler<EventArgs>)delegate
 			{
 				((Control)CustomTooltip).Dispose();
@@ -139,7 +139,8 @@ namespace Kenedia.Modules.BuildsManager
 					ContentTextures = item.Attributes.Select((API.StatAttribute e) => e.Icon.Texture).ToList()
 				});
 			}
-			Instructions = new List<string> { "Left Click to select Stat/Upgrade", "Alt + Right Click to select Weapon", "Right Click to copy Stat/Upgrade Name" };
+			Instructions = common.GearTab_Tips.Split('\n').ToList();
+			BuildsManager.ModuleInstance.LanguageChanged += ModuleInstance_LanguageChanged;
 			((Control)this).add_Shown((EventHandler<EventArgs>)delegate
 			{
 				UpdateLayout();
@@ -147,6 +148,11 @@ namespace Kenedia.Modules.BuildsManager
 			ProfessionChanged();
 			UpdateLayout();
 			BuildsManager.ModuleInstance.Selected_Template_Changed += ModuleInstance_Selected_Template_Changed;
+		}
+
+		private void ModuleInstance_LanguageChanged(object sender, EventArgs e)
+		{
+			Instructions = common.GearTab_Tips.Split('\n').ToList();
 		}
 
 		private void ModuleInstance_Selected_Template_Changed(object sender, EventArgs e)

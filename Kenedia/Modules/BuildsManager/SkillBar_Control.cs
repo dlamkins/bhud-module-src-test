@@ -13,21 +13,37 @@ namespace Kenedia.Modules.BuildsManager
 	{
 		private CustomTooltip CustomTooltip;
 
+		private List<Skill_Control> _Legends_Aquatic;
+
+		private List<Skill_Control> _Legends_Terrestrial;
+
 		private List<Skill_Control> _Skills_Aquatic;
 
-		private List<Skill_Control> _Skills_Terrestial;
+		private List<Skill_Control> _Skills_Terrestrial;
 
 		private Texture2D _AquaTexture;
 
-		private Texture2D _TerrestialTexture;
+		private Texture2D _TerrestrialTexture;
+
+		private Texture2D _SwapTexture;
 
 		public SkillSelector_Control SkillSelector;
+
+		public SkillSelector_Control LegendSelector;
+
+		public SkillSelector_Control PetSelector;
+
+		private bool CanClick = true;
+
+		private bool ShowProfessionSkills;
 
 		private double _Scale = 1.0;
 
 		private int _SkillSize = 55;
 
 		public int _Width = 643;
+
+		private Point _OGLocation;
 
 		public Template Template => BuildsManager.ModuleInstance.Selected_Template;
 
@@ -44,27 +60,56 @@ namespace Kenedia.Modules.BuildsManager
 				{
 					item.Scale = value;
 				}
-				foreach (Skill_Control item2 in _Skills_Terrestial)
+				foreach (Skill_Control item2 in _Skills_Terrestrial)
 				{
 					item2.Scale = value;
 				}
 			}
 		}
 
+		public Point _Location
+		{
+			get
+			{
+				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+				return ((Control)this).get_Location();
+			}
+			set
+			{
+				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+				//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+				//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+				((Control)this).get_Location();
+				if (((Control)this).get_Location() == Point.get_Zero())
+				{
+					_OGLocation = value;
+				}
+				((Control)this).set_Location(value);
+			}
+		}
+
 		public SkillBar_Control(Container parent)
 			: this()
 		{
-			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0321: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0383: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0429: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0490: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).set_Parent(parent);
 			CustomTooltip customTooltip = new CustomTooltip(((Control)this).get_Parent());
 			((Control)customTooltip).set_ClipsBounds(false);
 			customTooltip.HeaderColor = new Color(255, 204, 119, 255);
 			CustomTooltip = customTooltip;
-			_TerrestialTexture = BuildsManager.TextureManager.getControlTexture(_Controls.Land);
+			_TerrestrialTexture = BuildsManager.TextureManager.getControlTexture(_Controls.Land);
 			_AquaTexture = BuildsManager.TextureManager.getControlTexture(_Controls.Water);
+			_SwapTexture = BuildsManager.TextureManager.getIcon(_Icons.Refresh);
 			Enum.GetValues(typeof(SkillSlots));
 			_Skills_Aquatic = new List<Skill_Control>();
 			foreach (API.Skill item in Template.Build.Skills_Aquatic)
@@ -72,138 +117,293 @@ namespace Kenedia.Modules.BuildsManager
 				_ = item;
 				List<Skill_Control> skills_Aquatic = _Skills_Aquatic;
 				Skill_Control skill_Control = new Skill_Control(((Control)this).get_Parent());
-				((Control)skill_Control).set_Location(new Point(27 + _Skills_Aquatic.Count * (_SkillSize + 1), 0));
+				((Control)skill_Control).set_Location(new Point(27 + _Skills_Aquatic.Count * (_SkillSize + 1), 51));
 				skill_Control.Skill = Template.Build.Skills_Aquatic[_Skills_Aquatic.Count];
 				skill_Control.Slot = (SkillSlots)_Skills_Aquatic.Count;
 				skill_Control.Aquatic = true;
 				skills_Aquatic.Add(skill_Control);
-				Skill_Control control2 = _Skills_Aquatic[_Skills_Aquatic.Count - 1];
-				((Control)control2).add_Click((EventHandler<MouseEventArgs>)delegate
-				{
-					//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-					//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-					if (!((Control)SkillSelector).get_Visible() || SkillSelector.currentObject != control2)
-					{
-						((Control)SkillSelector).set_Visible(true);
-						SkillSelector.Skill_Control = control2;
-						((Control)SkillSelector).set_Location(((Control)control2).get_Location().Add(new Point(2, ((Control)control2).get_Height())));
-						List<API.Skill> list2 = new List<API.Skill>();
-						if (Template.Build.Profession != null)
-						{
-							foreach (API.Skill iSkill2 in (from e in Template.Build.Profession.Skills
-								orderby e.Specialization, (e.Categories.Count <= 0) ? "Unkown" : e.Categories[0]
-								select e).ToList())
-							{
-								if (iSkill2.Specialization == 0 || Template.Build.SpecLines.Find((SpecLine e) => e.Specialization != null && e.Specialization.Id == iSkill2.Specialization) != null)
-								{
-									switch (control2.Slot)
-									{
-									case SkillSlots.Heal:
-										if (iSkill2.Slot == API.skillSlot.Heal)
-										{
-											list2.Add(iSkill2);
-										}
-										break;
-									case SkillSlots.Elite:
-										if (iSkill2.Slot == API.skillSlot.Elite)
-										{
-											list2.Add(iSkill2);
-										}
-										break;
-									default:
-										if (iSkill2.Slot == API.skillSlot.Utility)
-										{
-											list2.Add(iSkill2);
-										}
-										break;
-									}
-								}
-							}
-						}
-						SkillSelector.Skills = list2;
-						SkillSelector.Aquatic = true;
-						SkillSelector.currentObject = control2;
-					}
-					else
-					{
-						((Control)SkillSelector).set_Visible(false);
-					}
-				});
-				BuildsManager.ModuleInstance.Selected_Template_Changed += ApplyBuild;
+				((Control)_Skills_Aquatic[_Skills_Aquatic.Count - 1]).add_Click((EventHandler<MouseEventArgs>)Control_Click);
 			}
 			int p = _Width - _Skills_Aquatic.Count * (_SkillSize + 1);
-			_Skills_Terrestial = new List<Skill_Control>();
-			foreach (API.Skill item2 in Template.Build.Skills_Terrestial)
+			_Skills_Terrestrial = new List<Skill_Control>();
+			foreach (API.Skill item2 in Template.Build.Skills_Terrestrial)
 			{
 				_ = item2;
-				List<Skill_Control> skills_Terrestial = _Skills_Terrestial;
+				List<Skill_Control> skills_Terrestrial = _Skills_Terrestrial;
 				Skill_Control skill_Control2 = new Skill_Control(((Control)this).get_Parent());
-				((Control)skill_Control2).set_Location(new Point(p + _Skills_Terrestial.Count * (_SkillSize + 1), 0));
-				skill_Control2.Skill = Template.Build.Skills_Terrestial[_Skills_Terrestial.Count];
-				skill_Control2.Slot = (SkillSlots)_Skills_Terrestial.Count;
-				skills_Terrestial.Add(skill_Control2);
-				Skill_Control control = _Skills_Terrestial[_Skills_Terrestial.Count - 1];
-				((Control)control).add_Click((EventHandler<MouseEventArgs>)delegate
-				{
-					//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-					//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-					if (!((Control)SkillSelector).get_Visible() || SkillSelector.currentObject != control)
-					{
-						((Control)SkillSelector).set_Visible(true);
-						SkillSelector.Skill_Control = control;
-						((Control)SkillSelector).set_Location(((Control)control).get_Location().Add(new Point(-2, ((Control)control).get_Height())));
-						List<API.Skill> list = new List<API.Skill>();
-						if (Template.Build.Profession != null)
-						{
-							foreach (API.Skill iSkill in (from e in Template.Build.Profession.Skills
-								orderby e.Specialization, (e.Categories.Count <= 0) ? "Unkown" : e.Categories[0]
-								select e).ToList())
-							{
-								if (iSkill.Specialization == 0 || Template.Build.SpecLines.Find((SpecLine e) => e.Specialization != null && e.Specialization.Id == iSkill.Specialization) != null)
-								{
-									switch (control.Slot)
-									{
-									case SkillSlots.Heal:
-										if (iSkill.Slot == API.skillSlot.Heal)
-										{
-											list.Add(iSkill);
-										}
-										break;
-									case SkillSlots.Elite:
-										if (iSkill.Slot == API.skillSlot.Elite)
-										{
-											list.Add(iSkill);
-										}
-										break;
-									default:
-										if (iSkill.Slot == API.skillSlot.Utility)
-										{
-											list.Add(iSkill);
-										}
-										break;
-									}
-								}
-							}
-						}
-						SkillSelector.Skills = list;
-						SkillSelector.Aquatic = false;
-						SkillSelector.currentObject = control;
-					}
-					else
-					{
-						((Control)SkillSelector).set_Visible(false);
-					}
-				});
+				((Control)skill_Control2).set_Location(new Point(p + _Skills_Terrestrial.Count * (_SkillSize + 1), 51));
+				skill_Control2.Skill = Template.Build.Skills_Terrestrial[_Skills_Terrestrial.Count];
+				skill_Control2.Slot = (SkillSlots)_Skills_Terrestrial.Count;
+				skills_Terrestrial.Add(skill_Control2);
+				((Control)_Skills_Terrestrial[_Skills_Terrestrial.Count - 1]).add_Click((EventHandler<MouseEventArgs>)Control_Click);
 			}
 			SkillSelector_Control skillSelector_Control = new SkillSelector_Control();
 			((Control)skillSelector_Control).set_Parent(((Control)this).get_Parent());
 			((Control)skillSelector_Control).set_Visible(false);
 			((Control)skillSelector_Control).set_ZIndex(((Control)this).get_ZIndex() + 3);
 			SkillSelector = skillSelector_Control;
+			_Legends_Aquatic = new List<Skill_Control>();
+			List<Skill_Control> legends_Aquatic = _Legends_Aquatic;
+			Skill_Control obj = new Skill_Control(((Control)this).get_Parent())
+			{
+				Skill = Template.Build.Legends_Aquatic[0].Skill,
+				Slot = SkillSlots.AquaticLegend1,
+				Aquatic = true,
+				Scale = 0.8
+			};
+			((Control)obj).set_Location(new Point(27, 0));
+			legends_Aquatic.Add(obj);
+			List<Skill_Control> legends_Aquatic2 = _Legends_Aquatic;
+			Skill_Control obj2 = new Skill_Control(((Control)this).get_Parent())
+			{
+				Skill = Template.Build.Legends_Aquatic[1].Skill,
+				Slot = SkillSlots.AquaticLegend1,
+				Aquatic = true,
+				Scale = 0.8
+			};
+			((Control)obj2).set_Location(new Point(89, 0));
+			legends_Aquatic2.Add(obj2);
+			((Control)_Legends_Aquatic[0]).add_Click((EventHandler<MouseEventArgs>)Legend);
+			((Control)_Legends_Aquatic[1]).add_Click((EventHandler<MouseEventArgs>)Legend);
+			_Legends_Terrestrial = new List<Skill_Control>();
+			List<Skill_Control> legends_Terrestrial = _Legends_Terrestrial;
+			Skill_Control obj3 = new Skill_Control(((Control)this).get_Parent())
+			{
+				Skill = Template.Build.Legends_Terrestrial[0].Skill,
+				Slot = SkillSlots.TerrestrialLegend1,
+				Aquatic = false,
+				Scale = 0.8
+			};
+			((Control)obj3).set_Location(new Point(p, 0));
+			legends_Terrestrial.Add(obj3);
+			List<Skill_Control> legends_Terrestrial2 = _Legends_Terrestrial;
+			Skill_Control obj4 = new Skill_Control(((Control)this).get_Parent())
+			{
+				Skill = Template.Build.Legends_Terrestrial[1].Skill,
+				Slot = SkillSlots.TerrestrialLegend1,
+				Aquatic = false,
+				Scale = 0.8
+			};
+			((Control)obj4).set_Location(new Point(p + 36 + 26, 0));
+			legends_Terrestrial2.Add(obj4);
+			((Control)_Legends_Terrestrial[0]).add_Click((EventHandler<MouseEventArgs>)Legend);
+			((Control)_Legends_Terrestrial[1]).add_Click((EventHandler<MouseEventArgs>)Legend);
+			SkillSelector_Control skillSelector_Control2 = new SkillSelector_Control();
+			((Control)skillSelector_Control2).set_Parent(((Control)this).get_Parent());
+			((Control)skillSelector_Control2).set_Visible(false);
+			((Control)skillSelector_Control2).set_ZIndex(((Control)this).get_ZIndex() + 3);
+			LegendSelector = skillSelector_Control2;
+			LegendSelector.SkillChanged += LegendSelector_SkillChanged;
 			SkillSelector.SkillChanged += OnSkillChanged;
 			Control.get_Input().get_Mouse().add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)OnGlobalClick);
+			BuildsManager.ModuleInstance.Selected_Template_Changed += ApplyBuild;
+		}
+
+		private void Control_Click(object sender, MouseEventArgs mouse)
+		{
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			Skill_Control control = (Skill_Control)sender;
+			if (!CanClick)
+			{
+				return;
+			}
+			if (!((Control)SkillSelector).get_Visible() || SkillSelector.currentObject != control)
+			{
+				((Control)SkillSelector).set_Visible(true);
+				SkillSelector.Skill_Control = control;
+				((Control)SkillSelector).set_Location(((Control)control).get_Location().Add(new Point(-2, ((Control)control).get_Height())));
+				List<API.Skill> Skills = new List<API.Skill>();
+				if (Template.Build.Profession != null)
+				{
+					if (Template.Build.Profession.Id == "Revenant")
+					{
+						API.Legend legend = (control.Aquatic ? Template.Build.Legends_Aquatic[0] : Template.Build.Legends_Terrestrial[0]);
+						if (legend != null && legend.Utilities != null)
+						{
+							switch (control.Slot)
+							{
+							case SkillSlots.Heal:
+								Skills.Add(legend?.Heal);
+								break;
+							case SkillSlots.Elite:
+								Skills.Add(legend?.Elite);
+								break;
+							default:
+								foreach (API.Skill iSkill2 in legend?.Utilities)
+								{
+									Skills.Add(iSkill2);
+								}
+								break;
+							}
+						}
+					}
+					else
+					{
+						foreach (API.Skill iSkill in (from e in Template.Build.Profession.Skills
+							orderby e.Specialization, (e.Categories.Count <= 0) ? "Unkown" : e.Categories[0]
+							select e).ToList())
+						{
+							if (iSkill.Specialization != 0 && Template.Build.SpecLines.Find((SpecLine e) => e.Specialization != null && e.Specialization.Id == iSkill.Specialization) == null)
+							{
+								continue;
+							}
+							switch (control.Slot)
+							{
+							case SkillSlots.Heal:
+								if (iSkill.Slot == API.skillSlot.Heal)
+								{
+									Skills.Add(iSkill);
+								}
+								break;
+							case SkillSlots.Elite:
+								if (iSkill.Slot == API.skillSlot.Elite)
+								{
+									Skills.Add(iSkill);
+								}
+								break;
+							default:
+								if (iSkill.Slot == API.skillSlot.Utility)
+								{
+									Skills.Add(iSkill);
+								}
+								break;
+							}
+						}
+					}
+				}
+				SkillSelector.Skills = Skills;
+				SkillSelector.Aquatic = control.Aquatic;
+				SkillSelector.currentObject = control;
+			}
+			else
+			{
+				((Control)SkillSelector).set_Visible(false);
+			}
+		}
+
+		protected override void OnClick(MouseEventArgs e)
+		{
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+			((Control)this).OnClick(e);
+			Rectangle rect0 = ClassExtensions.Scale(new Rectangle(new Point(36, 15), new Point(25, 25)), Scale);
+			Rectangle rect1 = ClassExtensions.Scale(new Rectangle(new Point(_Width - (_Skills_Aquatic.Count * (_SkillSize + 1) + 28) + 63, 15), new Point(25, 25)), Scale);
+			if (((Rectangle)(ref rect0)).Contains(((Control)this).get_RelativeMousePosition()) || ((Rectangle)(ref rect1)).Contains(((Control)this).get_RelativeMousePosition()))
+			{
+				Template.Build?.SwapLegends();
+				SetTemplate();
+			}
+		}
+
+		public override void DoUpdate(GameTime gameTime)
+		{
+			((Control)this).DoUpdate(gameTime);
+			if (!CanClick)
+			{
+				CanClick = true;
+			}
+		}
+
+		private void LegendSelector_SkillChanged(object sender, SkillChangedEvent e)
+		{
+			Skill_Control ctrl = e.Skill_Control;
+			API.Legend legend = Template.Build.Legends_Terrestrial[0];
+			if (ctrl == _Legends_Terrestrial[0])
+			{
+				Template.Build.Legends_Terrestrial[0] = Template.Profession.Legends.Find((API.Legend leg) => leg.Skill.Id == e.Skill.Id);
+				legend = Template.Build.Legends_Terrestrial[0];
+				if (legend != null)
+				{
+					Template.Build.Skills_Terrestrial[0] = legend.Heal;
+					Template.Build.Skills_Terrestrial[1] = legend.Utilities.Find((API.Skill skill) => skill.PaletteId == Template.Build.Skills_Terrestrial[1]?.PaletteId);
+					Template.Build.Skills_Terrestrial[2] = legend.Utilities.Find((API.Skill skill) => skill.PaletteId == Template.Build.Skills_Terrestrial[2]?.PaletteId);
+					Template.Build.Skills_Terrestrial[3] = legend.Utilities.Find((API.Skill skill) => skill.PaletteId == Template.Build.Skills_Terrestrial[3]?.PaletteId);
+					Template.Build.Skills_Terrestrial[4] = legend.Elite;
+				}
+			}
+			else if (ctrl == _Legends_Terrestrial[1])
+			{
+				Template.Build.Legends_Terrestrial[1] = Template.Profession.Legends.Find((API.Legend leg) => leg.Skill.Id == e.Skill.Id);
+				legend = Template.Build.Legends_Terrestrial[1];
+				if (legend != null)
+				{
+					Template.Build.InactiveSkills_Terrestrial[0] = legend.Heal;
+					Template.Build.InactiveSkills_Terrestrial[1] = legend.Utilities.Find((API.Skill skill) => skill.PaletteId == Template.Build.InactiveSkills_Terrestrial[1]?.PaletteId);
+					Template.Build.InactiveSkills_Terrestrial[2] = legend.Utilities.Find((API.Skill skill) => skill.PaletteId == Template.Build.InactiveSkills_Terrestrial[2]?.PaletteId);
+					Template.Build.InactiveSkills_Terrestrial[3] = legend.Utilities.Find((API.Skill skill) => skill.PaletteId == Template.Build.InactiveSkills_Terrestrial[3]?.PaletteId);
+					Template.Build.InactiveSkills_Terrestrial[4] = legend.Elite;
+				}
+			}
+			else if (ctrl == _Legends_Aquatic[0])
+			{
+				Template.Build.Legends_Aquatic[0] = Template.Profession.Legends.Find((API.Legend leg) => leg.Skill.Id == e.Skill.Id);
+				legend = Template.Build.Legends_Aquatic[0];
+				if (legend != null)
+				{
+					Template.Build.Skills_Aquatic[0] = legend.Heal;
+					Template.Build.Skills_Aquatic[1] = legend.Utilities.Find((API.Skill skill) => skill.PaletteId == Template.Build.Skills_Aquatic[1]?.PaletteId);
+					Template.Build.Skills_Aquatic[2] = legend.Utilities.Find((API.Skill skill) => skill.PaletteId == Template.Build.Skills_Aquatic[2]?.PaletteId);
+					Template.Build.Skills_Aquatic[3] = legend.Utilities.Find((API.Skill skill) => skill.PaletteId == Template.Build.Skills_Aquatic[3]?.PaletteId);
+					Template.Build.Skills_Aquatic[4] = legend.Elite;
+				}
+			}
+			else if (ctrl == _Legends_Aquatic[1])
+			{
+				Template.Build.Legends_Aquatic[1] = Template.Profession.Legends.Find((API.Legend leg) => leg.Skill.Id == e.Skill.Id);
+				legend = Template.Build.Legends_Aquatic[1];
+				if (legend != null)
+				{
+					Template.Build.InactiveSkills_Aquatic[0] = legend.Heal;
+					Template.Build.InactiveSkills_Aquatic[1] = legend.Utilities.Find((API.Skill skill) => skill.PaletteId == Template.Build.InactiveSkills_Aquatic[1]?.PaletteId);
+					Template.Build.InactiveSkills_Aquatic[2] = legend.Utilities.Find((API.Skill skill) => skill.PaletteId == Template.Build.InactiveSkills_Aquatic[2]?.PaletteId);
+					Template.Build.InactiveSkills_Aquatic[3] = legend.Utilities.Find((API.Skill skill) => skill.PaletteId == Template.Build.InactiveSkills_Aquatic[3]?.PaletteId);
+					Template.Build.InactiveSkills_Aquatic[4] = legend.Elite;
+				}
+			}
+			ctrl.Skill = e.Skill;
+			SetTemplate();
+			Template.SetChanged();
+			((Control)LegendSelector).set_Visible(false);
+			CanClick = false;
+		}
+
+		private void Legend(object sender, MouseEventArgs e)
+		{
+			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
+			Skill_Control ctrl = (Skill_Control)sender;
+			if (!(Template.Profession?.Id == "Revenant"))
+			{
+				return;
+			}
+			List<API.Skill> legends = new List<API.Skill>();
+			foreach (API.Legend legend in Template.Profession.Legends)
+			{
+				if (legend.Specialization == 0 || Template.Specialization?.Id == legend.Specialization)
+				{
+					legends.Add(legend.Skill);
+				}
+			}
+			LegendSelector.Skills = legends;
+			((Control)LegendSelector).set_Visible(true);
+			LegendSelector.Aquatic = false;
+			LegendSelector.currentObject = ctrl;
+			LegendSelector.Skill_Control = ctrl;
+			((Control)LegendSelector).set_Location(((Control)ctrl).get_Location().Add(new Point(-2, (int)((double)((Control)ctrl).get_Height() * ctrl.Scale))));
+			CanClick = false;
 		}
 
 		public void ApplyBuild(object sender, EventArgs e)
@@ -234,21 +434,21 @@ namespace Kenedia.Modules.BuildsManager
 			}
 			else
 			{
-				foreach (Skill_Control skill_Control in _Skills_Terrestial)
+				foreach (Skill_Control skill_Control in _Skills_Terrestrial)
 				{
 					if (skill_Control.Skill == e.Skill)
 					{
 						skill_Control.Skill = null;
 					}
 				}
-				for (int i = 0; i < Template.Build.Skills_Terrestial.Count; i++)
+				for (int i = 0; i < Template.Build.Skills_Terrestrial.Count; i++)
 				{
-					if (Template.Build.Skills_Terrestial[i] == e.Skill)
+					if (Template.Build.Skills_Terrestrial[i] == e.Skill)
 					{
-						Template.Build.Skills_Terrestial[i] = null;
+						Template.Build.Skills_Terrestrial[i] = null;
 					}
 				}
-				Template.Build.Skills_Terrestial[(int)e.Skill_Control.Slot] = e.Skill;
+				Template.Build.Skills_Terrestrial[(int)e.Skill_Control.Slot] = e.Skill;
 				e.Skill_Control.Skill = e.Skill;
 			}
 			Template.SetChanged();
@@ -256,56 +456,128 @@ namespace Kenedia.Modules.BuildsManager
 
 		private void OnGlobalClick(object sender, MouseEventArgs m)
 		{
-			if (!((Control)this).get_MouseOver() && !((Control)SkillSelector).get_MouseOver())
+			if (!((Control)SkillSelector).get_MouseOver())
 			{
 				((Control)SkillSelector).Hide();
+			}
+			if (!((Control)LegendSelector).get_MouseOver())
+			{
+				((Control)LegendSelector).Hide();
 			}
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _AquaTexture, ClassExtensions.Scale(new Rectangle(new Point(0, 0), new Point(25, 25)), Scale), (Rectangle?)_AquaTexture.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _TerrestialTexture, ClassExtensions.Scale(new Rectangle(new Point(_Width - (_Skills_Aquatic.Count * (_SkillSize + 1) + 28), 0), new Point(25, 25)), Scale), (Rectangle?)_TerrestialTexture.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0158: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0168: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0189: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018f: Unknown result type (might be due to invalid IL or missing references)
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _AquaTexture, ClassExtensions.Scale(new Rectangle(new Point(0, 50), new Point(25, 25)), Scale), (Rectangle?)_AquaTexture.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+			if (ShowProfessionSkills)
+			{
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _SwapTexture, ClassExtensions.Scale(new Rectangle(new Point(63, 15), new Point(25, 25)), Scale), (Rectangle?)_SwapTexture.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+			}
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _TerrestrialTexture, ClassExtensions.Scale(new Rectangle(new Point(_Width - (_Skills_Aquatic.Count * (_SkillSize + 1) + 28), 50), new Point(25, 25)), Scale), (Rectangle?)_TerrestrialTexture.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+			if (ShowProfessionSkills)
+			{
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _SwapTexture, ClassExtensions.Scale(new Rectangle(new Point(_Width - (_Skills_Aquatic.Count * (_SkillSize + 1) + 28) + 63, 15), new Point(25, 25)), Scale), (Rectangle?)_SwapTexture.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+			}
 		}
 
 		protected override void DisposeControl()
 		{
 			BuildsManager.ModuleInstance.Selected_Template_Changed -= ApplyBuild;
+			LegendSelector.SkillChanged -= LegendSelector_SkillChanged;
+			SkillSelector.SkillChanged -= OnSkillChanged;
+			Control.get_Input().get_Mouse().remove_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)OnGlobalClick);
+			((Control)_Legends_Terrestrial[0]).remove_Click((EventHandler<MouseEventArgs>)Legend);
+			((Control)_Legends_Terrestrial[1]).remove_Click((EventHandler<MouseEventArgs>)Legend);
+			((Control)_Legends_Aquatic[0]).remove_Click((EventHandler<MouseEventArgs>)Legend);
+			((Control)_Legends_Aquatic[1]).remove_Click((EventHandler<MouseEventArgs>)Legend);
+			foreach (Skill_Control item in _Skills_Terrestrial)
+			{
+				((Control)item).remove_Click((EventHandler<MouseEventArgs>)Control_Click);
+				((Control)item).Dispose();
+			}
+			foreach (Skill_Control item2 in _Skills_Aquatic)
+			{
+				((Control)item2).remove_Click((EventHandler<MouseEventArgs>)Control_Click);
+				((Control)item2).Dispose();
+			}
+			((Control)CustomTooltip).Dispose();
 			((Control)this).DisposeControl();
 		}
 
 		public void SetTemplate()
 		{
-			_ = BuildsManager.ModuleInstance.Selected_Template;
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
 			int i = 0;
+			ShowProfessionSkills = Template.Profession?.Id == "Revenant";
+			if (!ShowProfessionSkills)
+			{
+				((Control)this).set_Location(_OGLocation.Add(new Point(0, -16)));
+			}
+			else
+			{
+				((Control)this).set_Location(_OGLocation);
+			}
 			i = 0;
 			foreach (Skill_Control item in _Skills_Aquatic)
 			{
 				item.Skill = Template.Build.Skills_Aquatic[i];
+				((Control)item).set_Location(new Point(((Control)item).get_Location().X, ShowProfessionSkills ? 51 : 30));
 				i++;
 			}
 			i = 0;
-			foreach (Skill_Control item2 in _Skills_Terrestial)
+			foreach (Skill_Control item2 in _Skills_Terrestrial)
 			{
-				item2.Skill = Template.Build.Skills_Terrestial[i];
+				item2.Skill = Template.Build.Skills_Terrestrial[i];
+				((Control)item2).set_Location(new Point(((Control)item2).get_Location().X, ShowProfessionSkills ? 51 : 30));
 				i++;
 			}
+			_Legends_Terrestrial[0].Skill = Template.Build.Legends_Terrestrial[0]?.Skill;
+			_Legends_Terrestrial[1].Skill = Template.Build.Legends_Terrestrial[1]?.Skill;
+			_Legends_Aquatic[0].Skill = Template.Build.Legends_Aquatic[0]?.Skill;
+			_Legends_Aquatic[1].Skill = Template.Build.Legends_Aquatic[1]?.Skill;
+			((Control)_Legends_Terrestrial[0]).set_Visible(ShowProfessionSkills);
+			((Control)_Legends_Terrestrial[1]).set_Visible(ShowProfessionSkills);
+			((Control)_Legends_Aquatic[0]).set_Visible(ShowProfessionSkills);
+			((Control)_Legends_Aquatic[1]).set_Visible(ShowProfessionSkills);
 		}
 	}
 }

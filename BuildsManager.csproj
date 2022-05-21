@@ -9,7 +9,9 @@
     <LangVersion>Preview</LangVersion>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup />
+  <PropertyGroup>
+    <RootNamespace />
+  </PropertyGroup>
   <ItemGroup />
   <ItemGroup>
     <Reference Include="Blish HUD" />
@@ -17,9 +19,9 @@
     <Reference Include="MonoGame.Framework" />
     <Reference Include="Gw2Sharp" />
     <Reference Include="MonoGame.Extended" />
+    <Reference Include="Newtonsoft.Json" />
     <Reference Include="SemVer" />
     <Reference Include="System.Core" />
-    <Reference Include="Newtonsoft.Json" />
     <Reference Include="AsyncClipboardService" />
   </ItemGroup>
 </Project>
