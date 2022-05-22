@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls.Extern;
@@ -19,13 +20,17 @@ namespace Manlaan.Mounts
 	{
 		private readonly ContentsManager contentsManager;
 
+		private static SemaphoreSlim keybindSemaphore = new SemaphoreSlim(1, 1);
+
 		private readonly Dictionary<string, Texture2D> _textureCache = new Dictionary<string, Texture2D>();
+
+		private static readonly Logger Logger = Logger.GetLogger<Helper>();
 
 		private MapType[] warclawOnlyMaps;
 
 		public Helper(ContentsManager contentsManager)
 		{
-			MapType[] array = new MapType[8];
+			MapType[] array = new MapType[6];
 			RuntimeHelpers.InitializeArray(array, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);
 			warclawOnlyMaps = (MapType[])(object)array;
 			base._002Ector();
@@ -103,40 +108,59 @@ namespace Manlaan.Mounts
 				select m).FirstOrDefault();
 		}
 
+		public bool IsKeybindBeingTriggered()
+		{
+			return keybindSemaphore.CurrentCount != 1;
+		}
+
 		public async Task TriggerKeybind(SettingEntry<KeyBinding> keybindingSetting)
 		{
-			if ((int)keybindingSetting.get_Value().get_ModifierKeys() != 0)
+			_ = 1;
+			try
 			{
-				if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)2))
+				await keybindSemaphore.WaitAsync();
+				Logger.Debug("TriggerKeybind entered");
+				if ((int)keybindingSetting.get_Value().get_ModifierKeys() != 0)
 				{
-					Keyboard.Press((VirtualKeyShort)18, true);
+					Logger.Debug($"TriggerKeybind press modifiers {keybindingSetting.get_Value().get_ModifierKeys()}");
+					if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)2))
+					{
+						Keyboard.Press((VirtualKeyShort)18, true);
+					}
+					if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)1))
+					{
+						Keyboard.Press((VirtualKeyShort)17, true);
+					}
+					if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)4))
+					{
+						Keyboard.Press((VirtualKeyShort)16, true);
+					}
 				}
-				if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)1))
+				Logger.Debug($"TriggerKeybind press PrimaryKey {keybindingSetting.get_Value().get_PrimaryKey()}");
+				Keyboard.Press(ToVirtualKey(keybindingSetting.get_Value().get_PrimaryKey()), true);
+				await Task.Delay(50);
+				Logger.Debug($"TriggerKeybind release PrimaryKey {keybindingSetting.get_Value().get_PrimaryKey()}");
+				Keyboard.Release(ToVirtualKey(keybindingSetting.get_Value().get_PrimaryKey()), true);
+				if ((int)keybindingSetting.get_Value().get_ModifierKeys() != 0)
 				{
-					Keyboard.Press((VirtualKeyShort)17, true);
-				}
-				if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)4))
-				{
-					Keyboard.Press((VirtualKeyShort)16, true);
+					Logger.Debug($"TriggerKeybind release modifiers {keybindingSetting.get_Value().get_ModifierKeys()}");
+					if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)4))
+					{
+						Keyboard.Release((VirtualKeyShort)16, true);
+					}
+					if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)1))
+					{
+						Keyboard.Release((VirtualKeyShort)17, true);
+					}
+					if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)2))
+					{
+						Keyboard.Release((VirtualKeyShort)18, true);
+					}
 				}
 			}
-			Keyboard.Press(ToVirtualKey(keybindingSetting.get_Value().get_PrimaryKey()), true);
-			await Task.Delay(50);
-			Keyboard.Release(ToVirtualKey(keybindingSetting.get_Value().get_PrimaryKey()), true);
-			if ((int)keybindingSetting.get_Value().get_ModifierKeys() != 0)
+			finally
 			{
-				if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)4))
-				{
-					Keyboard.Release((VirtualKeyShort)16, true);
-				}
-				if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)1))
-				{
-					Keyboard.Release((VirtualKeyShort)17, true);
-				}
-				if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)2))
-				{
-					Keyboard.Release((VirtualKeyShort)18, true);
-				}
+				keybindSemaphore.Release();
 			}
 		}
 

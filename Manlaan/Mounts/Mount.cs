@@ -75,7 +75,12 @@ namespace Manlaan.Mounts
 			KeybindingSetting = settingCollection.DefineSetting<KeyBinding>("Mount" + name + "Binding", new KeyBinding((Keys)0), (Func<string>)(() => displayName + " Binding"), (Func<string>)(() => ""));
 		}
 
-		public async Task DoHotKey()
+		public async Task DoUnmountAction()
+		{
+			await _helper.TriggerKeybind(KeybindingSetting);
+		}
+
+		public async Task DoMountAction()
 		{
 			if (GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat())
 			{
@@ -110,7 +115,7 @@ namespace Manlaan.Mounts
 			CornerIcon = val;
 			((Control)CornerIcon).add_Click((EventHandler<MouseEventArgs>)async delegate
 			{
-				await DoHotKey();
+				await DoMountAction();
 			});
 		}
 

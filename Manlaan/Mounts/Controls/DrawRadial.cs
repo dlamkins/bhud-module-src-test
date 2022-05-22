@@ -143,7 +143,7 @@ namespace Manlaan.Mounts.Controls
 
 		public async Task TriggerSelectedMountAsync()
 		{
-			await (SelectedMount?.Mount.DoHotKey() ?? Task.CompletedTask);
+			await (SelectedMount?.Mount.DoMountAction() ?? Task.CompletedTask);
 		}
 
 		private async Task HandleShown(object sender, EventArgs e)

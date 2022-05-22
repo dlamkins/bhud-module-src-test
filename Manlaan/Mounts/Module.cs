@@ -45,8 +45,6 @@ namespace Manlaan.Mounts
 
 		public static SettingEntry<string> _settingDefaultWaterMountChoice;
 
-		public static SettingEntry<bool> _settingMountBlockKeybindFromGame;
-
 		public static SettingEntry<KeyBinding> _settingDefaultMountBinding;
 
 		public static SettingEntry<bool> _settingDisplayMountQueueing;
@@ -153,11 +151,11 @@ namespace Manlaan.Mounts
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014a: Expected O, but got Unknown
-			//IL_0500: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0548: Expected O, but got Unknown
-			//IL_069c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fb: Expected O, but got Unknown
+			//IL_04a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e9: Expected O, but got Unknown
+			//IL_063d: Unknown result type (might be due to invalid IL or missing references)
 			_mounts = new Collection<Mount>
 			{
 				new Raptor(settings, _helper),
@@ -170,10 +168,8 @@ namespace Manlaan.Mounts
 				new Skyscale(settings, _helper),
 				new SiegeTurtle(settings, _helper)
 			};
-			_settingMountBlockKeybindFromGame = settings.DefineSetting<bool>("MountBlockKeybindFromGame", false, (Func<string>)(() => Strings.Setting_MountBlockKeybindFromGame), (Func<string>)(() => ""));
 			_settingDefaultMountBinding = settings.DefineSetting<KeyBinding>("DefaultMountBinding", new KeyBinding((Keys)0), (Func<string>)(() => Strings.Setting_DefaultMountBinding), (Func<string>)(() => ""));
 			_settingDefaultMountBinding.get_Value().set_Enabled(true);
-			_settingDefaultMountBinding.get_Value().set_BlockSequenceFromGw2(true);
 			_settingDefaultMountBinding.get_Value().add_Activated((EventHandler<EventArgs>)async delegate
 			{
 				await DoDefaultMountActionAsync();
@@ -400,7 +396,7 @@ namespace Manlaan.Mounts
 				((Control)val2).set_BasicTooltipText(mount.DisplayName);
 				((Control)val2).add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)async delegate
 				{
-					await mount.DoHotKey();
+					await mount.DoMountAction();
 				});
 				if (_settingOrientation.get_Value().Equals("Horizontal"))
 				{
@@ -494,18 +490,30 @@ namespace Manlaan.Mounts
 
 		private async Task DoDefaultMountActionAsync()
 		{
+			if (_helper.IsKeybindBeingTriggered())
+			{
+				Logger.Debug("DoDefaultMountActionAsync IsKeybindBeingTriggered");
+				return;
+			}
 			Logger.Debug("DoDefaultMountActionAsync entered");
 			if ((int)GameService.Gw2Mumble.get_PlayerCharacter().get_CurrentMount() != 0)
 			{
-				await (_availableOrderedMounts.FirstOrDefault()?.DoHotKey() ?? Task.CompletedTask);
+				await (_availableOrderedMounts.FirstOrDefault()?.DoUnmountAction() ?? Task.CompletedTask);
 				Logger.Debug("DoDefaultMountActionAsync dismounted");
 				return;
 			}
 			Mount instantMount = _helper.GetInstantMount();
 			if (instantMount != null)
 			{
-				await instantMount.DoHotKey();
+				await instantMount.DoMountAction();
 				Logger.Debug("DoDefaultMountActionAsync instantmount");
+				return;
+			}
+			Mount defaultMount = _helper.GetDefaultMount();
+			if (defaultMount != null && GameService.Input.get_Mouse().get_CameraDragging())
+			{
+				await (defaultMount?.DoMountAction() ?? Task.CompletedTask);
+				Logger.Debug("DoDefaultMountActionAsync CameraDragging defaultmount");
 				return;
 			}
 			string value = _settingDefaultMountBehaviour.get_Value();
@@ -514,13 +522,13 @@ namespace Manlaan.Mounts
 				if (value == "Radial")
 				{
 					((Control)_radial).Show();
-					Logger.Debug("DoDefaultMountActionAsync radial");
+					Logger.Debug("DoDefaultMountActionAsync DefaultMountBehaviour radial");
 				}
 			}
 			else
 			{
-				await (_helper.GetDefaultMount()?.DoHotKey() ?? Task.CompletedTask);
-				Logger.Debug("DoDefaultMountActionAsync defaultmount");
+				await (defaultMount?.DoMountAction() ?? Task.CompletedTask);
+				Logger.Debug("DoDefaultMountActionAsync DefaultMountBehaviour defaultmount");
 			}
 		}
 
@@ -533,7 +541,7 @@ namespace Manlaan.Mounts
 			await ((from m in _mounts
 				where m.QueuedTimestamp.HasValue
 				orderby m.QueuedTimestamp descending
-				select m).FirstOrDefault()?.DoHotKey() ?? Task.CompletedTask);
+				select m).FirstOrDefault()?.DoMountAction() ?? Task.CompletedTask);
 			foreach (Mount mount in _mounts)
 			{
 				mount.QueuedTimestamp = null;
