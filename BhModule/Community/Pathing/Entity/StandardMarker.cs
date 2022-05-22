@@ -837,57 +837,65 @@ namespace BhModule.Community.Pathing.Entity
 
 		private void Populate_Behaviors(TmfLib.Prototype.AttributeCollection collection, IPackResourceManager resourceManager)
 		{
-			if (collection.TryGetSubset("festival", out var attributes15))
+			if (collection.TryGetSubset("festival", out var attributes17))
 			{
-				AddBehavior(FestivalFilter.BuildFromAttributes(attributes15));
+				AddBehavior(FestivalFilter.BuildFromAttributes(attributes17));
 			}
-			if (collection.TryGetSubset("mount", out var attributes14))
+			if (collection.TryGetSubset("mount", out var attributes16))
 			{
-				AddBehavior(MountFilter.BuildFromAttributes(attributes14));
+				AddBehavior(MountFilter.BuildFromAttributes(attributes16));
 			}
-			if (collection.TryGetSubset("profession", out var attributes13))
+			if (collection.TryGetSubset("profession", out var attributes15))
 			{
-				AddBehavior(ProfessionFilter.BuildFromAttributes(attributes13));
+				AddBehavior(ProfessionFilter.BuildFromAttributes(attributes15));
 			}
-			if (collection.TryGetSubset("race", out var attributes12))
+			if (collection.TryGetSubset("race", out var attributes14))
 			{
-				AddBehavior(RaceFilter.BuildFromAttributes(attributes12));
+				AddBehavior(RaceFilter.BuildFromAttributes(attributes14));
 			}
-			if (collection.TryGetSubset("specialization", out var attributes11))
+			if (collection.TryGetSubset("specialization", out var attributes13))
 			{
-				AddBehavior(SpecializationFilter.BuildFromAttributes(attributes11));
+				AddBehavior(SpecializationFilter.BuildFromAttributes(attributes13));
 			}
-			if (collection.TryGetSubset("maptype", out var attributes10))
+			if (collection.TryGetSubset("maptype", out var attributes12))
 			{
-				AddBehavior(MapTypeFilter.BuildFromAttributes(attributes10));
+				AddBehavior(MapTypeFilter.BuildFromAttributes(attributes12));
 			}
-			if (collection.TryGetSubset("schedule", out var attributes9))
+			if (collection.TryGetSubset("schedule", out var attributes11))
 			{
-				AddBehavior(ScheduleFilter.BuildFromAttributes(attributes9));
+				AddBehavior(ScheduleFilter.BuildFromAttributes(attributes11));
 			}
-			if (collection.TryGetSubset("behavior", out var attributes8))
+			if (collection.TryGetSubset("raid", out var attributes10))
 			{
-				AddBehavior(StandardBehaviorFilter.BuildFromAttributes(attributes8, this, _packState));
+				AddBehavior(RaidFilter.BuildFromAttributes(attributes10, this, _packState));
 			}
-			if (collection.TryGetSubset("achievement", out var attributes7))
+			if (collection.TryGetSubset("behavior", out var attributes9))
 			{
-				AddBehavior(AchievementFilter.BuildFromAttributes(attributes7, this, _packState));
+				AddBehavior(StandardBehaviorFilter.BuildFromAttributes(attributes9, this, _packState));
 			}
-			if (collection.TryGetSubset("info", out var attributes6))
+			if (collection.TryGetSubset("achievement", out var attributes8))
 			{
-				AddBehavior(InfoModifier.BuildFromAttributes(attributes6, this, _packState));
+				AddBehavior(AchievementFilter.BuildFromAttributes(attributes8, this, _packState));
 			}
-			if (collection.TryGetSubset("bounce", out var attributes5))
+			if (collection.TryGetSubset("info", out var attributes7))
 			{
-				AddBehavior(BounceModifier.BuildFromAttributes(attributes5, this, _packState));
+				AddBehavior(InfoModifier.BuildFromAttributes(attributes7, this, _packState));
 			}
-			if (collection.TryGetSubset("copy", out var attributes4))
+			if (collection.TryGetSubset("bounce", out var attributes6))
 			{
-				AddBehavior(CopyModifier.BuildFromAttributes(attributes4, this, _packState));
+				AddBehavior(BounceModifier.BuildFromAttributes(attributes6, this, _packState));
 			}
-			if (collection.TryGetSubset("toggle", out var attributes3))
+			if (collection.TryGetSubset("copy", out var attributes5))
 			{
-				AddBehavior(ToggleModifier.BuildFromAttributes(attributes3, this, _packState));
+				AddBehavior(CopyModifier.BuildFromAttributes(attributes5, this, _packState));
+			}
+			if (collection.TryGetSubset("toggle", out var attributes4))
+			{
+				AddBehavior(ToggleModifier.BuildFromAttributes(attributes4, this, _packState));
+			}
+			if (collection.TryGetSubset("resetguid", out var attributes3))
+			{
+				AddBehavior(ResetGuidModifier.BuildFromAttributes(attributes3, this, _packState));
 			}
 			if (collection.TryGetSubset("show", out var attributes2))
 			{
@@ -930,7 +938,12 @@ namespace BhModule.Community.Pathing.Entity
 		{
 			foreach (IBehavior behavior in base.Behaviors)
 			{
-				(behavior as ICanInteract)?.Interact(autoTriggered);
+				ICanInteract interactable = behavior as ICanInteract;
+				if (interactable != null)
+				{
+					Logger.Debug((autoTriggered ? "Automatically" : "Manually") + " interacted with marker '" + Guid.ToBase64String() + "': " + behavior.GetType().Name);
+					interactable.Interact(autoTriggered);
+				}
 			}
 		}
 
@@ -963,6 +976,7 @@ namespace BhModule.Community.Pathing.Entity
 			Populate_MinMaxSize(collection, resourceManager);
 			Populate_IconSize(collection, resourceManager);
 			Populate_IconFile(collection, resourceManager);
+			Populate_Title(collection, resourceManager);
 			Populate_Tint(collection, resourceManager);
 			Populate_Rotation(collection, resourceManager);
 			Populate_HeightOffset(collection, resourceManager);

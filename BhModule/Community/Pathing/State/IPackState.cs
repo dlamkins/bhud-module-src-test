@@ -20,6 +20,8 @@ namespace BhModule.Community.Pathing.State
 
 		AchievementStates AchievementStates { get; }
 
+		RaidStates RaidStates { get; }
+
 		CategoryStates CategoryStates { get; }
 
 		MapStates MapStates { get; }

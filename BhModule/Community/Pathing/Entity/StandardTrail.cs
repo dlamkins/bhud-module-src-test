@@ -566,33 +566,37 @@ namespace BhModule.Community.Pathing.Entity
 
 		private void Populate_Behaviors(AttributeCollection collection, IPackResourceManager resourceManager)
 		{
-			if (collection.TryGetSubset("festival", out var attributes8))
+			if (collection.TryGetSubset("festival", out var attributes9))
 			{
-				AddBehavior(FestivalFilter.BuildFromAttributes(attributes8));
+				AddBehavior(FestivalFilter.BuildFromAttributes(attributes9));
 			}
-			if (collection.TryGetSubset("mount", out var attributes7))
+			if (collection.TryGetSubset("mount", out var attributes8))
 			{
-				AddBehavior(MountFilter.BuildFromAttributes(attributes7));
+				AddBehavior(MountFilter.BuildFromAttributes(attributes8));
 			}
-			if (collection.TryGetSubset("profession", out var attributes6))
+			if (collection.TryGetSubset("profession", out var attributes7))
 			{
-				AddBehavior(ProfessionFilter.BuildFromAttributes(attributes6));
+				AddBehavior(ProfessionFilter.BuildFromAttributes(attributes7));
 			}
-			if (collection.TryGetSubset("race", out var attributes5))
+			if (collection.TryGetSubset("race", out var attributes6))
 			{
-				AddBehavior(RaceFilter.BuildFromAttributes(attributes5));
+				AddBehavior(RaceFilter.BuildFromAttributes(attributes6));
 			}
-			if (collection.TryGetSubset("specialization", out var attributes4))
+			if (collection.TryGetSubset("specialization", out var attributes5))
 			{
-				AddBehavior(SpecializationFilter.BuildFromAttributes(attributes4));
+				AddBehavior(SpecializationFilter.BuildFromAttributes(attributes5));
 			}
-			if (collection.TryGetSubset("maptype", out var attributes3))
+			if (collection.TryGetSubset("maptype", out var attributes4))
 			{
-				AddBehavior(MapTypeFilter.BuildFromAttributes(attributes3));
+				AddBehavior(MapTypeFilter.BuildFromAttributes(attributes4));
 			}
-			if (collection.TryGetSubset("schedule", out var attributes2))
+			if (collection.TryGetSubset("schedule", out var attributes3))
 			{
-				AddBehavior(ScheduleFilter.BuildFromAttributes(attributes2));
+				AddBehavior(ScheduleFilter.BuildFromAttributes(attributes3));
+			}
+			if (collection.TryGetSubset("raid", out var attributes2))
+			{
+				AddBehavior(RaidFilter.BuildFromAttributes(attributes2, this, _packState));
 			}
 			if (collection.TryGetSubset("achievement", out var attributes))
 			{

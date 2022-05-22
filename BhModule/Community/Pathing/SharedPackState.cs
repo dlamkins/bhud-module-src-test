@@ -41,6 +41,8 @@ namespace BhModule.Community.Pathing
 
 		public AchievementStates AchievementStates { get; private set; }
 
+		public RaidStates RaidStates { get; private set; }
+
 		public CategoryStates CategoryStates { get; private set; }
 
 		public MapStates MapStates { get; private set; }
@@ -84,19 +86,21 @@ namespace BhModule.Community.Pathing
 			ManagedState managedState = await categoryStates2.Start();
 			AchievementStates achievementStates2 = (AchievementStates = new AchievementStates(this));
 			ManagedState managedState2 = await achievementStates2.Start();
+			RaidStates raidStates2 = (RaidStates = new RaidStates(this));
+			ManagedState managedState3 = await raidStates2.Start();
 			BehaviorStates behaviorStates2 = (BehaviorStates = new BehaviorStates(this));
-			ManagedState managedState3 = await behaviorStates2.Start();
+			ManagedState managedState4 = await behaviorStates2.Start();
 			MapStates mapStates2 = (MapStates = new MapStates(this));
-			ManagedState managedState4 = await mapStates2.Start();
+			ManagedState managedState5 = await mapStates2.Start();
 			UserResourceStates userResourceStates2 = (UserResourceStates = new UserResourceStates(this));
-			ManagedState managedState5 = await userResourceStates2.Start();
+			ManagedState managedState6 = await userResourceStates2.Start();
 			UiStates uiStates2 = (UiStates = new UiStates(this));
-			ManagedState managedState6 = await uiStates2.Start();
+			ManagedState managedState7 = await uiStates2.Start();
 			EditorStates editorStates2 = (EditorStates = new EditorStates(this));
-			ManagedState managedState7 = await editorStates2.Start();
+			ManagedState managedState8 = await editorStates2.Start();
 			CachedMumbleStates cachedMumbleStates2 = (CachedMumbleStates = new CachedMumbleStates(this));
-			ManagedState managedState8 = await cachedMumbleStates2.Start();
-			_managedStates = new ManagedState[8] { managedState, managedState2, managedState3, managedState4, managedState5, managedState6, managedState7, managedState8 };
+			ManagedState managedState9 = await cachedMumbleStates2.Start();
+			_managedStates = new ManagedState[9] { managedState, managedState2, managedState3, managedState4, managedState5, managedState6, managedState7, managedState8, managedState9 };
 			_initialized = true;
 		}
 

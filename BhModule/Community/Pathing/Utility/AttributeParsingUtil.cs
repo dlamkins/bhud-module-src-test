@@ -96,7 +96,8 @@ namespace BhModule.Community.Pathing.Utility
 
 		public static IEnumerable<string> GetValueAsStrings(this IAttribute attribute)
 		{
-			return attribute.SplitAttributeValue();
+			return from val in attribute.SplitAttributeValue()
+				select val.Trim();
 		}
 
 		public static int GetValueAsInt(this IAttribute attribute, int @default = 0)

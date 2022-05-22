@@ -127,15 +127,17 @@ namespace BhModule.Community.Pathing
 			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00bd: Expected O, but got Unknown
 			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f6: Expected O, but got Unknown
-			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0130: Expected O, but got Unknown
-			//IL_0160: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016a: Expected O, but got Unknown
-			//IL_019a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a4: Expected O, but got Unknown
-			//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f1: Expected O, but got Unknown
+			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0113: Expected O, but got Unknown
+			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014d: Expected O, but got Unknown
+			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0187: Expected O, but got Unknown
+			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c1: Expected O, but got Unknown
+			//IL_0204: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020e: Expected O, but got Unknown
 			CornerIcon val = new CornerIcon();
 			val.set_IconName(Strings.General_UiName);
 			val.set_Icon(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\pathing-icon.png")));
@@ -147,6 +149,8 @@ namespace BhModule.Community.Pathing
 			((Control)val2).set_Location(new Point(100, 100));
 			((Control)val2).set_ClipsBounds(Program.get_OverlayVersion() == new Version(0, 11, 2, (string)null, (string)null) && GameService.Graphics.GetDpiScaleRatio() != 1f);
 			((WindowBase2)val2).set_Emblem(ContentsManager.GetTexture("png\\controls\\1615829.png"));
+			((WindowBase2)val2).set_Id(((Module)this).get_Namespace() + "_SettingsWindow");
+			((WindowBase2)val2).set_SavesPosition(true);
 			_settingsWindow = val2;
 			_packSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156740+155150.png")), (Func<IView>)(() => (IView)new SettingsView(ModuleSettings.PackSettings, -1)), Strings.Window_MainSettingsTab, (int?)null);
 			_mapSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\157123+155150.png")), (Func<IView>)(() => (IView)new SettingsView(ModuleSettings.MapSettings, -1)), Strings.Window_MapSettingsTab, (int?)null);
