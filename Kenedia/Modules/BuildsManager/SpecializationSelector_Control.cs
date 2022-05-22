@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
@@ -111,14 +112,14 @@ namespace Kenedia.Modules.BuildsManager
 			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)((Control)this).get_Parent(), Textures.get_Pixel(), bounds.Add(((Control)this).get_Location()), (Rectangle?)bounds, new Color(0, 0, 0, 205), 0f, Vector2.get_Zero(), (SpriteEffects)0);
 			if (Template.Build.Profession == null)
 			{
@@ -137,7 +138,7 @@ namespace Kenedia.Modules.BuildsManager
 					{
 						text = spec.Name;
 					}
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)((Control)this).get_Parent(), spec.Icon.Texture, rect.Add(((Control)this).get_Location()), (Rectangle?)spec.Icon.Texture.get_Bounds(), (Specialization == spec || ((Rectangle)(ref rect)).Contains(((Control)this).get_RelativeMousePosition())) ? Color.get_White() : Color.get_Gray(), 0f, Vector2.get_Zero(), (SpriteEffects)0);
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)((Control)this).get_Parent(), AsyncTexture2D.op_Implicit(spec.Icon._AsyncTexture), rect.Add(((Control)this).get_Location()), (Rectangle?)spec.Icon._AsyncTexture.get_Texture().get_Bounds(), (Specialization == spec || ((Rectangle)(ref rect)).Contains(((Control)this).get_RelativeMousePosition())) ? Color.get_White() : Color.get_Gray(), 0f, Vector2.get_Zero(), (SpriteEffects)0);
 					i++;
 				}
 			}

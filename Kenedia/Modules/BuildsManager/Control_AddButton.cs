@@ -35,14 +35,11 @@ namespace Kenedia.Modules.BuildsManager
 		public Control_AddButton()
 			: this()
 		{
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Expected O, but got Unknown
 			Texture = BuildsManager.TextureManager.getControlTexture(_Controls.Add);
 			TextureHovered = BuildsManager.TextureManager.getControlTexture(_Controls.Add_Hovered);
 			_EmptyTraitLine = Texture2DExtension.GetRegion(BuildsManager.TextureManager.getControlTexture(_Controls.PlaceHolder_Traitline), 0, 0, 647, 136);
 			_Template_Border = BuildsManager.TextureManager.getControlTexture(_Controls.Template_Border);
-			ContentService cnt = new ContentService();
-			Font = cnt.GetFont((FontFace)0, (FontSize)16, (FontStyle)0);
+			Font = GameService.Content.get_DefaultFont16();
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)

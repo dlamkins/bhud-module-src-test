@@ -18,8 +18,8 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="Gw2Sharp" />
-    <Reference Include="MonoGame.Extended" />
     <Reference Include="Newtonsoft.Json" />
+    <Reference Include="MonoGame.Extended" />
     <Reference Include="SemVer" />
     <Reference Include="System.Core" />
     <Reference Include="AsyncClipboardService" />

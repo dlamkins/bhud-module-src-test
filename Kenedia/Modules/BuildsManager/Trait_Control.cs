@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
@@ -186,20 +187,20 @@ namespace Kenedia.Modules.BuildsManager
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
 			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
 			if (Template != null)
 			{
 				_ = Bounds;
 				API.Trait trait = ((TraitType != API.traitType.Major) ? Template.Build.SpecLines[SpecIndex].Specialization?.MinorTraits[TraitIndex] : Template.Build.SpecLines[SpecIndex].Specialization?.MajorTraits[TraitIndex]);
 				if (trait != null)
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, trait.Icon.Texture, Bounds, (Rectangle?)trait.Icon.Texture.get_Bounds(), Selected ? Color.get_White() : (((Control)this).get_MouseOver() ? Color.get_LightGray() : Color.get_Gray()), 0f, default(Vector2), (SpriteEffects)0);
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(trait.Icon._AsyncTexture), Bounds, (Rectangle?)trait.Icon._AsyncTexture.get_Texture().get_Bounds(), Selected ? Color.get_White() : (((Control)this).get_MouseOver() ? Color.get_LightGray() : Color.get_Gray()), 0f, default(Vector2), (SpriteEffects)0);
 				}
 			}
 		}

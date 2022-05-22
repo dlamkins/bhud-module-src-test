@@ -1,5 +1,11 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+using Blish_HUD;
+using Blish_HUD.Content;
 using Kenedia.Modules.BuildsManager.Strings;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Kenedia.Modules.BuildsManager
@@ -119,15 +125,77 @@ namespace Kenedia.Modules.BuildsManager
 			LongBow = 12
 		}
 
+		public class JsonIcon
+		{
+			public string Path;
+
+			public string Url;
+		}
+
 		public class Icon
 		{
 			public string Path;
 
 			public string Url;
 
-			public Texture2D Texture;
+			public AsyncTexture2D _Texture;
 
-			public bool Loaded;
+			public Rectangle ImageRegion;
+
+			public Rectangle DefaultBounds;
+
+			public AsyncTexture2D _AsyncTexture
+			{
+				get
+				{
+					//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0024: Expected O, but got Unknown
+					if (_Texture == null && !BuildsManager.ModuleInstance.FetchingAPI)
+					{
+						_Texture = new AsyncTexture2D(Textures.get_TransparentPixel());
+						Task.Run(delegate
+						{
+							FileStream fs = new FileStream(BuildsManager.Paths.BasePath + Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+							GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate(GraphicsDevice graphicsDevice)
+							{
+								//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+								//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+								//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+								//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+								//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+								//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+								//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+								//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+								//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+								//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+								//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+								//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+								Texture2D val = TextureUtil.FromStreamPremultiplied(graphicsDevice, (Stream)fs);
+								_ = ImageRegion;
+								double factor = 1.0;
+								Rectangle defaultBounds = DefaultBounds;
+								Rectangle val2 = default(Rectangle);
+								if (defaultBounds != val2)
+								{
+									factor = (double)val.get_Width() / (double)DefaultBounds.Width;
+								}
+								ImageRegion = ImageRegion.Scale(factor);
+								if (val.get_Bounds().Width > 0 && ImageRegion.Width > 0)
+								{
+									val2 = val.get_Bounds();
+									if (((Rectangle)(ref val2)).Contains(ImageRegion))
+									{
+										val = Texture2DExtension.GetRegion(val, ImageRegion);
+									}
+								}
+								_Texture.SwapTexture(val);
+								fs.Close();
+							});
+						});
+					}
+					return _Texture;
+				}
+			}
 		}
 
 		public class Item

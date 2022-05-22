@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Modules.Managers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -300,7 +301,34 @@ namespace Kenedia.Modules.BuildsManager
 
 		public iData(ContentsManager contentsManager = null, DirectoriesManager directoriesManager = null)
 		{
-			iData iData2 = this;
+			//IL_03d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_040e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0413: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0433: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0438: Unknown result type (might be due to invalid IL or missing references)
+			//IL_044f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0454: Unknown result type (might be due to invalid IL or missing references)
+			//IL_047c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0481: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0491: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0496: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_054f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0554: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0628: Unknown result type (might be due to invalid IL or missing references)
+			//IL_062d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0671: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0676: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06ed: Unknown result type (might be due to invalid IL or missing references)
 			if (contentsManager != null)
 			{
 				ContentsManager = contentsManager;
@@ -321,12 +349,12 @@ namespace Kenedia.Modules.BuildsManager
 			}
 			foreach (API.Stat stat in Stats)
 			{
-				stat.Icon.Texture = ContentsManager.GetTexture(stat.Icon.Path);
+				stat.Icon._Texture = AsyncTexture2D.op_Implicit(ContentsManager.GetTexture(stat.Icon.Path));
 				stat.Attributes.Sort((API.StatAttribute a, API.StatAttribute b) => b.Multiplier.CompareTo(a.Multiplier));
 				foreach (API.StatAttribute attri in stat.Attributes)
 				{
 					attri.Name = attri.getLocalName;
-					attri.Icon.Texture = ContentsManager.GetTexture(attri.Icon.Path);
+					attri.Icon._Texture = AsyncTexture2D.op_Implicit(ContentsManager.GetTexture(attri.Icon.Path));
 				}
 			}
 			file_path = BuildsManager.Paths.professions + "professions [" + culture + "].json";
@@ -362,180 +390,63 @@ namespace Kenedia.Modules.BuildsManager
 			Trinkets = Trinkets.OrderBy((API.TrinketItem e) => e.TrinketType).ToList();
 			Weapons = Weapons.OrderBy((API.WeaponItem e) => (int)e.WeaponType).ToList();
 			BuildsManager.TextureManager.getIcon(_Icons.Bug);
-			GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate(GraphicsDevice graphicsDevice)
+			foreach (API.Profession profession in Professions)
 			{
-				//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-				//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0151: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0154: Unknown result type (might be due to invalid IL or missing references)
-				//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
-				//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
-				//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
-				//IL_01db: Unknown result type (might be due to invalid IL or missing references)
-				//IL_024d: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0253: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0256: Unknown result type (might be due to invalid IL or missing references)
-				//IL_025c: Unknown result type (might be due to invalid IL or missing references)
-				//IL_02d5: Unknown result type (might be due to invalid IL or missing references)
-				//IL_02dc: Unknown result type (might be due to invalid IL or missing references)
-				//IL_02e2: Unknown result type (might be due to invalid IL or missing references)
-				//IL_031e: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0324: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0327: Unknown result type (might be due to invalid IL or missing references)
-				//IL_032d: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0385: Unknown result type (might be due to invalid IL or missing references)
-				//IL_038b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_038e: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0394: Unknown result type (might be due to invalid IL or missing references)
-				//IL_03d8: Unknown result type (might be due to invalid IL or missing references)
-				//IL_03df: Unknown result type (might be due to invalid IL or missing references)
-				//IL_03e5: Unknown result type (might be due to invalid IL or missing references)
-				//IL_042a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0430: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0433: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0439: Unknown result type (might be due to invalid IL or missing references)
-				//IL_047e: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0484: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0487: Unknown result type (might be due to invalid IL or missing references)
-				//IL_048d: Unknown result type (might be due to invalid IL or missing references)
-				//IL_04e0: Unknown result type (might be due to invalid IL or missing references)
-				//IL_04e7: Unknown result type (might be due to invalid IL or missing references)
-				//IL_04ed: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0546: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0551: Unknown result type (might be due to invalid IL or missing references)
-				//IL_05c7: Unknown result type (might be due to invalid IL or missing references)
-				//IL_05ce: Unknown result type (might be due to invalid IL or missing references)
-				//IL_05d4: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0664: Unknown result type (might be due to invalid IL or missing references)
-				//IL_066b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0671: Unknown result type (might be due to invalid IL or missing references)
-				//IL_074a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0751: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0757: Unknown result type (might be due to invalid IL or missing references)
-				//IL_07ce: Unknown result type (might be due to invalid IL or missing references)
-				//IL_07d5: Unknown result type (might be due to invalid IL or missing references)
-				//IL_07db: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0852: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0859: Unknown result type (might be due to invalid IL or missing references)
-				//IL_085f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_08d6: Unknown result type (might be due to invalid IL or missing references)
-				//IL_08dd: Unknown result type (might be due to invalid IL or missing references)
-				//IL_08e3: Unknown result type (might be due to invalid IL or missing references)
-				//IL_097a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0981: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0987: Unknown result type (might be due to invalid IL or missing references)
-				foreach (API.TrinketItem current in iData2.Trinkets)
+				profession.Icon.ImageRegion = new Rectangle(4, 4, 26, 26);
+				foreach (API.Specialization specialization in profession.Specializations)
 				{
-					current.Icon.Texture = iData2.LoadImage(BuildsManager.Paths.BasePath + current.Icon.Path, graphicsDevice, filesToDelete);
-				}
-				foreach (API.WeaponItem current2 in iData2.Weapons)
-				{
-					current2.Icon.Texture = iData2.LoadImage(BuildsManager.Paths.BasePath + current2.Icon.Path, graphicsDevice, filesToDelete);
-				}
-				foreach (API.ArmorItem current3 in iData2.Armors)
-				{
-					current3.Icon.Texture = iData2.LoadImage(BuildsManager.Paths.BasePath + current3.Icon.Path, graphicsDevice, filesToDelete);
-				}
-				foreach (API.SigilItem current4 in iData2.Sigils)
-				{
-					current4.Icon.Texture = iData2.LoadImage(BuildsManager.Paths.BasePath + current4.Icon.Path, graphicsDevice, filesToDelete);
-				}
-				foreach (API.RuneItem current5 in iData2.Runes)
-				{
-					current5.Icon.Texture = iData2.LoadImage(BuildsManager.Paths.BasePath + current5.Icon.Path, graphicsDevice, filesToDelete);
-				}
-				foreach (API.Profession current6 in iData2.Professions)
-				{
-					current6.Icon.Texture = iData2.LoadImage(BuildsManager.Paths.BasePath + current6.Icon.Path, graphicsDevice, filesToDelete, new Rectangle(4, 4, 26, 26));
-					current6.IconBig.Texture = iData2.LoadImage(BuildsManager.Paths.BasePath + current6.IconBig.Path, graphicsDevice, filesToDelete);
-					foreach (API.Specialization current7 in current6.Specializations)
+					specialization.Background.ImageRegion = new Rectangle(0, 123, 643, 123);
+					if (specialization.WeaponTrait != null)
 					{
-						current7.Icon.Texture = iData2.LoadImage(BuildsManager.Paths.BasePath + current7.Icon.Path, graphicsDevice, filesToDelete);
-						current7.Background.Texture = iData2.LoadImage(BuildsManager.Paths.BasePath + current7.Background.Path, graphicsDevice, filesToDelete, new Rectangle(0, 123, 643, 123));
-						if (current7.ProfessionIcon != null)
-						{
-							current7.ProfessionIcon.Texture = iData2.LoadImage(BuildsManager.Paths.BasePath + current7.ProfessionIcon.Path, graphicsDevice, filesToDelete);
-						}
-						if (current7.ProfessionIconBig != null)
-						{
-							current7.ProfessionIconBig.Texture = iData2.LoadImage(BuildsManager.Paths.BasePath + current7.ProfessionIconBig.Path, graphicsDevice, filesToDelete);
-						}
-						if (current7.WeaponTrait != null)
-						{
-							current7.WeaponTrait.Icon.Texture = iData2.LoadImage(BuildsManager.Paths.BasePath + current7.WeaponTrait.Icon.Path, graphicsDevice, filesToDelete, new Rectangle(3, 3, 58, 58));
-						}
-						foreach (API.Trait current8 in current7.MajorTraits)
-						{
-							current8.Icon.Texture = iData2.LoadImage(BuildsManager.Paths.BasePath + current8.Icon.Path, graphicsDevice, filesToDelete, new Rectangle(3, 3, 58, 58), new Rectangle(0, 0, 64, 64));
-						}
-						foreach (API.Trait current9 in current7.MinorTraits)
-						{
-							current9.Icon.Texture = iData2.LoadImage(BuildsManager.Paths.BasePath + current9.Icon.Path, graphicsDevice, filesToDelete, new Rectangle(3, 3, 58, 58));
-						}
+						specialization.WeaponTrait.Icon.ImageRegion = new Rectangle(3, 3, 58, 58);
+						specialization.WeaponTrait.Icon.DefaultBounds = new Rectangle(0, 0, 64, 64);
 					}
-					foreach (API.Skill current10 in current6.Skills)
+					foreach (API.Trait majorTrait in specialization.MajorTraits)
 					{
-						current10.Icon.Texture = iData2.LoadImage(BuildsManager.Paths.BasePath + current10.Icon.Path, graphicsDevice, filesToDelete, new Rectangle(12, 12, 104, 104));
+						majorTrait.Icon.ImageRegion = new Rectangle(3, 3, 58, 58);
+						majorTrait.Icon.DefaultBounds = new Rectangle(0, 0, 64, 64);
 					}
-					if (current6.Legends.Count > 0)
+					foreach (API.Trait minorTrait in specialization.MinorTraits)
 					{
-						foreach (API.Legend current11 in current6.Legends)
-						{
-							BuildsManager.Logger.Debug("Loading " + current11.Name);
-							if (current11.Heal.Icon != null && current11.Heal.Icon.Path != "")
-							{
-								current11.Heal.Icon.Texture = iData2.LoadImage(BuildsManager.Paths.BasePath + current11.Heal.Icon.Path, graphicsDevice, filesToDelete, new Rectangle(12, 12, 104, 104));
-							}
-							if (current11.Elite.Icon != null && current11.Elite.Icon.Path != "")
-							{
-								current11.Elite.Icon.Texture = iData2.LoadImage(BuildsManager.Paths.BasePath + current11.Elite.Icon.Path, graphicsDevice, filesToDelete, new Rectangle(12, 12, 104, 104));
-							}
-							if (current11.Swap.Icon != null && current11.Swap.Icon.Path != "")
-							{
-								current11.Swap.Icon.Texture = iData2.LoadImage(BuildsManager.Paths.BasePath + current11.Swap.Icon.Path, graphicsDevice, filesToDelete, new Rectangle(12, 12, 104, 104));
-							}
-							if (current11.Skill.Icon != null && current11.Skill.Icon.Path != "")
-							{
-								current11.Skill.Icon.Texture = iData2.LoadImage(BuildsManager.Paths.BasePath + current11.Skill.Icon.Path, graphicsDevice, filesToDelete, new Rectangle(12, 12, 104, 104));
-							}
-							BuildsManager.Logger.Debug("Loading Utility of " + current11.Name);
-							foreach (API.Skill current12 in current11.Utilities)
-							{
-								if (current12.Icon != null && current12.Icon.Path != "")
-								{
-									current12.Icon.Texture = iData2.LoadImage(BuildsManager.Paths.BasePath + current12.Icon.Path, graphicsDevice, filesToDelete, new Rectangle(12, 12, 104, 104));
-								}
-							}
-						}
+						minorTrait.Icon.ImageRegion = new Rectangle(3, 3, 58, 58);
+						minorTrait.Icon.DefaultBounds = new Rectangle(0, 0, 64, 64);
 					}
 				}
-				foreach (string current13 in filesToDelete)
+				foreach (API.Skill skill in profession.Skills)
 				{
-					try
+					skill.Icon.ImageRegion = new Rectangle(12, 12, 104, 104);
+				}
+				if (profession.Legends.Count <= 0)
+				{
+					continue;
+				}
+				foreach (API.Legend legend in profession.Legends)
+				{
+					if (legend.Heal.Icon != null && legend.Heal.Icon.Path != "")
 					{
-						File.Delete(current13);
+						legend.Heal.Icon.ImageRegion = new Rectangle(12, 12, 104, 104);
 					}
-					catch (IOException)
+					if (legend.Elite.Icon != null && legend.Elite.Icon.Path != "")
 					{
+						legend.Elite.Icon.ImageRegion = new Rectangle(12, 12, 104, 104);
+					}
+					if (legend.Swap.Icon != null && legend.Swap.Icon.Path != "")
+					{
+						legend.Swap.Icon.ImageRegion = new Rectangle(12, 12, 104, 104);
+					}
+					if (legend.Skill.Icon != null && legend.Skill.Icon.Path != "")
+					{
+						legend.Skill.Icon.ImageRegion = new Rectangle(12, 12, 104, 104);
+					}
+					foreach (API.Skill utility in legend.Utilities)
+					{
+						utility.Icon.ImageRegion = new Rectangle(12, 12, 104, 104);
 					}
 				}
-				if (iData2.fetchAPI)
-				{
-					iData2.fetchAPI = false;
-					BuildsManager.ModuleInstance.Fetch_APIData(force: true);
-				}
-				else
-				{
-					BuildsManager.DataLoaded = true;
-				}
+			}
+			GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
+			{
+				BuildsManager.DataLoaded = true;
 			});
 		}
 	}

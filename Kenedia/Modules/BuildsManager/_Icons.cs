@@ -24,6 +24,7 @@ namespace Kenedia.Modules.BuildsManager
 		Edit_Feather_Highlight,
 		Edit_Feather_Pressed,
 		Mouse,
-		Lock_Locked
+		Lock_Locked,
+		SingleSpinner
 	}
 }

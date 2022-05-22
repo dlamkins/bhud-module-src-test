@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
@@ -79,15 +80,12 @@ namespace Kenedia.Modules.BuildsManager
 		{
 			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005e: Expected O, but got Unknown
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
 			CustomTooltip customTooltip = new CustomTooltip(((Control)this).get_Parent());
 			((Control)customTooltip).set_ClipsBounds(false);
 			customTooltip.HeaderColor = new Color(255, 204, 119, 255);
 			CustomTooltip = customTooltip;
-			ContentService cnt = new ContentService();
-			Font = cnt.GetFont((FontFace)0, (FontSize)18, (FontStyle)0);
+			Font = GameService.Content.get_DefaultFont18();
 			((Control)this).set_Size(new Point(20 + 4 * _SkillSize, _SkillSize * (int)Math.Ceiling((double)Skills.Count / 4.0)));
 			((Control)this).set_ClipsBounds(false);
 			_NoWaterTexture = Texture2DExtension.GetRegion(BuildsManager.TextureManager.getControlTexture(_Controls.NoWaterTexture), 16, 16, 96, 96);
@@ -203,53 +201,53 @@ namespace Kenedia.Modules.BuildsManager
 			//IL_02ab: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02b4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0331: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0347: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0355: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0368: Unknown result type (might be due to invalid IL or missing references)
-			//IL_036e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0383: Unknown result type (might be due to invalid IL or missing references)
-			//IL_038e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0336: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0351: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0366: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0372: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0378: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0398: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0400: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0405: Unknown result type (might be due to invalid IL or missing references)
-			//IL_040b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0441: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0446: Unknown result type (might be due to invalid IL or missing references)
+			//IL_040f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0415: Unknown result type (might be due to invalid IL or missing references)
+			//IL_044b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0450: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0456: Unknown result type (might be due to invalid IL or missing references)
-			//IL_048e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0493: Unknown result type (might be due to invalid IL or missing references)
+			//IL_045a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0460: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0498: Unknown result type (might be due to invalid IL or missing references)
 			//IL_049d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_04ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0526: Unknown result type (might be due to invalid IL or missing references)
-			//IL_052b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0530: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0535: Unknown result type (might be due to invalid IL or missing references)
-			//IL_053b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0571: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0576: Unknown result type (might be due to invalid IL or missing references)
+			//IL_053f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0545: Unknown result type (might be due to invalid IL or missing references)
+			//IL_057b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0580: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0586: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_058a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0590: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05c8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_05cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_060b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0610: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0615: Unknown result type (might be due to invalid IL or missing references)
 			//IL_061a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0620: Unknown result type (might be due to invalid IL or missing references)
-			//IL_068c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0691: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0624: Unknown result type (might be due to invalid IL or missing references)
+			//IL_062a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0696: Unknown result type (might be due to invalid IL or missing references)
+			//IL_069b: Unknown result type (might be due to invalid IL or missing references)
 			UpdateLayout();
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), bounds, (Rectangle?)bounds, new Color(0, 0, 0, 230), 0f, default(Vector2), (SpriteEffects)0);
 			Color color = Color.get_Black();
@@ -292,7 +290,7 @@ namespace Kenedia.Modules.BuildsManager
 				if (entry.Skill != null)
 				{
 					bool noUnderwater = Aquatic && entry.Skill.Flags.Contains("NoUnderwater");
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, entry.Skill.Icon.Texture, entry.Bounds, (Rectangle?)entry.Skill.Icon.Texture.get_Bounds(), noUnderwater ? Color.get_Gray() : Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(entry.Skill.Icon._AsyncTexture), entry.Bounds, (Rectangle?)entry.Skill.Icon._AsyncTexture.get_Texture().get_Bounds(), noUnderwater ? Color.get_Gray() : Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
 					if (noUnderwater)
 					{
 						SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _NoWaterTexture, entry.Bounds, (Rectangle?)_NoWaterTexture.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);

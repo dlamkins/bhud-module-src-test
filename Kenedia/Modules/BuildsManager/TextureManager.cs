@@ -98,6 +98,7 @@ namespace Kenedia.Modules.BuildsManager
 				Texture2D texture = contentsManager8.GetTexture("textures\\stats\\" + num8 + ".png");
 				_Stats.Insert((int)num, texture);
 			}
+			BuildsManager.ModuleInstance.LoadingTexture = getIcon(Kenedia.Modules.BuildsManager._Icons.SingleSpinner);
 		}
 
 		public Texture2D getBackground(_Backgrounds background)

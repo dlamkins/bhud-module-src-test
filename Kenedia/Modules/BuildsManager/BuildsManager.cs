@@ -73,6 +73,8 @@ namespace Kenedia.Modules.BuildsManager
 
 		public Window_MainWindow MainWindow;
 
+		public Texture2D LoadingTexture;
+
 		public LoadingSpinner loadingSpinner;
 
 		public ProgressBar downloadBar;
@@ -80,6 +82,8 @@ namespace Kenedia.Modules.BuildsManager
 		private CornerIcon cornerIcon;
 
 		private static bool _DataLoaded;
+
+		public bool FetchingAPI;
 
 		public API.Profession CurrentProfession;
 
@@ -541,6 +545,7 @@ namespace Kenedia.Modules.BuildsManager
 			{
 				return;
 			}
+			FetchingAPI = true;
 			List<APIDownload_Image> downloadList = new List<APIDownload_Image>();
 			string culture = getCultureString();
 			double total2 = 0.0;
@@ -548,6 +553,10 @@ namespace Kenedia.Modules.BuildsManager
 			double progress = 0.0;
 			List<int> _runes = JsonConvert.DeserializeObject<List<int>>(new StreamReader(ContentsManager.GetFileStream("data\\runes.json")).ReadToEnd());
 			List<int> _sigils = JsonConvert.DeserializeObject<List<int>>(new StreamReader(ContentsManager.GetFileStream("data\\sigils.json")).ReadToEnd());
+			JsonSerializerSettings val = new JsonSerializerSettings();
+			val.set_NullValueHandling((NullValueHandling)1);
+			val.set_Formatting((Formatting)1);
+			JsonSerializerSettings settings = val;
 			int totalFetches = 9;
 			Logger.Debug("Fetching all required Data from the API!");
 			((Control)loadingSpinner).set_Visible(true);
@@ -635,7 +644,7 @@ namespace Kenedia.Modules.BuildsManager
 			downloadBar.Text = $"{completed2} / {totalFetches}";
 			Logger.Debug(string.Format("Fetched {0}", "Itemstats"));
 			List<API.RuneItem> Runes = new List<API.RuneItem>();
-			RenderUrl val;
+			RenderUrl val2;
 			foreach (ItemUpgradeComponent item5 in runes)
 			{
 				ItemUpgradeComponent rune = item5;
@@ -644,8 +653,8 @@ namespace Kenedia.Modules.BuildsManager
 					continue;
 				}
 				((Item)rune).get_Icon();
-				val = ((Item)rune).get_Icon();
-				if (((RenderUrl)(ref val)).get_Url() != null)
+				val2 = ((Item)rune).get_Icon();
+				if (((RenderUrl)(ref val2)).get_Url() != null)
 				{
 					API.RuneItem obj = new API.RuneItem
 					{
@@ -654,8 +663,8 @@ namespace Kenedia.Modules.BuildsManager
 						ChatLink = ((Item)rune).get_ChatLink()
 					};
 					API.Icon icon = new API.Icon();
-					val = ((Item)rune).get_Icon();
-					icon.Url = ((RenderUrl)(ref val)).get_Url().ToString();
+					val2 = ((Item)rune).get_Icon();
+					icon.Url = ((RenderUrl)(ref val2)).get_Url().ToString();
 					icon.Path = Paths.rune_icons.Replace(Paths.BasePath, "") + Regex.Match(RenderUrl.op_Implicit(((Item)rune).get_Icon()), "[0-9]*.png");
 					obj.Icon = icon;
 					obj.Bonuses = rune.get_Details().get_Bonuses().ToList();
@@ -673,7 +682,7 @@ namespace Kenedia.Modules.BuildsManager
 					total2 += 1.0;
 				}
 			}
-			File.WriteAllText(Paths.runes + "runes [" + culture + "].json", JsonConvert.SerializeObject((object)Runes.ToArray()));
+			File.WriteAllText(Paths.runes + "runes [" + culture + "].json", JsonConvert.SerializeObject((object)Runes.ToArray(), settings));
 			List<API.SigilItem> Sigils = new List<API.SigilItem>();
 			foreach (ItemUpgradeComponent item6 in sigils)
 			{
@@ -683,8 +692,8 @@ namespace Kenedia.Modules.BuildsManager
 					continue;
 				}
 				((Item)sigil).get_Icon();
-				val = ((Item)sigil).get_Icon();
-				if (((RenderUrl)(ref val)).get_Url() != null)
+				val2 = ((Item)sigil).get_Icon();
+				if (((RenderUrl)(ref val2)).get_Url() != null)
 				{
 					API.SigilItem obj2 = new API.SigilItem
 					{
@@ -693,8 +702,8 @@ namespace Kenedia.Modules.BuildsManager
 						ChatLink = ((Item)sigil).get_ChatLink()
 					};
 					API.Icon icon2 = new API.Icon();
-					val = ((Item)sigil).get_Icon();
-					icon2.Url = ((RenderUrl)(ref val)).get_Url().ToString();
+					val2 = ((Item)sigil).get_Icon();
+					icon2.Url = ((RenderUrl)(ref val2)).get_Url().ToString();
 					icon2.Path = Paths.sigil_icons.Replace(Paths.BasePath, "") + Regex.Match(RenderUrl.op_Implicit(((Item)sigil).get_Icon()), "[0-9]*.png");
 					obj2.Icon = icon2;
 					obj2.Description = sigil.get_Details().get_InfixUpgrade().get_Buff()
@@ -714,7 +723,7 @@ namespace Kenedia.Modules.BuildsManager
 					total2 += 1.0;
 				}
 			}
-			File.WriteAllText(Paths.sigils + "sigils [" + culture + "].json", JsonConvert.SerializeObject((object)Sigils.ToArray()));
+			File.WriteAllText(Paths.sigils + "sigils [" + culture + "].json", JsonConvert.SerializeObject((object)Sigils.ToArray(), settings));
 			List<API.Stat> Stats = new List<API.Stat>();
 			foreach (Itemstat stat in (IEnumerable<Itemstat>)stats)
 			{
@@ -747,7 +756,7 @@ namespace Kenedia.Modules.BuildsManager
 				}
 				Stats.Add(temp6);
 			}
-			File.WriteAllText(Paths.stats + "stats [" + culture + "].json", JsonConvert.SerializeObject((object)Stats.ToArray()));
+			File.WriteAllText(Paths.stats + "stats [" + culture + "].json", JsonConvert.SerializeObject((object)Stats.ToArray(), settings));
 			List<API.ArmorItem> Armors = new List<API.ArmorItem>();
 			List<API.WeaponItem> Weapons = new List<API.WeaponItem>();
 			List<API.TrinketItem> Trinkets = new List<API.TrinketItem>();
@@ -758,8 +767,8 @@ namespace Kenedia.Modules.BuildsManager
 					continue;
 				}
 				i.get_Icon();
-				val = i.get_Icon();
-				if (!(((RenderUrl)(ref val)).get_Url() != null))
+				val2 = i.get_Icon();
+				if (!(((RenderUrl)(ref val2)).get_Url() != null))
 				{
 					continue;
 				}
@@ -775,15 +784,15 @@ namespace Kenedia.Modules.BuildsManager
 							ChatLink = ((Item)item).get_ChatLink()
 						};
 						API.Icon icon3 = new API.Icon();
-						val = ((Item)item).get_Icon();
-						icon3.Url = ((RenderUrl)(ref val)).get_Url().ToString();
+						val2 = ((Item)item).get_Icon();
+						icon3.Url = ((RenderUrl)(ref val2)).get_Url().ToString();
 						icon3.Path = Paths.armory_icons.Replace(Paths.BasePath, "") + Regex.Match(RenderUrl.op_Implicit(((Item)item).get_Icon()), "[0-9]*.png");
 						obj3.Icon = icon3;
 						obj3.AttributeAdjustment = item.get_Details().get_AttributeAdjustment();
-						API.ArmorItem temp7 = obj3;
-						Enum.TryParse<API.armorSlot>(item.get_Details().get_Type().get_RawValue(), out temp7.Slot);
-						Enum.TryParse<API.armorWeight>(item.get_Details().get_WeightClass().get_RawValue(), out temp7.ArmorWeight);
-						Armors.Add(temp7);
+						API.ArmorItem temp8 = obj3;
+						Enum.TryParse<API.armorSlot>(item.get_Details().get_Type().get_RawValue(), out temp8.Slot);
+						Enum.TryParse<API.armorWeight>(item.get_Details().get_WeightClass().get_RawValue(), out temp8.ArmorWeight);
+						Armors.Add(temp8);
 					}
 				}
 				if (i.get_Type().get_RawValue() == "Weapon")
@@ -798,8 +807,8 @@ namespace Kenedia.Modules.BuildsManager
 							ChatLink = ((Item)item3).get_ChatLink()
 						};
 						API.Icon icon4 = new API.Icon();
-						val = ((Item)item3).get_Icon();
-						icon4.Url = ((RenderUrl)(ref val)).get_Url().ToString();
+						val2 = ((Item)item3).get_Icon();
+						icon4.Url = ((RenderUrl)(ref val2)).get_Url().ToString();
 						icon4.Path = Paths.armory_icons.Replace(Paths.BasePath, "") + Regex.Match(RenderUrl.op_Implicit(((Item)item3).get_Icon()), "[0-9]*.png");
 						obj4.Icon = icon4;
 						obj4.AttributeAdjustment = item3.get_Details().get_AttributeAdjustment();
@@ -821,14 +830,14 @@ namespace Kenedia.Modules.BuildsManager
 							ChatLink = ((Item)item4).get_ChatLink()
 						};
 						API.Icon icon5 = new API.Icon();
-						val = ((Item)item4).get_Icon();
-						icon5.Url = ((RenderUrl)(ref val)).get_Url().ToString();
+						val2 = ((Item)item4).get_Icon();
+						icon5.Url = ((RenderUrl)(ref val2)).get_Url().ToString();
 						icon5.Path = Paths.armory_icons.Replace(Paths.BasePath, "") + Regex.Match(RenderUrl.op_Implicit(((Item)item4).get_Icon()), "[0-9]*.png");
 						obj5.Icon = icon5;
 						obj5.AttributeAdjustment = item4.get_Details().get_AttributeAdjustment();
-						API.TrinketItem temp8 = obj5;
-						Enum.TryParse<API.trinketType>(item4.get_Details().get_Type().get_RawValue(), out temp8.TrinketType);
-						Trinkets.Add(temp8);
+						API.TrinketItem temp7 = obj5;
+						Enum.TryParse<API.trinketType>(item4.get_Details().get_Type().get_RawValue(), out temp7.TrinketType);
+						Trinkets.Add(temp7);
 					}
 				}
 				if (i.get_Type().get_RawValue() == "Back")
@@ -843,8 +852,8 @@ namespace Kenedia.Modules.BuildsManager
 							ChatLink = ((Item)item2).get_ChatLink()
 						};
 						API.Icon icon6 = new API.Icon();
-						val = ((Item)item2).get_Icon();
-						icon6.Url = ((RenderUrl)(ref val)).get_Url().ToString();
+						val2 = ((Item)item2).get_Icon();
+						icon6.Url = ((RenderUrl)(ref val2)).get_Url().ToString();
 						icon6.Path = Paths.armory_icons.Replace(Paths.BasePath, "") + Regex.Match(RenderUrl.op_Implicit(((Item)item2).get_Icon()), "[0-9]*.png");
 						obj6.Icon = icon6;
 						obj6.TrinketType = API.trinketType.Back;
@@ -862,9 +871,9 @@ namespace Kenedia.Modules.BuildsManager
 					});
 				}
 			}
-			File.WriteAllText(Paths.armory + "armors [" + culture + "].json", JsonConvert.SerializeObject((object)Armors.ToArray()));
-			File.WriteAllText(Paths.armory + "weapons [" + culture + "].json", JsonConvert.SerializeObject((object)Weapons.ToArray()));
-			File.WriteAllText(Paths.armory + "trinkets [" + culture + "].json", JsonConvert.SerializeObject((object)Trinkets.ToArray()));
+			File.WriteAllText(Paths.armory + "armors [" + culture + "].json", JsonConvert.SerializeObject((object)Armors.ToArray(), settings));
+			File.WriteAllText(Paths.armory + "weapons [" + culture + "].json", JsonConvert.SerializeObject((object)Weapons.ToArray(), settings));
+			File.WriteAllText(Paths.armory + "trinkets [" + culture + "].json", JsonConvert.SerializeObject((object)Trinkets.ToArray(), settings));
 			Logger.Debug("Preparing Traits ....");
 			List<API.Trait> Traits = new List<API.Trait>();
 			foreach (Trait trait3 in (IEnumerable<Trait>)traits)
@@ -872,8 +881,8 @@ namespace Kenedia.Modules.BuildsManager
 				if (trait3 != null)
 				{
 					trait3.get_Icon();
-					val = trait3.get_Icon();
-					if (((RenderUrl)(ref val)).get_Url() != null)
+					val2 = trait3.get_Icon();
+					if (((RenderUrl)(ref val2)).get_Url() != null)
 					{
 						API.Trait obj7 = new API.Trait
 						{
@@ -882,8 +891,8 @@ namespace Kenedia.Modules.BuildsManager
 							Id = trait3.get_Id()
 						};
 						API.Icon icon7 = new API.Icon();
-						val = trait3.get_Icon();
-						icon7.Url = ((RenderUrl)(ref val)).get_Url().ToString();
+						val2 = trait3.get_Icon();
+						icon7.Url = ((RenderUrl)(ref val2)).get_Url().ToString();
 						icon7.Path = Paths.traits_icons.Replace(Paths.BasePath, "") + Regex.Match(RenderUrl.op_Implicit(trait3.get_Icon()), "[0-9]*.png");
 						obj7.Icon = icon7;
 						obj7.Specialization = trait3.get_Specialization();
@@ -903,8 +912,8 @@ namespace Kenedia.Modules.BuildsManager
 					continue;
 				}
 				spec.get_Icon();
-				val = spec.get_Icon();
-				if (!(((RenderUrl)(ref val)).get_Url() != null))
+				val2 = spec.get_Icon();
+				if (!(((RenderUrl)(ref val2)).get_Url() != null))
 				{
 					continue;
 				}
@@ -914,13 +923,13 @@ namespace Kenedia.Modules.BuildsManager
 					Id = spec.get_Id()
 				};
 				API.Icon icon8 = new API.Icon();
-				val = spec.get_Icon();
-				icon8.Url = ((RenderUrl)(ref val)).get_Url().ToString();
+				val2 = spec.get_Icon();
+				icon8.Url = ((RenderUrl)(ref val2)).get_Url().ToString();
 				icon8.Path = Paths.spec_icons.Replace(Paths.BasePath, "") + Regex.Match(RenderUrl.op_Implicit(spec.get_Icon()), "[0-9]*.png");
 				obj8.Icon = icon8;
 				API.Icon icon9 = new API.Icon();
-				val = spec.get_Background();
-				icon9.Url = ((RenderUrl)(ref val)).get_Url().ToString();
+				val2 = spec.get_Background();
+				icon9.Url = ((RenderUrl)(ref val2)).get_Url().ToString();
 				icon9.Path = Paths.spec_backgrounds.Replace(Paths.BasePath, "") + Regex.Match(RenderUrl.op_Implicit(spec.get_Background()), "[0-9]*.png");
 				obj8.Background = icon9;
 				object obj9;
@@ -1015,8 +1024,8 @@ namespace Kenedia.Modules.BuildsManager
 					continue;
 				}
 				skill5.get_Icon();
-				val = skill5.get_Icon();
-				if (!(((RenderUrl)(ref val)).get_Url() != null) || skill5.get_Professions().Count != 1)
+				val2 = skill5.get_Icon();
+				if (!(((RenderUrl)(ref val2)).get_Url() != null) || skill5.get_Professions().Count != 1)
 				{
 					continue;
 				}
@@ -1026,8 +1035,8 @@ namespace Kenedia.Modules.BuildsManager
 					Id = skill5.get_Id()
 				};
 				API.Icon icon10 = new API.Icon();
-				val = skill5.get_Icon();
-				icon10.Url = ((RenderUrl)(ref val)).get_Url().ToString();
+				val2 = skill5.get_Icon();
+				icon10.Url = ((RenderUrl)(ref val2)).get_Url().ToString();
 				icon10.Path = Paths.skill_icons.Replace(Paths.BasePath, "") + Regex.Match(RenderUrl.op_Implicit(skill5.get_Icon()), "[0-9]*.png");
 				obj13.Icon = icon10;
 				obj13.ChatLink = skill5.get_ChatLink();
@@ -1056,8 +1065,8 @@ namespace Kenedia.Modules.BuildsManager
 					continue;
 				}
 				profession.get_Icon();
-				val = profession.get_Icon();
-				if (!(((RenderUrl)(ref val)).get_Url() != null))
+				val2 = profession.get_Icon();
+				if (!(((RenderUrl)(ref val2)).get_Url() != null))
 				{
 					continue;
 				}
@@ -1067,13 +1076,13 @@ namespace Kenedia.Modules.BuildsManager
 					Id = profession.get_Id()
 				};
 				API.Icon icon11 = new API.Icon();
-				val = profession.get_Icon();
-				icon11.Url = ((RenderUrl)(ref val)).get_Url().ToString();
+				val2 = profession.get_Icon();
+				icon11.Url = ((RenderUrl)(ref val2)).get_Url().ToString();
 				icon11.Path = Paths.profession_icons.Replace(Paths.BasePath, "") + Regex.Match(RenderUrl.op_Implicit(profession.get_Icon()), "[0-9]*.png");
 				obj14.Icon = icon11;
 				API.Icon icon12 = new API.Icon();
-				val = profession.get_IconBig();
-				icon12.Url = ((RenderUrl)(ref val)).get_Url().ToString();
+				val2 = profession.get_IconBig();
+				icon12.Url = ((RenderUrl)(ref val2)).get_Url().ToString();
 				icon12.Path = Paths.profession_icons.Replace(Paths.BasePath, "") + Regex.Match(RenderUrl.op_Implicit(profession.get_IconBig()), "[0-9]*.png");
 				obj14.IconBig = icon12;
 				API.Profession temp = obj14;
@@ -1280,7 +1289,7 @@ namespace Kenedia.Modules.BuildsManager
 				Professions.Add(temp);
 			}
 			Logger.Debug("Saving Professions ....");
-			File.WriteAllText(Paths.professions + "professions [" + culture + "].json", JsonConvert.SerializeObject((object)Professions.ToArray()));
+			File.WriteAllText(Paths.professions + "professions [" + culture + "].json", JsonConvert.SerializeObject((object)Professions.ToArray(), settings));
 			downloadBar.Progress = 0.0;
 			total2 = downloadList.Count;
 			completed2 = 0.0;
@@ -1305,6 +1314,7 @@ namespace Kenedia.Modules.BuildsManager
 			GameVersion.set_Value(GameService.Gw2Mumble.get_Info().get_Version());
 			ModuleVersion.set_Value(((object)((Module)this).get_Version().BaseVersion()).ToString());
 			Logger.Debug("API Data sucessfully fetched!");
+			FetchingAPI = false;
 		}
 
 		private async Task LoadData()

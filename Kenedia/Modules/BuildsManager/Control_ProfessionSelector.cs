@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
@@ -137,18 +138,18 @@ namespace Kenedia.Modules.BuildsManager
 			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0207: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0232: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0271: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0305: Unknown result type (might be due to invalid IL or missing references)
-			//IL_030c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0313: Unknown result type (might be due to invalid IL or missing references)
-			//IL_031d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0264: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0312: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0319: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0320: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032a: Unknown result type (might be due to invalid IL or missing references)
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), bounds, (Rectangle?)bounds, new Color(0, 0, 0, 145), 0f, Vector2.get_Zero(), (SpriteEffects)0);
 			Color color = Color.get_Black();
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, 2), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
@@ -164,7 +165,7 @@ namespace Kenedia.Modules.BuildsManager
 				profession.Hovered = ((Rectangle)(ref profession.Bounds)).Contains(((Control)this).get_RelativeMousePosition());
 				if (profession.Profession != null)
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, profession.Profession.Icon.Texture, profession.Bounds, (Rectangle?)profession.Profession.Icon.Texture.get_Bounds(), (Color)(profession.Hovered ? Color.get_White() : (Professions.Contains(profession.Profession) ? Color.get_LightGray() : new Color(48, 48, 48, 150))), 0f, Vector2.get_Zero(), (SpriteEffects)0);
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(profession.Profession.Icon._AsyncTexture), profession.Bounds, (Rectangle?)profession.Profession.Icon._AsyncTexture.get_Texture().get_Bounds(), (Color)(profession.Hovered ? Color.get_White() : (Professions.Contains(profession.Profession) ? Color.get_LightGray() : new Color(48, 48, 48, 150))), 0f, Vector2.get_Zero(), (SpriteEffects)0);
 				}
 				else
 				{
