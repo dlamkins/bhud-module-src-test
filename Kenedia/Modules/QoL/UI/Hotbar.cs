@@ -96,7 +96,7 @@ namespace Kenedia.Modules.QoL.UI
 			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-			int active = SubControls.Where((Hotbar_Button btn) => btn.SubModule.Active).Count();
+			int active = SubControls.Where((Hotbar_Button btn) => btn.SubModule != null && btn.SubModule.Active).Count();
 			FlowPanel.SortChildren<Hotbar_Button>((Comparison<Hotbar_Button>)((Hotbar_Button a, Hotbar_Button b) => ((Control)b).get_Visible().CompareTo(((Control)a).get_Visible())));
 			((Control)this).set_Size(new Point(ExpanderSize.X + active * ((int)FlowPanel.get_ControlPadding().X + ButtonSize.X), ((Control)this).get_Height()));
 			_PreSize = ((Control)this).get_Size();
@@ -108,7 +108,7 @@ namespace Kenedia.Modules.QoL.UI
 			{
 				SubControls.Remove(btn);
 			}
-			btn.SubModule = null;
+			btn.SubModule.Toggled -= SubModule_Toggled;
 			((Control)btn).Dispose();
 		}
 
@@ -250,7 +250,19 @@ namespace Kenedia.Modules.QoL.UI
 		protected override void DisposeControl()
 		{
 			((Container)this).DisposeControl();
-			((IEnumerable<IDisposable>)SubControls)?.DisposeAll();
+			foreach (Hotbar_Button btn in SubControls)
+			{
+				if (btn.SubModule != null)
+				{
+					btn.SubModule.Toggled -= SubModule_Toggled;
+				}
+			}
+			SubControls?.Clear();
+			FlowPanel flowPanel = FlowPanel;
+			if (flowPanel != null)
+			{
+				((Control)flowPanel).Dispose();
+			}
 			Background = null;
 		}
 	}
