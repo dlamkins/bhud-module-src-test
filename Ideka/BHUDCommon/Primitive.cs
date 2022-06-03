@@ -5,7 +5,7 @@ using Blish_HUD;
 using Blish_HUD.Controls;
 using Microsoft.Xna.Framework;
 
-namespace Ideka.HitboxView
+namespace Ideka.BHUDCommon
 {
 	public class Primitive
 	{

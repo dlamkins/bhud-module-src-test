@@ -4,7 +4,7 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Ideka.HitboxView
+namespace Ideka.BHUDCommon
 {
 	internal static class SpriteBatchExtensions
 	{

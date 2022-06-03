@@ -28,6 +28,7 @@
     </xsd:element>
   </xsd:schema>
 <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="SettingHitboxSmoothingText"><value>Move the hitbox smoothly, interpolating between the game's reported values.</value></data>
+  <data name="SettingHitboxOutlineColor"><value>Hitbox Outline Color</value></data>
   <data name="SettingToggleHitboxKey"><value>Toggle Hitbox</value></data>
   <data name="SettingHitboxSmoothing"><value>Hitbox Smoothing</value></data>
   <data name="SettingGamePingText"><value>Set this to your average ping (currently this cannot be automatically determined).</value></data>
@@ -36,6 +37,7 @@
   <data name="SettingGamePing"><value>Game Ping</value></data>
   <data name="SettingHitboxColor"><value>Hitbox Color</value></data>
   <data name="SettingGamePingValidation"><value>Ping must be a valid integer between {0} and {1}</value></data>
+  <data name="SettingHitboxOutlineColorText"><value>The color of the hitbox's outline.</value></data>
   <data name="SettingHitboxVisibleText"><value>Disable to hide the hitbox.</value></data>
   <data name="SettingHitboxColorText"><value>The color of the hitbox.</value></data>
   </root>

@@ -52,6 +52,10 @@ namespace Ideka.HitboxView
 
 		internal static string SettingHitboxColorText => ResourceManager.GetString("SettingHitboxColorText", resourceCulture);
 
+		internal static string SettingHitboxOutlineColor => ResourceManager.GetString("SettingHitboxOutlineColor", resourceCulture);
+
+		internal static string SettingHitboxOutlineColorText => ResourceManager.GetString("SettingHitboxOutlineColorText", resourceCulture);
+
 		internal static string SettingHitboxSmoothing => ResourceManager.GetString("SettingHitboxSmoothing", resourceCulture);
 
 		internal static string SettingHitboxSmoothingText => ResourceManager.GetString("SettingHitboxSmoothingText", resourceCulture);

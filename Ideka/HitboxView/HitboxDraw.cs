@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Controls;
+using Gw2Sharp.Models;
+using Ideka.BHUDCommon;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -91,6 +93,21 @@ namespace Ideka.HitboxView
 		private TimePos _lastQueued;
 
 		private readonly Queue<TimePos> _timePosQueue = new Queue<TimePos>();
+
+		private static readonly Dictionary<MountType, Vector2> Sizes = new Dictionary<MountType, Vector2>
+		{
+			[(MountType)0] = Vector2.get_One() * 1f,
+			[(MountType)5] = Vector2.get_One() * 2.8f,
+			[(MountType)3] = Vector2.get_One() * 2.2f,
+			[(MountType)4] = Vector2.get_One() * 3.1f,
+			[(MountType)1] = Vector2.get_One() * 2.2f,
+			[(MountType)2] = Vector2.get_One() * 2.7f,
+			[(MountType)6] = Vector2.get_One() * 2.8f,
+			[(MountType)7] = Vector2.get_One() * 1.7f,
+			[(MountType)8] = Vector2.get_One() * 2.7f,
+			[(MountType)9] = new Vector2(3.1f, 11.1f),
+			[(MountType)10] = Vector2.get_One() * 3.9f
+		};
 
 		public float DrawOrder => 100f;
 
@@ -195,31 +212,44 @@ namespace Ideka.HitboxView
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
 			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-			Matrix trs = Matrix.CreateScale(1f, 1f, 1f) * Matrix.CreateRotationZ(0f - (float)Math.Atan2(Forward.X, Forward.Y)) * Matrix.CreateTranslation(Position);
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
+			Vector2 s;
+			Vector2 scale = (Sizes.TryGetValue(GameService.Gw2Mumble.get_PlayerCharacter().get_CurrentMount(), out s) ? s : Vector2.get_One());
+			Matrix trs = Matrix.CreateScale(scale.X, scale.Y, 1f) * Matrix.CreateRotationZ(0f - (float)Math.Atan2(Forward.X, Forward.Y)) * Matrix.CreateTranslation(Position);
 			IEnumerable<Vector2> circle = _circle.Transformed(trs).ToScreen();
 			spriteBatch.DrawPolygon(Vector2.get_Zero(), circle, Color.get_Black(), 3f);
 			spriteBatch.DrawPolygon(Vector2.get_Zero(), circle, Color.get_White(), 2f);
-			IEnumerable<Vector2> slice = _slice.Transformed(trs).ToScreen();
-			spriteBatch.DrawPolygon(Vector2.get_Zero(), slice, Color.get_Black(), 3f, 0f, open: true);
-			spriteBatch.DrawPolygon(Vector2.get_Zero(), slice, Color.get_White(), 2f, 0f, open: true);
+			if (scale.X == scale.Y)
+			{
+				IEnumerable<Vector2> slice = _slice.Transformed(trs).ToScreen();
+				spriteBatch.DrawPolygon(Vector2.get_Zero(), slice, Color.get_Black(), 3f, 0f, open: true);
+				spriteBatch.DrawPolygon(Vector2.get_Zero(), slice, Color.get_White(), 2f, 0f, open: true);
+			}
 		}
 	}
 }
