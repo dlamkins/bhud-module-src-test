@@ -43,6 +43,7 @@ namespace BhModule.Community.Pathing.UI.Controls
 			_pathingCategory = pathingCategory;
 			_contexts = new List<(Texture2D, string, Action)>();
 			_forceShowAll = forceShowAll;
+			pathingCategory.ExplicitAttributes.AddOrUpdateAttribute("copy", "testing 123!");
 			BuildCategoryMenu();
 			DetectAndBuildContexts();
 		}
@@ -56,11 +57,8 @@ namespace BhModule.Community.Pathing.UI.Controls
 				{
 					((ContextMenuStripItem)this).set_Submenu((ContextMenuStrip)(object)new CategoryContextMenuStrip(_packState, _pathingCategory, _forceShowAll));
 				}
-				if (!_pathingCategory.IsSeparator)
-				{
-					((ContextMenuStripItem)this).set_CanCheck(true);
-					((ContextMenuStripItem)this).set_Checked(!_packState.CategoryStates.GetCategoryInactive(_pathingCategory));
-				}
+				((ContextMenuStripItem)this).set_CanCheck(true);
+				((ContextMenuStripItem)this).set_Checked(!_packState.CategoryStates.GetCategoryInactive(_pathingCategory));
 			}
 		}
 
@@ -113,18 +111,49 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		protected override void OnCheckedChanged(CheckChangedEvent e)
 		{
-			if (((Control)this).get_Enabled())
+			if (((Control)this).get_Enabled() && !_pathingCategory.IsSeparator)
 			{
 				_packState.CategoryStates.SetInactive(_pathingCategory, !e.get_Checked());
 			}
 			((ContextMenuStripItem)this).OnCheckedChanged(e);
 		}
 
+		private bool TryGetCopyDetails(out string copyValue, out string copyMessage)
+		{
+			copyValue = string.Empty;
+			copyMessage = "'{0}' copied to clipboard.";
+			if (_pathingCategory.ExplicitAttributes.TryGetAttribute("copy", out var copyValueAttr))
+			{
+				copyValue = copyValueAttr.GetValueAsString();
+				if (_packState.UserConfiguration.PackMarkerConsentToClipboard.get_Value() == MarkerClipboardConsentLevel.Never)
+				{
+					return false;
+				}
+				if (_pathingCategory.ExplicitAttributes.TryGetAttribute("copy-message", out var copyMessageAttr))
+				{
+					copyMessage = copyMessageAttr.GetValueAsString();
+				}
+				copyMessage = string.Format(copyMessage, copyValue);
+				return true;
+			}
+			return false;
+		}
+
 		protected override void OnClick(MouseEventArgs e)
 		{
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-			if (((ContextMenuStripItem)this).get_CanCheck())
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+			if (_pathingCategory.IsSeparator && TryGetCopyDetails(out var copyValue, out var copyMessage))
+			{
+				ClipboardUtil.get_WindowsClipboardService().SetTextAsync(copyValue).ContinueWith(delegate(Task<bool> t)
+				{
+					if (t.IsCompleted && t.Result)
+					{
+						ScreenNotification.ShowNotification(string.Format(copyMessage, copyValue), (NotificationType)0, (Texture2D)null, 2);
+					}
+				});
+			}
+			else if (!_pathingCategory.IsSeparator)
 			{
 				if (((Enum)GameService.Input.get_Keyboard().get_ActiveModifiers()).HasFlag((Enum)(object)(ModifierKeys)1))
 				{
@@ -152,9 +181,11 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			((ContextMenuStripItem)this).set_CanCheck(!_pathingCategory.IsSeparator);
 			((ContextMenuStripItem)this).Paint(spriteBatch, bounds);
+			((ContextMenuStripItem)this).set_CanCheck(true);
 			int rightOffset = 18;
 			for (int i = 0; i < _contexts.Count; i++)
 			{

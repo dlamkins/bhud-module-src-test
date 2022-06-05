@@ -9,6 +9,9 @@ namespace BhModule.Community.Pathing.State.UserResources
 		public string[] MarkerLoadPaths { get; set; } = Array.Empty<string>();
 
 
+		public bool OptimizeMarkerPacks { get; set; } = true;
+
+
 		public double CopyAttributeRechargeMs { get; set; } = 8000.0;
 
 

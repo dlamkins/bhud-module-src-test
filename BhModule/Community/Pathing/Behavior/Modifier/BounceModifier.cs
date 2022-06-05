@@ -108,7 +108,7 @@ namespace BhModule.Community.Pathing.Behavior.Modifier
 			_bounceAnimation = ((TweenerImpl)GameService.Animation.get_Tweener()).Tween<StandardMarker>(_pathingEntity, (object)new
 			{
 				HeightOffset = _originalVerticalOffset
-			}, _pathingEntity.HeightOffset / 2f, 0f, true).Ease((Func<float, float>)Ease.BounceOut);
+			}, BounceDuration, 0f, true).Ease((Func<float, float>)Ease.BounceOut);
 		}
 
 		public override void Unload()

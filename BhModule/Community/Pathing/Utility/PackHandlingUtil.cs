@@ -64,6 +64,11 @@ namespace BhModule.Community.Pathing.Utility
 			try
 			{
 				Pack pack = Pack.FromArchivedMarkerPack(downloadedPack);
+				if (pack.ManifestedPack)
+				{
+					pack.ReleaseLocks();
+					return downloadedPack;
+				}
 				IPackCollection packCollection = await pack.LoadAllAsync();
 				await new PackWriter(new PackWriterSettings
 				{
@@ -82,7 +87,7 @@ namespace BhModule.Community.Pathing.Utility
 
 		private static async Task BeginPackDownload(MarkerPackPkg markerPackPkg, IProgress<string> progress, Action<MarkerPackPkg, bool> funcOnComplete)
 		{
-			Logger.Info("Updating pack '" + markerPackPkg.Name + "'...");
+			Logger.Info("Downloading pack '" + markerPackPkg.Name + "'...");
 			progress.Report("Downloading pack '" + markerPackPkg.Name + "'...");
 			markerPackPkg.IsDownloading = true;
 			markerPackPkg.DownloadError = null;
@@ -128,8 +133,15 @@ namespace BhModule.Community.Pathing.Utility
 					}
 					val.Dispose();
 				}
-				progress.Report("Optimizing the pack...");
-				tempPackDownloadDestination = await OptimizePack(tempPackDownloadDestination);
+				if (PathingModule.Instance != null && PathingModule.Instance.PackInitiator.PackState.UserResourceStates.Advanced.OptimizeMarkerPacks)
+				{
+					progress.Report("Optimizing the pack...");
+					tempPackDownloadDestination = await OptimizePack(tempPackDownloadDestination);
+				}
+				else
+				{
+					Logger.Info("Skipping pack optimization - it's disabled or instance is null.");
+				}
 				if (File.Exists(finalPath))
 				{
 					needsInit = false;

@@ -13,9 +13,9 @@ namespace BhModule.Community.Pathing.Behavior.Modifier
 	{
 		public const string PRIMARY_ATTR_NAME = "copy";
 
-		private const string ATTR_MESSAGE = "copy-message";
+		public const string ATTR_MESSAGE = "copy-message";
 
-		private const string DEFAULT_COPYMESSAGE = "'{0}' copied to clipboard.";
+		public const string DEFAULT_COPYMESSAGE = "'{0}' copied to clipboard.";
 
 		private readonly IPackState _packState;
 

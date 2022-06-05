@@ -15,13 +15,13 @@
   </PropertyGroup>
   <ItemGroup />
   <ItemGroup>
-    <Reference Include="Blish HUD" />
     <Reference Include="TmfLib">
       <HintPath>..\..\working\TmfLib.dll</HintPath>
     </Reference>
     <Reference Include="MonoGame.Framework" />
     <Reference Include="MonoGame.Extended" />
     <Reference Include="System.Core" />
+    <Reference Include="Blish HUD" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="Gw2Sharp" />
     <Reference Include="System.Numerics" />
@@ -40,10 +40,10 @@
       <HintPath>..\..\working\Flurl.dll</HintPath>
     </Reference>
     <Reference Include="SemVer" />
+    <Reference Include="AsyncClipboardService" />
     <Reference Include="Humanizer">
       <HintPath>..\..\working\Humanizer.dll</HintPath>
     </Reference>
-    <Reference Include="AsyncClipboardService" />
     <Reference Include="Gapotchenko.FX" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Net.Http" />
