@@ -117,7 +117,7 @@ namespace Kenedia.Modules.BuildsManager
 			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).set_Parent(parent);
 			CustomTooltip = customTooltip;
 			Specialization_Control = specialization_Control;
@@ -126,51 +126,58 @@ namespace Kenedia.Modules.BuildsManager
 			DefaultBounds = new Rectangle(0, 0, 38, 38);
 			_Trait = trait;
 			((Control)this).set_Size(new Point(38, 38));
-			_Line = Texture2DExtension.GetRegion(BuildsManager.TextureManager.getControlTexture(_Controls.Line), new Rectangle(22, 15, 85, 5));
+			_Line = Texture2DExtension.GetRegion(BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.Line), new Rectangle(22, 15, 85, 5));
 			((Control)this).set_ClipsBounds(false);
-			((Control)this).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
-				if (Trait != null && Trait.Type == API.traitType.Major && Template != null && ((Control)this).get_MouseOver())
-				{
-					if (Template.Build.SpecLines[Specialization_Control.Index].Traits.Contains(Trait))
-					{
-						Template.Build.SpecLines[Specialization_Control.Index].Traits.Remove(Trait);
-					}
-					else
-					{
-						foreach (API.Trait current in Template.Build.SpecLines[Specialization_Control.Index].Traits.Where((API.Trait e) => e.Tier == Trait.Tier).ToList())
-						{
-							Template.Build.SpecLines[Specialization_Control.Index].Traits.Remove(current);
-						}
-						Template.Build.SpecLines[Specialization_Control.Index].Traits.Add(Trait);
-					}
-					Template.SetChanged();
-				}
-			});
 			UpdateLayout();
-			((Control)this).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
+		}
+
+		protected override void OnMouseEntered(MouseEventArgs e)
+		{
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+			((Control)this).OnMouseEntered(e);
+			if (Trait != null)
 			{
-				//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-				if (Trait != null)
+				((Control)CustomTooltip).set_Visible(true);
+				if (CustomTooltip.CurrentObject != this)
 				{
-					((Control)CustomTooltip).set_Visible(true);
-					if (CustomTooltip.CurrentObject != this)
-					{
-						CustomTooltip.CurrentObject = this;
-						CustomTooltip.Header = Trait.Name;
-						CustomTooltip.HeaderColor = new Color(255, 204, 119, 255);
-						CustomTooltip.Content = new List<string> { (Trait.Description == "") ? "No Description in API" : Trait.Description };
-					}
+					CustomTooltip.CurrentObject = this;
+					CustomTooltip.Header = Trait.Name;
+					CustomTooltip.HeaderColor = new Color(255, 204, 119, 255);
+					CustomTooltip.Content = new List<string> { (Trait.Description == "") ? "No Description in API" : Trait.Description };
 				}
-			});
-			((Control)this).add_MouseLeft((EventHandler<MouseEventArgs>)delegate
+			}
+		}
+
+		protected override void OnMouseLeft(MouseEventArgs e)
+		{
+			((Control)this).OnMouseLeft(e);
+			if (CustomTooltip.CurrentObject == this)
 			{
-				if (CustomTooltip.CurrentObject == this)
+				((Control)CustomTooltip).set_Visible(false);
+			}
+		}
+
+		protected override void OnClick(MouseEventArgs mouse)
+		{
+			((Control)this).OnClick(mouse);
+			if (Trait == null || Trait.Type != API.traitType.Major || Template == null || !((Control)this).get_MouseOver())
+			{
+				return;
+			}
+			if (Template.Build.SpecLines[Specialization_Control.Index].Traits.Contains(Trait))
+			{
+				Template.Build.SpecLines[Specialization_Control.Index].Traits.Remove(Trait);
+			}
+			else
+			{
+				foreach (API.Trait t in Template.Build.SpecLines[Specialization_Control.Index].Traits.Where((API.Trait e) => e.Tier == Trait.Tier).ToList())
 				{
-					((Control)CustomTooltip).set_Visible(false);
+					Template.Build.SpecLines[Specialization_Control.Index].Traits.Remove(t);
 				}
-			});
+				Template.Build.SpecLines[Specialization_Control.Index].Traits.Add(Trait);
+			}
+			Template.SetChanged();
 		}
 
 		private void UpdateLayout()

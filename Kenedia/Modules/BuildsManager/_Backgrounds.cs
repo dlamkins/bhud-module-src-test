@@ -4,6 +4,7 @@ namespace Kenedia.Modules.BuildsManager
 	{
 		MainWindow,
 		BlueishMainWindow,
-		Tooltip
+		Tooltip,
+		Build
 	}
 }

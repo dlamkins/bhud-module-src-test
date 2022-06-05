@@ -61,63 +61,63 @@ namespace Kenedia.Modules.BuildsManager
 		{
 			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d2: Expected O, but got Unknown
-			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0259: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0268: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0335: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0395: Unknown result type (might be due to invalid IL or missing references)
-			//IL_039a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b2: Expected O, but got Unknown
-			//IL_03da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f7: Expected O, but got Unknown
-			//IL_0493: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0500: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0575: Unknown result type (might be due to invalid IL or missing references)
-			//IL_057a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0581: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0588: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0598: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05db: Expected O, but got Unknown
-			//IL_05f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0603: Unknown result type (might be due to invalid IL or missing references)
-			//IL_060a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0611: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0621: Unknown result type (might be due to invalid IL or missing references)
-			//IL_062b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0633: Unknown result type (might be due to invalid IL or missing references)
-			//IL_064c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_065d: Expected O, but got Unknown
-			_EmptyTraitLine = Texture2DExtension.GetRegion(BuildsManager.TextureManager.getControlTexture(_Controls.PlaceHolder_Traitline), 0, 0, 647, 136);
-			_Delete = BuildsManager.TextureManager.getControlTexture(_Controls.Delete);
-			_DeleteHovered = BuildsManager.TextureManager.getControlTexture(_Controls.Delete_Hovered);
-			Disclaimer_Background = Texture2DExtension.GetRegion(BuildsManager.TextureManager._Controls[9], 0, 0, 647, 136);
+			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Expected O, but got Unknown
+			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_028b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0307: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0316: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03df: Expected O, but got Unknown
+			//IL_040c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0411: Unknown result type (might be due to invalid IL or missing references)
+			//IL_041d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0429: Expected O, but got Unknown
+			//IL_04c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0532: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0601: Unknown result type (might be due to invalid IL or missing references)
+			//IL_060d: Expected O, but got Unknown
+			//IL_0625: Unknown result type (might be due to invalid IL or missing references)
+			//IL_062a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0635: Unknown result type (might be due to invalid IL or missing references)
+			//IL_063c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0643: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0653: Unknown result type (might be due to invalid IL or missing references)
+			//IL_065d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0665: Unknown result type (might be due to invalid IL or missing references)
+			//IL_067e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_068f: Expected O, but got Unknown
+			_EmptyTraitLine = Texture2DExtension.GetRegion(BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.PlaceHolder_Traitline), 0, 0, 647, 136);
+			_Delete = BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.Delete);
+			_DeleteHovered = BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.Delete_Hovered);
+			Disclaimer_Background = Texture2DExtension.GetRegion(BuildsManager.ModuleInstance.TextureManager._Controls[9], 0, 0, 647, 136);
 			Font = GameService.Content.get_DefaultFont18();
 			Panel val = new Panel();
 			((Control)val).set_Parent((Container)(object)this);
@@ -135,7 +135,7 @@ namespace Kenedia.Modules.BuildsManager
 			Detail_Panel = container_TabbedPanel;
 			_Professions = new List<SelectionPopUp.SelectionEntry>();
 			ProfessionSelection = new SelectionPopUp((Container)(object)this);
-			foreach (API.Profession profession in BuildsManager.Data.Professions)
+			foreach (API.Profession profession in BuildsManager.ModuleInstance.Data.Professions)
 			{
 				_Professions.Add(new SelectionPopUp.SelectionEntry
 				{
@@ -150,14 +150,14 @@ namespace Kenedia.Modules.BuildsManager
 			ProfessionSelection.Changed += ProfessionSelection_Changed;
 			Control_AddButton obj = new Control_AddButton
 			{
-				Texture = BuildsManager.TextureManager.getControlTexture(_Controls.Import),
-				TextureHovered = BuildsManager.TextureManager.getControlTexture(_Controls.Import_Hovered)
+				Texture = BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.Import),
+				TextureHovered = BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.Import_Hovered)
 			};
 			((Control)obj).set_Parent((Container)(object)Templates_Panel);
 			obj.Text = "";
 			((Control)obj).set_Location(new Point(((Control)Templates_Panel).get_Width() - 130 - 40, 0));
 			((Control)obj).set_Size(new Point(35, 35));
-			((Control)obj).set_BasicTooltipText($"Import 'BuildPad' builds from '{BuildsManager.Paths.builds}config.ini'");
+			((Control)obj).set_BasicTooltipText($"Import 'BuildPad' builds from '{BuildsManager.ModuleInstance.Paths.builds}config.ini'");
 			((Control)obj).set_Visible(false);
 			Import_Button = obj;
 			((Control)Import_Button).add_Click((EventHandler<MouseEventArgs>)Import_Button_Click);
@@ -179,7 +179,7 @@ namespace Kenedia.Modules.BuildsManager
 			Tab obj2 = new Tab
 			{
 				Name = common.Build,
-				Icon = BuildsManager.TextureManager.getIcon(_Icons.Template)
+				Icon = BuildsManager.ModuleInstance.TextureManager.getIcon(_Icons.Template)
 			};
 			Panel val2 = new Panel();
 			((Control)val2).set_Parent((Container)(object)Detail_Panel);
@@ -189,7 +189,7 @@ namespace Kenedia.Modules.BuildsManager
 			Tab obj3 = new Tab
 			{
 				Name = common.Gear,
-				Icon = BuildsManager.TextureManager.getIcon(_Icons.Helmet)
+				Icon = BuildsManager.ModuleInstance.TextureManager.getIcon(_Icons.Helmet)
 			};
 			Panel val3 = new Panel();
 			((Control)val3).set_Parent((Container)(object)Detail_Panel);
@@ -198,13 +198,7 @@ namespace Kenedia.Modules.BuildsManager
 			list.Add(obj3);
 			detail_Panel.Tabs = list;
 			Detail_Panel.SelectedTab = Detail_Panel.Tabs[0];
-			((Control)Detail_Panel.Tabs[0].Panel).add_Resized((EventHandler<ResizedEventArgs>)delegate
-			{
-				//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-				//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-				((Control)Gear).set_Size(((Control)Detail_Panel.Tabs[0].Panel).get_Size().Add(new Point(0, -((Control)Detail_Panel.GearBox).get_Bottom() + 30)));
-			});
+			((Control)Detail_Panel.Tabs[0].Panel).add_Resized((EventHandler<ResizedEventArgs>)Panel_Resized);
 			Control_Build control_Build = new Control_Build((Container)(object)Detail_Panel.Tabs[0].Panel);
 			((Control)control_Build).set_Parent((Container)(object)Detail_Panel.Tabs[0].Panel);
 			((Control)control_Build).set_Size(((Control)Detail_Panel.Tabs[0].Panel).get_Size());
@@ -243,6 +237,14 @@ namespace Kenedia.Modules.BuildsManager
 			Detail_Panel.GearBox.add_EnterPressed((EventHandler<EventArgs>)GearBox_EnterPressed);
 			Control.get_Input().get_Mouse().add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)GlobalClick);
 			GameService.Gw2Mumble.get_PlayerCharacter().add_NameChanged((EventHandler<ValueEventArgs<string>>)PlayerCharacter_NameChanged);
+		}
+
+		private void Panel_Resized(object sender, ResizedEventArgs e)
+		{
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			((Control)Gear).set_Size(((Control)Detail_Panel.Tabs[0].Panel).get_Size().Add(new Point(0, -((Control)Detail_Panel.GearBox).get_Bottom() + 30)));
 		}
 
 		private void ProfessionSelection_Changed(object sender, EventArgs e)
@@ -355,11 +357,11 @@ namespace Kenedia.Modules.BuildsManager
 
 		private void Button_Click(object sender, MouseEventArgs e)
 		{
-			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
 			_Professions = new List<SelectionPopUp.SelectionEntry>();
-			foreach (API.Profession profession in BuildsManager.Data.Professions)
+			foreach (API.Profession profession in BuildsManager.ModuleInstance.Data.Professions)
 			{
 				_Professions.Add(new SelectionPopUp.SelectionEntry
 				{
@@ -491,12 +493,12 @@ namespace Kenedia.Modules.BuildsManager
 			//IL_02b3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02bf: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0374: Unknown result type (might be due to invalid IL or missing references)
-			//IL_038f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0392: Unknown result type (might be due to invalid IL or missing references)
-			//IL_039c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0379: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0394: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0397: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b3: Unknown result type (might be due to invalid IL or missing references)
 			((WindowBase2)this).PaintBeforeChildren(spriteBatch, bounds);
 			Rectangle rect = default(Rectangle);
 			((Rectangle)(ref rect))._002Ector(((Control)Detail_Panel).get_Location().X, 44, ((Control)Detail_Panel).get_Width() - 38, 35);
@@ -518,7 +520,7 @@ namespace Kenedia.Modules.BuildsManager
 			if (BuildsManager.ModuleInstance.Selected_Template.Profession != null)
 			{
 				Template template = BuildsManager.ModuleInstance.Selected_Template;
-				Texture2D texture = BuildsManager.TextureManager._Icons[0];
+				Texture2D texture = BuildsManager.ModuleInstance.TextureManager._Icons[0];
 				if (template.Specialization != null)
 				{
 					texture = template.Specialization.ProfessionIconBig._AsyncTexture.get_Texture();
@@ -534,13 +536,28 @@ namespace Kenedia.Modules.BuildsManager
 
 		protected override void DisposeControl()
 		{
-			((Control)_TemplateSelection).Dispose();
-			((Control)NameBox).Dispose();
-			((Control)NameLabel).Dispose();
-			((Control)Import_Button).Dispose();
+			((Control)Add_Button).remove_Click((EventHandler<MouseEventArgs>)Button_Click);
 			((Control)Add_Button).Dispose();
-			ProfessionSelection.Changed -= ProfessionSelection_Changed;
+			BuildsManager.ModuleInstance.LanguageChanged -= ModuleInstance_LanguageChanged;
+			BuildsManager.ModuleInstance.Selected_Template_Edit -= Selected_Template_Edit;
+			BuildsManager.ModuleInstance.Selected_Template_Changed -= ModuleInstance_Selected_Template_Changed;
+			BuildsManager.ModuleInstance.Templates_Loaded -= Templates_Loaded;
+			BuildsManager.ModuleInstance.Selected_Template_Redraw -= Selected_Template_Redraw;
+			((Control)Detail_Panel.Tabs[0].Panel).remove_Resized((EventHandler<ResizedEventArgs>)Panel_Resized);
+			Detail_Panel.TemplateBox.remove_EnterPressed((EventHandler<EventArgs>)TemplateBox_EnterPressed);
+			Detail_Panel.GearBox.remove_EnterPressed((EventHandler<EventArgs>)GearBox_EnterPressed);
+			Control.get_Input().get_Mouse().remove_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)GlobalClick);
 			GameService.Gw2Mumble.get_PlayerCharacter().remove_NameChanged((EventHandler<ValueEventArgs<string>>)PlayerCharacter_NameChanged);
+			_TemplateSelection.TemplateChanged -= _TemplateSelection_TemplateChanged;
+			((Control)_TemplateSelection).Dispose();
+			NameBox.remove_EnterPressed((EventHandler<EventArgs>)NameBox_TextChanged);
+			((Control)NameBox).Dispose();
+			((Control)NameLabel).remove_Click((EventHandler<MouseEventArgs>)NameLabel_Click);
+			((Control)NameLabel).Dispose();
+			((Control)Import_Button).remove_Click((EventHandler<MouseEventArgs>)Import_Button_Click);
+			((Control)Import_Button).Dispose();
+			ProfessionSelection.Changed -= ProfessionSelection_Changed;
+			((Control)ProfessionSelection).Dispose();
 			((WindowBase2)this).DisposeControl();
 		}
 

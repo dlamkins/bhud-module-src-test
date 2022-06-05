@@ -35,10 +35,10 @@ namespace Kenedia.Modules.BuildsManager
 		public Control_AddButton()
 			: this()
 		{
-			Texture = BuildsManager.TextureManager.getControlTexture(_Controls.Add);
-			TextureHovered = BuildsManager.TextureManager.getControlTexture(_Controls.Add_Hovered);
-			_EmptyTraitLine = Texture2DExtension.GetRegion(BuildsManager.TextureManager.getControlTexture(_Controls.PlaceHolder_Traitline), 0, 0, 647, 136);
-			_Template_Border = BuildsManager.TextureManager.getControlTexture(_Controls.Template_Border);
+			Texture = BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.Add);
+			TextureHovered = BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.Add_Hovered);
+			_EmptyTraitLine = Texture2DExtension.GetRegion(BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.PlaceHolder_Traitline), 0, 0, 647, 136);
+			_Template_Border = BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.Template_Border);
 			Font = GameService.Content.get_DefaultFont16();
 		}
 

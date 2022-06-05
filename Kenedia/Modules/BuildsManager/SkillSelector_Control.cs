@@ -88,7 +88,7 @@ namespace Kenedia.Modules.BuildsManager
 			Font = GameService.Content.get_DefaultFont18();
 			((Control)this).set_Size(new Point(20 + 4 * _SkillSize, _SkillSize * (int)Math.Ceiling((double)Skills.Count / 4.0)));
 			((Control)this).set_ClipsBounds(false);
-			_NoWaterTexture = Texture2DExtension.GetRegion(BuildsManager.TextureManager.getControlTexture(_Controls.NoWaterTexture), 16, 16, 96, 96);
+			_NoWaterTexture = Texture2DExtension.GetRegion(BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.NoWaterTexture), 16, 16, 96, 96);
 			Control.get_Input().get_Mouse().add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)OnGlobalClick);
 		}
 
@@ -96,6 +96,7 @@ namespace Kenedia.Modules.BuildsManager
 		{
 			((Control)this).DisposeControl();
 			((Control)CustomTooltip).Dispose();
+			Control.get_Input().get_Mouse().remove_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)OnGlobalClick);
 		}
 
 		private void OnGlobalClick(object sender, MouseEventArgs e)
@@ -314,10 +315,6 @@ namespace Kenedia.Modules.BuildsManager
 					}
 				}
 			}
-		}
-
-		public void SetTemplate()
-		{
 		}
 	}
 }

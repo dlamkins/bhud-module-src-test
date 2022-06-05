@@ -1,9 +1,12 @@
+using System;
 using System.Collections.Generic;
 
 namespace Kenedia.Modules.BuildsManager
 {
-	public class GearTemplate
+	public class GearTemplate : IDisposable
 	{
+		private bool disposed;
+
 		public List<TemplateItem> Trinkets = new List<TemplateItem>
 		{
 			new TemplateItem
@@ -153,6 +156,17 @@ namespace Kenedia.Modules.BuildsManager
 			}
 		}
 
+		public void Dispose()
+		{
+			if (!disposed)
+			{
+				Trinkets = null;
+				Armor = null;
+				Weapons = null;
+				AquaticWeapons = null;
+			}
+		}
+
 		public GearTemplate(string code = null)
 		{
 			if (code == null)
@@ -172,7 +186,7 @@ namespace Kenedia.Modules.BuildsManager
 				int.TryParse(ItemStrings[l], out var id);
 				if (id > 0)
 				{
-					Trinkets[m].Stat = BuildsManager.Data.Stats.Find((API.Stat e) => e.Id == id);
+					Trinkets[m].Stat = BuildsManager.ModuleInstance.Data.Stats.Find((API.Stat e) => e.Id == id);
 				}
 				BuildsManager.Logger.Debug("Trinkets[" + m + "].Stat: " + Trinkets[m].Stat?.Name);
 				m++;
@@ -185,13 +199,13 @@ namespace Kenedia.Modules.BuildsManager
 				int.TryParse(array[0], out var stat_id3);
 				if (stat_id3 > 0)
 				{
-					Armor[m].Stat = BuildsManager.Data.Stats.Find((API.Stat e) => e.Id == stat_id3);
+					Armor[m].Stat = BuildsManager.ModuleInstance.Data.Stats.Find((API.Stat e) => e.Id == stat_id3);
 				}
 				BuildsManager.Logger.Debug("Armor[" + m + "].Stat: " + Armor[m].Stat?.Name);
 				int.TryParse(array[1], out var rune_id);
 				if (stat_id3 > 0)
 				{
-					Armor[m].Rune = BuildsManager.Data.Runes.Find((API.RuneItem e) => e.Id == rune_id);
+					Armor[m].Rune = BuildsManager.ModuleInstance.Data.Runes.Find((API.RuneItem e) => e.Id == rune_id);
 				}
 				BuildsManager.Logger.Debug("Armor[" + m + "].Rune: " + Armor[m].Rune?.Name);
 				m++;
@@ -204,7 +218,7 @@ namespace Kenedia.Modules.BuildsManager
 				int.TryParse(array2[0], out var stat_id2);
 				if (stat_id2 > 0)
 				{
-					Weapons[m].Stat = BuildsManager.Data.Stats.Find((API.Stat e) => e.Id == stat_id2);
+					Weapons[m].Stat = BuildsManager.ModuleInstance.Data.Stats.Find((API.Stat e) => e.Id == stat_id2);
 				}
 				BuildsManager.Logger.Debug("Weapons[" + m + "].Stat: " + Weapons[m].Stat?.Name);
 				int weaponType = -1;
@@ -214,7 +228,7 @@ namespace Kenedia.Modules.BuildsManager
 				int.TryParse(array2[2], out var sigil_id);
 				if (stat_id2 > 0)
 				{
-					Weapons[m].Sigil = BuildsManager.Data.Sigils.Find((API.SigilItem e) => e.Id == sigil_id);
+					Weapons[m].Sigil = BuildsManager.ModuleInstance.Data.Sigils.Find((API.SigilItem e) => e.Id == sigil_id);
 				}
 				BuildsManager.Logger.Debug("Weapons[" + m + "].Sigil: " + Weapons[m].Sigil?.Name);
 				m++;
@@ -227,7 +241,7 @@ namespace Kenedia.Modules.BuildsManager
 				int.TryParse(array3[0], out var stat_id);
 				if (stat_id > 0)
 				{
-					AquaticWeapons[m].Stat = BuildsManager.Data.Stats.Find((API.Stat e) => e.Id == stat_id);
+					AquaticWeapons[m].Stat = BuildsManager.ModuleInstance.Data.Stats.Find((API.Stat e) => e.Id == stat_id);
 				}
 				BuildsManager.Logger.Debug("AquaticWeapons[" + m + "].Stat: " + AquaticWeapons[m].Stat?.Name);
 				int weaponType2 = -1;
@@ -237,13 +251,13 @@ namespace Kenedia.Modules.BuildsManager
 				int.TryParse(array3[2], out var sigil1_id);
 				if (sigil1_id > 0)
 				{
-					AquaticWeapons[m].Sigils[0] = BuildsManager.Data.Sigils.Find((API.SigilItem e) => e.Id == sigil1_id);
+					AquaticWeapons[m].Sigils[0] = BuildsManager.ModuleInstance.Data.Sigils.Find((API.SigilItem e) => e.Id == sigil1_id);
 				}
 				BuildsManager.Logger.Debug("AquaticWeapons[" + m + "].Sigil: " + AquaticWeapons[m].Sigils[0]?.Name);
 				int.TryParse(array3[3], out var sigil2_id);
 				if (sigil2_id > 0)
 				{
-					AquaticWeapons[m].Sigils[1] = BuildsManager.Data.Sigils.Find((API.SigilItem e) => e.Id == sigil2_id);
+					AquaticWeapons[m].Sigils[1] = BuildsManager.ModuleInstance.Data.Sigils.Find((API.SigilItem e) => e.Id == sigil2_id);
 				}
 				BuildsManager.Logger.Debug("AquaticWeapons[" + m + "].Sigil: " + AquaticWeapons[m].Sigils[1]?.Name);
 				m++;

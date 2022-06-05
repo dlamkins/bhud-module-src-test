@@ -107,10 +107,10 @@ namespace Kenedia.Modules.BuildsManager
 			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0213: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0266: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0216: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0240: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0257: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0293: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).set_Parent(parent);
 			((Control)this).set_Size(new Point((int)((double)_Width * Scale), (int)((double)_Height * Scale)));
 			CustomTooltip customTooltip = new CustomTooltip(((Control)this).get_Parent());
@@ -118,15 +118,15 @@ namespace Kenedia.Modules.BuildsManager
 			customTooltip.HeaderColor = new Color(255, 204, 119, 255);
 			CustomTooltip = customTooltip;
 			((Control)this).add_Click((EventHandler<MouseEventArgs>)OnClick);
-			_SpecSideSelector_Hovered = BuildsManager.TextureManager.getControlTexture(_Controls.SpecSideSelector_Hovered);
-			_SpecSideSelector = BuildsManager.TextureManager.getControlTexture(_Controls.SpecSideSelector);
-			_EliteFrame = Texture2DExtension.GetRegion(BuildsManager.TextureManager.getControlTexture(_Controls.EliteFrame), 0, 4, 625, 130);
-			_SpecHighlightFrame = Texture2DExtension.GetRegion(BuildsManager.TextureManager.getControlTexture(_Controls.SpecHighlight), 12, 5, 103, 116);
-			_SpecFrame = Texture2DExtension.GetRegion(BuildsManager.TextureManager.getControlTexture(_Controls.SpecFrame), 0, 0, 647, 136);
-			_EmptyTraitLine = Texture2DExtension.GetRegion(BuildsManager.TextureManager.getControlTexture(_Controls.PlaceHolder_Traitline), 0, 0, 647, 136);
-			_PlaceHolderTexture = BuildsManager.TextureManager._Icons[1];
-			_EmptyTexture = BuildsManager.TextureManager._Icons[0];
-			_Line = Texture2DExtension.GetRegion(BuildsManager.TextureManager.getControlTexture(_Controls.Line), new Rectangle(22, 15, 85, 5));
+			_SpecSideSelector_Hovered = BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.SpecSideSelector_Hovered);
+			_SpecSideSelector = BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.SpecSideSelector);
+			_EliteFrame = Texture2DExtension.GetRegion(BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.EliteFrame), 0, 4, 625, 130);
+			_SpecHighlightFrame = Texture2DExtension.GetRegion(BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.SpecHighlight), 12, 5, 103, 116);
+			_SpecFrame = Texture2DExtension.GetRegion(BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.SpecFrame), 0, 0, 647, 136);
+			_EmptyTraitLine = Texture2DExtension.GetRegion(BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.PlaceHolder_Traitline), 0, 0, 647, 136);
+			_PlaceHolderTexture = BuildsManager.ModuleInstance.TextureManager._Icons[1];
+			_EmptyTexture = BuildsManager.ModuleInstance.TextureManager._Icons[0];
+			_Line = Texture2DExtension.GetRegion(BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.Line), new Rectangle(22, 15, 85, 5));
 			_Background = _EmptyTraitLine;
 			SkillBar_Control obj = new SkillBar_Control(((Control)this).get_Parent())
 			{
@@ -143,16 +143,18 @@ namespace Kenedia.Modules.BuildsManager
 				specialization_Control.Elite = i == 2;
 				specializations.Add(specialization_Control);
 			}
-			((Control)this).add_Disposed((EventHandler<EventArgs>)delegate
-			{
-				((Control)CustomTooltip).Dispose();
-			});
 			UpdateTemplate();
 		}
 
 		protected override void DisposeControl()
 		{
 			((Control)this).DisposeControl();
+			((Control)this).remove_Click((EventHandler<MouseEventArgs>)OnClick);
+			CustomTooltip customTooltip = CustomTooltip;
+			if (customTooltip != null)
+			{
+				((Control)customTooltip).Dispose();
+			}
 		}
 
 		private void OnChanged()

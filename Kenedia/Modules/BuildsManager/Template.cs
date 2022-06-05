@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace Kenedia.Modules.BuildsManager
 {
-	public class Template
+	public class Template : IDisposable
 	{
 		public enum _TrinketSlots
 		{
@@ -45,6 +45,8 @@ namespace Kenedia.Modules.BuildsManager
 			AquaticWeapon2
 		}
 
+		private bool disposed;
+
 		public Template_json Template_json;
 
 		private string _Name;
@@ -78,6 +80,17 @@ namespace Kenedia.Modules.BuildsManager
 
 		public event EventHandler Deleted;
 
+		public void Dispose()
+		{
+			if (!disposed)
+			{
+				Profession = null;
+				Specialization = null;
+				Gear?.Dispose();
+				Build?.Dispose();
+			}
+		}
+
 		public Template(string name, string build, string gear)
 		{
 			Template_json = new Template_json
@@ -87,10 +100,10 @@ namespace Kenedia.Modules.BuildsManager
 				GearCode = gear
 			};
 			Name = name;
-			Path = BuildsManager.Paths.builds + "Builds.json";
+			Path = BuildsManager.ModuleInstance.Paths.builds + "Builds.json";
 			Build = new BuildTemplate(Template_json.BuildCode);
 			Gear = new GearTemplate(Template_json.GearCode);
-			Profession = BuildsManager.Data.Professions.Find((API.Profession e) => e.Id == Build?.Profession?.Id);
+			Profession = BuildsManager.ModuleInstance.Data.Professions.Find((API.Profession e) => e.Id == Build?.Profession?.Id);
 			Specialization = ((Profession == null) ? null : Build.SpecLines.Find((SpecLine e) => e.Specialization?.Elite ?? false)?.Specialization);
 		}
 
@@ -103,10 +116,10 @@ namespace Kenedia.Modules.BuildsManager
 				{
 					Template_json = template;
 					Name = template.Name;
-					Path = BuildsManager.Paths.builds + "Builds.json";
+					Path = BuildsManager.ModuleInstance.Paths.builds + "Builds.json";
 					Build = new BuildTemplate(Template_json.BuildCode);
 					Gear = new GearTemplate(Template_json.GearCode);
-					Profession = BuildsManager.Data.Professions.Find((API.Profession e) => e.Id == Build?.Profession.Id);
+					Profession = BuildsManager.ModuleInstance.Data.Professions.Find((API.Profession e) => e.Id == Build?.Profession.Id);
 					Specialization = ((Profession == null) ? null : Build.SpecLines.Find((SpecLine e) => e.Specialization.Elite)?.Specialization);
 				}
 			}
@@ -117,7 +130,7 @@ namespace Kenedia.Modules.BuildsManager
 				Name = "[No Name Set]";
 				Template_json = new Template_json();
 				Profession = BuildsManager.ModuleInstance.CurrentProfession;
-				Path = BuildsManager.Paths.builds + "Builds.json";
+				Path = BuildsManager.ModuleInstance.Paths.builds + "Builds.json";
 				SetChanged();
 			}
 		}
@@ -157,7 +170,7 @@ namespace Kenedia.Modules.BuildsManager
 			}
 			Build = new BuildTemplate();
 			Profession = BuildsManager.ModuleInstance.CurrentProfession;
-			Path = BuildsManager.Paths.builds;
+			Path = BuildsManager.ModuleInstance.Paths.builds;
 			SetChanged();
 		}
 

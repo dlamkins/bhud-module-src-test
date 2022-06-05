@@ -15,8 +15,10 @@ namespace Kenedia.Modules.BuildsManager
 {
 	public class SelectionPopUp : Control
 	{
-		public class SelectionEntry
+		public class SelectionEntry : IDisposable
 		{
+			private bool disposed;
+
 			public object Object;
 
 			public AsyncTexture2D Texture;
@@ -38,6 +40,22 @@ namespace Kenedia.Modules.BuildsManager
 			public Rectangle AbsolutBounds;
 
 			public bool Hovered;
+
+			public void Dispose()
+			{
+				if (!disposed)
+				{
+					disposed = true;
+					AsyncTexture2D texture = Texture;
+					if (texture != null)
+					{
+						texture.Dispose();
+					}
+					Texture = null;
+					((IEnumerable<IDisposable>)ContentTextures)?.DisposeAll();
+					ContentTextures = null;
+				}
+			}
 		}
 
 		public enum selectionType
@@ -74,13 +92,7 @@ namespace Kenedia.Modules.BuildsManager
 
 		public int UpgradeIndex;
 
-		private ContentService ContentService;
-
 		private BitmapFont Font;
-
-		private BitmapFont HeaderFont;
-
-		private Scrollbar Scrollbar;
 
 		public CustomTooltip CustomTooltip;
 
@@ -130,20 +142,18 @@ namespace Kenedia.Modules.BuildsManager
 			: this()
 		{
 			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00be: Expected O, but got Unknown
-			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f6: Expected O, but got Unknown
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c3: Expected O, but got Unknown
 			((Control)this).set_Parent(parent);
 			((Control)this).set_Visible(false);
 			((Control)this).set_ZIndex(997);
 			((Control)this).set_Size(new Point(300, 500));
-			Background = BuildsManager.TextureManager._Backgrounds[2];
+			Background = BuildsManager.ModuleInstance.TextureManager._Backgrounds[2];
 			TextBox val = new TextBox();
 			((Control)val).set_Parent(((Control)this).get_Parent());
 			((TextInputBase)val).set_PlaceholderText(common.Search + " ...");
@@ -153,40 +163,71 @@ namespace Kenedia.Modules.BuildsManager
 			FilterBox = val;
 			((TextInputBase)FilterBox).add_TextChanged((EventHandler<EventArgs>)FilterBox_TextChanged);
 			BuildsManager.ModuleInstance.LanguageChanged += ModuleInstance_LanguageChanged;
-			ContentService = new ContentService();
-			Font = ContentService.GetFont((FontFace)0, (FontSize)14, (FontStyle)0);
-			HeaderFont = ContentService.GetFont((FontFace)0, (FontSize)18, (FontStyle)0);
-			Control.get_Input().get_Mouse().add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)delegate
+			Font = GameService.Content.get_DefaultFont14();
+			Control.get_Input().get_Mouse().add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)Mouse_LeftMouseButtonPressed);
+		}
+
+		protected override void DisposeControl()
+		{
+			((Control)this).DisposeControl();
+			CustomTooltip customTooltip = CustomTooltip;
+			if (customTooltip != null)
 			{
-				OnChanged();
-			});
-			((Control)this).add_Moved((EventHandler<MovedEventArgs>)delegate
+				((Control)customTooltip).Dispose();
+			}
+			TextBox filterBox = FilterBox;
+			if (filterBox != null)
 			{
-				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-				((Control)FilterBox).set_Location(((Control)this).get_Location().Add(new Point(3, 4)));
-			});
-			((Control)this).add_Resized((EventHandler<ResizedEventArgs>)delegate
+				((Control)filterBox).Dispose();
+			}
+			if (FilterBox != null)
+			{
+				((TextInputBase)FilterBox).remove_TextChanged((EventHandler<EventArgs>)FilterBox_TextChanged);
+			}
+			BuildsManager.ModuleInstance.LanguageChanged -= ModuleInstance_LanguageChanged;
+			Control.get_Input().get_Mouse().remove_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)Mouse_LeftMouseButtonPressed);
+			FilteredList?.DisposeAll();
+			List?.DisposeAll();
+			_SelectionTarget = null;
+			SelectedProfession?.Dispose();
+			SelectedProfession = null;
+		}
+
+		protected override void OnHidden(EventArgs e)
+		{
+			((Control)this).OnHidden(e);
+			TextBox filterBox = FilterBox;
+			if (filterBox != null)
+			{
+				((Control)filterBox).Hide();
+			}
+			Clicked = false;
+		}
+
+		protected override void OnResized(ResizedEventArgs e)
+		{
+			((Control)this).OnResized(e);
+			if (FilterBox != null)
 			{
 				((Control)FilterBox).set_Width(((Control)this).get_Width() - 6);
-			});
-			((Control)this).add_Hidden((EventHandler<EventArgs>)delegate
+			}
+		}
+
+		protected override void OnMoved(MovedEventArgs e)
+		{
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			((Control)this).OnMoved(e);
+			if (FilterBox != null)
 			{
-				((Control)FilterBox).Hide();
-				Clicked = false;
-			});
-			((Control)this).add_Shown((EventHandler<EventArgs>)delegate
-			{
-				((Control)FilterBox).Show();
-				((TextInputBase)FilterBox).set_Focused(true);
-				UpdateLayout();
-				Clicked = false;
-			});
-			((Control)this).add_Disposed((EventHandler<EventArgs>)delegate
-			{
-				((Control)FilterBox).Dispose();
-			});
+				((Control)FilterBox).set_Location(((Control)this).get_Location().Add(new Point(3, 4)));
+			}
+		}
+
+		private void Mouse_LeftMouseButtonPressed(object sender, MouseEventArgs e)
+		{
+			OnChanged();
 		}
 
 		private void ModuleInstance_LanguageChanged(object sender, EventArgs e)
@@ -287,13 +328,13 @@ namespace Kenedia.Modules.BuildsManager
 
 		private void UpdateLayout()
 		{
-			//IL_0494: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0499: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0565: Unknown result type (might be due to invalid IL or missing references)
+			//IL_047f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0484: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0550: Unknown result type (might be due to invalid IL or missing references)
 			if (List == null || List.Count == 0)
 			{
 				return;
@@ -316,21 +357,21 @@ namespace Kenedia.Modules.BuildsManager
 					case _EquipmentSlots.Weapon2_MainHand:
 						if (!weapon.Wielded.Contains(API.weaponHand.Aquatic) && (weapon.Wielded.Contains(API.weaponHand.Mainhand) || weapon.Wielded.Contains(API.weaponHand.TwoHand) || weapon.Wielded.Contains(API.weaponHand.DualWielded)))
 						{
-							weapons.Add(weapon.Weapon.ToString());
+							weapons.Add(weapon.Weapon.getLocalName());
 						}
 						break;
 					case _EquipmentSlots.Weapon1_OffHand:
 					case _EquipmentSlots.Weapon2_OffHand:
 						if (weapon.Wielded.Contains(API.weaponHand.Offhand) || weapon.Wielded.Contains(API.weaponHand.DualWielded))
 						{
-							weapons.Add(weapon.Weapon.ToString());
+							weapons.Add(weapon.Weapon.getLocalName());
 						}
 						break;
 					case _EquipmentSlots.AquaticWeapon1:
 					case _EquipmentSlots.AquaticWeapon2:
 						if (weapon.Wielded.Contains(API.weaponHand.Aquatic))
 						{
-							weapons.Add(weapon.Weapon.ToString());
+							weapons.Add(weapon.Weapon.getLocalName());
 						}
 						break;
 					}
@@ -419,6 +460,9 @@ namespace Kenedia.Modules.BuildsManager
 		protected override void OnShown(EventArgs e)
 		{
 			((Control)this).OnShown(e);
+			UpdateLayout();
+			((Control)FilterBox).Show();
+			Clicked = false;
 			((TextInputBase)FilterBox).set_Focused(true);
 			((TextInputBase)FilterBox).set_SelectionStart(0);
 			((TextInputBase)FilterBox).set_SelectionEnd(((TextInputBase)FilterBox).get_Length());

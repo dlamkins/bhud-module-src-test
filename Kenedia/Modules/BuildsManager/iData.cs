@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace Kenedia.Modules.BuildsManager
 {
-	public class iData
+	public class iData : IDisposable
 	{
 		public class _Legend
 		{
@@ -39,9 +39,7 @@ namespace Kenedia.Modules.BuildsManager
 			public int ID;
 		}
 
-		public static ContentsManager ContentsManager;
-
-		public static DirectoriesManager DirectoriesManager;
+		private bool disposed;
 
 		public List<API.Stat> Stats = new List<API.Stat>();
 
@@ -61,15 +59,43 @@ namespace Kenedia.Modules.BuildsManager
 
 		public List<API.Legend> Legends = new List<API.Legend>();
 
-		private bool fetchAPI;
+		public Texture2D PlaceHolder;
 
-		private static Texture2D PlaceHolder;
+		public void Dispose()
+		{
+			if (!disposed)
+			{
+				disposed = true;
+				Professions.DisposeAll();
+				Stats.DisposeAll();
+				Runes.DisposeAll();
+				Sigils.DisposeAll();
+				Armors.DisposeAll();
+				Weapons.DisposeAll();
+				Trinkets.DisposeAll();
+				Legends.DisposeAll();
+				Stats.Clear();
+				Professions.Clear();
+				Runes.Clear();
+				Sigils.Clear();
+				Armors.Clear();
+				Weapons.Clear();
+				Trinkets.Clear();
+				Legends.Clear();
+				SkillID_Pairs.Clear();
+				Texture2D placeHolder = PlaceHolder;
+				if (placeHolder != null)
+				{
+					((GraphicsResource)placeHolder).Dispose();
+				}
+			}
+		}
 
 		public void UpdateLanguage()
 		{
 			string culture = BuildsManager.getCultureString();
 			List<string> filesToDelete = new List<string>();
-			string file_path = BuildsManager.Paths.professions + "professions [" + culture + "].json";
+			string file_path = BuildsManager.ModuleInstance.Paths.professions + "professions [" + culture + "].json";
 			if (!File.Exists(file_path))
 			{
 				return;
@@ -132,7 +158,7 @@ namespace Kenedia.Modules.BuildsManager
 					}
 				}
 			}
-			file_path = BuildsManager.Paths.stats + "stats [" + culture + "].json";
+			file_path = BuildsManager.ModuleInstance.Paths.stats + "stats [" + culture + "].json";
 			foreach (API.Stat tStat in JsonConvert.DeserializeObject<List<API.Stat>>(LoadFile(file_path, filesToDelete)))
 			{
 				API.Stat stat = Stats.Find((API.Stat e) => e.Id == tStat.Id);
@@ -143,10 +169,10 @@ namespace Kenedia.Modules.BuildsManager
 				stat.Name = tStat.Name;
 				foreach (API.StatAttribute attribute in stat.Attributes)
 				{
-					attribute.Name = attribute.getLocalName;
+					attribute.Name = attribute.getLocalName();
 				}
 			}
-			file_path = BuildsManager.Paths.runes + "runes [" + culture + "].json";
+			file_path = BuildsManager.ModuleInstance.Paths.runes + "runes [" + culture + "].json";
 			foreach (API.RuneItem tRune in JsonConvert.DeserializeObject<List<API.RuneItem>>(LoadFile(file_path, filesToDelete)))
 			{
 				API.RuneItem rune = Runes.Find((API.RuneItem e) => e.Id == tRune.Id);
@@ -156,7 +182,7 @@ namespace Kenedia.Modules.BuildsManager
 					rune.Bonuses = tRune.Bonuses;
 				}
 			}
-			file_path = BuildsManager.Paths.sigils + "sigils [" + culture + "].json";
+			file_path = BuildsManager.ModuleInstance.Paths.sigils + "sigils [" + culture + "].json";
 			foreach (API.SigilItem tSigil in JsonConvert.DeserializeObject<List<API.SigilItem>>(LoadFile(file_path, filesToDelete)))
 			{
 				API.SigilItem sigil = Sigils.Find((API.SigilItem e) => e.Id == tSigil.Id);
@@ -166,7 +192,7 @@ namespace Kenedia.Modules.BuildsManager
 					sigil.Description = tSigil.Description;
 				}
 			}
-			file_path = BuildsManager.Paths.armory + "armors [" + culture + "].json";
+			file_path = BuildsManager.ModuleInstance.Paths.armory + "armors [" + culture + "].json";
 			foreach (API.ArmorItem tArmor in JsonConvert.DeserializeObject<List<API.ArmorItem>>(LoadFile(file_path, filesToDelete)))
 			{
 				API.ArmorItem armor = Armors.Find((API.ArmorItem e) => e.Id == tArmor.Id);
@@ -175,7 +201,7 @@ namespace Kenedia.Modules.BuildsManager
 					armor.Name = tArmor.Name;
 				}
 			}
-			file_path = BuildsManager.Paths.armory + "weapons [" + culture + "].json";
+			file_path = BuildsManager.ModuleInstance.Paths.armory + "weapons [" + culture + "].json";
 			foreach (API.WeaponItem tWeapon in JsonConvert.DeserializeObject<List<API.WeaponItem>>(LoadFile(file_path, filesToDelete)))
 			{
 				API.WeaponItem weapon = Weapons.Find((API.WeaponItem e) => e.Id == tWeapon.Id);
@@ -184,7 +210,7 @@ namespace Kenedia.Modules.BuildsManager
 					weapon.Name = tWeapon.Name;
 				}
 			}
-			file_path = BuildsManager.Paths.armory + "trinkets [" + culture + "].json";
+			file_path = BuildsManager.ModuleInstance.Paths.armory + "trinkets [" + culture + "].json";
 			foreach (API.TrinketItem tTrinket in JsonConvert.DeserializeObject<List<API.TrinketItem>>(LoadFile(file_path, filesToDelete)))
 			{
 				API.TrinketItem trinket = Trinkets.Find((API.TrinketItem e) => e.Id == tTrinket.Id);
@@ -197,20 +223,20 @@ namespace Kenedia.Modules.BuildsManager
 
 		private Texture2D LoadImage(string path, GraphicsDevice graphicsDevice, List<string> filesToDelete, Rectangle region = default(Rectangle), Rectangle default_Bounds = default(Rectangle))
 		{
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
 			Texture2D texture = PlaceHolder;
 			try
 			{
@@ -241,27 +267,24 @@ namespace Kenedia.Modules.BuildsManager
 				{
 					filesToDelete.Add(path);
 				}
-				texture = BuildsManager.TextureManager.getIcon(_Icons.Bug);
+				texture = BuildsManager.ModuleInstance.TextureManager.getIcon(_Icons.Bug);
 				BuildsManager.Logger.Debug("InvalidOperationException: Failed to load {0}. Fetching the API again.", new object[1] { path });
-				fetchAPI = true;
 				return texture;
 			}
 			catch (UnauthorizedAccessException)
 			{
-				return BuildsManager.TextureManager.getIcon(_Icons.Bug);
+				return BuildsManager.ModuleInstance.TextureManager.getIcon(_Icons.Bug);
 			}
 			catch (FileNotFoundException)
 			{
-				texture = BuildsManager.TextureManager.getIcon(_Icons.Bug);
+				texture = BuildsManager.ModuleInstance.TextureManager.getIcon(_Icons.Bug);
 				BuildsManager.Logger.Debug("FileNotFoundException: Failed to load {0}. Fetching the API again.", new object[1] { path });
-				fetchAPI = true;
 				return texture;
 			}
 			catch (FileLoadException)
 			{
-				texture = BuildsManager.TextureManager.getIcon(_Icons.Bug);
+				texture = BuildsManager.ModuleInstance.TextureManager.getIcon(_Icons.Bug);
 				BuildsManager.Logger.Debug("FileLoadException: Failed to load {0}. Fetching the API again.", new object[1] { path });
-				fetchAPI = true;
 				return texture;
 			}
 		}
@@ -279,8 +302,8 @@ namespace Kenedia.Modules.BuildsManager
 				if (File.Exists(path))
 				{
 					filesToDelete.Add(path);
+					return txt;
 				}
-				fetchAPI = true;
 				return txt;
 			}
 			catch (UnauthorizedAccessException)
@@ -289,60 +312,52 @@ namespace Kenedia.Modules.BuildsManager
 			}
 			catch (FileNotFoundException)
 			{
-				fetchAPI = true;
 				return txt;
 			}
 			catch (FileLoadException)
 			{
-				fetchAPI = true;
 				return txt;
 			}
 		}
 
-		public iData(ContentsManager contentsManager = null, DirectoriesManager directoriesManager = null)
+		public iData()
 		{
-			//IL_03d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_040e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0413: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0433: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0438: Unknown result type (might be due to invalid IL or missing references)
-			//IL_044f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0454: Unknown result type (might be due to invalid IL or missing references)
-			//IL_047c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0481: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0491: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0496: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_054f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0554: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0628: Unknown result type (might be due to invalid IL or missing references)
-			//IL_062d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0671: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0676: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06ed: Unknown result type (might be due to invalid IL or missing references)
-			if (contentsManager != null)
-			{
-				ContentsManager = contentsManager;
-			}
-			if (directoriesManager != null)
-			{
-				DirectoriesManager = directoriesManager;
-			}
-			PlaceHolder = BuildsManager.TextureManager.getIcon(_Icons.Bug);
+			//IL_0403: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0408: Unknown result type (might be due to invalid IL or missing references)
+			//IL_043a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_043f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_045f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0464: Unknown result type (might be due to invalid IL or missing references)
+			//IL_047b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0480: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0503: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0508: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0518: Unknown result type (might be due to invalid IL or missing references)
+			//IL_051d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_057b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0580: Unknown result type (might be due to invalid IL or missing references)
+			//IL_060b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0610: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0654: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0659: Unknown result type (might be due to invalid IL or missing references)
+			//IL_069d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0714: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0719: Unknown result type (might be due to invalid IL or missing references)
+			ContentsManager ContentsManager = BuildsManager.ModuleInstance.ContentsManager;
+			_ = BuildsManager.ModuleInstance.DirectoriesManager;
+			PlaceHolder = BuildsManager.ModuleInstance.TextureManager.getIcon(_Icons.Bug);
 			List<string> filesToDelete = new List<string>();
 			string culture = BuildsManager.getCultureString();
-			_ = BuildsManager.Paths.BasePath + "\\api\\";
+			_ = BuildsManager.ModuleInstance.Paths.BasePath + "\\api\\";
 			SkillID_Pairs = JsonConvert.DeserializeObject<List<SkillID_Pair>>(new StreamReader(ContentsManager.GetFileStream("data\\skillpalettes.json")).ReadToEnd());
-			string file_path = BuildsManager.Paths.stats + "stats [" + culture + "].json";
+			string file_path = BuildsManager.ModuleInstance.Paths.stats + "stats [" + culture + "].json";
 			if (File.Exists(file_path))
 			{
 				Stats = JsonConvert.DeserializeObject<List<API.Stat>>(LoadFile(file_path, filesToDelete));
@@ -353,43 +368,43 @@ namespace Kenedia.Modules.BuildsManager
 				stat.Attributes.Sort((API.StatAttribute a, API.StatAttribute b) => b.Multiplier.CompareTo(a.Multiplier));
 				foreach (API.StatAttribute attri in stat.Attributes)
 				{
-					attri.Name = attri.getLocalName;
+					attri.Name = attri.getLocalName();
 					attri.Icon._Texture = AsyncTexture2D.op_Implicit(ContentsManager.GetTexture(attri.Icon.Path));
 				}
 			}
-			file_path = BuildsManager.Paths.professions + "professions [" + culture + "].json";
+			file_path = BuildsManager.ModuleInstance.Paths.professions + "professions [" + culture + "].json";
 			if (File.Exists(file_path))
 			{
 				Professions = JsonConvert.DeserializeObject<List<API.Profession>>(LoadFile(file_path, filesToDelete));
 			}
-			file_path = BuildsManager.Paths.runes + "runes [" + culture + "].json";
+			file_path = BuildsManager.ModuleInstance.Paths.runes + "runes [" + culture + "].json";
 			if (File.Exists(file_path))
 			{
 				Runes = JsonConvert.DeserializeObject<List<API.RuneItem>>(LoadFile(file_path, filesToDelete));
 			}
-			file_path = BuildsManager.Paths.sigils + "sigils [" + culture + "].json";
+			file_path = BuildsManager.ModuleInstance.Paths.sigils + "sigils [" + culture + "].json";
 			if (File.Exists(file_path))
 			{
 				Sigils = JsonConvert.DeserializeObject<List<API.SigilItem>>(LoadFile(file_path, filesToDelete));
 			}
-			file_path = BuildsManager.Paths.armory + "armors [" + culture + "].json";
+			file_path = BuildsManager.ModuleInstance.Paths.armory + "armors [" + culture + "].json";
 			if (File.Exists(file_path))
 			{
 				Armors = JsonConvert.DeserializeObject<List<API.ArmorItem>>(LoadFile(file_path, filesToDelete));
 			}
-			file_path = BuildsManager.Paths.armory + "weapons [" + culture + "].json";
+			file_path = BuildsManager.ModuleInstance.Paths.armory + "weapons [" + culture + "].json";
 			if (File.Exists(file_path))
 			{
 				Weapons = JsonConvert.DeserializeObject<List<API.WeaponItem>>(LoadFile(file_path, filesToDelete));
 			}
-			file_path = BuildsManager.Paths.armory + "trinkets [" + culture + "].json";
+			file_path = BuildsManager.ModuleInstance.Paths.armory + "trinkets [" + culture + "].json";
 			if (File.Exists(file_path))
 			{
 				Trinkets = JsonConvert.DeserializeObject<List<API.TrinketItem>>(LoadFile(file_path, filesToDelete));
 			}
 			Trinkets = Trinkets.OrderBy((API.TrinketItem e) => e.TrinketType).ToList();
 			Weapons = Weapons.OrderBy((API.WeaponItem e) => (int)e.WeaponType).ToList();
-			BuildsManager.TextureManager.getIcon(_Icons.Bug);
+			BuildsManager.ModuleInstance.TextureManager.getIcon(_Icons.Bug);
 			foreach (API.Profession profession in Professions)
 			{
 				profession.Icon.ImageRegion = new Rectangle(4, 4, 26, 26);
@@ -446,7 +461,7 @@ namespace Kenedia.Modules.BuildsManager
 			}
 			GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
 			{
-				BuildsManager.DataLoaded = true;
+				BuildsManager.ModuleInstance.DataLoaded = true;
 			});
 		}
 	}

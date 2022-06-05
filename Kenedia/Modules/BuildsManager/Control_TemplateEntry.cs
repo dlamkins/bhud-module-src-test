@@ -4,7 +4,6 @@ using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Gw2Mumble;
 using Blish_HUD.Input;
-using Gw2Sharp.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -15,8 +14,6 @@ namespace Kenedia.Modules.BuildsManager
 	public class Control_TemplateEntry : Control
 	{
 		public Template Template;
-
-		public Control_Build Control_Build;
 
 		private Texture2D _EmptyTraitLine;
 
@@ -32,8 +29,6 @@ namespace Kenedia.Modules.BuildsManager
 
 		private double Tick;
 
-		private float Transparency = 255f;
-
 		private string FeedbackPopup;
 
 		public event EventHandler<TemplateChangedEvent> TemplateChanged;
@@ -44,14 +39,11 @@ namespace Kenedia.Modules.BuildsManager
 			if (FeedbackPopup != null)
 			{
 				Tick += gameTime.get_ElapsedGameTime().TotalMilliseconds;
-				if (Tick < 350.0)
+				if (!(Tick < 350.0))
 				{
-					Transparency -= 25f;
-					return;
+					Tick = 0.0;
+					FeedbackPopup = null;
 				}
-				Tick = 0.0;
-				FeedbackPopup = null;
-				Transparency = 255f;
 			}
 		}
 
@@ -60,9 +52,9 @@ namespace Kenedia.Modules.BuildsManager
 		{
 			((Control)this).set_Parent(parent);
 			Template = template;
-			_EmptyTraitLine = Texture2DExtension.GetRegion(BuildsManager.TextureManager.getControlTexture(_Controls.PlaceHolder_Traitline), 0, 0, 647, 136);
-			_Template_Border = BuildsManager.TextureManager.getControlTexture(_Controls.Template_Border);
-			_Lock = BuildsManager.TextureManager.getIcon(_Icons.Lock_Locked);
+			_EmptyTraitLine = Texture2DExtension.GetRegion(BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.PlaceHolder_Traitline), 0, 0, 647, 136);
+			_Template_Border = BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.Template_Border);
+			_Lock = BuildsManager.ModuleInstance.TextureManager.getIcon(_Icons.Lock_Locked);
 			Font = GameService.Content.get_DefaultFont14();
 			FontItalic = GameService.Content.GetFont((FontFace)0, (FontSize)14, (FontStyle)1);
 		}
@@ -101,11 +93,15 @@ namespace Kenedia.Modules.BuildsManager
 		protected override void DisposeControl()
 		{
 			((Control)this).DisposeControl();
-			Control_Build control_Build = Control_Build;
-			if (control_Build != null)
+			Control_TemplateTooltip templateTooltip = TemplateTooltip;
+			if (templateTooltip != null)
 			{
-				((Control)control_Build).Dispose();
+				((Control)templateTooltip).Dispose();
 			}
+			Template = null;
+			_EmptyTraitLine = null;
+			_Lock = null;
+			_Template_Border = null;
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
@@ -124,8 +120,6 @@ namespace Kenedia.Modules.BuildsManager
 			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
 			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0168: Unknown result type (might be due to invalid IL or missing references)
 			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0179: Unknown result type (might be due to invalid IL or missing references)
@@ -153,8 +147,6 @@ namespace Kenedia.Modules.BuildsManager
 			//IL_027c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_028e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02eb: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0301: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0308: Unknown result type (might be due to invalid IL or missing references)
 			//IL_030f: Unknown result type (might be due to invalid IL or missing references)
@@ -220,12 +212,7 @@ namespace Kenedia.Modules.BuildsManager
 			{
 				texture = AsyncTexture2D.op_Implicit(Template.Build.Profession.IconBig._AsyncTexture);
 			}
-			Texture2D obj = texture;
-			Rectangle val = new Rectangle(2, 2, bounds.Height - 4, bounds.Height - 4);
-			Rectangle? val2 = texture.get_Bounds();
-			string obj2 = Template.Profession?.Id;
-			ProfessionType profession = player.get_Profession();
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, obj, val, val2, (obj2 == ((object)(ProfessionType)(ref profession)).ToString()) ? Color.get_White() : Color.get_LightGray(), 0f, Vector2.get_Zero(), (SpriteEffects)0);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, texture, new Rectangle(2, 2, bounds.Height - 4, bounds.Height - 4), (Rectangle?)texture.get_Bounds(), (Template.Profession?.Id == player.get_Profession().ToString()) ? Color.get_White() : Color.get_LightGray(), 0f, Vector2.get_Zero(), (SpriteEffects)0);
 			if (Template.Path == null)
 			{
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _Lock, new Rectangle(bounds.Height - 14, bounds.Height - 14, 12, 12), (Rectangle?)_Lock.get_Bounds(), new Color(183, 158, 117, 255), 0f, Vector2.get_Zero(), (SpriteEffects)0);
@@ -241,28 +228,7 @@ namespace Kenedia.Modules.BuildsManager
 			}
 			else
 			{
-				string name = Template.Name;
-				BitmapFont font = Font;
-				Rectangle val3 = textBounds;
-				_003F val4;
-				if (BuildsManager.ModuleInstance.Selected_Template != Template)
-				{
-					if (!((Control)this).get_MouseOver())
-					{
-						string obj3 = Template.Profession?.Id;
-						profession = player.get_Profession();
-						val4 = ((obj3 == ((object)(ProfessionType)(ref profession)).ToString()) ? Color.get_LightGray() : Color.get_Gray());
-					}
-					else
-					{
-						val4 = Color.get_White();
-					}
-				}
-				else
-				{
-					val4 = Color.get_LimeGreen();
-				}
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, name, font, val3, (Color)val4, true, (HorizontalAlignment)0, (VerticalAlignment)((rect.Height <= textBounds.Height) ? 1 : 0));
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, Template.Name, Font, textBounds, (BuildsManager.ModuleInstance.Selected_Template == Template) ? Color.get_LimeGreen() : (((Control)this).get_MouseOver() ? Color.get_White() : ((Template.Profession?.Id == player.get_Profession().ToString()) ? Color.get_LightGray() : Color.get_Gray())), true, (HorizontalAlignment)0, (VerticalAlignment)((rect.Height <= textBounds.Height) ? 1 : 0));
 			}
 			Color color = (((Control)this).get_MouseOver() ? Color.get_Honeydew() : Color.get_Transparent());
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, 2), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);

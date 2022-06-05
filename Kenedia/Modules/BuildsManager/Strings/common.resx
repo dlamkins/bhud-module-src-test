@@ -29,22 +29,42 @@
   </xsd:schema>
 <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="Template"><value>Template</value></data>
   <data name="Expertise"><value>Expertise</value></data>
+  <data name="Dagger"><value>Dagger</value></data>
   <data name="Delete"><value>Delete</value></data>
+  <data name="Trident"><value>Trident</value></data>
+  <data name="Scepter"><value>Scepter</value></data>
   <data name="Create"><value>Create</value></data>
+  <data name="Unkown"><value>Unkown</value></data>
+  <data name="Hammer"><value>Hammer</value></data>
   <data name="Search"><value>Search</value></data>
+  <data name="Shield"><value>Shield</value></data>
+  <data name="Pistol"><value>Pistol</value></data>
   <data name="HealingPower"><value>Healing Power</value></data>
+  <data name="Speargun"><value>Speargun</value></data>
   <data name="Vitality"><value>Vitality</value></data>
   <data name="Precision"><value>Precision</value></data>
+  <data name="Shortbow"><value>Shortbow</value></data>
+  <data name="Axe"><value>Axe</value></data>
+  <data name="Focus"><value>Focus</value></data>
   <data name="Build"><value>Build</value></data>
+  <data name="Torch"><value>Torch</value></data>
+  <data name="Rifle"><value>Rifle</value></data>
+  <data name="Sword"><value>Sword</value></data>
+  <data name="Staff"><value>Staff</value></data>
+  <data name="Spear"><value>Spear</value></data>
   <data name="Power"><value>Power</value></data>
   <data name="TemplateCode"><value>Template Code</value></data>
   <data name="Concentration"><value>Concentration</value></data>
   <data name="Ferocity"><value>Ferocity</value></data>
+  <data name="Longbow"><value>Longbow</value></data>
   <data name="Toughness"><value>Toughness</value></data>
   <data name="GearTab_Tips"><value>Left Click to select Stat/Upgrade
 Alt + Right Click to select Weapon
 Right Click to copy Stat/Upgrade Name</value></data>
+  <data name="Greatsword"><value>Greatsword</value></data>
   <data name="ConditionDamage"><value>Condition Damage</value></data>
+  <data name="Warhorn"><value>Warhorn</value></data>
   <data name="Gear"><value>Gear</value></data>
+  <data name="Mace"><value>Mace</value></data>
   <data name="Copy"><value>Copy</value></data>
   </root>

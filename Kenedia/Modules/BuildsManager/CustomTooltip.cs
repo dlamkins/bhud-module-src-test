@@ -76,17 +76,19 @@ namespace Kenedia.Modules.BuildsManager
 			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((Control)this).set_Size(new Point(225, 275));
-			Background = BuildsManager.TextureManager._Backgrounds[2];
+			Background = BuildsManager.ModuleInstance.TextureManager._Backgrounds[2];
 			((Control)this).set_ZIndex(1000);
 			((Control)this).set_Visible(false);
-			Control.get_Input().get_Mouse().add_MouseMoved((EventHandler<MouseEventArgs>)delegate
-			{
-				//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-				((Control)this).set_Location(Control.get_Input().get_Mouse().get_Position()
-					.Add(new Point(20, -10)));
-			});
+			Control.get_Input().get_Mouse().add_MouseMoved((EventHandler<MouseEventArgs>)Mouse_MouseMoved);
+		}
+
+		private void Mouse_MouseMoved(object sender, MouseEventArgs e)
+		{
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			((Control)this).set_Location(Control.get_Input().get_Mouse().get_Position()
+				.Add(new Point(20, -10)));
 		}
 
 		private void UpdateLayout()
@@ -224,6 +226,13 @@ namespace Kenedia.Modules.BuildsManager
 				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, Header, headerFont, new Rectangle(10, 10, 0, (int)rect.Height), HeaderColor, false, (HorizontalAlignment)0, (VerticalAlignment)1);
 				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, string.Join(Environment.NewLine, Content), font, new Rectangle(10, 10 + (int)rect.Height + 15, ((Control)this).get_Width() - 20, ((Control)this).get_Height() - (10 + (int)rect.Height + 15)), ContentColor, true, (HorizontalAlignment)0, (VerticalAlignment)0);
 			}
+		}
+
+		protected override void DisposeControl()
+		{
+			((Control)this).DisposeControl();
+			Background = null;
+			Control.get_Input().get_Mouse().remove_MouseMoved((EventHandler<MouseEventArgs>)Mouse_MouseMoved);
 		}
 	}
 }

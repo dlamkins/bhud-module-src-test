@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Blish_HUD;
 using Blish_HUD.Controls;
@@ -64,31 +63,35 @@ namespace Kenedia.Modules.BuildsManager
 			: this()
 		{
 			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).set_Parent(parent);
 			((Control)this).set_Size(new Point(_SkillSize, _SkillSize + 15));
-			_SelectorTexture = Texture2DExtension.GetRegion(BuildsManager.TextureManager.getControlTexture(_Controls.SkillSelector), 0, 2, 64, 12);
-			_SelectorTextureHovered = BuildsManager.TextureManager.getControlTexture(_Controls.SkillSelector_Hovered);
-			_SkillPlaceHolder = Texture2DExtension.GetRegion(BuildsManager.TextureManager.getControlTexture(_Controls.PlaceHolder_Traitline), 0, 0, 128, 128);
+			_SelectorTexture = Texture2DExtension.GetRegion(BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.SkillSelector), 0, 2, 64, 12);
+			_SelectorTextureHovered = BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.SkillSelector_Hovered);
+			_SkillPlaceHolder = Texture2DExtension.GetRegion(BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.PlaceHolder_Traitline), 0, 0, 128, 128);
 			CustomTooltip customTooltip = new CustomTooltip(((Control)this).get_Parent());
 			((Control)customTooltip).set_ClipsBounds(false);
 			customTooltip.HeaderColor = new Color(255, 204, 119, 255);
 			CustomTooltip = customTooltip;
-			((Control)this).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
+		}
+
+		protected override void OnMouseEntered(MouseEventArgs e)
+		{
+			((Control)this).OnMouseEntered(e);
+			if (Skill != null && Skill.Id > 0)
 			{
-				if (Skill != null && Skill.Id > 0)
-				{
-					((Control)CustomTooltip).set_Visible(true);
-					CustomTooltip.Header = Skill.Name;
-					CustomTooltip.Content = new List<string> { Skill.Description };
-					CustomTooltip.CurrentObject = Skill;
-				}
-			});
-			((Control)this).add_MouseLeft((EventHandler<MouseEventArgs>)delegate
-			{
-				((Control)CustomTooltip).set_Visible(false);
-			});
+				((Control)CustomTooltip).set_Visible(true);
+				CustomTooltip.Header = Skill.Name;
+				CustomTooltip.Content = new List<string> { Skill.Description };
+				CustomTooltip.CurrentObject = Skill;
+			}
+		}
+
+		protected override void OnMouseLeft(MouseEventArgs e)
+		{
+			((Control)this).OnMouseLeft(e);
+			((Control)CustomTooltip).set_Visible(false);
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
@@ -172,8 +175,12 @@ namespace Kenedia.Modules.BuildsManager
 			}
 		}
 
-		public void SetTemplate()
+		protected override void DisposeControl()
 		{
+			((Control)this).DisposeControl();
+			_SelectorTexture = null;
+			_SelectorTextureHovered = null;
+			_SkillPlaceHolder = null;
 		}
 	}
 }

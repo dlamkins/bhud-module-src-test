@@ -96,20 +96,20 @@ namespace Kenedia.Modules.BuildsManager
 		{
 			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0321: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0383: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0429: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0490: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0330: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0392: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0438: Unknown result type (might be due to invalid IL or missing references)
+			//IL_049f: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).set_Parent(parent);
 			CustomTooltip customTooltip = new CustomTooltip(((Control)this).get_Parent());
 			((Control)customTooltip).set_ClipsBounds(false);
 			customTooltip.HeaderColor = new Color(255, 204, 119, 255);
 			CustomTooltip = customTooltip;
-			_TerrestrialTexture = BuildsManager.TextureManager.getControlTexture(_Controls.Land);
-			_AquaTexture = BuildsManager.TextureManager.getControlTexture(_Controls.Water);
-			_SwapTexture = BuildsManager.TextureManager.getIcon(_Icons.Refresh);
+			_TerrestrialTexture = BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.Land);
+			_AquaTexture = BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.Water);
+			_SwapTexture = BuildsManager.ModuleInstance.TextureManager.getIcon(_Icons.Refresh);
 			Enum.GetValues(typeof(SkillSlots));
 			_Skills_Aquatic = new List<Skill_Control>();
 			foreach (API.Skill item in Template.Build.Skills_Aquatic)
@@ -525,13 +525,13 @@ namespace Kenedia.Modules.BuildsManager
 			foreach (Skill_Control item in _Skills_Terrestrial)
 			{
 				((Control)item).remove_Click((EventHandler<MouseEventArgs>)Control_Click);
-				((Control)item).Dispose();
 			}
 			foreach (Skill_Control item2 in _Skills_Aquatic)
 			{
 				((Control)item2).remove_Click((EventHandler<MouseEventArgs>)Control_Click);
-				((Control)item2).Dispose();
 			}
+			((IEnumerable<IDisposable>)_Skills_Terrestrial).DisposeAll();
+			((IEnumerable<IDisposable>)_Skills_Aquatic).DisposeAll();
 			((Control)CustomTooltip).Dispose();
 			((Control)this).DisposeControl();
 		}

@@ -69,6 +69,12 @@ namespace Kenedia.Modules.BuildsManager
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), RectangleExtension.Add(new Rectangle(1, 1, 1, ((Control)this)._size.Y - 2), -2, -2, 0, 4), FrameColor * 0.6f);
 		}
 
+		protected override void DisposeControl()
+		{
+			((Container)this).DisposeControl();
+			Texture = null;
+		}
+
 		public ProgressContainer()
 			: this()
 		{

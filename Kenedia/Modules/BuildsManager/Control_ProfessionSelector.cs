@@ -19,15 +19,15 @@ namespace Kenedia.Modules.BuildsManager
 
 		public int IconSize;
 
-		public EventHandler Changed;
+		public event EventHandler Changed;
 
 		public Control_ProfessionSelector()
 			: this()
 		{
 			_Professions = new List<ProfessionSelection>();
-			for (int i = 0; i < BuildsManager.Data.Professions.Count; i++)
+			for (int i = 0; i < BuildsManager.ModuleInstance.Data.Professions.Count; i++)
 			{
-				API.Profession profession = BuildsManager.Data.Professions[i];
+				API.Profession profession = BuildsManager.ModuleInstance.Data.Professions[i];
 				_Professions.Add(new ProfessionSelection
 				{
 					Profession = profession,
@@ -39,7 +39,7 @@ namespace Kenedia.Modules.BuildsManager
 				Index = _Professions.Count
 			});
 			IconSize = ((Control)this).get_Height() - 4;
-			ClearTexture = BuildsManager.TextureManager.getControlTexture(_Controls.Clear);
+			ClearTexture = BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.Clear);
 			UpdateLayout();
 		}
 
@@ -86,7 +86,7 @@ namespace Kenedia.Modules.BuildsManager
 
 		private void OnChanged(object sender, EventArgs e)
 		{
-			Changed?.Invoke(this, EventArgs.Empty);
+			this.Changed?.Invoke(this, EventArgs.Empty);
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
@@ -172,6 +172,18 @@ namespace Kenedia.Modules.BuildsManager
 					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, ClearTexture, profession.Bounds, (Rectangle?)ClearTexture.get_Bounds(), (Color)(profession.Hovered ? Color.get_White() : ((Professions.Count > 0) ? Color.get_LightGray() : new Color(48, 48, 48, 150))), 0f, Vector2.get_Zero(), (SpriteEffects)0);
 				}
 			}
+		}
+
+		protected override void DisposeControl()
+		{
+			((Control)this).DisposeControl();
+			Professions?.Clear();
+			foreach (ProfessionSelection profession in _Professions)
+			{
+				profession.Dispose();
+			}
+			_Professions?.Clear();
+			ClearTexture = null;
 		}
 	}
 }

@@ -4,7 +4,6 @@ using System.IO;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
-using Kenedia.Modules.BuildsManager.Strings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -132,8 +131,10 @@ namespace Kenedia.Modules.BuildsManager
 			public string Url;
 		}
 
-		public class Icon
+		public class Icon : IDisposable
 		{
+			private bool disposed;
+
 			public string Path;
 
 			public string Url;
@@ -155,7 +156,7 @@ namespace Kenedia.Modules.BuildsManager
 						_Texture = new AsyncTexture2D(Textures.get_TransparentPixel());
 						Task.Run(delegate
 						{
-							FileStream fs = new FileStream(BuildsManager.Paths.BasePath + Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+							FileStream fs = new FileStream(BuildsManager.ModuleInstance.Paths.BasePath + Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 							GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate(GraphicsDevice graphicsDevice)
 							{
 								//IL_0013: Unknown result type (might be due to invalid IL or missing references)
@@ -196,10 +197,25 @@ namespace Kenedia.Modules.BuildsManager
 					return _Texture;
 				}
 			}
+
+			public void Dispose()
+			{
+				if (!disposed)
+				{
+					disposed = true;
+					AsyncTexture2D texture = _Texture;
+					if (texture != null)
+					{
+						texture.Dispose();
+					}
+				}
+			}
 		}
 
-		public class Item
+		public class Item : IDisposable
 		{
+			private bool disposed;
+
 			public string Name;
 
 			public int Id;
@@ -207,6 +223,15 @@ namespace Kenedia.Modules.BuildsManager
 			public Icon Icon;
 
 			public string ChatLink;
+
+			public void Dispose()
+			{
+				if (!disposed)
+				{
+					disposed = true;
+					Icon?.Dispose();
+				}
+			}
 		}
 
 		public class EquipmentItem : Item
@@ -247,8 +272,10 @@ namespace Kenedia.Modules.BuildsManager
 			public string Description;
 		}
 
-		public class Skill
+		public class Skill : IDisposable
 		{
+			private bool disposed;
+
 			public string Name;
 
 			public int Id;
@@ -268,10 +295,21 @@ namespace Kenedia.Modules.BuildsManager
 			public List<string> Flags;
 
 			public List<string> Categories;
+
+			public void Dispose()
+			{
+				if (!disposed)
+				{
+					disposed = true;
+					Icon?.Dispose();
+				}
+			}
 		}
 
-		public class Legend
+		public class Legend : IDisposable
 		{
+			private bool disposed;
+
 			public string Name;
 
 			public int Id;
@@ -287,10 +325,25 @@ namespace Kenedia.Modules.BuildsManager
 			public Skill Skill;
 
 			public int Specialization;
+
+			public void Dispose()
+			{
+				if (!disposed)
+				{
+					disposed = true;
+					Heal?.Dispose();
+					Elite?.Dispose();
+					Swap?.Dispose();
+					Skill?.Dispose();
+					Utilities?.DisposeAll();
+				}
+			}
 		}
 
-		public class Trait
+		public class Trait : IDisposable
 		{
+			private bool disposed;
+
 			public string Name;
 
 			public int Id;
@@ -306,10 +359,21 @@ namespace Kenedia.Modules.BuildsManager
 			public int Order;
 
 			public traitType Type;
+
+			public void Dispose()
+			{
+				if (!disposed)
+				{
+					disposed = true;
+					Icon?.Dispose();
+				}
+			}
 		}
 
-		public class Specialization
+		public class Specialization : IDisposable
 		{
+			private bool disposed;
+
 			public string Name;
 
 			public int Id;
@@ -331,6 +395,21 @@ namespace Kenedia.Modules.BuildsManager
 			public List<Trait> MinorTraits = new List<Trait>();
 
 			public List<Trait> MajorTraits = new List<Trait>();
+
+			public void Dispose()
+			{
+				if (!disposed)
+				{
+					disposed = true;
+					Icon?.Dispose();
+					Background?.Dispose();
+					ProfessionIcon?.Dispose();
+					ProfessionIconBig?.Dispose();
+					WeaponTrait?.Dispose();
+					MinorTraits?.DisposeAll();
+					MajorTraits?.DisposeAll();
+				}
+			}
 		}
 
 		public class ProfessionWeapon
@@ -342,8 +421,10 @@ namespace Kenedia.Modules.BuildsManager
 			public List<weaponHand> Wielded;
 		}
 
-		public class Profession
+		public class Profession : IDisposable
 		{
+			private bool disposed;
+
 			public string Name;
 
 			public string Id;
@@ -359,10 +440,25 @@ namespace Kenedia.Modules.BuildsManager
 			public List<Skill> Skills = new List<Skill>();
 
 			public List<Legend> Legends = new List<Legend>();
+
+			public void Dispose()
+			{
+				if (!disposed)
+				{
+					disposed = true;
+					Icon?.Dispose();
+					IconBig?.Dispose();
+					Specializations?.DisposeAll();
+					Skills?.DisposeAll();
+					Legends?.DisposeAll();
+				}
+			}
 		}
 
-		public class StatAttribute
+		public class StatAttribute : IDisposable
 		{
+			private bool disposed;
+
 			public int Id;
 
 			public string Name;
@@ -373,30 +469,20 @@ namespace Kenedia.Modules.BuildsManager
 
 			public Icon Icon;
 
-			public string getLocalName
+			public void Dispose()
 			{
-				get
+				if (!disposed)
 				{
-					string text = Name;
-					return Id switch
-					{
-						7 => common.Power, 
-						8 => common.Precision, 
-						9 => common.Toughness, 
-						10 => common.Vitality, 
-						5 => common.Ferocity, 
-						6 => common.HealingPower, 
-						3 => common.ConditionDamage, 
-						2 => common.Concentration, 
-						4 => common.Expertise, 
-						_ => text, 
-					};
+					disposed = true;
+					Icon?.Dispose();
 				}
 			}
 		}
 
-		public class Stat
+		public class Stat : IDisposable
 		{
+			private bool disposed;
+
 			public int Id;
 
 			public string Name;
@@ -404,6 +490,16 @@ namespace Kenedia.Modules.BuildsManager
 			public List<StatAttribute> Attributes = new List<StatAttribute>();
 
 			public Icon Icon;
+
+			public void Dispose()
+			{
+				if (!disposed)
+				{
+					disposed = true;
+					Icon.Dispose();
+					Attributes?.DisposeAll();
+				}
+			}
 		}
 
 		public static string UniformAttributeName(string statName)

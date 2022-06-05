@@ -34,22 +34,19 @@ namespace Kenedia.Modules.BuildsManager
 
 		public static _ArmorWeight GetArmorWeight(this ProfessionType profession)
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Expected I4, but got Unknown
-			switch (profession - 1)
+			switch (profession)
 			{
-			case 5:
-			case 6:
-			case 7:
+			case ProfessionType.Elementalist:
+			case ProfessionType.Mesmer:
+			case ProfessionType.Necromancer:
 				return _ArmorWeight.Light;
-			case 2:
-			case 3:
-			case 4:
+			case ProfessionType.Engineer:
+			case ProfessionType.Ranger:
+			case ProfessionType.Thief:
 				return _ArmorWeight.Medium;
-			case 0:
-			case 1:
-			case 8:
+			case ProfessionType.Guardian:
+			case ProfessionType.Warrior:
+			case ProfessionType.Revenant:
 				return _ArmorWeight.Heavy;
 			default:
 				return _ArmorWeight.Unkown;

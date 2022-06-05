@@ -4,7 +4,6 @@ using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Gw2Mumble;
-using Gw2Sharp.Models;
 using Kenedia.Modules.BuildsManager.Strings;
 using Microsoft.Xna.Framework;
 
@@ -35,25 +34,25 @@ namespace Kenedia.Modules.BuildsManager
 			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0076: Expected O, but got Unknown
-			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0133: Expected O, but got Unknown
-			//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011d: Expected O, but got Unknown
+			//IL_0124: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0129: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016a: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).set_Parent(parent);
 			((FlowPanel)this).set_FlowDirection((ControlFlowDirection)3);
 			((FlowPanel)this).set_ControlPadding(new Vector2(0f, 3f));
@@ -63,7 +62,6 @@ namespace Kenedia.Modules.BuildsManager
 			((Control)val).set_Width(((Control)this).get_Width() - 5);
 			((TextInputBase)val).set_PlaceholderText(common.Search + " ...");
 			FilterBox = val;
-			BuildsManager.ModuleInstance.LanguageChanged += ModuleInstance_LanguageChanged;
 			Control_ProfessionSelector control_ProfessionSelector = new Control_ProfessionSelector();
 			((Control)control_ProfessionSelector).set_Parent((Container)(object)this);
 			((Control)control_ProfessionSelector).set_Size(new Point(((Control)this).get_Width() - 5, ((Control)FilterBox).get_Height()));
@@ -83,24 +81,21 @@ namespace Kenedia.Modules.BuildsManager
 			((Control)this).set_Size(new Point(255, ((Control)parent).get_Height() - (((Control)this).get_AbsoluteBounds().Y - 5)));
 			Refresh();
 			((TextInputBase)FilterBox).add_TextChanged((EventHandler<EventArgs>)FilterBox_TextChanged);
-			Control_ProfessionSelector professionSelector = _ProfessionSelector;
-			professionSelector.Changed = (EventHandler)Delegate.Combine(professionSelector.Changed, (EventHandler)delegate
-			{
-				RefreshList();
-			});
+			_ProfessionSelector.Changed += _ProfessionSelector_Changed;
+			BuildsManager.ModuleInstance.LanguageChanged += ModuleInstance_LanguageChanged;
 			BuildsManager.ModuleInstance.Templates_Loaded += ModuleInstance_Templates_Loaded;
 			BuildsManager.ModuleInstance.Template_Deleted += ModuleInstance_Template_Deleted;
 			((Container)ContentPanel).add_ChildAdded((EventHandler<ChildChangedEventArgs>)ContentPanel_ChildsChanged);
 			((Container)ContentPanel).add_ChildRemoved((EventHandler<ChildChangedEventArgs>)ContentPanel_ChildsChanged);
 		}
 
+		private void _ProfessionSelector_Changed(object sender, EventArgs e)
+		{
+			RefreshList();
+		}
+
 		private void ModuleInstance_Template_Deleted(object sender, EventArgs e)
 		{
-			foreach (Control_TemplateEntry template in Templates)
-			{
-				((Control)template).Dispose();
-			}
-			Templates = new List<Control_TemplateEntry>();
 			Refresh();
 		}
 
@@ -108,14 +103,7 @@ namespace Kenedia.Modules.BuildsManager
 		{
 			PlayerCharacter player = GameService.Gw2Mumble.get_PlayerCharacter();
 			_ProfessionSelector.Professions.Clear();
-			_ProfessionSelector.Professions.Add(BuildsManager.Data.Professions.Find(delegate(API.Profession e)
-			{
-				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-				string id = e.Id;
-				ProfessionType profession = player.get_Profession();
-				return id == ((object)(ProfessionType)(ref profession)).ToString();
-			}));
+			_ProfessionSelector.Professions.Add(BuildsManager.ModuleInstance.Data.Professions.Find((API.Profession e) => e.Id == player.get_Profession().ToString()));
 			RefreshList();
 		}
 
@@ -156,6 +144,7 @@ namespace Kenedia.Modules.BuildsManager
 
 		public void RefreshList()
 		{
+			((Control)ContentPanel).SuspendLayout();
 			string filter = ((TextInputBase)FilterBox).get_Text().ToLower();
 			API.Profession prof = BuildsManager.ModuleInstance.CurrentProfession;
 			ContentPanel.SortChildren<Control_TemplateEntry>((Comparison<Control_TemplateEntry>)delegate(Control_TemplateEntry a, Control_TemplateEntry b)
@@ -177,18 +166,22 @@ namespace Kenedia.Modules.BuildsManager
 			});
 			foreach (Control_TemplateEntry template in Templates)
 			{
-				string name = template.Template.Name.ToLower();
-				if ((_ProfessionSelector.Professions.Count == 0 || _ProfessionSelector.Professions.Contains(template.Template.Profession)) && name.Contains(filter))
+				if (template.Template != null)
 				{
-					((Control)template).Show();
-				}
-				else
-				{
-					((Control)template).Hide();
+					string name = template.Template.Name.ToLower();
+					if ((_ProfessionSelector.Professions.Count == 0 || _ProfessionSelector.Professions.Contains(template.Template.Profession)) && name.Contains(filter))
+					{
+						((Control)template).Show();
+					}
+					else
+					{
+						((Control)template).Hide();
+					}
 				}
 			}
 			ResizeChilds = true;
 			((Control)ContentPanel).Invalidate();
+			((Control)ContentPanel).ResumeLayout(false);
 		}
 
 		private void FilterBox_TextChanged(object sender, EventArgs e)
@@ -208,24 +201,46 @@ namespace Kenedia.Modules.BuildsManager
 
 		public void Refresh()
 		{
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			foreach (Template template in BuildsManager.ModuleInstance.Templates)
+			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
+			((Control)this).SuspendLayout();
+			((Control)ContentPanel).SuspendLayout();
+			foreach (Control_TemplateEntry template in new List<Control_TemplateEntry>(Templates))
 			{
-				if (Templates.Find((Control_TemplateEntry e) => e.Template == template) == null)
+				if (BuildsManager.ModuleInstance.Templates.Find((Template e) => e == template.Template) == null)
 				{
-					Control_TemplateEntry control_TemplateEntry = new Control_TemplateEntry((Container)(object)ContentPanel, template);
+					((Control)template).Dispose();
+					Templates.Remove(template);
+				}
+			}
+			foreach (Template template2 in BuildsManager.ModuleInstance.Templates)
+			{
+				if (Templates.Find((Control_TemplateEntry e) => e.Template == template2) == null)
+				{
+					Control_TemplateEntry control_TemplateEntry = new Control_TemplateEntry((Container)(object)ContentPanel, template2);
 					((Control)control_TemplateEntry).set_Size(new Point(((Control)this).get_Width() - 20, 38));
 					Control_TemplateEntry ctrl = control_TemplateEntry;
 					ctrl.TemplateChanged += OnTemplateChangedEvent;
 					Templates.Add(ctrl);
-					template.Deleted += delegate
-					{
-						((Control)ctrl).Dispose();
-						Templates.Remove(ctrl);
-					};
+					template2.Deleted += Template_Deleted;
 				}
 			}
+			((Control)this).ResumeLayout(false);
+			((Control)ContentPanel).ResumeLayout(false);
 			RefreshList();
+		}
+
+		private void Template_Deleted(object sender, EventArgs e)
+		{
+			Template template = (Template)sender;
+			Control_TemplateEntry ctrl = Templates.Find((Control_TemplateEntry a) => a.Template == template);
+			if (ctrl != null)
+			{
+				((Control)ctrl).Dispose();
+			}
+			if (ctrl != null)
+			{
+				Templates.Remove(ctrl);
+			}
 		}
 
 		public void Clear()
@@ -239,14 +254,38 @@ namespace Kenedia.Modules.BuildsManager
 
 		protected override void DisposeControl()
 		{
-			foreach (Control_TemplateEntry template in Templates)
-			{
-				((Control)template).Dispose();
-			}
-			Templates.Clear();
-			((Control)FilterBox).Dispose();
-			((Control)_ProfessionSelector).Dispose();
 			((Panel)this).DisposeControl();
+			foreach (Template template in BuildsManager.ModuleInstance.Templates)
+			{
+				template.Deleted -= Template_Deleted;
+			}
+			foreach (Control_TemplateEntry template2 in Templates)
+			{
+				template2.TemplateChanged -= OnTemplateChangedEvent;
+			}
+			((IEnumerable<IDisposable>)Templates).DisposeAll();
+			FlowPanel contentPanel = ContentPanel;
+			if (contentPanel != null)
+			{
+				((Control)contentPanel).Dispose();
+			}
+			TextBox filterBox = FilterBox;
+			if (filterBox != null)
+			{
+				((Control)filterBox).Dispose();
+			}
+			Control_ProfessionSelector professionSelector = _ProfessionSelector;
+			if (professionSelector != null)
+			{
+				((Control)professionSelector).Dispose();
+			}
+			((TextInputBase)FilterBox).remove_TextChanged((EventHandler<EventArgs>)FilterBox_TextChanged);
+			_ProfessionSelector.Changed -= _ProfessionSelector_Changed;
+			BuildsManager.ModuleInstance.LanguageChanged -= ModuleInstance_LanguageChanged;
+			BuildsManager.ModuleInstance.Templates_Loaded -= ModuleInstance_Templates_Loaded;
+			BuildsManager.ModuleInstance.Template_Deleted -= ModuleInstance_Template_Deleted;
+			((Container)ContentPanel).remove_ChildAdded((EventHandler<ChildChangedEventArgs>)ContentPanel_ChildsChanged);
+			((Container)ContentPanel).remove_ChildRemoved((EventHandler<ChildChangedEventArgs>)ContentPanel_ChildsChanged);
 		}
 
 		private void OnTemplateChangedEvent(object sender, TemplateChangedEvent e)

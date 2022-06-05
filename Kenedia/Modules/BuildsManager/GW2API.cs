@@ -69,17 +69,6 @@ namespace Kenedia.Modules.BuildsManager
 			{
 				get
 				{
-					//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-					//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-					//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-					//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-					//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-					//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
 					if (Rarity.isSet)
 					{
 						return __Rarity;
@@ -89,31 +78,31 @@ namespace Kenedia.Modules.BuildsManager
 						switch (Rarity.Value)
 						{
 						case 0:
-							__Rarity = (ItemRarity)0;
+							__Rarity = ItemRarity.Unknown;
 							break;
 						case 1:
-							__Rarity = (ItemRarity)1;
+							__Rarity = ItemRarity.Junk;
 							break;
 						case 2:
-							__Rarity = (ItemRarity)2;
+							__Rarity = ItemRarity.Basic;
 							break;
 						case 3:
-							__Rarity = (ItemRarity)3;
+							__Rarity = ItemRarity.Fine;
 							break;
 						case 4:
-							__Rarity = (ItemRarity)4;
+							__Rarity = ItemRarity.Masterwork;
 							break;
 						case 5:
-							__Rarity = (ItemRarity)5;
+							__Rarity = ItemRarity.Rare;
 							break;
 						case 6:
-							__Rarity = (ItemRarity)6;
+							__Rarity = ItemRarity.Exotic;
 							break;
 						case 7:
-							__Rarity = (ItemRarity)7;
+							__Rarity = ItemRarity.Ascended;
 							break;
 						case 8:
-							__Rarity = (ItemRarity)8;
+							__Rarity = ItemRarity.Legendary;
 							break;
 						}
 					}

@@ -7,8 +7,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Kenedia.Modules.BuildsManager
 {
-	public class TextureManager
+	public class TextureManager : IDisposable
 	{
+		private bool disposed;
+
 		public _UpgradeIDs _UpgradeIDs;
 
 		public List<Texture2D> _Backgrounds = new List<Texture2D>();
@@ -27,75 +29,79 @@ namespace Kenedia.Modules.BuildsManager
 
 		public List<Texture2D> _EquipSlotTextures = new List<Texture2D>();
 
-		public ContentsManager ContentsManager;
-
-		public DirectoriesManager DirectoriesManager;
-
-		public TextureManager(ContentsManager contentsManager, DirectoriesManager directoriesManager)
+		public void Dispose()
 		{
-			ContentsManager = contentsManager;
-			DirectoriesManager = directoriesManager;
+			if (!disposed)
+			{
+				disposed = true;
+				((IEnumerable<IDisposable>)_Backgrounds)?.DisposeAll();
+				((IEnumerable<IDisposable>)_Icons)?.DisposeAll();
+				((IEnumerable<IDisposable>)_Emblems)?.DisposeAll();
+				((IEnumerable<IDisposable>)_Controls)?.DisposeAll();
+				((IEnumerable<IDisposable>)_EquipmentTextures)?.DisposeAll();
+				((IEnumerable<IDisposable>)_Stats)?.DisposeAll();
+				((IEnumerable<IDisposable>)_StatIcons)?.DisposeAll();
+				((IEnumerable<IDisposable>)_EquipSlotTextures)?.DisposeAll();
+			}
+		}
+
+		public TextureManager()
+		{
+			ContentsManager ContentsManager = BuildsManager.ModuleInstance.ContentsManager;
 			Array values = Enum.GetValues(typeof(_Backgrounds));
 			_Backgrounds = new List<Texture2D>((IEnumerable<Texture2D>)(object)new Texture2D[values.Cast<int>().Max() + 1]);
-			foreach (_Backgrounds num7 in values)
+			foreach (_Backgrounds num4 in values)
 			{
-				ContentsManager contentsManager2 = ContentsManager;
-				int num8 = (int)num7;
-				Texture2D texture7 = contentsManager2.GetTexture("textures\\backgrounds\\" + num8 + ".png");
-				_Backgrounds.Insert((int)num7, texture7);
+				int num8 = (int)num4;
+				Texture2D texture6 = ContentsManager.GetTexture("textures\\backgrounds\\" + num8 + ".png");
+				_Backgrounds.Insert((int)num4, texture6);
 			}
 			values = Enum.GetValues(typeof(_Icons));
 			_Icons = new List<Texture2D>((IEnumerable<Texture2D>)(object)new Texture2D[values.Cast<int>().Max() + 1]);
-			foreach (_Icons num6 in values)
+			foreach (_Icons num7 in values)
 			{
-				ContentsManager contentsManager3 = ContentsManager;
-				int num8 = (int)num6;
-				Texture2D texture6 = contentsManager3.GetTexture("textures\\icons\\" + num8 + ".png");
-				_Icons.Insert((int)num6, texture6);
+				int num8 = (int)num7;
+				Texture2D texture7 = ContentsManager.GetTexture("textures\\icons\\" + num8 + ".png");
+				_Icons.Insert((int)num7, texture7);
 			}
 			values = Enum.GetValues(typeof(_Emblems));
 			_Emblems = new List<Texture2D>((IEnumerable<Texture2D>)(object)new Texture2D[values.Cast<int>().Max() + 1]);
-			foreach (_Emblems num5 in values)
+			foreach (_Emblems num6 in values)
 			{
-				ContentsManager contentsManager4 = ContentsManager;
-				int num8 = (int)num5;
-				Texture2D texture5 = contentsManager4.GetTexture("textures\\emblems\\" + num8 + ".png");
-				_Emblems.Insert((int)num5, texture5);
+				int num8 = (int)num6;
+				Texture2D texture5 = ContentsManager.GetTexture("textures\\emblems\\" + num8 + ".png");
+				_Emblems.Insert((int)num6, texture5);
 			}
 			values = Enum.GetValues(typeof(_Controls));
 			_Controls = new List<Texture2D>((IEnumerable<Texture2D>)(object)new Texture2D[values.Cast<int>().Max() + 1]);
-			foreach (_Controls num4 in values)
+			foreach (_Controls num5 in values)
 			{
-				ContentsManager contentsManager5 = ContentsManager;
-				int num8 = (int)num4;
-				Texture2D texture4 = contentsManager5.GetTexture("textures\\controls\\" + num8 + ".png");
-				_Controls.Insert((int)num4, texture4);
+				int num8 = (int)num5;
+				Texture2D texture4 = ContentsManager.GetTexture("textures\\controls\\" + num8 + ".png");
+				_Controls.Insert((int)num5, texture4);
 			}
 			values = Enum.GetValues(typeof(_EquipmentTextures));
 			_EquipmentTextures = new List<Texture2D>((IEnumerable<Texture2D>)(object)new Texture2D[values.Cast<int>().Max() + 1]);
 			foreach (_EquipmentTextures num3 in values)
 			{
-				ContentsManager contentsManager6 = ContentsManager;
 				int num8 = (int)num3;
-				Texture2D texture3 = contentsManager6.GetTexture("textures\\equipment slots\\" + num8 + ".png");
+				Texture2D texture3 = ContentsManager.GetTexture("textures\\equipment slots\\" + num8 + ".png");
 				_EquipmentTextures.Insert((int)num3, texture3);
 			}
 			values = Enum.GetValues(typeof(_EquipSlotTextures));
 			_EquipSlotTextures = new List<Texture2D>((IEnumerable<Texture2D>)(object)new Texture2D[values.Cast<int>().Max() + 1]);
 			foreach (_EquipSlotTextures num2 in values)
 			{
-				ContentsManager contentsManager7 = ContentsManager;
 				int num8 = (int)num2;
-				Texture2D texture2 = Texture2DExtension.GetRegion(contentsManager7.GetTexture("textures\\equipment slots\\" + num8 + ".png"), 37, 37, 54, 54);
+				Texture2D texture2 = Texture2DExtension.GetRegion(ContentsManager.GetTexture("textures\\equipment slots\\" + num8 + ".png"), 37, 37, 54, 54);
 				_EquipSlotTextures.Insert((int)num2, texture2);
 			}
 			values = Enum.GetValues(typeof(_Stats));
 			_Stats = new List<Texture2D>((IEnumerable<Texture2D>)(object)new Texture2D[values.Cast<int>().Max() + 1]);
 			foreach (_Stats num in values)
 			{
-				ContentsManager contentsManager8 = ContentsManager;
 				int num8 = (int)num;
-				Texture2D texture = contentsManager8.GetTexture("textures\\stats\\" + num8 + ".png");
+				Texture2D texture = ContentsManager.GetTexture("textures\\stats\\" + num8 + ".png");
 				_Stats.Insert((int)num, texture);
 			}
 			BuildsManager.ModuleInstance.LoadingTexture = getIcon(Kenedia.Modules.BuildsManager._Icons.SingleSpinner);

@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
+using Blish_HUD.Controls;
 
 namespace Kenedia.Modules.BuildsManager
 {
-	public class SpecLine
+	public class SpecLine : IDisposable
 	{
+		private bool disposed;
+
 		public int Index;
 
 		private API.Specialization _Specialization;
@@ -26,6 +29,21 @@ namespace Kenedia.Modules.BuildsManager
 				_Specialization = value;
 				Traits = new List<API.Trait>();
 				Changed?.Invoke(this, EventArgs.Empty);
+			}
+		}
+
+		public void Dispose()
+		{
+			if (!disposed)
+			{
+				disposed = true;
+				_Specialization?.Dispose();
+				Traits?.DisposeAll();
+				Specialization_Control control = Control;
+				if (control != null)
+				{
+					((Control)control).Dispose();
+				}
 			}
 		}
 	}

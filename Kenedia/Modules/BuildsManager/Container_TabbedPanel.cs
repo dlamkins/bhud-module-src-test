@@ -31,21 +31,21 @@ namespace Kenedia.Modules.BuildsManager
 		public Container_TabbedPanel()
 			: this()
 		{
-			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Expected O, but got Unknown
-			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c2: Expected O, but got Unknown
-			_TabBarTexture = BuildsManager.TextureManager.getControlTexture(_Controls.TabBar_FadeIn);
-			_Copy = BuildsManager.TextureManager.getControlTexture(_Controls.Copy);
-			_CopyHovered = BuildsManager.TextureManager.getControlTexture(_Controls.Copy_Hovered);
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0082: Expected O, but got Unknown
+			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d1: Expected O, but got Unknown
+			_TabBarTexture = BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.TabBar_FadeIn);
+			_Copy = BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.Copy);
+			_CopyHovered = BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.Copy_Hovered);
 			TextBox val = new TextBox();
 			((Control)val).set_Parent((Container)(object)this);
 			((Control)val).set_Width(((Control)this).get_Width());
@@ -97,6 +97,8 @@ namespace Kenedia.Modules.BuildsManager
 					((Control)tab.Panel).Dispose();
 				}
 			}
+			((TextInputBase)TemplateBox).remove_InputFocusChanged((EventHandler<ValueEventArgs<bool>>)TemplateBox_InputFocusChanged);
+			((TextInputBase)GearBox).remove_InputFocusChanged((EventHandler<ValueEventArgs<bool>>)GearBox_InputFocusChanged);
 			((Container)this).DisposeControl();
 		}
 

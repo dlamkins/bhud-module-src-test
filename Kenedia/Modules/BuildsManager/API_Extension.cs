@@ -9,7 +9,7 @@ namespace Kenedia.Modules.BuildsManager
 
 		public static Texture2D GetTextureFile(GW2API.BaseObject obj, string path, object targetControl = null, IconTargets iconTarget = IconTargets.Icon)
 		{
-			return BuildsManager.TextureManager._Icons[0];
+			return BuildsManager.ModuleInstance.TextureManager._Icons[0];
 		}
 
 		public static Texture2D getIcon(this GW2API.Item o, string path = null, object targetControl = null)
