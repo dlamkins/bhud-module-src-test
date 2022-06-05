@@ -1,5 +1,4 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
@@ -18,6 +17,18 @@ namespace Kenedia.Modules.QoL.SubModules
 {
 	public class ItemDestruction : SubModule
 	{
+		private enum State
+		{
+			Ready,
+			Copying,
+			Copied,
+			Dragging,
+			ReadyToPaste,
+			Pasting,
+			Pasted,
+			Done
+		}
+
 		public SettingEntry<KeyBinding> Cancel_Key;
 
 		private LoadingSpinner LoadingSpinner;
@@ -26,17 +37,13 @@ namespace Kenedia.Modules.QoL.SubModules
 
 		private DeleteIndicator DeleteIndicator;
 
-		private ButtonState MouseState;
+		private State ModuleState;
 
 		private Point MousePos = Point.get_Zero();
 
 		private Point ItemPos = Point.get_Zero();
 
 		private string _Instruction = common.ClickItem;
-
-		private bool DeleteRunning;
-
-		private bool DeletePrepared;
 
 		public string Instruction
 		{
@@ -51,56 +58,6 @@ namespace Kenedia.Modules.QoL.SubModules
 			}
 		}
 
-		private void Cancel_Key_Activated(object sender, EventArgs e)
-		{
-			DeletePrepared = false;
-		}
-
-		public async void Paste()
-		{
-			await Task.Run(delegate
-			{
-				Keyboard.Press((VirtualKeyShort)162, true);
-				Keyboard.Stroke((VirtualKeyShort)65, true);
-				Thread.Sleep(5);
-				Keyboard.Stroke((VirtualKeyShort)86, true);
-				Thread.Sleep(5);
-				Keyboard.Release((VirtualKeyShort)162, true);
-				DeletePrepared = false;
-			});
-		}
-
-		public async void Copy()
-		{
-			DeleteRunning = true;
-			await Task.Run(delegate
-			{
-				Keyboard.Press((VirtualKeyShort)162, true);
-				Keyboard.Stroke((VirtualKeyShort)65, true);
-				Thread.Sleep(5);
-				Keyboard.Release((VirtualKeyShort)162, true);
-				Keyboard.Press((VirtualKeyShort)162, true);
-				Keyboard.Stroke((VirtualKeyShort)67, true);
-				Thread.Sleep(5);
-				Keyboard.Release((VirtualKeyShort)162, true);
-				Keyboard.Release((VirtualKeyShort)160, true);
-				Thread.Sleep(5);
-				Keyboard.Stroke((VirtualKeyShort)8, true);
-				Keyboard.Stroke((VirtualKeyShort)13, true);
-			});
-			await Task.Run(delegate
-			{
-				string text = ClipboardUtil.get_WindowsClipboardService().GetTextAsync()?.Result;
-				text = ((text.Length > 3) ? text.Substring(1, text.Length - 2) : "");
-				if (text.Length > 0)
-				{
-					ClipboardUtil.get_WindowsClipboardService().SetTextAsync(text);
-				}
-				DeletePrepared = true;
-			});
-			DeleteRunning = false;
-		}
-
 		public ItemDestruction()
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
@@ -112,16 +69,15 @@ namespace Kenedia.Modules.QoL.SubModules
 			ModuleIconHovered = QoL.ModuleInstance.TextureManager.getIcon("ItemDestruction", _Icons.ModuleIcon_HoveredWhite);
 			ModuleIcon_Active = QoL.ModuleInstance.TextureManager.getIcon("ItemDestruction", _Icons.ModuleIcon_Active);
 			ModuleIconHovered_Active = QoL.ModuleInstance.TextureManager.getIcon("ItemDestruction", _Icons.ModuleIcon_Active_HoveredWhite);
-			Initialize();
-			LoadData();
 		}
 
 		public override void DefineSettings(SettingCollection settings)
 		{
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Expected O, but got Unknown
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Expected O, but got Unknown
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Expected O, but got Unknown
+			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Expected O, but got Unknown
+			base.DefineSettings(settings);
 			ToggleModule_Key = settings.DefineSetting<KeyBinding>(Name + "ToggleModule_Key", new KeyBinding((ModifierKeys)1, (Keys)46), (Func<string>)(() => string.Format(common.Toggle, Name)), (Func<string>)null);
 			SettingCollection internal_settings = settings.AddSubCollection(Name + " Internal Settings", false, false);
 			Cancel_Key = internal_settings.DefineSetting<KeyBinding>(Name + "Cancel_Key", new KeyBinding((Keys)27), (Func<string>)null, (Func<string>)null);
@@ -129,6 +85,8 @@ namespace Kenedia.Modules.QoL.SubModules
 			Cancel_Key.get_Value().add_Activated((EventHandler<EventArgs>)Cancel_Key_Activated);
 			ToggleModule_Key.get_Value().set_Enabled(true);
 			ToggleModule_Key.get_Value().add_Activated((EventHandler<EventArgs>)ToggleModule_Key_Activated);
+			Enabled = settings.DefineSetting<bool>(Name + "Enabled", true, (Func<string>)(() => $"Enable {Name}"), (Func<string>)null);
+			ShowOnBar = settings.DefineSetting<bool>(Name + "ShowOnBar", true, (Func<string>)(() => string.Format("Show Icon", Name)), (Func<string>)null);
 		}
 
 		private void ToggleModule_Key_Activated(object sender, EventArgs e)
@@ -139,7 +97,15 @@ namespace Kenedia.Modules.QoL.SubModules
 		public override void ToggleModule()
 		{
 			base.ToggleModule();
-			((Control)CursorIcon).set_Visible(Active);
+			if (Loaded)
+			{
+				((Control)CursorIcon).set_Visible(base.Active);
+				DeleteIndicator deleteIndicator = DeleteIndicator;
+				if (deleteIndicator != null)
+				{
+					((Control)deleteIndicator).Hide();
+				}
+			}
 		}
 
 		public override void Initialize()
@@ -177,6 +143,50 @@ namespace Kenedia.Modules.QoL.SubModules
 			deleteIndicator.Texture = QoL.ModuleInstance.TextureManager.getControl(_Controls.Delete);
 			((Control)deleteIndicator).set_ClipsBounds(false);
 			DeleteIndicator = deleteIndicator;
+			GameService.Input.get_Mouse().add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)Mouse_LeftMouseButtonPressed);
+			GameService.Input.get_Mouse().add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)Mouse_LeftMouseButtonReleased);
+			LoadData();
+		}
+
+		private async void Mouse_LeftMouseButtonReleased(object sender, MouseEventArgs e)
+		{
+			if (base.Active && ModuleState == State.Dragging)
+			{
+				MouseState mouse = Mouse.GetState();
+				if (MousePos.Distance2D(((MouseState)(ref mouse)).get_Position()) > 15)
+				{
+					await Paste();
+				}
+				else
+				{
+					ModuleState = State.Done;
+				}
+			}
+		}
+
+		private async void Mouse_LeftMouseButtonPressed(object sender, MouseEventArgs e)
+		{
+			if (base.Active)
+			{
+				MouseState mouse = Mouse.GetState();
+				KeyboardState keyboard = Keyboard.GetState();
+				((Control)DeleteIndicator).set_Visible(false);
+				if (ModuleState != State.Copying && ModuleState != State.Pasting && ((KeyboardState)(ref keyboard)).IsKeyDown((Keys)160))
+				{
+					ItemPos = ((MouseState)(ref mouse)).get_Position();
+					Instruction = common.ThrowItem;
+					await Copy();
+				}
+				if (ItemPos.Distance2D(((MouseState)(ref mouse)).get_Position()) > 100)
+				{
+					ModuleState = State.Done;
+				}
+				else if (ModuleState == State.ReadyToPaste)
+				{
+					ModuleState = State.Dragging;
+				}
+				mouse = default(MouseState);
+			}
 		}
 
 		public override void LoadData()
@@ -186,76 +196,20 @@ namespace Kenedia.Modules.QoL.SubModules
 
 		public override void Update(GameTime gameTime)
 		{
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Invalid comparison between Unknown and I4
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Invalid comparison between Unknown and I4
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0049: Invalid comparison between Unknown and I4
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0136: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013b: Unknown result type (might be due to invalid IL or missing references)
-			if (!GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus() || DeleteRunning)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			if (ModuleState == State.Copied)
 			{
-				return;
+				ModuleState = State.ReadyToPaste;
 			}
-			MouseState mouse = Mouse.GetState();
-			KeyboardState keyboard = Keyboard.GetState();
-			bool num = (int)MouseState == 1 && (int)((MouseState)(ref mouse)).get_LeftButton() == 0;
-			if ((int)((MouseState)(ref mouse)).get_LeftButton() == 1 && (int)MouseState == 0)
+			else if (ModuleState == State.Done || ModuleState == State.Pasted)
 			{
-				if (ItemPos.Distance2D(((MouseState)(ref mouse)).get_Position()) < 50)
-				{
-					MousePos = ((MousePos == Point.get_Zero()) ? ((MouseState)(ref mouse)).get_Position() : MousePos);
-				}
-				else
-				{
-					DeletePrepared = false;
-				}
-			}
-			if (num)
-			{
+				MousePos = Point.get_Zero();
 				((Control)DeleteIndicator).set_Visible(false);
-				if (((KeyboardState)(ref keyboard)).IsKeyDown((Keys)160))
-				{
-					ItemPos = ((MouseState)(ref mouse)).get_Position();
-					((Control)DeleteIndicator).set_Visible(true);
-					Instruction = common.ThrowItem;
-					Copy();
-				}
-				else if (DeletePrepared)
-				{
-					if (MousePos.Distance2D(((MouseState)(ref mouse)).get_Position()) > 100)
-					{
-						Paste();
-					}
-					DeletePrepared = false;
-					((Control)DeleteIndicator).set_Visible(false);
-				}
-				else
-				{
-					MousePos = Point.get_Zero();
-					Instruction = common.ClickItem;
-				}
+				Instruction = common.ClickItem;
+				ModuleState = State.Ready;
+				((Control)DeleteIndicator).set_Visible(false);
 			}
-			MouseState = ((MouseState)(ref mouse)).get_LeftButton();
 		}
 
 		public override void UpdateLanguage(object sender, EventArgs e)
@@ -300,7 +254,52 @@ namespace Kenedia.Modules.QoL.SubModules
 			Cancel_Key.get_Value().remove_Activated((EventHandler<EventArgs>)Cancel_Key_Activated);
 			ToggleModule_Key.get_Value().set_Enabled(false);
 			ToggleModule_Key.get_Value().remove_Activated((EventHandler<EventArgs>)ToggleModule_Key_Activated);
+			GameService.Input.get_Mouse().remove_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)Mouse_LeftMouseButtonPressed);
+			GameService.Input.get_Mouse().remove_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)Mouse_LeftMouseButtonReleased);
 			base.Dispose();
+		}
+
+		private void Cancel_Key_Activated(object sender, EventArgs e)
+		{
+			ModuleState = State.Done;
+		}
+
+		public async Task Paste()
+		{
+			ModuleState = State.Pasting;
+			await Task.Delay(25);
+			Keyboard.Press((VirtualKeyShort)162, true);
+			Keyboard.Stroke((VirtualKeyShort)86, true);
+			await Task.Delay(5);
+			Keyboard.Release((VirtualKeyShort)162, true);
+			ModuleState = State.Pasted;
+		}
+
+		public async Task Copy()
+		{
+			ModuleState = State.Copying;
+			await Task.Delay(25);
+			Keyboard.Release((VirtualKeyShort)160, true);
+			await Task.Delay(5);
+			Keyboard.Press((VirtualKeyShort)162, true);
+			Keyboard.Stroke((VirtualKeyShort)65, true);
+			await Task.Delay(5);
+			Keyboard.Release((VirtualKeyShort)162, true);
+			Keyboard.Press((VirtualKeyShort)162, true);
+			Keyboard.Stroke((VirtualKeyShort)67, true);
+			await Task.Delay(5);
+			Keyboard.Release((VirtualKeyShort)162, true);
+			Keyboard.Stroke((VirtualKeyShort)8, true);
+			Keyboard.Stroke((VirtualKeyShort)13, true);
+			string text = await ClipboardUtil.get_WindowsClipboardService().GetTextAsync();
+			if (text != null && text.Length > 0)
+			{
+				text = (text.StartsWith("[") ? text.Substring(1, text.Length - 1) : text);
+				text = (text.EndsWith("]") ? text.Substring(0, text.Length - 1) : text);
+				await ClipboardUtil.get_WindowsClipboardService().SetTextAsync(text);
+			}
+			ModuleState = State.Copied;
+			((Control)DeleteIndicator).set_Visible(true);
 		}
 	}
 }

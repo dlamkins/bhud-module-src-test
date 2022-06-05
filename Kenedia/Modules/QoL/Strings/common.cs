@@ -44,6 +44,10 @@ namespace Kenedia.Modules.QoL.Strings
 
 		internal static string Activated => ResourceManager.GetString("Activated", resourceCulture);
 
+		internal static string AllowManualZoom_Name => ResourceManager.GetString("AllowManualZoom_Name", resourceCulture);
+
+		internal static string AllowManualZoom_Tooltip => ResourceManager.GetString("AllowManualZoom_Tooltip", resourceCulture);
+
 		internal static string ClickItem => ResourceManager.GetString("ClickItem", resourceCulture);
 
 		internal static string Deactivated => ResourceManager.GetString("Deactivated", resourceCulture);
@@ -61,6 +65,10 @@ namespace Kenedia.Modules.QoL.Strings
 		internal static string ThrowItem => ResourceManager.GetString("ThrowItem", resourceCulture);
 
 		internal static string Toggle => ResourceManager.GetString("Toggle", resourceCulture);
+
+		internal static string ZoomOnCameraChange_Name => ResourceManager.GetString("ZoomOnCameraChange_Name", resourceCulture);
+
+		internal static string ZoomOnCameraChange_Tooltip => ResourceManager.GetString("ZoomOnCameraChange_Tooltip", resourceCulture);
 
 		internal common()
 		{

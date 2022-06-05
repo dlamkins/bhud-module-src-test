@@ -10,6 +10,8 @@ namespace Kenedia.Modules.QoL
 		ModuleIcon_Active_Hovered,
 		ModuleIcon_Active_HoveredWhite,
 		Expand,
-		Expand_Hovered
+		Expand_Hovered,
+		TyriaDayNight,
+		Calendar
 	}
 }

@@ -17,8 +17,6 @@ namespace Kenedia.Modules.QoL.Classes
 
 		public bool Loaded;
 
-		public bool Active;
-
 		public bool Include;
 
 		public Texture2D ModuleIcon;
@@ -31,9 +29,34 @@ namespace Kenedia.Modules.QoL.Classes
 
 		public SettingEntry<KeyBinding> ToggleModule_Key;
 
+		public SettingEntry<bool> Enabled;
+
+		public SettingEntry<bool> ShowOnBar;
+
+		public SettingEntry<bool> _Active;
+
 		public Ticks Ticks = new Ticks();
 
 		public Hotbar_Button Hotbar_Button;
+
+		public bool Active
+		{
+			get
+			{
+				if (_Active != null)
+				{
+					return _Active.get_Value();
+				}
+				return false;
+			}
+			set
+			{
+				if (_Active != null)
+				{
+					_Active.set_Value(value);
+				}
+			}
+		}
 
 		public event EventHandler Toggled;
 
@@ -50,7 +73,11 @@ namespace Kenedia.Modules.QoL.Classes
 		{
 		}
 
-		public abstract void DefineSettings(SettingCollection parentSettings);
+		public virtual void DefineSettings(SettingCollection settings)
+		{
+			SettingCollection internal_settings = settings.AddSubCollection(Name + " Internal Settings", false, false);
+			_Active = internal_settings.DefineSetting<bool>("_Active", false, (Func<string>)null, (Func<string>)null);
+		}
 
 		private void CornerIcon_Click(object sender, MouseEventArgs e)
 		{
@@ -61,9 +88,12 @@ namespace Kenedia.Modules.QoL.Classes
 
 		public virtual void ToggleModule()
 		{
-			Active = !Active;
-			ScreenNotification.ShowNotification(string.Format(common.RunStateChange, Name, (!Active) ? common.Deactivated : common.Activated), (NotificationType)1, (Texture2D)null, 4);
-			this.Toggled?.Invoke(this, EventArgs.Empty);
+			if (Enabled.get_Value())
+			{
+				Active = !Active;
+				ScreenNotification.ShowNotification(string.Format(common.RunStateChange, Name, (!Active) ? common.Deactivated : common.Activated), (NotificationType)1, (Texture2D)null, 4);
+				this.Toggled?.Invoke(this, EventArgs.Empty);
+			}
 		}
 
 		public abstract void Update(GameTime gameTime);

@@ -27,14 +27,18 @@
       </xsd:complexType>
     </xsd:element>
   </xsd:schema>
-<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="ShowCorner_Tooltip"><value>Show / Hide the Corner Icon of {0}.</value></data>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="ZoomOnCameraChange_Name"><value>Zoom on Camera change</value></data>
+  <data name="ShowCorner_Tooltip"><value>Show / Hide the Corner Icon of {0}.</value></data>
   <data name="ShowCorner_Name"><value>Show Corner Icon</value></data>
   <data name="Activated"><value>activated</value></data>
+  <data name="ZoomOnCameraChange_Tooltip"><value>Zoom out every time the distance between the player and the camera changes for more than 0.25 units</value></data>
   <data name="Toggle"><value>Toggle {0}</value></data>
+  <data name="AllowManualZoom_Tooltip"><value>Allow scrolling with your mouse wheel without triggering zooming out</value></data>
   <data name="Deactivated"><value>deactivated</value></data>
   <data name="ThrowItem"><value>Throw the marked item out!</value></data>
   <data name="RunStateChange"><value>{0} {1} !</value></data>
   <data name="ManualMaxZoomOut_Name"><value>Set Max Zoom</value></data>
   <data name="ManualMaxZoomOut_Tooltip"><value>Scroll out as much as possible!</value></data>
   <data name="ClickItem"><value>Shift + Click on an Item!</value></data>
+  <data name="AllowManualZoom_Name"><value>Allow Mouse Scroll</value></data>
   </root>
