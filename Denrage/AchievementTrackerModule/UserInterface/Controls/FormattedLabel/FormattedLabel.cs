@@ -113,6 +113,8 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls.FormattedLabel
 
 		private FormattedLabelPart _hoveredTextPart;
 
+		private bool finishedInitialization;
+
 		internal FormattedLabel(IEnumerable<FormattedLabelPart> parts, bool wrapText, bool autoSizeWidth, bool autoSizeHeight, HorizontalAlignment horizontalAlignment, VerticalAlignment verticalAlignment)
 			: this()
 		{
@@ -182,40 +184,41 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls.FormattedLabel
 
 		private void InitializeRectangles()
 		{
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0207: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
 			//IL_020e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0292: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0215: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0232: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0294: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0299: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_030b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0344: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0349: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0312: Unknown result type (might be due to invalid IL or missing references)
 			//IL_034b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0365: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0422: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0350: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0352: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0354: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0362: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0364: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0429: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0515: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0430: Unknown result type (might be due to invalid IL or missing references)
+			//IL_051c: Unknown result type (might be due to invalid IL or missing references)
 			if (((Control)this).get_Width() == 0)
 			{
 				return;
 			}
+			finishedInitialization = false;
 			_rectangles.Clear();
 			Rectangle imageRectangle = default(Rectangle);
 			Rectangle imageRectangle2 = default(Rectangle);
@@ -317,6 +320,7 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls.FormattedLabel
 			HandleHorizontalAlignment();
 			HandleVerticalAlignment();
 			HandleFontSizeDifferences();
+			finishedInitialization = true;
 		}
 
 		private void HandleFontSizeDifferences()
@@ -425,76 +429,83 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls.FormattedLabel
 
 		public override void DoUpdate(GameTime gameTime)
 		{
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-			bool hoverSet = false;
-			foreach (var rectangle in _rectangles)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+			if (finishedInitialization)
 			{
-				Rectangle destinationRectangle = RectangleExtension.ToBounds(rectangle.Rectangle.Rectangle, ((Control)this).get_AbsoluteBounds());
-				Point mousePosition = GameService.Input.get_Mouse().get_Position();
-				if (rectangle.Text.Link != null && mousePosition.X > destinationRectangle.X && mousePosition.X < destinationRectangle.X + destinationRectangle.Width && mousePosition.Y > destinationRectangle.Y && mousePosition.Y < destinationRectangle.Y + destinationRectangle.Height)
+				bool hoverSet = false;
+				foreach (var rectangle in _rectangles)
 				{
-					_hoveredTextPart = rectangle.Text;
-					hoverSet = true;
+					Rectangle destinationRectangle = RectangleExtension.ToBounds(rectangle.Rectangle.Rectangle, ((Control)this).get_AbsoluteBounds());
+					Point mousePosition = GameService.Input.get_Mouse().get_Position();
+					if (rectangle.Text.Link != null && mousePosition.X > destinationRectangle.X && mousePosition.X < destinationRectangle.X + destinationRectangle.Width && mousePosition.Y > destinationRectangle.Y && mousePosition.Y < destinationRectangle.Y + destinationRectangle.Height)
+					{
+						_hoveredTextPart = rectangle.Text;
+						hoverSet = true;
+					}
 				}
-			}
-			if (!hoverSet)
-			{
-				_hoveredTextPart = null;
+				if (!hoverSet)
+				{
+					_hoveredTextPart = null;
+				}
 			}
 			((Control)this).DoUpdate(gameTime);
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0112: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0135: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
 			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0154: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
+			if (!finishedInitialization)
+			{
+				return;
+			}
 			foreach (var rectangle in _rectangles)
 			{
 				Rectangle destinationRectangle = RectangleExtension.ToBounds(rectangle.Rectangle.Rectangle, ((Control)this).get_AbsoluteBounds());

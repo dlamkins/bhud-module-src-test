@@ -6,6 +6,7 @@ using Blish_HUD.Input;
 using Denrage.AchievementTrackerModule.Interfaces;
 using Denrage.AchievementTrackerModule.Libs.Achievement;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Denrage.AchievementTrackerModule.UserInterface.Views
 {
@@ -47,7 +48,10 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Views
 			//IL_0053: Expected O, but got Unknown
 			((Control)buildPanel).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				achievementTrackerService.TrackAchievement(achievement.Id);
+				if (!achievementTrackerService.TrackAchievement(achievement.Id))
+				{
+					ScreenNotification.ShowNotification("You can have a maximum of 15 achievements tracked concurrently.\n Untrack one to add a new one.", (NotificationType)0, (Texture2D)null, 4);
+				}
 			});
 			DetailsButton val = new DetailsButton();
 			val.set_Text(achievement.Name);

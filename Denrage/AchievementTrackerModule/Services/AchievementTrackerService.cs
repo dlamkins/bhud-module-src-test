@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Blish_HUD;
+using Blish_HUD.Settings;
 using Denrage.AchievementTrackerModule.Interfaces;
 
 namespace Denrage.AchievementTrackerModule.Services
@@ -11,22 +12,33 @@ namespace Denrage.AchievementTrackerModule.Services
 
 		private readonly Logger logger;
 
+		private readonly SettingEntry<bool> limitAchievement;
+
 		public IReadOnlyList<int> ActiveAchievements => activeAchievements.AsReadOnly();
 
 		public event Action<int> AchievementTracked;
 
 		public event Action<int> AchievementUntracked;
 
-		public AchievementTrackerService(Logger logger)
+		public AchievementTrackerService(Logger logger, SettingEntry<bool> limitAchievement)
 		{
 			activeAchievements = new List<int>();
 			this.logger = logger;
+			this.limitAchievement = limitAchievement;
 		}
 
-		public void TrackAchievement(int achievement)
+		public bool TrackAchievement(int achievement)
 		{
-			activeAchievements.Add(achievement);
-			this.AchievementTracked?.Invoke(achievement);
+			if (!limitAchievement.get_Value() || activeAchievements.Count <= 15)
+			{
+				if (!activeAchievements.Contains(achievement))
+				{
+					activeAchievements.Add(achievement);
+					this.AchievementTracked?.Invoke(achievement);
+				}
+				return true;
+			}
+			return false;
 		}
 
 		public void RemoveAchievement(int achievement)

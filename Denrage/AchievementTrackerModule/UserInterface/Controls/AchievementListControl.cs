@@ -99,30 +99,30 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls
 			panel = val;
 			Task.Run(delegate
 			{
-				//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-				//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-				//IL_007f: Expected O, but got Unknown
-				//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00db: Expected O, but got Unknown
-				//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0105: Expected O, but got Unknown
-				//IL_0105: Unknown result type (might be due to invalid IL or missing references)
-				//IL_010a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0112: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0124: Unknown result type (might be due to invalid IL or missing references)
-				//IL_012b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0132: Unknown result type (might be due to invalid IL or missing references)
+				//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+				//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+				//IL_008d: Expected O, but got Unknown
+				//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+				//IL_010b: Expected O, but got Unknown
+				//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+				//IL_011d: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0125: Unknown result type (might be due to invalid IL or missing references)
+				//IL_012c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0135: Expected O, but got Unknown
+				//IL_014f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0154: Unknown result type (might be due to invalid IL or missing references)
+				//IL_015c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_015f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_016e: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0175: Unknown result type (might be due to invalid IL or missing references)
+				//IL_017c: Unknown result type (might be due to invalid IL or missing references)
 				bool flag = AchievementService.HasFinishedAchievement(achievement.Id);
 				TEntry[] entries = GetEntries(description).ToArray();
 				for (int i = 0; i < entries.Length; i++)
@@ -135,27 +135,38 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls
 					Panel val3 = val2;
 					Control val4 = CreateEntryControl(i, entries[i], (Container)(object)val3);
 					val4.set_Location(new Point((((Control)val3).get_Width() - val4.get_Width()) / 2, (((Control)val3).get_Height() - val4.get_Height()) / 2));
-					Tooltip val5 = new Tooltip();
-					((Container)val5).set_HeightSizingMode((SizingMode)1);
-					((Container)val5).set_WidthSizingMode((SizingMode)1);
-					val4.set_Tooltip(val5);
-					FlowPanel val6 = new FlowPanel();
-					((Control)val6).set_Parent((Container)(object)val4.get_Tooltip());
-					((Control)val6).set_Width(100);
+					Control val5 = val4;
+					ImageSpinner imageSpinner = val4 as ImageSpinner;
+					if (imageSpinner != null)
+					{
+						val5 = (Control)(object)imageSpinner.Image;
+					}
+					Control obj = val5;
+					Tooltip val6 = new Tooltip();
 					((Container)val6).set_HeightSizingMode((SizingMode)1);
-					val6.set_FlowDirection((ControlFlowDirection)3);
-					FlowPanel val7 = val6;
-					Label val8 = new Label();
-					((Control)val8).set_Parent((Container)(object)val7);
-					((Control)val8).set_Width(((Container)val7).get_ContentRegion().Width);
-					val8.set_WrapText(true);
-					val8.set_AutoSizeHeight(true);
-					val8.set_Font(Control.get_Content().get_DefaultFont18());
-					val8.set_Text(GetDisplayName(entries[i]));
+					((Container)val6).set_WidthSizingMode((SizingMode)1);
+					obj.set_Tooltip(val6);
+					FlowPanel val7 = new FlowPanel();
+					((Control)val7).set_Parent((Container)(object)val5.get_Tooltip());
+					((Control)val7).set_Width(100);
+					((Container)val7).set_HeightSizingMode((SizingMode)1);
+					val7.set_FlowDirection((ControlFlowDirection)3);
+					FlowPanel val8 = val7;
+					int index = i;
+					val5.add_RightMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
+					{
+						AchievementService.ToggleManualCompleteStatus(achievement.Id, index);
+					});
+					Label val9 = new Label();
+					((Control)val9).set_Parent((Container)(object)val8);
+					((Control)val9).set_Width(((Container)val8).get_ContentRegion().Width);
+					val9.set_WrapText(true);
+					val9.set_AutoSizeHeight(true);
+					val9.set_Font(Control.get_Content().get_DefaultFont18());
+					val9.set_Text(GetDisplayName(entries[i]));
 					ColorControl(val4, flag || AchievementService.HasFinishedAchievementBit(achievement.Id, i));
 					if (achievementDetails != null)
 					{
-						int index = i;
 						val4.add_Click((EventHandler<MouseEventArgs>)delegate
 						{
 							itemDetailWindowManager.CreateAndShowWindow(GetDisplayName(entries[index]), achievementDetails.ColumnNames, achievementDetails.Entries[index], achievementDetails.Link, achievementDetails.Id, index);
@@ -163,8 +174,8 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls
 					}
 					else
 					{
-						TEntry val9 = entries[i];
-						ILinkEntry linkEntry = val9 as ILinkEntry;
+						TEntry val10 = entries[i];
+						ILinkEntry linkEntry = val10 as ILinkEntry;
 						if (linkEntry != null)
 						{
 							val4.add_Click((EventHandler<MouseEventArgs>)delegate

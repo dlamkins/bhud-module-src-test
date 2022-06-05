@@ -7,11 +7,11 @@ namespace Denrage.AchievementTrackerModule.Services.Factories.ItemDetails
 {
 	public class AchievementTableItemEntryFactory : AchievementTableEntryFactory<CollectionAchievementTable.CollectionAchievementTableItemEntry>
 	{
-		private readonly IAchievementService achievementService;
+		private readonly IExternalImageService externalImageService;
 
-		public AchievementTableItemEntryFactory(IAchievementService achievementService)
+		public AchievementTableItemEntryFactory(IExternalImageService externalImageService)
 		{
-			this.achievementService = achievementService;
+			this.externalImageService = externalImageService;
 		}
 
 		protected override Control CreateInternal(CollectionAchievementTable.CollectionAchievementTableItemEntry entry)
@@ -20,7 +20,7 @@ namespace Denrage.AchievementTrackerModule.Services.Factories.ItemDetails
 			FormattedLabelPartBuilder partBuilder = formattedLabelBuilder.CreatePart(entry.Name);
 			if (!string.IsNullOrEmpty(entry.ImageUrl))
 			{
-				partBuilder.SetPrefixImage(achievementService.GetImageFromIndirectLink(entry.ImageUrl, null));
+				partBuilder.SetPrefixImage(externalImageService.GetImageFromIndirectLink(entry.ImageUrl));
 			}
 			return (Control)(object)formattedLabelBuilder.CreatePart(partBuilder).Build();
 		}

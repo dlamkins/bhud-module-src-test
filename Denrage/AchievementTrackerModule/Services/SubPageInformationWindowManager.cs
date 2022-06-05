@@ -21,14 +21,17 @@ namespace Denrage.AchievementTrackerModule.Services
 
 		private readonly Func<IFormattedLabelHtmlService> getFormattedLabelHtmlSerice;
 
+		private readonly IExternalImageService externalImageService;
+
 		private IFormattedLabelHtmlService formattedLabelHtmlService;
 
-		public SubPageInformationWindowManager(GraphicsService graphicsService, ContentsManager contentsManager, IAchievementService achievementService, Func<IFormattedLabelHtmlService> getFormattedLabelHtmlSerice)
+		public SubPageInformationWindowManager(GraphicsService graphicsService, ContentsManager contentsManager, IAchievementService achievementService, Func<IFormattedLabelHtmlService> getFormattedLabelHtmlSerice, IExternalImageService externalImageService)
 		{
 			this.graphicsService = graphicsService;
 			this.contentsManager = contentsManager;
 			this.achievementService = achievementService;
 			this.getFormattedLabelHtmlSerice = getFormattedLabelHtmlSerice;
+			this.externalImageService = externalImageService;
 		}
 
 		public void Create(SubPageInformation subPageInformation)
@@ -42,7 +45,7 @@ namespace Denrage.AchievementTrackerModule.Services
 			{
 				formattedLabelHtmlService = getFormattedLabelHtmlSerice();
 			}
-			SubPageInformationWindow subPageInformationWindow = new SubPageInformationWindow(contentsManager, achievementService, formattedLabelHtmlService, subPageInformation);
+			SubPageInformationWindow subPageInformationWindow = new SubPageInformationWindow(contentsManager, achievementService, formattedLabelHtmlService, subPageInformation, externalImageService);
 			((Control)subPageInformationWindow).set_Parent((Container)(object)graphicsService.get_SpriteScreen());
 			window = (WindowBase2)(object)subPageInformationWindow;
 			((Control)window).add_Hidden((EventHandler<EventArgs>)delegate

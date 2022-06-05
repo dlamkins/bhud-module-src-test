@@ -2,21 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
-using Blish_HUD.Content;
 using Blish_HUD.Modules.Managers;
 using Denrage.AchievementTrackerModule.Interfaces;
 using Denrage.AchievementTrackerModule.Libs.Achievement;
-using Flurl.Http;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Denrage.AchievementTrackerModule.Services
 {
@@ -28,9 +24,137 @@ namespace Denrage.AchievementTrackerModule.Services
 
 		private readonly Logger logger;
 
+		private readonly Func<IPersistanceService> getPersistanceService;
+
 		private Task trackAchievementProgressTask;
 
 		private CancellationTokenSource trackAchievementProgressCancellationTokenSource;
+
+		private readonly Dictionary<int, Func<int, int>> specialSnowflakeCompletedHandling = new Dictionary<int, Func<int, int>>
+		{
+			{
+				5693,
+				(int index) => index switch
+				{
+					5 => 8, 
+					4 => 7, 
+					3 => 6, 
+					2 => 2, 
+					1 => 1, 
+					0 => 0, 
+					_ => -1, 
+				}
+			},
+			{
+				5700,
+				(int index) => index switch
+				{
+					3 => 8, 
+					2 => 5, 
+					1 => 2, 
+					0 => 1, 
+					_ => -1, 
+				}
+			},
+			{
+				5704,
+				(int index) => index switch
+				{
+					3 => 8, 
+					2 => 5, 
+					1 => 2, 
+					0 => 1, 
+					_ => -1, 
+				}
+			},
+			{
+				5703,
+				(int index) => index switch
+				{
+					6 => 7, 
+					5 => 5, 
+					4 => 4, 
+					3 => 3, 
+					2 => 2, 
+					1 => 1, 
+					0 => 0, 
+					_ => -1, 
+				}
+			},
+			{
+				5697,
+				(int index) => index switch
+				{
+					4 => 6, 
+					3 => 5, 
+					2 => 3, 
+					1 => 1, 
+					0 => 0, 
+					_ => -1, 
+				}
+			},
+			{
+				5688,
+				(int index) => index switch
+				{
+					4 => 8, 
+					3 => 7, 
+					2 => 6, 
+					1 => 4, 
+					0 => 3, 
+					_ => -1, 
+				}
+			},
+			{
+				5709,
+				(int index) => index switch
+				{
+					4 => 7, 
+					3 => 6, 
+					2 => 4, 
+					1 => 2, 
+					0 => 0, 
+					_ => -1, 
+				}
+			},
+			{
+				5698,
+				(int index) => index switch
+				{
+					3 => 6, 
+					2 => 4, 
+					1 => 3, 
+					0 => 0, 
+					_ => -1, 
+				}
+			},
+			{
+				5691,
+				(int index) => index switch
+				{
+					3 => 7, 
+					2 => 6, 
+					1 => 5, 
+					0 => 4, 
+					_ => -1, 
+				}
+			},
+			{
+				5708,
+				(int index) => index switch
+				{
+					4 => 8, 
+					3 => 5, 
+					2 => 2, 
+					1 => 1, 
+					0 => 0, 
+					_ => -1, 
+				}
+			}
+		};
+
+		public Dictionary<int, List<int>> ManualCompletedAchievements { get; set; } = new Dictionary<int, List<int>>();
+
 
 		public IEnumerable<AccountAchievement> PlayerAchievements { get; private set; }
 
@@ -48,11 +172,42 @@ namespace Denrage.AchievementTrackerModule.Services
 
 		public event Action ApiAchievementsLoaded;
 
-		public AchievementService(ContentsManager contentsManager, Gw2ApiManager gw2ApiManager, Logger logger)
+		public AchievementService(ContentsManager contentsManager, Gw2ApiManager gw2ApiManager, Logger logger, Func<IPersistanceService> getPersistanceService)
 		{
 			this.contentsManager = contentsManager;
 			this.gw2ApiManager = gw2ApiManager;
 			this.logger = logger;
+			this.getPersistanceService = getPersistanceService;
+		}
+
+		public void ToggleManualCompleteStatus(int achievementId, int bit)
+		{
+			if (specialSnowflakeCompletedHandling.TryGetValue(achievementId, out var conversionFunc))
+			{
+				bit = conversionFunc(bit);
+			}
+			if (PlayerAchievements != null)
+			{
+				AccountAchievement achievement = PlayerAchievements.FirstOrDefault((AccountAchievement x) => x.get_Id() == achievementId);
+				if (achievement != null && (achievement.get_Done() || achievement.get_Bits().Contains(bit)))
+				{
+					return;
+				}
+			}
+			if (!ManualCompletedAchievements.TryGetValue(achievementId, out var achievementBits))
+			{
+				achievementBits = new List<int>();
+				ManualCompletedAchievements[achievementId] = achievementBits;
+			}
+			if (achievementBits.Contains(bit))
+			{
+				achievementBits.Remove(bit);
+			}
+			else
+			{
+				achievementBits.Add(bit);
+			}
+			this.PlayerAchievementsLoaded?.Invoke();
 		}
 
 		public async Task LoadAsync(CancellationToken cancellationToken = default(CancellationToken))
@@ -87,6 +242,7 @@ namespace Denrage.AchievementTrackerModule.Services
 				throw;
 			}
 			logger.Info("Finished reading saved achievement information");
+			ManualCompletedAchievements = getPersistanceService().Get().ManualCompletedAchievements;
 			Task.Run(async delegate
 			{
 				await InitializeApiAchievements();
@@ -133,6 +289,14 @@ namespace Denrage.AchievementTrackerModule.Services
 
 		public bool HasFinishedAchievementBit(int achievementId, int positionIndex)
 		{
+			if (specialSnowflakeCompletedHandling.TryGetValue(achievementId, out var conversionFunc))
+			{
+				positionIndex = conversionFunc(positionIndex);
+			}
+			if (ManualCompletedAchievements.TryGetValue(achievementId, out var manualAchievement) && manualAchievement.Contains(positionIndex))
+			{
+				return true;
+			}
 			if (PlayerAchievements == null)
 			{
 				return false;
@@ -162,6 +326,25 @@ namespace Denrage.AchievementTrackerModule.Services
 				{
 					PlayerAchievements = (IEnumerable<AccountAchievement>)(await ((IBlobClient<IApiV2ObjectList<AccountAchievement>>)(object)gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
 						.get_Achievements()).GetAsync(cancellationToken));
+					foreach (AccountAchievement item in PlayerAchievements)
+					{
+						if (!ManualCompletedAchievements.TryGetValue(item.get_Id(), out var achievementBits))
+						{
+							continue;
+						}
+						if (item.get_Done())
+						{
+							ManualCompletedAchievements.Remove(item.get_Id());
+							continue;
+						}
+						foreach (int bit in item.get_Bits())
+						{
+							if (achievementBits.Contains(bit))
+							{
+								achievementBits.Remove(bit);
+							}
+						}
+					}
 					Task.Run(delegate
 					{
 						this.PlayerAchievementsLoaded?.Invoke();
@@ -203,88 +386,6 @@ namespace Denrage.AchievementTrackerModule.Services
 			catch (OperationCanceledException)
 			{
 			}
-		}
-
-		public AsyncTexture2D GetImage(string imageUrl, Action beforeSwap)
-		{
-			return GetImageInternal((async () => await GeneratedExtensions.GetStreamAsync(DownloadWikiContent(imageUrl), default(CancellationToken), (HttpCompletionOption)0), imageUrl), beforeSwap);
-		}
-
-		public async Task<string> GetDirectImageLink(string imagePath, CancellationToken cancellationToken = default(CancellationToken))
-		{
-			if (imagePath.Contains("File:"))
-			{
-				try
-				{
-					string obj = await GeneratedExtensions.GetStringAsync(DownloadWikiContent(imagePath), cancellationToken, (HttpCompletionOption)0);
-					int fillImageStartIndex = obj.IndexOf("fullImageLink");
-					int hrefStartIndex = obj.IndexOf("href=", fillImageStartIndex);
-					int linkStartIndex = obj.IndexOf("\"", hrefStartIndex) + 1;
-					int linkEndIndex = obj.IndexOf("\"", linkStartIndex);
-					return obj.Substring(linkStartIndex, linkEndIndex - linkStartIndex);
-				}
-				catch (Exception ex)
-				{
-					logger.Error(ex, "Exception occured on parsing an image path");
-					return string.Empty;
-				}
-			}
-			return imagePath;
-		}
-
-		public AsyncTexture2D GetImageFromIndirectLink(string imagePath, Action beforeSwap)
-		{
-			return GetImageInternal((async delegate
-			{
-				string url = await GetDirectImageLink(imagePath);
-				return await GeneratedExtensions.GetStreamAsync(DownloadWikiContent(url), default(CancellationToken), (HttpCompletionOption)0);
-			}, imagePath), beforeSwap);
-		}
-
-		private AsyncTexture2D GetImageInternal((Func<Task<Stream>> GetStream, string Url) getImageStream, Action beforeSwap)
-		{
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Expected O, but got Unknown
-			AsyncTexture2D texture = new AsyncTexture2D(Textures.get_TransparentPixel());
-			Stream imageStream;
-			Task.Run(async delegate
-			{
-				try
-				{
-					imageStream = await getImageStream.GetStream();
-					beforeSwap?.Invoke();
-					GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate(GraphicsDevice device)
-					{
-						try
-						{
-							texture.SwapTexture(TextureUtil.FromStreamPremultiplied(device, imageStream));
-							imageStream.Close();
-						}
-						catch (Exception ex2)
-						{
-							logger.Error(ex2, "Exception occured on downloading/swapping image. URL: " + getImageStream.Url);
-							GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
-							{
-								texture.SwapTexture(Textures.get_Error());
-							});
-						}
-					});
-				}
-				catch (Exception ex)
-				{
-					logger.Error(ex, "Exception occured on downloading/swapping image. URL: " + getImageStream.Url);
-					GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
-					{
-						texture.SwapTexture(Textures.get_Error());
-					});
-				}
-			});
-			return texture;
-		}
-
-		private IFlurlRequest DownloadWikiContent(string url)
-		{
-			return GeneratedExtensions.WithHeader("https://wiki.guildwars2.com" + url, "user-agent", (object)"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36");
 		}
 
 		public void Dispose()

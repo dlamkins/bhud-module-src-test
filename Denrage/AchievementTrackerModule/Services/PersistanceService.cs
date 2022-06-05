@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Modules.Managers;
+using Blish_HUD.Settings;
 using Denrage.AchievementTrackerModule.Interfaces;
 using Denrage.AchievementTrackerModule.Models;
 using Denrage.AchievementTrackerModule.Models.Persistance;
@@ -17,8 +20,6 @@ namespace Denrage.AchievementTrackerModule.Services
 	{
 		private const string SAVE_FILE_NAME = "persistanceStorage.json";
 
-		private Storage storage;
-
 		private readonly DirectoriesManager directoriesManager;
 
 		private readonly AchievementDetailsWindowManager achievementDetailsWindowManager;
@@ -29,13 +30,68 @@ namespace Denrage.AchievementTrackerModule.Services
 
 		private readonly Logger logger;
 
-		public PersistanceService(DirectoriesManager directoriesManager, AchievementDetailsWindowManager achievementDetailsWindowManager, ItemDetailWindowManager itemDetailWindowManager, AchievementTrackerService achievementTrackerService, Logger logger)
+		private readonly AchievementService achievementService;
+
+		private Storage storage;
+
+		private Task autoSaveTask;
+
+		private CancellationTokenSource autoSaveCancellationTokenSource;
+
+		public event Action AutoSave;
+
+		public PersistanceService(DirectoriesManager directoriesManager, AchievementDetailsWindowManager achievementDetailsWindowManager, ItemDetailWindowManager itemDetailWindowManager, AchievementTrackerService achievementTrackerService, Logger logger, AchievementService achievementService, SettingEntry<bool> autoSave)
 		{
 			this.directoriesManager = directoriesManager;
 			this.achievementDetailsWindowManager = achievementDetailsWindowManager;
 			this.itemDetailWindowManager = itemDetailWindowManager;
 			this.achievementTrackerService = achievementTrackerService;
 			this.logger = logger;
+			this.achievementService = achievementService;
+			autoSave.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object s, ValueChangedEventArgs<bool> e)
+			{
+				if (e.get_NewValue())
+				{
+					InitializeAutoSaveTask();
+				}
+				else
+				{
+					ResetAutoSaveTask();
+				}
+			});
+			if (autoSave.get_Value())
+			{
+				InitializeAutoSaveTask();
+			}
+		}
+
+		private void ResetAutoSaveTask()
+		{
+			if (autoSaveTask != null)
+			{
+				autoSaveCancellationTokenSource.Cancel();
+				autoSaveTask = null;
+			}
+		}
+
+		private void InitializeAutoSaveTask()
+		{
+			ResetAutoSaveTask();
+			autoSaveCancellationTokenSource = new CancellationTokenSource();
+			autoSaveTask = Task.Run(async delegate
+			{
+				try
+				{
+					while (true)
+					{
+						await Task.Delay(TimeSpan.FromMinutes(5.0), autoSaveCancellationTokenSource.Token);
+						this.AutoSave?.Invoke();
+					}
+				}
+				catch (TaskCanceledException)
+				{
+				}
+			}, autoSaveCancellationTokenSource.Token);
 		}
 
 		public void Save(int achievementTrackWindowLocationX, int achievementTrackWindowLocationY, bool showTrackWindow)
@@ -70,6 +126,7 @@ namespace Denrage.AchievementTrackerModule.Services
 					PositionY = ((Control)item.Value.Window).get_Location().Y
 				};
 			}
+			storage.ManualCompletedAchievements = achievementService.ManualCompletedAchievements;
 			storage.TrackedAchievements.AddRange(achievementTrackerService.ActiveAchievements);
 			storage.TrackWindowLocationX = achievementTrackWindowLocationX;
 			storage.TrackWindowLocationY = achievementTrackWindowLocationY;

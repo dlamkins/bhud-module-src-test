@@ -15,17 +15,20 @@ namespace Denrage.AchievementTrackerModule.Services.Factories.AchievementControl
 
 		private readonly ContentsManager contentsManager;
 
-		public AchievementCollectionControlFactory(IAchievementService achievementService, IItemDetailWindowManager itemDetailWindowManager, IFormattedLabelHtmlService formattedLabelHtmlService, ContentsManager contentsManager)
+		private readonly IExternalImageService externalImageService;
+
+		public AchievementCollectionControlFactory(IAchievementService achievementService, IItemDetailWindowManager itemDetailWindowManager, IFormattedLabelHtmlService formattedLabelHtmlService, ContentsManager contentsManager, IExternalImageService externalImageService)
 		{
 			this.achievementService = achievementService;
 			this.itemDetailWindowManager = itemDetailWindowManager;
 			this.formattedLabelHtmlService = formattedLabelHtmlService;
 			this.contentsManager = contentsManager;
+			this.externalImageService = externalImageService;
 		}
 
 		protected override AchievementCollectionControl CreateInternal(AchievementTableEntry achievement, CollectionDescription description)
 		{
-			return new AchievementCollectionControl(itemDetailWindowManager, achievementService, formattedLabelHtmlService, contentsManager, achievement, description);
+			return new AchievementCollectionControl(itemDetailWindowManager, achievementService, formattedLabelHtmlService, externalImageService, contentsManager, achievement, description);
 		}
 	}
 }

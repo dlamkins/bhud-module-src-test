@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -90,13 +91,16 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Windows
 				CreatePanel(achievementId);
 			};
 			BuildWindow();
-			foreach (int item in this.achievementTrackerService.ActiveAchievements)
+			Task.Run(delegate
 			{
-				if (!this.achievementDetailsWindowManager.WindowExists(item))
+				foreach (int current in this.achievementTrackerService.ActiveAchievements)
 				{
-					AchievementTrackerService_AchievementTracked(item);
+					if (!this.achievementDetailsWindowManager.WindowExists(current))
+					{
+						AchievementTrackerService_AchievementTracked(current);
+					}
 				}
-			}
+			});
 		}
 
 		private void CreatePanel(int achievementId)
@@ -200,7 +204,7 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Windows
 					bool flag = false;
 					foreach (SubPageInformation current in achievementService.Subpages)
 					{
-						if (current.Link.Contains(achievement.Link))
+						if (current.Link == "https://wiki.guildwars2.com" + achievement.Link)
 						{
 							flag = true;
 							subPageInformationWindowManager.Create(current);

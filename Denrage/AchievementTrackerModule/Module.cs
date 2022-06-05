@@ -37,6 +37,10 @@ namespace Denrage.AchievementTrackerModule
 
 		private bool purposelyHidden;
 
+		private SettingEntry<bool> autoSave;
+
+		private SettingEntry<bool> limitAchievements;
+
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
 		internal ContentsManager ContentsManager => base.ModuleParameters.get_ContentsManager();
@@ -50,11 +54,13 @@ namespace Denrage.AchievementTrackerModule
 			: this(moduleParameters)
 		{
 			logger = Logger;
-			dependencyInjectionContainer = new DependencyInjectionContainer(Gw2ApiManager, ContentsManager, GameService.Content, DirectoriesManager, logger);
+			dependencyInjectionContainer = new DependencyInjectionContainer(Gw2ApiManager, ContentsManager, GameService.Content, DirectoriesManager, logger, GameService.Graphics);
 		}
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
+			autoSave = settings.DefineSetting<bool>("AutoSave", false, (Func<string>)(() => "Auto save every 5 minutes"), (Func<string>)(() => "Auto save tracked achievements, windows and their positions every 5 minutes"));
+			limitAchievements = settings.DefineSetting<bool>("LimitAchievements", true, (Func<string>)(() => "Limit Achievements to 15"), (Func<string>)(() => "This will limit the maximum of achievements to 15. If it's disabled expect performance and usability issues."));
 		}
 
 		protected override void Initialize()
@@ -75,7 +81,7 @@ namespace Denrage.AchievementTrackerModule
 			{
 				achievementOverviewView = () => (IView)(object)new AchievementTrackerView(dependencyInjectionContainer.AchievementItemOverviewFactory, dependencyInjectionContainer.AchievementService);
 				await Task.Delay(TimeSpan.FromSeconds(3.0));
-				await dependencyInjectionContainer.InitializeAsync();
+				await dependencyInjectionContainer.InitializeAsync(autoSave, limitAchievements);
 				dependencyInjectionContainer.AchievementTrackerService.AchievementTracked += AchievementTrackerService_AchievementTracked;
 				if (dependencyInjectionContainer.PersistanceService.Get().ShowTrackWindow)
 				{
@@ -95,6 +101,7 @@ namespace Denrage.AchievementTrackerModule
 					InitializeWindow();
 					((WindowBase2)window).ToggleWindow();
 				});
+				dependencyInjectionContainer.PersistanceService.AutoSave += SavePersistentInformation;
 			});
 			await _003C_003En__0();
 		}
@@ -162,11 +169,26 @@ namespace Denrage.AchievementTrackerModule
 
 		protected override void Unload()
 		{
+			SavePersistentInformation();
+			CornerIcon obj = cornerIcon;
+			if (obj != null)
+			{
+				((Control)obj).Dispose();
+			}
+			AchievementTrackWindow achievementTrackWindow = window;
+			if (achievementTrackWindow != null)
+			{
+				((Control)achievementTrackWindow).Dispose();
+			}
+		}
+
+		private void SavePersistentInformation()
+		{
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 			AchievementTrackWindow achievementTrackWindow = window;
 			Point location = (Point)((achievementTrackWindow != null) ? ((Control)achievementTrackWindow).get_Location() : new Point(-1, -1));
 			IPersistanceService persistanceService = dependencyInjectionContainer.PersistanceService;
@@ -176,16 +198,6 @@ namespace Denrage.AchievementTrackerModule
 				int y = location.Y;
 				AchievementTrackWindow achievementTrackWindow2 = window;
 				persistanceService.Save(x, y, achievementTrackWindow2 != null && ((Control)achievementTrackWindow2).get_Visible());
-			}
-			CornerIcon obj = cornerIcon;
-			if (obj != null)
-			{
-				((Control)obj).Dispose();
-			}
-			AchievementTrackWindow achievementTrackWindow3 = window;
-			if (achievementTrackWindow3 != null)
-			{
-				((Control)achievementTrackWindow3).Dispose();
 			}
 		}
 	}

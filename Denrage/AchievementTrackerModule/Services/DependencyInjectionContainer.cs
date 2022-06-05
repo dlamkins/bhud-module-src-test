@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Modules.Managers;
+using Blish_HUD.Settings;
 using Denrage.AchievementTrackerModule.Interfaces;
 using Denrage.AchievementTrackerModule.Services.Factories;
 using Denrage.AchievementTrackerModule.Services.Factories.ItemDetails;
@@ -20,6 +21,8 @@ namespace Denrage.AchievementTrackerModule.Services
 		private readonly DirectoriesManager directoriesManager;
 
 		private readonly Logger logger;
+
+		private readonly GraphicsService graphicsService;
 
 		public IItemDetailWindowManager ItemDetailWindowManager { get; set; }
 
@@ -49,31 +52,35 @@ namespace Denrage.AchievementTrackerModule.Services
 
 		public IFormattedLabelHtmlService FormattedLabelHtmlService { get; set; }
 
-		public DependencyInjectionContainer(Gw2ApiManager gw2ApiManager, ContentsManager contentsManager, ContentService contentService, DirectoriesManager directoriesManager, Logger logger)
+		public IExternalImageService ExternalImageService { get; set; }
+
+		public DependencyInjectionContainer(Gw2ApiManager gw2ApiManager, ContentsManager contentsManager, ContentService contentService, DirectoriesManager directoriesManager, Logger logger, GraphicsService graphicsService)
 		{
 			this.gw2ApiManager = gw2ApiManager;
 			this.contentsManager = contentsManager;
 			this.contentService = contentService;
 			this.directoriesManager = directoriesManager;
 			this.logger = logger;
+			this.graphicsService = graphicsService;
 		}
 
-		public async Task InitializeAsync(CancellationToken cancellationToken = default(CancellationToken))
+		public async Task InitializeAsync(SettingEntry<bool> autoSave, SettingEntry<bool> limitAchievement, CancellationToken cancellationToken = default(CancellationToken))
 		{
-			AchievementService achievementService = (AchievementService)(AchievementService = new AchievementService(contentsManager, gw2ApiManager, logger));
-			SubPageInformationWindowManager = new SubPageInformationWindowManager(GameService.Graphics, contentsManager, AchievementService, () => FormattedLabelHtmlService);
-			FormattedLabelHtmlService = new FormattedLabelHtmlService(contentsManager, AchievementService, SubPageInformationWindowManager);
-			AchievementTrackerService achievementTrackerService = (AchievementTrackerService)(AchievementTrackerService = new AchievementTrackerService(logger));
+			ExternalImageService = new ExternalImageService(graphicsService, logger);
+			AchievementService achievementService = (AchievementService)(AchievementService = new AchievementService(contentsManager, gw2ApiManager, logger, () => PersistanceService));
+			SubPageInformationWindowManager = new SubPageInformationWindowManager(graphicsService, contentsManager, AchievementService, () => FormattedLabelHtmlService, ExternalImageService);
+			FormattedLabelHtmlService = new FormattedLabelHtmlService(contentsManager, AchievementService, SubPageInformationWindowManager, ExternalImageService);
+			AchievementTrackerService achievementTrackerService = (AchievementTrackerService)(AchievementTrackerService = new AchievementTrackerService(logger, limitAchievement));
 			AchievementListItemFactory = new AchievementListItemFactory(AchievementTrackerService, contentService, AchievementService);
 			AchievementItemOverviewFactory = new AchievementItemOverviewFactory(AchievementListItemFactory, AchievementService);
-			AchievementTableEntryProvider = new AchievementTableEntryProvider(AchievementService, FormattedLabelHtmlService, logger);
+			AchievementTableEntryProvider = new AchievementTableEntryProvider(FormattedLabelHtmlService, ExternalImageService, logger, gw2ApiManager, contentsManager);
 			ItemDetailWindowFactory = new ItemDetailWindowFactory(contentsManager, AchievementService, AchievementTableEntryProvider, SubPageInformationWindowManager);
 			ItemDetailWindowManager itemDetailWindowManager = (ItemDetailWindowManager)(ItemDetailWindowManager = new ItemDetailWindowManager(ItemDetailWindowFactory, AchievementService, logger));
-			AchievementControlProvider = new AchievementControlProvider(AchievementService, ItemDetailWindowManager, FormattedLabelHtmlService, contentsManager);
+			AchievementControlProvider = new AchievementControlProvider(AchievementService, ItemDetailWindowManager, FormattedLabelHtmlService, contentsManager, ExternalImageService);
 			AchievementControlManager = new AchievementControlManager(AchievementControlProvider);
 			AchievementDetailsWindowFactory = new AchievementDetailsWindowFactory(contentsManager, AchievementService, AchievementControlProvider, AchievementControlManager);
 			AchievementDetailsWindowManager achievementDetailsWindowManager = (AchievementDetailsWindowManager)(AchievementDetailsWindowManager = new AchievementDetailsWindowManager(AchievementDetailsWindowFactory, AchievementControlManager, AchievementService, logger));
-			PersistanceService = new PersistanceService(directoriesManager, achievementDetailsWindowManager, itemDetailWindowManager, achievementTrackerService, logger);
+			PersistanceService = new PersistanceService(directoriesManager, achievementDetailsWindowManager, itemDetailWindowManager, achievementTrackerService, logger, achievementService, autoSave);
 			await achievementService.LoadAsync(cancellationToken);
 			achievementDetailsWindowManager.Load(PersistanceService);
 			itemDetailWindowManager.Load(PersistanceService);

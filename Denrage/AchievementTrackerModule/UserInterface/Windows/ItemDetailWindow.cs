@@ -71,21 +71,21 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Windows
 			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ad: Expected O, but got Unknown
 			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fa: Expected O, but got Unknown
-			//IL_01fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0207: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0213: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0239: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0240: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0249: Expected O, but got Unknown
-			//IL_0293: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0204: Expected O, but got Unknown
+			//IL_0204: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0209: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0211: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0234: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0243: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0253: Expected O, but got Unknown
+			//IL_029d: Unknown result type (might be due to invalid IL or missing references)
 			((WindowBase2)this).set_Title("Item Details");
 			((WindowBase2)this).ConstructWindow(texture, new Rectangle(0, 0, 600, 400), new Rectangle(0, 30, 600, 370));
 			FlowPanel val = new FlowPanel();
@@ -113,7 +113,7 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Windows
 				bool inSubpages = false;
 				foreach (SubPageInformation subPage in achievementService.Subpages)
 				{
-					if (subPage.Link.Contains(link))
+					if (subPage.Link == "https://wiki.guildwars2.com" + link)
 					{
 						inSubpages = true;
 						itemTitlePart.SetLink(delegate

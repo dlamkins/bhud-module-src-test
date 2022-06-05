@@ -1,20 +1,11 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using Blish_HUD;
-using Blish_HUD.Content;
 using Blish_HUD.Modules.Managers;
 using Denrage.AchievementTrackerModule.Interfaces;
 using Denrage.AchievementTrackerModule.Libs.Achievement;
 using Denrage.AchievementTrackerModule.UserInterface.Controls.FormattedLabel;
-using Flurl.Http;
 using HtmlAgilityPack;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Denrage.AchievementTrackerModule.Services
 {
@@ -26,13 +17,16 @@ namespace Denrage.AchievementTrackerModule.Services
 
 		private readonly ISubPageInformationWindowManager subPageInformationWindowManager;
 
+		private readonly IExternalImageService externalImageService;
+
 		public readonly ContentsManager contentsManager;
 
-		public FormattedLabelHtmlService(ContentsManager contentsManager, IAchievementService achievementService, ISubPageInformationWindowManager subPageInformationWindowManager)
+		public FormattedLabelHtmlService(ContentsManager contentsManager, IAchievementService achievementService, ISubPageInformationWindowManager subPageInformationWindowManager, IExternalImageService externalImageService)
 		{
 			this.contentsManager = contentsManager;
 			this.achievementService = achievementService;
 			this.subPageInformationWindowManager = subPageInformationWindowManager;
+			this.externalImageService = externalImageService;
 		}
 
 		public FormattedLabelBuilder CreateLabel(string textWithHtml)
@@ -66,7 +60,7 @@ namespace Denrage.AchievementTrackerModule.Services
 							bool inSubpages = false;
 							foreach (SubPageInformation subPage in achievementService.Subpages)
 							{
-								if (subPage.Link.Contains(link) && !inSubpages)
+								if (subPage.Link == "https://wiki.guildwars2.com" + link && !inSubpages)
 								{
 									inSubpages = true;
 									yield return part3.SetLink(delegate
@@ -103,7 +97,7 @@ namespace Denrage.AchievementTrackerModule.Services
 					if (imageNode != null)
 					{
 						FormattedLabelPartBuilder builder2 = labelBuilder.CreatePart("");
-						builder2.SetPrefixImage(GetTexture(imageNode.GetAttributeValue("src", ""))).SetPrefixImageSize(new Point(24, 24));
+						builder2.SetPrefixImage(externalImageService.GetImage(imageNode.GetAttributeValue("src", ""))).SetPrefixImageSize(new Point(24, 24));
 						yield return builder2;
 					}
 					yield break;
@@ -215,7 +209,7 @@ namespace Denrage.AchievementTrackerModule.Services
 			else if (childNode.Name == "img")
 			{
 				FormattedLabelPartBuilder builder = labelBuilder.CreatePart(string.Empty);
-				yield return builder.SetPrefixImage(GetTexture(childNode.GetAttributeValue("src", string.Empty)));
+				yield return builder.SetPrefixImage(externalImageService.GetImage(childNode.GetAttributeValue("src", string.Empty)));
 			}
 			else if (childNode.Name == "s")
 			{
@@ -271,40 +265,6 @@ namespace Denrage.AchievementTrackerModule.Services
 					}
 				}
 			}
-		}
-
-		private AsyncTexture2D GetTexture(string url)
-		{
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Expected O, but got Unknown
-			AsyncTexture2D texture = new AsyncTexture2D(Textures.get_TransparentPixel());
-			Stream imageStream;
-			Task.Run(delegate
-			{
-				try
-				{
-					imageStream = GeneratedExtensions.GetStreamAsync(GeneratedExtensions.WithHeader("https://wiki.guildwars2.com" + url, "user-agent", (object)"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"), default(CancellationToken), (HttpCompletionOption)0).Result;
-					GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate(GraphicsDevice device)
-					{
-						texture.SwapTexture(TextureUtil.FromStreamPremultiplied(device, imageStream));
-						imageStream.Close();
-					});
-				}
-				catch (Exception ex)
-				{
-					Exception innerException = ex.InnerException;
-					FlurlHttpException val = (FlurlHttpException)(object)((innerException is FlurlHttpException) ? innerException : null);
-					if (val == null)
-					{
-						throw;
-					}
-					if (!((Exception)(object)val).Message.Contains("404 (Not Found)"))
-					{
-						throw;
-					}
-				}
-			});
-			return texture;
 		}
 	}
 }
