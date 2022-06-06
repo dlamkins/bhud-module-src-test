@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
+using System.Resources;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
@@ -210,7 +211,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			_fishImgSize = settings.DefineSetting<int>("FishImgWidth", 30, (Func<string>)(() => Strings.FishPanelSize), (Func<string>)(() => string.Empty));
 			_showRarityBorder = settings.DefineSetting<bool>("ShowRarityBorder", true, (Func<string>)(() => Strings.SettingsRarity), (Func<string>)(() => Strings.RarityDescription));
 			_fishPanelOrientation = settings.DefineSetting<string>("FishPanelOrientation", _fishPanelOrientations.First(), (Func<string>)(() => Strings.Orientation), (Func<string>)(() => Strings.OrientationDescription));
-			_fishPanelDirection = settings.DefineSetting<string>("FishPanelDirection", _fishPanelDirections.First(), (Func<string>)(() => Strings.SettingsDirection), (Func<string>)(() => Strings.SettingsDirectionDescription));
+			_fishPanelDirection = settings.DefineSetting<string>("FishPanelDirection", _fishPanelDirections.First(), (Func<string>)(() => Strings.Direction), (Func<string>)(() => Strings.SettingsDirectionDescription));
 			_ignoreCaughtFish.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateFishSettings<bool>);
 			_includeSaltwater.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateFishSettings<bool>);
 			_includeWorldClass.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateFishSettings<bool>);
@@ -650,15 +651,19 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 
 		private string BuildTooltip(Fish fish)
 		{
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0286: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b8: Unknown result type (might be due to invalid IL or missing references)
 			string name = Strings.FishName + ": " + fish.Name;
 			string bait = Strings.FishFavoredBait + ": " + fish.Bait.GetEnumMemberValue();
 			string time = Strings.FishTimeOfDay + ": " + fish.Time.GetEnumMemberValue();
 			string hole = Strings.FishFishingHole + ": " + fish.Hole.GetEnumMemberValue() + (fish.OpenWater ? (", " + Strings.OpenWater) : string.Empty);
 			string achieve = Strings.Achievement + ": " + fish.Achievement;
-			string rarity = $"{Strings.Rarity}: {fish.Rarity}";
+			string rarity2 = Strings.Rarity;
+			ResourceManager resourceManager = Strings.ResourceManager;
+			ItemRarity rarity3 = fish.Rarity;
+			string rarity = rarity2 + ": " + resourceManager.GetString(((object)(ItemRarity)(ref rarity3)).ToString(), Strings.Culture);
 			string hiddenReason = string.Empty;
 			if (_useAPIToken)
 			{
@@ -675,7 +680,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 					hiddenReason = Strings.Hidden + ": " + Strings.HiddenCaught;
 				}
 			}
-			string notes = ((!string.IsNullOrWhiteSpace(fish.Notes)) ? (Strings.Notes + ": " + fish.Notes) : string.Empty);
+			string notes = ((!string.IsNullOrWhiteSpace(fish.Notes)) ? (Strings.Notes + ": " + Strings.ResourceManager.GetString(fish.Notes, Strings.Culture)) : string.Empty);
 			string text = _fishPanelTooltipDisplay.get_Value().Replace("@1", name).Replace("@2", bait)
 				.Replace("@3", time)
 				.Replace("@4", hole)
@@ -688,8 +693,9 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 				.Replace("#3", fish.Time.GetEnumMemberValue())
 				.Replace("#4", fish.Hole.GetEnumMemberValue() + (fish.OpenWater ? (", " + Strings.OpenWater) : string.Empty))
 				.Replace("#5", fish.Achievement);
-			ItemRarity rarity2 = fish.Rarity;
-			return text.Replace("#6", ((object)(ItemRarity)(ref rarity2)).ToString()).Replace("#8", fish.Notes).Replace("\\n", "\n")
+			ResourceManager resourceManager2 = Strings.ResourceManager;
+			rarity3 = fish.Rarity;
+			return text.Replace("#6", resourceManager2.GetString(((object)(ItemRarity)(ref rarity3)).ToString(), Strings.Culture)).Replace("#8", Strings.ResourceManager.GetString(fish.Notes, Strings.Culture)).Replace("\\n", "\n")
 				.Replace("\n\n", "\n")
 				.Trim();
 		}
