@@ -108,18 +108,18 @@ namespace Kenedia.Modules.QoL
 		protected override void DefineSettings(SettingCollection settings)
 		{
 			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0163: Expected O, but got Unknown
-			//IL_019f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0127: Expected O, but got Unknown
+			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
 			foreach (SubModule module in Modules)
 			{
 				SettingCollection subSettings = settings.AddSubCollection(module.Name + " - Settings", true, false);
 				module.DefineSettings(subSettings);
 			}
-			HotbarForceOnScreen = settings.DefineSetting<bool>("HotbarForceOnScreen", true, (Func<string>)(() => "Force Hotbar on Screen"), (Func<string>)(() => "When the Hotbar is moved outside the game bounds the bar gets moved back inside."));
-			HotbarExpandDirection = settings.DefineSetting<ExpandDirection>("HotbarExpandDirection", ExpandDirection.LeftToRight, (Func<string>)(() => "Expand Direction"), (Func<string>)(() => "Direction the Hotbar is supposed to expand."));
+			HotbarForceOnScreen = settings.DefineSetting<bool>("HotbarForceOnScreen", true, (Func<string>)(() => common.ForceOnScreen_Name), (Func<string>)(() => common.ForceOnScreen_Tooltip));
+			HotbarExpandDirection = settings.DefineSetting<ExpandDirection>("HotbarExpandDirection", ExpandDirection.LeftToRight, (Func<string>)(() => common.ExpandDirection_Name), (Func<string>)(() => common.ExpandDirection_Tooltip));
 			HotbarExpandDirection.add_SettingChanged((EventHandler<ValueChangedEventArgs<ExpandDirection>>)HotbarExpandDirection_SettingChanged);
 			SettingCollection internal_settings = settings.AddSubCollection("Internal Settings", false);
-			ReloadKey = internal_settings.DefineSetting<KeyBinding>("ReloadKey", new KeyBinding((Keys)0), (Func<string>)(() => "Reload Button"), (Func<string>)(() => ""));
+			ReloadKey = internal_settings.DefineSetting<KeyBinding>("ReloadKey", new KeyBinding((Keys)0), (Func<string>)null, (Func<string>)null);
 			ReloadKey.get_Value().set_Enabled(true);
 			ReloadKey.get_Value().add_Activated((EventHandler<EventArgs>)RebuildUI);
 			HotbarPosition = internal_settings.DefineSetting<Point>("HotbarPosition", new Point(0, 34), (Func<string>)null, (Func<string>)null);

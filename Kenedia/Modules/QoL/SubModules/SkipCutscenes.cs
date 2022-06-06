@@ -90,8 +90,8 @@ namespace Kenedia.Modules.QoL.SubModules
 			Cancel_Key.get_Value().add_Activated((EventHandler<EventArgs>)Cancel_Key_Activated);
 			ToggleModule_Key.get_Value().set_Enabled(true);
 			ToggleModule_Key.get_Value().add_Activated((EventHandler<EventArgs>)ToggleModule_Key_Activated);
-			Enabled = settings.DefineSetting<bool>(Name + "Enabled", true, (Func<string>)(() => $"Enable {Name}"), (Func<string>)null);
-			ShowOnBar = settings.DefineSetting<bool>(Name + "ShowOnBar", true, (Func<string>)(() => string.Format("Show Icon", Name)), (Func<string>)null);
+			Enabled = settings.DefineSetting<bool>(Name + "Enabled", true, (Func<string>)(() => string.Format(common.Enable_Name, Name)), (Func<string>)(() => string.Format(common.Enable_Tooltip, Name)));
+			ShowOnBar = settings.DefineSetting<bool>(Name + "ShowOnBar", true, (Func<string>)(() => string.Format(common.ShowIcon_Name, Name)), (Func<string>)(() => string.Format(common.ShowIcon_Tooltip, Name)));
 		}
 
 		public override void ToggleModule()

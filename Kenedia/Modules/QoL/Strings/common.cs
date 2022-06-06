@@ -50,7 +50,21 @@ namespace Kenedia.Modules.QoL.Strings
 
 		internal static string ClickItem => ResourceManager.GetString("ClickItem", resourceCulture);
 
+		internal static string days => ResourceManager.GetString("days", resourceCulture);
+
 		internal static string Deactivated => ResourceManager.GetString("Deactivated", resourceCulture);
+
+		internal static string Enable_Name => ResourceManager.GetString("Enable_Name", resourceCulture);
+
+		internal static string Enable_Tooltip => ResourceManager.GetString("Enable_Tooltip", resourceCulture);
+
+		internal static string ExpandDirection_Name => ResourceManager.GetString("ExpandDirection_Name", resourceCulture);
+
+		internal static string ExpandDirection_Tooltip => ResourceManager.GetString("ExpandDirection_Tooltip", resourceCulture);
+
+		internal static string ForceOnScreen_Name => ResourceManager.GetString("ForceOnScreen_Name", resourceCulture);
+
+		internal static string ForceOnScreen_Tooltip => ResourceManager.GetString("ForceOnScreen_Tooltip", resourceCulture);
 
 		internal static string ManualMaxZoomOut_Name => ResourceManager.GetString("ManualMaxZoomOut_Name", resourceCulture);
 
@@ -61,6 +75,10 @@ namespace Kenedia.Modules.QoL.Strings
 		internal static string ShowCorner_Name => ResourceManager.GetString("ShowCorner_Name", resourceCulture);
 
 		internal static string ShowCorner_Tooltip => ResourceManager.GetString("ShowCorner_Tooltip", resourceCulture);
+
+		internal static string ShowIcon_Name => ResourceManager.GetString("ShowIcon_Name", resourceCulture);
+
+		internal static string ShowIcon_Tooltip => ResourceManager.GetString("ShowIcon_Tooltip", resourceCulture);
 
 		internal static string ThrowItem => ResourceManager.GetString("ThrowItem", resourceCulture);
 

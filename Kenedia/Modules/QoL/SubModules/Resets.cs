@@ -75,11 +75,11 @@ namespace Kenedia.Modules.QoL.SubModules
 		{
 			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0031: Expected O, but got Unknown
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
 			base.DefineSettings(settings);
 			ToggleModule_Key = settings.DefineSetting<KeyBinding>(Name + "ToggleModule_Key", new KeyBinding((Keys)0), (Func<string>)(() => string.Format(common.Toggle, Name)), (Func<string>)null);
-			Enabled = settings.DefineSetting<bool>(Name + "Enabled", true, (Func<string>)(() => $"Enable {Name}"), (Func<string>)null);
-			ShowOnBar = settings.DefineSetting<bool>(Name + "ShowOnBar", true, (Func<string>)(() => string.Format("Show Icon", Name)), (Func<string>)null);
+			Enabled = settings.DefineSetting<bool>(Name + "Enabled", true, (Func<string>)(() => string.Format(common.Enable_Name, Name)), (Func<string>)(() => string.Format(common.Enable_Tooltip, Name)));
+			ShowOnBar = settings.DefineSetting<bool>(Name + "ShowOnBar", true, (Func<string>)(() => string.Format(common.ShowIcon_Name, Name)), (Func<string>)(() => string.Format(common.ShowIcon_Tooltip, Name)));
 			SettingCollection internal_settings = settings.AddSubCollection("Internal Settings " + Name, false);
 			ControlPosition = internal_settings.DefineSetting<Point>("ControlPosition", new Point(150, 150), (Func<string>)null, (Func<string>)null);
 		}
@@ -168,17 +168,17 @@ namespace Kenedia.Modules.QoL.SubModules
 			DateTime now = DateTime.UtcNow;
 			DateTime nextDay = DateTime.UtcNow.AddDays(1.0);
 			DateTime nextWeek = DateTime.UtcNow;
-			for (int i = 1; i < 7; i++)
+			for (int i = 0; i < 8; i++)
 			{
 				nextWeek = DateTime.UtcNow.AddDays(i);
-				if (nextWeek.DayOfWeek == DayOfWeek.Monday)
+				if (nextWeek.DayOfWeek == DayOfWeek.Monday && (nextWeek.Day != now.Day || now.Hour < 7 || (now.Hour == 7 && now.Minute < 30)))
 				{
 					break;
 				}
 			}
 			DateTime t = new DateTime(nextDay.Year, nextDay.Month, nextDay.Day, 0, 0, 0);
 			TimeSpan weeklyReset = new DateTime(nextWeek.Year, nextWeek.Month, nextWeek.Day, 7, 30, 0).Subtract(now);
-			WeeklyReset.Text = $"{weeklyReset.Days:0} days {weeklyReset.Hours:00}:{weeklyReset.Minutes:00}:{weeklyReset.Seconds:00}";
+			WeeklyReset.Text = string.Format("{1:0} {0} {2:00}:{3:00}:{4:00}", common.days, weeklyReset.Days, weeklyReset.Hours, weeklyReset.Minutes, weeklyReset.Seconds);
 			TimeSpan serverReset = t.Subtract(now);
 			ServerReset.Text = $"{serverReset.Hours:00}:{serverReset.Minutes:00}:{serverReset.Seconds:00}";
 		}
