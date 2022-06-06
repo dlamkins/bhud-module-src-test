@@ -254,10 +254,14 @@ namespace Kenedia.Modules.QoL
 
 		private void CreateUI()
 		{
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			if (Hotbar != null)
+			{
+				return;
+			}
 			Hotbar hotbar = new Hotbar();
 			((Control)hotbar).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((Control)hotbar).set_Size(new Point(36, 36));

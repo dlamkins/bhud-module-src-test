@@ -15,17 +15,20 @@ namespace Kenedia.Modules.QoL.UI
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
 			Texture2D texture = (SubModule.Active ? SubModule.ModuleIcon_Active : SubModule.ModuleIcon);
 			if (((Control)this).get_MouseOver())
 			{
 				texture = (SubModule.Active ? SubModule.ModuleIconHovered_Active : SubModule.ModuleIconHovered);
 			}
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, texture, bounds, (Rectangle?)SubModule.ModuleIcon.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+			if (texture != null)
+			{
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, texture, bounds, (Rectangle?)SubModule.ModuleIcon.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+			}
 		}
 
 		protected override void OnClick(MouseEventArgs e)

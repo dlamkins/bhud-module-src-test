@@ -109,16 +109,16 @@ namespace Kenedia.Modules.QoL.SubModules
 		{
 			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
 			base.Initialize();
 			RectangleF tRect = GameService.Content.get_DefaultFont14().GetStringRectangle("7 Tage 00:00:00");
 			CustomFlowPanel customFlowPanel = new CustomFlowPanel();
 			((Control)customFlowPanel).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)customFlowPanel).set_Visible(true);
+			((Control)customFlowPanel).set_Visible(base.Active);
 			((Control)customFlowPanel).set_Width((int)(tRect.Width + 6f + tRect.Height));
 			((Container)customFlowPanel).set_HeightSizingMode((SizingMode)1);
 			((FlowPanel)customFlowPanel).set_FlowDirection((ControlFlowDirection)0);
