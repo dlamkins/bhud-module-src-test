@@ -9,8 +9,6 @@ namespace Kenedia.Modules.Characters
 {
 	public class HeaderUnderlined : Panel
 	{
-		private static ContentService contentService = new ContentService();
-
 		private BitmapFont _Font;
 
 		private bool AlignCentered;
@@ -94,23 +92,23 @@ namespace Kenedia.Modules.Characters
 		public HeaderUnderlined()
 			: this()
 		{
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008b: Expected O, but got Unknown
-			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f1: Expected O, but got Unknown
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0087: Expected O, but got Unknown
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ed: Expected O, but got Unknown
 			((Container)this).set_WidthSizingMode((SizingMode)1);
 			((Container)this).set_HeightSizingMode((SizingMode)1);
-			_Font = contentService.GetFont((FontFace)0, (FontSize)18, (FontStyle)0);
+			_Font = GameService.Content.get_DefaultFont18();
 			Label val = new Label();
 			((Control)val).set_Location(new Point(_HorizontalPadding, 0));
 			val.set_Text("");
@@ -136,23 +134,23 @@ namespace Kenedia.Modules.Characters
 		public HeaderUnderlined(bool centered)
 			: this()
 		{
-			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Expected O, but got Unknown
-			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fc: Expected O, but got Unknown
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0092: Expected O, but got Unknown
+			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f8: Expected O, but got Unknown
 			AlignCentered = centered;
 			((Container)this).set_WidthSizingMode((SizingMode)((!AlignCentered) ? 1 : 0));
 			((Container)this).set_HeightSizingMode((SizingMode)1);
-			_Font = contentService.GetFont((FontFace)0, (FontSize)18, (FontStyle)0);
+			_Font = GameService.Content.get_DefaultFont18();
 			Label val = new Label();
 			((Control)val).set_Location(new Point(_HorizontalPadding, 0));
 			val.set_Text("");

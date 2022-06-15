@@ -81,24 +81,21 @@ namespace Kenedia.Modules.Characters
 		public TagEntry(string txt, Character character, FlowPanel parent, bool showButton = true, BitmapFont font = null)
 			: this()
 		{
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Expected O, but got Unknown
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fc: Expected O, but got Unknown
-			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0147: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0189: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019c: Expected O, but got Unknown
-			ContentService contentService = new ContentService();
-			BitmapFont textFont = ((font == null) ? contentService.GetFont((FontFace)0, (FontSize)14, (FontStyle)0) : font);
+			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f6: Expected O, but got Unknown
+			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0154: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0183: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0196: Expected O, but got Unknown
+			BitmapFont textFont = ((font == null) ? GameService.Content.get_DefaultFont14() : font);
 			assignedCharacter = character;
 			((Control)this).set_Parent((Container)(object)parent);
 			((Container)this).set_WidthSizingMode((SizingMode)1);

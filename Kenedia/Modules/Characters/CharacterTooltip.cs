@@ -10,8 +10,6 @@ namespace Kenedia.Modules.Characters
 {
 	public class CharacterTooltip : Tooltip
 	{
-		public static ContentService ContentService = new ContentService();
-
 		public Character assignedCharacter;
 
 		public IconLabel _Name;
@@ -52,7 +50,6 @@ namespace Kenedia.Modules.Characters
 			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
 			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0097: Expected O, but got Unknown
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_04d6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_04db: Unknown result type (might be due to invalid IL or missing references)
 			//IL_04e2: Unknown result type (might be due to invalid IL or missing references)
@@ -93,7 +90,7 @@ namespace Kenedia.Modules.Characters
 			};
 			((Control)obj).set_Parent((Container)(object)ContentRegion);
 			obj.Text = c.Name;
-			obj.Font = new ContentService().GetFont((FontFace)0, (FontSize)20, (FontStyle)0);
+			obj.Font = GameService.Content.GetFont((FontFace)0, (FontSize)20, (FontStyle)0);
 			obj.Gap = 4;
 			_Name = obj;
 			Separator separator = new Separator();
@@ -163,7 +160,7 @@ namespace Kenedia.Modules.Characters
 			Label val3 = new Label();
 			val3.set_Text("- " + string.Format(common.DoubleClickToSwap, assignedCharacter.Name) + " -");
 			((Control)val3).set_Parent((Container)(object)p);
-			val3.set_Font(ContentService.GetFont((FontFace)0, (FontSize)12, (FontStyle)0));
+			val3.set_Font(GameService.Content.GetFont((FontFace)0, (FontSize)12, (FontStyle)0));
 			val3.set_HorizontalAlignment((HorizontalAlignment)1);
 			val3.set_TextColor(Color.LightGray);
 			_switchInfoLabel = val3;
@@ -185,13 +182,10 @@ namespace Kenedia.Modules.Characters
 
 		public void _Update()
 		{
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Expected O, but got Unknown
 			if (assignedCharacter == null || assignedCharacter.characterControl == null)
 			{
 				return;
 			}
-			ContentService contentService = new ContentService();
 			Character c = assignedCharacter;
 			TimeSpan t = TimeSpan.FromSeconds(c.seconds);
 			_LastLogin.Text = string.Format("{3} " + common.Days + " {0:00}:{1:00}:{2:00}", t.Hours, t.Minutes, t.Seconds, t.Days);
@@ -217,7 +211,7 @@ namespace Kenedia.Modules.Characters
 			((Container)Tags).ClearChildren();
 			foreach (string tag in c.Tags)
 			{
-				new TagEntry(tag, c, Tags, showButton: false, contentService.GetFont((FontFace)0, (FontSize)12, (FontStyle)0));
+				new TagEntry(tag, c, Tags, showButton: false, GameService.Content.get_DefaultFont12());
 			}
 		}
 	}

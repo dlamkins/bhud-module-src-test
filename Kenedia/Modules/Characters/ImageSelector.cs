@@ -57,83 +57,80 @@ namespace Kenedia.Modules.Characters
 
 		public ImageSelector(int width, int height)
 		{
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Expected O, but got Unknown
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0101: Expected O, but got Unknown
-			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014b: Expected O, but got Unknown
-			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0158: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0167: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0187: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0193: Expected O, but got Unknown
-			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0199: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d1: Expected O, but got Unknown
-			//IL_0205: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0211: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0263: Expected O, but got Unknown
-			//IL_027b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0280: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0287: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0292: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b8: Expected O, but got Unknown
-			//IL_02d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0310: Expected O, but got Unknown
-			//IL_0328: Unknown result type (might be due to invalid IL or missing references)
-			//IL_032d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0334: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0351: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0365: Expected O, but got Unknown
-			//IL_037d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0382: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0389: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0394: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ba: Expected O, but got Unknown
-			//IL_03d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0406: Unknown result type (might be due to invalid IL or missing references)
-			//IL_041b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0422: Unknown result type (might be due to invalid IL or missing references)
-			//IL_042e: Expected O, but got Unknown
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ff: Expected O, but got Unknown
+			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0149: Expected O, but got Unknown
+			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0172: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0191: Expected O, but got Unknown
+			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d3: Expected O, but got Unknown
+			//IL_0207: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0213: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0251: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0265: Expected O, but got Unknown
+			//IL_027d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0282: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0289: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0294: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ba: Expected O, but got Unknown
+			//IL_02d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0312: Expected O, but got Unknown
+			//IL_032a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0336: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0341: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0353: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0367: Expected O, but got Unknown
+			//IL_037f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0384: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0396: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03bc: Expected O, but got Unknown
+			//IL_03d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0401: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0408: Unknown result type (might be due to invalid IL or missing references)
+			//IL_041d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0424: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0430: Expected O, but got Unknown
 			((Control)this).set_Width(width);
 			((Control)this).set_Height(height);
-			ContentService contentService = new ContentService();
 			int iPadding = 5;
 			Image val = new Image();
 			((Control)val).set_Parent((Container)(object)this);
@@ -147,7 +144,7 @@ namespace Kenedia.Modules.Characters
 			((Control)headerUnderlined).set_Parent((Container)(object)this);
 			headerUnderlined.Text = common.SelectImage;
 			((Control)headerUnderlined).set_Location(new Point(72, iPadding));
-			headerUnderlined.Font = contentService.get_DefaultFont32();
+			headerUnderlined.Font = GameService.Content.get_DefaultFont32();
 			((Control)headerUnderlined).set_Width(300);
 			header_HeaderUnderlined = headerUnderlined;
 			Image val2 = new Image();
@@ -174,7 +171,7 @@ namespace Kenedia.Modules.Characters
 			((Control)val5).set_Parent((Container)(object)this);
 			val5.set_Text("Character Name");
 			val5.set_AutoSizeWidth(true);
-			val5.set_Font(contentService.get_DefaultFont18());
+			val5.set_Font(GameService.Content.get_DefaultFont18());
 			val5.set_AutoSizeHeight(true);
 			val5.set_VerticalAlignment((VerticalAlignment)0);
 			name_Label = val5;

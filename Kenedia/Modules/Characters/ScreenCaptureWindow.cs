@@ -35,29 +35,27 @@ namespace Kenedia.Modules.Characters
 			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009a: Expected O, but got Unknown
-			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Expected O, but got Unknown
-			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0107: Expected O, but got Unknown
-			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0152: Expected O, but got Unknown
+			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0105: Expected O, but got Unknown
+			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0112: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0136: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0150: Expected O, but got Unknown
+			//IL_0204: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0209: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0215: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0220: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0245: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0262: Expected O, but got Unknown
+			//IL_0210: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025b: Expected O, but got Unknown
 			GameService.Graphics.get_UIScaleMultiplier();
 			GameService.Graphics.get_Resolution();
 			int CharacterImageSize = 140;
@@ -72,7 +70,6 @@ namespace Kenedia.Modules.Characters
 			((Control)val).set_Location(new Microsoft.Xna.Framework.Point(6 + 5 * (CharacterImageSize + Image_Gap), 0));
 			((Control)val).set_Size(new Microsoft.Xna.Framework.Point(CharacterImageSize, topMenuHeight - 30));
 			captureAll_Button = val;
-			ContentService contentService = new ContentService();
 			Label val2 = new Label();
 			((Control)val2).set_Parent((Container)(object)this);
 			val2.set_Text(common.UISizeDisclaimer);
@@ -80,7 +77,7 @@ namespace Kenedia.Modules.Characters
 			((Control)val2).set_Size(new Microsoft.Xna.Framework.Point(((Control)this).get_Width() - CharacterImageSize - Image_Gap, topMenuHeight - 30));
 			val2.set_HorizontalAlignment((HorizontalAlignment)1);
 			val2.set_TextColor(Microsoft.Xna.Framework.Color.Red);
-			val2.set_Font(contentService.get_DefaultFont18());
+			val2.set_Font(GameService.Content.get_DefaultFont18());
 			disclaimer_Label = val2;
 			StandardButton val3 = new StandardButton();
 			((Control)val3).set_Parent((Container)(object)this);

@@ -93,22 +93,21 @@ namespace Kenedia.Modules.Characters
 		public IconLabel()
 			: this()
 		{
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Expected O, but got Unknown
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c9: Expected O, but got Unknown
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006f: Expected O, but got Unknown
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c5: Expected O, but got Unknown
 			((Container)this).set_HeightSizingMode((SizingMode)1);
 			((Container)this).set_WidthSizingMode((SizingMode)1);
-			_Font = new ContentService().GetFont((FontFace)0, (FontSize)18, (FontStyle)0);
+			_Font = GameService.Content.get_DefaultFont18();
 			Image val = new Image();
 			((Control)val).set_Size(new Point(Font.LineHeight + 4, Font.LineHeight + 4));
 			((Control)val).set_Location(new Point(0, 0));
