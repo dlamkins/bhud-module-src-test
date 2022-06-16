@@ -151,13 +151,22 @@ namespace BhModule.Community.Pathing.Utility
 					}
 					File.Delete(finalPath);
 				}
-				File.Move(tempPackDownloadDestination, finalPath);
-				if (needsInit)
+				try
 				{
-					Pack newPack = Pack.FromArchivedMarkerPack(finalPath);
-					await PathingModule.Instance.PackInitiator.LoadPack(newPack);
-					newPack.ReleaseLocks();
+					File.Move(tempPackDownloadDestination, finalPath);
 				}
+				catch (IOException)
+				{
+					Logger.Warn("Failed to move temp marker pack from {startPath} to {endPath} so instead we'll attempt to copy it.", new object[2] { tempPackDownloadDestination, finalPath });
+					File.Copy(tempPackDownloadDestination, finalPath);
+				}
+				Pack newPack = Pack.FromArchivedMarkerPack(finalPath);
+				if (!needsInit)
+				{
+					PathingModule.Instance.PackInitiator.UnloadPackByName(newPack.Name);
+				}
+				await PathingModule.Instance.PackInitiator.LoadPack(newPack);
+				newPack.ReleaseLocks();
 			}
 			catch (InvalidDataException ex2)
 			{

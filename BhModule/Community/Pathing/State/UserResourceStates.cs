@@ -21,8 +21,6 @@ namespace BhModule.Community.Pathing.State
 
 		public IgnoreDefaults Ignore { get; set; }
 
-		public StaticValues Static { get; set; }
-
 		public TextureDefaults Textures { get; set; }
 
 		public UserResourceStates(IRootPackState rootPackState)
@@ -69,7 +67,6 @@ namespace BhModule.Community.Pathing.State
 			await ExportDefaultState(Path.Combine(userResourceDir, "advanced.yaml"), yamlSerializer, new AdvancedDefaults());
 			await ExportDefaultState(Path.Combine(userResourceDir, "populate.yaml"), yamlSerializer, new PopulationDefaults());
 			await ExportDefaultState(Path.Combine(userResourceDir, "ignore.yaml"), yamlSerializer, new IgnoreDefaults());
-			await ExportDefaultState(Path.Combine(userResourceDir, "static.yaml"), yamlSerializer, new StaticValues());
 		}
 
 		private async Task<T> LoadState<T>(string statePath, IDeserializer yamlDeserializer, Func<T> returnOnError) where T : class
@@ -95,14 +92,13 @@ namespace BhModule.Community.Pathing.State
 			Advanced = await LoadState(Path.Combine(userResourceDir, "advanced.yaml"), yamlDeserializer, () => new AdvancedDefaults());
 			Population = await LoadState(Path.Combine(userResourceDir, "populate.yaml"), yamlDeserializer, () => new PopulationDefaults());
 			Ignore = await LoadState(Path.Combine(userResourceDir, "ignore.yaml"), yamlDeserializer, () => new IgnoreDefaults());
-			Static = await LoadState(Path.Combine(userResourceDir, "static.yaml"), yamlDeserializer, () => new StaticValues());
 		}
 
 		public override Task Unload()
 		{
+			Advanced = null;
 			Population = null;
 			Ignore = null;
-			Static = null;
 			return Task.CompletedTask;
 		}
 

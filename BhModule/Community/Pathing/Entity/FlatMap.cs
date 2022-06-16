@@ -223,13 +223,13 @@ namespace BhModule.Community.Pathing.Entity
 		public override void DoUpdate(GameTime gameTime)
 		{
 			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
 			UpdateBounds();
 			if (GameService.Gw2Mumble.get_UI().get_IsMapOpen())
 			{
-				if ((int)GameService.Gw2Mumble.get_PlayerCharacter().get_CurrentMount() == 0)
+				if ((int)GameService.Gw2Mumble.get_PlayerCharacter().get_CurrentMount() == 0 && _packState.UserResourceStates.Advanced.MapTriggerHideFromCamera)
 				{
 					GameTime currentGameTime = GameService.Overlay.get_CurrentGameTime();
 					if (((currentGameTime != null) ? new double?(currentGameTime.get_TotalGameTime().TotalSeconds) : null) - _lastMapViewChanged < 1.2000000476837158)

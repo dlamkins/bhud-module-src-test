@@ -973,7 +973,7 @@ namespace BhModule.Community.Pathing.Entity
 			List<Vector3[]> trailSections = new List<Vector3[]>(trail.TrailSections.Count());
 			foreach (ITrailSection trailSection in trail.TrailSections)
 			{
-				trailSections.Add(PostProcessing_DouglasPeucker(trailSection.TrailPoints.Select((Func<Vector3, Vector3>)((Vector3 v) => new Vector3(v.X, v.Y, v.Z))), _packState.UserResourceStates.Static.MapTrailDouglasPeuckerError).ToArray());
+				trailSections.Add(PostProcessing_DouglasPeucker(trailSection.TrailPoints.Select((Func<Vector3, Vector3>)((Vector3 v) => new Vector3(v.X, v.Y, v.Z))), _packState.UserResourceStates.Advanced.MapTrailDouglasPeuckerError).ToArray());
 			}
 			_sectionPoints = trailSections.ToArray();
 			Populate(trail.GetAggregatedAttributes(), TextureResourceManager.GetTextureResourceManager(trail.ResourceManager));

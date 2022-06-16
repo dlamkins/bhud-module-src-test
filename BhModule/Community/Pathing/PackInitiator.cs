@@ -137,6 +137,19 @@ namespace BhModule.Community.Pathing
 			}
 		}
 
+		public void UnloadPackByName(string packName)
+		{
+			Pack[] array = _packs.ToArray();
+			foreach (Pack pack in array)
+			{
+				if (string.Equals(packName, pack.Name, StringComparison.OrdinalIgnoreCase))
+				{
+					_packs.Remove(pack);
+					break;
+				}
+			}
+		}
+
 		private async Task UnloadStateAndCollection()
 		{
 			_sharedPackCollection?.Unload();
@@ -188,24 +201,27 @@ namespace BhModule.Community.Pathing
 		{
 			IsLoading = true;
 			Stopwatch loadTimer = Stopwatch.StartNew();
+			List<(Pack Pack, long LoadDuration)> packTimings = new List<(Pack, long)>();
 			_loadingIndicator.Report("Loading marker packs...");
 			await PrepareState(mapId);
 			Pack[] array = _packs.ToArray();
-			foreach (Pack pack2 in array)
+			foreach (Pack pack in array)
 			{
 				try
 				{
-					_loadingIndicator.Report("Loading " + pack2.Name + "...");
-					await pack2.LoadMapAsync(mapId, _sharedPackCollection, _packReaderSettings);
+					Stopwatch packTimer = Stopwatch.StartNew();
+					_loadingIndicator.Report("Loading " + pack.Name + "...");
+					await pack.LoadMapAsync(mapId, _sharedPackCollection, _packReaderSettings);
+					packTimings.Add((pack, packTimer.ElapsedMilliseconds));
 				}
 				catch (FileNotFoundException e2)
 				{
 					Logger.Warn("Pack file '{packPath}' failed to load because it could not be found.", new object[1] { e2.FileName });
-					_packs.Remove(pack2);
+					_packs.Remove(pack);
 				}
 				catch (Exception e)
 				{
-					Logger.Warn(e, "Loading pack '" + pack2.Name + "' failed.");
+					Logger.Warn(e, "Loading pack '" + pack.Name + "' failed.");
 				}
 			}
 			_loadingIndicator.Report("Finalizing marker collection...");
@@ -225,8 +241,7 @@ namespace BhModule.Community.Pathing
 			}
 			_loadingIndicator.Report(null);
 			IsLoading = false;
-			loadTimer.Stop();
-			Logger.Info(string.Format("Finished loading packs {0} in {1} ms for map {2}.", string.Join(", ", _packs.Select((Pack pack) => pack.Name)), loadTimer.ElapsedMilliseconds, mapId));
+			Logger.Info(string.Format("Finished loading packs {0} in {1}ms for map {2}.", string.Join(", ", packTimings.Select(((Pack Pack, long LoadDuration) p) => string.Format("{0}{1}[{2}ms]", p.Pack.ManifestedPack ? "+" : "-", p.Pack.Name, p.LoadDuration))), loadTimer.ElapsedMilliseconds, mapId));
 		}
 
 		private void OnMapChanged(object sender, ValueEventArgs<int> e)
