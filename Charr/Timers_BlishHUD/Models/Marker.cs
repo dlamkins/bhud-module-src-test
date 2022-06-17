@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Blish_HUD;
-using Blish_HUD.Entities;
 using Charr.Timers_BlishHUD.Pathing.Content;
 using Charr.Timers_BlishHUD.Pathing.Entities;
 using Microsoft.Xna.Framework;
@@ -47,6 +46,10 @@ namespace Charr.Timers_BlishHUD.Models
 		[JsonProperty("text")]
 		public string Text { get; set; }
 
+		[JsonProperty("fadeCenter")]
+		public bool FadeCenter { get; set; } = true;
+
+
 		[JsonProperty("timestamps")]
 		public List<float> Timestamps { get; set; }
 
@@ -87,10 +90,10 @@ namespace Charr.Timers_BlishHUD.Models
 
 		public string Initialize(PathableResourceManager resourceManager)
 		{
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
 			if (Position == null || Position.Count != 3)
 			{
 				return Name + " invalid position property";
@@ -105,6 +108,7 @@ namespace Charr.Timers_BlishHUD.Models
 			}
 			_markerPathable = new MarkerPathable
 			{
+				FadeCenter = FadeCenter,
 				Opacity = Opacity,
 				Rotation = (Vector3)((Rotation != null && Rotation.Count == 3) ? new Vector3(Rotation[0], Rotation[1], Rotation[2]) : Vector3.get_Zero()),
 				Texture = resourceManager.LoadTexture(TextureString),
@@ -121,7 +125,7 @@ namespace Charr.Timers_BlishHUD.Models
 		{
 			if (_markerPathable != null && !_activated)
 			{
-				GameService.Graphics.get_World().AddEntity((IEntity)(object)_markerPathable);
+				GameService.Graphics.World.AddEntity(_markerPathable);
 				_activated = true;
 			}
 		}
@@ -130,7 +134,7 @@ namespace Charr.Timers_BlishHUD.Models
 		{
 			if (_markerPathable != null && _activated)
 			{
-				GameService.Graphics.get_World().RemoveEntity((IEntity)(object)_markerPathable);
+				GameService.Graphics.World.RemoveEntity(_markerPathable);
 				_activated = false;
 			}
 		}

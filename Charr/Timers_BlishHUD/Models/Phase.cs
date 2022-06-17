@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using Blish_HUD;
 using Charr.Timers_BlishHUD.Models.Triggers;
 using Charr.Timers_BlishHUD.Pathing.Content;
+using Charr.Timers_BlishHUD.State;
 using Newtonsoft.Json;
 
 namespace Charr.Timers_BlishHUD.Models
@@ -17,9 +19,7 @@ namespace Charr.Timers_BlishHUD.Models
 
 		private bool _showMarkers = true;
 
-		private bool _tempStartCondition;
-
-		private bool _tempFinishCondition;
+		private static readonly Logger Logger = Logger.GetLogger<Phase>();
 
 		[JsonProperty("name")]
 		public string Name { get; set; } = "Unnamed Phase";
@@ -42,6 +42,10 @@ namespace Charr.Timers_BlishHUD.Models
 
 		[JsonProperty("markers")]
 		public List<Marker> Markers { get; set; } = new List<Marker>();
+
+
+		[JsonProperty("sounds")]
+		public List<Sound> Sounds { get; set; } = new List<Sound>();
 
 
 		public bool Activated
@@ -168,6 +172,17 @@ namespace Charr.Timers_BlishHUD.Models
 					}
 				}
 			}
+			if (Sounds != null)
+			{
+				foreach (Sound sound in Sounds)
+				{
+					message = sound.Initialize();
+					if (message != null)
+					{
+						return message;
+					}
+				}
+			}
 			return null;
 		}
 
@@ -222,6 +237,10 @@ namespace Charr.Timers_BlishHUD.Models
 					mark.Activate();
 				}
 			});
+			Sounds.ForEach(delegate(Sound voice)
+			{
+				voice.Activate();
+			});
 			_activated = true;
 		}
 
@@ -256,17 +275,17 @@ namespace Charr.Timers_BlishHUD.Models
 				}
 				mark.Deactivate();
 			});
+			Sounds?.ForEach(delegate(Sound voice)
+			{
+				voice.Deactivate();
+			});
 			_activated = false;
 		}
 
 		public void WaitForStart()
 		{
 			StartTrigger?.Enable();
-			if (TimersModule.ModuleInstance._debugModeSetting.get_Value() && !StartTrigger.EntryRequired && !StartTrigger.DepartureRequired)
-			{
-				StartTrigger.EntryRequired = true;
-				_tempStartCondition = true;
-			}
+			Logger.Warn(Name + " phase waiting");
 		}
 
 		public void Start()
@@ -275,19 +294,9 @@ namespace Charr.Timers_BlishHUD.Models
 			{
 				StartTrigger?.Reset();
 				StartTrigger?.Disable();
-				if (_tempStartCondition)
-				{
-					StartTrigger.EntryRequired = false;
-					StartTrigger.DepartureRequired = false;
-					_tempStartCondition = false;
-				}
 				FinishTrigger?.Enable();
-				if (TimersModule.ModuleInstance._debugModeSetting.get_Value() && FinishTrigger != null && !FinishTrigger.EntryRequired && !FinishTrigger.DepartureRequired)
-				{
-					FinishTrigger.DepartureRequired = true;
-					_tempFinishCondition = true;
-				}
 				Active = true;
+				Logger.Warn(Name + " phase starting");
 			}
 		}
 
@@ -299,20 +308,8 @@ namespace Charr.Timers_BlishHUD.Models
 			}
 			StartTrigger?.Reset();
 			StartTrigger?.Disable();
-			if (_tempStartCondition)
-			{
-				StartTrigger.EntryRequired = false;
-				StartTrigger.DepartureRequired = false;
-				_tempStartCondition = false;
-			}
 			FinishTrigger?.Reset();
 			FinishTrigger?.Disable();
-			if (_tempFinishCondition)
-			{
-				FinishTrigger.EntryRequired = false;
-				FinishTrigger.DepartureRequired = false;
-				_tempFinishCondition = false;
-			}
 			Alerts?.ForEach(delegate(Alert al)
 			{
 				if (!string.IsNullOrEmpty(al.UID) && TimersModule.ModuleInstance._activeAlertIds.TryGetValue(al.UID, out var value3) && value3 == al)
@@ -337,7 +334,12 @@ namespace Charr.Timers_BlishHUD.Models
 				}
 				mark.Stop();
 			});
+			Sounds?.ForEach(delegate(Sound voice)
+			{
+				voice.Stop();
+			});
 			Active = false;
+			Logger.Warn(Name + " phase stopping");
 		}
 
 		public void Update(float elapsedTime)
@@ -354,6 +356,10 @@ namespace Charr.Timers_BlishHUD.Models
 			{
 				mark.Update(elapsedTime);
 			});
+			Sounds?.ForEach(delegate(Sound voice)
+			{
+				voice.Update(elapsedTime);
+			});
 		}
 
 		public void Dispose()
@@ -366,6 +372,7 @@ namespace Charr.Timers_BlishHUD.Models
 			Directions?.Clear();
 			Markers?.Clear();
 			Alerts?.Clear();
+			Sounds?.Clear();
 		}
 	}
 }

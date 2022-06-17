@@ -23,20 +23,25 @@ namespace Charr.Timers_BlishHUD.Models.Triggers
 				List<float> position = base.Position;
 				if (position == null || position.Count != 3)
 				{
-					return "invalid position";
+					List<float> position2 = base.Position;
+					if (position2 == null || position2.Count != 2)
+					{
+						return "invalid position";
+					}
 				}
 				List<float> antipode = base.Antipode;
 				if ((antipode == null || antipode.Count != 3) && base.Radius <= 0f)
 				{
 					return "invalid radius/size";
 				}
+				if (!base.CombatRequired && !base.OutOfCombatRequired && !base.EntryRequired && !base.DepartureRequired)
+				{
+					return "No possible trigger conditions.";
+				}
+				_initialized = true;
+				return null;
 			}
-			if (!base.CombatRequired && !base.OutOfCombatRequired && !base.EntryRequired && !base.DepartureRequired)
-			{
-				return "No possible trigger conditions.";
-			}
-			_initialized = true;
-			return null;
+			return "At least one of requireEntry and requireDeparture must be set to true";
 		}
 
 		public override void Enable()
@@ -55,27 +60,28 @@ namespace Charr.Timers_BlishHUD.Models.Triggers
 
 		public override bool Triggered()
 		{
-			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
 			if (!_enabled)
 			{
 				return false;
 			}
-			if (!TimersModule.ModuleInstance._debugModeSetting.get_Value() && base.CombatRequired && !GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat())
+			bool debugMode = TimersModule.ModuleInstance._debugModeSetting.Value;
+			if (!debugMode && base.CombatRequired && !GameService.Gw2Mumble.PlayerCharacter.IsInCombat)
 			{
 				return false;
 			}
-			if (base.OutOfCombatRequired && GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat())
+			if (!debugMode && base.OutOfCombatRequired && GameService.Gw2Mumble.PlayerCharacter.IsInCombat)
 			{
 				return false;
 			}
-			if (base.EntryRequired || base.DepartureRequired)
+			if (debugMode || base.EntryRequired || base.DepartureRequired)
 			{
-				float x = GameService.Gw2Mumble.get_PlayerCharacter().get_Position().X;
-				float y = GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Y;
-				float z = GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Z;
-				bool playerInArea = ((base.Antipode == null || base.Antipode.Count != 3) ? (Math.Sqrt(Math.Pow(x - base.Position[0], 2.0) + Math.Pow(y - base.Position[1], 2.0) + Math.Pow(z - base.Position[2], 2.0)) <= (double)base.Radius) : (x >= Math.Min(base.Position[0], base.Antipode[0]) && x <= Math.Max(base.Position[0], base.Antipode[0]) && y >= Math.Min(base.Position[1], base.Antipode[1]) && y <= Math.Max(base.Position[1], base.Antipode[1]) && z >= Math.Min(base.Position[2], base.Antipode[2]) && z <= Math.Max(base.Position[2], base.Antipode[2])));
+				float x = GameService.Gw2Mumble.PlayerCharacter.Position.X;
+				float y = GameService.Gw2Mumble.PlayerCharacter.Position.Y;
+				float z = GameService.Gw2Mumble.PlayerCharacter.Position.Z;
+				bool playerInArea = ((base.Antipode == null || base.Antipode.Count != 3) ? (((base.Position.Count == 2) ? Math.Sqrt(Math.Pow(x - base.Position[0], 2.0) + Math.Pow(y - base.Position[1], 2.0)) : Math.Sqrt(Math.Pow(x - base.Position[0], 2.0) + Math.Pow(y - base.Position[1], 2.0) + Math.Pow(z - base.Position[2], 2.0))) <= (double)base.Radius) : (x >= Math.Min(base.Position[0], base.Antipode[0]) && x <= Math.Max(base.Position[0], base.Antipode[0]) && y >= Math.Min(base.Position[1], base.Antipode[1]) && y <= Math.Max(base.Position[1], base.Antipode[1]) && z >= Math.Min(base.Position[2], base.Antipode[2]) && z <= Math.Max(base.Position[2], base.Antipode[2])));
 				if ((base.EntryRequired && !playerInArea) || (base.DepartureRequired && playerInArea))
 				{
 					return false;

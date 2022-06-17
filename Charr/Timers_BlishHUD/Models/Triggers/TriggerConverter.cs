@@ -22,22 +22,29 @@ namespace Charr.Timers_BlishHUD.Models.Triggers
 
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
 		{
-			JObject jsonObject = JObject.Load(reader);
-			Trigger trigger = null;
-			string type = ((JToken)jsonObject).Value<string>((object)"type") ?? "location";
-			if (!(type == "key"))
+			try
 			{
-				if (!(type == "location"))
+				JObject jsonObject = JObject.Load(reader);
+				string type = ((JToken)jsonObject).Value<string>((object)"type") ?? "location";
+				Trigger trigger;
+				if (!(type == "key"))
 				{
+					if (!(type == "location"))
+					{
+					}
+					trigger = new LocationTrigger();
 				}
-				trigger = new LocationTrigger();
+				else
+				{
+					trigger = new KeyTrigger();
+				}
+				serializer.Populate(((JToken)jsonObject).CreateReader(), (object)trigger);
+				return trigger;
 			}
-			else
+			catch (JsonReaderException)
 			{
-				trigger = new KeyTrigger();
+				return null;
 			}
-			serializer.Populate(((JToken)jsonObject).CreateReader(), (object)trigger);
-			return trigger;
 		}
 
 		public TriggerConverter()

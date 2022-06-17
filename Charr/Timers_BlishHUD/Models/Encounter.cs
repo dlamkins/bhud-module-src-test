@@ -12,23 +12,31 @@ namespace Charr.Timers_BlishHUD.Models
 	[JsonObject(/*Could not decode attribute arguments.*/)]
 	public class Encounter : IDisposable
 	{
-		private bool _activated;
+		public enum EncounterStates
+		{
+			Error,
+			Suspended,
+			Ready,
+			WaitingToRun,
+			Running,
+			WaitingNextPhase
+		}
 
-		private bool _awaitingNextPhase;
+		private string _zipFile;
 
-		private bool _showAlerts = true;
-
-		private bool _showMarkers = true;
-
-		private bool _showDirections = true;
-
-		private bool _tempResetCondition;
+		public EncounterStates State;
 
 		private int _currentPhase;
 
 		private DateTime _startTime;
 
 		private DateTime _lastUpdate;
+
+		private bool _showAlerts = true;
+
+		private bool _showMarkers = true;
+
+		private bool _showDirections = true;
 
 		private readonly int TICKRATE = 100;
 
@@ -68,25 +76,6 @@ namespace Charr.Timers_BlishHUD.Models
 		[JsonConverter(typeof(TriggerConverter))]
 		[JsonProperty("reset")]
 		public Trigger ResetTrigger { get; set; }
-
-		public bool Activated
-		{
-			get
-			{
-				return _activated;
-			}
-			set
-			{
-				if (value)
-				{
-					Activate();
-				}
-				else
-				{
-					Deactivate();
-				}
-			}
-		}
 
 		public bool ShowAlerts
 		{
@@ -136,19 +125,45 @@ namespace Charr.Timers_BlishHUD.Models
 			}
 		}
 
-		public bool Active { get; private set; }
-
-		public bool Invalid { get; private set; } = true;
+		public AsyncTexture2D Icon { get; set; } = ContentService.Textures.TransparentPixel;
 
 
-		public AsyncTexture2D Icon { get; set; }
+		public bool IsFromZip { get; set; }
+
+		public string ZipFile
+		{
+			get
+			{
+				return _zipFile;
+			}
+			set
+			{
+				_zipFile = value;
+				if (_zipFile != string.Empty)
+				{
+					IsFromZip = true;
+				}
+			}
+		}
+
+		public string TimerFile { get; set; }
+
+		public override bool Equals(object obj)
+		{
+			if (obj == null || !(GetType() == obj.GetType()))
+			{
+				return false;
+			}
+			Encounter enc = (Encounter)obj;
+			return Id == enc.Id;
+		}
 
 		public void Initialize(PathableResourceManager resourceManager)
 		{
 			Icon = TimersModule.ModuleInstance.Resources.GetIcon(IconString);
 			if (Icon == null)
 			{
-				Icon = AsyncTexture2D.op_Implicit(resourceManager.LoadTexture(IconString));
+				Icon = resourceManager.LoadTexture(IconString);
 			}
 			if (Map <= 0)
 			{
@@ -178,48 +193,47 @@ namespace Charr.Timers_BlishHUD.Models
 					throw new TimerReadException(Id + ": " + message);
 				}
 			}
-			Invalid = false;
+			State = EncounterStates.Ready;
 		}
 
-		private void Activate()
+		public void Activate()
 		{
-			if (Enabled && !_activated)
+			if (!Enabled || State > EncounterStates.Ready)
 			{
-				ResetTrigger.Enable();
-				if (TimersModule.ModuleInstance._debugModeSetting.get_Value() && !ResetTrigger.DepartureRequired && !ResetTrigger.DepartureRequired)
-				{
-					ResetTrigger.DepartureRequired = true;
-					_tempResetCondition = true;
-				}
+				return;
+			}
+			State = EncounterStates.Ready;
+			if (Map == GameService.Gw2Mumble.CurrentMap.Id)
+			{
 				Phases.ForEach(delegate(Phase ph)
 				{
 					ph.Activate();
 				});
 				Phases[0].WaitForStart();
-				_activated = true;
+				State = EncounterStates.WaitingToRun;
 			}
 		}
 
-		private void Deactivate()
+		public void Deactivate()
 		{
-			if (_activated)
+			if (State != EncounterStates.Suspended)
 			{
 				Stop();
-				Phases.ForEach(delegate(Phase ph)
+				Phases?.ForEach(delegate(Phase ph)
 				{
 					ph.Deactivate();
 				});
-				_activated = false;
+				State = EncounterStates.Suspended;
 			}
 		}
 
-		private bool ShouldStart()
+		private bool ShouldRun()
 		{
-			if (Active || !Enabled || !Activated)
+			if (!Enabled || State != EncounterStates.WaitingToRun)
 			{
 				return false;
 			}
-			if (Map != GameService.Gw2Mumble.get_CurrentMap().get_Id())
+			if (Map != GameService.Gw2Mumble.CurrentMap.Id)
 			{
 				return false;
 			}
@@ -228,11 +242,11 @@ namespace Charr.Timers_BlishHUD.Models
 
 		private bool ShouldStop()
 		{
-			if (!Active)
+			if (State != EncounterStates.Running && State != EncounterStates.WaitingNextPhase)
 			{
 				return false;
 			}
-			if (Map != GameService.Gw2Mumble.get_CurrentMap().get_Id())
+			if (Map != GameService.Gw2Mumble.CurrentMap.Id)
 			{
 				return true;
 			}
@@ -243,79 +257,71 @@ namespace Charr.Timers_BlishHUD.Models
 			return ResetTrigger.Triggered();
 		}
 
-		private void Start()
+		private void Run()
 		{
-			if (!Active && Enabled && Activated)
+			if (Enabled && State == EncounterStates.WaitingToRun)
 			{
+				ResetTrigger.Enable();
 				_startTime = DateTime.Now;
-				Active = true;
 				Phases[_currentPhase].Start();
 				Phases[_currentPhase].Update(0f);
 				_lastUpdate = DateTime.Now;
+				State = EncounterStates.Running;
 			}
 		}
 
 		private void Stop()
 		{
-			if (Active)
+			if (State != EncounterStates.Suspended)
 			{
-				Phases.ForEach(delegate(Phase ph)
+				Phases?.ForEach(delegate(Phase ph)
 				{
 					ph.Stop();
 				});
-				Active = false;
 				_currentPhase = 0;
-				_awaitingNextPhase = false;
-				ResetTrigger.Disable();
-				ResetTrigger.Reset();
-				if (_tempResetCondition)
-				{
-					ResetTrigger.EntryRequired = false;
-					ResetTrigger.DepartureRequired = false;
-				}
-				if (TimersModule.ModuleInstance._debugModeSetting.get_Value() && !ResetTrigger.DepartureRequired && !ResetTrigger.DepartureRequired)
-				{
-					ResetTrigger.DepartureRequired = true;
-					_tempResetCondition = true;
-				}
+				ResetTrigger?.Disable();
+				ResetTrigger?.Reset();
+				State = EncounterStates.Suspended;
 			}
 		}
 
 		public void Update(GameTime gameTime)
 		{
-			if (ShouldStart())
+			if (ShouldRun())
 			{
-				Start();
+				Run();
 			}
 			else if (ShouldStop())
 			{
 				Stop();
-				if (Enabled && Map == GameService.Gw2Mumble.get_CurrentMap().get_Id())
+				if (Enabled && Map == GameService.Gw2Mumble.CurrentMap.Id)
 				{
 					Phases[0].WaitForStart();
-					ResetTrigger.Enable();
+					State = EncounterStates.WaitingToRun;
 				}
 			}
-			else if (_awaitingNextPhase)
+			else if (State == EncounterStates.WaitingNextPhase)
 			{
 				if (_currentPhase + 1 < Phases.Count && Phases[_currentPhase + 1].StartTrigger != null && Phases[_currentPhase + 1].StartTrigger.Triggered())
 				{
 					_currentPhase++;
-					_awaitingNextPhase = false;
-					Start();
+					_startTime = DateTime.Now;
+					Phases[_currentPhase].Start();
+					Phases[_currentPhase].Update(0f);
+					_lastUpdate = DateTime.Now;
+					State = EncounterStates.Running;
 				}
 			}
 			else if (Phases[_currentPhase].FinishTrigger != null && Phases[_currentPhase].FinishTrigger.Triggered())
 			{
-				_awaitingNextPhase = true;
 				Phases[_currentPhase].Stop();
-				Active = false;
 				if (_currentPhase + 1 < Phases.Count)
 				{
 					Phases[_currentPhase + 1].WaitForStart();
+					State = EncounterStates.WaitingNextPhase;
 				}
 			}
-			else if (Active && (DateTime.Now - _lastUpdate).TotalSeconds >= (double)TimersModule.ModuleInstance.Resources.TICKINTERVAL)
+			if (State == EncounterStates.Running && (DateTime.Now - _lastUpdate).TotalSeconds >= (double)TimersModule.ModuleInstance.Resources.TICKINTERVAL)
 			{
 				float elapsedTime = (float)(DateTime.Now - _startTime).TotalSeconds;
 				_lastUpdate = DateTime.Now;

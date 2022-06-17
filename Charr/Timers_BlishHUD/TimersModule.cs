@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Blish_HUD;
-using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Blish_HUD.Modules;
@@ -14,11 +15,13 @@ using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Charr.Timers_BlishHUD.Controls;
 using Charr.Timers_BlishHUD.Controls.BigWigs;
+using Charr.Timers_BlishHUD.IO;
 using Charr.Timers_BlishHUD.Models;
 using Charr.Timers_BlishHUD.Pathing.Content;
+using Charr.Timers_BlishHUD.State;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
+using Octokit;
 
 namespace Charr.Timers_BlishHUD
 {
@@ -39,13 +42,17 @@ namespace Charr.Timers_BlishHUD
 
 		private WindowTab _timersTab;
 
+		public Menu timerCategories;
+
+		public FlowPanel timerPanel;
+
 		private Panel _tabPanel;
 
-		private List<TimerDetailsButton> _allTimerDetails;
+		private List<TimerDetails> _allTimerDetails;
 
-		private List<TimerDetailsButton> _displayedTimerDetails;
+		private List<TimerDetails> _displayedTimerDetails;
 
-		private Label _debugText;
+		private Blish_HUD.Controls.Label _debugText;
 
 		private List<PathableResourceManager> _pathableResourceManagers;
 
@@ -63,13 +70,15 @@ namespace Charr.Timers_BlishHUD
 
 		public Dictionary<string, Marker> _activeMarkerIds;
 
-		private List<Encounter> _encounters;
+		private HashSet<Encounter> _encounters;
 
-		private List<Encounter> _activeEncounters;
+		private HashSet<Encounter> _activeEncounters;
 
-		private List<Encounter> _invalidEncounters;
+		private HashSet<Encounter> _invalidEncounters;
 
 		private EventHandler<ValueEventArgs<int>> _onNewMapLoaded;
+
+		private SettingEntry<Update> _lastTimersUpdate;
 
 		private SettingEntry<bool> _showDebugSetting;
 
@@ -79,11 +88,13 @@ namespace Charr.Timers_BlishHUD
 
 		private SettingEntry<bool> _sortCategorySetting;
 
-		private SettingCollection _timerSettingCollection;
+		public SettingCollection _timerSettingCollection;
+
+		public SettingEntry<KeyBinding>[] _keyBindSettings;
 
 		private SettingCollection _alertSettingCollection;
 
-		private SettingEntry<bool> _lockAlertContainerSetting;
+		public SettingEntry<bool> _lockAlertContainerSetting;
 
 		private SettingEntry<bool> _centerAlertContainerSetting;
 
@@ -92,6 +103,8 @@ namespace Charr.Timers_BlishHUD
 		public SettingEntry<bool> _hideDirectionsSetting;
 
 		public SettingEntry<bool> _hideMarkersSetting;
+
+		public SettingEntry<bool> _hideSoundsSetting;
 
 		public SettingEntry<AlertType> _alertSizeSetting;
 
@@ -105,59 +118,67 @@ namespace Charr.Timers_BlishHUD
 
 		public SettingEntry<bool> _alertFillDirection;
 
-		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
+		public Update update = new Update();
 
-		internal ContentsManager ContentsManager => base.ModuleParameters.get_ContentsManager();
+		public TimerLoader timerLoader;
 
-		internal DirectoriesManager DirectoriesManager => base.ModuleParameters.get_DirectoriesManager();
+		private bool _timersNeedUpdate;
 
-		internal Gw2ApiManager Gw2ApiManager => base.ModuleParameters.get_Gw2ApiManager();
+		internal SettingsManager SettingsManager => ModuleParameters.SettingsManager;
+
+		internal ContentsManager ContentsManager => ModuleParameters.ContentsManager;
+
+		internal DirectoriesManager DirectoriesManager => ModuleParameters.DirectoriesManager;
+
+		internal Gw2ApiManager Gw2ApiManager => ModuleParameters.Gw2ApiManager;
 
 		[ImportingConstructor]
 		public TimersModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
-			: this(moduleParameters)
+			: base(moduleParameters)
 		{
 			ModuleInstance = this;
 		}
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			//IL_0136: Unknown result type (might be due to invalid IL or missing references)
-			_showDebugSetting = settings.DefineSetting<bool>("ShowDebugText", false, "Show Debug Text", "For creating timers. Placed in top-left corner. Displays location status.", (SettingTypeRendererDelegate)null);
-			_debugModeSetting = settings.DefineSetting<bool>("DebugMode", false, "Enable Debug Mode", "All Timer triggers will ignore requireCombat setting, allowing you to test them freely.", (SettingTypeRendererDelegate)null);
-			_sortCategorySetting = settings.DefineSetting<bool>("SortByCategory", false, "Sort Categories", "When enabled, categories from loaded timer files are sorted in alphanumerical order.\nOtherwise, categories are in the order they are loaded.\nThe module needs to be restarted to take effect.", (SettingTypeRendererDelegate)null);
-			_timerSettingCollection = settings.AddSubCollection("EnabledTimers", false);
-			_alertSettingCollection = settings.AddSubCollection("AlertSetting", false);
-			_lockAlertContainerSetting = _alertSettingCollection.DefineSetting<bool>("LockAlertContainer", false, (Func<string>)null, (Func<string>)null);
-			_hideAlertsSetting = _alertSettingCollection.DefineSetting<bool>("HideAlerts", false, (Func<string>)null, (Func<string>)null);
-			_hideDirectionsSetting = _alertSettingCollection.DefineSetting<bool>("HideDirections", false, (Func<string>)null, (Func<string>)null);
-			_hideMarkersSetting = _alertSettingCollection.DefineSetting<bool>("HideMarkers", false, (Func<string>)null, (Func<string>)null);
-			_centerAlertContainerSetting = _alertSettingCollection.DefineSetting<bool>("CenterAlertContainer", true, (Func<string>)null, (Func<string>)null);
-			_alertSizeSetting = _alertSettingCollection.DefineSetting<AlertType>("AlertSize", AlertType.BigWigStyle, (Func<string>)null, (Func<string>)null);
-			_alertDisplayOrientationSetting = _alertSettingCollection.DefineSetting<ControlFlowDirection>("AlertDisplayOrientation", (ControlFlowDirection)1, (Func<string>)null, (Func<string>)null);
-			_alertContainerLocationSetting = _alertSettingCollection.DefineSetting<Point>("AlertContainerLocation", Point.get_Zero(), (Func<string>)null, (Func<string>)null);
-			_alertMoveDelaySetting = _alertSettingCollection.DefineSetting<float>("AlertMoveSpeed", 1f, (Func<string>)null, (Func<string>)null);
-			_alertFadeDelaySetting = _alertSettingCollection.DefineSetting<float>("AlertFadeSpeed", 1f, (Func<string>)null, (Func<string>)null);
-			_alertFillDirection = _alertSettingCollection.DefineSetting<bool>("FillDirection", true, (Func<string>)null, (Func<string>)null);
+			//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
+			if (!settings.TryGetSetting("LastTimersUpdate", out _lastTimersUpdate))
+			{
+				_lastTimersUpdate = settings.DefineSetting("LastTimersUpdate", new Update(), "Last Timers Update", "Date of last timers update");
+			}
+			_showDebugSetting = settings.DefineSetting("ShowDebugText", defaultValue: false, "Show Debug Text", "For creating timers. Placed in top-left corner. Displays location status.");
+			_debugModeSetting = settings.DefineSetting("DebugMode", defaultValue: false, "Enable Debug Mode", "All Timer triggers will ignore requireCombat setting, allowing you to test them freely.");
+			_sortCategorySetting = settings.DefineSetting("SortByCategory", defaultValue: false, "Sort Categories", "When enabled, categories from loaded timer files are sorted in alphanumerical order.\nOtherwise, categories are in the order they are loaded.\nThe module needs to be restarted to take effect.");
+			_timerSettingCollection = settings.AddSubCollection("EnabledTimers");
+			_keyBindSettings = new SettingEntry<KeyBinding>[5];
+			for (int i = 0; i < 5; i++)
+			{
+				_keyBindSettings[i] = settings.DefineSetting("Trigger Key " + i, new KeyBinding(), "Trigger Key " + i, "For timers that require keys to trigger.");
+			}
+			_alertSettingCollection = settings.AddSubCollection("AlertSetting");
+			_lockAlertContainerSetting = _alertSettingCollection.DefineSetting("LockAlertContainer", defaultValue: false);
+			_hideAlertsSetting = _alertSettingCollection.DefineSetting("HideAlerts", defaultValue: false);
+			_hideDirectionsSetting = _alertSettingCollection.DefineSetting("HideDirections", defaultValue: false);
+			_hideMarkersSetting = _alertSettingCollection.DefineSetting("HideMarkers", defaultValue: false);
+			_hideSoundsSetting = _alertSettingCollection.DefineSetting("HideSounds", defaultValue: false);
+			_centerAlertContainerSetting = _alertSettingCollection.DefineSetting("CenterAlertContainer", defaultValue: true);
+			_alertSizeSetting = _alertSettingCollection.DefineSetting("AlertSize", AlertType.BigWigStyle);
+			_alertDisplayOrientationSetting = _alertSettingCollection.DefineSetting("AlertDisplayOrientation", ControlFlowDirection.SingleTopToBottom);
+			_alertContainerLocationSetting = _alertSettingCollection.DefineSetting<Point>("AlertContainerLocation", new Point(GameService.Graphics.WindowWidth - GameService.Graphics.WindowWidth / 4, GameService.Graphics.WindowHeight / 2));
+			_alertMoveDelaySetting = _alertSettingCollection.DefineSetting("AlertMoveSpeed", 1f);
+			_alertFadeDelaySetting = _alertSettingCollection.DefineSetting("AlertFadeSpeed", 1f);
+			_alertFillDirection = _alertSettingCollection.DefineSetting("FillDirection", defaultValue: true);
 		}
 
 		private void SettingsUpdateShowDebug(object sender = null, EventArgs e = null)
 		{
-			if (_showDebugSetting.get_Value())
+			if (_showDebugSetting.Value)
 			{
-				Label debugText = _debugText;
-				if (debugText != null)
-				{
-					((Control)debugText).Show();
-				}
+				_debugText?.Show();
 			}
 			else
 			{
-				Label debugText2 = _debugText;
-				if (debugText2 != null)
-				{
-					((Control)debugText2).Hide();
-				}
+				_debugText?.Hide();
 			}
 		}
 
@@ -165,7 +186,7 @@ namespace Charr.Timers_BlishHUD
 		{
 			if (_alertContainer != null)
 			{
-				_alertContainer.Lock = _lockAlertContainerSetting.get_Value();
+				_alertContainer.Lock = _lockAlertContainerSetting.Value;
 			}
 		}
 
@@ -177,55 +198,46 @@ namespace Charr.Timers_BlishHUD
 		{
 			_testAlertPanels?.ForEach(delegate(IAlertPanel panel)
 			{
-				panel.ShouldShow = !_hideAlertsSetting.get_Value();
+				panel.ShouldShow = !_hideAlertsSetting.Value;
 			});
-			_encounters?.ForEach(delegate(Encounter enc)
+			foreach (Encounter encounter in _encounters)
 			{
-				enc.ShowAlerts = !_hideAlertsSetting.get_Value();
-			});
-			if (_alertContainer == null)
-			{
-				return;
+				encounter.ShowAlerts = !_hideAlertsSetting.Value;
 			}
-			if (_hideAlertsSetting.get_Value())
+			if (_alertContainer != null)
 			{
-				AlertContainer alertContainer = _alertContainer;
-				if (alertContainer != null)
+				if (_hideAlertsSetting.Value)
 				{
-					((Control)alertContainer).Hide();
+					_alertContainer?.Hide();
 				}
-			}
-			else
-			{
-				_alertContainer.UpdateDisplay();
-				AlertContainer alertContainer2 = _alertContainer;
-				if (alertContainer2 != null)
+				else
 				{
-					((Control)alertContainer2).Show();
+					_alertContainer.UpdateDisplay();
+					_alertContainer?.Show();
 				}
+				_alertContainer.AutoShow = !_hideAlertsSetting.Value;
 			}
-			_alertContainer.AutoShow = !_hideAlertsSetting.get_Value();
 		}
 
 		private void SettingsUpdateHideDirections(object sender = null, EventArgs e = null)
 		{
-			_encounters?.ForEach(delegate(Encounter enc)
+			foreach (Encounter encounter in _encounters)
 			{
-				enc.ShowDirections = !_hideDirectionsSetting.get_Value();
-			});
+				encounter.ShowDirections = !_hideDirectionsSetting.Value;
+			}
 		}
 
 		private void SettingsUpdateHideMarkers(object sender = null, EventArgs e = null)
 		{
-			_encounters?.ForEach(delegate(Encounter enc)
+			foreach (Encounter encounter in _encounters)
 			{
-				enc.ShowMarkers = !_hideMarkersSetting.get_Value();
-			});
+				encounter.ShowMarkers = !_hideMarkersSetting.Value;
+			}
 		}
 
 		private void SettingsUpdateAlertSize(object sender = null, EventArgs e = null)
 		{
-			switch (_alertSizeSetting.get_Value())
+			switch (_alertSizeSetting.Value)
 			{
 			case AlertType.Small:
 				AlertPanel.DEFAULT_ALERTPANEL_WIDTH = 320;
@@ -248,42 +260,12 @@ namespace Charr.Timers_BlishHUD
 
 		private void SettingsUpdateAlertDisplayOrientation(object sender = null, EventArgs e = null)
 		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			_alertContainer.FlowDirection = _alertDisplayOrientationSetting.get_Value();
+			_alertContainer.FlowDirection = _alertDisplayOrientationSetting.Value;
 			_alertContainer.UpdateDisplay();
 		}
 
 		private void SettingsUpdateAlertContainerLocation(object sender = null, EventArgs e = null)
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Expected I4, but got Unknown
-			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			ControlFlowDirection value = _alertDisplayOrientationSetting.get_Value();
-			switch (value - 2)
-			{
-			case 0:
-			case 1:
-				((Control)_alertContainer).set_Location(_alertContainerLocationSetting.get_Value());
-				break;
-			case 3:
-				((Control)_alertContainer).set_Location(new Point(_alertContainerLocationSetting.get_Value().X - ((Control)_alertContainer).get_Width(), _alertContainerLocationSetting.get_Value().Y));
-				break;
-			case 5:
-				((Control)_alertContainer).set_Location(new Point(_alertContainerLocationSetting.get_Value().X, _alertContainerLocationSetting.get_Value().Y - ((Control)_alertContainer).get_Height()));
-				break;
-			case 2:
-			case 4:
-				break;
-			}
 		}
 
 		private void SettingsUpdateAlertMoveDelay(object sender = null, EventArgs e = null)
@@ -296,19 +278,8 @@ namespace Charr.Timers_BlishHUD
 
 		protected override void Initialize()
 		{
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f1: Expected O, but got Unknown
 			Resources = new Resources();
 			_pathableResourceManagers = new List<PathableResourceManager>();
 			_encounterEnableSettings = new Dictionary<string, SettingEntry<bool>>();
@@ -316,34 +287,35 @@ namespace Charr.Timers_BlishHUD
 			_activeAlertIds = new Dictionary<string, Alert>();
 			_activeDirectionIds = new Dictionary<string, Direction>();
 			_activeMarkerIds = new Dictionary<string, Marker>();
-			_encounters = new List<Encounter>();
-			_activeEncounters = new List<Encounter>();
-			_invalidEncounters = new List<Encounter>();
-			_allTimerDetails = new List<TimerDetailsButton>();
+			_encounters = new HashSet<Encounter>();
+			_activeEncounters = new HashSet<Encounter>();
+			_invalidEncounters = new HashSet<Encounter>();
+			_allTimerDetails = new List<TimerDetails>();
 			_testAlertPanels = new List<IAlertPanel>();
-			Label val = new Label();
-			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)val).set_Location(new Point(10, 38));
-			val.set_TextColor(Color.get_White());
-			val.set_Font(Resources.Font);
-			val.set_Text("DEBUG");
-			val.set_HorizontalAlignment((HorizontalAlignment)0);
-			val.set_StrokeText(true);
-			val.set_ShowShadow(true);
-			val.set_AutoSizeWidth(true);
-			_debugText = val;
+			_debugText = new Blish_HUD.Controls.Label
+			{
+				Parent = GameService.Graphics.SpriteScreen,
+				Location = new Point(10, 38),
+				TextColor = Color.get_White(),
+				Font = Resources.Font,
+				Text = "DEBUG",
+				HorizontalAlignment = HorizontalAlignment.Left,
+				StrokeText = true,
+				ShowShadow = true,
+				AutoSizeWidth = true
+			};
 			SettingsUpdateShowDebug();
-			_showDebugSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingsUpdateShowDebug);
-			_lockAlertContainerSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingsUpdateLockAlertContainer);
-			_centerAlertContainerSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingsUpdateCenterAlertContainer);
-			_hideAlertsSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingsUpdateHideAlerts);
-			_hideDirectionsSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingsUpdateHideDirections);
-			_hideMarkersSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingsUpdateHideMarkers);
-			_alertSizeSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<AlertType>>)SettingsUpdateAlertSize);
-			_alertDisplayOrientationSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<ControlFlowDirection>>)SettingsUpdateAlertDisplayOrientation);
-			_alertContainerLocationSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<Point>>)SettingsUpdateAlertContainerLocation);
-			_alertMoveDelaySetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)SettingsUpdateAlertMoveDelay);
-			_alertFadeDelaySetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)SettingsUpdateAlertFadeDelay);
+			_showDebugSetting.SettingChanged += SettingsUpdateShowDebug;
+			_lockAlertContainerSetting.SettingChanged += SettingsUpdateLockAlertContainer;
+			_centerAlertContainerSetting.SettingChanged += SettingsUpdateCenterAlertContainer;
+			_hideAlertsSetting.SettingChanged += SettingsUpdateHideAlerts;
+			_hideDirectionsSetting.SettingChanged += SettingsUpdateHideDirections;
+			_hideMarkersSetting.SettingChanged += SettingsUpdateHideMarkers;
+			_alertSizeSetting.SettingChanged += SettingsUpdateAlertSize;
+			_alertDisplayOrientationSetting.SettingChanged += SettingsUpdateAlertDisplayOrientation;
+			_alertContainerLocationSetting.SettingChanged += SettingsUpdateAlertContainerLocation;
+			_alertMoveDelaySetting.SettingChanged += SettingsUpdateAlertMoveDelay;
+			_alertFadeDelaySetting.SettingChanged += SettingsUpdateAlertFadeDelay;
 		}
 
 		private void ResetActivatedEncounters()
@@ -351,25 +323,22 @@ namespace Charr.Timers_BlishHUD
 			_activeEncounters.Clear();
 			foreach (Encounter enc in _encounters)
 			{
-				if (enc.Map == GameService.Gw2Mumble.get_CurrentMap().get_Id() && enc.Enabled)
+				if (enc.Map == GameService.Gw2Mumble.CurrentMap.Id && enc.Enabled)
 				{
-					if (!enc.Activated)
-					{
-						enc.Activated = true;
-					}
+					enc.Activate();
 					_activeEncounters.Add(enc);
 				}
 				else
 				{
-					enc.Activated = false;
+					enc.Deactivate();
 				}
 			}
 		}
 
-		private void readJson(Stream fileStream, PathableResourceManager pathableResourceManager)
+		private Encounter ParseEncounter(TimerStream timerStream)
 		{
 			string jsonContent;
-			using (StreamReader jsonReader = new StreamReader(fileStream))
+			using (StreamReader jsonReader = new StreamReader(timerStream.Stream))
 			{
 				jsonContent = jsonReader.ReadToEnd();
 			}
@@ -377,17 +346,11 @@ namespace Charr.Timers_BlishHUD
 			try
 			{
 				enc = JsonConvert.DeserializeObject<Encounter>(jsonContent, _jsonSettings);
-				enc.Initialize(pathableResourceManager);
-				if (!_encounterIds.Contains(enc.Id))
-				{
-					_encounters.Add(enc);
-					_encounterIds.Add(enc.Id);
-				}
+				enc.Initialize(timerStream.ResourceManager);
 			}
 			catch (TimerReadException ex2)
 			{
 				enc.Description = ex2.Message;
-				_invalidEncounters.Add(enc);
 				_errorCaught = true;
 				Logger.Error(enc.Name + " Timer parsing failure: " + ex2.Message);
 			}
@@ -395,43 +358,90 @@ namespace Charr.Timers_BlishHUD
 			{
 				enc?.Dispose();
 				Encounter encounter = new Encounter();
-				encounter.Name = ((FileStream)fileStream).Name.Split('\\').Last();
-				encounter.Description = "File Path: " + ((FileStream)fileStream).Name + "\n\nInvalid JSON format: " + ex.Message;
+				encounter.Name = timerStream.FileName.Split('\\').Last();
+				encounter.Description = "File Path: " + timerStream.FileName + "\n\nInvalid JSON format: " + ex.Message;
 				enc = encounter;
-				_invalidEncounters.Add(enc);
 				_errorCaught = true;
-				Logger.Error("File Path: " + ((FileStream)fileStream).Name + "\n\nInvalid JSON format: " + ex.Message);
+				Logger.Error("File Path: " + timerStream.FileName + "\n\nInvalid JSON format: " + ex.Message);
 			}
+			finally
+			{
+				enc.IsFromZip = timerStream.IsFromZip;
+				enc.ZipFile = timerStream.ZipFile;
+				enc.TimerFile = timerStream.FileName;
+			}
+			return enc;
+		}
+
+		private void AddEncounter(TimerStream timerStream)
+		{
+			Encounter enc = ParseEncounter(timerStream);
+			AddEncounter(enc);
+		}
+
+		private void AddEncounter(Encounter enc)
+		{
+			if (enc.State != 0)
+			{
+				_encounters.Add(enc);
+				_encounterIds.Add(enc.Id);
+			}
+			else
+			{
+				_invalidEncounters.Add(enc);
+			}
+		}
+
+		private void UpdateEncounter(Encounter enc)
+		{
+			if (enc.State != 0)
+			{
+				_encounters.RemoveWhere((Encounter e) => e.Equals(enc));
+			}
+			else
+			{
+				_invalidEncounters.RemoveWhere((Encounter e) => e.Equals(enc));
+			}
+			AddEncounter(enc);
+		}
+
+		[Conditional("DEBUG")]
+		private async void ShowLatestRelease()
+		{
+			await new GitHubClient(new ProductHeaderValue("BlishHUD_Timers")).Repository.Release.GetLatest("QuitarHero", "Hero-Timers");
 		}
 
 		protected override async Task LoadAsync()
 		{
 			string timerDirectory = DirectoriesManager.GetFullDirectoryPath("timers");
-			DirectoryReader directoryReader = new DirectoryReader(timerDirectory);
-			PathableResourceManager _directResourceManager = new PathableResourceManager((IDataReader)(object)directoryReader);
-			_pathableResourceManagers.Add(_directResourceManager);
-			TimersModule timersModule = this;
-			JsonSerializerSettings val = new JsonSerializerSettings();
-			val.set_NullValueHandling((NullValueHandling)1);
-			timersModule._jsonSettings = val;
-			directoryReader.LoadOnFileType((Action<Stream, IDataReader>)delegate(Stream fileStream, IDataReader dataReader)
+			try
 			{
-				readJson(fileStream, _directResourceManager);
-			}, ".bhtimer", (IProgress<string>)null);
-			List<string> list = new List<string>();
-			list.AddRange(Directory.GetFiles(timerDirectory, "*.zip", SearchOption.AllDirectories));
-			foreach (string item in list)
-			{
-				SortedZipArchiveReader zipDataReader = new SortedZipArchiveReader(item);
-				PathableResourceManager zipResourceManager = new PathableResourceManager((IDataReader)(object)zipDataReader);
-				_pathableResourceManagers.Add(zipResourceManager);
-				zipDataReader.LoadOnFileType(delegate(Stream fileStream, IDataReader dataReader)
+				using (new WebClient())
 				{
-					readJson(fileStream, zipResourceManager);
-				}, ".bhtimer");
+					List<Update> updates = JsonConvert.DeserializeObject<List<Update>>(new WebClient().DownloadString("https://bhm.blishhud.com/Charr.Timers_BlishHUD/timer_update.json"), _jsonSettings);
+					if (updates == null || updates.Count == 0)
+					{
+						throw new ArgumentNullException();
+					}
+					update = updates[0];
+					if (update.CreatedAt > _lastTimersUpdate.Value.CreatedAt)
+					{
+						_timersNeedUpdate = true;
+						ScreenNotification.ShowNotification("New timers available. Go to settings to update!", ScreenNotification.NotificationType.Warning, null, 3);
+					}
+				}
 			}
-			_encountersLoaded = true;
-			_tabPanel = BuildSettingsPanel(((Container)GameService.Overlay.get_BlishHudWindow()).get_ContentRegion());
+			catch (Exception)
+			{
+				_timersNeedUpdate = false;
+			}
+			if (!_timersNeedUpdate)
+			{
+				timerLoader = new TimerLoader(timerDirectory);
+				timerLoader.LoadFiles(AddEncounter);
+				_encountersLoaded = true;
+			}
+			_tabPanel = BuildSettingsPanel(GameService.Overlay.BlishHudWindow.ContentRegion);
 			_onNewMapLoaded = delegate
 			{
 				ResetActivatedEncounters();
@@ -442,687 +452,669 @@ namespace Charr.Timers_BlishHUD
 			SettingsUpdateHideMarkers();
 		}
 
+		private void ShowTimerEntries(Panel timerPanel)
+		{
+			foreach (Encounter enc3 in _invalidEncounters)
+			{
+				TimerDetails entry2 = new TimerDetails
+				{
+					Parent = timerPanel,
+					Encounter = enc3
+				};
+				entry2.Initialize();
+				entry2.PropertyChanged += delegate
+				{
+					ResetActivatedEncounters();
+				};
+				_allTimerDetails.Add(entry2);
+				entry2.ReloadClicked += delegate(object sender, Encounter enc)
+				{
+					if (enc.IsFromZip)
+					{
+						timerLoader.ReloadFile(delegate(TimerStream timerStream)
+						{
+							Encounter encounter4 = ParseEncounter(timerStream);
+							UpdateEncounter(encounter4);
+							entry2.Encounter?.Dispose();
+							entry2.Encounter = encounter4;
+							ScreenNotification.ShowNotification("Encounter <" + encounter4.Name + "> reloaded!", ScreenNotification.NotificationType.Info, encounter4.Icon, 3);
+						}, enc.ZipFile, enc.TimerFile);
+					}
+					else
+					{
+						timerLoader.ReloadFile(delegate(TimerStream timerStream)
+						{
+							Encounter encounter3 = ParseEncounter(timerStream);
+							UpdateEncounter(encounter3);
+							entry2.Encounter?.Dispose();
+							entry2.Encounter = encounter3;
+							ScreenNotification.ShowNotification("Encounter <" + encounter3.Name + "> reloaded!", ScreenNotification.NotificationType.Info, encounter3.Icon, 3);
+						}, enc.TimerFile);
+					}
+				};
+			}
+			foreach (Encounter enc2 in _encounters)
+			{
+				TimerDetails entry = new TimerDetails
+				{
+					Parent = timerPanel,
+					Encounter = enc2
+				};
+				entry.Initialize();
+				entry.PropertyChanged += delegate
+				{
+					ResetActivatedEncounters();
+				};
+				_allTimerDetails.Add(entry);
+				entry.ReloadClicked += delegate(object sender, Encounter enc)
+				{
+					if (enc.IsFromZip)
+					{
+						timerLoader.ReloadFile(delegate(TimerStream timerStream)
+						{
+							Encounter encounter2 = ParseEncounter(timerStream);
+							UpdateEncounter(encounter2);
+							entry.Encounter?.Dispose();
+							entry.Encounter = encounter2;
+							ScreenNotification.ShowNotification("Encounter <" + encounter2.Name + "> reloaded!", ScreenNotification.NotificationType.Info, encounter2.Icon, 3);
+						}, enc.ZipFile, enc.TimerFile);
+					}
+					else
+					{
+						timerLoader.ReloadFile(delegate(TimerStream timerStream)
+						{
+							Encounter encounter = ParseEncounter(timerStream);
+							UpdateEncounter(encounter);
+							entry.Encounter?.Dispose();
+							entry.Encounter = encounter;
+							ScreenNotification.ShowNotification("Encounter <" + encounter.Name + "> reloaded!", ScreenNotification.NotificationType.Info, encounter.Icon, 3);
+						}, enc.TimerFile);
+					}
+				};
+			}
+		}
+
+		public void ShowCustomTimerCategories()
+		{
+			List<IGrouping<string, Encounter>> categories = (from enc in _encounters
+				group enc by enc.Category).ToList();
+			if (_sortCategorySetting.Value)
+			{
+				categories.Sort((IGrouping<string, Encounter> cat1, IGrouping<string, Encounter> cat2) => cat1.Key.CompareTo(cat2.Key));
+			}
+			foreach (IGrouping<string, Encounter> category in categories)
+			{
+				timerCategories.AddMenuItem(category.Key).Click += delegate
+				{
+					timerPanel.FilterChildren((TimerDetails db) => string.Equals(db.Encounter.Category, category.Key));
+					_displayedTimerDetails = _allTimerDetails.Where((TimerDetails db) => string.Equals(db.Encounter.Category, category.Key)).ToList();
+				};
+			}
+		}
+
 		private Panel BuildSettingsPanel(Rectangle panelBounds)
 		{
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Expected O, but got Unknown
 			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
 			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0124: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013e: Expected O, but got Unknown
-			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0150: Unknown result type (might be due to invalid IL or missing references)
 			//IL_016a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
 			//IL_019a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_019f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c3: Expected O, but got Unknown
-			//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01dc: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0200: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0207: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0212: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0223: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022f: Expected O, but got Unknown
-			//IL_022f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0234: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0246: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0252: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025e: Expected O, but got Unknown
-			//IL_025e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0263: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0277: Expected O, but got Unknown
 			//IL_028f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02ac: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_030a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0314: Unknown result type (might be due to invalid IL or missing references)
-			//IL_031e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0325: Unknown result type (might be due to invalid IL or missing references)
-			//IL_032c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0338: Expected O, but got Unknown
-			//IL_0338: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0348: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0356: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0372: Unknown result type (might be due to invalid IL or missing references)
-			//IL_037c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0385: Expected O, but got Unknown
-			//IL_0385: Unknown result type (might be due to invalid IL or missing references)
-			//IL_038a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0395: Unknown result type (might be due to invalid IL or missing references)
-			//IL_039d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0405: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0411: Expected O, but got Unknown
-			//IL_0411: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0416: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0421: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0428: Unknown result type (might be due to invalid IL or missing references)
-			//IL_042f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0437: Unknown result type (might be due to invalid IL or missing references)
-			//IL_043e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_044b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0516: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0533: Unknown result type (might be due to invalid IL or missing references)
-			//IL_053e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0555: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0570: Unknown result type (might be due to invalid IL or missing references)
-			//IL_057b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_059f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ff: Expected O, but got Unknown
-			//IL_061c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0621: Unknown result type (might be due to invalid IL or missing references)
-			//IL_062d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0638: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0643: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0649: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0654: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0663: Expected O, but got Unknown
-			//IL_0691: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0696: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06f2: Expected O, but got Unknown
-			//IL_0720: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0725: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0731: Unknown result type (might be due to invalid IL or missing references)
-			//IL_073c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0747: Unknown result type (might be due to invalid IL or missing references)
-			//IL_074d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0767: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0772: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0781: Expected O, but got Unknown
-			//IL_07af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0801: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0810: Expected O, but got Unknown
-			//IL_083e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0843: Unknown result type (might be due to invalid IL or missing references)
-			//IL_084f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_085a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0865: Unknown result type (might be due to invalid IL or missing references)
-			//IL_086b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0885: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0890: Unknown result type (might be due to invalid IL or missing references)
-			//IL_089f: Expected O, but got Unknown
-			//IL_08cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0914: Unknown result type (might be due to invalid IL or missing references)
-			//IL_091f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_092e: Expected O, but got Unknown
-			//IL_095b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0960: Unknown result type (might be due to invalid IL or missing references)
-			//IL_096c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0977: Unknown result type (might be due to invalid IL or missing references)
-			//IL_097e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0984: Unknown result type (might be due to invalid IL or missing references)
-			//IL_099e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_09a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_09b5: Expected O, but got Unknown
-			//IL_09b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_09bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_09cc: Expected O, but got Unknown
-			//IL_0a5c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a61: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a6d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a78: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a7f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a85: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a9b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0aa6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ab2: Expected O, but got Unknown
-			//IL_0ab3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ab8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ac4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ad1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ae3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0af2: Expected O, but got Unknown
-			//IL_0b4c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0b51: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0b53: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0b56: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0b74: Expected I4, but got Unknown
-			//IL_0beb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0bf5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0bfa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c06: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c11: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c18: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c1e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c38: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c43: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c4e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c53: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c5f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c6a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c86: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c91: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c9d: Expected O, but got Unknown
-			//IL_0cb0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0cb5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0cc1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ccc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0cd9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ceb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0cf7: Expected O, but got Unknown
-			//IL_0d3e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d64: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d69: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d75: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d80: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d87: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d8d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0da3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0dae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0dba: Expected O, but got Unknown
-			//IL_0dba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0313: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0323: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0345: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0394: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_051d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_060b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0626: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0631: Unknown result type (might be due to invalid IL or missing references)
+			//IL_065b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0678: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0683: Unknown result type (might be due to invalid IL or missing references)
+			//IL_069a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_078e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0799: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0803: Unknown result type (might be due to invalid IL or missing references)
+			//IL_081d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0828: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0892: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0921: Unknown result type (might be due to invalid IL or missing references)
+			//IL_093b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0946: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a3f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a59: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a64: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ace: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ae8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0af3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b58: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b72: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b7d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c59: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c6f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c7a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ca5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cb7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0dbf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0dcb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0dd6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0de5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0df1: Expected O, but got Unknown
-			//IL_0e16: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e1b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e27: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e32: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e3d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e44: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e4a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e60: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e6b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e77: Expected O, but got Unknown
-			//IL_0e78: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e7d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e89: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e94: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ea3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0df2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0e0c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0e17: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0e5a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0e65: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0ead: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ebc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ec9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0eee: Expected O, but got Unknown
-			//IL_0eef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ef4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0f00: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0f0b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0f16: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0f21: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0f32: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0f39: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0f4a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0f5c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0f66: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0f7f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0f94: Expected O, but got Unknown
-			//IL_0fc2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0fc7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0fd3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0fde: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0fe9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ff0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ff6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_100c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1023: Expected O, but got Unknown
-			//IL_1024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1035: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_104f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1059: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_109a: Expected O, but got Unknown
-			//IL_109b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_10a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_10ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_10b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_10c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_10cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_10de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_10e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_10f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1108: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1112: Unknown result type (might be due to invalid IL or missing references)
-			//IL_112b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1140: Expected O, but got Unknown
-			//IL_116e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1173: Unknown result type (might be due to invalid IL or missing references)
-			//IL_117f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_118c: Expected O, but got Unknown
-			//IL_11c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_11d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1244: Unknown result type (might be due to invalid IL or missing references)
-			//IL_129b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_12a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_12b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_12cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_12d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_12db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_12e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_12f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1300: Unknown result type (might be due to invalid IL or missing references)
-			//IL_130d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1485: Unknown result type (might be due to invalid IL or missing references)
-			//IL_148a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_14a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_14bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_14cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_14d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_14e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_14fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1508: Unknown result type (might be due to invalid IL or missing references)
-			//IL_150f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1521: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1533: Expected O, but got Unknown
-			//IL_157b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1580: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1582: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1587: Unknown result type (might be due to invalid IL or missing references)
-			//IL_158b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1595: Unknown result type (might be due to invalid IL or missing references)
-			//IL_159d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_15a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_15b0: Expected O, but got Unknown
-			Panel val = new Panel();
-			val.set_CanScroll(false);
-			((Control)val).set_Size(((Rectangle)(ref panelBounds)).get_Size());
-			Panel mainPanel = val;
-			AlertContainer alertContainer = new AlertContainer();
-			((Control)alertContainer).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			alertContainer.ControlPadding = new Vector2(10f, 5f);
-			alertContainer.PadLeftBeforeControl = true;
-			alertContainer.PadTopBeforeControl = true;
-			((Control)alertContainer).set_BackgroundColor(new Color(Color.get_Black(), 0.3f));
-			alertContainer.FlowDirection = _alertDisplayOrientationSetting.get_Value();
-			alertContainer.Lock = _lockAlertContainerSetting.get_Value();
-			((Control)alertContainer).set_Location(_alertContainerLocationSetting.get_Value());
-			((Control)alertContainer).set_Visible(!_hideAlertsSetting.get_Value());
-			_alertContainer = alertContainer;
+			//IL_0ebf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f12: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f61: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f77: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f82: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0fb9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_101e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_103f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1077: Unknown result type (might be due to invalid IL or missing references)
+			//IL_111e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1130: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1153: Unknown result type (might be due to invalid IL or missing references)
+			//IL_11ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_11e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_11eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1223: Unknown result type (might be due to invalid IL or missing references)
+			//IL_12ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_12dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_12ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1395: Unknown result type (might be due to invalid IL or missing references)
+			//IL_13a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_13d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_13de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_13e2: Unknown result type (might be due to invalid IL or missing references)
+			Panel mainPanel = new Panel
+			{
+				CanScroll = false,
+				Size = ((Rectangle)(ref panelBounds)).get_Size()
+			};
+			_alertContainer = new AlertContainer
+			{
+				Parent = GameService.Graphics.SpriteScreen,
+				ControlPadding = new Vector2(10f, 5f),
+				PadLeftBeforeControl = true,
+				PadTopBeforeControl = true,
+				BackgroundColor = new Color(Color.get_Black(), 0.3f),
+				FlowDirection = _alertDisplayOrientationSetting.Value,
+				Lock = _lockAlertContainerSetting.Value,
+				Location = _alertContainerLocationSetting.Value,
+				Visible = !_hideAlertsSetting.Value
+			};
 			SettingsUpdateAlertSize();
 			SettingsUpdateAlertContainerLocation();
-			AlertContainer alertContainer2 = _alertContainer;
-			alertContainer2.ContainerDragged = (EventHandler<EventArgs>)Delegate.Combine(alertContainer2.ContainerDragged, (EventHandler<EventArgs>)delegate
+			AlertContainer alertContainer = _alertContainer;
+			alertContainer.ContainerDragged = (EventHandler<EventArgs>)Delegate.Combine(alertContainer.ContainerDragged, (EventHandler<EventArgs>)delegate
 			{
-				//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0031: Expected I4, but got Unknown
 				//IL_0048: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0079: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0083: Unknown result type (might be due to invalid IL or missing references)
 				//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
 				//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-				ControlFlowDirection value2 = _alertDisplayOrientationSetting.get_Value();
-				switch (value2 - 2)
+				switch (_alertDisplayOrientationSetting.Value)
 				{
-				case 0:
-				case 1:
-					_alertContainerLocationSetting.set_Value(((Control)_alertContainer).get_Location());
+				case ControlFlowDirection.SingleLeftToRight:
+				case ControlFlowDirection.SingleTopToBottom:
+					_alertContainerLocationSetting.Value = _alertContainer.Location;
 					break;
-				case 3:
-					_alertContainerLocationSetting.set_Value(new Point(((Control)_alertContainer).get_Right(), ((Control)_alertContainer).get_Location().Y));
+				case ControlFlowDirection.SingleRightToLeft:
+					_alertContainerLocationSetting.Value = new Point(_alertContainer.Right, _alertContainer.Location.Y);
 					break;
-				case 5:
-					_alertContainerLocationSetting.set_Value(new Point(((Control)_alertContainer).get_Location().X, ((Control)_alertContainer).get_Bottom()));
+				case ControlFlowDirection.SingleBottomToTop:
+					_alertContainerLocationSetting.Value = new Point(_alertContainer.Location.X, _alertContainer.Bottom);
 					break;
-				case 2:
-				case 4:
+				case ControlFlowDirection.RightToLeft:
+				case ControlFlowDirection.BottomToTop:
 					break;
 				}
 			});
-			TextBox val2 = new TextBox();
-			((Control)val2).set_Parent((Container)(object)mainPanel);
-			((Control)val2).set_Location(new Point(((DesignStandard)(ref Dropdown.Standard)).get_ControlOffset().X, ((DesignStandard)(ref Dropdown.Standard)).get_ControlOffset().Y));
-			((TextInputBase)val2).set_PlaceholderText("Search");
-			TextBox searchBox = val2;
-			Panel val3 = new Panel();
-			((Control)val3).set_Parent((Container)(object)mainPanel);
-			((Control)val3).set_Location(new Point(((DesignStandard)(ref Panel.MenuStandard)).get_PanelOffset().X, ((Control)searchBox).get_Bottom() + ((DesignStandard)(ref Panel.MenuStandard)).get_ControlOffset().Y));
-			((Control)val3).set_Size(((DesignStandard)(ref Panel.MenuStandard)).get_Size() - new Point(0, ((DesignStandard)(ref Panel.MenuStandard)).get_ControlOffset().Y));
-			val3.set_Title("Timer Categories");
-			val3.set_CanScroll(true);
-			val3.set_ShowBorder(true);
-			Panel menuSection = val3;
-			FlowPanel val4 = new FlowPanel();
-			((Control)val4).set_Parent((Container)(object)mainPanel);
-			((Control)val4).set_Location(new Point(((Control)menuSection).get_Right() + ((DesignStandard)(ref Panel.MenuStandard)).get_ControlOffset().X, ((DesignStandard)(ref Panel.MenuStandard)).get_ControlOffset().Y));
-			val4.set_FlowDirection((ControlFlowDirection)0);
-			val4.set_ControlPadding(new Vector2(8f, 8f));
-			((Panel)val4).set_CanScroll(true);
-			((Panel)val4).set_ShowBorder(true);
-			FlowPanel timerPanel = val4;
-			StandardButton val5 = new StandardButton();
-			((Control)val5).set_Parent((Container)(object)mainPanel);
-			val5.set_Text("Alert Settings");
-			StandardButton val6 = new StandardButton();
-			((Control)val6).set_Parent((Container)(object)mainPanel);
-			val6.set_Text("Enable All");
-			StandardButton enableAllButton = val6;
-			StandardButton val7 = new StandardButton();
-			((Control)val7).set_Parent((Container)(object)mainPanel);
-			val7.set_Text("Disable All");
-			StandardButton disableAllButton = val7;
-			((Control)timerPanel).set_Size(new Point(((Control)mainPanel).get_Right() - ((Control)menuSection).get_Right() - ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)mainPanel).get_Height() - ((Control)enableAllButton).get_Height() - ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y * 2));
-			if (!Directory.EnumerateFiles(DirectoriesManager.GetFullDirectoryPath("timers")).Any())
+			TextBox searchBox = new TextBox
 			{
-				Panel val8 = new Panel();
-				((Control)val8).set_Parent((Container)(object)mainPanel);
-				((Control)val8).set_Location(new Point(((Control)menuSection).get_Right() + ((DesignStandard)(ref Panel.MenuStandard)).get_ControlOffset().X, ((DesignStandard)(ref Panel.MenuStandard)).get_ControlOffset().Y));
-				val8.set_ShowBorder(true);
-				((Control)val8).set_Size(((Control)timerPanel).get_Size());
-				Panel noTimersPanel = val8;
-				Label val9 = new Label();
-				val9.set_Text("You don't have any timers!\nDownload some and place them in your timers folder.");
-				val9.set_HorizontalAlignment((HorizontalAlignment)1);
-				val9.set_VerticalAlignment((VerticalAlignment)2);
-				((Control)val9).set_Parent((Container)(object)noTimersPanel);
-				((Control)val9).set_Size(new Point(((Control)noTimersPanel).get_Width(), ((Control)noTimersPanel).get_Height() / 2 - 64));
-				((Control)val9).set_ClipsBounds(false);
-				Label noTimersNotice = val9;
-				StandardButton val10 = new StandardButton();
-				val10.set_Text("Download Hero's Timers");
-				((Control)val10).set_Parent((Container)(object)noTimersPanel);
-				((Control)val10).set_Width(196);
-				((Control)val10).set_Location(new Point(((Control)noTimersPanel).get_Width() / 2 - 200, ((Control)noTimersNotice).get_Bottom() + 24));
-				StandardButton val11 = new StandardButton();
-				val11.set_Text("Open Timers Folder");
-				((Control)val11).set_Parent((Container)(object)noTimersPanel);
-				((Control)val11).set_Width(196);
-				((Control)val11).set_Location(new Point(((Control)noTimersPanel).get_Width() / 2 + 4, ((Control)noTimersNotice).get_Bottom() + 24));
-				StandardButton openTimersFolder = val11;
-				Label val12 = new Label();
-				val12.set_Text("Once done, restart this module or Blish HUD to enable them.");
-				val12.set_HorizontalAlignment((HorizontalAlignment)1);
-				val12.set_VerticalAlignment((VerticalAlignment)0);
-				((Control)val12).set_Parent((Container)(object)noTimersPanel);
-				val12.set_AutoSizeHeight(true);
-				((Control)val12).set_Width(((Control)noTimersNotice).get_Width());
-				((Control)val12).set_Top(((Control)openTimersFolder).get_Bottom() + 4);
-				((Control)val10).add_Click((EventHandler<MouseEventArgs>)delegate
-				{
-					Process.Start("https://github.com/QuitarHero/Hero-Timers/releases/latest/download/Hero-Timers.zip");
-				});
-				((Control)openTimersFolder).add_Click((EventHandler<MouseEventArgs>)delegate
-				{
-					Process.Start("explorer.exe", "/open, \"" + DirectoriesManager.GetFullDirectoryPath("timers") + "\\\"");
-				});
-			}
-			((Control)searchBox).set_Width(((Control)menuSection).get_Width());
-			((TextInputBase)searchBox).add_TextChanged((EventHandler<EventArgs>)delegate
+				Parent = mainPanel,
+				Location = new Point(Dropdown.Standard.ControlOffset.X, Dropdown.Standard.ControlOffset.Y),
+				PlaceholderText = "Search"
+			};
+			Panel menuSection = new Panel
 			{
-				timerPanel.FilterChildren<TimerDetailsButton>((Func<TimerDetailsButton, bool>)((TimerDetailsButton db) => ((DetailsButton)db).get_Text().ToLower().Contains(((TextInputBase)searchBox).get_Text().ToLower())));
-			});
-			((Control)val5).set_Location(new Point(((Control)menuSection).get_Right() + ((DesignStandard)(ref Panel.MenuStandard)).get_ControlOffset().X, ((Control)timerPanel).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
-			((Control)enableAllButton).set_Location(new Point(((Control)timerPanel).get_Right() - ((Control)enableAllButton).get_Width() - ((Control)disableAllButton).get_Width() - ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X * 2, ((Control)timerPanel).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
-			((Control)disableAllButton).set_Location(new Point(((Control)enableAllButton).get_Right() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)timerPanel).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
-			StandardWindow val13 = new StandardWindow(Resources.AlertSettingsBackground, new Rectangle(24, 17, 505, 390), new Rectangle(38, 38, 472, 350));
-			((Control)val13).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((WindowBase2)val13).set_Title("Alert Settings");
-			((WindowBase2)val13).set_Emblem(Resources.TextureTimerEmblem);
-			((WindowBase2)val13).set_SavesPosition(true);
-			((WindowBase2)val13).set_Id("TimersAlertSettingsWindow");
-			_alertSettingsWindow = val13;
-			((Control)_alertSettingsWindow).Hide();
-			((Control)val5).add_Click((EventHandler<MouseEventArgs>)delegate
+				Parent = mainPanel,
+				Location = new Point(Panel.MenuStandard.PanelOffset.X, searchBox.Bottom + Panel.MenuStandard.ControlOffset.Y),
+				Size = Panel.MenuStandard.Size - new Point(0, Panel.MenuStandard.ControlOffset.Y),
+				Title = "Timer Categories",
+				CanScroll = true,
+				ShowBorder = true
+			};
+			timerPanel = new FlowPanel
 			{
-				if (((Control)_alertSettingsWindow).get_Visible())
+				Parent = mainPanel,
+				Location = new Point(menuSection.Right + Panel.MenuStandard.ControlOffset.X, Panel.MenuStandard.ControlOffset.Y),
+				FlowDirection = ControlFlowDirection.LeftToRight,
+				ControlPadding = new Vector2(8f, 8f),
+				CanScroll = true,
+				ShowBorder = true
+			};
+			StandardButton obj = new StandardButton
+			{
+				Parent = mainPanel,
+				Text = "Alert Settings"
+			};
+			StandardButton enableAllButton = new StandardButton
+			{
+				Parent = mainPanel,
+				Text = "Enable All"
+			};
+			StandardButton disableAllButton = new StandardButton
+			{
+				Parent = mainPanel,
+				Text = "Disable All"
+			};
+			timerPanel.Size = new Point(mainPanel.Right - menuSection.Right - Control.ControlStandard.ControlOffset.X, mainPanel.Height - enableAllButton.Height - Control.ControlStandard.ControlOffset.Y * 2);
+			if (!Directory.EnumerateFiles(DirectoriesManager.GetFullDirectoryPath("timers")).Any() || _timersNeedUpdate)
+			{
+				Panel noTimersPanel = new Panel
 				{
-					((Control)_alertSettingsWindow).Hide();
+					Parent = mainPanel,
+					Location = new Point(menuSection.Right + Panel.MenuStandard.ControlOffset.X, Panel.MenuStandard.ControlOffset.Y),
+					ShowBorder = true,
+					Size = timerPanel.Size
+				};
+				Blish_HUD.Controls.Label notice = new Blish_HUD.Controls.Label
+				{
+					HorizontalAlignment = HorizontalAlignment.Center,
+					VerticalAlignment = VerticalAlignment.Bottom,
+					Parent = noTimersPanel,
+					Size = new Point(noTimersPanel.Width, noTimersPanel.Height / 2 - 64),
+					ClipsBounds = false
+				};
+				if (_timersNeedUpdate)
+				{
+					notice.Text = "Your timers are outdated!\nDownload some now!";
 				}
 				else
 				{
-					((Control)_alertSettingsWindow).Show();
+					notice.Text = "You don't have any timers!\nDownload some now!";
 				}
-			});
-			Checkbox val14 = new Checkbox();
-			((Control)val14).set_Parent((Container)(object)_alertSettingsWindow);
-			val14.set_Text("Lock Alerts Container");
-			((Control)val14).set_BasicTooltipText("When enabled, the alerts container will be locked and cannot be moved.");
-			((Control)val14).set_Location(new Point(((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, 0));
-			Checkbox lockAlertsWindowCB = val14;
-			lockAlertsWindowCB.set_Checked(_lockAlertContainerSetting.get_Value());
-			lockAlertsWindowCB.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+				FlowPanel downloadPanel = new FlowPanel
+				{
+					Parent = noTimersPanel,
+					FlowDirection = ControlFlowDirection.LeftToRight
+				};
+				downloadPanel.Resized += delegate
+				{
+					//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+					downloadPanel.Location = new Point(noTimersPanel.Width / 2 - downloadPanel.Width / 2, notice.Bottom + 24);
+				};
+				downloadPanel.Width = 196;
+				StandardButton obj2 = new StandardButton
+				{
+					Text = "Download Hero's Timers",
+					Parent = downloadPanel,
+					Width = 196
+				};
+				StandardButton manualDownload = new StandardButton
+				{
+					Text = "Manual Download",
+					Parent = downloadPanel,
+					Width = 196
+				};
+				manualDownload.Visible = false;
+				StandardButton openTimersFolder = new StandardButton
+				{
+					Text = "Open Timers Folder",
+					Parent = noTimersPanel,
+					Width = 196,
+					Location = new Point(noTimersPanel.Width / 2 - 200, downloadPanel.Bottom + 4)
+				};
+				StandardButton skipUpdate = new StandardButton
+				{
+					Text = "Skip for now",
+					Parent = noTimersPanel,
+					Width = 196,
+					Location = new Point(openTimersFolder.Right + 4, downloadPanel.Bottom + 4)
+				};
+				Blish_HUD.Controls.Label restartBlishHudAfter = new Blish_HUD.Controls.Label
+				{
+					Text = "Once done, restart this module or Blish HUD to enable them.",
+					HorizontalAlignment = HorizontalAlignment.Center,
+					VerticalAlignment = VerticalAlignment.Top,
+					Parent = noTimersPanel,
+					AutoSizeHeight = true,
+					Width = notice.Width,
+					Top = skipUpdate.Bottom + 4
+				};
+				bool isDownloading = false;
+				obj2.Click += async delegate
+				{
+					try
+					{
+						if (!isDownloading)
+						{
+							isDownloading = true;
+							Uri downloadUrl = update.URL;
+							using WebClient webClient = new WebClient();
+							webClient.Headers.Add(HttpRequestHeader.UserAgent, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36");
+							webClient.Headers.Add(HttpRequestHeader.Accept, "application/octet-stream");
+							webClient.DownloadFileAsync(downloadUrl, DirectoriesManager.GetFullDirectoryPath("timers") + "/" + update.name);
+							restartBlishHudAfter.Text = "Downloading latest version of timers, please wait...";
+							webClient.DownloadFileCompleted += delegate(object sender, AsyncCompletedEventArgs eventArgs)
+							{
+								if (eventArgs.Error != null)
+								{
+									notice.Text = "Download failed: " + eventArgs.Error.Message;
+									Logger.Error("Download failed: " + eventArgs.Error.Message);
+									ScreenNotification.ShowNotification("Failed to download timers: " + eventArgs.Error.Message, ScreenNotification.NotificationType.Error, null, 3);
+									restartBlishHudAfter.Text = "Wait and try downloading again\nOr manually download and place them in your timers folder.";
+									downloadPanel.Width = 400;
+									manualDownload.Visible = true;
+									manualDownload.Click += delegate
+									{
+										Process.Start("https://github.com/QuitarHero/Hero-Timers/releases/latest/download/Hero-Timers.zip");
+										_lastTimersUpdate.Value = update;
+									};
+									downloadPanel.RecalculateLayout();
+								}
+								else
+								{
+									notice.Text = "Your timers have been updated!";
+									restartBlishHudAfter.Text = "Download complete, click Continue to enable them.";
+									ScreenNotification.ShowNotification("Timers updated!", ScreenNotification.NotificationType.Info, null, 3);
+									_lastTimersUpdate.Value = update;
+									downloadPanel.Dispose();
+									skipUpdate.Text = "Continue";
+								}
+								isDownloading = false;
+							};
+						}
+					}
+					catch (Exception)
+					{
+						ScreenNotification.ShowNotification("Failed to download timers: try again later...", ScreenNotification.NotificationType.Error, null, 3);
+						isDownloading = false;
+					}
+				};
+				openTimersFolder.Click += delegate
+				{
+					Process.Start("explorer.exe", "/open, \"" + DirectoriesManager.GetFullDirectoryPath("timers") + "\\\"");
+				};
+				skipUpdate.Click += delegate
+				{
+					if (!_encountersLoaded)
+					{
+						string fullDirectoryPath = DirectoriesManager.GetFullDirectoryPath("timers");
+						timerLoader = new TimerLoader(fullDirectoryPath);
+						timerLoader.LoadFiles(AddEncounter);
+						_encountersLoaded = true;
+						noTimersPanel.Dispose();
+						ShowTimerEntries(timerPanel);
+						ShowCustomTimerCategories();
+					}
+				};
+			}
+			searchBox.Width = menuSection.Width;
+			searchBox.TextChanged += delegate
 			{
-				_lockAlertContainerSetting.set_Value(lockAlertsWindowCB.get_Checked());
-			});
-			Checkbox val15 = new Checkbox();
-			((Control)val15).set_Parent((Container)(object)_alertSettingsWindow);
-			val15.set_Text("Center Alerts Container");
-			((Control)val15).set_BasicTooltipText("When enabled, the location of the alerts container will always be set to the center of the screen.");
-			((Control)val15).set_Location(new Point(((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)lockAlertsWindowCB).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
-			Checkbox centerAlertsWindowCB = val15;
-			centerAlertsWindowCB.set_Checked(_centerAlertContainerSetting.get_Value());
-			centerAlertsWindowCB.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+				timerPanel.FilterChildren((TimerDetails db) => db.Text.ToLower().Contains(searchBox.Text.ToLower()));
+			};
+			obj.Location = new Point(menuSection.Right + Panel.MenuStandard.ControlOffset.X, timerPanel.Bottom + Control.ControlStandard.ControlOffset.Y);
+			enableAllButton.Location = new Point(timerPanel.Right - enableAllButton.Width - disableAllButton.Width - Control.ControlStandard.ControlOffset.X * 2, timerPanel.Bottom + Control.ControlStandard.ControlOffset.Y);
+			disableAllButton.Location = new Point(enableAllButton.Right + Control.ControlStandard.ControlOffset.X, timerPanel.Bottom + Control.ControlStandard.ControlOffset.Y);
+			_alertSettingsWindow = new StandardWindow(Resources.AlertSettingsBackground, new Rectangle(24, 17, 505, 390), new Rectangle(38, 38, 472, 350))
 			{
-				_centerAlertContainerSetting.set_Value(centerAlertsWindowCB.get_Checked());
-			});
-			Checkbox val16 = new Checkbox();
-			((Control)val16).set_Parent((Container)(object)_alertSettingsWindow);
-			val16.set_Text("Hide Alerts");
-			((Control)val16).set_BasicTooltipText("When enabled, alerts on the screen will be hidden.");
-			((Control)val16).set_Location(new Point(((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)centerAlertsWindowCB).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
-			Checkbox hideAlertsCB = val16;
-			hideAlertsCB.set_Checked(_hideAlertsSetting.get_Value());
-			hideAlertsCB.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+				Parent = GameService.Graphics.SpriteScreen,
+				Title = "Alert Settings",
+				Emblem = Resources.TextureTimerEmblem,
+				SavesPosition = true,
+				Id = "TimersAlertSettingsWindow"
+			};
+			_alertSettingsWindow.Hide();
+			obj.Click += delegate
 			{
-				_hideAlertsSetting.set_Value(hideAlertsCB.get_Checked());
-			});
-			Checkbox val17 = new Checkbox();
-			((Control)val17).set_Parent((Container)(object)_alertSettingsWindow);
-			val17.set_Text("Hide Directions");
-			((Control)val17).set_BasicTooltipText("When enabled, directions on the screen will be hidden.");
-			((Control)val17).set_Location(new Point(((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)hideAlertsCB).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
-			Checkbox hideDirectionsCB = val17;
-			hideDirectionsCB.set_Checked(_hideDirectionsSetting.get_Value());
-			hideDirectionsCB.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+				if (_alertSettingsWindow.Visible)
+				{
+					_alertSettingsWindow.Hide();
+				}
+				else
+				{
+					_alertSettingsWindow.Show();
+				}
+			};
+			Checkbox lockAlertsWindowCB = new Checkbox
 			{
-				_hideDirectionsSetting.set_Value(hideDirectionsCB.get_Checked());
-			});
-			Checkbox val18 = new Checkbox();
-			((Control)val18).set_Parent((Container)(object)_alertSettingsWindow);
-			val18.set_Text("Hide Markers");
-			((Control)val18).set_BasicTooltipText("When enabled, markers on the screen will be hidden.");
-			((Control)val18).set_Location(new Point(((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)hideDirectionsCB).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
-			Checkbox hideMarkersCB = val18;
-			hideMarkersCB.set_Checked(_hideMarkersSetting.get_Value());
-			hideMarkersCB.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+				Parent = _alertSettingsWindow,
+				Text = "Lock Alerts Container",
+				BasicTooltipText = "When enabled, the alerts container will be locked and cannot be moved.",
+				Location = new Point(Control.ControlStandard.ControlOffset.X, 0)
+			};
+			lockAlertsWindowCB.Checked = _lockAlertContainerSetting.Value;
+			lockAlertsWindowCB.CheckedChanged += delegate
 			{
-				_hideMarkersSetting.set_Value(hideMarkersCB.get_Checked());
-			});
-			Checkbox val19 = new Checkbox();
-			((Control)val19).set_Parent((Container)(object)_alertSettingsWindow);
-			val19.set_Text("Invert Alert Fill");
-			((Control)val19).set_BasicTooltipText("When enabled, alerts fill up as time passes.\nWhen disabled, alerts drain as time passes.");
-			((Control)val19).set_Location(new Point(((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)hideMarkersCB).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
-			Checkbox fillDirection = val19;
-			fillDirection.set_Checked(_alertFillDirection.get_Value());
-			fillDirection.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+				_lockAlertContainerSetting.Value = lockAlertsWindowCB.Checked;
+			};
+			Checkbox centerAlertsWindowCB = new Checkbox
 			{
-				_alertFillDirection.set_Value(fillDirection.get_Checked());
-			});
-			Label val20 = new Label();
-			((Control)val20).set_Parent((Container)(object)_alertSettingsWindow);
-			val20.set_Text("Alert Size");
-			val20.set_AutoSizeWidth(true);
-			((Control)val20).set_Location(new Point(((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)fillDirection).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
-			Label alertSizeLabel = val20;
-			Dropdown val21 = new Dropdown();
-			((Control)val21).set_Parent((Container)(object)_alertSettingsWindow);
-			Dropdown alertSizeDropdown = val21;
-			alertSizeDropdown.get_Items().Add("Small");
-			alertSizeDropdown.get_Items().Add("Medium");
-			alertSizeDropdown.get_Items().Add("Large");
-			alertSizeDropdown.get_Items().Add("BigWig Style");
-			alertSizeDropdown.set_SelectedItem(_alertSizeSetting.get_Value().ToString());
-			alertSizeDropdown.add_ValueChanged((EventHandler<ValueChangedEventArgs>)delegate
+				Parent = _alertSettingsWindow,
+				Text = "Center Alerts Container",
+				BasicTooltipText = "When enabled, the location of the alerts container will always be set to the center of the screen.",
+				Location = new Point(Control.ControlStandard.ControlOffset.X, lockAlertsWindowCB.Bottom + Control.ControlStandard.ControlOffset.Y)
+			};
+			centerAlertsWindowCB.Checked = _centerAlertContainerSetting.Value;
+			centerAlertsWindowCB.CheckedChanged += delegate
 			{
-				_alertSizeSetting.set_Value((AlertType)Enum.Parse(typeof(AlertType), alertSizeDropdown.get_SelectedItem().Replace(" ", ""), ignoreCase: true));
-			});
-			Label val22 = new Label();
-			((Control)val22).set_Parent((Container)(object)_alertSettingsWindow);
-			val22.set_Text("Alert Display Orientation");
-			val22.set_AutoSizeWidth(true);
-			((Control)val22).set_Location(new Point(((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)alertSizeLabel).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
-			Label alertDisplayOrientationLabel = val22;
-			Dropdown val23 = new Dropdown();
-			((Control)val23).set_Parent((Container)(object)_alertSettingsWindow);
-			((Control)val23).set_Location(new Point(((Control)alertDisplayOrientationLabel).get_Right() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)alertDisplayOrientationLabel).get_Top()));
-			Dropdown alertDisplayOrientationDropdown = val23;
-			alertDisplayOrientationDropdown.get_Items().Add("Left to Right");
-			alertDisplayOrientationDropdown.get_Items().Add("Right to Left");
-			alertDisplayOrientationDropdown.get_Items().Add("Top to Bottom");
-			alertDisplayOrientationDropdown.get_Items().Add("Bottom to Top");
-			ControlFlowDirection value = _alertDisplayOrientationSetting.get_Value();
-			switch (value - 2)
+				_centerAlertContainerSetting.Value = centerAlertsWindowCB.Checked;
+			};
+			Checkbox hideAlertsCB = new Checkbox
 			{
-			case 0:
-				alertDisplayOrientationDropdown.set_SelectedItem("Left to Right");
+				Parent = _alertSettingsWindow,
+				Text = "Hide Alerts",
+				BasicTooltipText = "When enabled, alerts on the screen will be hidden.",
+				Location = new Point(Control.ControlStandard.ControlOffset.X, centerAlertsWindowCB.Bottom + Control.ControlStandard.ControlOffset.Y)
+			};
+			hideAlertsCB.Checked = _hideAlertsSetting.Value;
+			hideAlertsCB.CheckedChanged += delegate
+			{
+				_hideAlertsSetting.Value = hideAlertsCB.Checked;
+			};
+			Checkbox hideDirectionsCB = new Checkbox
+			{
+				Parent = _alertSettingsWindow,
+				Text = "Hide Directions",
+				BasicTooltipText = "When enabled, directions on the screen will be hidden.",
+				Location = new Point(Control.ControlStandard.ControlOffset.X, hideAlertsCB.Bottom + Control.ControlStandard.ControlOffset.Y)
+			};
+			hideDirectionsCB.Checked = _hideDirectionsSetting.Value;
+			hideDirectionsCB.CheckedChanged += delegate
+			{
+				_hideDirectionsSetting.Value = hideDirectionsCB.Checked;
+			};
+			Checkbox hideMarkersCB = new Checkbox
+			{
+				Parent = _alertSettingsWindow,
+				Text = "Hide Markers",
+				BasicTooltipText = "When enabled, markers on the screen will be hidden.",
+				Location = new Point(Control.ControlStandard.ControlOffset.X, hideDirectionsCB.Bottom + Control.ControlStandard.ControlOffset.Y)
+			};
+			hideMarkersCB.Checked = _hideMarkersSetting.Value;
+			hideMarkersCB.CheckedChanged += delegate
+			{
+				_hideMarkersSetting.Value = hideMarkersCB.Checked;
+			};
+			Checkbox hideSoundsCB = new Checkbox
+			{
+				Parent = _alertSettingsWindow,
+				Text = "Mute Text to Speech",
+				BasicTooltipText = "When enabled, text to speech will be muted.",
+				Location = new Point(Control.ControlStandard.ControlOffset.X, hideMarkersCB.Bottom + Control.ControlStandard.ControlOffset.Y)
+			};
+			hideSoundsCB.Checked = _hideSoundsSetting.Value;
+			hideSoundsCB.CheckedChanged += delegate
+			{
+				_hideSoundsSetting.Value = hideSoundsCB.Checked;
+			};
+			Checkbox fillDirection = new Checkbox
+			{
+				Parent = _alertSettingsWindow,
+				Text = "Invert Alert Fill",
+				BasicTooltipText = "When enabled, alerts fill up as time passes.\nWhen disabled, alerts drain as time passes.",
+				Location = new Point(Control.ControlStandard.ControlOffset.X, hideSoundsCB.Bottom + Control.ControlStandard.ControlOffset.Y)
+			};
+			fillDirection.Checked = _alertFillDirection.Value;
+			fillDirection.CheckedChanged += delegate
+			{
+				_alertFillDirection.Value = fillDirection.Checked;
+			};
+			Blish_HUD.Controls.Label alertSizeLabel = new Blish_HUD.Controls.Label
+			{
+				Parent = _alertSettingsWindow,
+				Text = "Alert Size",
+				AutoSizeWidth = true,
+				Location = new Point(Control.ControlStandard.ControlOffset.X, fillDirection.Bottom + Control.ControlStandard.ControlOffset.Y)
+			};
+			Dropdown alertSizeDropdown = new Dropdown
+			{
+				Parent = _alertSettingsWindow
+			};
+			alertSizeDropdown.Items.Add("Small");
+			alertSizeDropdown.Items.Add("Medium");
+			alertSizeDropdown.Items.Add("Large");
+			alertSizeDropdown.Items.Add("BigWig Style");
+			alertSizeDropdown.SelectedItem = _alertSizeSetting.Value.ToString();
+			alertSizeDropdown.ValueChanged += delegate
+			{
+				_alertSizeSetting.Value = (AlertType)Enum.Parse(typeof(AlertType), alertSizeDropdown.SelectedItem.Replace(" ", ""), ignoreCase: true);
+			};
+			Blish_HUD.Controls.Label alertDisplayOrientationLabel = new Blish_HUD.Controls.Label
+			{
+				Parent = _alertSettingsWindow,
+				Text = "Alert Display Orientation",
+				AutoSizeWidth = true,
+				Location = new Point(Control.ControlStandard.ControlOffset.X, alertSizeLabel.Bottom + Control.ControlStandard.ControlOffset.Y)
+			};
+			Dropdown alertDisplayOrientationDropdown = new Dropdown
+			{
+				Parent = _alertSettingsWindow,
+				Location = new Point(alertDisplayOrientationLabel.Right + Control.ControlStandard.ControlOffset.X, alertDisplayOrientationLabel.Top)
+			};
+			alertDisplayOrientationDropdown.Items.Add("Left to Right");
+			alertDisplayOrientationDropdown.Items.Add("Right to Left");
+			alertDisplayOrientationDropdown.Items.Add("Top to Bottom");
+			alertDisplayOrientationDropdown.Items.Add("Bottom to Top");
+			switch (_alertDisplayOrientationSetting.Value)
+			{
+			case ControlFlowDirection.SingleLeftToRight:
+				alertDisplayOrientationDropdown.SelectedItem = "Left to Right";
 				break;
-			case 3:
-				alertDisplayOrientationDropdown.set_SelectedItem("Right to Left");
+			case ControlFlowDirection.SingleRightToLeft:
+				alertDisplayOrientationDropdown.SelectedItem = "Right to Left";
 				break;
-			case 1:
-				alertDisplayOrientationDropdown.set_SelectedItem("Top to Bottom");
+			case ControlFlowDirection.SingleTopToBottom:
+				alertDisplayOrientationDropdown.SelectedItem = "Top to Bottom";
 				break;
-			case 5:
-				alertDisplayOrientationDropdown.set_SelectedItem("Bottom to Top");
+			case ControlFlowDirection.SingleBottomToTop:
+				alertDisplayOrientationDropdown.SelectedItem = "Bottom to Top";
 				break;
 			}
-			alertDisplayOrientationDropdown.add_ValueChanged((EventHandler<ValueChangedEventArgs>)delegate
+			alertDisplayOrientationDropdown.ValueChanged += delegate
 			{
-				switch (alertDisplayOrientationDropdown.get_SelectedItem())
+				switch (alertDisplayOrientationDropdown.SelectedItem)
 				{
 				case "Left to Right":
-					_alertDisplayOrientationSetting.set_Value((ControlFlowDirection)2);
+					_alertDisplayOrientationSetting.Value = ControlFlowDirection.SingleLeftToRight;
 					break;
 				case "Right to Left":
-					_alertDisplayOrientationSetting.set_Value((ControlFlowDirection)5);
+					_alertDisplayOrientationSetting.Value = ControlFlowDirection.SingleRightToLeft;
 					break;
 				case "Top to Bottom":
-					_alertDisplayOrientationSetting.set_Value((ControlFlowDirection)3);
+					_alertDisplayOrientationSetting.Value = ControlFlowDirection.SingleTopToBottom;
 					break;
 				case "Bottom to Top":
-					_alertDisplayOrientationSetting.set_Value((ControlFlowDirection)7);
+					_alertDisplayOrientationSetting.Value = ControlFlowDirection.SingleBottomToTop;
 					break;
 				}
-			});
-			((Control)alertSizeDropdown).set_Location(new Point(((Control)alertDisplayOrientationDropdown).get_Left(), ((Control)alertSizeLabel).get_Top()));
-			Label val24 = new Label();
-			((Control)val24).set_Parent((Container)(object)_alertSettingsWindow);
-			val24.set_Text("Alert Preview");
-			val24.set_AutoSizeWidth(true);
-			((Control)val24).set_Location(new Point(((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)alertDisplayOrientationDropdown).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
-			StandardButton val25 = new StandardButton();
-			((Control)val25).set_Parent((Container)(object)_alertSettingsWindow);
-			val25.set_Text("Add Test Alert");
-			((Control)val25).set_Location(new Point(((Control)alertDisplayOrientationDropdown).get_Left(), ((Control)alertDisplayOrientationDropdown).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
-			StandardButton addTestAlertButton = val25;
-			((Control)addTestAlertButton).add_Click((EventHandler<MouseEventArgs>)delegate
+			};
+			alertSizeDropdown.Location = new Point(alertDisplayOrientationDropdown.Left, alertSizeLabel.Top);
+			new Blish_HUD.Controls.Label
+			{
+				Parent = _alertSettingsWindow,
+				Text = "Alert Preview",
+				AutoSizeWidth = true,
+				Location = new Point(Control.ControlStandard.ControlOffset.X, alertDisplayOrientationDropdown.Bottom + Control.ControlStandard.ControlOffset.Y)
+			};
+			StandardButton addTestAlertButton = new StandardButton
+			{
+				Parent = _alertSettingsWindow,
+				Text = "Add Test Alert",
+				Location = new Point(alertDisplayOrientationDropdown.Left, alertDisplayOrientationDropdown.Bottom + Control.ControlStandard.ControlOffset.Y)
+			};
+			addTestAlertButton.Click += delegate
 			{
 				//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0072: Unknown result type (might be due to invalid IL or missing references)
 				//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-				IAlertPanel alertPanel3;
-				if (_alertSizeSetting.get_Value() != AlertType.BigWigStyle)
+				IAlertPanel alertPanel2;
+				if (_alertSizeSetting.Value != AlertType.BigWigStyle)
 				{
-					AlertPanel alertPanel = new AlertPanel();
-					((FlowPanel)alertPanel).set_ControlPadding(new Vector2(10f, 10f));
-					((FlowPanel)alertPanel).set_PadLeftBeforeControl(true);
-					((FlowPanel)alertPanel).set_PadTopBeforeControl(true);
-					IAlertPanel alertPanel2 = alertPanel;
-					alertPanel3 = alertPanel2;
+					IAlertPanel alertPanel = new AlertPanel
+					{
+						ControlPadding = new Vector2(10f, 10f),
+						PadLeftBeforeControl = true,
+						PadTopBeforeControl = true
+					};
+					alertPanel2 = alertPanel;
 				}
 				else
 				{
-					IAlertPanel alertPanel2 = new BigWigAlert();
-					alertPanel3 = alertPanel2;
+					IAlertPanel alertPanel = new BigWigAlert();
+					alertPanel2 = alertPanel;
 				}
-				IAlertPanel alertPanel4 = alertPanel3;
-				alertPanel4.Text = "Test Alert " + (_testAlertPanels.Count + 1);
-				alertPanel4.TextColor = Color.get_White();
-				alertPanel4.Icon = AsyncTexture2D.op_Implicit(Texture2DExtension.Duplicate(AsyncTexture2D.op_Implicit(Resources.GetIcon("raid"))));
-				alertPanel4.MaxFill = 100f;
-				alertPanel4.CurrentFill = (float)RandomUtil.GetRandom(0, 100) + (float)RandomUtil.GetRandom(0, 100) * 0.01f;
-				alertPanel4.FillColor = Color.get_Red();
-				alertPanel4.ShouldShow = !_hideAlertsSetting.get_Value();
-				((Control)alertPanel4).set_Parent((Container)(object)_alertContainer);
-				_testAlertPanels.Add(alertPanel4);
+				IAlertPanel alertPanel3 = alertPanel2;
+				alertPanel3.Text = "Test Alert " + (_testAlertPanels.Count + 1);
+				alertPanel3.TextColor = Color.get_White();
+				alertPanel3.Icon = Texture2DExtension.Duplicate(Resources.GetIcon("raid"));
+				alertPanel3.MaxFill = 100f;
+				alertPanel3.CurrentFill = (float)RandomUtil.GetRandom(0, 100) + (float)RandomUtil.GetRandom(0, 100) * 0.01f;
+				alertPanel3.FillColor = Color.get_Red();
+				alertPanel3.ShouldShow = !_hideAlertsSetting.Value;
+				((Control)alertPanel3).Parent = _alertContainer;
+				_testAlertPanels.Add(alertPanel3);
 				_alertContainer.UpdateDisplay();
-			});
-			StandardButton val26 = new StandardButton();
-			((Control)val26).set_Parent((Container)(object)_alertSettingsWindow);
-			val26.set_Text("Clear Test Alerts");
-			((Control)val26).set_Location(new Point(((Control)addTestAlertButton).get_Right() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)addTestAlertButton).get_Top()));
-			StandardButton clearTestAlertsButton = val26;
-			((Control)clearTestAlertsButton).set_Width((int)((double)((Control)clearTestAlertsButton).get_Width() * 1.15));
-			((Control)clearTestAlertsButton).add_Click((EventHandler<MouseEventArgs>)delegate
+			};
+			StandardButton clearTestAlertsButton = new StandardButton
+			{
+				Parent = _alertSettingsWindow,
+				Text = "Clear Test Alerts",
+				Location = new Point(addTestAlertButton.Right + Control.ControlStandard.ControlOffset.X, addTestAlertButton.Top)
+			};
+			clearTestAlertsButton.Width = (int)((double)clearTestAlertsButton.Width * 1.15);
+			clearTestAlertsButton.Click += delegate
 			{
 				_testAlertPanels.ForEach(delegate(IAlertPanel panel)
 				{
@@ -1130,341 +1122,263 @@ namespace Charr.Timers_BlishHUD
 				});
 				_testAlertPanels.Clear();
 				_alertContainer.UpdateDisplay();
-			});
-			((Control)alertSizeDropdown).set_Width(((Control)addTestAlertButton).get_Width() + ((Control)clearTestAlertsButton).get_Width() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X);
-			((Control)alertDisplayOrientationDropdown).set_Width(((Control)alertSizeDropdown).get_Width());
-			Label val27 = new Label();
-			((Control)val27).set_Parent((Container)(object)_alertSettingsWindow);
-			val27.set_Text("Alert Container Position");
-			val27.set_AutoSizeWidth(true);
-			((Control)val27).set_Location(new Point(((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)clearTestAlertsButton).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
-			Label alertContainerPositionLabel = val27;
-			StandardButton val28 = new StandardButton();
-			((Control)val28).set_Parent((Container)(object)_alertSettingsWindow);
-			val28.set_Text("Reset Position");
-			((Control)val28).set_Location(new Point(((Control)addTestAlertButton).get_Left(), ((Control)alertContainerPositionLabel).get_Top()));
-			StandardButton resetAlertContainerPositionButton = val28;
-			((Control)resetAlertContainerPositionButton).set_Width(((Control)alertSizeDropdown).get_Width());
-			((Control)resetAlertContainerPositionButton).add_Click((EventHandler<MouseEventArgs>)delegate
+			};
+			alertSizeDropdown.Width = addTestAlertButton.Width + clearTestAlertsButton.Width + Control.ControlStandard.ControlOffset.X;
+			alertDisplayOrientationDropdown.Width = alertSizeDropdown.Width;
+			Blish_HUD.Controls.Label alertContainerPositionLabel = new Blish_HUD.Controls.Label
+			{
+				Parent = _alertSettingsWindow,
+				Text = "Alert Container Position",
+				AutoSizeWidth = true,
+				Location = new Point(Control.ControlStandard.ControlOffset.X, clearTestAlertsButton.Bottom + Control.ControlStandard.ControlOffset.Y)
+			};
+			StandardButton resetAlertContainerPositionButton = new StandardButton
+			{
+				Parent = _alertSettingsWindow,
+				Text = "Reset Position",
+				Location = new Point(addTestAlertButton.Left, alertContainerPositionLabel.Top)
+			};
+			resetAlertContainerPositionButton.Width = alertSizeDropdown.Width;
+			resetAlertContainerPositionButton.Click += delegate
 			{
 				//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-				_alertContainerLocationSetting.set_Value(new Point(((Control)GameService.Graphics.get_SpriteScreen()).get_Width() / 2 - ((Control)_alertContainer).get_Width() / 2, ((Control)GameService.Graphics.get_SpriteScreen()).get_Height() / 2 - ((Control)_alertContainer).get_Height() / 2));
-			});
-			Label val29 = new Label();
-			((Control)val29).set_Parent((Container)(object)_alertSettingsWindow);
-			val29.set_Text("Alert Move Delay");
-			((Control)val29).set_BasicTooltipText("How many seconds alerts will take to reposition itself.");
-			val29.set_AutoSizeWidth(true);
-			((Control)val29).set_Location(new Point(((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)resetAlertContainerPositionButton).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
-			Label alertMoveDelayLabel = val29;
-			TextBox val30 = new TextBox();
-			((Control)val30).set_Parent((Container)(object)_alertSettingsWindow);
-			((Control)val30).set_BasicTooltipText("How many seconds alerts will take to reposition itself.");
-			((Control)val30).set_Location(new Point(((Control)resetAlertContainerPositionButton).get_Left(), ((Control)alertMoveDelayLabel).get_Top()));
-			((Control)val30).set_Width(((Control)resetAlertContainerPositionButton).get_Width() / 5);
-			((Control)val30).set_Height(((Control)alertMoveDelayLabel).get_Height());
-			((TextInputBase)val30).set_Text($"{_alertMoveDelaySetting.get_Value():0.00}");
-			TextBox alertMoveDelayTextBox = val30;
-			TrackBar val31 = new TrackBar();
-			((Control)val31).set_Parent((Container)(object)_alertSettingsWindow);
-			((Control)val31).set_BasicTooltipText("How many seconds alerts will take to reposition itself.");
-			val31.set_MinValue(0f);
-			val31.set_MaxValue(3f);
-			val31.set_Value(_alertMoveDelaySetting.get_Value());
-			val31.set_SmallStep(true);
-			((Control)val31).set_Location(new Point(((Control)alertMoveDelayTextBox).get_Right() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)alertMoveDelayLabel).get_Top()));
-			((Control)val31).set_Width(((Control)resetAlertContainerPositionButton).get_Width() - ((Control)alertMoveDelayTextBox).get_Width() - ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X);
-			TrackBar alertMoveDelaySlider = val31;
-			((TextInputBase)alertMoveDelayTextBox).add_TextChanged((EventHandler<EventArgs>)delegate
+				_alertContainerLocationSetting.Value = new Point(GameService.Graphics.SpriteScreen.Width / 2 - _alertContainer.Width / 2, GameService.Graphics.SpriteScreen.Height / 2 - _alertContainer.Height / 2);
+			};
+			Blish_HUD.Controls.Label alertMoveDelayLabel = new Blish_HUD.Controls.Label
 			{
-				int cursorIndex2 = ((TextInputBase)alertMoveDelayTextBox).get_CursorIndex();
-				if (float.TryParse(((TextInputBase)alertMoveDelayTextBox).get_Text(), out var result2) && result2 >= alertMoveDelaySlider.get_MinValue() && result2 <= alertMoveDelaySlider.get_MaxValue())
+				Parent = _alertSettingsWindow,
+				Text = "Alert Move Delay",
+				BasicTooltipText = "How many seconds alerts will take to reposition itself.",
+				AutoSizeWidth = true,
+				Location = new Point(Control.ControlStandard.ControlOffset.X, resetAlertContainerPositionButton.Bottom + Control.ControlStandard.ControlOffset.Y)
+			};
+			TextBox alertMoveDelayTextBox = new TextBox
+			{
+				Parent = _alertSettingsWindow,
+				BasicTooltipText = "How many seconds alerts will take to reposition itself.",
+				Location = new Point(resetAlertContainerPositionButton.Left, alertMoveDelayLabel.Top),
+				Width = resetAlertContainerPositionButton.Width / 5,
+				Height = alertMoveDelayLabel.Height,
+				Text = $"{_alertMoveDelaySetting.Value:0.00}"
+			};
+			TrackBar alertMoveDelaySlider = new TrackBar
+			{
+				Parent = _alertSettingsWindow,
+				BasicTooltipText = "How many seconds alerts will take to reposition itself.",
+				MinValue = 0f,
+				MaxValue = 3f,
+				Value = _alertMoveDelaySetting.Value,
+				SmallStep = true,
+				Location = new Point(alertMoveDelayTextBox.Right + Control.ControlStandard.ControlOffset.X, alertMoveDelayLabel.Top),
+				Width = resetAlertContainerPositionButton.Width - alertMoveDelayTextBox.Width - Control.ControlStandard.ControlOffset.X
+			};
+			alertMoveDelayTextBox.TextChanged += delegate
+			{
+				int cursorIndex2 = alertMoveDelayTextBox.CursorIndex;
+				if (float.TryParse(alertMoveDelayTextBox.Text, out var result2) && result2 >= alertMoveDelaySlider.MinValue && result2 <= alertMoveDelaySlider.MaxValue)
 				{
 					result2 = (float)Math.Round(result2, 2);
-					_alertMoveDelaySetting.set_Value(result2);
-					alertMoveDelaySlider.set_Value(result2);
-					((TextInputBase)alertMoveDelayTextBox).set_Text($"{result2:0.00}");
+					_alertMoveDelaySetting.Value = result2;
+					alertMoveDelaySlider.Value = result2;
+					alertMoveDelayTextBox.Text = $"{result2:0.00}";
 				}
 				else
 				{
-					((TextInputBase)alertMoveDelayTextBox).set_Text($"{_alertMoveDelaySetting.get_Value():0.00}");
+					alertMoveDelayTextBox.Text = $"{_alertMoveDelaySetting.Value:0.00}";
 				}
-				((TextInputBase)alertMoveDelayTextBox).set_CursorIndex(cursorIndex2);
-			});
-			alertMoveDelaySlider.add_ValueChanged((EventHandler<ValueEventArgs<float>>)delegate
+				alertMoveDelayTextBox.CursorIndex = cursorIndex2;
+			};
+			alertMoveDelaySlider.ValueChanged += delegate
 			{
-				float num2 = (float)Math.Round(alertMoveDelaySlider.get_Value(), 2);
-				_alertMoveDelaySetting.set_Value(num2);
-				((TextInputBase)alertMoveDelayTextBox).set_Text($"{num2:0.00}");
-			});
-			Label val32 = new Label();
-			((Control)val32).set_Parent((Container)(object)_alertSettingsWindow);
-			val32.set_Text("Alert Fade In/Out Delay");
-			((Control)val32).set_BasicTooltipText("How many seconds alerts will take to appear/disappear.");
-			val32.set_AutoSizeWidth(true);
-			((Control)val32).set_Location(new Point(((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)alertMoveDelayLabel).get_Bottom() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
-			Label alertFadeDelayLabel = val32;
-			TextBox val33 = new TextBox();
-			((Control)val33).set_Parent((Container)(object)_alertSettingsWindow);
-			((Control)val33).set_BasicTooltipText("How many seconds alerts will take to appear/disappear.");
-			((Control)val33).set_Location(new Point(((Control)resetAlertContainerPositionButton).get_Left(), ((Control)alertFadeDelayLabel).get_Top()));
-			((Control)val33).set_Width(((Control)resetAlertContainerPositionButton).get_Width() / 5);
-			((Control)val33).set_Height(((Control)alertFadeDelayLabel).get_Height());
-			((TextInputBase)val33).set_Text($"{_alertFadeDelaySetting.get_Value():0.00}");
-			TextBox alertFadeDelayTextBox = val33;
-			TrackBar val34 = new TrackBar();
-			((Control)val34).set_Parent((Container)(object)_alertSettingsWindow);
-			((Control)val34).set_BasicTooltipText("How many seconds alerts will take to appear/disappear.");
-			val34.set_MinValue(0f);
-			val34.set_MaxValue(3f);
-			val34.set_Value(_alertFadeDelaySetting.get_Value());
-			val34.set_SmallStep(true);
-			((Control)val34).set_Location(new Point(((Control)alertFadeDelayTextBox).get_Right() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, ((Control)alertFadeDelayLabel).get_Top()));
-			((Control)val34).set_Width(((Control)resetAlertContainerPositionButton).get_Width() - ((Control)alertFadeDelayTextBox).get_Width() - ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X);
-			TrackBar alertFadeDelaySlider = val34;
-			((TextInputBase)alertFadeDelayTextBox).add_TextChanged((EventHandler<EventArgs>)delegate
+				float num2 = (float)Math.Round(alertMoveDelaySlider.Value, 2);
+				_alertMoveDelaySetting.Value = num2;
+				alertMoveDelayTextBox.Text = $"{num2:0.00}";
+			};
+			Blish_HUD.Controls.Label alertFadeDelayLabel = new Blish_HUD.Controls.Label
 			{
-				int cursorIndex = ((TextInputBase)alertFadeDelayTextBox).get_CursorIndex();
-				if (float.TryParse(((TextInputBase)alertFadeDelayTextBox).get_Text(), out var result) && result >= alertFadeDelaySlider.get_MinValue() && result <= alertFadeDelaySlider.get_MaxValue())
+				Parent = _alertSettingsWindow,
+				Text = "Alert Fade In/Out Delay",
+				BasicTooltipText = "How many seconds alerts will take to appear/disappear.",
+				AutoSizeWidth = true,
+				Location = new Point(Control.ControlStandard.ControlOffset.X, alertMoveDelayLabel.Bottom + Control.ControlStandard.ControlOffset.Y)
+			};
+			TextBox alertFadeDelayTextBox = new TextBox
+			{
+				Parent = _alertSettingsWindow,
+				BasicTooltipText = "How many seconds alerts will take to appear/disappear.",
+				Location = new Point(resetAlertContainerPositionButton.Left, alertFadeDelayLabel.Top),
+				Width = resetAlertContainerPositionButton.Width / 5,
+				Height = alertFadeDelayLabel.Height,
+				Text = $"{_alertFadeDelaySetting.Value:0.00}"
+			};
+			TrackBar alertFadeDelaySlider = new TrackBar
+			{
+				Parent = _alertSettingsWindow,
+				BasicTooltipText = "How many seconds alerts will take to appear/disappear.",
+				MinValue = 0f,
+				MaxValue = 3f,
+				Value = _alertFadeDelaySetting.Value,
+				SmallStep = true,
+				Location = new Point(alertFadeDelayTextBox.Right + Control.ControlStandard.ControlOffset.X, alertFadeDelayLabel.Top),
+				Width = resetAlertContainerPositionButton.Width - alertFadeDelayTextBox.Width - Control.ControlStandard.ControlOffset.X
+			};
+			alertFadeDelayTextBox.TextChanged += delegate
+			{
+				int cursorIndex = alertFadeDelayTextBox.CursorIndex;
+				if (float.TryParse(alertFadeDelayTextBox.Text, out var result) && result >= alertFadeDelaySlider.MinValue && result <= alertFadeDelaySlider.MaxValue)
 				{
 					result = (float)Math.Round(result, 2);
-					_alertFadeDelaySetting.set_Value(result);
-					alertFadeDelaySlider.set_Value(result);
-					((TextInputBase)alertFadeDelayTextBox).set_Text($"{result:0.00}");
+					_alertFadeDelaySetting.Value = result;
+					alertFadeDelaySlider.Value = result;
+					alertFadeDelayTextBox.Text = $"{result:0.00}";
 				}
 				else
 				{
-					((TextInputBase)alertFadeDelayTextBox).set_Text($"{_alertFadeDelaySetting.get_Value():0.00}");
+					alertFadeDelayTextBox.Text = $"{_alertFadeDelaySetting.Value:0.00}";
 				}
-				((TextInputBase)alertFadeDelayTextBox).set_CursorIndex(cursorIndex);
-			});
-			alertFadeDelaySlider.add_ValueChanged((EventHandler<ValueEventArgs<float>>)delegate
+				alertFadeDelayTextBox.CursorIndex = cursorIndex;
+			};
+			alertFadeDelaySlider.ValueChanged += delegate
 			{
-				float num = (float)Math.Round(alertFadeDelaySlider.get_Value(), 2);
-				_alertFadeDelaySetting.set_Value(num);
-				((TextInputBase)alertFadeDelayTextBox).set_Text($"{num:0.00}");
-			});
-			StandardButton val35 = new StandardButton();
-			((Control)val35).set_Parent((Container)(object)_alertSettingsWindow);
-			val35.set_Text("Close");
-			StandardButton closeAlertSettingsButton = val35;
-			((Control)closeAlertSettingsButton).set_Location(new Point((((Control)_alertSettingsWindow).get_Left() + ((Control)_alertSettingsWindow).get_Right()) / 2 - ((Control)closeAlertSettingsButton).get_Width() / 2, ((Control)_alertSettingsWindow).get_Bottom() - ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y - ((Control)closeAlertSettingsButton).get_Height()));
-			((Control)closeAlertSettingsButton).add_Click((EventHandler<MouseEventArgs>)delegate
+				float num = (float)Math.Round(alertFadeDelaySlider.Value, 2);
+				_alertFadeDelaySetting.Value = num;
+				alertFadeDelayTextBox.Text = $"{num:0.00}";
+			};
+			StandardButton closeAlertSettingsButton = new StandardButton
 			{
-				((Control)_alertSettingsWindow).Hide();
-			});
-			foreach (Encounter enc2 in _invalidEncounters)
+				Parent = _alertSettingsWindow,
+				Text = "Close"
+			};
+			closeAlertSettingsButton.Location = new Point((_alertSettingsWindow.Left + _alertSettingsWindow.Right) / 2 - closeAlertSettingsButton.Width / 2, _alertSettingsWindow.Bottom - Control.ControlStandard.ControlOffset.Y - closeAlertSettingsButton.Height);
+			closeAlertSettingsButton.Click += delegate
 			{
-				TimerDetailsButton timerDetailsButton = new TimerDetailsButton();
-				((Control)timerDetailsButton).set_Parent((Container)(object)timerPanel);
-				timerDetailsButton.Encounter = enc2;
-				((DetailsButton)timerDetailsButton).set_Text(enc2.Name + "\nLoading error\nHover for details");
-				((DetailsButton)timerDetailsButton).set_IconSize((DetailsIconSize)0);
-				((Control)timerDetailsButton).set_BackgroundColor(Color.get_DarkRed());
-				((DetailsButton)timerDetailsButton).set_ShowVignette(false);
-				((DetailsButton)timerDetailsButton).set_HighlightType((DetailsHighlightType)2);
-				((DetailsButton)timerDetailsButton).set_ShowToggleButton(true);
-				((DetailsButton)timerDetailsButton).set_Icon(enc2.Icon ?? AsyncTexture2D.op_Implicit(Textures.get_TransparentPixel()));
-				((Control)timerDetailsButton).set_BasicTooltipText(enc2.Description);
-				TimerDetailsButton entry = timerDetailsButton;
-				if (!string.IsNullOrEmpty(enc2.Author))
+				_alertSettingsWindow.Hide();
+			};
+			ShowTimerEntries(timerPanel);
+			Menu menu = new Menu();
+			Rectangle contentRegion = menuSection.ContentRegion;
+			menu.Size = ((Rectangle)(ref contentRegion)).get_Size();
+			menu.MenuItemHeight = 40;
+			menu.Parent = menuSection;
+			menu.CanSelect = true;
+			timerCategories = menu;
+			MenuItem menuItem = timerCategories.AddMenuItem("All Timers");
+			menuItem.Select();
+			_displayedTimerDetails = _allTimerDetails.Where((TimerDetails db) => true).ToList();
+			menuItem.Click += delegate
+			{
+				timerPanel.FilterChildren((TimerDetails db) => true);
+				_displayedTimerDetails = _allTimerDetails.Where((TimerDetails db) => true).ToList();
+			};
+			MenuItem enabledTimers = timerCategories.AddMenuItem("Enabled Timers");
+			enabledTimers.Click += delegate
+			{
+				timerPanel.FilterChildren((TimerDetails db) => db.Encounter.Enabled);
+				_displayedTimerDetails = _allTimerDetails.Where((TimerDetails db) => db.Encounter.Enabled).ToList();
+			};
+			timerCategories.AddMenuItem("Current Map").Click += delegate
+			{
+				timerPanel.FilterChildren((TimerDetails db) => db.Encounter.Map == GameService.Gw2Mumble.CurrentMap.Id);
+				_displayedTimerDetails = _allTimerDetails.Where((TimerDetails db) => db.Encounter.Map == GameService.Gw2Mumble.CurrentMap.Id).ToList();
+			};
+			if (_encounters.Any((Encounter e) => e.State == Encounter.EncounterStates.Error))
+			{
+				timerCategories.AddMenuItem("Invalid Timers").Click += delegate
 				{
-					GlowButton val36 = new GlowButton();
-					val36.set_Icon(AsyncTexture2D.op_Implicit(Resources.TextureDescription));
-					((Control)val36).set_BasicTooltipText("By: " + enc2.Author);
-					((Control)val36).set_Parent((Container)(object)entry);
-				}
-				GlowButton val37 = new GlowButton();
-				((Control)val37).set_Parent((Container)(object)entry);
-				val37.set_Icon(AsyncTexture2D.op_Implicit(Resources.TextureX));
-				val37.set_ToggleGlow(true);
-				((Control)val37).set_BasicTooltipText(enc2.Description);
-				((Control)val37).set_Enabled(false);
-				_allTimerDetails.Add(entry);
+					timerPanel.FilterChildren((TimerDetails db) => db.Encounter.State == Encounter.EncounterStates.Error);
+					_displayedTimerDetails = _allTimerDetails.Where((TimerDetails db) => db.Encounter.State == Encounter.EncounterStates.Error).ToList();
+				};
 			}
-			foreach (Encounter enc3 in _encounters)
+			ShowCustomTimerCategories();
+			enableAllButton.Click += delegate
 			{
-				SettingEntry<bool> setting = _timerSettingCollection.DefineSetting<bool>("TimerEnable:" + enc3.Id, enc3.Enabled, (Func<string>)null, (Func<string>)null);
-				enc3.Enabled = setting.get_Value();
-				_encounterEnableSettings.Add("TimerEnable:" + enc3.Id, setting);
-				TimerDetailsButton timerDetailsButton2 = new TimerDetailsButton();
-				((Control)timerDetailsButton2).set_Parent((Container)(object)timerPanel);
-				timerDetailsButton2.Encounter = enc3;
-				((DetailsButton)timerDetailsButton2).set_Text(enc3.Name);
-				((DetailsButton)timerDetailsButton2).set_IconSize((DetailsIconSize)0);
-				((DetailsButton)timerDetailsButton2).set_ShowVignette(false);
-				((DetailsButton)timerDetailsButton2).set_HighlightType((DetailsHighlightType)2);
-				((DetailsButton)timerDetailsButton2).set_ShowToggleButton(true);
-				((DetailsButton)timerDetailsButton2).set_ToggleState(enc3.Enabled);
-				((DetailsButton)timerDetailsButton2).set_Icon(enc3.Icon);
-				((Control)timerDetailsButton2).set_BasicTooltipText(enc3.Description);
-				TimerDetailsButton entry2 = timerDetailsButton2;
-				if (!string.IsNullOrEmpty(enc3.Author))
+				if (timerCategories.SelectedMenuItem != enabledTimers)
 				{
-					GlowButton val38 = new GlowButton();
-					val38.set_Icon(AsyncTexture2D.op_Implicit(Resources.TextureDescription));
-					((Control)val38).set_BasicTooltipText("By: " + enc3.Author);
-					((Control)val38).set_Parent((Container)(object)entry2);
-				}
-				GlowButton val39 = new GlowButton();
-				val39.set_Icon(AsyncTexture2D.op_Implicit(Resources.TextureEye));
-				val39.set_ActiveIcon(AsyncTexture2D.op_Implicit(Resources.TextureEyeActive));
-				((Control)val39).set_BasicTooltipText("Click to toggle timer");
-				val39.set_ToggleGlow(true);
-				val39.set_Checked(enc3.Enabled);
-				((Control)val39).set_Parent((Container)(object)entry2);
-				GlowButton toggleButton = val39;
-				((Control)toggleButton).add_Click((EventHandler<MouseEventArgs>)delegate
-				{
-					enc3.Enabled = toggleButton.get_Checked();
-					setting.set_Value(toggleButton.get_Checked());
-					((DetailsButton)entry2).set_ToggleState(toggleButton.get_Checked());
-					ResetActivatedEncounters();
-				});
-				_allTimerDetails.Add(entry2);
-			}
-			Menu val40 = new Menu();
-			Rectangle contentRegion = ((Container)menuSection).get_ContentRegion();
-			((Control)val40).set_Size(((Rectangle)(ref contentRegion)).get_Size());
-			val40.set_MenuItemHeight(40);
-			((Control)val40).set_Parent((Container)(object)menuSection);
-			val40.set_CanSelect(true);
-			Menu timerCategories = val40;
-			MenuItem obj = timerCategories.AddMenuItem("All Timers", (Texture2D)null);
-			obj.Select();
-			_displayedTimerDetails = _allTimerDetails.Where((TimerDetailsButton db) => true).ToList();
-			((Control)obj).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
-				timerPanel.FilterChildren<TimerDetailsButton>((Func<TimerDetailsButton, bool>)((TimerDetailsButton db) => true));
-				_displayedTimerDetails = _allTimerDetails.Where((TimerDetailsButton db) => true).ToList();
-			});
-			MenuItem enabledTimers = timerCategories.AddMenuItem("Enabled Timers", (Texture2D)null);
-			((Control)enabledTimers).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
-				timerPanel.FilterChildren<TimerDetailsButton>((Func<TimerDetailsButton, bool>)((TimerDetailsButton db) => db.Encounter.Enabled));
-				_displayedTimerDetails = _allTimerDetails.Where((TimerDetailsButton db) => db.Encounter.Enabled).ToList();
-			});
-			((Control)timerCategories.AddMenuItem("Current Map", (Texture2D)null)).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
-				timerPanel.FilterChildren<TimerDetailsButton>((Func<TimerDetailsButton, bool>)((TimerDetailsButton db) => db.Encounter.Map == GameService.Gw2Mumble.get_CurrentMap().get_Id()));
-				_displayedTimerDetails = _allTimerDetails.Where((TimerDetailsButton db) => db.Encounter.Map == GameService.Gw2Mumble.get_CurrentMap().get_Id()).ToList();
-			});
-			if (_encounters.Any((Encounter e) => e.Invalid))
-			{
-				((Control)timerCategories.AddMenuItem("Invalid Timers", (Texture2D)null)).add_Click((EventHandler<MouseEventArgs>)delegate
-				{
-					timerPanel.FilterChildren<TimerDetailsButton>((Func<TimerDetailsButton, bool>)((TimerDetailsButton db) => db.Encounter.Invalid));
-					_displayedTimerDetails = _allTimerDetails.Where((TimerDetailsButton db) => db.Encounter.Invalid).ToList();
-				});
-			}
-			List<IGrouping<string, Encounter>> categories = (from enc in _encounters
-				group enc by enc.Category).ToList();
-			if (_sortCategorySetting.get_Value())
-			{
-				categories.Sort((IGrouping<string, Encounter> cat1, IGrouping<string, Encounter> cat2) => cat1.Key.CompareTo(cat2.Key));
-			}
-			foreach (IGrouping<string, Encounter> category in categories)
-			{
-				((Control)timerCategories.AddMenuItem(category.Key, (Texture2D)null)).add_Click((EventHandler<MouseEventArgs>)delegate
-				{
-					timerPanel.FilterChildren<TimerDetailsButton>((Func<TimerDetailsButton, bool>)((TimerDetailsButton db) => string.Equals(db.Encounter.Category, category.Key)));
-					_displayedTimerDetails = _allTimerDetails.Where((TimerDetailsButton db) => string.Equals(db.Encounter.Category, category.Key)).ToList();
-				});
-			}
-			((Control)enableAllButton).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
-				if (timerCategories.get_SelectedMenuItem() != enabledTimers)
-				{
-					_displayedTimerDetails.ForEach(delegate(TimerDetailsButton db)
+					_displayedTimerDetails.ForEach(delegate(TimerDetails db)
 					{
-						//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-						if (!db.Encounter.Invalid)
+						if (db.Encounter.State != 0)
 						{
-							((GlowButton)((IEnumerable<Control>)((Container)db).get_Children()).Where((Control c) => c is GlowButton && ((GlowButton)c).get_ToggleGlow()).First()).set_Checked(true);
-							db.Encounter.Enabled = true;
-							_encounterEnableSettings["TimerEnable:" + db.Encounter.Id].set_Value(true);
+							db.Enabled = true;
 						}
 					});
 				}
-			});
-			((Control)disableAllButton).add_Click((EventHandler<MouseEventArgs>)delegate
+			};
+			disableAllButton.Click += delegate
 			{
-				_displayedTimerDetails.ForEach(delegate(TimerDetailsButton db)
+				_displayedTimerDetails.ForEach(delegate(TimerDetails db)
 				{
-					//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-					if (!db.Encounter.Invalid)
+					if (db.Encounter.State != 0)
 					{
-						((GlowButton)((IEnumerable<Control>)((Container)db).get_Children()).Where((Control c) => c is GlowButton && ((GlowButton)c).get_ToggleGlow()).First()).set_Checked(false);
-						db.Encounter.Enabled = false;
-						_encounterEnableSettings["TimerEnable:" + db.Encounter.Id].set_Value(false);
+						db.Enabled = false;
 					}
 				});
-				if (timerCategories.get_SelectedMenuItem() == enabledTimers)
+				if (timerCategories.SelectedMenuItem == enabledTimers)
 				{
-					timerPanel.FilterChildren<TimerDetailsButton>((Func<TimerDetailsButton, bool>)((TimerDetailsButton db) => db.Encounter.Enabled));
+					timerPanel.FilterChildren((TimerDetails db) => db.Enabled);
 				}
-			});
+			};
 			return mainPanel;
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
-			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged(_onNewMapLoaded);
-			_timersTab = GameService.Overlay.get_BlishHudWindow().AddTab("Timers", AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("textures\\155035small.png")), _tabPanel);
-			((Module)this).OnModuleLoaded(e);
+			GameService.Gw2Mumble.CurrentMap.MapChanged += _onNewMapLoaded;
+			_timersTab = GameService.Overlay.BlishHudWindow.AddTab("Timers", ContentsManager.GetTexture("textures\\155035small.png"), _tabPanel);
+			base.OnModuleLoaded(e);
 		}
 
 		protected override void Update(GameTime gameTime)
 		{
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
 			if (_encountersLoaded)
 			{
-				_activeEncounters.ForEach(delegate(Encounter enc)
+				foreach (Encounter activeEncounter in _activeEncounters)
 				{
-					enc.Update(gameTime);
-				});
+					activeEncounter.Update(gameTime);
+				}
 			}
-			if (((Control)_debugText).get_Visible())
+			if (_debugText.Visible)
 			{
-				_debugText.set_Text("Debug: " + GameService.Gw2Mumble.get_PlayerCharacter().get_Position().X.ToString("0.0") + " " + GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Y.ToString("0.0") + " " + GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Z.ToString("0.0") + " ");
+				_debugText.Text = "Debug: " + GameService.Gw2Mumble.PlayerCharacter.Position.X.ToString("0.0") + " " + GameService.Gw2Mumble.PlayerCharacter.Position.Y.ToString("0.0") + " " + GameService.Gw2Mumble.PlayerCharacter.Position.Z.ToString("0.0") + " ";
 			}
-			if (_centerAlertContainerSetting.get_Value())
+			if (_centerAlertContainerSetting.Value)
 			{
-				((Control)_alertContainer).set_Location(new Point(((Control)GameService.Graphics.get_SpriteScreen()).get_Width() / 2 - ((Control)_alertContainer).get_Width() / 2, ((Control)_alertContainer).get_Location().Y));
+				_alertContainer.Location = new Point(GameService.Graphics.SpriteScreen.Width / 2 - _alertContainer.Width / 2, _alertContainer.Location.Y);
 			}
 		}
 
 		protected override void Unload()
 		{
-			((Control)_debugText).Dispose();
-			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged(_onNewMapLoaded);
-			_showDebugSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingsUpdateShowDebug);
-			_lockAlertContainerSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingsUpdateLockAlertContainer);
-			_centerAlertContainerSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingsUpdateCenterAlertContainer);
-			_hideAlertsSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingsUpdateHideAlerts);
-			_hideDirectionsSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingsUpdateHideDirections);
-			_hideMarkersSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingsUpdateHideMarkers);
-			_alertSizeSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<AlertType>>)SettingsUpdateAlertSize);
-			_alertDisplayOrientationSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<ControlFlowDirection>>)SettingsUpdateAlertDisplayOrientation);
-			_alertContainerLocationSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<Point>>)SettingsUpdateAlertContainerLocation);
-			_alertMoveDelaySetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)SettingsUpdateAlertMoveDelay);
-			_alertFadeDelaySetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)SettingsUpdateAlertFadeDelay);
-			GameService.Overlay.get_BlishHudWindow().RemoveTab(_timersTab);
-			((Control)_tabPanel).Dispose();
-			_allTimerDetails.ForEach(delegate(TimerDetailsButton de)
+			_debugText.Dispose();
+			timerLoader?.Dispose();
+			GameService.Gw2Mumble.CurrentMap.MapChanged -= _onNewMapLoaded;
+			_showDebugSetting.SettingChanged -= SettingsUpdateShowDebug;
+			_lockAlertContainerSetting.SettingChanged -= SettingsUpdateLockAlertContainer;
+			_centerAlertContainerSetting.SettingChanged -= SettingsUpdateCenterAlertContainer;
+			_hideAlertsSetting.SettingChanged -= SettingsUpdateHideAlerts;
+			_hideDirectionsSetting.SettingChanged -= SettingsUpdateHideDirections;
+			_hideMarkersSetting.SettingChanged -= SettingsUpdateHideMarkers;
+			_alertSizeSetting.SettingChanged -= SettingsUpdateAlertSize;
+			_alertDisplayOrientationSetting.SettingChanged -= SettingsUpdateAlertDisplayOrientation;
+			_alertContainerLocationSetting.SettingChanged -= SettingsUpdateAlertContainerLocation;
+			_alertMoveDelaySetting.SettingChanged -= SettingsUpdateAlertMoveDelay;
+			_alertFadeDelaySetting.SettingChanged -= SettingsUpdateAlertFadeDelay;
+			GameService.Overlay.BlishHudWindow.RemoveTab(_timersTab);
+			_tabPanel.Dispose();
+			_allTimerDetails.ForEach(delegate(TimerDetails de)
 			{
-				((Control)de).Dispose();
+				de.Dispose();
 			});
 			_allTimerDetails.Clear();
-			((Control)_alertContainer).Dispose();
-			((Control)_alertSettingsWindow).Dispose();
+			_alertContainer.Dispose();
+			_alertSettingsWindow.Dispose();
 			_testAlertPanels.ForEach(delegate(IAlertPanel panel)
 			{
 				panel.Dispose();
@@ -1474,16 +1388,16 @@ namespace Charr.Timers_BlishHUD
 			_activeDirectionIds.Clear();
 			_activeMarkerIds.Clear();
 			_encounterIds.Clear();
-			_encounters.ForEach(delegate(Encounter enc)
+			foreach (Encounter encounter in _encounters)
 			{
-				enc.Dispose();
-			});
+				encounter.Dispose();
+			}
 			_encounters.Clear();
 			_activeEncounters.Clear();
-			_invalidEncounters.ForEach(delegate(Encounter enc)
+			foreach (Encounter invalidEncounter in _invalidEncounters)
 			{
-				enc.Dispose();
-			});
+				invalidEncounter.Dispose();
+			}
 			_invalidEncounters.Clear();
 			_pathableResourceManagers.ForEach(delegate(PathableResourceManager m)
 			{

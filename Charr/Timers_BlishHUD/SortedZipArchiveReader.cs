@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -34,9 +35,7 @@ namespace Charr.Timers_BlishHUD
 
 		public IDataReader GetSubPath(string subPath)
 		{
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Expected O, but got Unknown
-			return (IDataReader)new ZipArchiveReader(_archivePath, Path.Combine(subPath));
+			return new ZipArchiveReader(_archivePath, Path.Combine(subPath));
 		}
 
 		public string GetPathRepresentation(string relativeFilePath = null)
@@ -54,13 +53,20 @@ namespace Charr.Timers_BlishHUD
 			{
 				progress?.Report($"Loading {entry.get_Name()}...");
 				Stream entryStream = GetFileStream(entry.get_FullName());
-				loadFileFunc(entryStream, (IDataReader)(object)this);
+				loadFileFunc(entryStream, this);
 			}
 		}
 
 		public bool FileExists(string filePath)
 		{
 			return _archive.get_Entries().Any((ZipArchiveEntry entry) => string.Equals(GetUniformFileName(entry.get_FullName()), GetUniformFileName(Path.Combine(_subPath, filePath)), StringComparison.OrdinalIgnoreCase));
+		}
+
+		public List<ZipArchiveEntry> GetValidFileEntries(string fileExtension)
+		{
+			return (from e in _archive.get_Entries()
+				where e.get_Name().EndsWith(fileExtension ?? "", StringComparison.OrdinalIgnoreCase)
+				select e).ToList();
 		}
 
 		private string GetUniformFileName(string filePath)

@@ -127,7 +127,7 @@ namespace Charr.Timers_BlishHUD.Models
 			Icon = TimersModule.ModuleInstance.Resources.GetIcon(IconString);
 			if (Icon == null)
 			{
-				Icon = AsyncTexture2D.op_Implicit(resourceManager.LoadTexture(IconString));
+				Icon = resourceManager.LoadTexture(IconString);
 			}
 			activePanels = new Dictionary<float, IAlertPanel>();
 			return null;
@@ -164,32 +164,32 @@ namespace Charr.Timers_BlishHUD.Models
 			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
 			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-			IAlertPanel alertPanel3;
-			if (TimersModule.ModuleInstance._alertSizeSetting.get_Value() != AlertType.BigWigStyle)
+			IAlertPanel alertPanel2;
+			if (TimersModule.ModuleInstance._alertSizeSetting.Value != AlertType.BigWigStyle)
 			{
-				AlertPanel alertPanel = new AlertPanel();
-				((FlowPanel)alertPanel).set_ControlPadding(new Vector2(8f, 8f));
-				((FlowPanel)alertPanel).set_PadLeftBeforeControl(true);
-				((FlowPanel)alertPanel).set_PadTopBeforeControl(true);
-				IAlertPanel alertPanel2 = alertPanel;
-				alertPanel3 = alertPanel2;
+				IAlertPanel alertPanel = new AlertPanel
+				{
+					ControlPadding = new Vector2(8f, 8f),
+					PadLeftBeforeControl = true,
+					PadTopBeforeControl = true
+				};
+				alertPanel2 = alertPanel;
 			}
 			else
 			{
-				IAlertPanel alertPanel2 = new BigWigAlert();
-				alertPanel3 = alertPanel2;
+				IAlertPanel alertPanel = new BigWigAlert();
+				alertPanel2 = alertPanel;
 			}
-			alertPanel3.Text = (string.IsNullOrEmpty(WarningText) ? AlertText : WarningText);
-			alertPanel3.TextColor = (string.IsNullOrEmpty(WarningText) ? AlertColor : WarningColor);
-			alertPanel3.Icon = AsyncTexture2D.op_Implicit(Texture2DExtension.Duplicate(AsyncTexture2D.op_Implicit(Icon)));
-			alertPanel3.FillColor = Fill;
-			alertPanel3.MaxFill = (string.IsNullOrEmpty(WarningText) ? 0f : WarningDuration);
-			alertPanel3.CurrentFill = 0f;
-			alertPanel3.ShouldShow = ShowAlert;
-			((Control)alertPanel3).set_Parent((Container)(object)TimersModule.ModuleInstance._alertContainer);
+			alertPanel2.Text = (string.IsNullOrEmpty(WarningText) ? AlertText : WarningText);
+			alertPanel2.TextColor = (string.IsNullOrEmpty(WarningText) ? AlertColor : WarningColor);
+			alertPanel2.Icon = Texture2DExtension.Duplicate(Icon);
+			alertPanel2.FillColor = Fill;
+			alertPanel2.MaxFill = (string.IsNullOrEmpty(WarningText) ? 0f : WarningDuration);
+			alertPanel2.CurrentFill = 0f;
+			alertPanel2.ShouldShow = ShowAlert;
+			((Control)alertPanel2).Parent = TimersModule.ModuleInstance._alertContainer;
 			TimersModule.ModuleInstance._alertContainer.UpdateDisplay();
-			return alertPanel3;
+			return alertPanel2;
 		}
 
 		public void Update(float elapsedTime)

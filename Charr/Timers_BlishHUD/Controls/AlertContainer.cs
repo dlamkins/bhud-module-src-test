@@ -1,7 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Glide;
@@ -66,9 +66,9 @@ namespace Charr.Timers_BlishHUD.Controls
 				//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 				//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-				if (((Control)this).SetProperty<bool>(ref _lock, value, false, "Lock"))
+				if (SetProperty(ref _lock, value, invalidateLayout: false, "Lock"))
 				{
-					((Control)this).set_BackgroundColor((Color)(_lock ? Color.get_Transparent() : new Color(Color.get_Black(), 0.3f)));
+					base.BackgroundColor = (Color)(_lock ? Color.get_Transparent() : new Color(Color.get_Black(), 0.3f));
 				}
 			}
 		}
@@ -83,7 +83,7 @@ namespace Charr.Timers_BlishHUD.Controls
 			set
 			{
 				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-				((Control)this).SetProperty<Vector2>(ref _controlPadding, value, true, "ControlPadding");
+				SetProperty(ref _controlPadding, value, invalidateLayout: true, "ControlPadding");
 			}
 		}
 
@@ -97,7 +97,7 @@ namespace Charr.Timers_BlishHUD.Controls
 			set
 			{
 				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-				((Control)this).SetProperty<Vector2>(ref _outerControlPadding, value, true, "OuterControlPadding");
+				SetProperty(ref _outerControlPadding, value, invalidateLayout: true, "OuterControlPadding");
 			}
 		}
 
@@ -110,7 +110,7 @@ namespace Charr.Timers_BlishHUD.Controls
 			}
 			set
 			{
-				((Control)this).SetProperty<bool>(ref _padLeftBeforeControl, value, true, "PadLeftBeforeControl");
+				SetProperty(ref _padLeftBeforeControl, value, invalidateLayout: true, "PadLeftBeforeControl");
 			}
 		}
 
@@ -123,7 +123,7 @@ namespace Charr.Timers_BlishHUD.Controls
 			}
 			set
 			{
-				((Control)this).SetProperty<bool>(ref _padTopBeforeControl, value, true, "PadTopBeforeControl");
+				SetProperty(ref _padTopBeforeControl, value, invalidateLayout: true, "PadTopBeforeControl");
 			}
 		}
 
@@ -131,62 +131,60 @@ namespace Charr.Timers_BlishHUD.Controls
 		{
 			get
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				return _flowDirection;
 			}
 			set
 			{
-				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-				((Control)this).SetProperty<ControlFlowDirection>(ref _flowDirection, value, true, "FlowDirection");
+				SetProperty(ref _flowDirection, value, invalidateLayout: true, "FlowDirection");
 			}
 		}
 
 		protected override void OnChildAdded(ChildChangedEventArgs e)
 		{
-			((Panel)this).OnChildAdded(e);
+			base.OnChildAdded(e);
 			OnChildrenChanged(e);
-			e.get_ChangedChild().add_Resized((EventHandler<ResizedEventArgs>)ChangedChildOnResized);
+			e.ChangedChild.Resized += ChangedChildOnResized;
 		}
 
 		protected override void OnChildRemoved(ChildChangedEventArgs e)
 		{
-			((Panel)this).OnChildRemoved(e);
+			base.OnChildRemoved(e);
 			OnChildrenChanged(e);
-			e.get_ChangedChild().remove_Resized((EventHandler<ResizedEventArgs>)ChangedChildOnResized);
+			e.ChangedChild.Resized -= ChangedChildOnResized;
 		}
 
 		private void ChangedChildOnResized(object sender, ResizedEventArgs e)
 		{
-			ReflowChildLayout(((Container)this)._children.ToArray());
+			ReflowChildLayout(_children.ToArray());
 		}
 
 		private void OnChildrenChanged(ChildChangedEventArgs e)
 		{
-			ReflowChildLayout(e.get_ResultingChildren().ToArray());
+			ReflowChildLayout(e.ResultingChildren.ToArray());
 		}
 
 		public override void RecalculateLayout()
 		{
-			ReflowChildLayout(((Container)this)._children.ToArray());
-			((Panel)this).RecalculateLayout();
+			ReflowChildLayout(_children.ToArray());
+			base.RecalculateLayout();
 		}
 
 		public void FilterChildren<TControl>(Func<TControl, bool> filter) where TControl : Control
 		{
-			((IEnumerable)((Container)this)._children).Cast<TControl>().ToList().ForEach(delegate(TControl tc)
+			_children.Cast<TControl>().ToList().ForEach(delegate(TControl tc)
 			{
-				((Control)tc).set_Visible(filter(tc));
+				tc.Visible = filter(tc);
 			});
-			ReflowChildLayout(((Container)this)._children.ToArray());
+			ReflowChildLayout(_children.ToArray());
 		}
 
 		public void SortChildren<TControl>(Comparison<TControl> comparison) where TControl : Control
 		{
-			List<TControl> tempChildren = ((IEnumerable)((Container)this)._children).Cast<TControl>().ToList();
+			List<TControl> tempChildren = _children.Cast<TControl>().ToList();
 			tempChildren.Sort(comparison);
-			((IEnumerable<Control>)((Container)this)._children).Select((Func<Control, bool>)((Container)this)._children.Remove);
-			((Container)this)._children.AddRange((IEnumerable<Control>)tempChildren);
-			ReflowChildLayout(((Container)this)._children.ToArray());
+			_children.Select(_children.Remove);
+			_children.AddRange(tempChildren);
+			ReflowChildLayout(_children.ToArray());
 		}
 
 		private void ReflowChildLayoutLeftToRight(IEnumerable<Control> allChildren)
@@ -196,16 +194,16 @@ namespace Charr.Timers_BlishHUD.Controls
 			float nextBottom;
 			float currentBottom = (nextBottom = (_padTopBeforeControl ? _controlPadding.Y : _outerControlPadding.Y));
 			float lastRight = outerPadX;
-			foreach (Control child in allChildren.Where((Control c) => c.get_Visible()))
+			foreach (Control child in allChildren.Where((Control c) => c.Visible))
 			{
-				if ((float)child.get_Width() >= (float)((Control)this).get_Width() - lastRight)
+				if ((float)child.Width >= (float)base.Width - lastRight)
 				{
 					currentBottom = nextBottom + _controlPadding.Y;
 					lastRight = outerPadX;
 				}
-				child.set_Location(new Point((int)lastRight, (int)currentBottom));
-				lastRight = (float)child.get_Right() + _controlPadding.X;
-				nextBottom = Math.Max(nextBottom, child.get_Bottom());
+				child.Location = new Point((int)lastRight, (int)currentBottom);
+				lastRight = (float)child.Right + _controlPadding.X;
+				nextBottom = Math.Max(nextBottom, child.Bottom);
 			}
 		}
 
@@ -217,17 +215,17 @@ namespace Charr.Timers_BlishHUD.Controls
 			float outerPadX = (_padLeftBeforeControl ? _controlPadding.X : _outerControlPadding.X);
 			float nextBottom;
 			float currentBottom = (nextBottom = (_padTopBeforeControl ? _controlPadding.Y : _outerControlPadding.Y));
-			float lastLeft = ((_anchor == Point.get_Zero()) ? ((float)((Control)this).get_Width() - outerPadX) : ((float)_anchor.X - outerPadX));
-			foreach (Control child in allChildren.Where((Control c) => c.get_Visible()))
+			float lastLeft = ((_anchor == Point.get_Zero()) ? ((float)base.Width - outerPadX) : ((float)_anchor.X - outerPadX));
+			foreach (Control child in allChildren.Where((Control c) => c.Visible))
 			{
-				if (outerPadX > lastLeft - (float)child.get_Width())
+				if (outerPadX > lastLeft - (float)child.Width)
 				{
 					currentBottom = nextBottom + _controlPadding.Y;
-					lastLeft = (float)((Control)this).get_Width() - outerPadX;
+					lastLeft = (float)base.Width - outerPadX;
 				}
-				child.set_Location(new Point((int)(lastLeft - (float)child.get_Width()), (int)currentBottom));
-				lastLeft = (float)child.get_Left() - _controlPadding.X;
-				nextBottom = Math.Max(nextBottom, child.get_Bottom());
+				child.Location = new Point((int)(lastLeft - (float)child.Width), (int)currentBottom);
+				lastLeft = (float)child.Left - _controlPadding.X;
+				nextBottom = Math.Max(nextBottom, child.Bottom);
 			}
 		}
 
@@ -239,16 +237,16 @@ namespace Charr.Timers_BlishHUD.Controls
 			float nextRight = outerPadX;
 			float currentRight = outerPadX;
 			float lastBottom = outerPadY;
-			foreach (Control child in allChildren.Where((Control c) => c.get_Visible()))
+			foreach (Control child in allChildren.Where((Control c) => c.Visible))
 			{
-				if ((float)child.get_Height() >= (float)((Control)this).get_Height() - lastBottom)
+				if ((float)child.Height >= (float)base.Height - lastBottom)
 				{
 					currentRight = nextRight + _controlPadding.X;
 					lastBottom = outerPadY;
 				}
-				child.set_Location(new Point((int)currentRight, (int)lastBottom));
-				lastBottom = (float)child.get_Bottom() + _controlPadding.Y;
-				nextRight = Math.Max(nextRight, child.get_Right());
+				child.Location = new Point((int)currentRight, (int)lastBottom);
+				lastBottom = (float)child.Bottom + _controlPadding.Y;
+				nextRight = Math.Max(nextRight, child.Right);
 			}
 		}
 
@@ -261,17 +259,17 @@ namespace Charr.Timers_BlishHUD.Controls
 			float outerPadY = (_padTopBeforeControl ? _controlPadding.Y : _outerControlPadding.Y);
 			float nextRight = num;
 			float currentRight = num;
-			float lastTop = ((_anchor == Point.get_Zero()) ? ((float)((Control)this).get_Height() - outerPadY) : ((float)_anchor.Y - outerPadY));
-			foreach (Control child in allChildren.Where((Control c) => c.get_Visible()))
+			float lastTop = ((_anchor == Point.get_Zero()) ? ((float)base.Height - outerPadY) : ((float)_anchor.Y - outerPadY));
+			foreach (Control child in allChildren.Where((Control c) => c.Visible))
 			{
-				if (outerPadY > lastTop - (float)child.get_Height())
+				if (outerPadY > lastTop - (float)child.Height)
 				{
 					currentRight = nextRight + _controlPadding.X;
-					lastTop = (float)((Control)this).get_Height() - outerPadY;
+					lastTop = (float)base.Height - outerPadY;
 				}
-				child.set_Location(new Point((int)currentRight, (int)(lastTop - (float)child.get_Height())));
-				lastTop = (float)child.get_Top() - _controlPadding.Y;
-				nextRight = Math.Max(nextRight, child.get_Right());
+				child.Location = new Point((int)currentRight, (int)(lastTop - (float)child.Height));
+				lastTop = (float)child.Top - _controlPadding.Y;
+				nextRight = Math.Max(nextRight, child.Right);
 			}
 		}
 
@@ -304,13 +302,13 @@ namespace Charr.Timers_BlishHUD.Controls
 					_previousLocations[child] = _newLocations[child];
 					_newLocations[child] = new Point((int)lastLeft, (int)outerPadY);
 				}
-				lastLeft = (float)(_newLocations[child].X + child.get_Width()) + _controlPadding.X;
+				lastLeft = (float)(_newLocations[child].X + child.Width) + _controlPadding.X;
 			}
 			foreach (Control child2 in allChildren)
 			{
 				if (noAnim)
 				{
-					child2.set_Location(_newLocations[child2]);
+					child2.Location = _newLocations[child2];
 					_animMoves.Clear();
 				}
 				else
@@ -319,18 +317,18 @@ namespace Charr.Timers_BlishHUD.Controls
 					{
 						continue;
 					}
-					if (child2.get_Location().X > _newLocations[child2].X)
+					if (child2.Location.X > _newLocations[child2].X)
 					{
 						if (_animMoves.TryGetValue(child2, out var animMove))
 						{
 							animMove.Cancel();
 							_animMoves.Remove(child2);
 						}
-						animMove = ((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<Control>(child2, (object)new
+						animMove = Control.Animation.Tweener.Tween(child2, new
 						{
 							Location = _newLocations[child2]
-						}, TimersModule.ModuleInstance._alertFadeDelaySetting.get_Value(), 0f, true).Ease((Func<float, float>)Ease.CubeInOut);
-						animMove.OnComplete((Action)delegate
+						}, TimersModule.ModuleInstance._alertFadeDelaySetting.Value).Ease(Ease.CubeInOut);
+						animMove.OnComplete(delegate
 						{
 							_animMoves.Remove(child2);
 						});
@@ -338,7 +336,7 @@ namespace Charr.Timers_BlishHUD.Controls
 					}
 					else
 					{
-						child2.set_Location(_newLocations[child2]);
+						child2.Location = _newLocations[child2];
 					}
 				}
 			}
@@ -368,33 +366,33 @@ namespace Charr.Timers_BlishHUD.Controls
 				{
 					if (child2 == allChildren.First())
 					{
-						offset = _newLocations[child2].X - (((Control)this).get_Width() - (int)outerPadX);
+						offset = _newLocations[child2].X - (base.Width - (int)outerPadX);
 					}
-					child2.set_Right(_newLocations[child2].X - offset);
+					child2.Right = _newLocations[child2].X - offset;
 				}
 				return;
 			}
-			float lastRight = (float)((Control)this).get_Width() - outerPadX;
+			float lastRight = (float)base.Width - outerPadX;
 			foreach (Control child in allChildren)
 			{
 				if (!_newLocations.ContainsKey(child))
 				{
 					_newLocations.Add(child, new Point((int)lastRight, (int)outerPadY));
-					_previousLocations.Add(child, child.get_Location());
+					_previousLocations.Add(child, child.Location);
 				}
 				else
 				{
 					_previousLocations[child] = _newLocations[child];
 					_newLocations[child] = new Point((int)lastRight, (int)outerPadY);
 				}
-				lastRight = (float)(_newLocations[child].X - child.get_Width()) - _controlPadding.X;
+				lastRight = (float)(_newLocations[child].X - child.Width) - _controlPadding.X;
 			}
 			foreach (Control child3 in allChildren)
 			{
 				if (noAnim)
 				{
-					child3.set_Location(new Point(child3.get_Location().X, _newLocations[child3].Y));
-					child3.set_Right(_newLocations[child3].X);
+					child3.Location = new Point(child3.Location.X, _newLocations[child3].Y);
+					child3.Right = _newLocations[child3].X;
 					_animMoves.Clear();
 					continue;
 				}
@@ -403,15 +401,15 @@ namespace Charr.Timers_BlishHUD.Controls
 					animMove.Cancel();
 					_animMoves.Remove(child3);
 				}
-				animMove = ((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<Control>(child3, (object)new
+				animMove = Control.Animation.Tweener.Tween(child3, new
 				{
 					Right = _newLocations[child3].X
-				}, TimersModule.ModuleInstance._alertFadeDelaySetting.get_Value(), 0f, true).Ease((Func<float, float>)Ease.CubeInOut);
-				animMove.OnComplete((Action)delegate
+				}, TimersModule.ModuleInstance._alertFadeDelaySetting.Value).Ease(Ease.CubeInOut);
+				animMove.OnComplete(delegate
 				{
 					//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 					_animMoves.Remove(child3);
-					child3.set_Right(_newLocations[child3].X);
+					child3.Right = _newLocations[child3].X;
 				});
 				_animMoves.Add(child3, animMove);
 			}
@@ -446,13 +444,13 @@ namespace Charr.Timers_BlishHUD.Controls
 					_previousLocations[child] = _newLocations[child];
 					_newLocations[child] = new Point((int)outerPadX, (int)lastBottom);
 				}
-				lastBottom = (float)(_newLocations[child].Y + child.get_Height()) + _controlPadding.Y;
+				lastBottom = (float)(_newLocations[child].Y + child.Height) + _controlPadding.Y;
 			}
 			foreach (Control child2 in allChildren)
 			{
 				if (noAnim)
 				{
-					child2.set_Location(_newLocations[child2]);
+					child2.Location = _newLocations[child2];
 					_animMoves.Clear();
 				}
 				else
@@ -461,18 +459,18 @@ namespace Charr.Timers_BlishHUD.Controls
 					{
 						continue;
 					}
-					if (child2.get_Location().Y > _newLocations[child2].Y)
+					if (child2.Location.Y > _newLocations[child2].Y)
 					{
 						if (_animMoves.TryGetValue(child2, out var animMove))
 						{
 							animMove.Cancel();
 							_animMoves.Remove(child2);
 						}
-						animMove = ((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<Control>(child2, (object)new
+						animMove = Control.Animation.Tweener.Tween(child2, new
 						{
 							Location = _newLocations[child2]
-						}, TimersModule.ModuleInstance._alertFadeDelaySetting.get_Value(), 0f, true).Ease((Func<float, float>)Ease.CubeInOut);
-						animMove.OnComplete((Action)delegate
+						}, TimersModule.ModuleInstance._alertFadeDelaySetting.Value).Ease(Ease.CubeInOut);
+						animMove.OnComplete(delegate
 						{
 							_animMoves.Remove(child2);
 						});
@@ -480,7 +478,7 @@ namespace Charr.Timers_BlishHUD.Controls
 					}
 					else
 					{
-						child2.set_Location(_newLocations[child2]);
+						child2.Location = _newLocations[child2];
 					}
 				}
 			}
@@ -510,33 +508,33 @@ namespace Charr.Timers_BlishHUD.Controls
 				{
 					if (child2 == allChildren.First())
 					{
-						offset = _newLocations[child2].Y - (((Control)this).get_Height() - (int)outerPadY);
+						offset = _newLocations[child2].Y - (base.Height - (int)outerPadY);
 					}
-					child2.set_Bottom(_newLocations[child2].Y - offset);
+					child2.Bottom = _newLocations[child2].Y - offset;
 				}
 				return;
 			}
-			float lastBottom = (float)((Control)this).get_Height() - outerPadY;
+			float lastBottom = (float)base.Height - outerPadY;
 			foreach (Control child in allChildren)
 			{
 				if (!_newLocations.ContainsKey(child))
 				{
 					_newLocations.Add(child, new Point((int)outerPadX, (int)lastBottom));
-					_previousLocations.Add(child, child.get_Location());
+					_previousLocations.Add(child, child.Location);
 				}
 				else
 				{
 					_previousLocations[child] = _newLocations[child];
 					_newLocations[child] = new Point((int)outerPadX, (int)lastBottom);
 				}
-				lastBottom = (float)(_newLocations[child].Y - child.get_Height()) - _controlPadding.Y;
+				lastBottom = (float)(_newLocations[child].Y - child.Height) - _controlPadding.Y;
 			}
 			foreach (Control child3 in allChildren)
 			{
 				if (noAnim)
 				{
-					child3.set_Location(new Point(_newLocations[child3].X, child3.get_Location().Y));
-					child3.set_Bottom(_newLocations[child3].Y);
+					child3.Location = new Point(_newLocations[child3].X, child3.Location.Y);
+					child3.Bottom = _newLocations[child3].Y;
 					_animMoves.Clear();
 					continue;
 				}
@@ -545,15 +543,15 @@ namespace Charr.Timers_BlishHUD.Controls
 					animMove.Cancel();
 					_animMoves.Remove(child3);
 				}
-				animMove = ((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<Control>(child3, (object)new
+				animMove = Control.Animation.Tweener.Tween(child3, new
 				{
 					Bottom = _newLocations[child3].Y
-				}, TimersModule.ModuleInstance._alertFadeDelaySetting.get_Value(), 0f, true).Ease((Func<float, float>)Ease.CubeInOut);
-				animMove.OnComplete((Action)delegate
+				}, TimersModule.ModuleInstance._alertFadeDelaySetting.Value).Ease(Ease.CubeInOut);
+				animMove.OnComplete(delegate
 				{
 					//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 					_animMoves.Remove(child3);
-					child3.set_Bottom(_newLocations[child3].Y);
+					child3.Bottom = _newLocations[child3].Y;
 				});
 				_animMoves.Add(child3, animMove);
 			}
@@ -562,43 +560,37 @@ namespace Charr.Timers_BlishHUD.Controls
 
 		private void ReflowChildLayout(Control[] allChildren)
 		{
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Expected I4, but got Unknown
-			IEnumerable<Control> filteredChildren = allChildren.Where((Control c) => ((object)c).GetType() != typeof(Scrollbar) && c.get_Visible());
-			ControlFlowDirection flowDirection = _flowDirection;
-			switch ((int)flowDirection)
+			IEnumerable<Control> filteredChildren = allChildren.Where((Control c) => c.GetType() != typeof(Scrollbar) && c.Visible);
+			switch (_flowDirection)
 			{
-			case 0:
+			case ControlFlowDirection.LeftToRight:
 				ReflowChildLayoutLeftToRight(filteredChildren);
 				break;
-			case 4:
+			case ControlFlowDirection.RightToLeft:
 				ReflowChildLayoutRightToLeft(filteredChildren);
 				break;
-			case 1:
+			case ControlFlowDirection.TopToBottom:
 				ReflowChildLayoutTopToBottom(filteredChildren);
 				break;
-			case 6:
+			case ControlFlowDirection.BottomToTop:
 				ReflowChildLayoutBottomToTop(filteredChildren);
 				break;
-			case 2:
+			case ControlFlowDirection.SingleLeftToRight:
 				ReflowChildLayoutSingleLeftToRight(filteredChildren);
 				break;
-			case 5:
+			case ControlFlowDirection.SingleRightToLeft:
 				ReflowChildLayoutSingleRightToLeft(filteredChildren);
 				break;
-			case 3:
+			case ControlFlowDirection.SingleTopToBottom:
 				ReflowChildLayoutSingleTopToBottom(filteredChildren);
 				break;
-			case 7:
+			case ControlFlowDirection.SingleBottomToTop:
 				ReflowChildLayoutSingleBottomToTop(filteredChildren);
 				break;
 			}
 		}
 
 		public AlertContainer()
-			: this()
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
@@ -608,89 +600,98 @@ namespace Charr.Timers_BlishHUD.Controls
 			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			Control.get_Input().get_Mouse().add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
+			GameService.Input.Mouse.LeftMouseButtonReleased += delegate(object sender, MouseEventArgs args)
 			{
-				Dragging = false;
-			});
+				HandleLeftMouseButtonReleased(args);
+			};
 			_animSizeChange = null;
-			((Container)this).add_ChildAdded((EventHandler<ChildChangedEventArgs>)delegate
+			base.ChildAdded += delegate
 			{
 				canChangeSize = false;
-				Tween animSizeChange2 = _animSizeChange;
-				if (animSizeChange2 != null)
-				{
-					animSizeChange2.Cancel();
-				}
+				_animSizeChange?.Cancel();
 				UpdateDisplay();
-			});
-			((Container)this).add_ChildRemoved((EventHandler<ChildChangedEventArgs>)delegate
+			};
+			base.ChildRemoved += delegate
 			{
 				canChangeSize = false;
-				Tween animSizeChange = _animSizeChange;
-				if (animSizeChange != null)
-				{
-					animSizeChange.Cancel();
-				}
+				_animSizeChange?.Cancel();
 				UpdateDisplay();
-			});
+			};
 		}
 
 		protected override CaptureType CapturesInput()
 		{
-			if (!Lock && ((Control)this).get_Visible())
+			if (Lock || !base.Visible)
 			{
-				return (CaptureType)13;
+				return CaptureType.DoNotBlock;
 			}
-			return (CaptureType)0;
-		}
-
-		protected override void OnMouseMoved(MouseEventArgs e)
-		{
-			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			MouseOverPanel = false;
-			int y = ((Control)this).get_RelativeMousePosition().Y;
-			Rectangle contentRegion = ((Container)this).get_ContentRegion();
-			if (y < ((Rectangle)(ref contentRegion)).get_Bottom())
-			{
-				MouseOverPanel = true;
-			}
-			((Control)this).OnMouseMoved(e);
-		}
-
-		protected override void OnMouseLeft(MouseEventArgs e)
-		{
-			MouseOverPanel = false;
-			((Control)this).OnMouseLeft(e);
+			return base.CapturesInput();
 		}
 
 		protected override void OnLeftMouseButtonPressed(MouseEventArgs e)
 		{
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			if (MouseOverPanel)
+			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			if (!Lock)
 			{
+				DragStart = base.RelativeMousePosition;
 				Dragging = true;
-				DragStart = Control.get_Input().get_Mouse().get_Position();
 			}
-			((Control)this).OnLeftMouseButtonPressed(e);
+			base.OnLeftMouseButtonPressed(e);
 		}
 
-		protected override void OnLeftMouseButtonReleased(MouseEventArgs e)
+		public void HandleLeftMouseButtonReleased(MouseEventArgs e)
 		{
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
 			Dragging = false;
-			((Control)this).OnLeftMouseButtonReleased(e);
+			switch (FlowDirection)
+			{
+			case ControlFlowDirection.SingleLeftToRight:
+			case ControlFlowDirection.SingleTopToBottom:
+			{
+				Point newLoc = base.Location;
+				newLoc.X = Math.Max(base.Location.X, 0);
+				newLoc.X = Math.Min(newLoc.X, GameService.Graphics.SpriteScreen.Width - base.Width / 2);
+				newLoc.Y = Math.Max(base.Location.Y, 0);
+				newLoc.Y = Math.Min(newLoc.Y, GameService.Graphics.SpriteScreen.Height - base.Height / 2);
+				base.Location = newLoc;
+				break;
+			}
+			case ControlFlowDirection.SingleRightToLeft:
+			case ControlFlowDirection.SingleBottomToTop:
+			{
+				Point newAnchor = _anchor;
+				newAnchor.X = Math.Max(_anchor.X, base.Width / 2);
+				newAnchor.X = Math.Min(newAnchor.X, GameService.Graphics.SpriteScreen.Width);
+				newAnchor.Y = Math.Max(_anchor.Y, base.Height / 2);
+				newAnchor.Y = Math.Min(newAnchor.Y, GameService.Graphics.SpriteScreen.Height);
+				_anchor = newAnchor;
+				break;
+			}
+			}
+			ContainerDragged?.Invoke(this, EventArgs.Empty);
 		}
 
 		public int GetChildrenMaxHeight()
 		{
 			int maxHeight = 0;
-			foreach (Control child in ((Container)this).get_Children())
+			foreach (Control child in base.Children)
 			{
-				if (child.get_Height() > maxHeight && child.get_Height() <= TimersModule.ModuleInstance.Resources.MAX_ALERT_HEIGHT)
+				if (child.Height > maxHeight && child.Height <= TimersModule.ModuleInstance.Resources.MAX_ALERT_HEIGHT)
 				{
-					maxHeight = child.get_Height();
+					maxHeight = child.Height;
 				}
 			}
 			return maxHeight;
@@ -699,11 +700,11 @@ namespace Charr.Timers_BlishHUD.Controls
 		public int GetChildrenMaxWidth()
 		{
 			int maxWidth = 0;
-			foreach (Control child in ((Container)this).get_Children())
+			foreach (Control child in base.Children)
 			{
-				if (child.get_Width() > maxWidth && child.get_Width() <= TimersModule.ModuleInstance.Resources.MAX_ALERT_WIDTH)
+				if (child.Width > maxWidth && child.Width <= TimersModule.ModuleInstance.Resources.MAX_ALERT_WIDTH)
 				{
-					maxWidth = child.get_Width();
+					maxWidth = child.Width;
 				}
 			}
 			return maxWidth;
@@ -711,20 +712,6 @@ namespace Charr.Timers_BlishHUD.Controls
 
 		public void UpdateDisplay()
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0007: Invalid comparison between Unknown and I4
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0019: Invalid comparison between Unknown and I4
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Invalid comparison between Unknown and I4
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Expected I4, but got Unknown
 			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
@@ -733,59 +720,41 @@ namespace Charr.Timers_BlishHUD.Controls
 			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0171: Expected I4, but got Unknown
 			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01e1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0206: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0213: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0219: Invalid comparison between Unknown and I4
-			//IL_022f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0235: Invalid comparison between Unknown and I4
-			//IL_0294: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0299: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02bc: Expected I4, but got Unknown
-			if ((int)FlowDirection == 1)
+			if (FlowDirection == ControlFlowDirection.TopToBottom)
 			{
-				FlowDirection = (ControlFlowDirection)3;
+				FlowDirection = ControlFlowDirection.SingleTopToBottom;
 			}
-			else if ((int)FlowDirection == 6)
+			else if (FlowDirection == ControlFlowDirection.BottomToTop)
 			{
-				FlowDirection = (ControlFlowDirection)7;
+				FlowDirection = ControlFlowDirection.SingleBottomToTop;
 			}
-			else if ((int)FlowDirection == 0)
+			else if (FlowDirection == ControlFlowDirection.LeftToRight)
 			{
-				FlowDirection = (ControlFlowDirection)2;
+				FlowDirection = ControlFlowDirection.SingleLeftToRight;
 			}
-			else if ((int)FlowDirection == 4)
+			else if (FlowDirection == ControlFlowDirection.RightToLeft)
 			{
-				FlowDirection = (ControlFlowDirection)5;
+				FlowDirection = ControlFlowDirection.SingleRightToLeft;
 			}
-			ControlFlowDirection flowDirection;
 			if (_previousFlowDirection != FlowDirection)
 			{
-				flowDirection = FlowDirection;
-				switch (flowDirection - 2)
+				switch (FlowDirection)
 				{
-				case 0:
-				case 1:
+				case ControlFlowDirection.SingleLeftToRight:
+				case ControlFlowDirection.SingleTopToBottom:
 					_anchor = Point.get_Zero();
 					break;
-				case 3:
-					_anchor = new Point(((Control)this).get_Right(), ((Control)this).get_Location().Y);
+				case ControlFlowDirection.SingleRightToLeft:
+					_anchor = new Point(base.Right, base.Location.Y);
 					break;
-				case 5:
-					_anchor = new Point(((Control)this).get_Location().X, ((Control)this).get_Bottom());
+				case ControlFlowDirection.SingleBottomToTop:
+					_anchor = new Point(base.Location.X, base.Bottom);
 					break;
 				}
 				SizeChanging = false;
@@ -793,178 +762,150 @@ namespace Charr.Timers_BlishHUD.Controls
 				_newLocations.Clear();
 				_previousLocations.Clear();
 				_animMoves.Clear();
-				ReflowChildLayout(((Container)this).get_Children().ToArray());
+				ReflowChildLayout(base.Children.ToArray());
 			}
 			_previousFlowDirection = FlowDirection;
 			int maxHeight = GetChildrenMaxHeight();
 			int maxWidth = GetChildrenMaxWidth();
 			int previousHeight = _newHeight;
 			int previousWidth = _newWidth;
-			_newHeight = ((Control)this).get_Height();
-			_newWidth = ((Control)this).get_Width();
-			flowDirection = FlowDirection;
-			switch (flowDirection - 2)
+			_newHeight = base.Height;
+			_newWidth = base.Width;
+			switch (FlowDirection)
 			{
-			case 1:
-			case 5:
-				_newHeight = maxHeight * ((Container)this).get_Children().get_Count() + (int)ControlPadding.Y * (((Container)this).get_Children().get_Count() + 1);
+			case ControlFlowDirection.SingleTopToBottom:
+			case ControlFlowDirection.SingleBottomToTop:
+				_newHeight = maxHeight * base.Children.Count + (int)ControlPadding.Y * (base.Children.Count + 1);
 				_newWidth = maxWidth + (int)ControlPadding.X * 2;
 				break;
-			case 0:
-			case 3:
+			case ControlFlowDirection.SingleLeftToRight:
+			case ControlFlowDirection.SingleRightToLeft:
 				_newHeight = maxHeight + (int)ControlPadding.Y * 2;
-				_newWidth = maxWidth * ((Container)this).get_Children().get_Count() + (int)ControlPadding.X * (((Container)this).get_Children().get_Count() + 1);
+				_newWidth = maxWidth * base.Children.Count + (int)ControlPadding.X * (base.Children.Count + 1);
 				break;
 			}
 			if (_anchor != Point.get_Zero())
 			{
-				if ((int)FlowDirection == 5)
+				if (FlowDirection == ControlFlowDirection.SingleRightToLeft)
 				{
-					((Control)this).set_Right(_anchor.X);
+					base.Right = _anchor.X;
 				}
-				else if ((int)FlowDirection == 7)
+				else if (FlowDirection == ControlFlowDirection.SingleBottomToTop)
 				{
-					((Control)this).set_Bottom(_anchor.Y);
+					base.Bottom = _anchor.Y;
 				}
 			}
 			if (!canChangeSize)
 			{
 				SizeChanging = false;
-				ReflowChildLayout(((Container)this).get_Children().ToArray());
+				ReflowChildLayout(base.Children.ToArray());
 			}
 			else if (previousWidth != _newWidth || previousHeight != _newHeight)
 			{
-				Tween animSizeChange = _animSizeChange;
-				if (animSizeChange != null)
+				_animSizeChange?.Cancel();
+				switch (FlowDirection)
 				{
-					animSizeChange.Cancel();
-				}
-				flowDirection = FlowDirection;
-				switch (flowDirection - 2)
-				{
-				case 1:
-				case 5:
-					((Control)this).set_Width(_newWidth);
+				case ControlFlowDirection.SingleTopToBottom:
+				case ControlFlowDirection.SingleBottomToTop:
+					base.Width = _newWidth;
 					SizeChanging = false;
 					noAnim = false;
-					ReflowChildLayout(((Container)this).get_Children().ToArray());
-					_animSizeChange = ((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<AlertContainer>(this, (object)new
+					ReflowChildLayout(base.Children.ToArray());
+					_animSizeChange = Control.Animation.Tweener.Tween(this, new
 					{
 						Height = _newHeight
-					}, TimersModule.ModuleInstance._alertMoveDelaySetting.get_Value(), (previousHeight < _newHeight) ? 0f : TimersModule.ModuleInstance._alertMoveDelaySetting.get_Value(), true).Ease((Func<float, float>)Ease.CubeInOut);
+					}, TimersModule.ModuleInstance._alertMoveDelaySetting.Value, (previousHeight < _newHeight) ? 0f : TimersModule.ModuleInstance._alertMoveDelaySetting.Value).Ease(Ease.CubeInOut);
 					break;
-				case 0:
-				case 3:
-					((Control)this).set_Height(_newHeight);
+				case ControlFlowDirection.SingleLeftToRight:
+				case ControlFlowDirection.SingleRightToLeft:
+					base.Height = _newHeight;
 					SizeChanging = false;
 					noAnim = false;
-					ReflowChildLayout(((Container)this).get_Children().ToArray());
-					_animSizeChange = ((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<AlertContainer>(this, (object)new
+					ReflowChildLayout(base.Children.ToArray());
+					_animSizeChange = Control.Animation.Tweener.Tween(this, new
 					{
 						Width = _newWidth
-					}, TimersModule.ModuleInstance._alertMoveDelaySetting.get_Value(), (previousWidth < _newWidth) ? 0f : TimersModule.ModuleInstance._alertMoveDelaySetting.get_Value(), true).Ease((Func<float, float>)Ease.CubeInOut);
+					}, TimersModule.ModuleInstance._alertMoveDelaySetting.Value, (previousWidth < _newWidth) ? 0f : TimersModule.ModuleInstance._alertMoveDelaySetting.Value).Ease(Ease.CubeInOut);
 					break;
 				}
-				Tween animSizeChange2 = _animSizeChange;
-				if (animSizeChange2 != null)
+				_animSizeChange?.OnBegin(delegate
 				{
-					animSizeChange2.OnBegin((Action)delegate
+					if (!canChangeSize)
 					{
-						if (!canChangeSize)
-						{
-							_animSizeChange.Cancel();
-							_animSizeChange = null;
-						}
-						SizeChanging = true;
-					});
-				}
-				Tween animSizeChange3 = _animSizeChange;
-				if (animSizeChange3 != null)
-				{
-					animSizeChange3.OnUpdate((Action)delegate
-					{
-						if (!canChangeSize)
-						{
-							_animSizeChange.Cancel();
-							_animSizeChange = null;
-						}
-						SizeChanging = true;
-						ReflowChildLayout(((Container)this).get_Children().ToArray());
-					});
-				}
-				Tween animSizeChange4 = _animSizeChange;
-				if (animSizeChange4 != null)
-				{
-					animSizeChange4.OnComplete((Action)delegate
-					{
-						//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-						//IL_000e: Invalid comparison between Unknown and I4
-						//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-						//IL_002a: Invalid comparison between Unknown and I4
+						_animSizeChange.Cancel();
 						_animSizeChange = null;
-						if ((int)FlowDirection == 5)
-						{
-							((Control)this).set_Right(_anchor.X);
-						}
-						else if ((int)FlowDirection == 7)
-						{
-							((Control)this).set_Bottom(_anchor.Y);
-						}
-						SizeChanging = false;
-						ReflowChildLayout(((Container)this).get_Children().ToArray());
-						ContainerDragged?.Invoke(this, EventArgs.Empty);
-					});
-				}
-			}
-			if (((Container)this).get_Children().get_Count() == 0)
-			{
-				((Control)this).Hide();
-				Tween animSizeChange5 = _animSizeChange;
-				if (animSizeChange5 != null)
+					}
+					SizeChanging = true;
+				});
+				_animSizeChange?.OnUpdate(delegate
 				{
-					animSizeChange5.Cancel();
-				}
+					if (!canChangeSize)
+					{
+						_animSizeChange.Cancel();
+						_animSizeChange = null;
+					}
+					SizeChanging = true;
+					ReflowChildLayout(base.Children.ToArray());
+				});
+				_animSizeChange?.OnComplete(delegate
+				{
+					_animSizeChange = null;
+					if (FlowDirection == ControlFlowDirection.SingleRightToLeft)
+					{
+						base.Right = _anchor.X;
+					}
+					else if (FlowDirection == ControlFlowDirection.SingleBottomToTop)
+					{
+						base.Bottom = _anchor.Y;
+					}
+					SizeChanging = false;
+					ReflowChildLayout(base.Children.ToArray());
+					ContainerDragged?.Invoke(this, EventArgs.Empty);
+				});
+			}
+			if (base.Children.Count == 0)
+			{
+				Hide();
+				_animSizeChange?.Cancel();
 				_animSizeChange = null;
-				((Control)this).set_Height(0);
-				((Control)this).set_Width(0);
+				base.Height = 0;
+				base.Width = 0;
 			}
 			else if (AutoShow)
 			{
-				((Control)this).Show();
+				Show();
 			}
 		}
 
 		public override void UpdateContainer(GameTime gameTime)
 		{
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0066: Invalid comparison between Unknown and I4
+			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Invalid comparison between Unknown and I4
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
 			if (Dragging)
 			{
-				Point nOffset = Control.get_Input().get_Mouse().get_Position() - DragStart;
-				((Control)this).set_Location(((Control)this).get_Location() + nOffset);
-				DragStart = Control.get_Input().get_Mouse().get_Position();
-				if (_anchor != Point.get_Zero() && ((int)FlowDirection == 5 || (int)FlowDirection == 7))
+				Point newLocation = Control.Input.Mouse.Position - DragStart;
+				Point offset = newLocation - base.Location;
+				base.Location = newLocation;
+				DragStart = base.RelativeMousePosition;
+				if (_anchor != Point.get_Zero() && (FlowDirection == ControlFlowDirection.SingleRightToLeft || FlowDirection == ControlFlowDirection.SingleBottomToTop))
 				{
-					_anchor += nOffset;
+					_anchor += offset;
 				}
-				ContainerDragged?.Invoke(this, EventArgs.Empty);
 			}
 			UpdateDisplay();
 		}

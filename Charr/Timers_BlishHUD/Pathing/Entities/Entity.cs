@@ -239,11 +239,11 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			}
 		}
 
-		public virtual float DistanceFromPlayer => Vector3.Distance(Position, GameService.Gw2Mumble.get_PlayerCharacter().get_Position());
+		public virtual float DistanceFromPlayer => Vector3.Distance(Position, GameService.Gw2Mumble.PlayerCharacter.Position);
 
-		public virtual float DistanceFromCamera => Vector3.Distance(Position, GameService.Gw2Mumble.get_PlayerCamera().get_Position());
+		public virtual float DistanceFromCamera => Vector3.Distance(Position, GameService.Gw2Mumble.PlayerCamera.Position);
 
-		public float DrawOrder => Vector3.DistanceSquared(Position, GameService.Gw2Mumble.get_PlayerCamera().get_Position());
+		public float DrawOrder => Vector3.DistanceSquared(Position, GameService.Gw2Mumble.PlayerCamera.Position);
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
@@ -259,7 +259,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 		{
 			if (_pendingRebuild)
 			{
-				HandleRebuild(GameService.Graphics.get_GraphicsDevice());
+				HandleRebuild(GameService.Graphics.GraphicsDevice);
 				_pendingRebuild = false;
 			}
 			Update(gameTime);
@@ -309,7 +309,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001b: Expected O, but got Unknown
-			BasicEffect val = new BasicEffect(GameService.Graphics.get_GraphicsDevice());
+			BasicEffect val = new BasicEffect(GameService.Graphics.GraphicsDevice);
 			val.set_TextureEnabled(true);
 			StandardEffect = val;
 		}
