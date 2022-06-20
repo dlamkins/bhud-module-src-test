@@ -827,6 +827,10 @@ namespace Charr.Timers_BlishHUD
 							restartBlishHudAfter.Text = "Downloading latest version of timers, please wait...";
 							webClient.DownloadFileCompleted += delegate(object sender, AsyncCompletedEventArgs eventArgs)
 							{
+								if (File.Exists(DirectoriesManager.GetFullDirectoryPath("timers") + "/Hero-Timers.zip"))
+								{
+									File.Delete(DirectoriesManager.GetFullDirectoryPath("timers") + "/Hero-Timers.zip");
+								}
 								if (eventArgs.Error != null)
 								{
 									notice.Text = "Download failed: " + eventArgs.Error.Message;
@@ -837,7 +841,7 @@ namespace Charr.Timers_BlishHUD
 									manualDownload.Visible = true;
 									manualDownload.Click += delegate
 									{
-										Process.Start("https://github.com/QuitarHero/Hero-Timers/releases/latest/download/Hero-Timers.zip");
+										Process.Start("https://github.com/QuitarHero/Hero-Timers/releases/latest/download/Hero.Timer.Pack.zip");
 										_lastTimersUpdate.Value = update;
 									};
 									downloadPanel.RecalculateLayout();
