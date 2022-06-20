@@ -2321,6 +2321,7 @@ namespace Kenedia.Modules.Characters
 				if (Last.Tick_Save > 250.0 && saveCharacters)
 				{
 					Last.Tick_Save = -250.0;
+					saveCharacters = false;
 					SaveCharacters();
 				}
 				if (Last.Tick_APIUpdate > 30000.0 && userAccount != null)
