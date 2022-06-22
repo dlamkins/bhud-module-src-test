@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
+using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.EventTable.Controls;
 using Estreya.BlishHUD.EventTable.Models.Settings;
@@ -16,7 +17,7 @@ namespace Estreya.BlishHUD.EventTable.State
 	{
 		private static readonly Logger Logger = Logger.GetLogger<EventFileState>();
 
-		private const string WEB_SOURCE_URL = "https://blishhud.estreya.de/files/event-table/events.json";
+		private const string WEB_SOURCE_URL = "https://files.blishhud.estreya.de/event-table/events.json";
 
 		private TimeSpan updateInterval = TimeSpan.FromHours(1.0);
 
@@ -41,24 +42,14 @@ namespace Estreya.BlishHUD.EventTable.State
 			FileName = fileName;
 		}
 
-		public override async Task InternalReload()
+		protected override async Task InternalReload()
 		{
-			await CheckAndNotify(null);
+			await CheckAndNotifyOrUpdate(null);
 		}
 
 		protected override async Task Initialize()
 		{
-			bool flag = !ExternalFileExists();
-			if (!flag)
-			{
-				bool flag2 = EventTableModule.ModuleInstance.ModuleSettings.AutomaticallyUpdateEventFile.get_Value();
-				if (flag2)
-				{
-					flag2 = await IsNewFileVersionAvaiable();
-				}
-				flag = flag2;
-			}
-			if (flag)
+			if (!ExternalFileExists())
 			{
 				await ExportFile();
 			}
@@ -71,7 +62,7 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		protected override void InternalUpdate(GameTime gameTime)
 		{
-			UpdateUtil.UpdateAsync(CheckAndNotify, gameTime, updateInterval.TotalMilliseconds, ref timeSinceUpdate);
+			UpdateUtil.UpdateAsync(CheckAndNotifyOrUpdate, gameTime, updateInterval.TotalMilliseconds, ref timeSinceUpdate);
 		}
 
 		protected override Task Load()
@@ -84,7 +75,7 @@ namespace Estreya.BlishHUD.EventTable.State
 			return Task.CompletedTask;
 		}
 
-		private async Task CheckAndNotify(GameTime gameTime)
+		private async Task CheckAndNotifyOrUpdate(GameTime gameTime)
 		{
 			lock (_lockObject)
 			{
@@ -93,13 +84,20 @@ namespace Estreya.BlishHUD.EventTable.State
 					return;
 				}
 			}
-			if (await IsNewFileVersionAvaiable())
+			if (!(await IsNewFileVersionAvaiable()))
 			{
-				ScreenNotification.ShowNotification(new string[2] { "A new version of the event file is available.", "Please update it from the settings window." }, (NotificationType)0, null, 10);
-				lock (_lockObject)
-				{
-					_notified = true;
-				}
+				return;
+			}
+			if (EventTableModule.ModuleInstance.ModuleSettings.AutomaticallyUpdateEventFile.get_Value())
+			{
+				await ExportFile();
+				await EventTableModule.ModuleInstance.LoadEvents();
+				return;
+			}
+			ScreenNotification.ShowNotification(new string[2] { "A new version of the event file is available.", "Please update it from the settings window." }, (NotificationType)0, null, 10);
+			lock (_lockObject)
+			{
+				_notified = true;
 			}
 		}
 
@@ -116,37 +114,40 @@ namespace Estreya.BlishHUD.EventTable.State
 			}
 		}
 
-		private async Task<string> GetInternalFileContent()
-		{
-			try
-			{
-				Logger.Debug("Loading json from web source.");
-				string webJson = await EventTableModule.ModuleInstance.GetWebClient().DownloadStringTaskAsync(new Uri("https://blishhud.estreya.de/files/event-table/events.json"));
-				Logger.Debug($"Got content (length): {webJson?.Length ?? 0}");
-				if (!string.IsNullOrWhiteSpace(webJson))
-				{
-					return webJson;
-				}
-			}
-			catch (Exception ex)
-			{
-				Logger.Error(ex, "Could not read json from web source.");
-			}
-			Logger.Debug("Load json from internal ref.");
-			using Stream stream = ContentsManager.GetFileStream("events.json");
-			return await FileUtil.ReadStringAsync(stream);
-		}
-
-		private async Task<string> GetExternalFileContent()
-		{
-			return await FileUtil.ReadStringAsync(FilePath);
-		}
-
 		public async Task<EventSettingsFile> GetInternalFile()
 		{
+			_ = 1;
 			try
 			{
-				return JsonConvert.DeserializeObject<EventSettingsFile>(await GetInternalFileContent());
+				try
+				{
+					Logger.Debug("Loading json from web source.");
+					string webJson = await EventTableModule.ModuleInstance.GetWebClient().DownloadStringTaskAsync(new Uri("https://files.blishhud.estreya.de/event-table/events.json"));
+					Logger.Debug($"Got content (length): {webJson?.Length ?? 0}");
+					if (!string.IsNullOrWhiteSpace(webJson))
+					{
+						EventSettingsFile webEventSettingFile = JsonConvert.DeserializeObject<EventSettingsFile>(webJson);
+						if (webEventSettingFile.MinimumModuleVersion.IsSatisfied(((Module)EventTableModule.ModuleInstance).get_Version().BaseVersion()))
+						{
+							Logger.Debug("Module statisfies min web file version");
+							return webEventSettingFile;
+						}
+						Logger.Debug("Module does not statisfy min web file version");
+					}
+				}
+				catch (Exception ex2)
+				{
+					Logger.Error(ex2, "Could not read json from web source.");
+				}
+				Logger.Debug("Load json from internal ref.");
+				using Stream stream = ContentsManager.GetFileStream("events.json");
+				EventSettingsFile internalEventSettingFile = JsonConvert.DeserializeObject<EventSettingsFile>(await FileUtil.ReadStringAsync(stream));
+				if (internalEventSettingFile.MinimumModuleVersion.IsSatisfied(((Module)EventTableModule.ModuleInstance).get_Version().BaseVersion()))
+				{
+					Logger.Debug("Module statisfies min internal file version");
+					return internalEventSettingFile;
+				}
+				Logger.Debug("Module does not statisfy min internal file version");
 			}
 			catch (Exception ex)
 			{
@@ -159,7 +160,7 @@ namespace Estreya.BlishHUD.EventTable.State
 		{
 			try
 			{
-				return JsonConvert.DeserializeObject<EventSettingsFile>(await GetExternalFileContent());
+				return JsonConvert.DeserializeObject<EventSettingsFile>(await FileUtil.ReadStringAsync(FilePath));
 			}
 			catch (Exception ex)
 			{
@@ -186,6 +187,10 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		internal async Task ExportFile(EventSettingsFile eventSettingsFile)
 		{
+			if (eventSettingsFile == null)
+			{
+				eventSettingsFile = new EventSettingsFile();
+			}
 			string content = JsonConvert.SerializeObject((object)eventSettingsFile, (Formatting)1);
 			await FileUtil.WriteStringAsync(FilePath, content);
 			await Clear();

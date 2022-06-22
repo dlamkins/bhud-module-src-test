@@ -24,11 +24,13 @@ namespace Estreya.BlishHUD.EventTable.UI.Views.Settings
 			RenderSetting<bool>(parent, base.ModuleSettings.HideOnOpenMap);
 			RenderSetting<bool>(parent, base.ModuleSettings.HideOnMissingMumbleTicks);
 			RenderSetting<bool>(parent, base.ModuleSettings.HideInCombat);
+			RenderSetting<bool>(parent, base.ModuleSettings.HideInWvW);
+			RenderSetting<bool>(parent, base.ModuleSettings.HideInPvP);
 			RenderSetting<bool>(parent, base.ModuleSettings.ShowTooltips);
-			RenderSetting<TooltipTimeMode>(parent, base.ModuleSettings.TooltipTimeMode);
 			RenderSetting<bool>(parent, base.ModuleSettings.HandleLeftClick);
 			RenderSetting<LeftClickAction>(parent, base.ModuleSettings.LeftClickAction);
 			RenderSetting<bool>(parent, base.ModuleSettings.DirectlyTeleportToWaypoint);
+			RenderSetting<KeyBinding>(parent, base.ModuleSettings.MapKeybinding);
 			RenderSetting<bool>(parent, base.ModuleSettings.ShowContextMenuOnClick);
 			RenderSetting<BuildDirection>(parent, base.ModuleSettings.BuildDirection);
 			if (!EventTableModule.ModuleInstance.Debug)

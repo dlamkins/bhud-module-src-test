@@ -5,6 +5,7 @@ using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
@@ -24,9 +25,11 @@ using Estreya.BlishHUD.EventTable.State;
 using Estreya.BlishHUD.EventTable.UI.Views;
 using Estreya.BlishHUD.EventTable.UI.Views.Settings;
 using Estreya.BlishHUD.EventTable.Utils;
+using Gw2Sharp.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.BitmapFonts;
+using SemVer;
 
 namespace Estreya.BlishHUD.EventTable
 {
@@ -36,6 +39,8 @@ namespace Estreya.BlishHUD.EventTable
 		private static readonly Logger Logger = Logger.GetLogger<EventTableModule>();
 
 		public const string WEBSITE_ROOT_URL = "https://blishhud.estreya.de";
+
+		public const string WEBSITE_FILE_ROOT_URL = "https://files.blishhud.estreya.de";
 
 		public const string WEBSITE_MODULE_URL = "https://blishhud.estreya.de/modules/event-table";
 
@@ -53,7 +58,14 @@ namespace Estreya.BlishHUD.EventTable
 
 		private readonly AsyncLock _stateLock = new AsyncLock();
 
-		public bool IsPrerelease => !string.IsNullOrWhiteSpace(((Module)this).get_Version()?.PreRelease);
+		public bool IsPrerelease
+		{
+			get
+			{
+				Version version = ((Module)this).get_Version();
+				return !string.IsNullOrWhiteSpace((version != null) ? version.get_PreRelease() : null);
+			}
+		}
 
 		private EventTableDrawer Drawer { get; set; }
 
@@ -96,20 +108,13 @@ namespace Estreya.BlishHUD.EventTable
 			{
 				if (_eventTimeSpan == TimeSpan.Zero)
 				{
-					if (double.TryParse(ModuleSettings.EventTimeSpan.get_Value(), out var timespan))
+					int timespan = ModuleSettings.EventTimeSpan.get_Value();
+					if (timespan > 1440)
 					{
-						if (timespan > 1440.0)
-						{
-							timespan = 1440.0;
-							Logger.Warn("Event Timespan over 1440. Cap at 1440 for performance reasons.");
-						}
-						_eventTimeSpan = TimeSpan.FromMinutes(timespan);
+						timespan = 1440;
+						Logger.Warn("Event Timespan over 1440. Cap at 1440 for performance reasons.");
 					}
-					else
-					{
-						Logger.Error("Event Timespan '" + ModuleSettings.EventTimeSpan.get_Value() + "' no real number, default to 120");
-						_eventTimeSpan = TimeSpan.FromMinutes(120.0);
-					}
+					_eventTimeSpan = TimeSpan.FromMinutes(timespan);
 				}
 				return _eventTimeSpan;
 			}
@@ -137,10 +142,12 @@ namespace Estreya.BlishHUD.EventTable
 
 		public List<EventCategory> EventCategories => _eventCategories.Where((EventCategory ec) => !ec.IsDisabled).ToList();
 
-		private Collection<ManagedState> States { get; set; } = new Collection<ManagedState>();
+		internal Collection<ManagedState> States { get; set; } = new Collection<ManagedState>();
 
 
 		public EventState EventState { get; private set; }
+
+		public AccountState AccountState { get; private set; }
 
 		public WorldbossState WorldbossState { get; private set; }
 
@@ -151,6 +158,8 @@ namespace Estreya.BlishHUD.EventTable
 		public IconState IconState { get; private set; }
 
 		public PointOfInterestState PointOfInterestState { get; private set; }
+
+		internal MapNavigationUtil MapNavigationUtil { get; private set; }
 
 		[ImportingConstructor]
 		public EventTableModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
@@ -187,10 +196,6 @@ namespace Estreya.BlishHUD.EventTable
 			await InitializeStates(beforeFileLoaded: true);
 			Logger.Debug("Load events.");
 			await LoadEvents();
-			lock (_eventCategories)
-			{
-				ModuleSettings.InitializeEventSettings(_eventCategories);
-			}
 			Logger.Debug("Initialize states (after event file loading)");
 			await InitializeStates();
 			await Drawer.LoadAsync();
@@ -219,6 +224,7 @@ namespace Estreya.BlishHUD.EventTable
 					break;
 				}
 			};
+			MapNavigationUtil = new MapNavigationUtil(ModuleSettings.MapKeybinding.get_Value());
 		}
 
 		public async Task LoadEvents()
@@ -266,6 +272,7 @@ namespace Estreya.BlishHUD.EventTable
 				{
 					Logger.Debug("Overwrite current categories with newly loaded.");
 					_eventCategories = categories;
+					ModuleSettings.InitializeEventSettings(_eventCategories);
 				}
 			}
 			catch (Exception ex)
@@ -300,17 +307,14 @@ namespace Estreya.BlishHUD.EventTable
 			{
 				if (!beforeFileLoaded)
 				{
-					PointOfInterestState = new PointOfInterestState(Gw2ApiManager);
-					WorldbossState = new WorldbossState(Gw2ApiManager);
-					WorldbossState.WorldbossCompleted += delegate(object s, string e)
-					{
-						CompleteEventAction(e);
-					};
-					MapchestState = new MapchestState(Gw2ApiManager);
-					MapchestState.MapchestCompleted += delegate(object s, string e)
-					{
-						CompleteEventAction(e);
-					};
+					AccountState = new AccountState(Gw2ApiManager);
+					PointOfInterestState = new PointOfInterestState(Gw2ApiManager, eventsDirectory);
+					WorldbossState = new WorldbossState(Gw2ApiManager, AccountState);
+					WorldbossState.WorldbossCompleted += State_EventCompleted;
+					WorldbossState.WorldbossRemoved += State_EventRemoved;
+					MapchestState = new MapchestState(Gw2ApiManager, AccountState);
+					MapchestState.MapchestCompleted += State_EventCompleted;
+					MapchestState.MapchestRemoved += State_EventRemoved;
 				}
 				else
 				{
@@ -320,6 +324,7 @@ namespace Estreya.BlishHUD.EventTable
 				}
 				if (!beforeFileLoaded)
 				{
+					States.Add(AccountState);
 					States.Add(PointOfInterestState);
 					States.Add(WorldbossState);
 					States.Add(MapchestState);
@@ -337,11 +342,15 @@ namespace Estreya.BlishHUD.EventTable
 						if (state2.AwaitLoad)
 						{
 							await state2.Start();
+							continue;
 						}
-						else
+						state2.Start().ContinueWith(delegate(Task task)
 						{
-							state2.Start();
-						}
+							if (task.IsFaulted)
+							{
+								Logger.Error((Exception)task.Exception, "Not awaited state start failed for \"{0}\"", new object[1] { state2.GetType().Name });
+							}
+						});
 					}
 					catch (Exception ex)
 					{
@@ -349,28 +358,42 @@ namespace Estreya.BlishHUD.EventTable
 					}
 				}
 			}
-			void CompleteEventAction(string apiCode)
+		}
+
+		private void State_EventRemoved(object sender, string apiCode)
+		{
+			lock (_eventCategories)
 			{
-				lock (_eventCategories)
+				(from ev in _eventCategories.SelectMany((EventCategory ec) => ec.Events)
+					where ev.APICode == apiCode
+					select ev).ToList().ForEach(delegate(Event ev)
 				{
-					(from ev in _eventCategories.SelectMany((EventCategory ec) => ec.Events)
-						where ev.APICode == apiCode
-						select ev).ToList().ForEach(delegate(Event ev)
+					EventState.Remove(ev.SettingKey);
+				});
+			}
+		}
+
+		private void State_EventCompleted(object sender, string apiCode)
+		{
+			lock (_eventCategories)
+			{
+				(from ev in _eventCategories.SelectMany((EventCategory ec) => ec.Events)
+					where ev.APICode == apiCode
+					select ev).ToList().ForEach(delegate(Event ev)
+				{
+					switch (ModuleSettings.EventCompletedAcion.get_Value())
 					{
-						switch (ModuleSettings.EventCompletedAcion.get_Value())
-						{
-						case EventCompletedAction.Crossout:
-							ev.Finish();
-							break;
-						case EventCompletedAction.Hide:
-							ev.Hide();
-							break;
-						default:
-							Logger.Warn("Unsupported event completion action: {0}", new object[1] { ModuleSettings.EventCompletedAcion.get_Value() });
-							break;
-						}
-					});
-				}
+					case EventCompletedAction.Crossout:
+						ev.Finish();
+						break;
+					case EventCompletedAction.Hide:
+						ev.Hide();
+						break;
+					default:
+						Logger.Warn("Unsupported event completion action: {0}", new object[1] { ModuleSettings.EventCompletedAcion.get_Value() });
+						break;
+					}
+				});
 			}
 		}
 
@@ -528,23 +551,40 @@ namespace Estreya.BlishHUD.EventTable
 
 		private void CheckMumble()
 		{
-			if (GameService.Gw2Mumble.get_IsAvailable() && Drawer != null)
+			if (!GameService.Gw2Mumble.get_IsAvailable() || Drawer == null)
 			{
-				bool show = true;
-				if (ModuleSettings.HideOnOpenMap.get_Value())
-				{
-					show &= !GameService.Gw2Mumble.get_UI().get_IsMapOpen();
-				}
-				if (ModuleSettings.HideOnMissingMumbleTicks.get_Value())
-				{
-					show &= GameService.Gw2Mumble.get_TimeSinceTick().TotalSeconds < 0.5;
-				}
-				if (ModuleSettings.HideInCombat.get_Value())
-				{
-					show &= !GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat();
-				}
-				ToggleContainer(show);
+				return;
 			}
+			bool show = true;
+			if (ModuleSettings.HideOnOpenMap.get_Value())
+			{
+				show &= !GameService.Gw2Mumble.get_UI().get_IsMapOpen();
+			}
+			if (ModuleSettings.HideOnMissingMumbleTicks.get_Value())
+			{
+				show &= GameService.Gw2Mumble.get_TimeSinceTick().TotalSeconds < 0.5;
+			}
+			if (ModuleSettings.HideInCombat.get_Value())
+			{
+				show &= !GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat();
+			}
+			if (ModuleSettings.HideInWvW.get_Value())
+			{
+				MapType[] array = new MapType[5];
+				RuntimeHelpers.InitializeArray(array, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);
+				MapType[] wvwMapTypes = (MapType[])(object)array;
+				show &= !GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode() || !wvwMapTypes.Any((MapType type) => type == GameService.Gw2Mumble.get_CurrentMap().get_Type());
+			}
+			if (ModuleSettings.HideInPvP.get_Value())
+			{
+				MapType[] pvpMapTypes = (MapType[])(object)new MapType[2]
+				{
+					(MapType)2,
+					(MapType)6
+				};
+				show &= !GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode() || !pvpMapTypes.Any((MapType type) => type == GameService.Gw2Mumble.get_CurrentMap().get_Type());
+			}
+			ToggleContainer(show);
 		}
 
 		public WebClient GetWebClient()
@@ -593,6 +633,10 @@ namespace Estreya.BlishHUD.EventTable
 			Logger.Debug("Unloading states...");
 			using (_stateLock.Lock())
 			{
+				WorldbossState.WorldbossCompleted -= State_EventCompleted;
+				MapchestState.MapchestCompleted -= State_EventCompleted;
+				WorldbossState.WorldbossRemoved -= State_EventRemoved;
+				MapchestState.MapchestRemoved -= State_EventRemoved;
 				States.ToList().ForEach(delegate(ManagedState state)
 				{
 					state.Dispose();

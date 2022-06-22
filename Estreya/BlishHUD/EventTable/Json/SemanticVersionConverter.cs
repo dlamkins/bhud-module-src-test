@@ -4,20 +4,24 @@ using SemVer;
 
 namespace Estreya.BlishHUD.EventTable.Json
 {
-	public class SemanticVersionConverter : JsonConverter<SemVer.Version>
+	public class SemanticVersionConverter : JsonConverter<Version>
 	{
-		public override SemVer.Version ReadJson(JsonReader reader, Type objectType, SemVer.Version existingValue, bool hasExistingValue, JsonSerializer serializer)
+		public override Version ReadJson(JsonReader reader, Type objectType, Version existingValue, bool hasExistingValue, JsonSerializer serializer)
 		{
-			if (objectType != typeof(SemVer.Version))
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001d: Expected O, but got Unknown
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Expected O, but got Unknown
+			if (!(objectType != typeof(Version)))
 			{
-				return new SemVer.Version(0, 0, 0);
+				return new Version((string)reader.get_Value(), false);
 			}
-			return new SemVer.Version((string)reader.get_Value());
+			return new Version(0, 0, 0, (string)null, (string)null);
 		}
 
-		public override void WriteJson(JsonWriter writer, SemVer.Version value, JsonSerializer serializer)
+		public override void WriteJson(JsonWriter writer, Version value, JsonSerializer serializer)
 		{
-			writer.WriteValue(value.ToString());
+			writer.WriteValue(((object)value).ToString());
 		}
 	}
 }

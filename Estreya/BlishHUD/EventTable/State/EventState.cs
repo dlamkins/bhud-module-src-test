@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -27,6 +28,8 @@ namespace Estreya.BlishHUD.EventTable.State
 
 			public DateTime Until;
 		}
+
+		private const string DATE_TIME_FORMAT = "yyyy-MM-ddTHH:mm:ss";
 
 		private static readonly Logger Logger = Logger.GetLogger<EventState>();
 
@@ -65,7 +68,7 @@ namespace Estreya.BlishHUD.EventTable.State
 			BasePath = basePath;
 		}
 
-		public override async Task InternalReload()
+		protected override async Task InternalReload()
 		{
 			await Clear();
 			await Load();
@@ -93,7 +96,7 @@ namespace Estreya.BlishHUD.EventTable.State
 			{
 				Remove(name);
 				until = until.ToUniversalTime();
-				Logger.Info($"Add event state for \"{name}\" with \"{state}\" until \"{until}\" UTC.");
+				Logger.Info(string.Format("Add event state for \"{0}\" with \"{1}\" until \"{2}\" UTC.", name, state, until.ToString("yyyy-MM-ddTHH:mm:ss")));
 				VisibleStateInfo visibleStateInfo = default(VisibleStateInfo);
 				visibleStateInfo.Key = name;
 				visibleStateInfo.State = state;
@@ -166,8 +169,10 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		protected override async Task Load()
 		{
+			Logger.Info("Load saved event states from filesystem.");
 			if (!File.Exists(Path))
 			{
+				Logger.Info("File does not exist.");
 				return;
 			}
 			try
@@ -192,7 +197,8 @@ namespace Estreya.BlishHUD.EventTable.State
 						try
 						{
 							EventStates state = (EventStates)Enum.Parse(typeof(EventStates), parts[1]);
-							DateTime until = DateTime.Parse(parts[2]);
+							DateTime until = DateTime.ParseExact(parts[2], "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture);
+							until = DateTime.SpecifyKind(until, DateTimeKind.Utc);
 							VisibleStateInfo visibleStateInfo = default(VisibleStateInfo);
 							visibleStateInfo.Key = name;
 							visibleStateInfo.Until = until;
@@ -201,7 +207,11 @@ namespace Estreya.BlishHUD.EventTable.State
 						}
 						catch (Exception ex2)
 						{
-							Logger.Error(ex2, "Loading line \"{0}\" failed.", new object[1] { name });
+							Logger.Error(ex2, "Loading line \"{0}\" failed. Parts: {1}", new object[2]
+							{
+								name,
+								string.Join(", ", parts)
+							});
 						}
 					}
 				}
@@ -223,7 +233,7 @@ namespace Estreya.BlishHUD.EventTable.State
 			{
 				foreach (VisibleStateInfo instance in Instances)
 				{
-					lines.Add(string.Format("{0}{1}{2}{3}{4}", instance.Key, "<-->", instance.State, "<-->", instance.Until));
+					lines.Add(string.Format("{0}{1}{2}{3}{4}", instance.Key, "<-->", instance.State, "<-->", instance.Until.ToString("yyyy-MM-ddTHH:mm:ss")));
 				}
 			}
 			await FileUtil.WriteLinesAsync(Path, lines.ToArray());

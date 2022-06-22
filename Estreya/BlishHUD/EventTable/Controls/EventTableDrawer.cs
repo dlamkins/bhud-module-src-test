@@ -128,29 +128,29 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			}
 			if (_renderTarget == null)
 			{
-				_renderTarget = new RenderTarget2D(GameService.Graphics.get_GraphicsDevice(), width, height, false, GameService.Graphics.get_GraphicsDevice().get_PresentationParameters().get_BackBufferFormat(), (DepthFormat)2, 1, (RenderTargetUsage)1);
+				_renderTarget = new RenderTarget2D(GameService.Graphics.get_GraphicsDevice(), width, height, false, GameService.Graphics.get_GraphicsDevice().get_PresentationParameters().get_BackBufferFormat(), (DepthFormat)3, 1, (RenderTargetUsage)1);
 				_renderTargetIsEmpty = true;
 			}
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0187: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0195: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0212: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0213: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0199: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0216: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0217: Unknown result type (might be due to invalid IL or missing references)
 			((GraphicsResource)spriteBatch).get_GraphicsDevice().get_PresentationParameters().set_RenderTargetUsage((RenderTargetUsage)1);
 			spriteBatch.End();
 			int refreshInterval = EventTableModule.ModuleInstance.ModuleSettings.RefreshRateDelay.get_Value();
 			if (_renderTargetIsEmpty || _lastDraw.TotalMilliseconds > (double)refreshInterval)
 			{
 				((GraphicsResource)spriteBatch).get_GraphicsDevice().SetRenderTarget(_renderTarget);
-				spriteBatch.Begin((SpriteSortMode)0, (BlendState)null, (SamplerState)null, (DepthStencilState)null, (RasterizerState)null, (Effect)null, (Matrix?)null);
+				spriteBatch.Begin((SpriteSortMode)0, (BlendState)null, SamplerState.PointClamp, (DepthStencilState)null, (RasterizerState)null, (Effect)null, (Matrix?)null);
 				((GraphicsResource)spriteBatch).get_GraphicsDevice().Clear(Color.get_Transparent());
 				List<EventCategory> eventCategories = EventTableModule.ModuleInstance.EventCategories;
 				int y = 0;

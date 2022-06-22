@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -134,36 +133,32 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			val.Show((IView)(object)new EmptySettingsLineView(25));
 		}
 
-		protected Panel RenderPropertyWithValidation<TObject, TProperty>(Panel parent, TObject obj, Expression<Func<TObject, TProperty>> expression, Func<TObject, bool> isEnabled, Func<TProperty, (bool Valid, string Message)> validationFunction, string title = null, string description = null, int width = -1)
+		protected Panel RenderProperty<TObject, TProperty>(Panel parent, TObject obj, Expression<Func<TObject, TProperty>> expression, Func<TObject, bool> isEnabled, (float Min, float Max)? range = null, string title = null, int width = -1)
 		{
-			return RenderPropertyWithChangedTypeValidation(parent, obj, expression, isEnabled, validationFunction, title, description, width);
+			return RenderPropertyWithValidation(parent, obj, expression, isEnabled, null, range, title, width);
 		}
 
-		protected Panel RenderProperty<TObject, TProperty>(Panel parent, TObject obj, Expression<Func<TObject, TProperty>> expression, Func<TObject, bool> isEnabled, string title = null, string description = null, int width = -1)
+		protected Panel RenderPropertyWithValidation<TObject, TProperty>(Panel parent, TObject obj, Expression<Func<TObject, TProperty>> expression, Func<TObject, bool> isEnabled, Func<TProperty, (bool Valid, string Message)> validationFunction, (float Min, float Max)? range = null, string title = null, int width = -1)
 		{
-			return RenderPropertyWithValidation(parent, obj, expression, isEnabled, null, title, description, width);
+			return RenderPropertyWithChangedTypeValidation(parent, obj, expression, isEnabled, validationFunction, range, title, width);
 		}
 
-		protected Panel RenderPropertyWithChangedTypeValidation<TObject, TProperty, TOverrideType>(Panel parent, TObject obj, Expression<Func<TObject, TProperty>> expression, Func<TObject, bool> isEnabled, Func<TOverrideType, (bool Valid, string Message)> validationFunction, string title = null, string description = null, int width = -1)
+		protected Panel RenderPropertyWithChangedTypeValidation<TObject, TProperty, TOverrideType>(Panel parent, TObject obj, Expression<Func<TObject, TProperty>> expression, Func<TObject, bool> isEnabled, Func<TOverrideType, (bool Valid, string Message)> validationFunction, (float Min, float Max)? range = null, string title = null, int width = -1)
 		{
 			Panel panel = GetPanel((Container)(object)parent);
 			MemberExpression memberExpression = expression.Body as MemberExpression;
 			if (memberExpression != null)
 			{
 				PropertyInfo property = memberExpression.Member as PropertyInfo;
-				if (title == null)
+				if ((object)property != null && title == null)
 				{
 					title = property.Name;
-				}
-				if (description == null)
-				{
-					description = property.GetCustomAttribute<DescriptionAttribute>()?.Description ?? property.Name;
 				}
 			}
 			Label label = GetLabel(panel, title ?? string.Empty);
 			try
 			{
-				Control obj2 = ControlHandler.CreateFromPropertyWithChangedTypeValidation(obj, expression, isEnabled, delegate(TOverrideType val)
+				ControlHandler.CreateFromPropertyWithChangedTypeValidation(obj, expression, isEnabled, delegate(TOverrideType val)
 				{
 					(bool, string) tuple = ((validationFunction != null) ? validationFunction(val) : (true, null));
 					if (!tuple.Item1)
@@ -171,9 +166,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 						ShowError(tuple.Item2);
 					}
 					return tuple.Item1;
-				}, (width == -1) ? 170 : width, -1, ((Control)label).get_Right() + 20, 0);
-				obj2.set_Parent((Container)(object)panel);
-				obj2.set_BasicTooltipText(description);
+				}, range, (width == -1) ? 170 : width, -1, ((Control)label).get_Right() + 20, 0).set_Parent((Container)(object)panel);
 				return panel;
 			}
 			catch (Exception ex)
@@ -284,7 +277,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			return button;
 		}
 
-		protected void RenderLabel(Panel parent, string title, string value = null, Color? textColor = null)
+		protected void RenderLabel(Panel parent, string title, string value = null, Color? textColorTitle = null, Color? textColorValue = null)
 		{
 			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
@@ -292,12 +285,12 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
 			Panel panel = GetPanel((Container)(object)parent);
 			Label titleLabel = GetLabel(panel, title);
-			titleLabel.set_TextColor((Color)(((_003F?)textColor) ?? titleLabel.get_TextColor()));
+			titleLabel.set_TextColor((Color)(((_003F?)textColorTitle) ?? titleLabel.get_TextColor()));
 			if (value != null)
 			{
 				Label valueLabel = GetLabel(panel, value);
 				((Control)valueLabel).set_Left(((Control)titleLabel).get_Right() + 20);
-				valueLabel.set_TextColor((Color)(((_003F?)textColor) ?? valueLabel.get_TextColor()));
+				valueLabel.set_TextColor((Color)(((_003F?)textColorValue) ?? valueLabel.get_TextColor()));
 			}
 			else
 			{

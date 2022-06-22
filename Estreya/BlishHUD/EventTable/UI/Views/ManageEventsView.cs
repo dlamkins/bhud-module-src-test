@@ -107,24 +107,24 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_03a6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03ae: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_053f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0586: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0544: Unknown result type (might be due to invalid IL or missing references)
 			//IL_058b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0598: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05a4: Expected O, but got Unknown
-			//IL_05fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0590: Unknown result type (might be due to invalid IL or missing references)
+			//IL_059d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05a9: Expected O, but got Unknown
 			//IL_05ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_060c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0618: Expected O, but got Unknown
-			//IL_064f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0604: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0611: Unknown result type (might be due to invalid IL or missing references)
+			//IL_061d: Expected O, but got Unknown
 			//IL_0654: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0661: Unknown result type (might be due to invalid IL or missing references)
-			//IL_066d: Expected O, but got Unknown
-			//IL_06a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0659: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0666: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0672: Expected O, but got Unknown
 			//IL_06a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06ca: Expected O, but got Unknown
+			//IL_06ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06cf: Expected O, but got Unknown
 			Panel val = new Panel();
 			((Control)val).set_Parent(buildPanel);
 			((Control)val).set_Location(new Point(MAIN_PADDING.X, MAIN_PADDING.Y));
@@ -180,8 +180,11 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				((Control)menuItemPair.Value).add_Click((EventHandler<MouseEventArgs>)delegate(object s, MouseEventArgs e)
 				{
 					MenuItem menuItem = (MenuItem)((s is MenuItem) ? s : null);
-					EventCategory category3 = EventTableModule.ModuleInstance.EventCategories.Where((EventCategory ec) => ec.Name == menuItem.get_Text()).FirstOrDefault();
-					eventPanel.FilterChildren<EventDetailsButton>((Func<EventDetailsButton, bool>)((EventDetailsButton detailsButton) => menuItem == menus["allEvents"] || category3.Events.Any((Event ev) => ev.EventCategory.Key == detailsButton.Event.EventCategory.Key && ev.Key == detailsButton.Event.Key)));
+					if (menuItem != null)
+					{
+						EventCategory category3 = EventTableModule.ModuleInstance.EventCategories.Where((EventCategory ec) => ec.Name == menuItem.get_Text()).FirstOrDefault();
+						eventPanel.FilterChildren<EventDetailsButton>((Func<EventDetailsButton, bool>)((EventDetailsButton detailsButton) => menuItem == menus["allEvents"] || category3.Events.Any((Event ev) => ev.EventCategory.Key == detailsButton.Event.EventCategory.Key && ev.Key == detailsButton.Event.Key)));
+					}
 				});
 			});
 			Panel val6 = new Panel();
@@ -201,10 +204,14 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				{
 					menus["allEvents"].get_Selected();
 					EventDetailsButton eventDetailsButton2 = control as EventDetailsButton;
-					if (((Control)eventDetailsButton2).get_Visible())
+					if (eventDetailsButton2 != null && ((Control)eventDetailsButton2).get_Visible())
 					{
 						Control obj3 = ((IEnumerable<Control>)((Container)eventDetailsButton2).get_Children()).Last();
-						((GlowButton)((obj3 is GlowButton) ? obj3 : null)).set_Checked(true);
+						GlowButton val14 = (GlowButton)(object)((obj3 is GlowButton) ? obj3 : null);
+						if (val14 != null)
+						{
+							val14.set_Checked(true);
+						}
 					}
 				});
 			});
@@ -219,10 +226,14 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				{
 					menus["allEvents"].get_Selected();
 					EventDetailsButton eventDetailsButton = control as EventDetailsButton;
-					if (((Control)eventDetailsButton).get_Visible())
+					if (eventDetailsButton != null && ((Control)eventDetailsButton).get_Visible())
 					{
 						Control obj2 = ((IEnumerable<Control>)((Container)eventDetailsButton).get_Children()).Last();
-						((GlowButton)((obj2 is GlowButton) ? obj2 : null)).set_Checked(false);
+						GlowButton val13 = (GlowButton)(object)((obj2 is GlowButton) ? obj2 : null);
+						if (val13 != null)
+						{
+							val13.set_Checked(false);
+						}
 					}
 				});
 			});
@@ -246,7 +257,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					{
 						continue;
 					}
-					IEnumerable<SettingEntry<bool>> settings = EventTableModule.ModuleInstance.ModuleSettings.AllEvents.FindAll((SettingEntry<bool> eventSetting) => ((SettingEntry)eventSetting).get_EntryKey().ToLowerInvariant() == e2.SettingKey.ToLowerInvariant());
+					IEnumerable<SettingEntry<bool>> settings = EventTableModule.ModuleInstance.ModuleSettings.AllEvents.ToList().FindAll((SettingEntry<bool> eventSetting) => ((SettingEntry)eventSetting).get_EntryKey().ToLowerInvariant() == e2.SettingKey.ToLowerInvariant());
 					SettingEntry<bool> setting = settings.First();
 					bool enabled = setting.get_Value();
 					EventDetailsButton obj = new EventDetailsButton
@@ -306,7 +317,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					{
 						//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 						//IL_0024: Expected O, but got Unknown
-						((Control)editButton).set_Tooltip(new Tooltip((ITooltipView)(object)new TooltipView("Edit", "Edit Description", "156684")));
+						((Control)editButton).set_Tooltip(new Tooltip((ITooltipView)(object)new TooltipView("Edit", "Edit the event", "156684")));
 						editButton.set_Icon(AsyncTexture2D.op_Implicit(EventTableModule.ModuleInstance.IconState.GetIcon("156684", checkRenderAPI: false)));
 					});
 					((Control)editButton).add_Click((EventHandler<MouseEventArgs>)delegate

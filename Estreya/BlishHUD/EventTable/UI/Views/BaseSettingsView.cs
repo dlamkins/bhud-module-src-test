@@ -126,14 +126,17 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		protected abstract void BuildView(Panel parent);
 
-		protected Panel RenderSetting<T>(Panel parent, SettingEntry<T> setting)
+		protected Panel RenderChangedTypeSetting<T, TOverride>(Panel parent, SettingEntry<T> setting, Func<TOverride, T> convertFunction)
 		{
 			Panel panel = GetPanel((Container)(object)parent);
 			Label label = GetLabel(panel, ((SettingEntry)setting).get_DisplayName());
-			((SettingEntry)setting).get_SettingType();
 			try
 			{
-				Control obj = ControlHandler.CreateFromSetting<T>(setting, HandleValidation, 170, -1, ((Control)label).get_Right() + 20, 0);
+				Control obj = ControlHandler.CreateFromChangedTypeSetting(setting, delegate(SettingEntry<T> settingEntry, TOverride val)
+				{
+					T value = convertFunction(val);
+					return HandleValidation(settingEntry, value);
+				}, 170, -1, ((Control)label).get_Right() + 20, 0);
 				obj.set_Parent((Container)(object)panel);
 				obj.set_BasicTooltipText(((SettingEntry)setting).get_Description());
 				return panel;
@@ -143,6 +146,11 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				Logger.Error(ex, "Type \"" + ((SettingEntry)setting).get_SettingType().FullName + "\" could not be found in internal type lookup:");
 				return panel;
 			}
+		}
+
+		protected Panel RenderSetting<T>(Panel parent, SettingEntry<T> setting)
+		{
+			return RenderChangedTypeSetting(parent, setting, (T val) => val);
 		}
 
 		protected Panel RenderSetting<T>(Panel parent, SettingEntry<T> setting, Action<T> onChangeAction)

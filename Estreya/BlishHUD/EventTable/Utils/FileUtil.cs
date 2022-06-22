@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Blish_HUD.Debug;
 
@@ -128,6 +129,13 @@ namespace Estreya.BlishHUD.EventTable.Utils
 			string tempFileNameWithExtension = Path.ChangeExtension(tempFileName, extension);
 			File.Move(tempFileName, tempFileNameWithExtension);
 			return tempFileNameWithExtension;
+		}
+
+		public static string SanitizeFileName(string fileName)
+		{
+			string invalidChars = Regex.Escape(new string(Path.GetInvalidFileNameChars()));
+			string invalidRegStr = string.Format("([{0}]*\\.+$)|([{0}]+)", invalidChars);
+			return Regex.Replace(fileName, invalidRegStr, "_");
 		}
 	}
 }

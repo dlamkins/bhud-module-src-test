@@ -77,7 +77,12 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		private void ModuleSettings_EventSettingChanged(object sender, ModuleSettings.EventSettingsChangedEventArgs e)
 		{
-			if (_originalEvents.Any((Event ev) => ev.SettingKey.ToLowerInvariant() == e.Name.ToLowerInvariant()))
+			List<Event> changedEvents = _originalEvents.Where((Event ev) => ev.SettingKey.ToLowerInvariant() == e.Name.ToLowerInvariant()).ToList();
+			foreach (Event item in changedEvents)
+			{
+				item.ResetCachedStates();
+			}
+			if (changedEvents.Count > 0)
 			{
 				UpdateEventOccurences(null);
 			}
@@ -238,15 +243,20 @@ namespace Estreya.BlishHUD.EventTable.Models
 		public void Hide()
 		{
 			DateTime now = EventTableModule.ModuleInstance.DateTimeNow.ToUniversalTime();
-			DateTime until = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0).AddDays(1.0);
+			DateTime until = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0, DateTimeKind.Utc).AddDays(1.0);
 			EventTableModule.ModuleInstance.EventState.Add(Key, until, EventState.EventStates.Hidden);
 		}
 
 		public void Finish()
 		{
 			DateTime now = EventTableModule.ModuleInstance.DateTimeNow.ToUniversalTime();
-			DateTime until = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0).AddDays(1.0);
+			DateTime until = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0, DateTimeKind.Utc).AddDays(1.0);
 			EventTableModule.ModuleInstance.EventState.Add(Key, until, EventState.EventStates.Completed);
+		}
+
+		public void Unfinish()
+		{
+			EventTableModule.ModuleInstance.EventState.Remove(Key);
 		}
 
 		public bool IsFinished()

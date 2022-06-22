@@ -5,130 +5,57 @@ using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Modules.Managers;
-using Estreya.BlishHUD.EventTable.Helpers;
-using Estreya.BlishHUD.EventTable.Utils;
-using Gw2Sharp.WebApi.Exceptions;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
-using Microsoft.Xna.Framework;
 
 namespace Estreya.BlishHUD.EventTable.State
 {
-	public class MapchestState : ManagedState
+	public class MapchestState : APIState<string>
 	{
 		private static readonly Logger Logger = Logger.GetLogger<MapchestState>();
 
-		private TimeSpan updateInterval = TimeSpan.FromMinutes(5.0).Add(TimeSpan.FromMilliseconds(100.0));
-
-		private double timeSinceUpdate;
-
-		private List<string> completedMapchests = new List<string>();
-
-		private Gw2ApiManager ApiManager { get; set; }
+		private readonly AccountState _accountState;
 
 		public event EventHandler<string> MapchestCompleted;
 
-		public MapchestState(Gw2ApiManager apiManager)
+		public event EventHandler<string> MapchestRemoved;
+
+		public MapchestState(Gw2ApiManager apiManager, AccountState accountState)
+			: base(apiManager, new List<TokenPermission>
+			{
+				(TokenPermission)1,
+				(TokenPermission)6
+			}, (TimeSpan?)null, awaitLoad: true, -1)
 		{
-			ApiManager = apiManager;
+			_accountState = accountState;
+			base.FetchAction = async delegate(Gw2ApiManager apiManager)
+			{
+				await _accountState.WaitAsync();
+				Account account = _accountState.Account;
+				DateTime obj = ((account != null) ? account.get_LastModified().UtcDateTime : DateTime.MinValue);
+				DateTime now = EventTableModule.ModuleInstance.DateTimeNow.ToUniversalTime();
+				DateTime lastResetUTC = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0, DateTimeKind.Utc);
+				return (obj < lastResetUTC) ? new List<string>() : ((IEnumerable<string>)(await ((IBlobClient<IApiV2ObjectList<string>>)(object)apiManager.get_Gw2ApiClient().get_V2().get_Account()
+					.get_MapChests()).GetAsync(default(CancellationToken)))).ToList();
+			};
+			base.APIObjectAdded += APIState_APIObjectAdded;
+			base.APIObjectRemoved += APIState_APIObjectRemoved;
 		}
 
-		private void ApiManager_SubtokenUpdated(object sender, ValueEventArgs<IEnumerable<TokenPermission>> e)
+		private void APIState_APIObjectRemoved(object sender, string e)
 		{
-			Task.Run(async delegate
-			{
-				await Reload();
-			});
+			this.MapchestRemoved?.Invoke(this, e);
+		}
+
+		private void APIState_APIObjectAdded(object sender, string e)
+		{
+			this.MapchestCompleted?.Invoke(this, e);
 		}
 
 		public bool IsCompleted(string apiCode)
 		{
-			return completedMapchests.Contains(apiCode);
-		}
-
-		public override async Task InternalReload()
-		{
-			await UpdatedCompletedMapchests(null);
-		}
-
-		private async Task UpdatedCompletedMapchests(GameTime gameTime)
-		{
-			Logger.Info("Check for completed mapchests.");
-			try
-			{
-				List<string> oldCompletedMapchests;
-				lock (completedMapchests)
-				{
-					oldCompletedMapchests = completedMapchests.ToArray().ToList();
-					completedMapchests.Clear();
-				}
-				if (!ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
-				{
-					(TokenPermission)1,
-					(TokenPermission)6
-				}))
-				{
-					return;
-				}
-				IApiV2ObjectList<string> mapchests = await ((IBlobClient<IApiV2ObjectList<string>>)(object)ApiManager.get_Gw2ApiClient().get_V2().get_Account()
-					.get_MapChests()).GetAsync(default(CancellationToken));
-				lock (completedMapchests)
-				{
-					completedMapchests.AddRange((IEnumerable<string>)mapchests);
-				}
-				foreach (string mapchest in (IEnumerable<string>)mapchests)
-				{
-					if (!oldCompletedMapchests.Contains(mapchest))
-					{
-						Logger.Info("Completed mapchest: " + mapchest);
-						try
-						{
-							this.MapchestCompleted?.Invoke(this, mapchest);
-						}
-						catch (Exception ex2)
-						{
-							Logger.Error("Error handling complete mapchest event: " + ex2.Message);
-						}
-					}
-				}
-			}
-			catch (MissingScopesException val)
-			{
-				MissingScopesException msex = val;
-				Logger.Warn("Could not update completed mapchests due to missing scopes: " + ((Exception)(object)msex).Message);
-			}
-			catch (InvalidAccessTokenException val2)
-			{
-				InvalidAccessTokenException iatex = val2;
-				Logger.Warn("Could not update completed mapchests due to invalid access token: " + ((Exception)(object)iatex).Message);
-			}
-			catch (Exception ex)
-			{
-				Logger.Warn("Error updating completed mapchests: " + ex.Message);
-			}
-		}
-
-		protected override Task Initialize()
-		{
-			ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)ApiManager_SubtokenUpdated);
-			return Task.CompletedTask;
-		}
-
-		protected override void InternalUnload()
-		{
-			ApiManager.remove_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)ApiManager_SubtokenUpdated);
-			AsyncHelper.RunSync(Clear);
-		}
-
-		protected override void InternalUpdate(GameTime gameTime)
-		{
-			UpdateUtil.UpdateAsync(UpdatedCompletedMapchests, gameTime, updateInterval.TotalMilliseconds, ref timeSinceUpdate);
-		}
-
-		protected override async Task Load()
-		{
-			await UpdatedCompletedMapchests(null);
+			return base.APIObjectList.Contains(apiCode);
 		}
 
 		protected override Task Save()
@@ -136,13 +63,15 @@ namespace Estreya.BlishHUD.EventTable.State
 			return Task.CompletedTask;
 		}
 
-		public override Task Clear()
+		public override Task DoClear()
 		{
-			lock (completedMapchests)
-			{
-				completedMapchests.Clear();
-			}
 			return Task.CompletedTask;
+		}
+
+		protected override void DoUnload()
+		{
+			base.APIObjectAdded -= APIState_APIObjectAdded;
+			base.APIObjectRemoved -= APIState_APIObjectRemoved;
 		}
 	}
 }

@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Modules.Managers;
+using Estreya.BlishHUD.EventTable.Helpers;
 using Estreya.BlishHUD.EventTable.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -49,7 +49,7 @@ namespace Estreya.BlishHUD.EventTable.State
 			_basePath = basePath;
 		}
 
-		public override async Task InternalReload()
+		protected override async Task InternalReload()
 		{
 			await LoadImages();
 		}
@@ -61,6 +61,7 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		protected override void InternalUnload()
 		{
+			AsyncHelper.RunSync(Save);
 			using (_textureLock.Lock())
 			{
 				foreach (KeyValuePair<string, Texture2D> loadedTexture in _loadedTextures)
@@ -95,7 +96,7 @@ namespace Estreya.BlishHUD.EventTable.State
 				string[] files = GetFiles();
 				for (int i = 0; i < files.Length; i++)
 				{
-					string sanitizedFileName = SanitizeFileName(System.IO.Path.GetFileNameWithoutExtension(files[i]));
+					string sanitizedFileName = FileUtil.SanitizeFileName(System.IO.Path.GetFileNameWithoutExtension(files[i]));
 					if (currentLoadedTextures.Contains(sanitizedFileName))
 					{
 						currentLoadedTextures.Remove(sanitizedFileName);
@@ -122,13 +123,6 @@ namespace Estreya.BlishHUD.EventTable.State
 					}
 				}
 			}
-		}
-
-		private static string SanitizeFileName(string fileName)
-		{
-			string invalidChars = Regex.Escape(new string(System.IO.Path.GetInvalidFileNameChars()));
-			string invalidRegStr = string.Format("([{0}]*\\.+$)|([{0}]+)", invalidChars);
-			return Regex.Replace(fileName, invalidRegStr, "_");
 		}
 
 		private Task LoadImages()
@@ -163,7 +157,7 @@ namespace Estreya.BlishHUD.EventTable.State
 							fileStream.Dispose();
 							asyncTexture.SwapTexture(val);
 						});
-						string fileName = SanitizeFileName(System.IO.Path.GetFileNameWithoutExtension(filePath));
+						string fileName = FileUtil.SanitizeFileName(System.IO.Path.GetFileNameWithoutExtension(filePath));
 						HandleAsyncTextureSwap(asyncTexture, fileName);
 					}
 					catch (Exception ex)
@@ -194,7 +188,7 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		public bool HasIcon(string identifier)
 		{
-			string sanitizedIdentifier = SanitizeFileName(identifier);
+			string sanitizedIdentifier = FileUtil.SanitizeFileName(identifier);
 			return _loadedTextures.ContainsKey(sanitizedIdentifier);
 		}
 
@@ -204,14 +198,14 @@ namespace Estreya.BlishHUD.EventTable.State
 			{
 				return null;
 			}
-			string sanitizedIdentifier = SanitizeFileName(System.IO.Path.ChangeExtension(identifier, null));
+			string sanitizedIdentifier = FileUtil.SanitizeFileName(System.IO.Path.ChangeExtension(identifier, null));
 			using (_textureLock.Lock())
 			{
 				if (_loadedTextures.ContainsKey(sanitizedIdentifier))
 				{
 					return _loadedTextures[sanitizedIdentifier];
 				}
-				Texture2D icon = null;
+				Texture2D icon = Textures.get_Error();
 				if (!string.IsNullOrWhiteSpace(identifier))
 				{
 					if (checkRenderAPI && identifier.Contains("/"))
@@ -222,19 +216,26 @@ namespace Estreya.BlishHUD.EventTable.State
 							HandleAsyncTextureSwap(asyncTexture, sanitizedIdentifier);
 							icon = AsyncTexture2D.op_Implicit(asyncTexture);
 						}
-						catch (Exception ex)
+						catch (Exception ex2)
 						{
-							Logger.Warn("Could not load icon from render api: " + ex.Message);
+							Logger.Warn(ex2, "Could not load icon from render api:");
 						}
 					}
 					else
 					{
-						Texture2D texture = _contentsManager.GetTexture(identifier);
-						if (texture == Textures.get_Error())
+						try
 						{
-							texture = GameService.Content.GetTexture(identifier);
+							Texture2D texture = _contentsManager.GetTexture(identifier);
+							if (texture == Textures.get_Error())
+							{
+								texture = GameService.Content.GetTexture(identifier);
+							}
+							icon = texture;
 						}
-						icon = texture;
+						catch (Exception ex)
+						{
+							Logger.Warn(ex, "Could not load icon from ref folders:");
+						}
 					}
 				}
 				_loadedTextures.Add(sanitizedIdentifier, icon);

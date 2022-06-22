@@ -13,6 +13,7 @@ using Blish_HUD.Input;
 using Blish_HUD.Settings;
 using Blish_HUD._Extensions;
 using Estreya.BlishHUD.EventTable.Controls;
+using Estreya.BlishHUD.EventTable.Extensions;
 using Estreya.BlishHUD.EventTable.Input;
 using Estreya.BlishHUD.EventTable.Json;
 using Estreya.BlishHUD.EventTable.Resources;
@@ -76,10 +77,6 @@ namespace Estreya.BlishHUD.EventTable.Models
 		})]
 		public TimeSpan Offset { get; set; }
 
-		[JsonProperty("convertOffset")]
-		public bool ConvertOffset { get; set; } = true;
-
-
 		[JsonProperty("repeat")]
 		[JsonConverter(typeof(TimeSpanJsonConverter), new object[]
 		{
@@ -87,6 +84,10 @@ namespace Estreya.BlishHUD.EventTable.Models
 			new string[] { "dd\\.hh\\:mm", "hh\\:mm" }
 		})]
 		public TimeSpan Repeat { get; set; }
+
+		[JsonProperty("startingDate")]
+		[JsonConverter(typeof(DateJsonConverter))]
+		public DateTime? StartingDate { get; set; }
 
 		[JsonProperty("location")]
 		public string Location { get; set; }
@@ -228,6 +229,10 @@ namespace Estreya.BlishHUD.EventTable.Models
 		public List<DateTime> Occurences { get; private set; } = new List<DateTime>();
 
 
+		[JsonProperty("markers")]
+		public List<EventPhaseMarker> EventPhaseMarkers { get; set; } = new List<EventPhaseMarker>();
+
+
 		public event EventHandler Edited;
 
 		private IEnumerable<ContextMenuStripItem> GetContextMenu()
@@ -299,20 +304,35 @@ namespace Estreya.BlishHUD.EventTable.Models
 				List<ContextMenuStripItem> list = new List<ContextMenuStripItem>();
 				ContextMenuStripItem val7 = new ContextMenuStripItem();
 				val7.set_Text("Finish Category");
-				((Control)val7).set_BasicTooltipText("Completes the event category until reset.");
+				((Control)val7).set_BasicTooltipText("Completes the event category until reset. Click again to reset.");
 				ContextMenuStripItem val8 = val7;
 				((Control)val8).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
-					FinishCategory();
+					EventCategory eventCategory = EventCategory;
+					if (eventCategory != null && !eventCategory.IsFinished())
+					{
+						EventCategory?.Finish();
+					}
+					else
+					{
+						EventCategory?.Unfinish();
+					}
 				});
 				list.Add(val8);
 				ContextMenuStripItem val9 = new ContextMenuStripItem();
 				val9.set_Text("Finish Event");
-				((Control)val9).set_BasicTooltipText("Completes the event until reset.");
+				((Control)val9).set_BasicTooltipText("Completes the event until reset. Click again to reset.");
 				ContextMenuStripItem val10 = val9;
 				((Control)val10).add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)delegate
 				{
-					Finish();
+					if (!IsFinished())
+					{
+						Finish();
+					}
+					else
+					{
+						Unfinish();
+					}
 				});
 				list.Add(val10);
 				return list;
@@ -350,41 +370,45 @@ namespace Estreya.BlishHUD.EventTable.Models
 		public bool Draw(SpriteBatch spriteBatch, Rectangle bounds, Texture2D baseTexture, int y, double pixelPerMinute, DateTime now, DateTime min, DateTime max, BitmapFont font)
 		{
 			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0203: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0208: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0241: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0292: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0294: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0319: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0320: Unknown result type (might be due to invalid IL or missing references)
-			//IL_032a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0331: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0345: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0354: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0366: Unknown result type (might be due to invalid IL or missing references)
-			//IL_036d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0375: Unknown result type (might be due to invalid IL or missing references)
-			//IL_037c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_038b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_038d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0221: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0226: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0264: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0282: Unknown result type (might be due to invalid IL or missing references)
+			//IL_028f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_031a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0321: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0332: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0346: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0355: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0367: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0376: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_040c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0410: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0451: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0453: Unknown result type (might be due to invalid IL or missing references)
 			List<DateTime> occurences = new List<DateTime>();
 			lock (Occurences)
 			{
@@ -393,6 +417,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 			_lastYPosition = y;
 			RectangleF eventTexturePosition = default(RectangleF);
 			RectangleF eventTimeRemainingPosition = default(RectangleF);
+			RectangleF markerRectangle = default(RectangleF);
 			foreach (DateTime eventStart in occurences)
 			{
 				float width = (float)GetWidth(eventStart, min, bounds, pixelPerMinute);
@@ -400,11 +425,11 @@ namespace Estreya.BlishHUD.EventTable.Models
 				{
 					continue;
 				}
-				float x = (float)GetXPosition(eventStart, min, pixelPerMinute);
-				x = Math.Max(x, 0f);
+				float originalX = (float)GetXPosition(eventStart, min, pixelPerMinute);
+				float x = Math.Max(originalX, 0f);
+				bool num = eventStart <= now && eventStart.AddMinutes(Duration) > now;
 				((RectangleF)(ref eventTexturePosition))._002Ector(x, (float)y, width, (float)EventTableModule.ModuleInstance.EventHeight);
-				bool drawBorder = !Filler && EventTableModule.ModuleInstance.ModuleSettings.DrawEventBorder.get_Value();
-				spriteBatch.DrawRectangle(baseTexture, eventTexturePosition, BackgroundColor * EventTableModule.ModuleInstance.ModuleSettings.Opacity.get_Value(), drawBorder ? 1 : 0, Color.get_Black());
+				SpriteBatchUtil.DrawRectangle(borderSize: (!Filler && EventTableModule.ModuleInstance.ModuleSettings.DrawEventBorder.get_Value()) ? 1 : 0, spriteBatch: spriteBatch, baseTexture: baseTexture, coords: eventTexturePosition, color: BackgroundColor * EventTableModule.ModuleInstance.ModuleSettings.Opacity.get_Value(), borderColor: Color.get_Black());
 				Color textColor = Color.get_Black();
 				if (Filler)
 				{
@@ -433,7 +458,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 					((RectangleF)(ref eventTextPosition))._002Ector(eventTexturePosition.X + 5f, eventTexturePosition.Y + 5f, eventTextWidth, eventTexturePosition.Height - 10f);
 					spriteBatch.DrawString(eventName, font, eventTextPosition, textColor, wrap: false, (HorizontalAlignment)0, (VerticalAlignment)1);
 				}
-				if (eventStart <= now && eventStart.AddMinutes(Duration) > now)
+				if (num)
 				{
 					TimeSpan timeRemaining = eventStart.AddMinutes(Duration).Subtract(now);
 					string timeRemainingString = FormatTime(timeRemaining);
@@ -447,6 +472,20 @@ namespace Estreya.BlishHUD.EventTable.Models
 					if (eventTimeRemainingPosition.X + eventTimeRemainingPosition.Width <= eventTexturePosition.X + eventTexturePosition.Width)
 					{
 						spriteBatch.DrawString(timeRemainingString, font, eventTimeRemainingPosition, textColor, wrap: false, (HorizontalAlignment)0, (VerticalAlignment)1);
+					}
+				}
+				if (num && EventPhaseMarkers != null)
+				{
+					int markerWidth = 2;
+					foreach (EventPhaseMarker marker in EventPhaseMarkers)
+					{
+						float xPosition = originalX + marker.Time * (float)pixelPerMinute;
+						xPosition = Math.Min(xPosition, ((RectangleF)(ref eventTexturePosition)).get_Right() - (float)markerWidth);
+						if (!(xPosition < 0f))
+						{
+							((RectangleF)(ref markerRectangle))._002Ector(xPosition, eventTexturePosition.Y, (float)markerWidth, eventTexturePosition.Height);
+							spriteBatch.DrawRectangle(baseTexture, markerRectangle, marker.Color);
+						}
 					}
 				}
 				if ((EventCategory?.IsFinished() ?? false) || IsFinished())
@@ -466,20 +505,20 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		private string FormatTime(TimeSpan ts)
 		{
-			if (ts.Hours <= 0)
+			if (ts.Days > 0)
 			{
-				return ts.ToString("mm\\:ss");
+				return ts.ToString("dd\\.hh\\:mm\\:ss");
 			}
-			return ts.ToString("hh\\:mm\\:ss");
+			if (ts.Hours > 0)
+			{
+				return ts.ToString("hh\\:mm\\:ss");
+			}
+			return ts.ToString("mm\\:ss");
 		}
 
 		private string FormatTime(DateTime dateTime)
 		{
-			if (dateTime.Hour <= 0)
-			{
-				return dateTime.ToString("mm:ss");
-			}
-			return dateTime.ToString("HH:mm:ss");
+			return FormatTime(dateTime.TimeOfDay);
 		}
 
 		private string GetLongestEventName(float maxSize, BitmapFont font)
@@ -538,22 +577,18 @@ namespace Estreya.BlishHUD.EventTable.Models
 			}
 		}
 
-		private List<DateTime> GetStartOccurences(DateTime now, DateTime max, DateTime min, bool addTimezoneOffset = true, bool limitsBetweenRanges = false)
+		private List<DateTime> GetStartOccurences(DateTime now, DateTime max, DateTime min)
 		{
 			List<DateTime> startOccurences = new List<DateTime>();
-			DateTime zero = new DateTime(min.Year, min.Month, min.Day, 0, 0, 0).AddDays((Repeat.TotalMinutes != 0.0) ? (-1) : 0);
-			TimeSpan offset = Offset;
-			if (ConvertOffset && addTimezoneOffset)
-			{
-				offset = offset.Add(TimeZone.CurrentTimeZone.GetUtcOffset(now));
-			}
+			DateTime zero = StartingDate ?? new DateTime(min.Year, min.Month, min.Day, 0, 0, 0).AddDays((Repeat.TotalMinutes != 0.0) ? (-1) : 0);
+			TimeSpan offset = Offset.Add(TimeZone.CurrentTimeZone.GetUtcOffset(now));
 			DateTime eventStart = zero.Add(offset);
 			while (eventStart < max)
 			{
-				bool startAfterMin = eventStart > min;
+				bool num = eventStart > min;
+				bool startBeforeMax = eventStart < max;
 				bool endAfterMin = eventStart.AddMinutes(Duration) > min;
-				bool endBeforeMax = eventStart.AddMinutes(Duration) < max;
-				if ((limitsBetweenRanges ? (startAfterMin && endBeforeMax) : (startAfterMin || endAfterMin)) && eventStart < max)
+				if ((num || endAfterMin) && startBeforeMax)
 				{
 					startOccurences.Add(eventStart);
 				}
@@ -562,12 +597,12 @@ namespace Estreya.BlishHUD.EventTable.Models
 			return startOccurences;
 		}
 
-		public double GetXPosition(DateTime start, DateTime min, double pixelPerMinute)
+		private double GetXPosition(DateTime start, DateTime min, double pixelPerMinute)
 		{
 			return start.Subtract(min).TotalMinutes * pixelPerMinute;
 		}
 
-		public double GetWidth(DateTime eventOccurence, DateTime min, Rectangle bounds, double pixelPerMinute)
+		private double GetWidth(DateTime eventOccurence, DateTime min, Rectangle bounds, double pixelPerMinute)
 		{
 			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
@@ -645,10 +680,17 @@ namespace Estreya.BlishHUD.EventTable.Models
 						}
 						else
 						{
-							ContinentFloorRegionMapPoi waypoint = EventTableModule.ModuleInstance.PointOfInterestState.GetPointOfInterest(Waypoint);
-							if (waypoint != null && !(await MapNavigationUtil.NavigateToPosition(waypoint)))
+							PointOfInterest pointOfInterest = EventTableModule.ModuleInstance.PointOfInterestState.GetPointOfInterest(Waypoint);
+							if (pointOfInterest != null)
 							{
-								ScreenNotification.ShowNotification("Navigation failed.", (NotificationType)2);
+								if (!(await EventTableModule.ModuleInstance.MapNavigationUtil.NavigateToPosition(pointOfInterest, EventTableModule.ModuleInstance.ModuleSettings.DirectlyTeleportToWaypoint.get_Value())))
+								{
+									ScreenNotification.ShowNotification("Navigation failed.", (NotificationType)2);
+								}
+							}
+							else
+							{
+								ScreenNotification.ShowNotification(Strings.Event_NoWaypointFound, (NotificationType)2);
 							}
 						}
 					});
@@ -663,7 +705,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 			}
 		}
 
-		public void HandleHover(object sender, MouseEventArgs e, double pixelPerMinute)
+		public void HandleHover(object _, MouseEventArgs e, double pixelPerMinute)
 		{
 			if (Filler)
 			{
@@ -686,29 +728,23 @@ namespace Estreya.BlishHUD.EventTable.Models
 			if (hoveredOccurences.Any())
 			{
 				DateTime hoveredOccurence = hoveredOccurences.First();
-				if (EventTableModule.ModuleInstance.ModuleSettings.TooltipTimeMode.get_Value() == TooltipTimeMode.Relative)
+				bool num = hoveredOccurence.AddMinutes(Duration) < EventTableModule.ModuleInstance.DateTimeNow;
+				bool isNext = !num && hoveredOccurence > EventTableModule.ModuleInstance.DateTimeNow;
+				bool isCurrent = !num && !isNext;
+				description = Location + ((!string.IsNullOrWhiteSpace(Location)) ? "\n" : string.Empty) + "\n";
+				if (num)
 				{
-					bool num = hoveredOccurence.AddMinutes(Duration) < EventTableModule.ModuleInstance.DateTimeNow;
-					bool isNext = !num && hoveredOccurence > EventTableModule.ModuleInstance.DateTimeNow;
-					bool isCurrent = !num && !isNext;
-					description = Location + ((!string.IsNullOrWhiteSpace(Location)) ? "\n" : string.Empty) + "\n";
-					if (num)
-					{
-						description = description + Strings.Event_Tooltip_FinishedSince + ": " + FormatTime(EventTableModule.ModuleInstance.DateTimeNow - hoveredOccurence.AddMinutes(Duration));
-					}
-					else if (isNext)
-					{
-						description = description + Strings.Event_Tooltip_StartsIn + ": " + FormatTime(hoveredOccurence - EventTableModule.ModuleInstance.DateTimeNow);
-					}
-					else if (isCurrent)
-					{
-						description = description + Strings.Event_Tooltip_Remaining + ": " + FormatTime(hoveredOccurence.AddMinutes(Duration) - EventTableModule.ModuleInstance.DateTimeNow);
-					}
+					description = description + Strings.Event_Tooltip_FinishedSince + ": " + FormatTime(EventTableModule.ModuleInstance.DateTimeNow - hoveredOccurence.AddMinutes(Duration));
 				}
-				else
+				else if (isNext)
 				{
-					description = Location + ((!string.IsNullOrWhiteSpace(Location)) ? "\n" : string.Empty) + "\n" + Strings.Event_Tooltip_StartsAt + ": " + FormatTime(hoveredOccurence);
+					description = description + Strings.Event_Tooltip_StartsIn + ": " + FormatTime(hoveredOccurence - EventTableModule.ModuleInstance.DateTimeNow);
 				}
+				else if (isCurrent)
+				{
+					description = description + Strings.Event_Tooltip_Remaining + ": " + FormatTime(hoveredOccurence.AddMinutes(Duration) - EventTableModule.ModuleInstance.DateTimeNow);
+				}
+				description = description + " (" + Strings.Event_Tooltip_StartsAt + ": " + FormatTime(hoveredOccurence) + ")";
 			}
 			else
 			{
@@ -718,7 +754,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 			Tooltip.Show(0, 0);
 		}
 
-		public void HandleNonHover(object sender, MouseEventArgs e)
+		public void HandleNonHover(object _, MouseEventArgs e)
 		{
 			if (((Control)Tooltip).get_Visible())
 			{
@@ -754,9 +790,9 @@ namespace Estreya.BlishHUD.EventTable.Models
 			EventTableModule.ModuleInstance.EventState.Add(SettingKey, until, EventState.EventStates.Completed);
 		}
 
-		private void FinishCategory()
+		public void Unfinish()
 		{
-			EventCategory?.Finish();
+			EventTableModule.ModuleInstance.EventState.Remove(SettingKey);
 		}
 
 		public bool IsFinished()
@@ -789,7 +825,6 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		public Task LoadAsync()
 		{
-			EventTableModule.ModuleInstance.ModuleSettings.EventSettingChanged += ModuleSettings_EventSettingChanged;
 			EventTableModule.ModuleInstance.EventState.StateAdded += EventState_StateAdded;
 			EventTableModule.ModuleInstance.EventState.StateRemoved += EventState_StateRemoved;
 			if (string.IsNullOrWhiteSpace(Key))
@@ -823,18 +858,14 @@ namespace Estreya.BlishHUD.EventTable.Models
 			}
 		}
 
-		private void ModuleSettings_EventSettingChanged(object sender, ModuleSettings.EventSettingsChangedEventArgs e)
+		public void ResetCachedStates()
 		{
-			if (SettingKey.ToLowerInvariant() == e.Name.ToLowerInvariant())
-			{
-				_isDisabled = null;
-			}
+			_isDisabled = null;
 		}
 
 		public void Unload()
 		{
 			Logger.Debug("Unload event: {0}", new object[1] { Key });
-			EventTableModule.ModuleInstance.ModuleSettings.EventSettingChanged -= ModuleSettings_EventSettingChanged;
 			EventTableModule.ModuleInstance.EventState.StateAdded -= EventState_StateAdded;
 			EventTableModule.ModuleInstance.EventState.StateRemoved -= EventState_StateRemoved;
 			Tooltip tooltip = _tooltip;
@@ -886,7 +917,12 @@ namespace Estreya.BlishHUD.EventTable.Models
 				((WindowBase2)val).set_CanClose(false);
 				((WindowBase2)val).set_Id("EventTableModule_f925849b-44bd-4c9f-aaac-76826d93ba6f");
 				StandardWindow window = val;
-				EditEventView editView = new EditEventView(Clone());
+				Event clonedEvent;
+				lock (this)
+				{
+					clonedEvent = Clone();
+				}
+				EditEventView editView = new EditEventView(clonedEvent);
 				editView.SavePressed += delegate(object s, ValueEventArgs<Event> e)
 				{
 					((Control)window).Hide();
@@ -904,6 +940,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 						BackgroundColorCode = e.get_Value().BackgroundColorCode;
 						APICodeType = e.get_Value().APICodeType;
 						APICode = e.get_Value().APICode;
+						EventPhaseMarkers = e.get_Value().EventPhaseMarkers;
 						timeSinceUpdate = updateInterval.TotalMilliseconds;
 						_editing = false;
 					}
@@ -924,7 +961,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		public Event Clone()
 		{
-			return (Event)MemberwiseClone();
+			return this.Copy();
 		}
 	}
 }

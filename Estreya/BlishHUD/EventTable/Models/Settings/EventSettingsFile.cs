@@ -9,7 +9,12 @@ namespace Estreya.BlishHUD.EventTable.Models.Settings
 	{
 		[JsonProperty("version")]
 		[JsonConverter(typeof(SemanticVersionConverter))]
-		public Version Version { get; set; } = new Version(0, 0, 0);
+		public Version Version { get; set; } = new Version(0, 0, 0, (string)null, (string)null);
+
+
+		[JsonProperty("moduleVersion")]
+		[JsonConverter(typeof(SemanticRangeConverter))]
+		public Range MinimumModuleVersion { get; set; } = new Range(">=0.0.0", false);
 
 
 		[JsonProperty("eventCategories")]

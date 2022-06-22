@@ -59,15 +59,16 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0159: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0135: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0155: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0169: Expected O, but got Unknown
+			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
 			buildPanel.set_HeightSizingMode((SizingMode)1);
 			buildPanel.set_WidthSizingMode((SizingMode)1);
 			Image val = new Image();
@@ -92,14 +93,15 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			val3.set_AutoSizeHeight(true);
 			val3.set_AutoSizeWidth(false);
 			((Control)val3).set_Location(new Point(((Control)nameLabel).get_Left(), ((Control)image).get_Top() + ((Control)image).get_Height() / 2));
-			((Control)val3).set_Width(Math.Max(((Control)nameLabel).get_Width(), 200));
 			((Control)val3).set_Padding(new Thickness(0f, 8f, 0f, 0f));
 			val3.set_HorizontalAlignment((HorizontalAlignment)0);
 			val3.set_VerticalAlignment((VerticalAlignment)1);
 			val3.set_TextColor(StandardColors.get_DisabledText());
-			val3.set_WrapText(true);
+			val3.set_WrapText(false);
 			val3.set_Text(Description);
 			((Control)val3).set_Parent(buildPanel);
+			Label descriptionLabel = val3;
+			((Control)descriptionLabel).set_Width((int)Math.Ceiling(Math.Max(((Control)nameLabel).get_Width(), descriptionLabel.get_Font().MeasureString(descriptionLabel.get_Text()).Width)));
 		}
 	}
 }

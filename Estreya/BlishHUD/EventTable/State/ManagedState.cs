@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
-using Estreya.BlishHUD.EventTable.Helpers;
 using Microsoft.Xna.Framework;
 
 namespace Estreya.BlishHUD.EventTable.State
@@ -61,7 +60,7 @@ namespace Estreya.BlishHUD.EventTable.State
 				return;
 			}
 			TimeSinceSave += gameTime.get_ElapsedGameTime();
-			if (TimeSinceSave.TotalMilliseconds >= (double)SaveInternal)
+			if (SaveInternal != -1 && TimeSinceSave.TotalMilliseconds >= (double)SaveInternal)
 			{
 				if (_saveSemaphore.CurrentCount > 0)
 				{
@@ -74,6 +73,10 @@ namespace Estreya.BlishHUD.EventTable.State
 							await Save();
 							TimeSinceSave = TimeSpan.Zero;
 						}
+						catch (Exception ex)
+						{
+							Logger.Error(ex, "{0} failed saving.", new object[1] { GetType().Name });
+						}
 						finally
 						{
 							_saveSemaphore.Release();
@@ -82,7 +85,7 @@ namespace Estreya.BlishHUD.EventTable.State
 				}
 				else
 				{
-					Logger.Debug("Another thread is already running Save()");
+					Logger.Debug("Another thread is already running Save() for {0}", new object[1] { GetType().Name });
 				}
 			}
 			InternalUpdate(gameTime);
@@ -101,9 +104,9 @@ namespace Estreya.BlishHUD.EventTable.State
 			}
 		}
 
-		public abstract Task InternalReload();
+		protected abstract Task InternalReload();
 
-		private async Task Unload()
+		private void Unload()
 		{
 			if (!Running)
 			{
@@ -112,7 +115,7 @@ namespace Estreya.BlishHUD.EventTable.State
 			else
 			{
 				Logger.Debug("Unloading state: {0}", new object[1] { GetType().Name });
-				await Save();
+				InternalUnload();
 			}
 		}
 
@@ -130,7 +133,7 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		public void Dispose()
 		{
-			AsyncHelper.RunSync(Unload);
+			Unload();
 			Stop();
 		}
 	}

@@ -14,9 +14,9 @@ namespace Estreya.BlishHUD.EventTable.UI.Views.Settings
 {
 	public class EventSettingsView : BaseSettingsView
 	{
-		private SemVer.Version CurrentVersion;
+		private Version CurrentVersion;
 
-		private SemVer.Version NewestVersion;
+		private Version NewestVersion;
 
 		public EventSettingsView(ModuleSettings settings)
 			: base(settings)
@@ -25,7 +25,11 @@ namespace Estreya.BlishHUD.EventTable.UI.Views.Settings
 
 		protected override void BuildView(Panel parent)
 		{
-			RenderSetting<string>(parent, base.ModuleSettings.EventTimeSpan);
+			RenderChangedTypeSetting(parent, base.ModuleSettings.EventTimeSpan, delegate(string val)
+			{
+				int.TryParse(val, out var result);
+				return result;
+			});
 			RenderSetting<int>(parent, base.ModuleSettings.EventHistorySplit);
 			RenderSetting<bool>(parent, base.ModuleSettings.DrawEventBorder);
 			RenderSetting<bool>(parent, base.ModuleSettings.UseEventTranslation);
@@ -45,8 +49,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views.Settings
 				await EventTableModule.ModuleInstance.LoadEvents();
 				ScreenNotification.ShowNotification(Strings.EventSettingsView_UpdateEventFile_Success, (NotificationType)0);
 			});
-			RenderLabel(parent, Strings.EventSettingsView_CurrentVersion_Title, CurrentVersion?.ToString() ?? Strings.EventSettingsView_CurrentVersion_Unknown);
-			RenderLabel(parent, Strings.EventSettingsView_NewestVersion_Title, NewestVersion?.ToString() ?? Strings.EventSettingsView_NewestVersion_Unknown);
+			RenderLabel(parent, Strings.EventSettingsView_CurrentVersion_Title, ((object)CurrentVersion)?.ToString() ?? Strings.EventSettingsView_CurrentVersion_Unknown);
+			RenderLabel(parent, Strings.EventSettingsView_NewestVersion_Title, ((object)NewestVersion)?.ToString() ?? Strings.EventSettingsView_NewestVersion_Unknown);
 			RenderButton(parent, "Diff in VS Code", async delegate
 			{
 				string filePath1 = FileUtil.CreateTempFile("json");

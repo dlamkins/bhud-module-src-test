@@ -2,7 +2,7 @@
   <PropertyGroup>
     <AssemblyName>Estreya.BlishHUD.EventTable</AssemblyName>
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
   </PropertyGroup>
   <PropertyGroup>
     <LangVersion>Preview</LangVersion>
@@ -19,10 +19,12 @@
     <Reference Include="MonoGame.Framework" />
     <Reference Include="Gw2Sharp" />
     <Reference Include="System.Core" />
-    <Reference Include="SemVer">
-      <HintPath>..\..\working\SemVer.dll</HintPath>
-    </Reference>
+    <Reference Include="SemVer" />
+    <Reference Include="Gapotchenko.FX" />
     <Reference Include="Newtonsoft.Json" />
     <Reference Include="AsyncClipboardService" />
+    <Reference Include="Humanizer">
+      <HintPath>..\..\working\Humanizer.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

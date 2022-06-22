@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using Blish_HUD.Settings;
 using Estreya.BlishHUD.EventTable.Extensions;
 using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.EventTable.Resources;
+using Estreya.BlishHUD.EventTable.Utils;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework.Input;
@@ -36,6 +38,8 @@ namespace Estreya.BlishHUD.EventTable
 
 		private Color _defaultColor;
 
+		private AsyncLock _eventSettingsLock = new AsyncLock();
+
 		private const string GLOBAL_SETTINGS = "event-table-global-settings";
 
 		private const string LOCATION_SETTINGS = "event-table-location-settings";
@@ -43,6 +47,8 @@ namespace Estreya.BlishHUD.EventTable
 		private const string EVENT_SETTINGS = "event-table-event-settings";
 
 		private const string EVENT_LIST_SETTINGS = "event-table-event-list-settings";
+
+		private ReadOnlyCollection<SettingEntry<bool>> _allEvents;
 
 		public Color DefaultGW2Color
 		{
@@ -80,11 +86,13 @@ namespace Estreya.BlishHUD.EventTable
 
 		public SettingEntry<bool> HideOnOpenMap { get; private set; }
 
+		public SettingEntry<bool> HideInWvW { get; private set; }
+
+		public SettingEntry<bool> HideInPvP { get; private set; }
+
 		public SettingEntry<bool> DebugEnabled { get; private set; }
 
 		public SettingEntry<bool> ShowTooltips { get; private set; }
-
-		public SettingEntry<TooltipTimeMode> TooltipTimeMode { get; private set; }
 
 		public SettingEntry<bool> HandleLeftClick { get; private set; }
 
@@ -98,6 +106,8 @@ namespace Estreya.BlishHUD.EventTable
 
 		public SettingEntry<bool> DirectlyTeleportToWaypoint { get; private set; }
 
+		public SettingEntry<KeyBinding> MapKeybinding { get; private set; }
+
 		public SettingCollection LocationSettings { get; private set; }
 
 		public SettingEntry<int> LocationX { get; private set; }
@@ -108,7 +118,7 @@ namespace Estreya.BlishHUD.EventTable
 
 		public SettingCollection EventSettings { get; private set; }
 
-		public SettingEntry<string> EventTimeSpan { get; private set; }
+		public SettingEntry<int> EventTimeSpan { get; private set; }
 
 		public SettingEntry<int> EventHistorySplit { get; private set; }
 
@@ -130,8 +140,16 @@ namespace Estreya.BlishHUD.EventTable
 
 		public SettingEntry<bool> UseEventTranslation { get; private set; }
 
-		public List<SettingEntry<bool>> AllEvents { get; private set; } = new List<SettingEntry<bool>>();
-
+		public ReadOnlyCollection<SettingEntry<bool>> AllEvents
+		{
+			get
+			{
+				using (_eventSettingsLock.Lock())
+				{
+					return _allEvents;
+				}
+			}
+		}
 
 		public event EventHandler<ModuleSettingsChangedEventArgs> ModuleSettingsChanged;
 
@@ -243,6 +261,8 @@ namespace Estreya.BlishHUD.EventTable
 		{
 			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d5: Expected O, but got Unknown
+			//IL_0e06: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0e4e: Expected O, but got Unknown
 			GlobalSettings = settings.AddSubCollection("event-table-global-settings", false);
 			GlobalEnabled = GlobalSettings.DefineSetting<bool>("GlobalEnabled", true, (Func<string>)(() => Strings.Setting_GlobalEnabled_Name), (Func<string>)(() => Strings.Setting_GlobalEnabled_Description));
 			GlobalEnabled.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
@@ -267,31 +287,27 @@ namespace Estreya.BlishHUD.EventTable
 			HideOnMissingMumbleTicks.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
 			HideInCombat = GlobalSettings.DefineSetting<bool>("HideInCombat", false, (Func<string>)(() => Strings.Setting_HideInCombat_Name), (Func<string>)(() => Strings.Setting_HideInCombat_Description));
 			HideInCombat.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+			HideInWvW = GlobalSettings.DefineSetting<bool>("HideInWvW", false, (Func<string>)(() => "Hide in WvW"), (Func<string>)(() => "Whether the event table should hide when in world vs. world."));
+			HideInWvW.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+			HideInPvP = GlobalSettings.DefineSetting<bool>("HideInPvP", false, (Func<string>)(() => "Hide in PvP"), (Func<string>)(() => "Whether the event table should hide when in player vs. player."));
+			HideInPvP.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
 			BackgroundColor = GlobalSettings.DefineSetting<Color>("BackgroundColor", DefaultGW2Color, (Func<string>)(() => Strings.Setting_BackgroundColor_Name), (Func<string>)(() => Strings.Setting_BackgroundColor_Description));
 			BackgroundColor.add_SettingChanged((EventHandler<ValueChangedEventArgs<Color>>)SettingChanged<Color>);
 			BackgroundColorOpacity = GlobalSettings.DefineSetting<float>("BackgroundColorOpacity", 0f, (Func<string>)(() => Strings.Setting_BackgroundColorOpacity_Name), (Func<string>)(() => Strings.Setting_BackgroundColorOpacity_Description));
 			SettingComplianceExtensions.SetRange(BackgroundColorOpacity, 0f, 1f);
 			BackgroundColorOpacity.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)SettingChanged<float>);
-			EventTimeSpan = GlobalSettings.DefineSetting<string>("EventTimeSpan", "120", (Func<string>)(() => Strings.Setting_EventTimeSpan_Name), (Func<string>)(() => Strings.Setting_EventTimeSpan_Description));
-			EventTimeSpan.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)SettingChanged<string>);
-			SettingComplianceExtensions.SetValidation<string>(EventTimeSpan, (Func<string, SettingValidationResult>)delegate(string val)
+			EventTimeSpan = GlobalSettings.DefineSetting<int>("EventTimeSpan", 120, (Func<string>)(() => Strings.Setting_EventTimeSpan_Name), (Func<string>)(() => Strings.Setting_EventTimeSpan_Description));
+			EventTimeSpan.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)SettingChanged<int>);
+			SettingComplianceExtensions.SetValidation<int>(EventTimeSpan, (Func<int, SettingValidationResult>)delegate(int val)
 			{
-				//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 				bool flag = true;
 				string text = null;
 				double num = 1440.0;
-				if (double.TryParse(val, out var result))
-				{
-					if (result > num)
-					{
-						flag = false;
-						text = string.Format(Strings.Setting_EventTimeSpan_Validation_OverLimit, num);
-					}
-				}
-				else
+				if ((double)val > num)
 				{
 					flag = false;
-					text = string.Format(Strings.Setting_EventTimeSpan_Validation_NoDouble, val);
+					text = string.Format(Strings.Setting_EventTimeSpan_Validation_OverLimit, num);
 				}
 				return new SettingValidationResult(flag, text);
 			});
@@ -309,8 +325,6 @@ namespace Estreya.BlishHUD.EventTable
 			DebugEnabled.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
 			ShowTooltips = GlobalSettings.DefineSetting<bool>("ShowTooltips", true, (Func<string>)(() => Strings.Setting_ShowTooltips_Name), (Func<string>)(() => Strings.Setting_ShowTooltips_Description));
 			ShowTooltips.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			TooltipTimeMode = GlobalSettings.DefineSetting<TooltipTimeMode>("TooltipTimeMode", Estreya.BlishHUD.EventTable.Models.TooltipTimeMode.Relative, (Func<string>)(() => Strings.Setting_TooltipTimeMode_Name), (Func<string>)(() => Strings.Setting_TooltipTimeMode_Description));
-			TooltipTimeMode.add_SettingChanged((EventHandler<ValueChangedEventArgs<TooltipTimeMode>>)SettingChanged<TooltipTimeMode>);
 			HandleLeftClick = GlobalSettings.DefineSetting<bool>("HandleLeftClick", true, (Func<string>)(() => Strings.Setting_HandleLeftClick_Name), (Func<string>)(() => Strings.Setting_HandleLeftClick_Description));
 			HandleLeftClick.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
 			LeftClickAction = GlobalSettings.DefineSetting<LeftClickAction>("LeftClickAction", Estreya.BlishHUD.EventTable.Models.LeftClickAction.CopyWaypoint, (Func<string>)(() => Strings.Setting_LeftClickAction_Title), (Func<string>)(() => Strings.Setting_LeftClickAction_Description));
@@ -336,6 +350,10 @@ namespace Estreya.BlishHUD.EventTable
 			EventCompletedAcion.add_SettingChanged((EventHandler<ValueChangedEventArgs<EventCompletedAction>>)SettingChanged<EventCompletedAction>);
 			UseEventTranslation = GlobalSettings.DefineSetting<bool>("UseEventTranslation", true, (Func<string>)(() => Strings.Setting_UseEventTranslation_Name), (Func<string>)(() => Strings.Setting_UseEventTranslation_Description));
 			UseEventTranslation.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+			MapKeybinding = GlobalSettings.DefineSetting<KeyBinding>("MapKeybinding", new KeyBinding((Keys)77), (Func<string>)(() => "Open Map Hotkey"), (Func<string>)(() => "Defines the key used to open the fullscreen map."));
+			MapKeybinding.add_SettingChanged((EventHandler<ValueChangedEventArgs<KeyBinding>>)SettingChanged<KeyBinding>);
+			MapKeybinding.get_Value().set_Enabled(true);
+			MapKeybinding.get_Value().set_BlockSequenceFromGw2(false);
 		}
 
 		private void InitializeLocationSettings(SettingCollection settings)
@@ -356,37 +374,42 @@ namespace Estreya.BlishHUD.EventTable
 
 		public void InitializeEventSettings(IEnumerable<EventCategory> eventCategories)
 		{
-			EventSettings = Settings.AddSubCollection("event-table-event-settings", false);
-			SettingCollection eventList = EventSettings.AddSubCollection("event-table-event-list-settings", false);
-			foreach (EventCategory category in eventCategories)
+			using (_eventSettingsLock.Lock())
 			{
-				IEnumerable<Event> enumerable;
-				if (!category.ShowCombined)
+				EventSettings = Settings.AddSubCollection("event-table-event-settings", false);
+				SettingCollection eventList = EventSettings.AddSubCollection("event-table-event-list-settings", false);
+				List<SettingEntry<bool>> eventSettingList = new List<SettingEntry<bool>>();
+				foreach (EventCategory category in eventCategories)
 				{
-					IEnumerable<Event> events = category.Events;
-					enumerable = events;
-				}
-				else
-				{
-					enumerable = from e in category.Events
-						group e by e.Key into eg
-						select eg.First();
-				}
-				foreach (Event e2 in enumerable)
-				{
-					SettingEntry<bool> setting = eventList.DefineSetting<bool>(e2.SettingKey, true, (Func<string>)null, (Func<string>)null);
-					setting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object s, ValueChangedEventArgs<bool> e)
+					IEnumerable<Event> enumerable;
+					if (!category.ShowCombined)
 					{
-						SettingEntry<bool> val = (SettingEntry<bool>)s;
-						this.EventSettingChanged?.Invoke(s, new EventSettingsChangedEventArgs
+						IEnumerable<Event> events = category.Events;
+						enumerable = events;
+					}
+					else
+					{
+						enumerable = from e in category.Events
+							group e by e.Key into eg
+							select eg.First();
+					}
+					foreach (Event e2 in enumerable)
+					{
+						SettingEntry<bool> setting = eventList.DefineSetting<bool>(e2.SettingKey, true, (Func<string>)null, (Func<string>)null);
+						setting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object s, ValueChangedEventArgs<bool> e)
 						{
-							Name = ((SettingEntry)val).get_EntryKey(),
-							Enabled = e.get_NewValue()
+							SettingEntry<bool> val = (SettingEntry<bool>)s;
+							this.EventSettingChanged?.Invoke(s, new EventSettingsChangedEventArgs
+							{
+								Name = ((SettingEntry)val).get_EntryKey(),
+								Enabled = e.get_NewValue()
+							});
+							SettingChanged<bool>(s, e);
 						});
-						SettingChanged<bool>(s, e);
-					});
-					AllEvents.Add(setting);
+						eventSettingList.Add(setting);
+					}
 				}
+				_allEvents = eventSettingList.AsReadOnly();
 			}
 		}
 
