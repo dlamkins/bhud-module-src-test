@@ -161,7 +161,10 @@ namespace Kenedia.Modules.BuildsManager
 			disposed = true;
 			foreach (SpecLine specLine in SpecLines)
 			{
-				specLine.Changed = (EventHandler)Delegate.Remove(specLine.Changed, new EventHandler(OnChanged));
+				if (specLine != null)
+				{
+					specLine.Changed = (EventHandler)Delegate.Remove(specLine.Changed, new EventHandler(OnChanged));
+				}
 			}
 			Profession = null;
 			SpecLines = null;
