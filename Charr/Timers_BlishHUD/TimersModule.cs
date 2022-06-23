@@ -352,7 +352,6 @@ namespace Charr.Timers_BlishHUD
 			{
 				enc.Description = ex2.Message;
 				_errorCaught = true;
-				Logger.Error(enc.Name + " Timer parsing failure: " + ex2.Message);
 			}
 			catch (Exception ex)
 			{
@@ -362,7 +361,6 @@ namespace Charr.Timers_BlishHUD
 				encounter.Description = "File Path: " + timerStream.FileName + "\n\nInvalid JSON format: " + ex.Message;
 				enc = encounter;
 				_errorCaught = true;
-				Logger.Error("File Path: " + timerStream.FileName + "\n\nInvalid JSON format: " + ex.Message);
 			}
 			finally
 			{
@@ -454,7 +452,7 @@ namespace Charr.Timers_BlishHUD
 
 		private void ShowTimerEntries(Panel timerPanel)
 		{
-			foreach (Encounter enc3 in _invalidEncounters)
+			foreach (Encounter enc3 in _encounters)
 			{
 				TimerDetails entry2 = new TimerDetails
 				{
@@ -493,7 +491,7 @@ namespace Charr.Timers_BlishHUD
 					}
 				};
 			}
-			foreach (Encounter enc2 in _encounters)
+			foreach (Encounter enc2 in _invalidEncounters)
 			{
 				TimerDetails entry = new TimerDetails
 				{
@@ -1285,14 +1283,11 @@ namespace Charr.Timers_BlishHUD
 				timerPanel.FilterChildren((TimerDetails db) => db.Encounter.Map == GameService.Gw2Mumble.CurrentMap.Id);
 				_displayedTimerDetails = _allTimerDetails.Where((TimerDetails db) => db.Encounter.Map == GameService.Gw2Mumble.CurrentMap.Id).ToList();
 			};
-			if (_encounters.Any((Encounter e) => e.State == Encounter.EncounterStates.Error))
+			timerCategories.AddMenuItem("Invalid Timers").Click += delegate
 			{
-				timerCategories.AddMenuItem("Invalid Timers").Click += delegate
-				{
-					timerPanel.FilterChildren((TimerDetails db) => db.Encounter.State == Encounter.EncounterStates.Error);
-					_displayedTimerDetails = _allTimerDetails.Where((TimerDetails db) => db.Encounter.State == Encounter.EncounterStates.Error).ToList();
-				};
-			}
+				timerPanel.FilterChildren((TimerDetails db) => db.Encounter.State == Encounter.EncounterStates.Error);
+				_displayedTimerDetails = _allTimerDetails.Where((TimerDetails db) => db.Encounter.State == Encounter.EncounterStates.Error).ToList();
+			};
 			ShowCustomTimerCategories();
 			enableAllButton.Click += delegate
 			{

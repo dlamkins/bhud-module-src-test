@@ -285,7 +285,6 @@ namespace Charr.Timers_BlishHUD.Models
 		public void WaitForStart()
 		{
 			StartTrigger?.Enable();
-			Logger.Warn(Name + " phase waiting");
 		}
 
 		public void Start()
@@ -296,7 +295,6 @@ namespace Charr.Timers_BlishHUD.Models
 				StartTrigger?.Disable();
 				FinishTrigger?.Enable();
 				Active = true;
-				Logger.Warn(Name + " phase starting");
 			}
 		}
 
@@ -339,7 +337,6 @@ namespace Charr.Timers_BlishHUD.Models
 				voice.Stop();
 			});
 			Active = false;
-			Logger.Warn(Name + " phase stopping");
 		}
 
 		public void Update(float elapsedTime)
