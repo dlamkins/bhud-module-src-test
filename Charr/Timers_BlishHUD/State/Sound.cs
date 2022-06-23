@@ -11,6 +11,8 @@ namespace Charr.Timers_BlishHUD.State
 
 		private SpeechSynthesizer _synthesizer;
 
+		private int timeIndex;
+
 		[JsonProperty("uid")]
 		public string UID { get; set; }
 
@@ -53,6 +55,7 @@ namespace Charr.Timers_BlishHUD.State
 			{
 				return Name + " invalid timestamps property";
 			}
+			Timestamps.Sort();
 			_synthesizer = new SpeechSynthesizer();
 			_synthesizer.Rate = -2;
 			_synthesizer.Volume = 100;
@@ -77,17 +80,10 @@ namespace Charr.Timers_BlishHUD.State
 
 		public void Update(float elapsedTime)
 		{
-			if (!_activated || TimersModule.ModuleInstance._hideSoundsSetting.Value)
+			if (_activated && !TimersModule.ModuleInstance._hideSoundsSetting.Value && timeIndex < Timestamps.Count && elapsedTime >= Timestamps[timeIndex])
 			{
-				return;
-			}
-			foreach (float time in Timestamps)
-			{
-				if (elapsedTime >= time && elapsedTime <= time + TimersModule.ModuleInstance.Resources.TICKINTERVAL)
-				{
-					_synthesizer.SpeakAsync(Text);
-					break;
-				}
+				_synthesizer.SpeakAsync(Text);
+				timeIndex++;
 			}
 		}
 	}

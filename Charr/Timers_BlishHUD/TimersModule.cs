@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Blish_HUD.Modules;
@@ -406,7 +407,9 @@ namespace Charr.Timers_BlishHUD
 		[Conditional("DEBUG")]
 		private async void ShowLatestRelease()
 		{
-			await new GitHubClient(new ProductHeaderValue("BlishHUD_Timers")).Repository.Release.GetLatest("QuitarHero", "Hero-Timers");
+			GitHubClient github = new GitHubClient(new ProductHeaderValue("BlishHUD_Timers"));
+			await github.Repository.Release.GetLatest("QuitarHero", "Hero-Timers");
+			await github.Repository.Release.GetAll("QuitarHero", "Hero-Timers");
 		}
 
 		protected override async Task LoadAsync()
@@ -829,6 +832,24 @@ namespace Charr.Timers_BlishHUD
 								{
 									File.Delete(DirectoriesManager.GetFullDirectoryPath("timers") + "/Hero-Timers.zip");
 								}
+								string[] files = Directory.GetFiles(DirectoriesManager.GetFullDirectoryPath("timers"), "*.bhtimer", SearchOption.AllDirectories);
+								DirectoryReader directoryReader = new DirectoryReader(DirectoriesManager.GetFullDirectoryPath("timers"));
+								PathableResourceManager pathableResourceManager = new PathableResourceManager(directoryReader);
+								string[] array = files;
+								foreach (string text in array)
+								{
+									if (Directory.GetLastWriteTimeUtc(text) <= DateTimeOffset.Parse("5/2/2022 5:28:21 PM +00:00"))
+									{
+										Encounter encounter = ParseEncounter(new TimerStream(directoryReader.GetFileStream(text), pathableResourceManager, text));
+										if (encounter.Author == "QuitarHero.1645" && File.Exists(text))
+										{
+											File.Delete(text);
+										}
+										encounter.Dispose();
+									}
+								}
+								directoryReader.Dispose();
+								pathableResourceManager.Dispose();
 								if (eventArgs.Error != null)
 								{
 									notice.Text = "Download failed: " + eventArgs.Error.Message;
