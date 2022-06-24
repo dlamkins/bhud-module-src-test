@@ -25,6 +25,7 @@ namespace Nekres.Screenshot_Manager
 						if (!(DateTime.UtcNow < dateTime))
 						{
 							ScreenshotManagerModule.Logger.Error(ex, ex.Message);
+							break;
 						}
 					}
 				}
@@ -56,6 +57,7 @@ namespace Nekres.Screenshot_Manager
 						if (!(DateTime.UtcNow < dateTime))
 						{
 							ScreenshotManagerModule.Logger.Error(ex, ex.Message);
+							break;
 						}
 					}
 				}

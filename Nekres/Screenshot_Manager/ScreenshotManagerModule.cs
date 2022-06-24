@@ -116,11 +116,6 @@ namespace Nekres.Screenshot_Manager
 			CreateOrDisposeCornerIcon(e.get_NewValue());
 		}
 
-		public override IView GetSettingsView()
-		{
-			return (IView)(object)new CustomSettingsView(new CustomSettingsModel(SettingsManager.get_ModuleSettings()));
-		}
-
 		private void LoadTextures()
 		{
 			ScreenShotSfx = ContentsManager.GetSound("audio\\screenshot.wav");
