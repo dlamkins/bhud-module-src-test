@@ -93,10 +93,9 @@ namespace BhModule.Community.Pathing.Utility
 			markerPackPkg.DownloadError = null;
 			markerPackPkg.DownloadProgress = 0;
 			string finalPath = Path.Combine(DataDirUtil.MarkerDir, markerPackPkg.FileName);
-			string tempPackDownloadDestination = Path.GetTempFileName();
+			string tempPackDownloadDestination = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
 			try
 			{
-				File.Delete(tempPackDownloadDestination);
 				using WebClient webClient = new WebClient();
 				webClient.Headers.Add("user-agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36");
 				webClient.DownloadProgressChanged += delegate(object s, DownloadProgressChangedEventArgs e)
