@@ -898,7 +898,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 						}
 						if (currentAccountAchievement.get_Bits() == null)
 						{
-							Logger.Warn($"Requested achievement bits are null, account achievement id: {accountAchievement.get_Id()}");
+							Logger.Debug($"Requested achievement bits are null, account achievement id: {accountAchievement.get_Id()}");
 							continue;
 						}
 						foreach (AchievementBit bit2 in currentAccountAchievement.get_Bits())
@@ -953,7 +953,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			}
 			catch (Exception ex)
 			{
-				Logger.Warn(ex, $"Unknown exception getting current map ({_currentMap.get_Name()} {_currentMap.get_Id()}) fish");
+				Logger.Debug(ex, $"Unknown exception getting current map ({_currentMap.get_Name()} {_currentMap.get_Id()}) fish");
 			}
 			finally
 			{
@@ -966,7 +966,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			Item fish = await RequestItem(fishItemId);
 			if (fish == null)
 			{
-				Logger.Warn($"Skipping fish due to API issue. id: '{fishItemId}'");
+				Logger.Debug($"Skipping fish due to API issue. id: '{fishItemId}'");
 				return;
 			}
 			Logger.Debug($"Found Fish '{fish.get_Name()}' id: '{fish.get_Id()}'");
@@ -974,7 +974,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			Fish ghoti = ((fishIdMatch.Count() != 0) ? fishIdMatch.First() : null);
 			if (ghoti == null)
 			{
-				Logger.Warn($"Missing fish from all fish list: name: '{fish.get_Name()}' id: '{fish.get_Id()}'");
+				Logger.Debug($"Missing fish from all fish list: name: '{fish.get_Name()}' id: '{fish.get_Id()}'");
 				return;
 			}
 			ghoti.Caught = caught;
