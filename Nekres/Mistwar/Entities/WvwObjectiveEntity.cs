@@ -19,14 +19,6 @@ namespace Nekres.Mistwar.Entities
 
 		private static readonly Texture2D TextureClaimed = MistwarModule.ModuleInstance.ContentsManager.GetTexture("1304078.png");
 
-		private static readonly Texture2D CustomTextureFortified = MistwarModule.ModuleInstance.ContentsManager.GetTexture("obj-fortified.png");
-
-		private static readonly Texture2D CustomTextureReinforced = MistwarModule.ModuleInstance.ContentsManager.GetTexture("obj-reinforced.png");
-
-		private static readonly Texture2D CustomTextureSecured = MistwarModule.ModuleInstance.ContentsManager.GetTexture("obj-secured.png");
-
-		private static readonly Texture2D CustomTextureClaimed = MistwarModule.ModuleInstance.ContentsManager.GetTexture("claimed.png");
-
 		private static readonly Texture2D TextureBuff = MistwarModule.ModuleInstance.ContentsManager.GetTexture("righteous_indignation.png");
 
 		private static readonly Color ColorRed = new Color(213, 71, 67);
@@ -71,11 +63,7 @@ namespace Nekres.Mistwar.Entities
 
 		public Texture2D UpgradeTexture => GetUpgradeTierTexture();
 
-		public Texture2D CustomUpgradeTexture => GetUpgradeTierTexture(useCustom: true);
-
 		public Texture2D ClaimedTexture => TextureClaimed;
-
-		public Texture2D CustomClaimedTexture => CustomTextureClaimed;
 
 		public Texture2D BuffTexture => TextureBuff;
 
@@ -163,29 +151,17 @@ namespace Nekres.Mistwar.Entities
 			return remainingTime.Ticks > 0;
 		}
 
-		private Texture2D GetUpgradeTierTexture(bool useCustom = false)
+		private Texture2D GetUpgradeTierTexture()
 		{
 			if (YaksDelivered < 140)
 			{
 				if (YaksDelivered < 60)
 				{
-					if (!useCustom)
-					{
-						return TextureSecured;
-					}
-					return CustomTextureSecured;
+					return TextureSecured;
 				}
-				if (!useCustom)
-				{
-					return TextureReinforced;
-				}
-				return CustomTextureReinforced;
+				return TextureReinforced;
 			}
-			if (!useCustom)
-			{
-				return TextureFortified;
-			}
-			return CustomTextureFortified;
+			return TextureFortified;
 		}
 	}
 }

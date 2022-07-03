@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using Blish_HUD;
 using Gw2Sharp.Models;
 using Gw2Sharp.WebApi.Exceptions;
 using Gw2Sharp.WebApi.V2.Clients;
@@ -59,16 +60,11 @@ namespace Nekres.Mistwar
 			return new Bitmap(responseStream);
 		}
 
-		public static async Task<Stream> DrawMapImage(int mapId, bool removeBackground = false, string filePath = null)
+		public static async Task BuildMap(Map map, string filePath, bool removeBackground = false, IProgress<string> progress = null)
 		{
-			Map map = await RequestMap(mapId);
 			if (map == null)
 			{
-				return null;
-			}
-			if (File.Exists(filePath))
-			{
-				return new MemoryStream(File.ReadAllBytes(filePath));
+				return;
 			}
 			Rectangle area = map.get_ContinentRect();
 			int zoom = 6;
@@ -83,14 +79,7 @@ namespace Nekres.Mistwar
 				gfx.CompositingMode = CompositingMode.SourceOver;
 				foreach (Point p in tileArea)
 				{
-					string[] obj = new string[6] { "Downloading[", null, null, null, null, null };
-					Point point = p;
-					obj[1] = point.ToString();
-					obj[2] = "]: ";
-					obj[3] = tileArea.IndexOf(p).ToString();
-					obj[4] = " of ";
-					obj[5] = tileArea.Count.ToString();
-					Console.WriteLine(string.Concat(obj));
+					progress?.Report($"Downloading {map.get_Name().Trim()} ({map.get_Id()})... {(float)tileArea.IndexOf(p) / (float)(tileArea.Count - 1) * 100f:N0}%");
 					Bitmap tile = await GetTileImage(0, map.get_ContinentId(), map.get_DefaultFloor(), p.X, p.Y, zoom);
 					if (tile != null)
 					{
@@ -105,12 +94,12 @@ namespace Nekres.Mistwar
 				gfx.Flush();
 				if (removeBackground)
 				{
-					IEnumerable<ContinentFloorRegionMapSector> obj2 = await RequestSectorsForFloor(map.get_ContinentId(), map.get_DefaultFloor(), map.get_RegionId(), map.get_Id());
+					IEnumerable<ContinentFloorRegionMapSector> obj = await RequestSectorsForFloor(map.get_ContinentId(), map.get_DefaultFloor(), map.get_RegionId(), map.get_Id());
 					GraphicsPath polygonPath = new GraphicsPath
 					{
 						FillMode = FillMode.Alternate
 					};
-					foreach (ContinentFloorRegionMapSector item in obj2)
+					foreach (ContinentFloorRegionMapSector item in obj)
 					{
 						Point[] bbox = (from coord in item.get_Bounds()
 							select Refit(coord, topLeftPx, padding)).ToArray();
@@ -123,14 +112,8 @@ namespace Nekres.Mistwar
 					gfx.FillRegion(Brushes.Transparent, region);
 				}
 			}
-			if (!string.IsNullOrEmpty(filePath))
-			{
-				bmpDestination.Save(filePath, ImageFormat.Png);
-			}
-			MemoryStream stream = new MemoryStream();
-			bmpDestination.Save(stream, ImageFormat.Png);
+			bmpDestination.Save(filePath, ImageFormat.Png);
 			bmpDestination.Dispose();
-			return stream;
 		}
 
 		public static Point Refit(Coordinates2 value, Coordinates2 destTopLeft, int padding = 0, int tileSize = 256)
@@ -153,7 +136,8 @@ namespace Nekres.Mistwar
 		{
 			try
 			{
-				return (IEnumerable<ContinentFloorRegionMapSector>)(await ((IAllExpandableClient<ContinentFloorRegionMapSector>)(object)MistwarModule.ModuleInstance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Continents()
+				return (IEnumerable<ContinentFloorRegionMapSector>)(await ((IAllExpandableClient<ContinentFloorRegionMapSector>)(object)GameService.Gw2WebApi.get_AnonymousConnection().get_Client().get_V2()
+					.get_Continents()
 					.get_Item(continentId)
 					.get_Floors()
 					.get_Item(floor)
@@ -178,7 +162,8 @@ namespace Nekres.Mistwar
 		{
 			try
 			{
-				return await ((IBulkExpandableClient<Map, int>)(object)MistwarModule.ModuleInstance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Maps()).GetAsync(id, default(CancellationToken));
+				return await ((IBulkExpandableClient<Map, int>)(object)GameService.Gw2WebApi.get_AnonymousConnection().get_Client().get_V2()
+					.get_Maps()).GetAsync(id, default(CancellationToken));
 			}
 			catch (Exception ex) when (ex is BadRequestException || ex is NotFoundException)
 			{

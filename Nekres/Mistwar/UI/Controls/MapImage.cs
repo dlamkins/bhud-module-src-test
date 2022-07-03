@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Glide;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Nekres.Mistwar.Entities;
@@ -20,8 +21,6 @@ namespace Nekres.Mistwar.UI.Controls
 		private Rectangle? _sourceRectangle;
 
 		private Color _tint = Color.get_White();
-
-		private float _grayscaleIntensity;
 
 		private Effect _grayscaleEffect;
 
@@ -82,19 +81,6 @@ namespace Nekres.Mistwar.UI.Controls
 			}
 		}
 
-		public float GrayscaleIntensity
-		{
-			get
-			{
-				return _grayscaleIntensity;
-			}
-			set
-			{
-				((Control)this).SetProperty<float>(ref _grayscaleIntensity, value, false, "GrayscaleIntensity");
-				_grayscaleEffect.get_Parameters().get_Item("Intensity").SetValue(MathHelper.Clamp(value, 0f, 1f));
-			}
-		}
-
 		public float ScaleRatio { get; private set; } = MathHelper.Clamp(MistwarModule.ModuleInstance.ScaleRatioSetting.get_Value() / 100f, 0f, 1f);
 
 
@@ -131,10 +117,44 @@ namespace Nekres.Mistwar.UI.Controls
 			MistwarModule.ModuleInstance.ScaleRatioSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnScaleRatioChanged);
 		}
 
+		public void Toggle(float tDuration = 0.1f, bool silent = false)
+		{
+			if (((Control)this)._enabled)
+			{
+				((Control)this)._enabled = false;
+				if (silent)
+				{
+					((Control)this).Hide();
+					return;
+				}
+				GameService.Content.PlaySoundEffectByName("window-close");
+				((TweenerImpl)GameService.Animation.get_Tweener()).Tween<MapImage>(this, (object)new
+				{
+					Opacity = 0f
+				}, tDuration, 0f, true).OnComplete((Action)((Control)this).Hide);
+				return;
+			}
+			((Control)this)._enabled = true;
+			((Control)this).Show();
+			if (!silent)
+			{
+				GameService.Content.PlaySoundEffectByName("page-open-" + RandomUtil.GetRandom(1, 3));
+				((TweenerImpl)GameService.Animation.get_Tweener()).Tween<MapImage>(this, (object)new
+				{
+					Opacity = 1f
+				}, 0.35f, 0f, true);
+			}
+		}
+
 		internal void SetOpacity(float opacity)
 		{
 			TextureOpacity = opacity;
 			_grayscaleEffect.get_Parameters().get_Item("Opacity").SetValue(opacity);
+		}
+
+		public void SetColorIntensity(float colorIntensity)
+		{
+			_grayscaleEffect.get_Parameters().get_Item("Intensity").SetValue(MathHelper.Clamp(colorIntensity, 0f, 1f));
 		}
 
 		private void OnScaleRatioChanged(object o, ValueChangedEventArgs<float> e)
@@ -167,6 +187,11 @@ namespace Nekres.Mistwar.UI.Controls
 				((Control)dynamicLayer).Dispose();
 			}
 			Texture.remove_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)OnTextureSwapped);
+			AsyncTexture2D texture = _texture;
+			if (texture != null)
+			{
+				texture.Dispose();
+			}
 			MistwarModule.ModuleInstance.ScaleRatioSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnScaleRatioChanged);
 			((Control)this).Dispose();
 		}

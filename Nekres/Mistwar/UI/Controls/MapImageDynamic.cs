@@ -170,31 +170,23 @@ namespace Nekres.Mistwar.UI.Controls
 			//IL_0594: Unknown result type (might be due to invalid IL or missing references)
 			//IL_05a0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_05aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_061a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0626: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0640: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0665: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0698: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_061b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0627: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0648: Unknown result type (might be due to invalid IL or missing references)
+			//IL_065e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_069b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06d4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_06d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_070a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0712: Unknown result type (might be due to invalid IL or missing references)
-			//IL_071e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0738: Unknown result type (might be due to invalid IL or missing references)
-			//IL_074e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_078b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0797: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0802: Unknown result type (might be due to invalid IL or missing references)
-			//IL_080a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_080f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_071a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_071f: Unknown result type (might be due to invalid IL or missing references)
 			if (WvwObjectives == null)
 			{
 				return;
@@ -287,28 +279,13 @@ namespace Nekres.Mistwar.UI.Controls
 					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, new Rectangle(dest.X - (int)size.Width / 2, dest.Y - (int)size.Height - dest.Height / 2 - 10, dest.Width, dest.Height), WvwObjectiveEntity.BrightGold, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
 				}
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, objectiveEntity.Icon, new Rectangle(dest.X - width / 2, dest.Y - height / 2, width, height), (Rectangle?)objectiveEntity.Icon.get_Bounds(), teamColor);
-				double scale = 0.5;
 				if (objectiveEntity.IsClaimed())
 				{
-					if (MistwarModule.ModuleInstance.UseCustomIconsSetting.get_Value())
-					{
-						SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, objectiveEntity.CustomClaimedTexture, new Rectangle(dest.X - width - 5, dest.Y + 10, (int)(scale * (double)objectiveEntity.CustomClaimedTexture.get_Width()), (int)(scale * (double)objectiveEntity.CustomClaimedTexture.get_Height())), (Rectangle?)objectiveEntity.CustomClaimedTexture.get_Bounds());
-					}
-					else
-					{
-						SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, objectiveEntity.ClaimedTexture, new Rectangle(dest.X + (int)(0.6 * (double)width) - objectiveEntity.ClaimedTexture.get_Width() / 2, dest.Y + (int)(0.9 * (double)height) - height / 2, objectiveEntity.ClaimedTexture.get_Width(), objectiveEntity.ClaimedTexture.get_Height()), (Rectangle?)objectiveEntity.ClaimedTexture.get_Bounds());
-					}
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, objectiveEntity.ClaimedTexture, new Rectangle(dest.X + (int)(0.6 * (double)width) - objectiveEntity.ClaimedTexture.get_Width() / 2, dest.Y + (int)(0.9 * (double)height) - height / 2, objectiveEntity.ClaimedTexture.get_Width(), objectiveEntity.ClaimedTexture.get_Height()), (Rectangle?)objectiveEntity.ClaimedTexture.get_Bounds());
 				}
 				if (objectiveEntity.HasUpgraded())
 				{
-					if (MistwarModule.ModuleInstance.UseCustomIconsSetting.get_Value())
-					{
-						SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, objectiveEntity.CustomUpgradeTexture, new Rectangle(dest.X + width / 2 - 2, dest.Y + 5, (int)(scale * (double)objectiveEntity.CustomUpgradeTexture.get_Width()), (int)(scale * (double)objectiveEntity.CustomUpgradeTexture.get_Height())), (Rectangle?)objectiveEntity.CustomUpgradeTexture.get_Bounds());
-					}
-					else
-					{
-						SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, objectiveEntity.UpgradeTexture, new Rectangle(dest.X - objectiveEntity.UpgradeTexture.get_Width() / 2, dest.Y - height / 2 - (int)(0.7 * (double)objectiveEntity.UpgradeTexture.get_Height()), objectiveEntity.UpgradeTexture.get_Width(), objectiveEntity.UpgradeTexture.get_Height()), (Rectangle?)objectiveEntity.UpgradeTexture.get_Bounds());
-					}
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, objectiveEntity.UpgradeTexture, new Rectangle(dest.X - objectiveEntity.UpgradeTexture.get_Width() / 2, dest.Y - height / 2 - (int)(0.7 * (double)objectiveEntity.UpgradeTexture.get_Height()), objectiveEntity.UpgradeTexture.get_Width(), objectiveEntity.UpgradeTexture.get_Height()), (Rectangle?)objectiveEntity.UpgradeTexture.get_Bounds());
 				}
 				if (MistwarModule.ModuleInstance.DrawObjectiveNamesSetting.get_Value())
 				{

@@ -47,9 +47,13 @@ namespace Nekres.Mistwar
 			return min;
 		}
 
-		public static bool IsNullOrEmpty<T>(this IEnumerable<T> data)
+		public static bool IsNullOrEmpty<T>(this IEnumerable<T> source)
 		{
-			return data?.Any() ?? false;
+			if (source == null)
+			{
+				return true;
+			}
+			return !source.Any();
 		}
 	}
 }
