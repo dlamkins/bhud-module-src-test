@@ -83,6 +83,12 @@ namespace Nekres.Mistwar
 
 		protected override async Task LoadAsync()
 		{
+			if (Gw2ApiManager.HasPermission((TokenPermission)1))
+			{
+				MapService mapService = _mapService;
+				WvwService wvwService = _wvwService;
+				mapService.DownloadMaps(await wvwService.GetWvWMapIds(await _wvwService.GetWorldId()));
+			}
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)

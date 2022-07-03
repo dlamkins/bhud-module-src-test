@@ -118,23 +118,31 @@ namespace Nekres.Mistwar.Services
 				cacheTex = new AsyncTexture2D();
 				_mapCache.Add(id, cacheTex);
 			}
-			await ReloadMap();
 			string filePath = string.Format("{0}/{1}.png", _dir.GetFullDirectoryPath("mistwar"), id);
-			if (File.Exists(filePath))
+			if (LoadFromCache(filePath, cacheTex))
 			{
-				using (MemoryStream fil = new MemoryStream(File.ReadAllBytes(filePath)))
-				{
-					Texture2D tex = Texture2D.FromStream(GameService.Graphics.get_GraphicsDevice(), (Stream)fil);
-					cacheTex.SwapTexture(tex);
-				}
+				await ReloadMap();
 				return;
 			}
 			await MapUtil.BuildMap(await MapUtil.RequestMap(id), filePath, removeBackground: true, _loadingIndicator).ContinueWith((Func<Task, Task>)async delegate
 			{
-				using MemoryStream memoryStream = new MemoryStream(File.ReadAllBytes(filePath));
-				Texture2D tex2 = Texture2D.FromStream(GameService.Graphics.get_GraphicsDevice(), (Stream)memoryStream);
-				cacheTex.SwapTexture(tex2);
+				if (LoadFromCache(filePath, cacheTex))
+				{
+					await ReloadMap();
+				}
 			});
+		}
+
+		private bool LoadFromCache(string filePath, AsyncTexture2D cacheTex)
+		{
+			if (!File.Exists(filePath))
+			{
+				return false;
+			}
+			using MemoryStream fil = new MemoryStream(File.ReadAllBytes(filePath));
+			Texture2D tex = Texture2D.FromStream(GameService.Graphics.get_GraphicsDevice(), (Stream)fil);
+			cacheTex.SwapTexture(tex);
+			return true;
 		}
 
 		public async Task ReloadMap()
