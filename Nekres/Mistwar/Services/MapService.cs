@@ -139,14 +139,11 @@ namespace Nekres.Mistwar.Services
 
 		public async Task ReloadMap()
 		{
-			((Control)_mapControl).Hide();
-			((Control)_mapControl).set_Enabled(false);
 			if (GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld() && _mapCache.TryGetValue(GameService.Gw2Mumble.get_CurrentMap().get_Id(), out var tex))
 			{
-				_mapControl.Texture = tex;
+				_mapControl.Texture.SwapTexture(AsyncTexture2D.op_Implicit(tex));
 				MapImage mapControl = _mapControl;
 				mapControl.WvwObjectives = await _wvw.GetObjectives(GameService.Gw2Mumble.get_CurrentMap().get_Id());
-				((Control)_mapControl).set_Enabled(true);
 			}
 		}
 
@@ -168,7 +165,6 @@ namespace Nekres.Mistwar.Services
 			if (e.get_Value())
 			{
 				((Control)_mapControl).Hide();
-				((Control)_mapControl).set_Enabled(false);
 			}
 		}
 
@@ -177,7 +173,6 @@ namespace Nekres.Mistwar.Services
 			if (e.get_Value())
 			{
 				((Control)_mapControl).Hide();
-				((Control)_mapControl).set_Enabled(false);
 			}
 		}
 

@@ -26,13 +26,20 @@ namespace Nekres.Mistwar.UI.Controls
 
 		private MapImageDynamic _dynamicLayer;
 
+		private bool _isVisible;
+
+		public float TextureOpacity { get; private set; }
+
+		public float ScaleRatio { get; private set; } = MathHelper.Clamp(MistwarModule.ModuleInstance.ScaleRatioSetting.get_Value() / 100f, 0f, 1f);
+
+
 		public AsyncTexture2D Texture
 		{
 			get
 			{
 				return _texture;
 			}
-			set
+			private init
 			{
 				((Control)this).SetProperty<AsyncTexture2D>(ref _texture, value, false, "Texture");
 			}
@@ -81,47 +88,34 @@ namespace Nekres.Mistwar.UI.Controls
 			}
 		}
 
-		public float ScaleRatio { get; private set; } = MathHelper.Clamp(MistwarModule.ModuleInstance.ScaleRatioSetting.get_Value() / 100f, 0f, 1f);
-
-
-		public float TextureOpacity { get; private set; }
-
 		public MapImage()
 			: this()
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0046: Expected O, but got Unknown
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ac: Expected O, but got Unknown
-			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0086: Expected O, but got Unknown
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
 			Texture = new AsyncTexture2D();
-			Rectangle bounds = _texture.get_Texture().get_Bounds();
-			((Control)this).set_Size(((Rectangle)(ref bounds)).get_Size());
-			if (_grayscaleEffect == null)
-			{
-				_grayscaleEffect = MistwarModule.ModuleInstance.ContentsManager.GetEffect<Effect>("effects\\grayscale.mgfx");
-			}
+			_grayscaleEffect = MistwarModule.ModuleInstance.ContentsManager.GetEffect<Effect>("effects\\grayscale.mgfx");
 			SpriteBatchParameters val = new SpriteBatchParameters((SpriteSortMode)0, (BlendState)null, (SamplerState)null, (DepthStencilState)null, (RasterizerState)null, (Effect)null, (Matrix?)null);
 			val.set_Effect(_grayscaleEffect);
 			((Control)this)._spriteBatchParameters = val;
-			_texture.add_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)OnTextureSwapped);
 			MapImageDynamic mapImageDynamic = new MapImageDynamic(this);
 			((Control)mapImageDynamic).set_Size(((Control)this).get_Size());
 			_dynamicLayer = mapImageDynamic;
+			Texture.add_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)OnTextureSwapped);
 			MistwarModule.ModuleInstance.ScaleRatioSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnScaleRatioChanged);
 		}
 
 		public void Toggle(float tDuration = 0.1f, bool silent = false)
 		{
-			if (((Control)this)._enabled)
+			if (_isVisible)
 			{
-				((Control)this)._enabled = false;
+				_isVisible = false;
 				if (silent)
 				{
 					((Control)this).Hide();
@@ -134,7 +128,7 @@ namespace Nekres.Mistwar.UI.Controls
 				}, tDuration, 0f, true).OnComplete((Action)((Control)this).Hide);
 				return;
 			}
-			((Control)this)._enabled = true;
+			_isVisible = true;
 			((Control)this).Show();
 			if (!silent)
 			{
@@ -186,11 +180,16 @@ namespace Nekres.Mistwar.UI.Controls
 			{
 				((Control)dynamicLayer).Dispose();
 			}
-			Texture.remove_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)OnTextureSwapped);
+			_texture.remove_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)OnTextureSwapped);
 			AsyncTexture2D texture = _texture;
 			if (texture != null)
 			{
 				texture.Dispose();
+			}
+			Effect grayscaleEffect = _grayscaleEffect;
+			if (grayscaleEffect != null)
+			{
+				((GraphicsResource)grayscaleEffect).Dispose();
 			}
 			MistwarModule.ModuleInstance.ScaleRatioSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnScaleRatioChanged);
 			((Control)this).Dispose();

@@ -177,13 +177,13 @@ namespace Nekres.Mistwar
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 			if (GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld())
 			{
-				((Control)_moduleIcon).Hide();
-				ToggleKeySetting.get_Value().set_Enabled(false);
+				((Control)_moduleIcon).Show();
+				ToggleKeySetting.get_Value().set_Enabled(true);
 			}
 			else
 			{
-				((Control)_moduleIcon).Show();
-				ToggleKeySetting.get_Value().set_Enabled(true);
+				((Control)_moduleIcon).Hide();
+				ToggleKeySetting.get_Value().set_Enabled(false);
 			}
 		}
 
