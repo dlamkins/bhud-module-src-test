@@ -44,6 +44,8 @@ namespace Nekres.Mistwar
 
 		private MapService _mapService;
 
+		private AsyncTexture2D _cornerTex;
+
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
 		internal ContentsManager ContentsManager => base.ModuleParameters.get_ContentsManager();
@@ -74,9 +76,12 @@ namespace Nekres.Mistwar
 
 		protected override void Initialize()
 		{
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Expected O, but got Unknown
-			_moduleIcon = new CornerIcon(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("corner_icon.png")), ((Module)this).get_Name());
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Expected O, but got Unknown
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Expected O, but got Unknown
+			_cornerTex = new AsyncTexture2D(ContentsManager.GetTexture("corner_icon.png"));
+			_moduleIcon = new CornerIcon(_cornerTex, ((Module)this).get_Name());
 			_wvwService = new WvwService(Gw2ApiManager);
 			_mapService = new MapService(Gw2ApiManager, DirectoriesManager, _wvwService, GetModuleProgressHandler());
 		}
@@ -114,12 +119,17 @@ namespace Nekres.Mistwar
 		private void UpdateModuleLoading(string loadingMessage)
 		{
 			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			if (_moduleIcon != null)
+			if (_moduleIcon == null)
 			{
-				_moduleIcon.set_LoadingMessage(loadingMessage);
-				if (loadingMessage == null && !GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld())
+				return;
+			}
+			_moduleIcon.set_LoadingMessage(loadingMessage);
+			if (loadingMessage == null && !GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld())
+			{
+				CornerIcon moduleIcon = _moduleIcon;
+				if (moduleIcon != null)
 				{
-					((Control)_moduleIcon).Hide();
+					((Control)moduleIcon).Dispose();
 				}
 			}
 		}
@@ -181,16 +191,21 @@ namespace Nekres.Mistwar
 		private void OnMapChanged(object o, ValueEventArgs<int> e)
 		{
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002d: Expected O, but got Unknown
 			if (GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld())
 			{
-				((Control)_moduleIcon).Show();
+				_moduleIcon = new CornerIcon(_cornerTex, ((Module)this).get_Name());
+				((Control)_moduleIcon).add_Click((EventHandler<MouseEventArgs>)OnModuleIconClick);
 				ToggleKeySetting.get_Value().set_Enabled(true);
+				return;
 			}
-			else
+			CornerIcon moduleIcon = _moduleIcon;
+			if (moduleIcon != null)
 			{
-				((Control)_moduleIcon).Hide();
-				ToggleKeySetting.get_Value().set_Enabled(false);
+				((Control)moduleIcon).Dispose();
 			}
+			ToggleKeySetting.get_Value().set_Enabled(false);
 		}
 
 		protected override void Unload()
