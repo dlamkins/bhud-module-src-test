@@ -191,21 +191,28 @@ namespace Nekres.Mistwar
 		private void OnMapChanged(object o, ValueEventArgs<int> e)
 		{
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Expected O, but got Unknown
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Expected O, but got Unknown
 			if (GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld())
 			{
+				CornerIcon moduleIcon = _moduleIcon;
+				if (moduleIcon != null)
+				{
+					((Control)moduleIcon).Dispose();
+				}
 				_moduleIcon = new CornerIcon(_cornerTex, ((Module)this).get_Name());
 				((Control)_moduleIcon).add_Click((EventHandler<MouseEventArgs>)OnModuleIconClick);
 				ToggleKeySetting.get_Value().set_Enabled(true);
-				return;
 			}
-			CornerIcon moduleIcon = _moduleIcon;
-			if (moduleIcon != null)
+			else
 			{
-				((Control)moduleIcon).Dispose();
+				CornerIcon moduleIcon2 = _moduleIcon;
+				if (moduleIcon2 != null)
+				{
+					((Control)moduleIcon2).Dispose();
+				}
+				ToggleKeySetting.get_Value().set_Enabled(false);
 			}
-			ToggleKeySetting.get_Value().set_Enabled(false);
 		}
 
 		protected override void Unload()
