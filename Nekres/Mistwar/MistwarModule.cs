@@ -223,6 +223,11 @@ namespace Nekres.Mistwar
 			{
 				((Control)moduleIcon).Dispose();
 			}
+			AsyncTexture2D cornerTex = _cornerTex;
+			if (cornerTex != null)
+			{
+				cornerTex.Dispose();
+			}
 			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
 			GameService.Gw2Mumble.get_UI().remove_IsMapOpenChanged((EventHandler<ValueEventArgs<bool>>)OnIsMapOpenChanged);
 			ToggleKeySetting.get_Value().set_Enabled(false);

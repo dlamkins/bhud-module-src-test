@@ -199,6 +199,13 @@ namespace Nekres.Mistwar.Services
 			{
 				((Control)mapControl).Dispose();
 			}
+			foreach (AsyncTexture2D value in _mapCache.Values)
+			{
+				if (value != null)
+				{
+					value.Dispose();
+				}
+			}
 		}
 	}
 }
