@@ -80,6 +80,8 @@ namespace Manlaan.Mounts
 
 		internal static string Setting_MountRadialSpawnAtMouse => ResourceManager.GetString("Setting_MountRadialSpawnAtMouse", resourceCulture);
 
+		internal static string Setting_MountRadialStartAngle => ResourceManager.GetString("Setting_MountRadialStartAngle", resourceCulture);
+
 		internal static string Setting_MountRadialToggleActionCameraKeyBinding => ResourceManager.GetString("Setting_MountRadialToggleActionCameraKeyBinding", resourceCulture);
 
 		internal static string Setting_Orientation => ResourceManager.GetString("Setting_Orientation", resourceCulture);

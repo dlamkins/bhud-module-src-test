@@ -823,49 +823,67 @@ namespace Manlaan.Mounts.Views
 			//IL_034f: Expected O, but got Unknown
 			//IL_0350: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0355: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0368: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0372: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0379: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0385: Expected O, but got Unknown
-			//IL_03e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0366: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0370: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0377: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0382: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03af: Expected O, but got Unknown
+			//IL_03c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0403: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0409: Expected O, but got Unknown
 			//IL_040a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0411: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0418: Unknown result type (might be due to invalid IL or missing references)
-			//IL_041f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_042c: Expected O, but got Unknown
-			//IL_042d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0432: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0436: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0440: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0447: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0457: Unknown result type (might be due to invalid IL or missing references)
-			//IL_046a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0479: Expected O, but got Unknown
-			//IL_0490: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0495: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04d3: Expected O, but got Unknown
-			//IL_04d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0503: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0527: Unknown result type (might be due to invalid IL or missing references)
-			//IL_052c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0533: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0537: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0541: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0548: Unknown result type (might be due to invalid IL or missing references)
-			//IL_055b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_040f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0422: Unknown result type (might be due to invalid IL or missing references)
+			//IL_042c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0433: Unknown result type (might be due to invalid IL or missing references)
+			//IL_043f: Expected O, but got Unknown
+			//IL_04a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e6: Expected O, but got Unknown
+			//IL_04e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0501: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0511: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0524: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0533: Expected O, but got Unknown
+			//IL_054a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_054f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_055a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0564: Unknown result type (might be due to invalid IL or missing references)
+			//IL_056b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0572: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0579: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0580: Unknown result type (might be due to invalid IL or missing references)
+			//IL_058d: Expected O, but got Unknown
+			//IL_058d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0592: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0599: Unknown result type (might be due to invalid IL or missing references)
+			//IL_059e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0602: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0615: Unknown result type (might be due to invalid IL or missing references)
 			Label val = new Label();
 			((Control)val).set_Location(new Point(0, 0));
 			((Control)val).set_Width(labelWidth);
@@ -918,53 +936,73 @@ namespace Manlaan.Mounts.Views
 			val6.set_AutoSizeHeight(false);
 			val6.set_WrapText(false);
 			((Control)val6).set_Parent(radialPanel);
-			val6.set_Text("Icon size: ");
-			Label settingMountRadialIconSizeModifier_Label = val6;
+			val6.set_Text("Start angle: ");
+			Label settingMountRadialStartAngle_Label = val6;
 			TrackBar val7 = new TrackBar();
-			((Control)val7).set_Location(new Point(((Control)settingMountRadialIconSizeModifier_Label).get_Right() + 5, ((Control)settingMountRadialIconSizeModifier_Label).get_Top()));
+			((Control)val7).set_Location(new Point(((Control)settingMountRadialStartAngle_Label).get_Right() + 5, ((Control)settingMountRadialStartAngle_Label).get_Top()));
 			((Control)val7).set_Width(mountsAndRadialInputWidth);
-			val7.set_MaxValue(100f);
-			val7.set_MinValue(5f);
-			val7.set_Value(Module._settingMountRadialIconSizeModifier.get_Value() * 100f);
+			val7.set_MaxValue(360f);
+			val7.set_MinValue(0f);
+			val7.set_Value(Module._settingMountRadialStartAngle.get_Value() * 360f);
 			((Control)val7).set_Parent(radialPanel);
-			TrackBar settingMountRadialIconSizeModifier_Slider = val7;
-			settingMountRadialIconSizeModifier_Slider.add_ValueChanged((EventHandler<ValueEventArgs<float>>)delegate
+			TrackBar settingMountRadialStartAngle_Slider = val7;
+			settingMountRadialStartAngle_Slider.add_ValueChanged((EventHandler<ValueEventArgs<float>>)delegate
 			{
-				Module._settingMountRadialIconSizeModifier.set_Value(settingMountRadialIconSizeModifier_Slider.get_Value() / 100f);
+				Module._settingMountRadialStartAngle.set_Value(settingMountRadialStartAngle_Slider.get_Value() / 360f);
 			});
 			Label val8 = new Label();
-			((Control)val8).set_Location(new Point(0, ((Control)settingMountRadialIconSizeModifier_Label).get_Bottom() + 6));
+			((Control)val8).set_Location(new Point(0, ((Control)settingMountRadialStartAngle_Label).get_Bottom() + 6));
 			((Control)val8).set_Width(labelWidth);
 			val8.set_AutoSizeHeight(false);
 			val8.set_WrapText(false);
 			((Control)val8).set_Parent(radialPanel);
-			val8.set_Text("Icon opacity: ");
-			Label settingMountRadialIconOpacity_Label = val8;
+			val8.set_Text("Icon size: ");
+			Label settingMountRadialIconSizeModifier_Label = val8;
 			TrackBar val9 = new TrackBar();
-			((Control)val9).set_Location(new Point(((Control)settingMountRadialIconOpacity_Label).get_Right() + 5, ((Control)settingMountRadialIconOpacity_Label).get_Top()));
+			((Control)val9).set_Location(new Point(((Control)settingMountRadialIconSizeModifier_Label).get_Right() + 5, ((Control)settingMountRadialIconSizeModifier_Label).get_Top()));
 			((Control)val9).set_Width(mountsAndRadialInputWidth);
 			val9.set_MaxValue(100f);
 			val9.set_MinValue(5f);
-			val9.set_Value(Module._settingMountRadialIconOpacity.get_Value() * 100f);
+			val9.set_Value(Module._settingMountRadialIconSizeModifier.get_Value() * 100f);
 			((Control)val9).set_Parent(radialPanel);
-			TrackBar settingMountRadialIconOpacity_Slider = val9;
-			settingMountRadialIconOpacity_Slider.add_ValueChanged((EventHandler<ValueEventArgs<float>>)delegate
+			TrackBar settingMountRadialIconSizeModifier_Slider = val9;
+			settingMountRadialIconSizeModifier_Slider.add_ValueChanged((EventHandler<ValueEventArgs<float>>)delegate
 			{
-				Module._settingMountRadialIconOpacity.set_Value(settingMountRadialIconOpacity_Slider.get_Value() / 100f);
+				Module._settingMountRadialIconSizeModifier.set_Value(settingMountRadialIconSizeModifier_Slider.get_Value() / 100f);
 			});
 			Label val10 = new Label();
-			((Control)val10).set_Location(new Point(0, ((Control)settingMountRadialIconOpacity_Label).get_Bottom() + 6));
+			((Control)val10).set_Location(new Point(0, ((Control)settingMountRadialIconSizeModifier_Label).get_Bottom() + 6));
 			((Control)val10).set_Width(labelWidth);
 			val10.set_AutoSizeHeight(false);
 			val10.set_WrapText(false);
 			((Control)val10).set_Parent(radialPanel);
-			val10.set_Text("Center mount: ");
-			Label settingMountRadialCenterMountBehavior_Label = val10;
-			Dropdown val11 = new Dropdown();
-			((Control)val11).set_Location(new Point(((Control)settingMountRadialCenterMountBehavior_Label).get_Right() + 5, ((Control)settingMountRadialCenterMountBehavior_Label).get_Top() - 4));
+			val10.set_Text("Icon opacity: ");
+			Label settingMountRadialIconOpacity_Label = val10;
+			TrackBar val11 = new TrackBar();
+			((Control)val11).set_Location(new Point(((Control)settingMountRadialIconOpacity_Label).get_Right() + 5, ((Control)settingMountRadialIconOpacity_Label).get_Top()));
 			((Control)val11).set_Width(mountsAndRadialInputWidth);
+			val11.set_MaxValue(100f);
+			val11.set_MinValue(5f);
+			val11.set_Value(Module._settingMountRadialIconOpacity.get_Value() * 100f);
 			((Control)val11).set_Parent(radialPanel);
-			Dropdown settingMountRadialCenterMountBehavior_Select = val11;
+			TrackBar settingMountRadialIconOpacity_Slider = val11;
+			settingMountRadialIconOpacity_Slider.add_ValueChanged((EventHandler<ValueEventArgs<float>>)delegate
+			{
+				Module._settingMountRadialIconOpacity.set_Value(settingMountRadialIconOpacity_Slider.get_Value() / 100f);
+			});
+			Label val12 = new Label();
+			((Control)val12).set_Location(new Point(0, ((Control)settingMountRadialIconOpacity_Label).get_Bottom() + 6));
+			((Control)val12).set_Width(labelWidth);
+			val12.set_AutoSizeHeight(false);
+			val12.set_WrapText(false);
+			((Control)val12).set_Parent(radialPanel);
+			val12.set_Text("Center mount: ");
+			Label settingMountRadialCenterMountBehavior_Label = val12;
+			Dropdown val13 = new Dropdown();
+			((Control)val13).set_Location(new Point(((Control)settingMountRadialCenterMountBehavior_Label).get_Right() + 5, ((Control)settingMountRadialCenterMountBehavior_Label).get_Top() - 4));
+			((Control)val13).set_Width(mountsAndRadialInputWidth);
+			((Control)val13).set_Parent(radialPanel);
+			Dropdown settingMountRadialCenterMountBehavior_Select = val13;
 			string[] mountRadialCenterMountBehavior = Module._mountRadialCenterMountBehavior;
 			foreach (string i in mountRadialCenterMountBehavior)
 			{
@@ -975,42 +1013,42 @@ namespace Manlaan.Mounts.Views
 			{
 				Module._settingMountRadialCenterMountBehavior.set_Value(settingMountRadialCenterMountBehavior_Select.get_SelectedItem());
 			});
-			Label val12 = new Label();
-			((Control)val12).set_Location(new Point(0, ((Control)settingMountRadialCenterMountBehavior_Label).get_Bottom() + 6));
-			((Control)val12).set_Width(labelWidth);
-			val12.set_AutoSizeHeight(false);
-			val12.set_WrapText(false);
-			((Control)val12).set_Parent(radialPanel);
-			val12.set_Text("Remove center mount from radial: ");
-			Label settingMountRadialRemoveCenterMount_Label = val12;
-			Checkbox val13 = new Checkbox();
-			((Control)val13).set_Size(new Point(labelWidth, 20));
-			((Control)val13).set_Parent(radialPanel);
-			val13.set_Checked(Module._settingMountRadialRemoveCenterMount.get_Value());
-			((Control)val13).set_Location(new Point(((Control)settingMountRadialRemoveCenterMount_Label).get_Right() + 5, ((Control)settingMountRadialRemoveCenterMount_Label).get_Top() - 1));
-			Checkbox settingMountRadialRemoveCenterMount_Checkbox = val13;
-			settingMountRadialRemoveCenterMount_Checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
-			{
-				Module._settingMountRadialRemoveCenterMount.set_Value(settingMountRadialRemoveCenterMount_Checkbox.get_Checked());
-			});
 			Label val14 = new Label();
-			((Control)val14).set_Location(new Point(0, ((Control)settingMountRadialRemoveCenterMount_Label).get_Bottom() + 6));
+			((Control)val14).set_Location(new Point(0, ((Control)settingMountRadialCenterMountBehavior_Label).get_Bottom() + 6));
 			((Control)val14).set_Width(labelWidth);
 			val14.set_AutoSizeHeight(false);
 			val14.set_WrapText(false);
 			((Control)val14).set_Parent(radialPanel);
-			val14.set_Text("In-game action camera key binding: ");
-			Label settingMountRadialToggleActionCameraKeyBinding_Label = val14;
-			Image val15 = new Image();
+			val14.set_Text("Remove center mount from radial: ");
+			Label settingMountRadialRemoveCenterMount_Label = val14;
+			Checkbox val15 = new Checkbox();
+			((Control)val15).set_Size(new Point(labelWidth, 20));
 			((Control)val15).set_Parent(radialPanel);
-			((Control)val15).set_Size(new Point(16, 16));
-			((Control)val15).set_Location(new Point(((Control)settingMountRadialToggleActionCameraKeyBinding_Label).get_Right() - 32, ((Control)settingMountRadialToggleActionCameraKeyBinding_Label).get_Bottom() - 16));
-			val15.set_Texture(AsyncTexture2D.op_Implicit(anetTexture));
-			KeybindingAssigner val16 = new KeybindingAssigner(Module._settingMountRadialToggleActionCameraKeyBinding.get_Value());
-			val16.set_NameWidth(0);
-			((Control)val16).set_Size(new Point(mountsAndRadialInputWidth, 20));
+			val15.set_Checked(Module._settingMountRadialRemoveCenterMount.get_Value());
+			((Control)val15).set_Location(new Point(((Control)settingMountRadialRemoveCenterMount_Label).get_Right() + 5, ((Control)settingMountRadialRemoveCenterMount_Label).get_Top() - 1));
+			Checkbox settingMountRadialRemoveCenterMount_Checkbox = val15;
+			settingMountRadialRemoveCenterMount_Checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+			{
+				Module._settingMountRadialRemoveCenterMount.set_Value(settingMountRadialRemoveCenterMount_Checkbox.get_Checked());
+			});
+			Label val16 = new Label();
+			((Control)val16).set_Location(new Point(0, ((Control)settingMountRadialRemoveCenterMount_Label).get_Bottom() + 6));
+			((Control)val16).set_Width(labelWidth);
+			val16.set_AutoSizeHeight(false);
+			val16.set_WrapText(false);
 			((Control)val16).set_Parent(radialPanel);
-			((Control)val16).set_Location(new Point(((Control)settingMountRadialToggleActionCameraKeyBinding_Label).get_Right() + 4, ((Control)settingMountRadialToggleActionCameraKeyBinding_Label).get_Top() - 1));
+			val16.set_Text("In-game action camera key binding: ");
+			Label settingMountRadialToggleActionCameraKeyBinding_Label = val16;
+			Image val17 = new Image();
+			((Control)val17).set_Parent(radialPanel);
+			((Control)val17).set_Size(new Point(16, 16));
+			((Control)val17).set_Location(new Point(((Control)settingMountRadialToggleActionCameraKeyBinding_Label).get_Right() - 32, ((Control)settingMountRadialToggleActionCameraKeyBinding_Label).get_Bottom() - 16));
+			val17.set_Texture(AsyncTexture2D.op_Implicit(anetTexture));
+			KeybindingAssigner val18 = new KeybindingAssigner(Module._settingMountRadialToggleActionCameraKeyBinding.get_Value());
+			val18.set_NameWidth(0);
+			((Control)val18).set_Size(new Point(mountsAndRadialInputWidth, 20));
+			((Control)val18).set_Parent(radialPanel);
+			((Control)val18).set_Location(new Point(((Control)settingMountRadialToggleActionCameraKeyBinding_Label).get_Right() + 4, ((Control)settingMountRadialToggleActionCameraKeyBinding_Label).get_Top() - 1));
 		}
 
 		private static void DisplayManualPanelIfNeeded(Panel manualPanel)

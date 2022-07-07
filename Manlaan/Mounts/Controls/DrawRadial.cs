@@ -16,6 +16,8 @@ namespace Manlaan.Mounts.Controls
 
 		private readonly Helper _helper;
 
+		private readonly TextureCache _textureCache;
+
 		private List<RadialMount> RadialMounts = new List<RadialMount>();
 
 		private int radius;
@@ -42,13 +44,14 @@ namespace Manlaan.Mounts.Controls
 
 		public bool IsActionCamToggledOnMount { get; private set; }
 
-		public DrawRadial(Helper helper)
+		public DrawRadial(Helper helper, TextureCache textureCache)
 			: this()
 		{
 			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).set_Visible(false);
 			((Control)this).set_Padding(Thickness.Zero);
 			_helper = helper;
+			_textureCache = textureCache;
 			((Control)this).add_Shown((EventHandler<EventArgs>)async delegate(object sender, EventArgs e)
 			{
 				await HandleShown(sender, e);
@@ -66,19 +69,19 @@ namespace Manlaan.Mounts.Controls
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0193: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0198: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0284: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0293: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d2: Unknown result type (might be due to invalid IL or missing references)
 			RadialMounts.Clear();
 			List<Mount> mounts = Module._availableOrderedMounts;
 			Mount mountToPutInCenter = _helper.GetCenterMount();
@@ -88,7 +91,7 @@ namespace Manlaan.Mounts.Controls
 				{
 					mounts.Remove(mountToPutInCenter);
 				}
-				Texture2D texture2 = _helper.GetImgFile(mountToPutInCenter.ImageFileName);
+				Texture2D texture2 = _textureCache.GetImgFile(mountToPutInCenter.ImageFileName);
 				int loc = radius;
 				RadialMounts.Add(new RadialMount
 				{
@@ -99,13 +102,14 @@ namespace Manlaan.Mounts.Controls
 					Default = true
 				});
 			}
-			double currentAngle = 0.0;
+			double startAngle = Math.PI * Math.Floor(Module._settingMountRadialStartAngle.get_Value() * 360f) / 180.0;
+			double currentAngle = startAngle;
 			double partAngleStep = Math.PI * 2.0 / (double)mounts.Count();
 			foreach (Mount mount in mounts)
 			{
 				double angleMid = currentAngle + partAngleStep / 2.0;
 				double angleEnd = currentAngle + partAngleStep;
-				Texture2D texture = _helper.GetImgFile(mount.ImageFileName);
+				Texture2D texture = _textureCache.GetImgFile(mount.ImageFileName);
 				int x = (int)Math.Round((double)radius + (double)radius * Math.Cos(angleMid));
 				int y = (int)Math.Round((double)radius + (double)radius * Math.Sin(angleMid));
 				RadialMounts.Add(new RadialMount
@@ -120,10 +124,9 @@ namespace Manlaan.Mounts.Controls
 				currentAngle = angleEnd;
 			}
 			Point diff = Control.get_Input().get_Mouse().get_Position() - SpawnPoint;
-			double angle = Math.Atan2(diff.Y, diff.X);
-			if (angle < 0.0)
+			double angle;
+			for (angle = Math.Atan2(diff.Y, diff.X); angle < startAngle; angle += Math.PI * 2.0)
 			{
-				angle += Math.PI * 2.0;
 			}
 			Vector2 val = new Vector2((float)diff.Y, (float)diff.X);
 			float length = ((Vector2)(ref val)).Length();
@@ -139,6 +142,15 @@ namespace Manlaan.Mounts.Controls
 				}
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, radialMount.Texture, new Rectangle(radialMount.ImageX, radialMount.ImageY, mountIconSize, mountIconSize), (Rectangle?)null, Color.get_White() * (radialMount.Selected ? 1f : Module._settingMountRadialIconOpacity.get_Value()));
 			}
+		}
+
+		private void DrawDbg(SpriteBatch spriteBatch, int position, string s)
+		{
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, s, GameService.Content.get_DefaultFont32(), new Rectangle(new Point(0, position), new Point(400, 400)), Color.get_Red(), false, (HorizontalAlignment)0, (VerticalAlignment)1);
 		}
 
 		public async Task TriggerSelectedMountAsync()

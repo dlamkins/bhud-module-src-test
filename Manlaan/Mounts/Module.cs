@@ -55,6 +55,8 @@ namespace Manlaan.Mounts
 
 		public static SettingEntry<float> _settingMountRadialRadiusModifier;
 
+		public static SettingEntry<float> _settingMountRadialStartAngle;
+
 		public static SettingEntry<float> _settingMountRadialIconSizeModifier;
 
 		public static SettingEntry<float> _settingMountRadialIconOpacity;
@@ -91,6 +93,8 @@ namespace Manlaan.Mounts
 
 		private Helper _helper;
 
+		private TextureCache _textureCache;
+
 		private bool _dragging;
 
 		private Point _dragStart = Point.get_Zero();
@@ -114,7 +118,7 @@ namespace Manlaan.Mounts
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			_helper = new Helper(ContentsManager);
+			_helper = new Helper();
 		}
 
 		protected override void Initialize()
@@ -153,9 +157,9 @@ namespace Manlaan.Mounts
 		{
 			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00fb: Expected O, but got Unknown
-			//IL_04a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04e9: Expected O, but got Unknown
-			//IL_063d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0508: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0550: Expected O, but got Unknown
+			//IL_06a4: Unknown result type (might be due to invalid IL or missing references)
 			_mounts = new Collection<Mount>
 			{
 				new Raptor(settings, _helper),
@@ -183,6 +187,8 @@ namespace Manlaan.Mounts
 			SettingComplianceExtensions.SetRange(_settingMountRadialIconSizeModifier, 0.05f, 1f);
 			_settingMountRadialRadiusModifier = settings.DefineSetting<float>("MountRadialRadiusModifier", 0.5f, (Func<string>)(() => Strings.Setting_MountRadialRadiusModifier), (Func<string>)(() => ""));
 			SettingComplianceExtensions.SetRange(_settingMountRadialRadiusModifier, 0.2f, 1f);
+			_settingMountRadialStartAngle = settings.DefineSetting<float>("MountRadialStartAngle", 0f, (Func<string>)(() => Strings.Setting_MountRadialStartAngle), (Func<string>)(() => ""));
+			SettingComplianceExtensions.SetRange(_settingMountRadialStartAngle, 0f, 1f);
 			_settingMountRadialIconOpacity = settings.DefineSetting<float>("MountRadialIconOpacity", 0.5f, (Func<string>)(() => Strings.Setting_MountRadialIconOpacity), (Func<string>)(() => ""));
 			SettingComplianceExtensions.SetRange(_settingMountRadialIconOpacity, 0.05f, 1f);
 			_settingMountRadialCenterMountBehavior = settings.DefineSetting<string>("MountRadialCenterMountBehavior", "Default", (Func<string>)(() => Strings.Setting_MountRadialCenterMountBehavior), (Func<string>)(() => ""));
@@ -210,6 +216,7 @@ namespace Manlaan.Mounts
 			_settingMountRadialSpawnAtMouse.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
 			_settingMountRadialIconSizeModifier.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)UpdateSettings);
 			_settingMountRadialRadiusModifier.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)UpdateSettings);
+			_settingMountRadialStartAngle.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)UpdateSettings);
 			_settingMountRadialCenterMountBehavior.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateSettings);
 			_settingMountRadialIconOpacity.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)UpdateSettings);
 			_settingMountRadialRemoveCenterMount.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
@@ -230,6 +237,7 @@ namespace Manlaan.Mounts
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
+			_textureCache = new TextureCache(ContentsManager);
 			DrawUI();
 			GameService.Overlay.get_BlishHudWindow().AddTab(windowTab, (Func<IView>)(() => (IView)(object)new SettingsView(ContentsManager)));
 			((Module)this).OnModuleLoaded(e);
@@ -302,6 +310,7 @@ namespace Manlaan.Mounts
 			_settingMountRadialSpawnAtMouse.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
 			_settingMountRadialIconSizeModifier.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)UpdateSettings);
 			_settingMountRadialRadiusModifier.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)UpdateSettings);
+			_settingMountRadialStartAngle.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)UpdateSettings);
 			_settingMountRadialCenterMountBehavior.remove_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateSettings);
 			_settingMountRadialIconOpacity.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)UpdateSettings);
 			_settingMountRadialRemoveCenterMount.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
@@ -386,7 +395,7 @@ namespace Manlaan.Mounts
 			_mountPanel = val;
 			foreach (Mount mount in _availableOrderedMounts)
 			{
-				Texture2D img = _helper.GetImgFile(mount.ImageFileName);
+				Texture2D img = _textureCache.GetImgFile(mount.ImageFileName);
 				Image val2 = new Image();
 				((Control)val2).set_Parent((Container)(object)_mountPanel);
 				val2.set_Texture(AsyncTexture2D.op_Implicit(img));
@@ -444,7 +453,7 @@ namespace Manlaan.Mounts
 		{
 			foreach (Mount mount in _availableOrderedMounts)
 			{
-				mount.CreateCornerIcon(_helper.GetImgFile(mount.ImageFileName));
+				mount.CreateCornerIcon(_textureCache.GetImgFile(mount.ImageFileName));
 			}
 		}
 
@@ -484,7 +493,7 @@ namespace Manlaan.Mounts
 			{
 				((Control)radial).Dispose();
 			}
-			_radial = new DrawRadial(_helper);
+			_radial = new DrawRadial(_helper, _textureCache);
 			((Control)_radial).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 		}
 

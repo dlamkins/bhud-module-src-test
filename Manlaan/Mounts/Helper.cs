@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -8,50 +7,19 @@ using Blish_HUD;
 using Blish_HUD.Controls.Extern;
 using Blish_HUD.Controls.Intern;
 using Blish_HUD.Input;
-using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Gw2Sharp.Models;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace Manlaan.Mounts
 {
 	public class Helper
 	{
-		private readonly ContentsManager contentsManager;
-
 		private static SemaphoreSlim keybindSemaphore = new SemaphoreSlim(1, 1);
-
-		private readonly Dictionary<string, Texture2D> _textureCache = new Dictionary<string, Texture2D>();
 
 		private static readonly Logger Logger = Logger.GetLogger<Helper>();
 
 		private MapType[] warclawOnlyMaps;
-
-		public Helper(ContentsManager contentsManager)
-		{
-			MapType[] array = new MapType[6];
-			RuntimeHelpers.InitializeArray(array, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);
-			warclawOnlyMaps = (MapType[])(object)array;
-			base._002Ector();
-			this.contentsManager = contentsManager;
-		}
-
-		public Texture2D GetImgFile(string filename)
-		{
-			string textureName = filename;
-			textureName = Module._settingDisplay.get_Value() switch
-			{
-				"Transparent" => textureName + "-trans.png", 
-				"SolidText" => textureName + "-text.png", 
-				_ => textureName + ".png", 
-			};
-			if (!_textureCache.ContainsKey(textureName))
-			{
-				_textureCache[textureName] = contentsManager.GetTexture(textureName);
-			}
-			return _textureCache[textureName];
-		}
 
 		private bool IsPlayerInWvWMap()
 		{
@@ -178,6 +146,14 @@ namespace Manlaan.Mounts
 			{
 				return (VirtualKeyShort)0;
 			}
+		}
+
+		public Helper()
+		{
+			MapType[] array = new MapType[6];
+			RuntimeHelpers.InitializeArray(array, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);
+			warclawOnlyMaps = (MapType[])(object)array;
+			base._002Ector();
 		}
 	}
 }
