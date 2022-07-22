@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
@@ -9,6 +10,8 @@ namespace RaidClears.Settings
 {
 	public class SettingService
 	{
+		public SettingEntry<ApiPollPeriod> RaidPanelApiPollingPeriod { get; }
+
 		public SettingEntry<Point> RaidPanelLocationPoint { get; }
 
 		public SettingEntry<bool> RaidPanelIsVisible { get; }
@@ -47,17 +50,21 @@ namespace RaidClears.Settings
 
 		public SettingService(SettingCollection settings)
 		{
-			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f6: Expected O, but got Unknown
-			//IL_05aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_060f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0146: Expected O, but got Unknown
+			//IL_0623: Unknown result type (might be due to invalid IL or missing references)
+			RaidPanelApiPollingPeriod = settings.DefineSetting<ApiPollPeriod>("RCPoll", ApiPollPeriod.MINUTES_5, (Func<string>)(() => "Api Poll Frequency"), (Func<string>)(() => "How often should the GW2 API be checked for updated information"));
 			ShowRaidsCornerIconSetting = settings.DefineSetting<bool>("RCCornerIcon", false, (Func<string>)(() => "Display top left toggle button"), (Func<string>)(() => "Add a button next to Blish on the top left of screen that hides or shows the Raid Clears window."));
 			RaidPanelIsVisible = settings.DefineSetting<bool>("RCActive", true, (Func<string>)(() => "Display on screen"), (Func<string>)(() => "Enable the Raid Clears grid."));
 			RaidPanelIsVisibleKeyBind = settings.DefineSetting<KeyBinding>("RCkeybind", new KeyBinding((Keys)0), (Func<string>)(() => "Display on screen keybind"), (Func<string>)(() => "Reveal or hide the display from key press."));
 			RaidPanelIsVisibleKeyBind.get_Value().set_Enabled(true);
 			RaidPanelDragWithMouseIsEnabledSetting = settings.DefineSetting<bool>("RCDrag", false, (Func<string>)(() => "Enable Dragging"), (Func<string>)(() => "Click and drag to reposition the clears window."));
 			RaidPanelAllowTooltipsSetting = settings.DefineSetting<bool>("RCtooltips", false, (Func<string>)(() => "Allow tooltips"), (Func<string>)(() => "Hovering the mouse over an encounter will display the full name"));
-			RaidPanelFontSizeSetting = settings.DefineSetting<FontSize>("RCFontSize", (FontSize)11, (Func<string>)(() => "Font Size"), (Func<string>)(() => "Change the size of the grid"));
+			RaidPanelFontSizeSetting = settings.DefineSetting<FontSize>("RCFontSize", (FontSize)11, (Func<string>)(() => "Font Size   "), (Func<string>)(() => "Change the size of the grid (Weird sizes from available fonts)"));
+			SettingEntry<FontSize> raidPanelFontSizeSetting = RaidPanelFontSizeSetting;
+			FontSize[] array = new FontSize[5];
+			RuntimeHelpers.InitializeArray(array, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);
+			SettingComplianceExtensions.SetExcluded<FontSize>(raidPanelFontSizeSetting, (FontSize[])(object)array);
 			RaidPanelWingLabelsSetting = settings.DefineSetting<WingLabel>("RCLabelDisplay", WingLabel.Abbreviation, (Func<string>)(() => "Wing Label"), (Func<string>)(() => "Display wing label as wing number or abbreviated name"));
 			RaidPanelOrientationSetting = settings.DefineSetting<Orientation>("RCOrientation", Orientation.Vertical, (Func<string>)(() => "Orientation"), (Func<string>)(() => "Display the wings in a vertial column or horizontal row"));
 			RaidPanelWingLabelOpacity = settings.DefineSetting<float>("RCWingOpacity", 1f, (Func<string>)(() => "Wing Label Opacity"), (Func<string>)(() => "Wing label transparency, Hidden <--> Full Visible"));
@@ -71,7 +78,6 @@ namespace RaidClears.Settings
 			W5IsVisibleSetting = settings.DefineSetting<bool>("RCw5", true, (Func<string>)(() => "W5 / Hall of Chains"), (Func<string>)(() => "Enable Hall of Chains on the main display"));
 			W6IsVisibleSetting = settings.DefineSetting<bool>("RCw6", true, (Func<string>)(() => "W6 / Mythwright Gambit"), (Func<string>)(() => "Enable Mythwright Gambit on the main display"));
 			W7IsVisibleSetting = settings.DefineSetting<bool>("RCw7", true, (Func<string>)(() => "W7 / The Key of Ahdashim"), (Func<string>)(() => "Enable The Key of Ahdashim on the main display"));
-			RaidPanelLocationPoint = settings.DefineSetting<Point>("RCLocation", new Point(100, 100), (Func<string>)(() => ""), (Func<string>)(() => ""));
 			SettingCollection internalSettingSubCollection = settings.AddSubCollection("internal settings (not visible in UI)", false);
 			RaidPanelLocationPoint = internalSettingSubCollection.DefineSetting<Point>("RCLocation", new Point(100, 100), (Func<string>)null, (Func<string>)null);
 		}

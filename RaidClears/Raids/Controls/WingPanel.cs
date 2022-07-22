@@ -27,18 +27,16 @@ namespace RaidClears.Raids.Controls
 			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Expected O, but got Unknown
-			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Expected O, but got Unknown
-			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0074: Expected O, but got Unknown
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bb: Expected O, but got Unknown
+			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
 			_wing = wing;
 			((FlowPanel)this).set_ControlPadding(new Vector2(2f, 2f));
 			((Container)this).set_HeightSizingMode((SizingMode)1);
@@ -48,7 +46,6 @@ namespace RaidClears.Raids.Controls
 			val.set_AutoSizeHeight(true);
 			((Control)val).set_BasicTooltipText(wing.name);
 			val.set_HorizontalAlignment(WingLabelAlignment());
-			((Control)val).set_Opacity(1f);
 			((Control)val).set_Parent((Container)(object)this);
 			val.set_Text(GetWingLabelText());
 			_wingLabelObj = val;
@@ -59,7 +56,6 @@ namespace RaidClears.Raids.Controls
 				val2.set_AutoSizeHeight(true);
 				((Control)val2).set_BasicTooltipText(encounter.name);
 				val2.set_HorizontalAlignment((HorizontalAlignment)1);
-				((Control)val2).set_Opacity(1f);
 				((Control)val2).set_Parent((Container)(object)this);
 				val2.set_Text(encounter.short_name);
 				Label encounterLabel = val2;
@@ -134,13 +130,73 @@ namespace RaidClears.Raids.Controls
 		public void SetFontSize(FontSize fontSize)
 		{
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 			BitmapFont font = GameService.Content.GetFont((FontFace)0, fontSize, (FontStyle)0);
+			int width = GetLabelWidthForFontSize(fontSize);
 			_wingLabelObj.set_Font(font);
+			((Control)_wingLabelObj).set_Width(width);
 			Encounter[] encounters = _wing.encounters;
-			for (int i = 0; i < encounters.Length; i++)
+			foreach (Encounter obj in encounters)
 			{
-				encounters[i].GetLabelReference().set_Font(font);
+				obj.GetLabelReference().set_Font(font);
+				((Control)obj.GetLabelReference()).set_Width(width);
 			}
+		}
+
+		public int GetLabelWidthForFontSize(FontSize size)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0003: Invalid comparison between Unknown and I4
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0008: Invalid comparison between Unknown and I4
+			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Invalid comparison between Unknown and I4
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Invalid comparison between Unknown and I4
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Invalid comparison between Unknown and I4
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001d: Invalid comparison between Unknown and I4
+			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Invalid comparison between Unknown and I4
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Invalid comparison between Unknown and I4
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Invalid comparison between Unknown and I4
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Invalid comparison between Unknown and I4
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Invalid comparison between Unknown and I4
+			if ((int)size <= 16)
+			{
+				if ((int)size <= 11)
+				{
+					if ((int)size == 8)
+					{
+						return 39;
+					}
+					if ((int)size == 11)
+					{
+						return 35;
+					}
+				}
+				else if ((int)size == 14 || (int)size == 16)
+				{
+					return 40;
+				}
+			}
+			else if ((int)size <= 24)
+			{
+				if ((int)size == 20 || (int)size == 24)
+				{
+					return 50;
+				}
+			}
+			else if ((int)size == 32 || (int)size == 34)
+			{
+				return 80;
+			}
+			return 40;
 		}
 
 		public void SetWingLabelOpacity(float opacity)

@@ -73,9 +73,13 @@ namespace RaidClears
 			})
 		};
 
-		private static double _lastApiCheck = -1.0;
+		private const int BUFFER_MS = 50;
 
-		private static readonly double API_QUERY_INTERVAL = 300100.0;
+		private const int MINUTE_MS = 60000;
+
+		private double _lastApiCheck = -1.0;
+
+		private double _API_QUERY_INTERVAL = 300100.0;
 
 		private SettingService _settingService;
 
@@ -106,14 +110,19 @@ namespace RaidClears
 
 		public override IView GetSettingsView()
 		{
-			return (IView)(object)new ModuleSettingsView(_settingService);
+			return (IView)(object)new ModuleSettingsView(_settingService, this);
 		}
 
 		protected override async Task LoadAsync()
 		{
 			_textureService = new TextureService(ContentsManager);
 			_raidsPanel = new RaidsPanel(Logger, _settingService, _textureService, wingInfo);
+			SetTimeoutValueInMinutes((int)_settingService.RaidPanelApiPollingPeriod.get_Value());
 			_settingService.RaidPanelIsVisibleKeyBind.get_Value().add_Activated((EventHandler<EventArgs>)OnRaidPanelDisplayKeybindActivated);
+			_settingService.RaidPanelApiPollingPeriod.add_SettingChanged((EventHandler<ValueChangedEventArgs<ApiPollPeriod>>)delegate(object s, ValueChangedEventArgs<ApiPollPeriod> e)
+			{
+				SetTimeoutValueInMinutes((int)e.get_NewValue());
+			});
 			_cornerIconService = new CornerIconService(_settingService.ShowRaidsCornerIconSetting, "Click to show/hide the Raid Clears window.\nIcon can be hidden by module settings.", delegate
 			{
 				_settingService.ToggleRaidPanelVisibility();
@@ -121,7 +130,7 @@ namespace RaidClears
 			Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
 			if (Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)GetCurrentClearsService.NECESSARY_API_TOKEN_PERMISSIONS))
 			{
-				_lastApiCheck = API_QUERY_INTERVAL;
+				_lastApiCheck = _API_QUERY_INTERVAL;
 			}
 		}
 
@@ -141,12 +150,31 @@ namespace RaidClears
 		protected override void Update(GameTime gameTime)
 		{
 			_raidsPanel?.ShowOrHide();
+			ApiPollTimeout(gameTime.get_ElapsedGameTime().TotalMilliseconds);
+		}
+
+		private void SetTimeoutValueInMinutes(int minutes)
+		{
+			_API_QUERY_INTERVAL = minutes * 60000 + 50;
+		}
+
+		public int GetTimeoutSecondsRemaining()
+		{
+			if (_lastApiCheck == -1.0)
+			{
+				return -1;
+			}
+			return (int)((_API_QUERY_INTERVAL - _lastApiCheck) / 1000.0);
+		}
+
+		private void ApiPollTimeout(double elapsedTime)
+		{
 			if (!(_lastApiCheck >= 0.0))
 			{
 				return;
 			}
-			_lastApiCheck += gameTime.get_ElapsedGameTime().TotalMilliseconds;
-			if (!(_lastApiCheck >= API_QUERY_INTERVAL))
+			_lastApiCheck += elapsedTime;
+			if (!(_lastApiCheck >= _API_QUERY_INTERVAL))
 			{
 				return;
 			}
@@ -164,7 +192,7 @@ namespace RaidClears
 
 		private void Gw2ApiManager_SubtokenUpdated(object sender, ValueEventArgs<IEnumerable<TokenPermission>> e)
 		{
-			_lastApiCheck = API_QUERY_INTERVAL;
+			_lastApiCheck = _API_QUERY_INTERVAL;
 		}
 
 		private void OnRaidPanelDisplayKeybindActivated(object sender, EventArgs e)

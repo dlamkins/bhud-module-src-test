@@ -56,10 +56,6 @@ namespace RaidClears.Raids.Controls
 			((Container)this).set_HeightSizingMode((SizingMode)1);
 			((Container)this).set_WidthSizingMode((SizingMode)1);
 			CreateWings(wings);
-			settingService.RaidPanelIsVisible.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object s, ValueChangedEventArgs<bool> e)
-			{
-				((Control)this).set_Visible(e.get_NewValue());
-			});
 			settingService.RaidPanelLocationPoint.add_SettingChanged((EventHandler<ValueChangedEventArgs<Point>>)delegate(object s, ValueChangedEventArgs<Point> e)
 			{
 				//IL_0002: Unknown result type (might be due to invalid IL or missing references)
@@ -122,6 +118,8 @@ namespace RaidClears.Raids.Controls
 			{
 				WingVisibilityChanged(6, e.get_PreviousValue(), e.get_NewValue());
 			});
+			WingLabelOpacityChanged(settingService.RaidPanelWingLabelOpacity.get_Value());
+			EncounterOpacityChanged(settingService.RaidPanelEncounterOpacity.get_Value());
 			AddDragDelegates();
 		}
 
