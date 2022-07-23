@@ -120,6 +120,12 @@ namespace Nekres.Mumble_Info
 			((Control)Control.get_Graphics().get_SpriteScreen()).add_Resized((EventHandler<ResizedEventArgs>)UpdateLocation);
 		}
 
+		protected override void DisposeControl()
+		{
+			((Control)Control.get_Graphics().get_SpriteScreen()).remove_Resized((EventHandler<ResizedEventArgs>)UpdateLocation);
+			((Container)this).DisposeControl();
+		}
+
 		protected override void OnMouseMoved(MouseEventArgs e)
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
@@ -142,53 +148,51 @@ namespace Nekres.Mumble_Info
 		{
 			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
 			_isMousePressed = false;
-			Vector3 val;
+			Vector3 forward;
 			if (_mouseOverAvatarFacing)
 			{
 				WindowsClipboardService windowsClipboardService = ClipboardUtil.get_WindowsClipboardService();
-				val = GameService.Gw2Mumble.get_PlayerCharacter().get_Forward();
-				windowsClipboardService.SetTextAsync(((object)(Vector3)(ref val)).ToString());
+				forward = GameService.Gw2Mumble.get_PlayerCharacter().get_Forward();
+				windowsClipboardService.SetTextAsync(((object)(Vector3)(ref forward)).ToString());
 				ScreenNotification.ShowNotification("Copied!", (NotificationType)0, (Texture2D)null, 4);
 			}
 			else if (_mouseOverAvatarPosition)
 			{
-				WindowsClipboardService windowsClipboardService2 = ClipboardUtil.get_WindowsClipboardService();
-				val = GameService.Gw2Mumble.get_PlayerCharacter().get_Position();
-				windowsClipboardService2.SetTextAsync(((object)(Vector3)(ref val)).ToString());
+				ClipboardUtil.get_WindowsClipboardService().SetTextAsync($"xpos=\"{GameService.Gw2Mumble.get_PlayerCharacter().get_Position().X}\" ypos=\"{GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Z}\" zpos=\"{GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Y}\"");
 				ScreenNotification.ShowNotification("Copied!", (NotificationType)0, (Texture2D)null, 4);
 			}
 			else if (_mouseOverMapCoordinates)
 			{
-				WindowsClipboardService windowsClipboardService3 = ClipboardUtil.get_WindowsClipboardService();
+				WindowsClipboardService windowsClipboardService2 = ClipboardUtil.get_WindowsClipboardService();
 				Coordinates2 playerLocationMap = GameService.Gw2Mumble.get_RawClient().get_PlayerLocationMap();
 				object arg = ((Coordinates2)(ref playerLocationMap)).get_X();
 				playerLocationMap = GameService.Gw2Mumble.get_RawClient().get_PlayerLocationMap();
-				windowsClipboardService3.SetTextAsync($"{{X:{arg} Y:{((Coordinates2)(ref playerLocationMap)).get_Y()}}}");
+				windowsClipboardService2.SetTextAsync($"xpos=\"{arg}\" ypos=\"{((Coordinates2)(ref playerLocationMap)).get_Y()}\"");
 				ScreenNotification.ShowNotification("Copied!", (NotificationType)0, (Texture2D)null, 4);
 			}
 			else if (_mouseOverCameraDirection)
 			{
-				WindowsClipboardService windowsClipboardService4 = ClipboardUtil.get_WindowsClipboardService();
-				val = GameService.Gw2Mumble.get_PlayerCamera().get_Forward();
-				windowsClipboardService4.SetTextAsync(((object)(Vector3)(ref val)).ToString());
+				WindowsClipboardService windowsClipboardService3 = ClipboardUtil.get_WindowsClipboardService();
+				forward = GameService.Gw2Mumble.get_PlayerCamera().get_Forward();
+				windowsClipboardService3.SetTextAsync(((object)(Vector3)(ref forward)).ToString());
 				ScreenNotification.ShowNotification("Copied!", (NotificationType)0, (Texture2D)null, 4);
 			}
 			else if (_mouseOverCameraPosition)
 			{
-				WindowsClipboardService windowsClipboardService5 = ClipboardUtil.get_WindowsClipboardService();
-				val = GameService.Gw2Mumble.get_PlayerCamera().get_Position();
-				windowsClipboardService5.SetTextAsync(((object)(Vector3)(ref val)).ToString());
+				ClipboardUtil.get_WindowsClipboardService().SetTextAsync($"xpos=\"{GameService.Gw2Mumble.get_PlayerCamera().get_Position().X}\" ypos=\"{GameService.Gw2Mumble.get_PlayerCamera().get_Position().Z}\" zpos=\"{GameService.Gw2Mumble.get_PlayerCamera().get_Position().Y}\"");
 				ScreenNotification.ShowNotification("Copied!", (NotificationType)0, (Texture2D)null, 4);
 			}
 			((Control)this).OnLeftMouseButtonReleased(e);
