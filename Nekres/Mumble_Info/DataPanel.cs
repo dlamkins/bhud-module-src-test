@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using AsyncWindowsClipboard;
 using Blish_HUD;
 using Blish_HUD.Controls;
@@ -148,51 +149,83 @@ namespace Nekres.Mumble_Info
 		{
 			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0166: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0212: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0239: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0265: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026a: Unknown result type (might be due to invalid IL or missing references)
 			_isMousePressed = false;
-			Vector3 forward;
+			Vector3 val;
 			if (_mouseOverAvatarFacing)
 			{
 				WindowsClipboardService windowsClipboardService = ClipboardUtil.get_WindowsClipboardService();
-				forward = GameService.Gw2Mumble.get_PlayerCharacter().get_Forward();
-				windowsClipboardService.SetTextAsync(((object)(Vector3)(ref forward)).ToString());
+				val = GameService.Gw2Mumble.get_PlayerCharacter().get_Forward();
+				windowsClipboardService.SetTextAsync(((object)(Vector3)(ref val)).ToString());
 				ScreenNotification.ShowNotification("Copied!", (NotificationType)0, (Texture2D)null, 4);
 			}
 			else if (_mouseOverAvatarPosition)
 			{
-				ClipboardUtil.get_WindowsClipboardService().SetTextAsync($"xpos=\"{GameService.Gw2Mumble.get_PlayerCharacter().get_Position().X}\" ypos=\"{GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Z}\" zpos=\"{GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Y}\"");
+				WindowsClipboardService windowsClipboardService2 = ClipboardUtil.get_WindowsClipboardService();
+				string[] obj = new string[7] { "xpos=\"", null, null, null, null, null, null };
+				val = GameService.Gw2Mumble.get_PlayerCharacter().get_Position();
+				obj[1] = val.X.ToString(CultureInfo.InvariantCulture);
+				obj[2] = "\" ypos=\"";
+				val = GameService.Gw2Mumble.get_PlayerCharacter().get_Position();
+				obj[3] = val.Z.ToString(CultureInfo.InvariantCulture);
+				obj[4] = "\" zpos=\"";
+				val = GameService.Gw2Mumble.get_PlayerCharacter().get_Position();
+				obj[5] = val.Y.ToString(CultureInfo.InvariantCulture);
+				obj[6] = "\"";
+				windowsClipboardService2.SetTextAsync(string.Concat(obj));
 				ScreenNotification.ShowNotification("Copied!", (NotificationType)0, (Texture2D)null, 4);
 			}
 			else if (_mouseOverMapCoordinates)
 			{
-				WindowsClipboardService windowsClipboardService2 = ClipboardUtil.get_WindowsClipboardService();
+				WindowsClipboardService windowsClipboardService3 = ClipboardUtil.get_WindowsClipboardService();
+				string[] obj2 = new string[5] { "xpos=\"", null, null, null, null };
 				Coordinates2 playerLocationMap = GameService.Gw2Mumble.get_RawClient().get_PlayerLocationMap();
-				object arg = ((Coordinates2)(ref playerLocationMap)).get_X();
+				obj2[1] = ((Coordinates2)(ref playerLocationMap)).get_X().ToString(CultureInfo.InvariantCulture);
+				obj2[2] = "\" ypos=\"";
 				playerLocationMap = GameService.Gw2Mumble.get_RawClient().get_PlayerLocationMap();
-				windowsClipboardService2.SetTextAsync($"xpos=\"{arg}\" ypos=\"{((Coordinates2)(ref playerLocationMap)).get_Y()}\"");
+				obj2[3] = ((Coordinates2)(ref playerLocationMap)).get_Y().ToString(CultureInfo.InvariantCulture);
+				obj2[4] = "\"";
+				windowsClipboardService3.SetTextAsync(string.Concat(obj2));
 				ScreenNotification.ShowNotification("Copied!", (NotificationType)0, (Texture2D)null, 4);
 			}
 			else if (_mouseOverCameraDirection)
 			{
-				WindowsClipboardService windowsClipboardService3 = ClipboardUtil.get_WindowsClipboardService();
-				forward = GameService.Gw2Mumble.get_PlayerCamera().get_Forward();
-				windowsClipboardService3.SetTextAsync(((object)(Vector3)(ref forward)).ToString());
+				WindowsClipboardService windowsClipboardService4 = ClipboardUtil.get_WindowsClipboardService();
+				val = GameService.Gw2Mumble.get_PlayerCamera().get_Forward();
+				windowsClipboardService4.SetTextAsync(((object)(Vector3)(ref val)).ToString());
 				ScreenNotification.ShowNotification("Copied!", (NotificationType)0, (Texture2D)null, 4);
 			}
 			else if (_mouseOverCameraPosition)
 			{
-				ClipboardUtil.get_WindowsClipboardService().SetTextAsync($"xpos=\"{GameService.Gw2Mumble.get_PlayerCamera().get_Position().X}\" ypos=\"{GameService.Gw2Mumble.get_PlayerCamera().get_Position().Z}\" zpos=\"{GameService.Gw2Mumble.get_PlayerCamera().get_Position().Y}\"");
+				WindowsClipboardService windowsClipboardService5 = ClipboardUtil.get_WindowsClipboardService();
+				string[] obj3 = new string[7] { "xpos=\"", null, null, null, null, null, null };
+				val = GameService.Gw2Mumble.get_PlayerCamera().get_Position();
+				obj3[1] = val.X.ToString(CultureInfo.InvariantCulture);
+				obj3[2] = "\" ypos=\"";
+				val = GameService.Gw2Mumble.get_PlayerCamera().get_Position();
+				obj3[3] = val.Z.ToString(CultureInfo.InvariantCulture);
+				obj3[4] = "\" zpos=\"";
+				val = GameService.Gw2Mumble.get_PlayerCamera().get_Position();
+				obj3[5] = val.Y.ToString(CultureInfo.InvariantCulture);
+				obj3[6] = "\"";
+				windowsClipboardService5.SetTextAsync(string.Concat(obj3));
 				ScreenNotification.ShowNotification("Copied!", (NotificationType)0, (Texture2D)null, 4);
 			}
 			((Control)this).OnLeftMouseButtonReleased(e);
