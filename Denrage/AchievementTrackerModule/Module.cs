@@ -41,6 +41,8 @@ namespace Denrage.AchievementTrackerModule
 
 		private SettingEntry<bool> limitAchievements;
 
+		private WindowTab blishhudOverlayTab;
+
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
 		internal ContentsManager ContentsManager => base.ModuleParameters.get_ContentsManager();
@@ -88,7 +90,7 @@ namespace Denrage.AchievementTrackerModule
 					InitializeWindow();
 					((Control)window).Show();
 				}
-				GameService.Overlay.get_BlishHudWindow().AddTab("Achievement Tracker", AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("achievement_icon.png")), achievementOverviewView, 0);
+				blishhudOverlayTab = GameService.Overlay.get_BlishHudWindow().AddTab("Achievement Tracker", AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("achievement_icon.png")), achievementOverviewView, 0);
 				CornerIcon val = new CornerIcon();
 				val.set_IconName("Open Achievement Panel");
 				val.set_Icon(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("corner_icon_inactive.png")));
@@ -169,16 +171,32 @@ namespace Denrage.AchievementTrackerModule
 
 		protected override void Unload()
 		{
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 			SavePersistentInformation();
+			AchievementTrackWindow achievementTrackWindow = window;
+			Point location = (Point)((achievementTrackWindow != null) ? ((Control)achievementTrackWindow).get_Location() : new Point(-1, -1));
+			IPersistanceService persistanceService = dependencyInjectionContainer.PersistanceService;
+			if (persistanceService != null)
+			{
+				int x = location.X;
+				int y = location.Y;
+				AchievementTrackWindow achievementTrackWindow2 = window;
+				persistanceService.Save(x, y, achievementTrackWindow2 != null && ((Control)achievementTrackWindow2).get_Visible());
+			}
+			GameService.Overlay.get_BlishHudWindow().RemoveTab(blishhudOverlayTab);
 			CornerIcon obj = cornerIcon;
 			if (obj != null)
 			{
 				((Control)obj).Dispose();
 			}
-			AchievementTrackWindow achievementTrackWindow = window;
-			if (achievementTrackWindow != null)
+			AchievementTrackWindow achievementTrackWindow3 = window;
+			if (achievementTrackWindow3 != null)
 			{
-				((Control)achievementTrackWindow).Dispose();
+				((Control)achievementTrackWindow3).Dispose();
 			}
 		}
 
