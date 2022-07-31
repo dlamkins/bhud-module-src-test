@@ -10,10 +10,14 @@ using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
+using RaidClears.Dungeons.Controls;
+using RaidClears.Dungeons.Model;
+using RaidClears.Dungeons.Services;
 using RaidClears.Raids.Controls;
 using RaidClears.Raids.Model;
 using RaidClears.Raids.Services;
 using RaidClears.Settings;
+using Settings.Enums;
 
 namespace RaidClears
 {
@@ -21,57 +25,6 @@ namespace RaidClears
 	public class Module : Module
 	{
 		private static readonly Logger Logger = Logger.GetLogger<Module>();
-
-		private static Wing[] wingInfo = new Wing[7]
-		{
-			new Wing("Spirit Vale", 1, "SV", new Encounter[4]
-			{
-				new Encounter("vale_guardian", "Vale Guardian", "VG"),
-				new Encounter("spirit_woods", "Spirit Run", "SR"),
-				new Encounter("gorseval", "Gorseval", "G"),
-				new Encounter("sabetha", "Sabetha", "S")
-			}),
-			new Wing("Salvation Pass", 2, "SP", new Encounter[3]
-			{
-				new Encounter("slothasor", "Slothasor", "S"),
-				new Encounter("bandit_trio", "Bandit Trio", "B3"),
-				new Encounter("matthias", "Matthias Gabrel", "M")
-			}),
-			new Wing("Stronghold of the Faithful", 3, "SotF", new Encounter[4]
-			{
-				new Encounter("escort", "Escort", "E"),
-				new Encounter("keep_construct", "Keep Construct", "KC"),
-				new Encounter("twisted_castle", "Twisted Castel", "TC"),
-				new Encounter("xera", "Xera", "X")
-			}),
-			new Wing("Bastion of the Penitent", 4, "BotP", new Encounter[4]
-			{
-				new Encounter("cairn", "Cairn the Indominable", "C"),
-				new Encounter("mursaat_overseer", "Mursaat Overseer", "MO"),
-				new Encounter("samarog", "Samarog", "S"),
-				new Encounter("deimos", "Deimos", "D")
-			}),
-			new Wing("Hall of Chains", 5, "HoC", new Encounter[4]
-			{
-				new Encounter("soulless_horror", "Soulless Horror", "SH"),
-				new Encounter("river_of_souls", "River of Souls", "R"),
-				new Encounter("statues_of_grenth", "Statues of Grenth", "S"),
-				new Encounter("voice_in_the_void", "Dhuum", "D")
-			}),
-			new Wing("Mythwright Gambit", 6, "MG", new Encounter[3]
-			{
-				new Encounter("conjured_amalgamate", "Conjured Amalgamate", "CA"),
-				new Encounter("twin_largos", "Twin Largos", "TL"),
-				new Encounter("qadim", "Qadim", "Q1")
-			}),
-			new Wing("The Key of Ahdashim", 7, "TKoA", new Encounter[4]
-			{
-				new Encounter("gate", "Gate", "G"),
-				new Encounter("adina", "Cardinal Adina", "A"),
-				new Encounter("sabir", "Cardinal Sabir", "S"),
-				new Encounter("qadim_the_peerless", "Qadim the Peerless", "Q2")
-			})
-		};
 
 		private const int BUFFER_MS = 50;
 
@@ -81,13 +34,17 @@ namespace RaidClears
 
 		private double _API_QUERY_INTERVAL = 300100.0;
 
-		private SettingService _settingService;
-
 		private TextureService _textureService;
+
+		private SettingService _settingService;
 
 		private CornerIconService _cornerIconService;
 
+		private DungeonCornerIconService _dungeonCornerIconService;
+
 		private RaidsPanel _raidsPanel;
+
+		private DungeonsPanel _dungeonsPanel;
 
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
@@ -110,15 +67,18 @@ namespace RaidClears
 
 		public override IView GetSettingsView()
 		{
-			return (IView)(object)new ModuleSettingsView(_settingService, this);
+			return (IView)(object)new ModuleSettingsView(_settingService, this, _textureService);
 		}
 
 		protected override async Task LoadAsync()
 		{
 			_textureService = new TextureService(ContentsManager);
-			_raidsPanel = new RaidsPanel(Logger, _settingService, _textureService, wingInfo);
+			_raidsPanel = new RaidsPanel(Logger, _settingService, Wing.GetWingMetaData());
+			_dungeonsPanel = new DungeonsPanel(Logger, _settingService, Dungeon.GetDungeonMetaData());
+			_dungeonsPanel.UpdateClearedStatus(new ApiDungeons());
 			SetTimeoutValueInMinutes((int)_settingService.RaidPanelApiPollingPeriod.get_Value());
 			_settingService.RaidPanelIsVisibleKeyBind.get_Value().add_Activated((EventHandler<EventArgs>)OnRaidPanelDisplayKeybindActivated);
+			_settingService.DungeonPanelIsVisibleKeyBind.get_Value().add_Activated((EventHandler<EventArgs>)OnDungeonPanelDisplayKeybindActivated);
 			_settingService.RaidPanelApiPollingPeriod.add_SettingChanged((EventHandler<ValueChangedEventArgs<ApiPollPeriod>>)delegate(object s, ValueChangedEventArgs<ApiPollPeriod> e)
 			{
 				SetTimeoutValueInMinutes((int)e.get_NewValue());
@@ -126,6 +86,10 @@ namespace RaidClears
 			_cornerIconService = new CornerIconService(_settingService.ShowRaidsCornerIconSetting, "Click to show/hide the Raid Clears window.\nIcon can be hidden by module settings.", delegate
 			{
 				_settingService.ToggleRaidPanelVisibility();
+			}, _textureService);
+			_dungeonCornerIconService = new DungeonCornerIconService(_settingService.ShowDungeonCornerIconSetting, _settingService.DungeonsEnabled, "Click to show/hide the Dungeon Clears window.\nIcon can be hidden by module settings.", delegate
+			{
+				_settingService.ToggleDungeonPanelVisibility();
 			}, _textureService);
 			Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
 			if (Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)GetCurrentClearsService.NECESSARY_API_TOKEN_PERMISSIONS))
@@ -137,19 +101,27 @@ namespace RaidClears
 		protected override void Unload()
 		{
 			_settingService.RaidPanelIsVisibleKeyBind.get_Value().remove_Activated((EventHandler<EventArgs>)OnRaidPanelDisplayKeybindActivated);
+			_settingService.DungeonPanelIsVisibleKeyBind.get_Value().remove_Activated((EventHandler<EventArgs>)OnDungeonPanelDisplayKeybindActivated);
 			Gw2ApiManager.remove_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
 			RaidsPanel raidsPanel = _raidsPanel;
 			if (raidsPanel != null)
 			{
 				((Control)raidsPanel).Dispose();
 			}
+			DungeonsPanel dungeonsPanel = _dungeonsPanel;
+			if (dungeonsPanel != null)
+			{
+				((Control)dungeonsPanel).Dispose();
+			}
 			_textureService?.Dispose();
 			_cornerIconService?.Dispose();
+			_dungeonCornerIconService?.Dispose();
 		}
 
 		protected override void Update(GameTime gameTime)
 		{
 			_raidsPanel?.ShowOrHide();
+			_dungeonsPanel?.ShowOrHide();
 			ApiPollTimeout(gameTime.get_ElapsedGameTime().TotalMilliseconds);
 		}
 
@@ -181,11 +153,24 @@ namespace RaidClears
 			_lastApiCheck = 0.0;
 			Task.Run(async delegate
 			{
-				(ApiRaids, bool) obj = await GetCurrentClearsService.GetClearsFromApi(Gw2ApiManager, Logger);
+				(ApiRaids, bool) obj2 = await GetCurrentClearsService.GetClearsFromApi(Gw2ApiManager, Logger);
+				var (weeklyClears2, _) = obj2;
+				if (!obj2.Item2)
+				{
+					_raidsPanel.UpdateClearedStatus(weeklyClears2);
+				}
+			});
+			if (!_settingService.DungeonsEnabled.get_Value())
+			{
+				return;
+			}
+			Task.Run(async delegate
+			{
+				(ApiDungeons, bool) obj = await DungeonsClearsService.GetDungeonClearsFromApi(Gw2ApiManager, Logger);
 				var (weeklyClears, _) = obj;
 				if (!obj.Item2)
 				{
-					_raidsPanel.UpdateClearedStatus(weeklyClears);
+					_dungeonsPanel.UpdateClearedStatus(weeklyClears);
 				}
 			});
 		}
@@ -198,6 +183,11 @@ namespace RaidClears
 		private void OnRaidPanelDisplayKeybindActivated(object sender, EventArgs e)
 		{
 			_settingService.ToggleRaidPanelVisibility();
+		}
+
+		private void OnDungeonPanelDisplayKeybindActivated(object sender, EventArgs e)
+		{
+			_settingService.ToggleDungeonPanelVisibility();
 		}
 	}
 }

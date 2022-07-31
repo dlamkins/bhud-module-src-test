@@ -2,22 +2,22 @@ using Blish_HUD;
 using Blish_HUD.Controls;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended.BitmapFonts;
-using RaidClears.Raids.Model;
+using RaidClears.Dungeons.Model;
 using Settings.Enums;
 
-namespace RaidClears.Raids.Controls
+namespace RaidClears.Dungeons.Controls
 {
-	public class WingPanel : FlowPanel
+	public class PathsPanel : FlowPanel
 	{
-		private Wing _wing;
+		private Dungeon _dungeon;
 
-		private Orientation _orientation;
+		private DungeonOrientation _orientation;
 
-		private WingLabel _labelDisplay;
+		private DungeonLabel _labelDisplay;
 
-		private Label _wingLabelObj;
+		private Label _dungeonLabel;
 
-		public WingPanel(Container parent, Wing wing, Orientation orientation, WingLabel label, FontSize fontSize)
+		public PathsPanel(Container parent, Dungeon dungeon, DungeonOrientation orientation, DungeonLabel label, FontSize fontSize)
 			: this()
 		{
 			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
@@ -37,29 +37,29 @@ namespace RaidClears.Raids.Controls
 			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00bb: Expected O, but got Unknown
 			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-			_wing = wing;
+			_dungeon = dungeon;
 			((FlowPanel)this).set_ControlPadding(new Vector2(2f, 2f));
 			((Container)this).set_HeightSizingMode((SizingMode)1);
 			((Control)this).set_Parent(parent);
 			((Container)this).set_WidthSizingMode((SizingMode)1);
 			Label val = new Label();
 			val.set_AutoSizeHeight(true);
-			((Control)val).set_BasicTooltipText(wing.name);
-			val.set_HorizontalAlignment(WingLabelAlignment());
+			((Control)val).set_BasicTooltipText(dungeon.GetTooltip());
+			val.set_HorizontalAlignment(DungeonLabelAlignment());
 			((Control)val).set_Parent((Container)(object)this);
 			val.set_Text(GetWingLabelText());
-			_wingLabelObj = val;
-			Encounter[] encounters = _wing.encounters;
-			foreach (Encounter encounter in encounters)
+			_dungeonLabel = val;
+			Path[] paths = _dungeon.paths;
+			foreach (Path path in paths)
 			{
 				Label val2 = new Label();
 				val2.set_AutoSizeHeight(true);
-				((Control)val2).set_BasicTooltipText(encounter.name);
+				((Control)val2).set_BasicTooltipText(path.name);
 				val2.set_HorizontalAlignment((HorizontalAlignment)1);
 				((Control)val2).set_Parent((Container)(object)this);
-				val2.set_Text(encounter.short_name);
-				Label encounterLabel = val2;
-				encounter.SetLabelReference(encounterLabel);
+				val2.set_Text(path.short_name);
+				Label pathLabel = val2;
+				path.SetLabelReference(pathLabel);
 			}
 			SetOrientation(orientation);
 			SetLabelDisplay(label);
@@ -70,59 +70,54 @@ namespace RaidClears.Raids.Controls
 		{
 			return _labelDisplay switch
 			{
-				WingLabel.NoLabel => "", 
-				WingLabel.WingNumber => _wing.index.ToString(), 
-				WingLabel.Abbreviation => _wing.shortName, 
+				DungeonLabel.NoLabel => "", 
+				DungeonLabel.Abbreviation => _dungeon.shortName, 
 				_ => "-", 
 			};
 		}
 
-		private HorizontalAlignment WingLabelAlignment()
+		private HorizontalAlignment DungeonLabelAlignment()
 		{
-			if (_orientation == Orientation.Vertical)
+			if (_orientation != 0)
 			{
-				if (_labelDisplay != 0)
-				{
-					return (HorizontalAlignment)2;
-				}
 				return (HorizontalAlignment)1;
 			}
-			return (HorizontalAlignment)1;
+			return (HorizontalAlignment)2;
 		}
 
-		public void SetOrientation(Orientation orientation)
+		public void SetOrientation(DungeonOrientation orientation)
 		{
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 			_orientation = orientation;
 			((FlowPanel)this).set_FlowDirection(GetFlowDirection(orientation));
-			_wingLabelObj.set_HorizontalAlignment(WingLabelAlignment());
+			_dungeonLabel.set_HorizontalAlignment(DungeonLabelAlignment());
 		}
 
-		private ControlFlowDirection GetFlowDirection(Orientation orientation)
+		private ControlFlowDirection GetFlowDirection(DungeonOrientation orientation)
 		{
 			return (ControlFlowDirection)(orientation switch
 			{
-				Orientation.Horizontal => 3, 
-				Orientation.Vertical => 2, 
-				Orientation.SingleRow => 2, 
+				DungeonOrientation.Horizontal => 3, 
+				DungeonOrientation.Vertical => 2, 
+				DungeonOrientation.SingleRow => 2, 
 				_ => 2, 
 			});
 		}
 
-		public void SetLabelDisplay(WingLabel label)
+		public void SetLabelDisplay(DungeonLabel label)
 		{
 			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 			_labelDisplay = label;
-			_wingLabelObj.set_Text(GetWingLabelText());
-			_wingLabelObj.set_HorizontalAlignment(WingLabelAlignment());
-			if (label == WingLabel.NoLabel)
+			_dungeonLabel.set_Text(GetWingLabelText());
+			_dungeonLabel.set_HorizontalAlignment(DungeonLabelAlignment());
+			if (label == DungeonLabel.NoLabel)
 			{
-				((Control)_wingLabelObj).Hide();
+				((Control)_dungeonLabel).Hide();
 			}
 			else
 			{
-				((Control)_wingLabelObj).Show();
+				((Control)_dungeonLabel).Show();
 			}
 			((Control)this).Invalidate();
 		}
@@ -133,10 +128,10 @@ namespace RaidClears.Raids.Controls
 			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 			BitmapFont font = GameService.Content.GetFont((FontFace)0, fontSize, (FontStyle)0);
 			int width = GetLabelWidthForFontSize(fontSize);
-			_wingLabelObj.set_Font(font);
-			((Control)_wingLabelObj).set_Width(width);
-			Encounter[] encounters = _wing.encounters;
-			foreach (Encounter obj in encounters)
+			_dungeonLabel.set_Font(font);
+			((Control)_dungeonLabel).set_Width(width);
+			Path[] paths = _dungeon.paths;
+			foreach (Path obj in paths)
 			{
 				obj.GetLabelReference().set_Font(font);
 				((Control)obj.GetLabelReference()).set_Width(width);
@@ -201,15 +196,15 @@ namespace RaidClears.Raids.Controls
 
 		public void SetWingLabelOpacity(float opacity)
 		{
-			((Control)_wingLabelObj).set_Opacity(opacity);
+			((Control)_dungeonLabel).set_Opacity(opacity);
 		}
 
 		public void SetEncounterOpacity(float opacity)
 		{
-			Encounter[] encounters = _wing.encounters;
-			for (int i = 0; i < encounters.Length; i++)
+			Path[] paths = _dungeon.paths;
+			for (int i = 0; i < paths.Length; i++)
 			{
-				((Control)encounters[i].GetLabelReference()).set_Opacity(opacity);
+				((Control)paths[i].GetLabelReference()).set_Opacity(opacity);
 			}
 		}
 

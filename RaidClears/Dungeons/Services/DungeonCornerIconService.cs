@@ -7,9 +7,9 @@ using Blish_HUD.Settings;
 using Microsoft.Xna.Framework.Graphics;
 using RaidClears.Settings;
 
-namespace RaidClears.Raids.Services
+namespace RaidClears.Dungeons.Services
 {
-	public class CornerIconService : IDisposable
+	public class DungeonCornerIconService : IDisposable
 	{
 		private readonly Texture2D _cornerIconTexture;
 
@@ -17,21 +17,25 @@ namespace RaidClears.Raids.Services
 
 		private readonly SettingEntry<bool> _cornerIconIsVisibleSetting;
 
+		private readonly SettingEntry<bool> _dungeonEnabledSetting;
+
 		private readonly EventHandler<MouseEventArgs> _cornerIconClickEventHandler;
 
 		private readonly string _tooltip;
 
 		private CornerIcon _cornerIcon;
 
-		public CornerIconService(SettingEntry<bool> cornerIconIsVisibleSetting, string tooltip, EventHandler<MouseEventArgs> cornerIconClickEventHandler, TextureService textureService)
+		public DungeonCornerIconService(SettingEntry<bool> cornerIconIsVisibleSetting, SettingEntry<bool> dungeonsEnabledSetting, string tooltip, EventHandler<MouseEventArgs> cornerIconClickEventHandler, TextureService textureService)
 		{
 			_tooltip = tooltip;
 			_cornerIconIsVisibleSetting = cornerIconIsVisibleSetting;
+			_dungeonEnabledSetting = dungeonsEnabledSetting;
 			_cornerIconClickEventHandler = cornerIconClickEventHandler;
-			_cornerIconTexture = textureService.CornerIconTexture;
-			_cornerIconHoverTexture = textureService.CornerIconHoverTexture;
-			cornerIconIsVisibleSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnCornerIconIsVisibleSettingChanged);
-			if (cornerIconIsVisibleSetting.get_Value())
+			_cornerIconTexture = textureService.DungeonsCornerIconTexture;
+			_cornerIconHoverTexture = textureService.DungeonsCornerIconHoverTexture;
+			_cornerIconIsVisibleSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnCornerIconIsVisibleSettingChanged);
+			_dungeonEnabledSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnCornerIconIsVisibleSettingChanged);
+			if (dungeonsEnabledSetting.get_Value() && cornerIconIsVisibleSetting.get_Value())
 			{
 				CreateCornerIcon();
 			}
@@ -40,6 +44,7 @@ namespace RaidClears.Raids.Services
 		public void Dispose()
 		{
 			_cornerIconIsVisibleSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnCornerIconIsVisibleSettingChanged);
+			_dungeonEnabledSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnCornerIconIsVisibleSettingChanged);
 			if (_cornerIcon != null)
 			{
 				RemoveCornerIcon();
@@ -76,7 +81,7 @@ namespace RaidClears.Raids.Services
 
 		private void OnCornerIconIsVisibleSettingChanged(object sender, ValueChangedEventArgs<bool> e)
 		{
-			if (e.get_NewValue())
+			if (_dungeonEnabledSetting.get_Value() && _cornerIconIsVisibleSetting.get_Value())
 			{
 				CreateCornerIcon();
 			}

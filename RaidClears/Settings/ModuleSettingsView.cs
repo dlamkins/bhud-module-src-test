@@ -5,12 +5,17 @@ using Blish_HUD.Graphics.UI;
 using Blish_HUD.Settings;
 using Blish_HUD.Settings.UI.Views;
 using Microsoft.Xna.Framework;
+using Settings.Enums;
 
 namespace RaidClears.Settings
 {
 	public class ModuleSettingsView : View
 	{
+		private FlowPanel _dungeonsSettingFlowPanel;
+
 		private Module _m;
+
+		private TextureService _textureService;
 
 		private Label _apiPollLabel;
 
@@ -18,11 +23,12 @@ namespace RaidClears.Settings
 
 		private FlowPanel _rootFlowPanel;
 
-		public ModuleSettingsView(SettingService settingService, Module m)
+		public ModuleSettingsView(SettingService settingService, Module m, TextureService textureService)
 			: this()
 		{
 			_m = m;
 			_settingService = settingService;
+			_textureService = textureService;
 		}
 
 		protected override void Build(Container buildPanel)
@@ -38,7 +44,6 @@ namespace RaidClears.Settings
 			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0060: Expected O, but got Unknown
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			val.set_FlowDirection((ControlFlowDirection)3);
 			((Panel)val).set_CanScroll(true);
@@ -48,24 +53,31 @@ namespace RaidClears.Settings
 			((Container)val).set_HeightSizingMode((SizingMode)2);
 			((Control)val).set_Parent(buildPanel);
 			_rootFlowPanel = val;
-			int singleColumnWidth = ((Control)buildPanel).get_Width() - (int)_rootFlowPanel.get_OuterControlPadding().X * 2;
+			int singleColumnWidth = ((Control)buildPanel).get_Width();
 			int doubleColWidth = singleColumnWidth / 2 - 100;
 			FlowPanel generalSettingFlowPanel = CreateSettingsGroupFlowPanel("General Options", (Container)(object)_rootFlowPanel);
+			((Panel)generalSettingFlowPanel).set_CanCollapse(true);
 			FlowPanel col2 = CreateTwoColPanel((Container)(object)generalSettingFlowPanel);
 			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.RaidPanelApiPollingPeriod, (Container)(object)col2, doubleColWidth);
 			_apiPollLabel = CreateApiPollRemainingLabel((Container)(object)col2, doubleColWidth);
-			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.RaidPanelIsVisibleKeyBind, (Container)(object)generalSettingFlowPanel, singleColumnWidth);
-			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.ShowRaidsCornerIconSetting, (Container)(object)generalSettingFlowPanel, singleColumnWidth);
-			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.RaidPanelIsVisible, (Container)(object)generalSettingFlowPanel, singleColumnWidth);
-			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.RaidPanelAllowTooltipsSetting, (Container)(object)generalSettingFlowPanel, singleColumnWidth);
-			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.RaidPanelDragWithMouseIsEnabledSetting, (Container)(object)generalSettingFlowPanel, singleColumnWidth);
-			FlowPanel layoutFlowPanel = CreateSettingsGroupFlowPanel("Layout and Visuals", (Container)(object)_rootFlowPanel);
+			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.AllowTooltipsSetting, (Container)(object)generalSettingFlowPanel, singleColumnWidth);
+			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.DragWithMouseIsEnabledSetting, (Container)(object)generalSettingFlowPanel, singleColumnWidth);
+			FlowPanel raidsSettingFlowPanel = CreateSettingsGroupFlowPanel("Raid Settings", (Container)(object)_rootFlowPanel);
+			((Panel)raidsSettingFlowPanel).set_CanCollapse(true);
+			((Panel)raidsSettingFlowPanel).Collapse();
+			((Panel)raidsSettingFlowPanel).set_ShowTint(true);
+			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.RaidPanelIsVisibleKeyBind, (Container)(object)raidsSettingFlowPanel, singleColumnWidth);
+			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.ShowRaidsCornerIconSetting, (Container)(object)raidsSettingFlowPanel, singleColumnWidth);
+			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.RaidPanelIsVisible, (Container)(object)raidsSettingFlowPanel, singleColumnWidth);
+			FlowPanel layoutFlowPanel = CreateSettingsGroupFlowPanel("Layout and Visuals", (Container)(object)raidsSettingFlowPanel);
+			((Panel)layoutFlowPanel).set_CanCollapse(true);
 			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.RaidPanelOrientationSetting, (Container)(object)layoutFlowPanel, singleColumnWidth);
 			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.RaidPanelFontSizeSetting, (Container)(object)layoutFlowPanel, singleColumnWidth);
 			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.RaidPanelWingLabelsSetting, (Container)(object)layoutFlowPanel, singleColumnWidth);
 			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.RaidPanelWingLabelOpacity, (Container)(object)layoutFlowPanel, singleColumnWidth);
 			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.RaidPanelEncounterOpacity, (Container)(object)layoutFlowPanel, singleColumnWidth);
-			FlowPanel wingSelectionFlowPanel = CreateSettingsGroupFlowPanel("Wing Selection", (Container)(object)_rootFlowPanel);
+			FlowPanel wingSelectionFlowPanel = CreateSettingsGroupFlowPanel("Wing Selection", (Container)(object)raidsSettingFlowPanel);
+			((Panel)wingSelectionFlowPanel).set_CanCollapse(true);
 			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.W1IsVisibleSetting, (Container)(object)wingSelectionFlowPanel, singleColumnWidth);
 			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.W2IsVisibleSetting, (Container)(object)wingSelectionFlowPanel, singleColumnWidth);
 			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.W3IsVisibleSetting, (Container)(object)wingSelectionFlowPanel, singleColumnWidth);
@@ -73,11 +85,55 @@ namespace RaidClears.Settings
 			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.W5IsVisibleSetting, (Container)(object)wingSelectionFlowPanel, singleColumnWidth);
 			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.W6IsVisibleSetting, (Container)(object)wingSelectionFlowPanel, singleColumnWidth);
 			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.W7IsVisibleSetting, (Container)(object)wingSelectionFlowPanel, singleColumnWidth);
+			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.DungeonsEnabled, (Container)(object)_rootFlowPanel, singleColumnWidth);
+			_dungeonsSettingFlowPanel = CreateSettingsGroupFlowPanel("Dungeon Settings", (Container)(object)_rootFlowPanel);
+			((Panel)_dungeonsSettingFlowPanel).set_CanCollapse(true);
+			((Panel)_dungeonsSettingFlowPanel).Collapse();
+			((Panel)_dungeonsSettingFlowPanel).set_ShowTint(true);
+			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.DungeonPanelIsVisibleKeyBind, (Container)(object)_dungeonsSettingFlowPanel, singleColumnWidth);
+			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.ShowDungeonCornerIconSetting, (Container)(object)_dungeonsSettingFlowPanel, singleColumnWidth);
+			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.DungeonPanelIsVisible, (Container)(object)_dungeonsSettingFlowPanel, singleColumnWidth);
+			FlowPanel dungeonLayoutFlowPanel = CreateSettingsGroupFlowPanel("Layout and Visuals", (Container)(object)_dungeonsSettingFlowPanel);
+			((Panel)dungeonLayoutFlowPanel).set_CanCollapse(true);
+			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.DungeonPanelOrientationSetting, (Container)(object)dungeonLayoutFlowPanel, singleColumnWidth);
+			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.DungeonPanelFontSizeSetting, (Container)(object)dungeonLayoutFlowPanel, singleColumnWidth);
+			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.DungeonPanelWingLabelsSetting, (Container)(object)dungeonLayoutFlowPanel, singleColumnWidth);
+			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.DungeonPanelWingLabelOpacity, (Container)(object)dungeonLayoutFlowPanel, singleColumnWidth);
+			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.DungeonPanelEncounterOpacity, (Container)(object)dungeonLayoutFlowPanel, singleColumnWidth);
+			FlowPanel dungeonSelectionFlowPanel = CreateSettingsGroupFlowPanel("Dungeon Selection", (Container)(object)_dungeonsSettingFlowPanel);
+			((Panel)dungeonSelectionFlowPanel).set_CanCollapse(true);
+			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.D1IsVisibleSetting, (Container)(object)dungeonSelectionFlowPanel, singleColumnWidth);
+			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.D2IsVisibleSetting, (Container)(object)dungeonSelectionFlowPanel, singleColumnWidth);
+			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.D3IsVisibleSetting, (Container)(object)dungeonSelectionFlowPanel, singleColumnWidth);
+			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.D4IsVisibleSetting, (Container)(object)dungeonSelectionFlowPanel, singleColumnWidth);
+			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.D5IsVisibleSetting, (Container)(object)dungeonSelectionFlowPanel, singleColumnWidth);
+			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.D6IsVisibleSetting, (Container)(object)dungeonSelectionFlowPanel, singleColumnWidth);
+			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.D7IsVisibleSetting, (Container)(object)dungeonSelectionFlowPanel, singleColumnWidth);
+			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.D8IsVisibleSetting, (Container)(object)dungeonSelectionFlowPanel, singleColumnWidth);
+			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.DFIsVisibleSetting, (Container)(object)dungeonSelectionFlowPanel, singleColumnWidth);
 			ReloadApiPollLabelText();
 			_settingService.RaidPanelApiPollingPeriod.add_SettingChanged((EventHandler<ValueChangedEventArgs<ApiPollPeriod>>)delegate
 			{
 				ReloadApiPollLabelText();
 			});
+			DungeonFeatureToggled(_settingService.DungeonsEnabled.get_Value());
+			_settingService.DungeonsEnabled.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object s, ValueChangedEventArgs<bool> e)
+			{
+				DungeonFeatureToggled(e.get_NewValue());
+			});
+		}
+
+		public void DungeonFeatureToggled(bool enabled)
+		{
+			if (!enabled)
+			{
+				((Control)_dungeonsSettingFlowPanel).Hide();
+			}
+			else
+			{
+				((Control)_dungeonsSettingFlowPanel).Show();
+			}
+			((Control)_rootFlowPanel).Invalidate();
 		}
 
 		private static FlowPanel CreateTwoColPanel(Container parent)

@@ -2,7 +2,7 @@ using System;
 using Blish_HUD;
 using Blish_HUD.Settings;
 using Microsoft.Xna.Framework;
-using RaidClears.Settings;
+using Settings.Enums;
 
 namespace RaidClears.Raids.Services
 {

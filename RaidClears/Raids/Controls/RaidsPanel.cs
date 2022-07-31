@@ -5,8 +5,8 @@ using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using RaidClears.Raids.Model;
-using RaidClears.Raids.Services;
 using RaidClears.Settings;
+using Settings.Enums;
 
 namespace RaidClears.Raids.Controls
 {
@@ -36,14 +36,14 @@ namespace RaidClears.Raids.Controls
 			}
 		}
 
-		public RaidsPanel(Logger logger, SettingService settingService, TextureService textureService, Wing[] wings)
+		public RaidsPanel(Logger logger, SettingService settingService, Wing[] wings)
 			: this()
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
 			_logger = logger;
 			_wings = wings;
 			_settingService = settingService;
@@ -82,11 +82,11 @@ namespace RaidClears.Raids.Controls
 			{
 				EncounterOpacityChanged(e.get_NewValue());
 			});
-			settingService.RaidPanelDragWithMouseIsEnabledSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate
+			settingService.DragWithMouseIsEnabledSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate
 			{
 				IgnoreMouseInput = ShouldIgnoreMouse();
 			});
-			settingService.RaidPanelAllowTooltipsSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate
+			settingService.AllowTooltipsSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate
 			{
 				IgnoreMouseInput = ShouldIgnoreMouse();
 			});
@@ -204,7 +204,7 @@ namespace RaidClears.Raids.Controls
 			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			if (_isDraggedByMouse && _settingService.RaidPanelDragWithMouseIsEnabledSetting.get_Value())
+			if (_isDraggedByMouse && _settingService.DragWithMouseIsEnabledSetting.get_Value())
 			{
 				Point nOffset = GameService.Input.get_Mouse().get_Position() - _dragStart;
 				((Control)this).set_Location(((Control)this).get_Location() + nOffset);
@@ -218,7 +218,7 @@ namespace RaidClears.Raids.Controls
 			{
 				//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-				if (_settingService.RaidPanelDragWithMouseIsEnabledSetting.get_Value())
+				if (_settingService.DragWithMouseIsEnabledSetting.get_Value())
 				{
 					_isDraggedByMouse = true;
 					_dragStart = GameService.Input.get_Mouse().get_Position();
@@ -227,7 +227,7 @@ namespace RaidClears.Raids.Controls
 			((Control)this).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
 			{
 				//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-				if (_settingService.RaidPanelDragWithMouseIsEnabledSetting.get_Value())
+				if (_settingService.DragWithMouseIsEnabledSetting.get_Value())
 				{
 					_isDraggedByMouse = false;
 					_settingService.RaidPanelLocationPoint.set_Value(((Control)this).get_Location());
@@ -237,9 +237,9 @@ namespace RaidClears.Raids.Controls
 
 		protected bool ShouldIgnoreMouse()
 		{
-			if (!_settingService.RaidPanelDragWithMouseIsEnabledSetting.get_Value())
+			if (!_settingService.DragWithMouseIsEnabledSetting.get_Value())
 			{
-				return !_settingService.RaidPanelAllowTooltipsSetting.get_Value();
+				return !_settingService.AllowTooltipsSetting.get_Value();
 			}
 			return false;
 		}
@@ -258,7 +258,7 @@ namespace RaidClears.Raids.Controls
 		public void ShowOrHide()
 		{
 			bool shouldBeVisible = _settingService.RaidPanelIsVisible.get_Value() && GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() && GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && GameService.Gw2Mumble.get_IsAvailable() && !GameService.Gw2Mumble.get_UI().get_IsMapOpen();
-			if (shouldBeVisible && _settingService.RaidPanelDragWithMouseIsEnabledSetting.get_Value())
+			if (shouldBeVisible && _settingService.DragWithMouseIsEnabledSetting.get_Value())
 			{
 				DoUpdate();
 			}
@@ -293,7 +293,6 @@ namespace RaidClears.Raids.Controls
 				Encounter[] encounters = wings[i].encounters;
 				foreach (Encounter encounter in encounters)
 				{
-					apiraids.Clears.Contains(encounter.id);
 					encounter.SetCleared(apiraids.Clears.Contains(encounter.id));
 				}
 			}
