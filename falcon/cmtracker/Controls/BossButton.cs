@@ -1,4 +1,5 @@
 using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -42,7 +43,7 @@ namespace falcon.cmtracker.Controls
 				if (_font != value)
 				{
 					_font = value;
-					OnPropertyChanged("Font");
+					((Control)this).OnPropertyChanged("Font");
 				}
 			}
 		}
@@ -51,14 +52,19 @@ namespace falcon.cmtracker.Controls
 		{
 			get
 			{
+				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				return _background;
 			}
 			set
 			{
+				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 				if (!(_background == value))
 				{
 					_background = value;
-					OnPropertyChanged("Background");
+					((Control)this).OnPropertyChanged("Background");
 				}
 			}
 		}
@@ -79,29 +85,48 @@ namespace falcon.cmtracker.Controls
 		}
 
 		public BossButton()
+			: this()
 		{
+			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
 			ICON_TITLE = ICON_TITLE ?? Module.ModuleInstance._sortByRaidTexture;
-			BORDER_SPRITE = BORDER_SPRITE ?? Control.Content.GetTexture("controls/detailsbutton/605003");
-			SEPARATOR = SEPARATOR ?? Control.Content.GetTexture("157218");
-			PIXEL = PIXEL ?? ContentService.Textures.Pixel;
-			base.Size = new Point(327, 100);
+			BORDER_SPRITE = BORDER_SPRITE ?? Control.get_Content().GetTexture("controls/detailsbutton/605003");
+			SEPARATOR = SEPARATOR ?? Control.get_Content().GetTexture("157218");
+			PIXEL = PIXEL ?? Textures.get_Pixel();
+			((Control)this).set_Size(new Point(327, 100));
 		}
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			spriteBatch.DrawOnCtrl(this, PIXEL, bounds, Background * 0.25f);
-			spriteBatch.DrawOnCtrl(this, PIXEL, base.ContentRegion, Color.Black * 0.1f);
-			int iconSize = ((base.IconSize == DetailsIconSize.Large) ? 100 : 65);
-			if (base.Icon != null && base.Icon.HasTexture)
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Invalid comparison between Unknown and I4
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a6: Invalid comparison between Unknown and I4
+			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, PIXEL, bounds, Background * 0.25f);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, PIXEL, ((Container)this).get_ContentRegion(), Color.get_Black() * 0.1f);
+			int iconSize = (((int)((DetailsButton)this).get_IconSize() == 1) ? 100 : 65);
+			if (((DetailsButton)this).get_Icon() != null && ((DetailsButton)this).get_Icon().get_HasTexture())
 			{
-				spriteBatch.DrawOnCtrl(this, base.Icon, new Rectangle(iconSize / 2 - 32 + ((base.IconSize == DetailsIconSize.Small) ? 10 : 0), iconSize / 2 - 32, 64, 64), Color.White);
-				if (base.IconSize == DetailsIconSize.Large)
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(((DetailsButton)this).get_Icon()), new Rectangle(iconSize / 2 - 32 + (((int)((DetailsButton)this).get_IconSize() == 0) ? 10 : 0), iconSize / 2 - 32, 64, 64), Color.get_White());
+				if ((int)((DetailsButton)this).get_IconSize() == 1)
 				{
-					spriteBatch.DrawOnCtrl(this, BORDER_SPRITE, new Rectangle(0, 0, iconSize, iconSize), Color.White);
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, BORDER_SPRITE, new Rectangle(0, 0, iconSize, iconSize), Color.get_White());
 				}
 			}
-			string wrappedText = DrawUtil.WrapText(Font, base.Text, 287 - iconSize - 20);
-			spriteBatch.DrawStringOnCtrl(this, wrappedText, Font, new Rectangle(iconSize + 20, 0, 327 - iconSize - 20, base.Height - 35), Color.White, wrap: false, stroke: true, 2);
+			string wrappedText = DrawUtil.WrapText(Font, ((DetailsButton)this).get_Text(), (float)(287 - iconSize - 20));
+			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, wrappedText, Font, new Rectangle(iconSize + 20, 0, 327 - iconSize - 20, ((Control)this).get_Height() - 35), Color.get_White(), false, true, 2, (HorizontalAlignment)0, (VerticalAlignment)1);
 		}
 	}
 }
