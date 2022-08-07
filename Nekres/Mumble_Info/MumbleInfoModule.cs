@@ -31,6 +31,8 @@ namespace Nekres.Mumble_Info
 
 		internal SettingEntry<bool> EnablePerformanceCounters;
 
+		internal SettingEntry<bool> SwapYZAxes;
+
 		private DataPanel _dataPanel;
 
 		private Label _cursorPos;
@@ -67,6 +69,7 @@ namespace Nekres.Mumble_Info
 			_toggleInfoBinding = settings.DefineSetting<KeyBinding>("ToggleInfoBinding", new KeyBinding((Keys)187), (Func<string>)(() => "Toggle display"), (Func<string>)(() => "Toggles the display of data."));
 			_showCursorPosition = settings.DefineSetting<bool>("ShowCursorPosition", false, (Func<string>)(() => "Show cursor position"), (Func<string>)(() => "Whether the cursor's current interface-relative position should be displayed.\nUse [Left Alt] to copy it."));
 			EnablePerformanceCounters = settings.DefineSetting<bool>("PerfCountersEnabled", false, (Func<string>)(() => "Show performance counters"), (Func<string>)(() => "Whether performance counters such as RAM and CPU utilization of the Guild Wars 2 process should be displayed."));
+			SwapYZAxes = settings.DefineSetting<bool>("SwapYZAxes", true, (Func<string>)(() => "Swap YZ Axes"), (Func<string>)(() => "Swaps the values of the Y and Z axes if enabled."));
 		}
 
 		protected override void Initialize()
