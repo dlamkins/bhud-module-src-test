@@ -32,7 +32,7 @@ namespace Nekres.Stream_Out.UI.Models
 				},
 				{
 					Social.Twitch,
-					"https://twitch.com/sNekCmd"
+					"https://twitch.tv/sNekCmd"
 				}
 			};
 			_socialLogos = new Dictionary<Social, Texture2D>
