@@ -1,11 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Glide;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
+using MonoGame.Extended.BitmapFonts;
 using Nekres.Mistwar.Entities;
 
 namespace Nekres.Mistwar.UI.Controls
@@ -24,9 +28,9 @@ namespace Nekres.Mistwar.UI.Controls
 
 		private Effect _grayscaleEffect;
 
-		private MapImageDynamic _dynamicLayer;
+		private SpriteBatchParameters _grayscaleSpriteBatchParams;
 
-		private bool _isVisible;
+		private BitmapFont _font;
 
 		public float TextureOpacity { get; private set; }
 
@@ -93,29 +97,29 @@ namespace Nekres.Mistwar.UI.Controls
 		{
 			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Expected O, but got Unknown
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0086: Expected O, but got Unknown
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			Texture = new AsyncTexture2D();
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0069: Expected O, but got Unknown
+			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a9: Expected O, but got Unknown
+			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b4: Expected O, but got Unknown
+			_font = Control.get_Content().GetFont((FontFace)0, (FontSize)24, (FontStyle)0);
+			((Control)this)._spriteBatchParameters = new SpriteBatchParameters((SpriteSortMode)0, (BlendState)null, (SamplerState)null, (DepthStencilState)null, (RasterizerState)null, (Effect)null, (Matrix?)null);
 			_grayscaleEffect = MistwarModule.ModuleInstance.ContentsManager.GetEffect<Effect>("effects\\grayscale.mgfx");
 			SpriteBatchParameters val = new SpriteBatchParameters((SpriteSortMode)0, (BlendState)null, (SamplerState)null, (DepthStencilState)null, (RasterizerState)null, (Effect)null, (Matrix?)null);
 			val.set_Effect(_grayscaleEffect);
-			((Control)this)._spriteBatchParameters = val;
-			MapImageDynamic mapImageDynamic = new MapImageDynamic(this);
-			((Control)mapImageDynamic).set_Size(((Control)this).get_Size());
-			_dynamicLayer = mapImageDynamic;
+			_grayscaleSpriteBatchParams = val;
+			Texture = new AsyncTexture2D();
 			Texture.add_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)OnTextureSwapped);
 			MistwarModule.ModuleInstance.ScaleRatioSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnScaleRatioChanged);
 		}
 
 		public void Toggle(float tDuration = 0.1f, bool silent = false)
 		{
-			if (_isVisible)
+			if (((Control)this)._visible)
 			{
-				_isVisible = false;
+				((Control)this)._visible = false;
 				if (silent)
 				{
 					((Control)this).Hide();
@@ -128,7 +132,7 @@ namespace Nekres.Mistwar.UI.Controls
 				}, tDuration, 0f, true).OnComplete((Action)((Control)this).Hide);
 				return;
 			}
-			_isVisible = true;
+			((Control)this)._visible = true;
 			((Control)this).Show();
 			if (!silent)
 			{
@@ -162,29 +166,21 @@ namespace Nekres.Mistwar.UI.Controls
 			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
 			ScaleRatio = MathHelper.Clamp(e.get_NewValue() / 100f, 0f, 1f);
 			if (_texture.get_HasTexture())
 			{
 				Rectangle bounds = _texture.get_Texture().get_Bounds();
 				((Control)this).set_Size(PointExtensions.ResizeKeepAspect(((Rectangle)(ref bounds)).get_Size(), (int)(ScaleRatio * (float)((Control)GameService.Graphics.get_SpriteScreen()).get_Width()), (int)(ScaleRatio * (float)((Control)GameService.Graphics.get_SpriteScreen()).get_Height()), false));
 				((Control)this).set_Location(new Point(((Control)((Control)this).get_Parent()).get_Size().X / 2 - ((Control)this).get_Size().X / 2, ((Control)((Control)this).get_Parent()).get_Size().Y / 2 - ((Control)this).get_Size().Y / 2));
-				((Control)_dynamicLayer).set_Size(((Control)this).get_Size());
 			}
 		}
 
-		private void Dispose()
+		protected override void DisposeControl()
 		{
-			MapImageDynamic dynamicLayer = _dynamicLayer;
-			if (dynamicLayer != null)
+			if (_texture != null)
 			{
-				((Control)dynamicLayer).Dispose();
-			}
-			_texture.remove_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)OnTextureSwapped);
-			AsyncTexture2D texture = _texture;
-			if (texture != null)
-			{
-				texture.Dispose();
+				_texture.remove_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)OnTextureSwapped);
+				_texture.Dispose();
 			}
 			Effect grayscaleEffect = _grayscaleEffect;
 			if (grayscaleEffect != null)
@@ -192,7 +188,7 @@ namespace Nekres.Mistwar.UI.Controls
 				((GraphicsResource)grayscaleEffect).Dispose();
 			}
 			MistwarModule.ModuleInstance.ScaleRatioSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnScaleRatioChanged);
-			((Control)this).Dispose();
+			((Container)this).DisposeControl();
 		}
 
 		private void OnTextureSwapped(object o, ValueChangedEventArgs<Texture2D> e)
@@ -207,24 +203,72 @@ namespace Nekres.Mistwar.UI.Controls
 			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
 			SourceRectangle = e.get_NewValue().get_Bounds();
 			Rectangle bounds = e.get_NewValue().get_Bounds();
 			((Control)this).set_Size(PointExtensions.ResizeKeepAspect(((Rectangle)(ref bounds)).get_Size(), (int)(ScaleRatio * (float)((Control)GameService.Graphics.get_SpriteScreen()).get_Width()), (int)(ScaleRatio * (float)((Control)GameService.Graphics.get_SpriteScreen()).get_Height()), false));
 			((Control)this).set_Location(new Point(((Control)((Control)this).get_Parent()).get_Size().X / 2 - ((Control)this).get_Size().X / 2, ((Control)((Control)this).get_Parent()).get_Size().Y / 2 - ((Control)this).get_Size().Y / 2));
-			((Control)_dynamicLayer).set_Size(((Control)this).get_Size());
 		}
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			if (_texture.get_HasTexture() && WvwObjectives != null)
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b1: Invalid comparison between Unknown and I4
+			//IL_0225: Unknown result type (might be due to invalid IL or missing references)
+			if (!((Control)this).get_Visible() || !_texture.get_HasTexture() || WvwObjectives == null)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_texture), bounds, (Rectangle?)SourceRectangle, _tint, 0f, Vector2.get_Zero(), _spriteEffects);
+				return;
+			}
+			spriteBatch.End();
+			SpriteBatchExtensions.Begin(spriteBatch, _grayscaleSpriteBatchParams);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_texture), bounds, (Rectangle?)SourceRectangle, _tint, 0f, Vector2.get_Zero(), _spriteEffects);
+			spriteBatch.End();
+			SpriteBatchExtensions.Begin(spriteBatch, ((Control)this)._spriteBatchParameters);
+			float widthRatio = (float)bounds.Width / (float)SourceRectangle.Width;
+			float heightRatio = (float)bounds.Height / (float)SourceRectangle.Height;
+			if (MistwarModule.ModuleInstance.DrawSectorsSetting.get_Value())
+			{
+				foreach (WvwObjectiveEntity wvwObjective in WvwObjectives)
+				{
+					Color teamColor = wvwObjective.TeamColor.GetColorBlindType(MistwarModule.ModuleInstance.ColorTypeSetting.get_Value(), (int)(TextureOpacity * 255f));
+					Vector2[] sectorBounds = wvwObjective.Bounds.Select((Func<Point, Vector2>)delegate(Point p)
+					{
+						//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+						//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+						//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+						//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+						//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+						//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+						//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+						Point val = PointExtensions.ToBounds(new Point((int)(widthRatio * (float)p.X), (int)(heightRatio * (float)p.Y)), ((Control)this).get_AbsoluteBounds());
+						return new Vector2((float)val.X, (float)val.Y);
+					}).ToArray();
+					ShapeExtensions.DrawPolygon(spriteBatch, new Vector2(0f, 0f), (IReadOnlyList<Vector2>)sectorBounds, teamColor, 3f, 0f);
+				}
+			}
+			Rectangle dest = default(Rectangle);
+			foreach (WvwObjectiveEntity objectiveEntity in WvwObjectives)
+			{
+				if (objectiveEntity.Icon != null && (MistwarModule.ModuleInstance.DrawRuinMapSetting.get_Value() || (int)objectiveEntity.Type != 6))
+				{
+					int width = (int)(ScaleRatio * (float)objectiveEntity.Icon.get_Width());
+					int height = (int)(ScaleRatio * (float)objectiveEntity.Icon.get_Height());
+					((Rectangle)(ref dest))._002Ector((int)(widthRatio * (float)objectiveEntity.Center.X), (int)(heightRatio * (float)objectiveEntity.Center.Y), width, height);
+					spriteBatch.DrawWvwObjectiveOnCtrl((Control)(object)this, objectiveEntity, dest, 1f, _font);
+				}
 			}
 		}
 	}

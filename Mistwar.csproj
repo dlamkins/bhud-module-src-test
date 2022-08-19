@@ -17,6 +17,7 @@
     <Reference Include="Blish HUD" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="MonoGame.Extended" />
+    <Reference Include="System.Numerics" />
     <Reference Include="Gapotchenko.FX" />
     <Reference Include="System.Core" />
   </ItemGroup>

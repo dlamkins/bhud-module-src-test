@@ -12,13 +12,28 @@ using Nekres.Mistwar.Entities;
 
 namespace Nekres.Mistwar.Services
 {
-	internal class WvwService : IDisposable
+	internal class WvwService
 	{
 		private Gw2ApiManager _api;
 
 		private Dictionary<int, IEnumerable<WvwObjectiveEntity>> _wvwObjectiveCache;
 
 		private DateTime _prevApiRequestTime = DateTime.UtcNow;
+
+		public IEnumerable<WvwObjectiveEntity> CurrentObjectives
+		{
+			get
+			{
+				IEnumerable<WvwObjectiveEntity> objEntities = default(IEnumerable<WvwObjectiveEntity>);
+				if (!(_wvwObjectiveCache?.TryGetValue(GameService.Gw2Mumble.get_CurrentMap().get_Id(), out objEntities) ?? false))
+				{
+					return null;
+				}
+				return objEntities;
+			}
+		}
+
+		public Guid? CurrentGuild { get; private set; }
 
 		public WvwService(Gw2ApiManager api)
 		{
@@ -28,11 +43,16 @@ namespace Nekres.Mistwar.Services
 
 		public async Task Update()
 		{
-			if (!GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld() || !_wvwObjectiveCache.ContainsKey(GameService.Gw2Mumble.get_CurrentMap().get_Id()) || DateTime.UtcNow.Subtract(_prevApiRequestTime).TotalSeconds < 15.0)
+			if (DateTime.UtcNow.Subtract(_prevApiRequestTime).TotalSeconds < 15.0)
 			{
 				return;
 			}
 			_prevApiRequestTime = DateTime.UtcNow;
+			CurrentGuild = await GetRepresentedGuild();
+			if (!GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld() || !_wvwObjectiveCache.ContainsKey(GameService.Gw2Mumble.get_CurrentMap().get_Id()))
+			{
+				return;
+			}
 			int worldId = await GetWorldId();
 			if (worldId != -1)
 			{
@@ -44,8 +64,26 @@ namespace Nekres.Mistwar.Services
 			}
 		}
 
+		public async Task<Guid?> GetRepresentedGuild()
+		{
+			if (!_api.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
+			{
+				(TokenPermission)1,
+				(TokenPermission)3
+			}))
+			{
+				return null;
+			}
+			return await ((IBlobClient<Character>)(object)_api.get_Gw2ApiClient().get_V2().get_Characters()
+				.get_Item(GameService.Gw2Mumble.get_PlayerCharacter().get_Name())).GetAsync(default(CancellationToken)).ContinueWith((Task<Character> t) => t.IsFaulted ? null : t.Result.get_Guild());
+		}
+
 		public async Task<int> GetWorldId()
 		{
+			if (!_api.HasPermission((TokenPermission)1))
+			{
+				return -1;
+			}
 			return await ((IBlobClient<Account>)(object)_api.get_Gw2ApiClient().get_V2().get_Account()).GetAsync(default(CancellationToken)).ContinueWith((Task<Account> task) => task.IsFaulted ? (-1) : task.Result.get_World());
 		}
 
@@ -119,16 +157,13 @@ namespace Nekres.Mistwar.Services
 					WvwObjective obj = ((IEnumerable<WvwObjective>)task.Result).FirstOrDefault((WvwObjective x) => x.get_SectorId() == sector.get_Id());
 					if (obj != null)
 					{
-						newObjectives.Add(new WvwObjectiveEntity(obj, map, sector));
+						WvwObjectiveEntity o = new WvwObjectiveEntity(obj, map, sector);
+						newObjectives.Add(o);
 					}
 				}
 				_wvwObjectiveCache.Add(map.get_Id(), newObjectives);
 				return newObjectives;
 			}).Unwrap();
-		}
-
-		public void Dispose()
-		{
 		}
 	}
 }
