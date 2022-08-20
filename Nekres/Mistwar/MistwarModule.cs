@@ -46,11 +46,13 @@ namespace Nekres.Mistwar
 
 		internal SettingEntry<bool> EnableMarkersSetting;
 
-		internal SettingEntry<float> MaxViewDistanceSetting;
-
 		internal SettingEntry<bool> HideInCombatSetting;
 
 		internal SettingEntry<bool> DrawRuinMarkersSetting;
+
+		internal SettingEntry<float> MaxViewDistanceSetting;
+
+		internal SettingEntry<float> MarkerScaleSetting;
 
 		private CornerIcon _moduleIcon;
 
@@ -101,6 +103,7 @@ namespace Nekres.Mistwar
 			HideInCombatSetting = markerSettings.DefineSetting<bool>("HideInCombat", true, (Func<string>)(() => "Hide in Combat"), (Func<string>)(() => "Shows only the closest objective in combat and hides all others."));
 			DrawRuinMarkersSetting = markerSettings.DefineSetting<bool>("ShowRuinMarkers", true, (Func<string>)(() => "Show Ruins"), (Func<string>)(() => "Shows markers for the ruins."));
 			MaxViewDistanceSetting = markerSettings.DefineSetting<float>("MaxViewDistance", 50f, (Func<string>)(() => "Max View Distance"), (Func<string>)(() => "The max view distance at which an objective marker can be seen."));
+			MarkerScaleSetting = markerSettings.DefineSetting<float>("ScaleRatio", 70f, (Func<string>)(() => "Scale Ratio"), (Func<string>)(() => "Changes the size of the markers."));
 		}
 
 		protected override void Initialize()
@@ -201,10 +204,14 @@ namespace Nekres.Mistwar
 
 		private void OnToggleMarkersKeyActivated(object o, EventArgs e)
 		{
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			if (GameUtil.IsUiAvailable() && GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld())
+			EnableMarkersSetting.set_Value(!EnableMarkersSetting.get_Value());
+			if (EnableMarkersSetting.get_Value())
 			{
-				MarkerService?.Toggle();
+				MarkerService?.Dispose();
+			}
+			else
+			{
+				MarkerService = new MarkerService(WvwService.CurrentObjectives);
 			}
 		}
 

@@ -20,6 +20,8 @@ namespace Nekres.Mistwar.Services
 
 		private DateTime _prevApiRequestTime = DateTime.UtcNow;
 
+		private Dictionary<int, Map> _mapCache;
+
 		public IEnumerable<WvwObjectiveEntity> CurrentObjectives
 		{
 			get
@@ -39,6 +41,7 @@ namespace Nekres.Mistwar.Services
 		{
 			_api = api;
 			_wvwObjectiveCache = new Dictionary<int, IEnumerable<WvwObjectiveEntity>>();
+			_mapCache = new Dictionary<int, Map>();
 		}
 
 		public async Task Update()
@@ -132,6 +135,11 @@ namespace Nekres.Mistwar.Services
 			});
 		}
 
+		public bool TryGetMap(int mapId, out Map map)
+		{
+			return _mapCache.TryGetValue(mapId, out map);
+		}
+
 		public async Task<IEnumerable<WvwObjectiveEntity>> GetObjectives(int mapId)
 		{
 			if (_wvwObjectiveCache.TryGetValue(mapId, out var objEntities))
@@ -146,6 +154,10 @@ namespace Nekres.Mistwar.Services
 					return Enumerable.Empty<WvwObjectiveEntity>();
 				}
 				Map map = await MapUtil.RequestMap(mapId);
+				if (!_mapCache.ContainsKey(map.get_Id()))
+				{
+					_mapCache.Add(map.get_Id(), map);
+				}
 				IEnumerable<ContinentFloorRegionMapSector> sectors = await MapUtil.RequestSectorsForFloor(map.get_ContinentId(), map.get_DefaultFloor(), map.get_RegionId(), mapId);
 				if (sectors == null)
 				{

@@ -6,7 +6,6 @@ using Blish_HUD.Controls;
 using Glide;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended.BitmapFonts;
 using Nekres.Mistwar.Entities;
 
 namespace Nekres.Mistwar.UI.Controls
@@ -15,14 +14,11 @@ namespace Nekres.Mistwar.UI.Controls
 	{
 		public IEnumerable<WvwObjectiveEntity> WvwObjectives;
 
-		private BitmapFont _font;
-
 		public MarkerBillboard()
 			: this()
 		{
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Expected O, but got Unknown
-			_font = Control.get_Content().GetFont((FontFace)0, (FontSize)24, (FontStyle)0);
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Expected O, but got Unknown
 			base._spriteBatchParameters = new SpriteBatchParameters((SpriteSortMode)0, (BlendState)null, (SamplerState)null, (DepthStencilState)null, (RasterizerState)null, (Effect)null, (Matrix?)null);
 		}
 
@@ -113,7 +109,7 @@ namespace Nekres.Mistwar.UI.Controls
 						int width = objectiveEntity.Icon.get_Width();
 						int height = objectiveEntity.Icon.get_Height();
 						((Rectangle)(ref dest))._002Ector((int)transformed.X, (int)transformed.Y, width, height);
-						spriteBatch.DrawWvwObjectiveOnCtrl((Control)(object)this, objectiveEntity, dest, objectiveEntity.Opacity, _font);
+						spriteBatch.DrawWvwObjectiveOnCtrl((Control)(object)this, objectiveEntity, dest, objectiveEntity.Opacity, MathUtil.Clamp(MistwarModule.ModuleInstance.MarkerScaleSetting.get_Value() / 100f, 0f, 1f));
 					}
 				}
 			}
