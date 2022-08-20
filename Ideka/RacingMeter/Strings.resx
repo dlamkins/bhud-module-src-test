@@ -1,0 +1,224 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="SupportStatusNo"><value>An update is required.
+Online features disabled.</value></data>
+  <data name="RacingMeter"><value>Racing Meter</value></data>
+  <data name="SettingSpeedometerAnchorYText"><value>Vertical position of the speedometer (in screen height percentage).</value></data>
+  <data name="NotifyRaceStartFailed"><value>Race start failed.</value></data>
+  <data name="Unavailable"><value>Unavailable</value></data>
+  <data name="SettingShowGuides"><value>Show Race Guides</value></data>
+  <data name="ExceptionInvalidRaceMap"><value>Invalid race map.</value></data>
+  <data name="RaceEditor"><value>Race Editor</value></data>
+  <data name="SettingAutoLocalGhost"><value>Autoload Best Local Ghost</value></data>
+  <data name="ExceptionRemoveResetPoint"><value>The reset point cannot be removed.</value></data>
+  <data name="NewRaceName"><value>New Race</value></data>
+  <data name="Leaderboard"><value>Leaderboard</value></data>
+  <data name="Delete"><value>Delete</value></data>
+  <data name="NotifyRaceSaved"><value>Race saved.</value></data>
+  <data name="Meters"><value>{0}m</value></data>
+  <data name="SettingGriffonMeter"><value>Griffon Meter</value></data>
+  <data name="ByInfo"><value>By {0}</value></data>
+  <data name="CopyOf"><value>Copy of {0}</value></data>
+  <data name="Cancel"><value>Cancel</value></data>
+  <data name="RaceLocalLeaderboardTooltip"><value>Local races have no leaderboard.</value></data>
+  <data name="ExceptionHttpListener"><value>Failed to bind HTTP listener.</value></data>
+  <data name="ErrorVersionVerification"><value>Unable to verify version</value></data>
+  <data name="BestLabel"><value>Best: {0}</value></data>
+  <data name="SettingRacerHAlignment"><value>Racing UI Horizontal Alignment</value></data>
+  <data name="Inches"><value>{0}in</value></data>
+  <data name="LogInError"><value>Error&lt;br&gt;{0}</value></data>
+  <data name="LogOut"><value>Log Out</value></data>
+  <data name="DeleteRace"><value>Delete This Race</value></data>
+  <data name="NotifyNotEnoughCheckpoints"><value>The race doesn't have enough checkpoints and cannot be run.</value></data>
+  <data name="TestingModeNotice"><value>Testing mode. No ghost data will be loaded or saved.</value></data>
+  <data name="ExceptionNoAccountApiPermission"><value>No Account API permission.</value></data>
+  <data name="SettingMaxGhostDataText"><value>Maximum number of ghost data files to keep on disk per racing track (only the top times are kept). Set this to 0 to disable saving ghost data files. Warning: Any existing ghost data files exeeding this number will be deleted when finishing a race.</value></data>
+  <data name="LogInSuccess"><value>Success! You may now close this webpage and return to the game.</value></data>
+  <data name="SettingShownCheckpoints"><value>Shown Checkpoints</value></data>
+  <data name="SwapPrev"><value>Prev Swap</value></data>
+  <data name="SwapNext"><value>Next Swap</value></data>
+  <data name="RaceTypeOfficial"><value>Official</value></data>
+  <data name="SettingSpeedometerAnchorY"><value>Speedometer Position</value></data>
+  <data name="SupportStatusFaulted"><value>Couldn't connect to the server.
+Online features disabled.</value></data>
+  <data name="ErrorLeaderboardLoad"><value>Leaderboard load failed</value></data>
+  <data name="Nothing"><value>Nothing</value></data>
+  <data name="NotifyOfflineMode"><value>Unavailable in offline mode.</value></data>
+  <data name="ResetPoint"><value>Reset</value></data>
+  <data name="BackToEditing"><value>Back to Editing</value></data>
+  <data name="AlreadySetTooltip"><value>Already set.</value></data>
+  <data name="SelectNearest"><value>Select Nearest</value></data>
+  <data name="RaceTypeUnknown"><value>Unknown</value></data>
+  <data name="Radius"><value>Radius</value></data>
+  <data name="RaceId"><value>Race ID</value></data>
+  <data name="AvatarSnapXY"><value>Snap to Avatar XY</value></data>
+  <data name="GhostTimeLabel"><value>Time: {0}</value></data>
+  <data name="NewRace"><value>New Race</value></data>
+  <data name="SettingRacerVAlignment"><value>Racing UI Vertical Alignment</value></data>
+  <data name="EditingLabel"><value>Editing: {0}</value></data>
+  <data name="ErrorRacesLoad"><value>Failed to load races</value></data>
+  <data name="SettingRacerHAlignmentText"><value>Horizontal alignment of the racing UI.
+Start a race to see the UI while you adjust it.</value></data>
+  <data name="SettingToggleSpeedometer"><value>Toggle Speedometer</value></data>
+  <data name="AreYouSure"><value>Are you sure?</value></data>
+  <data name="GhostDescribeLocal"><value>{0} (local)</value></data>
+  <data name="ExceptionGeneric"><value>Internal error.</value></data>
+  <data name="RaceTypeCustom"><value>Custom</value></data>
+  <data name="RaceCheckpointsLabel"><value>Checkpoints: {0}</value></data>
+  <data name="TestingRace"><value>Testing Race</value></data>
+  <data name="InsertBefore"><value>Insert Before</value></data>
+  <data name="BackToRacing"><value>Back to Racing</value></data>
+  <data name="RaceLocal"><value>(local)</value></data>
+  <data name="CheckpointLabel"><value>Checkpoint: {0} / {1}</value></data>
+  <data name="UnsavedChanges"><value>You have unsaved changes.</value></data>
+  <data name="GhostLocalUploadedTooltip"><value>This is a local ghost.</value></data>
+  <data name="NotifyNoRaceSelected"><value>No race selected.</value></data>
+  <data name="ChangeToCurrent"><value>Change to Current</value></data>
+  <data name="RacePreview"><value>Race Preview</value></data>
+  <data name="Deselect"><value>Deselect</value></data>
+  <data name="SettingToggleDebug"><value>Toggle Debug</value></data>
+  <data name="GhostLocalRacerTooltip"><value>This is a local ghost. Racer data is only recorded on upload.</value></data>
+  <data name="ServerStatusYes"><value>Server connection established.</value></data>
+  <data name="LoadGhost"><value>Race This Ghost</value></data>
+  <data name="SupportStatusTooltipFaulted"><value>The server couldn't be reached. This may mean it's currently offline, or an update is required.</value></data>
+  <data name="FinishTimeLabel"><value>Finish Time: {0}</value></data>
+  <data name="ErrorGhostLoad"><value>Error loading ghost</value></data>
+  <data name="LocalRaces"><value>Local Races</value></data>
+  <data name="PointDescription"><value>Point {0}: {1}</value></data>
+  <data name="GhostRacerLabel"><value>Racer: {0}</value></data>
+  <data name="LocalGhosts"><value>Local Ghosts</value></data>
+  <data name="NotifyRaceMapMismatch"><value>Warning: Loading a race on a different map.</value></data>
+  <data name="SettingSFXVolumeMultiplier"><value>SFX Volume Multiplier</value></data>
+  <data name="GhostDescribeRemote"><value>{0} (remote)</value></data>
+  <data name="GhostUploadedLabel"><value>Uploaded: {0}</value></data>
+  <data name="KoFiButton"><value>Support me
+on Ko-fi</value></data>
+  <data name="SettingRacerAnchorYText"><value>Vertical position of the racing UI, in screen height percentage.
+Start a race to see the UI while you adjust it.</value></data>
+  <data name="SettingRacerAnchorXText"><value>Horizontal position of the racing UI, in screen width percentage.
+Start a race to see the UI while you adjust it.</value></data>
+  <data name="LoggingIn"><value>Logging in...
+Opening your browser...</value></data>
+  <data name="Checkpoint"><value>Checkpoint</value></data>
+  <data name="ExceptionGw2AuthLogIn"><value>Failed to log in to GW2Auth.</value></data>
+  <data name="RaceUpdatedLabel"><value>Updated: {0}</value></data>
+  <data name="SettingShowSpeedometerText"><value>Disable to keep the speedometer hidden</value></data>
+  <data name="ExceptionPointRadius"><value>Point radius cannot be zero or negative.</value></data>
+  <data name="UploadGhost"><value>Upload Ghost</value></data>
+  <data name="SettingToggleDebugText"><value>Toggle visibility of debug information.</value></data>
+  <data name="RaceIdTooltip"><value>Race ID is randomly generated and not meant to be be changed.</value></data>
+  <data name="CsvImportWarning"><value>This will replace all race points in the current race. This action cannot be undone.</value></data>
+  <data name="ErrorLogIn"><value>Unable to log in</value></data>
+  <data name="CurrentRaceLabel"><value>Current race: {0}</value></data>
+  <data name="ConfirmRaceDeletion"><value>This action cannot be undone.</value></data>
+  <data name="Ghost"><value>Ghost</value></data>
+  <data name="LogIn"><value>Log In</value></data>
+  <data name="ExceptionApiAccount"><value>Failed to get GW2 account from API.</value></data>
+  <data name="Races"><value>Races</value></data>
+  <data name="SettingSkiffMeter"><value>Skiff Meter</value></data>
+  <data name="CurrentGhostLabel"><value>Current ghost: {0}</value></data>
+  <data name="UpdateLeaderboard"><value>Update Leaderboard</value></data>
+  <data name="SettingSFXVolumeMultiplierText"><value>Volume multiplier for sound effects. This is applied as a percentage, after Blish's volume setting. Set to 0 to disable all sound effects.</value></data>
+  <data name="SettingAutoLocalGhostText"><value>Automatically load your best local ghost when starting a race (unless you load a specific one).</value></data>
+  <data name="InsertAfter"><value>Insert After</value></data>
+  <data name="SettingShowSpeedometer"><value>Show Speedometer</value></data>
+  <data name="ExceptionEmptyRaceName"><value>The race's name cannot be empty.</value></data>
+  <data name="CreatedBy"><value>{0}
+created by {1}</value></data>
+  <data name="SettingNormalizedOfficialCheckpointsText"><value>When playing an official race, RacingMeter checkpoints will be visually resized to match the in-game look (hitbox is unaffected). Disable this option to see the real size of RacingMeter checkpoints.
+Enabling this option also mutes racing SFX, since official races have SFX already.</value></data>
+  <data name="ExceptionInvalidPointType"><value>Invalid point type.</value></data>
+  <data name="ErrorGhostUpload"><value>Error uploading ghost</value></data>
+  <data name="RunRace"><value>Run This Race</value></data>
+  <data name="ImportCsv"><value>Import .csv Race</value></data>
+  <data name="SettingNormalizedOfficialCheckpoints"><value>Normalized Checkpoints in Official Races</value></data>
+  <data name="ExceptionMinimumCheckpoints"><value>The last two checkpoints cannot be removed.</value></data>
+  <data name="RaceLocalAuthorTooltip"><value>This is a local race. Author data is only recorded on upload.</value></data>
+  <data name="UnloadRace"><value>Unload Race</value></data>
+  <data name="NotifyLogInRequired"><value>Log in required.</value></data>
+  <data name="SettingSkimmerMeter"><value>Skimmer Meter</value></data>
+  <data name="SettingRacerVAlignmentText"><value>Vertical alignment of the racing UI.
+Start a race to see the UI while you adjust it.</value></data>
+  <data name="UnloadGhost"><value>Unload Ghost</value></data>
+  <data name="ExceptionInvalidRaceType"><value>Invalid race type.</value></data>
+  <data name="ExceptionInvalidRaceName"><value>The race's name is invalid.</value></data>
+  <data name="SupportStatusUnchecked"><value>Connecting to server...</value></data>
+  <data name="SupportStatusTooltipNo"><value>Please update the module to continue using online features.</value></data>
+  <data name="PointTypeReset"><value>Reset</value></data>
+  <data name="LogInPrompt"><value>Authenticate to upload
+your race times</value></data>
+  <data name="PointTypeCheckpoint"><value>Checkpoint</value></data>
+  <data name="PointTypeGuide"><value>Guide</value></data>
+  <data name="NotifyGhostAlreadyBetter"><value>You already have a better time on this race.</value></data>
+  <data name="SettingShownCheckpointsText"><value>Number of checkpoints to show while racing. Set this to 0 to always show all checkpoints.</value></data>
+  <data name="SettingRacerAnchorY"><value>Racing UI Vertical Position</value></data>
+  <data name="SettingRacerAnchorX"><value>Racing UI Horizontal Position</value></data>
+  <data name="ErrorFormat"><value>{0}: {1}</value></data>
+  <data name="ExceptionMoveResetPoint"><value>The reset point cannot be moved.</value></data>
+  <data name="ExceptionAccountVerification"><value>The current GW2 account was not found or not verified in the GW2Auth account.</value></data>
+  <data name="TestFromHere"><value>Test From Here</value></data>
+  <data name="RaceLengthLabel"><value>Length: {0}m</value></data>
+  <data name="Loading"><value>Loading...</value></data>
+  <data name="GhostDescribeBy"><value>{0} by {1}</value></data>
+  <data name="SettingToggleSpeedometerText"><value>Toggle speedometer visibility</value></data>
+  <data name="PointTypeLoopStart"><value>Loop Start</value></data>
+  <data name="ErrorRefreshToken"><value>Log in refresh failed</value></data>
+  <data name="RaceMap"><value>Map</value></data>
+  <data name="ErrorRaceImport"><value>Race import failed</value></data>
+  <data name="RaceType"><value>Race Type</value></data>
+  <data name="RaceName"><value>Name</value></data>
+  <data name="ExceptionLogInExpired"><value>Login expired.</value></data>
+  <data name="SupportStatusTooltipUnchecked"><value>Please wait while server connectivity is verified.</value></data>
+  <data name="TestRace"><value>Test Race</value></data>
+  <data name="AvatarSnapXYZ"><value>Snap to Avatar</value></data>
+  <data name="RaceTypeLabel"><value>Type: {0}</value></data>
+  <data name="RacePoints"><value>Race Points</value></data>
+  <data name="LastLabel"><value>Last: {0}</value></data>
+  <data name="RaceMapLabel"><value>Map: {0}</value></data>
+  <data name="LoggedIn"><value>Logged in as
+{0}</value></data>
+  <data name="SettingMumblePollingRate"><value>Mumble Polling Rate</value></data>
+  <data name="SettingShowGuidesText"><value>Some race tracks have guides to help you find your way from checkpoint to checkpoint. They have no hitbox and can be ignored, or hidden entirely.</value></data>
+  <data name="PointType"><value>Point Type</value></data>
+  <data name="UpdateRaces"><value>Update Races</value></data>
+  <data name="RaceAuthorLabel"><value>Author: {0}</value></data>
+  <data name="SettingMaxGhostData"><value>Max Ghost Data Files</value></data>
+  <data name="GhostLocal"><value>(local)</value></data>
+  <data name="GhostLabel"><value>Ghost: {0}</value></data>
+  <data name="None"><value>(none)</value></data>
+  <data name="Next"><value>Next</value></data>
+  <data name="Undo"><value>Undo</value></data>
+  <data name="Redo"><value>Redo</value></data>
+  <data name="Race"><value>Race</value></data>
+  <data name="Save"><value>Save</value></data>
+  <data name="Prev"><value>Prev</value></data>
+  <data name="SettingMumblePollingRateText"><value>How many times per second to check for position updates from the game. It's recommended to set this to a value close to your GW2 framerate.</value></data>
+  <data name="SettingRollerBeetleMeter"><value>Roller Beetle Meter</value></data>
+  </root>
