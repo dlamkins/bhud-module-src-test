@@ -212,24 +212,13 @@ namespace Nekres.Mistwar
 
 		private void OnToggleKeyActivated(object o, EventArgs e)
 		{
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			if (GameUtil.IsUiAvailable() && GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld())
-			{
-				_mapService.Toggle();
-			}
+			_mapService.Toggle();
+			MarkerService?.Toggle(_mapService.IsVisible);
 		}
 
-		private async void OnToggleMarkersKeyActivated(object o, EventArgs e)
+		private void OnToggleMarkersKeyActivated(object o, EventArgs e)
 		{
 			EnableMarkersSetting.set_Value(!EnableMarkersSetting.get_Value());
-			if (EnableMarkersSetting.get_Value())
-			{
-				MarkerService?.Dispose();
-			}
-			else
-			{
-				MarkerService = new MarkerService(await WvwService.GetObjectives(GameService.Gw2Mumble.get_CurrentMap().get_Id()));
-			}
 		}
 
 		protected override async void Update(GameTime gameTime)
@@ -281,8 +270,11 @@ namespace Nekres.Mistwar
 			{
 				if (MarkerService == null)
 				{
-					MarkerService = new MarkerService(await WvwService.GetObjectives(GameService.Gw2Mumble.get_CurrentMap().get_Id()));
+					MarkerService = new MarkerService();
 				}
+				MarkerService markerService = MarkerService;
+				markerService.ReloadMarkers(await WvwService.GetObjectives(GameService.Gw2Mumble.get_CurrentMap().get_Id()));
+				MarkerService.Toggle(_mapService.IsVisible);
 			}
 			else
 			{

@@ -22,67 +22,66 @@ namespace Nekres.Mistwar.UI.Controls
 			base._spriteBatchParameters = new SpriteBatchParameters((SpriteSortMode)0, (BlendState)null, (SamplerState)null, (DepthStencilState)null, (RasterizerState)null, (Effect)null, (Matrix?)null);
 		}
 
-		public void Toggle(float tDuration = 0.1f, bool silent = false)
+		public void Toggle(bool forceHide = false, float tDuration = 0.1f, bool silent = false)
 		{
-			if (base._visible)
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			silent = silent || !GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld();
+			if (forceHide || !GameUtil.IsAvailable() || !GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld() || base._visible)
 			{
-				if (GameUtil.IsUiAvailable())
+				base._visible = false;
+				if (silent)
 				{
-					base._visible = false;
-					if (silent)
-					{
-						((Control)this).Hide();
-						return;
-					}
-					GameService.Content.PlaySoundEffectByName("window-close");
-					((TweenerImpl)GameService.Animation.get_Tweener()).Tween<MarkerBillboard>(this, (object)new
-					{
-						Opacity = 0f
-					}, tDuration, 0f, true).OnComplete((Action)((Control)this).Hide);
+					((Control)this).Hide();
+					return;
 				}
+				GameService.Content.PlaySoundEffectByName("window-close");
+				((TweenerImpl)GameService.Animation.get_Tweener()).Tween<MarkerBillboard>(this, (object)new
+				{
+					Opacity = 0f
+				}, tDuration, 0f, true).OnComplete((Action)((Control)this).Hide);
+				return;
 			}
-			else
+			base._visible = true;
+			((Control)this).Show();
+			if (!silent)
 			{
-				base._visible = true;
-				((Control)this).Show();
-				if (!silent)
+				GameService.Content.PlaySoundEffectByName("page-open-" + RandomUtil.GetRandom(1, 3));
+				((TweenerImpl)GameService.Animation.get_Tweener()).Tween<MarkerBillboard>(this, (object)new
 				{
-					GameService.Content.PlaySoundEffectByName("page-open-" + RandomUtil.GetRandom(1, 3));
-					((TweenerImpl)GameService.Animation.get_Tweener()).Tween<MarkerBillboard>(this, (object)new
-					{
-						Opacity = 1f
-					}, 0.35f, 0f, true);
-				}
+					Opacity = 1f
+				}, 0.35f, 0f, true);
 			}
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ea: Invalid comparison between Unknown and I4
-			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0158: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010c: Invalid comparison between Unknown and I4
+			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
 			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0170: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
 			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0198: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
-			if (!((Control)this).get_Visible() || WvwObjectives == null)
+			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
+			if (!GameUtil.IsAvailable() || !GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld() || !((Control)this).get_Visible() || WvwObjectives == null)
 			{
 				return;
 			}
@@ -94,7 +93,7 @@ namespace Nekres.Mistwar.UI.Controls
 				select x).ToList();
 			if (MistwarModule.ModuleInstance.HideInCombatSetting.get_Value() && GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat())
 			{
-				distanceSort = new List<WvwObjectiveEntity> { distanceSort[0] };
+				distanceSort = (distanceSort.IsNullOrEmpty() ? distanceSort : distanceSort.Take(1).ToList());
 			}
 			Rectangle dest = default(Rectangle);
 			foreach (WvwObjectiveEntity objectiveEntity in distanceSort)

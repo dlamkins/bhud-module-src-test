@@ -212,12 +212,66 @@ namespace Nekres.Mistwar.Entities
 
 		public bool HasGuildUpgrades()
 		{
-			return GuildUpgrades.IsNullOrEmpty();
+			return !GuildUpgrades.IsNullOrEmpty();
 		}
 
 		public bool HasUpgraded()
 		{
 			return YaksDelivered >= 20;
+		}
+
+		public bool HasEmergencyWaypoint()
+		{
+			if (HasGuildUpgrades())
+			{
+				return GuildUpgrades.Contains(178);
+			}
+			return false;
+		}
+
+		public bool HasRegularWaypoint()
+		{
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Invalid comparison between Unknown and I4
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Invalid comparison between Unknown and I4
+			if (!IsSpawn())
+			{
+				if (GetTier() == WvwObjectiveTier.Fortified)
+				{
+					if ((int)Type != 3)
+					{
+						return (int)Type == 2;
+					}
+					return true;
+				}
+				return false;
+			}
+			return true;
+		}
+
+		public bool IsSpawn()
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0008: Invalid comparison between Unknown and I4
+			return (int)Type == 9;
+		}
+
+		public WvwObjectiveTier GetTier()
+		{
+			if (YaksDelivered < 140)
+			{
+				if (YaksDelivered < 60)
+				{
+					if (YaksDelivered < 20)
+					{
+						return WvwObjectiveTier.Supported;
+					}
+					return WvwObjectiveTier.Secured;
+				}
+				return WvwObjectiveTier.Reinforced;
+			}
+			return WvwObjectiveTier.Fortified;
 		}
 
 		public bool HasBuff(out TimeSpan remainingTime)
@@ -299,9 +353,14 @@ namespace Nekres.Mistwar.Entities
 			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001b: Expected I4, but got Unknown
 			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 			WvwOwner owner = Owner;
 			return (Color)((owner - 2) switch
 			{
@@ -314,15 +373,13 @@ namespace Nekres.Mistwar.Entities
 
 		private Texture2D GetUpgradeTierTexture()
 		{
-			if (YaksDelivered < 140)
+			return (Texture2D)(GetTier() switch
 			{
-				if (YaksDelivered < 60)
-				{
-					return TextureSecured;
-				}
-				return TextureReinforced;
-			}
-			return TextureFortified;
+				WvwObjectiveTier.Fortified => TextureFortified, 
+				WvwObjectiveTier.Reinforced => TextureReinforced, 
+				WvwObjectiveTier.Secured => TextureSecured, 
+				_ => Textures.get_TransparentPixel(), 
+			});
 		}
 
 		private float GetOpacity()

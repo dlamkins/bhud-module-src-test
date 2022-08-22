@@ -12,7 +12,7 @@ namespace Nekres.Mistwar.Services
 	{
 		private MarkerBillboard _billboard;
 
-		public MarkerService(IEnumerable<WvwObjectiveEntity> currentObjectives = null)
+		public MarkerService()
 		{
 			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
@@ -23,8 +23,7 @@ namespace Nekres.Mistwar.Services
 			Rectangle absoluteBounds = ((Control)GameService.Graphics.get_SpriteScreen()).get_AbsoluteBounds();
 			((Control)markerBillboard).set_Size(((Rectangle)(ref absoluteBounds)).get_Size());
 			((Control)markerBillboard).set_Location(new Point(0, 0));
-			((Control)markerBillboard).set_Visible(currentObjectives != null);
-			markerBillboard.WvwObjectives = currentObjectives;
+			((Control)markerBillboard).set_Visible(false);
 			_billboard = markerBillboard;
 			GameService.Gw2Mumble.get_UI().add_IsMapOpenChanged((EventHandler<ValueEventArgs<bool>>)OnIsMapOpenChanged);
 			GameService.GameIntegration.get_Gw2Instance().add_IsInGameChanged((EventHandler<ValueEventArgs<bool>>)OnIsInGameChanged);
@@ -33,24 +32,11 @@ namespace Nekres.Mistwar.Services
 		public void ReloadMarkers(IEnumerable<WvwObjectiveEntity> entities)
 		{
 			_billboard.WvwObjectives = entities;
-			Toggle(keepOpen: true);
 		}
 
-		public void Toggle(bool keepOpen = false)
+		public void Toggle(bool forceHide = false)
 		{
-			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			if (GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld())
-			{
-				if (keepOpen && ((Control)_billboard).get_Visible())
-				{
-					((Control)_billboard).Hide();
-					((Control)_billboard).Show();
-				}
-				else
-				{
-					_billboard?.Toggle();
-				}
-			}
+			_billboard?.Toggle(forceHide);
 		}
 
 		private void OnIsMapOpenChanged(object o, ValueEventArgs<bool> e)
@@ -61,7 +47,7 @@ namespace Nekres.Mistwar.Services
 			}
 			else
 			{
-				((Control)_billboard).Hide();
+				Toggle(forceHide: true);
 			}
 		}
 
@@ -69,11 +55,11 @@ namespace Nekres.Mistwar.Services
 		{
 			if (e.get_Value())
 			{
-				Toggle(keepOpen: true);
+				Toggle();
 			}
 			else
 			{
-				((Control)_billboard).Hide();
+				Toggle(forceHide: true);
 			}
 		}
 

@@ -99,19 +99,6 @@ namespace Nekres.Mistwar
 			return new Point(x, y);
 		}
 
-		public static Point Refit(Point value, Coordinates2 destTopLeft, int padding = 0, int tileSize = 256)
-		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			Point val = new Point(value.X / tileSize, value.Y / tileSize);
-			int x = (int)((double)(val.X * tileSize) - ((Coordinates2)(ref destTopLeft)).get_X() + (double)padding);
-			int y = (int)((double)(val.Y * tileSize) - ((Coordinates2)(ref destTopLeft)).get_Y() + (double)padding);
-			return new Point(x, y);
-		}
-
 		private static async Task<Map> RequestMap(int mapId)
 		{
 			try

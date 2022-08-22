@@ -15,7 +15,7 @@ namespace Nekres.Mistwar
 			2103, 2267, 2253, 2275, 2217, 2148, 2134
 		};
 
-		public static bool IsUiAvailable()
+		public static bool IsAvailable()
 		{
 			if (GameService.Gw2Mumble.get_IsAvailable() && GameService.GameIntegration.get_Gw2Instance().get_IsInGame())
 			{

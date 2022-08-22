@@ -69,16 +69,18 @@ namespace Nekres.Mistwar
 
 		private static void Focus()
 		{
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
 			UnFocus();
+			Keyboard.Release((VirtualKeyShort)160, false);
+			Keyboard.Release((VirtualKeyShort)161, false);
 			if ((int)MistwarModule.ModuleInstance.ChatMessageKeySetting.get_Value().get_ModifierKeys() != 0)
 			{
 				Keyboard.Press(ModifierLookUp[MistwarModule.ModuleInstance.ChatMessageKeySetting.get_Value().get_ModifierKeys()], false);

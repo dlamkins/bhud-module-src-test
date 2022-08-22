@@ -62,6 +62,19 @@ namespace Nekres.Mistwar.Services
 			}
 		}
 
+		public bool IsVisible
+		{
+			get
+			{
+				MapImage mapControl = _mapControl;
+				if (mapControl == null)
+				{
+					return false;
+				}
+				return ((Control)mapControl).get_Visible();
+			}
+		}
+
 		public bool IsLoading { get; private set; }
 
 		public MapService(DirectoriesManager dir, WvwService wvw, IProgress<string> loadingIndicator)
@@ -193,16 +206,15 @@ namespace Nekres.Mistwar.Services
 			return await MapUtil.GetMapExpanded(obj, obj.get_DefaultFloor());
 		}
 
-		public void Toggle()
+		public void Toggle(bool forceHide = false)
 		{
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 			if (IsLoading)
 			{
 				ScreenNotification.ShowNotification("Mistwar is initializing.", (NotificationType)2, (Texture2D)null, 4);
 			}
-			else if (GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld())
+			else
 			{
-				_mapControl?.Toggle();
+				_mapControl?.Toggle(forceHide);
 			}
 		}
 
@@ -210,15 +222,15 @@ namespace Nekres.Mistwar.Services
 		{
 			if (e.get_Value())
 			{
-				((Control)_mapControl).Hide();
+				Toggle(forceHide: true);
 			}
 		}
 
 		private void OnIsInGameChanged(object o, ValueEventArgs<bool> e)
 		{
-			if (e.get_Value())
+			if (!e.get_Value())
 			{
-				((Control)_mapControl).Hide();
+				Toggle(forceHide: true);
 			}
 		}
 

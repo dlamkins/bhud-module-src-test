@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Modules.Managers;
+using Gw2Sharp.WebApi.Exceptions;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
@@ -28,6 +29,10 @@ namespace Nekres.Mistwar.Services
 
 		public WvwOwner CurrentTeam { get; private set; }
 
+		public bool IsLoading => !string.IsNullOrEmpty(LoadingMessage);
+
+		public string LoadingMessage { get; private set; }
+
 		public WvwService(Gw2ApiManager api)
 		{
 			_prevApiRequestTime = DateTime.MinValue.ToUniversalTime();
@@ -42,25 +47,46 @@ namespace Nekres.Mistwar.Services
 
 		public async Task Update()
 		{
-			if (DateTime.UtcNow.Subtract(_prevApiRequestTime).TotalSeconds < 15.0)
+			if (!IsLoading && GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld() && !(DateTime.UtcNow.Subtract(_prevApiRequestTime).TotalSeconds < 15.0))
 			{
-				return;
-			}
-			_prevApiRequestTime = DateTime.UtcNow;
-			CurrentGuild = await GetRepresentedGuild();
-			if (!GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld())
-			{
-				return;
-			}
-			int worldId = await GetWorldId();
-			if (worldId != -1)
-			{
-				int[] array = await GetWvWMapIds(worldId);
-				foreach (int id in array)
+				LoadingMessage = "Refreshing";
+				CurrentGuild = await GetRepresentedGuild();
+				int worldId = await GetWorldId();
+				if (worldId == -1)
 				{
-					await UpdateObjectives(worldId, id);
+					LoadingMessage = string.Empty;
+					_prevApiRequestTime = DateTime.UtcNow;
+				}
+				else
+				{
+					UpdateInBackground(worldId);
 				}
 			}
+		}
+
+		private void UpdateInBackground(int worldId)
+		{
+			Thread thread = new Thread((ThreadStart)delegate
+			{
+				UpdateObjectives(worldId);
+			});
+			thread.IsBackground = true;
+			thread.Start();
+		}
+
+		private async Task UpdateObjectives(int worldId)
+		{
+			List<Task> taskList = new List<Task>();
+			int[] array = await GetWvWMapIds(worldId);
+			foreach (int id in array)
+			{
+				Task<Task> t = new Task<Task>(() => UpdateObjectives(worldId, id));
+				taskList.Add(t);
+				t.Start();
+			}
+			Task.WaitAll(taskList.ToArray());
+			LoadingMessage = string.Empty;
+			_prevApiRequestTime = DateTime.UtcNow;
 		}
 
 		public async Task<Guid?> GetRepresentedGuild()
@@ -126,34 +152,41 @@ namespace Nekres.Mistwar.Services
 		private async Task UpdateObjectives(int worldId, int mapId)
 		{
 			IEnumerable<WvwObjectiveEntity> objEntities = await GetObjectives(mapId);
-			await ((IBlobClient<WvwMatch>)(object)_api.get_Gw2ApiClient().get_V2().get_Wvw()
-				.get_Matches()
-				.World(worldId)).GetAsync(default(CancellationToken)).ContinueWith(delegate(Task<WvwMatch> task)
+			WvwMatch match;
+			try
 			{
-				//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-				if (!task.IsFaulted)
+				match = await ((IBlobClient<WvwMatch>)(object)_api.get_Gw2ApiClient().get_V2().get_Wvw()
+					.get_Matches()
+					.World(worldId)).GetAsync(default(CancellationToken));
+			}
+			catch (RequestException)
+			{
+				return;
+			}
+			if (match == null)
+			{
+				return;
+			}
+			_teams = match.get_AllWorlds();
+			CurrentTeam = (WvwOwner)(_teams.get_Blue().Contains(worldId) ? 3 : (_teams.get_Red().Contains(worldId) ? 2 : (_teams.get_Green().Contains(worldId) ? 4 : 0)));
+			WvwMatchMap obj2 = match.get_Maps().FirstOrDefault((WvwMatchMap x) => x.get_Id() == mapId);
+			IReadOnlyList<WvwMatchMapObjective> objectives = ((obj2 != null) ? obj2.get_Objectives() : null);
+			if (objectives.IsNullOrEmpty())
+			{
+				return;
+			}
+			foreach (WvwObjectiveEntity objEntity in objEntities)
+			{
+				WvwMatchMapObjective obj = objectives.FirstOrDefault((WvwMatchMapObjective v) => v.get_Id().Equals(objEntity.Id, StringComparison.InvariantCultureIgnoreCase));
+				if (obj != null)
 				{
-					_teams = task.Result.get_AllWorlds();
-					CurrentTeam = (WvwOwner)(_teams.get_Blue().Contains(worldId) ? 3 : (_teams.get_Red().Contains(worldId) ? 2 : (_teams.get_Green().Contains(worldId) ? 4 : 0)));
-					WvwMatchMap obj = task.Result.get_Maps().FirstOrDefault((WvwMatchMap x) => x.get_Id() == mapId);
-					IReadOnlyList<WvwMatchMapObjective> source = ((obj != null) ? obj.get_Objectives() : null);
-					if (!source.IsNullOrEmpty())
-					{
-						foreach (WvwObjectiveEntity objEntity in objEntities)
-						{
-							WvwMatchMapObjective val = source.FirstOrDefault((WvwMatchMapObjective v) => v.get_Id().Equals(objEntity.Id, StringComparison.InvariantCultureIgnoreCase));
-							if (val != null)
-							{
-								objEntity.LastFlipped = val.get_LastFlipped() ?? DateTime.MinValue;
-								objEntity.Owner = val.get_Owner().get_Value();
-								objEntity.ClaimedBy = val.get_ClaimedBy() ?? Guid.Empty;
-								objEntity.GuildUpgrades = val.get_GuildUpgrades();
-								objEntity.YaksDelivered = val.get_YaksDelivered().GetValueOrDefault();
-							}
-						}
-					}
+					objEntity.LastFlipped = obj.get_LastFlipped() ?? DateTime.MinValue;
+					objEntity.Owner = obj.get_Owner().get_Value();
+					objEntity.ClaimedBy = obj.get_ClaimedBy() ?? Guid.Empty;
+					objEntity.GuildUpgrades = obj.get_GuildUpgrades();
+					objEntity.YaksDelivered = obj.get_YaksDelivered().GetValueOrDefault();
 				}
-			});
+			}
 		}
 
 		private async Task<IEnumerable<WvwObjectiveEntity>> RequestObjectives(int mapId)
