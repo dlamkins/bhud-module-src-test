@@ -22,9 +22,9 @@ namespace Lorf.BH.TTBlockersStuff.UI
 
 		private const int HEADER_HEIGHT = 36;
 
-		private static readonly Texture2D _texturePanelHeader = Control.get_Content().GetTexture("controls/panel/1032325");
+		private static readonly Texture2D _texturePanelHeader = Control.Content.GetTexture("controls/panel/1032325");
 
-		private static readonly Texture2D _texturePanelHeaderActive = Control.get_Content().GetTexture("controls/panel/1032324");
+		private static readonly Texture2D _texturePanelHeaderActive = Control.Content.GetTexture("controls/panel/1032324");
 
 		private static readonly Texture2D armorIcon = Module.Instance.ContentsManager.GetTexture("Armor_(attribute).png");
 
@@ -40,7 +40,7 @@ namespace Lorf.BH.TTBlockersStuff.UI
 
 		private static readonly Texture2D borderAccent = Module.Instance.ContentsManager.GetTexture("border_accent.png");
 
-		private static readonly SettingCollection windowSettings = Module.Instance.SettingsManager.get_ModuleSettings().AddSubCollection("TTPanel", false);
+		private static readonly SettingCollection windowSettings = Module.Instance.SettingsManager.ModuleSettings.AddSubCollection("TTPanel");
 
 		private Rectangle layoutHeaderBounds;
 
@@ -88,7 +88,7 @@ namespace Lorf.BH.TTBlockersStuff.UI
 			}
 			private set
 			{
-				((Control)this).SetProperty<bool>(ref dragging, value, false, "Dragging");
+				SetProperty(ref dragging, value, invalidateLayout: false, "Dragging");
 			}
 		}
 
@@ -100,7 +100,7 @@ namespace Lorf.BH.TTBlockersStuff.UI
 			}
 			set
 			{
-				((Control)this).SetProperty<bool>(ref isBlocking, value, true, "IsBlocking");
+				SetProperty(ref isBlocking, value, invalidateLayout: true, "IsBlocking");
 			}
 		}
 
@@ -112,7 +112,7 @@ namespace Lorf.BH.TTBlockersStuff.UI
 			}
 			set
 			{
-				((Control)this).SetProperty<bool>(ref isMounted, value, true, "IsMounted");
+				SetProperty(ref isMounted, value, invalidateLayout: true, "IsMounted");
 			}
 		}
 
@@ -124,7 +124,7 @@ namespace Lorf.BH.TTBlockersStuff.UI
 			}
 			set
 			{
-				((Control)this).SetProperty<float>(ref blockerIconRotation, value, false, "BlockerIconRotation");
+				SetProperty(ref blockerIconRotation, value, invalidateLayout: false, "BlockerIconRotation");
 			}
 		}
 
@@ -136,7 +136,7 @@ namespace Lorf.BH.TTBlockersStuff.UI
 			}
 			set
 			{
-				((Control)this).SetProperty<bool>(ref blockerIconVisible, value, true, "BlockerIconVisible");
+				SetProperty(ref blockerIconVisible, value, invalidateLayout: true, "BlockerIconVisible");
 			}
 		}
 
@@ -144,13 +144,11 @@ namespace Lorf.BH.TTBlockersStuff.UI
 		{
 			get
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				return blockerIconTint;
 			}
 			set
 			{
-				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-				((Control)this).SetProperty<Color>(ref blockerIconTint, value, false, "BlockerIconTint");
+				SetProperty(ref blockerIconTint, value, invalidateLayout: false, "BlockerIconTint");
 			}
 		}
 
@@ -162,7 +160,7 @@ namespace Lorf.BH.TTBlockersStuff.UI
 			}
 			private set
 			{
-				((Control)this).SetProperty<bool>(ref resizing, value, false, "Resizing");
+				SetProperty(ref resizing, value, invalidateLayout: false, "Resizing");
 			}
 		}
 
@@ -174,7 +172,7 @@ namespace Lorf.BH.TTBlockersStuff.UI
 			}
 			set
 			{
-				((Control)this).SetProperty<string>(ref title, value, false, "Title");
+				SetProperty(ref title, value, invalidateLayout: false, "Title");
 			}
 		}
 
@@ -186,230 +184,130 @@ namespace Lorf.BH.TTBlockersStuff.UI
 			}
 			set
 			{
-				((Control)this).SetProperty<bool>(ref targetVisibility, value, false, "TargetVisibility");
+				SetProperty(ref targetVisibility, value, invalidateLayout: false, "TargetVisibility");
 			}
 		}
 
-		protected int InternalWidth => ((Control)this).get_Width() - 4 - 4;
+		protected int InternalWidth => base.Width - 4 - 4;
 
-		protected int InternalHeight => ((Control)this).get_Height() - 5;
+		protected int InternalHeight => base.Height - 5;
 
 		public TTPanel()
-			: this()
 		{
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			GameService.Input.get_Mouse().add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)OnGlobalMouseRelease);
-			resizeHandleBounds = Rectangle.get_Empty();
-			dragStart = Point.get_Zero();
-			resizeStart = Point.get_Zero();
+			GameService.Input.Mouse.LeftMouseButtonReleased += OnGlobalMouseRelease;
+			resizeHandleBounds = Rectangle.Empty;
+			dragStart = Point.Zero;
+			resizeStart = Point.Zero;
 		}
 
 		protected virtual Point HandleWindowResize(Point newSize)
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-			return new Point(MathHelper.Clamp(newSize.X, 250, (int)((float)GameService.Graphics.get_Resolution().X / GameService.Graphics.get_UIScaleMultiplier())), MathHelper.Clamp(newSize.Y, 41, (int)((float)GameService.Graphics.get_Resolution().Y / GameService.Graphics.get_UIScaleMultiplier())));
+			return new Point(MathHelper.Clamp(newSize.X, 250, (int)((float)GameService.Graphics.Resolution.X / GameService.Graphics.UIScaleMultiplier)), MathHelper.Clamp(newSize.Y, 41, (int)((float)GameService.Graphics.Resolution.Y / GameService.Graphics.UIScaleMultiplier)));
 		}
 
 		public override void UpdateContainer(GameTime gameTime)
 		{
-			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
 			if (Dragging)
 			{
-				((Control)this).set_Location(((Control)this).get_Location() + (Control.get_Input().get_Mouse().get_Position() - dragStart));
-				dragStart = Control.get_Input().get_Mouse().get_Position();
+				base.Location += Control.Input.Mouse.Position - dragStart;
+				dragStart = Control.Input.Mouse.Position;
 			}
 			else if (Resizing)
 			{
-				Point nOffset = Control.get_Input().get_Mouse().get_Position() - dragStart;
-				((Control)this).set_Size(HandleWindowResize(resizeStart + nOffset));
+				Point nOffset = Control.Input.Mouse.Position - dragStart;
+				base.Size = HandleWindowResize(resizeStart + nOffset);
 			}
-			if (((Control)this).get_Visible() != TargetVisibility || ((Control)this)._opacity != 0f || ((Control)this)._opacity != 1f)
+			if (base.Visible != TargetVisibility || _opacity != 0f || _opacity != 1f)
 			{
 				if (TargetVisibility)
 				{
-					((Control)this).set_Opacity(MathHelper.Clamp(((Control)this).get_Opacity() + (float)(gameTime.get_ElapsedGameTime().TotalMilliseconds / 200.0), 0f, 1f));
+					base.Opacity = MathHelper.Clamp(base.Opacity + (float)(gameTime.ElapsedGameTime.TotalMilliseconds / 200.0), 0f, 1f);
 				}
 				else
 				{
-					((Control)this).set_Opacity(MathHelper.Clamp(((Control)this).get_Opacity() - (float)(gameTime.get_ElapsedGameTime().TotalMilliseconds / 200.0), 0f, 1f));
+					base.Opacity = MathHelper.Clamp(base.Opacity - (float)(gameTime.ElapsedGameTime.TotalMilliseconds / 200.0), 0f, 1f);
 				}
-				((Control)this).set_Visible(((Control)this)._opacity > 0f);
+				base.Visible = _opacity > 0f;
 			}
-			((Container)this).UpdateContainer(gameTime);
+			base.UpdateContainer(gameTime);
 		}
 
 		public override void RecalculateLayout()
 		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0119: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0136: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0166: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
 			layoutInternalBounds = new Rectangle(4, 0, InternalWidth, InternalHeight);
 			layoutHeaderBounds = new Rectangle(4, 0, InternalWidth, 36);
-			layoutHeaderTextBounds = new Rectangle(layoutHeaderBounds.X + 7 + (BlockerIconVisible ? (markerIcon.get_Width() + 3) : 0), layoutHeaderBounds.Y, layoutHeaderBounds.Width - 15 - 7, layoutHeaderBounds.Height);
-			resizeHandleBounds = new Rectangle(((Control)this).get_Width() - resizeCornerInactive.get_Width(), ((Control)this).get_Height() - resizeCornerInactive.get_Height(), resizeCornerInactive.get_Width(), resizeCornerInactive.get_Height());
-			int cornerAccentWidth = Math.Min(((Control)this).get_Width(), cornerAccent.get_Width());
-			layoutTopLeftAccentBounds = new Rectangle(0, 30, cornerAccentWidth, cornerAccent.get_Height());
-			layoutBottomRightAccentBounds = new Rectangle(((Control)this).get_Width() - cornerAccentWidth, ((Control)this).get_Height() - cornerAccent.get_Height(), cornerAccentWidth, cornerAccent.get_Height());
-			layoutCornerAccentSrc = new Rectangle(0, 0, cornerAccentWidth, cornerAccent.get_Height());
-			layoutLeftAccentBounds = new Rectangle(4, 36, borderAccent.get_Width(), Math.Min(InternalHeight - 36, borderAccent.get_Height()));
-			((Container)this).set_ContentRegion(new Rectangle(4, 36, InternalWidth, InternalHeight - 36));
+			layoutHeaderTextBounds = new Rectangle(layoutHeaderBounds.X + 7 + (BlockerIconVisible ? (markerIcon.Width + 3) : 0), layoutHeaderBounds.Y, layoutHeaderBounds.Width - 15 - 7, layoutHeaderBounds.Height);
+			resizeHandleBounds = new Rectangle(base.Width - resizeCornerInactive.Width, base.Height - resizeCornerInactive.Height, resizeCornerInactive.Width, resizeCornerInactive.Height);
+			int cornerAccentWidth = Math.Min(base.Width, cornerAccent.Width);
+			layoutTopLeftAccentBounds = new Rectangle(0, 30, cornerAccentWidth, cornerAccent.Height);
+			layoutBottomRightAccentBounds = new Rectangle(base.Width - cornerAccentWidth, base.Height - cornerAccent.Height, cornerAccentWidth, cornerAccent.Height);
+			layoutCornerAccentSrc = new Rectangle(0, 0, cornerAccentWidth, cornerAccent.Height);
+			layoutLeftAccentBounds = new Rectangle(4, 36, borderAccent.Width, Math.Min(InternalHeight - 36, borderAccent.Height));
+			base.ContentRegion = new Rectangle(4, 36, InternalWidth, InternalHeight - 36);
 		}
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0183: Unknown result type (might be due to invalid IL or missing references)
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), layoutInternalBounds, Color.get_Black() * 0.1f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, (((Control)this)._mouseOver && ((Control)this).get_RelativeMousePosition().Y <= 36) ? _texturePanelHeaderActive : _texturePanelHeader, layoutHeaderBounds);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, title, Control.get_Content().get_DefaultFont16(), layoutHeaderTextBounds, Color.get_White(), false, (HorizontalAlignment)0, (VerticalAlignment)1);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, cornerAccent, layoutTopLeftAccentBounds, (Rectangle?)layoutCornerAccentSrc, Color.get_White(), 0f, Vector2.get_Zero(), (SpriteEffects)1);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, cornerAccent, layoutBottomRightAccentBounds, (Rectangle?)layoutCornerAccentSrc, Color.get_White(), 0f, Vector2.get_Zero(), (SpriteEffects)2);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, borderAccent, layoutLeftAccentBounds, (Rectangle?)layoutLeftAccentBounds, Color.get_Black(), 0f, Vector2.get_Zero(), (SpriteEffects)0);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, layoutInternalBounds, Color.Black * 0.1f);
+			spriteBatch.DrawOnCtrl(this, (_mouseOver && base.RelativeMousePosition.Y <= 36) ? _texturePanelHeaderActive : _texturePanelHeader, layoutHeaderBounds);
+			spriteBatch.DrawStringOnCtrl(this, title, Control.Content.DefaultFont16, layoutHeaderTextBounds, Color.White);
+			spriteBatch.DrawOnCtrl(this, cornerAccent, layoutTopLeftAccentBounds, layoutCornerAccentSrc, Color.White, 0f, Vector2.Zero, SpriteEffects.FlipHorizontally);
+			spriteBatch.DrawOnCtrl(this, cornerAccent, layoutBottomRightAccentBounds, layoutCornerAccentSrc, Color.White, 0f, Vector2.Zero, SpriteEffects.FlipVertically);
+			spriteBatch.DrawOnCtrl(this, borderAccent, layoutLeftAccentBounds, layoutLeftAccentBounds, Color.Black, 0f, Vector2.Zero);
 			if (blockerIconVisible)
 			{
 				Texture2D icon = (isMounted ? impossibleIcon : (isBlocking ? armorIcon : markerIcon));
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, icon, new Rectangle(22, 18, 26, 26), (Rectangle?)icon.get_Bounds(), isMounted ? Color.get_White() : blockerIconTint, isMounted ? 0f : blockerIconRotation, new Vector2((float)(icon.get_Width() / 2), (float)(icon.get_Height() / 2)), (SpriteEffects)0);
+				spriteBatch.DrawOnCtrl(this, icon, new Rectangle(22, 18, 26, 26), icon.Bounds, isMounted ? Color.White : blockerIconTint, isMounted ? 0f : blockerIconRotation, new Vector2(icon.Width / 2, icon.Height / 2));
 			}
 		}
 
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			Texture2D iconTexture = ((((Rectangle)(ref resizeHandleBounds)).Contains(((Control)this).get_RelativeMousePosition()) || Resizing) ? resizeCornerActive : resizeCornerInactive);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, iconTexture, resizeHandleBounds);
-			((Container)this).PaintAfterChildren(spriteBatch, bounds);
+			Texture2D iconTexture = ((resizeHandleBounds.Contains(base.RelativeMousePosition) || Resizing) ? resizeCornerActive : resizeCornerInactive);
+			spriteBatch.DrawOnCtrl(this, iconTexture, resizeHandleBounds);
+			base.PaintAfterChildren(spriteBatch, bounds);
 		}
 
 		protected override void OnLeftMouseButtonPressed(MouseEventArgs e)
 		{
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-			if (((Rectangle)(ref resizeHandleBounds)).Contains(((Control)this).get_RelativeMousePosition()))
+			if (resizeHandleBounds.Contains(base.RelativeMousePosition))
 			{
 				Resizing = true;
-				resizeStart = ((Control)this).get_Size();
-				dragStart = Control.get_Input().get_Mouse().get_Position();
+				resizeStart = base.Size;
+				dragStart = Control.Input.Mouse.Position;
 			}
-			else if (((Control)this)._mouseOver && ((Control)this).get_RelativeMousePosition().Y <= 36)
+			else if (_mouseOver && base.RelativeMousePosition.Y <= 36)
 			{
 				Dragging = true;
-				dragStart = Control.get_Input().get_Mouse().get_Position();
+				dragStart = Control.Input.Mouse.Position;
 			}
-			((Control)this).OnLeftMouseButtonPressed(e);
+			base.OnLeftMouseButtonPressed(e);
 		}
 
 		protected void OnGlobalMouseRelease(object sender, MouseEventArgs e)
 		{
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00af: Expected O, but got Unknown
-			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-			if (!((Control)this).get_Visible())
+			if (!base.Visible)
 			{
 				return;
 			}
 			if (Dragging || Resizing)
 			{
-				((windowSettings.get_Item("location") as SettingEntry<Point>) ?? windowSettings.DefineSetting<Point>("location", dragStart, (Func<string>)null, (Func<string>)null)).set_Value(((Control)this).get_Location());
-				((windowSettings.get_Item("size") as SettingEntry<Point>) ?? windowSettings.DefineSetting<Point>("size", resizeStart, (Func<string>)null, (Func<string>)null)).set_Value(((Control)this).get_Size());
+				((windowSettings["location"] as SettingEntry<Point>) ?? windowSettings.DefineSetting("location", dragStart)).Value = base.Location;
+				((windowSettings["size"] as SettingEntry<Point>) ?? windowSettings.DefineSetting("size", resizeStart)).Value = base.Size;
 				if (Resizing)
 				{
-					((Control)this).OnResized(new ResizedEventArgs(resizeStart, ((Control)this).get_Size()));
+					OnResized(new ResizedEventArgs(resizeStart, base.Size));
 				}
 				Dragging = false;
 				Resizing = false;
 				return;
 			}
-			foreach (Control child in ((Container)this).get_Children())
+			foreach (Control child in base.Children)
 			{
 				TimerBar pb = child as TimerBar;
-				if (pb != null)
+				if (pb != null && pb.LocalBounds.OffsetBy(base.ContentRegion.Location).Contains(base.RelativeMousePosition))
 				{
-					Rectangle localBounds = ((Control)pb).get_LocalBounds();
-					Rectangle val = ((Container)this).get_ContentRegion();
-					val = RectangleExtension.OffsetBy(localBounds, ((Rectangle)(ref val)).get_Location());
-					if (((Rectangle)(ref val)).Contains(((Control)this).get_RelativeMousePosition()))
-					{
-						pb.OnInternalClick(this, e);
-					}
+					pb.OnInternalClick(this, e);
 				}
 			}
 		}
@@ -425,107 +323,60 @@ namespace Lorf.BH.TTBlockersStuff.UI
 
 		public override void Show()
 		{
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
 			if (TargetVisibility)
 			{
 				return;
 			}
 			TargetVisibility = true;
-			SettingEntry windowSize = default(SettingEntry);
-			if (windowSettings.TryGetSetting("size", ref windowSize))
+			if (windowSettings.TryGetSetting("size", out var windowSize))
 			{
 				SettingEntry<Point> setting2 = windowSize as SettingEntry<Point>;
 				if (setting2 == null)
 				{
 					setting2 = new SettingEntry<Point>();
-					setting2.set_Value(new Point(400, 120));
+					setting2.Value = new Point(400, 120);
 				}
-				((Control)this).set_Size(setting2.get_Value());
+				base.Size = setting2.Value;
 			}
 			else
 			{
-				((Control)this).set_Size(new Point(400, 120));
+				base.Size = new Point(400, 120);
 			}
-			SettingEntry windowPosition = default(SettingEntry);
-			if (windowSettings.TryGetSetting("location", ref windowPosition))
+			if (windowSettings.TryGetSetting("location", out var windowPosition))
 			{
 				SettingEntry<Point> setting = windowPosition as SettingEntry<Point>;
 				if (setting == null)
 				{
 					setting = new SettingEntry<Point>();
-					setting.set_Value(GetDefaultLocation());
+					setting.Value = GetDefaultLocation();
 				}
-				((Control)this).set_Location(setting.get_Value());
+				base.Location = setting.Value;
 			}
 			else
 			{
-				((Control)this).set_Location(GetDefaultLocation());
+				base.Location = GetDefaultLocation();
 			}
-			((Control)this).Show();
+			base.Show();
 		}
 
 		private Point GetDefaultLocation()
 		{
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			return new Point((int)((float)GameService.Graphics.get_Resolution().X / GameService.Graphics.get_UIScaleMultiplier() / 2f) - ((Control)this).get_Width() / 2, (int)((float)GameService.Graphics.get_Resolution().Y / GameService.Graphics.get_UIScaleMultiplier() / 2f) - ((Control)this).get_Height() / 2);
+			return new Point((int)((float)GameService.Graphics.Resolution.X / GameService.Graphics.UIScaleMultiplier / 2f) - base.Width / 2, (int)((float)GameService.Graphics.Resolution.Y / GameService.Graphics.UIScaleMultiplier / 2f) - base.Height / 2);
 		}
 
 		protected override void DisposeControl()
 		{
-			GameService.Input.get_Mouse().remove_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)OnGlobalMouseRelease);
-			Texture2D texturePanelHeader = _texturePanelHeader;
-			if (texturePanelHeader != null)
-			{
-				((GraphicsResource)texturePanelHeader).Dispose();
-			}
-			Texture2D texturePanelHeaderActive = _texturePanelHeaderActive;
-			if (texturePanelHeaderActive != null)
-			{
-				((GraphicsResource)texturePanelHeaderActive).Dispose();
-			}
-			Texture2D obj = armorIcon;
-			if (obj != null)
-			{
-				((GraphicsResource)obj).Dispose();
-			}
-			Texture2D obj2 = markerIcon;
-			if (obj2 != null)
-			{
-				((GraphicsResource)obj2).Dispose();
-			}
-			Texture2D obj3 = impossibleIcon;
-			if (obj3 != null)
-			{
-				((GraphicsResource)obj3).Dispose();
-			}
-			Texture2D obj4 = resizeCornerInactive;
-			if (obj4 != null)
-			{
-				((GraphicsResource)obj4).Dispose();
-			}
-			Texture2D obj5 = resizeCornerActive;
-			if (obj5 != null)
-			{
-				((GraphicsResource)obj5).Dispose();
-			}
-			Texture2D obj6 = cornerAccent;
-			if (obj6 != null)
-			{
-				((GraphicsResource)obj6).Dispose();
-			}
-			Texture2D obj7 = borderAccent;
-			if (obj7 != null)
-			{
-				((GraphicsResource)obj7).Dispose();
-			}
-			((Container)this).DisposeControl();
+			GameService.Input.Mouse.LeftMouseButtonReleased -= OnGlobalMouseRelease;
+			_texturePanelHeader?.Dispose();
+			_texturePanelHeaderActive?.Dispose();
+			armorIcon?.Dispose();
+			markerIcon?.Dispose();
+			impossibleIcon?.Dispose();
+			resizeCornerInactive?.Dispose();
+			resizeCornerActive?.Dispose();
+			cornerAccent?.Dispose();
+			borderAccent?.Dispose();
+			base.DisposeControl();
 		}
 	}
 }

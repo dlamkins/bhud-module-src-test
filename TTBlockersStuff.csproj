@@ -14,11 +14,19 @@
   </PropertyGroup>
   <ItemGroup />
   <ItemGroup>
-    <Reference Include="Blish HUD" />
+    <Reference Include="Blish HUD">
+      <HintPath>..\..\working\Blish HUD.exe</HintPath>
+    </Reference>
     <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="Gw2Sharp" />
-    <Reference Include="MonoGame.Framework" />
+    <Reference Include="Gw2Sharp">
+      <HintPath>..\..\working\Gw2Sharp.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Framework">
+      <HintPath>..\..\working\MonoGame.Framework.dll</HintPath>
+    </Reference>
     <Reference Include="System.Core" />
-    <Reference Include="MonoGame.Extended" />
+    <Reference Include="MonoGame.Extended">
+      <HintPath>..\..\working\MonoGame.Extended.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

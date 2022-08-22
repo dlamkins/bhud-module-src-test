@@ -26,17 +26,17 @@ namespace Lorf.BH.TTBlockersStuff.UI
 
 		private static readonly Texture2D textureBarGradient = Module.Instance.ContentsManager.GetTexture("bar_gradient.png");
 
-		private Rectangle layoutBarLeftSide;
+		private Microsoft.Xna.Framework.Rectangle layoutBarLeftSide;
 
-		private Rectangle layourBarRightSide;
+		private Microsoft.Xna.Framework.Rectangle layourBarRightSide;
 
-		private Rectangle layoutBarBackground;
+		private Microsoft.Xna.Framework.Rectangle layoutBarBackground;
 
-		private Rectangle layoutBarTop;
+		private Microsoft.Xna.Framework.Rectangle layoutBarTop;
 
-		private Rectangle layoutBarBottom;
+		private Microsoft.Xna.Framework.Rectangle layoutBarBottom;
 
-		private Rectangle layoutBarGradient;
+		private Microsoft.Xna.Framework.Rectangle layoutBarGradient;
 
 		protected float maxValue = 100f;
 
@@ -56,7 +56,7 @@ namespace Lorf.BH.TTBlockersStuff.UI
 			}
 			set
 			{
-				if (((Control)this).SetProperty<float>(ref maxValue, value, false, "MaxValue"))
+				if (SetProperty(ref maxValue, value, invalidateLayout: false, "MaxValue"))
 				{
 					Value = this.value;
 				}
@@ -71,7 +71,7 @@ namespace Lorf.BH.TTBlockersStuff.UI
 			}
 			set
 			{
-				if (((Control)this).SetProperty<float>(ref minValue, value, false, "MinValue"))
+				if (SetProperty(ref minValue, value, invalidateLayout: false, "MinValue"))
 				{
 					Value = this.value;
 				}
@@ -86,7 +86,7 @@ namespace Lorf.BH.TTBlockersStuff.UI
 			}
 			set
 			{
-				((Control)this).SetProperty<float>(ref this.value, MathHelper.Clamp(value, minValue, maxValue), true, "Value");
+				SetProperty(ref this.value, MathHelper.Clamp(value, minValue, maxValue), invalidateLayout: true, "Value");
 			}
 		}
 
@@ -98,41 +98,27 @@ namespace Lorf.BH.TTBlockersStuff.UI
 			}
 			set
 			{
-				((Control)this).SetProperty<string>(ref barText, value, false, "BarText");
+				SetProperty(ref barText, value, invalidateLayout: false, "BarText");
 			}
 		}
 
 		public event EventHandler<MouseEventArgs> InternalClick;
 
 		public TimerBar(int barIndex)
-			: this()
 		{
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).set_Size(new Point(256, 16));
+			base.Size = new Point(256, 16);
 			this.barIndex = barIndex;
 		}
 
 		public override void RecalculateLayout()
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
-			layoutBarLeftSide = new Rectangle(0, 0, textureBarLeftSide.get_Width(), ((Control)this).get_Height());
-			layourBarRightSide = new Rectangle(((Control)this).get_Width() - textureBarRightSide.get_Width(), 0, textureBarRightSide.get_Width(), ((Control)this).get_Height());
-			layoutBarTop = new Rectangle(0, 0, ((Control)this).get_Width(), textureBarTop.get_Height());
-			layoutBarBottom = new Rectangle(0, ((Control)this).get_Height() - textureBarBottom.get_Height(), ((Control)this).get_Width(), textureBarTop.get_Height());
-			float valueOffset = (Value - MinValue) / (MaxValue - MinValue) * (float)(((Control)this).get_Width() - textureBarLeftSide.get_Width());
-			layoutBarBackground = new Rectangle(textureBarLeftSide.get_Width(), 2, (int)valueOffset - textureBarLeftSide.get_Width(), ((Control)this).get_Height() - 4);
-			layoutBarGradient = new Rectangle((int)valueOffset - textureBarGradient.get_Width(), 2, textureBarGradient.get_Width(), ((Control)this).get_Height() - 4);
+			layoutBarLeftSide = new Microsoft.Xna.Framework.Rectangle(0, 0, textureBarLeftSide.Width, base.Height);
+			layourBarRightSide = new Microsoft.Xna.Framework.Rectangle(base.Width - textureBarRightSide.Width, 0, textureBarRightSide.Width, base.Height);
+			layoutBarTop = new Microsoft.Xna.Framework.Rectangle(0, 0, base.Width, textureBarTop.Height);
+			layoutBarBottom = new Microsoft.Xna.Framework.Rectangle(0, base.Height - textureBarBottom.Height, base.Width, textureBarTop.Height);
+			float valueOffset = (Value - MinValue) / (MaxValue - MinValue) * (float)(base.Width - textureBarLeftSide.Width);
+			layoutBarBackground = new Microsoft.Xna.Framework.Rectangle(textureBarLeftSide.Width, 2, (int)valueOffset - textureBarLeftSide.Width, base.Height - 4);
+			layoutBarGradient = new Microsoft.Xna.Framework.Rectangle((int)valueOffset - textureBarGradient.Width, 2, textureBarGradient.Width, base.Height - 4);
 		}
 
 		public void OnInternalClick(object sender, MouseEventArgs e)
@@ -140,72 +126,34 @@ namespace Lorf.BH.TTBlockersStuff.UI
 			this.InternalClick?.Invoke(sender, e);
 		}
 
-		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
+		protected override void Paint(SpriteBatch spriteBatch, Microsoft.Xna.Framework.Rectangle bounds)
 		{
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-			Color color = default(Color);
-			((Color)(ref color))._002Ector(237, 121, 38);
-			SettingEntry newColor = default(SettingEntry);
-			if (Module.Instance.SettingsManager.get_ModuleSettings().TryGetSetting("colorPickerSettingTimerBar" + barIndex, ref newColor) && Value >= MaxValue)
+			Microsoft.Xna.Framework.Color color = new Microsoft.Xna.Framework.Color(237, 121, 38);
+			if (Module.Instance.SettingsManager.ModuleSettings.TryGetSetting("colorPickerSettingTimerBar" + barIndex, out var newColor) && Value >= MaxValue)
 			{
-				ColorMaterial cloth = (newColor as SettingEntry<Color>).get_Value().get_Cloth();
-				color = ((cloth != null) ? ColorExtensions.ToXnaColor(cloth) : color);
+				color = (newColor as SettingEntry<Gw2Sharp.WebApi.V2.Models.Color>).Value.Cloth?.ToXnaColor() ?? color;
 			}
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), bounds, Color.get_Black() * 0.3f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), layoutBarBackground, color);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, bounds, Microsoft.Xna.Framework.Color.Black * 0.3f);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, layoutBarBackground, color);
 			if (Value < MaxValue)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, textureBarGradient, layoutBarGradient);
+				spriteBatch.DrawOnCtrl(this, textureBarGradient, layoutBarGradient);
 			}
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, barText, GameService.Content.get_DefaultFont16(), bounds, Color.get_White(), false, (HorizontalAlignment)1, (VerticalAlignment)1);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, textureBarTop, layoutBarTop);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, textureBarBottom, layoutBarBottom);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, textureBarLeftSide, layoutBarLeftSide);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, textureBarRightSide, layourBarRightSide);
+			spriteBatch.DrawStringOnCtrl(this, barText, GameService.Content.DefaultFont16, bounds, Microsoft.Xna.Framework.Color.White, wrap: false, HorizontalAlignment.Center);
+			spriteBatch.DrawOnCtrl(this, textureBarTop, layoutBarTop);
+			spriteBatch.DrawOnCtrl(this, textureBarBottom, layoutBarBottom);
+			spriteBatch.DrawOnCtrl(this, textureBarLeftSide, layoutBarLeftSide);
+			spriteBatch.DrawOnCtrl(this, textureBarRightSide, layourBarRightSide);
 		}
 
 		protected override void DisposeControl()
 		{
-			Texture2D obj = textureBarTop;
-			if (obj != null)
-			{
-				((GraphicsResource)obj).Dispose();
-			}
-			Texture2D obj2 = textureBarBottom;
-			if (obj2 != null)
-			{
-				((GraphicsResource)obj2).Dispose();
-			}
-			Texture2D obj3 = textureBarLeftSide;
-			if (obj3 != null)
-			{
-				((GraphicsResource)obj3).Dispose();
-			}
-			Texture2D obj4 = textureBarRightSide;
-			if (obj4 != null)
-			{
-				((GraphicsResource)obj4).Dispose();
-			}
-			Texture2D obj5 = textureBarGradient;
-			if (obj5 != null)
-			{
-				((GraphicsResource)obj5).Dispose();
-			}
-			((Control)this).DisposeControl();
+			textureBarTop?.Dispose();
+			textureBarBottom?.Dispose();
+			textureBarLeftSide?.Dispose();
+			textureBarRightSide?.Dispose();
+			textureBarGradient?.Dispose();
+			base.DisposeControl();
 		}
 	}
 }
