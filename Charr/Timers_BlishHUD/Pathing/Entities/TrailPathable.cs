@@ -51,7 +51,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 
 		static TrailPathable()
 		{
-			_sharedTrailEffect = new TrailEffect(GameService.Content.ContentManager.Load<Effect>("effects\\trail"));
+			_sharedTrailEffect = new TrailEffect(GameService.Content.get_ContentManager().Load<Effect>("effects\\trail"));
 			_fadeTexture = TimersModule.ModuleInstance.Resources.TextureFade;
 		}
 
@@ -189,7 +189,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 				{
 					((GraphicsResource)vertexBuffer).Dispose();
 				}
-				_vertexBuffer = new VertexBuffer(GameService.Graphics.GraphicsDevice, VertexPositionColorTexture.VertexDeclaration, _vertexData.Length, (BufferUsage)1);
+				_vertexBuffer = new VertexBuffer(GameService.Graphics.get_GraphicsDevice(), VertexPositionColorTexture.VertexDeclaration, _vertexData.Length, (BufferUsage)1);
 				_vertexBuffer.SetData<VertexPositionColorTexture>(_vertexData);
 			}
 		}
@@ -203,7 +203,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			{
 				return;
 			}
-			_sharedTrailEffect.SetEntityState(TrailTexture, AnimationSpeed, FadeNear, FadeFar, Opacity, FadeRadius, fadeCenter: true, _fadeTexture, TintColor);
+			_sharedTrailEffect.SetEntityState(AsyncTexture2D.op_Implicit(TrailTexture), AnimationSpeed, FadeNear, FadeFar, Opacity, FadeRadius, fadeCenter: true, _fadeTexture, TintColor);
 			graphicsDevice.SetVertexBuffer(_vertexBuffer, 0);
 			Enumerator enumerator = ((Effect)_sharedTrailEffect).get_CurrentTechnique().get_Passes().GetEnumerator();
 			try

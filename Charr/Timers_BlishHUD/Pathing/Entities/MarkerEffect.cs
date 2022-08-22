@@ -73,7 +73,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			set
 			{
 				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-				SetParameter("View", ref _view, value);
+				((SharedEffect)this).SetParameter("View", ref _view, value);
 			}
 		}
 
@@ -87,7 +87,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			set
 			{
 				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-				SetParameter("Projection", ref _projection, value);
+				((SharedEffect)this).SetParameter("Projection", ref _projection, value);
 			}
 		}
 
@@ -101,7 +101,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			set
 			{
 				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-				SetParameter("PlayerView", ref _playerView, value);
+				((SharedEffect)this).SetParameter("PlayerView", ref _playerView, value);
 			}
 		}
 
@@ -115,7 +115,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			set
 			{
 				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-				SetParameter("PlayerPosition", ref _playerPosition, value);
+				((SharedEffect)this).SetParameter("PlayerPosition", ref _playerPosition, value);
 			}
 		}
 
@@ -129,7 +129,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			set
 			{
 				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-				SetParameter("CameraPosition", ref _cameraPosition, value);
+				((SharedEffect)this).SetParameter("CameraPosition", ref _cameraPosition, value);
 			}
 		}
 
@@ -143,7 +143,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			set
 			{
 				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-				SetParameter("World", ref _world, value);
+				((SharedEffect)this).SetParameter("World", ref _world, value);
 			}
 		}
 
@@ -155,7 +155,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			}
 			set
 			{
-				SetParameter("Texture", ref _texture, value);
+				((SharedEffect)this).SetParameter("Texture", ref _texture, value);
 			}
 		}
 
@@ -167,7 +167,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			}
 			set
 			{
-				SetParameter("FadeTexture", ref _fadeTexture, value);
+				((SharedEffect)this).SetParameter("FadeTexture", ref _fadeTexture, value);
 			}
 		}
 
@@ -179,7 +179,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			}
 			set
 			{
-				SetParameter("Opacity", ref _opacity, value);
+				((SharedEffect)this).SetParameter("Opacity", ref _opacity, value);
 			}
 		}
 
@@ -191,7 +191,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			}
 			set
 			{
-				SetParameter("FadeNear", ref _fadeNear, value);
+				((SharedEffect)this).SetParameter("FadeNear", ref _fadeNear, value);
 			}
 		}
 
@@ -203,7 +203,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			}
 			set
 			{
-				SetParameter("FadeFar", ref _fadeFar, value);
+				((SharedEffect)this).SetParameter("FadeFar", ref _fadeFar, value);
 			}
 		}
 
@@ -215,7 +215,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			}
 			set
 			{
-				SetParameter("PlayerFadeRadius", ref _playerFadeRadius, value);
+				((SharedEffect)this).SetParameter("PlayerFadeRadius", ref _playerFadeRadius, value);
 			}
 		}
 
@@ -227,7 +227,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			}
 			set
 			{
-				SetParameter("FadeCenter", ref _fadeCenter, value);
+				((SharedEffect)this).SetParameter("FadeCenter", ref _fadeCenter, value);
 			}
 		}
 
@@ -241,22 +241,22 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			set
 			{
 				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-				SetParameter("TintColor", ref _tintColor, value);
+				((SharedEffect)this).SetParameter("TintColor", ref _tintColor, value);
 			}
 		}
 
 		public MarkerEffect(Effect baseEffect)
-			: base(baseEffect)
+			: this(baseEffect)
 		{
 		}
 
 		private MarkerEffect(GraphicsDevice graphicsDevice, byte[] effectCode)
-			: base(graphicsDevice, effectCode)
+			: this(graphicsDevice, effectCode)
 		{
 		}
 
 		private MarkerEffect(GraphicsDevice graphicsDevice, byte[] effectCode, int index, int count)
-			: base(graphicsDevice, effectCode, index, count)
+			: this(graphicsDevice, effectCode, index, count)
 		{
 		}
 
@@ -282,11 +282,11 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			PlayerPosition = GameService.Gw2Mumble.PlayerCharacter.Position;
-			CameraPosition = GameService.Gw2Mumble.PlayerCamera.Position;
-			View = GameService.Gw2Mumble.PlayerCamera.View;
-			Projection = GameService.Gw2Mumble.PlayerCamera.Projection;
-			PlayerView = GameService.Gw2Mumble.PlayerCamera.PlayerView;
+			PlayerPosition = GameService.Gw2Mumble.get_PlayerCharacter().get_Position();
+			CameraPosition = GameService.Gw2Mumble.get_PlayerCamera().get_Position();
+			View = GameService.Gw2Mumble.get_PlayerCamera().get_View();
+			Projection = GameService.Gw2Mumble.get_PlayerCamera().get_Projection();
+			PlayerView = GameService.Gw2Mumble.get_PlayerCamera().get_PlayerView();
 		}
 	}
 }

@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using Blish_HUD;
+using Blish_HUD.Content;
+using Blish_HUD.Entities;
 using Charr.Timers_BlishHUD.Pathing.Content;
 using Charr.Timers_BlishHUD.Pathing.Entities;
 using Microsoft.Xna.Framework;
@@ -108,8 +110,8 @@ namespace Charr.Timers_BlishHUD.Models
 			{
 				Opacity = Opacity,
 				AnimationSpeed = AnimSpeed,
-				TrailTexture = resourceManager.LoadTexture(TextureString),
-				PointA = GameService.Gw2Mumble.PlayerCharacter.Position,
+				TrailTexture = AsyncTexture2D.op_Implicit(resourceManager.LoadTexture(TextureString)),
+				PointA = GameService.Gw2Mumble.get_PlayerCharacter().get_Position(),
 				PointB = new Vector3(Position[0], Position[1], Position[2]),
 				ShouldShow = ShowDirection
 			};
@@ -121,7 +123,7 @@ namespace Charr.Timers_BlishHUD.Models
 		{
 			if (_trail != null && !_activated)
 			{
-				GameService.Graphics.World.AddEntity(_trail);
+				GameService.Graphics.get_World().AddEntity((IEntity)(object)_trail);
 				_activated = true;
 			}
 		}
@@ -130,7 +132,7 @@ namespace Charr.Timers_BlishHUD.Models
 		{
 			if (_trail != null && _activated)
 			{
-				GameService.Graphics.World.RemoveEntity(_trail);
+				GameService.Graphics.get_World().RemoveEntity((IEntity)(object)_trail);
 				_activated = false;
 			}
 		}
@@ -157,7 +159,7 @@ namespace Charr.Timers_BlishHUD.Models
 				{
 					enabled = true;
 					_trail.Visible = true;
-					_trail.PointA = GameService.Gw2Mumble.PlayerCharacter.Position;
+					_trail.PointA = GameService.Gw2Mumble.get_PlayerCharacter().get_Position();
 					break;
 				}
 			}

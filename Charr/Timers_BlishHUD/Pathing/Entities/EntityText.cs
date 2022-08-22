@@ -68,15 +68,19 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
 			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-			Size2 textSize = GameService.Content.DefaultFont32.MeasureString(_text);
-			_cachedTextRender?.Dispose();
+			Size2 textSize = GameService.Content.get_DefaultFont32().MeasureString(_text);
+			CachedStringRender cachedTextRender = _cachedTextRender;
+			if (cachedTextRender != null)
+			{
+				cachedTextRender.Dispose();
+			}
 			if (!string.IsNullOrEmpty(_text))
 			{
-				_cachedTextRender = CachedStringRender.GetCachedStringRender(_text, GameService.Content.DefaultFont32, new Rectangle(0, 0, (int)textSize.Width, (int)textSize.Height), _textColor, wrap: false, stroke: true);
-				Rectangle destinationRectangle = _cachedTextRender.DestinationRectangle;
+				_cachedTextRender = CachedStringRender.GetCachedStringRender(_text, GameService.Content.get_DefaultFont32(), new Rectangle(0, 0, (int)textSize.Width, (int)textSize.Height), _textColor, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				Rectangle destinationRectangle = _cachedTextRender.get_DestinationRectangle();
 				Point size = ((Rectangle)(ref destinationRectangle)).get_Size();
-				base.Size = ((Point)(ref size)).ToVector2().ToWorldCoord() / 2f;
-				base.Texture = _cachedTextRender.CachedRender;
+				base.Size = Vector2Extension.ToWorldCoord(((Point)(ref size)).ToVector2()) / 2f;
+				base.Texture = _cachedTextRender.get_CachedRender();
 			}
 		}
 	}

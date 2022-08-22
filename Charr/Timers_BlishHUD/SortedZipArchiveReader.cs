@@ -35,7 +35,9 @@ namespace Charr.Timers_BlishHUD
 
 		public IDataReader GetSubPath(string subPath)
 		{
-			return new ZipArchiveReader(_archivePath, Path.Combine(subPath));
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Expected O, but got Unknown
+			return (IDataReader)new ZipArchiveReader(_archivePath, Path.Combine(subPath));
 		}
 
 		public string GetPathRepresentation(string relativeFilePath = null)
@@ -53,7 +55,7 @@ namespace Charr.Timers_BlishHUD
 			{
 				progress?.Report($"Loading {entry.get_Name()}...");
 				Stream entryStream = GetFileStream(entry.get_FullName());
-				loadFileFunc(entryStream, this);
+				loadFileFunc(entryStream, (IDataReader)(object)this);
 			}
 		}
 

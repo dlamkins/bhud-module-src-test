@@ -41,7 +41,7 @@ namespace Charr.Timers_BlishHUD.Controls.BigWigs
 			}
 			set
 			{
-				SetProperty(ref _maxFill, value, invalidateLayout: true, "MaxFill");
+				((Control)this).SetProperty<float>(ref _maxFill, value, true, "MaxFill");
 			}
 		}
 
@@ -53,7 +53,7 @@ namespace Charr.Timers_BlishHUD.Controls.BigWigs
 			}
 			set
 			{
-				SetProperty(ref _currentFill, value, invalidateLayout: true, "CurrentFill");
+				((Control)this).SetProperty<float>(ref _currentFill, value, true, "CurrentFill");
 			}
 		}
 
@@ -66,7 +66,7 @@ namespace Charr.Timers_BlishHUD.Controls.BigWigs
 			set
 			{
 				value = value.Replace("\n", " - ");
-				SetProperty(ref _text, value, invalidateLayout: true, "Text");
+				((Control)this).SetProperty<string>(ref _text, value, true, "Text");
 			}
 		}
 
@@ -84,14 +84,16 @@ namespace Charr.Timers_BlishHUD.Controls.BigWigs
 
 		protected override CaptureType CapturesInput()
 		{
-			if (!TimersModule.ModuleInstance._lockAlertContainerSetting.Value)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			if (!TimersModule.ModuleInstance._lockAlertContainerSetting.get_Value())
 			{
-				return base.CapturesInput();
+				return ((Control)this).CapturesInput();
 			}
-			return CaptureType.DoNotBlock;
+			return (CaptureType)22;
 		}
 
 		public BigWigAlert()
+			: this()
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
@@ -102,8 +104,10 @@ namespace Charr.Timers_BlishHUD.Controls.BigWigs
 			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			base.Size = new Point(336, 35);
-			Icon = new AsyncTexture2D(ContentService.Textures.Error);
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Expected O, but got Unknown
+			((Control)this).set_Size(new Point(336, 35));
+			Icon = new AsyncTexture2D(Textures.get_Error());
 		}
 
 		public override void RecalculateLayout()
@@ -117,12 +121,12 @@ namespace Charr.Timers_BlishHUD.Controls.BigWigs
 			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
 			_iconBounds = new Rectangle(2, 2, 32, 32);
-			_timerBounds = new Rectangle(base.Width - 48, 0, 48, base.Height);
+			_timerBounds = new Rectangle(((Control)this).get_Width() - 48, 0, 48, ((Control)this).get_Height());
 			int progressLeft = 35;
 			int progressFill = (int)((float)_progressBounds.Width * (CurrentFill / MaxFill));
-			_progressBounds = new Rectangle(progressLeft, 2, base.Width - progressLeft - 1, base.Height - 2 - 1);
-			_filledBounds = new Rectangle(_progressBounds.X, _progressBounds.Y, TimersModule.ModuleInstance._alertFillDirection.Value ? progressFill : (_progressBounds.Width - progressFill), _progressBounds.Height);
-			base.RecalculateLayout();
+			_progressBounds = new Rectangle(progressLeft, 2, ((Control)this).get_Width() - progressLeft - 1, ((Control)this).get_Height() - 2 - 1);
+			_filledBounds = new Rectangle(_progressBounds.X, _progressBounds.Y, TimersModule.ModuleInstance._alertFillDirection.get_Value() ? progressFill : (_progressBounds.Width - progressFill), _progressBounds.Height);
+			((Control)this).RecalculateLayout();
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
@@ -164,12 +168,12 @@ namespace Charr.Timers_BlishHUD.Controls.BigWigs
 			{
 				return;
 			}
-			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, bounds, Color.get_Black() * 0.75f);
-			spriteBatch.DrawOnCtrl((Control)this, (Texture2D)Icon, _iconBounds);
-			spriteBatch.DrawOnCtrl(this, TimersModule.ModuleInstance.Resources.BigWigBackground, _progressBounds, _progressBounds.OffsetBy(TimersModule.ModuleInstance.Resources.BigWigBackground.get_Width() / 3, 0), Color.get_White() * 0.7f);
-			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _filledBounds, FillColor * 0.45f);
-			spriteBatch.DrawStringOnCtrl(this, Text, GameService.Content.DefaultFont18, _progressBounds.OffsetBy(11, -1), Color.get_Black());
-			spriteBatch.DrawStringOnCtrl(this, Text, GameService.Content.DefaultFont18, _progressBounds.OffsetBy(10, -2), TextColor);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), bounds, Color.get_Black() * 0.75f);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(Icon), _iconBounds);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, TimersModule.ModuleInstance.Resources.BigWigBackground, _progressBounds, (Rectangle?)RectangleExtension.OffsetBy(_progressBounds, TimersModule.ModuleInstance.Resources.BigWigBackground.get_Width() / 3, 0), Color.get_White() * 0.7f);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), _filledBounds, FillColor * 0.45f);
+			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, Text, GameService.Content.get_DefaultFont18(), RectangleExtension.OffsetBy(_progressBounds, 11, -1), Color.get_Black(), false, (HorizontalAlignment)0, (VerticalAlignment)1);
+			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, Text, GameService.Content.get_DefaultFont18(), RectangleExtension.OffsetBy(_progressBounds, 10, -2), TextColor, false, (HorizontalAlignment)0, (VerticalAlignment)1);
 			float remainingTime = MaxFill - CurrentFill;
 			string timerFormat = "0";
 			Color timerColor = TextColor;
@@ -185,12 +189,12 @@ namespace Charr.Timers_BlishHUD.Controls.BigWigs
 			{
 				goto IL_01ac;
 			}
-			spriteBatch.DrawStringOnCtrl(this, remainingTime.ToString(timerFormat), GameService.Content.DefaultFont18, _timerBounds.OffsetBy(1, 1), Color.get_Black(), wrap: false, HorizontalAlignment.Center);
-			spriteBatch.DrawStringOnCtrl(this, remainingTime.ToString(timerFormat), GameService.Content.DefaultFont18, _timerBounds, timerColor, wrap: false, HorizontalAlignment.Center);
+			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, remainingTime.ToString(timerFormat), GameService.Content.get_DefaultFont18(), RectangleExtension.OffsetBy(_timerBounds, 1, 1), Color.get_Black(), false, (HorizontalAlignment)1, (VerticalAlignment)1);
+			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, remainingTime.ToString(timerFormat), GameService.Content.get_DefaultFont18(), _timerBounds, timerColor, false, (HorizontalAlignment)1, (VerticalAlignment)1);
 			goto IL_01ac;
 			IL_01ac:
-			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(_progressBounds.X, _progressBounds.Y, _progressBounds.Width, 1), Color.get_White() * 0.25f);
-			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(_progressBounds.X, ((Rectangle)(ref _progressBounds)).get_Bottom() - 1, _progressBounds.Width, 1), Color.get_White() * 0.25f);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(_progressBounds.X, _progressBounds.Y, _progressBounds.Width, 1), Color.get_White() * 0.25f);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(_progressBounds.X, ((Rectangle)(ref _progressBounds)).get_Bottom() - 1, _progressBounds.Width, 1), Color.get_White() * 0.25f);
 		}
 	}
 }

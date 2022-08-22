@@ -94,11 +94,11 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 				//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 				//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-				if (SetProperty(ref _texture, value, rebuildEntity: false, "Texture") && _autoResizeBillboard && _texture.HasTexture)
+				if (SetProperty(ref _texture, value, rebuildEntity: false, "Texture") && _autoResizeBillboard && _texture.get_HasTexture())
 				{
-					Rectangle bounds = _texture.Texture.get_Bounds();
+					Rectangle bounds = _texture.get_Texture().get_Bounds();
 					Point size = ((Rectangle)(ref bounds)).get_Size();
-					Size = ((Point)(ref size)).ToVector2().ToWorldCoord();
+					Size = Vector2Extension.ToWorldCoord(((Point)(ref size)).ToVector2());
 				}
 			}
 		}
@@ -134,7 +134,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			Initialize();
 			AutoResizeBillboard = size == Vector2.get_Zero();
 			Size = size;
-			Texture = image;
+			Texture = AsyncTexture2D.op_Implicit(image);
 			Position = position;
 		}
 
@@ -142,7 +142,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 		{
 			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 			_verts = (VertexPositionTexture[])(object)new VertexPositionTexture[4];
-			_billboardEffect = (BasicEffect)(((object)_billboardEffect) ?? ((object)new BasicEffect(GameService.Graphics.GraphicsDevice)));
+			_billboardEffect = (BasicEffect)(((object)_billboardEffect) ?? ((object)new BasicEffect(GameService.Graphics.get_GraphicsDevice())));
 			_billboardEffect.set_TextureEnabled(true);
 		}
 
@@ -202,11 +202,11 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			{
 				return;
 			}
-			_billboardEffect.set_View(GameService.Gw2Mumble.PlayerCamera.View);
-			_billboardEffect.set_Projection(GameService.Gw2Mumble.PlayerCamera.Projection);
-			_billboardEffect.set_World(Matrix.CreateTranslation(new Vector3(Size.X / -2f, Size.Y / -2f, 0f)) * Matrix.CreateScale(_scale, _scale, 1f) * Matrix.CreateBillboard(Position + RenderOffset, new Vector3(GameService.Gw2Mumble.PlayerCamera.Position.X, GameService.Gw2Mumble.PlayerCamera.Position.Y, (_verticalConstraint == BillboardVerticalConstraint.CameraPosition) ? GameService.Gw2Mumble.PlayerCamera.Position.Z : GameService.Gw2Mumble.PlayerCharacter.Position.Z), new Vector3(0f, 0f, 1f), (Vector3?)GameService.Gw2Mumble.PlayerCamera.Forward));
+			_billboardEffect.set_View(GameService.Gw2Mumble.get_PlayerCamera().get_View());
+			_billboardEffect.set_Projection(GameService.Gw2Mumble.get_PlayerCamera().get_Projection());
+			_billboardEffect.set_World(Matrix.CreateTranslation(new Vector3(Size.X / -2f, Size.Y / -2f, 0f)) * Matrix.CreateScale(_scale, _scale, 1f) * Matrix.CreateBillboard(Position + RenderOffset, new Vector3(GameService.Gw2Mumble.get_PlayerCamera().get_Position().X, GameService.Gw2Mumble.get_PlayerCamera().get_Position().Y, (_verticalConstraint == BillboardVerticalConstraint.CameraPosition) ? GameService.Gw2Mumble.get_PlayerCamera().get_Position().Z : GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Z), new Vector3(0f, 0f, 1f), (Vector3?)GameService.Gw2Mumble.get_PlayerCamera().get_Forward()));
 			_billboardEffect.set_Alpha(Opacity);
-			_billboardEffect.set_Texture(Texture.Texture);
+			_billboardEffect.set_Texture(Texture.get_Texture());
 			Enumerator enumerator = ((Effect)_billboardEffect).get_CurrentTechnique().get_Passes().GetEnumerator();
 			try
 			{

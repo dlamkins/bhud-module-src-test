@@ -25,10 +25,12 @@ namespace Charr.Timers_BlishHUD.IO
 
 		public TimerLoader(string timerDirectory)
 		{
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Expected O, but got Unknown
 			TimerTimerDirectory = timerDirectory;
 			_normalTimerFiles = new HashSet<string>();
 			_directoryReader = new DirectoryReader(timerDirectory);
-			_directoryResourceManager = new PathableResourceManager(_directoryReader);
+			_directoryResourceManager = new PathableResourceManager((IDataReader)(object)_directoryReader);
 			_zipTimerFileEntries = new Dictionary<string, HashSet<ZipArchiveEntry>>();
 			_zipDataReaders = new Dictionary<string, SortedZipArchiveReader>();
 			_zipResourceManagers = new Dictionary<string, PathableResourceManager>();
@@ -48,7 +50,7 @@ namespace Charr.Timers_BlishHUD.IO
 				{
 					zipDataReader = new SortedZipArchiveReader(zipFile);
 					_zipDataReaders.Add(zipFile, zipDataReader);
-					_zipResourceManagers.Add(zipFile, new PathableResourceManager(zipDataReader));
+					_zipResourceManagers.Add(zipFile, new PathableResourceManager((IDataReader)(object)zipDataReader));
 					_zipTimerFileEntries.Add(zipFile, new HashSet<ZipArchiveEntry>());
 				}
 				_zipTimerFileEntries[zipFile].UnionWith(zipDataReader.GetValidFileEntries(".bhtimer"));

@@ -3,6 +3,7 @@ using System.ComponentModel;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.Controls.Effects;
 using Charr.Timers_BlishHUD.Controls.Effects;
 using Glide;
 using Microsoft.Xna.Framework;
@@ -74,7 +75,7 @@ namespace Charr.Timers_BlishHUD.Controls
 			}
 			set
 			{
-				SetProperty(ref _Text, value, invalidateLayout: false, "Text");
+				((Control)this).SetProperty<string>(ref _Text, value, false, "Text");
 			}
 		}
 
@@ -88,7 +89,7 @@ namespace Charr.Timers_BlishHUD.Controls
 			set
 			{
 				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-				SetProperty(ref _TextColor, value, invalidateLayout: false, "TextColor");
+				((Control)this).SetProperty<Color>(ref _TextColor, value, false, "TextColor");
 			}
 		}
 
@@ -100,7 +101,7 @@ namespace Charr.Timers_BlishHUD.Controls
 			}
 			set
 			{
-				SetProperty(ref _timerText, value, invalidateLayout: false, "TimerText");
+				((Control)this).SetProperty<string>(ref _timerText, value, false, "TimerText");
 			}
 		}
 
@@ -114,7 +115,7 @@ namespace Charr.Timers_BlishHUD.Controls
 			set
 			{
 				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-				SetProperty(ref _timerTextColor, value, invalidateLayout: false, "TimerTextColor");
+				((Control)this).SetProperty<Color>(ref _timerTextColor, value, false, "TimerTextColor");
 			}
 		}
 
@@ -128,12 +129,12 @@ namespace Charr.Timers_BlishHUD.Controls
 			{
 				if (_icon != null)
 				{
-					_icon.TextureSwapped -= _textureSwapEventHandler;
+					_icon.remove_TextureSwapped(_textureSwapEventHandler);
 				}
-				if (SetProperty(ref _icon, value, invalidateLayout: false, "Icon"))
+				if (((Control)this).SetProperty<AsyncTexture2D>(ref _icon, value, false, "Icon"))
 				{
-					_icon.TextureSwapped += _textureSwapEventHandler;
-					RecalculateLayout();
+					_icon.add_TextureSwapped(_textureSwapEventHandler);
+					((Control)this).RecalculateLayout();
 				}
 			}
 		}
@@ -146,9 +147,9 @@ namespace Charr.Timers_BlishHUD.Controls
 			}
 			set
 			{
-				if (SetProperty(ref _maxFill, value, invalidateLayout: false, "MaxFill"))
+				if (((Control)this).SetProperty<float>(ref _maxFill, value, false, "MaxFill"))
 				{
-					RecalculateLayout();
+					((Control)this).RecalculateLayout();
 				}
 			}
 		}
@@ -161,19 +162,27 @@ namespace Charr.Timers_BlishHUD.Controls
 			}
 			set
 			{
-				if (SetProperty(ref _currentFill, Math.Min(value, _maxFill), invalidateLayout: false, "CurrentFill"))
+				if (((Control)this).SetProperty<float>(ref _currentFill, Math.Min(value, _maxFill), false, "CurrentFill"))
 				{
-					_animFill?.Cancel();
+					Tween animFill = _animFill;
+					if (animFill != null)
+					{
+						animFill.Cancel();
+					}
 					_animFill = null;
-					_animFill = Control.Animation.Tweener.Tween(this, new
+					_animFill = ((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<AlertPanel>(this, (object)new
 					{
 						DisplayedFill = _currentFill
-					}, TimersModule.ModuleInstance.Resources.TICKINTERVAL, 0f, overwrite: false);
-					RecalculateLayout();
+					}, TimersModule.ModuleInstance.Resources.TICKINTERVAL, 0f, false);
+					((Control)this).RecalculateLayout();
 				}
 				if (_currentFill >= _maxFill)
 				{
-					_scrollEffect?.Enable();
+					SimpleScrollingHighlightEffect scrollEffect = _scrollEffect;
+					if (scrollEffect != null)
+					{
+						((ControlEffect)scrollEffect).Enable();
+					}
 				}
 			}
 		}
@@ -188,7 +197,7 @@ namespace Charr.Timers_BlishHUD.Controls
 			set
 			{
 				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-				SetProperty(ref _fillColor, value, invalidateLayout: false, "FillColor");
+				((Control)this).SetProperty<Color>(ref _fillColor, value, false, "FillColor");
 			}
 		}
 
@@ -198,6 +207,7 @@ namespace Charr.Timers_BlishHUD.Controls
 		public float DisplayedFill { get; set; }
 
 		public AlertPanel()
+			: this()
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
@@ -206,49 +216,66 @@ namespace Charr.Timers_BlishHUD.Controls
 			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			base.Size = new Point(DEFAULT_ALERTPANEL_WIDTH, DEFAULT_ALERTPANEL_HEIGHT);
+			((Control)this).set_Size(new Point(DEFAULT_ALERTPANEL_WIDTH, DEFAULT_ALERTPANEL_HEIGHT));
 			_iconSize = DEFAULT_ALERTPANEL_HEIGHT;
-			_scrollEffect = new SimpleScrollingHighlightEffect(this)
-			{
-				Enabled = false
-			};
-			base.EffectBehind = _scrollEffect;
+			SimpleScrollingHighlightEffect simpleScrollingHighlightEffect = new SimpleScrollingHighlightEffect((Control)(object)this);
+			((ControlEffect)simpleScrollingHighlightEffect).set_Enabled(false);
+			_scrollEffect = simpleScrollingHighlightEffect;
+			((Control)this).set_EffectBehind((ControlEffect)(object)_scrollEffect);
 			_textureSwapEventHandler = delegate
 			{
-				RecalculateLayout();
+				((Control)this).RecalculateLayout();
 			};
-			base.Opacity = 0f;
-			_animFade = Control.Animation.Tweener.Tween(this, new
+			((Control)this).set_Opacity(0f);
+			_animFade = ((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<AlertPanel>(this, (object)new
 			{
 				Opacity = 1f
-			}, TimersModule.ModuleInstance._alertFadeDelaySetting.Value).Repeat().Reflect();
-			_animFade?.OnComplete(delegate
+			}, TimersModule.ModuleInstance._alertFadeDelaySetting.get_Value(), 0f, true).Repeat(-1).Reflect();
+			Tween animFade = _animFade;
+			if (animFade == null)
+			{
+				return;
+			}
+			animFade.OnComplete((Action)delegate
 			{
 				_animFade.Pause();
-				if (base.Opacity <= 0f)
+				if (((Control)this).get_Opacity() <= 0f)
 				{
-					base.Visible = false;
-					_scrollEffect?.Disable();
+					((Control)this).set_Visible(false);
+					SimpleScrollingHighlightEffect scrollEffect = _scrollEffect;
+					if (scrollEffect != null)
+					{
+						((ControlEffect)scrollEffect).Disable();
+					}
 				}
 				else if (_currentFill >= _maxFill)
 				{
-					_scrollEffect?.Enable();
+					SimpleScrollingHighlightEffect scrollEffect2 = _scrollEffect;
+					if (scrollEffect2 != null)
+					{
+						((ControlEffect)scrollEffect2).Enable();
+					}
 				}
 				if (_shouldDispose)
 				{
-					_icon?.Dispose();
-					base.Dispose();
+					AsyncTexture2D icon = _icon;
+					if (icon != null)
+					{
+						icon.Dispose();
+					}
+					((Control)this).Dispose();
 				}
 			});
 		}
 
 		protected override CaptureType CapturesInput()
 		{
-			if (!TimersModule.ModuleInstance._lockAlertContainerSetting.Value)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			if (!TimersModule.ModuleInstance._lockAlertContainerSetting.get_Value())
 			{
-				return base.CapturesInput();
+				return ((Container)this).CapturesInput();
 			}
-			return CaptureType.DoNotBlock;
+			return (CaptureType)22;
 		}
 
 		public override void RecalculateLayout()
@@ -271,21 +298,21 @@ namespace Charr.Timers_BlishHUD.Controls
 			//IL_01fd: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0228: Unknown result type (might be due to invalid IL or missing references)
 			//IL_022d: Unknown result type (might be due to invalid IL or missing references)
-			_iconSize = base.Height;
+			_iconSize = ((Control)this).get_Height();
 			_iconBounds = new Rectangle(0, 0, _iconSize, _iconSize);
-			_fillPercent = ((!TimersModule.ModuleInstance._alertFillDirection.Value) ? (1f - ((_maxFill > 0f) ? (_currentFill / _maxFill) : 1f)) : ((_maxFill > 0f) ? (_currentFill / _maxFill) : 1f));
+			_fillPercent = ((!TimersModule.ModuleInstance._alertFillDirection.get_Value()) ? (1f - ((_maxFill > 0f) ? (_currentFill / _maxFill) : 1f)) : ((_maxFill > 0f) ? (_currentFill / _maxFill) : 1f));
 			_fillHeight = (float)_iconSize * _fillPercent;
 			if (_icon != null)
 			{
-				_topIconSource = new Rectangle(0, 0, _icon.Texture.get_Width(), _icon.Texture.get_Height() - (int)((float)_icon.Texture.get_Height() * _fillPercent));
-				_bottomIconSource = new Rectangle(0, _icon.Texture.get_Height() - (int)((float)_icon.Texture.get_Height() * _fillPercent), _icon.Texture.get_Width(), (int)((float)_icon.Texture.get_Height() * _fillPercent));
+				_topIconSource = new Rectangle(0, 0, _icon.get_Texture().get_Width(), _icon.get_Texture().get_Height() - (int)((float)_icon.get_Texture().get_Height() * _fillPercent));
+				_bottomIconSource = new Rectangle(0, _icon.get_Texture().get_Height() - (int)((float)_icon.get_Texture().get_Height() * _fillPercent), _icon.get_Texture().get_Width(), (int)((float)_icon.get_Texture().get_Height() * _fillPercent));
 			}
 			_topIconDestination = new Rectangle(0, 0, _iconSize, _iconSize - (int)_fillHeight);
 			_bottomIconDestination = new Rectangle(0, _iconSize - (int)_fillHeight, _iconSize, (int)_fillHeight);
 			_fillDestination = new Rectangle(0, (int)((float)_iconSize - _fillHeight), _iconSize, (int)_fillHeight);
 			_fillCrestDestination = new Rectangle(0, _iconSize - (int)_fillHeight, _iconSize, _iconSize);
 			_timerTextDestination = new Rectangle(0, 0, _iconSize, (int)((float)_iconSize * 0.99f));
-			_alertTextDestination = new Rectangle(_iconSize + 16, 0, _size.X - _iconSize - 35, base.Height);
+			_alertTextDestination = new Rectangle(_iconSize + 16, 0, ((Control)this)._size.X - _iconSize - 35, ((Control)this).get_Height());
 		}
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
@@ -308,46 +335,54 @@ namespace Charr.Timers_BlishHUD.Controls
 			//IL_0147: Unknown result type (might be due to invalid IL or missing references)
 			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
-			if (!base.Visible || !ShouldShow)
+			if (!((Control)this).get_Visible() || !ShouldShow)
 			{
 				return;
 			}
-			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, bounds, Color.get_Black() * 0.2f);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), bounds, Color.get_Black() * 0.2f);
 			if (_icon != null)
 			{
 				if (_fillPercent < 1f)
 				{
-					spriteBatch.DrawOnCtrl(this, _icon, _topIconDestination, _topIconSource, Color.get_DarkGray() * 0.4f);
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_icon), _topIconDestination, (Rectangle?)_topIconSource, Color.get_DarkGray() * 0.4f);
 				}
 				if (_fillPercent > 0f)
 				{
-					spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_icon, _bottomIconDestination, (Rectangle?)_bottomIconSource);
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_icon), _bottomIconDestination, (Rectangle?)_bottomIconSource);
 				}
 			}
 			if (_fillPercent > 0f)
 			{
-				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _fillDestination, _fillColor * 0.3f);
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), _fillDestination, _fillColor * 0.3f);
 				if (_fillPercent < 0.99f)
 				{
-					spriteBatch.DrawOnCtrl(this, TimersModule.ModuleInstance.Resources.TextureFillCrest, _fillCrestDestination);
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, TimersModule.ModuleInstance.Resources.TextureFillCrest, _fillCrestDestination);
 				}
 			}
-			spriteBatch.DrawOnCtrl(this, TimersModule.ModuleInstance.Resources.TextureVignette, _iconBounds);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, TimersModule.ModuleInstance.Resources.TextureVignette, _iconBounds);
 			if (!string.IsNullOrEmpty(_timerText))
 			{
-				spriteBatch.DrawStringOnCtrl(this, _timerText ?? "", Control.Content.DefaultFont32, _timerTextDestination, TimerTextColor, wrap: false, stroke: true, 1, HorizontalAlignment.Center);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, _timerText ?? "", Control.get_Content().get_DefaultFont32(), _timerTextDestination, TimerTextColor, false, true, 1, (HorizontalAlignment)1, (VerticalAlignment)1);
 			}
-			spriteBatch.DrawStringOnCtrl(this, _Text, TimersModule.ModuleInstance.Resources.Font, _alertTextDestination, TextColor, wrap: true, stroke: true);
+			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, _Text, TimersModule.ModuleInstance.Resources.Font, _alertTextDestination, TextColor, true, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
 		}
 
-		public new void Dispose()
+		public void Dispose()
 		{
 			_shouldDispose = true;
-			_animFade?.Resume();
-			_animFade?.OnComplete(delegate
+			Tween animFade = _animFade;
+			if (animFade != null)
 			{
-				base.Dispose();
-			});
+				animFade.Resume();
+			}
+			Tween animFade2 = _animFade;
+			if (animFade2 != null)
+			{
+				animFade2.OnComplete((Action)delegate
+				{
+					((Control)this).Dispose();
+				});
+			}
 		}
 	}
 }

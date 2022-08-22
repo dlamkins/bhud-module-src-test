@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Blish_HUD;
+using Blish_HUD.Entities;
 using Charr.Timers_BlishHUD.Pathing.Content;
 using Charr.Timers_BlishHUD.Pathing.Entities;
 using Microsoft.Xna.Framework;
@@ -125,7 +126,7 @@ namespace Charr.Timers_BlishHUD.Models
 		{
 			if (_markerPathable != null && !_activated)
 			{
-				GameService.Graphics.World.AddEntity(_markerPathable);
+				GameService.Graphics.get_World().AddEntity((IEntity)(object)_markerPathable);
 				_activated = true;
 			}
 		}
@@ -134,7 +135,7 @@ namespace Charr.Timers_BlishHUD.Models
 		{
 			if (_markerPathable != null && _activated)
 			{
-				GameService.Graphics.World.RemoveEntity(_markerPathable);
+				GameService.Graphics.get_World().RemoveEntity((IEntity)(object)_markerPathable);
 				_activated = false;
 			}
 		}

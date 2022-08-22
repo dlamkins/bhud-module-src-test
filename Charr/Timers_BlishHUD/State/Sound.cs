@@ -47,11 +47,11 @@ namespace Charr.Timers_BlishHUD.State
 
 		public string Initialize()
 		{
-			if (Text.IsNullOrEmpty())
+			if (CollectionUtilities.IsNullOrEmpty<char>((IEnumerable<char>)Text))
 			{
 				return Name + " invalid text property";
 			}
-			if (Timestamps.IsNullOrEmpty())
+			if (CollectionUtilities.IsNullOrEmpty<float>((IEnumerable<float>)Timestamps))
 			{
 				return Name + " invalid timestamps property";
 			}
@@ -80,7 +80,7 @@ namespace Charr.Timers_BlishHUD.State
 
 		public void Update(float elapsedTime)
 		{
-			if (_activated && !TimersModule.ModuleInstance._hideSoundsSetting.Value && timeIndex < Timestamps.Count && elapsedTime >= Timestamps[timeIndex])
+			if (_activated && !TimersModule.ModuleInstance._hideSoundsSetting.get_Value() && timeIndex < Timestamps.Count && elapsedTime >= Timestamps[timeIndex])
 			{
 				_synthesizer.SpeakAsync(Text);
 				timeIndex++;

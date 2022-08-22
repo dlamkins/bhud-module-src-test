@@ -53,7 +53,7 @@ namespace Charr.Timers_BlishHUD.Models.Triggers
 			if (!_enabled)
 			{
 				_enabled = true;
-				GameService.Input.Keyboard.KeyPressed += _keyPressedHandler;
+				GameService.Input.get_Keyboard().add_KeyPressed(_keyPressedHandler);
 				_keysPressed = false;
 			}
 		}
@@ -63,7 +63,7 @@ namespace Charr.Timers_BlishHUD.Models.Triggers
 			if (_enabled)
 			{
 				_enabled = false;
-				GameService.Input.Keyboard.KeyPressed -= _keyPressedHandler;
+				GameService.Input.get_Keyboard().remove_KeyPressed(_keyPressedHandler);
 				_keysPressed = false;
 			}
 		}
@@ -76,7 +76,7 @@ namespace Charr.Timers_BlishHUD.Models.Triggers
 		public override bool Triggered()
 		{
 			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			if ((int)TimersModule.ModuleInstance._keyBindSettings[KeyBind].Value.PrimaryKey == 0)
+			if ((int)TimersModule.ModuleInstance._keyBindSettings[KeyBind].get_Value().get_PrimaryKey() == 0)
 			{
 				return false;
 			}
@@ -87,18 +87,20 @@ namespace Charr.Timers_BlishHUD.Models.Triggers
 		{
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-			if (!_enabled || args.Key != TimersModule.ModuleInstance._keyBindSettings[KeyBind].Value.PrimaryKey || GameService.Input.Keyboard.ActiveModifiers != TimersModule.ModuleInstance._keyBindSettings[KeyBind].Value.ModifierKeys || (!TimersModule.ModuleInstance._debugModeSetting.Value && base.CombatRequired && !GameService.Gw2Mumble.PlayerCharacter.IsInCombat) || (base.OutOfCombatRequired && GameService.Gw2Mumble.PlayerCharacter.IsInCombat))
+			if (!_enabled || args.get_Key() != TimersModule.ModuleInstance._keyBindSettings[KeyBind].get_Value().get_PrimaryKey() || GameService.Input.get_Keyboard().get_ActiveModifiers() != TimersModule.ModuleInstance._keyBindSettings[KeyBind].get_Value().get_ModifierKeys() || (!TimersModule.ModuleInstance._debugModeSetting.get_Value() && base.CombatRequired && !GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat()) || (base.OutOfCombatRequired && GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat()))
 			{
 				return;
 			}
 			if (base.EntryRequired || base.DepartureRequired)
 			{
-				float x = GameService.Gw2Mumble.PlayerCharacter.Position.X;
-				float y = GameService.Gw2Mumble.PlayerCharacter.Position.Y;
-				float z = GameService.Gw2Mumble.PlayerCharacter.Position.Z;
+				float x = GameService.Gw2Mumble.get_PlayerCharacter().get_Position().X;
+				float y = GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Y;
+				float z = GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Z;
 				bool playerInArea = ((base.Antipode == null || base.Antipode.Count != 3) ? (((base.Position.Count == 2) ? Math.Sqrt(Math.Pow(x - base.Position[0], 2.0) + Math.Pow(y - base.Position[1], 2.0)) : Math.Sqrt(Math.Pow(x - base.Position[0], 2.0) + Math.Pow(y - base.Position[1], 2.0) + Math.Pow(z - base.Position[2], 2.0))) <= (double)base.Radius) : (x >= Math.Min(base.Position[0], base.Antipode[0]) && x <= Math.Max(base.Position[0], base.Antipode[0]) && y >= Math.Min(base.Position[1], base.Antipode[1]) && y <= Math.Max(base.Position[1], base.Antipode[1]) && z >= Math.Min(base.Position[2], base.Antipode[2]) && z <= Math.Max(base.Position[2], base.Antipode[2])));
 				if ((base.EntryRequired && !playerInArea) || (base.DepartureRequired && playerInArea))
 				{

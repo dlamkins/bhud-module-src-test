@@ -73,7 +73,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			set
 			{
 				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-				SetParameter("WorldViewProjection", ref _worldViewProjection, value);
+				((SharedEffect)this).SetParameter("WorldViewProjection", ref _worldViewProjection, value);
 			}
 		}
 
@@ -87,7 +87,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			set
 			{
 				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-				SetParameter("PlayerView", ref _playerView, value);
+				((SharedEffect)this).SetParameter("PlayerView", ref _playerView, value);
 			}
 		}
 
@@ -101,7 +101,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			set
 			{
 				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-				SetParameter("PlayerPosition", ref _playerPosition, value);
+				((SharedEffect)this).SetParameter("PlayerPosition", ref _playerPosition, value);
 			}
 		}
 
@@ -115,7 +115,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			set
 			{
 				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-				SetParameter("CameraPosition", ref _cameraPosition, value);
+				((SharedEffect)this).SetParameter("CameraPosition", ref _cameraPosition, value);
 			}
 		}
 
@@ -127,7 +127,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			}
 			set
 			{
-				SetParameter("TotalMilliseconds", ref _totalMilliseconds, value);
+				((SharedEffect)this).SetParameter("TotalMilliseconds", ref _totalMilliseconds, value);
 			}
 		}
 
@@ -139,7 +139,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			}
 			set
 			{
-				SetParameter("Texture", ref _texture, value);
+				((SharedEffect)this).SetParameter("Texture", ref _texture, value);
 			}
 		}
 
@@ -151,7 +151,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			}
 			set
 			{
-				SetParameter("FadeTexture", ref _fadeTexture, value);
+				((SharedEffect)this).SetParameter("FadeTexture", ref _fadeTexture, value);
 			}
 		}
 
@@ -163,7 +163,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			}
 			set
 			{
-				SetParameter("FlowSpeed", ref _flowSpeed, value);
+				((SharedEffect)this).SetParameter("FlowSpeed", ref _flowSpeed, value);
 			}
 		}
 
@@ -175,7 +175,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			}
 			set
 			{
-				SetParameter("FadeNear", ref _fadeNear, value);
+				((SharedEffect)this).SetParameter("FadeNear", ref _fadeNear, value);
 			}
 		}
 
@@ -187,7 +187,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			}
 			set
 			{
-				SetParameter("FadeFar", ref _fadeFar, value);
+				((SharedEffect)this).SetParameter("FadeFar", ref _fadeFar, value);
 			}
 		}
 
@@ -199,7 +199,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			}
 			set
 			{
-				SetParameter("Opacity", ref _opacity, value);
+				((SharedEffect)this).SetParameter("Opacity", ref _opacity, value);
 			}
 		}
 
@@ -211,7 +211,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			}
 			set
 			{
-				SetParameter("PlayerFadeRadius", ref _playerFadeRadius, value);
+				((SharedEffect)this).SetParameter("PlayerFadeRadius", ref _playerFadeRadius, value);
 			}
 		}
 
@@ -223,7 +223,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			}
 			set
 			{
-				SetParameter("FadeCenter", ref _fadeCenter, value);
+				((SharedEffect)this).SetParameter("FadeCenter", ref _fadeCenter, value);
 			}
 		}
 
@@ -237,22 +237,22 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			set
 			{
 				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-				SetParameter("TintColor", ref _tintColor, value);
+				((SharedEffect)this).SetParameter("TintColor", ref _tintColor, value);
 			}
 		}
 
 		public TrailEffect(Effect cloneSource)
-			: base(cloneSource)
+			: this(cloneSource)
 		{
 		}
 
 		public TrailEffect(GraphicsDevice graphicsDevice, byte[] effectCode)
-			: base(graphicsDevice, effectCode)
+			: this(graphicsDevice, effectCode)
 		{
 		}
 
 		public TrailEffect(GraphicsDevice graphicsDevice, byte[] effectCode, int index, int count)
-			: base(graphicsDevice, effectCode, index, count)
+			: this(graphicsDevice, effectCode, index, count)
 		{
 		}
 
@@ -277,10 +277,10 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
 			TotalMilliseconds = (float)gameTime.get_TotalGameTime().TotalMilliseconds;
-			PlayerPosition = GameService.Gw2Mumble.PlayerCharacter.Position;
-			CameraPosition = GameService.Gw2Mumble.PlayerCamera.Position;
-			WorldViewProjection = GameService.Gw2Mumble.PlayerCamera.WorldViewProjection;
-			PlayerView = GameService.Gw2Mumble.PlayerCamera.PlayerView;
+			PlayerPosition = GameService.Gw2Mumble.get_PlayerCharacter().get_Position();
+			CameraPosition = GameService.Gw2Mumble.get_PlayerCamera().get_Position();
+			WorldViewProjection = GameService.Gw2Mumble.get_PlayerCamera().get_WorldViewProjection();
+			PlayerView = GameService.Gw2Mumble.get_PlayerCamera().get_PlayerView();
 		}
 	}
 }

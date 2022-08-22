@@ -12,22 +12,16 @@
   <PropertyGroup />
   <ItemGroup />
   <ItemGroup>
-    <Reference Include="Blish HUD">
-      <HintPath>..\..\working\Blish HUD.exe</HintPath>
-    </Reference>
+    <Reference Include="Blish HUD" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="Newtonsoft.Json" />
     <Reference Include="System.Core" />
     <Reference Include="MonoGame.Framework" />
-    <Reference Include="Octokit">
-      <HintPath>..\..\working\Octokit.dll</HintPath>
-    </Reference>
+    <Reference Include="Octokit" />
     <Reference Include="System.Speech" />
     <Reference Include="MonoGame.Extended" />
     <Reference Include="System.IO.Compression.FileSystem" />
-    <Reference Include="Microsoft.IdentityModel.Tokens">
-      <HintPath>..\..\working\Microsoft.IdentityModel.Tokens.dll</HintPath>
-    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Tokens" />
   </ItemGroup>
 </Project>
