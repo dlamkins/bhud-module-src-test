@@ -36,6 +36,12 @@ namespace Nekres.Mistwar.Entities
 
 		private static readonly Texture2D TextureRuinOther = MistwarModule.ModuleInstance.ContentsManager.GetTexture("ruin_other.png");
 
+		private static readonly Texture2D TextureWayPoint = MistwarModule.ModuleInstance.ContentsManager.GetTexture("157353.png");
+
+		private static readonly Texture2D TextureWayPointHover = MistwarModule.ModuleInstance.ContentsManager.GetTexture("60970.png");
+
+		private static readonly Texture2D TextureWayPointContested = MistwarModule.ModuleInstance.ContentsManager.GetTexture("102349.png");
+
 		private static readonly IReadOnlyDictionary<string, Texture2D> _ruinsTexLookUp = new Dictionary<string, Texture2D>
 		{
 			{ "95-62", TextureRuinTemple },
@@ -66,6 +72,8 @@ namespace Nekres.Mistwar.Entities
 		public static readonly Color BrightGold = new Color(223, 194, 149, 255);
 
 		private readonly WvwObjective _internalObjective;
+
+		private readonly ContinentFloorRegionMapSector _internalSector;
 
 		private float _opacity;
 
@@ -105,7 +113,7 @@ namespace Nekres.Mistwar.Entities
 		{
 			get
 			{
-				if (!IsClaimedByRepresentedGuild())
+				if (!ClaimedBy.Equals(MistwarModule.ModuleInstance.WvwService.CurrentGuild))
 				{
 					return TextureClaimed;
 				}
@@ -117,36 +125,29 @@ namespace Nekres.Mistwar.Entities
 
 		public float Opacity => GetOpacity();
 
-		public WvwObjectiveEntity(WvwObjective objective, Map map, ContinentFloorRegionMapSector sector)
+		public List<ContinentFloorRegionMapPoi> WayPoints { get; }
+
+		public WvwObjectiveEntity(WvwObjective objective, ContinentFloorRegionMap map)
 		{
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0188: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0200: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018f: Unknown result type (might be due to invalid IL or missing references)
+			WvwObjectiveEntity wvwObjectiveEntity = this;
 			_internalObjective = objective;
+			_internalSector = map.get_Sectors()[objective.get_SectorId()];
 			_opacity = 1f;
 			Icon = GetTexture(ApiEnum<WvwObjectiveType>.op_Implicit(objective.get_Type()));
 			MapId = map.get_Id();
-			Bounds = sector.get_Bounds().Select(delegate(Coordinates2 coord)
+			Bounds = _internalSector.get_Bounds().Select(delegate(Coordinates2 coord)
 			{
 				//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
@@ -155,16 +156,101 @@ namespace Nekres.Mistwar.Entities
 				Rectangle continentRect2 = map.get_ContinentRect();
 				return MapUtil.Refit(coord, ((Rectangle)(ref continentRect2)).get_TopLeft());
 			});
-			Coordinates2 coord2 = sector.get_Coord();
+			Coordinates2 coord2 = _internalSector.get_Coord();
 			Rectangle continentRect = map.get_ContinentRect();
 			Center = MapUtil.Refit(coord2, ((Rectangle)(ref continentRect)).get_TopLeft());
 			LastFlipped = DateTime.MinValue.ToUniversalTime();
 			BuffDuration = new TimeSpan(0, 5, 0);
-			Coordinates3 v = objective.get_Coord();
-			if (objective.get_Id().Equals("38-15") && Math.Abs(((Coordinates3)(ref v)).get_X() - 11766.3) < 1.0 && Math.Abs(((Coordinates3)(ref v)).get_Y() - 14793.5) < 1.0 && Math.Abs(((Coordinates3)(ref v)).get_Z() - -2133.39) < 1.0)
+			WorldPosition = CalculateWorldPosition(map);
+			WayPoints = map.get_PointsOfInterest().Values.Where((ContinentFloorRegionMapPoi x) => x.get_Type() == ApiEnum<PoiType>.op_Implicit((PoiType)2)).Where(delegate(ContinentFloorRegionMapPoi y)
 			{
-				Coordinates3 coord3 = objective.get_Coord();
-				((Coordinates3)(ref v))._002Ector(11462.5, 15490.0, ((Coordinates3)(ref coord3)).get_Z() - 500.0);
+				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+				//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+				Coordinates2 coord4 = y.get_Coord();
+				float num = (float)((Coordinates2)(ref coord4)).get_X();
+				coord4 = y.get_Coord();
+				return PolygonUtil.InBounds(new Vector2(num, (float)((Coordinates2)(ref coord4)).get_Y()), ((IEnumerable<Coordinates2>)wvwObjectiveEntity._internalSector.get_Bounds()).Select((Func<Coordinates2, Vector2>)((Coordinates2 z) => new Vector2((float)((Coordinates2)(ref z)).get_X(), (float)((Coordinates2)(ref z)).get_Y()))).ToList());
+			}).ToList();
+			foreach (ContinentFloorRegionMapPoi wayPoint in WayPoints)
+			{
+				Coordinates2 coord3 = wayPoint.get_Coord();
+				continentRect = map.get_ContinentRect();
+				Point fit = MapUtil.Refit(coord3, ((Rectangle)(ref continentRect)).get_TopLeft());
+				wayPoint.set_Coord(new Coordinates2((double)fit.X, (double)fit.Y));
+			}
+		}
+
+		public Texture2D GetWayPointIcon(bool hover)
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			if (Owner != MistwarModule.ModuleInstance.WvwService.CurrentTeam)
+			{
+				return TextureWayPointContested;
+			}
+			if (!hover)
+			{
+				return TextureWayPoint;
+			}
+			return TextureWayPointHover;
+		}
+
+		public bool IsOwned()
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Invalid comparison between Unknown and I4
+			return (int)Owner <= 1;
+		}
+
+		public bool IsClaimed()
+		{
+			return !ClaimedBy.Equals(Guid.Empty);
+		}
+
+		public bool HasGuildUpgrades()
+		{
+			return GuildUpgrades.IsNullOrEmpty();
+		}
+
+		public bool HasUpgraded()
+		{
+			return YaksDelivered >= 20;
+		}
+
+		public bool HasBuff(out TimeSpan remainingTime)
+		{
+			TimeSpan buffTime = DateTime.UtcNow.Subtract(LastFlipped);
+			remainingTime = BuffDuration.Subtract(buffTime);
+			return remainingTime.Ticks > 0;
+		}
+
+		private Vector3 CalculateWorldPosition(ContinentFloorRegionMap map)
+		{
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0150: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
+			Coordinates3 v = _internalObjective.get_Coord();
+			if (_internalObjective.get_Id().Equals("38-15") && Math.Abs(((Coordinates3)(ref v)).get_X() - 11766.3) < 1.0 && Math.Abs(((Coordinates3)(ref v)).get_Y() - 14793.5) < 1.0 && Math.Abs(((Coordinates3)(ref v)).get_Z() - -2133.39) < 1.0)
+			{
+				Coordinates3 coord = _internalObjective.get_Coord();
+				((Coordinates3)(ref v))._002Ector(11462.5, 15490.0, ((Coordinates3)(ref coord)).get_Z() - 500.0);
 			}
 			Rectangle r = map.get_ContinentRect();
 			Coordinates2 val = ((Rectangle)(ref r)).get_TopLeft();
@@ -176,9 +262,7 @@ namespace Nekres.Mistwar.Entities
 			val = ((Rectangle)(ref r)).get_BottomRight();
 			Vector3 offset = default(Vector3);
 			((Vector3)(ref offset))._002Ector(num, 0f, (float)((y + ((Coordinates2)(ref val)).get_Y()) / 2.0));
-			Vector3 pos = default(Vector3);
-			((Vector3)(ref pos))._002Ector(WorldUtil.GameToWorldCoord((float)((((Coordinates3)(ref v)).get_X() - (double)offset.X) * 24.0)), WorldUtil.GameToWorldCoord((float)((0.0 - (((Coordinates3)(ref v)).get_Y() - (double)offset.Z)) * 24.0)), WorldUtil.GameToWorldCoord((float)(0.0 - ((Coordinates3)(ref v)).get_Z())));
-			WorldPosition = pos;
+			return new Vector3(WorldUtil.GameToWorldCoord((float)((((Coordinates3)(ref v)).get_X() - (double)offset.X) * 24.0)), WorldUtil.GameToWorldCoord((float)((0.0 - (((Coordinates3)(ref v)).get_Y() - (double)offset.Z)) * 24.0)), WorldUtil.GameToWorldCoord((float)(0.0 - ((Coordinates3)(ref v)).get_Z())));
 		}
 
 		private Texture2D GetTexture(WvwObjectiveType type)
@@ -226,33 +310,6 @@ namespace Nekres.Mistwar.Entities
 				2 => ColorGreen, 
 				_ => ColorNeutral, 
 			});
-		}
-
-		public bool IsClaimed()
-		{
-			return !ClaimedBy.Equals(Guid.Empty);
-		}
-
-		public bool IsClaimedByRepresentedGuild()
-		{
-			return ClaimedBy.Equals(MistwarModule.ModuleInstance.WvwService.CurrentGuild);
-		}
-
-		public bool HasGuildUpgrades()
-		{
-			return GuildUpgrades.IsNullOrEmpty();
-		}
-
-		public bool HasUpgraded()
-		{
-			return YaksDelivered >= 20;
-		}
-
-		public bool HasBuff(out TimeSpan remainingTime)
-		{
-			TimeSpan buffTime = DateTime.UtcNow.Subtract(LastFlipped);
-			remainingTime = BuffDuration.Subtract(buffTime);
-			return remainingTime.Ticks > 0;
 		}
 
 		private Texture2D GetUpgradeTierTexture()

@@ -79,5 +79,18 @@ namespace Nekres.Mistwar
 			}
 			return most;
 		}
+
+		public static T GetItem<T>(this List<T> array, int index)
+		{
+			if (index >= array.Count)
+			{
+				return array[index % array.Count];
+			}
+			if (index < 0)
+			{
+				return array[index % array.Count + array.Count];
+			}
+			return array[index];
+		}
 	}
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
@@ -14,6 +15,7 @@ using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Nekres.Mistwar.Services;
+using Nekres.Mistwar.UI.CustomSettingsView;
 
 namespace Nekres.Mistwar
 {
@@ -32,6 +34,8 @@ namespace Nekres.Mistwar
 
 		internal SettingEntry<KeyBinding> ToggleMarkersKeySetting;
 
+		internal SettingEntry<KeyBinding> ChatMessageKeySetting;
+
 		internal SettingEntry<float> ColorIntensitySetting;
 
 		internal SettingEntry<bool> DrawSectorsSetting;
@@ -49,6 +53,8 @@ namespace Nekres.Mistwar
 		internal SettingEntry<bool> HideInCombatSetting;
 
 		internal SettingEntry<bool> DrawRuinMarkersSetting;
+
+		internal SettingEntry<bool> DrawEmergencyWayPointsSetting;
 
 		internal SettingEntry<float> MaxViewDistanceSetting;
 
@@ -85,16 +91,20 @@ namespace Nekres.Mistwar
 			//IL_010d: Expected O, but got Unknown
 			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0166: Expected O, but got Unknown
+			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bc: Expected O, but got Unknown
 			SettingCollection generalSettings = settings.AddSubCollection("General", true, false);
 			ColorTypeSetting = generalSettings.DefineSetting<ColorType>("ColorType", ColorType.Normal, (Func<string>)(() => "Color Type"), (Func<string>)(() => "Select a different color type if you have a color deficiency."));
 			TeamShapesSetting = generalSettings.DefineSetting<bool>("TeamShapes", true, (Func<string>)(() => "Team Shapes"), (Func<string>)(() => "Enables uniquely shaped objective markers per team."));
 			SettingCollection hotKeySettings = settings.AddSubCollection("Control Options", true, false);
 			ToggleMapKeySetting = hotKeySettings.DefineSetting<KeyBinding>("ToggleKey", new KeyBinding((Keys)78), (Func<string>)(() => "Toggle Map"), (Func<string>)(() => "Key used to show and hide the strategic map."));
 			ToggleMarkersKeySetting = hotKeySettings.DefineSetting<KeyBinding>("ToggleMarkersKey", new KeyBinding((Keys)219), (Func<string>)(() => "Toggle Markers"), (Func<string>)(() => "Key used to show and hide the objective markers."));
+			ChatMessageKeySetting = hotKeySettings.DefineSetting<KeyBinding>("ChatMessageKey", new KeyBinding((Keys)13), (Func<string>)(() => "Chat Message"), (Func<string>)(() => "Give focus to the chat edit box."));
 			SettingCollection mapSettings = settings.AddSubCollection("Map", true, false);
 			DrawSectorsSetting = mapSettings.DefineSetting<bool>("DrawSectors", true, (Func<string>)(() => "Show Sector Boundaries"), (Func<string>)(() => "Indicates if the sector boundaries should be drawn."));
 			DrawObjectiveNamesSetting = mapSettings.DefineSetting<bool>("DrawObjectiveNames", true, (Func<string>)(() => "Show Objective Names"), (Func<string>)(() => "Indicates if the names of the objectives should be drawn."));
 			DrawRuinMapSetting = mapSettings.DefineSetting<bool>("ShowRuins", true, (Func<string>)(() => "Show Ruins"), (Func<string>)(() => "Indicates if the ruins should be shown."));
+			DrawEmergencyWayPointsSetting = mapSettings.DefineSetting<bool>("ShowEmergencyWayPoints", false, (Func<string>)(() => "Show Emergency Waypoints"), (Func<string>)(() => "Shows your team's Emergency Waypoints."));
 			OpacitySetting = mapSettings.DefineSetting<float>("Opacity", 80f, (Func<string>)(() => "Opacity"), (Func<string>)(() => "Changes the opacity of the tactical map interface."));
 			ColorIntensitySetting = mapSettings.DefineSetting<float>("ColorIntensity", 80f, (Func<string>)(() => "Color Intensity"), (Func<string>)(() => "Intensity of the background color."));
 			ScaleRatioSetting = mapSettings.DefineSetting<float>("ScaleRatio", 80f, (Func<string>)(() => "Scale Ratio"), (Func<string>)(() => "Changes the size of the tactical map interface"));
@@ -108,10 +118,11 @@ namespace Nekres.Mistwar
 
 		protected override void Initialize()
 		{
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Expected O, but got Unknown
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Expected O, but got Unknown
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Expected O, but got Unknown
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Expected O, but got Unknown
+			ChatMessageKeySetting.get_Value().set_Enabled(false);
 			_cornerTex = new AsyncTexture2D(ContentsManager.GetTexture("corner_icon.png"));
 			_moduleIcon = new CornerIcon(_cornerTex, ((Module)this).get_Name());
 			WvwService = new WvwService(Gw2ApiManager);
@@ -122,8 +133,14 @@ namespace Nekres.Mistwar
 			_mapService = new MapService(DirectoriesManager, WvwService, GetModuleProgressHandler());
 		}
 
+		public override IView GetSettingsView()
+		{
+			return (IView)(object)new CustomSettingsView(new CustomSettingsModel(SettingsManager.get_ModuleSettings(), ContentsManager));
+		}
+
 		protected override async Task LoadAsync()
 		{
+			await WvwService.LoadAsync();
 			if (Gw2ApiManager.HasPermission((TokenPermission)1))
 			{
 				MapService mapService = _mapService;
@@ -202,7 +219,7 @@ namespace Nekres.Mistwar
 			}
 		}
 
-		private void OnToggleMarkersKeyActivated(object o, EventArgs e)
+		private async void OnToggleMarkersKeyActivated(object o, EventArgs e)
 		{
 			EnableMarkersSetting.set_Value(!EnableMarkersSetting.get_Value());
 			if (EnableMarkersSetting.get_Value())
@@ -211,7 +228,7 @@ namespace Nekres.Mistwar
 			}
 			else
 			{
-				MarkerService = new MarkerService(WvwService.CurrentObjectives);
+				MarkerService = new MarkerService(await WvwService.GetObjectives(GameService.Gw2Mumble.get_CurrentMap().get_Id()));
 			}
 		}
 
@@ -258,13 +275,13 @@ namespace Nekres.Mistwar
 			}
 		}
 
-		private void OnEnableMarkersSettingChanged(object o, ValueChangedEventArgs<bool> e)
+		private async void OnEnableMarkersSettingChanged(object o, ValueChangedEventArgs<bool> e)
 		{
 			if (e.get_NewValue())
 			{
 				if (MarkerService == null)
 				{
-					MarkerService = new MarkerService(WvwService.CurrentObjectives);
+					MarkerService = new MarkerService(await WvwService.GetObjectives(GameService.Gw2Mumble.get_CurrentMap().get_Id()));
 				}
 			}
 			else

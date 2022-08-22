@@ -1,4 +1,6 @@
 using System;
+using System.Runtime.CompilerServices;
+using Microsoft.Xna.Framework;
 
 namespace Nekres.Mistwar
 {
@@ -73,6 +75,16 @@ namespace Nekres.Mistwar
 		public static float Map(float value, float fromLow, float fromHigh, float toLow, float toHigh)
 		{
 			return (value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow) + toLow;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static float Cross(Vector2 a, Vector2 b)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			return a.X * b.Y - a.Y * b.X;
 		}
 	}
 }
