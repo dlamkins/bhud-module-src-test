@@ -187,17 +187,21 @@ namespace Nekres.Mistwar.Services
 
 		public async Task ReloadMap()
 		{
-			if (GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld() && _mapCache.TryGetValue(GameService.Gw2Mumble.get_CurrentMap().get_Id(), out var tex))
+			if (!GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld() || !_mapCache.TryGetValue(GameService.Gw2Mumble.get_CurrentMap().get_Id(), out var tex))
 			{
-				_mapControl.Texture.SwapTexture(AsyncTexture2D.op_Implicit(tex));
-				MapImage mapControl = _mapControl;
-				mapControl.Map = await GetMap(GameService.Gw2Mumble.get_CurrentMap().get_Id());
-				await _wvw.GetObjectives(GameService.Gw2Mumble.get_CurrentMap().get_Id()).ContinueWith(delegate(Task<IEnumerable<WvwObjectiveEntity>> t)
+				return;
+			}
+			_mapControl.Texture.SwapTexture(AsyncTexture2D.op_Implicit(tex));
+			MapImage mapControl = _mapControl;
+			mapControl.Map = await GetMap(GameService.Gw2Mumble.get_CurrentMap().get_Id());
+			await _wvw.GetObjectives(GameService.Gw2Mumble.get_CurrentMap().get_Id()).ContinueWith(delegate(Task<IEnumerable<WvwObjectiveEntity>> t)
+			{
+				if (!t.IsFaulted)
 				{
 					_mapControl.WvwObjectives = t.Result;
 					MistwarModule.ModuleInstance.MarkerService?.ReloadMarkers(t.Result);
-				});
-			}
+				}
+			});
 		}
 
 		private async Task<ContinentFloorRegionMap> GetMap(int mapId)

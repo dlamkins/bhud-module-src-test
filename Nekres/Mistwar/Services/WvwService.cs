@@ -138,6 +138,10 @@ namespace Nekres.Mistwar.Services
 
 		public async Task<int[]> GetWvWMapIds(int worldId)
 		{
+			if (worldId < 0)
+			{
+				return Array.Empty<int>();
+			}
 			return await ((IBlobClient<WvwMatch>)(object)_api.get_Gw2ApiClient().get_V2().get_Wvw()
 				.get_Matches()
 				.World(worldId)).GetAsync(default(CancellationToken)).ContinueWith((Task<WvwMatch> t) => t.IsFaulted ? Array.Empty<int>() : (from m in t.Result.get_Maps()
