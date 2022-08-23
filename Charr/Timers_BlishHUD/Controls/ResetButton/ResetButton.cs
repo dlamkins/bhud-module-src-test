@@ -22,7 +22,9 @@ namespace Charr.Timers_BlishHUD.Controls.ResetButton
 
 		private bool MouseOverResizeHandle;
 
-		public Point MaxSize = new Point(499, 499);
+		public int MinSize = 50;
+
+		public int MaxSize = 499;
 
 		private Point _resizeStart;
 
@@ -71,26 +73,24 @@ namespace Charr.Timers_BlishHUD.Controls.ResetButton
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e5: Expected O, but got Unknown
-			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0153: Expected O, but got Unknown
+			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e3: Expected O, but got Unknown
+			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0151: Expected O, but got Unknown
 			StandardButton val = new StandardButton();
 			((Control)val).set_Location(new Point(2, 2));
 			val.set_Text("Reset Timer");
@@ -165,9 +165,9 @@ namespace Charr.Timers_BlishHUD.Controls.ResetButton
 			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
 			((Container)this).UpdateContainer(gameTime);
 			_dragging = _dragging && ((Control)this).get_MouseOver();
 			_resizing = _resizing && ((Control)this).get_MouseOver();
@@ -181,7 +181,8 @@ namespace Charr.Timers_BlishHUD.Controls.ResetButton
 			{
 				Point nOffset = Control.get_Input().get_Mouse().get_Position() - _dragStart;
 				Point newSize = _resizeStart + nOffset;
-				((Control)this).set_Size(new Point(MathHelper.Clamp(newSize.X, 50, MaxSize.X), MathHelper.Clamp(newSize.Y, 25, MaxSize.Y)));
+				int longestLength = Math.Max(newSize.X, newSize.Y);
+				((Control)this).set_Size(new Point(MathHelper.Clamp(longestLength, MinSize, MaxSize), MathHelper.Clamp(longestLength, MinSize, MaxSize)));
 				this.BoundsChanged?.Invoke(null, null);
 			}
 		}
