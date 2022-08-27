@@ -22,5 +22,8 @@
     <Reference Include="System.Core" />
     <Reference Include="MonoGame.Extended" />
     <Reference Include="System.ServiceModel" />
+    <Reference Include="Blish-HUD-Extended">
+      <HintPath>..\..\working\Blish-HUD-Extended.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

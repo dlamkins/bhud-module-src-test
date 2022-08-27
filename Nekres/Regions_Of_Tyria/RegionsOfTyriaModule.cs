@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Blish_HUD.Extended.Core.Views;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
@@ -18,8 +19,6 @@ using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using Nekres.Regions_Of_Tyria.Geometry;
 using Nekres.Regions_Of_Tyria.UI.Controls;
-using Nekres.Regions_Of_Tyria.UI.Models;
-using Nekres.Regions_Of_Tyria.UI.Views;
 using RBush;
 
 namespace Nekres.Regions_Of_Tyria
@@ -115,12 +114,12 @@ namespace Nekres.Regions_Of_Tyria
 
 		public override IView GetSettingsView()
 		{
-			return (IView)(object)new CustomSettingsView(new CustomSettingsModel(SettingsManager.get_ModuleSettings()));
+			return (IView)(object)new SocialsSettingsView(new SocialsSettingsModel(SettingsManager.get_ModuleSettings(), "https://pastebin.com/raw/Kk9DgVmL"));
 		}
 
 		protected override async void Update(GameTime gameTime)
 		{
-			if (!(gameTime.get_TotalGameTime().TotalMilliseconds - _lastRun < 10.0) && !(DateTime.UtcNow.Subtract(_lastUpdate).TotalMilliseconds < 1000.0) && _toggleSectorNotificationSetting.get_Value() && GameService.Gw2Mumble.get_IsAvailable() && GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && !GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode())
+			if (!(gameTime.get_TotalGameTime().TotalMilliseconds - _lastRun < 10.0) && !(DateTime.UtcNow.Subtract(_lastUpdate).TotalMilliseconds < 1000.0) && _toggleSectorNotificationSetting.get_Value() && GameService.Gw2Mumble.get_IsAvailable() && GameService.GameIntegration.get_Gw2Instance().get_IsInGame())
 			{
 				_lastRun = gameTime.get_ElapsedGameTime().TotalMilliseconds;
 				_lastUpdate = DateTime.UtcNow;
@@ -208,9 +207,8 @@ namespace Nekres.Regions_Of_Tyria
 			{
 				return null;
 			}
-			Coordinates2 playerLocation = GameService.Gw2Mumble.get_RawClient().get_AvatarPosition().ToContinentCoords(CoordsUnit.Meters, currentMap.get_MapRect(), currentMap.get_ContinentRect())
-				.SwapYZ()
-				.ToPlane();
+			Coordinates3 playerPos = (GameService.Gw2Mumble.get_RawClient().get_IsCompetitiveMode() ? GameService.Gw2Mumble.get_RawClient().get_CameraPosition() : GameService.Gw2Mumble.get_RawClient().get_AvatarPosition());
+			Coordinates2 playerLocation = playerPos.ToContinentCoords(CoordsUnit.Meters, currentMap.get_MapRect(), currentMap.get_ContinentRect()).SwapYZ().ToPlane();
 			RBush<Sector> obj = await _sectorRepository.GetItem(GameService.Gw2Mumble.get_CurrentMap().get_Id());
 			Envelope boundingBox = new Envelope(((Coordinates2)(ref playerLocation)).get_X(), ((Coordinates2)(ref playerLocation)).get_Y(), ((Coordinates2)(ref playerLocation)).get_X(), ((Coordinates2)(ref playerLocation)).get_Y());
 			IReadOnlyList<Sector> foundPoints = obj.Search(in boundingBox);
