@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.Extended;
+using Blish_HUD.Extended.Core.Views;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Blish_HUD.Modules;
@@ -13,8 +15,8 @@ using Blish_HUD.Settings;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Nekres.Mistwar.Entities;
 using Nekres.Mistwar.Services;
-using Nekres.Mistwar.UI.CustomSettingsView;
 
 namespace Nekres.Mistwar
 {
@@ -134,7 +136,7 @@ namespace Nekres.Mistwar
 
 		public override IView GetSettingsView()
 		{
-			return (IView)(object)new CustomSettingsView(new CustomSettingsModel(SettingsManager.get_ModuleSettings(), ContentsManager));
+			return (IView)(object)new SocialsSettingsView(new SocialsSettingsModel(SettingsManager.get_ModuleSettings(), "https://pastebin.com/raw/Kk9DgVmL"));
 		}
 
 		protected override async Task LoadAsync()
@@ -177,7 +179,7 @@ namespace Nekres.Mistwar
 				return;
 			}
 			_moduleIcon.set_LoadingMessage(loadingMessage);
-			if (loadingMessage == null && !GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld())
+			if (loadingMessage == null && !GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch())
 			{
 				CornerIcon moduleIcon = _moduleIcon;
 				if (moduleIcon != null)
@@ -231,7 +233,7 @@ namespace Nekres.Mistwar
 		private void OnIsMapOpenChanged(object o, ValueEventArgs<bool> e)
 		{
 			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			ToggleMapKeySetting.get_Value().set_Enabled(GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld());
+			ToggleMapKeySetting.get_Value().set_Enabled(GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch());
 		}
 
 		private void OnMapChanged(object o, ValueEventArgs<int> e)
@@ -239,7 +241,7 @@ namespace Nekres.Mistwar
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003e: Expected O, but got Unknown
-			if (GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld())
+			if (GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch())
 			{
 				CornerIcon moduleIcon = _moduleIcon;
 				if (moduleIcon != null)
@@ -266,7 +268,7 @@ namespace Nekres.Mistwar
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0046: Expected O, but got Unknown
-			if (e.get_Value() && GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld())
+			if (e.get_Value() && GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch())
 			{
 				CornerIcon moduleIcon = _moduleIcon;
 				if (moduleIcon != null)
@@ -296,9 +298,12 @@ namespace Nekres.Mistwar
 				{
 					MarkerService = new MarkerService();
 				}
-				MarkerService markerService = MarkerService;
-				markerService.ReloadMarkers(await WvwService.GetObjectives(GameService.Gw2Mumble.get_CurrentMap().get_Id()));
-				MarkerService.Toggle(_mapService.IsVisible);
+				if (GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch())
+				{
+					IEnumerable<WvwObjectiveEntity> obj = await WvwService.GetObjectives(GameService.Gw2Mumble.get_CurrentMap().get_Id());
+					MarkerService?.ReloadMarkers(obj);
+					MarkerService?.Toggle(_mapService.IsVisible);
+				}
 			}
 			else
 			{

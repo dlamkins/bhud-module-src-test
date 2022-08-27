@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Blish_HUD.Extended;
 using Blish_HUD.Modules.Managers;
 using Gw2Sharp.WebApi.Exceptions;
 using Gw2Sharp.WebApi.V2;
@@ -47,7 +48,7 @@ namespace Nekres.Mistwar.Services
 
 		public async Task Update()
 		{
-			if (!IsLoading && GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld() && !(DateTime.UtcNow.Subtract(_prevApiRequestTime).TotalSeconds < 15.0))
+			if (!IsLoading && GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch() && !(DateTime.UtcNow.Subtract(_prevApiRequestTime).TotalSeconds < 15.0))
 			{
 				LoadingMessage = "Refreshing";
 				CurrentGuild = await GetRepresentedGuild();

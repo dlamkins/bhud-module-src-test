@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Controls;
+using Blish_HUD.Extended;
 using Glide;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -26,8 +27,8 @@ namespace Nekres.Mistwar.UI.Controls
 		{
 			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			silent = silent || !GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld();
-			if (forceHide || !GameUtil.IsAvailable() || !GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld() || base._visible)
+			silent = silent || !GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch();
+			if (forceHide || !GameUtil.IsAvailable() || !GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch() || base._visible)
 			{
 				base._visible = false;
 				if (silent)
@@ -81,7 +82,7 @@ namespace Nekres.Mistwar.UI.Controls
 			//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
-			if (!GameUtil.IsAvailable() || !GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld() || !((Control)this).get_Visible() || WvwObjectives == null)
+			if (!GameUtil.IsAvailable() || !GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch() || !((Control)this).get_Visible() || WvwObjectives == null)
 			{
 				return;
 			}

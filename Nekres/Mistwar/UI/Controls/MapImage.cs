@@ -5,6 +5,7 @@ using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.Extended;
 using Blish_HUD.Input;
 using Glide;
 using Gw2Sharp.Models;
@@ -153,8 +154,8 @@ namespace Nekres.Mistwar.UI.Controls
 		{
 			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			silent = silent || !GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld();
-			if (forceHide || !GameUtil.IsAvailable() || !GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld() || ((Control)this)._visible)
+			silent = silent || !GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch();
+			if (forceHide || !GameUtil.IsAvailable() || !GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch() || ((Control)this)._visible)
 			{
 				((Control)this)._visible = false;
 				if (silent)
@@ -227,11 +228,11 @@ namespace Nekres.Mistwar.UI.Controls
 					GameService.Content.PlaySoundEffectByName("button-click");
 					if (PInvoke.IsLControlPressed())
 					{
-						await ChatUtil.PastText(wp.get_ChatLink());
+						await ChatUtil.Send(wp.get_ChatLink(), MistwarModule.ModuleInstance.ChatMessageKeySetting.get_Value());
 					}
 					else if (PInvoke.IsLShiftPressed())
 					{
-						await ChatUtil.InsertText(wp.get_ChatLink());
+						await ChatUtil.Insert(wp.get_ChatLink(), MistwarModule.ModuleInstance.ChatMessageKeySetting.get_Value());
 					}
 					else if (await ClipboardUtil.get_WindowsClipboardService().SetTextAsync(wp.get_ChatLink()))
 					{
@@ -424,7 +425,7 @@ namespace Nekres.Mistwar.UI.Controls
 			//IL_0709: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0731: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0733: Unknown result type (might be due to invalid IL or missing references)
-			if (!GameUtil.IsAvailable() || !GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld() || !((Control)this).get_Visible() || !_texture.get_HasTexture() || WvwObjectives == null)
+			if (!GameUtil.IsAvailable() || !GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch() || !((Control)this).get_Visible() || !_texture.get_HasTexture() || WvwObjectives == null)
 			{
 				return;
 			}

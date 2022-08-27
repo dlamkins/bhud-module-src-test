@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.Extended;
 using Blish_HUD.Modules.Managers;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
@@ -187,7 +188,7 @@ namespace Nekres.Mistwar.Services
 
 		public async Task ReloadMap()
 		{
-			if (!GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWorldVsWorld() || !_mapCache.TryGetValue(GameService.Gw2Mumble.get_CurrentMap().get_Id(), out var tex))
+			if (!GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch() || !_mapCache.TryGetValue(GameService.Gw2Mumble.get_CurrentMap().get_Id(), out var tex))
 			{
 				return;
 			}
@@ -196,10 +197,10 @@ namespace Nekres.Mistwar.Services
 			mapControl.Map = await GetMap(GameService.Gw2Mumble.get_CurrentMap().get_Id());
 			await _wvw.GetObjectives(GameService.Gw2Mumble.get_CurrentMap().get_Id()).ContinueWith(delegate(Task<IEnumerable<WvwObjectiveEntity>> t)
 			{
-				if (!t.IsFaulted)
+				if (!t.IsFaulted && t.Result != null)
 				{
 					_mapControl.WvwObjectives = t.Result;
-					MistwarModule.ModuleInstance.MarkerService?.ReloadMarkers(t.Result);
+					MistwarModule.ModuleInstance?.MarkerService?.ReloadMarkers(t.Result);
 				}
 			});
 		}
