@@ -32,12 +32,16 @@
   <data name="ColorSelectionButtonTextOk"><value>OK</value></data>
   <data name="GatheringSpotTitleCobalt"><value>Cobalt</value></data>
   <data name="SettingColorSelectionEggsTooltipText"><value>Color for the eggs bar.</value></data>
+  <data name="SettingColorSelectionHusksRefillingText"><value>Husks bar color whilst refilling.</value></data>
   <data name="SettingColorSelectionHusksText"><value>Husks bar color.</value></data>
+  <data name="SettingColorSelectionEggsRefillingTooltipText"><value>Color for the eggs bar whilst refilling.</value></data>
+  <data name="SettingColorSelectionEggsRefillingText"><value>Eggs bar color whilst refilling.</value></data>
   <data name="GatheringSpotTitleCrimson"><value>Crimson</value></data>
   <data name="TimerBarTextEggs"><value>Eggs</value></data>
   <data name="GatheringSpotTitleAmber"><value>Amber</value></data>
   <data name="TimerBarTextHusks"><value>Husks</value></data>
   <data name="TimerBarTextReady"><value>ready</value></data>
+  <data name="SettingColorSelectionHusksRefillingTooltipText"><value>Color for the husks bar whilst refilling.</value></data>
   <data name="SettingColorSelectionEggsText"><value>Eggs bar color.</value></data>
   <data name="ColorSelectionButtonTextCancel"><value>Cancel</value></data>
   <data name="ColorSelectionTitle"><value>Color Selection (WIP)</value></data>

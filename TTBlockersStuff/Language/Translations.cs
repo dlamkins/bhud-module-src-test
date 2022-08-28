@@ -56,9 +56,17 @@ namespace TTBlockersStuff.Language
 
 		internal static string GatheringspotTitleMain => ResourceManager.GetString("GatheringspotTitleMain", resourceCulture);
 
+		internal static string SettingColorSelectionEggsRefillingText => ResourceManager.GetString("SettingColorSelectionEggsRefillingText", resourceCulture);
+
+		internal static string SettingColorSelectionEggsRefillingTooltipText => ResourceManager.GetString("SettingColorSelectionEggsRefillingTooltipText", resourceCulture);
+
 		internal static string SettingColorSelectionEggsText => ResourceManager.GetString("SettingColorSelectionEggsText", resourceCulture);
 
 		internal static string SettingColorSelectionEggsTooltipText => ResourceManager.GetString("SettingColorSelectionEggsTooltipText", resourceCulture);
+
+		internal static string SettingColorSelectionHusksRefillingText => ResourceManager.GetString("SettingColorSelectionHusksRefillingText", resourceCulture);
+
+		internal static string SettingColorSelectionHusksRefillingTooltipText => ResourceManager.GetString("SettingColorSelectionHusksRefillingTooltipText", resourceCulture);
 
 		internal static string SettingColorSelectionHusksText => ResourceManager.GetString("SettingColorSelectionHusksText", resourceCulture);
 

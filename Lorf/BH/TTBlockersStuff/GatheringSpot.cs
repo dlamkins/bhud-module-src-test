@@ -29,6 +29,8 @@ namespace Lorf.BH.TTBlockersStuff
 
 		private GatheringSpot(string name, int huskTime, Vector2 position, bool isWurm, float spotRadius)
 		{
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 			Name = name;
 			HuskTime = huskTime;
 			Position = position;
@@ -38,6 +40,8 @@ namespace Lorf.BH.TTBlockersStuff
 
 		public static GatheringSpot FromPosition(Vector2 position)
 		{
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 			return All.FirstOrDefault((GatheringSpot x) => Vector2.Distance(x.Position, position) < x.SpotRadius);
 		}
 	}

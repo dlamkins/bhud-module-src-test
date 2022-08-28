@@ -3,6 +3,7 @@ using Blish_HUD;
 using Blish_HUD.Controls;
 using Lorf.BH.TTBlockersStuff.UI;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using TTBlockersStuff.Language;
 
 namespace Lorf.BH.TTBlockersStuff
@@ -19,16 +20,27 @@ namespace Lorf.BH.TTBlockersStuff
 
 		public TimerBar TimerBar { get; set; }
 
-		public void Reset()
+		public TimerManager()
 		{
 			targetTime = DateTime.MinValue;
-			TimerBar.MaxValue = 1f;
-			TimerBar.Value = 1f;
 		}
 
 		public void Activate(int time)
 		{
-			Vector3 pos = GameService.Gw2Mumble.PlayerCharacter.Position;
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+			if (Active)
+			{
+				Active = false;
+				TimerBar.BarText = Name + " (" + Translations.TimerBarTextReady + ")";
+				TimerBar.Value = TimerBar.MaxValue;
+				targetTime = DateTime.MinValue;
+				return;
+			}
+			Vector3 pos = GameService.Gw2Mumble.get_PlayerCharacter().get_Position();
 			Logger.Debug($"Timer {Name} activated (x: {pos.X}, y: {pos.Y}, z: {pos.Z}, time: {time})");
 			targetTime = DateTime.UtcNow.AddSeconds(time);
 			TimerBar.MaxValue = time;
@@ -48,7 +60,7 @@ namespace Lorf.BH.TTBlockersStuff
 					return;
 				}
 				Active = false;
-				ScreenNotification.ShowNotification(Name + " " + Translations.TimerBarTextReady + "!");
+				ScreenNotification.ShowNotification(Name + " " + Translations.TimerBarTextReady + "!", (NotificationType)0, (Texture2D)null, 4);
 				TimerBar.BarText = Name + " (" + Translations.TimerBarTextReady + ")";
 				TimerBar.Value = TimerBar.MaxValue;
 			}
