@@ -281,6 +281,13 @@ namespace Nekres.Mistwar.Entities
 			return remainingTime.Ticks > 0;
 		}
 
+		public float GetDistance()
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			return WorldPosition.Distance(GameService.Gw2Mumble.get_PlayerCamera().get_Position());
+		}
+
 		private Vector3 CalculateWorldPosition(ContinentFloorRegionMap map)
 		{
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)

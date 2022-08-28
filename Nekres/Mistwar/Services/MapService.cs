@@ -211,7 +211,7 @@ namespace Nekres.Mistwar.Services
 			return await MapUtil.GetMapExpanded(obj, obj.get_DefaultFloor());
 		}
 
-		public void Toggle(bool forceHide = false)
+		public void Toggle(bool forceHide = false, bool silent = false)
 		{
 			if (IsLoading)
 			{
@@ -219,7 +219,7 @@ namespace Nekres.Mistwar.Services
 			}
 			else
 			{
-				_mapControl?.Toggle(forceHide);
+				_mapControl?.Toggle(forceHide, silent);
 			}
 		}
 
@@ -227,7 +227,7 @@ namespace Nekres.Mistwar.Services
 		{
 			if (e.get_Value())
 			{
-				Toggle(forceHide: true);
+				Toggle(forceHide: true, silent: true);
 			}
 		}
 
@@ -235,7 +235,7 @@ namespace Nekres.Mistwar.Services
 		{
 			if (!e.get_Value())
 			{
-				Toggle(forceHide: true);
+				Toggle(forceHide: true, silent: true);
 			}
 		}
 

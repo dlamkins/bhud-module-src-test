@@ -12,7 +12,7 @@ namespace Nekres.Mistwar
 {
 	public static class SpriteBatchExtensions
 	{
-		public static void DrawWvwObjectiveOnCtrl(this SpriteBatch spriteBatch, Control control, WvwObjectiveEntity objectiveEntity, Rectangle dest, float opacity = 1f, float scale = 1f, bool drawName = true)
+		public static void DrawWvwObjectiveOnCtrl(this SpriteBatch spriteBatch, Control control, WvwObjectiveEntity objectiveEntity, Rectangle dest, float opacity = 1f, float scale = 1f, bool drawName = true, bool drawDistance = false)
 		{
 			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
@@ -93,48 +93,53 @@ namespace Nekres.Mistwar
 			//IL_038f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0399: Unknown result type (might be due to invalid IL or missing references)
 			//IL_039e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03da: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0408: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0404: Unknown result type (might be due to invalid IL or missing references)
 			//IL_040e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0417: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0423: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0429: Unknown result type (might be due to invalid IL or missing references)
-			//IL_042f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0434: Unknown result type (might be due to invalid IL or missing references)
-			//IL_045d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0470: Unknown result type (might be due to invalid IL or missing references)
-			//IL_048d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0502: Unknown result type (might be due to invalid IL or missing references)
-			//IL_051b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0523: Unknown result type (might be due to invalid IL or missing references)
-			//IL_056b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0576: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0580: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0592: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0597: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_041a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_041c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0445: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0458: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0475: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0488: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0492: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0503: Unknown result type (might be due to invalid IL or missing references)
+			//IL_050b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0553: Unknown result type (might be due to invalid IL or missing references)
+			//IL_055e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0568: Unknown result type (might be due to invalid IL or missing references)
+			//IL_057a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_057f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_058a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0590: Unknown result type (might be due to invalid IL or missing references)
+			//IL_059b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05bc: Unknown result type (might be due to invalid IL or missing references)
 			//IL_05c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0636: Unknown result type (might be due to invalid IL or missing references)
+			//IL_063b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0642: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0648: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0653: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0659: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0662: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0675: Unknown result type (might be due to invalid IL or missing references)
+			//IL_067b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0681: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0686: Unknown result type (might be due to invalid IL or missing references)
 			if (objectiveEntity.Icon == null)
 			{
 				return;
@@ -184,11 +189,15 @@ namespace Nekres.Mistwar
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, control, objectiveEntity.Icon, new Rectangle(dest.X - (int)(scale * (float)dest.Width) / 2, dest.Y - (int)(scale * (float)dest.Height) / 2, (int)(scale * (float)dest.Width), (int)(scale * (float)dest.Height)), (Rectangle?)objectiveEntity.Icon.get_Bounds(), teamColor);
 			if (objectiveEntity.HasBuff(out var remainingTime))
 			{
-				string text = remainingTime.ToString("m\\:ss");
-				Size2 size = font.MeasureString(text);
-				Point texSize = PointExtensions.ResizeKeepAspect(new Point(objectiveEntity.BuffTexture.get_Width(), objectiveEntity.BuffTexture.get_Height()), (int)(scale * size.Width), (int)(scale * size.Height), false);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, control, objectiveEntity.BuffTexture, new Rectangle(dest.X + texSize.X / 2, dest.Y - texSize.Y + 1, texSize.X, texSize.Y), (Rectangle?)objectiveEntity.BuffTexture.get_Bounds(), whiteColor);
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, control, text, font, new Rectangle(dest.X - (int)size.Width / 2, dest.Y - (int)size.Height - dest.Height / 2 - 10, dest.Width, dest.Height), textColor, false, opacity >= 0.99f, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				string text2 = remainingTime.ToString("m\\:ss");
+				Size2 size2 = font.MeasureString(text2);
+				Point texSize = PointExtensions.ResizeKeepAspect(new Point(objectiveEntity.BuffTexture.get_Width(), objectiveEntity.BuffTexture.get_Height()), (int)(scale * size2.Width), (int)(scale * size2.Height), false);
+				Rectangle iconBnds = default(Rectangle);
+				((Rectangle)(ref iconBnds))._002Ector(dest.X - 20, (int)((float)dest.Y - scale * 80f), texSize.X, texSize.Y);
+				Rectangle textBnds = default(Rectangle);
+				((Rectangle)(ref textBnds))._002Ector(((Rectangle)(ref iconBnds)).get_Right() + 3, iconBnds.Y, iconBnds.Width, iconBnds.Height);
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, control, objectiveEntity.BuffTexture, iconBnds, (Rectangle?)objectiveEntity.BuffTexture.get_Bounds(), whiteColor);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, control, text2, font, textBnds, textColor, false, opacity >= 0.99f, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
 			}
 			if (objectiveEntity.IsClaimed())
 			{
@@ -201,7 +210,17 @@ namespace Nekres.Mistwar
 			if (drawName)
 			{
 				Size2 nameSize = font.MeasureString(objectiveEntity.Name);
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, control, objectiveEntity.Name, font, new Rectangle(dest.X - (int)nameSize.Width / 2, dest.Y + dest.Height / 2 + 3, (int)nameSize.Width, (int)nameSize.Height), textColor, false, opacity >= 0.99f, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, control, objectiveEntity.Name, font, new Rectangle(dest.X - (int)nameSize.Width / 2, dest.Y + dest.Height / 2 + (int)(scale * 12f), (int)nameSize.Width, (int)nameSize.Height), textColor, false, opacity >= 0.99f, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+			}
+			if (drawDistance)
+			{
+				float distance = objectiveEntity.GetDistance() - 25f;
+				if (distance > 1f)
+				{
+					string text = ((distance >= 1000f) ? $"{distance / 1000f:N2}km" : $"{distance:N0}m");
+					Size2 size = font.MeasureString(text);
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, control, text, font, new Rectangle(dest.X - (int)size.Width / 2, dest.Y - (int)size.Height - dest.Height / 2 - (int)(scale * 80f), dest.Width, dest.Height), textColor, false, opacity >= 0.99f, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				}
 			}
 		}
 	}

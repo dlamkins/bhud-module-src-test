@@ -53,9 +53,13 @@ namespace Nekres.Mistwar
 
 		internal SettingEntry<bool> HideInCombatSetting;
 
+		internal SettingEntry<bool> HideAlliedMarkersSetting;
+
 		internal SettingEntry<bool> DrawRuinMarkersSetting;
 
 		internal SettingEntry<bool> DrawEmergencyWayPointsSetting;
+
+		internal SettingEntry<bool> DrawDistanceSetting;
 
 		internal SettingEntry<float> MaxViewDistanceSetting;
 
@@ -111,8 +115,10 @@ namespace Nekres.Mistwar
 			ScaleRatioSetting = mapSettings.DefineSetting<float>("ScaleRatio", 80f, (Func<string>)(() => "Scale Ratio"), (Func<string>)(() => "Changes the size of the tactical map interface"));
 			SettingCollection markerSettings = settings.AddSubCollection("Markers", true, false);
 			EnableMarkersSetting = markerSettings.DefineSetting<bool>("EnableMarkers", true, (Func<string>)(() => "Enable Markers"), (Func<string>)(() => "Enables the markers overlay which shows objectives at their world position."));
-			HideInCombatSetting = markerSettings.DefineSetting<bool>("HideInCombat", true, (Func<string>)(() => "Hide in Combat"), (Func<string>)(() => "Shows only the closest objective in combat and hides all others."));
-			DrawRuinMarkersSetting = markerSettings.DefineSetting<bool>("ShowRuinMarkers", true, (Func<string>)(() => "Show Ruins"), (Func<string>)(() => "Shows markers for the ruins."));
+			HideAlliedMarkersSetting = markerSettings.DefineSetting<bool>("HideAlliedMarkers", false, (Func<string>)(() => "Hide Allied Objectives"), (Func<string>)(() => "Only hostile objectives will be shown."));
+			HideInCombatSetting = markerSettings.DefineSetting<bool>("HideInCombat", true, (Func<string>)(() => "Hide in Combat"), (Func<string>)(() => "Only the closest objective will be shown when in combat."));
+			DrawRuinMarkersSetting = markerSettings.DefineSetting<bool>("ShowRuinMarkers", true, (Func<string>)(() => "Show Ruins"), (Func<string>)(() => "Show markers for the ruins."));
+			DrawDistanceSetting = markerSettings.DefineSetting<bool>("ShowDistance", true, (Func<string>)(() => "Show Distance"), (Func<string>)(() => "Show flight distance to objectives."));
 			MaxViewDistanceSetting = markerSettings.DefineSetting<float>("MaxViewDistance", 50f, (Func<string>)(() => "Max View Distance"), (Func<string>)(() => "The max view distance at which an objective marker can be seen."));
 			MarkerScaleSetting = markerSettings.DefineSetting<float>("ScaleRatio", 70f, (Func<string>)(() => "Scale Ratio"), (Func<string>)(() => "Changes the size of the markers."));
 		}
