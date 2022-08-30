@@ -32,10 +32,6 @@ namespace Nekres.Stream_Out.Core.Services
 			await Gw2Util.GenerateKarmaImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wallet_karma.png", 10000000, overwrite: false);
 		}
 
-		protected override async Task ResetDaily()
-		{
-		}
-
 		private async Task UpdateWallet()
 		{
 			if (!Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]

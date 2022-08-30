@@ -16,10 +16,10 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="Gw2Sharp" />
     <Reference Include="MonoGame.Framework" />
-    <Reference Include="Flurl.Http" />
-    <Reference Include="Newtonsoft.Json" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Net.Http" />
+    <Reference Include="Blish-HUD-Extended">
+      <HintPath>..\..\working\Blish-HUD-Extended.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 </Project>

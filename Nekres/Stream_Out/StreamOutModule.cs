@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Blish_HUD.Extended.Core.Views;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
@@ -11,8 +12,6 @@ using Blish_HUD.Settings;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using Nekres.Stream_Out.Core.Services;
-using Nekres.Stream_Out.UI.Models;
-using Nekres.Stream_Out.UI.Views;
 
 namespace Nekres.Stream_Out
 {
@@ -101,9 +100,10 @@ namespace Nekres.Stream_Out
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			OnlyLastDigitSettingEntry = settings.DefineSetting<bool>("OnlyLastDigits", true, (Func<string>)(() => "Only Output Last Digits of Server Address"), (Func<string>)(() => "Only outputs the last digits of the server address you are currently connected to.\nThis is the address shown when entering \"/ip\" in chat."));
-			AddUnicodeSymbols = settings.DefineSetting<UnicodeSigning>("UnicodeSymbols", UnicodeSigning.Suffixed, (Func<string>)(() => "Numeric Value Signing"), (Func<string>)(() => "The way numeric values should be signed with unicode symbols."));
-			UseCatmanderTag = settings.DefineSetting<bool>("CatmanderTag", false, (Func<string>)(() => "Use Catmander Tag"), (Func<string>)(() => "Replaces the Commander icon with the Catmander icon if you tag up as Commander in-game."));
+			SettingCollection general = settings.AddSubCollection("General", true, false);
+			OnlyLastDigitSettingEntry = general.DefineSetting<bool>("OnlyLastDigits", true, (Func<string>)(() => "Only Output Last Digits of Server Address"), (Func<string>)(() => "Only outputs the last digits of the server address you are currently connected to.\nThis is the address shown when entering \"/ip\" in chat."));
+			UseCatmanderTag = general.DefineSetting<bool>("CatmanderTag", false, (Func<string>)(() => "Use Catmander Tag"), (Func<string>)(() => "Replaces the Commander icon with the Catmander icon if you tag up as Commander in-game."));
+			AddUnicodeSymbols = general.DefineSetting<UnicodeSigning>("UnicodeSymbols", UnicodeSigning.Suffixed, (Func<string>)(() => "Numeric Value Signing"), (Func<string>)(() => "The way numeric values should be signed with unicode symbols."));
 			SettingCollection toggles = settings.AddSubCollection("Export Toggles", true, false);
 			ExportClientInfo = toggles.DefineSetting<bool>("clientInfo", true, (Func<string>)(() => "Export Client Info"), (Func<string>)(() => "Client info such as server address."));
 			ExportCharacterInfo = toggles.DefineSetting<bool>("characterInfo", true, (Func<string>)(() => "Export Character Info"), (Func<string>)(() => "Character info such as name, deaths, profession and commander tag."));
@@ -131,7 +131,7 @@ namespace Nekres.Stream_Out
 
 		public override IView GetSettingsView()
 		{
-			return (IView)(object)new CustomSettingsView(new CustomSettingsModel(SettingsManager.get_ModuleSettings()));
+			return (IView)(object)new SocialsSettingsView(new SocialsSettingsModel(SettingsManager.get_ModuleSettings(), "https://pastebin.com/raw/Kk9DgVmL"));
 		}
 
 		protected override void Initialize()
