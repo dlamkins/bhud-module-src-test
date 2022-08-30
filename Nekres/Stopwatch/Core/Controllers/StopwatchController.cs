@@ -182,8 +182,9 @@ namespace Nekres.Stopwatch.Core.Controllers
 			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
 			if (_display == null)
 			{
 				StopwatchDisplay stopwatchDisplay = new StopwatchDisplay();
@@ -204,7 +205,7 @@ namespace Nekres.Stopwatch.Core.Controllers
 			_prevTick = TimeSpan.Zero;
 			if (StopwatchModule.ModuleInstance.StartOnMovementEnabled.get_Value())
 			{
-				PlayerPosition = GameService.Gw2Mumble.get_PlayerCharacter().get_Position();
+				PlayerPosition = (GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode() ? GameService.Gw2Mumble.get_PlayerCamera().get_Position() : GameService.Gw2Mumble.get_PlayerCharacter().get_Position());
 				_display.Text = $"Awaiting movement...\nX:{PlayerPosition.X:F} Y:{PlayerPosition.Y:F} Z:{PlayerPosition.Z:F}";
 			}
 			else

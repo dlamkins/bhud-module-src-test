@@ -65,24 +65,27 @@ namespace Stopwatch
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0054: Expected O, but got Unknown
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fb: Expected O, but got Unknown
-			//IL_010a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0152: Expected O, but got Unknown
-			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0360: Unknown result type (might be due to invalid IL or missing references)
-			Toggle = settings.DefineSetting<KeyBinding>("toggleKey", new KeyBinding((Keys)164), (Func<string>)(() => "Toggle"), (Func<string>)(() => "Starts or pauses the stopwatch."));
-			StartOnMovementEnabled = settings.DefineSetting<bool>("startOnMovement", false, (Func<string>)(() => "Wait for Character Movement"), (Func<string>)(() => "When you activate the stopwatch it will delay its start until the moment you move from where you toggled it."));
-			Reset = settings.DefineSetting<KeyBinding>("resetKey", new KeyBinding((ModifierKeys)2, (Keys)82), (Func<string>)(() => "Reset"), (Func<string>)(() => "Rewinds and stops the stopwatch."));
-			SetStartTime = settings.DefineSetting<KeyBinding>("setStartTimeKey", new KeyBinding((ModifierKeys)2, (Keys)67), (Func<string>)(() => "Set Goal Time"), (Func<string>)(() => "Set a goal time and make the stopwatch count down into the negative."));
-			FontSize = settings.DefineSetting<FontSize>("fontSize", (FontSize)36, (Func<string>)(() => "Font Size"), (Func<string>)(() => "Sets the font size of the timer."));
-			FontColor = settings.DefineSetting<Color>("fontColor", Color.get_White(), (Func<string>)(() => "Font Color"), (Func<string>)(() => "Sets the font color of the timer."));
-			BackgroundOpacity = settings.DefineSetting<float>("backgroundOpacity", 30f, (Func<string>)(() => "Background Opacity"), (Func<string>)(() => "Sets the transparency of the background."));
-			SoundVolume = settings.DefineSetting<float>("soundVolume", 80f, (Func<string>)(() => "Audio Volume"), (Func<string>)(() => "Sets the volume of the audio effects"));
-			TickingSoundDisabledSetting = settings.DefineSetting<bool>("tickingSfxDisabled", false, (Func<string>)(() => "Disable Ticking Sound"), (Func<string>)(() => "Disables the ticking sounds"));
-			BeepSoundDisabledSetting = settings.DefineSetting<bool>("beepSfxDisabled", false, (Func<string>)(() => "Disable Beep Alerts"), (Func<string>)(() => "Disables the beeping alerts during a count from three to zero."));
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0062: Expected O, but got Unknown
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b9: Expected O, but got Unknown
+			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0110: Expected O, but got Unknown
+			//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038a: Unknown result type (might be due to invalid IL or missing references)
+			SettingCollection hotkeys = settings.AddSubCollection("Control Options", true, false);
+			Toggle = hotkeys.DefineSetting<KeyBinding>("toggleKey", new KeyBinding((Keys)164), (Func<string>)(() => "Toggle"), (Func<string>)(() => "Starts or pauses the stopwatch."));
+			Reset = hotkeys.DefineSetting<KeyBinding>("resetKey", new KeyBinding((ModifierKeys)2, (Keys)82), (Func<string>)(() => "Reset"), (Func<string>)(() => "Rewinds and stops the stopwatch."));
+			SetStartTime = hotkeys.DefineSetting<KeyBinding>("setStartTimeKey", new KeyBinding((ModifierKeys)2, (Keys)67), (Func<string>)(() => "Set Goal Time"), (Func<string>)(() => "Set a goal time and make the stopwatch count down into the negative."));
+			SettingCollection general = settings.AddSubCollection("General", true, false);
+			StartOnMovementEnabled = general.DefineSetting<bool>("startOnMovement", false, (Func<string>)(() => "Wait for Character Movement"), (Func<string>)(() => "When you activate the stopwatch it will delay its start until the moment you move from where you toggled it.\nIn competitive modes it will wait for camera movement instead."));
+			FontSize = general.DefineSetting<FontSize>("fontSize", (FontSize)36, (Func<string>)(() => "Font Size"), (Func<string>)(() => "Sets the font size of the timer."));
+			FontColor = general.DefineSetting<Color>("fontColor", Color.get_White(), (Func<string>)(() => "Font Color"), (Func<string>)(() => "Sets the font color of the timer."));
+			BackgroundOpacity = general.DefineSetting<float>("backgroundOpacity", 30f, (Func<string>)(() => "Background Opacity"), (Func<string>)(() => "Sets the transparency of the background."));
+			SettingCollection audio = settings.AddSubCollection("Sound Options", true, false);
+			TickingSoundDisabledSetting = audio.DefineSetting<bool>("tickingSfxDisabled", false, (Func<string>)(() => "Disable Ticking Sound"), (Func<string>)(() => "Disables the ticking sounds"));
+			BeepSoundDisabledSetting = audio.DefineSetting<bool>("beepSfxDisabled", false, (Func<string>)(() => "Disable Beep Alerts"), (Func<string>)(() => "Disables the beeping alerts during a count from three to zero."));
+			SoundVolume = audio.DefineSetting<float>("soundVolume", 80f, (Func<string>)(() => "Audio Volume"), (Func<string>)(() => "Sets the volume of the audio effects"));
 			SettingCollection hiddenSettingsCache = settings.AddSubCollection("hiddenSettingsCache", false, false);
 			Position = hiddenSettingsCache.DefineSetting<Point>("position", new Point(180, 60), (Func<string>)null, (Func<string>)null);
 			StartTime = hiddenSettingsCache.DefineSetting<TimeSpan>("startTime", TimeSpan.Zero, (Func<string>)null, (Func<string>)null);
