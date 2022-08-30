@@ -22,8 +22,6 @@ namespace Nekres.Inquest_Module.UI.Views
 
 		private ViewContainer _lastSettingContainer;
 
-		private FlowPanel _socialFlowPanel;
-
 		public bool LockBounds
 		{
 			get
@@ -64,109 +62,53 @@ namespace Nekres.Inquest_Module.UI.Views
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0071: Expected O, but got Unknown
-			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0166: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Expected O, but got Unknown
+			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fe: Expected O, but got Unknown
+			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ed: Expected O, but got Unknown
-			//IL_0244: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0249: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0250: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0257: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0268: Expected O, but got Unknown
-			//IL_0299: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02dd: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
-			((Control)val).set_Size(new Point(((Control)buildPanel).get_Width(), 78));
+			((Control)val).set_Size(new Point(((Control)buildPanel).get_Width(), ((Control)buildPanel).get_Height()));
 			((Control)val).set_Location(new Point(0, 0));
-			val.set_FlowDirection((ControlFlowDirection)5);
-			val.set_ControlPadding(new Vector2(27f, 2f));
-			val.set_OuterControlPadding(new Vector2(27f, 2f));
+			val.set_FlowDirection((ControlFlowDirection)3);
+			val.set_ControlPadding(new Vector2(5f, 2f));
+			val.set_OuterControlPadding(new Vector2(10f, 15f));
 			((Container)val).set_WidthSizingMode((SizingMode)2);
-			((Panel)val).set_ShowBorder(true);
+			((Container)val).set_HeightSizingMode((SizingMode)1);
+			((Container)val).set_AutoSizePadding(new Point(0, 15));
 			((Control)val).set_Parent(buildPanel);
-			_socialFlowPanel = val;
-			StandardButton val2 = new StandardButton();
-			((Control)val2).set_Parent((Container)(object)_socialFlowPanel);
-			((Control)val2).set_Size(new Point(160, 46));
-			val2.set_Text("Support Me on Ko-Fi");
-			val2.set_Icon(AsyncTexture2D.op_Implicit(((Presenter<CustomSettingsView, CustomSettingsModel>)base.get_Presenter()).get_Model().GetSocialLogo(CustomSettingsModel.Social.KoFi)));
-			val2.set_ResizeIcon(true);
-			((Control)val2).set_BasicTooltipText(((Presenter<CustomSettingsView, CustomSettingsModel>)base.get_Presenter()).get_Model().GetSocialUrl(CustomSettingsModel.Social.KoFi));
-			((Control)val2).add_Click((EventHandler<MouseEventArgs>)OnBrowserButtonClick);
-			StandardButton val3 = new StandardButton();
-			((Control)val3).set_Parent((Container)(object)_socialFlowPanel);
-			((Control)val3).set_Size(new Point(100, 46));
-			val3.set_Text("twitch");
-			val3.set_Icon(AsyncTexture2D.op_Implicit(((Presenter<CustomSettingsView, CustomSettingsModel>)base.get_Presenter()).get_Model().GetSocialLogo(CustomSettingsModel.Social.Twitch)));
-			val3.set_ResizeIcon(true);
-			((Control)val3).set_BasicTooltipText(((Presenter<CustomSettingsView, CustomSettingsModel>)base.get_Presenter()).get_Model().GetSocialUrl(CustomSettingsModel.Social.Twitch));
-			((Control)val3).add_Click((EventHandler<MouseEventArgs>)OnBrowserButtonClick);
-			FlowPanel val4 = new FlowPanel();
-			((Control)val4).set_Size(new Point(((Control)buildPanel).get_Width(), ((Control)buildPanel).get_Height()));
-			((Control)val4).set_Location(new Point(0, ((Control)_socialFlowPanel).get_Height()));
-			val4.set_FlowDirection((ControlFlowDirection)3);
-			val4.set_ControlPadding(new Vector2(5f, 2f));
-			val4.set_OuterControlPadding(new Vector2(10f, 15f));
-			((Container)val4).set_WidthSizingMode((SizingMode)2);
-			((Container)val4).set_HeightSizingMode((SizingMode)1);
-			((Container)val4).set_AutoSizePadding(new Point(0, 15));
-			((Control)val4).set_Parent(buildPanel);
-			_settingFlowPanel = val4;
+			_settingFlowPanel = val;
 			foreach (SettingEntry item in ((IEnumerable<SettingEntry>)((Presenter<CustomSettingsView, CustomSettingsModel>)base.get_Presenter()).get_Model().Settings).Where((SettingEntry s) => s.get_SessionDefined()))
 			{
 				IView settingView;
 				if ((settingView = SettingView.FromType(item, ((Control)_settingFlowPanel).get_Width())) != null)
 				{
-					ViewContainer val5 = new ViewContainer();
-					((Container)val5).set_WidthSizingMode((SizingMode)2);
-					((Container)val5).set_HeightSizingMode((SizingMode)1);
-					((Control)val5).set_Parent((Container)(object)_settingFlowPanel);
-					_lastSettingContainer = val5;
+					ViewContainer val2 = new ViewContainer();
+					((Container)val2).set_WidthSizingMode((SizingMode)2);
+					((Container)val2).set_HeightSizingMode((SizingMode)1);
+					((Control)val2).set_Parent((Container)(object)_settingFlowPanel);
+					_lastSettingContainer = val2;
 					_lastSettingContainer.Show(settingView);
 					SettingsView subSettingsView = (SettingsView)(object)((settingView is SettingsView) ? settingView : null);
 					if (subSettingsView != null)
@@ -175,13 +117,13 @@ namespace Nekres.Inquest_Module.UI.Views
 					}
 				}
 			}
-			StandardButton val6 = new StandardButton();
-			((Control)val6).set_Parent((Container)(object)_settingFlowPanel);
-			((Control)val6).set_Size(new Point(250, 50));
-			val6.set_Text("Policy: Macros and Macro Use");
-			((Control)val6).set_BasicTooltipText(((Presenter<CustomSettingsView, CustomSettingsModel>)base.get_Presenter()).get_Model().PolicyMacrosAndMacroUse);
-			val6.set_Icon(AsyncTexture2D.op_Implicit(GameService.Content.GetTexture("common/1441452")));
-			((Control)val6).add_Click((EventHandler<MouseEventArgs>)OnBrowserButtonClick);
+			StandardButton val3 = new StandardButton();
+			((Control)val3).set_Parent((Container)(object)_settingFlowPanel);
+			((Control)val3).set_Size(new Point(250, 50));
+			val3.set_Text("Policy: Macros and Macro Use");
+			((Control)val3).set_BasicTooltipText(((Presenter<CustomSettingsView, CustomSettingsModel>)base.get_Presenter()).get_Model().PolicyMacrosAndMacroUse);
+			val3.set_Icon(AsyncTexture2D.op_Implicit(GameService.Content.GetTexture("common/1441452")));
+			((Control)val3).add_Click((EventHandler<MouseEventArgs>)OnBrowserButtonClick);
 		}
 
 		private void OnBrowserButtonClick(object sender, MouseEventArgs e)

@@ -68,25 +68,27 @@ namespace Nekres.Inquest_Module
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0054: Expected O, but got Unknown
-			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fd: Expected O, but got Unknown
-			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f8: Expected O, but got Unknown
-			//IL_0214: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025c: Expected O, but got Unknown
-			//IL_026a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b2: Expected O, but got Unknown
-			AutoClickHoldKeySetting = settings.DefineSetting<KeyBinding>("autoClickHoldKeyBinding", new KeyBinding((Keys)188), (Func<string>)(() => "Hold Double Clicking"), (Func<string>)(() => "Perform Double Clicks at the current cursor position while the key is being pressed."));
-			HoldKeyWithLeftClickEnabledSetting = settings.DefineSetting<bool>("holdKeyWithLeftClick", false, (Func<string>)(() => "Hold Double Clicking + Left Mouse Button"), (Func<string>)(() => "Perform Double clicks at the current cursor position while Hold Double Clicking and Left Mouse Button is being pressed."));
-			AutoClickToggleKeySetting = settings.DefineSetting<KeyBinding>("autoClickToggleKeyBinding", new KeyBinding((Keys)219), (Func<string>)(() => "Toggle Double Clicking"), (Func<string>)(() => "Perform Double Clicks in an interval at the position of the cursor at the time of pressing the key."));
-			AutoClickSoundDisabledSetting = settings.DefineSetting<bool>("autoClickSoundsDisabled", false, (Func<string>)(() => "Disable Clicking Sounds"), (Func<string>)(() => "Disables the sound alert when an auto click is performed."));
-			AutoClickSoundVolume = settings.DefineSetting<float>("autoClickSoundsVolume", 80f, (Func<string>)(() => "Clicking Sounds Volume"), (Func<string>)(() => "Sets the audio volume of the clicking alerts."));
-			DodgeJumpKeyBindingSetting = settings.DefineSetting<KeyBinding>("dodgeJumpKeyBinding", new KeyBinding((ModifierKeys)1, (Keys)32), (Func<string>)(() => "Dodge-Jump"), (Func<string>)(() => "Perform a dodge roll and a jump simultaneously."));
-			SettingCollection controlOptions = settings.AddSubCollection("Movement Keys to Trigger on Dodge-Jump", true, false);
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0062: Expected O, but got Unknown
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bb: Expected O, but got Unknown
+			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0112: Expected O, but got Unknown
+			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0176: Expected O, but got Unknown
+			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cc: Expected O, but got Unknown
+			SettingCollection hotkeys = settings.AddSubCollection("Control Options", true, false);
+			AutoClickHoldKeySetting = hotkeys.DefineSetting<KeyBinding>("autoClickHoldKeyBinding", new KeyBinding((Keys)188), (Func<string>)(() => "Hold Double Clicking"), (Func<string>)(() => "Perform Double Clicks at the current cursor position while the key is being pressed."));
+			AutoClickToggleKeySetting = hotkeys.DefineSetting<KeyBinding>("autoClickToggleKeyBinding", new KeyBinding((Keys)219), (Func<string>)(() => "Toggle Double Clicking"), (Func<string>)(() => "Perform Double Clicks in an interval at the position of the cursor at the time of pressing the key."));
+			DodgeJumpKeyBindingSetting = hotkeys.DefineSetting<KeyBinding>("dodgeJumpKeyBinding", new KeyBinding((ModifierKeys)1, (Keys)32), (Func<string>)(() => "Dodge-Jump"), (Func<string>)(() => "Perform a dodge roll and a jump simultaneously."));
+			SettingCollection controlOptions = hotkeys.AddSubCollection("Movement Keys to Trigger on Dodge-Jump", true, false);
 			DodgeKeyBindingSetting = controlOptions.DefineSetting<KeyBinding>("dodgeKeyBinding", new KeyBinding((Keys)86), (Func<string>)(() => "Dodge"), (Func<string>)(() => "Do an evasive dodge roll, negating damage, in the direction your character is moving (backward if stationary)."));
 			JumpKeyBindingSetting = controlOptions.DefineSetting<KeyBinding>("jumpKeyBinding", new KeyBinding((Keys)32), (Func<string>)(() => "Jump"), (Func<string>)(() => "Press to jump over obstacles."));
+			HoldKeyWithLeftClickEnabledSetting = hotkeys.DefineSetting<bool>("holdKeyWithLeftClick", false, (Func<string>)(() => "Hold Double Clicking + Left Mouse Button"), (Func<string>)(() => "Perform Double clicks at the current cursor position while Hold Double Clicking and Left Mouse Button is being pressed."));
+			SettingCollection audio = settings.AddSubCollection("Sound Options", true, false);
+			AutoClickSoundDisabledSetting = audio.DefineSetting<bool>("autoClickSoundsDisabled", false, (Func<string>)(() => "Disable Clicking Sounds"), (Func<string>)(() => "Disables the sound alert when an auto click is performed."));
+			AutoClickSoundVolume = audio.DefineSetting<float>("autoClickSoundsVolume", 80f, (Func<string>)(() => "Clicking Sounds Volume"), (Func<string>)(() => "Sets the audio volume of the clicking alerts."));
 			SettingCollection hiddenSettingsCache = settings.AddSubCollection("hiddenSettingsCache", false, false);
 			AutoClickToggleInterval = hiddenSettingsCache.DefineSetting<double>("autoClickToggleInterval", 0.0, (Func<string>)null, (Func<string>)null);
 		}
@@ -126,20 +128,19 @@ namespace Nekres.Inquest_Module
 
 		private void OnDodgeJumpKeyActivated(object o, EventArgs e)
 		{
-			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
-			if ((int)GameService.Gw2Mumble.get_PlayerCharacter().get_CurrentMount() != 0 || DateTime.UtcNow < _nextDodgeJump)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0119: Unknown result type (might be due to invalid IL or missing references)
+			if (DateTime.UtcNow < _nextDodgeJump)
 			{
 				return;
 			}
