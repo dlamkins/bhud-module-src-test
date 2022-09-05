@@ -9,8 +9,27 @@
     <LangVersion>Preview</LangVersion>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup />
-  <ItemGroup />
+  <PropertyGroup>
+    <RootNamespace />
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Nekres\Regions_Of_Tyria\_Submodules.Blish_HUD_Extended.Resources.discord_logo.png" />
+    <None Remove="Nekres\Regions_Of_Tyria\_Submodules.Blish_HUD_Extended.Resources.github_logo.png" />
+    <None Remove="Nekres\Regions_Of_Tyria\_Submodules.Blish_HUD_Extended.Resources.instagram_logo.png" />
+    <None Remove="Nekres\Regions_Of_Tyria\_Submodules.Blish_HUD_Extended.Resources.kofi_logo.png" />
+    <None Remove="Nekres\Regions_Of_Tyria\_Submodules.Blish_HUD_Extended.Resources.patreon_logo.png" />
+    <None Remove="Nekres\Regions_Of_Tyria\_Submodules.Blish_HUD_Extended.Resources.twitch_logo.png" />
+    <None Remove="Nekres\Regions_Of_Tyria\_Submodules.Blish_HUD_Extended.Resources.twitter_logo.png" />
+    <None Remove="Nekres\Regions_Of_Tyria\_Submodules.Blish_HUD_Extended.Resources.youtube_logo.png" />
+    <EmbeddedResource Include="Nekres\Regions_Of_Tyria\_Submodules.Blish_HUD_Extended.Resources.discord_logo.png" />
+    <EmbeddedResource Include="Nekres\Regions_Of_Tyria\_Submodules.Blish_HUD_Extended.Resources.github_logo.png" />
+    <EmbeddedResource Include="Nekres\Regions_Of_Tyria\_Submodules.Blish_HUD_Extended.Resources.instagram_logo.png" />
+    <EmbeddedResource Include="Nekres\Regions_Of_Tyria\_Submodules.Blish_HUD_Extended.Resources.kofi_logo.png" />
+    <EmbeddedResource Include="Nekres\Regions_Of_Tyria\_Submodules.Blish_HUD_Extended.Resources.patreon_logo.png" />
+    <EmbeddedResource Include="Nekres\Regions_Of_Tyria\_Submodules.Blish_HUD_Extended.Resources.twitch_logo.png" />
+    <EmbeddedResource Include="Nekres\Regions_Of_Tyria\_Submodules.Blish_HUD_Extended.Resources.twitter_logo.png" />
+    <EmbeddedResource Include="Nekres\Regions_Of_Tyria\_Submodules.Blish_HUD_Extended.Resources.youtube_logo.png" />
+  </ItemGroup>
   <ItemGroup>
     <Reference Include="Blish HUD" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -22,8 +41,10 @@
     <Reference Include="System.Core" />
     <Reference Include="MonoGame.Extended" />
     <Reference Include="System.ServiceModel" />
-    <Reference Include="Blish-HUD-Extended">
-      <HintPath>..\..\working\Blish-HUD-Extended.dll</HintPath>
-    </Reference>
+    <Reference Include="Newtonsoft.Json" />
+    <Reference Include="Flurl.Http" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="AsyncClipboardService" />
+    <Reference Include="System.Net.Http" />
   </ItemGroup>
 </Project>
