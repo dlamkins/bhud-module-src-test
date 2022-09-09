@@ -1,4 +1,4 @@
-namespace Nekres.Mumble_Info._Extensions
+namespace Nekres.Mumble_Info
 {
 	public enum CoordsUnit
 	{

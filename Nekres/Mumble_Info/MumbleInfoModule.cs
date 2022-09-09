@@ -6,6 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
+using Blish_HUD.Extended.Core.Views;
+using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
@@ -15,15 +17,17 @@ using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Nekres.Mumble_Info.Core.Controls;
+using Nekres.Mumble_Info.Core.Services;
 
 namespace Nekres.Mumble_Info
 {
 	[Export(typeof(Module))]
 	public class MumbleInfoModule : Module
 	{
-		private static readonly Logger Logger = Logger.GetLogger(typeof(MumbleInfoModule));
+		internal static readonly Logger Logger = Logger.GetLogger(typeof(MumbleInfoModule));
 
-		internal static MumbleInfoModule ModuleInstance;
+		internal static MumbleInfoModule Instance;
 
 		private SettingEntry<KeyBinding> _toggleInfoBinding;
 
@@ -43,6 +47,14 @@ namespace Nekres.Mumble_Info
 
 		private DateTime _timeOutPc;
 
+		private MockService _mockService;
+
+		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
+
+		internal ContentsManager ContentsManager => base.ModuleParameters.get_ContentsManager();
+
+		internal DirectoriesManager DirectoriesManager => base.ModuleParameters.get_DirectoriesManager();
+
 		internal Gw2ApiManager Gw2ApiManager => base.ModuleParameters.get_Gw2ApiManager();
 
 		internal Map CurrentMap { get; private set; }
@@ -59,7 +71,7 @@ namespace Nekres.Mumble_Info
 		public MumbleInfoModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
 			: this(moduleParameters)
 		{
-			ModuleInstance = this;
+			Instance = this;
 		}
 
 		protected override void DefineSettings(SettingCollection settings)
@@ -76,6 +88,12 @@ namespace Nekres.Mumble_Info
 		{
 			_timeOutPc = DateTime.UtcNow;
 			CpuName = string.Empty;
+			_mockService = new MockService();
+		}
+
+		public override IView GetSettingsView()
+		{
+			return (IView)(object)new SocialsSettingsView(new SocialsSettingsModel(SettingsManager.get_ModuleSettings(), "https://pastebin.com/raw/Kk9DgVmL"));
 		}
 
 		protected override async Task LoadAsync()
@@ -91,6 +109,7 @@ namespace Nekres.Mumble_Info
 		{
 			UpdateCounter();
 			UpdateCursorPos();
+			_mockService.Update();
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)
@@ -378,6 +397,7 @@ namespace Nekres.Mumble_Info
 
 		protected override void Unload()
 		{
+			_mockService?.Dispose();
 			DataPanel dataPanel = _dataPanel;
 			if (dataPanel != null)
 			{
@@ -395,7 +415,7 @@ namespace Nekres.Mumble_Info
 			GameService.Gw2Mumble.get_PlayerCharacter().remove_SpecializationChanged((EventHandler<ValueEventArgs<int>>)OnSpecializationChanged);
 			GameService.GameIntegration.get_Gw2Instance().remove_Gw2Closed((EventHandler<EventArgs>)OnGw2Closed);
 			GameService.GameIntegration.get_Gw2Instance().remove_Gw2Started((EventHandler<EventArgs>)OnGw2Started);
-			ModuleInstance = null;
+			Instance = null;
 		}
 	}
 }

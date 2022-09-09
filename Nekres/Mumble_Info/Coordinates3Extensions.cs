@@ -1,7 +1,8 @@
+using System.Numerics;
 using Gw2Sharp.Models;
 using Gw2Sharp.WebApi.V2.Models;
 
-namespace Nekres.Mumble_Info._Extensions
+namespace Nekres.Mumble_Info
 {
 	internal static class Coordinates3Extensions
 	{
@@ -71,6 +72,11 @@ namespace Nekres.Mumble_Info._Extensions
 			val = ((Rectangle)(ref continentRectangle)).get_TopRight();
 			double z = num3 + ((Coordinates2)(ref val)).get_Y();
 			return new Coordinates3(num2, ((Coordinates3)(ref mapCoords)).get_Y(), z);
+		}
+
+		public static Vector3 ToVector3(this Coordinates3 coords)
+		{
+			return new Vector3((float)((Coordinates3)(ref coords)).get_X(), (float)((Coordinates3)(ref coords)).get_Y(), (float)((Coordinates3)(ref coords)).get_Z());
 		}
 	}
 }
