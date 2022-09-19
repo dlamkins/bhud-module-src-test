@@ -9,7 +9,6 @@ using Kenedia.Modules.QoL.Strings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Extended;
 
 namespace Kenedia.Modules.QoL.SubModules
 {
@@ -108,18 +107,15 @@ namespace Kenedia.Modules.QoL.SubModules
 		public override void Initialize()
 		{
 			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
 			base.Initialize();
-			RectangleF tRect = GameService.Content.get_DefaultFont14().GetStringRectangle("7 Tage 00:00:00");
+			GameService.Content.get_DefaultFont14().GetStringRectangle("7 Tage 00:00:00");
 			CustomFlowPanel customFlowPanel = new CustomFlowPanel();
 			((Control)customFlowPanel).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((Control)customFlowPanel).set_Visible(base.Active);
-			((Control)customFlowPanel).set_Width((int)(tRect.Width + 6f + tRect.Height));
+			((Container)customFlowPanel).set_WidthSizingMode((SizingMode)1);
 			((Container)customFlowPanel).set_HeightSizingMode((SizingMode)1);
 			((FlowPanel)customFlowPanel).set_FlowDirection((ControlFlowDirection)0);
 			customFlowPanel.Background = QoL.ModuleInstance.TextureManager.getBackground(_Backgrounds.Tooltip);
