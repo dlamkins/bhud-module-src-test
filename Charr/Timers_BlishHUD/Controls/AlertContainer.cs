@@ -137,7 +137,19 @@ namespace Charr.Timers_BlishHUD.Controls
 				//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 				((Control)this).set_Location(args.get_NewValue());
 			});
+			TimersModule.ModuleInstance._hideAlertsSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate
+			{
+				if (!TimersModule.ModuleInstance._hideAlertsSetting.get_Value() && ((Container)this)._children.get_Count() > 0)
+				{
+					((Control)this).Show();
+				}
+				else
+				{
+					((Control)this).Hide();
+				}
+			});
 			((Control)this).set_BasicTooltipText(_locationLock ? "" : "Drag to move alert container.\nYou can lock it in place by going to the settings panel.");
+			((Control)this).set_Visible(false);
 		}
 
 		protected override void OnChildAdded(ChildChangedEventArgs e)
@@ -180,7 +192,7 @@ namespace Charr.Timers_BlishHUD.Controls
 
 		private void OnChildrenChanged(IEnumerable<Control> resultingChildren)
 		{
-			ReflowChildLayout(resultingChildren.ToArray());
+			((Control)this).RecalculateLayout();
 		}
 
 		public void FilterChildren<TControl>(Func<TControl, bool> filter) where TControl : Control
@@ -202,12 +214,23 @@ namespace Charr.Timers_BlishHUD.Controls
 
 		private void UpdateSizeToFitChildren()
 		{
-			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0171: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0254: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b3: Unknown result type (might be due to invalid IL or missing references)
+			if (((Container)this)._children.get_Count() == 0)
+			{
+				return;
+			}
 			float outerPadX = (_padLeftBeforeControl ? _controlPadding.X : _outerControlPadding.X);
 			float outerPadY = (_padTopBeforeControl ? _controlPadding.Y : _outerControlPadding.Y);
 			int newWidth = (int)((float)(((Container)this)._children.get_Count() * ((Container)this)._children.get_Item(0).get_Width()) + (float)(((Container)this)._children.get_Count() - 1) * _controlPadding.X + outerPadX * 2f);
@@ -223,7 +246,21 @@ namespace Charr.Timers_BlishHUD.Controls
 				((Control)this).set_Width((int)((float)((Container)this)._children.get_Item(0).get_Width() + outerPadX * 2f));
 				((Control)this).set_Height(newHeight);
 			}
-			RecalculateLocation();
+			switch (TimersModule.ModuleInstance._alertDisplayOrientationSetting.get_Value())
+			{
+			case AlertFlowDirection.LeftToRight:
+			case AlertFlowDirection.TopToBottom:
+				((Control)this).set_Location(TimersModule.ModuleInstance._alertContainerLocationSetting.get_Value());
+				break;
+			case AlertFlowDirection.RightToLeft:
+				((Control)this).set_Right(TimersModule.ModuleInstance._alertContainerLocationSetting.get_Value().X + TimersModule.ModuleInstance._alertContainerSizeSetting.get_Value().X);
+				((Control)this).set_Top(TimersModule.ModuleInstance._alertContainerLocationSetting.get_Value().Y);
+				break;
+			case AlertFlowDirection.BottomToTop:
+				((Control)this).set_Left(TimersModule.ModuleInstance._alertContainerLocationSetting.get_Value().X);
+				((Control)this).set_Bottom(TimersModule.ModuleInstance._alertContainerLocationSetting.get_Value().Y + TimersModule.ModuleInstance._alertContainerSizeSetting.get_Value().Y);
+				break;
+			}
 			if (FlowDirection == AlertFlowDirection.RightToLeft)
 			{
 				foreach (Control child in ((Container)this)._children)
@@ -317,38 +354,14 @@ namespace Charr.Timers_BlishHUD.Controls
 			if (((Container)this)._children.get_Count() == 0 || TimersModule.ModuleInstance._hideAlertsSetting.get_Value())
 			{
 				((Control)this).Hide();
-				return;
 			}
-			((Control)this).Show();
+			else
+			{
+				((Control)this).Show();
+			}
 			UpdateSizeToFitChildren();
 			ReflowChildLayout(((Container)this)._children.ToArray());
 			((Panel)this).RecalculateLayout();
-		}
-
-		protected void RecalculateLocation()
-		{
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-			switch (TimersModule.ModuleInstance._alertDisplayOrientationSetting.get_Value())
-			{
-			case AlertFlowDirection.LeftToRight:
-			case AlertFlowDirection.TopToBottom:
-				((Control)this).set_Location(TimersModule.ModuleInstance._alertContainerLocationSetting.get_Value());
-				break;
-			case AlertFlowDirection.RightToLeft:
-				((Control)this).set_Right(TimersModule.ModuleInstance._alertContainerLocationSetting.get_Value().X + TimersModule.ModuleInstance._alertContainerSizeSetting.get_Value().X);
-				((Control)this).set_Top(TimersModule.ModuleInstance._alertContainerLocationSetting.get_Value().Y);
-				break;
-			case AlertFlowDirection.BottomToTop:
-				((Control)this).set_Left(TimersModule.ModuleInstance._alertContainerLocationSetting.get_Value().X);
-				((Control)this).set_Bottom(TimersModule.ModuleInstance._alertContainerLocationSetting.get_Value().Y + TimersModule.ModuleInstance._alertContainerSizeSetting.get_Value().Y);
-				break;
-			}
 		}
 
 		protected override CaptureType CapturesInput()
@@ -373,7 +386,7 @@ namespace Charr.Timers_BlishHUD.Controls
 			((Control)this).OnLeftMouseButtonPressed(e);
 		}
 
-		public void HandleLeftMouseButtonReleased(MouseEventArgs e)
+		private void HandleLeftMouseButtonReleased(MouseEventArgs e)
 		{
 			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
