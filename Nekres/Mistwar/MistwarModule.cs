@@ -92,20 +92,23 @@ namespace Nekres.Mistwar
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010d: Expected O, but got Unknown
-			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0166: Expected O, but got Unknown
-			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bc: Expected O, but got Unknown
-			SettingCollection generalSettings = settings.AddSubCollection("General", true, false);
+			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0119: Expected O, but got Unknown
+			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0172: Expected O, but got Unknown
+			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c8: Expected O, but got Unknown
+			SettingCollection generalSettings = settings.AddSubCollection("General", false);
+			generalSettings.set_RenderInUi(true);
 			ColorTypeSetting = generalSettings.DefineSetting<ColorType>("ColorType", ColorType.Normal, (Func<string>)(() => "Color Type"), (Func<string>)(() => "Select a different color type if you have a color deficiency."));
 			TeamShapesSetting = generalSettings.DefineSetting<bool>("TeamShapes", true, (Func<string>)(() => "Team Shapes"), (Func<string>)(() => "Enables uniquely shaped objective markers per team."));
-			SettingCollection hotKeySettings = settings.AddSubCollection("Control Options", true, false);
+			SettingCollection hotKeySettings = settings.AddSubCollection("Control Options", false);
+			hotKeySettings.set_RenderInUi(true);
 			ToggleMapKeySetting = hotKeySettings.DefineSetting<KeyBinding>("ToggleKey", new KeyBinding((Keys)78), (Func<string>)(() => "Toggle Map"), (Func<string>)(() => "Key used to show and hide the strategic map."));
 			ToggleMarkersKeySetting = hotKeySettings.DefineSetting<KeyBinding>("ToggleMarkersKey", new KeyBinding((Keys)219), (Func<string>)(() => "Toggle Markers"), (Func<string>)(() => "Key used to show and hide the objective markers."));
 			ChatMessageKeySetting = hotKeySettings.DefineSetting<KeyBinding>("ChatMessageKey", new KeyBinding((Keys)13), (Func<string>)(() => "Chat Message"), (Func<string>)(() => "Give focus to the chat edit box."));
-			SettingCollection mapSettings = settings.AddSubCollection("Map", true, false);
+			SettingCollection mapSettings = settings.AddSubCollection("Map", false);
+			mapSettings.set_RenderInUi(true);
 			DrawSectorsSetting = mapSettings.DefineSetting<bool>("DrawSectors", true, (Func<string>)(() => "Show Sector Boundaries"), (Func<string>)(() => "Indicates if the sector boundaries should be drawn."));
 			DrawObjectiveNamesSetting = mapSettings.DefineSetting<bool>("DrawObjectiveNames", true, (Func<string>)(() => "Show Objective Names"), (Func<string>)(() => "Indicates if the names of the objectives should be drawn."));
 			DrawRuinMapSetting = mapSettings.DefineSetting<bool>("ShowRuins", true, (Func<string>)(() => "Show Ruins"), (Func<string>)(() => "Indicates if the ruins should be shown."));
@@ -114,6 +117,7 @@ namespace Nekres.Mistwar
 			ColorIntensitySetting = mapSettings.DefineSetting<float>("ColorIntensity", 80f, (Func<string>)(() => "Color Intensity"), (Func<string>)(() => "Intensity of the background color."));
 			ScaleRatioSetting = mapSettings.DefineSetting<float>("ScaleRatio", 80f, (Func<string>)(() => "Scale Ratio"), (Func<string>)(() => "Changes the size of the tactical map interface"));
 			SettingCollection markerSettings = settings.AddSubCollection("Markers", true, false);
+			markerSettings.set_RenderInUi(true);
 			EnableMarkersSetting = markerSettings.DefineSetting<bool>("EnableMarkers", true, (Func<string>)(() => "Enable Markers"), (Func<string>)(() => "Enables the markers overlay which shows objectives at their world position."));
 			HideAlliedMarkersSetting = markerSettings.DefineSetting<bool>("HideAlliedMarkers", false, (Func<string>)(() => "Hide Allied Objectives"), (Func<string>)(() => "Only hostile objectives will be shown."));
 			HideInCombatSetting = markerSettings.DefineSetting<bool>("HideInCombat", true, (Func<string>)(() => "Hide in Combat"), (Func<string>)(() => "Only the closest objective will be shown when in combat."));
