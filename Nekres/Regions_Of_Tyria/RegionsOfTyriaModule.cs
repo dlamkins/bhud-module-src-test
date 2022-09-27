@@ -44,6 +44,8 @@ namespace Nekres.Regions_Of_Tyria
 
 		private SettingEntry<bool> _includeMapInSectorNotification;
 
+		internal SettingEntry<float> VerticalPositionSetting;
+
 		private float _showDuration;
 
 		private float _fadeInDuration;
@@ -97,13 +99,20 @@ namespace Nekres.Regions_Of_Tyria
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			_showDurationSetting = settings.DefineSetting<float>("ShowDuration", 40f, (Func<string>)(() => "Show Duration"), (Func<string>)(() => "The duration in which to stay in full opacity."));
-			_fadeInDurationSetting = settings.DefineSetting<float>("FadeInDuration", 20f, (Func<string>)(() => "Fade-In Duration"), (Func<string>)(() => "The duration of the fade-in."));
-			_fadeOutDurationSetting = settings.DefineSetting<float>("FadeOutDuration", 20f, (Func<string>)(() => "Fade-Out Duration"), (Func<string>)(() => "The duration of the fade-out."));
-			_toggleMapNotificationSetting = settings.DefineSetting<bool>("EnableMapChangedNotification", true, (Func<string>)(() => "Notify Map Change"), (Func<string>)(() => "Whether a map's name should be shown when entering a map."));
-			_includeRegionInMapNotificationSetting = settings.DefineSetting<bool>("IncludeRegionInMapNotification", true, (Func<string>)(() => "Include Region Name in Map Notification"), (Func<string>)(() => "Whether the corresponding region name of a map should be shown above a map's name."));
-			_toggleSectorNotificationSetting = settings.DefineSetting<bool>("EnableSectorChangedNotification", true, (Func<string>)(() => "Notify Sector Change"), (Func<string>)(() => "Whether a sector's name should be shown when entering a sector."));
-			_includeMapInSectorNotification = settings.DefineSetting<bool>("IncludeMapInSectorNotification", true, (Func<string>)(() => "Include Map Name in Sector Notification"), (Func<string>)(() => "Whether the corresponding map name of a sector should be shown above a sector's name."));
+			SettingCollection toggleCol = settings.AddSubCollection("Toggles", false);
+			toggleCol.set_RenderInUi(true);
+			_toggleMapNotificationSetting = toggleCol.DefineSetting<bool>("EnableMapChangedNotification", true, (Func<string>)(() => "Notify Map Change"), (Func<string>)(() => "Whether a map's name should be shown when entering a map."));
+			_includeRegionInMapNotificationSetting = toggleCol.DefineSetting<bool>("IncludeRegionInMapNotification", true, (Func<string>)(() => "Include Region Name in Map Notification"), (Func<string>)(() => "Whether the corresponding region name of a map should be shown above a map's name."));
+			_toggleSectorNotificationSetting = toggleCol.DefineSetting<bool>("EnableSectorChangedNotification", true, (Func<string>)(() => "Notify Sector Change"), (Func<string>)(() => "Whether a sector's name should be shown when entering a sector."));
+			_includeMapInSectorNotification = toggleCol.DefineSetting<bool>("IncludeMapInSectorNotification", true, (Func<string>)(() => "Include Map Name in Sector Notification"), (Func<string>)(() => "Whether the corresponding map name of a sector should be shown above a sector's name."));
+			SettingCollection durationCol = settings.AddSubCollection("Durations", false);
+			durationCol.set_RenderInUi(true);
+			_showDurationSetting = durationCol.DefineSetting<float>("ShowDuration", 40f, (Func<string>)(() => "Show Duration"), (Func<string>)(() => "The duration in which to stay in full opacity."));
+			_fadeInDurationSetting = durationCol.DefineSetting<float>("FadeInDuration", 20f, (Func<string>)(() => "Fade-In Duration"), (Func<string>)(() => "The duration of the fade-in."));
+			_fadeOutDurationSetting = durationCol.DefineSetting<float>("FadeOutDuration", 20f, (Func<string>)(() => "Fade-Out Duration"), (Func<string>)(() => "The duration of the fade-out."));
+			SettingCollection positionCol = settings.AddSubCollection("Position", false);
+			positionCol.set_RenderInUi(true);
+			VerticalPositionSetting = positionCol.DefineSetting<float>("pos_y", 30f, (Func<string>)(() => "Vertical Position"), (Func<string>)(() => "Sets the vertical position of area notifications."));
 		}
 
 		protected override void Initialize()
@@ -119,9 +128,9 @@ namespace Nekres.Regions_Of_Tyria
 
 		protected override async void Update(GameTime gameTime)
 		{
-			if (!(gameTime.get_TotalGameTime().TotalMilliseconds - _lastRun < 10.0) && !(DateTime.UtcNow.Subtract(_lastUpdate).TotalMilliseconds < 1000.0) && _toggleSectorNotificationSetting.get_Value() && GameService.Gw2Mumble.get_IsAvailable() && GameService.GameIntegration.get_Gw2Instance().get_IsInGame())
+			if (!(gameTime.TotalGameTime.TotalMilliseconds - _lastRun < 10.0) && !(DateTime.UtcNow.Subtract(_lastUpdate).TotalMilliseconds < 1000.0) && _toggleSectorNotificationSetting.get_Value() && GameService.Gw2Mumble.get_IsAvailable() && GameService.GameIntegration.get_Gw2Instance().get_IsInGame())
 			{
-				_lastRun = gameTime.get_ElapsedGameTime().TotalMilliseconds;
+				_lastRun = gameTime.ElapsedGameTime.TotalMilliseconds;
 				_lastUpdate = DateTime.UtcNow;
 				Map currentMap = await _mapRepository.GetItem(GameService.Gw2Mumble.get_CurrentMap().get_Id());
 				Sector currentSector = await GetSector(currentMap);

@@ -6,6 +6,7 @@ using Blish_HUD.Controls;
 using Glide;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
 using MonoGame.Extended.BitmapFonts;
 
 namespace Nekres.Regions_Of_Tyria.UI.Controls
@@ -112,8 +113,6 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 
 		static MapNotification()
 		{
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 			_lastNotificationTime = DateTime.Now;
 			ActiveMapNotifications = new SynchronizedCollection<MapNotification>();
 			SmallFont = Control.get_Content().GetFont((FontFace)0, (FontSize)24, (FontStyle)0);
@@ -124,10 +123,6 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 		private MapNotification(string header, string text, float showDuration = 4f, float fadeInDuration = 2f, float fadeOutDuration = 2f)
 			: this()
 		{
-			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
 			_showDuration = showDuration;
 			_fadeInDuration = fadeInDuration;
 			_fadeOutDuration = fadeOutDuration;
@@ -135,19 +130,17 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 			Header = header;
 			((Control)this).set_ClipsBounds(true);
 			((Control)this).set_Opacity(0f);
-			((Control)this).set_Size(new Point(1000, 1000));
+			((Control)this).set_Size(new Point(((Control)GameService.Graphics.get_SpriteScreen()).get_Width(), ((Control)GameService.Graphics.get_SpriteScreen()).get_Height()));
 			((Control)this).set_ZIndex(30);
-			((Control)this).set_Location(new Point(((Control)Control.get_Graphics().get_SpriteScreen()).get_Width() / 2 - ((Control)this).get_Size().X / 2, ((Control)Control.get_Graphics().get_SpriteScreen()).get_Height() / 4 - ((Control)this).get_Size().Y / 4));
+			((Control)this).set_Location(new Point(0, 0));
 			_targetTop = ((Control)this).get_Top();
-			((Control)this).add_Resized((EventHandler<ResizedEventArgs>)UpdateLocation);
+			((Control)GameService.Graphics.get_SpriteScreen()).add_Resized((EventHandler<ResizedEventArgs>)UpdateLocation);
 		}
 
-		public void UpdateLocation(object o, ResizedEventArgs e)
+		private void UpdateLocation(object o, ResizedEventArgs e)
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).set_Location(new Point(((Control)Control.get_Graphics().get_SpriteScreen()).get_Width() / 2 - ((Control)this).get_Size().X / 2, ((Control)Control.get_Graphics().get_SpriteScreen()).get_Height() / 4 - ((Control)this).get_Size().Y / 2));
+			((Control)this).set_Size(new Point(((Control)GameService.Graphics.get_SpriteScreen()).get_Width(), ((Control)GameService.Graphics.get_SpriteScreen()).get_Height()));
+			((Control)this).set_Location(new Point(0, 0));
 		}
 
 		protected override CaptureType CapturesInput()
@@ -157,47 +150,22 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0158: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0193: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
-			int height = 0;
-			Rectangle rect = Rectangle.get_Empty();
+			int height = (int)(RegionsOfTyriaModule.ModuleInstance.VerticalPositionSetting.get_Value() / 100f * (float)bounds.Height);
 			if (!string.IsNullOrEmpty(Header) && !Header.Equals(Text, StringComparison.InvariantCultureIgnoreCase))
 			{
-				int width = 0;
 				foreach (string headerLine in _headerLines)
 				{
-					width = (int)SmallFont.MeasureString(headerLine).Width;
-					rect = new Rectangle(0, 20 + height, bounds.Width, bounds.Height);
-					height += SmallFont.get_LetterSpacing() + (int)SmallFont.MeasureString(headerLine).Height;
+					Size2 size = SmallFont.MeasureString(headerLine);
+					int lineWidth = (int)size.Width;
+					int lineHeight = (int)size.Height;
+					Rectangle rect = new Rectangle(0, 20 + height, bounds.Width, bounds.Height);
+					height += SmallFont.LetterSpacing + lineHeight;
 					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, headerLine, SmallFont, rect, BrightGold, false, true, 1, (HorizontalAlignment)1, (VerticalAlignment)0);
+					rect = new Rectangle((bounds.Width - (lineWidth + 2)) / 2, rect.Y + lineHeight + 2, lineWidth + 2, 3);
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), rect, Color.Black * 0.8f);
+					rect = new Rectangle(rect.X + 1, rect.Y + 1, lineWidth, 1);
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), rect, BrightGold);
 				}
-				((Rectangle)(ref rect))._002Ector(((Control)this).get_Size().X / 2 - width / 2 - 1, rect.Y + height + 2, width + 2, 3);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), rect, new Color(0, 0, 0, 200));
-				((Rectangle)(ref rect))._002Ector(rect.X + 1, rect.Y + 1, width, 1);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), rect, BrightGold);
 				height += 20;
 			}
 			if (string.IsNullOrEmpty(Text))
@@ -206,8 +174,8 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 			}
 			foreach (string textLine in _textLines)
 			{
-				rect = new Rectangle(0, 20 + height, bounds.Width, bounds.Height);
-				height += MediumFont.get_LetterSpacing() + (int)MediumFont.MeasureString(textLine).Height;
+				Rectangle rect = new Rectangle(0, 20 + height, bounds.Width, bounds.Height);
+				height += MediumFont.LetterSpacing + (int)MediumFont.MeasureString(textLine).Height;
 				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, textLine, MediumFont, rect, BrightGold, false, true, 1, (HorizontalAlignment)1, (VerticalAlignment)0);
 			}
 		}
@@ -252,6 +220,7 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 		protected override void DisposeControl()
 		{
 			ActiveMapNotifications.Remove(this);
+			((Control)GameService.Graphics.get_SpriteScreen()).remove_Resized((EventHandler<ResizedEventArgs>)UpdateLocation);
 			((Container)this).DisposeControl();
 		}
 
@@ -268,7 +237,7 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 			((Control)nNot).set_ZIndex(ActiveMapNotifications.DefaultIfEmpty(nNot).Max((MapNotification n) => ((Control)n).get_ZIndex()) + 1);
 			foreach (MapNotification activeMapNotification in ActiveMapNotifications)
 			{
-				activeMapNotification.SlideDown((int)((float)(SmallFont.get_LineHeight() + MediumFont.get_LineHeight()) + 21f));
+				activeMapNotification.SlideDown((int)((float)(SmallFont.LineHeight + MediumFont.LineHeight) + 21f));
 			}
 			ActiveMapNotifications.Add(nNot);
 			((Control)nNot).Show();
