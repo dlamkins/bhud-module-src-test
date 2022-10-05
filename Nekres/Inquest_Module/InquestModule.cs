@@ -68,28 +68,32 @@ namespace Nekres.Inquest_Module
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Expected O, but got Unknown
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Expected O, but got Unknown
-			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0112: Expected O, but got Unknown
-			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0176: Expected O, but got Unknown
-			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cc: Expected O, but got Unknown
-			SettingCollection hotkeys = settings.AddSubCollection("Control Options", true, false);
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0068: Expected O, but got Unknown
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c1: Expected O, but got Unknown
+			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0118: Expected O, but got Unknown
+			//IL_013a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0182: Expected O, but got Unknown
+			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d8: Expected O, but got Unknown
+			SettingCollection hotkeys = settings.AddSubCollection("Control Options", false);
+			hotkeys.set_RenderInUi(true);
 			AutoClickHoldKeySetting = hotkeys.DefineSetting<KeyBinding>("autoClickHoldKeyBinding", new KeyBinding((Keys)188), (Func<string>)(() => "Hold Double Clicking"), (Func<string>)(() => "Perform Double Clicks at the current cursor position while the key is being pressed."));
 			AutoClickToggleKeySetting = hotkeys.DefineSetting<KeyBinding>("autoClickToggleKeyBinding", new KeyBinding((Keys)219), (Func<string>)(() => "Toggle Double Clicking"), (Func<string>)(() => "Perform Double Clicks in an interval at the position of the cursor at the time of pressing the key."));
 			DodgeJumpKeyBindingSetting = hotkeys.DefineSetting<KeyBinding>("dodgeJumpKeyBinding", new KeyBinding((ModifierKeys)1, (Keys)32), (Func<string>)(() => "Dodge-Jump"), (Func<string>)(() => "Perform a dodge roll and a jump simultaneously."));
-			SettingCollection controlOptions = hotkeys.AddSubCollection("Movement Keys to Trigger on Dodge-Jump", true, false);
+			SettingCollection controlOptions = hotkeys.AddSubCollection("Movement Keys to Trigger on Dodge-Jump", false);
+			controlOptions.set_RenderInUi(true);
 			DodgeKeyBindingSetting = controlOptions.DefineSetting<KeyBinding>("dodgeKeyBinding", new KeyBinding((Keys)86), (Func<string>)(() => "Dodge"), (Func<string>)(() => "Do an evasive dodge roll, negating damage, in the direction your character is moving (backward if stationary)."));
 			JumpKeyBindingSetting = controlOptions.DefineSetting<KeyBinding>("jumpKeyBinding", new KeyBinding((Keys)32), (Func<string>)(() => "Jump"), (Func<string>)(() => "Press to jump over obstacles."));
 			HoldKeyWithLeftClickEnabledSetting = hotkeys.DefineSetting<bool>("holdKeyWithLeftClick", false, (Func<string>)(() => "Hold Double Clicking + Left Mouse Button"), (Func<string>)(() => "Perform Double clicks at the current cursor position while Hold Double Clicking and Left Mouse Button is being pressed."));
-			SettingCollection audio = settings.AddSubCollection("Sound Options", true, false);
+			SettingCollection audio = settings.AddSubCollection("Sound Options", false);
+			audio.set_RenderInUi(true);
 			AutoClickSoundDisabledSetting = audio.DefineSetting<bool>("autoClickSoundsDisabled", false, (Func<string>)(() => "Disable Clicking Sounds"), (Func<string>)(() => "Disables the sound alert when an auto click is performed."));
 			AutoClickSoundVolume = audio.DefineSetting<float>("autoClickSoundsVolume", 80f, (Func<string>)(() => "Clicking Sounds Volume"), (Func<string>)(() => "Sets the audio volume of the clicking alerts."));
-			SettingCollection hiddenSettingsCache = settings.AddSubCollection("hiddenSettingsCache", false, false);
+			SettingCollection hiddenSettingsCache = settings.AddSubCollection("hiddenSettingsCache", false);
+			hiddenSettingsCache.set_RenderInUi(true);
 			AutoClickToggleInterval = hiddenSettingsCache.DefineSetting<double>("autoClickToggleInterval", 0.0, (Func<string>)null, (Func<string>)null);
 		}
 
