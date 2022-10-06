@@ -184,7 +184,7 @@ namespace Ideka.RacingMeter
 
 		public void PopulateLeaderboard(bool force = false)
 		{
-			//IL_01b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
 			FullGhost ghost = Ghost;
 			if (ghost != null && !ghost.IsLocal)
 			{
@@ -224,13 +224,15 @@ namespace Ideka.RacingMeter
 				place2.Deconstruct(out var key, out var value);
 				int place = key;
 				MetaGhost meta = value;
-				MenuItem item = _ghostsMenu.AddMenuItem($"{place + 1}. {meta.Time.Formatted()} - {meta.AccountName}", (Texture2D)null);
+				OnelineMenuItem onelineMenuItem = new OnelineMenuItem($"{place + 1}. {meta.Time.Formatted()} - {meta.AccountName}");
+				((Control)onelineMenuItem).set_Parent((Container)(object)_ghostsMenu);
+				((Control)onelineMenuItem).set_BasicTooltipText(meta.AccountName);
+				OnelineMenuItem item = onelineMenuItem;
 				if (RacingModule.Server.User?.AccountId == meta.UserId)
 				{
 					((Control)item).set_BackgroundColor(SelfBoardColor);
 				}
-				((Control)item).set_BasicTooltipText(meta.AccountName);
-				item.add_ItemSelected((EventHandler<ControlActivatedEventArgs>)delegate
+				((MenuItem)item).add_ItemSelected((EventHandler<ControlActivatedEventArgs>)delegate
 				{
 					MenuItem selectedMenuItem = _localGhostsMenu.get_SelectedMenuItem();
 					if (selectedMenuItem != null)

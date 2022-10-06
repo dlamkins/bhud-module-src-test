@@ -574,13 +574,13 @@ namespace Ideka.RacingMeter
 				RacePoint preview = ((_pointPreview.point == point) ? _pointPreview.preview : point);
 				if (selected)
 				{
-					ShapeExtensions.DrawCircle(spriteBatch, map.Locate(base.Race.MapId, preview.Position), 20f, 4, color, 2f, 0f);
+					ShapeExtensions.DrawCircle(spriteBatch, map.FromWorld(base.Race.MapId, preview.Position), 20f, 4, color, 2f, 0f);
 				}
 				else
 				{
 					DrawMapRacePoint(spriteBatch, map, preview, color);
 				}
-				DrawText(spriteBatch, map.Locate(base.Race.MapId, preview.Position), Control.get_Content().get_DefaultFont14(), Color.get_White(), text);
+				DrawText(spriteBatch, map.FromWorld(base.Race.MapId, preview.Position), Control.get_Content().get_DefaultFont14(), Color.get_White(), text);
 			}
 		}
 

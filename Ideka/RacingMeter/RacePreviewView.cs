@@ -11,6 +11,7 @@ using Ideka.RacingMeterLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended;
 
 namespace Ideka.RacingMeter
 {
@@ -25,7 +26,7 @@ namespace Ideka.RacingMeter
 				_view = view;
 			}
 
-			public override Vector2 Locate(int mapId, Vector3 worldMeters)
+			public override Vector2 FromWorld(int mapId, Vector3 worldMeters)
 			{
 				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0008: Unknown result type (might be due to invalid IL or missing references)
@@ -38,7 +39,23 @@ namespace Ideka.RacingMeter
 				float scale = _view.Scale;
 				Matrix identity = Matrix.get_Identity();
 				Point center = base.Center;
-				return MapOverlay.Data.ToMap(mapId, worldMeters, mapCenter, scale, identity, ((Point)(ref center)).ToVector2());
+				return MapOverlay.Data.WorldToMapScreen(mapId, worldMeters, mapCenter, scale, identity, ((Point)(ref center)).ToVector2());
+			}
+
+			public override Vector2 FromMap(Vector2 mapCoords)
+			{
+				//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+				//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+				//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+				Vector2 mapCenter = _view.MapCenter;
+				float scale = _view.Scale;
+				Matrix identity = Matrix.get_Identity();
+				Point center = base.Center;
+				return MapOverlay.Data.MapToMapScreen(mapCoords, mapCenter, scale, identity, ((Point)(ref center)).ToVector2());
 			}
 		}
 
@@ -61,6 +78,8 @@ namespace Ideka.RacingMeter
 		private Tween _moveAnimation;
 
 		private Tween _zoomAnimation;
+
+		private readonly HashSet<Map> _maps;
 
 		private readonly PreviewBounds _bounds;
 
@@ -254,9 +273,13 @@ namespace Ideka.RacingMeter
 		public RacePreviewView()
 			: base(screenMap: false)
 		{
+			_maps = new HashSet<Map>();
 			_bounds = new PreviewBounds(this);
+			RacingModule.Server.RemoteRacesChanged += RemoteRacesChanged;
+			RacingModule.Racer.LocalRacesChanged += new Action(LocalRacesChanged);
 			Control.get_Input().get_Mouse().add_MouseMoved((EventHandler<MouseEventArgs>)MouseMoved);
 			Control.get_Input().get_Mouse().add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)LeftMouseButtonReleased);
+			RepopulateMaps();
 		}
 
 		protected override CaptureType CapturesInput()
@@ -342,6 +365,19 @@ namespace Ideka.RacingMeter
 			_dragStart = null;
 		}
 
+		private void RepopulateMaps()
+		{
+			_maps.Clear();
+			foreach (int mapId in new HashSet<int>(RacingModule.Server.RemoteRaces.Races.Values.Select((FullRace r) => r.Race.MapId).Concat(DataInterface.GetLocalRaces().Values.Select((FullRace r) => r.Race.MapId))))
+			{
+				Map map = RacingModule.MapData.GetMap(mapId);
+				if (map != null)
+				{
+					_maps.Add(map);
+				}
+			}
+		}
+
 		protected override void OnLeftMouseButtonPressed(MouseEventArgs e)
 		{
 			((Control)this).OnLeftMouseButtonPressed(e);
@@ -367,6 +403,14 @@ namespace Ideka.RacingMeter
 
 		public override void DrawToMap(SpriteBatch spriteBatch, MapBounds map)
 		{
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			foreach (Map data in _maps)
+			{
+				ShapeExtensions.DrawRectangle(spriteBatch, RectangleF.op_Implicit(map.FromMap(data.get_ContinentRect())), Color.get_Black(), 1f, 0f);
+			}
 			if (base.Race != null)
 			{
 				DrawMapLine(spriteBatch, map);
@@ -375,6 +419,16 @@ namespace Ideka.RacingMeter
 					DrawGhost(spriteBatch, map, Ghost.SnapshotAt(GhostProgress));
 				}
 			}
+		}
+
+		private void RemoteRacesChanged(RemoteRaces _)
+		{
+			RepopulateMaps();
+		}
+
+		private void LocalRacesChanged()
+		{
+			RepopulateMaps();
 		}
 
 		private void MouseMoved(object sender, MouseEventArgs e)
@@ -389,6 +443,8 @@ namespace Ideka.RacingMeter
 
 		protected override void DisposeControl()
 		{
+			RacingModule.Server.RemoteRacesChanged -= RemoteRacesChanged;
+			RacingModule.Racer.LocalRacesChanged -= new Action(LocalRacesChanged);
 			Control.get_Input().get_Mouse().remove_MouseMoved((EventHandler<MouseEventArgs>)MouseMoved);
 			Control.get_Input().get_Mouse().remove_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)LeftMouseButtonReleased);
 			base.DisposeControl();

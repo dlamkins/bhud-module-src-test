@@ -170,10 +170,6 @@ namespace Ideka.RacingMeter
 
 		private void PopulateRemoteRaces(IEnumerable<FullRace> races)
 		{
-			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0216: Expected O, but got Unknown
 			FullRace race2 = Race;
 			string oldId = ((race2 != null && !race2.IsLocal) ? Race.Meta.Id : null);
 			if (oldId != null)
@@ -198,19 +194,24 @@ namespace Ideka.RacingMeter
 				select r)
 			{
 				IGrouping<int, FullRace> group = item.Item2;
-				MenuItem val2 = (_remoteRaceMaps[group.Key] = _racesMenu.AddMenuItem(RacingModule.MapData.Describe(group.Key), (Texture2D)null));
-				MenuItem mapItem = val2;
+				Dictionary<int, MenuItem> remoteRaceMaps = _remoteRaceMaps;
+				int key = group.Key;
+				OnelineMenuItem onelineMenuItem = new OnelineMenuItem(RacingModule.MapData.Describe(group.Key));
+				((Control)onelineMenuItem).set_Parent((Container)(object)_racesMenu);
+				MenuItem val = (MenuItem)(object)onelineMenuItem;
+				remoteRaceMaps[key] = (MenuItem)(object)onelineMenuItem;
+				MenuItem mapItem = val;
 				((Control)mapItem).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
 					SaveScroll(2);
 				});
 				foreach (FullRace race in group.OrderBy((FullRace r) => r.Race.Name))
 				{
-					MenuItem val3 = new MenuItem("  " + race.Race.Name);
-					((Control)val3).set_Parent((Container)(object)mapItem);
-					((Control)val3).set_BasicTooltipText(race.Race.Name);
-					MenuItem raceItem = val3;
-					raceItem.add_ItemSelected((EventHandler<ControlActivatedEventArgs>)delegate
+					OnelineMenuItem onelineMenuItem2 = new OnelineMenuItem("  " + race.Race.Name);
+					((Control)onelineMenuItem2).set_Parent((Container)(object)mapItem);
+					((Control)onelineMenuItem2).set_BasicTooltipText(race.Race.Name);
+					OnelineMenuItem raceItem = onelineMenuItem2;
+					((MenuItem)raceItem).add_ItemSelected((EventHandler<ControlActivatedEventArgs>)delegate
 					{
 						MenuItem selectedMenuItem = _localRacesMenu.get_SelectedMenuItem();
 						if (selectedMenuItem != null)
@@ -221,7 +222,7 @@ namespace Ideka.RacingMeter
 					});
 					if (race.Meta.Id == oldId)
 					{
-						_localRacesMenu.Select(raceItem);
+						_localRacesMenu.Select((MenuItem)(object)raceItem);
 					}
 				}
 			}
@@ -229,10 +230,6 @@ namespace Ideka.RacingMeter
 
 		private void PopulateLocalRaces()
 		{
-			//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0200: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0208: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0221: Expected O, but got Unknown
 			string oldId = ((Race?.IsLocal ?? false) ? Race.Meta.Id : null);
 			if (oldId != null)
 			{
@@ -257,19 +254,24 @@ namespace Ideka.RacingMeter
 				select r)
 			{
 				IGrouping<int, FullRace> group = item.Item2;
-				MenuItem val2 = (_localRaceMaps[group.Key] = _localRacesMenu.AddMenuItem(RacingModule.MapData.Describe(group.Key), (Texture2D)null));
-				MenuItem mapItem = val2;
+				Dictionary<int, MenuItem> localRaceMaps = _localRaceMaps;
+				int key = group.Key;
+				OnelineMenuItem onelineMenuItem = new OnelineMenuItem(RacingModule.MapData.Describe(group.Key));
+				((Control)onelineMenuItem).set_Parent((Container)(object)_localRacesMenu);
+				MenuItem val = (MenuItem)(object)onelineMenuItem;
+				localRaceMaps[key] = (MenuItem)(object)onelineMenuItem;
+				MenuItem mapItem = val;
 				((Control)mapItem).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
 					SaveScroll(2);
 				});
 				foreach (FullRace race in group.OrderBy((FullRace r) => r.Race.Name))
 				{
-					MenuItem val3 = new MenuItem("  " + race.Race.Name);
-					((Control)val3).set_Parent((Container)(object)mapItem);
-					((Control)val3).set_BasicTooltipText(race.Race.Name);
-					MenuItem raceItem = val3;
-					raceItem.add_ItemSelected((EventHandler<ControlActivatedEventArgs>)delegate
+					OnelineMenuItem onelineMenuItem2 = new OnelineMenuItem("  " + race.Race.Name);
+					((Control)onelineMenuItem2).set_Parent((Container)(object)mapItem);
+					((Control)onelineMenuItem2).set_BasicTooltipText(race.Race.Name);
+					OnelineMenuItem raceItem = onelineMenuItem2;
+					((MenuItem)raceItem).add_ItemSelected((EventHandler<ControlActivatedEventArgs>)delegate
 					{
 						MenuItem selectedMenuItem = _racesMenu.get_SelectedMenuItem();
 						if (selectedMenuItem != null)
@@ -280,7 +282,7 @@ namespace Ideka.RacingMeter
 					});
 					if (race.Meta.Id == oldId)
 					{
-						_localRacesMenu.Select(raceItem);
+						_localRacesMenu.Select((MenuItem)(object)raceItem);
 					}
 				}
 			}

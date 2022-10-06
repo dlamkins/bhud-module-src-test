@@ -190,7 +190,7 @@ namespace Ideka.RacingMeter
 			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			DrawMapRacePoint(spriteBatch, map.Locate(Race.MapId, point.Position), color, radius);
+			DrawMapRacePoint(spriteBatch, map.FromWorld(Race.MapId, point.Position), color, radius);
 		}
 
 		public void DrawMapEdgeRacePoint(SpriteBatch spriteBatch, MapBounds map, RacePoint point, Color color, float radius = 10f)
@@ -204,7 +204,7 @@ namespace Ideka.RacingMeter
 			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			Vector2 pos = map.Locate(Race.MapId, point.Position);
+			Vector2 pos = map.FromWorld(Race.MapId, point.Position);
 			if (map.Contains(pos))
 			{
 				DrawMapRacePoint(spriteBatch, map, point, color, radius);
@@ -219,7 +219,7 @@ namespace Ideka.RacingMeter
 		{
 			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			spriteBatch.DrawPolygon(Vector2.get_Zero(), Race.RoadPoints.Select((RacePoint c) => map.Locate(Race.MapId, c.Position)), CheckpointColor, 2f, 0f, open: true);
+			spriteBatch.DrawPolygon(Vector2.get_Zero(), Race.RoadPoints.Select((RacePoint c) => map.FromWorld(Race.MapId, c.Position)), CheckpointColor, 2f, 0f, open: true);
 		}
 
 		public void DrawGhost(SpriteBatch spriteBatch, MapBounds map, GhostSnapshot snapshot)
@@ -246,7 +246,7 @@ namespace Ideka.RacingMeter
 			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
 			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
 			Matrix trs = Matrix.CreateScale(10f) * Matrix.CreateRotationZ((float)(Math.Atan2(snapshot.Front.X, snapshot.Front.Y) + Math.PI));
-			Vector2 position = map.Locate(Race.MapId, snapshot.Position);
+			Vector2 position = map.FromWorld(Race.MapId, snapshot.Position);
 			spriteBatch.DrawPolygon(position, GhostA.Transformed(trs).Flat(), color, 2f);
 			spriteBatch.DrawPolygon(position, GhostB.Transformed(trs).Flat(), color, 2f);
 		}
