@@ -76,6 +76,8 @@ namespace RaidClears.Settings
 			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.RaidPanelWingLabelsSetting, (Container)(object)layoutFlowPanel, singleColumnWidth);
 			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.RaidPanelWingLabelOpacity, (Container)(object)layoutFlowPanel, singleColumnWidth);
 			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.RaidPanelEncounterOpacity, (Container)(object)layoutFlowPanel, singleColumnWidth);
+			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.RaidPanelHighlightEmbolden, (Container)(object)layoutFlowPanel, singleColumnWidth);
+			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.RaidPanelHighlightCotM, (Container)(object)layoutFlowPanel, singleColumnWidth);
 			FlowPanel wingSelectionFlowPanel = CreateSettingsGroupFlowPanel("Wing Selection", (Container)(object)raidsSettingFlowPanel);
 			((Panel)wingSelectionFlowPanel).set_CanCollapse(true);
 			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.W1IsVisibleSetting, (Container)(object)wingSelectionFlowPanel, singleColumnWidth);

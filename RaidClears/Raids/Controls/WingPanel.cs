@@ -44,7 +44,7 @@ namespace RaidClears.Raids.Controls
 			((Container)this).set_WidthSizingMode((SizingMode)1);
 			Label val = new Label();
 			val.set_AutoSizeHeight(true);
-			((Control)val).set_BasicTooltipText(wing.name);
+			((Control)val).set_BasicTooltipText(GetWingTooltip());
 			val.set_HorizontalAlignment(WingLabelAlignment());
 			((Control)val).set_Parent((Container)(object)this);
 			val.set_Text(GetWingLabelText());
@@ -64,6 +64,19 @@ namespace RaidClears.Raids.Controls
 			SetOrientation(orientation);
 			SetLabelDisplay(label);
 			SetFontSize(fontSize);
+		}
+
+		public string GetWingTooltip()
+		{
+			if (_wing.isCallOfTheMist)
+			{
+				return "(Call of the Mists) " + _wing.name;
+			}
+			if (_wing.isEmboldened)
+			{
+				return "(Emboldened) " + _wing.name;
+			}
+			return _wing.name;
 		}
 
 		public string GetWingLabelText()
@@ -125,6 +138,21 @@ namespace RaidClears.Raids.Controls
 				((Control)_wingLabelObj).Show();
 			}
 			((Control)this).Invalidate();
+		}
+
+		public void SetHighlightColor(Color color)
+		{
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+			((Container)this).get_Children().ToList().ForEach(delegate(Control elem)
+			{
+				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+				Label val = (Label)(object)((elem is Label) ? elem : null);
+				if (val != null)
+				{
+					val.set_TextColor(color);
+				}
+			});
 		}
 
 		public void SetFontSize(FontSize fontSize)

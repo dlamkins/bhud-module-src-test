@@ -12,6 +12,10 @@ namespace RaidClears.Raids.Model
 
 		public Encounter[] encounters;
 
+		public bool isEmboldened;
+
+		public bool isCallOfTheMist;
+
 		private WingPanel _wingPanel;
 
 		public Wing(string name, int index, string shortName, Encounter[] encounters)
@@ -20,6 +24,8 @@ namespace RaidClears.Raids.Model
 			this.index = index;
 			this.shortName = shortName;
 			this.encounters = encounters;
+			isEmboldened = false;
+			isCallOfTheMist = false;
 		}
 
 		public void SetWingPanelReference(WingPanel panel)
@@ -30,6 +36,16 @@ namespace RaidClears.Raids.Model
 		public WingPanel GetWingPanelReference()
 		{
 			return _wingPanel;
+		}
+
+		public void setEmboldened(bool embolden)
+		{
+			isEmboldened = embolden;
+		}
+
+		public void setCallOfTheMist(bool call)
+		{
+			isCallOfTheMist = call;
 		}
 
 		public static Wing[] GetWingMetaData()

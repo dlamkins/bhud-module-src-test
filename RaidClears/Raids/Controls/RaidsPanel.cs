@@ -5,6 +5,7 @@ using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using RaidClears.Raids.Model;
+using RaidClears.Raids.Services;
 using RaidClears.Settings;
 using Settings.Enums;
 
@@ -22,6 +23,10 @@ namespace RaidClears.Raids.Controls
 
 		private Point _dragStart = Point.get_Zero();
 
+		private Color CallOfTheMistColor = new Color(243, 245, 39, 10);
+
+		private Color EmboldenColor = new Color(80, 80, 255, 10);
+
 		private bool _ignoreMouseInput;
 
 		public bool IgnoreMouseInput
@@ -36,14 +41,18 @@ namespace RaidClears.Raids.Controls
 			}
 		}
 
-		public RaidsPanel(Logger logger, SettingService settingService, Wing[] wings)
+		public RaidsPanel(Logger logger, SettingService settingService, Wing[] wings, WingRotationService wingRotation)
 			: this()
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
 			_logger = logger;
 			_wings = wings;
 			_settingService = settingService;
@@ -55,6 +64,9 @@ namespace RaidClears.Raids.Controls
 			((Control)this).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((Container)this).set_HeightSizingMode((SizingMode)1);
 			((Container)this).set_WidthSizingMode((SizingMode)1);
+			var (embolden, callOfMist) = wingRotation.getHighlightedWingIndices();
+			wings[embolden].setEmboldened(embolden: true);
+			wings[callOfMist].setCallOfTheMist(call: true);
 			CreateWings(wings);
 			settingService.RaidPanelLocationPoint.add_SettingChanged((EventHandler<ValueChangedEventArgs<Point>>)delegate(object s, ValueChangedEventArgs<Point> e)
 			{
@@ -118,8 +130,18 @@ namespace RaidClears.Raids.Controls
 			{
 				WingVisibilityChanged(6, e.get_PreviousValue(), e.get_NewValue());
 			});
+			settingService.RaidPanelHighlightEmbolden.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object s, ValueChangedEventArgs<bool> e)
+			{
+				EmboldenChanged(embolden, e.get_NewValue());
+			});
+			settingService.RaidPanelHighlightCotM.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object s, ValueChangedEventArgs<bool> e)
+			{
+				CotMChanged(callOfMist, e.get_NewValue());
+			});
 			WingLabelOpacityChanged(settingService.RaidPanelWingLabelOpacity.get_Value());
 			EncounterOpacityChanged(settingService.RaidPanelEncounterOpacity.get_Value());
+			EmboldenChanged(embolden, settingService.RaidPanelHighlightEmbolden.get_Value());
+			CotMChanged(callOfMist, settingService.RaidPanelHighlightCotM.get_Value());
 			AddDragDelegates();
 		}
 
@@ -127,6 +149,20 @@ namespace RaidClears.Raids.Controls
 		{
 			_wings[wingIndex].GetWingPanelReference().ShowHide(now);
 			((Control)this).Invalidate();
+		}
+
+		protected void EmboldenChanged(int wingIndex, bool highlight)
+		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			_wings[wingIndex].GetWingPanelReference().SetHighlightColor(highlight ? EmboldenColor : Color.get_White());
+		}
+
+		protected void CotMChanged(int wingIndex, bool highlight)
+		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			_wings[wingIndex].GetWingPanelReference().SetHighlightColor(highlight ? CallOfTheMistColor : Color.get_White());
 		}
 
 		protected ControlFlowDirection GetFlowDirection()

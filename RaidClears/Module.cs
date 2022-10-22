@@ -36,6 +36,8 @@ namespace RaidClears
 
 		private TextureService _textureService;
 
+		private WingRotationService _wingRotationService;
+
 		private SettingService _settingService;
 
 		private CornerIconService _cornerIconService;
@@ -73,7 +75,8 @@ namespace RaidClears
 		protected override async Task LoadAsync()
 		{
 			_textureService = new TextureService(ContentsManager);
-			_raidsPanel = new RaidsPanel(Logger, _settingService, Wing.GetWingMetaData());
+			_wingRotationService = new WingRotationService();
+			_raidsPanel = new RaidsPanel(Logger, _settingService, Wing.GetWingMetaData(), _wingRotationService);
 			_dungeonsPanel = new DungeonsPanel(Logger, _settingService, Dungeon.GetDungeonMetaData());
 			_dungeonsPanel.UpdateClearedStatus(new ApiDungeons());
 			SetTimeoutValueInMinutes((int)_settingService.RaidPanelApiPollingPeriod.get_Value());
