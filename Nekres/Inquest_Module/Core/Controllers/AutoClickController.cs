@@ -244,7 +244,7 @@ namespace Nekres.Inquest_Module.Core.Controllers
 
 		private bool IsBusy()
 		{
-			if (!GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() || !GameService.GameIntegration.get_Gw2Instance().get_IsInGame() || GameService.Gw2Mumble.get_UI().get_IsTextInputFocused() || GameService.Input.get_Mouse().get_CameraDragging() || GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat())
+			if (KeyStateUtil.IsAnyControlPressed() || KeyStateUtil.IsAnyShiftPressed() || !GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() || !GameService.GameIntegration.get_Gw2Instance().get_IsInGame() || GameService.Gw2Mumble.get_UI().get_IsTextInputFocused() || GameService.Input.get_Mouse().get_CameraDragging() || GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat())
 			{
 				if (_paused)
 				{

@@ -93,7 +93,7 @@ namespace Nekres.Inquest_Module
 			AutoClickSoundDisabledSetting = audio.DefineSetting<bool>("autoClickSoundsDisabled", false, (Func<string>)(() => "Disable Clicking Sounds"), (Func<string>)(() => "Disables the sound alert when an auto click is performed."));
 			AutoClickSoundVolume = audio.DefineSetting<float>("autoClickSoundsVolume", 80f, (Func<string>)(() => "Clicking Sounds Volume"), (Func<string>)(() => "Sets the audio volume of the clicking alerts."));
 			SettingCollection hiddenSettingsCache = settings.AddSubCollection("hiddenSettingsCache", false);
-			hiddenSettingsCache.set_RenderInUi(true);
+			hiddenSettingsCache.set_RenderInUi(false);
 			AutoClickToggleInterval = hiddenSettingsCache.DefineSetting<double>("autoClickToggleInterval", 0.0, (Func<string>)null, (Func<string>)null);
 		}
 
