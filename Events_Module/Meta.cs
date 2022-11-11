@@ -213,15 +213,6 @@ namespace Events_Module
 				{
 					uniqueEvents.Add(meta);
 				}
-				if (!string.IsNullOrEmpty(meta._wikiEn))
-				{
-					Task<Task<Dictionary<string, string>>> task = GetInterwikiLinks(new Uri(meta._wikiEn).Segments.Last()).ContinueWith(async delegate(Task<Dictionary<string, string>> v)
-					{
-						Meta meta2 = meta;
-						return meta2._wikiLinks = await v;
-					});
-					wikiTasks.Add(task);
-				}
 			}
 			await Task.WhenAll(wikiTasks.ToArray());
 			Events = uniqueEvents;
@@ -232,7 +223,7 @@ namespace Events_Module
 		[Localizable(false)]
 		private static async Task<Dictionary<string, string>> GetInterwikiLinks(string page)
 		{
-			dynamic wikiPage = ((dynamic)(await GeneratedExtensions.GetJsonAsync(StringExtensions.AppendPathSegment("https://wiki.guildwars2.com", (object)"api.php", false).SetQueryParams((object)new
+			dynamic wikiPage = ((dynamic)(await GeneratedExtensions.GetJsonAsync(GeneratedExtensions.WithHeader(StringExtensions.AppendPathSegment("https://wiki.guildwars2.com", (object)"api.php", false).SetQueryParams((object)new
 			{
 				action = "query",
 				format = "json",
@@ -242,7 +233,7 @@ namespace Events_Module
 				converttitles = 1,
 				formatversion = 2,
 				llprop = "url"
-			}, (NullValueHandling)1), default(CancellationToken), (HttpCompletionOption)0))).query.pages[0];
+			}, (NullValueHandling)1), "User-Agent", (object)"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36 Edg/103.0.1264.49"), default(CancellationToken), (HttpCompletionOption)0))).query.pages[0];
 			if (((IDictionary<string, object>)wikiPage).ContainsKey("langlinks"))
 			{
 				Dictionary<string, string> links = new Dictionary<string, string>();

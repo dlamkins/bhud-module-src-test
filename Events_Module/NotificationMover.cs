@@ -6,10 +6,11 @@ using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Events_Module
 {
-	public class NotificationMover : Control, IWindow
+	public class NotificationMover : Control
 	{
 		private const int HANDLE_SIZE = 40;
 
@@ -23,12 +24,6 @@ namespace Events_Module
 
 		private readonly Texture2D _handleTexture;
 
-		public bool TopMost => true;
-
-		public double LastInteraction { get; }
-
-		public bool CanClose => true;
-
 		public NotificationMover(params ScreenRegion[] screenPositions)
 			: this(screenPositions.ToList())
 		{
@@ -39,9 +34,8 @@ namespace Events_Module
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Expected O, but got Unknown
-			WindowBase2.RegisterWindow((IWindow)(object)this);
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Expected O, but got Unknown
 			((Control)this).set_ZIndex(2147483637);
 			_clearDrawParameters = new SpriteBatchParameters((SpriteSortMode)0, BlendState.Opaque, (SamplerState)null, (DepthStencilState)null, (RasterizerState)null, (Effect)null, (Matrix?)null);
 			_screenRegions = screenPositions.ToArray();
@@ -55,6 +49,15 @@ namespace Events_Module
 			if (_activeScreenRegion != null)
 			{
 				_grabPosition = ((Control)this).get_RelativeMousePosition();
+			}
+		}
+
+		public override void DoUpdate(GameTime gameTime)
+		{
+			((Control)this).DoUpdate(gameTime);
+			if (GameService.Input.get_Keyboard().get_KeysDown().Contains((Keys)27))
+			{
+				((Control)this).Dispose();
 			}
 		}
 
@@ -190,20 +193,6 @@ namespace Events_Module
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, handleTexture4, new Rectangle(num3, ((Rectangle)(ref bounds2)).get_Bottom() - 20, 40, 40), (Rectangle?)_handleTexture.get_Bounds(), Color.get_White() * 0.6f, (float)Math.PI, new Vector2(20f, 20f), (SpriteEffects)0);
 			}
 			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, "Press ESC to close.", GameService.Content.get_DefaultFont32(), bounds, Color.get_White(), false, (HorizontalAlignment)1, (VerticalAlignment)1);
-		}
-
-		public override void Hide()
-		{
-			((Control)this).Dispose();
-		}
-
-		public void BringWindowToFront()
-		{
-		}
-
-		protected override void DisposeControl()
-		{
-			WindowBase2.UnregisterWindow((IWindow)(object)this);
 		}
 	}
 }
