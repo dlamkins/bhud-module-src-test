@@ -21,6 +21,8 @@ namespace Compass_Module
 
 		private SettingEntry<float> _settingVerticalOffset;
 
+		private SettingEntry<bool> _settingFadeForwardDirection;
+
 		private CompassBillboard _northBb;
 
 		private CompassBillboard _eastBb;
@@ -44,9 +46,10 @@ namespace Compass_Module
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			_settingCompassSize = settings.DefineSetting<float>("CompassSize", 0.5f, "Compass Size", "Size of the compass elements.", (SettingTypeRendererDelegate)null);
-			_settingCompassRadius = settings.DefineSetting<float>("CompassRadius", 0f, "Compass Radius", "Radius of the compass.", (SettingTypeRendererDelegate)null);
-			_settingVerticalOffset = settings.DefineSetting<float>("VerticalOffset", 2.5f, "Vertical Offset", "How high to offset the compass off the ground.", (SettingTypeRendererDelegate)null);
+			_settingCompassSize = settings.DefineSetting<float>("CompassSize", 0.5f, (Func<string>)(() => "Compass Size"), (Func<string>)(() => "Size of the compass elements."));
+			_settingCompassRadius = settings.DefineSetting<float>("CompassRadius", 0f, (Func<string>)(() => "Compass Radius"), (Func<string>)(() => "Radius of the compass."));
+			_settingVerticalOffset = settings.DefineSetting<float>("VerticalOffset", 2.5f, (Func<string>)(() => "Vertical Offset"), (Func<string>)(() => "How high to offset the compass off the ground."));
+			_settingFadeForwardDirection = settings.DefineSetting<bool>("FadeForwardDirection", true, (Func<string>)(() => "Fade Forward Direction"), (Func<string>)(() => "If enabled, the direction in front of the character is faded out."));
 			SettingComplianceExtensions.SetRange(_settingCompassSize, 0.1f, 2f);
 			SettingComplianceExtensions.SetRange(_settingCompassRadius, 0f, 4f);
 			SettingComplianceExtensions.SetRange(_settingVerticalOffset, 0f, 5f);
@@ -99,14 +102,24 @@ namespace Compass_Module
 
 		private void UpdateBillboardOpacity()
 		{
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			_northBb.Opacity = Math.Min(1f - GameService.Gw2Mumble.get_PlayerCamera().get_Forward().Y, 1f);
-			_eastBb.Opacity = Math.Min(1f - GameService.Gw2Mumble.get_PlayerCamera().get_Forward().X, 1f);
-			_southBb.Opacity = Math.Min(1f + GameService.Gw2Mumble.get_PlayerCamera().get_Forward().Y, 1f);
-			_westBb.Opacity = Math.Min(1f + GameService.Gw2Mumble.get_PlayerCamera().get_Forward().X, 1f);
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+			if (_settingFadeForwardDirection.get_Value())
+			{
+				_northBb.Opacity = Math.Min(1f - GameService.Gw2Mumble.get_PlayerCamera().get_Forward().Y, 1f);
+				_eastBb.Opacity = Math.Min(1f - GameService.Gw2Mumble.get_PlayerCamera().get_Forward().X, 1f);
+				_southBb.Opacity = Math.Min(1f + GameService.Gw2Mumble.get_PlayerCamera().get_Forward().Y, 1f);
+				_westBb.Opacity = Math.Min(1f + GameService.Gw2Mumble.get_PlayerCamera().get_Forward().X, 1f);
+			}
+			else
+			{
+				_northBb.Opacity = 1f;
+				_eastBb.Opacity = 1f;
+				_southBb.Opacity = 1f;
+				_westBb.Opacity = 1f;
+			}
 		}
 
 		protected override void Unload()
