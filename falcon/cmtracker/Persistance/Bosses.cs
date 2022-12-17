@@ -116,7 +116,7 @@ namespace falcon.cmtracker.Persistance
 				new Token
 				{
 					Id = 77302,
-					Name = "Qadim2",
+					Name = "Qadim the Peerless",
 					Icon = "icon_qadim2.png",
 					setting = SettingUtil.GetSettingForBoss(setting, Module.CURRENT_ACCOUNT.get_Value(), Boss.Qadim2),
 					bossType = BossType.Raid
@@ -151,6 +151,14 @@ namespace falcon.cmtracker.Persistance
 					Name = "Harvest Temple",
 					Icon = "icon_harvest_temple.png",
 					setting = SettingUtil.GetSettingForBoss(setting, Module.CURRENT_ACCOUNT.get_Value(), Boss.Harvest_Temple),
+					bossType = BossType.Strike
+				},
+				new Token
+				{
+					Id = 77302,
+					Name = "Old Lion's Court",
+					Icon = "icon_old.png",
+					setting = SettingUtil.GetSettingForBoss(setting, Module.CURRENT_ACCOUNT.get_Value(), Boss.Old),
 					bossType = BossType.Strike
 				}
 			};

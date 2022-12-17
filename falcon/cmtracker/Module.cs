@@ -71,8 +71,6 @@ namespace falcon.cmtracker
 
 		private string SORTBY_RAID;
 
-		private string VisitUsAndHelpText;
-
 		private string ClearCheckboxTooltipText;
 
 		private string CurrentSortMethod;

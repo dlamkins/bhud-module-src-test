@@ -18,6 +18,7 @@ namespace falcon.cmtracker
 		Aetherblade_Hideout,
 		Xunlai_Jade_Junkyard,
 		Kaineng_Overlook,
-		Harvest_Temple
+		Harvest_Temple,
+		Old
 	}
 }

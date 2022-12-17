@@ -87,7 +87,7 @@ namespace falcon.cmtracker
 					return Item;
 				}
 			}
-			return null;
+			return AddNewBoss(settingList, account, boss);
 		}
 
 		public List<SettingValue> GetSettingForAccount(string account)
@@ -116,6 +116,12 @@ namespace falcon.cmtracker
 				Setting.Add(new SettingValue(accountName, boss, value: false));
 			}
 			SettingString = ConvirtListToString(Setting);
+		}
+
+		public static SettingValue AddNewBoss(List<SettingValue> settingList, string account, Boss boss)
+		{
+			settingList.Add(new SettingValue(account, boss, value: false));
+			return settingList[settingList.Count - 1];
 		}
 
 		public HashSet<string> GetAllAccounts()
