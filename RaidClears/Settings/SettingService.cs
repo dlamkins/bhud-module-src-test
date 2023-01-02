@@ -11,6 +11,8 @@ namespace RaidClears.Settings
 {
 	public class SettingService
 	{
+		public SettingEntry<Color> colorTest { get; }
+
 		public SettingEntry<ApiPollPeriod> RaidPanelApiPollingPeriod { get; }
 
 		public SettingEntry<Point> RaidPanelLocationPoint { get; }
@@ -53,6 +55,18 @@ namespace RaidClears.Settings
 
 		public SettingEntry<KeyBinding> RaidPanelIsVisibleKeyBind { get; }
 
+		public SettingEntry<string> RaidPanelColorUnknown { get; }
+
+		public SettingEntry<string> RaidPanelColorNotCleared { get; }
+
+		public SettingEntry<string> RaidPanelColorCleared { get; }
+
+		public SettingEntry<string> RaidPanelColorText { get; }
+
+		public SettingEntry<string> RaidPanelColorCotm { get; }
+
+		public SettingEntry<string> RaidPanelColorEmbolden { get; }
+
 		public SettingEntry<bool> ShowRaidsCornerIconSetting { get; }
 
 		public SettingEntry<Point> DungeonPanelLocationPoint { get; }
@@ -93,18 +107,23 @@ namespace RaidClears.Settings
 
 		public SettingService(SettingCollection settings)
 		{
-			//IL_019e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e6: Expected O, but got Unknown
-			//IL_07a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07eb: Expected O, but got Unknown
-			//IL_0cc8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ce7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0342: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038a: Expected O, but got Unknown
+			//IL_0947: Unknown result type (might be due to invalid IL or missing references)
+			//IL_098f: Expected O, but got Unknown
+			//IL_0e6c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0e8b: Unknown result type (might be due to invalid IL or missing references)
+			RaidPanelColorNotCleared = settings.DefineSetting<string>("colNotCleared", "#781414", (Func<string>)(() => "Non-cleared encounter color"), (Func<string>)(() => "Hex color code (#rrggbb) for Encounters that have not been cleared this week"));
+			RaidPanelColorCleared = settings.DefineSetting<string>("colCleared", "#147814", (Func<string>)(() => "Cleared encounter color"), (Func<string>)(() => "Hex color code (#rrggbb) for Encounters that have been cleared this week"));
+			RaidPanelColorText = settings.DefineSetting<string>("colText", "#ffffff", (Func<string>)(() => "Wing and Encounter text color"), (Func<string>)(() => "Hex color code (#rrggbb) for Wing and Encounter text"));
+			RaidPanelColorCotm = settings.DefineSetting<string>("colCotm", "#f3f527", (Func<string>)(() => "Call of the Mists text color"), (Func<string>)(() => "Hex color code (#rrggbb) for Wing and Encounters text during the Call of the Mists week"));
+			RaidPanelColorEmbolden = settings.DefineSetting<string>("colEmbolden", "#5050ff", (Func<string>)(() => "Emboldened text color"), (Func<string>)(() => "Hex color code (#rrggbb) for Wing and Encounters text during the Emboldened week"));
 			RaidPanelApiPollingPeriod = settings.DefineSetting<ApiPollPeriod>("RCPoll", ApiPollPeriod.MINUTES_5, (Func<string>)(() => "Api Poll Frequency"), (Func<string>)(() => "How often should the GW2 API be checked for updated information"));
-			DragWithMouseIsEnabledSetting = settings.DefineSetting<bool>("RCDrag", false, (Func<string>)(() => "Enable Dragging"), (Func<string>)(() => "Click and drag to reposition the clears window."));
+			DragWithMouseIsEnabledSetting = settings.DefineSetting<bool>("RCDrag", false, (Func<string>)(() => "Unlock position (allows overlays to be dragged)"), (Func<string>)(() => "Click and drag to reposition the clears window."));
 			AllowTooltipsSetting = settings.DefineSetting<bool>("RCtooltips", false, (Func<string>)(() => "Allow tooltips"), (Func<string>)(() => "Hovering the mouse over an encounter will display the full name"));
 			ShowRaidsCornerIconSetting = settings.DefineSetting<bool>("RCCornerIcon", false, (Func<string>)(() => "Display top left toggle button"), (Func<string>)(() => "Add a button next to Blish on the top left of screen that hides or shows the Raid Clears window."));
-			RaidPanelIsVisible = settings.DefineSetting<bool>("RCActive", true, (Func<string>)(() => "Display on screen"), (Func<string>)(() => "Enable the Raid Clears grid."));
-			RaidPanelIsVisibleKeyBind = settings.DefineSetting<KeyBinding>("RCkeybind", new KeyBinding((Keys)0), (Func<string>)(() => "Display on screen keybind"), (Func<string>)(() => "Reveal or hide the display from key press."));
+			RaidPanelIsVisible = settings.DefineSetting<bool>("RCActive", true, (Func<string>)(() => "Show the overlay on screen"), (Func<string>)(() => "Enable the Raid Clears grid"));
+			RaidPanelIsVisibleKeyBind = settings.DefineSetting<KeyBinding>("RCkeybind", new KeyBinding((Keys)0), (Func<string>)(() => "Display on screen keybind"), (Func<string>)(() => "Reveal or hide the display from key press"));
 			RaidPanelIsVisibleKeyBind.get_Value().set_Enabled(true);
 			RaidPanelFontSizeSetting = settings.DefineSetting<FontSize>("RCFontSize", (FontSize)11, (Func<string>)(() => "Font Size   "), (Func<string>)(() => "Change the size of the grid (Weird sizes from available fonts)"));
 			SettingEntry<FontSize> raidPanelFontSizeSetting = RaidPanelFontSizeSetting;
@@ -114,10 +133,10 @@ namespace RaidClears.Settings
 			RaidPanelWingLabelsSetting = settings.DefineSetting<WingLabel>("RCLabelDisplay", WingLabel.Abbreviation, (Func<string>)(() => "Wing Label"), (Func<string>)(() => "Display wing label as wing number or abbreviated name"));
 			RaidPanelOrientationSetting = settings.DefineSetting<Orientation>("RCOrientation", Orientation.Vertical, (Func<string>)(() => "Orientation"), (Func<string>)(() => "Display the wings in a vertial column or horizontal row"));
 			RaidPanelWingLabelOpacity = settings.DefineSetting<float>("RCWingOpacity", 1f, (Func<string>)(() => "Wing Label Opacity"), (Func<string>)(() => "Wing label transparency, Hidden <--> Full Visible"));
-			SettingComplianceExtensions.SetRange(RaidPanelWingLabelOpacity, 0f, 1f);
+			SettingComplianceExtensions.SetRange(RaidPanelWingLabelOpacity, 0.1f, 1f);
 			RaidPanelEncounterOpacity = settings.DefineSetting<float>("RCEncOpacity", 0.8f, (Func<string>)(() => "Encounter Opacity"), (Func<string>)(() => "Encounter label transparency, Hidden <--> Full Visible"));
-			SettingComplianceExtensions.SetRange(RaidPanelEncounterOpacity, 0f, 1f);
-			RaidPanelHighlightEmbolden = settings.DefineSetting<bool>("RCEmbolden", true, (Func<string>)(() => "Highlight the weekly 'Emboldened' raid wing"), (Func<string>)(() => "Colors the text blue for the weekly Emboldened raid wing\nEmbolden mode increases player health, damage, and healing for each stack."));
+			SettingComplianceExtensions.SetRange(RaidPanelEncounterOpacity, 0.1f, 1f);
+			RaidPanelHighlightEmbolden = settings.DefineSetting<bool>("RCEmbolden", true, (Func<string>)(() => "Highlight the weekly 'Emboldened' raid wing"), (Func<string>)(() => "Colors the text blue for the weekly Emboldened raid wing\nEmbolden mode increases player health, damage, and healing for each stack"));
 			RaidPanelHighlightCotM = settings.DefineSetting<bool>("RCCotM", true, (Func<string>)(() => "Highlight the weekly 'Call of the Mist' raid wing"), (Func<string>)(() => "Colors the text golden for the weekly Call of the Mists raid wing\nCall of the Mists doubles all gold in the boss loot chest"));
 			W1IsVisibleSetting = settings.DefineSetting<bool>("RCw1", true, (Func<string>)(() => "W1 / Spirit Vale"), (Func<string>)(() => "Enable Spirit Vale on the main display"));
 			W2IsVisibleSetting = settings.DefineSetting<bool>("RCw2", true, (Func<string>)(() => "W2 / Salvation Pass"), (Func<string>)(() => "Enable Salvation Pass on the main display"));
@@ -139,9 +158,9 @@ namespace RaidClears.Settings
 			DungeonPanelWingLabelsSetting = settings.DefineSetting<DungeonLabel>("RCDungeonLabelDisplay", DungeonLabel.Abbreviation, (Func<string>)(() => "Dungeon Label"), (Func<string>)(() => "Display wing label as wing number or abbreviated name"));
 			DungeonPanelOrientationSetting = settings.DefineSetting<DungeonOrientation>("RCDungeonOrientation", DungeonOrientation.Vertical, (Func<string>)(() => "Orientation     "), (Func<string>)(() => "Display the dungeons in a vertial column or horizontal row"));
 			DungeonPanelWingLabelOpacity = settings.DefineSetting<float>("RCDungeonOpacity", 1f, (Func<string>)(() => "Dungeon Label Opacity"), (Func<string>)(() => "Dungeon label transparency, Hidden <--> Full Visible"));
-			SettingComplianceExtensions.SetRange(DungeonPanelWingLabelOpacity, 0f, 1f);
+			SettingComplianceExtensions.SetRange(DungeonPanelWingLabelOpacity, 0.1f, 1f);
 			DungeonPanelEncounterOpacity = settings.DefineSetting<float>("RCPathOpacity", 0.8f, (Func<string>)(() => "Path Opacity"), (Func<string>)(() => "Path label transparency, Hidden <--> Full Visible"));
-			SettingComplianceExtensions.SetRange(DungeonPanelEncounterOpacity, 0f, 1f);
+			SettingComplianceExtensions.SetRange(DungeonPanelEncounterOpacity, 0.1f, 1f);
 			D1IsVisibleSetting = settings.DefineSetting<bool>("RCd1", true, (Func<string>)(() => "Ascalonian Catacombs"), (Func<string>)(() => "Enable Ascalonian Catacombs on the dungeon display"));
 			D2IsVisibleSetting = settings.DefineSetting<bool>("RCd2", true, (Func<string>)(() => "Caudecus Manor"), (Func<string>)(() => "Enable Caudecus Manor on the dungeon display"));
 			D3IsVisibleSetting = settings.DefineSetting<bool>("RCd3", true, (Func<string>)(() => "Twilight Arbor"), (Func<string>)(() => "Enable Twilight Arbor on the dungeon display"));

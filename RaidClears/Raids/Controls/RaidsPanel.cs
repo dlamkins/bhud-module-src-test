@@ -19,13 +19,25 @@ namespace RaidClears.Raids.Controls
 
 		private readonly SettingService _settingService;
 
+		private readonly WingRotationService _wingRotation;
+
 		private bool _isDraggedByMouse;
 
 		private Point _dragStart = Point.get_Zero();
 
-		private Color CallOfTheMistColor = new Color(243, 245, 39, 10);
+		private Color CallOfTheMistColor = new Color(243, 245, 39);
 
-		private Color EmboldenColor = new Color(80, 80, 255, 10);
+		private Color EmboldenColor = new Color(80, 80, 255);
+
+		private Color TextColor = Color.get_White();
+
+		private Color NotClearedColor = new Color(120, 20, 20);
+
+		private Color ClearedColor = new Color(20, 120, 20);
+
+		private int _cotmIndex;
+
+		private int _emboldenIndex;
 
 		private bool _ignoreMouseInput;
 
@@ -46,16 +58,23 @@ namespace RaidClears.Raids.Controls
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
 			_logger = logger;
 			_wings = wings;
 			_settingService = settingService;
+			_wingRotation = wingRotation;
 			((FlowPanel)this).set_ControlPadding(new Vector2(2f, 2f));
 			((FlowPanel)this).set_FlowDirection(GetFlowDirection());
 			IgnoreMouseInput = ShouldIgnoreMouse();
@@ -64,9 +83,10 @@ namespace RaidClears.Raids.Controls
 			((Control)this).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((Container)this).set_HeightSizingMode((SizingMode)1);
 			((Container)this).set_WidthSizingMode((SizingMode)1);
-			var (embolden, callOfMist) = wingRotation.getHighlightedWingIndices();
-			wings[embolden].setEmboldened(embolden: true);
-			wings[callOfMist].setCallOfTheMist(call: true);
+			(_emboldenIndex, _cotmIndex) = wingRotation.getHighlightedWingIndices();
+			wings[_emboldenIndex].setEmboldened(embolden: true);
+			wings[_cotmIndex].setCallOfTheMist(call: true);
+			InitColors(settingService);
 			CreateWings(wings);
 			settingService.RaidPanelLocationPoint.add_SettingChanged((EventHandler<ValueChangedEventArgs<Point>>)delegate(object s, ValueChangedEventArgs<Point> e)
 			{
@@ -132,17 +152,125 @@ namespace RaidClears.Raids.Controls
 			});
 			settingService.RaidPanelHighlightEmbolden.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object s, ValueChangedEventArgs<bool> e)
 			{
-				EmboldenChanged(embolden, e.get_NewValue());
+				EmboldenChanged(_emboldenIndex, e.get_NewValue());
 			});
 			settingService.RaidPanelHighlightCotM.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object s, ValueChangedEventArgs<bool> e)
 			{
-				CotMChanged(callOfMist, e.get_NewValue());
+				CotMChanged(_cotmIndex, e.get_NewValue());
+			});
+			settingService.RaidPanelColorCleared.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)delegate(object s, ValueChangedEventArgs<string> e)
+			{
+				ColorChanged("cleared", e.get_NewValue());
+			});
+			settingService.RaidPanelColorNotCleared.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)delegate(object s, ValueChangedEventArgs<string> e)
+			{
+				ColorChanged("notCleared", e.get_NewValue());
+			});
+			settingService.RaidPanelColorText.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)delegate(object s, ValueChangedEventArgs<string> e)
+			{
+				ColorChanged("text", e.get_NewValue());
+			});
+			settingService.RaidPanelColorCotm.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)delegate(object s, ValueChangedEventArgs<string> e)
+			{
+				ColorChanged("cotm", e.get_NewValue());
+			});
+			settingService.RaidPanelColorEmbolden.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)delegate(object s, ValueChangedEventArgs<string> e)
+			{
+				ColorChanged("embolden", e.get_NewValue());
 			});
 			WingLabelOpacityChanged(settingService.RaidPanelWingLabelOpacity.get_Value());
 			EncounterOpacityChanged(settingService.RaidPanelEncounterOpacity.get_Value());
-			EmboldenChanged(embolden, settingService.RaidPanelHighlightEmbolden.get_Value());
-			CotMChanged(callOfMist, settingService.RaidPanelHighlightCotM.get_Value());
+			EmboldenChanged(_emboldenIndex, settingService.RaidPanelHighlightEmbolden.get_Value());
+			CotMChanged(_cotmIndex, settingService.RaidPanelHighlightCotM.get_Value());
 			AddDragDelegates();
+		}
+
+		private void InitColors(SettingService _settings)
+		{
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			ColorHelper emboldenColor = new ColorHelper(_settings.RaidPanelColorEmbolden.get_Value());
+			EmboldenColor = emboldenColor.XnaColor;
+			ColorHelper cotmColor = new ColorHelper(_settings.RaidPanelColorCotm.get_Value());
+			CallOfTheMistColor = cotmColor.XnaColor;
+			ColorHelper textColor = new ColorHelper(_settings.RaidPanelColorText.get_Value());
+			TextColor = textColor.XnaColor;
+			ColorHelper clearedColor = new ColorHelper(_settings.RaidPanelColorCleared.get_Value());
+			ClearedColor = clearedColor.XnaColor;
+			ColorHelper notClearedColor = new ColorHelper(_settings.RaidPanelColorNotCleared.get_Value());
+			NotClearedColor = notClearedColor.XnaColor;
+		}
+
+		protected void ColorChanged(string type, string hexCode)
+		{
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0129: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
+			ColorHelper _colorHelper = new ColorHelper(hexCode);
+			switch (type)
+			{
+			case "cleared":
+				ClearedColor = _colorHelper.XnaColor;
+				break;
+			case "notCleared":
+				NotClearedColor = _colorHelper.XnaColor;
+				break;
+			case "text":
+				TextColor = _colorHelper.XnaColor;
+				break;
+			case "cotm":
+				CallOfTheMistColor = _colorHelper.XnaColor;
+				break;
+			case "embolden":
+				EmboldenColor = _colorHelper.XnaColor;
+				break;
+			}
+			for (int i = 0; i < _wings.Length; i++)
+			{
+				Color textColor = TextColor;
+				Wing obj = _wings[i];
+				if (obj.isEmboldened && _settingService.RaidPanelHighlightEmbolden.get_Value())
+				{
+					textColor = EmboldenColor;
+				}
+				if (obj.isCallOfTheMist && _settingService.RaidPanelHighlightCotM.get_Value())
+				{
+					textColor = CallOfTheMistColor;
+				}
+				obj.GetWingPanelReference().UpdateEncounterColors(ClearedColor, NotClearedColor);
+				obj.GetWingPanelReference().SetHighlightColor(textColor);
+				Encounter[] encounters = obj.encounters;
+				for (int j = 0; j < encounters.Length; j++)
+				{
+					encounters[j].UpdateColors(ClearedColor, NotClearedColor);
+				}
+			}
 		}
 
 		protected void WingVisibilityChanged(int wingIndex, bool was, bool now)
@@ -153,16 +281,16 @@ namespace RaidClears.Raids.Controls
 
 		protected void EmboldenChanged(int wingIndex, bool highlight)
 		{
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			_wings[wingIndex].GetWingPanelReference().SetHighlightColor(highlight ? EmboldenColor : Color.get_White());
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			_wings[wingIndex].GetWingPanelReference().SetHighlightColor(highlight ? EmboldenColor : TextColor);
 		}
 
 		protected void CotMChanged(int wingIndex, bool highlight)
 		{
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			_wings[wingIndex].GetWingPanelReference().SetHighlightColor(highlight ? CallOfTheMistColor : Color.get_White());
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			_wings[wingIndex].GetWingPanelReference().SetHighlightColor(highlight ? CallOfTheMistColor : TextColor);
 		}
 
 		protected ControlFlowDirection GetFlowDirection()
@@ -310,12 +438,16 @@ namespace RaidClears.Raids.Controls
 
 		protected void CreateWings(Wing[] wings)
 		{
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
 			bool[] wingVis = _settingService.GetWingVisibilitySettings();
 			foreach (Wing wing in wings)
 			{
-				WingPanel wingPanel = new WingPanel((Container)(object)this, wing, _settingService.RaidPanelOrientationSetting.get_Value(), _settingService.RaidPanelWingLabelsSetting.get_Value(), _settingService.RaidPanelFontSizeSetting.get_Value());
+				WingPanel wingPanel = new WingPanel((Container)(object)this, wing, _settingService.RaidPanelOrientationSetting.get_Value(), _settingService.RaidPanelWingLabelsSetting.get_Value(), _settingService.RaidPanelFontSizeSetting.get_Value(), ClearedColor, NotClearedColor);
 				wing.SetWingPanelReference(wingPanel);
+				wing.GetWingPanelReference().SetHighlightColor(TextColor);
 				wingPanel.ShowHide(wingVis[wing.index - 1]);
 				((Container)this).AddChild((Control)(object)wingPanel);
 			}

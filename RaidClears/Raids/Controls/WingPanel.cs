@@ -17,7 +17,7 @@ namespace RaidClears.Raids.Controls
 
 		private Label _wingLabelObj;
 
-		public WingPanel(Container parent, Wing wing, Orientation orientation, WingLabel label, FontSize fontSize)
+		public WingPanel(Container parent, Wing wing, Orientation orientation, WingLabel label, FontSize fontSize, Color clearedColor, Color notClearedColor)
 			: this()
 		{
 			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
@@ -29,14 +29,16 @@ namespace RaidClears.Raids.Controls
 			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0074: Expected O, but got Unknown
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Expected O, but got Unknown
-			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c5: Expected O, but got Unknown
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
 			_wing = wing;
 			((FlowPanel)this).set_ControlPadding(new Vector2(2f, 2f));
 			((Container)this).set_HeightSizingMode((SizingMode)1);
@@ -52,6 +54,7 @@ namespace RaidClears.Raids.Controls
 			Encounter[] encounters = _wing.encounters;
 			foreach (Encounter encounter in encounters)
 			{
+				encounter.SetClearColors(clearedColor, notClearedColor);
 				Label val2 = new Label();
 				val2.set_AutoSizeHeight(true);
 				((Control)val2).set_BasicTooltipText(encounter.name);
@@ -153,6 +156,16 @@ namespace RaidClears.Raids.Controls
 					val.set_TextColor(color);
 				}
 			});
+		}
+
+		public void UpdateEncounterColors(Color cleared, Color notCleared)
+		{
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			for (int i = 0; i < _wing.encounters.Length; i++)
+			{
+				_wing.encounters[i].UpdateColors(cleared, notCleared);
+			}
 		}
 
 		public void SetFontSize(FontSize fontSize)

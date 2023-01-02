@@ -44,6 +44,10 @@ namespace RaidClears.Settings
 			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0060: Expected O, but got Unknown
+			//IL_01db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			val.set_FlowDirection((ControlFlowDirection)3);
 			((Panel)val).set_CanScroll(true);
@@ -78,6 +82,16 @@ namespace RaidClears.Settings
 			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.RaidPanelEncounterOpacity, (Container)(object)layoutFlowPanel, singleColumnWidth);
 			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.RaidPanelHighlightEmbolden, (Container)(object)layoutFlowPanel, singleColumnWidth);
 			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.RaidPanelHighlightCotM, (Container)(object)layoutFlowPanel, singleColumnWidth);
+			Label val2 = new Label();
+			val2.set_AutoSizeHeight(true);
+			((Control)val2).set_Parent((Container)(object)layoutFlowPanel);
+			val2.set_Text("Customize the colors by entering a Hex color code. (Tip: Google 'color picker' for help)");
+			((Control)val2).set_Width(singleColumnWidth);
+			ShowColorSettingWithViewContainer(_settingService.RaidPanelColorNotCleared, (Container)(object)layoutFlowPanel, singleColumnWidth);
+			ShowColorSettingWithViewContainer(_settingService.RaidPanelColorCleared, (Container)(object)layoutFlowPanel, singleColumnWidth);
+			ShowColorSettingWithViewContainer(_settingService.RaidPanelColorCotm, (Container)(object)layoutFlowPanel, singleColumnWidth);
+			ShowColorSettingWithViewContainer(_settingService.RaidPanelColorEmbolden, (Container)(object)layoutFlowPanel, singleColumnWidth);
+			ShowColorSettingWithViewContainer(_settingService.RaidPanelColorText, (Container)(object)layoutFlowPanel, singleColumnWidth);
 			FlowPanel wingSelectionFlowPanel = CreateSettingsGroupFlowPanel("Wing Selection", (Container)(object)raidsSettingFlowPanel);
 			((Panel)wingSelectionFlowPanel).set_CanCollapse(true);
 			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.W1IsVisibleSetting, (Container)(object)wingSelectionFlowPanel, singleColumnWidth);
@@ -188,6 +202,18 @@ namespace RaidClears.Settings
 			ViewContainer val = new ViewContainer();
 			((Control)val).set_Parent(parent);
 			val.Show(SettingView.FromType(settingEntry, ((Control)parent).get_Width()));
+			return val;
+		}
+
+		private static ViewContainer ShowColorSettingWithViewContainer(SettingEntry<string> settingEntry, Container parent, int width)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Expected O, but got Unknown
+			ViewContainer val = new ViewContainer();
+			((Control)val).set_Parent(parent);
+			val.Show((IView)(object)new ColorSettingView(settingEntry, ((Control)parent).get_Width()));
 			return val;
 		}
 
