@@ -416,56 +416,39 @@ namespace Kenedia.Modules.BuildsManager
 			OnSelected_Template_Changed();
 		}
 
-		protected override void OnModuleLoaded(EventArgs e)
+		protected override async void OnModuleLoaded(EventArgs e)
 		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Expected O, but got Unknown
-			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00db: Expected O, but got Unknown
-			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0112: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
 			TextureManager = new TextureManager();
+			BuildsManager buildsManager = this;
 			CornerIcon val = new CornerIcon();
 			val.set_Icon(AsyncTexture2D.op_Implicit(TextureManager.getIcon(_Icons.Template)));
 			((Control)val).set_BasicTooltipText(((Module)this).get_Name() ?? "");
 			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((Control)val).set_Visible(ShowCornerIcon.get_Value());
-			cornerIcon = val;
+			buildsManager.cornerIcon = val;
+			BuildsManager buildsManager2 = this;
 			LoadingSpinner val2 = new LoadingSpinner();
 			((Control)val2).set_Location(new Point(((Control)cornerIcon).get_Location().X - ((Control)cornerIcon).get_Width(), ((Control)cornerIcon).get_Location().Y + ((Control)cornerIcon).get_Height() + 5));
 			((Control)val2).set_Size(((Control)cornerIcon).get_Size());
 			((Control)val2).set_Visible(false);
 			((Control)val2).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			loadingSpinner = val2;
+			buildsManager2.loadingSpinner = val2;
+			BuildsManager buildsManager3 = this;
 			ProgressBar progressBar = new ProgressBar();
 			((Control)progressBar).set_Location(new Point(((Control)cornerIcon).get_Location().X, ((Control)cornerIcon).get_Location().Y + ((Control)cornerIcon).get_Height() + 5 + 3));
 			((Control)progressBar).set_Size(new Point(150, ((Control)cornerIcon).get_Height() - 6));
 			((Control)progressBar).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			progressBar.Progress = 0.66;
 			((Control)progressBar).set_Visible(false);
-			downloadBar = progressBar;
+			buildsManager3.downloadBar = progressBar;
 			((Control)cornerIcon).add_MouseEntered((EventHandler<MouseEventArgs>)CornerIcon_MouseEntered);
 			((Control)cornerIcon).add_MouseLeft((EventHandler<MouseEventArgs>)CornerIcon_MouseLeft);
 			((Control)cornerIcon).add_Click((EventHandler<MouseEventArgs>)CornerIcon_Click);
 			((Control)cornerIcon).add_Moved((EventHandler<MovedEventArgs>)CornerIcon_Moved);
 			ShowCornerIcon.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowCornerIcon_SettingChanged);
 			DataLoaded_Event += BuildsManager_DataLoaded_Event;
-			((Module)this).OnModuleLoaded(e);
-			LoadData();
+			_003C_003En__0(e);
+			await LoadData();
 		}
 
 		private void CornerIcon_Moved(object sender, MovedEventArgs e)
@@ -542,8 +525,10 @@ namespace Kenedia.Modules.BuildsManager
 			DefaultTemplates?.Clear();
 			TextureManager?.Dispose();
 			TextureManager = null;
-			_Selected_Template.Edit -= OnSelected_Template_Edit;
-			_Selected_Template.Edit -= null;
+			if (_Selected_Template != null)
+			{
+				_Selected_Template.Edit -= OnSelected_Template_Edit;
+			}
 			Selected_Template = null;
 			CurrentProfession = null;
 			CurrentSpecialization = null;
@@ -559,10 +544,13 @@ namespace Kenedia.Modules.BuildsManager
 			ToggleWindow.get_Value().remove_Activated((EventHandler<EventArgs>)ToggleWindow_Activated);
 			ReloadKey.get_Value().set_Enabled(false);
 			ReloadKey.get_Value().remove_Activated((EventHandler<EventArgs>)ReloadKey_Activated);
-			((Control)cornerIcon).remove_MouseEntered((EventHandler<MouseEventArgs>)CornerIcon_MouseEntered);
-			((Control)cornerIcon).remove_MouseLeft((EventHandler<MouseEventArgs>)CornerIcon_MouseLeft);
-			((Control)cornerIcon).remove_Click((EventHandler<MouseEventArgs>)CornerIcon_Click);
-			((Control)cornerIcon).remove_Moved((EventHandler<MovedEventArgs>)CornerIcon_Moved);
+			if (cornerIcon != null)
+			{
+				((Control)cornerIcon).remove_MouseEntered((EventHandler<MouseEventArgs>)CornerIcon_MouseEntered);
+				((Control)cornerIcon).remove_MouseLeft((EventHandler<MouseEventArgs>)CornerIcon_MouseLeft);
+				((Control)cornerIcon).remove_Click((EventHandler<MouseEventArgs>)CornerIcon_Click);
+				((Control)cornerIcon).remove_Moved((EventHandler<MovedEventArgs>)CornerIcon_Moved);
+			}
 			DataLoaded_Event -= BuildsManager_DataLoaded_Event;
 			ShowCornerIcon.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowCornerIcon_SettingChanged);
 			IncludeDefaultBuilds.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)IncludeDefaultBuilds_SettingChanged);
@@ -1054,31 +1042,30 @@ namespace Kenedia.Modules.BuildsManager
 			List<API.Skill> Skills = new List<API.Skill>();
 			foreach (Skill skill5 in skills)
 			{
-				if (skill5 == null)
+				if (skill5 == null || !skill5.Icon.HasValue || skill5.Professions.Count != 1)
 				{
 					continue;
 				}
-				_ = skill5.Icon;
-				if (skill5.Professions.Count != 1)
-				{
-					continue;
-				}
-				API.Skill temp2 = new API.Skill
+				API.Skill obj6 = new API.Skill
 				{
 					Name = skill5.Name,
-					Id = skill5.Id,
-					Icon = new API.Icon
-					{
-						Url = skill5.Icon.ToString(),
-						Path = Paths.skill_icons.Replace(Paths.BasePath, "") + Regex.Match((string)skill5.Icon, "[0-9]*.png")
-					},
-					ChatLink = skill5.ChatLink,
-					Description = skill5.Description,
-					Specialization = (skill5.Specialization.HasValue ? skill5.Specialization.Value : 0),
-					Flags = (from e in skill5.Flags.ToList()
-						select e.RawValue).ToList(),
-					Categories = new List<string>()
+					Id = skill5.Id
 				};
+				API.Icon obj7 = new API.Icon
+				{
+					Url = skill5.Icon.ToString()
+				};
+				string text3 = Paths.skill_icons.Replace(Paths.BasePath, "");
+				RenderUrl? professionIconBig = skill5.Icon;
+				obj7.Path = text3 + Regex.Match(professionIconBig.HasValue ? ((string)professionIconBig.GetValueOrDefault()) : null, "[0-9]*.png");
+				obj6.Icon = obj7;
+				obj6.ChatLink = skill5.ChatLink;
+				obj6.Description = skill5.Description;
+				obj6.Specialization = (skill5.Specialization.HasValue ? skill5.Specialization.Value : 0);
+				obj6.Flags = (from e in skill5.Flags.ToList()
+					select e.RawValue).ToList();
+				obj6.Categories = new List<string>();
+				API.Skill temp2 = obj6;
 				if (skill5.Categories != null)
 				{
 					foreach (string category in skill5.Categories!)
