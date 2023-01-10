@@ -67,20 +67,20 @@ namespace Charr.Timers_BlishHUD.Models.Triggers
 			{
 				return false;
 			}
-			bool debugMode = TimersModule.ModuleInstance._debugModeSetting.get_Value();
-			if (!debugMode && base.CombatRequired && !GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat())
+			bool debugMode = TimersModule.ModuleInstance._debugModeSetting.Value;
+			if (!debugMode && base.CombatRequired && !GameService.Gw2Mumble.PlayerCharacter.IsInCombat)
 			{
 				return false;
 			}
-			if (!debugMode && base.OutOfCombatRequired && GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat())
+			if (!debugMode && base.OutOfCombatRequired && GameService.Gw2Mumble.PlayerCharacter.IsInCombat)
 			{
 				return false;
 			}
 			if (debugMode || base.EntryRequired || base.DepartureRequired)
 			{
-				float x = GameService.Gw2Mumble.get_PlayerCharacter().get_Position().X;
-				float y = GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Y;
-				float z = GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Z;
+				float x = GameService.Gw2Mumble.PlayerCharacter.Position.X;
+				float y = GameService.Gw2Mumble.PlayerCharacter.Position.Y;
+				float z = GameService.Gw2Mumble.PlayerCharacter.Position.Z;
 				bool playerInArea = ((base.Antipode == null || base.Antipode.Count != 3) ? (((base.Position.Count == 2) ? Math.Sqrt(Math.Pow(x - base.Position[0], 2.0) + Math.Pow(y - base.Position[1], 2.0)) : Math.Sqrt(Math.Pow(x - base.Position[0], 2.0) + Math.Pow(y - base.Position[1], 2.0) + Math.Pow(z - base.Position[2], 2.0))) <= (double)base.Radius) : (x >= Math.Min(base.Position[0], base.Antipode[0]) && x <= Math.Max(base.Position[0], base.Antipode[0]) && y >= Math.Min(base.Position[1], base.Antipode[1]) && y <= Math.Max(base.Position[1], base.Antipode[1]) && z >= Math.Min(base.Position[2], base.Antipode[2]) && z <= Math.Max(base.Position[2], base.Antipode[2])));
 				if ((base.EntryRequired && !playerInArea) || (base.DepartureRequired && playerInArea))
 				{

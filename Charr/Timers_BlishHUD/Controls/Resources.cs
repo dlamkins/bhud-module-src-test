@@ -88,12 +88,12 @@ namespace Charr.Timers_BlishHUD.Controls
 		public Resources()
 		{
 			TICKINTERVAL = 1 / TICKRATE;
-			MasterScrollEffect = GameService.Content.get_ContentManager().Load<Effect>("effects\\menuitem");
+			MasterScrollEffect = GameService.Content.ContentManager.Load<Effect>("effects\\menuitem");
 			MasterScrollEffect.get_Parameters().get_Item("Mask").SetValue((Texture)(object)GameService.Content.GetTexture("156072"));
 			MasterScrollEffect.get_Parameters().get_Item("Overlay").SetValue((Texture)(object)GameService.Content.GetTexture("156071"));
 			TextureFillCrest = GameService.Content.GetTexture("controls/detailsbutton/605004");
 			TextureVignette = GameService.Content.GetTexture("controls/detailsbutton/605003");
-			Font = GameService.Content.GetFont((FontFace)0, (FontSize)22, (FontStyle)0);
+			Font = GameService.Content.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size22, ContentService.FontStyle.Regular);
 			TextureEye = TimersModule.ModuleInstance.ContentsManager.GetTexture("textures\\605021.png");
 			TextureEyeActive = TimersModule.ModuleInstance.ContentsManager.GetTexture("textures\\605019.png");
 			TextureDescription = GameService.Content.GetTexture("102530");

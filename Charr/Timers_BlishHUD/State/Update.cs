@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 
@@ -27,7 +26,7 @@ namespace Charr.Timers_BlishHUD.State
 
 		public void Initialize()
 		{
-			if (CollectionUtilities.IsNullOrEmpty<char>((IEnumerable<char>)Version))
+			if (Version.IsNullOrEmpty())
 			{
 				throw new ArgumentNullException();
 			}

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Blish_HUD;
 using Blish_HUD.Content;
+using Blish_HUD.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Charr.Timers_BlishHUD.Pathing.Content
@@ -33,7 +34,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Content
 			{
 				return;
 			}
-			Logger.Debug("Running texture swap for pathables. {addCount} will be added and {removeCount} will be removed.", new object[2] { _pendingTextureUse.Count, _pendingTextureRemoval.Count });
+			Logger.Debug("Running texture swap for pathables. {addCount} will be added and {removeCount} will be removed.", _pendingTextureUse.Count, _pendingTextureRemoval.Count);
 			_pendingTextureRemoval.RemoveWhere((string t) => _pendingTextureUse.Contains(t));
 			foreach (string textureKey in _pendingTextureRemoval)
 			{
@@ -57,7 +58,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Content
 
 		public Texture2D LoadTexture(string texturePath)
 		{
-			return LoadTexture(texturePath, Textures.get_Error());
+			return LoadTexture(texturePath, ContentService.Textures.Error);
 		}
 
 		public Texture2D LoadTexture(string texturePath, Texture2D fallbackTexture)
@@ -68,18 +69,21 @@ namespace Charr.Timers_BlishHUD.Pathing.Content
 				using Stream textureStream = DataReader.GetFileStream(texturePath);
 				if (textureStream == null)
 				{
-					Logger.Warn("Failed to load texture {dataReaderPath}.", new object[1] { DataReader.GetPathRepresentation(texturePath) });
+					Logger.Warn("Failed to load texture {dataReaderPath}.", DataReader.GetPathRepresentation(texturePath));
 					return fallbackTexture;
 				}
-				_textureCache.Add(texturePath, TextureUtil.FromStreamPremultiplied(GameService.Graphics.get_GraphicsDevice(), textureStream));
-				Logger.Debug("Successfully loaded texture {dataReaderPath}.", new object[1] { DataReader.GetPathRepresentation(texturePath) });
+				using (GraphicsDeviceContext graphicsDeviceContext = GameService.Graphics.LendGraphicsDeviceContext())
+				{
+					_textureCache.Add(texturePath, TextureUtil.FromStreamPremultiplied(graphicsDeviceContext.GraphicsDevice, textureStream));
+				}
+				Logger.Debug("Successfully loaded texture {dataReaderPath}.", DataReader.GetPathRepresentation(texturePath));
 			}
 			return _textureCache[texturePath];
 		}
 
 		public void Dispose()
 		{
-			((IDisposable)DataReader)?.Dispose();
+			DataReader?.Dispose();
 			foreach (KeyValuePair<string, Texture2D> item in _textureCache)
 			{
 				Texture2D value = item.Value;

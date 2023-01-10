@@ -125,7 +125,7 @@ namespace Charr.Timers_BlishHUD.Models
 			}
 		}
 
-		public AsyncTexture2D Icon { get; set; } = AsyncTexture2D.op_Implicit(Textures.get_TransparentPixel());
+		public AsyncTexture2D Icon { get; set; } = ContentService.Textures.TransparentPixel;
 
 
 		public bool IsFromZip { get; set; }
@@ -163,7 +163,7 @@ namespace Charr.Timers_BlishHUD.Models
 			Icon = TimersModule.ModuleInstance.Resources.GetIcon(IconString);
 			if (Icon == null)
 			{
-				Icon = AsyncTexture2D.op_Implicit(resourceManager.LoadTexture(IconString));
+				Icon = resourceManager.LoadTexture(IconString);
 			}
 			if (Map <= 0)
 			{
@@ -210,7 +210,7 @@ namespace Charr.Timers_BlishHUD.Models
 				return;
 			}
 			State = EncounterStates.Ready;
-			if (Map == GameService.Gw2Mumble.get_CurrentMap().get_Id())
+			if (Map == GameService.Gw2Mumble.CurrentMap.Id)
 			{
 				Phases.ForEach(delegate(Phase ph)
 				{
@@ -240,7 +240,7 @@ namespace Charr.Timers_BlishHUD.Models
 			{
 				return false;
 			}
-			if (Map != GameService.Gw2Mumble.get_CurrentMap().get_Id())
+			if (Map != GameService.Gw2Mumble.CurrentMap.Id)
 			{
 				return false;
 			}
@@ -253,7 +253,7 @@ namespace Charr.Timers_BlishHUD.Models
 			{
 				return false;
 			}
-			if (Map != GameService.Gw2Mumble.get_CurrentMap().get_Id())
+			if (Map != GameService.Gw2Mumble.CurrentMap.Id)
 			{
 				return true;
 			}
@@ -301,7 +301,7 @@ namespace Charr.Timers_BlishHUD.Models
 			else if (ShouldStop())
 			{
 				Stop();
-				if (Enabled && Map == GameService.Gw2Mumble.get_CurrentMap().get_Id())
+				if (Enabled && Map == GameService.Gw2Mumble.CurrentMap.Id)
 				{
 					Phases[0].WaitForStart();
 					State = EncounterStates.WaitingToRun;

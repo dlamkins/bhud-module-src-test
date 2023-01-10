@@ -1,5 +1,6 @@
 using System;
 using Blish_HUD;
+using Blish_HUD.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -173,7 +174,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 					VerticalConstraint = ((_texture.get_Height() != _texture.get_Width()) ? BillboardVerticalConstraint.PlayerPosition : BillboardVerticalConstraint.CameraPosition);
 					if (_autoResize)
 					{
-						Size = new Vector2(WorldUtil.GameToWorldCoord((float)_texture.get_Width()), WorldUtil.GameToWorldCoord((float)_texture.get_Height()));
+						Size = new Vector2(WorldUtil.GameToWorldCoord(_texture.get_Width()), WorldUtil.GameToWorldCoord(_texture.get_Height()));
 					}
 				}
 			}
@@ -184,7 +185,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 		static MarkerPathable()
 		{
 			Logger = Logger.GetLogger<MarkerPathable>();
-			_sharedMarkerEffect = new MarkerEffect(GameService.Content.get_ContentManager().Load<Effect>("effects\\marker"));
+			_sharedMarkerEffect = new MarkerEffect(GameService.Content.ContentManager.Load<Effect>("effects\\marker"));
 			_fadeTexture = TimersModule.ModuleInstance.Resources.TextureFade;
 		}
 
@@ -227,10 +228,11 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 
 		private void Initialize()
 		{
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Expected O, but got Unknown
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Expected O, but got Unknown
 			_verts = (VertexPositionTexture[])(object)new VertexPositionTexture[4];
-			_vertexBuffer = new DynamicVertexBuffer(GameService.Graphics.get_GraphicsDevice(), typeof(VertexPositionTexture), 4, (BufferUsage)1);
+			using GraphicsDeviceContext graphicsDeviceContext = GameService.Graphics.LendGraphicsDeviceContext();
+			_vertexBuffer = new DynamicVertexBuffer(graphicsDeviceContext.GraphicsDevice, typeof(VertexPositionTexture), 4, (BufferUsage)1);
 		}
 
 		private void RecalculateSize(Vector2 newSize, float scale)
@@ -315,7 +317,7 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 				return;
 			}
 			Matrix modelMatrix = Matrix.CreateTranslation(_size.X / -2f, _size.Y / -2f, 0f) * Matrix.CreateScale(_scale);
-			modelMatrix = ((!(Rotation == Vector3.get_Zero())) ? (modelMatrix * (Matrix.CreateRotationX(MathHelper.ToRadians(Rotation.X)) * Matrix.CreateRotationY(MathHelper.ToRadians(Rotation.Y)) * Matrix.CreateRotationZ(MathHelper.ToRadians(Rotation.Z)) * Matrix.CreateTranslation(Position + RenderOffset))) : (modelMatrix * Matrix.CreateBillboard(Position + RenderOffset, new Vector3(GameService.Gw2Mumble.get_PlayerCamera().get_Position().X, GameService.Gw2Mumble.get_PlayerCamera().get_Position().Y, (_verticalConstraint == BillboardVerticalConstraint.CameraPosition) ? GameService.Gw2Mumble.get_PlayerCamera().get_Position().Z : GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Z), new Vector3(0f, 0f, 1f), (Vector3?)GameService.Gw2Mumble.get_PlayerCamera().get_Forward())));
+			modelMatrix = ((!(Rotation == Vector3.get_Zero())) ? (modelMatrix * (Matrix.CreateRotationX(MathHelper.ToRadians(Rotation.X)) * Matrix.CreateRotationY(MathHelper.ToRadians(Rotation.Y)) * Matrix.CreateRotationZ(MathHelper.ToRadians(Rotation.Z)) * Matrix.CreateTranslation(Position + RenderOffset))) : (modelMatrix * Matrix.CreateBillboard(Position + RenderOffset, new Vector3(GameService.Gw2Mumble.PlayerCamera.Position.X, GameService.Gw2Mumble.PlayerCamera.Position.Y, (_verticalConstraint == BillboardVerticalConstraint.CameraPosition) ? GameService.Gw2Mumble.PlayerCamera.Position.Z : GameService.Gw2Mumble.PlayerCharacter.Position.Z), new Vector3(0f, 0f, 1f), (Vector3?)GameService.Gw2Mumble.PlayerCamera.Forward)));
 			_sharedMarkerEffect.SetEntityState(modelMatrix, _texture, _opacity, _fadeNear, _fadeFar, _playerFadeRadius, _fadeCenter, _fadeTexture, _tintColor);
 			graphicsDevice.SetVertexBuffer((VertexBuffer)(object)_vertexBuffer);
 			Enumerator enumerator = ((Effect)_sharedMarkerEffect).get_CurrentTechnique().get_Passes().GetEnumerator();

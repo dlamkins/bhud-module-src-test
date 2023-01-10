@@ -36,9 +36,9 @@ namespace Charr.Timers_BlishHUD.Controls.ResetButton
 
 		public bool TintOnHover;
 
-		private AsyncTexture2D _resizeTexture = AsyncTexture2D.op_Implicit(TimersModule.ModuleInstance.ContentsManager.GetTexture("textures\\156009.png"));
+		private AsyncTexture2D _resizeTexture = TimersModule.ModuleInstance.ContentsManager.GetTexture("textures\\156009.png");
 
-		private AsyncTexture2D _resizeTextureHovered = AsyncTexture2D.op_Implicit(TimersModule.ModuleInstance.ContentsManager.GetTexture("textures\\156010.png"));
+		private AsyncTexture2D _resizeTextureHovered = TimersModule.ModuleInstance.ContentsManager.GetTexture("textures\\156010.png");
 
 		private StandardButton Button;
 
@@ -56,9 +56,9 @@ namespace Charr.Timers_BlishHUD.Controls.ResetButton
 				//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-				Rectangle localBounds = ((Control)this).get_LocalBounds();
+				Rectangle localBounds = base.LocalBounds;
 				int num = ((Rectangle)(ref localBounds)).get_Right() - 15;
-				localBounds = ((Control)this).get_LocalBounds();
+				localBounds = base.LocalBounds;
 				return new Rectangle(num, ((Rectangle)(ref localBounds)).get_Bottom() - 15, 15, 15);
 			}
 		}
@@ -68,7 +68,6 @@ namespace Charr.Timers_BlishHUD.Controls.ResetButton
 		public event EventHandler BoundsChanged;
 
 		public ResetButton()
-			: this()
 		{
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
@@ -76,51 +75,40 @@ namespace Charr.Timers_BlishHUD.Controls.ResetButton
 			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
 			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e3: Expected O, but got Unknown
-			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0151: Expected O, but got Unknown
-			StandardButton val = new StandardButton();
-			((Control)val).set_Location(new Point(2, 2));
-			val.set_Text("Reset Timer");
-			((Control)val).set_Parent((Container)(object)this);
-			((Control)val).set_BasicTooltipText(string.Format("Reset Active Timers" + Environment.NewLine + "Hold {0} to move and resize.", ((object)(Keys)(ref ModifierKey)).ToString()));
-			((Control)val).set_Visible(false);
-			Button = val;
-			Image val2 = new Image();
-			((Control)val2).set_Location(new Point(2, 2));
-			((Control)val2).set_Parent((Container)(object)this);
-			((Control)val2).set_BasicTooltipText(string.Format("Reset Active Timers" + Environment.NewLine + "Hold {0} to move and resize.", ((object)(Keys)(ref ModifierKey)).ToString()));
-			val2.set_Texture(AsyncTexture2D.op_Implicit(TimersModule.ModuleInstance.ContentsManager.GetTexture("textures\\resetbutton_big.png")));
-			ImageButton = val2;
-			((Control)ImageButton).add_Click((EventHandler<MouseEventArgs>)Button_Click);
-			((Control)Button).add_Click((EventHandler<MouseEventArgs>)Button_Click);
+			Button = new StandardButton
+			{
+				Location = new Point(2, 2),
+				Text = "Reset Timer",
+				Parent = this,
+				BasicTooltipText = string.Format("Reset Active Timers" + Environment.NewLine + "Hold {0} to move and resize.", ((object)(Keys)(ref ModifierKey)).ToString()),
+				Visible = false
+			};
+			ImageButton = new Image
+			{
+				Location = new Point(2, 2),
+				Parent = this,
+				BasicTooltipText = string.Format("Reset Active Timers" + Environment.NewLine + "Hold {0} to move and resize.", ((object)(Keys)(ref ModifierKey)).ToString()),
+				Texture = TimersModule.ModuleInstance.ContentsManager.GetTexture("textures\\resetbutton_big.png")
+			};
+			ImageButton.Click += Button_Click;
+			Button.Click += Button_Click;
 		}
 
 		private void Button_Click(object sender, MouseEventArgs e)
 		{
-			this.ButtonClicked?.Invoke(sender, (EventArgs)(object)e);
+			this.ButtonClicked?.Invoke(sender, e);
 		}
 
 		public void ToggleVisibility()
 		{
-			((Control)this).set_Visible(!((Control)this).get_Visible());
+			base.Visible = !base.Visible;
 		}
 
 		protected override void OnLeftMouseButtonReleased(MouseEventArgs e)
 		{
-			((Control)this).OnLeftMouseButtonReleased(e);
+			base.OnLeftMouseButtonReleased(e);
 			_dragging = false;
 			_resizing = false;
 		}
@@ -138,17 +126,15 @@ namespace Charr.Timers_BlishHUD.Controls.ResetButton
 			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
 			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).OnLeftMouseButtonPressed(e);
-			if (((Control)this).get_MouseOver() && Control.get_Input().get_Keyboard().get_KeysDown()
-				.ToList()
-				.Contains(ModifierKey))
+			base.OnLeftMouseButtonPressed(e);
+			if (base.MouseOver && Control.Input.Keyboard.KeysDown.ToList().Contains(ModifierKey))
 			{
 				Rectangle resizeCorner = _resizeCorner;
-				_resizing = ((Rectangle)(ref resizeCorner)).Contains(e.get_MousePosition());
-				_resizeStart = ((Control)this).get_Size();
-				_dragStart = Control.get_Input().get_Mouse().get_Position();
+				_resizing = ((Rectangle)(ref resizeCorner)).Contains(e.MousePosition);
+				_resizeStart = base.Size;
+				_dragStart = Control.Input.Mouse.Position;
 				_dragging = !_resizing;
-				_draggingStart = (_dragging ? ((Control)this).get_RelativeMousePosition() : Point.get_Zero());
+				_draggingStart = (_dragging ? base.RelativeMousePosition : Point.get_Zero());
 			}
 		}
 
@@ -168,21 +154,21 @@ namespace Charr.Timers_BlishHUD.Controls.ResetButton
 			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
-			((Container)this).UpdateContainer(gameTime);
-			_dragging = _dragging && ((Control)this).get_MouseOver();
-			_resizing = _resizing && ((Control)this).get_MouseOver();
-			MouseOverResizeHandle = MouseOverResizeHandle && ((Control)this).get_MouseOver();
+			base.UpdateContainer(gameTime);
+			_dragging = _dragging && base.MouseOver;
+			_resizing = _resizing && base.MouseOver;
+			MouseOverResizeHandle = MouseOverResizeHandle && base.MouseOver;
 			if (_dragging)
 			{
-				((Control)this).set_Location(Control.get_Input().get_Mouse().get_Position() + new Point(-_draggingStart.X, -_draggingStart.Y));
+				base.Location = Control.Input.Mouse.Position + new Point(-_draggingStart.X, -_draggingStart.Y);
 				this.BoundsChanged?.Invoke(null, null);
 			}
 			if (_resizing)
 			{
-				Point nOffset = Control.get_Input().get_Mouse().get_Position() - _dragStart;
+				Point nOffset = Control.Input.Mouse.Position - _dragStart;
 				Point newSize = _resizeStart + nOffset;
 				int longestLength = Math.Max(newSize.X, newSize.Y);
-				((Control)this).set_Size(new Point(MathHelper.Clamp(longestLength, MinSize, MaxSize), MathHelper.Clamp(longestLength, MinSize, MaxSize)));
+				base.Size = new Point(MathHelper.Clamp(longestLength, MinSize, MaxSize), MathHelper.Clamp(longestLength, MinSize, MaxSize));
 				this.BoundsChanged?.Invoke(null, null);
 			}
 		}
@@ -200,13 +186,13 @@ namespace Charr.Timers_BlishHUD.Controls.ResetButton
 			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
 			ResetMouseRegionStates();
 			Rectangle resizeHandleBounds = ResizeHandleBounds;
-			if (((Rectangle)(ref resizeHandleBounds)).Contains(((Control)this).get_RelativeMousePosition()))
+			if (((Rectangle)(ref resizeHandleBounds)).Contains(base.RelativeMousePosition))
 			{
-				int x = ((Control)this).get_RelativeMousePosition().X;
+				int x = base.RelativeMousePosition.X;
 				resizeHandleBounds = ResizeHandleBounds;
 				if (x > ((Rectangle)(ref resizeHandleBounds)).get_Right() - 16)
 				{
-					int y = ((Control)this).get_RelativeMousePosition().Y;
+					int y = base.RelativeMousePosition.Y;
 					resizeHandleBounds = ResizeHandleBounds;
 					if (y > ((Rectangle)(ref resizeHandleBounds)).get_Bottom() - 16)
 					{
@@ -214,7 +200,7 @@ namespace Charr.Timers_BlishHUD.Controls.ResetButton
 					}
 				}
 			}
-			((Control)this).OnMouseMoved(e);
+			base.OnMouseMoved(e);
 		}
 
 		private void ResetMouseRegionStates()
@@ -229,17 +215,17 @@ namespace Charr.Timers_BlishHUD.Controls.ResetButton
 			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).RecalculateLayout();
-			ResizeHandleBounds = new Rectangle(((Control)this).get_Width() - _resizeTexture.get_Texture().get_Width(), ((Control)this).get_Height() - _resizeTexture.get_Texture().get_Height(), _resizeTexture.get_Texture().get_Width(), _resizeTexture.get_Texture().get_Height());
+			base.RecalculateLayout();
+			ResizeHandleBounds = new Rectangle(base.Width - _resizeTexture.Texture.get_Width(), base.Height - _resizeTexture.Texture.get_Height(), _resizeTexture.Texture.get_Width(), _resizeTexture.Texture.get_Height());
 			Point sqSize = default(Point);
-			((Point)(ref sqSize))._002Ector(Math.Min(((Control)this).get_Width(), ((Control)this).get_Height()) - 5, Math.Min(((Control)this).get_Width(), ((Control)this).get_Height()) - 5);
+			((Point)(ref sqSize))._002Ector(Math.Min(base.Width, base.Height) - 5, Math.Min(base.Width, base.Height) - 5);
 			if (Button != null)
 			{
-				((Control)Button).set_Size(((Control)this).get_Size() - new Point(5, 5));
+				Button.Size = base.Size - new Point(5, 5);
 			}
 			if (ImageButton != null)
 			{
-				((Control)ImageButton).set_Size(sqSize);
+				ImageButton.Size = sqSize;
 			}
 		}
 
@@ -300,28 +286,26 @@ namespace Charr.Timers_BlishHUD.Controls.ResetButton
 			//IL_0305: Unknown result type (might be due to invalid IL or missing references)
 			//IL_030f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0315: Unknown result type (might be due to invalid IL or missing references)
-			((Container)this).PaintAfterChildren(spriteBatch, bounds);
-			if (((Control)this).get_MouseOver() && Control.get_Input().get_Keyboard().get_KeysDown()
-				.ToList()
-				.Contains(ModifierKey))
+			base.PaintAfterChildren(spriteBatch, bounds);
+			if (base.MouseOver && Control.Input.Keyboard.KeysDown.ToList().Contains(ModifierKey))
 			{
-				if (!TintOnHover || ((Control)this).get_MouseOver())
+				if (!TintOnHover || base.MouseOver)
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), bounds, (Rectangle?)Rectangle.get_Empty(), TintColor, 0f, default(Vector2), (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, bounds, Rectangle.get_Empty(), TintColor, 0f, default(Vector2), (SpriteEffects)0);
 				}
 				if (_resizeTexture != null)
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit((_resizing || MouseOverResizeHandle) ? _resizeTextureHovered : _resizeTexture), new Rectangle(((Rectangle)(ref bounds)).get_Right() - _resizeTexture.get_Texture().get_Width() - 1, ((Rectangle)(ref bounds)).get_Bottom() - _resizeTexture.get_Texture().get_Height() - 1, _resizeTexture.get_Texture().get_Width(), _resizeTexture.get_Texture().get_Height()), (Rectangle?)_resizeTexture.get_Texture().get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(this, (_resizing || MouseOverResizeHandle) ? _resizeTextureHovered : _resizeTexture, new Rectangle(((Rectangle)(ref bounds)).get_Right() - _resizeTexture.Texture.get_Width() - 1, ((Rectangle)(ref bounds)).get_Bottom() - _resizeTexture.Texture.get_Height() - 1, _resizeTexture.Texture.get_Width(), _resizeTexture.Texture.get_Height()), _resizeTexture.Texture.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
 				}
-				Color color = (((Control)this).get_MouseOver() ? Colors.ColonialWhite : Color.get_Transparent());
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, 2), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, 1), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Bottom() - 2, bounds.Width, 2), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Bottom() - 1, bounds.Width, 1), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), 2, bounds.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), 1, bounds.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Right() - 2, ((Rectangle)(ref bounds)).get_Top(), 2, bounds.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Right() - 1, ((Rectangle)(ref bounds)).get_Top(), 1, bounds.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
+				Color color = (base.MouseOver ? ContentService.Colors.ColonialWhite : Color.get_Transparent());
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, 2), Rectangle.get_Empty(), color * 0.5f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, 1), Rectangle.get_Empty(), color * 0.6f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Bottom() - 2, bounds.Width, 2), Rectangle.get_Empty(), color * 0.5f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Bottom() - 1, bounds.Width, 1), Rectangle.get_Empty(), color * 0.6f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), 2, bounds.Height), Rectangle.get_Empty(), color * 0.5f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), 1, bounds.Height), Rectangle.get_Empty(), color * 0.6f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Right() - 2, ((Rectangle)(ref bounds)).get_Top(), 2, bounds.Height), Rectangle.get_Empty(), color * 0.5f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Right() - 1, ((Rectangle)(ref bounds)).get_Top(), 1, bounds.Height), Rectangle.get_Empty(), color * 0.6f);
 			}
 		}
 	}

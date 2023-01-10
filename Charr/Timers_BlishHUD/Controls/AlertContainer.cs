@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Blish_HUD;
@@ -44,7 +43,7 @@ namespace Charr.Timers_BlishHUD.Controls
 			set
 			{
 				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-				((Control)this).SetProperty<Vector2>(ref _controlPadding, value, true, "ControlPadding");
+				SetProperty(ref _controlPadding, value, invalidateLayout: true, "ControlPadding");
 			}
 		}
 
@@ -58,7 +57,7 @@ namespace Charr.Timers_BlishHUD.Controls
 			set
 			{
 				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-				((Control)this).SetProperty<Vector2>(ref _outerControlPadding, value, true, "OuterControlPadding");
+				SetProperty(ref _outerControlPadding, value, invalidateLayout: true, "OuterControlPadding");
 			}
 		}
 
@@ -71,7 +70,7 @@ namespace Charr.Timers_BlishHUD.Controls
 			}
 			set
 			{
-				((Control)this).SetProperty<bool>(ref _padLeftBeforeControl, value, true, "PadLeftBeforeControl");
+				SetProperty(ref _padLeftBeforeControl, value, invalidateLayout: true, "PadLeftBeforeControl");
 			}
 		}
 
@@ -84,7 +83,7 @@ namespace Charr.Timers_BlishHUD.Controls
 			}
 			set
 			{
-				((Control)this).SetProperty<bool>(ref _padTopBeforeControl, value, true, "PadTopBeforeControl");
+				SetProperty(ref _padTopBeforeControl, value, invalidateLayout: true, "PadTopBeforeControl");
 			}
 		}
 
@@ -96,7 +95,7 @@ namespace Charr.Timers_BlishHUD.Controls
 			}
 			set
 			{
-				((Control)this).SetProperty<AlertFlowDirection>(ref _flowDirection, value, true, "FlowDirection");
+				SetProperty(ref _flowDirection, value, invalidateLayout: true, "FlowDirection");
 			}
 		}
 
@@ -111,16 +110,15 @@ namespace Charr.Timers_BlishHUD.Controls
 				//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 				//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-				if (((Control)this).SetProperty<bool>(ref _locationLock, value, false, "LocationLock"))
+				if (SetProperty(ref _locationLock, value, invalidateLayout: false, "LocationLock"))
 				{
-					((Control)this).set_BackgroundColor((Color)(_locationLock ? Color.get_Transparent() : new Color(Color.get_Black(), 0.3f)));
-					((Control)this).set_BasicTooltipText(_locationLock ? "" : "Drag to move alert container.\nYou can lock it in place by going to the settings panel.");
+					base.BackgroundColor = (Color)(_locationLock ? Color.get_Transparent() : new Color(Color.get_Black(), 0.3f));
+					base.BasicTooltipText = (_locationLock ? "" : "Drag to move alert container.\nYou can lock it in place by going to the settings panel.");
 				}
 			}
 		}
 
 		public AlertContainer()
-			: this()
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
@@ -128,88 +126,88 @@ namespace Charr.Timers_BlishHUD.Controls
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			GameService.Input.get_Mouse().add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)delegate(object sender, MouseEventArgs args)
+			GameService.Input.Mouse.LeftMouseButtonReleased += delegate(object sender, MouseEventArgs args)
 			{
 				HandleLeftMouseButtonReleased(args);
-			});
-			TimersModule.ModuleInstance._alertContainerLocationSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<Point>>)delegate(object sender, ValueChangedEventArgs<Point> args)
+			};
+			TimersModule.ModuleInstance._alertContainerLocationSetting.SettingChanged += delegate(object sender, ValueChangedEventArgs<Point> args)
 			{
 				//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-				((Control)this).set_Location(args.get_NewValue());
-			});
-			TimersModule.ModuleInstance._hideAlertsSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate
+				base.Location = args.NewValue;
+			};
+			TimersModule.ModuleInstance._hideAlertsSetting.SettingChanged += delegate
 			{
-				if (!TimersModule.ModuleInstance._hideAlertsSetting.get_Value() && ((Container)this)._children.get_Count() > 0)
+				if (!TimersModule.ModuleInstance._hideAlertsSetting.Value && _children.Count > 0)
 				{
-					((Control)this).Show();
+					Show();
 				}
 				else
 				{
-					((Control)this).Hide();
+					Hide();
 				}
-			});
-			((Control)this).set_BasicTooltipText(_locationLock ? "" : "Drag to move alert container.\nYou can lock it in place by going to the settings panel.");
-			((Control)this).set_Visible(false);
+			};
+			base.BasicTooltipText = (_locationLock ? "" : "Drag to move alert container.\nYou can lock it in place by going to the settings panel.");
+			base.Visible = false;
 		}
 
 		protected override void OnChildAdded(ChildChangedEventArgs e)
 		{
-			OnChildrenChanged(e.get_ResultingChildren());
-			((Panel)this).OnChildAdded(e);
-			e.get_ChangedChild().add_Resized((EventHandler<ResizedEventArgs>)ChangedChildOnResized);
+			OnChildrenChanged(e.ResultingChildren);
+			base.OnChildAdded(e);
+			e.ChangedChild.Resized += ChangedChildOnResized;
 			float outerPadX = (_padLeftBeforeControl ? _controlPadding.X : _outerControlPadding.X);
 			float outerPadY = (_padTopBeforeControl ? _controlPadding.Y : _outerControlPadding.Y);
-			e.get_ChangedChild().set_Top((int)outerPadY);
-			e.get_ChangedChild().set_Left((int)outerPadX);
+			e.ChangedChild.Top = (int)outerPadY;
+			e.ChangedChild.Left = (int)outerPadX;
 			switch (FlowDirection)
 			{
 			case AlertFlowDirection.LeftToRight:
-				e.get_ChangedChild().set_Left(((Control)this).get_Width() + e.get_ChangedChild().get_Width());
+				e.ChangedChild.Left = base.Width + e.ChangedChild.Width;
 				break;
 			case AlertFlowDirection.RightToLeft:
-				e.get_ChangedChild().set_Right(-e.get_ChangedChild().get_Width());
+				e.ChangedChild.Right = -e.ChangedChild.Width;
 				break;
 			case AlertFlowDirection.TopToBottom:
-				e.get_ChangedChild().set_Top(((Control)this).get_Height() + e.get_ChangedChild().get_Height());
+				e.ChangedChild.Top = base.Height + e.ChangedChild.Height;
 				break;
 			case AlertFlowDirection.BottomToTop:
-				e.get_ChangedChild().set_Bottom(-e.get_ChangedChild().get_Height());
+				e.ChangedChild.Bottom = -e.ChangedChild.Height;
 				break;
 			}
 		}
 
 		protected override void OnChildRemoved(ChildChangedEventArgs e)
 		{
-			OnChildrenChanged(e.get_ResultingChildren());
-			((Panel)this).OnChildRemoved(e);
-			e.get_ChangedChild().remove_Resized((EventHandler<ResizedEventArgs>)ChangedChildOnResized);
+			OnChildrenChanged(e.ResultingChildren);
+			base.OnChildRemoved(e);
+			e.ChangedChild.Resized -= ChangedChildOnResized;
 		}
 
 		private void ChangedChildOnResized(object sender, ResizedEventArgs e)
 		{
-			OnChildrenChanged(((Container)this)._children.ToArray());
+			OnChildrenChanged(_children.ToArray());
 		}
 
 		private void OnChildrenChanged(IEnumerable<Control> resultingChildren)
 		{
-			((Control)this).RecalculateLayout();
+			RecalculateLayout();
 		}
 
 		public void FilterChildren<TControl>(Func<TControl, bool> filter) where TControl : Control
 		{
-			((IEnumerable)((Container)this)._children).Cast<TControl>().ToList().ForEach(delegate(TControl tc)
+			_children.Cast<TControl>().ToList().ForEach(delegate(TControl tc)
 			{
-				((Control)tc).set_Visible(filter(tc));
+				tc.Visible = filter(tc);
 			});
-			((Control)this).Invalidate();
+			Invalidate();
 		}
 
 		public void SortChildren<TControl>(Comparison<TControl> comparison) where TControl : Control
 		{
-			List<TControl> tempChildren = ((IEnumerable)((Container)this)._children).Cast<TControl>().ToList();
+			List<TControl> tempChildren = _children.Cast<TControl>().ToList();
 			tempChildren.Sort(comparison);
-			((Container)this)._children = new ControlCollection<Control>((IEnumerable<Control>)tempChildren);
-			((Control)this).Invalidate();
+			_children = new ControlCollection<Control>(tempChildren);
+			Invalidate();
 		}
 
 		private void UpdateSizeToFitChildren()
@@ -227,45 +225,45 @@ namespace Charr.Timers_BlishHUD.Controls
 			//IL_025e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02a9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02b3: Unknown result type (might be due to invalid IL or missing references)
-			if (((Container)this)._children.get_Count() == 0)
+			if (_children.Count == 0)
 			{
 				return;
 			}
 			float outerPadX = (_padLeftBeforeControl ? _controlPadding.X : _outerControlPadding.X);
 			float outerPadY = (_padTopBeforeControl ? _controlPadding.Y : _outerControlPadding.Y);
-			int newWidth = (int)((float)(((Container)this)._children.get_Count() * ((Container)this)._children.get_Item(0).get_Width()) + (float)(((Container)this)._children.get_Count() - 1) * _controlPadding.X + outerPadX * 2f);
-			int newHeight = (int)((float)(((Container)this)._children.get_Count() * ((Container)this)._children.get_Item(0).get_Height()) + (float)(((Container)this)._children.get_Count() - 1) * _controlPadding.Y + outerPadY * 2f);
-			Point previousSize = ((Control)this).get_Size();
+			int newWidth = (int)((float)(_children.Count * _children[0].Width) + (float)(_children.Count - 1) * _controlPadding.X + outerPadX * 2f);
+			int newHeight = (int)((float)(_children.Count * _children[0].Height) + (float)(_children.Count - 1) * _controlPadding.Y + outerPadY * 2f);
+			Point previousSize = base.Size;
 			if (FlowDirection == AlertFlowDirection.LeftToRight || FlowDirection == AlertFlowDirection.RightToLeft)
 			{
-				((Control)this).set_Width(newWidth);
-				((Control)this).set_Height((int)((float)((Container)this)._children.get_Item(0).get_Height() + outerPadY * 2f));
+				base.Width = newWidth;
+				base.Height = (int)((float)_children[0].Height + outerPadY * 2f);
 			}
 			else if (FlowDirection == AlertFlowDirection.TopToBottom || FlowDirection == AlertFlowDirection.BottomToTop)
 			{
-				((Control)this).set_Width((int)((float)((Container)this)._children.get_Item(0).get_Width() + outerPadX * 2f));
-				((Control)this).set_Height(newHeight);
+				base.Width = (int)((float)_children[0].Width + outerPadX * 2f);
+				base.Height = newHeight;
 			}
-			switch (TimersModule.ModuleInstance._alertDisplayOrientationSetting.get_Value())
+			switch (TimersModule.ModuleInstance._alertDisplayOrientationSetting.Value)
 			{
 			case AlertFlowDirection.LeftToRight:
 			case AlertFlowDirection.TopToBottom:
-				((Control)this).set_Location(TimersModule.ModuleInstance._alertContainerLocationSetting.get_Value());
+				base.Location = TimersModule.ModuleInstance._alertContainerLocationSetting.Value;
 				break;
 			case AlertFlowDirection.RightToLeft:
-				((Control)this).set_Right(TimersModule.ModuleInstance._alertContainerLocationSetting.get_Value().X + TimersModule.ModuleInstance._alertContainerSizeSetting.get_Value().X);
-				((Control)this).set_Top(TimersModule.ModuleInstance._alertContainerLocationSetting.get_Value().Y);
+				base.Right = TimersModule.ModuleInstance._alertContainerLocationSetting.Value.X + TimersModule.ModuleInstance._alertContainerSizeSetting.Value.X;
+				base.Top = TimersModule.ModuleInstance._alertContainerLocationSetting.Value.Y;
 				break;
 			case AlertFlowDirection.BottomToTop:
-				((Control)this).set_Left(TimersModule.ModuleInstance._alertContainerLocationSetting.get_Value().X);
-				((Control)this).set_Bottom(TimersModule.ModuleInstance._alertContainerLocationSetting.get_Value().Y + TimersModule.ModuleInstance._alertContainerSizeSetting.get_Value().Y);
+				base.Left = TimersModule.ModuleInstance._alertContainerLocationSetting.Value.X;
+				base.Bottom = TimersModule.ModuleInstance._alertContainerLocationSetting.Value.Y + TimersModule.ModuleInstance._alertContainerSizeSetting.Value.Y;
 				break;
 			}
 			if (FlowDirection == AlertFlowDirection.RightToLeft)
 			{
-				foreach (Control child in ((Container)this)._children)
+				foreach (Control child in _children)
 				{
-					child.set_Right(child.get_Right() + (((Control)this).get_Size().X - previousSize.X));
+					child.Right += base.Size.X - previousSize.X;
 				}
 			}
 			else
@@ -274,9 +272,9 @@ namespace Charr.Timers_BlishHUD.Controls
 				{
 					return;
 				}
-				foreach (Control child2 in ((Container)this)._children)
+				foreach (Control child2 in _children)
 				{
-					child2.set_Bottom(child2.get_Bottom() + (((Control)this).get_Size().Y - previousSize.Y));
+					child2.Bottom += base.Size.Y - previousSize.Y;
 				}
 			}
 		}
@@ -295,8 +293,8 @@ namespace Charr.Timers_BlishHUD.Controls
 			{
 				directionY = ((FlowDirection == AlertFlowDirection.TopToBottom) ? 1 : (-1));
 			}
-			float startLocationX = ((FlowDirection != AlertFlowDirection.RightToLeft) ? outerPadX : ((float)((Control)this).get_Width() - outerPadX));
-			float num = ((FlowDirection != AlertFlowDirection.BottomToTop) ? outerPadY : ((float)((Control)this).get_Height() - outerPadY));
+			float startLocationX = ((FlowDirection != AlertFlowDirection.RightToLeft) ? outerPadX : ((float)base.Width - outerPadX));
+			float num = ((FlowDirection != AlertFlowDirection.BottomToTop) ? outerPadY : ((float)base.Height - outerPadY));
 			float nextLocationX = startLocationX;
 			float nextLocationY = num;
 			foreach (Control child in allChildren)
@@ -314,64 +312,63 @@ namespace Charr.Timers_BlishHUD.Controls
 					{
 						Left = (int)nextLocationX
 					};
-					child.set_Top((int)nextLocationY);
+					child.Top = (int)nextLocationY;
 					break;
 				case AlertFlowDirection.RightToLeft:
 					tweenValue = new
 					{
 						Right = (int)nextLocationX
 					};
-					child.set_Top((int)nextLocationY);
+					child.Top = (int)nextLocationY;
 					break;
 				case AlertFlowDirection.TopToBottom:
 					tweenValue = new
 					{
 						Top = (int)nextLocationY
 					};
-					child.set_Left((int)nextLocationX);
+					child.Left = (int)nextLocationX;
 					break;
 				case AlertFlowDirection.BottomToTop:
 					tweenValue = new
 					{
 						Bottom = (int)nextLocationY
 					};
-					child.set_Left((int)nextLocationX);
+					child.Left = (int)nextLocationX;
 					break;
 				}
-				childTween = ((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<Control>(child, tweenValue, TimersModule.ModuleInstance._alertMoveDelaySetting.get_Value(), 0f, true);
-				childTween.OnComplete((Action)delegate
+				childTween = Control.Animation.Tweener.Tween(child, tweenValue, TimersModule.ModuleInstance._alertMoveDelaySetting.Value);
+				childTween.OnComplete(delegate
 				{
 					_childTweens.Remove(child);
 				});
 				_childTweens.Add(child, childTween);
-				nextLocationX += ((float)child.get_Width() + _controlPadding.X) * (float)directionX;
-				nextLocationY += ((float)child.get_Height() + _controlPadding.Y) * (float)directionY;
+				nextLocationX += ((float)child.Width + _controlPadding.X) * (float)directionX;
+				nextLocationY += ((float)child.Height + _controlPadding.Y) * (float)directionY;
 			}
 		}
 
 		public override void RecalculateLayout()
 		{
-			if (((Container)this)._children.get_Count() == 0 || TimersModule.ModuleInstance._hideAlertsSetting.get_Value())
+			if (_children.Count == 0 || TimersModule.ModuleInstance._hideAlertsSetting.Value)
 			{
-				((Control)this).Hide();
+				Hide();
 			}
 			else
 			{
-				((Control)this).Show();
+				Show();
 			}
 			UpdateSizeToFitChildren();
-			ReflowChildLayout(((Container)this)._children.ToArray());
-			((Panel)this).RecalculateLayout();
+			ReflowChildLayout(_children.ToArray());
+			base.RecalculateLayout();
 		}
 
 		protected override CaptureType CapturesInput()
 		{
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			if (LocationLock || !((Control)this)._visible)
+			if (LocationLock || !_visible)
 			{
-				return (CaptureType)22;
+				return CaptureType.DoNotBlock;
 			}
-			return ((Container)this).CapturesInput();
+			return base.CapturesInput();
 		}
 
 		protected override void OnLeftMouseButtonPressed(MouseEventArgs e)
@@ -380,10 +377,10 @@ namespace Charr.Timers_BlishHUD.Controls
 			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 			if (!LocationLock)
 			{
-				_dragStart = ((Control)this).get_RelativeMousePosition();
+				_dragStart = base.RelativeMousePosition;
 				_mouseDragging = true;
 			}
-			((Control)this).OnLeftMouseButtonPressed(e);
+			base.OnLeftMouseButtonPressed(e);
 		}
 
 		private void HandleLeftMouseButtonReleased(MouseEventArgs e)
@@ -394,8 +391,8 @@ namespace Charr.Timers_BlishHUD.Controls
 			{
 				if (_mouseDragging)
 				{
-					TimersModule.ModuleInstance._alertContainerLocationSetting.set_Value(((Control)this).get_Location());
-					TimersModule.ModuleInstance._alertContainerSizeSetting.set_Value(((Control)this).get_Size());
+					TimersModule.ModuleInstance._alertContainerLocationSetting.Value = base.Location;
+					TimersModule.ModuleInstance._alertContainerSizeSetting.Value = base.Size;
 					_mouseDragging = false;
 				}
 				ContainerDragged?.Invoke(this, EventArgs.Empty);
@@ -413,9 +410,8 @@ namespace Charr.Timers_BlishHUD.Controls
 			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 			if (_mouseDragging)
 			{
-				Point newLocation = Control.get_Input().get_Mouse().get_Position() - _dragStart;
-				((Control)this).set_Location(newLocation);
-				_dragStart = ((Control)this).get_RelativeMousePosition();
+				Point newLocation = (base.Location = Control.Input.Mouse.Position - _dragStart);
+				_dragStart = base.RelativeMousePosition;
 			}
 		}
 	}

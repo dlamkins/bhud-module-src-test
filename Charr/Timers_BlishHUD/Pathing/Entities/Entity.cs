@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Blish_HUD;
@@ -26,7 +27,18 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 
 		private EntityText _basicTitleTextBillboard;
 
-		protected static BasicEffect StandardEffect { get; }
+		protected static BasicEffect StandardEffect { get; } = ((Func<BasicEffect>)delegate
+		{
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Expected O, but got Unknown
+			BasicEffect val = null;
+			using GraphicsDeviceContext graphicsDeviceContext = GameService.Graphics.LendGraphicsDeviceContext();
+			BasicEffect val2 = new BasicEffect(graphicsDeviceContext.GraphicsDevice);
+			val2.set_TextureEnabled(true);
+			return val2;
+		})();
+
 
 		public virtual Vector3 Position
 		{
@@ -239,11 +251,11 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 			}
 		}
 
-		public virtual float DistanceFromPlayer => Vector3.Distance(Position, GameService.Gw2Mumble.get_PlayerCharacter().get_Position());
+		public virtual float DistanceFromPlayer => Vector3.Distance(Position, GameService.Gw2Mumble.PlayerCharacter.Position);
 
-		public virtual float DistanceFromCamera => Vector3.Distance(Position, GameService.Gw2Mumble.get_PlayerCamera().get_Position());
+		public virtual float DistanceFromCamera => Vector3.Distance(Position, GameService.Gw2Mumble.PlayerCamera.Position);
 
-		public float DrawOrder => Vector3.DistanceSquared(Position, GameService.Gw2Mumble.get_PlayerCamera().get_Position());
+		public float DrawOrder => Vector3.DistanceSquared(Position, GameService.Gw2Mumble.PlayerCamera.Position);
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
@@ -259,7 +271,11 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 		{
 			if (_pendingRebuild)
 			{
-				HandleRebuild(GameService.Graphics.get_GraphicsDevice());
+				using (GraphicsDeviceContext graphicsDeviceContext = GameService.Graphics.LendGraphicsDeviceContext())
+				{
+					HandleRebuild(graphicsDeviceContext.GraphicsDevice);
+					graphicsDeviceContext.Dispose();
+				}
 				_pendingRebuild = false;
 			}
 			Update(gameTime);
@@ -302,16 +318,6 @@ namespace Charr.Timers_BlishHUD.Pathing.Entities
 		protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
 		{
 			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-		}
-
-		static Entity()
-		{
-			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Expected O, but got Unknown
-			BasicEffect val = new BasicEffect(GameService.Graphics.get_GraphicsDevice());
-			val.set_TextureEnabled(true);
-			StandardEffect = val;
 		}
 	}
 }
