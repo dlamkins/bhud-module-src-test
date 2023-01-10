@@ -1,5 +1,6 @@
 using System;
 using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
@@ -12,8 +13,6 @@ namespace Nekres.Stopwatch.Core.Controls
 {
 	internal sealed class TimeSpanInputPrompt : Container
 	{
-		private static Texture2D _bgTexture = GameService.Content.GetTexture("tooltip");
-
 		private static BitmapFont _font = GameService.Content.GetFont((FontFace)0, (FontSize)24, (FontStyle)0);
 
 		private static TimeSpanInputPrompt _singleton;
@@ -40,6 +39,8 @@ namespace Nekres.Stopwatch.Core.Controls
 
 		private readonly string _defaultValue;
 
+		private AsyncTexture2D _bgTexture;
+
 		private TimeSpanInputPrompt(Action<bool, TimeSpan> callback, string text, string defaultValue, string confirmButtonText, string cancelButtonText)
 			: this()
 		{
@@ -50,6 +51,24 @@ namespace Nekres.Stopwatch.Core.Controls
 			_cancelButtonButtonText = cancelButtonText;
 			((Control)this).set_ZIndex(999);
 			GameService.Input.get_Keyboard().add_KeyPressed((EventHandler<KeyboardEventArgs>)OnKeyPressed);
+			LoadTextures();
+		}
+
+		protected override void DisposeControl()
+		{
+			_singleton = null;
+			AsyncTexture2D bgTexture = _bgTexture;
+			if (bgTexture != null)
+			{
+				bgTexture.Dispose();
+			}
+			GameService.Input.get_Keyboard().remove_KeyPressed((EventHandler<KeyboardEventArgs>)OnKeyPressed);
+			((Container)this).DisposeControl();
+		}
+
+		private void LoadTextures()
+		{
+			_bgTexture = GameService.Content.get_DatAssetCache().GetTextureFromAssetId(156003);
 		}
 
 		public static void ShowPrompt(Action<bool, TimeSpan> callback, string text, string defaultValue = "", string confirmButtonText = "Confirm", string cancelButtonText = "Cancel")
@@ -230,22 +249,23 @@ namespace Nekres.Stopwatch.Core.Controls
 			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
 			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0176: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0206: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0211: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0216: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0183: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0200: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0205: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0224: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0234: Unknown result type (might be due to invalid IL or missing references)
 			((Container)this).PaintBeforeChildren(spriteBatch, bounds);
 			Size2 textSize = _font.MeasureString(_text);
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), bounds, Color.get_Black() * 0.8f);
@@ -259,7 +279,7 @@ namespace Nekres.Stopwatch.Core.Controls
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(bgBounds.X - 1, bgBounds.Y - 1, 1, bgBounds.Height + 1), Color.get_Black());
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(bgBounds.X + bgBounds.Width, bgBounds.Y, 1, bgBounds.Height + 1), Color.get_Black());
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(bgBounds.X, bgBounds.Y + bgBounds.Height, bgBounds.Width, 1), Color.get_Black());
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _bgTexture, bgBounds, Color.get_White());
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_bgTexture), bgBounds, (Rectangle?)new Rectangle(29, 23, 942, 942), Color.get_White());
 			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, _text, _font, new Rectangle(bgBounds.X + 6, bgBounds.Y + 5, bgBounds.Width - 11, bgBounds.Height), Color.get_White(), true, (HorizontalAlignment)0, (VerticalAlignment)0);
 			int btnMaxWith = Math.Min(100, bgBounds.Width / 2 - 10);
 			_confirmButtonBounds = new Rectangle(((Rectangle)(ref bgBounds)).get_Left() + 5, ((Rectangle)(ref bgBounds)).get_Bottom() - 50, btnMaxWith, 45);

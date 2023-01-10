@@ -1,6 +1,5 @@
 using System;
 using System.ComponentModel.Composition;
-using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
@@ -104,10 +103,6 @@ namespace Stopwatch
 				AudioVolume = Math.Min(1f, SoundVolume.get_Value() / 1000f),
 				Position = Position.get_Value()
 			};
-		}
-
-		protected override async Task LoadAsync()
-		{
 		}
 
 		public override IView GetSettingsView()

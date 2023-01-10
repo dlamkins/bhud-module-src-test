@@ -30,6 +30,8 @@ namespace Nekres.Stopwatch.Core.Controls
 
 		public bool CanClose => true;
 
+		public bool CanCloseWithEscape => true;
+
 		public SpriteScreenMover(params ScreenRegion[] screenPositions)
 			: this(screenPositions.ToList())
 		{
@@ -40,13 +42,22 @@ namespace Nekres.Stopwatch.Core.Controls
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Expected O, but got Unknown
-			WindowBase2.RegisterWindow((IWindow)(object)this);
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Expected O, but got Unknown
 			((Control)this).set_ZIndex(2147483637);
 			_clearDrawParameters = new SpriteBatchParameters((SpriteSortMode)0, BlendState.Opaque, (SamplerState)null, (DepthStencilState)null, (RasterizerState)null, (Effect)null, (Matrix?)null);
 			_screenRegions = screenPositions.ToArray();
 			_handleTexture = StopwatchModule.ModuleInstance.ContentsManager.GetTexture("handle.png");
+		}
+
+		protected override void DisposeControl()
+		{
+			Texture2D handleTexture = _handleTexture;
+			if (handleTexture != null)
+			{
+				((GraphicsResource)handleTexture).Dispose();
+			}
+			((Control)this).DisposeControl();
 		}
 
 		protected override void OnLeftMouseButtonPressed(MouseEventArgs e)
@@ -200,11 +211,6 @@ namespace Nekres.Stopwatch.Core.Controls
 
 		public void BringWindowToFront()
 		{
-		}
-
-		protected override void DisposeControl()
-		{
-			WindowBase2.UnregisterWindow((IWindow)(object)this);
 		}
 	}
 }
