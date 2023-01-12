@@ -44,10 +44,10 @@ namespace RaidClears.Settings
 			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0060: Expected O, but got Unknown
-			//IL_01db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			val.set_FlowDirection((ControlFlowDirection)3);
 			((Panel)val).set_CanScroll(true);
@@ -68,7 +68,6 @@ namespace RaidClears.Settings
 			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.DragWithMouseIsEnabledSetting, (Container)(object)generalSettingFlowPanel, singleColumnWidth);
 			FlowPanel raidsSettingFlowPanel = CreateSettingsGroupFlowPanel("Raid Settings", (Container)(object)_rootFlowPanel);
 			((Panel)raidsSettingFlowPanel).set_CanCollapse(true);
-			((Panel)raidsSettingFlowPanel).Collapse();
 			((Panel)raidsSettingFlowPanel).set_ShowTint(true);
 			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.RaidPanelIsVisibleKeyBind, (Container)(object)raidsSettingFlowPanel, singleColumnWidth);
 			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.ShowRaidsCornerIconSetting, (Container)(object)raidsSettingFlowPanel, singleColumnWidth);
@@ -104,7 +103,6 @@ namespace RaidClears.Settings
 			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.DungeonsEnabled, (Container)(object)_rootFlowPanel, singleColumnWidth);
 			_dungeonsSettingFlowPanel = CreateSettingsGroupFlowPanel("Dungeon Settings", (Container)(object)_rootFlowPanel);
 			((Panel)_dungeonsSettingFlowPanel).set_CanCollapse(true);
-			((Panel)_dungeonsSettingFlowPanel).Collapse();
 			((Panel)_dungeonsSettingFlowPanel).set_ShowTint(true);
 			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.DungeonPanelIsVisibleKeyBind, (Container)(object)_dungeonsSettingFlowPanel, singleColumnWidth);
 			ShowSettingWithViewContainer((SettingEntry)(object)_settingService.ShowDungeonCornerIconSetting, (Container)(object)_dungeonsSettingFlowPanel, singleColumnWidth);
