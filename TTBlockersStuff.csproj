@@ -14,7 +14,9 @@
   </PropertyGroup>
   <ItemGroup />
   <ItemGroup>
-    <Reference Include="Blish HUD" />
+    <Reference Include="Blish HUD">
+      <HintPath>..\..\working\Blish HUD.exe</HintPath>
+    </Reference>
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="Gw2Sharp" />
     <Reference Include="MonoGame.Framework" />

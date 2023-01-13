@@ -46,6 +46,8 @@ namespace Lorf.BH.TTBlockersStuff.UI
 
 		protected string barText;
 
+		protected Color textColor = Color.get_White();
+
 		protected int barIndex;
 
 		public float MaxValue
@@ -56,7 +58,7 @@ namespace Lorf.BH.TTBlockersStuff.UI
 			}
 			set
 			{
-				if (((Control)this).SetProperty<float>(ref maxValue, value, false, "MaxValue"))
+				if (SetProperty(ref maxValue, value, invalidateLayout: false, "MaxValue"))
 				{
 					Value = this.value;
 				}
@@ -71,7 +73,7 @@ namespace Lorf.BH.TTBlockersStuff.UI
 			}
 			set
 			{
-				if (((Control)this).SetProperty<float>(ref minValue, value, false, "MinValue"))
+				if (SetProperty(ref minValue, value, invalidateLayout: false, "MinValue"))
 				{
 					Value = this.value;
 				}
@@ -86,7 +88,7 @@ namespace Lorf.BH.TTBlockersStuff.UI
 			}
 			set
 			{
-				((Control)this).SetProperty<float>(ref this.value, MathHelper.Clamp(value, minValue, maxValue), true, "Value");
+				SetProperty(ref this.value, MathHelper.Clamp(value, minValue, maxValue), invalidateLayout: true, "Value");
 			}
 		}
 
@@ -98,17 +100,32 @@ namespace Lorf.BH.TTBlockersStuff.UI
 			}
 			set
 			{
-				((Control)this).SetProperty<string>(ref barText, value, false, "BarText");
+				SetProperty(ref barText, value, invalidateLayout: false, "BarText");
+			}
+		}
+
+		public Color TextColor
+		{
+			get
+			{
+				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+				return textColor;
+			}
+			set
+			{
+				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+				SetProperty(ref textColor, value, invalidateLayout: false, "TextColor");
 			}
 		}
 
 		public event EventHandler<MouseEventArgs> InternalClick;
 
 		public TimerBar(int barIndex)
-			: this()
 		{
-			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).set_Size(new Point(256, 16));
+			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+			base.Size = new Point(256, 16);
 			this.barIndex = barIndex;
 		}
 
@@ -126,13 +143,13 @@ namespace Lorf.BH.TTBlockersStuff.UI
 			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_011f: Unknown result type (might be due to invalid IL or missing references)
-			layoutBarLeftSide = new Rectangle(0, 0, textureBarLeftSide.get_Width(), ((Control)this).get_Height());
-			layourBarRightSide = new Rectangle(((Control)this).get_Width() - textureBarRightSide.get_Width(), 0, textureBarRightSide.get_Width(), ((Control)this).get_Height());
-			layoutBarTop = new Rectangle(0, 0, ((Control)this).get_Width(), textureBarTop.get_Height());
-			layoutBarBottom = new Rectangle(0, ((Control)this).get_Height() - textureBarBottom.get_Height(), ((Control)this).get_Width(), textureBarTop.get_Height());
-			float valueOffset = (Value - MinValue) / (MaxValue - MinValue) * (float)(((Control)this).get_Width() - textureBarLeftSide.get_Width());
-			layoutBarBackground = new Rectangle(textureBarLeftSide.get_Width(), 2, (int)valueOffset - textureBarLeftSide.get_Width(), ((Control)this).get_Height() - 4);
-			layoutBarGradient = new Rectangle((int)valueOffset - textureBarGradient.get_Width(), 2, textureBarGradient.get_Width(), ((Control)this).get_Height() - 4);
+			layoutBarLeftSide = new Rectangle(0, 0, textureBarLeftSide.get_Width(), base.Height);
+			layourBarRightSide = new Rectangle(base.Width - textureBarRightSide.get_Width(), 0, textureBarRightSide.get_Width(), base.Height);
+			layoutBarTop = new Rectangle(0, 0, base.Width, textureBarTop.get_Height());
+			layoutBarBottom = new Rectangle(0, base.Height - textureBarBottom.get_Height(), base.Width, textureBarTop.get_Height());
+			float valueOffset = (Value - MinValue) / (MaxValue - MinValue) * (float)(base.Width - textureBarLeftSide.get_Width());
+			layoutBarBackground = new Rectangle(textureBarLeftSide.get_Width(), 2, (int)valueOffset - textureBarLeftSide.get_Width(), base.Height - 4);
+			layoutBarGradient = new Rectangle((int)valueOffset - textureBarGradient.get_Width(), 2, textureBarGradient.get_Width(), base.Height - 4);
 		}
 
 		public void OnInternalClick(object sender, MouseEventArgs e)
@@ -155,39 +172,36 @@ namespace Lorf.BH.TTBlockersStuff.UI
 			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0166: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0154: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0167: Unknown result type (might be due to invalid IL or missing references)
 			Color color = default(Color);
 			((Color)(ref color))._002Ector(237, 121, 38);
-			SettingEntry newColor = default(SettingEntry);
+			SettingEntry newColor;
 			if (Value >= MaxValue)
 			{
-				SettingEntry newColor2 = default(SettingEntry);
-				if (Module.Instance.SettingsManager.get_ModuleSettings().TryGetSetting("colorPickerSettingTimerBar" + barIndex, ref newColor2))
+				if (Module.Instance.SettingsManager.ModuleSettings.TryGetSetting("colorPickerSettingTimerBar" + barIndex, out var newColor2))
 				{
-					ColorMaterial cloth = (newColor2 as SettingEntry<Color>).get_Value().get_Cloth();
-					color = ((cloth != null) ? ColorExtensions.ToXnaColor(cloth) : color);
+					color = (newColor2 as SettingEntry<Color>).Value.get_Cloth()?.ToXnaColor() ?? color;
 				}
 			}
-			else if (Module.Instance.SettingsManager.get_ModuleSettings().TryGetSetting("colorPickerSettingTimerBarRefilling" + barIndex, ref newColor))
+			else if (Module.Instance.SettingsManager.ModuleSettings.TryGetSetting("colorPickerSettingTimerBarRefilling" + barIndex, out newColor))
 			{
-				ColorMaterial cloth2 = (newColor as SettingEntry<Color>).get_Value().get_Cloth();
-				color = ((cloth2 != null) ? ColorExtensions.ToXnaColor(cloth2) : color);
+				color = (newColor as SettingEntry<Color>).Value.get_Cloth()?.ToXnaColor() ?? color;
 			}
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), bounds, Color.get_Black() * 0.3f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), layoutBarBackground, color);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, bounds, Color.get_Black() * 0.3f);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, layoutBarBackground, color);
 			if (Value < MaxValue)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, textureBarGradient, layoutBarGradient);
+				spriteBatch.DrawOnCtrl(this, textureBarGradient, layoutBarGradient);
 			}
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, barText, GameService.Content.get_DefaultFont16(), bounds, Color.get_White(), false, (HorizontalAlignment)1, (VerticalAlignment)1);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, textureBarTop, layoutBarTop);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, textureBarBottom, layoutBarBottom);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, textureBarLeftSide, layoutBarLeftSide);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, textureBarRightSide, layourBarRightSide);
+			spriteBatch.DrawStringOnCtrl(this, barText, GameService.Content.DefaultFont16, bounds, textColor, wrap: false, HorizontalAlignment.Center);
+			spriteBatch.DrawOnCtrl(this, textureBarTop, layoutBarTop);
+			spriteBatch.DrawOnCtrl(this, textureBarBottom, layoutBarBottom);
+			spriteBatch.DrawOnCtrl(this, textureBarLeftSide, layoutBarLeftSide);
+			spriteBatch.DrawOnCtrl(this, textureBarRightSide, layourBarRightSide);
 		}
 
 		protected override void DisposeControl()
@@ -217,7 +231,7 @@ namespace Lorf.BH.TTBlockersStuff.UI
 			{
 				((GraphicsResource)obj5).Dispose();
 			}
-			((Control)this).DisposeControl();
+			base.DisposeControl();
 		}
 	}
 }

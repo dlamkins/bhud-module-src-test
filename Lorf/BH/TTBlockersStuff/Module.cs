@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
-using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
@@ -18,8 +17,8 @@ using TTBlockersStuff.Language;
 
 namespace Lorf.BH.TTBlockersStuff
 {
-	[Export(typeof(Module))]
-	public class Module : Module
+	[Export(typeof(Blish_HUD.Modules.Module))]
+	public class Module : Blish_HUD.Modules.Module
 	{
 		private const int PROGRESS_BAR_MARGIN = 7;
 
@@ -41,17 +40,17 @@ namespace Lorf.BH.TTBlockersStuff
 
 		private TimerManager eggsTimerManager;
 
-		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
+		internal SettingsManager SettingsManager => ModuleParameters.SettingsManager;
 
-		internal ContentsManager ContentsManager => base.ModuleParameters.get_ContentsManager();
+		internal ContentsManager ContentsManager => ModuleParameters.ContentsManager;
 
-		internal DirectoriesManager DirectoriesManager => base.ModuleParameters.get_DirectoriesManager();
+		internal DirectoriesManager DirectoriesManager => ModuleParameters.DirectoriesManager;
 
-		internal Gw2ApiManager Gw2ApiManager => base.ModuleParameters.get_Gw2ApiManager();
+		internal Gw2ApiManager Gw2ApiManager => ModuleParameters.Gw2ApiManager;
 
 		[ImportingConstructor]
 		public Module([Import("ModuleParameters")] ModuleParameters moduleParameters)
-			: this(moduleParameters)
+			: base(moduleParameters)
 		{
 			Instance = this;
 		}
@@ -69,28 +68,28 @@ namespace Lorf.BH.TTBlockersStuff
 			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
 			Logger.Info("Initializing TT Blockers Stuff");
-			TTPanel obj = new TTPanel
+			mainPanel = new TTPanel
 			{
-				Title = "Blockers Stuff"
+				Title = "Blockers Stuff",
+				Parent = GameService.Graphics.SpriteScreen
 			};
-			((Control)obj).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			mainPanel = obj;
-			TimerBar timerBar = new TimerBar(0);
-			((Control)timerBar).set_Location(new Point(7, 7));
-			((Control)timerBar).set_Size(new Point(((Container)mainPanel).get_ContentRegion().Width - 14, ((Container)mainPanel).get_ContentRegion().Height / 2 - 7 - 3));
-			((Control)timerBar).set_Parent((Container)(object)mainPanel);
-			timerBar.MaxValue = 1f;
-			timerBar.Value = 1f;
-			timerBar.BarText = Translations.TimerBarTextHusks + " (" + Translations.TimerBarTextReady + ")";
-			husksBar = timerBar;
-			((Control)mainPanel).add_Resized((EventHandler<ResizedEventArgs>)delegate
+			husksBar = new TimerBar(0)
+			{
+				Location = new Point(7, 7),
+				Size = new Point(mainPanel.ContentRegion.Width - 14, mainPanel.ContentRegion.Height / 2 - 7 - 3),
+				Parent = mainPanel,
+				MaxValue = 1f,
+				Value = 1f,
+				BarText = Translations.TimerBarTextHusks + " (" + Translations.TimerBarTextReady + ")"
+			};
+			mainPanel.Resized += delegate
 			{
 				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 				//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-				((Control)husksBar).set_Width(((Container)mainPanel).get_ContentRegion().Width - 14);
-				((Control)husksBar).set_Height(((Container)mainPanel).get_ContentRegion().Height / 2 - 7 - 3);
-				((Control)husksBar).RecalculateLayout();
-			});
+				husksBar.Width = mainPanel.ContentRegion.Width - 14;
+				husksBar.Height = mainPanel.ContentRegion.Height / 2 - 7 - 3;
+				husksBar.RecalculateLayout();
+			};
 			husksTimerManager = new TimerManager
 			{
 				Name = Translations.TimerBarTextHusks,
@@ -101,26 +100,27 @@ namespace Lorf.BH.TTBlockersStuff
 				GameService.Content.PlaySoundEffectByName("button-click");
 				husksTimerManager.Activate(gatheringSpot.HuskTime);
 			};
-			TimerBar timerBar2 = new TimerBar(1);
-			((Control)timerBar2).set_Location(new Point(7, ((Control)husksBar).get_Location().Y + ((Control)husksBar).get_Size().Y + 7));
-			((Control)timerBar2).set_Size(new Point(((Container)mainPanel).get_ContentRegion().Width - 14, ((Container)mainPanel).get_ContentRegion().Height / 2 - 7 - 3));
-			((Control)timerBar2).set_Parent((Container)(object)mainPanel);
-			timerBar2.MaxValue = 1f;
-			timerBar2.Value = 1f;
-			timerBar2.BarText = Translations.TimerBarTextEggs + " (" + Translations.TimerBarTextReady + ")";
-			eggsBar = timerBar2;
-			((Control)mainPanel).add_Resized((EventHandler<ResizedEventArgs>)delegate
+			eggsBar = new TimerBar(1)
+			{
+				Location = new Point(7, husksBar.Location.Y + husksBar.Size.Y + 7),
+				Size = new Point(mainPanel.ContentRegion.Width - 14, mainPanel.ContentRegion.Height / 2 - 7 - 3),
+				Parent = mainPanel,
+				MaxValue = 1f,
+				Value = 1f,
+				BarText = Translations.TimerBarTextEggs + " (" + Translations.TimerBarTextReady + ")"
+			};
+			mainPanel.Resized += delegate
 			{
 				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 				//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 				//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 				//IL_005c: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-				((Control)eggsBar).set_Width(((Container)mainPanel).get_ContentRegion().Width - 14);
-				((Control)eggsBar).set_Height(((Container)mainPanel).get_ContentRegion().Height / 2 - 7 - 3);
-				((Control)eggsBar).set_Location(new Point(7, ((Control)husksBar).get_Location().Y + ((Control)husksBar).get_Size().Y + 7));
-				((Control)eggsBar).RecalculateLayout();
-			});
+				eggsBar.Width = mainPanel.ContentRegion.Width - 14;
+				eggsBar.Height = mainPanel.ContentRegion.Height / 2 - 7 - 3;
+				eggsBar.Location = new Point(7, husksBar.Location.Y + husksBar.Size.Y + 7);
+				eggsBar.RecalculateLayout();
+			};
 			eggsTimerManager = new TimerManager
 			{
 				Name = Translations.TimerBarTextEggs,
@@ -143,37 +143,25 @@ namespace Lorf.BH.TTBlockersStuff
 			val.set_Cloth(val2);
 			list.Add(val);
 			IEnumerable<Color> first = list;
-			Colors = first.Concat((IEnumerable<Color>)(await ((IAllExpandableClient<Color>)(object)Instance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Colors()).AllAsync(default(CancellationToken))));
-			SettingsManager.get_ModuleSettings().DefineSetting<Color>("colorPickerSettingTimerBar0", Colors?.First(), (Func<string>)(() => Translations.SettingColorSelectionHusksText), (Func<string>)(() => Translations.SettingColorSelectionHusksTooltipText));
-			SettingsManager.get_ModuleSettings().DefineSetting<Color>("colorPickerSettingTimerBarRefilling0", Colors?.First(), (Func<string>)(() => Translations.SettingColorSelectionHusksRefillingText), (Func<string>)(() => Translations.SettingColorSelectionHusksRefillingTooltipText));
-			SettingsManager.get_ModuleSettings().DefineSetting<Color>("colorPickerSettingTimerBar1", Colors?.First(), (Func<string>)(() => Translations.SettingColorSelectionEggsText), (Func<string>)(() => Translations.SettingColorSelectionEggsTooltipText));
-			SettingsManager.get_ModuleSettings().DefineSetting<Color>("colorPickerSettingTimerBarRefilling1", Colors?.First(), (Func<string>)(() => Translations.SettingColorSelectionEggsRefillingText), (Func<string>)(() => Translations.SettingColorSelectionEggsRefillingTooltipText));
-			await _003C_003En__0();
+			Colors = first.Concat((IEnumerable<Color>)(await ((IAllExpandableClient<Color>)(object)Instance.Gw2ApiManager.Gw2ApiClient.get_V2().get_Colors()).AllAsync(default(CancellationToken))));
+			SettingsManager.ModuleSettings.DefineSetting<Color>("colorPickerSettingTimerBar0", Colors?.First(), () => Translations.SettingColorSelectionHusksText, () => Translations.SettingColorSelectionHusksTooltipText);
+			SettingsManager.ModuleSettings.DefineSetting<Color>("colorPickerSettingTimerBarRefilling0", Colors?.First(), () => Translations.SettingColorSelectionHusksRefillingText, () => Translations.SettingColorSelectionHusksRefillingTooltipText);
+			SettingsManager.ModuleSettings.DefineSetting<Color>("colorPickerSettingTimerBar1", Colors?.First(), () => Translations.SettingColorSelectionEggsText, () => Translations.SettingColorSelectionEggsTooltipText);
+			SettingsManager.ModuleSettings.DefineSetting<Color>("colorPickerSettingTimerBarRefilling1", Colors?.First(), () => Translations.SettingColorSelectionEggsRefillingText, () => Translations.SettingColorSelectionEggsRefillingTooltipText);
+			await base.LoadAsync();
 		}
 
 		public override IView GetSettingsView()
 		{
-			return (IView)(object)new TTSettingsCollection(SettingsManager.get_ModuleSettings());
+			return new TTSettingsCollection(SettingsManager.ModuleSettings);
 		}
 
 		protected override void Unload()
 		{
 			Logger.Info("Unloading TT Blockers Stuff");
-			TTPanel tTPanel = mainPanel;
-			if (tTPanel != null)
-			{
-				((Control)tTPanel).Dispose();
-			}
-			TimerBar timerBar = husksBar;
-			if (timerBar != null)
-			{
-				((Control)timerBar).Dispose();
-			}
-			TimerBar timerBar2 = eggsBar;
-			if (timerBar2 != null)
-			{
-				((Control)timerBar2).Dispose();
-			}
+			mainPanel?.Dispose();
+			husksBar?.Dispose();
+			eggsBar?.Dispose();
 			Instance = null;
 		}
 
@@ -228,15 +216,15 @@ namespace Lorf.BH.TTBlockersStuff
 			//IL_0335: Unknown result type (might be due to invalid IL or missing references)
 			//IL_033a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0357: Unknown result type (might be due to invalid IL or missing references)
-			if (GameService.Gw2Mumble.get_CurrentMap().get_Id() != 73)
+			if (GameService.Gw2Mumble.CurrentMap.Id != 73)
 			{
 				if (mainPanel.TargetVisibility)
 				{
-					((Control)mainPanel).Hide();
+					mainPanel.Hide();
 				}
 				return;
 			}
-			Vector3 pos = GameService.Gw2Mumble.get_PlayerCharacter().get_Position();
+			Vector3 pos = GameService.Gw2Mumble.PlayerCharacter.Position;
 			Vector2 vec2Pos = default(Vector2);
 			((Vector2)(ref vec2Pos))._002Ector(pos.X, pos.Y);
 			gatheringSpot = GatheringSpot.FromPosition(vec2Pos);
@@ -244,7 +232,7 @@ namespace Lorf.BH.TTBlockersStuff
 			{
 				if (mainPanel.TargetVisibility)
 				{
-					((Control)mainPanel).Hide();
+					mainPanel.Hide();
 				}
 				return;
 			}
@@ -253,7 +241,7 @@ namespace Lorf.BH.TTBlockersStuff
 				mainPanel.BlockerIconVisible = false;
 				mainPanel.BlockerIconTint = new Color(Color.get_White(), 0f);
 				mainPanel.Title = "Blockers Stuff - " + gatheringSpot.Name;
-				((Control)mainPanel).Show();
+				mainPanel.Show();
 			}
 			bool isInMajorBlockRange = Vector2.Distance(gatheringSpot.Position, vec2Pos) < 10f;
 			if (mainPanel.BlockerIconVisible != isInMajorBlockRange)
@@ -264,7 +252,7 @@ namespace Lorf.BH.TTBlockersStuff
 			{
 				bool isInMiddleBlockRange = Vector2.Distance(gatheringSpot.Position, vec2Pos) < 1f;
 				bool isInBlockRange = Vector2.Distance(gatheringSpot.Position, vec2Pos) < 0.35f;
-				bool isMounted = (int)GameService.Gw2Mumble.get_PlayerCharacter().get_CurrentMount() > 0;
+				bool isMounted = (int)GameService.Gw2Mumble.PlayerCharacter.CurrentMount > 0;
 				if (mainPanel.IsMounted != isMounted)
 				{
 					mainPanel.IsMounted = isMounted;
@@ -283,8 +271,8 @@ namespace Lorf.BH.TTBlockersStuff
 				}
 				else
 				{
-					Vector3 rawCharacterPosition = Vector3Extensions.ToXnaVector3(GameService.Gw2Mumble.get_RawClient().get_AvatarPosition());
-					Vector2 playerChameraDirection = new Vector2(GameService.Gw2Mumble.get_PlayerCamera().get_Position().X, GameService.Gw2Mumble.get_PlayerCamera().get_Position().Y) - new Vector2(rawCharacterPosition.X, rawCharacterPosition.Y);
+					Vector3 rawCharacterPosition = GameService.Gw2Mumble.RawClient.get_AvatarPosition().ToXnaVector3();
+					Vector2 playerChameraDirection = new Vector2(GameService.Gw2Mumble.PlayerCamera.Position.X, GameService.Gw2Mumble.PlayerCamera.Position.Y) - new Vector2(rawCharacterPosition.X, rawCharacterPosition.Y);
 					Vector2 targetDirection = gatheringSpot.Position - new Vector2(rawCharacterPosition.X, rawCharacterPosition.Y);
 					double sin = playerChameraDirection.X * targetDirection.Y - targetDirection.X * playerChameraDirection.Y;
 					float angle = MathHelper.ToRadians((float)(Math.Atan2(playerChameraDirection.X * targetDirection.X + playerChameraDirection.Y * targetDirection.Y, sin) * (180.0 / Math.PI)));
@@ -299,8 +287,8 @@ namespace Lorf.BH.TTBlockersStuff
 					}
 				}
 			}
-			husksTimerManager.Update();
-			eggsTimerManager.Update();
+			husksTimerManager.Update(gameTime);
+			eggsTimerManager.Update(gameTime);
 		}
 	}
 }
