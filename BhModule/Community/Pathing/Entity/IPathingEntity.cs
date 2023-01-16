@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using BhModule.Community.Pathing.Behavior;
 using Blish_HUD;
@@ -12,6 +13,8 @@ namespace BhModule.Community.Pathing.Entity
 {
 	public interface IPathingEntity : IEntity, IUpdatable, IRenderable3D
 	{
+		Guid Guid { get; }
+
 		IList<IBehavior> Behaviors { get; }
 
 		bool BehaviorFiltered { get; }

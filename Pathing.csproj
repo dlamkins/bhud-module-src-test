@@ -23,6 +23,9 @@
     <Reference Include="System.Core" />
     <Reference Include="Blish HUD" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="Neo.Lua">
+      <HintPath>..\..\working\Neo.Lua.dll</HintPath>
+    </Reference>
     <Reference Include="Gw2Sharp" />
     <Reference Include="System.Numerics" />
     <Reference Include="Cronos">
@@ -33,6 +36,9 @@
     </Reference>
     <Reference Include="YamlDotNet">
       <HintPath>..\..\working\YamlDotNet.dll</HintPath>
+    </Reference>
+    <Reference Include="Neo.Lua.Dbg">
+      <HintPath>..\..\working\Neo.Lua.Dbg.dll</HintPath>
     </Reference>
     <Reference Include="Flurl.Http" />
     <Reference Include="Newtonsoft.Json" />

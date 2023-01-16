@@ -14,6 +14,8 @@ namespace BhModule.Community.Pathing
 
 		private const string MAP_SETTINGS = "map-settings";
 
+		private const string SCRIPT_SETTINGS = "script-settings";
+
 		private const string KEYBIND_SETTINGS = "keybind-settings";
 
 		public SettingCollection GlobalSettings { get; private set; }
@@ -52,6 +54,8 @@ namespace BhModule.Community.Pathing
 
 		public SettingEntry<bool> PackShowWhenCategoriesAreFiltered { get; private set; }
 
+		public SettingEntry<bool> PackShowHiddenMarkersReducedOpacity { get; private set; }
+
 		public SettingCollection MapSettings { get; private set; }
 
 		public SettingEntry<bool> MapPathablesEnabled { get; private set; }
@@ -74,6 +78,14 @@ namespace BhModule.Community.Pathing
 
 		public SettingEntry<float> MapTrailWidth { get; private set; }
 
+		public SettingEntry<bool> MapShowTooltip { get; private set; }
+
+		public SettingCollection ScriptSettings { get; private set; }
+
+		public SettingEntry<bool> ScriptsEnabled { get; private set; }
+
+		public SettingEntry<bool> ScriptsConsoleEnabled { get; private set; }
+
 		public SettingCollection KeyBindSettings { get; private set; }
 
 		public SettingEntry<KeyBinding> KeyBindTogglePathables { get; private set; }
@@ -87,6 +99,7 @@ namespace BhModule.Community.Pathing
 			InitGlobalSettings(settings);
 			InitPackSettings(settings);
 			InitMapSettings(settings);
+			InitScriptSettings(settings);
 			InitKeyBindSettings(settings);
 		}
 
@@ -114,6 +127,7 @@ namespace BhModule.Community.Pathing
 			PackAllowMarkersToAnimate = PackSettings.DefineSetting<bool>("PackAllowMarkersToAnimate", true, (Func<string>)(() => Strings.Setting_PackAllowMarkersToAnimate), (Func<string>)(() => "Allows animations such as 'bounce' and trail movements."));
 			PackEnableSmartCategoryFilter = PackSettings.DefineSetting<bool>("PackEnableSmartCategoryFilter", true, (Func<string>)(() => "Enable Smart Categories"), (Func<string>)(() => "If a category doesn't contain markers or trails relevant to the current map, the category is hidden."));
 			PackShowWhenCategoriesAreFiltered = PackSettings.DefineSetting<bool>("PackShowWhenCategoriesAreFiltered", true, (Func<string>)(() => "Indicate when categories are hidden"), (Func<string>)(() => "Shows a note at the bottom of the menu indicating if categories have been hidden.  Clicking the note will show the hidden categories temporarily."));
+			PackShowHiddenMarkersReducedOpacity = PackSettings.DefineSetting<bool>("PackShowHiddenMarkersReducedOpacity", false, (Func<string>)(() => "Show Ghost Markers"), (Func<string>)(() => "Shows hidden markers with a reduced opacity allowing you to unhide them."));
 			SettingComplianceExtensions.SetRange(PackMaxOpacityOverride, 0f, 1f);
 			SettingComplianceExtensions.SetRange(PackMaxViewDistance, 25f, 50000f);
 			SettingComplianceExtensions.SetRange(PackMaxTrailAnimationSpeed, 0f, 10f);
@@ -132,10 +146,18 @@ namespace BhModule.Community.Pathing
 			MiniMapDrawOpacity = MapSettings.DefineSetting<float>("MiniMapDrawOpacity", 1f, (Func<string>)(() => "Opacity on the Minimap"), (Func<string>)(() => ""));
 			MapShowAboveBelowIndicators = MapSettings.DefineSetting<bool>("MapShowAboveBelowIndicators", true, (Func<string>)(() => Strings.Setting_MapShowAboveBelowIndicators), (Func<string>)(() => ""));
 			MapFadeVerticallyDistantTrailSegments = MapSettings.DefineSetting<bool>("MapFadeVerticallyDistantTrailSegments", true, (Func<string>)(() => "Fade Trail Segments Which Are High Above or Below"), (Func<string>)(() => ""));
+			MapShowTooltip = MapSettings.DefineSetting<bool>("MapShowTooltip", true, (Func<string>)(() => "Show Tooltips on Map"), (Func<string>)(() => "If enabled, tooltips will be shown on the map when the cursor is over a marker."));
 			MapTrailWidth = MapSettings.DefineSetting<float>("MapTrailWidth", 2f, (Func<string>)(() => "Trail Width on Maps"), (Func<string>)(() => "The thickness of trails shown on the map."));
 			SettingComplianceExtensions.SetRange(MapDrawOpacity, 0f, 1f);
 			SettingComplianceExtensions.SetRange(MiniMapDrawOpacity, 0f, 1f);
 			SettingComplianceExtensions.SetRange(MapTrailWidth, 0.5f, 4.5f);
+		}
+
+		private void InitScriptSettings(SettingCollection settings)
+		{
+			ScriptSettings = settings.AddSubCollection("script-settings", false);
+			ScriptsEnabled = ScriptSettings.DefineSetting<bool>("ScriptsEnabled", false, (Func<string>)(() => "Enable Lua Scripts"), (Func<string>)(() => "If enabled, marker packs may load Lua scripts to provide custom functionality."));
+			ScriptsConsoleEnabled = ScriptSettings.DefineSetting<bool>("ScriptsConsoleEnabled", false, (Func<string>)(() => "Enable Script Console"), (Func<string>)(() => "If enabled, the Script Console can be accessed from the Pathing module menu to debug scripts."));
 		}
 
 		private void InitKeyBindSettings(SettingCollection settings)

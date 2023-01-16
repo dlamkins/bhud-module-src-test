@@ -41,6 +41,11 @@ namespace BhModule.Community.Pathing.Behavior.Filter
 			_isFiltered = !AllowedFestivals.Any((Festival f) => ((Festival)(ref f)).IsActive());
 		}
 
+		public string FilterReason()
+		{
+			return "Hidden because the " + string.Join(", ", AllowedFestivals.Select((Festival festival) => ((Festival)(ref festival)).get_DisplayName())) + " festival isn't active.";
+		}
+
 		private void AllowedFestivalsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
 			UpdateFiltered();

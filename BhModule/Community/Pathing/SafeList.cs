@@ -36,7 +36,10 @@ namespace BhModule.Community.Pathing
 
 			public void Dispose()
 			{
-				_rwLock.ExitReadLock();
+				if (_rwLock.IsReadLockHeld)
+				{
+					_rwLock.ExitReadLock();
+				}
 			}
 		}
 
@@ -53,7 +56,10 @@ namespace BhModule.Community.Pathing
 		{
 			get
 			{
-				_listLock.EnterReadLock();
+				if (!_listLock.IsReadLockHeld)
+				{
+					_listLock.EnterReadLock();
+				}
 				try
 				{
 					return _innerList.Count;
@@ -69,7 +75,10 @@ namespace BhModule.Community.Pathing
 		{
 			get
 			{
-				_listLock.EnterReadLock();
+				if (!_listLock.IsReadLockHeld)
+				{
+					_listLock.EnterReadLock();
+				}
 				try
 				{
 					return _innerList[index];
@@ -81,7 +90,10 @@ namespace BhModule.Community.Pathing
 			}
 			set
 			{
-				_listLock.EnterWriteLock();
+				if (!_listLock.IsWriteLockHeld)
+				{
+					_listLock.EnterWriteLock();
+				}
 				_innerList[index] = value;
 				_listLock.ExitWriteLock();
 			}
@@ -100,7 +112,10 @@ namespace BhModule.Community.Pathing
 
 		public IEnumerator<T> GetEnumerator()
 		{
-			_listLock.EnterReadLock();
+			if (!_listLock.IsReadLockHeld)
+			{
+				_listLock.EnterReadLock();
+			}
 			return new SafeEnumerator<T>(_innerList.GetEnumerator(), _listLock);
 		}
 
@@ -113,7 +128,10 @@ namespace BhModule.Community.Pathing
 		{
 			if (!Contains(item) && item != null)
 			{
-				_listLock.EnterWriteLock();
+				if (!_listLock.IsWriteLockHeld)
+				{
+					_listLock.EnterWriteLock();
+				}
 				_innerList.Add(item);
 				IsEmpty = false;
 				_listLock.ExitWriteLock();
@@ -122,7 +140,10 @@ namespace BhModule.Community.Pathing
 
 		public void AddRange(IEnumerable<T> items)
 		{
-			_listLock.EnterWriteLock();
+			if (!_listLock.IsWriteLockHeld)
+			{
+				_listLock.EnterWriteLock();
+			}
 			_innerList.AddRange(items);
 			IsEmpty = !_innerList.Any();
 			_listLock.ExitWriteLock();
@@ -130,7 +151,10 @@ namespace BhModule.Community.Pathing
 
 		public void SetRange(IEnumerable<T> items)
 		{
-			_listLock.EnterWriteLock();
+			if (!_listLock.IsWriteLockHeld)
+			{
+				_listLock.EnterWriteLock();
+			}
 			_innerList = items.ToList();
 			IsEmpty = !_innerList.Any();
 			_listLock.ExitWriteLock();
@@ -138,7 +162,10 @@ namespace BhModule.Community.Pathing
 
 		public void Clear()
 		{
-			_listLock.EnterWriteLock();
+			if (!_listLock.IsWriteLockHeld)
+			{
+				_listLock.EnterWriteLock();
+			}
 			_innerList.Clear();
 			IsEmpty = true;
 			_listLock.ExitWriteLock();
@@ -146,7 +173,10 @@ namespace BhModule.Community.Pathing
 
 		public bool Contains(T item)
 		{
-			_listLock.EnterReadLock();
+			if (!_listLock.IsReadLockHeld)
+			{
+				_listLock.EnterReadLock();
+			}
 			try
 			{
 				return _innerList.Contains(item);
@@ -165,7 +195,10 @@ namespace BhModule.Community.Pathing
 
 		public bool Remove(T item)
 		{
-			_listLock.EnterWriteLock();
+			if (!_listLock.IsWriteLockHeld)
+			{
+				_listLock.EnterWriteLock();
+			}
 			try
 			{
 				return _innerList.Remove(item);
@@ -179,7 +212,10 @@ namespace BhModule.Community.Pathing
 
 		public List<T> ToList()
 		{
-			_listLock.EnterReadLock();
+			if (!_listLock.IsReadLockHeld)
+			{
+				_listLock.EnterReadLock();
+			}
 			try
 			{
 				return new List<T>(_innerList);
@@ -192,16 +228,28 @@ namespace BhModule.Community.Pathing
 
 		public T[] ToArray()
 		{
-			_listLock.EnterReadLock();
-			T[] items = new T[_innerList.Count];
-			_innerList.CopyTo(items, 0);
-			_listLock.ExitReadLock();
-			return items;
+			if (!_listLock.IsReadLockHeld)
+			{
+				_listLock.EnterReadLock();
+			}
+			try
+			{
+				T[] items = new T[_innerList.Count];
+				_innerList.CopyTo(items, 0);
+				return items;
+			}
+			finally
+			{
+				_listLock.ExitReadLock();
+			}
 		}
 
 		public int IndexOf(T item)
 		{
-			_listLock.EnterReadLock();
+			if (!_listLock.IsReadLockHeld)
+			{
+				_listLock.EnterReadLock();
+			}
 			try
 			{
 				return _innerList.Count;
@@ -214,14 +262,20 @@ namespace BhModule.Community.Pathing
 
 		public void Insert(int index, T item)
 		{
-			_listLock.EnterWriteLock();
+			if (!_listLock.IsWriteLockHeld)
+			{
+				_listLock.EnterWriteLock();
+			}
 			_innerList.Insert(index, item);
 			_listLock.ExitWriteLock();
 		}
 
 		public void RemoveAt(int index)
 		{
-			_listLock.EnterWriteLock();
+			if (!_listLock.IsWriteLockHeld)
+			{
+				_listLock.EnterWriteLock();
+			}
 			_innerList.RemoveAt(index);
 			_listLock.ExitWriteLock();
 		}

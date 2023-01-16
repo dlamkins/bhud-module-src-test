@@ -42,6 +42,11 @@ namespace BhModule.Community.Pathing.Behavior.Filter
 			_isFiltered = AllowedRaces.All((RaceType r) => r != GameService.Gw2Mumble.get_PlayerCharacter().get_Race());
 		}
 
+		public string FilterReason()
+		{
+			return "Hidden because you're not: " + string.Join(", ", AllowedRaces.Select((RaceType race) => ((object)(RaceType)(ref race)).ToString())) + ".";
+		}
+
 		private void PlayerCharacterOnNameChanged(object sender, ValueEventArgs<string> e)
 		{
 			UpdateFiltered();

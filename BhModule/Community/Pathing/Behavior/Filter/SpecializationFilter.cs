@@ -41,6 +41,11 @@ namespace BhModule.Community.Pathing.Behavior.Filter
 			_isFiltered = AllowedSpecializations.All((int p) => p != GameService.Gw2Mumble.get_PlayerCharacter().get_Specialization());
 		}
 
+		public string FilterReason()
+		{
+			return "Hidden because you're not the correct specialization.";
+		}
+
 		private void PlayerCharacterOnSpecializationChanged(object sender, ValueEventArgs<int> e)
 		{
 			UpdateFiltered();

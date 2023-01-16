@@ -39,7 +39,7 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		private (IEnumerable<PathingCategory> SubCategories, int Skipped) GetSubCategories(bool forceShowAll = false)
 		{
-			IEnumerable<PathingCategory> subCategories = _pathingCategory.Where((PathingCategory cat) => cat.LoadedFromPack);
+			IEnumerable<PathingCategory> subCategories = _pathingCategory.Where((PathingCategory cat) => cat.LoadedFromPack && cat.DisplayName != "");
 			if (!_packState.UserConfiguration.PackEnableSmartCategoryFilter.get_Value() || forceShowAll)
 			{
 				return (subCategories, 0);

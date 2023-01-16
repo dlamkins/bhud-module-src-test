@@ -46,6 +46,22 @@ namespace BhModule.Community.Pathing.Behavior.Filter
 			return new StandardBehaviorFilter((StandardPathableBehavior)attributes["behavior"].GetValueAsInt(), marker, packState);
 		}
 
+		public string FilterReason()
+		{
+			return _behaviorMode switch
+			{
+				StandardPathableBehavior.ReappearOnMapChange => "Hidden until the next map change because you interacted with it.", 
+				StandardPathableBehavior.ReappearOnDailyReset => "Hidden until daily reset because you interacted with it.", 
+				StandardPathableBehavior.OnlyVisibleBeforeActivation => "Hidden permanently because you interacted with it.", 
+				StandardPathableBehavior.ReappearAfterTimer => "Hidden for a period of time because you interacted with it.", 
+				StandardPathableBehavior.ReappearOnMapReset => "Hidden until map reset because you interacted with it.", 
+				StandardPathableBehavior.OncePerInstance => "Hidden until you change map instances because you interacted with it.", 
+				StandardPathableBehavior.OnceDailyPerCharacter => "Hidden for this character until daily reset because you interacted with it.", 
+				StandardPathableBehavior.ReappearOnWeeklyReset => "Hidden until weekly reset because you interacted with it.", 
+				_ => "Unknown", 
+			};
+		}
+
 		public void Interact(bool autoTriggered)
 		{
 			switch (_behaviorMode)
@@ -105,7 +121,7 @@ namespace BhModule.Community.Pathing.Behavior.Filter
 				interactText = "Hide marker until map reset {0}";
 				break;
 			case StandardPathableBehavior.OncePerInstance:
-				interactText = "Hide marker permanently on this instance {0}";
+				interactText = "Hide marker until you join a new instance of this map {0}";
 				break;
 			case StandardPathableBehavior.OnceDailyPerCharacter:
 				interactText = "Hide marker for this character until daily reset {0}";

@@ -46,6 +46,8 @@ namespace BhModule.Community.Pathing.Entity
 
 		private const string ATTR_FADEFAR = "fadefar";
 
+		private const string ATTR_GUID = "guid";
+
 		private const string ATTR_MINIMAPVISIBILITY = "minimapvisibility";
 
 		private const string ATTR_MAPVISIBILITY = "mapvisibility";
@@ -484,6 +486,20 @@ namespace BhModule.Community.Pathing.Entity
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private void Populate_Guid(AttributeCollection collection, IPackResourceManager resourceManager)
+		{
+			base.Guid = _packState.UserResourceStates.Population.MarkerPopulationDefaults.Guid;
+			if (collection.TryPopAttribute("guid", out var attribute))
+			{
+				base.Guid = attribute.GetValueAsGuid();
+			}
+			if (base.Guid == Guid.Empty)
+			{
+				base.Guid = Guid.NewGuid();
+			}
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private void Populate_MapVisibility(AttributeCollection collection, IPackResourceManager resourceManager)
 		{
 			MiniMapVisibility = _packState.UserResourceStates.Population.TrailPopulationDefaults.MiniMapVisibility;
@@ -566,41 +582,45 @@ namespace BhModule.Community.Pathing.Entity
 
 		private void Populate_Behaviors(AttributeCollection collection, IPackResourceManager resourceManager)
 		{
-			if (collection.TryGetSubset("festival", out var attributes9))
+			if (collection.TryGetSubset("festival", out var attributes10))
 			{
-				AddBehavior(FestivalFilter.BuildFromAttributes(attributes9));
+				AddBehavior(FestivalFilter.BuildFromAttributes(attributes10));
 			}
-			if (collection.TryGetSubset("mount", out var attributes8))
+			if (collection.TryGetSubset("mount", out var attributes9))
 			{
-				AddBehavior(MountFilter.BuildFromAttributes(attributes8));
+				AddBehavior(MountFilter.BuildFromAttributes(attributes9));
 			}
-			if (collection.TryGetSubset("profession", out var attributes7))
+			if (collection.TryGetSubset("profession", out var attributes8))
 			{
-				AddBehavior(ProfessionFilter.BuildFromAttributes(attributes7));
+				AddBehavior(ProfessionFilter.BuildFromAttributes(attributes8));
 			}
-			if (collection.TryGetSubset("race", out var attributes6))
+			if (collection.TryGetSubset("race", out var attributes7))
 			{
-				AddBehavior(RaceFilter.BuildFromAttributes(attributes6));
+				AddBehavior(RaceFilter.BuildFromAttributes(attributes7));
 			}
-			if (collection.TryGetSubset("specialization", out var attributes5))
+			if (collection.TryGetSubset("specialization", out var attributes6))
 			{
-				AddBehavior(SpecializationFilter.BuildFromAttributes(attributes5));
+				AddBehavior(SpecializationFilter.BuildFromAttributes(attributes6));
 			}
-			if (collection.TryGetSubset("maptype", out var attributes4))
+			if (collection.TryGetSubset("maptype", out var attributes5))
 			{
-				AddBehavior(MapTypeFilter.BuildFromAttributes(attributes4));
+				AddBehavior(MapTypeFilter.BuildFromAttributes(attributes5));
 			}
-			if (collection.TryGetSubset("schedule", out var attributes3))
+			if (collection.TryGetSubset("schedule", out var attributes4))
 			{
-				AddBehavior(ScheduleFilter.BuildFromAttributes(attributes3));
+				AddBehavior(ScheduleFilter.BuildFromAttributes(attributes4));
 			}
-			if (collection.TryGetSubset("raid", out var attributes2))
+			if (collection.TryGetSubset("raid", out var attributes3))
 			{
-				AddBehavior(RaidFilter.BuildFromAttributes(attributes2, this, _packState));
+				AddBehavior(RaidFilter.BuildFromAttributes(attributes3, this, _packState));
 			}
-			if (collection.TryGetSubset("achievement", out var attributes))
+			if (collection.TryGetSubset("achievement", out var attributes2))
 			{
-				AddBehavior(AchievementFilter.BuildFromAttributes(attributes, this, _packState));
+				AddBehavior(AchievementFilter.BuildFromAttributes(attributes2, this, _packState));
+			}
+			if (collection.TryGetSubset("script", out var attributes))
+			{
+				AddBehavior(Script.BuildFromAttributes(attributes, this));
 			}
 		}
 
@@ -684,7 +704,7 @@ namespace BhModule.Community.Pathing.Entity
 			Vector3 val;
 			Vector3 prevPoint = (val = pointsArr[0]);
 			yield return val;
-			_003C_003Ec__DisplayClass96_0 CS_0024_003C_003E8__locals0 = default(_003C_003Ec__DisplayClass96_0);
+			_003C_003Ec__DisplayClass98_0 CS_0024_003C_003E8__locals0 = default(_003C_003Ec__DisplayClass98_0);
 			for (int j = 0; j < pointsArr.Length - 1; j++)
 			{
 				Vector3 p0 = pointsArr[j];
@@ -954,6 +974,7 @@ namespace BhModule.Community.Pathing.Entity
 
 		private void Populate(AttributeCollection collection, TextureResourceManager resourceManager)
 		{
+			Populate_Guid(collection, resourceManager);
 			Populate_Alpha(collection, resourceManager);
 			Populate_AnimationSpeed(collection, resourceManager);
 			Populate_Tint(collection, resourceManager);

@@ -287,7 +287,10 @@ namespace BhModule.Community.Pathing.Entity
 			}
 			_tooltipView.Title = tooltipTitle;
 			_tooltipView.Description = tooltipDescription;
-			((Control)this).set_Tooltip(_activeTooltip);
+			if (_packState.UserConfiguration.MapShowTooltip.get_Value())
+			{
+				((Control)this).set_Tooltip(_activeTooltip);
+			}
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)

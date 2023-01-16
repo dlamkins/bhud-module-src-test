@@ -143,17 +143,22 @@ namespace BhModule.Community.Pathing
 			}
 		}
 
+		public IPathingEntity InitPointOfInterest(PointOfInterest pointOfInterest)
+		{
+			IPathingEntity entity = BuildEntity(pointOfInterest);
+			Entities.Add(entity);
+			GameService.Graphics.get_World().AddEntity((IEntity)entity);
+			return entity;
+		}
+
 		private async Task InitPointsOfInterest(IEnumerable<PointOfInterest> pointsOfInterest)
 		{
 			PointOfInterest[] pois = pointsOfInterest.ToArray();
-			new List<IPathingEntity>(pois.Length);
 			PointOfInterest[] array = pois;
 			foreach (PointOfInterest poi in array)
 			{
 				await PreloadTextures(poi);
-				IPathingEntity entity = BuildEntity(poi);
-				Entities.Add(entity);
-				GameService.Graphics.get_World().AddEntity((IEntity)entity);
+				InitPointOfInterest(poi);
 			}
 			await Task.CompletedTask;
 		}

@@ -28,6 +28,11 @@ namespace BhModule.Community.Pathing.Behavior.Filter
 			return new RaidFilter(attributes.TryGetAttribute("raid", out idAttr) ? idAttr.GetValueAsStrings() : Enumerable.Empty<string>(), pathingEntity, packState);
 		}
 
+		public string FilterReason()
+		{
+			return "Hidden because you've completed: " + string.Join(", ", Raids) + ".";
+		}
+
 		public bool IsFiltered()
 		{
 			if (Raids.Any())

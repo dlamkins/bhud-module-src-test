@@ -64,6 +64,15 @@ namespace BhModule.Community.Pathing.State
 			}
 		}
 
+		private void CleanTwinStates(SafeList<PathingCategory> categories, SafeList<PathingCategory> invertedCategories)
+		{
+			foreach (PathingCategory twin in categories.ToArray().Intersect(invertedCategories.ToArray()))
+			{
+				categories.Remove(twin);
+				invertedCategories.Remove(twin);
+			}
+		}
+
 		private async Task LoadStates()
 		{
 			PathingCategory rootCategory = _rootPackState.RootCategory;
@@ -72,6 +81,7 @@ namespace BhModule.Community.Pathing.State
 				Logger.Debug("Loading CategoryStates state.");
 				await LoadCategoryState("categories.txt", _rawInactiveCategories, rootCategory);
 				await LoadCategoryState("invcategories.txt", _rawInvertedCategories, rootCategory);
+				CleanTwinStates(_rawInactiveCategories, _rawInvertedCategories);
 				_calculationDirty = true;
 			}
 		}

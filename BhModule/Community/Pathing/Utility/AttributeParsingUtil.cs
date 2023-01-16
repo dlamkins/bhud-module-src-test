@@ -54,7 +54,7 @@ namespace BhModule.Community.Pathing.Utility
 			return value;
 		}
 
-		private static Guid InternalGetValueAsGuid(string attributeValue)
+		internal static Guid InternalGetValueAsGuid(string attributeValue)
 		{
 			byte[] rawGuid = null;
 			try

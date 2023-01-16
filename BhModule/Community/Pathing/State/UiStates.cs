@@ -21,6 +21,8 @@ namespace BhModule.Community.Pathing.State
 
 		public FlatMap Map { get; private set; }
 
+		public HorizontalCompass HorizontalCompass { get; private set; }
+
 		public SmallInteract Interact { get; private set; }
 
 		public UiStates(IRootPackState rootPackState)
@@ -59,6 +61,16 @@ namespace BhModule.Community.Pathing.State
 				FlatMap flatMap = new FlatMap(_rootPackState);
 				((Control)flatMap).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 				Map = flatMap;
+			}
+		}
+
+		private void InitHorizontalCompass()
+		{
+			if (HorizontalCompass == null)
+			{
+				HorizontalCompass horizontalCompass = new HorizontalCompass(_rootPackState);
+				((Control)horizontalCompass).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+				HorizontalCompass = horizontalCompass;
 			}
 		}
 

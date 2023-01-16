@@ -42,6 +42,11 @@ namespace BhModule.Community.Pathing.Behavior.Filter
 			_isFiltered = AllowedProfessions.All((ProfessionType p) => p != GameService.Gw2Mumble.get_PlayerCharacter().get_Profession());
 		}
 
+		public string FilterReason()
+		{
+			return "Hidden because you're not the profession: " + string.Join(", ", AllowedProfessions.Select((ProfessionType profession) => ((object)(ProfessionType)(ref profession)).ToString())) + ".";
+		}
+
 		private void PlayerCharacterOnNameChanged(object sender, ValueEventArgs<string> e)
 		{
 			UpdateFiltered();

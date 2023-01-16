@@ -146,10 +146,6 @@ namespace BhModule.Community.Pathing.Entity
 
 		public float FadeFar { get; set; }
 
-		[Description("A unique identifier used to track the state of certain behaviors between launch sessions.")]
-		[Category("Behavior")]
-		public Guid Guid { get; set; }
-
 		[Description("Renders the marker the specified amount higher than the actual position.")]
 		[Category("Appearance")]
 		public float HeightOffset { get; set; }
@@ -163,11 +159,11 @@ namespace BhModule.Community.Pathing.Entity
 			}
 			set
 			{
-				_texture = value;
-				if (_texture != null)
+				if (_texture == null)
 				{
 					FadeIn();
 				}
+				_texture = value;
 			}
 		}
 
@@ -265,6 +261,12 @@ namespace BhModule.Community.Pathing.Entity
 
 		public override float DrawOrder => Vector3.DistanceSquared(Position, GameService.Gw2Mumble.get_PlayerCamera().get_Position());
 
+		public TextureResourceManager TextureResourceManager { get; }
+
+		public void RenderToHorizontalCompass(SpriteBatch spriteBatch, Rectangle bounds)
+		{
+		}
+
 		public override RectangleF? RenderToMiniMap(SpriteBatch spriteBatch, Rectangle bounds, double offsetX, double offsetY, double scale, float opacity)
 		{
 			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
@@ -280,13 +282,14 @@ namespace BhModule.Community.Pathing.Entity
 			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0168: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0229: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0232: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0234: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0236: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0247: Unknown result type (might be due to invalid IL or missing references)
 			if (IsFiltered(EntityRenderTarget.Map) || Texture == null)
 			{
 				return null;
@@ -316,7 +319,7 @@ namespace BhModule.Community.Pathing.Entity
 			float drawScale = (float)(1.0 / scale);
 			RectangleF drawRect = default(RectangleF);
 			((RectangleF)(ref drawRect))._002Ector(Point2.op_Implicit(location - new Vector2(MapDisplaySize / 2f * drawScale, MapDisplaySize / 2f * drawScale)), Size2.op_Implicit(new Vector2(MapDisplaySize * drawScale, MapDisplaySize * drawScale)));
-			spriteBatch.Draw(AsyncTexture2D.op_Implicit(Texture), drawRect, Tint * opacity);
+			spriteBatch.Draw(AsyncTexture2D.op_Implicit(Texture), drawRect, Tint * Alpha * opacity);
 			if (_packState.UserConfiguration.MapShowAboveBelowIndicators.get_Value() && scale < 2.0)
 			{
 				float diff = Position.Z - GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Z;
@@ -374,6 +377,10 @@ namespace BhModule.Community.Pathing.Entity
 
 		private float GetOpacity()
 		{
+			if (base.BehaviorFiltered)
+			{
+				return 0.5f;
+			}
 			float fade = 1f - MathHelper.Clamp((base.DistanceToPlayer - WorldUtil.GameToWorldCoord(FadeNear)) / (WorldUtil.GameToWorldCoord(FadeFar) - WorldUtil.GameToWorldCoord(FadeNear)), 0f, 1f);
 			return Alpha * fade * _packState.UserConfiguration.PackMaxOpacityOverride.get_Value() * base.AnimatedFadeOpacity * ((!_packState.UserConfiguration.PackFadePathablesDuringCombat.get_Value()) ? 1f : (GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat() ? 0.5f : 1f));
 		}
@@ -447,11 +454,11 @@ namespace BhModule.Community.Pathing.Entity
 			//IL_0330: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0335: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0341: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0376: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0387: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0388: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0381: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0392: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0393: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03bd: Unknown result type (might be due to invalid IL or missing references)
 			if (IsFiltered(EntityRenderTarget.World))
 			{
 				return;
@@ -490,7 +497,7 @@ namespace BhModule.Community.Pathing.Entity
 			{
 				modelMatrix *= Matrix.CreateRotationX(RotationXyz.Value.X) * Matrix.CreateRotationY(RotationXyz.Value.Y) * Matrix.CreateRotationZ(RotationXyz.Value.Z) * Matrix.CreateTranslation(position);
 			}
-			_packState.SharedMarkerEffect.SetEntityState(modelMatrix, AsyncTexture2D.op_Implicit(Texture), GetOpacity(), minRender, maxRender, CanFade && _packState.UserConfiguration.PackFadeMarkersBetweenCharacterAndCamera.get_Value(), Tint, base.DebugRender);
+			_packState.SharedMarkerEffect.SetEntityState(modelMatrix, AsyncTexture2D.op_Implicit(Texture), GetOpacity(), minRender, maxRender, CanFade && _packState.UserConfiguration.PackFadeMarkersBetweenCharacterAndCamera.get_Value() && !base.BehaviorFiltered, Tint, base.DebugRender);
 			_modelMatrix = modelMatrix;
 			graphicsDevice.SetVertexBuffer((VertexBuffer)(object)_sharedVertexBuffer);
 			Enumerator enumerator = ((Effect)_packState.SharedMarkerEffect).get_CurrentTechnique().get_Passes().GetEnumerator();
@@ -600,14 +607,14 @@ namespace BhModule.Community.Pathing.Entity
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private void Populate_Guid(TmfLib.Prototype.AttributeCollection collection, IPackResourceManager resourceManager)
 		{
-			Guid = _packState.UserResourceStates.Population.MarkerPopulationDefaults.Guid;
+			base.Guid = _packState.UserResourceStates.Population.MarkerPopulationDefaults.Guid;
 			if (collection.TryPopAttribute("guid", out var attribute))
 			{
-				Guid = attribute.GetValueAsGuid();
+				base.Guid = attribute.GetValueAsGuid();
 			}
-			if (Guid == Guid.Empty)
+			if (base.Guid == Guid.Empty)
 			{
-				Guid = Guid.NewGuid();
+				base.Guid = Guid.NewGuid();
 			}
 		}
 
@@ -641,7 +648,7 @@ namespace BhModule.Community.Pathing.Entity
 			else
 			{
 				Texture = _packState.UserResourceStates.Textures.DefaultMarkerTexture;
-				Logger.Warn("Marker '" + Guid.ToBase64String() + "' is missing 'iconfile' attribute.");
+				Logger.Debug("Marker '" + base.Guid.ToBase64String() + "' is missing 'iconfile' attribute.");
 			}
 		}
 
@@ -837,73 +844,77 @@ namespace BhModule.Community.Pathing.Entity
 
 		private void Populate_Behaviors(TmfLib.Prototype.AttributeCollection collection, IPackResourceManager resourceManager)
 		{
-			if (collection.TryGetSubset("festival", out var attributes17))
+			if (collection.TryGetSubset("festival", out var attributes18))
 			{
-				AddBehavior(FestivalFilter.BuildFromAttributes(attributes17));
+				AddBehavior(FestivalFilter.BuildFromAttributes(attributes18));
 			}
-			if (collection.TryGetSubset("mount", out var attributes16))
+			if (collection.TryGetSubset("mount", out var attributes17))
 			{
-				AddBehavior(MountFilter.BuildFromAttributes(attributes16));
+				AddBehavior(MountFilter.BuildFromAttributes(attributes17));
 			}
-			if (collection.TryGetSubset("profession", out var attributes15))
+			if (collection.TryGetSubset("profession", out var attributes16))
 			{
-				AddBehavior(ProfessionFilter.BuildFromAttributes(attributes15));
+				AddBehavior(ProfessionFilter.BuildFromAttributes(attributes16));
 			}
-			if (collection.TryGetSubset("race", out var attributes14))
+			if (collection.TryGetSubset("race", out var attributes15))
 			{
-				AddBehavior(RaceFilter.BuildFromAttributes(attributes14));
+				AddBehavior(RaceFilter.BuildFromAttributes(attributes15));
 			}
-			if (collection.TryGetSubset("specialization", out var attributes13))
+			if (collection.TryGetSubset("specialization", out var attributes14))
 			{
-				AddBehavior(SpecializationFilter.BuildFromAttributes(attributes13));
+				AddBehavior(SpecializationFilter.BuildFromAttributes(attributes14));
 			}
-			if (collection.TryGetSubset("maptype", out var attributes12))
+			if (collection.TryGetSubset("maptype", out var attributes13))
 			{
-				AddBehavior(MapTypeFilter.BuildFromAttributes(attributes12));
+				AddBehavior(MapTypeFilter.BuildFromAttributes(attributes13));
 			}
-			if (collection.TryGetSubset("schedule", out var attributes11))
+			if (collection.TryGetSubset("schedule", out var attributes12))
 			{
-				AddBehavior(ScheduleFilter.BuildFromAttributes(attributes11));
+				AddBehavior(ScheduleFilter.BuildFromAttributes(attributes12));
 			}
-			if (collection.TryGetSubset("raid", out var attributes10))
+			if (collection.TryGetSubset("raid", out var attributes11))
 			{
-				AddBehavior(RaidFilter.BuildFromAttributes(attributes10, this, _packState));
+				AddBehavior(RaidFilter.BuildFromAttributes(attributes11, this, _packState));
 			}
-			if (collection.TryGetSubset("behavior", out var attributes9))
+			if (collection.TryGetSubset("behavior", out var attributes10))
 			{
-				AddBehavior(StandardBehaviorFilter.BuildFromAttributes(attributes9, this, _packState));
+				AddBehavior(StandardBehaviorFilter.BuildFromAttributes(attributes10, this, _packState));
 			}
-			if (collection.TryGetSubset("achievement", out var attributes8))
+			if (collection.TryGetSubset("achievement", out var attributes9))
 			{
-				AddBehavior(AchievementFilter.BuildFromAttributes(attributes8, this, _packState));
+				AddBehavior(AchievementFilter.BuildFromAttributes(attributes9, this, _packState));
 			}
-			if (collection.TryGetSubset("info", out var attributes7))
+			if (collection.TryGetSubset("info", out var attributes8))
 			{
-				AddBehavior(InfoModifier.BuildFromAttributes(attributes7, this, _packState));
+				AddBehavior(InfoModifier.BuildFromAttributes(attributes8, this, _packState));
 			}
-			if (collection.TryGetSubset("bounce", out var attributes6))
+			if (collection.TryGetSubset("bounce", out var attributes7))
 			{
-				AddBehavior(BounceModifier.BuildFromAttributes(attributes6, this, _packState));
+				AddBehavior(BounceModifier.BuildFromAttributes(attributes7, this, _packState));
 			}
-			if (collection.TryGetSubset("copy", out var attributes5))
+			if (collection.TryGetSubset("copy", out var attributes6))
 			{
-				AddBehavior(CopyModifier.BuildFromAttributes(attributes5, this, _packState));
+				AddBehavior(CopyModifier.BuildFromAttributes(attributes6, this, _packState));
 			}
-			if (collection.TryGetSubset("toggle", out var attributes4))
+			if (collection.TryGetSubset("toggle", out var attributes5))
 			{
-				AddBehavior(ToggleModifier.BuildFromAttributes(attributes4, this, _packState));
+				AddBehavior(ToggleModifier.BuildFromAttributes(attributes5, this, _packState));
 			}
-			if (collection.TryGetSubset("resetguid", out var attributes3))
+			if (collection.TryGetSubset("resetguid", out var attributes4))
 			{
-				AddBehavior(ResetGuidModifier.BuildFromAttributes(attributes3, this, _packState));
+				AddBehavior(ResetGuidModifier.BuildFromAttributes(attributes4, this, _packState));
 			}
-			if (collection.TryGetSubset("show", out var attributes2))
+			if (collection.TryGetSubset("show", out var attributes3))
+			{
+				AddBehavior(ShowHideModifier.BuildFromAttributes(attributes3, this, _packState));
+			}
+			if (collection.TryGetSubset("hide", out var attributes2))
 			{
 				AddBehavior(ShowHideModifier.BuildFromAttributes(attributes2, this, _packState));
 			}
-			if (collection.TryGetSubset("hide", out var attributes))
+			if (collection.TryGetSubset("script", out var attributes))
 			{
-				AddBehavior(ShowHideModifier.BuildFromAttributes(attributes, this, _packState));
+				AddBehavior(Script.BuildFromAttributes(attributes, this));
 			}
 		}
 
@@ -919,12 +930,26 @@ namespace BhModule.Community.Pathing.Entity
 
 		public override void Focus()
 		{
-			if (!Focused)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			if (Focused)
 			{
-				Focused = true;
-				if (AutoTrigger)
+				return;
+			}
+			Focused = true;
+			if (AutoTrigger)
+			{
+				Interact(autoTriggered: true);
+			}
+			if (!base.BehaviorFiltered || !_packState.UserConfiguration.PackShowHiddenMarkersReducedOpacity.get_Value())
+			{
+				return;
+			}
+			foreach (IBehavior behavior in base.Behaviors)
+			{
+				ICanFilter filter = behavior as ICanFilter;
+				if (filter != null && filter.IsFiltered())
 				{
-					Interact(autoTriggered: true);
+					_packState.UiStates.Interact.ShowInteract(this, filter.FilterReason() + "\n\nPress {0} or click this gear to unhide the marker.", Color.get_LightBlue());
 				}
 			}
 		}
@@ -932,17 +957,38 @@ namespace BhModule.Community.Pathing.Entity
 		public override void Unfocus()
 		{
 			Focused = false;
+			_packState.UiStates.Interact.DisconnectInteract(this);
 		}
 
 		public override void Interact(bool autoTriggered)
 		{
-			foreach (IBehavior behavior in base.Behaviors)
+			if (!autoTriggered && base.BehaviorFiltered && _packState.UserConfiguration.PackShowHiddenMarkersReducedOpacity.get_Value())
 			{
-				ICanInteract interactable = behavior as ICanInteract;
-				if (interactable != null)
+				IBehavior[] array = base.Behaviors.ToArray();
+				foreach (IBehavior behavior2 in array)
 				{
-					Logger.Debug((autoTriggered ? "Automatically" : "Manually") + " interacted with marker '" + Guid.ToBase64String() + "': " + behavior.GetType().Name);
-					interactable.Interact(autoTriggered);
+					if (behavior2 is ICanFilter)
+					{
+						base.Behaviors.Remove(behavior2);
+					}
+				}
+				_packState.BehaviorStates.ClearHiddenBehavior(base.Guid);
+				Unfocus();
+			}
+			else
+			{
+				if (base.BehaviorFiltered)
+				{
+					return;
+				}
+				foreach (IBehavior behavior in base.Behaviors)
+				{
+					ICanInteract interactable = behavior as ICanInteract;
+					if (interactable != null)
+					{
+						Logger.Debug((autoTriggered ? "Automatically" : "Manually") + " interacted with marker '" + base.Guid.ToBase64String() + "': " + behavior.GetType().Name);
+						interactable.Interact(autoTriggered);
+					}
 				}
 			}
 		}
@@ -965,7 +1011,8 @@ namespace BhModule.Community.Pathing.Entity
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			Populate(pointOfInterest.GetAggregatedAttributes(), TextureResourceManager.GetTextureResourceManager(pointOfInterest.ResourceManager));
+			TextureResourceManager = TextureResourceManager.GetTextureResourceManager(pointOfInterest.ResourceManager);
+			Populate(pointOfInterest.GetAggregatedAttributes(), TextureResourceManager);
 		}
 
 		private void Populate(TmfLib.Prototype.AttributeCollection collection, TextureResourceManager resourceManager)

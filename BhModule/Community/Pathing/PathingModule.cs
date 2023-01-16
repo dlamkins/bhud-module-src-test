@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using BhModule.Community.Pathing.Entity;
 using BhModule.Community.Pathing.LocalHttp;
 using BhModule.Community.Pathing.MarkerPackRepo;
+using BhModule.Community.Pathing.Scripting;
+using BhModule.Community.Pathing.Scripting.Console;
 using BhModule.Community.Pathing.UI.Views;
 using Blish_HUD;
 using Blish_HUD.Content;
@@ -40,9 +42,13 @@ namespace BhModule.Community.Pathing
 
 		private Tab _keybindSettingsTab;
 
+		private Tab _scriptSettingsTab;
+
 		private Tab _markerRepoTab;
 
 		private HttpHost _apiHost;
+
+		private ConsoleWindow _scriptConsoleWindow;
 
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
@@ -53,6 +59,8 @@ namespace BhModule.Community.Pathing
 		internal Gw2ApiManager Gw2ApiManager => base.ModuleParameters.get_Gw2ApiManager();
 
 		internal static PathingModule Instance { get; private set; }
+
+		public ScriptEngine ScriptEngine { get; private set; }
 
 		public ModuleSettings ModuleSettings { get; private set; }
 
@@ -90,9 +98,21 @@ namespace BhModule.Community.Pathing
 				_settingsWindow.set_SelectedTab(_markerRepoTab);
 				((Control)_settingsWindow).Show();
 			});
-			ContextMenuStripItem val2 = new ContextMenuStripItem();
-			val2.set_Text("Pathing Module Settings");
-			ContextMenuStripItem openSettings = val2;
+			yield return downloadMarkers;
+			if (ModuleSettings.ScriptsConsoleEnabled.get_Value() || ((Enum)GameService.Input.get_Keyboard().get_ActiveModifiers()).HasFlag((Enum)(object)(ModifierKeys)4))
+			{
+				ContextMenuStripItem val2 = new ContextMenuStripItem();
+				val2.set_Text("Script Console");
+				ContextMenuStripItem scriptConsole = val2;
+				((Control)scriptConsole).add_Click((EventHandler<MouseEventArgs>)delegate
+				{
+					ShowScriptWindow();
+				});
+				yield return scriptConsole;
+			}
+			ContextMenuStripItem val3 = new ContextMenuStripItem();
+			val3.set_Text("Pathing Module Settings");
+			ContextMenuStripItem openSettings = val3;
 			((Control)openSettings).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				if (_settingsWindow.get_SelectedTab() == _markerRepoTab)
@@ -105,7 +125,6 @@ namespace BhModule.Community.Pathing
 				}
 				((WindowBase2)_settingsWindow).ToggleWindow();
 			});
-			yield return downloadMarkers;
 			yield return openSettings;
 		}
 
@@ -136,8 +155,10 @@ namespace BhModule.Community.Pathing
 			//IL_0187: Expected O, but got Unknown
 			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01c1: Expected O, but got Unknown
-			//IL_0204: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020e: Expected O, but got Unknown
+			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fb: Expected O, but got Unknown
+			//IL_023e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0248: Expected O, but got Unknown
 			CornerIcon val = new CornerIcon();
 			val.set_IconName(Strings.General_UiName);
 			val.set_Icon(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\pathing-icon.png")));
@@ -154,10 +175,12 @@ namespace BhModule.Community.Pathing
 			_settingsWindow = val2;
 			_packSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156740+155150.png")), (Func<IView>)(() => (IView)new SettingsView(ModuleSettings.PackSettings, -1)), Strings.Window_MainSettingsTab, (int?)null);
 			_mapSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\157123+155150.png")), (Func<IView>)(() => (IView)new SettingsView(ModuleSettings.MapSettings, -1)), Strings.Window_MapSettingsTab, (int?)null);
+			_scriptSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156701.png")), (Func<IView>)(() => (IView)new SettingsView(ModuleSettings.ScriptSettings, -1)), "Script Options", (int?)null);
 			_keybindSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156734+155150.png")), (Func<IView>)(() => (IView)new SettingsView(ModuleSettings.KeyBindSettings, -1)), Strings.Window_KeyBindSettingsTab, (int?)null);
 			_markerRepoTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156909.png")), (Func<IView>)(() => (IView)(object)new PackRepoView()), Strings.Window_DownloadMarkerPacks, (int?)null);
 			_settingsWindow.get_Tabs().Add(_packSettingsTab);
 			_settingsWindow.get_Tabs().Add(_mapSettingsTab);
+			_settingsWindow.get_Tabs().Add(_scriptSettingsTab);
 			_settingsWindow.get_Tabs().Add(_keybindSettingsTab);
 			_settingsWindow.get_Tabs().Add(_markerRepoTab);
 			((Control)_pathingIcon).add_Click((EventHandler<MouseEventArgs>)delegate
@@ -179,6 +202,20 @@ namespace BhModule.Community.Pathing
 					ShowPathingContextMenu();
 				}
 			});
+		}
+
+		private void ShowScriptWindow()
+		{
+			if (_scriptConsoleWindow == null)
+			{
+				_scriptConsoleWindow = new ConsoleWindow(this);
+			}
+			_scriptConsoleWindow.Show();
+			_scriptConsoleWindow.BringToFront();
+			_scriptConsoleWindow.FormClosed += delegate
+			{
+				_scriptConsoleWindow = null;
+			};
 		}
 
 		private void ShowPathingContextMenu()
@@ -204,9 +241,10 @@ namespace BhModule.Community.Pathing
 		protected override async Task LoadAsync()
 		{
 			Stopwatch sw = Stopwatch.StartNew();
+			ScriptEngine = new ScriptEngine();
 			MarkerPackRepo = new BhModule.Community.Pathing.MarkerPackRepo.MarkerPackRepo();
 			MarkerPackRepo.Init();
-			PackInitiator = new PackInitiator(DirectoriesManager.GetFullDirectoryPath("markers"), ModuleSettings, GetModuleProgressHandler());
+			PackInitiator = new PackInitiator(DirectoriesManager.GetFullDirectoryPath("markers"), this, GetModuleProgressHandler());
 			await PackInitiator.Init();
 			sw.Stop();
 			Logger.Debug($"Took {sw.ElapsedMilliseconds} ms to complete loading Pathing module...");
@@ -219,6 +257,7 @@ namespace BhModule.Community.Pathing
 
 		protected override void Update(GameTime gameTime)
 		{
+			ScriptEngine?.Update(gameTime);
 			PackInitiator?.Update(gameTime);
 		}
 
@@ -236,6 +275,7 @@ namespace BhModule.Community.Pathing
 
 		protected override void Unload()
 		{
+			ScriptEngine?.Unload();
 			_apiHost?.Close();
 			PackInitiator?.Unload();
 			CornerIcon pathingIcon = _pathingIcon;
@@ -248,6 +288,7 @@ namespace BhModule.Community.Pathing
 			{
 				((Control)settingsWindow).Dispose();
 			}
+			_scriptConsoleWindow?.Dispose();
 			UnloadPathingElements();
 			Instance = null;
 		}

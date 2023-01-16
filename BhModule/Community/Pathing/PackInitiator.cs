@@ -23,7 +23,7 @@ namespace BhModule.Community.Pathing
 
 		private readonly string _watchPath;
 
-		private readonly ModuleSettings _moduleSettings;
+		private readonly PathingModule _module;
 
 		private readonly IProgress<string> _loadingIndicator;
 
@@ -41,14 +41,14 @@ namespace BhModule.Community.Pathing
 
 		public IRootPackState PackState => _packState;
 
-		public PackInitiator(string watchPath, ModuleSettings moduleSettings, IProgress<string> loadingIndicator)
+		public PackInitiator(string watchPath, PathingModule module, IProgress<string> loadingIndicator)
 		{
 			_watchPath = watchPath;
-			_moduleSettings = moduleSettings;
+			_module = module;
 			_loadingIndicator = loadingIndicator;
 			_packReaderSettings = new PackReaderSettings();
 			_packReaderSettings.VenderPrefixes.Add("bh-");
-			_packState = new SharedPackState(moduleSettings);
+			_packState = new SharedPackState(module.ModuleSettings);
 		}
 
 		public void ReloadPacks()
@@ -66,13 +66,17 @@ namespace BhModule.Community.Pathing
 			ContextMenuStripItem val = new ContextMenuStripItem();
 			val.set_Text("All Markers");
 			val.set_CanCheck(true);
-			val.set_Checked(_moduleSettings.GlobalPathablesEnabled.get_Value());
+			val.set_Checked(_module.ModuleSettings.GlobalPathablesEnabled.get_Value());
 			val.set_Submenu((ContextMenuStrip)(object)(isAnyMarkers ? new CategoryContextMenuStrip(_packState, _sharedPackCollection.Categories, forceShowAll: false) : null));
 			ContextMenuStripItem allMarkers = val;
 			allMarkers.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object _, CheckChangedEvent e)
 			{
-				_moduleSettings.GlobalPathablesEnabled.set_Value(e.get_Checked());
+				_module.ModuleSettings.GlobalPathablesEnabled.set_Value(e.get_Checked());
 			});
+			if (PathingModule.Instance.ScriptEngine.Global.Menu.Menus.Any())
+			{
+				yield return PathingModule.Instance.ScriptEngine.Global.Menu.BuildMenu();
+			}
 			ContextMenuStripItem val2 = new ContextMenuStripItem();
 			val2.set_Text("Reload Markers");
 			((Control)val2).set_Enabled(!IsLoading && _packState.CurrentMapId > 0);
@@ -201,10 +205,12 @@ namespace BhModule.Community.Pathing
 		{
 			IsLoading = true;
 			Stopwatch loadTimer = Stopwatch.StartNew();
+			PathingModule.Instance.ScriptEngine.Reset();
 			List<(Pack Pack, long LoadDuration)> packTimings = new List<(Pack, long)>();
 			_loadingIndicator.Report("Loading marker packs...");
 			await PrepareState(mapId);
-			Pack[] array = _packs.ToArray();
+			Pack[] packs = _packs.ToArray();
+			Pack[] array = packs;
 			foreach (Pack pack in array)
 			{
 				try
@@ -234,7 +240,16 @@ namespace BhModule.Community.Pathing
 				Logger.Warn(e3, "Finalizing packs failed.");
 				_packState?.Unload();
 			}
-			Pack[] array2 = _packs.ToArray();
+			if (PathingModule.Instance.ModuleSettings.ScriptsEnabled.get_Value())
+			{
+				_loadingIndicator.Report("Loading scripts...");
+				array = packs;
+				foreach (Pack pack2 in array)
+				{
+					await PathingModule.Instance.ScriptEngine.LoadScript("pack.lua", pack2.ResourceManager);
+				}
+			}
+			Pack[] array2 = packs;
 			for (int j = 0; j < array2.Length; j++)
 			{
 				array2[j].ReleaseLocks();

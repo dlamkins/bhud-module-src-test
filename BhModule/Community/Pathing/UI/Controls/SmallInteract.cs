@@ -1,10 +1,12 @@
 using System;
 using BhModule.Community.Pathing.Entity;
 using BhModule.Community.Pathing.State;
+using BhModule.Community.Pathing.UI.Tooltips;
 using Blish_HUD;
 using Blish_HUD.Common.Gw2;
 using Blish_HUD.Common.UI.Views;
 using Blish_HUD.Controls;
+using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -34,6 +36,8 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		private double _showStart;
 
+		private Color _tint = Color.get_White();
+
 		private IPathingEntity _activePathingEntity;
 
 		public SmallInteract(IRootPackState packState)
@@ -41,7 +45,9 @@ namespace BhModule.Community.Pathing.UI.Controls
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 			_packState = packState;
 			((Control)this).set_Visible(false);
 			((Control)this).set_Size(new Point(64, 64));
@@ -54,25 +60,44 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		public void ShowInteract(IPathingEntity pathingEntity, string interactMessage)
 		{
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Expected O, but got Unknown
-			ShowInteract(pathingEntity, (ITooltipView)new BasicTooltipView(string.Format(interactMessage, "[" + KeyBindings.Interact.GetBindingDisplayText() + "]")));
+			ShowInteract(pathingEntity, (ITooltipView)(object)new BasicTooltipView(string.Format(interactMessage, "[" + KeyBindings.Interact.GetBindingDisplayText() + "]")));
+		}
+
+		public void ShowInteract(IPathingEntity pathingEntity, string interactMessage, Color tint)
+		{
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			ShowInteract(pathingEntity, (ITooltipView)(object)new BasicTooltipView(string.Format(interactMessage, "[" + KeyBindings.Interact.GetBindingDisplayText() + "]")), tint);
+		}
+
+		public void ShowInteract(IPathingEntity pathingEntity, ITooltipView tooltipView, Color tint)
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Expected O, but got Unknown
+			_tint = tint;
+			_activePathingEntity = pathingEntity;
+			if (_packState.UserResourceStates.Advanced.InteractGearAnimation)
+			{
+				_showStart = GameService.Overlay.get_CurrentGameTime().get_TotalGameTime().TotalSeconds;
+			}
+			((Control)this).set_Tooltip(new Tooltip(tooltipView));
+			((Control)this).set_Visible(true);
 		}
 
 		public void ShowInteract(IPathingEntity pathingEntity, ITooltipView tooltipView)
 		{
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Expected O, but got Unknown
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 			if (!pathingEntity.BehaviorFiltered)
 			{
-				_activePathingEntity = pathingEntity;
-				if (_packState.UserResourceStates.Advanced.InteractGearAnimation)
-				{
-					_showStart = GameService.Overlay.get_CurrentGameTime().get_TotalGameTime().TotalSeconds;
-				}
-				((Control)this).set_Tooltip(new Tooltip(tooltipView));
-				((Control)this).set_Visible(true);
+				ShowInteract(pathingEntity, tooltipView, Color.FromNonPremultiplied(255, 142, 50, 255));
 			}
+		}
+
+		protected override void OnClick(MouseEventArgs e)
+		{
+			((Control)this).OnClick(e);
+			_activePathingEntity?.Interact(autoTriggered: false);
 		}
 
 		public void DisconnectInteract(IPathingEntity pathingEntity)
@@ -108,15 +133,15 @@ namespace BhModule.Community.Pathing.UI.Controls
 		{
 			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
 			if (_packState.UserConfiguration.PackAllowInteractIcon.get_Value() && _activePathingEntity != null && !_activePathingEntity.IsFiltered(EntityRenderTarget.World))
 			{
 				float baseOpacity = 0.4f;
 				double tCTS = Math.Max(GameService.Overlay.get_CurrentGameTime().get_TotalGameTime().TotalSeconds - _subtleTimer, 0.05);
 				float opacity = (((Control)this).get_MouseOver() ? baseOpacity : 0.3f) + (float)Math.Min((tCTS / 0.103 - 0.05) * 0.6000000238418579, 0.6000000238418579);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _interact1, RectangleExtension.OffsetBy(bounds, 32, 32), (Rectangle?)null, Color.get_White() * opacity, Math.Min((float)(GameService.Overlay.get_CurrentGameTime().get_TotalGameTime().TotalSeconds - _showStart) * 20f, (float)Math.PI * 2f), new Vector2(32f, 32f), (SpriteEffects)0);
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _interact1, RectangleExtension.OffsetBy(bounds, 32, 32), (Rectangle?)null, _tint * opacity, Math.Min((float)(GameService.Overlay.get_CurrentGameTime().get_TotalGameTime().TotalSeconds - _showStart) * 20f, (float)Math.PI * 2f), new Vector2(32f, 32f), (SpriteEffects)0);
 			}
 		}
 	}

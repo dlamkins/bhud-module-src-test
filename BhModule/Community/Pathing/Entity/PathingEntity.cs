@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using BhModule.Community.Pathing.Behavior;
@@ -23,6 +24,10 @@ namespace BhModule.Community.Pathing.Entity
 		private bool _needsFadeIn = true;
 
 		private bool _wasInactive;
+
+		[Description("A unique identifier used to track the state of certain behaviors between launch sessions.")]
+		[Category("Behavior")]
+		public Guid Guid { get; set; }
 
 		[Browsable(false)]
 		public IList<IBehavior> Behaviors { get; } = new SafeList<IBehavior>();
@@ -173,7 +178,11 @@ namespace BhModule.Community.Pathing.Entity
 			{
 				return true;
 			}
-			return BehaviorFiltered;
+			if (BehaviorFiltered)
+			{
+				return !_packState.UserConfiguration.PackShowHiddenMarkersReducedOpacity.get_Value();
+			}
+			return false;
 		}
 
 		protected Vector2 GetScaledLocation(double x, double y, double scale, double offsetX, double offsetY)

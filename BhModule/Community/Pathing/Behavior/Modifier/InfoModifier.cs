@@ -15,7 +15,29 @@ namespace BhModule.Community.Pathing.Behavior.Modifier
 
 		private readonly IPackState _packState;
 
-		public string InfoValue { get; set; }
+		private string _infoValue;
+
+		private bool _inFocus;
+
+		public string InfoValue
+		{
+			get
+			{
+				return _infoValue;
+			}
+			set
+			{
+				if (!string.Equals(_infoValue, value))
+				{
+					_packState.UiStates.RemoveInfoString(_infoValue);
+					_infoValue = value;
+					if (_inFocus)
+					{
+						Focus();
+					}
+				}
+			}
+		}
 
 		public InfoModifier(StandardMarker pathingEntity, string value, float range, IPackState packState)
 			: base(pathingEntity)
@@ -39,12 +61,14 @@ namespace BhModule.Community.Pathing.Behavior.Modifier
 		{
 			if (!_pathingEntity.BehaviorFiltered)
 			{
+				_inFocus = true;
 				_packState.UiStates.AddInfoString(InfoValue);
 			}
 		}
 
 		public void Unfocus()
 		{
+			_inFocus = false;
 			_packState.UiStates.RemoveInfoString(InfoValue);
 		}
 

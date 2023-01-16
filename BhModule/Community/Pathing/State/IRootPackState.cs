@@ -1,6 +1,8 @@
 using System.Threading.Tasks;
+using BhModule.Community.Pathing.Entity;
 using Blish_HUD;
 using TmfLib;
+using TmfLib.Pathable;
 
 namespace BhModule.Community.Pathing.State
 {
@@ -13,5 +15,7 @@ namespace BhModule.Community.Pathing.State
 		Task LoadPackCollection(IPackCollection collection);
 
 		Task Unload();
+
+		IPathingEntity InitPointOfInterest(PointOfInterest pointOfInterest);
 	}
 }
