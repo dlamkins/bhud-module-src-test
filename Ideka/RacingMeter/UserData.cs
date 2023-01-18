@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
-using Ideka.RacingMeterLib;
+using Ideka.RacingMeter.Lib;
 
 namespace Ideka.RacingMeter
 {
@@ -40,10 +40,6 @@ namespace Ideka.RacingMeter
 				Account = null;
 				AccessToken = null;
 				Token = null;
-				if (!RacingModule.Gw2ApiManager.HasPermission((TokenPermission)1))
-				{
-					throw FriendlyError.Create(new UnauthorizedAccessException(Strings.ExceptionNoAccountApiPermission));
-				}
 				Account = await ((IBlobClient<Account>)(object)RacingModule.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()).GetAsync(ct);
 				AccessToken = (await ((IBlobClient<CreateSubtoken>)(object)RacingModule.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_CreateSubtoken()
 					.Expires(DateTimeOffset.UtcNow + TokenDuration)

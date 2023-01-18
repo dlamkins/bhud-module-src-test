@@ -2,7 +2,7 @@ using System;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Ideka.NetCommon;
-using Ideka.RacingMeterLib;
+using Ideka.RacingMeter.Lib;
 using Microsoft.Xna.Framework;
 
 namespace Ideka.RacingMeter
@@ -35,6 +35,8 @@ namespace Ideka.RacingMeter
 
 		private readonly StandardButton _nextSwapButton;
 
+		private readonly StandardButton _snapButton;
+
 		public RacePointEditPanel(RaceEditor editor)
 			: this()
 		{
@@ -64,6 +66,11 @@ namespace Ideka.RacingMeter
 			//IL_018f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01a6: Expected O, but got Unknown
+			//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ca: Expected O, but got Unknown
 			_editor = editor;
 			((Panel)this).set_ShowTint(true);
 			((Panel)this).set_Title(" ");
@@ -111,6 +118,15 @@ namespace Ideka.RacingMeter
 			((Control)val6).set_Parent((Container)(object)this);
 			val6.set_Text(Strings.SwapNext);
 			_nextSwapButton = val6;
+			StandardButton val7 = new StandardButton();
+			((Control)val7).set_Parent((Container)(object)this);
+			val7.set_Text("Snap");
+			((Control)val7).set_Visible(false);
+			_snapButton = val7;
+			((Control)_snapButton).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				_editor.SnapPoint();
+			});
 			_posBox.TempValue += _editor.MovePointPreview;
 			_posBox.ValueCommitted += _editor.MovePoint;
 			_radiusBox.TempValue += _editor.ResizePointPreview;
@@ -219,16 +235,16 @@ namespace Ideka.RacingMeter
 
 		private void UpdateLayout()
 		{
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0167: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020a: Unknown result type (might be due to invalid IL or missing references)
 			if (_editor != null)
 			{
 				((Control)_snapXYZButton).set_Left(10);
 				((Control)(object)_snapXYZButton).ArrangeLeftRight(10, (Control)_snapXYButton, (Control)_removeButton);
 				((Control)_prevSwapButton).set_Left(10);
-				((Control)(object)_prevSwapButton).ArrangeLeftRight(10, (Control)_nextSwapButton);
+				((Control)(object)_prevSwapButton).ArrangeLeftRight(10, (Control)_nextSwapButton, (Control)_snapButton);
 				if (((Container)this).get_ContentRegion().Width != ((Control)_removeButton).get_Right() + 10)
 				{
 					((Container)(object)this).SetContentRegionWidth(((Control)_removeButton).get_Right() + 10);
@@ -264,7 +280,9 @@ namespace Ideka.RacingMeter
 				((Control)snapXYButton).set_Top(top = num);
 				((Control)snapXYZButton).set_Top(top);
 				StandardButton prevSwapButton = _prevSwapButton;
-				((Control)_nextSwapButton).set_Top(top = ((Control)_snapXYZButton).get_Bottom() + 10);
+				StandardButton nextSwapButton = _nextSwapButton;
+				((Control)_snapButton).set_Top(num = ((Control)_snapXYZButton).get_Bottom() + 10);
+				((Control)nextSwapButton).set_Top(top = num);
 				((Control)prevSwapButton).set_Top(top);
 				((Container)(object)this).SetContentRegionHeight(((Control)_nextSwapButton).get_Bottom() + 10);
 			}

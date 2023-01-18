@@ -5,7 +5,7 @@ using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Ideka.NetCommon;
-using Ideka.RacingMeterLib;
+using Ideka.RacingMeter.Lib;
 using Microsoft.Xna.Framework;
 
 namespace Ideka.RacingMeter
@@ -18,7 +18,13 @@ namespace Ideka.RacingMeter
 
 		private const int Spacing = 10;
 
+		private readonly StandardButton _koFiButton;
+
+		private readonly Label _madeByLabel;
+
 		private readonly Label _statusLabel;
+
+		private readonly StandardButton _onlineButton;
 
 		private readonly Label _raceLabel;
 
@@ -27,10 +33,6 @@ namespace Ideka.RacingMeter
 		private readonly Label _ghostLabel;
 
 		private readonly StandardButton _unloadGhostButton;
-
-		private readonly Label _madeByLabel;
-
-		private readonly StandardButton _koFiButton;
 
 		public TopBar()
 			: this()
@@ -46,27 +48,32 @@ namespace Ideka.RacingMeter
 			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c2: Expected O, but got Unknown
-			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e2: Expected O, but got Unknown
-			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c6: Expected O, but got Unknown
+			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Expected O, but got Unknown
+			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0106: Expected O, but got Unknown
 			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
 			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0126: Expected O, but got Unknown
-			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012a: Expected O, but got Unknown
+			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
 			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_014a: Expected O, but got Unknown
+			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0150: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016e: Expected O, but got Unknown
 			StandardButton val = new StandardButton();
 			((Control)val).set_Parent((Container)(object)this);
 			val.set_Text(Strings.KoFiButton);
@@ -80,31 +87,36 @@ namespace Ideka.RacingMeter
 			val2.set_VerticalAlignment((VerticalAlignment)0);
 			val2.set_Text(StringExtensions.Format(Strings.CreatedBy, $"{RacingModule.Name} v{RacingModule.Version}", "Ideka"));
 			_madeByLabel = val2;
-			Label val3 = new Label();
+			StandardButton val3 = new StandardButton();
 			((Control)val3).set_Parent((Container)(object)this);
-			val3.set_AutoSizeWidth(true);
-			val3.set_AutoSizeHeight(true);
-			_statusLabel = val3;
+			((Control)val3).set_Visible(false);
+			val3.set_Text("Online Racing");
+			_onlineButton = val3;
 			Label val4 = new Label();
 			((Control)val4).set_Parent((Container)(object)this);
 			val4.set_AutoSizeWidth(true);
 			val4.set_AutoSizeHeight(true);
-			_raceLabel = val4;
-			StandardButton val5 = new StandardButton();
+			_statusLabel = val4;
+			Label val5 = new Label();
 			((Control)val5).set_Parent((Container)(object)this);
-			val5.set_Text(Strings.UnloadRace);
-			((Control)val5).set_Enabled(false);
-			_unloadRaceButton = val5;
-			Label val6 = new Label();
+			val5.set_AutoSizeWidth(true);
+			val5.set_AutoSizeHeight(true);
+			_raceLabel = val5;
+			StandardButton val6 = new StandardButton();
 			((Control)val6).set_Parent((Container)(object)this);
-			val6.set_AutoSizeWidth(true);
-			val6.set_AutoSizeHeight(true);
-			_ghostLabel = val6;
-			StandardButton val7 = new StandardButton();
+			val6.set_Text(Strings.UnloadRace);
+			((Control)val6).set_Enabled(false);
+			_unloadRaceButton = val6;
+			Label val7 = new Label();
 			((Control)val7).set_Parent((Container)(object)this);
-			val7.set_Text(Strings.UnloadGhost);
-			((Control)val7).set_Enabled(false);
-			_unloadGhostButton = val7;
+			val7.set_AutoSizeWidth(true);
+			val7.set_AutoSizeHeight(true);
+			_ghostLabel = val7;
+			StandardButton val8 = new StandardButton();
+			((Control)val8).set_Parent((Container)(object)this);
+			val8.set_Text(Strings.UnloadGhost);
+			((Control)val8).set_Enabled(false);
+			_unloadGhostButton = val8;
 			((Control)_unloadRaceButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				RacingModule.Racer.FullRace = null;
@@ -117,6 +129,10 @@ namespace Ideka.RacingMeter
 			((Control)_koFiButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				Process.Start("https://ko-fi.com/ideka");
+			});
+			((Control)_onlineButton).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				RacingModule.Racer.CurrentMode = Racer.Mode.Online;
 			});
 			RacingModule.Racer.RaceLoaded += new Action<FullRace>(RaceLoaded);
 			RacingModule.Racer.GhostLoaded += new Action<FullGhost>(GhostLoaded);
@@ -135,16 +151,17 @@ namespace Ideka.RacingMeter
 
 		private void UpdateLayout()
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			((Control)_koFiButton).set_Location(Point.get_Zero());
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
 			((Control)_koFiButton).set_Width(150);
 			((Control)_koFiButton).set_Height(((Container)this).get_ContentRegion().Height);
-			((Control)(object)_koFiButton).ArrangeLeftRight(10, (Control)_madeByLabel);
+			((Control)(object)_koFiButton).ArrangeLeftRight(10, (Control)_madeByLabel, (Control)_onlineButton, (Control)_statusLabel);
+			((Control)(object)_koFiButton).AlignMiddle();
 			((Control)(object)_madeByLabel).AlignMiddle();
+			((Control)(object)_onlineButton).AlignMiddle();
+			((Control)(object)_statusLabel).AlignMiddle();
 			StandardButton unloadRaceButton = _unloadRaceButton;
 			int width;
 			((Control)_unloadGhostButton).set_Right(width = ((Container)this).get_ContentRegion().Width);
@@ -184,8 +201,6 @@ namespace Ideka.RacingMeter
 			Color item2;
 			statusLabel2.set_TextColor(item2 = tuple.Item2);
 			((Control)statusLabel3).set_BasicTooltipText(item = tuple.Item3);
-			((Control)(object)_madeByLabel).ArrangeLeftRight(10, (Control)_statusLabel);
-			((Control)(object)_statusLabel).AlignMiddle();
 		}
 
 		private void RaceLoaded(FullRace race)
@@ -204,7 +219,7 @@ namespace Ideka.RacingMeter
 		{
 			RacingModule.Racer.RaceLoaded -= new Action<FullRace>(RaceLoaded);
 			RacingModule.Racer.GhostLoaded -= new Action<FullGhost>(GhostLoaded);
-			AsyncTexture2D icon = _koFiButton.get_Icon();
+			AsyncTexture2D icon = _onlineButton.get_Icon();
 			if (icon != null)
 			{
 				icon.Dispose();

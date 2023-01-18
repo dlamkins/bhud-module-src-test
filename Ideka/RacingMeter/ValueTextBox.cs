@@ -30,6 +30,7 @@ namespace Ideka.RacingMeter
 						{
 							CommitValue(value);
 						}
+						base.Value = value;
 					}
 				}
 			});

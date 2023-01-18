@@ -7,7 +7,7 @@ using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Gw2Sharp.WebApi.V2.Models;
-using Ideka.RacingMeterLib;
+using Ideka.RacingMeter.Lib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -159,7 +159,7 @@ namespace Ideka.RacingMeter
 				{
 					RacingModule.Racer.FullRace = Race;
 				}
-				RacingModule.Racer.EditMode = true;
+				RacingModule.Racer.CurrentMode = Racer.Mode.Edit;
 			});
 			RacingModule.Server.RemoteRacesChanged += RemoteRacesChanged;
 			RacingModule.Racer.LocalRacesChanged += new Action(LocalRacesChanged);

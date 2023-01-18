@@ -7,7 +7,7 @@ using Glide;
 using Gw2Sharp.WebApi.V2.Models;
 using Ideka.BHUDCommon;
 using Ideka.NetCommon;
-using Ideka.RacingMeterLib;
+using Ideka.RacingMeter.Lib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Blish_HUD;
-using Ideka.RacingMeterLib;
+using Ideka.RacingMeter.Lib;
 using Newtonsoft.Json;
 
 namespace Ideka.RacingMeter
@@ -33,7 +33,7 @@ namespace Ideka.RacingMeter
 		public void ToCache(string path)
 		{
 			Directory.CreateDirectory(Path.GetDirectoryName(path));
-			File.WriteAllText(path, JsonConvert.SerializeObject((object)this));
+			File.WriteAllText(path, JsonConvert.SerializeObject(this));
 		}
 	}
 }

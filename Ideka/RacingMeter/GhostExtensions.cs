@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Ideka.NetCommon;
-using Ideka.RacingMeterLib;
+using Ideka.RacingMeter.Lib;
 using Microsoft.Xna.Framework;
 
 namespace Ideka.RacingMeter
@@ -80,11 +80,15 @@ namespace Ideka.RacingMeter
 			return ghost.SnapshotAt(ghost.Time.Multiply(p));
 		}
 
-		public static GhostSnapshot SnapshotAt(this Ghost ghost, TimeSpan time)
+		public static GhostSnapshot SnapshotAt(this Ghost ghost, TimeSpan time, bool clamped = true)
 		{
 			if (!ghost.Snapshots.Any())
 			{
 				return default(GhostSnapshot);
+			}
+			if (clamped && time > ghost.Time)
+			{
+				time = ghost.Time;
 			}
 			time += ghost.Start;
 			if (time <= ghost.Snapshots.First().Time)

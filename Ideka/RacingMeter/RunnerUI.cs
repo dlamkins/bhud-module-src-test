@@ -2,7 +2,7 @@ using System;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Ideka.NetCommon;
-using Ideka.RacingMeterLib;
+using Ideka.RacingMeter.Lib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.BitmapFonts;
@@ -29,6 +29,13 @@ namespace Ideka.RacingMeter
 			addLine().WithUpdate(delegate(SizedTextLabel x)
 			{
 				x.Text = Strings.CheckpointLabel.Format(racer.CurrentStep, racer.Checkpoints.Count);
+			});
+			addLine().WithUpdate(delegate(SizedTextLabel x)
+			{
+				x.Text = $"{racer.Progress:P2}";
+			}).With(delegate(SizedTextLabel x)
+			{
+				x.SuffixModel = $"{0.99:P2}";
 			});
 			addLine(GameService.Content.get_DefaultFont32()).WithUpdate(delegate(SizedTextLabel x)
 			{

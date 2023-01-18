@@ -3,7 +3,7 @@ using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Ideka.BHUDCommon;
-using Ideka.RacingMeterLib;
+using Ideka.RacingMeter.Lib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -73,9 +73,22 @@ namespace Ideka.RacingMeter
 
 		public bool CanDraw()
 		{
-			if (Race != null && GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && !GameService.Gw2Mumble.get_UI().get_IsMapOpen())
+			if (GameService.GameIntegration.get_Gw2Instance().get_IsInGame())
 			{
-				return Race.MapId == GameService.Gw2Mumble.get_CurrentMap().get_Id();
+				return !GameService.Gw2Mumble.get_UI().get_IsMapOpen();
+			}
+			return false;
+		}
+
+		public bool CanDrawRace()
+		{
+			if (CanDraw())
+			{
+				Race race = Race;
+				if (race != null)
+				{
+					return race.MapId == GameService.Gw2Mumble.get_CurrentMap().get_Id();
+				}
 			}
 			return false;
 		}

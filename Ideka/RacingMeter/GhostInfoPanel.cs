@@ -6,7 +6,7 @@ using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Ideka.NetCommon;
-using Ideka.RacingMeterLib;
+using Ideka.RacingMeter.Lib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -200,7 +200,7 @@ namespace Ideka.RacingMeter
 				return;
 			}
 			CancellationToken ct = TaskUtils.New(ref _downloadGhost);
-			Task.Run(async delegate
+			((Func<Task>)async delegate
 			{
 				_ghostLoadingLabel.set_Text(Strings.Loading);
 				Ghost ghost = await RacingModule.Server.GetGhost(id, ct);
@@ -209,7 +209,7 @@ namespace Ideka.RacingMeter
 				{
 					this.GhostChanged?.Invoke(ghostTarget);
 				}
-			}).Done(Logger, Strings.ErrorGhostLoad, _downloadGhost).ContinueWith(delegate(Task<TaskUtils.TaskState> task)
+			})().Done(Logger, Strings.ErrorGhostLoad, _downloadGhost).ContinueWith(delegate(Task<TaskUtils.TaskState> task)
 			{
 				if (Ghost == ghostTarget)
 				{
@@ -223,7 +223,7 @@ namespace Ideka.RacingMeter
 			TaskUtils.Cancel(ref _uploadGhost);
 			((Control)_uploadGhostButton).set_Enabled(false);
 			CancellationToken ct = TaskUtils.New(ref _uploadGhost);
-			Task.Run(async delegate
+			((Func<Task>)async delegate
 			{
 				UserData user = RacingModule.Server.User;
 				if (user == null)
@@ -243,7 +243,7 @@ namespace Ideka.RacingMeter
 					}
 					await RacingModule.Server.UploadGhost(raceId, ghost, ct);
 				}
-			}).Done(Logger, Strings.ErrorGhostUpload, _uploadGhost).ContinueWith(delegate
+			})().Done(Logger, Strings.ErrorGhostUpload, _uploadGhost).ContinueWith(delegate
 			{
 				((Control)_uploadGhostButton).set_Enabled(Ghost?.IsLocal ?? false);
 			});

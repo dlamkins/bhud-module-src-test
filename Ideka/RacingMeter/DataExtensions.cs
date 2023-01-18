@@ -1,6 +1,6 @@
 using Blish_HUD;
 using Ideka.NetCommon;
-using Ideka.RacingMeterLib;
+using Ideka.RacingMeter.Lib;
 
 namespace Ideka.RacingMeter
 {

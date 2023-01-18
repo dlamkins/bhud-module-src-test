@@ -1,6 +1,6 @@
 using System;
 using Blish_HUD.Controls;
-using Ideka.RacingMeterLib;
+using Ideka.RacingMeter.Lib;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Ideka.RacingMeter

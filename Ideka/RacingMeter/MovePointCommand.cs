@@ -1,4 +1,4 @@
-using Ideka.RacingMeterLib;
+using Ideka.RacingMeter.Lib;
 using Microsoft.Xna.Framework;
 
 namespace Ideka.RacingMeter

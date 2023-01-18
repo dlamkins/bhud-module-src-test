@@ -30,7 +30,7 @@ namespace Ideka.RacingMeter
 			_backButton = val;
 			((Control)_backButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				RacingModule.Racer.EditMode = true;
+				RacingModule.Racer.CurrentMode = Racer.Mode.Edit;
 			});
 		}
 

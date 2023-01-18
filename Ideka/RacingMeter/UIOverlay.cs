@@ -11,11 +11,11 @@ namespace Ideka.RacingMeter
 	{
 		public static float GetScale()
 		{
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0068: Expected I4, but got Unknown
-			float num = 1f * Math.Min((float)Math.Min(GameService.Graphics.get_WindowWidth(), 1024) / 1024f, (float)Math.Min(GameService.Graphics.get_WindowHeight(), 768) / 768f);
+			//IL_0062: Expected I4, but got Unknown
+			float num = Math.Min((float)Math.Min(GameService.Graphics.get_WindowWidth(), 1024) / 1024f, (float)Math.Min(GameService.Graphics.get_WindowHeight(), 768) / 768f);
 			UiSize uISize = GameService.Gw2Mumble.get_UI().get_UISize();
 			return num * (int)uISize switch
 			{

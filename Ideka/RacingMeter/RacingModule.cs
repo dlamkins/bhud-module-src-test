@@ -122,7 +122,7 @@ namespace Ideka.RacingMeter
 			_racer = _dc.Add(new Racer());
 			_metaPanel = _dc.Add<MetaPanel>(new MetaPanel(GameService.Overlay.get_BlishHudWindow()));
 			_confirmationModal = _dc.Add<ConfirmationModal>(new ConfirmationModal(ContentsManager.GetTexture("Tooltip.png")));
-			_racer.EditMode = false;
+			_racer.CurrentMode = Racer.Mode.Racing;
 		}
 
 		protected override void Unload()

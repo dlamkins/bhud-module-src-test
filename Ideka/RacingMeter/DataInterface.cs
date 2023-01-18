@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Blish_HUD;
 using Ideka.NetCommon;
-using Ideka.RacingMeterLib;
+using Ideka.RacingMeter.Lib;
 using Microsoft.VisualBasic.FileIO;
 using Newtonsoft.Json;
 
@@ -55,7 +55,7 @@ namespace Ideka.RacingMeter
 		{
 			race.Race.Modified = DateTime.UtcNow;
 			Directory.CreateDirectory(RacingModule.RacePath);
-			File.WriteAllText(Path.Combine(RacingModule.RacePath, race.Meta.Id + ".race"), JsonConvert.SerializeObject((object)race.Race));
+			File.WriteAllText(Path.Combine(RacingModule.RacePath, race.Meta.Id + ".race"), JsonConvert.SerializeObject(race.Race));
 		}
 
 		public static void DeleteRace(FullRace race)
@@ -118,7 +118,7 @@ namespace Ideka.RacingMeter
 			if (existing.ContainsKey(target))
 			{
 				Directory.CreateDirectory(path);
-				File.WriteAllText(target, JsonConvert.SerializeObject((object)ghost));
+				File.WriteAllText(target, JsonConvert.SerializeObject(ghost));
 				return true;
 			}
 			return false;

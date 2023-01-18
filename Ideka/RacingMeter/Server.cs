@@ -6,7 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD.Controls;
 using Ideka.NetCommon;
-using Ideka.RacingMeterLib;
+using Ideka.RacingMeter.Lib;
+using Ideka.RacingMeter.Lib.Server;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Ideka.RacingMeter
@@ -86,7 +87,7 @@ namespace Ideka.RacingMeter
 			return !IsOnline;
 		}
 
-		private async Task RefreshUser(CancellationToken ct = default(CancellationToken))
+		public async Task RefreshUser(CancellationToken ct = default(CancellationToken))
 		{
 			string prevAccountId = User?.AccountId;
 			try

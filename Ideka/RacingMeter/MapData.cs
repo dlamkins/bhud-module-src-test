@@ -33,16 +33,13 @@ namespace Ideka.RacingMeter
 
 		public MapData(string cacheFilePath)
 		{
-			string cacheFilePath2 = cacheFilePath;
-			base._002Ector();
-			MapData mapData = this;
 			CacheFile cache = null;
-			if (File.Exists(cacheFilePath2))
+			if (File.Exists(cacheFilePath))
 			{
 				Logger.Info("Found cache file, loading.");
 				try
 				{
-					cache = JsonSerializer.Deserialize<CacheFile>(File.ReadAllText(cacheFilePath2), (JsonSerializerOptions)null);
+					cache = System.Text.Json.JsonSerializer.Deserialize<CacheFile>(File.ReadAllText(cacheFilePath));
 					if (cache == null)
 					{
 						Logger.Warn("Cache load resulted in null.");
@@ -54,7 +51,7 @@ namespace Ideka.RacingMeter
 				}
 			}
 			_maps = cache?.Maps ?? new Dictionary<int, Map>();
-			Task.Run(() => mapData.LoadMapData(cache?.BuildId ?? 0, cacheFilePath2, mapData._cancellation.Token));
+			LoadMapData(cache?.BuildId ?? 0, cacheFilePath, _cancellation.Token);
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)CurrentMapChanged);
 		}
 
@@ -121,7 +118,7 @@ namespace Ideka.RacingMeter
 				}
 			}
 			Directory.CreateDirectory(Path.GetDirectoryName(cacheFilePath));
-			File.WriteAllText(cacheFilePath, JsonConvert.SerializeObject((object)new CacheFile
+			File.WriteAllText(cacheFilePath, JsonConvert.SerializeObject(new CacheFile
 			{
 				BuildId = ((GameService.Gw2Mumble.get_Info().get_BuildId() != 0) ? GameService.Gw2Mumble.get_Info().get_BuildId() : cachedVersion),
 				Maps = _maps

@@ -5,9 +5,8 @@ using Blish_HUD;
 using Blish_HUD.Controls;
 using Ideka.BHUDCommon;
 using Ideka.NetCommon;
-using Ideka.RacingMeterLib;
+using Ideka.RacingMeter.Lib;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 
@@ -31,6 +30,8 @@ namespace Ideka.RacingMeter
 
 		private int _currentStep;
 
+		public readonly RaceDrawer Drawer;
+
 		private Ghost _ready;
 
 		private Ghost _racing;
@@ -42,14 +43,6 @@ namespace Ideka.RacingMeter
 		private readonly Primitive _ghostA;
 
 		private readonly Primitive _ghostB;
-
-		private readonly SoundEffect _raceStartSfx;
-
-		private readonly SoundEffect _raceFinishSfx;
-
-		private readonly SoundEffect _raceCancelSfx;
-
-		private readonly SoundEffect _checkpointSfx;
 
 		private readonly RectAnchor _ui;
 
@@ -63,42 +56,21 @@ namespace Ideka.RacingMeter
 			{
 				CancelRace();
 				_fullRace = null;
-				Checkpoints = null;
-				LoopStartIndex = 0;
-				RoadPoints = null;
 				if (value != null)
 				{
-					Checkpoints = value.Race?.Checkpoints.ToList();
-					if (Checkpoints.Count < 2)
+					if (!value.Race.Checkpoints.Skip(1).Any())
 					{
-						Checkpoints = null;
 						ScreenNotification.ShowNotification(Strings.NotifyNotEnoughCheckpoints, (NotificationType)2, (Texture2D)null, 4);
 					}
 					else
 					{
-						LoopStartIndex = value.Race.LoopStartIndex;
-						RoadPoints = new List<(int, RacePoint)>();
-						int i = 0;
-						foreach (RacePoint point in value.Race.RoadPoints)
-						{
-							RoadPoints.Add((i, point));
-							if (point.IsCheckpoint)
-							{
-								i++;
-							}
-						}
 						_fullRace = value;
 					}
 				}
+				Drawer.LoadRace(_fullRace?.Race);
 				RaceLoad();
 			}
 		}
-
-		public List<RacePoint> Checkpoints { get; private set; }
-
-		public int LoopStartIndex { get; private set; }
-
-		public List<(int i, RacePoint point)> RoadPoints { get; private set; }
 
 		public FullGhost FullGhost
 		{
@@ -118,6 +90,8 @@ namespace Ideka.RacingMeter
 			}
 		}
 
+		public List<RacePoint> Checkpoints => Drawer.Checkpoints;
+
 		public Ghost Ghost
 		{
 			get
@@ -132,18 +106,6 @@ namespace Ideka.RacingMeter
 
 		public Dictionary<string, FullGhost> LocalGhosts { get; private set; }
 
-		public float Volume { get; set; }
-
-		public int MaxGhostData { get; set; }
-
-		public bool AutoLocalGhost { get; set; }
-
-		public int ShownCheckpoints { get; set; }
-
-		public bool ShowGuides { get; set; }
-
-		public bool NormalizedOfficialCheckpoints { get; set; }
-
 		public bool SpecificGhostLoaded { get; set; }
 
 		public int CurrentStep
@@ -157,6 +119,8 @@ namespace Ideka.RacingMeter
 				_currentStep = Math.Max(value, TestCheckpoint);
 			}
 		}
+
+		public double Progress => Drawer.Route.ProgressPercent(CurrentStep, RacingModule.Measurer.Pos.Meters);
 
 		public int TestCheckpoint { get; }
 
@@ -178,17 +142,9 @@ namespace Ideka.RacingMeter
 			}
 		}
 
-		public bool OfficialPoints
-		{
-			get
-			{
-				if (base.Race != null && base.Race.IsOfficial)
-				{
-					return NormalizedOfficialCheckpoints;
-				}
-				return false;
-			}
-		}
+		public int MaxGhostData { get; set; }
+
+		public bool AutoLocalGhost { get; set; }
 
 		public event Action<FullRace> RaceLoaded;
 
@@ -204,23 +160,15 @@ namespace Ideka.RacingMeter
 
 		public RaceRunner(int testCheckpoint = -1)
 		{
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			Drawer = new RaceDrawer(this);
 			TestCheckpoint = testCheckpoint;
 			CurrentStep = (IsTesting ? TestCheckpoint : 0);
 			_ghostA = Primitive.HorizontalCircle(1f, 100);
 			_ghostB = new Primitive(Vector3.get_Zero(), new Vector3(0f, 1f, 0f));
-			_raceStartSfx = RacingModule.ContentsManager.GetSound("SFX/RaceStart.wav");
-			_raceFinishSfx = RacingModule.ContentsManager.GetSound("SFX/RaceFinish.wav");
-			_raceCancelSfx = RacingModule.ContentsManager.GetSound("SFX/RaceCancel.wav");
-			_checkpointSfx = RacingModule.ContentsManager.GetSound("SFX/Checkpoint.wav");
-			_ui = RunnerUI.Construct(this);
-			RacingModule.Settings.SfxVolumeMultiplier.OnChangedAndNow(delegate(float v)
-			{
-				Volume = v;
-			});
 			RacingModule.Settings.MaxGhostData.OnChangedAndNow(delegate(int v)
 			{
 				MaxGhostData = v;
@@ -229,37 +177,18 @@ namespace Ideka.RacingMeter
 			{
 				AutoLocalGhost = v;
 			});
-			RacingModule.Settings.ShownCheckpoints.OnChangedAndNow(delegate(int v)
-			{
-				ShownCheckpoints = v;
-			});
-			RacingModule.Settings.ShowGuides.OnChangedAndNow(delegate(bool v)
-			{
-				ShowGuides = v;
-			});
-			RacingModule.Settings.NormalizedOfficialCheckpoints.OnChangedAndNow(delegate(bool v)
-			{
-				NormalizedOfficialCheckpoints = v;
-			});
+			_ui = RunnerUI.Construct(this);
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)MapChanged);
 			RacingModule.Measurer.NewPosition += new Action<PosSnapshot>(NewPosition);
 			RacingModule.Measurer.Teleported += new Action(Teleported);
 		}
 
-		private void Play(SoundEffect sfx)
-		{
-			if (!OfficialPoints || IsTesting)
-			{
-				sfx.Play(GameService.GameIntegration.get_Audio().get_Volume() * Volume, 0f, 0f);
-			}
-		}
-
 		private void NewPosition(PosSnapshot pos)
 		{
-			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027e: Unknown result type (might be due to invalid IL or missing references)
 			PosStack.Push(pos);
-			if (base.Race == null)
+			if (Drawer.Race == null)
 			{
 				return;
 			}
@@ -295,7 +224,7 @@ namespace Ideka.RacingMeter
 				{
 					if (entered)
 					{
-						Play(_raceFinishSfx);
+						Drawer.FinishSfx(IsTesting);
 					}
 					int after;
 					if (IsTesting)
@@ -312,7 +241,7 @@ namespace Ideka.RacingMeter
 				}
 				else if (entered)
 				{
-					Play(_checkpointSfx);
+					Drawer.CheckpointSfx(IsTesting);
 					CurrentStep++;
 				}
 			}
@@ -368,7 +297,7 @@ namespace Ideka.RacingMeter
 			_racing = new Ghost();
 			_timeBase = pos.Time;
 			_racing.AddSnapshot(_timeBase, pos);
-			Play(_raceStartSfx);
+			Drawer.StartSfx(IsTesting);
 			this.RaceStarted?.Invoke(base.Race);
 		}
 
@@ -389,7 +318,7 @@ namespace Ideka.RacingMeter
 				ScreenNotification.ShowNotification(Strings.NotifyRaceStartFailed, (NotificationType)2, (Texture2D)null, 4);
 				return;
 			}
-			Play(_raceStartSfx);
+			Drawer.StartSfx(IsTesting);
 			this.RaceStarted?.Invoke(base.Race);
 		}
 
@@ -408,7 +337,7 @@ namespace Ideka.RacingMeter
 		{
 			if (_racing != null)
 			{
-				Play(_raceCancelSfx);
+				Drawer.CancelSfx(IsTesting);
 				CurrentStep = 0;
 				_ready = null;
 				_racing = null;
@@ -445,36 +374,25 @@ namespace Ideka.RacingMeter
 			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0245: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0304: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0311: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0326: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0333: Unknown result type (might be due to invalid IL or missing references)
-			//IL_037c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_037e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0383: Unknown result type (might be due to invalid IL or missing references)
-			//IL_039f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a1: Unknown result type (might be due to invalid IL or missing references)
-			if (!CanDraw())
+			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
+			if (!CanDrawRace())
 			{
 				return;
 			}
@@ -487,39 +405,11 @@ namespace Ideka.RacingMeter
 			}
 			if (_racing == null && _ready == null && !IsTesting)
 			{
-				DrawRacePoint(spriteBatch, Checkpoints[0], RaceHolder.CheckpointColor, flat: true);
+				Drawer.DrawStart(spriteBatch);
 			}
 			else
 			{
-				int shown = 0;
-				RacePoint lastCheckpoint = Checkpoints[Checkpoints.Count - 1];
-				foreach (var item3 in RoadPoints.Append(RoadPoints.First()).SkipWhile(((int i, RacePoint point) p) => p.i != CurrentStep).By2())
-				{
-					(int, RacePoint) item = item3.Item1;
-					(int i, RacePoint point) item2 = item3.Item2;
-					int i = item.Item1;
-					RacePoint point = item.Item2;
-					RacePoint next = item2.point;
-					bool isLast = point == lastCheckpoint;
-					Color color2 = (isLast ? RaceHolder.FinalCheckpointColor : ((i <= CurrentStep) ? RaceHolder.NextCheckpointColor : RaceHolder.CheckpointColor));
-					if (ShownCheckpoints != 1)
-					{
-						((Color)(ref color2)).set_A((byte)(MathUtils.Scale(shown, 0.0, ShownCheckpoints, 1.0, 0.1) * 255.0));
-					}
-					if (point.Type == RacePointType.Guide && ShowGuides && i - 1 <= CurrentStep)
-					{
-						DrawRaceArrow(spriteBatch, point.Position, point.Radius, next.Position, color2);
-					}
-					else if (point.IsCheckpoint)
-					{
-						shown++;
-						DrawRacePoint(spriteBatch, point.Position, (OfficialPoints && i >= LoopStartIndex) ? 7.62f : point.Radius, isLast ? null : new Vector3?(next.Position), color2);
-					}
-					if (isLast || shown >= ShownCheckpoints)
-					{
-						break;
-					}
-				}
+				Drawer.DrawPoints(spriteBatch, CurrentStep);
 			}
 			if (Ghost != null && _racing != null)
 			{
@@ -577,26 +467,7 @@ namespace Ideka.RacingMeter
 			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)MapChanged);
 			RacingModule.Measurer.NewPosition -= new Action<PosSnapshot>(NewPosition);
 			RacingModule.Measurer.Teleported -= new Action(Teleported);
-			SoundEffect raceStartSfx = _raceStartSfx;
-			if (raceStartSfx != null)
-			{
-				raceStartSfx.Dispose();
-			}
-			SoundEffect raceFinishSfx = _raceFinishSfx;
-			if (raceFinishSfx != null)
-			{
-				raceFinishSfx.Dispose();
-			}
-			SoundEffect raceCancelSfx = _raceCancelSfx;
-			if (raceCancelSfx != null)
-			{
-				raceCancelSfx.Dispose();
-			}
-			SoundEffect checkpointSfx = _checkpointSfx;
-			if (checkpointSfx != null)
-			{
-				checkpointSfx.Dispose();
-			}
+			Drawer?.Dispose();
 			base.DisposeControl();
 		}
 	}

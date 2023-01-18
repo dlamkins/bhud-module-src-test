@@ -44,7 +44,7 @@ namespace Ideka.RacingMeter
 			}
 		}
 
-		private List<RectAnchor> _children = new List<RectAnchor>();
+		private readonly List<RectAnchor> _children = new List<RectAnchor>();
 
 		public bool Visible { get; set; } = true;
 
@@ -157,19 +157,22 @@ namespace Ideka.RacingMeter
 
 		public void Draw(SpriteBatch spriteBatch, Control control, RectangleF rect)
 		{
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 			Update?.Invoke(this);
 			if (!Visible)
 			{
 				return;
 			}
+			rect = Target(rect);
 			RectTarget target = new RectTarget(spriteBatch, control, rect);
 			EarlyDraw(target);
 			foreach (RectAnchor child in _children)
 			{
-				child.Draw(spriteBatch, control, child.Target(rect));
+				child.Draw(spriteBatch, control, rect);
 			}
 			LateDraw(target);
 		}

@@ -1,9 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Ideka.NetCommon;
-using Ideka.RacingMeterLib;
+using Ideka.RacingMeter.Lib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -12,11 +13,26 @@ namespace Ideka.RacingMeter
 {
 	public class RaceEditor : RaceHolder
 	{
+		public class RawPoint
+		{
+			public string Type { get; set; }
+
+			public double X { get; set; }
+
+			public double Y { get; set; }
+
+			public double Z { get; set; }
+
+			public Vector3 Position => new Vector3((float)X, (float)Y, (float)Z);
+		}
+
 		private BasicEffect _effect;
 
 		private readonly CommandList _commands;
 
 		private readonly EditState _state;
+
+		private readonly Dictionary<string, RawPoint> _rawPoints = new Dictionary<string, RawPoint>();
 
 		private (RacePoint point, RacePoint preview) _pointPreview = (null, new RacePoint());
 
@@ -398,6 +414,16 @@ namespace Ideka.RacingMeter
 			}
 		}
 
+		public void SnapPoint()
+		{
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			if (IsReady(out var point) && _rawPoints.Any())
+			{
+				RawPoint closest = _rawPoints.Values.MinBy((RawPoint p) => Vector3.DistanceSquared(p.Position, point.Position));
+				_commands.Run(new MovePointCommand(point, closest.Position));
+			}
+		}
+
 		public void ResizePoint(float radius)
 		{
 			ResizePoint(null, radius);
@@ -477,7 +503,21 @@ namespace Ideka.RacingMeter
 			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-			if (!CanDraw())
+			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
+			if (!CanDrawRace())
 			{
 				return;
 			}
@@ -500,6 +540,19 @@ namespace Ideka.RacingMeter
 			foreach (RacePoint point2 in base.Race.RacePoints)
 			{
 				drawPoint(point2);
+			}
+			foreach (RawPoint value in _rawPoints.Values)
+			{
+				SpriteBatch spriteBatch2 = spriteBatch;
+				Vector3 position = value.Position;
+				DrawRacePoint(spriteBatch2, position, 1f, (Color)(value.Type switch
+				{
+					"checkpoint" => Color.get_White(), 
+					"flag" => Color.get_Yellow(), 
+					"boost" => Color.get_Blue(), 
+					"obstacle" => Color.get_Red(), 
+					_ => Color.get_Black(), 
+				}), flat: true);
 			}
 			void drawPoint(RacePoint point)
 			{

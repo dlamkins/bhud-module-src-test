@@ -50,27 +50,27 @@ namespace Ideka.RacingMeter
 			}, others);
 		}
 
-		public static void WidthFillRight(this Control control)
+		public static void WidthFillRight(this Control control, int spacing = 0)
 		{
 			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			control.set_Width(control.get_Parent().get_ContentRegion().Width - control.get_Left());
+			control.set_Width(control.get_Parent().get_ContentRegion().Width - control.get_Left() - spacing);
 		}
 
-		public static void WidthFillLeft(this Control control)
+		public static void WidthFillLeft(this Control control, int spacing = 0)
 		{
-			control.set_Width(control.get_Right());
+			control.set_Width(control.get_Right() - spacing);
 			control.set_Left(0);
 		}
 
-		public static void HeightFillDown(this Control control)
+		public static void HeightFillDown(this Control control, int spacing = 0)
 		{
 			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			control.set_Height(control.get_Parent().get_ContentRegion().Height - control.get_Top());
+			control.set_Height(control.get_Parent().get_ContentRegion().Height - control.get_Top() - spacing);
 		}
 
-		public static void HeightFillUp(this Control control)
+		public static void HeightFillUp(this Control control, int spacing = 0)
 		{
-			control.set_Height(control.get_Bottom());
+			control.set_Height(control.get_Bottom() - spacing);
 			control.set_Top(0);
 		}
 

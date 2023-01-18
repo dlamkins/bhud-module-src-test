@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using Ideka.RacingMeterLib;
+using Ideka.RacingMeter.Lib;
 using Microsoft.Xna.Framework;
 
 namespace Ideka.RacingMeter

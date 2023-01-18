@@ -5,7 +5,7 @@ using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Ideka.BHUDCommon;
-using Ideka.RacingMeterLib;
+using Ideka.RacingMeter.Lib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -135,7 +135,7 @@ namespace Ideka.RacingMeter
 				if (await ConfirmDiscard(Strings.BackToRacing))
 				{
 					_editor.DiscardChanges();
-					RacingModule.Racer.EditMode = false;
+					RacingModule.Racer.CurrentMode = Racer.Mode.Racing;
 				}
 			});
 			((Control)_newButton).add_Click((EventHandler<MouseEventArgs>)async delegate
@@ -257,9 +257,9 @@ namespace Ideka.RacingMeter
 		private void UpdateLayout()
 		{
 			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
 			if (_editor != null)
 			{
 				((Control)_backButton).set_Location(Point.get_Zero());

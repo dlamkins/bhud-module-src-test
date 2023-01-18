@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Blish_HUD;
 using Blish_HUD.Controls;
-using Ideka.RacingMeterLib;
+using Ideka.RacingMeter.Lib;
 
 namespace Ideka.RacingMeter
 {

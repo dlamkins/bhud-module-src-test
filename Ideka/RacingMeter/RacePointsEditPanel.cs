@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
-using Ideka.RacingMeterLib;
+using Ideka.RacingMeter.Lib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -273,7 +273,7 @@ namespace Ideka.RacingMeter
 		{
 			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
 			if (_editor != null)
 			{
 				((Control)_insertAfterButton).set_Left(0);

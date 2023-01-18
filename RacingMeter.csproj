@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <AssemblyName>RacingMeter</AssemblyName>
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
-    <UseWindowsForms>True</UseWindowsForms>
+    <OutputType>Library</OutputType>
     <TargetFramework>net48</TargetFramework>
   </PropertyGroup>
   <PropertyGroup>
@@ -14,11 +14,17 @@
   </PropertyGroup>
   <ItemGroup />
   <ItemGroup>
-    <Reference Include="RacingMeterLib">
-      <HintPath>..\..\working\RacingMeterLib.dll</HintPath>
+    <Reference Include="RacingMeter.Lib">
+      <HintPath>..\..\working\RacingMeter.Lib.dll</HintPath>
     </Reference>
     <Reference Include="Blish HUD" />
     <Reference Include="MonoGame.Framework" />
+    <Reference Include="Microsoft.AspNetCore.SignalR.Client.Core">
+      <HintPath>..\..\working\Microsoft.AspNetCore.SignalR.Client.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson">
+      <HintPath>..\..\working\Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson.dll</HintPath>
+    </Reference>
     <Reference Include="BHUDCommon">
       <HintPath>..\..\working\BHUDCommon.dll</HintPath>
     </Reference>
@@ -30,11 +36,22 @@
     <Reference Include="Gw2Sharp" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Text.Json" />
+    <Reference Include="System.Text.Json">
+      <HintPath>..\..\working\System.Text.Json.dll</HintPath>
+    </Reference>
     <Reference Include="NetCommon">
       <HintPath>..\..\working\NetCommon.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\working\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="Microsoft.AspNetCore.SignalR.Client">
+      <HintPath>..\..\working\Microsoft.AspNetCore.SignalR.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions">
+      <HintPath>..\..\working\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="AsyncClipboardService" />
   </ItemGroup>
 </Project>

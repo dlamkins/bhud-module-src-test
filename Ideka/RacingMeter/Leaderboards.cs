@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Ideka.RacingMeterLib;
+using Ideka.RacingMeter.Lib;
 
 namespace Ideka.RacingMeter
 {
