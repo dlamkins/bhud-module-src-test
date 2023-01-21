@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using BhModule.Community.Pathing.Behavior;
 using BhModule.Community.Pathing.State;
@@ -30,7 +29,7 @@ namespace BhModule.Community.Pathing.Entity
 		public Guid Guid { get; set; }
 
 		[Browsable(false)]
-		public IList<IBehavior> Behaviors { get; } = new SafeList<IBehavior>();
+		public SafeList<IBehavior> Behaviors { get; } = new SafeList<IBehavior>();
 
 
 		public PathingCategory Category { get; }

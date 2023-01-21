@@ -160,7 +160,7 @@ namespace BhModule.Community.Pathing.UI.Controls
 			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			if (PathingModule.Instance != null && GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && PathingModule.Instance.ModuleSettings.PackAllowInfoText.get_Value())
+			if (PathingModule.Instance != null && GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && PathingModule.Instance.Settings.PackAllowInfoText.get_Value())
 			{
 				AlphaMaskEffect.SharedInstance.SetEffectState(_croppedMask);
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _croppedWindow, bounds, Color.get_White() * 0.9f);

@@ -12,11 +12,18 @@ namespace BhModule.Community.Pathing.Scripting.Lib
 	{
 		private readonly Dictionary<string, Guid> _guidCache = new Dictionary<string, Guid>(StringComparer.InvariantCultureIgnoreCase);
 
-		public PathingCategory RootCategory => PathingModule.Instance.PackInitiator.PackState.RootCategory;
+		private readonly PathingGlobal _global;
+
+		public PathingCategory RootCategory => _global.ScriptEngine.Module.PackInitiator.PackState.RootCategory;
+
+		internal World(PathingGlobal global)
+		{
+			_global = global;
+		}
 
 		public PathingCategory CategoryByType(string id)
 		{
-			if (!PathingModule.Instance.PackInitiator.PackState.RootCategory.TryGetCategoryFromNamespace(id, out var category))
+			if (!_global.ScriptEngine.Module.PackInitiator.PackState.RootCategory.TryGetCategoryFromNamespace(id, out var category))
 			{
 				return null;
 			}
@@ -29,7 +36,7 @@ namespace BhModule.Community.Pathing.Scripting.Lib
 			{
 				_guidCache.Add(guid, g = AttributeParsingUtil.InternalGetValueAsGuid(guid));
 			}
-			foreach (IPathingEntity pathable in PathingModule.Instance.PackInitiator.PackState.Entities)
+			foreach (IPathingEntity pathable in _global.ScriptEngine.Module.PackInitiator.PackState.Entities)
 			{
 				if (pathable.Guid == g)
 				{
@@ -46,7 +53,7 @@ namespace BhModule.Community.Pathing.Scripting.Lib
 			{
 				_guidCache.Add(guid, g = AttributeParsingUtil.InternalGetValueAsGuid(guid));
 			}
-			foreach (IPathingEntity pathable in PathingModule.Instance.PackInitiator.PackState.Entities)
+			foreach (IPathingEntity pathable in _global.ScriptEngine.Module.PackInitiator.PackState.Entities)
 			{
 				if (pathable.Guid == g)
 				{
@@ -68,7 +75,7 @@ namespace BhModule.Community.Pathing.Scripting.Lib
 
 		public StandardMarker GetClosestMarker()
 		{
-			return (from marker in PathingModule.Instance.PackInitiator.PackState.Entities.ToArray().OfType<StandardMarker>()
+			return (from marker in _global.ScriptEngine.Module.PackInitiator.PackState.Entities.ToArray().OfType<StandardMarker>()
 				orderby marker.DistanceToPlayer
 				select marker).FirstOrDefault();
 		}
@@ -76,7 +83,7 @@ namespace BhModule.Community.Pathing.Scripting.Lib
 		public LuaTable GetClosestMarkers(int quantity)
 		{
 			LuaTable nTable = new LuaTable();
-			foreach (StandardMarker marker2 in (from marker in PathingModule.Instance.PackInitiator.PackState.Entities.ToArray().OfType<StandardMarker>()
+			foreach (StandardMarker marker2 in (from marker in _global.ScriptEngine.Module.PackInitiator.PackState.Entities.ToArray().OfType<StandardMarker>()
 				orderby marker.DistanceToPlayer
 				select marker).Take(quantity))
 			{

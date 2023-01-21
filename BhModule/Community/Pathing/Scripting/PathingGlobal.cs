@@ -22,8 +22,7 @@ namespace BhModule.Community.Pathing.Scripting
 		internal ScriptEngine ScriptEngine { get; set; }
 
 		[LuaMember("World", false)]
-		public World World { get; } = new World();
-
+		public World World { get; }
 
 		[LuaMember("Packs", false)]
 		public World Packs
@@ -46,8 +45,7 @@ namespace BhModule.Community.Pathing.Scripting
 		public Debug Debug { get; }
 
 		[LuaMember("I", false)]
-		public Instance I { get; } = new Instance();
-
+		public Instance I { get; }
 
 		[LuaMember("Menu", false)]
 		public Menu Menu { get; } = new Menu("Scripts", null);
@@ -86,6 +84,8 @@ namespace BhModule.Community.Pathing.Scripting
 			Debug = new Debug(this);
 			Event = new Event(this);
 			User = new User(this);
+			World = new World(this);
+			I = new Instance(this);
 		}
 
 		[LuaMember("require", false)]

@@ -618,9 +618,9 @@ namespace BhModule.Community.Pathing.Entity
 			{
 				AddBehavior(AchievementFilter.BuildFromAttributes(attributes2, this, _packState));
 			}
-			if (collection.TryGetSubset("script", out var attributes))
+			if (_packState.UserConfiguration.ScriptsEnabled.get_Value() && collection.TryGetSubset("script", out var attributes))
 			{
-				AddBehavior(Script.BuildFromAttributes(attributes, this));
+				AddBehavior(Script.BuildFromAttributes(attributes, this, _packState));
 			}
 		}
 

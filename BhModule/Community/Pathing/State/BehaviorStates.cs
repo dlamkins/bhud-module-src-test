@@ -225,7 +225,12 @@ namespace BhModule.Community.Pathing.State
 					try
 					{
 						Guid markerGuid = Guid.ParseExact(lineParts[0], "D");
-						DateTime markerExpire = DateTime.Parse(lineParts[1]);
+						_ = DateTime.MinValue;
+						if (!lineParts[1].StartsWith("t"))
+						{
+							DateTime.Parse(lineParts[1]);
+						}
+						DateTime markerExpire = DateTime.Parse(lineParts[1].TrimStart('t'));
 						_hiddenUntilTimer.Add(markerGuid);
 						_timerMetadata.Add((markerExpire, markerGuid));
 					}
@@ -248,7 +253,7 @@ namespace BhModule.Community.Pathing.State
 			string timerStatesPath = Path.Combine(DataDirUtil.GetSafeDataDir("states"), "timers.txt");
 			try
 			{
-				await FileUtil.WriteLinesAsync(timerStatesPath, timerMetadata.Select(((DateTime timerExpiration, Guid guid) metadata) => $"{metadata.guid},{metadata.timerExpiration}"));
+				await FileUtil.WriteLinesAsync(timerStatesPath, timerMetadata.Select(((DateTime timerExpiration, Guid guid) metadata) => $"{metadata.guid},t{metadata.timerExpiration:s}"));
 			}
 			catch (Exception e)
 			{

@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BhModule.Community.Pathing.MarkerPackRepo;
 using Blish_HUD;
+using Blish_HUD.Modules;
 using TmfLib;
 using TmfLib.Writer;
 
@@ -17,17 +18,17 @@ namespace BhModule.Community.Pathing.Utility
 
 		private const string DOWNLOAD_UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36";
 
-		public static void DownloadPack(MarkerPackPkg markerPackPkg, Action<MarkerPackPkg, bool> funcOnComplete)
+		public static void DownloadPack(PathingModule module, MarkerPackPkg markerPackPkg, Action<MarkerPackPkg, bool> funcOnComplete)
 		{
 			Thread thread = new Thread((ThreadStart)async delegate
 			{
-				await BeginPackDownload(markerPackPkg, PathingModule.Instance.GetModuleProgressHandler(), funcOnComplete);
+				await BeginPackDownload(module, markerPackPkg, module.GetModuleProgressHandler(), funcOnComplete);
 			});
 			thread.IsBackground = true;
 			thread.Start();
 		}
 
-		public static void DeletePack(MarkerPackPkg markerPackPkg)
+		public static void DeletePack(PathingModule module, MarkerPackPkg markerPackPkg)
 		{
 			markerPackPkg.IsDownloading = true;
 			markerPackPkg.DownloadError = null;
@@ -36,7 +37,7 @@ namespace BhModule.Community.Pathing.Utility
 			{
 				if (File.Exists(mpPath))
 				{
-					while (PathingModule.Instance.PackInitiator.IsLoading)
+					while (module.PackInitiator.IsLoading)
 					{
 						Thread.Sleep(1000);
 					}
@@ -85,7 +86,7 @@ namespace BhModule.Community.Pathing.Utility
 			return Path.Combine(dir, file);
 		}
 
-		private static async Task BeginPackDownload(MarkerPackPkg markerPackPkg, IProgress<string> progress, Action<MarkerPackPkg, bool> funcOnComplete)
+		private static async Task BeginPackDownload(PathingModule module, MarkerPackPkg markerPackPkg, IProgress<string> progress, Action<MarkerPackPkg, bool> funcOnComplete)
 		{
 			Logger.Info("Downloading pack '" + markerPackPkg.Name + "'...");
 			progress.Report("Downloading pack '" + markerPackPkg.Name + "'...");
@@ -132,7 +133,7 @@ namespace BhModule.Community.Pathing.Utility
 					}
 					val.Dispose();
 				}
-				if (PathingModule.Instance != null && PathingModule.Instance.PackInitiator.PackState.UserResourceStates.Advanced.OptimizeMarkerPacks)
+				if ((int)((Module)module).get_RunState() == 2 && module.PackInitiator.PackState.UserResourceStates.Advanced.OptimizeMarkerPacks)
 				{
 					progress.Report("Optimizing the pack...");
 					tempPackDownloadDestination = await OptimizePack(tempPackDownloadDestination);
@@ -144,7 +145,7 @@ namespace BhModule.Community.Pathing.Utility
 				if (File.Exists(finalPath))
 				{
 					needsInit = false;
-					while (PathingModule.Instance.PackInitiator.IsLoading)
+					while (module.PackInitiator.IsLoading)
 					{
 						Thread.Sleep(1000);
 					}
@@ -162,9 +163,9 @@ namespace BhModule.Community.Pathing.Utility
 				Pack newPack = Pack.FromArchivedMarkerPack(finalPath);
 				if (!needsInit)
 				{
-					PathingModule.Instance.PackInitiator.UnloadPackByName(newPack.Name);
+					module.PackInitiator.UnloadPackByName(newPack.Name);
 				}
-				await PathingModule.Instance.PackInitiator.LoadPack(newPack);
+				await module.PackInitiator.LoadPack(newPack);
 				newPack.ReleaseLocks();
 			}
 			catch (InvalidDataException ex2)

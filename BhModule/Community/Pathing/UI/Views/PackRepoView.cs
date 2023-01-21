@@ -9,10 +9,10 @@ namespace BhModule.Community.Pathing.UI.Views
 	{
 		public FlowPanel RepoFlowPanel { get; private set; }
 
-		public PackRepoView()
+		public PackRepoView(PathingModule module)
 			: this()
 		{
-			((View)this).WithPresenter((IPresenter)(object)new PackRepoPresenter(this, PathingModule.Instance.MarkerPackRepo));
+			((View)this).WithPresenter((IPresenter)(object)new PackRepoPresenter(this, module));
 		}
 
 		protected override void Build(Container buildPanel)

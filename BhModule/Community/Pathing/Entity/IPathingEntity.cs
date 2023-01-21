@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using BhModule.Community.Pathing.Behavior;
 using Blish_HUD;
 using Blish_HUD.Entities;
@@ -15,7 +14,7 @@ namespace BhModule.Community.Pathing.Entity
 	{
 		Guid Guid { get; }
 
-		IList<IBehavior> Behaviors { get; }
+		SafeList<IBehavior> Behaviors { get; }
 
 		bool BehaviorFiltered { get; }
 

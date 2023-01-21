@@ -47,6 +47,8 @@ namespace BhModule.Community.Pathing.Scripting
 
 		public readonly SafeList<ScriptMessage> OutputMessages = new SafeList<ScriptMessage>();
 
+		internal PathingModule Module { get; }
+
 		public PathingGlobal Global { get; private set; }
 
 		public SafeList<ScriptState> Scripts { get; } = new SafeList<ScriptState>();
@@ -67,8 +69,9 @@ namespace BhModule.Community.Pathing.Scripting
 			}
 		}
 
-		public ScriptEngine()
+		public ScriptEngine(PathingModule module)
 		{
+			Module = module;
 			LuaType.RegisterTypeExtension(typeof(StandardMarkerScriptExtensions));
 			LuaType.RegisterTypeExtension(typeof(PathingCategoryScriptExtensions));
 			LuaType.RegisterTypeExtension(typeof(GuidExtensions));
@@ -78,6 +81,7 @@ namespace BhModule.Community.Pathing.Scripting
 		{
 			_lua?.Dispose();
 			_lua = new Lua(LuaIntegerType.Int32, LuaFloatType.Float);
+			PathingCategoryScriptExtensions.SetPackInitiator(Module.PackInitiator);
 			_stackTraceDebugger = new TraceLineDebugger();
 			Global = _lua.CreateEnvironment<PathingGlobal>();
 			Global.ScriptEngine = this;
@@ -246,6 +250,7 @@ namespace BhModule.Community.Pathing.Scripting
 		{
 			Scripts.Clear();
 			_lua.Dispose();
+			PathingCategoryScriptExtensions.SetPackInitiator(null);
 		}
 	}
 }

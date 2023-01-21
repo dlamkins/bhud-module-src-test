@@ -6,19 +6,26 @@ namespace BhModule.Community.Pathing.Scripting.Extensions
 {
 	internal static class PathingCategoryScriptExtensions
 	{
+		private static PackInitiator _packInitiator;
+
+		internal static void SetPackInitiator(PackInitiator packInitiator)
+		{
+			_packInitiator = packInitiator;
+		}
+
 		public static bool IsVisible(this PathingCategory category)
 		{
-			return !PathingModule.Instance.PackInitiator.PackState.CategoryStates.GetCategoryInactive(category);
+			return !_packInitiator.PackState.CategoryStates.GetCategoryInactive(category);
 		}
 
 		public static void Show(this PathingCategory category)
 		{
-			PathingModule.Instance.PackInitiator.PackState.CategoryStates.SetInactive(category, isInactive: false);
+			_packInitiator.PackState.CategoryStates.SetInactive(category, isInactive: false);
 		}
 
 		public static void Hide(this PathingCategory category)
 		{
-			PathingModule.Instance.PackInitiator.PackState.CategoryStates.SetInactive(category, isInactive: true);
+			_packInitiator.PackState.CategoryStates.SetInactive(category, isInactive: true);
 		}
 
 		public static LuaTable GetMarkers(this PathingCategory category)
@@ -29,7 +36,7 @@ namespace BhModule.Community.Pathing.Scripting.Extensions
 		public static LuaTable GetMarkers(this PathingCategory category, bool getAll)
 		{
 			LuaTable markers = new LuaTable();
-			foreach (IPathingEntity pathable in PathingModule.Instance.PackInitiator.PackState.Entities)
+			foreach (IPathingEntity pathable in _packInitiator.PackState.Entities)
 			{
 				StandardMarker marker = pathable as StandardMarker;
 				if (marker == null)

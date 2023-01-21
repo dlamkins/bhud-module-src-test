@@ -48,7 +48,7 @@ namespace BhModule.Community.Pathing
 			_loadingIndicator = loadingIndicator;
 			_packReaderSettings = new PackReaderSettings();
 			_packReaderSettings.VenderPrefixes.Add("bh-");
-			_packState = new SharedPackState(module.ModuleSettings);
+			_packState = new SharedPackState(_module);
 		}
 
 		public void ReloadPacks()
@@ -66,16 +66,16 @@ namespace BhModule.Community.Pathing
 			ContextMenuStripItem val = new ContextMenuStripItem();
 			val.set_Text("All Markers");
 			val.set_CanCheck(true);
-			val.set_Checked(_module.ModuleSettings.GlobalPathablesEnabled.get_Value());
+			val.set_Checked(_module.Settings.GlobalPathablesEnabled.get_Value());
 			val.set_Submenu((ContextMenuStrip)(object)(isAnyMarkers ? new CategoryContextMenuStrip(_packState, _sharedPackCollection.Categories, forceShowAll: false) : null));
 			ContextMenuStripItem allMarkers = val;
 			allMarkers.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object _, CheckChangedEvent e)
 			{
-				_module.ModuleSettings.GlobalPathablesEnabled.set_Value(e.get_Checked());
+				_module.Settings.GlobalPathablesEnabled.set_Value(e.get_Checked());
 			});
-			if (PathingModule.Instance.ScriptEngine.Global.Menu.Menus.Any())
+			if (_module.ScriptEngine.Global.Menu.Menus.Any())
 			{
-				yield return PathingModule.Instance.ScriptEngine.Global.Menu.BuildMenu();
+				yield return _module.ScriptEngine.Global.Menu.BuildMenu();
 			}
 			ContextMenuStripItem val2 = new ContextMenuStripItem();
 			val2.set_Text("Reload Markers");
@@ -205,7 +205,7 @@ namespace BhModule.Community.Pathing
 		{
 			IsLoading = true;
 			Stopwatch loadTimer = Stopwatch.StartNew();
-			PathingModule.Instance.ScriptEngine.Reset();
+			_packState.Module.ScriptEngine.Reset();
 			List<(Pack Pack, long LoadDuration)> packTimings = new List<(Pack, long)>();
 			_loadingIndicator.Report("Loading marker packs...");
 			await PrepareState(mapId);
@@ -240,13 +240,13 @@ namespace BhModule.Community.Pathing
 				Logger.Warn(e3, "Finalizing packs failed.");
 				_packState?.Unload();
 			}
-			if (PathingModule.Instance.ModuleSettings.ScriptsEnabled.get_Value())
+			if (_packState.Module.Settings.ScriptsEnabled.get_Value())
 			{
 				_loadingIndicator.Report("Loading scripts...");
 				array = packs;
 				foreach (Pack pack2 in array)
 				{
-					await PathingModule.Instance.ScriptEngine.LoadScript("pack.lua", pack2.ResourceManager);
+					await _packState.Module.ScriptEngine.LoadScript("pack.lua", pack2.ResourceManager);
 				}
 			}
 			Pack[] array2 = packs;

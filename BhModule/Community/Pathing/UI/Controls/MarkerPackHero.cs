@@ -24,6 +24,8 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		private static readonly Texture2D _textureHeroBackground;
 
+		private readonly PathingModule _module;
+
 		private readonly MarkerPackPkg _markerPackPkg;
 
 		private readonly BlueButton _downloadButton;
@@ -45,18 +47,19 @@ namespace BhModule.Community.Pathing.UI.Controls
 			_textureHeroBackground = PathingModule.Instance.ContentsManager.GetTexture("png\\controls\\155209.png");
 		}
 
-		public MarkerPackHero(MarkerPackPkg markerPackPkg)
+		public MarkerPackHero(PathingModule module, MarkerPackPkg markerPackPkg)
 			: this()
 		{
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
 			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ad: Expected O, but got Unknown
-			//IL_0227: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0246: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b4: Expected O, but got Unknown
+			//IL_022e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024d: Unknown result type (might be due to invalid IL or missing references)
+			_module = module;
 			_markerPackPkg = markerPackPkg;
 			if (markerPackPkg.LastUpdate != default(DateTime))
 			{
@@ -118,7 +121,7 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		private void DeleteButtonOnClick(object sender, MouseEventArgs e)
 		{
-			PackHandlingUtil.DeletePack(_markerPackPkg);
+			PackHandlingUtil.DeletePack(_module, _markerPackPkg);
 		}
 
 		private void KeepUpdatedCheckboxOnChecked(object sender, CheckChangedEvent e)
@@ -129,7 +132,7 @@ namespace BhModule.Community.Pathing.UI.Controls
 		private void DownloadButtonOnClick(object sender, MouseEventArgs e)
 		{
 			((Control)_downloadButton).set_Enabled(false);
-			PackHandlingUtil.DownloadPack(_markerPackPkg, OnComplete);
+			PackHandlingUtil.DownloadPack(_module, _markerPackPkg, OnComplete);
 		}
 
 		private static void OnComplete(MarkerPackPkg markerPackPkg, bool success)
@@ -151,7 +154,7 @@ namespace BhModule.Community.Pathing.UI.Controls
 				downloadEnabled = false;
 				((Control)_deleteButton).set_Visible(true);
 				((Control)_deleteButton).set_Enabled(true);
-				if (PathingModule.Instance.PackInitiator.IsLoading)
+				if (_module.PackInitiator.IsLoading)
 				{
 					downloadText = "Loading...";
 				}

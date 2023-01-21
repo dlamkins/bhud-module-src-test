@@ -14,6 +14,13 @@ namespace BhModule.Community.Pathing.Scripting.Lib
 {
 	public class Instance
 	{
+		private readonly PathingGlobal _global;
+
+		internal Instance(PathingGlobal global)
+		{
+			_global = global;
+		}
+
 		public Vector3 Vector3(float x, float y, float z)
 		{
 			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
@@ -33,8 +40,8 @@ namespace BhModule.Community.Pathing.Scripting.Lib
 
 		public StandardMarker Marker(IPackResourceManager resourceManager, LuaTable attributes = null)
 		{
-			PointOfInterest poi = new PointOfInterest(resourceManager, PointOfInterestType.Marker, (attributes != null) ? AttributeCollectionFromLuaTable(attributes) : new AttributeCollection(), PathingModule.Instance.PackInitiator.PackState.RootCategory);
-			StandardMarker marker = PathingModule.Instance.PackInitiator.PackState.InitPointOfInterest(poi) as StandardMarker;
+			PointOfInterest poi = new PointOfInterest(resourceManager, PointOfInterestType.Marker, (attributes != null) ? AttributeCollectionFromLuaTable(attributes) : new AttributeCollection(), _global.ScriptEngine.Module.PackInitiator.PackState.RootCategory);
+			StandardMarker marker = _global.ScriptEngine.Module.PackInitiator.PackState.InitPointOfInterest(poi) as StandardMarker;
 			if (marker.MapId < 0)
 			{
 				marker.MapId = GameService.Gw2Mumble.get_CurrentMap().get_Id();

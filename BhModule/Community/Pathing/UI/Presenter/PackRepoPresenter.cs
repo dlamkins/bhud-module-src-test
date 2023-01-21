@@ -11,9 +11,12 @@ namespace BhModule.Community.Pathing.UI.Presenter
 {
 	public class PackRepoPresenter : Presenter<PackRepoView, BhModule.Community.Pathing.MarkerPackRepo.MarkerPackRepo>
 	{
-		public PackRepoPresenter(PackRepoView view, BhModule.Community.Pathing.MarkerPackRepo.MarkerPackRepo model)
-			: base(view, model)
+		private readonly PathingModule _module;
+
+		public PackRepoPresenter(PackRepoView view, PathingModule module)
+			: base(view, module.MarkerPackRepo)
 		{
+			_module = module;
 		}
 
 		protected override Task<bool> Load(IProgress<string> progress)
@@ -24,9 +27,9 @@ namespace BhModule.Community.Pathing.UI.Presenter
 		protected override void UpdateView()
 		{
 			((Container)base.get_View().RepoFlowPanel).ClearChildren();
-			foreach (MarkerPackPkg item in base.get_Model().MarkerPackages.OrderByDescending((MarkerPackPkg markerPkg) => markerPkg.LastUpdate))
+			foreach (MarkerPackPkg markerPackPkg in base.get_Model().MarkerPackages.OrderByDescending((MarkerPackPkg markerPkg) => markerPkg.LastUpdate))
 			{
-				MarkerPackHero markerPackHero = new MarkerPackHero(item);
+				MarkerPackHero markerPackHero = new MarkerPackHero(_module, markerPackPkg);
 				((Control)markerPackHero).set_Parent((Container)(object)base.get_View().RepoFlowPanel);
 				((Control)markerPackHero).set_Width(((Control)base.get_View().RepoFlowPanel).get_Width() - 60);
 			}

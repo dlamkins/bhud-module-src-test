@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BhModule.Community.Pathing.Utility;
 using Blish_HUD;
+using Blish_HUD.Modules;
 using Blish_HUD.Settings;
 using Flurl.Http;
 
@@ -23,16 +24,27 @@ namespace BhModule.Community.Pathing.MarkerPackRepo
 
 		private string _repoUrl;
 
+		private readonly PathingModule _module;
+
 		private SettingCollection _markerPackSettings;
 
 		public MarkerPackPkg[] MarkerPackages { get; private set; } = Array.Empty<MarkerPackPkg>();
 
 
+		public MarkerPackRepo(PathingModule module)
+		{
+			_module = module;
+		}
+
 		public void Init()
 		{
 			Thread thread = new Thread((ThreadStart)async delegate
 			{
-				await Load(PathingModule.Instance.GetModuleProgressHandler());
+				await Task.Delay(3000);
+				if ((int)((Module)_module).get_RunState() != 3 && (int)((Module)_module).get_RunState() != 0)
+				{
+					await Load(_module.GetModuleProgressHandler());
+				}
 			});
 			thread.IsBackground = true;
 			thread.Start();
@@ -49,13 +61,13 @@ namespace BhModule.Community.Pathing.MarkerPackRepo
 
 		private void DefineRepoSettings()
 		{
-			_repoUrl = PathingModule.Instance.SettingsManager.get_ModuleSettings().DefineSetting<string>("PackRepoUrl", "https://mp-repo.blishhud.com/repo.json", (Func<string>)null, (Func<string>)null).get_Value();
-			_markerPackSettings = PathingModule.Instance.SettingsManager.get_ModuleSettings().AddSubCollection("MarkerRepoSettings", false);
+			_repoUrl = _module.SettingsManager.get_ModuleSettings().DefineSetting<string>("PackRepoUrl", "https://mp-repo.blishhud.com/repo.json", (Func<string>)null, (Func<string>)null).get_Value();
+			_markerPackSettings = _module.SettingsManager.get_ModuleSettings().AddSubCollection("MarkerRepoSettings", false);
 		}
 
 		private void LoadLocalPackInfo()
 		{
-			string fullDirectoryPath = PathingModule.Instance.DirectoriesManager.GetFullDirectoryPath("markers");
+			string fullDirectoryPath = _module.DirectoriesManager.GetFullDirectoryPath("markers");
 			string[] existingTacoPacks = Directory.GetFiles(fullDirectoryPath, "*.taco", SearchOption.AllDirectories);
 			string[] existingZipPacks = Directory.GetFiles(fullDirectoryPath, "*.zip", SearchOption.AllDirectories);
 			string[] existingPacks = existingTacoPacks.Concat(existingZipPacks).ToArray();
@@ -78,7 +90,7 @@ namespace BhModule.Community.Pathing.MarkerPackRepo
 					pack.CurrentDownloadDate = File.GetLastWriteTimeUtc(associatedLocalPack);
 					if (pack.AutoUpdate.get_Value() && pack.CurrentDownloadDate != default(DateTime) && pack.LastUpdate > pack.CurrentDownloadDate)
 					{
-						PackHandlingUtil.DownloadPack(pack, OnUpdateComplete);
+						PackHandlingUtil.DownloadPack(_module, pack, OnUpdateComplete);
 					}
 				}
 			}

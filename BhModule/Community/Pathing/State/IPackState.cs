@@ -6,6 +6,8 @@ namespace BhModule.Community.Pathing.State
 {
 	public interface IPackState
 	{
+		PathingModule Module { get; }
+
 		ModuleSettings UserConfiguration { get; }
 
 		int CurrentMapId { get; }

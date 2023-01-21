@@ -62,7 +62,7 @@ namespace BhModule.Community.Pathing
 
 		public ScriptEngine ScriptEngine { get; private set; }
 
-		public ModuleSettings ModuleSettings { get; private set; }
+		public ModuleSettings Settings { get; private set; }
 
 		public PackInitiator PackInitiator { get; private set; }
 
@@ -77,7 +77,7 @@ namespace BhModule.Community.Pathing
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			ModuleSettings = new ModuleSettings(settings);
+			Settings = new ModuleSettings(settings);
 		}
 
 		private IEnumerable<ContextMenuStripItem> GetPathingMenuItems()
@@ -99,7 +99,7 @@ namespace BhModule.Community.Pathing
 				((Control)_settingsWindow).Show();
 			});
 			yield return downloadMarkers;
-			if (ModuleSettings.ScriptsConsoleEnabled.get_Value() || ((Enum)GameService.Input.get_Keyboard().get_ActiveModifiers()).HasFlag((Enum)(object)(ModifierKeys)4))
+			if (Settings.ScriptsConsoleEnabled.get_Value() || ((Enum)GameService.Input.get_Keyboard().get_ActiveModifiers()).HasFlag((Enum)(object)(ModifierKeys)4))
 			{
 				ContextMenuStripItem val2 = new ContextMenuStripItem();
 				val2.set_Text("Script Console");
@@ -157,8 +157,8 @@ namespace BhModule.Community.Pathing
 			//IL_01c1: Expected O, but got Unknown
 			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01fb: Expected O, but got Unknown
-			//IL_023e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0248: Expected O, but got Unknown
+			//IL_022b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0235: Expected O, but got Unknown
 			CornerIcon val = new CornerIcon();
 			val.set_IconName(Strings.General_UiName);
 			val.set_Icon(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\pathing-icon.png")));
@@ -173,11 +173,11 @@ namespace BhModule.Community.Pathing
 			((WindowBase2)val2).set_Id(((Module)this).get_Namespace() + "_SettingsWindow");
 			((WindowBase2)val2).set_SavesPosition(true);
 			_settingsWindow = val2;
-			_packSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156740+155150.png")), (Func<IView>)(() => (IView)new SettingsView(ModuleSettings.PackSettings, -1)), Strings.Window_MainSettingsTab, (int?)null);
-			_mapSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\157123+155150.png")), (Func<IView>)(() => (IView)new SettingsView(ModuleSettings.MapSettings, -1)), Strings.Window_MapSettingsTab, (int?)null);
-			_scriptSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156701.png")), (Func<IView>)(() => (IView)new SettingsView(ModuleSettings.ScriptSettings, -1)), "Script Options", (int?)null);
-			_keybindSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156734+155150.png")), (Func<IView>)(() => (IView)new SettingsView(ModuleSettings.KeyBindSettings, -1)), Strings.Window_KeyBindSettingsTab, (int?)null);
-			_markerRepoTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156909.png")), (Func<IView>)(() => (IView)(object)new PackRepoView()), Strings.Window_DownloadMarkerPacks, (int?)null);
+			_packSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156740+155150.png")), (Func<IView>)(() => (IView)new SettingsView(Settings.PackSettings, -1)), Strings.Window_MainSettingsTab, (int?)null);
+			_mapSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\157123+155150.png")), (Func<IView>)(() => (IView)new SettingsView(Settings.MapSettings, -1)), Strings.Window_MapSettingsTab, (int?)null);
+			_scriptSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156701.png")), (Func<IView>)(() => (IView)new SettingsView(Settings.ScriptSettings, -1)), "Script Options", (int?)null);
+			_keybindSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156734+155150.png")), (Func<IView>)(() => (IView)new SettingsView(Settings.KeyBindSettings, -1)), Strings.Window_KeyBindSettingsTab, (int?)null);
+			_markerRepoTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156909.png")), (Func<IView>)(() => (IView)(object)new PackRepoView(this)), Strings.Window_DownloadMarkerPacks, (int?)null);
 			_settingsWindow.get_Tabs().Add(_packSettingsTab);
 			_settingsWindow.get_Tabs().Add(_mapSettingsTab);
 			_settingsWindow.get_Tabs().Add(_scriptSettingsTab);
@@ -188,7 +188,7 @@ namespace BhModule.Community.Pathing
 				//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 				if (((Enum)GameService.Input.get_Keyboard().get_ActiveModifiers()).HasFlag((Enum)(object)(ModifierKeys)1))
 				{
-					ModuleSettings.GlobalPathablesEnabled.set_Value(!ModuleSettings.GlobalPathablesEnabled.get_Value());
+					Settings.GlobalPathablesEnabled.set_Value(!Settings.GlobalPathablesEnabled.get_Value());
 				}
 				else
 				{
@@ -229,8 +229,17 @@ namespace BhModule.Community.Pathing
 
 		private void UpdateModuleLoading(string loadingMessage)
 		{
-			_pathingIcon.set_LoadingMessage(loadingMessage);
-			_packsLoading = !string.IsNullOrWhiteSpace(loadingMessage);
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Invalid comparison between Unknown and I4
+			if ((int)((Module)this).get_RunState() == 2)
+			{
+				_pathingIcon.set_LoadingMessage(loadingMessage);
+				_packsLoading = !string.IsNullOrWhiteSpace(loadingMessage);
+			}
+			if (!_packsLoading)
+			{
+				((Control)_pathingIcon).set_BasicTooltipText(Strings.General_UiName);
+			}
 		}
 
 		public IProgress<string> GetModuleProgressHandler()
@@ -241,8 +250,8 @@ namespace BhModule.Community.Pathing
 		protected override async Task LoadAsync()
 		{
 			Stopwatch sw = Stopwatch.StartNew();
-			ScriptEngine = new ScriptEngine();
-			MarkerPackRepo = new BhModule.Community.Pathing.MarkerPackRepo.MarkerPackRepo();
+			ScriptEngine = new ScriptEngine(this);
+			MarkerPackRepo = new BhModule.Community.Pathing.MarkerPackRepo.MarkerPackRepo(this);
 			MarkerPackRepo.Init();
 			PackInitiator = new PackInitiator(DirectoriesManager.GetFullDirectoryPath("markers"), this, GetModuleProgressHandler());
 			await PackInitiator.Init();

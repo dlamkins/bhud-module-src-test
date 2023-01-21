@@ -27,7 +27,10 @@ namespace BhModule.Community.Pathing
 
 		private bool _loadingState;
 
-		public ModuleSettings UserConfiguration { get; }
+		public PathingModule Module { get; }
+
+		[Obsolete("Use 'ModuleSettings' on the 'Module' property instead.")]
+		public ModuleSettings UserConfiguration => Module.Settings;
 
 		public int CurrentMapId { get; set; }
 
@@ -58,9 +61,9 @@ namespace BhModule.Community.Pathing
 		public SafeList<IPathingEntity> Entities { get; private set; } = new SafeList<IPathingEntity>();
 
 
-		public SharedPackState(ModuleSettings moduleSettings)
+		public SharedPackState(PathingModule module)
 		{
-			UserConfiguration = moduleSettings;
+			Module = module;
 			InitShaders();
 			KeyBindings.Interact.add_Activated((EventHandler<EventArgs>)OnInteractPressed);
 		}
@@ -165,9 +168,9 @@ namespace BhModule.Community.Pathing
 
 		private void InitShaders()
 		{
-			SharedMarkerEffect = new MarkerEffect(PathingModule.Instance.ContentsManager.GetEffect("hlsl\\marker.mgfx"));
-			SharedTrailEffect = new TrailEffect(PathingModule.Instance.ContentsManager.GetEffect("hlsl\\trail.mgfx"));
-			SharedMarkerEffect.FadeTexture = PathingModule.Instance.ContentsManager.GetTexture("png\\42975.png");
+			SharedMarkerEffect = new MarkerEffect(Module.ContentsManager.GetEffect("hlsl\\marker.mgfx"));
+			SharedTrailEffect = new TrailEffect(Module.ContentsManager.GetEffect("hlsl\\trail.mgfx"));
+			SharedMarkerEffect.FadeTexture = Module.ContentsManager.GetTexture("png\\42975.png");
 		}
 
 		private void OnInteractPressed(object sender, EventArgs e)
