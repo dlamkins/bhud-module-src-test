@@ -123,6 +123,8 @@ namespace Nekres.Stopwatch.Core.Controllers
 			}
 		}
 
+		public bool IsRunning => _stopwatch.IsRunning;
+
 		public float AudioVolume { get; set; }
 
 		public StopwatchController()
@@ -151,21 +153,6 @@ namespace Nekres.Stopwatch.Core.Controllers
 			TimeSpanInputPrompt.ShowPrompt(TimeSpanInputPromptCallback, "Enter a start time:", prevValue.Equals(TimeSpan.Zero) ? string.Empty : prevValue.ToString("hh\\:mm\\:ss\\.fff"));
 		}
 
-		public void Toggle()
-		{
-			if (!_inInputPrompt)
-			{
-				if (_stopwatch.IsRunning)
-				{
-					_stopwatch.Stop();
-				}
-				else
-				{
-					Start(StopwatchModule.ModuleInstance.StartTime.get_Value());
-				}
-			}
-		}
-
 		private void TimeSpanInputPromptCallback(bool confirmed, TimeSpan time)
 		{
 			_inInputPrompt = false;
@@ -176,32 +163,49 @@ namespace Nekres.Stopwatch.Core.Controllers
 			}
 		}
 
-		private void Start(TimeSpan? start = null)
+		public void Start(TimeSpan? start = null)
 		{
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-			if (_display == null)
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+			if (_inInputPrompt || !((Vector3)(ref PlayerPosition)).Equals(Vector3.get_Zero()))
 			{
-				StopwatchDisplay stopwatchDisplay = new StopwatchDisplay();
-				((Control)stopwatchDisplay).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-				((Control)stopwatchDisplay).set_Size(new Point(400, 100));
-				((Control)stopwatchDisplay).set_Location(Position);
-				stopwatchDisplay.Color = FontColor;
-				stopwatchDisplay.FontSize = FontSize;
-				stopwatchDisplay.BackgroundOpacity = BackgroundOpacity;
-				_display = stopwatchDisplay;
+				return;
 			}
+			_startSfx.Play(AudioVolume, 0f, 0f);
+			if (_display != null && !_stopwatch.IsRunning)
+			{
+				Start();
+				return;
+			}
+			StopwatchDisplay display = _display;
+			if (display != null)
+			{
+				((Control)display).Dispose();
+			}
+			StopwatchDisplay stopwatchDisplay = new StopwatchDisplay();
+			((Control)stopwatchDisplay).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			((Control)stopwatchDisplay).set_Size(new Point(400, 100));
+			((Control)stopwatchDisplay).set_Location(Position);
+			stopwatchDisplay.Color = FontColor;
+			stopwatchDisplay.FontSize = FontSize;
+			stopwatchDisplay.BackgroundOpacity = BackgroundOpacity;
+			_display = stopwatchDisplay;
 			if (start.HasValue)
 			{
 				_startTime = start.Value;
 				_prevBeep = TimeSpan.Zero;
 			}
-			_startSfx.Play(AudioVolume, 0f, 0f);
+			Start();
+		}
+
+		private void Start()
+		{
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 			_prevTick = TimeSpan.Zero;
 			if (StopwatchModule.ModuleInstance.StartOnMovementEnabled.get_Value())
 			{
@@ -216,13 +220,11 @@ namespace Nekres.Stopwatch.Core.Controllers
 
 		public void Stop()
 		{
-			StopwatchDisplay display = _display;
-			if (display != null)
+			if (!_inInputPrompt)
 			{
-				((Control)display).Dispose();
+				_startSfx.Play(AudioVolume, 0f, 0f);
+				_stopwatch.Stop();
 			}
-			_display = null;
-			_stopwatch.Stop();
 		}
 
 		public void Reset()
@@ -289,12 +291,12 @@ namespace Nekres.Stopwatch.Core.Controllers
 
 		public void Dispose()
 		{
+			_stopwatch.Stop();
 			StopwatchDisplay display = _display;
 			if (display != null)
 			{
 				((Control)display).Dispose();
 			}
-			_stopwatch.Stop();
 			SoundEffect[] rewindSfx = _rewindSfx;
 			for (int i = 0; i < rewindSfx.Length; i++)
 			{

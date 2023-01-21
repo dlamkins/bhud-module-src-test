@@ -21,6 +21,10 @@ namespace Stopwatch
 
 		internal SettingEntry<KeyBinding> Toggle;
 
+		internal SettingEntry<KeyBinding> Start;
+
+		internal SettingEntry<KeyBinding> Stop;
+
 		internal SettingEntry<bool> StartOnMovementEnabled;
 
 		internal SettingEntry<KeyBinding> Reset;
@@ -64,18 +68,24 @@ namespace Stopwatch
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Expected O, but got Unknown
-			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b9: Expected O, but got Unknown
-			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0110: Expected O, but got Unknown
-			//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_038a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0063: Expected O, but got Unknown
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b8: Expected O, but got Unknown
+			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010d: Expected O, but got Unknown
+			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0164: Expected O, but got Unknown
+			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bb: Expected O, but got Unknown
+			//IL_0276: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0435: Unknown result type (might be due to invalid IL or missing references)
 			SettingCollection hotkeys = settings.AddSubCollection("Control Options", true, false);
-			Toggle = hotkeys.DefineSetting<KeyBinding>("toggleKey", new KeyBinding((Keys)164), (Func<string>)(() => "Toggle"), (Func<string>)(() => "Starts or pauses the stopwatch."));
-			Reset = hotkeys.DefineSetting<KeyBinding>("resetKey", new KeyBinding((ModifierKeys)2, (Keys)82), (Func<string>)(() => "Reset"), (Func<string>)(() => "Rewinds and stops the stopwatch."));
-			SetStartTime = hotkeys.DefineSetting<KeyBinding>("setStartTimeKey", new KeyBinding((ModifierKeys)2, (Keys)67), (Func<string>)(() => "Set Goal Time"), (Func<string>)(() => "Set a goal time and make the stopwatch count down into the negative."));
+			Toggle = hotkeys.DefineSetting<KeyBinding>("toggleKey", new KeyBinding((ModifierKeys)2, (Keys)220), (Func<string>)(() => "Toggle"), (Func<string>)(() => "Starts or stops the stopwatch."));
+			Start = hotkeys.DefineSetting<KeyBinding>("startKey", new KeyBinding((Keys)0), (Func<string>)(() => "Start"), (Func<string>)(() => "Starts the stopwatch."));
+			Stop = hotkeys.DefineSetting<KeyBinding>("stopKey", new KeyBinding((Keys)0), (Func<string>)(() => "Stop"), (Func<string>)(() => "Stops the stopwatch."));
+			Reset = hotkeys.DefineSetting<KeyBinding>("resetKey", new KeyBinding((ModifierKeys)2, (Keys)27), (Func<string>)(() => "Reset"), (Func<string>)(() => "Rewinds the stopwatch."));
+			SetStartTime = hotkeys.DefineSetting<KeyBinding>("setStartTimeKey", new KeyBinding((ModifierKeys)2, (Keys)9), (Func<string>)(() => "Set Goal Time"), (Func<string>)(() => "Set a goal time and make the stopwatch count down into the negative."));
 			SettingCollection general = settings.AddSubCollection("General", true, false);
 			StartOnMovementEnabled = general.DefineSetting<bool>("startOnMovement", false, (Func<string>)(() => "Wait for Character Movement"), (Func<string>)(() => "When you activate the stopwatch it will delay its start until the moment you move from where you toggled it.\nIn competitive modes it will wait for camera movement instead."));
 			FontSize = general.DefineSetting<FontSize>("fontSize", (FontSize)36, (Func<string>)(() => "Font Size"), (Func<string>)(() => "Sets the font size of the timer."));
@@ -113,9 +123,13 @@ namespace Stopwatch
 		protected override void OnModuleLoaded(EventArgs e)
 		{
 			Toggle.get_Value().set_Enabled(true);
+			Start.get_Value().set_Enabled(true);
+			Stop.get_Value().set_Enabled(true);
 			SetStartTime.get_Value().set_Enabled(true);
 			Reset.get_Value().set_Enabled(true);
 			Toggle.get_Value().add_Activated((EventHandler<EventArgs>)OnToggleActivated);
+			Stop.get_Value().add_Activated((EventHandler<EventArgs>)OnStopActivated);
+			Start.get_Value().add_Activated((EventHandler<EventArgs>)OnStartActivated);
 			SetStartTime.get_Value().add_Activated((EventHandler<EventArgs>)SetStartTimeActivated);
 			Reset.get_Value().add_Activated((EventHandler<EventArgs>)OnResetActivated);
 			SoundVolume.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnSoundVolumeSettingChanged);
@@ -130,7 +144,30 @@ namespace Stopwatch
 		{
 			if (GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus() && !GameService.Gw2Mumble.get_UI().get_IsTextInputFocused())
 			{
-				_stopwatchController.Toggle();
+				if (_stopwatchController.IsRunning)
+				{
+					_stopwatchController.Stop();
+				}
+				else
+				{
+					_stopwatchController.Start(StartTime.get_Value());
+				}
+			}
+		}
+
+		private void OnStopActivated(object o, EventArgs e)
+		{
+			if (GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus() && !GameService.Gw2Mumble.get_UI().get_IsTextInputFocused() && _stopwatchController.IsRunning)
+			{
+				_stopwatchController.Stop();
+			}
+		}
+
+		private void OnStartActivated(object o, EventArgs e)
+		{
+			if (GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus() && !GameService.Gw2Mumble.get_UI().get_IsTextInputFocused() && !_stopwatchController.IsRunning)
+			{
+				_stopwatchController.Start();
 			}
 		}
 
@@ -183,6 +220,8 @@ namespace Stopwatch
 		protected override void Unload()
 		{
 			Toggle.get_Value().remove_Activated((EventHandler<EventArgs>)OnToggleActivated);
+			Stop.get_Value().remove_Activated((EventHandler<EventArgs>)OnStopActivated);
+			Start.get_Value().remove_Activated((EventHandler<EventArgs>)OnStartActivated);
 			SetStartTime.get_Value().remove_Activated((EventHandler<EventArgs>)SetStartTimeActivated);
 			Reset.get_Value().remove_Activated((EventHandler<EventArgs>)OnResetActivated);
 			SoundVolume.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnSoundVolumeSettingChanged);
