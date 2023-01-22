@@ -34,6 +34,18 @@ namespace Ideka.RacingMeter
 
 		public List<(int i, RacePoint point)> RoadPoints { get; private set; }
 
+		public bool IsReady
+		{
+			get
+			{
+				if (Race != null)
+				{
+					return Checkpoints?.Any() ?? false;
+				}
+				return false;
+			}
+		}
+
 		public bool OfficialPoints
 		{
 			get

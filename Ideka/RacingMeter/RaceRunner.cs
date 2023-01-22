@@ -112,6 +112,10 @@ namespace Ideka.RacingMeter
 		{
 			get
 			{
+				if (!Drawer.IsReady)
+				{
+					return 0;
+				}
 				return Math.Min(Math.Max(_currentStep, TestCheckpoint), Checkpoints.Count - 1);
 			}
 			private set
@@ -120,7 +124,18 @@ namespace Ideka.RacingMeter
 			}
 		}
 
-		public double Progress => Drawer.Route.ProgressPercent(CurrentStep, RacingModule.Measurer.Pos.Meters);
+		public double Progress
+		{
+			get
+			{
+				//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+				if (!Drawer.IsReady)
+				{
+					return 0.0;
+				}
+				return Drawer.Route.ProgressPercent(CurrentStep, RacingModule.Measurer.Pos.Meters);
+			}
+		}
 
 		public int TestCheckpoint { get; }
 
@@ -188,7 +203,7 @@ namespace Ideka.RacingMeter
 			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
 			//IL_027e: Unknown result type (might be due to invalid IL or missing references)
 			PosStack.Push(pos);
-			if (Drawer.Race == null)
+			if (!Drawer.IsReady)
 			{
 				return;
 			}
@@ -369,30 +384,30 @@ namespace Ideka.RacingMeter
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
 			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0129: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0147: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
 			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
-			if (!CanDrawRace())
+			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
+			if (!CanDrawRace() || !Drawer.IsReady)
 			{
 				return;
 			}
@@ -428,10 +443,10 @@ namespace Ideka.RacingMeter
 
 		public override void DrawToMap(SpriteBatch spriteBatch, MapBounds map)
 		{
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-			if (base.Race == null)
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+			if (!Drawer.IsReady)
 			{
 				return;
 			}
