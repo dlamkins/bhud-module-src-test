@@ -302,6 +302,22 @@ namespace Ideka.RacingMeter
 
 		internal static string SettingAutoLocalGhostText => ResourceManager.GetString("SettingAutoLocalGhostText", resourceCulture);
 
+		internal static string SettingBeetleDriftKey => ResourceManager.GetString("SettingBeetleDriftKey", resourceCulture);
+
+		internal static string SettingBeetleDriftKeyText => ResourceManager.GetString("SettingBeetleDriftKeyText", resourceCulture);
+
+		internal static string SettingCheckpointAlpha => ResourceManager.GetString("SettingCheckpointAlpha", resourceCulture);
+
+		internal static string SettingCheckpointAlphaText => ResourceManager.GetString("SettingCheckpointAlphaText", resourceCulture);
+
+		internal static string SettingCheckpointArrow => ResourceManager.GetString("SettingCheckpointArrow", resourceCulture);
+
+		internal static string SettingCheckpointArrowText => ResourceManager.GetString("SettingCheckpointArrowText", resourceCulture);
+
+		internal static string SettingCheckpointLineThickness => ResourceManager.GetString("SettingCheckpointLineThickness", resourceCulture);
+
+		internal static string SettingCheckpointLineThicknessText => ResourceManager.GetString("SettingCheckpointLineThicknessText", resourceCulture);
+
 		internal static string SettingGriffonMeter => ResourceManager.GetString("SettingGriffonMeter", resourceCulture);
 
 		internal static string SettingMaxGhostData => ResourceManager.GetString("SettingMaxGhostData", resourceCulture);

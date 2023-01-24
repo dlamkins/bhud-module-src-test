@@ -35,7 +35,9 @@ Online features disabled.</value></data>
   <data name="Unavailable"><value>Unavailable</value></data>
   <data name="SettingShowGuides"><value>Show Race Guides</value></data>
   <data name="ExceptionInvalidRaceMap"><value>Invalid race map.</value></data>
+  <data name="SettingCheckpointLineThicknessText"><value>Thickness of displayed checkpoints, where 100% equals one pixel.</value></data>
   <data name="RaceEditor"><value>Race Editor</value></data>
+  <data name="SettingBeetleDriftKeyText"><value>Set this to enable the Roller Beetle drift-hold indicator. It should match the key you use to drift.</value></data>
   <data name="SettingAutoLocalGhost"><value>Autoload Best Local Ghost</value></data>
   <data name="ExceptionRemoveResetPoint"><value>The reset point cannot be removed.</value></data>
   <data name="NewRaceName"><value>New Race</value></data>
@@ -51,6 +53,8 @@ Online features disabled.</value></data>
   <data name="ExceptionHttpListener"><value>Failed to bind HTTP listener.</value></data>
   <data name="ErrorVersionVerification"><value>Unable to verify version</value></data>
   <data name="BestLabel"><value>Best: {0}</value></data>
+  <data name="SettingCheckpointArrow"><value>Checkpoint Arrow</value></data>
+  <data name="SettingCheckpointAlpha"><value>Checkpoint Alpha</value></data>
   <data name="SettingRacerHAlignment"><value>Racing UI Horizontal Alignment</value></data>
   <data name="Inches"><value>{0}in</value></data>
   <data name="LogInError"><value>Error&lt;br&gt;{0}</value></data>
@@ -100,6 +104,7 @@ Start a race to see the UI while you adjust it.</value></data>
   <data name="UnsavedChanges"><value>You have unsaved changes.</value></data>
   <data name="GhostLocalUploadedTooltip"><value>This is a local ghost.</value></data>
   <data name="NotifyNoRaceSelected"><value>No race selected.</value></data>
+  <data name="SettingCheckpointAlphaText"><value>Alpha multiplier of displayed checkpoints.</value></data>
   <data name="ChangeToCurrent"><value>Change to Current</value></data>
   <data name="RacePreview"><value>Race Preview</value></data>
   <data name="Deselect"><value>Deselect</value></data>
@@ -147,6 +152,7 @@ Opening your browser...</value></data>
   <data name="UpdateLeaderboard"><value>Update Leaderboard</value></data>
   <data name="SettingSFXVolumeMultiplierText"><value>Volume multiplier for sound effects. This is applied as a percentage, after Blish's volume setting. Set to 0 to disable all sound effects.</value></data>
   <data name="SettingAutoLocalGhostText"><value>Automatically load your best local ghost when starting a race (unless you load a specific one).</value></data>
+  <data name="SettingBeetleDriftKey"><value>Beetle Drift Key</value></data>
   <data name="InsertAfter"><value>Insert After</value></data>
   <data name="SettingShowSpeedometer"><value>Show Speedometer</value></data>
   <data name="ExceptionEmptyRaceName"><value>The race's name cannot be empty.</value></data>
@@ -166,8 +172,10 @@ Enabling this option also mutes racing SFX, since official races have SFX alread
   <data name="SettingSkimmerMeter"><value>Skimmer Meter</value></data>
   <data name="SettingRacerVAlignmentText"><value>Vertical alignment of the racing UI.
 Start a race to see the UI while you adjust it.</value></data>
+  <data name="SettingCheckpointLineThickness"><value>Checkpoint Line Thickness</value></data>
   <data name="UnloadGhost"><value>Unload Ghost</value></data>
   <data name="ExceptionInvalidRaceType"><value>Invalid race type.</value></data>
+  <data name="SettingCheckpointArrowText"><value>Show an arrow on the current checkpoint, pointing towards the next checkpoint.</value></data>
   <data name="ExceptionInvalidRaceName"><value>The race's name is invalid.</value></data>
   <data name="SupportStatusUnchecked"><value>Connecting to server...</value></data>
   <data name="SupportStatusTooltipNo"><value>Please update the module to continue using online features.</value></data>

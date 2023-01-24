@@ -25,7 +25,7 @@ namespace Ideka.RacingMeter
 
 		private static readonly Primitive GhostB = new Primitive(Vector3.get_Zero(), new Vector3(0f, 1f, 0f));
 
-		public const float Thickness = 2f;
+		public const float MapThickness = 2f;
 
 		public static readonly Color ResetColor = Color.get_Red();
 
@@ -40,6 +40,12 @@ namespace Ideka.RacingMeter
 		public static readonly Color FinalCheckpointColor = Color.get_Yellow();
 
 		public static readonly Color GhostColor = Color.get_White();
+
+		public static float Thickness => RacingModule.Settings.CheckpointLineThickness.Value;
+
+		public static float Alpha => RacingModule.Settings.CheckpointAlpha.Value;
+
+		public static bool ShowArrow => RacingModule.Settings.CheckpointArrow.Value;
 
 		public abstract FullRace FullRace { get; set; }
 
@@ -112,23 +118,28 @@ namespace Ideka.RacingMeter
 			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
 			Matrix trs = GetTRS(radius) * Matrix.CreateConstrainedBillboard(position, GameService.Gw2Mumble.get_PlayerCamera().get_Position(), Up, (Vector3?)null, (Vector3?)null);
-			Circle.Transformed(trs).ToScreen().Draw(spriteBatch, color, 2f);
+			Circle.Transformed(trs).ToScreen().Draw(spriteBatch, color * Alpha, Thickness);
 			if (!flat)
 			{
-				Arc.Transformed(trs).ToScreen().Draw(spriteBatch, color, 2f);
+				Arc.Transformed(trs).ToScreen().Draw(spriteBatch, color * Alpha, Thickness);
 			}
 			if (next.HasValue)
 			{
 				Vector3 nextPosition = next.GetValueOrDefault();
-				DrawRaceArrow(spriteBatch, position, radius, nextPosition, color);
+				if (ShowArrow)
+				{
+					DrawRaceArrow(spriteBatch, position, radius, nextPosition, color);
+				}
 			}
 		}
 
@@ -143,11 +154,12 @@ namespace Ideka.RacingMeter
 			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 			Matrix tRS = GetTRS(radius);
 			Vector3 up = default(Vector3);
 			((Vector3)(ref up))._002Ector(0f, 0f, 1f);
 			Matrix trs = tRS * Matrix.CreateConstrainedBillboard(position, next, up, (Vector3?)null, (Vector3?)null);
-			Arrow.Transformed(trs).ToScreen().Draw(spriteBatch, color, 2f);
+			Arrow.Transformed(trs).ToScreen().Draw(spriteBatch, color * Alpha, Thickness);
 		}
 
 		public void DrawRacePoint(SpriteBatch spriteBatch, Vector3 position, float radius, Color color, bool flat = false)
