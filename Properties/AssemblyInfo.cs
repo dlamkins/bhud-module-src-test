@@ -6,14 +6,15 @@ using System.Runtime.Versioning;
 using System.Security;
 using System.Security.Permissions;
 
-[assembly: AssemblyTitle("Blish-HUD-Extended")]
-[assembly: AssemblyDescription("Extensions to make Blish-HUD more awesome.")]
+[assembly: AssemblyTitle("Nekres.Stream_Out.Properties")]
+[assembly: AssemblyDescription("A module for BlishHUD which exports game and account information to image and text files.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("agaertner")]
-[assembly: AssemblyProduct("Blish-HUD-Extended")]
-[assembly: AssemblyCopyright("Copyright © agaertner 2022")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("Nekres.Stream_Out.Properties")]
+[assembly: AssemblyCopyright("Copyright © Andreas G. 2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: ComVisible(false)]
-[assembly: Guid("33c90e9c-3308-4a0e-8dfd-5855f296a72c")]
-[assembly: AssemblyFileVersion("0.1.0.8")]
-[assembly: AssemblyVersion("0.1.0.8")]
+[assembly: Guid("c2aa8f69-b58f-4e9d-9c0b-4aee99640247")]
+[assembly: AssemblyFileVersion("0.7.8.1")]
+[assembly: AssemblyInformationalVersion("0.7.8-dev.1+Branch.dev.Sha.c1a2dc7b67c9a36c83f2c36426c01f2570194b84")]
+[assembly: AssemblyVersion("0.7.8.1")]

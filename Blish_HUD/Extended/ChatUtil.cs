@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using AsyncWindowsClipboard.Clipboard.Exceptions;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework.Input;
 
@@ -8,6 +10,10 @@ namespace Blish_HUD.Extended
 {
 	public static class ChatUtil
 	{
+		public const int MAX_MESSAGE_LENGTH = 199;
+
+		private static Logger _logger = Logger.GetLogger(typeof(ChatUtil));
+
 		private static readonly IReadOnlyDictionary<ModifierKeys, int> ModifierLookUp = new Dictionary<ModifierKeys, int>
 		{
 			{
@@ -24,11 +30,20 @@ namespace Blish_HUD.Extended
 			}
 		};
 
-		public static async Task Send(string text, KeyBinding messageKey)
+		public static void Send(string text, KeyBinding messageKey)
 		{
-			byte[] prevClipboardContent = await ClipboardUtil.get_WindowsClipboardService().GetAsUnicodeBytesAsync();
-			if (await ClipboardUtil.get_WindowsClipboardService().SetTextAsync(text) && Focus(messageKey))
+			if (!IsTextValid(text) || !Focus(messageKey))
 			{
+				return;
+			}
+			try
+			{
+				byte[] prevClipboardContent = ClipboardUtil.get_WindowsClipboardService().GetAsUnicodeBytesAsync().Result;
+				if (!ClipboardUtil.get_WindowsClipboardService().SetTextAsync(text).Result)
+				{
+					SetUnicodeBytesAsync(prevClipboardContent);
+					return;
+				}
 				Thread.Sleep(1);
 				KeyboardUtil.Press(162, sendToSystem: true);
 				KeyboardUtil.Stroke(65, sendToSystem: true);
@@ -41,34 +56,50 @@ namespace Blish_HUD.Extended
 				KeyboardUtil.Release(162, sendToSystem: true);
 				Thread.Sleep(1);
 				KeyboardUtil.Stroke(13);
-				if (prevClipboardContent != null)
-				{
-					await ClipboardUtil.get_WindowsClipboardService().SetUnicodeBytesAsync(prevClipboardContent);
-				}
+				SetUnicodeBytesAsync(prevClipboardContent);
+			}
+			catch (Exception ex) when (ex is ClipboardWindowsApiException || ex is ClipboardTimeoutException)
+			{
+				_logger.Error(ex, ex.Message);
 			}
 		}
 
-		public static async Task Insert(string text, KeyBinding messageKey)
+		public static void Insert(string text, KeyBinding messageKey)
 		{
-			byte[] prevClipboardContent = await ClipboardUtil.get_WindowsClipboardService().GetAsUnicodeBytesAsync();
-			if (await ClipboardUtil.get_WindowsClipboardService().SetTextAsync(text) && Focus(messageKey))
+			if (!IsTextValid(text) || !Focus(messageKey))
 			{
+				return;
+			}
+			try
+			{
+				byte[] prevClipboardContent = ClipboardUtil.get_WindowsClipboardService().GetAsUnicodeBytesAsync().Result;
+				if (!ClipboardUtil.get_WindowsClipboardService().SetTextAsync(text).Result)
+				{
+					SetUnicodeBytesAsync(prevClipboardContent);
+					return;
+				}
 				Thread.Sleep(1);
 				KeyboardUtil.Press(162, sendToSystem: true);
 				KeyboardUtil.Stroke(86, sendToSystem: true);
 				Thread.Sleep(1);
 				KeyboardUtil.Release(162, sendToSystem: true);
-				if (prevClipboardContent != null)
-				{
-					await ClipboardUtil.get_WindowsClipboardService().SetUnicodeBytesAsync(prevClipboardContent);
-				}
+				SetUnicodeBytesAsync(prevClipboardContent);
+			}
+			catch (Exception ex) when (ex is ClipboardWindowsApiException || ex is ClipboardTimeoutException)
+			{
+				_logger.Error(ex, ex.Message);
 			}
 		}
 
 		private static bool Focus(KeyBinding messageKey)
 		{
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			if (IsBusy())
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0062: Expected I4, but got Unknown
+			if (IsBusy() || messageKey == null || ((int)messageKey.get_PrimaryKey() == 0 && (int)messageKey.get_ModifierKeys() == 0))
 			{
 				return false;
 			}
@@ -80,7 +111,7 @@ namespace Blish_HUD.Extended
 			{
 				KeyboardUtil.Press(modifierKey, sendToSystem: true);
 			}
-			if (messageKey.get_PrimaryKey() != 0)
+			if ((int)messageKey.get_PrimaryKey() != 0)
 			{
 				KeyboardUtil.Stroke((int)messageKey.get_PrimaryKey(), sendToSystem: true);
 			}
@@ -91,11 +122,43 @@ namespace Blish_HUD.Extended
 			return true;
 		}
 
+		private static async Task SetUnicodeBytesAsync(byte[] clipboardContent)
+		{
+			if (clipboardContent != null)
+			{
+				await ClipboardUtil.get_WindowsClipboardService().SetUnicodeBytesAsync(clipboardContent);
+			}
+		}
+
 		private static bool IsBusy()
 		{
 			if (GameService.Gw2Mumble.get_IsAvailable() && GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() && GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus() && GameService.GameIntegration.get_Gw2Instance().get_IsInGame())
 			{
 				return GameService.Gw2Mumble.get_UI().get_IsTextInputFocused();
+			}
+			return true;
+		}
+
+		private static bool IsTextValid(string text)
+		{
+			if (string.IsNullOrEmpty(text))
+			{
+				_logger.Debug("Invalid chat message. Argument 'text' was null or empty.");
+				return false;
+			}
+			if (text.Length > 199)
+			{
+				_logger.Warn(string.Format("Invalid chat message. Argument '{0}' exceeds limit of {1} characters. Value: \"{2}[..+{3}]\"", "text", 199, text.Substring(0, 25), 174));
+				return false;
+			}
+			return true;
+		}
+
+		public static bool IsLengthValid(string message)
+		{
+			if (!string.IsNullOrEmpty(message))
+			{
+				return message.Length <= 199;
 			}
 			return true;
 		}

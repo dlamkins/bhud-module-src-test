@@ -24,6 +24,8 @@ namespace Nekres.Stream_Out.Core.Services
 
 		private const string PROFESSION_ICON = "profession_icon.png";
 
+		private const string PROFESSION_NAME = "profession_name.txt";
+
 		private const string COMMANDER_ICON = "commander_icon.png";
 
 		private const string DEATHS_WEEK = "deaths_week.txt";
@@ -91,8 +93,21 @@ namespace Nekres.Stream_Out.Core.Services
 			try
 			{
 				Specialization specialization = await ((IBulkExpandableClient<Specialization, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Specializations()).GetAsync(e.get_Value(), default(CancellationToken));
-				Profession profession = await ((IBulkAliasExpandableClient<Profession, ProfessionType>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Professions()).GetAsync(GameService.Gw2Mumble.get_PlayerCharacter().get_Profession(), default(CancellationToken));
-				RenderUrl? val = (specialization.get_Elite() ? specialization.get_ProfessionIconBig() : new RenderUrl?(profession.get_IconBig()));
+				RenderUrl? icon;
+				string name;
+				if (specialization.get_Elite())
+				{
+					icon = specialization.get_ProfessionIconBig();
+					name = specialization.get_Name();
+				}
+				else
+				{
+					Profession profession = await ((IBulkAliasExpandableClient<Profession, ProfessionType>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Professions()).GetAsync(GameService.Gw2Mumble.get_PlayerCharacter().get_Profession(), default(CancellationToken));
+					icon = profession.get_IconBig();
+					name = profession.get_Name();
+				}
+				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/profession_name.txt", name ?? string.Empty);
+				RenderUrl? val = icon;
 				await TextureUtil.SaveToImage(val.HasValue ? RenderUrl.op_Implicit(val.GetValueOrDefault()) : null, DirectoriesManager.GetFullDirectoryPath("stream_out") + "/profession_icon.png");
 			}
 			catch (UnexpectedStatusException)

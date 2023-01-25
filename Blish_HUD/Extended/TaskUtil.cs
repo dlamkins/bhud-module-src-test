@@ -46,16 +46,19 @@ namespace Blish_HUD.Extended
 
 		public static bool TryParseJson<T>(string json, out T result)
 		{
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Expected O, but got Unknown
 			bool success = true;
-			JsonSerializerSettings settings = new JsonSerializerSettings
+			JsonSerializerSettings val = new JsonSerializerSettings();
+			val.set_Error((EventHandler<ErrorEventArgs>)delegate(object _, ErrorEventArgs args)
 			{
-				Error = delegate(object _, ErrorEventArgs args)
-				{
-					success = false;
-					args.ErrorContext.Handled = true;
-				},
-				MissingMemberHandling = MissingMemberHandling.Error
-			};
+				success = false;
+				args.get_ErrorContext().set_Handled(true);
+			});
+			val.set_MissingMemberHandling((MissingMemberHandling)1);
+			JsonSerializerSettings settings = val;
 			result = JsonConvert.DeserializeObject<T>(json, settings);
 			return success;
 		}
@@ -77,9 +80,10 @@ namespace Blish_HUD.Extended
 				FlurlHttpException ex3 = val2;
 				Logger.Warn((Exception)(object)ex3, "Request '" + request + "' was not successful.");
 			}
-			catch (JsonReaderException ex2)
+			catch (JsonReaderException val3)
 			{
-				Logger.Warn((Exception)ex2, "Failed to deserialize requested content from \"" + request + "\"\n" + ex2.StackTrace);
+				JsonReaderException ex2 = val3;
+				Logger.Warn((Exception)(object)ex2, "Failed to deserialize requested content from \"" + request + "\"\n" + ((Exception)(object)ex2).StackTrace);
 			}
 			catch (Exception ex)
 			{
