@@ -9,17 +9,47 @@
     <LangVersion>Preview</LangVersion>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup />
-  <ItemGroup />
+  <PropertyGroup>
+    <RootNamespace />
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Nekres\Stream_Out\_Submodules.Blish_HUD_Extended.Resources.discord_logo.png" />
+    <None Remove="Nekres\Stream_Out\_Submodules.Blish_HUD_Extended.Resources.github_logo.png" />
+    <None Remove="Nekres\Stream_Out\_Submodules.Blish_HUD_Extended.Resources.instagram_logo.png" />
+    <None Remove="Nekres\Stream_Out\_Submodules.Blish_HUD_Extended.Resources.kofi_logo.png" />
+    <None Remove="Nekres\Stream_Out\_Submodules.Blish_HUD_Extended.Resources.patreon_logo.png" />
+    <None Remove="Nekres\Stream_Out\_Submodules.Blish_HUD_Extended.Resources.twitch_logo.png" />
+    <None Remove="Nekres\Stream_Out\_Submodules.Blish_HUD_Extended.Resources.twitter_logo.png" />
+    <None Remove="Nekres\Stream_Out\_Submodules.Blish_HUD_Extended.Resources.youtube_logo.png" />
+    <EmbeddedResource Include="Nekres\Stream_Out\_Submodules.Blish_HUD_Extended.Resources.discord_logo.png" />
+    <EmbeddedResource Include="Nekres\Stream_Out\_Submodules.Blish_HUD_Extended.Resources.github_logo.png" />
+    <EmbeddedResource Include="Nekres\Stream_Out\_Submodules.Blish_HUD_Extended.Resources.instagram_logo.png" />
+    <EmbeddedResource Include="Nekres\Stream_Out\_Submodules.Blish_HUD_Extended.Resources.kofi_logo.png" />
+    <EmbeddedResource Include="Nekres\Stream_Out\_Submodules.Blish_HUD_Extended.Resources.patreon_logo.png" />
+    <EmbeddedResource Include="Nekres\Stream_Out\_Submodules.Blish_HUD_Extended.Resources.twitch_logo.png" />
+    <EmbeddedResource Include="Nekres\Stream_Out\_Submodules.Blish_HUD_Extended.Resources.twitter_logo.png" />
+    <EmbeddedResource Include="Nekres\Stream_Out\_Submodules.Blish_HUD_Extended.Resources.youtube_logo.png" />
+  </ItemGroup>
   <ItemGroup>
     <Reference Include="Blish HUD" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="Gw2Sharp" />
-    <Reference Include="MonoGame.Framework" />
+    <Reference Include="MonoGame.Framework">
+      <HintPath>..\..\working\MonoGame.Framework.dll</HintPath>
+    </Reference>
     <Reference Include="System.Core" />
-    <Reference Include="Blish-HUD-Extended">
-      <HintPath>..\..\working\Blish-HUD-Extended.dll</HintPath>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\working\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Flurl.Http" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="MonoGame.Extended">
+      <HintPath>..\..\working\MonoGame.Extended.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="AsyncClipboardService">
+      <HintPath>..\..\working\AsyncClipboardService.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http" />
   </ItemGroup>
 </Project>
