@@ -1,9 +1,11 @@
 using System;
 using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using MonoGame.Extended.BitmapFonts;
 
@@ -11,7 +13,9 @@ namespace Nekres.Screenshot_Manager.UI.Controls
 {
 	internal sealed class ConfirmationPrompt : Container
 	{
-		private static Texture2D _bgTexture = GameService.Content.GetTexture("tooltip");
+		private AsyncTexture2D _bgTexture;
+
+		private static ConfirmationPrompt _singleton;
 
 		private static BitmapFont _font = GameService.Content.GetFont((FontFace)0, (FontSize)24, (FontStyle)0);
 
@@ -46,17 +50,83 @@ namespace Nekres.Screenshot_Manager.UI.Controls
 			_cancelButtonButtonText = cancelButtonText;
 			_challengeText = challengeText;
 			((Control)this).set_ZIndex(999);
+			GameService.Input.get_Keyboard().add_KeyPressed((EventHandler<KeyboardEventArgs>)OnKeyPressed);
+			LoadTextures();
+		}
+
+		private void LoadTextures()
+		{
+			_bgTexture = GameService.Content.get_DatAssetCache().GetTextureFromAssetId(156003);
 		}
 
 		public static void ShowPrompt(Action<bool> callback, string text, string confirmButtonText = "Confirm", string cancelButtonText = "Cancel", string challengeText = "")
 		{
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			ConfirmationPrompt confirmationPrompt = new ConfirmationPrompt(callback, text, confirmButtonText, cancelButtonText, challengeText);
-			((Control)confirmationPrompt).set_Parent((Container)(object)Control.get_Graphics().get_SpriteScreen());
-			((Control)confirmationPrompt).set_Location(Point.get_Zero());
-			((Control)confirmationPrompt).set_Size(((Control)Control.get_Graphics().get_SpriteScreen()).get_Size());
-			((Control)confirmationPrompt).Show();
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			if (_singleton == null)
+			{
+				ConfirmationPrompt confirmationPrompt = new ConfirmationPrompt(callback, text, confirmButtonText, cancelButtonText, challengeText);
+				((Control)confirmationPrompt).set_Parent((Container)(object)Control.get_Graphics().get_SpriteScreen());
+				((Control)confirmationPrompt).set_Location(Point.get_Zero());
+				((Control)confirmationPrompt).set_Size(((Control)Control.get_Graphics().get_SpriteScreen()).get_Size());
+				_singleton = confirmationPrompt;
+				((Control)_singleton).Show();
+			}
+		}
+
+		private void Confirm()
+		{
+			if (_confirmButton != null && ((Control)_confirmButton).get_Enabled())
+			{
+				GameService.Input.get_Keyboard().remove_KeyPressed((EventHandler<KeyboardEventArgs>)OnKeyPressed);
+				GameService.Content.PlaySoundEffectByName("button-click");
+				_singleton = null;
+				_callback(obj: true);
+				((Control)this).Dispose();
+			}
+		}
+
+		private void Cancel()
+		{
+			GameService.Input.get_Keyboard().remove_KeyPressed((EventHandler<KeyboardEventArgs>)OnKeyPressed);
+			GameService.Content.PlaySoundEffectByName("button-click");
+			_singleton = null;
+			_callback(obj: false);
+			((Control)this).Dispose();
+		}
+
+		private void OnKeyPressed(object o, KeyboardEventArgs e)
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000a: Invalid comparison between Unknown and I4
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000f: Invalid comparison between Unknown and I4
+			Keys key = e.get_Key();
+			if ((int)key != 13)
+			{
+				if ((int)key == 27)
+				{
+					Cancel();
+				}
+			}
+			else
+			{
+				Confirm();
+			}
+		}
+
+		protected override void DisposeControl()
+		{
+			_singleton = null;
+			AsyncTexture2D bgTexture = _bgTexture;
+			if (bgTexture != null)
+			{
+				bgTexture.Dispose();
+			}
+			GameService.Input.get_Keyboard().remove_KeyPressed((EventHandler<KeyboardEventArgs>)OnKeyPressed);
+			((Container)this).DisposeControl();
 		}
 
 		private void CreateButtons()
@@ -89,9 +159,7 @@ namespace Nekres.Screenshot_Manager.UI.Controls
 				_confirmButton = val;
 				((Control)_confirmButton).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
-					GameService.Content.PlaySoundEffectByName("button-click");
-					_callback(obj: true);
-					((Control)this).Dispose();
+					Confirm();
 				});
 			}
 			if (_cancelButton == null)
@@ -104,9 +172,7 @@ namespace Nekres.Screenshot_Manager.UI.Controls
 				_cancelButton = val2;
 				((Control)_cancelButton).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
-					GameService.Content.PlaySoundEffectByName("button-click");
-					_callback(obj: false);
-					((Control)this).Dispose();
+					Cancel();
 				});
 			}
 		}
@@ -177,21 +243,22 @@ namespace Nekres.Screenshot_Manager.UI.Controls
 			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0176: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0187: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0210: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0220: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0202: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0239: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023e: Unknown result type (might be due to invalid IL or missing references)
 			((Container)this).PaintBeforeChildren(spriteBatch, bounds);
 			Size2 textSize = _font.MeasureString(_text);
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), bounds, Color.get_Black() * 0.8f);
@@ -205,7 +272,7 @@ namespace Nekres.Screenshot_Manager.UI.Controls
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(bgBounds.X - 1, bgBounds.Y - 1, 1, bgBounds.Height + 1), Color.get_Black());
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(bgBounds.X + bgBounds.Width, bgBounds.Y, 1, bgBounds.Height + 1), Color.get_Black());
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(bgBounds.X, bgBounds.Y + bgBounds.Height, bgBounds.Width, 1), Color.get_Black());
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _bgTexture, bgBounds, Color.get_White());
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_bgTexture), bgBounds, (Rectangle?)new Rectangle(29, 23, 942, 942), Color.get_White());
 			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, _text, _font, new Rectangle(bgBounds.X + 6, bgBounds.Y + 5, bgBounds.Width - 11, bgBounds.Height), Color.get_White(), true, (HorizontalAlignment)0, (VerticalAlignment)0);
 			_confirmButtonBounds = new Rectangle(((Rectangle)(ref bgBounds)).get_Left() + 5, ((Rectangle)(ref bgBounds)).get_Bottom() - 50, 100, 45);
 			_cancelButtonBounds = new Rectangle(((Rectangle)(ref _confirmButtonBounds)).get_Right() + 10, _confirmButtonBounds.Y, 100, 45);

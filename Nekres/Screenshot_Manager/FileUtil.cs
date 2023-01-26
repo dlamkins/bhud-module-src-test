@@ -8,6 +8,20 @@ namespace Nekres.Screenshot_Manager
 {
 	internal static class FileUtil
 	{
+		public static string IndexedFilename(string stub, string extension)
+		{
+			int ix = 0;
+			string filename;
+			do
+			{
+				ix++;
+				string zeros = ((ix < 10) ? "00" : ((ix < 100) ? "0" : string.Empty));
+				filename = $"{stub}{zeros}{ix}.{extension}";
+			}
+			while (File.Exists(filename));
+			return filename;
+		}
+
 		public static async Task<bool> MoveAsync(string oldFilePath, string newFilePath)
 		{
 			return await Task.Run(delegate

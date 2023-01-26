@@ -50,6 +50,8 @@ namespace Nekres.Screenshot_Manager.Properties
 
 		internal static string Cancel => ResourceManager.GetString("Cancel", resourceCulture);
 
+		internal static string Choose_your_preferred_image_format_ => ResourceManager.GetString("Choose your preferred image format.", resourceCulture);
+
 		internal static string Click_To_Zoom => ResourceManager.GetString("Click To Zoom", resourceCulture);
 
 		internal static string Delete_Image_ => ResourceManager.GetString("Delete Image?", resourceCulture);
@@ -66,7 +68,11 @@ namespace Nekres.Screenshot_Manager.Properties
 
 		internal static string Favourite => ResourceManager.GetString("Favourite", resourceCulture);
 
+		internal static string General_Options => ResourceManager.GetString("General Options", resourceCulture);
+
 		internal static string Hide_Corner_Icon => ResourceManager.GetString("Hide Corner Icon", resourceCulture);
+
+		internal static string Image_Format => ResourceManager.GetString("Image Format", resourceCulture);
 
 		internal static string Image_name_cannot_be_empty_ => ResourceManager.GetString("Image name cannot be empty.", resourceCulture);
 
@@ -84,7 +90,11 @@ namespace Nekres.Screenshot_Manager.Properties
 
 		internal static string Screenshot_Created_ => ResourceManager.GetString("Screenshot Created!", resourceCulture);
 
+		internal static string Screenshot_Options => ResourceManager.GetString("Screenshot Options", resourceCulture);
+
 		internal static string Search___ => ResourceManager.GetString("Search...", resourceCulture);
+
+		internal static string Sound_Options => ResourceManager.GetString("Sound Options", resourceCulture);
 
 		internal static string Stereoscopic => ResourceManager.GetString("Stereoscopic", resourceCulture);
 

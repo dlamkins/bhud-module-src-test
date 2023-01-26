@@ -16,19 +16,19 @@ namespace Nekres.Screenshot_Manager.UI.Controls
 	{
 		private Rectangle _nameTextBoxBounds;
 
-		private const int MaxFileNameLength = 50;
+		private const int MAX_FILE_NAME_LENGTH = 50;
 
 		private readonly IEnumerable<char> _invalidFileNameCharacters;
 
-		private static Texture2D _completeHeartIcon = ScreenshotManagerModule.ModuleInstance.ContentsManager.GetTexture("complete_heart.png");
+		private static Texture2D _completeHeartIcon;
 
-		private static Texture2D _incompleteHeartIcon = ScreenshotManagerModule.ModuleInstance.ContentsManager.GetTexture("incomplete_heart.png");
+		private static Texture2D _incompleteHeartIcon;
 
-		private static Texture2D _trashcanClosedIcon64 = ScreenshotManagerModule.ModuleInstance.ContentsManager.GetTexture("trashcanClosed_icon_64x64.png");
+		private static Texture2D _trashcanClosedIcon64;
 
-		private static Texture2D _trashcanOpenIcon64 = ScreenshotManagerModule.ModuleInstance.ContentsManager.GetTexture("trashcanOpen_icon_64x64.png");
+		private static Texture2D _trashcanOpenIcon64;
 
-		private static Texture2D _inspectIcon = ScreenshotManagerModule.ModuleInstance.ContentsManager.GetTexture("inspect.png");
+		private static Texture2D _inspectIcon;
 
 		private bool _mouseOverFavButton;
 
@@ -65,10 +65,44 @@ namespace Nekres.Screenshot_Manager.UI.Controls
 
 		public event EventHandler<EventArgs> OnDelete;
 
+		public static void DisposeTextures()
+		{
+			Texture2D completeHeartIcon = _completeHeartIcon;
+			if (completeHeartIcon != null)
+			{
+				((GraphicsResource)completeHeartIcon).Dispose();
+			}
+			Texture2D incompleteHeartIcon = _incompleteHeartIcon;
+			if (incompleteHeartIcon != null)
+			{
+				((GraphicsResource)incompleteHeartIcon).Dispose();
+			}
+			Texture2D trashcanClosedIcon = _trashcanClosedIcon64;
+			if (trashcanClosedIcon != null)
+			{
+				((GraphicsResource)trashcanClosedIcon).Dispose();
+			}
+			Texture2D trashcanOpenIcon = _trashcanOpenIcon64;
+			if (trashcanOpenIcon != null)
+			{
+				((GraphicsResource)trashcanOpenIcon).Dispose();
+			}
+			Texture2D inspectIcon = _inspectIcon;
+			if (inspectIcon != null)
+			{
+				((GraphicsResource)inspectIcon).Dispose();
+			}
+		}
+
 		public ResponsiveThumbnail(AsyncTexture2D texture, string fileName)
 			: base(texture, fileName)
 		{
 			_invalidFileNameCharacters = Path.GetInvalidFileNameChars().Union(Path.GetInvalidPathChars());
+			_completeHeartIcon = _completeHeartIcon ?? ScreenshotManagerModule.ModuleInstance.ContentsManager.GetTexture("complete_heart.png");
+			_incompleteHeartIcon = _incompleteHeartIcon ?? ScreenshotManagerModule.ModuleInstance.ContentsManager.GetTexture("incomplete_heart.png");
+			_trashcanClosedIcon64 = _trashcanClosedIcon64 ?? ScreenshotManagerModule.ModuleInstance.ContentsManager.GetTexture("trashcanClosed_icon_64x64.png");
+			_trashcanOpenIcon64 = _trashcanOpenIcon64 ?? ScreenshotManagerModule.ModuleInstance.ContentsManager.GetTexture("trashcanOpen_icon_64x64.png");
+			_inspectIcon = _inspectIcon ?? ScreenshotManagerModule.ModuleInstance.ContentsManager.GetTexture("inspect.png");
 		}
 
 		protected override void OnMouseMoved(MouseEventArgs e)

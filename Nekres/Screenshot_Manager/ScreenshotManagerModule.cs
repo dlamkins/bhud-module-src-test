@@ -1,9 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.IO;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.Extended;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Blish_HUD.Modules;
@@ -12,8 +17,10 @@ using Blish_HUD.Settings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Nekres.Screenshot_Manager.Core;
 using Nekres.Screenshot_Manager.Properties;
+using Nekres.Screenshot_Manager.UI.Controls;
 using Nekres.Screenshot_Manager.UI.Models;
 using Nekres.Screenshot_Manager.UI.Views;
 
@@ -26,6 +33,8 @@ namespace Nekres.Screenshot_Manager
 
 		internal static ScreenshotManagerModule ModuleInstance;
 
+		internal SettingEntry<KeyBinding> ScreenshotNormalBinding;
+
 		internal SettingEntry<bool> MuteSound;
 
 		internal SettingEntry<bool> DisableNotification;
@@ -35,6 +44,8 @@ namespace Nekres.Screenshot_Manager
 		internal SettingEntry<bool> HideCornerIcon;
 
 		internal SettingEntry<List<string>> Favorites;
+
+		internal SettingEntry<ImageFormatExt> Format;
 
 		private Texture2D _icon64;
 
@@ -46,7 +57,7 @@ namespace Nekres.Screenshot_Manager
 
 		private FileWatcherFactory _fileWatcherFactory;
 
-		public const int FileTimeOutMilliseconds = 10000;
+		public const int FILE_TIME_OUT_MILLISECONDS = 10000;
 
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
@@ -69,10 +80,17 @@ namespace Nekres.Screenshot_Manager
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			MuteSound = settings.DefineSetting<bool>("muteSound", false, (Func<string>)(() => Resources.Mute_Screenshot_Sound), (Func<string>)(() => Resources.Mutes_the_sound_alert_when_a_new_screenshot_has_been_captured_));
-			DisableNotification = settings.DefineSetting<bool>("disableNotification", false, (Func<string>)(() => Resources.Disable_Screenshot_Notification), (Func<string>)(() => Resources.Disables_the_notification_when_a_new_screenshot_has_been_captured_));
-			SendToRecycleBin = settings.DefineSetting<bool>("sendToRecycleBin", true, (Func<string>)(() => Resources.Delete_sends_to_Recycle_Bin), (Func<string>)(() => Resources.By_default__screenshots_are_sent_to_the_Recycle_Bin_so_that_they_can_be_recovered_if_needed__nWhen_this_feature_is_disabled__deleted_screenshots_are_removed_from_the_hard_disk_and_their_space_is_marked_as_overwriteable_));
-			HideCornerIcon = settings.DefineSetting<bool>("hideCornerIcon", false, (Func<string>)(() => Resources.Hide_Corner_Icon), (Func<string>)(() => Resources.Disables_the_corner_icon_in_the_navigation_menu_));
+			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c8: Expected O, but got Unknown
+			SettingCollection generalOptions = settings.AddSubCollection("general", true, false, (Func<string>)(() => Resources.General_Options));
+			HideCornerIcon = generalOptions.DefineSetting<bool>("hideCornerIcon", false, (Func<string>)(() => Resources.Hide_Corner_Icon), (Func<string>)(() => Resources.Disables_the_corner_icon_in_the_navigation_menu_));
+			SettingCollection soundOptions = settings.AddSubCollection("audio", true, false, (Func<string>)(() => Resources.Sound_Options));
+			MuteSound = soundOptions.DefineSetting<bool>("muteSound", false, (Func<string>)(() => Resources.Mute_Screenshot_Sound), (Func<string>)(() => Resources.Mutes_the_sound_alert_when_a_new_screenshot_has_been_captured_));
+			DisableNotification = soundOptions.DefineSetting<bool>("disableNotification", false, (Func<string>)(() => Resources.Disable_Screenshot_Notification), (Func<string>)(() => Resources.Disables_the_notification_when_a_new_screenshot_has_been_captured_));
+			SettingCollection screenshotOptions = settings.AddSubCollection("capture", true, false, (Func<string>)(() => Resources.Screenshot_Options));
+			ScreenshotNormalBinding = screenshotOptions.DefineSetting<KeyBinding>("normalKey", new KeyBinding((Keys)121), (Func<string>)(() => Resources.Normal), (Func<string>)(() => Resources.Take_a_normal_screenshot_));
+			Format = screenshotOptions.DefineSetting<ImageFormatExt>("imageFormat", ImageFormatExt.Png, (Func<string>)(() => Resources.Image_Format), (Func<string>)(() => Resources.Choose_your_preferred_image_format_));
+			SendToRecycleBin = screenshotOptions.DefineSetting<bool>("sendToRecycleBin", true, (Func<string>)(() => Resources.Delete_sends_to_Recycle_Bin), (Func<string>)(() => Resources.By_default__screenshots_are_sent_to_the_Recycle_Bin_so_that_they_can_be_recovered_if_needed__nWhen_this_feature_is_disabled__deleted_screenshots_are_removed_from_the_hard_disk_and_their_space_is_marked_as_overwriteable_));
 			SettingCollection selfManagedSettings = settings.AddSubCollection("ManagedSettings", false, false);
 			Favorites = selfManagedSettings.DefineSetting<List<string>>("favorites", new List<string>(), (Func<string>)null, (Func<string>)null);
 		}
@@ -129,7 +147,9 @@ namespace Nekres.Screenshot_Manager
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
+			ScreenshotNormalBinding.get_Value().set_Enabled(true);
 			HideCornerIcon.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnHideCornerIconSettingChanged);
+			ScreenshotNormalBinding.get_Value().add_Activated((EventHandler<EventArgs>)OnScreenshotNormalBindingActivated);
 			((Module)this).OnModuleLoaded(e);
 		}
 
@@ -137,9 +157,50 @@ namespace Nekres.Screenshot_Manager
 		{
 		}
 
+		private void OnScreenshotNormalBindingActivated(object o, EventArgs e)
+		{
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+			ImageFormat format;
+			string ext;
+			switch (Format.get_Value())
+			{
+			default:
+				return;
+			case ImageFormatExt.Jpeg:
+				format = ImageFormat.Jpeg;
+				ext = "jpg";
+				break;
+			case ImageFormatExt.Png:
+				format = ImageFormat.Png;
+				ext = "png";
+				break;
+			case ImageFormatExt.Bmp:
+				format = ImageFormat.Bmp;
+				ext = "bmp";
+				break;
+			}
+			string name = FileUtil.IndexedFilename(Path.Combine(DirectoryUtil.get_ScreensPath(), "gw"), ext);
+			WindowUtil.GetInnerBounds(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle(), out var bounds);
+			using Bitmap bitmap = new Bitmap(bounds.Width, bounds.Height);
+			using (Graphics g = Graphics.FromImage(bitmap))
+			{
+				g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+				g.SmoothingMode = SmoothingMode.HighQuality;
+				g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+				g.CompositingQuality = CompositingQuality.HighQuality;
+				g.CopyFromScreen(new Point(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top()), Point.Empty, new Size(((Rectangle)(ref bounds)).get_Size().X, ((Rectangle)(ref bounds)).get_Size().Y));
+			}
+			bitmap.Save(name, format);
+		}
+
 		protected override void Unload()
 		{
+			ResponsiveThumbnail.DisposeTextures();
 			HideCornerIcon.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnHideCornerIconSettingChanged);
+			ScreenshotNormalBinding.get_Value().remove_Activated((EventHandler<EventArgs>)OnScreenshotNormalBindingActivated);
 			_fileWatcherFactory.Dispose();
 			if (_moduleCornerIcon != null)
 			{
