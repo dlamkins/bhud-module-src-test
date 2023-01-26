@@ -1,6 +1,10 @@
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace Nekres.Screenshot_Manager
 {
@@ -29,6 +33,22 @@ namespace Nekres.Screenshot_Manager
 			}
 			source.Dispose();
 			return newBitmap;
+		}
+
+		public static async Task SaveOnNetworkShare(this Image image, string fileName, ImageFormat imageFormat)
+		{
+			try
+			{
+				using MemoryStream lMemoryStream = new MemoryStream();
+				image.Save(lMemoryStream, imageFormat);
+				using FileStream lFileStream = new FileStream(fileName, FileMode.Create);
+				lMemoryStream.Position = 0L;
+				await lMemoryStream.CopyToAsync(lFileStream);
+			}
+			catch (Exception ex) when (ex is ExternalException || ex is UnauthorizedAccessException || ex is IOException)
+			{
+				ScreenshotManagerModule.Logger.Warn(ex, ex.Message);
+			}
 		}
 	}
 }

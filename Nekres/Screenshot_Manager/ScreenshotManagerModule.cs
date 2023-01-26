@@ -157,12 +157,8 @@ namespace Nekres.Screenshot_Manager
 		{
 		}
 
-		private void OnScreenshotNormalBindingActivated(object o, EventArgs e)
+		private async void OnScreenshotNormalBindingActivated(object o, EventArgs e)
 		{
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
 			ImageFormat format;
 			string ext;
 			switch (Format.get_Value())
@@ -193,7 +189,7 @@ namespace Nekres.Screenshot_Manager
 				g.CompositingQuality = CompositingQuality.HighQuality;
 				g.CopyFromScreen(new Point(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top()), Point.Empty, new Size(((Rectangle)(ref bounds)).get_Size().X, ((Rectangle)(ref bounds)).get_Size().Y));
 			}
-			bitmap.Save(name, format);
+			await bitmap.SaveOnNetworkShare(name, format);
 		}
 
 		protected override void Unload()
