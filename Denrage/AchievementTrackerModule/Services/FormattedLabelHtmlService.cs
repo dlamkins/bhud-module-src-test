@@ -1,9 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Blish_HUD.Controls;
 using Blish_HUD.Modules.Managers;
 using Denrage.AchievementTrackerModule.Interfaces;
 using Denrage.AchievementTrackerModule.Libs.Achievement;
-using Denrage.AchievementTrackerModule.UserInterface.Controls.FormattedLabel;
 using HtmlAgilityPack;
 using Microsoft.Xna.Framework;
 
@@ -31,6 +32,8 @@ namespace Denrage.AchievementTrackerModule.Services
 
 		public FormattedLabelBuilder CreateLabel(string textWithHtml)
 		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Expected O, but got Unknown
 			FormattedLabelBuilder labelBuilder = new FormattedLabelBuilder();
 			foreach (HtmlNode childNode in (IEnumerable<HtmlNode>)HtmlNode.CreateNode("<div>" + textWithHtml + "</div>").ChildNodes)
 			{
@@ -63,7 +66,7 @@ namespace Denrage.AchievementTrackerModule.Services
 								if (subPage.Link == "https://wiki.guildwars2.com" + link && !inSubpages)
 								{
 									inSubpages = true;
-									yield return part3.SetLink(delegate
+									yield return part3.SetLink((Action)delegate
 									{
 										subPageInformationWindowManager.Create(subPage);
 									}).MakeUnderlined();

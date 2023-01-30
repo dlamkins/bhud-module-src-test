@@ -25,7 +25,7 @@ namespace Denrage.AchievementTrackerModule.Services
 
 		public AsyncTexture2D GetImage(string imageUrl)
 		{
-			return GetImageInternal((async () => await GeneratedExtensions.GetStreamAsync(DownloadWikiContent(imageUrl), default(CancellationToken), (HttpCompletionOption)0), imageUrl));
+			return GetImageInternal((async () => await DownloadWikiContent(imageUrl).GetStreamAsync(default(CancellationToken), (HttpCompletionOption)0), imageUrl));
 		}
 
 		public async Task<string> GetDirectImageLink(string imagePath, CancellationToken cancellationToken = default(CancellationToken))
@@ -34,7 +34,7 @@ namespace Denrage.AchievementTrackerModule.Services
 			{
 				try
 				{
-					string obj = await GeneratedExtensions.GetStringAsync(DownloadWikiContent(imagePath), cancellationToken, (HttpCompletionOption)0);
+					string obj = await DownloadWikiContent(imagePath).GetStringAsync(cancellationToken, (HttpCompletionOption)0);
 					int fillImageStartIndex = obj.IndexOf("fullImageLink");
 					int hrefStartIndex = obj.IndexOf("href=", fillImageStartIndex);
 					int linkStartIndex = obj.IndexOf("\"", hrefStartIndex) + 1;
@@ -55,7 +55,7 @@ namespace Denrage.AchievementTrackerModule.Services
 			return GetImageInternal((async delegate
 			{
 				string url = await GetDirectImageLink(imagePath);
-				return await GeneratedExtensions.GetStreamAsync(DownloadWikiContent(url), default(CancellationToken), (HttpCompletionOption)0);
+				return await DownloadWikiContent(url).GetStreamAsync(default(CancellationToken), (HttpCompletionOption)0);
 			}, imagePath));
 		}
 
@@ -101,7 +101,7 @@ namespace Denrage.AchievementTrackerModule.Services
 
 		private IFlurlRequest DownloadWikiContent(string url)
 		{
-			return GeneratedExtensions.WithHeader("https://wiki.guildwars2.com" + url, "user-agent", (object)"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36");
+			return ("https://wiki.guildwars2.com" + url).WithHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36");
 		}
 	}
 }

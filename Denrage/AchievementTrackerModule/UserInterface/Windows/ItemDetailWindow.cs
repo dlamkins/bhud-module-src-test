@@ -6,7 +6,6 @@ using Blish_HUD.Controls;
 using Blish_HUD.Modules.Managers;
 using Denrage.AchievementTrackerModule.Interfaces;
 using Denrage.AchievementTrackerModule.Libs.Achievement;
-using Denrage.AchievementTrackerModule.UserInterface.Controls.FormattedLabel;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -70,6 +69,7 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Windows
 			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ad: Expected O, but got Unknown
+			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
@@ -116,7 +116,7 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Windows
 					if (subPage.Link == "https://wiki.guildwars2.com" + link)
 					{
 						inSubpages = true;
-						itemTitlePart.SetLink(delegate
+						itemTitlePart.SetLink((Action)delegate
 						{
 							subPageInformationWindowManager.Create(subPage);
 						}).MakeUnderlined();

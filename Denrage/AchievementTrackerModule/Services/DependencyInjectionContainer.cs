@@ -67,7 +67,7 @@ namespace Denrage.AchievementTrackerModule.Services
 		public async Task InitializeAsync(SettingEntry<bool> autoSave, SettingEntry<bool> limitAchievement, CancellationToken cancellationToken = default(CancellationToken))
 		{
 			ExternalImageService = new ExternalImageService(graphicsService, logger);
-			AchievementService achievementService = (AchievementService)(AchievementService = new AchievementService(contentsManager, gw2ApiManager, logger, () => PersistanceService));
+			AchievementService achievementService = (AchievementService)(AchievementService = new AchievementService(contentsManager, gw2ApiManager, logger, directoriesManager, () => PersistanceService));
 			SubPageInformationWindowManager = new SubPageInformationWindowManager(graphicsService, contentsManager, AchievementService, () => FormattedLabelHtmlService, ExternalImageService);
 			FormattedLabelHtmlService = new FormattedLabelHtmlService(contentsManager, AchievementService, SubPageInformationWindowManager, ExternalImageService);
 			AchievementTrackerService achievementTrackerService = (AchievementTrackerService)(AchievementTrackerService = new AchievementTrackerService(logger, limitAchievement));

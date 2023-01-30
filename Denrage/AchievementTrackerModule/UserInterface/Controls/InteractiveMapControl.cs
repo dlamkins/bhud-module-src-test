@@ -161,7 +161,7 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls
 			{
 				try
 				{
-					imageStream = await GeneratedExtensions.GetStreamAsync(GeneratedExtensions.WithHeader(url, "user-agent", (object)"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"), default(CancellationToken), (HttpCompletionOption)0);
+					imageStream = await url.WithHeader("user-agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36").GetStreamAsync(default(CancellationToken), (HttpCompletionOption)0);
 					GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate(GraphicsDevice device)
 					{
 						texture.SwapTexture(TextureUtil.FromStreamPremultiplied(device, imageStream));
@@ -170,13 +170,12 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls
 				}
 				catch (Exception ex)
 				{
-					Exception innerException = ex.InnerException;
-					FlurlHttpException httpException = (FlurlHttpException)(object)((innerException is FlurlHttpException) ? innerException : null);
+					FlurlHttpException httpException = ex.InnerException as FlurlHttpException;
 					if (httpException == null)
 					{
 						throw;
 					}
-					if (!((Exception)(object)httpException).Message.Contains("404 (Not Found)"))
+					if (!httpException.Message.Contains("404 (Not Found)"))
 					{
 						throw;
 					}

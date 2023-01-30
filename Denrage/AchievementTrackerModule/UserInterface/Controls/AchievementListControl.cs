@@ -9,7 +9,6 @@ using Blish_HUD.Input;
 using Blish_HUD.Modules.Managers;
 using Denrage.AchievementTrackerModule.Interfaces;
 using Denrage.AchievementTrackerModule.Libs.Achievement;
-using Denrage.AchievementTrackerModule.UserInterface.Controls.FormattedLabel;
 using Microsoft.Xna.Framework;
 
 namespace Denrage.AchievementTrackerModule.UserInterface.Controls
@@ -30,9 +29,9 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls
 
 		private readonly List<Control> itemControls = new List<Control>();
 
-		private Denrage.AchievementTrackerModule.UserInterface.Controls.FormattedLabel.FormattedLabel gameTextLabel;
+		private FormattedLabel gameTextLabel;
 
-		private Denrage.AchievementTrackerModule.UserInterface.Controls.FormattedLabel.FormattedLabel gameHintLabel;
+		private FormattedLabel gameHintLabel;
 
 		private FlowPanel panel;
 
@@ -221,7 +220,7 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls
 				itemControl.Dispose();
 			}
 			itemControls.Clear();
-			((Panel)this).DisposeControl();
+			((FlowPanel)this).DisposeControl();
 		}
 
 		Point IAchievementControl.get_Size()

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -10,6 +11,7 @@ using Blish_HUD;
 using Blish_HUD.Modules.Managers;
 using Denrage.AchievementTrackerModule.Interfaces;
 using Denrage.AchievementTrackerModule.Libs.Achievement;
+using Flurl.Http;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
@@ -18,11 +20,29 @@ namespace Denrage.AchievementTrackerModule.Services
 {
 	public class AchievementService : IAchievementService, IDisposable
 	{
+		private const string DataVersionUrl = "https://raw.githubusercontent.com/Denrage/AchievementTrackerModule/main/data/version.txt";
+
+		private const string AchievementDataUrl = "https://raw.githubusercontent.com/Denrage/AchievementTrackerModule/main/data/achievement_data.json";
+
+		private const string AchievementTablesUrl = "https://raw.githubusercontent.com/Denrage/AchievementTrackerModule/main/data/achievement_tables.json";
+
+		private const string SubPagesUrl = "https://raw.githubusercontent.com/Denrage/AchievementTrackerModule/main/data/subPages.json";
+
+		private const string VersionFileName = "version.txt";
+
+		private const string AchievementDataFileName = "achievement_data.json";
+
+		private const string AchievementTablesFileName = "achievement_tables.json";
+
+		private const string SubPagesFileName = "subPages.json";
+
 		private readonly ContentsManager contentsManager;
 
 		private readonly Gw2ApiManager gw2ApiManager;
 
 		private readonly Logger logger;
+
+		private readonly DirectoriesManager directoriesManager;
 
 		private readonly Func<IPersistanceService> getPersistanceService;
 
@@ -172,11 +192,12 @@ namespace Denrage.AchievementTrackerModule.Services
 
 		public event Action ApiAchievementsLoaded;
 
-		public AchievementService(ContentsManager contentsManager, Gw2ApiManager gw2ApiManager, Logger logger, Func<IPersistanceService> getPersistanceService)
+		public AchievementService(ContentsManager contentsManager, Gw2ApiManager gw2ApiManager, Logger logger, DirectoriesManager directoriesManager, Func<IPersistanceService> getPersistanceService)
 		{
 			this.contentsManager = contentsManager;
 			this.gw2ApiManager = gw2ApiManager;
 			this.logger = logger;
+			this.directoriesManager = directoriesManager;
 			this.getPersistanceService = getPersistanceService;
 		}
 
@@ -225,15 +246,38 @@ namespace Denrage.AchievementTrackerModule.Services
 			};
 			try
 			{
-				using (Stream utf8Json = contentsManager.GetFileStream("achievement_data.json"))
+				string dataFolder = directoriesManager.GetFullDirectoryPath("achievement_module");
+				Directory.CreateDirectory(dataFolder);
+				bool downloadData = false;
+				if (!File.Exists(Path.Combine(dataFolder, "version.txt")) || !File.Exists(Path.Combine(dataFolder, "achievement_data.json")) || !File.Exists(Path.Combine(dataFolder, "achievement_tables.json")) || !File.Exists(Path.Combine(dataFolder, "subPages.json")))
+				{
+					downloadData = true;
+				}
+				else
+				{
+					int githubVersion = int.Parse(await "https://raw.githubusercontent.com/Denrage/AchievementTrackerModule/main/data/version.txt".GetStringAsync(cancellationToken, (HttpCompletionOption)0));
+					if (int.Parse(File.ReadAllText(Path.Combine(dataFolder, "version.txt"))) != githubVersion)
+					{
+						downloadData = true;
+					}
+				}
+				if (downloadData)
+				{
+					logger.Info("Downloading AchievementData");
+					await "https://raw.githubusercontent.com/Denrage/AchievementTrackerModule/main/data/version.txt".DownloadFileAsync(dataFolder, "version.txt");
+					await "https://raw.githubusercontent.com/Denrage/AchievementTrackerModule/main/data/achievement_data.json".DownloadFileAsync(dataFolder, "achievement_data.json");
+					await "https://raw.githubusercontent.com/Denrage/AchievementTrackerModule/main/data/achievement_tables.json".DownloadFileAsync(dataFolder, "achievement_tables.json");
+					await "https://raw.githubusercontent.com/Denrage/AchievementTrackerModule/main/data/subPages.json".DownloadFileAsync(dataFolder, "subPages.json");
+				}
+				using (FileStream utf8Json = File.Open(Path.Combine(dataFolder, "achievement_data.json"), FileMode.Open))
 				{
 					Achievements = (await JsonSerializer.DeserializeAsync<List<AchievementTableEntry>>(utf8Json, serializerOptions, cancellationToken)).AsReadOnly();
 				}
-				using (Stream utf8Json = contentsManager.GetFileStream("achievement_tables.json"))
+				using (FileStream utf8Json = File.Open(Path.Combine(dataFolder, "achievement_tables.json"), FileMode.Open))
 				{
 					AchievementDetails = (await JsonSerializer.DeserializeAsync<List<CollectionAchievementTable>>(utf8Json, serializerOptions)).AsReadOnly();
 				}
-				using Stream utf8Json = contentsManager.GetFileStream("subpages.json");
+				using FileStream utf8Json = File.Open(Path.Combine(dataFolder, "subPages.json"), FileMode.Open);
 				Subpages = (await JsonSerializer.DeserializeAsync<List<SubPageInformation>>(utf8Json, serializerOptions)).AsReadOnly();
 			}
 			catch (Exception ex)

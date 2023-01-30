@@ -8,7 +8,6 @@ using Denrage.AchievementTrackerModule.Interfaces;
 using Denrage.AchievementTrackerModule.Libs.Achievement;
 using Denrage.AchievementTrackerModule.Libs.Interfaces;
 using Denrage.AchievementTrackerModule.UserInterface.Controls;
-using Denrage.AchievementTrackerModule.UserInterface.Controls.FormattedLabel;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -59,6 +58,7 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Windows
 			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e5: Expected O, but got Unknown
+			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
@@ -121,10 +121,10 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Windows
 			val.set_ControlPadding(new Vector2(0f, 20f));
 			val.set_OuterControlPadding(new Vector2(15f, 15f));
 			FlowPanel flowPanel = val;
-			((Control)new FormattedLabelBuilder().CreatePart(subPageInformation.Title, delegate(FormattedLabelPartBuilder x)
+			((Control)new FormattedLabelBuilder().CreatePart(subPageInformation.Title, (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder x)
 			{
 				x.SetHyperLink(subPageInformation.Link).SetFontSize((FontSize)24).MakeUnderlined();
-			}).CreatePart("  ", delegate(FormattedLabelPartBuilder x)
+			}).CreatePart("  ", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder x)
 			{
 				//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 				x.SetSuffixImage(AsyncTexture2D.op_Implicit(contentsManager.GetTexture("wiki.png"))).SetSuffixImageSize(new Point(24, 24));
@@ -149,13 +149,13 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Windows
 			LocationSubPageInformation locationSubPage = subPageInformation as LocationSubPageInformation;
 			if (locationSubPage != null)
 			{
-				FormattedLabel formattedLabel = formattedLabelHtmlService.CreateLabel(locationSubPage.Statistics).AutoSizeHeight().Wrap()
+				FormattedLabel obj = formattedLabelHtmlService.CreateLabel(locationSubPage.Statistics).AutoSizeHeight().Wrap()
 					.SetWidth(((Container)panel).get_ContentRegion().Width / 2 - 5)
 					.SetHorizontalAlignment((HorizontalAlignment)1)
 					.Build();
-				((Control)formattedLabel).set_Location(new Point(labelWidth + 5, 0));
-				((Control)formattedLabel).set_Parent((Container)(object)panel);
-				statisticsControl = (Control)(object)formattedLabel;
+				((Control)obj).set_Location(new Point(labelWidth + 5, 0));
+				((Control)obj).set_Parent((Container)(object)panel);
+				statisticsControl = (Control)(object)obj;
 			}
 			Control imageControl = null;
 			IHasImage hasImage = subPageInformation as IHasImage;
@@ -194,11 +194,11 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Windows
 					((Control)formattedLabelHtmlService.CreateLabel(item2.Key).AutoSizeHeight().Wrap()
 						.SetWidth(((Container)descriptionEntryPanel).get_ContentRegion().Width / 2)
 						.Build()).set_Parent((Container)(object)descriptionEntryPanel);
-					FormattedLabel formattedLabel2 = formattedLabelHtmlService.CreateLabel(item2.Value).AutoSizeHeight().Wrap()
+					FormattedLabel obj2 = formattedLabelHtmlService.CreateLabel(item2.Value).AutoSizeHeight().Wrap()
 						.SetWidth(((Container)descriptionEntryPanel).get_ContentRegion().Width / 2)
 						.Build();
-					((Control)formattedLabel2).set_Parent((Container)(object)descriptionEntryPanel);
-					((Control)formattedLabel2).set_Location(new Point(((Container)descriptionEntryPanel).get_ContentRegion().Width / 2, 0));
+					((Control)obj2).set_Parent((Container)(object)descriptionEntryPanel);
+					((Control)obj2).set_Location(new Point(((Container)descriptionEntryPanel).get_ContentRegion().Width / 2, 0));
 				}
 				if (imageControl != null)
 				{

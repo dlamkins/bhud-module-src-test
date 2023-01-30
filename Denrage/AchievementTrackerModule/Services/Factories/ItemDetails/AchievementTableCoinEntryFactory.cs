@@ -5,7 +5,6 @@ using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Modules.Managers;
 using Denrage.AchievementTrackerModule.Libs.Achievement;
-using Denrage.AchievementTrackerModule.UserInterface.Controls.FormattedLabel;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
@@ -55,15 +54,15 @@ namespace Denrage.AchievementTrackerModule.Services.Factories.ItemDetails
 				FormattedLabelBuilder formattedLabel = new FormattedLabelBuilder();
 				if (entry.Type == CollectionAchievementTable.CollectionAchievementTableCoinEntry.TradingPostType.Sell)
 				{
-					formattedLabel.CreatePart($"{sellPrice.Item1}", delegate(FormattedLabelPartBuilder x)
+					formattedLabel.CreatePart($"{sellPrice.Item1}", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder x)
 					{
 						//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 						x.SetSuffixImage(goldTexture).SetSuffixImageSize(new Point(15, 15));
-					}).CreatePart($" {sellPrice.Item2}", delegate(FormattedLabelPartBuilder x)
+					}).CreatePart($" {sellPrice.Item2}", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder x)
 					{
 						//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 						x.SetSuffixImage(silverTexture).SetSuffixImageSize(new Point(15, 15));
-					}).CreatePart($" {sellPrice.Item3}", delegate(FormattedLabelPartBuilder x)
+					}).CreatePart($" {sellPrice.Item3}", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder x)
 					{
 						//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 						x.SetSuffixImage(copperTexture).SetSuffixImageSize(new Point(15, 15));
@@ -71,15 +70,15 @@ namespace Denrage.AchievementTrackerModule.Services.Factories.ItemDetails
 				}
 				else
 				{
-					formattedLabel.CreatePart($"{buyPrice.Item1}", delegate(FormattedLabelPartBuilder x)
+					formattedLabel.CreatePart($"{buyPrice.Item1}", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder x)
 					{
 						//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 						x.SetSuffixImage(goldTexture).SetSuffixImageSize(new Point(15, 15));
-					}).CreatePart($" {buyPrice.Item2}", delegate(FormattedLabelPartBuilder x)
+					}).CreatePart($" {buyPrice.Item2}", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder x)
 					{
 						//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 						x.SetSuffixImage(silverTexture).SetSuffixImageSize(new Point(15, 15));
-					}).CreatePart($" {buyPrice.Item3}", delegate(FormattedLabelPartBuilder x)
+					}).CreatePart($" {buyPrice.Item3}", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder x)
 					{
 						//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 						x.SetSuffixImage(copperTexture).SetSuffixImageSize(new Point(15, 15));

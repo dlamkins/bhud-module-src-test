@@ -1,7 +1,6 @@
 using Blish_HUD.Controls;
 using Denrage.AchievementTrackerModule.Interfaces;
 using Denrage.AchievementTrackerModule.Libs.Achievement;
-using Denrage.AchievementTrackerModule.UserInterface.Controls.FormattedLabel;
 using Microsoft.Xna.Framework;
 
 namespace Denrage.AchievementTrackerModule.UserInterface.Controls
@@ -14,9 +13,9 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls
 
 		private readonly StringDescription description;
 
-		private Denrage.AchievementTrackerModule.UserInterface.Controls.FormattedLabel.FormattedLabel gameTextLabel;
+		private FormattedLabel gameTextLabel;
 
-		private Denrage.AchievementTrackerModule.UserInterface.Controls.FormattedLabel.FormattedLabel gameHintLabel;
+		private FormattedLabel gameHintLabel;
 
 		public AchievementTextControl(IFormattedLabelHtmlService formattedLabelHtmlService, AchievementTableEntry achievement, StringDescription description)
 			: this()
