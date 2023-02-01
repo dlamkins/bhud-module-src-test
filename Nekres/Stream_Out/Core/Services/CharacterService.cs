@@ -114,6 +114,11 @@ namespace Nekres.Stream_Out.Core.Services
 			{
 				StreamOutModule.Logger.Warn(StreamOutModule.Instance.WebApiDown);
 			}
+			catch (RequestException val3)
+			{
+				RequestException ex = val3;
+				StreamOutModule.Logger.Error((Exception)(object)ex, ((Exception)(object)ex).Message);
+			}
 		}
 
 		private async void OnIsCommanderChanged(object o, ValueEventArgs<bool> e)
