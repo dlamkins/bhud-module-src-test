@@ -22,27 +22,35 @@ namespace Estreya.BlishHUD.LiveMap.UI.Views
 
 		private readonly Func<double> _getPosY;
 
-		public SettingsView(Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, ModuleSettings moduleSettings, Func<string> getGuildId, Func<double> getPosX, Func<double> getPosY, BitmapFont font = null)
+		private readonly Func<string> _getGlobalUrl;
+
+		private readonly Func<string> _getGuildUrl;
+
+		public SettingsView(Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, ModuleSettings moduleSettings, Func<string> getGuildId, Func<double> getPosX, Func<double> getPosY, Func<string> getGlobalUrl, Func<string> getGuildUrl, BitmapFont font = null)
 			: base(apiManager, iconState, translationState, font)
 		{
 			_moduleSettings = moduleSettings;
 			_getGuildId = getGuildId;
 			_getPosX = getPosX;
 			_getPosY = getPosY;
+			_getGlobalUrl = getGlobalUrl;
+			_getGuildUrl = getGuildUrl;
 		}
 
 		protected override void BuildView(Panel parent)
 		{
 			RenderEnumSetting<PublishType>(parent, _moduleSettings.PublishType);
 			RenderEnumSetting<PlayerFacingType>(parent, _moduleSettings.PlayerFacingType);
+			RenderBoolSetting(parent, _moduleSettings.HideCommander);
+			RenderBoolSetting(parent, _moduleSettings.StreamerModeEnabled);
 			RenderEmptyLine(parent);
 			RenderButton(parent, "Open Global Map", delegate
 			{
-				Process.Start(FormatUrlWithPositions("https://gw2map.estreya.de"));
+				Process.Start(FormatUrlWithPositions(_getGlobalUrl()));
 			});
 			RenderButton(parent, "Open Guild Map", delegate
 			{
-				string url = "https://gw2map.estreya.de/guild/{0}".FormatWith(_getGuildId());
+				string url = _getGuildUrl().FormatWith(_getGuildId());
 				Process.Start(FormatUrlWithPositions(url));
 			}, () => string.IsNullOrWhiteSpace(_getGuildId()));
 		}

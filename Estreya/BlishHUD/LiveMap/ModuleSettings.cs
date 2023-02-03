@@ -12,6 +12,10 @@ namespace Estreya.BlishHUD.LiveMap
 
 		public SettingEntry<PublishType> PublishType { get; private set; }
 
+		public SettingEntry<bool> HideCommander { get; private set; }
+
+		public SettingEntry<bool> StreamerModeEnabled { get; private set; }
+
 		public ModuleSettings(SettingCollection settings)
 			: base(settings, new KeyBinding())
 		{
@@ -20,6 +24,8 @@ namespace Estreya.BlishHUD.LiveMap
 			base.RegisterCornerIcon.set_Value(false);
 			PlayerFacingType = settings.DefineSetting<PlayerFacingType>("PlayerFacingType", Estreya.BlishHUD.LiveMap.Models.PlayerFacingType.Camera, (Func<string>)(() => "Player Facing Type"), (Func<string>)(() => "Defines the type with which your player facing gets displayed."));
 			PublishType = settings.DefineSetting<PublishType>("PublishType", Estreya.BlishHUD.LiveMap.Models.PublishType.Both, (Func<string>)(() => "Publish Type"), (Func<string>)(() => "Defines the scope where your position should be published to."));
+			HideCommander = settings.DefineSetting<bool>("HideCommander", false, (Func<string>)(() => "Hide Commander"), (Func<string>)(() => "Whether the commander tag should be hidden on the live map."));
+			StreamerModeEnabled = settings.DefineSetting<bool>("StreamerModeEnabled", false, (Func<string>)(() => "Streamer Mode Enabled"), (Func<string>)(() => "Whether the module should stop sending the position when a streaming program is detected."));
 		}
 	}
 }
