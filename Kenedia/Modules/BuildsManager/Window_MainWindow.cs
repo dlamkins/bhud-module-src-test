@@ -4,6 +4,10 @@ using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
+using Kenedia.Modules.BuildsManager.Controls;
+using Kenedia.Modules.BuildsManager.Enums;
+using Kenedia.Modules.BuildsManager.Extensions;
+using Kenedia.Modules.BuildsManager.Models;
 using Kenedia.Modules.BuildsManager.Strings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -13,48 +17,39 @@ namespace Kenedia.Modules.BuildsManager
 {
 	public class Window_MainWindow : StandardWindow
 	{
-		private Panel Templates_Panel;
+		private readonly Panel _templatesPanel;
 
-		private Container_TabbedPanel Detail_Panel;
+		private readonly Container_TabbedPanel _detailPanel;
 
-		private Control_Equipment Gear;
+		private readonly Control_Equipment _gear;
 
-		private Control_Build Build;
+		private readonly Control_Build _build;
 
-		public Control_TemplateSelection _TemplateSelection;
+		private readonly ControlTemplateSelection _templateSelection;
 
-		private Texture2D _EmptyTraitLine;
+		private readonly Texture2D _emptyTraitLine;
 
-		private Texture2D _Delete;
+		private readonly Texture2D _delete;
 
-		private Texture2D _DeleteHovered;
+		private readonly Texture2D _deleteHovered;
 
-		private Texture2D ProfessionIcon;
+		private readonly Texture2D _disclaimerBackground;
 
-		private Texture2D Disclaimer_Background;
+		private readonly SelectionPopUp _professionSelection;
 
-		private SelectionPopUp ProfessionSelection;
+		private readonly TextBox _nameBox;
 
-		private List<SelectionPopUp.SelectionEntry> _Professions;
+		private readonly Label _nameLabel;
 
-		private TextBox NameBox;
+		private readonly Control_AddButton _addButton;
 
-		private Label NameLabel;
+		private readonly BitmapFont _font;
 
-		private Control_AddButton Add_Button;
+		public readonly Control_AddButton ImportButton;
 
-		public Control_AddButton Import_Button;
+		public ControlTemplateSelection TemplateSelection;
 
-		private BitmapFont Font;
-
-		private void _TemplateSelection_TemplateChanged(object sender, TemplateChangedEvent e)
-		{
-			BuildsManager.ModuleInstance.Selected_Template = e.Template;
-			((TextInputBase)Detail_Panel.TemplateBox).set_Text(BuildsManager.ModuleInstance.Selected_Template?.Build.TemplateCode);
-			NameLabel.set_Text(e.Template.Name);
-			((Control)NameLabel).Show();
-			((Control)NameBox).Hide();
-		}
+		private List<SelectionPopUp.SelectionEntry> _professions;
 
 		public Window_MainWindow(Texture2D background, Rectangle windowRegion, Rectangle contentRegion)
 			: this(background, windowRegion, contentRegion)
@@ -114,30 +109,30 @@ namespace Kenedia.Modules.BuildsManager
 			//IL_0665: Unknown result type (might be due to invalid IL or missing references)
 			//IL_067e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_068f: Expected O, but got Unknown
-			_EmptyTraitLine = Texture2DExtension.GetRegion(BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.PlaceHolder_Traitline), 0, 0, 647, 136);
-			_Delete = BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.Delete);
-			_DeleteHovered = BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.Delete_Hovered);
-			Disclaimer_Background = Texture2DExtension.GetRegion(BuildsManager.ModuleInstance.TextureManager._Controls[9], 0, 0, 647, 136);
-			Font = GameService.Content.get_DefaultFont18();
+			_emptyTraitLine = Texture2DExtension.GetRegion(BuildsManager.s_moduleInstance.TextureManager.getControlTexture(ControlTexture.PlaceHolder_Traitline), 0, 0, 647, 136);
+			_delete = BuildsManager.s_moduleInstance.TextureManager.getControlTexture(ControlTexture.Delete);
+			_deleteHovered = BuildsManager.s_moduleInstance.TextureManager.getControlTexture(ControlTexture.Delete_Hovered);
+			_disclaimerBackground = Texture2DExtension.GetRegion(BuildsManager.s_moduleInstance.TextureManager._Controls[9], 0, 0, 647, 136);
+			_font = GameService.Content.get_DefaultFont18();
 			Panel val = new Panel();
 			((Control)val).set_Parent((Container)(object)this);
 			((Control)val).set_Location(new Point(0, 0));
 			((Control)val).set_Size(new Point(260, ((Container)this).get_ContentRegion().Height));
 			((Control)val).set_BackgroundColor(new Color(0, 0, 0, 50));
-			Templates_Panel = val;
+			_templatesPanel = val;
 			Container_TabbedPanel container_TabbedPanel = new Container_TabbedPanel();
 			((Control)container_TabbedPanel).set_Parent((Container)(object)this);
-			Rectangle localBounds = ((Control)Templates_Panel).get_LocalBounds();
+			Rectangle localBounds = ((Control)_templatesPanel).get_LocalBounds();
 			((Control)container_TabbedPanel).set_Location(new Point(((Rectangle)(ref localBounds)).get_Right(), 40));
 			int width = ((Container)this).get_ContentRegion().Width;
-			localBounds = ((Control)Templates_Panel).get_LocalBounds();
+			localBounds = ((Control)_templatesPanel).get_LocalBounds();
 			((Control)container_TabbedPanel).set_Size(new Point(width - ((Rectangle)(ref localBounds)).get_Right(), ((Container)this).get_ContentRegion().Height - 45));
-			Detail_Panel = container_TabbedPanel;
-			_Professions = new List<SelectionPopUp.SelectionEntry>();
-			ProfessionSelection = new SelectionPopUp((Container)(object)this);
-			foreach (API.Profession profession in BuildsManager.ModuleInstance.Data.Professions)
+			_detailPanel = container_TabbedPanel;
+			_professions = new List<SelectionPopUp.SelectionEntry>();
+			_professionSelection = new SelectionPopUp((Container)(object)this);
+			foreach (API.Profession profession in BuildsManager.s_moduleInstance.Data.Professions)
 			{
-				_Professions.Add(new SelectionPopUp.SelectionEntry
+				_professions.Add(new SelectionPopUp.SelectionEntry
 				{
 					Object = profession,
 					Texture = AsyncTexture2D.op_Implicit(profession.IconBig._AsyncTexture.get_Texture()),
@@ -146,292 +141,114 @@ namespace Kenedia.Modules.BuildsManager
 					ContentTextures = new List<AsyncTexture2D>()
 				});
 			}
-			ProfessionSelection.List = _Professions;
-			ProfessionSelection.Changed += ProfessionSelection_Changed;
+			_professionSelection.List = _professions;
+			_professionSelection.Changed += ProfessionSelection_Changed;
 			Control_AddButton obj = new Control_AddButton
 			{
-				Texture = BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.Import),
-				TextureHovered = BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.Import_Hovered)
+				Texture = BuildsManager.s_moduleInstance.TextureManager.getControlTexture(ControlTexture.Import),
+				TextureHovered = BuildsManager.s_moduleInstance.TextureManager.getControlTexture(ControlTexture.Import_Hovered)
 			};
-			((Control)obj).set_Parent((Container)(object)Templates_Panel);
-			obj.Text = "";
-			((Control)obj).set_Location(new Point(((Control)Templates_Panel).get_Width() - 130 - 40, 0));
+			((Control)obj).set_Parent((Container)(object)_templatesPanel);
+			obj.Text = string.Empty;
+			((Control)obj).set_Location(new Point(((Control)_templatesPanel).get_Width() - 130 - 40, 0));
 			((Control)obj).set_Size(new Point(35, 35));
-			((Control)obj).set_BasicTooltipText($"Import 'BuildPad' builds from '{BuildsManager.ModuleInstance.Paths.builds}config.ini'");
+			((Control)obj).set_BasicTooltipText($"Import 'BuildPad' builds from '{BuildsManager.s_moduleInstance.Paths.builds}config.ini'");
 			((Control)obj).set_Visible(false);
-			Import_Button = obj;
-			((Control)Import_Button).add_Click((EventHandler<MouseEventArgs>)Import_Button_Click);
+			ImportButton = obj;
+			((Control)ImportButton).add_Click((EventHandler<MouseEventArgs>)Import_Button_Click);
 			Control_AddButton control_AddButton = new Control_AddButton();
-			((Control)control_AddButton).set_Parent((Container)(object)Templates_Panel);
+			((Control)control_AddButton).set_Parent((Container)(object)_templatesPanel);
 			control_AddButton.Text = common.Create;
-			((Control)control_AddButton).set_Location(new Point(((Control)Templates_Panel).get_Width() - 130, 0));
+			((Control)control_AddButton).set_Location(new Point(((Control)_templatesPanel).get_Width() - 130, 0));
 			((Control)control_AddButton).set_Size(new Point(125, 35));
-			Add_Button = control_AddButton;
-			((Control)Add_Button).add_Click((EventHandler<MouseEventArgs>)Button_Click);
-			BuildsManager.ModuleInstance.LanguageChanged += ModuleInstance_LanguageChanged;
-			Control_TemplateSelection control_TemplateSelection = new Control_TemplateSelection((Container)(object)this);
-			((Control)control_TemplateSelection).set_Location(new Point(5, 40));
-			((Control)control_TemplateSelection).set_Parent((Container)(object)Templates_Panel);
-			_TemplateSelection = control_TemplateSelection;
-			_TemplateSelection.TemplateChanged += _TemplateSelection_TemplateChanged;
-			Container_TabbedPanel detail_Panel = Detail_Panel;
+			_addButton = control_AddButton;
+			((Control)_addButton).add_Click((EventHandler<MouseEventArgs>)Button_Click);
+			BuildsManager.s_moduleInstance.LanguageChanged += ModuleInstance_LanguageChanged;
+			ControlTemplateSelection controlTemplateSelection = new ControlTemplateSelection((Container)(object)this);
+			((Control)controlTemplateSelection).set_Location(new Point(5, 40));
+			((Control)controlTemplateSelection).set_Parent((Container)(object)_templatesPanel);
+			_templateSelection = controlTemplateSelection;
+			_templateSelection.TemplateChanged += TemplateSelection_TemplateChanged;
+			Container_TabbedPanel detailPanel = _detailPanel;
 			List<Tab> list = new List<Tab>();
 			Tab obj2 = new Tab
 			{
 				Name = common.Build,
-				Icon = BuildsManager.ModuleInstance.TextureManager.getIcon(_Icons.Template)
+				Icon = BuildsManager.s_moduleInstance.TextureManager.getIcon(Icons.Template)
 			};
 			Panel val2 = new Panel();
-			((Control)val2).set_Parent((Container)(object)Detail_Panel);
+			((Control)val2).set_Parent((Container)(object)_detailPanel);
 			((Control)val2).set_Visible(true);
 			obj2.Panel = val2;
 			list.Add(obj2);
 			Tab obj3 = new Tab
 			{
 				Name = common.Gear,
-				Icon = BuildsManager.ModuleInstance.TextureManager.getIcon(_Icons.Helmet)
+				Icon = BuildsManager.s_moduleInstance.TextureManager.getIcon(Icons.Helmet)
 			};
 			Panel val3 = new Panel();
-			((Control)val3).set_Parent((Container)(object)Detail_Panel);
+			((Control)val3).set_Parent((Container)(object)_detailPanel);
 			((Control)val3).set_Visible(false);
 			obj3.Panel = val3;
 			list.Add(obj3);
-			detail_Panel.Tabs = list;
-			Detail_Panel.SelectedTab = Detail_Panel.Tabs[0];
-			((Control)Detail_Panel.Tabs[0].Panel).add_Resized((EventHandler<ResizedEventArgs>)Panel_Resized);
-			Control_Build control_Build = new Control_Build((Container)(object)Detail_Panel.Tabs[0].Panel);
-			((Control)control_Build).set_Parent((Container)(object)Detail_Panel.Tabs[0].Panel);
-			((Control)control_Build).set_Size(((Control)Detail_Panel.Tabs[0].Panel).get_Size());
+			detailPanel.Tabs = list;
+			_detailPanel.SelectedTab = _detailPanel.Tabs[0];
+			((Control)_detailPanel.Tabs[0].Panel).add_Resized((EventHandler<ResizedEventArgs>)Panel_Resized);
+			Control_Build control_Build = new Control_Build((Container)(object)_detailPanel.Tabs[0].Panel);
+			((Control)control_Build).set_Parent((Container)(object)_detailPanel.Tabs[0].Panel);
+			((Control)control_Build).set_Size(((Control)_detailPanel.Tabs[0].Panel).get_Size());
 			control_Build.Scale = 1.0;
-			Build = control_Build;
-			Control_Equipment control_Equipment = new Control_Equipment((Container)(object)Detail_Panel.Tabs[1].Panel);
-			((Control)control_Equipment).set_Parent((Container)(object)Detail_Panel.Tabs[1].Panel);
-			((Control)control_Equipment).set_Size(((Control)Detail_Panel.Tabs[1].Panel).get_Size());
+			_build = control_Build;
+			Control_Equipment control_Equipment = new Control_Equipment((Container)(object)_detailPanel.Tabs[1].Panel);
+			((Control)control_Equipment).set_Parent((Container)(object)_detailPanel.Tabs[1].Panel);
+			((Control)control_Equipment).set_Size(((Control)_detailPanel.Tabs[1].Panel).get_Size());
 			control_Equipment.Scale = 1.0;
-			Gear = control_Equipment;
-			((TextInputBase)Detail_Panel.TemplateBox).set_Text(BuildsManager.ModuleInstance.Selected_Template?.Build.ParseBuildCode());
-			((TextInputBase)Detail_Panel.GearBox).set_Text(BuildsManager.ModuleInstance.Selected_Template?.Gear.TemplateCode);
+			_gear = control_Equipment;
+			((TextInputBase)_detailPanel.TemplateBox).set_Text(BuildsManager.s_moduleInstance.Selected_Template?.Build.ParseBuildCode());
+			((TextInputBase)_detailPanel.GearBox).set_Text(BuildsManager.s_moduleInstance.Selected_Template?.Gear.TemplateCode);
 			TextBox val4 = new TextBox();
 			((Control)val4).set_Parent((Container)(object)this);
-			((Control)val4).set_Location(new Point(((Control)Detail_Panel).get_Location().X + 5 + 32, 0));
+			((Control)val4).set_Location(new Point(((Control)_detailPanel).get_Location().X + 5 + 32, 0));
 			((Control)val4).set_Height(35);
-			((Control)val4).set_Width(((Control)Detail_Panel).get_Width() - 38 - 32 - 5);
-			((TextInputBase)val4).set_Font(Font);
+			((Control)val4).set_Width(((Control)_detailPanel).get_Width() - 38 - 32 - 5);
+			((TextInputBase)val4).set_Font(_font);
 			((Control)val4).set_Visible(false);
-			NameBox = val4;
-			NameBox.add_EnterPressed((EventHandler<EventArgs>)NameBox_TextChanged);
+			_nameBox = val4;
+			_nameBox.add_EnterPressed((EventHandler<EventArgs>)NameBox_TextChanged);
 			Label val5 = new Label();
 			val5.set_Text("A Template Name");
 			((Control)val5).set_Parent((Container)(object)this);
-			((Control)val5).set_Location(new Point(((Control)Detail_Panel).get_Location().X + 5 + 32, 0));
+			((Control)val5).set_Location(new Point(((Control)_detailPanel).get_Location().X + 5 + 32, 0));
 			((Control)val5).set_Height(35);
-			((Control)val5).set_Width(((Control)Detail_Panel).get_Width() - 38 - 32 - 5);
-			val5.set_Font(Font);
-			NameLabel = val5;
-			((Control)NameLabel).add_Click((EventHandler<MouseEventArgs>)NameLabel_Click);
-			BuildsManager.ModuleInstance.Selected_Template_Edit += Selected_Template_Edit;
-			BuildsManager.ModuleInstance.Selected_Template_Changed += ModuleInstance_Selected_Template_Changed;
-			BuildsManager.ModuleInstance.Templates_Loaded += Templates_Loaded;
-			BuildsManager.ModuleInstance.Selected_Template_Redraw += Selected_Template_Redraw;
-			Detail_Panel.TemplateBox.add_EnterPressed((EventHandler<EventArgs>)TemplateBox_EnterPressed);
-			Detail_Panel.GearBox.add_EnterPressed((EventHandler<EventArgs>)GearBox_EnterPressed);
+			((Control)val5).set_Width(((Control)_detailPanel).get_Width() - 38 - 32 - 5);
+			val5.set_Font(_font);
+			_nameLabel = val5;
+			((Control)_nameLabel).add_Click((EventHandler<MouseEventArgs>)NameLabel_Click);
+			BuildsManager.s_moduleInstance.Selected_Template_Edit += Selected_Template_Edit;
+			BuildsManager.s_moduleInstance.Selected_Template_Changed += ModuleInstance_Selected_Template_Changed;
+			BuildsManager.s_moduleInstance.Templates_Loaded += Templates_Loaded;
+			BuildsManager.s_moduleInstance.Selected_Template_Redraw += Selected_Template_Redraw;
+			_detailPanel.TemplateBox.add_EnterPressed((EventHandler<EventArgs>)TemplateBox_EnterPressed);
+			_detailPanel.GearBox.add_EnterPressed((EventHandler<EventArgs>)GearBox_EnterPressed);
 			Control.get_Input().get_Mouse().add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)GlobalClick);
 			GameService.Gw2Mumble.get_PlayerCharacter().add_NameChanged((EventHandler<ValueEventArgs<string>>)PlayerCharacter_NameChanged);
 		}
 
-		private void Panel_Resized(object sender, ResizedEventArgs e)
-		{
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-			((Control)Gear).set_Size(((Control)Detail_Panel.Tabs[0].Panel).get_Size().Add(new Point(0, -((Control)Detail_Panel.GearBox).get_Bottom() + 30)));
-		}
-
-		private void ProfessionSelection_Changed(object sender, EventArgs e)
-		{
-			if (ProfessionSelection.SelectedProfession != null)
-			{
-				Template template = new Template();
-				template.Profession = ProfessionSelection.SelectedProfession;
-				template.Build.Profession = ProfessionSelection.SelectedProfession;
-				BuildsManager.ModuleInstance.Selected_Template = template;
-				BuildsManager.ModuleInstance.Templates.Add(BuildsManager.ModuleInstance.Selected_Template);
-				BuildsManager.ModuleInstance.Selected_Template.SetChanged();
-				_TemplateSelection.RefreshList();
-				ProfessionSelection.SelectedProfession = null;
-			}
-		}
-
 		public void PlayerCharacter_NameChanged(object sender, ValueEventArgs<string> e)
 		{
-			if (BuildsManager.ModuleInstance.ShowCurrentProfession.get_Value())
+			if (BuildsManager.s_moduleInstance.ShowCurrentProfession.get_Value())
 			{
-				_TemplateSelection.SetSelection();
+				_templateSelection.SetSelection();
 			}
-		}
-
-		private void Import_Button_Click(object sender, MouseEventArgs e)
-		{
-			BuildsManager.ModuleInstance.ImportTemplates();
-			_TemplateSelection.Refresh();
-			((Control)Import_Button).Hide();
-		}
-
-		private void ModuleInstance_LanguageChanged(object sender, EventArgs e)
-		{
-			Add_Button.Text = common.Create;
-			Import_Button.Text = common.Create;
-			Detail_Panel.Tabs[0].Name = common.Build;
-			Detail_Panel.Tabs[1].Name = common.Gear;
-		}
-
-		private void GlobalClick(object sender, MouseEventArgs e)
-		{
-			if (!((Control)NameBox).get_MouseOver())
-			{
-				((Control)NameBox).set_Visible(false);
-				((Control)NameLabel).set_Visible(true);
-			}
-		}
-
-		private void Selected_Template_Redraw(object sender, EventArgs e)
-		{
-			Build.SkillBar.ApplyBuild(sender, e);
-			Gear.UpdateLayout();
-		}
-
-		private void GearBox_EnterPressed(object sender, EventArgs e)
-		{
-			GearTemplate gear = new GearTemplate(((TextInputBase)Detail_Panel.GearBox).get_Text());
-			if (gear != null)
-			{
-				BuildsManager.ModuleInstance.Selected_Template.Gear = gear;
-				BuildsManager.ModuleInstance.Selected_Template.SetChanged();
-				BuildsManager.ModuleInstance.OnSelected_Template_Redraw(null, null);
-			}
-		}
-
-		private void TemplateBox_EnterPressed(object sender, EventArgs e)
-		{
-			BuildTemplate build = new BuildTemplate(((TextInputBase)Detail_Panel.TemplateBox).get_Text());
-			if (build == null || build.Profession == null)
-			{
-				return;
-			}
-			BuildsManager.ModuleInstance.Selected_Template.Build = build;
-			BuildsManager.ModuleInstance.Selected_Template.Profession = build.Profession;
-			foreach (SpecLine spec in BuildsManager.ModuleInstance.Selected_Template.Build.SpecLines)
-			{
-				if (spec.Specialization?.Elite ?? false)
-				{
-					BuildsManager.ModuleInstance.Selected_Template.Specialization = spec.Specialization;
-					break;
-				}
-			}
-			BuildsManager.ModuleInstance.Selected_Template.SetChanged();
-			BuildsManager.ModuleInstance.OnSelected_Template_Redraw(null, null);
-		}
-
-		private void NameBox_TextChanged(object sender, EventArgs e)
-		{
-			BuildsManager.ModuleInstance.Selected_Template.Name = ((TextInputBase)NameBox).get_Text();
-			BuildsManager.ModuleInstance.Selected_Template.Save();
-			((Control)NameLabel).set_Visible(true);
-			((Control)NameBox).set_Visible(false);
-			NameLabel.set_Text(BuildsManager.ModuleInstance.Selected_Template.Name);
-			_TemplateSelection.RefreshList();
-		}
-
-		private void NameLabel_Click(object sender, MouseEventArgs e)
-		{
-			if (BuildsManager.ModuleInstance.Selected_Template?.Path != null)
-			{
-				((Control)NameLabel).set_Visible(false);
-				((Control)NameBox).set_Visible(true);
-				((TextInputBase)NameBox).set_Text(NameLabel.get_Text());
-				((TextInputBase)NameBox).set_SelectionStart(0);
-				((TextInputBase)NameBox).set_SelectionEnd(((TextInputBase)NameBox).get_Text().Length);
-				((TextInputBase)NameBox).set_Focused(true);
-			}
-		}
-
-		private void Button_Click(object sender, MouseEventArgs e)
-		{
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-			_Professions = new List<SelectionPopUp.SelectionEntry>();
-			foreach (API.Profession profession in BuildsManager.ModuleInstance.Data.Professions)
-			{
-				_Professions.Add(new SelectionPopUp.SelectionEntry
-				{
-					Object = profession,
-					Texture = AsyncTexture2D.op_Implicit(profession.IconBig._AsyncTexture.get_Texture()),
-					Header = profession.Name,
-					Content = new List<string>(),
-					ContentTextures = new List<AsyncTexture2D>()
-				});
-			}
-			ProfessionSelection.List = _Professions;
-			((Control)ProfessionSelection).Show();
-			((Control)ProfessionSelection).set_Location(((Control)Add_Button).get_Location().Add(new Point(((Control)Add_Button).get_Width() + 5, 0)));
-			ProfessionSelection.SelectionType = SelectionPopUp.selectionType.Profession;
-			ProfessionSelection.SelectionTarget = BuildsManager.ModuleInstance.Selected_Template.Profession;
-			((Control)ProfessionSelection).set_Width(175);
-			ProfessionSelection.SelectionTarget = null;
-			ProfessionSelection.List = _Professions;
-		}
-
-		private void Templates_Loaded(object sender, EventArgs e)
-		{
-			((Control)_TemplateSelection).Invalidate();
-		}
-
-		private void ModuleInstance_Selected_Template_Changed(object sender, EventArgs e)
-		{
-			NameLabel.set_Text(BuildsManager.ModuleInstance.Selected_Template.Name);
-			((TextInputBase)Detail_Panel.TemplateBox).set_Text(BuildsManager.ModuleInstance.Selected_Template.Build.TemplateCode);
-			((TextInputBase)Detail_Panel.GearBox).set_Text(BuildsManager.ModuleInstance.Selected_Template.Gear.TemplateCode);
-		}
-
-		private void Selected_Template_Edit(object sender, EventArgs e)
-		{
-			BuildsManager.ModuleInstance.Selected_Template.Specialization = null;
-			foreach (SpecLine spec in BuildsManager.ModuleInstance.Selected_Template.Build.SpecLines)
-			{
-				if (spec.Specialization?.Elite ?? false)
-				{
-					BuildsManager.ModuleInstance.Selected_Template.Specialization = spec.Specialization;
-					break;
-				}
-			}
-			((TextInputBase)Detail_Panel.TemplateBox).set_Text(BuildsManager.ModuleInstance.Selected_Template.Build.ParseBuildCode());
-			((TextInputBase)Detail_Panel.GearBox).set_Text(BuildsManager.ModuleInstance.Selected_Template?.Gear.TemplateCode);
-			_TemplateSelection.Refresh();
-		}
-
-		protected override void OnClick(MouseEventArgs e)
-		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).OnClick(e);
-			Rectangle localBounds = ((Control)Detail_Panel).get_LocalBounds();
-			Rectangle rect = default(Rectangle);
-			((Rectangle)(ref rect))._002Ector(((Rectangle)(ref localBounds)).get_Right() - 35, 44, 35, 35);
-			if (((Rectangle)(ref rect)).Contains(((Control)this).get_RelativeMousePosition()) && BuildsManager.ModuleInstance.Selected_Template.Path != null)
-			{
-				BuildsManager.ModuleInstance.Selected_Template.Delete();
-				BuildsManager.ModuleInstance.Selected_Template = new Template();
-			}
-			((Control)ProfessionSelection).Hide();
 		}
 
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
 			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 			((WindowBase2)this).PaintAfterChildren(spriteBatch, bounds);
-			_ = BuildsManager.ModuleInstance.Selected_Template;
+			using (BuildsManager.s_moduleInstance.Selected_Template)
+			{
+			}
 		}
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
@@ -501,8 +318,8 @@ namespace Kenedia.Modules.BuildsManager
 			//IL_03b3: Unknown result type (might be due to invalid IL or missing references)
 			((WindowBase2)this).PaintBeforeChildren(spriteBatch, bounds);
 			Rectangle rect = default(Rectangle);
-			((Rectangle)(ref rect))._002Ector(((Control)Detail_Panel).get_Location().X, 44, ((Control)Detail_Panel).get_Width() - 38, 35);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _EmptyTraitLine, rect, (Rectangle?)_EmptyTraitLine.get_Bounds(), new Color(135, 135, 135, 255), 0f, default(Vector2), (SpriteEffects)0);
+			((Rectangle)(ref rect))._002Ector(((Control)_detailPanel).get_Location().X, 44, ((Control)_detailPanel).get_Width() - 38, 35);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _emptyTraitLine, rect, (Rectangle?)_emptyTraitLine.get_Bounds(), new Color(135, 135, 135, 255), 0f, default(Vector2), (SpriteEffects)0);
 			Color color = Color.get_Black();
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref rect)).get_Left(), ((Rectangle)(ref rect)).get_Top(), rect.Width, 2), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref rect)).get_Left(), ((Rectangle)(ref rect)).get_Top(), rect.Width, 1), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
@@ -512,15 +329,15 @@ namespace Kenedia.Modules.BuildsManager
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref rect)).get_Left(), ((Rectangle)(ref rect)).get_Top(), 1, rect.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref rect)).get_Right() - 2, ((Rectangle)(ref rect)).get_Top(), 2, rect.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref rect)).get_Right() - 1, ((Rectangle)(ref rect)).get_Top(), 1, rect.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
-			Rectangle localBounds = ((Control)Detail_Panel).get_LocalBounds();
+			Rectangle localBounds = ((Control)_detailPanel).get_LocalBounds();
 			((Rectangle)(ref rect))._002Ector(((Rectangle)(ref localBounds)).get_Right() - 35, 44, 35, 35);
 			bool hovered = ((Rectangle)(ref rect)).Contains(((Control)this).get_RelativeMousePosition());
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, hovered ? _DeleteHovered : _Delete, rect, (Rectangle?)_Delete.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, hovered ? _deleteHovered : _delete, rect, (Rectangle?)_delete.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
 			((Control)this).set_BasicTooltipText(hovered ? (common.Delete + " " + common.Template) : null);
-			if (BuildsManager.ModuleInstance.Selected_Template.Profession != null)
+			if (BuildsManager.s_moduleInstance.Selected_Template.Profession != null)
 			{
-				Template template = BuildsManager.ModuleInstance.Selected_Template;
-				Texture2D texture = BuildsManager.ModuleInstance.TextureManager._Icons[0];
+				Template template = BuildsManager.s_moduleInstance.Selected_Template;
+				Texture2D texture = BuildsManager.s_moduleInstance.TextureManager._Icons[0];
 				if (template.Specialization != null)
 				{
 					texture = template.Specialization.ProfessionIconBig._AsyncTexture.get_Texture();
@@ -529,45 +346,236 @@ namespace Kenedia.Modules.BuildsManager
 				{
 					texture = template.Build.Profession.IconBig._AsyncTexture.get_Texture();
 				}
-				((Rectangle)(ref rect))._002Ector(((Control)Detail_Panel).get_Location().X + 2, 46, 30, 30);
+				((Rectangle)(ref rect))._002Ector(((Control)_detailPanel).get_Location().X + 2, 46, 30, 30);
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, texture, rect, (Rectangle?)texture.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
 			}
 		}
 
+		protected override void OnClick(MouseEventArgs e)
+		{
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			((WindowBase2)this).OnClick(e);
+			Rectangle localBounds = ((Control)_detailPanel).get_LocalBounds();
+			Rectangle rect = default(Rectangle);
+			((Rectangle)(ref rect))._002Ector(((Rectangle)(ref localBounds)).get_Right() - 35, 44, 35, 35);
+			if (((Rectangle)(ref rect)).Contains(((Control)this).get_RelativeMousePosition()) && BuildsManager.s_moduleInstance.Selected_Template.Path != null)
+			{
+				BuildsManager.s_moduleInstance.Selected_Template.Delete();
+				BuildsManager.s_moduleInstance.Selected_Template = new Template();
+			}
+			((Control)_professionSelection).Hide();
+		}
+
 		protected override void DisposeControl()
 		{
-			((Control)Add_Button).remove_Click((EventHandler<MouseEventArgs>)Button_Click);
-			((Control)Add_Button).Dispose();
-			BuildsManager.ModuleInstance.LanguageChanged -= ModuleInstance_LanguageChanged;
-			BuildsManager.ModuleInstance.Selected_Template_Edit -= Selected_Template_Edit;
-			BuildsManager.ModuleInstance.Selected_Template_Changed -= ModuleInstance_Selected_Template_Changed;
-			BuildsManager.ModuleInstance.Templates_Loaded -= Templates_Loaded;
-			BuildsManager.ModuleInstance.Selected_Template_Redraw -= Selected_Template_Redraw;
-			((Control)Detail_Panel.Tabs[0].Panel).remove_Resized((EventHandler<ResizedEventArgs>)Panel_Resized);
-			Detail_Panel.TemplateBox.remove_EnterPressed((EventHandler<EventArgs>)TemplateBox_EnterPressed);
-			Detail_Panel.GearBox.remove_EnterPressed((EventHandler<EventArgs>)GearBox_EnterPressed);
+			((Control)_addButton).remove_Click((EventHandler<MouseEventArgs>)Button_Click);
+			((Control)_addButton).Dispose();
+			BuildsManager.s_moduleInstance.LanguageChanged -= ModuleInstance_LanguageChanged;
+			BuildsManager.s_moduleInstance.Selected_Template_Edit -= Selected_Template_Edit;
+			BuildsManager.s_moduleInstance.Selected_Template_Changed -= ModuleInstance_Selected_Template_Changed;
+			BuildsManager.s_moduleInstance.Templates_Loaded -= Templates_Loaded;
+			BuildsManager.s_moduleInstance.Selected_Template_Redraw -= Selected_Template_Redraw;
+			((Control)_detailPanel.Tabs[0].Panel).remove_Resized((EventHandler<ResizedEventArgs>)Panel_Resized);
+			_detailPanel.TemplateBox.remove_EnterPressed((EventHandler<EventArgs>)TemplateBox_EnterPressed);
+			_detailPanel.GearBox.remove_EnterPressed((EventHandler<EventArgs>)GearBox_EnterPressed);
 			Control.get_Input().get_Mouse().remove_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)GlobalClick);
 			GameService.Gw2Mumble.get_PlayerCharacter().remove_NameChanged((EventHandler<ValueEventArgs<string>>)PlayerCharacter_NameChanged);
-			_TemplateSelection.TemplateChanged -= _TemplateSelection_TemplateChanged;
-			((Control)_TemplateSelection).Dispose();
-			NameBox.remove_EnterPressed((EventHandler<EventArgs>)NameBox_TextChanged);
-			((Control)NameBox).Dispose();
-			((Control)NameLabel).remove_Click((EventHandler<MouseEventArgs>)NameLabel_Click);
-			((Control)NameLabel).Dispose();
-			((Control)Import_Button).remove_Click((EventHandler<MouseEventArgs>)Import_Button_Click);
-			((Control)Import_Button).Dispose();
-			ProfessionSelection.Changed -= ProfessionSelection_Changed;
-			((Control)ProfessionSelection).Dispose();
+			_templateSelection.TemplateChanged -= TemplateSelection_TemplateChanged;
+			((Control)_templateSelection).Dispose();
+			_nameBox.remove_EnterPressed((EventHandler<EventArgs>)NameBox_TextChanged);
+			((Control)_nameBox).Dispose();
+			((Control)_nameLabel).remove_Click((EventHandler<MouseEventArgs>)NameLabel_Click);
+			((Control)_nameLabel).Dispose();
+			((Control)ImportButton).remove_Click((EventHandler<MouseEventArgs>)Import_Button_Click);
+			((Control)ImportButton).Dispose();
+			_professionSelection.Changed -= ProfessionSelection_Changed;
+			((Control)_professionSelection).Dispose();
 			((WindowBase2)this).DisposeControl();
 		}
 
 		protected override void OnShown(EventArgs e)
 		{
 			((Control)this).OnShown(e);
-			if (BuildsManager.ModuleInstance.ShowCurrentProfession.get_Value())
+			if (BuildsManager.s_moduleInstance.ShowCurrentProfession.get_Value())
 			{
-				_TemplateSelection.SetSelection();
+				_templateSelection.SetSelection();
 			}
+		}
+
+		private void TemplateSelection_TemplateChanged(object sender, TemplateChangedEvent e)
+		{
+			BuildsManager.s_moduleInstance.Selected_Template = e.Template;
+			((TextInputBase)_detailPanel.TemplateBox).set_Text(BuildsManager.s_moduleInstance.Selected_Template?.Build.TemplateCode);
+			_nameLabel.set_Text(e.Template.Name);
+			((Control)_nameLabel).Show();
+			((Control)_nameBox).Hide();
+		}
+
+		private void Panel_Resized(object sender, ResizedEventArgs e)
+		{
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			((Control)_gear).set_Size(((Control)_detailPanel.Tabs[0].Panel).get_Size().Add(new Point(0, -((Control)_detailPanel.GearBox).get_Bottom() + 30)));
+		}
+
+		private void ProfessionSelection_Changed(object sender, EventArgs e)
+		{
+			if (_professionSelection.SelectedProfession != null)
+			{
+				Template template = new Template
+				{
+					Profession = _professionSelection.SelectedProfession
+				};
+				template.Build.Profession = _professionSelection.SelectedProfession;
+				BuildsManager.s_moduleInstance.Selected_Template = template;
+				BuildsManager.s_moduleInstance.Templates.Add(BuildsManager.s_moduleInstance.Selected_Template);
+				BuildsManager.s_moduleInstance.Selected_Template.SetChanged();
+				_templateSelection.RefreshList();
+				_professionSelection.SelectedProfession = null;
+			}
+		}
+
+		private void Import_Button_Click(object sender, MouseEventArgs e)
+		{
+			BuildsManager.s_moduleInstance.ImportTemplates();
+			_templateSelection.Refresh();
+			((Control)ImportButton).Hide();
+		}
+
+		private void ModuleInstance_LanguageChanged(object sender, EventArgs e)
+		{
+			_addButton.Text = common.Create;
+			ImportButton.Text = common.Create;
+			_detailPanel.Tabs[0].Name = common.Build;
+			_detailPanel.Tabs[1].Name = common.Gear;
+		}
+
+		private void GlobalClick(object sender, MouseEventArgs e)
+		{
+			if (!((Control)_nameBox).get_MouseOver())
+			{
+				((Control)_nameBox).set_Visible(false);
+				((Control)_nameLabel).set_Visible(true);
+			}
+		}
+
+		private void Selected_Template_Redraw(object sender, EventArgs e)
+		{
+			_build.SkillBar.ApplyBuild(sender, e);
+			_gear.UpdateLayout();
+		}
+
+		private void GearBox_EnterPressed(object sender, EventArgs e)
+		{
+			GearTemplate gear = new GearTemplate(((TextInputBase)_detailPanel.GearBox).get_Text());
+			if (gear != null)
+			{
+				BuildsManager.s_moduleInstance.Selected_Template.Gear = gear;
+				BuildsManager.s_moduleInstance.Selected_Template.SetChanged();
+				BuildsManager.s_moduleInstance.OnSelected_Template_Redraw(null, null);
+			}
+		}
+
+		private void TemplateBox_EnterPressed(object sender, EventArgs e)
+		{
+			using BuildTemplate build = new BuildTemplate(((TextInputBase)_detailPanel.TemplateBox).get_Text());
+			if (build == null || build.Profession == null)
+			{
+				return;
+			}
+			BuildsManager.s_moduleInstance.Selected_Template.Build = build;
+			BuildsManager.s_moduleInstance.Selected_Template.Profession = build.Profession;
+			foreach (SpecLine spec in BuildsManager.s_moduleInstance.Selected_Template.Build.SpecLines)
+			{
+				if (spec.Specialization?.Elite ?? false)
+				{
+					BuildsManager.s_moduleInstance.Selected_Template.Specialization = spec.Specialization;
+					break;
+				}
+			}
+			BuildsManager.s_moduleInstance.Selected_Template.SetChanged();
+			BuildsManager.s_moduleInstance.OnSelected_Template_Redraw(null, null);
+		}
+
+		private void NameBox_TextChanged(object sender, EventArgs e)
+		{
+			BuildsManager.s_moduleInstance.Selected_Template.Name = ((TextInputBase)_nameBox).get_Text();
+			BuildsManager.s_moduleInstance.Selected_Template.Save();
+			((Control)_nameLabel).set_Visible(true);
+			((Control)_nameBox).set_Visible(false);
+			_nameLabel.set_Text(BuildsManager.s_moduleInstance.Selected_Template.Name);
+			_templateSelection.RefreshList();
+		}
+
+		private void NameLabel_Click(object sender, MouseEventArgs e)
+		{
+			if (BuildsManager.s_moduleInstance.Selected_Template?.Path != null)
+			{
+				((Control)_nameLabel).set_Visible(false);
+				((Control)_nameBox).set_Visible(true);
+				((TextInputBase)_nameBox).set_Text(_nameLabel.get_Text());
+				((TextInputBase)_nameBox).set_SelectionStart(0);
+				((TextInputBase)_nameBox).set_SelectionEnd(((TextInputBase)_nameBox).get_Text().Length);
+				((TextInputBase)_nameBox).set_Focused(true);
+			}
+		}
+
+		private void Button_Click(object sender, MouseEventArgs e)
+		{
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+			_professions = new List<SelectionPopUp.SelectionEntry>();
+			foreach (API.Profession profession in BuildsManager.s_moduleInstance.Data.Professions)
+			{
+				_professions.Add(new SelectionPopUp.SelectionEntry
+				{
+					Object = profession,
+					Texture = AsyncTexture2D.op_Implicit(profession.IconBig._AsyncTexture.get_Texture()),
+					Header = profession.Name,
+					Content = new List<string>(),
+					ContentTextures = new List<AsyncTexture2D>()
+				});
+			}
+			_professionSelection.List = _professions;
+			((Control)_professionSelection).Show();
+			((Control)_professionSelection).set_Location(((Control)_addButton).get_Location().Add(new Point(((Control)_addButton).get_Width() + 5, 0)));
+			_professionSelection.SelectionType = SelectionPopUp.selectionType.Profession;
+			_professionSelection.SelectionTarget = BuildsManager.s_moduleInstance.Selected_Template.Profession;
+			((Control)_professionSelection).set_Width(175);
+			_professionSelection.SelectionTarget = null;
+			_professionSelection.List = _professions;
+		}
+
+		private void Templates_Loaded(object sender, EventArgs e)
+		{
+			((Control)_templateSelection).Invalidate();
+		}
+
+		private void ModuleInstance_Selected_Template_Changed(object sender, EventArgs e)
+		{
+			_nameLabel.set_Text(BuildsManager.s_moduleInstance.Selected_Template.Name);
+			((TextInputBase)_detailPanel.TemplateBox).set_Text(BuildsManager.s_moduleInstance.Selected_Template.Build.TemplateCode);
+			((TextInputBase)_detailPanel.GearBox).set_Text(BuildsManager.s_moduleInstance.Selected_Template.Gear.TemplateCode);
+		}
+
+		private void Selected_Template_Edit(object sender, EventArgs e)
+		{
+			BuildsManager.s_moduleInstance.Selected_Template.Specialization = null;
+			foreach (SpecLine spec in BuildsManager.s_moduleInstance.Selected_Template.Build.SpecLines)
+			{
+				if (spec.Specialization?.Elite ?? false)
+				{
+					BuildsManager.s_moduleInstance.Selected_Template.Specialization = spec.Specialization;
+					break;
+				}
+			}
+			((TextInputBase)_detailPanel.TemplateBox).set_Text(BuildsManager.s_moduleInstance.Selected_Template.Build.ParseBuildCode());
+			((TextInputBase)_detailPanel.GearBox).set_Text(BuildsManager.s_moduleInstance.Selected_Template?.Gear.TemplateCode);
+			_templateSelection.Refresh();
 		}
 	}
 }

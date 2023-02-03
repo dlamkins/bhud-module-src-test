@@ -15,7 +15,7 @@ namespace Kenedia.Modules.BuildsManager
 
 		public class LegendaryItem
 		{
-			public class iType
+			public class LegendaryItemType
 			{
 				public bool IsUnknown;
 
@@ -24,21 +24,21 @@ namespace Kenedia.Modules.BuildsManager
 				public string RawValue;
 			}
 
-			public class iDetails
+			public class LegendaryItemDetails
 			{
 				public List<int> StatChoices;
 
-				public iType Type;
+				public LegendaryItemType Type;
 			}
 
-			public class iIcon
+			public class LegendaryItemIcon
 			{
 				public string Url;
 			}
 
-			public class iRarity
+			public class LegendaryItemRarity
 			{
-				public bool isSet;
+				public bool IsSet;
 
 				public bool IsUnknown;
 
@@ -49,65 +49,82 @@ namespace Kenedia.Modules.BuildsManager
 
 			public string Name;
 
-			public iIcon Icon;
+			public LegendaryItemIcon Icon;
 
 			public string ChatLink;
 
 			public int Id;
 
-			public iDetails Details;
+			public LegendaryItemDetails Details;
 
-			public iType Type;
+			public LegendaryItemType Type;
 
-			public iRarity Rarity;
+			public LegendaryItemRarity Rarity;
 
-			public ItemRarity __Rarity;
+			private ItemRarity _itemRarity;
 
 			public Texture2D Texture;
 
-			public ItemRarity _Rarity
+			public ItemRarity ItemRarity
 			{
 				get
 				{
-					if (Rarity.isSet)
+					//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+					//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+					//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+					//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+					//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
+					//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+					if (Rarity.IsSet)
 					{
-						return __Rarity;
+						return _itemRarity;
 					}
 					if (Rarity != null)
 					{
 						switch (Rarity.Value)
 						{
 						case 0:
-							__Rarity = ItemRarity.Unknown;
+							_itemRarity = (ItemRarity)0;
 							break;
 						case 1:
-							__Rarity = ItemRarity.Junk;
+							_itemRarity = (ItemRarity)1;
 							break;
 						case 2:
-							__Rarity = ItemRarity.Basic;
+							_itemRarity = (ItemRarity)2;
 							break;
 						case 3:
-							__Rarity = ItemRarity.Fine;
+							_itemRarity = (ItemRarity)3;
 							break;
 						case 4:
-							__Rarity = ItemRarity.Masterwork;
+							_itemRarity = (ItemRarity)4;
 							break;
 						case 5:
-							__Rarity = ItemRarity.Rare;
+							_itemRarity = (ItemRarity)5;
 							break;
 						case 6:
-							__Rarity = ItemRarity.Exotic;
+							_itemRarity = (ItemRarity)6;
 							break;
 						case 7:
-							__Rarity = ItemRarity.Ascended;
+							_itemRarity = (ItemRarity)7;
 							break;
 						case 8:
-							__Rarity = ItemRarity.Legendary;
+							_itemRarity = (ItemRarity)8;
 							break;
 						}
 					}
-					Rarity.isSet = true;
-					return __Rarity;
+					Rarity.IsSet = true;
+					return _itemRarity;
+				}
+				set
+				{
+					//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+					_itemRarity = value;
 				}
 			}
 		}

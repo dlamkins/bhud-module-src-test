@@ -7,7 +7,7 @@ namespace Kenedia.Modules.BuildsManager
 	{
 		public static void setTexture(this Image ctrl, GW2API.Item item, string path)
 		{
-			ctrl.set_Texture(AsyncTexture2D.op_Implicit(item.getIcon(path, ctrl)));
+			ctrl.set_Texture(AsyncTexture2D.op_Implicit(item.GetIcon(path, ctrl)));
 			((Control)ctrl).set_BasicTooltipText(item.Name);
 		}
 	}

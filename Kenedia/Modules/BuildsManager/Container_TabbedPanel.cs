@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
+using Kenedia.Modules.BuildsManager.Enums;
 using Kenedia.Modules.BuildsManager.Strings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -16,17 +17,17 @@ namespace Kenedia.Modules.BuildsManager
 
 		public List<Tab> Tabs = new List<Tab>();
 
-		private Texture2D _TabBarTexture;
+		private readonly Texture2D _tabBarTexture;
 
 		public TextBox TemplateBox;
 
 		public TextBox GearBox;
 
-		private Texture2D _Copy;
+		private readonly Texture2D _copy;
 
-		private Texture2D _CopyHovered;
+		private readonly Texture2D _copyHovered;
 
-		private int TabSize;
+		private int _tabSize;
 
 		public Container_TabbedPanel()
 			: this()
@@ -43,9 +44,9 @@ namespace Kenedia.Modules.BuildsManager
 			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d1: Expected O, but got Unknown
-			_TabBarTexture = BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.TabBar_FadeIn);
-			_Copy = BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.Copy);
-			_CopyHovered = BuildsManager.ModuleInstance.TextureManager.getControlTexture(_Controls.Copy_Hovered);
+			_tabBarTexture = BuildsManager.s_moduleInstance.TextureManager.getControlTexture(ControlTexture.TabBar_FadeIn);
+			_copy = BuildsManager.s_moduleInstance.TextureManager.getControlTexture(ControlTexture.Copy);
+			_copyHovered = BuildsManager.s_moduleInstance.TextureManager.getControlTexture(ControlTexture.Copy_Hovered);
 			TextBox val = new TextBox();
 			((Control)val).set_Parent((Container)(object)this);
 			((Control)val).set_Width(((Control)this).get_Width());
@@ -92,9 +93,10 @@ namespace Kenedia.Modules.BuildsManager
 		{
 			foreach (Tab tab in Tabs)
 			{
-				if (tab.Panel != null)
+				Panel panel = tab.Panel;
+				if (panel != null)
 				{
-					((Control)tab.Panel).Dispose();
+					((Control)panel).Dispose();
 				}
 			}
 			((TextInputBase)TemplateBox).remove_InputFocusChanged((EventHandler<ValueEventArgs<bool>>)TemplateBox_InputFocusChanged);
@@ -117,7 +119,7 @@ namespace Kenedia.Modules.BuildsManager
 					continue;
 				}
 				string text = ((i == 0) ? ((TextInputBase)TemplateBox).get_Text() : ((TextInputBase)GearBox).get_Text());
-				if (text != "" && text != null)
+				if (text != string.Empty && text != null)
 				{
 					try
 					{
@@ -196,7 +198,7 @@ namespace Kenedia.Modules.BuildsManager
 			//IL_019f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
 			int i = 0;
-			TabSize = ((Control)this).get_Width() / Math.Max(1, Tabs.Count);
+			_tabSize = ((Control)this).get_Width() / Math.Max(1, Tabs.Count);
 			foreach (Tab tab in Tabs)
 			{
 				if (tab.Panel != null)
@@ -218,15 +220,15 @@ namespace Kenedia.Modules.BuildsManager
 				{
 					((Control)tab.Panel).set_Location(new Point(5, ((Control)tab.Panel).get_Location().Y));
 				}
-				tab.Bounds = new Rectangle(i * TabSize, 0, TabSize, 40);
+				tab.Bounds = new Rectangle(i * _tabSize, 0, _tabSize, 40);
 				if (tab.Icon != null)
 				{
-					tab.Icon_Bounds = new Rectangle(i * TabSize + 5, 5, 30, 30);
-					tab.Text_Bounds = new Rectangle(i * TabSize + 45, 0, TabSize - 50, 40);
+					tab.Icon_Bounds = new Rectangle(i * _tabSize + 5, 5, 30, 30);
+					tab.Text_Bounds = new Rectangle(i * _tabSize + 45, 0, _tabSize - 50, 40);
 				}
 				else
 				{
-					tab.Text_Bounds = new Rectangle(i * TabSize, 0, TabSize, 40);
+					tab.Text_Bounds = new Rectangle(i * _tabSize, 0, _tabSize, 40);
 				}
 				tab.Hovered = ((Rectangle)(ref tab.Bounds)).Contains(((Control)this).get_RelativeMousePosition());
 				i++;
@@ -360,7 +362,7 @@ namespace Kenedia.Modules.BuildsManager
 			{
 				Color color2 = (Color)((SelectedTab == tab) ? new Color(30, 30, 30, 10) : (tab.Hovered ? new Color(0, 0, 0, 50) : Color.get_Transparent()));
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), tab.Bounds, (Rectangle?)tab.Bounds, color2);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _TabBarTexture, tab.Bounds, (Rectangle?)_TabBarTexture.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _tabBarTexture, tab.Bounds, (Rectangle?)_tabBarTexture.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
 				if (tab.Icon != null)
 				{
 					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, tab.Icon, tab.Icon_Bounds, (Rectangle?)tab.Icon.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
@@ -381,7 +383,7 @@ namespace Kenedia.Modules.BuildsManager
 			{
 				((Rectangle)(ref rect))._002Ector(bounds.Width - ((Control)TemplateBox).get_Height() - 6, ((Control)TemplateBox).get_LocalBounds().Y + i * (((Control)TemplateBox).get_Height() + 5), ((Control)TemplateBox).get_Height(), ((Control)TemplateBox).get_Height());
 				bool hovered = ((Rectangle)(ref rect)).Contains(((Control)this).get_RelativeMousePosition());
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, hovered ? _CopyHovered : _Copy, rect, (Rectangle?)_Copy.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, hovered ? _copyHovered : _copy, rect, (Rectangle?)_copy.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
 				((Control)this).set_BasicTooltipText(hovered ? (common.Copy + " " + common.Template) : null);
 				Color color = Color.get_Black();
 				rect = bounds;

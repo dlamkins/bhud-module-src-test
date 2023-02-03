@@ -56,7 +56,7 @@ namespace Kenedia.Modules.BuildsManager
 				if (property.PropertyType == typeof(string))
 				{
 					string path = property.GetValue(this, null).ToString();
-					if (path != null && path != "" && !Directory.Exists(path))
+					if (path != null && path != string.Empty && !Directory.Exists(path))
 					{
 						Directory.CreateDirectory(path);
 					}

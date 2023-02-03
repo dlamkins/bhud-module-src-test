@@ -53,6 +53,7 @@
   <data name="Staff"><value>Staff</value></data>
   <data name="Spear"><value>Spear</value></data>
   <data name="Power"><value>Power</value></data>
+  <data name="MyTestString"><value>This is a test phrase.</value></data>
   <data name="TemplateCode"><value>Template Code</value></data>
   <data name="Concentration"><value>Concentration</value></data>
   <data name="Ferocity"><value>Ferocity</value></data>

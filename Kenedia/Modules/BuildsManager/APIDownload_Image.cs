@@ -4,10 +4,10 @@ namespace Kenedia.Modules.BuildsManager
 	{
 		public API_Image Parent;
 
-		public string display_text = "";
+		public string Display_text = string.Empty;
 
-		public string url;
+		public string Url;
 
-		public string path;
+		public string Path;
 	}
 }

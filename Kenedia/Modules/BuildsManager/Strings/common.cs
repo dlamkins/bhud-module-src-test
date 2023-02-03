@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 
 namespace Kenedia.Modules.BuildsManager.Strings
 {
-	[GeneratedCode("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+	[GeneratedCode("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
 	[DebuggerNonUserCode]
 	[CompilerGenerated]
 	internal class common
@@ -77,6 +77,8 @@ namespace Kenedia.Modules.BuildsManager.Strings
 		internal static string Longbow => ResourceManager.GetString("Longbow", resourceCulture);
 
 		internal static string Mace => ResourceManager.GetString("Mace", resourceCulture);
+
+		internal static string MyTestString => ResourceManager.GetString("MyTestString", resourceCulture);
 
 		internal static string Pistol => ResourceManager.GetString("Pistol", resourceCulture);
 

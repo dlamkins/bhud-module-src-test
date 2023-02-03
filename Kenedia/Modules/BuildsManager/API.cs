@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
+using Kenedia.Modules.BuildsManager.Extensions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -151,12 +152,12 @@ namespace Kenedia.Modules.BuildsManager
 				{
 					//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 					//IL_0024: Expected O, but got Unknown
-					if (_Texture == null && !BuildsManager.ModuleInstance.FetchingAPI)
+					if (_Texture == null && !BuildsManager.s_moduleInstance.FetchingAPI)
 					{
 						_Texture = new AsyncTexture2D(Textures.get_TransparentPixel());
 						Task.Run(delegate
 						{
-							FileStream fs = new FileStream(BuildsManager.ModuleInstance.Paths.BasePath + Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+							FileStream fs = new FileStream(BuildsManager.s_moduleInstance.Paths.BasePath + Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 							GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate(GraphicsDevice graphicsDevice)
 							{
 								//IL_0013: Unknown result type (might be due to invalid IL or missing references)

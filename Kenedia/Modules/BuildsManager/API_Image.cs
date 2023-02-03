@@ -11,23 +11,19 @@ namespace Kenedia.Modules.BuildsManager
 
 		public string Url;
 
-		public bool fileChecked;
+		public bool FileChecked;
 
-		public bool fileFetched;
+		public bool FileFetched;
 
-		public bool fileLoaded;
+		public bool FileLoaded;
 
-		public string folderPath;
-
-		private string _iconPath;
+		public string FolderPath;
 
 		private string _fileName;
 
-		public Texture2D _Texture;
-
 		public Texture2D Texture;
 
-		public string fileName
+		public string FileName
 		{
 			get
 			{
@@ -40,11 +36,6 @@ namespace Kenedia.Modules.BuildsManager
 			}
 		}
 
-		public string iconPath => folderPath + "/" + fileName;
-
-		private bool fetchImage()
-		{
-			return false;
-		}
+		public string IconPath => FolderPath + "/" + FileName;
 	}
 }
