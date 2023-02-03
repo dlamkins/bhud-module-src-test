@@ -65,6 +65,12 @@ namespace Nekres.Stream_Out.Core.Services
 				StreamOutModule.Logger.Warn(StreamOutModule.Instance.WebApiDown);
 				return;
 			}
+			catch (RequestException val)
+			{
+				RequestException exe = val;
+				StreamOutModule.Logger.Error((Exception)(object)exe, ((Exception)(object)exe).Message);
+				return;
+			}
 			string location = map.get_Name();
 			if (map.get_Name().Equals(map.get_RegionName(), StringComparison.InvariantCultureIgnoreCase))
 			{
