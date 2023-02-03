@@ -8,19 +8,20 @@ namespace Ideka.RacingMeter
 
 		protected override bool TryMakeValue(string innerValue, out string value)
 		{
-			value = ((_validator != null) ? _validator(innerValue) : innerValue);
+			value = _validator(innerValue);
 			return value != null;
 		}
 
 		protected override bool TryMakeText(ref string value, out string text)
 		{
-			value = (text = ((_validator != null) ? _validator(value) : value));
+			value = (text = _validator(value));
 			return value != null;
 		}
 
-		public StringBox(Func<string, string> validator = null)
+		public StringBox(Func<string, string>? validator = null)
+			: base("")
 		{
-			_validator = validator;
+			_validator = validator ?? ((Func<string, string>)((string s) => s));
 		}
 	}
 }

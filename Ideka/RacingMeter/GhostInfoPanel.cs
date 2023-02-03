@@ -18,7 +18,9 @@ namespace Ideka.RacingMeter
 
 		private const int Spacing = 10;
 
-		private FullGhost _ghost;
+		private FullRace? _race;
+
+		private FullGhost? _ghost;
 
 		private readonly FlowPanel _panel;
 
@@ -32,15 +34,30 @@ namespace Ideka.RacingMeter
 
 		private readonly StandardButton _uploadGhostButton;
 
-		private readonly StandardButton _loadGhostButton;
+		private readonly StandardButton _raceGhostButton;
 
-		private CancellationTokenSource _downloadGhost;
+		private CancellationTokenSource? _downloadGhost;
 
-		private CancellationTokenSource _uploadGhost;
+		private CancellationTokenSource? _uploadGhost;
 
-		public FullRace Race { get; set; }
+		public FullRace? Race
+		{
+			get
+			{
+				return _race;
+			}
+			set
+			{
+				_race = value;
+				string raceId = Ghost?.Meta?.RaceId;
+				if (raceId != null && raceId != _race?.Meta?.Id)
+				{
+					Ghost = null;
+				}
+			}
+		}
 
-		public FullGhost Ghost
+		public FullGhost? Ghost
 		{
 			get
 			{
@@ -49,28 +66,30 @@ namespace Ideka.RacingMeter
 			set
 			{
 				_ghost = value;
-				((Control)_loadGhostButton).set_Enabled(Ghost?.Ghost != null);
+				((Control)_raceGhostButton).set_Enabled(Ghost?.Ghost != null);
 				StandardButton uploadGhostButton = _uploadGhostButton;
-				FullRace race = Race;
-				((Control)uploadGhostButton).set_Enabled(race != null && !race.IsLocal && (Ghost?.IsLocal ?? false) && !TaskUtils.IsRunning(_uploadGhost));
+				FullRace? race = Race;
+				((Control)uploadGhostButton).set_Enabled(race != null && !race!.IsLocal && (Ghost?.IsLocal ?? false) && !TaskUtils.IsRunning(_uploadGhost));
 				_ghostLoadingLabel.set_Text((string)null);
-				string time = ((Ghost?.IsLocal ?? false) ? Ghost.Ghost.Time.Formatted() : Ghost?.Meta.Time.Formatted());
+				string time = ((Ghost?.IsLocal ?? false) ? Ghost!.Ghost.Time.Formatted() : Ghost?.Meta.Time.Formatted());
 				_ghostTimeLabel.set_Text(StringExtensions.Format(Strings.GhostTimeLabel, time ?? ""));
 				string racer = ((Ghost?.IsLocal ?? false) ? Strings.GhostLocal : Ghost?.Meta.AccountName);
 				_ghostRacerLabel.set_Text(StringExtensions.Format(Strings.GhostRacerLabel, racer ?? ""));
 				((Control)_ghostRacerLabel).set_BasicTooltipText((Ghost?.IsLocal ?? false) ? Strings.GhostLocalRacerTooltip : racer);
-				string uploadedRelative = ((Ghost?.IsLocal ?? false) ? Strings.GhostLocal : ((Ghost == null) ? null : Ghost.Meta.Upload.ToRelativeDateUtc()));
+				string uploadedRelative = ((Ghost?.IsLocal ?? false) ? Strings.GhostLocal : ((Ghost == null) ? null : Ghost!.Meta.Upload.ToRelativeDateUtc()));
 				string uploaded = ((Ghost?.IsLocal ?? false) ? Strings.GhostLocal : $"{Ghost?.Meta.Upload.ToLocalTime()}");
 				_ghostUploadedLabel.set_Text(StringExtensions.Format(Strings.GhostUploadedLabel, uploadedRelative ?? ""));
 				((Control)_ghostUploadedLabel).set_BasicTooltipText((Ghost?.IsLocal ?? false) ? Strings.GhostLocalUploadedTooltip : uploaded);
-				if (Ghost != null && !Ghost.IsLocal && Ghost.Ghost == null)
+				if (Ghost != null && !Ghost!.IsLocal && Ghost!.Ghost == null)
 				{
 					DownloadGhost();
 				}
 			}
 		}
 
-		public event Action<FullGhost> GhostChanged;
+		public event Action<FullGhost>? GhostChanged;
+
+		public event Action<FullRace, FullGhost>? GhostRequested;
 
 		public GhostInfoPanel()
 			: this()
@@ -160,58 +179,65 @@ namespace Ideka.RacingMeter
 			StandardButton val7 = new StandardButton();
 			((Control)val7).set_Parent((Container)(object)this);
 			val7.set_Text(Strings.LoadGhost);
-			_loadGhostButton = val7;
+			_raceGhostButton = val7;
+			UpdateLayout();
 			((Control)_uploadGhostButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				if (!RacingModule.Server.NotifyIfOffline())
+				string text = Race?.Meta?.Id;
+				if (text != null)
 				{
-					string text = Race?.Meta?.Id;
-					FullGhost ghost = Ghost;
-					Ghost ghost2 = ghost?.Ghost;
-					if (text != null && ghost2 != null && ghost != null && ghost.IsLocal)
+					FullGhost ghost2 = Ghost;
+					if (ghost2 != null && ghost2.IsLocal)
 					{
-						UploadGhost(text, ghost2);
+						Ghost ghost3 = ghost2.Ghost;
+						if (ghost3 != null)
+						{
+							UploadGhost(text, ghost3);
+						}
 					}
 				}
 			});
-			((Control)_loadGhostButton).add_Click((EventHandler<MouseEventArgs>)delegate
+			((Control)_raceGhostButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				if (Ghost?.Ghost != null)
+				FullRace race = Race;
+				if (race != null)
 				{
-					if (RacingModule.Racer.FullRace != Race)
+					FullGhost ghost = Ghost;
+					if (ghost != null && race.Meta?.Id == ghost.Ghost.RaceId)
 					{
-						RacingModule.Racer.FullRace = Race;
+						this.GhostRequested?.Invoke(race, ghost);
 					}
-					RacingModule.Racer.FullGhost = Ghost;
-					RacingModule.Racer.SpecificGhostLoaded = true;
 				}
 			});
 			Ghost = null;
-			UpdateLayout();
 		}
 
 		private void DownloadGhost()
 		{
 			TaskUtils.Cancel(ref _downloadGhost);
-			FullGhost ghostTarget = Ghost;
-			string id = ghostTarget?.Meta.Id;
+			FullGhost target = Ghost;
+			if (target == null)
+			{
+				return;
+			}
+			string id = target.Meta?.Id;
 			if (id == null)
 			{
 				return;
 			}
-			CancellationToken ct = TaskUtils.New(ref _downloadGhost);
+			CancellationToken ct = TaskUtils.New(out _downloadGhost);
 			((Func<Task>)async delegate
 			{
 				_ghostLoadingLabel.set_Text(Strings.Loading);
-				Ghost ghost = await RacingModule.Server.GetGhost(id, ct);
-				ghostTarget.Ghost = ghost;
-				if (Ghost == ghostTarget)
+				FullGhost fullGhost = target;
+				fullGhost.Ghost = await RacingModule.Server.GetGhost(id, ct);
+				if (Ghost == target)
 				{
-					this.GhostChanged?.Invoke(ghostTarget);
+					this.GhostChanged?.Invoke(target);
 				}
 			})().Done(Logger, Strings.ErrorGhostLoad, _downloadGhost).ContinueWith(delegate(Task<TaskUtils.TaskState> task)
 			{
-				if (Ghost == ghostTarget)
+				if (Ghost == target)
 				{
 					_ghostLoadingLabel.set_Text(task.Result.Canceled ? Strings.Loading : (task.Result.Faulted ? Strings.ErrorGhostLoad : null));
 				}
@@ -220,9 +246,11 @@ namespace Ideka.RacingMeter
 
 		private void UploadGhost(string raceId, Ghost ghost)
 		{
+			string raceId2 = raceId;
+			Ghost ghost2 = ghost;
 			TaskUtils.Cancel(ref _uploadGhost);
 			((Control)_uploadGhostButton).set_Enabled(false);
-			CancellationToken ct = TaskUtils.New(ref _uploadGhost);
+			CancellationToken ct = TaskUtils.New(out _uploadGhost);
 			((Func<Task>)async delegate
 			{
 				UserData user = RacingModule.Server.User;
@@ -232,16 +260,16 @@ namespace Ideka.RacingMeter
 				}
 				else
 				{
-					if (RacingModule.Server.Leaderboards.Boards.TryGetValue(raceId, out var board))
+					if (RacingModule.Server.Leaderboards.Boards.TryGetValue(raceId2, out var board))
 					{
 						MetaGhost current = board.Places.Values.FirstOrDefault((MetaGhost p) => p.UserId == user.AccountId);
-						if (current != null && current.Time <= ghost.Time)
+						if (current != null && current.Time <= ghost2.Time)
 						{
 							ScreenNotification.ShowNotification(Strings.NotifyGhostAlreadyBetter, (NotificationType)2, (Texture2D)null, 4);
 							return;
 						}
 					}
-					await RacingModule.Server.UploadGhost(raceId, ghost, ct);
+					await RacingModule.Server.UploadGhost(raceId2, ghost2, ct);
 				}
 			})().Done(Logger, Strings.ErrorGhostUpload, _uploadGhost).ContinueWith(delegate
 			{
@@ -264,13 +292,13 @@ namespace Ideka.RacingMeter
 			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
 			if (_panel != null)
 			{
-				((Control)_loadGhostButton).set_Bottom(((Container)this).get_ContentRegion().Height);
-				((Control)_loadGhostButton).set_Right(((Control)_panel).get_Left() + ((Control)_panel).get_Width() / 2);
+				((Control)_raceGhostButton).set_Bottom(((Container)this).get_ContentRegion().Height);
+				((Control)_raceGhostButton).set_Right(((Control)_panel).get_Left() + ((Control)_panel).get_Width() / 2);
 				((Control)_uploadGhostButton).set_Bottom(((Container)this).get_ContentRegion().Height);
 				((Control)_uploadGhostButton).set_Left(((Control)_panel).get_Left() + ((Control)_panel).get_Width() / 2);
 				((Control)_panel).set_Location(Point.get_Zero());
 				((Control)_panel).set_Width(((Container)this).get_ContentRegion().Width);
-				((Control)_panel).set_Height(((Container)this).get_ContentRegion().Height - ((Control)_loadGhostButton).get_Height() - 10);
+				((Control)_panel).set_Height(((Container)this).get_ContentRegion().Height - ((Control)_raceGhostButton).get_Height() - 10);
 			}
 		}
 	}

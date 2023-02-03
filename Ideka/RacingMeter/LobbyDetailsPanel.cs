@@ -40,6 +40,21 @@ namespace Ideka.RacingMeter
 			stringBox.Label = "Lobby ID";
 			stringBox.ControlEnabled = false;
 			_idBox = stringBox;
+			RacingServer server = Server;
+			IntBox intBox = new IntBox();
+			((Control)intBox).set_Parent((Container)(object)this);
+			intBox.Label = "Max Users";
+			intBox.MinValue = 2;
+			intBox.MaxValue = 50;
+			_sizeBox = server.Register<IntBox>(intBox);
+			RacingServer server2 = Server;
+			IntBox intBox2 = new IntBox();
+			((Control)intBox2).set_Parent((Container)(object)this);
+			intBox2.Label = "Race Laps";
+			intBox2.MinValue = 1;
+			intBox2.MaxValue = 50;
+			_lapsBox = server2.Register<IntBox>(intBox2);
+			UpdateLayout();
 			((Control)_idBox).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				if (!string.IsNullOrEmpty(_idBox.Value))
@@ -48,13 +63,6 @@ namespace Ideka.RacingMeter
 					ScreenNotification.ShowNotification("Copied!", (NotificationType)0, (Texture2D)null, 4);
 				}
 			});
-			RacingServer server = Server;
-			IntBox intBox = new IntBox();
-			((Control)intBox).set_Parent((Container)(object)this);
-			intBox.Label = "Max Users";
-			intBox.MinValue = 2;
-			intBox.MaxValue = 50;
-			_sizeBox = server.Register<IntBox>(intBox);
 			_sizeBox.ValueCommitted += async delegate
 			{
 				Lobby lobby2 = Client.Lobby;
@@ -68,13 +76,6 @@ namespace Ideka.RacingMeter
 					}
 				}
 			};
-			RacingServer server2 = Server;
-			IntBox intBox2 = new IntBox();
-			((Control)intBox2).set_Parent((Container)(object)this);
-			intBox2.Label = "Race Laps";
-			intBox2.MinValue = 1;
-			intBox2.MaxValue = 50;
-			_lapsBox = server2.Register<IntBox>(intBox2);
 			_lapsBox.ValueCommitted += async delegate
 			{
 				Lobby lobby = Client.Lobby;
@@ -88,12 +89,11 @@ namespace Ideka.RacingMeter
 					}
 				}
 			};
-			Client.LobbyChanged += LobbyChanged;
-			Client.LobbySettingsUpdated += LobbySettingsUpdated;
-			UpdateLayout();
+			Client.LobbyChanged += new Action<Lobby>(LobbyChanged);
+			Client.LobbySettingsUpdated += new Action<Lobby>(LobbySettingsUpdated);
 		}
 
-		private void LobbyChanged(Lobby lobby)
+		private void LobbyChanged(Lobby? lobby)
 		{
 			_idBox.Value = lobby?.Id ?? "";
 			_idBox.AllBasicTooltipText = ((lobby == null) ? null : "Click to copy");
@@ -101,7 +101,7 @@ namespace Ideka.RacingMeter
 			_lapsBox.Value = lobby?.Settings.Laps ?? 0;
 		}
 
-		private void LobbySettingsUpdated(Lobby lobby)
+		private void LobbySettingsUpdated(Lobby? lobby)
 		{
 			_sizeBox.Value = lobby?.Settings.Size ?? 0;
 			_lapsBox.Value = lobby?.Settings.Laps ?? 0;
@@ -127,9 +127,9 @@ namespace Ideka.RacingMeter
 
 		protected override void DisposeControl()
 		{
-			Client.LobbyChanged -= LobbyChanged;
-			Client.LobbySettingsUpdated -= LobbySettingsUpdated;
-			((Panel)this).DisposeControl();
+			Client.LobbyChanged -= new Action<Lobby>(LobbyChanged);
+			Client.LobbySettingsUpdated -= new Action<Lobby>(LobbySettingsUpdated);
+			((FlowPanel)this).DisposeControl();
 		}
 	}
 }

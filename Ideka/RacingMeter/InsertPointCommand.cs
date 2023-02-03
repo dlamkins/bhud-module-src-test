@@ -8,7 +8,7 @@ namespace Ideka.RacingMeter
 
 		private readonly RacePoint _insert;
 
-		private RacePoint _prevSelected;
+		private RacePoint? _prevSelected;
 
 		public bool Modifying => true;
 

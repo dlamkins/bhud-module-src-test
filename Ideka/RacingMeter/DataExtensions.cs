@@ -6,12 +6,12 @@ namespace Ideka.RacingMeter
 {
 	internal static class DataExtensions
 	{
-		public static string Describe(this FullRace race)
+		public static string? Describe(this FullRace race)
 		{
 			return race?.Race.Name;
 		}
 
-		public static string Describe(this FullGhost ghost, bool shortVersion = false)
+		public static string? Describe(this FullGhost ghost, bool shortVersion = false)
 		{
 			if (ghost != null)
 			{
@@ -28,7 +28,7 @@ namespace Ideka.RacingMeter
 			return null;
 		}
 
-		public static string Describe(this RaceType type)
+		public static string? Describe(this RaceType type)
 		{
 			return type switch
 			{
@@ -38,7 +38,7 @@ namespace Ideka.RacingMeter
 			};
 		}
 
-		public static string Describe(this RacePointType type)
+		public static string? Describe(this RacePointType type)
 		{
 			return type switch
 			{

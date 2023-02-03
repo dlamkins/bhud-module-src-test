@@ -22,12 +22,12 @@ namespace Ideka.RacingMeter
 			throw base.InnerException;
 		}
 
-		public static void Report(Logger logger, string message, FriendlyError error, Exception outer = null)
+		public static void Report(Logger logger, string? message, FriendlyError error, Exception? outer = null)
 		{
 			Report(logger, outer ?? error, message, error.Message);
 		}
 
-		public static void Report(Logger logger, string message, AggregateException outer)
+		public static void Report(Logger logger, string? message, AggregateException outer)
 		{
 			FriendlyError error = outer?.InnerException as FriendlyError;
 			if (error != null)
@@ -40,7 +40,7 @@ namespace Ideka.RacingMeter
 			}
 		}
 
-		public static void Report(Logger logger, string message, Exception exception)
+		public static void Report(Logger logger, string? message, Exception? exception)
 		{
 			FriendlyError error = exception as FriendlyError;
 			if (error != null)
@@ -59,22 +59,24 @@ namespace Ideka.RacingMeter
 			}
 		}
 
-		private static void Report(Logger logger, Exception exception, string message, string errorMessage)
+		private static void Report(Logger logger, Exception? exception, string? message, string? errorMessage)
 		{
-			if (message != null)
+			string message2 = message;
+			string errorMessage2 = errorMessage;
+			if (message2 != null)
 			{
 				GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
 				{
-					ScreenNotification.ShowNotification(string.Format(Strings.ErrorFormat, message, errorMessage ?? Strings.ExceptionGeneric), (NotificationType)2, (Texture2D)null, 4);
+					ScreenNotification.ShowNotification(string.Format(Strings.ErrorFormat, message2, errorMessage2 ?? Strings.ExceptionGeneric), (NotificationType)2, (Texture2D)null, 4);
 				});
 			}
-			if (errorMessage == null)
+			if (errorMessage2 == null)
 			{
-				logger.Error(exception, message);
+				logger.Error(exception, message2);
 			}
 			else
 			{
-				logger.Warn(exception, message ?? errorMessage);
+				logger.Warn(exception, message2 ?? errorMessage2);
 			}
 		}
 	}

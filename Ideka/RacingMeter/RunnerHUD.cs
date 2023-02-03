@@ -9,11 +9,15 @@ using MonoGame.Extended.BitmapFonts;
 
 namespace Ideka.RacingMeter
 {
-	public static class RunnerUI
+	public class RunnerHUD : RectAnchor, IDisposable
 	{
-		public static RectAnchor Construct(RaceRunner racer)
+		private readonly DisposableCollection _dc = new DisposableCollection();
+
+		public RunnerHUD(RaceRunner racer)
 		{
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+			RaceRunner racer2 = racer;
+			base._002Ector();
 			RectAnchor rect = new RectAnchor();
 			RectAnchor inner = rect.AddChild(new RectAnchor());
 			inner.AddChild(new SimpleRectangle
@@ -28,27 +32,27 @@ namespace Ideka.RacingMeter
 			SizedTextLabel raceAuthor = addLine(GameService.Content.get_DefaultFont12());
 			addLine().WithUpdate(delegate(SizedTextLabel x)
 			{
-				x.Text = Strings.CheckpointLabel.Format(racer.CurrentStep, racer.Checkpoints.Count);
+				x.Text = Strings.CheckpointLabel.Format(racer2.PassedPoints, racer2.Checkpoints.Count);
 			});
 			addLine().WithUpdate(delegate(SizedTextLabel x)
 			{
-				x.Text = $"{racer.Progress:P2}";
+				x.Text = $"{racer2.Progress:P2}";
 			}).With(delegate(SizedTextLabel x)
 			{
 				x.SuffixModel = $"{0.99:P2}";
 			});
 			addLine(GameService.Content.get_DefaultFont32()).WithUpdate(delegate(SizedTextLabel x)
 			{
-				if (racer.RaceTime != TimeSpan.Zero)
+				if (racer2.RaceTime != TimeSpan.Zero)
 				{
-					current = racer.RaceTime;
+					current = racer2.RaceTime;
 				}
 				x.Text = current.Formatted();
 			}).With(delegate(SizedTextLabel x)
 			{
 				x.SuffixModel = TimeSpan.Zero.Formatted();
 			});
-			if (racer.IsTesting)
+			if (racer2.IsTesting)
 			{
 				addLine().With(delegate(SizedTextLabel x)
 				{
@@ -66,50 +70,48 @@ namespace Ideka.RacingMeter
 					x.Text = StringExtensions.Format(Strings.BestLabel, best.Formatted());
 				});
 			}
-			racer.RaceLoaded += delegate
+			racer2.RaceLoaded += delegate(FullRace? race)
 			{
 				current = (best = (last = TimeSpan.Zero));
-				raceName.Text = racer.Race?.Name;
-				SizedTextLabel sizedTextLabel = raceAuthor;
-				FullRace fullRace = racer.FullRace;
-				sizedTextLabel.Text = ((fullRace != null && !fullRace.IsLocal) ? StringExtensions.Format(Strings.ByInfo, racer.FullRace.Meta.AuthorName) : null);
+				raceName.Text = race?.Race?.Name ?? "";
+				raceAuthor.Text = ((race != null && !race!.IsLocal) ? StringExtensions.Format(Strings.ByInfo, race!.Meta.AuthorName) : "");
 			};
-			racer.RaceStarted += delegate
+			racer2.RaceStarted += delegate
 			{
 				current = TimeSpan.Zero;
 			};
-			racer.RaceFinished += delegate(Race _, TimeSpan time)
+			racer2.RaceFinished += delegate(Race _, Ghost ghost)
 			{
-				ScreenNotification.ShowNotification(StringExtensions.Format(Strings.FinishTimeLabel, time.Formatted()), (NotificationType)0, (Texture2D)null, 4);
-				current = (last = time);
-				if (time < best || best == TimeSpan.Zero)
+				ScreenNotification.ShowNotification(StringExtensions.Format(Strings.FinishTimeLabel, ghost.Time.Formatted()), (NotificationType)0, (Texture2D)null, 4);
+				current = (last = ghost.Time);
+				if (ghost.Time < best || best == TimeSpan.Zero)
 				{
-					best = time;
+					best = ghost.Time;
 				}
 			};
-			racer.RaceCancelled += delegate
+			racer2.RaceCancelled += delegate
 			{
 				current = TimeSpan.Zero;
 			};
-			SizedTextLabel ghost = addLine();
-			racer.GhostLoaded += delegate(FullGhost fullGhost)
+			SizedTextLabel ghost2 = addLine();
+			racer2.GhostLoaded += delegate(FullGhost? fullGhost)
 			{
-				string text = fullGhost.Describe();
-				ghost.Text = ((text != null) ? StringExtensions.Format(Strings.GhostLabel, text) : null);
+				string text = fullGhost?.Describe() ?? null;
+				ghost2.Text = ((text != null) ? StringExtensions.Format(Strings.GhostLabel, text) : "");
 			};
-			RacingModule.Settings.RacerAnchorX.OnChangedAndNow(delegate(float v)
+			_dc.Add(RacingModule.Settings.RacerAnchorX.OnChangedAndNow(delegate(float v)
 			{
 				//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 				inner.Anchor = new Vector2(v, inner.AnchorMin.Y);
-			});
-			RacingModule.Settings.RacerAnchorY.OnChangedAndNow(delegate(float v)
+			}));
+			_dc.Add(RacingModule.Settings.RacerAnchorY.OnChangedAndNow(delegate(float v)
 			{
 				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 				inner.Anchor = new Vector2(inner.AnchorMin.X, v);
-			});
-			RacingModule.Settings.RacerHAlignment.OnChangedAndNow(delegate(RacingSettings.HorizontalAlignment v)
+			}));
+			_dc.Add(RacingModule.Settings.RacerHAlignment.OnChangedAndNow(delegate(RacingSettings.HorizontalAlignment v)
 			{
 				//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 				//IL_002f: Unknown result type (might be due to invalid IL or missing references)
@@ -121,15 +123,14 @@ namespace Ideka.RacingMeter
 				{
 					Vector2 val3 = (current2.Anchor = (current2.Pivot = new Vector2(num, current2.Pivot.Y)));
 				}
-			});
-			RacingModule.Settings.RacerVAlignment.OnChangedAndNow(delegate(RacingSettings.VerticalAlignment v)
+			}));
+			_dc.Add(RacingModule.Settings.RacerVAlignment.OnChangedAndNow(delegate(RacingSettings.VerticalAlignment v)
 			{
 				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 				//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 				inner.Pivot = new Vector2(inner.Pivot.X, RacingSettings.AlignmentPercentage(v));
-			});
-			return rect;
-			SizedTextLabel addLine(BitmapFont font = null)
+			}));
+			SizedTextLabel addLine(BitmapFont? font = null)
 			{
 				//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0021: Unknown result type (might be due to invalid IL or missing references)
@@ -149,6 +150,11 @@ namespace Ideka.RacingMeter
 				inner.SizeDelta = new Vector2(0f, inner.SizeDelta.Y + line.SizeDelta.Y);
 				return line;
 			}
+		}
+
+		public void Dispose()
+		{
+			_dc.Dispose();
 		}
 	}
 }

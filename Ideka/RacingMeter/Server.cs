@@ -4,11 +4,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Blish_HUD.Controls;
 using Ideka.NetCommon;
 using Ideka.RacingMeter.Lib;
 using Ideka.RacingMeter.Lib.Server;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Ideka.RacingMeter
 {
@@ -22,9 +20,9 @@ namespace Ideka.RacingMeter
 			Faulted
 		}
 
-		private readonly HttpClient _client;
+		private readonly HttpClient _client = new HttpClient();
 
-		private readonly ConcurrentDictionary<string, Ghost> _ghostCache;
+		private readonly ConcurrentDictionary<string, Ghost> _ghostCache = new ConcurrentDictionary<string, Ghost>();
 
 		private readonly CallCheckVersion _checkVersion = new CallCheckVersion
 		{
@@ -55,48 +53,53 @@ namespace Ideka.RacingMeter
 
 		public bool IsOnline => Online == OnlineStatus.Yes;
 
-		public UserData User { get; } = new UserData();
-
+		public UserData User { get; }
 
 		public RemoteRaces RemoteRaces { get; }
 
 		public Leaderboards Leaderboards { get; }
 
-		public event Action<UserData> UserChanged;
+		public event Action<OnlineStatus>? StatusChanged;
 
-		public event Action<RemoteRaces> RemoteRacesChanged;
+		public event Action<UserData>? UserChanged;
 
-		public event Action<string> LeaderboardsChanged;
+		public event Action<RemoteRaces>? RemoteRacesChanged;
+
+		public event Action<string>? LeaderboardsChanged;
 
 		public Server()
 		{
-			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c8: Expected O, but got Unknown
-			RemoteRaces = RemoteRaces.FromCache(RacingModule.RaceCachePath);
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000b: Expected O, but got Unknown
+			User = new UserData();
+			RemoteRaces = Ideka.RacingMeter.RemoteRaces.FromCache(RacingModule.RaceCachePath);
 			Leaderboards = new Leaderboards();
-			_client = new HttpClient();
-			_ghostCache = new ConcurrentDictionary<string, Ghost>();
 		}
 
-		public bool NotifyIfOffline()
+		private void AssertOnline()
 		{
-			if (!IsOnline)
+			switch (Online)
 			{
-				ScreenNotification.ShowNotification(Strings.NotifyOfflineMode, (NotificationType)2, (Texture2D)null, 4);
+			case OnlineStatus.Unchecked:
+				throw FriendlyError.Create(new Exception(Strings.ExceptionStillConnecting));
+			case OnlineStatus.No:
+			case OnlineStatus.Faulted:
+				throw FriendlyError.Create(new Exception(Strings.ExceptionOfflineMode));
+			case OnlineStatus.Yes:
+				break;
 			}
-			return !IsOnline;
 		}
 
 		public async Task RefreshUser(CancellationToken ct = default(CancellationToken))
 		{
-			string prevAccountId = User?.AccountId;
+			string prevAccountId = User.AccountId;
 			try
 			{
 				await User.Refresh(ct);
 			}
 			finally
 			{
-				if (prevAccountId != User?.AccountId)
+				if (prevAccountId != User.AccountId)
 				{
 					this.UserChanged?.Invoke(User);
 				}
@@ -105,6 +108,7 @@ namespace Ideka.RacingMeter
 
 		public async Task CheckVersion(string version, CancellationToken ct = default(CancellationToken))
 		{
+			OnlineStatus oldStatus = Online;
 			try
 			{
 				Online = ((await _checkVersion.Call(_client, new CallCheckVersion.Req
@@ -117,10 +121,18 @@ namespace Ideka.RacingMeter
 				Online = OnlineStatus.Faulted;
 				throw ex;
 			}
+			finally
+			{
+				if (Online != oldStatus)
+				{
+					this.StatusChanged?.Invoke(Online);
+				}
+			}
 		}
 
 		public async Task UpdateRaces(bool force = false, CancellationToken ct = default(CancellationToken))
 		{
+			AssertOnline();
 			try
 			{
 				this.RemoteRacesChanged?.Invoke(new RemoteRaces());
@@ -128,7 +140,7 @@ namespace Ideka.RacingMeter
 				{
 					LastUpdate = ((!force && RemoteRaces.Races.Any()) ? RemoteRaces.Races.Values.Max((FullRace r) => r.Race.Modified) : DateTimeOffset.FromUnixTimeSeconds(0L).UtcDateTime)
 				}, ct);
-				RemoteRaces.Races.MergeOverwrite(res.Races);
+				RemoteRaces.Races.MergeOverwrite<string, FullRace>(res.Races);
 				RemoteRaces.ToCache(RacingModule.RaceCachePath);
 			}
 			finally
@@ -139,6 +151,7 @@ namespace Ideka.RacingMeter
 
 		public async Task UpdateLeaderboard(string raceId, CancellationToken ct = default(CancellationToken))
 		{
+			AssertOnline();
 			try
 			{
 				await RefreshUser(ct);
@@ -157,6 +170,7 @@ namespace Ideka.RacingMeter
 
 		public async Task<Ghost> GetGhost(string ghostId, CancellationToken ct = default(CancellationToken))
 		{
+			AssertOnline();
 			if (_ghostCache.TryGetValue(ghostId, out var ghost))
 			{
 				return ghost;
@@ -171,6 +185,7 @@ namespace Ideka.RacingMeter
 
 		public async Task UploadGhost(string raceId, Ghost ghost, CancellationToken ct = default(CancellationToken))
 		{
+			AssertOnline();
 			await RefreshUser(ct);
 			await _uploadGhost.Call(_client, User?.AccessToken, new CallUploadGhost.Req
 			{

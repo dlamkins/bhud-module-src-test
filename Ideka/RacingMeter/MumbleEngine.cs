@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Gw2Sharp.Models;
+using Ideka.NetCommon;
 
 namespace Ideka.RacingMeter
 {
@@ -15,29 +16,30 @@ namespace Ideka.RacingMeter
 
 		public readonly DropOutStack<int> TickHealth = new DropOutStack<int>(50);
 
+		private readonly DisposableCollection _dc = new DisposableCollection();
+
 		private int _lastTick;
 
 		private TimeSpan _lastMovementTime = TimeSpan.Zero;
 
 		private Coordinates3 _lastPosition;
 
-		private readonly CancellationTokenSource _ct;
+		private readonly CancellationTokenSource _ct = new CancellationTokenSource();
 
 		private TimeSpan _delay;
 
 		public bool Disposed { get; private set; }
 
-		public event Action<TimeSpan> FrameTick;
+		public event Action<TimeSpan>? FrameTick;
 
-		public event Action<TimeSpan, TimeSpan> PositionTick;
+		public event Action<TimeSpan, TimeSpan>? PositionTick;
 
 		public MumbleEngine()
 		{
-			RacingModule.Settings.MumblePollingRate.OnChangedAndNow(delegate(int value)
+			_dc.Add(RacingModule.Settings.MumblePollingRate.OnChangedAndNow(delegate(int value)
 			{
 				_delay = TimeSpan.FromSeconds(1.0 / (double)value);
-			});
-			_ct = new CancellationTokenSource();
+			}));
 			Loop(_ct.Token);
 		}
 
@@ -87,7 +89,8 @@ namespace Ideka.RacingMeter
 
 		public void Dispose()
 		{
-			_ct?.Cancel();
+			_dc.Dispose();
+			_ct.Cancel();
 		}
 	}
 }

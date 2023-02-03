@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Controls;
+using Ideka.BHUDCommon;
 using Ideka.NetCommon;
 using Ideka.RacingMeter.Lib;
 using Microsoft.Xna.Framework;
@@ -11,11 +12,12 @@ using MonoGame.Extended;
 
 namespace Ideka.RacingMeter
 {
-	public class RaceEditor : RaceHolder
+	public class RaceEditor : RaceDrawerWorld
 	{
 		public class RawPoint
 		{
-			public string Type { get; set; }
+			public string Type { get; set; } = "";
+
 
 			public double X { get; set; }
 
@@ -26,17 +28,19 @@ namespace Ideka.RacingMeter
 			public Vector3 Position => new Vector3((float)X, (float)Y, (float)Z);
 		}
 
-		private BasicEffect _effect;
+		private bool _disposed;
 
-		private readonly CommandList _commands;
+		private BasicEffect? _effect;
 
 		private readonly EditState _state;
 
+		private readonly CommandList _commands;
+
 		private readonly Dictionary<string, RawPoint> _rawPoints = new Dictionary<string, RawPoint>();
 
-		private (RacePoint point, RacePoint preview) _pointPreview = (null, new RacePoint());
+		private (RacePoint? point, RacePoint preview) _pointPreview = (null, new RacePoint());
 
-		public override FullRace FullRace
+		public FullRace FullRace
 		{
 			get
 			{
@@ -48,9 +52,13 @@ namespace Ideka.RacingMeter
 			}
 		}
 
+		public override Race Race => FullRace.Race;
+
+		public MeasurerRealtime Measurer { get; }
+
 		public bool Draw300InGuide { get; set; }
 
-		public RacePoint Selected => _state.Selected;
+		public RacePoint? Selected => _state.Selected;
 
 		public bool CanUndo => _commands.CanUndo;
 
@@ -166,80 +174,69 @@ namespace Ideka.RacingMeter
 			}
 		}
 
-		public event Action LocalRacesChanged;
+		public event Action<int>? TestRequested;
 
-		public RaceEditor(CommandList commands)
+		public RaceEditor(MeasurerRealtime measurer, FullRace? race)
 		{
-			_commands = commands;
-			_state = commands.State;
+			Measurer = measurer;
+			_state = new EditState(race);
+			_commands = new CommandList(_state);
 			RaceLoaded += delegate
 			{
 				_commands.Clear();
 			};
-			RacingModule.MetaPanel.PanelOverride = new EditorPanel(this);
 			Control.get_Graphics().QueueMainThreadRender((Action<GraphicsDevice>)delegate(GraphicsDevice graphicsDevice)
 			{
-				//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0014: Expected O, but got Unknown
-				if (_effect == null)
+				//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+				//IL_001c: Expected O, but got Unknown
+				if (!_disposed && _effect == null)
 				{
 					_effect = new BasicEffect(graphicsDevice);
 				}
 			});
 		}
 
-		public void Test(RacePoint testPoint)
+		private bool FixPoint(out RacePoint result)
 		{
-			if (IsReady(ref testPoint))
+			return FixPoint(null, out result);
+		}
+
+		private bool FixPoint(RacePoint? point, out RacePoint result)
+		{
+			result = point ?? Selected;
+			return result != null;
+		}
+
+		public void Test(RacePoint? testPoint)
+		{
+			if (FixPoint(testPoint, out var target))
 			{
-				int index = base.Race.RacePoints.IndexOf(testPoint);
-				(int, RacePoint) p2 = base.Race.RacePoints.Enumerate().Reverse().FirstOrDefault(((int index, RacePoint item) p) => p.item.IsCheckpoint && p.index <= index);
-				int i = base.Race.Checkpoints.ToList().IndexOf(p2.Item2);
+				int index = Race.RacePoints.IndexOf(target);
+				(int, RacePoint) p2 = Race.RacePoints.Enumerate().Reverse().FirstOrDefault(((int index, RacePoint item) p) => p.item.IsCheckpoint && p.index <= index);
+				int i = Race.Checkpoints.ToList().IndexOf(p2.Item2);
 				Test((i >= 0) ? i : 0);
 			}
 		}
 
 		public void Test(int testCheckpoint = 0)
 		{
-			if (base.Race != null)
-			{
-				RacingModule.MetaPanel.PanelOverride = new TestPanel();
-				RacingModule.Racer.Run(testCheckpoint);
-			}
+			this.TestRequested?.Invoke(testCheckpoint);
 		}
 
 		public void DiscardChanges()
 		{
-			if (FullRace != null)
+			FullRace original = LocalData.GetRaceFromDisk(FullRace.Meta.Id);
+			if (original != null)
 			{
-				RacingModule.Racer.FullRace = DataInterface.GetLocalRace(FullRace.Meta.Id);
-				this.LocalRacesChanged?.Invoke();
+				FullRace = original;
 			}
 		}
 
 		public void DeleteRace()
 		{
-			if (FullRace != null)
-			{
-				DataInterface.DeleteRace(FullRace);
-				RacingModule.Racer.FullRace = null;
-				this.LocalRacesChanged?.Invoke();
-			}
-		}
-
-		private void Undo(object sender, EventArgs e)
-		{
-			Undo();
-		}
-
-		private void Redo(object sender, EventArgs e)
-		{
-			Redo();
-		}
-
-		private void Save(object sender, EventArgs e)
-		{
-			Save();
+			FullRace toDelete = FullRace;
+			FullRace = DataExtensions.NewRace();
+			RacingModule.LocalData.DeleteRace(toDelete);
 		}
 
 		public void Undo()
@@ -254,94 +251,68 @@ namespace Ideka.RacingMeter
 
 		public void Save()
 		{
-			if (FullRace != null)
-			{
-				DataInterface.SaveRace(FullRace);
-				_commands.Saved();
-				ScreenNotification.ShowNotification(Strings.NotifyRaceSaved, (NotificationType)0, (Texture2D)null, 4);
-				this.LocalRacesChanged?.Invoke();
-			}
+			RacingModule.LocalData.SaveRace(FullRace);
+			_commands.Saved();
+			ScreenNotification.ShowNotification(Strings.NotifyRaceSaved, (NotificationType)0, (Texture2D)null, 4);
 		}
 
-		public string Describe(RacePoint point)
+		public string? Describe(RacePoint? point)
 		{
-			if (point == null || base.Race == null)
+			if (point == null)
 			{
 				return null;
 			}
-			int i = base.Race.RacePoints.IndexOf(point);
+			int i = Race.RacePoints.IndexOf(point);
 			if (i < 0)
 			{
 				return null;
 			}
-			return Strings.PointDescription.Format(i + 1, point.Type.Describe());
-		}
-
-		private bool IsReady(out RacePoint point)
-		{
-			point = null;
-			return IsReady(ref point);
-		}
-
-		private bool IsReady(ref RacePoint point, bool nullPointOk = false)
-		{
-			if (base.Race != null)
-			{
-				return (point ?? (point = Selected)) != null || nullPointOk;
-			}
-			return false;
+			return Strings.PointDescription.Format(i + 1, point!.Type.Describe());
 		}
 
 		public void RenameRace(string name)
 		{
-			if (base.Race != null)
-			{
-				_commands.Run(new RenameRaceCommand(name));
-			}
+			_commands.Run(new RenameRaceCommand(name));
 		}
 
 		public void SetRaceType(RaceType type)
 		{
-			if (base.Race != null)
-			{
-				_commands.Run(new SetRaceTypeCommand(type));
-			}
+			_commands.Run(new SetRaceTypeCommand(type));
 		}
 
 		public void SetRaceMap(int mapId)
 		{
-			if (base.Race != null)
-			{
-				_commands.Run(new SetRaceMapCommand(mapId));
-			}
+			_commands.Run(new SetRaceMapCommand(mapId));
 		}
 
-		public void Select(RacePoint point)
+		public void Select(RacePoint? point)
 		{
 			_commands.Run(new SelectPointCommand(point));
 		}
 
 		public void SelectNearest()
 		{
-			Select(base.Race?.RacePoints.MinBy((RacePoint c) => Vector3.DistanceSquared(c.Position, RacingModule.Measurer.Pos.Meters)));
+			Select(Race.RacePoints.MinBy((RacePoint c) => Vector3.DistanceSquared(c.Position, Measurer.Pos.Meters)));
 		}
 
-		public void SelectPrevious(RacePoint point = null)
+		public void SelectPrevious(RacePoint? point = null)
 		{
-			if (IsReady(ref point, nullPointOk: true))
+			if (point == null)
 			{
-				int i = _state.PointIndexOf(point);
-				Select((i < 0 || point == null) ? base.Race.RacePoints.Last() : base.Race.RacePoints.Skip(i - 1).First());
+				point = Selected;
 			}
+			int i = _state.PointIndexOf(point);
+			Select((i < 0 || point == null) ? Race.RacePoints.Last() : Race.RacePoints.Skip(i - 1).First());
 		}
 
-		public void SelectNext(RacePoint point = null)
+		public void SelectNext(RacePoint? point = null)
 		{
-			if (IsReady(ref point, nullPointOk: true))
+			if (point == null)
 			{
-				int i = _state.PointIndexOf(point);
-				Select((i < 0 || point == null) ? base.Race.RacePoints.First() : base.Race.RacePoints.Skip(Math.Min(i + 1, base.Race.RacePoints.Count - 1)).First());
+				point = Selected;
 			}
+			int i = _state.PointIndexOf(point);
+			Select((i < 0 || point == null) ? Race.RacePoints.First() : Race.RacePoints.Skip(Math.Min(i + 1, Race.RacePoints.Count - 1)).First());
 		}
 
 		public void InsertCheckpoint(bool before)
@@ -349,27 +320,28 @@ namespace Ideka.RacingMeter
 			InsertCheckpoint(null, before);
 		}
 
-		public void InsertCheckpoint(RacePoint existing, bool before)
+		public void InsertCheckpoint(RacePoint? existing, bool before)
 		{
 			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			if (IsReady(ref existing, nullPointOk: true))
+			if (existing == null)
 			{
-				int i = _state.PointIndexOf(existing);
-				i = ((i < 0) ? ((!before) ? base.Race.RacePoints.Count : 0) : (before ? i : (i + 1)));
-				_commands.Run(new InsertPointCommand(i, new RacePoint
-				{
-					Position = RacingModule.Measurer.Pos.Meters,
-					Radius = (Selected?.Radius ?? 15f),
-					Type = (Selected?.Type ?? RacePointType.Checkpoint)
-				}));
+				existing = Selected;
 			}
+			int i = _state.PointIndexOf(existing);
+			i = ((i < 0) ? ((!before) ? Race.RacePoints.Count : 0) : (before ? i : (i + 1)));
+			_commands.Run(new InsertPointCommand(i, new RacePoint
+			{
+				Position = Measurer.Pos.Meters,
+				Radius = (Selected?.Radius ?? 15f),
+				Type = (Selected?.Type ?? RacePointType.Checkpoint)
+			}));
 		}
 
-		public void RemoveCheckpoint(RacePoint point = null)
+		public void RemoveCheckpoint(RacePoint? point = null)
 		{
-			if (IsReady(ref point))
+			if (FixPoint(point, out var @fixed))
 			{
-				_commands.Run(new RemovePointCommand(point));
+				_commands.Run(new RemovePointCommand(@fixed));
 			}
 		}
 
@@ -378,11 +350,11 @@ namespace Ideka.RacingMeter
 			SwapCheckpoint(null, previous);
 		}
 
-		public void SwapCheckpoint(RacePoint point, bool previous)
+		public void SwapCheckpoint(RacePoint? point, bool previous)
 		{
-			if (IsReady(ref point))
+			if (FixPoint(point, out var target))
 			{
-				_commands.Run(new SwapPointCommand(point, previous));
+				_commands.Run(new SwapPointCommand(target, previous));
 			}
 		}
 
@@ -398,26 +370,26 @@ namespace Ideka.RacingMeter
 			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			if (IsReady(out var point))
+			if (FixPoint(out var point))
 			{
 				MovePoint(point, new Vector3(x ?? point.Position.X, y ?? point.Position.Y, z ?? point.Position.Z));
 			}
 		}
 
-		public void MovePoint(RacePoint point, Vector3 position)
+		public void MovePoint(RacePoint? point, Vector3 position)
 		{
 			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 			_pointPreview.point = null;
-			if (IsReady(ref point))
+			if (FixPoint(point, out var target))
 			{
-				_commands.Run(new MovePointCommand(point, position));
+				_commands.Run(new MovePointCommand(target, position));
 			}
 		}
 
 		public void SnapPoint()
 		{
 			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			if (IsReady(out var point) && _rawPoints.Any())
+			if (FixPoint(out var point) && _rawPoints.Any())
 			{
 				RawPoint closest = _rawPoints.Values.MinBy((RawPoint p) => Vector3.DistanceSquared(p.Position, point.Position));
 				_commands.Run(new MovePointCommand(point, closest.Position));
@@ -429,12 +401,12 @@ namespace Ideka.RacingMeter
 			ResizePoint(null, radius);
 		}
 
-		public void ResizePoint(RacePoint point, float radius)
+		public void ResizePoint(RacePoint? point, float radius)
 		{
 			_pointPreview.point = null;
-			if (IsReady(ref point))
+			if (FixPoint(point, out var target))
 			{
-				_commands.Run(new ResizePointCommand(point, radius));
+				_commands.Run(new ResizePointCommand(target, radius));
 			}
 		}
 
@@ -443,11 +415,11 @@ namespace Ideka.RacingMeter
 			SetPointType(null, type);
 		}
 
-		public void SetPointType(RacePoint point, RacePointType type)
+		public void SetPointType(RacePoint? point, RacePointType type)
 		{
-			if (IsReady(ref point))
+			if (FixPoint(point, out var target))
 			{
-				_commands.Run(new SetPointTypeCommand(point, type));
+				_commands.Run(new SetPointTypeCommand(target, type));
 			}
 		}
 
@@ -457,14 +429,14 @@ namespace Ideka.RacingMeter
 			MovePointPreview(null, position);
 		}
 
-		public void MovePointPreview(RacePoint point, Vector3 position)
+		public void MovePointPreview(RacePoint? point, Vector3 position)
 		{
 			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			if (IsReady(ref point))
+			if (FixPoint(point, out var target))
 			{
-				_pointPreview.point = point;
+				_pointPreview.point = target;
 				_pointPreview.preview.Position = position;
-				_pointPreview.preview.Radius = point.Radius;
+				_pointPreview.preview.Radius = target.Radius;
 			}
 		}
 
@@ -478,74 +450,72 @@ namespace Ideka.RacingMeter
 			ResizePointPreview(null, radius);
 		}
 
-		public void ResizePointPreview(RacePoint point)
+		public void ResizePointPreview(RacePoint? point)
 		{
-			if (IsReady(ref point))
+			if (FixPoint(point, out var target))
 			{
-				ResizePointPreview(point, point.Radius);
+				ResizePointPreview(target, target.Radius);
 			}
 		}
 
-		public void ResizePointPreview(RacePoint point, float radius)
+		public void ResizePointPreview(RacePoint? point, float radius)
 		{
 			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			if (IsReady(ref point))
+			if (FixPoint(point, out var target))
 			{
-				_pointPreview.point = point;
-				_pointPreview.preview.Position = point.Position;
+				_pointPreview.point = target;
+				_pointPreview.preview.Position = target.Position;
 				_pointPreview.preview.Radius = radius;
 			}
 		}
 
-		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
+		protected override void DrawRaceToWorld(SpriteBatch spriteBatch)
 		{
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0186: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0198: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
-			if (!CanDrawRace())
+			SpriteBatch spriteBatch2 = spriteBatch;
+			BasicEffect effect = _effect;
+			if (effect != null)
 			{
-				return;
-			}
-			if (_effect != null)
-			{
-				_effect.set_Projection(GameService.Gw2Mumble.get_PlayerCamera().get_WorldViewProjection());
-				int length = base.Race.RoadPoints.Count();
+				effect.set_Projection(GameService.Gw2Mumble.get_PlayerCamera().get_WorldViewProjection());
+				int length = Race.RoadPoints.Count();
 				if (length >= 2)
 				{
-					((Effect)_effect).get_CurrentTechnique().get_Passes().get_Item(0)
+					((Effect)effect).get_CurrentTechnique().get_Passes().get_Item(0)
 						.Apply();
 					VertexPosition[] vertices = (VertexPosition[])(object)new VertexPosition[length];
-					foreach (var (i, p) in base.Race.RoadPoints.Enumerate())
+					foreach (var (i, p) in Race.RoadPoints.Enumerate())
 					{
 						vertices[i] = new VertexPosition(p.Position);
 					}
-					((GraphicsResource)spriteBatch).get_GraphicsDevice().DrawUserPrimitives<VertexPosition>((PrimitiveType)3, vertices, 0, length - 1);
+					((GraphicsResource)spriteBatch2).get_GraphicsDevice().DrawUserPrimitives<VertexPosition>((PrimitiveType)3, vertices, 0, length - 1);
 				}
 			}
-			foreach (RacePoint point2 in base.Race.RacePoints)
+			foreach (RacePoint point2 in Race.RacePoints)
 			{
 				drawPoint(point2);
 			}
 			foreach (RawPoint value in _rawPoints.Values)
 			{
-				SpriteBatch spriteBatch2 = spriteBatch;
+				SpriteBatch spriteBatch3 = spriteBatch2;
 				Vector3 position = value.Position;
-				DrawRacePoint(spriteBatch2, position, 1f, (Color)(value.Type switch
+				DrawRacePoint(spriteBatch3, position, 1f, (Color)(value.Type switch
 				{
 					"checkpoint" => Color.get_White(), 
 					"flag" => Color.get_Yellow(), 
@@ -560,47 +530,45 @@ namespace Ideka.RacingMeter
 				//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 				//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-				//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+				//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0052: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-				//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+				//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
 				bool selected = point == Selected;
 				Color color = (Color)(point.Type switch
 				{
-					RacePointType.Guide => RaceHolder.GuidePointColor, 
-					RacePointType.Reset => RaceHolder.ResetColor, 
-					_ => point.Collides(RacingModule.Measurer.Pos.Meters) ? RaceHolder.TouchedCheckpointColor : RaceHolder.CheckpointColor, 
+					RacePointType.Guide => RaceDrawer.GuidePointColor, 
+					RacePointType.Reset => RaceDrawer.ResetColor, 
+					_ => point.Collides(Measurer.Pos.Meters) ? RaceDrawer.TouchedCheckpointColor : RaceDrawer.CheckpointColor, 
 				});
 				RacePoint preview = ((_pointPreview.point == point) ? _pointPreview.preview : point);
 				if (!selected)
 				{
 					((Color)(ref color)).set_A((byte)64);
 				}
-				DrawRacePoint(spriteBatch, preview, color, point.Type == RacePointType.Guide);
+				DrawRacePoint(spriteBatch2, preview, color, point.Type == RacePointType.Guide);
 				if (selected && point.IsCheckpoint && Draw300InGuide)
 				{
-					DrawRacePoint(spriteBatch, preview.Position, 7.62f, color);
+					DrawRacePoint(spriteBatch2, preview.Position, 7.62f, color);
 				}
 			}
 		}
 
-		public override void DrawToMap(SpriteBatch spriteBatch, MapBounds map)
+		protected override void DrawRaceToMap(SpriteBatch spriteBatch, IMapBounds map)
 		{
-			if (base.Race == null)
-			{
-				return;
-			}
-			DrawMapLine(spriteBatch, map);
-			foreach (var (point2, j) in base.Race.RacePoints.Select((RacePoint c, int i) => (c, i)))
+			SpriteBatch spriteBatch2 = spriteBatch;
+			IMapBounds map2 = map;
+			DrawMapLine(spriteBatch2, map2);
+			foreach (var (point2, j) in Race.RacePoints.Select((RacePoint c, int i) => (c, i)))
 			{
 				drawPoint(point2, $"{j + 1}");
 			}
-			void drawPoint(RacePoint point, string text = null)
+			void drawPoint(RacePoint point, string text)
 			{
 				//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0023: Unknown result type (might be due to invalid IL or missing references)
@@ -620,28 +588,30 @@ namespace Ideka.RacingMeter
 				bool selected = point == Selected;
 				Color color = (Color)(point.Type switch
 				{
-					RacePointType.Guide => RaceHolder.GuidePointColor, 
-					RacePointType.Reset => RaceHolder.ResetColor, 
-					_ => RaceHolder.CheckpointColor, 
+					RacePointType.Guide => RaceDrawer.GuidePointColor, 
+					RacePointType.Reset => RaceDrawer.ResetColor, 
+					_ => RaceDrawer.CheckpointColor, 
 				});
 				RacePoint preview = ((_pointPreview.point == point) ? _pointPreview.preview : point);
 				if (selected)
 				{
-					ShapeExtensions.DrawCircle(spriteBatch, map.FromWorld(base.Race.MapId, preview.Position), 20f, 4, color, 2f, 0f);
+					ShapeExtensions.DrawCircle(spriteBatch2, map2.FromWorld(Race.MapId, preview.Position), 20f, 4, color, 2f, 0f);
 				}
 				else
 				{
-					DrawMapRacePoint(spriteBatch, map, preview, color);
+					DrawMapRacePoint(spriteBatch2, map2, preview, color);
 				}
-				DrawText(spriteBatch, map.FromWorld(base.Race.MapId, preview.Position), Control.get_Content().get_DefaultFont14(), Color.get_White(), text);
+				DrawText(spriteBatch2, map2.FromWorld(Race.MapId, preview.Position), Control.get_Content().get_DefaultFont14(), Color.get_White(), text);
 			}
 		}
 
 		protected override void DisposeControl()
 		{
-			if (RacingModule.MetaPanel.PanelOverride is EditorPanel)
+			_disposed = true;
+			BasicEffect? effect = _effect;
+			if (effect != null)
 			{
-				RacingModule.MetaPanel.PanelOverride = null;
+				((GraphicsResource)effect).Dispose();
 			}
 			base.DisposeControl();
 		}

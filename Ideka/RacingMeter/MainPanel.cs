@@ -1,17 +1,22 @@
 using System;
+using System.Collections.Generic;
 using Blish_HUD.Controls;
 using Ideka.RacingMeter.Lib;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Ideka.RacingMeter
 {
-	public class MainPanel : Panel, IPanelOverride
+	public class MainPanel : Panel, IUIPanel
 	{
 		private const int Spacing = 10;
 
-		private FullRace _race;
+		private FullRace? _fullRace;
 
-		private FullGhost _ghost;
+		private readonly PanelStack _panelStack;
+
+		private readonly RaceRunner _runner;
+
+		private readonly RaceRunnerLoader _runnerLoader;
 
 		private readonly TopBar _topBar;
 
@@ -25,35 +30,21 @@ namespace Ideka.RacingMeter
 
 		private readonly RacePreview _racePreview;
 
-		public FullRace Race
+		public FullRace? FullRace
 		{
 			get
 			{
-				return _race;
+				return _fullRace;
 			}
 			private set
 			{
-				GhostsPanel ghostsPanel = _ghostsPanel;
-				GhostInfoPanel ghostInfoPanel = _ghostInfoPanel;
 				RaceInfoPanel raceInfoPanel = _raceInfoPanel;
-				FullRace fullRace2 = (_racePreview.FullRace = value);
-				FullRace fullRace4 = (raceInfoPanel.Race = fullRace2);
-				FullRace fullRace6 = (ghostInfoPanel.Race = fullRace4);
-				FullRace fullRace8 = (_race = (ghostsPanel.Race = fullRace6));
-			}
-		}
-
-		public FullGhost Ghost
-		{
-			get
-			{
-				return _ghost;
-			}
-			private set
-			{
 				GhostInfoPanel ghostInfoPanel = _ghostInfoPanel;
-				FullGhost fullGhost2 = (_racePreview.FullGhost = value);
-				FullGhost fullGhost4 = (_ghost = (ghostInfoPanel.Ghost = fullGhost2));
+				GhostsPanel ghostsPanel = _ghostsPanel;
+				FullRace fullRace2 = (_racePreview.Race = (_fullRace = value));
+				FullRace fullRace4 = (ghostsPanel.Race = fullRace2);
+				FullRace fullRace7 = (raceInfoPanel.Race = (ghostInfoPanel.Race = fullRace4));
+				_racesPanel.SelectRace(value);
 			}
 		}
 
@@ -64,9 +55,14 @@ namespace Ideka.RacingMeter
 
 		public string Caption => Strings.RacingMeter;
 
-		public MainPanel()
-			: this()
+		public MainPanel(PanelStack panelStack, MeasurerRealtime measurer)
 		{
+			MeasurerRealtime measurer2 = measurer;
+			((Panel)this)._002Ector();
+			MainPanel mainPanel = this;
+			_panelStack = panelStack;
+			_runner = new RaceRunner(measurer2);
+			_runnerLoader = new RaceRunnerLoader(_runner);
 			TopBar topBar = new TopBar();
 			((Control)topBar).set_Parent((Container)(object)this);
 			_topBar = topBar;
@@ -85,21 +81,58 @@ namespace Ideka.RacingMeter
 			GhostInfoPanel ghostInfoPanel = new GhostInfoPanel();
 			((Control)ghostInfoPanel).set_Parent((Container)(object)this);
 			_ghostInfoPanel = ghostInfoPanel;
-			_racesPanel.RaceChanged += delegate(FullRace race)
+			UpdateLayout();
+			_topBar.UnloadRace += delegate
 			{
-				Race = race;
+				mainPanel._runnerLoader.LoadRace(null, null);
 			};
-			_ghostsPanel.GhostChanged += delegate(FullGhost ghost)
+			_topBar.UnloadGhost += delegate
 			{
-				Ghost = ghost;
+				mainPanel._runnerLoader.SetGhost(null, lockGhost: true);
+			};
+			_racesPanel.RaceSelected += delegate(FullRace? race)
+			{
+				mainPanel.FullRace = race;
+			};
+			_racesPanel.RaceEditorRequested += delegate
+			{
+				mainPanel._panelStack.Push(new EditorPanel(mainPanel._panelStack, measurer2, mainPanel.FullRace));
+			};
+			_ghostsPanel.GhostSelected += delegate(FullGhost? ghost)
+			{
+				FullGhost fullGhost6 = (mainPanel._ghostInfoPanel.Ghost = (mainPanel._racePreview.Ghost = ghost));
+			};
+			_raceInfoPanel.RaceRequested += delegate(FullRace race)
+			{
+				mainPanel._runnerLoader.LoadRace(race, null);
 			};
 			_ghostInfoPanel.GhostChanged += delegate(FullGhost ghost)
 			{
-				Ghost = ghost;
+				FullGhost fullGhost3 = (mainPanel._ghostInfoPanel.Ghost = (mainPanel._racePreview.Ghost = ghost));
 			};
-			RacingModule.Racer.RaceLoaded += new Action<FullRace>(RaceLoaded);
-			RacingModule.Racer.GhostLoaded += new Action<FullGhost>(GhostLoaded);
-			UpdateLayout();
+			_ghostInfoPanel.GhostRequested += delegate(FullRace race, FullGhost ghost)
+			{
+				mainPanel._runnerLoader.LoadRace(race, ghost);
+			};
+			_runnerLoader.RaceLoaded += new Action<FullRace>(_topBar.RaceLoaded);
+			_runnerLoader.GhostLoaded += new Action<FullGhost>(_topBar.GhostLoaded);
+			RacingModule.LocalData.RacesChanged += new Action<IReadOnlyDictionary<string, FullRace>>(RacesChanged);
+			RacingModule.LocalData.RaceCreated += new Action<FullRace>(RaceCreated);
+			this.SoftChild((Control)(object)_runner);
+		}
+
+		private void RacesChanged(IReadOnlyDictionary<string, FullRace> races)
+		{
+			string id = FullRace?.Meta?.Id;
+			if (id != null)
+			{
+				FullRace = (races.TryGetValue(id, out var race) ? race : null);
+			}
+		}
+
+		private void RaceCreated(FullRace race)
+		{
+			FullRace = race;
 		}
 
 		protected override void OnResized(ResizedEventArgs e)
@@ -143,31 +176,13 @@ namespace Ideka.RacingMeter
 			}
 		}
 
-		private void RaceLoaded(FullRace race)
-		{
-			if (Race != race)
-			{
-				Race = race;
-			}
-		}
-
-		private void GhostLoaded(FullGhost ghost)
-		{
-			if (Ghost != ghost)
-			{
-				Ghost = ghost;
-			}
-		}
-
 		protected override void DisposeControl()
 		{
-			RacingModule.Racer.RaceLoaded -= new Action<FullRace>(RaceLoaded);
-			RacingModule.Racer.GhostLoaded -= new Action<FullGhost>(GhostLoaded);
-			Texture2D icon = Icon;
-			if (icon != null)
-			{
-				((GraphicsResource)icon).Dispose();
-			}
+			_runnerLoader.RaceLoaded -= new Action<FullRace>(_topBar.RaceLoaded);
+			_runnerLoader.GhostLoaded -= new Action<FullGhost>(_topBar.GhostLoaded);
+			RacingModule.LocalData.RacesChanged -= new Action<IReadOnlyDictionary<string, FullRace>>(RacesChanged);
+			RacingModule.LocalData.RaceCreated -= new Action<FullRace>(RaceCreated);
+			((GraphicsResource)Icon).Dispose();
 			((Panel)this).DisposeControl();
 		}
 	}

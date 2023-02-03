@@ -90,17 +90,17 @@ namespace Ideka.RacingMeter
 					await Server.CancelRace();
 				}
 			});
-			Client.LobbyRaceUpdated += RaceUpdated;
-			Client.LobbySettingsUpdated += SettingsUpdated;
-			Client.UserUpdated += UserUpdated;
+			Client.LobbyRaceUpdated += new Action<FullRace>(RaceUpdated);
+			Client.LobbySettingsUpdated += new Action<Lobby>(SettingsUpdated);
+			Client.UserUpdated += new Action<User, bool>(UserUpdated);
 		}
 
-		private void RaceUpdated(FullRace race)
+		private void RaceUpdated(FullRace? _)
 		{
 			UpdateVisuals();
 		}
 
-		private void SettingsUpdated(Lobby lobby)
+		private void SettingsUpdated(Lobby? _)
 		{
 			UpdateVisuals();
 		}
@@ -114,8 +114,8 @@ namespace Ideka.RacingMeter
 		{
 			_raceLabel.set_Text("Race: " + (Client.Lobby?.Race?.Race.Name ?? Strings.None));
 			int laps = Client.Lobby?.Settings.Laps ?? 0;
-			Lobby lobby = Client.Lobby;
-			bool notLooping = lobby != null && lobby.Race?.Race.IsLooping == false;
+			Lobby? lobby = Client.Lobby;
+			bool notLooping = lobby != null && lobby!.Race?.Race.IsLooping == false;
 			_lapsLabel.set_Text($"Laps: {(notLooping ? 1 : laps)}");
 			((Control)_lapsLabel).set_BasicTooltipText(notLooping ? "The current race does not support looping." : null);
 			List<User> obj = Client.Lobby?.Racers.ToList();
@@ -147,10 +147,10 @@ namespace Ideka.RacingMeter
 
 		protected override void DisposeControl()
 		{
-			Client.LobbyRaceUpdated -= RaceUpdated;
-			Client.LobbySettingsUpdated -= SettingsUpdated;
-			Client.UserUpdated -= UserUpdated;
-			((Panel)this).DisposeControl();
+			Client.LobbyRaceUpdated -= new Action<FullRace>(RaceUpdated);
+			Client.LobbySettingsUpdated -= new Action<Lobby>(SettingsUpdated);
+			Client.UserUpdated -= new Action<User, bool>(UserUpdated);
+			((FlowPanel)this).DisposeControl();
 		}
 	}
 }

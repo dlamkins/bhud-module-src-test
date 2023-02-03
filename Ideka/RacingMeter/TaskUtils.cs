@@ -7,7 +7,7 @@ namespace Ideka.RacingMeter
 {
 	internal static class TaskUtils
 	{
-		public class TaskState
+		public readonly struct TaskState
 		{
 			public bool Completed { get; }
 
@@ -29,7 +29,7 @@ namespace Ideka.RacingMeter
 
 			public Exception Exception { get; }
 
-			public TaskState(Task task, CancellationTokenSource src)
+			public TaskState(Task task, CancellationTokenSource? src)
 			{
 				Completed = task.IsCompleted;
 				Canceled = task.IsCanceled || (src?.IsCancellationRequested ?? false);
@@ -38,38 +38,42 @@ namespace Ideka.RacingMeter
 			}
 		}
 
-		public static bool IsRunning(CancellationTokenSource src)
+		public static bool IsRunning(CancellationTokenSource? src)
 		{
 			if (src == null)
 			{
 				return false;
 			}
-			return !src.IsCancellationRequested;
+			return !src!.IsCancellationRequested;
 		}
 
-		public static void Cancel(ref CancellationTokenSource src)
+		public static void Cancel(ref CancellationTokenSource? src)
 		{
 			src?.Cancel();
 			src = null;
 		}
 
-		public static CancellationToken New(ref CancellationTokenSource src)
+		public static CancellationToken New(out CancellationTokenSource? src)
 		{
 			src = new CancellationTokenSource();
-			return src.Token;
+			return src!.Token;
 		}
 
-		public static Task<TaskState> Done(this Task task, Logger logger, string failMessage, CancellationTokenSource src = null)
+		public static Task<TaskState> Done(this Task task, Logger logger, string? failMessage, CancellationTokenSource? src = null)
 		{
-			return task.ContinueWith(delegate
+			Task task2 = task;
+			CancellationTokenSource src2 = src;
+			Logger logger2 = logger;
+			string failMessage2 = failMessage;
+			return task2.ContinueWith(delegate
 			{
-				TaskState taskState = new TaskState(task, src);
-				src?.Cancel();
-				if (!taskState.Canceled && (taskState.Faulted || !taskState.Completed))
+				TaskState result = new TaskState(task2, src2);
+				src2?.Cancel();
+				if (!result.Canceled && (result.Faulted || !result.Completed))
 				{
-					FriendlyError.Report(logger, failMessage, taskState.Exception);
+					FriendlyError.Report(logger2, failMessage2, result.Exception);
 				}
-				return taskState;
+				return result;
 			});
 		}
 	}

@@ -46,31 +46,31 @@ namespace Ideka.RacingMeter
 			//IL_0093: Expected O, but got Unknown
 			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ca: Expected O, but got Unknown
-			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0132: Expected O, but got Unknown
-			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014f: Expected O, but got Unknown
-			//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0155: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016c: Expected O, but got Unknown
-			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0172: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0179: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0189: Expected O, but got Unknown
-			//IL_018a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a6: Expected O, but got Unknown
-			//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ca: Expected O, but got Unknown
+			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0133: Expected O, but got Unknown
+			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0150: Expected O, but got Unknown
+			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016d: Expected O, but got Unknown
+			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018a: Expected O, but got Unknown
+			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a7: Expected O, but got Unknown
+			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cb: Expected O, but got Unknown
 			_editor = editor;
 			((Panel)this).set_ShowTint(true);
 			((Panel)this).set_Title(" ");
@@ -94,7 +94,7 @@ namespace Ideka.RacingMeter
 			((Control)val).set_Parent((Container)(object)this);
 			val.set_Text(Strings.Meters.Format(15));
 			_radius15mButton = val;
-			EnumDropdown<RacePointType> enumDropdown = new EnumDropdown<RacePointType>();
+			EnumDropdown<RacePointType> enumDropdown = new EnumDropdown<RacePointType>(null, RacePointType.Checkpoint);
 			((Control)enumDropdown).set_Parent((Container)(object)this);
 			enumDropdown.Label = Strings.PointType;
 			_typeSelect = enumDropdown;
@@ -127,11 +127,12 @@ namespace Ideka.RacingMeter
 			{
 				_editor.SnapPoint();
 			});
-			_posBox.TempValue += _editor.MovePointPreview;
-			_posBox.ValueCommitted += _editor.MovePoint;
-			_radiusBox.TempValue += _editor.ResizePointPreview;
-			_radiusBox.TempClear += _editor.ResizePointPreview;
-			_radiusBox.ValueCommitted += _editor.ResizePoint;
+			UpdateLayout();
+			_posBox.TempValue += new Action<Vector3>(_editor.MovePointPreview);
+			_posBox.ValueCommitted += new Action<Vector3>(_editor.MovePoint);
+			_radiusBox.TempValue += new Action<float>(_editor.ResizePointPreview);
+			_radiusBox.TempClear += new Action(_editor.ResizePointPreview);
+			_radiusBox.ValueCommitted += new Action<float>(_editor.ResizePoint);
 			((Control)_radius5mButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				_editor.ResizePoint(5f);
@@ -144,19 +145,19 @@ namespace Ideka.RacingMeter
 			{
 				_editor.ResizePoint(15f);
 			});
-			_typeSelect.ValueCommitted += _editor.SetPointType;
+			_typeSelect.ValueCommitted += new Action<RacePointType>(_editor.SetPointType);
 			((Control)_snapXYZButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-				_editor.MovePoint(RacingModule.Measurer.Pos.Meters);
+				//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+				_editor.MovePoint(_editor.Measurer.Pos.Meters);
 			});
 			((Control)_snapXYButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-				Vector3 meters = RacingModule.Measurer.Pos.Meters;
+				//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+				//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+				Vector3 meters = _editor.Measurer.Pos.Meters;
 				_editor.MovePoint(meters.X, meters.Y);
 			});
 			((Control)_removeButton).add_Click((EventHandler<MouseEventArgs>)delegate
@@ -171,27 +172,28 @@ namespace Ideka.RacingMeter
 			{
 				_editor.SwapCheckpoint(previous: false);
 			});
-			_editor.PointSelected += PointSelected;
-			_editor.PointModified += PointModified;
-			_editor.PointRemoved += PointRemoved;
-			_editor.PointInserted += PointInserted;
-			_editor.PointSwapped += PointSwapped;
-			UpdateLayout();
+			_editor.PointSelected += new Action<RacePoint>(PointSelected);
+			_editor.PointModified += new Action<RacePoint>(PointModified);
+			_editor.PointRemoved += new Action<RacePoint>(PointRemoved);
+			_editor.PointInserted += new Action<RacePoint>(PointInserted);
+			_editor.PointSwapped += new Action<RacePoint, bool>(PointSwapped);
 			UpdateValues();
 		}
 
 		private void UpdateValues()
 		{
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
 			RacePoint selected = _editor.Selected;
-			((Control)this).set_Visible(selected != null);
-			if (((Control)this).get_Visible())
+			if (selected == null)
 			{
-				UpdateTitle();
-				_posBox.Value = selected.Position;
-				_radiusBox.Value = selected.Radius;
-				_typeSelect.Value = selected.Type;
+				((Control)this).set_Visible(false);
+				return;
 			}
+			((Control)this).set_Visible(true);
+			UpdateTitle();
+			_posBox.Value = selected.Position;
+			_radiusBox.Value = selected.Radius;
+			_typeSelect.Value = selected.Type;
 		}
 
 		private void UpdateTitle()
@@ -290,11 +292,11 @@ namespace Ideka.RacingMeter
 
 		protected override void DisposeControl()
 		{
-			_editor.PointSelected -= PointSelected;
-			_editor.PointModified -= PointModified;
-			_editor.PointRemoved -= PointRemoved;
-			_editor.PointInserted -= PointInserted;
-			_editor.PointSwapped -= PointSwapped;
+			_editor.PointSelected -= new Action<RacePoint>(PointSelected);
+			_editor.PointModified -= new Action<RacePoint>(PointModified);
+			_editor.PointRemoved -= new Action<RacePoint>(PointRemoved);
+			_editor.PointInserted -= new Action<RacePoint>(PointInserted);
+			_editor.PointSwapped -= new Action<RacePoint, bool>(PointSwapped);
 			((Panel)this).DisposeControl();
 		}
 	}

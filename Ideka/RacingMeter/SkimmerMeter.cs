@@ -25,27 +25,28 @@ namespace Ideka.RacingMeter
 
 		public const double VSpeedRange = 1024.0;
 
-		public static RectAnchor Construct()
+		public static RectAnchor Construct(IMeasurer measurer)
 		{
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0282: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0297: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_037d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_030a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_039f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0402: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0411: Unknown result type (might be due to invalid IL or missing references)
+			IMeasurer measurer2 = measurer;
 			RectAnchor meter = new RectAnchor();
 			List<RectAnchor> airComponents = new List<RectAnchor>();
 			List<RectAnchor> waterComponents = new List<RectAnchor>();
-			ArcMeterMaker arc = new ArcMeterMaker();
+			ArcMeterMaker arc = new ArcMeterMaker(measurer2);
 			Projection speedP = arc.Meter.AddProjection(Projection.ZeroTo(1100.0)).WithSoftMax(935.0);
 			Projection angleP = arc.Meter.AddProjection(Projection.Symmetric(1.2222222222222223));
 			meter.AddChild(arc.Meter);
@@ -55,17 +56,18 @@ namespace Ideka.RacingMeter
 			waterComponents.Add(arc.AddZone(speedP, Color.get_MediumPurple(), 550.0));
 			waterComponents.Add(arc.AddZone(speedP, Color.get_SaddleBrown(), 637.0));
 			arc.AddSoftMaxSpeedZone(speedP);
-			airComponents.AddRange(arc.AddOrbMarkers(angleP));
-			airComponents.Add(arc.AddCameraOrb(angleP));
-			airComponents.Add(arc.AddForwardOrb(angleP));
+			airComponents.Add(arc.AddAngleOrbMarker(angleP, 0.0));
+			airComponents.AddRange(arc.AddAngleOrbMarkers(angleP));
+			airComponents.Add(arc.AddCameraAngleOrb(angleP));
+			airComponents.Add(arc.AddForwardAngleOrb(angleP));
 			arc.AddArc(speedP);
 			arc.AddSpeed3DNeedle(speedP);
 			arc.AddSpeedNeedle(speedP);
 			arc.AddSpeedText(speedP);
 			arc.AddAccelText(speedP);
 			arc.AddSlopeAngleText();
-			LineMeterMaker right = new LineMeterMaker();
-			Projection heightP = right.Meter.AddProjection(new Projection().WithAnchors(new ProjectionAnchors(() => RacingModule.Measurer.Pos.HeightIn)));
+			LineMeterMaker right = new LineMeterMaker(measurer2);
+			Projection heightP = right.Meter.AddProjection(new Projection()).WithAnchors(new ProjectionAnchors(() => measurer2.Pos.HeightIn));
 			Projection vSpeedP = right.Meter.AddProjection(Projection.ZeroTo(1024.0));
 			right.TackOn(right: true);
 			meter.AddChild(right.Meter);
@@ -83,7 +85,7 @@ namespace Ideka.RacingMeter
 				SizeDelta = new Vector2(5f, 0f)
 			});
 			right.AddLevelText(heightP, new Vector2(0.5f, 0f), new Vector2(0.5f, 1f));
-			LineMeterMaker left = new LineMeterMaker();
+			LineMeterMaker left = new LineMeterMaker(measurer2);
 			Projection pitch = left.Meter.AddProjection(Projection.Symmetric(7.0 / 9.0));
 			left.TackOn(right: false);
 			waterComponents.Add(meter.AddChild(left.Meter));
@@ -97,16 +99,16 @@ namespace Ideka.RacingMeter
 			});
 			left.AddNeedle(pitch, Color.get_White()).WithUpdate(delegate(LineMeterNeedle x)
 			{
-				x.Value = RacingModule.Measurer.Pos.CameraPitch;
+				x.Value = measurer2.Pos.CameraPitch;
 			});
 			left.AddOutline();
 			left.AddText(new Vector2(0.5f, 0f), new Vector2(0.5f, 1f)).WithUpdate(delegate(SizedTextLabel x)
 			{
-				x.Text = $"{MeterMaker.RoundedDegrees(RacingModule.Measurer.Pos.CameraPitch)}°";
+				x.Text = $"{MeterMaker.RoundedDegrees(measurer2.Pos.CameraPitch)}°";
 			});
 			meter.WithUpdate(delegate
 			{
-				bool flag = (double)RacingModule.Measurer.Pos.HeightIn < -40.0;
+				bool flag = (double)measurer2.Pos.HeightIn < -40.0;
 				foreach (RectAnchor item in airComponents)
 				{
 					item.Visible = !flag;
@@ -116,7 +118,7 @@ namespace Ideka.RacingMeter
 					item2.Visible = flag;
 				}
 			});
-			Speedometer.ExtraDebug.Add((meter, "3ips", () => $"{RacingModule.Measurer.Speed.Speed3D:0}"));
+			meter.DebugData.Add(("3ips", () => $"{measurer2.Speed.Speed3D:0}"));
 			return meter;
 		}
 	}

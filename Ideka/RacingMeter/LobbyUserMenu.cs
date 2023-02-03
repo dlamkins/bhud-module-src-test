@@ -20,9 +20,9 @@ namespace Ideka.RacingMeter
 
 		private readonly ContextMenuStripItem _kick;
 
-		private User _selected;
+		private User? _selected;
 
-		private Control _control;
+		private Control? _control;
 
 		private RacingServer Server => Client.Server;
 
@@ -92,8 +92,8 @@ namespace Ideka.RacingMeter
 				}
 			});
 			_menu = new ContextMenuStrip((Func<IEnumerable<ContextMenuStripItem>>)menu);
-			Client.LobbyChanged += LobbyChanged;
-			Client.UserUpdated += UserUpdated;
+			Client.LobbyChanged += new Action<Lobby>(LobbyChanged);
+			Client.UserUpdated += new Action<User, bool>(UserUpdated);
 			IEnumerable<ContextMenuStripItem> menu()
 			{
 				yield return _userName;
@@ -103,9 +103,9 @@ namespace Ideka.RacingMeter
 			}
 		}
 
-		private void LobbyChanged(Lobby lobby)
+		private void LobbyChanged(Lobby? lobby)
 		{
-			if (_selected != null && (lobby == null || !lobby.Users.TryGetValue(_selected.Id, out var _)))
+			if (_selected != null && (lobby == null || !lobby!.Users.TryGetValue(_selected!.Id, out var _)))
 			{
 				Hide();
 			}
@@ -126,13 +126,13 @@ namespace Ideka.RacingMeter
 			}
 		}
 
-		public void Show(string userId, Control control)
+		public void Show(string userId, Control? control)
 		{
-			Lobby lobby = Client.Lobby;
-			if (lobby != null && lobby.Users.TryGetValue(userId, out var user))
+			Lobby? lobby = Client.Lobby;
+			if (lobby != null && lobby!.Users.TryGetValue(userId, out var user))
 			{
-				User user2 = Client.User;
-				if (user2 != null && user2.LobbyData.IsHost)
+				User? user2 = Client.User;
+				if (user2 != null && user2!.LobbyData.IsHost)
 				{
 					_selected = user;
 					_control = control;
@@ -159,8 +159,8 @@ namespace Ideka.RacingMeter
 			((Control)_isRacer).Dispose();
 			((Control)_isHost).Dispose();
 			((Control)_kick).Dispose();
-			Client.LobbyChanged -= LobbyChanged;
-			Client.UserUpdated -= UserUpdated;
+			Client.LobbyChanged -= new Action<Lobby>(LobbyChanged);
+			Client.UserUpdated -= new Action<User, bool>(UserUpdated);
 		}
 	}
 }

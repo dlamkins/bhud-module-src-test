@@ -8,6 +8,7 @@ using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Ideka.BHUDCommon;
+using Ideka.NetCommon;
 using SemVer;
 
 namespace Ideka.RacingMeter
@@ -15,23 +16,21 @@ namespace Ideka.RacingMeter
 	[Export(typeof(Module))]
 	public class RacingModule : Module
 	{
+		private static readonly Logger Logger = Logger.GetLogger<RacingModule>();
+
 		private RacingSettings _settings;
-
-		private MapData _mapData;
-
-		private Server _server;
-
-		private MapOverlay _mapOverlay;
-
-		private Measurer _measurer;
-
-		private Racer _racer;
-
-		private MetaPanel _metaPanel;
 
 		private ConfirmationModal _confirmationModal;
 
-		private readonly DisposableCollection _dc;
+		private MapData _mapData;
+
+		private ScreenMap _screenMap;
+
+		private LocalData _localData;
+
+		private Server _server;
+
+		private readonly DisposableCollection _dc = new DisposableCollection();
 
 		private static RacingModule Instance { get; set; }
 
@@ -59,19 +58,15 @@ namespace Ideka.RacingMeter
 
 		internal static RacingSettings Settings => Instance._settings;
 
+		internal static ConfirmationModal ConfirmationModal => Instance._confirmationModal;
+
 		internal static MapData MapData => Instance._mapData;
 
+		internal static ScreenMap ScreenMap => Instance._screenMap;
+
+		internal static LocalData LocalData => Instance._localData;
+
 		internal static Server Server => Instance._server;
-
-		internal static MapOverlay MapOverlay => Instance._mapOverlay;
-
-		internal static Measurer Measurer => Instance._measurer;
-
-		internal static Racer Racer => Instance._racer;
-
-		internal static MetaPanel MetaPanel => Instance._metaPanel;
-
-		internal static ConfirmationModal ConfirmationModal => Instance._confirmationModal;
 
 		internal static string GhostRacePath(string raceId)
 		{
@@ -83,7 +78,6 @@ namespace Ideka.RacingMeter
 			: this(moduleParameters)
 		{
 			Instance = this;
-			_dc = new DisposableCollection();
 		}
 
 		protected override void DefineSettings(SettingCollection settings)
@@ -107,22 +101,23 @@ namespace Ideka.RacingMeter
 		protected override void OnModuleLoaded(EventArgs e)
 		{
 			((Module)this).OnModuleLoaded(e);
-			_server = _dc.Add(new Server());
+			_confirmationModal = _dc.Add<ConfirmationModal>(new ConfirmationModal(ContentsManager.GetTexture("Tooltip.png")));
 			_mapData = _dc.Add(new MapData(MapCachePath));
 			DisposableCollection dc = _dc;
-			MapOverlay mapOverlay = new MapOverlay();
-			((Control)mapOverlay).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			_mapOverlay = dc.Add<MapOverlay>(mapOverlay);
-			_measurer = _dc.Add(new Measurer());
+			ScreenMap screenMap = new ScreenMap(_mapData);
+			((Control)screenMap).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			_screenMap = dc.Add<ScreenMap>(screenMap);
+			_localData = _dc.Add(new LocalData());
+			_server = _dc.Add(new Server());
+			MeasurerRealtime measurer = _dc.Add(new MeasurerRealtime());
 			DisposableCollection dc2 = _dc;
-			Speedometer speedometer = new Speedometer();
+			Speedometer speedometer = new Speedometer(measurer);
 			((Control)speedometer).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((Control)speedometer).set_ZIndex(50);
 			dc2.Add<Speedometer>(speedometer);
-			_racer = _dc.Add(new Racer());
-			_metaPanel = _dc.Add<MetaPanel>(new MetaPanel(GameService.Overlay.get_BlishHudWindow()));
-			_confirmationModal = _dc.Add<ConfirmationModal>(new ConfirmationModal(ContentsManager.GetTexture("Tooltip.png")));
-			_racer.CurrentMode = Racer.Mode.Racing;
+			PanelStack panelStack = _dc.Add<PanelStack>(new PanelStack(GameService.Overlay.get_BlishHudWindow()));
+			panelStack.SetHomePanel(new MainPanel(panelStack, measurer));
+			Server.CheckVersion(Version.ToString()).Done(Logger, null);
 		}
 
 		protected override void Unload()

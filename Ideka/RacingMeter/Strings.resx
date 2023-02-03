@@ -34,11 +34,13 @@ Online features disabled.</value></data>
   <data name="NotifyRaceStartFailed"><value>Race start failed.</value></data>
   <data name="Unavailable"><value>Unavailable</value></data>
   <data name="SettingShowGuides"><value>Show Race Guides</value></data>
+  <data name="OnlineRacing"><value>Online Racing</value></data>
   <data name="ExceptionInvalidRaceMap"><value>Invalid race map.</value></data>
   <data name="SettingCheckpointLineThicknessText"><value>Thickness of displayed checkpoints, where 100% equals one pixel.</value></data>
   <data name="RaceEditor"><value>Race Editor</value></data>
   <data name="SettingBeetleDriftKeyText"><value>Set this to enable the Roller Beetle drift-hold indicator. It should match the key you use to drift.</value></data>
   <data name="SettingAutoLocalGhost"><value>Autoload Best Local Ghost</value></data>
+  <data name="UnavailableOffline"><value>Unavailable in offline mode.</value></data>
   <data name="ExceptionRemoveResetPoint"><value>The reset point cannot be removed.</value></data>
   <data name="NewRaceName"><value>New Race</value></data>
   <data name="Leaderboard"><value>Leaderboard</value></data>
@@ -49,6 +51,7 @@ Online features disabled.</value></data>
   <data name="ByInfo"><value>By {0}</value></data>
   <data name="CopyOf"><value>Copy of {0}</value></data>
   <data name="Cancel"><value>Cancel</value></data>
+  <data name="ErrorRaceReload"><value>Couldn't reload race from disk</value></data>
   <data name="RaceLocalLeaderboardTooltip"><value>Local races have no leaderboard.</value></data>
   <data name="ExceptionHttpListener"><value>Failed to bind HTTP listener.</value></data>
   <data name="ErrorVersionVerification"><value>Unable to verify version</value></data>
@@ -74,7 +77,6 @@ Online features disabled.</value></data>
 Online features disabled.</value></data>
   <data name="ErrorLeaderboardLoad"><value>Leaderboard load failed</value></data>
   <data name="Nothing"><value>Nothing</value></data>
-  <data name="NotifyOfflineMode"><value>Unavailable in offline mode.</value></data>
   <data name="ResetPoint"><value>Reset</value></data>
   <data name="BackToEditing"><value>Back to Editing</value></data>
   <data name="AlreadySetTooltip"><value>Already set.</value></data>
@@ -133,6 +135,7 @@ Start a race to see the UI while you adjust it.</value></data>
 Opening your browser...</value></data>
   <data name="Checkpoint"><value>Checkpoint</value></data>
   <data name="ExceptionGw2AuthLogIn"><value>Failed to log in to GW2Auth.</value></data>
+  <data name="ExceptionOfflineMode"><value>Unavailable in offline mode.</value></data>
   <data name="RaceUpdatedLabel"><value>Updated: {0}</value></data>
   <data name="SettingShowSpeedometerText"><value>Disable to keep the speedometer hidden</value></data>
   <data name="ExceptionPointRadius"><value>Point radius cannot be zero or negative.</value></data>
@@ -152,6 +155,7 @@ Opening your browser...</value></data>
   <data name="UpdateLeaderboard"><value>Update Leaderboard</value></data>
   <data name="SettingSFXVolumeMultiplierText"><value>Volume multiplier for sound effects. This is applied as a percentage, after Blish's volume setting. Set to 0 to disable all sound effects.</value></data>
   <data name="SettingAutoLocalGhostText"><value>Automatically load your best local ghost when starting a race (unless you load a specific one).</value></data>
+  <data name="ExceptionUnauthenticated"><value>Authentication failed</value></data>
   <data name="SettingBeetleDriftKey"><value>Beetle Drift Key</value></data>
   <data name="InsertAfter"><value>Insert After</value></data>
   <data name="SettingShowSpeedometer"><value>Show Speedometer</value></data>
@@ -173,6 +177,7 @@ Enabling this option also mutes racing SFX, since official races have SFX alread
   <data name="SettingRacerVAlignmentText"><value>Vertical alignment of the racing UI.
 Start a race to see the UI while you adjust it.</value></data>
   <data name="SettingCheckpointLineThickness"><value>Checkpoint Line Thickness</value></data>
+  <data name="ExceptionStillConnecting"><value>Server connectivity has not yet been verified.</value></data>
   <data name="UnloadGhost"><value>Unload Ghost</value></data>
   <data name="ExceptionInvalidRaceType"><value>Invalid race type.</value></data>
   <data name="SettingCheckpointArrowText"><value>Show an arrow on the current checkpoint, pointing towards the next checkpoint.</value></data>
@@ -184,6 +189,7 @@ Start a race to see the UI while you adjust it.</value></data>
 your race times</value></data>
   <data name="PointTypeCheckpoint"><value>Checkpoint</value></data>
   <data name="PointTypeGuide"><value>Guide</value></data>
+  <data name="ErrorRaceLoad"><value>Race load failed</value></data>
   <data name="NotifyGhostAlreadyBetter"><value>You already have a better time on this race.</value></data>
   <data name="SettingShownCheckpointsText"><value>Number of checkpoints to show while racing. Set this to 0 to always show all checkpoints.</value></data>
   <data name="SettingRacerAnchorY"><value>Racing UI Vertical Position</value></data>

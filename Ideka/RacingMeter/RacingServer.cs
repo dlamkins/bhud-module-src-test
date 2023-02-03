@@ -62,19 +62,20 @@ namespace Ideka.RacingMeter
 
 		public T Register<T>(T control) where T : Control
 		{
-			_controls[(Control)(object)control] = true;
-			((Control)control).add_Disposed((EventHandler<EventArgs>)delegate
+			T control2 = control;
+			_controls[(Control)(object)control2] = true;
+			((Control)control2).add_Disposed((EventHandler<EventArgs>)delegate
 			{
-				_controls.TryRemove((Control)(object)control, out var _);
+				_controls.TryRemove((Control)(object)control2, out var _);
 			});
 			lock (this)
 			{
 				if (_locks.Any())
 				{
-					((Control)control).set_Enabled(false);
+					((Control)control2).set_Enabled(false);
 				}
 			}
-			return control;
+			return control2;
 		}
 
 		public UILock Lock()

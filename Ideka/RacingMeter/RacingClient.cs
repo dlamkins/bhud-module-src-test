@@ -81,7 +81,7 @@ namespace Ideka.RacingMeter
 				return Task.CompletedTask;
 			}
 
-			public Task UpdateLobbyRace(FullRace race)
+			public Task UpdateLobbyRace(FullRace? race)
 			{
 				_outer.UpdateLobbyRace(race);
 				return Task.CompletedTask;
@@ -122,7 +122,7 @@ namespace Ideka.RacingMeter
 
 		private static readonly Logger Logger = Logger.GetLogger<RacingClient>();
 
-		private Lobby _lobby;
+		private Lobby? _lobby;
 
 		public ClientState _state;
 
@@ -130,9 +130,11 @@ namespace Ideka.RacingMeter
 
 		private readonly DropOutStack<TimeSpan> _latencies = new DropOutStack<TimeSpan>(5);
 
-		private CancellationTokenSource _cts;
+		private readonly MeasurerRealtime _measurer;
 
-		private CancellationTokenSource _ping;
+		private CancellationTokenSource? _cts;
+
+		private CancellationTokenSource? _ping;
 
 		private readonly HubConnection _conn;
 
@@ -142,13 +144,13 @@ namespace Ideka.RacingMeter
 
 		private DateTime _lastUpdate;
 
-		private CancellationTokenSource _countdown;
+		private CancellationTokenSource? _countdown;
 
 		public RacingServer Server { get; }
 
-		public RaceRouteData Route { get; private set; }
+		public RaceRouteData? Route { get; private set; }
 
-		public Lobby Lobby
+		public Lobby? Lobby
 		{
 			get
 			{
@@ -159,7 +161,7 @@ namespace Ideka.RacingMeter
 				if (_lobby != value)
 				{
 					_lobby = value;
-					Route = ((_lobby?.Race?.Race == null) ? null : new RaceRouteData(_lobby.Race!.Race));
+					Route = ((_lobby?.Race?.Race == null) ? null : new RaceRouteData(_lobby!.Race!.Race));
 					this.LobbyChanged?.Invoke(value);
 					this.LobbyRaceUpdated?.Invoke(value?.Race);
 					this.LobbySettingsUpdated?.Invoke(value);
@@ -167,14 +169,15 @@ namespace Ideka.RacingMeter
 			}
 		}
 
-		public string UserId { get; private set; }
+		public string? UserId { get; private set; }
 
-		public User User
+		public User? User
 		{
 			get
 			{
+				string id = UserId;
 				User user = default(User);
-				if (!(Lobby?.Users.TryGetValue(UserId, out user) ?? false))
+				if (id == null || !(Lobby?.Users.TryGetValue(id, out user) ?? false))
 				{
 					return null;
 				}
@@ -202,28 +205,29 @@ namespace Ideka.RacingMeter
 
 		public int Ping => Latency.Milliseconds;
 
-		public event Action<ClientState> StateChanged;
+		public event Action<ClientState>? StateChanged;
 
-		public event Action<string> Authenticated;
+		public event Action<string>? Authenticated;
 
-		public event Action<int> PingUpdated;
+		public event Action<int>? PingUpdated;
 
-		public event Action<Lobby> LobbyChanged;
+		public event Action<Lobby?>? LobbyChanged;
 
-		public event Action<User, bool> UserUpdated;
+		public event Action<User, bool>? UserUpdated;
 
-		public event Action<Lobby> LobbySettingsUpdated;
+		public event Action<Lobby?>? LobbySettingsUpdated;
 
-		public event Action<FullRace> LobbyRaceUpdated;
+		public event Action<FullRace?>? LobbyRaceUpdated;
 
-		public event Action RaceStarted;
+		public event Action? RaceStarted;
 
-		public event Action RaceCanceled;
+		public event Action? RaceCanceled;
 
-		public event Action<User> PositionUpdated;
+		public event Action<User>? PositionUpdated;
 
-		public RacingClient()
+		public RacingClient(MeasurerRealtime measurer)
 		{
+			_measurer = measurer;
 			_conn = new HubConnectionBuilder().WithUrl("http://localhost:5000/racing").AddNewtonsoftJsonProtocol(delegate(NewtonsoftJsonHubProtocolOptions options)
 			{
 				JsonSerialization.Configure(options.PayloadSerializerSettings);
@@ -250,21 +254,26 @@ namespace Ideka.RacingMeter
 			_conn.On("CancelRace", new Func<Task>(_int.CancelRace));
 			_conn.On("RaceFinished", new Func<Task>(_int.RaceFinished));
 			_conn.On("UpdatePosition", new Func<string, int, Vector3, Vector3, Task>(_int.UpdatePosition));
-			RacingModule.Measurer.NewPosition += new Action<PosSnapshot>(NewPosition);
+			_measurer.NewPosition += new Action<PosSnapshot>(NewPosition);
 		}
 
 		public void Connect()
 		{
 			TaskUtils.Cancel(ref _cts);
-			CancellationToken ct = TaskUtils.New(ref _cts);
+			CancellationToken ct = TaskUtils.New(out _cts);
 			((Func<Task>)async delegate
 			{
 				State = ClientState.Connecting;
 				await RacingModule.Server.RefreshUser(ct);
+				string accessToken = RacingModule.Server.User.AccessToken;
+				if (accessToken == null)
+				{
+					throw FriendlyError.Create(new UnauthorizedAccessException(Strings.ExceptionUnauthenticated));
+				}
 				await _conn.StartAsync(ct);
-				await Server.Authenticate(RacingModule.Server.User.AccessToken);
+				await Server.Authenticate(accessToken);
 				TaskUtils.Cancel(ref _ping);
-				CancellationToken pingToken = TaskUtils.New(ref _ping);
+				CancellationToken pingToken = TaskUtils.New(out _ping);
 				((Func<Task>)async delegate
 				{
 					while (true)
@@ -332,37 +341,40 @@ namespace Ideka.RacingMeter
 
 		private void UpdateUser(User user, bool leaving)
 		{
+			User user2 = user;
 			WithCurrentLobby(delegate(Lobby lobby)
 			{
 				User value;
 				if (!leaving)
 				{
-					lobby.Users[user.Id] = user;
+					lobby.Users[user2.Id] = user2;
 				}
-				else if (!lobby.Users.TryRemove(user.Id, out value))
+				else if (!lobby.Users.TryRemove(user2.Id, out value))
 				{
 					return;
 				}
-				this.UserUpdated?.Invoke(user, leaving);
+				this.UserUpdated?.Invoke(user2, leaving);
 			});
 		}
 
 		private void UpdateLobbySettings(LobbySettings settings)
 		{
+			LobbySettings settings2 = settings;
 			WithCurrentLobby(delegate(Lobby lobby)
 			{
-				lobby.Settings = settings;
+				lobby.Settings = settings2;
 				this.LobbySettingsUpdated?.Invoke(lobby);
 			});
 		}
 
-		private void UpdateLobbyRace(FullRace race)
+		private void UpdateLobbyRace(FullRace? race)
 		{
+			FullRace race2 = race;
 			WithCurrentLobby(delegate(Lobby lobby)
 			{
-				lobby.Race = race;
-				Route = ((race?.Race == null) ? null : new RaceRouteData(race.Race));
-				this.LobbyRaceUpdated?.Invoke(race);
+				lobby.Race = race2;
+				Route = ((race2?.Race == null) ? null : new RaceRouteData(race2.Race));
+				this.LobbyRaceUpdated?.Invoke(race2);
 			});
 		}
 
@@ -375,7 +387,7 @@ namespace Ideka.RacingMeter
 					value.RacerData = new RacerUser();
 				}
 				TaskUtils.Cancel(ref _countdown);
-				CancellationToken ct = TaskUtils.New(ref _countdown);
+				CancellationToken ct = TaskUtils.New(out _countdown);
 				((Func<Task>)async delegate
 				{
 					int i;
@@ -426,11 +438,12 @@ namespace Ideka.RacingMeter
 			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			string userId2 = userId;
 			WithCurrentLobby(delegate(Lobby lobby)
 			{
 				//IL_003a: Unknown result type (might be due to invalid IL or missing references)
 				//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-				if (lobby.Users.TryGetValue(userId, out var value))
+				if (lobby.Users.TryGetValue(userId2, out var value))
 				{
 					value.RacerData.Sent = true;
 					value.RacerData.MapId = mapId;
@@ -460,7 +473,7 @@ namespace Ideka.RacingMeter
 
 		public void Dispose()
 		{
-			RacingModule.Measurer.NewPosition -= new Action<PosSnapshot>(NewPosition);
+			_measurer.NewPosition -= new Action<PosSnapshot>(NewPosition);
 			_conn.DisposeAsync();
 			TaskUtils.Cancel(ref _cts);
 			TaskUtils.Cancel(ref _countdown);

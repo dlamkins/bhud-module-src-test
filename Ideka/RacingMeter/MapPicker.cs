@@ -36,7 +36,7 @@ namespace Ideka.RacingMeter
 			}
 		}
 
-		public event Action<int> ValueChanged;
+		public event Action<int>? ValueChanged;
 
 		public MapPicker()
 			: this()
@@ -57,13 +57,13 @@ namespace Ideka.RacingMeter
 			((Control)val2).set_Parent((Container)(object)this);
 			val2.set_Text(Strings.ChangeToCurrent);
 			_button = val2;
+			UpdateLayout();
+			UpdateButton();
 			((Control)_button).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				Value = GameService.Gw2Mumble.get_CurrentMap().get_Id();
 			});
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)MapChanged);
-			UpdateLayout();
-			UpdateButton();
 		}
 
 		private void UpdateButton()

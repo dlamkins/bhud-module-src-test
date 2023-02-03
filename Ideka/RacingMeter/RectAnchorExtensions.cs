@@ -12,12 +12,14 @@ namespace Ideka.RacingMeter
 
 		public static T WithUpdate<T>(this T ra, Action<T> update) where T : RectAnchor
 		{
-			ref T reference = ref ra;
+			Action<T> update2 = update;
+			T ra2 = ra;
+			ref T reference = ref ra2;
 			reference.Update = (Action<RectAnchor>)Delegate.Combine(reference.Update, (Action<RectAnchor>)delegate
 			{
-				update(ra);
+				update2(ra2);
 			});
-			return ra;
+			return ra2;
 		}
 	}
 }

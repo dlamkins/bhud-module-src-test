@@ -22,13 +22,14 @@ namespace Ideka.RacingMeter
 			return (float)(-4.06707E-09 * MathUtils.Biquadrated(ips) + 8.34847E-06 * MathUtils.Cubed(ips) - 0.000873353 * MathUtils.Squared(ips) + 0.241738 * ips - 1.43113);
 		}
 
-		public static RectAnchor Construct()
+		public static RectAnchor Construct(IMeasurer measurer)
 		{
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-			ArcMeterMaker arcMeterMaker = new ArcMeterMaker();
+			IMeasurer measurer2 = measurer;
+			ArcMeterMaker arcMeterMaker = new ArcMeterMaker(measurer2);
 			Projection speedP = arcMeterMaker.Meter.AddProjection(Projection.ZeroTo(1200.0)).WithSoftMax(1000.0);
 			Projection angleP = arcMeterMaker.Meter.AddProjection(Projection.Symmetric(1.2222222222222223));
 			arcMeterMaker.Meter.AddChild(new WorldCircle
@@ -37,21 +38,21 @@ namespace Ideka.RacingMeter
 				Thickness = 2f
 			}).WithUpdate(delegate(WorldCircle x)
 			{
-				//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-				//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-				//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-				float speed2D = RacingModule.Measurer.Speed.Speed2D;
+				//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+				//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+				//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+				float speed2D = measurer2.Speed.Speed2D;
 				x.Visible = (double)speed2D > 330.0;
 				if (x.Visible)
 				{
-					Vector3 inches = RacingModule.Measurer.Pos.Inches;
-					Vector3 front = RacingModule.Measurer.Pos.Front;
+					Vector3 inches = measurer2.Pos.Inches;
+					Vector3 front = measurer2.Pos.Front;
 					float num = DistanceToZero(speed2D);
 					Vector3 val = inches + front * num;
 					val.Z = 0f;
@@ -63,9 +64,10 @@ namespace Ideka.RacingMeter
 			arcMeterMaker.AddZone(speedP, Color.get_YellowGreen(), 600.0);
 			arcMeterMaker.AddZone(speedP, Color.get_OrangeRed(), 800.0);
 			arcMeterMaker.AddSoftMaxSpeedZone(speedP);
-			arcMeterMaker.AddOrbMarkers(angleP);
-			arcMeterMaker.AddCameraOrb(angleP);
-			arcMeterMaker.AddForwardOrb(angleP);
+			arcMeterMaker.AddAngleOrbMarker(angleP, 0.0);
+			arcMeterMaker.AddAngleOrbMarkers(angleP);
+			arcMeterMaker.AddCameraAngleOrb(angleP);
+			arcMeterMaker.AddForwardAngleOrb(angleP);
 			arcMeterMaker.AddArc(speedP);
 			arcMeterMaker.AddSpeedNeedle(speedP);
 			arcMeterMaker.AddSpeedText(speedP);

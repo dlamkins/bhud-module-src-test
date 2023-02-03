@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Gw2Sharp.Models;
@@ -15,16 +14,17 @@ namespace Ideka.RacingMeter
 {
 	public class Speedometer : Control
 	{
-		private readonly Dictionary<MountType, RectAnchor> _meters = new Dictionary<MountType, RectAnchor>();
+		private readonly Dictionary<MountType, RectAnchor?> _meters = new Dictionary<MountType, RectAnchor>();
+
+		private readonly DisposableCollection _dc = new DisposableCollection();
+
+		private readonly MeasurerRealtime _measurer;
 
 		private readonly RectAnchor _meterContainer;
 
-		private RectAnchor _currentMeter;
+		private RectAnchor? _currentMeter;
 
-		public static List<(RectAnchor, string, Func<string>)> ExtraDebug { get; } = new List<(RectAnchor, string, Func<string>)>();
-
-
-		public float AnchorY
+		private float AnchorY
 		{
 			set
 			{
@@ -41,42 +41,51 @@ namespace Ideka.RacingMeter
 
 		public bool Debug { get; set; }
 
-		public Speedometer()
+		public Speedometer(MeasurerRealtime measurer)
 			: this()
 		{
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0150: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
+			_measurer = measurer;
 			((Control)this).set_ClipsBounds(false);
 			_meterContainer = new RectAnchor
 			{
 				SizeDelta = new Vector2(400f, 100f),
 				Anchor = new Vector2(0.5f, 0.5f)
 			};
-			RacingModule.Settings.SpeedometerAnchorY.OnChangedAndNow(delegate(float v)
+			_dc.Add(RacingModule.Settings.SpeedometerAnchorY.OnChangedAndNow(delegate(float v)
 			{
 				AnchorY = v;
-			});
-			RacingModule.Settings.ShowSpeedometer.OnChangedAndNow(delegate(bool v)
+			}));
+			_dc.Add(RacingModule.Settings.ShowSpeedometer.OnChangedAndNow(delegate(bool v)
 			{
 				((Control)this).set_Visible(v);
-			});
-			RacingModule.Settings.ToggleDebug.OnActivated(delegate
+			}));
+			_dc.Add(RacingModule.Settings.ToggleDebug.OnActivated(delegate
 			{
 				Debug = !Debug;
-			});
-			foreach (KeyValuePair<MountType, (GenericSetting<bool>, RectAnchor)> meter2 in RacingModule.Settings.Meters)
+			}));
+			Dictionary<MountType, RectAnchor> meters = new Dictionary<MountType, RectAnchor>
 			{
-				meter2.Deconstruct(out var key, out var value);
-				(GenericSetting<bool>, RectAnchor) tuple = value;
-				MountType mountType = key;
-				var (genericSetting, meter) = tuple;
-				genericSetting.OnChangedAndNow(delegate(bool v)
+				[(MountType)4] = SkimmerMeter.Construct(measurer),
+				[(MountType)2] = GriffonMeter.Construct(measurer),
+				[(MountType)6] = BeetleMeter.Construct(measurer, new Func<bool?>(RacingModule.Settings.IsDriftKeyDown)),
+				[(MountType)9] = SkiffMeter.Construct(measurer)
+			};
+			foreach (KeyValuePair<MountType, GenericSetting<bool>> meter2 in RacingModule.Settings.Meters)
+			{
+				var (mountType, setting) = meter2;
+				if (meters.TryGetValue(mountType, out var meter))
 				{
-					//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-					SetMeter(mountType, v ? meter : null);
-				});
+					_dc.Add(setting.OnChangedAndNow(delegate(bool v)
+					{
+						//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+						SetMeter(mountType, v ? meter : null);
+					}));
+				}
 			}
 			GameService.Gw2Mumble.get_PlayerCharacter().add_CurrentMountChanged((EventHandler<ValueEventArgs<MountType>>)MountChanged);
 		}
@@ -86,7 +95,7 @@ namespace Ideka.RacingMeter
 			return (CaptureType)0;
 		}
 
-		public void SetMeter(MountType mount, RectAnchor meter)
+		public void SetMeter(MountType mount, RectAnchor? meter)
 		{
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			_meters[mount] = meter;
@@ -123,42 +132,37 @@ namespace Ideka.RacingMeter
 				_meterContainer.Draw(spriteBatch, (Control)(object)this, rect);
 				if (Debug)
 				{
-					DrawDebug(spriteBatch, (Control)(object)this, rect, _currentMeter);
+					DrawDebug(spriteBatch, rect);
 				}
 			}
 		}
 
-		protected override void DisposeControl()
+		private void DrawDebug(SpriteBatch spriteBatch, RectangleF rect)
 		{
-			GameService.Gw2Mumble.get_PlayerCharacter().remove_CurrentMountChanged((EventHandler<ValueEventArgs<MountType>>)MountChanged);
-			ExtraDebug.Clear();
-			((Control)this).DisposeControl();
-		}
-
-		private static void DrawDebug(SpriteBatch spriteBatch, Control ctrl, RectangleF rect, RectAnchor currentMeter)
-		{
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			SpriteBatch spriteBatch2 = spriteBatch;
 			BitmapFont font = Control.get_Content().get_DefaultFont16();
-			ShapeExtensions.DrawRectangle(spriteBatch, rect, Color.get_Black(), 1f, 0f);
+			ShapeExtensions.DrawRectangle(spriteBatch2, rect, Color.get_Black(), 1f, 0f);
 			string toDraw = "";
-			add<int>("misses", RacingModule.Measurer.MissedTicks);
-			add<float>("ddiff", RacingModule.Measurer.DoubledDiff, shown: true, "G");
-			add<int>("doublings", RacingModule.Measurer.Doublings);
-			add<float>("slope", RacingModule.Measurer.Speed.SlopeAngle, shown: false);
-			add<float>("camera", RacingModule.Measurer.Speed.CamMovementYaw, shown: false);
-			add<float>("drift", RacingModule.Measurer.Speed.FwdMovementYaw, shown: false);
-			add<float>("ips", RacingModule.Measurer.Speed.Speed2D);
-			add<float>("3ips", RacingModule.Measurer.Speed.Speed3D);
-			add<float>("vips", RacingModule.Measurer.Speed.UpSpeed);
-			add<float>("ips2", RacingModule.Measurer.Accel.Accel2D);
-			add<float>("3ips2", RacingModule.Measurer.Accel.Accel3D);
-			add<float>("vips2", RacingModule.Measurer.Accel.UpAccel);
-			foreach (var item in ExtraDebug.Where(((RectAnchor, string, Func<string>) e) => e.Item1 == currentMeter || e.Item1 == null))
+			add<int>("misses", _measurer.MissedTicks);
+			add<float>("ddiff", _measurer.DoubledDiff, shown: true, "G");
+			add<int>("doublings", _measurer.Doublings);
+			add<float>("slope", _measurer.Speed.SlopeAngle, shown: false);
+			add<float>("camera", _measurer.Speed.CamMovementYaw, shown: false);
+			add<float>("drift", _measurer.Speed.FwdMovementYaw, shown: false);
+			add<float>("ips", _measurer.Speed.Speed2D);
+			add<float>("3ips", _measurer.Speed.Speed3D);
+			add<float>("vips", _measurer.Speed.UpSpeed);
+			add<float>("ips2", _measurer.Accel.Accel2D);
+			add<float>("3ips2", _measurer.Accel.Accel3D);
+			add<float>("vips2", _measurer.Accel.UpAccel);
+			if (_currentMeter != null)
 			{
-				string name2 = item.Item2;
-				Func<string> getter = item.Item3;
-				add<string>(name2, getter());
+				foreach (var (name2, getter) in _currentMeter!.DebugData)
+				{
+					add<string>(name2, getter());
+				}
 			}
 			draw(toDraw);
 			T add<T>(string name, T value, bool shown = true, string format = "N0")
@@ -175,13 +179,20 @@ namespace Ideka.RacingMeter
 				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 				//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-				//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0035: Unknown result type (might be due to invalid IL or missing references)
 				Size2 size = font.MeasureString(text);
 				Rectangle textRect = default(Rectangle);
 				((Rectangle)(ref textRect))._002Ector(20, 20, (int)size.Width, (int)size.Height);
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, ctrl, text, font, textRect, Color.get_White(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch2, (Control)(object)this, text, font, textRect, Color.get_White(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
 			}
+		}
+
+		protected override void DisposeControl()
+		{
+			GameService.Gw2Mumble.get_PlayerCharacter().remove_CurrentMountChanged((EventHandler<ValueEventArgs<MountType>>)MountChanged);
+			_dc.Dispose();
+			((Control)this).DisposeControl();
 		}
 	}
 }

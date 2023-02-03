@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Linq;
 using Blish_HUD.Controls;
@@ -40,11 +41,11 @@ namespace Ideka.RacingMeter
 			LobbyUsersPanel lobbyUsersPanel = new LobbyUsersPanel(Client);
 			((Control)lobbyUsersPanel).set_Parent((Container)(object)_panel);
 			_usersPanel = lobbyUsersPanel;
-			_usersPanel.SaveScroll += saveScroll;
 			LobbyRacesPanel lobbyRacesPanel = new LobbyRacesPanel(Client);
 			((Control)lobbyRacesPanel).set_Parent((Container)(object)_panel);
 			_racesPanel = lobbyRacesPanel;
-			_racesPanel.SaveScroll += saveScroll;
+			_usersPanel.SaveScroll += new Action<int>(saveScroll);
+			_racesPanel.SaveScroll += new Action<int>(saveScroll);
 			UpdateLayout();
 			void saveScroll(int frames)
 			{

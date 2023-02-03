@@ -1,14 +1,17 @@
 using System;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
+using Ideka.RacingMeter.Lib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Ideka.RacingMeter
 {
-	public class TestPanel : Panel, IPanelOverride
+	public class TestPanel : Panel, IUIPanel
 	{
 		private readonly StandardButton _backButton;
+
+		private readonly RaceRunner _runner;
 
 		public Panel Panel => (Panel)(object)this;
 
@@ -17,21 +20,26 @@ namespace Ideka.RacingMeter
 
 		public string Caption => Strings.TestingRace;
 
-		public TestPanel()
-			: this()
+		public TestPanel(PanelStack panelStack, MeasurerRealtime measurer, FullRace race, int testCheckpoint)
 		{
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Expected O, but got Unknown
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Expected O, but got Unknown
+			PanelStack panelStack2 = panelStack;
+			((Panel)this)._002Ector();
+			_runner = new RaceRunner(measurer, testCheckpoint);
+			_runner.SetRace(race);
 			StandardButton val = new StandardButton();
 			((Control)val).set_Parent((Container)(object)this);
 			val.set_Text(Strings.BackToEditing);
 			_backButton = val;
+			UpdateLayout();
 			((Control)_backButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				RacingModule.Racer.CurrentMode = Racer.Mode.Edit;
+				panelStack2.GoBack();
 			});
+			this.SoftChild((Control)(object)_runner);
 		}
 
 		protected override void OnResized(ResizedEventArgs e)
@@ -70,11 +78,8 @@ namespace Ideka.RacingMeter
 
 		protected override void DisposeControl()
 		{
-			Texture2D icon = Icon;
-			if (icon != null)
-			{
-				((GraphicsResource)icon).Dispose();
-			}
+			((Control)_runner).Dispose();
+			((GraphicsResource)Icon).Dispose();
 			((Panel)this).DisposeControl();
 		}
 	}

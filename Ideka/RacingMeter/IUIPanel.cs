@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Ideka.RacingMeter
 {
-	public interface IPanelOverride
+	public interface IUIPanel
 	{
 		Panel Panel { get; }
 

@@ -11,7 +11,7 @@ namespace Ideka.RacingMeter
 {
 	public class RectAnchor
 	{
-		public struct RectTarget
+		public readonly struct RectTarget
 		{
 			public SpriteBatch SpriteBatch { get; }
 
@@ -76,9 +76,12 @@ namespace Ideka.RacingMeter
 			}
 		}
 
-		public Action<RectAnchor> Update { get; set; }
+		public Action<RectAnchor>? Update { get; set; }
 
-		public RectAnchor Parent { get; private set; }
+		public RectAnchor? Parent { get; private set; }
+
+		public List<(string, Func<string>)> DebugData { get; } = new List<(string, Func<string>)>();
+
 
 		public IReadOnlyList<RectAnchor> Children => _children;
 

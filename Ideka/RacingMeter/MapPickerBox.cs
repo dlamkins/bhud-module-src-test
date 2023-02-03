@@ -2,11 +2,12 @@ namespace Ideka.RacingMeter
 {
 	public class MapPickerBox : ValueControl<int, int, MapPicker>
 	{
-		protected override void Initialize(MapPicker control)
+		public MapPickerBox()
+			: base(0)
 		{
-			control.ValueChanged += delegate
+			base.Control.ValueChanged += delegate
 			{
-				if (!TryMakeValue(control.Value, out var value))
+				if (!TryMakeValue(base.Control.Value, out var value))
 				{
 					ResetValue();
 				}
@@ -23,19 +24,14 @@ namespace Ideka.RacingMeter
 			return innerValue > 0;
 		}
 
-		protected override bool TryReflectValue(ref int value, MapPicker control)
+		protected override bool TryReflectValue(ref int value)
 		{
 			if (value <= 0)
 			{
 				return false;
 			}
-			control.Value = value;
+			base.Control.Value = value;
 			return true;
-		}
-
-		public MapPickerBox()
-			: base(initialize: true)
-		{
 		}
 	}
 }

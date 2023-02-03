@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Ideka.RacingMeter
 {
-	public class Measurer : IDisposable
+	public class MeasurerRealtime : IMeasurer, IDisposable
 	{
 		private const int TeleportThreshold = 100000;
 
@@ -25,15 +25,13 @@ namespace Ideka.RacingMeter
 
 		private readonly MumbleEngine _engine;
 
-		private readonly KalmanFilter<PosSnapshot> _posFilter = new KalmanFilter<PosSnapshot>(PosSnapshot.Integrate, 1.0, 0.0);
-
 		private bool _clearing;
 
-		public PosSnapshot Pos => _pos ?? new PosSnapshot(TimeSpan.Zero);
+		public PosSnapshot Pos => _pos ?? PosSnapshot.Empty;
 
-		public SpeedTime Speed => _speed ?? new SpeedTime();
+		public SpeedTime Speed => _speed ?? SpeedTime.Empty;
 
-		public AccelTime Accel => _accel ?? new AccelTime();
+		public AccelTime Accel => _accel ?? AccelTime.Empty;
 
 		public int MissedTicks { get; private set; }
 
@@ -45,11 +43,11 @@ namespace Ideka.RacingMeter
 
 		public event Action? Teleported;
 
-		public Measurer()
+		public MeasurerRealtime()
 		{
 			_engine = new MumbleEngine();
-			_engine.FrameTick += FrameTick;
-			_engine.PositionTick += PositionTick;
+			_engine.FrameTick += new Action<TimeSpan>(FrameTick);
+			_engine.PositionTick += new Action<TimeSpan, TimeSpan>(PositionTick);
 		}
 
 		public void Reset()
@@ -62,7 +60,6 @@ namespace Ideka.RacingMeter
 			_speed = null;
 			_accel = null;
 			MissedTicks = 0;
-			_posFilter.Reset();
 			_clearing = false;
 		}
 
@@ -79,7 +76,7 @@ namespace Ideka.RacingMeter
 				return;
 			}
 			PosSnapshot prevPos = _pos;
-			PosSnapshot newPos = (_pos = _posFilter.Update(new PosSnapshot(time)));
+			PosSnapshot newPos = (_pos = new PosSnapshot(time));
 			PosStack.Push(newPos);
 			if (prevPos != null)
 			{

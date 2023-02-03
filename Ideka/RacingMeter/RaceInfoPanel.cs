@@ -12,7 +12,7 @@ namespace Ideka.RacingMeter
 	{
 		private const int Spacing = 10;
 
-		private FullRace _race;
+		private FullRace? _race;
 
 		private readonly FlowPanel _panel;
 
@@ -28,9 +28,9 @@ namespace Ideka.RacingMeter
 
 		private readonly Label _raceLengthLabel;
 
-		private readonly StandardButton _loadRaceButton;
+		private readonly StandardButton _runRaceButton;
 
-		public FullRace Race
+		public FullRace? Race
 		{
 			get
 			{
@@ -39,23 +39,25 @@ namespace Ideka.RacingMeter
 			set
 			{
 				_race = value;
-				((Control)_loadRaceButton).set_Enabled(Race != null);
+				((Control)_runRaceButton).set_Enabled(Race != null);
 				((Panel)_panel).set_Title(Race?.Race.Name ?? Strings.None);
 				string author = ((Race?.IsLocal ?? false) ? Strings.RaceLocal : Race?.Meta.AuthorName);
 				_raceAuthorLabel.set_Text(StringExtensions.Format(Strings.RaceAuthorLabel, author ?? ""));
 				((Control)_raceAuthorLabel).set_BasicTooltipText((Race?.IsLocal ?? false) ? Strings.RaceLocalAuthorTooltip : author);
-				string modifiedRelative = ((Race != null) ? Race.Meta.Modified.ToRelativeDateUtc() : null);
-				string modified = ((Race != null) ? $"{Race.Meta.Modified.ToLocalTime()}" : null);
+				string modifiedRelative = ((Race != null) ? Race!.Meta.Modified.ToRelativeDateUtc() : null);
+				string modified = ((Race != null) ? $"{Race!.Meta.Modified.ToLocalTime()}" : null);
 				_raceModifiedLabel.set_Text(StringExtensions.Format(Strings.RaceUpdatedLabel, modifiedRelative ?? ""));
 				((Control)_raceModifiedLabel).set_BasicTooltipText(modified);
-				string type = ((Race != null) ? (Race.Race.Type.Describe() ?? Strings.RaceTypeUnknown) : null);
+				string type = ((Race != null) ? (Race!.Race.Type.Describe() ?? Strings.RaceTypeUnknown) : null);
 				_raceTypeLabel.set_Text(StringExtensions.Format(Strings.RaceTypeLabel, type ?? ""));
-				string mapName = ((Race != null) ? RacingModule.MapData.Describe(Race.Race.MapId) : null);
+				string mapName = ((Race != null) ? RacingModule.MapData.Describe(Race!.Race.MapId) : null);
 				_raceMapLabel.set_Text(StringExtensions.Format(Strings.RaceMapLabel, mapName ?? ""));
 				_raceCheckpointsLabel.set_Text(Strings.RaceCheckpointsLabel.Format(Race?.Race.Checkpoints.Count() ?? 0));
 				_raceLengthLabel.set_Text(StringExtensions.Format(Strings.RaceLengthLabel, $"{Race?.Race.GetLength() ?? 0f:N0}"));
 			}
 		}
+
+		public event Action<FullRace>? RaceRequested;
 
 		public RaceInfoPanel()
 			: this()
@@ -159,16 +161,16 @@ namespace Ideka.RacingMeter
 			StandardButton val8 = new StandardButton();
 			((Control)val8).set_Parent((Container)(object)this);
 			val8.set_Text(Strings.RunRace);
-			_loadRaceButton = val8;
-			((Control)_loadRaceButton).add_Click((EventHandler<MouseEventArgs>)delegate
+			_runRaceButton = val8;
+			UpdateLayout();
+			((Control)_runRaceButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				if (Race?.Race != null)
 				{
-					RacingModule.Racer.FullRace = Race;
+					this.RaceRequested?.Invoke(Race);
 				}
 			});
 			Race = null;
-			UpdateLayout();
 		}
 
 		protected override void OnResized(ResizedEventArgs e)
@@ -183,12 +185,12 @@ namespace Ideka.RacingMeter
 			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 			if (_panel != null)
 			{
-				((Control)_loadRaceButton).set_Bottom(((Container)this).get_ContentRegion().Height);
-				((Control)(object)_loadRaceButton).ArrangeBottomUp(10, (Control)_panel);
+				((Control)_runRaceButton).set_Bottom(((Container)this).get_ContentRegion().Height);
+				((Control)(object)_runRaceButton).ArrangeBottomUp(10, (Control)_panel);
 				((Control)_panel).set_Left(0);
 				((Control)_panel).set_Width(((Container)this).get_ContentRegion().Width);
 				((Control)(object)_panel).HeightFillUp();
-				((Control)(object)_loadRaceButton).CenterWith((Control)(object)_panel);
+				((Control)(object)_runRaceButton).CenterWith((Control)(object)_panel);
 			}
 		}
 	}

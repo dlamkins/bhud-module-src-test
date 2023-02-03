@@ -18,7 +18,7 @@ namespace Ideka.RacingMeter
 
 		private readonly LobbyRaceMenu _raceMenu;
 
-		public event Action<int> SaveScroll;
+		public event Action<int>? SaveScroll;
 
 		public LobbyRacesPanel(RacingClient client)
 			: this()
@@ -53,7 +53,7 @@ namespace Ideka.RacingMeter
 		{
 			List<FullRace> races = new List<FullRace>();
 			races.AddRange(RacingModule.Server.RemoteRaces.Races.Values);
-			races.AddRange(DataInterface.GetLocalRaces().Values);
+			races.AddRange(RacingModule.LocalData.Races.Values);
 			((Container)_menu).ClearChildren();
 			if (!races.Any())
 			{
@@ -85,7 +85,7 @@ namespace Ideka.RacingMeter
 					OnelineMenuItem raceItem = onelineMenuItem2;
 					((Control)raceItem).add_RightMouseButtonPressed((EventHandler<MouseEventArgs>)delegate
 					{
-						_raceMenu.Show(race, (Control)(object)raceItem);
+						_raceMenu.Show(race, (Control?)(object)raceItem);
 					});
 				}
 			}

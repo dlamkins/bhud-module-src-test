@@ -38,7 +38,7 @@ namespace Ideka.RacingMeter
 
 		private float _scrollTarget = -1f;
 
-		private Control _scrollItem;
+		private Control? _scrollItem;
 
 		public RacePointsEditPanel(RaceEditor editor)
 			: this()
@@ -115,6 +115,7 @@ namespace Ideka.RacingMeter
 			((Control)val8).set_Parent((Container)(object)this);
 			val8.set_Text(Strings.InsertAfter);
 			_insertAfterButton = val8;
+			UpdateLayout();
 			((Control)_nearestButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				_editor.SelectNearest();
@@ -139,40 +140,19 @@ namespace Ideka.RacingMeter
 			{
 				_editor.InsertCheckpoint(before: false);
 			});
-			_editor.RaceLoaded += RaceLoaded;
-			_editor.PointSelected += PointSelected;
-			_editor.PointRemoved += PointRemoved;
-			_editor.PointInserted += PointInserted;
-			_editor.PointSwapped += PointSwapped;
-			_editor.PointModified += PointModified;
-			UpdateLayout();
 			RaceLoaded(_editor.FullRace);
+			_editor.RaceLoaded += new Action<FullRace>(RaceLoaded);
+			_editor.PointSelected += new Action<RacePoint>(PointSelected);
+			_editor.PointRemoved += new Action<RacePoint>(PointRemoved);
+			_editor.PointInserted += new Action<RacePoint>(PointInserted);
+			_editor.PointSwapped += new Action<RacePoint, bool>(PointSwapped);
+			_editor.PointModified += new Action<RacePoint>(PointModified);
 		}
 
 		private void RaceLoaded(FullRace fullRace)
 		{
 			((Container)_menu).ClearChildren();
 			_items.Clear();
-			StandardButton nearestButton = _nearestButton;
-			StandardButton deselectButton = _deselectButton;
-			StandardButton prevButton = _prevButton;
-			StandardButton nextButton = _nextButton;
-			StandardButton insertBeforeButton = _insertBeforeButton;
-			bool flag;
-			((Control)_insertAfterButton).set_Enabled(flag = fullRace != null);
-			bool flag2;
-			((Control)insertBeforeButton).set_Enabled(flag2 = flag);
-			bool flag3;
-			((Control)nextButton).set_Enabled(flag3 = flag2);
-			bool flag4;
-			((Control)prevButton).set_Enabled(flag4 = flag3);
-			bool enabled;
-			((Control)deselectButton).set_Enabled(enabled = flag4);
-			((Control)nearestButton).set_Enabled(enabled);
-			if (fullRace == null)
-			{
-				return;
-			}
 			foreach (RacePoint point in fullRace.Race.RacePoints)
 			{
 				AddPointItem(point);
@@ -207,7 +187,7 @@ namespace Ideka.RacingMeter
 			}
 		}
 
-		private void PointSelected(RacePoint point)
+		private void PointSelected(RacePoint? point)
 		{
 			MenuItem control;
 			if (point == null)
@@ -223,7 +203,7 @@ namespace Ideka.RacingMeter
 				_menu.set_CanSelect(true);
 				_menu.Select(control);
 				_menu.set_CanSelect(false);
-				_scrollItem = (Control)(object)control;
+				_scrollItem = (Control?)(object)control;
 			}
 		}
 
@@ -233,20 +213,21 @@ namespace Ideka.RacingMeter
 			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005b: Expected O, but got Unknown
 			//IL_0060: Expected O, but got Unknown
-			if (_items.TryGetValue(point, out var old))
+			RacePoint point2 = point;
+			if (_items.TryGetValue(point2, out var old))
 			{
-				_items.Remove(point);
+				_items.Remove(point2);
 				((Control)old).set_Parent((Container)null);
 				((Control)old).Dispose();
 			}
 			Dictionary<RacePoint, MenuItem> items = _items;
-			RacePoint key = point;
+			RacePoint key = point2;
 			MenuItem val = new MenuItem();
 			MenuItem val2 = val;
 			items[key] = val;
 			((Control)val2).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				_editor.Select(point);
+				_editor.Select(point2);
 			});
 			return val2;
 		}
@@ -315,12 +296,12 @@ namespace Ideka.RacingMeter
 
 		protected override void DisposeControl()
 		{
-			_editor.RaceLoaded -= RaceLoaded;
-			_editor.PointSelected -= PointSelected;
-			_editor.PointRemoved -= PointRemoved;
-			_editor.PointInserted -= PointInserted;
-			_editor.PointSwapped -= PointSwapped;
-			_editor.PointModified -= PointModified;
+			_editor.RaceLoaded -= new Action<FullRace>(RaceLoaded);
+			_editor.PointSelected -= new Action<RacePoint>(PointSelected);
+			_editor.PointRemoved -= new Action<RacePoint>(PointRemoved);
+			_editor.PointInserted -= new Action<RacePoint>(PointInserted);
+			_editor.PointSwapped -= new Action<RacePoint, bool>(PointSwapped);
+			_editor.PointModified -= new Action<RacePoint>(PointModified);
 			((Container)this).DisposeControl();
 		}
 	}

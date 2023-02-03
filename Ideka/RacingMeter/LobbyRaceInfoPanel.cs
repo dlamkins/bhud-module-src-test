@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Blish_HUD.Controls;
 using Ideka.NetCommon;
@@ -141,28 +142,28 @@ namespace Ideka.RacingMeter
 			val8.set_AutoSizeWidth(true);
 			((Control)val8).set_BasicTooltipText("Looping races can be run with multiple laps.");
 			_raceLoopingLabel = val8;
-			Client.LobbyRaceUpdated += RaceUpdated;
+			Client.LobbyRaceUpdated += new Action<FullRace>(RaceUpdated);
 			RaceUpdated(Client.Lobby?.Race);
 			UpdateLayout();
 		}
 
-		private void RaceUpdated(FullRace race)
+		private void RaceUpdated(FullRace? race)
 		{
 			string name = race?.Race.Name ?? Strings.None;
 			_raceNameLabel.set_Text(name);
 			((Control)_raceNameLabel).set_BasicTooltipText(name);
-			string author = ((race != null && race.IsLocal) ? Strings.RaceLocal : race?.Meta.AuthorName);
+			string author = ((race != null && race!.IsLocal) ? Strings.RaceLocal : race?.Meta.AuthorName);
 			_raceAuthorLabel.set_Text(StringExtensions.Format(Strings.RaceAuthorLabel, author ?? ""));
-			((Control)_raceAuthorLabel).set_BasicTooltipText((race != null && race.IsLocal) ? Strings.RaceLocalAuthorTooltip : author);
+			((Control)_raceAuthorLabel).set_BasicTooltipText((race != null && race!.IsLocal) ? Strings.RaceLocalAuthorTooltip : author);
 			string modifiedRelative = race?.Meta.Modified.ToRelativeDateUtc();
-			string modified = ((race != null) ? $"{race.Meta.Modified.ToLocalTime()}" : null);
+			string modified = ((race != null) ? $"{race!.Meta.Modified.ToLocalTime()}" : null);
 			_raceModifiedLabel.set_Text(StringExtensions.Format(Strings.RaceUpdatedLabel, modifiedRelative ?? ""));
 			((Control)_raceModifiedLabel).set_BasicTooltipText(modified);
-			string type = ((race != null) ? (race.Race.Type.Describe() ?? Strings.RaceTypeUnknown) : null);
+			string type = ((race != null) ? (race!.Race.Type.Describe() ?? Strings.RaceTypeUnknown) : null);
 			_raceTypeLabel.set_Text(StringExtensions.Format(Strings.RaceTypeLabel, type ?? ""));
-			string mapName = ((race != null) ? RacingModule.MapData.Describe(race.Race.MapId) : null);
+			string mapName = ((race != null) ? RacingModule.MapData.Describe(race!.Race.MapId) : null);
 			_raceMapLabel.set_Text(StringExtensions.Format(Strings.RaceMapLabel, mapName ?? ""));
-			string looping = ((race == null) ? "" : ((race.Race.LoopStartPoint == null) ? "No" : "Yes"));
+			string looping = ((race == null) ? "" : ((race!.Race.LoopStartPoint == null) ? "No" : "Yes"));
 			_raceLoopingLabel.set_Text("Looping: " + looping);
 			_raceCheckpointsLabel.set_Text(Strings.RaceCheckpointsLabel.Format(race?.Race.Checkpoints.Count() ?? 0));
 			_raceLengthLabel.set_Text(StringExtensions.Format(Strings.RaceLengthLabel, $"{race?.Race.GetLength() ?? 0f:N0}"));
@@ -185,8 +186,8 @@ namespace Ideka.RacingMeter
 
 		protected override void DisposeControl()
 		{
-			Client.LobbyRaceUpdated -= RaceUpdated;
-			((Panel)this).DisposeControl();
+			Client.LobbyRaceUpdated -= new Action<FullRace>(RaceUpdated);
+			((FlowPanel)this).DisposeControl();
 		}
 	}
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,11 +48,11 @@ namespace Ideka.RacingMeter
 			((Container)reMenu).set_WidthSizingMode((SizingMode)2);
 			((Container)reMenu).set_HeightSizingMode((SizingMode)1);
 			_menu = reMenu;
-			Client.RaceStarted += RaceStarted;
-			Client.RaceCanceled += RaceCanceled;
-			Client.UserUpdated += UserUpdated;
-			Client.PositionUpdated += PositionUpdated;
 			UpdateLayout();
+			Client.RaceStarted += new Action(RaceStarted);
+			Client.RaceCanceled += new Action(RaceCanceled);
+			Client.UserUpdated += new Action<User, bool>(UserUpdated);
+			Client.PositionUpdated += new Action<User>(PositionUpdated);
 		}
 
 		private void RaceStarted()
@@ -164,10 +165,10 @@ namespace Ideka.RacingMeter
 
 		protected override void DisposeControl()
 		{
-			Client.RaceStarted -= RaceStarted;
-			Client.RaceCanceled -= RaceCanceled;
-			Client.UserUpdated -= UserUpdated;
-			Client.PositionUpdated -= PositionUpdated;
+			Client.RaceStarted -= new Action(RaceStarted);
+			Client.RaceCanceled -= new Action(RaceCanceled);
+			Client.UserUpdated -= new Action<User, bool>(UserUpdated);
+			Client.PositionUpdated -= new Action<User>(PositionUpdated);
 			((Container)this).DisposeControl();
 		}
 	}

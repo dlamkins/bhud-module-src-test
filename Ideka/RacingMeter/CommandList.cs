@@ -9,7 +9,7 @@ namespace Ideka.RacingMeter
 {
 	public class CommandList
 	{
-		private class EventReport : IDisposable
+		private readonly struct EventReport : IDisposable
 		{
 			private readonly CommandList _commandList;
 
@@ -78,9 +78,9 @@ namespace Ideka.RacingMeter
 
 		public EditState State { get; }
 
-		public event Action<bool> IsDirtyChanged;
+		public event Action<bool>? IsDirtyChanged;
 
-		public event Action<bool, bool> CanUndoRedoChanged;
+		public event Action<bool, bool>? CanUndoRedoChanged;
 
 		public CommandList(EditState state)
 		{

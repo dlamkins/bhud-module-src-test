@@ -25,10 +25,6 @@ namespace Ideka.RacingMeter
 
 		public bool IsDouble { get; }
 
-		protected ValueTime()
-		{
-		}
-
 		public ValueTime(TData first, TData second, TimeSpan deltaTime, bool isDouble = false)
 		{
 			First = first;

@@ -61,7 +61,7 @@ namespace Ideka.RacingMeter
 			}
 		}
 
-		public string AllBasicTooltipText
+		public string? AllBasicTooltipText
 		{
 			set
 			{
@@ -77,7 +77,7 @@ namespace Ideka.RacingMeter
 
 		protected Control Control { get; private set; }
 
-		public ValueControl()
+		public ValueControl(Control control)
 			: this()
 		{
 			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
@@ -91,6 +91,9 @@ namespace Ideka.RacingMeter
 			val.set_AutoSizeWidth(true);
 			val.set_VerticalAlignment((VerticalAlignment)1);
 			_label = val;
+			Control = control;
+			control.set_Parent((Container)(object)this);
+			UpdateLayout();
 		}
 
 		public static void AlignLabels(params ValueControl[] controls)
@@ -103,12 +106,6 @@ namespace Ideka.RacingMeter
 				((Control)obj._label).set_Width(width);
 				obj.UpdateLayout();
 			}
-		}
-
-		protected virtual void Initialize(Control control)
-		{
-			Control = control;
-			UpdateLayout();
 		}
 
 		protected override void OnResized(ResizedEventArgs e)
@@ -141,45 +138,30 @@ namespace Ideka.RacingMeter
 			}
 			set
 			{
-				if (TryReflectValue(ref value, (TControl)(object)base.Control))
+				if (TryReflectValue(ref value))
 				{
 					_value = value;
 				}
 			}
 		}
 
-		protected bool MouseOverControl => base.Control.get_MouseOver();
+		protected new TControl Control => (TControl)(object)base.Control;
 
-		public event Action<TValue> TempValue;
+		protected bool MouseOverControl => ((Control)Control).get_MouseOver();
 
-		public event Action TempClear;
+		public event Action<TValue>? TempValue;
 
-		public event Action<TValue> ValueCommitted;
+		public event Action? TempClear;
 
-		public ValueControl(bool initialize = true)
+		public event Action<TValue>? ValueCommitted;
+
+		public ValueControl(TValue start)
+			: base((Control)(object)new TControl())
 		{
-			if (initialize)
-			{
-				Initialize();
-			}
+			_value = start;
 		}
 
-		protected void Initialize()
-		{
-			TControl val = new TControl();
-			((Control)val).set_Parent((Container)(object)this);
-			Initialize((Control)(object)val);
-		}
-
-		protected sealed override void Initialize(Control control)
-		{
-			Initialize((TControl)(object)control);
-			base.Initialize(control);
-		}
-
-		protected abstract void Initialize(TControl control);
-
-		protected abstract bool TryReflectValue(ref TValue value, TControl control);
+		protected abstract bool TryReflectValue(ref TValue value);
 
 		protected abstract bool TryMakeValue(TInnerValue innerValue, out TValue value);
 
@@ -190,7 +172,7 @@ namespace Ideka.RacingMeter
 
 		protected void SetTempValue(TValue value, bool reflect)
 		{
-			if (!reflect || TryReflectValue(ref value, (TControl)(object)base.Control))
+			if (!reflect || TryReflectValue(ref value))
 			{
 				this.TempValue?.Invoke(value);
 			}

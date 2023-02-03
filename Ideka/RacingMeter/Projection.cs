@@ -7,9 +7,9 @@ namespace Ideka.RacingMeter
 	{
 		public const int SoftMaxBP = 99;
 
-		private Action<Projection> _update;
+		private Action<Projection>? _update;
 
-		private ProjectionAnchors _anchors;
+		private ProjectionAnchors? _anchors;
 
 		public double MinValue { get; set; }
 
@@ -31,7 +31,7 @@ namespace Ideka.RacingMeter
 
 		public double GetAnchorLevel()
 		{
-			return _anchors.GetLevel();
+			return _anchors?.GetLevel() ?? 0.0;
 		}
 
 		public int GetBP(double value)
@@ -56,7 +56,7 @@ namespace Ideka.RacingMeter
 			return this;
 		}
 
-		public Projection WithAnchors(ProjectionAnchors anchors)
+		public Projection WithAnchors(ProjectionAnchors? anchors)
 		{
 			_anchors = anchors;
 			return this;
@@ -64,7 +64,7 @@ namespace Ideka.RacingMeter
 
 		public T AddAnchor<T>(T anchor) where T : IProjectionAnchor
 		{
-			_anchors.AddAnchor(anchor);
+			_anchors?.AddAnchor(anchor);
 			return anchor;
 		}
 

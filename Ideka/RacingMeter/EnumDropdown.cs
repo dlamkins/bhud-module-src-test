@@ -7,32 +7,27 @@ namespace Ideka.RacingMeter
 {
 	public class EnumDropdown<TEnum> : ValueControl<TEnum, string, Dropdown> where TEnum : struct, Enum
 	{
-		private readonly Func<TEnum, string> _describe;
+		private readonly Func<TEnum, string?> _describe;
 
 		private readonly Dictionary<string, TEnum> _descValue = new Dictionary<string, TEnum>();
 
-		public EnumDropdown(Func<TEnum, string> describe = null)
-			: base(initialize: false)
+		public EnumDropdown(Func<TEnum, string?>? describe = null, TEnum start = default(TEnum))
+			: base(start)
 		{
 			_describe = describe ?? ((Func<TEnum, string>)((TEnum v) => Enum.GetName(typeof(TEnum), v)));
 			TEnum[] cachedValues = EnumUtil.GetCachedValues<TEnum>();
 			foreach (TEnum value in cachedValues)
 			{
-				_descValue[_describe(value)] = value;
+				string desc = _describe(value);
+				if (desc != null)
+				{
+					_descValue[desc] = value;
+					base.Control.get_Items().Add(desc);
+				}
 			}
-			Initialize();
-		}
-
-		protected override void Initialize(Dropdown dropdown)
-		{
-			TEnum[] cachedValues = EnumUtil.GetCachedValues<TEnum>();
-			foreach (TEnum value in cachedValues)
+			base.Control.add_ValueChanged((EventHandler<ValueChangedEventArgs>)delegate
 			{
-				dropdown.get_Items().Add(_describe(value));
-			}
-			dropdown.add_ValueChanged((EventHandler<ValueChangedEventArgs>)delegate
-			{
-				if (!TryMakeValue(dropdown.get_SelectedItem(), out var value2))
+				if (!TryMakeValue(base.Control.get_SelectedItem(), out var value2))
 				{
 					ResetValue();
 				}
@@ -48,14 +43,14 @@ namespace Ideka.RacingMeter
 			return _descValue.TryGetValue(innerValue, out value);
 		}
 
-		protected override bool TryReflectValue(ref TEnum value, Dropdown control)
+		protected override bool TryReflectValue(ref TEnum value)
 		{
 			string item = _describe(value);
 			if (item == null)
 			{
 				return false;
 			}
-			control.set_SelectedItem(item);
+			base.Control.set_SelectedItem(item);
 			return true;
 		}
 	}

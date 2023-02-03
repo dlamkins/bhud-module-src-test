@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Ideka.RacingMeter.Lib;
@@ -16,7 +17,7 @@ namespace Ideka.RacingMeter
 
 		private readonly TrackBar _progressBar;
 
-		public FullRace FullRace
+		public FullRace? Race
 		{
 			get
 			{
@@ -29,7 +30,7 @@ namespace Ideka.RacingMeter
 			}
 		}
 
-		public FullGhost FullGhost
+		public FullGhost? Ghost
 		{
 			get
 			{
@@ -37,14 +38,30 @@ namespace Ideka.RacingMeter
 			}
 			set
 			{
-				_view.FullGhost = ((FullRace?.Race == null) ? null : value);
-				((Control)_progressBar).set_Enabled(FullGhost?.Ghost != null);
-				GhostCheckpoints = FullGhost?.Ghost?.Checkpoints(FullRace.Race);
+				RacePreviewView view = _view;
+				string raceId = value?.Ghost?.RaceId;
+				view.FullGhost = ((raceId != null && Race?.Meta?.Id == raceId) ? value : null);
+				((Control)_progressBar).set_Enabled(_view.Ghost != null);
+				Race race = _view.Race;
+				object ghostCheckpoints;
+				if (race != null)
+				{
+					Ghost ghost = _view.Ghost;
+					if (ghost != null)
+					{
+						ghostCheckpoints = ghost.Checkpoints(race);
+						goto IL_0093;
+					}
+				}
+				ghostCheckpoints = null;
+				goto IL_0093;
+				IL_0093:
+				GhostCheckpoints = (IReadOnlyList<GhostSnapshot>?)ghostCheckpoints;
 				UpdateLabels();
 			}
 		}
 
-		public IReadOnlyList<GhostSnapshot> GhostCheckpoints { get; private set; }
+		public IReadOnlyList<GhostSnapshot>? GhostCheckpoints { get; private set; }
 
 		public RacePreview()
 			: this()
@@ -60,7 +77,8 @@ namespace Ideka.RacingMeter
 			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0089: Expected O, but got Unknown
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0094: Expected O, but got Unknown
 			((Panel)this).set_Title(Strings.RacePreview);
 			((Panel)this).set_ShowTint(true);
 			RacePreviewView racePreviewView = new RacePreviewView();
@@ -77,21 +95,40 @@ namespace Ideka.RacingMeter
 			val2.set_SmallStep(true);
 			val2.set_MinValue(0f);
 			val2.set_MaxValue(1f);
+			val2.set_Value(0f);
 			_progressBar = val2;
+			UpdateLayout();
 			_progressBar.add_ValueChanged((EventHandler<ValueEventArgs<float>>)delegate
 			{
 				_view.GhostProgress = _progressBar.get_Value();
 				UpdateLabels();
 			});
-			FullRace = null;
-			FullGhost = null;
+			RacingModule.Server.RemoteRacesChanged += new Action<RemoteRaces>(RemoteRacesChanged);
+			RacingModule.LocalData.RacesChanged += new Action<IReadOnlyDictionary<string, FullRace>>(LocalRacesChanged);
+			UpdateMaps();
+			Race = null;
+			Ghost = null;
 			_progressBar.set_Value(0f);
-			UpdateLayout();
+		}
+
+		private void LocalRacesChanged(IReadOnlyDictionary<string, FullRace> _)
+		{
+			UpdateMaps();
+		}
+
+		private void RemoteRacesChanged(RemoteRaces _)
+		{
+			UpdateMaps();
+		}
+
+		private void UpdateMaps()
+		{
+			_view.RepopulateMaps(Enumerable.Empty<int>().Concat(RacingModule.Server.RemoteRaces.Races.Values.Select((FullRace r) => r.Race.MapId)).Concat(RacingModule.LocalData.Races.Values.Select((FullRace r) => r.Race.MapId)));
 		}
 
 		private void UpdateLabels()
 		{
-			_timeLabel.set_Text((FullGhost?.Ghost?.SnapshotAt(_progressBar.get_Value()).Time ?? TimeSpan.Zero).Formatted());
+			_timeLabel.set_Text((Ghost?.Ghost?.SnapshotAt(_progressBar.get_Value()).Time ?? TimeSpan.Zero).Formatted());
 		}
 
 		protected override void OnResized(ResizedEventArgs e)
@@ -117,6 +154,13 @@ namespace Ideka.RacingMeter
 				((Control)_view).set_Width(((Container)this).get_ContentRegion().Width);
 				((Control)_view).set_Height(((Control)_view).get_Bottom());
 			}
+		}
+
+		protected override void DisposeControl()
+		{
+			RacingModule.Server.RemoteRacesChanged -= new Action<RemoteRaces>(RemoteRacesChanged);
+			RacingModule.LocalData.RacesChanged -= new Action<IReadOnlyDictionary<string, FullRace>>(LocalRacesChanged);
+			((Panel)this).DisposeControl();
 		}
 	}
 }

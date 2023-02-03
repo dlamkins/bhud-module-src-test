@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Ideka.NetCommon;
 using Ideka.RacingMeter.Lib;
 using Microsoft.Xna.Framework;
 
@@ -9,7 +10,7 @@ namespace Ideka.RacingMeter
 	{
 		private FullRace _fullRace;
 
-		private RacePoint _selected;
+		private RacePoint? _selected;
 
 		public FullRace FullRace
 		{
@@ -28,9 +29,9 @@ namespace Ideka.RacingMeter
 			}
 		}
 
-		public Race Race => FullRace?.Race;
+		public Race Race => FullRace.Race;
 
-		public RacePoint Selected
+		public RacePoint? Selected
 		{
 			get
 			{
@@ -38,11 +39,16 @@ namespace Ideka.RacingMeter
 			}
 			set
 			{
-				if (value == null || Race == null || Race.RacePoints.Contains(value))
+				if (value != null)
 				{
-					_selected = value;
-					this.PointSelected?.Invoke(_selected);
+					Race race = Race;
+					if (race == null || !race.RacePoints.Contains(value))
+					{
+						return;
+					}
 				}
+				_selected = value;
+				this.PointSelected?.Invoke(_selected);
 			}
 		}
 
@@ -61,23 +67,28 @@ namespace Ideka.RacingMeter
 			}
 		}
 
-		public event Action<FullRace> RaceLoaded;
+		public event Action<FullRace?>? RaceLoaded;
 
-		public event Action<FullRace> RaceModified;
+		public event Action<FullRace>? RaceModified;
 
-		public event Action<RacePoint> PointSelected;
+		public event Action<RacePoint?>? PointSelected;
 
-		public event Action<RacePoint> PointInserted;
+		public event Action<RacePoint>? PointInserted;
 
-		public event Action<RacePoint> PointRemoved;
+		public event Action<RacePoint>? PointRemoved;
 
-		public event Action<RacePoint, bool> PointSwapped;
+		public event Action<RacePoint, bool>? PointSwapped;
 
-		public event Action<RacePoint> PointModified;
+		public event Action<RacePoint>? PointModified;
 
-		public int PointIndexOf(RacePoint point)
+		public int PointIndexOf(RacePoint? point)
 		{
 			return Race?.RacePoints.IndexOf(point) ?? (-1);
+		}
+
+		public EditState(FullRace? fullRace)
+		{
+			_fullRace = (FullRace = ((fullRace == null) ? DataExtensions.NewRace() : (fullRace!.IsLocal ? fullRace : fullRace!.CloneNew(StringExtensions.Format(Strings.CopyOf, fullRace!.Race.Name)))));
 		}
 
 		public bool SetRaceMap(int map)

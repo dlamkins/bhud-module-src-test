@@ -6,6 +6,8 @@ namespace Ideka.RacingMeter
 {
 	public class SpeedTime : ValueTime<PosSnapshot>
 	{
+		public static readonly SpeedTime Empty = new SpeedTime(PosSnapshot.Empty, PosSnapshot.Empty, TimeSpan.Zero);
+
 		public float Speed2D { get; }
 
 		public float Speed3D { get; }
@@ -19,10 +21,6 @@ namespace Ideka.RacingMeter
 		public float FwdMovementYaw { get; private set; }
 
 		public float SlopeAngle { get; }
-
-		public SpeedTime()
-		{
-		}
 
 		public SpeedTime(PosSnapshot first, PosSnapshot second, TimeSpan deltaTime, bool isDouble = false)
 			: base(first, second, deltaTime, isDouble)

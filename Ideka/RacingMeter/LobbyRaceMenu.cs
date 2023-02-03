@@ -17,9 +17,9 @@ namespace Ideka.RacingMeter
 
 		private readonly ContextMenuStripItem _setRace;
 
-		private FullRace _selected;
+		private FullRace? _selected;
 
-		private Control _control;
+		private Control? _control;
 
 		private RacingServer Server => Client.Server;
 
@@ -56,12 +56,12 @@ namespace Ideka.RacingMeter
 			}
 		}
 
-		public void Show(FullRace race, Control control)
+		public void Show(FullRace race, Control? control)
 		{
 			if (race != null)
 			{
-				User user = Client.User;
-				if (user != null && user.LobbyData.IsHost)
+				User? user = Client.User;
+				if (user != null && user!.LobbyData.IsHost)
 				{
 					_selected = race;
 					_control = control;

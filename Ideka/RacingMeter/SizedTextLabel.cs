@@ -1,4 +1,5 @@
 using System;
+using Blish_HUD;
 using Blish_HUD.Controls;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
@@ -8,13 +9,15 @@ namespace Ideka.RacingMeter
 {
 	public class SizedTextLabel : RectAnchor
 	{
-		public string SuffixModel;
+		public string? SuffixModel;
 
-		public override Vector2 SizeDelta => Size2.op_Implicit((SuffixModel != null) ? (Font.MeasureString(Text.Substring(0, Math.Max(0, Text.Length - SuffixModel.Length))) + Font.MeasureString(SuffixModel)) : Font.MeasureString(Text));
+		public override Vector2 SizeDelta => Size2.op_Implicit((SuffixModel != null) ? (Font.MeasureString(Text.Substring(0, Math.Max(0, Text.Length - SuffixModel!.Length))) + Font.MeasureString(SuffixModel)) : Font.MeasureString(Text));
 
-		public string Text { get; set; }
+		public string Text { get; set; } = "";
 
-		public BitmapFont Font { get; set; }
+
+		public BitmapFont Font { get; set; } = GameService.Content.get_DefaultFont12();
+
 
 		public Color Color { get; set; }
 

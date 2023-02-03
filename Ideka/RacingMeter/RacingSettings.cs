@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using Blish_HUD;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
 using Gw2Sharp.Models;
 using Ideka.BHUDCommon;
+using Ideka.NetCommon;
 using Microsoft.Xna.Framework.Input;
 
 namespace Ideka.RacingMeter
@@ -34,11 +36,9 @@ namespace Ideka.RacingMeter
 
 		private KeyBindingSetting ToggleSpeedometer { get; }
 
-		public IReadOnlyDictionary<MountType, (GenericSetting<bool> setting, RectAnchor meter)> Meters { get; }
+		public IReadOnlyDictionary<MountType, GenericSetting<bool>> Meters { get; }
 
 		private KeyBindingSetting BeetleDriftKey { get; }
-
-		public Keys BeetleDriftKeyValue => BeetleDriftKey.Value.get_PrimaryKey();
 
 		public GenericSetting<float> SfxVolumeMultiplier { get; }
 
@@ -68,28 +68,42 @@ namespace Ideka.RacingMeter
 
 		public KeyBindingSetting ToggleDebug { get; }
 
+		public bool? IsDriftKeyDown()
+		{
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			if ((int)BeetleDriftKey.Value.get_PrimaryKey() == 0)
+			{
+				return null;
+			}
+			KeyboardState state = GameService.Input.get_Keyboard().get_State();
+			return ((KeyboardState)(ref state)).IsKeyDown(BeetleDriftKey.Value.get_PrimaryKey());
+		}
+
 		public RacingSettings(SettingCollection settings)
 		{
 			//IL_0147: Unknown result type (might be due to invalid IL or missing references)
 			//IL_018f: Expected O, but got Unknown
-			//IL_02e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0331: Expected O, but got Unknown
-			//IL_083a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0882: Expected O, but got Unknown
+			//IL_02cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0315: Expected O, but got Unknown
+			//IL_081e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0866: Expected O, but got Unknown
 			MumblePollingRate = _dc.Add(settings.Slider("MumblePollingRate", 50, 25, 200, () => Strings.SettingMumblePollingRate, () => Strings.SettingMumblePollingRateText));
 			SpeedometerAnchorY = _dc.Add(settings.PercentageSlider("SpeedometerAnchorY", 0.7f, 0f, 1f, () => Strings.SettingSpeedometerAnchorY, () => Strings.SettingSpeedometerAnchorYText));
 			ShowSpeedometer = _dc.Add(settings.Generic("ShowSpeedometer", defaultValue: true, () => Strings.SettingShowSpeedometer, () => Strings.SettingShowSpeedometerText));
 			ToggleSpeedometer = _dc.Add(settings.KeyBinding("ToggleSpeedometer", new KeyBinding(), () => Strings.SettingToggleSpeedometer, () => Strings.SettingToggleSpeedometerText));
-			ToggleSpeedometer.OnActivated(delegate
+			_dc.Add(ToggleSpeedometer.OnActivated(delegate
 			{
 				ShowSpeedometer.Value = !ShowSpeedometer.Value;
-			});
-			Meters = new Dictionary<MountType, (GenericSetting<bool>, RectAnchor)>
+			}));
+			Meters = new Dictionary<MountType, GenericSetting<bool>>
 			{
-				[(MountType)4] = (_dc.Add(settings.Generic("SkimmerMeter", defaultValue: true, () => Strings.SettingSkimmerMeter)), SkimmerMeter.Construct()),
-				[(MountType)2] = (_dc.Add(settings.Generic("GriffonMeter", defaultValue: true, () => Strings.SettingGriffonMeter)), GriffonMeter.Construct()),
-				[(MountType)6] = (_dc.Add(settings.Generic("RollerBeetleMeter", defaultValue: true, () => Strings.SettingRollerBeetleMeter)), BeetleMeter.Construct()),
-				[(MountType)9] = (_dc.Add(settings.Generic("SkiffMeter", defaultValue: true, () => Strings.SettingSkiffMeter)), SkiffMeter.Construct())
+				[(MountType)4] = _dc.Add(settings.Generic("SkimmerMeter", defaultValue: true, () => Strings.SettingSkimmerMeter)),
+				[(MountType)2] = _dc.Add(settings.Generic("GriffonMeter", defaultValue: true, () => Strings.SettingGriffonMeter)),
+				[(MountType)6] = _dc.Add(settings.Generic("RollerBeetleMeter", defaultValue: true, () => Strings.SettingRollerBeetleMeter)),
+				[(MountType)9] = _dc.Add(settings.Generic("SkiffMeter", defaultValue: true, () => Strings.SettingSkiffMeter))
 			};
 			BeetleDriftKey = _dc.Add(settings.KeyBinding("BeetleDriftKey", new KeyBinding(), () => Strings.SettingBeetleDriftKey, () => Strings.SettingBeetleDriftKeyText));
 			SfxVolumeMultiplier = _dc.Add(settings.PercentageSlider("SFXVolumeMultiplier", 1.5f, 0f, 3f, () => Strings.SettingSFXVolumeMultiplier, () => Strings.SettingSFXVolumeMultiplierText));

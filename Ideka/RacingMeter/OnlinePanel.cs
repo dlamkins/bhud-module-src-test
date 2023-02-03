@@ -1,14 +1,17 @@
+using System;
 using Blish_HUD.Controls;
 using Ideka.RacingMeter.Lib.RacingServer;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Ideka.RacingMeter
 {
-	public class OnlinePanel : Panel, IPanelOverride
+	public class OnlinePanel : Panel, IUIPanel
 	{
 		private const int Spacing = 10;
 
 		private readonly RacingClient Client;
+
+		private readonly RaceOnline _online;
 
 		private readonly LobbyBar _lobbyBar;
 
@@ -21,10 +24,11 @@ namespace Ideka.RacingMeter
 
 		public string Caption => "Online Racing";
 
-		public OnlinePanel(RacingClient client)
+		public OnlinePanel(PanelStack panelStack, MeasurerRealtime measurer)
 			: this()
 		{
-			Client = client;
+			Client = new RacingClient(measurer);
+			_online = new RaceOnline(Client);
 			LobbyBar lobbyBar = new LobbyBar(Client);
 			((Control)lobbyBar).set_Parent((Container)(object)this);
 			_lobbyBar = lobbyBar;
@@ -32,11 +36,13 @@ namespace Ideka.RacingMeter
 			((Control)lobbyPanel).set_Parent((Container)(object)this);
 			((Control)lobbyPanel).set_Visible(Client.Lobby != null);
 			_lobbyPanel = lobbyPanel;
-			Client.LobbyChanged += LobbyChanged;
 			UpdateLayout();
+			_lobbyBar.BackRequested += new Action(panelStack.GoBack);
+			Client.LobbyChanged += new Action<Lobby>(LobbyChanged);
+			Client.Connect();
 		}
 
-		private void LobbyChanged(Lobby lobby)
+		private void LobbyChanged(Lobby? lobby)
 		{
 			((Control)_lobbyPanel).set_Visible(lobby != null);
 		}
@@ -64,7 +70,9 @@ namespace Ideka.RacingMeter
 
 		protected override void DisposeControl()
 		{
-			Client.LobbyChanged -= LobbyChanged;
+			Client.Dispose();
+			((Control)_online).Dispose();
+			Client.LobbyChanged -= new Action<Lobby>(LobbyChanged);
 			((Panel)this).DisposeControl();
 		}
 	}

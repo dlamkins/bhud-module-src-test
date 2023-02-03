@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
-using Ideka.NetCommon;
 using Ideka.RacingMeter.Lib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -17,29 +15,23 @@ namespace Ideka.RacingMeter
 	{
 		private static readonly Logger Logger = Logger.GetLogger<GhostsPanel>();
 
-		private static readonly Color SelfBoardColor = Color.get_Blue() * 0.05f;
-
 		private const int Spacing = 10;
 
-		private FullRace _race;
-
-		private FullGhost _ghost;
+		public FullRace? _race;
 
 		private readonly FlowPanel _panel;
 
-		private readonly Panel _ghostsPanel;
+		private readonly GhostsMenu _remoteGhostsMenu;
 
-		private readonly Menu _ghostsMenu;
-
-		private readonly Panel _localGhostsPanel;
-
-		private readonly Menu _localGhostsMenu;
+		private readonly GhostsMenu _localGhostsMenu;
 
 		private readonly StandardButton _updateLeaderboardButton;
 
-		private CancellationTokenSource _updateLeaderboard;
+		private CancellationTokenSource? _updateLeaderboard;
 
-		public FullRace Race
+		private CancellationTokenSource? _loadLocalGhosts;
+
+		public FullRace? Race
 		{
 			get
 			{
@@ -48,28 +40,15 @@ namespace Ideka.RacingMeter
 			set
 			{
 				_race = value;
-				TaskUtils.Cancel(ref _updateLeaderboard);
 				StandardButton updateLeaderboardButton = _updateLeaderboardButton;
-				FullRace race = _race;
-				((Control)updateLeaderboardButton).set_Enabled(race != null && !race.IsLocal);
-				PopulateGhosts();
+				FullRace? race = _race;
+				((Control)updateLeaderboardButton).set_Enabled(race != null && !race!.IsLocal);
+				PopulateLeaderboard();
+				PopulateLocalGhosts();
 			}
 		}
 
-		public FullGhost Ghost
-		{
-			get
-			{
-				return _ghost;
-			}
-			private set
-			{
-				_ghost = value;
-				this.GhostChanged?.Invoke(_ghost);
-			}
-		}
-
-		public event Action<FullGhost> GhostChanged;
+		public event Action<FullGhost?>? GhostSelected;
 
 		public GhostsPanel()
 			: this()
@@ -80,213 +59,146 @@ namespace Ideka.RacingMeter
 			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002d: Expected O, but got Unknown
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Expected O, but got Unknown
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0089: Expected O, but got Unknown
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b9: Expected O, but got Unknown
-			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e5: Expected O, but got Unknown
-			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0102: Expected O, but got Unknown
+			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Expected O, but got Unknown
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)this);
 			val.set_FlowDirection((ControlFlowDirection)3);
 			((Panel)val).set_CanScroll(true);
 			((Panel)val).set_ShowBorder(true);
 			_panel = val;
-			Panel val2 = new Panel();
-			((Control)val2).set_Parent((Container)(object)_panel);
-			((Container)val2).set_HeightSizingMode((SizingMode)1);
-			val2.set_CanCollapse(true);
-			val2.set_Title(Strings.Leaderboard);
-			_ghostsPanel = val2;
-			Menu val3 = new Menu();
-			((Control)val3).set_Parent((Container)(object)_ghostsPanel);
-			((Container)val3).set_WidthSizingMode((SizingMode)2);
-			((Container)val3).set_HeightSizingMode((SizingMode)1);
-			val3.set_CanSelect(true);
-			_ghostsMenu = val3;
-			Panel val4 = new Panel();
-			((Control)val4).set_Parent((Container)(object)_panel);
-			((Container)val4).set_HeightSizingMode((SizingMode)1);
-			val4.set_CanCollapse(true);
-			val4.set_Title(Strings.LocalGhosts);
-			_localGhostsPanel = val4;
-			Menu val5 = new Menu();
-			((Control)val5).set_Parent((Container)(object)_localGhostsPanel);
-			((Container)val5).set_WidthSizingMode((SizingMode)2);
-			((Container)val5).set_HeightSizingMode((SizingMode)1);
-			val5.set_CanSelect(true);
-			_localGhostsMenu = val5;
-			StandardButton val6 = new StandardButton();
-			((Control)val6).set_Parent((Container)(object)this);
-			val6.set_Text(Strings.UpdateLeaderboard);
-			_updateLeaderboardButton = val6;
+			GhostsMenu ghostsMenu = new GhostsMenu();
+			((Control)ghostsMenu).set_Parent((Container)(object)_panel);
+			((Panel)ghostsMenu).set_Title(Strings.Leaderboard);
+			_remoteGhostsMenu = ghostsMenu;
+			GhostsMenu ghostsMenu2 = new GhostsMenu();
+			((Control)ghostsMenu2).set_Parent((Container)(object)_panel);
+			((Panel)ghostsMenu2).set_Title(Strings.LocalGhosts);
+			_localGhostsMenu = ghostsMenu2;
+			StandardButton val2 = new StandardButton();
+			((Control)val2).set_Parent((Container)(object)this);
+			val2.set_Text(Strings.UpdateLeaderboard);
+			_updateLeaderboardButton = val2;
+			UpdateLayout();
+			_remoteGhostsMenu.ItemSelected += new Action<FullGhost>(OnGhostSelected);
+			_localGhostsMenu.ItemSelected += new Action<FullGhost>(OnGhostSelected);
 			((Control)_updateLeaderboardButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				if (!RacingModule.Server.NotifyIfOffline())
+				if (Race?.Meta.Id == null)
 				{
-					if (Race?.Meta.Id == null)
-					{
-						ScreenNotification.ShowNotification(Strings.NotifyNoRaceSelected, (NotificationType)2, (Texture2D)null, 4);
-					}
-					else
-					{
-						PopulateLeaderboard(force: true);
-					}
+					ScreenNotification.ShowNotification(Strings.NotifyNoRaceSelected, (NotificationType)2, (Texture2D)null, 4);
+				}
+				else
+				{
+					PopulateLeaderboard(force: true);
 				}
 			});
-			RacingModule.Server.UserChanged += UserChanged;
-			RacingModule.Server.LeaderboardsChanged += LeaderboardsChanged;
-			RacingModule.Racer.GhostSaved += new Action<Ghost>(GhostSaved);
-			UpdateLayout();
+			Race = null;
+			RacingModule.Server.LeaderboardsChanged += new Action<string>(LeaderboardsChanged);
+			RacingModule.Server.UserChanged += new Action<UserData>(UserChanged);
+			RacingModule.LocalData.GhostsChanged += new Action<FullRace>(GhostsChanged);
+		}
+
+		public void GhostsChanged(FullRace race)
+		{
+			if (race.Meta?.Id == Race?.Meta?.Id)
+			{
+				PopulateLocalGhosts();
+			}
+		}
+
+		private void OnGhostSelected(FullGhost? ghost)
+		{
+			_remoteGhostsMenu.Selected = ghost;
+			_localGhostsMenu.Selected = ghost;
+			this.GhostSelected?.Invoke(ghost);
 		}
 
 		private void UpdateLeaderboard(string raceId)
 		{
+			TaskUtils.Cancel(ref _updateLeaderboard);
 			if (!RacingModule.Server.IsOnline)
 			{
 				return;
 			}
-			TaskUtils.Cancel(ref _updateLeaderboard);
 			((Control)_updateLeaderboardButton).set_Enabled(false);
-			RacingModule.Server.UpdateLeaderboard(raceId, TaskUtils.New(ref _updateLeaderboard)).Done(Logger, Strings.ErrorLeaderboardLoad, _updateLeaderboard).ContinueWith(delegate(Task<TaskUtils.TaskState> task)
+			RacingModule.Server.UpdateLeaderboard(raceId, TaskUtils.New(out _updateLeaderboard)).Done(Logger, Strings.ErrorLeaderboardLoad, _updateLeaderboard).ContinueWith(delegate(Task<TaskUtils.TaskState> task)
 			{
-				if (task.Result.Success && raceId == Race?.Meta.Id)
+				if (!task.IsCanceled)
 				{
-					PopulateLeaderboard();
+					((Control)_updateLeaderboardButton).set_Enabled(true);
 				}
-				StandardButton updateLeaderboardButton = _updateLeaderboardButton;
-				FullRace race = Race;
-				((Control)updateLeaderboardButton).set_Enabled(race != null && !race.IsLocal);
 			});
 		}
 
-		public void PopulateLeaderboard(bool force = false)
+		private void PopulateLeaderboard(bool force = false)
 		{
-			//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
-			FullGhost ghost = Ghost;
-			if (ghost != null && !ghost.IsLocal)
+			FullRace race = Race;
+			if (race != null)
 			{
-				Ghost = null;
-			}
-			((Container)_ghostsMenu).ClearChildren();
-			_ghostsMenu.set_CanSelect(false);
-			string raceId = Race?.Meta.Id;
-			if (raceId == null)
-			{
-				return;
-			}
-			if (Race?.IsLocal ?? false)
-			{
-				((Control)_ghostsMenu.AddMenuItem(Strings.Unavailable, (Texture2D)null)).set_BasicTooltipText(Strings.RaceLocalLeaderboardTooltip);
-				return;
-			}
-			if (!RacingModule.Server.IsOnline)
-			{
-				((Control)_ghostsMenu.AddMenuItem(Strings.Unavailable, (Texture2D)null)).set_BasicTooltipText(Strings.NotifyOfflineMode);
-				return;
-			}
-			if (force || !RacingModule.Server.Leaderboards.Boards.TryGetValue(raceId, out var board))
-			{
-				_ghostsMenu.AddMenuItem(Strings.Loading, (Texture2D)null);
-				UpdateLeaderboard(raceId);
-				return;
-			}
-			_ghostsMenu.set_CanSelect(board.Places.Any());
-			if (!board.Places.Any())
-			{
-				_ghostsMenu.AddMenuItem(Strings.Nothing, (Texture2D)null);
-				return;
-			}
-			foreach (KeyValuePair<int, MetaGhost> place2 in board.Places)
-			{
-				place2.Deconstruct(out var key, out var value);
-				int place = key;
-				MetaGhost meta = value;
-				OnelineMenuItem onelineMenuItem = new OnelineMenuItem($"{place + 1}. {meta.Time.Formatted()} - {meta.AccountName}");
-				((Control)onelineMenuItem).set_Parent((Container)(object)_ghostsMenu);
-				((Control)onelineMenuItem).set_BasicTooltipText(meta.AccountName);
-				OnelineMenuItem item = onelineMenuItem;
-				if (RacingModule.Server.User?.AccountId == meta.UserId)
+				string raceId = race.Meta?.Id;
+				if (raceId != null)
 				{
-					((Control)item).set_BackgroundColor(SelfBoardColor);
-				}
-				((MenuItem)item).add_ItemSelected((EventHandler<ControlActivatedEventArgs>)delegate
-				{
-					MenuItem selectedMenuItem = _localGhostsMenu.get_SelectedMenuItem();
-					if (selectedMenuItem != null)
+					Leaderboard board;
+					if (race.IsLocal)
 					{
-						selectedMenuItem.Deselect();
+						_remoteGhostsMenu.Placeholder(Strings.Unavailable, Strings.RaceLocalLeaderboardTooltip);
 					}
-					Ghost = new FullGhost
+					else if (!RacingModule.Server.IsOnline)
 					{
-						Meta = meta,
-						Ghost = null
-					};
-				});
+						_remoteGhostsMenu.Placeholder(Strings.Unavailable, Strings.UnavailableOffline);
+					}
+					else if (force || !RacingModule.Server.Leaderboards.Boards.TryGetValue(raceId, out board))
+					{
+						_remoteGhostsMenu.Placeholder(Strings.Loading);
+						UpdateLeaderboard(raceId);
+					}
+					else
+					{
+						_remoteGhostsMenu.SetLeaderboard(board);
+					}
+					return;
+				}
 			}
+			_remoteGhostsMenu.Placeholder(Strings.Nothing);
 		}
 
 		private void PopulateLocalGhosts()
 		{
-			if (Ghost?.IsLocal ?? false)
+			TaskUtils.Cancel(ref _loadLocalGhosts);
+			FullRace race = Race;
+			if (race == null)
 			{
-				Ghost = null;
-			}
-			((Container)_localGhostsMenu).ClearChildren();
-			_localGhostsMenu.set_CanSelect(false);
-			if (Race?.Meta.Id == null)
-			{
+				_localGhostsMenu.Placeholder(Strings.Nothing);
 				return;
 			}
-			Dictionary<string, FullGhost>.ValueCollection ghosts = DataInterface.GetLocalGhosts(Race).Values;
-			_localGhostsMenu.set_CanSelect(ghosts.Any());
-			if (!ghosts.Any())
+			_localGhostsMenu.Placeholder(Strings.Loading);
+			IEnumerable<FullGhost> ghosts = null;
+			Task.Run(delegate
 			{
-				_localGhostsMenu.AddMenuItem(Strings.Nothing, (Texture2D)null);
-				return;
-			}
-			foreach (var item in ghosts.OrderBy((FullGhost g) => g.Meta.Time).Enumerate())
+				ghosts = LocalData.GetGhosts(race).Values;
+			}, TaskUtils.New(out _loadLocalGhosts)).Done(Logger, null, _loadLocalGhosts).ContinueWith(delegate(Task<TaskUtils.TaskState> task)
 			{
-				var (place, ghost) = item;
-				_localGhostsMenu.AddMenuItem($"{place + 1}. {ghost.Meta.Time.Formatted()}", (Texture2D)null).add_ItemSelected((EventHandler<ControlActivatedEventArgs>)delegate
+				if (task.Result.Success && ghosts != null)
 				{
-					MenuItem selectedMenuItem = _ghostsMenu.get_SelectedMenuItem();
-					if (selectedMenuItem != null)
-					{
-						selectedMenuItem.Deselect();
-					}
-					Ghost = ghost;
-				});
-			}
+					_localGhostsMenu.SetLocalGhosts(ghosts);
+				}
+			});
 		}
 
-		private void PopulateGhosts()
+		private void UserChanged(UserData _)
 		{
-			Ghost = null;
-			PopulateLocalGhosts();
 			PopulateLeaderboard();
+		}
+
+		private void LeaderboardsChanged(string raceId)
+		{
+			if (raceId == Race?.Meta?.Id)
+			{
+				PopulateLeaderboard();
+			}
 		}
 
 		protected override void OnResized(ResizedEventArgs e)
@@ -309,39 +221,18 @@ namespace Ideka.RacingMeter
 				((Control)_panel).set_Width(((Container)this).get_ContentRegion().Width);
 				((Control)_panel).set_Height(((Control)_updateLeaderboardButton).get_Top() - 10);
 				((Control)_updateLeaderboardButton).set_Left(((Container)this).get_ContentRegion().Width / 2 - ((Control)_updateLeaderboardButton).get_Width() / 2);
-				Panel ghostsPanel = _ghostsPanel;
+				GhostsMenu remoteGhostsMenu = _remoteGhostsMenu;
 				int width;
-				((Control)_localGhostsPanel).set_Width(width = ((Container)this).get_ContentRegion().Width - 20);
-				((Control)ghostsPanel).set_Width(width);
-			}
-		}
-
-		private void UserChanged(UserData _)
-		{
-			PopulateLeaderboard();
-		}
-
-		private void LeaderboardsChanged(string raceId)
-		{
-			if (Race?.Meta.Id == raceId)
-			{
-				PopulateLeaderboard();
-			}
-		}
-
-		private void GhostSaved(Ghost ghost)
-		{
-			if (Race?.Meta.Id == ghost.RaceId)
-			{
-				PopulateLocalGhosts();
+				((Control)_localGhostsMenu).set_Width(width = ((Container)this).get_ContentRegion().Width - 20);
+				((Control)remoteGhostsMenu).set_Width(width);
 			}
 		}
 
 		protected override void DisposeControl()
 		{
-			RacingModule.Server.UserChanged -= UserChanged;
-			RacingModule.Server.LeaderboardsChanged -= LeaderboardsChanged;
-			RacingModule.Racer.GhostSaved -= new Action<Ghost>(GhostSaved);
+			RacingModule.Server.LeaderboardsChanged -= new Action<string>(LeaderboardsChanged);
+			RacingModule.Server.UserChanged -= new Action<UserData>(UserChanged);
+			RacingModule.LocalData.GhostsChanged -= new Action<FullRace>(GhostsChanged);
 			((Container)this).DisposeControl();
 		}
 	}

@@ -9,11 +9,11 @@ namespace Ideka.RacingMeter
 {
 	public static class GhostExtensions
 	{
-		public static (TimeSpan, Ghost) Ready(FullRace fullRace, IEnumerable<PosSnapshot> initialSnapshots)
+		public static (TimeSpan, Ghost?) Ready(FullRace fullRace, IEnumerable<PosSnapshot> initialSnapshots)
 		{
 			if (!initialSnapshots.Any())
 			{
-				return default((TimeSpan, Ghost));
+				return (default(TimeSpan), null);
 			}
 			Ghost ghost = new Ghost
 			{
@@ -25,15 +25,6 @@ namespace Ideka.RacingMeter
 				ghost.AddSnapshot(timeBase, snapshot);
 			}
 			return (timeBase, ghost);
-		}
-
-		public static int AfterEnd(this Ghost ghost)
-		{
-			if (!(ghost.End != TimeSpan.Zero))
-			{
-				return 0;
-			}
-			return ghost.Snapshots.Reverse().SkipWhile((GhostSnapshot s) => s.Time > ghost.End).Count();
 		}
 
 		public static GhostSnapshot ToGhostSnapshot(this PosSnapshot pos, TimeSpan timeBase)

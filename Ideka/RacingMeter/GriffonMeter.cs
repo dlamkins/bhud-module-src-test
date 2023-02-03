@@ -29,22 +29,23 @@ namespace Ideka.RacingMeter
 
 		public const double VSpeedRange = 2000.0;
 
-		public static RectAnchor Construct()
+		public static RectAnchor Construct(IMeasurer measurer)
 		{
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0171: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0204: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0213: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0222: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0243: Unknown result type (might be due to invalid IL or missing references)
-			RectAnchor meter = new RectAnchor();
-			ArcMeterMaker arc = new ArcMeterMaker();
+			//IL_0234: Unknown result type (might be due to invalid IL or missing references)
+			IMeasurer measurer2 = measurer;
+			RectAnchor rectAnchor = new RectAnchor();
+			ArcMeterMaker arc = new ArcMeterMaker(measurer2);
 			Projection speedP = arc.Meter.AddProjection(Projection.ZeroTo(2500.0)).WithSoftMax(2000.0);
-			meter.AddChild(arc.Meter);
+			rectAnchor.AddChild(arc.Meter);
 			arc.AddSoftMaxSpeedIndicator(speedP);
 			arc.AddZone(speedP, Color.get_MediumPurple(), 1000.0);
 			arc.AddZone(speedP, Color.get_DarkGreen(), 1310.0);
@@ -54,11 +55,11 @@ namespace Ideka.RacingMeter
 			arc.AddSpeed3DNeedle(speedP);
 			arc.AddSpeed3DText(speedP);
 			arc.AddAccel3DText(speedP);
-			LineMeterMaker right = new LineMeterMaker();
-			Projection heightP = right.Meter.AddProjection(new Projection()).WithAnchors(new ProjectionAnchors(() => RacingModule.Measurer.Pos.HeightIn));
+			LineMeterMaker right = new LineMeterMaker(measurer2);
+			Projection heightP = right.Meter.AddProjection(new Projection()).WithAnchors(new ProjectionAnchors(() => measurer2.Pos.HeightIn));
 			Projection vSpeedP = right.Meter.AddProjection(Projection.ZeroTo(2000.0));
 			right.TackOn(right: true);
-			meter.AddChild(right.Meter);
+			rectAnchor.AddChild(right.Meter);
 			right.AddWaterZone(heightP);
 			right.AddUpSpeedZone(vSpeedP);
 			right.AddDownSpeedZone(vSpeedP);
@@ -74,7 +75,7 @@ namespace Ideka.RacingMeter
 				SizeDelta = new Vector2(5f, 0f)
 			});
 			right.AddLevelText(heightP, new Vector2(0.5f, 0f), new Vector2(0.5f, 1f));
-			meter.AddChild(new EnduranceMarker
+			rectAnchor.AddChild(new EnduranceMarker
 			{
 				Percentage = 0.76,
 				Color = Color.get_Black(),
@@ -83,19 +84,19 @@ namespace Ideka.RacingMeter
 			bool preClimb = false;
 			bool diving = false;
 			bool climbing = false;
-			Speedometer.ExtraDebug.Add((meter, "3ips", () => $"{RacingModule.Measurer.Speed.Speed3D:0}"));
-			Speedometer.ExtraDebug.Add((meter, "preclimb", () => $"{preClimb}"));
-			Speedometer.ExtraDebug.Add((meter, "diving", () => $"{diving}"));
-			Speedometer.ExtraDebug.Add((meter, "climbing", () => $"{climbing}"));
-			meter.WithUpdate(delegate
+			rectAnchor.DebugData.Add(("3ips", () => $"{measurer2.Speed.Speed3D:0}"));
+			rectAnchor.DebugData.Add(("preclimb", () => $"{preClimb}"));
+			rectAnchor.DebugData.Add(("diving", () => $"{diving}"));
+			rectAnchor.DebugData.Add(("climbing", () => $"{climbing}"));
+			rectAnchor.WithUpdate(delegate
 			{
-				float speed2D = RacingModule.Measurer.Speed.Speed2D;
-				float speed3D = RacingModule.Measurer.Speed.Speed3D;
-				float accel2D = RacingModule.Measurer.Accel.Accel2D;
-				float upSpeed = RacingModule.Measurer.Speed.UpSpeed;
-				float downSpeed = RacingModule.Measurer.Speed.DownSpeed;
-				float downAccel = RacingModule.Measurer.Accel.DownAccel;
-				float heightIn = RacingModule.Measurer.Pos.HeightIn;
+				float speed2D = measurer2.Speed.Speed2D;
+				float speed3D = measurer2.Speed.Speed3D;
+				float accel2D = measurer2.Accel.Accel2D;
+				float upSpeed = measurer2.Speed.UpSpeed;
+				float downSpeed = measurer2.Speed.DownSpeed;
+				float downAccel = measurer2.Accel.DownAccel;
+				float heightIn = measurer2.Pos.HeightIn;
 				diving = ((double)speed2D >= 300.0 || (diving && (double)speed3D > 300.0)) && downSpeed > 0f && (downAccel > 1300f || (diving && downAccel > 700f) || (diving && downSpeed > 500f));
 				climbing = (climbing || preClimb) && upSpeed > 500f;
 				preClimb = !climbing && !diving && (double)speed2D >= 1000.0 && (Math.Abs(accel2D) > 500f || (preClimb && accel2D > 0f) || (preClimb && upSpeed > 0f && accel2D < -100f));
@@ -110,7 +111,7 @@ namespace Ideka.RacingMeter
 					diveHeight.Visible = false;
 				}
 			});
-			return meter;
+			return rectAnchor;
 		}
 	}
 }

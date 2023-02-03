@@ -1,17 +1,14 @@
 using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 
 namespace Ideka.RacingMeter
 {
 	public class LineMeterMaker : MeterMaker<LineMeter>
 	{
-		public List<LineMeterNeedle> HeightAnchors { get; } = new List<LineMeterNeedle>();
-
-
-		public LineMeterMaker()
+		public LineMeterMaker(IMeasurer measurer)
+			: base(measurer)
 		{
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 			base.Meter.Padding = new Vector2(2f, 2f);
 		}
 
@@ -54,22 +51,23 @@ namespace Ideka.RacingMeter
 				Color = MeterMaker.UpSpeedColor
 			}).WithUpdate(delegate(LineMeterZone x)
 			{
-				x.End = Math.Max(RacingModule.Measurer.Speed.UpSpeed, 0f);
+				x.End = Math.Max(base.Measurer.Speed.UpSpeed, 0f);
 			});
 		}
 
 		public LineMeterZone AddDownSpeedZone(Projection projection)
 		{
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			Projection projection2 = projection;
 			return base.Meter.AddChild(new LineMeterZone
 			{
-				Projection = projection,
+				Projection = projection2,
 				End = double.NaN,
 				Clamp = true,
 				Color = MeterMaker.DownSpeedColor
 			}).WithUpdate(delegate(LineMeterZone x)
 			{
-				x.Start = projection.MaxValue - (double)Math.Max(RacingModule.Measurer.Speed.DownSpeed, 0f);
+				x.Start = projection2.MaxValue - (double)Math.Max(base.Measurer.Speed.DownSpeed, 0f);
 			});
 		}
 
@@ -99,7 +97,7 @@ namespace Ideka.RacingMeter
 			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 			return AddNeedle(projection, MeterMaker.DefaultColor).WithUpdate(delegate(LineMeterNeedle x)
 			{
-				x.Value = RacingModule.Measurer.Pos.HeightIn;
+				x.Value = base.Measurer.Pos.HeightIn;
 			});
 		}
 
@@ -107,6 +105,7 @@ namespace Ideka.RacingMeter
 		{
 			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			Projection projection2 = projection;
 			SimpleRectangle black = container.AddChild(new SimpleRectangle
 			{
 				FillColor = Color.get_Black()
@@ -121,7 +120,7 @@ namespace Ideka.RacingMeter
 				//IL_006b: Unknown result type (might be due to invalid IL or missing references)
 				//IL_007c: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-				double anchorLevel = projection.GetAnchorLevel();
+				double anchorLevel = projection2.GetAnchorLevel();
 				SimpleRectangle simpleRectangle3;
 				SimpleRectangle simpleRectangle4;
 				if ((int)anchorLevel % 2 != 0)
@@ -150,9 +149,10 @@ namespace Ideka.RacingMeter
 		{
 			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			Projection projection2 = projection;
 			return AddText(anchor, pivot).WithUpdate(delegate(SizedTextLabel x)
 			{
-				x.Text = $"L{(int)projection.GetAnchorLevel()}";
+				x.Text = $"L{(int)projection2.GetAnchorLevel()}";
 			});
 		}
 

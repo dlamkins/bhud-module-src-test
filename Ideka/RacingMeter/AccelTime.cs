@@ -4,6 +4,8 @@ namespace Ideka.RacingMeter
 {
 	public class AccelTime : ValueTime<SpeedTime>
 	{
+		public static readonly AccelTime Empty = new AccelTime(SpeedTime.Empty, SpeedTime.Empty, TimeSpan.Zero);
+
 		public float Accel2D { get; }
 
 		public float Accel3D { get; }
@@ -11,10 +13,6 @@ namespace Ideka.RacingMeter
 		public float UpAccel { get; }
 
 		public float DownAccel { get; }
-
-		public AccelTime()
-		{
-		}
 
 		public AccelTime(SpeedTime first, SpeedTime second, TimeSpan dt)
 			: base(first, second, dt, isDouble: false)

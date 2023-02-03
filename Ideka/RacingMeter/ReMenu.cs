@@ -11,7 +11,7 @@ namespace Ideka.RacingMeter
 		{
 			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).RecalculateLayout();
+			((Menu)this).RecalculateLayout();
 			int lastBottom = 0;
 			foreach (Control item in ((IEnumerable<Control>)((Container)this)._children).Where((Control c) => c.get_Visible()))
 			{

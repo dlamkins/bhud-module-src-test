@@ -28,6 +28,8 @@ namespace Ideka.RacingMeter
 
 		private RacingServer Server => Client.Server;
 
+		public event Action? BackRequested;
+
 		public LobbyBar(RacingClient client)
 			: this()
 		{
@@ -40,26 +42,26 @@ namespace Ideka.RacingMeter
 			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004e: Expected O, but got Unknown
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Expected O, but got Unknown
+			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
 			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0095: Expected O, but got Unknown
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cf: Expected O, but got Unknown
-			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010e: Expected O, but got Unknown
-			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0136: Expected O, but got Unknown
-			//IL_0159: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0175: Expected O, but got Unknown
+			//IL_008e: Expected O, but got Unknown
+			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Expected O, but got Unknown
+			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00de: Expected O, but got Unknown
+			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0106: Expected O, but got Unknown
 			Client = client;
 			Label val = new Label();
 			((Control)val).set_Parent((Container)(object)this);
@@ -70,30 +72,15 @@ namespace Ideka.RacingMeter
 			((Control)val2).set_Parent((Container)(object)this);
 			val2.set_Text(Strings.BackToRacing);
 			_backButton = val2;
-			((Control)_backButton).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
-				RacingModule.Racer.CurrentMode = Racer.Mode.Racing;
-			});
 			StandardButton val3 = new StandardButton();
 			((Control)val3).set_Parent((Container)(object)this);
 			val3.set_Text("Connect");
 			_connectButton = val3;
-			((Control)_connectButton).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
-				Client.Connect();
-			});
 			RacingServer server = Server;
 			StandardButton val4 = new StandardButton();
 			((Control)val4).set_Parent((Container)(object)this);
 			val4.set_Text("Create Lobby");
 			_lobbyCreateButton = server.Register<StandardButton>(val4);
-			((Control)_lobbyCreateButton).add_Click((EventHandler<MouseEventArgs>)async delegate
-			{
-				using (Client.Server.Lock())
-				{
-					await Client.Server.CreateLobby();
-				}
-			});
 			RacingServer server2 = Server;
 			TextBox val5 = new TextBox();
 			((Control)val5).set_Parent((Container)(object)this);
@@ -104,6 +91,27 @@ namespace Ideka.RacingMeter
 			((Control)val6).set_Parent((Container)(object)this);
 			val6.set_Text("Join Lobby");
 			_lobbyJoinButton = server3.Register<StandardButton>(val6);
+			RacingServer server4 = Server;
+			StandardButton val7 = new StandardButton();
+			((Control)val7).set_Parent((Container)(object)this);
+			val7.set_Text("Leave Lobby");
+			_lobbyLeaveButton = server4.Register<StandardButton>(val7);
+			UpdateLayout();
+			((Control)_backButton).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				this.BackRequested?.Invoke();
+			});
+			((Control)_connectButton).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				Client.Connect();
+			});
+			((Control)_lobbyCreateButton).add_Click((EventHandler<MouseEventArgs>)async delegate
+			{
+				using (Client.Server.Lock())
+				{
+					await Client.Server.CreateLobby();
+				}
+			});
 			((Control)_lobbyJoinButton).add_Click((EventHandler<MouseEventArgs>)async delegate
 			{
 				using (Client.Server.Lock())
@@ -111,11 +119,6 @@ namespace Ideka.RacingMeter
 					await Client.Server.JoinLobby(((TextInputBase)_lobbyIdInput).get_Text());
 				}
 			});
-			RacingServer server4 = Server;
-			StandardButton val7 = new StandardButton();
-			((Control)val7).set_Parent((Container)(object)this);
-			val7.set_Text("Leave Lobby");
-			_lobbyLeaveButton = server4.Register<StandardButton>(val7);
 			((Control)_lobbyLeaveButton).add_Click((EventHandler<MouseEventArgs>)async delegate
 			{
 				using (Client.Server.Lock())
@@ -123,10 +126,9 @@ namespace Ideka.RacingMeter
 					await Client.Server.LeaveLobby();
 				}
 			});
-			Client.PingUpdated += PingUpdated;
-			Client.StateChanged += ClientStateChanged;
-			Client.LobbyChanged += LobbyChanged;
-			UpdateLayout();
+			Client.PingUpdated += new Action<int>(PingUpdated);
+			Client.StateChanged += new Action<RacingClient.ClientState>(ClientStateChanged);
+			Client.LobbyChanged += new Action<Lobby>(LobbyChanged);
 		}
 
 		private void PingUpdated(int ping)
@@ -142,12 +144,12 @@ namespace Ideka.RacingMeter
 			UpdateLobbyButtons(state, Client.Lobby);
 		}
 
-		private void LobbyChanged(Lobby currentLobby)
+		private void LobbyChanged(Lobby? currentLobby)
 		{
 			UpdateLobbyButtons(Client.State, currentLobby);
 		}
 
-		private void UpdateLobbyButtons(RacingClient.ClientState state, Lobby currentLobby)
+		private void UpdateLobbyButtons(RacingClient.ClientState state, Lobby? currentLobby)
 		{
 			StandardButton lobbyCreateButton = _lobbyCreateButton;
 			TextBox lobbyIdInput = _lobbyIdInput;
@@ -195,9 +197,9 @@ namespace Ideka.RacingMeter
 
 		protected override void DisposeControl()
 		{
-			Client.PingUpdated -= PingUpdated;
-			Client.StateChanged -= ClientStateChanged;
-			Client.LobbyChanged -= LobbyChanged;
+			Client.PingUpdated -= new Action<int>(PingUpdated);
+			Client.StateChanged -= new Action<RacingClient.ClientState>(ClientStateChanged);
+			Client.LobbyChanged -= new Action<Lobby>(LobbyChanged);
 			((Container)this).DisposeControl();
 		}
 	}

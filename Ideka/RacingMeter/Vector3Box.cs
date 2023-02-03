@@ -82,9 +82,9 @@ namespace Ideka.RacingMeter
 			}
 		}
 
-		public event Action<Vector3> ValueCommitted;
+		public event Action<Vector3>? ValueCommitted;
 
-		public event Action<Vector3> TempValue;
+		public event Action<Vector3>? TempValue;
 
 		private static string Labeler(string x)
 		{

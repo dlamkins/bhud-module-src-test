@@ -4,7 +4,7 @@ namespace Ideka.RacingMeter
 	{
 		private readonly string _name;
 
-		private string _prevName;
+		private string _prevName = "";
 
 		public bool Modifying => true;
 

@@ -8,7 +8,7 @@ namespace Ideka.RacingMeter
 
 		public WorldCircle()
 		{
-			Primitive = Primitive.HorizontalCircle(0.5f, 128);
+			Primitive = Ideka.BHUDCommon.Primitive.HorizontalCircle(0.5f, 128);
 		}
 	}
 }

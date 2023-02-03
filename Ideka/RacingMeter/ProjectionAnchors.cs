@@ -7,6 +7,10 @@ namespace Ideka.RacingMeter
 {
 	public class ProjectionAnchors
 	{
+		public const double DefaultViewSlack = 500.0;
+
+		public const double DefaultScrollBase = 1000.0;
+
 		private readonly Func<double> _valueGet;
 
 		private readonly double _viewSlack;
@@ -38,7 +42,7 @@ namespace Ideka.RacingMeter
 			return anchor;
 		}
 
-		public IProjectionAnchor GetFurthestAnchor()
+		public IProjectionAnchor? GetFurthestAnchor()
 		{
 			double value = _valueGet();
 			IEnumerable<IProjectionAnchor> visible = _anchors.Where((IProjectionAnchor a) => a.Visible);

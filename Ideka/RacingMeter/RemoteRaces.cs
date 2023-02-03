@@ -16,18 +16,23 @@ namespace Ideka.RacingMeter
 
 		public static RemoteRaces FromCache(string path)
 		{
-			try
+			RemoteRaces races = null;
+			if (File.Exists(path))
 			{
-				if (File.Exists(path))
+				try
 				{
-					return JsonConvert.DeserializeObject<RemoteRaces>(File.ReadAllText(path));
+					races = JsonConvert.DeserializeObject<RemoteRaces>(File.ReadAllText(path));
+					if (races == null)
+					{
+						Logger.Warn("Failed to load Races cache.");
+					}
+				}
+				catch (Exception e)
+				{
+					Logger.Warn(e, "Error when loading Races cache.");
 				}
 			}
-			catch (Exception e)
-			{
-				Logger.Warn(e, "Failed to load Races cache.");
-			}
-			return new RemoteRaces();
+			return races ?? new RemoteRaces();
 		}
 
 		public void ToCache(string path)

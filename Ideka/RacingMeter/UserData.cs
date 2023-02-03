@@ -14,32 +14,36 @@ namespace Ideka.RacingMeter
 
 		private static readonly TimeSpan TokenRefreshSlack = TimeSpan.FromMinutes(5.0);
 
-		public Account Account { get; private set; }
+		public Account? Account { get; private set; }
 
-		public string AccessToken { get; private set; }
+		public string? AccessToken { get; private set; }
 
-		public Gw2Jwt Token { get; private set; }
+		public Gw2Jwt? Token { get; private set; }
 
-		public string AccountId
+		public string? AccountId
 		{
 			get
 			{
-				Account account = Account;
+				Account? account = Account;
 				if (account == null)
 				{
 					return null;
 				}
-				return account.get_Id().ToString();
+				return account!.get_Id().ToString();
 			}
 		}
 
 		public async Task Refresh(CancellationToken ct)
 		{
-			if (Token == null || !(Token.Payload.Expires - DateTime.UtcNow > TokenRefreshSlack))
+			if (Token == null || !(Token!.Payload.Expires - DateTime.UtcNow > TokenRefreshSlack))
 			{
 				Account = null;
 				AccessToken = null;
 				Token = null;
+				if (!RacingModule.Gw2ApiManager.HasPermission((TokenPermission)1))
+				{
+					throw FriendlyError.Create(new UnauthorizedAccessException(Strings.ExceptionNoAccountApiPermission));
+				}
 				Account = await ((IBlobClient<Account>)(object)RacingModule.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()).GetAsync(ct);
 				AccessToken = (await ((IBlobClient<CreateSubtoken>)(object)RacingModule.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_CreateSubtoken()
 					.Expires(DateTimeOffset.UtcNow + TokenDuration)

@@ -27,15 +27,18 @@ namespace Ideka.RacingMeter
 
 		public const float NeedleLength = 20f;
 
-		public const int AngleOrbDistance = 15;
+		public const int AngleMeterDistance = 15;
 
-		public const double AngleGuide = 50.0;
-
-		public const double HeightViewSlack = 500.0;
-
-		public const double LevelScrollBase = 1000.0;
+		public const double AngleGuide = 45.0;
 
 		public const double WaterLevel = -40.0;
+
+		public IMeasurer Measurer { get; }
+
+		public MeterMaker(IMeasurer measurer)
+		{
+			Measurer = measurer;
+		}
 
 		public static int RoundedDegrees(double angle)
 		{
@@ -51,12 +54,13 @@ namespace Ideka.RacingMeter
 	{
 		public T Meter { get; }
 
-		public MeterMaker()
+		public MeterMaker(IMeasurer measurer)
+			: base(measurer)
 		{
 			Meter = new T();
 		}
 
-		public SizedTextLabel AddText(Vector2 anchor, Vector2 pivot, BitmapFont font = null)
+		public SizedTextLabel AddText(Vector2 anchor, Vector2 pivot, BitmapFont? font = null)
 		{
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0018: Unknown result type (might be due to invalid IL or missing references)

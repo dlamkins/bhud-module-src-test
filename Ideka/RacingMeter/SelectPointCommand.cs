@@ -4,13 +4,13 @@ namespace Ideka.RacingMeter
 {
 	public class SelectPointCommand : IEditorCommand
 	{
-		private readonly RacePoint _selection;
+		private readonly RacePoint? _selection;
 
-		private RacePoint _prevSelection;
+		private RacePoint? _prevSelection;
 
 		public bool Modifying => false;
 
-		public SelectPointCommand(RacePoint selection)
+		public SelectPointCommand(RacePoint? selection)
 		{
 			_selection = selection;
 		}

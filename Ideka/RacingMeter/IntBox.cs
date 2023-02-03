@@ -98,11 +98,12 @@ namespace Ideka.RacingMeter
 
 
 		public IntBox()
+			: base(0)
 		{
 			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0069: Expected O, but got Unknown
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006a: Expected O, but got Unknown
 			_escBlock = new EscBlockWindow((Container)(object)this);
 			base.Spacing = 10;
 			_dragCancel = new KeyBinding((Keys)27);

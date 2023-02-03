@@ -1,4 +1,6 @@
+using System;
 using Blish_HUD;
+using Ideka.BHUDCommon;
 using Ideka.RacingMeter.Lib;
 using Ideka.RacingMeter.Lib.RacingServer;
 using Microsoft.Xna.Framework;
@@ -6,17 +8,15 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Ideka.RacingMeter
 {
-	public class RaceOnline : RaceHolder
+	public class RaceOnline : RaceDrawerWorld
 	{
-		public const double MinCheckpointAlpha = 0.1;
-
-		private FullRace _fullRace;
+		private FullRace? _fullRace;
 
 		private readonly RacingClient Client;
 
-		private readonly RaceDrawer Drawer;
+		private RaceRunFx? _runFx;
 
-		public override FullRace FullRace
+		public FullRace? FullRace
 		{
 			get
 			{
@@ -25,35 +25,45 @@ namespace Ideka.RacingMeter
 			set
 			{
 				_fullRace = value;
-				Drawer.LoadRace(_fullRace?.Race);
+				Race race = _fullRace?.Race;
+				if (race == null)
+				{
+					_runFx?.Dispose();
+					_runFx = null;
+					return;
+				}
+				RaceRunFx runFx = _runFx;
+				if (runFx != null)
+				{
+					runFx.LoadRace(race);
+				}
+				else
+				{
+					_runFx = new RaceRunFx(this, race);
+				}
 			}
 		}
 
-		public RaceOnline()
+		public override Race? Race => FullRace?.Race;
+
+		public RaceOnline(RacingClient client)
 		{
-			Client = new RacingClient();
-			Drawer = new RaceDrawer(this);
-			RacingModule.MetaPanel.PanelOverride = new OnlinePanel(Client);
-			Client.LobbyRaceUpdated += RaceUpdated;
-			Client.Connect();
+			Client = client;
+			Client.LobbyRaceUpdated += new Action<FullRace>(RaceUpdated);
 		}
 
-		private void RaceUpdated(FullRace race)
+		private void RaceUpdated(FullRace? race)
 		{
 			FullRace = race;
 		}
 
-		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
+		protected override void DrawRaceToWorld(SpriteBatch spriteBatch)
 		{
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			if (!CanDraw())
-			{
-				return;
-			}
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
 			Lobby lobby = Client.Lobby;
 			if (lobby == null)
 			{
@@ -66,7 +76,8 @@ namespace Ideka.RacingMeter
 					DrawRaceArrow(spriteBatch, user2.RacerData.Position, 1f, user2.RacerData.Position + user2.RacerData.Front, Color.get_White());
 				}
 			}
-			if (!CanDrawRace())
+			RaceRunFx runFx = _runFx;
+			if (runFx == null)
 			{
 				return;
 			}
@@ -75,28 +86,23 @@ namespace Ideka.RacingMeter
 			{
 				if (!user.RacerData.RaceReady)
 				{
-					Drawer.DrawStart(spriteBatch);
+					runFx.DrawStart(spriteBatch);
 				}
 				else
 				{
-					Drawer.DrawPoints(spriteBatch, lobby.IsRunning ? user.RacerData.Times.Count : 0, lobby.Settings.Laps);
+					runFx.DrawPoints(spriteBatch, lobby.IsRunning ? user.RacerData.Times.Count : 0, lobby.Settings.Laps);
 				}
 			}
 		}
 
-		public override void DrawToMap(SpriteBatch spriteBatch, MapBounds map)
+		protected override void DrawRaceToMap(SpriteBatch spriteBatch, IMapBounds map)
 		{
 		}
 
 		protected override void DisposeControl()
 		{
-			if (RacingModule.MetaPanel.PanelOverride is OnlinePanel)
-			{
-				RacingModule.MetaPanel.PanelOverride = null;
-			}
-			Client.LobbyRaceUpdated -= RaceUpdated;
-			Drawer?.Dispose();
-			Client?.Dispose();
+			Client.LobbyRaceUpdated -= new Action<FullRace>(RaceUpdated);
+			_runFx?.Dispose();
 			base.DisposeControl();
 		}
 	}

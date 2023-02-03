@@ -1,3 +1,4 @@
+using System;
 using Blish_HUD.Controls;
 using Ideka.NetCommon;
 using Ideka.RacingMeter.Lib;
@@ -42,7 +43,7 @@ namespace Ideka.RacingMeter
 			stringBox2.AllBasicTooltipText = Strings.RaceIdTooltip;
 			stringBox2.ControlEnabled = false;
 			_idBox = stringBox2;
-			EnumDropdown<RaceType> enumDropdown = new EnumDropdown<RaceType>(DataExtensions.Describe);
+			EnumDropdown<RaceType> enumDropdown = new EnumDropdown<RaceType>(new Func<RaceType, string>(DataExtensions.Describe), RaceType.Custom);
 			((Control)enumDropdown).set_Parent((Container)(object)this);
 			enumDropdown.Label = Strings.RaceType;
 			_typeSelect = enumDropdown;
@@ -50,6 +51,7 @@ namespace Ideka.RacingMeter
 			((Control)mapPickerBox).set_Parent((Container)(object)this);
 			mapPickerBox.Label = Strings.RaceMap;
 			_mapPickerBox = mapPickerBox;
+			UpdateLayout();
 			_nameBox.ValueCommitted += delegate(string name)
 			{
 				_editor.RenameRace(name);
@@ -65,32 +67,26 @@ namespace Ideka.RacingMeter
 				_editor.SetRaceMap(mapId);
 				UpdateValues();
 			};
-			_editor.RaceLoaded += RaceLoaded;
-			_editor.RaceModified += RaceModified;
-			UpdateLayout();
 			RaceLoaded(_editor.FullRace);
+			_editor.RaceLoaded += new Action<FullRace>(RaceLoaded);
+			_editor.RaceModified += new Action<FullRace>(RaceModified);
 		}
 
 		private void UpdateValues()
 		{
-			FullRace race = _editor.FullRace;
-			((Control)this).set_Visible(race != null);
-			if (((Control)this).get_Visible())
-			{
-				((Panel)this).set_Title(StringExtensions.Format(Strings.EditingLabel, race.Race.Name));
-				_idBox.Value = race.Meta.Id;
-				_nameBox.Value = race.Race.Name;
-				_typeSelect.Value = race.Race.Type;
-				_mapPickerBox.Value = race.Race.MapId;
-			}
+			((Panel)this).set_Title(StringExtensions.Format(Strings.EditingLabel, _editor.FullRace.Race.Name));
+			_idBox.Value = _editor.FullRace.Meta.Id;
+			_nameBox.Value = _editor.FullRace.Race.Name;
+			_typeSelect.Value = _editor.FullRace.Race.Type;
+			_mapPickerBox.Value = _editor.FullRace.Race.MapId;
 		}
 
-		private void RaceLoaded(FullRace race)
+		private void RaceLoaded(FullRace _)
 		{
 			UpdateValues();
 		}
 
-		private void RaceModified(FullRace race)
+		private void RaceModified(FullRace _)
 		{
 			UpdateValues();
 		}
@@ -123,9 +119,9 @@ namespace Ideka.RacingMeter
 
 		protected override void DisposeControl()
 		{
-			_editor.RaceLoaded -= RaceLoaded;
-			_editor.RaceModified -= RaceModified;
-			((Panel)this).DisposeControl();
+			_editor.RaceLoaded -= new Action<FullRace>(RaceLoaded);
+			_editor.RaceModified -= new Action<FullRace>(RaceModified);
+			((FlowPanel)this).DisposeControl();
 		}
 	}
 }

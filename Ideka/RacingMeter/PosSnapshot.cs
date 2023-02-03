@@ -7,6 +7,8 @@ namespace Ideka.RacingMeter
 {
 	public class PosSnapshot : ITimedMeasure
 	{
+		public static readonly PosSnapshot Empty = new PosSnapshot(TimeSpan.Zero);
+
 		public Vector3 Meters { get; private set; }
 
 		public Vector3 Front { get; private set; }
@@ -68,28 +70,6 @@ namespace Ideka.RacingMeter
 			CameraFront = Vector3Extensions.ToXnaVector3(GameService.Gw2Mumble.get_RawClient().get_CameraFront());
 			Mount = GameService.Gw2Mumble.get_PlayerCharacter().get_CurrentMount();
 			LastUpdate = time;
-		}
-
-		public static Vector3 Integrate(Vector3 data, Vector3 x, double k)
-		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			return x + (data - x) * (float)k;
-		}
-
-		public static PosSnapshot Integrate(PosSnapshot data, PosSnapshot x, double k)
-		{
-			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			return new PosSnapshot(data)
-			{
-				Meters = Integrate(data.Meters, x.Meters, k)
-			};
 		}
 	}
 }
