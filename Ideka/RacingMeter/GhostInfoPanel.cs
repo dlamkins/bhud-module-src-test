@@ -18,9 +18,9 @@ namespace Ideka.RacingMeter
 
 		private const int Spacing = 10;
 
-		private FullRace? _race;
+		private FullRace? _fullRace;
 
-		private FullGhost? _ghost;
+		private FullGhost? _fullGhost;
 
 		private readonly FlowPanel _panel;
 
@@ -40,47 +40,46 @@ namespace Ideka.RacingMeter
 
 		private CancellationTokenSource? _uploadGhost;
 
-		public FullRace? Race
+		public FullRace? FullRace
 		{
 			get
 			{
-				return _race;
+				return _fullRace;
 			}
 			set
 			{
-				_race = value;
-				string raceId = Ghost?.Meta?.RaceId;
-				if (raceId != null && raceId != _race?.Meta?.Id)
+				_fullRace = value;
+				if (FullGhost?.Ghost.RaceId != _fullRace?.Meta.Id)
 				{
-					Ghost = null;
+					FullGhost = null;
 				}
 			}
 		}
 
-		public FullGhost? Ghost
+		public FullGhost? FullGhost
 		{
 			get
 			{
-				return _ghost;
+				return _fullGhost;
 			}
 			set
 			{
-				_ghost = value;
-				((Control)_raceGhostButton).set_Enabled(Ghost?.Ghost != null);
+				_fullGhost = value;
+				((Control)_raceGhostButton).set_Enabled(FullGhost?.Ghost != null);
 				StandardButton uploadGhostButton = _uploadGhostButton;
-				FullRace? race = Race;
-				((Control)uploadGhostButton).set_Enabled(race != null && !race!.IsLocal && (Ghost?.IsLocal ?? false) && !TaskUtils.IsRunning(_uploadGhost));
+				FullRace? fullRace = FullRace;
+				((Control)uploadGhostButton).set_Enabled(fullRace != null && !fullRace!.IsLocal && (FullGhost?.IsLocal ?? false) && !TaskUtils.IsRunning(_uploadGhost));
 				_ghostLoadingLabel.set_Text((string)null);
-				string time = ((Ghost?.IsLocal ?? false) ? Ghost!.Ghost.Time.Formatted() : Ghost?.Meta.Time.Formatted());
-				_ghostTimeLabel.set_Text(StringExtensions.Format(Strings.GhostTimeLabel, time ?? ""));
-				string racer = ((Ghost?.IsLocal ?? false) ? Strings.GhostLocal : Ghost?.Meta.AccountName);
-				_ghostRacerLabel.set_Text(StringExtensions.Format(Strings.GhostRacerLabel, racer ?? ""));
-				((Control)_ghostRacerLabel).set_BasicTooltipText((Ghost?.IsLocal ?? false) ? Strings.GhostLocalRacerTooltip : racer);
-				string uploadedRelative = ((Ghost?.IsLocal ?? false) ? Strings.GhostLocal : ((Ghost == null) ? null : Ghost!.Meta.Upload.ToRelativeDateUtc()));
-				string uploaded = ((Ghost?.IsLocal ?? false) ? Strings.GhostLocal : $"{Ghost?.Meta.Upload.ToLocalTime()}");
-				_ghostUploadedLabel.set_Text(StringExtensions.Format(Strings.GhostUploadedLabel, uploadedRelative ?? ""));
-				((Control)_ghostUploadedLabel).set_BasicTooltipText((Ghost?.IsLocal ?? false) ? Strings.GhostLocalUploadedTooltip : uploaded);
-				if (Ghost != null && !Ghost!.IsLocal && Ghost!.Ghost == null)
+				string time = ((FullGhost?.IsLocal ?? false) ? FullGhost!.Ghost.Time.Formatted() : FullGhost?.Meta.Time.Formatted());
+				_ghostTimeLabel.set_Text(StringExtensions.Format(Strings.LabelGhostTime, time ?? ""));
+				string racer = ((FullGhost?.IsLocal ?? false) ? Strings.GhostLocal : FullGhost?.Meta.AccountName);
+				_ghostRacerLabel.set_Text(StringExtensions.Format(Strings.LabelGhostRacer, racer ?? ""));
+				((Control)_ghostRacerLabel).set_BasicTooltipText((FullGhost?.IsLocal ?? false) ? Strings.GhostLocalRacerTooltip : racer);
+				string uploadedRelative = ((FullGhost?.IsLocal ?? false) ? Strings.GhostLocal : ((FullGhost == null) ? null : FullGhost!.Meta.Upload.ToRelativeDateUtc()));
+				string uploaded = ((FullGhost?.IsLocal ?? false) ? Strings.GhostLocal : $"{FullGhost?.Meta.Upload.ToLocalTime()}");
+				_ghostUploadedLabel.set_Text(StringExtensions.Format(Strings.LabelGhostUploaded, uploadedRelative ?? ""));
+				((Control)_ghostUploadedLabel).set_BasicTooltipText((FullGhost?.IsLocal ?? false) ? Strings.GhostLocalUploadedTooltip : uploaded);
+				if (FullGhost != null && !FullGhost!.IsLocal && FullGhost!.Ghost == null)
 				{
 					DownloadGhost();
 				}
@@ -183,39 +182,35 @@ namespace Ideka.RacingMeter
 			UpdateLayout();
 			((Control)_uploadGhostButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				string text = Race?.Meta?.Id;
+				string text = FullRace?.Meta.Id;
 				if (text != null)
 				{
-					FullGhost ghost2 = Ghost;
-					if (ghost2 != null && ghost2.IsLocal)
+					FullGhost fullGhost2 = FullGhost;
+					if (fullGhost2 != null && fullGhost2.IsLocal)
 					{
-						Ghost ghost3 = ghost2.Ghost;
-						if (ghost3 != null)
-						{
-							UploadGhost(text, ghost3);
-						}
+						UploadGhost(text, fullGhost2.Ghost);
 					}
 				}
 			});
 			((Control)_raceGhostButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				FullRace race = Race;
-				if (race != null)
+				FullRace fullRace = FullRace;
+				if (fullRace != null)
 				{
-					FullGhost ghost = Ghost;
-					if (ghost != null && race.Meta?.Id == ghost.Ghost.RaceId)
+					FullGhost fullGhost = FullGhost;
+					if (fullGhost != null && fullRace.Meta.Id == fullGhost.Ghost.RaceId)
 					{
-						this.GhostRequested?.Invoke(race, ghost);
+						this.GhostRequested?.Invoke(fullRace, fullGhost);
 					}
 				}
 			});
-			Ghost = null;
+			FullGhost = null;
 		}
 
 		private void DownloadGhost()
 		{
 			TaskUtils.Cancel(ref _downloadGhost);
-			FullGhost target = Ghost;
+			FullGhost target = FullGhost;
 			if (target == null)
 			{
 				return;
@@ -231,13 +226,13 @@ namespace Ideka.RacingMeter
 				_ghostLoadingLabel.set_Text(Strings.Loading);
 				FullGhost fullGhost = target;
 				fullGhost.Ghost = await RacingModule.Server.GetGhost(id, ct);
-				if (Ghost == target)
+				if (FullGhost == target)
 				{
 					this.GhostChanged?.Invoke(target);
 				}
 			})().Done(Logger, Strings.ErrorGhostLoad, _downloadGhost).ContinueWith(delegate(Task<TaskUtils.TaskState> task)
 			{
-				if (Ghost == target)
+				if (FullGhost == target)
 				{
 					_ghostLoadingLabel.set_Text(task.Result.Canceled ? Strings.Loading : (task.Result.Faulted ? Strings.ErrorGhostLoad : null));
 				}
@@ -273,7 +268,7 @@ namespace Ideka.RacingMeter
 				}
 			})().Done(Logger, Strings.ErrorGhostUpload, _uploadGhost).ContinueWith(delegate
 			{
-				((Control)_uploadGhostButton).set_Enabled(Ghost?.IsLocal ?? false);
+				((Control)_uploadGhostButton).set_Enabled(FullGhost?.IsLocal ?? false);
 			});
 		}
 

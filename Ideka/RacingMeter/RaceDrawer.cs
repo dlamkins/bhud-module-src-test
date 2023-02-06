@@ -45,8 +45,6 @@ namespace Ideka.RacingMeter
 
 		public static float Alpha => RacingModule.Settings.CheckpointAlpha.Value;
 
-		public static bool ShowArrow => RacingModule.Settings.CheckpointArrow.Value;
-
 		public abstract Race? Race { get; }
 
 		protected SpriteBatchParameters UIParams { get; }
@@ -90,9 +88,9 @@ namespace Ideka.RacingMeter
 			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
 			Matrix trs = GetTRS(radius) * Matrix.CreateConstrainedBillboard(position, GameService.Gw2Mumble.get_PlayerCamera().get_Position(), Up, (Vector3?)null, (Vector3?)null);
 			Circle.Transformed(trs).ToScreen().Draw(spriteBatch, color * Alpha, Thickness);
 			if (!flat)
@@ -102,10 +100,7 @@ namespace Ideka.RacingMeter
 			if (next.HasValue)
 			{
 				Vector3 nextPosition = next.GetValueOrDefault();
-				if (ShowArrow)
-				{
-					DrawRaceArrow(spriteBatch, position, radius, nextPosition, color);
-				}
+				DrawRaceArrow(spriteBatch, position, radius, nextPosition, color);
 			}
 		}
 

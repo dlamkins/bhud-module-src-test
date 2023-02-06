@@ -81,9 +81,9 @@ namespace Ideka.RacingMeter
 				return Task.CompletedTask;
 			}
 
-			public Task UpdateLobbyRace(FullRace? race)
+			public Task UpdateLobbyRace(FullRace? fullRace)
 			{
-				_outer.UpdateLobbyRace(race);
+				_outer.UpdateLobbyRace(fullRace);
 				return Task.CompletedTask;
 			}
 
@@ -161,9 +161,9 @@ namespace Ideka.RacingMeter
 				if (_lobby != value)
 				{
 					_lobby = value;
-					Route = ((_lobby?.Race?.Race == null) ? null : new RaceRouteData(_lobby!.Race!.Race));
+					Route = ((_lobby?.FullRace?.Race == null) ? null : new RaceRouteData(_lobby!.FullRace!.Race));
 					this.LobbyChanged?.Invoke(value);
-					this.LobbyRaceUpdated?.Invoke(value?.Race);
+					this.LobbyRaceUpdated?.Invoke(value?.FullRace);
 					this.LobbySettingsUpdated?.Invoke(value);
 				}
 			}
@@ -284,7 +284,7 @@ namespace Ideka.RacingMeter
 						await Task.Delay(TimeSpan.FromSeconds(5.0));
 					}
 				})();
-			})().Done(Logger, "Failed to connect", _cts).ContinueWith(delegate(Task<TaskUtils.TaskState> t)
+			})().Done(Logger, Strings.ErrorFailedToConnect, _cts).ContinueWith(delegate(Task<TaskUtils.TaskState> t)
 			{
 				State = (t.Result.Success ? ClientState.Online : ClientState.Offline);
 			});
@@ -367,14 +367,14 @@ namespace Ideka.RacingMeter
 			});
 		}
 
-		private void UpdateLobbyRace(FullRace? race)
+		private void UpdateLobbyRace(FullRace? fullRace)
 		{
-			FullRace race2 = race;
+			FullRace fullRace2 = fullRace;
 			WithCurrentLobby(delegate(Lobby lobby)
 			{
-				lobby.Race = race2;
-				Route = ((race2?.Race == null) ? null : new RaceRouteData(race2.Race));
-				this.LobbyRaceUpdated?.Invoke(race2);
+				lobby.FullRace = fullRace2;
+				Route = ((fullRace2?.Race == null) ? null : new RaceRouteData(fullRace2.Race));
+				this.LobbyRaceUpdated?.Invoke(fullRace2);
 			});
 		}
 
@@ -410,7 +410,7 @@ namespace Ideka.RacingMeter
 			{
 				GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
 				{
-					ScreenNotification.ShowNotification("GO!", (NotificationType)0, (Texture2D)null, 4);
+					ScreenNotification.ShowNotification(Strings.OnlineNoticeGo, (NotificationType)0, (Texture2D)null, 4);
 				});
 				lobby.IsRunning = true;
 				lobby.StartTime = new DateTime(time);
@@ -424,7 +424,7 @@ namespace Ideka.RacingMeter
 			{
 				GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
 				{
-					ScreenNotification.ShowNotification("Race canceled", (NotificationType)0, (Texture2D)null, 4);
+					ScreenNotification.ShowNotification(Strings.OnlineNoticeRaceCanceled, (NotificationType)0, (Texture2D)null, 4);
 				});
 				TaskUtils.Cancel(ref _countdown);
 				lobby.IsRunning = false;

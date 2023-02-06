@@ -29,7 +29,7 @@ namespace Ideka.RacingMeter
 			Client = client;
 			((Container)this).set_HeightSizingMode((SizingMode)1);
 			((Panel)this).set_CanCollapse(true);
-			((Panel)this).set_Title("Users");
+			((Panel)this).set_Title(Strings.LobbyUsers);
 			ReMenu reMenu = new ReMenu();
 			((Control)reMenu).set_Parent((Container)(object)this);
 			((Container)reMenu).set_WidthSizingMode((SizingMode)2);

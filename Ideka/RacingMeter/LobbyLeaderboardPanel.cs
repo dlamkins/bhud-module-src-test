@@ -40,7 +40,7 @@ namespace Ideka.RacingMeter
 			((Control)val).set_Parent((Container)(object)this);
 			val.set_CanScroll(true);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
-			val.set_Title("Leaderboard");
+			val.set_Title(Strings.LobbyLeaderboard);
 			_panel = val;
 			_scrollbar = ((IEnumerable)((Container)this).get_Children()).OfType<Scrollbar>().First();
 			ReMenu reMenu = new ReMenu();
@@ -84,7 +84,7 @@ namespace Ideka.RacingMeter
 			{
 				return;
 			}
-			Race race = lobby.Race?.Race;
+			Race race = lobby.FullRace?.Race;
 			if (race == null)
 			{
 				return;

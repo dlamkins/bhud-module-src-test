@@ -6,26 +6,22 @@ namespace Ideka.RacingMeter
 {
 	internal static class DataExtensions
 	{
-		public static string? Describe(this FullRace race)
+		public static string? Describe(this FullRace fullRace)
 		{
-			return race?.Race.Name;
+			return fullRace?.Race.Name;
 		}
 
-		public static string? Describe(this FullGhost ghost, bool shortVersion = false)
+		public static string? Describe(this FullGhost fullGhost, bool shortVersion = false)
 		{
-			if (ghost != null)
+			if (!fullGhost.IsLocal)
 			{
-				if (!ghost.IsLocal)
+				if (!shortVersion)
 				{
-					if (!shortVersion)
-					{
-						return StringExtensions.Format(Strings.GhostDescribeBy, ghost.Meta.Time.Formatted(), ghost.Meta.AccountName);
-					}
-					return StringExtensions.Format(Strings.GhostDescribeRemote, ghost.Meta.Time.Formatted());
+					return StringExtensions.Format(Strings.GhostDescribeBy, fullGhost.Meta.Time.Formatted(), fullGhost.Meta.AccountName);
 				}
-				return StringExtensions.Format(Strings.GhostDescribeLocal, ghost.Ghost.Time.Formatted());
+				return StringExtensions.Format(Strings.GhostDescribeRemote, fullGhost.Meta.Time.Formatted());
 			}
-			return null;
+			return StringExtensions.Format(Strings.GhostDescribeLocal, fullGhost.Ghost.Time.Formatted());
 		}
 
 		public static string? Describe(this RaceType type)

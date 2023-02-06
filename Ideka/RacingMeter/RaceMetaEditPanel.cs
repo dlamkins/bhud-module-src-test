@@ -74,7 +74,7 @@ namespace Ideka.RacingMeter
 
 		private void UpdateValues()
 		{
-			((Panel)this).set_Title(StringExtensions.Format(Strings.EditingLabel, _editor.FullRace.Race.Name));
+			((Panel)this).set_Title(StringExtensions.Format(Strings.LabelEditing, _editor.FullRace.Race.Name));
 			_idBox.Value = _editor.FullRace.Meta.Id;
 			_nameBox.Value = _editor.FullRace.Race.Name;
 			_typeSelect.Value = _editor.FullRace.Race.Type;

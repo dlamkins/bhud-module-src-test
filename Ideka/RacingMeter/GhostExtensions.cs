@@ -15,10 +15,7 @@ namespace Ideka.RacingMeter
 			{
 				return (default(TimeSpan), null);
 			}
-			Ghost ghost = new Ghost
-			{
-				RaceId = fullRace.Meta?.Id
-			};
+			Ghost ghost = new Ghost(fullRace.Meta.Id);
 			TimeSpan timeBase = initialSnapshots.First().Time;
 			foreach (PosSnapshot snapshot in initialSnapshots)
 			{

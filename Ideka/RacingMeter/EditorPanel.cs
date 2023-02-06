@@ -56,7 +56,7 @@ namespace Ideka.RacingMeter
 
 		public string Caption => Strings.RaceEditor;
 
-		public EditorPanel(PanelStack panelStack, MeasurerRealtime measurer, FullRace? race)
+		public EditorPanel(PanelStack panelStack, MeasurerRealtime measurer, FullRace? fullRace)
 			: this()
 		{
 			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
@@ -90,7 +90,7 @@ namespace Ideka.RacingMeter
 			//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01cb: Expected O, but got Unknown
 			_panelStack = panelStack;
-			_editor = _dc.Add<RaceEditor>(new RaceEditor(measurer, race));
+			_editor = _dc.Add<RaceEditor>(new RaceEditor(measurer, fullRace));
 			StandardButton val = new StandardButton();
 			((Control)val).set_Parent((Container)(object)this);
 			val.set_Text(Strings.BackToRacing);

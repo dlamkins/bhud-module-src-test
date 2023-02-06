@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
+using Ideka.NetCommon;
 using Ideka.RacingMeter.Lib;
 using Ideka.RacingMeter.Lib.RacingServer;
 using Microsoft.Xna.Framework;
@@ -51,7 +52,7 @@ namespace Ideka.RacingMeter
 			//IL_00dd: Expected O, but got Unknown
 			Client = client;
 			((Panel)this).set_ShowTint(true);
-			((Panel)this).set_Title("Race");
+			((Panel)this).set_Title(Strings.Race);
 			((FlowPanel)this).set_FlowDirection((ControlFlowDirection)3);
 			Vector2 val = default(Vector2);
 			((Vector2)(ref val))._002Ector(10f, 10f);
@@ -69,7 +70,7 @@ namespace Ideka.RacingMeter
 			RacingServer server = Server;
 			StandardButton val5 = new StandardButton();
 			((Control)val5).set_Parent((Container)(object)this);
-			val5.set_Text("Start Race");
+			val5.set_Text(Strings.LobbyRaceStart);
 			_startRaceButton = server.Register<StandardButton>(val5);
 			((Control)_startRaceButton).add_Click((EventHandler<MouseEventArgs>)async delegate
 			{
@@ -81,7 +82,7 @@ namespace Ideka.RacingMeter
 			RacingServer server2 = Server;
 			StandardButton val6 = new StandardButton();
 			((Control)val6).set_Parent((Container)(object)this);
-			val6.set_Text("Cancel Race");
+			val6.set_Text(Strings.LobbyRaceCancel);
 			_cancelRaceButton = server2.Register<StandardButton>(val6);
 			((Control)_cancelRaceButton).add_Click((EventHandler<MouseEventArgs>)async delegate
 			{
@@ -112,18 +113,18 @@ namespace Ideka.RacingMeter
 
 		private void UpdateVisuals()
 		{
-			_raceLabel.set_Text("Race: " + (Client.Lobby?.Race?.Race.Name ?? Strings.None));
+			_raceLabel.set_Text(StringExtensions.Format(Strings.LabelRace, Client.Lobby?.FullRace?.Race.Name ?? Strings.None));
 			int laps = Client.Lobby?.Settings.Laps ?? 0;
 			Lobby? lobby = Client.Lobby;
-			bool notLooping = lobby != null && lobby!.Race?.Race.IsLooping == false;
-			_lapsLabel.set_Text($"Laps: {(notLooping ? 1 : laps)}");
-			((Control)_lapsLabel).set_BasicTooltipText(notLooping ? "The current race does not support looping." : null);
+			bool notLooping = lobby != null && lobby!.FullRace?.Race.IsLooping == false;
+			_lapsLabel.set_Text(Strings.LabelRaceLaps.Format(notLooping ? 1 : laps));
+			((Control)_lapsLabel).set_BasicTooltipText(notLooping ? Strings.TooltipRaceNotLooping : null);
 			List<User> obj = Client.Lobby?.Racers.ToList();
 			List<User> notReady = obj?.Where((User r) => !r.RacerData.RaceReady).ToList();
 			int total = obj?.Count ?? 0;
 			int ready = total - (notReady?.Count ?? 0);
-			_racersLabel.set_Text($"Racers: {ready} / {total}");
-			((Control)_racersLabel).set_BasicTooltipText((notReady == null || !notReady.Any()) ? null : ("Not ready:\n" + string.Join("\n", notReady.Select((User n) => n.Id))));
+			_racersLabel.set_Text(Strings.LabelLobbyRacers.Format(ready, total));
+			((Control)_racersLabel).set_BasicTooltipText((notReady == null || !notReady.Any()) ? null : StringExtensions.Format(Strings.LabelLobbyUsersNotReady, string.Join("\n", notReady.Select((User n) => n.Id))));
 		}
 
 		protected override void OnResized(ResizedEventArgs e)

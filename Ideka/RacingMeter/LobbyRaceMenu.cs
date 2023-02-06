@@ -36,15 +36,15 @@ namespace Ideka.RacingMeter
 			ContextMenuStripItem val = new ContextMenuStripItem();
 			((Control)val).set_Enabled(false);
 			_raceName = val;
-			_setRace = Server.Register<ContextMenuStripItem>(new ContextMenuStripItem("Set this Race"));
+			_setRace = Server.Register<ContextMenuStripItem>(new ContextMenuStripItem(Strings.LobbyRaceSet));
 			((Control)_setRace).add_Click((EventHandler<MouseEventArgs>)async delegate
 			{
-				FullRace race = _selected;
-				if (race != null)
+				FullRace fullRace = _selected;
+				if (fullRace != null)
 				{
 					using (Client.Server.Lock())
 					{
-						await Server.SetLobbyRace(race);
+						await Server.SetLobbyRace(fullRace);
 					}
 				}
 			});
@@ -56,16 +56,16 @@ namespace Ideka.RacingMeter
 			}
 		}
 
-		public void Show(FullRace race, Control? control)
+		public void Show(FullRace fullRace, Control? control)
 		{
-			if (race != null)
+			if (fullRace != null)
 			{
 				User? user = Client.User;
 				if (user != null && user!.LobbyData.IsHost)
 				{
-					_selected = race;
+					_selected = fullRace;
 					_control = control;
-					_raceName.set_Text(race.Race.Name);
+					_raceName.set_Text(fullRace.Race.Name);
 					_menu.Show(_control);
 					return;
 				}

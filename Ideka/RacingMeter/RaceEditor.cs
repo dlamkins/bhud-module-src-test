@@ -176,10 +176,10 @@ namespace Ideka.RacingMeter
 
 		public event Action<int>? TestRequested;
 
-		public RaceEditor(MeasurerRealtime measurer, FullRace? race)
+		public RaceEditor(MeasurerRealtime measurer, FullRace? fullRace)
 		{
 			Measurer = measurer;
-			_state = new EditState(race);
+			_state = new EditState(fullRace);
 			_commands = new CommandList(_state);
 			RaceLoaded += delegate
 			{

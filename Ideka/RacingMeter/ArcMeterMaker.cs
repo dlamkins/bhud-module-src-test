@@ -97,6 +97,46 @@ namespace Ideka.RacingMeter
 			});
 		}
 
+		public ArcMeterNeedle AddAngleNeedle(Projection projection, float length, Color color)
+		{
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			return base.Meter.AddChild(new ArcMeterNeedle
+			{
+				Projection = projection,
+				Distance = 15f,
+				Length = length,
+				Color = color,
+				Thickness = 2f
+			});
+		}
+
+		public ArcMeterNeedle AddAngleNeedleMarker(Projection projection, double degrees)
+		{
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			return AddAngleNeedle(projection, 7.5f, MeterMaker.DefaultColor).With(delegate(ArcMeterNeedle x)
+			{
+				x.Value = degrees * 0.005555555555555556;
+			});
+		}
+
+		public ArcMeterNeedle[] AddAngleNeedleMarkers(Projection projection, double guideDegrees = 45.0)
+		{
+			return new ArcMeterNeedle[2]
+			{
+				AddAngleNeedleMarker(projection, guideDegrees),
+				AddAngleNeedleMarker(projection, 0.0 - guideDegrees)
+			};
+		}
+
+		public ArcMeterNeedle AddForwardAngleNeedle(Projection projection)
+		{
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			return AddAngleNeedle(projection, 5f, MeterMaker.ForwardOrbColor).WithUpdate(delegate(ArcMeterNeedle x)
+			{
+				x.Value = base.Measurer.Speed.FwdMovementYaw;
+			});
+		}
+
 		public ArcMeterOrb AddAngleOrb(Projection projection, float radius, Color color)
 		{
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)

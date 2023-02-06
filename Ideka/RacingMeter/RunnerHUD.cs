@@ -15,11 +15,10 @@ namespace Ideka.RacingMeter
 
 		public RunnerHUD(RaceRunner racer)
 		{
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
 			RaceRunner racer2 = racer;
 			base._002Ector();
-			RectAnchor rect = new RectAnchor();
-			RectAnchor inner = rect.AddChild(new RectAnchor());
+			RectAnchor inner = AddChild(new RectAnchor());
 			inner.AddChild(new SimpleRectangle
 			{
 				Color = Color.get_Black(),
@@ -32,7 +31,7 @@ namespace Ideka.RacingMeter
 			SizedTextLabel raceAuthor = addLine(GameService.Content.get_DefaultFont12());
 			addLine().WithUpdate(delegate(SizedTextLabel x)
 			{
-				x.Text = Strings.CheckpointLabel.Format(racer2.PassedPoints, racer2.Checkpoints.Count);
+				x.Text = Strings.LabelCheckpoint.Format(racer2.PassedPoints, racer2.Checkpoints.Count);
 			});
 			addLine().WithUpdate(delegate(SizedTextLabel x)
 			{
@@ -63,17 +62,17 @@ namespace Ideka.RacingMeter
 			{
 				addLine().WithUpdate(delegate(SizedTextLabel x)
 				{
-					x.Text = StringExtensions.Format(Strings.LastLabel, last.Formatted());
+					x.Text = StringExtensions.Format(Strings.LabelLast, last.Formatted());
 				});
 				addLine().WithUpdate(delegate(SizedTextLabel x)
 				{
-					x.Text = StringExtensions.Format(Strings.BestLabel, best.Formatted());
+					x.Text = StringExtensions.Format(Strings.LabelBest, best.Formatted());
 				});
 			}
 			racer2.RaceLoaded += delegate(FullRace? race)
 			{
 				current = (best = (last = TimeSpan.Zero));
-				raceName.Text = race?.Race?.Name ?? "";
+				raceName.Text = race?.Race.Name ?? "";
 				raceAuthor.Text = ((race != null && !race!.IsLocal) ? StringExtensions.Format(Strings.ByInfo, race!.Meta.AuthorName) : "");
 			};
 			racer2.RaceStarted += delegate
@@ -82,7 +81,7 @@ namespace Ideka.RacingMeter
 			};
 			racer2.RaceFinished += delegate(Race _, Ghost ghost)
 			{
-				ScreenNotification.ShowNotification(StringExtensions.Format(Strings.FinishTimeLabel, ghost.Time.Formatted()), (NotificationType)0, (Texture2D)null, 4);
+				ScreenNotification.ShowNotification(StringExtensions.Format(Strings.LabelFinishTime, ghost.Time.Formatted()), (NotificationType)0, (Texture2D)null, 4);
 				current = (last = ghost.Time);
 				if (ghost.Time < best || best == TimeSpan.Zero)
 				{

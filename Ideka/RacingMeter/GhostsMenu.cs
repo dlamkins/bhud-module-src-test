@@ -14,7 +14,7 @@ namespace Ideka.RacingMeter
 
 		protected override string? ExtractId(FullGhost? item)
 		{
-			return item?.Meta?.Id;
+			return item?.Meta.Id;
 		}
 
 		public void SetLeaderboard(Leaderboard board)
@@ -53,11 +53,7 @@ namespace Ideka.RacingMeter
 						}
 						((MenuItem)onelineMenuItem3).add_ItemSelected((EventHandler<ControlActivatedEventArgs>)delegate
 						{
-							Select(new FullGhost
-							{
-								Meta = meta,
-								Ghost = null
-							});
+							Select(new FullGhost(meta, null));
 						});
 					}
 				}

@@ -31,6 +31,8 @@ namespace Ideka.RacingMeter
 
 		private readonly StandardButton _unloadGhostButton;
 
+		public event Action? OnlineRequested;
+
 		public event Action? UnloadRace;
 
 		public event Action? UnloadGhost;
@@ -123,6 +125,10 @@ namespace Ideka.RacingMeter
 			((Control)val8).set_Enabled(false);
 			_unloadGhostButton = val8;
 			UpdateLayout();
+			((Control)_onlineButton).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				this.OnlineRequested?.Invoke();
+			});
 			((Control)_unloadRaceButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				this.UnloadRace?.Invoke();
@@ -137,17 +143,17 @@ namespace Ideka.RacingMeter
 			GhostLoaded(null);
 		}
 
-		public void RaceLoaded(FullRace? race)
+		public void RaceLoaded(FullRace? fullRace)
 		{
-			((Control)_unloadRaceButton).set_Enabled(race != null);
-			_raceLabel.set_Text(StringExtensions.Format(Strings.CurrentRaceLabel, race?.Describe() ?? Strings.None));
+			((Control)_unloadRaceButton).set_Enabled(fullRace != null);
+			_raceLabel.set_Text(StringExtensions.Format(Strings.LabelCurrentRace, fullRace?.Describe() ?? Strings.None));
 			PositionLabels();
 		}
 
-		public void GhostLoaded(FullGhost? ghost)
+		public void GhostLoaded(FullGhost? fullGhost)
 		{
-			((Control)_unloadGhostButton).set_Enabled(ghost != null);
-			_ghostLabel.set_Text(StringExtensions.Format(Strings.CurrentGhostLabel, ghost?.Describe(shortVersion: true) ?? Strings.None));
+			((Control)_unloadGhostButton).set_Enabled(fullGhost != null);
+			_ghostLabel.set_Text(StringExtensions.Format(Strings.LabelCurrentGhost, fullGhost?.Describe(shortVersion: true) ?? Strings.None));
 			PositionLabels();
 		}
 

@@ -169,20 +169,21 @@ namespace Ideka.RacingMeter
 			{
 				fullGhost = null;
 			}
-			if (fullGhost != null)
+			if (fullGhost != null && (FullRace == null || FullRace!.Meta.Id != fullGhost!.Ghost.RaceId))
 			{
-				string raceId = FullRace?.Meta?.Id;
-				if (raceId == null || raceId != fullGhost?.Ghost?.RaceId)
+				return;
+			}
+			Ghost ghost = fullGhost?.Ghost;
+			if (ghost != null)
+			{
+				Race race = FullRace?.Race;
+				if (race != null)
 				{
-					return;
+					ghost.CalculateStart(race);
+					ghost.Checkpoints(race);
 				}
 			}
 			FullGhost = fullGhost;
-			if (fullGhost?.Ghost != null)
-			{
-				fullGhost!.Ghost.CalculateStart(Race);
-				fullGhost!.Ghost.Checkpoints(Race);
-			}
 			this.GhostLoaded?.Invoke(fullGhost);
 		}
 
@@ -300,15 +301,15 @@ namespace Ideka.RacingMeter
 			RaceRunFx runFx = _runFx;
 			if (runFx != null)
 			{
-				Race race = Race;
-				if (race != null)
+				FullRace fullRace = FullRace;
+				if (fullRace != null)
 				{
 					_ready = null;
-					_racing = new Ghost();
+					_racing = new Ghost(fullRace.Meta.Id);
 					_timeBase = pos.Time;
 					_racing.AddSnapshot(_timeBase, pos);
 					runFx.StartSfx(IsTesting);
-					this.RaceStarted?.Invoke(race);
+					this.RaceStarted?.Invoke(fullRace.Race);
 				}
 			}
 		}

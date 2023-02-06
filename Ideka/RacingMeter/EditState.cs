@@ -39,16 +39,11 @@ namespace Ideka.RacingMeter
 			}
 			set
 			{
-				if (value != null)
+				if (value == null || Race.RacePoints.Contains(value))
 				{
-					Race race = Race;
-					if (race == null || !race.RacePoints.Contains(value))
-					{
-						return;
-					}
+					_selected = value;
+					this.PointSelected?.Invoke(_selected);
 				}
-				_selected = value;
-				this.PointSelected?.Invoke(_selected);
 			}
 		}
 
@@ -83,7 +78,11 @@ namespace Ideka.RacingMeter
 
 		public int PointIndexOf(RacePoint? point)
 		{
-			return Race?.RacePoints.IndexOf(point) ?? (-1);
+			if (point == null)
+			{
+				return -1;
+			}
+			return Race.RacePoints.IndexOf(point);
 		}
 
 		public EditState(FullRace? fullRace)

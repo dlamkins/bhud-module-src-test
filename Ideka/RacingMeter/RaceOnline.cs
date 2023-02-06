@@ -52,9 +52,9 @@ namespace Ideka.RacingMeter
 			Client.LobbyRaceUpdated += new Action<FullRace>(RaceUpdated);
 		}
 
-		private void RaceUpdated(FullRace? race)
+		private void RaceUpdated(FullRace? fullRace)
 		{
-			FullRace = race;
+			FullRace = fullRace;
 		}
 
 		protected override void DrawRaceToWorld(SpriteBatch spriteBatch)

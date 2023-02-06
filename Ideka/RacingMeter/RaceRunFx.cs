@@ -54,6 +54,8 @@ namespace Ideka.RacingMeter
 
 		public bool ShowGuides { get; set; }
 
+		public bool CheckpointArrow { get; set; }
+
 		public bool NormalizedOfficialCheckpoints { get; set; }
 
 		public RaceRunFx(RaceDrawer drawer, Race race)
@@ -74,6 +76,10 @@ namespace Ideka.RacingMeter
 			_dc.Add(RacingModule.Settings.ShowGuides.OnChangedAndNow(delegate(bool v)
 			{
 				ShowGuides = v;
+			}));
+			_dc.Add(RacingModule.Settings.CheckpointArrow.OnChangedAndNow(delegate(bool v)
+			{
+				CheckpointArrow = v;
 			}));
 			_dc.Add(RacingModule.Settings.NormalizedOfficialCheckpoints.OnChangedAndNow(delegate(bool v)
 			{
@@ -156,8 +162,8 @@ namespace Ideka.RacingMeter
 			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
 			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020b: Unknown result type (might be due to invalid IL or missing references)
 			(int, int) tuple = Route.Progress(reachedPoints);
 			int currentLap = tuple.Item1;
 			int pointIndex = tuple.Item2;
@@ -184,7 +190,7 @@ namespace Ideka.RacingMeter
 				else if (point.IsCheckpoint)
 				{
 					shown++;
-					Drawer.DrawRacePoint(spriteBatch, point.Position, (OfficialPoints && i >= LoopStartIndex) ? 7.62f : point.Radius, isFinishLine ? null : new Vector3?(next.Position), color);
+					Drawer.DrawRacePoint(spriteBatch, point.Position, (OfficialPoints && i > 0) ? 7.62f : point.Radius, (!isFinishLine && (CheckpointArrow || (i == 0 && pointIndex == 0))) ? new Vector3?(next.Position) : null, color);
 				}
 				if (isFinishLine || shown >= ShownCheckpoints)
 				{

@@ -95,74 +95,74 @@ namespace Ideka.RacingMeter
 
 		public Task GetLobbies()
 		{
-			return _conn.InvokeAsync("GetLobbies").Done(Logger, "Send failed");
+			return _conn.InvokeAsync("GetLobbies").Done(Logger, Strings.ErrorSendFailed);
 		}
 
 		public Task CreateLobby()
 		{
-			return _conn.InvokeAsync("CreateLobby").Done(Logger, "Send failed");
+			return _conn.InvokeAsync("CreateLobby").Done(Logger, Strings.ErrorSendFailed);
 		}
 
 		public Task JoinLobby(string lobbyId)
 		{
-			return _conn.InvokeAsync("JoinLobby", lobbyId).Done(Logger, "Send failed");
+			return _conn.InvokeAsync("JoinLobby", lobbyId).Done(Logger, Strings.ErrorSendFailed);
 		}
 
 		public Task LeaveLobby()
 		{
-			return _conn.InvokeAsync("LeaveLobby").Done(Logger, "Send failed");
+			return _conn.InvokeAsync("LeaveLobby").Done(Logger, Strings.ErrorSendFailed);
 		}
 
 		public Task KickUser(string userId)
 		{
-			return _conn.InvokeAsync("KickUser", userId).Done(Logger, "Send failed");
+			return _conn.InvokeAsync("KickUser", userId).Done(Logger, Strings.ErrorSendFailed);
 		}
 
 		public Task SetHost(string userId, bool value)
 		{
-			return _conn.InvokeAsync("SetHost", userId, value).Done(Logger, "Send failed");
+			return _conn.InvokeAsync("SetHost", userId, value).Done(Logger, Strings.ErrorSendFailed);
 		}
 
 		public Task SetRacer(string userId, bool value)
 		{
-			return _conn.InvokeAsync("SetRacer", userId, value).Done(Logger, "Send failed");
+			return _conn.InvokeAsync("SetRacer", userId, value).Done(Logger, Strings.ErrorSendFailed);
 		}
 
 		public Task SetLobbyName(string name)
 		{
-			return _conn.InvokeAsync("SetLobbyName", name).Done(Logger, "Send failed");
+			return _conn.InvokeAsync("SetLobbyName", name).Done(Logger, Strings.ErrorSendFailed);
 		}
 
 		public Task SetLobbySize(int size)
 		{
-			return _conn.InvokeAsync("SetLobbySize", size).Done(Logger, "Send failed");
+			return _conn.InvokeAsync("SetLobbySize", size).Done(Logger, Strings.ErrorSendFailed);
 		}
 
 		public Task SetLobbyLaps(int laps)
 		{
-			return _conn.InvokeAsync("SetLobbyLaps", laps).Done(Logger, "Send failed");
+			return _conn.InvokeAsync("SetLobbyLaps", laps).Done(Logger, Strings.ErrorSendFailed);
 		}
 
-		public Task SetLobbyRace(FullRace race)
+		public Task SetLobbyRace(FullRace fullRace)
 		{
-			return _conn.InvokeAsync("SetLobbyRace", race).Done(Logger, "Send failed");
+			return _conn.InvokeAsync("SetLobbyRace", fullRace).Done(Logger, Strings.ErrorSendFailed);
 		}
 
 		public Task StartCountdown()
 		{
-			return _conn.InvokeAsync("StartCountdown").Done(Logger, "Send failed");
+			return _conn.InvokeAsync("StartCountdown").Done(Logger, Strings.ErrorSendFailed);
 		}
 
 		public Task CancelRace()
 		{
-			return _conn.InvokeAsync("CancelRace").Done(Logger, "Send failed");
+			return _conn.InvokeAsync("CancelRace").Done(Logger, Strings.ErrorSendFailed);
 		}
 
 		public Task UpdatePosition(int mapId, Vector3 position, Vector3 front)
 		{
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			return _conn.SendAsync("UpdatePosition", mapId, position, front).Done(Logger, "Send failed");
+			return _conn.SendAsync("UpdatePosition", mapId, position, front).Done(Logger, Strings.ErrorSendFailed);
 		}
 	}
 }

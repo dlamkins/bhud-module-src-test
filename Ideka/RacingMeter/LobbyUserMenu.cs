@@ -46,7 +46,7 @@ namespace Ideka.RacingMeter
 			((Control)val).set_Enabled(false);
 			_userName = val;
 			RacingServer server = Server;
-			ContextMenuStripItem val2 = new ContextMenuStripItem("Is Racer");
+			ContextMenuStripItem val2 = new ContextMenuStripItem(Strings.LobbyUserIsRacer);
 			val2.set_CanCheck(true);
 			_isRacer = server.Register<ContextMenuStripItem>(val2);
 			_isRacer.add_CheckedChanged((EventHandler<CheckChangedEvent>)async delegate
@@ -63,7 +63,7 @@ namespace Ideka.RacingMeter
 				}
 			});
 			RacingServer server2 = Server;
-			ContextMenuStripItem val3 = new ContextMenuStripItem("Is Host");
+			ContextMenuStripItem val3 = new ContextMenuStripItem(Strings.LobbyUserIsHost);
 			val3.set_CanCheck(true);
 			_isHost = server2.Register<ContextMenuStripItem>(val3);
 			_isHost.add_CheckedChanged((EventHandler<CheckChangedEvent>)async delegate
@@ -79,7 +79,7 @@ namespace Ideka.RacingMeter
 					}
 				}
 			});
-			_kick = Server.Register<ContextMenuStripItem>(new ContextMenuStripItem("Kick"));
+			_kick = Server.Register<ContextMenuStripItem>(new ContextMenuStripItem(Strings.LobbyUserKick));
 			((Control)_kick).add_Click((EventHandler<MouseEventArgs>)async delegate
 			{
 				string userId = _selected?.Id;

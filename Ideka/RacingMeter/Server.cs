@@ -26,27 +26,27 @@ namespace Ideka.RacingMeter
 
 		private readonly CallCheckVersion _checkVersion = new CallCheckVersion
 		{
-			ExceptionFactory = FriendlyError.Create
+			ExceptionFactory = new Func<Exception, Exception>(FriendlyError.Create)
 		};
 
 		private readonly CallGetRaces _getRaces = new CallGetRaces
 		{
-			ExceptionFactory = FriendlyError.Create
+			ExceptionFactory = new Func<Exception, Exception>(FriendlyError.Create)
 		};
 
 		private readonly CallGetLeaderboard _getLeaderboard = new CallGetLeaderboard
 		{
-			ExceptionFactory = FriendlyError.Create
+			ExceptionFactory = new Func<Exception, Exception>(FriendlyError.Create)
 		};
 
 		private readonly CallGetGhost _getGhost = new CallGetGhost
 		{
-			ExceptionFactory = FriendlyError.Create
+			ExceptionFactory = new Func<Exception, Exception>(FriendlyError.Create)
 		};
 
 		private readonly CallUploadGhost _uploadGhost = new CallUploadGhost
 		{
-			ExceptionFactory = FriendlyError.Create
+			ExceptionFactory = new Func<Exception, Exception>(FriendlyError.Create)
 		};
 
 		public OnlineStatus Online { get; private set; }
@@ -111,10 +111,7 @@ namespace Ideka.RacingMeter
 			OnlineStatus oldStatus = Online;
 			try
 			{
-				Online = ((await _checkVersion.Call(_client, new CallCheckVersion.Req
-				{
-					Version = version
-				}, ct)).Supported ? OnlineStatus.Yes : OnlineStatus.No);
+				Online = ((await _checkVersion.Call(_client, new CallCheckVersion.Req(version), ct)).Supported ? OnlineStatus.Yes : OnlineStatus.No);
 			}
 			catch (Exception ex)
 			{
@@ -140,7 +137,7 @@ namespace Ideka.RacingMeter
 				{
 					LastUpdate = ((!force && RemoteRaces.Races.Any()) ? RemoteRaces.Races.Values.Max((FullRace r) => r.Race.Modified) : DateTimeOffset.FromUnixTimeSeconds(0L).UtcDateTime)
 				}, ct);
-				RemoteRaces.Races.MergeOverwrite<string, FullRace>(res.Races);
+				RemoteRaces.Races.MergeOverwrite(res.Races);
 				RemoteRaces.ToCache(RacingModule.RaceCachePath);
 			}
 			finally
@@ -159,9 +156,8 @@ namespace Ideka.RacingMeter
 			catch
 			{
 			}
-			CallGetLeaderboard.Res res = await _getLeaderboard.Call(_client, new CallGetLeaderboard.Req
+			CallGetLeaderboard.Res res = await _getLeaderboard.Call(_client, new CallGetLeaderboard.Req(raceId)
 			{
-				RaceId = raceId,
 				AccountId = User?.AccountId
 			}, ct);
 			Leaderboards.Boards[raceId] = res.Leaderboard;
@@ -175,10 +171,7 @@ namespace Ideka.RacingMeter
 			{
 				return ghost;
 			}
-			CallGetGhost.Res res = await _getGhost.Call(_client, new CallGetGhost.Req
-			{
-				GhostId = ghostId
-			}, ct);
+			CallGetGhost.Res res = await _getGhost.Call(_client, new CallGetGhost.Req(ghostId), ct);
 			_ghostCache[ghostId] = res.Ghost;
 			return res.Ghost;
 		}
@@ -187,11 +180,7 @@ namespace Ideka.RacingMeter
 		{
 			AssertOnline();
 			await RefreshUser(ct);
-			await _uploadGhost.Call(_client, User?.AccessToken, new CallUploadGhost.Req
-			{
-				RaceId = raceId,
-				Ghost = ghost
-			}, ct);
+			await _uploadGhost.Call(_client, User?.AccessToken, new CallUploadGhost.Req(raceId, ghost), ct);
 			await UpdateLeaderboard(raceId, ct);
 		}
 

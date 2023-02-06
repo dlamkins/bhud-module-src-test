@@ -17,7 +17,7 @@ namespace Ideka.RacingMeter
 
 		private const int Spacing = 10;
 
-		public FullRace? _race;
+		public FullRace? _fullRace;
 
 		private readonly FlowPanel _panel;
 
@@ -31,18 +31,18 @@ namespace Ideka.RacingMeter
 
 		private CancellationTokenSource? _loadLocalGhosts;
 
-		public FullRace? Race
+		public FullRace? FullRace
 		{
 			get
 			{
-				return _race;
+				return _fullRace;
 			}
 			set
 			{
-				_race = value;
+				_fullRace = value;
 				StandardButton updateLeaderboardButton = _updateLeaderboardButton;
-				FullRace? race = _race;
-				((Control)updateLeaderboardButton).set_Enabled(race != null && !race!.IsLocal);
+				FullRace? fullRace = _fullRace;
+				((Control)updateLeaderboardButton).set_Enabled(fullRace != null && !fullRace!.IsLocal);
 				PopulateLeaderboard();
 				PopulateLocalGhosts();
 			}
@@ -86,7 +86,7 @@ namespace Ideka.RacingMeter
 			_localGhostsMenu.ItemSelected += new Action<FullGhost>(OnGhostSelected);
 			((Control)_updateLeaderboardButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				if (Race?.Meta.Id == null)
+				if (FullRace == null)
 				{
 					ScreenNotification.ShowNotification(Strings.NotifyNoRaceSelected, (NotificationType)2, (Texture2D)null, 4);
 				}
@@ -95,25 +95,25 @@ namespace Ideka.RacingMeter
 					PopulateLeaderboard(force: true);
 				}
 			});
-			Race = null;
+			FullRace = null;
 			RacingModule.Server.LeaderboardsChanged += new Action<string>(LeaderboardsChanged);
 			RacingModule.Server.UserChanged += new Action<UserData>(UserChanged);
 			RacingModule.LocalData.GhostsChanged += new Action<FullRace>(GhostsChanged);
 		}
 
-		public void GhostsChanged(FullRace race)
+		public void GhostsChanged(FullRace fullRace)
 		{
-			if (race.Meta?.Id == Race?.Meta?.Id)
+			if (fullRace.Meta.Id == FullRace?.Meta.Id)
 			{
 				PopulateLocalGhosts();
 			}
 		}
 
-		private void OnGhostSelected(FullGhost? ghost)
+		private void OnGhostSelected(FullGhost? fullGhost)
 		{
-			_remoteGhostsMenu.Selected = ghost;
-			_localGhostsMenu.Selected = ghost;
-			this.GhostSelected?.Invoke(ghost);
+			_remoteGhostsMenu.Selected = fullGhost;
+			_localGhostsMenu.Selected = fullGhost;
+			this.GhostSelected?.Invoke(fullGhost);
 		}
 
 		private void UpdateLeaderboard(string raceId)
@@ -135,41 +135,36 @@ namespace Ideka.RacingMeter
 
 		private void PopulateLeaderboard(bool force = false)
 		{
-			FullRace race = Race;
-			if (race != null)
+			FullRace fullRace = FullRace;
+			Leaderboard board;
+			if (fullRace == null)
 			{
-				string raceId = race.Meta?.Id;
-				if (raceId != null)
-				{
-					Leaderboard board;
-					if (race.IsLocal)
-					{
-						_remoteGhostsMenu.Placeholder(Strings.Unavailable, Strings.RaceLocalLeaderboardTooltip);
-					}
-					else if (!RacingModule.Server.IsOnline)
-					{
-						_remoteGhostsMenu.Placeholder(Strings.Unavailable, Strings.UnavailableOffline);
-					}
-					else if (force || !RacingModule.Server.Leaderboards.Boards.TryGetValue(raceId, out board))
-					{
-						_remoteGhostsMenu.Placeholder(Strings.Loading);
-						UpdateLeaderboard(raceId);
-					}
-					else
-					{
-						_remoteGhostsMenu.SetLeaderboard(board);
-					}
-					return;
-				}
+				_remoteGhostsMenu.Placeholder(Strings.Nothing);
 			}
-			_remoteGhostsMenu.Placeholder(Strings.Nothing);
+			else if (fullRace.IsLocal)
+			{
+				_remoteGhostsMenu.Placeholder(Strings.Unavailable, Strings.RaceLocalLeaderboardTooltip);
+			}
+			else if (!RacingModule.Server.IsOnline)
+			{
+				_remoteGhostsMenu.Placeholder(Strings.Unavailable, Strings.UnavailableOffline);
+			}
+			else if (force || !RacingModule.Server.Leaderboards.Boards.TryGetValue(fullRace.Meta.Id, out board))
+			{
+				_remoteGhostsMenu.Placeholder(Strings.Loading);
+				UpdateLeaderboard(fullRace.Meta.Id);
+			}
+			else
+			{
+				_remoteGhostsMenu.SetLeaderboard(board);
+			}
 		}
 
 		private void PopulateLocalGhosts()
 		{
 			TaskUtils.Cancel(ref _loadLocalGhosts);
-			FullRace race = Race;
-			if (race == null)
+			FullRace fullRace = FullRace;
+			if (fullRace == null)
 			{
 				_localGhostsMenu.Placeholder(Strings.Nothing);
 				return;
@@ -178,7 +173,7 @@ namespace Ideka.RacingMeter
 			IEnumerable<FullGhost> ghosts = null;
 			Task.Run(delegate
 			{
-				ghosts = LocalData.GetGhosts(race).Values;
+				ghosts = LocalData.GetGhosts(fullRace).Values;
 			}, TaskUtils.New(out _loadLocalGhosts)).Done(Logger, null, _loadLocalGhosts).ContinueWith(delegate(Task<TaskUtils.TaskState> task)
 			{
 				if (task.Result.Success && ghosts != null)
@@ -195,7 +190,7 @@ namespace Ideka.RacingMeter
 
 		private void LeaderboardsChanged(string raceId)
 		{
-			if (raceId == Race?.Meta?.Id)
+			if (raceId == FullRace?.Meta.Id)
 			{
 				PopulateLeaderboard();
 			}

@@ -20,7 +20,7 @@ namespace Ideka.RacingMeter
 
 		public string Caption => Strings.TestingRace;
 
-		public TestPanel(PanelStack panelStack, MeasurerRealtime measurer, FullRace race, int testCheckpoint)
+		public TestPanel(PanelStack panelStack, MeasurerRealtime measurer, FullRace fullRace, int testCheckpoint)
 		{
 			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
@@ -29,7 +29,7 @@ namespace Ideka.RacingMeter
 			PanelStack panelStack2 = panelStack;
 			((Panel)this)._002Ector();
 			_runner = new RaceRunner(measurer, testCheckpoint);
-			_runner.SetRace(race);
+			_runner.SetRace(fullRace);
 			StandardButton val = new StandardButton();
 			((Control)val).set_Parent((Container)(object)this);
 			val.set_Text(Strings.BackToEditing);

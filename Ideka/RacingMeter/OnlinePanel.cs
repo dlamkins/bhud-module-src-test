@@ -22,7 +22,7 @@ namespace Ideka.RacingMeter
 		public Texture2D Icon { get; } = RacingModule.ContentsManager.GetTexture("OnlineIcon.png");
 
 
-		public string Caption => "Online Racing";
+		public string Caption => Strings.OnlineRacing;
 
 		public OnlinePanel(PanelStack panelStack, MeasurerRealtime measurer)
 			: this()
@@ -40,6 +40,7 @@ namespace Ideka.RacingMeter
 			_lobbyBar.BackRequested += new Action(panelStack.GoBack);
 			Client.LobbyChanged += new Action<Lobby>(LobbyChanged);
 			Client.Connect();
+			this.SoftChild((Control)(object)_online);
 		}
 
 		private void LobbyChanged(Lobby? lobby)
@@ -70,6 +71,7 @@ namespace Ideka.RacingMeter
 
 		protected override void DisposeControl()
 		{
+			((GraphicsResource)Icon).Dispose();
 			Client.Dispose();
 			((Control)_online).Dispose();
 			Client.LobbyChanged -= new Action<Lobby>(LobbyChanged);

@@ -107,10 +107,10 @@ namespace Ideka.RacingMeter
 			RacingModule.LocalData.ReloadRaces();
 		}
 
-		public void SelectRace(FullRace? race)
+		public void SelectRace(FullRace? fullRace)
 		{
-			_remoteRacesMenu.Selected = race;
-			_localRacesMenu.Selected = race;
+			_remoteRacesMenu.Selected = fullRace;
+			_localRacesMenu.Selected = fullRace;
 		}
 
 		private void RacesChanged(IReadOnlyDictionary<string, FullRace> races)
@@ -123,11 +123,11 @@ namespace Ideka.RacingMeter
 			_remoteRacesMenu.SetRaces(remoteRaces.Races.Values);
 		}
 
-		private void OnRaceSelected(FullRace? race)
+		private void OnRaceSelected(FullRace? fullRace)
 		{
-			_remoteRacesMenu.Selected = race;
-			_localRacesMenu.Selected = race;
-			this.RaceSelected?.Invoke(race);
+			_remoteRacesMenu.Selected = fullRace;
+			_localRacesMenu.Selected = fullRace;
+			this.RaceSelected?.Invoke(fullRace);
 		}
 
 		protected override void OnResized(ResizedEventArgs e)

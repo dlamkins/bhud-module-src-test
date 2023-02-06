@@ -1,6 +1,7 @@
 using System;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
+using Ideka.NetCommon;
 using Ideka.RacingMeter.Lib.RacingServer;
 using Microsoft.Xna.Framework;
 
@@ -34,38 +35,35 @@ namespace Ideka.RacingMeter
 			: this()
 		{
 			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Expected O, but got Unknown
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Expected O, but got Unknown
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Expected O, but got Unknown
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Expected O, but got Unknown
-			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b6: Expected O, but got Unknown
-			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00de: Expected O, but got Unknown
-			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0106: Expected O, but got Unknown
+			//IL_0014: Expected O, but got Unknown
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0063: Expected O, but got Unknown
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0080: Expected O, but got Unknown
+			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a3: Expected O, but got Unknown
+			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cb: Expected O, but got Unknown
+			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f3: Expected O, but got Unknown
+			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011b: Expected O, but got Unknown
 			Client = client;
 			Label val = new Label();
 			((Control)val).set_Parent((Container)(object)this);
-			val.set_Text("Ping: ...");
+			val.set_Text(StringExtensions.Format(Strings.LabelPing, "..."));
 			val.set_AutoSizeWidth(true);
 			_pingLabel = val;
 			StandardButton val2 = new StandardButton();
@@ -74,27 +72,27 @@ namespace Ideka.RacingMeter
 			_backButton = val2;
 			StandardButton val3 = new StandardButton();
 			((Control)val3).set_Parent((Container)(object)this);
-			val3.set_Text("Connect");
+			val3.set_Text(Strings.Connect);
 			_connectButton = val3;
 			RacingServer server = Server;
 			StandardButton val4 = new StandardButton();
 			((Control)val4).set_Parent((Container)(object)this);
-			val4.set_Text("Create Lobby");
+			val4.set_Text(Strings.LobbyCreate);
 			_lobbyCreateButton = server.Register<StandardButton>(val4);
 			RacingServer server2 = Server;
 			TextBox val5 = new TextBox();
 			((Control)val5).set_Parent((Container)(object)this);
-			((TextInputBase)val5).set_PlaceholderText("Lobby ID to join");
+			((TextInputBase)val5).set_PlaceholderText(Strings.LobbyIdInput);
 			_lobbyIdInput = server2.Register<TextBox>(val5);
 			RacingServer server3 = Server;
 			StandardButton val6 = new StandardButton();
 			((Control)val6).set_Parent((Container)(object)this);
-			val6.set_Text("Join Lobby");
+			val6.set_Text(Strings.LobbyJoin);
 			_lobbyJoinButton = server3.Register<StandardButton>(val6);
 			RacingServer server4 = Server;
 			StandardButton val7 = new StandardButton();
 			((Control)val7).set_Parent((Container)(object)this);
-			val7.set_Text("Leave Lobby");
+			val7.set_Text(Strings.LobbyLeave);
 			_lobbyLeaveButton = server4.Register<StandardButton>(val7);
 			UpdateLayout();
 			((Control)_backButton).add_Click((EventHandler<MouseEventArgs>)delegate
@@ -133,14 +131,14 @@ namespace Ideka.RacingMeter
 
 		private void PingUpdated(int ping)
 		{
-			_pingLabel.set_Text($"Ping: {ping}ms");
+			_pingLabel.set_Text(Strings.LabelPing.Format(ping));
 		}
 
 		private void ClientStateChanged(RacingClient.ClientState state)
 		{
 			((Control)_connectButton).set_Visible(state != RacingClient.ClientState.Online);
 			((Control)_connectButton).set_Enabled(state == RacingClient.ClientState.Offline);
-			_pingLabel.set_Text("Ping: ...");
+			_pingLabel.set_Text(StringExtensions.Format(Strings.LabelPing, "..."));
 			UpdateLobbyButtons(state, Client.Lobby);
 		}
 

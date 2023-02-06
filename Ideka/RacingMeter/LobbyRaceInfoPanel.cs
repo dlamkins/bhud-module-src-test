@@ -88,7 +88,7 @@ namespace Ideka.RacingMeter
 			//IL_01df: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01ef: Expected O, but got Unknown
 			Client = _client;
-			((Panel)this).set_Title("Selected Race");
+			((Panel)this).set_Title(Strings.LobbyRaceSelected);
 			((FlowPanel)this).set_FlowDirection((ControlFlowDirection)3);
 			((FlowPanel)this).set_ControlPadding(Vector2.get_UnitY() * 10f / 2f);
 			((FlowPanel)this).set_OuterControlPadding(Vector2.get_One() * 10f / 2f);
@@ -140,33 +140,33 @@ namespace Ideka.RacingMeter
 			val8.set_Font(Control.get_Content().get_DefaultFont16());
 			val8.set_AutoSizeHeight(true);
 			val8.set_AutoSizeWidth(true);
-			((Control)val8).set_BasicTooltipText("Looping races can be run with multiple laps.");
+			((Control)val8).set_BasicTooltipText(Strings.TooltipRaceLooping);
 			_raceLoopingLabel = val8;
 			Client.LobbyRaceUpdated += new Action<FullRace>(RaceUpdated);
-			RaceUpdated(Client.Lobby?.Race);
+			RaceUpdated(Client.Lobby?.FullRace);
 			UpdateLayout();
 		}
 
-		private void RaceUpdated(FullRace? race)
+		private void RaceUpdated(FullRace? fullRace)
 		{
-			string name = race?.Race.Name ?? Strings.None;
+			string name = fullRace?.Race.Name ?? Strings.None;
 			_raceNameLabel.set_Text(name);
 			((Control)_raceNameLabel).set_BasicTooltipText(name);
-			string author = ((race != null && race!.IsLocal) ? Strings.RaceLocal : race?.Meta.AuthorName);
-			_raceAuthorLabel.set_Text(StringExtensions.Format(Strings.RaceAuthorLabel, author ?? ""));
-			((Control)_raceAuthorLabel).set_BasicTooltipText((race != null && race!.IsLocal) ? Strings.RaceLocalAuthorTooltip : author);
-			string modifiedRelative = race?.Meta.Modified.ToRelativeDateUtc();
-			string modified = ((race != null) ? $"{race!.Meta.Modified.ToLocalTime()}" : null);
-			_raceModifiedLabel.set_Text(StringExtensions.Format(Strings.RaceUpdatedLabel, modifiedRelative ?? ""));
+			string author = ((fullRace != null && fullRace!.IsLocal) ? Strings.RaceLocal : fullRace?.Meta.AuthorName);
+			_raceAuthorLabel.set_Text(StringExtensions.Format(Strings.LabelRaceAuthor, author ?? ""));
+			((Control)_raceAuthorLabel).set_BasicTooltipText((fullRace != null && fullRace!.IsLocal) ? Strings.RaceLocalAuthorTooltip : author);
+			string modifiedRelative = fullRace?.Meta.Modified.ToRelativeDateUtc();
+			string modified = ((fullRace != null) ? $"{fullRace!.Meta.Modified.ToLocalTime()}" : null);
+			_raceModifiedLabel.set_Text(StringExtensions.Format(Strings.LabelRaceUpdated, modifiedRelative ?? ""));
 			((Control)_raceModifiedLabel).set_BasicTooltipText(modified);
-			string type = ((race != null) ? (race!.Race.Type.Describe() ?? Strings.RaceTypeUnknown) : null);
-			_raceTypeLabel.set_Text(StringExtensions.Format(Strings.RaceTypeLabel, type ?? ""));
-			string mapName = ((race != null) ? RacingModule.MapData.Describe(race!.Race.MapId) : null);
-			_raceMapLabel.set_Text(StringExtensions.Format(Strings.RaceMapLabel, mapName ?? ""));
-			string looping = ((race == null) ? "" : ((race!.Race.LoopStartPoint == null) ? "No" : "Yes"));
-			_raceLoopingLabel.set_Text("Looping: " + looping);
-			_raceCheckpointsLabel.set_Text(Strings.RaceCheckpointsLabel.Format(race?.Race.Checkpoints.Count() ?? 0));
-			_raceLengthLabel.set_Text(StringExtensions.Format(Strings.RaceLengthLabel, $"{race?.Race.GetLength() ?? 0f:N0}"));
+			string type = ((fullRace != null) ? (fullRace!.Race.Type.Describe() ?? Strings.RaceTypeUnknown) : null);
+			_raceTypeLabel.set_Text(StringExtensions.Format(Strings.LabelRaceType, type ?? ""));
+			string mapName = ((fullRace != null) ? RacingModule.MapData.Describe(fullRace!.Race.MapId) : null);
+			_raceMapLabel.set_Text(StringExtensions.Format(Strings.LabelRaceMap, mapName ?? ""));
+			string looping = ((fullRace == null) ? "" : ((fullRace!.Race.LoopStartPoint == null) ? Strings.No : Strings.Yes));
+			_raceLoopingLabel.set_Text(StringExtensions.Format(Strings.LabelRaceLooping, looping));
+			_raceCheckpointsLabel.set_Text(Strings.LabelRaceCheckpoints.Format(fullRace?.Race.Checkpoints.Count() ?? 0));
+			_raceLengthLabel.set_Text(StringExtensions.Format(Strings.LabelRaceLength, $"{fullRace?.Race.GetLength() ?? 0f:N0}"));
 			UpdateLayout();
 		}
 

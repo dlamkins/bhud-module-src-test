@@ -27,11 +27,15 @@ namespace Ideka.RacingMeter
 		public static FullRace? GetRaceFromDisk(string raceId)
 		{
 			string path = Path.Combine(RacingModule.RacePath, raceId + ".race");
-			if (!File.Exists(path))
+			if (File.Exists(path))
 			{
-				return null;
+				Race race = JsonConvert.DeserializeObject<Race>(File.ReadAllText(path));
+				if (race != null)
+				{
+					return FullRace.FromLocal(race, path);
+				}
 			}
-			return FullRace.FromLocal(JsonConvert.DeserializeObject<Race>(File.ReadAllText(path)), path);
+			return null;
 		}
 
 		public void ReloadRaces()
@@ -65,41 +69,37 @@ namespace Ideka.RacingMeter
 			this.RacesChanged?.Invoke(Races);
 		}
 
-		public void SaveRace(FullRace race)
+		public void SaveRace(FullRace fullRace)
 		{
-			DateTime dateTime2 = (race.Race.Modified = (race.Meta.Modified = DateTime.UtcNow));
+			DateTime dateTime2 = (fullRace.Race.Modified = (fullRace.Meta.Modified = DateTime.UtcNow));
 			Directory.CreateDirectory(RacingModule.RacePath);
-			File.WriteAllText(Path.Combine(RacingModule.RacePath, race.Meta.Id + ".race"), JsonConvert.SerializeObject(race.Race));
-			bool num = _races.ContainsKey(race.Meta.Id);
-			_races[race.Meta.Id] = race;
+			File.WriteAllText(Path.Combine(RacingModule.RacePath, fullRace.Meta.Id + ".race"), JsonConvert.SerializeObject(fullRace.Race));
+			bool num = _races.ContainsKey(fullRace.Meta.Id);
+			_races[fullRace.Meta.Id] = fullRace;
 			this.RacesChanged?.Invoke(Races);
 			if (!num)
 			{
-				this.RaceCreated?.Invoke(race);
+				this.RaceCreated?.Invoke(fullRace);
 			}
 		}
 
-		public void DeleteRace(FullRace race)
+		public void DeleteRace(FullRace fullRace)
 		{
-			string racePath = Path.Combine(RacingModule.RacePath, race.Meta.Id + ".race");
+			string racePath = Path.Combine(RacingModule.RacePath, fullRace.Meta.Id + ".race");
 			if (File.Exists(racePath))
 			{
 				FileSystem.DeleteFile(racePath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
 			}
-			if (_races.Remove(race.Meta.Id))
+			if (_races.Remove(fullRace.Meta.Id))
 			{
 				this.RacesChanged?.Invoke(Races);
 			}
 		}
 
-		public static Dictionary<string, FullGhost> GetGhosts(FullRace race)
+		public static Dictionary<string, FullGhost> GetGhosts(FullRace fullRace)
 		{
 			Dictionary<string, FullGhost> dict = new Dictionary<string, FullGhost>();
-			if (race == null || race.Meta?.Id == null)
-			{
-				return dict;
-			}
-			string path = RacingModule.GhostRacePath(race.Meta.Id);
+			string path = RacingModule.GhostRacePath(fullRace.Meta.Id);
 			if (!Directory.Exists(path))
 			{
 				return dict;
@@ -111,7 +111,7 @@ namespace Ideka.RacingMeter
 				try
 				{
 					Ghost ghost = JsonConvert.DeserializeObject<Ghost>(File.ReadAllText(fname));
-					if (ghost == null || !ghost.Validate(race.Race))
+					if (ghost == null || !ghost.Validate(fullRace.Race))
 					{
 						Logger.Warn("Failed to load ghost file " + fname + ", skipping.");
 					}

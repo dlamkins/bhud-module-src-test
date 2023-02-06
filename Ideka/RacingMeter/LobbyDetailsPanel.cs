@@ -29,7 +29,7 @@ namespace Ideka.RacingMeter
 			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 			Client = client;
 			((Panel)this).set_ShowTint(true);
-			((Panel)this).set_Title("Lobby Settings");
+			((Panel)this).set_Title(Strings.LobbySettings);
 			((FlowPanel)this).set_FlowDirection((ControlFlowDirection)3);
 			Vector2 val = default(Vector2);
 			((Vector2)(ref val))._002Ector(10f, 10f);
@@ -37,20 +37,20 @@ namespace Ideka.RacingMeter
 			((FlowPanel)this).set_ControlPadding(val);
 			StringBox stringBox = new StringBox();
 			((Control)stringBox).set_Parent((Container)(object)this);
-			stringBox.Label = "Lobby ID";
+			stringBox.Label = Strings.LobbyId;
 			stringBox.ControlEnabled = false;
 			_idBox = stringBox;
 			RacingServer server = Server;
 			IntBox intBox = new IntBox();
 			((Control)intBox).set_Parent((Container)(object)this);
-			intBox.Label = "Max Users";
+			intBox.Label = Strings.LobbyMaxUsers;
 			intBox.MinValue = 2;
 			intBox.MaxValue = 50;
 			_sizeBox = server.Register<IntBox>(intBox);
 			RacingServer server2 = Server;
 			IntBox intBox2 = new IntBox();
 			((Control)intBox2).set_Parent((Container)(object)this);
-			intBox2.Label = "Race Laps";
+			intBox2.Label = Strings.LobbyRaceLaps;
 			intBox2.MinValue = 1;
 			intBox2.MaxValue = 50;
 			_lapsBox = server2.Register<IntBox>(intBox2);
@@ -60,7 +60,7 @@ namespace Ideka.RacingMeter
 				if (!string.IsNullOrEmpty(_idBox.Value))
 				{
 					ClipboardUtil.get_WindowsClipboardService().SetTextAsync(_idBox.Value);
-					ScreenNotification.ShowNotification("Copied!", (NotificationType)0, (Texture2D)null, 4);
+					ScreenNotification.ShowNotification(Strings.NoticeCopied, (NotificationType)0, (Texture2D)null, 4);
 				}
 			});
 			_sizeBox.ValueCommitted += async delegate
@@ -96,7 +96,7 @@ namespace Ideka.RacingMeter
 		private void LobbyChanged(Lobby? lobby)
 		{
 			_idBox.Value = lobby?.Id ?? "";
-			_idBox.AllBasicTooltipText = ((lobby == null) ? null : "Click to copy");
+			_idBox.AllBasicTooltipText = ((lobby == null) ? null : Strings.ClickToCopy);
 			_sizeBox.Value = lobby?.Settings.Size ?? 0;
 			_lapsBox.Value = lobby?.Settings.Laps ?? 0;
 		}

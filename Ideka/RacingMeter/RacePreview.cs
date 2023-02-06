@@ -17,7 +17,7 @@ namespace Ideka.RacingMeter
 
 		private readonly TrackBar _progressBar;
 
-		public FullRace? Race
+		public FullRace? FullRace
 		{
 			get
 			{
@@ -30,7 +30,7 @@ namespace Ideka.RacingMeter
 			}
 		}
 
-		public FullGhost? Ghost
+		public FullGhost? FullGhost
 		{
 			get
 			{
@@ -38,9 +38,10 @@ namespace Ideka.RacingMeter
 			}
 			set
 			{
-				RacePreviewView view = _view;
-				string raceId = value?.Ghost?.RaceId;
-				view.FullGhost = ((raceId != null && Race?.Meta?.Id == raceId) ? value : null);
+				if (value?.Ghost?.RaceId == FullRace?.Meta.Id)
+				{
+					_view.FullGhost = value;
+				}
 				((Control)_progressBar).set_Enabled(_view.Ghost != null);
 				Race race = _view.Race;
 				object ghostCheckpoints;
@@ -50,12 +51,12 @@ namespace Ideka.RacingMeter
 					if (ghost != null)
 					{
 						ghostCheckpoints = ghost.Checkpoints(race);
-						goto IL_0093;
+						goto IL_0084;
 					}
 				}
 				ghostCheckpoints = null;
-				goto IL_0093;
-				IL_0093:
+				goto IL_0084;
+				IL_0084:
 				GhostCheckpoints = (IReadOnlyList<GhostSnapshot>?)ghostCheckpoints;
 				UpdateLabels();
 			}
@@ -106,8 +107,8 @@ namespace Ideka.RacingMeter
 			RacingModule.Server.RemoteRacesChanged += new Action<RemoteRaces>(RemoteRacesChanged);
 			RacingModule.LocalData.RacesChanged += new Action<IReadOnlyDictionary<string, FullRace>>(LocalRacesChanged);
 			UpdateMaps();
-			Race = null;
-			Ghost = null;
+			FullRace = null;
+			FullGhost = null;
 			_progressBar.set_Value(0f);
 		}
 
@@ -128,7 +129,7 @@ namespace Ideka.RacingMeter
 
 		private void UpdateLabels()
 		{
-			_timeLabel.set_Text((Ghost?.Ghost?.SnapshotAt(_progressBar.get_Value()).Time ?? TimeSpan.Zero).Formatted());
+			_timeLabel.set_Text((FullGhost?.Ghost.SnapshotAt(_progressBar.get_Value()).Time ?? TimeSpan.Zero).Formatted());
 		}
 
 		protected override void OnResized(ResizedEventArgs e)

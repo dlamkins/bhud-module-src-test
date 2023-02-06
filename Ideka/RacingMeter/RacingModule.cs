@@ -38,8 +38,6 @@ namespace Ideka.RacingMeter
 
 		internal static SemVer.Version Version => ((Module)Instance).get_Version();
 
-		internal static string Namespace => ((Module)Instance).get_Namespace();
-
 		internal static ContentsManager ContentsManager => ((Module)Instance).ModuleParameters.get_ContentsManager();
 
 		internal static Gw2ApiManager Gw2ApiManager => ((Module)Instance).ModuleParameters.get_Gw2ApiManager();
@@ -115,8 +113,7 @@ namespace Ideka.RacingMeter
 			((Control)speedometer).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((Control)speedometer).set_ZIndex(50);
 			dc2.Add<Speedometer>(speedometer);
-			PanelStack panelStack = _dc.Add<PanelStack>(new PanelStack(GameService.Overlay.get_BlishHudWindow()));
-			panelStack.SetHomePanel(new MainPanel(panelStack, measurer));
+			_dc.Add<PanelStack>(new PanelStack(GameService.Overlay.get_BlishHudWindow(), (PanelStack panelStack) => new MainPanel(panelStack, measurer)));
 			Server.CheckVersion(Version.ToString()).Done(Logger, null);
 		}
 

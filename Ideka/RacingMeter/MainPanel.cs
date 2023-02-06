@@ -41,9 +41,9 @@ namespace Ideka.RacingMeter
 				RaceInfoPanel raceInfoPanel = _raceInfoPanel;
 				GhostInfoPanel ghostInfoPanel = _ghostInfoPanel;
 				GhostsPanel ghostsPanel = _ghostsPanel;
-				FullRace fullRace2 = (_racePreview.Race = (_fullRace = value));
-				FullRace fullRace4 = (ghostsPanel.Race = fullRace2);
-				FullRace fullRace7 = (raceInfoPanel.Race = (ghostInfoPanel.Race = fullRace4));
+				FullRace fullRace2 = (_racePreview.FullRace = (_fullRace = value));
+				FullRace fullRace4 = (ghostsPanel.FullRace = fullRace2);
+				FullRace fullRace7 = (raceInfoPanel.FullRace = (ghostInfoPanel.FullRace = fullRace4));
 				_racesPanel.SelectRace(value);
 			}
 		}
@@ -82,6 +82,10 @@ namespace Ideka.RacingMeter
 			((Control)ghostInfoPanel).set_Parent((Container)(object)this);
 			_ghostInfoPanel = ghostInfoPanel;
 			UpdateLayout();
+			_topBar.OnlineRequested += delegate
+			{
+				mainPanel._panelStack.Push(new OnlinePanel(mainPanel._panelStack, measurer2));
+			};
 			_topBar.UnloadRace += delegate
 			{
 				mainPanel._runnerLoader.LoadRace(null, null);
@@ -100,7 +104,7 @@ namespace Ideka.RacingMeter
 			};
 			_ghostsPanel.GhostSelected += delegate(FullGhost? ghost)
 			{
-				FullGhost fullGhost6 = (mainPanel._ghostInfoPanel.Ghost = (mainPanel._racePreview.Ghost = ghost));
+				FullGhost fullGhost6 = (mainPanel._ghostInfoPanel.FullGhost = (mainPanel._racePreview.FullGhost = ghost));
 			};
 			_raceInfoPanel.RaceRequested += delegate(FullRace race)
 			{
@@ -108,7 +112,7 @@ namespace Ideka.RacingMeter
 			};
 			_ghostInfoPanel.GhostChanged += delegate(FullGhost ghost)
 			{
-				FullGhost fullGhost3 = (mainPanel._ghostInfoPanel.Ghost = (mainPanel._racePreview.Ghost = ghost));
+				FullGhost fullGhost3 = (mainPanel._ghostInfoPanel.FullGhost = (mainPanel._racePreview.FullGhost = ghost));
 			};
 			_ghostInfoPanel.GhostRequested += delegate(FullRace race, FullGhost ghost)
 			{
@@ -123,16 +127,16 @@ namespace Ideka.RacingMeter
 
 		private void RacesChanged(IReadOnlyDictionary<string, FullRace> races)
 		{
-			string id = FullRace?.Meta?.Id;
+			string id = FullRace?.Meta.Id;
 			if (id != null)
 			{
-				FullRace = (races.TryGetValue(id, out var race) ? race : null);
+				FullRace = (races.TryGetValue(id, out var fullRace) ? fullRace : null);
 			}
 		}
 
-		private void RaceCreated(FullRace race)
+		private void RaceCreated(FullRace fullRace)
 		{
-			FullRace = race;
+			FullRace = fullRace;
 		}
 
 		protected override void OnResized(ResizedEventArgs e)

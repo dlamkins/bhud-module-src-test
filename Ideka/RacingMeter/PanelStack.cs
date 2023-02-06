@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Blish_HUD.Content;
@@ -8,9 +9,7 @@ namespace Ideka.RacingMeter
 {
 	public class PanelStack : Panel
 	{
-		private IUIPanel? _currentPanel;
-
-		private IUIPanel? _homePanel;
+		private IUIPanel _currentPanel;
 
 		private readonly Stack<IUIPanel> _stack = new Stack<IUIPanel>();
 
@@ -18,7 +17,9 @@ namespace Ideka.RacingMeter
 
 		private readonly WindowTab _tab;
 
-		public IUIPanel? CurrentPanel
+		private readonly IUIPanel _homePanel;
+
+		public IUIPanel CurrentPanel
 		{
 			get
 			{
@@ -26,40 +27,29 @@ namespace Ideka.RacingMeter
 			}
 			private set
 			{
-				if (value != _currentPanel && value != null)
-				{
-					if (_currentPanel != null)
-					{
-						((Control)_currentPanel!.Panel).set_Parent((Container)null);
-					}
-					_tab.set_Icon(AsyncTexture2D.op_Implicit(value!.Icon));
-					WindowTab tab = _tab;
-					string caption;
-					((WindowBase)_targetWindow).set_Subtitle(caption = value!.Caption);
-					tab.set_Name(caption);
-					((Control)value!.Panel).set_Parent((Container)(object)this);
-					_currentPanel = value;
-					UpdateLayout();
-				}
+				_tab.set_Icon(AsyncTexture2D.op_Implicit(value.Icon));
+				WindowTab tab = _tab;
+				string caption;
+				((WindowBase)_targetWindow).set_Subtitle(caption = value.Caption);
+				tab.set_Name(caption);
+				((Control)value.Panel).set_Parent((Container)(object)this);
+				_currentPanel = value;
+				UpdateLayout();
 			}
 		}
 
-		public PanelStack(TabbedWindow targetWindow)
+		public PanelStack(TabbedWindow targetWindow, Func<PanelStack, IUIPanel> makeHomePanel)
 			: this()
 		{
 			_targetWindow = targetWindow;
 			_tab = _targetWindow.AddTab("", (AsyncTexture2D)null, (Panel)(object)this);
-		}
-
-		public void SetHomePanel(IUIPanel homePanel)
-		{
-			IUIPanel currentPanel = (CurrentPanel = homePanel);
-			_homePanel = (_currentPanel = currentPanel);
+			CurrentPanel = (_currentPanel = (_homePanel = makeHomePanel(this)));
 		}
 
 		public void Push(IUIPanel panel)
 		{
 			_stack.Push(panel);
+			((Control)CurrentPanel.Panel).set_Parent((Container)null);
 			CurrentPanel = panel;
 		}
 
@@ -88,8 +78,8 @@ namespace Ideka.RacingMeter
 			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 			if (CurrentPanel != null)
 			{
-				((Control)CurrentPanel!.Panel).set_Location(Point.get_Zero());
-				Panel panel = CurrentPanel!.Panel;
+				((Control)CurrentPanel.Panel).set_Location(Point.get_Zero());
+				Panel panel = CurrentPanel.Panel;
 				Rectangle contentRegion = ((Container)this).get_ContentRegion();
 				((Control)panel).set_Size(((Rectangle)(ref contentRegion)).get_Size());
 			}
@@ -102,11 +92,7 @@ namespace Ideka.RacingMeter
 			{
 				((Control)item.Panel).Dispose();
 			}
-			IUIPanel? homePanel = _homePanel;
-			if (homePanel != null)
-			{
-				((Control)homePanel!.Panel).Dispose();
-			}
+			((Control)_homePanel.Panel).Dispose();
 			((Panel)this).DisposeControl();
 		}
 	}

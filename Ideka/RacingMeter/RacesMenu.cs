@@ -15,7 +15,7 @@ namespace Ideka.RacingMeter
 
 		protected override string? ExtractId(FullRace? item)
 		{
-			return item?.Meta?.Id;
+			return item?.Meta.Id;
 		}
 
 		public void SetRaces(IEnumerable<FullRace> races)
