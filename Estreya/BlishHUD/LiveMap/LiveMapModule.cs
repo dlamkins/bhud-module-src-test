@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,6 +19,7 @@ using Estreya.BlishHUD.Shared.Modules;
 using Estreya.BlishHUD.Shared.Settings;
 using Estreya.BlishHUD.Shared.Threading;
 using Estreya.BlishHUD.Shared.Utils;
+using Flurl.Util;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
@@ -32,18 +34,20 @@ namespace Estreya.BlishHUD.LiveMap
 	{
 		private new static readonly Logger Logger = Logger.GetLogger<LiveMapModule>();
 
-		private const string LIVE_MAP_BASE_API_URL = "https://gw2map.api.estreya.de/v2";
+		private const string LIVE_MAP_BASE_API_URL = "https://gw2map.api.estreya.de/v3";
 
-		private const string LIVE_MAP_GLOBAL_API_URL = "https://gw2map.api.estreya.de/v2/global/write";
+		private const string LIVE_MAP_GLOBAL_API_URL = "https://gw2map.api.estreya.de/v3/global/write";
 
-		private const string LIVE_MAP_GUILD_API_URL = "https://gw2map.api.estreya.de/v2/guild/write";
+		private const string LIVE_MAP_GUILD_API_URL = "https://gw2map.api.estreya.de/v3/guild/write";
 
-		private SocketIO GlobalSocket = new SocketIO("https://gw2map.api.estreya.de/v2/global/write", new SocketIOOptions
+		public const string LIVE_MAP_GLOBAL_URL = "https://gw2map.estreya.de/";
+
+		private SocketIO GlobalSocket = new SocketIO("https://gw2map.api.estreya.de/v3/global/write", new SocketIOOptions
 		{
 			Transport = TransportProtocol.WebSocket
 		});
 
-		private SocketIO GuildSocket = new SocketIO("https://gw2map.api.estreya.de/v2/guild/write", new SocketIOOptions
+		private SocketIO GuildSocket = new SocketIO("https://gw2map.api.estreya.de/v3/guild/write", new SocketIOOptions
 		{
 			Transport = TransportProtocol.WebSocket
 		});
@@ -58,28 +62,17 @@ namespace Estreya.BlishHUD.LiveMap
 
 		private AsyncRef<double> _lastGuildFetch = new AsyncRef<double>(0.0);
 
-		private TimeSpan _wvwColorFetchInterval = TimeSpan.FromHours(1.0);
+		private TimeSpan _wvwFetchInterval = TimeSpan.FromHours(1.0);
 
-		private AsyncRef<double> _lastWvWColorFetch = new AsyncRef<double>(0.0);
+		private AsyncRef<double> _lastWvWFetch = new AsyncRef<double>(0.0);
 
 		private string _accountName;
 
 		private string _guildId;
 
-		private string _wvwColor;
+		private PlayerWvW _wvw;
 
 		private Map _map;
-
-		public string LIVE_MAP_GLOBAL_URL
-		{
-			get
-			{
-				Map map = _map;
-				return $"https://gw2map.estreya.de/{((map == null) ? 1 : map.get_ContinentId())}";
-			}
-		}
-
-		public string LIVE_MAP_GUILD_URL => LIVE_MAP_GLOBAL_URL + "/guild/{0}";
 
 		public string GuildId => _guildId;
 
@@ -123,11 +116,11 @@ namespace Estreya.BlishHUD.LiveMap
 				int value = resp.GetValue<int>();
 				_sendInterval = TimeSpan.FromMilliseconds(value);
 			});
-			await GlobalSocket.ConnectAsync();
-			await GuildSocket.ConnectAsync();
+			Task.Run((Func<Task>)GlobalSocket.ConnectAsync);
+			Task.Run((Func<Task>)GuildSocket.ConnectAsync);
 			await FetchAccountName();
 			await FetchGuildId();
-			await FetchWvWColor();
+			await FetchWvW();
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)
@@ -139,7 +132,7 @@ namespace Estreya.BlishHUD.LiveMap
 		{
 			Task.Run((Func<Task>)FetchAccountName);
 			_lastGuildFetch.Value = _guildFetchInterval.TotalMilliseconds;
-			_lastWvWColorFetch.Value = _wvwColorFetchInterval.TotalMilliseconds;
+			_lastWvWFetch.Value = _wvwFetchInterval.TotalMilliseconds;
 		}
 
 		private void PlayerCharacter_NameChanged(object sender, ValueEventArgs<string> e)
@@ -170,9 +163,10 @@ namespace Estreya.BlishHUD.LiveMap
 			}
 		}
 
-		private async Task FetchWvWColor()
+		private async Task FetchWvW()
 		{
 			string color = "white";
+			string matchId = "0-0";
 			if (base.Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[1] { (TokenPermission)1 }))
 			{
 				try
@@ -180,17 +174,23 @@ namespace Estreya.BlishHUD.LiveMap
 					int worldId = (await ((IBlobClient<Account>)(object)base.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()).GetAsync(default(CancellationToken))).get_World();
 					IApiV2ObjectList<WvwMatch> source = await ((IAllExpandableClient<WvwMatch>)(object)base.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Wvw()
 						.get_Matches()).AllAsync(default(CancellationToken));
-					if (((IEnumerable<WvwMatch>)source).Where((WvwMatch m) => m.get_AllWorlds().get_Green().Contains(worldId)).Any())
+					WvwMatch match = ((IEnumerable<WvwMatch>)source).Where((WvwMatch m) => m.get_AllWorlds().get_Green().Contains(worldId)).FirstOrDefault();
+					if (match != null)
 					{
 						color = "green";
+						matchId = match.get_Id();
 					}
-					if (((IEnumerable<WvwMatch>)source).Where((WvwMatch m) => m.get_AllWorlds().get_Red().Contains(worldId)).Any())
+					match = ((IEnumerable<WvwMatch>)source).Where((WvwMatch m) => m.get_AllWorlds().get_Red().Contains(worldId)).FirstOrDefault();
+					if (match != null)
 					{
 						color = "red";
+						matchId = match.get_Id();
 					}
-					if (((IEnumerable<WvwMatch>)source).Where((WvwMatch m) => m.get_AllWorlds().get_Blue().Contains(worldId)).Any())
+					match = ((IEnumerable<WvwMatch>)source).Where((WvwMatch m) => m.get_AllWorlds().get_Blue().Contains(worldId)).FirstOrDefault();
+					if (match != null)
 					{
 						color = "blue";
+						matchId = match.get_Id();
 					}
 				}
 				catch (Exception ex)
@@ -198,7 +198,11 @@ namespace Estreya.BlishHUD.LiveMap
 					Logger.Debug(ex, "Failed to fetch wvw team color:");
 				}
 			}
-			_wvwColor = color;
+			_wvw = new PlayerWvW
+			{
+				Match = matchId,
+				TeamColor = color
+			};
 		}
 
 		private async Task SendPosition()
@@ -237,12 +241,15 @@ namespace Estreya.BlishHUD.LiveMap
 
 		private async Task PublishToGlobal(Player player)
 		{
-			await GlobalSocket.EmitAsync("update", player);
+			if (GlobalSocket.Connected)
+			{
+				await GlobalSocket.EmitAsync("update", player);
+			}
 		}
 
 		private async Task PublishToGuild(Player player)
 		{
-			if (!string.IsNullOrWhiteSpace(player.Identification.GuildId))
+			if (GuildSocket.Connected && !string.IsNullOrWhiteSpace(player.Identification.GuildId))
 			{
 				await GuildSocket.EmitAsync("update", player);
 			}
@@ -252,7 +259,7 @@ namespace Estreya.BlishHUD.LiveMap
 		{
 			UpdateUtil.UpdateAsync(SendPosition, gameTime, _sendInterval.TotalMilliseconds, _lastSend, doLogging: false);
 			UpdateUtil.UpdateAsync(FetchGuildId, gameTime, _guildFetchInterval.TotalMilliseconds, _lastGuildFetch);
-			UpdateUtil.UpdateAsync(FetchWvWColor, gameTime, _wvwColorFetchInterval.TotalMilliseconds, _lastWvWColorFetch);
+			UpdateUtil.UpdateAsync(FetchWvW, gameTime, _wvwFetchInterval.TotalMilliseconds, _lastWvWFetch);
 		}
 
 		protected override void Unload()
@@ -311,17 +318,65 @@ namespace Estreya.BlishHUD.LiveMap
 			{
 				Angle = cameraAngle
 			};
-			obj.WvW = new PlayerWvW
-			{
-				TeamColor = _wvwColor
-			};
+			obj.WvW = _wvw;
 			obj.Commander = !base.ModuleSettings.HideCommander.get_Value() && GameService.Gw2Mumble.get_PlayerCharacter().get_IsCommander();
 			return obj;
 		}
 
+		private string GetGlobalUrl(bool formatPositions = true)
+		{
+			string baseUrl = "https://gw2map.estreya.de/";
+			string url = baseUrl;
+			Map map = _map;
+			if (map != null && map.get_ContinentId() == 1)
+			{
+				url = Path.Combine(url, "tyria");
+			}
+			else
+			{
+				Map map2 = _map;
+				if (map2 == null || map2.get_ContinentId() != 2)
+				{
+					return baseUrl;
+				}
+				url = Path.Combine(url, "mists");
+				if (_wvw != null)
+				{
+					url = Path.Combine(url, _wvw.Match);
+				}
+			}
+			if (!formatPositions)
+			{
+				return url;
+			}
+			return FormatUrlWithPosition(url);
+		}
+
+		private string GetGuildUrl(bool formatPositions = true)
+		{
+			string baseUrl = GetGlobalUrl(formatPositions: false);
+			string url = baseUrl;
+			if (!string.IsNullOrWhiteSpace(GuildId))
+			{
+				url = Path.Combine(url, "guild", GuildId);
+				if (!formatPositions)
+				{
+					return url;
+				}
+				return FormatUrlWithPosition(url);
+			}
+			return baseUrl;
+		}
+
+		private string FormatUrlWithPosition(string url)
+		{
+			Player player = GetPlayer();
+			return url + "?posX=" + player.Map.Position.X.ToInvariantString() + "&posY=" + player.Map.Position.Y.ToInvariantString() + "&zoom=6";
+		}
+
 		public override IView GetSettingsView()
 		{
-			return (IView)(object)new SettingsView(base.Gw2ApiManager, base.IconState, base.TranslationState, base.ModuleSettings, () => GuildId, () => GetPlayer().Map.Position.X, () => GetPlayer().Map.Position.Y, () => LIVE_MAP_GLOBAL_URL, () => LIVE_MAP_GUILD_URL);
+			return (IView)(object)new SettingsView(base.Gw2ApiManager, base.IconState, base.TranslationState, base.ModuleSettings, () => GetGlobalUrl(), () => GetGuildUrl());
 		}
 
 		protected override BaseModuleSettings DefineModuleSettings(SettingCollection settings)

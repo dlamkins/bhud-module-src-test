@@ -353,7 +353,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 		{
 			if (_defaultSettingView == null)
 			{
-				_defaultSettingView = new ModuleSettingsView(TranslationState.GetTranslation("moduleSettingsView-openSettingsBtn", "Open Settings"), IconState, TranslationState);
+				_defaultSettingView = new ModuleSettingsView(IconState, TranslationState);
 				_defaultSettingView.OpenClicked += DefaultSettingView_OpenClicked;
 				_defaultSettingView.CreateGithubIssueClicked += DefaultSettingView_CreateGithubIssueClicked;
 			}

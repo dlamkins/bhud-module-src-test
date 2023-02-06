@@ -9,16 +9,13 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 {
 	public class ModuleSettingsView : BaseView
 	{
-		private readonly string _openSettingsText;
-
 		public event EventHandler OpenClicked;
 
 		public event EventHandler CreateGithubIssueClicked;
 
-		public ModuleSettingsView(string openSettingsText, IconState iconState, TranslationState translationState)
+		public ModuleSettingsView(IconState iconState, TranslationState translationState)
 			: base(null, iconState, translationState)
 		{
-			_openSettingsText = openSettingsText;
 		}
 
 		protected override Task<bool> InternalLoad(IProgress<string> progress)
@@ -49,18 +46,18 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0089: Expected O, but got Unknown
-			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a5: Expected O, but got Unknown
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0132: Expected O, but got Unknown
-			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0179: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b4: Expected O, but got Unknown
+			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0147: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0151: Expected O, but got Unknown
+			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0198: Unknown result type (might be due to invalid IL or missing references)
 			Rectangle bounds = ((Container)parent).get_ContentRegion();
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Size(((Rectangle)(ref bounds)).get_Size());
@@ -77,7 +74,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			((Container)val2).set_HeightSizingMode((SizingMode)1);
 			((Control)val2).set_Parent((Container)(object)parentPanel);
 			ViewContainer settingContainer = val2;
-			string buttonText = _openSettingsText;
+			string buttonText = base.TranslationState.GetTranslation("moduleSettingsView-openSettingsBtn", "Open Settings");
 			StandardButton val3 = new StandardButton();
 			((Control)val3).set_Parent((Container)(object)settingContainer);
 			val3.set_Text(buttonText);
@@ -91,7 +88,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			{
 				this.OpenClicked?.Invoke(this, EventArgs.Empty);
 			});
-			string githubIssueText = "Create Bug/Feature Issue";
+			string githubIssueText = base.TranslationState.GetTranslation("moduleSettingsView-createGitHubIssueBtn", "Create Bug/Feature Issue");
 			StandardButton val4 = new StandardButton();
 			((Control)val4).set_Parent((Container)(object)settingContainer);
 			val4.set_Text(githubIssueText);

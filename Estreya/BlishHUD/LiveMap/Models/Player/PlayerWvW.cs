@@ -4,6 +4,9 @@ namespace Estreya.BlishHUD.LiveMap.Models.Player
 {
 	public class PlayerWvW
 	{
+		[JsonPropertyName("match")]
+		public string Match { get; set; }
+
 		[JsonPropertyName("teamColor")]
 		public string TeamColor { get; set; }
 
@@ -14,7 +17,7 @@ namespace Estreya.BlishHUD.LiveMap.Models.Player
 				PlayerWvW playerWvW = obj as PlayerWvW;
 				if (playerWvW != null)
 				{
-					return true & (TeamColor == playerWvW.TeamColor);
+					return true & (Match == playerWvW.Match) & (TeamColor == playerWvW.TeamColor);
 				}
 			}
 			return false;

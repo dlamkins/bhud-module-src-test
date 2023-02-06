@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,7 +19,7 @@ namespace Estreya.BlishHUD.Shared.State
 
 		private readonly string _rootUrl;
 
-		private static List<string> _locales = new List<string> { "en", "de" };
+		private static List<string> _locales = new List<string> { "en", "de", "es", "fr" };
 
 		public TranslationState(StateConfiguration configuration, IFlurlClient flurlClient, string rootUrl)
 			: base(configuration)
@@ -71,7 +72,7 @@ namespace Estreya.BlishHUD.Shared.State
 					if (lineParts.Length >= 2)
 					{
 						string key = lineParts[0];
-						string value = lineParts[1];
+						string value = string.Join("=", lineParts.Skip(1));
 						if (!localeTranslations.TryAdd(key, value))
 						{
 							Logger.Warn(key + " for locale " + locale + " already added.");
@@ -82,7 +83,7 @@ namespace Estreya.BlishHUD.Shared.State
 			}
 			catch (Exception ex)
 			{
-				_ = ex.Message;
+				Logger.Warn(ex, "Failed to load translations for locale " + locale + ":");
 			}
 		}
 
