@@ -4,8 +4,10 @@ using Kenedia.Modules.Core.Services;
 
 namespace Kenedia.Modules.Core.Models
 {
-	public class ServiceCollection
+	public class ServiceCollection : IDisposable
 	{
+		private bool _disposed;
+
 		public Dictionary<Type, bool> States { get; } = new Dictionary<Type, bool>();
 
 
@@ -31,6 +33,16 @@ namespace Kenedia.Modules.Core.Models
 			States[typeof(SharedSettings)] = true;
 			States[typeof(TexturesService)] = true;
 			States[typeof(InputDetectionService)] = true;
+		}
+
+		public void Dispose()
+		{
+			if (!_disposed)
+			{
+				_disposed = true;
+				GameState.Dispose();
+				TexturesService.Dispose();
+			}
 		}
 	}
 }

@@ -392,22 +392,6 @@ namespace Kenedia.Modules.Characters
 
 		protected override void Unload()
 		{
-			base.Settings?.Dispose();
-			SettingsWindow settingsWindow = SettingsWindow;
-			if (settingsWindow != null)
-			{
-				((Control)settingsWindow).Dispose();
-			}
-			MainWindow mainWindow = base.MainWindow;
-			if (mainWindow != null)
-			{
-				((Control)mainWindow).Dispose();
-			}
-			CornerIcon cornerIcon = _cornerIcon;
-			if (cornerIcon != null)
-			{
-				((Control)cornerIcon).Dispose();
-			}
 			TextureManager = null;
 			DeleteCornerIcons();
 			CharacterModels.CollectionChanged -= OnCharacterCollectionChanged;

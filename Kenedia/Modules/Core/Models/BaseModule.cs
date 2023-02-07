@@ -132,7 +132,8 @@ namespace Kenedia.Modules.Core.Models
 		protected override void Unload()
 		{
 			((Module)this).Unload();
-			Services.GameState?.Dispose();
+			UnloadGUI();
+			Services?.Dispose();
 			ModuleInstance = default(ModuleType);
 		}
 

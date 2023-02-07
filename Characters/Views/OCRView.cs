@@ -342,7 +342,7 @@ namespace Characters.Views
 			MaskedRegion maskedRegion = new MaskedRegion();
 			((Control)maskedRegion).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((Control)maskedRegion).set_ZIndex(int.MaxValue);
-			((Control)maskedRegion).set_Visible(true);
+			((Control)maskedRegion).set_Visible(false);
 			_maskedRegion = maskedRegion;
 			ResizeableContainer resizeableContainer = new ResizeableContainer();
 			((Control)resizeableContainer).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
