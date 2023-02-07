@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 namespace System.Runtime.CompilerServices
 {
 	[CompilerGenerated]
-	[Embedded]
+	[Microsoft.CodeAnalysis.Embedded]
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Method | AttributeTargets.Interface | AttributeTargets.Delegate, AllowMultiple = false, Inherited = false)]
 	internal sealed class NullableContextAttribute : Attribute
 	{

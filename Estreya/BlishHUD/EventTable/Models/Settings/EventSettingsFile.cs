@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Estreya.BlishHUD.EventTable.Json;
+using Estreya.BlishHUD.Shared.Json.Converter;
 using Newtonsoft.Json;
 using SemVer;
 

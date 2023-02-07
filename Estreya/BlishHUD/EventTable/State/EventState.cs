@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Blish_HUD;
-using Estreya.BlishHUD.EventTable.Helpers;
-using Estreya.BlishHUD.EventTable.Utils;
+using Estreya.BlishHUD.Shared.Helpers;
+using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Utils;
 using Microsoft.Xna.Framework;
+using Newtonsoft.Json;
 
 namespace Estreya.BlishHUD.EventTable.State
 {
@@ -22,7 +22,9 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		public struct VisibleStateInfo
 		{
-			public string Key;
+			public string AreaName;
+
+			public string EventKey;
 
 			public EventStates State;
 
@@ -31,17 +33,17 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		private const string DATE_TIME_FORMAT = "yyyy-MM-ddTHH:mm:ss";
 
-		private static readonly Logger Logger = Logger.GetLogger<EventState>();
+		private new static readonly Logger Logger = Logger.GetLogger<EventState>();
 
-		private const string FILE_NAME = "event_states.txt";
-
-		private const string LINE_SPLIT = "<-->";
+		private const string FILE_NAME = "event_states.json";
 
 		private bool dirty;
 
 		private string _path;
 
-		private string BasePath { get; set; }
+		private readonly Func<DateTime> _getNowAction;
+
+		private string _basePath { get; set; }
 
 		private string Path
 		{
@@ -49,23 +51,24 @@ namespace Estreya.BlishHUD.EventTable.State
 			{
 				if (_path == null)
 				{
-					_path = System.IO.Path.Combine(BasePath, "event_states.txt");
+					_path = System.IO.Path.Combine(_basePath, "event_states.json");
 				}
 				return _path;
 			}
 		}
 
-		private List<VisibleStateInfo> Instances { get; set; } = new List<VisibleStateInfo>();
+		public List<VisibleStateInfo> Instances { get; private set; } = new List<VisibleStateInfo>();
 
 
 		public event EventHandler<ValueEventArgs<VisibleStateInfo>> StateAdded;
 
 		public event EventHandler<ValueEventArgs<string>> StateRemoved;
 
-		public EventState(string basePath)
-			: base(awaitLoad: true, 30000)
+		public EventState(StateConfiguration configuration, string basePath, Func<DateTime> getNowAction)
+			: base(configuration)
 		{
-			BasePath = basePath;
+			_basePath = basePath;
+			_getNowAction = getNowAction;
 		}
 
 		protected override async Task InternalReload()
@@ -76,7 +79,7 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		protected override void InternalUpdate(GameTime gameTime)
 		{
-			DateTime now = EventTableModule.ModuleInstance.DateTimeNow.ToUniversalTime();
+			DateTime now = _getNowAction().ToUniversalTime();
 			lock (Instances)
 			{
 				for (int i = Instances.Count - 1; i >= 0; i--)
@@ -84,21 +87,23 @@ namespace Estreya.BlishHUD.EventTable.State
 					VisibleStateInfo instance = Instances.ElementAt(i);
 					if (now >= instance.Until)
 					{
-						Remove(instance.Key);
+						Remove(instance.AreaName, instance.EventKey);
 					}
 				}
 			}
 		}
 
-		public void Add(string name, DateTime until, EventStates state)
+		public void Add(string areaName, string eventKey, DateTime until, EventStates state)
 		{
 			lock (Instances)
 			{
-				Remove(name);
+				Remove(areaName, eventKey);
 				until = until.ToUniversalTime();
+				string name = GetName(areaName, eventKey);
 				Logger.Info(string.Format("Add event state for \"{0}\" with \"{1}\" until \"{2}\" UTC.", name, state, until.ToString("yyyy-MM-ddTHH:mm:ss")));
 				VisibleStateInfo visibleStateInfo = default(VisibleStateInfo);
-				visibleStateInfo.Key = name;
+				visibleStateInfo.AreaName = areaName;
+				visibleStateInfo.EventKey = eventKey;
 				visibleStateInfo.State = state;
 				visibleStateInfo.Until = until;
 				VisibleStateInfo newInstance = visibleStateInfo;
@@ -115,13 +120,14 @@ namespace Estreya.BlishHUD.EventTable.State
 			}
 		}
 
-		public void Remove(string name)
+		public void Remove(string areaName, string eventKey)
 		{
 			lock (Instances)
 			{
-				List<VisibleStateInfo> instancesToRemove = Instances.Where((VisibleStateInfo instance) => instance.Key == name).ToList();
+				List<VisibleStateInfo> instancesToRemove = Instances.Where((VisibleStateInfo instance) => instance.AreaName == areaName && instance.EventKey == eventKey).ToList();
 				if (instancesToRemove.Count != 0)
 				{
+					string name = GetName(areaName, eventKey);
 					Logger.Info("Remove event states for \"" + name + "\".");
 					for (int i = instancesToRemove.Count - 1; i >= 0; i--)
 					{
@@ -140,25 +146,30 @@ namespace Estreya.BlishHUD.EventTable.State
 			}
 		}
 
-		public override Task Clear()
+		private string GetName(string areaName, string eventKey)
+		{
+			return areaName + "-" + eventKey;
+		}
+
+		protected override Task Clear()
 		{
 			lock (Instances)
 			{
 				Logger.Info("Remove all event states.");
 				for (int i = Instances.Count - 1; i >= 0; i--)
 				{
-					Remove(Instances[i].Key);
+					Remove(Instances[i].AreaName, Instances[i].EventKey);
 				}
 				dirty = true;
 			}
 			return Task.CompletedTask;
 		}
 
-		public bool Contains(string name, EventStates state)
+		public bool Contains(string areaName, string eventKey, EventStates state)
 		{
 			lock (Instances)
 			{
-				return Instances.Any((VisibleStateInfo instance) => instance.Key == name && instance.State == state);
+				return Instances.Any((VisibleStateInfo instance) => instance.AreaName == areaName && instance.EventKey == eventKey && instance.State == state);
 			}
 		}
 
@@ -177,43 +188,14 @@ namespace Estreya.BlishHUD.EventTable.State
 			}
 			try
 			{
-				string[] lines = await FileUtil.ReadLinesAsync(Path);
-				if (lines == null || lines.Length == 0)
+				string json = await FileUtil.ReadStringAsync(Path);
+				if (string.IsNullOrWhiteSpace(json))
 				{
 					return;
 				}
-				lock (Instances)
+				foreach (VisibleStateInfo instance in JsonConvert.DeserializeObject<List<VisibleStateInfo>>(json)!)
 				{
-					string[] array = lines;
-					for (int i = 0; i < array.Length; i++)
-					{
-						string[] parts = array[i].Split(new string[1] { "<-->" }, StringSplitOptions.None);
-						if (parts.Length == 0)
-						{
-							Logger.Warn("Line is empty.");
-							continue;
-						}
-						string name = parts[0];
-						try
-						{
-							EventStates state = (EventStates)Enum.Parse(typeof(EventStates), parts[1]);
-							DateTime until = DateTime.ParseExact(parts[2], "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture);
-							until = DateTime.SpecifyKind(until, DateTimeKind.Utc);
-							VisibleStateInfo visibleStateInfo = default(VisibleStateInfo);
-							visibleStateInfo.Key = name;
-							visibleStateInfo.Until = until;
-							visibleStateInfo.State = state;
-							Add(name, until, state);
-						}
-						catch (Exception ex2)
-						{
-							Logger.Error(ex2, "Loading line \"{0}\" failed. Parts: {1}", new object[2]
-							{
-								name,
-								string.Join(", ", parts)
-							});
-						}
-					}
+					Add(instance.AreaName, instance.EventKey, instance.Until, instance.State);
 				}
 			}
 			catch (Exception ex)
@@ -224,20 +206,19 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		protected override async Task Save()
 		{
-			if (!dirty)
+			if (dirty)
 			{
-				return;
-			}
-			Collection<string> lines = new Collection<string>();
-			lock (Instances)
-			{
-				foreach (VisibleStateInfo instance in Instances)
+				string json = null;
+				lock (Instances)
 				{
-					lines.Add(string.Format("{0}{1}{2}{3}{4}", instance.Key, "<-->", instance.State, "<-->", instance.Until.ToString("yyyy-MM-ddTHH:mm:ss")));
+					json = JsonConvert.SerializeObject(Instances, Formatting.Indented);
 				}
+				if (!string.IsNullOrWhiteSpace(json))
+				{
+					await FileUtil.WriteStringAsync(Path, json);
+				}
+				dirty = false;
 			}
-			await FileUtil.WriteLinesAsync(Path, lines.ToArray());
-			dirty = false;
 		}
 
 		protected override void InternalUnload()

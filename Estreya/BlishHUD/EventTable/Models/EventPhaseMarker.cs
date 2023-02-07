@@ -2,7 +2,6 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using Blish_HUD;
-using Estreya.BlishHUD.EventTable.UI.Views.Controls;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 
@@ -19,7 +18,6 @@ namespace Estreya.BlishHUD.EventTable.Models
 		private Color? _color;
 
 		[JsonProperty("time")]
-		[TypeOverride(typeof(string))]
 		[Description("Specifies the time in minutes after the event started.")]
 		public float Time { get; set; }
 

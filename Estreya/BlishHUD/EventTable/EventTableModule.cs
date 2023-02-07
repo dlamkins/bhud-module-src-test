@@ -2,10 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
-using System.Globalization;
 using System.Linq;
-using System.Net;
-using System.Runtime.CompilerServices;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
@@ -14,651 +12,360 @@ using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Blish_HUD.Modules;
-using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Estreya.BlishHUD.EventTable.Controls;
-using Estreya.BlishHUD.EventTable.Helpers;
 using Estreya.BlishHUD.EventTable.Models;
-using Estreya.BlishHUD.EventTable.Models.Settings;
-using Estreya.BlishHUD.EventTable.Resources;
 using Estreya.BlishHUD.EventTable.State;
 using Estreya.BlishHUD.EventTable.UI.Views;
-using Estreya.BlishHUD.EventTable.UI.Views.Settings;
-using Estreya.BlishHUD.EventTable.Utils;
-using Gw2Sharp.Models;
+using Estreya.BlishHUD.Shared.Helpers;
+using Estreya.BlishHUD.Shared.Modules;
+using Estreya.BlishHUD.Shared.Settings;
+using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Threading;
+using Estreya.BlishHUD.Shared.Utils;
+using Flurl.Http;
+using Humanizer;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended.BitmapFonts;
-using SemVer;
 
 namespace Estreya.BlishHUD.EventTable
 {
 	[Export(typeof(Module))]
-	public class EventTableModule : Module
+	public class EventTableModule : BaseModule<EventTableModule, ModuleSettings>
 	{
-		private static readonly Logger Logger = Logger.GetLogger<EventTableModule>();
+		private Dictionary<string, EventArea> _areas = new Dictionary<string, EventArea>();
 
-		public const string WEBSITE_ROOT_URL = "https://blishhud.estreya.de";
-
-		public const string WEBSITE_FILE_ROOT_URL = "https://files.blishhud.estreya.de";
-
-		public const string WEBSITE_MODULE_URL = "https://blishhud.estreya.de/modules/event-table";
-
-		internal static EventTableModule ModuleInstance;
-
-		private WebClient _webclient;
-
-		private BitmapFont _font;
-
-		private TimeSpan _eventTimeSpan = TimeSpan.Zero;
-
-		private SemaphoreSlim _eventCategorySemaphore = new SemaphoreSlim(1, 1);
+		private AsyncLock _eventCategoryLock = new AsyncLock();
 
 		private List<EventCategory> _eventCategories = new List<EventCategory>();
 
-		private readonly AsyncLock _stateLock = new AsyncLock();
+		private static TimeSpan _updateEventsInterval = TimeSpan.FromMinutes(30.0);
 
-		public bool IsPrerelease
-		{
-			get
-			{
-				Version version = ((Module)this).get_Version();
-				return !string.IsNullOrWhiteSpace((version != null) ? version.get_PreRelease() : null);
-			}
-		}
+		private AsyncRef<double> _lastEventUpdate = new AsyncRef<double>(0.0);
 
-		private EventTableDrawer Drawer { get; set; }
+		public override string WebsiteModuleName => "event-table";
 
-		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
-
-		internal ContentsManager ContentsManager => base.ModuleParameters.get_ContentsManager();
-
-		internal DirectoriesManager DirectoriesManager => base.ModuleParameters.get_DirectoriesManager();
-
-		internal Gw2ApiManager Gw2ApiManager => base.ModuleParameters.get_Gw2ApiManager();
-
-		internal ModuleSettings ModuleSettings { get; private set; }
-
-		private CornerIcon CornerIcon { get; set; }
-
-		internal TabbedWindow2 SettingsWindow { get; private set; }
-
-		internal bool Debug => ModuleSettings.DebugEnabled.get_Value();
-
-		internal BitmapFont Font
-		{
-			get
-			{
-				//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-				if (_font == null)
-				{
-					_font = GameService.Content.GetFont((FontFace)0, ModuleSettings.EventFontSize.get_Value(), (FontStyle)0);
-				}
-				return _font;
-			}
-		}
-
-		internal int EventHeight => ModuleSettings?.EventHeight?.get_Value() ?? 30;
-
-		internal DateTime DateTimeNow => DateTime.Now;
-
-		internal TimeSpan EventTimeSpan
-		{
-			get
-			{
-				if (_eventTimeSpan == TimeSpan.Zero)
-				{
-					int timespan = ModuleSettings.EventTimeSpan.get_Value();
-					if (timespan > 1440)
-					{
-						timespan = 1440;
-						Logger.Warn("Event Timespan over 1440. Cap at 1440 for performance reasons.");
-					}
-					_eventTimeSpan = TimeSpan.FromMinutes(timespan);
-				}
-				return _eventTimeSpan;
-			}
-		}
-
-		internal float EventTimeSpanRatio => 0.5f + ((float)ModuleSettings.EventHistorySplit.get_Value() / 100f - 0.5f);
-
-		internal DateTime EventTimeMin
-		{
-			get
-			{
-				TimeSpan timespan = TimeSpan.FromMilliseconds(EventTimeSpan.TotalMilliseconds * (double)EventTimeSpanRatio);
-				return ModuleInstance.DateTimeNow.Subtract(timespan);
-			}
-		}
-
-		internal DateTime EventTimeMax
-		{
-			get
-			{
-				TimeSpan timespan = TimeSpan.FromMilliseconds(EventTimeSpan.TotalMilliseconds * (double)(1f - EventTimeSpanRatio));
-				return ModuleInstance.DateTimeNow.Add(timespan);
-			}
-		}
-
-		public List<EventCategory> EventCategories => _eventCategories.Where((EventCategory ec) => !ec.IsDisabled).ToList();
-
-		internal Collection<ManagedState> States { get; set; } = new Collection<ManagedState>();
-
+		private DateTime NowUTC => DateTime.UtcNow;
 
 		public EventState EventState { get; private set; }
 
-		public AccountState AccountState { get; private set; }
+		public DynamicEventState DynamicEventState { get; private set; }
 
-		public WorldbossState WorldbossState { get; private set; }
+		internal MapUtil MapUtil { get; private set; }
 
-		public MapchestState MapchestState { get; private set; }
-
-		public EventFileState EventFileState { get; private set; }
-
-		public IconState IconState { get; private set; }
-
-		public PointOfInterestState PointOfInterestState { get; private set; }
-
-		internal MapNavigationUtil MapNavigationUtil { get; private set; }
+		protected override string API_VERSION_NO => "1";
 
 		[ImportingConstructor]
 		public EventTableModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
-			: this(moduleParameters)
+			: base(moduleParameters)
 		{
-			ModuleInstance = this;
-		}
-
-		protected override void DefineSettings(SettingCollection settings)
-		{
-			ModuleSettings = new ModuleSettings(settings);
-		}
-
-		protected override void Initialize()
-		{
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			EventTableDrawer eventTableDrawer = new EventTableDrawer();
-			((Control)eventTableDrawer).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)eventTableDrawer).set_BackgroundColor(Color.get_Transparent());
-			((Control)eventTableDrawer).set_Opacity(0f);
-			eventTableDrawer.Visible = false;
-			Drawer = eventTableDrawer;
-			GameService.Overlay.add_UserLocaleChanged((EventHandler<ValueEventArgs<CultureInfo>>)delegate
-			{
-				AsyncHelper.RunSync(LoadEvents);
-			});
 		}
 
 		protected override async Task LoadAsync()
 		{
-			Logger.Debug("Load module settings.");
-			await ModuleSettings.LoadAsync();
-			Logger.Debug("Initialize states (before event file loading)");
-			await InitializeStates(beforeFileLoaded: true);
-			Logger.Debug("Load events.");
+			await base.LoadAsync();
+			MapUtil = new MapUtil(base.ModuleSettings.MapKeybinding.get_Value(), base.Gw2ApiManager);
+			base.Logger.Debug("Load events.");
 			await LoadEvents();
-			Logger.Debug("Initialize states (after event file loading)");
-			await InitializeStates();
-			await Drawer.LoadAsync();
-			ModuleSettings.ModuleSettingsChanged += delegate(object sender, ModuleSettings.ModuleSettingsChangedEventArgs eventArgs)
+			AddAllAreas();
+			await SetAreaEvents();
+		}
+
+		private void Keyboard_KeyPressed(object sender, KeyboardEventArgs e)
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000b: Invalid comparison between Unknown and I4
+			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Invalid comparison between Unknown and I4
+			if ((int)e.get_EventType() == 256 && !GameService.Input.get_Keyboard().TextFieldIsActive() && (int)e.get_Key() == 85)
 			{
-				switch (eventArgs.Name)
-				{
-				case "Width":
-					Drawer.UpdateSize(ModuleSettings.Width.get_Value(), -1);
-					break;
-				case "GlobalEnabled":
-					ToggleContainer(ModuleSettings.GlobalEnabled.get_Value());
-					break;
-				case "EventTimeSpan":
-					_eventTimeSpan = TimeSpan.Zero;
-					break;
-				case "EventFontSize":
-					_font = null;
-					break;
-				case "RegisterCornerIcon":
-					HandleCornerIcon(ModuleSettings.RegisterCornerIcon.get_Value());
-					break;
-				case "BackgroundColor":
-				case "BackgroundColorOpacity":
-					Drawer.UpdateBackgroundColor();
-					break;
-				}
-			};
-			MapNavigationUtil = new MapNavigationUtil(ModuleSettings.MapKeybinding.get_Value());
+				new EventNotification(_eventCategories.First().Events.First(), "Starts in 10 minutes! ajkshdkjahsdkjhaskjdhkajlshdkha", base.IconState).Show(TimeSpan.FromSeconds(5.0), 200, 200);
+			}
+		}
+
+		private async Task SetAreaEvents()
+		{
+			foreach (EventArea area in _areas.Values)
+			{
+				await SetAreaEvents(area);
+			}
+		}
+
+		private async Task SetAreaEvents(EventArea area)
+		{
+			await area.UpdateAllEvents(_eventCategories);
 		}
 
 		public async Task LoadEvents()
 		{
-			string threadName = $"{Thread.CurrentThread.ManagedThreadId}";
-			Logger.Debug("Try loading events from thread: {0}", new object[1] { threadName });
-			await _eventCategorySemaphore.WaitAsync();
-			Logger.Debug("Thread \"{0}\" started loading", new object[1] { threadName });
-			try
+			using (await _eventCategoryLock.LockAsync())
 			{
-				if (_eventCategories != null)
+				int num;
+				_ = num - 1;
+				_ = 2;
+				try
 				{
-					lock (_eventCategories)
-					{
-						foreach (EventCategory eventCategory in _eventCategories)
-						{
-							eventCategory.Unload();
-						}
-						_eventCategories.Clear();
-					}
-				}
-				EventSettingsFile eventSettingsFile = await EventFileState.GetExternalFile();
-				if (eventSettingsFile == null)
-				{
-					Logger.Error("Failed to load event file.");
-					return;
-				}
-				Logger.Info($"Loaded event file version: {eventSettingsFile.Version}");
-				List<EventCategory> categories = eventSettingsFile.EventCategories ?? new List<EventCategory>();
-				int eventCategoryCount = categories.Count;
-				int eventCount = categories.Sum((EventCategory ec) => ec.Events.Count);
-				Logger.Info($"Loaded {eventCategoryCount} Categories with {eventCount} Events.");
-				await Task.WhenAll(categories.Select((EventCategory ec) => ec.LoadAsync()));
-				categories.ForEach(delegate(EventCategory ec)
-				{
-					ec.Events.ForEach(delegate(Event ev)
-					{
-						if (!ev.Filler)
-						{
-							ev.Edited += EventEdited;
-						}
-					});
-				});
-				lock (_eventCategories)
-				{
-					Logger.Debug("Overwrite current categories with newly loaded.");
+					_eventCategories?.Clear();
+					List<EventCategory> categories = await GetFlurlClient().Request(base.API_URL, "events").GetJsonAsync<List<EventCategory>>(default(CancellationToken), (HttpCompletionOption)0);
+					int eventCategoryCount = categories.Count;
+					int eventCount = categories.Sum((EventCategory ec) => ec.Events.Count);
+					base.Logger.Info($"Loaded {eventCategoryCount} Categories with {eventCount} Events.");
+					await Task.WhenAll(categories.Select((EventCategory ec) => ec.LoadAsync(base.TranslationState)));
 					_eventCategories = categories;
-					ModuleSettings.InitializeEventSettings(_eventCategories);
-				}
-			}
-			catch (Exception ex)
-			{
-				Logger.Error(ex, "Failed loading events.");
-				throw ex;
-			}
-			finally
-			{
-				_eventCategorySemaphore.Release();
-				Logger.Debug("Thread \"{0}\" released loading lock", new object[1] { threadName });
-			}
-		}
-
-		private void EventEdited(object sender, EventArgs e)
-		{
-			Event ev = sender as Event;
-			Logger.Debug("Event \"" + ev.Key + "\" edited.");
-			lock (_eventCategories)
-			{
-				EventSettingsFile eventSettingsFile = AsyncHelper.RunSync(EventFileState.GetExternalFile);
-				eventSettingsFile.EventCategories = _eventCategories;
-				Logger.Debug("Export updated file.");
-				AsyncHelper.RunSync(() => EventFileState.ExportFile(eventSettingsFile));
-			}
-		}
-
-		private async Task InitializeStates(bool beforeFileLoaded = false)
-		{
-			string eventsDirectory = DirectoriesManager.GetFullDirectoryPath("events");
-			using (await _stateLock.LockAsync())
-			{
-				if (!beforeFileLoaded)
-				{
-					AccountState = new AccountState(Gw2ApiManager);
-					PointOfInterestState = new PointOfInterestState(Gw2ApiManager, eventsDirectory);
-					WorldbossState = new WorldbossState(Gw2ApiManager, AccountState);
-					WorldbossState.WorldbossCompleted += State_EventCompleted;
-					WorldbossState.WorldbossRemoved += State_EventRemoved;
-					MapchestState = new MapchestState(Gw2ApiManager, AccountState);
-					MapchestState.MapchestCompleted += State_EventCompleted;
-					MapchestState.MapchestRemoved += State_EventRemoved;
-				}
-				else
-				{
-					EventFileState = new EventFileState(ContentsManager, eventsDirectory, "events.json");
-					EventState = new EventState(eventsDirectory);
-					IconState = new IconState(ContentsManager, eventsDirectory);
-				}
-				if (!beforeFileLoaded)
-				{
-					States.Add(AccountState);
-					States.Add(PointOfInterestState);
-					States.Add(WorldbossState);
-					States.Add(MapchestState);
-				}
-				else
-				{
-					States.Add(EventFileState);
-					States.Add(EventState);
-					States.Add(IconState);
-				}
-				foreach (ManagedState state2 in States.Where((ManagedState state) => !state.Running))
-				{
-					try
+					_eventCategories.SelectMany((EventCategory ec) => ec.Events).ToList().ForEach(delegate(Estreya.BlishHUD.EventTable.Models.Event ev)
 					{
-						if (state2.AwaitLoad)
-						{
-							await state2.Start();
-							continue;
-						}
-						state2.Start().ContinueWith(delegate(Task task)
-						{
-							if (task.IsFaulted)
-							{
-								Logger.Error((Exception)task.Exception, "Not awaited state start failed for \"{0}\"", new object[1] { state2.GetType().Name });
-							}
-						});
-					}
-					catch (Exception ex)
-					{
-						Logger.Error(ex, "Failed starting state \"{0}\"", new object[1] { state2.GetType().Name });
-					}
+						AddEventHooks(ev);
+					});
+					await SetAreaEvents();
+				}
+				catch (Exception ex)
+				{
+					base.Logger.Warn(ex, "Failed loading events.");
 				}
 			}
-		}
-
-		private void State_EventRemoved(object sender, string apiCode)
-		{
-			lock (_eventCategories)
-			{
-				(from ev in _eventCategories.SelectMany((EventCategory ec) => ec.Events)
-					where ev.APICode == apiCode
-					select ev).ToList().ForEach(delegate(Event ev)
-				{
-					EventState.Remove(ev.SettingKey);
-				});
-			}
-		}
-
-		private void State_EventCompleted(object sender, string apiCode)
-		{
-			lock (_eventCategories)
-			{
-				(from ev in _eventCategories.SelectMany((EventCategory ec) => ec.Events)
-					where ev.APICode == apiCode
-					select ev).ToList().ForEach(delegate(Event ev)
-				{
-					switch (ModuleSettings.EventCompletedAcion.get_Value())
-					{
-					case EventCompletedAction.Crossout:
-						ev.Finish();
-						break;
-					case EventCompletedAction.Hide:
-						ev.Hide();
-						break;
-					default:
-						Logger.Warn("Unsupported event completion action: {0}", new object[1] { ModuleSettings.EventCompletedAcion.get_Value() });
-						break;
-					}
-				});
-			}
-		}
-
-		private void HandleCornerIcon(bool show)
-		{
-			//IL_0004: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Expected O, but got Unknown
-			if (show)
-			{
-				CornerIcon val = new CornerIcon();
-				val.set_IconName("Event Table");
-				val.set_Icon(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("images\\event_boss_grey.png")));
-				CornerIcon = val;
-				((Control)CornerIcon).add_Click((EventHandler<MouseEventArgs>)delegate
-				{
-					((WindowBase2)SettingsWindow).ToggleWindow();
-				});
-			}
-			else if (CornerIcon != null)
-			{
-				((Control)CornerIcon).Dispose();
-				CornerIcon = null;
-			}
-		}
-
-		private void ToggleContainer(bool show)
-		{
-			if (Drawer == null)
-			{
-				return;
-			}
-			if (!ModuleSettings.GlobalEnabled.get_Value())
-			{
-				if (Drawer.Visible)
-				{
-					Drawer.Hide();
-				}
-			}
-			else if (show)
-			{
-				if (!Drawer.Visible)
-				{
-					Drawer.Show();
-				}
-			}
-			else if (Drawer.Visible)
-			{
-				Drawer.Hide();
-			}
-		}
-
-		public override IView GetSettingsView()
-		{
-			return (IView)(object)new ModuleSettingsView();
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0111: Expected O, but got Unknown
-			//IL_0160: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016a: Expected O, but got Unknown
-			//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c3: Expected O, but got Unknown
-			//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0209: Expected O, but got Unknown
-			//IL_0245: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024f: Expected O, but got Unknown
-			//IL_028b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0295: Expected O, but got Unknown
-			((Module)this).OnModuleLoaded(e);
-			Drawer.UpdatePosition(ModuleSettings.LocationX.get_Value(), ModuleSettings.LocationY.get_Value());
-			Drawer.UpdateSize(ModuleSettings.Width.get_Value(), -1);
-			Logger.Debug("Start building settings window.");
-			Texture2D windowBackground = IconState.GetIcon("images\\502049.png", checkRenderAPI: false);
-			Rectangle settingsWindowSize = default(Rectangle);
-			((Rectangle)(ref settingsWindowSize))._002Ector(35, 26, 1100, 714);
-			int contentRegionPaddingY = settingsWindowSize.Y - 15;
-			int contentRegionPaddingX = settingsWindowSize.X + 46;
-			Rectangle contentRegion = default(Rectangle);
-			((Rectangle)(ref contentRegion))._002Ector(contentRegionPaddingX, contentRegionPaddingY, settingsWindowSize.Width - 52, settingsWindowSize.Height - contentRegionPaddingY);
-			TabbedWindow2 val = new TabbedWindow2(windowBackground, settingsWindowSize, contentRegion);
-			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((WindowBase2)val).set_Title(Strings.SettingsWindow_Title);
-			((WindowBase2)val).set_Emblem(IconState.GetIcon("images\\event_boss.png"));
-			((WindowBase2)val).set_Subtitle(Strings.SettingsWindow_Subtitle);
-			((WindowBase2)val).set_SavesPosition(true);
-			((WindowBase2)val).set_Id("EventTableModule_6bd04be4-dc19-4914-a2c3-8160ce76818b");
-			SettingsWindow = val;
-			SettingsWindow.get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(IconState.GetIcon("images\\event_boss_grey.png")), (Func<IView>)(() => (IView)(object)new ManageEventsView()), Strings.SettingsWindow_ManageEvents_Title, (int?)null));
-			SettingsWindow.get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(IconState.GetIcon("images\\bars.png")), (Func<IView>)(() => (IView)(object)new ReorderEventsView()), Strings.SettingsWindow_ReorderSettings_Title, (int?)null));
-			SettingsWindow.get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(IconState.GetIcon("156736")), (Func<IView>)(() => (IView)(object)new GeneralSettingsView(ModuleSettings)), Strings.SettingsWindow_GeneralSettings_Title, (int?)null));
-			SettingsWindow.get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(IconState.GetIcon("images\\graphics_settings.png")), (Func<IView>)(() => (IView)(object)new GraphicsSettingsView(ModuleSettings)), Strings.SettingsWindow_GraphicSettings_Title, (int?)null));
-			SettingsWindow.get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(IconState.GetIcon("155052")), (Func<IView>)(() => (IView)(object)new EventSettingsView(ModuleSettings)), Strings.SettingsWindow_EventSettings_Title, (int?)null));
-			Logger.Debug("Finished building settings window.");
-			HandleCornerIcon(ModuleSettings.RegisterCornerIcon.get_Value());
-			if (ModuleSettings.GlobalEnabled.get_Value())
+			base.OnModuleLoaded(e);
+			if (base.ModuleSettings.GlobalDrawerVisible.get_Value())
 			{
-				ToggleContainer(show: true);
+				ToggleContainers(show: true);
 			}
+		}
+
+		private void ToggleContainers(bool show)
+		{
+			if (!base.ModuleSettings.GlobalDrawerVisible.get_Value())
+			{
+				show = false;
+			}
+			_areas.Values.ToList().ForEach(delegate(EventArea area)
+			{
+				if (show && area.Enabled)
+				{
+					if (!((Control)area).get_Visible())
+					{
+						((Control)area).Show();
+					}
+				}
+				else if (((Control)area).get_Visible())
+				{
+					((Control)area).Hide();
+				}
+			});
 		}
 
 		protected override void Update(GameTime gameTime)
 		{
-			CheckMumble();
-			Drawer.UpdatePosition(ModuleSettings.LocationX.get_Value(), ModuleSettings.LocationY.get_Value());
-			CheckContainerSizeAndPosition();
-			using (_stateLock.Lock())
+			base.Update(gameTime);
+			ToggleContainers(base.ShowUI);
+			base.ModuleSettings.CheckGlobalSizeAndPosition();
+			foreach (EventArea area in _areas.Values)
 			{
-				foreach (ManagedState state in States)
+				base.ModuleSettings.CheckDrawerSizeAndPosition(area.Configuration);
+			}
+			if (_eventCategoryLock.IsFree())
+			{
+				using (_eventCategoryLock.Lock())
 				{
-					state.Update(gameTime);
+					DateTime now = NowUTC;
+					_eventCategories.SelectMany((EventCategory ec) => ec.Events).ToList().ForEach(delegate(Estreya.BlishHUD.EventTable.Models.Event ev)
+					{
+						ev.Update(now);
+					});
 				}
 			}
-			lock (_eventCategories)
+			UpdateUtil.UpdateAsync(LoadEvents, gameTime, _updateEventsInterval.TotalMilliseconds, _lastEventUpdate);
+		}
+
+		private void AddEventHooks(Estreya.BlishHUD.EventTable.Models.Event ev)
+		{
+			ev.Reminder += Ev_Reminder;
+		}
+
+		private void RemoveEventHooks(Estreya.BlishHUD.EventTable.Models.Event ev)
+		{
+			ev.Reminder -= Ev_Reminder;
+		}
+
+		private void Ev_Reminder(object sender, TimeSpan e)
+		{
+			Estreya.BlishHUD.EventTable.Models.Event ev = sender as Estreya.BlishHUD.EventTable.Models.Event;
+			if (base.ModuleSettings.RemindersEnabled.get_Value() && !base.ModuleSettings.ReminderDisabledForEvents.get_Value().Contains(ev.SettingKey))
 			{
-				_eventCategories.ForEach(delegate(EventCategory ec)
+				string startsInTranslation = base.TranslationState.GetTranslation("eventArea-reminder-startsIn", "Starts in");
+				new EventNotification(ev, startsInTranslation + " " + e.Humanize() + "!", base.IconState).Show(TimeSpan.FromSeconds(base.ModuleSettings.ReminderDuration.get_Value()), base.ModuleSettings.ReminderPosition.X.get_Value(), base.ModuleSettings.ReminderPosition.Y.get_Value());
+			}
+		}
+
+		private void AddAllAreas()
+		{
+			if (base.ModuleSettings.EventAreaNames.get_Value().Count == 0)
+			{
+				base.ModuleSettings.EventAreaNames.get_Value().Add("Main");
+			}
+			foreach (string areaName in base.ModuleSettings.EventAreaNames.get_Value())
+			{
+				AddArea(areaName);
+			}
+		}
+
+		private EventAreaConfiguration AddArea(string name)
+		{
+			EventAreaConfiguration config = base.ModuleSettings.AddDrawer(name, _eventCategories);
+			AddArea(config);
+			return config;
+		}
+
+		private void AddArea(EventAreaConfiguration configuration)
+		{
+			if (!base.ModuleSettings.EventAreaNames.get_Value().Contains(configuration.Name))
+			{
+				base.ModuleSettings.EventAreaNames.set_Value(new List<string>(base.ModuleSettings.EventAreaNames.get_Value()) { configuration.Name });
+			}
+			base.ModuleSettings.UpdateDrawerLocalization(configuration, base.TranslationState);
+			EventArea eventArea = new EventArea(configuration, base.IconState, base.TranslationState, EventState, base.WorldbossState, base.MapchestState, base.PointOfInterestState, MapUtil, GetFlurlClient(), base.API_URL, () => NowUTC, () => ((Module)this).get_Version());
+			((Control)eventArea).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			EventArea area = eventArea;
+			_areas.Add(configuration.Name, area);
+		}
+
+		private void RemoveArea(EventAreaConfiguration configuration)
+		{
+			base.ModuleSettings.EventAreaNames.set_Value(new List<string>(from areaName in base.ModuleSettings.EventAreaNames.get_Value()
+				where areaName != configuration.Name
+				select areaName));
+			EventArea eventArea = _areas[configuration.Name];
+			if (eventArea != null)
+			{
+				((Control)eventArea).Dispose();
+			}
+			_areas.Remove(configuration.Name);
+			base.ModuleSettings.RemoveDrawer(configuration.Name);
+		}
+
+		protected override BaseModuleSettings DefineModuleSettings(SettingCollection settings)
+		{
+			return new ModuleSettings(settings);
+		}
+
+		protected override void OnSettingWindowBuild(TabbedWindow2 settingWindow)
+		{
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Expected O, but got Unknown
+			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010f: Expected O, but got Unknown
+			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014e: Expected O, but got Unknown
+			//IL_0183: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018d: Expected O, but got Unknown
+			base.SettingsWindow.get_Tabs().Add(new Tab(base.IconState.GetIcon("156736.png"), (Func<IView>)(() => (IView)(object)new GeneralSettingsView(base.ModuleSettings, base.Gw2ApiManager, base.IconState, base.TranslationState, GameService.Content.get_DefaultFont16())
+			{
+				DefaultColor = base.ModuleSettings.DefaultGW2Color
+			}), "General", (int?)null));
+			AreaSettingsView areaSettingsView = new AreaSettingsView(() => _areas.Values.Select((EventArea area) => area.Configuration), () => _eventCategories, base.Gw2ApiManager, base.IconState, base.TranslationState, EventState, GameService.Content.get_DefaultFont16())
+			{
+				DefaultColor = base.ModuleSettings.DefaultGW2Color
+			};
+			areaSettingsView.AddArea += delegate(object s, AreaSettingsView.AddAreaEventArgs e)
+			{
+				e.AreaConfiguration = AddArea(e.Name);
+				if (e.AreaConfiguration != null)
 				{
-					ec.Update(gameTime);
-				});
-			}
+					EventArea newArea = _areas.Values.Where((EventArea x) => x.Configuration.Name == e.Name).First();
+					AsyncHelper.RunSync(async delegate
+					{
+						await SetAreaEvents(newArea);
+					});
+				}
+			};
+			areaSettingsView.RemoveArea += delegate(object s, EventAreaConfiguration e)
+			{
+				RemoveArea(e);
+			};
+			base.SettingsWindow.get_Tabs().Add(new Tab(base.IconState.GetIcon("605018.png"), (Func<IView>)(() => (IView)(object)areaSettingsView), "Event Areas", (int?)null));
+			base.SettingsWindow.get_Tabs().Add(new Tab(base.IconState.GetIcon("841721.png"), (Func<IView>)(() => (IView)(object)new ReminderSettingsView(base.ModuleSettings, () => _eventCategories, base.Gw2ApiManager, base.IconState, base.TranslationState, GameService.Content.get_DefaultFont16())
+			{
+				DefaultColor = base.ModuleSettings.DefaultGW2Color
+			}), "Reminders", (int?)null));
+			base.SettingsWindow.get_Tabs().Add(new Tab(base.IconState.GetIcon("482926.png"), (Func<IView>)(() => (IView)(object)new HelpView(() => _eventCategories, base.API_URL, base.Gw2ApiManager, base.IconState, base.TranslationState, GameService.Content.get_DefaultFont16())
+			{
+				DefaultColor = base.ModuleSettings.DefaultGW2Color
+			}), "Help", (int?)null));
 		}
 
-		private void CheckContainerSizeAndPosition()
+		protected override string GetDirectoryName()
 		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-			bool buildFromBottom = ModuleSettings.BuildDirection.get_Value() == BuildDirection.Bottom;
-			int num = (int)((float)GameService.Graphics.get_Resolution().X / GameService.Graphics.get_UIScaleMultiplier());
-			int maxResY = (int)((float)GameService.Graphics.get_Resolution().Y / GameService.Graphics.get_UIScaleMultiplier());
-			int minLocationX = 0;
-			int maxLocationX = num - ((Control)Drawer).get_Width();
-			int minLocationY = (buildFromBottom ? ((Control)Drawer).get_Height() : 0);
-			int maxLocationY = (buildFromBottom ? maxResY : (maxResY - ((Control)Drawer).get_Height()));
-			int minWidth = 0;
-			int maxWidth = num - ModuleSettings.LocationX.get_Value();
-			SettingComplianceExtensions.SetRange(ModuleSettings.LocationX, minLocationX, maxLocationX);
-			SettingComplianceExtensions.SetRange(ModuleSettings.LocationY, minLocationY, maxLocationY);
-			SettingComplianceExtensions.SetRange(ModuleSettings.Width, minWidth, maxWidth);
+			return "events";
 		}
 
-		private void CheckMumble()
+		protected override void ConfigureStates(StateConfigurations configurations)
 		{
-			if (!GameService.Gw2Mumble.get_IsAvailable() || Drawer == null)
-			{
-				return;
-			}
-			bool show = true;
-			if (ModuleSettings.HideOnOpenMap.get_Value())
-			{
-				show &= !GameService.Gw2Mumble.get_UI().get_IsMapOpen();
-			}
-			if (ModuleSettings.HideOnMissingMumbleTicks.get_Value())
-			{
-				show &= GameService.Gw2Mumble.get_TimeSinceTick().TotalSeconds < 0.5;
-			}
-			if (ModuleSettings.HideInCombat.get_Value())
-			{
-				show &= !GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat();
-			}
-			if (ModuleSettings.HideInWvW.get_Value())
-			{
-				MapType[] array = new MapType[5];
-				RuntimeHelpers.InitializeArray(array, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);
-				MapType[] wvwMapTypes = (MapType[])(object)array;
-				show &= !GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode() || !wvwMapTypes.Any((MapType type) => type == GameService.Gw2Mumble.get_CurrentMap().get_Type());
-			}
-			if (ModuleSettings.HideInPvP.get_Value())
-			{
-				MapType[] pvpMapTypes = (MapType[])(object)new MapType[2]
-				{
-					(MapType)2,
-					(MapType)6
-				};
-				show &= !GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode() || !pvpMapTypes.Any((MapType type) => type == GameService.Gw2Mumble.get_CurrentMap().get_Type());
-			}
-			ToggleContainer(show);
+			configurations.Account.Enabled = true;
+			configurations.Worldbosses.Enabled = true;
+			configurations.Mapchests.Enabled = true;
+			configurations.PointOfInterests.Enabled = true;
 		}
 
-		public WebClient GetWebClient()
+		protected override Collection<ManagedState> GetAdditionalStates(string directoryPath)
 		{
-			if (_webclient == null)
+			Collection<ManagedState> collection = new Collection<ManagedState>();
+			EventState = new EventState(new StateConfiguration
 			{
-				_webclient = new WebClient();
-				_webclient.Headers.Add("user-agent", $"Event Table {((Module)this).get_Version()}");
-			}
-			return _webclient;
+				AwaitLoading = false,
+				Enabled = true,
+				SaveInterval = TimeSpan.FromSeconds(30.0)
+			}, directoryPath, () => NowUTC);
+			DynamicEventState = new DynamicEventState(new StateConfiguration
+			{
+				AwaitLoading = false,
+				Enabled = true,
+				SaveInterval = Timeout.InfiniteTimeSpan
+			}, GetFlurlClient());
+			collection.Add(EventState);
+			collection.Add(DynamicEventState);
+			return collection;
+		}
+
+		protected override AsyncTexture2D GetEmblem()
+		{
+			return base.IconState.GetIcon(base.IsPrerelease ? "textures/emblem_demo.png" : "102392.png");
+		}
+
+		protected override AsyncTexture2D GetCornerIcon()
+		{
+			return base.IconState.GetIcon("textures/event_boss_grey" + (base.IsPrerelease ? "_demo" : "") + ".png");
 		}
 
 		protected override void Unload()
 		{
-			Logger.Debug("Unload module.");
-			Logger.Debug("Unload base.");
-			((Module)this).Unload();
-			Logger.Debug("Unload event categories.");
-			foreach (EventCategory eventCategory in _eventCategories)
+			base.Logger.Debug("Unload module.");
+			base.Logger.Debug("Unload drawer.");
+			foreach (EventArea value in _areas.Values)
 			{
-				eventCategory.Events.ForEach(delegate(Event ev)
+				if (value != null)
 				{
-					if (!ev.Filler)
+					((Control)value).Dispose();
+				}
+			}
+			_areas?.Clear();
+			base.Logger.Debug("Unloaded drawer.");
+			base.Logger.Debug("Unload events.");
+			using (_eventCategoryLock.Lock())
+			{
+				foreach (EventCategory eventCategory in _eventCategories)
+				{
+					eventCategory.Events.ForEach(delegate(Estreya.BlishHUD.EventTable.Models.Event ev)
 					{
-						ev.Edited -= EventEdited;
-					}
-				});
-				eventCategory.Unload();
+						RemoveEventHooks(ev);
+					});
+				}
+				_eventCategories?.Clear();
 			}
-			Logger.Debug("Unloaded event categories.");
-			Logger.Debug("Unload event container.");
-			if (Drawer != null)
-			{
-				((Control)Drawer).Dispose();
-			}
-			Logger.Debug("Unloaded event container.");
-			Logger.Debug("Unload settings window.");
-			if (SettingsWindow != null)
-			{
-				((Control)SettingsWindow).Hide();
-			}
-			Logger.Debug("Unloaded settings window.");
-			Logger.Debug("Unload corner icon.");
-			HandleCornerIcon(show: false);
-			Logger.Debug("Unloaded corner icon.");
-			Logger.Debug("Unloading states...");
-			using (_stateLock.Lock())
-			{
-				WorldbossState.WorldbossCompleted -= State_EventCompleted;
-				MapchestState.MapchestCompleted -= State_EventCompleted;
-				WorldbossState.WorldbossRemoved -= State_EventRemoved;
-				MapchestState.MapchestRemoved -= State_EventRemoved;
-				States.ToList().ForEach(delegate(ManagedState state)
-				{
-					state.Dispose();
-				});
-			}
-			Logger.Debug("Finished unloading states.");
-		}
-
-		internal async Task ReloadStates()
-		{
-			using (await _stateLock.LockAsync())
-			{
-				await Task.WhenAll(States.Select((ManagedState state) => state.Reload()));
-			}
-		}
-
-		internal async Task ClearStates()
-		{
-			using (await _stateLock.LockAsync())
-			{
-				await Task.WhenAll(States.Select((ManagedState state) => state.Clear()));
-			}
+			base.Logger.Debug("Unloaded events.");
+			base.Logger.Debug("Unload base.");
+			base.Unload();
+			base.Logger.Debug("Unloaded base.");
 		}
 	}
 }

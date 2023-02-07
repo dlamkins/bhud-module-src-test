@@ -1,429 +1,222 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
-using Estreya.BlishHUD.EventTable.Extensions;
 using Estreya.BlishHUD.EventTable.Models;
-using Estreya.BlishHUD.EventTable.Resources;
-using Estreya.BlishHUD.EventTable.Utils;
-using Gw2Sharp.WebApi.V2.Clients;
+using Estreya.BlishHUD.Shared.Models.Drawers;
+using Estreya.BlishHUD.Shared.Settings;
+using Estreya.BlishHUD.Shared.State;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework.Input;
-using Newtonsoft.Json;
 
 namespace Estreya.BlishHUD.EventTable
 {
-	public class ModuleSettings
+	public class ModuleSettings : BaseModuleSettings
 	{
-		public class ModuleSettingsChangedEventArgs
-		{
-			public string Name { get; set; }
+		private const string EVENT_SETTINGS = "event-settings";
 
-			public object Value { get; set; }
-		}
-
-		public class EventSettingsChangedEventArgs
-		{
-			public string Name { get; set; }
-
-			public bool Enabled { get; set; }
-		}
-
-		private static readonly Logger Logger = Logger.GetLogger<ModuleSettings>();
-
-		private Color _defaultColor;
-
-		private AsyncLock _eventSettingsLock = new AsyncLock();
-
-		private const string GLOBAL_SETTINGS = "event-table-global-settings";
-
-		private const string LOCATION_SETTINGS = "event-table-location-settings";
-
-		private const string EVENT_SETTINGS = "event-table-event-settings";
-
-		private const string EVENT_LIST_SETTINGS = "event-table-event-list-settings";
-
-		private ReadOnlyCollection<SettingEntry<bool>> _allEvents;
-
-		public Color DefaultGW2Color
-		{
-			get
-			{
-				return _defaultColor;
-			}
-			private set
-			{
-				_defaultColor = value;
-			}
-		}
-
-		private SettingCollection Settings { get; set; }
-
-		public SettingCollection GlobalSettings { get; private set; }
-
-		public SettingEntry<bool> GlobalEnabled { get; private set; }
-
-		public SettingEntry<KeyBinding> GlobalEnabledHotkey { get; private set; }
-
-		public SettingEntry<bool> RegisterCornerIcon { get; private set; }
-
-		public SettingEntry<int> RefreshRateDelay { get; private set; }
-
-		public SettingEntry<bool> AutomaticallyUpdateEventFile { get; private set; }
-
-		public SettingEntry<Color> BackgroundColor { get; private set; }
-
-		public SettingEntry<float> BackgroundColorOpacity { get; private set; }
-
-		public SettingEntry<bool> HideOnMissingMumbleTicks { get; private set; }
-
-		public SettingEntry<bool> HideInCombat { get; private set; }
-
-		public SettingEntry<bool> HideOnOpenMap { get; private set; }
-
-		public SettingEntry<bool> HideInWvW { get; private set; }
-
-		public SettingEntry<bool> HideInPvP { get; private set; }
-
-		public SettingEntry<bool> DebugEnabled { get; private set; }
-
-		public SettingEntry<bool> ShowTooltips { get; private set; }
-
-		public SettingEntry<bool> HandleLeftClick { get; private set; }
-
-		public SettingEntry<LeftClickAction> LeftClickAction { get; private set; }
-
-		public SettingEntry<bool> ShowContextMenuOnClick { get; private set; }
-
-		public SettingEntry<BuildDirection> BuildDirection { get; private set; }
-
-		public SettingEntry<float> Opacity { get; private set; }
-
-		public SettingEntry<bool> DirectlyTeleportToWaypoint { get; private set; }
+		private const string EVENT_AREA_SETTINGS = "event-area-settings";
 
 		public SettingEntry<KeyBinding> MapKeybinding { get; private set; }
 
-		public SettingCollection LocationSettings { get; private set; }
-
-		public SettingEntry<int> LocationX { get; private set; }
-
-		public SettingEntry<int> LocationY { get; private set; }
-
-		public SettingEntry<int> Width { get; private set; }
-
 		public SettingCollection EventSettings { get; private set; }
 
-		public SettingEntry<int> EventTimeSpan { get; private set; }
+		public SettingCollection EventAreaSettings { get; private set; }
 
-		public SettingEntry<int> EventHistorySplit { get; private set; }
+		public SettingEntry<List<string>> EventAreaNames { get; private set; }
 
-		public SettingEntry<int> EventHeight { get; private set; }
+		public SettingEntry<bool> RemindersEnabled { get; set; }
 
-		public SettingEntry<bool> DrawEventBorder { get; private set; }
+		public EventReminderPositition ReminderPosition { get; set; }
 
-		public SettingEntry<FontSize> EventFontSize { get; private set; }
+		public SettingEntry<float> ReminderDuration { get; set; }
 
-		public SettingEntry<bool> UseFiller { get; private set; }
-
-		public SettingEntry<bool> UseFillerEventNames { get; private set; }
-
-		public SettingEntry<Color> TextColor { get; private set; }
-
-		public SettingEntry<Color> FillerTextColor { get; private set; }
-
-		public SettingEntry<EventCompletedAction> EventCompletedAcion { get; private set; }
-
-		public SettingEntry<bool> UseEventTranslation { get; private set; }
-
-		public ReadOnlyCollection<SettingEntry<bool>> AllEvents
-		{
-			get
-			{
-				using (_eventSettingsLock.Lock())
-				{
-					return _allEvents;
-				}
-			}
-		}
-
-		public event EventHandler<ModuleSettingsChangedEventArgs> ModuleSettingsChanged;
-
-		public event EventHandler<EventSettingsChangedEventArgs> EventSettingChanged;
+		public SettingEntry<List<string>> ReminderDisabledForEvents { get; set; }
 
 		public ModuleSettings(SettingCollection settings)
+			: base(settings, new KeyBinding((ModifierKeys)2, (Keys)69))
 		{
-			Settings = settings;
-			BuildDefaultColor();
-			InitializeGlobalSettings(settings);
-			InitializeLocationSettings(settings);
+		}//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000f: Expected O, but got Unknown
+
+
+		protected override void InitializeAdditionalSettings(SettingCollection settings)
+		{
+			EventAreaSettings = settings.AddSubCollection("event-area-settings", false);
+			EventAreaNames = EventAreaSettings.DefineSetting<List<string>>("EventAreaNames", new List<string>(), (Func<string>)(() => "Event Area Names"), (Func<string>)(() => "Defines the event area names."));
 		}
 
-		private void BuildDefaultColor()
+		protected override void DoInitializeGlobalSettings(SettingCollection globalSettingCollection)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a9: Expected O, but got Unknown
-			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0114: Expected O, but got Unknown
-			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0147: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017e: Expected O, but got Unknown
-			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e9: Expected O, but got Unknown
-			//IL_01ee: Expected O, but got Unknown
-			Color val = new Color();
-			val.set_Name("Dye Remover");
-			val.set_Id(1);
-			val.set_BaseRgb((IReadOnlyList<int>)new List<int> { 128, 26, 26 });
-			ColorMaterial val2 = new ColorMaterial();
-			val2.set_Brightness(15);
-			val2.set_Contrast(1.25);
-			val2.set_Hue(38);
-			val2.set_Saturation(9.0 / 32.0);
-			val2.set_Lightness(1.44531);
-			val2.set_Rgb((IReadOnlyList<int>)new List<int> { 124, 108, 83 });
-			val.set_Cloth(val2);
-			ColorMaterial val3 = new ColorMaterial();
-			val3.set_Brightness(-8);
-			val3.set_Contrast(1.0);
-			val3.set_Hue(34);
-			val3.set_Saturation(0.3125);
-			val3.set_Lightness(1.09375);
-			val3.set_Rgb((IReadOnlyList<int>)new List<int> { 65, 49, 29 });
-			val.set_Leather(val3);
-			ColorMaterial val4 = new ColorMaterial();
-			val4.set_Brightness(5);
-			val4.set_Contrast(1.05469);
-			val4.set_Hue(38);
-			val4.set_Saturation(0.101563);
-			val4.set_Lightness(1.36719);
-			val4.set_Rgb((IReadOnlyList<int>)new List<int> { 96, 91, 83 });
-			val.set_Metal(val4);
-			ColorMaterial val5 = new ColorMaterial();
-			val5.set_Brightness(15);
-			val5.set_Contrast(1.25);
-			val5.set_Hue(38);
-			val5.set_Saturation(9.0 / 32.0);
-			val5.set_Lightness(1.44531);
-			val5.set_Rgb((IReadOnlyList<int>)new List<int> { 124, 108, 83 });
-			val.set_Fur(val5);
-			_defaultColor = val;
-		}
-
-		public async Task LoadAsync()
-		{
-			try
-			{
-				DefaultGW2Color = await ((IBulkExpandableClient<Color, int>)(object)EventTableModule.ModuleInstance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Colors()).GetAsync(1, default(CancellationToken));
-			}
-			catch (Exception ex)
-			{
-				Logger.Warn("Could not load default gw2 color: " + ex.Message);
-			}
-		}
-
-		private void InitializeGlobalSettings(SettingCollection settings)
-		{
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d5: Expected O, but got Unknown
-			//IL_0e06: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0e4e: Expected O, but got Unknown
-			GlobalSettings = settings.AddSubCollection("event-table-global-settings", false);
-			GlobalEnabled = GlobalSettings.DefineSetting<bool>("GlobalEnabled", true, (Func<string>)(() => Strings.Setting_GlobalEnabled_Name), (Func<string>)(() => Strings.Setting_GlobalEnabled_Description));
-			GlobalEnabled.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			GlobalEnabledHotkey = GlobalSettings.DefineSetting<KeyBinding>("GlobalEnabledHotkey", new KeyBinding((ModifierKeys)2, (Keys)69), (Func<string>)(() => Strings.Setting_GlobalEnabledHotkey_Name), (Func<string>)(() => Strings.Setting_GlobalEnabledHotkey_Description));
-			GlobalEnabledHotkey.add_SettingChanged((EventHandler<ValueChangedEventArgs<KeyBinding>>)SettingChanged<KeyBinding>);
-			GlobalEnabledHotkey.get_Value().set_Enabled(true);
-			GlobalEnabledHotkey.get_Value().add_Activated((EventHandler<EventArgs>)delegate
-			{
-				GlobalEnabled.set_Value(!GlobalEnabled.get_Value());
-			});
-			GlobalEnabledHotkey.get_Value().set_BlockSequenceFromGw2(true);
-			RegisterCornerIcon = GlobalSettings.DefineSetting<bool>("RegisterCornerIcon", true, (Func<string>)(() => Strings.Setting_RegisterCornerIcon_Name), (Func<string>)(() => Strings.Setting_RegisterCornerIcon_Description));
-			RegisterCornerIcon.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			RefreshRateDelay = GlobalSettings.DefineSetting<int>("RefreshRateDelay", 900, (Func<string>)(() => Strings.Setting_RefreshRateDelay_Title), (Func<string>)(() => string.Format(Strings.Setting_RefreshRateDelay_Description, RefreshRateDelay.GetRange<int>().Value.Min, RefreshRateDelay.GetRange<int>().Value.Max)));
-			RefreshRateDelay.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)SettingChanged<int>);
-			SettingComplianceExtensions.SetRange(RefreshRateDelay, 0, 900);
-			AutomaticallyUpdateEventFile = GlobalSettings.DefineSetting<bool>("AutomaticallyUpdateEventFile", true, (Func<string>)(() => Strings.Setting_AutomaticallyUpdateEventFile_Name), (Func<string>)(() => Strings.Setting_AutomaticallyUpdateEventFile_Description));
-			AutomaticallyUpdateEventFile.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			HideOnOpenMap = GlobalSettings.DefineSetting<bool>("HideOnOpenMap", true, (Func<string>)(() => Strings.Setting_HideOnMap_Name), (Func<string>)(() => Strings.Setting_HideOnMap_Description));
-			HideOnOpenMap.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			HideOnMissingMumbleTicks = GlobalSettings.DefineSetting<bool>("HideOnMissingMumbleTicks", true, (Func<string>)(() => Strings.Setting_HideOnMissingMumbleTicks_Name), (Func<string>)(() => Strings.Setting_HideOnMissingMumbleTicks_Description));
-			HideOnMissingMumbleTicks.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			HideInCombat = GlobalSettings.DefineSetting<bool>("HideInCombat", false, (Func<string>)(() => Strings.Setting_HideInCombat_Name), (Func<string>)(() => Strings.Setting_HideInCombat_Description));
-			HideInCombat.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			HideInWvW = GlobalSettings.DefineSetting<bool>("HideInWvW", false, (Func<string>)(() => "Hide in WvW"), (Func<string>)(() => "Whether the event table should hide when in world vs. world."));
-			HideInWvW.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			HideInPvP = GlobalSettings.DefineSetting<bool>("HideInPvP", false, (Func<string>)(() => "Hide in PvP"), (Func<string>)(() => "Whether the event table should hide when in player vs. player."));
-			HideInPvP.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			BackgroundColor = GlobalSettings.DefineSetting<Color>("BackgroundColor", DefaultGW2Color, (Func<string>)(() => Strings.Setting_BackgroundColor_Name), (Func<string>)(() => Strings.Setting_BackgroundColor_Description));
-			BackgroundColor.add_SettingChanged((EventHandler<ValueChangedEventArgs<Color>>)SettingChanged<Color>);
-			BackgroundColorOpacity = GlobalSettings.DefineSetting<float>("BackgroundColorOpacity", 0f, (Func<string>)(() => Strings.Setting_BackgroundColorOpacity_Name), (Func<string>)(() => Strings.Setting_BackgroundColorOpacity_Description));
-			SettingComplianceExtensions.SetRange(BackgroundColorOpacity, 0f, 1f);
-			BackgroundColorOpacity.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)SettingChanged<float>);
-			EventTimeSpan = GlobalSettings.DefineSetting<int>("EventTimeSpan", 120, (Func<string>)(() => Strings.Setting_EventTimeSpan_Name), (Func<string>)(() => Strings.Setting_EventTimeSpan_Description));
-			EventTimeSpan.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)SettingChanged<int>);
-			SettingComplianceExtensions.SetValidation<int>(EventTimeSpan, (Func<int, SettingValidationResult>)delegate(int val)
-			{
-				//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-				bool flag = true;
-				string text = null;
-				double num = 1440.0;
-				if ((double)val > num)
-				{
-					flag = false;
-					text = string.Format(Strings.Setting_EventTimeSpan_Validation_OverLimit, num);
-				}
-				return new SettingValidationResult(flag, text);
-			});
-			EventHistorySplit = GlobalSettings.DefineSetting<int>("EventHistorySplit", 50, (Func<string>)(() => Strings.Setting_EventHistorySplit_Name), (Func<string>)(() => Strings.Setting_EventHistorySplit_Description));
-			SettingComplianceExtensions.SetRange(EventHistorySplit, 0, 75);
-			EventHistorySplit.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)SettingChanged<int>);
-			EventHeight = GlobalSettings.DefineSetting<int>("EventHeight", 20, (Func<string>)(() => Strings.Setting_EventHeight_Name), (Func<string>)(() => Strings.Setting_EventHeight_Description));
-			SettingComplianceExtensions.SetRange(EventHeight, 5, 50);
-			EventHeight.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)SettingChanged<int>);
-			EventFontSize = GlobalSettings.DefineSetting<FontSize>("EventFontSize", (FontSize)16, (Func<string>)(() => Strings.Setting_EventFontSize_Name), (Func<string>)(() => Strings.Setting_EventFontSize_Description));
-			EventFontSize.add_SettingChanged((EventHandler<ValueChangedEventArgs<FontSize>>)SettingChanged<FontSize>);
-			DrawEventBorder = GlobalSettings.DefineSetting<bool>("DrawEventBorder", true, (Func<string>)(() => Strings.Setting_DrawEventBorder_Name), (Func<string>)(() => Strings.Setting_DrawEventBorder_Description));
-			DrawEventBorder.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			DebugEnabled = GlobalSettings.DefineSetting<bool>("DebugEnabled", false, (Func<string>)(() => Strings.Setting_DebugEnabled_Name), (Func<string>)(() => Strings.Setting_DebugEnabled_Description));
-			DebugEnabled.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			ShowTooltips = GlobalSettings.DefineSetting<bool>("ShowTooltips", true, (Func<string>)(() => Strings.Setting_ShowTooltips_Name), (Func<string>)(() => Strings.Setting_ShowTooltips_Description));
-			ShowTooltips.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			HandleLeftClick = GlobalSettings.DefineSetting<bool>("HandleLeftClick", true, (Func<string>)(() => Strings.Setting_HandleLeftClick_Name), (Func<string>)(() => Strings.Setting_HandleLeftClick_Description));
-			HandleLeftClick.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			LeftClickAction = GlobalSettings.DefineSetting<LeftClickAction>("LeftClickAction", Estreya.BlishHUD.EventTable.Models.LeftClickAction.CopyWaypoint, (Func<string>)(() => Strings.Setting_LeftClickAction_Title), (Func<string>)(() => Strings.Setting_LeftClickAction_Description));
-			LeftClickAction.add_SettingChanged((EventHandler<ValueChangedEventArgs<LeftClickAction>>)SettingChanged<LeftClickAction>);
-			DirectlyTeleportToWaypoint = GlobalSettings.DefineSetting<bool>("DirectlyTeleportToWaypoint", false, (Func<string>)(() => Strings.Setting_DirectlyTeleportToWaypoint_Title), (Func<string>)(() => Strings.Setting_DirectlyTeleportToWaypoint_Description));
-			DirectlyTeleportToWaypoint.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			ShowContextMenuOnClick = GlobalSettings.DefineSetting<bool>("ShowContextMenuOnClick", true, (Func<string>)(() => Strings.Setting_ShowContextMenuOnClick_Name), (Func<string>)(() => Strings.Setting_ShowContextMenuOnClick_Description));
-			ShowContextMenuOnClick.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			BuildDirection = GlobalSettings.DefineSetting<BuildDirection>("BuildDirection", Estreya.BlishHUD.EventTable.Models.BuildDirection.Top, (Func<string>)(() => Strings.Setting_BuildDirection_Name), (Func<string>)(() => Strings.Setting_BuildDirection_Description));
-			BuildDirection.add_SettingChanged((EventHandler<ValueChangedEventArgs<BuildDirection>>)SettingChanged<BuildDirection>);
-			Opacity = GlobalSettings.DefineSetting<float>("Opacity", 1f, (Func<string>)(() => Strings.Setting_Opacity_Name), (Func<string>)(() => Strings.Setting_Opacity_Description));
-			SettingComplianceExtensions.SetRange(Opacity, 0.1f, 1f);
-			Opacity.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)SettingChanged<float>);
-			UseFiller = GlobalSettings.DefineSetting<bool>("UseFiller", false, (Func<string>)(() => Strings.Setting_UseFiller_Name), (Func<string>)(() => Strings.Setting_UseFiller_Description));
-			UseFiller.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			UseFillerEventNames = GlobalSettings.DefineSetting<bool>("UseFillerEventNames", false, (Func<string>)(() => Strings.Setting_UseFillerEventNames_Name), (Func<string>)(() => Strings.Setting_UseFillerEventNames_Description));
-			UseFillerEventNames.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			TextColor = GlobalSettings.DefineSetting<Color>("TextColor", DefaultGW2Color, (Func<string>)(() => Strings.Setting_TextColor_Name), (Func<string>)(() => Strings.Setting_TextColor_Description));
-			TextColor.add_SettingChanged((EventHandler<ValueChangedEventArgs<Color>>)SettingChanged<Color>);
-			FillerTextColor = GlobalSettings.DefineSetting<Color>("FillerTextColor", DefaultGW2Color, (Func<string>)(() => Strings.Setting_FillerTextColor_Name), (Func<string>)(() => Strings.Setting_FillerTextColor_Description));
-			FillerTextColor.add_SettingChanged((EventHandler<ValueChangedEventArgs<Color>>)SettingChanged<Color>);
-			EventCompletedAcion = GlobalSettings.DefineSetting<EventCompletedAction>("EventCompletedAcion", EventCompletedAction.Crossout, (Func<string>)(() => Strings.Setting_EventCompletedAction_Name), (Func<string>)(() => Strings.Setting_EventCompletedAction_Description));
-			EventCompletedAcion.add_SettingChanged((EventHandler<ValueChangedEventArgs<EventCompletedAction>>)SettingChanged<EventCompletedAction>);
-			UseEventTranslation = GlobalSettings.DefineSetting<bool>("UseEventTranslation", true, (Func<string>)(() => Strings.Setting_UseEventTranslation_Name), (Func<string>)(() => Strings.Setting_UseEventTranslation_Description));
-			UseEventTranslation.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			MapKeybinding = GlobalSettings.DefineSetting<KeyBinding>("MapKeybinding", new KeyBinding((Keys)77), (Func<string>)(() => "Open Map Hotkey"), (Func<string>)(() => "Defines the key used to open the fullscreen map."));
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Expected O, but got Unknown
+			MapKeybinding = base.GlobalSettings.DefineSetting<KeyBinding>("MapKeybinding", new KeyBinding((Keys)77), (Func<string>)(() => "Open Map Hotkey"), (Func<string>)(() => "Defines the key used to open the fullscreen map."));
 			MapKeybinding.add_SettingChanged((EventHandler<ValueChangedEventArgs<KeyBinding>>)SettingChanged<KeyBinding>);
 			MapKeybinding.get_Value().set_Enabled(true);
 			MapKeybinding.get_Value().set_BlockSequenceFromGw2(false);
-		}
-
-		private void InitializeLocationSettings(SettingCollection settings)
-		{
-			LocationSettings = settings.AddSubCollection("event-table-location-settings", false);
-			int height = 1080;
-			int width = 1920;
-			LocationX = LocationSettings.DefineSetting<int>("LocationX", (int)((double)width * 0.1), (Func<string>)(() => Strings.Setting_LocationX_Name), (Func<string>)(() => Strings.Setting_LocationX_Description));
-			SettingComplianceExtensions.SetRange(LocationX, 0, width);
-			LocationX.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)SettingChanged<int>);
-			LocationY = LocationSettings.DefineSetting<int>("LocationY", (int)((double)height * 0.1), (Func<string>)(() => Strings.Setting_LocationY_Name), (Func<string>)(() => Strings.Setting_LocationY_Description));
-			SettingComplianceExtensions.SetRange(LocationY, 0, height);
-			LocationY.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)SettingChanged<int>);
-			Width = LocationSettings.DefineSetting<int>("Width", (int)((double)width * 0.5), (Func<string>)(() => Strings.Setting_Width_Name), (Func<string>)(() => Strings.Setting_Width_Description));
-			SettingComplianceExtensions.SetRange(Width, 0, width);
-			Width.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)SettingChanged<int>);
-		}
-
-		public void InitializeEventSettings(IEnumerable<EventCategory> eventCategories)
-		{
-			using (_eventSettingsLock.Lock())
+			RemindersEnabled = base.GlobalSettings.DefineSetting<bool>("RemindersEnabled", true, (Func<string>)(() => "Reminders Enabled"), (Func<string>)(() => "Whether the drawer should display alerts before an event starts."));
+			ReminderPosition = new EventReminderPositition
 			{
-				EventSettings = Settings.AddSubCollection("event-table-event-settings", false);
-				SettingCollection eventList = EventSettings.AddSubCollection("event-table-event-list-settings", false);
-				List<SettingEntry<bool>> eventSettingList = new List<SettingEntry<bool>>();
-				foreach (EventCategory category in eventCategories)
-				{
-					IEnumerable<Event> enumerable;
-					if (!category.ShowCombined)
-					{
-						IEnumerable<Event> events = category.Events;
-						enumerable = events;
-					}
-					else
-					{
-						enumerable = from e in category.Events
-							group e by e.Key into eg
-							select eg.First();
-					}
-					foreach (Event e2 in enumerable)
-					{
-						SettingEntry<bool> setting = eventList.DefineSetting<bool>(e2.SettingKey, true, (Func<string>)null, (Func<string>)null);
-						setting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object s, ValueChangedEventArgs<bool> e)
-						{
-							SettingEntry<bool> val = (SettingEntry<bool>)s;
-							this.EventSettingChanged?.Invoke(s, new EventSettingsChangedEventArgs
-							{
-								Name = ((SettingEntry)val).get_EntryKey(),
-								Enabled = e.get_NewValue()
-							});
-							SettingChanged<bool>(s, e);
-						});
-						eventSettingList.Add(setting);
-					}
-				}
-				_allEvents = eventSettingList.AsReadOnly();
+				X = base.GlobalSettings.DefineSetting<int>("ReminderPositionX", 200, (Func<string>)(() => "Location X"), (Func<string>)(() => "Defines the position of reminders on the x axis.")),
+				Y = base.GlobalSettings.DefineSetting<int>("ReminderPositionY", 200, (Func<string>)(() => "Location Y"), (Func<string>)(() => "Defines the position of reminders on the y axis."))
+			};
+			int reminderDurationMin = 1;
+			int reminderDurationMax = 15;
+			ReminderDuration = base.GlobalSettings.DefineSetting<float>("ReminderDuration", 5f, (Func<string>)(() => "Reminder Duration"), (Func<string>)(() => $"Defines the reminder duration. Min: {reminderDurationMin}s - Max: {reminderDurationMax}s"));
+			SettingComplianceExtensions.SetRange(ReminderDuration, (float)reminderDurationMin, (float)reminderDurationMax);
+			ReminderDisabledForEvents = base.GlobalSettings.DefineSetting<List<string>>("ReminderDisabledForEvents", new List<string>(), (Func<string>)(() => "Reminder disabled for Events"), (Func<string>)(() => "Defines the events for which NO reminder should be displayed."));
+		}
+
+		public void CheckDrawerSizeAndPosition(EventAreaConfiguration configuration)
+		{
+			CheckDrawerSizeAndPosition((DrawerConfiguration)configuration);
+		}
+
+		public void CheckGlobalSizeAndPosition()
+		{
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			int maxResX = (int)((float)GameService.Graphics.get_Resolution().X / GameService.Graphics.get_UIScaleMultiplier());
+			int maxResY = (int)((float)GameService.Graphics.get_Resolution().Y / GameService.Graphics.get_UIScaleMultiplier());
+			EventReminderPositition reminderPosition = ReminderPosition;
+			if (reminderPosition != null)
+			{
+				SettingComplianceExtensions.SetRange(reminderPosition.X, 0, maxResX);
+			}
+			EventReminderPositition reminderPosition2 = ReminderPosition;
+			if (reminderPosition2 != null)
+			{
+				SettingComplianceExtensions.SetRange(reminderPosition2.Y, 0, maxResY);
 			}
 		}
 
-		private void SettingChanged<T>(object sender, ValueChangedEventArgs<T> e)
+		public EventAreaConfiguration AddDrawer(string name, List<EventCategory> eventCategories)
 		{
-			SettingEntry<T> settingEntry = (SettingEntry<T>)sender;
-			string prevValue = ((e.get_PreviousValue().GetType() == typeof(string)) ? e.get_PreviousValue().ToString() : JsonConvert.SerializeObject((object)e.get_PreviousValue()));
-			string newValue = ((e.get_NewValue().GetType() == typeof(string)) ? e.get_NewValue().ToString() : JsonConvert.SerializeObject((object)e.get_NewValue()));
-			Logger.Debug("Changed setting \"" + ((SettingEntry)settingEntry).get_EntryKey() + "\" from \"" + prevValue + "\" to \"" + newValue + "\"");
-			this.ModuleSettingsChanged?.Invoke(this, new ModuleSettingsChangedEventArgs
+			DrawerConfiguration drawer = AddDrawer(name);
+			SettingEntry<LeftClickAction> leftClickAction = base.DrawerSettings.DefineSetting<LeftClickAction>(name + "-leftClickAction", LeftClickAction.CopyWaypoint, (Func<string>)(() => "Left Click Action"), (Func<string>)(() => "Defines the action which is executed when left clicking."));
+			SettingEntry<bool> showTooltips = base.DrawerSettings.DefineSetting<bool>(name + "-showTooltips", true, (Func<string>)(() => "Show Tooltips"), (Func<string>)(() => "Whether a tooltip should be displayed when hovering."));
+			SettingEntry<int> timespan = base.DrawerSettings.DefineSetting<int>(name + "-timespan", 120, (Func<string>)(() => "Timespan"), (Func<string>)(() => "Defines the timespan the event drawer covers."));
+			SettingEntry<int> historySplit = base.DrawerSettings.DefineSetting<int>(name + "-historySplit", 50, (Func<string>)(() => "History Split"), (Func<string>)(() => "Defines how much history the timespan should contain."));
+			SettingComplianceExtensions.SetRange(historySplit, 0, 75);
+			SettingEntry<bool> drawBorders = base.DrawerSettings.DefineSetting<bool>(name + "-drawBorders", false, (Func<string>)(() => "Draw Borders"), (Func<string>)(() => "Whether the events should be rendered with borders."));
+			SettingEntry<bool> useFillers = base.DrawerSettings.DefineSetting<bool>(name + "-useFillers", true, (Func<string>)(() => "Use Filler Events"), (Func<string>)(() => "Whether the empty spaces should be filled by filler events."));
+			SettingEntry<Color> fillerTextColor = base.DrawerSettings.DefineSetting<Color>(name + "-fillerTextColor", base.DefaultGW2Color, (Func<string>)(() => "Filler Text Color"), (Func<string>)(() => "Defines the text color used by filler events."));
+			SettingEntry<bool> acceptWaypointPrompt = base.DrawerSettings.DefineSetting<bool>(name + "-acceptWaypointPrompt", true, (Func<string>)(() => "Accept Waypoint Prompt"), (Func<string>)(() => "Whether the waypoint prompt should be accepted automatically when performing an automated teleport."));
+			SettingEntry<EventCompletedAction> completionAction = base.DrawerSettings.DefineSetting<EventCompletedAction>(name + "-completionAction", EventCompletedAction.Crossout, (Func<string>)(() => "Completion Action"), (Func<string>)(() => "Defines the action to perform if an event has been completed."));
+			SettingEntry<List<string>> disabledEventKeys = base.DrawerSettings.DefineSetting<List<string>>(name + "-disabledEventKeys", new List<string>(), (Func<string>)(() => "Active Event Keys"), (Func<string>)(() => "Defines the active event keys."));
+			SettingEntry<int> eventHeight = base.DrawerSettings.DefineSetting<int>(name + "-eventHeight", 30, (Func<string>)(() => "Event Height"), (Func<string>)(() => "Defines the height of the individual event rows."));
+			SettingComplianceExtensions.SetRange(eventHeight, 5, 30);
+			SettingEntry<List<string>> eventOrder = base.DrawerSettings.DefineSetting<List<string>>(name + "-eventOrder", new List<string>(eventCategories.Select((EventCategory x) => x.Key)), (Func<string>)(() => "Event Order"), (Func<string>)(() => "Defines the order of events."));
+			return new EventAreaConfiguration
 			{
-				Name = ((SettingEntry)settingEntry).get_EntryKey(),
-				Value = e.get_NewValue()
-			});
+				Name = drawer.Name,
+				Enabled = drawer.Enabled,
+				EnabledKeybinding = drawer.EnabledKeybinding,
+				BuildDirection = drawer.BuildDirection,
+				BackgroundColor = drawer.BackgroundColor,
+				FontSize = drawer.FontSize,
+				TextColor = drawer.TextColor,
+				Location = drawer.Location,
+				Opacity = drawer.Opacity,
+				Size = drawer.Size,
+				LeftClickAction = leftClickAction,
+				ShowTooltips = showTooltips,
+				DrawBorders = drawBorders,
+				HistorySplit = historySplit,
+				TimeSpan = timespan,
+				UseFiller = useFillers,
+				FillerTextColor = fillerTextColor,
+				AcceptWaypointPrompt = acceptWaypointPrompt,
+				DisabledEventKeys = disabledEventKeys,
+				CompletionAcion = completionAction,
+				EventHeight = eventHeight,
+				EventOrder = eventOrder
+			};
+		}
+
+		public new void RemoveDrawer(string name)
+		{
+			base.RemoveDrawer(name);
+			base.DrawerSettings.UndefineSetting(name + "-leftClickAction");
+			base.DrawerSettings.UndefineSetting(name + "-showTooltips");
+			base.DrawerSettings.UndefineSetting(name + "-timespan");
+			base.DrawerSettings.UndefineSetting(name + "-historySplit");
+			base.DrawerSettings.UndefineSetting(name + "-drawBorders");
+			base.DrawerSettings.UndefineSetting(name + "-useFillers");
+			base.DrawerSettings.UndefineSetting(name + "-fillerTextColor");
+			base.DrawerSettings.UndefineSetting(name + "-acceptWaypointPrompt");
+			base.DrawerSettings.UndefineSetting(name + "-completionAction");
+			base.DrawerSettings.UndefineSetting(name + "-disabledEventKeys");
+			base.DrawerSettings.UndefineSetting(name + "-eventHeight");
+			base.DrawerSettings.UndefineSetting(name + "-eventOrder");
+		}
+
+		public override void UpdateLocalization(TranslationState translationState)
+		{
+			base.UpdateLocalization(translationState);
+			string mapKeybindingDisplayNameDefault = ((SettingEntry)MapKeybinding).get_DisplayName();
+			string mapKeybindingDescriptionDefault = ((SettingEntry)MapKeybinding).get_Description();
+			((SettingEntry)MapKeybinding).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-mapKeybinding-name", mapKeybindingDisplayNameDefault)));
+			((SettingEntry)MapKeybinding).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-mapKeybinding-description", mapKeybindingDescriptionDefault)));
+			string remindersEnabledDisplayNameDefault = ((SettingEntry)RemindersEnabled).get_DisplayName();
+			string remindersEnabledDescriptionDefault = ((SettingEntry)RemindersEnabled).get_Description();
+			((SettingEntry)RemindersEnabled).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-remindersEnabled-name", remindersEnabledDisplayNameDefault)));
+			((SettingEntry)RemindersEnabled).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-remindersEnabled-description", remindersEnabledDescriptionDefault)));
+		}
+
+		public void UpdateDrawerLocalization(EventAreaConfiguration drawerConfiguration, TranslationState translationState)
+		{
+			UpdateDrawerLocalization((DrawerConfiguration)drawerConfiguration, translationState);
+			string leftClickActionDisplayNameDefault = ((SettingEntry)drawerConfiguration.LeftClickAction).get_DisplayName();
+			string leftClickActionDescriptionDefault = ((SettingEntry)drawerConfiguration.LeftClickAction).get_Description();
+			((SettingEntry)drawerConfiguration.LeftClickAction).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerLeftClickAction-name", leftClickActionDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.LeftClickAction).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerLeftClickAction-description", leftClickActionDescriptionDefault)));
+			string showTooltipsDisplayNameDefault = ((SettingEntry)drawerConfiguration.ShowTooltips).get_DisplayName();
+			string showTooltipsDescriptionDefault = ((SettingEntry)drawerConfiguration.ShowTooltips).get_Description();
+			((SettingEntry)drawerConfiguration.ShowTooltips).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerShowTooltips-name", showTooltipsDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.ShowTooltips).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerShowTooltips-description", showTooltipsDescriptionDefault)));
+			string timespanDisplayNameDefault = ((SettingEntry)drawerConfiguration.TimeSpan).get_DisplayName();
+			string timespanDescriptionDefault = ((SettingEntry)drawerConfiguration.TimeSpan).get_Description();
+			((SettingEntry)drawerConfiguration.TimeSpan).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerTimespan-name", timespanDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.TimeSpan).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerTimespan-description", timespanDescriptionDefault)));
+			string historySplitDisplayNameDefault = ((SettingEntry)drawerConfiguration.HistorySplit).get_DisplayName();
+			string historySplitDescriptionDefault = ((SettingEntry)drawerConfiguration.HistorySplit).get_Description();
+			((SettingEntry)drawerConfiguration.HistorySplit).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerHistorySplit-name", historySplitDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.HistorySplit).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerHistorySplit-description", historySplitDescriptionDefault)));
+			string drawBordersDisplayNameDefault = ((SettingEntry)drawerConfiguration.DrawBorders).get_DisplayName();
+			string drawBordersDescriptionDefault = ((SettingEntry)drawerConfiguration.DrawBorders).get_Description();
+			((SettingEntry)drawerConfiguration.DrawBorders).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerDrawBorders-name", drawBordersDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.DrawBorders).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerDrawBorders-description", drawBordersDescriptionDefault)));
+			string useFillersDisplayNameDefault = ((SettingEntry)drawerConfiguration.UseFiller).get_DisplayName();
+			string useFillersDescriptionDefault = ((SettingEntry)drawerConfiguration.UseFiller).get_Description();
+			((SettingEntry)drawerConfiguration.UseFiller).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerUseFillers-name", useFillersDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.UseFiller).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerUseFillers-description", useFillersDescriptionDefault)));
+			string fillerTextColorDisplayNameDefault = ((SettingEntry)drawerConfiguration.FillerTextColor).get_DisplayName();
+			string fillerTextColorDescriptionDefault = ((SettingEntry)drawerConfiguration.FillerTextColor).get_Description();
+			((SettingEntry)drawerConfiguration.FillerTextColor).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerFillerTextColor-name", fillerTextColorDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.FillerTextColor).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerFillerTextColor-description", fillerTextColorDescriptionDefault)));
+			string acceptWaypointPromptDisplayNameDefault = ((SettingEntry)drawerConfiguration.AcceptWaypointPrompt).get_DisplayName();
+			string acceptWaypointPromptDescriptionDefault = ((SettingEntry)drawerConfiguration.AcceptWaypointPrompt).get_Description();
+			((SettingEntry)drawerConfiguration.AcceptWaypointPrompt).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerAcceptWaypointPrompt-name", acceptWaypointPromptDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.AcceptWaypointPrompt).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerAcceptWaypointPrompt-description", acceptWaypointPromptDescriptionDefault)));
+			string completionActionDisplayNameDefault = ((SettingEntry)drawerConfiguration.CompletionAcion).get_DisplayName();
+			string completionActionDescriptionDefault = ((SettingEntry)drawerConfiguration.CompletionAcion).get_Description();
+			((SettingEntry)drawerConfiguration.CompletionAcion).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerCompletionAction-name", completionActionDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.CompletionAcion).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerCompletionAction-description", completionActionDescriptionDefault)));
+			string disabledEventKeysDisplayNameDefault = ((SettingEntry)drawerConfiguration.DisabledEventKeys).get_DisplayName();
+			string disabledEventKeysDescriptionDefault = ((SettingEntry)drawerConfiguration.DisabledEventKeys).get_Description();
+			((SettingEntry)drawerConfiguration.DisabledEventKeys).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerDisabledEventKeys-name", disabledEventKeysDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.DisabledEventKeys).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerDisabledEventKeys-description", disabledEventKeysDescriptionDefault)));
+			string eventHeightDisplayNameDefault = ((SettingEntry)drawerConfiguration.EventHeight).get_DisplayName();
+			string eventHeightDescriptionDefault = ((SettingEntry)drawerConfiguration.EventHeight).get_Description();
+			((SettingEntry)drawerConfiguration.EventHeight).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventHeight-name", eventHeightDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.EventHeight).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventHeight-description", eventHeightDescriptionDefault)));
+			string eventOrderDisplayNameDefault = ((SettingEntry)drawerConfiguration.EventOrder).get_DisplayName();
+			string eventOrderDescriptionDefault = ((SettingEntry)drawerConfiguration.EventOrder).get_Description();
+			((SettingEntry)drawerConfiguration.EventOrder).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventOrder-name", eventOrderDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.EventOrder).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventOrder-description", eventOrderDescriptionDefault)));
 		}
 	}
 }

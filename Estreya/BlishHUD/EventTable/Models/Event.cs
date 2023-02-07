@@ -1,31 +1,13 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using Blish_HUD;
-using Blish_HUD.Common.UI.Views;
-using Blish_HUD.Controls;
-using Blish_HUD.Graphics.UI;
-using Blish_HUD.Input;
-using Blish_HUD.Settings;
-using Blish_HUD._Extensions;
-using Estreya.BlishHUD.EventTable.Controls;
-using Estreya.BlishHUD.EventTable.Extensions;
-using Estreya.BlishHUD.EventTable.Input;
-using Estreya.BlishHUD.EventTable.Json;
-using Estreya.BlishHUD.EventTable.Resources;
-using Estreya.BlishHUD.EventTable.State;
-using Estreya.BlishHUD.EventTable.UI.Views;
-using Estreya.BlishHUD.EventTable.UI.Views.Edit;
-using Estreya.BlishHUD.EventTable.Utils;
-using Gw2Sharp.WebApi.V2.Models;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended;
-using MonoGame.Extended.BitmapFonts;
+using Estreya.BlishHUD.Shared.Attributes;
+using Estreya.BlishHUD.Shared.Json.Converter;
+using Estreya.BlishHUD.Shared.State;
 using Newtonsoft.Json;
 
 namespace Estreya.BlishHUD.EventTable.Models
@@ -33,34 +15,14 @@ namespace Estreya.BlishHUD.EventTable.Models
 	[Serializable]
 	public class Event
 	{
+		[IgnoreCopy]
 		private static readonly Logger Logger = Logger.GetLogger<Event>();
 
-		private readonly TimeSpan updateInterval = TimeSpan.FromMinutes(15.0);
-
-		private double timeSinceUpdate;
-
-		private bool _editing;
+		[JsonIgnore]
+		public TimeSpan[] ReminderTimes = new TimeSpan[1] { TimeSpan.FromMinutes(10.0) };
 
 		[JsonIgnore]
-		private string _backgroundColorCode;
-
-		[JsonIgnore]
-		private Tooltip _tooltip;
-
-		[JsonIgnore]
-		private ContextMenuStrip _contextMenuStrip;
-
-		[JsonIgnore]
-		private string _settingKey;
-
-		[JsonIgnore]
-		private Color? _backgroundColor;
-
-		[JsonIgnore]
-		private bool? _isDisabled;
-
-		[JsonIgnore]
-		private int _lastYPosition;
+		private ConcurrentDictionary<DateTime, List<TimeSpan>> _remindedFor = new ConcurrentDictionary<DateTime, List<TimeSpan>>();
 
 		[Description("Specifies the key of the event. Should be unique for a event category. Avoid changing it, as it resets saved settings and states.")]
 		[JsonProperty("key")]
@@ -105,863 +67,123 @@ namespace Estreya.BlishHUD.EventTable.Models
 		public string Icon { get; set; }
 
 		[JsonProperty("color")]
-		public string BackgroundColorCode
-		{
-			get
-			{
-				return _backgroundColorCode;
-			}
-			set
-			{
-				_backgroundColorCode = value;
-				_backgroundColor = null;
-			}
-		}
+		public string BackgroundColorCode { get; set; }
 
 		[JsonProperty("apiType")]
-		public APICodeType APICodeType { get; set; }
+		public APICodeType? APICodeType { get; set; }
 
-		[JsonProperty("api")]
+		[JsonProperty("apiCode")]
 		public string APICode { get; set; }
 
 		[JsonIgnore]
-		internal bool Filler { get; set; }
+		public bool Filler { get; set; }
 
-		[JsonIgnore]
-		internal EventCategory EventCategory { get; set; }
-
-		[JsonIgnore]
-		private Tooltip Tooltip
-		{
-			get
-			{
-				//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0033: Expected O, but got Unknown
-				if (_tooltip == null)
-				{
-					_tooltip = new Tooltip((ITooltipView)(object)new TooltipView(Name, Location ?? "", Icon));
-				}
-				return _tooltip;
-			}
-		}
-
-		[JsonIgnore]
-		public string SettingKey
-		{
-			get
-			{
-				if (_settingKey == null)
-				{
-					_settingKey = EventCategory.Key + "-" + (Key ?? Name);
-				}
-				return _settingKey;
-			}
-		}
-
-		[JsonIgnore]
-		private ContextMenuStrip ContextMenuStrip
-		{
-			get
-			{
-				//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-				//IL_001f: Expected O, but got Unknown
-				if (_contextMenuStrip == null)
-				{
-					_contextMenuStrip = new ContextMenuStrip((Func<IEnumerable<ContextMenuStripItem>>)GetContextMenu);
-				}
-				return _contextMenuStrip;
-			}
-		}
-
-		[JsonIgnore]
-		public Color BackgroundColor
-		{
-			get
-			{
-				//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-				//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-				if (!_backgroundColor.HasValue && !Filler)
-				{
-					try
-					{
-						Color colorFromEvent = (string.IsNullOrWhiteSpace(BackgroundColorCode) ? Color.White : ColorTranslator.FromHtml(BackgroundColorCode));
-						_backgroundColor = new Color((int)colorFromEvent.R, (int)colorFromEvent.G, (int)colorFromEvent.B);
-					}
-					catch (Exception ex)
-					{
-						Logger.Error(ex, "Failed generating background color:");
-						_backgroundColor = Color.get_Transparent();
-					}
-				}
-				return (Color)(((_003F?)_backgroundColor) ?? Color.get_Transparent());
-			}
-		}
-
-		[JsonIgnore]
-		public bool IsDisabled
-		{
-			get
-			{
-				if (!_isDisabled.HasValue)
-				{
-					if (Filler)
-					{
-						_isDisabled = false;
-					}
-					IEnumerable<SettingEntry<bool>> eventSetting = EventTableModule.ModuleInstance.ModuleSettings.AllEvents.Where((SettingEntry<bool> e) => ((SettingEntry)e).get_EntryKey().ToLowerInvariant() == SettingKey.ToLowerInvariant());
-					if (eventSetting.Any())
-					{
-						bool enabled = eventSetting.First().get_Value() && !EventTableModule.ModuleInstance.EventState.Contains(SettingKey, EventState.EventStates.Hidden);
-						_isDisabled = !enabled;
-					}
-					if (!_isDisabled.HasValue)
-					{
-						_isDisabled = false;
-					}
-				}
-				return _isDisabled.Value;
-			}
-		}
-
-		[JsonIgnore]
+		[JsonProperty("occurences")]
 		public List<DateTime> Occurences { get; private set; } = new List<DateTime>();
 
 
-		[JsonProperty("markers")]
-		public List<EventPhaseMarker> EventPhaseMarkers { get; set; } = new List<EventPhaseMarker>();
+		[JsonIgnore]
+		public string SettingKey { get; private set; }
 
+		public event EventHandler<TimeSpan> Reminder;
 
-		public event EventHandler Edited;
-
-		private IEnumerable<ContextMenuStripItem> GetContextMenu()
+		public DateTime? GetCurrentOccurence(DateTime now)
 		{
-			ContextMenuStripItem val = new ContextMenuStripItem();
-			val.set_Text(Strings.Event_CopyWaypoint);
-			((Control)val).set_BasicTooltipText("Copies the waypoint to the clipboard.");
-			ContextMenuStripItem copyWaypoint = val;
-			((Control)copyWaypoint).add_Click((EventHandler<MouseEventArgs>)delegate
+			IEnumerable<DateTime> occurences = Occurences.Where((DateTime oc) => oc <= now && oc.AddMinutes(Duration) >= now);
+			if (!occurences.Any())
 			{
-				CopyWaypoint();
-			});
-			yield return copyWaypoint;
-			ContextMenuStripItem val2 = new ContextMenuStripItem();
-			val2.set_Text(Strings.Event_OpenWiki);
-			((Control)val2).set_BasicTooltipText("Open the wiki in the default browser.");
-			ContextMenuStripItem openWiki = val2;
-			((Control)openWiki).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
-				OpenWiki();
-			});
-			yield return openWiki;
-			ContextMenuStrip hideMenuStrip = new ContextMenuStrip((Func<IEnumerable<ContextMenuStripItem>>)delegate
-			{
-				//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0021: Expected O, but got Unknown
-				//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0056: Expected O, but got Unknown
-				List<ContextMenuStripItem> list2 = new List<ContextMenuStripItem>();
-				ContextMenuStripItem val11 = new ContextMenuStripItem();
-				val11.set_Text(Strings.Event_HideCategory);
-				((Control)val11).set_BasicTooltipText("Hides the event category until reset.");
-				ContextMenuStripItem val12 = val11;
-				((Control)val12).add_Click((EventHandler<MouseEventArgs>)delegate
-				{
-					HideCategory();
-				});
-				list2.Add(val12);
-				ContextMenuStripItem val13 = new ContextMenuStripItem();
-				val13.set_Text(Strings.Event_HideEvent);
-				((Control)val13).set_BasicTooltipText("Hides the event until reset.");
-				ContextMenuStripItem val14 = val13;
-				((Control)val14).add_Click((EventHandler<MouseEventArgs>)delegate
-				{
-					Hide();
-				});
-				list2.Add(val14);
-				return list2;
-			});
-			ContextMenuStripItem val3 = new ContextMenuStripItem();
-			val3.set_Text("Hide");
-			val3.set_Submenu(hideMenuStrip);
-			((Control)val3).set_BasicTooltipText("Adds options for hiding events.");
-			yield return val3;
-			ContextMenuStrip finishMenuStrip = new ContextMenuStrip((Func<IEnumerable<ContextMenuStripItem>>)delegate
-			{
-				//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0021: Expected O, but got Unknown
-				//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0056: Expected O, but got Unknown
-				List<ContextMenuStripItem> list = new List<ContextMenuStripItem>();
-				ContextMenuStripItem val7 = new ContextMenuStripItem();
-				val7.set_Text("Finish Category");
-				((Control)val7).set_BasicTooltipText("Completes the event category until reset. Click again to reset.");
-				ContextMenuStripItem val8 = val7;
-				((Control)val8).add_Click((EventHandler<MouseEventArgs>)delegate
-				{
-					EventCategory eventCategory = EventCategory;
-					if (eventCategory != null && !eventCategory.IsFinished())
-					{
-						EventCategory?.Finish();
-					}
-					else
-					{
-						EventCategory?.Unfinish();
-					}
-				});
-				list.Add(val8);
-				ContextMenuStripItem val9 = new ContextMenuStripItem();
-				val9.set_Text("Finish Event");
-				((Control)val9).set_BasicTooltipText("Completes the event until reset. Click again to reset.");
-				ContextMenuStripItem val10 = val9;
-				((Control)val10).add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)delegate
-				{
-					if (!IsFinished())
-					{
-						Finish();
-					}
-					else
-					{
-						Unfinish();
-					}
-				});
-				list.Add(val10);
-				return list;
-			});
-			ContextMenuStripItem val4 = new ContextMenuStripItem();
-			val4.set_Text("Finish");
-			val4.set_Submenu(finishMenuStrip);
-			((Control)val4).set_BasicTooltipText("Adds options for finishing events.");
-			yield return val4;
-			ContextMenuStripItem val5 = new ContextMenuStripItem();
-			val5.set_Text("Edit");
-			((Control)val5).set_BasicTooltipText("Opens the edit window.");
-			ContextMenuStripItem edit = val5;
-			((Control)edit).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
-				Edit();
-			});
-			yield return edit;
-			ContextMenuStripItem val6 = new ContextMenuStripItem();
-			val6.set_Text(Strings.Event_Disable);
-			((Control)val6).set_BasicTooltipText("Disables the event completely.");
-			ContextMenuStripItem disable = val6;
-			((Control)disable).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
-				Disable();
-			});
-			yield return disable;
+				return null;
+			}
+			return occurences.First();
 		}
 
-		public Event()
+		public bool IsRunning(DateTime now)
 		{
-			timeSinceUpdate = updateInterval.TotalMilliseconds;
+			return GetCurrentOccurence(now).HasValue;
 		}
 
-		public bool Draw(SpriteBatch spriteBatch, Rectangle bounds, Texture2D baseTexture, int y, double pixelPerMinute, DateTime now, DateTime min, DateTime max, BitmapFont font)
+		public TimeSpan GetTimeRemaining(DateTime now)
 		{
-			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0221: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0226: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0264: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0282: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_031a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0321: Unknown result type (might be due to invalid IL or missing references)
-			//IL_032b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0332: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0346: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0355: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0367: Unknown result type (might be due to invalid IL or missing references)
-			//IL_036e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0376: Unknown result type (might be due to invalid IL or missing references)
-			//IL_037d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_038c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_038e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_040c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0410: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0451: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0453: Unknown result type (might be due to invalid IL or missing references)
-			List<DateTime> occurences = new List<DateTime>();
-			lock (Occurences)
+			DateTime? co = GetCurrentOccurence(now);
+			if (co.HasValue)
 			{
-				occurences.AddRange(Occurences.Where((DateTime oc) => (oc >= min || oc.AddMinutes(Duration) >= min) && oc <= max));
+				return co.Value.AddMinutes(Duration) - now;
 			}
-			_lastYPosition = y;
-			RectangleF eventTexturePosition = default(RectangleF);
-			RectangleF eventTimeRemainingPosition = default(RectangleF);
-			RectangleF markerRectangle = default(RectangleF);
-			foreach (DateTime eventStart in occurences)
-			{
-				float width = (float)GetWidth(eventStart, min, bounds, pixelPerMinute);
-				if (width <= 0f)
-				{
-					continue;
-				}
-				float originalX = (float)GetXPosition(eventStart, min, pixelPerMinute);
-				float x = Math.Max(originalX, 0f);
-				bool num = eventStart <= now && eventStart.AddMinutes(Duration) > now;
-				((RectangleF)(ref eventTexturePosition))._002Ector(x, (float)y, width, (float)EventTableModule.ModuleInstance.EventHeight);
-				SpriteBatchUtil.DrawRectangle(borderSize: (!Filler && EventTableModule.ModuleInstance.ModuleSettings.DrawEventBorder.get_Value()) ? 1 : 0, spriteBatch: spriteBatch, baseTexture: baseTexture, coords: eventTexturePosition, color: BackgroundColor * EventTableModule.ModuleInstance.ModuleSettings.Opacity.get_Value(), borderColor: Color.get_Black());
-				Color textColor = Color.get_Black();
-				if (Filler)
-				{
-					if (EventTableModule.ModuleInstance.ModuleSettings.FillerTextColor.get_Value() != null)
-					{
-						Color value = EventTableModule.ModuleInstance.ModuleSettings.FillerTextColor.get_Value();
-						if (value == null || value.get_Id() != 1)
-						{
-							textColor = ColorExtensions.ToXnaColor(EventTableModule.ModuleInstance.ModuleSettings.FillerTextColor.get_Value().get_Cloth());
-						}
-					}
-				}
-				else if (EventTableModule.ModuleInstance.ModuleSettings.TextColor.get_Value() != null)
-				{
-					Color value2 = EventTableModule.ModuleInstance.ModuleSettings.TextColor.get_Value();
-					if (value2 == null || value2.get_Id() != 1)
-					{
-						textColor = ColorExtensions.ToXnaColor(EventTableModule.ModuleInstance.ModuleSettings.TextColor.get_Value().get_Cloth());
-					}
-				}
-				RectangleF eventTextPosition = RectangleF.op_Implicit(Rectangle.get_Empty());
-				if (!string.IsNullOrWhiteSpace(Name) && (!Filler || (Filler && EventTableModule.ModuleInstance.ModuleSettings.UseFillerEventNames.get_Value())))
-				{
-					string eventName = GetLongestEventName(eventTexturePosition.Width, font);
-					float eventTextWidth = MeasureStringWidth(eventName, font);
-					((RectangleF)(ref eventTextPosition))._002Ector(eventTexturePosition.X + 5f, eventTexturePosition.Y + 5f, eventTextWidth, eventTexturePosition.Height - 10f);
-					spriteBatch.DrawString(eventName, font, eventTextPosition, textColor, wrap: false, (HorizontalAlignment)0, (VerticalAlignment)1);
-				}
-				if (num)
-				{
-					TimeSpan timeRemaining = eventStart.AddMinutes(Duration).Subtract(now);
-					string timeRemainingString = FormatTime(timeRemaining);
-					float timeRemainingWidth = MeasureStringWidth(timeRemainingString, font);
-					float timeRemainingX = eventTexturePosition.X + (eventTexturePosition.Width / 2f - timeRemainingWidth / 2f);
-					if (timeRemainingX < eventTextPosition.X + eventTextPosition.Width)
-					{
-						timeRemainingX = eventTextPosition.X + eventTextPosition.Width + 10f;
-					}
-					((RectangleF)(ref eventTimeRemainingPosition))._002Ector(timeRemainingX, eventTexturePosition.Y + 5f, timeRemainingWidth, eventTexturePosition.Height - 10f);
-					if (eventTimeRemainingPosition.X + eventTimeRemainingPosition.Width <= eventTexturePosition.X + eventTexturePosition.Width)
-					{
-						spriteBatch.DrawString(timeRemainingString, font, eventTimeRemainingPosition, textColor, wrap: false, (HorizontalAlignment)0, (VerticalAlignment)1);
-					}
-				}
-				if (num && EventPhaseMarkers != null)
-				{
-					int markerWidth = 2;
-					foreach (EventPhaseMarker marker in EventPhaseMarkers)
-					{
-						float xPosition = originalX + marker.Time * (float)pixelPerMinute;
-						xPosition = Math.Min(xPosition, ((RectangleF)(ref eventTexturePosition)).get_Right() - (float)markerWidth);
-						if (!(xPosition < 0f))
-						{
-							((RectangleF)(ref markerRectangle))._002Ector(xPosition, eventTexturePosition.Y, (float)markerWidth, eventTexturePosition.Height);
-							spriteBatch.DrawRectangle(baseTexture, markerRectangle, marker.Color);
-						}
-					}
-				}
-				if ((EventCategory?.IsFinished() ?? false) || IsFinished())
-				{
-					spriteBatch.DrawCrossOut(baseTexture, eventTexturePosition, Color.get_Red());
-				}
-			}
-			return occurences.Any();
+			return TimeSpan.Zero;
 		}
 
-		private void UpdateTooltip(string description)
-		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Expected O, but got Unknown
-			_tooltip = new Tooltip((ITooltipView)(object)new TooltipView(Name, description, Icon));
-		}
-
-		private string FormatTime(TimeSpan ts)
-		{
-			if (ts.Days > 0)
-			{
-				return ts.ToString("dd\\.hh\\:mm\\:ss");
-			}
-			if (ts.Hours > 0)
-			{
-				return ts.ToString("hh\\:mm\\:ss");
-			}
-			return ts.ToString("mm\\:ss");
-		}
-
-		private string FormatTime(DateTime dateTime)
-		{
-			return FormatTime(dateTime.TimeOfDay);
-		}
-
-		private string GetLongestEventName(float maxSize, BitmapFont font)
-		{
-			if (MeasureStringWidth(Name, font) <= maxSize)
-			{
-				return Name;
-			}
-			for (int i = 0; i < Name.Length; i++)
-			{
-				string name = Name.Substring(0, Name.Length - i);
-				if (MeasureStringWidth(name, font) <= maxSize)
-				{
-					return name;
-				}
-			}
-			return "...";
-		}
-
-		private float MeasureStringWidth(string text, BitmapFont font)
-		{
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			if (string.IsNullOrEmpty(text))
-			{
-				return 0f;
-			}
-			return font.MeasureString(text).Width + 10f;
-		}
-
-		public void CopyWaypoint()
-		{
-			if (!string.IsNullOrWhiteSpace(Waypoint))
-			{
-				ClipboardUtil.get_WindowsClipboardService().SetTextAsync(Waypoint);
-				ScreenNotification.ShowNotification(new string[2]
-				{
-					Name ?? "",
-					Strings.Event_WaypointCopied
-				}, (NotificationType)0);
-			}
-			else
-			{
-				ScreenNotification.ShowNotification(new string[2]
-				{
-					Name ?? "",
-					Strings.Event_NoWaypointFound
-				}, (NotificationType)0);
-			}
-		}
-
-		public void OpenWiki()
-		{
-			if (!string.IsNullOrWhiteSpace(Wiki))
-			{
-				Process.Start(Wiki);
-			}
-		}
-
-		private List<DateTime> GetStartOccurences(DateTime now, DateTime max, DateTime min)
-		{
-			List<DateTime> startOccurences = new List<DateTime>();
-			DateTime zero = StartingDate ?? new DateTime(min.Year, min.Month, min.Day, 0, 0, 0).AddDays((Repeat.TotalMinutes != 0.0) ? (-1) : 0);
-			TimeSpan offset = Offset.Add(TimeZone.CurrentTimeZone.GetUtcOffset(now));
-			DateTime eventStart = zero.Add(offset);
-			while (eventStart < max)
-			{
-				bool num = eventStart > min;
-				bool startBeforeMax = eventStart < max;
-				bool endAfterMin = eventStart.AddMinutes(Duration) > min;
-				if ((num || endAfterMin) && startBeforeMax)
-				{
-					startOccurences.Add(eventStart);
-				}
-				eventStart = ((Repeat.TotalMinutes == 0.0) ? eventStart.Add(TimeSpan.FromDays(1.0)) : eventStart.Add(Repeat));
-			}
-			return startOccurences;
-		}
-
-		private double GetXPosition(DateTime start, DateTime min, double pixelPerMinute)
+		public double CalculateXPosition(DateTime start, DateTime min, double pixelPerMinute)
 		{
 			return start.Subtract(min).TotalMinutes * pixelPerMinute;
 		}
 
-		private double GetWidth(DateTime eventOccurence, DateTime min, Rectangle bounds, double pixelPerMinute)
+		public double CalculateWidth(DateTime eventOccurence, DateTime min, int maxWidth, double pixelPerMinute)
 		{
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 			double eventWidth = (double)Duration * pixelPerMinute;
-			double x = GetXPosition(eventOccurence, min, pixelPerMinute);
+			double x = CalculateXPosition(eventOccurence, min, pixelPerMinute);
 			if (x < 0.0)
 			{
 				eventWidth -= Math.Abs(x);
 			}
-			if (((x > 0.0) ? x : 0.0) + eventWidth > (double)bounds.Width)
+			if (((x > 0.0) ? x : 0.0) + eventWidth > (double)maxWidth)
 			{
-				eventWidth = (double)bounds.Width - ((x > 0.0) ? x : 0.0);
+				eventWidth = (double)maxWidth - ((x > 0.0) ? x : 0.0);
 			}
 			return eventWidth;
 		}
 
-		public bool IsHovered(DateTime min, Rectangle bounds, Point relativeMousePosition, double pixelPerMinute)
+		public Task LoadAsync(EventCategory ec, TranslationState translationState = null)
 		{
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-			if (IsDisabled)
-			{
-				return false;
-			}
-			foreach (DateTime occurence in Occurences)
-			{
-				double x = GetXPosition(occurence, min, pixelPerMinute);
-				double width = GetWidth(occurence, min, bounds, pixelPerMinute);
-				x = Math.Max(x, 0.0);
-				if ((double)relativeMousePosition.X >= x && (double)relativeMousePosition.X < x + width && relativeMousePosition.Y >= _lastYPosition && relativeMousePosition.Y < _lastYPosition + EventTableModule.ModuleInstance.EventHeight)
-				{
-					return true;
-				}
-			}
-			return false;
-		}
-
-		public void HandleClick(object sender, MouseEventArgs e)
-		{
-			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Invalid comparison between Unknown and I4
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Invalid comparison between Unknown and I4
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
-			if (Filler)
-			{
-				return;
-			}
-			if ((int)e.get_EventType() == 513 && EventTableModule.ModuleInstance.ModuleSettings.HandleLeftClick.get_Value())
-			{
-				if (EventTableModule.ModuleInstance.ModuleSettings.LeftClickAction.get_Value() == LeftClickAction.CopyWaypoint)
-				{
-					CopyWaypoint();
-				}
-				else
-				{
-					if (EventTableModule.ModuleInstance.ModuleSettings.LeftClickAction.get_Value() != LeftClickAction.NavigateToWaypoint)
-					{
-						return;
-					}
-					Task.Run(async delegate
-					{
-						if (EventTableModule.ModuleInstance.PointOfInterestState.Loading)
-						{
-							ScreenNotification.ShowNotification("Point of Interest State is currently loading...", (NotificationType)2);
-						}
-						else
-						{
-							PointOfInterest pointOfInterest = EventTableModule.ModuleInstance.PointOfInterestState.GetPointOfInterest(Waypoint);
-							if (pointOfInterest != null)
-							{
-								if (!(await EventTableModule.ModuleInstance.MapNavigationUtil.NavigateToPosition(pointOfInterest, EventTableModule.ModuleInstance.ModuleSettings.DirectlyTeleportToWaypoint.get_Value())))
-								{
-									ScreenNotification.ShowNotification("Navigation failed.", (NotificationType)2);
-								}
-							}
-							else
-							{
-								ScreenNotification.ShowNotification(Strings.Event_NoWaypointFound, (NotificationType)2);
-							}
-						}
-					});
-				}
-			}
-			else if ((int)e.get_EventType() == 516 && EventTableModule.ModuleInstance.ModuleSettings.ShowContextMenuOnClick.get_Value())
-			{
-				int topPos = ((e.get_MousePosition().Y + ((Control)ContextMenuStrip).get_Height() > ((Control)GameService.Graphics.get_SpriteScreen()).get_Height()) ? (-((Control)ContextMenuStrip).get_Height()) : 0);
-				int leftPos = ((e.get_MousePosition().X + ((Control)ContextMenuStrip).get_Width() >= ((Control)GameService.Graphics.get_SpriteScreen()).get_Width()) ? (-((Control)ContextMenuStrip).get_Width()) : 0);
-				Point menuPosition = e.get_MousePosition() + new Point(leftPos, topPos);
-				ContextMenuStrip.Show(menuPosition);
-			}
-		}
-
-		public void HandleHover(object _, MouseEventArgs e, double pixelPerMinute)
-		{
-			if (Filler)
-			{
-				return;
-			}
-			List<DateTime> occurences = Occurences;
-			IEnumerable<DateTime> hoveredOccurences = occurences.Where(delegate(DateTime eo)
-			{
-				//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-				//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-				double xPosition = GetXPosition(eo, EventTableModule.ModuleInstance.EventTimeMin, pixelPerMinute);
-				double num2 = xPosition + (double)Duration * pixelPerMinute;
-				return (double)e.Position.X > xPosition && (double)e.Position.X < num2;
-			});
-			if (((Control)Tooltip).get_Visible())
-			{
-				return;
-			}
-			string description = Location ?? "";
-			if (hoveredOccurences.Any())
-			{
-				DateTime hoveredOccurence = hoveredOccurences.First();
-				bool num = hoveredOccurence.AddMinutes(Duration) < EventTableModule.ModuleInstance.DateTimeNow;
-				bool isNext = !num && hoveredOccurence > EventTableModule.ModuleInstance.DateTimeNow;
-				bool isCurrent = !num && !isNext;
-				description = Location + ((!string.IsNullOrWhiteSpace(Location)) ? "\n" : string.Empty) + "\n";
-				if (num)
-				{
-					description = description + Strings.Event_Tooltip_FinishedSince + ": " + FormatTime(EventTableModule.ModuleInstance.DateTimeNow - hoveredOccurence.AddMinutes(Duration));
-				}
-				else if (isNext)
-				{
-					description = description + Strings.Event_Tooltip_StartsIn + ": " + FormatTime(hoveredOccurence - EventTableModule.ModuleInstance.DateTimeNow);
-				}
-				else if (isCurrent)
-				{
-					description = description + Strings.Event_Tooltip_Remaining + ": " + FormatTime(hoveredOccurence.AddMinutes(Duration) - EventTableModule.ModuleInstance.DateTimeNow);
-				}
-				description = description + " (" + Strings.Event_Tooltip_StartsAt + ": " + FormatTime(hoveredOccurence) + ")";
-			}
-			else
-			{
-				Logger.Warn("Can't find hovered event: " + Name + " - " + string.Join(", ", occurences.Select((DateTime o) => o.ToString())));
-			}
-			UpdateTooltip(description);
-			Tooltip.Show(0, 0);
-		}
-
-		public void HandleNonHover(object _, MouseEventArgs e)
-		{
-			if (((Control)Tooltip).get_Visible())
-			{
-				((Control)Tooltip).Hide();
-			}
-		}
-
-		public void Hide()
-		{
-			DateTime now = EventTableModule.ModuleInstance.DateTimeNow.ToUniversalTime();
-			DateTime until = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0, DateTimeKind.Utc).AddDays(1.0);
-			EventTableModule.ModuleInstance.EventState.Add(SettingKey, until, EventState.EventStates.Hidden);
-		}
-
-		private void HideCategory()
-		{
-			EventCategory?.Hide();
-		}
-
-		public void Disable()
-		{
-			IEnumerable<SettingEntry<bool>> eventSetting = EventTableModule.ModuleInstance.ModuleSettings.AllEvents.Where((SettingEntry<bool> e) => ((SettingEntry)e).get_EntryKey().ToLowerInvariant() == SettingKey.ToLowerInvariant());
-			if (eventSetting.Any())
-			{
-				eventSetting.First().set_Value(false);
-			}
-		}
-
-		public void Finish()
-		{
-			DateTime now = EventTableModule.ModuleInstance.DateTimeNow.ToUniversalTime();
-			DateTime until = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0, DateTimeKind.Utc).AddDays(1.0);
-			EventTableModule.ModuleInstance.EventState.Add(SettingKey, until, EventState.EventStates.Completed);
-		}
-
-		public void Unfinish()
-		{
-			EventTableModule.ModuleInstance.EventState.Remove(SettingKey);
-		}
-
-		public bool IsFinished()
-		{
-			if (Filler)
-			{
-				return false;
-			}
-			return EventTableModule.ModuleInstance.EventState.Contains(SettingKey, EventState.EventStates.Completed);
-		}
-
-		private void UpdateEventOccurences(GameTime gameTime)
-		{
-			if (!Filler)
-			{
-				lock (Occurences)
-				{
-					Occurences.Clear();
-				}
-				DateTime now = EventTableModule.ModuleInstance.DateTimeNow;
-				DateTime min = now.AddDays(-2.0);
-				DateTime max = now.AddDays(2.0);
-				List<DateTime> occurences = GetStartOccurences(now, max, min);
-				lock (Occurences)
-				{
-					Occurences.AddRange(occurences);
-				}
-			}
-		}
-
-		public Task LoadAsync()
-		{
-			EventTableModule.ModuleInstance.EventState.StateAdded += EventState_StateAdded;
-			EventTableModule.ModuleInstance.EventState.StateRemoved += EventState_StateRemoved;
 			if (string.IsNullOrWhiteSpace(Key))
 			{
 				Key = Name;
 			}
-			if (EventTableModule.ModuleInstance.ModuleSettings.UseEventTranslation.get_Value())
-			{
-				Name = Strings.ResourceManager.GetString("event-" + SettingKey) ?? Name;
-			}
 			if (string.IsNullOrWhiteSpace(Icon))
 			{
-				Icon = EventCategory.Icon;
+				Icon = ec.Icon;
+			}
+			SettingKey = ec.Key + "_" + Key;
+			if (translationState != null)
+			{
+				Name = translationState.GetTranslation("event-" + ec.Key + "_" + Key + "-name", Name);
 			}
 			return Task.CompletedTask;
 		}
 
-		private void EventState_StateRemoved(object sender, ValueEventArgs<string> e)
+		public void Update(DateTime nowUTC)
 		{
-			if (SettingKey == e.get_Value())
+			if (Filler)
 			{
-				_isDisabled = null;
+				return;
 			}
-		}
-
-		private void EventState_StateAdded(object sender, ValueEventArgs<EventState.VisibleStateInfo> e)
-		{
-			if (SettingKey == e.get_Value().Key && e.get_Value().State == EventState.EventStates.Hidden)
+			foreach (DateTime occurence in Occurences.Where((DateTime o) => o >= nowUTC))
 			{
-				_isDisabled = null;
-			}
-		}
-
-		public void ResetCachedStates()
-		{
-			_isDisabled = null;
-		}
-
-		public void Unload()
-		{
-			Logger.Debug("Unload event: {0}", new object[1] { Key });
-			EventTableModule.ModuleInstance.EventState.StateAdded -= EventState_StateAdded;
-			EventTableModule.ModuleInstance.EventState.StateRemoved -= EventState_StateRemoved;
-			Tooltip tooltip = _tooltip;
-			if (tooltip != null)
-			{
-				((Control)tooltip).Dispose();
-			}
-			_tooltip = null;
-			ContextMenuStrip contextMenuStrip = _contextMenuStrip;
-			if (contextMenuStrip != null)
-			{
-				((Control)contextMenuStrip).Dispose();
-			}
-			_contextMenuStrip = null;
-			Logger.Debug("Unloaded event: {0}", new object[1] { Key });
-		}
-
-		public void Update(GameTime gameTime)
-		{
-			UpdateUtil.Update(UpdateEventOccurences, gameTime, updateInterval.TotalMilliseconds, ref timeSinceUpdate);
-		}
-
-		public void Edit()
-		{
-			lock (this)
-			{
-				if (_editing)
+				List<TimeSpan> alreadyRemindedTimes = _remindedFor.GetOrAdd(occurence, (DateTime o) => new List<TimeSpan>());
+				TimeSpan[] reminderTimes = ReminderTimes;
+				foreach (TimeSpan time in reminderTimes)
 				{
-					return;
-				}
-				_editing = true;
-			}
-			Task.Run(async delegate
-			{
-				Texture2D backgroundTexture = await EventTableModule.ModuleInstance.IconState.GetIconAsync("controls/window/502049", checkRenderAPI: false);
-				Rectangle settingsWindowSize = default(Rectangle);
-				((Rectangle)(ref settingsWindowSize))._002Ector(35, 50, 913, 691);
-				int contentRegionPaddingY = settingsWindowSize.Y - 15;
-				int contentRegionPaddingX = settingsWindowSize.X + 46;
-				Rectangle contentRegion = default(Rectangle);
-				((Rectangle)(ref contentRegion))._002Ector(contentRegionPaddingX, contentRegionPaddingY, settingsWindowSize.Width - 52, settingsWindowSize.Height - contentRegionPaddingY);
-				StandardWindow val = new StandardWindow(backgroundTexture, settingsWindowSize, contentRegion);
-				((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-				((WindowBase2)val).set_Title("Edit");
-				StandardWindow val2 = val;
-				((WindowBase2)val2).set_Emblem(await EventTableModule.ModuleInstance.IconState.GetIconAsync("156684", checkRenderAPI: false));
-				((WindowBase2)val).set_Subtitle(Name);
-				((WindowBase2)val).set_SavesPosition(true);
-				((WindowBase2)val).set_CanClose(false);
-				((WindowBase2)val).set_Id("EventTableModule_f925849b-44bd-4c9f-aaac-76826d93ba6f");
-				StandardWindow window = val;
-				Event clonedEvent;
-				lock (this)
-				{
-					clonedEvent = Clone();
-				}
-				EditEventView editView = new EditEventView(clonedEvent);
-				editView.SavePressed += delegate(object s, ValueEventArgs<Event> e)
-				{
-					((Control)window).Hide();
-					((Control)window).Dispose();
-					lock (this)
+					if (!alreadyRemindedTimes.Contains(time))
 					{
-						Name = e.get_Value().Name;
-						Offset = e.get_Value().Offset;
-						Repeat = e.get_Value().Repeat;
-						Location = e.get_Value().Location;
-						Waypoint = e.get_Value().Waypoint;
-						Wiki = e.get_Value().Wiki;
-						Duration = e.get_Value().Duration;
-						Icon = e.get_Value().Icon;
-						BackgroundColorCode = e.get_Value().BackgroundColorCode;
-						APICodeType = e.get_Value().APICodeType;
-						APICode = e.get_Value().APICode;
-						EventPhaseMarkers = e.get_Value().EventPhaseMarkers;
-						timeSinceUpdate = updateInterval.TotalMilliseconds;
-						_editing = false;
+						DateTime remindAt = occurence - time;
+						TimeSpan diff = nowUTC - remindAt;
+						if (remindAt <= nowUTC && Math.Abs(diff.TotalSeconds) <= 1.0)
+						{
+							this.Reminder?.Invoke(this, time);
+							alreadyRemindedTimes.Add(time);
+						}
 					}
-					this.Edited?.Invoke(this, EventArgs.Empty);
-				};
-				editView.CancelPressed += delegate
-				{
-					((Control)window).Hide();
-					((Control)window).Dispose();
-					lock (this)
-					{
-						_editing = false;
-					}
-				};
-				window.Show((IView)(object)editView);
-			});
+				}
+			}
 		}
 
-		public Event Clone()
+		public override string ToString()
 		{
-			return this.Copy();
+			string[] keySplit = SettingKey?.Split('_') ?? new string[2]
+			{
+				string.Empty,
+				Name
+			};
+			return $"Category: {keySplit[0]} - Name: {keySplit[1]} - Filler {Filler}";
 		}
 	}
 }
