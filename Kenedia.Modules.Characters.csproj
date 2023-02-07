@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <AssemblyName>Kenedia.Modules.Characters</AssemblyName>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <UseWindowsForms>True</UseWindowsForms>
+    <TargetFramework>net472</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>Preview</LangVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace />
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Reference Include="MonoGame.Framework" />
+    <Reference Include="Blish HUD" />
+    <Reference Include="MonoGame.Extended" />
+    <Reference Include="SemVer" />
+    <Reference Include="Newtonsoft.Json" />
+    <Reference Include="Gw2Sharp" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="Patagames.Ocr">
+      <HintPath>..\..\working\Patagames.Ocr.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core" />
+  </ItemGroup>
+</Project>
