@@ -324,7 +324,7 @@ namespace Kenedia.Modules.Characters
 			{
 				CancelEverything();
 			}
-			if (_ticks.Global > 15000.0)
+			if (_ticks.Global > 500.0)
 			{
 				_ticks.Global = 0.0;
 				PlayerCharacter player = GameService.Gw2Mumble.get_PlayerCharacter();

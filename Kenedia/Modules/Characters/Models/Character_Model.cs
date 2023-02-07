@@ -466,10 +466,10 @@ namespace Kenedia.Modules.Characters.Models
 			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0124: Expected I4, but got Unknown
+			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0147: Expected I4, but got Unknown
 			_characterSwapping = characterSwapping;
 			ModulePath = modulePath;
 			_requestSave = requestSave;
@@ -482,7 +482,7 @@ namespace Kenedia.Modules.Characters.Models
 			_specialization = SpecializationType.None;
 			_created = character.get_Created();
 			_lastModified = character.get_LastModified().UtcDateTime;
-			_lastLogin = character.get_LastModified().UtcDateTime;
+			_lastLogin = ((_lastLogin > character.get_LastModified().UtcDateTime) ? _lastLogin : character.get_LastModified().UtcDateTime);
 			_gender = ApiEnum<Gender>.op_Implicit(character.get_Gender());
 			foreach (CharacterCraftingDiscipline disc in character.get_Crafting().ToList())
 			{
@@ -614,6 +614,7 @@ namespace Kenedia.Modules.Characters.Models
 
 		public void Swap(bool ignoreOCR = false)
 		{
+			Save();
 			_characterSwapping?.Start(this, ignoreOCR);
 		}
 
@@ -637,10 +638,10 @@ namespace Kenedia.Modules.Characters.Models
 			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0105: Expected I4, but got Unknown
+			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0128: Expected I4, but got Unknown
 			_name = character.get_Name();
 			_level = character.get_Level();
 			_race = (RaceType)Enum.Parse(typeof(RaceType), character.get_Race());
@@ -648,7 +649,7 @@ namespace Kenedia.Modules.Characters.Models
 			_specialization = SpecializationType.None;
 			_created = character.get_Created();
 			_lastModified = character.get_LastModified().UtcDateTime;
-			_lastLogin = character.get_LastModified().UtcDateTime;
+			_lastLogin = ((_lastLogin > character.get_LastModified().UtcDateTime) ? _lastLogin : character.get_LastModified().UtcDateTime);
 			_gender = ApiEnum<Gender>.op_Implicit(character.get_Gender());
 			foreach (CharacterCraftingDiscipline disc in character.get_Crafting().ToList())
 			{

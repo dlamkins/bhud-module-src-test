@@ -690,6 +690,7 @@ namespace Kenedia.Modules.Characters.Views
 			{
 				c.HideTooltips();
 			});
+			_filterBox?.ResetText();
 		}
 
 		protected override void OnResized(ResizedEventArgs e)

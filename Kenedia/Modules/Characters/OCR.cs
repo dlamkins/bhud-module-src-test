@@ -108,7 +108,7 @@ namespace Kenedia.Modules.Characters
 			{
 				_view.EnableMaskedRegion();
 			}
-			await Task.Delay(50);
+			await Task.Delay(5);
 			Texture2D cleanedTexture = CleanedTexture;
 			if (cleanedTexture != null)
 			{

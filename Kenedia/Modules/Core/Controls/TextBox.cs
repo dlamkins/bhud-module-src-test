@@ -52,6 +52,11 @@ namespace Kenedia.Modules.Core.Controls
 			UserLocale_SettingChanged(null, null);
 		}
 
+		public void ResetText()
+		{
+			((TextInputBase)this).set_Text((string)null);
+		}
+
 		protected override void OnEnterPressed(EventArgs e)
 		{
 			((TextBox)this).OnEnterPressed(e);

@@ -150,7 +150,7 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
 			if (_isEnabled.get_Value())
 			{
-				_screenPartionSize = new Point(Math.Min(640, ((Control)GameService.Graphics.get_SpriteScreen()).get_Size().X / 6), Math.Min(360, ((Control)GameService.Graphics.get_SpriteScreen()).get_Size().Y / 6));
+				_screenPartionSize = new Point(Math.Min(640, ((Control)GameService.Graphics.get_SpriteScreen()).get_Size().X / 5), Math.Min(360, ((Control)GameService.Graphics.get_SpriteScreen()).get_Size().Y / 5));
 				int x = (((Control)GameService.Graphics.get_SpriteScreen()).get_Size().X - _screenPartionSize.X) / 2;
 				int y = (((Control)GameService.Graphics.get_SpriteScreen()).get_Size().Y - _screenPartionSize.Y) / 2;
 				((Control)this).set_Location(new Point(x, y));
