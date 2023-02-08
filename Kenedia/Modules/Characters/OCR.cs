@@ -46,6 +46,8 @@ namespace Kenedia.Modules.Characters
 
 		public Texture2D CleanedTexture { get; private set; }
 
+		public Texture2D ScaledTexture { get; private set; }
+
 		public string ReadResult { get; private set; }
 
 		public string BestMatchResult { get; private set; }
@@ -104,130 +106,154 @@ namespace Kenedia.Modules.Characters
 		public async Task<string?> Read(bool show = false)
 		{
 			string finalText = null;
-			if (!show)
+			try
 			{
-				_view.EnableMaskedRegion();
-			}
-			await Task.Delay(5);
-			Texture2D cleanedTexture = CleanedTexture;
-			if (cleanedTexture != null)
-			{
-				((GraphicsResource)cleanedTexture).Dispose();
-			}
-			Texture2D sourceTexture = SourceTexture;
-			if (sourceTexture != null)
-			{
-				((GraphicsResource)sourceTexture).Dispose();
-			}
-			User32Dll.RECT wndBounds = _clientWindowService.WindowBounds;
-			ScreenModeSetting? screenMode = GameService.GameIntegration.get_GfxSettings().get_ScreenMode();
-			Point p = (Point)(((screenMode.HasValue ? ScreenModeSetting.op_Implicit(screenMode.GetValueOrDefault()) : null) == ScreenModeSetting.op_Implicit(ScreenModeSetting.get_Windowed())) ? new Point(_sharedSettings.WindowOffset.Left, _sharedSettings.WindowOffset.Top) : Point.get_Zero());
-			double factor = GameService.Graphics.get_UIScaleMultiplier();
-			Point size = default(Point);
-			((Point)(ref size))._002Ector((int)((double)_settings.ActiveOCRRegion.Width * factor), (int)((double)_settings.ActiveOCRRegion.Height * factor));
-			using (Bitmap bitmap = new Bitmap(size.X, size.Y))
-			{
-				Bitmap spacingVisibleBitmap = new Bitmap(size.X, size.Y);
-				using (Graphics g = Graphics.FromImage(bitmap))
+				if (!show)
 				{
-					int left = wndBounds.Left + p.X;
-					int top = wndBounds.Top + p.Y;
-					Rectangle activeOCRRegion = _settings.ActiveOCRRegion;
-					int x = (int)Math.Ceiling((double)((Rectangle)(ref activeOCRRegion)).get_Left() * factor);
-					activeOCRRegion = _settings.ActiveOCRRegion;
-					int y = (int)Math.Ceiling((double)((Rectangle)(ref activeOCRRegion)).get_Top() * factor);
-					g.CopyFromScreen(new Point(left + x, top + y), Point.Empty, new Size(size.X, size.Y));
-					if (show)
+					_view.EnableMaskedRegion();
+				}
+				await Task.Delay(5);
+				User32Dll.RECT wndBounds = _clientWindowService.WindowBounds;
+				ScreenModeSetting? screenMode = GameService.GameIntegration.get_GfxSettings().get_ScreenMode();
+				Point p = (Point)(((screenMode.HasValue ? ScreenModeSetting.op_Implicit(screenMode.GetValueOrDefault()) : null) == ScreenModeSetting.op_Implicit(ScreenModeSetting.get_Windowed())) ? new Point(_sharedSettings.WindowOffset.Left, _sharedSettings.WindowOffset.Top) : Point.get_Zero());
+				double factor = GameService.Graphics.get_UIScaleMultiplier();
+				Point size = default(Point);
+				((Point)(ref size))._002Ector((int)((double)_settings.ActiveOCRRegion.Width * factor), (int)((double)_settings.ActiveOCRRegion.Height * factor));
+				using (Bitmap bitmap = new Bitmap(size.X, size.Y))
+				{
+					Bitmap spacingVisibleBitmap = new Bitmap(size.X, size.Y);
+					using (Graphics g = Graphics.FromImage(bitmap))
 					{
-						using MemoryStream memoryStream = new MemoryStream();
-						bitmap.Save(memoryStream, ImageFormat.Bmp);
-						SourceTexture = memoryStream.CreateTexture2D();
-					}
-					int emptyPixelRow = 0;
-					bool stringStarted = false;
-					for (int i = 0; i < bitmap.Width; i++)
-					{
-						bool containsPixel = false;
-						for (int k = 0; k < bitmap.Height; k++)
+						int left = wndBounds.Left + p.X;
+						int top = wndBounds.Top + p.Y;
+						Rectangle activeOCRRegion = _settings.ActiveOCRRegion;
+						int x = (int)Math.Ceiling((double)((Rectangle)(ref activeOCRRegion)).get_Left() * factor);
+						activeOCRRegion = _settings.ActiveOCRRegion;
+						int y = (int)Math.Ceiling((double)((Rectangle)(ref activeOCRRegion)).get_Top() * factor);
+						g.CopyFromScreen(new Point(left + x, top + y), Point.Empty, new Size(size.X, size.Y));
+						if (show)
 						{
-							Color oc = bitmap.GetPixel(i, k);
-							int threshold = _settings.OCR_ColorThreshold.get_Value();
-							if (oc.R >= threshold && oc.G >= threshold && oc.B >= threshold && emptyPixelRow < CustomThreshold)
+							using MemoryStream memoryStream = new MemoryStream();
+							bitmap.Save(memoryStream, ImageFormat.Bmp);
+							Texture2D sourceTexture = SourceTexture;
+							if (sourceTexture != null)
 							{
-								bitmap.SetPixel(i, k, Color.Black);
-								if (show)
-								{
-									spacingVisibleBitmap.SetPixel(i, k, Color.Black);
-								}
-								containsPixel = true;
-								stringStarted = true;
+								((GraphicsResource)sourceTexture).Dispose();
 							}
-							else if (emptyPixelRow >= CustomThreshold)
+							SourceTexture = memoryStream.CreateTexture2D();
+						}
+						int emptyPixelRow = 0;
+						bool stringStarted = false;
+						for (int i = 0; i < bitmap.Width; i++)
+						{
+							bool containsPixel = false;
+							for (int k = 0; k < bitmap.Height; k++)
+							{
+								Color oc = bitmap.GetPixel(i, k);
+								int threshold = _settings.OCR_ColorThreshold.get_Value();
+								if (oc.R >= threshold && oc.G >= threshold && oc.B >= threshold && emptyPixelRow < CustomThreshold)
+								{
+									bitmap.SetPixel(i, k, Color.Black);
+									if (show)
+									{
+										spacingVisibleBitmap.SetPixel(i, k, Color.Black);
+									}
+									containsPixel = true;
+									stringStarted = true;
+								}
+								else if (emptyPixelRow >= CustomThreshold)
+								{
+									if (show)
+									{
+										spacingVisibleBitmap.SetPixel(i, k, _ignoredColor);
+									}
+									bitmap.SetPixel(i, k, Color.White);
+								}
+								else
+								{
+									if (show)
+									{
+										spacingVisibleBitmap.SetPixel(i, k, Color.White);
+									}
+									bitmap.SetPixel(i, k, Color.White);
+								}
+							}
+							if (emptyPixelRow >= CustomThreshold)
+							{
+								continue;
+							}
+							if (!containsPixel)
 							{
 								if (show)
 								{
-									spacingVisibleBitmap.SetPixel(i, k, _ignoredColor);
+									for (int j = 0; j < bitmap.Height; j++)
+									{
+										spacingVisibleBitmap.SetPixel(i, j, _spacingColor);
+									}
 								}
-								bitmap.SetPixel(i, k, Color.White);
+								if (stringStarted)
+								{
+									emptyPixelRow++;
+								}
 							}
 							else
 							{
-								if (show)
-								{
-									spacingVisibleBitmap.SetPixel(i, k, Color.White);
-								}
-								bitmap.SetPixel(i, k, Color.White);
+								emptyPixelRow = 0;
 							}
 						}
-						if (emptyPixelRow >= CustomThreshold)
+						using MemoryStream memoryStream2 = new MemoryStream();
+						spacingVisibleBitmap.Save(memoryStream2, ImageFormat.Bmp);
+						if (show)
 						{
-							continue;
-						}
-						if (!containsPixel)
-						{
-							if (show)
+							Texture2D cleanedTexture = CleanedTexture;
+							if (cleanedTexture != null)
 							{
-								for (int j = 0; j < bitmap.Height; j++)
-								{
-									spacingVisibleBitmap.SetPixel(i, j, _spacingColor);
-								}
+								((GraphicsResource)cleanedTexture).Dispose();
 							}
-							if (stringStarted)
-							{
-								emptyPixelRow++;
-							}
-						}
-						else
-						{
-							emptyPixelRow = 0;
+							CleanedTexture = memoryStream2.CreateTexture2D();
 						}
 					}
-					using MemoryStream s = new MemoryStream();
-					spacingVisibleBitmap.Save(s, ImageFormat.Bmp);
+					Bitmap ocr_bitmap = bitmap;
+					if (bitmap.Width >= 500 || bitmap.Height >= 500)
+					{
+						double scale = 499.0 / (double)Math.Max(bitmap.Width, bitmap.Height);
+						ocr_bitmap = new Bitmap(bitmap, (int)((double)bitmap.Width * scale), (int)((double)bitmap.Height * scale));
+					}
 					if (show)
 					{
-						CleanedTexture = s.CreateTexture2D();
+						using MemoryStream s = new MemoryStream();
+						ocr_bitmap.Save(s, ImageFormat.Bmp);
+						Texture2D scaledTexture = ScaledTexture;
+						if (scaledTexture != null)
+						{
+							((GraphicsResource)scaledTexture).Dispose();
+						}
+						ScaledTexture = s.CreateTexture2D();
 					}
-				}
-				string[] array = _ocrApi.GetTextFromImage(bitmap).Split(' ');
-				for (int l = 0; l < array.Length; l++)
-				{
-					string wordText = array[l].Trim();
-					if (wordText.StartsWith("l"))
+					string[] array = _ocrApi.GetTextFromImage(ocr_bitmap).Split(' ');
+					for (int l = 0; l < array.Length; l++)
 					{
-						wordText = "I" + wordText.Remove(0, 1);
+						string wordText = array[l].Trim();
+						if (wordText.StartsWith("l"))
+						{
+							wordText = "I" + wordText.Remove(0, 1);
+						}
+						finalText = ((finalText == null) ? wordText : (finalText + " " + wordText));
 					}
-					finalText = ((finalText == null) ? wordText : (finalText + " " + wordText));
+					finalText = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(finalText?.ToLower());
+					BestMatchResult = GetBestMatch(finalText).Item1;
+					ReadResult = finalText;
 				}
-				finalText = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(finalText?.ToLower());
-				BestMatchResult = GetBestMatch(finalText).Item1;
-				ReadResult = finalText;
+				if (!show)
+				{
+					_view.DisableMaskedRegion();
+				}
+				return finalText;
 			}
-			if (!show)
+			catch
 			{
-				_view.DisableMaskedRegion();
 			}
-			return finalText;
+			return "No OCR Result!";
 		}
 
 		private (string, int, int, int, bool) GetBestMatch(string name)

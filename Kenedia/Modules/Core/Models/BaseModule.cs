@@ -69,7 +69,7 @@ namespace Kenedia.Modules.Core.Models
 		protected override void Initialize()
 		{
 			((Module)this).Initialize();
-			ModuleVersion = ((Module)this).get_Version().BaseVersion();
+			ModuleVersion = ((Module)this).get_Version();
 			Logger.Debug($"Initializing {((Module)this).get_Name()} {ModuleVersion}");
 			Paths = new PathCollection(DirectoriesManager, ((Module)this).get_Name());
 			ModKeyMapping = (VirtualKeyShort[])(object)new VirtualKeyShort[5];

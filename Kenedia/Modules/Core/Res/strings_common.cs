@@ -50,6 +50,10 @@ namespace Kenedia.Modules.Core.Res
 
 		internal static string BottomRightCorner => ResourceManager.GetString("BottomRightCorner", resourceCulture);
 
+		internal static string Edit => ResourceManager.GetString("Edit", resourceCulture);
+
+		internal static string EditItem => ResourceManager.GetString("EditItem", resourceCulture);
+
 		internal static string FetchingApiData => ResourceManager.GetString("FetchingApiData", resourceCulture);
 
 		internal static string GeneralSettings => ResourceManager.GetString("GeneralSettings", resourceCulture);
@@ -65,6 +69,12 @@ namespace Kenedia.Modules.Core.Res
 		internal static Bitmap RollingChoya => (Bitmap)ResourceManager.GetObject("RollingChoya", resourceCulture);
 
 		internal static string Settings => ResourceManager.GetString("Settings", resourceCulture);
+
+		internal static string ShowCornerIcon => ResourceManager.GetString("ShowCornerIcon", resourceCulture);
+
+		internal static string ShowCornerIcon_ttp => ResourceManager.GetString("ShowCornerIcon_ttp", resourceCulture);
+
+		internal static string ToggleItem => ResourceManager.GetString("ToggleItem", resourceCulture);
 
 		internal static string TopLeftCorner => ResourceManager.GetString("TopLeftCorner", resourceCulture);
 

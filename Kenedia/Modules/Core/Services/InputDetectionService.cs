@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Blish_HUD;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -16,6 +18,12 @@ namespace Kenedia.Modules.Core.Services
 		private double _lastMouseMove;
 
 		private double _lastMouseClick;
+
+		private double _lastClickOrKey;
+
+		private List<Keys> _ignoredKeys = new List<Keys> { (Keys)0 };
+
+		private List<Keys> _noKeys = new List<Keys>();
 
 		private Point _lastMousePosition;
 
@@ -99,6 +107,22 @@ namespace Kenedia.Modules.Core.Services
 			}
 		}
 
+		public double LastClickOrKey
+		{
+			get
+			{
+				return _lastClickOrKey;
+			}
+			set
+			{
+				if (_lastClickOrKey != value)
+				{
+					_lastClickOrKey = value;
+					this.ClickedOrKey?.Invoke(this, value);
+				}
+			}
+		}
+
 		public event EventHandler<double> Interacted;
 
 		public event EventHandler<double> KeyInteracted;
@@ -109,24 +133,45 @@ namespace Kenedia.Modules.Core.Services
 
 		public event EventHandler<double> MouseClicked;
 
+		public event EventHandler<double> ClickedOrKey;
+
 		public void Run(GameTime gameTime)
 		{
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Invalid comparison between Unknown and I4
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Invalid comparison between Unknown and I4
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Invalid comparison between Unknown and I4
+			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Invalid comparison between Unknown and I4
+			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0097: Invalid comparison between Unknown and I4
+			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a1: Invalid comparison between Unknown and I4
+			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ab: Invalid comparison between Unknown and I4
+			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
 			double now = gameTime.get_TotalGameTime().TotalMilliseconds;
-			LastKeyInteraction = ((GameService.Input.get_Keyboard().get_KeysDown().Count > 0) ? now : LastKeyInteraction);
+			IEnumerable<Keys> enumerable;
+			if (GameService.Input.get_Keyboard().get_KeysDown().Count <= 0)
+			{
+				IEnumerable<Keys> noKeys = _noKeys;
+				enumerable = noKeys;
+			}
+			else
+			{
+				enumerable = GameService.Input.get_Keyboard().get_KeysDown().Except(_ignoredKeys)
+					.Distinct();
+			}
+			IEnumerable<Keys> keys = enumerable;
+			LastKeyInteraction = ((keys.Count() > 0) ? now : LastKeyInteraction);
 			MouseState mouse = GameService.Input.get_Mouse().get_State();
-			LastMouseClick = (((int)((MouseState)(ref mouse)).get_LeftButton() == 1 || (int)((MouseState)(ref mouse)).get_RightButton() == 1) ? now : LastMouseClick);
+			LastMouseClick = (((int)((MouseState)(ref mouse)).get_LeftButton() == 1 || (int)((MouseState)(ref mouse)).get_RightButton() == 1 || (int)((MouseState)(ref mouse)).get_MiddleButton() == 1 || (int)((MouseState)(ref mouse)).get_XButton1() == 1 || (int)((MouseState)(ref mouse)).get_XButton2() == 1) ? now : LastMouseClick);
 			LastMouseMove = ((((MouseState)(ref mouse)).get_Position() != _lastMousePosition) ? now : LastMouseMove);
 			LastMouseInteraction = Math.Max(LastMouseMove, LastMouseClick);
+			LastClickOrKey = Math.Max(LastKeyInteraction, LastMouseClick);
 			LastInteraction = Math.Max(LastMouseInteraction, LastKeyInteraction);
 			_lastMousePosition = ((MouseState)(ref mouse)).get_Position();
 		}

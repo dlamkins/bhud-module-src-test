@@ -216,6 +216,8 @@ namespace Kenedia.Modules.Characters.Services
 
 		public SettingEntry<Version> Version { get; set; }
 
+		public SettingEntry<Version> ImportVersion { get; set; }
+
 		public SettingEntry<bool> FocusSearchOnShow { get; private set; }
 
 		public event EventHandler AppearanceSettingChanged;
@@ -224,27 +226,30 @@ namespace Kenedia.Modules.Characters.Services
 		{
 			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0038: Expected O, but got Unknown
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0052: Expected O, but got Unknown
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006d: Expected O, but got Unknown
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0086: Expected O, but got Unknown
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Expected O, but got Unknown
-			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b9: Expected O, but got Unknown
-			//IL_0155: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0199: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0368: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_040c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Expected O, but got Unknown
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0070: Expected O, but got Unknown
+			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Expected O, but got Unknown
+			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a4: Expected O, but got Unknown
+			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00be: Expected O, but got Unknown
+			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d7: Expected O, but got Unknown
+			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0195: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0386: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_042a: Unknown result type (might be due to invalid IL or missing references)
 			SettingCollection internalSettings = settings.AddSubCollection("Internal", false, false);
 			Version = internalSettings.DefineSetting<Version>("Version", new Version("0.0.0", false), (Func<string>)null, (Func<string>)null);
+			ImportVersion = internalSettings.DefineSetting<Version>("ImportVersion", new Version("0.0.0", false), (Func<string>)null, (Func<string>)null);
 			LogoutKey = internalSettings.DefineSetting<KeyBinding>("LogoutKey", new KeyBinding((Keys)123), (Func<string>)null, (Func<string>)null);
 			ShortcutKey = internalSettings.DefineSetting<KeyBinding>("ShortcutKey", new KeyBinding((ModifierKeys)4, (Keys)67), (Func<string>)null, (Func<string>)null);
 			RadialKey = internalSettings.DefineSetting<KeyBinding>("RadialKey", new KeyBinding((Keys)0), (Func<string>)null, (Func<string>)null);
@@ -286,12 +291,12 @@ namespace Kenedia.Modules.Characters.Services
 			DisplayToggles = internalSettings.DefineSetting<Dictionary<string, ShowCheckPair>>("DisplayToggles", new Dictionary<string, ShowCheckPair>(), (Func<string>)null, (Func<string>)null);
 			GameService.Graphics.get_Resolution();
 			PinSideMenus = internalSettings.DefineSetting<bool>("PinSideMenus", false, (Func<string>)null, (Func<string>)null);
-			UseOCR = internalSettings.DefineSetting<bool>("UseOCR", true, (Func<string>)null, (Func<string>)null);
+			UseOCR = internalSettings.DefineSetting<bool>("UseOCR", false, (Func<string>)null, (Func<string>)null);
 			AutoSortCharacters = internalSettings.DefineSetting<bool>("AutoSortCharacters", false, (Func<string>)null, (Func<string>)null);
 			OCRRegion = internalSettings.DefineSetting<Rectangle>("OCRRegion", new Rectangle(50, 550, 530, 50), (Func<string>)null, (Func<string>)null);
 			OCRRegions = internalSettings.DefineSetting<Dictionary<string, Rectangle>>("OCRRegions", new Dictionary<string, Rectangle>(), (Func<string>)null, (Func<string>)null);
 			OCRNoPixelColumns = internalSettings.DefineSetting<int>("OCRNoPixelColumns", 20, (Func<string>)null, (Func<string>)null);
-			OCR_ColorThreshold = internalSettings.DefineSetting<int>("OCR_ColorThreshold", 180, (Func<string>)null, (Func<string>)null);
+			OCR_ColorThreshold = internalSettings.DefineSetting<int>("OCR_ColorThreshold", 181, (Func<string>)null, (Func<string>)null);
 			PanelSize = internalSettings.DefineSetting<PanelSizes>("PanelSize", PanelSizes.Normal, (Func<string>)null, (Func<string>)null);
 			CustomCharacterIconSize = internalSettings.DefineSetting<int>("CustomCharacterIconSize", 128, (Func<string>)null, (Func<string>)null);
 			CustomCharacterFontSize = internalSettings.DefineSetting<int>("CustomCharacterFontSize", 16, (Func<string>)null, (Func<string>)null);

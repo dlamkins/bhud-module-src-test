@@ -39,6 +39,8 @@ namespace Characters.Views
 
 		private readonly Kenedia.Modules.Core.Controls.Image _cleanedImage;
 
+		private readonly Kenedia.Modules.Core.Controls.Image _scaledImage;
+
 		private readonly ImageButton _closeButton;
 
 		private readonly ResizeableContainer _ocrRegionContainer;
@@ -93,33 +95,40 @@ namespace Characters.Views
 			//IL_06b1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_06e8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0759: Unknown result type (might be due to invalid IL or missing references)
-			//IL_076e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_079e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0804: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0970: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0983: Unknown result type (might be due to invalid IL or missing references)
-			//IL_09aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ad0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ad5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ad9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0aea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0aef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0af3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0afe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0b1c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0b76: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0b7b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0b7f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ba5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_078b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0795: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_080b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_087c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0891: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0927: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a06: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a93: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0aa6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0acd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0bf3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0bf8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0bfc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c0d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c12: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c16: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c21: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c3f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c99: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c9e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ca2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cc8: Unknown result type (might be due to invalid IL or missing references)
 			_settings = settings;
 			_ocr = ocr;
 			base.BorderColor = Color.get_Black();
 			base.BackgroundImage = AsyncTexture2D.FromAssetId(156003);
 			base.TextureRectangle = new Rectangle(50, 50, 500, 500);
-			((Control)this).set_Height(290);
+			((Control)this).set_Height(350);
 			((Control)this).set_Width(620);
 			FlowPanel flowPanel = new FlowPanel();
 			((Control)flowPanel).set_Parent((Container)(object)this);
@@ -239,7 +248,7 @@ namespace Characters.Views
 			Kenedia.Modules.Core.Controls.Image image = new Kenedia.Modules.Core.Controls.Image();
 			((Control)image).set_Location(new Point(5, 5));
 			((Control)image).set_Parent((Container)(object)p);
-			_cleanedImage = image;
+			_scaledImage = image;
 			Label label6 = new Label();
 			((Control)label6).set_Parent((Container)(object)fp);
 			((Control)label6).set_Height(((Control)p).get_Height());
@@ -247,7 +256,7 @@ namespace Characters.Views
 			((Label)label6).set_TextColor(Color.get_White());
 			((Label)label6).set_Font(GameService.Content.get_DefaultFont16());
 			((Label)label6).set_WrapText(true);
-			label6.SetLocalizedText = () => "Cleaned";
+			label6.SetLocalizedText = () => "Scaled";
 			((Label)label6).set_VerticalAlignment((VerticalAlignment)1);
 			FlowPanel flowPanel6 = new FlowPanel();
 			((Control)flowPanel6).set_Parent((Container)(object)contentFlowPanel);
@@ -267,7 +276,7 @@ namespace Characters.Views
 			Kenedia.Modules.Core.Controls.Image image2 = new Kenedia.Modules.Core.Controls.Image();
 			((Control)image2).set_Location(new Point(5, 5));
 			((Control)image2).set_Parent((Container)(object)p);
-			_sourceImage = image2;
+			_cleanedImage = image2;
 			Label label7 = new Label();
 			((Control)label7).set_Parent((Container)(object)fp);
 			((Control)label7).set_Height(((Control)p).get_Height());
@@ -275,23 +284,51 @@ namespace Characters.Views
 			((Label)label7).set_TextColor(Color.get_White());
 			((Label)label7).set_Font(GameService.Content.get_DefaultFont16());
 			((Label)label7).set_WrapText(true);
-			label7.SetLocalizedText = () => "Source";
+			label7.SetLocalizedText = () => "Cleaned";
 			((Label)label7).set_VerticalAlignment((VerticalAlignment)1);
 			FlowPanel flowPanel7 = new FlowPanel();
 			((Control)flowPanel7).set_Parent((Container)(object)contentFlowPanel);
-			((Container)flowPanel7).set_WidthSizingMode((SizingMode)1);
+			((Container)flowPanel7).set_WidthSizingMode((SizingMode)2);
 			((Container)flowPanel7).set_HeightSizingMode((SizingMode)1);
-			((FlowPanel)flowPanel7).set_OuterControlPadding(new Vector2(0f, 5f));
-			((FlowPanel)flowPanel7).set_ControlPadding(new Vector2(5f, 5f));
+			((FlowPanel)flowPanel7).set_ControlPadding(new Vector2(10f, 0f));
 			((FlowPanel)flowPanel7).set_FlowDirection((ControlFlowDirection)2);
-			FlowPanel thresholdPanel = flowPanel7;
+			fp = flowPanel7;
+			FramedContainer framedContainer5 = new FramedContainer();
+			((Control)framedContainer5).set_Parent((Container)(object)fp);
+			((Control)framedContainer5).set_Width(500);
+			((Control)framedContainer5).set_Height(55);
+			framedContainer5.BorderColor = Color.get_Black() * 0.7f;
+			framedContainer5.BackgroundColor = Color.get_Black() * 0.4f;
+			framedContainer5.BorderWidth = new RectangleDimensions(2);
+			p = framedContainer5;
+			Kenedia.Modules.Core.Controls.Image image3 = new Kenedia.Modules.Core.Controls.Image();
+			((Control)image3).set_Location(new Point(5, 5));
+			((Control)image3).set_Parent((Container)(object)p);
+			_sourceImage = image3;
 			Label label8 = new Label();
-			((Control)label8).set_Parent((Container)(object)thresholdPanel);
-			((Control)label8).set_Height(25);
-			((Label)label8).set_AutoSizeWidth(true);
-			((Label)label8).set_TextColor(Colors.ColonialWhite);
-			label8.SetLocalizedText = () => strings.EmptyColumns;
-			label8.SetLocalizedTooltip = () => strings.EmptyColumns_Tooltip;
+			((Control)label8).set_Parent((Container)(object)fp);
+			((Control)label8).set_Height(((Control)p).get_Height());
+			((Control)label8).set_Width(100);
+			((Label)label8).set_TextColor(Color.get_White());
+			((Label)label8).set_Font(GameService.Content.get_DefaultFont16());
+			((Label)label8).set_WrapText(true);
+			label8.SetLocalizedText = () => "Source";
+			((Label)label8).set_VerticalAlignment((VerticalAlignment)1);
+			FlowPanel flowPanel8 = new FlowPanel();
+			((Control)flowPanel8).set_Parent((Container)(object)contentFlowPanel);
+			((Container)flowPanel8).set_WidthSizingMode((SizingMode)1);
+			((Container)flowPanel8).set_HeightSizingMode((SizingMode)1);
+			((FlowPanel)flowPanel8).set_OuterControlPadding(new Vector2(0f, 5f));
+			((FlowPanel)flowPanel8).set_ControlPadding(new Vector2(5f, 5f));
+			((FlowPanel)flowPanel8).set_FlowDirection((ControlFlowDirection)2);
+			FlowPanel thresholdPanel = flowPanel8;
+			Label label9 = new Label();
+			((Control)label9).set_Parent((Container)(object)thresholdPanel);
+			((Control)label9).set_Height(25);
+			((Label)label9).set_AutoSizeWidth(true);
+			((Label)label9).set_TextColor(Colors.ColonialWhite);
+			label9.SetLocalizedText = () => strings.EmptyColumns;
+			label9.SetLocalizedTooltip = () => strings.EmptyColumns_Tooltip;
 			NumberBox numberBox = new NumberBox();
 			((Control)numberBox).set_Parent((Container)(object)thresholdPanel);
 			((Control)numberBox).set_Size(new Point(100, 25));
@@ -308,24 +345,24 @@ namespace Characters.Views
 			((Control)panel).set_Parent((Container)(object)thresholdPanel);
 			panel.BackgroundColor = new Color(_spacingColor.R, _spacingColor.G, _spacingColor.B, _spacingColor.A);
 			((Control)panel).set_Size(new Point(25, 25));
-			Label label9 = new Label();
-			((Control)label9).set_Parent((Container)(object)thresholdPanel);
-			((Control)label9).set_Height(25);
-			((Label)label9).set_AutoSizeWidth(true);
-			((Label)label9).set_TextColor(Colors.ColonialWhite);
-			label9.SetLocalizedText = () => strings.EmptyColumn;
-			label9.SetLocalizedTooltip = () => strings.EmptyColumn_Tooltip;
-			Panel panel2 = new Panel();
-			((Control)panel2).set_Parent((Container)(object)thresholdPanel);
-			panel2.BackgroundColor = new Color(_ignoredColor.R, _ignoredColor.G, _ignoredColor.B, _ignoredColor.A);
-			((Control)panel2).set_Size(new Point(25, 25));
 			Label label10 = new Label();
 			((Control)label10).set_Parent((Container)(object)thresholdPanel);
 			((Control)label10).set_Height(25);
 			((Label)label10).set_AutoSizeWidth(true);
 			((Label)label10).set_TextColor(Colors.ColonialWhite);
-			label10.SetLocalizedText = () => strings.IgnoredPart;
-			label10.SetLocalizedTooltip = () => strings.IgnoredPart_Tooltip;
+			label10.SetLocalizedText = () => strings.EmptyColumn;
+			label10.SetLocalizedTooltip = () => strings.EmptyColumn_Tooltip;
+			Panel panel2 = new Panel();
+			((Control)panel2).set_Parent((Container)(object)thresholdPanel);
+			panel2.BackgroundColor = new Color(_ignoredColor.R, _ignoredColor.G, _ignoredColor.B, _ignoredColor.A);
+			((Control)panel2).set_Size(new Point(25, 25));
+			Label label11 = new Label();
+			((Control)label11).set_Parent((Container)(object)thresholdPanel);
+			((Control)label11).set_Height(25);
+			((Label)label11).set_AutoSizeWidth(true);
+			((Label)label11).set_TextColor(Colors.ColonialWhite);
+			label11.SetLocalizedText = () => strings.IgnoredPart;
+			label11.SetLocalizedTooltip = () => strings.IgnoredPart_Tooltip;
 			NumberBox numberBox2 = new NumberBox();
 			((Control)numberBox2).set_Parent((Container)(object)thresholdPanel);
 			((Control)numberBox2).set_Height(25);
@@ -477,6 +514,10 @@ namespace Characters.Views
 					Kenedia.Modules.Core.Controls.Image cleanedImage = _cleanedImage;
 					val = _ocr.CleanedTexture.get_Bounds();
 					((Control)cleanedImage).set_Size(((Rectangle)(ref val)).get_Size());
+					((Image)_scaledImage).set_Texture(AsyncTexture2D.op_Implicit(_ocr.ScaledTexture));
+					Kenedia.Modules.Core.Controls.Image scaledImage = _scaledImage;
+					val = _ocr.ScaledTexture.get_Bounds();
+					((Control)scaledImage).set_Size(((Rectangle)(ref val)).get_Size());
 				}
 			}
 		}
@@ -513,6 +554,11 @@ namespace Characters.Views
 			if (cleanedImage != null)
 			{
 				((Control)cleanedImage).Dispose();
+			}
+			Kenedia.Modules.Core.Controls.Image scaledImage = _scaledImage;
+			if (scaledImage != null)
+			{
+				((Control)scaledImage).Dispose();
 			}
 			Label resultLabel = _resultLabel;
 			if (resultLabel != null)

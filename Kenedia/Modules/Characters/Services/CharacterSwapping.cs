@@ -199,13 +199,20 @@ namespace Kenedia.Modules.Characters.Services
 			_state = SwappingState.None;
 		}
 
-		public void Cancel()
+		public bool Cancel()
 		{
+			bool result = _cancellationTokenSource != null && !_cancellationTokenSource.IsCancellationRequested;
 			_state = SwappingState.Canceled;
-			_cancellationTokenSource?.Cancel();
+			CancellationTokenSource cancellationTokenSource = _cancellationTokenSource;
+			if (cancellationTokenSource != null)
+			{
+				cancellationTokenSource.Cancel();
+				return result;
+			}
+			return result;
 		}
 
-		public async void Start(Character_Model character, bool ignoreOCR = false)
+		public async void Start(Character_Model character, bool ignoreOCR = false, Logger logger = null)
 		{
 			PlayerCharacter player = GameService.Gw2Mumble.get_PlayerCharacter();
 			bool inCharSelection = (_settings.UseBetaGamestate.get_Value() ? _gameState.IsCharacterSelection : (!GameService.GameIntegration.get_Gw2Instance().get_IsInGame()));

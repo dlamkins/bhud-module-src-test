@@ -29,20 +29,16 @@ using Kenedia.Modules.Core.Controls;
 using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Models;
 using Kenedia.Modules.Core.Res;
-using Kenedia.Modules.Core.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Newtonsoft.Json;
-using SemVer;
 
 namespace Kenedia.Modules.Characters
 {
 	[Export(typeof(Module))]
 	public class Characters : BaseModule<Characters, MainWindow, SettingsModel>
 	{
-		public readonly Version BaseVersion;
-
 		public readonly ResourceManager RM = new ResourceManager("Kenedia.Modules.Characters.Res.strings", Assembly.GetExecutingAssembly());
 
 		private readonly Ticks _ticks = new Ticks();
@@ -101,9 +97,7 @@ namespace Kenedia.Modules.Characters
 		{
 			BaseModule<Characters, MainWindow, SettingsModel>.ModuleInstance = this;
 			HasGUI = true;
-			BaseVersion = ((Module)this).get_Version().BaseVersion();
 			Data = new Data(base.ContentsManager);
-			base.Services.States[typeof(InputDetectionService)] = false;
 		}
 
 		public void UpdateFolderPaths(string accountName, bool api_handled = true)
@@ -246,13 +240,23 @@ namespace Kenedia.Modules.Characters
 				}
 				CharacterModels.FirstOrDefault((Character_Model e) => e.Name == c3.get_Name())?.UpdateCharacter(c3);
 			}
+			if (!File.Exists(CharactersPath) || base.Settings.ImportVersion.get_Value() < OldCharacterModel.ImportVersion)
+			{
+				string p = CharactersPath.Replace("kenedia\\", "");
+				if (File.Exists(p))
+				{
+					BaseModule<Characters, MainWindow, SettingsModel>.Logger.Info($"This is the first start of {((Module)this).get_Name()} since import version {OldCharacterModel.ImportVersion}. Importing old data from {p}!");
+					OldCharacterModel.Import(p, CharacterModels, AccountImagesPath, base.Paths.AccountName, BaseModule<Characters, MainWindow, SettingsModel>.Logger);
+				}
+				base.Settings.ImportVersion.set_Value(OldCharacterModel.ImportVersion);
+			}
 			SaveCharacterList();
 		}
 
 		protected override void Initialize()
 		{
 			base.Initialize();
-			BaseModule<Characters, MainWindow, SettingsModel>.Logger.Info("Starting  " + ((Module)this).get_Name() + " v." + (object)BaseVersion);
+			BaseModule<Characters, MainWindow, SettingsModel>.Logger.Info("Starting " + ((Module)this).get_Name() + " v." + (object)base.ModuleVersion);
 			JsonConvert.set_DefaultSettings((Func<JsonSerializerSettings>)delegate
 			{
 				//IL_0000: Unknown result type (might be due to invalid IL or missing references)
@@ -265,14 +269,14 @@ namespace Kenedia.Modules.Characters
 				return val;
 			});
 			GlobalAccountsPath = base.Paths.ModulePath + "\\accounts.json";
-			if (!File.Exists(base.Paths.ModulePath + "\\gw2.traineddata") || base.Settings.Version.get_Value() != BaseVersion)
+			if (!File.Exists(base.Paths.ModulePath + "\\gw2.traineddata") || base.Settings.Version.get_Value() != base.ModuleVersion)
 			{
 				using Stream destination = File.Create(base.Paths.ModulePath + "\\gw2.traineddata");
 				Stream fileStream = base.ContentsManager.GetFileStream("data\\gw2.traineddata");
 				fileStream.Seek(0L, SeekOrigin.Begin);
 				fileStream.CopyTo(destination);
 			}
-			if (!File.Exists(base.Paths.ModulePath + "\\tesseract.dll") || base.Settings.Version.get_Value() != BaseVersion)
+			if (!File.Exists(base.Paths.ModulePath + "\\tesseract.dll") || base.Settings.Version.get_Value() != base.ModuleVersion)
 			{
 				using Stream target = File.Create(base.Paths.ModulePath + "\\tesseract.dll");
 				Stream fileStream2 = base.ContentsManager.GetFileStream("data\\tesseract.dll");
@@ -286,7 +290,7 @@ namespace Kenedia.Modules.Characters
 			base.Settings.RadialKey.get_Value().set_Enabled(true);
 			base.Settings.RadialKey.get_Value().add_Activated((EventHandler<EventArgs>)RadialMenuToggle);
 			Tags.CollectionChanged += Tags_CollectionChanged;
-			base.Settings.Version.set_Value(BaseVersion);
+			base.Settings.Version.set_Value(base.ModuleVersion);
 			GW2APIHandler = new GW2API_Handler(base.Gw2ApiManager, AddOrUpdateCharacters, () => (LoadingSpinner)(object)APISpinner, GlobalAccountsPath, UpdateFolderPaths);
 		}
 
@@ -307,23 +311,12 @@ namespace Kenedia.Modules.Characters
 
 		protected override void Update(GameTime gameTime)
 		{
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d0: Invalid comparison between Unknown and I4
-			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00da: Invalid comparison between Unknown and I4
 			base.Update(gameTime);
 			_ticks.Global += gameTime.get_ElapsedGameTime().TotalMilliseconds;
 			_ticks.APIUpdate += gameTime.get_ElapsedGameTime().TotalSeconds;
 			_ticks.Save += gameTime.get_ElapsedGameTime().TotalMilliseconds;
 			_ticks.Tags += gameTime.get_ElapsedGameTime().TotalMilliseconds;
 			_ticks.OCR += gameTime.get_ElapsedGameTime().TotalMilliseconds;
-			MouseState mouse = GameService.Input.get_Mouse().get_State();
-			if (GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus() && ((int)((MouseState)(ref mouse)).get_LeftButton() == 1 || (int)((MouseState)(ref mouse)).get_RightButton() == 1 || GameService.Input.get_Keyboard().get_KeysDown().Count > 0))
-			{
-				CancelEverything();
-			}
 			if (_ticks.Global > 500.0)
 			{
 				_ticks.Global = 0.0;
@@ -357,8 +350,27 @@ namespace Kenedia.Modules.Characters
 
 		private void CancelEverything()
 		{
-			CharacterSwapping.Cancel();
-			CharacterSorting.Cancel();
+			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Invalid comparison between Unknown and I4
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Invalid comparison between Unknown and I4
+			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b0: Invalid comparison between Unknown and I4
+			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Invalid comparison between Unknown and I4
+			MouseState mouse = GameService.Input.get_Mouse().get_State();
+			if (CharacterSwapping.Cancel())
+			{
+				BaseModule<Characters, MainWindow, SettingsModel>.Logger.Info(string.Format("Cancel any automated action. Left Mouse Down: {0} | Right Mouse Down: {1} | Keyboard Keys pressed {2}", (int)((MouseState)(ref mouse)).get_LeftButton() == 1, (int)((MouseState)(ref mouse)).get_RightButton() == 1, string.Join("|", (from k in GameService.Input.get_Keyboard().get_KeysDown()
+					select ((object)(Keys)(ref k)).ToString()).ToArray())));
+			}
+			if (CharacterSorting.Cancel())
+			{
+				BaseModule<Characters, MainWindow, SettingsModel>.Logger.Info(string.Format("Cancel any automated action. Left Mouse Down: {0} | Right Mouse Down: {1} | Keyboard Keys pressed {2}", (int)((MouseState)(ref mouse)).get_LeftButton() == 1, (int)((MouseState)(ref mouse)).get_RightButton() == 1, string.Join("|", (from k in GameService.Input.get_Keyboard().get_KeysDown()
+					select ((object)(Keys)(ref k)).ToString()).ToArray())));
+			}
 		}
 
 		protected override async Task LoadAsync()
@@ -387,6 +399,15 @@ namespace Kenedia.Modules.Characters
 			if (base.Settings.LoadCachedAccounts.get_Value())
 			{
 				LoadCharacters();
+			}
+			base.Services.InputDetectionService.ClickedOrKey += InputDetectionService_ClickedOrKey;
+		}
+
+		private void InputDetectionService_ClickedOrKey(object sender, double e)
+		{
+			if (GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus())
+			{
+				CancelEverything();
 			}
 		}
 

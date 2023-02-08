@@ -93,10 +93,17 @@ namespace Kenedia.Modules.Characters.Services
 			_characters = characters;
 		}
 
-		public void Cancel()
+		public bool Cancel()
 		{
+			bool result = _cancellationTokenSource != null && !_cancellationTokenSource.IsCancellationRequested;
 			_state = SortingState.Canceled;
-			_cancellationTokenSource?.Cancel();
+			CancellationTokenSource cancellationTokenSource = _cancellationTokenSource;
+			if (cancellationTokenSource != null)
+			{
+				cancellationTokenSource.Cancel();
+				return result;
+			}
+			return result;
 		}
 
 		public async void Start()
