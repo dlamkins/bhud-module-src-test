@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Modules.Managers;
@@ -223,9 +222,10 @@ namespace Kenedia.Modules.Characters.Services
 
 		private readonly ContentsManager _contentsManager;
 
-		public Map[] Maps { get; set; }
+		public Dictionary<int, Map> Maps { get; } = new Dictionary<int, Map>();
 
-		public Dictionary<int, CraftingProfession> CrafingProfessions { get; set; } = new Dictionary<int, CraftingProfession>
+
+		public Dictionary<int, CraftingProfession> CrafingProfessions { get; } = new Dictionary<int, CraftingProfession>
 		{
 			{
 				0,
@@ -520,7 +520,7 @@ namespace Kenedia.Modules.Characters.Services
 		};
 
 
-		public Dictionary<ProfessionType, Profession> Professions { get; set; } = new Dictionary<ProfessionType, Profession>
+		public Dictionary<ProfessionType, Profession> Professions { get; } = new Dictionary<ProfessionType, Profession>
 		{
 			{
 				(ProfessionType)1,
@@ -804,7 +804,7 @@ namespace Kenedia.Modules.Characters.Services
 		};
 
 
-		public Dictionary<SpecializationType, Specialization> Specializations { get; set; } = new Dictionary<SpecializationType, Specialization>
+		public Dictionary<SpecializationType, Specialization> Specializations { get; } = new Dictionary<SpecializationType, Specialization>
 		{
 			{
 				SpecializationType.Druid,
@@ -1592,7 +1592,7 @@ namespace Kenedia.Modules.Characters.Services
 		};
 
 
-		public Dictionary<RaceType, Race> Races { get; set; } = new Dictionary<RaceType, Race>
+		public Dictionary<RaceType, Race> Races { get; } = new Dictionary<RaceType, Race>
 		{
 			{
 				(RaceType)0,
@@ -1734,34 +1734,28 @@ namespace Kenedia.Modules.Characters.Services
 
 		public Data(ContentsManager contentsManager)
 		{
-			//IL_0517: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0643: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_076c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0895: Unknown result type (might be due to invalid IL or missing references)
-			//IL_092b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_09bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0522: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_064e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0777: Unknown result type (might be due to invalid IL or missing references)
+			//IL_080a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0936: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09ca: Unknown result type (might be due to invalid IL or missing references)
 			_contentsManager = contentsManager;
 			string path = "data\\maps.json";
-			Map[] maps = new Map[1];
 			string jsonString = new StreamReader(_contentsManager.GetFileStream(path)).ReadToEnd();
 			if (jsonString != null && jsonString != string.Empty)
 			{
-				List<Map> list = JsonConvert.DeserializeObject<List<Map>>(jsonString);
-				maps = new Map[list.Aggregate((Map i1, Map i2) => (i1.Id <= i2.Id) ? i2 : i1).Id + 1];
-				foreach (Map entry in list)
+				JsonConvert.DeserializeObject<List<Map>>(jsonString).ForEach(delegate(Map e)
 				{
-					maps[entry.Id] = new Map
+					if (!Maps.ContainsKey(e.Id))
 					{
-						Names = entry.Names,
-						APIId = entry.Id,
-						Id = entry.Id
-					};
-				}
+						Maps.Add(e.Id, e);
+					}
+				});
 			}
-			Maps = maps;
 			Races[(RaceType)0].Icon = AsyncTexture2D.op_Implicit(_contentsManager.GetTexture("textures\\races\\asura.png"));
 			Races[(RaceType)1].Icon = AsyncTexture2D.op_Implicit(_contentsManager.GetTexture("textures\\races\\charr.png"));
 			Races[(RaceType)2].Icon = AsyncTexture2D.op_Implicit(_contentsManager.GetTexture("textures\\races\\human.png"));
@@ -1771,7 +1765,7 @@ namespace Kenedia.Modules.Characters.Services
 
 		public Map GetMapById(int id)
 		{
-			if (Maps.Length <= id || Maps[id] == null)
+			if (!Maps.ContainsKey(id))
 			{
 				return new Map
 				{

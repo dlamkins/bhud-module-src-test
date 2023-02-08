@@ -158,9 +158,12 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			((Dropdown)_orderDropdown).set_SelectedItem(_settings.SortType.get_Value().GetSortType());
 			((Dropdown)_orderDropdown).get_Items().Clear();
 			((Dropdown)_orderDropdown).get_Items().Add(string.Format(strings.SortBy, strings.Name));
-			((Dropdown)_orderDropdown).get_Items().Add(string.Format(strings.SortBy, strings.Tags));
+			((Dropdown)_orderDropdown).get_Items().Add(string.Format(strings.SortBy, strings.Level));
+			((Dropdown)_orderDropdown).get_Items().Add(string.Format(strings.SortBy, strings.Race));
+			((Dropdown)_orderDropdown).get_Items().Add(string.Format(strings.SortBy, strings.Gender));
 			((Dropdown)_orderDropdown).get_Items().Add(string.Format(strings.SortBy, strings.Profession));
-			((Dropdown)_orderDropdown).get_Items().Add(string.Format(strings.SortBy, strings.LastLogin));
+			((Dropdown)_orderDropdown).get_Items().Add(string.Format(strings.SortBy, strings.Specialization));
+			((Dropdown)_orderDropdown).get_Items().Add(string.Format(strings.SortBy, strings.TimeSinceLogin));
 			((Dropdown)_orderDropdown).get_Items().Add(string.Format(strings.SortBy, strings.Map));
 			((Dropdown)_orderDropdown).get_Items().Add(strings.Custom);
 			((Dropdown)_flowDropdown).set_SelectedItem(_settings.SortOrder.get_Value().GetSortOrder());

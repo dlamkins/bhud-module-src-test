@@ -93,6 +93,7 @@
   <data name="CharacterName"><value>Character Name</value></data>
   <data name="OpenSidemenuOnSearch_Tooltip"><value>Open the side menu when clicking the search field</value></data>
   <data name="DoubleClickToEnter"><value>Double Click to Swap</value></data>
+  <data name="TimeSinceLogin"><value>Time since login</value></data>
   <data name="RandomButton_Tooltip"><value>Switch to a random character in your current list</value></data>
   <data name="ShowRandomButton_Name"><value>Show Random Button</value></data>
   <data name="CouldNotFindNamedItem"><value>Could not find any {0} with name {1}</value></data>
@@ -110,7 +111,7 @@
   <data name="OCRAndImageRecognition"><value>OCR and Image Recoginition</value></data>
   <data name="Scribe"><value>Scribe</value></data>
   <data name="Search"><value>Search ...</value></data>
-  <data name="SortBy"><value>Sort By {0}</value></data>
+  <data name="SortBy"><value>Sort by {0}</value></data>
   <data name="CardWith"><value>Card Width {0} px</value></data>
   <data name="SwapDelay"><value>Loading Delay ({0} ms)</value></data>
   <data name="IncludeMatches"><value>Include matches</value></data>

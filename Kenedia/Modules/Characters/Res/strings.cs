@@ -532,6 +532,8 @@ namespace Kenedia.Modules.Characters.Res
 
 		internal static string TextAndIcon => ResourceManager.GetString("TextAndIcon", resourceCulture);
 
+		internal static string TimeSinceLogin => ResourceManager.GetString("TimeSinceLogin", resourceCulture);
+
 		internal static string Toggle => ResourceManager.GetString("Toggle", resourceCulture);
 
 		internal static string ToggleAll => ResourceManager.GetString("ToggleAll", resourceCulture);

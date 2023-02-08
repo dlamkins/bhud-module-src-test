@@ -39,6 +39,7 @@ namespace Kenedia.Modules.Core.Controls
 			if (_performFiltering && gameTime.get_TotalGameTime().TotalMilliseconds - _lastFiltering >= FilteringDelay)
 			{
 				_lastFiltering = gameTime.get_TotalGameTime().TotalMilliseconds;
+				_performFiltering = false;
 				PerformFiltering?.Invoke(((TextInputBase)this).get_Text());
 			}
 		}

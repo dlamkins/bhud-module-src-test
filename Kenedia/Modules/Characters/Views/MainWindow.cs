@@ -9,7 +9,6 @@ using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
-using Gw2Sharp.Models;
 using Gw2Sharp.WebApi.V2.Models;
 using Kenedia.Modules.Characters.Controls;
 using Kenedia.Modules.Characters.Controls.SideMenu;
@@ -20,6 +19,7 @@ using Kenedia.Modules.Core.Controls;
 using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Models;
 using Kenedia.Modules.Core.Structs;
+using Kenedia.Modules.Core.Utility;
 using Kenedia.Modules.Core.Views;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -162,7 +162,10 @@ namespace Kenedia.Modules.Characters.Views
 			filterBox.FilteringDelay = _settings.FilterDelay.get_Value();
 			filterBox.EnterPressedAction = FilterBox_EnterPressed;
 			filterBox.ClickAction = FilterBox_Click;
-			filterBox.PerformFiltering = PerformFiltering;
+			filterBox.PerformFiltering = delegate
+			{
+				mainWindow.PerformFiltering();
+			};
 			filterBox.FilteringOnTextChange = true;
 			_filterBox = filterBox;
 			_settings.FilterDelay.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)FilterDelay_SettingChanged);
@@ -246,7 +249,7 @@ namespace Kenedia.Modules.Characters.Views
 			_toggleSideMenuButton = imageButton5;
 			CharacterEdit characterEdit = new CharacterEdit(textureManager, togglePotrait, accountImagePath, tags, settings, delegate
 			{
-				mainWindow.PerformFiltering(null);
+				mainWindow.PerformFiltering();
 			});
 			((Control)characterEdit).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			characterEdit.Anchor = (Control)(object)this;
@@ -281,7 +284,7 @@ namespace Kenedia.Modules.Characters.Views
 		private void CurrentMap_MapChanged(object sender, ValueEventArgs<int> e)
 		{
 			_currentCharacter?.Invoke()?.UpdateCharacter();
-			PerformFiltering(null);
+			PerformFiltering();
 		}
 
 		private void Texture_TextureSwapped(object sender, ValueChangedEventArgs<Texture2D> e)
@@ -328,7 +331,7 @@ namespace Kenedia.Modules.Characters.Views
 			_filterCharacters = true;
 		}
 
-		public void PerformFiltering(string t)
+		public void PerformFiltering()
 		{
 			Regex regex = (_settings.FilterAsOne.get_Value() ? new Regex("^(?!\\s*$).+") : new Regex("\\w+|\"[\\w\\s]*\""));
 			List<Match> strings = regex.Matches(((TextInputBase)_filterBox).get_Text().Trim().ToLower()).Cast<Match>().ToList();
@@ -506,114 +509,43 @@ namespace Kenedia.Modules.Characters.Views
 
 		public void SortCharacters()
 		{
-			SettingsModel.ESortOrder order = _settings.SortOrder.get_Value();
-			switch (_settings.SortType.get_Value())
+			SettingsModel.SortBy sortby = _settings.SortType.get_Value();
+			bool asc = _settings.SortOrder.get_Value() == SettingsModel.SortDirection.Ascending;
+			bool isNum = sortby == SettingsModel.SortBy.Level || sortby == SettingsModel.SortBy.TimeSinceLogin || sortby == SettingsModel.SortBy.Map;
+			if (_settings.SortType.get_Value() != SettingsModel.SortBy.Custom)
 			{
-			case SettingsModel.ESortType.SortByName:
-				switch (order)
+				((FlowPanel)CharactersPanel).SortChildren<CharacterCard>((Comparison<CharacterCard>)delegate(CharacterCard a, CharacterCard b)
 				{
-				case SettingsModel.ESortOrder.Ascending:
-					((FlowPanel)CharactersPanel).SortChildren<CharacterCard>((Comparison<CharacterCard>)delegate(CharacterCard a, CharacterCard b)
+					if (isNum)
 					{
-						int num13 = b.Character.Name.CompareTo(a.Character.Name);
-						int num14 = b.Character.Position.CompareTo(a.Character.Position);
-						return (num13 != 0) ? num13 : (num13 - num14);
-					});
-					break;
-				case SettingsModel.ESortOrder.Descending:
-					((FlowPanel)CharactersPanel).SortChildren<CharacterCard>((Comparison<CharacterCard>)delegate(CharacterCard a, CharacterCard b)
-					{
-						int num15 = a.Character.Name.CompareTo(b.Character.Name);
-						int num16 = a.Character.Position.CompareTo(b.Character.Position);
-						return (num15 != 0) ? num15 : (num15 - num16);
-					});
-					break;
-				}
-				break;
-			case SettingsModel.ESortType.SortByLastLogin:
-				switch (order)
-				{
-				case SettingsModel.ESortOrder.Ascending:
-					((FlowPanel)CharactersPanel).SortChildren<CharacterCard>((Comparison<CharacterCard>)delegate(CharacterCard a, CharacterCard b)
-					{
-						int num9 = b.Character.LastLogin.CompareTo(a.Character.LastLogin);
-						int num10 = b.Character.Position.CompareTo(a.Character.Position);
-						return (num9 != 0) ? num9 : (num9 - num10);
-					});
-					break;
-				case SettingsModel.ESortOrder.Descending:
-					((FlowPanel)CharactersPanel).SortChildren<CharacterCard>((Comparison<CharacterCard>)delegate(CharacterCard a, CharacterCard b)
-					{
-						int num11 = a.Character.LastLogin.CompareTo(b.Character.LastLogin);
-						int num12 = a.Character.Position.CompareTo(b.Character.Position);
-						return (num11 != 0) ? num11 : (num11 - num12);
-					});
-					break;
-				}
-				break;
-			case SettingsModel.ESortType.SortByMap:
-				switch (order)
-				{
-				case SettingsModel.ESortOrder.Ascending:
-					((FlowPanel)CharactersPanel).SortChildren<CharacterCard>((Comparison<CharacterCard>)delegate(CharacterCard a, CharacterCard b)
-					{
-						int num = b.Character.Map.CompareTo(a.Character.Map);
-						int num2 = b.Character.Position.CompareTo(a.Character.Position);
-						return (num != 0) ? num : (num - num2);
-					});
-					break;
-				case SettingsModel.ESortOrder.Descending:
-					((FlowPanel)CharactersPanel).SortChildren<CharacterCard>((Comparison<CharacterCard>)delegate(CharacterCard a, CharacterCard b)
-					{
-						int num3 = a.Character.Map.CompareTo(b.Character.Map);
-						int num4 = a.Character.Position.CompareTo(b.Character.Position);
-						return (num3 != 0) ? num3 : (num3 - num4);
-					});
-					break;
-				}
-				break;
-			case SettingsModel.ESortType.SortByProfession:
-				switch (order)
-				{
-				case SettingsModel.ESortOrder.Ascending:
-					((FlowPanel)CharactersPanel).SortChildren<CharacterCard>((Comparison<CharacterCard>)delegate(CharacterCard a, CharacterCard b)
-					{
-						//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-						//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-						ProfessionType profession = b.Character.Profession;
-						int num5 = ((Enum)(ProfessionType)(ref profession)).CompareTo((object)a.Character.Profession);
-						int num6 = b.Character.Position.CompareTo(a.Character.Position);
-						return (num5 != 0) ? num5 : (num5 - num6);
-					});
-					break;
-				case SettingsModel.ESortOrder.Descending:
-					((FlowPanel)CharactersPanel).SortChildren<CharacterCard>((Comparison<CharacterCard>)delegate(CharacterCard a, CharacterCard b)
-					{
-						//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-						//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-						ProfessionType profession2 = a.Character.Profession;
-						int num7 = ((Enum)(ProfessionType)(ref profession2)).CompareTo((object)b.Character.Profession);
-						int num8 = a.Character.Position.CompareTo(b.Character.Position);
-						return (num7 != 0) ? num7 : (num7 - num8);
-					});
-					break;
-				}
-				break;
-			case SettingsModel.ESortType.Custom:
-			{
-				((FlowPanel)CharactersPanel).SortChildren<CharacterCard>((Comparison<CharacterCard>)((CharacterCard a, CharacterCard b) => a.Index.CompareTo(b.Index)));
-				int i = 0;
-				foreach (CharacterCard item in ((IEnumerable)((Container)CharactersPanel).get_Children()).Cast<CharacterCard>())
-				{
-					item.Index = i;
-					i++;
-				}
-				break;
+						int num = (asc ? getValue(a.Character).CompareTo(getValue(b.Character)) : getValue(b.Character).CompareTo(getValue(a.Character)));
+						int num2 = (asc ? a.Character.Position.CompareTo(b.Character.Position) : b.Character.Position.CompareTo(a.Character.Position));
+						if (num != 0)
+						{
+							return num;
+						}
+						return num - num2;
+					}
+					int num3 = (asc ? getString(a.Character).CompareTo(getString(b.Character)) : getString(b.Character).CompareTo(getString(a.Character)));
+					int num4 = (asc ? a.Character.Position.CompareTo(b.Character.Position) : b.Character.Position.CompareTo(a.Character.Position));
+					return (num3 != 0) ? num3 : (num3 - num4);
+				});
+				return;
 			}
-			case SettingsModel.ESortType.SortByTag:
-				break;
+			((FlowPanel)CharactersPanel).SortChildren<CharacterCard>((Comparison<CharacterCard>)((CharacterCard a, CharacterCard b) => a.Index.CompareTo(b.Index)));
+			int i = 0;
+			foreach (CharacterCard item in ((IEnumerable)((Container)CharactersPanel).get_Children()).Cast<CharacterCard>())
+			{
+				item.Index = i;
+				i++;
+			}
+			string getString(Character_Model c)
+			{
+				return Common.GetPropertyValueAsString(c, $"{_settings.SortType.get_Value()}");
+			}
+			int getValue(Character_Model c)
+			{
+				return Common.GetPropertyValue<int>(c, $"{_settings.SortType.get_Value()}");
 			}
 		}
 
@@ -624,8 +556,8 @@ namespace Kenedia.Modules.Characters.Views
 			if (_filterCharacters && gameTime.get_TotalGameTime().TotalMilliseconds - _filterTick > (double)_settings.FilterDelay.get_Value())
 			{
 				_filterTick = gameTime.get_TotalGameTime().TotalMilliseconds;
-				PerformFiltering(null);
 				_filterCharacters = false;
+				PerformFiltering();
 			}
 		}
 

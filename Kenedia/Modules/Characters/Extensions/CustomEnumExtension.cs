@@ -5,60 +5,80 @@ namespace Kenedia.Modules.Characters.Extensions
 {
 	public static class CustomEnumExtension
 	{
-		public static SettingsModel.ESortType GetSortType(this string s)
+		public static SettingsModel.SortBy GetSortType(this string s)
 		{
 			if (s == string.Format(strings.SortBy, strings.Name))
 			{
-				return SettingsModel.ESortType.SortByName;
+				return SettingsModel.SortBy.Name;
 			}
-			if (s == string.Format(strings.SortBy, strings.Tag))
+			if (s == string.Format(strings.SortBy, strings.Level))
 			{
-				return SettingsModel.ESortType.SortByTag;
+				return SettingsModel.SortBy.Level;
+			}
+			if (s == string.Format(strings.SortBy, strings.Race))
+			{
+				return SettingsModel.SortBy.Race;
+			}
+			if (s == string.Format(strings.SortBy, strings.Gender))
+			{
+				return SettingsModel.SortBy.Gender;
 			}
 			if (s == string.Format(strings.SortBy, strings.Profession))
 			{
-				return SettingsModel.ESortType.SortByProfession;
+				return SettingsModel.SortBy.Profession;
 			}
-			if (s == string.Format(strings.SortBy, strings.LastLogin))
+			if (s == string.Format(strings.SortBy, strings.Specialization))
 			{
-				return SettingsModel.ESortType.SortByLastLogin;
+				return SettingsModel.SortBy.Specialization;
+			}
+			if (s == string.Format(strings.SortBy, strings.TimeSinceLogin))
+			{
+				return SettingsModel.SortBy.TimeSinceLogin;
 			}
 			if (s == string.Format(strings.SortBy, strings.Map))
 			{
-				return SettingsModel.ESortType.SortByMap;
+				return SettingsModel.SortBy.Map;
 			}
-			return SettingsModel.ESortType.Custom;
+			if (s == string.Format(strings.SortBy, strings.Tag))
+			{
+				return SettingsModel.SortBy.Tag;
+			}
+			return SettingsModel.SortBy.Custom;
 		}
 
-		public static string GetSortType(this SettingsModel.ESortType st)
+		public static string GetSortType(this SettingsModel.SortBy st)
 		{
 			return st switch
 			{
-				SettingsModel.ESortType.SortByName => string.Format(strings.SortBy, strings.Name), 
-				SettingsModel.ESortType.SortByTag => string.Format(strings.SortBy, strings.Tag), 
-				SettingsModel.ESortType.SortByProfession => string.Format(strings.SortBy, strings.Profession), 
-				SettingsModel.ESortType.SortByLastLogin => string.Format(strings.SortBy, strings.LastLogin), 
-				SettingsModel.ESortType.SortByMap => string.Format(strings.SortBy, strings.Map), 
-				SettingsModel.ESortType.Custom => strings.Custom, 
+				SettingsModel.SortBy.Name => string.Format(strings.SortBy, strings.Name), 
+				SettingsModel.SortBy.Level => string.Format(strings.SortBy, strings.Level), 
+				SettingsModel.SortBy.Race => string.Format(strings.SortBy, strings.Race), 
+				SettingsModel.SortBy.Gender => string.Format(strings.SortBy, strings.Gender), 
+				SettingsModel.SortBy.Profession => string.Format(strings.SortBy, strings.Profession), 
+				SettingsModel.SortBy.Specialization => string.Format(strings.SortBy, strings.Specialization), 
+				SettingsModel.SortBy.TimeSinceLogin => string.Format(strings.SortBy, strings.TimeSinceLogin), 
+				SettingsModel.SortBy.Map => string.Format(strings.SortBy, strings.Map), 
+				SettingsModel.SortBy.Tag => string.Format(strings.SortBy, strings.Tag), 
+				SettingsModel.SortBy.Custom => strings.Custom, 
 				_ => strings.Custom, 
 			};
 		}
 
-		public static SettingsModel.ESortOrder GetSortOrder(this string s)
+		public static SettingsModel.SortDirection GetSortOrder(this string s)
 		{
 			if (!(s == strings.Descending))
 			{
-				return SettingsModel.ESortOrder.Ascending;
+				return SettingsModel.SortDirection.Ascending;
 			}
-			return SettingsModel.ESortOrder.Descending;
+			return SettingsModel.SortDirection.Descending;
 		}
 
-		public static string GetSortOrder(this SettingsModel.ESortOrder so)
+		public static string GetSortOrder(this SettingsModel.SortDirection so)
 		{
 			return so switch
 			{
-				SettingsModel.ESortOrder.Ascending => strings.Ascending, 
-				SettingsModel.ESortOrder.Descending => strings.Descending, 
+				SettingsModel.SortDirection.Ascending => strings.Ascending, 
+				SettingsModel.SortDirection.Descending => strings.Descending, 
 				_ => strings.Ascending, 
 			};
 		}

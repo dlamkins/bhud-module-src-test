@@ -17,19 +17,23 @@ namespace Kenedia.Modules.Characters.Services
 {
 	public class SettingsModel : BaseSettingsModel
 	{
-		public enum ESortOrder
+		public enum SortDirection
 		{
 			Ascending,
 			Descending
 		}
 
-		public enum ESortType
+		public enum SortBy
 		{
-			SortByName,
-			SortByTag,
-			SortByProfession,
-			SortByLastLogin,
-			SortByMap,
+			Name,
+			Level,
+			Tag,
+			Profession,
+			TimeSinceLogin,
+			Map,
+			Race,
+			Gender,
+			Specialization,
 			Custom
 		}
 
@@ -174,9 +178,9 @@ namespace Kenedia.Modules.Characters.Services
 
 		public SettingEntry<FilterBehavior> ResultFilterBehavior { get; set; }
 
-		public SettingEntry<ESortType> SortType { get; set; }
+		public SettingEntry<SortBy> SortType { get; set; }
 
-		public SettingEntry<ESortOrder> SortOrder { get; set; }
+		public SettingEntry<SortDirection> SortOrder { get; set; }
 
 		public SettingEntry<KeyBinding> LogoutKey { get; set; }
 
@@ -315,8 +319,8 @@ namespace Kenedia.Modules.Characters.Services
 			ShowDetailedTooltip = internalSettings.DefineSetting<bool>("ShowDetailedTooltip", true, (Func<string>)null, (Func<string>)null);
 			ResultMatchingBehavior = internalSettings.DefineSetting<MatchingBehavior>("ResultMatchingBehavior", MatchingBehavior.MatchAny, (Func<string>)null, (Func<string>)null);
 			ResultFilterBehavior = internalSettings.DefineSetting<FilterBehavior>("ResultFilterBehavior", FilterBehavior.Include, (Func<string>)null, (Func<string>)null);
-			SortType = internalSettings.DefineSetting<ESortType>("SortType", ESortType.SortByLastLogin, (Func<string>)null, (Func<string>)null);
-			SortOrder = internalSettings.DefineSetting<ESortOrder>("SortOrder", ESortOrder.Ascending, (Func<string>)null, (Func<string>)null);
+			SortType = internalSettings.DefineSetting<SortBy>("SortType", SortBy.TimeSinceLogin, (Func<string>)null, (Func<string>)null);
+			SortOrder = internalSettings.DefineSetting<SortDirection>("SortOrder", SortDirection.Ascending, (Func<string>)null, (Func<string>)null);
 			foreach (SettingEntry item in (Collection<SettingEntry>)(object)_appearanceSettings)
 			{
 				item.add_PropertyChanged((PropertyChangedEventHandler)OnAppearanceSettingChanged);

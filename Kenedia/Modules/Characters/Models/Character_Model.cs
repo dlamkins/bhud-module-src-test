@@ -7,10 +7,12 @@ using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using Blish_HUD;
 using Blish_HUD.Content;
+using Blish_HUD.Controls;
 using Blish_HUD.Gw2Mumble;
 using Gw2Sharp.Models;
 using Gw2Sharp.WebApi.V2.Models;
 using Kenedia.Modules.Characters.Enums;
+using Kenedia.Modules.Characters.Res;
 using Kenedia.Modules.Characters.Services;
 using Kenedia.Modules.Core.Extensions;
 using Microsoft.Xna.Framework.Graphics;
@@ -65,6 +67,20 @@ namespace Kenedia.Modules.Characters.Models
 		private bool _showOnRadial;
 
 		private bool _hadBirthday;
+
+		private bool _isCurrentCharacter;
+
+		public bool IsCurrentCharacter
+		{
+			get
+			{
+				return _isCurrentCharacter;
+			}
+			set
+			{
+				SetProperty(ref _isCurrentCharacter, value, "IsCurrentCharacter");
+			}
+		}
 
 		[DataMember]
 		public string Name
@@ -235,11 +251,11 @@ namespace Kenedia.Modules.Characters.Models
 		{
 			get
 			{
-				if (_data == null || _data.Maps[Map] == null)
+				if (_data == null || !_data.Maps.TryGetValue(Map, out var map))
 				{
 					return string.Empty;
 				}
-				return _data.Maps[Map].Name;
+				return map.Name;
 			}
 		}
 
@@ -247,12 +263,12 @@ namespace Kenedia.Modules.Characters.Models
 		{
 			get
 			{
-				//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-				if (_data == null)
+				//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+				if (_data == null || !_data.Races.TryGetValue(Race, out var race))
 				{
-					return "Data not loaded.";
+					return "Unkown Race";
 				}
-				return _data.Races[Race].Name;
+				return race.Name;
 			}
 		}
 
@@ -260,12 +276,12 @@ namespace Kenedia.Modules.Characters.Models
 		{
 			get
 			{
-				//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-				if (_data == null)
+				//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+				if (_data == null || !_data.Professions.TryGetValue(Profession, out var profession))
 				{
 					return "Data not loaded.";
 				}
-				return _data.Professions[Profession].Name;
+				return profession.Name;
 			}
 		}
 
@@ -273,25 +289,36 @@ namespace Kenedia.Modules.Characters.Models
 		{
 			get
 			{
-				if (_data == null || Specialization == SpecializationType.None || !Enum.IsDefined(typeof(SpecializationType), Specialization))
+				if (_data == null || Specialization == SpecializationType.None || !Enum.IsDefined(typeof(SpecializationType), Specialization) || !_data.Specializations.TryGetValue(Specialization, out var specialization))
 				{
 					return ProfessionName;
 				}
-				return _data.Specializations[Specialization].Name;
+				return specialization.Name;
 			}
 		}
 
-		public AsyncTexture2D ProfessionIcon => _data?.Professions[Profession].IconBig;
+		public AsyncTexture2D ProfessionIcon
+		{
+			get
+			{
+				//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+				if (_data == null || !_data.Professions.TryGetValue(Profession, out var profession))
+				{
+					return null;
+				}
+				return profession.IconBig;
+			}
+		}
 
 		public AsyncTexture2D SpecializationIcon
 		{
 			get
 			{
-				if (_data == null || Specialization == SpecializationType.None || !Enum.IsDefined(typeof(SpecializationType), Specialization))
+				if (_data == null || Specialization == SpecializationType.None || !Enum.IsDefined(typeof(SpecializationType), Specialization) || !_data.Specializations.TryGetValue(Specialization, out var specialization))
 				{
 					return ProfessionIcon;
 				}
-				return _data.Specializations[Specialization].IconBig;
+				return specialization.IconBig;
 			}
 		}
 
@@ -452,6 +479,8 @@ namespace Kenedia.Modules.Characters.Models
 			}
 		}
 
+		public int TimeSinceLogin => (int)DateTimeOffset.UtcNow.Subtract(LastLogin).TotalSeconds;
+
 		public event EventHandler Updated;
 
 		public event EventHandler Deleted;
@@ -565,10 +594,13 @@ namespace Kenedia.Modules.Characters.Models
 
 		public void AddTag(string tag, bool update = true)
 		{
-			Tags.Add(tag);
-			if (update)
+			if (!Tags.Contains(tag))
 			{
-				OnUpdated();
+				if (update)
+				{
+					OnUpdated();
+				}
+				Tags.Add(tag);
 			}
 		}
 
@@ -617,8 +649,15 @@ namespace Kenedia.Modules.Characters.Models
 
 		public void Swap(bool ignoreOCR = false)
 		{
-			Save();
-			_characterSwapping?.Start(this, ignoreOCR);
+			if (!GameService.Gw2Mumble.get_CurrentMap().IsPvpMap())
+			{
+				Save();
+				_characterSwapping?.Start(this, ignoreOCR);
+			}
+			else
+			{
+				ScreenNotification.ShowNotification(strings.Error_Competivive, (NotificationType)2, (Texture2D)null, 4);
+			}
 		}
 
 		public void UpdateCharacter(PlayerCharacter character = null)
@@ -641,15 +680,14 @@ namespace Kenedia.Modules.Characters.Models
 			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0128: Expected I4, but got Unknown
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0121: Expected I4, but got Unknown
 			_name = character.get_Name();
 			_level = character.get_Level();
 			_race = (RaceType)Enum.Parse(typeof(RaceType), character.get_Race());
 			_profession = (ProfessionType)Enum.Parse(typeof(ProfessionType), character.get_Profession());
-			_specialization = SpecializationType.None;
 			_created = character.get_Created();
 			_lastModified = character.get_LastModified().UtcDateTime;
 			_lastLogin = ((_lastLogin > character.get_LastModified().UtcDateTime) ? _lastLogin : character.get_LastModified().UtcDateTime);
