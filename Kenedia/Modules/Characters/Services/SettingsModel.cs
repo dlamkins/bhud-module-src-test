@@ -66,6 +66,10 @@ namespace Kenedia.Modules.Characters.Services
 
 		private readonly ObservableCollection<SettingEntry> _appearanceSettings = new ObservableCollection<SettingEntry>();
 
+		private readonly SettingCollection _settings;
+
+		public SettingCollection AccountSettings { get; private set; }
+
 		public SettingEntry<Dictionary<string, ShowCheckPair>> DisplayToggles { get; set; }
 
 		public SettingEntry<bool> PinSideMenus { get; set; }
@@ -230,30 +234,27 @@ namespace Kenedia.Modules.Characters.Services
 		{
 			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0038: Expected O, but got Unknown
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Expected O, but got Unknown
-			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0070: Expected O, but got Unknown
-			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008b: Expected O, but got Unknown
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a4: Expected O, but got Unknown
-			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00be: Expected O, but got Unknown
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d7: Expected O, but got Unknown
-			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0195: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0386: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_042a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0052: Expected O, but got Unknown
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006d: Expected O, but got Unknown
+			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0086: Expected O, but got Unknown
+			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Expected O, but got Unknown
+			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b9: Expected O, but got Unknown
+			//IL_0155: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0199: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0368: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_040c: Unknown result type (might be due to invalid IL or missing references)
 			SettingCollection internalSettings = settings.AddSubCollection("Internal", false, false);
 			Version = internalSettings.DefineSetting<Version>("Version", new Version("0.0.0", false), (Func<string>)null, (Func<string>)null);
-			ImportVersion = internalSettings.DefineSetting<Version>("ImportVersion", new Version("0.0.0", false), (Func<string>)null, (Func<string>)null);
 			LogoutKey = internalSettings.DefineSetting<KeyBinding>("LogoutKey", new KeyBinding((Keys)123), (Func<string>)null, (Func<string>)null);
 			ShortcutKey = internalSettings.DefineSetting<KeyBinding>("ShortcutKey", new KeyBinding((ModifierKeys)4, (Keys)67), (Func<string>)null, (Func<string>)null);
 			RadialKey = internalSettings.DefineSetting<KeyBinding>("RadialKey", new KeyBinding((Keys)0), (Func<string>)null, (Func<string>)null);
@@ -327,6 +328,7 @@ namespace Kenedia.Modules.Characters.Services
 			}
 			_appearanceSettings.add_ItemAdded((EventHandler<ItemEventArgs<SettingEntry>>)AppearanceSettings_ItemAdded);
 			_appearanceSettings.add_ItemRemoved((EventHandler<ItemEventArgs<SettingEntry>>)AppearanceSettings_ItemRemoved);
+			_settings = settings;
 		}
 
 		protected override void OnDispose()
@@ -353,6 +355,14 @@ namespace Kenedia.Modules.Characters.Services
 		private void OnAppearanceSettingChanged(object sender, PropertyChangedEventArgs e)
 		{
 			this.AppearanceSettingChanged?.Invoke(sender, e);
+		}
+
+		public void LoadAccountSettings(string accountName)
+		{
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Expected O, but got Unknown
+			AccountSettings = _settings.AddSubCollection(accountName, false, false);
+			ImportVersion = AccountSettings.DefineSetting<Version>("ImportVersion", new Version("0.0.0", false), (Func<string>)null, (Func<string>)null);
 		}
 	}
 }

@@ -135,6 +135,7 @@ namespace Kenedia.Modules.Characters
 		public void UpdateFolderPaths(string accountName, bool api_handled = true)
 		{
 			base.Paths.AccountName = accountName;
+			base.Settings.LoadAccountSettings(accountName);
 			string b = base.Paths.ModulePath;
 			AccountPath = b + accountName;
 			CharactersPath = b + accountName + "\\characters.json";
@@ -282,7 +283,7 @@ namespace Kenedia.Modules.Characters
 				if (File.Exists(p))
 				{
 					BaseModule<Characters, MainWindow, SettingsModel>.Logger.Info($"This is the first start of {((Module)this).get_Name()} since import version {OldCharacterModel.ImportVersion}. Importing old data from {p}!");
-					OldCharacterModel.Import(p, CharacterModels, AccountImagesPath, base.Paths.AccountName, BaseModule<Characters, MainWindow, SettingsModel>.Logger);
+					OldCharacterModel.Import(p, CharacterModels, AccountImagesPath, base.Paths.AccountName, BaseModule<Characters, MainWindow, SettingsModel>.Logger, Tags);
 				}
 				base.Settings.ImportVersion.set_Value(OldCharacterModel.ImportVersion);
 			}
