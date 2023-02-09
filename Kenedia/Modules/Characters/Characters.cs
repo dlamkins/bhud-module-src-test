@@ -600,7 +600,7 @@ namespace Kenedia.Modules.Characters
 			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
 			//IL_021e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0239: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ff: Unknown result type (might be due to invalid IL or missing references)
 			base.LoadGUI();
 			RadialMenu radialMenu = new RadialMenu(base.Settings, CharacterModels, (Container)(object)GameService.Graphics.get_SpriteScreen(), () => CurrentCharacterModel, Data, TextureManager);
 			((Control)radialMenu).set_Visible(false);
@@ -632,7 +632,7 @@ namespace Kenedia.Modules.Characters
 			}, async delegate
 			{
 				await GW2APIHandler.CheckAPI();
-			}, AccountImagesPath, Tags, () => CurrentCharacterModel, Data, CharacterSorting);
+			}, () => AccountImagesPath, Tags, () => CurrentCharacterModel, Data, CharacterSorting);
 			((Control)mainWindow).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((WindowBase2)mainWindow).set_Title("❤");
 			((WindowBase2)mainWindow).set_Subtitle("❤");
@@ -661,6 +661,7 @@ namespace Kenedia.Modules.Characters
 			});
 			base.MainWindow.SideMenu.TogglesTab = _toggles;
 			base.MainWindow.SideMenu.SwitchTab(_toggles);
+			base.MainWindow?.CreateCharacterControls(CharacterModels);
 			PotraitCapture.OnImageCaptured = delegate
 			{
 				base.MainWindow.CharacterEdit.LoadImages(null, null);

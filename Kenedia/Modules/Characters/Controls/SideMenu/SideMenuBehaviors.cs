@@ -26,6 +26,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			new KeyValuePair<string, DisplayCheckToggle>("Map", null),
 			new KeyValuePair<string, DisplayCheckToggle>("CraftingProfession", null),
 			new KeyValuePair<string, DisplayCheckToggle>("OnlyMaxCrafting", null),
+			new KeyValuePair<string, DisplayCheckToggle>("CustomIndex", null),
 			new KeyValuePair<string, DisplayCheckToggle>("Tags", null)
 		};
 
@@ -51,12 +52,12 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 
 		public SideMenuBehaviors(ResourceManager resourceManager, TextureManager textureManager, SettingsModel settings, Action onSortChanged)
 		{
-			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0219: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0223: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0124: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0259: Unknown result type (might be due to invalid IL or missing references)
 			_resourceManager = resourceManager;
 			_settings = settings;
 			_onSortChanged = onSortChanged;
@@ -69,6 +70,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			((Control)this).set_Location(new Point(0, 25));
 			Dropdown dropdown = new Dropdown();
 			((Control)dropdown).set_Parent((Container)(object)this);
+			dropdown.SetLocalizedTooltip = () => strings.CustomOrderDisclaimer;
 			_orderDropdown = dropdown;
 			((Dropdown)_orderDropdown).add_ValueChanged((EventHandler<ValueChangedEventArgs>)OrderDropdown_ValueChanged);
 			Dropdown dropdown2 = new Dropdown();

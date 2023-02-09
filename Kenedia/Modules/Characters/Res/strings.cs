@@ -154,6 +154,10 @@ namespace Kenedia.Modules.Characters.Res
 
 		internal static string Custom => ResourceManager.GetString("Custom", resourceCulture);
 
+		internal static string CustomIndex => ResourceManager.GetString("CustomIndex", resourceCulture);
+
+		internal static string CustomOrderDisclaimer => ResourceManager.GetString("CustomOrderDisclaimer", resourceCulture);
+
 		internal static string CustomTags => ResourceManager.GetString("CustomTags", resourceCulture);
 
 		internal static string Days => ResourceManager.GetString("Days", resourceCulture);
@@ -455,6 +459,8 @@ namespace Kenedia.Modules.Characters.Res
 		internal static string SearchGuide => ResourceManager.GetString("SearchGuide", resourceCulture);
 
 		internal static string SelectImage => ResourceManager.GetString("SelectImage", resourceCulture);
+
+		internal static string SetSpecializationIcon => ResourceManager.GetString("SetSpecializationIcon", resourceCulture);
 
 		internal static string Settings => ResourceManager.GetString("Settings", resourceCulture);
 

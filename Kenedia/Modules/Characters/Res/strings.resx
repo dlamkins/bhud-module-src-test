@@ -109,6 +109,7 @@
   <data name="ExcludeMatches"><value>Exclude matches</value></data>
   <data name="Switch"><value>Switch to {0}</value></data>
   <data name="OCRAndImageRecognition"><value>OCR and Image Recoginition</value></data>
+  <data name="CustomOrderDisclaimer"><value>To move a character to set a custom order you have to CTRL + Drag and Drop them on their new position</value></data>
   <data name="Scribe"><value>Scribe</value></data>
   <data name="Search"><value>Search ...</value></data>
   <data name="SortBy"><value>Sort by {0}</value></data>
@@ -268,6 +269,7 @@ Uu : Üü Ûû Ùù</value></data>
   <data name="ShowLastButton_Tooltip"><value>Show a button which will ignore OCR and log the very last character in your character screen in</value></data>
   <data name="Radial_UseProfessionColor_Tooltip"><value>Use the profession color as the background for the character section in the radial menu</value></data>
   <data name="ShowHidden_Tooltip"><value>Show Hidden Characters</value></data>
+  <data name="CustomIndex"><value>Custom Index</value></data>
   <data name="Status_Done"><value>Done!</value></data>
   <data name="FadeOut"><value>Fade side menu</value></data>
   <data name="CardWidth_Tooltip"><value>Sets the character card width always to {0} px</value></data>
@@ -288,6 +290,7 @@ Uu : Üü Ûû Ùù</value></data>
   <data name="FixCharacters_Tooltip"><value>Perform a OCR through all your characters to update their current order to match the character selection</value></data>
   <data name="DoubleClickToEnter_Tooltip"><value>Enables double clicking the character in the character list to login to that character</value></data>
   <data name="UseBetaGameState"><value>Use Gamestate Detection</value></data>
+  <data name="SetSpecializationIcon"><value>Use the specialization/profession icon as icon (default)</value></data>
   <data name="AutoFix_Tooltip"><value>When failing to swap to a character automatically go through the characters to fix their order.</value></data>
   <data name="PotraitFrame"><value>Potrait Frame</value></data>
   <data name="LogoutDescription"><value>Key to Press to open the logout menu. Must be the same as the game keybind for 'Logout'!</value></data>

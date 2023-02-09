@@ -22,6 +22,8 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private Rectangle _textRectangle = Rectangle.get_Empty();
 
+		public bool CaptureInput { get; set; }
+
 		public string Text
 		{
 			get
@@ -95,6 +97,16 @@ namespace Kenedia.Modules.Characters.Controls
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(texture), _iconRectangle, (Rectangle?)((TextureRectangle == Rectangle.get_Empty()) ? texture.get_Bounds() : TextureRectangle), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
 			}
 			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, Text, Font, _textRectangle, TextColor, false, (HorizontalAlignment)0, (VerticalAlignment)1);
+		}
+
+		protected override CaptureType CapturesInput()
+		{
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			if (!CaptureInput)
+			{
+				return (CaptureType)0;
+			}
+			return ((Control)this).CapturesInput();
 		}
 
 		private void UpdateLayout()

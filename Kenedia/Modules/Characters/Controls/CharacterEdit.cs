@@ -54,8 +54,6 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private readonly FlowPanel _imagePanel;
 
-		private readonly string _accountPath;
-
 		private readonly TagList _allTags;
 
 		private readonly SettingsModel _settings;
@@ -63,6 +61,10 @@ namespace Kenedia.Modules.Characters.Controls
 		private readonly Action _refreshCharacters;
 
 		private Character_Model _character;
+
+		private ImageButton _noImgButton;
+
+		public Func<string> AccountImagePath { get; set; }
 
 		public Character_Model Character
 		{
@@ -77,7 +79,7 @@ namespace Kenedia.Modules.Characters.Controls
 			}
 		}
 
-		public CharacterEdit(TextureManager tM, Action togglePotrait, string accountPath, TagList allTags, SettingsModel settings, Action refreshCharacters)
+		public CharacterEdit(TextureManager tM, Action togglePotrait, Func<string> accountPath, TagList allTags, SettingsModel settings, Action refreshCharacters)
 		{
 			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
@@ -112,7 +114,7 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_0761: Unknown result type (might be due to invalid IL or missing references)
 			//IL_079b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_07b7: Unknown result type (might be due to invalid IL or missing references)
-			_accountPath = accountPath;
+			AccountImagePath = accountPath;
 			_allTags = allTags;
 			_settings = settings;
 			_refreshCharacters = refreshCharacters;
@@ -230,11 +232,15 @@ namespace Kenedia.Modules.Characters.Controls
 			((StandardButton)button2).set_ResizeIcon(true);
 			button2.ClickAction = delegate
 			{
-				Process.Start(new ProcessStartInfo
+				string text = AccountImagePath?.Invoke();
+				if (!string.IsNullOrEmpty(text))
 				{
-					Arguments = _accountPath,
-					FileName = "explorer.exe"
-				});
+					Process.Start(new ProcessStartInfo
+					{
+						Arguments = text,
+						FileName = "explorer.exe"
+					});
+				}
 			};
 			_openFolder = button2;
 			Panel panel2 = new Panel();
@@ -327,14 +333,7 @@ namespace Kenedia.Modules.Characters.Controls
 				}
 				foreach (string tag in addTags)
 				{
-					List<Tag> tags = _tags;
-					Tag tag3 = new Tag();
-					((Control)tag3).set_Parent((Container)(object)_tagPanel);
-					tag3.Text = tag;
-					tag3.Active = true;
-					tag3.ShowDelete = false;
-					tag3.CanInteract = false;
-					tags.Add(tag3);
+					AddTag(tag, Character != null && Character.Tags.Contains(tag));
 				}
 			}
 			_tagPanel.FitWidestTag(355);
@@ -356,11 +355,15 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public void LoadImages(object sender, EventArgs e)
 		{
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-			string path = _accountPath;
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
+			string path = AccountImagePath?.Invoke();
+			if (string.IsNullOrEmpty(path))
+			{
+				return;
+			}
 			List<string> images = new List<string>(Directory.GetFiles(path, "*.png", SearchOption.AllDirectories));
 			_settings.PanelSize.get_Value();
 			int imageSize = 80;
@@ -370,28 +373,31 @@ namespace Kenedia.Modules.Characters.Controls
 			((Container)_imagePanel).get_Children().Clear();
 			GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate(GraphicsDevice graphicsDevice)
 			{
-				//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-				//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
-				//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
-				//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0205: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0216: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0220: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+				//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_01eb: Unknown result type (might be due to invalid IL or missing references)
+				//IL_01fc: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0228: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0239: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0243: Unknown result type (might be due to invalid IL or missing references)
 				AsyncTexture2D val = null;
 				if (((Control)this).get_Visible() && Character != null)
 				{
 					val = Character.SpecializationIcon;
+					CharacterEdit characterEdit = this;
 					ImageButton imageButton = new ImageButton();
 					((Control)imageButton).set_Parent((Container)(object)_imagePanel);
 					((Control)imageButton).set_Size(new Point(imageSize));
 					imageButton.Texture = val;
+					imageButton.SetLocalizedTooltip = () => strings.SetSpecializationIcon;
 					imageButton.ClickAction = delegate
 					{
 						Character.IconPath = null;
 						Character.Icon = null;
 						ApplyCharacter();
 					};
+					characterEdit._noImgButton = imageButton;
 					foreach (string p in images)
 					{
 						AsyncTexture2D texture = AsyncTexture2D.op_Implicit(TextureUtil.FromStreamPremultiplied(graphicsDevice, (Stream)new FileStream(p, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)));
@@ -475,6 +481,10 @@ namespace Kenedia.Modules.Characters.Controls
 			{
 				t.SetActive(_character.Tags.Contains(t.Text));
 			}
+			if (_noImgButton != null)
+			{
+				_noImgButton.Texture = Character.SpecializationIcon;
+			}
 		}
 
 		private Tag AddTag(string txt, bool active = false)
@@ -487,9 +497,11 @@ namespace Kenedia.Modules.Characters.Controls
 			obj.Active = active;
 			obj.CanInteract = true;
 			obj.ShowDelete = false;
-			obj.ActiveChanged += Tag_ActiveChanged;
+			Tag tag = obj;
+			tag.ActiveChanged += Tag_ActiveChanged;
 			_tagPanel.FitWidestTag(355);
-			return obj;
+			_tags.Add(tag);
+			return tag;
 		}
 
 		private void Tag_ActiveChanged(object sender, EventArgs e)

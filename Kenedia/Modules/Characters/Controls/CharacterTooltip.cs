@@ -38,6 +38,8 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private readonly IconLabel _lastLoginLabel;
 
+		private readonly Label _disclaimerLabel;
+
 		private readonly TagFlowPanel _tagPanel;
 
 		private readonly CraftingControl _craftingControl;

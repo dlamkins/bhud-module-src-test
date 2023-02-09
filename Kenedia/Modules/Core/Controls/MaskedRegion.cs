@@ -9,6 +9,8 @@ namespace Kenedia.Modules.Core.Controls
 	{
 		private readonly SpriteBatchParameters _batchParameters;
 
+		public bool CaptureInput { get; set; }
+
 		public MaskedRegion()
 			: this()
 		{
@@ -17,6 +19,16 @@ namespace Kenedia.Modules.Core.Controls
 			((Control)this).set_ZIndex(int.MaxValue);
 			_batchParameters = ((Control)this).get_SpriteBatchParameters();
 			((Control)this).set_SpriteBatchParameters(new SpriteBatchParameters((SpriteSortMode)0, BlendState.Opaque, (SamplerState)null, (DepthStencilState)null, (RasterizerState)null, (Effect)null, (Matrix?)null));
+		}
+
+		protected override CaptureType CapturesInput()
+		{
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			if (!CaptureInput)
+			{
+				return (CaptureType)0;
+			}
+			return ((Control)this).CapturesInput();
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)

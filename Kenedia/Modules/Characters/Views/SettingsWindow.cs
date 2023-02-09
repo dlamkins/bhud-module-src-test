@@ -582,7 +582,7 @@ namespace Kenedia.Modules.Characters.Views
 			((Panel)panel).set_CanCollapse(true);
 			panel.SetLocalizedTitle = () => strings.ModuleBehavior;
 			panel.SetLocalizedTitleTooltip = () => strings.ModuleBehavior_Tooltip;
-			panel.TitleIcon = AsyncTexture2D.FromAssetId(157094);
+			panel.TitleIcon = AsyncTexture2D.FromAssetId(60968);
 			Panel p = panel;
 			FlowPanel flowPanel = new FlowPanel();
 			((Control)flowPanel).set_Parent((Container)(object)p);

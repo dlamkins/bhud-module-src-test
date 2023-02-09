@@ -75,6 +75,8 @@ namespace Kenedia.Modules.Characters.Views
 
 		private BitmapFont _titleFont;
 
+		private List<Character_Model> loadedModels = new List<Character_Model>();
+
 		public SettingsWindow SettingsWindow { get; set; }
 
 		public SideMenu SideMenu { get; }
@@ -86,39 +88,34 @@ namespace Kenedia.Modules.Characters.Views
 
 		public CharacterEdit CharacterEdit { get; set; }
 
-		public DraggingControl DraggingControl { get; set; }
+		public DraggingControl DraggingControl { get; set; } = new DraggingControl();
+
 
 		public FlowPanel CharactersPanel { get; private set; }
 
 		public FlowPanel ContentPanel { get; private set; }
 
-		public MainWindow(Texture2D background, Rectangle windowRegion, Rectangle contentRegion, SettingsModel settings, TextureManager textureManager, ObservableCollection<Character_Model> characterModels, SearchFilterCollection searchFilters, SearchFilterCollection tagFilters, Action toggleOCR, Action togglePotrait, Action refreshAPI, string accountImagePath, TagList tags, Func<Character_Model> currentCharacter, Data data, CharacterSorting characterSorting)
+		public MainWindow(Texture2D background, Rectangle windowRegion, Rectangle contentRegion, SettingsModel settings, TextureManager textureManager, ObservableCollection<Character_Model> characterModels, SearchFilterCollection searchFilters, SearchFilterCollection tagFilters, Action toggleOCR, Action togglePotrait, Action refreshAPI, Func<string> accountImagePath, TagList tags, Func<Character_Model> currentCharacter, Data data, CharacterSorting characterSorting)
+			: base(AsyncTexture2D.op_Implicit(background), windowRegion, contentRegion)
 		{
-			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0314: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0361: Unknown result type (might be due to invalid IL or missing references)
-			//IL_036c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_037c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0410: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_053e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0549: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0559: Unknown result type (might be due to invalid IL or missing references)
-			DraggingControl draggingControl = new DraggingControl();
-			((Control)draggingControl).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)draggingControl).set_Visible(false);
-			((Control)draggingControl).set_ZIndex(2147483646);
-			((Control)draggingControl).set_Enabled(false);
-			DraggingControl = draggingControl;
-			base._002Ector(AsyncTexture2D.op_Implicit(background), windowRegion, contentRegion);
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0167: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0191: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0343: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0520: Unknown result type (might be due to invalid IL or missing references)
+			//IL_052b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_053b: Unknown result type (might be due to invalid IL or missing references)
 			MainWindow mainWindow = this;
 			_settings = settings;
 			_textureManager = textureManager;
@@ -268,7 +265,6 @@ namespace Kenedia.Modules.Characters.Views
 			SideMenu = sideMenu;
 			AttachContainer(CharacterEdit);
 			AttachContainer(SideMenu);
-			CreateCharacterControls(_characterModels);
 			_created = true;
 			_settings.PinSideMenus.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)PinSideMenus_SettingChanged);
 			_settings.ShowRandomButton.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowRandomButton_SettingChanged);
@@ -337,7 +333,7 @@ namespace Kenedia.Modules.Characters.Views
 			List<Match> strings = regex.Matches(((TextInputBase)_filterBox).get_Text().Trim().ToLower()).Cast<Match>().ToList();
 			new List<string>();
 			List<KeyValuePair<string, SearchFilter<Character_Model>>> stringFilters = new List<KeyValuePair<string, SearchFilter<Character_Model>>>();
-			_003C_003Ec__DisplayClass61_0 CS_0024_003C_003E8__locals0;
+			_003C_003Ec__DisplayClass62_0 CS_0024_003C_003E8__locals0;
 			foreach (Match match in strings)
 			{
 				string string_text = SearchableString(match.ToString().Replace("\"", ""));
@@ -371,7 +367,7 @@ namespace Kenedia.Modules.Characters.Views
 					{
 						//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 						//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-						_003C_003Ec__DisplayClass61_0 _003C_003Ec__DisplayClass61_ = CS_0024_003C_003E8__locals0;
+						_003C_003Ec__DisplayClass62_0 _003C_003Ec__DisplayClass62_ = CS_0024_003C_003E8__locals0;
 						Gender gender = c.Gender;
 						return SearchableString(((object)(Gender)(ref gender)).ToString()).Contains(string_text);
 					}, enabled: true)));
@@ -489,20 +485,22 @@ namespace Kenedia.Modules.Characters.Views
 
 		public void CreateCharacterControls(IEnumerable<Character_Model> models)
 		{
-			foreach (Character_Model c in models)
+			if (SideMenu.Tabs.Count <= 1)
 			{
-				if (CharacterCards.Find((CharacterCard e) => e.Character.Name == c.Name) == null)
-				{
-					List<CharacterCard> characterCards = CharacterCards;
-					CharacterCard obj = new CharacterCard(_currentCharacter, _textureManager, _data, this, _settings)
-					{
-						Character = c
-					};
-					((Control)obj).set_Parent((Container)(object)CharactersPanel);
-					obj.AttachedCards = CharacterCards;
-					characterCards.Add(obj);
-				}
+				return;
 			}
+			foreach (Character_Model c in models.Except(loadedModels))
+			{
+				List<CharacterCard> characterCards = CharacterCards;
+				CharacterCard obj = new CharacterCard(_currentCharacter, _textureManager, _data, this, _settings)
+				{
+					Character = c
+				};
+				((Control)obj).set_Parent((Container)(object)CharactersPanel);
+				obj.AttachedCards = CharacterCards;
+				characterCards.Add(obj);
+			}
+			loadedModels = new List<Character_Model>(models);
 			FilterCharacters();
 			CharacterCards.FirstOrDefault()?.UniformWithAttached();
 		}
@@ -530,14 +528,10 @@ namespace Kenedia.Modules.Characters.Views
 					int num4 = (asc ? a.Character.Position.CompareTo(b.Character.Position) : b.Character.Position.CompareTo(a.Character.Position));
 					return (num3 != 0) ? num3 : (num3 - num4);
 				});
-				return;
 			}
-			((FlowPanel)CharactersPanel).SortChildren<CharacterCard>((Comparison<CharacterCard>)((CharacterCard a, CharacterCard b) => a.Index.CompareTo(b.Index)));
-			int i = 0;
-			foreach (CharacterCard item in ((IEnumerable)((Container)CharactersPanel).get_Children()).Cast<CharacterCard>())
+			else
 			{
-				item.Index = i;
-				i++;
+				((FlowPanel)CharactersPanel).SortChildren<CharacterCard>((Comparison<CharacterCard>)((CharacterCard a, CharacterCard b) => a.Index.CompareTo(b.Index)));
 			}
 			string getString(Character_Model c)
 			{
@@ -750,64 +744,39 @@ namespace Kenedia.Modules.Characters.Views
 		private void DraggingControl_LeftMouseButtonReleased(object sender, MouseEventArgs e)
 		{
 			SetNewIndex(DraggingControl.CharacterControl);
-			DraggingControl.CharacterControl = null;
+			DraggingControl.EndDragging();
 		}
 
 		private void SetNewIndex(CharacterCard characterControl)
 		{
-			characterControl.Index = GetHoveredIndex(characterControl);
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			MouseHandler i = Control.get_Input().get_Mouse();
+			IEnumerable<CharacterCard> enumerable = ((IEnumerable)((Container)CharactersPanel).get_Children()).Cast<CharacterCard>();
+			int newIndex = -1;
+			int index = 0;
+			foreach (CharacterCard c in enumerable)
+			{
+				Rectangle absoluteBounds = ((Control)c).get_AbsoluteBounds();
+				if (((Rectangle)(ref absoluteBounds)).Contains(i.get_Position()) && newIndex == -1)
+				{
+					characterControl.Index = c.Index;
+					characterControl.Character.Index = c.Index;
+					newIndex = c.Index;
+				}
+				if (newIndex == index)
+				{
+					index++;
+				}
+				if (c != characterControl)
+				{
+					c.Character.SetIndex(index);
+					c.Index = index;
+					index++;
+				}
+			}
 			SortCharacters();
-		}
-
-		private double GetHoveredIndex(CharacterCard characterControl)
-		{
-			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-			MouseHandler j = Control.get_Input().get_Mouse();
-			CharacterCard lastControl = characterControl;
-			int i = 0;
-			foreach (CharacterCard item in ((IEnumerable)((Container)CharactersPanel).get_Children()).Cast<CharacterCard>())
-			{
-				item.Index = i;
-				i++;
-			}
-			Rectangle absoluteBounds;
-			foreach (CharacterCard c in ((IEnumerable)((Container)CharactersPanel).get_Children()).Cast<CharacterCard>())
-			{
-				absoluteBounds = ((Control)c).get_AbsoluteBounds();
-				if (((Rectangle)(ref absoluteBounds)).Contains(j.get_Position()))
-				{
-					return (characterControl.Index > c.Index) ? (c.Index - 0.1) : (c.Index + 0.1);
-				}
-				lastControl = c;
-			}
-			absoluteBounds = ((Control)lastControl).get_AbsoluteBounds();
-			if (((Rectangle)(ref absoluteBounds)).get_Bottom() >= j.get_Position().Y)
-			{
-				absoluteBounds = ((Control)lastControl).get_AbsoluteBounds();
-				if (((Rectangle)(ref absoluteBounds)).get_Top() < j.get_Position().Y)
-				{
-					absoluteBounds = ((Control)lastControl).get_AbsoluteBounds();
-					if (((Rectangle)(ref absoluteBounds)).get_Right() < j.get_Position().X)
-					{
-						goto IL_0130;
-					}
-				}
-				return characterControl.Index;
-			}
-			goto IL_0130;
-			IL_0130:
-			return CharacterCards.Count + 1;
 		}
 	}
 }

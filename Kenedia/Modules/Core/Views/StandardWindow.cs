@@ -11,6 +11,8 @@ namespace Kenedia.Modules.Core.Views
 	{
 		private readonly List<AnchoredContainer> _attachedContainers = new List<AnchoredContainer>();
 
+		public bool IsActive => WindowBase2.get_ActiveWindow() == this;
+
 		public StandardWindow(AsyncTexture2D background, Rectangle windowRegion, Rectangle contentRegion)
 			: this(background, windowRegion, contentRegion)
 		{
