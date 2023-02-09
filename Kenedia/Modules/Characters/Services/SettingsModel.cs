@@ -116,13 +116,13 @@ namespace Kenedia.Modules.Characters.Services
 				//IL_0005: Unknown result type (might be due to invalid IL or missing references)
 				//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-				//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+				//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0049: Unknown result type (might be due to invalid IL or missing references)
 				Point res = GameService.Graphics.get_Resolution();
 				Dictionary<string, Rectangle> regions = OCRRegions.get_Value();
 				if (!regions.ContainsKey(OCRKey))
 				{
-					return new Rectangle(50, (int)((double)res.Y * 0.8413), 530, 50);
+					return new Rectangle(50, (res.Y - 350) / 2, 530, 50);
 				}
 				return regions[OCRKey];
 			}

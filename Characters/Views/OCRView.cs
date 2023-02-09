@@ -118,11 +118,11 @@ namespace Characters.Views
 			//IL_0c12: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0c16: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0c21: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c3f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c99: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c9e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ca2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0cc8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c40: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c9a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c9f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ca3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cc9: Unknown result type (might be due to invalid IL or missing references)
 			_settings = settings;
 			_ocr = ocr;
 			base.BorderColor = Color.get_Black();
@@ -390,7 +390,7 @@ namespace Characters.Views
 			((Control)resizeableContainer).set_Size(((Rectangle)(ref activeOCRRegion)).get_Size());
 			resizeableContainer.BorderColor = Colors.ColonialWhite;
 			resizeableContainer.ShowResizeOnlyOnMouseOver = true;
-			resizeableContainer.MaxSize = new Point(500, 50);
+			resizeableContainer.MaxSize = new Point(((Control)this).get_Width(), 100);
 			resizeableContainer.BorderWidth = new RectangleDimensions(2);
 			((Control)resizeableContainer).set_ZIndex(2147483646);
 			_ocrRegionContainer = resizeableContainer;
@@ -399,6 +399,7 @@ namespace Characters.Views
 			activeOCRRegion = _settings.ActiveOCRRegion;
 			((Rectangle)(ref activeOCRRegion)).get_Size();
 			((Control)this).set_Location(new Point(((Control)_ocrRegionContainer).get_Left(), ((Control)_ocrRegionContainer).get_Top() - ((Control)this).get_Height() - 5));
+			ForceOnScreen();
 		}
 
 		public void EnableMaskedRegion()
@@ -464,17 +465,18 @@ namespace Characters.Views
 
 		public void ToggleContainer()
 		{
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
 			bool visible = ((Control)(object)this).ToggleVisibility();
+			ForceOnScreen();
 			((Control)(object)_ocrRegionContainer)?.ToggleVisibility(visible);
 			((Control)(object)_maskedRegion)?.ToggleVisibility(visible);
 			if (((Control)_ocrRegionContainer).get_Visible())
@@ -496,6 +498,7 @@ namespace Characters.Views
 			{
 				return;
 			}
+			ForceOnScreen();
 			MaskedRegion maskedRegion = _maskedRegion;
 			Rectangle val = ((Control)_ocrRegionContainer).get_AbsoluteBounds();
 			((Control)maskedRegion).set_Visible(!((Rectangle)(ref val)).Contains(Control.get_Input().get_Mouse().get_Position()));
@@ -574,6 +577,27 @@ namespace Characters.Views
 			if (maskedRegion != null)
 			{
 				((Control)maskedRegion).Dispose();
+			}
+		}
+
+		private void ForceOnScreen()
+		{
+			Screen screen = Control.get_Graphics().get_SpriteScreen();
+			if (((Control)_ocrRegionContainer).get_Bottom() > ((Control)screen).get_Bottom())
+			{
+				((Control)_ocrRegionContainer).set_Bottom(((Control)screen).get_Bottom());
+			}
+			if (((Control)_ocrRegionContainer).get_Top() < ((Control)screen).get_Top() + ((Control)this).get_Height())
+			{
+				((Control)_ocrRegionContainer).set_Top(((Control)screen).get_Top() + ((Control)this).get_Height());
+			}
+			if (((Control)_ocrRegionContainer).get_Left() < ((Control)screen).get_Left())
+			{
+				((Control)_ocrRegionContainer).set_Left(((Control)screen).get_Left());
+			}
+			if (((Control)this).get_Right() > ((Control)screen).get_Right())
+			{
+				((Control)_ocrRegionContainer).set_Left(((Control)screen).get_Right() - ((Control)this).get_Width());
 			}
 		}
 	}
