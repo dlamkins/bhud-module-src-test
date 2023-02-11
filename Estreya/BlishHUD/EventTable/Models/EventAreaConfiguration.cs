@@ -30,5 +30,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 		public SettingEntry<int> EventHeight { get; set; }
 
 		public SettingEntry<List<string>> EventOrder { get; set; }
+
+		public SettingEntry<float> EventOpacity { get; set; }
 	}
 }

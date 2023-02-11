@@ -27,11 +27,13 @@ namespace Estreya.BlishHUD.EventTable
 
 		public SettingEntry<List<string>> EventAreaNames { get; private set; }
 
-		public SettingEntry<bool> RemindersEnabled { get; set; }
+		public SettingEntry<bool> RemindersEnabled { get; private set; }
 
-		public EventReminderPositition ReminderPosition { get; set; }
+		public EventReminderPositition ReminderPosition { get; private set; }
 
-		public SettingEntry<float> ReminderDuration { get; set; }
+		public SettingEntry<float> ReminderDuration { get; private set; }
+
+		public SettingEntry<float> ReminderOpacity { get; private set; }
 
 		public SettingEntry<List<string>> ReminderDisabledForEvents { get; set; }
 
@@ -67,6 +69,8 @@ namespace Estreya.BlishHUD.EventTable
 			ReminderDuration = base.GlobalSettings.DefineSetting<float>("ReminderDuration", 5f, (Func<string>)(() => "Reminder Duration"), (Func<string>)(() => $"Defines the reminder duration. Min: {reminderDurationMin}s - Max: {reminderDurationMax}s"));
 			SettingComplianceExtensions.SetRange(ReminderDuration, (float)reminderDurationMin, (float)reminderDurationMax);
 			ReminderDisabledForEvents = base.GlobalSettings.DefineSetting<List<string>>("ReminderDisabledForEvents", new List<string>(), (Func<string>)(() => "Reminder disabled for Events"), (Func<string>)(() => "Defines the events for which NO reminder should be displayed."));
+			ReminderOpacity = base.GlobalSettings.DefineSetting<float>("ReminderOpacity", 0.5f, (Func<string>)(() => "Reminder Opacity"), (Func<string>)(() => "Defines the background opacity for reminders."));
+			SettingComplianceExtensions.SetRange(ReminderOpacity, 0.1f, 1f);
 		}
 
 		public void CheckDrawerSizeAndPosition(EventAreaConfiguration configuration)
@@ -79,16 +83,20 @@ namespace Estreya.BlishHUD.EventTable
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 			int maxResX = (int)((float)GameService.Graphics.get_Resolution().X / GameService.Graphics.get_UIScaleMultiplier());
-			int maxResY = (int)((float)GameService.Graphics.get_Resolution().Y / GameService.Graphics.get_UIScaleMultiplier());
+			int num = (int)((float)GameService.Graphics.get_Resolution().Y / GameService.Graphics.get_UIScaleMultiplier());
+			int minLocationX = 0;
+			int maxLocationX = maxResX - 350;
+			int minLocationY = 0;
+			int maxLocationY = num - 96;
 			EventReminderPositition reminderPosition = ReminderPosition;
 			if (reminderPosition != null)
 			{
-				SettingComplianceExtensions.SetRange(reminderPosition.X, 0, maxResX);
+				SettingComplianceExtensions.SetRange(reminderPosition.X, minLocationX, maxLocationX);
 			}
 			EventReminderPositition reminderPosition2 = ReminderPosition;
 			if (reminderPosition2 != null)
 			{
-				SettingComplianceExtensions.SetRange(reminderPosition2.Y, 0, maxResY);
+				SettingComplianceExtensions.SetRange(reminderPosition2.Y, minLocationY, maxLocationY);
 			}
 		}
 
@@ -98,6 +106,7 @@ namespace Estreya.BlishHUD.EventTable
 			SettingEntry<LeftClickAction> leftClickAction = base.DrawerSettings.DefineSetting<LeftClickAction>(name + "-leftClickAction", LeftClickAction.CopyWaypoint, (Func<string>)(() => "Left Click Action"), (Func<string>)(() => "Defines the action which is executed when left clicking."));
 			SettingEntry<bool> showTooltips = base.DrawerSettings.DefineSetting<bool>(name + "-showTooltips", true, (Func<string>)(() => "Show Tooltips"), (Func<string>)(() => "Whether a tooltip should be displayed when hovering."));
 			SettingEntry<int> timespan = base.DrawerSettings.DefineSetting<int>(name + "-timespan", 120, (Func<string>)(() => "Timespan"), (Func<string>)(() => "Defines the timespan the event drawer covers."));
+			SettingComplianceExtensions.SetRange(timespan, 60, 240);
 			SettingEntry<int> historySplit = base.DrawerSettings.DefineSetting<int>(name + "-historySplit", 50, (Func<string>)(() => "History Split"), (Func<string>)(() => "Defines how much history the timespan should contain."));
 			SettingComplianceExtensions.SetRange(historySplit, 0, 75);
 			SettingEntry<bool> drawBorders = base.DrawerSettings.DefineSetting<bool>(name + "-drawBorders", false, (Func<string>)(() => "Draw Borders"), (Func<string>)(() => "Whether the events should be rendered with borders."));
@@ -109,6 +118,8 @@ namespace Estreya.BlishHUD.EventTable
 			SettingEntry<int> eventHeight = base.DrawerSettings.DefineSetting<int>(name + "-eventHeight", 30, (Func<string>)(() => "Event Height"), (Func<string>)(() => "Defines the height of the individual event rows."));
 			SettingComplianceExtensions.SetRange(eventHeight, 5, 30);
 			SettingEntry<List<string>> eventOrder = base.DrawerSettings.DefineSetting<List<string>>(name + "-eventOrder", new List<string>(eventCategories.Select((EventCategory x) => x.Key)), (Func<string>)(() => "Event Order"), (Func<string>)(() => "Defines the order of events."));
+			SettingEntry<float> eventOpacity = base.DrawerSettings.DefineSetting<float>(name + "-eventOpacity", 1f, (Func<string>)(() => "Event Opacity"), (Func<string>)(() => "Defines the opacity of the individual events."));
+			SettingComplianceExtensions.SetRange(eventOpacity, 0.1f, 1f);
 			return new EventAreaConfiguration
 			{
 				Name = drawer.Name,
@@ -132,7 +143,8 @@ namespace Estreya.BlishHUD.EventTable
 				DisabledEventKeys = disabledEventKeys,
 				CompletionAcion = completionAction,
 				EventHeight = eventHeight,
-				EventOrder = eventOrder
+				EventOrder = eventOrder,
+				EventOpacity = eventOpacity
 			};
 		}
 
@@ -151,6 +163,7 @@ namespace Estreya.BlishHUD.EventTable
 			base.DrawerSettings.UndefineSetting(name + "-disabledEventKeys");
 			base.DrawerSettings.UndefineSetting(name + "-eventHeight");
 			base.DrawerSettings.UndefineSetting(name + "-eventOrder");
+			base.DrawerSettings.UndefineSetting(name + "-eventOpacity");
 		}
 
 		public override void UpdateLocalization(TranslationState translationState)
@@ -217,6 +230,10 @@ namespace Estreya.BlishHUD.EventTable
 			string eventOrderDescriptionDefault = ((SettingEntry)drawerConfiguration.EventOrder).get_Description();
 			((SettingEntry)drawerConfiguration.EventOrder).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventOrder-name", eventOrderDisplayNameDefault)));
 			((SettingEntry)drawerConfiguration.EventOrder).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventOrder-description", eventOrderDescriptionDefault)));
+			string eventOpacityDisplayNameDefault = ((SettingEntry)drawerConfiguration.EventOpacity).get_DisplayName();
+			string eventOpacityDescriptionDefault = ((SettingEntry)drawerConfiguration.EventOpacity).get_Description();
+			((SettingEntry)drawerConfiguration.EventOpacity).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventOpacity-name", eventOpacityDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.EventOpacity).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventOpacity-description", eventOpacityDescriptionDefault)));
 		}
 	}
 }

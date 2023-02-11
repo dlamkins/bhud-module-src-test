@@ -83,7 +83,7 @@ namespace Estreya.BlishHUD.Shared.State
 			}
 			catch (Exception ex)
 			{
-				Logger.Warn(ex, "Failed to load translations for locale " + locale + ":");
+				Logger.Debug(ex, "Failed to load translations for locale " + locale + ":");
 			}
 		}
 

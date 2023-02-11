@@ -87,6 +87,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			Configuration.Size.Y.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)Size_SettingChanged);
 			Configuration.Location.X.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)Location_SettingChanged);
 			Configuration.Location.Y.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)Location_SettingChanged);
+			Configuration.TimeSpan.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)TimeSpan_SettingChanged);
 			Configuration.Opacity.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)Opacity_SettingChanged);
 			Configuration.BackgroundColor.add_SettingChanged((EventHandler<ValueChangedEventArgs<Color>>)BackgroundColor_SettingChanged);
 			Configuration.UseFiller.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UseFiller_SettingChanged);
@@ -120,6 +121,11 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			}
 		}
 
+		private void TimeSpan_SettingChanged(object sender, ValueChangedEventArgs<int> e)
+		{
+			ReAddEvents();
+		}
+
 		private void EventOrder_SettingChanged(object sender, ValueChangedEventArgs<List<string>> e)
 		{
 			ReAddEvents();
@@ -145,12 +151,15 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			ReAddEvents();
 		}
 
-		public async Task UpdateAllEvents(List<EventCategory> allEvents)
+		public void UpdateAllEvents(List<EventCategory> allEvents)
 		{
 			_allEvents.Clear();
 			_allEvents.AddRange(JsonConvert.DeserializeObject<List<EventCategory>>(JsonConvert.SerializeObject(allEvents)));
 			GetTimes();
-			await Task.WhenAll(_allEvents.Select((EventCategory ec) => ec.LoadAsync(_translationState)));
+			_allEvents.ForEach(delegate(EventCategory ec)
+			{
+				ec.Load(_translationState);
+			});
 			ReAddEvents();
 		}
 
@@ -263,9 +272,9 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			float middleLineX = ((Control)this).get_Width() / 2;
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			float middleLineX = (float)((Control)this).get_Width() * GetTimeSpanRatio();
 			float width = 2f;
 			SpriteBatchUtil.DrawLineOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new RectangleF(middleLineX - width / 2f, 0f, width, (float)((Control)this).get_Height()), Color.get_LightGray());
 		}
@@ -273,30 +282,33 @@ namespace Estreya.BlishHUD.EventTable.Controls
 		private (DateTime Now, DateTime Min, DateTime Max) GetTimes()
 		{
 			DateTime now = _getNowAction();
-			double halveTimespan = Configuration.TimeSpan.get_Value() / 2;
-			DateTime min = now.AddMinutes(0.0 - halveTimespan);
-			DateTime max = now.AddMinutes(halveTimespan);
+			DateTime min = now.Subtract(TimeSpan.FromMinutes((float)Configuration.TimeSpan.get_Value() * GetTimeSpanRatio()));
+			DateTime max = now.Add(TimeSpan.FromMinutes((float)Configuration.TimeSpan.get_Value() * (1f - GetTimeSpanRatio())));
 			return (now, min, max);
+		}
+
+		private float GetTimeSpanRatio()
+		{
+			return 0.5f + ((float)Configuration.HistorySplit.get_Value() / 100f - 0.5f);
 		}
 
 		private async Task UpdateEventOccurences()
 		{
 			(DateTime, DateTime, DateTime) times = GetTimes();
-			List<Task> tasks = new List<Task>();
+			new List<Task>();
 			List<string> activeEventKeys = GetActiveEventKeys();
 			ConcurrentDictionary<string, List<Estreya.BlishHUD.EventTable.Models.Event>> fillers = await GetFillers(times.Item1, times.Item2, times.Item3, activeEventKeys.Where((string ev) => !EventDisabled(ev)).ToList());
 			foreach (EventCategory ec in _allEvents)
 			{
-				tasks.Add(Task.Run(async delegate
+				if (fillers.TryGetValue(ec.Key, out var categoryFillers))
 				{
-					if (fillers.TryGetValue(ec.Key, out var categoryFillers))
+					categoryFillers.ForEach(delegate(Estreya.BlishHUD.EventTable.Models.Event cf)
 					{
-						await Task.WhenAll(categoryFillers.Select((Estreya.BlishHUD.EventTable.Models.Event cf) => cf.LoadAsync(ec, _translationState)));
-					}
-					ec.UpdateFillers(categoryFillers);
-				}));
+						cf.Load(ec, _translationState);
+					});
+				}
+				ec.UpdateFillers(categoryFillers);
 			}
-			await Task.WhenAll(tasks);
 		}
 
 		private async Task<ConcurrentDictionary<string, List<Estreya.BlishHUD.EventTable.Models.Event>>> GetFillers(DateTime now, DateTime min, DateTime max, List<string> activeEventKeys)
@@ -468,18 +480,20 @@ namespace Estreya.BlishHUD.EventTable.Controls
 						{
 							//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 							//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+							//IL_007b: Unknown result type (might be due to invalid IL or missing references)
 							if (ev2.Filler)
 							{
 								return Color.get_Transparent();
 							}
 							Color color = (string.IsNullOrWhiteSpace(ev2.BackgroundColorCode) ? Color.White : ColorTranslator.FromHtml(ev2.BackgroundColorCode));
-							return new Color((int)color.R, (int)color.G, (int)color.B);
+							return new Color((int)color.R, (int)color.G, (int)color.B) * Configuration.EventOpacity.get_Value();
 						});
 						((Control)@event).set_Parent((Container)(object)this);
 						((Control)@event).set_Top(y);
 						@event.Height = Configuration.EventHeight.get_Value();
 						@event.Width = width;
 						((Control)@event).set_Left((x2 >= 0) ? x2 : 0);
+						((Control)@event).set_ClipsBounds(false);
 						Event newEventControl = @event;
 						AddEventHooks(newEventControl);
 						Logger.Debug($"Added event {ev2.Name} with occurence {occurence}");

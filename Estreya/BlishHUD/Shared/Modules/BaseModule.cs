@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
@@ -107,6 +108,8 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		public TranslationState TranslationState { get; private set; }
 
+		public SettingEventState SettingEventState { get; private set; }
+
 		public WorldbossState WorldbossState { get; private set; }
 
 		public MapchestState MapchestState { get; private set; }
@@ -206,6 +209,13 @@ namespace Estreya.BlishHUD.Shared.Modules
 					AwaitLoading = true
 				}, GetFlurlClient(), WEBSITE_MODULE_FILE_URL);
 				_states.Add(TranslationState);
+				SettingEventState = new SettingEventState(new StateConfiguration
+				{
+					Enabled = true,
+					AwaitLoading = false,
+					SaveInterval = Timeout.InfiniteTimeSpan
+				});
+				_states.Add(SettingEventState);
 				if (configurations.Items.Enabled)
 				{
 					ItemState = new ItemState(configurations.Items, Gw2ApiManager, directoryPath);
@@ -416,7 +426,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 			OnSettingWindowBuild(SettingsWindow);
 			if (Debug)
 			{
-				SettingsWindow.get_Tabs().Add(new Tab(IconState.GetIcon("155052.png"), (Func<IView>)(() => (IView)(object)new StateSettingsView(_states, Gw2ApiManager, IconState, TranslationState, Font)
+				SettingsWindow.get_Tabs().Add(new Tab(IconState.GetIcon("155052.png"), (Func<IView>)(() => (IView)(object)new StateSettingsView(_states, Gw2ApiManager, IconState, TranslationState, SettingEventState, Font)
 				{
 					DefaultColor = ModuleSettings.DefaultGW2Color
 				}), "Debug", (int?)null));

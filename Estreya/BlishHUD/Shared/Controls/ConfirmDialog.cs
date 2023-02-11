@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Blish_HUD;
-using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Estreya.BlishHUD.Shared.Extensions;
@@ -36,8 +35,6 @@ namespace Estreya.BlishHUD.Shared.Controls
 		private static readonly BitmapFont _messageFont = GameService.Content.get_DefaultFont18();
 
 		private EventWaitHandle _waitHandle = new EventWaitHandle(initialState: false, EventResetMode.ManualReset);
-
-		private AsyncTexture2D _backgroundImage;
 
 		private Rectangle _shadowRect;
 
@@ -109,7 +106,6 @@ namespace Estreya.BlishHUD.Shared.Controls
 			((Control)this).set_Height(((Control)((Control)this).get_Parent()).get_Height());
 			((Control)this).set_ZIndex(int.MaxValue);
 			((Control)this).set_Visible(false);
-			_backgroundImage = _iconState.GetIcon("155963.png");
 			GameService.Input.get_Keyboard().add_KeyPressed((EventHandler<KeyboardEventArgs>)Keyboard_KeyPressed);
 		}
 
@@ -287,16 +283,15 @@ namespace Estreya.BlishHUD.Shared.Controls
 			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), _shadowRect, Color.get_LightGray() * 0.8f);
-			if (_backgroundImage != null && _backgroundImage.get_HasSwapped())
-			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_backgroundImage), _confirmRect);
-			}
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), _confirmRect, Color.get_Black() * 0.9f);
 			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, _parsedTitle, _titleFont, _titleRect, Color.get_White(), false, (HorizontalAlignment)1, (VerticalAlignment)0);
 			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, _parsedMessage, _messageFont, _messageRect, Color.get_White(), false, (HorizontalAlignment)1, (VerticalAlignment)0);
 		}
@@ -337,7 +332,6 @@ namespace Estreya.BlishHUD.Shared.Controls
 			_waitHandle?.Set();
 			_waitHandle?.Dispose();
 			_waitHandle = null;
-			_backgroundImage = null;
 		}
 	}
 }

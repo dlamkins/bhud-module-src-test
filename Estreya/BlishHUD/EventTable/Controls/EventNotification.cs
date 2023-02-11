@@ -16,9 +16,9 @@ namespace Estreya.BlishHUD.EventTable.Controls
 {
 	public class EventNotification : RenderTargetControl
 	{
-		private const int NOTIFICATION_WIDTH = 350;
+		public const int NOTIFICATION_WIDTH = 350;
 
-		private const int NOTIFICATION_HEIGHT = 96;
+		public const int NOTIFICATION_HEIGHT = 96;
 
 		private const int ICON_SIZE = 64;
 
@@ -32,6 +32,10 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private AsyncTexture2D _eventIcon;
 
+		private int _x;
+
+		private int _y;
+
 		private static BitmapFont _titleFont = GameService.Content.get_DefaultFont18();
 
 		private static BitmapFont _messageFont = GameService.Content.get_DefaultFont16();
@@ -44,10 +48,15 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private static Rectangle _messageRect = new Rectangle(((Rectangle)(ref _iconRect)).get_Right() + 5, ((Rectangle)(ref _titleRect)).get_Bottom(), _fullRect.Width - (((Rectangle)(ref _iconRect)).get_Right() + 5), 96 - _titleRect.Height);
 
-		public EventNotification(Estreya.BlishHUD.EventTable.Models.Event ev, string message, IconState iconState)
+		public float BackgroundOpacity { get; set; } = 1f;
+
+
+		public EventNotification(Estreya.BlishHUD.EventTable.Models.Event ev, string message, int x, int y, IconState iconState)
 		{
 			_event = ev;
 			_message = message;
+			_x = x;
+			_y = y;
 			_iconState = iconState;
 			_eventIcon = _iconState?.GetIcon(ev.Icon);
 			base.Width = 350;
@@ -57,11 +66,11 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			((Control)this).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 		}
 
-		public void Show(TimeSpan duration, int x, int y)
+		public void Show(TimeSpan duration)
 		{
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 			_shownNotifications++;
-			((Control)this).set_Location(new Point(x, y + 111 * _shownNotifications));
+			((Control)this).set_Location(new Point(_x, _y + 111 * _shownNotifications));
 			((Control)this).Show();
 			((TweenerImpl)GameService.Animation.get_Tweener()).Tween<EventNotification>(this, (object)new
 			{
@@ -91,16 +100,16 @@ namespace Estreya.BlishHUD.EventTable.Controls
 		{
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			spriteBatch.Draw(Textures.get_Pixel(), _fullRect, Color.get_Black() * 0.4f);
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			spriteBatch.Draw(Textures.get_Pixel(), _fullRect, Color.get_Black() * BackgroundOpacity);
 			if (_eventIcon != null && _eventIcon.get_HasSwapped())
 			{
 				spriteBatch.Draw(AsyncTexture2D.op_Implicit(_eventIcon), _iconRect, Color.get_White());

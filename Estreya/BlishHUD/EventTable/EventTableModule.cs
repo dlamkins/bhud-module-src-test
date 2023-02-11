@@ -17,7 +17,6 @@ using Estreya.BlishHUD.EventTable.Controls;
 using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.EventTable.State;
 using Estreya.BlishHUD.EventTable.UI.Views;
-using Estreya.BlishHUD.Shared.Helpers;
 using Estreya.BlishHUD.Shared.Modules;
 using Estreya.BlishHUD.Shared.Settings;
 using Estreya.BlishHUD.Shared.State;
@@ -67,7 +66,7 @@ namespace Estreya.BlishHUD.EventTable
 			base.Logger.Debug("Load events.");
 			await LoadEvents();
 			AddAllAreas();
-			await SetAreaEvents();
+			SetAreaEvents();
 		}
 
 		private void Keyboard_KeyPressed(object sender, KeyboardEventArgs e)
@@ -78,44 +77,55 @@ namespace Estreya.BlishHUD.EventTable
 			//IL_0028: Invalid comparison between Unknown and I4
 			if ((int)e.get_EventType() == 256 && !GameService.Input.get_Keyboard().TextFieldIsActive() && (int)e.get_Key() == 85)
 			{
-				new EventNotification(_eventCategories.First().Events.First(), "Starts in 10 minutes! ajkshdkjahsdkjhaskjdhkajlshdkha", base.IconState).Show(TimeSpan.FromSeconds(5.0), 200, 200);
+				EventNotification eventNotification = new EventNotification(_eventCategories.First().Events.First(), "Starts in 10 minutes! ajkshdkjahsdkjhaskjdhkajlshdkha", 200, 200, base.IconState);
+				eventNotification.BackgroundOpacity = base.ModuleSettings.ReminderOpacity.get_Value();
+				eventNotification.Show(TimeSpan.FromSeconds(5.0));
 			}
 		}
 
-		private async Task SetAreaEvents()
+		private void SetAreaEvents()
 		{
 			foreach (EventArea area in _areas.Values)
 			{
-				await SetAreaEvents(area);
+				SetAreaEvents(area);
 			}
 		}
 
-		private async Task SetAreaEvents(EventArea area)
+		private void SetAreaEvents(EventArea area)
 		{
-			await area.UpdateAllEvents(_eventCategories);
+			area.UpdateAllEvents(_eventCategories);
 		}
 
 		public async Task LoadEvents()
 		{
 			using (await _eventCategoryLock.LockAsync())
 			{
-				int num;
-				_ = num - 1;
-				_ = 2;
 				try
 				{
+					_eventCategories?.SelectMany((EventCategory ec) => ec.Events).ToList().ForEach(delegate(Estreya.BlishHUD.EventTable.Models.Event ev)
+					{
+						RemoveEventHooks(ev);
+					});
 					_eventCategories?.Clear();
 					List<EventCategory> categories = await GetFlurlClient().Request(base.API_URL, "events").GetJsonAsync<List<EventCategory>>(default(CancellationToken), (HttpCompletionOption)0);
 					int eventCategoryCount = categories.Count;
 					int eventCount = categories.Sum((EventCategory ec) => ec.Events.Count);
 					base.Logger.Info($"Loaded {eventCategoryCount} Categories with {eventCount} Events.");
-					await Task.WhenAll(categories.Select((EventCategory ec) => ec.LoadAsync(base.TranslationState)));
+					categories.ForEach(delegate(EventCategory ec)
+					{
+						ec.Load(base.TranslationState);
+					});
 					_eventCategories = categories;
 					_eventCategories.SelectMany((EventCategory ec) => ec.Events).ToList().ForEach(delegate(Estreya.BlishHUD.EventTable.Models.Event ev)
 					{
 						AddEventHooks(ev);
 					});
-					await SetAreaEvents();
+					SetAreaEvents();
+				}
+				catch (FlurlHttpException ex2)
+				{
+					string message = await ex2.GetResponseStringAsync();
+					base.Logger.Warn((Exception)ex2, "Failed loading events: " + message);
 				}
 				catch (Exception ex)
 				{
@@ -194,7 +204,9 @@ namespace Estreya.BlishHUD.EventTable
 			if (base.ModuleSettings.RemindersEnabled.get_Value() && !base.ModuleSettings.ReminderDisabledForEvents.get_Value().Contains(ev.SettingKey))
 			{
 				string startsInTranslation = base.TranslationState.GetTranslation("eventArea-reminder-startsIn", "Starts in");
-				new EventNotification(ev, startsInTranslation + " " + e.Humanize() + "!", base.IconState).Show(TimeSpan.FromSeconds(base.ModuleSettings.ReminderDuration.get_Value()), base.ModuleSettings.ReminderPosition.X.get_Value(), base.ModuleSettings.ReminderPosition.Y.get_Value());
+				EventNotification eventNotification = new EventNotification(ev, startsInTranslation + " " + e.Humanize() + "!", base.ModuleSettings.ReminderPosition.X.get_Value(), base.ModuleSettings.ReminderPosition.Y.get_Value(), base.IconState);
+				eventNotification.BackgroundOpacity = base.ModuleSettings.ReminderOpacity.get_Value();
+				eventNotification.Show(TimeSpan.FromSeconds(base.ModuleSettings.ReminderDuration.get_Value()));
 			}
 		}
 
@@ -253,17 +265,17 @@ namespace Estreya.BlishHUD.EventTable
 		{
 			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004c: Expected O, but got Unknown
-			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010f: Expected O, but got Unknown
-			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014e: Expected O, but got Unknown
-			//IL_0183: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018d: Expected O, but got Unknown
-			base.SettingsWindow.get_Tabs().Add(new Tab(base.IconState.GetIcon("156736.png"), (Func<IView>)(() => (IView)(object)new GeneralSettingsView(base.ModuleSettings, base.Gw2ApiManager, base.IconState, base.TranslationState, GameService.Content.get_DefaultFont16())
+			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0115: Expected O, but got Unknown
+			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0154: Expected O, but got Unknown
+			//IL_0189: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0193: Expected O, but got Unknown
+			base.SettingsWindow.get_Tabs().Add(new Tab(base.IconState.GetIcon("156736.png"), (Func<IView>)(() => (IView)(object)new GeneralSettingsView(base.ModuleSettings, base.Gw2ApiManager, base.IconState, base.TranslationState, base.SettingEventState, GameService.Content.get_DefaultFont16())
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			}), "General", (int?)null));
-			AreaSettingsView areaSettingsView = new AreaSettingsView(() => _areas.Values.Select((EventArea area) => area.Configuration), () => _eventCategories, base.Gw2ApiManager, base.IconState, base.TranslationState, EventState, GameService.Content.get_DefaultFont16())
+			AreaSettingsView areaSettingsView = new AreaSettingsView(() => _areas.Values.Select((EventArea area) => area.Configuration), () => _eventCategories, base.Gw2ApiManager, base.IconState, base.TranslationState, base.SettingEventState, EventState, GameService.Content.get_DefaultFont16())
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			};
@@ -272,11 +284,8 @@ namespace Estreya.BlishHUD.EventTable
 				e.AreaConfiguration = AddArea(e.Name);
 				if (e.AreaConfiguration != null)
 				{
-					EventArea newArea = _areas.Values.Where((EventArea x) => x.Configuration.Name == e.Name).First();
-					AsyncHelper.RunSync(async delegate
-					{
-						await SetAreaEvents(newArea);
-					});
+					EventArea areaEvents = _areas.Values.Where((EventArea x) => x.Configuration.Name == e.Name).First();
+					SetAreaEvents(areaEvents);
 				}
 			};
 			areaSettingsView.RemoveArea += delegate(object s, EventAreaConfiguration e)
@@ -284,7 +293,7 @@ namespace Estreya.BlishHUD.EventTable
 				RemoveArea(e);
 			};
 			base.SettingsWindow.get_Tabs().Add(new Tab(base.IconState.GetIcon("605018.png"), (Func<IView>)(() => (IView)(object)areaSettingsView), "Event Areas", (int?)null));
-			base.SettingsWindow.get_Tabs().Add(new Tab(base.IconState.GetIcon("841721.png"), (Func<IView>)(() => (IView)(object)new ReminderSettingsView(base.ModuleSettings, () => _eventCategories, base.Gw2ApiManager, base.IconState, base.TranslationState, GameService.Content.get_DefaultFont16())
+			base.SettingsWindow.get_Tabs().Add(new Tab(base.IconState.GetIcon("841721.png"), (Func<IView>)(() => (IView)(object)new ReminderSettingsView(base.ModuleSettings, () => _eventCategories, base.Gw2ApiManager, base.IconState, base.TranslationState, base.SettingEventState, GameService.Content.get_DefaultFont16())
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			}), "Reminders", (int?)null));

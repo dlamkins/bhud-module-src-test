@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Blish_HUD;
 using Estreya.BlishHUD.Shared.Attributes;
 using Estreya.BlishHUD.Shared.State;
@@ -62,15 +61,18 @@ namespace Estreya.BlishHUD.EventTable.Models
 			}
 		}
 
-		public async Task LoadAsync(TranslationState translationState = null)
+		public void Load(TranslationState translationState = null)
 		{
 			if (translationState != null)
 			{
 				Name = translationState.GetTranslation("eventCategory-" + Key + "-name", Name);
 			}
-			using (await _eventLock.LockAsync())
+			using (_eventLock.Lock())
 			{
-				await Task.WhenAll(Events.Select((Event ev) => ev.LoadAsync(this, translationState)));
+				Events.ForEach(delegate(Event ev)
+				{
+					ev.Load(this, translationState);
+				});
 			}
 		}
 	}

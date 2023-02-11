@@ -54,8 +54,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		public event EventHandler<EventAreaConfiguration> RemoveArea;
 
-		public AreaSettingsView(Func<IEnumerable<EventAreaConfiguration>> areaConfiguration, Func<List<EventCategory>> allEvents, Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, EventState eventState, BitmapFont font = null)
-			: base(apiManager, iconState, translationState, font)
+		public AreaSettingsView(Func<IEnumerable<EventAreaConfiguration>> areaConfiguration, Func<List<EventCategory>> allEvents, Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, SettingEventState settingEventState, EventState eventState, BitmapFont font = null)
+			: base(apiManager, iconState, translationState, settingEventState, font)
 		{
 			_areaConfigurationFunc = areaConfiguration;
 			_allEvents = allEvents;
@@ -318,6 +318,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderIntSetting((Panel)(object)settingsPanel, areaConfiguration.EventHeight);
 			RenderEmptyLine((Panel)(object)settingsPanel);
 			RenderIntSetting((Panel)(object)settingsPanel, areaConfiguration.TimeSpan);
+			RenderIntSetting((Panel)(object)settingsPanel, areaConfiguration.HistorySplit);
 			RenderEmptyLine((Panel)(object)settingsPanel);
 			RenderBoolSetting((Panel)(object)settingsPanel, areaConfiguration.DrawBorders);
 			RenderEnumSetting<BuildDirection>((Panel)(object)settingsPanel, areaConfiguration.BuildDirection);
@@ -333,6 +334,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderEmptyLine((Panel)(object)settingsPanel);
 			RenderColorSetting((Panel)(object)settingsPanel, areaConfiguration.BackgroundColor);
 			RenderFloatSetting((Panel)(object)settingsPanel, areaConfiguration.Opacity);
+			RenderFloatSetting((Panel)(object)settingsPanel, areaConfiguration.EventOpacity);
 			RenderEmptyLine((Panel)(object)settingsPanel);
 			((IEnumerable<Control>)((Container)settingsPanel).get_Children()).Last();
 			StandardButton manageEventsButton = RenderButton(_areaPanel, "Manage Events", delegate

@@ -25,8 +25,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private StandardWindow _manageEventsWindow;
 
-		public ReminderSettingsView(ModuleSettings moduleSettings, Func<List<EventCategory>> getEvents, Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, BitmapFont font = null)
-			: base(apiManager, iconState, translationState, font)
+		public ReminderSettingsView(ModuleSettings moduleSettings, Func<List<EventCategory>> getEvents, Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, SettingEventState settingEventState, BitmapFont font = null)
+			: base(apiManager, iconState, translationState, settingEventState, font)
 		{
 			_moduleSettings = moduleSettings;
 			_getEvents = getEvents;
@@ -38,6 +38,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderIntSetting((Panel)(object)parent, _moduleSettings.ReminderPosition.X);
 			RenderIntSetting((Panel)(object)parent, _moduleSettings.ReminderPosition.Y);
 			RenderFloatSetting((Panel)(object)parent, _moduleSettings.ReminderDuration);
+			RenderFloatSetting((Panel)(object)parent, _moduleSettings.ReminderOpacity);
 			RenderEmptyLine((Panel)(object)parent);
 			RenderButton((Panel)(object)parent, "Manage Reminders", delegate
 			{
@@ -79,10 +80,13 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			});
 			RenderButton((Panel)(object)parent, "Test Reminder", delegate
 			{
-				Estreya.BlishHUD.EventTable.Models.Event @event = new Estreya.BlishHUD.EventTable.Models.Event();
-				@event.Name = "Test Event";
-				@event.Icon = "textures/maintenance.png";
-				new EventNotification(@event, "Test description!", base.IconState).Show(TimeSpan.FromSeconds(_moduleSettings.ReminderDuration.get_Value()), _moduleSettings.ReminderPosition.X.get_Value(), _moduleSettings.ReminderPosition.Y.get_Value());
+				EventNotification eventNotification = new EventNotification(new Estreya.BlishHUD.EventTable.Models.Event
+				{
+					Name = "Test Event",
+					Icon = "textures/maintenance.png"
+				}, "Test description!", _moduleSettings.ReminderPosition.X.get_Value(), _moduleSettings.ReminderPosition.Y.get_Value(), base.IconState);
+				eventNotification.BackgroundOpacity = _moduleSettings.ReminderOpacity.get_Value();
+				eventNotification.Show(TimeSpan.FromSeconds(_moduleSettings.ReminderDuration.get_Value()));
 			});
 		}
 

@@ -24,7 +24,9 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		private static readonly Logger Logger = Logger.GetLogger<BaseSettingsView>();
 
-		protected BaseSettingsView(Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, BitmapFont font = null)
+		private readonly SettingEventState _settingEventState;
+
+		protected BaseSettingsView(Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, SettingEventState settingEventState, BitmapFont font = null)
 			: base(apiManager, iconState, translationState, font)
 		{
 			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
@@ -32,6 +34,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			base.LABEL_WIDTH = 250;
 			CONTROL_WIDTH = 250;
 			CONTROL_LOCATION = new Point(base.LABEL_WIDTH + 20, 0);
+			_settingEventState = settingEventState;
 		}
 
 		protected sealed override void InternalBuild(Panel parent)
@@ -96,7 +99,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		protected (Panel Panel, Label label, TrackBar trackBar) RenderIntSetting(Panel parent, SettingEntry<int> settingEntry)
 		{
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
 			Panel panel = GetPanel((Container)(object)parent);
 			(Label, Label) label = RenderLabel(panel, ((SettingEntry)settingEntry).get_DisplayName());
 			(float, float)? range = settingEntry.GetRange<int>();
@@ -105,12 +108,28 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 				settingEntry.set_Value(newValue);
 			});
 			((Control)trackbar).set_BasicTooltipText(((SettingEntry)settingEntry).get_Description());
+			_settingEventState.AddForRangeCheck((SettingEntry)(object)settingEntry);
+			_settingEventState.RangeUpdated += delegate(object s, ComplianceUpdated e)
+			{
+				//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+				if (e.SettingEntry.get_EntryKey() == ((SettingEntry)settingEntry).get_EntryKey())
+				{
+					IntRangeRangeComplianceRequisite val = (IntRangeRangeComplianceRequisite)(object)e.NewCompliance;
+					trackbar.set_MinValue((float)((IntRangeRangeComplianceRequisite)(ref val)).get_MinValue());
+					trackbar.set_MaxValue((float)((IntRangeRangeComplianceRequisite)(ref val)).get_MaxValue());
+				}
+			};
+			((Control)trackbar).add_Disposed((EventHandler<EventArgs>)delegate
+			{
+				_settingEventState.RemoveFromRangeCheck((SettingEntry)(object)settingEntry);
+			});
 			return (panel, label.Item1, trackbar);
 		}
 
 		protected (Panel Panel, Label label, TrackBar trackBar) RenderFloatSetting(Panel parent, SettingEntry<float> settingEntry)
 		{
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
 			Panel panel = GetPanel((Container)(object)parent);
 			(Label, Label) label = RenderLabel(panel, ((SettingEntry)settingEntry).get_DisplayName());
 			(float, float)? range = settingEntry.GetRange<float>();
@@ -119,6 +138,22 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 				settingEntry.set_Value(newValue);
 			});
 			((Control)trackbar).set_BasicTooltipText(((SettingEntry)settingEntry).get_Description());
+			_settingEventState.AddForRangeCheck((SettingEntry)(object)settingEntry);
+			_settingEventState.RangeUpdated += delegate(object s, ComplianceUpdated e)
+			{
+				//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+				if (e.SettingEntry.get_EntryKey() == ((SettingEntry)settingEntry).get_EntryKey())
+				{
+					FloatRangeRangeComplianceRequisite val = (FloatRangeRangeComplianceRequisite)(object)e.NewCompliance;
+					trackbar.set_MinValue(((FloatRangeRangeComplianceRequisite)(ref val)).get_MinValue());
+					trackbar.set_MaxValue(((FloatRangeRangeComplianceRequisite)(ref val)).get_MaxValue());
+				}
+			};
+			((Control)trackbar).add_Disposed((EventHandler<EventArgs>)delegate
+			{
+				_settingEventState.RemoveFromRangeCheck((SettingEntry)(object)settingEntry);
+			});
 			return (panel, label.Item1, trackbar);
 		}
 
@@ -168,6 +203,14 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 		protected override void Unload()
 		{
 			base.Unload();
+			((Container)base.MainPanel).get_Children()?.ToList().ForEach(delegate(Control c)
+			{
+				if (c != null)
+				{
+					c.Dispose();
+				}
+			});
+			((Container)base.MainPanel).get_Children()?.Clear();
 		}
 	}
 }

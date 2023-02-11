@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Threading.Tasks;
 using Blish_HUD;
 using Estreya.BlishHUD.Shared.Attributes;
 using Estreya.BlishHUD.Shared.Json.Converter;
@@ -132,7 +131,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 			return eventWidth;
 		}
 
-		public Task LoadAsync(EventCategory ec, TranslationState translationState = null)
+		public void Load(EventCategory ec, TranslationState translationState = null)
 		{
 			if (string.IsNullOrWhiteSpace(Key))
 			{
@@ -147,7 +146,6 @@ namespace Estreya.BlishHUD.EventTable.Models
 			{
 				Name = translationState.GetTranslation("event-" + ec.Key + "_" + Key + "-name", Name);
 			}
-			return Task.CompletedTask;
 		}
 
 		public void Update(DateTime nowUTC)

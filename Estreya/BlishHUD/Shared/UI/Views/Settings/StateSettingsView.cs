@@ -15,8 +15,8 @@ namespace Estreya.BlishHUD.Shared.UI.Views.Settings
 
 		private readonly Func<Task> _reloadCalledAction;
 
-		public StateSettingsView(Collection<ManagedState> stateList, Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, BitmapFont font = null, Func<Task> reloadCalledAction = null)
-			: base(apiManager, iconState, translationState, font)
+		public StateSettingsView(Collection<ManagedState> stateList, Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, SettingEventState settingEventState, BitmapFont font = null, Func<Task> reloadCalledAction = null)
+			: base(apiManager, iconState, translationState, settingEventState, font)
 		{
 			_stateList = stateList;
 			_reloadCalledAction = reloadCalledAction;

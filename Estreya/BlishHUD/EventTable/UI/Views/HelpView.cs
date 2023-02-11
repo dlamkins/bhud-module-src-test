@@ -261,6 +261,12 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				{
 					builder.SetHyperLink(_apiUrl.TrimEnd('/') + "/events");
 				})
+				.CreatePart("\n", (Action<FormattedLabelPartBuilder>)delegate
+				{
+				})
+				.CreatePart("- You have abused the backend and are currently ratelimited (same result as the above answer).", (Action<FormattedLabelPartBuilder>)delegate
+				{
+				})
 				.CreatePart("\n \n", (Action<FormattedLabelPartBuilder>)delegate
 				{
 				})

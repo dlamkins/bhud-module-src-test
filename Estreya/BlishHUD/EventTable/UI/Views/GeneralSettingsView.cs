@@ -12,8 +12,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 	{
 		private readonly ModuleSettings _moduleSettings;
 
-		public GeneralSettingsView(ModuleSettings moduleSettings, Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, BitmapFont font = null)
-			: base(apiManager, iconState, translationState, font)
+		public GeneralSettingsView(ModuleSettings moduleSettings, Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, SettingEventState settingEventState, BitmapFont font = null)
+			: base(apiManager, iconState, translationState, settingEventState, font)
 		{
 			_moduleSettings = moduleSettings;
 		}
@@ -27,6 +27,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderKeybindingSetting((Panel)(object)parent, _moduleSettings.MapKeybinding);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideOnMissingMumbleTicks);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideOnOpenMap);
+			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideInCombat);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideInPvE_OpenWorld);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideInPvE_Competetive);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideInWvW);
