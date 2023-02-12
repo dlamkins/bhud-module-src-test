@@ -10,187 +10,128 @@ using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
-using RaidClears.Dungeons.Controls;
-using RaidClears.Dungeons.Model;
-using RaidClears.Dungeons.Services;
-using RaidClears.Raids.Controls;
-using RaidClears.Raids.Model;
-using RaidClears.Raids.Services;
-using RaidClears.Settings;
-using Settings.Enums;
+using RaidClears.Features.Dungeons;
+using RaidClears.Features.Raids;
+using RaidClears.Features.Shared.Services;
+using RaidClears.Features.Strikes;
+using RaidClears.Features.Strikes.Services;
+using RaidClears.Localization;
+using RaidClears.Settings.Controls;
+using RaidClears.Settings.Services;
+using RaidClears.Settings.Views;
 
 namespace RaidClears
 {
 	[Export(typeof(Module))]
 	public class Module : Module
 	{
-		private static readonly Logger Logger = Logger.GetLogger<Module>();
+		public static string DIRECTORY_PATH = "clearsTracker";
 
-		private const int BUFFER_MS = 50;
-
-		private const int MINUTE_MS = 60000;
-
-		private double _lastApiCheck = -1.0;
-
-		private double _API_QUERY_INTERVAL = 300100.0;
-
-		private TextureService _textureService;
-
-		private WingRotationService _wingRotationService;
-
-		private SettingService _settingService;
-
-		private CornerIconService _cornerIconService;
-
-		private DungeonCornerIconService _dungeonCornerIconService;
-
-		private RaidsPanel _raidsPanel;
-
-		private DungeonsPanel _dungeonsPanel;
-
-		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
-
-		internal ContentsManager ContentsManager => base.ModuleParameters.get_ContentsManager();
-
-		internal DirectoriesManager DirectoriesManager => base.ModuleParameters.get_DirectoriesManager();
-
-		internal Gw2ApiManager Gw2ApiManager => base.ModuleParameters.get_Gw2ApiManager();
+		internal static readonly Logger ModuleLogger = Logger.GetLogger<Module>();
 
 		[ImportingConstructor]
 		public Module([Import("ModuleParameters")] ModuleParameters moduleParameters)
 			: this(moduleParameters)
 		{
+			Service.ModuleInstance = this;
+			Service.ContentsManager = moduleParameters.get_ContentsManager();
+			Service.Gw2ApiManager = moduleParameters.get_Gw2ApiManager();
+			Service.DirectoriesManager = moduleParameters.get_DirectoriesManager();
 		}
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			_settingService = new SettingService(settings);
+			Service.Settings = new SettingService(settings);
 		}
 
 		public override IView GetSettingsView()
 		{
-			return (IView)(object)new ModuleSettingsView(_settingService, this, _textureService);
+			return (IView)(object)new ModuleMainSettingsView();
 		}
 
-		protected override async Task LoadAsync()
+		protected override Task LoadAsync()
 		{
-			_textureService = new TextureService(ContentsManager);
-			_wingRotationService = new WingRotationService();
-			_raidsPanel = new RaidsPanel(Logger, _settingService, Wing.GetWingMetaData(), _wingRotationService);
-			_dungeonsPanel = new DungeonsPanel(Logger, _settingService, Dungeon.GetDungeonMetaData());
-			_dungeonsPanel.UpdateClearedStatus(new ApiDungeons());
-			SetTimeoutValueInMinutes((int)_settingService.RaidPanelApiPollingPeriod.get_Value());
-			_settingService.RaidPanelIsVisibleKeyBind.get_Value().add_Activated((EventHandler<EventArgs>)OnRaidPanelDisplayKeybindActivated);
-			_settingService.DungeonPanelIsVisibleKeyBind.get_Value().add_Activated((EventHandler<EventArgs>)OnDungeonPanelDisplayKeybindActivated);
-			_settingService.RaidPanelApiPollingPeriod.add_SettingChanged((EventHandler<ValueChangedEventArgs<ApiPollPeriod>>)delegate(object s, ValueChangedEventArgs<ApiPollPeriod> e)
+			Service.StrikePersistance = StrikePersistance.Load();
+			Service.ApiPollingService = new ApiPollService(Service.Settings.ApiPollingPeriod);
+			Service.Textures = new TextureService(Service.ContentsManager);
+			Service.ResetWatcher = new ResetsWatcherService();
+			Service.MapWatcher = new MapWatcherService();
+			Service.SettingsWindow = new SettingsPanel();
+			Service.RaidWindow = new RaidPanel();
+			Service.StrikesWindow = new StrikesPanel();
+			Service.DungeonWindow = new DungeonPanel();
+			Service.CornerIcon = new CornerIconService(Service.Settings.GlobalCornerIconEnabled, Strings.Module_Title, Service.Textures!.CornerIconTexture, Service.Textures!.CornerIconHoverTexture, new List<CornerIconToggleMenuItem>
 			{
-				SetTimeoutValueInMinutes((int)e.get_NewValue());
+				new CornerIconToggleMenuItem((Control)(object)Service.SettingsWindow, Strings.ModuleSettings_OpenSettings),
+				new CornerIconToggleMenuItem(Service.Settings.RaidSettings.Generic.Visible, Strings.SettingsPanel_Tab_Raids),
+				new CornerIconToggleMenuItem(Service.Settings.StrikeSettings.Generic.Visible, Strings.SettingsPanel_Tab_Strikes),
+				new CornerIconToggleMenuItem(Service.Settings.DungeonSettings.Generic.Visible, Strings.SettingsPanel_Tab_Dunegons)
 			});
-			_cornerIconService = new CornerIconService(_settingService.ShowRaidsCornerIconSetting, "Click to show/hide the Raid Clears window.\nIcon can be hidden by module settings.", delegate
-			{
-				_settingService.ToggleRaidPanelVisibility();
-			}, _textureService);
-			_dungeonCornerIconService = new DungeonCornerIconService(_settingService.ShowDungeonCornerIconSetting, _settingService.DungeonsEnabled, "Click to show/hide the Dungeon Clears window.\nIcon can be hidden by module settings.", delegate
-			{
-				_settingService.ToggleDungeonPanelVisibility();
-			}, _textureService);
-			Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
-			if (Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)GetCurrentClearsService.NECESSARY_API_TOKEN_PERMISSIONS))
-			{
-				_lastApiCheck = _API_QUERY_INTERVAL;
-			}
+			Service.CornerIcon.IconLeftClicked += new EventHandler<bool>(CornerIcon_IconLeftClicked);
+			Service.Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
+			return Task.CompletedTask;
 		}
 
 		protected override void Unload()
 		{
-			_settingService.RaidPanelIsVisibleKeyBind.get_Value().remove_Activated((EventHandler<EventArgs>)OnRaidPanelDisplayKeybindActivated);
-			_settingService.DungeonPanelIsVisibleKeyBind.get_Value().remove_Activated((EventHandler<EventArgs>)OnDungeonPanelDisplayKeybindActivated);
-			Gw2ApiManager.remove_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
-			RaidsPanel raidsPanel = _raidsPanel;
-			if (raidsPanel != null)
+			Service.Gw2ApiManager.remove_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
+			Service.CornerIcon.IconLeftClicked -= new EventHandler<bool>(CornerIcon_IconLeftClicked);
+			ContentsManager contentsManager = Service.ContentsManager;
+			if (contentsManager != null)
 			{
-				((Control)raidsPanel).Dispose();
+				contentsManager.Dispose();
 			}
-			DungeonsPanel dungeonsPanel = _dungeonsPanel;
-			if (dungeonsPanel != null)
+			Service.Textures?.Dispose();
+			Service.ApiPollingService?.Dispose();
+			StrikesPanel strikesWindow = Service.StrikesWindow;
+			if (strikesWindow != null)
 			{
-				((Control)dungeonsPanel).Dispose();
+				((Control)strikesWindow).Dispose();
 			}
-			_textureService?.Dispose();
-			_cornerIconService?.Dispose();
-			_dungeonCornerIconService?.Dispose();
+			DungeonPanel dungeonWindow = Service.DungeonWindow;
+			if (dungeonWindow != null)
+			{
+				((Control)dungeonWindow).Dispose();
+			}
+			RaidPanel raidWindow = Service.RaidWindow;
+			if (raidWindow != null)
+			{
+				((Control)raidWindow).Dispose();
+			}
+			SettingsPanel settingsWindow = Service.SettingsWindow;
+			if (settingsWindow != null)
+			{
+				((Control)settingsWindow).Dispose();
+			}
+			Service.CornerIcon?.Dispose();
+			Service.MapWatcher?.Dispose();
+			Service.ResetWatcher?.Dispose();
 		}
 
 		protected override void Update(GameTime gameTime)
 		{
-			_raidsPanel?.ShowOrHide();
-			_dungeonsPanel?.ShowOrHide();
-			ApiPollTimeout(gameTime.get_ElapsedGameTime().TotalMilliseconds);
+			Service.ApiPollingService?.Update(gameTime);
+			Service.RaidWindow?.Update();
+			Service.DungeonWindow?.Update();
+			Service.StrikesWindow?.Update();
+			Service.ResetWatcher?.Update(gameTime);
 		}
 
-		private void SetTimeoutValueInMinutes(int minutes)
+		private void CornerIcon_IconLeftClicked(object sender, bool e)
 		{
-			_API_QUERY_INTERVAL = minutes * 60000 + 50;
-		}
-
-		public int GetTimeoutSecondsRemaining()
-		{
-			if (_lastApiCheck == -1.0)
-			{
-				return -1;
-			}
-			return (int)((_API_QUERY_INTERVAL - _lastApiCheck) / 1000.0);
-		}
-
-		private void ApiPollTimeout(double elapsedTime)
-		{
-			if (!(_lastApiCheck >= 0.0))
-			{
-				return;
-			}
-			_lastApiCheck += elapsedTime;
-			if (!(_lastApiCheck >= _API_QUERY_INTERVAL))
-			{
-				return;
-			}
-			_lastApiCheck = 0.0;
-			Task.Run(async delegate
-			{
-				(ApiRaids, bool) obj2 = await GetCurrentClearsService.GetClearsFromApi(Gw2ApiManager, Logger);
-				var (weeklyClears2, _) = obj2;
-				if (!obj2.Item2)
-				{
-					_raidsPanel.UpdateClearedStatus(weeklyClears2);
-				}
-			});
-			if (!_settingService.DungeonsEnabled.get_Value())
-			{
-				return;
-			}
-			Task.Run(async delegate
-			{
-				(ApiDungeons, bool) obj = await DungeonsClearsService.GetDungeonClearsFromApi(Gw2ApiManager, Logger);
-				var (weeklyClears, _) = obj;
-				if (!obj.Item2)
-				{
-					_dungeonsPanel.UpdateClearedStatus(weeklyClears);
-				}
-			});
+			Service.Settings.RaidSettings.Generic.ToggleVisible();
+			Service.Settings.DungeonSettings.Generic.ToggleVisible();
+			Service.Settings.StrikeSettings.Generic.ToggleVisible();
 		}
 
 		private void Gw2ApiManager_SubtokenUpdated(object sender, ValueEventArgs<IEnumerable<TokenPermission>> e)
 		{
-			_lastApiCheck = _API_QUERY_INTERVAL;
-		}
-
-		private void OnRaidPanelDisplayKeybindActivated(object sender, EventArgs e)
-		{
-			_settingService.ToggleRaidPanelVisibility();
-		}
-
-		private void OnDungeonPanelDisplayKeybindActivated(object sender, EventArgs e)
-		{
-			_settingService.ToggleDungeonPanelVisibility();
+			Task.Run(async delegate
+			{
+				Service.CurrentAccountName = await AccountNameService.UpdateAccountName();
+				Service.MapWatcher.DispatchCurrentStrikeClears();
+			});
+			Service.ApiPollingService?.Invoke();
 		}
 	}
 }
