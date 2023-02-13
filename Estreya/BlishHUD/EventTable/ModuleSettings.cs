@@ -35,6 +35,8 @@ namespace Estreya.BlishHUD.EventTable
 
 		public SettingEntry<float> ReminderOpacity { get; private set; }
 
+		public SettingEntry<bool> ShowDynamicEventsOnMap { get; private set; }
+
 		public SettingEntry<List<string>> ReminderDisabledForEvents { get; set; }
 
 		public ModuleSettings(SettingCollection settings)
@@ -52,13 +54,13 @@ namespace Estreya.BlishHUD.EventTable
 
 		protected override void DoInitializeGlobalSettings(SettingCollection globalSettingCollection)
 		{
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005c: Expected O, but got Unknown
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Expected O, but got Unknown
 			MapKeybinding = base.GlobalSettings.DefineSetting<KeyBinding>("MapKeybinding", new KeyBinding((Keys)77), (Func<string>)(() => "Open Map Hotkey"), (Func<string>)(() => "Defines the key used to open the fullscreen map."));
 			MapKeybinding.add_SettingChanged((EventHandler<ValueChangedEventArgs<KeyBinding>>)SettingChanged<KeyBinding>);
 			MapKeybinding.get_Value().set_Enabled(true);
 			MapKeybinding.get_Value().set_BlockSequenceFromGw2(false);
-			RemindersEnabled = base.GlobalSettings.DefineSetting<bool>("RemindersEnabled", true, (Func<string>)(() => "Reminders Enabled"), (Func<string>)(() => "Whether the drawer should display alerts before an event starts."));
+			RemindersEnabled = base.GlobalSettings.DefineSetting<bool>("RemindersEnabled", true, (Func<string>)(() => "Reminders Enabled"), (Func<string>)(() => "Whether the module should display alerts before an event starts."));
 			ReminderPosition = new EventReminderPositition
 			{
 				X = base.GlobalSettings.DefineSetting<int>("ReminderPositionX", 200, (Func<string>)(() => "Location X"), (Func<string>)(() => "Defines the position of reminders on the x axis.")),
@@ -66,11 +68,12 @@ namespace Estreya.BlishHUD.EventTable
 			};
 			int reminderDurationMin = 1;
 			int reminderDurationMax = 15;
-			ReminderDuration = base.GlobalSettings.DefineSetting<float>("ReminderDuration", 5f, (Func<string>)(() => "Reminder Duration"), (Func<string>)(() => $"Defines the reminder duration. Min: {reminderDurationMin}s - Max: {reminderDurationMax}s"));
+			ReminderDuration = base.GlobalSettings.DefineSetting<float>("ReminderDuration", 5f, (Func<string>)(() => "Reminder Duration"), (Func<string>)(() => "Defines the reminder duration."));
 			SettingComplianceExtensions.SetRange(ReminderDuration, (float)reminderDurationMin, (float)reminderDurationMax);
 			ReminderDisabledForEvents = base.GlobalSettings.DefineSetting<List<string>>("ReminderDisabledForEvents", new List<string>(), (Func<string>)(() => "Reminder disabled for Events"), (Func<string>)(() => "Defines the events for which NO reminder should be displayed."));
 			ReminderOpacity = base.GlobalSettings.DefineSetting<float>("ReminderOpacity", 0.5f, (Func<string>)(() => "Reminder Opacity"), (Func<string>)(() => "Defines the background opacity for reminders."));
 			SettingComplianceExtensions.SetRange(ReminderOpacity, 0.1f, 1f);
+			ShowDynamicEventsOnMap = base.GlobalSettings.DefineSetting<bool>("ShowDynamicEventsOnMap", false, (Func<string>)(() => "Show Dynamic Events on Map"), (Func<string>)(() => "Whether the dynamic events of the map should be shown."));
 		}
 
 		public void CheckDrawerSizeAndPosition(EventAreaConfiguration configuration)
@@ -177,6 +180,22 @@ namespace Estreya.BlishHUD.EventTable
 			string remindersEnabledDescriptionDefault = ((SettingEntry)RemindersEnabled).get_Description();
 			((SettingEntry)RemindersEnabled).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-remindersEnabled-name", remindersEnabledDisplayNameDefault)));
 			((SettingEntry)RemindersEnabled).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-remindersEnabled-description", remindersEnabledDescriptionDefault)));
+			string reminderPositionXDisplayNameDefault = ((SettingEntry)ReminderPosition.X).get_DisplayName();
+			string reminderPositionXDescriptionDefault = ((SettingEntry)ReminderPosition.X).get_Description();
+			((SettingEntry)ReminderPosition.X).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-reminderPositionX-name", reminderPositionXDisplayNameDefault)));
+			((SettingEntry)ReminderPosition.X).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-reminderPositionX-description", reminderPositionXDescriptionDefault)));
+			string reminderPositionYDisplayNameDefault = ((SettingEntry)ReminderPosition.Y).get_DisplayName();
+			string reminderPositionYDescriptionDefault = ((SettingEntry)ReminderPosition.Y).get_Description();
+			((SettingEntry)ReminderPosition.Y).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-reminderPositionY-name", reminderPositionYDisplayNameDefault)));
+			((SettingEntry)ReminderPosition.Y).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-reminderPositionY-description", reminderPositionYDescriptionDefault)));
+			string reminderDurationDisplayNameDefault = ((SettingEntry)ReminderDuration).get_DisplayName();
+			string reminderDurationDescriptionDefault = ((SettingEntry)ReminderDuration).get_Description();
+			((SettingEntry)ReminderDuration).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-reminderDuration-name", reminderDurationDisplayNameDefault)));
+			((SettingEntry)ReminderDuration).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-reminderDuration-description", reminderDurationDescriptionDefault)));
+			string reminderOpacityDisplayNameDefault = ((SettingEntry)ReminderOpacity).get_DisplayName();
+			string reminderOpacityDescriptionDefault = ((SettingEntry)ReminderOpacity).get_Description();
+			((SettingEntry)ReminderOpacity).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-reminderOpacity-name", reminderOpacityDisplayNameDefault)));
+			((SettingEntry)ReminderOpacity).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-reminderOpacity-description", reminderOpacityDescriptionDefault)));
 		}
 
 		public void UpdateDrawerLocalization(EventAreaConfiguration drawerConfiguration, TranslationState translationState)
@@ -218,18 +237,10 @@ namespace Estreya.BlishHUD.EventTable
 			string completionActionDescriptionDefault = ((SettingEntry)drawerConfiguration.CompletionAcion).get_Description();
 			((SettingEntry)drawerConfiguration.CompletionAcion).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerCompletionAction-name", completionActionDisplayNameDefault)));
 			((SettingEntry)drawerConfiguration.CompletionAcion).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerCompletionAction-description", completionActionDescriptionDefault)));
-			string disabledEventKeysDisplayNameDefault = ((SettingEntry)drawerConfiguration.DisabledEventKeys).get_DisplayName();
-			string disabledEventKeysDescriptionDefault = ((SettingEntry)drawerConfiguration.DisabledEventKeys).get_Description();
-			((SettingEntry)drawerConfiguration.DisabledEventKeys).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerDisabledEventKeys-name", disabledEventKeysDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.DisabledEventKeys).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerDisabledEventKeys-description", disabledEventKeysDescriptionDefault)));
 			string eventHeightDisplayNameDefault = ((SettingEntry)drawerConfiguration.EventHeight).get_DisplayName();
 			string eventHeightDescriptionDefault = ((SettingEntry)drawerConfiguration.EventHeight).get_Description();
 			((SettingEntry)drawerConfiguration.EventHeight).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventHeight-name", eventHeightDisplayNameDefault)));
 			((SettingEntry)drawerConfiguration.EventHeight).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventHeight-description", eventHeightDescriptionDefault)));
-			string eventOrderDisplayNameDefault = ((SettingEntry)drawerConfiguration.EventOrder).get_DisplayName();
-			string eventOrderDescriptionDefault = ((SettingEntry)drawerConfiguration.EventOrder).get_Description();
-			((SettingEntry)drawerConfiguration.EventOrder).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventOrder-name", eventOrderDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.EventOrder).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventOrder-description", eventOrderDescriptionDefault)));
 			string eventOpacityDisplayNameDefault = ((SettingEntry)drawerConfiguration.EventOpacity).get_DisplayName();
 			string eventOpacityDescriptionDefault = ((SettingEntry)drawerConfiguration.EventOpacity).get_Description();
 			((SettingEntry)drawerConfiguration.EventOpacity).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventOpacity-name", eventOpacityDisplayNameDefault)));

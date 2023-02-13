@@ -40,7 +40,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderFloatSetting((Panel)(object)parent, _moduleSettings.ReminderDuration);
 			RenderFloatSetting((Panel)(object)parent, _moduleSettings.ReminderOpacity);
 			RenderEmptyLine((Panel)(object)parent);
-			RenderButton((Panel)(object)parent, "Manage Reminders", delegate
+			RenderButton((Panel)(object)parent, base.TranslationState.GetTranslation("reminderSettingsView-manageReminders-btn", "Manage Reminders"), delegate
 			{
 				//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0040: Unknown result type (might be due to invalid IL or missing references)
@@ -78,7 +78,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				manageEventsView.EventChanged += ManageView_EventChanged;
 				_manageEventsWindow.Show((IView)(object)manageEventsView);
 			});
-			RenderButton((Panel)(object)parent, "Test Reminder", delegate
+			RenderButton((Panel)(object)parent, base.TranslationState.GetTranslation("reminderSettingsView-testReminder-btn", "Test Reminder"), delegate
 			{
 				EventNotification eventNotification = new EventNotification(new Estreya.BlishHUD.EventTable.Models.Event
 				{
@@ -95,14 +95,6 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			_moduleSettings.ReminderDisabledForEvents.set_Value(e.NewState ? new List<string>(from s in _moduleSettings.ReminderDisabledForEvents.get_Value()
 				where s != e.EventSettingKey
 				select s) : new List<string>(_moduleSettings.ReminderDisabledForEvents.get_Value()) { e.EventSettingKey });
-		}
-
-		private void UpdateToggleButton(GlowButton button)
-		{
-			GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
-			{
-				button.set_Icon(button.get_Checked() ? base.IconState.GetIcon("784259.png") : base.IconState.GetIcon("784261.png"));
-			});
 		}
 
 		protected override Task<bool> InternalLoad(IProgress<string> progress)

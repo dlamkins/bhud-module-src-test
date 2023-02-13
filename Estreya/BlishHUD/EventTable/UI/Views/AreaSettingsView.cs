@@ -93,8 +93,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0211: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0274: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0221: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0284: Unknown result type (might be due to invalid IL or missing references)
 			LoadConfigurations();
 			Panel newParent = GetPanel(((Control)parent).get_Parent());
 			((Control)newParent).set_Location(((Control)parent).get_Location());
@@ -139,7 +139,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					BuildEditPanel(newParent, areaPanelBounds, menuItem.Value, areaConfiguration3);
 				});
 			});
-			StandardButton obj = RenderButton(newParent, "Add", delegate
+			StandardButton obj = RenderButton(newParent, base.TranslationState.GetTranslation("areaSettingsView-add-btn", "Add"), delegate
 			{
 				//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 				BuildAddPanel(newParent, areaPanelBounds, areaOverviewMenu);
@@ -195,7 +195,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			string name;
 			EventAreaConfiguration configuration2;
 			MenuItem menuItem;
-			StandardButton saveButton = RenderButton(_areaPanel, "Save", delegate
+			StandardButton saveButton = RenderButton(_areaPanel, base.TranslationState.GetTranslation("areaSettingsView-save-btn", "Save"), delegate
 			{
 				//IL_00db: Unknown result type (might be due to invalid IL or missing references)
 				try
@@ -239,7 +239,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				TextBox val2 = (TextBox)((s is TextBox) ? s : null);
 				((Control)saveButton).set_Enabled(!string.IsNullOrWhiteSpace(((TextInputBase)val2).get_Text()));
 			});
-			StandardButton obj = RenderButton(_areaPanel, "Cancel", delegate
+			StandardButton obj = RenderButton(_areaPanel, base.TranslationState.GetTranslation("areaSettingsView-cancel-btn", "Cancel"), delegate
 			{
 				ClearAreaPanel();
 			});
@@ -337,19 +337,19 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderFloatSetting((Panel)(object)settingsPanel, areaConfiguration.EventOpacity);
 			RenderEmptyLine((Panel)(object)settingsPanel);
 			((IEnumerable<Control>)((Container)settingsPanel).get_Children()).Last();
-			StandardButton manageEventsButton = RenderButton(_areaPanel, "Manage Events", delegate
+			StandardButton manageEventsButton = RenderButton(_areaPanel, base.TranslationState.GetTranslation("areaSettingsView-manageEvents-btn", "Manage Events"), delegate
 			{
 				ManageEvents(areaConfiguration);
 			});
 			((Control)manageEventsButton).set_Top(((Control)areaName).get_Top());
 			((Control)manageEventsButton).set_Left(((Control)settingsPanel).get_Left());
-			StandardButton obj = RenderButton(_areaPanel, "Reorder Events", delegate
+			StandardButton obj = RenderButton(_areaPanel, base.TranslationState.GetTranslation("areaSettingsView-reorderEvents-btn", "Reorder Events"), delegate
 			{
 				ReorderEvents(areaConfiguration);
 			});
 			((Control)obj).set_Top(((Control)manageEventsButton).get_Bottom() + 2);
 			((Control)obj).set_Left(((Control)manageEventsButton).get_Left());
-			StandardButton removeButton = RenderButtonAsync(_areaPanel, "Remove", async delegate
+			StandardButton removeButton = RenderButtonAsync(_areaPanel, base.TranslationState.GetTranslation("areaSettingsView-remove-btn", "Remove"), async delegate
 			{
 				ConfirmDialog dialog = new ConfirmDialog("Delete Event Area \"" + areaConfiguration.Name + "\"", "Your are in the process of deleting the event area \"" + areaConfiguration.Name + "\".\nThis action will delete all settings.\n\nContinue?", base.IconState, new ButtonDefinition[2]
 				{

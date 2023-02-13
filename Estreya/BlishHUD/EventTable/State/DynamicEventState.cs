@@ -1,16 +1,17 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.Shared.State;
 using Flurl.Http;
-using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 
 namespace Estreya.BlishHUD.EventTable.State
 {
-	public class DynamicEventState : ManagedState
+	public class DynamicEventState : APIState
 	{
 		public class Map
 		{
@@ -71,29 +72,10 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		public DynamicEvent[] Events { get; private set; }
 
-		public DynamicEventState(StateConfiguration configuration, IFlurlClient flurlClient)
-			: base(configuration)
+		public DynamicEventState(APIStateConfiguration configuration, Gw2ApiManager apiManager, IFlurlClient flurlClient)
+			: base(apiManager, configuration)
 		{
 			_flurlClient = flurlClient;
-		}
-
-		protected override Task Initialize()
-		{
-			return Task.CompletedTask;
-		}
-
-		protected override void InternalUnload()
-		{
-		}
-
-		protected override void InternalUpdate(GameTime gameTime)
-		{
-		}
-
-		protected override async Task Load()
-		{
-			Maps = await GetMaps();
-			Events = await GetEvents();
 		}
 
 		public Map GetMap(int id)
@@ -103,12 +85,12 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		public DynamicEvent[] GetEventsByMap(int mapId)
 		{
-			return Events.Where((DynamicEvent e) => e.MapId == mapId).ToArray();
+			return Events?.Where((DynamicEvent e) => e.MapId == mapId).ToArray();
 		}
 
 		public DynamicEvent GetEventById(string eventId)
 		{
-			return Events.Where((DynamicEvent e) => e.ID == eventId).FirstOrDefault();
+			return Events?.Where((DynamicEvent e) => e.ID == eventId).FirstOrDefault();
 		}
 
 		private async Task<Map[]> GetMaps()
@@ -126,6 +108,12 @@ namespace Estreya.BlishHUD.EventTable.State
 				x.Value.ID = x.Key;
 				return x.Value;
 			}).ToArray();
+		}
+
+		protected override async Task FetchFromAPI(Gw2ApiManager apiManager, IProgress<string> progress)
+		{
+			Maps = await GetMaps();
+			Events = await GetEvents();
 		}
 	}
 }

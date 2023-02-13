@@ -4,11 +4,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Blish_HUD.Controls;
 using Blish_HUD.Controls.Extern;
 using Blish_HUD.Controls.Intern;
 using Blish_HUD.Input;
 using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.Shared.Controls;
+using Estreya.BlishHUD.Shared.Controls.Map;
 using Estreya.BlishHUD.Shared.Extensions;
 using Gw2Sharp.Models;
 using Gw2Sharp.WebApi.V2.Clients;
@@ -17,7 +19,7 @@ using Microsoft.Xna.Framework;
 
 namespace Estreya.BlishHUD.Shared.Utils
 {
-	public class MapUtil
+	public class MapUtil : IDisposable
 	{
 		public enum ChangeMapLayerDirection
 		{
@@ -44,6 +46,8 @@ namespace Estreya.BlishHUD.Shared.Utils
 
 		private readonly Gw2ApiManager _apiManager;
 
+		private FlatMap _flatMap;
+
 		public static int MouseMoveAndClickDelay { get; set; } = 50;
 
 
@@ -54,6 +58,9 @@ namespace Estreya.BlishHUD.Shared.Utils
 		{
 			_mapKeybinding = mapKeybinding;
 			_apiManager = apiManager;
+			FlatMap flatMap = new FlatMap();
+			((Control)flatMap).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			_flatMap = flatMap;
 		}
 
 		private double GetDistance(double x1, double y1, double x2, double y2)
@@ -72,6 +79,14 @@ namespace Estreya.BlishHUD.Shared.Utils
 			while (GameService.Gw2Mumble.get_Tick() - tick < ticks * 2)
 			{
 				await Task.Delay(10);
+			}
+		}
+
+		public async Task WaitForMapClose(int delay = 10)
+		{
+			while (GameService.Gw2Mumble.get_UI().get_IsMapOpen())
+			{
+				await Task.Delay(delay);
 			}
 		}
 
@@ -333,7 +348,7 @@ namespace Estreya.BlishHUD.Shared.Utils
 			}
 		}
 
-		public async Task<(double X, double Y)> MapCoordinatesToContinentCoordinates(int mapId, double[] coordinates)
+		public async Task<(double X, double Y)> EventMapCoordinatesToContinentCoordinates(int mapId, double[] coordinates)
 		{
 			Map obj = await ((IBulkExpandableClient<Map, int>)(object)_apiManager.get_Gw2ApiClient().get_V2().get_Maps()).GetAsync(mapId, default(CancellationToken));
 			Rectangle continent_rect = obj.get_ContinentRect();
@@ -367,14 +382,46 @@ namespace Estreya.BlishHUD.Shared.Utils
 			return (item, y);
 		}
 
-		public async Task<NavigationResult> DrawCircle(double x, double y, double radius)
+		public async Task<double> EventMapLengthToContinentLength(int mapId, double length)
 		{
-			NavigationResult navResult = await NavigateToPosition(x, y);
-			if (!navResult.Success)
-			{
-				return navResult;
-			}
-			return new NavigationResult(success: true, null);
+			Rectangle map_rect = (await ((IBulkExpandableClient<Map, int>)(object)_apiManager.get_Gw2ApiClient().get_V2().get_Maps()).GetAsync(mapId, default(CancellationToken))).get_MapRect();
+			length /= 0.041666666666666664;
+			double num = length;
+			Coordinates2 val = ((Rectangle)(ref map_rect)).get_BottomLeft();
+			double num2 = num - ((Coordinates2)(ref val)).get_X();
+			val = ((Rectangle)(ref map_rect)).get_TopRight();
+			double x = ((Coordinates2)(ref val)).get_X();
+			val = ((Rectangle)(ref map_rect)).get_BottomLeft();
+			double num3 = num2 / (x - ((Coordinates2)(ref val)).get_X());
+			double num4 = length;
+			val = ((Rectangle)(ref map_rect)).get_BottomLeft();
+			double num5 = num4 - ((Coordinates2)(ref val)).get_Y();
+			val = ((Rectangle)(ref map_rect)).get_TopRight();
+			double y = ((Coordinates2)(ref val)).get_Y();
+			val = ((Rectangle)(ref map_rect)).get_BottomLeft();
+			double scaley = num5 / (y - ((Coordinates2)(ref val)).get_Y());
+			return Math.Sqrt(num3 * num3 + scaley * scaley);
+		}
+
+		public MapEntity AddCircle(double x, double y, double radius, Color color, float thickness = 1f)
+		{
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			MapCircle circle = new MapCircle((float)x, (float)y, (float)radius, color, thickness);
+			_flatMap.AddEntity(circle);
+			return circle;
+		}
+
+		public MapEntity AddBorder(double x, double y, float[][] points, Color color, float thickness = 1f)
+		{
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			MapBorder border = new MapBorder((float)x, (float)y, points, color, thickness);
+			_flatMap.AddEntity(border);
+			return border;
+		}
+
+		public void ClearMapEntities()
+		{
+			_flatMap.ClearEntities();
 		}
 
 		private async Task<NavigationResult> MoveMouse(int x, int y, bool sendToSystem = false)
@@ -383,6 +430,16 @@ namespace Estreya.BlishHUD.Shared.Utils
 			Mouse.SetPosition(x, y, sendToSystem);
 			await WaitForTick();
 			return new NavigationResult(success: true, null);
+		}
+
+		public void Dispose()
+		{
+			FlatMap flatMap = _flatMap;
+			if (flatMap != null)
+			{
+				((Control)flatMap).Dispose();
+			}
+			_flatMap = null;
 		}
 	}
 }

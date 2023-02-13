@@ -17,6 +17,7 @@ using Estreya.BlishHUD.EventTable.Controls;
 using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.EventTable.State;
 using Estreya.BlishHUD.EventTable.UI.Views;
+using Estreya.BlishHUD.Shared.Controls.Map;
 using Estreya.BlishHUD.Shared.Modules;
 using Estreya.BlishHUD.Shared.Settings;
 using Estreya.BlishHUD.Shared.State;
@@ -67,6 +68,31 @@ namespace Estreya.BlishHUD.EventTable
 			await LoadEvents();
 			AddAllAreas();
 			SetAreaEvents();
+			await AddDynamicEventsToMap(removeAfterMapClose: false);
+			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)CurrentMap_MapChanged);
+			base.ModuleSettings.ShowDynamicEventsOnMap.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowDynamicEventsOnMap_SettingChanged);
+		}
+
+		private async void ShowDynamicEventsOnMap_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
+		{
+			try
+			{
+				await AddDynamicEventsToMap(removeAfterMapClose: false);
+			}
+			catch (Exception)
+			{
+			}
+		}
+
+		private async void CurrentMap_MapChanged(object sender, ValueEventArgs<int> e)
+		{
+			try
+			{
+				await AddDynamicEventsToMap(removeAfterMapClose: false);
+			}
+			catch (Exception)
+			{
+			}
 		}
 
 		private void Keyboard_KeyPressed(object sender, KeyboardEventArgs e)
@@ -74,12 +100,84 @@ namespace Estreya.BlishHUD.EventTable
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000b: Invalid comparison between Unknown and I4
 			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Invalid comparison between Unknown and I4
-			if ((int)e.get_EventType() == 256 && !GameService.Input.get_Keyboard().TextFieldIsActive() && (int)e.get_Key() == 85)
+			if ((int)e.get_EventType() == 256 && !GameService.Input.get_Keyboard().TextFieldIsActive())
 			{
-				EventNotification eventNotification = new EventNotification(_eventCategories.First().Events.First(), "Starts in 10 minutes! ajkshdkjahsdkjhaskjdhkajlshdkha", 200, 200, base.IconState);
-				eventNotification.BackgroundOpacity = base.ModuleSettings.ReminderOpacity.get_Value();
-				eventNotification.Show(TimeSpan.FromSeconds(5.0));
+				e.get_Key();
+				_ = 85;
+			}
+		}
+
+		private async Task AddDynamicEventsToMap(bool removeAfterMapClose = true)
+		{
+			MapUtil.ClearMapEntities();
+			if (!base.ModuleSettings.ShowDynamicEventsOnMap.get_Value() || !GameService.Gw2Mumble.get_IsAvailable())
+			{
+				return;
+			}
+			await DynamicEventState.WaitForCompletion();
+			IOrderedEnumerable<DynamicEventState.DynamicEvent> events = DynamicEventState.GetEventsByMap(GameService.Gw2Mumble.get_CurrentMap().get_Id()).OrderByDescending(delegate(DynamicEventState.DynamicEvent d)
+			{
+				double[][] points3 = d.Location.Points;
+				return (points3 != null) ? points3.Length : 0;
+			}).ThenByDescending((DynamicEventState.DynamicEvent d) => d.Location.Radius);
+			if (events == null)
+			{
+				return;
+			}
+			List<MapEntity> mapEntites = new List<MapEntity>();
+			foreach (DynamicEventState.DynamicEvent ev in events)
+			{
+				try
+				{
+					(double X, double Y) coords = await MapUtil.EventMapCoordinatesToContinentCoordinates(ev.MapId, new double[2]
+					{
+						ev.Location.Center[0],
+						ev.Location.Center[1]
+					});
+					switch (ev.Location.Type)
+					{
+					case "sphere":
+					case "cylinder":
+					{
+						double radius = await MapUtil.EventMapLengthToContinentLength(ev.MapId, ev.Location.Radius * 5.0);
+						MapEntity circle = MapUtil.AddCircle(coords.X, coords.Y, radius, Color.get_DarkOrange(), 3f);
+						circle.TooltipText = $"{ev.Name} (Level {ev.Level})";
+						mapEntites.Add(circle);
+						break;
+					}
+					case "poly":
+					{
+						List<float[]> points = new List<float[]>();
+						double[][] points2 = ev.Location.Points;
+						foreach (double[] item in points2)
+						{
+							(double, double) polyCoords = await MapUtil.EventMapCoordinatesToContinentCoordinates(ev.MapId, item);
+							points.Add(new float[2]
+							{
+								(float)polyCoords.Item1,
+								(float)polyCoords.Item2
+							});
+						}
+						MapEntity border = MapUtil.AddBorder(coords.X, coords.Y, points.ToArray(), Color.get_DarkOrange(), 4f);
+						border.TooltipText = $"{ev.Name} (Level {ev.Level})";
+						mapEntites.Add(border);
+						break;
+					}
+					}
+				}
+				catch (Exception ex)
+				{
+					base.Logger.Debug(ex, "Failed to add " + ev.Name + " to map.");
+				}
+			}
+			if (removeAfterMapClose)
+			{
+				await MapUtil.WaitForMapClose(250);
+				mapEntites.ForEach(delegate(MapEntity m)
+				{
+					m?.Dispose();
+				});
+				mapEntites.Clear();
 			}
 		}
 
@@ -271,6 +369,8 @@ namespace Estreya.BlishHUD.EventTable
 			//IL_0154: Expected O, but got Unknown
 			//IL_0189: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0193: Expected O, but got Unknown
+			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d2: Expected O, but got Unknown
 			base.SettingsWindow.get_Tabs().Add(new Tab(base.IconState.GetIcon("156736.png"), (Func<IView>)(() => (IView)(object)new GeneralSettingsView(base.ModuleSettings, base.Gw2ApiManager, base.IconState, base.TranslationState, base.SettingEventState, GameService.Content.get_DefaultFont16())
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
@@ -297,6 +397,10 @@ namespace Estreya.BlishHUD.EventTable
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			}), "Reminders", (int?)null));
+			base.SettingsWindow.get_Tabs().Add(new Tab(base.IconState.GetIcon("759448.png"), (Func<IView>)(() => (IView)(object)new DynamicEventsSettingsView(base.ModuleSettings, base.Gw2ApiManager, base.IconState, base.TranslationState, base.SettingEventState, GameService.Content.get_DefaultFont16())
+			{
+				DefaultColor = base.ModuleSettings.DefaultGW2Color
+			}), "Dynamic Events", (int?)null));
 			base.SettingsWindow.get_Tabs().Add(new Tab(base.IconState.GetIcon("482926.png"), (Func<IView>)(() => (IView)(object)new HelpView(() => _eventCategories, base.API_URL, base.Gw2ApiManager, base.IconState, base.TranslationState, GameService.Content.get_DefaultFont16())
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
@@ -325,12 +429,12 @@ namespace Estreya.BlishHUD.EventTable
 				Enabled = true,
 				SaveInterval = TimeSpan.FromSeconds(30.0)
 			}, directoryPath, () => NowUTC);
-			DynamicEventState = new DynamicEventState(new StateConfiguration
+			DynamicEventState = new DynamicEventState(new APIStateConfiguration
 			{
 				AwaitLoading = false,
 				Enabled = true,
 				SaveInterval = Timeout.InfiniteTimeSpan
-			}, GetFlurlClient());
+			}, base.Gw2ApiManager, GetFlurlClient());
 			collection.Add(EventState);
 			collection.Add(DynamicEventState);
 			return collection;
@@ -349,6 +453,10 @@ namespace Estreya.BlishHUD.EventTable
 		protected override void Unload()
 		{
 			base.Logger.Debug("Unload module.");
+			base.ModuleSettings.ShowDynamicEventsOnMap.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowDynamicEventsOnMap_SettingChanged);
+			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)CurrentMap_MapChanged);
+			MapUtil?.Dispose();
+			MapUtil = null;
 			base.Logger.Debug("Unload drawer.");
 			foreach (EventArea value in _areas.Values)
 			{
