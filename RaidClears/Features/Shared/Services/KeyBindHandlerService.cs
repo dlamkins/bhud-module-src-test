@@ -14,11 +14,13 @@ namespace RaidClears.Features.Shared.Services
 		{
 			_keyBindSetting = keyBindSetting;
 			_toggleControlSetting = toggleControlSetting;
+			_keyBindSetting.get_Value().set_Enabled(true);
 			_keyBindSetting.get_Value().add_Activated((EventHandler<EventArgs>)OnKeyBindActivated);
 		}
 
 		public void Dispose()
 		{
+			_keyBindSetting.get_Value().set_Enabled(false);
 			_keyBindSetting.get_Value().remove_Activated((EventHandler<EventArgs>)OnKeyBindActivated);
 		}
 
