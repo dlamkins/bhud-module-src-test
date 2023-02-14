@@ -37,6 +37,8 @@ namespace Kenedia.Modules.Core.Services
 
 		private GameStatus _gameStatus;
 
+		public bool Enabled { get; set; }
+
 		public ClientWindowService ClientWindowService { get; set; }
 
 		public SharedSettings SharedSettings { get; set; }
@@ -126,6 +128,7 @@ namespace Kenedia.Modules.Core.Services
 			_logoutMask = framedMaskedRegion2;
 			_spinnerResults = new List<double>();
 			_gameStatuses = new List<GameStatus>();
+			Enabled = true;
 			base._002Ector();
 			ClientWindowService = clientWindowService;
 			SharedSettings = sharedSettings;
@@ -133,6 +136,10 @@ namespace Kenedia.Modules.Core.Services
 
 		public void Run(GameTime gameTime)
 		{
+			if (!Enabled)
+			{
+				return;
+			}
 			NewStatus = GameStatus.Unknown;
 			if (GameService.Gw2Mumble.get_TimeSinceTick().TotalMilliseconds <= 500.0)
 			{

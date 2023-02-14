@@ -277,13 +277,13 @@ namespace Kenedia.Modules.Characters.Services
 			Radial_ShowAdvancedTooltip = internalSettings.DefineSetting<bool>("Radial_ShowAdvancedTooltip", true, (Func<string>)null, (Func<string>)null);
 			LoadCachedAccounts = internalSettings.DefineSetting<bool>("LoadCachedAccounts", true, (Func<string>)null, (Func<string>)null);
 			OpenSidemenuOnSearch = internalSettings.DefineSetting<bool>("OpenSidemenuOnSearch", true, (Func<string>)null, (Func<string>)null);
-			FocusSearchOnShow = internalSettings.DefineSetting<bool>("FocusSearchOnShow", true, (Func<string>)null, (Func<string>)null);
+			FocusSearchOnShow = internalSettings.DefineSetting<bool>("FocusSearchOnShow", false, (Func<string>)null, (Func<string>)null);
 			ShowRandomButton = internalSettings.DefineSetting<bool>("ShowRandomButton", true, (Func<string>)null, (Func<string>)null);
 			ShowLastButton = internalSettings.DefineSetting<bool>("ShowLastButton", false, (Func<string>)null, (Func<string>)null);
 			ShowStatusWindow = internalSettings.DefineSetting<bool>("ShowStatusWindow", true, (Func<string>)null, (Func<string>)null);
 			ShowChoyaSpinner = internalSettings.DefineSetting<bool>("ShowChoyaSpinner", true, (Func<string>)null, (Func<string>)null);
 			EnterOnSwap = internalSettings.DefineSetting<bool>("EnterOnSwap", true, (Func<string>)null, (Func<string>)null);
-			OnlyEnterOnExact = internalSettings.DefineSetting<bool>("OnlyEnterOnExact", true, (Func<string>)null, (Func<string>)null);
+			OnlyEnterOnExact = internalSettings.DefineSetting<bool>("OnlyEnterOnExact", false, (Func<string>)null, (Func<string>)null);
 			OpenInventoryOnEnter = internalSettings.DefineSetting<bool>("OpenInventoryOnEnter", false, (Func<string>)null, (Func<string>)null);
 			DoubleClickToEnter = internalSettings.DefineSetting<bool>("DoubleClickToEnter", false, (Func<string>)null, (Func<string>)null);
 			EnterToLogin = internalSettings.DefineSetting<bool>("EnterToLogin", false, (Func<string>)null, (Func<string>)null);

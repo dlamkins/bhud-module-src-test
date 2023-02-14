@@ -4,6 +4,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Gw2Sharp.WebApi;
 using Kenedia.Modules.Core.Interfaces;
+using Kenedia.Modules.Core.Services;
 
 namespace Kenedia.Modules.Core.Controls
 {
@@ -44,7 +45,7 @@ namespace Kenedia.Modules.Core.Controls
 		public KeybindingAssigner()
 			: this()
 		{
-			GameService.Overlay.get_UserLocale().add_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)UserLocale_SettingChanged);
+			LocalizingService.LocaleChanged += UserLocale_SettingChanged;
 			((KeybindingAssigner)this).add_BindingChanged((EventHandler<EventArgs>)KeybindingAssigner_BindingChanged);
 			UserLocale_SettingChanged(null, null);
 		}

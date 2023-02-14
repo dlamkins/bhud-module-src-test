@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using Blish_HUD;
+using Kenedia.Modules.Characters.Services;
+using Kenedia.Modules.Characters.Views;
+using Kenedia.Modules.Core.Models;
 using Newtonsoft.Json;
 using SemVer;
 
@@ -21,7 +23,7 @@ namespace Kenedia.Modules.Characters.Models
 
 		public int Map;
 
-		public static void Import(string path, ObservableCollection<Character_Model> characters, string imagePath, string accountName, Logger logger, TagList tags)
+		public static void Import(string path, ObservableCollection<Character_Model> characters, string imagePath, string accountName, TagList tags)
 		{
 			if (!File.Exists(path))
 			{
@@ -71,7 +73,7 @@ namespace Kenedia.Modules.Characters.Models
 					{
 						if (File.Exists(basePath + "\\" + old.Icon) && !File.Exists(imagePath + old.Icon))
 						{
-							logger.Info("Copy Icon for " + old.Name + " from old path '" + basePath + "\\" + old.Icon + "' to '" + imagePath + old.Icon + "'.");
+							BaseModule<Characters, MainWindow, SettingsModel>.Logger.Info("Copy Icon for " + old.Name + " from old path '" + basePath + "\\" + old.Icon + "' to '" + imagePath + old.Icon + "'.");
 							File.Copy(basePath + "\\" + old.Icon, imagePath + old.Icon);
 						}
 					}

@@ -4,6 +4,7 @@ using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Gw2Sharp.WebApi;
 using Gw2Sharp.WebApi.V2.Models;
 using Kenedia.Modules.Characters.Models;
 using Kenedia.Modules.Characters.Res;
@@ -360,6 +361,17 @@ namespace Kenedia.Modules.Characters.Controls
 			_craftingControl.Character = Character;
 			UpdateLabelLayout();
 			UpdateSize();
+		}
+
+		public override void UserLocale_SettingChanged(object sender, ValueChangedEventArgs<Locale> e)
+		{
+			base.UserLocale_SettingChanged(sender, e);
+			ApplyCharacter(sender, (EventArgs)(object)e);
+		}
+
+		protected override void DisposeControl()
+		{
+			base.DisposeControl();
 		}
 	}
 }

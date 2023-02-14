@@ -5,6 +5,7 @@ using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Gw2Sharp.WebApi;
 using Kenedia.Modules.Core.Interfaces;
+using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.Core.Structs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -89,7 +90,7 @@ namespace Kenedia.Modules.Core.Controls
 			: this()
 		{
 			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			GameService.Overlay.get_UserLocale().add_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)UserLocale_SettingChanged);
+			LocalizingService.LocaleChanged += UserLocale_SettingChanged;
 			UserLocale_SettingChanged(null, null);
 		}
 

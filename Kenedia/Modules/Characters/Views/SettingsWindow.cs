@@ -14,27 +14,11 @@ using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Models;
 using Kenedia.Modules.Core.Views;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended;
-using MonoGame.Extended.BitmapFonts;
-using SemVer;
 
 namespace Kenedia.Modules.Characters.Views
 {
-	public class SettingsWindow : StandardWindow
+	public class SettingsWindow : BaseSettingsWindow
 	{
-		private readonly AsyncTexture2D _subWindowEmblem = AsyncTexture2D.FromAssetId(156027);
-
-		private readonly AsyncTexture2D _mainWindowEmblem = AsyncTexture2D.FromAssetId(156015);
-
-		private readonly BitmapFont _titleFont = GameService.Content.get_DefaultFont32();
-
-		private Rectangle _mainEmblemRectangle;
-
-		private Rectangle _subEmblemRectangle;
-
-		private Rectangle _titleRectangle;
-
 		private Label _customFontSizeLabel;
 
 		private Dropdown _customFontSize;
@@ -53,16 +37,14 @@ namespace Kenedia.Modules.Characters.Views
 
 		private double _tick;
 
-		public Version Version { get; set; }
-
 		public SettingsWindow(AsyncTexture2D background, Rectangle windowRegion, Rectangle contentRegion, SharedSettingsView sharedSettingsView, OCR ocr, SettingsModel settings)
 			: base(background, windowRegion, contentRegion)
 		{
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 			_sharedSettingsView = sharedSettingsView;
 			_ocr = ocr;
 			_settings = settings;
@@ -73,6 +55,9 @@ namespace Kenedia.Modules.Characters.Views
 			((FlowPanel)flowPanel).set_ControlPadding(new Vector2(0f, 10f));
 			((Panel)flowPanel).set_CanScroll(true);
 			_contentPanel = flowPanel;
+			base.SubWindowEmblem = AsyncTexture2D.FromAssetId(156027);
+			base.MainWindowEmblem = AsyncTexture2D.FromAssetId(156015);
+			base.Name = string.Format(strings.ItemSettings, BaseModule<Characters, MainWindow, SettingsModel>.ModuleName ?? "");
 			CreateOCR();
 			CreateAppearance();
 			CreateBehavior();
@@ -1091,60 +1076,7 @@ namespace Kenedia.Modules.Characters.Views
 
 		public void OnLanguageChanged(object s = null, EventArgs e = null)
 		{
-		}
-
-		public override void RecalculateLayout()
-		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			((WindowBase2)this).RecalculateLayout();
-			_subEmblemRectangle = new Rectangle(21, 6, 64, 64);
-			_mainEmblemRectangle = new Rectangle(-43, -58, 128, 128);
-			RectangleF titleBounds = _titleFont.GetStringRectangle(string.Format(strings.ItemSettings, BaseModule<Characters, MainWindow, SettingsModel>.ModuleName ?? ""));
-			_titleRectangle = new Rectangle(80, 5, (int)titleBounds.Width, Math.Max(30, (int)titleBounds.Height));
-		}
-
-		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
-		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-			((WindowBase2)this).PaintAfterChildren(spriteBatch, bounds);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_mainWindowEmblem), _mainEmblemRectangle, (Rectangle?)_mainWindowEmblem.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_subWindowEmblem), _subEmblemRectangle, (Rectangle?)_subWindowEmblem.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
-			if (_titleRectangle.Width < bounds.Width - (_subEmblemRectangle.Width - 20))
-			{
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, string.Format(strings.ItemSettings, BaseModule<Characters, MainWindow, SettingsModel>.ModuleName ?? ""), _titleFont, _titleRectangle, Colors.ColonialWhite, false, (HorizontalAlignment)0, (VerticalAlignment)2);
-			}
-		}
-
-		protected override void DisposeControl()
-		{
-			((WindowBase2)this).DisposeControl();
-			GameService.Overlay.get_UserLocale().remove_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)OnLanguageChanged);
-			((IEnumerable<IDisposable>)((Container)this).get_Children()).DisposeAll();
-			((IEnumerable<IDisposable>)((Container)_contentPanel).get_Children()).DisposeAll();
-			_subWindowEmblem.Dispose();
-			_mainWindowEmblem.Dispose();
+			base.Name = string.Format(strings.ItemSettings, BaseModule<Characters, MainWindow, SettingsModel>.ModuleName ?? "");
 		}
 
 		public override void UpdateContainer(GameTime gameTime)
@@ -1157,18 +1089,6 @@ namespace Kenedia.Modules.Characters.Views
 				{
 					_sharedSettingsView?.UpdateOffset();
 				}
-			}
-		}
-
-		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
-		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			((WindowBase2)this).PaintBeforeChildren(spriteBatch, bounds);
-			if (Version != (Version)null)
-			{
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, $"v. {Version}", Control.get_Content().get_DefaultFont16(), new Rectangle(((Rectangle)(ref bounds)).get_Right() - 150, ((Rectangle)(ref bounds)).get_Top() + 10, 100, 30), Color.get_White(), false, true, 1, (HorizontalAlignment)2, (VerticalAlignment)0);
 			}
 		}
 	}

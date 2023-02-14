@@ -75,7 +75,7 @@ namespace Kenedia.Modules.Characters
 			_ocrApi.Init(basePath + "\\", "gw2");
 			OCRView oCRView = new OCRView(_settings, this);
 			((Control)oCRView).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)oCRView).set_ZIndex(2147483646);
+			((Control)oCRView).set_ZIndex(1073741822);
 			((Control)oCRView).set_Visible(false);
 			_view = oCRView;
 		}

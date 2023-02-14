@@ -31,6 +31,8 @@ namespace Kenedia.Modules.Core.Models
 
 		public string ModulePath => BasePath + "\\" + _moduleName + "\\";
 
+		public string ModuleDataPath => BasePath + "\\" + _moduleName + "\\data\\";
+
 		public string SharedSettingsPath => BasePath + "\\shared_settings.json";
 
 		public string? AccountPath
@@ -53,6 +55,10 @@ namespace Kenedia.Modules.Core.Models
 			if (!Directory.Exists(ModulePath))
 			{
 				Directory.CreateDirectory(ModulePath);
+			}
+			if (!Directory.Exists(ModuleDataPath))
+			{
+				Directory.CreateDirectory(ModuleDataPath);
 			}
 		}
 

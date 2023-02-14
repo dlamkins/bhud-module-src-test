@@ -159,17 +159,11 @@ namespace Kenedia.Modules.Characters.Services
 					break;
 				}
 				_state = SwappingState.CharacterLost;
-				for (int i = 1; i < Math.Min(_characterModels.Count, _settings.CheckDistance.get_Value()); i++)
+				await MoveLeft(cancellationToken, Math.Min(_characterModels.Count, _settings.CheckDistance.get_Value()));
+				for (int i = 1; i < Math.Min(_characterModels.Count, _settings.CheckDistance.get_Value() * 2); i++)
 				{
-					await MoveLeft(cancellationToken, i * 2 - 1);
-					await Delay(cancellationToken, 250);
-					if (await ConfirmName())
-					{
-						_state = SwappingState.CharacterFound;
-						return;
-					}
-					await MoveRight(cancellationToken, i * 2);
-					await Delay(cancellationToken, 250);
+					await MoveRight(cancellationToken);
+					await Delay(cancellationToken, 150);
 					if (await ConfirmName())
 					{
 						_state = SwappingState.CharacterFound;
@@ -294,21 +288,53 @@ namespace Kenedia.Modules.Characters.Services
 				await _settings.LogoutKey.get_Value().PerformPress(_settings.KeyDelay.get_Value(), triggerSystem: true, cancellationToken);
 				Keyboard.Stroke((VirtualKeyShort)13, false);
 				await Delay(cancellationToken);
-				if (!_settings.UseBetaGamestate.get_Value())
-				{
-					await Delay(cancellationToken, _settings.SwapDelay.get_Value());
-				}
-				else
+				Stopwatch stopwatch = new Stopwatch();
+				if (_settings.UseBetaGamestate.get_Value())
 				{
 					while (!_gameState.IsCharacterSelection && !cancellationToken.IsCancellationRequested)
 					{
-						await Delay(cancellationToken, 250);
+						await Delay(cancellationToken, 50);
 						if (cancellationToken.IsCancellationRequested)
 						{
 							return _gameState.IsCharacterSelection;
 						}
 					}
+					if (_settings.UseOCR.get_Value())
+					{
+						stopwatch.Start();
+						string txt2 = await OCR.Read();
+						while (stopwatch.ElapsedMilliseconds < 5000 && txt2.Length <= 2 && !cancellationToken.IsCancellationRequested)
+						{
+							BaseModule<Characters, MainWindow, SettingsModel>.Logger.Debug("We are in the character selection but the OCR did only read '" + txt2 + "'. Waiting a bit longer!");
+							await Delay(cancellationToken, 250);
+							txt2 = await OCR.Read();
+							if (cancellationToken.IsCancellationRequested)
+							{
+								return _gameState.IsCharacterSelection;
+							}
+						}
+					}
 				}
+				else
+				{
+					await Delay(cancellationToken, _settings.SwapDelay.get_Value());
+					if (_settings.UseOCR.get_Value())
+					{
+						stopwatch.Start();
+						string txt = await OCR.Read();
+						while (stopwatch.ElapsedMilliseconds < 5000 && txt.Length <= 2 && !cancellationToken.IsCancellationRequested)
+						{
+							BaseModule<Characters, MainWindow, SettingsModel>.Logger.Debug("We should be in the character selection but the OCR did only read '" + txt + "'. Waiting a bit longer!");
+							await Delay(cancellationToken, 250);
+							txt = await OCR.Read();
+							if (cancellationToken.IsCancellationRequested)
+							{
+								return _gameState.IsCharacterSelection;
+							}
+						}
+					}
+				}
+				stopwatch.Stop();
 			}
 			return !GameService.GameIntegration.get_Gw2Instance().get_IsInGame();
 		}
@@ -427,15 +453,15 @@ namespace Kenedia.Modules.Characters.Services
 					}
 				}
 			}
+			if (_settings.OpenInventoryOnEnter.get_Value())
+			{
+				await _settings.InventoryKey.get_Value().PerformPress(_settings.KeyDelay.get_Value(), triggerSystem: false);
+			}
 			PlayerCharacter player = GameService.Gw2Mumble.get_PlayerCharacter();
 			if (player != null && player.get_Name() == Character.Name)
 			{
 				Character.UpdateCharacter(player);
 				this.Succeeded?.Invoke(null, null);
-			}
-			if (_settings.OpenInventoryOnEnter.get_Value())
-			{
-				await _settings.InventoryKey.get_Value().PerformPress(_settings.KeyDelay.get_Value(), triggerSystem: false);
 			}
 			return true;
 		}

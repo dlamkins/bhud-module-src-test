@@ -14,7 +14,9 @@ using Gw2Sharp.WebApi.V2.Models;
 using Kenedia.Modules.Characters.Enums;
 using Kenedia.Modules.Characters.Res;
 using Kenedia.Modules.Characters.Services;
+using Kenedia.Modules.Characters.Views;
 using Kenedia.Modules.Core.Extensions;
+using Kenedia.Modules.Core.Models;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Kenedia.Modules.Characters.Models
@@ -244,6 +246,7 @@ namespace Kenedia.Modules.Characters.Models
 				_iconPath = value;
 				_icon = null;
 				_pathChecked = false;
+				OnUpdated();
 			}
 		}
 
@@ -653,10 +656,11 @@ namespace Kenedia.Modules.Characters.Models
 			{
 				Save();
 				_characterSwapping?.Start(this, ignoreOCR);
+				BaseModule<Characters, MainWindow, SettingsModel>.Logger.Info(string.Format(strings.CharacterSwap_SwitchTo, Name));
 			}
 			else
 			{
-				ScreenNotification.ShowNotification(strings.Error_Competivive, (NotificationType)2, (Texture2D)null, 4);
+				ScreenNotification.ShowNotification("[Characters]: " + strings.Error_Competivive, (NotificationType)2, (Texture2D)null, 4);
 			}
 		}
 
@@ -669,7 +673,7 @@ namespace Kenedia.Modules.Characters.Models
 			if (character != null && character.get_Name() == Name)
 			{
 				Specialization = (SpecializationType)character.get_Specialization();
-				Map = GameService.Gw2Mumble.get_CurrentMap().get_Id();
+				Map = (GameService.Gw2Mumble.get_CurrentMap().IsCommonMap() ? GameService.Gw2Mumble.get_CurrentMap().get_Id() : Map);
 				LastLogin = DateTime.UtcNow;
 			}
 		}

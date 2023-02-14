@@ -9,6 +9,9 @@ namespace Kenedia.Modules.Core.Services
 	{
 		private double _resolutionTick;
 
+		public bool Enabled { get; set; } = true;
+
+
 		public int TitleBarHeight { get; set; }
 
 		public int SideBarWidth { get; set; }
@@ -19,7 +22,7 @@ namespace Kenedia.Modules.Core.Services
 
 		public void Run(GameTime gameTime)
 		{
-			if (!(gameTime.get_TotalGameTime().TotalMilliseconds - _resolutionTick >= 50.0))
+			if (!Enabled || !(gameTime.get_TotalGameTime().TotalMilliseconds - _resolutionTick >= 50.0))
 			{
 				return;
 			}

@@ -6,6 +6,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Gw2Sharp.WebApi;
 using Kenedia.Modules.Core.Interfaces;
+using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.Core.Structs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -160,7 +161,7 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			GameService.Overlay.get_UserLocale().add_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)UserLocale_SettingChanged);
+			LocalizingService.LocaleChanged += UserLocale_SettingChanged;
 			UserLocale_SettingChanged(null, null);
 			RecalculateFading();
 		}
@@ -424,7 +425,7 @@ namespace Kenedia.Modules.Core.Controls
 			DrawBorders(spriteBatch);
 		}
 
-		public void UserLocale_SettingChanged(object sender, ValueChangedEventArgs<Locale> e)
+		public virtual void UserLocale_SettingChanged(object sender, ValueChangedEventArgs<Locale> e)
 		{
 			if (SetLocalizedTooltip != null)
 			{
@@ -462,7 +463,7 @@ namespace Kenedia.Modules.Core.Controls
 		protected override void DisposeControl()
 		{
 			((Container)this).DisposeControl();
-			GameService.Overlay.get_UserLocale().remove_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)UserLocale_SettingChanged);
+			LocalizingService.LocaleChanged -= UserLocale_SettingChanged;
 		}
 
 		private void RecalculateFading()

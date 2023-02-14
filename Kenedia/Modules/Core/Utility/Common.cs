@@ -1,17 +1,18 @@
 using System;
 using System.Reflection;
 using Blish_HUD;
+using Gw2Sharp.WebApi;
 
 namespace Kenedia.Modules.Core.Utility
 {
-	public class Common
+	public static class Common
 	{
 		public static double Now()
 		{
 			return GameService.Overlay.get_CurrentGameTime().get_TotalGameTime().TotalMilliseconds;
 		}
 
-		public static bool SetProperty<T>(ref T property, T newValue, bool triggerOnUpdate = true, Action OnUpdated = null)
+		public static bool SetProperty<T>(ref T property, T newValue, Action OnUpdated = null, bool triggerOnUpdate = true)
 		{
 			if (object.Equals(property, newValue))
 			{
@@ -52,6 +53,42 @@ namespace Kenedia.Modules.Core.Utility
 				return null;
 			}
 			return p.GetValue(obj, null)?.ToString();
+		}
+
+		public static int GetAssetIdFromRenderUrl(this RenderUrl? url)
+		{
+			if (!url.HasValue)
+			{
+				return 0;
+			}
+			string s = url.ToString();
+			int pos = s.LastIndexOf("/") + 1;
+			if (!int.TryParse(s.Substring(pos, s.Length - pos - 4), out var id))
+			{
+				return 0;
+			}
+			return id;
+		}
+
+		public static int GetAssetIdFromRenderUrl(this RenderUrl url)
+		{
+			string s = ((object)(RenderUrl)(ref url)).ToString();
+			int pos = s.LastIndexOf("/") + 1;
+			if (!int.TryParse(s.Substring(pos, s.Length - pos - 4), out var id))
+			{
+				return 0;
+			}
+			return id;
+		}
+
+		public static int GetAssetIdFromRenderUrl(string s)
+		{
+			int pos = s.ToString().LastIndexOf("/") + 1;
+			if (!int.TryParse(s.Substring(pos, s.Length - pos - 4), out var id))
+			{
+				return 0;
+			}
+			return id;
 		}
 	}
 }

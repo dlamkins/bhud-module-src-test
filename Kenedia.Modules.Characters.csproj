@@ -18,8 +18,8 @@
     <Reference Include="Blish HUD" />
     <Reference Include="MonoGame.Extended" />
     <Reference Include="SemVer" />
-    <Reference Include="Newtonsoft.Json" />
     <Reference Include="Gw2Sharp" />
+    <Reference Include="Newtonsoft.Json" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="Patagames.Ocr">

@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.Controls.Extern;
+using Blish_HUD.Controls.Intern;
 using Blish_HUD.Input;
 using Gw2Sharp.WebApi.V2.Models;
 using Kenedia.Modules.Characters.Controls;
@@ -23,6 +25,7 @@ using Kenedia.Modules.Core.Utility;
 using Kenedia.Modules.Core.Views;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using MonoGame.Extended.BitmapFonts;
 using SemVer;
@@ -75,13 +78,12 @@ namespace Kenedia.Modules.Characters.Views
 
 		private BitmapFont _titleFont;
 
-		private List<Character_Model> loadedModels = new List<Character_Model>();
+		private List<Character_Model> LoadedModels { get; } = new List<Character_Model>();
+
 
 		public SettingsWindow SettingsWindow { get; set; }
 
 		public SideMenu SideMenu { get; }
-
-		public Version Version { get; set; }
 
 		public List<CharacterCard> CharacterCards { get; } = new List<CharacterCard>();
 
@@ -98,25 +100,24 @@ namespace Kenedia.Modules.Characters.Views
 		public MainWindow(Texture2D background, Rectangle windowRegion, Rectangle contentRegion, SettingsModel settings, TextureManager textureManager, ObservableCollection<Character_Model> characterModels, SearchFilterCollection searchFilters, SearchFilterCollection tagFilters, Action toggleOCR, Action togglePotrait, Action refreshAPI, Func<string> accountImagePath, TagList tags, Func<Character_Model> currentCharacter, Data data, CharacterSorting characterSorting)
 			: base(AsyncTexture2D.op_Implicit(background), windowRegion, contentRegion)
 		{
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0167: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0191: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0343: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0520: Unknown result type (might be due to invalid IL or missing references)
-			//IL_052b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_053b: Unknown result type (might be due to invalid IL or missing references)
-			MainWindow mainWindow = this;
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0263: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0335: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0345: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_049a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0507: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0512: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0522: Unknown result type (might be due to invalid IL or missing references)
 			_settings = settings;
 			_textureManager = textureManager;
 			_characterModels = characterModels;
@@ -161,7 +162,7 @@ namespace Kenedia.Modules.Characters.Views
 			filterBox.ClickAction = FilterBox_Click;
 			filterBox.PerformFiltering = delegate
 			{
-				mainWindow.PerformFiltering();
+				PerformFiltering();
 			};
 			filterBox.FilteringOnTextChange = true;
 			_filterBox = filterBox;
@@ -176,9 +177,9 @@ namespace Kenedia.Modules.Characters.Views
 			((Control)imageButton).set_Visible(false);
 			imageButton.ClickAction = delegate
 			{
-				((TextInputBase)mainWindow._filterBox).set_Text((string)null);
-				mainWindow._filterCharacters = true;
-				mainWindow.SideMenu.ResetToggles();
+				((TextInputBase)_filterBox).set_Text((string)null);
+				_filterCharacters = true;
+				SideMenu.ResetToggles();
 			};
 			_clearButton = imageButton;
 			FlowPanel flowPanel4 = new FlowPanel();
@@ -199,7 +200,7 @@ namespace Kenedia.Modules.Characters.Views
 			((Control)imageButton2).set_Visible(_settings.ShowLastButton.get_Value());
 			imageButton2.ClickAction = delegate
 			{
-				characterModels.Aggregate((Character_Model a, Character_Model b) => (!(b.LastLogin > a.LastLogin)) ? b : a)?.Swap(ignoreOCR: true);
+				_characterModels.Aggregate((Character_Model a, Character_Model b) => (!(b.LastLogin > a.LastLogin)) ? b : a)?.Swap(ignoreOCR: true);
 			};
 			_lastButton = imageButton2;
 			_lastButton.Texture.add_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)Texture_TextureSwapped);
@@ -212,7 +213,7 @@ namespace Kenedia.Modules.Characters.Views
 			((Control)imageButton3).set_Visible(_settings.ShowRandomButton.get_Value());
 			imageButton3.ClickAction = delegate
 			{
-				List<Control> list = ((IEnumerable<Control>)((Container)mainWindow.CharactersPanel).get_Children()).Where((Control e) => e.get_Visible()).ToList();
+				List<Control> list = ((IEnumerable<Control>)((Container)CharactersPanel).get_Children()).Where((Control e) => e.get_Visible()).ToList();
 				int index = RandomService.Rnd.Next(list.Count);
 				((CharacterCard)(object)list[index])?.Character.Swap();
 			};
@@ -225,7 +226,7 @@ namespace Kenedia.Modules.Characters.Views
 			imageButton4.SetLocalizedTooltip = () => string.Format(strings.ShowItem, string.Format(strings.ItemSettings, strings.Display));
 			imageButton4.ClickAction = delegate
 			{
-				SettingsWindow settingsWindow = mainWindow.SettingsWindow;
+				SettingsWindow settingsWindow = SettingsWindow;
 				if (settingsWindow != null)
 				{
 					((WindowBase2)settingsWindow).ToggleWindow();
@@ -241,13 +242,10 @@ namespace Kenedia.Modules.Characters.Views
 			imageButton5.SetLocalizedTooltip = () => string.Format(strings.Toggle, "Side Menu");
 			imageButton5.ClickAction = delegate
 			{
-				mainWindow.ShowAttached(((Control)mainWindow.SideMenu).get_Visible() ? null : mainWindow.SideMenu);
+				ShowAttached(((Control)SideMenu).get_Visible() ? null : SideMenu);
 			};
 			_toggleSideMenuButton = imageButton5;
-			CharacterEdit characterEdit = new CharacterEdit(textureManager, togglePotrait, accountImagePath, tags, settings, delegate
-			{
-				mainWindow.PerformFiltering();
-			});
+			CharacterEdit characterEdit = new CharacterEdit(textureManager, togglePotrait, accountImagePath, tags, settings, PerformFiltering);
 			((Control)characterEdit).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			characterEdit.Anchor = (Control)(object)this;
 			characterEdit.AnchorPosition = AnchoredContainer.AnchorPos.AutoHorizontal;
@@ -333,7 +331,7 @@ namespace Kenedia.Modules.Characters.Views
 			List<Match> strings = regex.Matches(((TextInputBase)_filterBox).get_Text().Trim().ToLower()).Cast<Match>().ToList();
 			new List<string>();
 			List<KeyValuePair<string, SearchFilter<Character_Model>>> stringFilters = new List<KeyValuePair<string, SearchFilter<Character_Model>>>();
-			_003C_003Ec__DisplayClass62_0 CS_0024_003C_003E8__locals0;
+			_003C_003Ec__DisplayClass60_0 CS_0024_003C_003E8__locals0;
 			foreach (Match match in strings)
 			{
 				string string_text = SearchableString(match.ToString().Replace("\"", ""));
@@ -367,7 +365,7 @@ namespace Kenedia.Modules.Characters.Views
 					{
 						//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 						//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-						_003C_003Ec__DisplayClass62_0 _003C_003Ec__DisplayClass62_ = CS_0024_003C_003E8__locals0;
+						_003C_003Ec__DisplayClass60_0 _003C_003Ec__DisplayClass60_ = CS_0024_003C_003E8__locals0;
 						Gender gender = c.Gender;
 						return SearchableString(((object)(Gender)(ref gender)).ToString()).Contains(string_text);
 					}, enabled: true)));
@@ -483,14 +481,15 @@ namespace Kenedia.Modules.Characters.Views
 			}
 		}
 
-		public void CreateCharacterControls(IEnumerable<Character_Model> models)
+		public void CreateCharacterControls()
 		{
-			if (SideMenu.Tabs.Count <= 1)
+			if (SideMenu.Tabs.Count <= 1 || CharacterCards == null)
 			{
 				return;
 			}
-			foreach (Character_Model c in models.Except(loadedModels))
+			foreach (Character_Model c in _characterModels.Except(LoadedModels))
 			{
+				LoadedModels.Add(c);
 				List<CharacterCard> characterCards = CharacterCards;
 				CharacterCard obj = new CharacterCard(_currentCharacter, _textureManager, _data, this, _settings)
 				{
@@ -500,7 +499,6 @@ namespace Kenedia.Modules.Characters.Views
 				obj.AttachedCards = CharacterCards;
 				characterCards.Add(obj);
 			}
-			loadedModels = new List<Character_Model>(models);
 			FilterCharacters();
 			CharacterCards.FirstOrDefault()?.UniformWithAttached();
 		}
@@ -546,7 +544,7 @@ namespace Kenedia.Modules.Characters.Views
 		public override void UpdateContainer(GameTime gameTime)
 		{
 			base.UpdateContainer(gameTime);
-			((Control)this).set_BasicTooltipText((((WindowBase2)this).get_MouseOverTitleBar() && Version != (Version)null) ? $"v. {Version}" : null);
+			((Control)this).set_BasicTooltipText((((WindowBase2)this).get_MouseOverTitleBar() && base.Version != (Version)null) ? $"v. {base.Version}" : null);
 			if (_filterCharacters && gameTime.get_TotalGameTime().TotalMilliseconds - _filterTick > (double)_settings.FilterDelay.get_Value())
 			{
 				_filterTick = gameTime.get_TotalGameTime().TotalMilliseconds;
@@ -569,7 +567,7 @@ namespace Kenedia.Modules.Characters.Views
 			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			((WindowBase2)this).RecalculateLayout();
+			base.RecalculateLayout();
 			_emblemRectangle = new Rectangle(-43, -58, 128, 128);
 			_titleFont = GameService.Content.get_DefaultFont32();
 			RectangleF titleBounds = _titleFont.GetStringRectangle(BaseModule<Characters, MainWindow, SettingsModel>.ModuleName);
@@ -592,7 +590,7 @@ namespace Kenedia.Modules.Characters.Views
 			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-			((WindowBase2)this).PaintAfterChildren(spriteBatch, bounds);
+			base.PaintAfterChildren(spriteBatch, bounds);
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_windowEmblem), _emblemRectangle, (Rectangle?)_windowEmblem.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
 			if (_titleRectangle.Width < bounds.Width - (_emblemRectangle.Width - 20))
 			{
@@ -602,11 +600,19 @@ namespace Kenedia.Modules.Characters.Views
 
 		protected override void OnShown(EventArgs e)
 		{
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).OnShown(e);
-			if (_settings.FocusSearchOnShow.get_Value())
+			if (!_settings.FocusSearchOnShow.get_Value())
 			{
-				((TextInputBase)_filterBox).set_Focused(true);
+				return;
 			}
+			foreach (Keys item in GameService.Input.get_Keyboard().get_KeysDown())
+			{
+				Keyboard.Release((VirtualKeyShort)(short)item, false);
+				Keyboard.Release((VirtualKeyShort)(short)item, true);
+			}
+			((TextInputBase)_filterBox).set_Focused(true);
 		}
 
 		protected override void OnHidden(EventArgs e)
@@ -668,7 +674,7 @@ namespace Kenedia.Modules.Characters.Views
 
 		protected override void DisposeControl()
 		{
-			((WindowBase2)this).DisposeControl();
+			base.DisposeControl();
 			_settings.PinSideMenus.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)PinSideMenus_SettingChanged);
 			_settings.ShowRandomButton.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowRandomButton_SettingChanged);
 			_settings.ShowLastButton.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowLastButton_SettingChanged);
@@ -676,11 +682,11 @@ namespace Kenedia.Modules.Characters.Views
 			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)CurrentMap_MapChanged);
 			((Control)DraggingControl).remove_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)DraggingControl_LeftMouseButtonReleased);
 			((Control)_buttonPanel).remove_Resized((EventHandler<ResizedEventArgs>)ButtonPanel_Resized);
-			if (CharacterCards.Count > 0)
+			FlowPanel contentPanel = ContentPanel;
+			if (contentPanel != null)
 			{
-				((IEnumerable<IDisposable>)CharacterCards)?.DisposeAll();
+				((Control)contentPanel).Dispose();
 			}
-			((IEnumerable<IDisposable>)ContentPanel)?.DisposeAll();
 			FlowPanel charactersPanel = CharactersPanel;
 			if (charactersPanel != null)
 			{

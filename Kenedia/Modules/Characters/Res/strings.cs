@@ -84,6 +84,8 @@ namespace Kenedia.Modules.Characters.Res
 
 		internal static string CaptureAll => ResourceManager.GetString("CaptureAll", resourceCulture);
 
+		internal static string CapturedXPotraits => ResourceManager.GetString("CapturedXPotraits", resourceCulture);
+
 		internal static string CaptureImages => ResourceManager.GetString("CaptureImages", resourceCulture);
 
 		internal static string CaptureNotification => ResourceManager.GetString("CaptureNotification", resourceCulture);

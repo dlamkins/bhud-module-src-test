@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Modules.Managers;
 using Gw2Sharp.Models;
 using Gw2Sharp.WebApi;
 using Kenedia.Modules.Characters.Enums;
+using Kenedia.Modules.Characters.Views;
 using Kenedia.Modules.Core.DataModels;
+using Kenedia.Modules.Core.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
@@ -222,7 +225,9 @@ namespace Kenedia.Modules.Characters.Services
 
 		private readonly ContentsManager _contentsManager;
 
-		public Dictionary<int, Map> Maps { get; } = new Dictionary<int, Map>();
+		private readonly PathCollection _paths;
+
+		public Dictionary<int, Map> Maps { get; private set; } = new Dictionary<int, Map>();
 
 
 		public Dictionary<int, CraftingProfession> CrafingProfessions { get; } = new Dictionary<int, CraftingProfession>
@@ -1732,7 +1737,7 @@ namespace Kenedia.Modules.Characters.Services
 		};
 
 
-		public Data(ContentsManager contentsManager)
+		public Data(ContentsManager contentsManager, PathCollection paths)
 		{
 			//IL_0522: Unknown result type (might be due to invalid IL or missing references)
 			//IL_05b8: Unknown result type (might be due to invalid IL or missing references)
@@ -1744,17 +1749,7 @@ namespace Kenedia.Modules.Characters.Services
 			//IL_0936: Unknown result type (might be due to invalid IL or missing references)
 			//IL_09ca: Unknown result type (might be due to invalid IL or missing references)
 			_contentsManager = contentsManager;
-			string path = "data\\maps.json";
-			string jsonString = new StreamReader(_contentsManager.GetFileStream(path)).ReadToEnd();
-			if (jsonString != null && jsonString != string.Empty)
-			{
-				Maps = JsonConvert.DeserializeObject<Dictionary<int, Map>>(jsonString);
-			}
-			Races[(RaceType)0].Icon = AsyncTexture2D.op_Implicit(_contentsManager.GetTexture("textures\\races\\asura.png"));
-			Races[(RaceType)1].Icon = AsyncTexture2D.op_Implicit(_contentsManager.GetTexture("textures\\races\\charr.png"));
-			Races[(RaceType)2].Icon = AsyncTexture2D.op_Implicit(_contentsManager.GetTexture("textures\\races\\human.png"));
-			Races[(RaceType)3].Icon = AsyncTexture2D.op_Implicit(_contentsManager.GetTexture("textures\\races\\norn.png"));
-			Races[(RaceType)4].Icon = AsyncTexture2D.op_Implicit(_contentsManager.GetTexture("textures\\races\\sylvari.png"));
+			_paths = paths;
 		}
 
 		public Map GetMapById(int id)
@@ -1768,6 +1763,33 @@ namespace Kenedia.Modules.Characters.Services
 				};
 			}
 			return Maps[id];
+		}
+
+		public async Task Load()
+		{
+			string path = _paths.ModuleDataPath + "Maps.json";
+			BaseModule<Characters, MainWindow, SettingsModel>.Logger.Debug("Trying to load Maps from " + path);
+			try
+			{
+				if (File.Exists(path))
+				{
+					string jsonString = await new StreamReader(path).ReadToEndAsync();
+					if (jsonString != null && jsonString != string.Empty)
+					{
+						Maps = JsonConvert.DeserializeObject<Dictionary<int, Map>>(jsonString);
+						BaseModule<Characters, MainWindow, SettingsModel>.Logger.Debug("Loaded Maps from " + path);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				BaseModule<Characters, MainWindow, SettingsModel>.Logger.Warn($"{ex}");
+			}
+			Races[(RaceType)0].Icon = AsyncTexture2D.op_Implicit(_contentsManager.GetTexture("textures\\races\\asura.png"));
+			Races[(RaceType)1].Icon = AsyncTexture2D.op_Implicit(_contentsManager.GetTexture("textures\\races\\charr.png"));
+			Races[(RaceType)2].Icon = AsyncTexture2D.op_Implicit(_contentsManager.GetTexture("textures\\races\\human.png"));
+			Races[(RaceType)3].Icon = AsyncTexture2D.op_Implicit(_contentsManager.GetTexture("textures\\races\\norn.png"));
+			Races[(RaceType)4].Icon = AsyncTexture2D.op_Implicit(_contentsManager.GetTexture("textures\\races\\sylvari.png"));
 		}
 	}
 }

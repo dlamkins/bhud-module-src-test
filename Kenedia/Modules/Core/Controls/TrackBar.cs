@@ -3,6 +3,7 @@ using Blish_HUD;
 using Blish_HUD.Controls;
 using Gw2Sharp.WebApi;
 using Kenedia.Modules.Core.Interfaces;
+using Kenedia.Modules.Core.Services;
 
 namespace Kenedia.Modules.Core.Controls
 {
@@ -28,7 +29,7 @@ namespace Kenedia.Modules.Core.Controls
 		public TrackBar()
 			: this()
 		{
-			GameService.Overlay.get_UserLocale().add_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)UserLocale_SettingChanged);
+			LocalizingService.LocaleChanged += UserLocale_SettingChanged;
 			((TrackBar)this).add_ValueChanged((EventHandler<ValueEventArgs<float>>)TrackBar_ValueChanged);
 			UserLocale_SettingChanged(null, null);
 		}

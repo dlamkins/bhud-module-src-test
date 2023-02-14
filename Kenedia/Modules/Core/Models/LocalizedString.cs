@@ -23,10 +23,17 @@ namespace Kenedia.Modules.Core.Models
 		{
 			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002b: Invalid comparison between Unknown and I4
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Invalid comparison between Unknown and I4
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 			foreach (Locale locale in Enum.GetValues(typeof(Locale)))
 			{
-				Add(locale, null);
+				if ((int)locale != 4 && (int)locale != 5)
+				{
+					Add(locale, null);
+				}
 			}
 		}
 

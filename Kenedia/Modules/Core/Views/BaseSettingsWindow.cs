@@ -27,12 +27,12 @@ namespace Kenedia.Modules.Core.Views
 
 		private Rectangle _titleRectangle;
 
-		public Version Version { get; set; }
+		public new Version Version { get; set; }
 
-		public string Name { get; set; } = "Module";
+		public new string Name { get; set; } = "Module";
 
 
-		public AsyncTexture2D MainWindowEmblem { get; set; } = AsyncTexture2D.FromAssetId(156015);
+		public new AsyncTexture2D MainWindowEmblem { get; set; } = AsyncTexture2D.FromAssetId(156015);
 
 
 		public BaseSettingsWindow(AsyncTexture2D background, Rectangle windowRegion, Rectangle contentRegion)
@@ -65,7 +65,7 @@ namespace Kenedia.Modules.Core.Views
 			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			((WindowBase2)this).RecalculateLayout();
+			base.RecalculateLayout();
 			_subEmblemRectangle = new Rectangle(21, 6, 64, 64);
 			_mainEmblemRectangle = new Rectangle(-43, -58, 128, 128);
 			RectangleF titleBounds = _titleFont.GetStringRectangle(Name);
@@ -88,7 +88,7 @@ namespace Kenedia.Modules.Core.Views
 			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-			((WindowBase2)this).PaintAfterChildren(spriteBatch, bounds);
+			base.PaintAfterChildren(spriteBatch, bounds);
 			if (MainWindowEmblem != null)
 			{
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(MainWindowEmblem), _mainEmblemRectangle, (Rectangle?)MainWindowEmblem.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
@@ -102,7 +102,7 @@ namespace Kenedia.Modules.Core.Views
 
 		protected override void DisposeControl()
 		{
-			((WindowBase2)this).DisposeControl();
+			base.DisposeControl();
 			((IEnumerable<IDisposable>)((Container)this).get_Children()).DisposeAll();
 			((IEnumerable<IDisposable>)((Container)ContentPanel).get_Children()).DisposeAll();
 			_subWindowEmblem.Dispose();

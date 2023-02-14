@@ -17,6 +17,7 @@ using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.Core.Utility.WindowsUtil;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Kenedia.Modules.Characters.Controls
 {
@@ -208,6 +209,7 @@ namespace Kenedia.Modules.Characters.Controls
 				((Control)this).set_Location(Control.get_Input().get_Mouse().get_Position()
 					.Add(new Point(-_draggingStart.X, -_draggingStart.Y)));
 			}
+			ForceOnScreen();
 		}
 
 		protected override void DisposeControl()
@@ -368,11 +370,12 @@ namespace Kenedia.Modules.Characters.Controls
 				bitmap.Save(GetImagePath(images), ImageFormat.Png);
 			}
 			OnImageCaptured?.Invoke();
+			ScreenNotification.ShowNotification(string.Format("[Characters]: " + strings.CapturedXPotraits, _characterPotraitFrames.Count), (NotificationType)0, (Texture2D)null, 4);
 			string GetImagePath(List<string> imagePaths)
 			{
-				for (int i = 0; i < int.MaxValue; i++)
+				for (int i = 1; i < int.MaxValue; i++)
 				{
-					string imagePath = $"{path2}Image {i}.png";
+					string imagePath = path2 + "Image " + $"{i:00}" + ".png";
 					if (!imagePaths.Contains(imagePath))
 					{
 						imagePaths.Add(imagePath);
@@ -400,6 +403,7 @@ namespace Kenedia.Modules.Characters.Controls
 			{
 				((Control)characterPotraitFrame).Show();
 			}
+			ForceOnScreen();
 		}
 
 		protected override void OnHidden(EventArgs e)
@@ -409,6 +413,27 @@ namespace Kenedia.Modules.Characters.Controls
 			foreach (FramedMaskedRegion characterPotraitFrame in _characterPotraitFrames)
 			{
 				((Control)characterPotraitFrame).Hide();
+			}
+		}
+
+		private void ForceOnScreen()
+		{
+			Screen screen = Control.get_Graphics().get_SpriteScreen();
+			if (((Control)this).get_Bottom() > ((Control)screen).get_Bottom())
+			{
+				((Control)this).set_Bottom(((Control)screen).get_Bottom());
+			}
+			if (((Control)this).get_Top() < ((Control)screen).get_Top() + ((Control)this).get_Height())
+			{
+				((Control)this).set_Top(((Control)screen).get_Top() + ((Control)this).get_Height());
+			}
+			if (((Control)this).get_Left() < ((Control)screen).get_Left())
+			{
+				((Control)this).set_Left(((Control)screen).get_Left());
+			}
+			if (((Control)this).get_Right() > ((Control)screen).get_Right())
+			{
+				((Control)this).set_Left(((Control)screen).get_Right() - ((Control)this).get_Width());
 			}
 		}
 	}

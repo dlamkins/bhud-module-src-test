@@ -113,6 +113,7 @@
   <data name="Scribe"><value>Scribe</value></data>
   <data name="Search"><value>Search ...</value></data>
   <data name="SortBy"><value>Sort by {0}</value></data>
+  <data name="CapturedXPotraits"><value>Captured {0} portraits!</value></data>
   <data name="CardWith"><value>Card Width {0} px</value></data>
   <data name="SwapDelay"><value>Loading Delay ({0} ms)</value></data>
   <data name="IncludeMatches"><value>Include matches</value></data>
@@ -230,8 +231,7 @@ To get the current value you will have to swap module tabs once to update the se
   <data name="TextAndIcon"><value>Text and Icons</value></data>
   <data name="Huntsman"><value>Huntsman</value></data>
   <data name="ShowChoyaSpinner"><value>Show Choya as loading spinner</value></data>
-  <data name="SwapDelay_Tooltip"><value>Avg. loading time from ingame to character selection.
-To get the current value you will have to swap module tabs once to update the settings page!</value></data>
+  <data name="SwapDelay_Tooltip"><value>Avg. loading time from ingame to character selection.</value></data>
   <data name="Tag_Placeholder"><value>PvE, WvW, Main, ERP ...</value></data>
   <data name="CheckOnlyMaxCrafting"><value>Check Only Max Crafting</value></data>
   <data name="AutoFix"><value>Auto Fix (requires OCR)</value></data>

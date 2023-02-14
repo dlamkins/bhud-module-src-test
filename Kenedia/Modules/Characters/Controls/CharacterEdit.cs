@@ -9,6 +9,7 @@ using Blish_HUD.Controls;
 using Kenedia.Modules.Characters.Models;
 using Kenedia.Modules.Characters.Res;
 using Kenedia.Modules.Characters.Services;
+using Kenedia.Modules.Characters.Views;
 using Kenedia.Modules.Core.Controls;
 using Kenedia.Modules.Core.Structs;
 using Microsoft.Xna.Framework;
@@ -150,7 +151,7 @@ namespace Kenedia.Modules.Characters.Controls
 			((Control)imageButton2).set_Size(new Point(70, 70));
 			imageButton2.ClickAction = delegate
 			{
-				ShowImages();
+				ShowImages(!((Control)_imagePanelParent).get_Visible());
 			};
 			_image = imageButton2;
 			Label label = new Label();
@@ -355,10 +356,6 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public void LoadImages(object sender, EventArgs e)
 		{
-			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
 			string path = AccountImagePath?.Invoke();
 			if (string.IsNullOrEmpty(path))
 			{
@@ -367,24 +364,30 @@ namespace Kenedia.Modules.Characters.Controls
 			List<string> images = new List<string>(Directory.GetFiles(path, "*.png", SearchOption.AllDirectories));
 			_settings.PanelSize.get_Value();
 			int imageSize = 80;
-			int maxHeight = ((Control)GameService.Graphics.get_SpriteScreen()).get_Height() / 2;
-			int width = (int)Math.Min(710f, Math.Min(((Control)GameService.Graphics.get_SpriteScreen()).get_Height() / 2, ((FlowPanel)_imagePanel).get_OuterControlPadding().Y * 2f + (float)(images.Count + 1) * ((float)imageSize + ((FlowPanel)_imagePanel).get_ControlPadding().X)));
-			int height = (int)Math.Min(maxHeight, (double)(((FlowPanel)_imagePanel).get_OuterControlPadding().Y * 2f) + (double)(images.Count + 1) / Math.Floor((double)width / (double)imageSize) * (double)((float)imageSize + ((FlowPanel)_imagePanel).get_ControlPadding().Y));
-			((Container)_imagePanel).get_Children().Clear();
 			GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate(GraphicsDevice graphicsDevice)
 			{
-				//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-				//IL_010c: Unknown result type (might be due to invalid IL or missing references)
-				//IL_01eb: Unknown result type (might be due to invalid IL or missing references)
-				//IL_01fc: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0206: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0228: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0239: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0243: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+				//IL_01a5: Unknown result type (might be due to invalid IL or missing references)
+				//IL_022d: Unknown result type (might be due to invalid IL or missing references)
+				//IL_023e: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0248: Unknown result type (might be due to invalid IL or missing references)
+				//IL_026a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_027b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0285: Unknown result type (might be due to invalid IL or missing references)
 				AsyncTexture2D val = null;
-				if (((Control)this).get_Visible() && Character != null)
+				if (Character == null)
 				{
+					Character_Model character_Model2 = (Character = (base.Anchor as MainWindow)?.CharacterCards.FirstOrDefault()?.Character);
+				}
+				if (Character != null)
+				{
+					((Container)_imagePanel).get_Children().Clear();
 					val = Character.SpecializationIcon;
+					if (base.Anchor != null && base.Anchor.get_Visible())
+					{
+						(base.Anchor as MainWindow)?.ShowAttached(this);
+						ShowImages(toggle: true, loadImages: false);
+					}
 					CharacterEdit characterEdit = this;
 					ImageButton imageButton = new ImageButton();
 					((Control)imageButton).set_Parent((Container)(object)_imagePanel);
@@ -412,14 +415,30 @@ namespace Kenedia.Modules.Characters.Controls
 							ApplyCharacter();
 						};
 					}
-					((Control)_imagePanel).set_Width(width);
-					((Control)_imagePanel).set_Height(height);
-					((Control)_imagePanel).Invalidate();
-					((Control)_imagePanelParent).set_Width(width);
-					((Control)_imagePanelParent).set_Height(height);
+					AdjustImagePanelHeight(images);
 					((Control)_closeButton).set_Location((((Control)_imagePanelParent).get_Right() > 355) ? new Point(((Control)_imagePanelParent).get_Right() - ((Control)_closeButton).get_Size().X, ((Container)this).get_AutoSizePadding().Y) : new Point(355 - ((Control)_closeButton).get_Size().X, ((Container)this).get_AutoSizePadding().Y));
 				}
 			});
+		}
+
+		private void AdjustImagePanelHeight(List<string> images)
+		{
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+			int imageSize = 80;
+			int maxHeight = ((Control)GameService.Graphics.get_SpriteScreen()).get_Height() / 3;
+			int cols = Math.Min(images.Count + 1, Math.Min(640, ((Control)GameService.Graphics.get_SpriteScreen()).get_Height() / 3) / 80);
+			int rows = (int)Math.Ceiling((double)(images.Count + 1) / (double)cols);
+			int width = cols * imageSize + (cols - 1) * (int)((FlowPanel)_imagePanel).get_ControlPadding().X + (int)((FlowPanel)_imagePanel).get_OuterControlPadding().X + 30;
+			int height = rows * imageSize + (rows - 1) * (int)((FlowPanel)_imagePanel).get_ControlPadding().Y + (int)((FlowPanel)_imagePanel).get_OuterControlPadding().Y + 10;
+			((Control)_imagePanelParent).set_Width(width + 10);
+			((Control)_imagePanelParent).set_Height(Math.Min(maxHeight, height));
+			((Control)_imagePanel).set_Width(width);
+			((Control)_imagePanel).set_Height(Math.Min(maxHeight, height));
+			((Control)_imagePanel).Invalidate();
+			((Control)_imagePanelParent).Invalidate();
 		}
 
 		protected override void DisposeControl()
@@ -442,12 +461,16 @@ namespace Kenedia.Modules.Characters.Controls
 			}
 		}
 
-		private void ShowImages(bool toggle = true)
+		public void ShowImages(bool toggle = true, bool loadImages = true)
 		{
 			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			if (((Control)_imagePanelParent).get_Visible() || !toggle)
+			if (loadImages && toggle)
+			{
+				LoadImages(null, null);
+			}
+			if (!toggle)
 			{
 				((Control)_closeButton).set_Location(new Point(355 - ((Control)_closeButton).get_Size().X, ((Container)this).get_AutoSizePadding().Y));
 				((Control)_tagContainer).Show();
@@ -461,7 +484,7 @@ namespace Kenedia.Modules.Characters.Controls
 				((Control)_tagContainer).Hide();
 				((Control)_buttonContainer).Show();
 				((Control)_imagePanelParent).Show();
-				LoadImages(null, null);
+				((Control)_imagePanelParent).Invalidate();
 			}
 		}
 

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Kenedia.Modules.Core.Services;
 
 namespace Kenedia.Modules.Core.Models
@@ -7,9 +6,6 @@ namespace Kenedia.Modules.Core.Models
 	public class ServiceCollection : IDisposable
 	{
 		private bool _disposed;
-
-		public Dictionary<Type, bool> States { get; } = new Dictionary<Type, bool>();
-
 
 		public GameState GameState { get; }
 
@@ -28,11 +24,6 @@ namespace Kenedia.Modules.Core.Models
 			SharedSettings = sharedSettings;
 			TexturesService = texturesService;
 			InputDetectionService = inputDetectionService;
-			States[typeof(GameState)] = true;
-			States[typeof(ClientWindowService)] = true;
-			States[typeof(SharedSettings)] = true;
-			States[typeof(TexturesService)] = true;
-			States[typeof(InputDetectionService)] = true;
 		}
 
 		public void Dispose()

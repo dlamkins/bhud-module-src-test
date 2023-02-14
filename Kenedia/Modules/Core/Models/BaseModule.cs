@@ -9,6 +9,7 @@ using Blish_HUD.Input;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
+using Gw2Sharp.WebApi;
 using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.Core.Views;
 using Microsoft.Xna.Framework;
@@ -21,6 +22,8 @@ namespace Kenedia.Modules.Core.Models
 		public static readonly Logger Logger = Logger.GetLogger<ModuleType>();
 
 		protected bool HasGUI;
+
+		protected bool AutoLoadGUI = true;
 
 		protected bool IsGUICreated;
 
@@ -64,6 +67,7 @@ namespace Kenedia.Modules.Core.Models
 			GameState gameState = new GameState(clientWindowService, sharedSettings);
 			Services = new ServiceCollection(gameState, clientWindowService, sharedSettings, texturesService, inputDetectionService);
 			SharedSettingsView = new SharedSettingsView(sharedSettings, clientWindowService);
+			GameService.Overlay.get_UserLocale().add_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)OnLocaleChanged);
 		}
 
 		protected override void Initialize()
@@ -82,6 +86,11 @@ namespace Kenedia.Modules.Core.Models
 		{
 			await _003C_003En__0();
 			await Services.SharedSettings.Load(Paths.SharedSettingsPath);
+		}
+
+		protected virtual void OnLocaleChanged(object sender, ValueChangedEventArgs<Locale> eventArgs)
+		{
+			LocalizingService.OnLocaleChanged(sender, eventArgs);
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)
@@ -107,19 +116,10 @@ namespace Kenedia.Modules.Core.Models
 		protected override void Update(GameTime gameTime)
 		{
 			((Module)this).Update(gameTime);
-			if (Services.States[typeof(GameState)])
-			{
-				Services.GameState.Run(gameTime);
-			}
-			if (Services.States[typeof(ClientWindowService)])
-			{
-				Services.ClientWindowService.Run(gameTime);
-			}
-			if (Services.States[typeof(InputDetectionService)])
-			{
-				Services.InputDetectionService.Run(gameTime);
-			}
-			if (HasGUI && !IsGUICreated)
+			Services.GameState.Run(gameTime);
+			Services.ClientWindowService.Run(gameTime);
+			Services.InputDetectionService.Run(gameTime);
+			if (HasGUI && !IsGUICreated && AutoLoadGUI)
 			{
 				PlayerCharacter player = GameService.Gw2Mumble.get_PlayerCharacter();
 				if (player != null && !string.IsNullOrEmpty(player.get_Name()))
@@ -134,6 +134,7 @@ namespace Kenedia.Modules.Core.Models
 			((Module)this).Unload();
 			UnloadGUI();
 			Services?.Dispose();
+			GameService.Overlay.get_UserLocale().remove_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)OnLocaleChanged);
 			ModuleInstance = default(ModuleType);
 		}
 
