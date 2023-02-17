@@ -15,6 +15,8 @@ namespace BhModule.Community.Pathing.UI.Tooltips
 	{
 		private Achievement _achievement;
 
+		private readonly int _achievementBit;
+
 		private AchievementCategory _achievementCategory;
 
 		private Image _categoryIconImage;
@@ -62,9 +64,10 @@ namespace BhModule.Community.Pathing.UI.Tooltips
 		{
 		}
 
-		public AchievementTooltipView(int achievementId)
+		public AchievementTooltipView(int achievementId, int achievementBit)
 			: this()
 		{
+			_achievementBit = achievementBit;
 			((View)this).WithPresenter((IPresenter)(object)new AchievementPresenter(this, achievementId));
 		}
 
@@ -169,21 +172,31 @@ namespace BhModule.Community.Pathing.UI.Tooltips
 
 		private void UpdateAchievementView()
 		{
-			if (_achievement != null)
+			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+			if (_achievement == null)
 			{
-				_achievementNameLabel.set_Text(_achievement.get_Name());
-				_achievementDescriptionLabel.set_Text(CleanMessage(_achievement.get_Description()));
-				_achievementRequirementLabel.set_Text(CleanMessage(_achievement.get_Requirement()));
-				((Control)_achievementNameLabel).set_Height(string.IsNullOrEmpty(_achievement.get_Description()) ? ((Control)_categoryIconImage).get_Height() : (((Control)_categoryIconImage).get_Height() / 2));
-				((Control)_achievementDescriptionLabel).set_Width(Math.Max(((Control)_achievementNameLabel).get_Width(), 200));
-				((Control)_achievementRequirementLabel).set_Width(new int[3]
-				{
-					((Control)_achievementNameLabel).get_Right() + 8,
-					((Control)_achievementDescriptionLabel).get_Right() + 8,
-					300
-				}.Max());
-				((Control)_achievementRequirementLabel).set_Top(Math.Max(((Control)_achievementDescriptionLabel).get_Bottom() + 8, ((Control)_categoryIconImage).get_Bottom() + 8));
+				return;
 			}
+			_achievementNameLabel.set_Text(_achievement.get_Name());
+			_achievementDescriptionLabel.set_Text(CleanMessage(_achievement.get_Description()));
+			_achievementRequirementLabel.set_Text(CleanMessage(_achievement.get_Requirement()));
+			if (_achievementBit != -1 && _achievement.get_Bits() != null)
+			{
+				AchievementBit bit = _achievement.get_Bits()[_achievementBit];
+				if (bit.get_Type() == ApiEnum<AchievementBitType>.op_Implicit((AchievementBitType)4))
+				{
+					_achievementRequirementLabel.set_Text(CleanMessage(((AchievementTextBit)bit).get_Text()));
+				}
+			}
+			((Control)_achievementNameLabel).set_Height(string.IsNullOrEmpty(_achievement.get_Description()) ? ((Control)_categoryIconImage).get_Height() : (((Control)_categoryIconImage).get_Height() / 2));
+			((Control)_achievementDescriptionLabel).set_Width(Math.Max(((Control)_achievementNameLabel).get_Width(), 200));
+			((Control)_achievementRequirementLabel).set_Width(new int[3]
+			{
+				((Control)_achievementNameLabel).get_Right() + 8,
+				((Control)_achievementDescriptionLabel).get_Right() + 8,
+				300
+			}.Max());
+			((Control)_achievementRequirementLabel).set_Top(Math.Max(((Control)_achievementDescriptionLabel).get_Bottom() + 8, ((Control)_categoryIconImage).get_Bottom() + 8));
 		}
 
 		private static string CleanMessage(string message)

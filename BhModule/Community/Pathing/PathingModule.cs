@@ -229,16 +229,17 @@ namespace BhModule.Community.Pathing
 
 		private void UpdateModuleLoading(string loadingMessage)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0007: Invalid comparison between Unknown and I4
-			if ((int)((Module)this).get_RunState() == 2)
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Invalid comparison between Unknown and I4
+			_pathingIcon.set_LoadingMessage(loadingMessage);
+			if ((int)((Module)this).get_RunState() == 2 && _pathingIcon != null)
 			{
 				_pathingIcon.set_LoadingMessage(loadingMessage);
 				_packsLoading = !string.IsNullOrWhiteSpace(loadingMessage);
-			}
-			if (!_packsLoading)
-			{
-				((Control)_pathingIcon).set_BasicTooltipText(Strings.General_UiName);
+				if (!_packsLoading)
+				{
+					((Control)_pathingIcon).set_BasicTooltipText(Strings.General_UiName);
+				}
 			}
 		}
 

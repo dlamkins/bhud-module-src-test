@@ -73,7 +73,7 @@ namespace BhModule.Community.Pathing
 			{
 				_module.Settings.GlobalPathablesEnabled.set_Value(e.get_Checked());
 			});
-			if (_module.ScriptEngine.Global.Menu.Menus.Any())
+			if (_module.Settings.ScriptsEnabled.get_Value() && _module.ScriptEngine.Global != null && _module.ScriptEngine.Global.Menu.Menus.Any())
 			{
 				yield return _module.ScriptEngine.Global.Menu.BuildMenu();
 			}

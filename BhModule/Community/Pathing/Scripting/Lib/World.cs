@@ -80,10 +80,31 @@ namespace BhModule.Community.Pathing.Scripting.Lib
 				select marker).FirstOrDefault();
 		}
 
+		public StandardMarker GetClosestMarker(PathingCategory category)
+		{
+			return (from marker in _global.ScriptEngine.Module.PackInitiator.PackState.Entities.ToArray().OfType<StandardMarker>()
+				where marker.Category == category
+				orderby marker.DistanceToPlayer
+				select marker).FirstOrDefault();
+		}
+
 		public LuaTable GetClosestMarkers(int quantity)
 		{
 			LuaTable nTable = new LuaTable();
 			foreach (StandardMarker marker2 in (from marker in _global.ScriptEngine.Module.PackInitiator.PackState.Entities.ToArray().OfType<StandardMarker>()
+				orderby marker.DistanceToPlayer
+				select marker).Take(quantity))
+			{
+				nTable.Add(marker2);
+			}
+			return nTable;
+		}
+
+		public LuaTable GetClosestMarkers(PathingCategory category, int quantity)
+		{
+			LuaTable nTable = new LuaTable();
+			foreach (StandardMarker marker2 in (from marker in _global.ScriptEngine.Module.PackInitiator.PackState.Entities.ToArray().OfType<StandardMarker>()
+				where marker.Category == category
 				orderby marker.DistanceToPlayer
 				select marker).Take(quantity))
 			{

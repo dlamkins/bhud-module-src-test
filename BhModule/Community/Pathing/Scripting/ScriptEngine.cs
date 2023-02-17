@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using BhModule.Community.Pathing.Scripting.Extensions;
 using Blish_HUD;
 using Blish_HUD.Debug;
+using Humanizer;
 using Microsoft.Xna.Framework;
 using Neo.IronLua;
 using TmfLib;
@@ -194,6 +195,7 @@ namespace BhModule.Community.Pathing.Scripting
 				ScriptState newScript = new ScriptState(chunk);
 				newScript.Run(Global, new PackContext(this, resourceManager));
 				Scripts.Add(newScript);
+				PushMessage(newScript.Name + ".lua loaded in " + newScript.LoadTime.Humanize(2) + ".", (newScript.LoadTime.Milliseconds > 500) ? 1 : 0, null, "system");
 				return chunk;
 			}
 			catch (LuaException ex2)
@@ -249,7 +251,7 @@ namespace BhModule.Community.Pathing.Scripting
 		public void Unload()
 		{
 			Scripts.Clear();
-			_lua.Dispose();
+			_lua?.Dispose();
 			PathingCategoryScriptExtensions.SetPackInitiator(null);
 		}
 	}

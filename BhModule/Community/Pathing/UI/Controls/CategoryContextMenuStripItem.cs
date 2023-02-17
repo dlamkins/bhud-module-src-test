@@ -61,6 +61,19 @@ namespace BhModule.Community.Pathing.UI.Controls
 			}
 		}
 
+		protected override void OnMouseEntered(MouseEventArgs e)
+		{
+			((ContextMenuStripItem)this).OnMouseEntered(e);
+			if (!((Control)this).get_Enabled())
+			{
+				ContextMenuStrip submenu = ((ContextMenuStripItem)this).get_Submenu();
+				if (submenu != null)
+				{
+					submenu.Show((Control)(object)this);
+				}
+			}
+		}
+
 		private void AddAchievementContext(int achievementId)
 		{
 			if (achievementId >= 0)
@@ -80,22 +93,28 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		private void DetectAndBuildContexts()
 		{
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Expected O, but got Unknown
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a7: Expected O, but got Unknown
+			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Expected O, but got Unknown
+			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cf: Expected O, but got Unknown
 			IAttribute descriptionAttr;
 			if (_pathingCategory.TryGetAggregatedAttributeValue("achievementid", out var achievementAttr))
 			{
+				int achievementBit = -1;
+				int achievementBitParsed = default(int);
+				if (_pathingCategory.TryGetAggregatedAttributeValue("achievementbit", out var achievementBitAttr) && InvariantUtil.TryParseInt(achievementBitAttr, ref achievementBitParsed))
+				{
+					achievementBit = achievementBitParsed;
+				}
 				int achievementId = default(int);
 				if (!InvariantUtil.TryParseInt(achievementAttr, ref achievementId) || achievementId < 0)
 				{
 					return;
 				}
-				((Control)this).set_Tooltip(new Tooltip((ITooltipView)(object)new AchievementTooltipView(achievementId)));
+				((Control)this).set_Tooltip(new Tooltip((ITooltipView)(object)new AchievementTooltipView(achievementId, achievementBit)));
 				if (_packState.UserConfiguration.PackAllowMarkersToAutomaticallyHide.get_Value())
 				{
-					((Control)this).set_Enabled(!_packState.AchievementStates.IsAchievementHidden(achievementId, -1));
+					((Control)this).set_Enabled(!_packState.AchievementStates.IsAchievementHidden(achievementId, achievementBit));
 					if (!((Control)this).get_Enabled())
 					{
 						((ContextMenuStripItem)this).set_Checked(false);
