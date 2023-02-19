@@ -1,6 +1,9 @@
 using System;
+using System.ComponentModel;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
+using Blish_HUD.Content;
 using Gw2Sharp.WebApi;
 
 namespace Kenedia.Modules.Core.Utility
@@ -10,6 +13,20 @@ namespace Kenedia.Modules.Core.Utility
 		public static double Now()
 		{
 			return GameService.Overlay.get_CurrentGameTime().get_TotalGameTime().TotalMilliseconds;
+		}
+
+		public static bool SetProperty<T>(ref T property, T newValue, PropertyChangedEventHandler OnUpdated = null, bool triggerOnUpdate = true, [CallerMemberName] string propName = null)
+		{
+			if (object.Equals(property, newValue))
+			{
+				return false;
+			}
+			property = newValue;
+			if (triggerOnUpdate)
+			{
+				OnUpdated?.Invoke(property, new PropertyChangedEventArgs(propName));
+			}
+			return true;
 		}
 
 		public static bool SetProperty<T>(ref T property, T newValue, Action OnUpdated = null, bool triggerOnUpdate = true)
@@ -89,6 +106,21 @@ namespace Kenedia.Modules.Core.Utility
 				return 0;
 			}
 			return id;
+		}
+
+		public static AsyncTexture2D GetAssetFromRenderUrl(this RenderUrl? url)
+		{
+			if (!url.HasValue)
+			{
+				return null;
+			}
+			string s = url.ToString();
+			int pos = url.ToString().LastIndexOf("/") + 1;
+			if (int.TryParse(s.Substring(pos, s.Length - pos - 4), out var id))
+			{
+				return AsyncTexture2D.FromAssetId(id);
+			}
+			return null;
 		}
 	}
 }

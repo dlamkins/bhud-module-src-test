@@ -1,5 +1,6 @@
 using System.IO;
 using Blish_HUD.Modules.Managers;
+using Kenedia.Modules.Core.Utility;
 
 namespace Kenedia.Modules.Core.Models
 {
@@ -19,11 +20,7 @@ namespace Kenedia.Modules.Core.Models
 			}
 			set
 			{
-				_accountName = value;
-				if (!string.IsNullOrEmpty(value))
-				{
-					AddAccountFolder();
-				}
+				Common.SetProperty(ref _accountName, value, AddAccountFolder, !string.IsNullOrEmpty(value));
 			}
 		}
 
@@ -43,7 +40,7 @@ namespace Kenedia.Modules.Core.Models
 				{
 					return null;
 				}
-				return ModulePath + "\\" + AccountName + "\\";
+				return ModulePath + AccountName + "\\";
 			}
 		}
 

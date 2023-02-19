@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using Kenedia.Modules.Characters.Models;
 
-namespace Kenedia.Modules.Characters
+namespace Kenedia.Modules.Characters.Models
 {
 	public class SearchFilterCollection : Dictionary<string, SearchFilter<Character_Model>>
 	{

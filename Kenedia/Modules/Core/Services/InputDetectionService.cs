@@ -148,14 +148,10 @@ namespace Kenedia.Modules.Core.Services
 			//IL_0096: Invalid comparison between Unknown and I4
 			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a0: Invalid comparison between Unknown and I4
-			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00aa: Invalid comparison between Unknown and I4
-			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b4: Invalid comparison between Unknown and I4
-			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
 			if (Enabled)
 			{
 				double now = gameTime.get_TotalGameTime().TotalMilliseconds;
@@ -173,7 +169,7 @@ namespace Kenedia.Modules.Core.Services
 				IEnumerable<Keys> keys = enumerable;
 				LastKeyInteraction = ((keys.Count() > 0) ? now : LastKeyInteraction);
 				MouseState mouse = GameService.Input.get_Mouse().get_State();
-				LastMouseClick = (((int)((MouseState)(ref mouse)).get_LeftButton() == 1 || (int)((MouseState)(ref mouse)).get_RightButton() == 1 || (int)((MouseState)(ref mouse)).get_MiddleButton() == 1 || (int)((MouseState)(ref mouse)).get_XButton1() == 1 || (int)((MouseState)(ref mouse)).get_XButton2() == 1) ? now : LastMouseClick);
+				LastMouseClick = (((int)((MouseState)(ref mouse)).get_LeftButton() == 1 || (int)((MouseState)(ref mouse)).get_RightButton() == 1 || (int)((MouseState)(ref mouse)).get_MiddleButton() == 1) ? now : LastMouseClick);
 				LastMouseMove = ((((MouseState)(ref mouse)).get_Position() != _lastMousePosition) ? now : LastMouseMove);
 				LastMouseInteraction = Math.Max(LastMouseMove, LastMouseClick);
 				LastClickOrKey = Math.Max(LastKeyInteraction, LastMouseClick);

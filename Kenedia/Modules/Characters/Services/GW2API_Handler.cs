@@ -29,8 +29,6 @@ namespace Kenedia.Modules.Characters.Services
 
 		private readonly Action<IApiV2ObjectList<Character>> _callBack;
 
-		private readonly Action<string, bool> _updateFolderPaths;
-
 		private readonly Data _data;
 
 		private readonly Func<LoadingSpinner> _getSpinner;
@@ -51,23 +49,18 @@ namespace Kenedia.Modules.Characters.Services
 			}
 			set
 			{
-				if (value != null && (_account == null || _account.get_Name() != value.get_Name()))
-				{
-					_paths.AccountName = value.get_Name();
-					_updateFolderPaths?.Invoke(value.get_Name(), arg2: true);
-				}
+				_paths.AccountName = value.get_Name();
 				_account = value;
 			}
 		}
 
-		public GW2API_Handler(Gw2ApiManager gw2ApiManager, Action<IApiV2ObjectList<Character>> callBack, Func<LoadingSpinner> getSpinner, PathCollection paths, Action<string, bool> updateFolderPaths, Data data)
+		public GW2API_Handler(Gw2ApiManager gw2ApiManager, Action<IApiV2ObjectList<Character>> callBack, Func<LoadingSpinner> getSpinner, PathCollection paths, Data data)
 		{
 			_gw2ApiManager = gw2ApiManager;
 			_callBack = callBack;
 			_getSpinner = getSpinner;
 			_paths = paths;
 			_accountFilePath = paths.ModulePath + "\\accounts.json";
-			_updateFolderPaths = updateFolderPaths;
 			_data = data;
 		}
 

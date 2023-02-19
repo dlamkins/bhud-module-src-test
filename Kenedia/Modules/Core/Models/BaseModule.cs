@@ -13,6 +13,7 @@ using Gw2Sharp.WebApi;
 using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.Core.Views;
 using Microsoft.Xna.Framework;
+using Newtonsoft.Json;
 using SemVer;
 
 namespace Kenedia.Modules.Core.Models
@@ -80,6 +81,17 @@ namespace Kenedia.Modules.Core.Models
 			ModKeyMapping[1] = (VirtualKeyShort)17;
 			ModKeyMapping[2] = (VirtualKeyShort)18;
 			ModKeyMapping[4] = (VirtualKeyShort)160;
+			JsonConvert.set_DefaultSettings((Func<JsonSerializerSettings>)delegate
+			{
+				//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0014: Expected O, but got Unknown
+				JsonSerializerSettings val = new JsonSerializerSettings();
+				val.set_Formatting((Formatting)1);
+				val.set_NullValueHandling((NullValueHandling)1);
+				return val;
+			});
 		}
 
 		protected override async Task LoadAsync()

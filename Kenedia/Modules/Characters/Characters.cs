@@ -49,12 +49,11 @@ namespace Kenedia.Modules.Characters
 
 		private bool _saveCharacters;
 
+		private bool _loadedCharacters;
+
 		private bool _mapsUpdated;
 
 		private Character_Model _currentCharacterModel;
-
-		public string ActiveAccountName { get; set; } = string.Empty;
-
 
 		public SearchFilterCollection SearchFilters { get; } = new SearchFilterCollection();
 
@@ -115,9 +114,9 @@ namespace Kenedia.Modules.Characters
 
 		public string GlobalAccountsPath { get; set; }
 
-		public string CharactersPath => base.Paths.AccountPath + "\\characters.json";
+		public string CharactersPath => base.Paths.AccountPath + "characters.json";
 
-		public string AccountImagesPath => base.Paths.AccountPath + "\\images\\";
+		public string AccountImagesPath => base.Paths.AccountPath + "images";
 
 		public GW2API_Handler GW2APIHandler { get; private set; }
 
@@ -187,7 +186,7 @@ namespace Kenedia.Modules.Characters
 			base.Settings.RadialKey.get_Value().add_Activated((EventHandler<EventArgs>)RadialMenuToggle);
 			Tags.CollectionChanged += Tags_CollectionChanged;
 			base.Settings.Version.set_Value(base.ModuleVersion);
-			GW2APIHandler = new GW2API_Handler(base.Gw2ApiManager, AddOrUpdateCharacters, () => (LoadingSpinner)(object)APISpinner, base.Paths, UpdateFolderPaths, Data);
+			GW2APIHandler = new GW2API_Handler(base.Gw2ApiManager, AddOrUpdateCharacters, () => (LoadingSpinner)(object)APISpinner, base.Paths, Data);
 		}
 
 		protected override void DefineSettings(SettingCollection settings)
@@ -577,7 +576,11 @@ namespace Kenedia.Modules.Characters
 
 		private void AddOrUpdateCharacters(IApiV2ObjectList<Character> characters)
 		{
-			ActiveAccountName = GW2APIHandler.Account.get_Name();
+			if (!_loadedCharacters)
+			{
+				BaseModule<Characters, MainWindow, SettingsModel>.Logger.Info("This is our first API data fetched for this character/session. Trying to load local data first.");
+				LoadCharacters();
+			}
 			BaseModule<Characters, MainWindow, SettingsModel>.Logger.Info("Update characters based on fresh data from the api.");
 			var freshList = ((IEnumerable<Character>)characters).Select((Character c) => new
 			{
@@ -635,20 +638,6 @@ namespace Kenedia.Modules.Characters
 			base.MainWindow?.PerformFiltering();
 		}
 
-		private void UpdateFolderPaths(string accountName, bool api_handled = true)
-		{
-			base.Paths.AccountName = accountName;
-			base.Settings.LoadAccountSettings(accountName);
-			if (!Directory.Exists(AccountImagesPath))
-			{
-				Directory.CreateDirectory(AccountImagesPath);
-			}
-			if (api_handled && CharacterModels.Count == 0)
-			{
-				LoadCharacters();
-			}
-		}
-
 		private bool LoadCharacters()
 		{
 			PlayerCharacter player = GameService.Gw2Mumble.get_PlayerCharacter();
@@ -657,11 +646,18 @@ namespace Kenedia.Modules.Characters
 				return false;
 			}
 			AccountSummary account = getAccount();
+			if (base.Paths.AccountName != null)
+			{
+				_loadedCharacters = true;
+				base.Settings.LoadAccountSettings(base.Paths.AccountName);
+				if (!Directory.Exists(AccountImagesPath))
+				{
+					Directory.CreateDirectory(AccountImagesPath);
+				}
+			}
 			if (account != null)
 			{
-				ActiveAccountName = account.AccountName;
 				BaseModule<Characters, MainWindow, SettingsModel>.Logger.Debug("Found '" + player.get_Name() + "' in a stored character list for '" + account.AccountName + "'. Loading characters of '" + account.AccountName + "'");
-				UpdateFolderPaths(account.AccountName, api_handled: false);
 				return LoadCharacterFile();
 			}
 			return false;
