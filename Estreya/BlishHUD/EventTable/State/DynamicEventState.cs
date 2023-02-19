@@ -35,6 +35,9 @@ namespace Estreya.BlishHUD.EventTable.State
 				[JsonProperty("radius")]
 				public double Radius { get; set; }
 
+				[JsonProperty("height")]
+				public double Height { get; set; }
+
 				[JsonProperty("rotation")]
 				public double Rotation { get; set; }
 
@@ -43,6 +46,15 @@ namespace Estreya.BlishHUD.EventTable.State
 
 				[JsonProperty("points")]
 				public double[][] Points { get; set; }
+			}
+
+			public class DynamicEventIcon
+			{
+				[JsonProperty("file_id")]
+				public int FileID { get; set; }
+
+				[JsonProperty("signature")]
+				public string Signature { get; set; }
 			}
 
 			[JsonIgnore]
@@ -62,15 +74,20 @@ namespace Estreya.BlishHUD.EventTable.State
 
 			[JsonProperty("location")]
 			public DynamicEventLocation Location { get; set; }
+
+			[JsonProperty("icon")]
+			public DynamicEventIcon Icon { get; set; }
 		}
 
 		private const string BASE_URL = "https://api.guildwars2.com/v1";
 
 		private readonly IFlurlClient _flurlClient;
 
-		public Map[] Maps { get; private set; }
+		public Map[] Maps { get; private set; } = new Map[0];
 
-		public DynamicEvent[] Events { get; private set; }
+
+		public DynamicEvent[] Events { get; private set; } = new DynamicEvent[0];
+
 
 		public DynamicEventState(APIStateConfiguration configuration, Gw2ApiManager apiManager, IFlurlClient flurlClient)
 			: base(apiManager, configuration)

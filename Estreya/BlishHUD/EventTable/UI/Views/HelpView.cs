@@ -141,18 +141,18 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Container)val).set_HeightSizingMode((SizingMode)1);
 			val.set_ShowBorder(true);
 			Panel panel = val;
-			((Control)GetLabelBuilder((Panel)(object)parent).CreatePart("Why can't I move my event areas to the border of the screen?", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder builder)
+			((Control)GetLabelBuilder((Panel)(object)parent).CreatePart("Why are my setting sliders moving when I move others?", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder builder)
 			{
 				builder.SetFontSize((FontSize)20).MakeUnderlined();
 			}).CreatePart("\n \n", (Action<FormattedLabelPartBuilder>)delegate
 			{
-			}).CreatePart("The sliders can't refresh automatically with their new values.", (Action<FormattedLabelPartBuilder>)delegate
+			}).CreatePart("Some sliders have a connection. For example:", (Action<FormattedLabelPartBuilder>)delegate
 			{
 			})
 				.CreatePart("\n", (Action<FormattedLabelPartBuilder>)delegate
 				{
 				})
-				.CreatePart("Switch the settings tab back and fourth. The sliders will be updated.", (Action<FormattedLabelPartBuilder>)delegate
+				.CreatePart("If you make the table bigger, it can't be moved as far to the right.", (Action<FormattedLabelPartBuilder>)delegate
 				{
 				})
 				.Build()).set_Parent((Container)(object)panel);

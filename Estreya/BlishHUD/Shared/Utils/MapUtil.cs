@@ -1,7 +1,6 @@
 using System;
 using System.Drawing;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
@@ -13,7 +12,6 @@ using Estreya.BlishHUD.Shared.Controls;
 using Estreya.BlishHUD.Shared.Controls.Map;
 using Estreya.BlishHUD.Shared.Extensions;
 using Gw2Sharp.Models;
-using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 
@@ -348,61 +346,6 @@ namespace Estreya.BlishHUD.Shared.Utils
 			}
 		}
 
-		public async Task<(double X, double Y)> EventMapCoordinatesToContinentCoordinates(int mapId, double[] coordinates)
-		{
-			Map obj = await ((IBulkExpandableClient<Map, int>)(object)_apiManager.get_Gw2ApiClient().get_V2().get_Maps()).GetAsync(mapId, default(CancellationToken));
-			Rectangle continent_rect = obj.get_ContinentRect();
-			Rectangle map_rect = obj.get_MapRect();
-			Coordinates2 val = ((Rectangle)(ref continent_rect)).get_TopLeft();
-			double x = ((Coordinates2)(ref val)).get_X();
-			double num = coordinates[0];
-			val = ((Rectangle)(ref map_rect)).get_BottomLeft();
-			double num2 = 1.0 * (num - ((Coordinates2)(ref val)).get_X());
-			val = ((Rectangle)(ref map_rect)).get_TopRight();
-			double x2 = ((Coordinates2)(ref val)).get_X();
-			val = ((Rectangle)(ref map_rect)).get_BottomLeft();
-			double num3 = num2 / (x2 - ((Coordinates2)(ref val)).get_X());
-			val = ((Rectangle)(ref continent_rect)).get_BottomRight();
-			double x3 = ((Coordinates2)(ref val)).get_X();
-			val = ((Rectangle)(ref continent_rect)).get_TopLeft();
-			double item = Math.Round(x + num3 * (x3 - ((Coordinates2)(ref val)).get_X()));
-			val = ((Rectangle)(ref continent_rect)).get_TopLeft();
-			double y2 = ((Coordinates2)(ref val)).get_Y();
-			double num4 = coordinates[1];
-			val = ((Rectangle)(ref map_rect)).get_TopRight();
-			double num5 = -1.0 * (num4 - ((Coordinates2)(ref val)).get_Y());
-			val = ((Rectangle)(ref map_rect)).get_TopRight();
-			double y3 = ((Coordinates2)(ref val)).get_Y();
-			val = ((Rectangle)(ref map_rect)).get_BottomLeft();
-			double num6 = num5 / (y3 - ((Coordinates2)(ref val)).get_Y());
-			val = ((Rectangle)(ref continent_rect)).get_BottomRight();
-			double y4 = ((Coordinates2)(ref val)).get_Y();
-			val = ((Rectangle)(ref continent_rect)).get_TopLeft();
-			double y = Math.Round(y2 + num6 * (y4 - ((Coordinates2)(ref val)).get_Y()));
-			return (item, y);
-		}
-
-		public async Task<double> EventMapLengthToContinentLength(int mapId, double length)
-		{
-			Rectangle map_rect = (await ((IBulkExpandableClient<Map, int>)(object)_apiManager.get_Gw2ApiClient().get_V2().get_Maps()).GetAsync(mapId, default(CancellationToken))).get_MapRect();
-			length /= 0.041666666666666664;
-			double num = length;
-			Coordinates2 val = ((Rectangle)(ref map_rect)).get_BottomLeft();
-			double num2 = num - ((Coordinates2)(ref val)).get_X();
-			val = ((Rectangle)(ref map_rect)).get_TopRight();
-			double x = ((Coordinates2)(ref val)).get_X();
-			val = ((Rectangle)(ref map_rect)).get_BottomLeft();
-			double num3 = num2 / (x - ((Coordinates2)(ref val)).get_X());
-			double num4 = length;
-			val = ((Rectangle)(ref map_rect)).get_BottomLeft();
-			double num5 = num4 - ((Coordinates2)(ref val)).get_Y();
-			val = ((Rectangle)(ref map_rect)).get_TopRight();
-			double y = ((Coordinates2)(ref val)).get_Y();
-			val = ((Rectangle)(ref map_rect)).get_BottomLeft();
-			double scaley = num5 / (y - ((Coordinates2)(ref val)).get_Y());
-			return Math.Sqrt(num3 * num3 + scaley * scaley);
-		}
-
 		public MapEntity AddCircle(double x, double y, double radius, Color color, float thickness = 1f)
 		{
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
@@ -422,6 +365,11 @@ namespace Estreya.BlishHUD.Shared.Utils
 		public void ClearMapEntities()
 		{
 			_flatMap.ClearEntities();
+		}
+
+		public void RemoveEntity(MapEntity mapEntity)
+		{
+			_flatMap.RemoveEntity(mapEntity);
 		}
 
 		private async Task<NavigationResult> MoveMouse(int x, int y, bool sendToSystem = false)

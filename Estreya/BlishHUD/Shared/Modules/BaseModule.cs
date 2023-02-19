@@ -483,52 +483,48 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected virtual bool CalculateUIVisibility()
 		{
-			if (GameService.Gw2Mumble.get_IsAvailable())
+			bool show = true;
+			if (ModuleSettings.HideOnOpenMap.get_Value())
 			{
-				bool show = true;
-				if (ModuleSettings.HideOnOpenMap.get_Value())
-				{
-					show &= !GameService.Gw2Mumble.get_UI().get_IsMapOpen();
-				}
-				if (ModuleSettings.HideOnMissingMumbleTicks.get_Value())
-				{
-					show &= GameService.Gw2Mumble.get_TimeSinceTick().TotalSeconds < 0.5;
-				}
-				if (ModuleSettings.HideInCombat.get_Value())
-				{
-					show &= !GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat();
-				}
-				if (ModuleSettings.HideInPvE_OpenWorld.get_Value())
-				{
-					MapType[] array = new MapType[4];
-					RuntimeHelpers.InitializeArray(array, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);
-					MapType[] pveOpenWorldMapTypes = (MapType[])(object)array;
-					show &= GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode() || !pveOpenWorldMapTypes.Any((MapType type) => type == GameService.Gw2Mumble.get_CurrentMap().get_Type()) || MapInfo.MAP_IDS_PVE_COMPETETIVE.Contains(GameService.Gw2Mumble.get_CurrentMap().get_Id());
-				}
-				if (ModuleSettings.HideInPvE_Competetive.get_Value())
-				{
-					MapType[] pveCompetetiveMapTypes = (MapType[])(object)new MapType[1] { (MapType)4 };
-					show &= GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode() || !pveCompetetiveMapTypes.Any((MapType type) => type == GameService.Gw2Mumble.get_CurrentMap().get_Type()) || !MapInfo.MAP_IDS_PVE_COMPETETIVE.Contains(GameService.Gw2Mumble.get_CurrentMap().get_Id());
-				}
-				if (ModuleSettings.HideInWvW.get_Value())
-				{
-					MapType[] array2 = new MapType[5];
-					RuntimeHelpers.InitializeArray(array2, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);
-					MapType[] wvwMapTypes = (MapType[])(object)array2;
-					show &= !GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode() || !wvwMapTypes.Any((MapType type) => type == GameService.Gw2Mumble.get_CurrentMap().get_Type());
-				}
-				if (ModuleSettings.HideInPvP.get_Value())
-				{
-					MapType[] pvpMapTypes = (MapType[])(object)new MapType[2]
-					{
-						(MapType)2,
-						(MapType)6
-					};
-					show &= !GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode() || !pvpMapTypes.Any((MapType type) => type == GameService.Gw2Mumble.get_CurrentMap().get_Type());
-				}
-				return show;
+				show &= !GameService.Gw2Mumble.get_UI().get_IsMapOpen();
 			}
-			return ShowUI;
+			if (ModuleSettings.HideOnMissingMumbleTicks.get_Value())
+			{
+				show &= GameService.Gw2Mumble.get_TimeSinceTick().TotalSeconds < 0.5;
+			}
+			if (ModuleSettings.HideInCombat.get_Value())
+			{
+				show &= !GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat();
+			}
+			if (ModuleSettings.HideInPvE_OpenWorld.get_Value())
+			{
+				MapType[] array = new MapType[4];
+				RuntimeHelpers.InitializeArray(array, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);
+				MapType[] pveOpenWorldMapTypes = (MapType[])(object)array;
+				show &= GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode() || !pveOpenWorldMapTypes.Any((MapType type) => type == GameService.Gw2Mumble.get_CurrentMap().get_Type()) || MapInfo.MAP_IDS_PVE_COMPETETIVE.Contains(GameService.Gw2Mumble.get_CurrentMap().get_Id());
+			}
+			if (ModuleSettings.HideInPvE_Competetive.get_Value())
+			{
+				MapType[] pveCompetetiveMapTypes = (MapType[])(object)new MapType[1] { (MapType)4 };
+				show &= GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode() || !pveCompetetiveMapTypes.Any((MapType type) => type == GameService.Gw2Mumble.get_CurrentMap().get_Type()) || !MapInfo.MAP_IDS_PVE_COMPETETIVE.Contains(GameService.Gw2Mumble.get_CurrentMap().get_Id());
+			}
+			if (ModuleSettings.HideInWvW.get_Value())
+			{
+				MapType[] array2 = new MapType[5];
+				RuntimeHelpers.InitializeArray(array2, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);
+				MapType[] wvwMapTypes = (MapType[])(object)array2;
+				show &= !GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode() || !wvwMapTypes.Any((MapType type) => type == GameService.Gw2Mumble.get_CurrentMap().get_Type());
+			}
+			if (ModuleSettings.HideInPvP.get_Value())
+			{
+				MapType[] pvpMapTypes = (MapType[])(object)new MapType[2]
+				{
+					(MapType)2,
+					(MapType)6
+				};
+				show &= !GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode() || !pvpMapTypes.Any((MapType type) => type == GameService.Gw2Mumble.get_CurrentMap().get_Type());
+			}
+			return show;
 		}
 
 		protected void HandleLoadingSpinner(bool show, string text = null)

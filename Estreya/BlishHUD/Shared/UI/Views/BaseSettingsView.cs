@@ -81,6 +81,8 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 				settingEntry.set_Value(color);
 			}, base.MainPanel);
 			((Control)colorBox).set_BasicTooltipText(((SettingEntry)settingEntry).get_Description());
+			SetControlEnabledState((Control)(object)colorBox, (SettingEntry)(object)settingEntry);
+			AddControlForDisabledCheck((Control)(object)colorBox, (SettingEntry)(object)settingEntry);
 			return (panel, label.Item1, colorBox);
 		}
 
@@ -94,6 +96,8 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 				settingEntry.set_Value(newValue);
 			});
 			((Control)textBox).set_BasicTooltipText(((SettingEntry)settingEntry).get_Description());
+			SetControlEnabledState((Control)(object)textBox, (SettingEntry)(object)settingEntry);
+			AddControlForDisabledCheck((Control)(object)textBox, (SettingEntry)(object)settingEntry);
 			return (panel, label.Item1, textBox);
 		}
 
@@ -124,6 +128,8 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			{
 				_settingEventState.RemoveFromRangeCheck((SettingEntry)(object)settingEntry);
 			});
+			SetControlEnabledState((Control)(object)trackbar, (SettingEntry)(object)settingEntry);
+			AddControlForDisabledCheck((Control)(object)trackbar, (SettingEntry)(object)settingEntry);
 			return (panel, label.Item1, trackbar);
 		}
 
@@ -154,6 +160,8 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			{
 				_settingEventState.RemoveFromRangeCheck((SettingEntry)(object)settingEntry);
 			});
+			SetControlEnabledState((Control)(object)trackbar, (SettingEntry)(object)settingEntry);
+			AddControlForDisabledCheck((Control)(object)trackbar, (SettingEntry)(object)settingEntry);
 			return (panel, label.Item1, trackbar);
 		}
 
@@ -167,6 +175,8 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 				settingEntry.set_Value(newValue);
 			});
 			((Control)checkbox).set_BasicTooltipText(((SettingEntry)settingEntry).get_Description());
+			SetControlEnabledState((Control)(object)checkbox, (SettingEntry)(object)settingEntry);
+			AddControlForDisabledCheck((Control)(object)checkbox, (SettingEntry)(object)settingEntry);
 			return (panel, label.Item1, checkbox);
 		}
 
@@ -181,6 +191,8 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 				GameService.Settings.Save(false);
 			});
 			((Control)keybindingAssigner).set_BasicTooltipText(((SettingEntry)settingEntry).get_Description());
+			SetControlEnabledState((Control)(object)keybindingAssigner, (SettingEntry)(object)settingEntry);
+			AddControlForDisabledCheck((Control)(object)keybindingAssigner, (SettingEntry)(object)settingEntry);
 			return (panel, label.Item1, keybindingAssigner);
 		}
 
@@ -197,20 +209,47 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 				settingEntry.set_Value(values[formattedValues.ToList().IndexOf(newValue)]);
 			});
 			((Control)dropdown).set_BasicTooltipText(((SettingEntry)settingEntry).get_Description());
+			SetControlEnabledState((Control)(object)dropdown, (SettingEntry)(object)settingEntry);
+			AddControlForDisabledCheck((Control)(object)dropdown, (SettingEntry)(object)settingEntry);
 			return (panel, label.Item1, dropdown);
+		}
+
+		private void AddControlForDisabledCheck(Control control, SettingEntry settingEntry)
+		{
+			_settingEventState.AddForDisabledCheck(settingEntry);
+			_settingEventState.DisabledUpdated += delegate(object s, ComplianceUpdated e)
+			{
+				//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+				if (e.SettingEntry.get_EntryKey() == settingEntry.get_EntryKey())
+				{
+					SettingDisabledComplianceRequisite val = (SettingDisabledComplianceRequisite)(object)e.NewCompliance;
+					control.set_Enabled(!((SettingDisabledComplianceRequisite)(ref val)).get_Disabled());
+				}
+			};
+			control.add_Disposed((EventHandler<EventArgs>)delegate
+			{
+				_settingEventState.RemoveFromDisabledCheck(settingEntry);
+			});
+		}
+
+		private void SetControlEnabledState(Control control, SettingEntry settingEntry)
+		{
+			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+			IEnumerable<SettingDisabledComplianceRequisite> compliances = (from c in SettingComplianceExtensions.GetComplianceRequisite(settingEntry)
+				where c is SettingDisabledComplianceRequisite
+				select c).Select((Func<IComplianceRequisite, SettingDisabledComplianceRequisite>)((IComplianceRequisite c) => (SettingDisabledComplianceRequisite)(object)c));
+			if (compliances.Any())
+			{
+				SettingDisabledComplianceRequisite val = compliances.First();
+				control.set_Enabled(!((SettingDisabledComplianceRequisite)(ref val)).get_Disabled());
+			}
 		}
 
 		protected override void Unload()
 		{
 			base.Unload();
-			((Container)base.MainPanel).get_Children()?.ToList().ForEach(delegate(Control c)
-			{
-				if (c != null)
-				{
-					c.Dispose();
-				}
-			});
-			((Container)base.MainPanel).get_Children()?.Clear();
 		}
 	}
 }

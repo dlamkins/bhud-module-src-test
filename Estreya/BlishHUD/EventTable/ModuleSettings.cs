@@ -35,9 +35,19 @@ namespace Estreya.BlishHUD.EventTable
 
 		public SettingEntry<float> ReminderOpacity { get; private set; }
 
+		public SettingEntry<List<string>> ReminderDisabledForEvents { get; set; }
+
 		public SettingEntry<bool> ShowDynamicEventsOnMap { get; private set; }
 
-		public SettingEntry<List<string>> ReminderDisabledForEvents { get; set; }
+		public SettingEntry<bool> ShowDynamicEventInWorld { get; private set; }
+
+		public SettingEntry<bool> ShowDynamicEventsInWorldOnlyWhenInside { get; private set; }
+
+		public SettingEntry<bool> IgnoreZAxisOnDynamicEventsInWorld { get; private set; }
+
+		public SettingEntry<int> DynamicEventsRenderDistance { get; private set; }
+
+		public SettingEntry<List<string>> DisabledDynamicEventIds { get; private set; }
 
 		public ModuleSettings(SettingCollection settings)
 			: base(settings, new KeyBinding((ModifierKeys)2, (Keys)69))
@@ -74,6 +84,32 @@ namespace Estreya.BlishHUD.EventTable
 			ReminderOpacity = base.GlobalSettings.DefineSetting<float>("ReminderOpacity", 0.5f, (Func<string>)(() => "Reminder Opacity"), (Func<string>)(() => "Defines the background opacity for reminders."));
 			SettingComplianceExtensions.SetRange(ReminderOpacity, 0.1f, 1f);
 			ShowDynamicEventsOnMap = base.GlobalSettings.DefineSetting<bool>("ShowDynamicEventsOnMap", false, (Func<string>)(() => "Show Dynamic Events on Map"), (Func<string>)(() => "Whether the dynamic events of the map should be shown."));
+			ShowDynamicEventInWorld = base.GlobalSettings.DefineSetting<bool>("ShowDynamicEventInWorld", false, (Func<string>)(() => "Show Dynamic Events in World"), (Func<string>)(() => "Whether dynamic events should be shown inside the world."));
+			ShowDynamicEventInWorld.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowDynamicEventInWorld_SettingChanged);
+			ShowDynamicEventsInWorldOnlyWhenInside = base.GlobalSettings.DefineSetting<bool>("ShowDynamicEventsInWorldOnlyWhenInside", true, (Func<string>)(() => "Show only when inside."), (Func<string>)(() => "Whether the dynamic events inside the world should only show up when the player is inside."));
+			ShowDynamicEventsInWorldOnlyWhenInside.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowDynamicEventsInWorldOnlyWhenInside_SettingChanged);
+			IgnoreZAxisOnDynamicEventsInWorld = base.GlobalSettings.DefineSetting<bool>("IgnoreZAxisOnDynamicEventsInWorld", true, (Func<string>)(() => "Ignore Z Axis"), (Func<string>)(() => "Defines whether the z axis should be ignored when calculating the visibility of in world events."));
+			DynamicEventsRenderDistance = base.GlobalSettings.DefineSetting<int>("DynamicEventsRenderDistance", 300, (Func<string>)(() => "Dynamic Event Render Distance"), (Func<string>)(() => "Defines the distance in which dynamic events should be rendered"));
+			SettingComplianceExtensions.SetRange(DynamicEventsRenderDistance, 50, 500);
+			DisabledDynamicEventIds = base.GlobalSettings.DefineSetting<List<string>>("DisabledDynamicEventIds", new List<string>(), (Func<string>)(() => "Disabled Dynamic Events"), (Func<string>)(() => "Defines which dynamic events are disabled."));
+			HandleEnabledStates();
+		}
+
+		private void ShowDynamicEventInWorld_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
+		{
+			HandleEnabledStates();
+		}
+
+		private void ShowDynamicEventsInWorldOnlyWhenInside_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
+		{
+			HandleEnabledStates();
+		}
+
+		private void HandleEnabledStates()
+		{
+			SettingComplianceExtensions.SetDisabled((SettingEntry)(object)ShowDynamicEventsInWorldOnlyWhenInside, !ShowDynamicEventInWorld.get_Value());
+			SettingComplianceExtensions.SetDisabled((SettingEntry)(object)IgnoreZAxisOnDynamicEventsInWorld, !ShowDynamicEventInWorld.get_Value() || !ShowDynamicEventsInWorldOnlyWhenInside.get_Value());
+			SettingComplianceExtensions.SetDisabled((SettingEntry)(object)DynamicEventsRenderDistance, !ShowDynamicEventInWorld.get_Value() || ShowDynamicEventsInWorldOnlyWhenInside.get_Value());
 		}
 
 		public void CheckDrawerSizeAndPosition(EventAreaConfiguration configuration)
@@ -245,6 +281,13 @@ namespace Estreya.BlishHUD.EventTable
 			string eventOpacityDescriptionDefault = ((SettingEntry)drawerConfiguration.EventOpacity).get_Description();
 			((SettingEntry)drawerConfiguration.EventOpacity).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventOpacity-name", eventOpacityDisplayNameDefault)));
 			((SettingEntry)drawerConfiguration.EventOpacity).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventOpacity-description", eventOpacityDescriptionDefault)));
+		}
+
+		public override void Unload()
+		{
+			base.Unload();
+			ShowDynamicEventInWorld.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowDynamicEventInWorld_SettingChanged);
+			ShowDynamicEventsInWorldOnlyWhenInside.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowDynamicEventsInWorldOnlyWhenInside_SettingChanged);
 		}
 	}
 }

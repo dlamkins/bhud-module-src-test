@@ -546,15 +546,28 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		protected override void Unload()
 		{
-			((View<IPresenter>)this).Unload();
-			((Container)MainPanel).get_Children()?.ToList().ForEach(delegate(Control c)
+			Panel mainPanel = MainPanel;
+			if (mainPanel != null)
 			{
-				if (c != null)
+				((Container)mainPanel).get_Children()?.ToList().ForEach(delegate(Control c)
 				{
-					c.Dispose();
-				}
-			});
-			((Container)MainPanel).get_Children()?.Clear();
+					if (c != null)
+					{
+						c.Dispose();
+					}
+				});
+			}
+			Panel mainPanel2 = MainPanel;
+			if (mainPanel2 != null)
+			{
+				((Container)mainPanel2).get_Children()?.Clear();
+			}
+			Panel mainPanel3 = MainPanel;
+			if (mainPanel3 != null)
+			{
+				((Control)mainPanel3).Dispose();
+			}
+			MainPanel = null;
 		}
 	}
 }
