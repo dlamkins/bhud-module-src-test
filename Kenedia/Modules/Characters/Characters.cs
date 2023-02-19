@@ -116,7 +116,7 @@ namespace Kenedia.Modules.Characters
 
 		public string CharactersPath => base.Paths.AccountPath + "characters.json";
 
-		public string AccountImagesPath => base.Paths.AccountPath + "images";
+		public string AccountImagesPath => base.Paths.AccountPath + "images\\";
 
 		public GW2API_Handler GW2APIHandler { get; private set; }
 
