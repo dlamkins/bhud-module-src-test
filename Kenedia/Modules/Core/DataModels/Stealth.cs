@@ -1,17 +1,9 @@
 namespace Kenedia.Modules.Core.DataModels
 {
-	public class Stealth
+	public class Stealth : BaseConnectionProperty
 	{
-		public int? Default;
+		public int? Default { get; set; }
 
-		public int? Deadeye;
-
-		public int?[] Values => new int?[2] { Default, Deadeye };
-
-		public void Clear()
-		{
-			Default = null;
-			Deadeye = null;
-		}
+		public int? Malicious { get; set; }
 	}
 }

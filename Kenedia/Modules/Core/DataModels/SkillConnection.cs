@@ -9,9 +9,12 @@ namespace Kenedia.Modules.Core.DataModels
 
 		public int? Default { get; set; }
 
+		public int? AssetId { get; set; }
+
 		public int? EnviromentalCounterskill { get; set; }
 
-		public Enviroment Enviroment { get; set; }
+		public Enviroment Enviroment { get; set; } = Enviroment.Terrestrial;
+
 
 		public SkillWeaponType? Weapon { get; set; }
 
@@ -19,7 +22,7 @@ namespace Kenedia.Modules.Core.DataModels
 
 		public DualSkill DualSkill { get; set; }
 
-		public AttunementSkill Attunement { get; set; }
+		public AttunementSkill AttunementSkill { get; set; }
 
 		public Burst Burst { get; set; }
 
@@ -27,7 +30,7 @@ namespace Kenedia.Modules.Core.DataModels
 
 		public Transform Transform { get; set; }
 
-		public BundleSkill Bundle { get; set; }
+		public Bundle Bundle { get; set; }
 
 		public int? Unleashed { get; set; }
 
@@ -37,7 +40,7 @@ namespace Kenedia.Modules.Core.DataModels
 
 		public Chain Chain { get; set; }
 
-		public FlipSkill FlipSkills { get; set; }
+		public FlipSkills FlipSkills { get; set; }
 
 		public Dictionary<int, List<int>> Traited { get; set; }
 
@@ -49,7 +52,7 @@ namespace Kenedia.Modules.Core.DataModels
 			Weapon = null;
 			Specialization = null;
 			DualSkill = null;
-			Attunement = null;
+			AttunementSkill = null;
 			Burst = null;
 			Stealth = null;
 			Transform = null;

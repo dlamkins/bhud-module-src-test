@@ -1,10 +1,10 @@
 namespace Kenedia.Modules.Core.DataModels
 {
-	public class Transform : BaseConnectionProperty
+	public class Bundle : BaseConnectionProperty
 	{
-		public int? Enter { get; set; }
+		public int? Equip { get; set; }
 
-		public int? Exit { get; set; }
+		public int? Stow { get; set; }
 
 		public int? Weapon1 { get; set; }
 

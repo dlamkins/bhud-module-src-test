@@ -1,29 +1,17 @@
 namespace Kenedia.Modules.Core.DataModels
 {
-	public class Burst
+	public class Burst : BaseConnectionProperty
 	{
-		public int? Spellbreaker;
+		public int? Spellbreaker { get; set; }
 
-		public int? Berserker;
+		public int? Berserker { get; set; }
 
-		public int? Stage0;
+		public int? Stage0 { get; set; }
 
-		public int? Stage1;
+		public int? Stage1 { get; set; }
 
-		public int? Stage2;
+		public int? Stage2 { get; set; }
 
-		public int? Stage3;
-
-		public int?[] Values => new int?[6] { Spellbreaker, Berserker, Stage0, Stage1, Stage2, Stage3 };
-
-		public void Clear()
-		{
-			Spellbreaker = null;
-			Berserker = null;
-			Stage0 = null;
-			Stage1 = null;
-			Stage2 = null;
-			Stage3 = null;
-		}
+		public int? Stage3 { get; set; }
 	}
 }

@@ -1,36 +1,23 @@
 namespace Kenedia.Modules.Core.DataModels
 {
-	public class Chain
+	public class Chain : BaseConnectionProperty
 	{
-		public int? First;
+		public int? First { get; set; }
 
-		public int? Second;
+		public int? Second { get; set; }
 
-		public int? Third;
+		public int? Third { get; set; }
 
-		public int? Fourth;
+		public int? Fourth { get; set; }
 
-		public int? Fifth;
+		public int? Fifth { get; set; }
 
-		public int? Stealth;
+		public int? Stealth { get; set; }
 
-		public int? StealthDeadeye;
+		public int? Malicious { get; set; }
 
-		public int? Ambush;
+		public int? Ambush { get; set; }
 
-		public int? Unleashed;
-
-		public void Clear()
-		{
-			First = null;
-			Second = null;
-			Third = null;
-			Fourth = null;
-			Fifth = null;
-			Stealth = null;
-			StealthDeadeye = null;
-			Ambush = null;
-			Unleashed = null;
-		}
+		public int? Unleashed { get; set; }
 	}
 }
