@@ -388,8 +388,8 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private void UpdateEventsOnScreen()
 		{
-			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
 			if (_clearing)
 			{
 				return;
@@ -401,6 +401,10 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				orderby order.IndexOf(x.Key)
 				select x.Value).ToList())
 			{
+				if (controlEventPairs.Count == 0)
+				{
+					continue;
+				}
 				List<(DateTime, Event)> toDelete = new List<(DateTime, Event)>();
 				foreach (var controlEvent in controlEventPairs)
 				{

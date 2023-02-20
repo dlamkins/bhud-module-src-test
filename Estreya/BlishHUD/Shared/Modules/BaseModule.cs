@@ -32,8 +32,6 @@ namespace Estreya.BlishHUD.Shared.Modules
 {
 	public abstract class BaseModule<TModule, TSettings> : Module where TModule : class where TSettings : BaseModuleSettings
 	{
-		public const string WEBSITE_ROOT_URL = "https://blishhud.estreya.de";
-
 		public const string FILE_ROOT_URL = "https://files.estreya.de";
 
 		public const string FILE_BLISH_ROOT_URL = "https://files.estreya.de/blish-hud";
@@ -63,8 +61,6 @@ namespace Estreya.BlishHUD.Shared.Modules
 		protected GitHubHelper GithubHelper { get; private set; }
 
 		protected PasswordManager PasswordManager { get; private set; }
-
-		public string WEBSITE_MODULE_URL => "https://blishhud.estreya.de/modules/" + WebsiteModuleName;
 
 		public string WEBSITE_MODULE_FILE_URL => "https://files.estreya.de/blish-hud/" + WebsiteModuleName;
 

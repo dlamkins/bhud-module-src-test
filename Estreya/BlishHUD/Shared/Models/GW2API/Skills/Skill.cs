@@ -1,19 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Blish_HUD.Content;
 using Estreya.BlishHUD.Shared.State;
 using Gw2Sharp;
 using Gw2Sharp.WebApi;
 using Gw2Sharp.WebApi.V2.Models;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Estreya.BlishHUD.Shared.Models.GW2API.Skills
 {
 	public class Skill : IDisposable
 	{
+		[JsonConverter(typeof(StringEnumConverter))]
 		public SkillCategory Category { get; set; }
 
 		public int Id { get; set; }
@@ -31,15 +31,19 @@ namespace Estreya.BlishHUD.Shared.Models.GW2API.Skills
 		public string ChatLink { get; set; } = string.Empty;
 
 
+		[JsonConverter(typeof(StringEnumConverter))]
 		public SkillType Type { get; set; }
 
+		[JsonConverter(typeof(StringEnumConverter))]
 		public SkillWeaponType WeaponType { get; set; }
 
 		public List<string> Professions { get; set; } = new List<string>();
 
 
+		[JsonConverter(typeof(StringEnumConverter))]
 		public SkillSlot Slot { get; set; }
 
+		[JsonConverter(typeof(StringEnumConverter))]
 		public Attunement DualAttunement { get; set; }
 
 		public List<SkillFlag> Flags { get; set; }
@@ -49,6 +53,7 @@ namespace Estreya.BlishHUD.Shared.Models.GW2API.Skills
 		[JsonProperty("subskills")]
 		public List<SkillSubSkill> SubSkills { get; set; }
 
+		[JsonConverter(typeof(StringEnumConverter))]
 		public Attunement Attunement { get; set; }
 
 		public int Cost { get; set; }
@@ -182,11 +187,11 @@ namespace Estreya.BlishHUD.Shared.Models.GW2API.Skills
 			IconTexture = null;
 		}
 
-		public async Task LoadTexture(IconState iconState, CancellationToken cancellationToken)
+		public void LoadTexture(IconState iconState)
 		{
 			if (!string.IsNullOrWhiteSpace(Icon))
 			{
-				IconTexture = await iconState.GetIconAsync(Icon, cancellationToken);
+				IconTexture = iconState.GetIcon(Icon);
 			}
 		}
 	}
