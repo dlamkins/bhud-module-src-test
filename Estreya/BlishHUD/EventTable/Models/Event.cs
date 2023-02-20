@@ -86,31 +86,6 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		public event EventHandler<TimeSpan> Reminder;
 
-		public DateTime? GetCurrentOccurence(DateTime now)
-		{
-			IEnumerable<DateTime> occurences = Occurences.Where((DateTime oc) => oc <= now && oc.AddMinutes(Duration) >= now);
-			if (!occurences.Any())
-			{
-				return null;
-			}
-			return occurences.First();
-		}
-
-		public bool IsRunning(DateTime now)
-		{
-			return GetCurrentOccurence(now).HasValue;
-		}
-
-		public TimeSpan GetTimeRemaining(DateTime now)
-		{
-			DateTime? co = GetCurrentOccurence(now);
-			if (co.HasValue)
-			{
-				return co.Value.AddMinutes(Duration) - now;
-			}
-			return TimeSpan.Zero;
-		}
-
 		public double CalculateXPosition(DateTime start, DateTime min, double pixelPerMinute)
 		{
 			return start.Subtract(min).TotalMinutes * pixelPerMinute;

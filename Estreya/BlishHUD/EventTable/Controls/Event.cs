@@ -37,6 +37,10 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private readonly Func<Color> _getColorAction;
 
+		private readonly Func<bool> _getDrawShadowAction;
+
+		private readonly Func<Color> _getShadowColor;
+
 		private Tooltip _tooltip;
 
 		public Estreya.BlishHUD.EventTable.Models.Event Ev { get; private set; }
@@ -47,7 +51,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		public event EventHandler FinishRequested;
 
-		public Event(Estreya.BlishHUD.EventTable.Models.Event ev, IconState iconState, TranslationState translationState, Func<DateTime> getNowAction, DateTime startTime, DateTime endTime, Func<BitmapFont> getFontAction, Func<bool> getDrawBorders, Func<bool> getDrawCrossout, Func<Color> getTextColor, Func<Color> getColorAction)
+		public Event(Estreya.BlishHUD.EventTable.Models.Event ev, IconState iconState, TranslationState translationState, Func<DateTime> getNowAction, DateTime startTime, DateTime endTime, Func<BitmapFont> getFontAction, Func<bool> getDrawBorders, Func<bool> getDrawCrossout, Func<Color> getTextColor, Func<Color> getColorAction, Func<bool> getDrawShadowAction, Func<Color> getShadowColor)
 		{
 			Ev = ev;
 			_iconState = iconState;
@@ -60,6 +64,8 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			_getDrawCrossout = getDrawCrossout;
 			_getTextColor = getTextColor;
 			_getColorAction = getColorAction;
+			_getDrawShadowAction = getDrawShadowAction;
+			_getShadowColor = getShadowColor;
 			BuildContextMenu();
 		}
 
@@ -112,8 +118,8 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private void BuildOrUpdateTooltip()
 		{
-			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d7: Expected O, but got Unknown
+			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d2: Expected O, but got Unknown
 			DateTime now = _getNowAction();
 			bool num = _startTime.AddMinutes(Ev.Duration) < now;
 			bool isNext = !num && _startTime > now;
@@ -131,7 +137,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			}
 			else if (isCurrent)
 			{
-				TimeSpan remaining = Ev.GetTimeRemaining(now);
+				TimeSpan remaining = GetTimeRemaining(now);
 				description = description + _translationState.GetTranslation("event-tooltip-remaining", "Remaining") + ": " + FormatTime(remaining);
 			}
 			description = description + " (" + _translationState.GetTranslation("event-tooltip-startsAt", "Starts at") + ": " + FormatTime(_startTime.ToLocalTime()) + ")";
@@ -161,33 +167,32 @@ namespace Estreya.BlishHUD.EventTable.Controls
 		private int DrawName(SpriteBatch spriteBatch, BitmapFont font)
 		{
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
 			int nameWidth = MathHelper.Clamp((int)Math.Ceiling(font.MeasureString(Ev.Name).Width) + 10, 0, base.Width - 10);
 			Rectangle nameRect = default(Rectangle);
 			((Rectangle)(ref nameRect))._002Ector(5, 0, nameWidth, base.Height);
-			Color textColor = _getTextColor();
-			spriteBatch.DrawString(Ev.Name, font, RectangleF.op_Implicit(nameRect), textColor, wrap: false, (HorizontalAlignment)0, (VerticalAlignment)1);
+			spriteBatch.DrawString(Ev.Name, font, RectangleF.op_Implicit(nameRect), _getTextColor(), wrap: false, _getDrawShadowAction(), 1, _getShadowColor(), (HorizontalAlignment)0, (VerticalAlignment)1);
 			return nameRect.Width;
 		}
 
 		private void DrawRemainingTime(SpriteBatch spriteBatch, BitmapFont font, int x)
 		{
-			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
 			if (x > base.Width)
 			{
 				return;
 			}
-			TimeSpan remainingTime = Ev.GetTimeRemaining(_getNowAction());
+			TimeSpan remainingTime = GetTimeRemaining(_getNowAction());
 			if (!(remainingTime == TimeSpan.Zero))
 			{
 				string remainingTimeString = FormatTimeRemaining(remainingTime);
@@ -203,9 +208,18 @@ namespace Estreya.BlishHUD.EventTable.Controls
 					Rectangle timeRect = default(Rectangle);
 					((Rectangle)(ref timeRect))._002Ector(centerX, 0, maxWidth, base.Height);
 					Color textColor = _getTextColor();
-					spriteBatch.DrawString(remainingTimeString, font, RectangleF.op_Implicit(timeRect), textColor, wrap: false, (HorizontalAlignment)0, (VerticalAlignment)1);
+					spriteBatch.DrawString(remainingTimeString, font, RectangleF.op_Implicit(timeRect), textColor, wrap: false, _getDrawShadowAction(), 1, _getShadowColor(), (HorizontalAlignment)0, (VerticalAlignment)1);
 				}
 			}
+		}
+
+		private TimeSpan GetTimeRemaining(DateTime now)
+		{
+			if (!(now <= _startTime) && !(now >= _endTime))
+			{
+				return _startTime.AddMinutes(Ev.Duration) - now;
+			}
+			return TimeSpan.Zero;
 		}
 
 		private void DrawCrossout(SpriteBatch spriteBatch)

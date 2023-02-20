@@ -323,6 +323,9 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderBoolSetting((Panel)(object)settingsPanel, areaConfiguration.DrawBorders);
 			RenderEnumSetting<BuildDirection>((Panel)(object)settingsPanel, areaConfiguration.BuildDirection);
 			base.RenderEnumSetting<FontSize>((Panel)(object)settingsPanel, areaConfiguration.FontSize);
+			RenderColorSetting((Panel)(object)settingsPanel, areaConfiguration.TextColor);
+			RenderBoolSetting((Panel)(object)settingsPanel, areaConfiguration.DrawShadows);
+			RenderColorSetting((Panel)(object)settingsPanel, areaConfiguration.ShadowColor);
 			RenderEmptyLine((Panel)(object)settingsPanel);
 			RenderEnumSetting<LeftClickAction>((Panel)(object)settingsPanel, areaConfiguration.LeftClickAction);
 			RenderBoolSetting((Panel)(object)settingsPanel, areaConfiguration.AcceptWaypointPrompt);
@@ -331,6 +334,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderEmptyLine((Panel)(object)settingsPanel);
 			RenderBoolSetting((Panel)(object)settingsPanel, areaConfiguration.UseFiller);
 			RenderColorSetting((Panel)(object)settingsPanel, areaConfiguration.FillerTextColor);
+			RenderBoolSetting((Panel)(object)settingsPanel, areaConfiguration.DrawShadowsForFiller);
+			RenderColorSetting((Panel)(object)settingsPanel, areaConfiguration.FillerShadowColor);
 			RenderEmptyLine((Panel)(object)settingsPanel);
 			RenderColorSetting((Panel)(object)settingsPanel, areaConfiguration.BackgroundColor);
 			RenderFloatSetting((Panel)(object)settingsPanel, areaConfiguration.Opacity);

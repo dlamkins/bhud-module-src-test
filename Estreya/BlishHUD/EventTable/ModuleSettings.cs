@@ -159,6 +159,10 @@ namespace Estreya.BlishHUD.EventTable
 			SettingEntry<List<string>> eventOrder = base.DrawerSettings.DefineSetting<List<string>>(name + "-eventOrder", new List<string>(eventCategories.Select((EventCategory x) => x.Key)), (Func<string>)(() => "Event Order"), (Func<string>)(() => "Defines the order of events."));
 			SettingEntry<float> eventOpacity = base.DrawerSettings.DefineSetting<float>(name + "-eventOpacity", 1f, (Func<string>)(() => "Event Opacity"), (Func<string>)(() => "Defines the opacity of the individual events."));
 			SettingComplianceExtensions.SetRange(eventOpacity, 0.1f, 1f);
+			SettingEntry<bool> drawShadows = base.DrawerSettings.DefineSetting<bool>(name + "-drawShadows", false, (Func<string>)(() => "Draw Shadows"), (Func<string>)(() => "Whether the text should have shadows"));
+			SettingEntry<Color> shadowColor = base.DrawerSettings.DefineSetting<Color>(name + "-shadowColor", base.DefaultGW2Color, (Func<string>)(() => "Shadow Color"), (Func<string>)(() => "Defines the color of the shadows"));
+			SettingEntry<bool> drawShadowsForFiller = base.DrawerSettings.DefineSetting<bool>(name + "-drawShadowsForFiller", false, (Func<string>)(() => "Draw Shadows for Filler"), (Func<string>)(() => "Whether the filler text should have shadows"));
+			SettingEntry<Color> fillerShadowColor = base.DrawerSettings.DefineSetting<Color>(name + "-fillerShadowColor", base.DefaultGW2Color, (Func<string>)(() => "Filler Shadow Color"), (Func<string>)(() => "Defines the color of the shadows for fillers"));
 			return new EventAreaConfiguration
 			{
 				Name = drawer.Name,
@@ -183,7 +187,11 @@ namespace Estreya.BlishHUD.EventTable
 				CompletionAcion = completionAction,
 				EventHeight = eventHeight,
 				EventOrder = eventOrder,
-				EventOpacity = eventOpacity
+				EventOpacity = eventOpacity,
+				DrawShadows = drawShadows,
+				ShadowColor = shadowColor,
+				DrawShadowsForFiller = drawShadowsForFiller,
+				FillerShadowColor = fillerShadowColor
 			};
 		}
 
@@ -203,6 +211,10 @@ namespace Estreya.BlishHUD.EventTable
 			base.DrawerSettings.UndefineSetting(name + "-eventHeight");
 			base.DrawerSettings.UndefineSetting(name + "-eventOrder");
 			base.DrawerSettings.UndefineSetting(name + "-eventOpacity");
+			base.DrawerSettings.UndefineSetting(name + "-drawShadows");
+			base.DrawerSettings.UndefineSetting(name + "-shadowColor");
+			base.DrawerSettings.UndefineSetting(name + "-drawShadowsForFiller");
+			base.DrawerSettings.UndefineSetting(name + "-fillerShadowColor");
 		}
 
 		public override void UpdateLocalization(TranslationState translationState)

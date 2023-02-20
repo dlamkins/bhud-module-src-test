@@ -491,6 +491,21 @@ namespace Estreya.BlishHUD.EventTable.Controls
 							}
 							Color color = (string.IsNullOrWhiteSpace(ev2.BackgroundColorCode) ? Color.White : ColorTranslator.FromHtml(ev2.BackgroundColorCode));
 							return new Color((int)color.R, (int)color.G, (int)color.B) * Configuration.EventOpacity.get_Value();
+						}, () => (!ev2.Filler) ? Configuration.DrawShadows.get_Value() : Configuration.DrawShadowsForFiller.get_Value(), delegate
+						{
+							//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+							//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+							//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+							//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+							if (!ev2.Filler)
+							{
+								if (Configuration.ShadowColor.get_Value().get_Id() != 1)
+								{
+									return ColorExtensions.ToXnaColor(Configuration.ShadowColor.get_Value().get_Cloth());
+								}
+								return Color.get_Black();
+							}
+							return (Configuration.FillerShadowColor.get_Value().get_Id() != 1) ? ColorExtensions.ToXnaColor(Configuration.FillerShadowColor.get_Value().get_Cloth()) : Color.get_Black();
 						});
 						((Control)@event).set_Parent((Container)(object)this);
 						((Control)@event).set_Top(y);
