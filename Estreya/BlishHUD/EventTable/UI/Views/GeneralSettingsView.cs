@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Blish_HUD.Controls;
 using Blish_HUD.Modules.Managers;
+using Estreya.BlishHUD.Shared.Models;
 using Estreya.BlishHUD.Shared.State;
 using Estreya.BlishHUD.Shared.UI.Views;
 using MonoGame.Extended.BitmapFonts;
@@ -23,6 +24,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.GlobalDrawerVisible);
 			RenderKeybindingSetting((Panel)(object)parent, _moduleSettings.GlobalDrawerVisibleHotkey);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.RegisterCornerIcon);
+			RenderEnumSetting<CornerIconLeftClickAction>((Panel)(object)parent, _moduleSettings.CornerIconLeftClickAction);
+			RenderEnumSetting<CornerIconRightClickAction>((Panel)(object)parent, _moduleSettings.CornerIconRightClickAction);
 			RenderEmptyLine((Panel)(object)parent);
 			RenderKeybindingSetting((Panel)(object)parent, _moduleSettings.MapKeybinding);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideOnMissingMumbleTicks);

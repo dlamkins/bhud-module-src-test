@@ -506,7 +506,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 								return Color.get_Black();
 							}
 							return (Configuration.FillerShadowColor.get_Value().get_Id() != 1) ? ColorExtensions.ToXnaColor(Configuration.FillerShadowColor.get_Value().get_Cloth()) : Color.get_Black();
-						});
+						}, () => Configuration.ShowTooltips.get_Value());
 						((Control)@event).set_Parent((Container)(object)this);
 						((Control)@event).set_Top(y);
 						@event.Height = Configuration.EventHeight.get_Value();

@@ -14,6 +14,7 @@ using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Estreya.BlishHUD.Shared.Helpers;
+using Estreya.BlishHUD.Shared.Models;
 using Estreya.BlishHUD.Shared.MumbleInfo.Map;
 using Estreya.BlishHUD.Shared.Security;
 using Estreya.BlishHUD.Shared.Settings;
@@ -328,29 +329,68 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		private void HandleCornerIcon(bool show)
 		{
-			//IL_0004: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Expected O, but got Unknown
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002b: Expected O, but got Unknown
+			//IL_0030: Expected O, but got Unknown
 			if (show)
 			{
-				CornerIcon val = new CornerIcon();
-				val.set_IconName(((Module)this).get_Name());
-				val.set_Icon(GetCornerIcon());
-				CornerIcon = val;
-				((Control)CornerIcon).add_Click((EventHandler<MouseEventArgs>)CornerIcon_Click);
+				if (CornerIcon == null)
+				{
+					CornerIcon val = new CornerIcon();
+					val.set_IconName(((Module)this).get_Name());
+					val.set_Icon(GetCornerIcon());
+					CornerIcon val2 = val;
+					CornerIcon = val;
+				}
+				OnCornerIconBuild();
 			}
 			else if (CornerIcon != null)
 			{
-				((Control)CornerIcon).remove_Click((EventHandler<MouseEventArgs>)CornerIcon_Click);
+				OnCornerIconDispose();
 				((Control)CornerIcon).Dispose();
 				CornerIcon = null;
 			}
 		}
 
+		protected virtual void OnCornerIconBuild()
+		{
+			((Control)CornerIcon).add_Click((EventHandler<MouseEventArgs>)CornerIcon_Click);
+			((Control)CornerIcon).add_RightMouseButtonPressed((EventHandler<MouseEventArgs>)CornerIcon_RightMouseButtonPressed);
+		}
+
+		protected virtual void OnCornerIconDispose()
+		{
+			((Control)CornerIcon).remove_Click((EventHandler<MouseEventArgs>)CornerIcon_Click);
+			((Control)CornerIcon).remove_RightMouseButtonPressed((EventHandler<MouseEventArgs>)CornerIcon_RightMouseButtonPressed);
+		}
+
 		private void CornerIcon_Click(object sender, MouseEventArgs e)
 		{
-			((WindowBase2)SettingsWindow).ToggleWindow();
+			switch (ModuleSettings.CornerIconLeftClickAction.get_Value())
+			{
+			case CornerIconLeftClickAction.Settings:
+				((WindowBase2)SettingsWindow).ToggleWindow();
+				break;
+			case CornerIconLeftClickAction.Visibility:
+				ModuleSettings.GlobalDrawerVisible.set_Value(!ModuleSettings.GlobalDrawerVisible.get_Value());
+				break;
+			}
+		}
+
+		private void CornerIcon_RightMouseButtonPressed(object sender, MouseEventArgs e)
+		{
+			switch (ModuleSettings.CornerIconRightClickAction.get_Value())
+			{
+			case CornerIconRightClickAction.Settings:
+				((WindowBase2)SettingsWindow).ToggleWindow();
+				break;
+			case CornerIconRightClickAction.Visibility:
+				ModuleSettings.GlobalDrawerVisible.set_Value(!ModuleSettings.GlobalDrawerVisible.get_Value());
+				break;
+			}
 		}
 
 		public override IView GetSettingsView()

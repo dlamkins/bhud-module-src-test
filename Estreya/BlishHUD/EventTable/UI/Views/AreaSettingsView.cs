@@ -330,6 +330,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderEnumSetting<LeftClickAction>((Panel)(object)settingsPanel, areaConfiguration.LeftClickAction);
 			RenderBoolSetting((Panel)(object)settingsPanel, areaConfiguration.AcceptWaypointPrompt);
 			RenderEmptyLine((Panel)(object)settingsPanel);
+			RenderBoolSetting((Panel)(object)settingsPanel, areaConfiguration.ShowTooltips);
+			RenderEmptyLine((Panel)(object)settingsPanel);
 			RenderEnumSetting<EventCompletedAction>((Panel)(object)settingsPanel, areaConfiguration.CompletionAcion);
 			RenderEmptyLine((Panel)(object)settingsPanel);
 			RenderBoolSetting((Panel)(object)settingsPanel, areaConfiguration.UseFiller);
