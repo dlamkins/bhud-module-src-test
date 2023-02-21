@@ -18,26 +18,25 @@ namespace Estreya.BlishHUD.LiveMap.UI.Views
 
 		private readonly Func<string> _getGuildUrl;
 
-		public SettingsView(Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, ModuleSettings moduleSettings, Func<string> getGlobalUrl, Func<string> getGuildUrl, BitmapFont font = null)
-			: base(apiManager, iconState, translationState, font)
+		public SettingsView(Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, SettingEventState settingEventState, ModuleSettings moduleSettings, Func<string> getGlobalUrl, Func<string> getGuildUrl, BitmapFont font = null)
+			: base(apiManager, iconState, translationState, settingEventState, font)
 		{
 			_moduleSettings = moduleSettings;
 			_getGlobalUrl = getGlobalUrl;
 			_getGuildUrl = getGuildUrl;
 		}
 
-		protected override void BuildView(Panel parent)
+		protected override void BuildView(FlowPanel parent)
 		{
-			RenderEnumSetting<PublishType>(parent, _moduleSettings.PublishType);
-			RenderEnumSetting<PlayerFacingType>(parent, _moduleSettings.PlayerFacingType);
-			RenderBoolSetting(parent, _moduleSettings.HideCommander);
-			RenderBoolSetting(parent, _moduleSettings.StreamerModeEnabled);
-			RenderEmptyLine(parent);
-			RenderButton(parent, "Open Global Map", delegate
+			RenderEnumSetting<PlayerFacingType>((Panel)(object)parent, _moduleSettings.PlayerFacingType);
+			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideCommander);
+			RenderBoolSetting((Panel)(object)parent, _moduleSettings.StreamerModeEnabled);
+			RenderEmptyLine((Panel)(object)parent);
+			RenderButton((Panel)(object)parent, "Open Global Map", delegate
 			{
 				Process.Start(_getGlobalUrl());
 			});
-			RenderButton(parent, "Open Guild Map", delegate
+			RenderButton((Panel)(object)parent, "Open Guild Map", delegate
 			{
 				Process.Start(_getGuildUrl());
 			}, () => string.IsNullOrWhiteSpace(_getGuildUrl()));

@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
@@ -13,6 +14,7 @@ using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Estreya.BlishHUD.Shared.Helpers;
+using Estreya.BlishHUD.Shared.Models;
 using Estreya.BlishHUD.Shared.MumbleInfo.Map;
 using Estreya.BlishHUD.Shared.Security;
 using Estreya.BlishHUD.Shared.Settings;
@@ -31,8 +33,6 @@ namespace Estreya.BlishHUD.Shared.Modules
 {
 	public abstract class BaseModule<TModule, TSettings> : Module where TModule : class where TSettings : BaseModuleSettings
 	{
-		public const string WEBSITE_ROOT_URL = "https://blishhud.estreya.de";
-
 		public const string FILE_ROOT_URL = "https://files.estreya.de";
 
 		public const string FILE_BLISH_ROOT_URL = "https://files.estreya.de/blish-hud";
@@ -62,8 +62,6 @@ namespace Estreya.BlishHUD.Shared.Modules
 		protected GitHubHelper GithubHelper { get; private set; }
 
 		protected PasswordManager PasswordManager { get; private set; }
-
-		public string WEBSITE_MODULE_URL => "https://blishhud.estreya.de/modules/" + WebsiteModuleName;
 
 		public string WEBSITE_MODULE_FILE_URL => "https://files.estreya.de/blish-hud/" + WebsiteModuleName;
 
@@ -103,11 +101,11 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		public virtual BitmapFont Font => GameService.Content.get_DefaultFont16();
 
-		protected DateTime DateTimeNow => DateTime.Now;
-
 		public IconState IconState { get; private set; }
 
 		public TranslationState TranslationState { get; private set; }
+
+		public SettingEventState SettingEventState { get; private set; }
 
 		public WorldbossState WorldbossState { get; private set; }
 
@@ -208,6 +206,13 @@ namespace Estreya.BlishHUD.Shared.Modules
 					AwaitLoading = true
 				}, GetFlurlClient(), WEBSITE_MODULE_FILE_URL);
 				_states.Add(TranslationState);
+				SettingEventState = new SettingEventState(new StateConfiguration
+				{
+					Enabled = true,
+					AwaitLoading = false,
+					SaveInterval = Timeout.InfiniteTimeSpan
+				});
+				_states.Add(SettingEventState);
 				if (configurations.Items.Enabled)
 				{
 					ItemState = new ItemState(configurations.Items, Gw2ApiManager, directoryPath);
@@ -324,29 +329,68 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		private void HandleCornerIcon(bool show)
 		{
-			//IL_0004: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Expected O, but got Unknown
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002b: Expected O, but got Unknown
+			//IL_0030: Expected O, but got Unknown
 			if (show)
 			{
-				CornerIcon val = new CornerIcon();
-				val.set_IconName(((Module)this).get_Name());
-				val.set_Icon(GetCornerIcon());
-				CornerIcon = val;
-				((Control)CornerIcon).add_Click((EventHandler<MouseEventArgs>)CornerIcon_Click);
+				if (CornerIcon == null)
+				{
+					CornerIcon val = new CornerIcon();
+					val.set_IconName(((Module)this).get_Name());
+					val.set_Icon(GetCornerIcon());
+					CornerIcon val2 = val;
+					CornerIcon = val;
+				}
+				OnCornerIconBuild();
 			}
 			else if (CornerIcon != null)
 			{
-				((Control)CornerIcon).remove_Click((EventHandler<MouseEventArgs>)CornerIcon_Click);
+				OnCornerIconDispose();
 				((Control)CornerIcon).Dispose();
 				CornerIcon = null;
 			}
 		}
 
+		protected virtual void OnCornerIconBuild()
+		{
+			((Control)CornerIcon).add_Click((EventHandler<MouseEventArgs>)CornerIcon_Click);
+			((Control)CornerIcon).add_RightMouseButtonPressed((EventHandler<MouseEventArgs>)CornerIcon_RightMouseButtonPressed);
+		}
+
+		protected virtual void OnCornerIconDispose()
+		{
+			((Control)CornerIcon).remove_Click((EventHandler<MouseEventArgs>)CornerIcon_Click);
+			((Control)CornerIcon).remove_RightMouseButtonPressed((EventHandler<MouseEventArgs>)CornerIcon_RightMouseButtonPressed);
+		}
+
 		private void CornerIcon_Click(object sender, MouseEventArgs e)
 		{
-			((WindowBase2)SettingsWindow).ToggleWindow();
+			switch (ModuleSettings.CornerIconLeftClickAction.get_Value())
+			{
+			case CornerIconLeftClickAction.Settings:
+				((WindowBase2)SettingsWindow).ToggleWindow();
+				break;
+			case CornerIconLeftClickAction.Visibility:
+				ModuleSettings.GlobalDrawerVisible.set_Value(!ModuleSettings.GlobalDrawerVisible.get_Value());
+				break;
+			}
+		}
+
+		private void CornerIcon_RightMouseButtonPressed(object sender, MouseEventArgs e)
+		{
+			switch (ModuleSettings.CornerIconRightClickAction.get_Value())
+			{
+			case CornerIconRightClickAction.Settings:
+				((WindowBase2)SettingsWindow).ToggleWindow();
+				break;
+			case CornerIconRightClickAction.Visibility:
+				ModuleSettings.GlobalDrawerVisible.set_Value(!ModuleSettings.GlobalDrawerVisible.get_Value());
+				break;
+			}
 		}
 
 		public override IView GetSettingsView()
@@ -418,7 +462,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 			OnSettingWindowBuild(SettingsWindow);
 			if (Debug)
 			{
-				SettingsWindow.get_Tabs().Add(new Tab(IconState.GetIcon("155052.png"), (Func<IView>)(() => (IView)(object)new StateSettingsView(_states, Gw2ApiManager, IconState, TranslationState, Font)
+				SettingsWindow.get_Tabs().Add(new Tab(IconState.GetIcon("155052.png"), (Func<IView>)(() => (IView)(object)new StateSettingsView(_states, Gw2ApiManager, IconState, TranslationState, SettingEventState, Font)
 				{
 					DefaultColor = ModuleSettings.DefaultGW2Color
 				}), "Debug", (int?)null));
@@ -475,52 +519,48 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected virtual bool CalculateUIVisibility()
 		{
-			if (GameService.Gw2Mumble.get_IsAvailable())
+			bool show = true;
+			if (ModuleSettings.HideOnOpenMap.get_Value())
 			{
-				bool show = true;
-				if (ModuleSettings.HideOnOpenMap.get_Value())
-				{
-					show &= !GameService.Gw2Mumble.get_UI().get_IsMapOpen();
-				}
-				if (ModuleSettings.HideOnMissingMumbleTicks.get_Value())
-				{
-					show &= GameService.Gw2Mumble.get_TimeSinceTick().TotalSeconds < 0.5;
-				}
-				if (ModuleSettings.HideInCombat.get_Value())
-				{
-					show &= !GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat();
-				}
-				if (ModuleSettings.HideInPvE_OpenWorld.get_Value())
-				{
-					MapType[] array = new MapType[4];
-					RuntimeHelpers.InitializeArray(array, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);
-					MapType[] pveOpenWorldMapTypes = (MapType[])(object)array;
-					show &= GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode() || !pveOpenWorldMapTypes.Any((MapType type) => type == GameService.Gw2Mumble.get_CurrentMap().get_Type()) || MapInfo.MAP_IDS_PVE_COMPETETIVE.Contains(GameService.Gw2Mumble.get_CurrentMap().get_Id());
-				}
-				if (ModuleSettings.HideInPvE_Competetive.get_Value())
-				{
-					MapType[] pveCompetetiveMapTypes = (MapType[])(object)new MapType[1] { (MapType)4 };
-					show &= GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode() || !pveCompetetiveMapTypes.Any((MapType type) => type == GameService.Gw2Mumble.get_CurrentMap().get_Type()) || !MapInfo.MAP_IDS_PVE_COMPETETIVE.Contains(GameService.Gw2Mumble.get_CurrentMap().get_Id());
-				}
-				if (ModuleSettings.HideInWvW.get_Value())
-				{
-					MapType[] array2 = new MapType[5];
-					RuntimeHelpers.InitializeArray(array2, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);
-					MapType[] wvwMapTypes = (MapType[])(object)array2;
-					show &= !GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode() || !wvwMapTypes.Any((MapType type) => type == GameService.Gw2Mumble.get_CurrentMap().get_Type());
-				}
-				if (ModuleSettings.HideInPvP.get_Value())
-				{
-					MapType[] pvpMapTypes = (MapType[])(object)new MapType[2]
-					{
-						(MapType)2,
-						(MapType)6
-					};
-					show &= !GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode() || !pvpMapTypes.Any((MapType type) => type == GameService.Gw2Mumble.get_CurrentMap().get_Type());
-				}
-				return show;
+				show &= !GameService.Gw2Mumble.get_UI().get_IsMapOpen();
 			}
-			return ShowUI;
+			if (ModuleSettings.HideOnMissingMumbleTicks.get_Value())
+			{
+				show &= GameService.Gw2Mumble.get_TimeSinceTick().TotalSeconds < 0.5;
+			}
+			if (ModuleSettings.HideInCombat.get_Value())
+			{
+				show &= !GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat();
+			}
+			if (ModuleSettings.HideInPvE_OpenWorld.get_Value())
+			{
+				MapType[] array = new MapType[4];
+				RuntimeHelpers.InitializeArray(array, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);
+				MapType[] pveOpenWorldMapTypes = (MapType[])(object)array;
+				show &= GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode() || !pveOpenWorldMapTypes.Any((MapType type) => type == GameService.Gw2Mumble.get_CurrentMap().get_Type()) || MapInfo.MAP_IDS_PVE_COMPETETIVE.Contains(GameService.Gw2Mumble.get_CurrentMap().get_Id());
+			}
+			if (ModuleSettings.HideInPvE_Competetive.get_Value())
+			{
+				MapType[] pveCompetetiveMapTypes = (MapType[])(object)new MapType[1] { (MapType)4 };
+				show &= GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode() || !pveCompetetiveMapTypes.Any((MapType type) => type == GameService.Gw2Mumble.get_CurrentMap().get_Type()) || !MapInfo.MAP_IDS_PVE_COMPETETIVE.Contains(GameService.Gw2Mumble.get_CurrentMap().get_Id());
+			}
+			if (ModuleSettings.HideInWvW.get_Value())
+			{
+				MapType[] array2 = new MapType[5];
+				RuntimeHelpers.InitializeArray(array2, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);
+				MapType[] wvwMapTypes = (MapType[])(object)array2;
+				show &= !GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode() || !wvwMapTypes.Any((MapType type) => type == GameService.Gw2Mumble.get_CurrentMap().get_Type());
+			}
+			if (ModuleSettings.HideInPvP.get_Value())
+			{
+				MapType[] pvpMapTypes = (MapType[])(object)new MapType[2]
+				{
+					(MapType)2,
+					(MapType)6
+				};
+				show &= !GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode() || !pvpMapTypes.Any((MapType type) => type == GameService.Gw2Mumble.get_CurrentMap().get_Type());
+			}
+			return show;
 		}
 
 		protected void HandleLoadingSpinner(bool show, string text = null)

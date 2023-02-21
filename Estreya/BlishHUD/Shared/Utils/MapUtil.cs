@@ -1,23 +1,23 @@
 using System;
 using System.Drawing;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Blish_HUD.Controls;
 using Blish_HUD.Controls.Extern;
 using Blish_HUD.Controls.Intern;
 using Blish_HUD.Input;
 using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.Shared.Controls;
+using Estreya.BlishHUD.Shared.Controls.Map;
 using Estreya.BlishHUD.Shared.Extensions;
 using Gw2Sharp.Models;
-using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 
 namespace Estreya.BlishHUD.Shared.Utils
 {
-	public class MapUtil
+	public class MapUtil : IDisposable
 	{
 		public enum ChangeMapLayerDirection
 		{
@@ -44,6 +44,8 @@ namespace Estreya.BlishHUD.Shared.Utils
 
 		private readonly Gw2ApiManager _apiManager;
 
+		private FlatMap _flatMap;
+
 		public static int MouseMoveAndClickDelay { get; set; } = 50;
 
 
@@ -54,6 +56,9 @@ namespace Estreya.BlishHUD.Shared.Utils
 		{
 			_mapKeybinding = mapKeybinding;
 			_apiManager = apiManager;
+			FlatMap flatMap = new FlatMap();
+			((Control)flatMap).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			_flatMap = flatMap;
 		}
 
 		private double GetDistance(double x1, double y1, double x2, double y2)
@@ -72,6 +77,14 @@ namespace Estreya.BlishHUD.Shared.Utils
 			while (GameService.Gw2Mumble.get_Tick() - tick < ticks * 2)
 			{
 				await Task.Delay(10);
+			}
+		}
+
+		public async Task WaitForMapClose(int delay = 10)
+		{
+			while (GameService.Gw2Mumble.get_UI().get_IsMapOpen())
+			{
+				await Task.Delay(delay);
 			}
 		}
 
@@ -333,48 +346,30 @@ namespace Estreya.BlishHUD.Shared.Utils
 			}
 		}
 
-		public async Task<(double X, double Y)> MapCoordinatesToContinentCoordinates(int mapId, double[] coordinates)
+		public MapEntity AddCircle(double x, double y, double radius, Color color, float thickness = 1f)
 		{
-			Map obj = await ((IBulkExpandableClient<Map, int>)(object)_apiManager.get_Gw2ApiClient().get_V2().get_Maps()).GetAsync(mapId, default(CancellationToken));
-			Rectangle continent_rect = obj.get_ContinentRect();
-			Rectangle map_rect = obj.get_MapRect();
-			Coordinates2 val = ((Rectangle)(ref continent_rect)).get_TopLeft();
-			double x = ((Coordinates2)(ref val)).get_X();
-			double num = coordinates[0];
-			val = ((Rectangle)(ref map_rect)).get_BottomLeft();
-			double num2 = 1.0 * (num - ((Coordinates2)(ref val)).get_X());
-			val = ((Rectangle)(ref map_rect)).get_TopRight();
-			double x2 = ((Coordinates2)(ref val)).get_X();
-			val = ((Rectangle)(ref map_rect)).get_BottomLeft();
-			double num3 = num2 / (x2 - ((Coordinates2)(ref val)).get_X());
-			val = ((Rectangle)(ref continent_rect)).get_BottomRight();
-			double x3 = ((Coordinates2)(ref val)).get_X();
-			val = ((Rectangle)(ref continent_rect)).get_TopLeft();
-			double item = Math.Round(x + num3 * (x3 - ((Coordinates2)(ref val)).get_X()));
-			val = ((Rectangle)(ref continent_rect)).get_TopLeft();
-			double y2 = ((Coordinates2)(ref val)).get_Y();
-			double num4 = coordinates[1];
-			val = ((Rectangle)(ref map_rect)).get_TopRight();
-			double num5 = -1.0 * (num4 - ((Coordinates2)(ref val)).get_Y());
-			val = ((Rectangle)(ref map_rect)).get_TopRight();
-			double y3 = ((Coordinates2)(ref val)).get_Y();
-			val = ((Rectangle)(ref map_rect)).get_BottomLeft();
-			double num6 = num5 / (y3 - ((Coordinates2)(ref val)).get_Y());
-			val = ((Rectangle)(ref continent_rect)).get_BottomRight();
-			double y4 = ((Coordinates2)(ref val)).get_Y();
-			val = ((Rectangle)(ref continent_rect)).get_TopLeft();
-			double y = Math.Round(y2 + num6 * (y4 - ((Coordinates2)(ref val)).get_Y()));
-			return (item, y);
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			MapCircle circle = new MapCircle((float)x, (float)y, (float)radius, color, thickness);
+			_flatMap.AddEntity(circle);
+			return circle;
 		}
 
-		public async Task<NavigationResult> DrawCircle(double x, double y, double radius)
+		public MapEntity AddBorder(double x, double y, float[][] points, Color color, float thickness = 1f)
 		{
-			NavigationResult navResult = await NavigateToPosition(x, y);
-			if (!navResult.Success)
-			{
-				return navResult;
-			}
-			return new NavigationResult(success: true, null);
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			MapBorder border = new MapBorder((float)x, (float)y, points, color, thickness);
+			_flatMap.AddEntity(border);
+			return border;
+		}
+
+		public void ClearMapEntities()
+		{
+			_flatMap.ClearEntities();
+		}
+
+		public void RemoveEntity(MapEntity mapEntity)
+		{
+			_flatMap.RemoveEntity(mapEntity);
 		}
 
 		private async Task<NavigationResult> MoveMouse(int x, int y, bool sendToSystem = false)
@@ -383,6 +378,16 @@ namespace Estreya.BlishHUD.Shared.Utils
 			Mouse.SetPosition(x, y, sendToSystem);
 			await WaitForTick();
 			return new NavigationResult(success: true, null);
+		}
+
+		public void Dispose()
+		{
+			FlatMap flatMap = _flatMap;
+			if (flatMap != null)
+			{
+				((Control)flatMap).Dispose();
+			}
+			_flatMap = null;
 		}
 	}
 }

@@ -23,7 +23,7 @@ namespace Estreya.BlishHUD.LiveMap.Models.Player
 				PlayerMap playerMap = obj as PlayerMap;
 				if (playerMap != null)
 				{
-					return true & Continent.Equals(playerMap.Continent) & ID.Equals(playerMap.ID) & Name.Equals(playerMap.Name) & Position.Equals(playerMap.Position);
+					return true & Continent.Equals(playerMap.Continent) & ID.Equals(playerMap.ID) & (Name?.Equals(playerMap.Name) ?? (Name == null && playerMap.Name == null)) & (Position?.Equals(playerMap.Position) ?? (Position == null && playerMap.Position == null));
 				}
 			}
 			return false;

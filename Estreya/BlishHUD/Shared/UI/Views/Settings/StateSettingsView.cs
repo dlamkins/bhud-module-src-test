@@ -15,14 +15,14 @@ namespace Estreya.BlishHUD.Shared.UI.Views.Settings
 
 		private readonly Func<Task> _reloadCalledAction;
 
-		public StateSettingsView(Collection<ManagedState> stateList, Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, BitmapFont font = null, Func<Task> reloadCalledAction = null)
-			: base(apiManager, iconState, translationState, font)
+		public StateSettingsView(Collection<ManagedState> stateList, Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, SettingEventState settingEventState, BitmapFont font = null, Func<Task> reloadCalledAction = null)
+			: base(apiManager, iconState, translationState, settingEventState, font)
 		{
 			_stateList = stateList;
 			_reloadCalledAction = reloadCalledAction;
 		}
 
-		protected override void BuildView(Panel parent)
+		protected override void BuildView(FlowPanel parent)
 		{
 			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
@@ -37,21 +37,21 @@ namespace Estreya.BlishHUD.Shared.UI.Views.Settings
 					string title = state.GetType().Name + " running & loaded:";
 					string value = finished.ToString();
 					Color? textColorValue = (finished ? Color.get_Green() : Color.get_Red());
-					RenderLabel(parent, title, value, null, textColorValue);
+					RenderLabel((Panel)(object)parent, title, value, null, textColorValue);
 				}
 				else
 				{
 					string title2 = state.GetType().Name + " running:";
 					string value2 = state.Running.ToString();
 					Color? textColorValue = (state.Running ? Color.get_Green() : Color.get_Red());
-					RenderLabel(parent, title2, value2, null, textColorValue);
+					RenderLabel((Panel)(object)parent, title2, value2, null, textColorValue);
 				}
 			}
 			if (_reloadCalledAction != null)
 			{
-				RenderEmptyLine(parent);
-				RenderEmptyLine(parent);
-				RenderButtonAsync(parent, "Reload", _reloadCalledAction);
+				RenderEmptyLine((Panel)(object)parent);
+				RenderEmptyLine((Panel)(object)parent);
+				RenderButtonAsync((Panel)(object)parent, "Reload", _reloadCalledAction);
 			}
 		}
 

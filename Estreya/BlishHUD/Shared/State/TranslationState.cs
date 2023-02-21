@@ -68,7 +68,7 @@ namespace Estreya.BlishHUD.Shared.State
 				string[] array = obj.Split(new char[1] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
 				for (int i = 0; i < array.Length; i++)
 				{
-					string[] lineParts = array[i].Split('=');
+					string[] lineParts = array[i].Trim('\n', '\r').Split('=');
 					if (lineParts.Length >= 2)
 					{
 						string key = lineParts[0];
@@ -83,7 +83,7 @@ namespace Estreya.BlishHUD.Shared.State
 			}
 			catch (Exception ex)
 			{
-				Logger.Warn(ex, "Failed to load translations for locale " + locale + ":");
+				Logger.Debug(ex, "Failed to load translations for locale " + locale + ":");
 			}
 		}
 

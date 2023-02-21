@@ -55,6 +55,10 @@ namespace Estreya.BlishHUD.Shared.Settings
 
 		public SettingEntry<bool> RegisterCornerIcon { get; private set; }
 
+		public SettingEntry<CornerIconLeftClickAction> CornerIconLeftClickAction { get; private set; }
+
+		public SettingEntry<CornerIconRightClickAction> CornerIconRightClickAction { get; private set; }
+
 		public SettingEntry<bool> HideOnMissingMumbleTicks { get; private set; }
 
 		public SettingEntry<bool> HideInCombat { get; private set; }
@@ -198,6 +202,11 @@ namespace Estreya.BlishHUD.Shared.Settings
 			GlobalDrawerVisibleHotkey.get_Value().set_BlockSequenceFromGw2(globalHotkeyEnabled);
 			RegisterCornerIcon = GlobalSettings.DefineSetting<bool>("RegisterCornerIcon", true, (Func<string>)(() => "Register Corner Icon"), (Func<string>)(() => "Whether the module should register a corner icon."));
 			RegisterCornerIcon.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+			RegisterCornerIcon.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)RegisterCornerIcon_SettingChanged);
+			CornerIconLeftClickAction = GlobalSettings.DefineSetting<CornerIconLeftClickAction>("CornerIconLeftClickAction", Estreya.BlishHUD.Shared.Models.CornerIconLeftClickAction.Settings, (Func<string>)(() => "Corner Icon Left Click Action"), (Func<string>)(() => "Defines the action of the corner icon when left clicked."));
+			CornerIconLeftClickAction.add_SettingChanged((EventHandler<ValueChangedEventArgs<CornerIconLeftClickAction>>)SettingChanged<CornerIconLeftClickAction>);
+			CornerIconRightClickAction = GlobalSettings.DefineSetting<CornerIconRightClickAction>("CornerIconRightClickAction", Estreya.BlishHUD.Shared.Models.CornerIconRightClickAction.None, (Func<string>)(() => "Corner Icon Right Click Action"), (Func<string>)(() => "Defines the action of the corner icon when right clicked."));
+			CornerIconRightClickAction.add_SettingChanged((EventHandler<ValueChangedEventArgs<CornerIconRightClickAction>>)SettingChanged<CornerIconRightClickAction>);
 			HideOnOpenMap = GlobalSettings.DefineSetting<bool>("HideOnOpenMap", true, (Func<string>)(() => "Hide on open Map"), (Func<string>)(() => "Whether the modules drawers should hide when the map is open."));
 			HideOnOpenMap.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
 			HideOnMissingMumbleTicks = GlobalSettings.DefineSetting<bool>("HideOnMissingMumbleTicks", true, (Func<string>)(() => "Hide on Cutscenes"), (Func<string>)(() => "Whether the modules drawers should hide when cutscenes are played."));
@@ -214,12 +223,24 @@ namespace Estreya.BlishHUD.Shared.Settings
 			HideInPvP.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
 			DebugEnabled = GlobalSettings.DefineSetting<bool>("DebugEnabled", false, (Func<string>)(() => "Debug Enabled"), (Func<string>)(() => "Whether the module runs in debug mode."));
 			DebugEnabled.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+			HandleEnabledStates();
 			DoInitializeGlobalSettings(GlobalSettings);
+		}
+
+		private void RegisterCornerIcon_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
+		{
+			HandleEnabledStates();
 		}
 
 		private void GlobalEnabledHotkey_Activated(object sender, EventArgs e)
 		{
 			GlobalDrawerVisible.set_Value(!GlobalDrawerVisible.get_Value());
+		}
+
+		private void HandleEnabledStates()
+		{
+			SettingComplianceExtensions.SetDisabled((SettingEntry)(object)CornerIconLeftClickAction, !RegisterCornerIcon.get_Value());
+			SettingComplianceExtensions.SetDisabled((SettingEntry)(object)CornerIconRightClickAction, !RegisterCornerIcon.get_Value());
 		}
 
 		protected virtual void DoInitializeGlobalSettings(SettingCollection globalSettingCollection)
@@ -366,8 +387,8 @@ namespace Estreya.BlishHUD.Shared.Settings
 			((SettingEntry)drawerConfiguration.Enabled).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEnabled-description", enabledDescriptionDefault)));
 			string enabledKeybindingDisplayNameDefault = ((SettingEntry)drawerConfiguration.EnabledKeybinding).get_DisplayName();
 			string enabledKeybindingDescriptionDefault = ((SettingEntry)drawerConfiguration.EnabledKeybinding).get_Description();
-			((SettingEntry)drawerConfiguration.Enabled).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEnabledKeybinding-name", enabledKeybindingDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.Enabled).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEnabledKeybinding-description", enabledKeybindingDescriptionDefault)));
+			((SettingEntry)drawerConfiguration.EnabledKeybinding).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEnabledKeybinding-name", enabledKeybindingDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.EnabledKeybinding).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEnabledKeybinding-description", enabledKeybindingDescriptionDefault)));
 			string locationXDisplayNameDefault = ((SettingEntry)drawerConfiguration.Location.X).get_DisplayName();
 			string locationXDescriptionDefault = ((SettingEntry)drawerConfiguration.Location.X).get_Description();
 			((SettingEntry)drawerConfiguration.Location.X).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerLocationX-name", locationXDisplayNameDefault)));
@@ -413,6 +434,7 @@ namespace Estreya.BlishHUD.Shared.Settings
 			GlobalDrawerVisibleHotkey.get_Value().set_Enabled(false);
 			GlobalDrawerVisibleHotkey.get_Value().remove_Activated((EventHandler<EventArgs>)GlobalEnabledHotkey_Activated);
 			RegisterCornerIcon.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+			RegisterCornerIcon.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)RegisterCornerIcon_SettingChanged);
 			HideOnOpenMap.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
 			HideOnMissingMumbleTicks.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
 			HideInPvE_OpenWorld.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
@@ -420,10 +442,6 @@ namespace Estreya.BlishHUD.Shared.Settings
 			HideInCombat.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
 			HideInPvP.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
 			DebugEnabled.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			for (int i = GlobalSettings.get_Entries().Count - 1; i >= 0; i--)
-			{
-				GlobalSettings.UndefineSetting(GlobalSettings.get_Entries()[i].get_EntryKey());
-			}
 		}
 
 		protected void SettingChanged<T>(object sender, ValueChangedEventArgs<T> e)

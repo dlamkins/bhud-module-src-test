@@ -358,11 +358,11 @@ namespace Estreya.BlishHUD.Shared.State
 
 		protected override async Task Load()
 		{
-			_ = 12;
+			_ = 9;
 			try
 			{
 				await LoadMissingSkills();
-				await UnknownSkill.LoadTexture(_iconState, _cancellationTokenSource.Token);
+				UnknownSkill.LoadTexture(_iconState);
 				if (!(await ShouldLoadFiles()))
 				{
 					await base.Load();
@@ -370,7 +370,7 @@ namespace Estreya.BlishHUD.Shared.State
 					await AddMissingSkills(base.APIObjectList);
 					await RemapSkillIds(base.APIObjectList);
 					Logger.Debug("Loading skill icons..");
-					await LoadSkillIcons(base.APIObjectList);
+					LoadSkillIcons(base.APIObjectList);
 					Logger.Debug("Loaded skill icons..");
 				}
 				else
@@ -381,7 +381,7 @@ namespace Estreya.BlishHUD.Shared.State
 						List<Skill> skills = JsonConvert.DeserializeObject<List<Skill>>(await FileUtil.ReadStringAsync(Path.Combine(DirectoryPath, "skills.json")));
 						await AddMissingSkills(skills);
 						await RemapSkillIds(skills);
-						await LoadSkillIcons(skills);
+						LoadSkillIcons(skills);
 						using (await _apiObjectListLock.LockAsync())
 						{
 							base.APIObjectList.AddRange(skills);
@@ -489,9 +489,12 @@ namespace Estreya.BlishHUD.Shared.State
 			}
 		}
 
-		private async Task LoadSkillIcons(List<Skill> skills)
+		private void LoadSkillIcons(List<Skill> skills)
 		{
-			await Task.WhenAll(skills.Select((Skill skill) => skill.LoadTexture(_iconState, _cancellationTokenSource.Token)));
+			skills.ForEach(delegate(Skill skill)
+			{
+				skill.LoadTexture(_iconState);
+			});
 		}
 
 		protected override async Task Save()
