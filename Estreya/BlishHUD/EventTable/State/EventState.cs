@@ -9,6 +9,7 @@ using Estreya.BlishHUD.Shared.State;
 using Estreya.BlishHUD.Shared.Utils;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Estreya.BlishHUD.EventTable.State
 {
@@ -26,6 +27,7 @@ namespace Estreya.BlishHUD.EventTable.State
 
 			public string EventKey;
 
+			[JsonConverter(typeof(StringEnumConverter))]
 			public EventStates State;
 
 			public DateTime Until;

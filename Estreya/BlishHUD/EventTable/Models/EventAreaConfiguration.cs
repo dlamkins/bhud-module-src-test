@@ -40,5 +40,11 @@ namespace Estreya.BlishHUD.EventTable.Models
 		public SettingEntry<bool> DrawShadows { get; set; }
 
 		public SettingEntry<Color> ShadowColor { get; set; }
+
+		public SettingEntry<DrawInterval> DrawInterval { get; set; }
+
+		public SettingEntry<bool> LimitToCurrentMap { get; set; }
+
+		public SettingEntry<bool> AllowUnspecifiedMap { get; set; }
 	}
 }

@@ -163,6 +163,9 @@ namespace Estreya.BlishHUD.EventTable
 			SettingEntry<Color> shadowColor = base.DrawerSettings.DefineSetting<Color>(name + "-shadowColor", base.DefaultGW2Color, (Func<string>)(() => "Shadow Color"), (Func<string>)(() => "Defines the color of the shadows"));
 			SettingEntry<bool> drawShadowsForFiller = base.DrawerSettings.DefineSetting<bool>(name + "-drawShadowsForFiller", false, (Func<string>)(() => "Draw Shadows for Filler"), (Func<string>)(() => "Whether the filler text should have shadows"));
 			SettingEntry<Color> fillerShadowColor = base.DrawerSettings.DefineSetting<Color>(name + "-fillerShadowColor", base.DefaultGW2Color, (Func<string>)(() => "Filler Shadow Color"), (Func<string>)(() => "Defines the color of the shadows for fillers"));
+			SettingEntry<DrawInterval> drawInterval = base.DrawerSettings.DefineSetting<DrawInterval>(name + "-drawInterval", DrawInterval.FAST, (Func<string>)(() => "Draw Interval"), (Func<string>)(() => "Defines the refresh rate of the drawer."));
+			SettingEntry<bool> limitToCurrentMap = base.DrawerSettings.DefineSetting<bool>(name + "-limitToCurrentMap", false, (Func<string>)(() => "Limit to current Map"), (Func<string>)(() => "Whether the drawer should only show events from the current map."));
+			SettingEntry<bool> allowUnspecifiedMap = base.DrawerSettings.DefineSetting<bool>(name + "-allowUnspecifiedMap", true, (Func<string>)(() => "Allow from unspecified Maps"), (Func<string>)(() => "Whether the table should show events which do not have a map id specified."));
 			return new EventAreaConfiguration
 			{
 				Name = drawer.Name,
@@ -191,7 +194,10 @@ namespace Estreya.BlishHUD.EventTable
 				DrawShadows = drawShadows,
 				ShadowColor = shadowColor,
 				DrawShadowsForFiller = drawShadowsForFiller,
-				FillerShadowColor = fillerShadowColor
+				FillerShadowColor = fillerShadowColor,
+				DrawInterval = drawInterval,
+				LimitToCurrentMap = limitToCurrentMap,
+				AllowUnspecifiedMap = allowUnspecifiedMap
 			};
 		}
 
@@ -215,6 +221,9 @@ namespace Estreya.BlishHUD.EventTable
 			base.DrawerSettings.UndefineSetting(name + "-shadowColor");
 			base.DrawerSettings.UndefineSetting(name + "-drawShadowsForFiller");
 			base.DrawerSettings.UndefineSetting(name + "-fillerShadowColor");
+			base.DrawerSettings.UndefineSetting(name + "-drawInterval");
+			base.DrawerSettings.UndefineSetting(name + "-limitToCurrentMap");
+			base.DrawerSettings.UndefineSetting(name + "-allowUnspecifiedMap");
 		}
 
 		public override void UpdateLocalization(TranslationState translationState)

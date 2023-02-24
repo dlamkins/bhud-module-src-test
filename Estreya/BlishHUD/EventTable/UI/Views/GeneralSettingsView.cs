@@ -24,8 +24,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.GlobalDrawerVisible);
 			RenderKeybindingSetting((Panel)(object)parent, _moduleSettings.GlobalDrawerVisibleHotkey);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.RegisterCornerIcon);
-			RenderEnumSetting<CornerIconLeftClickAction>((Panel)(object)parent, _moduleSettings.CornerIconLeftClickAction);
-			RenderEnumSetting<CornerIconRightClickAction>((Panel)(object)parent, _moduleSettings.CornerIconRightClickAction);
+			RenderEnumSetting<CornerIconClickAction>((Panel)(object)parent, _moduleSettings.CornerIconLeftClickAction);
+			RenderEnumSetting<CornerIconClickAction>((Panel)(object)parent, _moduleSettings.CornerIconRightClickAction);
 			RenderEmptyLine((Panel)(object)parent);
 			RenderKeybindingSetting((Panel)(object)parent, _moduleSettings.MapKeybinding);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideOnMissingMumbleTicks);

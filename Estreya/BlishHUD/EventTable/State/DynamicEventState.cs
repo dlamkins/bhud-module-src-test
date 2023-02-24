@@ -129,7 +129,9 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		protected override async Task FetchFromAPI(Gw2ApiManager apiManager, IProgress<string> progress)
 		{
+			progress.Report("Loading maps..");
 			Maps = await GetMaps();
+			progress.Report("Loading events..");
 			Events = await GetEvents();
 		}
 	}

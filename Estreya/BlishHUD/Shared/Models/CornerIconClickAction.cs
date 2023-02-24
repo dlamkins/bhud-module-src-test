@@ -2,7 +2,7 @@ using System.ComponentModel;
 
 namespace Estreya.BlishHUD.Shared.Models
 {
-	public enum CornerIconRightClickAction
+	public enum CornerIconClickAction
 	{
 		None,
 		[Description("Toggle Settingswindow")]

@@ -310,6 +310,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			FlowPanel settingsPanel = val2;
 			RenderBoolSetting((Panel)(object)settingsPanel, areaConfiguration.Enabled);
 			RenderKeybindingSetting((Panel)(object)settingsPanel, areaConfiguration.EnabledKeybinding);
+			RenderEnumSetting<DrawInterval>((Panel)(object)settingsPanel, areaConfiguration.DrawInterval);
 			RenderEmptyLine((Panel)(object)settingsPanel);
 			RenderIntSetting((Panel)(object)settingsPanel, areaConfiguration.Location.X);
 			RenderIntSetting((Panel)(object)settingsPanel, areaConfiguration.Location.Y);
@@ -333,6 +334,9 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderBoolSetting((Panel)(object)settingsPanel, areaConfiguration.ShowTooltips);
 			RenderEmptyLine((Panel)(object)settingsPanel);
 			RenderEnumSetting<EventCompletedAction>((Panel)(object)settingsPanel, areaConfiguration.CompletionAcion);
+			RenderEmptyLine((Panel)(object)settingsPanel);
+			RenderBoolSetting((Panel)(object)settingsPanel, areaConfiguration.LimitToCurrentMap);
+			RenderBoolSetting((Panel)(object)settingsPanel, areaConfiguration.AllowUnspecifiedMap);
 			RenderEmptyLine((Panel)(object)settingsPanel);
 			RenderBoolSetting((Panel)(object)settingsPanel, areaConfiguration.UseFiller);
 			RenderColorSetting((Panel)(object)settingsPanel, areaConfiguration.FillerTextColor);

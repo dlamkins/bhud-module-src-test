@@ -320,7 +320,7 @@ namespace Estreya.BlishHUD.Shared.State
 			}
 		};
 
-		private ConcurrentDictionary<int, string> _missingSkillsFromAPIReportedByArcDPS;
+		private ConcurrentDictionary<int, (string Name, int HintId)> _missingSkillsFromAPIReportedByArcDPS;
 
 		private string DirectoryPath => Path.Combine(_baseFolderPath, "skills");
 
@@ -344,7 +344,7 @@ namespace Estreya.BlishHUD.Shared.State
 
 		protected override Task DoInitialize()
 		{
-			_missingSkillsFromAPIReportedByArcDPS = new ConcurrentDictionary<int, string>();
+			_missingSkillsFromAPIReportedByArcDPS = new ConcurrentDictionary<int, (string, int)>();
 			return Task.CompletedTask;
 		}
 
@@ -458,7 +458,7 @@ namespace Estreya.BlishHUD.Shared.State
 						skills.Remove(skillToRemap);
 					});
 					skills.Add(skillToInsert);
-					Logger.Debug($"Remapped skill from {remappedSkill.OriginalID} to {remappedSkill.DestinationID}");
+					Logger.Debug($"Remapped skill from {remappedSkill.OriginalID} to {remappedSkill.DestinationID} ({remappedSkill.Comment})");
 				}
 			}
 		}
@@ -473,6 +473,7 @@ namespace Estreya.BlishHUD.Shared.State
 					Name = missingSkill.Name,
 					Icon = missingSkill.Icon
 				});
+				Logger.Debug($"Added missing skill {missingSkill.ID} ({missingSkill.Name})");
 				if (missingSkill.NameAliases != null)
 				{
 					string[] nameAliases = missingSkill.NameAliases;
@@ -484,6 +485,7 @@ namespace Estreya.BlishHUD.Shared.State
 							Name = alias,
 							Icon = missingSkill.Icon
 						});
+						Logger.Debug($"Added missing skill alias {missingSkill.ID} ({alias})");
 					}
 				}
 			}
@@ -518,7 +520,7 @@ namespace Estreya.BlishHUD.Shared.State
 
 		private async Task SaveMissingSkills()
 		{
-			await FileUtil.WriteStringAsync(Path.Combine(DirectoryPath, "missingSkills.json"), JsonConvert.SerializeObject(_missingSkillsFromAPIReportedByArcDPS.OrderBy((KeyValuePair<int, string> skill) => skill.Value).ToDictionary((KeyValuePair<int, string> skill) => skill.Key, (KeyValuePair<int, string> skill) => skill.Value), Formatting.Indented));
+			await FileUtil.WriteStringAsync(Path.Combine(DirectoryPath, "missingSkills.json"), JsonConvert.SerializeObject(_missingSkillsFromAPIReportedByArcDPS.OrderBy((KeyValuePair<int, (string Name, int HintId)> skill) => skill.Value).ToDictionary((KeyValuePair<int, (string Name, int HintId)> skill) => skill.Key, (KeyValuePair<int, (string Name, int HintId)> skill) => skill.Value), Formatting.Indented));
 		}
 
 		private async Task LoadMissingSkills()
@@ -526,11 +528,17 @@ namespace Estreya.BlishHUD.Shared.State
 			string missingSkillPath = Path.Combine(DirectoryPath, "missingSkills.json");
 			if (File.Exists(missingSkillPath))
 			{
-				_missingSkillsFromAPIReportedByArcDPS = JsonConvert.DeserializeObject<ConcurrentDictionary<int, string>>(await FileUtil.ReadStringAsync(missingSkillPath));
+				try
+				{
+					_missingSkillsFromAPIReportedByArcDPS = JsonConvert.DeserializeObject<ConcurrentDictionary<int, (string, int)>>(await FileUtil.ReadStringAsync(missingSkillPath));
+				}
+				catch (Exception)
+				{
+				}
 			}
 			else
 			{
-				_missingSkillsFromAPIReportedByArcDPS = new ConcurrentDictionary<int, string>();
+				_missingSkillsFromAPIReportedByArcDPS = new ConcurrentDictionary<int, (string, int)>();
 			}
 		}
 
@@ -591,7 +599,19 @@ namespace Estreya.BlishHUD.Shared.State
 
 		public bool AddMissingSkill(int id, string name)
 		{
-			return _missingSkillsFromAPIReportedByArcDPS?.TryAdd(id, name) ?? false;
+			int hintId = -1;
+			using (_apiObjectListLock.Lock())
+			{
+				foreach (Skill skill in base.APIObjectList)
+				{
+					if (skill.Name == name)
+					{
+						hintId = skill.Id;
+						break;
+					}
+				}
+			}
+			return _missingSkillsFromAPIReportedByArcDPS?.TryAdd(id, (name, hintId)) ?? false;
 		}
 
 		public void RemoveMissingSkill(int id)

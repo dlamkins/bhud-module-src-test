@@ -53,6 +53,9 @@ namespace Estreya.BlishHUD.EventTable.Models
 		[JsonProperty("location")]
 		public string Location { get; set; }
 
+		[JsonProperty("mapIds")]
+		public int[] MapIds { get; set; }
+
 		[JsonProperty("waypoint")]
 		public string Waypoint { get; set; }
 

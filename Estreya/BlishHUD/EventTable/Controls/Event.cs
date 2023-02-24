@@ -4,7 +4,6 @@ using Blish_HUD.Common.UI.Views;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Estreya.BlishHUD.EventTable.Models;
-using Estreya.BlishHUD.Shared.Controls;
 using Estreya.BlishHUD.Shared.State;
 using Estreya.BlishHUD.Shared.UI.Views;
 using Estreya.BlishHUD.Shared.Utils;
@@ -15,11 +14,11 @@ using MonoGame.Extended.BitmapFonts;
 
 namespace Estreya.BlishHUD.EventTable.Controls
 {
-	public class Event : RenderTargetControl
+	public class Event : IDisposable
 	{
-		private readonly IconState _iconState;
+		private IconState _iconState;
 
-		private readonly TranslationState _translationState;
+		private TranslationState _translationState;
 
 		private readonly Func<DateTime> _getNowAction;
 
@@ -69,67 +68,50 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			_getDrawShadowAction = getDrawShadowAction;
 			_getShadowColor = getShadowColor;
 			_getShowTooltips = getShowTooltips;
-			BuildContextMenu();
 		}
 
-		private void BuildContextMenu()
+		public ContextMenuStrip BuildContextMenu()
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000b: Expected O, but got Unknown
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Expected O, but got Unknown
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).set_Menu(new ContextMenuStrip());
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			ContextMenuStrip menu = new ContextMenuStrip();
 			ContextMenuStripItem val = new ContextMenuStripItem("Disable");
-			((Control)val).set_Parent((Container)(object)((Control)this).get_Menu());
+			((Control)val).set_Parent((Container)(object)menu);
 			((Control)val).set_BasicTooltipText("Disables the event entirely.");
 			((Control)val).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				this.DisableRequested?.Invoke(this, EventArgs.Empty);
 			});
 			ContextMenuStripItem val2 = new ContextMenuStripItem("Hide");
-			((Control)val2).set_Parent((Container)(object)((Control)this).get_Menu());
+			((Control)val2).set_Parent((Container)(object)menu);
 			((Control)val2).set_BasicTooltipText("Hides the event until the next reset.");
 			((Control)val2).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				this.HideRequested?.Invoke(this, EventArgs.Empty);
 			});
 			ContextMenuStripItem val3 = new ContextMenuStripItem("Finish");
-			((Control)val3).set_Parent((Container)(object)((Control)this).get_Menu());
+			((Control)val3).set_Parent((Container)(object)menu);
 			((Control)val3).set_BasicTooltipText("Completes the event until the next reset.");
 			((Control)val3).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				this.FinishRequested?.Invoke(this, EventArgs.Empty);
 			});
+			return menu;
 		}
 
-		protected override void OnMouseEntered(MouseEventArgs e)
+		public Tooltip BuildTooltip()
 		{
-			((Control)this).OnMouseEntered(e);
-			if (!Ev.Filler)
-			{
-				if (_getShowTooltips())
-				{
-					BuildOrUpdateTooltip();
-					((Control)this).set_Tooltip(_tooltip);
-				}
-				else
-				{
-					((Control)this).set_Tooltip((Tooltip)null);
-				}
-			}
-		}
-
-		private void BuildOrUpdateTooltip()
-		{
-			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d2: Expected O, but got Unknown
+			//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cd: Expected O, but got Unknown
 			DateTime now = _getNowAction();
 			bool num = _startTime.AddMinutes(Ev.Duration) < now;
 			bool isNext = !num && _startTime > now;
@@ -151,54 +133,79 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				description = description + _translationState.GetTranslation("event-tooltip-remaining", "Remaining") + ": " + FormatTime(remaining);
 			}
 			description = description + " (" + _translationState.GetTranslation("event-tooltip-startsAt", "Starts at") + ": " + FormatTime(_startTime.ToLocalTime()) + ")";
-			_tooltip = new Tooltip((ITooltipView)(object)new TooltipView(Ev.Name, description, _iconState.GetIcon(Ev.Icon), _translationState));
+			return new Tooltip((ITooltipView)(object)new TooltipView(Ev.Name, description, _iconState.GetIcon(Ev.Icon), _translationState));
 		}
 
-		protected override void DoPaint(SpriteBatch spriteBatch, Rectangle bounds)
+		public void Render(SpriteBatch spriteBatch, RectangleF bounds)
 		{
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
 			BitmapFont font = _getFontAction();
-			DrawBackground(spriteBatch);
-			int nameWidth = ((!Ev.Filler) ? DrawName(spriteBatch, font) : 0);
-			DrawRemainingTime(spriteBatch, font, nameWidth);
-			DrawCrossout(spriteBatch);
+			DrawBackground(spriteBatch, bounds);
+			float nameWidth = (Ev.Filler ? 0f : DrawName(spriteBatch, bounds, font));
+			DrawRemainingTime(spriteBatch, bounds, font, nameWidth);
+			DrawCrossout(spriteBatch, bounds);
 		}
 
-		private void DrawBackground(SpriteBatch spriteBatch)
+		private void DrawBackground(SpriteBatch spriteBatch, RectangleF bounds)
 		{
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			Rectangle backgroundRect = default(Rectangle);
-			((Rectangle)(ref backgroundRect))._002Ector(0, 0, base.Width, base.Height);
-			spriteBatch.DrawRectangle(Textures.get_Pixel(), RectangleF.op_Implicit(backgroundRect), _getColorAction(), _getDrawBorders() ? 1 : 0, Color.get_Black());
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			spriteBatch.DrawRectangle(Textures.get_Pixel(), bounds, _getColorAction(), _getDrawBorders() ? 1 : 0, Color.get_Black());
 		}
 
-		private int DrawName(SpriteBatch spriteBatch, BitmapFont font)
+		private float DrawName(SpriteBatch spriteBatch, RectangleF bounds, BitmapFont font)
 		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-			int nameWidth = MathHelper.Clamp((int)Math.Ceiling(font.MeasureString(Ev.Name).Width) + 10, 0, base.Width - 10);
-			Rectangle nameRect = default(Rectangle);
-			((Rectangle)(ref nameRect))._002Ector(5, 0, nameWidth, base.Height);
-			spriteBatch.DrawString(Ev.Name, font, RectangleF.op_Implicit(nameRect), _getTextColor(), wrap: false, _getDrawShadowAction(), 1, _getShadowColor(), (HorizontalAlignment)0, (VerticalAlignment)1);
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			float xOffset = 5f;
+			float maxWidth = bounds.Width - xOffset * 2f;
+			float nameWidth = 0f;
+			string text = Ev.Name;
+			do
+			{
+				nameWidth = (float)Math.Ceiling(font.MeasureString(text).Width);
+				if (string.IsNullOrWhiteSpace(text))
+				{
+					return 0f;
+				}
+				if (nameWidth > maxWidth)
+				{
+					text = text.Substring(0, text.Length - 1);
+				}
+			}
+			while (nameWidth > maxWidth);
+			RectangleF nameRect = default(RectangleF);
+			((RectangleF)(ref nameRect))._002Ector(bounds.X + xOffset, bounds.Y, nameWidth, bounds.Height);
+			spriteBatch.DrawString(text, font, nameRect, _getTextColor(), wrap: false, _getDrawShadowAction(), 1, _getShadowColor(), (HorizontalAlignment)0, (VerticalAlignment)1);
 			return nameRect.Width;
 		}
 
-		private void DrawRemainingTime(SpriteBatch spriteBatch, BitmapFont font, int x)
+		private void DrawRemainingTime(SpriteBatch spriteBatch, RectangleF bounds, BitmapFont font, float nameWidth)
 		{
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
 			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-			if (x > base.Width)
+			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+			if (nameWidth > bounds.Width)
 			{
 				return;
 			}
@@ -206,19 +213,19 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			if (!(remainingTime == TimeSpan.Zero))
 			{
 				string remainingTimeString = FormatTimeRemaining(remainingTime);
-				int timeWidth = (int)Math.Ceiling(font.MeasureString(remainingTimeString).Width) + 10;
-				int maxWidth = base.Width - x;
-				int centerX = maxWidth / 2 - timeWidth / 2;
-				if (centerX < x)
+				float timeWidth = (float)Math.Ceiling(font.MeasureString(remainingTimeString).Width);
+				float maxWidth = bounds.Width - nameWidth;
+				float centerX = maxWidth / 2f - timeWidth / 2f;
+				if (centerX < nameWidth)
 				{
-					centerX = x + 10;
+					centerX = nameWidth + 10f;
 				}
-				if (centerX + timeWidth <= base.Width)
+				if (!(centerX + timeWidth > bounds.Width))
 				{
-					Rectangle timeRect = default(Rectangle);
-					((Rectangle)(ref timeRect))._002Ector(centerX, 0, maxWidth, base.Height);
+					RectangleF timeRect = default(RectangleF);
+					((RectangleF)(ref timeRect))._002Ector(centerX + bounds.X, bounds.Y, maxWidth, bounds.Height);
 					Color textColor = _getTextColor();
-					spriteBatch.DrawString(remainingTimeString, font, RectangleF.op_Implicit(timeRect), textColor, wrap: false, _getDrawShadowAction(), 1, _getShadowColor(), (HorizontalAlignment)0, (VerticalAlignment)1);
+					spriteBatch.DrawString(remainingTimeString, font, timeRect, textColor, wrap: false, _getDrawShadowAction(), 1, _getShadowColor(), (HorizontalAlignment)0, (VerticalAlignment)1);
 				}
 			}
 		}
@@ -232,16 +239,13 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			return TimeSpan.Zero;
 		}
 
-		private void DrawCrossout(SpriteBatch spriteBatch)
+		private void DrawCrossout(SpriteBatch spriteBatch, RectangleF bounds)
 		{
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 			if (_getDrawCrossout())
 			{
-				Rectangle fullRect = default(Rectangle);
-				((Rectangle)(ref fullRect))._002Ector(0, 0, base.Width, base.Height);
-				spriteBatch.DrawCrossOut(Textures.get_Pixel(), RectangleF.op_Implicit(fullRect), Color.get_Red());
+				spriteBatch.DrawCrossOut(Textures.get_Pixel(), bounds, Color.get_Red());
 			}
 		}
 
@@ -270,6 +274,13 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				return ts.ToString("dd\\.hh\\:mm\\:ss");
 			}
 			return ts.ToString("hh\\:mm\\:ss");
+		}
+
+		public void Dispose()
+		{
+			_iconState = null;
+			_translationState = null;
+			Ev = null;
 		}
 	}
 }
