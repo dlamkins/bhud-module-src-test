@@ -20,13 +20,13 @@ namespace Denrage.AchievementTrackerModule.Services
 {
 	public class AchievementService : IAchievementService, IDisposable
 	{
-		private const string DataVersionUrl = "https://raw.githubusercontent.com/Denrage/AchievementTrackerModule/main/data/version.txt";
+		private const string DataVersionUrl = "https://bhm.blishhud.com/Denrage.AchievementTrackerModule/data/version.txt";
 
-		private const string AchievementDataUrl = "https://raw.githubusercontent.com/Denrage/AchievementTrackerModule/main/data/achievement_data.json";
+		private const string AchievementDataUrl = "https://bhm.blishhud.com/Denrage.AchievementTrackerModule/data/achievement_data.json";
 
-		private const string AchievementTablesUrl = "https://raw.githubusercontent.com/Denrage/AchievementTrackerModule/main/data/achievement_tables.json";
+		private const string AchievementTablesUrl = "https://bhm.blishhud.com/Denrage.AchievementTrackerModule/data/achievement_tables.json";
 
-		private const string SubPagesUrl = "https://raw.githubusercontent.com/Denrage/AchievementTrackerModule/main/data/subPages.json";
+		private const string SubPagesUrl = "https://bhm.blishhud.com/Denrage.AchievementTrackerModule/data/subPages.json";
 
 		private const string VersionFileName = "version.txt";
 
@@ -255,7 +255,7 @@ namespace Denrage.AchievementTrackerModule.Services
 				}
 				else
 				{
-					int githubVersion = int.Parse(await "https://raw.githubusercontent.com/Denrage/AchievementTrackerModule/main/data/version.txt".GetStringAsync(cancellationToken, (HttpCompletionOption)0));
+					int githubVersion = int.Parse(await "https://bhm.blishhud.com/Denrage.AchievementTrackerModule/data/version.txt".GetStringAsync(cancellationToken, (HttpCompletionOption)0));
 					if (int.Parse(File.ReadAllText(Path.Combine(dataFolder, "version.txt"))) != githubVersion)
 					{
 						downloadData = true;
@@ -264,10 +264,10 @@ namespace Denrage.AchievementTrackerModule.Services
 				if (downloadData)
 				{
 					logger.Info("Downloading AchievementData");
-					await "https://raw.githubusercontent.com/Denrage/AchievementTrackerModule/main/data/version.txt".DownloadFileAsync(dataFolder, "version.txt");
-					await "https://raw.githubusercontent.com/Denrage/AchievementTrackerModule/main/data/achievement_data.json".DownloadFileAsync(dataFolder, "achievement_data.json");
-					await "https://raw.githubusercontent.com/Denrage/AchievementTrackerModule/main/data/achievement_tables.json".DownloadFileAsync(dataFolder, "achievement_tables.json");
-					await "https://raw.githubusercontent.com/Denrage/AchievementTrackerModule/main/data/subPages.json".DownloadFileAsync(dataFolder, "subPages.json");
+					await "https://bhm.blishhud.com/Denrage.AchievementTrackerModule/data/version.txt".DownloadFileAsync(dataFolder, "version.txt");
+					await "https://bhm.blishhud.com/Denrage.AchievementTrackerModule/data/achievement_data.json".DownloadFileAsync(dataFolder, "achievement_data.json");
+					await "https://bhm.blishhud.com/Denrage.AchievementTrackerModule/data/achievement_tables.json".DownloadFileAsync(dataFolder, "achievement_tables.json");
+					await "https://bhm.blishhud.com/Denrage.AchievementTrackerModule/data/subPages.json".DownloadFileAsync(dataFolder, "subPages.json");
 				}
 				using (FileStream utf8Json = File.Open(Path.Combine(dataFolder, "achievement_data.json"), FileMode.Open))
 				{
