@@ -23,7 +23,19 @@ namespace Tortle.PlayerMarker.Entity
 
 		public float VerticalOffset { get; set; }
 
-		public float DrawOrder => 0f;
+		public float DrawOrder
+		{
+			get
+			{
+				//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+				Vector3 position = GameService.Gw2Mumble.get_PlayerCharacter().get_Position();
+				position.Z += VerticalOffset;
+				return Vector3.DistanceSquared(position, GameService.Graphics.get_World().get_Camera().get_Position());
+			}
+		}
 
 		public PlayerMarker()
 		{
@@ -33,6 +45,7 @@ namespace Tortle.PlayerMarker.Entity
 			MarkerOpacity = 1f;
 			MarkerColor = Color.get_White();
 			Visible = false;
+			VerticalOffset = 0f;
 			_vertex = (VertexPositionColorTexture[])(object)new VertexPositionColorTexture[4];
 		}
 

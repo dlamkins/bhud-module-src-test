@@ -28,7 +28,7 @@ namespace Tortle.PlayerMarker.Services
 
 		public SettingEntry<string> ImageName { get; private set; }
 
-		public string[] DefaultMarkerFileNames { get; } = new string[2] { "gw2PersonalTarget.png", "circleFill.png" };
+		public string[] DefaultMarkerFileNames { get; } = new string[10] { "gw2PersonalTarget.png", "circleFill.png", "gw2CommanderArrow.png", "gw2CommanderCircle.png", "gw2CommanderHeart.png", "gw2CommanderSquare.png", "gw2CommanderStar.png", "gw2CommanderSpiral.png", "gw2CommanderTriangle.png", "gw2CommanderX.png" };
 
 
 		public ModuleSettings(TextureCache textureCache, Tortle.PlayerMarker.Entity.PlayerMarker playerMarker)
