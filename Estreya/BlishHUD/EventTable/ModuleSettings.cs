@@ -318,10 +318,10 @@ namespace Estreya.BlishHUD.EventTable
 			string eventHeightDescriptionDefault = ((SettingEntry)drawerConfiguration.EventHeight).get_Description();
 			((SettingEntry)drawerConfiguration.EventHeight).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventHeight-name", eventHeightDisplayNameDefault)));
 			((SettingEntry)drawerConfiguration.EventHeight).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventHeight-description", eventHeightDescriptionDefault)));
-			string eventOpacityDisplayNameDefault = ((SettingEntry)drawerConfiguration.EventBackgroundOpacity).get_DisplayName();
-			string eventOpacityDescriptionDefault = ((SettingEntry)drawerConfiguration.EventBackgroundOpacity).get_Description();
-			((SettingEntry)drawerConfiguration.EventBackgroundOpacity).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventOpacity-name", eventOpacityDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.EventBackgroundOpacity).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventOpacity-description", eventOpacityDescriptionDefault)));
+			string eventBackgroundOpacityDisplayNameDefault = ((SettingEntry)drawerConfiguration.EventBackgroundOpacity).get_DisplayName();
+			string eventBackgroundOpacityDescriptionDefault = ((SettingEntry)drawerConfiguration.EventBackgroundOpacity).get_Description();
+			((SettingEntry)drawerConfiguration.EventBackgroundOpacity).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventBackgroundOpacity-name", eventBackgroundOpacityDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.EventBackgroundOpacity).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventBackgroundOpacity-description", eventBackgroundOpacityDescriptionDefault)));
 		}
 
 		public override void Unload()

@@ -69,7 +69,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private List<EventCategory> _allEvents = new List<EventCategory>();
 
-		private int _heightFromLastDraw;
+		private int _heightFromLastDraw = 1;
 
 		private Event _lastActiveEvent;
 
