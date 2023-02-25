@@ -157,8 +157,8 @@ namespace Estreya.BlishHUD.EventTable
 			SettingEntry<int> eventHeight = base.DrawerSettings.DefineSetting<int>(name + "-eventHeight", 30, (Func<string>)(() => "Event Height"), (Func<string>)(() => "Defines the height of the individual event rows."));
 			SettingComplianceExtensions.SetRange(eventHeight, 5, 30);
 			SettingEntry<List<string>> eventOrder = base.DrawerSettings.DefineSetting<List<string>>(name + "-eventOrder", new List<string>(eventCategories.Select((EventCategory x) => x.Key)), (Func<string>)(() => "Event Order"), (Func<string>)(() => "Defines the order of events."));
-			SettingEntry<float> eventOpacity = base.DrawerSettings.DefineSetting<float>(name + "-eventOpacity", 1f, (Func<string>)(() => "Event Opacity"), (Func<string>)(() => "Defines the opacity of the individual events."));
-			SettingComplianceExtensions.SetRange(eventOpacity, 0.1f, 1f);
+			SettingEntry<float> eventBackgroundOpacity = base.DrawerSettings.DefineSetting<float>(name + "-eventBackgroundOpacity", 1f, (Func<string>)(() => "Event Background Opacity"), (Func<string>)(() => "Defines the opacity of the individual event backgrounds."));
+			SettingComplianceExtensions.SetRange(eventBackgroundOpacity, 0.1f, 1f);
 			SettingEntry<bool> drawShadows = base.DrawerSettings.DefineSetting<bool>(name + "-drawShadows", false, (Func<string>)(() => "Draw Shadows"), (Func<string>)(() => "Whether the text should have shadows"));
 			SettingEntry<Color> shadowColor = base.DrawerSettings.DefineSetting<Color>(name + "-shadowColor", base.DefaultGW2Color, (Func<string>)(() => "Shadow Color"), (Func<string>)(() => "Defines the color of the shadows"));
 			SettingEntry<bool> drawShadowsForFiller = base.DrawerSettings.DefineSetting<bool>(name + "-drawShadowsForFiller", false, (Func<string>)(() => "Draw Shadows for Filler"), (Func<string>)(() => "Whether the filler text should have shadows"));
@@ -166,6 +166,16 @@ namespace Estreya.BlishHUD.EventTable
 			SettingEntry<DrawInterval> drawInterval = base.DrawerSettings.DefineSetting<DrawInterval>(name + "-drawInterval", DrawInterval.FAST, (Func<string>)(() => "Draw Interval"), (Func<string>)(() => "Defines the refresh rate of the drawer."));
 			SettingEntry<bool> limitToCurrentMap = base.DrawerSettings.DefineSetting<bool>(name + "-limitToCurrentMap", false, (Func<string>)(() => "Limit to current Map"), (Func<string>)(() => "Whether the drawer should only show events from the current map."));
 			SettingEntry<bool> allowUnspecifiedMap = base.DrawerSettings.DefineSetting<bool>(name + "-allowUnspecifiedMap", true, (Func<string>)(() => "Allow from unspecified Maps"), (Func<string>)(() => "Whether the table should show events which do not have a map id specified."));
+			SettingEntry<float> timeLineOpacity = base.DrawerSettings.DefineSetting<float>(name + "-timeLineOpacity", 1f, (Func<string>)(() => "Timeline Opacity"), (Func<string>)(() => "Defines the opacity of the time line bar."));
+			SettingComplianceExtensions.SetRange(timeLineOpacity, 0.1f, 1f);
+			SettingEntry<float> eventTextOpacity = base.DrawerSettings.DefineSetting<float>(name + "-eventTextOpacity", 1f, (Func<string>)(() => "Event Text Opacity"), (Func<string>)(() => "Defines the opacity of the event text."));
+			SettingComplianceExtensions.SetRange(eventTextOpacity, 0.1f, 1f);
+			SettingEntry<float> fillerTextOpacity = base.DrawerSettings.DefineSetting<float>(name + "-fillerTextOpacity", 1f, (Func<string>)(() => "Filler Text Opacity"), (Func<string>)(() => "Defines the opacity of filler event text."));
+			SettingComplianceExtensions.SetRange(fillerTextOpacity, 0.1f, 1f);
+			SettingEntry<float> shadowOpacity = base.DrawerSettings.DefineSetting<float>(name + "-shadowOpacity", 1f, (Func<string>)(() => "Shadow Opacity"), (Func<string>)(() => "Defines the opacity for shadows."));
+			SettingComplianceExtensions.SetRange(shadowOpacity, 0.1f, 1f);
+			SettingEntry<float> fillerShadowOpacity = base.DrawerSettings.DefineSetting<float>(name + "-fillerShadowOpacity", 1f, (Func<string>)(() => "Filler Shadow Opacity"), (Func<string>)(() => "Defines the opacity for filler shadows."));
+			SettingComplianceExtensions.SetRange(fillerShadowOpacity, 0.1f, 1f);
 			return new EventAreaConfiguration
 			{
 				Name = drawer.Name,
@@ -190,14 +200,19 @@ namespace Estreya.BlishHUD.EventTable
 				CompletionAcion = completionAction,
 				EventHeight = eventHeight,
 				EventOrder = eventOrder,
-				EventOpacity = eventOpacity,
+				EventBackgroundOpacity = eventBackgroundOpacity,
 				DrawShadows = drawShadows,
 				ShadowColor = shadowColor,
 				DrawShadowsForFiller = drawShadowsForFiller,
 				FillerShadowColor = fillerShadowColor,
 				DrawInterval = drawInterval,
 				LimitToCurrentMap = limitToCurrentMap,
-				AllowUnspecifiedMap = allowUnspecifiedMap
+				AllowUnspecifiedMap = allowUnspecifiedMap,
+				TimeLineOpacity = timeLineOpacity,
+				EventTextOpacity = eventTextOpacity,
+				FillerTextOpacity = fillerTextOpacity,
+				ShadowOpacity = shadowOpacity,
+				FillerShadowOpacity = fillerShadowOpacity
 			};
 		}
 
@@ -216,7 +231,7 @@ namespace Estreya.BlishHUD.EventTable
 			base.DrawerSettings.UndefineSetting(name + "-disabledEventKeys");
 			base.DrawerSettings.UndefineSetting(name + "-eventHeight");
 			base.DrawerSettings.UndefineSetting(name + "-eventOrder");
-			base.DrawerSettings.UndefineSetting(name + "-eventOpacity");
+			base.DrawerSettings.UndefineSetting(name + "-eventBackgroundOpacity");
 			base.DrawerSettings.UndefineSetting(name + "-drawShadows");
 			base.DrawerSettings.UndefineSetting(name + "-shadowColor");
 			base.DrawerSettings.UndefineSetting(name + "-drawShadowsForFiller");
@@ -224,6 +239,11 @@ namespace Estreya.BlishHUD.EventTable
 			base.DrawerSettings.UndefineSetting(name + "-drawInterval");
 			base.DrawerSettings.UndefineSetting(name + "-limitToCurrentMap");
 			base.DrawerSettings.UndefineSetting(name + "-allowUnspecifiedMap");
+			base.DrawerSettings.UndefineSetting(name + "-timeLineOpacity");
+			base.DrawerSettings.UndefineSetting(name + "-eventTextOpacity");
+			base.DrawerSettings.UndefineSetting(name + "-fillerTextOpacity");
+			base.DrawerSettings.UndefineSetting(name + "-shadowOpacity");
+			base.DrawerSettings.UndefineSetting(name + "-fillerShadowOpacity");
 		}
 
 		public override void UpdateLocalization(TranslationState translationState)
@@ -298,10 +318,10 @@ namespace Estreya.BlishHUD.EventTable
 			string eventHeightDescriptionDefault = ((SettingEntry)drawerConfiguration.EventHeight).get_Description();
 			((SettingEntry)drawerConfiguration.EventHeight).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventHeight-name", eventHeightDisplayNameDefault)));
 			((SettingEntry)drawerConfiguration.EventHeight).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventHeight-description", eventHeightDescriptionDefault)));
-			string eventOpacityDisplayNameDefault = ((SettingEntry)drawerConfiguration.EventOpacity).get_DisplayName();
-			string eventOpacityDescriptionDefault = ((SettingEntry)drawerConfiguration.EventOpacity).get_Description();
-			((SettingEntry)drawerConfiguration.EventOpacity).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventOpacity-name", eventOpacityDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.EventOpacity).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventOpacity-description", eventOpacityDescriptionDefault)));
+			string eventOpacityDisplayNameDefault = ((SettingEntry)drawerConfiguration.EventBackgroundOpacity).get_DisplayName();
+			string eventOpacityDescriptionDefault = ((SettingEntry)drawerConfiguration.EventBackgroundOpacity).get_Description();
+			((SettingEntry)drawerConfiguration.EventBackgroundOpacity).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventOpacity-name", eventOpacityDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.EventBackgroundOpacity).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventOpacity-description", eventOpacityDescriptionDefault)));
 		}
 
 		public override void Unload()

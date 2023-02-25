@@ -586,13 +586,14 @@ namespace Estreya.BlishHUD.EventTable.Controls
 						{
 							//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 							//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-							//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-							//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-							//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-							//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-							//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
+							//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+							//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+							//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+							//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
+							//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+							//IL_011e: Unknown result type (might be due to invalid IL or missing references)
 							Color black = Color.get_Black();
-							return ((!ev2.Filler) ? ((Configuration.TextColor.get_Value().get_Id() == 1) ? black : ColorExtensions.ToXnaColor(Configuration.TextColor.get_Value().get_Cloth())) : ((Configuration.FillerTextColor.get_Value().get_Id() == 1) ? black : ColorExtensions.ToXnaColor(Configuration.FillerTextColor.get_Value().get_Cloth()))) * Configuration.EventOpacity.get_Value();
+							return (!ev2.Filler) ? (((Configuration.TextColor.get_Value().get_Id() == 1) ? black : ColorExtensions.ToXnaColor(Configuration.TextColor.get_Value().get_Cloth())) * Configuration.EventTextOpacity.get_Value()) : (((Configuration.FillerTextColor.get_Value().get_Id() == 1) ? black : ColorExtensions.ToXnaColor(Configuration.FillerTextColor.get_Value().get_Cloth())) * Configuration.FillerTextOpacity.get_Value());
 						}, delegate
 						{
 							//IL_000d: Unknown result type (might be due to invalid IL or missing references)
@@ -603,23 +604,8 @@ namespace Estreya.BlishHUD.EventTable.Controls
 								return Color.get_Transparent();
 							}
 							Color color = (string.IsNullOrWhiteSpace(ev2.BackgroundColorCode) ? Color.White : ColorTranslator.FromHtml(ev2.BackgroundColorCode));
-							return new Color((int)color.R, (int)color.G, (int)color.B) * Configuration.EventOpacity.get_Value();
-						}, () => (!ev2.Filler) ? Configuration.DrawShadows.get_Value() : Configuration.DrawShadowsForFiller.get_Value(), delegate
-						{
-							//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-							//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-							//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-							//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-							if (!ev2.Filler)
-							{
-								if (Configuration.ShadowColor.get_Value().get_Id() != 1)
-								{
-									return ColorExtensions.ToXnaColor(Configuration.ShadowColor.get_Value().get_Cloth());
-								}
-								return Color.get_Black();
-							}
-							return (Configuration.FillerShadowColor.get_Value().get_Id() != 1) ? ColorExtensions.ToXnaColor(Configuration.FillerShadowColor.get_Value().get_Cloth()) : Color.get_Black();
-						}, () => Configuration.ShowTooltips.get_Value());
+							return new Color((int)color.R, (int)color.G, (int)color.B) * Configuration.EventBackgroundOpacity.get_Value();
+						}, () => (!ev2.Filler) ? Configuration.DrawShadows.get_Value() : Configuration.DrawShadowsForFiller.get_Value(), () => (!ev2.Filler) ? (((Configuration.ShadowColor.get_Value().get_Id() == 1) ? Color.get_Black() : ColorExtensions.ToXnaColor(Configuration.ShadowColor.get_Value().get_Cloth())) * Configuration.ShadowOpacity.get_Value()) : (((Configuration.FillerShadowColor.get_Value().get_Id() == 1) ? Color.get_Black() : ColorExtensions.ToXnaColor(Configuration.FillerShadowColor.get_Value().get_Cloth())) * Configuration.FillerShadowOpacity.get_Value()), () => Configuration.ShowTooltips.get_Value());
 						AddEventHooks(newEventControl);
 						Logger.Debug($"Added event {ev2.Name} with occurence {occurence}");
 						_controlEvents[categoryKey].Add((occurence, newEventControl));
@@ -697,7 +683,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
 			float middleLineX = (float)base.Width * GetTimeSpanRatio();
 			float width = 2f;
-			SpriteBatchUtil.DrawLine(spriteBatch, Textures.get_Pixel(), new RectangleF(middleLineX - width / 2f, 0f, width, (float)base.Height), Color.get_LightGray() * Configuration.EventOpacity.get_Value());
+			SpriteBatchUtil.DrawLine(spriteBatch, Textures.get_Pixel(), new RectangleF(middleLineX - width / 2f, 0f, width, (float)base.Height), Color.get_LightGray() * Configuration.TimeLineOpacity.get_Value());
 		}
 
 		private void ClearEventControls()

@@ -308,44 +308,18 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			val2.set_FlowDirection((ControlFlowDirection)3);
 			((Panel)val2).set_CanScroll(true);
 			FlowPanel settingsPanel = val2;
-			RenderBoolSetting((Panel)(object)settingsPanel, areaConfiguration.Enabled);
-			RenderKeybindingSetting((Panel)(object)settingsPanel, areaConfiguration.EnabledKeybinding);
-			RenderEnumSetting<DrawInterval>((Panel)(object)settingsPanel, areaConfiguration.DrawInterval);
+			((Control)settingsPanel).DoUpdate(GameService.Overlay.get_CurrentGameTime());
+			RenderEnabledSettings(settingsPanel, areaConfiguration);
 			RenderEmptyLine((Panel)(object)settingsPanel);
-			RenderIntSetting((Panel)(object)settingsPanel, areaConfiguration.Location.X);
-			RenderIntSetting((Panel)(object)settingsPanel, areaConfiguration.Location.Y);
+			RenderLocationAndSizeSettings(settingsPanel, areaConfiguration);
 			RenderEmptyLine((Panel)(object)settingsPanel);
-			RenderIntSetting((Panel)(object)settingsPanel, areaConfiguration.Size.X);
-			RenderIntSetting((Panel)(object)settingsPanel, areaConfiguration.EventHeight);
+			RenderLayoutSettings(settingsPanel, areaConfiguration);
 			RenderEmptyLine((Panel)(object)settingsPanel);
-			RenderIntSetting((Panel)(object)settingsPanel, areaConfiguration.TimeSpan);
-			RenderIntSetting((Panel)(object)settingsPanel, areaConfiguration.HistorySplit);
+			RenderTextAndColorSettings(settingsPanel, areaConfiguration);
 			RenderEmptyLine((Panel)(object)settingsPanel);
-			RenderBoolSetting((Panel)(object)settingsPanel, areaConfiguration.DrawBorders);
-			RenderEnumSetting<BuildDirection>((Panel)(object)settingsPanel, areaConfiguration.BuildDirection);
-			base.RenderEnumSetting<FontSize>((Panel)(object)settingsPanel, areaConfiguration.FontSize);
-			RenderColorSetting((Panel)(object)settingsPanel, areaConfiguration.TextColor);
-			RenderBoolSetting((Panel)(object)settingsPanel, areaConfiguration.DrawShadows);
-			RenderColorSetting((Panel)(object)settingsPanel, areaConfiguration.ShadowColor);
+			RenderBehaviourSettings(settingsPanel, areaConfiguration);
 			RenderEmptyLine((Panel)(object)settingsPanel);
-			RenderEnumSetting<LeftClickAction>((Panel)(object)settingsPanel, areaConfiguration.LeftClickAction);
-			RenderBoolSetting((Panel)(object)settingsPanel, areaConfiguration.AcceptWaypointPrompt);
-			RenderEmptyLine((Panel)(object)settingsPanel);
-			RenderBoolSetting((Panel)(object)settingsPanel, areaConfiguration.ShowTooltips);
-			RenderEmptyLine((Panel)(object)settingsPanel);
-			RenderEnumSetting<EventCompletedAction>((Panel)(object)settingsPanel, areaConfiguration.CompletionAcion);
-			RenderEmptyLine((Panel)(object)settingsPanel);
-			RenderBoolSetting((Panel)(object)settingsPanel, areaConfiguration.LimitToCurrentMap);
-			RenderBoolSetting((Panel)(object)settingsPanel, areaConfiguration.AllowUnspecifiedMap);
-			RenderEmptyLine((Panel)(object)settingsPanel);
-			RenderBoolSetting((Panel)(object)settingsPanel, areaConfiguration.UseFiller);
-			RenderColorSetting((Panel)(object)settingsPanel, areaConfiguration.FillerTextColor);
-			RenderBoolSetting((Panel)(object)settingsPanel, areaConfiguration.DrawShadowsForFiller);
-			RenderColorSetting((Panel)(object)settingsPanel, areaConfiguration.FillerShadowColor);
-			RenderEmptyLine((Panel)(object)settingsPanel);
-			RenderColorSetting((Panel)(object)settingsPanel, areaConfiguration.BackgroundColor);
-			RenderFloatSetting((Panel)(object)settingsPanel, areaConfiguration.Opacity);
-			RenderFloatSetting((Panel)(object)settingsPanel, areaConfiguration.EventOpacity);
+			RenderFillerSettings(settingsPanel, areaConfiguration);
 			RenderEmptyLine((Panel)(object)settingsPanel);
 			((IEnumerable<Control>)((Container)settingsPanel).get_Children()).Last();
 			StandardButton manageEventsButton = RenderButton(_areaPanel, base.TranslationState.GetTranslation("areaSettingsView-manageEvents-btn", "Manage Events"), delegate
@@ -385,6 +359,214 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Control)removeButton).set_Right(((Rectangle)(ref panelBounds)).get_Right());
 			((Control)areaName).set_Left(((Control)manageEventsButton).get_Right());
 			((Control)areaName).set_Width(((Control)removeButton).get_Left() - ((Control)areaName).get_Left());
+		}
+
+		private void RenderEnabledSettings(FlowPanel settingsPanel, EventAreaConfiguration areaConfiguration)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Expected O, but got Unknown
+			FlowPanel val = new FlowPanel();
+			((Control)val).set_Parent((Container)(object)settingsPanel);
+			((Container)val).set_HeightSizingMode((SizingMode)1);
+			((Control)val).set_Width(((Control)settingsPanel).get_Width() - 30);
+			val.set_FlowDirection((ControlFlowDirection)3);
+			val.set_OuterControlPadding(new Vector2(20f, 20f));
+			((Panel)val).set_ShowBorder(true);
+			((Panel)val).set_CanCollapse(true);
+			((Panel)val).set_Collapsed(false);
+			((Panel)val).set_Title("Enabled");
+			FlowPanel groupPanel = val;
+			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.Enabled);
+			RenderKeybindingSetting((Panel)(object)groupPanel, areaConfiguration.EnabledKeybinding);
+			RenderEnumSetting<DrawInterval>((Panel)(object)groupPanel, areaConfiguration.DrawInterval);
+			RenderEmptyLine((Panel)(object)groupPanel, 20);
+		}
+
+		private void RenderLocationAndSizeSettings(FlowPanel settingsPanel, EventAreaConfiguration areaConfiguration)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Expected O, but got Unknown
+			FlowPanel val = new FlowPanel();
+			((Control)val).set_Parent((Container)(object)settingsPanel);
+			((Container)val).set_HeightSizingMode((SizingMode)1);
+			((Control)val).set_Width(((Control)settingsPanel).get_Width() - 30);
+			val.set_FlowDirection((ControlFlowDirection)3);
+			val.set_OuterControlPadding(new Vector2(20f, 20f));
+			((Panel)val).set_ShowBorder(true);
+			((Panel)val).set_CanCollapse(true);
+			((Panel)val).set_Collapsed(true);
+			((Panel)val).set_Title("Location & Size");
+			FlowPanel groupPanel = val;
+			RenderIntSetting((Panel)(object)groupPanel, areaConfiguration.Location.X);
+			RenderIntSetting((Panel)(object)groupPanel, areaConfiguration.Location.Y);
+			RenderEmptyLine((Panel)(object)groupPanel);
+			RenderIntSetting((Panel)(object)groupPanel, areaConfiguration.Size.X);
+			RenderIntSetting((Panel)(object)groupPanel, areaConfiguration.EventHeight);
+			RenderEmptyLine((Panel)(object)groupPanel, 20);
+		}
+
+		private void RenderLayoutSettings(FlowPanel settingsPanel, EventAreaConfiguration areaConfiguration)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Expected O, but got Unknown
+			FlowPanel val = new FlowPanel();
+			((Control)val).set_Parent((Container)(object)settingsPanel);
+			((Container)val).set_HeightSizingMode((SizingMode)1);
+			((Control)val).set_Width(((Control)settingsPanel).get_Width() - 30);
+			val.set_FlowDirection((ControlFlowDirection)3);
+			val.set_OuterControlPadding(new Vector2(20f, 20f));
+			((Panel)val).set_ShowBorder(true);
+			((Panel)val).set_CanCollapse(true);
+			((Panel)val).set_Collapsed(true);
+			((Panel)val).set_Title("Layout");
+			FlowPanel groupPanel = val;
+			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.DrawBorders);
+			RenderEnumSetting<BuildDirection>((Panel)(object)groupPanel, areaConfiguration.BuildDirection);
+			RenderIntSetting((Panel)(object)groupPanel, areaConfiguration.TimeSpan);
+			RenderIntSetting((Panel)(object)groupPanel, areaConfiguration.HistorySplit);
+			RenderEmptyLine((Panel)(object)groupPanel, 20);
+		}
+
+		private void RenderTextAndColorSettings(FlowPanel settingsPanel, EventAreaConfiguration areaConfiguration)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Expected O, but got Unknown
+			FlowPanel val = new FlowPanel();
+			((Control)val).set_Parent((Container)(object)settingsPanel);
+			((Container)val).set_HeightSizingMode((SizingMode)1);
+			((Control)val).set_Width(((Control)settingsPanel).get_Width() - 30);
+			val.set_FlowDirection((ControlFlowDirection)3);
+			val.set_OuterControlPadding(new Vector2(20f, 20f));
+			((Panel)val).set_ShowBorder(true);
+			((Panel)val).set_CanCollapse(true);
+			((Panel)val).set_Collapsed(true);
+			((Panel)val).set_Title("Text & Color");
+			FlowPanel groupPanel = val;
+			base.RenderEnumSetting<FontSize>((Panel)(object)groupPanel, areaConfiguration.FontSize);
+			RenderColorSetting((Panel)(object)groupPanel, areaConfiguration.TextColor);
+			RenderFloatSetting((Panel)(object)groupPanel, areaConfiguration.EventTextOpacity);
+			RenderEmptyLine((Panel)(object)groupPanel);
+			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.DrawShadows);
+			RenderColorSetting((Panel)(object)groupPanel, areaConfiguration.ShadowColor);
+			RenderFloatSetting((Panel)(object)groupPanel, areaConfiguration.ShadowOpacity);
+			RenderEmptyLine((Panel)(object)groupPanel);
+			RenderFloatSetting((Panel)(object)groupPanel, areaConfiguration.TimeLineOpacity);
+			RenderEmptyLine((Panel)(object)groupPanel);
+			RenderColorSetting((Panel)(object)groupPanel, areaConfiguration.BackgroundColor);
+			RenderFloatSetting((Panel)(object)groupPanel, areaConfiguration.Opacity);
+			RenderFloatSetting((Panel)(object)groupPanel, areaConfiguration.EventBackgroundOpacity);
+			RenderEmptyLine((Panel)(object)groupPanel, 20);
+		}
+
+		private void RenderBehaviourSettings(FlowPanel settingsPanel, EventAreaConfiguration areaConfiguration)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Expected O, but got Unknown
+			FlowPanel val = new FlowPanel();
+			((Control)val).set_Parent((Container)(object)settingsPanel);
+			((Container)val).set_HeightSizingMode((SizingMode)1);
+			((Control)val).set_Width(((Control)settingsPanel).get_Width() - 30);
+			val.set_FlowDirection((ControlFlowDirection)3);
+			val.set_OuterControlPadding(new Vector2(20f, 20f));
+			((Panel)val).set_ShowBorder(true);
+			((Panel)val).set_CanCollapse(true);
+			((Panel)val).set_Collapsed(true);
+			((Panel)val).set_Title("Behaviours");
+			FlowPanel groupPanel = val;
+			RenderEnumSetting<LeftClickAction>((Panel)(object)groupPanel, areaConfiguration.LeftClickAction);
+			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.AcceptWaypointPrompt);
+			RenderEmptyLine((Panel)(object)groupPanel);
+			RenderEnumSetting<EventCompletedAction>((Panel)(object)groupPanel, areaConfiguration.CompletionAcion);
+			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.ShowTooltips);
+			RenderEmptyLine((Panel)(object)groupPanel);
+			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.LimitToCurrentMap);
+			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.AllowUnspecifiedMap);
+			RenderEmptyLine((Panel)(object)groupPanel, 20);
+		}
+
+		private void RenderFillerSettings(FlowPanel settingsPanel, EventAreaConfiguration areaConfiguration)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Expected O, but got Unknown
+			FlowPanel val = new FlowPanel();
+			((Control)val).set_Parent((Container)(object)settingsPanel);
+			((Container)val).set_HeightSizingMode((SizingMode)1);
+			((Control)val).set_Width(((Control)settingsPanel).get_Width() - 30);
+			val.set_FlowDirection((ControlFlowDirection)3);
+			val.set_OuterControlPadding(new Vector2(20f, 20f));
+			((Panel)val).set_ShowBorder(true);
+			((Panel)val).set_CanCollapse(true);
+			((Panel)val).set_Collapsed(true);
+			((Panel)val).set_Title("Fillers");
+			FlowPanel groupPanel = val;
+			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.UseFiller);
+			RenderColorSetting((Panel)(object)groupPanel, areaConfiguration.FillerTextColor);
+			RenderFloatSetting((Panel)(object)groupPanel, areaConfiguration.FillerTextOpacity);
+			RenderEmptyLine((Panel)(object)groupPanel);
+			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.DrawShadowsForFiller);
+			RenderColorSetting((Panel)(object)groupPanel, areaConfiguration.FillerShadowColor);
+			RenderFloatSetting((Panel)(object)groupPanel, areaConfiguration.FillerShadowOpacity);
+			RenderEmptyLine((Panel)(object)groupPanel, 20);
 		}
 
 		private void ReorderEvents(EventAreaConfiguration configuration)

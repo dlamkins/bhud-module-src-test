@@ -27,24 +27,34 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		public SettingEntry<Color> FillerTextColor { get; set; }
 
+		public SettingEntry<float> FillerTextOpacity { get; set; }
+
 		public SettingEntry<bool> DrawShadowsForFiller { get; set; }
 
 		public SettingEntry<Color> FillerShadowColor { get; set; }
+
+		public SettingEntry<float> FillerShadowOpacity { get; set; }
 
 		public SettingEntry<int> EventHeight { get; set; }
 
 		public SettingEntry<List<string>> EventOrder { get; set; }
 
-		public SettingEntry<float> EventOpacity { get; set; }
+		public SettingEntry<float> EventBackgroundOpacity { get; set; }
+
+		public SettingEntry<float> EventTextOpacity { get; set; }
 
 		public SettingEntry<bool> DrawShadows { get; set; }
 
 		public SettingEntry<Color> ShadowColor { get; set; }
+
+		public SettingEntry<float> ShadowOpacity { get; set; }
 
 		public SettingEntry<DrawInterval> DrawInterval { get; set; }
 
 		public SettingEntry<bool> LimitToCurrentMap { get; set; }
 
 		public SettingEntry<bool> AllowUnspecifiedMap { get; set; }
+
+		public SettingEntry<float> TimeLineOpacity { get; set; }
 	}
 }
