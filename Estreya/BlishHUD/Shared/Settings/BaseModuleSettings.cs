@@ -55,9 +55,9 @@ namespace Estreya.BlishHUD.Shared.Settings
 
 		public SettingEntry<bool> RegisterCornerIcon { get; private set; }
 
-		public SettingEntry<CornerIconLeftClickAction> CornerIconLeftClickAction { get; private set; }
+		public SettingEntry<CornerIconClickAction> CornerIconLeftClickAction { get; private set; }
 
-		public SettingEntry<CornerIconRightClickAction> CornerIconRightClickAction { get; private set; }
+		public SettingEntry<CornerIconClickAction> CornerIconRightClickAction { get; private set; }
 
 		public SettingEntry<bool> HideOnMissingMumbleTicks { get; private set; }
 
@@ -203,10 +203,10 @@ namespace Estreya.BlishHUD.Shared.Settings
 			RegisterCornerIcon = GlobalSettings.DefineSetting<bool>("RegisterCornerIcon", true, (Func<string>)(() => "Register Corner Icon"), (Func<string>)(() => "Whether the module should register a corner icon."));
 			RegisterCornerIcon.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
 			RegisterCornerIcon.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)RegisterCornerIcon_SettingChanged);
-			CornerIconLeftClickAction = GlobalSettings.DefineSetting<CornerIconLeftClickAction>("CornerIconLeftClickAction", Estreya.BlishHUD.Shared.Models.CornerIconLeftClickAction.Settings, (Func<string>)(() => "Corner Icon Left Click Action"), (Func<string>)(() => "Defines the action of the corner icon when left clicked."));
-			CornerIconLeftClickAction.add_SettingChanged((EventHandler<ValueChangedEventArgs<CornerIconLeftClickAction>>)SettingChanged<CornerIconLeftClickAction>);
-			CornerIconRightClickAction = GlobalSettings.DefineSetting<CornerIconRightClickAction>("CornerIconRightClickAction", Estreya.BlishHUD.Shared.Models.CornerIconRightClickAction.None, (Func<string>)(() => "Corner Icon Right Click Action"), (Func<string>)(() => "Defines the action of the corner icon when right clicked."));
-			CornerIconRightClickAction.add_SettingChanged((EventHandler<ValueChangedEventArgs<CornerIconRightClickAction>>)SettingChanged<CornerIconRightClickAction>);
+			CornerIconLeftClickAction = GlobalSettings.DefineSetting<CornerIconClickAction>("CornerIconLeftClickAction", CornerIconClickAction.Settings, (Func<string>)(() => "Corner Icon Left Click Action"), (Func<string>)(() => "Defines the action of the corner icon when left clicked."));
+			CornerIconLeftClickAction.add_SettingChanged((EventHandler<ValueChangedEventArgs<CornerIconClickAction>>)SettingChanged<CornerIconClickAction>);
+			CornerIconRightClickAction = GlobalSettings.DefineSetting<CornerIconClickAction>("CornerIconRightClickAction", CornerIconClickAction.None, (Func<string>)(() => "Corner Icon Right Click Action"), (Func<string>)(() => "Defines the action of the corner icon when right clicked."));
+			CornerIconRightClickAction.add_SettingChanged((EventHandler<ValueChangedEventArgs<CornerIconClickAction>>)SettingChanged<CornerIconClickAction>);
 			HideOnOpenMap = GlobalSettings.DefineSetting<bool>("HideOnOpenMap", true, (Func<string>)(() => "Hide on open Map"), (Func<string>)(() => "Whether the modules drawers should hide when the map is open."));
 			HideOnOpenMap.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
 			HideOnMissingMumbleTicks = GlobalSettings.DefineSetting<bool>("HideOnMissingMumbleTicks", true, (Func<string>)(() => "Hide on Cutscenes"), (Func<string>)(() => "Whether the modules drawers should hide when cutscenes are played."));

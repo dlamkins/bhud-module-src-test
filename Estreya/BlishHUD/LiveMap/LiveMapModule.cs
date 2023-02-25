@@ -9,11 +9,11 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Blish_HUD.ArcDps.Common;
 using Blish_HUD.Content;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Modules;
 using Blish_HUD.Settings;
-using Estreya.BlishHUD.LiveMap.Models;
 using Estreya.BlishHUD.LiveMap.Models.Player;
 using Estreya.BlishHUD.LiveMap.UI.Views;
 using Estreya.BlishHUD.Shared.Extensions;
@@ -85,6 +85,7 @@ namespace Estreya.BlishHUD.LiveMap
 			base.Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
 			GameService.Gw2Mumble.get_PlayerCharacter().add_NameChanged((EventHandler<ValueEventArgs<string>>)PlayerCharacter_NameChanged);
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)CurrentMap_MapChanged);
+			GameService.ArcDps.get_Common().Activate();
 			_lastSend.Value = _sendInterval.TotalMilliseconds;
 			_lastGuildFetch.Value = _guildFetchInterval.TotalMilliseconds;
 			BaseModule<LiveMapModule, ModuleSettings>.Instance = this;
@@ -259,19 +260,18 @@ namespace Estreya.BlishHUD.LiveMap
 			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
 			Vector2 position = _map?.WorldMeterCoordsToMapCoords(GameService.Gw2Mumble.get_PlayerCharacter().get_Position()) ?? Vector2.get_Zero();
-			Vector3 cameraForward = ((base.ModuleSettings.PlayerFacingType.get_Value() == PlayerFacingType.Camera) ? GameService.Gw2Mumble.get_PlayerCamera().get_Forward() : GameService.Gw2Mumble.get_PlayerCharacter().get_Forward());
-			double cameraAngle = Math.Atan2(cameraForward.X, cameraForward.Y) * 180.0 / Math.PI;
-			if (cameraAngle < 0.0)
+			Vector3 forward = GameService.Gw2Mumble.get_PlayerCharacter().get_Forward();
+			double angle = Math.Atan2(forward.X, forward.Y) * 180.0 / Math.PI;
+			if (angle < 0.0)
 			{
-				cameraAngle += 360.0;
+				angle += 360.0;
 			}
 			Player obj = new Player
 			{
@@ -282,26 +282,47 @@ namespace Estreya.BlishHUD.LiveMap
 					GuildId = _guildId
 				}
 			};
-			PlayerMap playerMap = new PlayerMap();
+			PlayerMap obj2 = new PlayerMap
+			{
+				Continent = GetContinentId(_map)
+			};
 			Map map = _map;
-			playerMap.Continent = ((map != null) ? map.get_ContinentId() : (-1));
+			obj2.Name = ((map != null) ? map.get_Name() : null);
 			Map map2 = _map;
-			playerMap.Name = ((map2 != null) ? map2.get_Name() : null);
-			Map map3 = _map;
-			playerMap.ID = ((map3 != null) ? map3.get_Id() : (-1));
-			playerMap.Position = new PlayerPosition
+			obj2.ID = ((map2 != null) ? map2.get_Id() : (-1));
+			obj2.Position = new PlayerPosition
 			{
 				X = position.X,
 				Y = position.Y
 			};
-			obj.Map = playerMap;
+			obj.Map = obj2;
 			obj.Facing = new PlayerFacing
 			{
-				Angle = cameraAngle
+				Angle = angle
 			};
 			obj.WvW = _wvw;
+			obj.Group = new PlayerGroup
+			{
+				Squad = (base.ModuleSettings.SendGroupInformation.get_Value() ? (from p in GameService.ArcDps.get_Common().get_PlayersInSquad().Values
+					select ((Player)(ref p)).get_AccountName().Trim(':') into p
+					where p != _accountName
+					select p).ToArray() : null)
+			};
 			obj.Commander = !base.ModuleSettings.HideCommander.get_Value() && GameService.Gw2Mumble.get_PlayerCharacter().get_IsCommander();
 			return obj;
+		}
+
+		private int GetContinentId(Map map)
+		{
+			if (map == null)
+			{
+				return -1;
+			}
+			if (map.get_Id() == 1206)
+			{
+				return 1;
+			}
+			return map.get_ContinentId();
 		}
 
 		private string GetGlobalUrl(bool formatPositions = true)
@@ -352,7 +373,7 @@ namespace Estreya.BlishHUD.LiveMap
 		private string FormatUrlWithPosition(string url)
 		{
 			Player player = GetPlayer();
-			return url + "?posX=" + player.Map.Position.X.ToInvariantString() + "&posY=" + player.Map.Position.Y.ToInvariantString() + "&zoom=6";
+			return url + "?posX=" + player.Map.Position.X.ToInvariantString() + "&posY=" + player.Map.Position.Y.ToInvariantString() + "&zoom=6" + ((!string.IsNullOrWhiteSpace(_accountName)) ? ("&account=" + _accountName) : "") + "&follow=" + (base.ModuleSettings.FollowOnMap.get_Value() ? "true" : "false");
 		}
 
 		public override IView GetSettingsView()

@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Blish_HUD.Controls;
 using Blish_HUD.Modules.Managers;
-using Estreya.BlishHUD.LiveMap.Models;
 using Estreya.BlishHUD.Shared.State;
 using Estreya.BlishHUD.Shared.UI.Views;
 using MonoGame.Extended.BitmapFonts;
@@ -28,9 +27,10 @@ namespace Estreya.BlishHUD.LiveMap.UI.Views
 
 		protected override void BuildView(FlowPanel parent)
 		{
-			RenderEnumSetting<PlayerFacingType>((Panel)(object)parent, _moduleSettings.PlayerFacingType);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideCommander);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.StreamerModeEnabled);
+			RenderBoolSetting((Panel)(object)parent, _moduleSettings.FollowOnMap);
+			RenderBoolSetting((Panel)(object)parent, _moduleSettings.SendGroupInformation);
 			RenderEmptyLine((Panel)(object)parent);
 			RenderButton((Panel)(object)parent, "Open Global Map", delegate
 			{

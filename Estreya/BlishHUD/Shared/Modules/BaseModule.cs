@@ -371,10 +371,10 @@ namespace Estreya.BlishHUD.Shared.Modules
 		{
 			switch (ModuleSettings.CornerIconLeftClickAction.get_Value())
 			{
-			case CornerIconLeftClickAction.Settings:
+			case CornerIconClickAction.Settings:
 				((WindowBase2)SettingsWindow).ToggleWindow();
 				break;
-			case CornerIconLeftClickAction.Visibility:
+			case CornerIconClickAction.Visibility:
 				ModuleSettings.GlobalDrawerVisible.set_Value(!ModuleSettings.GlobalDrawerVisible.get_Value());
 				break;
 			}
@@ -384,10 +384,10 @@ namespace Estreya.BlishHUD.Shared.Modules
 		{
 			switch (ModuleSettings.CornerIconRightClickAction.get_Value())
 			{
-			case CornerIconRightClickAction.Settings:
+			case CornerIconClickAction.Settings:
 				((WindowBase2)SettingsWindow).ToggleWindow();
 				break;
-			case CornerIconRightClickAction.Visibility:
+			case CornerIconClickAction.Visibility:
 				ModuleSettings.GlobalDrawerVisible.set_Value(!ModuleSettings.GlobalDrawerVisible.get_Value());
 				break;
 			}
@@ -600,6 +600,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 			{
 				ModuleSettings.ModuleSettingsChanged -= ModuleSettings_ModuleSettingsChanged;
 				ModuleSettings.Unload();
+				ModuleSettings = null;
 			}
 			Logger.Debug("Unloaded settings.");
 			Logger.Debug("Unload default settings view...");
@@ -622,6 +623,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 			{
 				((Control)settingsWindow2).Dispose();
 			}
+			SettingsWindow = null;
 			Logger.Debug("Unloaded settings window.");
 			Logger.Debug("Unload corner icon...");
 			HandleCornerIcon(show: false);
@@ -640,10 +642,22 @@ namespace Estreya.BlishHUD.Shared.Modules
 					state?.Dispose();
 				});
 				_states.Clear();
+				AccountState = null;
+				ArcDPSState = null;
+				IconState = null;
+				ItemState = null;
+				MapchestState = null;
+				WorldbossState = null;
+				PointOfInterestState = null;
+				SettingEventState = null;
+				SkillState = null;
+				TradingPostState = null;
+				TranslationState = null;
 			}
 			Logger.Debug("Unloaded states.");
 			Logger.Debug("Unload flurl client...");
 			_flurlClient?.Dispose();
+			_flurlClient = null;
 			Logger.Debug("Unloaded flurl client.");
 			Logger.Debug("Unload module instance...");
 			Instance = null;

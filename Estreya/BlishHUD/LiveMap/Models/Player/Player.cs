@@ -16,6 +16,9 @@ namespace Estreya.BlishHUD.LiveMap.Models.Player
 		[JsonPropertyName("wvw")]
 		public PlayerWvW WvW { get; set; }
 
+		[JsonPropertyName("group")]
+		public PlayerGroup Group { get; set; }
+
 		[JsonPropertyName("commander")]
 		public bool Commander { get; set; }
 
@@ -26,7 +29,7 @@ namespace Estreya.BlishHUD.LiveMap.Models.Player
 				Player player = obj as Player;
 				if (player != null)
 				{
-					return true & Identification.Equals(player.Identification) & Map.Equals(player.Map) & Facing.Equals(player.Facing) & Commander.Equals(player.Commander) & WvW.Equals(player.WvW);
+					return true & Identification.Equals(player.Identification) & Map.Equals(player.Map) & Facing.Equals(player.Facing) & Commander.Equals(player.Commander) & Group.Equals(player.Group) & WvW.Equals(player.WvW);
 				}
 			}
 			return false;
