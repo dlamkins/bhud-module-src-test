@@ -35,8 +35,6 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		private const string DATE_TIME_FORMAT = "yyyy-MM-ddTHH:mm:ss";
 
-		private new static readonly Logger Logger = Logger.GetLogger<EventState>();
-
 		private const string FILE_NAME = "event_states.json";
 
 		private bool dirty;
@@ -64,7 +62,7 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		public event EventHandler<ValueEventArgs<VisibleStateInfo>> StateAdded;
 
-		public event EventHandler<ValueEventArgs<string>> StateRemoved;
+		public event EventHandler<ValueEventArgs<VisibleStateInfo>> StateRemoved;
 
 		public EventState(StateConfiguration configuration, string basePath, Func<DateTime> getNowAction)
 			: base(configuration)
@@ -122,29 +120,42 @@ namespace Estreya.BlishHUD.EventTable.State
 			}
 		}
 
+		public void Remove(string areaName, EventStates? state)
+		{
+			lock (Instances)
+			{
+				Instances.Where((VisibleStateInfo instance) => instance.AreaName == areaName && (!state.HasValue || instance.State == state.Value)).ToList().ForEach(delegate(VisibleStateInfo i)
+				{
+					Remove(areaName, i.EventKey);
+				});
+			}
+		}
+
 		public void Remove(string areaName, string eventKey)
 		{
 			lock (Instances)
 			{
 				List<VisibleStateInfo> instancesToRemove = Instances.Where((VisibleStateInfo instance) => instance.AreaName == areaName && instance.EventKey == eventKey).ToList();
-				if (instancesToRemove.Count != 0)
+				if (instancesToRemove.Count == 0)
 				{
-					string name = GetName(areaName, eventKey);
-					Logger.Info("Remove event states for \"" + name + "\".");
-					for (int i = instancesToRemove.Count - 1; i >= 0; i--)
-					{
-						Instances.Remove(instancesToRemove[i]);
-					}
+					return;
+				}
+				string name = GetName(areaName, eventKey);
+				Logger.Info("Remove event states for \"" + name + "\".");
+				for (int i = instancesToRemove.Count - 1; i >= 0; i--)
+				{
+					VisibleStateInfo instance2 = instancesToRemove[i];
+					Instances.Remove(instance2);
 					try
 					{
-						this.StateRemoved?.Invoke(this, new ValueEventArgs<string>(name));
+						this.StateRemoved?.Invoke(this, new ValueEventArgs<VisibleStateInfo>(instance2));
 					}
 					catch (Exception ex)
 					{
 						Logger.Error(ex, "StateRemoved.Invoke failed.");
 					}
-					dirty = true;
 				}
+				dirty = true;
 			}
 		}
 
