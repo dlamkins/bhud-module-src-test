@@ -10,6 +10,13 @@ namespace BhModule.Community.Pathing.Scripting.Extensions
 {
 	internal static class StandardMarkerScriptExtensions
 	{
+		private static PackInitiator _packInitiator;
+
+		internal static void SetPackInitiator(PackInitiator packInitiator)
+		{
+			_packInitiator = packInitiator;
+		}
+
 		public static void SetPos(this StandardMarker marker, float x, float y, float z)
 		{
 			//IL_0004: Unknown result type (might be due to invalid IL or missing references)
@@ -80,6 +87,12 @@ namespace BhModule.Community.Pathing.Scripting.Extensions
 			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 			marker.SetRot(marker.RotationXyz.GetValueOrDefault(Vector3.get_Zero()).X, marker.RotationXyz.GetValueOrDefault(Vector3.get_Zero()).Y, z);
+		}
+
+		public static void Remove(this StandardMarker marker)
+		{
+			marker.Unload();
+			_packInitiator.PackState.RemovePathingEntity(marker);
 		}
 
 		public static void SetTexture(this StandardMarker marker, string texturePath)

@@ -82,6 +82,7 @@ namespace BhModule.Community.Pathing.Scripting
 		{
 			_lua?.Dispose();
 			_lua = new Lua(LuaIntegerType.Int32, LuaFloatType.Float);
+			StandardMarkerScriptExtensions.SetPackInitiator(Module.PackInitiator);
 			PathingCategoryScriptExtensions.SetPackInitiator(Module.PackInitiator);
 			_stackTraceDebugger = new TraceLineDebugger();
 			Global = _lua.CreateEnvironment<PathingGlobal>();
@@ -252,6 +253,7 @@ namespace BhModule.Community.Pathing.Scripting
 		{
 			Scripts.Clear();
 			_lua?.Dispose();
+			StandardMarkerScriptExtensions.SetPackInitiator(null);
 			PathingCategoryScriptExtensions.SetPackInitiator(null);
 		}
 	}

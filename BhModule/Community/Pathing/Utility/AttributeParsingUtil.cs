@@ -59,7 +59,7 @@ namespace BhModule.Community.Pathing.Utility
 			byte[] rawGuid = null;
 			try
 			{
-				if (attributeValue.Length % 4 == 0)
+				if (attributeValue.Length % 4 == 0 && attributeValue.EndsWith("=="))
 				{
 					rawGuid = Convert.FromBase64String(attributeValue);
 				}
@@ -71,7 +71,7 @@ namespace BhModule.Community.Pathing.Utility
 			}
 			catch (Exception ex)
 			{
-				Logger.Warn(ex, "Failed to parse value " + attributeValue + " as a GUID.");
+				Logger.Debug(ex, "Failed to parse value " + attributeValue + " as a GUID.");
 			}
 			if (rawGuid == null || rawGuid.Length != 16)
 			{
