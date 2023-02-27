@@ -42,17 +42,13 @@ namespace RaidClears.Localization
 			}
 		}
 
-		internal static string CornerIcon_Dungeon => ResourceManager.GetString("CornerIcon_Dungeon", resourceCulture);
-
-		internal static string CornerIcon_Raid => ResourceManager.GetString("CornerIcon_Raid", resourceCulture);
-
-		internal static string CornerIcon_Strike => ResourceManager.GetString("CornerIcon_Strike", resourceCulture);
-
 		internal static string Module_Title => ResourceManager.GetString("Module_Title", resourceCulture);
 
 		internal static string ModuleSettings_OpenSettings => ResourceManager.GetString("ModuleSettings_OpenSettings", resourceCulture);
 
-		internal static string Raid_OverlayEnable => ResourceManager.GetString("Raid_OverlayEnable", resourceCulture);
+		internal static string PatchNotes => ResourceManager.GetString("PatchNotes", resourceCulture);
+
+		internal static string PatchNotes_Tooltip => ResourceManager.GetString("PatchNotes_Tooltip", resourceCulture);
 
 		internal static string Raid_Wing_1 => ResourceManager.GetString("Raid_Wing_1", resourceCulture);
 
@@ -201,8 +197,6 @@ namespace RaidClears.Localization
 		internal static string Setting_Dun_ColFreqText_Label => ResourceManager.GetString("Setting_Dun_ColFreqText_Label", resourceCulture);
 
 		internal static string Setting_Dun_ColFreqText_Tooltip => ResourceManager.GetString("Setting_Dun_ColFreqText_Tooltip", resourceCulture);
-
-		internal static string Setting_Dun_DisabledWarning => ResourceManager.GetString("Setting_Dun_DisabledWarning", resourceCulture);
 
 		internal static string Setting_Dun_Drag_Label => ResourceManager.GetString("Setting_Dun_Drag_Label", resourceCulture);
 
@@ -354,8 +348,6 @@ namespace RaidClears.Localization
 
 		internal static string Setting_Strike_ColText_Tooltip => ResourceManager.GetString("Setting_Strike_ColText_Tooltip", resourceCulture);
 
-		internal static string Setting_Strike_CopyRaids => ResourceManager.GetString("Setting_Strike_CopyRaids", resourceCulture);
-
 		internal static string Setting_Strike_CW_Label => ResourceManager.GetString("Setting_Strike_CW_Label", resourceCulture);
 
 		internal static string Setting_Strike_Drag_Label => ResourceManager.GetString("Setting_Strike_Drag_Label", resourceCulture);
@@ -484,7 +476,41 @@ namespace RaidClears.Localization
 
 		internal static string Strike_Confirm_Message => ResourceManager.GetString("Strike_Confirm_Message", resourceCulture);
 
+		internal static string Strike_Short_AetherbladeHideout => ResourceManager.GetString("Strike_Short_AetherbladeHideout", resourceCulture);
+
+		internal static string Strike_Short_Boneskinner => ResourceManager.GetString("Strike_Short_Boneskinner", resourceCulture);
+
+		internal static string Strike_Short_ColdWar => ResourceManager.GetString("Strike_Short_ColdWar", resourceCulture);
+
+		internal static string Strike_Short_Fraenir => ResourceManager.GetString("Strike_Short_Fraenir", resourceCulture);
+
+		internal static string Strike_Short_HarvestTemple => ResourceManager.GetString("Strike_Short_HarvestTemple", resourceCulture);
+
+		internal static string Strike_Short_Junkyard => ResourceManager.GetString("Strike_Short_Junkyard", resourceCulture);
+
+		internal static string Strike_Short_OldLionsCourt => ResourceManager.GetString("Strike_Short_OldLionsCourt", resourceCulture);
+
+		internal static string Strike_Short_Overlook => ResourceManager.GetString("Strike_Short_Overlook", resourceCulture);
+
+		internal static string Strike_Short_Shiverpeak => ResourceManager.GetString("Strike_Short_Shiverpeak", resourceCulture);
+
+		internal static string Strike_Short_VoiceAndClaw => ResourceManager.GetString("Strike_Short_VoiceAndClaw", resourceCulture);
+
+		internal static string Strike_Short_Whisper => ResourceManager.GetString("Strike_Short_Whisper", resourceCulture);
+
 		internal static string Strike_Tooltip_tomorrow => ResourceManager.GetString("Strike_Tooltip_tomorrow", resourceCulture);
+
+		internal static string StrikeGroup_EoD => ResourceManager.GetString("StrikeGroup_EoD", resourceCulture);
+
+		internal static string StrikeGroup_Eod_abbr => ResourceManager.GetString("StrikeGroup_Eod_abbr", resourceCulture);
+
+		internal static string StrikeGroup_Icebrood => ResourceManager.GetString("StrikeGroup_Icebrood", resourceCulture);
+
+		internal static string StrikeGroup_Icebrood_abbr => ResourceManager.GetString("StrikeGroup_Icebrood_abbr", resourceCulture);
+
+		internal static string StrikeGroup_Priority => ResourceManager.GetString("StrikeGroup_Priority", resourceCulture);
+
+		internal static string StrikeGroup_Priority_abbr => ResourceManager.GetString("StrikeGroup_Priority_abbr", resourceCulture);
 
 		internal static string VisibleHide => ResourceManager.GetString("VisibleHide", resourceCulture);
 

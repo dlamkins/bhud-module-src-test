@@ -6,6 +6,7 @@ using RaidClears.Features.Raids.Models;
 using RaidClears.Features.Shared.Controls;
 using RaidClears.Features.Shared.Enums;
 using RaidClears.Features.Shared.Models;
+using RaidClears.Localization;
 using RaidClears.Settings.Models;
 using RaidClears.Utils;
 
@@ -43,7 +44,7 @@ namespace RaidClears.Features.Strikes.Models
 					encounter.WatchColorSettings(settings.Style.Color.Cleared, settings.Style.Color.NotCleared);
 				}
 			}
-			strikes.Add(new PriorityStrikes("Priority Strike Missions (Daily)", 10, "PS", new List<BoxModel>(), (Container)(object)panel));
+			strikes.Add(new PriorityStrikes(Strings.StrikeGroup_Priority, 10, Strings.StrikeGroup_Priority_abbr, new List<BoxModel>(), (Container)(object)panel));
 			return strikes;
 		}
 
@@ -51,7 +52,7 @@ namespace RaidClears.Features.Strikes.Models
 		{
 			return new List<Strike>
 			{
-				new Strike("Icebrood Saga", 8, "IBS", new List<BoxModel>
+				new Strike(Strings.StrikeGroup_Icebrood, 8, Strings.StrikeGroup_Icebrood_abbr, new List<BoxModel>
 				{
 					new Encounter(Encounters.StrikeMission.ShiverpeaksPass),
 					new Encounter(Encounters.StrikeMission.Fraenir),
@@ -60,7 +61,7 @@ namespace RaidClears.Features.Strikes.Models
 					new Encounter(Encounters.StrikeMission.Boneskinner),
 					new Encounter(Encounters.StrikeMission.ColdWar)
 				}),
-				new Strike("End of Dragons", 9, "EoD", new List<BoxModel>
+				new Strike(Strings.StrikeGroup_EoD, 9, Strings.StrikeGroup_Eod_abbr, new List<BoxModel>
 				{
 					new Encounter(Encounters.StrikeMission.AetherbladeHideout),
 					new Encounter(Encounters.StrikeMission.Junkyard),

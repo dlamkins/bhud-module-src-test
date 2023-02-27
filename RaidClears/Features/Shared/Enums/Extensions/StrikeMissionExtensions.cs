@@ -28,17 +28,17 @@ namespace RaidClears.Features.Shared.Enums.Extensions
 		{
 			return value switch
 			{
-				Encounters.StrikeMission.ShiverpeaksPass => "SP", 
-				Encounters.StrikeMission.ColdWar => "CW", 
-				Encounters.StrikeMission.Fraenir => "FoJ", 
-				Encounters.StrikeMission.VoiceAndClaw => "V&C", 
-				Encounters.StrikeMission.Whisper => "WoJ", 
-				Encounters.StrikeMission.Boneskinner => "BS", 
-				Encounters.StrikeMission.AetherbladeHideout => "AH", 
-				Encounters.StrikeMission.Junkyard => "XJJ", 
-				Encounters.StrikeMission.Overlook => "KO", 
-				Encounters.StrikeMission.HarvestTemple => "HT", 
-				Encounters.StrikeMission.OldLionsCourt => "OLC", 
+				Encounters.StrikeMission.ShiverpeaksPass => Strings.Strike_Short_Shiverpeak, 
+				Encounters.StrikeMission.ColdWar => Strings.Strike_Short_ColdWar, 
+				Encounters.StrikeMission.Fraenir => Strings.Strike_Short_Fraenir, 
+				Encounters.StrikeMission.VoiceAndClaw => Strings.Strike_Short_VoiceAndClaw, 
+				Encounters.StrikeMission.Whisper => Strings.Strike_Short_Whisper, 
+				Encounters.StrikeMission.Boneskinner => Strings.Strike_Short_Boneskinner, 
+				Encounters.StrikeMission.AetherbladeHideout => Strings.Strike_Short_AetherbladeHideout, 
+				Encounters.StrikeMission.Junkyard => Strings.Strike_Short_Junkyard, 
+				Encounters.StrikeMission.Overlook => Strings.Strike_Short_Overlook, 
+				Encounters.StrikeMission.HarvestTemple => Strings.Strike_Short_HarvestTemple, 
+				Encounters.StrikeMission.OldLionsCourt => Strings.Strike_Short_OldLionsCourt, 
 				_ => throw new ArgumentOutOfRangeException("value", value, null), 
 			};
 		}

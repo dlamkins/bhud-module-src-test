@@ -55,13 +55,13 @@ namespace RaidClears.Features.Strikes.Services
 			DateTime utcNow = DateTime.UtcNow;
 			if (utcNow >= NextDailyReset)
 			{
-				this.DailyReset?.Invoke(this, NextDailyReset);
 				CalcNextDailyReset();
+				this.DailyReset?.Invoke(this, NextDailyReset);
 			}
 			if (utcNow >= NextWeeklyReset)
 			{
-				this.WeeklyReset?.Invoke(this, NextWeeklyReset);
 				CalcNextWeeklyReset();
+				this.WeeklyReset?.Invoke(this, NextWeeklyReset);
 			}
 		}
 
