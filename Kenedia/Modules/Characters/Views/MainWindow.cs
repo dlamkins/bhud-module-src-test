@@ -34,7 +34,7 @@ namespace Kenedia.Modules.Characters.Views
 {
 	public class MainWindow : StandardWindow
 	{
-		private readonly SettingsModel _settings;
+		private readonly Settings _settings;
 
 		private readonly TextureManager _textureManager;
 
@@ -44,6 +44,8 @@ namespace Kenedia.Modules.Characters.Views
 
 		private readonly SearchFilterCollection _tagFilters;
 
+		private readonly Action _toggleOCR;
+
 		private readonly Func<Character_Model> _currentCharacter;
 
 		private readonly Data _data;
@@ -52,6 +54,8 @@ namespace Kenedia.Modules.Characters.Views
 
 		private readonly ImageButton _toggleSideMenuButton;
 
+		private readonly CollapseContainer _collapseWrapper;
+
 		private readonly ImageButton _displaySettingsButton;
 
 		private readonly ImageButton _randomButton;
@@ -59,6 +63,8 @@ namespace Kenedia.Modules.Characters.Views
 		private readonly ImageButton _lastButton;
 
 		private readonly ImageButton _clearButton;
+
+		private NotificationPanel _notifications;
 
 		private readonly FlowPanel _dropdownPanel;
 
@@ -77,6 +83,10 @@ namespace Kenedia.Modules.Characters.Views
 		private Rectangle _titleRectangle;
 
 		private BitmapFont _titleFont;
+
+		private APITimeoutNotification _apiTimeoutNotification;
+
+		private APIPermissionNotification _apiPermissionNotification;
 
 		private List<Character_Model> LoadedModels { get; } = new List<Character_Model>();
 
@@ -97,62 +107,74 @@ namespace Kenedia.Modules.Characters.Views
 
 		public FlowPanel ContentPanel { get; private set; }
 
-		public MainWindow(Texture2D background, Rectangle windowRegion, Rectangle contentRegion, SettingsModel settings, TextureManager textureManager, ObservableCollection<Character_Model> characterModels, SearchFilterCollection searchFilters, SearchFilterCollection tagFilters, Action toggleOCR, Action togglePotrait, Action refreshAPI, Func<string> accountImagePath, TagList tags, Func<Character_Model> currentCharacter, Data data, CharacterSorting characterSorting)
+		public MainWindow(Texture2D background, Rectangle windowRegion, Rectangle contentRegion, Settings settings, TextureManager textureManager, ObservableCollection<Character_Model> characterModels, SearchFilterCollection searchFilters, SearchFilterCollection tagFilters, Action toggleOCR, Action togglePotrait, Action refreshAPI, Func<string> accountImagePath, TagList tags, Func<Character_Model> currentCharacter, Data data, CharacterSorting characterSorting)
 			: base(AsyncTexture2D.op_Implicit(background), windowRegion, contentRegion)
 		{
 			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0263: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_032a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0335: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0345: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_049a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0507: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0512: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0522: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0374: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0470: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0531: Unknown result type (might be due to invalid IL or missing references)
+			//IL_059e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0618: Unknown result type (might be due to invalid IL or missing references)
+			//IL_062d: Unknown result type (might be due to invalid IL or missing references)
 			_settings = settings;
 			_textureManager = textureManager;
 			_characterModels = characterModels;
 			_searchFilters = searchFilters;
 			_tagFilters = tagFilters;
+			_toggleOCR = toggleOCR;
 			_currentCharacter = currentCharacter;
 			_data = data;
 			FlowPanel flowPanel = new FlowPanel();
 			((Control)flowPanel).set_Parent((Container)(object)this);
-			((Control)flowPanel).set_Location(new Point(0, 35));
+			((Control)flowPanel).set_Location(new Point(0, 0));
 			((Container)flowPanel).set_WidthSizingMode((SizingMode)2);
 			((Container)flowPanel).set_HeightSizingMode((SizingMode)2);
 			((Container)flowPanel).set_AutoSizePadding(new Point(5, 5));
+			((FlowPanel)flowPanel).set_ControlPadding(new Vector2(0f, 5f));
 			ContentPanel = flowPanel;
-			Dummy dummy = new Dummy();
-			((Control)dummy).set_Parent((Container)(object)ContentPanel);
-			((Control)dummy).set_Width(((Control)ContentPanel).get_Width());
-			((Control)dummy).set_Height(3);
+			((Control)DraggingControl).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)DraggingControl_LeftMouseButtonReleased);
+			CollapseContainer collapseContainer = new CollapseContainer();
+			((Control)collapseContainer).set_Parent((Container)(object)ContentPanel);
+			((Container)collapseContainer).set_WidthSizingMode((SizingMode)2);
+			collapseContainer.SetLocalizedTitle = () => strings.Notifications;
+			collapseContainer.TitleIcon = AsyncTexture2D.FromAssetId(222246);
+			collapseContainer.TitleBarHeight = 24;
+			((Control)collapseContainer).set_Height(24);
+			collapseContainer.ContentPadding = new RectangleDimensions(5);
+			collapseContainer.MaxSize = new Point(-1, 350);
+			collapseContainer.Collapsed = true;
+			((Control)collapseContainer).set_Visible(false);
+			_collapseWrapper = collapseContainer;
+			((Control)_collapseWrapper).add_Hidden((EventHandler<EventArgs>)CollapseWrapper_Hidden);
+			NotificationPanel notificationPanel = new NotificationPanel(_characterModels);
+			((Control)notificationPanel).set_Parent((Container)(object)_collapseWrapper);
+			((Container)notificationPanel).set_WidthSizingMode((SizingMode)2);
+			notificationPanel.MaxSize = new Point(-1, 310);
+			_notifications = notificationPanel;
+			_collapseWrapper.SizeDeterminingChild = (Control)(object)_notifications;
 			FlowPanel flowPanel2 = new FlowPanel();
 			((Control)flowPanel2).set_Parent((Container)(object)ContentPanel);
-			((Control)flowPanel2).set_Size(((Control)this).get_Size());
-			((FlowPanel)flowPanel2).set_ControlPadding(new Vector2(2f, 4f));
+			((Control)flowPanel2).set_Location(new Point(0, 2));
+			((FlowPanel)flowPanel2).set_FlowDirection((ControlFlowDirection)2);
 			((Container)flowPanel2).set_WidthSizingMode((SizingMode)2);
-			((Container)flowPanel2).set_HeightSizingMode((SizingMode)2);
-			((Panel)flowPanel2).set_CanScroll(true);
-			CharactersPanel = flowPanel2;
-			((Control)DraggingControl).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)DraggingControl_LeftMouseButtonReleased);
-			FlowPanel flowPanel3 = new FlowPanel();
-			((Control)flowPanel3).set_Parent((Container)(object)this);
-			((Control)flowPanel3).set_Location(new Point(0, 2));
-			((FlowPanel)flowPanel3).set_FlowDirection((ControlFlowDirection)2);
-			((Container)flowPanel3).set_WidthSizingMode((SizingMode)2);
-			((Container)flowPanel3).set_HeightSizingMode((SizingMode)1);
-			((FlowPanel)flowPanel3).set_ControlPadding(new Vector2(5f, 0f));
-			_dropdownPanel = flowPanel3;
+			((Container)flowPanel2).set_HeightSizingMode((SizingMode)1);
+			((FlowPanel)flowPanel2).set_ControlPadding(new Vector2(5f, 0f));
+			_dropdownPanel = flowPanel2;
 			FilterBox filterBox = new FilterBox();
 			((Control)filterBox).set_Parent((Container)(object)_dropdownPanel);
 			((TextInputBase)filterBox).set_PlaceholderText(strings.Search);
@@ -182,13 +204,13 @@ namespace Kenedia.Modules.Characters.Views
 				SideMenu.ResetToggles();
 			};
 			_clearButton = imageButton;
-			FlowPanel flowPanel4 = new FlowPanel();
-			((Control)flowPanel4).set_Parent((Container)(object)_dropdownPanel);
-			((FlowPanel)flowPanel4).set_FlowDirection((ControlFlowDirection)2);
-			((Container)flowPanel4).set_WidthSizingMode((SizingMode)1);
-			((Container)flowPanel4).set_HeightSizingMode((SizingMode)1);
-			((Control)flowPanel4).set_Padding(new Thickness(15f));
-			_buttonPanel = flowPanel4;
+			FlowPanel flowPanel3 = new FlowPanel();
+			((Control)flowPanel3).set_Parent((Container)(object)_dropdownPanel);
+			((FlowPanel)flowPanel3).set_FlowDirection((ControlFlowDirection)2);
+			((Container)flowPanel3).set_WidthSizingMode((SizingMode)1);
+			((Container)flowPanel3).set_HeightSizingMode((SizingMode)1);
+			((Control)flowPanel3).set_Padding(new Thickness(15f));
+			_buttonPanel = flowPanel3;
 			((Control)_buttonPanel).add_Resized((EventHandler<ResizedEventArgs>)ButtonPanel_Resized);
 			ImageButton imageButton2 = new ImageButton();
 			((Control)imageButton2).set_Parent((Container)(object)_buttonPanel);
@@ -245,6 +267,14 @@ namespace Kenedia.Modules.Characters.Views
 				ShowAttached(((Control)SideMenu).get_Visible() ? null : SideMenu);
 			};
 			_toggleSideMenuButton = imageButton5;
+			FlowPanel flowPanel4 = new FlowPanel();
+			((Control)flowPanel4).set_Parent((Container)(object)ContentPanel);
+			((Control)flowPanel4).set_Size(((Control)this).get_Size());
+			((FlowPanel)flowPanel4).set_ControlPadding(new Vector2(2f, 4f));
+			((Container)flowPanel4).set_WidthSizingMode((SizingMode)2);
+			((Container)flowPanel4).set_HeightSizingMode((SizingMode)2);
+			((Panel)flowPanel4).set_CanScroll(true);
+			CharactersPanel = flowPanel4;
 			CharacterEdit characterEdit = new CharacterEdit(textureManager, togglePotrait, accountImagePath, tags, settings, PerformFiltering);
 			((Control)characterEdit).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			characterEdit.Anchor = (Control)(object)this;
@@ -263,11 +293,18 @@ namespace Kenedia.Modules.Characters.Views
 			SideMenu = sideMenu;
 			AttachContainer(CharacterEdit);
 			AttachContainer(SideMenu);
+			UpdateMissingNotification();
+			CheckOCRRegion();
 			_created = true;
 			_settings.PinSideMenus.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)PinSideMenus_SettingChanged);
 			_settings.ShowRandomButton.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowRandomButton_SettingChanged);
 			_settings.ShowLastButton.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowLastButton_SettingChanged);
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)CurrentMap_MapChanged);
+		}
+
+		private void CollapseWrapper_Hidden(object sender, EventArgs e)
+		{
+			((Control)ContentPanel).Invalidate();
 		}
 
 		private void FilterDelay_SettingChanged(object sender, ValueChangedEventArgs<int> e)
@@ -317,7 +354,7 @@ namespace Kenedia.Modules.Characters.Views
 			Rectangle localBounds = ((Control)_filterBox).get_LocalBounds();
 			int num = ((Rectangle)(ref localBounds)).get_Right() - 25;
 			localBounds = ((Control)_filterBox).get_LocalBounds();
-			((Control)clearButton).set_Location(new Point(num, ((Rectangle)(ref localBounds)).get_Top() + 5));
+			((Control)clearButton).set_Location(new Point(num, ((Rectangle)(ref localBounds)).get_Top() + 8));
 		}
 
 		public void FilterCharacters(object sender = null, EventArgs e = null)
@@ -331,7 +368,7 @@ namespace Kenedia.Modules.Characters.Views
 			List<Match> strings = regex.Matches(((TextInputBase)_filterBox).get_Text().Trim().ToLower()).Cast<Match>().ToList();
 			new List<string>();
 			List<KeyValuePair<string, SearchFilter<Character_Model>>> stringFilters = new List<KeyValuePair<string, SearchFilter<Character_Model>>>();
-			_003C_003Ec__DisplayClass60_0 CS_0024_003C_003E8__locals0;
+			_003C_003Ec__DisplayClass66_0 CS_0024_003C_003E8__locals0;
 			foreach (Match match in strings)
 			{
 				string string_text = SearchableString(match.ToString().Replace("\"", ""));
@@ -365,7 +402,7 @@ namespace Kenedia.Modules.Characters.Views
 					{
 						//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 						//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-						_003C_003Ec__DisplayClass60_0 _003C_003Ec__DisplayClass60_ = CS_0024_003C_003E8__locals0;
+						_003C_003Ec__DisplayClass66_0 _003C_003Ec__DisplayClass66_ = CS_0024_003C_003E8__locals0;
 						Gender gender = c.Gender;
 						return SearchableString(((object)(Gender)(ref gender)).ToString()).Contains(string_text);
 					}, enabled: true)));
@@ -400,9 +437,9 @@ namespace Kenedia.Modules.Characters.Views
 					return false;
 				}, enabled: true)));
 			}
-			bool matchAny = _settings.ResultMatchingBehavior.get_Value() == SettingsModel.MatchingBehavior.MatchAny;
-			bool matchAll = _settings.ResultMatchingBehavior.get_Value() == SettingsModel.MatchingBehavior.MatchAll;
-			bool include = _settings.ResultFilterBehavior.get_Value() == SettingsModel.FilterBehavior.Include;
+			bool matchAny = _settings.ResultMatchingBehavior.get_Value() == Settings.MatchingBehavior.MatchAny;
+			bool matchAll = _settings.ResultMatchingBehavior.get_Value() == Settings.MatchingBehavior.MatchAll;
+			bool include = _settings.ResultFilterBehavior.get_Value() == Settings.FilterBehavior.Include;
 			List<KeyValuePair<string, SearchFilter<Character_Model>>> toggleFilters = _searchFilters.Where((KeyValuePair<string, SearchFilter<Character_Model>> e) => e.Value.IsEnabled).ToList();
 			List<KeyValuePair<string, SearchFilter<Character_Model>>> tagFilters = _tagFilters.Where((KeyValuePair<string, SearchFilter<Character_Model>> e) => e.Value.IsEnabled).ToList();
 			foreach (var (ctrl2, toggleResult, stringsResult, tagsResult) in from CharacterCard ctrl in (IEnumerable)((Container)CharactersPanel).get_Children()
@@ -505,10 +542,10 @@ namespace Kenedia.Modules.Characters.Views
 
 		public void SortCharacters()
 		{
-			SettingsModel.SortBy sortby = _settings.SortType.get_Value();
-			bool asc = _settings.SortOrder.get_Value() == SettingsModel.SortDirection.Ascending;
-			bool isNum = sortby == SettingsModel.SortBy.Level || sortby == SettingsModel.SortBy.TimeSinceLogin || sortby == SettingsModel.SortBy.Map;
-			if (_settings.SortType.get_Value() != SettingsModel.SortBy.Custom)
+			Settings.SortBy sortby = _settings.SortType.get_Value();
+			bool asc = _settings.SortOrder.get_Value() == Settings.SortDirection.Ascending;
+			bool isNum = sortby == Settings.SortBy.Level || sortby == Settings.SortBy.TimeSinceLogin || sortby == Settings.SortBy.Map;
+			if (_settings.SortType.get_Value() != Settings.SortBy.Custom)
 			{
 				((FlowPanel)CharactersPanel).SortChildren<CharacterCard>((Comparison<CharacterCard>)delegate(CharacterCard a, CharacterCard b)
 				{
@@ -570,11 +607,11 @@ namespace Kenedia.Modules.Characters.Views
 			base.RecalculateLayout();
 			_emblemRectangle = new Rectangle(-43, -58, 128, 128);
 			_titleFont = GameService.Content.get_DefaultFont32();
-			RectangleF titleBounds = _titleFont.GetStringRectangle(BaseModule<Characters, MainWindow, SettingsModel>.ModuleName);
+			RectangleF titleBounds = _titleFont.GetStringRectangle(BaseModule<Characters, MainWindow, Settings>.ModuleName);
 			if (titleBounds.Width > (float)(((Control)this).get_LocalBounds().Width - (_emblemRectangle.Width - 15)))
 			{
 				_titleFont = GameService.Content.get_DefaultFont18();
-				titleBounds = _titleFont.GetStringRectangle(BaseModule<Characters, MainWindow, SettingsModel>.ModuleName);
+				titleBounds = _titleFont.GetStringRectangle(BaseModule<Characters, MainWindow, Settings>.ModuleName);
 			}
 			_titleRectangle = new Rectangle(65, 5, (int)titleBounds.Width, Math.Max(30, (int)titleBounds.Height));
 		}
@@ -594,7 +631,7 @@ namespace Kenedia.Modules.Characters.Views
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_windowEmblem), _emblemRectangle, (Rectangle?)_windowEmblem.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
 			if (_titleRectangle.Width < bounds.Width - (_emblemRectangle.Width - 20))
 			{
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, BaseModule<Characters, MainWindow, SettingsModel>.ModuleName ?? "", _titleFont, _titleRectangle, Colors.ColonialWhite, false, (HorizontalAlignment)0, (VerticalAlignment)2);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, BaseModule<Characters, MainWindow, Settings>.ModuleName ?? "", _titleFont, _titleRectangle, Colors.ColonialWhite, false, (HorizontalAlignment)0, (VerticalAlignment)2);
 			}
 		}
 
@@ -662,7 +699,7 @@ namespace Kenedia.Modules.Characters.Views
 					val = ((Control)_filterBox).get_LocalBounds();
 					int num = ((Rectangle)(ref val)).get_Right() - 23;
 					val = ((Control)_filterBox).get_LocalBounds();
-					((Control)clearButton).set_Location(new Point(num, ((Rectangle)(ref val)).get_Top() + 6));
+					((Control)clearButton).set_Location(new Point(num, ((Rectangle)(ref val)).get_Top() + 8));
 				}
 				if (e.get_CurrentSize().Y < 135)
 				{
@@ -682,6 +719,12 @@ namespace Kenedia.Modules.Characters.Views
 			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)CurrentMap_MapChanged);
 			((Control)DraggingControl).remove_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)DraggingControl_LeftMouseButtonReleased);
 			((Control)_buttonPanel).remove_Resized((EventHandler<ResizedEventArgs>)ButtonPanel_Resized);
+			((Control)_collapseWrapper).remove_Hidden((EventHandler<EventArgs>)CollapseWrapper_Hidden);
+			CollapseContainer collapseWrapper = _collapseWrapper;
+			if (collapseWrapper != null)
+			{
+				((Control)collapseWrapper).Dispose();
+			}
 			FlowPanel contentPanel = ContentPanel;
 			if (contentPanel != null)
 			{
@@ -783,6 +826,93 @@ namespace Kenedia.Modules.Characters.Views
 				}
 			}
 			SortCharacters();
+		}
+
+		public void SendAPITimeoutNotification()
+		{
+			if (_apiTimeoutNotification == null)
+			{
+				APITimeoutNotification aPITimeoutNotification = new APITimeoutNotification();
+				((Control)aPITimeoutNotification).set_Parent((Container)(object)_notifications);
+				((Control)aPITimeoutNotification).set_Height(25);
+				_apiTimeoutNotification = aPITimeoutNotification;
+			}
+			if (_settings.ShowNotifications.get_Value() && ((Container)_notifications).get_Children().get_Count() > 0 && ((IEnumerable<Control>)((Container)_notifications).get_Children()).Any((Control e) => e.get_Visible()))
+			{
+				((Control)_collapseWrapper).Show();
+				((Control)ContentPanel).Invalidate();
+			}
+		}
+
+		public void SendAPIPermissionNotification()
+		{
+			if (_apiPermissionNotification == null)
+			{
+				APIPermissionNotification aPIPermissionNotification = new APIPermissionNotification();
+				((Control)aPIPermissionNotification).set_Parent((Container)(object)_notifications);
+				((Control)aPIPermissionNotification).set_Height(25);
+				_apiPermissionNotification = aPIPermissionNotification;
+			}
+			if (_settings.ShowNotifications.get_Value() && ((Container)_notifications).get_Children().get_Count() > 0 && ((IEnumerable<Control>)((Container)_notifications).get_Children()).Any((Control e) => e.get_Visible()))
+			{
+				((Control)_collapseWrapper).Show();
+				((Control)ContentPanel).Invalidate();
+			}
+		}
+
+		public void CheckOCRRegion()
+		{
+			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			Rectangle defaultRect = default(Rectangle);
+			((Rectangle)(ref defaultRect))._002Ector(50, (GameService.Graphics.get_Resolution().Y - 350) / 2, 530, 50);
+			if (_settings.UseOCR.get_Value())
+			{
+				Rectangle activeOCRRegion = _settings.ActiveOCRRegion;
+				if (((Rectangle)(ref activeOCRRegion)).Equals(defaultRect))
+				{
+					OCRSetupNotification obj = new OCRSetupNotification
+					{
+						Resolution = _settings.OCRKey
+					};
+					((Control)obj).set_Parent((Container)(object)_notifications);
+					((Control)obj).set_Height(25);
+					obj.ClickAction = delegate
+					{
+						_toggleOCR?.Invoke();
+						SettingsWindow settingsWindow = SettingsWindow;
+						if (settingsWindow != null)
+						{
+							((Control)settingsWindow).Show();
+						}
+					};
+				}
+			}
+			if (_settings.ShowNotifications.get_Value() && ((Container)_notifications).get_Children().get_Count() > 0 && ((IEnumerable<Control>)((Container)_notifications).get_Children()).Any((Control e) => e.get_Visible()))
+			{
+				((Control)_collapseWrapper).Show();
+				((Control)ContentPanel).Invalidate();
+			}
+			if (_collapseWrapper.Collapsed)
+			{
+				((Control)_collapseWrapper).set_Height(_collapseWrapper.TitleBarHeight);
+			}
+		}
+
+		public void UpdateMissingNotification()
+		{
+			_notifications.UpdateCharacters();
+			if (_settings.ShowNotifications.get_Value() && ((Container)_notifications).get_Children().get_Count() > 0 && ((IEnumerable<Control>)((Container)_notifications).get_Children()).Any((Control e) => e.get_Visible()))
+			{
+				((Control)_collapseWrapper).Show();
+				((Control)ContentPanel).Invalidate();
+			}
+			if (_collapseWrapper.Collapsed)
+			{
+				((Control)_collapseWrapper).set_Height(_collapseWrapper.TitleBarHeight);
+			}
 		}
 	}
 }

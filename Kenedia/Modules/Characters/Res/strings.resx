@@ -28,11 +28,13 @@
     </xsd:element>
   </xsd:schema>
 <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="OpenItem"><value>Open {0}</value></data>
+  <data name="APITimeoutNotification"><value>We have troubles reaching the API. Thus we can not retrieve the characters list and make this module working.</value></data>
   <data name="Radial_Scale_Tooltip"><value>Percentage of the screen size the radial menu will be sized to</value></data>
   <data name="ShowStatusWindow_Tooltip"><value>Displays a popup while any automated action is performed</value></data>
   <data name="CharacterDisplayOption"><value>Character Display Option</value></data>
   <data name="PinSideMenus_Tooltip"><value>Prevent the side menus from fading out</value></data>
   <data name="ShowCornerIcon_Tooltip"><value>Show/Hide Corner Icon</value></data>
+  <data name="DeletedCharacterNotification_DismissTooltip"><value>Ignore missing data for '{0}' during this session.</value></data>
   <data name="DragOverCharacter_Instructions"><value>Drag this control so the yellow frames contain your character portraits</value></data>
   <data name="Armorsmith"><value>Armorsmith</value></data>
   <data name="WindowedMode_Tooltip"><value>Is the game set to Window Mode?</value></data>
@@ -80,6 +82,7 @@
   <data name="Offset"><value>Offset</value></data>
   <data name="TogglePortraitCapture_Tooltip"><value>Toggle the Potrait Capture control</value></data>
   <data name="Logout"><value>Logout</value></data>
+  <data name="DeletedCharacterNotification"><value>{0} created {1} is missing in the latest api data. Delete it?</value></data>
   <data name="DeleteItem"><value>Delete {0}</value></data>
   <data name="OnlyMaxCrafting_Tooltip"><value>Show only crafts that are at a 500 rank (Jeweler &amp; Scribe at 400).</value></data>
   <data name="CoreProfession"><value>Core {0}</value></data>
@@ -107,6 +110,7 @@
   <data name="Tailor"><value>Tailor</value></data>
   <data name="Toggle"><value>Toggle {0}</value></data>
   <data name="ExcludeMatches"><value>Exclude matches</value></data>
+  <data name="CancelOnlyOnESC_Tooltip"><value>Cancel character swapping and sorting only if the ESC key is pressed</value></data>
   <data name="Switch"><value>Switch to {0}</value></data>
   <data name="OCRAndImageRecognition"><value>OCR and Image Recoginition</value></data>
   <data name="CustomOrderDisclaimer"><value>To move a character to set a custom order you have to CTRL + Drag and Drop them on their new position</value></data>
@@ -116,6 +120,7 @@
   <data name="CapturedXPotraits"><value>Captured {0} portraits!</value></data>
   <data name="CardWith"><value>Card Width {0} px</value></data>
   <data name="SwapDelay"><value>Loading Delay ({0} ms)</value></data>
+  <data name="ShowNotifications"><value>Show Notifications</value></data>
   <data name="IncludeMatches"><value>Include matches</value></data>
   <data name="Radial_ShowAdvancedTooltip_Tooltip"><value>Show an advanced character tooltip to provide additional information.</value></data>
   <data name="OCRAndImageRecognition_Tooltip"><value>Optical Character Recoginition (OCR) and Image Recoginition</value></data>
@@ -130,6 +135,8 @@
   <data name="CharacterSwap_Left"><value>Check left ...</value></data>
   <data name="Radial_IdleBorderColor"><value>Border Color</value></data>
   <data name="DoubleClickToSwap"><value>Doubleclick to swap to {0}!</value></data>
+  <data name="CancelOnlyOnESC"><value>Cancel only on ESC</value></data>
+  <data name="AutomaticCharacterDelete"><value>Automatically delete Characters</value></data>
   <data name="FixCharacter_MoveNext"><value>Move to next character ...</value></data>
   <data name="RefreshAPI"><value>Refresh API</value></data>
   <data name="Show_Birthday_Tooltip"><value>Show Characters with Birthday Gifts</value></data>
@@ -138,6 +145,7 @@
   <data name="ShowOnRadial_Tooltip"><value>Show Character on the radial menu. Requires activating the "Use Radial Menu" setting.</value></data>
   <data name="FocusFilter"><value>Focus search field</value></data>
   <data name="ShowOnlyMaxCrafting"><value>Show Only Max Crafting</value></data>
+  <data name="OCRNotification"><value>OCR is not yet setup for {0}</value></data>
   <data name="FilterAsOne_Tooltip"><value>Use all text of the filterbox as one single filter term</value></data>
   <data name="Capture"><value>Capture</value></data>
   <data name="FilterDiacriticsInsensitive_Tooltip"><value>Ignore any type of diacritics this treats the following  letters as their 'parent letter'
@@ -167,6 +175,7 @@ Once fully loaded it will switch to the character which is set to be the "Login 
   <data name="Jeweler"><value>Jeweler</value></data>
   <data name="KeyDelay_Tooltip"><value>Adds a delay between key presses. This slows down the character swapping and should only be used if your PC is stressed that much so it isn't able to switch without a delay!</value></data>
   <data name="CheckDistance"><value>Check Distance {0}</value></data>
+  <data name="APIPermissionNotification"><value>The currently assigned API key to this character is missing permissions. Thus we can not retrieve the character list and update the characters.</value></data>
   <data name="NormalizedNames"><value>Use normalized character names</value></data>
   <data name="EditOCR"><value>Edit OCR Region</value></data>
   <data name="KeyDelay"><value>Key Delay {0} ms</value></data>
@@ -174,6 +183,7 @@ Once fully loaded it will switch to the character which is set to be the "Login 
   <data name="Keybinds"><value>Keybinds</value></data>
   <data name="OnlyEnterOnExact"><value>Only login on exact OCR match</value></data>
   <data name="Display"><value>Display</value></data>
+  <data name="Dismiss"><value>Dismiss</value></data>
   <data name="Radial_UseProfessionIconsColor_Tooltip"><value>Color the profession icons in the profession color</value></data>
   <data name="RunStateChange"><value>{0} {1} !</value></data>
   <data name="EnableRadialMenu_Tooltip"><value>Enable radial menu to swap quickly between a collection of characters</value></data>
@@ -216,6 +226,7 @@ Once fully loaded it will switch to the character which is set to be the "Login 
 To get the current value you will have to swap module tabs once to update the settings page!</value></data>
   <data name="CharactersFixed"><value>Characters fixed!</value></data>
   <data name="Appearance"><value>Appearance</value></data>
+  <data name="Notifications"><value>Notifications</value></data>
   <data name="Birthday"><value>Birthday</value></data>
   <data name="RadialMenuKey_Tooltip"><value>Key which will show the radial menu while beeing pressed</value></data>
   <data name="Settings"><value>Settings</value></data>
@@ -256,6 +267,11 @@ Uu : Üü Ûû Ùù</value></data>
   <data name="EmptyColumns"><value>Empty Columns</value></data>
   <data name="Descending"><value>Descending</value></data>
   <data name="Characters"><value>Characters</value></data>
+  <data name="ShowNotifications_Tooltip"><value>Show Notifications on the top of the main window. 
+Notifications in case of:
+- missing api permissions
+- missing/deleted characters in the api data
+- missing ocr configuration</value></data>
   <data name="OnlyIcons"><value>Only Icons</value></data>
   <data name="EmptyColumn"><value>Empty Column</value></data>
   <data name="FixCharacter_Start"><value>Fixing characters ...</value></data>
@@ -277,6 +293,7 @@ Uu : Üü Ûû Ùù</value></data>
   <data name="Radial_Scale"><value>Radial Size Scale</value></data>
   <data name="LevelAmount"><value>Level {0}</value></data>
   <data name="ShowLastButton"><value>Show Last Button</value></data>
+  <data name="DeletedCharacterNotification_DeleteTooltip"><value>Delete '{0}' permanently.</value></data>
   <data name="IgnoredPart"><value>Ignored Part</value></data>
   <data name="CapturePotraits"><value>Capture Potraits</value></data>
   <data name="TopOffset"><value>Top Offset</value></data>
@@ -309,6 +326,7 @@ Uu : Üü Ûû Ùù</value></data>
   <data name="CustomTags"><value>Custom Tags</value></data>
   <data name="OCR_Instructions"><value>Move and Size the yellow frame to contain only the character name row in the character selection!</value></data>
   <data name="Birthday_Text"><value>It was {0}'s birthday! They are now {1} years old!</value></data>
+  <data name="AutomaticCharacterDelete_Tooltip"><value>Automatically delete characters missing in the api data</value></data>
   <data name="ModuleBehavior_Tooltip"><value>Settings all around the behavior of the module.
 How should the filter treat diacritics?
 Log in automatically?

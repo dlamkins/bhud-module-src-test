@@ -32,7 +32,7 @@ namespace Kenedia.Modules.Characters
 
 		private readonly SharedSettings _sharedSettings;
 
-		private readonly SettingsModel _settings;
+		private readonly Settings _settings;
 
 		private readonly ObservableCollection<Character_Model> _characterModels;
 
@@ -64,7 +64,7 @@ namespace Kenedia.Modules.Characters
 			}
 		}
 
-		public OCR(ClientWindowService clientWindowService, SharedSettings sharedSettings, SettingsModel settings, string basePath, ObservableCollection<Character_Model> characterModels)
+		public OCR(ClientWindowService clientWindowService, SharedSettings sharedSettings, Settings settings, string basePath, ObservableCollection<Character_Model> characterModels)
 		{
 			_clientWindowService = clientWindowService;
 			_sharedSettings = sharedSettings;

@@ -72,6 +72,8 @@ namespace Kenedia.Modules.Characters.Models
 
 		private bool _isCurrentCharacter;
 
+		private bool _markedAsDeleted;
+
 		public bool IsCurrentCharacter
 		{
 			get
@@ -366,6 +368,19 @@ namespace Kenedia.Modules.Characters.Models
 		}
 
 		[DataMember]
+		public bool MarkedAsDeleted
+		{
+			get
+			{
+				return _markedAsDeleted;
+			}
+			set
+			{
+				SetProperty(ref _markedAsDeleted, value, "MarkedAsDeleted");
+			}
+		}
+
+		[DataMember]
 		public TagList Tags { get; private set; } = new TagList();
 
 
@@ -656,7 +671,7 @@ namespace Kenedia.Modules.Characters.Models
 			{
 				Save();
 				_characterSwapping?.Start(this, ignoreOCR);
-				BaseModule<Characters, MainWindow, SettingsModel>.Logger.Info(string.Format(strings.CharacterSwap_SwitchTo, Name));
+				BaseModule<Characters, MainWindow, Settings>.Logger.Info(string.Format(strings.CharacterSwap_SwitchTo, Name));
 			}
 			else
 			{

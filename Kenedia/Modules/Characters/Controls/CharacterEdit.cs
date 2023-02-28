@@ -6,6 +6,7 @@ using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.Input;
 using Kenedia.Modules.Characters.Models;
 using Kenedia.Modules.Characters.Res;
 using Kenedia.Modules.Characters.Services;
@@ -22,6 +23,8 @@ namespace Kenedia.Modules.Characters.Controls
 		private readonly AsyncTexture2D _presentTexture = AsyncTexture2D.FromAssetId(593864);
 
 		private readonly AsyncTexture2D _presentTextureOpen = AsyncTexture2D.FromAssetId(593865);
+
+		private readonly ImageButton _delete;
 
 		private readonly List<Tag> _tags = new List<Tag>();
 
@@ -57,7 +60,7 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private readonly TagList _allTags;
 
-		private readonly SettingsModel _settings;
+		private readonly Settings _settings;
 
 		private readonly Action _refreshCharacters;
 
@@ -80,7 +83,7 @@ namespace Kenedia.Modules.Characters.Controls
 			}
 		}
 
-		public CharacterEdit(TextureManager tM, Action togglePotrait, Func<string> accountPath, TagList allTags, SettingsModel settings, Action refreshCharacters)
+		public CharacterEdit(TextureManager tM, Action togglePotrait, Func<string> accountPath, TagList allTags, Settings settings, Action refreshCharacters)
 		{
 			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
@@ -96,25 +99,27 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_0299: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0307: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0316: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0445: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0480: Unknown result type (might be due to invalid IL or missing references)
-			//IL_048c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0526: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0538: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0615: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0690: Unknown result type (might be due to invalid IL or missing references)
-			//IL_069f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_070b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0728: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0738: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0742: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0761: Unknown result type (might be due to invalid IL or missing references)
-			//IL_079b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0393: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_044b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_045a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0505: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0511: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_065f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_069a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0715: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0724: Unknown result type (might be due to invalid IL or missing references)
+			//IL_077b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0790: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0820: Unknown result type (might be due to invalid IL or missing references)
+			//IL_083c: Unknown result type (might be due to invalid IL or missing references)
 			AccountImagePath = accountPath;
 			_allTags = allTags;
 			_settings = settings;
@@ -191,22 +196,32 @@ namespace Kenedia.Modules.Characters.Controls
 				_refreshCharacters?.Invoke();
 			};
 			_radial = checkbox2;
-			int x = (355 - (((Control)_radial).get_Right() + 5 + 2) - 48) / 2;
 			ImageButton imageButton3 = new ImageButton();
 			((Control)imageButton3).set_Parent((Container)(object)this);
-			((Control)imageButton3).set_Location(new Point(((Control)_radial).get_Right() + 5 + 2 + x, ((Control)_name).get_Bottom()));
-			((Control)imageButton3).set_Size(new Point(48, 48));
-			imageButton3.Texture = _presentTexture;
-			imageButton3.HoveredTexture = _presentTextureOpen;
-			imageButton3.ClickAction = delegate
+			((Control)imageButton3).set_Size(new Point(40, 40));
+			((Control)imageButton3).set_Location(new Point(315, 30));
+			imageButton3.Texture = AsyncTexture2D.op_Implicit(tM.GetControlTexture(TextureManager.ControlTextures.Delete_Button));
+			imageButton3.HoveredTexture = AsyncTexture2D.op_Implicit(tM.GetControlTexture(TextureManager.ControlTextures.Delete_Button_Hovered));
+			imageButton3.SetLocalizedTooltip = () => string.Format(strings.DeleteItem, (Character != null) ? Character.Name : "Character");
+			imageButton3.ClickAction = ConfirmDelete;
+			((Control)imageButton3).set_ZIndex(11);
+			_delete = imageButton3;
+			int x = (355 - (((Control)_radial).get_Right() + 5 + 2) - 48) / 2;
+			ImageButton imageButton4 = new ImageButton();
+			((Control)imageButton4).set_Parent((Container)(object)this);
+			((Control)imageButton4).set_Location(new Point(((Control)_radial).get_Right() + 5 + 2 + x, ((Control)_name).get_Bottom()));
+			((Control)imageButton4).set_Size(new Point(48, 48));
+			imageButton4.Texture = _presentTexture;
+			imageButton4.HoveredTexture = _presentTextureOpen;
+			imageButton4.ClickAction = delegate
 			{
 				Character.HadBirthday = false;
 				_refreshCharacters?.Invoke();
 				((Control)_birthdayButton).Hide();
 			};
-			imageButton3.SetLocalizedTooltip = () => (Character == null) ? string.Empty : (string.Format(strings.Birthday_Text, Character.Name, Character.Age) + "\n" + strings.ClickBirthdayToMarkAsOpen);
-			((Control)imageButton3).set_Visible(false);
-			_birthdayButton = imageButton3;
+			imageButton4.SetLocalizedTooltip = () => (Character == null) ? string.Empty : (string.Format(strings.Birthday_Text, Character.Name, Character.Age) + "\n" + strings.ClickBirthdayToMarkAsOpen);
+			((Control)imageButton4).set_Visible(false);
+			_birthdayButton = imageButton4;
 			Panel panel = new Panel();
 			((Control)panel).set_Parent((Container)(object)this);
 			((Control)panel).set_Location(new Point(0, ((Control)_image).get_Bottom() + 5 + 2));
@@ -266,14 +281,14 @@ namespace Kenedia.Modules.Characters.Controls
 				}
 			};
 			_tagBox = textBox;
-			ImageButton imageButton4 = new ImageButton();
-			((Control)imageButton4).set_Parent((Container)(object)_tagContainer);
-			imageButton4.Texture = AsyncTexture2D.op_Implicit(tM.GetControlTexture(TextureManager.ControlTextures.Plus_Button));
-			imageButton4.HoveredTexture = AsyncTexture2D.op_Implicit(tM.GetControlTexture(TextureManager.ControlTextures.Plus_Button_Hovered));
-			((Control)imageButton4).set_Location(new Point(((Control)_tagBox).get_Right() + 2, ((Control)_tagBox).get_Top()));
-			((Control)imageButton4).set_Size(new Point(24, 24));
-			((Control)imageButton4).set_BasicTooltipText(string.Format(strings.AddItem, strings.Tag));
-			imageButton4.ClickAction = delegate
+			ImageButton imageButton5 = new ImageButton();
+			((Control)imageButton5).set_Parent((Container)(object)_tagContainer);
+			imageButton5.Texture = AsyncTexture2D.op_Implicit(tM.GetControlTexture(TextureManager.ControlTextures.Plus_Button));
+			imageButton5.HoveredTexture = AsyncTexture2D.op_Implicit(tM.GetControlTexture(TextureManager.ControlTextures.Plus_Button_Hovered));
+			((Control)imageButton5).set_Location(new Point(((Control)_tagBox).get_Right() + 2, ((Control)_tagBox).get_Top()));
+			((Control)imageButton5).set_Size(new Point(24, 24));
+			((Control)imageButton5).set_BasicTooltipText(string.Format(strings.AddItem, strings.Tag));
+			imageButton5.ClickAction = delegate
 			{
 				if (((TextInputBase)_tagBox).get_Text() != null && ((TextInputBase)_tagBox).get_Text().Length > 0 && !_allTags.Contains(((TextInputBase)_tagBox).get_Text()))
 				{
@@ -284,7 +299,7 @@ namespace Kenedia.Modules.Characters.Controls
 					((TextInputBase)_tagBox).set_Text((string)null);
 				}
 			};
-			_addTag = imageButton4;
+			_addTag = imageButton5;
 			TagFlowPanel tagFlowPanel = new TagFlowPanel();
 			((Control)tagFlowPanel).set_Parent((Container)(object)_tagContainer);
 			((Control)tagFlowPanel).set_Location(new Point(5, ((Control)_tagBox).get_Bottom() + 5));
@@ -374,6 +389,10 @@ namespace Kenedia.Modules.Characters.Controls
 				//IL_026a: Unknown result type (might be due to invalid IL or missing references)
 				//IL_027b: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0285: Unknown result type (might be due to invalid IL or missing references)
+				//IL_02c1: Unknown result type (might be due to invalid IL or missing references)
+				//IL_02dc: Unknown result type (might be due to invalid IL or missing references)
+				//IL_02fe: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0319: Unknown result type (might be due to invalid IL or missing references)
 				AsyncTexture2D val = null;
 				if (Character == null)
 				{
@@ -417,6 +436,7 @@ namespace Kenedia.Modules.Characters.Controls
 					}
 					AdjustImagePanelHeight(images);
 					((Control)_closeButton).set_Location((((Control)_imagePanelParent).get_Right() > 355) ? new Point(((Control)_imagePanelParent).get_Right() - ((Control)_closeButton).get_Size().X, ((Container)this).get_AutoSizePadding().Y) : new Point(355 - ((Control)_closeButton).get_Size().X, ((Container)this).get_AutoSizePadding().Y));
+					((Control)_delete).set_Location((((Control)_imagePanelParent).get_Right() > 355) ? new Point(((Control)_imagePanelParent).get_Right() - ((Control)_delete).get_Size().X, ((Control)_delete).get_Top()) : new Point(355 - ((Control)_delete).get_Size().X, ((Control)_delete).get_Top()));
 				}
 			});
 		}
@@ -463,9 +483,11 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public void ShowImages(bool toggle = true, bool loadImages = true)
 		{
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
 			if (loadImages && toggle)
 			{
 				LoadImages(null, null);
@@ -473,6 +495,7 @@ namespace Kenedia.Modules.Characters.Controls
 			if (!toggle)
 			{
 				((Control)_closeButton).set_Location(new Point(355 - ((Control)_closeButton).get_Size().X, ((Container)this).get_AutoSizePadding().Y));
+				((Control)_delete).set_Location(new Point(355 - ((Control)_delete).get_Size().X, ((Control)_delete).get_Top()));
 				((Control)_tagContainer).Show();
 				((Control)_buttonContainer).Hide();
 				((Control)_imagePanelParent).Hide();
@@ -500,6 +523,7 @@ namespace Kenedia.Modules.Characters.Controls
 			((Checkbox)_radial).set_Checked(Character.ShowOnRadial);
 			((Control)_birthdayButton).set_BasicTooltipText(_birthdayButton.SetLocalizedTooltip?.Invoke());
 			((Control)_birthdayButton).set_Visible(Character.HadBirthday);
+			_delete.UserLocale_SettingChanged(null, null);
 			foreach (Tag t in _tags)
 			{
 				t.SetActive(_character.Tags.Contains(t.Text));
@@ -537,6 +561,15 @@ namespace Kenedia.Modules.Characters.Controls
 			else
 			{
 				_character.RemoveTag(tag.Text);
+			}
+		}
+
+		private async void ConfirmDelete(MouseEventArgs m)
+		{
+			if (await new BaseDialog("Delete Character", "Are you sure to delete " + Character?.Name + "?").ShowDialog() == DialogResult.OK)
+			{
+				Character?.Delete();
+				((Control)this).Hide();
 			}
 		}
 	}

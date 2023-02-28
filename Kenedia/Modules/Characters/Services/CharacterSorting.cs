@@ -18,7 +18,7 @@ namespace Kenedia.Modules.Characters.Services
 	{
 		private string _status;
 
-		private readonly SettingsModel _settings;
+		private readonly Settings _settings;
 
 		private readonly GameState _gameState;
 
@@ -86,7 +86,7 @@ namespace Kenedia.Modules.Characters.Services
 
 		public event EventHandler StatusChanged;
 
-		public CharacterSorting(SettingsModel settings, GameState gameState, ObservableCollection<Character_Model> characters)
+		public CharacterSorting(Settings settings, GameState gameState, ObservableCollection<Character_Model> characters)
 		{
 			_settings = settings;
 			_gameState = gameState;

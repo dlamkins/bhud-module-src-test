@@ -20,7 +20,7 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public Data Data { get; set; }
 
-		public SettingsModel Settings { get; set; }
+		public Settings Settings { get; set; }
 
 		public Character_Model Character { get; set; }
 
@@ -48,7 +48,7 @@ namespace Kenedia.Modules.Characters.Controls
 		{
 		}
 
-		public CraftingControl(Data data, SettingsModel settings)
+		public CraftingControl(Data data, Settings settings)
 			: this()
 		{
 			Data = data;

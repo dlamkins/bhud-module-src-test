@@ -101,7 +101,7 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private readonly MainWindow _mainWindow;
 
-		private readonly SettingsModel _settings;
+		private readonly Settings _settings;
 
 		private double _lastUniform;
 
@@ -317,7 +317,7 @@ namespace Kenedia.Modules.Characters.Controls
 			_updateCharacter = true;
 		}
 
-		public CharacterCard(Func<Character_Model> currentCharacter, TextureManager textureManager, Data data, MainWindow mainWindow, SettingsModel settings)
+		public CharacterCard(Func<Character_Model> currentCharacter, TextureManager textureManager, Data data, MainWindow mainWindow, Settings settings)
 			: this()
 		{
 			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
@@ -410,19 +410,19 @@ namespace Kenedia.Modules.Characters.Controls
 			if (_created && ((Control)this).get_Visible())
 			{
 				UpdateDataControlsVisibility();
-				((Control)_contentPanel).set_Visible(_settings.PanelLayout.get_Value() != SettingsModel.CharacterPanelLayout.OnlyIcons);
+				((Control)_contentPanel).set_Visible(_settings.PanelLayout.get_Value() != Settings.CharacterPanelLayout.OnlyIcons);
 				_tagPanel.FitWidestTag(_dataControls.Max((Control e) => (e.get_Visible() && e != _tagPanel) ? e.get_Width() : 0));
 				IEnumerable<Control> controls = _dataControls.Where((Control e) => e.get_Visible());
 				Control firstControl = ((controls.Count() <= 0) ? null : _dataControls.Where((Control e) => e.get_Visible() && e is IFontControl)?.FirstOrDefault());
 				bool anyVisible = ((Control)_contentPanel).get_Visible() && controls.Count() > 0;
 				int width = (anyVisible ? (controls.Max((Control e) => e.get_Width()) + (int)(((FlowPanel)_contentPanel).get_OuterControlPadding().X * 2f)) : 0);
 				int height = (anyVisible ? controls.Aggregate((int)(((FlowPanel)_contentPanel).get_OuterControlPadding().Y * 2f), (int result, Control e) => result + e.get_Height() + (int)((FlowPanel)_contentPanel).get_ControlPadding().Y) : 0);
-				SettingsModel.PanelSizes pSize = _settings.PanelSize.get_Value();
-				_iconSize = ((_settings.PanelLayout.get_Value() != SettingsModel.CharacterPanelLayout.OnlyText) ? (pSize switch
+				Settings.PanelSizes pSize = _settings.PanelSize.get_Value();
+				_iconSize = ((_settings.PanelLayout.get_Value() != Settings.CharacterPanelLayout.OnlyText) ? (pSize switch
 				{
-					SettingsModel.PanelSizes.Large => 112, 
-					SettingsModel.PanelSizes.Normal => 80, 
-					SettingsModel.PanelSizes.Small => 64, 
+					Settings.PanelSizes.Large => 112, 
+					Settings.PanelSizes.Normal => 80, 
+					Settings.PanelSizes.Small => 64, 
 					_ => _settings.CustomCharacterIconSize.get_Value(), 
 				}) : 0);
 				if (_settings.CharacterPanelFixedWidth.get_Value())
@@ -492,7 +492,7 @@ namespace Kenedia.Modules.Characters.Controls
 			{
 				return;
 			}
-			if (_settings.PanelLayout.get_Value() != SettingsModel.CharacterPanelLayout.OnlyText)
+			if (_settings.PanelLayout.get_Value() != Settings.CharacterPanelLayout.OnlyText)
 			{
 				if (!Character.HasDefaultIcon && Character.Icon != null)
 				{
@@ -619,7 +619,7 @@ namespace Kenedia.Modules.Characters.Controls
 			{
 				((Control)_textTooltip).set_Visible(false);
 				bool loginHovered = !IsDraggingTarget && ((Rectangle)(ref _loginRect)).Contains(((Control)this).get_RelativeMousePosition());
-				if (_settings.PanelLayout.get_Value() != SettingsModel.CharacterPanelLayout.OnlyText)
+				if (_settings.PanelLayout.get_Value() != Settings.CharacterPanelLayout.OnlyText)
 				{
 					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), _iconRectangle, (Rectangle?)Rectangle.get_Empty(), IsDraggingTarget ? Color.get_Transparent() : (Color.get_Black() * 0.5f), 0f, default(Vector2), (SpriteEffects)0);
 					if (!IsDraggingTarget)
@@ -659,7 +659,7 @@ namespace Kenedia.Modules.Characters.Controls
 			}
 			if (!((Control)this).get_MouseOver() && Character != null && Character.HasBirthdayPresent)
 			{
-				if (_settings.PanelLayout.get_Value() != SettingsModel.CharacterPanelLayout.OnlyText)
+				if (_settings.PanelLayout.get_Value() != Settings.CharacterPanelLayout.OnlyText)
 				{
 					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), _iconRectangle, (Rectangle?)Rectangle.get_Empty(), Color.get_Black() * 0.5f, 0f, default(Vector2), (SpriteEffects)0);
 					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_presentTexture), _loginRect, (Rectangle?)_presentTexture.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
@@ -770,7 +770,7 @@ namespace Kenedia.Modules.Characters.Controls
 				return;
 			}
 			KeyboardState state = Keyboard.GetState();
-			if (((KeyboardState)(ref state)).IsKeyDown((Keys)162) && _settings.SortType.get_Value() == SettingsModel.SortBy.Custom)
+			if (((KeyboardState)(ref state)).IsKeyDown((Keys)162) && _settings.SortType.get_Value() == Settings.SortBy.Custom)
 			{
 				_mainWindow.DraggingControl.StartDragging(this);
 				_dragging = true;
@@ -882,16 +882,16 @@ namespace Kenedia.Modules.Characters.Controls
 			FontSize fontSize = (FontSize)8;
 			switch (_settings.PanelSize.get_Value())
 			{
-			case SettingsModel.PanelSizes.Small:
+			case Settings.PanelSizes.Small:
 				fontSize = (FontSize)(nameFont ? 16 : 12);
 				break;
-			case SettingsModel.PanelSizes.Normal:
+			case Settings.PanelSizes.Normal:
 				fontSize = (FontSize)(nameFont ? 18 : 14);
 				break;
-			case SettingsModel.PanelSizes.Large:
+			case Settings.PanelSizes.Large:
 				fontSize = (FontSize)(nameFont ? 22 : 18);
 				break;
-			case SettingsModel.PanelSizes.Custom:
+			case Settings.PanelSizes.Custom:
 				fontSize = (FontSize)(nameFont ? _settings.CustomCharacterNameFontSize.get_Value() : _settings.CustomCharacterFontSize.get_Value());
 				break;
 			}

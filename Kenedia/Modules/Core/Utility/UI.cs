@@ -1,3 +1,4 @@
+using System;
 using Blish_HUD.Controls;
 using Kenedia.Modules.Core.Controls;
 using Microsoft.Xna.Framework;
@@ -8,7 +9,7 @@ namespace Kenedia.Modules.Core.Utility
 	{
 		public static (Label, CtrlT) CreateLabeledControl<CtrlT>(Container parent, string text, int labelWidth = 175, int controlWidth = 100, int height = 25) where CtrlT : Control, new()
 		{
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
 			Panel panel = new Panel();
 			((Control)panel).set_Parent(parent);
 			((Container)panel).set_WidthSizingMode((SizingMode)1);
@@ -26,7 +27,17 @@ namespace Kenedia.Modules.Core.Utility
 			((Control)val).set_Height(height);
 			((Control)val).set_Parent((Container)(object)p);
 			CtrlT num = val;
+			((Control)num).add_Disposed((EventHandler<EventArgs>)Disposed);
+			((Control)label).add_Disposed((EventHandler<EventArgs>)Disposed);
 			return (label, num);
+			void Disposed(object s, EventArgs e)
+			{
+				((Control)num).remove_Disposed((EventHandler<EventArgs>)Disposed);
+				((Control)label).remove_Disposed((EventHandler<EventArgs>)Disposed);
+				((Control)num).Dispose();
+				((Control)label).Dispose();
+				((Control)p).Dispose();
+			}
 		}
 	}
 }

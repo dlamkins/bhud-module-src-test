@@ -25,7 +25,7 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private readonly CharacterTooltip _tooltip;
 
-		private readonly SettingsModel _settings;
+		private readonly Settings _settings;
 
 		private readonly ObservableCollection<Character_Model> _characters;
 
@@ -43,7 +43,7 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private Character_Model CurrentCharacter => _currentCharacter?.Invoke();
 
-		public RadialMenu(SettingsModel settings, ObservableCollection<Character_Model> characters, Container parent, Func<Character_Model> currentCharacter, Data data, TextureManager textureManager)
+		public RadialMenu(Settings settings, ObservableCollection<Character_Model> characters, Container parent, Func<Character_Model> currentCharacter, Data data, TextureManager textureManager)
 			: this()
 		{
 			//IL_0076: Unknown result type (might be due to invalid IL or missing references)

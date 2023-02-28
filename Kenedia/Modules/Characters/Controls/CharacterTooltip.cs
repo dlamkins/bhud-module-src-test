@@ -98,7 +98,7 @@ namespace Kenedia.Modules.Characters.Controls
 			}
 		}
 
-		public CharacterTooltip(Func<Character_Model> currentCharacter, TextureManager textureManager, Data data, SettingsModel settings)
+		public CharacterTooltip(Func<Character_Model> currentCharacter, TextureManager textureManager, Data data, Settings settings)
 		{
 			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001a: Unknown result type (might be due to invalid IL or missing references)

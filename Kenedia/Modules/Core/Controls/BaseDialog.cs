@@ -41,6 +41,8 @@ namespace Kenedia.Modules.Core.Controls
 
 		private string _message;
 
+		private CancellationTokenSource _cancellationTokenSource;
+
 		public string Title { get; private set; }
 
 		public string Message { get; private set; }
@@ -73,15 +75,17 @@ namespace Kenedia.Modules.Core.Controls
 
 		public BaseDialog(string title, string message, ButtonDefinition[] buttons = null)
 		{
-			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
 			(Button, DialogResult)[] array = new(Button, DialogResult)[2];
 			Button button = new Button();
 			((StandardButton)button).set_Text("OK");
+			button.SelectedTint = true;
 			array[0] = (button, DialogResult.OK);
 			Button button2 = new Button();
 			((StandardButton)button2).set_Text("Cancel");
+			button2.SelectedTint = true;
 			array[1] = (button2, DialogResult.Cancel);
 			_buttons = array;
 			FlowPanel flowPanel = new FlowPanel();
@@ -207,6 +211,7 @@ namespace Kenedia.Modules.Core.Controls
 					if ((int)key == 27)
 					{
 						_dialogResult = DialogResult.None;
+						_waitHandle.Set();
 					}
 					return;
 				}
@@ -227,6 +232,7 @@ namespace Kenedia.Modules.Core.Controls
 				return;
 			}
 			_dialogResult = _buttons[SelectedButtonIndex].Result;
+			_waitHandle.Set();
 		}
 
 		public async Task<DialogResult> ShowDialog(CancellationToken cancellationToken = default(CancellationToken))

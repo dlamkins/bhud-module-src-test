@@ -1,11 +1,7 @@
-using Gw2Sharp.WebApi.V2.Models;
-
 namespace Kenedia.Modules.Core.DataModels
 {
 	public class AttunementSkill : BaseConnectionProperty
 	{
-		public Attunement? Attunement { get; set; }
-
 		public int? Fire { get; set; }
 
 		public int? Water { get; set; }
@@ -13,5 +9,17 @@ namespace Kenedia.Modules.Core.DataModels
 		public int? Earth { get; set; }
 
 		public int? Air { get; set; }
+
+		public int? FireWater { get; set; }
+
+		public int? FireAir { get; set; }
+
+		public int? FireEarth { get; set; }
+
+		public int? WaterAir { get; set; }
+
+		public int? WaterEarth { get; set; }
+
+		public int? AirEarth { get; set; }
 	}
 }

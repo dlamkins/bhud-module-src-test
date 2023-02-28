@@ -11,5 +11,7 @@ namespace Kenedia.Modules.Core.DataModels
 		public int? State3 { get; set; }
 
 		public int? State4 { get; set; }
+
+		public int? State5 { get; set; }
 	}
 }

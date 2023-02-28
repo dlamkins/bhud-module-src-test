@@ -40,6 +40,8 @@ namespace Kenedia.Modules.Core.Controls
 
 		private Func<string> _setLocalizedTitle;
 
+		private Vector2 _layoutAccordionArrowOrigin;
+
 		private Rectangle _layoutTopLeftAccentBounds;
 
 		private Rectangle _layoutBottomRightAccentBounds;
@@ -56,8 +58,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		private Rectangle _layoutHeaderIconBounds;
 
-		private Vector2 _layoutAccordionArrowOrigin;
-
 		private Rectangle _layoutAccordionArrowBounds;
 
 		private RectangleDimensions _contentPadding;
@@ -65,6 +65,10 @@ namespace Kenedia.Modules.Core.Controls
 		private RectangleDimensions _borderWidth;
 
 		private Rectangle _backgroundBounds;
+
+		private RectangleDimensions _titleIconPadding;
+
+		private int _titleBarHeight;
 
 		public string BasicTitleTooltipText { get; set; }
 
@@ -111,6 +115,32 @@ namespace Kenedia.Modules.Core.Controls
 		public Color? BackgroundHoveredColor { get; set; }
 
 		public Rectangle? TextureRectangle { get; set; }
+
+		public RectangleDimensions TitleIconPadding
+		{
+			get
+			{
+				return _titleIconPadding;
+			}
+			set
+			{
+				_titleIconPadding = value;
+				((Control)this).RecalculateLayout();
+			}
+		}
+
+		public int TitleBarHeight
+		{
+			get
+			{
+				return _titleBarHeight;
+			}
+			set
+			{
+				_titleBarHeight = value;
+				((Control)this).RecalculateLayout();
+			}
+		}
 
 		public string TitleTooltipText
 		{
@@ -165,14 +195,16 @@ namespace Kenedia.Modules.Core.Controls
 
 		public Panel()
 		{
-			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
 			BasicTooltip basicTooltip = new BasicTooltip();
 			((Control)basicTooltip).set_Parent((Container)(object)Control.get_Graphics().get_SpriteScreen());
-			((Control)basicTooltip).set_ZIndex(2147483646);
+			((Control)basicTooltip).set_ZIndex(1073741823);
 			((Control)basicTooltip).set_Visible(false);
 			_tooltip = basicTooltip;
 			_contentPadding = new RectangleDimensions(0);
 			_borderWidth = new RectangleDimensions(0);
+			_titleIconPadding = new RectangleDimensions(3, 3, 5, 3);
+			_titleBarHeight = 36;
 			BackgroundImageColor = Color.get_White();
 			((Panel)this)._002Ector();
 			LocalizingService.LocaleChanged += UserLocale_SettingChanged;
@@ -190,36 +222,34 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0222: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0227: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0245: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0270: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0281: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0298: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0302: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0307: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0325: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0330: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0335: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0226: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0249: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_030e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0313: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0349: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0363: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0368: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0386: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0393: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0398: Unknown result type (might be due to invalid IL or missing references)
+			//IL_039d: Unknown result type (might be due to invalid IL or missing references)
 			((Panel)this).RecalculateLayout();
 			((Container)this)._contentRegion = new Rectangle(_contentPadding.Left + BorderWidth.Left, _contentPadding.Top + BorderWidth.Top, ((Control)this).get_Width() - _contentPadding.Horizontal - BorderWidth.Horizontal - (((int)((Container)this).get_WidthSizingMode() == 1) ? ((Container)this).get_AutoSizePadding().X : 0), ((Control)this).get_Height() - _contentPadding.Vertical - BorderWidth.Vertical - (((int)((Container)this).get_HeightSizingMode() == 1) ? ((Container)this).get_AutoSizePadding().Y : 0));
 			_backgroundBounds = new Rectangle(Math.Max(BorderWidth.Left - 2, 0), Math.Max(BorderWidth.Top - 2, 0), ((Control)this).get_Width() - Math.Max(BorderWidth.Horizontal - 4, 0), ((Control)this).get_Height() - Math.Max(BorderWidth.Vertical - 4, 0));
-			int num = ((!string.IsNullOrEmpty(base._title)) ? 36 : 0);
+			int num = ((!string.IsNullOrEmpty(base._title)) ? _titleBarHeight : 0);
 			int num2 = 0;
 			int num3 = 0;
 			int num4 = 0;
@@ -236,13 +266,13 @@ namespace Kenedia.Modules.Core.Controls
 				_layoutLeftAccentBounds = new Rectangle(num4 - 7, num, _textureLeftSideAccent.get_Width(), Math.Min(((Control)this)._size.Y - num - num3, _textureLeftSideAccent.get_Height()));
 				_layoutLeftAccentSrc = new Rectangle(0, 0, _textureLeftSideAccent.get_Width(), _layoutLeftAccentBounds.Height);
 			}
-			((Container)this).set_ContentRegion(new Rectangle(num4, num, ((Control)this)._size.X - num4 - num2, ((Control)this)._size.Y - num - num3));
-			Rectangle contentRegion = ((Container)this).get_ContentRegion();
-			_layoutHeaderBounds = new Rectangle(((Rectangle)(ref contentRegion)).get_Left(), 0, ((Container)this).get_ContentRegion().Width, 36);
-			_layoutHeaderTextBounds = new Rectangle(((Rectangle)(ref _layoutHeaderBounds)).get_Left() + 10 + ((TitleIcon != null) ? 36 : 0), 0, _layoutHeaderBounds.Width - 10, 36);
-			_layoutHeaderIconBounds = new Rectangle(((Rectangle)(ref _layoutHeaderBounds)).get_Left() + 5, 0, 36, 36);
+			((Container)this).set_ContentRegion(new Rectangle(_contentPadding.Left + num4, _contentPadding.Top + num, ((Control)this)._size.X - num4 - num2 - _contentPadding.Horizontal, ((Control)this)._size.Y - num - num3 - _contentPadding.Vertical));
+			_layoutHeaderBounds = new Rectangle(num4, 0, ((Control)this).get_Width(), num);
+			_layoutHeaderIconBounds = (Rectangle)((TitleIcon != null) ? new Rectangle(((Rectangle)(ref _layoutHeaderBounds)).get_Left() + _titleIconPadding.Left, _titleIconPadding.Top, num - _titleIconPadding.Vertical, num - _titleIconPadding.Vertical) : Rectangle.get_Empty());
+			_layoutHeaderTextBounds = new Rectangle(((Rectangle)(ref _layoutHeaderIconBounds)).get_Right() + _titleIconPadding.Right, 0, _layoutHeaderBounds.Width - _layoutHeaderIconBounds.Width, num);
+			int arrowSize = num - 4;
 			_layoutAccordionArrowOrigin = new Vector2(16f, 16f);
-			_layoutAccordionArrowBounds = RectangleExtension.OffsetBy(new Rectangle(((Rectangle)(ref _layoutHeaderBounds)).get_Right() - 32, (num - 32) / 2, 32, 32), ((Vector2)(ref _layoutAccordionArrowOrigin)).ToPoint());
+			_layoutAccordionArrowBounds = RectangleExtension.OffsetBy(new Rectangle(((Rectangle)(ref _layoutHeaderBounds)).get_Right() - arrowSize, (num - arrowSize) / 2, arrowSize, arrowSize), new Point(arrowSize / 2, arrowSize / 2));
 			CalculateBorders();
 		}
 

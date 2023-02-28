@@ -52,6 +52,10 @@ namespace Kenedia.Modules.Characters.Res
 
 		internal static string AnyProfession => ResourceManager.GetString("AnyProfession", resourceCulture);
 
+		internal static string APIPermissionNotification => ResourceManager.GetString("APIPermissionNotification", resourceCulture);
+
+		internal static string APITimeoutNotification => ResourceManager.GetString("APITimeoutNotification", resourceCulture);
+
 		internal static string Appearance => ResourceManager.GetString("Appearance", resourceCulture);
 
 		internal static string AppearanceAndBehavior => ResourceManager.GetString("AppearanceAndBehavior", resourceCulture);
@@ -70,6 +74,10 @@ namespace Kenedia.Modules.Characters.Res
 
 		internal static string AutoLogin_Tooltip => ResourceManager.GetString("AutoLogin_Tooltip", resourceCulture);
 
+		internal static string AutomaticCharacterDelete => ResourceManager.GetString("AutomaticCharacterDelete", resourceCulture);
+
+		internal static string AutomaticCharacterDelete_Tooltip => ResourceManager.GetString("AutomaticCharacterDelete_Tooltip", resourceCulture);
+
 		internal static string BestResultLargerDisclaimer => ResourceManager.GetString("BestResultLargerDisclaimer", resourceCulture);
 
 		internal static string Birthday => ResourceManager.GetString("Birthday", resourceCulture);
@@ -79,6 +87,10 @@ namespace Kenedia.Modules.Characters.Res
 		internal static string BottomOffset => ResourceManager.GetString("BottomOffset", resourceCulture);
 
 		internal static string Cancel => ResourceManager.GetString("Cancel", resourceCulture);
+
+		internal static string CancelOnlyOnESC => ResourceManager.GetString("CancelOnlyOnESC", resourceCulture);
+
+		internal static string CancelOnlyOnESC_Tooltip => ResourceManager.GetString("CancelOnlyOnESC_Tooltip", resourceCulture);
 
 		internal static string Capture => ResourceManager.GetString("Capture", resourceCulture);
 
@@ -168,6 +180,12 @@ namespace Kenedia.Modules.Characters.Res
 
 		internal static string Delays => ResourceManager.GetString("Delays", resourceCulture);
 
+		internal static string DeletedCharacterNotification => ResourceManager.GetString("DeletedCharacterNotification", resourceCulture);
+
+		internal static string DeletedCharacterNotification_DeleteTooltip => ResourceManager.GetString("DeletedCharacterNotification_DeleteTooltip", resourceCulture);
+
+		internal static string DeletedCharacterNotification_DismissTooltip => ResourceManager.GetString("DeletedCharacterNotification_DismissTooltip", resourceCulture);
+
 		internal static string DeleteItem => ResourceManager.GetString("DeleteItem", resourceCulture);
 
 		internal static string Descending => ResourceManager.GetString("Descending", resourceCulture);
@@ -175,6 +193,8 @@ namespace Kenedia.Modules.Characters.Res
 		internal static string DetailedTooltip => ResourceManager.GetString("DetailedTooltip", resourceCulture);
 
 		internal static string DetailedTooltip_Tooltip => ResourceManager.GetString("DetailedTooltip_Tooltip", resourceCulture);
+
+		internal static string Dismiss => ResourceManager.GetString("Dismiss", resourceCulture);
 
 		internal static string Display => ResourceManager.GetString("Display", resourceCulture);
 
@@ -354,11 +374,15 @@ namespace Kenedia.Modules.Characters.Res
 
 		internal static string NormalizedNames_Tooltip => ResourceManager.GetString("NormalizedNames_Tooltip", resourceCulture);
 
+		internal static string Notifications => ResourceManager.GetString("Notifications", resourceCulture);
+
 		internal static string OCR_Instructions => ResourceManager.GetString("OCR_Instructions", resourceCulture);
 
 		internal static string OCRAndImageRecognition => ResourceManager.GetString("OCRAndImageRecognition", resourceCulture);
 
 		internal static string OCRAndImageRecognition_Tooltip => ResourceManager.GetString("OCRAndImageRecognition_Tooltip", resourceCulture);
+
+		internal static string OCRNotification => ResourceManager.GetString("OCRNotification", resourceCulture);
 
 		internal static string Offset => ResourceManager.GetString("Offset", resourceCulture);
 
@@ -493,6 +517,10 @@ namespace Kenedia.Modules.Characters.Res
 		internal static string ShowLastButton => ResourceManager.GetString("ShowLastButton", resourceCulture);
 
 		internal static string ShowLastButton_Tooltip => ResourceManager.GetString("ShowLastButton_Tooltip", resourceCulture);
+
+		internal static string ShowNotifications => ResourceManager.GetString("ShowNotifications", resourceCulture);
+
+		internal static string ShowNotifications_Tooltip => ResourceManager.GetString("ShowNotifications_Tooltip", resourceCulture);
 
 		internal static string ShowOnlyMaxCrafting => ResourceManager.GetString("ShowOnlyMaxCrafting", resourceCulture);
 

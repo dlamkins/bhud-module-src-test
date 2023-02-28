@@ -33,11 +33,11 @@ namespace Kenedia.Modules.Characters.Views
 
 		private readonly OCR _ocr;
 
-		private readonly SettingsModel _settings;
+		private readonly Settings _settings;
 
 		private double _tick;
 
-		public SettingsWindow(AsyncTexture2D background, Rectangle windowRegion, Rectangle contentRegion, SharedSettingsView sharedSettingsView, OCR ocr, SettingsModel settings)
+		public SettingsWindow(AsyncTexture2D background, Rectangle windowRegion, Rectangle contentRegion, SharedSettingsView sharedSettingsView, OCR ocr, Settings settings)
 			: base(background, windowRegion, contentRegion)
 		{
 			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
@@ -57,7 +57,7 @@ namespace Kenedia.Modules.Characters.Views
 			_contentPanel = flowPanel;
 			base.SubWindowEmblem = AsyncTexture2D.FromAssetId(156027);
 			base.MainWindowEmblem = AsyncTexture2D.FromAssetId(156015);
-			base.Name = string.Format(strings.ItemSettings, BaseModule<Characters, MainWindow, SettingsModel>.ModuleName ?? "");
+			base.Name = string.Format(strings.ItemSettings, BaseModule<Characters, MainWindow, Settings>.ModuleName ?? "");
 			CreateOCR();
 			CreateAppearance();
 			CreateBehavior();
@@ -557,8 +557,8 @@ namespace Kenedia.Modules.Characters.Views
 			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_060a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0704: Unknown result type (might be due to invalid IL or missing references)
 			Panel panel = new Panel();
 			((Control)panel).set_Parent((Container)(object)_contentPanel);
 			((Control)panel).set_Width(((Container)this).get_ContentRegion().Width - 20);
@@ -651,10 +651,28 @@ namespace Kenedia.Modules.Characters.Views
 			};
 			Checkbox checkbox9 = new Checkbox();
 			((Control)checkbox9).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox9).set_Checked(_settings.FilterAsOne.get_Value());
-			checkbox9.SetLocalizedText = () => strings.FilterAsOne;
-			checkbox9.SetLocalizedTooltip = () => strings.FilterAsOne_Tooltip;
+			((Checkbox)checkbox9).set_Checked(_settings.AutomaticCharacterDelete.get_Value());
+			checkbox9.SetLocalizedText = () => strings.AutomaticCharacterDelete;
+			checkbox9.SetLocalizedTooltip = () => strings.AutomaticCharacterDelete_Tooltip;
 			checkbox9.CheckedChangedAction = delegate(bool b)
+			{
+				_settings.AutomaticCharacterDelete.set_Value(b);
+			};
+			Checkbox checkbox10 = new Checkbox();
+			((Control)checkbox10).set_Parent((Container)(object)cP);
+			((Checkbox)checkbox10).set_Checked(_settings.CancelOnlyOnESC.get_Value());
+			checkbox10.SetLocalizedText = () => strings.CancelOnlyOnESC;
+			checkbox10.SetLocalizedTooltip = () => strings.CancelOnlyOnESC_Tooltip;
+			checkbox10.CheckedChangedAction = delegate(bool b)
+			{
+				_settings.CancelOnlyOnESC.set_Value(b);
+			};
+			Checkbox checkbox11 = new Checkbox();
+			((Control)checkbox11).set_Parent((Container)(object)cP);
+			((Checkbox)checkbox11).set_Checked(_settings.FilterAsOne.get_Value());
+			checkbox11.SetLocalizedText = () => strings.FilterAsOne;
+			checkbox11.SetLocalizedTooltip = () => strings.FilterAsOne_Tooltip;
+			checkbox11.CheckedChangedAction = delegate(bool b)
 			{
 				_settings.FilterAsOne.set_Value(b);
 			};
@@ -719,7 +737,7 @@ namespace Kenedia.Modules.Characters.Views
 			((Control)checkbox).set_Parent((Container)(object)cP);
 			((Checkbox)checkbox).set_Checked(_settings.ShowCornerIcon.get_Value());
 			checkbox.SetLocalizedText = () => strings.ShowCorner_Name;
-			checkbox.SetLocalizedTooltip = () => string.Format(strings.ShowCorner_Tooltip, BaseModule<Characters, MainWindow, SettingsModel>.ModuleName);
+			checkbox.SetLocalizedTooltip = () => string.Format(strings.ShowCorner_Tooltip, BaseModule<Characters, MainWindow, Settings>.ModuleName);
 			checkbox.CheckedChangedAction = delegate(bool b)
 			{
 				_settings.ShowCornerIcon.set_Value(b);
@@ -1064,6 +1082,15 @@ namespace Kenedia.Modules.Characters.Views
 			};
 			checkbox5.SetLocalizedText = () => strings.FocusSearchOnShow;
 			checkbox5.SetLocalizedTooltip = () => strings.FocusSearchOnShow_Tooltip;
+			Checkbox checkbox6 = new Checkbox();
+			((Control)checkbox6).set_Parent((Container)(object)cP);
+			((Checkbox)checkbox6).set_Checked(_settings.ShowNotifications.get_Value());
+			checkbox6.CheckedChangedAction = delegate(bool b)
+			{
+				_settings.ShowNotifications.set_Value(b);
+			};
+			checkbox6.SetLocalizedText = () => strings.ShowNotifications;
+			checkbox6.SetLocalizedTooltip = () => strings.ShowNotifications_Tooltip;
 		}
 
 		private void GetFontSize(SettingEntry<int> setting, string item)
@@ -1076,7 +1103,7 @@ namespace Kenedia.Modules.Characters.Views
 
 		public void OnLanguageChanged(object s = null, EventArgs e = null)
 		{
-			base.Name = string.Format(strings.ItemSettings, BaseModule<Characters, MainWindow, SettingsModel>.ModuleName ?? "");
+			base.Name = string.Format(strings.ItemSettings, BaseModule<Characters, MainWindow, Settings>.ModuleName ?? "");
 		}
 
 		public override void UpdateContainer(GameTime gameTime)

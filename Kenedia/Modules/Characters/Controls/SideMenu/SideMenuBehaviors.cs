@@ -44,13 +44,13 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 
 		private readonly ResourceManager _resourceManager;
 
-		private readonly SettingsModel _settings;
+		private readonly Settings _settings;
 
 		private readonly Action _onSortChanged;
 
 		private Rectangle _contentRectangle;
 
-		public SideMenuBehaviors(ResourceManager resourceManager, TextureManager textureManager, SettingsModel settings, Action onSortChanged)
+		public SideMenuBehaviors(ResourceManager resourceManager, TextureManager textureManager, Settings settings, Action onSortChanged)
 		{
 			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
@@ -100,7 +100,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			for (int i = 0; i < _toggles.Count; i++)
 			{
 				KeyValuePair<string, DisplayCheckToggle> t = _toggles[i];
-				SettingsModel settings2 = _settings;
+				Settings settings2 = _settings;
 				string key = t.Key;
 				string key2 = t.Key;
 				DisplayCheckToggle displayCheckToggle2 = new DisplayCheckToggle(textureManager, settings2, key, key2 == "Name" || key2 == "Profession" || key2 == "LastLogin");

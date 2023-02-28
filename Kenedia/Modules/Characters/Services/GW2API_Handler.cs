@@ -8,6 +8,7 @@ using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Modules.Managers;
 using Gw2Sharp.WebApi;
+using Gw2Sharp.WebApi.Exceptions;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
@@ -40,6 +41,8 @@ namespace Kenedia.Modules.Characters.Services
 		private CancellationTokenSource _cancellationTokenSource;
 
 		private Account _account;
+
+		public MainWindow MainWindow { get; set; }
 
 		public Account Account
 		{
@@ -140,7 +143,7 @@ namespace Kenedia.Modules.Characters.Services
 			}
 			if (cancellationToken.IsCancellationRequested)
 			{
-				BaseModule<Characters, MainWindow, SettingsModel>.Logger.Info("Canceled API Data fetch!");
+				BaseModule<Characters, MainWindow, Settings>.Logger.Info("Canceled API Data fetch!");
 			}
 			_cancellationTokenSource = null;
 		}
@@ -161,7 +164,7 @@ namespace Kenedia.Modules.Characters.Services
 			}
 			try
 			{
-				BaseModule<Characters, MainWindow, SettingsModel>.Logger.Info("Fetching new API Data ...");
+				BaseModule<Characters, MainWindow, Settings>.Logger.Info("Fetching new API Data ...");
 				if (_gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
 				{
 					(TokenPermission)1,
@@ -189,8 +192,17 @@ namespace Kenedia.Modules.Characters.Services
 				if (!cancellationToken.IsCancellationRequested)
 				{
 					ScreenNotification.ShowNotification("[Characters]: " + strings.Error_InvalidPermissions, (NotificationType)2, (Texture2D)null, 4);
-					BaseModule<Characters, MainWindow, SettingsModel>.Logger.Error(strings.Error_InvalidPermissions);
+					BaseModule<Characters, MainWindow, Settings>.Logger.Warn(strings.Error_InvalidPermissions);
+					MainWindow?.SendAPIPermissionNotification();
 				}
+				Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
+				return false;
+			}
+			catch (UnexpectedStatusException val)
+			{
+				UnexpectedStatusException ex2 = val;
+				MainWindow?.SendAPITimeoutNotification();
+				BaseModule<Characters, MainWindow, Settings>.Logger.Warn((Exception)(object)ex2, strings.APITimeoutNotification);
 				Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
 				return false;
 			}
@@ -198,7 +210,7 @@ namespace Kenedia.Modules.Characters.Services
 			{
 				if (!cancellationToken.IsCancellationRequested)
 				{
-					BaseModule<Characters, MainWindow, SettingsModel>.Logger.Warn(ex, strings.Error_FailedAPIFetch);
+					BaseModule<Characters, MainWindow, Settings>.Logger.Warn(ex, strings.Error_FailedAPIFetch);
 				}
 				Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
 				return false;
@@ -215,7 +227,7 @@ namespace Kenedia.Modules.Characters.Services
 			}
 			if (force || _data.Maps.Count == 0 || !_data.Maps.FirstOrDefault().Value.Names.TryGetValue(locale.Value, out var name) || string.IsNullOrEmpty(name))
 			{
-				BaseModule<Characters, MainWindow, SettingsModel>.Logger.Info($"No data for {locale.Value} loaded yet. Fetching new data from the API.");
+				BaseModule<Characters, MainWindow, Settings>.Logger.Info($"No data for {locale.Value} loaded yet. Fetching new data from the API.");
 				await GetMaps();
 			}
 		}

@@ -31,7 +31,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 
 		private ImageButton _refreshButton;
 
-		private readonly SettingsModel _settings;
+		private readonly Settings _settings;
 
 		private readonly TextureManager _textureManager;
 
@@ -45,7 +45,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 
 		public SideMenuToggles TogglesTab { get; set; }
 
-		public SideMenu(Action toggleOCR, Action togglePotrait, Action refreshAPI, TextureManager textureManager, SettingsModel settings, CharacterSorting characterSorting)
+		public SideMenu(Action toggleOCR, Action togglePotrait, Action refreshAPI, TextureManager textureManager, Settings settings, CharacterSorting characterSorting)
 		{
 			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006b: Unknown result type (might be due to invalid IL or missing references)

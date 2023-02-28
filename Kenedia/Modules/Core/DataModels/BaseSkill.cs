@@ -14,6 +14,9 @@ namespace Kenedia.Modules.Core.DataModels
 		private AsyncTexture2D _icon;
 
 		[DataMember]
+		public SkillSlot? Slot { get; set; }
+
+		[DataMember]
 		public int Id { get; set; }
 
 		[DataMember]
@@ -59,10 +62,12 @@ namespace Kenedia.Modules.Core.DataModels
 		public BaseSkill(Skill skill)
 		{
 			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
 			Id = skill.get_Id();
 			Name = skill.get_Name();
 			AssetId = skill.get_Icon()?.GetAssetIdFromRenderUrl();
 			Professions = skill.get_Professions().ToList();
+			Slot = skill.get_Slot()?.ToEnum();
 		}
 	}
 }

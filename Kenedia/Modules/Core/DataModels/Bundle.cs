@@ -6,14 +6,14 @@ namespace Kenedia.Modules.Core.DataModels
 
 		public int? Stow { get; set; }
 
-		public int? Weapon1 { get; set; }
+		public int? Weapon_1 { get; set; }
 
-		public int? Weapon2 { get; set; }
+		public int? Weapon_2 { get; set; }
 
-		public int? Weapon3 { get; set; }
+		public int? Weapon_3 { get; set; }
 
-		public int? Weapon4 { get; set; }
+		public int? Weapon_4 { get; set; }
 
-		public int? Weapon5 { get; set; }
+		public int? Weapon_5 { get; set; }
 	}
 }

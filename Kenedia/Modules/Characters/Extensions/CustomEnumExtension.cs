@@ -5,173 +5,173 @@ namespace Kenedia.Modules.Characters.Extensions
 {
 	public static class CustomEnumExtension
 	{
-		public static SettingsModel.SortBy GetSortType(this string s)
+		public static Settings.SortBy GetSortType(this string s)
 		{
 			if (s == string.Format(strings.SortBy, strings.Name))
 			{
-				return SettingsModel.SortBy.Name;
+				return Settings.SortBy.Name;
 			}
 			if (s == string.Format(strings.SortBy, strings.Level))
 			{
-				return SettingsModel.SortBy.Level;
+				return Settings.SortBy.Level;
 			}
 			if (s == string.Format(strings.SortBy, strings.Race))
 			{
-				return SettingsModel.SortBy.Race;
+				return Settings.SortBy.Race;
 			}
 			if (s == string.Format(strings.SortBy, strings.Gender))
 			{
-				return SettingsModel.SortBy.Gender;
+				return Settings.SortBy.Gender;
 			}
 			if (s == string.Format(strings.SortBy, strings.Profession))
 			{
-				return SettingsModel.SortBy.Profession;
+				return Settings.SortBy.Profession;
 			}
 			if (s == string.Format(strings.SortBy, strings.Specialization))
 			{
-				return SettingsModel.SortBy.Specialization;
+				return Settings.SortBy.Specialization;
 			}
 			if (s == string.Format(strings.SortBy, strings.TimeSinceLogin))
 			{
-				return SettingsModel.SortBy.TimeSinceLogin;
+				return Settings.SortBy.TimeSinceLogin;
 			}
 			if (s == string.Format(strings.SortBy, strings.Map))
 			{
-				return SettingsModel.SortBy.Map;
+				return Settings.SortBy.Map;
 			}
 			if (s == string.Format(strings.SortBy, strings.Tag))
 			{
-				return SettingsModel.SortBy.Tag;
+				return Settings.SortBy.Tag;
 			}
-			return SettingsModel.SortBy.Custom;
+			return Settings.SortBy.Custom;
 		}
 
-		public static string GetSortType(this SettingsModel.SortBy st)
+		public static string GetSortType(this Settings.SortBy st)
 		{
 			return st switch
 			{
-				SettingsModel.SortBy.Name => string.Format(strings.SortBy, strings.Name), 
-				SettingsModel.SortBy.Level => string.Format(strings.SortBy, strings.Level), 
-				SettingsModel.SortBy.Race => string.Format(strings.SortBy, strings.Race), 
-				SettingsModel.SortBy.Gender => string.Format(strings.SortBy, strings.Gender), 
-				SettingsModel.SortBy.Profession => string.Format(strings.SortBy, strings.Profession), 
-				SettingsModel.SortBy.Specialization => string.Format(strings.SortBy, strings.Specialization), 
-				SettingsModel.SortBy.TimeSinceLogin => string.Format(strings.SortBy, strings.TimeSinceLogin), 
-				SettingsModel.SortBy.Map => string.Format(strings.SortBy, strings.Map), 
-				SettingsModel.SortBy.Tag => string.Format(strings.SortBy, strings.Tag), 
-				SettingsModel.SortBy.Custom => strings.Custom, 
+				Settings.SortBy.Name => string.Format(strings.SortBy, strings.Name), 
+				Settings.SortBy.Level => string.Format(strings.SortBy, strings.Level), 
+				Settings.SortBy.Race => string.Format(strings.SortBy, strings.Race), 
+				Settings.SortBy.Gender => string.Format(strings.SortBy, strings.Gender), 
+				Settings.SortBy.Profession => string.Format(strings.SortBy, strings.Profession), 
+				Settings.SortBy.Specialization => string.Format(strings.SortBy, strings.Specialization), 
+				Settings.SortBy.TimeSinceLogin => string.Format(strings.SortBy, strings.TimeSinceLogin), 
+				Settings.SortBy.Map => string.Format(strings.SortBy, strings.Map), 
+				Settings.SortBy.Tag => string.Format(strings.SortBy, strings.Tag), 
+				Settings.SortBy.Custom => strings.Custom, 
 				_ => strings.Custom, 
 			};
 		}
 
-		public static SettingsModel.SortDirection GetSortOrder(this string s)
+		public static Settings.SortDirection GetSortOrder(this string s)
 		{
 			if (!(s == strings.Descending))
 			{
-				return SettingsModel.SortDirection.Ascending;
+				return Settings.SortDirection.Ascending;
 			}
-			return SettingsModel.SortDirection.Descending;
+			return Settings.SortDirection.Descending;
 		}
 
-		public static string GetSortOrder(this SettingsModel.SortDirection so)
+		public static string GetSortOrder(this Settings.SortDirection so)
 		{
 			return so switch
 			{
-				SettingsModel.SortDirection.Ascending => strings.Ascending, 
-				SettingsModel.SortDirection.Descending => strings.Descending, 
+				Settings.SortDirection.Ascending => strings.Ascending, 
+				Settings.SortDirection.Descending => strings.Descending, 
 				_ => strings.Ascending, 
 			};
 		}
 
-		public static SettingsModel.FilterBehavior GetFilterBehavior(this string s)
+		public static Settings.FilterBehavior GetFilterBehavior(this string s)
 		{
 			if (!(s == strings.ExcludeMatches))
 			{
-				return SettingsModel.FilterBehavior.Include;
+				return Settings.FilterBehavior.Include;
 			}
-			return SettingsModel.FilterBehavior.Exclude;
+			return Settings.FilterBehavior.Exclude;
 		}
 
-		public static string GetFilterBehavior(this SettingsModel.FilterBehavior fb)
+		public static string GetFilterBehavior(this Settings.FilterBehavior fb)
 		{
 			return fb switch
 			{
-				SettingsModel.FilterBehavior.Include => strings.IncludeMatches, 
-				SettingsModel.FilterBehavior.Exclude => strings.ExcludeMatches, 
+				Settings.FilterBehavior.Include => strings.IncludeMatches, 
+				Settings.FilterBehavior.Exclude => strings.ExcludeMatches, 
 				_ => strings.IncludeMatches, 
 			};
 		}
 
-		public static SettingsModel.MatchingBehavior GetMatchingBehavior(this string s)
+		public static Settings.MatchingBehavior GetMatchingBehavior(this string s)
 		{
 			if (!(s == strings.MatchAllFilter))
 			{
-				return SettingsModel.MatchingBehavior.MatchAny;
+				return Settings.MatchingBehavior.MatchAny;
 			}
-			return SettingsModel.MatchingBehavior.MatchAll;
+			return Settings.MatchingBehavior.MatchAll;
 		}
 
-		public static string GetMatchingBehavior(this SettingsModel.MatchingBehavior fb)
+		public static string GetMatchingBehavior(this Settings.MatchingBehavior fb)
 		{
 			return fb switch
 			{
-				SettingsModel.MatchingBehavior.MatchAny => strings.MatchAnyFilter, 
-				SettingsModel.MatchingBehavior.MatchAll => strings.MatchAllFilter, 
+				Settings.MatchingBehavior.MatchAny => strings.MatchAnyFilter, 
+				Settings.MatchingBehavior.MatchAll => strings.MatchAllFilter, 
 				_ => strings.MatchAnyFilter, 
 			};
 		}
 
-		public static string GetPanelSize(this SettingsModel.PanelSizes s)
+		public static string GetPanelSize(this Settings.PanelSizes s)
 		{
 			return s switch
 			{
-				SettingsModel.PanelSizes.Small => strings.Small, 
-				SettingsModel.PanelSizes.Normal => strings.Normal, 
-				SettingsModel.PanelSizes.Large => strings.Large, 
-				SettingsModel.PanelSizes.Custom => strings.Custom, 
+				Settings.PanelSizes.Small => strings.Small, 
+				Settings.PanelSizes.Normal => strings.Normal, 
+				Settings.PanelSizes.Large => strings.Large, 
+				Settings.PanelSizes.Custom => strings.Custom, 
 				_ => strings.Normal, 
 			};
 		}
 
-		public static SettingsModel.PanelSizes GetPanelSize(this string s)
+		public static Settings.PanelSizes GetPanelSize(this string s)
 		{
 			if (s == strings.Small)
 			{
-				return SettingsModel.PanelSizes.Small;
+				return Settings.PanelSizes.Small;
 			}
 			if (s == strings.Large)
 			{
-				return SettingsModel.PanelSizes.Large;
+				return Settings.PanelSizes.Large;
 			}
 			if (s == strings.Custom)
 			{
-				return SettingsModel.PanelSizes.Custom;
+				return Settings.PanelSizes.Custom;
 			}
-			return SettingsModel.PanelSizes.Normal;
+			return Settings.PanelSizes.Normal;
 		}
 
-		public static string GetPanelLayout(this SettingsModel.CharacterPanelLayout layout)
+		public static string GetPanelLayout(this Settings.CharacterPanelLayout layout)
 		{
 			return layout switch
 			{
-				SettingsModel.CharacterPanelLayout.OnlyIcons => strings.OnlyIcons, 
-				SettingsModel.CharacterPanelLayout.OnlyText => strings.OnlyText, 
-				SettingsModel.CharacterPanelLayout.IconAndText => strings.TextAndIcon, 
+				Settings.CharacterPanelLayout.OnlyIcons => strings.OnlyIcons, 
+				Settings.CharacterPanelLayout.OnlyText => strings.OnlyText, 
+				Settings.CharacterPanelLayout.IconAndText => strings.TextAndIcon, 
 				_ => strings.TextAndIcon, 
 			};
 		}
 
-		public static SettingsModel.CharacterPanelLayout GetPanelLayout(this string layout)
+		public static Settings.CharacterPanelLayout GetPanelLayout(this string layout)
 		{
 			if (layout == strings.OnlyIcons)
 			{
-				return SettingsModel.CharacterPanelLayout.OnlyIcons;
+				return Settings.CharacterPanelLayout.OnlyIcons;
 			}
 			if (layout == strings.OnlyText)
 			{
-				return SettingsModel.CharacterPanelLayout.OnlyText;
+				return Settings.CharacterPanelLayout.OnlyText;
 			}
-			return SettingsModel.CharacterPanelLayout.IconAndText;
+			return Settings.CharacterPanelLayout.IconAndText;
 		}
 	}
 }

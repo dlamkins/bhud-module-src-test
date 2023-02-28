@@ -74,7 +74,7 @@ namespace Kenedia.Modules.Characters.Controls
 			Label label = new Label();
 			((Control)label).set_Parent((Container)(object)this);
 			((Control)label).set_Location(new Point(0, 10));
-			((Label)label).set_Text(BaseModule<Characters, MainWindow, SettingsModel>.ModuleName);
+			((Label)label).set_Text(BaseModule<Characters, MainWindow, Settings>.ModuleName);
 			((Label)label).set_AutoSizeHeight(true);
 			((Label)label).set_HorizontalAlignment((HorizontalAlignment)1);
 			((Label)label).set_Font(GameService.Content.GetFont((FontFace)0, (FontSize)36, (FontStyle)0));

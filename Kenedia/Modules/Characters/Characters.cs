@@ -39,7 +39,7 @@ using Newtonsoft.Json;
 namespace Kenedia.Modules.Characters
 {
 	[Export(typeof(Module))]
-	public class Characters : BaseModule<Characters, MainWindow, SettingsModel>
+	public class Characters : BaseModule<Characters, MainWindow, Settings>
 	{
 		public readonly ResourceManager RM = new ResourceManager("Kenedia.Modules.Characters.Res.strings", Assembly.GetExecutingAssembly());
 
@@ -124,7 +124,7 @@ namespace Kenedia.Modules.Characters
 		public Characters([Import("ModuleParameters")] ModuleParameters moduleParameters)
 			: base(moduleParameters)
 		{
-			BaseModule<Characters, MainWindow, SettingsModel>.ModuleInstance = this;
+			BaseModule<Characters, MainWindow, Settings>.ModuleInstance = this;
 			HasGUI = true;
 		}
 
@@ -150,7 +150,7 @@ namespace Kenedia.Modules.Characters
 		protected override void Initialize()
 		{
 			base.Initialize();
-			BaseModule<Characters, MainWindow, SettingsModel>.Logger.Info("Starting " + ((Module)this).get_Name() + " v." + (object)base.ModuleVersion);
+			BaseModule<Characters, MainWindow, Settings>.Logger.Info("Starting " + ((Module)this).get_Name() + " v." + (object)base.ModuleVersion);
 			JsonConvert.set_DefaultSettings((Func<JsonSerializerSettings>)delegate
 			{
 				//IL_0000: Unknown result type (might be due to invalid IL or missing references)
@@ -192,7 +192,7 @@ namespace Kenedia.Modules.Characters
 		protected override void DefineSettings(SettingCollection settings)
 		{
 			base.DefineSettings(settings);
-			base.Settings = new SettingsModel(settings);
+			base.Settings = new Settings(settings);
 			base.Settings.ShowCornerIcon.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowCornerIcon_SettingChanged);
 		}
 
@@ -267,6 +267,7 @@ namespace Kenedia.Modules.Characters
 			DeleteCornerIcons();
 			CharacterModels.CollectionChanged -= OnCharacterCollectionChanged;
 			Tags.CollectionChanged -= Tags_CollectionChanged;
+			base.Services.ClientWindowService.ResolutionChanged -= ClientWindowService_ResolutionChanged;
 			base.Unload();
 		}
 
@@ -347,6 +348,13 @@ namespace Kenedia.Modules.Characters
 			CharacterSwapping.OCR = OCR;
 			CharacterSorting.OCR = OCR;
 			CharacterSorting.UpdateCharacterList = base.MainWindow.PerformFiltering;
+			base.Services.ClientWindowService.ResolutionChanged += ClientWindowService_ResolutionChanged;
+			GW2APIHandler.MainWindow = base.MainWindow;
+		}
+
+		private void ClientWindowService_ResolutionChanged(object sender, ValueChangedEventArgs<Point> e)
+		{
+			base.MainWindow?.CheckOCRRegion();
 		}
 
 		protected override void UnloadGUI()
@@ -412,7 +420,7 @@ namespace Kenedia.Modules.Characters
 
 		private void InputDetectionService_ClickedOrKey(object sender, double e)
 		{
-			if (GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus())
+			if (GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus() && (!base.Settings.CancelOnlyOnESC.get_Value() || GameService.Input.get_Keyboard().get_KeysDown().Contains((Keys)27)))
 			{
 				CancelEverything();
 			}
@@ -433,12 +441,12 @@ namespace Kenedia.Modules.Characters
 			MouseState mouse = GameService.Input.get_Mouse().get_State();
 			if (CharacterSwapping.Cancel())
 			{
-				BaseModule<Characters, MainWindow, SettingsModel>.Logger.Info(string.Format("Cancel any automated action. Left Mouse Down: {0} | Right Mouse Down: {1} | Keyboard Keys pressed {2}", (int)((MouseState)(ref mouse)).get_LeftButton() == 1, (int)((MouseState)(ref mouse)).get_RightButton() == 1, string.Join("|", (from k in GameService.Input.get_Keyboard().get_KeysDown()
+				BaseModule<Characters, MainWindow, Settings>.Logger.Info(string.Format("Cancel any automated action. Left Mouse Down: {0} | Right Mouse Down: {1} | Keyboard Keys pressed {2}", (int)((MouseState)(ref mouse)).get_LeftButton() == 1, (int)((MouseState)(ref mouse)).get_RightButton() == 1, string.Join("|", (from k in GameService.Input.get_Keyboard().get_KeysDown()
 					select ((object)(Keys)(ref k)).ToString()).ToArray())));
 			}
 			if (CharacterSorting.Cancel())
 			{
-				BaseModule<Characters, MainWindow, SettingsModel>.Logger.Info(string.Format("Cancel any automated action. Left Mouse Down: {0} | Right Mouse Down: {1} | Keyboard Keys pressed {2}", (int)((MouseState)(ref mouse)).get_LeftButton() == 1, (int)((MouseState)(ref mouse)).get_RightButton() == 1, string.Join("|", (from k in GameService.Input.get_Keyboard().get_KeysDown()
+				BaseModule<Characters, MainWindow, Settings>.Logger.Info(string.Format("Cancel any automated action. Left Mouse Down: {0} | Right Mouse Down: {1} | Keyboard Keys pressed {2}", (int)((MouseState)(ref mouse)).get_LeftButton() == 1, (int)((MouseState)(ref mouse)).get_RightButton() == 1, string.Join("|", (from k in GameService.Input.get_Keyboard().get_KeysDown()
 					select ((object)(Keys)(ref k)).ToString()).ToArray())));
 			}
 		}
@@ -578,24 +586,38 @@ namespace Kenedia.Modules.Characters
 		{
 			if (!_loadedCharacters)
 			{
-				BaseModule<Characters, MainWindow, SettingsModel>.Logger.Info("This is our first API data fetched for this character/session. Trying to load local data first.");
+				BaseModule<Characters, MainWindow, Settings>.Logger.Info("This is our first API data fetched for this character/session. Trying to load local data first.");
 				LoadCharacters();
 			}
-			BaseModule<Characters, MainWindow, SettingsModel>.Logger.Info("Update characters based on fresh data from the api.");
+			BaseModule<Characters, MainWindow, Settings>.Logger.Info("Update characters based on fresh data from the api.");
 			var freshList = ((IEnumerable<Character>)characters).Select((Character c) => new
 			{
 				Name = c.get_Name(),
 				Created = c.get_Created()
 			}).ToList();
 			var oldList = CharacterModels.Select((Character_Model c) => new { c.Name, c.Created }).ToList();
+			bool updateMarkedCharacters = false;
 			for (int i = CharacterModels.Count - 1; i >= 0; i--)
 			{
 				Character_Model c2 = CharacterModels[i];
 				if (!freshList.Contains(new { c2.Name, c2.Created }))
 				{
-					BaseModule<Characters, MainWindow, SettingsModel>.Logger.Info($"{c2.Name} created on {c2.Created} no longer exists. Delete them!");
-					c2.Delete();
+					if (base.Settings.AutomaticCharacterDelete.get_Value())
+					{
+						BaseModule<Characters, MainWindow, Settings>.Logger.Info($"{c2.Name} created on {c2.Created} no longer exists. Delete them!");
+						c2.Delete();
+					}
+					else if (!c2.MarkedAsDeleted)
+					{
+						BaseModule<Characters, MainWindow, Settings>.Logger.Info($"{c2.Name} created on {c2.Created} does not exist in the api data. Mark them as potentially deleted!");
+						c2.MarkedAsDeleted = true;
+						updateMarkedCharacters = true;
+					}
 				}
+			}
+			if (updateMarkedCharacters)
+			{
+				base.MainWindow.UpdateMissingNotification();
 			}
 			int pos = 0;
 			foreach (Character c3 in (IEnumerable<Character>)characters)
@@ -606,7 +628,7 @@ namespace Kenedia.Modules.Characters
 					Created = c3.get_Created()
 				}))
 				{
-					BaseModule<Characters, MainWindow, SettingsModel>.Logger.Info($"{c3.get_Name()} created on {c3.get_Created()} does not exist yet. Create them!");
+					BaseModule<Characters, MainWindow, Settings>.Logger.Info($"{c3.get_Name()} created on {c3.get_Created()} does not exist yet. Create them!");
 					CharacterModels.Add(new Character_Model(c3, CharacterSwapping, base.Paths.ModulePath, RequestCharacterSave, CharacterModels, Data)
 					{
 						Position = pos
@@ -628,7 +650,7 @@ namespace Kenedia.Modules.Characters
 				string p = CharactersPath.Replace("kenedia\\", "");
 				if (File.Exists(p))
 				{
-					BaseModule<Characters, MainWindow, SettingsModel>.Logger.Info($"This is the first start of {((Module)this).get_Name()} since import version {OldCharacterModel.ImportVersion}. Importing old data from {p}!");
+					BaseModule<Characters, MainWindow, Settings>.Logger.Info($"This is the first start of {((Module)this).get_Name()} since import version {OldCharacterModel.ImportVersion}. Importing old data from {p}!");
 					OldCharacterModel.Import(p, CharacterModels, AccountImagesPath, base.Paths.AccountName, Tags);
 				}
 				base.Settings.ImportVersion.set_Value(OldCharacterModel.ImportVersion);
@@ -646,8 +668,9 @@ namespace Kenedia.Modules.Characters
 				return false;
 			}
 			AccountSummary account = getAccount();
-			if (base.Paths.AccountName != null)
+			if (account != null)
 			{
+				base.Paths.AccountName = account.AccountName;
 				_loadedCharacters = true;
 				base.Settings.LoadAccountSettings(base.Paths.AccountName);
 				if (!Directory.Exists(AccountImagesPath))
@@ -657,7 +680,7 @@ namespace Kenedia.Modules.Characters
 			}
 			if (account != null)
 			{
-				BaseModule<Characters, MainWindow, SettingsModel>.Logger.Debug("Found '" + player.get_Name() + "' in a stored character list for '" + account.AccountName + "'. Loading characters of '" + account.AccountName + "'");
+				BaseModule<Characters, MainWindow, Settings>.Logger.Debug("Found '" + player.get_Name() + "' in a stored character list for '" + account.AccountName + "'. Loading characters of '" + account.AccountName + "'");
 				return LoadCharacterFile();
 			}
 			return false;
@@ -700,7 +723,7 @@ namespace Kenedia.Modules.Characters
 								names.Add(c.Name);
 							}
 						});
-						BaseModule<Characters, MainWindow, SettingsModel>.Logger.Info("Loaded local characters from file '" + CharactersPath + "'.");
+						BaseModule<Characters, MainWindow, Settings>.Logger.Info("Loaded local characters from file '" + CharactersPath + "'.");
 						return true;
 					}
 				}
@@ -708,7 +731,7 @@ namespace Kenedia.Modules.Characters
 			}
 			catch (Exception ex)
 			{
-				BaseModule<Characters, MainWindow, SettingsModel>.Logger.Warn(ex, "Failed to load the local characters from file '" + CharactersPath + "'.");
+				BaseModule<Characters, MainWindow, Settings>.Logger.Warn(ex, "Failed to load the local characters from file '" + CharactersPath + "'.");
 				File.Copy(CharactersPath, CharactersPath.Replace(".json", " [" + DateTimeOffset.Now.ToUnixTimeSeconds() + "].corrupted.json"));
 				return false;
 			}

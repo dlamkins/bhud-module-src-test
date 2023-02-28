@@ -19,7 +19,7 @@ namespace Characters.Views
 	{
 		private readonly OCR _ocr;
 
-		private readonly SettingsModel _settings;
+		private readonly Settings _settings;
 
 		private readonly Color _spacingColor = Color.FromArgb(255, 200, 200, 200);
 
@@ -51,7 +51,7 @@ namespace Characters.Views
 
 		private double _readTick;
 
-		public OCRView(SettingsModel settings, OCR ocr)
+		public OCRView(Settings settings, OCR ocr)
 		{
 			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
