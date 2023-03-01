@@ -18,15 +18,36 @@ namespace RaidClears.Features.Strikes.Services
 
 		private static int NUMBER_OF_EOD_STRIKES = 5;
 
+		private static DateTime zeroIndex = new DateTime(2023, 1, 31, 0, 0, 0, DateTimeKind.Utc);
+
 		public static IEnumerable<BoxModel> GetPriorityEncounters()
 		{
 			return from e in GetPriorityStrikes()
 				select new BoxModel("priority_" + e.Encounter.id, e.Encounter.name + "\n\n" + Strings.Strike_Tooltip_tomorrow + "\n" + e.TomorrowEncounter.GetLabel(), e.Encounter.shortName);
 		}
 
+		public static int DayOfYearIndex()
+		{
+			return DayOfYearIndex(DateTime.UtcNow);
+		}
+
+		public static int DayOfYearIndex(DateTime date)
+		{
+			int day = date.DayOfYear - 1;
+			if (DateTime.IsLeapYear(date.Year))
+			{
+				return day;
+			}
+			if (date.Month >= 3)
+			{
+				return day + 1;
+			}
+			return day;
+		}
+
 		public static IEnumerable<StrikeInfo> GetPriorityStrikes()
 		{
-			int num = (int)Math.Floor((decimal)((((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds() - BOTH_AT_INDEX_0_TIMESTAMP) / DAILY_SECONDS));
+			int num = DayOfYearIndex();
 			int ibs_index = num % NUMBER_OF_IBS_STRIKES;
 			int eod_index = num % NUMBER_OF_EOD_STRIKES;
 			return new List<StrikeInfo>
