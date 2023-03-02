@@ -27,41 +27,77 @@ namespace Estreya.BlishHUD.Shared.State
 
 		private readonly string _baseFolderPath;
 
+		private AsyncLock _itemLock = new AsyncLock();
+
+		private List<Item> _items;
+
 		private string DirectoryPath => Path.Combine(_baseFolderPath, "items");
 
-		public List<Item> Items => base.APIObjectList;
+		public List<Item> Items => _items;
 
 		public ItemState(APIStateConfiguration configuration, Gw2ApiManager apiManager, string baseFolderPath)
 			: base(apiManager, configuration)
 		{
 			_baseFolderPath = baseFolderPath;
+			base.Updated += ItemState_Updated;
+		}
+
+		private void ItemState_Updated(object sender, EventArgs e)
+		{
+			using (_itemLock.Lock())
+			{
+				_items = base.APIObjectList.ToArray().ToList();
+			}
+		}
+
+		protected override Task DoInitialize()
+		{
+			using (_itemLock.Lock())
+			{
+				_items = new List<Item>();
+			}
+			return Task.CompletedTask;
+		}
+
+		protected override Task DoClear()
+		{
+			using (_itemLock.Lock())
+			{
+				_items.Clear();
+			}
+			return Task.CompletedTask;
 		}
 
 		protected override async Task Load()
 		{
-			_ = 4;
+			_ = 3;
 			try
 			{
-				if (!(await ShouldLoadFiles()))
-				{
-					await base.Load();
-					await Save();
-				}
-				else
+				bool canLoadFiles = CanLoadFiles();
+				bool shouldLoadFiles = await ShouldLoadFiles();
+				if (canLoadFiles)
 				{
 					try
 					{
 						base.Loading = true;
 						List<Item> items = JsonConvert.DeserializeObject<List<Item>>(await FileUtil.ReadStringAsync(Path.Combine(DirectoryPath, "items.json")));
-						using (await _apiObjectListLock.LockAsync())
+						using (_itemLock.Lock())
 						{
-							base.APIObjectList.AddRange(items);
+							_items = items;
 						}
 					}
 					finally
 					{
 						base.Loading = false;
 						SignalCompletion();
+					}
+				}
+				if (!shouldLoadFiles)
+				{
+					await LoadFromAPI(!canLoadFiles);
+					if (!_cancellationTokenSource.Token.IsCancellationRequested)
+					{
+						await Save();
 					}
 				}
 				Logger.Debug("Loaded {0} items.", new object[1] { base.APIObjectList.Count });
@@ -72,13 +108,22 @@ namespace Estreya.BlishHUD.Shared.State
 			}
 		}
 
-		private async Task<bool> ShouldLoadFiles()
+		private bool CanLoadFiles()
 		{
 			if (!Directory.Exists(DirectoryPath))
 			{
 				return false;
 			}
 			if (!File.Exists(Path.Combine(DirectoryPath, "items.json")))
+			{
+				return false;
+			}
+			return true;
+		}
+
+		private async Task<bool> ShouldLoadFiles()
+		{
+			if (!CanLoadFiles())
 			{
 				return false;
 			}
@@ -118,13 +163,13 @@ namespace Estreya.BlishHUD.Shared.State
 
 		public Item GetItemByName(string name)
 		{
-			if (base.Loading)
+			if (!_itemLock.IsFree())
 			{
 				return null;
 			}
-			using (_apiObjectListLock.Lock())
+			using (_itemLock.Lock())
 			{
-				foreach (Item item in base.APIObjectList)
+				foreach (Item item in Items)
 				{
 					if (item.Name == name)
 					{
@@ -137,13 +182,13 @@ namespace Estreya.BlishHUD.Shared.State
 
 		public Item GetItemById(int id)
 		{
-			if (base.Loading)
+			if (!_itemLock.IsFree())
 			{
 				return null;
 			}
-			using (_apiObjectListLock.Lock())
+			using (_itemLock.Lock())
 			{
-				foreach (Item item in base.APIObjectList)
+				foreach (Item item in Items)
 				{
 					if (item.Id == id)
 					{
@@ -163,6 +208,10 @@ namespace Estreya.BlishHUD.Shared.State
 			int chunkSize = 200;
 			foreach (IEnumerable<int> itemIdChunk in ((IEnumerable<int>)itemIds).ChunkBy(chunkSize))
 			{
+				if (_cancellationTokenSource.Token.IsCancellationRequested)
+				{
+					break;
+				}
 				try
 				{
 					try
@@ -201,6 +250,11 @@ namespace Estreya.BlishHUD.Shared.State
 			progress.Report(message);
 			Logger.Debug(message);
 			return (await ((IBulkExpandableClient<Item, int>)(object)apiManager.get_Gw2ApiClient().get_V2().get_Items()).ManyAsync(itemIdChunk, _cancellationTokenSource.Token)).Select((Item apiItem) => Item.FromAPI(apiItem)).ToList();
+		}
+
+		protected override void DoUnload()
+		{
+			base.Updated -= ItemState_Updated;
 		}
 	}
 }

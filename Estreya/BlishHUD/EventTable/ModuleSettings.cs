@@ -216,6 +216,19 @@ namespace Estreya.BlishHUD.EventTable
 			};
 		}
 
+		public void CheckDrawerSettings(EventAreaConfiguration configuration, List<EventCategory> categories)
+		{
+			Dictionary<int, EventCategory> notOrderedEventCategories = categories.Where((EventCategory ec) => !configuration.EventOrder.get_Value().Contains(ec.Key)).ToDictionary((EventCategory ec) => categories.IndexOf(ec), (EventCategory ec) => ec);
+			foreach (KeyValuePair<int, EventCategory> notOrderedEventCategory in notOrderedEventCategories)
+			{
+				configuration.EventOrder.get_Value().Insert(notOrderedEventCategory.Key, notOrderedEventCategory.Value.Key);
+			}
+			if (notOrderedEventCategories.Count > 0)
+			{
+				configuration.EventOrder.set_Value(new List<string>(configuration.EventOrder.get_Value()));
+			}
+		}
+
 		public new void RemoveDrawer(string name)
 		{
 			base.RemoveDrawer(name);

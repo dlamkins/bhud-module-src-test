@@ -257,7 +257,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				GetTimes();
 				_allEvents.ForEach(delegate(EventCategory ec)
 				{
-					ec.Load(_translationState);
+					ec.Load(_getNowAction, _translationState);
 				});
 			}
 			ReAddEvents();
@@ -265,29 +265,33 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private void Event_Removed(object sender, string apiCode)
 		{
+			List<Estreya.BlishHUD.EventTable.Models.Event> events = new List<Estreya.BlishHUD.EventTable.Models.Event>();
 			using (_eventLock.Lock())
 			{
-				(from ev in _allEvents.SelectMany((EventCategory ec) => ec.Events)
+				events.AddRange(from ev in _allEvents.SelectMany((EventCategory ec) => ec.Events)
 					where ev.APICode == apiCode
-					select ev).ToList().ForEach(delegate(Estreya.BlishHUD.EventTable.Models.Event ev)
-				{
-					_eventState.Remove(Configuration.Name, ev.SettingKey);
-				});
+					select ev);
 			}
+			events.ForEach(delegate(Estreya.BlishHUD.EventTable.Models.Event ev)
+			{
+				_eventState.Remove(Configuration.Name, ev.SettingKey);
+			});
 		}
 
 		private void Event_Completed(object sender, string apiCode)
 		{
 			DateTime until = GetNextReset();
+			List<Estreya.BlishHUD.EventTable.Models.Event> events = new List<Estreya.BlishHUD.EventTable.Models.Event>();
 			using (_eventLock.Lock())
 			{
-				(from ev in _allEvents.SelectMany((EventCategory ec) => ec.Events)
+				events.AddRange(from ev in _allEvents.SelectMany((EventCategory ec) => ec.Events)
 					where ev.APICode == apiCode
-					select ev).ToList().ForEach(delegate(Estreya.BlishHUD.EventTable.Models.Event ev)
-				{
-					FinishEvent(ev, until);
-				});
+					select ev);
 			}
+			events.ForEach(delegate(Estreya.BlishHUD.EventTable.Models.Event ev)
+			{
+				FinishEvent(ev, until);
+			});
 		}
 
 		private void BackgroundColor_SettingChanged(object sender, ValueChangedEventArgs<Color> e)
@@ -410,16 +414,19 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			new List<Task>();
 			List<string> activeEventKeys = GetActiveEventKeys();
 			ConcurrentDictionary<string, List<Estreya.BlishHUD.EventTable.Models.Event>> fillers = await GetFillers(times.Item1, times.Item2, times.Item3, activeEventKeys);
-			foreach (EventCategory ec in _allEvents)
+			using (await _eventLock.LockAsync())
 			{
-				if (fillers.TryGetValue(ec.Key, out var categoryFillers))
+				foreach (EventCategory ec in _allEvents)
 				{
-					categoryFillers.ForEach(delegate(Estreya.BlishHUD.EventTable.Models.Event cf)
+					if (fillers.TryGetValue(ec.Key, out var categoryFillers))
 					{
-						cf.Load(ec, _translationState);
-					});
+						categoryFillers.ForEach(delegate(Estreya.BlishHUD.EventTable.Models.Event cf)
+						{
+							cf.Load(ec, _getNowAction, _translationState);
+						});
+					}
+					ec.UpdateFillers(categoryFillers);
 				}
-				ec.UpdateFillers(categoryFillers);
 			}
 		}
 
@@ -439,7 +446,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 						where activeEventKeys.Any((string aeg) => aeg == ev.SettingKey)
 						select ev).ToList());
 				}
-				IEnumerable<string> eventKeys = activeEvents.Select((Estreya.BlishHUD.EventTable.Models.Event a) => a.SettingKey);
+				IEnumerable<string> eventKeys = activeEvents.Select((Estreya.BlishHUD.EventTable.Models.Event a) => a.SettingKey).Distinct();
 				Logger.Debug("Fetch fillers with active keys: " + string.Join(", ", eventKeys.ToArray()));
 				List<OnlineFillerCategory> fillerList = (await (await flurlRequest.PostJsonAsync(new OnlineFillerRequest
 				{
@@ -587,6 +594,10 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				}
 				_lastActiveEvent = _activeEvent;
 			}
+			else if (_activeEvent == null)
+			{
+				_lastActiveEvent = null;
+			}
 		}
 
 		private void CheckForNewEventsForScreen()
@@ -660,7 +671,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 							}
 							Color color = (string.IsNullOrWhiteSpace(ev2.BackgroundColorCode) ? Color.White : ColorTranslator.FromHtml(ev2.BackgroundColorCode));
 							return new Color((int)color.R, (int)color.G, (int)color.B) * Configuration.EventBackgroundOpacity.get_Value();
-						}, () => (!ev2.Filler) ? Configuration.DrawShadows.get_Value() : Configuration.DrawShadowsForFiller.get_Value(), () => (!ev2.Filler) ? (((Configuration.ShadowColor.get_Value().get_Id() == 1) ? Color.get_Black() : ColorExtensions.ToXnaColor(Configuration.ShadowColor.get_Value().get_Cloth())) * Configuration.ShadowOpacity.get_Value()) : (((Configuration.FillerShadowColor.get_Value().get_Id() == 1) ? Color.get_Black() : ColorExtensions.ToXnaColor(Configuration.FillerShadowColor.get_Value().get_Cloth())) * Configuration.FillerShadowOpacity.get_Value()), () => Configuration.ShowTooltips.get_Value());
+						}, () => (!ev2.Filler) ? Configuration.DrawShadows.get_Value() : Configuration.DrawShadowsForFiller.get_Value(), () => (!ev2.Filler) ? (((Configuration.ShadowColor.get_Value().get_Id() == 1) ? Color.get_Black() : ColorExtensions.ToXnaColor(Configuration.ShadowColor.get_Value().get_Cloth())) * Configuration.ShadowOpacity.get_Value()) : (((Configuration.FillerShadowColor.get_Value().get_Id() == 1) ? Color.get_Black() : ColorExtensions.ToXnaColor(Configuration.FillerShadowColor.get_Value().get_Cloth())) * Configuration.FillerShadowOpacity.get_Value()));
 						AddEventHooks(newEventControl);
 						Logger.Debug($"Added event {ev2.Name} with occurence {occurence}");
 						using (_controlLock.Lock())

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
@@ -9,7 +10,6 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
-using Blish_HUD.Entities;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Blish_HUD.Modules;
@@ -33,7 +33,7 @@ namespace Estreya.BlishHUD.EventTable
 	[Export(typeof(Module))]
 	public class EventTableModule : BaseModule<EventTableModule, ModuleSettings>
 	{
-		private Dictionary<string, EventArea> _areas = new Dictionary<string, EventArea>();
+		private ConcurrentDictionary<string, EventArea> _areas = new ConcurrentDictionary<string, EventArea>();
 
 		private AsyncLock _eventCategoryLock = new AsyncLock();
 
@@ -43,7 +43,9 @@ namespace Estreya.BlishHUD.EventTable
 
 		private AsyncRef<double> _lastEventUpdate = new AsyncRef<double>(0.0);
 
-		private List<IEntity> _worldEntites = new List<IEntity>();
+		private static TimeSpan _checkDrawerSettingInterval = TimeSpan.FromSeconds(30.0);
+
+		private double _lastCheckDrawerSettings;
 
 		public override string WebsiteModuleName => "event-table";
 
@@ -72,7 +74,6 @@ namespace Estreya.BlishHUD.EventTable
 			DynamicEventHandler = new DynamicEventHandler(MapUtil, DynamicEventState, base.Gw2ApiManager, base.ModuleSettings);
 			await DynamicEventHandler.AddDynamicEventsToMap();
 			await DynamicEventHandler.AddDynamicEventsToWorld();
-			base.Logger.Debug("Load events.");
 			await LoadEvents();
 			AddAllAreas();
 			SetAreaEvents();
@@ -105,6 +106,7 @@ namespace Estreya.BlishHUD.EventTable
 
 		public async Task LoadEvents()
 		{
+			base.Logger.Debug("Load events.");
 			using (await _eventCategoryLock.LockAsync())
 			{
 				try
@@ -120,13 +122,14 @@ namespace Estreya.BlishHUD.EventTable
 					base.Logger.Info($"Loaded {eventCategoryCount} Categories with {eventCount} Events.");
 					categories.ForEach(delegate(EventCategory ec)
 					{
-						ec.Load(base.TranslationState);
+						ec.Load(() => NowUTC, base.TranslationState);
 					});
 					_eventCategories = categories;
-					_eventCategories.SelectMany((EventCategory ec) => ec.Events).ToList().ForEach(delegate(Estreya.BlishHUD.EventTable.Models.Event ev)
+					foreach (Estreya.BlishHUD.EventTable.Models.Event ev2 in _eventCategories.SelectMany((EventCategory ec) => ec.Events))
 					{
-						AddEventHooks(ev);
-					});
+						AddEventHooks(ev2);
+					}
+					_lastCheckDrawerSettings = _checkDrawerSettingInterval.TotalMilliseconds;
 					SetAreaEvents();
 				}
 				catch (FlurlHttpException ex2)
@@ -137,6 +140,17 @@ namespace Estreya.BlishHUD.EventTable
 				catch (Exception ex)
 				{
 					base.Logger.Warn(ex, "Failed loading events.");
+				}
+			}
+		}
+
+		private void CheckDrawerSettings()
+		{
+			using (_eventCategoryLock.Lock())
+			{
+				foreach (KeyValuePair<string, EventArea> area in _areas)
+				{
+					base.ModuleSettings.CheckDrawerSettings(area.Value.Configuration, _eventCategories);
 				}
 			}
 		}
@@ -185,14 +199,14 @@ namespace Estreya.BlishHUD.EventTable
 			{
 				using (_eventCategoryLock.Lock())
 				{
-					DateTime now = NowUTC;
-					_eventCategories.SelectMany((EventCategory ec) => ec.Events).ToList().ForEach(delegate(Estreya.BlishHUD.EventTable.Models.Event ev)
+					foreach (Estreya.BlishHUD.EventTable.Models.Event item in _eventCategories.SelectMany((EventCategory ec) => ec.Events))
 					{
-						ev.Update(now);
-					});
+						item.Update(gameTime);
+					}
 				}
 			}
 			DynamicEventHandler.Update(gameTime);
+			UpdateUtil.Update(CheckDrawerSettings, gameTime, _checkDrawerSettingInterval.TotalMilliseconds, ref _lastCheckDrawerSettings);
 			UpdateUtil.UpdateAsync(LoadEvents, gameTime, _updateEventsInterval.TotalMilliseconds, _lastEventUpdate);
 		}
 
@@ -212,7 +226,7 @@ namespace Estreya.BlishHUD.EventTable
 			if (base.ModuleSettings.RemindersEnabled.get_Value() && !base.ModuleSettings.ReminderDisabledForEvents.get_Value().Contains(ev.SettingKey))
 			{
 				string startsInTranslation = base.TranslationState.GetTranslation("eventArea-reminder-startsIn", "Starts in");
-				EventNotification eventNotification = new EventNotification(ev, startsInTranslation + " " + e.Humanize() + "!", base.ModuleSettings.ReminderPosition.X.get_Value(), base.ModuleSettings.ReminderPosition.Y.get_Value(), base.IconState);
+				EventNotification eventNotification = new EventNotification(ev, startsInTranslation + " " + e.Humanize(2) + "!", base.ModuleSettings.ReminderPosition.X.get_Value(), base.ModuleSettings.ReminderPosition.Y.get_Value(), base.IconState);
 				eventNotification.BackgroundOpacity = base.ModuleSettings.ReminderOpacity.get_Value();
 				eventNotification.Show(TimeSpan.FromSeconds(base.ModuleSettings.ReminderDuration.get_Value()));
 			}
@@ -247,7 +261,7 @@ namespace Estreya.BlishHUD.EventTable
 			EventArea eventArea = new EventArea(configuration, base.IconState, base.TranslationState, EventState, base.WorldbossState, base.MapchestState, base.PointOfInterestState, MapUtil, GetFlurlClient(), base.API_URL, () => NowUTC, () => ((Module)this).get_Version());
 			((Control)eventArea).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			EventArea area = eventArea;
-			_areas.Add(configuration.Name, area);
+			_areas.AddOrUpdate(configuration.Name, area, (string name, EventArea prev) => area);
 		}
 
 		private void RemoveArea(EventAreaConfiguration configuration)
@@ -260,7 +274,7 @@ namespace Estreya.BlishHUD.EventTable
 			{
 				((Control)eventArea).Dispose();
 			}
-			_areas.Remove(configuration.Name);
+			_areas.TryRemove(configuration.Name, out var _);
 			base.ModuleSettings.RemoveDrawer(configuration.Name);
 		}
 

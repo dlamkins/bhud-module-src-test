@@ -61,7 +61,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 			}
 		}
 
-		public void Load(TranslationState translationState = null)
+		public void Load(Func<DateTime> getNowAction, TranslationState translationState = null)
 		{
 			if (translationState != null)
 			{
@@ -71,7 +71,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 			{
 				Events.ForEach(delegate(Event ev)
 				{
-					ev.Load(this, translationState);
+					ev.Load(this, getNowAction, translationState);
 				});
 			}
 		}

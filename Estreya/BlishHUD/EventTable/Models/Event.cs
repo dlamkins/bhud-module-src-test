@@ -7,15 +7,25 @@ using Blish_HUD;
 using Estreya.BlishHUD.Shared.Attributes;
 using Estreya.BlishHUD.Shared.Json.Converter;
 using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Utils;
+using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 
 namespace Estreya.BlishHUD.EventTable.Models
 {
 	[Serializable]
-	public class Event
+	public class Event : IUpdatable
 	{
 		[IgnoreCopy]
 		private static readonly Logger Logger = Logger.GetLogger<Event>();
+
+		[IgnoreCopy]
+		private static TimeSpan _checkForRemindersInterval = TimeSpan.FromMilliseconds(5000.0);
+
+		[IgnoreCopy]
+		private double _lastCheckForReminders;
+
+		private Func<DateTime> _getNowAction;
 
 		[JsonIgnore]
 		public TimeSpan[] ReminderTimes = new TimeSpan[1] { TimeSpan.FromMinutes(10.0) };
@@ -109,7 +119,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 			return eventWidth;
 		}
 
-		public void Load(EventCategory ec, TranslationState translationState = null)
+		public void Load(EventCategory ec, Func<DateTime> getNowAction, TranslationState translationState = null)
 		{
 			if (string.IsNullOrWhiteSpace(Key))
 			{
@@ -120,18 +130,25 @@ namespace Estreya.BlishHUD.EventTable.Models
 				Icon = ec.Icon;
 			}
 			SettingKey = ec.Key + "_" + Key;
+			_getNowAction = getNowAction;
 			if (translationState != null)
 			{
 				Name = translationState.GetTranslation("event-" + ec.Key + "_" + Key + "-name", Name);
 			}
 		}
 
-		public void Update(DateTime nowUTC)
+		public void Update(GameTime gameTime)
+		{
+			UpdateUtil.Update(CheckForReminder, gameTime, _checkForRemindersInterval.TotalMilliseconds, ref _lastCheckForReminders);
+		}
+
+		private void CheckForReminder()
 		{
 			if (Filler)
 			{
 				return;
 			}
+			DateTime nowUTC = _getNowAction();
 			foreach (DateTime occurence in Occurences.Where((DateTime o) => o >= nowUTC))
 			{
 				List<TimeSpan> alreadyRemindedTimes = _remindedFor.GetOrAdd(occurence, (DateTime o) => new List<TimeSpan>());
@@ -141,10 +158,10 @@ namespace Estreya.BlishHUD.EventTable.Models
 					if (!alreadyRemindedTimes.Contains(time))
 					{
 						DateTime remindAt = occurence - time;
-						TimeSpan diff = nowUTC - remindAt;
-						if (remindAt <= nowUTC && Math.Abs(diff.TotalSeconds) <= 1.0)
+						TimeSpan diff = remindAt - nowUTC;
+						if (remindAt < nowUTC || (remindAt >= nowUTC && diff.TotalSeconds <= 0.0))
 						{
-							this.Reminder?.Invoke(this, time);
+							this.Reminder?.Invoke(this, occurence - nowUTC);
 							alreadyRemindedTimes.Add(time);
 						}
 					}

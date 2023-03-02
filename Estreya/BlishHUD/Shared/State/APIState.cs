@@ -88,6 +88,11 @@ namespace Estreya.BlishHUD.Shared.State
 
 		protected override async Task Load()
 		{
+			await LoadFromAPI();
+		}
+
+		protected async Task LoadFromAPI(bool resetCompletion = true)
+		{
 			if (!_loadingLock.IsFree())
 			{
 				Logger.Warn("Tried to load again while already loading.");
@@ -95,7 +100,10 @@ namespace Estreya.BlishHUD.Shared.State
 			}
 			using (await _loadingLock.LockAsync())
 			{
-				_eventWaitHandle.Reset();
+				if (resetCompletion)
+				{
+					_eventWaitHandle.Reset();
+				}
 				Loading = true;
 				try
 				{
@@ -111,7 +119,7 @@ namespace Estreya.BlishHUD.Shared.State
 				finally
 				{
 					Loading = false;
-					_eventWaitHandle.Set();
+					SignalCompletion();
 				}
 			}
 		}
@@ -175,7 +183,7 @@ namespace Estreya.BlishHUD.Shared.State
 			{
 				using (await _apiObjectListLock.LockAsync())
 				{
-					List<T> oldAPIObjectList = APIObjectList.Copy();
+					List<T> oldAPIObjectList = APIObjectList.ToArray().ToList();
 					APIObjectList.Clear();
 					Logger.Debug("Got {0} api objects from previous fetch.", new object[1] { oldAPIObjectList.Count });
 					if (!_apiManager.HasPermissions((IEnumerable<TokenPermission>)base.Configuration.NeededPermissions))

@@ -98,7 +98,14 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			((Container)val).set_AutoSizePadding(new Point(15, 15));
 			((Control)val).set_Parent(buildPanel);
 			Panel parentPanel = (MainPanel = val);
-			InternalBuild(parentPanel);
+			try
+			{
+				InternalBuild(parentPanel);
+			}
+			catch (Exception ex)
+			{
+				Logger.Warn(ex, "Failed building view " + ((object)this).GetType().FullName);
+			}
 		}
 
 		protected abstract void InternalBuild(Panel parent);
@@ -108,12 +115,10 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			ViewContainer val = new ViewContainer();
-			((Container)val).set_WidthSizingMode((SizingMode)2);
-			((Container)val).set_HeightSizingMode((SizingMode)1);
+			Panel val = new Panel();
 			((Control)val).set_Parent((Container)(object)parent);
-			val.Show((IView)(object)new EmptyLineView(height));
+			((Control)val).set_Height(height);
+			((Container)val).set_WidthSizingMode((SizingMode)2);
 		}
 
 		protected TextBox RenderTextbox(Panel parent, Point location, int width, string value, string placeholder, Action<string> onChangeAction = null, Action<string> onEnterAction = null, bool clearOnEnter = false)

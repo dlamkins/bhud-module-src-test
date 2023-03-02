@@ -40,10 +40,6 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private readonly Func<Color> _getShadowColor;
 
-		private readonly Func<bool> _getShowTooltips;
-
-		private Tooltip _tooltip;
-
 		public Estreya.BlishHUD.EventTable.Models.Event Ev { get; private set; }
 
 		public event EventHandler HideRequested;
@@ -52,7 +48,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		public event EventHandler FinishRequested;
 
-		public Event(Estreya.BlishHUD.EventTable.Models.Event ev, IconState iconState, TranslationState translationState, Func<DateTime> getNowAction, DateTime startTime, DateTime endTime, Func<BitmapFont> getFontAction, Func<bool> getDrawBorders, Func<bool> getDrawCrossout, Func<Color> getTextColor, Func<Color> getColorAction, Func<bool> getDrawShadowAction, Func<Color> getShadowColor, Func<bool> getShowTooltips)
+		public Event(Estreya.BlishHUD.EventTable.Models.Event ev, IconState iconState, TranslationState translationState, Func<DateTime> getNowAction, DateTime startTime, DateTime endTime, Func<BitmapFont> getFontAction, Func<bool> getDrawBorders, Func<bool> getDrawCrossout, Func<Color> getTextColor, Func<Color> getColorAction, Func<bool> getDrawShadowAction, Func<Color> getShadowColor)
 		{
 			Ev = ev;
 			_iconState = iconState;
@@ -67,7 +63,6 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			_getColorAction = getColorAction;
 			_getDrawShadowAction = getDrawShadowAction;
 			_getShadowColor = getShadowColor;
-			_getShowTooltips = getShowTooltips;
 		}
 
 		public ContextMenuStrip BuildContextMenu()

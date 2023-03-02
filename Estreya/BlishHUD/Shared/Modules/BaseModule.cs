@@ -332,9 +332,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Expected O, but got Unknown
-			//IL_0030: Expected O, but got Unknown
+			//IL_002e: Expected O, but got Unknown
 			if (show)
 			{
 				if (CornerIcon == null)
@@ -342,10 +340,9 @@ namespace Estreya.BlishHUD.Shared.Modules
 					CornerIcon val = new CornerIcon();
 					val.set_IconName(((Module)this).get_Name());
 					val.set_Icon(GetCornerIcon());
-					CornerIcon val2 = val;
 					CornerIcon = val;
+					OnCornerIconBuild();
 				}
-				OnCornerIconBuild();
 			}
 			else if (CornerIcon != null)
 			{
@@ -429,8 +426,10 @@ namespace Estreya.BlishHUD.Shared.Modules
 			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d8: Expected O, but got Unknown
-			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0168: Expected O, but got Unknown
+			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0160: Expected O, but got Unknown
+			//IL_019e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a8: Expected O, but got Unknown
 			((Module)this).OnModuleLoaded(e);
 			Logger.Debug("Start building settings window.");
 			Texture2D windowBackground = AsyncTexture2D.op_Implicit(IconState.GetIcon("textures\\setting_window_background.png"));
@@ -460,6 +459,10 @@ namespace Estreya.BlishHUD.Shared.Modules
 				}
 			}
 			OnSettingWindowBuild(SettingsWindow);
+			SettingsWindow.get_Tabs().Add(new Tab(IconState.GetIcon("156331.png"), (Func<IView>)(() => (IView)(object)new DonationView(GetFlurlClient(), Gw2ApiManager, IconState, TranslationState, GameService.Content.get_DefaultFont16())
+			{
+				DefaultColor = ModuleSettings.DefaultGW2Color
+			}), "Donation", (int?)null));
 			if (Debug)
 			{
 				SettingsWindow.get_Tabs().Add(new Tab(IconState.GetIcon("155052.png"), (Func<IView>)(() => (IView)(object)new StateSettingsView(_states, Gw2ApiManager, IconState, TranslationState, SettingEventState, Font)
