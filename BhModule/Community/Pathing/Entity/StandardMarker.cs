@@ -116,6 +116,8 @@ namespace BhModule.Community.Pathing.Entity
 
 		private const string ATTR_TRIGGERRANGE = "triggerrange";
 
+		private const string ATTR_INFORANGE = "inforange";
+
 		private bool _focused;
 
 		private const string ATTR_RESETLENGTH = "resetlength";
@@ -925,6 +927,10 @@ namespace BhModule.Community.Pathing.Entity
 			if (collection.TryPopAttribute("triggerrange", out var attribute))
 			{
 				TriggerRange = attribute.GetValueAsFloat(_packState.UserResourceStates.Population.MarkerPopulationDefaults.TriggerRange);
+			}
+			if (TriggerRange == _packState.UserResourceStates.Population.MarkerPopulationDefaults.TriggerRange && collection.TryPopAttribute("inforange", out var rangeAttr))
+			{
+				TriggerRange = rangeAttr.GetValueAsFloat(_packState.UserResourceStates.Population.MarkerPopulationDefaults.TriggerRange);
 			}
 		}
 

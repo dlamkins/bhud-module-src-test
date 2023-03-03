@@ -9,10 +9,6 @@ namespace BhModule.Community.Pathing.Behavior.Modifier
 	{
 		public const string PRIMARY_ATTR_NAME = "info";
 
-		private const string ATTR_RANGE = "inforange";
-
-		private const float DEFAULT_INFORANGE = 2f;
-
 		private readonly IPackState _packState;
 
 		private string _infoValue;
@@ -39,22 +35,17 @@ namespace BhModule.Community.Pathing.Behavior.Modifier
 			}
 		}
 
-		public InfoModifier(StandardMarker pathingEntity, string value, float range, IPackState packState)
+		public InfoModifier(StandardMarker pathingEntity, string value, IPackState packState)
 			: base(pathingEntity)
 		{
 			_packState = packState;
 			InfoValue = value;
-			if (pathingEntity.TriggerRange == _packState.UserResourceStates.Population.MarkerPopulationDefaults.TriggerRange)
-			{
-				pathingEntity.TriggerRange = range;
-			}
 		}
 
 		public static IBehavior BuildFromAttributes(AttributeCollection attributes, StandardMarker marker, IPackState packState)
 		{
 			IAttribute valueAttr;
-			IAttribute rangeAttr;
-			return new InfoModifier(marker, attributes.TryGetAttribute("info", out valueAttr) ? valueAttr.GetValueAsString() : "", attributes.TryGetAttribute("inforange", out rangeAttr) ? rangeAttr.GetValueAsFloat(2f) : 2f, packState);
+			return new InfoModifier(marker, attributes.TryGetAttribute("info", out valueAttr) ? valueAttr.GetValueAsString() : "", packState);
 		}
 
 		public void Focus()

@@ -75,7 +75,11 @@ namespace BhModule.Community.Pathing.Entity
 			}
 			((Control)newMenu).add_Hidden((EventHandler<EventArgs>)delegate
 			{
-				((Control)_activeContextMenu).Dispose();
+				ContextMenuStrip activeContextMenu = _activeContextMenu;
+				if (activeContextMenu != null)
+				{
+					((Control)activeContextMenu).Dispose();
+				}
 				_activeContextMenu = null;
 			});
 			_activeContextMenu = newMenu;
