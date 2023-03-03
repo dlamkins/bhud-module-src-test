@@ -4,14 +4,15 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 
-[assembly: AssemblyTitle("Blish-HUD-Extended")]
-[assembly: AssemblyDescription("Extensions to make Blish-HUD more awesome.")]
+[assembly: AssemblyTitle("RegionsOfTyriaModule")]
+[assembly: AssemblyDescription("A beautiful area notification as you walk in and out of different zones.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("agaertner")]
-[assembly: AssemblyProduct("Blish-HUD-Extended")]
-[assembly: AssemblyCopyright("Copyright © agaertner 2022")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("RegionsOfTyriaModule")]
+[assembly: AssemblyCopyright("Copyright © A. Gärtner 2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: ComVisible(false)]
-[assembly: Guid("33c90e9c-3308-4a0e-8dfd-5855f296a72c")]
-[assembly: AssemblyFileVersion("0.1.0.8")]
-[assembly: AssemblyVersion("0.1.0.8")]
+[assembly: Guid("e2c4cb6b-fcc2-437f-a111-fcf6805ef806")]
+[assembly: AssemblyFileVersion("0.6.9.3")]
+[assembly: AssemblyInformationalVersion("0.6.9-dev.3+Branch.dev.Sha.b4184912dbce749b2e2e9a49e68e9c2d92b613da")]
+[assembly: AssemblyVersion("0.6.9.3")]

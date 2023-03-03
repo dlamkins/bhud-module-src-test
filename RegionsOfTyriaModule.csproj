@@ -37,22 +37,15 @@
     <Reference Include="RBush">
       <HintPath>..\..\working\RBush.dll</HintPath>
     </Reference>
-    <Reference Include="MonoGame.Framework">
-      <HintPath>..\..\working\MonoGame.Framework.dll</HintPath>
-    </Reference>
+    <Reference Include="MonoGame.Framework" />
     <Reference Include="System.Core" />
-    <Reference Include="MonoGame.Extended">
-      <HintPath>..\..\working\MonoGame.Extended.dll</HintPath>
-    </Reference>
+    <Reference Include="MonoGame.Extended" />
     <Reference Include="System.ServiceModel" />
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\working\Newtonsoft.Json.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="Newtonsoft.Json" />
     <Reference Include="Flurl.Http" />
     <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="AsyncClipboardService">
-      <HintPath>..\..\working\AsyncClipboardService.dll</HintPath>
-    </Reference>
+    <Reference Include="AsyncClipboardService" />
     <Reference Include="System.Net.Http" />
   </ItemGroup>
 </Project>

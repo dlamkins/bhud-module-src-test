@@ -27,7 +27,11 @@ namespace Blish_HUD.Extended
 
 		public static bool GetInnerBounds(IntPtr hWnd, out Rectangle bounds)
 		{
-			bounds = Rectangle.Empty;
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+			bounds = Rectangle.get_Empty();
 			if (!GetWindowRect(hWnd, out var wndBounds) || !GetClientRect(hWnd, out var clientBounds))
 			{
 				return false;

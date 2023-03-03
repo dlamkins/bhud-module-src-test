@@ -113,6 +113,8 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 
 		static MapNotification()
 		{
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 			_lastNotificationTime = DateTime.Now;
 			ActiveMapNotifications = new SynchronizedCollection<MapNotification>();
 			SmallFont = Control.get_Content().GetFont((FontFace)0, (FontSize)24, (FontStyle)0);
@@ -123,6 +125,8 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 		private MapNotification(string header, string text, float showDuration = 4f, float fadeInDuration = 2f, float fadeOutDuration = 2f)
 			: this()
 		{
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
 			_showDuration = showDuration;
 			_fadeInDuration = fadeInDuration;
 			_fadeOutDuration = fadeOutDuration;
@@ -139,6 +143,8 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 
 		private void UpdateLocation(object o, ResizedEventArgs e)
 		{
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).set_Size(new Point(((Control)GameService.Graphics.get_SpriteScreen()).get_Width(), ((Control)GameService.Graphics.get_SpriteScreen()).get_Height()));
 			((Control)this).set_Location(new Point(0, 0));
 		}
@@ -150,19 +156,52 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0193: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
+			if (RegionsOfTyriaModule.ModuleInstance == null)
+			{
+				return;
+			}
 			int height = (int)(RegionsOfTyriaModule.ModuleInstance.VerticalPositionSetting.get_Value() / 100f * (float)bounds.Height);
 			if (!string.IsNullOrEmpty(Header) && !Header.Equals(Text, StringComparison.InvariantCultureIgnoreCase))
 			{
 				foreach (string headerLine in _headerLines)
 				{
-					Size2 size = SmallFont.MeasureString(headerLine);
-					int lineWidth = (int)size.Width;
-					int lineHeight = (int)size.Height;
+					Size2 val = SmallFont.MeasureString(headerLine);
+					int lineWidth = (int)val.Width;
+					int lineHeight = (int)val.Height;
 					Rectangle rect = new Rectangle(0, 20 + height, bounds.Width, bounds.Height);
-					height += SmallFont.LetterSpacing + lineHeight;
+					height += SmallFont.get_LetterSpacing() + lineHeight;
 					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, headerLine, SmallFont, rect, BrightGold, false, true, 1, (HorizontalAlignment)1, (VerticalAlignment)0);
 					rect = new Rectangle((bounds.Width - (lineWidth + 2)) / 2, rect.Y + lineHeight + 2, lineWidth + 2, 3);
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), rect, Color.Black * 0.8f);
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), rect, Color.get_Black() * 0.8f);
 					rect = new Rectangle(rect.X + 1, rect.Y + 1, lineWidth, 1);
 					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), rect, BrightGold);
 				}
@@ -175,7 +214,7 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 			foreach (string textLine in _textLines)
 			{
 				Rectangle rect = new Rectangle(0, 20 + height, bounds.Width, bounds.Height);
-				height += MediumFont.LetterSpacing + (int)MediumFont.MeasureString(textLine).Height;
+				height += MediumFont.get_LetterSpacing() + (int)MediumFont.MeasureString(textLine).Height;
 				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, textLine, MediumFont, rect, BrightGold, false, true, 1, (HorizontalAlignment)1, (VerticalAlignment)0);
 			}
 		}
@@ -237,7 +276,7 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 			((Control)nNot).set_ZIndex(ActiveMapNotifications.DefaultIfEmpty(nNot).Max((MapNotification n) => ((Control)n).get_ZIndex()) + 1);
 			foreach (MapNotification activeMapNotification in ActiveMapNotifications)
 			{
-				activeMapNotification.SlideDown((int)((float)(SmallFont.LineHeight + MediumFont.LineHeight) + 21f));
+				activeMapNotification.SlideDown((int)((float)(SmallFont.get_LineHeight() + MediumFont.get_LineHeight()) + 21f));
 			}
 			ActiveMapNotifications.Add(nNot);
 			((Control)nNot).Show();

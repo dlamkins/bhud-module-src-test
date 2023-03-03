@@ -46,7 +46,11 @@ namespace Nekres.Regions_Of_Tyria.Geometry
 
 		public bool Equals(Sector other)
 		{
-			return _envelope == other._envelope;
+			if (other != null)
+			{
+				return _envelope == other._envelope;
+			}
+			return false;
 		}
 	}
 }

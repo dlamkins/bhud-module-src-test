@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Blish_HUD.Controls;
 using Blish_HUD.Extended.Core.Views;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Modules;
@@ -13,7 +14,6 @@ using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Gw2Sharp.Models;
 using Gw2Sharp.WebApi.Exceptions;
-using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
@@ -45,6 +45,10 @@ namespace Nekres.Regions_Of_Tyria
 		private SettingEntry<bool> _includeMapInSectorNotification;
 
 		internal SettingEntry<float> VerticalPositionSetting;
+
+		private DateTime _lastVerticalChange = DateTime.UtcNow;
+
+		private ControlPositionIndicator _verticalIndicator;
 
 		private float _showDuration;
 
@@ -128,16 +132,26 @@ namespace Nekres.Regions_Of_Tyria
 
 		protected override async void Update(GameTime gameTime)
 		{
-			if (!(gameTime.TotalGameTime.TotalMilliseconds - _lastRun < 10.0) && !(DateTime.UtcNow.Subtract(_lastUpdate).TotalMilliseconds < 1000.0) && _toggleSectorNotificationSetting.get_Value() && GameService.Gw2Mumble.get_IsAvailable() && GameService.GameIntegration.get_Gw2Instance().get_IsInGame())
+			if (gameTime.get_TotalGameTime().TotalMilliseconds - _lastRun < 10.0 || DateTime.UtcNow.Subtract(_lastUpdate).TotalMilliseconds < 1000.0 || !_toggleSectorNotificationSetting.get_Value() || !GameService.Gw2Mumble.get_IsAvailable() || !GameService.GameIntegration.get_Gw2Instance().get_IsInGame())
 			{
-				_lastRun = gameTime.ElapsedGameTime.TotalMilliseconds;
-				_lastUpdate = DateTime.UtcNow;
-				Map currentMap = await _mapRepository.GetItem(GameService.Gw2Mumble.get_CurrentMap().get_Id());
-				Sector currentSector = await GetSector(currentMap);
-				if (currentSector != null)
+				return;
+			}
+			_lastRun = gameTime.get_ElapsedGameTime().TotalMilliseconds;
+			_lastUpdate = DateTime.UtcNow;
+			if (DateTime.UtcNow.Subtract(_lastVerticalChange).TotalMilliseconds > 250.0)
+			{
+				ControlPositionIndicator verticalIndicator = _verticalIndicator;
+				if (verticalIndicator != null)
 				{
-					MapNotification.ShowNotification(_includeMapInSectorNotification.get_Value() ? currentMap.get_Name() : null, currentSector.Name, null, _showDuration, _fadeInDuration, _fadeOutDuration);
+					((Control)verticalIndicator).Dispose();
 				}
+				_verticalIndicator = null;
+			}
+			Map currentMap = await _mapRepository.GetItem(GameService.Gw2Mumble.get_CurrentMap().get_Id());
+			Sector currentSector = await GetSector(currentMap);
+			if (currentSector != null)
+			{
+				MapNotification.ShowNotification(_includeMapInSectorNotification.get_Value() ? currentMap.get_Name() : null, currentSector.Name, null, _showDuration, _fadeInDuration, _fadeOutDuration);
 			}
 		}
 
@@ -151,6 +165,7 @@ namespace Nekres.Regions_Of_Tyria
 			_showDurationSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnShowDurationSettingChanged);
 			_fadeInDurationSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnFadeInDurationSettingChanged);
 			_fadeOutDurationSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnFadeOutDurationSettingChanged);
+			VerticalPositionSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnVerticalPositionSettingChanged);
 			((Module)this).OnModuleLoaded(e);
 		}
 
@@ -171,12 +186,29 @@ namespace Nekres.Regions_Of_Tyria
 
 		protected override void Unload()
 		{
+			ControlPositionIndicator verticalIndicator = _verticalIndicator;
+			if (verticalIndicator != null)
+			{
+				((Control)verticalIndicator).Dispose();
+			}
+			VerticalPositionSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnVerticalPositionSettingChanged);
 			_showDurationSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnShowDurationSettingChanged);
 			_fadeInDurationSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnFadeInDurationSettingChanged);
 			_fadeOutDurationSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnFadeOutDurationSettingChanged);
 			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
 			GameService.Overlay.remove_UserLocaleChanged((EventHandler<ValueEventArgs<CultureInfo>>)OnUserLocaleChanged);
 			ModuleInstance = null;
+		}
+
+		private void OnVerticalPositionSettingChanged(object o, ValueChangedEventArgs<float> e)
+		{
+			_lastVerticalChange = DateTime.UtcNow;
+			if (_verticalIndicator == null)
+			{
+				ControlPositionIndicator controlPositionIndicator = new ControlPositionIndicator();
+				((Control)controlPositionIndicator).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+				_verticalIndicator = controlPositionIndicator;
+			}
 		}
 
 		private void OnUserLocaleChanged(object o, ValueEventArgs<CultureInfo> e)
@@ -221,7 +253,7 @@ namespace Nekres.Regions_Of_Tyria
 			RBush<Sector> obj = await _sectorRepository.GetItem(GameService.Gw2Mumble.get_CurrentMap().get_Id());
 			Envelope boundingBox = new Envelope(((Coordinates2)(ref playerLocation)).get_X(), ((Coordinates2)(ref playerLocation)).get_Y(), ((Coordinates2)(ref playerLocation)).get_X(), ((Coordinates2)(ref playerLocation)).get_Y());
 			IReadOnlyList<Sector> foundPoints = obj.Search(in boundingBox);
-			if (foundPoints == null || foundPoints.Count == 0 || _prevSectorId.Equals(foundPoints[0].Id))
+			if (foundPoints.Count == 0 || _prevSectorId.Equals(foundPoints[0].Id))
 			{
 				return null;
 			}
@@ -231,34 +263,38 @@ namespace Nekres.Regions_Of_Tyria
 
 		private async Task<RBush<Sector>> RequestSectors(int mapId)
 		{
-			return await (await _mapRepository.GetItem(mapId).ContinueWith(async delegate(Task<Map> result)
+			Map map;
+			try
 			{
-				if (result.IsFaulted)
-				{
-					return null;
-				}
-				Map map = result.Result;
-				IEnumerable<Sector> sectors = new HashSet<Sector>();
-				ProjectionEqualityComparer<Sector, int> comparer = ProjectionEqualityComparer<Sector>.Create((Sector x) => x.Id);
-				foreach (int floor in map.get_Floors())
-				{
-					IEnumerable<Sector> first = sectors;
-					sectors = first.Union(await RequestSectorsForFloor(map.get_ContinentId(), floor, map.get_RegionId(), map.get_Id()), comparer);
-				}
-				RBush<Sector> rtree = new RBush<Sector>();
-				foreach (Sector sector in sectors)
-				{
-					rtree.Insert(sector);
-				}
-				return rtree;
-			}));
+				map = await _mapRepository.GetItem(mapId);
+			}
+			catch (RequestException val)
+			{
+				RequestException e = val;
+				Logger.Debug((Exception)(object)e, ((Exception)(object)e).Message);
+				return null;
+			}
+			if (map == null)
+			{
+				return null;
+			}
+			IEnumerable<Sector> sectors = new HashSet<Sector>();
+			ProjectionEqualityComparer<Sector, int> comparer = ProjectionEqualityComparer<Sector>.Create((Sector x) => x.Id);
+			foreach (int floor in map.get_Floors())
+			{
+				IEnumerable<Sector> first = sectors;
+				sectors = first.Union(await RequestSectorsForFloor(map.get_ContinentId(), floor, map.get_RegionId(), map.get_Id()), comparer);
+			}
+			RBush<Sector> rBush = new RBush<Sector>();
+			rBush.BulkLoad(sectors);
+			return rBush;
 		}
 
 		private async Task<IEnumerable<Sector>> RequestSectorsForFloor(int continentId, int floor, int regionId, int mapId)
 		{
 			try
 			{
-				return await ((IAllExpandableClient<ContinentFloorRegionMapSector>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Continents()
+				return ((IEnumerable<ContinentFloorRegionMapSector>)(await ((IAllExpandableClient<ContinentFloorRegionMapSector>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Continents()
 					.get_Item(continentId)
 					.get_Floors()
 					.get_Item(floor)
@@ -266,35 +302,22 @@ namespace Nekres.Regions_Of_Tyria
 					.get_Item(regionId)
 					.get_Maps()
 					.get_Item(mapId)
-					.get_Sectors()).AllAsync(default(CancellationToken)).ContinueWith(delegate(Task<IApiV2ObjectList<ContinentFloorRegionMapSector>> task)
-				{
-					HashSet<Sector> hashSet = new HashSet<Sector>();
-					if (task.IsFaulted)
-					{
-						return hashSet;
-					}
-					foreach (ContinentFloorRegionMapSector current in (IEnumerable<ContinentFloorRegionMapSector>)task.Result)
-					{
-						hashSet.Add(new Sector(current));
-					}
-					return hashSet;
-				});
+					.get_Sectors()).AllAsync(default(CancellationToken)))).Select((ContinentFloorRegionMapSector x) => new Sector(x));
 			}
-			catch (BadRequestException val)
+			catch (NotFoundException val)
 			{
-				BadRequestException bre = val;
-				Logger.Debug("{0} | The map id {1} does not exist on floor {2}.", new object[3]
-				{
-					((Exception)(object)bre).GetType().FullName,
-					mapId,
-					floor
-				});
+				NotFoundException e = val;
+				Logger.Debug((Exception)(object)e, "The map id {0} does not exist on floor {1}.", new object[2] { mapId, floor });
 				return Enumerable.Empty<Sector>();
 			}
-			catch (UnexpectedStatusException val2)
+			catch (BadRequestException)
 			{
-				UnexpectedStatusException use = val2;
-				Logger.Debug(((Exception)(object)use).Message);
+				return Enumerable.Empty<Sector>();
+			}
+			catch (RequestException val3)
+			{
+				RequestException ex = val3;
+				Logger.Debug((Exception)(object)ex, ((Exception)(object)ex).Message);
 				return Enumerable.Empty<Sector>();
 			}
 		}
@@ -303,18 +326,12 @@ namespace Nekres.Regions_Of_Tyria
 		{
 			try
 			{
-				return await ((IBulkExpandableClient<Map, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Maps()).GetAsync(id, default(CancellationToken)).ContinueWith((Task<Map> task) => (!task.IsFaulted && task.IsCompleted) ? task.Result : null);
+				return await ((IBulkExpandableClient<Map, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Maps()).GetAsync(id, default(CancellationToken));
 			}
-			catch (BadRequestException val)
+			catch (RequestException val)
 			{
-				BadRequestException bre = val;
-				Logger.Debug(((Exception)(object)bre).Message);
-				return null;
-			}
-			catch (UnexpectedStatusException val2)
-			{
-				UnexpectedStatusException use = val2;
-				Logger.Debug(((Exception)(object)use).Message);
+				RequestException e = val;
+				Logger.Debug(((Exception)(object)e).Message);
 				return null;
 			}
 		}
