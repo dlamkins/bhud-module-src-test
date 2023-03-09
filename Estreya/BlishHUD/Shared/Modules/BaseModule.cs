@@ -33,11 +33,11 @@ namespace Estreya.BlishHUD.Shared.Modules
 {
 	public abstract class BaseModule<TModule, TSettings> : Module where TModule : class where TSettings : BaseModuleSettings
 	{
-		public const string FILE_ROOT_URL = "https://files.estreya.de";
+		protected const string FILE_ROOT_URL = "https://files.estreya.de";
 
-		public const string FILE_BLISH_ROOT_URL = "https://files.estreya.de/blish-hud";
+		protected const string FILE_BLISH_ROOT_URL = "https://files.estreya.de/blish-hud";
 
-		private const string API_ROOT_URL = "https://blish-hud.api.estreya.de";
+		protected string API_ROOT_URL = "https://blish-hud.api.estreya.de";
 
 		protected const string GITHUB_OWNER = "Tharylia";
 
@@ -65,7 +65,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		public string WEBSITE_MODULE_FILE_URL => "https://files.estreya.de/blish-hud/" + WebsiteModuleName;
 
-		public string API_URL => "https://blish-hud.api.estreya.de/v" + API_VERSION_NO + "/" + WebsiteModuleName;
+		public string API_URL => API_ROOT_URL + "/v" + API_VERSION_NO + "/" + WebsiteModuleName;
 
 		public abstract string WebsiteModuleName { get; }
 
@@ -161,7 +161,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 		protected override async Task LoadAsync()
 		{
 			Logger.Debug("Initialize states");
-			await InitializeStates();
+			await Task.Factory.StartNew((Func<Task>)InitializeStates, TaskCreationOptions.LongRunning).Unwrap();
 			GithubHelper = new GitHubHelper("Tharylia", "Blish-HUD-Modules", "Iv1.9e4dc29d43243704", ((Module)this).get_Name(), PasswordManager, IconState, TranslationState);
 			ModuleSettings.UpdateLocalization(TranslationState);
 			ModuleSettings.ModuleSettingsChanged += ModuleSettings_ModuleSettingsChanged;

@@ -13,15 +13,6 @@ namespace Estreya.BlishHUD.EventTable.State
 {
 	public class DynamicEventState : APIState
 	{
-		public class Map
-		{
-			[JsonProperty("id")]
-			public int ID { get; set; }
-
-			[JsonProperty("name")]
-			public string Name { get; set; }
-		}
-
 		public class DynamicEvent
 		{
 			public class DynamicEventLocation
@@ -30,22 +21,22 @@ namespace Estreya.BlishHUD.EventTable.State
 				public string Type { get; set; }
 
 				[JsonProperty("center")]
-				public double[] Center { get; set; }
+				public float[] Center { get; set; }
 
 				[JsonProperty("radius")]
-				public double Radius { get; set; }
+				public float Radius { get; set; }
 
 				[JsonProperty("height")]
-				public double Height { get; set; }
+				public float Height { get; set; }
 
 				[JsonProperty("rotation")]
-				public double Rotation { get; set; }
+				public float Rotation { get; set; }
 
 				[JsonProperty("z_range")]
-				public double[] ZRange { get; set; }
+				public float[] ZRange { get; set; }
 
 				[JsonProperty("points")]
-				public double[][] Points { get; set; }
+				public float[][] Points { get; set; }
 			}
 
 			public class DynamicEventIcon
@@ -57,7 +48,7 @@ namespace Estreya.BlishHUD.EventTable.State
 				public string Signature { get; set; }
 			}
 
-			[JsonIgnore]
+			[JsonProperty("id")]
 			public string ID { get; set; }
 
 			[JsonProperty("name")]
@@ -79,25 +70,20 @@ namespace Estreya.BlishHUD.EventTable.State
 			public DynamicEventIcon Icon { get; set; }
 		}
 
-		private const string BASE_URL = "https://api.guildwars2.com/v1";
-
 		private readonly IFlurlClient _flurlClient;
 
-		public Map[] Maps { get; private set; } = new Map[0];
+		private readonly string _apiBaseUrl;
 
+		private string API_URL => _apiBaseUrl.TrimEnd('/') + "/v1/gw2/dynamicEvents";
 
 		public DynamicEvent[] Events { get; private set; } = new DynamicEvent[0];
 
 
-		public DynamicEventState(APIStateConfiguration configuration, Gw2ApiManager apiManager, IFlurlClient flurlClient)
+		public DynamicEventState(APIStateConfiguration configuration, Gw2ApiManager apiManager, IFlurlClient flurlClient, string apiBaseUrl)
 			: base(apiManager, configuration)
 		{
 			_flurlClient = flurlClient;
-		}
-
-		public Map GetMap(int id)
-		{
-			return Maps.Where((Map m) => m.ID == id).FirstOrDefault();
+			_apiBaseUrl = apiBaseUrl;
 		}
 
 		public DynamicEvent[] GetEventsByMap(int mapId)
@@ -110,29 +96,22 @@ namespace Estreya.BlishHUD.EventTable.State
 			return Events?.Where((DynamicEvent e) => e.ID == eventId).FirstOrDefault();
 		}
 
-		private async Task<Map[]> GetMaps()
-		{
-			return await _flurlClient.Request("https://api.guildwars2.com/v1", "map_names.json").SetQueryParam("lang", "en").GetJsonAsync<Map[]>(default(CancellationToken), (HttpCompletionOption)0);
-		}
-
 		private async Task<DynamicEvent[]> GetEvents()
 		{
-			return JsonConvert.DeserializeAnonymousType(await _flurlClient.Request("https://api.guildwars2.com/v1", "event_details.json").SetQueryParam("lang", "en").GetStringAsync(default(CancellationToken), (HttpCompletionOption)0), new
-			{
-				events = new Dictionary<string, DynamicEvent>()
-			})!.events.Select(delegate(KeyValuePair<string, DynamicEvent> x)
-			{
-				x.Value.ID = x.Key;
-				return x.Value;
-			}).ToArray();
+			return JsonConvert.DeserializeObject<List<DynamicEvent>>(await _flurlClient.Request(API_URL).SetQueryParam("lang", "en").GetStringAsync(default(CancellationToken), (HttpCompletionOption)0))!.ToArray();
 		}
 
 		protected override async Task FetchFromAPI(Gw2ApiManager apiManager, IProgress<string> progress)
 		{
-			progress.Report("Loading maps..");
-			Maps = await GetMaps();
-			progress.Report("Loading events..");
-			Events = await GetEvents();
+			try
+			{
+				progress.Report("Loading events..");
+				Events = await GetEvents();
+			}
+			catch (Exception ex)
+			{
+				Logger.Warn(ex, "Failed loading events:");
+			}
 		}
 	}
 }

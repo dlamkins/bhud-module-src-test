@@ -106,9 +106,10 @@ namespace Estreya.BlishHUD.EventTable
 
 		public async Task LoadEvents()
 		{
-			base.Logger.Debug("Load events.");
+			base.Logger.Info("Load events...");
 			using (await _eventCategoryLock.LockAsync())
 			{
+				base.Logger.Debug("Acquired lock.");
 				try
 				{
 					_eventCategories?.SelectMany((EventCategory ec) => ec.Events).ToList().ForEach(delegate(Estreya.BlishHUD.EventTable.Models.Event ev)
@@ -124,6 +125,7 @@ namespace Estreya.BlishHUD.EventTable
 					{
 						ec.Load(() => NowUTC, base.TranslationState);
 					});
+					base.Logger.Debug("Loaded all event categories.");
 					_eventCategories = categories;
 					foreach (Estreya.BlishHUD.EventTable.Models.Event ev2 in _eventCategories.SelectMany((EventCategory ec) => ec.Events))
 					{
@@ -131,6 +133,7 @@ namespace Estreya.BlishHUD.EventTable
 					}
 					_lastCheckDrawerSettings = _checkDrawerSettingInterval.TotalMilliseconds;
 					SetAreaEvents();
+					base.Logger.Debug("Updated events in all areas.");
 				}
 				catch (FlurlHttpException ex2)
 				{
@@ -139,13 +142,17 @@ namespace Estreya.BlishHUD.EventTable
 				}
 				catch (Exception ex)
 				{
-					base.Logger.Warn(ex, "Failed loading events.");
+					base.Logger.Error(ex, "Failed loading events.");
 				}
 			}
 		}
 
 		private void CheckDrawerSettings()
 		{
+			if (!_eventCategoryLock.IsFree())
+			{
+				return;
+			}
 			using (_eventCategoryLock.Lock())
 			{
 				foreach (KeyValuePair<string, EventArea> area in _areas)
@@ -358,7 +365,7 @@ namespace Estreya.BlishHUD.EventTable
 				AwaitLoading = false,
 				Enabled = true,
 				SaveInterval = Timeout.InfiniteTimeSpan
-			}, base.Gw2ApiManager, GetFlurlClient());
+			}, base.Gw2ApiManager, GetFlurlClient(), API_ROOT_URL);
 			collection.Add(EventState);
 			collection.Add(DynamicEventState);
 			return collection;

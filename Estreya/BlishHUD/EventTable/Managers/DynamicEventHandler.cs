@@ -105,7 +105,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 				int mapId = GameService.Gw2Mumble.get_CurrentMap().get_Id();
 				IOrderedEnumerable<DynamicEventState.DynamicEvent> events = _dynamicEventState.GetEventsByMap(mapId)?.Where((DynamicEventState.DynamicEvent de) => !_moduleSettings.DisabledDynamicEventIds.get_Value().Contains(de.ID)).OrderByDescending(delegate(DynamicEventState.DynamicEvent d)
 				{
-					double[][] points = d.Location.Points;
+					float[][] points = d.Location.Points;
 					return (points != null) ? points.Length : 0;
 				}).ThenByDescending((DynamicEventState.DynamicEvent d) => d.Location.Radius);
 				if (events == null)
@@ -148,16 +148,15 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			}
 			try
 			{
-				Map map = await ((IBulkExpandableClient<Map, int>)(object)_apiManager.get_Gw2ApiClient().get_V2().get_Maps()).GetAsync(dynamicEvent.MapId, default(CancellationToken));
-				Vector2 coords = map.EventMapCoordinatesToMapCoordinates(new Vector2((float)dynamicEvent.Location.Center[0], (float)dynamicEvent.Location.Center[1]));
+				await ((IBulkExpandableClient<Map, int>)(object)_apiManager.get_Gw2ApiClient().get_V2().get_Maps()).GetAsync(dynamicEvent.MapId, default(CancellationToken));
+				Vector2 coords = default(Vector2);
+				((Vector2)(ref coords))._002Ector(dynamicEvent.Location.Center[0], dynamicEvent.Location.Center[1]);
 				switch (dynamicEvent.Location.Type)
 				{
 				case "sphere":
 				case "cylinder":
 				{
-					double radiusScale = map.GetDynamicEventMapLengthScale(dynamicEvent.Location.Radius);
-					double radius = dynamicEvent.Location.Radius * 0.0416666679084301 / radiusScale;
-					MapEntity circle = _mapUtil.AddCircle(coords.X, coords.Y, radius, Color.get_DarkOrange(), 3f);
+					MapEntity circle = _mapUtil.AddCircle(coords.X, coords.Y, dynamicEvent.Location.Radius * 0.041666668f, Color.get_DarkOrange(), 3f);
 					circle.TooltipText = $"{dynamicEvent.Name} (Level {dynamicEvent.Level})";
 					_mapEntities.AddOrUpdate(dynamicEvent.ID, circle, (string _, MapEntity _) => circle);
 					break;
@@ -165,10 +164,11 @@ namespace Estreya.BlishHUD.EventTable.Managers
 				case "poly":
 				{
 					List<float[]> points = new List<float[]>();
-					double[][] points2 = dynamicEvent.Location.Points;
-					foreach (double[] item in points2)
+					float[][] points2 = dynamicEvent.Location.Points;
+					Vector2 polyCoords = default(Vector2);
+					foreach (float[] item in points2)
 					{
-						Vector2 polyCoords = map.EventMapCoordinatesToMapCoordinates(new Vector2((float)item[0], (float)item[1]));
+						((Vector2)(ref polyCoords))._002Ector(item[0], item[1]);
 						points.Add(new float[2] { polyCoords.X, polyCoords.Y });
 					}
 					MapEntity border = _mapUtil.AddBorder(coords.X, coords.Y, points.ToArray(), Color.get_DarkOrange(), 4f);
@@ -240,12 +240,13 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			{
 				return;
 			}
-			Map map = await ((IBulkExpandableClient<Map, int>)(object)_apiManager.get_Gw2ApiClient().get_V2().get_Maps()).GetAsync(dynamicEvent.MapId, default(CancellationToken));
-			Vector2 centerAsMapCoords = map.EventMapCoordinatesToMapCoordinates(new Vector2((float)dynamicEvent.Location.Center[0], (float)dynamicEvent.Location.Center[1]));
-			Vector3 centerAsWorldMeters = map.MapCoordsToWorldMeters(new Vector2(centerAsMapCoords.X, centerAsMapCoords.Y));
-			centerAsWorldMeters.Z = (float)Math.Abs(dynamicEvent.Location.Center[2].ToMeters());
 			try
 			{
+				Map map = await ((IBulkExpandableClient<Map, int>)(object)_apiManager.get_Gw2ApiClient().get_V2().get_Maps()).GetAsync(dynamicEvent.MapId, default(CancellationToken));
+				Vector2 centerAsMapCoords = default(Vector2);
+				((Vector2)(ref centerAsMapCoords))._002Ector(dynamicEvent.Location.Center[0], dynamicEvent.Location.Center[1]);
+				Vector3 centerAsWorldMeters = map.MapCoordsToWorldMeters(new Vector2(centerAsMapCoords.X, centerAsMapCoords.Y));
+				centerAsWorldMeters.Z = Math.Abs(dynamicEvent.Location.Center[2].ToMeters());
 				List<WorldEntity> entites = new List<WorldEntity>();
 				switch (dynamicEvent.Location.Type)
 				{
@@ -279,16 +280,15 @@ namespace Estreya.BlishHUD.EventTable.Managers
 
 		private async Task<WorldEntity> GetSphere(DynamicEventState.DynamicEvent ev, Map map, Vector3 centerAsWorldMeters, Func<WorldEntity, bool> renderCondition)
 		{
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 			int tessellation = 50;
 			int connections = tessellation / 5;
 			if (connections > tessellation)
 			{
 				throw new ArgumentOutOfRangeException("connections", "connections can't be greater than tessellation");
 			}
-			double radiusScale = map.GetDynamicEventMapLengthScale(ev.Location.Radius);
-			float radius = (float)ev.Location.Radius.ToMeters() / (float)radiusScale;
+			float radius = ev.Location.Radius.ToMeters();
 			List<Vector3> points = new List<Vector3>();
 			for (int i = 0; i < tessellation; i++)
 			{
@@ -367,18 +367,16 @@ namespace Estreya.BlishHUD.EventTable.Managers
 
 		private async Task<WorldEntity> GetCylinder(DynamicEventState.DynamicEvent ev, Map map, Vector3 centerAsWorldMeters, Func<WorldEntity, bool> renderCondition)
 		{
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 			int tessellation = 50;
 			int connections = tessellation / 4;
 			if (connections > tessellation)
 			{
 				throw new ArgumentOutOfRangeException("connections", "connections can't be greater than tessellation");
 			}
-			double radiusScale = map.GetDynamicEventMapLengthScale(ev.Location.Radius);
-			float radius = (float)ev.Location.Radius.ToMeters() / (float)radiusScale;
-			double heightScale = map.GetDynamicEventMapLengthScale(ev.Location.Height);
-			float height = (float)ev.Location.Height.ToMeters() / (float)heightScale;
+			float radius = ev.Location.Radius.ToMeters();
+			float height = ev.Location.Height.ToMeters();
 			List<Vector3> points = new List<Vector3>();
 			for (int j = 0; j < tessellation; j++)
 			{
@@ -429,20 +427,18 @@ namespace Estreya.BlishHUD.EventTable.Managers
 		{
 			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			Vector3[] points = ((IEnumerable<double[]>)dynamicEvent.Location.Points).Select((Func<double[], Vector3>)delegate(double[] p)
+			Vector3[] points = ((IEnumerable<float[]>)dynamicEvent.Location.Points).Select((Func<float[], Vector3>)delegate(float[] p)
 			{
-				//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-				//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+				//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 				//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-				//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-				Vector2 val = map.EventMapCoordinatesToMapCoordinates(new Vector2((float)p[0], (float)p[1]));
+				//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+				Vector2 val = default(Vector2);
+				((Vector2)(ref val))._002Ector(p[0], p[1]);
 				Vector3 val2 = map.MapCoordsToWorldMeters(new Vector2(val.X, val.Y));
 				return new Vector3(val2.X, val2.Y, centerAsWorldMeters.Z);
 			}).ToArray();
@@ -465,8 +461,8 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			}
 			Vector3[][] perZRangePoints = (from z in dynamicEvent.Location.ZRange
 				orderby z
-				select (double)centerAsWorldMeters.Z + z.ToMeters() into z
-				select ((IEnumerable<Vector3>)mappedPoints).Select((Func<Vector3, Vector3>)((Vector3 mp) => new Vector3(mp.X, mp.Y, (float)z))).ToArray()).ToArray();
+				select centerAsWorldMeters.Z + z.ToMeters() into z
+				select ((IEnumerable<Vector3>)mappedPoints).Select((Func<Vector3, Vector3>)((Vector3 mp) => new Vector3(mp.X, mp.Y, z))).ToArray()).ToArray();
 			List<Vector3> connectPoints = new List<Vector3>();
 			for (int i = 0; i < perZRangePoints.Length - 1; i++)
 			{

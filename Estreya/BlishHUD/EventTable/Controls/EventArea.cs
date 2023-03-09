@@ -611,9 +611,16 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			{
 				string categoryKey = activeEventGroup.Key;
 				EventCategory validCategory = null;
-				using (_eventLock.Lock())
+				if (_eventLock.IsFree())
 				{
-					validCategory = _allEvents.Find((EventCategory ec) => ec.Key == categoryKey);
+					using (_eventLock.Lock())
+					{
+						validCategory = _allEvents.Find((EventCategory ec) => ec.Key == categoryKey);
+					}
+				}
+				else
+				{
+					Logger.Debug("Event lock is busy. Can't update category " + categoryKey);
 				}
 				List<Estreya.BlishHUD.EventTable.Models.Event> events = validCategory?.Events.Where((Estreya.BlishHUD.EventTable.Models.Event ev) => activeEventGroup.Any((string aeg) => aeg == ev.SettingKey) || (Configuration.UseFiller.get_Value() && ev.Filler)).ToList();
 				if (events == null || events.Count == 0)

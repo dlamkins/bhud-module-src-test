@@ -179,6 +179,11 @@ namespace Estreya.BlishHUD.Shared.State
 				Logger.Warn("API Manager is null");
 				return;
 			}
+			if (base.Configuration.NeededPermissions.Count > 0 && !apiManager.HasPermission((TokenPermission)1))
+			{
+				Logger.Debug("No token yet.");
+				return;
+			}
 			try
 			{
 				using (await _apiObjectListLock.LockAsync())
@@ -238,18 +243,15 @@ namespace Estreya.BlishHUD.Shared.State
 			{
 				MissingScopesException msex = val;
 				Logger.Warn((Exception)(object)msex, "Could not update api objects due to missing scopes:");
-				throw;
 			}
 			catch (InvalidAccessTokenException val2)
 			{
 				InvalidAccessTokenException iatex = val2;
 				Logger.Warn((Exception)(object)iatex, "Could not update api objects due to invalid access token:");
-				throw;
 			}
 			catch (Exception ex)
 			{
 				Logger.Warn(ex, "Error updating api objects:");
-				throw;
 			}
 		}
 
