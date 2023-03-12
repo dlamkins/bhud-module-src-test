@@ -74,8 +74,6 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderEmptyLine((Panel)(object)flowPanel);
 			BuildMapMovementDoesNotWorkSection(flowPanel);
 			RenderEmptyLine((Panel)(object)flowPanel);
-			BuildReminderOverlapSection(flowPanel);
-			RenderEmptyLine((Panel)(object)flowPanel);
 			BuildQuestionNotFoundSection(flowPanel);
 		}
 
@@ -318,31 +316,6 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				.CreatePart("No, not yet.", (Action<FormattedLabelPartBuilder>)delegate
 				{
 				})
-				.Build()).set_Parent((Container)(object)panel);
-		}
-
-		private void BuildReminderOverlapSection(FlowPanel parent)
-		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Expected O, but got Unknown
-			Panel val = new Panel();
-			((Control)val).set_Parent((Container)(object)parent);
-			((Container)val).set_WidthSizingMode((SizingMode)1);
-			((Container)val).set_HeightSizingMode((SizingMode)1);
-			val.set_ShowBorder(true);
-			Panel panel = val;
-			((Control)GetLabelBuilder((Panel)(object)parent).CreatePart("Why are my reminders overlapping?", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder builder)
-			{
-				builder.SetFontSize((FontSize)20).MakeUnderlined();
-			}).CreatePart("\n \n", (Action<FormattedLabelPartBuilder>)delegate
-			{
-			}).CreatePart("This is due to the current implementation. Will be fixed in a later version.", (Action<FormattedLabelPartBuilder>)delegate
-			{
-			})
 				.Build()).set_Parent((Container)(object)panel);
 		}
 

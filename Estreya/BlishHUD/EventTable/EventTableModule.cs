@@ -332,7 +332,7 @@ namespace Estreya.BlishHUD.EventTable
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			}), "Dynamic Events", (int?)null));
-			base.SettingsWindow.get_Tabs().Add(new Tab(base.IconState.GetIcon("482926.png"), (Func<IView>)(() => (IView)(object)new HelpView(() => _eventCategories, base.API_URL, base.Gw2ApiManager, base.IconState, base.TranslationState, GameService.Content.get_DefaultFont16())
+			base.SettingsWindow.get_Tabs().Add(new Tab(base.IconState.GetIcon("157097.png"), (Func<IView>)(() => (IView)(object)new HelpView(() => _eventCategories, base.API_URL, base.Gw2ApiManager, base.IconState, base.TranslationState, GameService.Content.get_DefaultFont16())
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			}), "Help", (int?)null));

@@ -126,12 +126,12 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_0328: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0330: Unknown result type (might be due to invalid IL or missing references)
 			//IL_033d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0488: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04f2: Expected O, but got Unknown
+			//IL_0464: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ce: Expected O, but got Unknown
 			Panel val = new Panel();
 			((Control)val).set_Parent((Container)(object)parent);
 			((Control)val).set_Location(new Point(MAIN_PADDING.X, MAIN_PADDING.Y));
@@ -238,7 +238,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					}
 				});
 			});
-			List<DynamicEventState.DynamicEvent> eventList = _dynamicEventState.Events.Where((DynamicEventState.DynamicEvent e) => !string.IsNullOrWhiteSpace(e.Name)).ToList();
+			List<DynamicEventState.DynamicEvent> eventList = _dynamicEventState.Events.ToList();
 			foreach (Map map2 in maps.Where((Map m) => m.get_Id() == GameService.Gw2Mumble.get_CurrentMap().get_Id()))
 			{
 				foreach (DynamicEventState.DynamicEvent e2 in eventList.Where((DynamicEventState.DynamicEvent e) => e.MapId == map2.get_Id()))

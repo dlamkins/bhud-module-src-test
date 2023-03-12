@@ -22,7 +22,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private const int ICON_SIZE = 64;
 
-		private static int _shownNotifications = 0;
+		private static EventNotification _lastShown = null;
 
 		private Estreya.BlishHUD.EventTable.Models.Event _event;
 
@@ -68,10 +68,10 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		public void Show(TimeSpan duration)
 		{
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			_shownNotifications++;
-			((Control)this).set_Location(new Point(_x, _y + 111 * _shownNotifications));
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			((Control)this).set_Location(new Point(_x, (_lastShown != null) ? (((Control)_lastShown).get_Bottom() + 15) : _y));
 			((Control)this).Show();
+			_lastShown = this;
 			((TweenerImpl)GameService.Animation.get_Tweener()).Tween<EventNotification>(this, (object)new
 			{
 				Opacity = 1f
@@ -91,8 +91,11 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				Opacity = 0f
 			}, 0.4f, 0f, true).OnComplete((Action)delegate
 			{
-				_shownNotifications--;
 				((Control)this).Dispose();
+				if (_lastShown == this)
+				{
+					_lastShown = null;
+				}
 			});
 		}
 

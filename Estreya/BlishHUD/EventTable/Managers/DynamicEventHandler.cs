@@ -148,7 +148,6 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			}
 			try
 			{
-				await ((IBulkExpandableClient<Map, int>)(object)_apiManager.get_Gw2ApiClient().get_V2().get_Maps()).GetAsync(dynamicEvent.MapId, default(CancellationToken));
 				Vector2 coords = default(Vector2);
 				((Vector2)(ref coords))._002Ector(dynamicEvent.Location.Center[0], dynamicEvent.Location.Center[1]);
 				switch (dynamicEvent.Location.Type)

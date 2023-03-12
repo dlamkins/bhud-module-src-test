@@ -107,6 +107,8 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		public SettingEventState SettingEventState { get; private set; }
 
+		public NewsState NewsState { get; private set; }
+
 		public WorldbossState WorldbossState { get; private set; }
 
 		public MapchestState MapchestState { get; private set; }
@@ -213,6 +215,12 @@ namespace Estreya.BlishHUD.Shared.Modules
 					SaveInterval = Timeout.InfiniteTimeSpan
 				});
 				_states.Add(SettingEventState);
+				NewsState = new NewsState(new StateConfiguration
+				{
+					AwaitLoading = true,
+					Enabled = true
+				}, GetFlurlClient(), WEBSITE_MODULE_FILE_URL);
+				_states.Add(NewsState);
 				if (configurations.Items.Enabled)
 				{
 					ItemState = new ItemState(configurations.Items, Gw2ApiManager, directoryPath);
@@ -426,10 +434,12 @@ namespace Estreya.BlishHUD.Shared.Modules
 			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d8: Expected O, but got Unknown
-			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0160: Expected O, but got Unknown
-			//IL_019e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a8: Expected O, but got Unknown
+			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0154: Expected O, but got Unknown
+			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a0: Expected O, but got Unknown
+			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e8: Expected O, but got Unknown
 			((Module)this).OnModuleLoaded(e);
 			Logger.Debug("Start building settings window.");
 			Texture2D windowBackground = AsyncTexture2D.op_Implicit(IconState.GetIcon("textures\\setting_window_background.png"));
@@ -458,6 +468,10 @@ namespace Estreya.BlishHUD.Shared.Modules
 					emblem.add_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)SettingsWindowEmblem_TextureSwapped);
 				}
 			}
+			SettingsWindow.get_Tabs().Add(new Tab(IconState.GetIcon("482926.png"), (Func<IView>)(() => (IView)(object)new NewsView(Gw2ApiManager, IconState, TranslationState, NewsState, GameService.Content.get_DefaultFont16())
+			{
+				DefaultColor = ModuleSettings.DefaultGW2Color
+			}), "News", (int?)null));
 			OnSettingWindowBuild(SettingsWindow);
 			SettingsWindow.get_Tabs().Add(new Tab(IconState.GetIcon("156331.png"), (Func<IView>)(() => (IView)(object)new DonationView(GetFlurlClient(), Gw2ApiManager, IconState, TranslationState, GameService.Content.get_DefaultFont16())
 			{
