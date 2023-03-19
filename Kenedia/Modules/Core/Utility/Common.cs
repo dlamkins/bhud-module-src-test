@@ -1,7 +1,10 @@
 using System;
 using System.ComponentModel;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Gw2Sharp.WebApi;
@@ -10,6 +13,8 @@ namespace Kenedia.Modules.Core.Utility
 {
 	public static class Common
 	{
+		private static char[] s_invalids;
+
 		public static double Now()
 		{
 			return GameService.Overlay.get_CurrentGameTime().get_TotalGameTime().TotalMilliseconds;
@@ -129,6 +134,53 @@ namespace Kenedia.Modules.Core.Utility
 				return AsyncTexture2D.FromAssetId(id);
 			}
 			return null;
+		}
+
+		public static string MakeValidFileName(string text, char? replacement = '_', bool fancy = true)
+		{
+			StringBuilder sb = new StringBuilder(text.Length);
+			char[] invalids = s_invalids ?? (s_invalids = Path.GetInvalidFileNameChars());
+			bool changed = false;
+			foreach (char c in text)
+			{
+				if (invalids.Contains(c))
+				{
+					changed = true;
+					char repl = replacement.GetValueOrDefault();
+					if (fancy)
+					{
+						switch (c)
+						{
+						case '"':
+							repl = '”';
+							break;
+						case '\'':
+							repl = '’';
+							break;
+						case '/':
+							repl = '⁄';
+							break;
+						}
+					}
+					if (repl != 0)
+					{
+						sb.Append(repl);
+					}
+				}
+				else
+				{
+					sb.Append(c);
+				}
+			}
+			if (sb.Length != 0)
+			{
+				if (!changed)
+				{
+					return text;
+				}
+				return sb.ToString();
+			}
+			return "_";
 		}
 	}
 }

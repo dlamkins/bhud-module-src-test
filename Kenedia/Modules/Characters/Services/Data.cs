@@ -1768,7 +1768,7 @@ namespace Kenedia.Modules.Characters.Services
 		public async Task Load()
 		{
 			string path = _paths.ModuleDataPath + "Maps.json";
-			BaseModule<Characters, MainWindow, Settings>.Logger.Debug("Trying to load Maps from " + path);
+			BaseModule<Characters, MainWindow, Settings>.Logger.Info("Trying to load Maps from " + path);
 			try
 			{
 				if (File.Exists(path))
@@ -1777,7 +1777,7 @@ namespace Kenedia.Modules.Characters.Services
 					if (jsonString != null && jsonString != string.Empty)
 					{
 						Maps = JsonConvert.DeserializeObject<Dictionary<int, Map>>(jsonString);
-						BaseModule<Characters, MainWindow, Settings>.Logger.Debug("Loaded Maps from " + path);
+						BaseModule<Characters, MainWindow, Settings>.Logger.Info("Loaded Maps from " + path);
 					}
 				}
 			}

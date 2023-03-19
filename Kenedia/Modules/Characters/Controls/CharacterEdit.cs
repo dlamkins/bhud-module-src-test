@@ -110,16 +110,16 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_05bd: Unknown result type (might be due to invalid IL or missing references)
 			//IL_065f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_069a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0715: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0724: Unknown result type (might be due to invalid IL or missing references)
-			//IL_077b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0790: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0820: Unknown result type (might be due to invalid IL or missing references)
-			//IL_083c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0727: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0736: Unknown result type (might be due to invalid IL or missing references)
+			//IL_078d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0832: Unknown result type (might be due to invalid IL or missing references)
+			//IL_084e: Unknown result type (might be due to invalid IL or missing references)
 			AccountImagePath = accountPath;
 			_allTags = allTags;
 			_settings = settings;
@@ -269,6 +269,10 @@ namespace Kenedia.Modules.Characters.Controls
 			((Control)textBox).set_Parent((Container)(object)_tagContainer);
 			((Control)textBox).set_Size(new Point(329, 24));
 			((TextInputBase)textBox).set_PlaceholderText(strings.Tag_Placeholder);
+			textBox.TextChangedAction = delegate
+			{
+				LastInteraction = DateTime.Now;
+			};
 			textBox.EnterPressedAction = delegate(string t)
 			{
 				if (t != null && t.Length > 0 && !_allTags.Contains(t))
@@ -321,6 +325,15 @@ namespace Kenedia.Modules.Characters.Controls
 			((Panel)flowPanel).set_CanScroll(true);
 			((Control)flowPanel).set_ZIndex(11);
 			_imagePanel = flowPanel;
+		}
+
+		public override void UpdateContainer(GameTime gameTime)
+		{
+			base.UpdateContainer(gameTime);
+			if (((TextInputBase)_tagBox).get_Focused())
+			{
+				LastInteraction = DateTime.Now;
+			}
 		}
 
 		protected override void OnShown(EventArgs e)

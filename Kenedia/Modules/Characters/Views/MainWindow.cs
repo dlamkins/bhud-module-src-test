@@ -26,8 +26,6 @@ using Kenedia.Modules.Core.Views;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Extended;
-using MonoGame.Extended.BitmapFonts;
 using SemVer;
 
 namespace Kenedia.Modules.Characters.Views
@@ -82,13 +80,11 @@ namespace Kenedia.Modules.Characters.Views
 
 		private Rectangle _titleRectangle;
 
-		private BitmapFont _titleFont;
-
 		private APITimeoutNotification _apiTimeoutNotification;
 
 		private APIPermissionNotification _apiPermissionNotification;
 
-		private List<Character_Model> LoadedModels { get; } = new List<Character_Model>();
+		public List<Character_Model> LoadedModels { get; } = new List<Character_Model>();
 
 
 		public SettingsWindow SettingsWindow { get; set; }
@@ -236,8 +232,11 @@ namespace Kenedia.Modules.Characters.Views
 			imageButton3.ClickAction = delegate
 			{
 				List<Control> list = ((IEnumerable<Control>)((Container)CharactersPanel).get_Children()).Where((Control e) => e.get_Visible()).ToList();
-				int index = RandomService.Rnd.Next(list.Count);
-				((CharacterCard)(object)list[index])?.Character.Swap();
+				int num = RandomService.Rnd.Next(list.Count);
+				if (list.Count > num)
+				{
+					((CharacterCard)(object)list[num])?.Character.Swap();
+				}
 			};
 			_randomButton = imageButton3;
 			ImageButton imageButton4 = new ImageButton();
@@ -368,7 +367,7 @@ namespace Kenedia.Modules.Characters.Views
 			List<Match> strings = regex.Matches(((TextInputBase)_filterBox).get_Text().Trim().ToLower()).Cast<Match>().ToList();
 			new List<string>();
 			List<KeyValuePair<string, SearchFilter<Character_Model>>> stringFilters = new List<KeyValuePair<string, SearchFilter<Character_Model>>>();
-			_003C_003Ec__DisplayClass66_0 CS_0024_003C_003E8__locals0;
+			_003C_003Ec__DisplayClass65_0 CS_0024_003C_003E8__locals0;
 			foreach (Match match in strings)
 			{
 				string string_text = SearchableString(match.ToString().Replace("\"", ""));
@@ -402,7 +401,7 @@ namespace Kenedia.Modules.Characters.Views
 					{
 						//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 						//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-						_003C_003Ec__DisplayClass66_0 _003C_003Ec__DisplayClass66_ = CS_0024_003C_003E8__locals0;
+						_003C_003Ec__DisplayClass65_0 _003C_003Ec__DisplayClass65_ = CS_0024_003C_003E8__locals0;
 						Gender gender = c.Gender;
 						return SearchableString(((object)(Gender)(ref gender)).ToString()).Contains(string_text);
 					}, enabled: true)));
@@ -592,47 +591,13 @@ namespace Kenedia.Modules.Characters.Views
 
 		public override void RecalculateLayout()
 		{
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
-			_emblemRectangle = new Rectangle(-43, -58, 128, 128);
-			_titleFont = GameService.Content.get_DefaultFont32();
-			RectangleF titleBounds = _titleFont.GetStringRectangle(BaseModule<Characters, MainWindow, Settings>.ModuleName);
-			if (titleBounds.Width > (float)(((Control)this).get_LocalBounds().Width - (_emblemRectangle.Width - 15)))
-			{
-				_titleFont = GameService.Content.get_DefaultFont18();
-				titleBounds = _titleFont.GetStringRectangle(BaseModule<Characters, MainWindow, Settings>.ModuleName);
-			}
-			_titleRectangle = new Rectangle(65, 5, (int)titleBounds.Width, Math.Max(30, (int)titleBounds.Height));
 		}
 
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
 			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintAfterChildren(spriteBatch, bounds);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_windowEmblem), _emblemRectangle, (Rectangle?)_windowEmblem.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
-			if (_titleRectangle.Width < bounds.Width - (_emblemRectangle.Width - 20))
-			{
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, BaseModule<Characters, MainWindow, Settings>.ModuleName ?? "", _titleFont, _titleRectangle, Colors.ColonialWhite, false, (HorizontalAlignment)0, (VerticalAlignment)2);
-			}
 		}
 
 		protected override void OnShown(EventArgs e)
@@ -769,15 +734,20 @@ namespace Kenedia.Modules.Characters.Views
 
 		private async void FilterBox_EnterPressed(string t)
 		{
-			if (_settings.EnterToLogin.get_Value())
+			if (!_settings.EnterToLogin.get_Value())
 			{
-				_filterBox.ForceFilter();
-				CharacterCard c = (CharacterCard)(object)((IEnumerable<Control>)((Container)CharactersPanel).get_Children()).Where((Control e) => e.get_Visible()).FirstOrDefault();
-				((Control)_filterBox).UnsetFocus();
-				await Task.Delay(5);
-				if (await ExtendedInputService.WaitForNoKeyPressed())
+				return;
+			}
+			_filterBox.ForceFilter();
+			CharacterCard c = (CharacterCard)(object)((IEnumerable<Control>)((Container)CharactersPanel).get_Children()).Where((Control e) => e.get_Visible()).FirstOrDefault();
+			((Control)_filterBox).UnsetFocus();
+			await Task.Delay(5);
+			if (await ExtendedInputService.WaitForNoKeyPressed())
+			{
+				c?.Character.Swap();
+				if (c == null)
 				{
-					c?.Character.Swap();
+					BaseModule<Characters, MainWindow, Settings>.Logger.Debug("No character found to swap to.");
 				}
 			}
 		}

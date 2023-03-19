@@ -75,7 +75,7 @@ namespace Kenedia.Modules.Core.Models
 		{
 			((Module)this).Initialize();
 			ModuleVersion = ((Module)this).get_Version();
-			Logger.Debug($"Initializing {((Module)this).get_Name()} {ModuleVersion}");
+			Logger.Info($"Initializing {((Module)this).get_Name()} {ModuleVersion}");
 			Paths = new PathCollection(DirectoriesManager, ((Module)this).get_Name());
 			ModKeyMapping = (VirtualKeyShort[])(object)new VirtualKeyShort[5];
 			ModKeyMapping[1] = (VirtualKeyShort)17;

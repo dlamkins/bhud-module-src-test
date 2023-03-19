@@ -50,6 +50,8 @@ namespace Kenedia.Modules.Core.Controls
 
 		private Rectangle _layoutLeftAccentBounds;
 
+		private Rectangle _layoutRightAccentBounds;
+
 		private Rectangle _layoutLeftAccentSrc;
 
 		private Rectangle _layoutHeaderBounds;
@@ -105,6 +107,8 @@ namespace Kenedia.Modules.Core.Controls
 		public AsyncTexture2D BackgroundImage { get; set; }
 
 		public AsyncTexture2D TitleIcon { get; set; }
+
+		public bool ShowRightBorder { get; set; }
 
 		public Color? BackgroundImageColor { get; set; }
 
@@ -230,22 +234,24 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_01f2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0226: Unknown result type (might be due to invalid IL or missing references)
 			//IL_022b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0249: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_030e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0313: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0349: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0363: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0368: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0386: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0393: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0398: Unknown result type (might be due to invalid IL or missing references)
-			//IL_039d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_028c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0291: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_030a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_031e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0323: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0331: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0374: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0379: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0403: Unknown result type (might be due to invalid IL or missing references)
 			((Panel)this).RecalculateLayout();
 			((Container)this)._contentRegion = new Rectangle(_contentPadding.Left + BorderWidth.Left, _contentPadding.Top + BorderWidth.Top, ((Control)this).get_Width() - _contentPadding.Horizontal - BorderWidth.Horizontal - (((int)((Container)this).get_WidthSizingMode() == 1) ? ((Container)this).get_AutoSizePadding().X : 0), ((Control)this).get_Height() - _contentPadding.Vertical - BorderWidth.Vertical - (((int)((Container)this).get_HeightSizingMode() == 1) ? ((Container)this).get_AutoSizePadding().Y : 0));
 			_backgroundBounds = new Rectangle(Math.Max(BorderWidth.Left - 2, 0), Math.Max(BorderWidth.Top - 2, 0), ((Control)this).get_Width() - Math.Max(BorderWidth.Horizontal - 4, 0), ((Control)this).get_Height() - Math.Max(BorderWidth.Vertical - 4, 0));
@@ -264,6 +270,7 @@ namespace Kenedia.Modules.Core.Controls
 				_layoutBottomRightAccentBounds = new Rectangle(((Control)this)._size.X - num5 + 2, ((Control)this)._size.Y - 59, num5, _textureCornerAccent.get_Height());
 				_layoutCornerAccentSrc = new Rectangle(256 - num5, 0, num5, _textureCornerAccent.get_Height());
 				_layoutLeftAccentBounds = new Rectangle(num4 - 7, num, _textureLeftSideAccent.get_Width(), Math.Min(((Control)this)._size.Y - num - num3, _textureLeftSideAccent.get_Height()));
+				_layoutRightAccentBounds = new Rectangle(((Control)this)._size.X - 12, Math.Max(0, ((Control)this)._size.Y - _layoutLeftAccentBounds.Height), _textureLeftSideAccent.get_Width(), Math.Min(((Control)this)._size.Y - num - num3 - 10, _textureLeftSideAccent.get_Height() - 10));
 				_layoutLeftAccentSrc = new Rectangle(0, 0, _textureLeftSideAccent.get_Width(), _layoutLeftAccentBounds.Height);
 			}
 			((Container)this).set_ContentRegion(new Rectangle(_contentPadding.Left + num4, _contentPadding.Top + num, ((Control)this)._size.X - num4 - num2 - _contentPadding.Horizontal, ((Control)this)._size.Y - num - num3 - _contentPadding.Vertical));
@@ -302,25 +309,30 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0204: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0227: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0237: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0242: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0290: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0295: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_030d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0316: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0322: Unknown result type (might be due to invalid IL or missing references)
-			//IL_032e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0334: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0216: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0235: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0254: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0273: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0288: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0292: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0338: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0353: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0368: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0374: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037a: Unknown result type (might be due to invalid IL or missing references)
 			((Control)_tooltip).set_Visible(false);
 			if (base._backgroundTexture != null)
 			{
@@ -355,9 +367,13 @@ namespace Kenedia.Modules.Core.Controls
 			if (((Panel)this).get_ShowBorder())
 			{
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), ((Container)this).get_ContentRegion(), Color.get_Black() * (0.1f * ((Panel)this).get_AccentOpacity()));
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_textureLeftSideAccent), _layoutLeftAccentBounds, (Rectangle?)_layoutLeftAccentSrc, Color.get_Black() * ((Panel)this).get_AccentOpacity(), 0f, Vector2.get_Zero(), (SpriteEffects)2);
+				if (ShowRightBorder)
+				{
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_textureLeftSideAccent), _layoutRightAccentBounds, (Rectangle?)_layoutLeftAccentSrc, Color.get_Black() * ((Panel)this).get_AccentOpacity(), 0f, Vector2.get_Zero(), (SpriteEffects)0);
+				}
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_textureCornerAccent), _layoutTopLeftAccentBounds, (Rectangle?)_layoutCornerAccentSrc, Color.get_White() * ((Panel)this).get_AccentOpacity(), 0f, Vector2.get_Zero(), (SpriteEffects)1);
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_textureCornerAccent), _layoutBottomRightAccentBounds, (Rectangle?)_layoutCornerAccentSrc, Color.get_White() * ((Panel)this).get_AccentOpacity(), 0f, Vector2.get_Zero(), (SpriteEffects)2);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_textureLeftSideAccent), _layoutLeftAccentBounds, (Rectangle?)_layoutLeftAccentSrc, Color.get_Black() * ((Panel)this).get_AccentOpacity(), 0f, Vector2.get_Zero(), (SpriteEffects)2);
 			}
 			Color? backgroundColor = ((BackgroundHoveredColor.HasValue && ((Control)this).get_MouseOver()) ? BackgroundHoveredColor : BackgroundColor);
 			if (backgroundColor.HasValue)

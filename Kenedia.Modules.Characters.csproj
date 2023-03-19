@@ -22,9 +22,9 @@
     <Reference Include="Newtonsoft.Json" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Core" />
     <Reference Include="Patagames.Ocr">
       <HintPath>..\..\working\Patagames.Ocr.dll</HintPath>
     </Reference>
-    <Reference Include="System.Core" />
   </ItemGroup>
 </Project>

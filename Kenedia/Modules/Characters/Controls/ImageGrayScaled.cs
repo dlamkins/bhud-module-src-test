@@ -4,6 +4,7 @@ using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics;
 using Kenedia.Modules.Core.Extensions;
+using Kenedia.Modules.Core.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -34,11 +35,21 @@ namespace Kenedia.Modules.Characters.Controls
 			}
 			set
 			{
-				_texture = value;
-				_texture.add_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)Texture_TextureSwapped);
-				if (value != null)
+				AsyncTexture2D temp = _texture;
+				if (Common.SetProperty(ref _texture, value))
 				{
-					_grayScaleTexture = value.get_Texture().ToGrayScaledPalettable();
+					if (temp != null)
+					{
+						temp.remove_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)Texture_TextureSwapped);
+					}
+					if (_texture != null)
+					{
+						_texture.add_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)Texture_TextureSwapped);
+					}
+					if (_texture != null)
+					{
+						_grayScaleTexture = _texture.get_Texture().ToGrayScaledPalettable();
+					}
 				}
 			}
 		}

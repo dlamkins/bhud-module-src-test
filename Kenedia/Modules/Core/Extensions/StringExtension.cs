@@ -8,6 +8,8 @@ namespace Kenedia.Modules.Core.Extensions
 	{
 		private static readonly Regex s_diacritics = new Regex("\\p{M}");
 
+		private static readonly Regex s_namingConventionConvert = new Regex("\r\n                (?<=[A-Z])(?=[A-Z][a-z]) |\r\n                 (?<=[^A-Z])(?=[A-Z]) |\r\n                 (?<=[A-Za-z])(?=[^A-Za-z])", RegexOptions.IgnorePatternWhitespace);
+
 		public static string RemoveDiacritics(this string s)
 		{
 			string result = s.Normalize(NormalizationForm.FormD);
@@ -15,6 +17,11 @@ namespace Kenedia.Modules.Core.Extensions
 				.Replace("æ", "ae")
 				.Replace("œ", "oe")
 				.Replace("Œ", "Oe");
+		}
+
+		public static string ToLowercaseNamingConvention(this string s)
+		{
+			return s_namingConventionConvert.Replace(s.Replace("_", ""), " ");
 		}
 
 		public static int LevenshteinDistance(this string source, string target)

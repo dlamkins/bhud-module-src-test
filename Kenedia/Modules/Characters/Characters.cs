@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
@@ -179,14 +180,12 @@ namespace Kenedia.Modules.Characters
 				fileStream2.CopyTo(target);
 			}
 			CreateToggleCategories();
-			base.Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
 			base.Settings.ShortcutKey.get_Value().set_Enabled(true);
 			base.Settings.ShortcutKey.get_Value().add_Activated((EventHandler<EventArgs>)ShortcutWindowToggle);
 			base.Settings.RadialKey.get_Value().set_Enabled(true);
 			base.Settings.RadialKey.get_Value().add_Activated((EventHandler<EventArgs>)RadialMenuToggle);
 			Tags.CollectionChanged += Tags_CollectionChanged;
 			base.Settings.Version.set_Value(base.ModuleVersion);
-			GW2APIHandler = new GW2API_Handler(base.Gw2ApiManager, AddOrUpdateCharacters, () => (LoadingSpinner)(object)APISpinner, base.Paths, Data);
 		}
 
 		protected override void DefineSettings(SettingCollection settings)
@@ -210,6 +209,9 @@ namespace Kenedia.Modules.Characters
 			CharacterSwapping.CharacterSorting = CharacterSorting;
 			CharacterSorting.CharacterSwapping = CharacterSwapping;
 			TextureManager = new TextureManager(base.Services.TexturesService);
+			GW2APIHandler = new GW2API_Handler(base.Gw2ApiManager, AddOrUpdateCharacters, () => (LoadingSpinner)(object)APISpinner, base.Paths, Data);
+			GW2APIHandler.AccountChanged += GW2APIHandler_AccountChanged;
+			base.Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
 			if (base.Settings.ShowCornerIcon.get_Value())
 			{
 				CreateCornerIcons();
@@ -220,6 +222,25 @@ namespace Kenedia.Modules.Characters
 				LoadCharacters();
 			}
 			base.Services.InputDetectionService.ClickedOrKey += InputDetectionService_ClickedOrKey;
+		}
+
+		private void GW2APIHandler_AccountChanged(object sender, PropertyChangedEventArgs e)
+		{
+			if (!string.IsNullOrEmpty(base.Paths.AccountName))
+			{
+				string? accountName = base.Paths.AccountName;
+				Account account = GW2APIHandler.Account;
+				if (accountName != ((account != null) ? account.get_Name() : null))
+				{
+					PathCollection paths = base.Paths;
+					Account account2 = GW2APIHandler.Account;
+					paths.AccountName = ((account2 != null) ? account2.get_Name() : null);
+					BaseModule<Characters, MainWindow, Settings>.Logger.Info("Account changed. Wipe all account bound data of this session.");
+					CharacterModels.Clear();
+					base.MainWindow?.CharacterCards.Clear();
+					base.MainWindow?.LoadedModels.Clear();
+				}
+			}
 		}
 
 		protected override void Update(GameTime gameTime)
@@ -277,7 +298,7 @@ namespace Kenedia.Modules.Characters
 			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0229: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0244: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0315: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0331: Unknown result type (might be due to invalid IL or missing references)
 			base.LoadGUI();
 			RadialMenu radialMenu = new RadialMenu(base.Settings, CharacterModels, (Container)(object)GameService.Graphics.get_SpriteScreen(), () => CurrentCharacterModel, Data, TextureManager);
 			((Control)radialMenu).set_Visible(false);
@@ -315,6 +336,8 @@ namespace Kenedia.Modules.Characters
 			((WindowBase2)mainWindow).set_Subtitle("❤");
 			((WindowBase2)mainWindow).set_SavesPosition(true);
 			((WindowBase2)mainWindow).set_Id(((Module)this).get_Name() + " MainWindow");
+			mainWindow.Name = ((Module)this).get_Name();
+			mainWindow.MainWindowEmblem = AsyncTexture2D.FromAssetId(156015);
 			((WindowBase2)mainWindow).set_CanResize(true);
 			((Control)mainWindow).set_Size(base.Settings.WindowSize.get_Value());
 			mainWindow.SettingsWindow = (SettingsWindow)base.SettingsWindow;
@@ -584,12 +607,15 @@ namespace Kenedia.Modules.Characters
 
 		private void AddOrUpdateCharacters(IApiV2ObjectList<Character> characters)
 		{
-			if (!_loadedCharacters)
+			if (!_loadedCharacters && base.Settings.LoadCachedAccounts.get_Value())
 			{
 				BaseModule<Characters, MainWindow, Settings>.Logger.Info("This is our first API data fetched for this character/session. Trying to load local data first.");
-				LoadCharacters();
+				if (!LoadCharacters().HasValue)
+				{
+					BaseModule<Characters, MainWindow, Settings>.Logger.Info("Checking the cache.");
+				}
 			}
-			BaseModule<Characters, MainWindow, Settings>.Logger.Info("Update characters based on fresh data from the api.");
+			BaseModule<Characters, MainWindow, Settings>.Logger.Info("Update characters for '" + base.Paths.AccountName + "' based on fresh data from the api.");
 			var freshList = ((IEnumerable<Character>)characters).Select((Character c) => new
 			{
 				Name = c.get_Name(),
@@ -645,42 +671,34 @@ namespace Kenedia.Modules.Characters
 				}
 				pos++;
 			}
-			if (!File.Exists(CharactersPath) || base.Settings.ImportVersion.get_Value() < OldCharacterModel.ImportVersion)
-			{
-				string p = CharactersPath.Replace("kenedia\\", "");
-				if (File.Exists(p))
-				{
-					BaseModule<Characters, MainWindow, Settings>.Logger.Info($"This is the first start of {((Module)this).get_Name()} since import version {OldCharacterModel.ImportVersion}. Importing old data from {p}!");
-					OldCharacterModel.Import(p, CharacterModels, AccountImagesPath, base.Paths.AccountName, Tags);
-				}
-				base.Settings.ImportVersion.set_Value(OldCharacterModel.ImportVersion);
-			}
 			SaveCharacterList();
 			base.MainWindow?.CreateCharacterControls();
 			base.MainWindow?.PerformFiltering();
 		}
 
-		private bool LoadCharacters()
+		private bool? LoadCharacters()
 		{
 			PlayerCharacter player = GameService.Gw2Mumble.get_PlayerCharacter();
-			if (player == null || string.IsNullOrEmpty(player.get_Name()))
+			if ((player == null || string.IsNullOrEmpty(player.get_Name())) && string.IsNullOrEmpty(base.Paths.AccountName))
 			{
-				return false;
+				BaseModule<Characters, MainWindow, Settings>.Logger.Info("Player name is currently null or empty. Can not check for the account.");
+				return null;
 			}
 			AccountSummary account = getAccount();
-			if (account != null)
+			if (account != null || !string.IsNullOrEmpty(base.Paths.AccountName))
 			{
-				base.Paths.AccountName = account.AccountName;
+				PathCollection paths = base.Paths;
+				if (paths.AccountName == null)
+				{
+					string text = (paths.AccountName = account.AccountName);
+				}
 				_loadedCharacters = true;
 				base.Settings.LoadAccountSettings(base.Paths.AccountName);
 				if (!Directory.Exists(AccountImagesPath))
 				{
 					Directory.CreateDirectory(AccountImagesPath);
 				}
-			}
-			if (account != null)
-			{
-				BaseModule<Characters, MainWindow, Settings>.Logger.Debug("Found '" + player.get_Name() + "' in a stored character list for '" + account.AccountName + "'. Loading characters of '" + account.AccountName + "'");
+				BaseModule<Characters, MainWindow, Settings>.Logger.Info("Found '" + (player.get_Name() ?? "Unkown Player name.") + "' in a stored character list for '" + base.Paths.AccountName + "'. Loading characters of '" + base.Paths.AccountName + "'");
 				return LoadCharacterFile();
 			}
 			return false;

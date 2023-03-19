@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -17,6 +18,7 @@ using Kenedia.Modules.Characters.Res;
 using Kenedia.Modules.Characters.Views;
 using Kenedia.Modules.Core.DataModels;
 using Kenedia.Modules.Core.Models;
+using Kenedia.Modules.Core.Utility;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
 
@@ -52,10 +54,15 @@ namespace Kenedia.Modules.Characters.Services
 			}
 			set
 			{
-				_paths.AccountName = value.get_Name();
-				_account = value;
+				Account temp = _account;
+				if (Common.SetProperty(ref _account, value, this.AccountChanged, value != null && _paths.AccountName != ((value != null) ? value.get_Name() : null), "Account"))
+				{
+					BaseModule<Characters, MainWindow, Settings>.Logger.Info("Account changed from " + (((temp != null) ? temp.get_Name() : null) ?? "No Account") + " to " + (((value != null) ? value.get_Name() : null) ?? "No Account") + "!");
+				}
 			}
 		}
+
+		public event PropertyChangedEventHandler AccountChanged;
 
 		public GW2API_Handler(Gw2ApiManager gw2ApiManager, Action<IApiV2ObjectList<Character>> callBack, Func<LoadingSpinner> getSpinner, PathCollection paths, Data data)
 		{
@@ -178,6 +185,7 @@ namespace Kenedia.Modules.Characters.Services
 						return false;
 					}
 					Account = account;
+					BaseModule<Characters, MainWindow, Settings>.Logger.Info("Fetching characters for '" + Account.get_Name() + "' ...");
 					IApiV2ObjectList<Character> characters = await ((IAllExpandableClient<Character>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Characters()).AllAsync(cancellationToken);
 					if (cancellationToken.IsCancellationRequested)
 					{
