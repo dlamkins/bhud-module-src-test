@@ -69,6 +69,13 @@ namespace RaidClears
 			});
 			Service.CornerIcon.IconLeftClicked += new EventHandler<bool>(CornerIcon_IconLeftClicked);
 			Service.Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
+			if (Service.Settings.StrikeSettings.AnchorToRaidPanel.get_Value())
+			{
+				Task.Delay(1500).ContinueWith(delegate
+				{
+					Service.Settings.AlignStrikesWithRaidPanel();
+				});
+			}
 			return Task.CompletedTask;
 		}
 

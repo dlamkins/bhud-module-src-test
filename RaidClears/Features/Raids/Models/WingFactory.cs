@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Blish_HUD.Controls;
@@ -17,9 +18,18 @@ namespace RaidClears.Features.Raids.Models
 		public static IEnumerable<Wing> Create(RaidPanel panel, WeeklyWings weekly)
 		{
 			RaidSettings settings = Service.Settings.RaidSettings;
-			Wing[] wings = GetWingMetaData();
-			Wing[] array = wings;
-			foreach (Wing wing in array)
+			List<Wing> wings = GetWingMetaData();
+			if (DateTime.UtcNow.Month == 4 && DateTime.UtcNow.Day == 1)
+			{
+				wings.Add(new Wing("The Wait for Wing 8", 7, "W8", new BoxModel[4]
+				{
+					new BoxModel("w8-1", "Not", "N"),
+					new BoxModel("w8-2", "Our", "O"),
+					new BoxModel("w8-3", "Priority", "P"),
+					new BoxModel("w8-4", "Ever", "E")
+				}));
+			}
+			foreach (Wing wing in wings)
 			{
 				GridGroup group = new GridGroup((Container)(object)panel, settings.Style.Layout);
 				((FlowPanel)(object)group).VisiblityChanged(GetWingSelectionByIndex(wing.index, settings));
@@ -61,58 +71,57 @@ namespace RaidClears.Features.Raids.Models
 			return settings.RaidWings.ElementAt(index);
 		}
 
-		private static Wing[] GetWingMetaData()
+		private static List<Wing> GetWingMetaData()
 		{
-			return new Wing[7]
+			List<Wing> list = new List<Wing>();
+			list.Add(new Wing(Strings.Raid_Wing_1, 0, Strings.Raid_Wing_1_Short, new BoxModel[4]
 			{
-				new Wing(Strings.Raid_Wing_1, 0, Strings.Raid_Wing_1_Short, new BoxModel[4]
-				{
-					new Encounter(Encounters.RaidBosses.ValeGuardian),
-					new Encounter(Encounters.RaidBosses.SpiritWoods),
-					new Encounter(Encounters.RaidBosses.Gorseval),
-					new Encounter(Encounters.RaidBosses.Sabetha)
-				}),
-				new Wing(Strings.Raid_Wing_2, 1, Strings.Raid_Wing_2_Short, new BoxModel[3]
-				{
-					new Encounter(Encounters.RaidBosses.Slothasor),
-					new Encounter(Encounters.RaidBosses.BanditTrio),
-					new Encounter(Encounters.RaidBosses.Matthias)
-				}),
-				new Wing(Strings.Raid_Wing_3, 2, Strings.Raid_Wing_3_Short, new BoxModel[4]
-				{
-					new Encounter(Encounters.RaidBosses.Escort),
-					new Encounter(Encounters.RaidBosses.KeepConstruct),
-					new Encounter(Encounters.RaidBosses.TwistedCastle),
-					new Encounter(Encounters.RaidBosses.Xera)
-				}),
-				new Wing(Strings.Raid_Wing_4, 3, Strings.Raid_Wing_4_Short, new BoxModel[4]
-				{
-					new Encounter(Encounters.RaidBosses.Cairn),
-					new Encounter(Encounters.RaidBosses.MursaatOverseer),
-					new Encounter(Encounters.RaidBosses.Samarog),
-					new Encounter(Encounters.RaidBosses.Deimos)
-				}),
-				new Wing(Strings.Raid_Wing_5, 4, Strings.Raid_Wing_5_Short, new BoxModel[4]
-				{
-					new Encounter(Encounters.RaidBosses.SoulessHorror),
-					new Encounter(Encounters.RaidBosses.RiverOfSouls),
-					new Encounter(Encounters.RaidBosses.StatuesOfGrenth),
-					new Encounter(Encounters.RaidBosses.VoiceInTheVoid)
-				}),
-				new Wing(Strings.Raid_Wing_6, 5, Strings.Raid_Wing_6_Short, new BoxModel[3]
-				{
-					new Encounter(Encounters.RaidBosses.ConjuredAmalgamate),
-					new Encounter(Encounters.RaidBosses.TwinLargos),
-					new Encounter(Encounters.RaidBosses.Qadim)
-				}),
-				new Wing(Strings.Raid_Wing_7, 6, Strings.Raid_Wing_7_Short, new BoxModel[4]
-				{
-					new Encounter(Encounters.RaidBosses.Gate),
-					new Encounter(Encounters.RaidBosses.Adina),
-					new Encounter(Encounters.RaidBosses.Sabir),
-					new Encounter(Encounters.RaidBosses.QadimThePeerless)
-				})
-			};
+				new Encounter(Encounters.RaidBosses.ValeGuardian),
+				new Encounter(Encounters.RaidBosses.SpiritWoods),
+				new Encounter(Encounters.RaidBosses.Gorseval),
+				new Encounter(Encounters.RaidBosses.Sabetha)
+			}));
+			list.Add(new Wing(Strings.Raid_Wing_2, 1, Strings.Raid_Wing_2_Short, new BoxModel[3]
+			{
+				new Encounter(Encounters.RaidBosses.Slothasor),
+				new Encounter(Encounters.RaidBosses.BanditTrio),
+				new Encounter(Encounters.RaidBosses.Matthias)
+			}));
+			list.Add(new Wing(Strings.Raid_Wing_3, 2, Strings.Raid_Wing_3_Short, new BoxModel[4]
+			{
+				new Encounter(Encounters.RaidBosses.Escort),
+				new Encounter(Encounters.RaidBosses.KeepConstruct),
+				new Encounter(Encounters.RaidBosses.TwistedCastle),
+				new Encounter(Encounters.RaidBosses.Xera)
+			}));
+			list.Add(new Wing(Strings.Raid_Wing_4, 3, Strings.Raid_Wing_4_Short, new BoxModel[4]
+			{
+				new Encounter(Encounters.RaidBosses.Cairn),
+				new Encounter(Encounters.RaidBosses.MursaatOverseer),
+				new Encounter(Encounters.RaidBosses.Samarog),
+				new Encounter(Encounters.RaidBosses.Deimos)
+			}));
+			list.Add(new Wing(Strings.Raid_Wing_5, 4, Strings.Raid_Wing_5_Short, new BoxModel[4]
+			{
+				new Encounter(Encounters.RaidBosses.SoulessHorror),
+				new Encounter(Encounters.RaidBosses.RiverOfSouls),
+				new Encounter(Encounters.RaidBosses.StatuesOfGrenth),
+				new Encounter(Encounters.RaidBosses.VoiceInTheVoid)
+			}));
+			list.Add(new Wing(Strings.Raid_Wing_6, 5, Strings.Raid_Wing_6_Short, new BoxModel[3]
+			{
+				new Encounter(Encounters.RaidBosses.ConjuredAmalgamate),
+				new Encounter(Encounters.RaidBosses.TwinLargos),
+				new Encounter(Encounters.RaidBosses.Qadim)
+			}));
+			list.Add(new Wing(Strings.Raid_Wing_7, 6, Strings.Raid_Wing_7_Short, new BoxModel[4]
+			{
+				new Encounter(Encounters.RaidBosses.Gate),
+				new Encounter(Encounters.RaidBosses.Adina),
+				new Encounter(Encounters.RaidBosses.Sabir),
+				new Encounter(Encounters.RaidBosses.QadimThePeerless)
+			}));
+			return list;
 		}
 	}
 }

@@ -133,7 +133,7 @@ namespace RaidClears.Settings.Models
 
 				public static Setting<bool> highlightCotm = new Setting<bool>("RCCotM", DefaultValue: true, () => Strings.Setting_Raid_Cotm_Label, () => Strings.Setting_Raid_Cotm_Tooltip);
 
-				public static Setting<bool>[] raidWings = new Setting<bool>[7]
+				public static Setting<bool>[] raidWings = new Setting<bool>[8]
 				{
 					new Setting<bool>("RCw1", DefaultValue: true, () => Strings.Setting_Raid_W1_Label, () => Strings.Setting_Raid_W1_Tooltip),
 					new Setting<bool>("RCw2", DefaultValue: true, () => Strings.Setting_Raid_W2_Label, () => Strings.Setting_Raid_W2_Tooltip),
@@ -141,7 +141,8 @@ namespace RaidClears.Settings.Models
 					new Setting<bool>("RCw4", DefaultValue: true, () => Strings.Setting_Raid_W4_Label, () => Strings.Setting_Raid_W4_Tooltip),
 					new Setting<bool>("RCw5", DefaultValue: true, () => Strings.Setting_Raid_W5_Label, () => Strings.Setting_Raid_W5_Tooltip),
 					new Setting<bool>("RCw6", DefaultValue: true, () => Strings.Setting_Raid_W6_Label, () => Strings.Setting_Raid_W6_Tooltip),
-					new Setting<bool>("RCw7", DefaultValue: true, () => Strings.Setting_Raid_W7_Label, () => Strings.Setting_Raid_W7_Tooltip)
+					new Setting<bool>("RCw7", DefaultValue: true, () => Strings.Setting_Raid_W7_Label, () => Strings.Setting_Raid_W7_Tooltip),
+					new Setting<bool>("RCw8", DefaultValue: true, () => "Wing 8", () => "Happy April 1st")
 				};
 			}
 		}

@@ -10,15 +10,9 @@ namespace RaidClears.Features.Strikes.Services
 {
 	public static class PriorityRotationService
 	{
-		private static int BOTH_AT_INDEX_0_TIMESTAMP = 1675123200;
-
-		private static int DAILY_SECONDS = 86400;
-
 		private static int NUMBER_OF_IBS_STRIKES = 6;
 
 		private static int NUMBER_OF_EOD_STRIKES = 5;
-
-		private static DateTime zeroIndex = new DateTime(2023, 1, 31, 0, 0, 0, DateTimeKind.Utc);
 
 		public static IEnumerable<BoxModel> GetPriorityEncounters()
 		{
