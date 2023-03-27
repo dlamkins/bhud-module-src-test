@@ -86,6 +86,8 @@ namespace Kenedia.Modules.Characters.Views
 
 		private TesseractFailedNotification _tesseractFailedNotification;
 
+		private double lastUniform;
+
 		public List<Character_Model> LoadedModels { get; } = new List<Character_Model>();
 
 
@@ -369,7 +371,7 @@ namespace Kenedia.Modules.Characters.Views
 			List<Match> strings = regex.Matches(((TextInputBase)_filterBox).get_Text().Trim().ToLower()).Cast<Match>().ToList();
 			new List<string>();
 			List<KeyValuePair<string, SearchFilter<Character_Model>>> stringFilters = new List<KeyValuePair<string, SearchFilter<Character_Model>>>();
-			_003C_003Ec__DisplayClass66_0 CS_0024_003C_003E8__locals0;
+			_003C_003Ec__DisplayClass67_0 CS_0024_003C_003E8__locals0;
 			foreach (Match match in strings)
 			{
 				string string_text = SearchableString(match.ToString().Replace("\"", ""));
@@ -403,7 +405,7 @@ namespace Kenedia.Modules.Characters.Views
 					{
 						//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 						//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-						_003C_003Ec__DisplayClass66_0 _003C_003Ec__DisplayClass66_ = CS_0024_003C_003E8__locals0;
+						_003C_003Ec__DisplayClass67_0 _003C_003Ec__DisplayClass67_ = CS_0024_003C_003E8__locals0;
 						Gender gender = c.Gender;
 						return SearchableString(((object)(Gender)(ref gender)).ToString()).Contains(string_text);
 					}, enabled: true)));
@@ -591,6 +593,11 @@ namespace Kenedia.Modules.Characters.Views
 				_filterCharacters = false;
 				PerformFiltering();
 			}
+			if (gameTime.get_TotalGameTime().TotalMilliseconds - lastUniform > 1000.0)
+			{
+				lastUniform = gameTime.get_TotalGameTime().TotalMilliseconds;
+				CharacterCards.FirstOrDefault()?.UniformWithAttached();
+			}
 		}
 
 		public override void RecalculateLayout()
@@ -609,16 +616,16 @@ namespace Kenedia.Modules.Characters.Views
 			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).OnShown(e);
-			if (!_settings.FocusSearchOnShow.get_Value())
+			if (_settings.FocusSearchOnShow.get_Value())
 			{
-				return;
+				foreach (Keys item in GameService.Input.get_Keyboard().get_KeysDown())
+				{
+					Keyboard.Release((VirtualKeyShort)(short)item, false);
+					Keyboard.Release((VirtualKeyShort)(short)item, true);
+				}
+				((TextInputBase)_filterBox).set_Focused(true);
 			}
-			foreach (Keys item in GameService.Input.get_Keyboard().get_KeysDown())
-			{
-				Keyboard.Release((VirtualKeyShort)(short)item, false);
-				Keyboard.Release((VirtualKeyShort)(short)item, true);
-			}
-			((TextInputBase)_filterBox).set_Focused(true);
+			CharacterCards.FirstOrDefault()?.UniformWithAttached();
 		}
 
 		protected override void OnHidden(EventArgs e)

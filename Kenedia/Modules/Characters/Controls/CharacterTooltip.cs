@@ -61,7 +61,18 @@ namespace Kenedia.Modules.Characters.Controls
 			set
 			{
 				_infoLabels.Character = value;
-				Common.SetProperty(ref _character, value);
+				Character_Model temp = _character;
+				if (Common.SetProperty(ref _character, value))
+				{
+					if (temp != null)
+					{
+						temp.Updated -= Character_Updated;
+					}
+					if (_character != null)
+					{
+						_character.Updated += Character_Updated;
+					}
+				}
 			}
 		}
 
@@ -110,6 +121,13 @@ namespace Kenedia.Modules.Characters.Controls
 			_infoLabels.UpdateDataControlsVisibility(tooltip: true);
 		}
 
+		private void Character_Updated(object sender, EventArgs e)
+		{
+			_infoLabels.UpdateDataControlsVisibility(tooltip: true);
+			_infoLabels.Update();
+			UpdateSize();
+		}
+
 		public override void UpdateContainer(GameTime gameTime)
 		{
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
@@ -119,9 +137,6 @@ namespace Kenedia.Modules.Characters.Controls
 			((Control)this).set_Location(new Point(Control.get_Input().get_Mouse().get_Position()
 				.X, Control.get_Input().get_Mouse().get_Position()
 				.Y + 35));
-			_infoLabels.UpdateDataControlsVisibility(tooltip: true);
-			_infoLabels.Update(gameTime);
-			UpdateSize();
 		}
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
@@ -154,11 +169,16 @@ namespace Kenedia.Modules.Characters.Controls
 			((Control)this).set_Location(new Point(Control.get_Input().get_Mouse().get_Position()
 				.X, Control.get_Input().get_Mouse().get_Position()
 				.Y + 35));
+			Character_Updated(this, null);
 		}
 
 		protected override void DisposeControl()
 		{
 			base.DisposeControl();
+			if (_character != null)
+			{
+				_character.Updated -= Character_Updated;
+			}
 		}
 	}
 }

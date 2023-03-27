@@ -43,8 +43,6 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private readonly IconLabel _customIndex;
 
-		private readonly TagFlowPanel _tagPanel;
-
 		private Character_Model _character;
 
 		private readonly List<Tag> _tags = new List<Tag>();
@@ -57,7 +55,7 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private Settings _settings;
 
-		public TagFlowPanel TagPanel => _tagPanel;
+		public TagFlowPanel TagPanel { get; }
 
 		public BitmapFont NameFont { get; set; } = GameService.Content.get_DefaultFont14();
 
@@ -218,7 +216,7 @@ namespace Kenedia.Modules.Characters.Controls
 			((FlowPanel)tagFlowPanel).set_ControlPadding(new Vector2(3f, 2f));
 			((Container)tagFlowPanel).set_HeightSizingMode((SizingMode)1);
 			((Control)tagFlowPanel).set_Visible(false);
-			_tagPanel = tagFlowPanel;
+			TagPanel = tagFlowPanel;
 			DataControls = new List<Control>
 			{
 				(Control)(object)_nameLabel,
@@ -232,7 +230,7 @@ namespace Kenedia.Modules.Characters.Controls
 				(Control)(object)_ageLabel,
 				(Control)(object)_lastLoginLabel,
 				(Control)(object)_craftingControl,
-				(Control)(object)_tagPanel
+				(Control)(object)TagPanel
 			};
 			LocalizingService.LocaleChanged += UserLocale_SettingChanged;
 			UserLocale_SettingChanged(null, null);
@@ -270,7 +268,7 @@ namespace Kenedia.Modules.Characters.Controls
 		public void RecalculateBounds()
 		{
 			UpdateDataControlsVisibility();
-			_tagPanel.FitWidestTag(DataControls.Max((Control e) => (e.get_Visible() && e != _tagPanel) ? e.get_Width() : 0));
+			TagPanel.FitWidestTag(DataControls.Max((Control e) => (e.get_Visible() && e != TagPanel) ? e.get_Width() : 0));
 		}
 
 		public void Dispose()
@@ -330,51 +328,52 @@ namespace Kenedia.Modules.Characters.Controls
 				{
 					List<Tag> tags = _tags;
 					Tag tag3 = new Tag();
-					((Control)tag3).set_Parent((Container)(object)_tagPanel);
+					((Control)tag3).set_Parent((Container)(object)TagPanel);
 					tag3.Text = tag;
 					tag3.Active = true;
 					tag3.ShowDelete = false;
 					tag3.CanInteract = false;
 					tags.Add(tag3);
 				}
-				_tagPanel.FitWidestTag(DataControls.Max((Control e) => (e.get_Visible() && e != _tagPanel) ? e.get_Width() : 0));
+				TagPanel.FitWidestTag(DataControls.Max((Control e) => (e.get_Visible() && e != TagPanel) ? e.get_Width() : 0));
 			}
 			_craftingControl.Character = Character;
 		}
 
 		public void UpdateDataControlsVisibility(bool tooltip = false)
 		{
-			//IL_04fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_039a: Unknown result type (might be due to invalid IL or missing references)
 			if (_settings == null)
 			{
 				return;
 			}
+			Dictionary<string, ShowCheckPair> settings = _settings.DisplayToggles.get_Value();
 			NameFont = GetFont(nameFont: true);
 			Font = GetFont();
-			((Control)_nameLabel).set_Visible(tooltip ? _settings.DisplayToggles.get_Value()["Name"].ShowTooltip : _settings.DisplayToggles.get_Value()["Name"].Show);
+			((Control)_nameLabel).set_Visible(!settings.TryGetValue("Name", out var name) || (tooltip ? name.ShowTooltip : name.Show));
 			_nameLabel.Font = NameFont;
-			((Control)_levelLabel).set_Visible(tooltip ? _settings.DisplayToggles.get_Value()["Level"].ShowTooltip : _settings.DisplayToggles.get_Value()["Level"].Show);
+			((Control)_levelLabel).set_Visible(!settings.TryGetValue("Level", out var level) || (tooltip ? level.ShowTooltip : level.Show));
 			_levelLabel.Font = Font;
-			((Control)_genderLabel).set_Visible(tooltip ? _settings.DisplayToggles.get_Value()["Gender"].ShowTooltip : _settings.DisplayToggles.get_Value()["Gender"].Show);
+			((Control)_genderLabel).set_Visible(!settings.TryGetValue("Gender", out var gender) || (tooltip ? gender.ShowTooltip : gender.Show));
 			_genderLabel.Font = Font;
-			((Control)_raceLabel).set_Visible(tooltip ? _settings.DisplayToggles.get_Value()["Race"].ShowTooltip : _settings.DisplayToggles.get_Value()["Race"].Show);
+			((Control)_raceLabel).set_Visible(!settings.TryGetValue("Race", out var race) || (tooltip ? race.ShowTooltip : race.Show));
 			_raceLabel.Font = Font;
-			((Control)_professionLabel).set_Visible(tooltip ? _settings.DisplayToggles.get_Value()["Profession"].ShowTooltip : _settings.DisplayToggles.get_Value()["Profession"].Show);
+			((Control)_professionLabel).set_Visible(!settings.TryGetValue("Profession", out var profession) || (tooltip ? profession.ShowTooltip : profession.Show));
 			_professionLabel.Font = Font;
-			((Control)_lastLoginLabel).set_Visible(tooltip ? _settings.DisplayToggles.get_Value()["LastLogin"].ShowTooltip : _settings.DisplayToggles.get_Value()["LastLogin"].Show);
+			((Control)_lastLoginLabel).set_Visible(!settings.TryGetValue("LastLogin", out var lastlogin) || (tooltip ? lastlogin.ShowTooltip : lastlogin.Show));
 			_lastLoginLabel.Font = Font;
-			((Control)_ageLabel).set_Visible(tooltip ? _settings.DisplayToggles.get_Value()["Age"].ShowTooltip : _settings.DisplayToggles.get_Value()["Age"].Show);
+			((Control)_ageLabel).set_Visible(!settings.TryGetValue("Age", out var age) || (tooltip ? age.ShowTooltip : age.Show));
 			_ageLabel.Font = Font;
-			((Control)_nextBirthdayLabel).set_Visible(tooltip ? _settings.DisplayToggles.get_Value()["NextBirthday"].ShowTooltip : _settings.DisplayToggles.get_Value()["NextBirthday"].Show);
+			((Control)_nextBirthdayLabel).set_Visible(!settings.TryGetValue("NextBirthday", out var nextbirthday) || (tooltip ? nextbirthday.ShowTooltip : nextbirthday.Show));
 			_nextBirthdayLabel.Font = Font;
-			((Control)_mapLabel).set_Visible(tooltip ? _settings.DisplayToggles.get_Value()["Map"].ShowTooltip : _settings.DisplayToggles.get_Value()["Map"].Show);
+			((Control)_mapLabel).set_Visible(!settings.TryGetValue("Map", out var map) || (tooltip ? map.ShowTooltip : map.Show));
 			_mapLabel.Font = Font;
-			((Control)_craftingControl).set_Visible(tooltip ? _settings.DisplayToggles.get_Value()["CraftingProfession"].ShowTooltip : _settings.DisplayToggles.get_Value()["CraftingProfession"].Show);
+			((Control)_craftingControl).set_Visible(!settings.TryGetValue("CraftingProfession", out var craftingprofession) || (tooltip ? craftingprofession.ShowTooltip : craftingprofession.Show));
 			_craftingControl.Font = Font;
-			((Control)_customIndex).set_Visible(tooltip ? _settings.DisplayToggles.get_Value()["CustomIndex"].ShowTooltip : _settings.DisplayToggles.get_Value()["CustomIndex"].Show);
+			((Control)_customIndex).set_Visible(!settings.TryGetValue("CustomIndex", out var customindex) || (tooltip ? customindex.ShowTooltip : customindex.Show));
 			_customIndex.Font = Font;
-			((Control)_tagPanel).set_Visible((tooltip ? _settings.DisplayToggles.get_Value()["Tags"].ShowTooltip : _settings.DisplayToggles.get_Value()["Tags"].Show) && (Character?.Tags.Count ?? 0) > 0);
-			_tagPanel.Font = Font;
+			((Control)TagPanel).set_Visible((!settings.TryGetValue("Tags", out var tags) || (tooltip ? tags.ShowTooltip : tags.Show)) && (Character?.Tags.Count ?? 0) > 0);
+			TagPanel.Font = Font;
 			((Control)_craftingControl).set_Height(Font.get_LineHeight() + 2);
 			if (Parent != null)
 			{
@@ -418,7 +417,7 @@ namespace Kenedia.Modules.Characters.Controls
 			return GameService.Content.GetFont((FontFace)0, fontSize, (FontStyle)0);
 		}
 
-		internal void Update(GameTime gameTime)
+		internal void Update()
 		{
 			if (Character != null && ((Control)_lastLoginLabel).get_Visible())
 			{

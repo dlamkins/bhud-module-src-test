@@ -94,8 +94,7 @@ namespace Kenedia.Modules.Characters
 			_characterModels = characterModels;
 			try
 			{
-				string path = basePath + "tesseract.dll";
-				OcrApi.PathToEngine = basePath + path;
+				string path = (OcrApi.PathToEngine = basePath + "tesseract.dll");
 				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info($"Set Path to Tesseract Engine: {OcrApi.PathToEngine}. File exists: {File.Exists(path)}");
 				_ocrApi = OcrApi.Create();
 				_ocrApi.Init(basePath, "gw2");

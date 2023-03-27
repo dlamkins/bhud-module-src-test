@@ -213,12 +213,17 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private void Settings_AppearanceSettingChanged(object sender, EventArgs e)
 		{
+			Update();
+			UniformWithAttached();
+		}
+
+		private void Update()
+		{
 			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 			_infoLabels.UpdateDataControlsVisibility();
 			_infoLabels.UpdateCharacterInfo();
 			CalculateLayout();
 			AdaptNewBounds();
-			UniformWithAttached();
 		}
 
 		public CharacterCard(Func<Character_Model> currentCharacter, TextureManager textureManager, Data data, MainWindow mainWindow, Settings settings)
@@ -254,14 +259,15 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public void UniformWithAttached(bool force = false)
 		{
-			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
 			double now = Common.Now();
+			Update();
 			if (!(_lastUniform != now || force))
 			{
 				return;
@@ -605,7 +611,7 @@ namespace Kenedia.Modules.Characters.Controls
 					((Control)_characterTooltip).set_Visible(((Control)this).get_MouseOver());
 				}
 			}
-			_infoLabels.Update(gameTime);
+			_infoLabels.Update();
 			if (_updateCharacter && _created && ((Control)this).get_Visible())
 			{
 				Settings_AppearanceSettingChanged(this, null);
