@@ -202,21 +202,21 @@ namespace Kenedia.Modules.Characters
 		protected override async Task LoadAsync()
 		{
 			await base.LoadAsync();
-			if (base.Settings.LoadCachedAccounts.get_Value())
-			{
-				await LoadCharacters();
-			}
-			await Data.Load();
-		}
-
-		protected override void OnModuleLoaded(EventArgs e)
-		{
-			base.OnModuleLoaded(e);
 			CharacterSwapping = new CharacterSwapping(base.Settings, base.Services.GameState, CharacterModels);
 			CharacterSorting = new CharacterSorting(base.Settings, base.Services.GameState, CharacterModels);
 			CharacterSwapping.CharacterSorting = CharacterSorting;
 			CharacterSorting.CharacterSwapping = CharacterSwapping;
 			TextureManager = new TextureManager(base.Services.TexturesService);
+			await Data.Load();
+			if (base.Settings.LoadCachedAccounts.get_Value())
+			{
+				await LoadCharacters();
+			}
+		}
+
+		protected override void OnModuleLoaded(EventArgs e)
+		{
+			base.OnModuleLoaded(e);
 			GW2APIHandler = new GW2API_Handler(base.Gw2ApiManager, AddOrUpdateCharacters, () => (LoadingSpinner)(object)APISpinner, base.Paths, Data);
 			GW2APIHandler.AccountChanged += GW2APIHandler_AccountChanged;
 			base.Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
