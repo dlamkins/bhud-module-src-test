@@ -108,6 +108,11 @@ namespace Kenedia.Modules.Characters.Services
 
 		public async void Start()
 		{
+			OCR oCR = OCR;
+			if (oCR == null || !oCR.IsLoaded)
+			{
+				return;
+			}
 			_state = SortingState.Canceled;
 			_cancellationTokenSource?.Cancel();
 			_cancellationTokenSource = new CancellationTokenSource();
@@ -267,8 +272,8 @@ namespace Kenedia.Modules.Characters.Services
 		private async Task<string> FetchName(CancellationToken cancellationToken)
 		{
 			string name = await (OCR?.Read());
-			Status = string.Format(strings.FixCharacter_FetchName, Environment.NewLine, name);
-			if (name != null)
+			Status = string.Format(strings.FixCharacter_FetchName, Environment.NewLine, name ?? "Unkown Character Name");
+			if (string.IsNullOrEmpty(name))
 			{
 				(string, int, int, int, bool) match = GetBestMatch(name);
 				Character_Model c = _models.Find((Character_Model e) => e.Name == match.Item1);

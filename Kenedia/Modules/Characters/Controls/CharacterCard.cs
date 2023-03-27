@@ -6,7 +6,6 @@ using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Gw2Mumble;
 using Blish_HUD.Input;
-using Gw2Sharp.WebApi.V2.Models;
 using Kenedia.Modules.Characters.Models;
 using Kenedia.Modules.Characters.Res;
 using Kenedia.Modules.Characters.Services;
@@ -14,7 +13,6 @@ using Kenedia.Modules.Characters.Views;
 using Kenedia.Modules.Core.Controls;
 using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Interfaces;
-using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.Core.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -25,10 +23,6 @@ namespace Kenedia.Modules.Characters.Controls
 {
 	public class CharacterCard : Panel
 	{
-		private readonly List<Control> _dataControls = new List<Control>();
-
-		private bool _updateCharacter;
-
 		private readonly AsyncTexture2D _iconFrame = AsyncTexture2D.FromAssetId(1414041);
 
 		private readonly AsyncTexture2D _loginTexture = AsyncTexture2D.FromAssetId(60968);
@@ -43,31 +37,13 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private readonly AsyncTexture2D _presentTextureOpen = AsyncTexture2D.FromAssetId(593865);
 
-		private readonly IconLabel _nameLabel;
-
-		private readonly IconLabel _levelLabel;
-
-		private readonly IconLabel _professionLabel;
-
-		private readonly IconLabel _raceLabel;
-
-		private readonly IconLabel _genderLabel;
-
-		private readonly IconLabel _mapLabel;
-
-		private readonly IconLabel _lastLoginLabel;
-
-		private readonly IconLabel _customIndex;
-
-		private readonly TagFlowPanel _tagPanel;
-
-		private readonly CraftingControl _craftingControl;
-
 		private readonly BasicTooltip _textTooltip;
 
 		private readonly CharacterTooltip _characterTooltip;
 
 		private readonly FlowPanel _contentPanel;
+
+		private readonly CharacterLabels _infoLabels;
 
 		private readonly Dummy _iconDummy;
 
@@ -91,10 +67,6 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private Character_Model _character;
 
-		private readonly List<Tag> _tags = new List<Tag>();
-
-		private readonly Func<Character_Model> _currentCharacter;
-
 		private readonly TextureManager _textureManager;
 
 		private readonly Data _data;
@@ -105,9 +77,9 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private double _lastUniform;
 
-		public bool IsDraggingTarget { get; set; }
+		private bool _updateCharacter;
 
-		private Character_Model CurrentCharacter => _currentCharacter?.Invoke();
+		public bool IsDraggingTarget { get; set; }
 
 		public List<CharacterCard> AttachedCards { get; set; } = new List<CharacterCard>();
 
@@ -132,7 +104,7 @@ namespace Kenedia.Modules.Characters.Controls
 			{
 				if (Character != null)
 				{
-					UpdateCharacterInfo();
+					_infoLabels.UpdateCharacterInfo();
 				}
 			}
 		}
@@ -145,24 +117,27 @@ namespace Kenedia.Modules.Characters.Controls
 			}
 			set
 			{
-				if (_character != value)
+				Character_Model temp = _character;
+				if (Common.SetProperty(ref _character, value))
 				{
+					if (temp != null)
+					{
+						temp.Deleted -= CharacterDeleted;
+						temp.Updated -= ApplyCharacter;
+					}
 					if (_character != null)
 					{
-						_character.Updated -= ApplyCharacter;
-						_character.Deleted -= CharacterDeleted;
-					}
-					_character = value;
-					if (_characterTooltip != null)
-					{
-						_characterTooltip.Character = value;
-					}
-					if (value != null)
-					{
-						_character.Updated += ApplyCharacter;
 						_character.Deleted += CharacterDeleted;
-						UpdateCharacterInfo();
+						_character.Updated += ApplyCharacter;
 					}
+				}
+				if (_characterTooltip != null)
+				{
+					_characterTooltip.Character = value;
+				}
+				if (_infoLabels != null)
+				{
+					_infoLabels.Character = value;
 				}
 			}
 		}
@@ -187,20 +162,14 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public CharacterCard()
 		{
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0257: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0311: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0365: Unknown result type (might be due to invalid IL or missing references)
-			//IL_042e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
 			((Container)this).set_HeightSizingMode((SizingMode)1);
 			base.BackgroundColor = Color.get_Black() * 0.5f;
 			((Container)this).set_AutoSizePadding(new Point(0, 2));
@@ -213,82 +182,7 @@ namespace Kenedia.Modules.Characters.Controls
 			((Control)dummy).set_Parent((Container)(object)this);
 			((Control)dummy).set_Size(Point.get_Zero());
 			_iconDummy = dummy;
-			IconLabel iconLabel = new IconLabel();
-			((Control)iconLabel).set_Parent((Container)(object)_contentPanel);
-			iconLabel.AutoSizeWidth = true;
-			iconLabel.AutoSizeHeight = true;
-			iconLabel.TextColor = Colors.ColonialWhite;
-			_nameLabel = iconLabel;
-			IconLabel iconLabel2 = new IconLabel();
-			((Control)iconLabel2).set_Parent((Container)(object)_contentPanel);
-			iconLabel2.AutoSizeWidth = true;
-			iconLabel2.AutoSizeHeight = true;
-			iconLabel2.Icon = AsyncTexture2D.FromAssetId(157085);
-			iconLabel2.TextureRectangle = new Rectangle(2, 2, 28, 28);
-			_levelLabel = iconLabel2;
-			IconLabel iconLabel3 = new IconLabel();
-			((Control)iconLabel3).set_Parent((Container)(object)_contentPanel);
-			iconLabel3.AutoSizeWidth = true;
-			iconLabel3.AutoSizeHeight = true;
-			_genderLabel = iconLabel3;
-			IconLabel iconLabel4 = new IconLabel();
-			((Control)iconLabel4).set_Parent((Container)(object)_contentPanel);
-			iconLabel4.AutoSizeWidth = true;
-			iconLabel4.AutoSizeHeight = true;
-			_raceLabel = iconLabel4;
-			IconLabel iconLabel5 = new IconLabel();
-			((Control)iconLabel5).set_Parent((Container)(object)_contentPanel);
-			iconLabel5.AutoSizeWidth = true;
-			iconLabel5.AutoSizeHeight = true;
-			_professionLabel = iconLabel5;
-			IconLabel iconLabel6 = new IconLabel();
-			((Control)iconLabel6).set_Parent((Container)(object)_contentPanel);
-			iconLabel6.AutoSizeWidth = true;
-			iconLabel6.AutoSizeHeight = true;
-			iconLabel6.Icon = AsyncTexture2D.FromAssetId(358406);
-			iconLabel6.TextureRectangle = new Rectangle(2, 2, 28, 28);
-			_mapLabel = iconLabel6;
-			CraftingControl craftingControl = new CraftingControl();
-			((Control)craftingControl).set_Parent((Container)(object)_contentPanel);
-			((Control)craftingControl).set_Width(((Control)_contentPanel).get_Width());
-			((Control)craftingControl).set_Height(20);
-			craftingControl.Character = Character;
-			_craftingControl = craftingControl;
-			IconLabel iconLabel7 = new IconLabel();
-			((Control)iconLabel7).set_Parent((Container)(object)_contentPanel);
-			iconLabel7.AutoSizeWidth = true;
-			iconLabel7.AutoSizeHeight = true;
-			iconLabel7.Icon = AsyncTexture2D.FromAssetId(155035);
-			iconLabel7.TextureRectangle = new Rectangle(10, 10, 44, 44);
-			_lastLoginLabel = iconLabel7;
-			IconLabel iconLabel8 = new IconLabel();
-			((Control)iconLabel8).set_Parent((Container)(object)_contentPanel);
-			iconLabel8.AutoSizeWidth = true;
-			iconLabel8.AutoSizeHeight = true;
-			iconLabel8.TextureRectangle = new Rectangle(2, 2, 28, 28);
-			iconLabel8.Icon = AsyncTexture2D.FromAssetId(156909);
-			_customIndex = iconLabel8;
-			TagFlowPanel tagFlowPanel = new TagFlowPanel();
-			((Control)tagFlowPanel).set_Parent((Container)(object)_contentPanel);
-			tagFlowPanel.Font = _lastLoginLabel.Font;
-			((FlowPanel)tagFlowPanel).set_FlowDirection((ControlFlowDirection)0);
-			((FlowPanel)tagFlowPanel).set_ControlPadding(new Vector2(3f, 2f));
-			((Container)tagFlowPanel).set_HeightSizingMode((SizingMode)1);
-			((Control)tagFlowPanel).set_Visible(false);
-			_tagPanel = tagFlowPanel;
-			_dataControls = new List<Control>
-			{
-				(Control)(object)_nameLabel,
-				(Control)(object)_customIndex,
-				(Control)(object)_levelLabel,
-				(Control)(object)_genderLabel,
-				(Control)(object)_raceLabel,
-				(Control)(object)_professionLabel,
-				(Control)(object)_mapLabel,
-				(Control)(object)_lastLoginLabel,
-				(Control)(object)_craftingControl,
-				(Control)(object)_tagPanel
-			};
+			_infoLabels = new CharacterLabels(_contentPanel);
 			BasicTooltip basicTooltip = new BasicTooltip();
 			((Control)basicTooltip).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((Control)basicTooltip).set_ZIndex(1000);
@@ -297,33 +191,42 @@ namespace Kenedia.Modules.Characters.Controls
 			_textTooltip = basicTooltip;
 			((Control)_textTooltip).add_Shown((EventHandler<EventArgs>)TextTooltip_Shown);
 			_created = true;
+			_updateCharacter = true;
 		}
 
 		public CharacterCard(CharacterCard card)
 			: this()
 		{
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			_currentCharacter = card._currentCharacter;
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 			_textureManager = card._textureManager;
 			_data = card._data;
 			_mainWindow = card._mainWindow;
 			_settings = card._settings;
-			_craftingControl.Settings = _settings;
-			_craftingControl.Data = _data;
-			_genderLabel.Icon = AsyncTexture2D.op_Implicit(_textureManager.GetIcon(TextureManager.Icons.Gender));
 			((Control)this).set_Size(((Control)card).get_Size());
 			Character = card._character;
-			UpdateDataControlsVisibility();
-			_updateCharacter = true;
+			_infoLabels.TextureManager = _textureManager;
+			_infoLabels.Data = _data;
+			_infoLabels.Settings = _settings;
+			_settings.AppearanceSettingChanged += Settings_AppearanceSettingChanged;
+			Settings_AppearanceSettingChanged(this, null);
+		}
+
+		private void Settings_AppearanceSettingChanged(object sender, EventArgs e)
+		{
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			_infoLabels.UpdateDataControlsVisibility();
+			_infoLabels.UpdateCharacterInfo();
+			CalculateLayout();
+			AdaptNewBounds();
+			UniformWithAttached();
 		}
 
 		public CharacterCard(Func<Character_Model> currentCharacter, TextureManager textureManager, Data data, MainWindow mainWindow, Settings settings)
 			: this()
 		{
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-			_currentCharacter = currentCharacter;
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
 			_textureManager = textureManager;
 			_data = data;
 			_mainWindow = mainWindow;
@@ -331,17 +234,22 @@ namespace Kenedia.Modules.Characters.Controls
 			((Container)this).set_HeightSizingMode((SizingMode)1);
 			base.BackgroundColor = new Color(0, 0, 0, 75);
 			((Container)this).set_AutoSizePadding(new Point(0, 2));
-			LocalizingService.LocaleChanged += ApplyCharacter;
+			_infoLabels.TextureManager = _textureManager;
+			_infoLabels.Data = _data;
+			_infoLabels.Settings = _settings;
+			_infoLabels.CurrentCharacter = currentCharacter;
 			_settings.AppearanceSettingChanged += Settings_AppearanceSettingChanged;
-			_craftingControl.Settings = _settings;
-			_craftingControl.Data = _data;
-			_genderLabel.Icon = AsyncTexture2D.op_Implicit(_textureManager.GetIcon(TextureManager.Icons.Gender));
 			CharacterTooltip characterTooltip = new CharacterTooltip(currentCharacter, textureManager, data, _settings);
 			((Control)characterTooltip).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((Control)characterTooltip).set_ZIndex(1001);
 			((Control)characterTooltip).set_Size(new Point(300, 50));
 			((Control)characterTooltip).set_Visible(false);
 			_characterTooltip = characterTooltip;
+		}
+
+		private void ApplyCharacter(object sender, EventArgs e)
+		{
+			_updateCharacter = true;
 		}
 
 		public void UniformWithAttached(bool force = false)
@@ -390,30 +298,29 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public Rectangle CalculateLayout()
 		{
-			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0288: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0307: Unknown result type (might be due to invalid IL or missing references)
-			//IL_030c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0333: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0338: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0404: Unknown result type (might be due to invalid IL or missing references)
-			//IL_040a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0270: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0275: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0286: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_031b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0320: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0388: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f2: Unknown result type (might be due to invalid IL or missing references)
 			if (_created && ((Control)this).get_Visible())
 			{
-				UpdateDataControlsVisibility();
+				_infoLabels.RecalculateBounds();
 				((Control)_contentPanel).set_Visible(_settings.PanelLayout.get_Value() != Settings.CharacterPanelLayout.OnlyIcons);
-				_tagPanel.FitWidestTag(_dataControls.Max((Control e) => (e.get_Visible() && e != _tagPanel) ? e.get_Width() : 0));
-				IEnumerable<Control> controls = _dataControls.Where((Control e) => e.get_Visible());
-				Control firstControl = ((controls.Count() <= 0) ? null : _dataControls.Where((Control e) => e.get_Visible() && e is IFontControl)?.FirstOrDefault());
+				IEnumerable<Control> controls = _infoLabels.DataControls.Where((Control e) => e.get_Visible());
+				Control firstControl = ((controls.Count() <= 0) ? null : _infoLabels.DataControls.Where((Control e) => e.get_Visible() && e is IFontControl)?.FirstOrDefault());
 				bool anyVisible = ((Control)_contentPanel).get_Visible() && controls.Count() > 0;
 				int width = (anyVisible ? (controls.Max((Control e) => e.get_Width()) + (int)(((FlowPanel)_contentPanel).get_OuterControlPadding().X * 2f)) : 0);
 				int height = (anyVisible ? controls.Aggregate((int)(((FlowPanel)_contentPanel).get_OuterControlPadding().Y * 2f), (int result, Control e) => result + e.get_Height() + (int)((FlowPanel)_contentPanel).get_ControlPadding().Y) : 0);
@@ -524,96 +431,96 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
 			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0205: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0302: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0322: Unknown result type (might be due to invalid IL or missing references)
-			//IL_032d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0337: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0343: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0349: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0357: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0204: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0307: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0327: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0332: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0348: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0410: Unknown result type (might be due to invalid IL or missing references)
-			//IL_041b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0425: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0431: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0437: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0447: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0448: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0452: Unknown result type (might be due to invalid IL or missing references)
-			//IL_045c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0468: Unknown result type (might be due to invalid IL or missing references)
-			//IL_046e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0483: Unknown result type (might be due to invalid IL or missing references)
-			//IL_048e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0498: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0400: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0415: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0420: Unknown result type (might be due to invalid IL or missing references)
+			//IL_042a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0436: Unknown result type (might be due to invalid IL or missing references)
+			//IL_043c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_044c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_044d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0457: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0461: Unknown result type (might be due to invalid IL or missing references)
+			//IL_046d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0473: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0488: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0493: Unknown result type (might be due to invalid IL or missing references)
+			//IL_049d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04c9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_04ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0503: Unknown result type (might be due to invalid IL or missing references)
-			//IL_050a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0508: Unknown result type (might be due to invalid IL or missing references)
 			//IL_050f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0519: Unknown result type (might be due to invalid IL or missing references)
-			//IL_051f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_053e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0545: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0514: Unknown result type (might be due to invalid IL or missing references)
+			//IL_051e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0524: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0543: Unknown result type (might be due to invalid IL or missing references)
 			//IL_054a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0554: Unknown result type (might be due to invalid IL or missing references)
-			//IL_055a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_057b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0582: Unknown result type (might be due to invalid IL or missing references)
+			//IL_054f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0559: Unknown result type (might be due to invalid IL or missing references)
+			//IL_055f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0580: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0587: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0591: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0597: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_058c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0596: Unknown result type (might be due to invalid IL or missing references)
+			//IL_059c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05bd: Unknown result type (might be due to invalid IL or missing references)
 			//IL_05c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05f9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_05ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0609: Unknown result type (might be due to invalid IL or missing references)
-			//IL_060f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_062f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0635: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0604: Unknown result type (might be due to invalid IL or missing references)
+			//IL_060e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0614: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0634: Unknown result type (might be due to invalid IL or missing references)
 			//IL_063a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0644: Unknown result type (might be due to invalid IL or missing references)
-			//IL_064a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_066c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0672: Unknown result type (might be due to invalid IL or missing references)
+			//IL_063f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0649: Unknown result type (might be due to invalid IL or missing references)
+			//IL_064f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0671: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0677: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0681: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0687: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_067c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0686: Unknown result type (might be due to invalid IL or missing references)
+			//IL_068c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06ae: Unknown result type (might be due to invalid IL or missing references)
 			//IL_06b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06c9: Unknown result type (might be due to invalid IL or missing references)
 			((Container)this).PaintAfterChildren(spriteBatch, bounds);
 			if (((Control)this).get_MouseOver())
 			{
@@ -627,7 +534,7 @@ namespace Kenedia.Modules.Characters.Controls
 						int num;
 						if (((Control)_contentPanel).get_Visible())
 						{
-							IEnumerable<Control> enumerable = _dataControls.Where((Control e) => e.get_Visible());
+							IEnumerable<Control> enumerable = _infoLabels.DataControls.Where((Control e) => e.get_Visible());
 							num = ((enumerable != null && enumerable.Count() > 0) ? 1 : 0);
 						}
 						else
@@ -687,18 +594,6 @@ namespace Kenedia.Modules.Characters.Controls
 		public override void UpdateContainer(GameTime gameTime)
 		{
 			((Container)this).UpdateContainer(gameTime);
-			if (Character != null && ((Control)_lastLoginLabel).get_Visible())
-			{
-				if (CurrentCharacter != Character)
-				{
-					TimeSpan ts = DateTimeOffset.UtcNow.Subtract(Character.LastLogin);
-					_lastLoginLabel.Text = string.Format("{1} {0} {2:00}:{3:00}:{4:00}", strings.Days, Math.Floor(ts.TotalDays), ts.Hours, ts.Minutes, ts.Seconds);
-				}
-				else
-				{
-					_lastLoginLabel.Text = string.Format("{1} {0} {2:00}:{3:00}:{4:00}", strings.Days, 0, 0, 0, 0);
-				}
-			}
 			if (!IsDraggingTarget)
 			{
 				if (!((Control)this).get_MouseOver() && ((Control)_textTooltip).get_Visible())
@@ -710,9 +605,11 @@ namespace Kenedia.Modules.Characters.Controls
 					((Control)_characterTooltip).set_Visible(((Control)this).get_MouseOver());
 				}
 			}
+			_infoLabels.Update(gameTime);
 			if (_updateCharacter && _created && ((Control)this).get_Visible())
 			{
-				UpdateCharacterInfo();
+				Settings_AppearanceSettingChanged(this, null);
+				_updateCharacter = false;
 			}
 		}
 
@@ -841,14 +738,12 @@ namespace Kenedia.Modules.Characters.Controls
 		protected override void DisposeControl()
 		{
 			base.DisposeControl();
-			LocalizingService.LocaleChanged -= ApplyCharacter;
 			((Control)_textTooltip).remove_Shown((EventHandler<EventArgs>)TextTooltip_Shown);
 			if (_character != null)
 			{
-				_character.Updated -= ApplyCharacter;
 				_character.Deleted -= CharacterDeleted;
 			}
-			((IEnumerable<IDisposable>)_dataControls)?.DisposeAll();
+			_infoLabels?.Dispose();
 			FlowPanel contentPanel = _contentPanel;
 			if (contentPanel != null)
 			{
@@ -864,38 +759,8 @@ namespace Kenedia.Modules.Characters.Controls
 			{
 				((Control)characterTooltip).Dispose();
 			}
-			((IEnumerable<IDisposable>)((Container)_tagPanel).get_Children()).DisposeAll();
-			((IEnumerable<IDisposable>)_tagPanel).DisposeAll();
 			((IEnumerable<IDisposable>)((Container)this).get_Children()).DisposeAll();
 			_mainWindow.CharacterCards.Remove(this);
-			_updateCharacter = true;
-		}
-
-		private BitmapFont GetFont(bool nameFont = false)
-		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			FontSize fontSize = (FontSize)8;
-			switch (_settings.PanelSize.get_Value())
-			{
-			case Settings.PanelSizes.Small:
-				fontSize = (FontSize)(nameFont ? 16 : 12);
-				break;
-			case Settings.PanelSizes.Normal:
-				fontSize = (FontSize)(nameFont ? 18 : 14);
-				break;
-			case Settings.PanelSizes.Large:
-				fontSize = (FontSize)(nameFont ? 22 : 18);
-				break;
-			case Settings.PanelSizes.Custom:
-				fontSize = (FontSize)(nameFont ? _settings.CustomCharacterNameFontSize.get_Value() : _settings.CustomCharacterFontSize.get_Value());
-				break;
-			}
-			return GameService.Content.GetFont((FontFace)0, fontSize, (FontStyle)0);
 		}
 
 		private void TextTooltip_Shown(object sender, EventArgs e)
@@ -912,106 +777,10 @@ namespace Kenedia.Modules.Characters.Controls
 			((Control)this).Dispose();
 		}
 
-		private void ApplyCharacter(object sender, EventArgs e)
-		{
-			_updateCharacter = true;
-		}
-
-		private void UpdateCharacterInfo()
-		{
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0112: Unknown result type (might be due to invalid IL or missing references)
-			_nameLabel.Text = Character.Name;
-			_levelLabel.Text = string.Format(strings.LevelAmount, Character.Level);
-			_professionLabel.Icon = Character.SpecializationIcon;
-			_professionLabel.Text = Character.SpecializationName;
-			if (_professionLabel.Icon != null)
-			{
-				_professionLabel.TextureRectangle = ((_professionLabel.Icon.get_Width() == 32) ? new Rectangle(2, 2, 28, 28) : new Rectangle(4, 4, 56, 56));
-			}
-			IconLabel genderLabel = _genderLabel;
-			Gender gender = Character.Gender;
-			genderLabel.Text = ((object)(Gender)(ref gender)).ToString();
-			_raceLabel.Text = _data.Races[Character.Race].Name;
-			_raceLabel.Icon = _data.Races[Character.Race].Icon;
-			_mapLabel.Text = _data.GetMapById(Character.Map).Name;
-			_lastLoginLabel.Text = string.Format("{1} {0} {2:00}:{3:00}:{4:00}", strings.Days, 0, 0, 0, 0);
-			_customIndex.Text = string.Format(strings.CustomIndex + " {0}", Character.Index);
-			IEnumerable<string> tagLlist = _tags.Select((Tag e) => e.Text);
-			List<string> characterTags = Character.Tags.ToList();
-			IEnumerable<string> deleteTags = tagLlist.Except(characterTags);
-			IEnumerable<string> addTags = characterTags.Except(tagLlist);
-			if (deleteTags.Any() || addTags.Any())
-			{
-				List<Tag> deleteList = new List<Tag>();
-				foreach (string tag2 in deleteTags)
-				{
-					Tag t2 = _tags.FirstOrDefault((Tag e) => e.Text == tag2);
-					if (t2 != null)
-					{
-						deleteList.Add(t2);
-					}
-				}
-				foreach (Tag t in deleteList)
-				{
-					((Control)t).Dispose();
-					_tags.Remove(t);
-				}
-				foreach (string tag in addTags)
-				{
-					List<Tag> tags = _tags;
-					Tag tag3 = new Tag();
-					((Control)tag3).set_Parent((Container)(object)_tagPanel);
-					tag3.Text = tag;
-					tag3.Active = true;
-					tag3.ShowDelete = false;
-					tag3.CanInteract = false;
-					tags.Add(tag3);
-				}
-				_tagPanel.FitWidestTag(_dataControls.Max((Control e) => (e.get_Visible() && e != _tagPanel) ? e.get_Width() : 0));
-			}
-			_craftingControl.Character = Character;
-			_updateCharacter = false;
-			UniformWithAttached();
-		}
-
 		public void HideTooltips()
 		{
 			((Control)_textTooltip).Hide();
 			((Control)_characterTooltip).Hide();
-		}
-
-		private void UpdateDataControlsVisibility()
-		{
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			NameFont = GetFont(nameFont: true);
-			Font = GetFont();
-			((FlowPanel)_contentPanel).set_ControlPadding(new Vector2((float)(Font.get_LineHeight() / 10), (float)(Font.get_LineHeight() / 10)));
-			((Control)_nameLabel).set_Visible(_settings.DisplayToggles.get_Value()["Name"].Show);
-			_nameLabel.Font = NameFont;
-			((Control)_levelLabel).set_Visible(_settings.DisplayToggles.get_Value()["Level"].Show);
-			_levelLabel.Font = Font;
-			((Control)_genderLabel).set_Visible(_settings.DisplayToggles.get_Value()["Gender"].Show);
-			_genderLabel.Font = Font;
-			((Control)_raceLabel).set_Visible(_settings.DisplayToggles.get_Value()["Race"].Show);
-			_raceLabel.Font = Font;
-			((Control)_professionLabel).set_Visible(_settings.DisplayToggles.get_Value()["Profession"].Show);
-			_professionLabel.Font = Font;
-			((Control)_lastLoginLabel).set_Visible(_settings.DisplayToggles.get_Value()["LastLogin"].Show);
-			_lastLoginLabel.Font = Font;
-			((Control)_mapLabel).set_Visible(_settings.DisplayToggles.get_Value()["Map"].Show);
-			_mapLabel.Font = Font;
-			((Control)_craftingControl).set_Visible(_settings.DisplayToggles.get_Value()["CraftingProfession"].Show);
-			_craftingControl.Font = Font;
-			((Control)_customIndex).set_Visible(_settings.DisplayToggles.get_Value()["CustomIndex"].Show);
-			_customIndex.Font = Font;
-			((Control)_tagPanel).set_Visible(_settings.DisplayToggles.get_Value()["Tags"].Show && Character.Tags.Count > 0);
-			_tagPanel.Font = Font;
-			((Control)_craftingControl).set_Height(Font.get_LineHeight() + 2);
 		}
 
 		private void AdaptNewBounds()
@@ -1019,12 +788,12 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
 			//IL_019f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
 			if (((Control)this).get_Width() != _controlBounds.Width + ((Container)this).get_AutoSizePadding().X)
 			{
 				((Control)this).set_Width(_controlBounds.Width + ((Container)this).get_AutoSizePadding().X);
@@ -1036,7 +805,7 @@ namespace Kenedia.Modules.Characters.Controls
 			int num;
 			if (((Control)_contentPanel).get_Visible())
 			{
-				IEnumerable<Control> enumerable = _dataControls.Where((Control e) => e.get_Visible());
+				IEnumerable<Control> enumerable = _infoLabels.DataControls.Where((Control e) => e.get_Visible());
 				num = ((enumerable != null && enumerable.Count() > 0) ? 1 : 0);
 			}
 			else
@@ -1048,11 +817,6 @@ namespace Kenedia.Modules.Characters.Controls
 			int size = ((_iconSize > 0) ? Math.Min(56, _iconRectangle.Width - 8) : Math.Min(56, Math.Min(_textBounds.Width, _textBounds.Height) - 8));
 			int pad = (_iconRectangle.Width - size) / 2;
 			_loginRect = ((!anyVisible) ? new Rectangle(pad, pad, size, size) : ((_iconSize > 0) ? new Rectangle((_iconRectangle.Width - size) / 2, (_iconRectangle.Height - size) / 2, size, size) : new Rectangle((_textBounds.Width - size) / 2, (_textBounds.Height - size) / 2, size, size)));
-		}
-
-		private void Settings_AppearanceSettingChanged(object sender, EventArgs e)
-		{
-			ApplyCharacter(null, null);
 		}
 	}
 }

@@ -6,10 +6,13 @@ namespace Kenedia.Modules.Characters.Models
 
 		public bool Check { get; set; }
 
-		public ShowCheckPair(bool show, bool check)
+		public bool ShowTooltip { get; set; }
+
+		public ShowCheckPair(bool show, bool check, bool tooltip)
 		{
 			Check = check;
 			Show = show;
+			ShowTooltip = tooltip;
 		}
 	}
 }

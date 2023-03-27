@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Resources;
+using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
@@ -40,7 +41,7 @@ using Newtonsoft.Json;
 namespace Kenedia.Modules.Characters
 {
 	[Export(typeof(Module))]
-	public class Characters : BaseModule<Characters, MainWindow, Settings>
+	public class Characters : BaseModule<Characters, MainWindow, Settings, PathCollection>
 	{
 		public readonly ResourceManager RM = new ResourceManager("Kenedia.Modules.Characters.Res.strings", Assembly.GetExecutingAssembly());
 
@@ -55,6 +56,8 @@ namespace Kenedia.Modules.Characters
 		private bool _mapsUpdated;
 
 		private Character_Model _currentCharacterModel;
+
+		private CancellationTokenSource _characterFileTokenSource;
 
 		public SearchFilterCollection SearchFilters { get; } = new SearchFilterCollection();
 
@@ -125,7 +128,7 @@ namespace Kenedia.Modules.Characters
 		public Characters([Import("ModuleParameters")] ModuleParameters moduleParameters)
 			: base(moduleParameters)
 		{
-			BaseModule<Characters, MainWindow, Settings>.ModuleInstance = this;
+			BaseModule<Characters, MainWindow, Settings, PathCollection>.ModuleInstance = this;
 			HasGUI = true;
 		}
 
@@ -151,7 +154,8 @@ namespace Kenedia.Modules.Characters
 		protected override void Initialize()
 		{
 			base.Initialize();
-			BaseModule<Characters, MainWindow, Settings>.Logger.Info("Starting " + ((Module)this).get_Name() + " v." + (object)base.ModuleVersion);
+			base.Paths = new PathCollection(base.DirectoriesManager, ((Module)this).get_Name());
+			BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Starting " + ((Module)this).get_Name() + " v." + (object)base.ModuleVersion);
 			JsonConvert.set_DefaultSettings((Func<JsonSerializerSettings>)delegate
 			{
 				//IL_0000: Unknown result type (might be due to invalid IL or missing references)
@@ -198,6 +202,10 @@ namespace Kenedia.Modules.Characters
 		protected override async Task LoadAsync()
 		{
 			await base.LoadAsync();
+			if (base.Settings.LoadCachedAccounts.get_Value())
+			{
+				await LoadCharacters();
+			}
 			await Data.Load();
 		}
 
@@ -217,10 +225,6 @@ namespace Kenedia.Modules.Characters
 				CreateCornerIcons();
 			}
 			CharacterModels.CollectionChanged += OnCharacterCollectionChanged;
-			if (base.Settings.LoadCachedAccounts.get_Value())
-			{
-				LoadCharacters();
-			}
 			base.Services.InputDetectionService.ClickedOrKey += InputDetectionService_ClickedOrKey;
 		}
 
@@ -235,7 +239,7 @@ namespace Kenedia.Modules.Characters
 					PathCollection paths = base.Paths;
 					Account account2 = GW2APIHandler.Account;
 					paths.AccountName = ((account2 != null) ? account2.get_Name() : null);
-					BaseModule<Characters, MainWindow, Settings>.Logger.Info("Account changed. Wipe all account bound data of this session.");
+					BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Account changed. Wipe all account bound data of this session.");
 					CharacterModels.Clear();
 					base.MainWindow?.CharacterCards.Clear();
 					base.MainWindow?.LoadedModels.Clear();
@@ -367,6 +371,7 @@ namespace Kenedia.Modules.Characters
 				base.MainWindow.CharacterEdit.LoadImages(null, null);
 				base.MainWindow.CharacterEdit.ShowImages();
 			};
+			OCR.MainWindow = base.MainWindow;
 			CharacterSwapping.HideMainWindow = ((Control)base.MainWindow).Hide;
 			CharacterSwapping.OCR = OCR;
 			CharacterSorting.OCR = OCR;
@@ -464,12 +469,12 @@ namespace Kenedia.Modules.Characters
 			MouseState mouse = GameService.Input.get_Mouse().get_State();
 			if (CharacterSwapping.Cancel())
 			{
-				BaseModule<Characters, MainWindow, Settings>.Logger.Info(string.Format("Cancel any automated action. Left Mouse Down: {0} | Right Mouse Down: {1} | Keyboard Keys pressed {2}", (int)((MouseState)(ref mouse)).get_LeftButton() == 1, (int)((MouseState)(ref mouse)).get_RightButton() == 1, string.Join("|", (from k in GameService.Input.get_Keyboard().get_KeysDown()
+				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info(string.Format("Cancel any automated action. Left Mouse Down: {0} | Right Mouse Down: {1} | Keyboard Keys pressed {2}", (int)((MouseState)(ref mouse)).get_LeftButton() == 1, (int)((MouseState)(ref mouse)).get_RightButton() == 1, string.Join("|", (from k in GameService.Input.get_Keyboard().get_KeysDown()
 					select ((object)(Keys)(ref k)).ToString()).ToArray())));
 			}
 			if (CharacterSorting.Cancel())
 			{
-				BaseModule<Characters, MainWindow, Settings>.Logger.Info(string.Format("Cancel any automated action. Left Mouse Down: {0} | Right Mouse Down: {1} | Keyboard Keys pressed {2}", (int)((MouseState)(ref mouse)).get_LeftButton() == 1, (int)((MouseState)(ref mouse)).get_RightButton() == 1, string.Join("|", (from k in GameService.Input.get_Keyboard().get_KeysDown()
+				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info(string.Format("Cancel any automated action. Left Mouse Down: {0} | Right Mouse Down: {1} | Keyboard Keys pressed {2}", (int)((MouseState)(ref mouse)).get_LeftButton() == 1, (int)((MouseState)(ref mouse)).get_RightButton() == 1, string.Join("|", (from k in GameService.Input.get_Keyboard().get_KeysDown()
 					select ((object)(Keys)(ref k)).ToString()).ToArray())));
 			}
 		}
@@ -605,17 +610,17 @@ namespace Kenedia.Modules.Characters
 			SearchFilters.Add("Male", new SearchFilter<Character_Model>((Character_Model c) => (int)c.Gender == 1));
 		}
 
-		private void AddOrUpdateCharacters(IApiV2ObjectList<Character> characters)
+		private async void AddOrUpdateCharacters(IApiV2ObjectList<Character> characters)
 		{
 			if (!_loadedCharacters && base.Settings.LoadCachedAccounts.get_Value())
 			{
-				BaseModule<Characters, MainWindow, Settings>.Logger.Info("This is our first API data fetched for this character/session. Trying to load local data first.");
-				if (!LoadCharacters().HasValue)
+				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("This is our first API data fetched for this character/session. Trying to load local data first.");
+				if (!(await LoadCharacters()).HasValue)
 				{
-					BaseModule<Characters, MainWindow, Settings>.Logger.Info("Checking the cache.");
+					BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Checking the cache.");
 				}
 			}
-			BaseModule<Characters, MainWindow, Settings>.Logger.Info("Update characters for '" + base.Paths.AccountName + "' based on fresh data from the api.");
+			BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Update characters for '" + base.Paths.AccountName + "' based on fresh data from the api.");
 			var freshList = ((IEnumerable<Character>)characters).Select((Character c) => new
 			{
 				Name = c.get_Name(),
@@ -630,12 +635,12 @@ namespace Kenedia.Modules.Characters
 				{
 					if (base.Settings.AutomaticCharacterDelete.get_Value())
 					{
-						BaseModule<Characters, MainWindow, Settings>.Logger.Info($"{c2.Name} created on {c2.Created} no longer exists. Delete them!");
+						BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info($"{c2.Name} created on {c2.Created} no longer exists. Delete them!");
 						c2.Delete();
 					}
 					else if (!c2.MarkedAsDeleted)
 					{
-						BaseModule<Characters, MainWindow, Settings>.Logger.Info($"{c2.Name} created on {c2.Created} does not exist in the api data. Mark them as potentially deleted!");
+						BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info($"{c2.Name} created on {c2.Created} does not exist in the api data. Mark them as potentially deleted!");
 						c2.MarkedAsDeleted = true;
 						updateMarkedCharacters = true;
 					}
@@ -654,7 +659,7 @@ namespace Kenedia.Modules.Characters
 					Created = c3.get_Created()
 				}))
 				{
-					BaseModule<Characters, MainWindow, Settings>.Logger.Info($"{c3.get_Name()} created on {c3.get_Created()} does not exist yet. Create them!");
+					BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info($"{c3.get_Name()} created on {c3.get_Created()} does not exist yet. Create them!");
 					CharacterModels.Add(new Character_Model(c3, CharacterSwapping, base.Paths.ModulePath, RequestCharacterSave, CharacterModels, Data)
 					{
 						Position = pos
@@ -671,17 +676,17 @@ namespace Kenedia.Modules.Characters
 				}
 				pos++;
 			}
-			SaveCharacterList();
 			base.MainWindow?.CreateCharacterControls();
 			base.MainWindow?.PerformFiltering();
+			SaveCharacterList();
 		}
 
-		private bool? LoadCharacters()
+		private async Task<bool?> LoadCharacters()
 		{
 			PlayerCharacter player = GameService.Gw2Mumble.get_PlayerCharacter();
 			if ((player == null || string.IsNullOrEmpty(player.get_Name())) && string.IsNullOrEmpty(base.Paths.AccountName))
 			{
-				BaseModule<Characters, MainWindow, Settings>.Logger.Info("Player name is currently null or empty. Can not check for the account.");
+				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Player name is currently null or empty. Can not check for the account.");
 				return null;
 			}
 			AccountSummary account = getAccount();
@@ -690,7 +695,7 @@ namespace Kenedia.Modules.Characters
 				PathCollection paths = base.Paths;
 				if (paths.AccountName == null)
 				{
-					string text = (paths.AccountName = account.AccountName);
+					paths.AccountName = account.AccountName;
 				}
 				_loadedCharacters = true;
 				base.Settings.LoadAccountSettings(base.Paths.AccountName);
@@ -698,8 +703,8 @@ namespace Kenedia.Modules.Characters
 				{
 					Directory.CreateDirectory(AccountImagesPath);
 				}
-				BaseModule<Characters, MainWindow, Settings>.Logger.Info("Found '" + (player.get_Name() ?? "Unkown Player name.") + "' in a stored character list for '" + base.Paths.AccountName + "'. Loading characters of '" + base.Paths.AccountName + "'");
-				return LoadCharacterFile();
+				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Found '" + (player.get_Name() ?? "Unkown Player name.") + "' in a stored character list for '" + base.Paths.AccountName + "'. Loading characters of '" + base.Paths.AccountName + "'");
+				return await LoadCharacterFile();
 			}
 			return false;
 			AccountSummary getAccount()
@@ -712,18 +717,25 @@ namespace Kenedia.Modules.Characters
 						return JsonConvert.DeserializeObject<List<AccountSummary>>(File.ReadAllText(path)).Find((AccountSummary e) => e.CharacterNames.Contains(player.get_Name()));
 					}
 				}
-				catch
+				catch (Exception)
 				{
 				}
 				return null;
 			}
 		}
 
-		private bool LoadCharacterFile()
+		private async Task<bool> LoadCharacterFile()
 		{
 			try
 			{
-				if (File.Exists(CharactersPath))
+				_characterFileTokenSource?.Cancel();
+				_characterFileTokenSource = new CancellationTokenSource();
+				bool flag = File.Exists(CharactersPath);
+				if (flag)
+				{
+					flag = await FileExtension.WaitForFileUnlock(CharactersPath, 2500, _characterFileTokenSource.Token);
+				}
+				if (flag)
 				{
 					new FileInfo(CharactersPath);
 					string text = File.ReadAllText(CharactersPath);
@@ -741,7 +753,7 @@ namespace Kenedia.Modules.Characters
 								names.Add(c.Name);
 							}
 						});
-						BaseModule<Characters, MainWindow, Settings>.Logger.Info("Loaded local characters from file '" + CharactersPath + "'.");
+						BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Loaded local characters from file '" + CharactersPath + "'.");
 						return true;
 					}
 				}
@@ -749,16 +761,36 @@ namespace Kenedia.Modules.Characters
 			}
 			catch (Exception ex)
 			{
-				BaseModule<Characters, MainWindow, Settings>.Logger.Warn(ex, "Failed to load the local characters from file '" + CharactersPath + "'.");
-				File.Copy(CharactersPath, CharactersPath.Replace(".json", " [" + DateTimeOffset.Now.ToUnixTimeSeconds() + "].corrupted.json"));
+				if (!_characterFileTokenSource.IsCancellationRequested)
+				{
+					BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Warn(ex, "Failed to load the local characters from file '" + CharactersPath + "'.");
+					File.Copy(CharactersPath, CharactersPath.Replace(".json", " [" + DateTimeOffset.Now.ToUnixTimeSeconds() + "].corrupted.json"));
+				}
 				return false;
 			}
 		}
 
-		private void SaveCharacterList()
+		private async Task SaveCharacterList()
 		{
-			string json = JsonConvert.SerializeObject((object)CharacterModels, (Formatting)1);
-			File.WriteAllText(CharactersPath, json);
+			try
+			{
+				_characterFileTokenSource?.Cancel();
+				_characterFileTokenSource = new CancellationTokenSource();
+				if (await FileExtension.WaitForFileUnlock(CharactersPath, 2500, _characterFileTokenSource.Token))
+				{
+					string json = JsonConvert.SerializeObject((object)CharacterModels, (Formatting)1);
+					File.WriteAllText(CharactersPath, json);
+				}
+				else if (!_characterFileTokenSource.IsCancellationRequested)
+				{
+					BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Failed to save the characters file '" + CharactersPath + "'.");
+				}
+			}
+			catch (Exception ex)
+			{
+				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Warn("Failed to save the characters file '" + CharactersPath + "'.");
+				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Warn($"{ex}");
+			}
 		}
 
 		private void RequestCharacterSave()

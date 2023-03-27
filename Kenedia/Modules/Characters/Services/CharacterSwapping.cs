@@ -301,17 +301,24 @@ namespace Kenedia.Modules.Characters.Services
 					}
 					if (_settings.UseOCR.get_Value())
 					{
-						stopwatch.Start();
-						string txt2 = await OCR.Read();
-						while (stopwatch.ElapsedMilliseconds < 5000 && txt2.Length <= 2 && !cancellationToken.IsCancellationRequested)
+						if (OCR.IsLoaded)
 						{
-							BaseModule<Characters, MainWindow, Settings>.Logger.Info("We are in the character selection but the OCR did only read '" + txt2 + "'. Waiting a bit longer!");
-							await Delay(cancellationToken, 250);
-							txt2 = await OCR.Read();
-							if (cancellationToken.IsCancellationRequested)
+							stopwatch.Start();
+							string txt = await OCR.Read();
+							while (stopwatch.ElapsedMilliseconds < 5000 && txt.Length <= 2 && !cancellationToken.IsCancellationRequested)
 							{
-								return _gameState.IsCharacterSelection;
+								BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("We are in the character selection but the OCR did only read '" + txt + "'. Waiting a bit longer!");
+								await Delay(cancellationToken, 250);
+								txt = await OCR.Read();
+								if (cancellationToken.IsCancellationRequested)
+								{
+									return _gameState.IsCharacterSelection;
+								}
 							}
+						}
+						else
+						{
+							BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("OCR did not load the engine fully. " + (Character?.Name ?? "Character Name") + " can not be confirmed!");
 						}
 					}
 				}
@@ -320,17 +327,24 @@ namespace Kenedia.Modules.Characters.Services
 					await Delay(cancellationToken, _settings.SwapDelay.get_Value());
 					if (_settings.UseOCR.get_Value())
 					{
-						stopwatch.Start();
-						string txt = await OCR.Read();
-						while (stopwatch.ElapsedMilliseconds < 5000 && txt.Length <= 2 && !cancellationToken.IsCancellationRequested)
+						if (OCR.IsLoaded)
 						{
-							BaseModule<Characters, MainWindow, Settings>.Logger.Info("We should be in the character selection but the OCR did only read '" + txt + "'. Waiting a bit longer!");
-							await Delay(cancellationToken, 250);
-							txt = await OCR.Read();
-							if (cancellationToken.IsCancellationRequested)
+							stopwatch.Start();
+							string txt2 = await OCR.Read();
+							while (stopwatch.ElapsedMilliseconds < 5000 && txt2.Length <= 2 && !cancellationToken.IsCancellationRequested)
 							{
-								return _gameState.IsCharacterSelection;
+								BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("We should be in the character selection but the OCR did only read '" + txt2 + "'. Waiting a bit longer!");
+								await Delay(cancellationToken, 250);
+								txt2 = await OCR.Read();
+								if (cancellationToken.IsCancellationRequested)
+								{
+									return _gameState.IsCharacterSelection;
+								}
 							}
+						}
+						else
+						{
+							BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("OCR did not load the engine fully. " + (Character?.Name ?? "Character Name") + " can not be confirmed!");
 						}
 					}
 				}
@@ -393,7 +407,7 @@ namespace Kenedia.Modules.Characters.Services
 
 		private async Task<bool> ConfirmName()
 		{
-			if (!_settings.UseOCR.get_Value() || _ignoreOCR)
+			if (!_settings.UseOCR.get_Value() || _ignoreOCR || !OCR.IsLoaded)
 			{
 				return true;
 			}
@@ -407,13 +421,13 @@ namespace Kenedia.Modules.Characters.Services
 			if (_settings.UseOCR.get_Value())
 			{
 				Status = "Confirm name ..." + Environment.NewLine + ocr_result;
-				BaseModule<Characters, MainWindow, Settings>.Logger.Info("OCR Result: " + ocr_result + ".");
+				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("OCR Result: " + ocr_result + ".");
 				if (_settings.OnlyEnterOnExact.get_Value())
 				{
 					return Character.Name == ocr_result;
 				}
 				isBestMatch = Character.NameMatches(ocr_result);
-				BaseModule<Characters, MainWindow, Settings>.Logger.Info($"Swapping to {Character.Name} - Best result for : '{ocr_result}' is '{isBestMatch.Item1}' with edit distance of: {isBestMatch.Item2} and which is {isBestMatch.Item3} steps away in the character list. Resulting in a total difference of {isBestMatch.Item4}.");
+				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info($"Swapping to {Character.Name} - Best result for : '{ocr_result}' is '{isBestMatch.Item1}' with edit distance of: {isBestMatch.Item2} and which is {isBestMatch.Item3} steps away in the character list. Resulting in a total difference of {isBestMatch.Item4}.");
 				return isBestMatch.Item5;
 			}
 			return isBestMatch.Item5;

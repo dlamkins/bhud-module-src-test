@@ -1,12 +1,21 @@
 using System;
+using Blish_HUD;
 using Blish_HUD.Controls;
 using Kenedia.Modules.Core.Controls;
 using Microsoft.Xna.Framework;
+using MonoGame.Extended.BitmapFonts;
 
 namespace Kenedia.Modules.Core.Utility
 {
 	public static class UI
 	{
+		public static BitmapFont GetFont(FontSize fontSize, FontStyle style)
+		{
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			return GameService.Content.GetFont((FontFace)0, fontSize, style);
+		}
+
 		public static (Label, CtrlT) CreateLabeledControl<CtrlT>(Container parent, string text, int labelWidth = 175, int controlWidth = 100, int height = 25) where CtrlT : Control, new()
 		{
 			//IL_006d: Unknown result type (might be due to invalid IL or missing references)

@@ -18,7 +18,7 @@ using SemVer;
 
 namespace Kenedia.Modules.Core.Models
 {
-	public abstract class BaseModule<ModuleType, ModuleWindow, ModuleSettings> : Module where ModuleType : Module where ModuleWindow : Container where ModuleSettings : BaseSettingsModel
+	public abstract class BaseModule<ModuleType, ModuleWindow, ModuleSettings, ModulePaths> : Module where ModuleType : Module where ModuleWindow : Container where ModuleSettings : BaseSettingsModel where ModulePaths : PathCollection, new()
 	{
 		public static readonly Logger Logger = Logger.GetLogger<ModuleType>();
 
@@ -36,7 +36,7 @@ namespace Kenedia.Modules.Core.Models
 
 		public Version ModuleVersion { get; private set; }
 
-		public PathCollection Paths { get; private set; }
+		public ModulePaths Paths { get; protected set; }
 
 		public ServiceCollection Services { get; private set; }
 
@@ -76,7 +76,6 @@ namespace Kenedia.Modules.Core.Models
 			((Module)this).Initialize();
 			ModuleVersion = ((Module)this).get_Version();
 			Logger.Info($"Initializing {((Module)this).get_Name()} {ModuleVersion}");
-			Paths = new PathCollection(DirectoriesManager, ((Module)this).get_Name());
 			ModKeyMapping = (VirtualKeyShort[])(object)new VirtualKeyShort[5];
 			ModKeyMapping[1] = (VirtualKeyShort)17;
 			ModKeyMapping[2] = (VirtualKeyShort)18;

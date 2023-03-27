@@ -6,11 +6,11 @@ namespace Kenedia.Modules.Core.Models
 {
 	public class PathCollection
 	{
-		private readonly string? _moduleName;
+		protected readonly string? ModuleName;
+
+		protected readonly DirectoriesManager DirectoriesManager;
 
 		private string? _accountName;
-
-		private readonly DirectoriesManager _directoriesManager;
 
 		public string? AccountName
 		{
@@ -26,9 +26,9 @@ namespace Kenedia.Modules.Core.Models
 
 		public string BasePath { get; }
 
-		public string ModulePath => BasePath + "\\" + _moduleName + "\\";
+		public string ModulePath => BasePath + "\\" + ModuleName + "\\";
 
-		public string ModuleDataPath => BasePath + "\\" + _moduleName + "\\data\\";
+		public string ModuleDataPath => BasePath + "\\" + ModuleName + "\\data\\";
 
 		public string SharedSettingsPath => BasePath + "\\shared_settings.json";
 
@@ -44,11 +44,15 @@ namespace Kenedia.Modules.Core.Models
 			}
 		}
 
+		public PathCollection()
+		{
+		}
+
 		public PathCollection(DirectoriesManager directoriesManager, string moduleName)
 		{
-			_directoriesManager = directoriesManager;
-			_moduleName = moduleName.Replace(' ', '_').ToLower();
-			BasePath = _directoriesManager.GetFullDirectoryPath("kenedia");
+			DirectoriesManager = directoriesManager;
+			ModuleName = moduleName.Replace(' ', '_').ToLower();
+			BasePath = DirectoriesManager.GetFullDirectoryPath("kenedia");
 			if (!Directory.Exists(ModulePath))
 			{
 				Directory.CreateDirectory(ModulePath);

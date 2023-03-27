@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Kenedia.Modules.Core.Models
@@ -80,6 +81,14 @@ namespace Kenedia.Modules.Core.Models
 				val.PropertyChanged -= ItemProperty_Changed;
 			}
 			return base.Remove(key);
+		}
+
+		public virtual void Wipe()
+		{
+			foreach (TKey key in base.Keys.ToList())
+			{
+				this[key] = default(TValue);
+			}
 		}
 
 		protected void ItemProperty_Changed(object sender, PropertyChangedEventArgs e)

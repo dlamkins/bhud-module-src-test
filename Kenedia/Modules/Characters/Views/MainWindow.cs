@@ -84,6 +84,8 @@ namespace Kenedia.Modules.Characters.Views
 
 		private APIPermissionNotification _apiPermissionNotification;
 
+		private TesseractFailedNotification _tesseractFailedNotification;
+
 		public List<Character_Model> LoadedModels { get; } = new List<Character_Model>();
 
 
@@ -367,7 +369,7 @@ namespace Kenedia.Modules.Characters.Views
 			List<Match> strings = regex.Matches(((TextInputBase)_filterBox).get_Text().Trim().ToLower()).Cast<Match>().ToList();
 			new List<string>();
 			List<KeyValuePair<string, SearchFilter<Character_Model>>> stringFilters = new List<KeyValuePair<string, SearchFilter<Character_Model>>>();
-			_003C_003Ec__DisplayClass65_0 CS_0024_003C_003E8__locals0;
+			_003C_003Ec__DisplayClass66_0 CS_0024_003C_003E8__locals0;
 			foreach (Match match in strings)
 			{
 				string string_text = SearchableString(match.ToString().Replace("\"", ""));
@@ -401,7 +403,7 @@ namespace Kenedia.Modules.Characters.Views
 					{
 						//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 						//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-						_003C_003Ec__DisplayClass65_0 _003C_003Ec__DisplayClass65_ = CS_0024_003C_003E8__locals0;
+						_003C_003Ec__DisplayClass66_0 _003C_003Ec__DisplayClass66_ = CS_0024_003C_003E8__locals0;
 						Gender gender = c.Gender;
 						return SearchableString(((object)(Gender)(ref gender)).ToString()).Contains(string_text);
 					}, enabled: true)));
@@ -543,7 +545,7 @@ namespace Kenedia.Modules.Characters.Views
 		{
 			Settings.SortBy sortby = _settings.SortType.get_Value();
 			bool asc = _settings.SortOrder.get_Value() == Settings.SortDirection.Ascending;
-			bool isNum = sortby == Settings.SortBy.Level || sortby == Settings.SortBy.TimeSinceLogin || sortby == Settings.SortBy.Map;
+			bool isNum = sortby == Settings.SortBy.Level || sortby == Settings.SortBy.TimeSinceLogin || sortby == Settings.SortBy.Map || sortby == Settings.SortBy.NextBirthday || sortby == Settings.SortBy.Age;
 			if (_settings.SortType.get_Value() != Settings.SortBy.Custom)
 			{
 				((FlowPanel)CharactersPanel).SortChildren<CharacterCard>((Comparison<CharacterCard>)delegate(CharacterCard a, CharacterCard b)
@@ -569,11 +571,13 @@ namespace Kenedia.Modules.Characters.Views
 			}
 			string getString(Character_Model c)
 			{
-				return Common.GetPropertyValueAsString(c, $"{_settings.SortType.get_Value()}");
+				string sortType = ((_settings.SortType.get_Value() == Settings.SortBy.NextBirthday) ? "SecondsUntilNextBirthday" : _settings.SortType.get_Value().ToString());
+				return Common.GetPropertyValueAsString(c, sortType);
 			}
 			int getValue(Character_Model c)
 			{
-				return Common.GetPropertyValue<int>(c, $"{_settings.SortType.get_Value()}");
+				string sortType2 = ((_settings.SortType.get_Value() == Settings.SortBy.NextBirthday) ? "SecondsUntilNextBirthday" : _settings.SortType.get_Value().ToString());
+				return Common.GetPropertyValue<int>(c, sortType2);
 			}
 		}
 
@@ -747,7 +751,7 @@ namespace Kenedia.Modules.Characters.Views
 				c?.Character.Swap();
 				if (c == null)
 				{
-					BaseModule<Characters, MainWindow, Settings>.Logger.Debug("No character found to swap to.");
+					BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Debug("No character found to swap to.");
 				}
 			}
 		}
@@ -796,6 +800,24 @@ namespace Kenedia.Modules.Characters.Views
 				}
 			}
 			SortCharacters();
+		}
+
+		public void SendTesseractFailedNotification(string pathToEngine)
+		{
+			if (_tesseractFailedNotification == null)
+			{
+				TesseractFailedNotification tesseractFailedNotification = new TesseractFailedNotification();
+				((Control)tesseractFailedNotification).set_Parent((Container)(object)_notifications);
+				((Control)tesseractFailedNotification).set_Height(25);
+				tesseractFailedNotification.PathToEngine = pathToEngine;
+				tesseractFailedNotification.ClickAction = _toggleOCR;
+				_tesseractFailedNotification = tesseractFailedNotification;
+			}
+			if (_settings.ShowNotifications.get_Value() && ((Container)_notifications).get_Children().get_Count() > 0 && ((IEnumerable<Control>)((Container)_notifications).get_Children()).Any((Control e) => e.get_Visible()))
+			{
+				((Control)_collapseWrapper).Show();
+				((Control)ContentPanel).Invalidate();
+			}
 		}
 
 		public void SendAPITimeoutNotification()

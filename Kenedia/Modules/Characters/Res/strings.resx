@@ -194,6 +194,7 @@ Once fully loaded it will switch to the character which is set to be the "Login 
   <data name="EnterToLogin_Tooltip"><value>If the searchbox is focused pressing 'RETURN' will log to the first character in the list.</value></data>
   <data name="UseOCR_Tooltip"><value>Use 'Optical Character Recognition' (OCR) to confirm the character name.</value></data>
   <data name="ShowItem"><value>Show {0}</value></data>
+  <data name="Age"><value>Age</value></data>
   <data name="Add"><value>Add</value></data>
   <data name="Map"><value>Map</value></data>
   <data name="Tag"><value>Tag</value></data>
@@ -265,6 +266,7 @@ Uu : Üü Ûû Ùù</value></data>
   <data name="RadialMenuKey"><value>Radial Menu Key</value></data>
   <data name="FixCharacter_NoChange"><value>Character name did not change {0}/2 ...</value></data>
   <data name="EmptyColumns"><value>Empty Columns</value></data>
+  <data name="NextBirthday"><value>Next Birthday</value></data>
   <data name="Descending"><value>Descending</value></data>
   <data name="Characters"><value>Characters</value></data>
   <data name="ShowNotifications_Tooltip"><value>Show Notifications on the top of the main window. 
@@ -277,6 +279,7 @@ Notifications in case of:
   <data name="FixCharacter_Start"><value>Fixing characters ...</value></data>
   <data name="MailKey_Tooltip"><value>Open or close the Mail dialog</value></data>
   <data name="WindowedMode"><value>Windowed Mode</value></data>
+  <data name="CreationDate"><value>Creation Date</value></data>
   <data name="Error_Competivive"><value>Character swapping is disabled in competition mode!</value></data>
   <data name="OnlyEnterOnExact_Tooltip"><value>Only login if the OCR result matches perfectly with the desired character name</value></data>
   <data name="UntilBirthday"><value>until Birthday</value></data>
@@ -314,6 +317,7 @@ Notifications in case of:
   <data name="FadeOut_Tooltip"><value>Fade the side menus automatically after 2.5 seconds</value></data>
   <data name="BestResultLargerDisclaimer"><value>Best results with Interface set to 'Larger'!</value></data>
   <data name="NameFontSize"><value>Name Font Size: {0}</value></data>
+  <data name="ShowItemOnTooltip"><value>Show {0} on tooltip</value></data>
   <data name="DetailedTooltip"><value>Detailed Tooltip</value></data>
   <data name="Character"><value>Character</value></data>
   <data name="TogglePortraitCapture"><value>Toggle Potrait Capture</value></data>
@@ -334,6 +338,8 @@ Log in automatically?
   <data name="GeneralAndWindows"><value>General Settings &amp; Windows</value></data>
   <data name="FilterAsOne"><value>Single filter string</value></data>
   <data name="FilterDelay"><value>Filter Delay ({0} ms)</value></data>
+  <data name="TesseractFailedNotification"><value>Failed to load the 'tesseract.dll' which is required for the Character Name reading.
+Path to the 'tesseract.dll': {0}</value></data>
   <data name="RemoveItem"><value>Remove {0}</value></data>
   <data name="Days"><value>Days</value></data>
   <data name="Male"><value>Male</value></data>

@@ -50,6 +50,8 @@ namespace Kenedia.Modules.Core.Res
 
 		internal static string BottomRightCorner => ResourceManager.GetString("BottomRightCorner", resourceCulture);
 
+		internal static string DeleteX => ResourceManager.GetString("DeleteX", resourceCulture);
+
 		internal static string Edit => ResourceManager.GetString("Edit", resourceCulture);
 
 		internal static string EditItem => ResourceManager.GetString("EditItem", resourceCulture);
@@ -73,6 +75,8 @@ namespace Kenedia.Modules.Core.Res
 		internal static string ShowCornerIcon => ResourceManager.GetString("ShowCornerIcon", resourceCulture);
 
 		internal static string ShowCornerIcon_ttp => ResourceManager.GetString("ShowCornerIcon_ttp", resourceCulture);
+
+		internal static string Tag => ResourceManager.GetString("Tag", resourceCulture);
 
 		internal static string ToggleItem => ResourceManager.GetString("ToggleItem", resourceCulture);
 

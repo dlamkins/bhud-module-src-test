@@ -74,6 +74,8 @@ namespace Kenedia.Modules.Characters.Models
 
 		private bool _markedAsDeleted;
 
+		private DateTime _nextBirthday;
+
 		public bool IsCurrentCharacter
 		{
 			get
@@ -482,6 +484,27 @@ namespace Kenedia.Modules.Characters.Models
 			}
 		}
 
+		public TimeSpan UntilNextBirthday => NextBirthday.Subtract(DateTime.UtcNow);
+
+		public int SecondsUntilNextBirthday => (int)UntilNextBirthday.TotalSeconds;
+
+		public DateTime NextBirthday
+		{
+			get
+			{
+				for (int i = 1; i < 100; i++)
+				{
+					DateTime birthDay = Created.AddYears(i).DateTime;
+					if ((birthDay.Year == DateTime.UtcNow.Year && birthDay >= DateTime.UtcNow) || birthDay.Year == DateTime.UtcNow.Year + 1)
+					{
+						_nextBirthday = birthDay;
+						return _nextBirthday;
+					}
+				}
+				return _nextBirthday;
+			}
+		}
+
 		public string ModulePath { get; private set; }
 
 		[DataMember]
@@ -671,7 +694,7 @@ namespace Kenedia.Modules.Characters.Models
 			{
 				Save();
 				_characterSwapping?.Start(this, ignoreOCR);
-				BaseModule<Characters, MainWindow, Settings>.Logger.Info(string.Format(strings.CharacterSwap_SwitchTo, Name));
+				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info(string.Format(strings.CharacterSwap_SwitchTo, Name));
 			}
 			else
 			{

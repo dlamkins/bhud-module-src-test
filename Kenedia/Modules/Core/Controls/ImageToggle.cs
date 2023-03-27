@@ -3,6 +3,7 @@ using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
+using Kenedia.Modules.Core.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -14,7 +15,7 @@ namespace Kenedia.Modules.Core.Controls
 
 		private bool _clicked;
 
-		private readonly Action<bool> _onChanged;
+		private Action<bool> _onCheckChanged;
 
 		private Rectangle _xTextureRectangle;
 
@@ -49,6 +50,12 @@ namespace Kenedia.Modules.Core.Controls
 
 		public Rectangle SizeRectangle { get; set; }
 
+		public Color ImageColor { get; set; } = Color.get_White();
+
+
+		public Color? ActiveColor { get; set; } = Color.get_White();
+
+
 		public bool ShowX { get; set; }
 
 		public bool Checked
@@ -64,17 +71,32 @@ namespace Kenedia.Modules.Core.Controls
 			}
 		}
 
+		public Action<bool> OnCheckChanged
+		{
+			get
+			{
+				return _onCheckChanged;
+			}
+			set
+			{
+				Common.SetProperty(ref _onCheckChanged, value);
+			}
+		}
+
 		public event EventHandler<CheckChangedEvent> CheckedChanged;
 
 		public ImageToggle()
 			: this()
 		{
-		}
+		}//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+
 
 		public ImageToggle(Action<bool> onChanged)
 			: this()
 		{
-			_onChanged = onChanged;
+			OnCheckChanged = onChanged;
 		}
 
 		private void OnCheckedChanged()
@@ -103,25 +125,27 @@ namespace Kenedia.Modules.Core.Controls
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
 			AsyncTexture2D texture = GetTexture();
 			if (texture != null)
 			{
 				_clicked = _clicked && ((Control)this).get_MouseOver();
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(texture), (SizeRectangle != Rectangle.get_Empty()) ? SizeRectangle : bounds, (Rectangle?)((TextureRectangle == Rectangle.get_Empty()) ? texture.get_Bounds() : TextureRectangle), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(texture), (SizeRectangle != Rectangle.get_Empty()) ? SizeRectangle : bounds, (Rectangle?)((TextureRectangle == Rectangle.get_Empty()) ? texture.get_Bounds() : TextureRectangle), (Color)((!Checked) ? ImageColor : (((_003F?)ActiveColor) ?? ImageColor)), 0f, default(Vector2), (SpriteEffects)0);
 			}
 			if (ShowX && !Checked)
 			{
@@ -147,7 +171,7 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0049: Expected O, but got Unknown
 			((Control)this).OnClick(e);
 			Checked = !Checked;
-			_onChanged?.Invoke(Checked);
+			OnCheckChanged?.Invoke(Checked);
 			this.CheckedChanged?.Invoke(this, new CheckChangedEvent(Checked));
 		}
 

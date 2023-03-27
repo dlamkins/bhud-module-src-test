@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Kenedia.Modules.Core.Models
@@ -26,6 +27,14 @@ namespace Kenedia.Modules.Core.Models
 			{
 				base[key] = value;
 				this.CollectionChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+			}
+		}
+
+		public void Wipe()
+		{
+			foreach (TKey key in base.Keys.ToList())
+			{
+				this[key] = default(TValue);
 			}
 		}
 	}

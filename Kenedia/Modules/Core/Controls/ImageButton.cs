@@ -57,6 +57,8 @@ namespace Kenedia.Modules.Core.Controls
 
 		public AsyncTexture2D Texture { get; set; }
 
+		public AsyncTexture2D DisabledTexture { get; set; }
+
 		public AsyncTexture2D HoveredTexture { get; set; }
 
 		public AsyncTexture2D ClickedTexture { get; set; }
@@ -100,15 +102,19 @@ namespace Kenedia.Modules.Core.Controls
 
 		private AsyncTexture2D GetTexture()
 		{
-			if (!Clicked || ClickedTexture == null)
+			if (((Control)this).get_Enabled() || DisabledTexture == null)
 			{
-				if (!((Control)this).get_MouseOver() || HoveredTexture == null)
+				if (!Clicked || ClickedTexture == null)
 				{
-					return Texture;
+					if (!((Control)this).get_MouseOver() || HoveredTexture == null)
+					{
+						return Texture;
+					}
+					return HoveredTexture;
 				}
-				return HoveredTexture;
+				return ClickedTexture;
 			}
-			return ClickedTexture;
+			return DisabledTexture;
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
@@ -131,7 +137,10 @@ namespace Kenedia.Modules.Core.Controls
 		protected override void OnClick(MouseEventArgs e)
 		{
 			((Control)this).OnClick(e);
-			ClickAction?.Invoke(e);
+			if (((Control)this).get_Enabled())
+			{
+				ClickAction?.Invoke(e);
+			}
 		}
 	}
 }

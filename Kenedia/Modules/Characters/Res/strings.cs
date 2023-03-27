@@ -50,6 +50,8 @@ namespace Kenedia.Modules.Characters.Res
 
 		internal static string AdjustSettings => ResourceManager.GetString("AdjustSettings", resourceCulture);
 
+		internal static string Age => ResourceManager.GetString("Age", resourceCulture);
+
 		internal static string AnyProfession => ResourceManager.GetString("AnyProfession", resourceCulture);
 
 		internal static string APIPermissionNotification => ResourceManager.GetString("APIPermissionNotification", resourceCulture);
@@ -165,6 +167,8 @@ namespace Kenedia.Modules.Characters.Res
 		internal static string CraftingProfession => ResourceManager.GetString("CraftingProfession", resourceCulture);
 
 		internal static string CreateImages => ResourceManager.GetString("CreateImages", resourceCulture);
+
+		internal static string CreationDate => ResourceManager.GetString("CreationDate", resourceCulture);
 
 		internal static string Custom => ResourceManager.GetString("Custom", resourceCulture);
 
@@ -366,6 +370,8 @@ namespace Kenedia.Modules.Characters.Res
 
 		internal static string NameFontSize => ResourceManager.GetString("NameFontSize", resourceCulture);
 
+		internal static string NextBirthday => ResourceManager.GetString("NextBirthday", resourceCulture);
+
 		internal static string NoCraftingProfession => ResourceManager.GetString("NoCraftingProfession", resourceCulture);
 
 		internal static string Normal => ResourceManager.GetString("Normal", resourceCulture);
@@ -514,6 +520,8 @@ namespace Kenedia.Modules.Characters.Res
 
 		internal static string ShowItem => ResourceManager.GetString("ShowItem", resourceCulture);
 
+		internal static string ShowItemOnTooltip => ResourceManager.GetString("ShowItemOnTooltip", resourceCulture);
+
 		internal static string ShowLastButton => ResourceManager.GetString("ShowLastButton", resourceCulture);
 
 		internal static string ShowLastButton_Tooltip => ResourceManager.GetString("ShowLastButton_Tooltip", resourceCulture);
@@ -565,6 +573,8 @@ namespace Kenedia.Modules.Characters.Res
 		internal static string Tags => ResourceManager.GetString("Tags", resourceCulture);
 
 		internal static string Tailor => ResourceManager.GetString("Tailor", resourceCulture);
+
+		internal static string TesseractFailedNotification => ResourceManager.GetString("TesseractFailedNotification", resourceCulture);
 
 		internal static string TextAndIcon => ResourceManager.GetString("TextAndIcon", resourceCulture);
 

@@ -19,9 +19,15 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 
 		private readonly AsyncTexture2D _telescopeHovered;
 
+		private readonly AsyncTexture2D _info;
+
+		private readonly AsyncTexture2D _infoHovered;
+
 		private readonly ImageToggle _showButton;
 
 		private readonly ImageToggle _checkButton;
+
+		private readonly ImageToggle _showTooltipButton;
 
 		private readonly Label _textLabel;
 
@@ -32,6 +38,8 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 		private bool _checkChecked;
 
 		private bool _showChecked;
+
+		private bool _showTooltip;
 
 		public string Text
 		{
@@ -57,6 +65,18 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			}
 		}
 
+		public string ShowTooltipTooltip
+		{
+			get
+			{
+				return ((Control)_showTooltipButton).get_BasicTooltipText();
+			}
+			set
+			{
+				((Control)_showTooltipButton).set_BasicTooltipText(value);
+			}
+		}
+
 		public string DisplayTooltip
 		{
 			get
@@ -66,6 +86,19 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			set
 			{
 				((Control)_showButton).set_BasicTooltipText(value);
+			}
+		}
+
+		public bool ShowTooltipChecked
+		{
+			get
+			{
+				return _showTooltip;
+			}
+			set
+			{
+				_showTooltip = value;
+				_showTooltipButton.Checked = value;
 			}
 		}
 
@@ -99,17 +132,22 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 
 		public event EventHandler<bool> ShowChanged;
 
+		public event EventHandler<bool> ShowTooltipChanged;
+
 		public event EventHandler<bool> CheckChanged;
 
-		public DisplayCheckToggle(TextureManager textureManager, bool displayButton_Checked = true, bool checkbox_Checked = true)
+		public DisplayCheckToggle(TextureManager textureManager, bool displayButton_Checked = true, bool checkbox_Checked = true, bool showTooltip_Checked = true)
 		{
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
 			_eye = AsyncTexture2D.op_Implicit(textureManager.GetControlTexture(TextureManager.ControlTextures.Eye_Button));
 			_eyeHovered = AsyncTexture2D.op_Implicit(textureManager.GetControlTexture(TextureManager.ControlTextures.Eye_Button_Hovered));
 			_telescope = AsyncTexture2D.op_Implicit(textureManager.GetControlTexture(TextureManager.ControlTextures.Telescope_Button));
 			_telescopeHovered = AsyncTexture2D.op_Implicit(textureManager.GetControlTexture(TextureManager.ControlTextures.Telescope_Button_Hovered));
+			_info = AsyncTexture2D.op_Implicit(textureManager.GetControlTexture(TextureManager.ControlTextures.Info_Button));
+			_infoHovered = AsyncTexture2D.op_Implicit(textureManager.GetControlTexture(TextureManager.ControlTextures.Info_Button_Hovered));
 			((Container)this).set_WidthSizingMode((SizingMode)2);
 			((Container)this).set_HeightSizingMode((SizingMode)1);
 			((FlowPanel)this).set_FlowDirection((ControlFlowDirection)2);
@@ -134,6 +172,16 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			_checkButton = imageToggle2;
 			CheckChecked = _checkButton.Checked;
 			_checkButton.CheckedChanged += SettingChanged;
+			ImageToggle imageToggle3 = new ImageToggle();
+			((Control)imageToggle3).set_Parent((Container)(object)this);
+			imageToggle3.ShowX = true;
+			imageToggle3.Texture = _info;
+			imageToggle3.HoveredTexture = _infoHovered;
+			((Control)imageToggle3).set_Size(new Point(20, 20));
+			imageToggle3.Checked = showTooltip_Checked;
+			_showTooltipButton = imageToggle3;
+			ShowTooltipChecked = _showTooltipButton.Checked;
+			_showTooltipButton.CheckedChanged += SettingChanged;
 			Label label = new Label();
 			((Control)label).set_Parent((Container)(object)this);
 			((Control)label).set_Height(20);
@@ -142,26 +190,28 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			_textLabel = label;
 		}
 
-		public DisplayCheckToggle(TextureManager textureManager, Settings settings, string key, bool show = true, bool check = true)
+		public DisplayCheckToggle(TextureManager textureManager, Settings settings, string key, bool show = true, bool check = true, bool tooltip = true)
 			: this(textureManager)
 		{
 			_settings = settings;
 			_key = key;
 			if (!settings.DisplayToggles.get_Value().ContainsKey(_key))
 			{
-				settings.DisplayToggles.get_Value().Add(_key, new ShowCheckPair(show, check));
+				settings.DisplayToggles.get_Value().Add(_key, new ShowCheckPair(show, check, tooltip));
 			}
 			_showButton.Checked = settings.DisplayToggles.get_Value()[_key].Show;
 			ShowChecked = _showButton.Checked;
 			_checkButton.Checked = settings.DisplayToggles.get_Value()[_key].Check;
 			CheckChecked = _checkButton.Checked;
+			_showTooltipButton.Checked = settings.DisplayToggles.get_Value()[_key].ShowTooltip;
+			ShowTooltipChecked = _showTooltipButton.Checked;
 		}
 
 		private void SettingChanged(object sender, CheckChangedEvent e)
 		{
 			if (_settings != null)
 			{
-				_settings.DisplayToggles.set_Value(new Dictionary<string, ShowCheckPair>(_settings.DisplayToggles.get_Value()) { [_key] = new ShowCheckPair(_showButton.Checked, _checkButton.Checked) });
+				_settings.DisplayToggles.set_Value(new Dictionary<string, ShowCheckPair>(_settings.DisplayToggles.get_Value()) { [_key] = new ShowCheckPair(_showButton.Checked, _checkButton.Checked, _showTooltipButton.Checked) });
 			}
 			if (_checkChecked != _checkButton.Checked)
 			{
@@ -172,6 +222,11 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			{
 				_showChecked = _showButton.Checked;
 				this.ShowChanged?.Invoke(this, _showButton.Checked);
+			}
+			if (_showTooltip != _showTooltipButton.Checked)
+			{
+				_showTooltip = _showTooltipButton.Checked;
+				this.ShowTooltipChanged?.Invoke(this, _showTooltipButton.Checked);
 			}
 			this.Changed?.Invoke(this, new Tuple<bool, bool>(_showButton.Checked, _checkButton.Checked));
 		}

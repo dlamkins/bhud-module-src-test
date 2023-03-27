@@ -1,3 +1,4 @@
+using Blish_HUD;
 using Blish_HUD.Controls;
 using Microsoft.Xna.Framework;
 
@@ -5,6 +6,27 @@ namespace Kenedia.Modules.Core.Extensions
 {
 	public static class ControlExtensions
 	{
+		public static bool IsVisible(this Control control)
+		{
+			return IsParentSetAndVisible(control);
+			static bool IsParentSetAndVisible(Control ctrl)
+			{
+				if (ctrl.get_Visible() && ctrl.get_Parent() != null)
+				{
+					if (ctrl.get_Parent() != GameService.Graphics.get_SpriteScreen() || !((Control)ctrl.get_Parent()).get_Visible())
+					{
+						if (((Control)ctrl.get_Parent()).get_Visible())
+						{
+							return IsParentSetAndVisible((Control)(object)ctrl.get_Parent());
+						}
+						return false;
+					}
+					return true;
+				}
+				return false;
+			}
+		}
+
 		public static bool ToggleVisibility(this Control c, bool? visible = null)
 		{
 			c.set_Visible(visible ?? (!c.get_Visible()));

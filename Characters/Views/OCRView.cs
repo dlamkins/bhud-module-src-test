@@ -505,10 +505,9 @@ namespace Characters.Views
 			if (gameTime.get_TotalGameTime().TotalMilliseconds - _readTick > 250.0 && ((Control)_maskedRegion).get_Visible())
 			{
 				_readTick = gameTime.get_TotalGameTime().TotalMilliseconds;
-				if (await _ocr.Read(show: true) != null)
+				string result = await _ocr.Read(show: true);
+				if (result != null)
 				{
-					((Label)_bestMatchLabel).set_Text(_ocr.BestMatchResult);
-					((Label)_resultLabel).set_Text(_ocr.ReadResult);
 					((Image)_sourceImage).set_Texture(AsyncTexture2D.op_Implicit(_ocr.SourceTexture));
 					Kenedia.Modules.Core.Controls.Image sourceImage = _sourceImage;
 					val = _ocr.SourceTexture.get_Bounds();
@@ -521,6 +520,17 @@ namespace Characters.Views
 					Kenedia.Modules.Core.Controls.Image scaledImage = _scaledImage;
 					val = _ocr.ScaledTexture.get_Bounds();
 					((Control)scaledImage).set_Size(((Rectangle)(ref val)).get_Size());
+					((Label)_resultLabel).set_Font(Control.get_Content().get_DefaultFont32());
+					((Label)_resultLabel).set_WrapText(false);
+					((Label)_bestMatchLabel).set_Text(_ocr.BestMatchResult);
+					((Label)_resultLabel).set_Text(_ocr.ReadResult);
+				}
+				else if (!_ocr.IsLoaded)
+				{
+					((Label)_bestMatchLabel).set_Text((!string.IsNullOrEmpty(result)) ? _ocr.BestMatchResult : $"Tesseract Engine Loaded: {_ocr.IsLoaded}");
+					((Label)_resultLabel).set_Text((!string.IsNullOrEmpty(result)) ? _ocr.ReadResult : (_ocr.PathToEngine ?? ""));
+					((Label)_resultLabel).set_Font(Control.get_Content().get_DefaultFont14());
+					((Label)_resultLabel).set_WrapText(true);
 				}
 			}
 		}

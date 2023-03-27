@@ -17,7 +17,7 @@ using Newtonsoft.Json;
 
 namespace Kenedia.Modules.Characters.Services
 {
-	public class Data
+	public class Data : IDisposable
 	{
 		public class CraftingProfession
 		{
@@ -134,7 +134,7 @@ namespace Kenedia.Modules.Characters.Services
 				if (e.get_NewValue() != null)
 				{
 					IconBig.remove_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)IconBig_TextureSwapped);
-					IconBig.SwapTexture(Texture2DExtension.GetRegion(IconBig.get_Texture(), new Rectangle(5, 5, IconBig.get_Width() - 10, IconBig.get_Height() - 10)));
+					_iconBig = AsyncTexture2D.op_Implicit(Texture2DExtension.GetRegion(Texture2DExtension.Duplicate(IconBig.get_Texture()), new Rectangle(5, 5, IconBig.get_Width() - 10, IconBig.get_Height() - 10)));
 				}
 			}
 
@@ -144,7 +144,7 @@ namespace Kenedia.Modules.Characters.Services
 				if (e.get_NewValue() != null)
 				{
 					Icon.remove_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)Icon_TextureSwapped);
-					Icon.SwapTexture(Texture2DExtension.GetRegion(Icon.get_Texture(), new Rectangle(5, 5, Icon.get_Width() - 10, Icon.get_Height() - 10)));
+					_icon = AsyncTexture2D.op_Implicit(Texture2DExtension.GetRegion(Texture2DExtension.Duplicate(IconBig.get_Texture()), new Rectangle(5, 5, Icon.get_Width() - 10, Icon.get_Height() - 10)));
 				}
 			}
 		}
@@ -222,6 +222,8 @@ namespace Kenedia.Modules.Characters.Services
 
 			public AsyncTexture2D Icon { get; set; }
 		}
+
+		private bool _disposed;
 
 		private readonly ContentsManager _contentsManager;
 
@@ -1768,7 +1770,7 @@ namespace Kenedia.Modules.Characters.Services
 		public async Task Load()
 		{
 			string path = _paths.ModuleDataPath + "Maps.json";
-			BaseModule<Characters, MainWindow, Settings>.Logger.Info("Trying to load Maps from " + path);
+			BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Trying to load Maps from " + path);
 			try
 			{
 				if (File.Exists(path))
@@ -1777,19 +1779,37 @@ namespace Kenedia.Modules.Characters.Services
 					if (jsonString != null && jsonString != string.Empty)
 					{
 						Maps = JsonConvert.DeserializeObject<Dictionary<int, Map>>(jsonString);
-						BaseModule<Characters, MainWindow, Settings>.Logger.Info("Loaded Maps from " + path);
+						BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Loaded Maps from " + path);
 					}
 				}
 			}
 			catch (Exception ex)
 			{
-				BaseModule<Characters, MainWindow, Settings>.Logger.Warn($"{ex}");
+				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Warn($"{ex}");
 			}
 			Races[(RaceType)0].Icon = AsyncTexture2D.op_Implicit(_contentsManager.GetTexture("textures\\races\\asura.png"));
 			Races[(RaceType)1].Icon = AsyncTexture2D.op_Implicit(_contentsManager.GetTexture("textures\\races\\charr.png"));
 			Races[(RaceType)2].Icon = AsyncTexture2D.op_Implicit(_contentsManager.GetTexture("textures\\races\\human.png"));
 			Races[(RaceType)3].Icon = AsyncTexture2D.op_Implicit(_contentsManager.GetTexture("textures\\races\\norn.png"));
 			Races[(RaceType)4].Icon = AsyncTexture2D.op_Implicit(_contentsManager.GetTexture("textures\\races\\sylvari.png"));
+		}
+
+		public void Dispose()
+		{
+			if (_disposed)
+			{
+				return;
+			}
+			_disposed = true;
+			foreach (Profession value in Professions.Values)
+			{
+				value.Icon.Dispose();
+				value.IconBig.Dispose();
+			}
+			Races.Clear();
+			Specializations.Clear();
+			Professions.Clear();
+			CrafingProfessions.Clear();
 		}
 	}
 }

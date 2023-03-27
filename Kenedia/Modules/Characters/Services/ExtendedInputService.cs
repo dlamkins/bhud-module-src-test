@@ -26,8 +26,8 @@ namespace Kenedia.Modules.Characters.Services
 			while (keys.Count() > 0)
 			{
 				await Task.Delay(250);
-				BaseModule<Characters, MainWindow, Settings>.Logger.Info($"There are currently {keys.Count()} keys pressed. These keys are:");
-				BaseModule<Characters, MainWindow, Settings>.Logger.Info(string.Join(", ", keys));
+				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info($"There are currently {keys.Count()} keys pressed. These keys are:");
+				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info(string.Join(", ", keys));
 				if (GameService.Overlay.get_CurrentGameTime().get_TotalGameTime().TotalMilliseconds - start >= maxDelay)
 				{
 					return false;

@@ -57,7 +57,7 @@ namespace Kenedia.Modules.Characters.Services
 				Account temp = _account;
 				if (Common.SetProperty(ref _account, value, this.AccountChanged, value != null && _paths.AccountName != ((value != null) ? value.get_Name() : null), "Account"))
 				{
-					BaseModule<Characters, MainWindow, Settings>.Logger.Info("Account changed from " + (((temp != null) ? temp.get_Name() : null) ?? "No Account") + " to " + (((value != null) ? value.get_Name() : null) ?? "No Account") + "!");
+					BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Account changed from " + (((temp != null) ? temp.get_Name() : null) ?? "No Account") + " to " + (((value != null) ? value.get_Name() : null) ?? "No Account") + "!");
 				}
 			}
 		}
@@ -150,7 +150,7 @@ namespace Kenedia.Modules.Characters.Services
 			}
 			if (cancellationToken.IsCancellationRequested)
 			{
-				BaseModule<Characters, MainWindow, Settings>.Logger.Info("Canceled API Data fetch!");
+				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Canceled API Data fetch!");
 			}
 			_cancellationTokenSource = null;
 		}
@@ -171,7 +171,7 @@ namespace Kenedia.Modules.Characters.Services
 			}
 			try
 			{
-				BaseModule<Characters, MainWindow, Settings>.Logger.Info("Fetching new API Data ...");
+				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Fetching new API Data ...");
 				if (_gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
 				{
 					(TokenPermission)1,
@@ -185,7 +185,7 @@ namespace Kenedia.Modules.Characters.Services
 						return false;
 					}
 					Account = account;
-					BaseModule<Characters, MainWindow, Settings>.Logger.Info("Fetching characters for '" + Account.get_Name() + "' ...");
+					BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Fetching characters for '" + Account.get_Name() + "' ...");
 					IApiV2ObjectList<Character> characters = await ((IAllExpandableClient<Character>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Characters()).AllAsync(cancellationToken);
 					if (cancellationToken.IsCancellationRequested)
 					{
@@ -200,7 +200,7 @@ namespace Kenedia.Modules.Characters.Services
 				if (!cancellationToken.IsCancellationRequested)
 				{
 					ScreenNotification.ShowNotification("[Characters]: " + strings.Error_InvalidPermissions, (NotificationType)2, (Texture2D)null, 4);
-					BaseModule<Characters, MainWindow, Settings>.Logger.Warn(strings.Error_InvalidPermissions);
+					BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Warn(strings.Error_InvalidPermissions);
 					MainWindow?.SendAPIPermissionNotification();
 				}
 				Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
@@ -210,7 +210,7 @@ namespace Kenedia.Modules.Characters.Services
 			{
 				UnexpectedStatusException ex2 = val;
 				MainWindow?.SendAPITimeoutNotification();
-				BaseModule<Characters, MainWindow, Settings>.Logger.Warn((Exception)(object)ex2, strings.APITimeoutNotification);
+				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Warn((Exception)(object)ex2, strings.APITimeoutNotification);
 				Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
 				return false;
 			}
@@ -218,7 +218,7 @@ namespace Kenedia.Modules.Characters.Services
 			{
 				if (!cancellationToken.IsCancellationRequested)
 				{
-					BaseModule<Characters, MainWindow, Settings>.Logger.Warn(ex, strings.Error_FailedAPIFetch);
+					BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Warn(ex, strings.Error_FailedAPIFetch);
 				}
 				Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
 				return false;
@@ -235,7 +235,7 @@ namespace Kenedia.Modules.Characters.Services
 			}
 			if (force || _data.Maps.Count == 0 || !_data.Maps.FirstOrDefault().Value.Names.TryGetValue(locale.Value, out var name) || string.IsNullOrEmpty(name))
 			{
-				BaseModule<Characters, MainWindow, Settings>.Logger.Info($"No data for {locale.Value} loaded yet. Fetching new data from the API.");
+				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info($"No data for {locale.Value} loaded yet. Fetching new data from the API.");
 				await GetMaps();
 			}
 		}

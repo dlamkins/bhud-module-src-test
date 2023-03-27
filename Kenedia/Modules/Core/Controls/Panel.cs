@@ -74,6 +74,24 @@ namespace Kenedia.Modules.Core.Controls
 
 		public string BasicTitleTooltipText { get; set; }
 
+		public bool Hovered
+		{
+			get
+			{
+				//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+				//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+				//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+				if (!ClipInputToBounds)
+				{
+					Rectangle absoluteBounds = ((Control)this).get_AbsoluteBounds();
+					return ((Rectangle)(ref absoluteBounds)).Contains(Control.get_Input().get_Mouse().get_Position());
+				}
+				return ((Control)this).get_MouseOver();
+			}
+		}
+
+		public bool ClipInputToBounds { get; set; }
+
 		public RectangleDimensions BorderWidth
 		{
 			get
@@ -199,7 +217,7 @@ namespace Kenedia.Modules.Core.Controls
 
 		public Panel()
 		{
-			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
 			BasicTooltip basicTooltip = new BasicTooltip();
 			((Control)basicTooltip).set_Parent((Container)(object)Control.get_Graphics().get_SpriteScreen());
 			((Control)basicTooltip).set_ZIndex(1073741823);
@@ -209,6 +227,7 @@ namespace Kenedia.Modules.Core.Controls
 			_borderWidth = new RectangleDimensions(0);
 			_titleIconPadding = new RectangleDimensions(3, 3, 5, 3);
 			_titleBarHeight = 36;
+			ClipInputToBounds = true;
 			BackgroundImageColor = Color.get_White();
 			((Panel)this)._002Ector();
 			LocalizingService.LocaleChanged += UserLocale_SettingChanged;
@@ -375,17 +394,17 @@ namespace Kenedia.Modules.Core.Controls
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_textureCornerAccent), _layoutTopLeftAccentBounds, (Rectangle?)_layoutCornerAccentSrc, Color.get_White() * ((Panel)this).get_AccentOpacity(), 0f, Vector2.get_Zero(), (SpriteEffects)1);
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_textureCornerAccent), _layoutBottomRightAccentBounds, (Rectangle?)_layoutCornerAccentSrc, Color.get_White() * ((Panel)this).get_AccentOpacity(), 0f, Vector2.get_Zero(), (SpriteEffects)2);
 			}
-			Color? backgroundColor = ((BackgroundHoveredColor.HasValue && ((Control)this).get_MouseOver()) ? BackgroundHoveredColor : BackgroundColor);
+			Color? backgroundColor = ((BackgroundHoveredColor.HasValue && Hovered) ? BackgroundHoveredColor : BackgroundColor);
 			if (backgroundColor.HasValue)
 			{
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), _backgroundBounds, (Rectangle?)Rectangle.get_Empty(), backgroundColor.Value);
 			}
-			Color? backgroundImageColor = ((BackgroundImageHoveredColor.HasValue && ((Control)this).get_MouseOver()) ? BackgroundImageHoveredColor : BackgroundImageColor);
+			Color? backgroundImageColor = ((BackgroundImageHoveredColor.HasValue && Hovered) ? BackgroundImageHoveredColor : BackgroundImageColor);
 			if (BackgroundImage != null && backgroundImageColor.HasValue)
 			{
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(BackgroundImage), _backgroundBounds, (Rectangle?)(Rectangle)(((_003F?)TextureRectangle) ?? BackgroundImage.get_Bounds()), backgroundImageColor.Value, 0f, default(Vector2), (SpriteEffects)0);
 			}
-			if (((HoveredBorderColor.HasValue && ((Control)this).get_MouseOver()) ? HoveredBorderColor : BorderColor).HasValue)
+			if (((HoveredBorderColor.HasValue && Hovered) ? HoveredBorderColor : BorderColor).HasValue)
 			{
 				DrawBorders(spriteBatch);
 			}
@@ -593,7 +612,7 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
 			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
-			Color? borderColor = ((HoveredBorderColor.HasValue && ((Control)this).get_MouseOver()) ? HoveredBorderColor : BorderColor);
+			Color? borderColor = ((HoveredBorderColor.HasValue && Hovered) ? HoveredBorderColor : BorderColor);
 			if (!borderColor.HasValue)
 			{
 				return;

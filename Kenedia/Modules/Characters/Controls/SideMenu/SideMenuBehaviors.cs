@@ -23,6 +23,8 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			new KeyValuePair<string, DisplayCheckToggle>("Gender", null),
 			new KeyValuePair<string, DisplayCheckToggle>("Profession", null),
 			new KeyValuePair<string, DisplayCheckToggle>("LastLogin", null),
+			new KeyValuePair<string, DisplayCheckToggle>("NextBirthday", null),
+			new KeyValuePair<string, DisplayCheckToggle>("Age", null),
 			new KeyValuePair<string, DisplayCheckToggle>("Map", null),
 			new KeyValuePair<string, DisplayCheckToggle>("CraftingProfession", null),
 			new KeyValuePair<string, DisplayCheckToggle>("OnlyMaxCrafting", null),
@@ -52,12 +54,12 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 
 		public SideMenuBehaviors(ResourceManager resourceManager, TextureManager textureManager, Settings settings, Action onSortChanged)
 		{
-			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0124: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0259: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0154: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0289: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0293: Unknown result type (might be due to invalid IL or missing references)
 			_resourceManager = resourceManager;
 			_settings = settings;
 			_onSortChanged = onSortChanged;
@@ -90,6 +92,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			_toggleAll = displayCheckToggle;
 			_toggleAll.ShowChanged += All_ShowChanged;
 			_toggleAll.CheckChanged += All_CheckChanged;
+			_toggleAll.ShowTooltipChanged += All_ShowTooltipCheckChanged;
 			Panel obj = new Panel
 			{
 				BackgroundColor = Color.get_White() * 0.6f
@@ -111,6 +114,14 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			}
 			GameService.Overlay.get_UserLocale().add_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)OnLanguageChanged);
 			OnLanguageChanged();
+		}
+
+		private void All_ShowTooltipCheckChanged(object sender, bool e)
+		{
+			foreach (KeyValuePair<string, DisplayCheckToggle> toggle in _toggles)
+			{
+				toggle.Value.ShowTooltipChecked = e;
+			}
 		}
 
 		private void All_CheckChanged(object sender, bool e)
@@ -166,6 +177,8 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			((Dropdown)_orderDropdown).get_Items().Add(string.Format(strings.SortBy, strings.Profession));
 			((Dropdown)_orderDropdown).get_Items().Add(string.Format(strings.SortBy, strings.Specialization));
 			((Dropdown)_orderDropdown).get_Items().Add(string.Format(strings.SortBy, strings.TimeSinceLogin));
+			((Dropdown)_orderDropdown).get_Items().Add(string.Format(strings.SortBy, strings.NextBirthday));
+			((Dropdown)_orderDropdown).get_Items().Add(string.Format(strings.SortBy, strings.Age));
 			((Dropdown)_orderDropdown).get_Items().Add(string.Format(strings.SortBy, strings.Map));
 			((Dropdown)_orderDropdown).get_Items().Add(strings.Custom);
 			((Dropdown)_flowDropdown).set_SelectedItem(_settings.SortOrder.get_Value().GetSortOrder());
@@ -186,6 +199,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 				t.Value.Text = _resourceManager.GetString(t.Key);
 				t.Value.DisplayTooltip = string.Format(_resourceManager.GetString("ShowItem"), _resourceManager.GetString(t.Key));
 				t.Value.CheckTooltip = string.Format(_resourceManager.GetString("CheckItem"), _resourceManager.GetString(t.Key));
+				t.Value.ShowTooltipTooltip = string.Format(_resourceManager.GetString("ShowItemOnTooltip"), _resourceManager.GetString(t.Key));
 			}
 		}
 

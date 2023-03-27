@@ -267,19 +267,29 @@ namespace Kenedia.Modules.Core.Services
 			double factor = GameService.Graphics.get_UIScaleMultiplier();
 			((Control)_spinnerMask).set_Size(new Point((int)((double)(size.Width * 2) * factor), (int)((double)(size.Height * 2) * factor)));
 			((Control)_spinnerMask).set_Location(new Point(((Control)GameService.Graphics.get_SpriteScreen()).get_Right() + -((Control)_spinnerMask).get_Size().X, ((Control)GameService.Graphics.get_SpriteScreen()).get_Bottom() + -((Control)_spinnerMask).get_Size().Y));
-			using Bitmap bitmap = new Bitmap(size.Width, size.Height);
-			using Graphics g = Graphics.FromImage(bitmap);
-			using (new MemoryStream())
+			try
 			{
-				g.CopyFromScreen(new Point(wndBounds.Right + offset.Right + pos.X, wndBounds.Bottom + offset.Bottom + pos.Y - 30), Point.Empty, size);
-				(Bitmap, bool, double) isFilled = bitmap.IsNotBlackAndCheckFilled(0.4);
-				if (isFilled.Item2)
+				using Bitmap bitmap = new Bitmap(size.Width, size.Height);
+				using Graphics g = Graphics.FromImage(bitmap);
+				using (new MemoryStream())
 				{
-					SaveResult(isFilled.Item3, _spinnerResults);
+					g.CopyFromScreen(new Point(wndBounds.Right + offset.Right + pos.X, wndBounds.Bottom + offset.Bottom + pos.Y - 30), Point.Empty, size);
+					(Bitmap, bool, double) isFilled = bitmap.IsNotBlackAndCheckFilled(0.4);
+					if (isFilled.Item2)
+					{
+						SaveResult(isFilled.Item3, _spinnerResults);
+					}
 				}
-				IEnumerable<double> enumerable = _spinnerResults.Distinct();
-				return enumerable != null && enumerable.Count() >= 3;
 			}
+			catch (Exception)
+			{
+			}
+			IEnumerable<double> obj = _spinnerResults?.Distinct();
+			if (obj == null)
+			{
+				return false;
+			}
+			return obj.Count() >= 3;
 		}
 
 		private void SaveResult(double result, List<double> list)

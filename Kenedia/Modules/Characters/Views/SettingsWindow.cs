@@ -57,7 +57,7 @@ namespace Kenedia.Modules.Characters.Views
 			_contentPanel = flowPanel;
 			base.SubWindowEmblem = AsyncTexture2D.FromAssetId(156027);
 			base.MainWindowEmblem = AsyncTexture2D.FromAssetId(156015);
-			base.Name = string.Format(strings.ItemSettings, BaseModule<Characters, MainWindow, Settings>.ModuleName ?? "");
+			base.Name = string.Format(strings.ItemSettings, BaseModule<Characters, MainWindow, Settings, PathCollection>.ModuleName ?? "");
 			CreateOCR();
 			CreateAppearance();
 			CreateBehavior();
@@ -737,7 +737,7 @@ namespace Kenedia.Modules.Characters.Views
 			((Control)checkbox).set_Parent((Container)(object)cP);
 			((Checkbox)checkbox).set_Checked(_settings.ShowCornerIcon.get_Value());
 			checkbox.SetLocalizedText = () => strings.ShowCorner_Name;
-			checkbox.SetLocalizedTooltip = () => string.Format(strings.ShowCorner_Tooltip, BaseModule<Characters, MainWindow, Settings>.ModuleName);
+			checkbox.SetLocalizedTooltip = () => string.Format(strings.ShowCorner_Tooltip, BaseModule<Characters, MainWindow, Settings, PathCollection>.ModuleName);
 			checkbox.CheckedChangedAction = delegate(bool b)
 			{
 				_settings.ShowCornerIcon.set_Value(b);
@@ -1103,7 +1103,7 @@ namespace Kenedia.Modules.Characters.Views
 
 		public void OnLanguageChanged(object s = null, EventArgs e = null)
 		{
-			base.Name = string.Format(strings.ItemSettings, BaseModule<Characters, MainWindow, Settings>.ModuleName ?? "");
+			base.Name = string.Format(strings.ItemSettings, BaseModule<Characters, MainWindow, Settings, PathCollection>.ModuleName ?? "");
 		}
 
 		public override void UpdateContainer(GameTime gameTime)

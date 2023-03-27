@@ -4,6 +4,8 @@ using Blish_HUD.Controls;
 using Gw2Sharp.WebApi;
 using Kenedia.Modules.Core.Interfaces;
 using Kenedia.Modules.Core.Services;
+using Kenedia.Modules.Core.Utility;
+using Microsoft.Xna.Framework;
 
 namespace Kenedia.Modules.Core.Controls
 {
@@ -40,6 +42,20 @@ namespace Kenedia.Modules.Core.Controls
 		}
 
 		public Action<bool> CheckedChangedAction { get; set; }
+
+		public Color TextColor
+		{
+			get
+			{
+				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+				return ((LabelBase)this)._textColor;
+			}
+			set
+			{
+				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+				Common.SetProperty(ref ((LabelBase)this)._textColor, value);
+			}
+		}
 
 		public Checkbox()
 			: this()

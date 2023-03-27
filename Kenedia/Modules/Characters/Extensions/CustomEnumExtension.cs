@@ -19,6 +19,10 @@ namespace Kenedia.Modules.Characters.Extensions
 			{
 				return Settings.SortBy.Race;
 			}
+			if (s == string.Format(strings.SortBy, strings.Age))
+			{
+				return Settings.SortBy.Age;
+			}
 			if (s == string.Format(strings.SortBy, strings.Gender))
 			{
 				return Settings.SortBy.Gender;
@@ -34,6 +38,10 @@ namespace Kenedia.Modules.Characters.Extensions
 			if (s == string.Format(strings.SortBy, strings.TimeSinceLogin))
 			{
 				return Settings.SortBy.TimeSinceLogin;
+			}
+			if (s == string.Format(strings.SortBy, strings.NextBirthday))
+			{
+				return Settings.SortBy.NextBirthday;
 			}
 			if (s == string.Format(strings.SortBy, strings.Map))
 			{
@@ -53,10 +61,12 @@ namespace Kenedia.Modules.Characters.Extensions
 				Settings.SortBy.Name => string.Format(strings.SortBy, strings.Name), 
 				Settings.SortBy.Level => string.Format(strings.SortBy, strings.Level), 
 				Settings.SortBy.Race => string.Format(strings.SortBy, strings.Race), 
+				Settings.SortBy.Age => string.Format(strings.SortBy, strings.Age), 
 				Settings.SortBy.Gender => string.Format(strings.SortBy, strings.Gender), 
 				Settings.SortBy.Profession => string.Format(strings.SortBy, strings.Profession), 
 				Settings.SortBy.Specialization => string.Format(strings.SortBy, strings.Specialization), 
 				Settings.SortBy.TimeSinceLogin => string.Format(strings.SortBy, strings.TimeSinceLogin), 
+				Settings.SortBy.NextBirthday => string.Format(strings.SortBy, strings.NextBirthday), 
 				Settings.SortBy.Map => string.Format(strings.SortBy, strings.Map), 
 				Settings.SortBy.Tag => string.Format(strings.SortBy, strings.Tag), 
 				Settings.SortBy.Custom => strings.Custom, 
