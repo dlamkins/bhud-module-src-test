@@ -102,18 +102,17 @@ namespace Nekres.Stream_Out.Core.Services
 
 		private async Task<bool> ResetWorldVersusWorld()
 		{
-			if (_lastResetTimeWvW.get_Value() < _nextResetTimeWvW.get_Value())
+			if (_lastResetTimeWvW.get_Value() < _nextResetTimeWvW.get_Value() && DateTime.UtcNow > _nextResetTimeWvW.get_Value())
 			{
-				return true;
+				int totalKills = await RequestTotalKillsForWvW();
+				if (totalKills < 0)
+				{
+					return false;
+				}
+				_killsAtResetDaily.set_Value(totalKills);
+				_killsAtResetMatch.set_Value(totalKills);
+				_lastResetTimeWvW.set_Value(DateTime.UtcNow);
 			}
-			int totalKills = await RequestTotalKillsForWvW();
-			if (totalKills < 0)
-			{
-				return false;
-			}
-			_killsAtResetDaily.set_Value(totalKills);
-			_killsAtResetMatch.set_Value(totalKills);
-			_lastResetTimeWvW.set_Value(DateTime.UtcNow);
 			return true;
 		}
 
@@ -126,7 +125,7 @@ namespace Nekres.Stream_Out.Core.Services
 			{
 				return false;
 			}
-			_nextResetTimeWvW.set_Value(wvwWorldMatch.get_EndTime().UtcDateTime);
+			_nextResetTimeWvW.set_Value(wvwWorldMatch.get_EndTime().UtcDateTime.AddMinutes(5.0));
 			return true;
 		}
 

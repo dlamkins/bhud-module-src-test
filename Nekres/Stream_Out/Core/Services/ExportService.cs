@@ -44,31 +44,29 @@ namespace Nekres.Stream_Out.Core.Services
 
 		private async Task<bool> DoResetDaily()
 		{
-			if (_lastResetTimeDaily.get_Value() < _nextResetTimeDaily.get_Value())
+			if (_lastResetTimeDaily.get_Value() < _nextResetTimeDaily.get_Value() && DateTime.UtcNow > _nextResetTimeDaily.get_Value())
 			{
-				return true;
+				if (!(await ResetDaily()))
+				{
+					return false;
+				}
+				_lastResetTimeDaily.set_Value(DateTime.UtcNow);
+				_nextResetTimeDaily.set_Value(Gw2Util.GetDailyResetTime());
 			}
-			if (!(await ResetDaily()))
-			{
-				return false;
-			}
-			_lastResetTimeDaily.set_Value(DateTime.UtcNow);
-			_nextResetTimeDaily.set_Value(Gw2Util.GetDailyResetTime());
 			return true;
 		}
 
 		private async Task<bool> DoResetWeekly()
 		{
-			if (_lastResetTimeWeekly.get_Value() < _nextResetTimeWeekly.get_Value())
+			if (_lastResetTimeWeekly.get_Value() < _nextResetTimeWeekly.get_Value() && DateTime.UtcNow > _nextResetTimeWeekly.get_Value())
 			{
-				return true;
+				if (!(await ResetWeekly()))
+				{
+					return false;
+				}
+				_lastResetTimeWeekly.set_Value(DateTime.UtcNow);
+				_nextResetTimeWeekly.set_Value(Gw2Util.GetWeeklyResetTime());
 			}
-			if (!(await ResetWeekly()))
-			{
-				return false;
-			}
-			_lastResetTimeWeekly.set_Value(DateTime.UtcNow);
-			_nextResetTimeWeekly.set_Value(Gw2Util.GetWeeklyResetTime());
 			return true;
 		}
 
