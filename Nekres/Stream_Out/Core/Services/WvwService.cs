@@ -100,10 +100,17 @@ namespace Nekres.Stream_Out.Core.Services
 			return (obj != null) ? obj.get_Current() : (-1);
 		}
 
-		private async Task<bool> ResetWorldVersusWorld()
+		private async Task<bool> ResetWvWMatch(int worldId)
 		{
 			if (_lastResetTimeWvW.get_Value() < _nextResetTimeWvW.get_Value() && DateTime.UtcNow > _nextResetTimeWvW.get_Value())
 			{
+				WvwMatch wvwWorldMatch = await TaskUtil.RetryAsync(() => ((IBlobClient<WvwMatch>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Wvw()
+					.get_Matches()
+					.World(worldId)).GetAsync(default(CancellationToken))).Unwrap();
+				if (wvwWorldMatch == null)
+				{
+					return false;
+				}
 				int totalKills = await RequestTotalKillsForWvW();
 				if (totalKills < 0)
 				{
@@ -112,20 +119,8 @@ namespace Nekres.Stream_Out.Core.Services
 				_killsAtResetDaily.set_Value(totalKills);
 				_killsAtResetMatch.set_Value(totalKills);
 				_lastResetTimeWvW.set_Value(DateTime.UtcNow);
+				_nextResetTimeWvW.set_Value(wvwWorldMatch.get_EndTime().UtcDateTime.AddMinutes(5.0));
 			}
-			return true;
-		}
-
-		private async Task<bool> GetWvWResetTime(int worldId)
-		{
-			WvwMatch wvwWorldMatch = await TaskUtil.RetryAsync(() => ((IBlobClient<WvwMatch>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Wvw()
-				.get_Matches()
-				.World(worldId)).GetAsync(default(CancellationToken))).Unwrap();
-			if (wvwWorldMatch == null)
-			{
-				return false;
-			}
-			_nextResetTimeWvW.set_Value(wvwWorldMatch.get_EndTime().UtcDateTime.AddMinutes(5.0));
 			return true;
 		}
 
@@ -148,7 +143,7 @@ namespace Nekres.Stream_Out.Core.Services
 				return;
 			}
 			await UpdateRankForWvw(account);
-			if (await GetWvWResetTime(account.get_World()) && await ResetWorldVersusWorld())
+			if (await ResetWvWMatch(account.get_World()))
 			{
 				string prefixKills = ((UnicodeSigning == StreamOutModule.UnicodeSigning.Prefixed) ? "⚔" : string.Empty);
 				string suffixKills = ((UnicodeSigning == StreamOutModule.UnicodeSigning.Suffixed) ? "⚔" : string.Empty);
