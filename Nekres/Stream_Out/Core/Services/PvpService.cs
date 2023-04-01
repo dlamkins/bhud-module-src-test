@@ -31,8 +31,6 @@ namespace Nekres.Stream_Out.Core.Services
 
 		private const string SWORDS = "⚔";
 
-		private SettingEntry<int> _killsDaily;
-
 		private SettingEntry<int> _killsAtResetDaily;
 
 		private Gw2ApiManager Gw2ApiManager => StreamOutModule.Instance?.Gw2ApiManager;
@@ -46,7 +44,6 @@ namespace Nekres.Stream_Out.Core.Services
 		public PvpService(SettingCollection settings)
 			: base(settings)
 		{
-			_killsDaily = settings.DefineSetting<int>(GetType().Name + "_kills_daily", 0, (Func<string>)null, (Func<string>)null);
 			_killsAtResetDaily = settings.DefineSetting<int>(GetType().Name + "_kills_daily_reset", 0, (Func<string>)null, (Func<string>)null);
 		}
 
@@ -98,59 +95,54 @@ namespace Nekres.Stream_Out.Core.Services
 				return;
 			}
 			PvpSeason season = ((IEnumerable<PvpSeason>)seasons).OrderByDescending((PvpSeason x) => x.get_End()).First();
-			await ((IBlobClient<ApiV2BaseObjectList<PvpStanding>>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Pvp()
-				.get_Standings()).GetAsync(default(CancellationToken)).ContinueWith((Func<Task<ApiV2BaseObjectList<PvpStanding>>, Task>)async delegate(Task<ApiV2BaseObjectList<PvpStanding>> t)
+			PvpStanding standing = ((IEnumerable<PvpStanding>)(await TaskUtil.RetryAsync(() => ((IBlobClient<ApiV2BaseObjectList<PvpStanding>>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Pvp()
+				.get_Standings()).GetAsync(default(CancellationToken))).Unwrap()))?.FirstOrDefault((PvpStanding x) => x.get_SeasonId().Equals(season.get_Id()));
+			if (standing == null || !standing.get_Current().get_Rating().HasValue)
 			{
-				if (!t.IsFaulted)
+				return;
+			}
+			PvpSeasonRank rank = season.get_Ranks().First();
+			int tier = 1;
+			bool found = false;
+			int ranksTotal = season.get_Ranks().Count;
+			List<PvpSeasonRankTier> data = season.get_Ranks().SelectMany((PvpSeasonRank x) => x.get_Tiers()).ToList();
+			int maxRating = data.MaxBy((PvpSeasonRankTier y) => y.get_Rating()).get_Rating();
+			int rating = data.MinBy((PvpSeasonRankTier y) => y.get_Rating()).get_Rating();
+			if (standing.get_Current().get_Rating() > maxRating)
+			{
+				rank = season.get_Ranks().Last();
+				tier = rank.get_Tiers().Count;
+				found = true;
+			}
+			if (standing.get_Current().get_Rating() < rating)
+			{
+				rank = season.get_Ranks().First();
+				tier = 1;
+				found = true;
+			}
+			for (int i = 0; i < ranksTotal; i++)
+			{
+				if (found)
 				{
-					PvpStanding standing = ((IEnumerable<PvpStanding>)t.Result).FirstOrDefault((PvpStanding x) => x.get_SeasonId().Equals(season.get_Id()));
-					if (standing != null && standing.get_Current().get_Rating().HasValue)
+					break;
+				}
+				PvpSeasonRank currentRank = season.get_Ranks()[i];
+				int tiersTotal = currentRank.get_Tiers().Count;
+				for (int j = 0; j < tiersTotal; j++)
+				{
+					int rating2 = currentRank.get_Tiers()[j].get_Rating();
+					if (!(standing.get_Current().get_Rating() > rating2))
 					{
-						PvpSeasonRank rank = season.get_Ranks().First();
-						int tier = 1;
-						bool found = false;
-						int ranksTotal = season.get_Ranks().Count;
-						List<PvpSeasonRankTier> data = season.get_Ranks().SelectMany((PvpSeasonRank x) => x.get_Tiers()).ToList();
-						int maxRating = data.MaxBy((PvpSeasonRankTier y) => y.get_Rating()).get_Rating();
-						int rating = data.MinBy((PvpSeasonRankTier y) => y.get_Rating()).get_Rating();
-						if (standing.get_Current().get_Rating() > maxRating)
-						{
-							rank = season.get_Ranks().Last();
-							tier = rank.get_Tiers().Count;
-							found = true;
-						}
-						if (standing.get_Current().get_Rating() < rating)
-						{
-							rank = season.get_Ranks().First();
-							tier = 1;
-							found = true;
-						}
-						for (int i = 0; i < ranksTotal; i++)
-						{
-							if (found)
-							{
-								break;
-							}
-							PvpSeasonRank currentRank = season.get_Ranks()[i];
-							int tiersTotal = currentRank.get_Tiers().Count;
-							for (int j = 0; j < tiersTotal; j++)
-							{
-								int rating2 = currentRank.get_Tiers()[j].get_Rating();
-								if (!(standing.get_Current().get_Rating() > rating2))
-								{
-									tier = j + 1;
-									rank = currentRank;
-									found = true;
-									break;
-								}
-							}
-						}
-						await Task.Run(() => Gw2Util.GeneratePvpTierImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_tier_icon.png", tier, rank.get_Tiers().Count));
-						await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_rank.txt", rank.get_Name() + " " + tier.ToRomanNumeral());
-						await TextureUtil.SaveToImage(RenderUrl.op_Implicit(rank.get_Overlay()), DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_rank_icon.png");
+						tier = j + 1;
+						rank = currentRank;
+						found = true;
+						break;
 					}
 				}
-			});
+			}
+			await Task.Run(() => Gw2Util.GeneratePvpTierImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_tier_icon.png", tier, rank.get_Tiers().Count));
+			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_rank.txt", rank.get_Name() + " " + tier.ToRomanNumeral());
+			await TextureUtil.SaveToImage(RenderUrl.op_Implicit(rank.get_Overlay()), DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_rank_icon.png");
 		}
 
 		private async Task UpdateStatsForPvp()
@@ -190,7 +182,6 @@ namespace Nekres.Stream_Out.Core.Services
 			{
 				return false;
 			}
-			_killsDaily.set_Value(0);
 			_killsAtResetDaily.set_Value(totalKills);
 			return true;
 		}
@@ -204,8 +195,8 @@ namespace Nekres.Stream_Out.Core.Services
 			int totalKills = await RequestTotalKillsForPvP();
 			if (totalKills >= 0)
 			{
-				_killsDaily.set_Value(totalKills - _killsAtResetDaily.get_Value());
-				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_kills_day.txt", $"{prefixKills}{_killsDaily.get_Value()}{suffixKills}");
+				int killsDaily = totalKills - _killsAtResetDaily.get_Value();
+				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_kills_day.txt", $"{prefixKills}{killsDaily}{suffixKills}");
 				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/pvp_kills_total.txt", $"{prefixKills}{totalKills}{suffixKills}");
 			}
 		}

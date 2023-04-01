@@ -23,10 +23,6 @@ namespace Nekres.Stream_Out.Core.Services
 
 		private SettingEntry<int> _killsAtResetMatch;
 
-		private SettingEntry<int> _killsMatch;
-
-		private SettingEntry<int> _killsDaily;
-
 		private const string WVW_KILLS_WEEK = "wvw_kills_week.txt";
 
 		private const string WVW_KILLS_DAY = "wvw_kills_day.txt";
@@ -50,8 +46,6 @@ namespace Nekres.Stream_Out.Core.Services
 			_lastResetTimeWvW = settings.DefineSetting<DateTime>(GetType().Name + "_last_reset", DateTime.UtcNow, (Func<string>)null, (Func<string>)null);
 			_killsAtResetDaily = settings.DefineSetting<int>(GetType().Name + "_kills_daily_reset", 0, (Func<string>)null, (Func<string>)null);
 			_killsAtResetMatch = settings.DefineSetting<int>(GetType().Name + "_kills_match_reset", 0, (Func<string>)null, (Func<string>)null);
-			_killsMatch = settings.DefineSetting<int>(GetType().Name + "_kills_match", 0, (Func<string>)null, (Func<string>)null);
-			_killsDaily = settings.DefineSetting<int>(GetType().Name + "_kills_daily", 0, (Func<string>)null, (Func<string>)null);
 		}
 
 		public override async Task Initialize()
@@ -117,8 +111,6 @@ namespace Nekres.Stream_Out.Core.Services
 			{
 				return false;
 			}
-			_killsDaily.set_Value(0);
-			_killsMatch.set_Value(0);
 			_killsAtResetDaily.set_Value(totalKills);
 			_killsAtResetMatch.set_Value(totalKills);
 			_lastResetTimeWvW.set_Value(DateTime.UtcNow);
@@ -146,16 +138,11 @@ namespace Nekres.Stream_Out.Core.Services
 				return false;
 			}
 			_killsAtResetDaily.set_Value(totalKills);
-			_killsDaily.set_Value(0);
 			return true;
 		}
 
 		protected override async Task Update()
 		{
-			if (!Gw2ApiManager.HasPermission((TokenPermission)1))
-			{
-				return;
-			}
 			Account account = StreamOutModule.Instance?.Account;
 			if (account == null)
 			{
@@ -170,10 +157,10 @@ namespace Nekres.Stream_Out.Core.Services
 				if (totalKillsWvW >= 0)
 				{
 					await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wvw_kills_total.txt", $"{prefixKills}{totalKillsWvW}{suffixKills}");
-					_killsDaily.set_Value(totalKillsWvW - _killsAtResetDaily.get_Value());
-					await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wvw_kills_day.txt", $"{prefixKills}{_killsDaily.get_Value()}{suffixKills}");
-					_killsMatch.set_Value(totalKillsWvW - _killsAtResetMatch.get_Value());
-					await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wvw_kills_week.txt", $"{prefixKills}{_killsMatch.get_Value()}{suffixKills}");
+					int killsDaily = totalKillsWvW - _killsAtResetDaily.get_Value();
+					await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wvw_kills_day.txt", $"{prefixKills}{killsDaily}{suffixKills}");
+					int killsMatch = totalKillsWvW - _killsAtResetMatch.get_Value();
+					await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wvw_kills_week.txt", $"{prefixKills}{killsMatch}{suffixKills}");
 				}
 			}
 		}

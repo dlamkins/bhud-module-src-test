@@ -139,7 +139,10 @@ namespace Nekres.Stream_Out
 		private async void SubTokenUpdated(object o, ValueEventArgs<IEnumerable<TokenPermission>> e)
 		{
 			HasSubToken = true;
-			Account = await TaskUtil.RetryAsync(() => ((IBlobClient<Account>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()).GetAsync(default(CancellationToken))).Unwrap();
+			if (Gw2ApiManager.HasPermission((TokenPermission)1))
+			{
+				Account = await TaskUtil.RetryAsync(() => ((IBlobClient<Account>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()).GetAsync(default(CancellationToken))).Unwrap();
+			}
 		}
 
 		protected override async Task LoadAsync()

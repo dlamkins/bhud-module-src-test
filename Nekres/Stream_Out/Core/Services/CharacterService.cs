@@ -45,10 +45,6 @@ namespace Nekres.Stream_Out.Core.Services
 
 		private Bitmap _battleIcon;
 
-		private SettingEntry<int> _deathsWeekly;
-
-		private SettingEntry<int> _deathsDaily;
-
 		private SettingEntry<int> _deathsAtResetWeekly;
 
 		private SettingEntry<int> _deathsAtResetDaily;
@@ -73,8 +69,6 @@ namespace Nekres.Stream_Out.Core.Services
 			UseCatmanderTag.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUseCatmanderTagSettingChanged);
 			OnNameChanged(null, new ValueEventArgs<string>(GameService.Gw2Mumble.get_PlayerCharacter().get_Name()));
 			OnSpecializationChanged(null, new ValueEventArgs<int>(GameService.Gw2Mumble.get_PlayerCharacter().get_Specialization()));
-			_deathsWeekly = settings.DefineSetting<int>(GetType().Name + "_deaths_weekly", 0, (Func<string>)null, (Func<string>)null);
-			_deathsDaily = settings.DefineSetting<int>(GetType().Name + "_deaths_daily", 0, (Func<string>)null, (Func<string>)null);
 			_deathsAtResetWeekly = settings.DefineSetting<int>(GetType().Name + "_deaths_weekly_reset", 0, (Func<string>)null, (Func<string>)null);
 			_deathsAtResetDaily = settings.DefineSetting<int>(GetType().Name + "_deaths_daily_reset", 0, (Func<string>)null, (Func<string>)null);
 		}
@@ -188,7 +182,6 @@ namespace Nekres.Stream_Out.Core.Services
 			{
 				return false;
 			}
-			_deathsDaily.set_Value(0);
 			_deathsAtResetDaily.set_Value(totalDeaths);
 			return true;
 		}
@@ -200,7 +193,6 @@ namespace Nekres.Stream_Out.Core.Services
 			{
 				return false;
 			}
-			_deathsWeekly.set_Value(0);
 			_deathsAtResetWeekly.set_Value(totalDeaths);
 			return true;
 		}
@@ -212,10 +204,10 @@ namespace Nekres.Stream_Out.Core.Services
 			int totalDeaths = await RequestTotalDeaths();
 			if (totalDeaths >= 0)
 			{
-				_deathsDaily.set_Value(totalDeaths - _deathsAtResetDaily.get_Value());
-				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/deaths_week.txt", $"{prefixDeaths}{_deathsDaily.get_Value()}{suffixDeaths}");
-				_deathsWeekly.set_Value(totalDeaths - _deathsAtResetWeekly.get_Value());
-				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/deaths_day.txt", $"{prefixDeaths}{_deathsWeekly.get_Value()}{suffixDeaths}");
+				int deathsDaily = totalDeaths - _deathsAtResetDaily.get_Value();
+				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/deaths_week.txt", $"{prefixDeaths}{deathsDaily}{suffixDeaths}");
+				int deathsWeekly = totalDeaths - _deathsAtResetWeekly.get_Value();
+				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/deaths_day.txt", $"{prefixDeaths}{deathsWeekly}{suffixDeaths}");
 			}
 		}
 
