@@ -2,13 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Blish_HUD.Extended;
 using Blish_HUD.Extended.Core.Views;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
+using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using Nekres.Stream_Out.Core.Services;
@@ -51,33 +54,7 @@ namespace Nekres.Stream_Out
 
 		internal SettingEntry<bool> ExportKillProofs;
 
-		internal SettingEntry<DateTime> ResetTimeWvW;
-
-		internal SettingEntry<DateTime> ResetTimeDaily;
-
-		internal SettingEntry<int> SessionKillsWvW;
-
-		internal SettingEntry<int> SessionKillsWvwDaily;
-
-		internal SettingEntry<int> SessionKillsPvP;
-
-		internal SettingEntry<int> TotalKillsAtResetWvW;
-
-		internal SettingEntry<int> TotalKillsAtResetPvP;
-
-		internal SettingEntry<int> TotalDeathsAtResetWvW;
-
-		internal SettingEntry<int> TotalDeathsAtResetDaily;
-
-		internal SettingEntry<int> SessionDeathsWvW;
-
-		internal SettingEntry<int> SessionDeathsDaily;
-
-		internal SettingEntry<Guid> AccountGuid;
-
-		internal SettingEntry<string> AccountName;
-
-		internal string WebApiDown = "Unable to connect to the official Guild Wars 2 WebApi. Check if the WebApi is down for maintenance.";
+		private SettingCollection _selfManagedSettings;
 
 		private List<ExportService> _allExportServices;
 
@@ -90,6 +67,8 @@ namespace Nekres.Stream_Out
 		internal Gw2ApiManager Gw2ApiManager => base.ModuleParameters.get_Gw2ApiManager();
 
 		internal bool HasSubToken { get; private set; }
+
+		internal Account Account { get; private set; }
 
 		[ImportingConstructor]
 		public StreamOutModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
@@ -113,20 +92,7 @@ namespace Nekres.Stream_Out
 			ExportPvpInfo = toggles.DefineSetting<bool>("pvpInfo", true, (Func<string>)(() => "Export PvP Info"), (Func<string>)(() => "PvP info such as rank, tier, win rate and kills."));
 			ExportWvwInfo = toggles.DefineSetting<bool>("wvwInfo", true, (Func<string>)(() => "Export WvW info"), (Func<string>)(() => "WvW info such as rank and kills"));
 			ExportWalletInfo = toggles.DefineSetting<bool>("walletInfo", true, (Func<string>)(() => "Export Wallet Info"), (Func<string>)(() => "Currencies such as coins and karma."));
-			SettingCollection cache = settings.AddSubCollection("CachedValues", false, false);
-			AccountGuid = cache.DefineSetting<Guid>("AccountGuid", Guid.Empty, (Func<string>)null, (Func<string>)null);
-			AccountName = cache.DefineSetting<string>("AccountName", string.Empty, (Func<string>)null, (Func<string>)null);
-			ResetTimeWvW = cache.DefineSetting<DateTime>("ResetTimeWvW", DateTime.UtcNow, (Func<string>)null, (Func<string>)null);
-			ResetTimeDaily = cache.DefineSetting<DateTime>("ResetTimeDaily", DateTime.UtcNow, (Func<string>)null, (Func<string>)null);
-			SessionKillsWvW = cache.DefineSetting<int>("SessionKillsWvW", 0, (Func<string>)null, (Func<string>)null);
-			SessionKillsWvwDaily = cache.DefineSetting<int>("SessionsKillsWvWDaily", 0, (Func<string>)null, (Func<string>)null);
-			SessionKillsPvP = cache.DefineSetting<int>("SessionKillsPvP", 0, (Func<string>)null, (Func<string>)null);
-			SessionDeathsWvW = cache.DefineSetting<int>("SessionDeathsWvW", 0, (Func<string>)null, (Func<string>)null);
-			SessionDeathsDaily = cache.DefineSetting<int>("SessionDeathsDaily", 0, (Func<string>)null, (Func<string>)null);
-			TotalKillsAtResetWvW = cache.DefineSetting<int>("TotalKillsAtResetWvW", 0, (Func<string>)null, (Func<string>)null);
-			TotalKillsAtResetPvP = cache.DefineSetting<int>("TotalKillsAtResetPvP", 0, (Func<string>)null, (Func<string>)null);
-			TotalDeathsAtResetWvW = cache.DefineSetting<int>("TotalDeathsAtResetWvW", 0, (Func<string>)null, (Func<string>)null);
-			TotalDeathsAtResetDaily = cache.DefineSetting<int>("TotalDeathsAtResetDaily", 0, (Func<string>)null, (Func<string>)null);
+			_selfManagedSettings = settings.AddSubCollection("CachedValues", false, false);
 		}
 
 		public override IView GetSettingsView()
@@ -158,7 +124,7 @@ namespace Nekres.Stream_Out
 			ExportService service2 = _allExportServices.FirstOrDefault((ExportService x) => x.GetType() == typeof(TType));
 			if (enabled && service2 == null)
 			{
-				service2 = (TType)Activator.CreateInstance(typeof(TType));
+				service2 = (TType)Activator.CreateInstance(typeof(TType), _selfManagedSettings);
 				_allExportServices.Add(service2);
 				await service2.Initialize();
 			}
@@ -170,9 +136,10 @@ namespace Nekres.Stream_Out
 			}
 		}
 
-		private void SubTokenUpdated(object o, ValueEventArgs<IEnumerable<TokenPermission>> e)
+		private async void SubTokenUpdated(object o, ValueEventArgs<IEnumerable<TokenPermission>> e)
 		{
 			HasSubToken = true;
+			Account = await TaskUtil.RetryAsync(() => ((IBlobClient<Account>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()).GetAsync(default(CancellationToken))).Unwrap();
 		}
 
 		protected override async Task LoadAsync()

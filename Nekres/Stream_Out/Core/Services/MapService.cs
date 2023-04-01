@@ -5,10 +5,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Blish_HUD.Extended;
 using Blish_HUD.Modules.Managers;
+using Blish_HUD.Settings;
 using Gw2Sharp.Models;
-using Gw2Sharp.WebApi.Exceptions;
-using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 
@@ -24,7 +24,8 @@ namespace Nekres.Stream_Out.Core.Services
 
 		private DirectoriesManager DirectoriesManager => StreamOutModule.Instance?.DirectoriesManager;
 
-		public MapService()
+		public MapService(SettingCollection settings)
+			: base(settings)
 		{
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
 			OnMapChanged(null, new ValueEventArgs<int>(GameService.Gw2Mumble.get_CurrentMap().get_Id()));
@@ -32,7 +33,7 @@ namespace Nekres.Stream_Out.Core.Services
 
 		private async Task<IEnumerable<ContinentFloorRegionMapSector>> RequestSectors(int continentId, int floor, int regionId, int mapId)
 		{
-			return await ((IAllExpandableClient<ContinentFloorRegionMapSector>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Continents()
+			return (IEnumerable<ContinentFloorRegionMapSector>)(await TaskUtil.RetryAsync(() => ((IAllExpandableClient<ContinentFloorRegionMapSector>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Continents()
 				.get_Item(continentId)
 				.get_Floors()
 				.get_Item(floor)
@@ -40,7 +41,7 @@ namespace Nekres.Stream_Out.Core.Services
 				.get_Item(regionId)
 				.get_Maps()
 				.get_Item(mapId)
-				.get_Sectors()).AllAsync(default(CancellationToken)).ContinueWith((Task<IApiV2ObjectList<ContinentFloorRegionMapSector>> task) => (!task.IsFaulted) ? ((IEnumerable<ContinentFloorRegionMapSector>)task.Result) : Enumerable.Empty<ContinentFloorRegionMapSector>());
+				.get_Sectors()).AllAsync(default(CancellationToken))).Unwrap());
 		}
 
 		private async void OnMapChanged(object o, ValueEventArgs<int> e)
@@ -51,24 +52,11 @@ namespace Nekres.Stream_Out.Core.Services
 				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/map_type.txt", string.Empty);
 				return;
 			}
-			Map map;
-			try
+			Map map = await TaskUtil.RetryAsync(() => ((IBulkExpandableClient<Map, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Maps()).GetAsync(e.get_Value(), default(CancellationToken))).Unwrap();
+			if (map == null)
 			{
-				map = await ((IBulkExpandableClient<Map, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Maps()).GetAsync(e.get_Value(), default(CancellationToken));
-				if (map == null)
-				{
-					throw new NullReferenceException("Unknown error.");
-				}
-			}
-			catch (Exception ex) when (ex is UnexpectedStatusException || ex is NullReferenceException)
-			{
-				StreamOutModule.Logger.Warn(StreamOutModule.Instance.WebApiDown);
-				return;
-			}
-			catch (RequestException val)
-			{
-				RequestException exe = val;
-				StreamOutModule.Logger.Error((Exception)(object)exe, ((Exception)(object)exe).Message);
+				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/map_name.txt", string.Empty);
+				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/map_type.txt", string.Empty);
 				return;
 			}
 			string location = map.get_Name();

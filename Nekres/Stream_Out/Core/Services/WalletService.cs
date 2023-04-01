@@ -1,10 +1,11 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Blish_HUD.Extended;
 using Blish_HUD.Modules.Managers;
+using Blish_HUD.Settings;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
@@ -20,6 +21,11 @@ namespace Nekres.Stream_Out.Core.Services
 		private Gw2ApiManager Gw2ApiManager => StreamOutModule.Instance?.Gw2ApiManager;
 
 		private DirectoriesManager DirectoriesManager => StreamOutModule.Instance?.DirectoriesManager;
+
+		public WalletService(SettingCollection settings)
+			: base(settings)
+		{
+		}
 
 		protected override async Task Update()
 		{
@@ -42,17 +48,17 @@ namespace Nekres.Stream_Out.Core.Services
 			{
 				return;
 			}
-			await ((IBlobClient<IApiV2ObjectList<AccountCurrency>>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
-				.get_Wallet()).GetAsync(default(CancellationToken)).ContinueWith((Func<Task<IApiV2ObjectList<AccountCurrency>>, Task>)async delegate(Task<IApiV2ObjectList<AccountCurrency>> task)
+			IApiV2ObjectList<AccountCurrency> wallet = await TaskUtil.RetryAsync(() => ((IBlobClient<IApiV2ObjectList<AccountCurrency>>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
+				.get_Wallet()).GetAsync(default(CancellationToken))).Unwrap();
+			if (wallet != null)
 			{
-				if (!task.IsFaulted)
-				{
-					int coins = ((IEnumerable<AccountCurrency>)task.Result).First((AccountCurrency x) => x.get_Id() == 1).get_Value();
-					await Gw2Util.GenerateCoinsImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wallet_coins.png", coins);
-					int karma = ((IEnumerable<AccountCurrency>)task.Result).First((AccountCurrency x) => x.get_Id() == 2).get_Value();
-					await Gw2Util.GenerateKarmaImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wallet_karma.png", karma);
-				}
-			});
+				AccountCurrency obj = ((IEnumerable<AccountCurrency>)wallet).FirstOrDefault((AccountCurrency x) => x.get_Id() == 1);
+				int coins = ((obj != null) ? obj.get_Value() : 0);
+				await Gw2Util.GenerateCoinsImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wallet_coins.png", coins);
+				AccountCurrency obj2 = ((IEnumerable<AccountCurrency>)wallet).FirstOrDefault((AccountCurrency x) => x.get_Id() == 2);
+				int karma = ((obj2 != null) ? obj2.get_Value() : 0);
+				await Gw2Util.GenerateKarmaImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/wallet_karma.png", karma);
+			}
 		}
 
 		public override async Task Clear()

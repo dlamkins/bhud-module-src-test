@@ -39,7 +39,6 @@
     <Reference Include="System.Numerics" />
     <Reference Include="Newtonsoft.Json" />
     <Reference Include="Flurl.Http" />
-    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="AsyncClipboardService" />
     <Reference Include="MonoGame.Extended" />
     <Reference Include="Microsoft.CSharp" />

@@ -9,7 +9,9 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Blish_HUD.Extended;
 using Blish_HUD.Modules.Managers;
+using Blish_HUD.Settings;
 using Gw2Sharp.WebApi;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
@@ -32,6 +34,11 @@ namespace Nekres.Stream_Out.Core.Services
 
 		private DirectoriesManager DirectoriesManager => StreamOutModule.Instance?.DirectoriesManager;
 
+		public GuildService(SettingCollection settings)
+			: base(settings)
+		{
+		}
+
 		private async Task UpdateGuild()
 		{
 			if (!GameService.Gw2Mumble.get_IsAvailable())
@@ -45,9 +52,10 @@ namespace Nekres.Stream_Out.Core.Services
 			{
 				return;
 			}
-			Guid guildId = await ((IBlobClient<CharactersCore>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Characters()
+			CharactersCore obj = await TaskUtil.RetryAsync(() => ((IBlobClient<CharactersCore>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Characters()
 				.get_Item(GameService.Gw2Mumble.get_PlayerCharacter().get_Name())
-				.get_Core()).GetAsync(default(CancellationToken)).ContinueWith((Task<CharactersCore> task) => (!task.IsFaulted) ? task.Result.get_Guild() : Guid.Empty);
+				.get_Core()).GetAsync(default(CancellationToken))).Unwrap();
+			Guid guildId = ((obj != null) ? obj.get_Guild() : Guid.Empty);
 			if (guildId.Equals(Guid.Empty))
 			{
 				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/guild_name.txt", string.Empty);
@@ -74,10 +82,10 @@ namespace Nekres.Stream_Out.Core.Services
 					}
 					else
 					{
-						Emblem bg = await ((IBulkExpandableClient<Emblem, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Emblem()
-							.get_Backgrounds()).GetAsync(emblem.get_Background().get_Id(), default(CancellationToken));
-						Emblem fg = await ((IBulkExpandableClient<Emblem, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Emblem()
-							.get_Foregrounds()).GetAsync(emblem.get_Foreground().get_Id(), default(CancellationToken));
+						Emblem bg = await TaskUtil.RetryAsync(() => ((IBulkExpandableClient<Emblem, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Emblem()
+							.get_Backgrounds()).GetAsync(emblem.get_Background().get_Id(), default(CancellationToken))).Unwrap();
+						Emblem fg = await TaskUtil.RetryAsync(() => ((IBulkExpandableClient<Emblem, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Emblem()
+							.get_Foregrounds()).GetAsync(emblem.get_Foreground().get_Id(), default(CancellationToken))).Unwrap();
 						List<RenderUrl> layersCombined = new List<RenderUrl>();
 						if (bg != null)
 						{
@@ -105,20 +113,20 @@ namespace Nekres.Stream_Out.Core.Services
 							colorsCombined.AddRange(emblem.get_Background().get_Colors());
 							colorsCombined.AddRange(emblem.get_Foreground().get_Colors());
 							List<Color> colors = new List<Color>();
-							foreach (int color2 in colorsCombined)
+							foreach (int colorId in colorsCombined)
 							{
-								List<Color> list = colors;
-								list.Add(await ((IBulkExpandableClient<Color, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Colors()).GetAsync(color2, default(CancellationToken)));
+								Color color = await TaskUtil.RetryAsync(() => ((IBulkExpandableClient<Color, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Colors()).GetAsync(colorId, default(CancellationToken))).Unwrap();
+								if (color == null)
+								{
+									return;
+								}
+								colors.Add(Color.FromArgb(color.get_Cloth().get_Rgb()[0], color.get_Cloth().get_Rgb()[1], color.get_Cloth().get_Rgb()[2]));
 							}
 							Bitmap result = new Bitmap(256, 256);
 							for (int i = 0; i < layers.Count; i++)
 							{
 								Bitmap layer = layers[i].FitTo(result);
-								if (colors.Any())
-								{
-									Color color = Color.FromArgb(colors[i].get_Cloth().get_Rgb()[0], colors[i].get_Cloth().get_Rgb()[1], colors[i].get_Cloth().get_Rgb()[2]);
-									layer.Colorize(color);
-								}
+								layer.Colorize(colors[i]);
 								if (bg != null && i < bg.get_Layers().Count)
 								{
 									layer.Flip(((IEnumerable<ApiEnum<GuildEmblemFlag>>)emblem.get_Flags()).Any((ApiEnum<GuildEmblemFlag> x) => x == ApiEnum<GuildEmblemFlag>.op_Implicit((GuildEmblemFlag)0)), ((IEnumerable<ApiEnum<GuildEmblemFlag>>)emblem.get_Flags()).Any((ApiEnum<GuildEmblemFlag> x) => x == ApiEnum<GuildEmblemFlag>.op_Implicit((GuildEmblemFlag)1)));

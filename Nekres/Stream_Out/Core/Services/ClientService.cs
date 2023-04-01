@@ -17,7 +17,8 @@ namespace Nekres.Stream_Out.Core.Services
 
 		private SettingEntry<bool> OnlyLastDigitSettingEntry => StreamOutModule.Instance?.OnlyLastDigitSettingEntry;
 
-		public ClientService()
+		public ClientService(SettingCollection settings)
+			: base(settings)
 		{
 			_prevServerAddress = string.Empty;
 		}

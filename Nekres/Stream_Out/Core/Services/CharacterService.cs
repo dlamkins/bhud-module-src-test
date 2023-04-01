@@ -7,12 +7,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Blish_HUD.Extended;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Gw2Sharp.Models;
 using Gw2Sharp.WebApi;
-using Gw2Sharp.WebApi.Exceptions;
-using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 
@@ -32,11 +31,27 @@ namespace Nekres.Stream_Out.Core.Services
 
 		private const string DEATHS_DAY = "deaths_day.txt";
 
+		private const string COMBAT_ICON = "combat_icon.png";
+
+		private const string COMBAT_TEXT = "combat.txt";
+
 		private const string SKULL = "☠";
+
+		private const string SWORDS = "⚔";
 
 		private Bitmap _commanderIcon;
 
 		private Bitmap _catmanderIcon;
+
+		private Bitmap _battleIcon;
+
+		private SettingEntry<int> _deathsWeekly;
+
+		private SettingEntry<int> _deathsDaily;
+
+		private SettingEntry<int> _deathsAtResetWeekly;
+
+		private SettingEntry<int> _deathsAtResetDaily;
 
 		private static Gw2ApiManager Gw2ApiManager => StreamOutModule.Instance?.Gw2ApiManager;
 
@@ -44,37 +59,48 @@ namespace Nekres.Stream_Out.Core.Services
 
 		private ContentsManager ContentsManager => StreamOutModule.Instance?.ContentsManager;
 
-		private SettingEntry<int> SessionDeathsWvW => StreamOutModule.Instance?.SessionDeathsWvW;
-
-		private SettingEntry<int> TotalDeathsAtResetWvW => StreamOutModule.Instance?.TotalDeathsAtResetWvW;
-
-		private SettingEntry<int> SessionDeathsDaily => StreamOutModule.Instance?.SessionDeathsDaily;
-
-		private SettingEntry<int> TotalDeathsAtResetDaily => StreamOutModule.Instance?.TotalDeathsAtResetDaily;
-
 		private StreamOutModule.UnicodeSigning UnicodeSigning => StreamOutModule.Instance?.AddUnicodeSymbols.get_Value() ?? StreamOutModule.UnicodeSigning.Suffixed;
 
 		private SettingEntry<bool> UseCatmanderTag => StreamOutModule.Instance.UseCatmanderTag;
 
-		public CharacterService()
+		public CharacterService(SettingCollection settings)
+			: base(settings)
 		{
 			GameService.Gw2Mumble.get_PlayerCharacter().add_NameChanged((EventHandler<ValueEventArgs<string>>)OnNameChanged);
 			GameService.Gw2Mumble.get_PlayerCharacter().add_SpecializationChanged((EventHandler<ValueEventArgs<int>>)OnSpecializationChanged);
 			GameService.Gw2Mumble.get_PlayerCharacter().add_IsCommanderChanged((EventHandler<ValueEventArgs<bool>>)OnIsCommanderChanged);
+			GameService.Gw2Mumble.get_PlayerCharacter().add_IsInCombatChanged((EventHandler<ValueEventArgs<bool>>)OnIsInCombatChanged);
 			UseCatmanderTag.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUseCatmanderTagSettingChanged);
 			OnNameChanged(null, new ValueEventArgs<string>(GameService.Gw2Mumble.get_PlayerCharacter().get_Name()));
 			OnSpecializationChanged(null, new ValueEventArgs<int>(GameService.Gw2Mumble.get_PlayerCharacter().get_Specialization()));
+			_deathsWeekly = settings.DefineSetting<int>(GetType().Name + "_deaths_weekly", 0, (Func<string>)null, (Func<string>)null);
+			_deathsDaily = settings.DefineSetting<int>(GetType().Name + "_deaths_daily", 0, (Func<string>)null, (Func<string>)null);
+			_deathsAtResetWeekly = settings.DefineSetting<int>(GetType().Name + "_deaths_weekly_reset", 0, (Func<string>)null, (Func<string>)null);
+			_deathsAtResetDaily = settings.DefineSetting<int>(GetType().Name + "_deaths_daily_reset", 0, (Func<string>)null, (Func<string>)null);
 		}
 
 		public override async Task Initialize()
 		{
 			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/deaths_week.txt", "0☠", overwrite: false);
 			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/deaths_day.txt", "0☠", overwrite: false);
-			string moduleDir = DirectoriesManager.GetFullDirectoryPath("stream_out");
-			ContentsManager.ExtractIcons(UseCatmanderTag.get_Value() ? "catmander_tag_white.png" : "commander_tag_white.png", Path.Combine(moduleDir, "commander_icon.png"));
-			if (!GameService.Gw2Mumble.get_PlayerCharacter().get_IsCommander())
+			using Stream catmanderIconStream = ContentsManager.GetFileStream("catmander_tag_white.png");
+			_catmanderIcon = new Bitmap(catmanderIconStream);
+			using Stream commanderIconStream = ContentsManager.GetFileStream("commander_tag_white.png");
+			_commanderIcon = new Bitmap(commanderIconStream);
+			using Stream battleIconStream = ContentsManager.GetFileStream("240678.png");
+			_battleIcon = new Bitmap(battleIconStream);
+		}
+
+		private async void OnIsInCombatChanged(object o, ValueEventArgs<bool> e)
+		{
+			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/combat.txt", e.get_Value() ? "⚔" : string.Empty);
+			if (!e.get_Value())
 			{
-				await TextureUtil.ClearImage(moduleDir + "/commander_icon.png");
+				await TextureUtil.ClearImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/combat_icon.png");
+			}
+			else
+			{
+				await _battleIcon.SaveOnNetworkShare(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/combat_icon.png", ImageFormat.Png);
 			}
 		}
 
@@ -90,35 +116,31 @@ namespace Nekres.Stream_Out.Core.Services
 				await TextureUtil.ClearImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/profession_icon.png");
 				return;
 			}
-			try
+			Specialization specialization = await TaskUtil.RetryAsync(() => ((IBulkExpandableClient<Specialization, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Specializations()).GetAsync(e.get_Value(), default(CancellationToken))).Unwrap();
+			if (specialization == null)
 			{
-				Specialization specialization = await ((IBulkExpandableClient<Specialization, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Specializations()).GetAsync(e.get_Value(), default(CancellationToken));
-				RenderUrl? icon;
-				string name;
-				if (specialization.get_Elite())
+				return;
+			}
+			RenderUrl? icon;
+			string name;
+			if (specialization.get_Elite())
+			{
+				icon = specialization.get_ProfessionIconBig();
+				name = specialization.get_Name();
+			}
+			else
+			{
+				Profession profession = await TaskUtil.RetryAsync(() => ((IBulkAliasExpandableClient<Profession, ProfessionType>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Professions()).GetAsync(GameService.Gw2Mumble.get_PlayerCharacter().get_Profession(), default(CancellationToken))).Unwrap();
+				if (profession == null)
 				{
-					icon = specialization.get_ProfessionIconBig();
-					name = specialization.get_Name();
+					return;
 				}
-				else
-				{
-					Profession profession = await ((IBulkAliasExpandableClient<Profession, ProfessionType>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Professions()).GetAsync(GameService.Gw2Mumble.get_PlayerCharacter().get_Profession(), default(CancellationToken));
-					icon = profession.get_IconBig();
-					name = profession.get_Name();
-				}
-				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/profession_name.txt", name ?? string.Empty);
-				RenderUrl? val = icon;
-				await TextureUtil.SaveToImage(val.HasValue ? RenderUrl.op_Implicit(val.GetValueOrDefault()) : null, DirectoriesManager.GetFullDirectoryPath("stream_out") + "/profession_icon.png");
+				icon = profession.get_IconBig();
+				name = profession.get_Name();
 			}
-			catch (UnexpectedStatusException)
-			{
-				StreamOutModule.Logger.Warn(StreamOutModule.Instance.WebApiDown);
-			}
-			catch (RequestException val3)
-			{
-				RequestException ex = val3;
-				StreamOutModule.Logger.Error((Exception)(object)ex, ((Exception)(object)ex).Message);
-			}
+			await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/profession_name.txt", name ?? string.Empty);
+			RenderUrl? val = icon;
+			await TextureUtil.SaveToImage(val.HasValue ? RenderUrl.op_Implicit(val.GetValueOrDefault()) : null, DirectoriesManager.GetFullDirectoryPath("stream_out") + "/profession_icon.png");
 		}
 
 		private async void OnIsCommanderChanged(object o, ValueEventArgs<bool> e)
@@ -135,24 +157,7 @@ namespace Nekres.Stream_Out.Core.Services
 
 		private async Task SaveCommanderIcon(bool useCatmanderIcon)
 		{
-			if (useCatmanderIcon)
-			{
-				if (_catmanderIcon == null)
-				{
-					using Stream stream = ContentsManager.GetFileStream("catmander_tag_white.png");
-					_catmanderIcon = new Bitmap(stream);
-					await stream.FlushAsync();
-				}
-				await _catmanderIcon.SaveOnNetworkShare(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/commander_icon.png", ImageFormat.Png);
-				return;
-			}
-			if (_commanderIcon == null)
-			{
-				using Stream stream = ContentsManager.GetFileStream("commander_tag_white.png");
-				_commanderIcon = new Bitmap(stream);
-				await stream.FlushAsync();
-			}
-			await _commanderIcon.SaveOnNetworkShare(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/commander_icon.png", ImageFormat.Png);
+			await (useCatmanderIcon ? _catmanderIcon : _commanderIcon).SaveOnNetworkShare(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/commander_icon.png", ImageFormat.Png);
 		}
 
 		private async void OnUseCatmanderTagSettingChanged(object o, ValueChangedEventArgs<bool> e)
@@ -173,14 +178,31 @@ namespace Nekres.Stream_Out.Core.Services
 			{
 				return -1;
 			}
-			return await ((IAllExpandableClient<Character>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Characters()).AllAsync(default(CancellationToken)).ContinueWith((Task<IApiV2ObjectList<Character>> task) => (!task.IsFaulted) ? ((IEnumerable<Character>)task.Result).Sum((Character x) => x.get_Deaths()) : (-1));
+			return ((IEnumerable<Character>)(await TaskUtil.RetryAsync(() => ((IAllExpandableClient<Character>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Characters()).AllAsync(default(CancellationToken))).Unwrap()))?.Sum((Character x) => x.get_Deaths()) ?? (-1);
 		}
 
-		protected override async Task ResetDaily()
+		protected override async Task<bool> ResetDaily()
 		{
-			SessionDeathsDaily.set_Value(0);
-			SettingEntry<int> totalDeathsAtResetDaily = TotalDeathsAtResetDaily;
-			totalDeathsAtResetDaily.set_Value(await RequestTotalDeaths());
+			int totalDeaths = await RequestTotalDeaths();
+			if (totalDeaths < 0)
+			{
+				return false;
+			}
+			_deathsDaily.set_Value(0);
+			_deathsAtResetDaily.set_Value(totalDeaths);
+			return true;
+		}
+
+		protected override async Task<bool> ResetWeekly()
+		{
+			int totalDeaths = await RequestTotalDeaths();
+			if (totalDeaths < 0)
+			{
+				return false;
+			}
+			_deathsWeekly.set_Value(0);
+			_deathsAtResetWeekly.set_Value(totalDeaths);
+			return true;
 		}
 
 		protected override async Task Update()
@@ -190,10 +212,10 @@ namespace Nekres.Stream_Out.Core.Services
 			int totalDeaths = await RequestTotalDeaths();
 			if (totalDeaths >= 0)
 			{
-				SessionDeathsDaily.set_Value(totalDeaths - TotalDeathsAtResetDaily.get_Value());
-				SessionDeathsWvW.set_Value(totalDeaths - TotalDeathsAtResetWvW.get_Value());
-				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/deaths_week.txt", $"{prefixDeaths}{SessionDeathsWvW.get_Value()}{suffixDeaths}");
-				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/deaths_day.txt", $"{prefixDeaths}{SessionDeathsDaily.get_Value()}{suffixDeaths}");
+				_deathsDaily.set_Value(totalDeaths - _deathsAtResetDaily.get_Value());
+				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/deaths_week.txt", $"{prefixDeaths}{_deathsDaily.get_Value()}{suffixDeaths}");
+				_deathsWeekly.set_Value(totalDeaths - _deathsAtResetWeekly.get_Value());
+				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/deaths_day.txt", $"{prefixDeaths}{_deathsWeekly.get_Value()}{suffixDeaths}");
 			}
 		}
 
@@ -211,10 +233,12 @@ namespace Nekres.Stream_Out.Core.Services
 		{
 			_commanderIcon?.Dispose();
 			_catmanderIcon?.Dispose();
+			_battleIcon?.Dispose();
 			GameService.Gw2Mumble.get_PlayerCharacter().remove_NameChanged((EventHandler<ValueEventArgs<string>>)OnNameChanged);
 			GameService.Gw2Mumble.get_PlayerCharacter().remove_SpecializationChanged((EventHandler<ValueEventArgs<int>>)OnSpecializationChanged);
 			UseCatmanderTag.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUseCatmanderTagSettingChanged);
 			GameService.Gw2Mumble.get_PlayerCharacter().remove_IsCommanderChanged((EventHandler<ValueEventArgs<bool>>)OnIsCommanderChanged);
+			GameService.Gw2Mumble.get_PlayerCharacter().remove_IsInCombatChanged((EventHandler<ValueEventArgs<bool>>)OnIsInCombatChanged);
 		}
 	}
 }

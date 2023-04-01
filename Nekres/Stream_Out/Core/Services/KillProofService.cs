@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Extended;
 using Blish_HUD.Modules.Managers;
+using Blish_HUD.Settings;
+using Gw2Sharp.WebApi.V2.Models;
 
 namespace Nekres.Stream_Out.Core.Services
 {
@@ -23,7 +25,10 @@ namespace Nekres.Stream_Out.Core.Services
 
 		private ContentsManager ContentsManager => StreamOutModule.Instance?.ContentsManager;
 
-		private string AccountName => StreamOutModule.Instance?.AccountName.get_Value();
+		public KillProofService(SettingCollection settings)
+			: base(settings)
+		{
+		}
 
 		public override async Task Initialize()
 		{
@@ -40,7 +45,12 @@ namespace Nekres.Stream_Out.Core.Services
 
 		private unsafe async Task UpdateKillProofs()
 		{
-			await TaskUtil.GetJsonResponse<object>(string.Format("{0}{1}?lang={2}", "https://killproof.me/api/kp/", AccountName, GameService.Overlay.get_UserLocale().get_Value())).ContinueWith((Func<Task<(bool, object)>, Task>)async delegate(Task<(bool, dynamic)> task)
+			Account account = StreamOutModule.Instance?.Account;
+			if (account == null || string.IsNullOrEmpty(account.get_Name()))
+			{
+				return;
+			}
+			await TaskUtil.GetJsonResponse<object>(string.Format("{0}{1}?lang={2}", "https://killproof.me/api/kp/", account.get_Name(), GameService.Overlay.get_UserLocale().get_Value())).ContinueWith((Func<Task<(bool, object)>, Task>)async delegate(Task<(bool, dynamic)> task)
 			{
 				if (!task.IsFaulted && ((ValueTuple<bool, object>)task.Result).Item1)
 				{
@@ -67,11 +77,11 @@ namespace Nekres.Stream_Out.Core.Services
 									if (awaiter2 == null)
 									{
 										INotifyCompletion awaiter3 = (INotifyCompletion)awaiter;
-										asyncTaskMethodBuilder.AwaitOnCompleted(ref awaiter3, ref *(_003C_003CUpdateKillProofs_003Eb__13_0_003Ed*)/*Error near IL_041c: stateMachine*/);
+										asyncTaskMethodBuilder.AwaitOnCompleted(ref awaiter3, ref *(_003C_003CUpdateKillProofs_003Eb__11_0_003Ed*)/*Error near IL_041c: stateMachine*/);
 									}
 									else
 									{
-										asyncTaskMethodBuilder.AwaitUnsafeOnCompleted(ref awaiter2, ref *(_003C_003CUpdateKillProofs_003Eb__13_0_003Ed*)/*Error near IL_042f: stateMachine*/);
+										asyncTaskMethodBuilder.AwaitUnsafeOnCompleted(ref awaiter2, ref *(_003C_003CUpdateKillProofs_003Eb__11_0_003Ed*)/*Error near IL_042f: stateMachine*/);
 									}
 									/*Error near IL_0438: leave MoveNext - await not detected correctly*/;
 								}
@@ -88,11 +98,11 @@ namespace Nekres.Stream_Out.Core.Services
 									if (awaiter2 == null)
 									{
 										INotifyCompletion awaiter3 = (INotifyCompletion)awaiter;
-										asyncTaskMethodBuilder.AwaitOnCompleted(ref awaiter3, ref *(_003C_003CUpdateKillProofs_003Eb__13_0_003Ed*)/*Error near IL_06d7: stateMachine*/);
+										asyncTaskMethodBuilder.AwaitOnCompleted(ref awaiter3, ref *(_003C_003CUpdateKillProofs_003Eb__11_0_003Ed*)/*Error near IL_06d7: stateMachine*/);
 									}
 									else
 									{
-										asyncTaskMethodBuilder.AwaitUnsafeOnCompleted(ref awaiter2, ref *(_003C_003CUpdateKillProofs_003Eb__13_0_003Ed*)/*Error near IL_06ea: stateMachine*/);
+										asyncTaskMethodBuilder.AwaitUnsafeOnCompleted(ref awaiter2, ref *(_003C_003CUpdateKillProofs_003Eb__11_0_003Ed*)/*Error near IL_06ea: stateMachine*/);
 									}
 									/*Error near IL_06f3: leave MoveNext - await not detected correctly*/;
 								}
@@ -109,11 +119,11 @@ namespace Nekres.Stream_Out.Core.Services
 									if (awaiter2 == null)
 									{
 										INotifyCompletion awaiter3 = (INotifyCompletion)awaiter;
-										asyncTaskMethodBuilder.AwaitOnCompleted(ref awaiter3, ref *(_003C_003CUpdateKillProofs_003Eb__13_0_003Ed*)/*Error near IL_0992: stateMachine*/);
+										asyncTaskMethodBuilder.AwaitOnCompleted(ref awaiter3, ref *(_003C_003CUpdateKillProofs_003Eb__11_0_003Ed*)/*Error near IL_0992: stateMachine*/);
 									}
 									else
 									{
-										asyncTaskMethodBuilder.AwaitUnsafeOnCompleted(ref awaiter2, ref *(_003C_003CUpdateKillProofs_003Eb__13_0_003Ed*)/*Error near IL_09a5: stateMachine*/);
+										asyncTaskMethodBuilder.AwaitUnsafeOnCompleted(ref awaiter2, ref *(_003C_003CUpdateKillProofs_003Eb__11_0_003Ed*)/*Error near IL_09a5: stateMachine*/);
 									}
 									/*Error near IL_09ae: leave MoveNext - await not detected correctly*/;
 								}

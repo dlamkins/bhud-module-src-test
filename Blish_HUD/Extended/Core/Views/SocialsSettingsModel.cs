@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Blish_HUD.Graphics;
 using Blish_HUD.Settings;
@@ -16,22 +15,14 @@ namespace Blish_HUD.Extended.Core.Views
 	{
 		public enum SocialType
 		{
-			[EnumMember(Value = "kofi")]
-			KoFi,
-			[EnumMember(Value = "discord")]
-			Discord,
-			[EnumMember(Value = "github")]
-			GitHub,
-			[EnumMember(Value = "instagram")]
-			Instagram,
-			[EnumMember(Value = "patreon")]
-			Patreon,
-			[EnumMember(Value = "twitch")]
-			Twitch,
-			[EnumMember(Value = "twitter")]
-			Twitter,
-			[EnumMember(Value = "youtube")]
-			YouTube
+			KOFI,
+			DISCORD,
+			GITHUB,
+			INSTAGRAM,
+			PATREON,
+			TWITCH,
+			TWITTER,
+			YOUTUBE
 		}
 
 		private sealed class Social

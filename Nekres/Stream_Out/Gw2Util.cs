@@ -186,5 +186,12 @@ namespace Nekres.Stream_Out
 			DateTime nextDay = DateTime.UtcNow.AddDays(1.0);
 			return new DateTime(nextDay.Year, nextDay.Month, nextDay.Day, 2, 0, 0).ToUniversalTime();
 		}
+
+		public static DateTime GetWeeklyResetTime()
+		{
+			DateTime currTime = DateTime.UtcNow;
+			DateTime nextWeek = currTime.AddDays((int)(1 - currTime.DayOfWeek + 7) % 7);
+			return new DateTime(nextWeek.Year, nextWeek.Month, nextWeek.Day, 2, 0, 0).ToUniversalTime();
+		}
 	}
 }
