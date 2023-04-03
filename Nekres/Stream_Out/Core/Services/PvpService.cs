@@ -69,7 +69,7 @@ namespace Nekres.Stream_Out.Core.Services
 				return -1;
 			}
 			IApiV2ObjectList<AccountAchievement> achievements = await TaskUtil.RetryAsync(() => ((IBlobClient<IApiV2ObjectList<AccountAchievement>>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
-				.get_Achievements()).GetAsync(default(CancellationToken))).Unwrap();
+				.get_Achievements()).GetAsync(default(CancellationToken)));
 			if (achievements == null)
 			{
 				return -1;
@@ -89,14 +89,14 @@ namespace Nekres.Stream_Out.Core.Services
 				return;
 			}
 			IApiV2ObjectList<PvpSeason> seasons = await TaskUtil.RetryAsync(() => ((IAllExpandableClient<PvpSeason>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Pvp()
-				.get_Seasons()).AllAsync(default(CancellationToken))).Unwrap();
+				.get_Seasons()).AllAsync(default(CancellationToken)));
 			if (seasons == null)
 			{
 				return;
 			}
 			PvpSeason season = ((IEnumerable<PvpSeason>)seasons).OrderByDescending((PvpSeason x) => x.get_End()).First();
 			PvpStanding standing = ((IEnumerable<PvpStanding>)(await TaskUtil.RetryAsync(() => ((IBlobClient<ApiV2BaseObjectList<PvpStanding>>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Pvp()
-				.get_Standings()).GetAsync(default(CancellationToken))).Unwrap()))?.FirstOrDefault((PvpStanding x) => x.get_SeasonId().Equals(season.get_Id()));
+				.get_Standings()).GetAsync(default(CancellationToken)))))?.FirstOrDefault((PvpStanding x) => x.get_SeasonId().Equals(season.get_Id()));
 			if (standing == null || !standing.get_Current().get_Rating().HasValue)
 			{
 				return;
@@ -156,7 +156,7 @@ namespace Nekres.Stream_Out.Core.Services
 				return;
 			}
 			PvpStats stats = await TaskUtil.RetryAsync(() => ((IBlobClient<PvpStats>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Pvp()
-				.get_Stats()).GetAsync(default(CancellationToken))).Unwrap();
+				.get_Stats()).GetAsync(default(CancellationToken)));
 			if (stats != null)
 			{
 				KeyValuePair<string, PvpStatsAggregate>[] source = (from x in stats.get_Ladders()

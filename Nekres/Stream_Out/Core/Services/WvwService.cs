@@ -72,7 +72,7 @@ namespace Nekres.Stream_Out.Core.Services
 				return;
 			}
 			IApiV2ObjectList<WvwRank> wvwRanks = await TaskUtil.RetryAsync(() => ((IAllExpandableClient<WvwRank>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Wvw()
-				.get_Ranks()).AllAsync(default(CancellationToken))).Unwrap();
+				.get_Ranks()).AllAsync(default(CancellationToken)));
 			if (wvwRanks != null)
 			{
 				WvwRank wvwRankObj = ((IEnumerable<WvwRank>)wvwRanks).MaxBy((WvwRank y) => wvwRankNum >= y.get_MinRank());
@@ -91,7 +91,7 @@ namespace Nekres.Stream_Out.Core.Services
 				return -1;
 			}
 			IApiV2ObjectList<AccountAchievement> achievements = await TaskUtil.RetryAsync(() => ((IBlobClient<IApiV2ObjectList<AccountAchievement>>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
-				.get_Achievements()).GetAsync(default(CancellationToken))).Unwrap();
+				.get_Achievements()).GetAsync(default(CancellationToken)));
 			if (achievements == null)
 			{
 				return -1;
@@ -106,7 +106,7 @@ namespace Nekres.Stream_Out.Core.Services
 			{
 				WvwMatch wvwWorldMatch = await TaskUtil.RetryAsync(() => ((IBlobClient<WvwMatch>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Wvw()
 					.get_Matches()
-					.World(worldId)).GetAsync(default(CancellationToken))).Unwrap();
+					.World(worldId)).GetAsync(default(CancellationToken)));
 				if (wvwWorldMatch == null)
 				{
 					return false;

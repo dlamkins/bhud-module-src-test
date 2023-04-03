@@ -141,7 +141,7 @@ namespace Nekres.Stream_Out
 			HasSubToken = true;
 			if (Gw2ApiManager.HasPermission((TokenPermission)1))
 			{
-				Account = await TaskUtil.RetryAsync(() => ((IBlobClient<Account>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()).GetAsync(default(CancellationToken))).Unwrap();
+				Account = await TaskUtil.RetryAsync(() => ((IBlobClient<Account>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()).GetAsync(default(CancellationToken)));
 			}
 		}
 

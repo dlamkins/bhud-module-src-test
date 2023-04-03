@@ -41,7 +41,7 @@ namespace Nekres.Stream_Out.Core.Services
 				.get_Item(regionId)
 				.get_Maps()
 				.get_Item(mapId)
-				.get_Sectors()).AllAsync(default(CancellationToken))).Unwrap());
+				.get_Sectors()).AllAsync(default(CancellationToken))));
 		}
 
 		private async void OnMapChanged(object o, ValueEventArgs<int> e)
@@ -52,7 +52,7 @@ namespace Nekres.Stream_Out.Core.Services
 				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/map_type.txt", string.Empty);
 				return;
 			}
-			Map map = await TaskUtil.RetryAsync(() => ((IBulkExpandableClient<Map, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Maps()).GetAsync(e.get_Value(), default(CancellationToken))).Unwrap();
+			Map map = await TaskUtil.RetryAsync(() => ((IBulkExpandableClient<Map, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Maps()).GetAsync(e.get_Value(), default(CancellationToken)));
 			if (map == null)
 			{
 				await FileUtil.WriteAllTextAsync(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/map_name.txt", string.Empty);

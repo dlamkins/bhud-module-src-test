@@ -54,7 +54,7 @@ namespace Nekres.Stream_Out.Core.Services
 			}
 			CharactersCore obj = await TaskUtil.RetryAsync(() => ((IBlobClient<CharactersCore>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Characters()
 				.get_Item(GameService.Gw2Mumble.get_PlayerCharacter().get_Name())
-				.get_Core()).GetAsync(default(CancellationToken))).Unwrap();
+				.get_Core()).GetAsync(default(CancellationToken)));
 			Guid guildId = ((obj != null) ? obj.get_Guild() : Guid.Empty);
 			if (guildId.Equals(Guid.Empty))
 			{
@@ -83,9 +83,9 @@ namespace Nekres.Stream_Out.Core.Services
 					else
 					{
 						Emblem bg = await TaskUtil.RetryAsync(() => ((IBulkExpandableClient<Emblem, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Emblem()
-							.get_Backgrounds()).GetAsync(emblem.get_Background().get_Id(), default(CancellationToken))).Unwrap();
+							.get_Backgrounds()).GetAsync(emblem.get_Background().get_Id(), default(CancellationToken)));
 						Emblem fg = await TaskUtil.RetryAsync(() => ((IBulkExpandableClient<Emblem, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Emblem()
-							.get_Foregrounds()).GetAsync(emblem.get_Foreground().get_Id(), default(CancellationToken))).Unwrap();
+							.get_Foregrounds()).GetAsync(emblem.get_Foreground().get_Id(), default(CancellationToken)));
 						List<RenderUrl> layersCombined = new List<RenderUrl>();
 						if (bg != null)
 						{
@@ -115,7 +115,7 @@ namespace Nekres.Stream_Out.Core.Services
 							List<Color> colors = new List<Color>();
 							foreach (int colorId in colorsCombined)
 							{
-								Color color = await TaskUtil.RetryAsync(() => ((IBulkExpandableClient<Color, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Colors()).GetAsync(colorId, default(CancellationToken))).Unwrap();
+								Color color = await TaskUtil.RetryAsync(() => ((IBulkExpandableClient<Color, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Colors()).GetAsync(colorId, default(CancellationToken)));
 								if (color == null)
 								{
 									return;

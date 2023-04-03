@@ -49,7 +49,7 @@ namespace Nekres.Stream_Out.Core.Services
 				return;
 			}
 			IApiV2ObjectList<AccountCurrency> wallet = await TaskUtil.RetryAsync(() => ((IBlobClient<IApiV2ObjectList<AccountCurrency>>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
-				.get_Wallet()).GetAsync(default(CancellationToken))).Unwrap();
+				.get_Wallet()).GetAsync(default(CancellationToken)));
 			if (wallet != null)
 			{
 				AccountCurrency obj = ((IEnumerable<AccountCurrency>)wallet).FirstOrDefault((AccountCurrency x) => x.get_Id() == 1);

@@ -110,7 +110,7 @@ namespace Nekres.Stream_Out.Core.Services
 				await TextureUtil.ClearImage(DirectoriesManager.GetFullDirectoryPath("stream_out") + "/profession_icon.png");
 				return;
 			}
-			Specialization specialization = await TaskUtil.RetryAsync(() => ((IBulkExpandableClient<Specialization, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Specializations()).GetAsync(e.get_Value(), default(CancellationToken))).Unwrap();
+			Specialization specialization = await TaskUtil.RetryAsync(() => ((IBulkExpandableClient<Specialization, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Specializations()).GetAsync(e.get_Value(), default(CancellationToken)));
 			if (specialization == null)
 			{
 				return;
@@ -124,7 +124,7 @@ namespace Nekres.Stream_Out.Core.Services
 			}
 			else
 			{
-				Profession profession = await TaskUtil.RetryAsync(() => ((IBulkAliasExpandableClient<Profession, ProfessionType>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Professions()).GetAsync(GameService.Gw2Mumble.get_PlayerCharacter().get_Profession(), default(CancellationToken))).Unwrap();
+				Profession profession = await TaskUtil.RetryAsync(() => ((IBulkAliasExpandableClient<Profession, ProfessionType>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Professions()).GetAsync(GameService.Gw2Mumble.get_PlayerCharacter().get_Profession(), default(CancellationToken)));
 				if (profession == null)
 				{
 					return;
@@ -172,7 +172,7 @@ namespace Nekres.Stream_Out.Core.Services
 			{
 				return -1;
 			}
-			return ((IEnumerable<Character>)(await TaskUtil.RetryAsync(() => ((IAllExpandableClient<Character>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Characters()).AllAsync(default(CancellationToken))).Unwrap()))?.Sum((Character x) => x.get_Deaths()) ?? (-1);
+			return ((IEnumerable<Character>)(await TaskUtil.RetryAsync(() => ((IAllExpandableClient<Character>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Characters()).AllAsync(default(CancellationToken)))))?.Sum((Character x) => x.get_Deaths()) ?? (-1);
 		}
 
 		protected override async Task<bool> ResetDaily()
