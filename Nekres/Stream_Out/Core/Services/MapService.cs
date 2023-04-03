@@ -62,7 +62,7 @@ namespace Nekres.Stream_Out.Core.Services
 			string location = map.get_Name();
 			if (map.get_Name().Equals(map.get_RegionName(), StringComparison.InvariantCultureIgnoreCase))
 			{
-				ContinentFloorRegionMapSector defaultSector = (await RequestSectors(map.get_ContinentId(), map.get_DefaultFloor(), map.get_RegionId(), map.get_Id())).FirstOrDefault();
+				ContinentFloorRegionMapSector defaultSector = (await RequestSectors(map.get_ContinentId(), map.get_DefaultFloor(), map.get_RegionId(), map.get_Id()))?.FirstOrDefault();
 				if (defaultSector != null && !string.IsNullOrEmpty(defaultSector.get_Name()))
 				{
 					location = defaultSector.get_Name().Replace("<br>", " ");
