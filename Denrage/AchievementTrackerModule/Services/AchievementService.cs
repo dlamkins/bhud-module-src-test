@@ -12,6 +12,7 @@ using Blish_HUD.Modules.Managers;
 using Denrage.AchievementTrackerModule.Interfaces;
 using Denrage.AchievementTrackerModule.Libs.Achievement;
 using Flurl.Http;
+using Gw2Sharp.WebApi;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
@@ -45,6 +46,8 @@ namespace Denrage.AchievementTrackerModule.Services
 		private readonly DirectoriesManager directoriesManager;
 
 		private readonly Func<IPersistanceService> getPersistanceService;
+
+		private readonly ITextureService textureService;
 
 		private Task trackAchievementProgressTask;
 
@@ -192,13 +195,14 @@ namespace Denrage.AchievementTrackerModule.Services
 
 		public event Action ApiAchievementsLoaded;
 
-		public AchievementService(ContentsManager contentsManager, Gw2ApiManager gw2ApiManager, Logger logger, DirectoriesManager directoriesManager, Func<IPersistanceService> getPersistanceService)
+		public AchievementService(ContentsManager contentsManager, Gw2ApiManager gw2ApiManager, Logger logger, DirectoriesManager directoriesManager, Func<IPersistanceService> getPersistanceService, ITextureService textureService)
 		{
 			this.contentsManager = contentsManager;
 			this.gw2ApiManager = gw2ApiManager;
 			this.logger = logger;
 			this.directoriesManager = directoriesManager;
 			this.getPersistanceService = getPersistanceService;
+			this.textureService = textureService;
 		}
 
 		public void ToggleManualCompleteStatus(int achievementId, int bit)
@@ -303,6 +307,10 @@ namespace Denrage.AchievementTrackerModule.Services
 					.get_Groups()).AllAsync(cancellationToken));
 				AchievementCategories = (IEnumerable<AchievementCategory>)(await ((IAllExpandableClient<AchievementCategory>)(object)gw2ApiManager.get_Gw2ApiClient().get_V2().get_Achievements()
 					.get_Categories()).AllAsync(cancellationToken));
+				foreach (AchievementCategory category in AchievementCategories)
+				{
+					textureService.GetTexture(RenderUrl.op_Implicit(category.get_Icon()));
+				}
 				logger.Info("Finished getting achievement data from api");
 				this.ApiAchievementsLoaded?.Invoke();
 			}

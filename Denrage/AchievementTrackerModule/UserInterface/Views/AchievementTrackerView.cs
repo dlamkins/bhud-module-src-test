@@ -8,6 +8,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Denrage.AchievementTrackerModule.Interfaces;
 using Denrage.AchievementTrackerModule.Libs.Achievement;
+using Gw2Sharp.WebApi;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -21,6 +22,8 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Views
 		private readonly IAchievementItemOverviewFactory achievementItemOverviewFactory;
 
 		private readonly IAchievementService achievementService;
+
+		private readonly ITextureService textureService;
 
 		private readonly IDictionary<MenuItem, AchievementCategory> menuItemCategories;
 
@@ -38,11 +41,12 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Views
 
 		private Dictionary<int, AchievementCategory> categories;
 
-		public AchievementTrackerView(IAchievementItemOverviewFactory achievementItemOverviewFactory, IAchievementService achievementService)
+		public AchievementTrackerView(IAchievementItemOverviewFactory achievementItemOverviewFactory, IAchievementService achievementService, ITextureService textureService)
 			: this()
 		{
 			this.achievementItemOverviewFactory = achievementItemOverviewFactory;
 			this.achievementService = achievementService;
+			this.textureService = textureService;
 			menuItemCategories = new Dictionary<MenuItem, AchievementCategory>();
 		}
 
@@ -155,9 +159,10 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Views
 
 		private void InitializeAchievementElements()
 		{
-			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0108: Expected O, but got Unknown
+			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011f: Expected O, but got Unknown
 			categories = achievementService.AchievementCategories.ToDictionary((AchievementCategory x) => x.get_Id(), (AchievementCategory y) => y);
 			foreach (AchievementGroup group in achievementService.AchievementGroups.OrderBy((AchievementGroup x) => x.get_Order()))
 			{
@@ -167,7 +172,7 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Views
 					orderby x.get_Order()
 					select x)
 				{
-					MenuItem val = new MenuItem(category.get_Name());
+					MenuItem val = new MenuItem(category.get_Name(), textureService.GetTexture(RenderUrl.op_Implicit(category.get_Icon())));
 					((Control)val).set_Parent((Container)(object)menuItem);
 					MenuItem innerMenuItem = val;
 					innerMenuItem.add_ItemSelected((EventHandler<ControlActivatedEventArgs>)delegate(object sender, ControlActivatedEventArgs e)

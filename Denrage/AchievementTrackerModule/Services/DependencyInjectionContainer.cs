@@ -34,6 +34,8 @@ namespace Denrage.AchievementTrackerModule.Services
 
 		public IAchievementService AchievementService { get; set; }
 
+		public ITextureService TextureService { get; set; }
+
 		public IPersistanceService PersistanceService { get; private set; }
 
 		public IAchievementControlProvider AchievementControlProvider { get; set; }
@@ -67,11 +69,12 @@ namespace Denrage.AchievementTrackerModule.Services
 		public async Task InitializeAsync(SettingEntry<bool> autoSave, SettingEntry<bool> limitAchievement, CancellationToken cancellationToken = default(CancellationToken))
 		{
 			ExternalImageService = new ExternalImageService(graphicsService, logger);
-			AchievementService achievementService = (AchievementService)(AchievementService = new AchievementService(contentsManager, gw2ApiManager, logger, directoriesManager, () => PersistanceService));
+			TextureService = new TextureService(contentService, contentsManager);
+			AchievementService achievementService = (AchievementService)(AchievementService = new AchievementService(contentsManager, gw2ApiManager, logger, directoriesManager, () => PersistanceService, TextureService));
 			SubPageInformationWindowManager = new SubPageInformationWindowManager(graphicsService, contentsManager, AchievementService, () => FormattedLabelHtmlService, ExternalImageService);
 			FormattedLabelHtmlService = new FormattedLabelHtmlService(contentsManager, AchievementService, SubPageInformationWindowManager, ExternalImageService);
 			AchievementTrackerService achievementTrackerService = (AchievementTrackerService)(AchievementTrackerService = new AchievementTrackerService(logger, limitAchievement));
-			AchievementListItemFactory = new AchievementListItemFactory(AchievementTrackerService, contentService, AchievementService);
+			AchievementListItemFactory = new AchievementListItemFactory(AchievementTrackerService, contentService, AchievementService, TextureService);
 			AchievementItemOverviewFactory = new AchievementItemOverviewFactory(AchievementListItemFactory, AchievementService);
 			AchievementTableEntryProvider = new AchievementTableEntryProvider(FormattedLabelHtmlService, ExternalImageService, logger, gw2ApiManager, contentsManager);
 			ItemDetailWindowFactory = new ItemDetailWindowFactory(contentsManager, AchievementService, AchievementTableEntryProvider, SubPageInformationWindowManager);

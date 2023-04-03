@@ -13,16 +13,19 @@ namespace Denrage.AchievementTrackerModule.Services.Factories
 
 		private readonly IAchievementService achievementService;
 
-		public AchievementListItemFactory(IAchievementTrackerService achievementTrackerService, ContentService contentService, IAchievementService achievementService)
+		private readonly ITextureService textureService;
+
+		public AchievementListItemFactory(IAchievementTrackerService achievementTrackerService, ContentService contentService, IAchievementService achievementService, ITextureService textureService)
 		{
 			this.achievementTrackerService = achievementTrackerService;
 			this.contentService = contentService;
 			this.achievementService = achievementService;
+			this.textureService = textureService;
 		}
 
 		public AchievementListItem Create(AchievementTableEntry achievement, string icon)
 		{
-			return new AchievementListItem(achievement, achievementTrackerService, achievementService, contentService, icon);
+			return new AchievementListItem(achievement, achievementTrackerService, achievementService, contentService, textureService, icon);
 		}
 	}
 }

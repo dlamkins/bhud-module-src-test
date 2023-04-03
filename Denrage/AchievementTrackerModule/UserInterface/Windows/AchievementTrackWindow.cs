@@ -174,7 +174,7 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Windows
 			((Control)val2).set_Parent((Container)(object)panel);
 			((Control)val2).set_Width(32);
 			((Control)val2).set_Height(32);
-			val2.set_Texture(AsyncTexture2D.op_Implicit(contentsManager.GetTexture("605019.png")));
+			val2.set_Texture(AsyncTexture2D.op_Implicit(contentsManager.GetTexture("track_enabled.png")));
 			Image trackButton = val2;
 			((Control)trackButton).set_Location(new Point(((Container)panel).get_ContentRegion().Width - ((Control)trackButton).get_Width(), 0));
 			((Control)trackButton).add_Click((EventHandler<MouseEventArgs>)delegate
@@ -318,7 +318,7 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Windows
 			//IL_022f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_023b: Expected O, but got Unknown
 			((WindowBase2)this).set_Title("Tracked");
-			((WindowBase2)this).set_Emblem(contentsManager.GetTexture("605019.png"));
+			((WindowBase2)this).set_Emblem(contentsManager.GetTexture("track_enabled.png"));
 			((WindowBase2)this).ConstructWindow(texture, new Rectangle(0, 0, 350, 600), new Rectangle(0, 30, 350, 570));
 			StandardButton val = new StandardButton();
 			val.set_Text("Collapse All");

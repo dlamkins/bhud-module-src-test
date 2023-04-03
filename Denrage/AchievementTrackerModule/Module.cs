@@ -81,7 +81,7 @@ namespace Denrage.AchievementTrackerModule
 		{
 			Task.Run(async delegate
 			{
-				achievementOverviewView = () => (IView)(object)new AchievementTrackerView(dependencyInjectionContainer.AchievementItemOverviewFactory, dependencyInjectionContainer.AchievementService);
+				achievementOverviewView = () => (IView)(object)new AchievementTrackerView(dependencyInjectionContainer.AchievementItemOverviewFactory, dependencyInjectionContainer.AchievementService, dependencyInjectionContainer.TextureService);
 				await Task.Delay(TimeSpan.FromSeconds(3.0));
 				await dependencyInjectionContainer.InitializeAsync(autoSave, limitAchievements);
 				dependencyInjectionContainer.AchievementTrackerService.AchievementTracked += AchievementTrackerService_AchievementTracked;
@@ -198,6 +198,7 @@ namespace Denrage.AchievementTrackerModule
 			{
 				((Control)achievementTrackWindow3).Dispose();
 			}
+			dependencyInjectionContainer.TextureService?.Dispose();
 		}
 
 		private void SavePersistentInformation()

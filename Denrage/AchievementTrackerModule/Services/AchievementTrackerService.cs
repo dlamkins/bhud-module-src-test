@@ -41,6 +41,15 @@ namespace Denrage.AchievementTrackerModule.Services
 			return false;
 		}
 
+		public bool IsBeingTracked(int achievement)
+		{
+			if (!limitAchievement.get_Value() || activeAchievements.Count <= 15)
+			{
+				return activeAchievements.Contains(achievement);
+			}
+			return false;
+		}
+
 		public void RemoveAchievement(int achievement)
 		{
 			activeAchievements.Remove(achievement);
