@@ -2,12 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Modules.Managers;
+using Blish_HUD.Settings;
 using Estreya.BlishHUD.EventTable.State;
+using Estreya.BlishHUD.Shared.Controls;
 using Estreya.BlishHUD.Shared.State;
 using Estreya.BlishHUD.Shared.UI.Views;
 using Microsoft.Xna.Framework;
@@ -34,7 +37,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 		protected override void BuildView(FlowPanel parent)
 		{
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.ShowDynamicEventsOnMap);
-			RenderBoolSetting((Panel)(object)parent, _moduleSettings.ShowDynamicEventInWorld);
+			RenderBoolSetting((Panel)(object)parent, _moduleSettings.ShowDynamicEventInWorld, async (bool oldVal, bool newVal) => !newVal || await new ConfirmDialog("Activate \"" + ((SettingEntry)_moduleSettings.ShowDynamicEventInWorld).get_DisplayName() + "\"?", "You are in the process of activating \"" + ((SettingEntry)_moduleSettings.ShowDynamicEventInWorld).get_DisplayName() + "\".\nThis setting will add event boundaries inside your view (only when applicable events are on your map).\n\nDo you want to continue?", base.IconState).ShowDialog() == DialogResult.OK);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.ShowDynamicEventsInWorldOnlyWhenInside);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.IgnoreZAxisOnDynamicEventsInWorld);
 			RenderIntSetting((Panel)(object)parent, _moduleSettings.DynamicEventsRenderDistance);
@@ -78,7 +81,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			});
 		}
 
-		private void ManageView_EventChanged(object sender, EventChangedArgs e)
+		private void ManageView_EventChanged(object sender, ManageEventsView.EventChangedArgs e)
 		{
 			_moduleSettings.DisabledDynamicEventIds.set_Value(e.NewState ? new List<string>(from s in _moduleSettings.DisabledDynamicEventIds.get_Value()
 				where s != e.EventSettingKey

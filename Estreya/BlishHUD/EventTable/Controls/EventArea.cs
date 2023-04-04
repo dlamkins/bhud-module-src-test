@@ -67,6 +67,8 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private readonly Func<Version> _getVersion;
 
+		private readonly Func<string> _getAccessToken;
+
 		private AsyncLock _eventLock = new AsyncLock();
 
 		private List<EventCategory> _allEvents = new List<EventCategory>();
@@ -123,7 +125,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		public EventAreaConfiguration Configuration { get; private set; }
 
-		public EventArea(EventAreaConfiguration configuration, IconState iconState, TranslationState translationState, EventState eventState, WorldbossState worldbossState, MapchestState mapchestState, PointOfInterestState pointOfInterestState, MapUtil mapUtil, IFlurlClient flurlClient, string apiRootUrl, Func<DateTime> getNowAction, Func<Version> getVersion)
+		public EventArea(EventAreaConfiguration configuration, IconState iconState, TranslationState translationState, EventState eventState, WorldbossState worldbossState, MapchestState mapchestState, PointOfInterestState pointOfInterestState, MapUtil mapUtil, IFlurlClient flurlClient, string apiRootUrl, Func<DateTime> getNowAction, Func<Version> getVersion, Func<string> getAccessToken)
 		{
 			Configuration = configuration;
 			Configuration.EnabledKeybinding.get_Value().add_Activated((EventHandler<EventArgs>)EnabledKeybinding_Activated);
@@ -150,6 +152,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			DrawInterval_SettingChanged(this, new ValueChangedEventArgs<DrawInterval>(Estreya.BlishHUD.EventTable.Models.DrawInterval.INSTANT, Configuration.DrawInterval.get_Value()));
 			_getNowAction = getNowAction;
 			_getVersion = getVersion;
+			_getAccessToken = getAccessToken;
 			_iconState = iconState;
 			_translationState = translationState;
 			_eventState = eventState;
@@ -438,7 +441,14 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				{
 					return new ConcurrentDictionary<string, List<Estreya.BlishHUD.EventTable.Models.Event>>();
 				}
+				Logger.Info("Load fillers...");
 				IFlurlRequest flurlRequest = _flurlClient.Request(_apiRootUrl, "fillers");
+				string accessToken = _getAccessToken();
+				if (!string.IsNullOrWhiteSpace(accessToken))
+				{
+					Logger.Info("Include custom event fillers...");
+					flurlRequest.WithOAuthBearerToken(accessToken);
+				}
 				List<Estreya.BlishHUD.EventTable.Models.Event> activeEvents = new List<Estreya.BlishHUD.EventTable.Models.Event>();
 				using (_eventLock.Lock())
 				{
@@ -655,29 +665,51 @@ namespace Estreya.BlishHUD.EventTable.Controls
 						{
 							continue;
 						}
-						Event newEventControl = new Event(ev2, _iconState, _translationState, _getNowAction, occurence, occurence.AddMinutes(ev2.Duration), () => _fonts.GetOrAdd(Configuration.FontSize.get_Value(), (Func<FontSize, BitmapFont>)((FontSize fontSize) => GameService.Content.GetFont((FontFace)0, fontSize, (FontStyle)0))), () => !ev2.Filler && Configuration.DrawBorders.get_Value(), () => _eventState.Contains(Configuration.Name, ev2.SettingKey, EventState.EventStates.Completed), delegate
+						Event newEventControl = new Event(ev2, _iconState, _translationState, _getNowAction, occurence, occurence.AddMinutes(ev2.Duration), () => _fonts.GetOrAdd(Configuration.FontSize.get_Value(), (Func<FontSize, BitmapFont>)((FontSize fontSize) => GameService.Content.GetFont((FontFace)0, fontSize, (FontStyle)0))), () => !ev2.Filler && Configuration.DrawBorders.get_Value(), delegate
+						{
+							EventCompletedAction value4 = Configuration.CompletionAction.get_Value();
+							return (value4 == EventCompletedAction.Crossout || value4 == EventCompletedAction.CrossoutAndChangeOpacity) && _eventState.Contains(Configuration.Name, ev2.SettingKey, EventState.EventStates.Completed);
+						}, delegate
 						{
 							//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 							//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-							//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-							//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-							//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-							//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-							//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-							//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+							//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+							//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+							//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+							//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+							//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+							//IL_0203: Unknown result type (might be due to invalid IL or missing references)
+							//IL_0205: Unknown result type (might be due to invalid IL or missing references)
 							Color black = Color.get_Black();
-							return (!ev2.Filler) ? (((Configuration.TextColor.get_Value().get_Id() == 1) ? black : ColorExtensions.ToXnaColor(Configuration.TextColor.get_Value().get_Cloth())) * Configuration.EventTextOpacity.get_Value()) : (((Configuration.FillerTextColor.get_Value().get_Id() == 1) ? black : ColorExtensions.ToXnaColor(Configuration.FillerTextColor.get_Value().get_Cloth())) * Configuration.FillerTextOpacity.get_Value());
+							Color val = ((!ev2.Filler) ? ((Configuration.TextColor.get_Value().get_Id() == 1) ? black : ColorExtensions.ToXnaColor(Configuration.TextColor.get_Value().get_Cloth())) : ((Configuration.FillerTextColor.get_Value().get_Id() == 1) ? black : ColorExtensions.ToXnaColor(Configuration.FillerTextColor.get_Value().get_Cloth())));
+							float num2 = (ev2.Filler ? Configuration.FillerTextOpacity.get_Value() : Configuration.EventTextOpacity.get_Value());
+							EventCompletedAction value3 = Configuration.CompletionAction.get_Value();
+							if ((value3 == EventCompletedAction.ChangeOpacity || value3 == EventCompletedAction.CrossoutAndChangeOpacity) && _eventState.Contains(Configuration.Name, ev2.SettingKey, EventState.EventStates.Completed))
+							{
+								if (Configuration.CompletedEventsInvertTextColor.get_Value())
+								{
+									((Color)(ref val))._002Ector(((Color)(ref val)).get_PackedValue() ^ 0xFFFFFFu);
+								}
+								num2 = Configuration.CompletedEventsTextOpacity.get_Value();
+							}
+							return val * num2;
 						}, delegate
 						{
 							//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-							//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-							//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+							//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+							//IL_011b: Unknown result type (might be due to invalid IL or missing references)
 							if (ev2.Filler)
 							{
 								return Color.get_Transparent();
 							}
+							float value = Configuration.EventBackgroundOpacity.get_Value();
+							EventCompletedAction value2 = Configuration.CompletionAction.get_Value();
+							if ((value2 == EventCompletedAction.ChangeOpacity || value2 == EventCompletedAction.CrossoutAndChangeOpacity) && _eventState.Contains(Configuration.Name, ev2.SettingKey, EventState.EventStates.Completed))
+							{
+								value = Configuration.CompletedEventsBackgroundOpacity.get_Value();
+							}
 							Color color = (string.IsNullOrWhiteSpace(ev2.BackgroundColorCode) ? Color.White : ColorTranslator.FromHtml(ev2.BackgroundColorCode));
-							return new Color((int)color.R, (int)color.G, (int)color.B) * Configuration.EventBackgroundOpacity.get_Value();
+							return new Color((int)color.R, (int)color.G, (int)color.B) * value;
 						}, () => (!ev2.Filler) ? Configuration.DrawShadows.get_Value() : Configuration.DrawShadowsForFiller.get_Value(), () => (!ev2.Filler) ? (((Configuration.ShadowColor.get_Value().get_Id() == 1) ? Color.get_Black() : ColorExtensions.ToXnaColor(Configuration.ShadowColor.get_Value().get_Cloth())) * Configuration.ShadowOpacity.get_Value()) : (((Configuration.FillerShadowColor.get_Value().get_Id() == 1) ? Color.get_Black() : ColorExtensions.ToXnaColor(Configuration.FillerShadowColor.get_Value().get_Cloth())) * Configuration.FillerShadowOpacity.get_Value()));
 						AddEventHooks(newEventControl);
 						Logger.Debug($"Added event {ev2.Name} with occurence {occurence}");
@@ -800,9 +832,10 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private void FinishEvent(Estreya.BlishHUD.EventTable.Models.Event ev, DateTime until)
 		{
-			switch (Configuration.CompletionAcion.get_Value())
+			switch (Configuration.CompletionAction.get_Value())
 			{
 			case EventCompletedAction.Crossout:
+			case EventCompletedAction.ChangeOpacity:
 				_eventState.Add(Configuration.Name, ev.SettingKey, until, EventState.EventStates.Completed);
 				break;
 			case EventCompletedAction.Hide:

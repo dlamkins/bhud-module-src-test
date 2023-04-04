@@ -35,7 +35,9 @@ namespace Estreya.BlishHUD.EventTable
 
 		public SettingEntry<float> ReminderOpacity { get; private set; }
 
-		public SettingEntry<List<string>> ReminderDisabledForEvents { get; set; }
+		public SettingEntry<List<string>> ReminderDisabledForEvents { get; private set; }
+
+		public SettingEntry<Dictionary<string, List<TimeSpan>>> ReminderTimesOverride { get; private set; }
 
 		public SettingEntry<bool> ShowDynamicEventsOnMap { get; private set; }
 
@@ -81,6 +83,7 @@ namespace Estreya.BlishHUD.EventTable
 			ReminderDuration = base.GlobalSettings.DefineSetting<float>("ReminderDuration", 5f, (Func<string>)(() => "Reminder Duration"), (Func<string>)(() => "Defines the reminder duration."));
 			SettingComplianceExtensions.SetRange(ReminderDuration, (float)reminderDurationMin, (float)reminderDurationMax);
 			ReminderDisabledForEvents = base.GlobalSettings.DefineSetting<List<string>>("ReminderDisabledForEvents", new List<string>(), (Func<string>)(() => "Reminder disabled for Events"), (Func<string>)(() => "Defines the events for which NO reminder should be displayed."));
+			ReminderTimesOverride = base.GlobalSettings.DefineSetting<Dictionary<string, List<TimeSpan>>>("ReminderTimesOverride", new Dictionary<string, List<TimeSpan>>(), (Func<string>)(() => "Reminder Times Override"), (Func<string>)(() => "Defines the overridden times for reminders per event."));
 			ReminderOpacity = base.GlobalSettings.DefineSetting<float>("ReminderOpacity", 0.5f, (Func<string>)(() => "Reminder Opacity"), (Func<string>)(() => "Defines the background opacity for reminders."));
 			SettingComplianceExtensions.SetRange(ReminderOpacity, 0.1f, 1f);
 			ShowDynamicEventsOnMap = base.GlobalSettings.DefineSetting<bool>("ShowDynamicEventsOnMap", false, (Func<string>)(() => "Show Dynamic Events on Map"), (Func<string>)(() => "Whether the dynamic events of the map should be shown."));
@@ -176,6 +179,11 @@ namespace Estreya.BlishHUD.EventTable
 			SettingComplianceExtensions.SetRange(shadowOpacity, 0.1f, 1f);
 			SettingEntry<float> fillerShadowOpacity = base.DrawerSettings.DefineSetting<float>(name + "-fillerShadowOpacity", 1f, (Func<string>)(() => "Filler Shadow Opacity"), (Func<string>)(() => "Defines the opacity for filler shadows."));
 			SettingComplianceExtensions.SetRange(fillerShadowOpacity, 0.1f, 1f);
+			SettingEntry<float> completedEventsBackgroundOpacity = base.DrawerSettings.DefineSetting<float>(name + "-completedEventsBackgroundOpacity", 0.5f, (Func<string>)(() => "Completed Events Background Opacity"), (Func<string>)(() => "Defines the background opacity of completed events. Only works in combination with CompletionAction = Change Opacity"));
+			SettingComplianceExtensions.SetRange(completedEventsBackgroundOpacity, 0.1f, 0.9f);
+			SettingEntry<float> completedEventsTextOpacity = base.DrawerSettings.DefineSetting<float>(name + "-completedEventsTextOpacity", 1f, (Func<string>)(() => "Completed Events Text Opacity"), (Func<string>)(() => "Defines the text opacity of completed events. Only works in combination with CompletionAction = Change Opacity"));
+			SettingComplianceExtensions.SetRange(completedEventsBackgroundOpacity, 0f, 1f);
+			SettingEntry<bool> completedEventsInvertTextColor = base.DrawerSettings.DefineSetting<bool>(name + "-completedEventsInvertTextColor", true, (Func<string>)(() => "Completed Events Invert Textcolor"), (Func<string>)(() => "Specified if completed events should have their text color inverted. Only works in combination with CompletionAction = Change Opacity"));
 			return new EventAreaConfiguration
 			{
 				Name = drawer.Name,
@@ -197,7 +205,7 @@ namespace Estreya.BlishHUD.EventTable
 				FillerTextColor = fillerTextColor,
 				AcceptWaypointPrompt = acceptWaypointPrompt,
 				DisabledEventKeys = disabledEventKeys,
-				CompletionAcion = completionAction,
+				CompletionAction = completionAction,
 				EventHeight = eventHeight,
 				EventOrder = eventOrder,
 				EventBackgroundOpacity = eventBackgroundOpacity,
@@ -212,7 +220,10 @@ namespace Estreya.BlishHUD.EventTable
 				EventTextOpacity = eventTextOpacity,
 				FillerTextOpacity = fillerTextOpacity,
 				ShadowOpacity = shadowOpacity,
-				FillerShadowOpacity = fillerShadowOpacity
+				FillerShadowOpacity = fillerShadowOpacity,
+				CompletedEventsBackgroundOpacity = completedEventsBackgroundOpacity,
+				CompletedEventsTextOpacity = completedEventsTextOpacity,
+				CompletedEventsInvertTextColor = completedEventsInvertTextColor
 			};
 		}
 
@@ -257,6 +268,9 @@ namespace Estreya.BlishHUD.EventTable
 			base.DrawerSettings.UndefineSetting(name + "-fillerTextOpacity");
 			base.DrawerSettings.UndefineSetting(name + "-shadowOpacity");
 			base.DrawerSettings.UndefineSetting(name + "-fillerShadowOpacity");
+			base.DrawerSettings.UndefineSetting(name + "-completedEventsBackgroundOpacity");
+			base.DrawerSettings.UndefineSetting(name + "-completedEventsTextOpacity");
+			base.DrawerSettings.UndefineSetting(name + "-completedEventsInvertTextColor");
 		}
 
 		public override void UpdateLocalization(TranslationState translationState)
@@ -323,10 +337,10 @@ namespace Estreya.BlishHUD.EventTable
 			string acceptWaypointPromptDescriptionDefault = ((SettingEntry)drawerConfiguration.AcceptWaypointPrompt).get_Description();
 			((SettingEntry)drawerConfiguration.AcceptWaypointPrompt).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerAcceptWaypointPrompt-name", acceptWaypointPromptDisplayNameDefault)));
 			((SettingEntry)drawerConfiguration.AcceptWaypointPrompt).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerAcceptWaypointPrompt-description", acceptWaypointPromptDescriptionDefault)));
-			string completionActionDisplayNameDefault = ((SettingEntry)drawerConfiguration.CompletionAcion).get_DisplayName();
-			string completionActionDescriptionDefault = ((SettingEntry)drawerConfiguration.CompletionAcion).get_Description();
-			((SettingEntry)drawerConfiguration.CompletionAcion).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerCompletionAction-name", completionActionDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.CompletionAcion).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerCompletionAction-description", completionActionDescriptionDefault)));
+			string completionActionDisplayNameDefault = ((SettingEntry)drawerConfiguration.CompletionAction).get_DisplayName();
+			string completionActionDescriptionDefault = ((SettingEntry)drawerConfiguration.CompletionAction).get_Description();
+			((SettingEntry)drawerConfiguration.CompletionAction).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerCompletionAction-name", completionActionDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.CompletionAction).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerCompletionAction-description", completionActionDescriptionDefault)));
 			string eventHeightDisplayNameDefault = ((SettingEntry)drawerConfiguration.EventHeight).get_DisplayName();
 			string eventHeightDescriptionDefault = ((SettingEntry)drawerConfiguration.EventHeight).get_Description();
 			((SettingEntry)drawerConfiguration.EventHeight).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventHeight-name", eventHeightDisplayNameDefault)));

@@ -324,6 +324,8 @@ namespace Estreya.BlishHUD.Shared.State
 
 		private string DirectoryPath => Path.Combine(_baseFolderPath, "skills");
 
+		public List<Skill> Skills => base.APIObjectList;
+
 		public static Skill UnknownSkill { get; } = new Skill
 		{
 			Id = int.MaxValue,
@@ -372,6 +374,7 @@ namespace Estreya.BlishHUD.Shared.State
 					Logger.Debug("Loading skill icons..");
 					LoadSkillIcons(base.APIObjectList);
 					Logger.Debug("Loaded skill icons..");
+					SignalUpdated();
 				}
 				else
 				{
@@ -386,6 +389,7 @@ namespace Estreya.BlishHUD.Shared.State
 						{
 							base.APIObjectList.AddRange(skills);
 						}
+						SignalUpdated();
 					}
 					finally
 					{

@@ -28,9 +28,6 @@ namespace Estreya.BlishHUD.EventTable.Models
 		private Func<DateTime> _getNowAction;
 
 		[JsonIgnore]
-		public TimeSpan[] ReminderTimes = new TimeSpan[1] { TimeSpan.FromMinutes(10.0) };
-
-		[JsonIgnore]
 		private ConcurrentDictionary<DateTime, List<TimeSpan>> _remindedFor = new ConcurrentDictionary<DateTime, List<TimeSpan>>();
 
 		[Description("Specifies the key of the event. Should be unique for a event category. Avoid changing it, as it resets saved settings and states.")]
@@ -43,16 +40,16 @@ namespace Estreya.BlishHUD.EventTable.Models
 		[JsonProperty("offset")]
 		[JsonConverter(typeof(TimeSpanJsonConverter), new object[]
 		{
-			"dd\\.hh\\:mm",
-			new string[] { "dd\\.hh\\:mm", "hh\\:mm" }
+			"dd\\.hh\\:mm\\:ss",
+			new string[] { "dd\\.hh\\:mm\\:ss", "hh\\:mm\\:ss" }
 		})]
 		public TimeSpan Offset { get; set; }
 
 		[JsonProperty("repeat")]
 		[JsonConverter(typeof(TimeSpanJsonConverter), new object[]
 		{
-			"dd\\.hh\\:mm",
-			new string[] { "dd\\.hh\\:mm", "hh\\:mm" }
+			"dd\\.hh\\:mm\\:ss",
+			new string[] { "dd\\.hh\\:mm\\:ss", "hh\\:mm\\:ss" }
 		})]
 		public TimeSpan Repeat { get; set; }
 
@@ -96,6 +93,16 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		[JsonIgnore]
 		public string SettingKey { get; private set; }
+
+		[JsonProperty("reminderTimes")]
+		[JsonConverter(typeof(TimeSpanArrayJsonConverter), new object[]
+		{
+			"hh\\:mm\\:ss",
+			new string[] { "hh\\:mm", "hh\\:mm\\:ss" },
+			true
+		})]
+		public TimeSpan[] ReminderTimes { get; private set; } = new TimeSpan[1] { TimeSpan.FromMinutes(10.0) };
+
 
 		public event EventHandler<TimeSpan> Reminder;
 
@@ -152,6 +159,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 			foreach (DateTime occurence in Occurences.Where((DateTime o) => o >= nowUTC))
 			{
 				List<TimeSpan> alreadyRemindedTimes = _remindedFor.GetOrAdd(occurence, (DateTime o) => new List<TimeSpan>());
+				List<(TimeSpan, TimeSpan)> eligableTimes = new List<(TimeSpan, TimeSpan)>();
 				TimeSpan[] reminderTimes = ReminderTimes;
 				foreach (TimeSpan time in reminderTimes)
 				{
@@ -161,12 +169,25 @@ namespace Estreya.BlishHUD.EventTable.Models
 						TimeSpan diff = remindAt - nowUTC;
 						if (remindAt < nowUTC || (remindAt >= nowUTC && diff.TotalSeconds <= 0.0))
 						{
-							this.Reminder?.Invoke(this, occurence - nowUTC);
-							alreadyRemindedTimes.Add(time);
+							eligableTimes.Add((time, occurence - nowUTC));
 						}
 					}
 				}
+				if (eligableTimes.Count > 0)
+				{
+					eligableTimes.ForEach(delegate((TimeSpan reminderTime, TimeSpan timeLeft) et)
+					{
+						alreadyRemindedTimes.Add(et.reminderTime);
+					});
+					this.Reminder?.Invoke(this, eligableTimes.OrderBy<(TimeSpan, TimeSpan), TimeSpan>(((TimeSpan reminderTime, TimeSpan timeLeft) et) => et.reminderTime).First().Item2);
+				}
 			}
+		}
+
+		public void UpdateReminderTimes(TimeSpan[] reminderTimes)
+		{
+			ReminderTimes = reminderTimes;
+			_remindedFor.Clear();
 		}
 
 		public override string ToString()

@@ -34,7 +34,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		public Panel Panel { get; private set; }
 
-		public event EventHandler<EventChangedArgs> EventChanged;
+		public event EventHandler<ManageEventsView.EventChangedArgs> EventChanged;
 
 		public ManageDynamicEventsSettingsView(DynamicEventState dynamicEventState, Func<List<string>> getDisabledEventGuids, Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, BitmapFont font = null)
 			: base(apiManager, iconState, translationState, font)
@@ -279,7 +279,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					UpdateToggleButton(toggleButton);
 					toggleButton.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object s, CheckChangedEvent eventArgs)
 					{
-						this.EventChanged?.Invoke(this, new EventChangedArgs
+						this.EventChanged?.Invoke(this, new ManageEventsView.EventChangedArgs
 						{
 							OldState = !eventArgs.get_Checked(),
 							NewState = eventArgs.get_Checked(),

@@ -6,6 +6,13 @@ namespace Estreya.BlishHUD.Shared.State
 {
 	public class StateConfigurations
 	{
+		public StateConfiguration BlishHUDAPI { get; } = new StateConfiguration
+		{
+			Enabled = false,
+			AwaitLoading = true
+		};
+
+
 		public APIStateConfiguration Account { get; } = new APIStateConfiguration
 		{
 			Enabled = false,

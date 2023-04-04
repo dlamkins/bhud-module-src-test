@@ -125,6 +125,8 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		public ArcDPSState ArcDPSState { get; private set; }
 
+		public BlishHudApiState BlishHUDAPIState { get; private set; }
+
 		protected IFlurlClient GetFlurlClient()
 		{
 			if (_flurlClient == null)
@@ -191,6 +193,15 @@ namespace Estreya.BlishHUD.Shared.Modules
 			{
 				StateConfigurations configurations = new StateConfigurations();
 				ConfigureStates(configurations);
+				if (configurations.BlishHUDAPI.Enabled)
+				{
+					if (PasswordManager == null)
+					{
+						throw new ArgumentNullException("PasswordManager");
+					}
+					BlishHUDAPIState = new BlishHudApiState(configurations.BlishHUDAPI, ModuleSettings.BlishAPIUsername, PasswordManager, GetFlurlClient(), API_ROOT_URL, API_VERSION_NO);
+					_states.Add(BlishHUDAPIState);
+				}
 				if (configurations.Account.Enabled)
 				{
 					AccountState = new AccountState(configurations.Account, Gw2ApiManager);

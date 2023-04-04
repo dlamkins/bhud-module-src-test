@@ -47,10 +47,10 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0076: Expected O, but got Unknown
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0176: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0218: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a5: Unknown result type (might be due to invalid IL or missing references)
 			Rectangle contentRegion = ((Container)parent).get_ContentRegion();
 			parent.set_CanScroll(true);
 			Label val = new Label();

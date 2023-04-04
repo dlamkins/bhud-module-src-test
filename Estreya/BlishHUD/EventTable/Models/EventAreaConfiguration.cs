@@ -9,7 +9,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 	{
 		public SettingEntry<List<string>> DisabledEventKeys { get; set; }
 
-		public SettingEntry<EventCompletedAction> CompletionAcion { get; set; }
+		public SettingEntry<EventCompletedAction> CompletionAction { get; set; }
 
 		public SettingEntry<bool> ShowTooltips { get; set; }
 
@@ -56,5 +56,11 @@ namespace Estreya.BlishHUD.EventTable.Models
 		public SettingEntry<bool> AllowUnspecifiedMap { get; set; }
 
 		public SettingEntry<float> TimeLineOpacity { get; set; }
+
+		public SettingEntry<float> CompletedEventsBackgroundOpacity { get; set; }
+
+		public SettingEntry<float> CompletedEventsTextOpacity { get; set; }
+
+		public SettingEntry<bool> CompletedEventsInvertTextColor { get; set; }
 	}
 }

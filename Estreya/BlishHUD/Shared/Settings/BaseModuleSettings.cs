@@ -75,6 +75,8 @@ namespace Estreya.BlishHUD.Shared.Settings
 
 		public SettingEntry<bool> DebugEnabled { get; private set; }
 
+		public SettingEntry<string> BlishAPIUsername { get; private set; }
+
 		public SettingCollection DrawerSettings { get; private set; }
 
 		public event EventHandler<ModuleSettingsChangedEventArgs> ModuleSettingsChanged;
@@ -223,6 +225,7 @@ namespace Estreya.BlishHUD.Shared.Settings
 			HideInPvP.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
 			DebugEnabled = GlobalSettings.DefineSetting<bool>("DebugEnabled", false, (Func<string>)(() => "Debug Enabled"), (Func<string>)(() => "Whether the module runs in debug mode."));
 			DebugEnabled.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+			BlishAPIUsername = GlobalSettings.DefineSetting<string>("BlishAPIUsername", (string)null, (Func<string>)(() => "Blish API Username"), (Func<string>)(() => "Defines the login username for the Estreya Blish HUD API."));
 			HandleEnabledStates();
 			DoInitializeGlobalSettings(GlobalSettings);
 		}

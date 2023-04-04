@@ -29,6 +29,8 @@ namespace Estreya.BlishHUD.Shared.State
 
 		private string DirectoryPath => Path.Combine(_baseFolderPath, "pois");
 
+		public List<PointOfInterest> PointOfInterests => base.APIObjectList;
+
 		public PointOfInterestState(APIStateConfiguration configuration, Gw2ApiManager apiManager, string baseFolderPath)
 			: base(apiManager, configuration)
 		{
@@ -55,6 +57,7 @@ namespace Estreya.BlishHUD.Shared.State
 						{
 							base.APIObjectList.AddRange(pois);
 						}
+						SignalUpdated();
 					}
 					finally
 					{

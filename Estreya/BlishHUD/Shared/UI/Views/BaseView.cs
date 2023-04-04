@@ -121,17 +121,22 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			((Container)val).set_WidthSizingMode((SizingMode)2);
 		}
 
-		protected TextBox RenderTextbox(Panel parent, Point location, int width, string value, string placeholder, Action<string> onChangeAction = null, Action<string> onEnterAction = null, bool clearOnEnter = false)
+		protected TextBox RenderTextbox(Panel parent, Point location, int width, string value, string placeholder, Action<string> onChangeAction = null, Action<string> onEnterAction = null, bool clearOnEnter = false, Func<string, string, Task<bool>> onBeforeChangeAction = null)
 		{
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Expected O, but got Unknown
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Expected O, but got Unknown
+			if (onBeforeChangeAction == null)
+			{
+				onBeforeChangeAction = (string _, string _) => Task.FromResult(result: true);
+			}
+			bool changing = false;
 			TextBox val = new TextBox();
 			((Control)val).set_Parent((Container)(object)parent);
 			((TextInputBase)val).set_PlaceholderText(placeholder);
@@ -144,8 +149,25 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			{
 				((TextInputBase)textBox).add_TextChanged((EventHandler<EventArgs>)delegate(object s, EventArgs e)
 				{
-					TextBox val3 = (TextBox)((s is TextBox) ? s : null);
-					onChangeAction?.Invoke(((TextInputBase)val3).get_Text());
+					if (!changing)
+					{
+						changing = true;
+						TextBox scopeTextBox = (TextBox)((s is TextBox) ? s : null);
+						ValueChangedEventArgs<string> ea = e as ValueChangedEventArgs<string>;
+						onBeforeChangeAction(ea?.get_PreviousValue(), ((TextInputBase)scopeTextBox).get_Text()).ContinueWith(delegate(Task<bool> resultTask)
+						{
+							if (resultTask.Result)
+							{
+								onChangeAction?.Invoke(((TextInputBase)scopeTextBox).get_Text());
+							}
+							else
+							{
+								((TextInputBase)scopeTextBox).set_Text(ea.get_PreviousValue());
+							}
+							changing = false;
+						});
+						onChangeAction?.Invoke(((TextInputBase)scopeTextBox).get_Text());
+					}
 				});
 			}
 			if (onEnterAction != null)
@@ -163,14 +185,18 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			return textBox;
 		}
 
-		protected TrackBar RenderTrackBar(Panel parent, Point location, int width, int value, (int Min, int Max)? range = null, Action<int> onChangeAction = null)
+		protected TrackBar RenderTrackBar(Panel parent, Point location, int width, int value, (int Min, int Max)? range = null, Action<int> onChangeAction = null, Func<int, int, Task<bool>> onBeforeChangeAction = null)
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Expected O, but got Unknown
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Expected O, but got Unknown
+			if (onBeforeChangeAction == null)
+			{
+				onBeforeChangeAction = (int _, int _) => Task.FromResult(result: true);
+			}
 			TrackBar val = new TrackBar();
 			((Control)val).set_Parent((Container)(object)parent);
 			((Control)val).set_Location(location);
@@ -190,15 +216,19 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			return trackBar;
 		}
 
-		protected TrackBar RenderTrackBar(Panel parent, Point location, int width, float value, (float Min, float Max)? range = null, Action<float> onChangeAction = null)
+		protected TrackBar RenderTrackBar(Panel parent, Point location, int width, float value, (float Min, float Max)? range = null, Action<float> onChangeAction = null, Func<float, float, Task<bool>> onBeforeChangeAction = null)
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Expected O, but got Unknown
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Expected O, but got Unknown
+			if (onBeforeChangeAction == null)
+			{
+				onBeforeChangeAction = (float _, float _) => Task.FromResult(result: true);
+			}
 			TrackBar val = new TrackBar();
 			((Control)val).set_Parent((Container)(object)parent);
 			val.set_SmallStep(true);
@@ -219,14 +249,18 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			return trackBar;
 		}
 
-		protected Checkbox RenderCheckbox(Panel parent, Point location, bool value, Action<bool> onChangeAction = null)
+		protected Checkbox RenderCheckbox(Panel parent, Point location, bool value, Action<bool> onChangeAction = null, Func<bool, bool, Task<bool>> onBeforeChangeAction = null)
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Expected O, but got Unknown
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005e: Expected O, but got Unknown
+			if (onBeforeChangeAction == null)
+			{
+				onBeforeChangeAction = (bool _, bool _) => Task.FromResult(result: true);
+			}
 			Checkbox val = new Checkbox();
 			((Control)val).set_Parent((Container)(object)parent);
 			val.set_Checked(value);
@@ -236,21 +270,36 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			{
 				checkBox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object s, CheckChangedEvent e)
 				{
-					Checkbox val2 = (Checkbox)((s is Checkbox) ? s : null);
-					onChangeAction?.Invoke(val2.get_Checked());
+					onBeforeChangeAction(!e.get_Checked(), e.get_Checked()).ContinueWith(delegate(Task<bool> resultTask)
+					{
+						object obj = s;
+						Checkbox val2 = (Checkbox)((obj is Checkbox) ? obj : null);
+						if (resultTask.Result)
+						{
+							onChangeAction?.Invoke(val2.get_Checked());
+						}
+						else
+						{
+							val2.set_Checked(!e.get_Checked());
+						}
+					});
 				});
 			}
 			return checkBox;
 		}
 
-		protected Dropdown RenderDropdown(Panel parent, Point location, int width, string[] values, string value, Action<string> onChangeAction = null)
+		protected Dropdown RenderDropdown(Panel parent, Point location, int width, string[] values, string value, Action<string> onChangeAction = null, Func<string, string, Task<bool>> onBeforeChangeAction = null)
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Expected O, but got Unknown
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Expected O, but got Unknown
+			if (onBeforeChangeAction == null)
+			{
+				onBeforeChangeAction = (string _, string _) => Task.FromResult(result: true);
+			}
 			Dropdown val = new Dropdown();
 			((Control)val).set_Parent((Container)(object)parent);
 			((Control)val).set_Width(width);
@@ -275,9 +324,13 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			return dropdown;
 		}
 
-		protected KeybindingAssigner RenderKeybinding(Panel parent, Point location, int width, KeyBinding value, Action<KeyBinding> onChangeAction = null)
+		protected KeybindingAssigner RenderKeybinding(Panel parent, Point location, int width, KeyBinding value, Action<KeyBinding> onChangeAction = null, Func<KeyBinding, KeyBinding, Task<bool>> onBeforeChangeAction = null)
 		{
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			if (onBeforeChangeAction == null)
+			{
+				onBeforeChangeAction = (KeyBinding _, KeyBinding _) => Task.FromResult(result: true);
+			}
 			KeybindingAssigner keybindingAssigner2 = new KeybindingAssigner(withName: false);
 			((Control)keybindingAssigner2).set_Parent((Container)(object)parent);
 			((Control)keybindingAssigner2).set_Width(width);
@@ -311,24 +364,28 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		protected Label GetLabel(Panel parent, string text, Color? color = null, BitmapFont font = null)
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Expected O, but got Unknown
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006d: Expected O, but got Unknown
+			if (font == null)
+			{
+				font = Font;
+			}
 			Label val = new Label();
 			((Control)val).set_Parent((Container)(object)parent);
 			val.set_Text(text);
-			val.set_Font(font ?? Font);
+			val.set_Font(font);
 			val.set_TextColor((Color)(((_003F?)color) ?? Color.get_White()));
 			val.set_AutoSizeHeight(!string.IsNullOrWhiteSpace(text));
-			((Control)val).set_Width((int)Font.MeasureString(text).Width + 10);
+			((Control)val).set_Width((int)font.MeasureString(text).Width + 20);
 			return val;
 		}
 
@@ -397,7 +454,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			return button;
 		}
 
-		protected (Label TitleLabel, Label ValueLabel) RenderLabel(Panel parent, string title, string value = null, Color? textColorTitle = null, Color? textColorValue = null)
+		protected (Label TitleLabel, Label ValueLabel) RenderLabel(Panel parent, string title, string value = null, Color? textColorTitle = null, Color? textColorValue = null, int? valueXLocation = null)
 		{
 			Panel panel = GetPanel((Container)(object)parent);
 			Label titleLabel = GetLabel(panel, title, textColorTitle);
@@ -405,7 +462,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			if (value != null)
 			{
 				valueLabel = GetLabel(panel, value, textColorValue);
-				((Control)valueLabel).set_Left(((Control)titleLabel).get_Right() + CONTROL_X_SPACING);
+				((Control)valueLabel).set_Left(valueXLocation ?? (((Control)titleLabel).get_Right() + CONTROL_X_SPACING));
 			}
 			else
 			{
@@ -506,10 +563,12 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 		{
 			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Expected O, but got Unknown
+			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
 			_messageCancellationTokenSource?.Cancel();
 			_messageCancellationTokenSource = new CancellationTokenSource();
 			if (font == null)
@@ -517,13 +576,14 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 				font = Font;
 			}
 			Size2 textSize = font.MeasureString(message);
-			Panel messagePanel = GetPanel((Container)(object)MainPanel);
+			Panel messagePanel = new Panel();
 			((Container)messagePanel).set_HeightSizingMode((SizingMode)0);
 			((Control)messagePanel).set_Height((int)textSize.Height);
 			((Container)messagePanel).set_WidthSizingMode((SizingMode)0);
 			((Control)messagePanel).set_Width((int)textSize.Width + 10);
 			((Control)messagePanel).set_Location(new Point(((Control)MainPanel).get_Width() / 2 - ((Control)messagePanel).get_Width() / 2, ((Control)MainPanel).get_Bottom() - ((Control)messagePanel).get_Height()));
 			GetLabel(messagePanel, message, color, font);
+			((Control)messagePanel).set_Parent((Container)(object)MainPanel);
 			Task.Run(async delegate
 			{
 				try
@@ -546,7 +606,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 		protected void ShowInfo(string message)
 		{
 			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			ShowMessage(message, Color.get_White(), 2500);
+			ShowMessage(message, Color.get_White(), 2500, GameService.Content.get_DefaultFont18());
 		}
 
 		protected override void Unload()

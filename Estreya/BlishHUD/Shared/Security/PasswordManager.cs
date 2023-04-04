@@ -34,6 +34,15 @@ namespace Estreya.BlishHUD.Shared.Security
 			}
 		}
 
+		public void Delete(string key)
+		{
+			string filePath = Path.Combine(_directoryPath, key + ".pwd");
+			if (File.Exists(filePath))
+			{
+				File.Delete(filePath);
+			}
+		}
+
 		public async Task<byte[]> Retrive(string key, bool silent = false)
 		{
 			return DecryptData(await ReadPasswordFile(key), silent);

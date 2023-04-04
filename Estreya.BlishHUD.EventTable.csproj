@@ -25,6 +25,7 @@
     <Reference Include="Humanizer">
       <HintPath>..\..\working\Humanizer.dll</HintPath>
     </Reference>
+    <Reference Include="System.Net.Http" />
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\working\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -32,9 +33,11 @@
     <Reference Include="Octokit">
       <HintPath>..\..\working\Octokit.dll</HintPath>
     </Reference>
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Core" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="jose-jwt">
+      <HintPath>..\..\working\jose-jwt.dll</HintPath>
+    </Reference>
     <Reference Include="System.Security" />
     <Reference Include="AsyncClipboardService" />
     <Reference Include="Flurl">

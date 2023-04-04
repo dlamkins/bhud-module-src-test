@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
@@ -73,12 +74,19 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		protected (Panel Panel, Label label, ColorBox colorBox) RenderColorSetting(Panel parent, SettingEntry<Color> settingEntry)
 		{
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 			Panel panel = GetPanel((Container)(object)parent);
 			(Label, Label) label = RenderLabel(panel, ((SettingEntry)settingEntry).get_DisplayName());
 			ColorBox colorBox = RenderColorBox(panel, CONTROL_LOCATION, settingEntry.get_Value(), delegate(Color color)
 			{
-				settingEntry.set_Value(color);
+				try
+				{
+					settingEntry.set_Value(color);
+				}
+				catch (Exception ex)
+				{
+					ShowError(ex.Message);
+				}
 			}, base.MainPanel);
 			((Control)colorBox).set_BasicTooltipText(((SettingEntry)settingEntry).get_Description());
 			SetControlEnabledState((Control)(object)colorBox, (SettingEntry)(object)settingEntry);
@@ -88,12 +96,19 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		protected (Panel Panel, Label label, TextBox textBox) RenderTextSetting(Panel parent, SettingEntry<string> settingEntry)
 		{
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 			Panel panel = GetPanel((Container)(object)parent);
 			(Label, Label) label = RenderLabel(panel, ((SettingEntry)settingEntry).get_DisplayName());
 			TextBox textBox = RenderTextbox(panel, CONTROL_LOCATION, CONTROL_WIDTH, settingEntry.get_Value(), ((SettingEntry)settingEntry).get_Description(), delegate(string newValue)
 			{
-				settingEntry.set_Value(newValue);
+				try
+				{
+					settingEntry.set_Value(newValue);
+				}
+				catch (Exception ex)
+				{
+					ShowError(ex.Message);
+				}
 			});
 			((Control)textBox).set_BasicTooltipText(((SettingEntry)settingEntry).get_Description());
 			SetControlEnabledState((Control)(object)textBox, (SettingEntry)(object)settingEntry);
@@ -103,13 +118,20 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		protected (Panel Panel, Label label, TrackBar trackBar) RenderIntSetting(Panel parent, SettingEntry<int> settingEntry)
 		{
-			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
 			Panel panel = GetPanel((Container)(object)parent);
 			(Label, Label) label = RenderLabel(panel, ((SettingEntry)settingEntry).get_DisplayName());
 			(float, float)? range = settingEntry.GetRange<int>();
 			TrackBar trackbar = RenderTrackBar(panel, CONTROL_LOCATION, CONTROL_WIDTH, settingEntry.get_Value(), new(int, int)?(((int)(range?.Item1 ?? 0f), (int)(range?.Item2 ?? 100f))), delegate(int newValue)
 			{
-				settingEntry.set_Value(newValue);
+				try
+				{
+					settingEntry.set_Value(newValue);
+				}
+				catch (Exception ex)
+				{
+					ShowError(ex.Message);
+				}
 			});
 			((Control)trackbar).set_BasicTooltipText(((SettingEntry)settingEntry).get_Description());
 			_settingEventState.AddForRangeCheck((SettingEntry)(object)settingEntry);
@@ -135,13 +157,20 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		protected (Panel Panel, Label label, TrackBar trackBar) RenderFloatSetting(Panel parent, SettingEntry<float> settingEntry)
 		{
-			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
 			Panel panel = GetPanel((Container)(object)parent);
 			(Label, Label) label = RenderLabel(panel, ((SettingEntry)settingEntry).get_DisplayName());
 			(float, float)? range = settingEntry.GetRange<float>();
 			TrackBar trackbar = RenderTrackBar(panel, CONTROL_LOCATION, CONTROL_WIDTH, settingEntry.get_Value(), range, delegate(float newValue)
 			{
-				settingEntry.set_Value(newValue);
+				try
+				{
+					settingEntry.set_Value(newValue);
+				}
+				catch (Exception ex)
+				{
+					ShowError(ex.Message);
+				}
 			});
 			((Control)trackbar).set_BasicTooltipText(((SettingEntry)settingEntry).get_Description());
 			_settingEventState.AddForRangeCheck((SettingEntry)(object)settingEntry);
@@ -165,15 +194,22 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			return (panel, label.Item1, trackbar);
 		}
 
-		protected (Panel Panel, Label label, Checkbox checkbox) RenderBoolSetting(Panel parent, SettingEntry<bool> settingEntry)
+		protected (Panel Panel, Label label, Checkbox checkbox) RenderBoolSetting(Panel parent, SettingEntry<bool> settingEntry, Func<bool, bool, Task<bool>> onBeforeChangeAction = null)
 		{
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 			Panel panel = GetPanel((Container)(object)parent);
 			(Label, Label) label = RenderLabel(panel, ((SettingEntry)settingEntry).get_DisplayName());
 			Checkbox checkbox = RenderCheckbox(panel, CONTROL_LOCATION, settingEntry.get_Value(), delegate(bool newValue)
 			{
-				settingEntry.set_Value(newValue);
-			});
+				try
+				{
+					settingEntry.set_Value(newValue);
+				}
+				catch (Exception ex)
+				{
+					ShowError(ex.Message);
+				}
+			}, onBeforeChangeAction);
 			((Control)checkbox).set_BasicTooltipText(((SettingEntry)settingEntry).get_Description());
 			SetControlEnabledState((Control)(object)checkbox, (SettingEntry)(object)settingEntry);
 			AddControlForDisabledCheck((Control)(object)checkbox, (SettingEntry)(object)settingEntry);
@@ -182,13 +218,20 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		protected (Panel Panel, Label label, KeybindingAssigner keybindingAssigner) RenderKeybindingSetting(Panel parent, SettingEntry<KeyBinding> settingEntry)
 		{
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 			Panel panel = GetPanel((Container)(object)parent);
 			(Label, Label) label = RenderLabel(panel, ((SettingEntry)settingEntry).get_DisplayName());
 			KeybindingAssigner keybindingAssigner = RenderKeybinding(panel, CONTROL_LOCATION, CONTROL_WIDTH, settingEntry.get_Value(), delegate(KeyBinding newValue)
 			{
-				settingEntry.set_Value(newValue);
-				GameService.Settings.Save(false);
+				try
+				{
+					settingEntry.set_Value(newValue);
+					GameService.Settings.Save(false);
+				}
+				catch (Exception ex)
+				{
+					ShowError(ex.Message);
+				}
 			});
 			((Control)keybindingAssigner).set_BasicTooltipText(((SettingEntry)settingEntry).get_Description());
 			SetControlEnabledState((Control)(object)keybindingAssigner, (SettingEntry)(object)settingEntry);
@@ -198,15 +241,35 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		protected (Panel Panel, Label label, Dropdown dropdown) RenderEnumSetting<T>(Panel parent, SettingEntry<T> settingEntry) where T : Enum
 		{
-			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
 			Panel panel = GetPanel((Container)(object)parent);
 			(Label, Label) label = RenderLabel(panel, ((SettingEntry)settingEntry).get_DisplayName());
 			LetterCasing casing = LetterCasing.Title;
-			List<T> values = ((T[])Enum.GetValues(((SettingEntry)settingEntry).get_SettingType())).ToList();
+			List<T> values = new List<T>();
+			IEnumerable<EnumInclusionComplianceRequisite<T>> requisite = from cr in SettingComplianceExtensions.GetComplianceRequisite((SettingEntry)(object)settingEntry)
+				where cr is EnumInclusionComplianceRequisite<T>
+				select (EnumInclusionComplianceRequisite<T>)(object)cr;
+			if (requisite.Any())
+			{
+				values.AddRange(requisite.First().get_IncludedValues());
+			}
+			else
+			{
+				values.AddRange((T[])Enum.GetValues(((SettingEntry)settingEntry).get_SettingType()));
+			}
 			string[] formattedValues = values.Select((T value) => value.Humanize(casing)).ToArray();
 			Dropdown dropdown = RenderDropdown(panel, CONTROL_LOCATION, CONTROL_WIDTH, formattedValues, settingEntry.get_Value().Humanize(casing), delegate(string newValue)
 			{
-				settingEntry.set_Value(values[formattedValues.ToList().IndexOf(newValue)]);
+				try
+				{
+					settingEntry.set_Value(values[formattedValues.ToList().IndexOf(newValue)]);
+				}
+				catch (Exception ex)
+				{
+					ShowError(ex.Message);
+				}
 			});
 			((Control)dropdown).set_BasicTooltipText(((SettingEntry)settingEntry).get_Description());
 			SetControlEnabledState((Control)(object)dropdown, (SettingEntry)(object)settingEntry);

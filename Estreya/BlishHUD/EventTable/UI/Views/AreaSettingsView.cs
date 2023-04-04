@@ -527,7 +527,10 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.AcceptWaypointPrompt);
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.ShowTooltips);
 			RenderEmptyLine((Panel)(object)groupPanel);
-			RenderEnumSetting<EventCompletedAction>((Panel)(object)groupPanel, areaConfiguration.CompletionAcion);
+			RenderEnumSetting<EventCompletedAction>((Panel)(object)groupPanel, areaConfiguration.CompletionAction);
+			RenderFloatSetting((Panel)(object)groupPanel, areaConfiguration.CompletedEventsBackgroundOpacity);
+			RenderFloatSetting((Panel)(object)groupPanel, areaConfiguration.CompletedEventsTextOpacity);
+			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.CompletedEventsInvertTextColor);
 			RenderButton((Panel)(object)groupPanel, "Reset hidden Events", delegate
 			{
 				_eventState.Remove(areaConfiguration.Name, EventState.EventStates.Hidden);
@@ -665,7 +668,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			_manageEventsWindow.Show((IView)(object)view);
 		}
 
-		private void ManageView_EventChanged(object sender, EventChangedArgs e)
+		private void ManageView_EventChanged(object sender, ManageEventsView.EventChangedArgs e)
 		{
 			EventAreaConfiguration configuration = e.AdditionalData["configuration"] as EventAreaConfiguration;
 			configuration.DisabledEventKeys.set_Value(e.NewState ? new List<string>(from aek in configuration.DisabledEventKeys.get_Value()

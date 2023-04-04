@@ -113,7 +113,7 @@ namespace Estreya.BlishHUD.Shared.State
 					});
 					progress.Report("Loading " + GetType().Name);
 					await FetchFromAPI(_apiManager, progress);
-					this.Updated?.Invoke(this, EventArgs.Empty);
+					SignalUpdated();
 					ProgressText = string.Empty;
 				}
 				finally
@@ -126,7 +126,12 @@ namespace Estreya.BlishHUD.Shared.State
 
 		protected abstract Task FetchFromAPI(Gw2ApiManager apiManager, IProgress<string> progress);
 
-		public void SignalCompletion()
+		protected void SignalUpdated()
+		{
+			this.Updated?.Invoke(this, EventArgs.Empty);
+		}
+
+		protected void SignalCompletion()
 		{
 			_eventWaitHandle.Set();
 		}

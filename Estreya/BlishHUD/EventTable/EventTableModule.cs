@@ -26,6 +26,7 @@ using Estreya.BlishHUD.Shared.Threading;
 using Estreya.BlishHUD.Shared.Utils;
 using Flurl.Http;
 using Humanizer;
+using Humanizer.Localisation;
 using Microsoft.Xna.Framework;
 
 namespace Estreya.BlishHUD.EventTable
@@ -70,6 +71,8 @@ namespace Estreya.BlishHUD.EventTable
 		protected override async Task LoadAsync()
 		{
 			await base.LoadAsync();
+			base.BlishHUDAPIState.NewLogin += BlishHUDAPIState_NewLogin;
+			base.BlishHUDAPIState.LoggedOut += BlishHUDAPIState_LoggedOut;
 			MapUtil = new MapUtil(base.ModuleSettings.MapKeybinding.get_Value(), base.Gw2ApiManager);
 			DynamicEventHandler = new DynamicEventHandler(MapUtil, DynamicEventState, base.Gw2ApiManager, base.ModuleSettings);
 			await DynamicEventHandler.AddDynamicEventsToMap();
@@ -117,7 +120,13 @@ namespace Estreya.BlishHUD.EventTable
 						RemoveEventHooks(ev);
 					});
 					_eventCategories?.Clear();
-					List<EventCategory> categories = await GetFlurlClient().Request(base.API_URL, "events").GetJsonAsync<List<EventCategory>>(default(CancellationToken), (HttpCompletionOption)0);
+					IFlurlRequest request = GetFlurlClient().Request(base.API_URL, "events");
+					if (!string.IsNullOrWhiteSpace(base.BlishHUDAPIState.AccessToken))
+					{
+						base.Logger.Info("Include custom events...");
+						request.WithOAuthBearerToken(base.BlishHUDAPIState.AccessToken);
+					}
+					List<EventCategory> categories = await request.GetJsonAsync<List<EventCategory>>(default(CancellationToken), (HttpCompletionOption)0);
 					int eventCategoryCount = categories.Count;
 					int eventCount = categories.Sum((EventCategory ec) => ec.Events.Count);
 					base.Logger.Info($"Loaded {eventCategoryCount} Categories with {eventCount} Events.");
@@ -126,6 +135,7 @@ namespace Estreya.BlishHUD.EventTable
 						ec.Load(() => NowUTC, base.TranslationState);
 					});
 					base.Logger.Debug("Loaded all event categories.");
+					AssignEventReminderTimes(categories);
 					_eventCategories = categories;
 					foreach (Estreya.BlishHUD.EventTable.Models.Event ev2 in _eventCategories.SelectMany((EventCategory ec) => ec.Events))
 					{
@@ -143,6 +153,20 @@ namespace Estreya.BlishHUD.EventTable
 				catch (Exception ex)
 				{
 					base.Logger.Error(ex, "Failed loading events.");
+				}
+			}
+		}
+
+		private void AssignEventReminderTimes(List<EventCategory> categories)
+		{
+			foreach (Estreya.BlishHUD.EventTable.Models.Event ev2 in from ev in categories.SelectMany((EventCategory ec) => ec.Events)
+				where !ev.Filler
+				select ev)
+			{
+				if (base.ModuleSettings.ReminderTimesOverride.get_Value().ContainsKey(ev2.SettingKey))
+				{
+					List<TimeSpan> times = base.ModuleSettings.ReminderTimesOverride.get_Value()[ev2.SettingKey];
+					ev2.UpdateReminderTimes(times.ToArray());
 				}
 			}
 		}
@@ -233,7 +257,7 @@ namespace Estreya.BlishHUD.EventTable
 			if (base.ModuleSettings.RemindersEnabled.get_Value() && !base.ModuleSettings.ReminderDisabledForEvents.get_Value().Contains(ev.SettingKey))
 			{
 				string startsInTranslation = base.TranslationState.GetTranslation("eventArea-reminder-startsIn", "Starts in");
-				EventNotification eventNotification = new EventNotification(ev, startsInTranslation + " " + e.Humanize(2) + "!", base.ModuleSettings.ReminderPosition.X.get_Value(), base.ModuleSettings.ReminderPosition.Y.get_Value(), base.IconState);
+				EventNotification eventNotification = new EventNotification(ev, startsInTranslation + " " + e.Humanize(2, null, TimeUnit.Week, TimeUnit.Second) + "!", base.ModuleSettings.ReminderPosition.X.get_Value(), base.ModuleSettings.ReminderPosition.Y.get_Value(), base.IconState);
 				eventNotification.BackgroundOpacity = base.ModuleSettings.ReminderOpacity.get_Value();
 				eventNotification.Show(TimeSpan.FromSeconds(base.ModuleSettings.ReminderDuration.get_Value()));
 			}
@@ -265,7 +289,7 @@ namespace Estreya.BlishHUD.EventTable
 				base.ModuleSettings.EventAreaNames.set_Value(new List<string>(base.ModuleSettings.EventAreaNames.get_Value()) { configuration.Name });
 			}
 			base.ModuleSettings.UpdateDrawerLocalization(configuration, base.TranslationState);
-			EventArea eventArea = new EventArea(configuration, base.IconState, base.TranslationState, EventState, base.WorldbossState, base.MapchestState, base.PointOfInterestState, MapUtil, GetFlurlClient(), base.API_URL, () => NowUTC, () => ((Module)this).get_Version());
+			EventArea eventArea = new EventArea(configuration, base.IconState, base.TranslationState, EventState, base.WorldbossState, base.MapchestState, base.PointOfInterestState, MapUtil, GetFlurlClient(), base.API_URL, () => NowUTC, () => ((Module)this).get_Version(), () => base.BlishHUDAPIState.AccessToken);
 			((Control)eventArea).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			EventArea area = eventArea;
 			_areas.AddOrUpdate(configuration.Name, area, (string name, EventArea prev) => area);
@@ -302,6 +326,8 @@ namespace Estreya.BlishHUD.EventTable
 			//IL_0193: Expected O, but got Unknown
 			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01d2: Expected O, but got Unknown
+			//IL_0207: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0211: Expected O, but got Unknown
 			base.SettingsWindow.get_Tabs().Add(new Tab(base.IconState.GetIcon("156736.png"), (Func<IView>)(() => (IView)(object)new GeneralSettingsView(base.ModuleSettings, base.Gw2ApiManager, base.IconState, base.TranslationState, base.SettingEventState, GameService.Content.get_DefaultFont16())
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
@@ -324,7 +350,7 @@ namespace Estreya.BlishHUD.EventTable
 				RemoveArea(e);
 			};
 			base.SettingsWindow.get_Tabs().Add(new Tab(base.IconState.GetIcon("605018.png"), (Func<IView>)(() => (IView)(object)areaSettingsView), "Event Areas", (int?)null));
-			base.SettingsWindow.get_Tabs().Add(new Tab(base.IconState.GetIcon("841721.png"), (Func<IView>)(() => (IView)(object)new ReminderSettingsView(base.ModuleSettings, () => _eventCategories, base.Gw2ApiManager, base.IconState, base.TranslationState, base.SettingEventState, GameService.Content.get_DefaultFont16())
+			base.SettingsWindow.get_Tabs().Add(new Tab(base.IconState.GetIcon("1466345.png"), (Func<IView>)(() => (IView)(object)new ReminderSettingsView(base.ModuleSettings, () => _eventCategories, base.Gw2ApiManager, base.IconState, base.TranslationState, base.SettingEventState, GameService.Content.get_DefaultFont16())
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			}), "Reminders", (int?)null));
@@ -332,6 +358,10 @@ namespace Estreya.BlishHUD.EventTable
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			}), "Dynamic Events", (int?)null));
+			base.SettingsWindow.get_Tabs().Add(new Tab(base.IconState.GetIcon("156764.png"), (Func<IView>)(() => (IView)(object)new CustomEventView(base.Gw2ApiManager, base.IconState, base.TranslationState, base.BlishHUDAPIState)
+			{
+				DefaultColor = base.ModuleSettings.DefaultGW2Color
+			}), "Custom Events", (int?)null));
 			base.SettingsWindow.get_Tabs().Add(new Tab(base.IconState.GetIcon("157097.png"), (Func<IView>)(() => (IView)(object)new HelpView(() => _eventCategories, base.API_URL, base.Gw2ApiManager, base.IconState, base.TranslationState, GameService.Content.get_DefaultFont16())
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
@@ -345,10 +375,21 @@ namespace Estreya.BlishHUD.EventTable
 
 		protected override void ConfigureStates(StateConfigurations configurations)
 		{
+			configurations.BlishHUDAPI.Enabled = true;
 			configurations.Account.Enabled = true;
 			configurations.Worldbosses.Enabled = true;
 			configurations.Mapchests.Enabled = true;
 			configurations.PointOfInterests.Enabled = true;
+		}
+
+		private void BlishHUDAPIState_NewLogin(object sender, EventArgs e)
+		{
+			_lastEventUpdate.Value = _updateEventsInterval.TotalMilliseconds;
+		}
+
+		private void BlishHUDAPIState_LoggedOut(object sender, EventArgs e)
+		{
+			_lastEventUpdate.Value = _updateEventsInterval.TotalMilliseconds;
 		}
 
 		protected override Collection<ManagedState> GetAdditionalStates(string directoryPath)

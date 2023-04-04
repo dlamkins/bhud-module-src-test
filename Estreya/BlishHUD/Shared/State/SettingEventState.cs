@@ -124,7 +124,7 @@ namespace Estreya.BlishHUD.Shared.State
 			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
 			for (int i = 0; i < _registeredForDisabledUpdates.Count; i++)
 			{
-				(SettingEntry, IComplianceRequisite) settingPair = _registeredForDisabledUpdates.ElementAt(i);
+				(SettingEntry, IComplianceRequisite) settingPair = _registeredForDisabledUpdates[i];
 				bool changed = false;
 				SettingEntry setting = settingPair.Item1;
 				IComplianceRequisite priorRange = settingPair.Item2;
