@@ -27,6 +27,10 @@ namespace Blish_HUD.Extended
 			{
 				Directory.CreateDirectory(Path.GetDirectoryName(outFilePath));
 				using Stream stream = contentsManager.GetFileStream(refFilePath);
+				if (stream == null)
+				{
+					throw new FileNotFoundException("File not found: '" + refFilePath + "'");
+				}
 				stream.Position = 0L;
 				using FileStream file = File.Create(outFilePath);
 				file.Position = 0L;

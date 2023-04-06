@@ -206,9 +206,12 @@ namespace Nekres.Mistwar
 
 		private async void OnSubtokenUpdated(object o, ValueEventArgs<IEnumerable<TokenPermission>> e)
 		{
-			MapService mapService = _mapService;
-			WvwService wvwService = WvwService;
-			mapService.DownloadMaps(await wvwService.GetWvWMapIds(await WvwService.GetWorldId()));
+			if (Gw2ApiManager.HasPermission((TokenPermission)1))
+			{
+				MapService mapService = _mapService;
+				WvwService wvwService = WvwService;
+				mapService.DownloadMaps(await wvwService.GetWvWMapIds(await WvwService.GetWorldId()));
+			}
 		}
 
 		private void OnOpacitySettingChanged(object o, ValueChangedEventArgs<float> e)
@@ -310,7 +313,7 @@ namespace Nekres.Mistwar
 				}
 				if (GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch())
 				{
-					IEnumerable<WvwObjectiveEntity> obj = await WvwService.GetObjectives(GameService.Gw2Mumble.get_CurrentMap().get_Id());
+					List<WvwObjectiveEntity> obj = await WvwService.GetObjectives(GameService.Gw2Mumble.get_CurrentMap().get_Id());
 					MarkerService?.ReloadMarkers(obj);
 					MarkerService?.Toggle(_mapService.IsVisible);
 				}

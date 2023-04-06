@@ -40,7 +40,6 @@
     <Reference Include="Gapotchenko.FX" />
     <Reference Include="Newtonsoft.Json" />
     <Reference Include="Flurl.Http" />
-    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
     <Reference Include="AsyncClipboardService" />
     <Reference Include="System.Net.Http" />

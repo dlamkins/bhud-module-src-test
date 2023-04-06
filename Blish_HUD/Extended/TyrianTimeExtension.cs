@@ -6,14 +6,14 @@ namespace Blish_HUD.Extended
 		{
 			switch (time)
 			{
-			case TyrianTime.Day:
-			case TyrianTime.Dusk:
-				return TyrianTime.Day;
-			case TyrianTime.Dawn:
-			case TyrianTime.Night:
-				return TyrianTime.Night;
+			case TyrianTime.DAY:
+			case TyrianTime.DUSK:
+				return TyrianTime.DAY;
+			case TyrianTime.DAWN:
+			case TyrianTime.NIGHT:
+				return TyrianTime.NIGHT;
 			default:
-				return TyrianTime.None;
+				return TyrianTime.NONE;
 			}
 		}
 

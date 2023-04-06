@@ -63,11 +63,28 @@ namespace Blish_HUD.Extended
 
 		private const uint MAPVK_VK_TO_VSC_EX = 4u;
 
+		private const uint KEY_PRESSED = 32768u;
+
+		private const uint VK_LSHIFT = 160u;
+
+		private const uint VK_RSHIFT = 161u;
+
+		private const uint VK_LCONTROL = 162u;
+
+		private const uint VK_RCONTROL = 163u;
+
+		private const uint VK_CONTROL = 17u;
+
+		private const uint VK_SHIFT = 16u;
+
 		private static List<int> ExtendedKeys = new List<int>
 		{
 			45, 36, 34, 46, 35, 33, 165, 161, 163, 38,
 			40, 37, 39, 144, 42
 		};
+
+		[DllImport("USER32.dll")]
+		private static extern short GetKeyState(uint vk);
 
 		[DllImport("user32.dll")]
 		private static extern uint MapVirtualKey(uint uCode, uint uMapType);
@@ -236,6 +253,41 @@ namespace Blish_HUD.Extended
 		{
 			Press(keyCode, sendToSystem);
 			Release(keyCode, sendToSystem);
+		}
+
+		public static bool IsPressed(uint keyCode)
+		{
+			return Convert.ToBoolean((long)GetKeyState(keyCode) & 0x8000L);
+		}
+
+		public static bool IsLCtrlPressed()
+		{
+			return Convert.ToBoolean((long)GetKeyState(162u) & 0x8000L);
+		}
+
+		public static bool IsRCtrlPressed()
+		{
+			return Convert.ToBoolean((long)GetKeyState(163u) & 0x8000L);
+		}
+
+		public static bool IsLShiftPressed()
+		{
+			return Convert.ToBoolean((long)GetKeyState(160u) & 0x8000L);
+		}
+
+		public static bool IsRShiftPressed()
+		{
+			return Convert.ToBoolean((long)GetKeyState(161u) & 0x8000L);
+		}
+
+		public static bool IsCtrlPressed()
+		{
+			return Convert.ToBoolean((long)GetKeyState(17u) & 0x8000L);
+		}
+
+		public static bool IsShiftPressed()
+		{
+			return Convert.ToBoolean((long)GetKeyState(16u) & 0x8000L);
 		}
 	}
 }

@@ -4,14 +4,15 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 
-[assembly: AssemblyTitle("Blish-HUD-Extended")]
-[assembly: AssemblyDescription("Extensions to make Blish-HUD more awesome.")]
+[assembly: AssemblyTitle("Nekres.Mistwar.Properties")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("agaertner")]
-[assembly: AssemblyProduct("Blish-HUD-Extended")]
-[assembly: AssemblyCopyright("Copyright © agaertner 2022")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("Nekres.Mistwar.Properties")]
+[assembly: AssemblyCopyright("Copyright © A. Gärtner 2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: ComVisible(false)]
-[assembly: Guid("33c90e9c-3308-4a0e-8dfd-5855f296a72c")]
-[assembly: AssemblyFileVersion("0.1.0.8")]
-[assembly: AssemblyVersion("0.1.0.8")]
+[assembly: Guid("55a0ab3c-ed84-428b-8226-662fb7ceb124")]
+[assembly: AssemblyFileVersion("1.2.0.2")]
+[assembly: AssemblyInformationalVersion("1.2.0-dev.2+Branch.dev.Sha.0d0db1e523609605579bb4a1d0697fcb32e2a8f9")]
+[assembly: AssemblyVersion("1.2.0.2")]

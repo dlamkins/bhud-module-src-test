@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using Blish_HUD.Graphics;
 using Blish_HUD.Settings;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
@@ -15,22 +15,14 @@ namespace Blish_HUD.Extended.Core.Views
 	{
 		public enum SocialType
 		{
-			[EnumMember(Value = "kofi")]
-			KoFi,
-			[EnumMember(Value = "discord")]
-			Discord,
-			[EnumMember(Value = "github")]
-			GitHub,
-			[EnumMember(Value = "instagram")]
-			Instagram,
-			[EnumMember(Value = "patreon")]
-			Patreon,
-			[EnumMember(Value = "twitch")]
-			Twitch,
-			[EnumMember(Value = "twitter")]
-			Twitter,
-			[EnumMember(Value = "youtube")]
-			YouTube
+			KOFI,
+			DISCORD,
+			GITHUB,
+			INSTAGRAM,
+			PATREON,
+			TWITCH,
+			TWITTER,
+			YOUTUBE
 		}
 
 		private sealed class Social
@@ -56,18 +48,28 @@ namespace Blish_HUD.Extended.Core.Views
 
 		static SocialsSettingsModel()
 		{
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
 			Dictionary<SocialType, Texture2D> socialLogos = new Dictionary<SocialType, Texture2D>();
 			Assembly assembly = typeof(SocialsSettingsModel).GetTypeInfo().Assembly;
-			IEnumerable<SocialType> enumerable = Enum.GetValues(typeof(SocialType)).Cast<SocialType>();
+			IEnumerable<SocialType> socials = Enum.GetValues(typeof(SocialType)).Cast<SocialType>();
 			string[] resourceNames = assembly.GetManifestResourceNames();
-			foreach (SocialType social in enumerable)
+			GraphicsDeviceContext gdx = GameService.Graphics.LendGraphicsDeviceContext();
+			try
 			{
-				string resource = resourceNames.FirstOrDefault((string x) => x.EndsWith(social.ToString().ToLowerInvariant() + "_logo.png"));
-				if (resource != null)
+				foreach (SocialType social in socials)
 				{
-					using Stream file = assembly.GetManifestResourceStream(resource);
-					socialLogos.Add(social, Texture2D.FromStream(GameService.Graphics.get_GraphicsDevice(), file));
+					string resource = resourceNames.FirstOrDefault((string x) => x.EndsWith(social.ToString().ToLowerInvariant() + "_logo.png"));
+					if (resource != null)
+					{
+						using Stream file = assembly.GetManifestResourceStream(resource);
+						socialLogos.Add(social, Texture2D.FromStream(((GraphicsDeviceContext)(ref gdx)).get_GraphicsDevice(), file));
+					}
 				}
+			}
+			finally
+			{
+				((GraphicsDeviceContext)(ref gdx)).Dispose();
 			}
 			_socialLogos = socialLogos;
 		}
@@ -118,22 +120,20 @@ namespace Blish_HUD.Extended.Core.Views
 
 		internal string GetSocialUrl(SocialType social)
 		{
-			string val = default(string);
-			if (!(_socialUrls?.TryGetValue(social, out val) ?? false))
+			if (_socialUrls != null && _socialUrls.TryGetValue(social, out var val))
 			{
-				return string.Empty;
+				return val;
 			}
-			return val;
+			return string.Empty;
 		}
 
 		internal string GetSocialText(SocialType social)
 		{
-			string val = default(string);
-			if (!(_socialTexts?.TryGetValue(social, out val) ?? false))
+			if (_socialUrls != null && _socialTexts.TryGetValue(social, out var val))
 			{
-				return string.Empty;
+				return val;
 			}
-			return val;
+			return string.Empty;
 		}
 
 		internal IEnumerable<SocialType> GetSocials()

@@ -84,7 +84,7 @@ namespace Nekres.Mistwar.UI.Controls
 			{
 				objectives = objectives.Where((WvwObjectiveEntity x) => x.Owner != MistwarModule.ModuleInstance.WvwService.CurrentTeam);
 			}
-			List<WvwObjectiveEntity> distanceSort = objectives.OrderBy((WvwObjectiveEntity x) => x.GetDistance()).ToList();
+			List<WvwObjectiveEntity> distanceSort = objectives.OrderByDescending((WvwObjectiveEntity x) => x.GetDistance()).ToList();
 			if (MistwarModule.ModuleInstance.HideInCombatSetting.get_Value() && GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat())
 			{
 				distanceSort = (distanceSort.IsNullOrEmpty() ? distanceSort : distanceSort.Take(1).ToList());

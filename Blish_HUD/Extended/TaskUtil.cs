@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Flurl.Http;
+using Gw2Sharp.WebApi.Exceptions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -90,6 +91,55 @@ namespace Blish_HUD.Extended
 				Logger.Error(ex, "Unexpected error while requesting '" + request + "'.");
 			}
 			return (false, default(T));
+		}
+
+		public static async Task<T> RetryAsync<T>(Func<Task<T>> func, int retries = 2, int delayMs = 30000)
+		{
+			T result = default(T);
+			object obj;
+			int num;
+			try
+			{
+				result = await func();
+				return result;
+			}
+			catch (Exception ex)
+			{
+				obj = ex;
+				num = 1;
+			}
+			if (num != 1)
+			{
+				return result;
+			}
+			Exception e = (Exception)obj;
+			if (e is NotFoundException || e is BadRequestException || e is AuthorizationRequiredException)
+			{
+				Logger.Debug(e, e.Message);
+				return default(T);
+			}
+			if (retries > 0)
+			{
+				Logger.Warn(e, $"Failed to pull data from the GW2 API. Retrying in {delayMs / 1000} second(s) (remaining retries: {retries}).");
+				await Task.Delay(delayMs);
+				return await RetryAsync(func, retries - 1);
+			}
+			if (!(e is TooManyRequestsException))
+			{
+				if (e is RequestException || e is RequestException<string>)
+				{
+					Logger.Debug(e, e.Message);
+				}
+				else
+				{
+					Logger.Error(e, e.Message);
+				}
+			}
+			else
+			{
+				Logger.Warn(e, "After multiple attempts no data could be loaded due to being rate limited by the API.");
+			}
+			return default(T);
 		}
 	}
 }

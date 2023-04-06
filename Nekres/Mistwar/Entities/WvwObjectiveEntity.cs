@@ -71,37 +71,108 @@ namespace Nekres.Mistwar.Entities
 
 		public static readonly Color BrightGold = new Color(223, 194, 149, 255);
 
-		private readonly WvwObjective _internalObjective;
+		private DateTime _lastFlipped = DateTime.MinValue;
 
-		private readonly ContinentFloorRegionMapSector _internalSector;
+		private WvwOwner _owner = (WvwOwner)1;
+
+		private Guid _claimedBy = Guid.Empty;
+
+		private int _yaksDelivered;
+
+		private IReadOnlyList<int> _guildUpgrades;
 
 		private float _opacity;
 
-		public int MapId { get; }
+		private readonly WvwObjective _internalObjective;
 
-		public string Id => _internalObjective.get_Id();
+		public DateTime LastModified { get; private set; }
 
-		public string Name => _internalObjective.get_Name();
+		public DateTime LastFlipped
+		{
+			get
+			{
+				return _lastFlipped;
+			}
+			set
+			{
+				if (_lastFlipped != value)
+				{
+					_lastFlipped = value;
+					LastModified = DateTime.UtcNow;
+				}
+			}
+		}
 
-		public WvwObjectiveType Type => ApiEnum<WvwObjectiveType>.op_Implicit(_internalObjective.get_Type());
+		public WvwOwner Owner
+		{
+			get
+			{
+				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+				return _owner;
+			}
+			set
+			{
+				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+				//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+				if (_owner != value)
+				{
+					_owner = value;
+					LastModified = DateTime.UtcNow;
+				}
+			}
+		}
 
-		public IEnumerable<Point> Bounds { get; }
+		public Guid ClaimedBy
+		{
+			get
+			{
+				return _claimedBy;
+			}
+			set
+			{
+				if (_claimedBy != value)
+				{
+					_claimedBy = value;
+					LastModified = DateTime.UtcNow;
+				}
+			}
+		}
 
-		public Point Center { get; }
+		public int YaksDelivered
+		{
+			get
+			{
+				return _yaksDelivered;
+			}
+			set
+			{
+				if (_yaksDelivered != value)
+				{
+					_yaksDelivered = value;
+					LastModified = DateTime.UtcNow;
+				}
+			}
+		}
 
-		public Vector3 WorldPosition { get; }
-
-		public DateTime LastFlipped { get; set; }
-
-		public WvwOwner Owner { get; set; }
+		public IReadOnlyList<int> GuildUpgrades
+		{
+			get
+			{
+				return _guildUpgrades;
+			}
+			set
+			{
+				if (_guildUpgrades?.SequenceEqual(value) ?? (_guildUpgrades != value))
+				{
+					_guildUpgrades = value;
+					LastModified = DateTime.UtcNow;
+				}
+			}
+		}
 
 		public Color TeamColor => GetColor();
-
-		public Guid ClaimedBy { get; set; }
-
-		public IReadOnlyList<int> GuildUpgrades { get; set; }
-
-		public int YaksDelivered { get; set; }
 
 		public Texture2D Icon { get; }
 
@@ -123,31 +194,45 @@ namespace Nekres.Mistwar.Entities
 
 		public Texture2D BuffTexture => TextureBuff;
 
+		public IEnumerable<Point> Bounds { get; }
+
+		public Point Center { get; }
+
+		public Vector3 WorldPosition { get; }
+
 		public float Opacity => GetOpacity();
 
 		public List<ContinentFloorRegionMapPoi> WayPoints { get; }
 
+		public string Id => _internalObjective.get_Id();
+
+		public string Name => _internalObjective.get_Name();
+
+		public WvwObjectiveType Type => ApiEnum<WvwObjectiveType>.op_Implicit(_internalObjective.get_Type());
+
+		public int MapId { get; }
+
 		public WvwObjectiveEntity(WvwObjective objective, ContinentFloorRegionMap map)
 		{
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018f: Unknown result type (might be due to invalid IL or missing references)
-			WvwObjectiveEntity wvwObjectiveEntity = this;
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0176: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0198: Unknown result type (might be due to invalid IL or missing references)
 			_internalObjective = objective;
-			_internalSector = map.get_Sectors()[objective.get_SectorId()];
+			ContinentFloorRegionMapSector internalSector = map.get_Sectors()[objective.get_SectorId()];
 			_opacity = 1f;
 			Icon = GetTexture(ApiEnum<WvwObjectiveType>.op_Implicit(objective.get_Type()));
 			MapId = map.get_Id();
-			Bounds = _internalSector.get_Bounds().Select(delegate(Coordinates2 coord)
+			Bounds = internalSector.get_Bounds().Select(delegate(Coordinates2 coord)
 			{
 				//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
@@ -156,10 +241,9 @@ namespace Nekres.Mistwar.Entities
 				Rectangle continentRect2 = map.get_ContinentRect();
 				return MapUtil.Refit(coord, ((Rectangle)(ref continentRect2)).get_TopLeft());
 			});
-			Coordinates2 coord2 = _internalSector.get_Coord();
+			Coordinates2 coord2 = internalSector.get_Coord();
 			Rectangle continentRect = map.get_ContinentRect();
 			Center = MapUtil.Refit(coord2, ((Rectangle)(ref continentRect)).get_TopLeft());
-			LastFlipped = DateTime.MinValue.ToUniversalTime();
 			BuffDuration = new TimeSpan(0, 5, 0);
 			WorldPosition = CalculateWorldPosition(map);
 			WayPoints = map.get_PointsOfInterest().Values.Where((ContinentFloorRegionMapPoi x) => x.get_Type() == ApiEnum<PoiType>.op_Implicit((PoiType)2)).Where(delegate(ContinentFloorRegionMapPoi y)
@@ -172,7 +256,7 @@ namespace Nekres.Mistwar.Entities
 				Coordinates2 coord4 = y.get_Coord();
 				float num = (float)((Coordinates2)(ref coord4)).get_X();
 				coord4 = y.get_Coord();
-				return PolygonUtil.InBounds(new Vector2(num, (float)((Coordinates2)(ref coord4)).get_Y()), ((IEnumerable<Coordinates2>)wvwObjectiveEntity._internalSector.get_Bounds()).Select((Func<Coordinates2, Vector2>)((Coordinates2 z) => new Vector2((float)((Coordinates2)(ref z)).get_X(), (float)((Coordinates2)(ref z)).get_Y()))).ToList());
+				return PolygonUtil.InBounds(new Vector2(num, (float)((Coordinates2)(ref coord4)).get_Y()), ((IEnumerable<Coordinates2>)internalSector.get_Bounds()).Select((Func<Coordinates2, Vector2>)((Coordinates2 z) => new Vector2((float)((Coordinates2)(ref z)).get_X(), (float)((Coordinates2)(ref z)).get_Y()))).ToList());
 			}).ToList();
 			foreach (ContinentFloorRegionMapPoi wayPoint in WayPoints)
 			{
@@ -201,8 +285,13 @@ namespace Nekres.Mistwar.Entities
 		public bool IsOwned()
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0007: Invalid comparison between Unknown and I4
-			return (int)Owner <= 1;
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0009: Invalid comparison between Unknown and I4
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000d: Invalid comparison between Unknown and I4
+			WvwOwner owner = Owner;
+			return (int)owner == 2 || (int)owner == 4;
 		}
 
 		public bool IsClaimed()
@@ -232,18 +321,17 @@ namespace Nekres.Mistwar.Entities
 		public bool HasRegularWaypoint()
 		{
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Invalid comparison between Unknown and I4
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Invalid comparison between Unknown and I4
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Invalid comparison between Unknown and I4
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Invalid comparison between Unknown and I4
 			if (!IsSpawn())
 			{
 				if (GetTier() == WvwObjectiveTier.Fortified)
 				{
-					if ((int)Type != 3)
-					{
-						return (int)Type == 2;
-					}
-					return true;
+					WvwObjectiveType type = Type;
+					return (int)type == 3 || (int)type == 2;
 				}
 				return false;
 			}

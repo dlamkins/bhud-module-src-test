@@ -9,8 +9,8 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Blish_HUD.Extended;
 using Gw2Sharp.Models;
-using Gw2Sharp.WebApi.Exceptions;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
@@ -101,47 +101,23 @@ namespace Nekres.Mistwar
 
 		private static async Task<Map> RequestMap(int mapId)
 		{
-			try
-			{
-				return await ((IBulkExpandableClient<Map, int>)(object)GameService.Gw2WebApi.get_AnonymousConnection().get_Client().get_V2()
-					.get_Maps()).GetAsync(mapId, default(CancellationToken));
-			}
-			catch (Exception ex) when (ex is BadRequestException || ex is NotFoundException)
-			{
-				return null;
-			}
-			catch (UnexpectedStatusException)
-			{
-				MistwarModule.Logger.Warn(CommonStrings.WebApiDown);
-				return null;
-			}
+			return await TaskUtil.RetryAsync(() => ((IBulkExpandableClient<Map, int>)(object)GameService.Gw2WebApi.get_AnonymousConnection().get_Client().get_V2()
+				.get_Maps()).GetAsync(mapId, default(CancellationToken)));
 		}
 
 		private static async Task<ContinentFloorRegionMap> RequestMapExpanded(Map map, int floorId)
 		{
-			try
-			{
-				return await ((IBulkExpandableClient<ContinentFloorRegionMap, int>)(object)GameService.Gw2WebApi.get_AnonymousConnection().get_Client().get_V2()
-					.get_Continents()
-					.get_Item(map.get_ContinentId())
-					.get_Floors()
-					.get_Item(floorId)
-					.get_Regions()
-					.get_Item(map.get_RegionId())
-					.get_Maps()).GetAsync(map.get_Id(), default(CancellationToken));
-			}
-			catch (Exception ex) when (ex is BadRequestException || ex is NotFoundException)
-			{
-				return null;
-			}
-			catch (UnexpectedStatusException)
-			{
-				MistwarModule.Logger.Warn(CommonStrings.WebApiDown);
-				return null;
-			}
+			return await TaskUtil.RetryAsync(() => ((IBulkExpandableClient<ContinentFloorRegionMap, int>)(object)GameService.Gw2WebApi.get_AnonymousConnection().get_Client().get_V2()
+				.get_Continents()
+				.get_Item(map.get_ContinentId())
+				.get_Floors()
+				.get_Item(floorId)
+				.get_Regions()
+				.get_Item(map.get_RegionId())
+				.get_Maps()).GetAsync(map.get_Id(), default(CancellationToken)));
 		}
 
-		private static Point FromPixelToTileXY(Coordinates2 p, int zoom = 8)
+		private static Point FromPixelToTileXy(Coordinates2 p, int zoom = 8)
 		{
 			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 			int tileSize = zoom * 32;
@@ -159,8 +135,8 @@ namespace Nekres.Mistwar
 			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			Point topLeft = FromPixelToTileXY(((Rectangle)(ref rect)).get_TopLeft());
-			Point val = FromPixelToTileXY(((Rectangle)(ref rect)).get_BottomRight());
+			Point topLeft = FromPixelToTileXy(((Rectangle)(ref rect)).get_TopLeft());
+			Point val = FromPixelToTileXy(((Rectangle)(ref rect)).get_BottomRight());
 			int x = Math.Max(0, topLeft.X);
 			int toX = val.X;
 			int y2 = Math.Max(0, topLeft.Y);
@@ -183,7 +159,8 @@ namespace Nekres.Mistwar
 				return null;
 			}
 			string dns = ((dnsAlias > 0 && dnsAlias < 5) ? dnsAlias.ToString() : string.Empty);
-			Stream responseStream = (await WebRequest.Create($"https://tiles{dns}.guildwars2.com/{continentId}/{floor}/{zoom}/{x}/{y}.jpg").GetResponseAsync()).GetResponseStream();
+			using WebResponse response = await WebRequest.Create($"https://tiles{dns}.guildwars2.com/{continentId}/{floor}/{zoom}/{x}/{y}.jpg").GetResponseAsync();
+			using Stream responseStream = response.GetResponseStream();
 			if (responseStream == null)
 			{
 				return null;
