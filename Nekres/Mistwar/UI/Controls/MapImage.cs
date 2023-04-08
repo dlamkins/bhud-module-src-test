@@ -155,33 +155,36 @@ namespace Nekres.Mistwar.UI.Controls
 
 		public void Toggle(bool forceHide = false, bool silent = false, float tDuration = 0.1f)
 		{
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			silent = silent || !GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch();
-			if (forceHide || !GameUtil.IsAvailable() || !GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch() || ((Control)this)._visible)
+			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+			bool isWvWMatch = GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch();
+			if (!forceHide && GameUtil.IsAvailable() && isWvWMatch && !((Control)this)._visible)
+			{
+				((Control)this)._visible = true;
+				((Control)this).set_Visible(true);
+				if (!silent)
+				{
+					GameService.Content.PlaySoundEffectByName("page-open-" + RandomUtil.GetRandom(1, 3));
+					((TweenerImpl)GameService.Animation.get_Tweener()).Tween<MapImage>(this, (object)new
+					{
+						Opacity = 1f
+					}, 0.35f, 0f, true);
+				}
+			}
+			else if (((Control)this)._visible)
 			{
 				((Control)this)._visible = false;
-				if (silent)
+				if (!silent)
+				{
+					GameService.Content.PlaySoundEffectByName("window-close");
+					((TweenerImpl)GameService.Animation.get_Tweener()).Tween<MapImage>(this, (object)new
+					{
+						Opacity = 0f
+					}, tDuration, 0f, true).OnComplete((Action)((Control)this).Hide);
+				}
+				else
 				{
 					((Control)this).set_Visible(false);
-					return;
 				}
-				GameService.Content.PlaySoundEffectByName("window-close");
-				((TweenerImpl)GameService.Animation.get_Tweener()).Tween<MapImage>(this, (object)new
-				{
-					Opacity = 0f
-				}, tDuration, 0f, true).OnComplete((Action)((Control)this).Hide);
-				return;
-			}
-			((Control)this)._visible = true;
-			((Control)this).set_Visible(true);
-			if (!silent)
-			{
-				GameService.Content.PlaySoundEffectByName("page-open-" + RandomUtil.GetRandom(1, 3));
-				((TweenerImpl)GameService.Animation.get_Tweener()).Tween<MapImage>(this, (object)new
-				{
-					Opacity = 1f
-				}, 0.35f, 0f, true);
 			}
 		}
 

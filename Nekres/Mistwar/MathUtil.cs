@@ -86,5 +86,14 @@ namespace Nekres.Mistwar
 			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			return a.X * b.Y - a.Y * b.X;
 		}
+
+		public static int RoundToClosest(int value, int a, int b)
+		{
+			if (Math.Abs(value - a) >= Math.Abs(value - b))
+			{
+				return b;
+			}
+			return a;
+		}
 	}
 }

@@ -34,8 +34,8 @@
     <Reference Include="MonoGame.Framework" />
     <Reference Include="Blish HUD" />
     <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="Gw2Sharp" />
     <Reference Include="MonoGame.Extended" />
+    <Reference Include="Gw2Sharp" />
     <Reference Include="System.Numerics" />
     <Reference Include="Gapotchenko.FX" />
     <Reference Include="Newtonsoft.Json" />

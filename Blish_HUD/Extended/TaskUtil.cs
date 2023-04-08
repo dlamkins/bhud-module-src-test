@@ -115,20 +115,20 @@ namespace Blish_HUD.Extended
 			Exception e = (Exception)obj;
 			if (e is NotFoundException || e is BadRequestException || e is AuthorizationRequiredException)
 			{
-				Logger.Debug(e, e.Message);
+				Logger.Trace(e, e.Message);
 				return default(T);
 			}
 			if (retries > 0)
 			{
 				Logger.Warn(e, $"Failed to pull data from the GW2 API. Retrying in {delayMs / 1000} second(s) (remaining retries: {retries}).");
 				await Task.Delay(delayMs);
-				return await RetryAsync(func, retries - 1);
+				return await RetryAsync(func, retries - 1, delayMs);
 			}
 			if (!(e is TooManyRequestsException))
 			{
 				if (e is RequestException || e is RequestException<string>)
 				{
-					Logger.Debug(e, e.Message);
+					Logger.Trace(e, e.Message);
 				}
 				else
 				{
@@ -140,6 +140,40 @@ namespace Blish_HUD.Extended
 				Logger.Warn(e, "After multiple attempts no data could be loaded due to being rate limited by the API.");
 			}
 			return default(T);
+		}
+
+		public static async Task<T> TryAsync<T>(Func<Task<T>> func)
+		{
+			try
+			{
+				return await func();
+			}
+			catch (Exception e)
+			{
+				if (!(e is NotFoundException) && !(e is BadRequestException) && !(e is AuthorizationRequiredException))
+				{
+					if (!(e is TooManyRequestsException))
+					{
+						if (e is RequestException || e is RequestException<string>)
+						{
+							Logger.Trace(e, e.Message);
+						}
+						else
+						{
+							Logger.Error(e, e.Message);
+						}
+					}
+					else
+					{
+						Logger.Warn(e, "No data could be loaded due to being rate limited by the API.");
+					}
+				}
+				else
+				{
+					Logger.Trace(e, e.Message);
+				}
+				return default(T);
+			}
 		}
 	}
 }

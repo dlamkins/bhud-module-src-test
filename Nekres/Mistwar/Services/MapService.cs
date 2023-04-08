@@ -20,12 +20,6 @@ namespace Nekres.Mistwar.Services
 {
 	internal class MapService : IDisposable
 	{
-		private DirectoriesManager _dir;
-
-		private WvwService _wvw;
-
-		private MapImage _mapControl;
-
 		private float _opacity;
 
 		private float _colorIntensity;
@@ -33,6 +27,12 @@ namespace Nekres.Mistwar.Services
 		private readonly IProgress<string> _loadingIndicator;
 
 		private Dictionary<int, AsyncTexture2D> _mapCache;
+
+		private DirectoriesManager _dir;
+
+		private WvwService _wvw;
+
+		private MapImage _mapControl;
 
 		public float Opacity
 		{
@@ -75,6 +75,8 @@ namespace Nekres.Mistwar.Services
 
 		public bool IsLoading { get; private set; }
 
+		public bool IsReady { get; private set; }
+
 		public MapService(DirectoriesManager dir, WvwService wvw, IProgress<string> loadingIndicator)
 		{
 			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
@@ -96,7 +98,7 @@ namespace Nekres.Mistwar.Services
 
 		public void DownloadMaps(int[] mapIds)
 		{
-			if (!mapIds.IsNullOrEmpty())
+			if (!IsReady && !IsLoading && !mapIds.IsNullOrEmpty())
 			{
 				Thread thread = new Thread((ThreadStart)delegate
 				{
@@ -114,19 +116,24 @@ namespace Nekres.Mistwar.Services
 			{
 				DownloadMapImage(id).Wait();
 			}
-			IsLoading = false;
 			_loadingIndicator.Report(null);
+			IsLoading = false;
 		}
 
 		private async Task DownloadMapImage(int id)
 		{
-			if (!_mapCache.TryGetValue(id, out var cacheTex))
+			AsyncTexture2D tex;
+			lock (_mapCache)
 			{
-				cacheTex = new AsyncTexture2D();
-				_mapCache.Add(id, cacheTex);
+				if (!_mapCache.TryGetValue(id, out tex))
+				{
+					tex = new AsyncTexture2D();
+					_mapCache.Add(id, tex);
+				}
 			}
-			string filePath = string.Format("{0}/{1}.png", _dir.GetFullDirectoryPath("mistwar"), id);
-			if (LoadFromCache(filePath, cacheTex))
+			string filePath = Path.Combine(_dir.GetFullDirectoryPath("mistwar"), $"{id}.png");
+			IsReady = LoadFromCache(filePath, tex);
+			if (IsReady)
 			{
 				await ReloadMap();
 				return;
@@ -135,7 +142,8 @@ namespace Nekres.Mistwar.Services
 			if (map != null)
 			{
 				await MapUtil.BuildMap(map, filePath, removeBackground: true, _loadingIndicator);
-				if (LoadFromCache(filePath, cacheTex))
+				IsReady = LoadFromCache(filePath, tex);
+				if (IsReady)
 				{
 					await ReloadMap();
 				}
@@ -176,17 +184,26 @@ namespace Nekres.Mistwar.Services
 
 		public async Task ReloadMap()
 		{
-			if (GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch() && _mapCache.TryGetValue(GameService.Gw2Mumble.get_CurrentMap().get_Id(), out var tex) && tex != null)
+			if (!GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch())
 			{
-				_mapControl.Texture.SwapTexture(AsyncTexture2D.op_Implicit(tex));
-				MapImage mapControl = _mapControl;
-				mapControl.Map = await GetMap(GameService.Gw2Mumble.get_CurrentMap().get_Id());
-				List<WvwObjectiveEntity> wvwObjectives = await _wvw.GetObjectives(GameService.Gw2Mumble.get_CurrentMap().get_Id());
-				if (!wvwObjectives.IsNullOrEmpty())
+				return;
+			}
+			AsyncTexture2D tex;
+			lock (_mapCache)
+			{
+				if (!_mapCache.TryGetValue(GameService.Gw2Mumble.get_CurrentMap().get_Id(), out tex) || tex == null)
 				{
-					_mapControl.WvwObjectives = wvwObjectives;
-					MistwarModule.ModuleInstance?.MarkerService?.ReloadMarkers(wvwObjectives);
+					return;
 				}
+			}
+			_mapControl.Texture.SwapTexture(AsyncTexture2D.op_Implicit(tex));
+			MapImage mapControl = _mapControl;
+			mapControl.Map = await GetMap(GameService.Gw2Mumble.get_CurrentMap().get_Id());
+			List<WvwObjectiveEntity> wvwObjectives = await _wvw.GetObjectives(GameService.Gw2Mumble.get_CurrentMap().get_Id());
+			if (!wvwObjectives.IsNullOrEmpty())
+			{
+				_mapControl.WvwObjectives = wvwObjectives;
+				MistwarModule.ModuleInstance?.MarkerService?.ReloadMarkers(wvwObjectives);
 			}
 		}
 
@@ -198,7 +215,7 @@ namespace Nekres.Mistwar.Services
 
 		public void Toggle(bool forceHide = false, bool silent = false)
 		{
-			if (IsLoading)
+			if (!IsReady)
 			{
 				ScreenNotification.ShowNotification("(" + ((Module)MistwarModule.ModuleInstance).get_Name() + ") Map images are being prepared...", (NotificationType)2, (Texture2D)null, 4);
 			}

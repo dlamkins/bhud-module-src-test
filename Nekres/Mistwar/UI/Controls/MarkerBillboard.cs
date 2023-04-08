@@ -52,27 +52,35 @@ namespace Nekres.Mistwar.UI.Controls
 			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0148: Invalid comparison between Unknown and I4
-			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0168: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0202: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0217: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0149: Invalid comparison between Unknown and I4
+			//IL_0158: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0183: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0205: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0230: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0241: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0254: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034c: Unknown result type (might be due to invalid IL or missing references)
 			if (!GameUtil.IsAvailable() || !GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch() || !((Control)this).get_Visible() || WvwObjectives == null)
 			{
 				return;
@@ -87,24 +95,55 @@ namespace Nekres.Mistwar.UI.Controls
 			List<WvwObjectiveEntity> distanceSort = objectives.OrderByDescending((WvwObjectiveEntity x) => x.GetDistance()).ToList();
 			if (MistwarModule.ModuleInstance.HideInCombatSetting.get_Value() && GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat())
 			{
-				distanceSort = (distanceSort.IsNullOrEmpty() ? distanceSort : distanceSort.Take(1).ToList());
+				WvwObjectiveEntity closest = distanceSort.LastOrDefault();
+				if (closest == null)
+				{
+					return;
+				}
+				distanceSort = new List<WvwObjectiveEntity> { closest };
 			}
 			Rectangle dest = default(Rectangle);
+			Rectangle screenBounds = default(Rectangle);
 			foreach (WvwObjectiveEntity objectiveEntity in distanceSort)
 			{
-				if (objectiveEntity.Icon != null && (MistwarModule.ModuleInstance.DrawRuinMarkersSetting.get_Value() || (int)objectiveEntity.Type != 6))
+				if (objectiveEntity.Icon == null || (!MistwarModule.ModuleInstance.DrawRuinMarkersSetting.get_Value() && (int)objectiveEntity.Type == 6))
 				{
-					Vector3 dir = GameService.Gw2Mumble.get_PlayerCamera().get_Position() - objectiveEntity.WorldPosition;
-					if (!(Math.Abs(180.0 / Math.PI * GameService.Gw2Mumble.get_PlayerCamera().get_Forward().Angle(dir)) < 90.0))
-					{
-						Matrix trs = Matrix.CreateScale(1f) * Matrix.CreateTranslation(objectiveEntity.WorldPosition);
-						Vector2 transformed = Vector3.Transform(((Matrix)(ref trs)).get_Translation(), GameService.Gw2Mumble.get_PlayerCamera().get_WorldViewProjection()).Flatten();
-						int width = objectiveEntity.Icon.get_Width();
-						int height = objectiveEntity.Icon.get_Height();
-						((Rectangle)(ref dest))._002Ector((int)transformed.X, (int)transformed.Y, width, height);
-						spriteBatch.DrawWvwObjectiveOnCtrl((Control)(object)this, objectiveEntity, dest, objectiveEntity.Opacity, MathUtil.Clamp(MistwarModule.ModuleInstance.MarkerScaleSetting.get_Value() / 100f, 0f, 1f), drawName: true, MistwarModule.ModuleInstance.DrawDistanceSetting.get_Value());
-					}
+					continue;
 				}
+				Vector3 dir = GameService.Gw2Mumble.get_PlayerCamera().get_Position() - objectiveEntity.WorldPosition;
+				double value = 180.0 / Math.PI * GameService.Gw2Mumble.get_PlayerCamera().get_Forward().Angle(dir);
+				Matrix trs = Matrix.CreateScale(1f) * Matrix.CreateTranslation(objectiveEntity.WorldPosition);
+				Vector2 transformed = Vector3.Transform(((Matrix)(ref trs)).get_Translation(), GameService.Gw2Mumble.get_PlayerCamera().get_WorldViewProjection()).Flatten();
+				int width = objectiveEntity.Icon.get_Width();
+				int height = objectiveEntity.Icon.get_Height();
+				((Rectangle)(ref dest))._002Ector((int)transformed.X, (int)transformed.Y, width, height);
+				((Rectangle)(ref screenBounds))._002Ector(0, 0, bounds.Width, bounds.Height);
+				int left = ((Rectangle)(ref screenBounds)).get_Left() + dest.Width / 2;
+				int right = ((Rectangle)(ref screenBounds)).get_Right() - dest.Width;
+				int top = ((Rectangle)(ref screenBounds)).get_Top() + dest.Height / 2;
+				int bottom = ((Rectangle)(ref screenBounds)).get_Bottom() - dest.Height;
+				if (Math.Abs(value) < 90.0)
+				{
+					if (!MistwarModule.ModuleInstance.MarkerStickySetting.get_Value())
+					{
+						continue;
+					}
+					dest.Y = bottom;
+				}
+				if (MistwarModule.ModuleInstance.MarkerStickySetting.get_Value())
+				{
+					dest.X = (int)MathUtil.Clamp(dest.X, left, right);
+					dest.Y = (int)MathUtil.Clamp(dest.Y, top, bottom);
+				}
+				float minScale = 0.2f;
+				float maxScale = MathUtil.Clamp(MistwarModule.ModuleInstance.MarkerScaleSetting.get_Value() / 100f, minScale, 1f);
+				float scale = maxScale;
+				float distance = objectiveEntity.GetDistance();
+				if (!MistwarModule.ModuleInstance.MarkerFixedSizeSetting.get_Value() && distance > 400f)
+				{
+					scale = MathUtil.Clamp((float)Math.Sqrt(Math.Abs(1f - distance / 1500f)), minScale, maxScale);
+				}
+				spriteBatch.DrawWvwObjectiveOnCtrl((Control)(object)this, objectiveEntity, dest, objectiveEntity.Opacity, scale, drawName: true, MistwarModule.ModuleInstance.DrawDistanceSetting.get_Value());
 			}
 		}
 

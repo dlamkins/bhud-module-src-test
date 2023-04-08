@@ -65,6 +65,10 @@ namespace Nekres.Mistwar
 
 		internal SettingEntry<float> MarkerScaleSetting;
 
+		internal SettingEntry<bool> MarkerFixedSizeSetting;
+
+		internal SettingEntry<bool> MarkerStickySetting;
+
 		private AsyncTexture2D _cornerTex;
 
 		private CornerIcon _moduleIcon;
@@ -124,7 +128,9 @@ namespace Nekres.Mistwar
 			DrawRuinMarkersSetting = markerSettings.DefineSetting<bool>("ShowRuinMarkers", true, (Func<string>)(() => "Show Ruins"), (Func<string>)(() => "Show markers for the ruins."));
 			DrawDistanceSetting = markerSettings.DefineSetting<bool>("ShowDistance", true, (Func<string>)(() => "Show Distance"), (Func<string>)(() => "Show flight distance to objectives."));
 			MaxViewDistanceSetting = markerSettings.DefineSetting<float>("MaxViewDistance", 50f, (Func<string>)(() => "Max View Distance"), (Func<string>)(() => "The max view distance at which an objective marker can be seen."));
-			MarkerScaleSetting = markerSettings.DefineSetting<float>("ScaleRatio", 70f, (Func<string>)(() => "Scale Ratio"), (Func<string>)(() => "Changes the size of the markers."));
+			MarkerScaleSetting = markerSettings.DefineSetting<float>("ScaleRatio", 70f, (Func<string>)(() => "Marker Size"), (Func<string>)(() => "Changes the maximum size of the markers."));
+			MarkerFixedSizeSetting = markerSettings.DefineSetting<bool>("FixedSize", false, (Func<string>)(() => "Fixed Size"), (Func<string>)(() => "Disables the distance-based down-scaling of objective markers."));
+			MarkerStickySetting = markerSettings.DefineSetting<bool>("Sticky", true, (Func<string>)(() => "Sticky"), (Func<string>)(() => "Objectives which are out of view will have their marker stick to the edge of your screen if enabled."));
 		}
 
 		protected override void Initialize()
@@ -152,14 +158,10 @@ namespace Nekres.Mistwar
 		protected override async Task LoadAsync()
 		{
 			await WvwService.LoadAsync();
-			MapService mapService = _mapService;
-			WvwService wvwService = WvwService;
-			mapService.DownloadMaps(await wvwService.GetWvWMapIds(await WvwService.GetWorldId()));
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
-			Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)OnSubtokenUpdated);
 			ColorIntensitySetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnColorIntensitySettingChanged);
 			ToggleMapKeySetting.get_Value().add_Activated((EventHandler<EventArgs>)OnToggleKeyActivated);
 			ToggleMarkersKeySetting.get_Value().add_Activated((EventHandler<EventArgs>)OnToggleMarkersKeyActivated);
@@ -204,16 +206,6 @@ namespace Nekres.Mistwar
 			return new Progress<string>(UpdateModuleLoading);
 		}
 
-		private async void OnSubtokenUpdated(object o, ValueEventArgs<IEnumerable<TokenPermission>> e)
-		{
-			if (Gw2ApiManager.HasPermission((TokenPermission)1))
-			{
-				MapService mapService = _mapService;
-				WvwService wvwService = WvwService;
-				mapService.DownloadMaps(await wvwService.GetWvWMapIds(await WvwService.GetWorldId()));
-			}
-		}
-
 		private void OnOpacitySettingChanged(object o, ValueChangedEventArgs<float> e)
 		{
 			_mapService.Opacity = MathHelper.Clamp(e.get_NewValue() / 100f, 0f, 1f);
@@ -232,6 +224,7 @@ namespace Nekres.Mistwar
 
 		protected override async void Update(GameTime gameTime)
 		{
+			_mapService.DownloadMaps(WvwService.GetWvWMapIds());
 			if (Gw2ApiManager.HasPermission((TokenPermission)1))
 			{
 				await WvwService.Update();
@@ -327,7 +320,6 @@ namespace Nekres.Mistwar
 
 		protected override void Unload()
 		{
-			Gw2ApiManager.remove_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)OnSubtokenUpdated);
 			ColorIntensitySetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnColorIntensitySettingChanged);
 			ToggleMapKeySetting.get_Value().remove_Activated((EventHandler<EventArgs>)OnToggleKeyActivated);
 			ToggleMarkersKeySetting.get_Value().remove_Activated((EventHandler<EventArgs>)OnToggleMarkersKeyActivated);
@@ -338,7 +330,6 @@ namespace Nekres.Mistwar
 			GameService.GameIntegration.get_Gw2Instance().remove_IsInGameChanged((EventHandler<ValueEventArgs<bool>>)OnIsInGameChanged);
 			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
 			GameService.Gw2Mumble.get_UI().remove_IsMapOpenChanged((EventHandler<ValueEventArgs<bool>>)OnIsMapOpenChanged);
-			MarkerService?.Dispose();
 			_mapService?.Dispose();
 			CornerIcon moduleIcon = _moduleIcon;
 			if (moduleIcon != null)
@@ -350,6 +341,8 @@ namespace Nekres.Mistwar
 			{
 				cornerTex.Dispose();
 			}
+			MarkerService?.Dispose();
+			WvwService?.Dispose();
 			ModuleInstance = null;
 		}
 	}

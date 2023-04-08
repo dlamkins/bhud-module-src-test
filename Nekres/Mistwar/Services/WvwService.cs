@@ -16,7 +16,7 @@ using Nekres.Mistwar.Entities;
 
 namespace Nekres.Mistwar.Services
 {
-	internal class WvwService
+	internal class WvwService : IDisposable
 	{
 		private enum WvwMap
 		{
@@ -42,9 +42,9 @@ namespace Nekres.Mistwar.Services
 
 		public DateTime LastChange { get; private set; }
 
-		public bool IsLoading => !string.IsNullOrEmpty(LoadingMessage);
-
 		public string LoadingMessage { get; private set; }
+
+		public bool IsLoading => !string.IsNullOrEmpty(LoadingMessage);
 
 		public WvwService(Gw2ApiManager api)
 		{
@@ -69,20 +69,22 @@ namespace Nekres.Mistwar.Services
 			LoadingMessage = "Refreshing";
 			CurrentGuild = await GetRepresentedGuild();
 			int worldId = await GetWorldId();
-			if (worldId < 0)
+			if (worldId >= 0)
 			{
-				LoadingMessage = string.Empty;
-				return;
+				int[] wvWMapIds = GetWvWMapIds();
+				List<Task> taskList = new List<Task>();
+				int[] array = wvWMapIds;
+				foreach (int id in array)
+				{
+					Task<Task> t = new Task<Task>(() => UpdateObjectives(worldId, id));
+					taskList.Add(t);
+					t.Start();
+				}
+				if (taskList.Any())
+				{
+					await Task.WhenAll(taskList.ToArray());
+				}
 			}
-			List<Task> taskList = new List<Task>();
-			int[] array = await GetWvWMapIds(worldId);
-			foreach (int id in array)
-			{
-				Task<Task> t = new Task<Task>(() => UpdateObjectives(worldId, id));
-				taskList.Add(t);
-				t.Start();
-			}
-			Task.WaitAll(taskList.ToArray());
 			double mins = Math.Round(LastChange.Subtract(DateTime.UtcNow).TotalMinutes);
 			if (mins > 0.0 && mins % 2.0 == 0.0)
 			{
@@ -101,13 +103,9 @@ namespace Nekres.Mistwar.Services
 			{
 				return Guid.Empty;
 			}
-			Character character = await TaskUtil.RetryAsync(() => ((IBlobClient<Character>)(object)_api.get_Gw2ApiClient().get_V2().get_Characters()
+			Character obj = await TaskUtil.TryAsync(() => ((IBlobClient<Character>)(object)_api.get_Gw2ApiClient().get_V2().get_Characters()
 				.get_Item(GameService.Gw2Mumble.get_PlayerCharacter().get_Name())).GetAsync(default(CancellationToken)));
-			if (character == null)
-			{
-				return Guid.Empty;
-			}
-			return character.get_Guild() ?? Guid.Empty;
+			return ((obj != null) ? obj.get_Guild() : null) ?? Guid.Empty;
 		}
 
 		public string GetWorldName(WvwOwner owner)
@@ -130,7 +128,7 @@ namespace Nekres.Mistwar.Services
 			default:
 				return string.Empty;
 			}
-			World obj = _worlds.OrderBy((World x) => x.get_Population().get_Value()).Reverse().FirstOrDefault((World y) => team.Contains(y.get_Id()));
+			World obj = _worlds.OrderByDescending((World x) => x.get_Population().get_Value()).FirstOrDefault((World y) => team.Contains(y.get_Id()));
 			return ((obj != null) ? obj.get_Name() : null) ?? string.Empty;
 		}
 
@@ -140,21 +138,13 @@ namespace Nekres.Mistwar.Services
 			{
 				return -1;
 			}
-			Account obj = await TaskUtil.RetryAsync(() => ((IBlobClient<Account>)(object)_api.get_Gw2ApiClient().get_V2().get_Account()).GetAsync(default(CancellationToken)));
+			Account obj = await TaskUtil.TryAsync(() => ((IBlobClient<Account>)(object)_api.get_Gw2ApiClient().get_V2().get_Account()).GetAsync(default(CancellationToken)));
 			return (obj != null) ? obj.get_World() : (-1);
 		}
 
-		public async Task<int[]> GetWvWMapIds(int worldId)
+		public int[] GetWvWMapIds()
 		{
-			WvwMatch matches = await TaskUtil.RetryAsync(() => ((IBlobClient<WvwMatch>)(object)_api.get_Gw2ApiClient().get_V2().get_Wvw()
-				.get_Matches()
-				.World(worldId)).GetAsync(default(CancellationToken)));
-			if (matches == null)
-			{
-				return null;
-			}
-			return (from m in matches.get_Maps()
-				select m.get_Id()).ToArray();
+			return Enum.GetValues(typeof(WvwMap)).Cast<int>().ToArray();
 		}
 
 		public async Task<List<WvwObjectiveEntity>> GetObjectives(int mapId)
@@ -165,7 +155,7 @@ namespace Nekres.Mistwar.Services
 		private async Task UpdateObjectives(int worldId, int mapId)
 		{
 			List<WvwObjectiveEntity> objEntities = await GetObjectives(mapId);
-			WvwMatch match = await TaskUtil.RetryAsync(() => ((IBlobClient<WvwMatch>)(object)_api.get_Gw2ApiClient().get_V2().get_Wvw()
+			WvwMatch match = await TaskUtil.TryAsync(() => ((IBlobClient<WvwMatch>)(object)_api.get_Gw2ApiClient().get_V2().get_Wvw()
 				.get_Matches()
 				.World(worldId)).GetAsync(default(CancellationToken)));
 			if (match == null)
@@ -223,6 +213,11 @@ namespace Nekres.Mistwar.Services
 				}
 			}
 			return newObjectives;
+		}
+
+		public void Dispose()
+		{
+			_wvwObjectiveCache?.Clear();
 		}
 	}
 }

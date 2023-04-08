@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
@@ -38,6 +39,33 @@ namespace Nekres.Mistwar
 		{
 			TaskCompletionSource<TValue> item;
 			return (!_completionSourceCache.TryRemove(key, out item)) ? default(TValue) : (await item.Task);
+		}
+
+		public async Task Clear()
+		{
+			foreach (TKey key in _completionSourceCache.Keys)
+			{
+				TValue item = await RemoveItem(key);
+				if (item == null)
+				{
+					continue;
+				}
+				IDisposable disposable = item as IDisposable;
+				if (disposable != null)
+				{
+					disposable.Dispose();
+					continue;
+				}
+				IEnumerable enumerable = item as IEnumerable;
+				if (enumerable == null)
+				{
+					continue;
+				}
+				foreach (object item2 in enumerable)
+				{
+					(item2 as IDisposable)?.Dispose();
+				}
+			}
 		}
 
 		public bool ContainsKey(TKey key)
