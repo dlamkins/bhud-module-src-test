@@ -25,7 +25,6 @@ using Estreya.BlishHUD.Shared.Utils;
 using Flurl.Http;
 using Gw2Sharp.Models;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.BitmapFonts;
 using SemVer;
 
@@ -351,7 +350,8 @@ namespace Estreya.BlishHUD.Shared.Modules
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Expected O, but got Unknown
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Expected O, but got Unknown
 			if (show)
 			{
 				if (CornerIcon == null)
@@ -359,6 +359,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 					CornerIcon val = new CornerIcon();
 					val.set_IconName(((Module)this).get_Name());
 					val.set_Icon(GetCornerIcon());
+					val.set_Priority(1289351278);
 					CornerIcon = val;
 					OnCornerIconBuild();
 				}
@@ -432,54 +433,19 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Expected O, but got Unknown
+			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d8: Expected O, but got Unknown
-			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0154: Expected O, but got Unknown
-			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a0: Expected O, but got Unknown
-			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e8: Expected O, but got Unknown
+			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011f: Expected O, but got Unknown
 			((Module)this).OnModuleLoaded(e);
 			Logger.Debug("Start building settings window.");
-			Texture2D windowBackground = AsyncTexture2D.op_Implicit(IconState.GetIcon("textures\\setting_window_background.png"));
-			Rectangle settingsWindowSize = default(Rectangle);
-			((Rectangle)(ref settingsWindowSize))._002Ector(35, 26, 1100, 714);
-			int contentRegionPaddingY = settingsWindowSize.Y - 15;
-			int contentRegionPaddingX = settingsWindowSize.X + 46;
-			Rectangle contentRegion = default(Rectangle);
-			((Rectangle)(ref contentRegion))._002Ector(contentRegionPaddingX, contentRegionPaddingY, settingsWindowSize.Width - 52, settingsWindowSize.Height - contentRegionPaddingY);
-			TabbedWindow2 val = new TabbedWindow2(windowBackground, settingsWindowSize, contentRegion);
-			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((WindowBase2)val).set_Title(((Module)this).get_Name());
-			((WindowBase2)val).set_Subtitle(TranslationState.GetTranslation("settingsWindow-subtitle", "Settings"));
-			((WindowBase2)val).set_SavesPosition(true);
-			((WindowBase2)val).set_Id(((object)this).GetType().Name + "_6bd04be4-dc19-4914-a2c3-8160ce76818b");
-			SettingsWindow = val;
-			AsyncTexture2D emblem = GetEmblem();
-			if (emblem != null)
+			if (SettingsWindow == null)
 			{
-				if (emblem.get_HasSwapped())
-				{
-					((WindowBase2)SettingsWindow).set_Emblem(AsyncTexture2D.op_Implicit(emblem));
-				}
-				else
-				{
-					emblem.add_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)SettingsWindowEmblem_TextureSwapped);
-				}
+				TabbedWindow2 val2 = (SettingsWindow = WindowUtil.CreateTabbedWindow(((Module)this).get_Name(), ((object)this).GetType(), Guid.Parse("6bd04be4-dc19-4914-a2c3-8160ce76818b"), IconState, GetEmblem()));
 			}
-			SettingsWindow.get_Tabs().Add(new Tab(IconState.GetIcon("482926.png"), (Func<IView>)(() => (IView)(object)new NewsView(Gw2ApiManager, IconState, TranslationState, NewsState, GameService.Content.get_DefaultFont16())
+			SettingsWindow.get_Tabs().Add(new Tab(IconState.GetIcon("482926.png"), (Func<IView>)(() => (IView)(object)new NewsView(GetFlurlClient(), Gw2ApiManager, IconState, TranslationState, NewsState, GameService.Content.get_DefaultFont16())
 			{
 				DefaultColor = ModuleSettings.DefaultGW2Color
 			}), "News", (int?)null));
@@ -487,7 +453,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 			SettingsWindow.get_Tabs().Add(new Tab(IconState.GetIcon("156331.png"), (Func<IView>)(() => (IView)(object)new DonationView(GetFlurlClient(), Gw2ApiManager, IconState, TranslationState, GameService.Content.get_DefaultFont16())
 			{
 				DefaultColor = ModuleSettings.DefaultGW2Color
-			}), "Donation", (int?)null));
+			}), "Donations", (int?)null));
 			if (Debug)
 			{
 				SettingsWindow.get_Tabs().Add(new Tab(IconState.GetIcon("155052.png"), (Func<IView>)(() => (IView)(object)new StateSettingsView(_states, Gw2ApiManager, IconState, TranslationState, SettingEventState, Font)
@@ -497,12 +463,6 @@ namespace Estreya.BlishHUD.Shared.Modules
 			}
 			Logger.Debug("Finished building settings window.");
 			HandleCornerIcon(ModuleSettings.RegisterCornerIcon.get_Value());
-		}
-
-		private void SettingsWindowEmblem_TextureSwapped(object sender, ValueChangedEventArgs<Texture2D> e)
-		{
-			((AsyncTexture2D)((sender is AsyncTexture2D) ? sender : null)).remove_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)SettingsWindowEmblem_TextureSwapped);
-			((WindowBase2)SettingsWindow).set_Emblem(e.get_NewValue());
 		}
 
 		protected abstract AsyncTexture2D GetEmblem();

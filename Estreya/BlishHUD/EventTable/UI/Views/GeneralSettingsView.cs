@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Blish_HUD.Controls;
 using Blish_HUD.Modules.Managers;
+using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.Shared.Models;
 using Estreya.BlishHUD.Shared.State;
 using Estreya.BlishHUD.Shared.UI.Views;
@@ -35,6 +36,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideInPvE_Competetive);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideInWvW);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideInPvP);
+			RenderEmptyLine((Panel)(object)parent);
+			RenderEnumSetting<MenuEventSortMode>((Panel)(object)parent, _moduleSettings.MenuEventSortMenu);
 		}
 
 		protected override Task<bool> InternalLoad(IProgress<string> progress)

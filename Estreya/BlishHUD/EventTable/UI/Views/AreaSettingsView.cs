@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Blish_HUD;
-using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
@@ -15,6 +14,7 @@ using Estreya.BlishHUD.Shared.Controls;
 using Estreya.BlishHUD.Shared.Models;
 using Estreya.BlishHUD.Shared.State;
 using Estreya.BlishHUD.Shared.UI.Views;
+using Estreya.BlishHUD.Shared.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.BitmapFonts;
@@ -38,6 +38,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private readonly Func<List<EventCategory>> _allEvents;
 
+		private readonly ModuleSettings _moduleSettings;
+
 		private readonly EventState _eventState;
 
 		private IEnumerable<EventAreaConfiguration> _areaConfigurations;
@@ -54,11 +56,12 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		public event EventHandler<EventAreaConfiguration> RemoveArea;
 
-		public AreaSettingsView(Func<IEnumerable<EventAreaConfiguration>> areaConfiguration, Func<List<EventCategory>> allEvents, Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, SettingEventState settingEventState, EventState eventState, BitmapFont font = null)
+		public AreaSettingsView(Func<IEnumerable<EventAreaConfiguration>> areaConfiguration, Func<List<EventCategory>> allEvents, ModuleSettings moduleSettings, Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, SettingEventState settingEventState, EventState eventState, BitmapFont font = null)
 			: base(apiManager, iconState, translationState, settingEventState, font)
 		{
 			_areaConfigurationFunc = areaConfiguration;
 			_allEvents = allEvents;
+			_moduleSettings = moduleSettings;
 			_eventState = eventState;
 		}
 
@@ -139,13 +142,13 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					BuildEditPanel(newParent, areaPanelBounds, menuItem.Value, areaConfiguration3);
 				});
 			});
-			StandardButton obj = RenderButton(newParent, base.TranslationState.GetTranslation("areaSettingsView-add-btn", "Add"), delegate
+			Estreya.BlishHUD.Shared.Controls.Button button = RenderButton(newParent, base.TranslationState.GetTranslation("areaSettingsView-add-btn", "Add"), delegate
 			{
 				//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 				BuildAddPanel(newParent, areaPanelBounds, areaOverviewMenu);
 			});
-			((Control)obj).set_Location(new Point(((Control)areaOverviewPanel).get_Left(), ((Control)areaOverviewPanel).get_Bottom() + 10));
-			((Control)obj).set_Width(((Control)areaOverviewPanel).get_Width());
+			((Control)button).set_Location(new Point(((Control)areaOverviewPanel).get_Left(), ((Control)areaOverviewPanel).get_Bottom() + 10));
+			((Control)button).set_Width(((Control)areaOverviewPanel).get_Width());
 			if (_menuItems.Count > 0)
 			{
 				KeyValuePair<string, MenuItem> menuItem3 = _menuItems.First();
@@ -195,7 +198,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			string name;
 			EventAreaConfiguration configuration2;
 			MenuItem menuItem;
-			StandardButton saveButton = RenderButton(_areaPanel, base.TranslationState.GetTranslation("areaSettingsView-save-btn", "Save"), delegate
+			Estreya.BlishHUD.Shared.Controls.Button saveButton = RenderButton(_areaPanel, base.TranslationState.GetTranslation("areaSettingsView-save-btn", "Save"), delegate
 			{
 				//IL_00db: Unknown result type (might be due to invalid IL or missing references)
 				try
@@ -239,12 +242,12 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				TextBox val2 = (TextBox)((s is TextBox) ? s : null);
 				((Control)saveButton).set_Enabled(!string.IsNullOrWhiteSpace(((TextInputBase)val2).get_Text()));
 			});
-			StandardButton obj = RenderButton(_areaPanel, base.TranslationState.GetTranslation("areaSettingsView-cancel-btn", "Cancel"), delegate
+			Estreya.BlishHUD.Shared.Controls.Button button = RenderButton(_areaPanel, base.TranslationState.GetTranslation("areaSettingsView-cancel-btn", "Cancel"), delegate
 			{
 				ClearAreaPanel();
 			});
-			((Control)obj).set_Right(((Control)saveButton).get_Left() - 10);
-			((Control)obj).set_Bottom(((Rectangle)(ref panelBounds)).get_Bottom() - 20);
+			((Control)button).set_Right(((Control)saveButton).get_Left() - 10);
+			((Control)button).set_Bottom(((Rectangle)(ref panelBounds)).get_Bottom() - 20);
 			((Control)areaName).set_Width(((Rectangle)(ref panelBounds)).get_Right() - 20 - ((Control)areaName).get_Left());
 		}
 
@@ -322,19 +325,19 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderFillerSettings(settingsPanel, areaConfiguration);
 			RenderEmptyLine((Panel)(object)settingsPanel);
 			((IEnumerable<Control>)((Container)settingsPanel).get_Children()).Last();
-			StandardButton manageEventsButton = RenderButton(_areaPanel, base.TranslationState.GetTranslation("areaSettingsView-manageEvents-btn", "Manage Events"), delegate
+			Estreya.BlishHUD.Shared.Controls.Button manageEventsButton = RenderButton(_areaPanel, base.TranslationState.GetTranslation("areaSettingsView-manageEvents-btn", "Manage Events"), delegate
 			{
 				ManageEvents(areaConfiguration);
 			});
 			((Control)manageEventsButton).set_Top(((Control)areaName).get_Top());
 			((Control)manageEventsButton).set_Left(((Control)settingsPanel).get_Left());
-			StandardButton obj = RenderButton(_areaPanel, base.TranslationState.GetTranslation("areaSettingsView-reorderEvents-btn", "Reorder Events"), delegate
+			Estreya.BlishHUD.Shared.Controls.Button button = RenderButton(_areaPanel, base.TranslationState.GetTranslation("areaSettingsView-reorderEvents-btn", "Reorder Events"), delegate
 			{
 				ReorderEvents(areaConfiguration);
 			});
-			((Control)obj).set_Top(((Control)manageEventsButton).get_Bottom() + 2);
-			((Control)obj).set_Left(((Control)manageEventsButton).get_Left());
-			StandardButton removeButton = RenderButtonAsync(_areaPanel, base.TranslationState.GetTranslation("areaSettingsView-remove-btn", "Remove"), async delegate
+			((Control)button).set_Top(((Control)manageEventsButton).get_Bottom() + 2);
+			((Control)button).set_Left(((Control)manageEventsButton).get_Left());
+			Estreya.BlishHUD.Shared.Controls.Button removeButton = RenderButtonAsync(_areaPanel, base.TranslationState.GetTranslation("areaSettingsView-remove-btn", "Remove"), async delegate
 			{
 				ConfirmDialog dialog = new ConfirmDialog("Delete Event Area \"" + areaConfiguration.Name + "\"", "Your are in the process of deleting the event area \"" + areaConfiguration.Name + "\".\nThis action will delete all settings.\n\nContinue?", base.IconState, new ButtonDefinition[2]
 				{
@@ -578,33 +581,9 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private void ReorderEvents(EventAreaConfiguration configuration)
 		{
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ae: Expected O, but got Unknown
 			if (_reorderEventsWindow == null)
 			{
-				Texture2D windowBackground = AsyncTexture2D.op_Implicit(base.IconState.GetIcon("textures\\setting_window_background.png"));
-				Rectangle settingsWindowSize = default(Rectangle);
-				((Rectangle)(ref settingsWindowSize))._002Ector(35, 26, 1100, 714);
-				int contentRegionPaddingY = settingsWindowSize.Y - 15;
-				int contentRegionPaddingX = settingsWindowSize.X;
-				Rectangle contentRegion = default(Rectangle);
-				((Rectangle)(ref contentRegion))._002Ector(contentRegionPaddingX, contentRegionPaddingY, settingsWindowSize.Width - 6, settingsWindowSize.Height - contentRegionPaddingY);
-				StandardWindow val = new StandardWindow(windowBackground, settingsWindowSize, contentRegion);
-				((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-				((WindowBase2)val).set_Title("Reorder Events");
-				((WindowBase2)val).set_SavesPosition(true);
-				((WindowBase2)val).set_Id(((object)this).GetType().Name + "_b5cbbd99-f02d-4229-8dda-869b42ac242e");
-				_reorderEventsWindow = val;
+				_reorderEventsWindow = WindowUtil.CreateStandardWindow("Reorder Events", ((object)this).GetType(), Guid.Parse("b5cbbd99-f02d-4229-8dda-869b42ac242e"), base.IconState);
 			}
 			if (((WindowBase2)_reorderEventsWindow).get_CurrentView() != null)
 			{
@@ -622,33 +601,9 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private void ManageEvents(EventAreaConfiguration configuration)
 		{
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00be: Expected O, but got Unknown
 			if (_manageEventsWindow == null)
 			{
-				Texture2D windowBackground = AsyncTexture2D.op_Implicit(base.IconState.GetIcon("textures\\setting_window_background.png"));
-				Rectangle settingsWindowSize = default(Rectangle);
-				((Rectangle)(ref settingsWindowSize))._002Ector(35, 26, 1100, 714);
-				int contentRegionPaddingY = settingsWindowSize.Y - 15;
-				int contentRegionPaddingX = settingsWindowSize.X;
-				Rectangle contentRegion = default(Rectangle);
-				((Rectangle)(ref contentRegion))._002Ector(contentRegionPaddingX, contentRegionPaddingY, settingsWindowSize.Width - 6, settingsWindowSize.Height - contentRegionPaddingY);
-				StandardWindow val = new StandardWindow(windowBackground, settingsWindowSize, contentRegion);
-				((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-				((WindowBase2)val).set_Title("Manage Events");
-				((WindowBase2)val).set_SavesPosition(true);
-				((WindowBase2)val).set_Id(((object)this).GetType().Name + "_7dc52c82-67ae-4cfb-9fe3-a16a8b30892c");
-				_manageEventsWindow = val;
+				_manageEventsWindow = WindowUtil.CreateStandardWindow("Manage Events", ((object)this).GetType(), Guid.Parse("7dc52c82-67ae-4cfb-9fe3-a16a8b30892c"), base.IconState);
 			}
 			if (((WindowBase2)_manageEventsWindow).get_CurrentView() != null)
 			{
@@ -663,7 +618,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 						where x.AreaName == configuration.Name && x.State == EventState.EventStates.Hidden
 						select x.EventKey).ToList()
 				}
-			}, () => configuration.DisabledEventKeys.get_Value(), base.APIManager, base.IconState, base.TranslationState);
+			}, () => configuration.DisabledEventKeys.get_Value(), _moduleSettings, base.APIManager, base.IconState, base.TranslationState);
 			view.EventChanged += ManageView_EventChanged;
 			_manageEventsWindow.Show((IView)(object)view);
 		}

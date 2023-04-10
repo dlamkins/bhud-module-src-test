@@ -389,19 +389,14 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			return val;
 		}
 
-		private StandardButton BuildButton(Panel parent, string text, Func<bool> disabledCallback = null)
+		private Button BuildButton(Panel parent, string text, Func<bool> disabledCallback = null)
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Expected O, but got Unknown
 			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			StandardButton val = new StandardButton();
-			((Control)val).set_Parent((Container)(object)parent);
-			val.set_Text(text);
-			((Control)val).set_Enabled(disabledCallback == null || !disabledCallback());
-			StandardButton button = val;
+			Button button2 = new Button();
+			((Control)button2).set_Parent((Container)(object)parent);
+			button2.Text = text;
+			((Control)button2).set_Enabled(disabledCallback == null || !disabledCallback());
+			Button button = button2;
 			int measuredWidth = (int)Font.MeasureString(text).Width + 10;
 			if (((Control)button).get_Width() < measuredWidth)
 			{
@@ -410,10 +405,10 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			return button;
 		}
 
-		protected StandardButton RenderButton(Panel parent, string text, Action action, Func<bool> disabledCallback = null)
+		protected Button RenderButton(Panel parent, string text, Action action, Func<bool> disabledCallback = null)
 		{
-			StandardButton obj = BuildButton(parent, text, disabledCallback);
-			((Control)obj).add_Click((EventHandler<MouseEventArgs>)delegate
+			Button button = BuildButton(parent, text, disabledCallback);
+			((Control)button).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				try
 				{
@@ -425,12 +420,12 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 					ShowError(ex.Message);
 				}
 			});
-			return obj;
+			return button;
 		}
 
-		protected StandardButton RenderButtonAsync(Panel parent, string text, Func<Task> action, Func<bool> disabledCallback = null)
+		protected Button RenderButtonAsync(Panel parent, string text, Func<Task> action, Func<bool> disabledCallback = null)
 		{
-			StandardButton button = BuildButton(parent, text, disabledCallback);
+			Button button = BuildButton(parent, text, disabledCallback);
 			((Control)button).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				Task.Run(async delegate

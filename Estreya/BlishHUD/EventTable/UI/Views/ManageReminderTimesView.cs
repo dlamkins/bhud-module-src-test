@@ -6,6 +6,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.EventTable.Controls;
 using Estreya.BlishHUD.EventTable.Models;
+using Estreya.BlishHUD.Shared.Controls;
 using Estreya.BlishHUD.Shared.State;
 using Estreya.BlishHUD.Shared.UI.Views;
 using Microsoft.Xna.Framework;
@@ -117,15 +118,15 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Control)val).set_Width(x + 100);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
 			Panel addButtonPanel = val;
-			StandardButton obj3 = RenderButton(addButtonPanel, "Add", delegate
+			Button button = RenderButton(addButtonPanel, "Add", delegate
 			{
 				_reminderTimes.Add(TimeSpan.Zero);
 				RenderTimes(parent);
 			});
-			((Control)obj3).set_Left(x);
-			((Control)obj3).set_Width(100);
-			obj3.set_Icon(base.IconState.GetIcon("1444520.png"));
-			obj3.set_ResizeIcon(false);
+			((Control)button).set_Left(x);
+			((Control)button).set_Width(100);
+			button.Icon = base.IconState.GetIcon("1444520.png");
+			button.ResizeIcon = false;
 		}
 
 		private Panel AddTimeSection(Panel parent, TimeSpan time, bool disableRemove)
@@ -224,15 +225,15 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					ShowError(ex.Message);
 				}
 			};
-			StandardButton obj = RenderButton(timeSectionPanel, "Remove", delegate
+			Button button = RenderButton(timeSectionPanel, "Remove", delegate
 			{
 				_reminderTimes.Remove(time);
 				RenderTimes(parent);
 			}, () => disableRemove);
-			((Control)obj).set_Left(((Control)seconds).get_Right() + 10);
-			((Control)obj).set_Width(100);
-			obj.set_Icon(base.IconState.GetIcon("1444524.png"));
-			obj.set_ResizeIcon(false);
+			((Control)button).set_Left(((Control)seconds).get_Right() + 10);
+			((Control)button).set_Width(100);
+			button.Icon = base.IconState.GetIcon("1444524.png");
+			button.ResizeIcon = false;
 			return timeSectionPanel;
 		}
 

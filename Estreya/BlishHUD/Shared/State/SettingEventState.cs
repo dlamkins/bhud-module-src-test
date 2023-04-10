@@ -53,6 +53,10 @@ namespace Estreya.BlishHUD.Shared.State
 
 		public void AddForRangeCheck(SettingEntry settingEntry, IComplianceRequisite defaultRange = null)
 		{
+			if (settingEntry == null)
+			{
+				throw new ArgumentNullException("settingEntry");
+			}
 			if (!_registeredForRangeUpdates.Any(((SettingEntry SettingEntry, IComplianceRequisite ComplianceRequisite) p) => p.SettingEntry.get_EntryKey() == settingEntry.get_EntryKey()))
 			{
 				_registeredForRangeUpdates.Add((settingEntry, defaultRange));
@@ -62,12 +66,20 @@ namespace Estreya.BlishHUD.Shared.State
 
 		public void RemoveFromRangeCheck(SettingEntry settingEntry)
 		{
+			if (settingEntry == null)
+			{
+				throw new ArgumentNullException("settingEntry");
+			}
 			_registeredForRangeUpdates.RemoveAll(((SettingEntry SettingEntry, IComplianceRequisite ComplianceRequisite) p) => p.SettingEntry.get_EntryKey() == settingEntry.get_EntryKey());
 			_logger.Debug("Stopped tracking setting \"" + settingEntry.get_EntryKey() + "\" for range updates.");
 		}
 
 		public void AddForDisabledCheck(SettingEntry settingEntry, IComplianceRequisite defaultRange = null)
 		{
+			if (settingEntry == null)
+			{
+				throw new ArgumentNullException("settingEntry");
+			}
 			if (!_registeredForDisabledUpdates.Any(((SettingEntry SettingEntry, IComplianceRequisite ComplianceRequisite) p) => p.SettingEntry.get_EntryKey() == settingEntry.get_EntryKey()))
 			{
 				_registeredForDisabledUpdates.Add((settingEntry, defaultRange));
@@ -77,6 +89,10 @@ namespace Estreya.BlishHUD.Shared.State
 
 		public void RemoveFromDisabledCheck(SettingEntry settingEntry)
 		{
+			if (settingEntry == null)
+			{
+				throw new ArgumentNullException("settingEntry");
+			}
 			_registeredForDisabledUpdates.RemoveAll(((SettingEntry SettingEntry, IComplianceRequisite ComplianceRequisite) p) => p.SettingEntry.get_EntryKey() == settingEntry.get_EntryKey());
 			_logger.Debug("Stopped tracking setting \"" + settingEntry.get_EntryKey() + "\" for disabled updates.");
 		}

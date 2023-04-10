@@ -94,7 +94,6 @@ namespace Estreya.BlishHUD.Shared.State
 			}
 			Logger.Debug("Unloading state.");
 			_cancellationTokenSource.Cancel();
-			Clear();
 			InternalUnload();
 		}
 

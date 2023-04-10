@@ -48,10 +48,6 @@ namespace Estreya.BlishHUD.Shared.Models.GW2API.Skills
 
 		public List<SkillFlag> Flags { get; set; }
 
-		public List<SkillFact>? Facts { get; set; }
-
-		public List<SkillFact>? TraitedFacts { get; set; }
-
 		public List<string>? Categories { get; set; }
 
 		[JsonProperty("subskills")]
@@ -89,7 +85,7 @@ namespace Estreya.BlishHUD.Shared.Models.GW2API.Skills
 			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
 			Skill obj = new Skill
 			{
 				Category = SkillCategory.Skill,
@@ -118,8 +114,6 @@ namespace Estreya.BlishHUD.Shared.Models.GW2API.Skills
 			obj.DualAttunement = (Attunement)((!(skill.get_DualAttunement()?.get_IsUnknown() ?? true)) ? ((int)ApiEnum<Attunement>.op_Implicit(skill.get_DualAttunement())) : 0);
 			obj.Flags = (from flag in skill.get_Flags()?.get_List()
 				select flag.get_Value()).ToList();
-			obj.Facts = skill.get_Facts()?.ToList();
-			obj.TraitedFacts = skill.get_TraitedFacts()?.ToList();
 			obj.Categories = skill.get_Categories()?.ToList();
 			obj.SubSkills = skill.get_SubSkills()?.ToList();
 			obj.Attunement = (Attunement)((!(skill.get_Attunement()?.get_IsUnknown() ?? true)) ? ((int)ApiEnum<Attunement>.op_Implicit(skill.get_Attunement())) : 0);
@@ -162,8 +156,6 @@ namespace Estreya.BlishHUD.Shared.Models.GW2API.Skills
 				ChatLink = skill.get_ChatLink(),
 				Flags = (from flag in skill.get_Flags()?.get_List()
 					select flag.get_Value()).ToList(),
-				Facts = skill.get_Facts()?.ToList(),
-				TraitedFacts = skill.get_TraitedFacts()?.ToList(),
 				Categories = skill.get_Categories()?.ToList()
 			};
 		}

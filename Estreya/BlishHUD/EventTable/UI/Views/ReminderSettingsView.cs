@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Blish_HUD;
-using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Modules.Managers;
@@ -11,8 +9,8 @@ using Estreya.BlishHUD.EventTable.Controls;
 using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.Shared.State;
 using Estreya.BlishHUD.Shared.UI.Views;
+using Estreya.BlishHUD.Shared.Utils;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.BitmapFonts;
 
 namespace Estreya.BlishHUD.EventTable.UI.Views
@@ -52,33 +50,9 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderEmptyLine((Panel)(object)parent);
 			RenderButton((Panel)(object)parent, base.TranslationState.GetTranslation("reminderSettingsView-manageReminders-btn", "Manage Reminders"), delegate
 			{
-				//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-				//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-				//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-				//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-				//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00ae: Expected O, but got Unknown
 				if (_manageEventsWindow == null)
 				{
-					Texture2D val = AsyncTexture2D.op_Implicit(base.IconState.GetIcon("textures\\setting_window_background.png"));
-					Rectangle val2 = default(Rectangle);
-					((Rectangle)(ref val2))._002Ector(35, 26, 1100, 714);
-					int num = val2.Y - 15;
-					int x = val2.X;
-					Rectangle val3 = default(Rectangle);
-					((Rectangle)(ref val3))._002Ector(x, num, val2.Width - 6, val2.Height - num);
-					StandardWindow val4 = new StandardWindow(val, val2, val3);
-					((Control)val4).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-					((WindowBase2)val4).set_Title("Manage Events");
-					((WindowBase2)val4).set_SavesPosition(true);
-					((WindowBase2)val4).set_Id(((object)this).GetType().Name + "_7dc52c82-67ae-4cfb-9fe3-a16a8b30892c");
-					_manageEventsWindow = val4;
+					_manageEventsWindow = WindowUtil.CreateStandardWindow("Manage Events", ((object)this).GetType(), Guid.Parse("37e3f99c-f413-469c-b0f5-e2e6e31e4789"), base.IconState);
 				}
 				if (((WindowBase2)_manageEventsWindow).get_CurrentView() != null)
 				{
@@ -100,7 +74,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 							}
 						}
 					}
-				} }, () => _moduleSettings.ReminderDisabledForEvents.get_Value(), base.APIManager, base.IconState, base.TranslationState);
+				} }, () => _moduleSettings.ReminderDisabledForEvents.get_Value(), _moduleSettings, base.APIManager, base.IconState, base.TranslationState);
 				manageEventsView.EventChanged += ManageView_EventChanged;
 				_manageEventsWindow.Show((IView)(object)manageEventsView);
 			});
@@ -129,45 +103,12 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private void ManageReminderTimes(Estreya.BlishHUD.EventTable.Models.Event ev)
 		{
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Expected O, but got Unknown
-			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
 			if (_manageReminderTimesWindow == null)
 			{
-				Texture2D windowBackground = AsyncTexture2D.op_Implicit(base.IconState.GetIcon("textures\\setting_window_background.png"));
-				Rectangle settingsWindowSize = default(Rectangle);
-				((Rectangle)(ref settingsWindowSize))._002Ector(35, 26, 1100, 714);
-				int contentRegionPaddingY = settingsWindowSize.Y - 15;
-				int contentRegionPaddingX = settingsWindowSize.X;
-				Rectangle contentRegion = default(Rectangle);
-				((Rectangle)(ref contentRegion))._002Ector(contentRegionPaddingX, contentRegionPaddingY, settingsWindowSize.Width - 6, settingsWindowSize.Height - contentRegionPaddingY);
-				StandardWindow val = new StandardWindow(windowBackground, settingsWindowSize, contentRegion);
-				((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-				((WindowBase2)val).set_Title("Manage Reminder Times");
-				((WindowBase2)val).set_SavesPosition(true);
-				((WindowBase2)val).set_Id(((object)this).GetType().Name + "_930702ac-bf87-416c-b5ba-cdf9e0266bf7");
-				_manageReminderTimesWindow = val;
-				((Control)_manageReminderTimesWindow).set_Size(new Point(450, ((Control)_manageReminderTimesWindow).get_Height()));
-				AsyncTexture2D emblem = base.IconState.GetIcon("1466345.png");
-				if (emblem.get_HasSwapped())
-				{
-					((WindowBase2)_manageReminderTimesWindow).set_Emblem(AsyncTexture2D.op_Implicit(emblem));
-				}
-				else
-				{
-					emblem.add_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)Emblem_TextureSwapped);
-				}
+				_manageReminderTimesWindow = WindowUtil.CreateStandardWindow("Manage Reminder Times", ((object)this).GetType(), Guid.Parse("930702ac-bf87-416c-b5ba-cdf9e0266bf7"), base.IconState, base.IconState.GetIcon("1466345.png"));
 			}
+			((Control)_manageReminderTimesWindow).set_Size(new Point(450, ((Control)_manageReminderTimesWindow).get_Height()));
 			StandardWindow manageReminderTimesWindow = _manageReminderTimesWindow;
 			ManageReminderTimesView mrtv = ((manageReminderTimesWindow != null) ? ((WindowBase2)manageReminderTimesWindow).get_CurrentView() : null) as ManageReminderTimesView;
 			if (mrtv != null)
@@ -179,11 +120,6 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			view.CancelClicked += ManageReminderTimesView_CancelClicked;
 			view.SaveClicked += new EventHandler<(Estreya.BlishHUD.EventTable.Models.Event, List<TimeSpan>)>(ManageReminderTimesView_SaveClicked);
 			_manageReminderTimesWindow.Show((IView)(object)view);
-		}
-
-		private void Emblem_TextureSwapped(object sender, ValueChangedEventArgs<Texture2D> e)
-		{
-			((WindowBase2)_manageReminderTimesWindow).set_Emblem(e.get_NewValue());
 		}
 
 		private void ManageReminderTimesView_SaveClicked(object sender, (Estreya.BlishHUD.EventTable.Models.Event Event, List<TimeSpan> ReminderTimes) e)

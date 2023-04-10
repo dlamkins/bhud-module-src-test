@@ -237,7 +237,6 @@ namespace Estreya.BlishHUD.EventTable.State
 		protected override void InternalUnload()
 		{
 			AsyncHelper.RunSync(Save);
-			AsyncHelper.RunSync(Clear);
 		}
 	}
 }

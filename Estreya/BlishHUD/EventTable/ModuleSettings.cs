@@ -51,6 +51,8 @@ namespace Estreya.BlishHUD.EventTable
 
 		public SettingEntry<List<string>> DisabledDynamicEventIds { get; private set; }
 
+		public SettingEntry<MenuEventSortMode> MenuEventSortMenu { get; private set; }
+
 		public ModuleSettings(SettingCollection settings)
 			: base(settings, new KeyBinding((ModifierKeys)2, (Keys)69))
 		{
@@ -95,6 +97,7 @@ namespace Estreya.BlishHUD.EventTable
 			DynamicEventsRenderDistance = base.GlobalSettings.DefineSetting<int>("DynamicEventsRenderDistance", 300, (Func<string>)(() => "Dynamic Event Render Distance"), (Func<string>)(() => "Defines the distance in which dynamic events should be rendered"));
 			SettingComplianceExtensions.SetRange(DynamicEventsRenderDistance, 50, 500);
 			DisabledDynamicEventIds = base.GlobalSettings.DefineSetting<List<string>>("DisabledDynamicEventIds", new List<string>(), (Func<string>)(() => "Disabled Dynamic Events"), (Func<string>)(() => "Defines which dynamic events are disabled."));
+			MenuEventSortMenu = base.GlobalSettings.DefineSetting<MenuEventSortMode>("MenuEventSortMenu", MenuEventSortMode.Default, (Func<string>)(() => "Menu Event Sort Mode"), (Func<string>)(() => "Defines the mode by which the events in menu views are sorted by."));
 			HandleEnabledStates();
 		}
 

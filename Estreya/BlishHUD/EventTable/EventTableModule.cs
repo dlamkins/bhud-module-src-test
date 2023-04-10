@@ -318,21 +318,21 @@ namespace Estreya.BlishHUD.EventTable
 		{
 			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004c: Expected O, but got Unknown
-			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0115: Expected O, but got Unknown
-			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0154: Expected O, but got Unknown
-			//IL_0189: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0193: Expected O, but got Unknown
-			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d2: Expected O, but got Unknown
-			//IL_0207: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0211: Expected O, but got Unknown
+			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011b: Expected O, but got Unknown
+			//IL_0150: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015a: Expected O, but got Unknown
+			//IL_018f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0199: Expected O, but got Unknown
+			//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d8: Expected O, but got Unknown
+			//IL_020d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0217: Expected O, but got Unknown
 			base.SettingsWindow.get_Tabs().Add(new Tab(base.IconState.GetIcon("156736.png"), (Func<IView>)(() => (IView)(object)new GeneralSettingsView(base.ModuleSettings, base.Gw2ApiManager, base.IconState, base.TranslationState, base.SettingEventState, GameService.Content.get_DefaultFont16())
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			}), "General", (int?)null));
-			AreaSettingsView areaSettingsView = new AreaSettingsView(() => _areas.Values.Select((EventArea area) => area.Configuration), () => _eventCategories, base.Gw2ApiManager, base.IconState, base.TranslationState, base.SettingEventState, EventState, GameService.Content.get_DefaultFont16())
+			AreaSettingsView areaSettingsView = new AreaSettingsView(() => _areas.Values.Select((EventArea area) => area.Configuration), () => _eventCategories, base.ModuleSettings, base.Gw2ApiManager, base.IconState, base.TranslationState, base.SettingEventState, EventState, GameService.Content.get_DefaultFont16())
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			};
@@ -354,7 +354,7 @@ namespace Estreya.BlishHUD.EventTable
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			}), "Reminders", (int?)null));
-			base.SettingsWindow.get_Tabs().Add(new Tab(base.IconState.GetIcon("759448.png"), (Func<IView>)(() => (IView)(object)new DynamicEventsSettingsView(DynamicEventState, base.ModuleSettings, base.Gw2ApiManager, base.IconState, base.TranslationState, base.SettingEventState, GameService.Content.get_DefaultFont16())
+			base.SettingsWindow.get_Tabs().Add(new Tab(base.IconState.GetIcon("759448.png"), (Func<IView>)(() => (IView)(object)new DynamicEventsSettingsView(DynamicEventState, base.ModuleSettings, GetFlurlClient(), base.Gw2ApiManager, base.IconState, base.TranslationState, base.SettingEventState, GameService.Content.get_DefaultFont16())
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			}), "Dynamic Events", (int?)null));

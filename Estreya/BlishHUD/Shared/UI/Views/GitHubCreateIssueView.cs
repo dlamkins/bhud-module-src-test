@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
+using Estreya.BlishHUD.Shared.Controls;
 using Estreya.BlishHUD.Shared.State;
 using Estreya.BlishHUD.Shared.Threading.Events;
 using Microsoft.Xna.Framework;
@@ -77,18 +78,18 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			((Control)includeSystemInformationLabel).set_Top(((Control)discordNameLabel).get_Bottom() + 20);
 			Checkbox includeSystemInformationCheckbox = RenderCheckbox(parent, new Point(base.LABEL_WIDTH, ((Control)includeSystemInformationLabel).get_Top()), value: false);
 			((Control)includeSystemInformationCheckbox).set_BasicTooltipText("If checked, additional system information will be included to assist looking into your issue.");
-			StandardButton cancelButton = RenderButton(parent, "Cancel", delegate
+			Button cancelButton = RenderButton(parent, "Cancel", delegate
 			{
 				this.CancelClicked?.Invoke(this, EventArgs.Empty);
 			});
 			((Control)cancelButton).set_Bottom(((Rectangle)(ref contentRegion)).get_Bottom());
 			((Control)cancelButton).set_Right(((Rectangle)(ref contentRegion)).get_Right());
-			StandardButton obj = RenderButtonAsync(parent, "Create", async delegate
+			Button button = RenderButtonAsync(parent, "Create", async delegate
 			{
 				await (this.CreateClicked?.Invoke(this, (((TextInputBase)issueTitleTextBox).get_Text(), ((TextInputBase)issueMessageTextBox).get_Text(), ((TextInputBase)discordNameTextBox).get_Text(), includeSystemInformationCheckbox.get_Checked())));
 			});
-			((Control)obj).set_Top(((Control)cancelButton).get_Top());
-			((Control)obj).set_Right(((Control)cancelButton).get_Left() + 10);
+			((Control)button).set_Top(((Control)cancelButton).get_Top());
+			((Control)button).set_Right(((Control)cancelButton).get_Left() + 10);
 		}
 
 		protected override Task<bool> InternalLoad(IProgress<string> progress)
