@@ -390,17 +390,16 @@ namespace KpRefresher.Services
 			{
 				return true;
 			}
-			foreach (string item2 in result)
+			foreach (string res in result)
 			{
-				if (Enum.TryParse<RaidBoss>(item2, out var raidBoss))
+				if (!_raidBossNames.Any((RaidBoss r) => r.GetDisplayName() == res))
 				{
-					if (raidBoss.HasAttribute<FinalBossAttribute>())
-					{
-						return true;
-					}
-					continue;
+					return true;
 				}
-				return true;
+				if (_raidBossNames.FirstOrDefault((RaidBoss r) => r.GetDisplayName() == res).HasAttribute<FinalBossAttribute>())
+				{
+					return true;
+				}
 			}
 			return false;
 		}
