@@ -118,31 +118,33 @@ namespace KpRefresher
 			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0052: Expected O, but got Unknown
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Expected O, but got Unknown
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Expected O, but got Unknown
+			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
 			//IL_007f: Expected O, but got Unknown
-			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00af: Expected O, but got Unknown
-			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e4: Expected O, but got Unknown
-			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0106: Expected O, but got Unknown
-			//IL_0176: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Expected O, but got Unknown
+			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ba: Expected O, but got Unknown
+			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ef: Expected O, but got Unknown
+			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0111: Expected O, but got Unknown
+			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0186: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e6: Expected O, but got Unknown
+			//IL_01e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f1: Expected O, but got Unknown
 			CornerIcon val = new CornerIcon();
 			val.set_Icon(AsyncTexture2D.op_Implicit(_cornerIconTexture));
 			((Control)val).set_BasicTooltipText(((Module)this).get_Name() ?? "");
 			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			val.set_HoverIcon(AsyncTexture2D.op_Implicit(_cornerIconHoverTexture));
+			val.set_Priority(1283537108);
 			_cornerIcon = val;
 			((Control)_cornerIcon).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
