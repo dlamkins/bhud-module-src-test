@@ -304,7 +304,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			Label areaName = val;
 			FlowPanel val2 = new FlowPanel();
 			((Control)val2).set_Left(((Control)areaName).get_Left());
-			((Control)val2).set_Top(((Control)areaName).get_Bottom() + 75);
+			((Control)val2).set_Top(((Control)areaName).get_Bottom() + 50);
 			((Control)val2).set_Parent((Container)(object)_areaPanel);
 			((Container)val2).set_HeightSizingMode((SizingMode)2);
 			((Container)val2).set_WidthSizingMode((SizingMode)2);
@@ -317,6 +317,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderLocationAndSizeSettings(settingsPanel, areaConfiguration);
 			RenderEmptyLine((Panel)(object)settingsPanel);
 			RenderLayoutSettings(settingsPanel, areaConfiguration);
+			RenderEmptyLine((Panel)(object)settingsPanel);
+			RenderVisibilitySettings(settingsPanel, areaConfiguration);
 			RenderEmptyLine((Panel)(object)settingsPanel);
 			RenderTextAndColorSettings(settingsPanel, areaConfiguration);
 			RenderEmptyLine((Panel)(object)settingsPanel);
@@ -457,6 +459,43 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderEnumSetting<BuildDirection>((Panel)(object)groupPanel, areaConfiguration.BuildDirection);
 			RenderIntSetting((Panel)(object)groupPanel, areaConfiguration.TimeSpan);
 			RenderIntSetting((Panel)(object)groupPanel, areaConfiguration.HistorySplit);
+			RenderEmptyLine((Panel)(object)groupPanel);
+			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.ShowCategoryNames);
+			RenderEmptyLine((Panel)(object)groupPanel, 20);
+		}
+
+		private void RenderVisibilitySettings(FlowPanel settingsPanel, EventAreaConfiguration areaConfiguration)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Expected O, but got Unknown
+			FlowPanel val = new FlowPanel();
+			((Control)val).set_Parent((Container)(object)settingsPanel);
+			((Container)val).set_HeightSizingMode((SizingMode)1);
+			((Control)val).set_Width(((Control)settingsPanel).get_Width() - 30);
+			val.set_FlowDirection((ControlFlowDirection)3);
+			val.set_OuterControlPadding(new Vector2(20f, 20f));
+			((Panel)val).set_ShowBorder(true);
+			((Panel)val).set_CanCollapse(true);
+			((Panel)val).set_Collapsed(true);
+			((Panel)val).set_Title("Visibility");
+			FlowPanel groupPanel = val;
+			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.HideOnMissingMumbleTicks);
+			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.HideOnOpenMap);
+			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.HideInCombat);
+			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.HideInPvE_OpenWorld);
+			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.HideInPvE_Competetive);
+			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.HideInWvW);
+			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.HideInPvP);
 			RenderEmptyLine((Panel)(object)groupPanel, 20);
 		}
 
@@ -498,6 +537,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderColorSetting((Panel)(object)groupPanel, areaConfiguration.BackgroundColor);
 			RenderFloatSetting((Panel)(object)groupPanel, areaConfiguration.Opacity);
 			RenderFloatSetting((Panel)(object)groupPanel, areaConfiguration.EventBackgroundOpacity);
+			RenderEmptyLine((Panel)(object)groupPanel);
+			RenderColorSetting((Panel)(object)groupPanel, areaConfiguration.CategoryNameColor);
 			RenderEmptyLine((Panel)(object)groupPanel, 20);
 		}
 

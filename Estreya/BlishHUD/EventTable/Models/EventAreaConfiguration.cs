@@ -62,5 +62,23 @@ namespace Estreya.BlishHUD.EventTable.Models
 		public SettingEntry<float> CompletedEventsTextOpacity { get; set; }
 
 		public SettingEntry<bool> CompletedEventsInvertTextColor { get; set; }
+
+		public SettingEntry<bool> HideOnMissingMumbleTicks { get; set; }
+
+		public SettingEntry<bool> HideInCombat { get; set; }
+
+		public SettingEntry<bool> HideOnOpenMap { get; set; }
+
+		public SettingEntry<bool> HideInPvE_OpenWorld { get; set; }
+
+		public SettingEntry<bool> HideInPvE_Competetive { get; set; }
+
+		public SettingEntry<bool> HideInWvW { get; set; }
+
+		public SettingEntry<bool> HideInPvP { get; set; }
+
+		public SettingEntry<bool> ShowCategoryNames { get; set; }
+
+		public SettingEntry<Color> CategoryNameColor { get; set; }
 	}
 }

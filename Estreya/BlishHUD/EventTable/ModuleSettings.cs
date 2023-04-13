@@ -53,6 +53,20 @@ namespace Estreya.BlishHUD.EventTable
 
 		public SettingEntry<MenuEventSortMode> MenuEventSortMenu { get; private set; }
 
+		public SettingEntry<bool> HideRemindersOnMissingMumbleTicks { get; private set; }
+
+		public SettingEntry<bool> HideRemindersInCombat { get; private set; }
+
+		public SettingEntry<bool> HideRemindersOnOpenMap { get; private set; }
+
+		public SettingEntry<bool> HideRemindersInPvE_OpenWorld { get; private set; }
+
+		public SettingEntry<bool> HideRemindersInPvE_Competetive { get; private set; }
+
+		public SettingEntry<bool> HideRemindersInWvW { get; private set; }
+
+		public SettingEntry<bool> HideRemindersInPvP { get; private set; }
+
 		public ModuleSettings(SettingCollection settings)
 			: base(settings, new KeyBinding((ModifierKeys)2, (Keys)69))
 		{
@@ -98,6 +112,13 @@ namespace Estreya.BlishHUD.EventTable
 			SettingComplianceExtensions.SetRange(DynamicEventsRenderDistance, 50, 500);
 			DisabledDynamicEventIds = base.GlobalSettings.DefineSetting<List<string>>("DisabledDynamicEventIds", new List<string>(), (Func<string>)(() => "Disabled Dynamic Events"), (Func<string>)(() => "Defines which dynamic events are disabled."));
 			MenuEventSortMenu = base.GlobalSettings.DefineSetting<MenuEventSortMode>("MenuEventSortMenu", MenuEventSortMode.Default, (Func<string>)(() => "Menu Event Sort Mode"), (Func<string>)(() => "Defines the mode by which the events in menu views are sorted by."));
+			HideRemindersOnOpenMap = base.GlobalSettings.DefineSetting<bool>("HideRemindersOnOpenMap", false, (Func<string>)(() => "Hide Reminders on open Map"), (Func<string>)(() => "Whether the reminders should hide when the map is open."));
+			HideRemindersOnMissingMumbleTicks = base.GlobalSettings.DefineSetting<bool>("HideRemindersOnMissingMumbleTicks", true, (Func<string>)(() => "Hide Reminders on Cutscenes"), (Func<string>)(() => "Whether the reminders should hide when cutscenes are played."));
+			HideRemindersInCombat = base.GlobalSettings.DefineSetting<bool>("HideRemindersInCombat", false, (Func<string>)(() => "Hide Reminders in Combat"), (Func<string>)(() => "Whether the reminders should hide when in combat."));
+			HideRemindersInPvE_OpenWorld = base.GlobalSettings.DefineSetting<bool>("HideRemindersInPvE_OpenWorld", false, (Func<string>)(() => "Hide Reminders in PvE (Open World)"), (Func<string>)(() => "Whether the reminders should hide when in PvE (Open World)."));
+			HideRemindersInPvE_Competetive = base.GlobalSettings.DefineSetting<bool>("HideRemindersInPvE_Competetive", false, (Func<string>)(() => "Hide Reminders in PvE (Competetive)"), (Func<string>)(() => "Whether the reminders should hide when in PvE (Competetive)."));
+			HideRemindersInWvW = base.GlobalSettings.DefineSetting<bool>("HideRemindersInWvW", false, (Func<string>)(() => "Hide Reminders in WvW"), (Func<string>)(() => "Whether the reminders should hide when in world vs. world."));
+			HideRemindersInPvP = base.GlobalSettings.DefineSetting<bool>("HideRemindersInPvP", false, (Func<string>)(() => "Hide Reminders in PvP"), (Func<string>)(() => "Whether the reminders should hide when in player vs. player."));
 			HandleEnabledStates();
 		}
 
@@ -187,6 +208,15 @@ namespace Estreya.BlishHUD.EventTable
 			SettingEntry<float> completedEventsTextOpacity = base.DrawerSettings.DefineSetting<float>(name + "-completedEventsTextOpacity", 1f, (Func<string>)(() => "Completed Events Text Opacity"), (Func<string>)(() => "Defines the text opacity of completed events. Only works in combination with CompletionAction = Change Opacity"));
 			SettingComplianceExtensions.SetRange(completedEventsBackgroundOpacity, 0f, 1f);
 			SettingEntry<bool> completedEventsInvertTextColor = base.DrawerSettings.DefineSetting<bool>(name + "-completedEventsInvertTextColor", true, (Func<string>)(() => "Completed Events Invert Textcolor"), (Func<string>)(() => "Specified if completed events should have their text color inverted. Only works in combination with CompletionAction = Change Opacity"));
+			SettingEntry<bool> hideOnOpenMap = base.DrawerSettings.DefineSetting<bool>(name + "-hideOnOpenMap", true, (Func<string>)(() => "Hide on open Map"), (Func<string>)(() => "Whether the area should hide when the map is open."));
+			SettingEntry<bool> hideOnMissingMumbleTicks = base.DrawerSettings.DefineSetting<bool>(name + "-hideOnMissingMumbleTicks", true, (Func<string>)(() => "Hide on Cutscenes"), (Func<string>)(() => "Whether the area should hide when cutscenes are played."));
+			SettingEntry<bool> hideInCombat = base.DrawerSettings.DefineSetting<bool>(name + "-hideInCombat", false, (Func<string>)(() => "Hide in Combat"), (Func<string>)(() => "Whether the area should hide when in combat."));
+			SettingEntry<bool> hideInPvE_OpenWorld = base.DrawerSettings.DefineSetting<bool>(name + "-hideInPvE_OpenWorld", false, (Func<string>)(() => "Hide in PvE (Open World)"), (Func<string>)(() => "Whether the area should hide when in PvE (Open World)."));
+			SettingEntry<bool> hideInPvE_Competetive = base.DrawerSettings.DefineSetting<bool>(name + "-hideInPvE_Competetive", false, (Func<string>)(() => "Hide in PvE (Competetive)"), (Func<string>)(() => "Whether the area should hide when in PvE (Competetive)."));
+			SettingEntry<bool> hideInWvW = base.DrawerSettings.DefineSetting<bool>(name + "-hideInWvW", false, (Func<string>)(() => "Hide in WvW"), (Func<string>)(() => "Whether the area should hide when in world vs. world."));
+			SettingEntry<bool> hideInPvP = base.DrawerSettings.DefineSetting<bool>(name + "-hideInPvP", false, (Func<string>)(() => "Hide in PvP"), (Func<string>)(() => "Whether the area should hide when in player vs. player."));
+			SettingEntry<bool> showCategoryNames = base.DrawerSettings.DefineSetting<bool>(name + "-showCategoryNames", false, (Func<string>)(() => "Show Category Names"), (Func<string>)(() => "Defines if the category names should be shown before the event bars."));
+			SettingEntry<Color> categoryNameColor = base.DrawerSettings.DefineSetting<Color>(name + "-categoryNameColor", base.DefaultGW2Color, (Func<string>)(() => "Category Name Color"), (Func<string>)(() => "Defines the color of the category names."));
 			return new EventAreaConfiguration
 			{
 				Name = drawer.Name,
@@ -226,7 +256,16 @@ namespace Estreya.BlishHUD.EventTable
 				FillerShadowOpacity = fillerShadowOpacity,
 				CompletedEventsBackgroundOpacity = completedEventsBackgroundOpacity,
 				CompletedEventsTextOpacity = completedEventsTextOpacity,
-				CompletedEventsInvertTextColor = completedEventsInvertTextColor
+				CompletedEventsInvertTextColor = completedEventsInvertTextColor,
+				HideInCombat = hideInCombat,
+				HideOnMissingMumbleTicks = hideOnMissingMumbleTicks,
+				HideOnOpenMap = hideOnOpenMap,
+				HideInPvE_Competetive = hideInPvE_Competetive,
+				HideInPvE_OpenWorld = hideInPvE_OpenWorld,
+				HideInPvP = hideInPvP,
+				HideInWvW = hideInWvW,
+				ShowCategoryNames = showCategoryNames,
+				CategoryNameColor = categoryNameColor
 			};
 		}
 
@@ -274,6 +313,15 @@ namespace Estreya.BlishHUD.EventTable
 			base.DrawerSettings.UndefineSetting(name + "-completedEventsBackgroundOpacity");
 			base.DrawerSettings.UndefineSetting(name + "-completedEventsTextOpacity");
 			base.DrawerSettings.UndefineSetting(name + "-completedEventsInvertTextColor");
+			base.DrawerSettings.UndefineSetting(name + "-hideOnOpenMap");
+			base.DrawerSettings.UndefineSetting(name + "-hideOnMissingMumbleTicks");
+			base.DrawerSettings.UndefineSetting(name + "-hideInCombat");
+			base.DrawerSettings.UndefineSetting(name + "-hideInPvE_OpenWorld");
+			base.DrawerSettings.UndefineSetting(name + "-hideInPvE_Competetive");
+			base.DrawerSettings.UndefineSetting(name + "-hideInWvW");
+			base.DrawerSettings.UndefineSetting(name + "-hideInPvP");
+			base.DrawerSettings.UndefineSetting(name + "-showCategoryNames");
+			base.DrawerSettings.UndefineSetting(name + "-categoryNameColor");
 		}
 
 		public override void UpdateLocalization(TranslationState translationState)

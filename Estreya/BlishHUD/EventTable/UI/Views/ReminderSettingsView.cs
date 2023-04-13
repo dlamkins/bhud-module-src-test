@@ -92,6 +92,14 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			{
 				ManageReminderTimes(_globalChangeTempEvent);
 			});
+			RenderEmptyLine((Panel)(object)parent);
+			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideRemindersOnMissingMumbleTicks);
+			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideRemindersOnOpenMap);
+			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideRemindersInCombat);
+			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideRemindersInPvE_OpenWorld);
+			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideRemindersInPvE_Competetive);
+			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideRemindersInWvW);
+			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideRemindersInPvP);
 		}
 
 		private void ManageView_EventChanged(object sender, ManageEventsView.EventChangedArgs e)

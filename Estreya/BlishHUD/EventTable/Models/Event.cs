@@ -94,6 +94,9 @@ namespace Estreya.BlishHUD.EventTable.Models
 		[JsonIgnore]
 		public string SettingKey { get; private set; }
 
+		[JsonIgnore]
+		public WeakReference<EventCategory> Category { get; private set; }
+
 		[JsonProperty("reminderTimes")]
 		[JsonConverter(typeof(TimeSpanArrayJsonConverter), new object[]
 		{
@@ -137,6 +140,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 				Icon = ec.Icon;
 			}
 			SettingKey = ec.Key + "_" + Key;
+			Category = new WeakReference<EventCategory>(ec);
 			_getNowAction = getNowAction;
 			if (translationState != null)
 			{
