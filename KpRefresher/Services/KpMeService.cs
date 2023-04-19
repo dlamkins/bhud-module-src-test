@@ -144,7 +144,11 @@ namespace KpRefresher.Services
 						{
 							return false;
 						}
-						if (response.get_StatusCode() == HttpStatusCode.NotFound)
+						if (response.get_StatusCode() == HttpStatusCode.Forbidden)
+						{
+							ScreenNotification.ShowNotification("[KpRefresher] Refresh failed : please allow anonymous refresh\nin your KillProof.me settings", (NotificationType)2, (Texture2D)null, 4);
+						}
+						else if (response.get_StatusCode() == HttpStatusCode.NotFound)
 						{
 							ScreenNotification.ShowNotification("[KpRefresher] KillProof.me Id " + kpId + " does not exist !", (NotificationType)2, (Texture2D)null, 4);
 						}
