@@ -95,5 +95,30 @@ namespace RaidClears.Features.Shared.Enums
 			RuinedCityOfArahForgotten,
 			RuinedCityOfArahSeer
 		}
+
+		public enum Fractal
+		{
+			AetherbladeFractal,
+			AquaticRuinsFractal,
+			CaptainMaiTrinBossFractal,
+			ChaosFractal,
+			CliffsideFractal,
+			DeepstoneFractal,
+			MoltenBossFractal,
+			MoltenFurnaceFractal,
+			NightmareFractal,
+			ShatteredObservatoryFractal,
+			SirensReefFractal,
+			SnowblindFractal,
+			SunquaPeakFractal,
+			SolidOceanFractal,
+			SwamplandFractal,
+			ThaumanovaReactorFractal,
+			TwilightOasisFractal,
+			UncategorizedFractal,
+			UndergroundFacilityFractal,
+			UrbanBattlegroundFractal,
+			VolcanicFractal
+		}
 	}
 }

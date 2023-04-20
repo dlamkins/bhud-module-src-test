@@ -26,6 +26,8 @@ namespace RaidClears.Settings.Services
 
 		public StrikeSettings StrikeSettings { get; }
 
+		public FractalSettings FractalSettings { get; }
+
 		public SettingService(SettingCollection settings)
 		{
 			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
@@ -37,6 +39,7 @@ namespace RaidClears.Settings.Services
 			RaidSettings = new RaidSettings(settings);
 			DungeonSettings = new DungeonSettings(settings);
 			StrikeSettings = new StrikeSettings(settings);
+			FractalSettings = new FractalSettings(settings);
 			StrikeSettings.AnchorToRaidPanel.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object _, ValueChangedEventArgs<bool> e)
 			{
 				if (e.get_NewValue())

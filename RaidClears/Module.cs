@@ -5,13 +5,17 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
+using Blish_HUD.Input;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using RaidClears.Features.Dungeons;
+using RaidClears.Features.Fractals;
+using RaidClears.Features.Fractals.Services;
 using RaidClears.Features.Raids;
+using RaidClears.Features.Shared.Models;
 using RaidClears.Features.Shared.Services;
 using RaidClears.Features.Strikes;
 using RaidClears.Features.Strikes.Services;
@@ -51,31 +55,38 @@ namespace RaidClears
 
 		protected override Task LoadAsync()
 		{
+			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0092: Expected O, but got Unknown
 			Service.StrikePersistance = StrikePersistance.Load();
+			Service.FractalPersistance = FractalPersistance.Load();
 			Service.ApiPollingService = new ApiPollService(Service.Settings.ApiPollingPeriod);
 			Service.Textures = new TextureService(Service.ContentsManager);
 			Service.ResetWatcher = new ResetsWatcherService();
 			Service.MapWatcher = new MapWatcherService();
+			Service.FractalMapWatcher = new FractalMapWatcherService();
 			Service.SettingsWindow = new SettingsPanel();
 			Service.RaidWindow = new RaidPanel();
 			Service.StrikesWindow = new StrikesPanel();
+			Service.FractalWindow = new FractalsPanel();
 			Service.DungeonWindow = new DungeonPanel();
-			Service.CornerIcon = new CornerIconService(Service.Settings.GlobalCornerIconEnabled, Strings.Module_Title, Service.Textures!.CornerIconTexture, Service.Textures!.CornerIconHoverTexture, new List<CornerIconToggleMenuItem>
+			ContextMenuStripItem refreshApiContextMenu = new ContextMenuStripItem(Strings.Settings_RefreshNow);
+			((Control)refreshApiContextMenu).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				new CornerIconToggleMenuItem((Control)(object)Service.SettingsWindow, Strings.ModuleSettings_OpenSettings),
-				new CornerIconToggleMenuItem(Service.Settings.RaidSettings.Generic.Visible, Strings.SettingsPanel_Tab_Raids),
-				new CornerIconToggleMenuItem(Service.Settings.StrikeSettings.Generic.Visible, Strings.SettingsPanel_Tab_Strikes),
-				new CornerIconToggleMenuItem(Service.Settings.DungeonSettings.Generic.Visible, Strings.SettingsPanel_Tab_Dunegons)
+				Service.ApiPollingService?.Invoke();
+			});
+			Service.CornerIcon = new CornerIconService(Service.Settings.GlobalCornerIconEnabled, Strings.Module_Title, Service.Textures!.CornerIconTexture, Service.Textures!.CornerIconHoverTexture, new List<ContextMenuStripItem>
+			{
+				(ContextMenuStripItem)(object)new CornerIconToggleMenuItem((Control)(object)Service.SettingsWindow, Strings.ModuleSettings_OpenSettings),
+				(ContextMenuStripItem)(object)new ContextMenuStripItemSeparator(),
+				(ContextMenuStripItem)(object)new CornerIconToggleMenuItem(Service.Settings.RaidSettings.Generic.Visible, Strings.SettingsPanel_Tab_Raids),
+				(ContextMenuStripItem)(object)new CornerIconToggleMenuItem(Service.Settings.StrikeSettings.Generic.Visible, Strings.SettingsPanel_Tab_Strikes),
+				(ContextMenuStripItem)(object)new CornerIconToggleMenuItem(Service.Settings.FractalSettings.Generic.Visible, "Fractals"),
+				(ContextMenuStripItem)(object)new CornerIconToggleMenuItem(Service.Settings.DungeonSettings.Generic.Visible, Strings.SettingsPanel_Tab_Dunegons),
+				(ContextMenuStripItem)(object)new ContextMenuStripItemSeparator(),
+				refreshApiContextMenu
 			});
 			Service.CornerIcon.IconLeftClicked += new EventHandler<bool>(CornerIcon_IconLeftClicked);
 			Service.Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
-			if (Service.Settings.StrikeSettings.AnchorToRaidPanel.get_Value())
-			{
-				Task.Delay(1500).ContinueWith(delegate
-				{
-					Service.Settings.AlignStrikesWithRaidPanel();
-				});
-			}
 			return Task.CompletedTask;
 		}
 
@@ -90,6 +101,11 @@ namespace RaidClears
 			}
 			Service.Textures?.Dispose();
 			Service.ApiPollingService?.Dispose();
+			FractalsPanel fractalWindow = Service.FractalWindow;
+			if (fractalWindow != null)
+			{
+				((Control)fractalWindow).Dispose();
+			}
 			StrikesPanel strikesWindow = Service.StrikesWindow;
 			if (strikesWindow != null)
 			{
@@ -112,6 +128,7 @@ namespace RaidClears
 			}
 			Service.CornerIcon?.Dispose();
 			Service.MapWatcher?.Dispose();
+			Service.FractalMapWatcher.Dispose();
 			Service.ResetWatcher?.Dispose();
 		}
 
@@ -121,6 +138,7 @@ namespace RaidClears
 			Service.RaidWindow?.Update();
 			Service.DungeonWindow?.Update();
 			Service.StrikesWindow?.Update();
+			Service.FractalWindow?.Update();
 			Service.ResetWatcher?.Update(gameTime);
 		}
 
@@ -129,6 +147,7 @@ namespace RaidClears
 			Service.Settings.RaidSettings.Generic.ToggleVisible();
 			Service.Settings.DungeonSettings.Generic.ToggleVisible();
 			Service.Settings.StrikeSettings.Generic.ToggleVisible();
+			Service.Settings.FractalSettings.Generic.ToggleVisible();
 		}
 
 		private void Gw2ApiManager_SubtokenUpdated(object sender, ValueEventArgs<IEnumerable<TokenPermission>> e)
@@ -137,6 +156,7 @@ namespace RaidClears
 			{
 				Service.CurrentAccountName = await AccountNameService.UpdateAccountName();
 				Service.MapWatcher.DispatchCurrentStrikeClears();
+				Service.FractalMapWatcher.DispatchCurrentClears();
 			});
 			Service.ApiPollingService?.Invoke();
 		}

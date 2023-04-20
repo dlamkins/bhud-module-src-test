@@ -59,7 +59,8 @@ namespace RaidClears.Settings.Views.SubViews
 			((Container)val3).set_HeightSizingMode((SizingMode)1);
 			((Control)val3).set_Width(((Control)panel).get_Width() - 40);
 			panel.AddChildPanel((Panel)(object)FlowPanelExtensions.AddString(val3, Strings.Setting_cornerIconHelpText).AddSetting((SettingEntry)(object)Service.Settings.RaidSettings.Generic.ToolbarIcon).AddSetting((SettingEntry)(object)Service.Settings.DungeonSettings.Generic.ToolbarIcon)
-				.AddSetting((SettingEntry)(object)Service.Settings.StrikeSettings.Generic.ToolbarIcon));
+				.AddSetting((SettingEntry)(object)Service.Settings.StrikeSettings.Generic.ToolbarIcon)
+				.AddSetting((SettingEntry)(object)Service.Settings.FractalSettings.Generic.ToolbarIcon));
 			refreshButton.add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				Service.ApiPollingService?.Invoke();

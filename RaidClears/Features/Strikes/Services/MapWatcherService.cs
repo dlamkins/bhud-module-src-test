@@ -52,6 +52,10 @@ namespace RaidClears.Features.Strikes.Services
 						clearedStrikesThisReset.Add("priority_" + entry.Key.GetApiLabel());
 					}
 				}
+				if (entry.Key.GetExpansionType() == StrikeMissionType.Eod && entry.Value >= Service.ResetWatcher.LastDailyReset)
+				{
+					clearedStrikesThisReset.Add("priority_" + entry.Key.GetApiLabel());
+				}
 			}
 			this.CompletedStrikes?.Invoke(this, clearedStrikesThisReset);
 		}

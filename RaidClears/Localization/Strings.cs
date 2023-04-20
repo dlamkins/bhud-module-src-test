@@ -42,6 +42,14 @@ namespace RaidClears.Localization
 			}
 		}
 
+		internal static string Fractals_DailyRecommended => ResourceManager.GetString("Fractals_DailyRecommended", resourceCulture);
+
+		internal static string Fractals_DailyTierN => ResourceManager.GetString("Fractals_DailyTierN", resourceCulture);
+
+		internal static string Fractals_Message => ResourceManager.GetString("Fractals_Message", resourceCulture);
+
+		internal static string Fractals_Selection_Prompt => ResourceManager.GetString("Fractals_Selection_Prompt", resourceCulture);
+
 		internal static string Module_Title => ResourceManager.GetString("Module_Title", resourceCulture);
 
 		internal static string ModuleSettings_OpenSettings => ResourceManager.GetString("ModuleSettings_OpenSettings", resourceCulture);
@@ -221,6 +229,66 @@ namespace RaidClears.Localization
 		internal static string Setting_Dun_Visible_Label => ResourceManager.GetString("Setting_Dun_Visible_Label", resourceCulture);
 
 		internal static string Setting_Dun_Visible_Tooltip => ResourceManager.GetString("Setting_Dun_Visible_Tooltip", resourceCulture);
+
+		internal static string Setting_Fractals_ColBG_Label => ResourceManager.GetString("Setting_Fractals_ColBG_Label", resourceCulture);
+
+		internal static string Setting_Fractals_ColBG_Tooltip => ResourceManager.GetString("Setting_Fractals_ColBG_Tooltip", resourceCulture);
+
+		internal static string Setting_Fractals_ColClear_Label => ResourceManager.GetString("Setting_Fractals_ColClear_Label", resourceCulture);
+
+		internal static string Setting_Fractals_ColClear_Tooltip => ResourceManager.GetString("Setting_Fractals_ColClear_Tooltip", resourceCulture);
+
+		internal static string Setting_Fractals_ColNotClear_Label => ResourceManager.GetString("Setting_Fractals_ColNotClear_Label", resourceCulture);
+
+		internal static string Setting_Fractals_ColNotClear_Tooltip => ResourceManager.GetString("Setting_Fractals_ColNotClear_Tooltip", resourceCulture);
+
+		internal static string Setting_Fractals_ColText_Label => ResourceManager.GetString("Setting_Fractals_ColText_Label", resourceCulture);
+
+		internal static string Setting_Fractals_ColText_Tooltip => ResourceManager.GetString("Setting_Fractals_ColText_Tooltip", resourceCulture);
+
+		internal static string Setting_Fractals_Drag_Label => ResourceManager.GetString("Setting_Fractals_Drag_Label", resourceCulture);
+
+		internal static string Setting_Fractals_Drag_Tooltip => ResourceManager.GetString("Setting_Fractals_Drag_Tooltip", resourceCulture);
+
+		internal static string Setting_Fractals_Font_Label => ResourceManager.GetString("Setting_Fractals_Font_Label", resourceCulture);
+
+		internal static string Setting_Fractals_Font_Tooptip => ResourceManager.GetString("Setting_Fractals_Font_Tooptip", resourceCulture);
+
+		internal static string Setting_Fractals_GridOpacity_Label => ResourceManager.GetString("Setting_Fractals_GridOpacity_Label", resourceCulture);
+
+		internal static string Setting_Fractals_GridOpactiy_Tooltip => ResourceManager.GetString("Setting_Fractals_GridOpactiy_Tooltip", resourceCulture);
+
+		internal static string Setting_Fractals_Icon_Label => ResourceManager.GetString("Setting_Fractals_Icon_Label", resourceCulture);
+
+		internal static string Setting_Fractals_Icon_Tooltip => ResourceManager.GetString("Setting_Fractals_Icon_Tooltip", resourceCulture);
+
+		internal static string Setting_Fractals_Keybind_Label => ResourceManager.GetString("Setting_Fractals_Keybind_Label", resourceCulture);
+
+		internal static string Setting_Fractals_Keybind_Tooltip => ResourceManager.GetString("Setting_Fractals_Keybind_Tooltip", resourceCulture);
+
+		internal static string Setting_Fractals_LabelDisplay_Label => ResourceManager.GetString("Setting_Fractals_LabelDisplay_Label", resourceCulture);
+
+		internal static string Setting_Fractals_LabelDisplay_Tooltip => ResourceManager.GetString("Setting_Fractals_LabelDisplay_Tooltip", resourceCulture);
+
+		internal static string Setting_Fractals_LabelOpacity_Label => ResourceManager.GetString("Setting_Fractals_LabelOpacity_Label", resourceCulture);
+
+		internal static string Setting_Fractals_LabelOpacity_Tooltip => ResourceManager.GetString("Setting_Fractals_LabelOpacity_Tooltip", resourceCulture);
+
+		internal static string Setting_Fractals_Layout_Label => ResourceManager.GetString("Setting_Fractals_Layout_Label", resourceCulture);
+
+		internal static string Setting_Fractals_Layout_Tooltip => ResourceManager.GetString("Setting_Fractals_Layout_Tooltip", resourceCulture);
+
+		internal static string Setting_Fractals_PanelOpacity_Label => ResourceManager.GetString("Setting_Fractals_PanelOpacity_Label", resourceCulture);
+
+		internal static string Setting_Fractals_PanelOpacity_Tooltip => ResourceManager.GetString("Setting_Fractals_PanelOpacity_Tooltip", resourceCulture);
+
+		internal static string Setting_Fractals_Tooltips_Label => ResourceManager.GetString("Setting_Fractals_Tooltips_Label", resourceCulture);
+
+		internal static string Setting_Fractals_Tooltips_Tooltip => ResourceManager.GetString("Setting_Fractals_Tooltips_Tooltip", resourceCulture);
+
+		internal static string Setting_Fractals_Visible_Label => ResourceManager.GetString("Setting_Fractals_Visible_Label", resourceCulture);
+
+		internal static string Setting_Fractals_Visible_Tooltip => ResourceManager.GetString("Setting_Fractals_Visible_Tooltip", resourceCulture);
 
 		internal static string Setting_Raid_ColBG_Label => ResourceManager.GetString("Setting_Raid_ColBG_Label", resourceCulture);
 
@@ -416,6 +484,10 @@ namespace RaidClears.Localization
 
 		internal static string Settings_Dungeon_Heading => ResourceManager.GetString("Settings_Dungeon_Heading", resourceCulture);
 
+		internal static string Settings_Fractals_Completion => ResourceManager.GetString("Settings_Fractals_Completion", resourceCulture);
+
+		internal static string Settings_Fractals_CompletionTooltip => ResourceManager.GetString("Settings_Fractals_CompletionTooltip", resourceCulture);
+
 		internal static string Settings_Keybind_Label => ResourceManager.GetString("Settings_Keybind_Label", resourceCulture);
 
 		internal static string Settings_Keybind_tooltip => ResourceManager.GetString("Settings_Keybind_tooltip", resourceCulture);
@@ -444,6 +516,8 @@ namespace RaidClears.Localization
 
 		internal static string SettingsPanel_Dun_Heading_PathSelection => ResourceManager.GetString("SettingsPanel_Dun_Heading_PathSelection", resourceCulture);
 
+		internal static string SettingsPanel_Fractals_Heading_Selection => ResourceManager.GetString("SettingsPanel_Fractals_Heading_Selection", resourceCulture);
+
 		internal static string SettingsPanel_Raid_Visual_Colors => ResourceManager.GetString("SettingsPanel_Raid_Visual_Colors", resourceCulture);
 
 		internal static string SettingsPanel_Raid_Visual_ColorsTip => ResourceManager.GetString("SettingsPanel_Raid_Visual_ColorsTip", resourceCulture);
@@ -459,6 +533,8 @@ namespace RaidClears.Localization
 		internal static string SettingsPanel_Subtitle => ResourceManager.GetString("SettingsPanel_Subtitle", resourceCulture);
 
 		internal static string SettingsPanel_Tab_Dunegons => ResourceManager.GetString("SettingsPanel_Tab_Dunegons", resourceCulture);
+
+		internal static string SettingsPanel_Tab_Fractals => ResourceManager.GetString("SettingsPanel_Tab_Fractals", resourceCulture);
 
 		internal static string SettingsPanel_Tab_General => ResourceManager.GetString("SettingsPanel_Tab_General", resourceCulture);
 

@@ -15,5 +15,10 @@ namespace RaidClears.Features.Raids.Models
 			: base(boss.GetApiLabel(), boss.GetLabel(), boss.GetLabelShort())
 		{
 		}
+
+		public Encounter(Encounters.Fractal fractal)
+			: base(fractal.GetApiLabel(), fractal.GetLabel(), fractal.GetLabelShort())
+		{
+		}
 	}
 }

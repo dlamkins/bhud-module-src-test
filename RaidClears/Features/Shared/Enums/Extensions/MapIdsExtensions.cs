@@ -41,5 +41,49 @@ namespace RaidClears.Features.Shared.Enums.Extensions
 		{
 			return value.GetStrikeMission().GetLabelShort();
 		}
+
+		public static Encounters.Fractal GetFractal(this MapIds.FractalMaps value)
+		{
+			return value switch
+			{
+				MapIds.FractalMaps.AetherbladeFractal => Encounters.Fractal.AetherbladeFractal, 
+				MapIds.FractalMaps.AquaticRuinsFractal => Encounters.Fractal.AquaticRuinsFractal, 
+				MapIds.FractalMaps.CaptainMaiTrinBossFractal => Encounters.Fractal.CaptainMaiTrinBossFractal, 
+				MapIds.FractalMaps.ChaosFractal => Encounters.Fractal.ChaosFractal, 
+				MapIds.FractalMaps.CliffsideFractal => Encounters.Fractal.CliffsideFractal, 
+				MapIds.FractalMaps.DeepstoneFractal => Encounters.Fractal.DeepstoneFractal, 
+				MapIds.FractalMaps.MoltenBoss => Encounters.Fractal.MoltenBossFractal, 
+				MapIds.FractalMaps.MoltenFurnace => Encounters.Fractal.MoltenFurnaceFractal, 
+				MapIds.FractalMaps.Nightmare => Encounters.Fractal.NightmareFractal, 
+				MapIds.FractalMaps.ShatteredObservatory => Encounters.Fractal.ShatteredObservatoryFractal, 
+				MapIds.FractalMaps.SirensReef => Encounters.Fractal.SirensReefFractal, 
+				MapIds.FractalMaps.SnowblindFractal => Encounters.Fractal.SnowblindFractal, 
+				MapIds.FractalMaps.SolidOceanFractal => Encounters.Fractal.SolidOceanFractal, 
+				MapIds.FractalMaps.SunquaPeak => Encounters.Fractal.SunquaPeakFractal, 
+				MapIds.FractalMaps.SwamplandFractal => Encounters.Fractal.SwamplandFractal, 
+				MapIds.FractalMaps.ThaumanovaReactor => Encounters.Fractal.ThaumanovaReactorFractal, 
+				MapIds.FractalMaps.TwilightOasis => Encounters.Fractal.TwilightOasisFractal, 
+				MapIds.FractalMaps.UncategorizedFractal => Encounters.Fractal.UncategorizedFractal, 
+				MapIds.FractalMaps.UndergroundFacilityFractal => Encounters.Fractal.UndergroundFacilityFractal, 
+				MapIds.FractalMaps.UrbanBattlegroundFractal => Encounters.Fractal.UrbanBattlegroundFractal, 
+				MapIds.FractalMaps.VolcanicFractal => Encounters.Fractal.VolcanicFractal, 
+				_ => Encounters.Fractal.VolcanicFractal, 
+			};
+		}
+
+		public static string GetApiLabel(this MapIds.FractalMaps value)
+		{
+			return value.GetFractal().GetApiLabel();
+		}
+
+		public static string GetLabel(this MapIds.FractalMaps value)
+		{
+			return value.GetFractal().GetLabel();
+		}
+
+		public static string GetLabelShort(this MapIds.FractalMaps value)
+		{
+			return value.GetFractal().GetLabelShort();
+		}
 	}
 }

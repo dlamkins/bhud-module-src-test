@@ -19,7 +19,7 @@ namespace RaidClears.Features.Raids.Models
 		{
 			RaidSettings settings = Service.Settings.RaidSettings;
 			List<Wing> wings = GetWingMetaData();
-			if (DateTime.UtcNow.Month == 4 && DateTime.UtcNow.Day == 1)
+			if (DateTime.Now.Month == 4 && DateTime.Now.Day == 1)
 			{
 				wings.Add(new Wing("The Wait for Wing 8", 7, "W8", new BoxModel[4]
 				{

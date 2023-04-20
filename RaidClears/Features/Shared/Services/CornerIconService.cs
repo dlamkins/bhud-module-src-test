@@ -11,7 +11,7 @@ namespace RaidClears.Features.Shared.Services
 {
 	public class CornerIconService : IDisposable
 	{
-		private readonly IEnumerable<CornerIconToggleMenuItem> _contextMenuItems;
+		private readonly IEnumerable<ContextMenuStripItem> _contextMenuItems;
 
 		private readonly Texture2D _cornerIconTexture;
 
@@ -25,7 +25,7 @@ namespace RaidClears.Features.Shared.Services
 
 		public event EventHandler<bool>? IconLeftClicked;
 
-		public CornerIconService(SettingEntry<bool> cornerIconIsVisibleSetting, string tooltip, Texture2D defaultTexture, Texture2D hoverTexture, IEnumerable<CornerIconToggleMenuItem> contextMenuItems)
+		public CornerIconService(SettingEntry<bool> cornerIconIsVisibleSetting, string tooltip, Texture2D defaultTexture, Texture2D hoverTexture, IEnumerable<ContextMenuStripItem> contextMenuItems)
 		{
 			_tooltip = tooltip;
 			_cornerIconIsVisibleSetting = cornerIconIsVisibleSetting;
@@ -52,18 +52,20 @@ namespace RaidClears.Features.Shared.Services
 			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Expected O, but got Unknown
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0082: Expected O, but got Unknown
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Expected O, but got Unknown
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Expected O, but got Unknown
 			RemoveCornerIcon();
 			CornerIcon val = new CornerIcon();
 			val.set_Icon(AsyncTexture2D.op_Implicit(_cornerIconTexture));
 			val.set_HoverIcon(AsyncTexture2D.op_Implicit(_cornerIconHoverTexture));
 			((Control)val).set_BasicTooltipText(_tooltip);
 			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			val.set_Priority(2033877237);
 			_cornerIcon = val;
 			((Control)_cornerIcon).add_Click((EventHandler<MouseEventArgs>)OnCornerIconClicked);
-			((Control)_cornerIcon).set_Menu(new ContextMenuStrip((Func<IEnumerable<ContextMenuStripItem>>)(() => (IEnumerable<ContextMenuStripItem>)_contextMenuItems)));
+			((Control)_cornerIcon).set_Menu(new ContextMenuStrip((Func<IEnumerable<ContextMenuStripItem>>)(() => _contextMenuItems)));
 		}
 
 		private void RemoveCornerIcon()
