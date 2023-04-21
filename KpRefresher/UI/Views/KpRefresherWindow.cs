@@ -130,22 +130,24 @@ namespace KpRefresher.UI.Views
 			//IL_04b2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_04b9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_04c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04cc: Expected O, but got Unknown
-			//IL_04cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04f9: Expected O, but got Unknown
-			//IL_0511: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0516: Unknown result type (might be due to invalid IL or missing references)
-			//IL_052f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0539: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0545: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d3: Expected O, but got Unknown
+			//IL_04d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0500: Expected O, but got Unknown
+			//IL_0518: Unknown result type (might be due to invalid IL or missing references)
+			//IL_051d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0536: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0540: Unknown result type (might be due to invalid IL or missing references)
 			//IL_054c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0553: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0563: Unknown result type (might be due to invalid IL or missing references)
-			//IL_056f: Expected O, but got Unknown
+			//IL_055a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_056a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0571: Unknown result type (might be due to invalid IL or missing references)
+			//IL_057d: Expected O, but got Unknown
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)this);
 			((Container)val).set_WidthSizingMode((SizingMode)2);
@@ -343,6 +345,7 @@ namespace KpRefresher.UI.Views
 			((Control)val10).set_Parent((Container)(object)mainContainer);
 			((Container)val10).set_HeightSizingMode((SizingMode)2);
 			((Container)val10).set_WidthSizingMode((SizingMode)2);
+			val10.set_CanScroll(true);
 			_notificationsContainer = val10;
 			LoadingSpinner val11 = new LoadingSpinner();
 			((Control)val11).set_Parent((Container)(object)_notificationsContainer);
@@ -369,6 +372,7 @@ namespace KpRefresher.UI.Views
 			val12.set_VerticalAlignment((VerticalAlignment)0);
 			val12.set_Font(GameService.Content.get_DefaultFont18());
 			val12.set_WrapText(true);
+			val12.set_AutoSizeHeight(true);
 			_notificationLabel = val12;
 		}
 
@@ -435,7 +439,6 @@ namespace KpRefresher.UI.Views
 			_notificationLabel.set_Text(message);
 			((Control)_notificationLabel).set_Visible(true);
 			((Control)_notificationLabel).set_Width(((Control)_notificationsContainer).get_Width());
-			((Control)_notificationLabel).set_Height(((Control)_notificationsContainer).get_Height());
 			if (!persistMessage)
 			{
 				Task.Run(async delegate
