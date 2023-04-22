@@ -38,10 +38,7 @@ namespace Ideka.RacingMeter
 			}
 			set
 			{
-				if (value?.Ghost?.RaceId == FullRace?.Meta.Id)
-				{
-					_view.FullGhost = value;
-				}
+				_view.FullGhost = ((value?.Ghost?.RaceId == FullRace?.Meta.Id) ? value : null);
 				((Control)_progressBar).set_Enabled(_view.Ghost != null);
 				Race race = _view.Race;
 				object ghostCheckpoints;
@@ -51,12 +48,12 @@ namespace Ideka.RacingMeter
 					if (ghost != null)
 					{
 						ghostCheckpoints = ghost.Checkpoints(race);
-						goto IL_0084;
+						goto IL_0087;
 					}
 				}
 				ghostCheckpoints = null;
-				goto IL_0084;
-				IL_0084:
+				goto IL_0087;
+				IL_0087:
 				GhostCheckpoints = (IReadOnlyList<GhostSnapshot>?)ghostCheckpoints;
 				UpdateLabels();
 			}

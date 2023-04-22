@@ -4,7 +4,7 @@ using Blish_HUD.Controls;
 
 namespace Ideka.RacingMeter
 {
-	public abstract class ValueTextBox<TValue> : ValueControl<TValue, string, TextBox>
+	public abstract class ValueTextBox<TValue> : ValueControl<TValue, string, TextBoxFix>
 	{
 		public ValueTextBox(TValue start)
 			: base(start)

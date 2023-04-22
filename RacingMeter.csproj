@@ -21,11 +21,11 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="Gw2Sharp" />
     <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="BHUDCommon">
-      <HintPath>..\..\working\BHUDCommon.dll</HintPath>
+    <Reference Include="5c0b1940-0be3-41ae-b86f-f79b69c8964f">
+      <HintPath>..\..\working\5c0b1940-0be3-41ae-b86f-f79b69c8964f.dll</HintPath>
     </Reference>
-    <Reference Include="NetCommon">
-      <HintPath>..\..\working\NetCommon.dll</HintPath>
+    <Reference Include="e2bae971-05dc-40aa-b7c9-4d69e0333208">
+      <HintPath>..\..\working\e2bae971-05dc-40aa-b7c9-4d69e0333208.dll</HintPath>
     </Reference>
     <Reference Include="SemVer">
       <HintPath>..\..\working\SemVer.dll</HintPath>
