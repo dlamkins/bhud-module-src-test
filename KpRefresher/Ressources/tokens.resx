@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="Escort"><value>Turret Fragment</value></data>
+  <data name="XunlaiJadeJunkyard"><value>Ankka's Coffer</value></data>
+  <data name="Deimos"><value>Fragment of Saul's Burden</value></data>
+  <data name="Sabetha"><value>Sabetha Flamethrower Fragment Piece</value></data>
+  <data name="Samarog"><value>Impaled Prisoner Token</value></data>
+  <data name="Statue"><value>Statue Token</value></data>
+  <data name="KainengOverlook"><value>Minister Li's Coffer</value></data>
+  <data name="AetherbladeHideoutCM"><value>Mai Trin's Magnificent Coffer</value></data>
+  <data name="TwinLargos"><value>Twin Largos Token</value></data>
+  <data name="Desmina"><value>Desmina's Token</value></data>
+  <data name="KeepConstruct"><value>Keep Construct Rubble</value></data>
+  <data name="Gorseval"><value>Gorseval Tentacle Piece</value></data>
+  <data name="Boneskinner"><value>Boneskinner Ritual Vial</value></data>
+  <data name="QTP"><value>Ether Djinn's Token</value></data>
+  <data name="Adina"><value>Cardinal Adina's Token</value></data>
+  <data name="Dhuum"><value>Dhuum's Token</value></data>
+  <data name="Cairn"><value>Cairn Fragment</value></data>
+  <data name="Qadim"><value>Qadim's Token</value></data>
+  <data name="River"><value>River of Souls Token</value></data>
+  <data name="Sabir"><value>Cardinal Sabir's Token</value></data>
+  <data name="HarvestTempleCM"><value>Void's Magnificent Coffer</value></data>
+  <data name="Slothasor"><value>Slothasor Mushroom</value></data>
+  <data name="ConjuredAmalgamate"><value>Conjured Amalgamate Token</value></data>
+  <data name="OldLionsCourt"><value>Assault Knights' Coffer</value></data>
+  <data name="Matthias"><value>White Mantle Abomination Crystal</value></data>
+  <data name="KainengOverlookCM"><value>Minister Li's Magnificent Coffer</value></data>
+  <data name="HarvestTemple"><value>Void's Coffer</value></data>
+  <data name="OldLionsCourtCM"><value>Assault Knights' Magnificent Coffer</value></data>
+  <data name="AetherbladeHideout"><value>Mai Trin's Coffer</value></data>
+  <data name="MursaatOverseer"><value>Recreation Room Floor Fragment</value></data>
+  <data name="XunlaiJadeJunkyardCM"><value>Ankka's Magnificent Coffer</value></data>
+  <data name="Vale"><value>Vale Guardian Fragment</value></data>
+  <data name="Xera"><value>Ribbon Scrap</value></data>
+  </root>
