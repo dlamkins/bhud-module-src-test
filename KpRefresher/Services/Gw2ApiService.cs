@@ -95,7 +95,7 @@ namespace KpRefresher.Services
 						string bankData = string.Empty;
 						foreach (var token3 in bankTokens.OrderBy(((Token, int) t) => t.Item1))
 						{
-							bankData = $"{bankData}{token3.Item2}   {token3.Item1.GetDisplayName()}\n";
+							bankData = $"{bankData}{token3.Item2}   {token3.Item1.GetDisplayNameLocalized()}\n";
 						}
 						res = res + "[" + strings.GW2APIService_Bank + "]\n" + bankData + "\n";
 					}
@@ -128,7 +128,7 @@ namespace KpRefresher.Services
 						string sharedInventoryData = string.Empty;
 						foreach (var token2 in sharedInventoryTokens.OrderBy(((Token, int) t) => t.Item1))
 						{
-							sharedInventoryData = $"{sharedInventoryData}{token2.Item2}   {token2.Item1.GetDisplayName()}\n";
+							sharedInventoryData = $"{sharedInventoryData}{token2.Item2}   {token2.Item1.GetDisplayNameLocalized()}\n";
 						}
 						res = res + "[" + strings.GW2APIService_SharedSlots + "]\n" + sharedInventoryData + "\n";
 					}
@@ -178,7 +178,7 @@ namespace KpRefresher.Services
 						string characterData = string.Empty;
 						foreach (var token in characterTokens.OrderBy(((Token, int) t) => t.Item1))
 						{
-							characterData = $"{characterData}{token.Item2}   {token.Item1.GetDisplayName()}\n";
+							characterData = $"{characterData}{token.Item2}   {token.Item1.GetDisplayNameLocalized()}\n";
 						}
 						res = res + "[" + character.get_Name() + "]\n" + characterData + "\n";
 						characterTokens.Clear();
