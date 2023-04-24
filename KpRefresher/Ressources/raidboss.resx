@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="mursaat_overseer"><value>Mursaat Overseer</value></data>
+  <data name="twisted_castle"><value>Twisted Castle</value></data>
+  <data name="river_of_souls"><value>River of Souls</value></data>
+  <data name="bandit_trio"><value>Bandit Trio</value></data>
+  <data name="slothasor"><value>Slothasor</value></data>
+  <data name="sabetha"><value>Sabetha</value></data>
+  <data name="samarog"><value>Samarog</value></data>
+  <data name="spirit_woods"><value>Spirit Woods</value></data>
+  <data name="soulless_horror"><value>Soulless Horror</value></data>
+  <data name="conjured_amalgamate"><value>Conjured Amalgamate</value></data>
+  <data name="adina"><value>Adina</value></data>
+  <data name="cairn"><value>Cairn</value></data>
+  <data name="qadim"><value>Qadim</value></data>
+  <data name="sabir"><value>Sabir</value></data>
+  <data name="vale_guardian"><value>Vale Guardian</value></data>
+  <data name="twin_largos"><value>Twin Largos</value></data>
+  <data name="keep_construct"><value>Keep Construct</value></data>
+  <data name="voice_in_the_void"><value>Dhuum</value></data>
+  <data name="deimos"><value>Deimos</value></data>
+  <data name="escort"><value>Escort</value></data>
+  <data name="matthias"><value>Matthias</value></data>
+  <data name="statues_of_grenth"><value>Statues</value></data>
+  <data name="qadim_the_peerless"><value>Qadim the Peerless</value></data>
+  <data name="gorseval"><value>Gorseval</value></data>
+  <data name="gate"><value>Gate</value></data>
+  <data name="xera"><value>Xera</value></data>
+  </root>

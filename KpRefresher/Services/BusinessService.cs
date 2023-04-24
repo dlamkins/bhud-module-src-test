@@ -171,7 +171,7 @@ namespace KpRefresher.Services
 			{
 				_playerWasInInstance = false;
 				ScheduleRefresh(_moduleSettings.DelayBeforeRefreshOnMapChange.get_Value());
-				ScreenNotification.ShowNotification(string.Format(strings.Notiication_InstanceExitDetected, _moduleSettings.DelayBeforeRefreshOnMapChange.get_Value(), (_moduleSettings.DelayBeforeRefreshOnMapChange.get_Value() > 1) ? "s" : string.Empty), (NotificationType)0, (Texture2D)null, 4);
+				ScreenNotification.ShowNotification(string.Format(strings.Notification_InstanceExitDetected, _moduleSettings.DelayBeforeRefreshOnMapChange.get_Value(), (_moduleSettings.DelayBeforeRefreshOnMapChange.get_Value() > 1) ? "s" : string.Empty), (NotificationType)0, (Texture2D)null, 4);
 			}
 		}
 
@@ -250,43 +250,28 @@ namespace KpRefresher.Services
 				ScreenNotification.ShowNotification(strings.Notification_DataNotAvailable, (NotificationType)1, (Texture2D)null, 4);
 				return null;
 			}
-			List<string> baseClears = await _kpMeService.GetClearData(_kpId);
-			List<string> obj = await _gw2ApiService.GetClears();
-			List<string> formattedGw2ApiClears = new List<string>();
-			foreach (string item in obj)
-			{
-				Enum.TryParse<RaidBoss>(item, out var boss2);
-				formattedGw2ApiClears.Add(boss2.GetDisplayName());
-			}
+			List<RaidBoss> baseClears = await _kpMeService.GetClearData(_kpId);
+			List<RaidBoss> clears = await _gw2ApiService.GetClears();
 			List<(string, Color?)> res = new List<(string, Color?)>();
 			List<RaidBoss> encounters = _raidBossNames.OrderBy((RaidBoss x) => (int)x).ToList();
 			foreach (int wingNumber in encounters.Select((RaidBoss ob) => ob.GetAttribute<WingAttribute>().WingNumber).Distinct())
 			{
 				res.Add(($"[{strings.BusinessService_Wing} {wingNumber}]\n", Color.get_White()));
-				IEnumerable<string> bossFromWing = from o in encounters
-					where o.GetAttribute<WingAttribute>().WingNumber == wingNumber
-					select o.GetDisplayName();
+				IEnumerable<RaidBoss> bossFromWing = encounters.Where((RaidBoss o) => o.GetAttribute<WingAttribute>().WingNumber == wingNumber);
 				for (int i = 0; i < bossFromWing.Count(); i++)
 				{
-					string boss = bossFromWing.ElementAt(i);
+					RaidBoss boss = bossFromWing.ElementAt(i);
 					Color bossColor = Colors.BaseColor;
-					if (baseClears.Contains(boss, StringComparer.OrdinalIgnoreCase))
+					if (baseClears.Contains(boss))
 					{
 						bossColor = Colors.KpRefreshedColor;
 					}
-					else if (formattedGw2ApiClears.Contains(boss, StringComparer.OrdinalIgnoreCase))
+					else if (clears.Contains(boss))
 					{
 						bossColor = Colors.OnlyGw2;
 					}
-					if (boss == "Statues Of Grenth")
-					{
-						boss = "Statues";
-					}
-					if (boss == "Voice In The Void")
-					{
-						boss = "Dhuum";
-					}
-					res.Add((boss + ((i < bossFromWing.Count() - 1) ? " - " : string.Empty), bossColor));
+					res.Add((boss.GetDisplayName(), bossColor));
+					res.Add(((i < bossFromWing.Count() - 1) ? " - " : string.Empty, Colors.BaseColor));
 				}
 				res.Add(("\n", null));
 			}
@@ -371,19 +356,13 @@ namespace KpRefresher.Services
 
 		private async Task<bool> CheckRaidClears()
 		{
-			List<string> baseClears = await _kpMeService.GetClearData(_kpId);
-			List<string> clears = await _gw2ApiService.GetClears();
+			List<RaidBoss> baseClears = await _kpMeService.GetClearData(_kpId);
+			List<RaidBoss> clears = await _gw2ApiService.GetClears();
 			if (clears == null || baseClears == null)
 			{
 				return false;
 			}
-			List<string> formattedGw2ApiClears = new List<string>();
-			foreach (string item in clears)
-			{
-				Enum.TryParse<RaidBoss>(item, out var boss);
-				formattedGw2ApiClears.Add(boss.GetDisplayName());
-			}
-			IEnumerable<string> result = formattedGw2ApiClears.Where((string p) => !baseClears.Any((string p2) => p2 == p));
+			IEnumerable<RaidBoss> result = clears.Where((RaidBoss p) => !baseClears.Any((RaidBoss p2) => p2 == p));
 			if (!result.Any())
 			{
 				return false;
@@ -392,13 +371,13 @@ namespace KpRefresher.Services
 			{
 				return true;
 			}
-			foreach (string res in result)
+			foreach (RaidBoss res in result)
 			{
-				if (!_raidBossNames.Any((RaidBoss r) => r.GetDisplayName() == res))
+				if (!_raidBossNames.Any((RaidBoss r) => r == res))
 				{
 					return true;
 				}
-				if (_raidBossNames.FirstOrDefault((RaidBoss r) => r.GetDisplayName() == res).HasAttribute<FinalBossAttribute>())
+				if (_raidBossNames.FirstOrDefault((RaidBoss r) => r == res).HasAttribute<FinalBossAttribute>())
 				{
 					return true;
 				}

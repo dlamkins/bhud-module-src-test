@@ -136,6 +136,8 @@ namespace KpRefresher.Ressources
 
 		internal static string Notification_DataNotAvailable => ResourceManager.GetString("Notification_DataNotAvailable", resourceCulture);
 
+		internal static string Notification_InstanceExitDetected => ResourceManager.GetString("Notification_InstanceExitDetected", resourceCulture);
+
 		internal static string Notification_KpAccountAnonymous => ResourceManager.GetString("Notification_KpAccountAnonymous", resourceCulture);
 
 		internal static string Notification_KpAccountUnknown => ResourceManager.GetString("Notification_KpAccountUnknown", resourceCulture);
@@ -157,8 +159,6 @@ namespace KpRefresher.Ressources
 		internal static string Notification_RefreshOk => ResourceManager.GetString("Notification_RefreshOk", resourceCulture);
 
 		internal static string Notification_TryScheduled => ResourceManager.GetString("Notification_TryScheduled", resourceCulture);
-
-		internal static string Notiication_InstanceExitDetected => ResourceManager.GetString("Notiication_InstanceExitDetected", resourceCulture);
 
 		internal strings()
 		{

@@ -41,7 +41,6 @@ Please retry later.</value></data>
   <data name="MainWindow_Actions_Title"><value>Actions</value></data>
   <data name="Notification_TryScheduled"><value>{0}
 A new try has been scheduled.</value></data>
-  <data name="Notiication_InstanceExitDetected"><value>[KpRefresher] Instance exit detected, refresh scheduled in {0} minute{1}</value></data>
   <data name="BusinessService_Wing"><value>Wing</value></data>
   <data name="CornerIcon_Refresh"><value>Refresh KillProof.me data</value></data>
   <data name="MainWindow_Button_ShowClears_Label"><value>Show clears</value></data>
@@ -63,6 +62,7 @@ If the color is purple, it means that the clear is visible by GW2 API, and can b
 {2}</value></data>
   <data name="MainWindow_RefreshOnKillOnlyBoss_Label"><value>Refresh on final boss kill</value></data>
   <data name="MainWindow_RefreshOnMapChange_Tooltip"><value>Schedule a refresh when leaving a raid or strike map</value></data>
+  <data name="Notification_InstanceExitDetected"><value>[KpRefresher] Instance exit detected, refresh scheduled in {0} minute{1}</value></data>
   <data name="MainWindow_RefreshOnKillOnlyBoss_Tooltip"><value>Only refresh if a final raid wing boss was cleared (e.g. Sabetha)</value></data>
   <data name="MainWindow_DelayBeforeRefreshOnMapChange_Label"><value>Delay before refresh</value></data>
   <data name="Notification_AccountNameFetchError"><value>[KpRefresher] Error while getting Account name from GW2 API.

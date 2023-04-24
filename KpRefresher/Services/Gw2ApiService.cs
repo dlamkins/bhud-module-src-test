@@ -9,6 +9,7 @@ using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using KpRefresher.Domain;
+using KpRefresher.Domain.Attributes;
 using KpRefresher.Extensions;
 using KpRefresher.Ressources;
 
@@ -48,7 +49,7 @@ namespace KpRefresher.Services
 			}
 		}
 
-		public async Task<List<string>> GetClears()
+		public async Task<List<RaidBoss>> GetClears()
 		{
 			if (!_gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)_gw2ApiManager.get_Permissions()))
 			{
@@ -58,7 +59,7 @@ namespace KpRefresher.Services
 			try
 			{
 				return ((IEnumerable<string>)(await ((IBlobClient<IApiV2ObjectList<string>>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
-					.get_Raids()).GetAsync(default(CancellationToken))))?.ToList();
+					.get_Raids()).GetAsync(default(CancellationToken))))?.Select((string d) => (RaidBoss)Enum.Parse(typeof(RaidBoss), d)).ToList();
 			}
 			catch (Exception ex)
 			{
@@ -93,9 +94,9 @@ namespace KpRefresher.Services
 					if (bankTokens.Count > 0)
 					{
 						string bankData = string.Empty;
-						foreach (var token3 in bankTokens.OrderBy(((Token, int) t) => t.Item1))
+						foreach (var token3 in bankTokens.OrderBy(((Token, int) t) => t.Item1.GetAttribute<OrderAttribute>().Order))
 						{
-							bankData = $"{bankData}{token3.Item2}   {token3.Item1.GetDisplayNameLocalized()}\n";
+							bankData = $"{bankData}{token3.Item2}   {token3.Item1.GetDisplayName()}\n";
 						}
 						res = res + "[" + strings.GW2APIService_Bank + "]\n" + bankData + "\n";
 					}
@@ -126,9 +127,9 @@ namespace KpRefresher.Services
 					if (sharedInventoryTokens.Count > 0)
 					{
 						string sharedInventoryData = string.Empty;
-						foreach (var token2 in sharedInventoryTokens.OrderBy(((Token, int) t) => t.Item1))
+						foreach (var token2 in sharedInventoryTokens.OrderBy(((Token, int) t) => t.Item1.GetAttribute<OrderAttribute>().Order))
 						{
-							sharedInventoryData = $"{sharedInventoryData}{token2.Item2}   {token2.Item1.GetDisplayNameLocalized()}\n";
+							sharedInventoryData = $"{sharedInventoryData}{token2.Item2}   {token2.Item1.GetDisplayName()}\n";
 						}
 						res = res + "[" + strings.GW2APIService_SharedSlots + "]\n" + sharedInventoryData + "\n";
 					}
@@ -176,9 +177,9 @@ namespace KpRefresher.Services
 							continue;
 						}
 						string characterData = string.Empty;
-						foreach (var token in characterTokens.OrderBy(((Token, int) t) => t.Item1))
+						foreach (var token in characterTokens.OrderBy(((Token, int) t) => t.Item1.GetAttribute<OrderAttribute>().Order))
 						{
-							characterData = $"{characterData}{token.Item2}   {token.Item1.GetDisplayNameLocalized()}\n";
+							characterData = $"{characterData}{token.Item2}   {token.Item1.GetDisplayName()}\n";
 						}
 						res = res + "[" + character.get_Name() + "]\n" + characterData + "\n";
 						characterTokens.Clear();

@@ -100,7 +100,7 @@ namespace KpRefresher
 			_cornerIconHoverTexture = ContentsManager.GetTexture("corner-hover.png");
 			_windowBackgroundTexture = AsyncTexture2D.FromAssetId(155985);
 			KpRefresherWindow kpRefresherWindow = new KpRefresherWindow(_windowBackgroundTexture, new Rectangle(40, 26, 913, 691), new Rectangle(50, 26, 893, 681), AsyncTexture2D.op_Implicit(_emblemTexture), ModuleSettings, BusinessService);
-			((Control)kpRefresherWindow).set_Size(new Point(500, 700));
+			((Control)kpRefresherWindow).set_Size(new Point(520, 700));
 			_mainWindow = kpRefresherWindow;
 			_mainWindow.BuildUi();
 		}
