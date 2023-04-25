@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls.Extern;
@@ -15,9 +14,11 @@ namespace Manlaan.Mounts
 {
 	public class Helper
 	{
-		private static SemaphoreSlim keybindSemaphore = new SemaphoreSlim(1, 1);
-
 		private static readonly Logger Logger = Logger.GetLogger<Helper>();
+
+		private Mount MountOnHide;
+
+		private string CharacterNameOnHide;
 
 		private MapType[] warclawOnlyMaps;
 
@@ -26,10 +27,20 @@ namespace Manlaan.Mounts
 			return Array.Exists(warclawOnlyMaps, (MapType mapType) => mapType == GameService.Gw2Mumble.get_CurrentMap().get_Type());
 		}
 
+		private bool IsPlayerGlidingOrFalling()
+		{
+			return Module.IsPlayerGlidingOrFalling;
+		}
+
 		private bool IsPlayerUnderOrCloseToWater()
 		{
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 			return GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Z <= 0f;
+		}
+
+		private Mount GetFlyingMount()
+		{
+			return Module._mounts.SingleOrDefault((Mount m) => m.IsFlyingMount && m.Name == Module._settingDefaultFlyingMountChoice.get_Value());
 		}
 
 		private static Mount GetWaterMount()
@@ -42,6 +53,10 @@ namespace Manlaan.Mounts
 			if (IsPlayerInWvWMap())
 			{
 				return Module._mounts.Single((Mount m) => m.IsWvWMount);
+			}
+			if (IsPlayerGlidingOrFalling())
+			{
+				return GetFlyingMount();
 			}
 			if (IsPlayerUnderOrCloseToWater())
 			{
@@ -76,59 +91,45 @@ namespace Manlaan.Mounts
 				select m).FirstOrDefault();
 		}
 
-		public bool IsKeybindBeingTriggered()
-		{
-			return keybindSemaphore.CurrentCount != 1;
-		}
-
 		public async Task TriggerKeybind(SettingEntry<KeyBinding> keybindingSetting)
 		{
-			_ = 1;
-			try
+			Logger.Debug("TriggerKeybind entered");
+			if ((int)keybindingSetting.get_Value().get_ModifierKeys() != 0)
 			{
-				await keybindSemaphore.WaitAsync();
-				Logger.Debug("TriggerKeybind entered");
-				if ((int)keybindingSetting.get_Value().get_ModifierKeys() != 0)
+				Logger.Debug($"TriggerKeybind press modifiers {keybindingSetting.get_Value().get_ModifierKeys()}");
+				if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)2))
 				{
-					Logger.Debug($"TriggerKeybind press modifiers {keybindingSetting.get_Value().get_ModifierKeys()}");
-					if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)2))
-					{
-						Keyboard.Press((VirtualKeyShort)18, true);
-					}
-					if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)1))
-					{
-						Keyboard.Press((VirtualKeyShort)17, true);
-					}
-					if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)4))
-					{
-						Keyboard.Press((VirtualKeyShort)16, true);
-					}
+					Keyboard.Press((VirtualKeyShort)18, false);
 				}
-				Logger.Debug($"TriggerKeybind press PrimaryKey {keybindingSetting.get_Value().get_PrimaryKey()}");
-				Keyboard.Press(ToVirtualKey(keybindingSetting.get_Value().get_PrimaryKey()), true);
-				await Task.Delay(50);
-				Logger.Debug($"TriggerKeybind release PrimaryKey {keybindingSetting.get_Value().get_PrimaryKey()}");
-				Keyboard.Release(ToVirtualKey(keybindingSetting.get_Value().get_PrimaryKey()), true);
-				if ((int)keybindingSetting.get_Value().get_ModifierKeys() != 0)
+				if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)1))
 				{
-					Logger.Debug($"TriggerKeybind release modifiers {keybindingSetting.get_Value().get_ModifierKeys()}");
-					if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)4))
-					{
-						Keyboard.Release((VirtualKeyShort)16, true);
-					}
-					if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)1))
-					{
-						Keyboard.Release((VirtualKeyShort)17, true);
-					}
-					if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)2))
-					{
-						Keyboard.Release((VirtualKeyShort)18, true);
-					}
+					Keyboard.Press((VirtualKeyShort)17, false);
+				}
+				if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)4))
+				{
+					Keyboard.Press((VirtualKeyShort)16, false);
 				}
 			}
-			finally
+			Logger.Debug($"TriggerKeybind press PrimaryKey {keybindingSetting.get_Value().get_PrimaryKey()}");
+			Keyboard.Press(ToVirtualKey(keybindingSetting.get_Value().get_PrimaryKey()), false);
+			await Task.Delay(50);
+			Logger.Debug($"TriggerKeybind release PrimaryKey {keybindingSetting.get_Value().get_PrimaryKey()}");
+			Keyboard.Release(ToVirtualKey(keybindingSetting.get_Value().get_PrimaryKey()), false);
+			if ((int)keybindingSetting.get_Value().get_ModifierKeys() != 0)
 			{
-				keybindSemaphore.Release();
+				Logger.Debug($"TriggerKeybind release modifiers {keybindingSetting.get_Value().get_ModifierKeys()}");
+				if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)4))
+				{
+					Keyboard.Release((VirtualKeyShort)16, false);
+				}
+				if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)1))
+				{
+					Keyboard.Release((VirtualKeyShort)17, false);
+				}
+				if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)2))
+				{
+					Keyboard.Release((VirtualKeyShort)18, false);
+				}
 			}
 		}
 
@@ -146,6 +147,28 @@ namespace Manlaan.Mounts
 			{
 				return (VirtualKeyShort)0;
 			}
+		}
+
+		internal void StoreMountForLaterUse(Mount mount, string characterName)
+		{
+			MountOnHide = mount;
+			CharacterNameOnHide = characterName;
+		}
+
+		internal bool IsCharacterTheSameAfterMapLoad(string characterName)
+		{
+			return CharacterNameOnHide == characterName;
+		}
+
+		internal Task DoMountActionForLaterUse()
+		{
+			return MountOnHide?.DoMountAction();
+		}
+
+		internal void ClearMountForLaterUse()
+		{
+			MountOnHide = null;
+			CharacterNameOnHide = null;
 		}
 
 		public Helper()

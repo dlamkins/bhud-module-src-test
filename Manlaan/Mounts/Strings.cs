@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 
 namespace Manlaan.Mounts
 {
-	[GeneratedCode("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+	[GeneratedCode("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
 	[DebuggerNonUserCode]
 	[CompilerGenerated]
 	internal class Strings
@@ -42,6 +42,8 @@ namespace Manlaan.Mounts
 			}
 		}
 
+		internal static string Setting_DefaultFlyingMountChoice => ResourceManager.GetString("Setting_DefaultFlyingMountChoice", resourceCulture);
+
 		internal static string Setting_DefaultMountBehaviour => ResourceManager.GetString("Setting_DefaultMountBehaviour", resourceCulture);
 
 		internal static string Setting_DefaultMountBinding => ResourceManager.GetString("Setting_DefaultMountBinding", resourceCulture);
@@ -50,7 +52,11 @@ namespace Manlaan.Mounts
 
 		internal static string Setting_DefaultWaterMountChoice => ResourceManager.GetString("Setting_DefaultWaterMountChoice", resourceCulture);
 
+		internal static string Setting_DisplayModuleOnLoadingScreen => ResourceManager.GetString("Setting_DisplayModuleOnLoadingScreen", resourceCulture);
+
 		internal static string Setting_DisplayMountQueueing => ResourceManager.GetString("Setting_DisplayMountQueueing", resourceCulture);
+
+		internal static string Setting_MountAutomaticallyAfterLoadingScreen => ResourceManager.GetString("Setting_MountAutomaticallyAfterLoadingScreen", resourceCulture);
 
 		internal static string Setting_MountBlockKeybindFromGame => ResourceManager.GetString("Setting_MountBlockKeybindFromGame", resourceCulture);
 
@@ -85,6 +91,10 @@ namespace Manlaan.Mounts
 		internal static string Setting_MountRadialToggleActionCameraKeyBinding => ResourceManager.GetString("Setting_MountRadialToggleActionCameraKeyBinding", resourceCulture);
 
 		internal static string Setting_Orientation => ResourceManager.GetString("Setting_Orientation", resourceCulture);
+
+		internal static string Settings_Button_Label => ResourceManager.GetString("Settings_Button_Label", resourceCulture);
+
+		internal static string Window_AllSettingsTab => ResourceManager.GetString("Window_AllSettingsTab", resourceCulture);
 
 		internal Strings()
 		{

@@ -10,6 +10,8 @@ namespace Manlaan.Mounts
 
 		private readonly Dictionary<string, Texture2D> _textureCache = new Dictionary<string, Texture2D>();
 
+		public readonly string MouseTexture = "255329.png";
+
 		public TextureCache(ContentsManager contentsManager)
 		{
 			this.contentsManager = contentsManager;
@@ -26,13 +28,24 @@ namespace Manlaan.Mounts
 					string textureName = GetTextureName(mount.ImageFileName, mountDisplay);
 					if (!_textureCache.ContainsKey(textureName))
 					{
-						_textureCache[textureName] = contentsManager.GetTexture(textureName);
+						PreCacheTexture(textureName);
 					}
 				}
 			}
+			PreCacheTexture(MouseTexture);
+		}
+
+		private void PreCacheTexture(string textureName)
+		{
+			_textureCache[textureName] = contentsManager.GetTexture(textureName);
 		}
 
 		public Texture2D GetImgFile(string filename)
+		{
+			return _textureCache[filename];
+		}
+
+		public Texture2D GetMountImgFile(string filename)
 		{
 			string textureName = GetTextureName(filename, Module._settingDisplay.get_Value());
 			return _textureCache[textureName];
