@@ -28,6 +28,15 @@ namespace Estreya.BlishHUD.Shared.Utils
 			return new byte[0];
 		}
 
+		public static FileStream ReadStream(string path)
+		{
+			if (string.IsNullOrWhiteSpace(path) && !File.Exists(path))
+			{
+				return null;
+			}
+			return new FileStream(path, FileMode.Open);
+		}
+
 		public static async Task<byte[]> ReadBytesAsync(string path)
 		{
 			if (string.IsNullOrWhiteSpace(path) && !File.Exists(path))
@@ -36,7 +45,7 @@ namespace Estreya.BlishHUD.Shared.Utils
 			}
 			try
 			{
-				using FileStream fileStream = new FileStream(path, FileMode.Open);
+				using FileStream fileStream = ReadStream(path);
 				byte[] result = new byte[fileStream.Length];
 				await fileStream.ReadAsync(result, 0, (int)fileStream.Length);
 				return result;

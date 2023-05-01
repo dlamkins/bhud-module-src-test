@@ -5,7 +5,7 @@ using Blish_HUD.Input;
 using Blish_HUD.Settings;
 using Estreya.BlishHUD.Shared.Models;
 using Estreya.BlishHUD.Shared.Models.Drawers;
-using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Services;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework.Input;
 using Newtonsoft.Json;
@@ -74,6 +74,8 @@ namespace Estreya.BlishHUD.Shared.Settings
 		public SettingEntry<bool> HideInPvP { get; private set; }
 
 		public SettingEntry<bool> DebugEnabled { get; private set; }
+
+		public SettingEntry<string> BlishAPIUsername { get; private set; }
 
 		public SettingCollection DrawerSettings { get; private set; }
 
@@ -223,13 +225,14 @@ namespace Estreya.BlishHUD.Shared.Settings
 			HideInPvP.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
 			DebugEnabled = GlobalSettings.DefineSetting<bool>("DebugEnabled", false, (Func<string>)(() => "Debug Enabled"), (Func<string>)(() => "Whether the module runs in debug mode."));
 			DebugEnabled.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			HandleEnabledStates();
+			BlishAPIUsername = GlobalSettings.DefineSetting<string>("BlishAPIUsername", (string)null, (Func<string>)(() => "Blish API Username"), (Func<string>)(() => "Defines the login username for the Estreya Blish HUD API."));
+			HandleEnabledServices();
 			DoInitializeGlobalSettings(GlobalSettings);
 		}
 
 		private void RegisterCornerIcon_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
 		{
-			HandleEnabledStates();
+			HandleEnabledServices();
 		}
 
 		private void GlobalEnabledHotkey_Activated(object sender, EventArgs e)
@@ -237,7 +240,7 @@ namespace Estreya.BlishHUD.Shared.Settings
 			GlobalDrawerVisible.set_Value(!GlobalDrawerVisible.get_Value());
 		}
 
-		private void HandleEnabledStates()
+		private void HandleEnabledServices()
 		{
 			SettingComplianceExtensions.SetDisabled((SettingEntry)(object)CornerIconLeftClickAction, !RegisterCornerIcon.get_Value());
 			SettingComplianceExtensions.SetDisabled((SettingEntry)(object)CornerIconRightClickAction, !RegisterCornerIcon.get_Value());
@@ -335,96 +338,96 @@ namespace Estreya.BlishHUD.Shared.Settings
 			SettingComplianceExtensions.SetRange(configuration.Size.Y, minHeight, maxHeight);
 		}
 
-		public virtual void UpdateLocalization(TranslationState translationState)
+		public virtual void UpdateLocalization(TranslationService translationService)
 		{
 			string globalDrawerVisibleDisplayNameDefault = ((SettingEntry)GlobalDrawerVisible).get_DisplayName();
 			string globalDrawerVisibleDescriptionDefault = ((SettingEntry)GlobalDrawerVisible).get_Description();
-			((SettingEntry)GlobalDrawerVisible).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-globalDrawerVisible-name", globalDrawerVisibleDisplayNameDefault)));
-			((SettingEntry)GlobalDrawerVisible).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-globalDrawerVisible-description", globalDrawerVisibleDescriptionDefault)));
+			((SettingEntry)GlobalDrawerVisible).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-globalDrawerVisible-name", globalDrawerVisibleDisplayNameDefault)));
+			((SettingEntry)GlobalDrawerVisible).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-globalDrawerVisible-description", globalDrawerVisibleDescriptionDefault)));
 			string globalDrawerVisibleHotkeyDisplayNameDefault = ((SettingEntry)GlobalDrawerVisibleHotkey).get_DisplayName();
 			string globalDrawerVisibleHotkeyDescriptionDefault = ((SettingEntry)GlobalDrawerVisibleHotkey).get_Description();
-			((SettingEntry)GlobalDrawerVisibleHotkey).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-globalDrawerVisibleHotkey-name", globalDrawerVisibleHotkeyDisplayNameDefault)));
-			((SettingEntry)GlobalDrawerVisibleHotkey).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-globalDrawerVisibleHotkey-description", globalDrawerVisibleHotkeyDescriptionDefault)));
+			((SettingEntry)GlobalDrawerVisibleHotkey).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-globalDrawerVisibleHotkey-name", globalDrawerVisibleHotkeyDisplayNameDefault)));
+			((SettingEntry)GlobalDrawerVisibleHotkey).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-globalDrawerVisibleHotkey-description", globalDrawerVisibleHotkeyDescriptionDefault)));
 			string registerCornerIconDisplayNameDefault = ((SettingEntry)RegisterCornerIcon).get_DisplayName();
 			string registerCornerIconDescriptionDefault = ((SettingEntry)RegisterCornerIcon).get_Description();
-			((SettingEntry)RegisterCornerIcon).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-registerCornerIcon-name", registerCornerIconDisplayNameDefault)));
-			((SettingEntry)RegisterCornerIcon).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-registerCornerIcon-description", registerCornerIconDescriptionDefault)));
+			((SettingEntry)RegisterCornerIcon).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-registerCornerIcon-name", registerCornerIconDisplayNameDefault)));
+			((SettingEntry)RegisterCornerIcon).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-registerCornerIcon-description", registerCornerIconDescriptionDefault)));
 			string hideOnOpenMapDisplayNameDefault = ((SettingEntry)HideOnOpenMap).get_DisplayName();
 			string hideOnOpenMapDescriptionDefault = ((SettingEntry)HideOnOpenMap).get_Description();
-			((SettingEntry)HideOnOpenMap).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-hideOnOpenMap-name", hideOnOpenMapDisplayNameDefault)));
-			((SettingEntry)HideOnOpenMap).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-hideOnOpenMap-description", hideOnOpenMapDescriptionDefault)));
+			((SettingEntry)HideOnOpenMap).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-hideOnOpenMap-name", hideOnOpenMapDisplayNameDefault)));
+			((SettingEntry)HideOnOpenMap).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-hideOnOpenMap-description", hideOnOpenMapDescriptionDefault)));
 			string hideOnMissingMumbleTickDisplayNameDefault = ((SettingEntry)HideOnMissingMumbleTicks).get_DisplayName();
 			string hideOnMissingMumbleTickDescriptionDefault = ((SettingEntry)HideOnMissingMumbleTicks).get_Description();
-			((SettingEntry)HideOnMissingMumbleTicks).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-hideOnMissingMumbleTick-name", hideOnMissingMumbleTickDisplayNameDefault)));
-			((SettingEntry)HideOnMissingMumbleTicks).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-hideOnMissingMumbleTick-description", hideOnMissingMumbleTickDescriptionDefault)));
+			((SettingEntry)HideOnMissingMumbleTicks).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-hideOnMissingMumbleTick-name", hideOnMissingMumbleTickDisplayNameDefault)));
+			((SettingEntry)HideOnMissingMumbleTicks).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-hideOnMissingMumbleTick-description", hideOnMissingMumbleTickDescriptionDefault)));
 			string hideInCombatDisplayNameDefault = ((SettingEntry)HideInCombat).get_DisplayName();
 			string hideInCombatDescriptionDefault = ((SettingEntry)HideInCombat).get_Description();
-			((SettingEntry)HideInCombat).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-hideInCombat-name", hideInCombatDisplayNameDefault)));
-			((SettingEntry)HideInCombat).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-hideInCombat-description", hideInCombatDescriptionDefault)));
+			((SettingEntry)HideInCombat).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-hideInCombat-name", hideInCombatDisplayNameDefault)));
+			((SettingEntry)HideInCombat).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-hideInCombat-description", hideInCombatDescriptionDefault)));
 			string hideInPVEOpenWorldDisplayNameDefault = ((SettingEntry)HideInPvE_OpenWorld).get_DisplayName();
 			string hideInPVEOpenWorldDescriptionDefault = ((SettingEntry)HideInPvE_OpenWorld).get_Description();
-			((SettingEntry)HideInPvE_OpenWorld).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-hideInPVEOpenWorld-name", hideInPVEOpenWorldDisplayNameDefault)));
-			((SettingEntry)HideInPvE_OpenWorld).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-hideInPVEOpenWorld-description", hideInPVEOpenWorldDescriptionDefault)));
+			((SettingEntry)HideInPvE_OpenWorld).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-hideInPVEOpenWorld-name", hideInPVEOpenWorldDisplayNameDefault)));
+			((SettingEntry)HideInPvE_OpenWorld).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-hideInPVEOpenWorld-description", hideInPVEOpenWorldDescriptionDefault)));
 			string hideInPVECompetetiveDisplayNameDefault = ((SettingEntry)HideInPvE_Competetive).get_DisplayName();
 			string hideInPVECompetetiveDescriptionDefault = ((SettingEntry)HideInPvE_Competetive).get_Description();
-			((SettingEntry)HideInPvE_Competetive).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-hideInPVECompetetive-name", hideInPVECompetetiveDisplayNameDefault)));
-			((SettingEntry)HideInPvE_Competetive).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-hideInPVECompetetive-description", hideInPVECompetetiveDescriptionDefault)));
+			((SettingEntry)HideInPvE_Competetive).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-hideInPVECompetetive-name", hideInPVECompetetiveDisplayNameDefault)));
+			((SettingEntry)HideInPvE_Competetive).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-hideInPVECompetetive-description", hideInPVECompetetiveDescriptionDefault)));
 			string hideInWVWDisplayNameDefault = ((SettingEntry)HideInWvW).get_DisplayName();
 			string hideInWVWDescriptionDefault = ((SettingEntry)HideInWvW).get_Description();
-			((SettingEntry)HideInWvW).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-hideInWVW-name", hideInWVWDisplayNameDefault)));
-			((SettingEntry)HideInWvW).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-hideInWVW-description", hideInWVWDescriptionDefault)));
+			((SettingEntry)HideInWvW).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-hideInWVW-name", hideInWVWDisplayNameDefault)));
+			((SettingEntry)HideInWvW).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-hideInWVW-description", hideInWVWDescriptionDefault)));
 			string hideInPVPDisplayNameDefault = ((SettingEntry)HideInPvP).get_DisplayName();
 			string hideInPVPDescriptionDefault = ((SettingEntry)HideInPvP).get_Description();
-			((SettingEntry)HideInPvP).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-hideInPVP-name", hideInPVPDisplayNameDefault)));
-			((SettingEntry)HideInPvP).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-hideInPVP-description", hideInPVPDescriptionDefault)));
+			((SettingEntry)HideInPvP).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-hideInPVP-name", hideInPVPDisplayNameDefault)));
+			((SettingEntry)HideInPvP).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-hideInPVP-description", hideInPVPDescriptionDefault)));
 		}
 
-		public void UpdateDrawerLocalization(DrawerConfiguration drawerConfiguration, TranslationState translationState)
+		public void UpdateDrawerLocalization(DrawerConfiguration drawerConfiguration, TranslationService translationService)
 		{
 			string enabledDisplayNameDefault = ((SettingEntry)drawerConfiguration.Enabled).get_DisplayName();
 			string enabledDescriptionDefault = ((SettingEntry)drawerConfiguration.Enabled).get_Description();
-			((SettingEntry)drawerConfiguration.Enabled).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEnabled-name", enabledDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.Enabled).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEnabled-description", enabledDescriptionDefault)));
+			((SettingEntry)drawerConfiguration.Enabled).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerEnabled-name", enabledDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.Enabled).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerEnabled-description", enabledDescriptionDefault)));
 			string enabledKeybindingDisplayNameDefault = ((SettingEntry)drawerConfiguration.EnabledKeybinding).get_DisplayName();
 			string enabledKeybindingDescriptionDefault = ((SettingEntry)drawerConfiguration.EnabledKeybinding).get_Description();
-			((SettingEntry)drawerConfiguration.EnabledKeybinding).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEnabledKeybinding-name", enabledKeybindingDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.EnabledKeybinding).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEnabledKeybinding-description", enabledKeybindingDescriptionDefault)));
+			((SettingEntry)drawerConfiguration.EnabledKeybinding).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerEnabledKeybinding-name", enabledKeybindingDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.EnabledKeybinding).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerEnabledKeybinding-description", enabledKeybindingDescriptionDefault)));
 			string locationXDisplayNameDefault = ((SettingEntry)drawerConfiguration.Location.X).get_DisplayName();
 			string locationXDescriptionDefault = ((SettingEntry)drawerConfiguration.Location.X).get_Description();
-			((SettingEntry)drawerConfiguration.Location.X).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerLocationX-name", locationXDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.Location.X).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerLocationX-description", locationXDescriptionDefault)));
+			((SettingEntry)drawerConfiguration.Location.X).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerLocationX-name", locationXDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.Location.X).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerLocationX-description", locationXDescriptionDefault)));
 			string locationYDisplayNameDefault = ((SettingEntry)drawerConfiguration.Location.Y).get_DisplayName();
 			string locationYDescriptionDefault = ((SettingEntry)drawerConfiguration.Location.Y).get_Description();
-			((SettingEntry)drawerConfiguration.Location.Y).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerLocationY-name", locationYDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.Location.Y).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerLocationY-description", locationYDescriptionDefault)));
+			((SettingEntry)drawerConfiguration.Location.Y).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerLocationY-name", locationYDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.Location.Y).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerLocationY-description", locationYDescriptionDefault)));
 			string widthDisplayNameDefault = ((SettingEntry)drawerConfiguration.Size.X).get_DisplayName();
 			string widthDescriptionDefault = ((SettingEntry)drawerConfiguration.Size.X).get_Description();
-			((SettingEntry)drawerConfiguration.Size.X).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerWidth-name", widthDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.Size.X).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerWidth-description", widthDescriptionDefault)));
+			((SettingEntry)drawerConfiguration.Size.X).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerWidth-name", widthDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.Size.X).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerWidth-description", widthDescriptionDefault)));
 			string heightDisplayNameDefault = ((SettingEntry)drawerConfiguration.Size.Y).get_DisplayName();
 			string heightDescriptionDefault = ((SettingEntry)drawerConfiguration.Size.Y).get_Description();
-			((SettingEntry)drawerConfiguration.Size.Y).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerHeight-name", heightDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.Size.Y).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerHeight-description", heightDescriptionDefault)));
+			((SettingEntry)drawerConfiguration.Size.Y).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerHeight-name", heightDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.Size.Y).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerHeight-description", heightDescriptionDefault)));
 			string buildDirectionDisplayNameDefault = ((SettingEntry)drawerConfiguration.BuildDirection).get_DisplayName();
 			string buildDirectionDescriptionDefault = ((SettingEntry)drawerConfiguration.BuildDirection).get_Description();
-			((SettingEntry)drawerConfiguration.BuildDirection).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerBuildDirection-name", buildDirectionDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.BuildDirection).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerBuildDirection-description", buildDirectionDescriptionDefault)));
+			((SettingEntry)drawerConfiguration.BuildDirection).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerBuildDirection-name", buildDirectionDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.BuildDirection).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerBuildDirection-description", buildDirectionDescriptionDefault)));
 			string opacityDisplayNameDefault = ((SettingEntry)drawerConfiguration.Opacity).get_DisplayName();
 			string opacityDescriptionDefault = ((SettingEntry)drawerConfiguration.Opacity).get_Description();
-			((SettingEntry)drawerConfiguration.Opacity).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerOpacity-name", opacityDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.Opacity).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerOpacity-description", opacityDescriptionDefault)));
+			((SettingEntry)drawerConfiguration.Opacity).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerOpacity-name", opacityDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.Opacity).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerOpacity-description", opacityDescriptionDefault)));
 			string backgroundColorDisplayNameDefault = ((SettingEntry)drawerConfiguration.BackgroundColor).get_DisplayName();
 			string backgroundColorDescriptionDefault = ((SettingEntry)drawerConfiguration.BackgroundColor).get_Description();
-			((SettingEntry)drawerConfiguration.BackgroundColor).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerBackgroundColor-name", backgroundColorDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.BackgroundColor).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerBackgroundColor-description", backgroundColorDescriptionDefault)));
+			((SettingEntry)drawerConfiguration.BackgroundColor).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerBackgroundColor-name", backgroundColorDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.BackgroundColor).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerBackgroundColor-description", backgroundColorDescriptionDefault)));
 			string fontSizeDisplayNameDefault = ((SettingEntry)drawerConfiguration.FontSize).get_DisplayName();
 			string fontSizeDescriptionDefault = ((SettingEntry)drawerConfiguration.FontSize).get_Description();
-			((SettingEntry)drawerConfiguration.FontSize).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerFontSize-name", fontSizeDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.FontSize).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerFontSize-description", fontSizeDescriptionDefault)));
+			((SettingEntry)drawerConfiguration.FontSize).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerFontSize-name", fontSizeDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.FontSize).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerFontSize-description", fontSizeDescriptionDefault)));
 			string textColorDisplayNameDefault = ((SettingEntry)drawerConfiguration.TextColor).get_DisplayName();
 			string textColorDescriptionDefault = ((SettingEntry)drawerConfiguration.TextColor).get_Description();
-			((SettingEntry)drawerConfiguration.TextColor).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerTextColor-name", textColorDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.TextColor).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerTextColor-description", textColorDescriptionDefault)));
+			((SettingEntry)drawerConfiguration.TextColor).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerTextColor-name", textColorDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.TextColor).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerTextColor-description", textColorDescriptionDefault)));
 		}
 
 		public virtual void Unload()

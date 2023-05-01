@@ -6,9 +6,9 @@ using Estreya.BlishHUD.Shared.Threading;
 using Estreya.BlishHUD.Shared.Utils;
 using Microsoft.Xna.Framework;
 
-namespace Estreya.BlishHUD.Shared.State
+namespace Estreya.BlishHUD.Shared.Services
 {
-	public abstract class ManagedState : IDisposable
+	public abstract class ManagedService : IDisposable
 	{
 		protected Logger Logger;
 
@@ -16,13 +16,13 @@ namespace Estreya.BlishHUD.Shared.State
 
 		protected CancellationTokenSource _cancellationTokenSource;
 
-		protected StateConfiguration Configuration { get; }
+		protected ServiceConfiguration Configuration { get; }
 
 		public bool Running { get; private set; }
 
 		public bool AwaitLoading => Configuration.AwaitLoading;
 
-		protected ManagedState(StateConfiguration configuration)
+		protected ManagedService(ServiceConfiguration configuration)
 		{
 			Logger = Logger.GetLogger(GetType());
 			Configuration = configuration;
@@ -94,7 +94,6 @@ namespace Estreya.BlishHUD.Shared.State
 			}
 			Logger.Debug("Unloading state.");
 			_cancellationTokenSource.Cancel();
-			Clear();
 			InternalUnload();
 		}
 

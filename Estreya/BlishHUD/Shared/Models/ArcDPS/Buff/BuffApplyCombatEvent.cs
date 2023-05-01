@@ -10,8 +10,8 @@ namespace Estreya.BlishHUD.Shared.Models.ArcDPS.Buff
 
 		public int AppliedDuration => base.Ev.get_Value();
 
-		public BuffApplyCombatEvent(Ev ev, Ag src, Ag dst, CombatEventCategory category, CombatEventType type, CombatEventState state)
-			: base(ev, src, dst, category, type, state)
+		public BuffApplyCombatEvent(CombatEvent combatEvent, CombatEventCategory category, CombatEventType type, CombatEventState state)
+			: base(combatEvent, category, type, state)
 		{
 		}
 	}

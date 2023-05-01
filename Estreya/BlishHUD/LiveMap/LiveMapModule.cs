@@ -61,11 +61,11 @@ namespace Estreya.BlishHUD.LiveMap
 
 		private Map _map;
 
-		private string LIVE_MAP_API_URL => base.API_URL + "/write";
+		private string LIVE_MAP_API_URL => base.MODULE_API_URL + "/write";
 
 		public string GuildId => _guildId;
 
-		public override string WebsiteModuleName => "live-map";
+		public override string UrlModuleName => "live-map";
 
 		protected override string API_VERSION_NO => "1";
 
@@ -378,7 +378,7 @@ namespace Estreya.BlishHUD.LiveMap
 
 		public override IView GetSettingsView()
 		{
-			return (IView)(object)new SettingsView(base.Gw2ApiManager, base.IconState, base.TranslationState, base.SettingEventState, base.ModuleSettings, () => GetGlobalUrl(), () => GetGuildUrl());
+			return (IView)(object)new SettingsView(base.Gw2ApiManager, base.IconService, base.TranslationService, base.SettingEventService, base.ModuleSettings, () => GetGlobalUrl(), () => GetGuildUrl());
 		}
 
 		protected override BaseModuleSettings DefineModuleSettings(SettingCollection settings)

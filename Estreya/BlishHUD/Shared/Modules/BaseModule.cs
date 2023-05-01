@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -17,15 +19,14 @@ using Estreya.BlishHUD.Shared.Helpers;
 using Estreya.BlishHUD.Shared.Models;
 using Estreya.BlishHUD.Shared.MumbleInfo.Map;
 using Estreya.BlishHUD.Shared.Security;
+using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Settings;
-using Estreya.BlishHUD.Shared.State;
 using Estreya.BlishHUD.Shared.UI.Views;
 using Estreya.BlishHUD.Shared.UI.Views.Settings;
 using Estreya.BlishHUD.Shared.Utils;
 using Flurl.Http;
 using Gw2Sharp.Models;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.BitmapFonts;
 using SemVer;
 
@@ -33,11 +34,11 @@ namespace Estreya.BlishHUD.Shared.Modules
 {
 	public abstract class BaseModule<TModule, TSettings> : Module where TModule : class where TSettings : BaseModuleSettings
 	{
-		public const string FILE_ROOT_URL = "https://files.estreya.de";
+		protected const string FILE_ROOT_URL = "https://files.estreya.de";
 
-		public const string FILE_BLISH_ROOT_URL = "https://files.estreya.de/blish-hud";
+		protected const string FILE_BLISH_ROOT_URL = "https://files.estreya.de/blish-hud";
 
-		private const string API_ROOT_URL = "https://blish-hud.api.estreya.de";
+		protected const string API_ROOT_URL = "https://blish-hud.api.estreya.de";
 
 		protected const string GITHUB_OWNER = "Tharylia";
 
@@ -51,11 +52,13 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		private FlurlClient _flurlClient;
 
+		private ConcurrentDictionary<string, string> _loadingTexts = new ConcurrentDictionary<string, string>();
+
 		private LoadingSpinner _loadingSpinner;
 
-		private readonly AsyncLock _stateLock = new AsyncLock();
+		private readonly AsyncLock _servicesLock = new AsyncLock();
 
-		private Collection<ManagedState> _states = new Collection<ManagedState>();
+		private Collection<ManagedService> _services = new Collection<ManagedService>();
 
 		protected Logger Logger { get; }
 
@@ -63,11 +66,11 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected PasswordManager PasswordManager { get; private set; }
 
-		public string WEBSITE_MODULE_FILE_URL => "https://files.estreya.de/blish-hud/" + WebsiteModuleName;
+		public string MODULE_FILE_URL => "https://files.estreya.de/blish-hud/" + UrlModuleName;
 
-		public string API_URL => "https://blish-hud.api.estreya.de/v" + API_VERSION_NO + "/" + WebsiteModuleName;
+		public string MODULE_API_URL => "https://blish-hud.api.estreya.de/v" + API_VERSION_NO + "/" + UrlModuleName;
 
-		public abstract string WebsiteModuleName { get; }
+		public abstract string UrlModuleName { get; }
 
 		protected abstract string API_VERSION_NO { get; }
 
@@ -101,27 +104,35 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		public virtual BitmapFont Font => GameService.Content.get_DefaultFont16();
 
-		public IconState IconState { get; private set; }
+		public IconService IconService { get; private set; }
 
-		public TranslationState TranslationState { get; private set; }
+		public TranslationService TranslationService { get; private set; }
 
-		public SettingEventState SettingEventState { get; private set; }
+		public SettingEventService SettingEventService { get; private set; }
 
-		public WorldbossState WorldbossState { get; private set; }
+		public NewsService NewsService { get; private set; }
 
-		public MapchestState MapchestState { get; private set; }
+		public WorldbossService WorldbossService { get; private set; }
 
-		public PointOfInterestState PointOfInterestState { get; private set; }
+		public MapchestService MapchestService { get; private set; }
 
-		public AccountState AccountState { get; private set; }
+		public PointOfInterestService PointOfInterestService { get; private set; }
 
-		public SkillState SkillState { get; private set; }
+		public AccountService AccountService { get; private set; }
 
-		public TradingPostState TradingPostState { get; private set; }
+		public SkillService SkillService { get; private set; }
 
-		public ItemState ItemState { get; private set; }
+		public TradingPostService TradingPostService { get; private set; }
 
-		public ArcDPSState ArcDPSState { get; private set; }
+		public ItemService ItemService { get; private set; }
+
+		public ArcDPSService ArcDPSService { get; private set; }
+
+		public BlishHudApiService BlishHUDAPIService { get; private set; }
+
+		public AchievementService AchievementService { get; private set; }
+
+		public AccountAchievementService AccountAchievementService { get; private set; }
 
 		protected IFlurlClient GetFlurlClient()
 		{
@@ -161,9 +172,9 @@ namespace Estreya.BlishHUD.Shared.Modules
 		protected override async Task LoadAsync()
 		{
 			Logger.Debug("Initialize states");
-			await InitializeStates();
-			GithubHelper = new GitHubHelper("Tharylia", "Blish-HUD-Modules", "Iv1.9e4dc29d43243704", ((Module)this).get_Name(), PasswordManager, IconState, TranslationState);
-			ModuleSettings.UpdateLocalization(TranslationState);
+			await Task.Factory.StartNew((Func<Task>)InitializeServices, TaskCreationOptions.LongRunning).Unwrap();
+			GithubHelper = new GitHubHelper("Tharylia", "Blish-HUD-Modules", "Iv1.9e4dc29d43243704", ((Module)this).get_Name(), PasswordManager, IconService, TranslationService, ModuleSettings);
+			ModuleSettings.UpdateLocalization(TranslationService);
 			ModuleSettings.ModuleSettingsChanged += ModuleSettings_ModuleSettingsChanged;
 		}
 
@@ -177,7 +188,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected abstract string GetDirectoryName();
 
-		private async Task InitializeStates()
+		private async Task InitializeServices()
 		{
 			string directoryName = GetDirectoryName();
 			string directoryPath = null;
@@ -185,54 +196,69 @@ namespace Estreya.BlishHUD.Shared.Modules
 			{
 				directoryPath = DirectoriesManager.GetFullDirectoryPath(directoryName);
 			}
-			using (await _stateLock.LockAsync())
+			using (await _servicesLock.LockAsync())
 			{
-				StateConfigurations configurations = new StateConfigurations();
-				ConfigureStates(configurations);
+				ServiceConfigurations configurations = new ServiceConfigurations();
+				ConfigureServices(configurations);
+				if (configurations.BlishHUDAPI.Enabled)
+				{
+					if (PasswordManager == null)
+					{
+						throw new ArgumentNullException("PasswordManager");
+					}
+					BlishHUDAPIService = new BlishHudApiService(configurations.BlishHUDAPI, ModuleSettings.BlishAPIUsername, PasswordManager, GetFlurlClient(), "https://blish-hud.api.estreya.de", API_VERSION_NO);
+					_services.Add(BlishHUDAPIService);
+				}
 				if (configurations.Account.Enabled)
 				{
-					AccountState = new AccountState(configurations.Account, Gw2ApiManager);
-					_states.Add(AccountState);
+					AccountService = new AccountService(configurations.Account, Gw2ApiManager);
+					_services.Add(AccountService);
 				}
-				IconState = new IconState(new StateConfiguration
+				IconService = new IconService(new APIServiceConfiguration
 				{
 					Enabled = true,
 					AwaitLoading = false
 				}, ContentsManager);
-				_states.Add(IconState);
-				TranslationState = new TranslationState(new StateConfiguration
+				_services.Add(IconService);
+				TranslationService = new TranslationService(new ServiceConfiguration
 				{
 					Enabled = true,
 					AwaitLoading = true
-				}, GetFlurlClient(), WEBSITE_MODULE_FILE_URL);
-				_states.Add(TranslationState);
-				SettingEventState = new SettingEventState(new StateConfiguration
+				}, GetFlurlClient(), MODULE_FILE_URL);
+				_services.Add(TranslationService);
+				SettingEventService = new SettingEventService(new ServiceConfiguration
 				{
 					Enabled = true,
 					AwaitLoading = false,
 					SaveInterval = Timeout.InfiniteTimeSpan
 				});
-				_states.Add(SettingEventState);
+				_services.Add(SettingEventService);
+				NewsService = new NewsService(new ServiceConfiguration
+				{
+					AwaitLoading = true,
+					Enabled = true
+				}, GetFlurlClient(), MODULE_FILE_URL);
+				_services.Add(NewsService);
 				if (configurations.Items.Enabled)
 				{
-					ItemState = new ItemState(configurations.Items, Gw2ApiManager, directoryPath);
-					_states.Add(ItemState);
+					ItemService = new ItemService(configurations.Items, Gw2ApiManager, directoryPath);
+					_services.Add(ItemService);
 				}
 				if (configurations.TradingPost.Enabled)
 				{
-					TradingPostState = new TradingPostState(configurations.TradingPost, Gw2ApiManager, ItemState);
-					_states.Add(TradingPostState);
+					TradingPostService = new TradingPostService(configurations.TradingPost, Gw2ApiManager, ItemService);
+					_services.Add(TradingPostService);
 				}
 				if (configurations.Worldbosses.Enabled)
 				{
 					if (configurations.Account.Enabled)
 					{
-						WorldbossState = new WorldbossState(configurations.Worldbosses, Gw2ApiManager, AccountState);
-						_states.Add(WorldbossState);
+						WorldbossService = new WorldbossService(configurations.Worldbosses, Gw2ApiManager, AccountService);
+						_services.Add(WorldbossService);
 					}
 					else
 					{
-						Logger.Debug(typeof(WorldbossState).Name + " is not available because " + typeof(AccountState).Name + " is deactivated.");
+						Logger.Debug(typeof(WorldbossService).Name + " is not available because " + typeof(AccountService).Name + " is deactivated.");
 						configurations.Worldbosses.Enabled = false;
 					}
 				}
@@ -240,12 +266,12 @@ namespace Estreya.BlishHUD.Shared.Modules
 				{
 					if (configurations.Account.Enabled)
 					{
-						MapchestState = new MapchestState(configurations.Mapchests, Gw2ApiManager, AccountState);
-						_states.Add(MapchestState);
+						MapchestService = new MapchestService(configurations.Mapchests, Gw2ApiManager, AccountService);
+						_services.Add(MapchestService);
 					}
 					else
 					{
-						Logger.Debug(typeof(MapchestState).Name + " is not available because " + typeof(AccountState).Name + " is deactivated.");
+						Logger.Debug(typeof(MapchestService).Name + " is not available because " + typeof(AccountService).Name + " is deactivated.");
 						configurations.Mapchests.Enabled = false;
 					}
 				}
@@ -255,8 +281,8 @@ namespace Estreya.BlishHUD.Shared.Modules
 					{
 						throw new ArgumentNullException("directoryPath", "Module directory is not specified.");
 					}
-					PointOfInterestState = new PointOfInterestState(configurations.PointOfInterests, Gw2ApiManager, directoryPath);
-					_states.Add(PointOfInterestState);
+					PointOfInterestService = new PointOfInterestService(configurations.PointOfInterests, Gw2ApiManager, directoryPath);
+					_services.Add(PointOfInterestService);
 				}
 				if (configurations.Skills.Enabled)
 				{
@@ -264,32 +290,42 @@ namespace Estreya.BlishHUD.Shared.Modules
 					{
 						throw new ArgumentNullException("directoryPath", "Module directory is not specified.");
 					}
-					SkillState = new SkillState(configurations.Skills, Gw2ApiManager, IconState, directoryPath, GetFlurlClient(), "https://files.estreya.de/blish-hud");
-					_states.Add(SkillState);
+					SkillService = new SkillService(configurations.Skills, Gw2ApiManager, IconService, directoryPath, GetFlurlClient(), "https://files.estreya.de/blish-hud");
+					_services.Add(SkillService);
 				}
 				if (configurations.ArcDPS.Enabled)
 				{
 					if (configurations.Skills.Enabled)
 					{
-						ArcDPSState = new ArcDPSState(configurations.ArcDPS, SkillState);
-						_states.Add(ArcDPSState);
+						ArcDPSService = new ArcDPSService(configurations.ArcDPS, SkillService);
+						_services.Add(ArcDPSService);
 					}
 					else
 					{
-						Logger.Debug(typeof(ArcDPSState).Name + " is not available because " + typeof(SkillState).Name + " is deactivated.");
+						Logger.Debug(typeof(ArcDPSService).Name + " is not available because " + typeof(SkillService).Name + " is deactivated.");
 						configurations.ArcDPS.Enabled = false;
 					}
 				}
-				Collection<ManagedState> customStates = GetAdditionalStates(directoryPath);
-				if (customStates != null && customStates.Count > 0)
+				if (configurations.Achievements.Enabled)
 				{
-					foreach (ManagedState customState in customStates)
+					AchievementService = new AchievementService(Gw2ApiManager, configurations.Achievements, directoryPath);
+					_services.Add(AchievementService);
+				}
+				if (configurations.AccountAchievements.Enabled)
+				{
+					AccountAchievementService = new AccountAchievementService(Gw2ApiManager, configurations.AccountAchievements);
+					_services.Add(AccountAchievementService);
+				}
+				Collection<ManagedService> customServices = GetAdditionalServices(directoryPath);
+				if (customServices != null && customServices.Count > 0)
+				{
+					foreach (ManagedService customService in customServices)
 					{
-						_states.Add(customState);
+						_services.Add(customService);
 					}
 				}
-				OnBeforeStatesStarted();
-				foreach (ManagedState state2 in _states.Where((ManagedState state) => !state.Running))
+				OnBeforeServicesStarted();
+				foreach (ManagedService state2 in _services.Where((ManagedService state) => !state.Running))
 				{
 					if (state2.AwaitLoading)
 					{
@@ -314,15 +350,15 @@ namespace Estreya.BlishHUD.Shared.Modules
 			}
 		}
 
-		protected virtual void ConfigureStates(StateConfigurations configurations)
+		protected virtual void ConfigureServices(ServiceConfigurations configurations)
 		{
 		}
 
-		protected virtual void OnBeforeStatesStarted()
+		protected virtual void OnBeforeServicesStarted()
 		{
 		}
 
-		protected virtual Collection<ManagedState> GetAdditionalStates(string directoryPath)
+		protected virtual Collection<ManagedService> GetAdditionalServices(string directoryPath)
 		{
 			return null;
 		}
@@ -333,8 +369,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Expected O, but got Unknown
-			//IL_0030: Expected O, but got Unknown
+			//IL_0039: Expected O, but got Unknown
 			if (show)
 			{
 				if (CornerIcon == null)
@@ -342,10 +377,10 @@ namespace Estreya.BlishHUD.Shared.Modules
 					CornerIcon val = new CornerIcon();
 					val.set_IconName(((Module)this).get_Name());
 					val.set_Icon(GetCornerIcon());
-					CornerIcon val2 = val;
+					val.set_Priority(1289351278);
 					CornerIcon = val;
+					OnCornerIconBuild();
 				}
-				OnCornerIconBuild();
 			}
 			else if (CornerIcon != null)
 			{
@@ -397,7 +432,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 		{
 			if (_defaultSettingView == null)
 			{
-				_defaultSettingView = new ModuleSettingsView(IconState, TranslationState);
+				_defaultSettingView = new ModuleSettingsView(IconService, TranslationService);
 				_defaultSettingView.OpenClicked += DefaultSettingView_OpenClicked;
 				_defaultSettingView.CreateGithubIssueClicked += DefaultSettingView_CreateGithubIssueClicked;
 			}
@@ -416,65 +451,36 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Expected O, but got Unknown
+			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d8: Expected O, but got Unknown
-			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0168: Expected O, but got Unknown
+			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011f: Expected O, but got Unknown
 			((Module)this).OnModuleLoaded(e);
 			Logger.Debug("Start building settings window.");
-			Texture2D windowBackground = AsyncTexture2D.op_Implicit(IconState.GetIcon("textures\\setting_window_background.png"));
-			Rectangle settingsWindowSize = default(Rectangle);
-			((Rectangle)(ref settingsWindowSize))._002Ector(35, 26, 1100, 714);
-			int contentRegionPaddingY = settingsWindowSize.Y - 15;
-			int contentRegionPaddingX = settingsWindowSize.X + 46;
-			Rectangle contentRegion = default(Rectangle);
-			((Rectangle)(ref contentRegion))._002Ector(contentRegionPaddingX, contentRegionPaddingY, settingsWindowSize.Width - 52, settingsWindowSize.Height - contentRegionPaddingY);
-			TabbedWindow2 val = new TabbedWindow2(windowBackground, settingsWindowSize, contentRegion);
-			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((WindowBase2)val).set_Title(((Module)this).get_Name());
-			((WindowBase2)val).set_Subtitle(TranslationState.GetTranslation("settingsWindow-subtitle", "Settings"));
-			((WindowBase2)val).set_SavesPosition(true);
-			((WindowBase2)val).set_Id(((object)this).GetType().Name + "_6bd04be4-dc19-4914-a2c3-8160ce76818b");
-			SettingsWindow = val;
-			AsyncTexture2D emblem = GetEmblem();
-			if (emblem != null)
+			if (SettingsWindow == null)
 			{
-				if (emblem.get_HasSwapped())
-				{
-					((WindowBase2)SettingsWindow).set_Emblem(AsyncTexture2D.op_Implicit(emblem));
-				}
-				else
-				{
-					emblem.add_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)SettingsWindowEmblem_TextureSwapped);
-				}
+				TabbedWindow2 val2 = (SettingsWindow = WindowUtil.CreateTabbedWindow(((Module)this).get_Name(), ((object)this).GetType(), Guid.Parse("6bd04be4-dc19-4914-a2c3-8160ce76818b"), IconService, GetEmblem()));
 			}
+			SettingsWindow.get_Tabs().Add(new Tab(IconService.GetIcon("482926.png"), (Func<IView>)(() => (IView)(object)new NewsView(GetFlurlClient(), Gw2ApiManager, IconService, TranslationService, NewsService, GameService.Content.get_DefaultFont16())
+			{
+				DefaultColor = ModuleSettings.DefaultGW2Color
+			}), "News", (int?)null));
 			OnSettingWindowBuild(SettingsWindow);
+			SettingsWindow.get_Tabs().Add(new Tab(IconService.GetIcon("156331.png"), (Func<IView>)(() => (IView)(object)new DonationView(GetFlurlClient(), Gw2ApiManager, IconService, TranslationService, GameService.Content.get_DefaultFont16())
+			{
+				DefaultColor = ModuleSettings.DefaultGW2Color
+			}), "Donations", (int?)null));
 			if (Debug)
 			{
-				SettingsWindow.get_Tabs().Add(new Tab(IconState.GetIcon("155052.png"), (Func<IView>)(() => (IView)(object)new StateSettingsView(_states, Gw2ApiManager, IconState, TranslationState, SettingEventState, Font)
+				SettingsWindow.get_Tabs().Add(new Tab(IconService.GetIcon("155052.png"), (Func<IView>)(() => (IView)(object)new ServiceSettingsView(_services, Gw2ApiManager, IconService, TranslationService, SettingEventService, Font)
 				{
 					DefaultColor = ModuleSettings.DefaultGW2Color
 				}), "Debug", (int?)null));
 			}
 			Logger.Debug("Finished building settings window.");
 			HandleCornerIcon(ModuleSettings.RegisterCornerIcon.get_Value());
-		}
-
-		private void SettingsWindowEmblem_TextureSwapped(object sender, ValueChangedEventArgs<Texture2D> e)
-		{
-			((AsyncTexture2D)((sender is AsyncTexture2D) ? sender : null)).remove_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)SettingsWindowEmblem_TextureSwapped);
-			((WindowBase2)SettingsWindow).set_Emblem(e.get_NewValue());
 		}
 
 		protected abstract AsyncTexture2D GetEmblem();
@@ -488,37 +494,50 @@ namespace Estreya.BlishHUD.Shared.Modules
 		protected override void Update(GameTime gameTime)
 		{
 			ShowUI = CalculateUIVisibility();
-			using (_stateLock.Lock())
+			using (_servicesLock.Lock())
 			{
-				bool anyStateLoading = false;
-				string loadingText = null;
-				foreach (ManagedState state in _states)
+				List<string> stateLoadingTexts = new List<string>();
+				foreach (ManagedService state in _services)
 				{
 					state.Update(gameTime);
-					APIState apiState = state as APIState;
-					if (apiState == null || !apiState.Loading)
+					APIService apiService = state as APIService;
+					if (apiService != null && apiService.Loading)
 					{
-						continue;
-					}
-					anyStateLoading = true;
-					if (!string.IsNullOrWhiteSpace(apiState.ProgressText))
-					{
-						if (loadingText == null)
+						if (!string.IsNullOrWhiteSpace(apiService.ProgressText))
 						{
-							loadingText = state.GetType().Name + ": " + apiState.ProgressText;
+							stateLoadingTexts.Add(state.GetType().Name + ": " + apiService.ProgressText);
+						}
+						else
+						{
+							stateLoadingTexts.Add(state.GetType().Name);
 						}
 					}
-					else if (loadingText == null)
-					{
-						loadingText = state.GetType().Name;
-					}
 				}
-				HandleLoadingSpinner(anyStateLoading, loadingText);
+				string stateTexts = ((stateLoadingTexts.Count == 0) ? null : ("Services:\n    " + string.Join("\n    ", stateLoadingTexts)));
+				ReportLoading("states", stateTexts);
 			}
+			StringBuilder loadingTexts = new StringBuilder();
+			foreach (KeyValuePair<string, string> loadingText in _loadingTexts)
+			{
+				if (loadingText.Value != null)
+				{
+					loadingTexts.AppendLine(loadingText.Value);
+				}
+			}
+			HandleLoadingSpinner(loadingTexts.Length > 0, loadingTexts.ToString().Trim());
+		}
+
+		protected void ReportLoading(string group, string loadingText)
+		{
+			_loadingTexts.AddOrUpdate(group, loadingText, (string key, string oldVal) => loadingText);
 		}
 
 		protected virtual bool CalculateUIVisibility()
 		{
+			if (!ModuleSettings.GlobalDrawerVisible.get_Value())
+			{
+				return false;
+			}
 			bool show = true;
 			if (ModuleSettings.HideOnOpenMap.get_Value())
 			{
@@ -635,24 +654,24 @@ namespace Estreya.BlishHUD.Shared.Modules
 			_loadingSpinner = null;
 			Logger.Debug("Unloaded corner icon.");
 			Logger.Debug("Unloading states...");
-			using (_stateLock.Lock())
+			using (_servicesLock.Lock())
 			{
-				_states.ToList().ForEach(delegate(ManagedState state)
+				_services.ToList().ForEach(delegate(ManagedService state)
 				{
 					state?.Dispose();
 				});
-				_states.Clear();
-				AccountState = null;
-				ArcDPSState = null;
-				IconState = null;
-				ItemState = null;
-				MapchestState = null;
-				WorldbossState = null;
-				PointOfInterestState = null;
-				SettingEventState = null;
-				SkillState = null;
-				TradingPostState = null;
-				TranslationState = null;
+				_services.Clear();
+				AccountService = null;
+				ArcDPSService = null;
+				IconService = null;
+				ItemService = null;
+				MapchestService = null;
+				WorldbossService = null;
+				PointOfInterestService = null;
+				SettingEventService = null;
+				SkillService = null;
+				TradingPostService = null;
+				TranslationService = null;
 			}
 			Logger.Debug("Unloaded states.");
 			Logger.Debug("Unload flurl client...");

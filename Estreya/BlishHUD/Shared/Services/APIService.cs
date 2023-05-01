@@ -14,9 +14,9 @@ using Gw2Sharp.WebApi.V2.Models;
 using Humanizer;
 using Microsoft.Xna.Framework;
 
-namespace Estreya.BlishHUD.Shared.State
+namespace Estreya.BlishHUD.Shared.Services
 {
-	public abstract class APIState : ManagedState
+	public abstract class APIService : ManagedService
 	{
 		protected readonly Gw2ApiManager _apiManager;
 
@@ -26,7 +26,7 @@ namespace Estreya.BlishHUD.Shared.State
 
 		private readonly AsyncLock _loadingLock = new AsyncLock();
 
-		protected new APIStateConfiguration Configuration { get; }
+		protected new APIServiceConfiguration Configuration { get; }
 
 		public bool Loading { get; protected set; }
 
@@ -35,7 +35,7 @@ namespace Estreya.BlishHUD.Shared.State
 
 		public event EventHandler Updated;
 
-		public APIState(Gw2ApiManager apiManager, APIStateConfiguration configuration)
+		public APIService(Gw2ApiManager apiManager, APIServiceConfiguration configuration)
 			: base(configuration)
 		{
 			_apiManager = apiManager;
@@ -88,6 +88,11 @@ namespace Estreya.BlishHUD.Shared.State
 
 		protected override async Task Load()
 		{
+			await LoadFromAPI();
+		}
+
+		protected async Task LoadFromAPI(bool resetCompletion = true)
+		{
 			if (!_loadingLock.IsFree())
 			{
 				Logger.Warn("Tried to load again while already loading.");
@@ -95,31 +100,44 @@ namespace Estreya.BlishHUD.Shared.State
 			}
 			using (await _loadingLock.LockAsync())
 			{
-				_eventWaitHandle.Reset();
+				if (resetCompletion)
+				{
+					_eventWaitHandle.Reset();
+				}
 				Loading = true;
 				try
 				{
 					IProgress<string> progress = new Progress<string>(delegate(string newProgress)
 					{
-						ProgressText = newProgress;
+						ReportProgress(newProgress);
 					});
 					progress.Report("Loading " + GetType().Name);
 					await FetchFromAPI(_apiManager, progress);
-					this.Updated?.Invoke(this, EventArgs.Empty);
-					ProgressText = string.Empty;
+					SignalUpdated();
 				}
 				finally
 				{
 					Loading = false;
-					_eventWaitHandle.Set();
+					SignalCompletion();
 				}
 			}
 		}
 
+		protected void ReportProgress(string status)
+		{
+			ProgressText = status;
+		}
+
 		protected abstract Task FetchFromAPI(Gw2ApiManager apiManager, IProgress<string> progress);
 
-		public void SignalCompletion()
+		protected void SignalUpdated()
 		{
+			this.Updated?.Invoke(this, EventArgs.Empty);
+		}
+
+		protected void SignalCompletion()
+		{
+			ReportProgress(null);
 			_eventWaitHandle.Set();
 		}
 
@@ -133,7 +151,7 @@ namespace Estreya.BlishHUD.Shared.State
 			return await _eventWaitHandle.WaitOneAsync(timeout, _cancellationTokenSource.Token);
 		}
 	}
-	public abstract class APIState<T> : APIState
+	public abstract class APIService<T> : APIService
 	{
 		protected readonly AsyncLock _apiObjectListLock = new AsyncLock();
 
@@ -144,7 +162,7 @@ namespace Estreya.BlishHUD.Shared.State
 
 		protected event EventHandler<T> APIObjectRemoved;
 
-		public APIState(Gw2ApiManager apiManager, APIStateConfiguration configuration)
+		public APIService(Gw2ApiManager apiManager, APIServiceConfiguration configuration)
 			: base(apiManager, configuration)
 		{
 		}
@@ -171,11 +189,16 @@ namespace Estreya.BlishHUD.Shared.State
 				Logger.Warn("API Manager is null");
 				return;
 			}
+			if (base.Configuration.NeededPermissions.Count > 0 && !apiManager.HasPermission((TokenPermission)1))
+			{
+				Logger.Debug("No token yet.");
+				return;
+			}
 			try
 			{
 				using (await _apiObjectListLock.LockAsync())
 				{
-					List<T> oldAPIObjectList = APIObjectList.Copy();
+					List<T> oldAPIObjectList = APIObjectList.ToArray().ToList();
 					APIObjectList.Clear();
 					Logger.Debug("Got {0} api objects from previous fetch.", new object[1] { oldAPIObjectList.Count });
 					if (!_apiManager.HasPermissions((IEnumerable<TokenPermission>)base.Configuration.NeededPermissions))
@@ -230,18 +253,15 @@ namespace Estreya.BlishHUD.Shared.State
 			{
 				MissingScopesException msex = val;
 				Logger.Warn((Exception)(object)msex, "Could not update api objects due to missing scopes:");
-				throw;
 			}
 			catch (InvalidAccessTokenException val2)
 			{
 				InvalidAccessTokenException iatex = val2;
 				Logger.Warn((Exception)(object)iatex, "Could not update api objects due to invalid access token:");
-				throw;
 			}
 			catch (Exception ex)
 			{
 				Logger.Warn(ex, "Error updating api objects:");
-				throw;
 			}
 		}
 

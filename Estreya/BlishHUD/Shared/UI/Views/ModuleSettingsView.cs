@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
-using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Services;
 using Microsoft.Xna.Framework;
 
 namespace Estreya.BlishHUD.Shared.UI.Views
@@ -13,8 +13,8 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		public event EventHandler CreateGithubIssueClicked;
 
-		public ModuleSettingsView(IconState iconState, TranslationState translationState)
-			: base(null, iconState, translationState)
+		public ModuleSettingsView(IconService iconService, TranslationService translationService)
+			: base(null, iconService, translationService)
 		{
 		}
 
@@ -74,7 +74,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			((Container)val2).set_HeightSizingMode((SizingMode)1);
 			((Control)val2).set_Parent((Container)(object)parentPanel);
 			ViewContainer settingContainer = val2;
-			string buttonText = base.TranslationState.GetTranslation("moduleSettingsView-openSettingsBtn", "Open Settings");
+			string buttonText = base.TranslationService.GetTranslation("moduleSettingsView-openSettingsBtn", "Open Settings");
 			StandardButton val3 = new StandardButton();
 			((Control)val3).set_Parent((Container)(object)settingContainer);
 			val3.set_Text(buttonText);
@@ -88,7 +88,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			{
 				this.OpenClicked?.Invoke(this, EventArgs.Empty);
 			});
-			string githubIssueText = base.TranslationState.GetTranslation("moduleSettingsView-createGitHubIssueBtn", "Create Bug/Feature Issue");
+			string githubIssueText = base.TranslationService.GetTranslation("moduleSettingsView-createGitHubIssueBtn", "Create Bug/Feature Issue");
 			StandardButton val4 = new StandardButton();
 			((Control)val4).set_Parent((Container)(object)settingContainer);
 			val4.set_Text(githubIssueText);

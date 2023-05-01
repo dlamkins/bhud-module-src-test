@@ -8,7 +8,8 @@ using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Estreya.BlishHUD.Shared.Controls;
 using Estreya.BlishHUD.Shared.Security;
-using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Services;
+using Estreya.BlishHUD.Shared.Settings;
 using Estreya.BlishHUD.Shared.Threading.Events;
 using Estreya.BlishHUD.Shared.UI.Views;
 using Estreya.BlishHUD.Shared.Utils;
@@ -32,9 +33,11 @@ namespace Estreya.BlishHUD.Shared.Helpers
 
 		private readonly PasswordManager _passwordManager;
 
-		private readonly IconState _iconState;
+		private readonly IconService _iconService;
 
-		private readonly TranslationState _translationState;
+		private readonly TranslationService _translationService;
+
+		private readonly BaseModuleSettings _baseModuleSettings;
 
 		private StandardWindow _window;
 
@@ -42,15 +45,16 @@ namespace Estreya.BlishHUD.Shared.Helpers
 
 		private GitHubCreateIssueView _issueView;
 
-		public GitHubHelper(string owner, string repository, string clientId, string moduleName, PasswordManager passwordManager, IconState iconState, TranslationState translationState)
+		public GitHubHelper(string owner, string repository, string clientId, string moduleName, PasswordManager passwordManager, IconService iconService, TranslationService translationService, BaseModuleSettings baseModuleSettings)
 		{
 			_owner = owner;
 			_repository = repository;
 			_clientId = clientId;
 			_moduleName = moduleName;
 			_passwordManager = passwordManager;
-			_iconState = iconState;
-			_translationState = translationState;
+			_iconService = iconService;
+			_translationService = translationService;
+			_baseModuleSettings = baseModuleSettings;
 			_github = new GitHubClient(new ProductHeaderValue(moduleName.Dehumanize()));
 			CreateWindow();
 		}
@@ -109,33 +113,26 @@ namespace Estreya.BlishHUD.Shared.Helpers
 
 		private void CreateWindow()
 		{
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009a: Expected O, but got Unknown
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
 			StandardWindow window = _window;
 			if (window != null)
 			{
 				((Control)window).Dispose();
 			}
-			StandardWindow val = new StandardWindow(_iconState.GetIcon("155985.png"), new Rectangle(40, 26, 913, 691), new Rectangle(70, 71, 839, 605));
-			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((WindowBase2)val).set_Title("Create Issue");
-			((WindowBase2)val).set_Emblem(AsyncTexture2D.op_Implicit(_iconState.GetIcon("156022.png")));
-			((WindowBase2)val).set_SavesPosition(true);
-			((WindowBase2)val).set_Id("GitHubHelper_ec5d3b09-b304-44c9-b70b-a4713ba8ffbf");
-			_window = val;
+			StandardWindow standardWindow = new StandardWindow(_baseModuleSettings, _iconService.GetIcon("155985.png"), new Rectangle(40, 26, 913, 691), new Rectangle(70, 71, 839, 605));
+			((Control)standardWindow).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			standardWindow.Title = "Create Issue";
+			standardWindow.Emblem = AsyncTexture2D.op_Implicit(_iconService.GetIcon("156022.png"));
+			standardWindow.SavesPosition = true;
+			standardWindow.Id = "GitHubHelper_ec5d3b09-b304-44c9-b70b-a4713ba8ffbf";
+			_window = standardWindow;
 		}
 
 		public void OpenIssueWindow(string title = null, string message = null)
 		{
 			UnloadIssueView();
-			_issueView = new GitHubCreateIssueView(_moduleName, _iconState, _translationState, GameService.Content.get_DefaultFont18(), title, message);
+			_issueView = new GitHubCreateIssueView(_moduleName, _iconService, _translationService, GameService.Content.get_DefaultFont18(), title, message);
 			_issueView.CreateClicked += new AsyncEventHandler<(string, string, string, bool)>(IssueView_CreateClicked);
 			_issueView.CancelClicked += IssueView_CancelClicked;
 			_window.Show((IView)(object)_issueView);

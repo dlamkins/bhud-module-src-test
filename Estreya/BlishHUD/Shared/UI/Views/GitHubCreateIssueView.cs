@@ -2,7 +2,8 @@ using System;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
-using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Controls;
+using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Threading.Events;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended.BitmapFonts;
@@ -21,14 +22,14 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		public event EventHandler CancelClicked;
 
-		public GitHubCreateIssueView(string moduleName, IconState iconState, TranslationState translationState, BitmapFont font = null)
-			: base(null, iconState, translationState, font)
+		public GitHubCreateIssueView(string moduleName, IconService iconService, TranslationService translationService, BitmapFont font = null)
+			: base(null, iconService, translationService, font)
 		{
 			_moduleName = moduleName;
 		}
 
-		public GitHubCreateIssueView(string moduleName, IconState iconState, TranslationState translationState, BitmapFont font = null, string title = null, string message = null)
-			: this(moduleName, iconState, translationState, font)
+		public GitHubCreateIssueView(string moduleName, IconService iconService, TranslationService translationService, BitmapFont font = null, string title = null, string message = null)
+			: this(moduleName, iconService, translationService, font)
 		{
 			_title = title;
 			_message = message;
@@ -47,10 +48,10 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0076: Expected O, but got Unknown
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0176: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0218: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a5: Unknown result type (might be due to invalid IL or missing references)
 			Rectangle contentRegion = ((Container)parent).get_ContentRegion();
 			parent.set_CanScroll(true);
 			Label val = new Label();
@@ -77,18 +78,18 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			((Control)includeSystemInformationLabel).set_Top(((Control)discordNameLabel).get_Bottom() + 20);
 			Checkbox includeSystemInformationCheckbox = RenderCheckbox(parent, new Point(base.LABEL_WIDTH, ((Control)includeSystemInformationLabel).get_Top()), value: false);
 			((Control)includeSystemInformationCheckbox).set_BasicTooltipText("If checked, additional system information will be included to assist looking into your issue.");
-			StandardButton cancelButton = RenderButton(parent, "Cancel", delegate
+			Button cancelButton = RenderButton(parent, "Cancel", delegate
 			{
 				this.CancelClicked?.Invoke(this, EventArgs.Empty);
 			});
 			((Control)cancelButton).set_Bottom(((Rectangle)(ref contentRegion)).get_Bottom());
 			((Control)cancelButton).set_Right(((Rectangle)(ref contentRegion)).get_Right());
-			StandardButton obj = RenderButtonAsync(parent, "Create", async delegate
+			Button button = RenderButtonAsync(parent, "Create", async delegate
 			{
 				await (this.CreateClicked?.Invoke(this, (((TextInputBase)issueTitleTextBox).get_Text(), ((TextInputBase)issueMessageTextBox).get_Text(), ((TextInputBase)discordNameTextBox).get_Text(), includeSystemInformationCheckbox.get_Checked())));
 			});
-			((Control)obj).set_Top(((Control)cancelButton).get_Top());
-			((Control)obj).set_Right(((Control)cancelButton).get_Left() + 10);
+			((Control)button).set_Top(((Control)cancelButton).get_Top());
+			((Control)button).set_Right(((Control)cancelButton).get_Left() + 10);
 		}
 
 		protected override Task<bool> InternalLoad(IProgress<string> progress)

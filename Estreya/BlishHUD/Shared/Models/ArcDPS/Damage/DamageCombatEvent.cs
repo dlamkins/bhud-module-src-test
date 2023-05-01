@@ -22,8 +22,8 @@ namespace Estreya.BlishHUD.Shared.Models.ArcDPS.Damage
 			}
 		}
 
-		public DamageCombatEvent(Ev ev, Ag src, Ag dst, CombatEventCategory category, CombatEventType type, CombatEventState state)
-			: base(ev, src, dst, category, type, state)
+		public DamageCombatEvent(CombatEvent combatEvent, CombatEventCategory category, CombatEventType type, CombatEventState state)
+			: base(combatEvent, category, type, state)
 		{
 		}
 	}

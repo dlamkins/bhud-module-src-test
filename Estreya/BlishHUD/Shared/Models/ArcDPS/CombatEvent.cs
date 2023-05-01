@@ -6,17 +6,63 @@ namespace Estreya.BlishHUD.Shared.Models.ArcDPS
 {
 	public abstract class CombatEvent
 	{
-		protected Ev Ev { get; private set; }
+		public CombatEvent RawCombatEvent { get; private set; }
 
-		protected Ag Src { get; private set; }
+		protected Ev Ev
+		{
+			get
+			{
+				CombatEvent rawCombatEvent = RawCombatEvent;
+				if (rawCombatEvent == null)
+				{
+					return null;
+				}
+				return rawCombatEvent.get_Ev();
+			}
+		}
 
-		protected Ag Dst { get; private set; }
+		protected Ag Src
+		{
+			get
+			{
+				CombatEvent rawCombatEvent = RawCombatEvent;
+				if (rawCombatEvent == null)
+				{
+					return null;
+				}
+				return rawCombatEvent.get_Src();
+			}
+		}
+
+		protected Ag Dst
+		{
+			get
+			{
+				CombatEvent rawCombatEvent = RawCombatEvent;
+				if (rawCombatEvent == null)
+				{
+					return null;
+				}
+				return rawCombatEvent.get_Dst();
+			}
+		}
 
 		public abstract Ag Source { get; }
 
 		public abstract Ag Destination { get; }
 
-		public uint SkillId => Ev.get_SkillId();
+		public uint SkillId
+		{
+			get
+			{
+				Ev ev = Ev;
+				if (ev == null)
+				{
+					return 0u;
+				}
+				return ev.get_SkillId();
+			}
+		}
 
 		public CombatEventCategory Category { get; }
 
@@ -26,11 +72,9 @@ namespace Estreya.BlishHUD.Shared.Models.ArcDPS
 
 		public Skill Skill { get; set; }
 
-		public CombatEvent(Ev ev, Ag src, Ag dst, CombatEventCategory category, CombatEventType type, CombatEventState state)
+		public CombatEvent(CombatEvent combatEvent, CombatEventCategory category, CombatEventType type, CombatEventState state)
 		{
-			Ev = ev;
-			Src = src;
-			Dst = dst;
+			RawCombatEvent = combatEvent;
 			Category = category;
 			Type = type;
 			State = state;
@@ -38,9 +82,7 @@ namespace Estreya.BlishHUD.Shared.Models.ArcDPS
 
 		public void Dispose()
 		{
-			Ev = null;
-			Src = null;
-			Dst = null;
+			RawCombatEvent = null;
 			Skill = null;
 		}
 
@@ -53,8 +95,10 @@ namespace Estreya.BlishHUD.Shared.Models.ArcDPS
 			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0059: Invalid comparison between Unknown and I4
+			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
 			if (ev == null)
 			{
 				throw new ArgumentNullException("ev", "Ev can't be null.");
@@ -70,6 +114,10 @@ namespace Estreya.BlishHUD.Shared.Models.ArcDPS
 			if ((int)ev.get_IsStateChange() == 0 && (int)ev.get_IsActivation() == 0 && (int)ev.get_IsBuffRemove() != 0 && ev.get_Buff())
 			{
 				return CombatEventState.BUFFREMOVE;
+			}
+			if ((int)ev.get_IsStateChange() == 18)
+			{
+				return CombatEventState.BUFFAPPLY;
 			}
 			if ((int)ev.get_IsStateChange() == 0 && (int)ev.get_IsActivation() == 0 && (int)ev.get_IsBuffRemove() == 0)
 			{

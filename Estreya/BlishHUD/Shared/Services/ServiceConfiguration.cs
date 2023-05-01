@@ -1,9 +1,9 @@
 using System;
 using System.Threading;
 
-namespace Estreya.BlishHUD.Shared.State
+namespace Estreya.BlishHUD.Shared.Services
 {
-	public class StateConfiguration
+	public class ServiceConfiguration
 	{
 		public bool Enabled { get; set; }
 

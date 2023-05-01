@@ -13,26 +13,26 @@
   <PropertyGroup />
   <ItemGroup />
   <ItemGroup>
-    <Reference Include="Blish HUD" />
     <Reference Include="Gw2Sharp" />
+    <Reference Include="Blish HUD" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="MonoGame.Extended" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml" />
-    <Reference Include="Humanizer">
-      <HintPath>..\..\working\Humanizer.dll</HintPath>
-    </Reference>
     <Reference Include="Flurl.Http">
       <HintPath>..\..\working\Flurl.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="Humanizer">
+      <HintPath>..\..\working\Humanizer.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\working\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="System.Net.Http" />
     <Reference Include="SemVer" />
     <Reference Include="Octokit">
       <HintPath>..\..\working\Octokit.dll</HintPath>
     </Reference>
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Core" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="SocketIOClient">
@@ -40,6 +40,9 @@
     </Reference>
     <Reference Include="System.Text.Json">
       <HintPath>..\..\working\System.Text.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="jose-jwt">
+      <HintPath>..\..\working\jose-jwt.dll</HintPath>
     </Reference>
     <Reference Include="System.Security" />
     <Reference Include="Flurl">

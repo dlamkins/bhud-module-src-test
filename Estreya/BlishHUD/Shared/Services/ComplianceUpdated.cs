@@ -1,6 +1,6 @@
 using Blish_HUD.Settings;
 
-namespace Estreya.BlishHUD.Shared.State
+namespace Estreya.BlishHUD.Shared.Services
 {
 	public class ComplianceUpdated
 	{
