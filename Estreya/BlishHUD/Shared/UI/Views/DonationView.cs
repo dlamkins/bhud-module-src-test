@@ -12,7 +12,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Graphics;
 using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.Shared.Controls;
-using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Utils;
 using Flurl.Http;
 using Microsoft.Xna.Framework;
@@ -27,8 +27,8 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		private Texture2D _kofiLogo;
 
-		public DonationView(IFlurlClient flurlClient, Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, BitmapFont font = null)
-			: base(apiManager, iconState, translationState, font)
+		public DonationView(IFlurlClient flurlClient, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, BitmapFont font = null)
+			: base(apiManager, iconService, translationService, font)
 		{
 			_flurlClient = flurlClient;
 		}

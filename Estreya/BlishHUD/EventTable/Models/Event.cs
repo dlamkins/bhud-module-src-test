@@ -6,7 +6,7 @@ using System.Linq;
 using Blish_HUD;
 using Estreya.BlishHUD.Shared.Attributes;
 using Estreya.BlishHUD.Shared.Json.Converter;
-using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Utils;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
@@ -129,7 +129,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 			return eventWidth;
 		}
 
-		public void Load(EventCategory ec, Func<DateTime> getNowAction, TranslationState translationState = null)
+		public void Load(EventCategory ec, Func<DateTime> getNowAction, TranslationService translationService = null)
 		{
 			if (string.IsNullOrWhiteSpace(Key))
 			{
@@ -142,9 +142,9 @@ namespace Estreya.BlishHUD.EventTable.Models
 			SettingKey = ec.Key + "_" + Key;
 			Category = new WeakReference<EventCategory>(ec);
 			_getNowAction = getNowAction;
-			if (translationState != null)
+			if (translationService != null)
 			{
-				Name = translationState.GetTranslation("event-" + ec.Key + "_" + Key + "-name", Name);
+				Name = translationService.GetTranslation("event-" + ec.Key + "_" + Key + "-name", Name);
 			}
 		}
 

@@ -4,7 +4,7 @@ using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.Shared.Controls;
-using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Utils;
 using Glide;
 using Microsoft.Xna.Framework;
@@ -28,7 +28,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private readonly string _message;
 
-		private IconState _iconState;
+		private IconService _iconService;
 
 		private AsyncTexture2D _eventIcon;
 
@@ -51,14 +51,14 @@ namespace Estreya.BlishHUD.EventTable.Controls
 		public float BackgroundOpacity { get; set; } = 1f;
 
 
-		public EventNotification(Estreya.BlishHUD.EventTable.Models.Event ev, string message, int x, int y, IconState iconState)
+		public EventNotification(Estreya.BlishHUD.EventTable.Models.Event ev, string message, int x, int y, IconService iconService)
 		{
 			_event = ev;
 			_message = message;
 			_x = x;
 			_y = y;
-			_iconState = iconState;
-			_eventIcon = _iconState?.GetIcon(ev.Icon);
+			_iconService = iconService;
+			_eventIcon = _iconService?.GetIcon(ev.Icon);
 			base.Width = 350;
 			base.Height = 96;
 			((Control)this).set_Visible(false);
@@ -129,7 +129,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 		protected override void InternalDispose()
 		{
 			_event = null;
-			_iconState = null;
+			_iconService = null;
 			_eventIcon = null;
 		}
 	}

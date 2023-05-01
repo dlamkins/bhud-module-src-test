@@ -8,8 +8,8 @@ namespace Estreya.BlishHUD.Shared.Models.ArcDPS.StateChange
 
 		public override Ag Destination => null;
 
-		public ExitCombatEvent(Ev ev, Ag src, Ag dst, CombatEventCategory category, CombatEventType type, CombatEventState state)
-			: base(ev, src, dst, category, type, state)
+		public ExitCombatEvent(CombatEvent combatEvent, CombatEventCategory category, CombatEventType type, CombatEventState state)
+			: base(combatEvent, category, type, state)
 		{
 		}
 	}

@@ -5,13 +5,13 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD.Modules.Managers;
-using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Services;
 using Flurl.Http;
 using Newtonsoft.Json;
 
-namespace Estreya.BlishHUD.EventTable.State
+namespace Estreya.BlishHUD.EventTable.Services
 {
-	public class DynamicEventState : APIState
+	public class DynamicEventService : APIService
 	{
 		public class DynamicEvent
 		{
@@ -79,7 +79,7 @@ namespace Estreya.BlishHUD.EventTable.State
 		public DynamicEvent[] Events { get; private set; } = new DynamicEvent[0];
 
 
-		public DynamicEventState(APIStateConfiguration configuration, Gw2ApiManager apiManager, IFlurlClient flurlClient, string apiBaseUrl)
+		public DynamicEventService(APIServiceConfiguration configuration, Gw2ApiManager apiManager, IFlurlClient flurlClient, string apiBaseUrl)
 			: base(apiManager, configuration)
 		{
 			_flurlClient = flurlClient;

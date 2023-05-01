@@ -11,7 +11,7 @@ using Blish_HUD.Input;
 using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.EventTable.Controls;
 using Estreya.BlishHUD.EventTable.Models;
-using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.UI.Views;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -23,9 +23,9 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 	{
 		public class EventChangedArgs
 		{
-			public bool OldState { get; set; }
+			public bool OldService { get; set; }
 
-			public bool NewState { get; set; }
+			public bool NewService { get; set; }
 
 			public Dictionary<string, object> AdditionalData { get; set; }
 
@@ -59,8 +59,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		public event EventHandler<EventChangedArgs> EventChanged;
 
-		public ManageEventsView(List<EventCategory> allEvents, Dictionary<string, object> additionalData, Func<List<string>> getDisabledEventKeys, ModuleSettings moduleSettings, Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, BitmapFont font = null)
-			: base(apiManager, iconState, translationState, font)
+		public ManageEventsView(List<EventCategory> allEvents, Dictionary<string, object> additionalData, Func<List<string>> getDisabledEventKeys, ModuleSettings moduleSettings, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, BitmapFont font = null)
+			: base(apiManager, iconService, translationService, font)
 		{
 			this.allEvents = allEvents;
 			_additionalData = additionalData ?? new Dictionary<string, object>();
@@ -72,7 +72,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 		{
 			GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
 			{
-				button.set_Icon(button.get_Checked() ? base.IconState.GetIcon("784259.png") : base.IconState.GetIcon("784261.png"));
+				button.set_Icon(button.get_Checked() ? base.IconService.GetIcon("784259.png") : base.IconService.GetIcon("784261.png"));
 			});
 		}
 
@@ -341,17 +341,17 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					};
 					((Control)obj).set_Parent((Container)(object)eventPanel);
 					((DetailsButton)obj).set_Text(e2.Name);
-					((DetailsButton)obj).set_Icon(base.IconState.GetIcon(e2.Icon));
+					((DetailsButton)obj).set_Icon(base.IconService.GetIcon(e2.Icon));
 					((DetailsButton)obj).set_ShowToggleButton(true);
 					((DetailsButton)obj).set_FillColor(Color.get_LightBlue());
 					EventDetailsButton button = obj;
 					if (!string.IsNullOrWhiteSpace(e2.Waypoint))
 					{
-						AsyncTexture2D icon2 = base.IconState.GetIcon("102348.png");
+						AsyncTexture2D icon2 = base.IconService.GetIcon("102348.png");
 						GlowButton val9 = new GlowButton();
 						((Control)val9).set_Parent((Container)(object)button);
 						val9.set_ToggleGlow(false);
-						((Control)val9).set_Tooltip(new Tooltip((ITooltipView)(object)new TooltipView("Waypoint", "Click to copy waypoint!", icon2, base.TranslationState)));
+						((Control)val9).set_Tooltip(new Tooltip((ITooltipView)(object)new TooltipView("Waypoint", "Click to copy waypoint!", icon2, base.TranslationService)));
 						val9.set_Icon(icon2);
 						((Control)val9).add_Click((EventHandler<MouseEventArgs>)delegate
 						{
@@ -376,11 +376,11 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					}
 					if (!string.IsNullOrWhiteSpace(e2.Wiki))
 					{
-						AsyncTexture2D icon = base.IconState.GetIcon("102353.png");
+						AsyncTexture2D icon = base.IconService.GetIcon("102353.png");
 						GlowButton val10 = new GlowButton();
 						((Control)val10).set_Parent((Container)(object)button);
 						val10.set_ToggleGlow(false);
-						((Control)val10).set_Tooltip(new Tooltip((ITooltipView)(object)new TooltipView("Wiki", "Click to open wiki!", icon, base.TranslationState)));
+						((Control)val10).set_Tooltip(new Tooltip((ITooltipView)(object)new TooltipView("Wiki", "Click to open wiki!", icon, base.TranslationService)));
 						val10.set_Icon(icon);
 						((Control)val10).add_Click((EventHandler<MouseEventArgs>)delegate
 						{
@@ -395,7 +395,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 							GlowButton val11 = new GlowButton();
 							((Control)val11).set_Parent((Container)(object)button);
 							val11.set_ToggleGlow(false);
-							val11.set_Icon(base.IconState.GetIcon("155018.png"));
+							val11.set_Icon(base.IconService.GetIcon("155018.png"));
 							((Control)val11).set_BasicTooltipText("This event is currently hidden due to dynamic states.");
 							((Control)val11).set_Enabled(false);
 						}
@@ -412,7 +412,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 									GlowButton val12 = new GlowButton();
 									((Control)val12).set_Parent((Container)(object)button);
 									val12.set_ToggleGlow(false);
-									val12.set_Icon((customAction.Icon != null) ? base.IconState.GetIcon(customAction.Icon) : null);
+									val12.set_Icon((customAction.Icon != null) ? base.IconService.GetIcon(customAction.Icon) : null);
 									((Control)val12).set_BasicTooltipText(customAction.Tooltip);
 									((Control)val12).add_Click((EventHandler<MouseEventArgs>)delegate
 									{
@@ -432,8 +432,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					{
 						this.EventChanged?.Invoke(this, new EventChangedArgs
 						{
-							OldState = !eventArgs.get_Checked(),
-							NewState = eventArgs.get_Checked(),
+							OldService = !eventArgs.get_Checked(),
+							NewService = eventArgs.get_Checked(),
 							EventSettingKey = button.Event.SettingKey,
 							AdditionalData = _additionalData
 						});

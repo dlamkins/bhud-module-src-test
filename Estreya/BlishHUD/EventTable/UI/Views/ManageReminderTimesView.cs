@@ -7,7 +7,7 @@ using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.EventTable.Controls;
 using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.Shared.Controls;
-using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.UI.Views;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended.BitmapFonts;
@@ -24,8 +24,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		public event EventHandler CancelClicked;
 
-		public ManageReminderTimesView(Estreya.BlishHUD.EventTable.Models.Event ev, Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, BitmapFont font = null)
-			: base(apiManager, iconState, translationState, font)
+		public ManageReminderTimesView(Estreya.BlishHUD.EventTable.Models.Event ev, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, BitmapFont font = null)
+			: base(apiManager, iconService, translationService, font)
 		{
 			_ev = ev;
 			if (_ev.ReminderTimes != null)
@@ -125,7 +125,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			});
 			((Control)button).set_Left(x);
 			((Control)button).set_Width(100);
-			button.Icon = base.IconState.GetIcon("1444520.png");
+			button.Icon = base.IconService.GetIcon("1444520.png");
 			button.ResizeIcon = false;
 		}
 
@@ -144,13 +144,13 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Container)val).set_WidthSizingMode((SizingMode)1);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
 			Panel timeSectionPanel = val;
-			Dropdown dropdown = new Dropdown();
+			Estreya.BlishHUD.EventTable.Controls.Dropdown dropdown = new Estreya.BlishHUD.EventTable.Controls.Dropdown();
 			((Control)dropdown).set_Parent((Container)(object)timeSectionPanel);
 			((Control)dropdown).set_Location(new Point(0, 0));
 			((Control)dropdown).set_Width(75);
 			((Control)dropdown).set_BasicTooltipText("Hours");
 			dropdown.PanelHeight = 400;
-			Dropdown hours = dropdown;
+			Estreya.BlishHUD.EventTable.Controls.Dropdown hours = dropdown;
 			foreach (string valueToAdd3 in from h in Enumerable.Range(0, 24)
 				select h.ToString())
 			{
@@ -171,13 +171,13 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					ShowError(ex3.Message);
 				}
 			};
-			Dropdown dropdown2 = new Dropdown();
+			Estreya.BlishHUD.EventTable.Controls.Dropdown dropdown2 = new Estreya.BlishHUD.EventTable.Controls.Dropdown();
 			((Control)dropdown2).set_Parent((Container)(object)timeSectionPanel);
 			((Control)dropdown2).set_Location(new Point(((Control)hours).get_Right() + 5, 0));
 			((Control)dropdown2).set_Width(75);
 			((Control)dropdown2).set_BasicTooltipText("Minutes");
 			dropdown2.PanelHeight = 400;
-			Dropdown minutes = dropdown2;
+			Estreya.BlishHUD.EventTable.Controls.Dropdown minutes = dropdown2;
 			foreach (string valueToAdd2 in from h in Enumerable.Range(0, 60)
 				select h.ToString())
 			{
@@ -198,13 +198,13 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					ShowError(ex2.Message);
 				}
 			};
-			Dropdown dropdown3 = new Dropdown();
+			Estreya.BlishHUD.EventTable.Controls.Dropdown dropdown3 = new Estreya.BlishHUD.EventTable.Controls.Dropdown();
 			((Control)dropdown3).set_Parent((Container)(object)timeSectionPanel);
 			((Control)dropdown3).set_Location(new Point(((Control)minutes).get_Right() + 5, 0));
 			((Control)dropdown3).set_Width(75);
 			((Control)dropdown3).set_BasicTooltipText("Seconds");
 			dropdown3.PanelHeight = 400;
-			Dropdown seconds = dropdown3;
+			Estreya.BlishHUD.EventTable.Controls.Dropdown seconds = dropdown3;
 			foreach (string valueToAdd in from h in Enumerable.Range(0, 60)
 				select h.ToString())
 			{
@@ -232,7 +232,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			}, () => disableRemove);
 			((Control)button).set_Left(((Control)seconds).get_Right() + 10);
 			((Control)button).set_Width(100);
-			button.Icon = base.IconState.GetIcon("1444524.png");
+			button.Icon = base.IconService.GetIcon("1444524.png");
 			button.ResizeIcon = false;
 			return timeSectionPanel;
 		}

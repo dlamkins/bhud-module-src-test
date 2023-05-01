@@ -5,7 +5,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.Shared.Models;
-using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.UI.Views;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended.BitmapFonts;
@@ -16,8 +16,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 	{
 		private readonly ModuleSettings _moduleSettings;
 
-		public GeneralSettingsView(ModuleSettings moduleSettings, Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, SettingEventState settingEventState, BitmapFont font = null)
-			: base(apiManager, iconState, translationState, settingEventState, font)
+		public GeneralSettingsView(ModuleSettings moduleSettings, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService, BitmapFont font = null)
+			: base(apiManager, iconService, translationService, settingEventService, font)
 		{
 			_moduleSettings = moduleSettings;
 		}

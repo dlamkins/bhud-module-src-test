@@ -9,10 +9,10 @@ using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.EventTable.Models;
-using Estreya.BlishHUD.EventTable.State;
+using Estreya.BlishHUD.EventTable.Services;
 using Estreya.BlishHUD.Shared.Controls;
 using Estreya.BlishHUD.Shared.Models;
-using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.UI.Views;
 using Estreya.BlishHUD.Shared.Utils;
 using Microsoft.Xna.Framework;
@@ -40,7 +40,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private readonly ModuleSettings _moduleSettings;
 
-		private readonly EventState _eventState;
+		private readonly EventStateService _eventStateService;
 
 		private IEnumerable<EventAreaConfiguration> _areaConfigurations;
 
@@ -56,13 +56,13 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		public event EventHandler<EventAreaConfiguration> RemoveArea;
 
-		public AreaSettingsView(Func<IEnumerable<EventAreaConfiguration>> areaConfiguration, Func<List<EventCategory>> allEvents, ModuleSettings moduleSettings, Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, SettingEventState settingEventState, EventState eventState, BitmapFont font = null)
-			: base(apiManager, iconState, translationState, settingEventState, font)
+		public AreaSettingsView(Func<IEnumerable<EventAreaConfiguration>> areaConfiguration, Func<List<EventCategory>> allEvents, ModuleSettings moduleSettings, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService, EventStateService eventStateService, BitmapFont font = null)
+			: base(apiManager, iconService, translationService, settingEventService, font)
 		{
 			_areaConfigurationFunc = areaConfiguration;
 			_allEvents = allEvents;
 			_moduleSettings = moduleSettings;
-			_eventState = eventState;
+			_eventStateService = eventStateService;
 		}
 
 		private void LoadConfigurations()
@@ -142,7 +142,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					BuildEditPanel(newParent, areaPanelBounds, menuItem.Value, areaConfiguration3);
 				});
 			});
-			Estreya.BlishHUD.Shared.Controls.Button button = RenderButton(newParent, base.TranslationState.GetTranslation("areaSettingsView-add-btn", "Add"), delegate
+			Estreya.BlishHUD.Shared.Controls.Button button = RenderButton(newParent, base.TranslationService.GetTranslation("areaSettingsView-add-btn", "Add"), delegate
 			{
 				//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 				BuildAddPanel(newParent, areaPanelBounds, areaOverviewMenu);
@@ -198,9 +198,9 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			string name;
 			EventAreaConfiguration configuration2;
 			MenuItem menuItem;
-			Estreya.BlishHUD.Shared.Controls.Button saveButton = RenderButton(_areaPanel, base.TranslationState.GetTranslation("areaSettingsView-save-btn", "Save"), delegate
+			Estreya.BlishHUD.Shared.Controls.Button saveButton = RenderButton(_areaPanel, base.TranslationService.GetTranslation("areaSettingsView-save-btn", "Save"), delegate
 			{
-				//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
 				try
 				{
 					name = ((TextInputBase)areaName).get_Text();
@@ -215,11 +215,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 							Name = name
 						};
 						this.AddArea?.Invoke(this, addAreaEventArgs);
-						configuration2 = addAreaEventArgs.AreaConfiguration;
-						if (configuration2 == null)
-						{
-							throw new ArgumentNullException("Area configuration could not be created.");
-						}
+						configuration2 = addAreaEventArgs.AreaConfiguration ?? throw new ArgumentNullException("Area configuration could not be created.");
 						menuItem = ((Menu)menu).AddMenuItem(name, (Texture2D)null);
 						((Control)menuItem).add_Click((EventHandler<MouseEventArgs>)delegate
 						{
@@ -242,7 +238,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				TextBox val2 = (TextBox)((s is TextBox) ? s : null);
 				((Control)saveButton).set_Enabled(!string.IsNullOrWhiteSpace(((TextInputBase)val2).get_Text()));
 			});
-			Estreya.BlishHUD.Shared.Controls.Button button = RenderButton(_areaPanel, base.TranslationState.GetTranslation("areaSettingsView-cancel-btn", "Cancel"), delegate
+			Estreya.BlishHUD.Shared.Controls.Button button = RenderButton(_areaPanel, base.TranslationService.GetTranslation("areaSettingsView-cancel-btn", "Cancel"), delegate
 			{
 				ClearAreaPanel();
 			});
@@ -327,21 +323,21 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderFillerSettings(settingsPanel, areaConfiguration);
 			RenderEmptyLine((Panel)(object)settingsPanel);
 			((IEnumerable<Control>)((Container)settingsPanel).get_Children()).Last();
-			Estreya.BlishHUD.Shared.Controls.Button manageEventsButton = RenderButton(_areaPanel, base.TranslationState.GetTranslation("areaSettingsView-manageEvents-btn", "Manage Events"), delegate
+			Estreya.BlishHUD.Shared.Controls.Button manageEventsButton = RenderButton(_areaPanel, base.TranslationService.GetTranslation("areaSettingsView-manageEvents-btn", "Manage Events"), delegate
 			{
 				ManageEvents(areaConfiguration);
 			});
 			((Control)manageEventsButton).set_Top(((Control)areaName).get_Top());
 			((Control)manageEventsButton).set_Left(((Control)settingsPanel).get_Left());
-			Estreya.BlishHUD.Shared.Controls.Button button = RenderButton(_areaPanel, base.TranslationState.GetTranslation("areaSettingsView-reorderEvents-btn", "Reorder Events"), delegate
+			Estreya.BlishHUD.Shared.Controls.Button button = RenderButton(_areaPanel, base.TranslationService.GetTranslation("areaSettingsView-reorderEvents-btn", "Reorder Events"), delegate
 			{
 				ReorderEvents(areaConfiguration);
 			});
 			((Control)button).set_Top(((Control)manageEventsButton).get_Bottom() + 2);
 			((Control)button).set_Left(((Control)manageEventsButton).get_Left());
-			Estreya.BlishHUD.Shared.Controls.Button removeButton = RenderButtonAsync(_areaPanel, base.TranslationState.GetTranslation("areaSettingsView-remove-btn", "Remove"), async delegate
+			Estreya.BlishHUD.Shared.Controls.Button removeButton = RenderButtonAsync(_areaPanel, base.TranslationService.GetTranslation("areaSettingsView-remove-btn", "Remove"), async delegate
 			{
-				ConfirmDialog dialog = new ConfirmDialog("Delete Event Area \"" + areaConfiguration.Name + "\"", "Your are in the process of deleting the event area \"" + areaConfiguration.Name + "\".\nThis action will delete all settings.\n\nContinue?", base.IconState, new ButtonDefinition[2]
+				ConfirmDialog dialog = new ConfirmDialog("Delete Event Area \"" + areaConfiguration.Name + "\"", "Your are in the process of deleting the event area \"" + areaConfiguration.Name + "\".\nThis action will delete all settings.\n\nContinue?", base.IconService, new ButtonDefinition[2]
 				{
 					new ButtonDefinition("Yes", DialogResult.Yes),
 					new ButtonDefinition("No", DialogResult.No)
@@ -577,7 +573,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.CompletedEventsInvertTextColor);
 			RenderButton((Panel)(object)groupPanel, "Reset hidden Events", delegate
 			{
-				_eventState.Remove(areaConfiguration.Name, EventState.EventStates.Hidden);
+				_eventStateService.Remove(areaConfiguration.Name, EventStateService.EventStates.Hidden);
 			});
 			RenderEmptyLine((Panel)(object)groupPanel);
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.LimitToCurrentMap);
@@ -624,13 +620,13 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 		{
 			if (_reorderEventsWindow == null)
 			{
-				_reorderEventsWindow = WindowUtil.CreateStandardWindow("Reorder Events", ((object)this).GetType(), Guid.Parse("b5cbbd99-f02d-4229-8dda-869b42ac242e"), base.IconState);
+				_reorderEventsWindow = WindowUtil.CreateStandardWindow(_moduleSettings, "Reorder Events", ((object)this).GetType(), Guid.Parse("b5cbbd99-f02d-4229-8dda-869b42ac242e"), base.IconService);
 			}
-			if (((WindowBase2)_reorderEventsWindow).get_CurrentView() != null)
+			if (_reorderEventsWindow.CurrentView != null)
 			{
-				(((WindowBase2)_reorderEventsWindow).get_CurrentView() as ReorderEventsView).SaveClicked -= new EventHandler<(EventAreaConfiguration, string[])>(ReorderView_SaveClicked);
+				(_reorderEventsWindow.CurrentView as ReorderEventsView).SaveClicked -= new EventHandler<(EventAreaConfiguration, string[])>(ReorderView_SaveClicked);
 			}
-			ReorderEventsView view = new ReorderEventsView(_allEvents(), configuration.EventOrder.get_Value(), configuration, base.APIManager, base.IconState, base.TranslationState);
+			ReorderEventsView view = new ReorderEventsView(_allEvents(), configuration.EventOrder.get_Value(), configuration, base.APIManager, base.IconService, base.TranslationService);
 			view.SaveClicked += new EventHandler<(EventAreaConfiguration, string[])>(ReorderView_SaveClicked);
 			_reorderEventsWindow.Show((IView)(object)view);
 		}
@@ -644,22 +640,22 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 		{
 			if (_manageEventsWindow == null)
 			{
-				_manageEventsWindow = WindowUtil.CreateStandardWindow("Manage Events", ((object)this).GetType(), Guid.Parse("7dc52c82-67ae-4cfb-9fe3-a16a8b30892c"), base.IconState);
+				_manageEventsWindow = WindowUtil.CreateStandardWindow(_moduleSettings, "Manage Events", ((object)this).GetType(), Guid.Parse("7dc52c82-67ae-4cfb-9fe3-a16a8b30892c"), base.IconService);
 			}
-			if (((WindowBase2)_manageEventsWindow).get_CurrentView() != null)
+			if (_manageEventsWindow.CurrentView != null)
 			{
-				(((WindowBase2)_manageEventsWindow).get_CurrentView() as ManageEventsView).EventChanged -= ManageView_EventChanged;
+				(_manageEventsWindow.CurrentView as ManageEventsView).EventChanged -= ManageView_EventChanged;
 			}
 			ManageEventsView view = new ManageEventsView(_allEvents(), new Dictionary<string, object>
 			{
 				{ "configuration", configuration },
 				{
 					"hiddenEventKeys",
-					(from x in _eventState.Instances
-						where x.AreaName == configuration.Name && x.State == EventState.EventStates.Hidden
+					(from x in _eventStateService.Instances
+						where x.AreaName == configuration.Name && x.State == EventStateService.EventStates.Hidden
 						select x.EventKey).ToList()
 				}
-			}, () => configuration.DisabledEventKeys.get_Value(), _moduleSettings, base.APIManager, base.IconState, base.TranslationState);
+			}, () => configuration.DisabledEventKeys.get_Value(), _moduleSettings, base.APIManager, base.IconService, base.TranslationService);
 			view.EventChanged += ManageView_EventChanged;
 			_manageEventsWindow.Show((IView)(object)view);
 		}
@@ -667,7 +663,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 		private void ManageView_EventChanged(object sender, ManageEventsView.EventChangedArgs e)
 		{
 			EventAreaConfiguration configuration = e.AdditionalData["configuration"] as EventAreaConfiguration;
-			configuration.DisabledEventKeys.set_Value(e.NewState ? new List<string>(from aek in configuration.DisabledEventKeys.get_Value()
+			configuration.DisabledEventKeys.set_Value(e.NewService ? new List<string>(from aek in configuration.DisabledEventKeys.get_Value()
 				where aek != e.EventSettingKey
 				select aek) : new List<string>(configuration.DisabledEventKeys.get_Value()) { e.EventSettingKey });
 		}

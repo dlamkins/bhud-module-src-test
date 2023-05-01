@@ -10,8 +10,8 @@ namespace Estreya.BlishHUD.Shared.Models.ArcDPS.Heal
 
 		public int Value => base.Ev.get_Value();
 
-		public HealCombatEvent(Ev ev, Ag src, Ag dst, CombatEventCategory category, CombatEventType type, CombatEventState state)
-			: base(ev, src, dst, category, type, state)
+		public HealCombatEvent(CombatEvent combatEvent, CombatEventCategory category, CombatEventType type, CombatEventState state)
+			: base(combatEvent, category, type, state)
 		{
 		}
 	}

@@ -2,18 +2,18 @@ using System;
 using System.Collections.Generic;
 using Gw2Sharp.WebApi.V2.Models;
 
-namespace Estreya.BlishHUD.Shared.State
+namespace Estreya.BlishHUD.Shared.Services
 {
-	public class StateConfigurations
+	public class ServiceConfigurations
 	{
-		public StateConfiguration BlishHUDAPI { get; } = new StateConfiguration
+		public ServiceConfiguration BlishHUDAPI { get; } = new ServiceConfiguration
 		{
 			Enabled = false,
 			AwaitLoading = true
 		};
 
 
-		public APIStateConfiguration Account { get; } = new APIStateConfiguration
+		public APIServiceConfiguration Account { get; } = new APIServiceConfiguration
 		{
 			Enabled = false,
 			AwaitLoading = true,
@@ -22,7 +22,7 @@ namespace Estreya.BlishHUD.Shared.State
 		};
 
 
-		public APIStateConfiguration Mapchests { get; } = new APIStateConfiguration
+		public APIServiceConfiguration Mapchests { get; } = new APIServiceConfiguration
 		{
 			Enabled = false,
 			AwaitLoading = false,
@@ -35,7 +35,7 @@ namespace Estreya.BlishHUD.Shared.State
 		};
 
 
-		public APIStateConfiguration Worldbosses { get; } = new APIStateConfiguration
+		public APIServiceConfiguration Worldbosses { get; } = new APIServiceConfiguration
 		{
 			Enabled = false,
 			AwaitLoading = false,
@@ -48,21 +48,21 @@ namespace Estreya.BlishHUD.Shared.State
 		};
 
 
-		public APIStateConfiguration PointOfInterests { get; } = new APIStateConfiguration
+		public APIServiceConfiguration PointOfInterests { get; } = new APIServiceConfiguration
 		{
 			Enabled = false,
 			AwaitLoading = false
 		};
 
 
-		public APIStateConfiguration Skills { get; } = new APIStateConfiguration
+		public APIServiceConfiguration Skills { get; } = new APIServiceConfiguration
 		{
 			Enabled = false,
 			AwaitLoading = false
 		};
 
 
-		public APIStateConfiguration TradingPost { get; } = new APIStateConfiguration
+		public APIServiceConfiguration TradingPost { get; } = new APIServiceConfiguration
 		{
 			Enabled = false,
 			AwaitLoading = false,
@@ -75,17 +75,37 @@ namespace Estreya.BlishHUD.Shared.State
 		};
 
 
-		public APIStateConfiguration Items { get; } = new APIStateConfiguration
+		public APIServiceConfiguration Items { get; } = new APIServiceConfiguration
 		{
 			Enabled = false,
 			AwaitLoading = false
 		};
 
 
-		public StateConfiguration ArcDPS { get; } = new StateConfiguration
+		public ServiceConfiguration ArcDPS { get; } = new ServiceConfiguration
 		{
 			Enabled = false,
 			AwaitLoading = false
+		};
+
+
+		public APIServiceConfiguration Achievements { get; } = new APIServiceConfiguration
+		{
+			Enabled = false,
+			AwaitLoading = false
+		};
+
+
+		public APIServiceConfiguration AccountAchievements { get; } = new APIServiceConfiguration
+		{
+			Enabled = false,
+			AwaitLoading = false,
+			NeededPermissions = new List<TokenPermission>
+			{
+				(TokenPermission)1,
+				(TokenPermission)6
+			},
+			UpdateInterval = TimeSpan.FromMinutes(5.0).Add(TimeSpan.FromMilliseconds(100.0))
 		};
 
 	}

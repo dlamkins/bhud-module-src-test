@@ -6,11 +6,11 @@ using Blish_HUD;
 using Blish_HUD.Settings;
 using Microsoft.Xna.Framework;
 
-namespace Estreya.BlishHUD.Shared.State
+namespace Estreya.BlishHUD.Shared.Services
 {
-	public class SettingEventState : ManagedState
+	public class SettingEventService : ManagedService
 	{
-		private static readonly Logger _logger = Logger.GetLogger<SettingEventState>();
+		private static readonly Logger _logger = Logger.GetLogger<SettingEventService>();
 
 		private List<(SettingEntry SettingEntry, IComplianceRequisite ComplianceRequisite)> _registeredForRangeUpdates;
 
@@ -20,7 +20,7 @@ namespace Estreya.BlishHUD.Shared.State
 
 		public event EventHandler<ComplianceUpdated> DisabledUpdated;
 
-		public SettingEventState(StateConfiguration configuration)
+		public SettingEventService(ServiceConfiguration configuration)
 			: base(configuration)
 		{
 		}

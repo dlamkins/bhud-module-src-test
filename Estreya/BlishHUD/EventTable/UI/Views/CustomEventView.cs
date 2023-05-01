@@ -4,7 +4,7 @@ using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.Shared.Helpers;
-using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.UI.Views;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended.BitmapFonts;
@@ -15,12 +15,12 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 	{
 		private static Point PADDING = new Point(25, 25);
 
-		private BlishHudApiState _blishHudApiState;
+		private BlishHudApiService _blishHudApiService;
 
-		public CustomEventView(Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, BlishHudApiState blishHudApiState, BitmapFont font = null)
-			: base(apiManager, iconState, translationState, font)
+		public CustomEventView(Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, BlishHudApiService blishHudApiService, BitmapFont font = null)
+			: base(apiManager, iconService, translationService, font)
 		{
-			_blishHudApiState = blishHudApiState;
+			_blishHudApiService = blishHudApiService;
 		}
 
 		protected override void InternalBuild(Panel parent)
@@ -123,8 +123,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			val.set_ControlPadding(new Vector2(0f, 5f));
 			val.set_FlowDirection((ControlFlowDirection)3);
 			FlowPanel loginPanel = val;
-			string password = AsyncHelper.RunSync(() => _blishHudApiState.GetAPIPassword());
-			TextBox usernameTextBox = RenderTextbox((Panel)(object)loginPanel, new Point(0, 0), 250, _blishHudApiState.GetAPIUsername(), "API Username");
+			string password = AsyncHelper.RunSync(() => _blishHudApiService.GetAPIPassword());
+			TextBox usernameTextBox = RenderTextbox((Panel)(object)loginPanel, new Point(0, 0), 250, _blishHudApiService.GetAPIUsername(), "API Username");
 			TextBox passwordTextBox = RenderTextbox((Panel)(object)loginPanel, new Point(0, 0), 250, (!string.IsNullOrWhiteSpace(password)) ? "<<Unchanged>>" : null, "API Password");
 			FlowPanel val2 = new FlowPanel();
 			((Control)val2).set_Parent((Container)(object)loginPanel);
@@ -134,20 +134,20 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			FlowPanel buttonPanel = val2;
 			RenderButtonAsync((Panel)(object)buttonPanel, "Save", async delegate
 			{
-				_blishHudApiState.SetAPIUsername(((TextInputBase)usernameTextBox).get_Text());
-				await _blishHudApiState.SetAPIPassword((((TextInputBase)passwordTextBox).get_Text() == "<<Unchanged>>") ? password : ((TextInputBase)passwordTextBox).get_Text());
-				await _blishHudApiState.Login();
+				_blishHudApiService.SetAPIUsername(((TextInputBase)usernameTextBox).get_Text());
+				await _blishHudApiService.SetAPIPassword((((TextInputBase)passwordTextBox).get_Text() == "<<Unchanged>>") ? password : ((TextInputBase)passwordTextBox).get_Text());
+				await _blishHudApiService.Login();
 			});
 			RenderButtonAsync((Panel)(object)buttonPanel, "Test Login", async delegate
 			{
-				await _blishHudApiState.TestLogin(((TextInputBase)usernameTextBox).get_Text(), (((TextInputBase)passwordTextBox).get_Text() == "<<Unchanged>>") ? password : ((TextInputBase)passwordTextBox).get_Text());
+				await _blishHudApiService.TestLogin(((TextInputBase)usernameTextBox).get_Text(), (((TextInputBase)passwordTextBox).get_Text() == "<<Unchanged>>") ? password : ((TextInputBase)passwordTextBox).get_Text());
 				ShowInfo("Login successful!");
 			});
 			RenderButtonAsync((Panel)(object)buttonPanel, "Clear Credentials", async delegate
 			{
-				_blishHudApiState.SetAPIUsername(null);
-				await _blishHudApiState.SetAPIPassword(null);
-				_blishHudApiState.Logout();
+				_blishHudApiService.SetAPIUsername(null);
+				await _blishHudApiService.SetAPIPassword(null);
+				_blishHudApiService.Logout();
 				ShowInfo("Logout successful!");
 			});
 		}

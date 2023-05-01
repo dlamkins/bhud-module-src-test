@@ -14,9 +14,9 @@ using Gw2Sharp.WebApi.V2.Models;
 using Humanizer;
 using Microsoft.Xna.Framework;
 
-namespace Estreya.BlishHUD.Shared.State
+namespace Estreya.BlishHUD.Shared.Services
 {
-	public abstract class APIState : ManagedState
+	public abstract class APIService : ManagedService
 	{
 		protected readonly Gw2ApiManager _apiManager;
 
@@ -26,7 +26,7 @@ namespace Estreya.BlishHUD.Shared.State
 
 		private readonly AsyncLock _loadingLock = new AsyncLock();
 
-		protected new APIStateConfiguration Configuration { get; }
+		protected new APIServiceConfiguration Configuration { get; }
 
 		public bool Loading { get; protected set; }
 
@@ -35,7 +35,7 @@ namespace Estreya.BlishHUD.Shared.State
 
 		public event EventHandler Updated;
 
-		public APIState(Gw2ApiManager apiManager, APIStateConfiguration configuration)
+		public APIService(Gw2ApiManager apiManager, APIServiceConfiguration configuration)
 			: base(configuration)
 		{
 			_apiManager = apiManager;
@@ -109,12 +109,11 @@ namespace Estreya.BlishHUD.Shared.State
 				{
 					IProgress<string> progress = new Progress<string>(delegate(string newProgress)
 					{
-						ProgressText = newProgress;
+						ReportProgress(newProgress);
 					});
 					progress.Report("Loading " + GetType().Name);
 					await FetchFromAPI(_apiManager, progress);
 					SignalUpdated();
-					ProgressText = string.Empty;
 				}
 				finally
 				{
@@ -122,6 +121,11 @@ namespace Estreya.BlishHUD.Shared.State
 					SignalCompletion();
 				}
 			}
+		}
+
+		protected void ReportProgress(string status)
+		{
+			ProgressText = status;
 		}
 
 		protected abstract Task FetchFromAPI(Gw2ApiManager apiManager, IProgress<string> progress);
@@ -133,6 +137,7 @@ namespace Estreya.BlishHUD.Shared.State
 
 		protected void SignalCompletion()
 		{
+			ReportProgress(null);
 			_eventWaitHandle.Set();
 		}
 
@@ -146,7 +151,7 @@ namespace Estreya.BlishHUD.Shared.State
 			return await _eventWaitHandle.WaitOneAsync(timeout, _cancellationTokenSource.Token);
 		}
 	}
-	public abstract class APIState<T> : APIState
+	public abstract class APIService<T> : APIService
 	{
 		protected readonly AsyncLock _apiObjectListLock = new AsyncLock();
 
@@ -157,7 +162,7 @@ namespace Estreya.BlishHUD.Shared.State
 
 		protected event EventHandler<T> APIObjectRemoved;
 
-		public APIState(Gw2ApiManager apiManager, APIStateConfiguration configuration)
+		public APIService(Gw2ApiManager apiManager, APIServiceConfiguration configuration)
 			: base(apiManager, configuration)
 		{
 		}

@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 using Flurl.Http;
 using Microsoft.Xna.Framework;
 
-namespace Estreya.BlishHUD.Shared.State
+namespace Estreya.BlishHUD.Shared.Services
 {
-	public class TranslationState : ManagedState
+	public class TranslationService : ManagedService
 	{
 		private ConcurrentDictionary<string, ConcurrentDictionary<string, string>> _translations;
 
@@ -21,7 +21,7 @@ namespace Estreya.BlishHUD.Shared.State
 
 		private static List<string> _locales = new List<string> { "en", "de", "es", "fr" };
 
-		public TranslationState(StateConfiguration configuration, IFlurlClient flurlClient, string rootUrl)
+		public TranslationService(ServiceConfiguration configuration, IFlurlClient flurlClient, string rootUrl)
 			: base(configuration)
 		{
 			_flurlClient = flurlClient;

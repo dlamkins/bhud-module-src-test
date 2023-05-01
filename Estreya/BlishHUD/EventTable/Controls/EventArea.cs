@@ -12,13 +12,13 @@ using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Blish_HUD._Extensions;
 using Estreya.BlishHUD.EventTable.Models;
-using Estreya.BlishHUD.EventTable.State;
+using Estreya.BlishHUD.EventTable.Services;
 using Estreya.BlishHUD.Shared.Controls;
 using Estreya.BlishHUD.Shared.Extensions;
 using Estreya.BlishHUD.Shared.Models;
 using Estreya.BlishHUD.Shared.Models.GW2API.PointOfInterest;
 using Estreya.BlishHUD.Shared.MumbleInfo.Map;
-using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Threading;
 using Estreya.BlishHUD.Shared.Utils;
 using Flurl.Http;
@@ -48,17 +48,17 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private static readonly ConcurrentDictionary<FontSize, BitmapFont> _fonts = new ConcurrentDictionary<FontSize, BitmapFont>();
 
-		private IconState _iconState;
+		private IconService _iconService;
 
-		private TranslationState _translationState;
+		private TranslationService _translationService;
 
-		private EventState _eventState;
+		private EventStateService _eventService;
 
-		private WorldbossState _worldbossState;
+		private WorldbossService _worldbossService;
 
-		private MapchestState _mapchestState;
+		private MapchestService _mapchestService;
 
-		private PointOfInterestState _pointOfInterestState;
+		private PointOfInterestService _pointOfInterestService;
 
 		private MapUtil _mapUtil;
 
@@ -146,7 +146,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		public EventAreaConfiguration Configuration { get; private set; }
 
-		public EventArea(EventAreaConfiguration configuration, IconState iconState, TranslationState translationState, EventState eventState, WorldbossState worldbossState, MapchestState mapchestState, PointOfInterestState pointOfInterestState, MapUtil mapUtil, IFlurlClient flurlClient, string apiRootUrl, Func<DateTime> getNowAction, Func<Version> getVersion, Func<string> getAccessToken)
+		public EventArea(EventAreaConfiguration configuration, IconService iconService, TranslationService translationService, EventStateService eventService, WorldbossService worldbossService, MapchestService mapchestService, PointOfInterestService pointOfInterestService, MapUtil mapUtil, IFlurlClient flurlClient, string apiRootUrl, Func<DateTime> getNowAction, Func<Version> getVersion, Func<string> getAccessToken)
 		{
 			Configuration = configuration;
 			Configuration.EnabledKeybinding.get_Value().add_Activated((EventHandler<EventArgs>)EnabledKeybinding_Activated);
@@ -174,43 +174,43 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			_getNowAction = getNowAction;
 			_getVersion = getVersion;
 			_getAccessToken = getAccessToken;
-			_iconState = iconState;
-			_translationState = translationState;
-			_eventState = eventState;
-			_worldbossState = worldbossState;
-			_mapchestState = mapchestState;
-			_pointOfInterestState = pointOfInterestState;
+			_iconService = iconService;
+			_translationService = translationService;
+			_eventService = eventService;
+			_worldbossService = worldbossService;
+			_mapchestService = mapchestService;
+			_pointOfInterestService = pointOfInterestService;
 			_mapUtil = mapUtil;
 			_flurlClient = flurlClient;
 			_apiRootUrl = apiRootUrl;
-			if (_worldbossState != null)
+			if (_worldbossService != null)
 			{
-				_worldbossState.WorldbossCompleted += Event_Completed;
-				_worldbossState.WorldbossRemoved += Event_Removed;
+				_worldbossService.WorldbossCompleted += Event_Completed;
+				_worldbossService.WorldbossRemoved += Event_Removed;
 			}
-			if (_mapchestState != null)
+			if (_mapchestService != null)
 			{
-				_mapchestState.MapchestCompleted += Event_Completed;
-				_mapchestState.MapchestRemoved += Event_Removed;
+				_mapchestService.MapchestCompleted += Event_Completed;
+				_mapchestService.MapchestRemoved += Event_Removed;
 			}
-			if (_eventState != null)
+			if (_eventService != null)
 			{
-				_eventState.StateAdded += EventState_StateAdded;
-				_eventState.StateRemoved += EventState_StateRemoved;
+				_eventService.StateAdded += EventService_ServiceAdded;
+				_eventService.StateRemoved += EventService_ServiceRemoved;
 			}
 		}
 
-		private void EventState_StateAdded(object sender, ValueEventArgs<EventState.VisibleStateInfo> e)
+		private void EventService_ServiceAdded(object sender, ValueEventArgs<EventStateService.VisibleStateInfo> e)
 		{
-			if (e.get_Value().AreaName == Configuration.Name && e.get_Value().State == EventState.EventStates.Hidden)
+			if (e.get_Value().AreaName == Configuration.Name && e.get_Value().State == EventStateService.EventStates.Hidden)
 			{
 				ReAddEvents();
 			}
 		}
 
-		private void EventState_StateRemoved(object sender, ValueEventArgs<EventState.VisibleStateInfo> e)
+		private void EventService_ServiceRemoved(object sender, ValueEventArgs<EventStateService.VisibleStateInfo> e)
 		{
-			if (e.get_Value().AreaName == Configuration.Name && e.get_Value().State == EventState.EventStates.Hidden)
+			if (e.get_Value().AreaName == Configuration.Name && e.get_Value().State == EventStateService.EventStates.Hidden)
 			{
 				ReAddEvents();
 			}
@@ -281,7 +281,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				GetTimes();
 				_allEvents.ForEach(delegate(EventCategory ec)
 				{
-					ec.Load(_getNowAction, _translationState);
+					ec.Load(_getNowAction, _translationService);
 				});
 			}
 			ReAddEvents();
@@ -298,7 +298,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			}
 			events.ForEach(delegate(Estreya.BlishHUD.EventTable.Models.Event ev)
 			{
-				_eventState.Remove(Configuration.Name, ev.SettingKey);
+				_eventService.Remove(Configuration.Name, ev.SettingKey);
 			});
 		}
 
@@ -457,7 +457,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 					{
 						categoryFillers.ForEach(delegate(Estreya.BlishHUD.EventTable.Models.Event cf)
 						{
-							cf.Load(ec, _getNowAction, _translationState);
+							cf.Load(ec, _getNowAction, _translationService);
 						});
 					}
 					ec.UpdateFillers(categoryFillers);
@@ -536,7 +536,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private bool EventCategoryDisabled(EventCategory ec)
 		{
-			return _eventState?.Contains(Configuration.Name, ec.Key, EventState.EventStates.Completed) ?? false;
+			return _eventService?.Contains(Configuration.Name, ec.Key, EventStateService.EventStates.Completed) ?? false;
 		}
 
 		private bool EventDisabled(Estreya.BlishHUD.EventTable.Models.Event ev)
@@ -560,7 +560,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private bool EventDisabled(string settingKey)
 		{
-			return !(!Configuration.DisabledEventKeys.get_Value().Contains(settingKey) & !_eventState.Contains(Configuration.Name, settingKey, EventState.EventStates.Hidden));
+			return !(!Configuration.DisabledEventKeys.get_Value().Contains(settingKey) & !_eventService.Contains(Configuration.Name, settingKey, EventStateService.EventStates.Hidden));
 		}
 
 		private void UpdateEventsOnScreen(SpriteBatch spriteBatch)
@@ -721,10 +721,10 @@ namespace Estreya.BlishHUD.EventTable.Controls
 						{
 							continue;
 						}
-						Event newEventControl = new Event(ev2, _iconState, _translationState, _getNowAction, occurence, occurence.AddMinutes(ev2.Duration), GetFont, () => !ev2.Filler && Configuration.DrawBorders.get_Value(), delegate
+						Event newEventControl = new Event(ev2, _iconService, _translationService, _getNowAction, occurence, occurence.AddMinutes(ev2.Duration), GetFont, () => !ev2.Filler && Configuration.DrawBorders.get_Value(), delegate
 						{
 							EventCompletedAction value4 = Configuration.CompletionAction.get_Value();
-							return (value4 == EventCompletedAction.Crossout || value4 == EventCompletedAction.CrossoutAndChangeOpacity) && _eventState.Contains(Configuration.Name, ev2.SettingKey, EventState.EventStates.Completed);
+							return (value4 == EventCompletedAction.Crossout || value4 == EventCompletedAction.CrossoutAndChangeOpacity) && _eventService.Contains(Configuration.Name, ev2.SettingKey, EventStateService.EventStates.Completed);
 						}, delegate
 						{
 							//IL_0000: Unknown result type (might be due to invalid IL or missing references)
@@ -740,7 +740,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 							Color val = ((!ev2.Filler) ? ((Configuration.TextColor.get_Value().get_Id() == 1) ? black : ColorExtensions.ToXnaColor(Configuration.TextColor.get_Value().get_Cloth())) : ((Configuration.FillerTextColor.get_Value().get_Id() == 1) ? black : ColorExtensions.ToXnaColor(Configuration.FillerTextColor.get_Value().get_Cloth())));
 							float num2 = (ev2.Filler ? Configuration.FillerTextOpacity.get_Value() : Configuration.EventTextOpacity.get_Value());
 							EventCompletedAction value3 = Configuration.CompletionAction.get_Value();
-							if ((value3 == EventCompletedAction.ChangeOpacity || value3 == EventCompletedAction.CrossoutAndChangeOpacity) && _eventState.Contains(Configuration.Name, ev2.SettingKey, EventState.EventStates.Completed))
+							if ((value3 == EventCompletedAction.ChangeOpacity || value3 == EventCompletedAction.CrossoutAndChangeOpacity) && _eventService.Contains(Configuration.Name, ev2.SettingKey, EventStateService.EventStates.Completed))
 							{
 								if (Configuration.CompletedEventsInvertTextColor.get_Value())
 								{
@@ -760,7 +760,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 							}
 							float value = Configuration.EventBackgroundOpacity.get_Value();
 							EventCompletedAction value2 = Configuration.CompletionAction.get_Value();
-							if ((value2 == EventCompletedAction.ChangeOpacity || value2 == EventCompletedAction.CrossoutAndChangeOpacity) && _eventState.Contains(Configuration.Name, ev2.SettingKey, EventState.EventStates.Completed))
+							if ((value2 == EventCompletedAction.ChangeOpacity || value2 == EventCompletedAction.CrossoutAndChangeOpacity) && _eventService.Contains(Configuration.Name, ev2.SettingKey, EventStateService.EventStates.Completed))
 							{
 								value = Configuration.CompletedEventsBackgroundOpacity.get_Value();
 							}
@@ -803,12 +803,12 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				{
 					break;
 				}
-				if (_pointOfInterestState.Loading)
+				if (_pointOfInterestService.Loading)
 				{
-					ScreenNotification.ShowNotification("PointOfInterestState is still loading!", ScreenNotification.NotificationType.Error);
+					ScreenNotification.ShowNotification("PointOfInterestService is still loading!", ScreenNotification.NotificationType.Error);
 					break;
 				}
-				PointOfInterest poi = _pointOfInterestState.GetPointOfInterest(_activeEvent.Ev.Waypoint);
+				PointOfInterest poi = _pointOfInterestService.GetPointOfInterest(_activeEvent.Ev.Waypoint);
 				if (poi == null)
 				{
 					ScreenNotification.ShowNotification(_activeEvent.Ev.Waypoint + " not found!", ScreenNotification.NotificationType.Error);
@@ -938,7 +938,8 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			{
 			case EventCompletedAction.Crossout:
 			case EventCompletedAction.ChangeOpacity:
-				_eventState.Add(Configuration.Name, ev.SettingKey, until, EventState.EventStates.Completed);
+			case EventCompletedAction.CrossoutAndChangeOpacity:
+				_eventService.Add(Configuration.Name, ev.SettingKey, until, EventStateService.EventStates.Completed);
 				break;
 			case EventCompletedAction.Hide:
 				HideEvent(ev, until);
@@ -948,7 +949,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private void HideEvent(Estreya.BlishHUD.EventTable.Models.Event ev, DateTime until)
 		{
-			_eventState.Add(Configuration.Name, ev.SettingKey, until, EventState.EventStates.Hidden);
+			_eventService.Add(Configuration.Name, ev.SettingKey, until, EventStateService.EventStates.Hidden);
 		}
 
 		private void Ev_HideRequested(object sender, EventArgs e)
@@ -975,27 +976,27 @@ namespace Estreya.BlishHUD.EventTable.Controls
 		protected override void InternalDispose()
 		{
 			ClearEventControls();
-			if (_worldbossState != null)
+			if (_worldbossService != null)
 			{
-				_worldbossState.WorldbossCompleted -= Event_Completed;
-				_worldbossState.WorldbossRemoved -= Event_Removed;
+				_worldbossService.WorldbossCompleted -= Event_Completed;
+				_worldbossService.WorldbossRemoved -= Event_Removed;
 			}
-			if (_mapchestState != null)
+			if (_mapchestService != null)
 			{
-				_mapchestState.MapchestCompleted -= Event_Completed;
-				_mapchestState.MapchestRemoved -= Event_Removed;
+				_mapchestService.MapchestCompleted -= Event_Completed;
+				_mapchestService.MapchestRemoved -= Event_Removed;
 			}
-			if (_eventState != null)
+			if (_eventService != null)
 			{
-				_eventState.StateAdded -= EventState_StateAdded;
-				_eventState.StateRemoved -= EventState_StateRemoved;
+				_eventService.StateAdded -= EventService_ServiceAdded;
+				_eventService.StateRemoved -= EventService_ServiceRemoved;
 			}
-			_iconState = null;
-			_worldbossState = null;
-			_mapchestState = null;
-			_eventState = null;
+			_iconService = null;
+			_worldbossService = null;
+			_mapchestService = null;
+			_eventService = null;
 			_mapUtil = null;
-			_pointOfInterestState = null;
+			_pointOfInterestService = null;
 			_flurlClient = null;
 			_apiRootUrl = null;
 			((Control)this).remove_Click((EventHandler<MouseEventArgs>)OnLeftMouseButtonPressed);

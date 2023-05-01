@@ -5,15 +5,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Estreya.BlishHUD.Shared.Helpers;
-using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Utils;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Estreya.BlishHUD.EventTable.State
+namespace Estreya.BlishHUD.EventTable.Services
 {
-	public class EventState : ManagedState
+	public class EventStateService : ManagedService
 	{
 		public enum EventStates
 		{
@@ -64,7 +64,7 @@ namespace Estreya.BlishHUD.EventTable.State
 
 		public event EventHandler<ValueEventArgs<VisibleStateInfo>> StateRemoved;
 
-		public EventState(StateConfiguration configuration, string basePath, Func<DateTime> getNowAction)
+		public EventStateService(ServiceConfiguration configuration, string basePath, Func<DateTime> getNowAction)
 			: base(configuration)
 		{
 			_basePath = basePath;

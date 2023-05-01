@@ -11,9 +11,9 @@ using Blish_HUD.Modules.Managers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Estreya.BlishHUD.Shared.State
+namespace Estreya.BlishHUD.Shared.Services
 {
-	public class IconState : ManagedState
+	public class IconService : ManagedService
 	{
 		public enum IconSource
 		{
@@ -43,7 +43,7 @@ namespace Estreya.BlishHUD.Shared.State
 
 		private readonly ContentsManager _contentsManager;
 
-		public IconState(StateConfiguration configuration, ContentsManager contentsManager)
+		public IconService(ServiceConfiguration configuration, ContentsManager contentsManager)
 			: base(configuration)
 		{
 			_contentsManager = contentsManager;

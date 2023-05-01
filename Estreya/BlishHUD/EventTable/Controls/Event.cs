@@ -4,7 +4,7 @@ using Blish_HUD.Common.UI.Views;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Estreya.BlishHUD.EventTable.Models;
-using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.UI.Views;
 using Estreya.BlishHUD.Shared.Utils;
 using Microsoft.Xna.Framework;
@@ -16,9 +16,9 @@ namespace Estreya.BlishHUD.EventTable.Controls
 {
 	public class Event : IDisposable
 	{
-		private IconState _iconState;
+		private IconService _iconService;
 
-		private TranslationState _translationState;
+		private TranslationService _translationService;
 
 		private readonly Func<DateTime> _getNowAction;
 
@@ -48,11 +48,11 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		public event EventHandler FinishRequested;
 
-		public Event(Estreya.BlishHUD.EventTable.Models.Event ev, IconState iconState, TranslationState translationState, Func<DateTime> getNowAction, DateTime startTime, DateTime endTime, Func<BitmapFont> getFontAction, Func<bool> getDrawBorders, Func<bool> getDrawCrossout, Func<Color> getTextColor, Func<Color> getColorAction, Func<bool> getDrawShadowAction, Func<Color> getShadowColor)
+		public Event(Estreya.BlishHUD.EventTable.Models.Event ev, IconService iconService, TranslationService translationService, Func<DateTime> getNowAction, DateTime startTime, DateTime endTime, Func<BitmapFont> getFontAction, Func<bool> getDrawBorders, Func<bool> getDrawCrossout, Func<Color> getTextColor, Func<Color> getColorAction, Func<bool> getDrawShadowAction, Func<Color> getShadowColor)
 		{
 			Ev = ev;
-			_iconState = iconState;
-			_translationState = translationState;
+			_iconService = iconService;
+			_translationService = translationService;
 			_getNowAction = getNowAction;
 			_startTime = startTime;
 			_endTime = endTime;
@@ -115,20 +115,20 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			if (num)
 			{
 				TimeSpan finishedSince = now - _startTime.AddMinutes(Ev.Duration);
-				description = description + _translationState.GetTranslation("event-tooltip-finishedSince", "Finished since") + ": " + FormatTime(finishedSince);
+				description = description + _translationService.GetTranslation("event-tooltip-finishedSince", "Finished since") + ": " + FormatTime(finishedSince);
 			}
 			else if (isNext)
 			{
 				TimeSpan startsIn = _startTime - now;
-				description = description + _translationState.GetTranslation("event-tooltip-startsIn", "Starts in") + ": " + FormatTime(startsIn);
+				description = description + _translationService.GetTranslation("event-tooltip-startsIn", "Starts in") + ": " + FormatTime(startsIn);
 			}
 			else if (isCurrent)
 			{
 				TimeSpan remaining = GetTimeRemaining(now);
-				description = description + _translationState.GetTranslation("event-tooltip-remaining", "Remaining") + ": " + FormatTime(remaining);
+				description = description + _translationService.GetTranslation("event-tooltip-remaining", "Remaining") + ": " + FormatTime(remaining);
 			}
-			description = description + " (" + _translationState.GetTranslation("event-tooltip-startsAt", "Starts at") + ": " + FormatTime(_startTime.ToLocalTime()) + ")";
-			return new Tooltip((ITooltipView)(object)new TooltipView(Ev.Name, description, _iconState.GetIcon(Ev.Icon), _translationState));
+			description = description + " (" + _translationService.GetTranslation("event-tooltip-startsAt", "Starts at") + ": " + FormatTime(_startTime.ToLocalTime()) + ")";
+			return new Tooltip((ITooltipView)(object)new TooltipView(Ev.Name, description, _iconService.GetIcon(Ev.Icon), _translationService));
 		}
 
 		public void Render(SpriteBatch spriteBatch, RectangleF bounds)
@@ -273,8 +273,8 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		public void Dispose()
 		{
-			_iconState = null;
-			_translationState = null;
+			_iconService = null;
+			_translationService = null;
 			Ev = null;
 		}
 	}

@@ -6,8 +6,8 @@ using Blish_HUD.Input;
 using Blish_HUD.Settings;
 using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.Shared.Models.Drawers;
+using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Settings;
-using Estreya.BlishHUD.Shared.State;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework.Input;
 
@@ -324,82 +324,82 @@ namespace Estreya.BlishHUD.EventTable
 			base.DrawerSettings.UndefineSetting(name + "-categoryNameColor");
 		}
 
-		public override void UpdateLocalization(TranslationState translationState)
+		public override void UpdateLocalization(TranslationService translationService)
 		{
-			base.UpdateLocalization(translationState);
+			base.UpdateLocalization(translationService);
 			string mapKeybindingDisplayNameDefault = ((SettingEntry)MapKeybinding).get_DisplayName();
 			string mapKeybindingDescriptionDefault = ((SettingEntry)MapKeybinding).get_Description();
-			((SettingEntry)MapKeybinding).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-mapKeybinding-name", mapKeybindingDisplayNameDefault)));
-			((SettingEntry)MapKeybinding).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-mapKeybinding-description", mapKeybindingDescriptionDefault)));
+			((SettingEntry)MapKeybinding).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-mapKeybinding-name", mapKeybindingDisplayNameDefault)));
+			((SettingEntry)MapKeybinding).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-mapKeybinding-description", mapKeybindingDescriptionDefault)));
 			string remindersEnabledDisplayNameDefault = ((SettingEntry)RemindersEnabled).get_DisplayName();
 			string remindersEnabledDescriptionDefault = ((SettingEntry)RemindersEnabled).get_Description();
-			((SettingEntry)RemindersEnabled).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-remindersEnabled-name", remindersEnabledDisplayNameDefault)));
-			((SettingEntry)RemindersEnabled).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-remindersEnabled-description", remindersEnabledDescriptionDefault)));
+			((SettingEntry)RemindersEnabled).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-remindersEnabled-name", remindersEnabledDisplayNameDefault)));
+			((SettingEntry)RemindersEnabled).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-remindersEnabled-description", remindersEnabledDescriptionDefault)));
 			string reminderPositionXDisplayNameDefault = ((SettingEntry)ReminderPosition.X).get_DisplayName();
 			string reminderPositionXDescriptionDefault = ((SettingEntry)ReminderPosition.X).get_Description();
-			((SettingEntry)ReminderPosition.X).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-reminderPositionX-name", reminderPositionXDisplayNameDefault)));
-			((SettingEntry)ReminderPosition.X).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-reminderPositionX-description", reminderPositionXDescriptionDefault)));
+			((SettingEntry)ReminderPosition.X).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-reminderPositionX-name", reminderPositionXDisplayNameDefault)));
+			((SettingEntry)ReminderPosition.X).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-reminderPositionX-description", reminderPositionXDescriptionDefault)));
 			string reminderPositionYDisplayNameDefault = ((SettingEntry)ReminderPosition.Y).get_DisplayName();
 			string reminderPositionYDescriptionDefault = ((SettingEntry)ReminderPosition.Y).get_Description();
-			((SettingEntry)ReminderPosition.Y).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-reminderPositionY-name", reminderPositionYDisplayNameDefault)));
-			((SettingEntry)ReminderPosition.Y).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-reminderPositionY-description", reminderPositionYDescriptionDefault)));
+			((SettingEntry)ReminderPosition.Y).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-reminderPositionY-name", reminderPositionYDisplayNameDefault)));
+			((SettingEntry)ReminderPosition.Y).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-reminderPositionY-description", reminderPositionYDescriptionDefault)));
 			string reminderDurationDisplayNameDefault = ((SettingEntry)ReminderDuration).get_DisplayName();
 			string reminderDurationDescriptionDefault = ((SettingEntry)ReminderDuration).get_Description();
-			((SettingEntry)ReminderDuration).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-reminderDuration-name", reminderDurationDisplayNameDefault)));
-			((SettingEntry)ReminderDuration).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-reminderDuration-description", reminderDurationDescriptionDefault)));
+			((SettingEntry)ReminderDuration).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-reminderDuration-name", reminderDurationDisplayNameDefault)));
+			((SettingEntry)ReminderDuration).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-reminderDuration-description", reminderDurationDescriptionDefault)));
 			string reminderOpacityDisplayNameDefault = ((SettingEntry)ReminderOpacity).get_DisplayName();
 			string reminderOpacityDescriptionDefault = ((SettingEntry)ReminderOpacity).get_Description();
-			((SettingEntry)ReminderOpacity).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-reminderOpacity-name", reminderOpacityDisplayNameDefault)));
-			((SettingEntry)ReminderOpacity).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-reminderOpacity-description", reminderOpacityDescriptionDefault)));
+			((SettingEntry)ReminderOpacity).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-reminderOpacity-name", reminderOpacityDisplayNameDefault)));
+			((SettingEntry)ReminderOpacity).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-reminderOpacity-description", reminderOpacityDescriptionDefault)));
 		}
 
-		public void UpdateDrawerLocalization(EventAreaConfiguration drawerConfiguration, TranslationState translationState)
+		public void UpdateDrawerLocalization(EventAreaConfiguration drawerConfiguration, TranslationService translationService)
 		{
-			UpdateDrawerLocalization((DrawerConfiguration)drawerConfiguration, translationState);
+			UpdateDrawerLocalization((DrawerConfiguration)drawerConfiguration, translationService);
 			string leftClickActionDisplayNameDefault = ((SettingEntry)drawerConfiguration.LeftClickAction).get_DisplayName();
 			string leftClickActionDescriptionDefault = ((SettingEntry)drawerConfiguration.LeftClickAction).get_Description();
-			((SettingEntry)drawerConfiguration.LeftClickAction).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerLeftClickAction-name", leftClickActionDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.LeftClickAction).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerLeftClickAction-description", leftClickActionDescriptionDefault)));
+			((SettingEntry)drawerConfiguration.LeftClickAction).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerLeftClickAction-name", leftClickActionDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.LeftClickAction).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerLeftClickAction-description", leftClickActionDescriptionDefault)));
 			string showTooltipsDisplayNameDefault = ((SettingEntry)drawerConfiguration.ShowTooltips).get_DisplayName();
 			string showTooltipsDescriptionDefault = ((SettingEntry)drawerConfiguration.ShowTooltips).get_Description();
-			((SettingEntry)drawerConfiguration.ShowTooltips).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerShowTooltips-name", showTooltipsDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.ShowTooltips).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerShowTooltips-description", showTooltipsDescriptionDefault)));
+			((SettingEntry)drawerConfiguration.ShowTooltips).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerShowTooltips-name", showTooltipsDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.ShowTooltips).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerShowTooltips-description", showTooltipsDescriptionDefault)));
 			string timespanDisplayNameDefault = ((SettingEntry)drawerConfiguration.TimeSpan).get_DisplayName();
 			string timespanDescriptionDefault = ((SettingEntry)drawerConfiguration.TimeSpan).get_Description();
-			((SettingEntry)drawerConfiguration.TimeSpan).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerTimespan-name", timespanDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.TimeSpan).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerTimespan-description", timespanDescriptionDefault)));
+			((SettingEntry)drawerConfiguration.TimeSpan).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerTimespan-name", timespanDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.TimeSpan).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerTimespan-description", timespanDescriptionDefault)));
 			string historySplitDisplayNameDefault = ((SettingEntry)drawerConfiguration.HistorySplit).get_DisplayName();
 			string historySplitDescriptionDefault = ((SettingEntry)drawerConfiguration.HistorySplit).get_Description();
-			((SettingEntry)drawerConfiguration.HistorySplit).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerHistorySplit-name", historySplitDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.HistorySplit).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerHistorySplit-description", historySplitDescriptionDefault)));
+			((SettingEntry)drawerConfiguration.HistorySplit).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerHistorySplit-name", historySplitDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.HistorySplit).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerHistorySplit-description", historySplitDescriptionDefault)));
 			string drawBordersDisplayNameDefault = ((SettingEntry)drawerConfiguration.DrawBorders).get_DisplayName();
 			string drawBordersDescriptionDefault = ((SettingEntry)drawerConfiguration.DrawBorders).get_Description();
-			((SettingEntry)drawerConfiguration.DrawBorders).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerDrawBorders-name", drawBordersDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.DrawBorders).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerDrawBorders-description", drawBordersDescriptionDefault)));
+			((SettingEntry)drawerConfiguration.DrawBorders).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerDrawBorders-name", drawBordersDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.DrawBorders).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerDrawBorders-description", drawBordersDescriptionDefault)));
 			string useFillersDisplayNameDefault = ((SettingEntry)drawerConfiguration.UseFiller).get_DisplayName();
 			string useFillersDescriptionDefault = ((SettingEntry)drawerConfiguration.UseFiller).get_Description();
-			((SettingEntry)drawerConfiguration.UseFiller).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerUseFillers-name", useFillersDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.UseFiller).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerUseFillers-description", useFillersDescriptionDefault)));
+			((SettingEntry)drawerConfiguration.UseFiller).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerUseFillers-name", useFillersDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.UseFiller).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerUseFillers-description", useFillersDescriptionDefault)));
 			string fillerTextColorDisplayNameDefault = ((SettingEntry)drawerConfiguration.FillerTextColor).get_DisplayName();
 			string fillerTextColorDescriptionDefault = ((SettingEntry)drawerConfiguration.FillerTextColor).get_Description();
-			((SettingEntry)drawerConfiguration.FillerTextColor).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerFillerTextColor-name", fillerTextColorDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.FillerTextColor).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerFillerTextColor-description", fillerTextColorDescriptionDefault)));
+			((SettingEntry)drawerConfiguration.FillerTextColor).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerFillerTextColor-name", fillerTextColorDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.FillerTextColor).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerFillerTextColor-description", fillerTextColorDescriptionDefault)));
 			string acceptWaypointPromptDisplayNameDefault = ((SettingEntry)drawerConfiguration.AcceptWaypointPrompt).get_DisplayName();
 			string acceptWaypointPromptDescriptionDefault = ((SettingEntry)drawerConfiguration.AcceptWaypointPrompt).get_Description();
-			((SettingEntry)drawerConfiguration.AcceptWaypointPrompt).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerAcceptWaypointPrompt-name", acceptWaypointPromptDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.AcceptWaypointPrompt).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerAcceptWaypointPrompt-description", acceptWaypointPromptDescriptionDefault)));
+			((SettingEntry)drawerConfiguration.AcceptWaypointPrompt).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerAcceptWaypointPrompt-name", acceptWaypointPromptDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.AcceptWaypointPrompt).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerAcceptWaypointPrompt-description", acceptWaypointPromptDescriptionDefault)));
 			string completionActionDisplayNameDefault = ((SettingEntry)drawerConfiguration.CompletionAction).get_DisplayName();
 			string completionActionDescriptionDefault = ((SettingEntry)drawerConfiguration.CompletionAction).get_Description();
-			((SettingEntry)drawerConfiguration.CompletionAction).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerCompletionAction-name", completionActionDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.CompletionAction).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerCompletionAction-description", completionActionDescriptionDefault)));
+			((SettingEntry)drawerConfiguration.CompletionAction).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerCompletionAction-name", completionActionDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.CompletionAction).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerCompletionAction-description", completionActionDescriptionDefault)));
 			string eventHeightDisplayNameDefault = ((SettingEntry)drawerConfiguration.EventHeight).get_DisplayName();
 			string eventHeightDescriptionDefault = ((SettingEntry)drawerConfiguration.EventHeight).get_Description();
-			((SettingEntry)drawerConfiguration.EventHeight).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventHeight-name", eventHeightDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.EventHeight).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventHeight-description", eventHeightDescriptionDefault)));
+			((SettingEntry)drawerConfiguration.EventHeight).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerEventHeight-name", eventHeightDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.EventHeight).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerEventHeight-description", eventHeightDescriptionDefault)));
 			string eventBackgroundOpacityDisplayNameDefault = ((SettingEntry)drawerConfiguration.EventBackgroundOpacity).get_DisplayName();
 			string eventBackgroundOpacityDescriptionDefault = ((SettingEntry)drawerConfiguration.EventBackgroundOpacity).get_Description();
-			((SettingEntry)drawerConfiguration.EventBackgroundOpacity).set_GetDisplayNameFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventBackgroundOpacity-name", eventBackgroundOpacityDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.EventBackgroundOpacity).set_GetDescriptionFunc((Func<string>)(() => translationState.GetTranslation("setting-drawerEventBackgroundOpacity-description", eventBackgroundOpacityDescriptionDefault)));
+			((SettingEntry)drawerConfiguration.EventBackgroundOpacity).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerEventBackgroundOpacity-name", eventBackgroundOpacityDisplayNameDefault)));
+			((SettingEntry)drawerConfiguration.EventBackgroundOpacity).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerEventBackgroundOpacity-description", eventBackgroundOpacityDescriptionDefault)));
 		}
 
 		public override void Unload()

@@ -8,7 +8,7 @@ using Blish_HUD.Input;
 using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.Shared.Controls;
-using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.UI.Views;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended.BitmapFonts;
@@ -31,8 +31,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		public event EventHandler<(EventAreaConfiguration AreaConfiguration, string[] CategoryKeys)> SaveClicked;
 
-		public ReorderEventsView(List<EventCategory> allEvents, List<string> order, EventAreaConfiguration areaConfiguration, Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, BitmapFont font = null)
-			: base(apiManager, iconState, translationState, font)
+		public ReorderEventsView(List<EventCategory> allEvents, List<string> order, EventAreaConfiguration areaConfiguration, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, BitmapFont font = null)
+			: base(apiManager, iconService, translationService, font)
 		{
 			_allEvents = allEvents;
 			_order = order;
@@ -59,7 +59,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				ListEntry<EventCategory> entry = listEntry;
 				if (eventCategory.Icon != null)
 				{
-					entry.Icon = base.IconState.GetIcon(eventCategory.Icon);
+					entry.Icon = base.IconService.GetIcon(eventCategory.Icon);
 				}
 			}
 		}

@@ -13,9 +13,9 @@ using Jose;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 
-namespace Estreya.BlishHUD.Shared.State
+namespace Estreya.BlishHUD.Shared.Services
 {
-	public class BlishHudApiState : ManagedState
+	public class BlishHudApiService : ManagedService
 	{
 		private const string API_PASSWORD_KEY = "estreyaBlishHudAPI";
 
@@ -43,7 +43,7 @@ namespace Estreya.BlishHUD.Shared.State
 
 		public event EventHandler LoggedOut;
 
-		public BlishHudApiState(StateConfiguration configuration, SettingEntry<string> usernameSetting, PasswordManager passwordManager, IFlurlClient flurlClient, string apiRootUrl, string apiVersion)
+		public BlishHudApiService(ServiceConfiguration configuration, SettingEntry<string> usernameSetting, PasswordManager passwordManager, IFlurlClient flurlClient, string apiRootUrl, string apiVersion)
 			: base(configuration)
 		{
 			_usernameSetting = usernameSetting;

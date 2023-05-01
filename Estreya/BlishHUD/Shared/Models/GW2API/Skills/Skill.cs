@@ -2,18 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Blish_HUD.Content;
-using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Services;
 using Gw2Sharp;
 using Gw2Sharp.WebApi;
 using Gw2Sharp.WebApi.V2.Models;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace Estreya.BlishHUD.Shared.Models.GW2API.Skills
 {
 	public class Skill : IDisposable
 	{
-		[JsonConverter(typeof(StringEnumConverter))]
 		public SkillCategory Category { get; set; }
 
 		public int Id { get; set; }
@@ -31,29 +29,27 @@ namespace Estreya.BlishHUD.Shared.Models.GW2API.Skills
 		public string ChatLink { get; set; } = string.Empty;
 
 
-		[JsonConverter(typeof(StringEnumConverter))]
 		public SkillType Type { get; set; }
 
-		[JsonConverter(typeof(StringEnumConverter))]
 		public SkillWeaponType WeaponType { get; set; }
 
 		public List<string> Professions { get; set; } = new List<string>();
 
 
-		[JsonConverter(typeof(StringEnumConverter))]
 		public SkillSlot Slot { get; set; }
 
-		[JsonConverter(typeof(StringEnumConverter))]
 		public Attunement DualAttunement { get; set; }
 
 		public List<SkillFlag> Flags { get; set; }
 
-		public List<string>? Categories { get; set; }
+		public List<SkillFact> Facts { get; set; }
 
-		[JsonProperty("subskills")]
+		public List<SkillFact> TraitedFacts { get; set; }
+
+		public List<string> Categories { get; set; }
+
 		public List<SkillSubSkill> SubSkills { get; set; }
 
-		[JsonConverter(typeof(StringEnumConverter))]
 		public Attunement Attunement { get; set; }
 
 		public int Cost { get; set; }
@@ -85,7 +81,7 @@ namespace Estreya.BlishHUD.Shared.Models.GW2API.Skills
 			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
 			Skill obj = new Skill
 			{
 				Category = SkillCategory.Skill,
@@ -114,6 +110,8 @@ namespace Estreya.BlishHUD.Shared.Models.GW2API.Skills
 			obj.DualAttunement = (Attunement)((!(skill.get_DualAttunement()?.get_IsUnknown() ?? true)) ? ((int)ApiEnum<Attunement>.op_Implicit(skill.get_DualAttunement())) : 0);
 			obj.Flags = (from flag in skill.get_Flags()?.get_List()
 				select flag.get_Value()).ToList();
+			obj.Facts = skill.get_Facts()?.ToList();
+			obj.TraitedFacts = skill.get_TraitedFacts()?.ToList();
 			obj.Categories = skill.get_Categories()?.ToList();
 			obj.SubSkills = skill.get_SubSkills()?.ToList();
 			obj.Attunement = (Attunement)((!(skill.get_Attunement()?.get_IsUnknown() ?? true)) ? ((int)ApiEnum<Attunement>.op_Implicit(skill.get_Attunement())) : 0);
@@ -156,6 +154,8 @@ namespace Estreya.BlishHUD.Shared.Models.GW2API.Skills
 				ChatLink = skill.get_ChatLink(),
 				Flags = (from flag in skill.get_Flags()?.get_List()
 					select flag.get_Value()).ToList(),
+				Facts = skill.get_Facts()?.ToList(),
+				TraitedFacts = skill.get_TraitedFacts()?.ToList(),
 				Categories = skill.get_Categories()?.ToList()
 			};
 		}
@@ -187,11 +187,11 @@ namespace Estreya.BlishHUD.Shared.Models.GW2API.Skills
 			IconTexture = null;
 		}
 
-		public void LoadTexture(IconState iconState)
+		public void LoadTexture(IconService iconService)
 		{
 			if (!string.IsNullOrWhiteSpace(Icon))
 			{
-				IconTexture = iconState.GetIcon(Icon);
+				IconTexture = iconService.GetIcon(Icon);
 			}
 		}
 	}

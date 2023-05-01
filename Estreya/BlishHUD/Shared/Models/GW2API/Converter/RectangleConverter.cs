@@ -47,8 +47,9 @@ namespace Estreya.BlishHUD.Shared.Models.GW2API.Converter
 
 		public override void WriteJson(JsonWriter writer, Rectangle value, JsonSerializer serializer)
 		{
-			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			serializer.Converters.Add(new CoordinatesConverter());
 			writer.WriteStartArray();
 			serializer.Serialize(writer, ((Rectangle)(ref value)).get_BottomLeft());
 			serializer.Serialize(writer, ((Rectangle)(ref value)).get_TopRight());

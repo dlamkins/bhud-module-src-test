@@ -8,7 +8,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.Shared.Extensions;
-using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.UI.Views;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
@@ -30,8 +30,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private List<string> _autocompleteAPIKeys = new List<string>();
 
-		public HelpView(Func<List<EventCategory>> getEvents, string apiUrl, Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, BitmapFont font = null)
-			: base(apiManager, iconState, translationState, font)
+		public HelpView(Func<List<EventCategory>> getEvents, string apiUrl, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, BitmapFont font = null)
+			: base(apiManager, iconService, translationService, font)
 		{
 			_getEvents = getEvents;
 			_apiUrl = apiUrl;

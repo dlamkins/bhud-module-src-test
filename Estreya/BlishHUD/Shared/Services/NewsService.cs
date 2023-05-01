@@ -8,9 +8,9 @@ using Flurl.Http;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 
-namespace Estreya.BlishHUD.Shared.State
+namespace Estreya.BlishHUD.Shared.Services
 {
-	public class NewsState : ManagedState
+	public class NewsService : ManagedService
 	{
 		private const string FILE_NAME = "news.json";
 
@@ -20,7 +20,7 @@ namespace Estreya.BlishHUD.Shared.State
 
 		public List<News> News { get; private set; }
 
-		public NewsState(StateConfiguration configuration, IFlurlClient flurlClient, string baseFilePath)
+		public NewsService(ServiceConfiguration configuration, IFlurlClient flurlClient, string baseFilePath)
 			: base(configuration)
 		{
 			_flurlClient = flurlClient;

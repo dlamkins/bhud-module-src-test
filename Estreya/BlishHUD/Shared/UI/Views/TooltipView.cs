@@ -6,7 +6,7 @@ using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Modules.Managers;
-using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Services;
 using Microsoft.Xna.Framework;
 
 namespace Estreya.BlishHUD.Shared.UI.Views
@@ -19,15 +19,15 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		private AsyncTexture2D Icon { get; set; }
 
-		public TooltipView(string title, string description, TranslationState translationState, Gw2ApiManager apiManager = null, IconState iconState = null)
-			: base(apiManager, iconState, translationState)
+		public TooltipView(string title, string description, TranslationService translationService, Gw2ApiManager apiManager = null, IconService iconService = null)
+			: base(apiManager, iconService, translationService)
 		{
 			Title = title;
 			Description = description;
 		}
 
-		public TooltipView(string title, string description, AsyncTexture2D icon, TranslationState translationState, Gw2ApiManager apiManager = null, IconState iconState = null)
-			: this(title, description, translationState, apiManager, iconState)
+		public TooltipView(string title, string description, AsyncTexture2D icon, TranslationService translationService, Gw2ApiManager apiManager = null, IconService iconService = null)
+			: this(title, description, translationService, apiManager, iconService)
 		{
 			Icon = icon;
 		}

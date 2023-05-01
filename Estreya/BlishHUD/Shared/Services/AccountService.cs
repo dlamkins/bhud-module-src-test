@@ -7,9 +7,9 @@ using Blish_HUD.Modules.Managers;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 
-namespace Estreya.BlishHUD.Shared.State
+namespace Estreya.BlishHUD.Shared.Services
 {
-	public class AccountState : APIState<Account>
+	public class AccountService : APIService<Account>
 	{
 		public Account Account
 		{
@@ -23,7 +23,7 @@ namespace Estreya.BlishHUD.Shared.State
 			}
 		}
 
-		public AccountState(APIStateConfiguration configuration, Gw2ApiManager apiManager)
+		public AccountService(APIServiceConfiguration configuration, Gw2ApiManager apiManager)
 			: base(apiManager, configuration)
 		{
 		}

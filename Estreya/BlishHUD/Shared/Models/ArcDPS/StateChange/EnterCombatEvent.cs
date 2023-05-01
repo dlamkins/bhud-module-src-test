@@ -10,8 +10,8 @@ namespace Estreya.BlishHUD.Shared.Models.ArcDPS.StateChange
 
 		public ulong Subgroup => base.Dst.get_Id();
 
-		public EnterCombatEvent(Ev ev, Ag src, Ag dst, CombatEventCategory category, CombatEventType type, CombatEventState state)
-			: base(ev, src, dst, category, type, state)
+		public EnterCombatEvent(CombatEvent combatEvent, CombatEventCategory category, CombatEventType type, CombatEventState state)
+			: base(combatEvent, category, type, state)
 		{
 		}
 	}

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Blish_HUD;
 using Estreya.BlishHUD.Shared.Attributes;
-using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Utils;
 using Newtonsoft.Json;
 
@@ -61,17 +61,17 @@ namespace Estreya.BlishHUD.EventTable.Models
 			}
 		}
 
-		public void Load(Func<DateTime> getNowAction, TranslationState translationState = null)
+		public void Load(Func<DateTime> getNowAction, TranslationService translationService = null)
 		{
-			if (translationState != null)
+			if (translationService != null)
 			{
-				Name = translationState.GetTranslation("eventCategory-" + Key + "-name", Name);
+				Name = translationService.GetTranslation("eventCategory-" + Key + "-name", Name);
 			}
 			using (_eventLock.Lock())
 			{
 				Events.ForEach(delegate(Event ev)
 				{
-					ev.Load(this, getNowAction, translationState);
+					ev.Load(this, getNowAction, translationService);
 				});
 			}
 		}

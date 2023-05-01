@@ -13,7 +13,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Graphics;
 using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.Shared.Models;
-using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Utils;
 using Flurl.Http;
 using Microsoft.Xna.Framework;
@@ -32,15 +32,15 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		private readonly IFlurlClient _flurlClient;
 
-		private NewsState _newsState;
+		private NewsService _newsService;
 
 		private Texture2D _discordLogo;
 
-		public NewsView(IFlurlClient flurlClient, Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, NewsState newsState, BitmapFont font = null)
-			: base(apiManager, iconState, translationState, font)
+		public NewsView(IFlurlClient flurlClient, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, NewsService newsService, BitmapFont font = null)
+			: base(apiManager, iconService, translationService, font)
 		{
 			_flurlClient = flurlClient;
-			_newsState = newsState;
+			_newsService = newsService;
 		}
 
 		protected override void InternalBuild(Panel parent)
@@ -64,12 +64,12 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0115: Expected O, but got Unknown
 			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0145: Expected O, but got Unknown
-			//IL_015b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014e: Expected O, but got Unknown
+			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)parent);
 			val.set_FlowDirection((ControlFlowDirection)3);
@@ -78,7 +78,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			((Control)val).set_Width(((Container)parent).get_ContentRegion().Width - 50);
 			((Panel)val).set_CanScroll(true);
 			FlowPanel newsList = val;
-			List<News> sortedNews = _newsState.News.OrderByDescending((News n) => n.Timestamp).ToList();
+			List<News> sortedNews = _newsService.News.OrderByDescending((News n) => n.Timestamp).ToList();
 			if (sortedNews.Count > 0)
 			{
 				foreach (News news in sortedNews)
@@ -98,7 +98,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			val2.set_ShowBorder(true);
 			Panel discordSection = val2;
 			((Control)discordSection).set_Height(((Container)parent).get_ContentRegion().Height - ((Control)discordSection).get_Top());
-			Image val3 = new Image(AsyncTexture2D.op_Implicit(_discordLogo));
+			Image val3 = new Image(AsyncTexture2D.op_Implicit(_discordLogo ?? Textures.get_TransparentPixel()));
 			((Control)val3).set_Parent((Container)(object)discordSection);
 			Image image = val3;
 			((Control)image).set_Location(new Point(30, ((Control)discordSection).get_Height() / 2 - ((Control)image).get_Height() / 2 - 5));
@@ -195,7 +195,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 				//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 				if (news.Important)
 				{
-					builder.SetPrefixImage(base.IconState.GetIcon("222246.png")).SetPrefixImageSize(_importantIconSize);
+					builder.SetPrefixImage(base.IconService.GetIcon("222246.png")).SetPrefixImageSize(_importantIconSize);
 				}
 			})
 				.CreatePart(title, (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder builder)
@@ -294,7 +294,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 		protected override void Unload()
 		{
 			base.Unload();
-			_newsState = null;
+			_newsService = null;
 			Texture2D discordLogo = _discordLogo;
 			if (discordLogo != null)
 			{

@@ -14,13 +14,13 @@ using Estreya.BlishHUD.Shared.Models.ArcDPS.StateChange;
 using Estreya.BlishHUD.Shared.Models.GW2API.Skills;
 using Microsoft.Xna.Framework;
 
-namespace Estreya.BlishHUD.Shared.State
+namespace Estreya.BlishHUD.Shared.Services
 {
-	public class ArcDPSState : ManagedState
+	public class ArcDPSService : ManagedService
 	{
 		private const int MAX_PARSE_PER_LOOP = 50;
 
-		private SkillState _skillState;
+		private SkillService _skillState;
 
 		private ConcurrentQueue<RawCombatEventArgs> _rawCombatEventQueue;
 
@@ -42,7 +42,7 @@ namespace Estreya.BlishHUD.Shared.State
 
 		public event EventHandler<CombatEvent> LocalCombatEvent;
 
-		public ArcDPSState(StateConfiguration configuration, SkillState skillState)
+		public ArcDPSService(ServiceConfiguration configuration, SkillService skillState)
 			: base(configuration)
 		{
 			_skillState = skillState;
@@ -151,8 +151,11 @@ namespace Estreya.BlishHUD.Shared.State
 			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b3: Expected O, but got Unknown
 			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0106: Expected O, but got Unknown
+			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
 			List<CombatEvent> combatEvents = new List<CombatEvent>();
 			if (!base.Running)
 			{
@@ -188,9 +191,11 @@ namespace Estreya.BlishHUD.Shared.State
 					{
 						_selfInstId = ev.get_DstInstId();
 					}
-					combatEvents.AddRange(HandleNormalCombatEvents(ev, src, dst, skillName, _selfInstId, targetAgentId, rawCombatEventArgs.get_EventType()));
-					combatEvents.AddRange(HandleActivationEvents(ev, src, dst, skillName, _selfInstId, targetAgentId, rawCombatEventArgs.get_EventType()));
-					combatEvents.AddRange(HandleStatechangeEvents(ev, src, dst, skillName, _selfInstId, targetAgentId, rawCombatEventArgs.get_EventType()));
+					rawCombatEvent = new CombatEvent(ev, src, dst, skillName, rawCombatEvent.get_Id(), rawCombatEvent.get_Revision());
+					combatEvents.AddRange(HandleNormalCombatEvents(rawCombatEvent, _selfInstId, targetAgentId, rawCombatEventArgs.get_EventType()));
+					combatEvents.AddRange(HandleActivationEvents(rawCombatEvent, _selfInstId, targetAgentId, rawCombatEventArgs.get_EventType()));
+					combatEvents.AddRange(HandleStatechangeEvents(rawCombatEvent, _selfInstId, targetAgentId, rawCombatEventArgs.get_EventType()));
+					combatEvents.AddRange(HandleBuffEvents(rawCombatEvent, _selfInstId, targetAgentId, rawCombatEventArgs.get_EventType()));
 					return combatEvents;
 				}
 				if (src != null)
@@ -207,48 +212,72 @@ namespace Estreya.BlishHUD.Shared.State
 			}
 		}
 
-		private List<CombatEvent> HandleStatechangeEvents(Ev ev, Ag src, Ag dst, string skillName, uint selfInstId, ulong targetAgentId, CombatEventType scope)
+		private List<CombatEvent> HandleStatechangeEvents(CombatEvent combatEvent, uint selfInstId, ulong targetAgentId, CombatEventType scope)
 		{
 			return new List<CombatEvent>();
 		}
 
-		private List<CombatEvent> HandleActivationEvents(Ev ev, Ag src, Ag dst, string skillName, uint selfInstId, ulong targetAgentId, CombatEventType scope)
+		private List<CombatEvent> HandleActivationEvents(CombatEvent combatEvent, uint selfInstId, ulong targetAgentId, CombatEventType scope)
 		{
 			return new List<CombatEvent>();
 		}
 
-		private List<CombatEvent> HandleNormalCombatEvents(Ev ev, Ag src, Ag dst, string skillName, ulong selfInstId, ulong targetAgentId, CombatEventType scope)
+		private List<CombatEvent> HandleBuffEvents(CombatEvent combatEvent, uint selfInstId, ulong targetAgentId, CombatEventType scope)
 		{
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0105: Expected O, but got Unknown
-			//IL_018a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f0: Expected O, but got Unknown
-			//IL_0309: Unknown result type (might be due to invalid IL or missing references)
-			//IL_031b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0321: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0339: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0368: Unknown result type (might be due to invalid IL or missing references)
-			//IL_036f: Expected O, but got Unknown
-			//IL_03ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03fc: Unknown result type (might be due to invalid IL or missing references)
+			List<CombatEvent> combatEvents = new List<CombatEvent>();
+			combatEvent.get_Ev();
+			CombatEvent parsedCombatEvent = null;
+			switch (CombatEvent.GetState(combatEvent.get_Ev()))
+			{
+			case CombatEventState.BUFFAPPLY:
+				parsedCombatEvent = GetCombatEvent(combatEvent, (combatEvent.get_Src().get_Self() != 1) ? CombatEventCategory.PLAYER_IN : CombatEventCategory.PLAYER_OUT, CombatEventType.BUFF);
+				break;
+			case CombatEventState.BUFFREMOVE:
+				parsedCombatEvent = GetCombatEvent(combatEvent, (combatEvent.get_Src().get_Self() == 1) ? CombatEventCategory.PLAYER_IN : CombatEventCategory.PLAYER_OUT, CombatEventType.BUFF);
+				break;
+			}
+			if (parsedCombatEvent != null)
+			{
+				combatEvents.Add(parsedCombatEvent);
+			}
+			return combatEvents;
+		}
+
+		private List<CombatEvent> HandleNormalCombatEvents(CombatEvent combatEvent, ulong selfInstId, ulong targetAgentId, CombatEventType scope)
+		{
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010b: Expected O, but got Unknown
+			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f7: Expected O, but got Unknown
+			//IL_0310: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0322: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0328: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0340: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0375: Expected O, but got Unknown
+			//IL_03f0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0402: Unknown result type (might be due to invalid IL or missing references)
-			//IL_041a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0449: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0450: Expected O, but got Unknown
+			//IL_0408: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0420: Unknown result type (might be due to invalid IL or missing references)
+			//IL_044f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0455: Expected O, but got Unknown
+			//IL_04f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04fe: Expected O, but got Unknown
 			List<CombatEvent> combatEvents = new List<CombatEvent>();
 			List<CombatEventType> types = new List<CombatEventType>();
+			Ev ev = combatEvent.get_Ev();
 			if ((int)ev.get_IsStateChange() != 0)
 			{
 				return combatEvents;
@@ -362,12 +391,13 @@ namespace Estreya.BlishHUD.Shared.State
 					}
 				}
 			}
+			combatEvent = new CombatEvent(ev, combatEvent.get_Src(), combatEvent.get_Dst(), combatEvent.get_SkillName(), combatEvent.get_Id(), combatEvent.get_Revision());
 			foreach (CombatEventType type in types)
 			{
 				List<CombatEventCategory> categories = new List<CombatEventCategory>();
-				if (src.get_Self() == 1)
+				if (combatEvent.get_Src().get_Self() == 1)
 				{
-					if (dst.get_Self() != 1)
+					if (combatEvent.get_Dst().get_Self() != 1)
 					{
 						categories.Add(CombatEventCategory.PLAYER_OUT);
 					}
@@ -376,7 +406,7 @@ namespace Estreya.BlishHUD.Shared.State
 				{
 					categories.Add(CombatEventCategory.PET_OUT);
 				}
-				if (dst.get_Self() == 1)
+				if (combatEvent.get_Dst().get_Self() == 1)
 				{
 					categories.Add(CombatEventCategory.PLAYER_IN);
 				}
@@ -386,29 +416,29 @@ namespace Estreya.BlishHUD.Shared.State
 				}
 				foreach (CombatEventCategory category in categories)
 				{
-					CombatEvent combatEvent = GetCombatEvent(ev, src, dst, category, type);
-					if (combatEvent != null)
+					CombatEvent parsedCombatEvent = GetCombatEvent(combatEvent, category, type);
+					if (parsedCombatEvent != null)
 					{
-						combatEvents.Add(combatEvent);
+						combatEvents.Add(parsedCombatEvent);
 					}
 				}
 			}
 			return combatEvents;
 		}
 
-		private CombatEvent GetCombatEvent(Ev ev, Ag src, Ag dst, CombatEventCategory category, CombatEventType type)
+		private CombatEvent GetCombatEvent(CombatEvent combatEvent, CombatEventCategory category, CombatEventType type)
 		{
-			return CombatEvent.GetState(ev) switch
+			return CombatEvent.GetState(combatEvent.get_Ev()) switch
 			{
-				CombatEventState.NORMAL => GetNormalCombatEvent(ev, src, dst, category, type), 
-				CombatEventState.STATECHANGE => GetStateChangeCombatEvent(ev, src, dst, category, type), 
-				CombatEventState.BUFFREMOVE => new BuffRemoveCombatEvent(ev, src, dst, category, type, CombatEventState.BUFFREMOVE), 
-				CombatEventState.BUFFAPPLY => new BuffApplyCombatEvent(ev, src, dst, category, type, CombatEventState.BUFFAPPLY), 
+				CombatEventState.NORMAL => GetNormalCombatEvent(combatEvent, category, type), 
+				CombatEventState.STATECHANGE => GetStateChangeCombatEvent(combatEvent, category, type), 
+				CombatEventState.BUFFREMOVE => new BuffRemoveCombatEvent(combatEvent, category, type, CombatEventState.BUFFREMOVE), 
+				CombatEventState.BUFFAPPLY => new BuffApplyCombatEvent(combatEvent, category, type, CombatEventState.BUFFAPPLY), 
 				_ => null, 
 			};
 		}
 
-		private CombatEvent GetNormalCombatEvent(Ev ev, Ag src, Ag dst, CombatEventCategory category, CombatEventType type)
+		private CombatEvent GetNormalCombatEvent(CombatEvent combatEvent, CombatEventCategory category, CombatEventType type)
 		{
 			switch (type)
 			{
@@ -426,30 +456,30 @@ namespace Estreya.BlishHUD.Shared.State
 			case CombatEventType.EVADE:
 			case CombatEventType.INVULNERABLE:
 			case CombatEventType.MISS:
-				return new DamageCombatEvent(ev, src, dst, category, type, CombatEventState.NORMAL);
+				return new DamageCombatEvent(combatEvent, category, type, CombatEventState.NORMAL);
 			case CombatEventType.HEAL:
 			case CombatEventType.HOT:
-				return new HealCombatEvent(ev, src, dst, category, type, CombatEventState.NORMAL);
+				return new HealCombatEvent(combatEvent, category, type, CombatEventState.NORMAL);
 			case CombatEventType.SHIELD_RECEIVE:
 			case CombatEventType.SHIELD_REMOVE:
-				return new BarrierCombatEvent(ev, src, dst, category, type, CombatEventState.NORMAL);
+				return new BarrierCombatEvent(combatEvent, category, type, CombatEventState.NORMAL);
 			default:
 				return null;
 			}
 		}
 
-		private CombatEvent GetStateChangeCombatEvent(Ev ev, Ag src, Ag dst, CombatEventCategory category, CombatEventType type)
+		private CombatEvent GetStateChangeCombatEvent(CombatEvent combatEvent, CombatEventCategory category, CombatEventType type)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a7: Expected I4, but got Unknown
-			StateChange isStateChange = ev.get_IsStateChange();
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Expected I4, but got Unknown
+			StateChange isStateChange = combatEvent.get_Ev().get_IsStateChange();
 			return (isStateChange - 1) switch
 			{
-				0 => new EnterCombatEvent(ev, src, dst, category, type, CombatEventState.STATECHANGE), 
-				1 => new ExitCombatEvent(ev, src, dst, category, type, CombatEventState.STATECHANGE), 
+				0 => new EnterCombatEvent(combatEvent, category, type, CombatEventState.STATECHANGE), 
+				1 => new ExitCombatEvent(combatEvent, category, type, CombatEventState.STATECHANGE), 
 				_ => null, 
 			};
 		}
@@ -463,7 +493,7 @@ namespace Estreya.BlishHUD.Shared.State
 				{
 					Logger.Debug($"Failed to fetch skill \"{combatEvent.SkillId}\". ArcDPS reports: {skillNameByArcDPS}");
 				}
-				skill2 = SkillState.UnknownSkill;
+				skill2 = SkillService.UnknownSkill;
 			}
 			else
 			{

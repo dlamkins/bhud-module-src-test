@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
+using System.Text;
 using Estreya.BlishHUD.Shared.Attributes;
+using Newtonsoft.Json;
 
 namespace Estreya.BlishHUD.Shared.Extensions
 {
@@ -91,6 +94,21 @@ namespace Estreya.BlishHUD.Shared.Extensions
 		public static T Copy<T>(this T original)
 		{
 			return (T)((object)original).Copy();
+		}
+
+		public static T CopyWithJson<T>(this T original, JsonSerializerSettings serializerSettings)
+		{
+			JsonSerializer jsonSerializer = JsonSerializer.CreateDefault(serializerSettings);
+			using MemoryStream memoryStream = new MemoryStream();
+			using (StreamWriter streamWriter = new StreamWriter(memoryStream, Encoding.UTF8, 1024, leaveOpen: true))
+			{
+				using JsonTextWriter jsonWriter = new JsonTextWriter(streamWriter);
+				jsonSerializer.Serialize(jsonWriter, original);
+			}
+			memoryStream.Position = 0L;
+			using StreamReader streamReader = new StreamReader(memoryStream);
+			using JsonTextReader jsonTextReader = new JsonTextReader(streamReader);
+			return jsonSerializer.Deserialize<T>(jsonTextReader);
 		}
 	}
 }

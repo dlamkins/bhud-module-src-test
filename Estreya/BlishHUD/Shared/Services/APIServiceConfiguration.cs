@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Threading;
 using Gw2Sharp.WebApi.V2.Models;
 
-namespace Estreya.BlishHUD.Shared.State
+namespace Estreya.BlishHUD.Shared.Services
 {
-	public class APIStateConfiguration : StateConfiguration
+	public class APIServiceConfiguration : ServiceConfiguration
 	{
 		public List<TokenPermission> NeededPermissions { get; set; } = new List<TokenPermission>();
 

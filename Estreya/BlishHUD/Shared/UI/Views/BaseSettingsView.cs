@@ -9,7 +9,7 @@ using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Estreya.BlishHUD.Shared.Controls;
 using Estreya.BlishHUD.Shared.Extensions;
-using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Services;
 using Gw2Sharp.WebApi.V2.Models;
 using Humanizer;
 using Microsoft.Xna.Framework;
@@ -25,17 +25,17 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		private static readonly Logger Logger = Logger.GetLogger<BaseSettingsView>();
 
-		private readonly SettingEventState _settingEventState;
+		private readonly SettingEventService _settingEventService;
 
-		protected BaseSettingsView(Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, SettingEventState settingEventState, BitmapFont font = null)
-			: base(apiManager, iconState, translationState, font)
+		protected BaseSettingsView(Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService, BitmapFont font = null)
+			: base(apiManager, iconService, translationService, font)
 		{
 			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 			base.LABEL_WIDTH = 250;
 			CONTROL_WIDTH = 250;
 			CONTROL_LOCATION = new Point(base.LABEL_WIDTH + 20, 0);
-			_settingEventState = settingEventState;
+			_settingEventService = settingEventService;
 		}
 
 		protected sealed override void InternalBuild(Panel parent)
@@ -94,7 +94,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			return (panel, label.Item1, colorBox);
 		}
 
-		protected (Panel Panel, Label label, TextBox textBox) RenderTextSetting(Panel parent, SettingEntry<string> settingEntry)
+		protected (Panel Panel, Label label, TextBox textBox) RenderTextSetting(Panel parent, SettingEntry<string> settingEntry, Func<string, string, Task<bool>> onBeforeChangeAction = null)
 		{
 			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 			Panel panel = GetPanel((Container)(object)parent);
@@ -109,7 +109,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 				{
 					ShowError(ex.Message);
 				}
-			});
+			}, null, clearOnEnter: false, onBeforeChangeAction);
 			((Control)textBox).set_BasicTooltipText(((SettingEntry)settingEntry).get_Description());
 			SetControlEnabledState((Control)(object)textBox, (SettingEntry)(object)settingEntry);
 			AddControlForDisabledCheck((Control)(object)textBox, (SettingEntry)(object)settingEntry);
@@ -134,8 +134,8 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 				}
 			});
 			((Control)trackbar).set_BasicTooltipText(((SettingEntry)settingEntry).get_Description());
-			_settingEventState.AddForRangeCheck((SettingEntry)(object)settingEntry);
-			_settingEventState.RangeUpdated += delegate(object s, ComplianceUpdated e)
+			_settingEventService.AddForRangeCheck((SettingEntry)(object)settingEntry);
+			_settingEventService.RangeUpdated += delegate(object s, ComplianceUpdated e)
 			{
 				//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0028: Unknown result type (might be due to invalid IL or missing references)
@@ -148,7 +148,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			};
 			((Control)trackbar).add_Disposed((EventHandler<EventArgs>)delegate
 			{
-				_settingEventState.RemoveFromRangeCheck((SettingEntry)(object)settingEntry);
+				_settingEventService.RemoveFromRangeCheck((SettingEntry)(object)settingEntry);
 			});
 			SetControlEnabledState((Control)(object)trackbar, (SettingEntry)(object)settingEntry);
 			AddControlForDisabledCheck((Control)(object)trackbar, (SettingEntry)(object)settingEntry);
@@ -173,8 +173,8 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 				}
 			});
 			((Control)trackbar).set_BasicTooltipText(((SettingEntry)settingEntry).get_Description());
-			_settingEventState.AddForRangeCheck((SettingEntry)(object)settingEntry);
-			_settingEventState.RangeUpdated += delegate(object s, ComplianceUpdated e)
+			_settingEventService.AddForRangeCheck((SettingEntry)(object)settingEntry);
+			_settingEventService.RangeUpdated += delegate(object s, ComplianceUpdated e)
 			{
 				//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0028: Unknown result type (might be due to invalid IL or missing references)
@@ -187,7 +187,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			};
 			((Control)trackbar).add_Disposed((EventHandler<EventArgs>)delegate
 			{
-				_settingEventState.RemoveFromRangeCheck((SettingEntry)(object)settingEntry);
+				_settingEventService.RemoveFromRangeCheck((SettingEntry)(object)settingEntry);
 			});
 			SetControlEnabledState((Control)(object)trackbar, (SettingEntry)(object)settingEntry);
 			AddControlForDisabledCheck((Control)(object)trackbar, (SettingEntry)(object)settingEntry);
@@ -279,8 +279,8 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		private void AddControlForDisabledCheck(Control control, SettingEntry settingEntry)
 		{
-			_settingEventState.AddForDisabledCheck(settingEntry);
-			_settingEventState.DisabledUpdated += delegate(object s, ComplianceUpdated e)
+			_settingEventService.AddForDisabledCheck(settingEntry);
+			_settingEventService.DisabledUpdated += delegate(object s, ComplianceUpdated e)
 			{
 				//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0028: Unknown result type (might be due to invalid IL or missing references)
@@ -292,7 +292,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			};
 			control.add_Disposed((EventHandler<EventArgs>)delegate
 			{
-				_settingEventState.RemoveFromDisabledCheck(settingEntry);
+				_settingEventService.RemoveFromDisabledCheck(settingEntry);
 			});
 		}
 

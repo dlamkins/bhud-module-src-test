@@ -9,7 +9,7 @@ using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.Shared.Controls;
-using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Services;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
@@ -38,18 +38,18 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		public Color DefaultColor { get; set; }
 
-		protected IconState IconState { get; }
+		protected IconService IconService { get; }
 
-		protected TranslationState TranslationState { get; }
+		protected TranslationService TranslationService { get; }
 
 		protected Panel MainPanel { get; private set; }
 
-		public BaseView(Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, BitmapFont font = null)
+		public BaseView(Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, BitmapFont font = null)
 			: this()
 		{
 			APIManager = apiManager;
-			IconState = iconState;
-			TranslationState = translationState;
+			IconService = iconService;
+			TranslationService = translationService;
 			Font = font ?? GameService.Content.get_DefaultFont16();
 		}
 
@@ -57,7 +57,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 		{
 			if (Colors == null)
 			{
-				progress.Report(TranslationState.GetTranslation("baseView-loadingColors", "Loading Colors..."));
+				progress.Report(TranslationService.GetTranslation("baseView-loadingColors", "Loading Colors..."));
 				try
 				{
 					if (APIManager != null)
@@ -290,36 +290,31 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		protected Dropdown RenderDropdown(Panel parent, Point location, int width, string[] values, string value, Action<string> onChangeAction = null, Func<string, string, Task<bool>> onBeforeChangeAction = null)
 		{
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Expected O, but got Unknown
 			if (onBeforeChangeAction == null)
 			{
 				onBeforeChangeAction = (string _, string _) => Task.FromResult(result: true);
 			}
-			Dropdown val = new Dropdown();
-			((Control)val).set_Parent((Container)(object)parent);
-			((Control)val).set_Width(width);
-			((Control)val).set_Location(location);
-			Dropdown dropdown = val;
+			Dropdown dropdown2 = new Dropdown();
+			((Control)dropdown2).set_Parent((Container)(object)parent);
+			((Control)dropdown2).set_Width(width);
+			((Control)dropdown2).set_Location(location);
+			Dropdown dropdown = dropdown2;
 			if (values != null)
 			{
 				foreach (string valueToAdd in values)
 				{
-					dropdown.get_Items().Add(valueToAdd);
+					dropdown.Items.Add(valueToAdd);
 				}
-				dropdown.set_SelectedItem(value);
+				dropdown.SelectedItem = value;
 			}
 			if (onChangeAction != null)
 			{
-				dropdown.add_ValueChanged((EventHandler<ValueChangedEventArgs>)delegate(object s, ValueChangedEventArgs e)
+				dropdown.ValueChanged += delegate(object s, ValueChangedEventArgs e)
 				{
-					Dropdown val2 = (Dropdown)((s is Dropdown) ? s : null);
-					onChangeAction?.Invoke(val2.get_SelectedItem());
-				});
+					Dropdown dropdown3 = s as Dropdown;
+					onChangeAction?.Invoke(dropdown3.SelectedItem);
+				};
 			}
 			return dropdown;
 		}

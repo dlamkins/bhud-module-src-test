@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Entities;
 using Blish_HUD.Modules.Managers;
-using Estreya.BlishHUD.EventTable.State;
+using Estreya.BlishHUD.EventTable.Services;
 using Estreya.BlishHUD.Shared.Controls.Map;
 using Estreya.BlishHUD.Shared.Controls.World;
 using Estreya.BlishHUD.Shared.Extensions;
@@ -25,7 +25,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 
 		private readonly MapUtil _mapUtil;
 
-		private readonly DynamicEventState _dynamicEventState;
+		private readonly DynamicEventService _dynamicEventService;
 
 		private readonly Gw2ApiManager _apiManager;
 
@@ -37,10 +37,18 @@ namespace Estreya.BlishHUD.EventTable.Managers
 
 		private ConcurrentQueue<(string Key, bool Add)> _entityQueue = new ConcurrentQueue<(string, bool)>();
 
-		public DynamicEventHandler(MapUtil mapUtil, DynamicEventState dynamicEventState, Gw2ApiManager apiManager, ModuleSettings moduleSettings)
+		private static TimeSpan _checkLostEntitiesInterval = TimeSpan.FromSeconds(5.0);
+
+		private double _lastLostEntitiesCheck;
+
+		private bool _notifiedLostEntities;
+
+		public event EventHandler FoundLostEntities;
+
+		public DynamicEventHandler(MapUtil mapUtil, DynamicEventService dynamicEventService, Gw2ApiManager apiManager, ModuleSettings moduleSettings)
 		{
 			_mapUtil = mapUtil;
-			_dynamicEventState = dynamicEventState;
+			_dynamicEventService = dynamicEventService;
 			_apiManager = apiManager;
 			_moduleSettings = moduleSettings;
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)CurrentMap_MapChanged);
@@ -97,24 +105,24 @@ namespace Estreya.BlishHUD.EventTable.Managers
 				{
 					return;
 				}
-				if (!(await _dynamicEventState.WaitForCompletion(TimeSpan.FromMinutes(5.0))))
+				if (!(await _dynamicEventService.WaitForCompletion(TimeSpan.FromMinutes(5.0))))
 				{
-					Logger.Debug("DynamicEventState did not finish in the given timespan. Abort.");
+					Logger.Debug("DynamicEventService did not finish in the given timespan. Abort.");
 					return;
 				}
 				int mapId = GameService.Gw2Mumble.get_CurrentMap().get_Id();
-				IOrderedEnumerable<DynamicEventState.DynamicEvent> events = _dynamicEventState.GetEventsByMap(mapId)?.Where((DynamicEventState.DynamicEvent de) => !_moduleSettings.DisabledDynamicEventIds.get_Value().Contains(de.ID)).OrderByDescending(delegate(DynamicEventState.DynamicEvent d)
+				IOrderedEnumerable<DynamicEventService.DynamicEvent> events = _dynamicEventService.GetEventsByMap(mapId)?.Where((DynamicEventService.DynamicEvent de) => !_moduleSettings.DisabledDynamicEventIds.get_Value().Contains(de.ID)).OrderByDescending(delegate(DynamicEventService.DynamicEvent d)
 				{
 					float[][] points = d.Location.Points;
 					return (points != null) ? points.Length : 0;
-				}).ThenByDescending((DynamicEventState.DynamicEvent d) => d.Location.Radius);
+				}).ThenByDescending((DynamicEventService.DynamicEvent d) => d.Location.Radius);
 				if (events == null)
 				{
 					Logger.Debug($"No events found for map {mapId}");
 					return;
 				}
 				new List<MapEntity>();
-				foreach (DynamicEventState.DynamicEvent ev in events)
+				foreach (DynamicEventService.DynamicEvent ev in events)
 				{
 					await AddDynamicEventToMap(ev);
 				}
@@ -125,7 +133,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			}
 		}
 
-		private void RemoveDynamicEventFromMap(DynamicEventState.DynamicEvent dynamicEvent)
+		private void RemoveDynamicEventFromMap(DynamicEventService.DynamicEvent dynamicEvent)
 		{
 			if (_mapEntities.ContainsKey(dynamicEvent.ID))
 			{
@@ -134,16 +142,16 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			}
 		}
 
-		public async Task AddDynamicEventToMap(DynamicEventState.DynamicEvent dynamicEvent)
+		public async Task AddDynamicEventToMap(DynamicEventService.DynamicEvent dynamicEvent)
 		{
 			RemoveDynamicEventFromMap(dynamicEvent);
 			if (!_moduleSettings.ShowDynamicEventsOnMap.get_Value() || !GameService.Gw2Mumble.get_IsAvailable())
 			{
 				return;
 			}
-			if (!(await _dynamicEventState.WaitForCompletion(TimeSpan.FromMinutes(5.0))))
+			if (!(await _dynamicEventService.WaitForCompletion(TimeSpan.FromMinutes(5.0))))
 			{
-				Logger.Debug("DynamicEventState did not finish in the given timespan. Abort.");
+				Logger.Debug("DynamicEventService did not finish in the given timespan. Abort.");
 				return;
 			}
 			try
@@ -200,13 +208,13 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			{
 				return;
 			}
-			if (!(await _dynamicEventState.WaitForCompletion(TimeSpan.FromMinutes(5.0))))
+			if (!(await _dynamicEventService.WaitForCompletion(TimeSpan.FromMinutes(5.0))))
 			{
-				Logger.Debug("DynamicEventState did not finish in the given timespan. Abort.");
+				Logger.Debug("DynamicEventService did not finish in the given timespan. Abort.");
 				return;
 			}
 			int mapId = GameService.Gw2Mumble.get_CurrentMap().get_Id();
-			IEnumerable<DynamicEventState.DynamicEvent> events = from de in _dynamicEventState.GetEventsByMap(mapId)
+			IEnumerable<DynamicEventService.DynamicEvent> events = from de in _dynamicEventService.GetEventsByMap(mapId)
 				where !_moduleSettings.DisabledDynamicEventIds.get_Value().Contains(de.ID)
 				select de;
 			if (events == null)
@@ -215,7 +223,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 				return;
 			}
 			Stopwatch sw = Stopwatch.StartNew();
-			foreach (DynamicEventState.DynamicEvent ev in events)
+			foreach (DynamicEventService.DynamicEvent ev in events)
 			{
 				await AddDynamicEventToWorld(ev);
 			}
@@ -223,7 +231,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			Logger.Debug($"Added events in {sw.ElapsedMilliseconds}ms");
 		}
 
-		private void RemoveDynamicEventFromWorld(DynamicEventState.DynamicEvent dynamicEvent)
+		private void RemoveDynamicEventFromWorld(DynamicEventService.DynamicEvent dynamicEvent)
 		{
 			if (_worldEntities.ContainsKey(dynamicEvent.ID))
 			{
@@ -232,7 +240,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			}
 		}
 
-		public async Task AddDynamicEventToWorld(DynamicEventState.DynamicEvent dynamicEvent)
+		public async Task AddDynamicEventToWorld(DynamicEventService.DynamicEvent dynamicEvent)
 		{
 			RemoveDynamicEventFromWorld(dynamicEvent);
 			if (!_moduleSettings.ShowDynamicEventInWorld.get_Value() || !GameService.Gw2Mumble.get_IsAvailable())
@@ -250,23 +258,14 @@ namespace Estreya.BlishHUD.EventTable.Managers
 				switch (dynamicEvent.Location.Type)
 				{
 				case "poly":
-				{
-					List<WorldEntity> list = entites;
-					list.Add(await GetPolygone(dynamicEvent, map, centerAsWorldMeters, WorldEventRenderCondition));
+					entites.Add(GetPolygone(dynamicEvent, map, centerAsWorldMeters, WorldEventRenderCondition));
 					break;
-				}
 				case "sphere":
-				{
-					List<WorldEntity> list = entites;
-					list.Add(await GetSphere(dynamicEvent, map, centerAsWorldMeters, WorldEventRenderCondition));
+					entites.Add(GetSphere(dynamicEvent, map, centerAsWorldMeters, WorldEventRenderCondition));
 					break;
-				}
 				case "cylinder":
-				{
-					List<WorldEntity> list = entites;
-					list.Add(await GetCylinder(dynamicEvent, map, centerAsWorldMeters, WorldEventRenderCondition));
+					entites.Add(GetCylinder(dynamicEvent, map, centerAsWorldMeters, WorldEventRenderCondition));
 					break;
-				}
 				}
 				_worldEntities.AddOrUpdate(dynamicEvent.ID, entites, (string _, List<WorldEntity> prev) => prev.Concat(entites).ToList());
 				GameService.Graphics.get_World().AddEntities((IEnumerable<IEntity>)entites);
@@ -277,10 +276,50 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			}
 		}
 
-		private async Task<WorldEntity> GetSphere(DynamicEventState.DynamicEvent ev, Map map, Vector3 centerAsWorldMeters, Func<WorldEntity, bool> renderCondition)
+		private WorldEntity GetSphere(DynamicEventService.DynamicEvent ev, Map map, Vector3 centerAsWorldMeters, Func<WorldEntity, bool> renderCondition)
 		{
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0135: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0167: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0172: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0179: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0186: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0202: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0211: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0219: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0220: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0236: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0238: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0241: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0243: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0247: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0252: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0257: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d6: Unknown result type (might be due to invalid IL or missing references)
 			int tessellation = 50;
 			int connections = tessellation / 5;
 			if (connections > tessellation)
@@ -364,10 +403,15 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			return new WorldPolygone(centerAsWorldMeters, allPoints.ToArray(), Color.get_White(), renderCondition);
 		}
 
-		private async Task<WorldEntity> GetCylinder(DynamicEventState.DynamicEvent ev, Map map, Vector3 centerAsWorldMeters, Func<WorldEntity, bool> renderCondition)
+		private WorldEntity GetCylinder(DynamicEventService.DynamicEvent ev, Map map, Vector3 centerAsWorldMeters, Func<WorldEntity, bool> renderCondition)
 		{
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0236: Unknown result type (might be due to invalid IL or missing references)
 			int tessellation = 50;
 			int connections = tessellation / 4;
 			if (connections > tessellation)
@@ -422,10 +466,25 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			return new WorldPolygone(centerAsWorldMeters, allPoints.ToArray(), Color.get_White(), renderCondition);
 		}
 
-		private async Task<WorldEntity> GetPolygone(DynamicEventState.DynamicEvent dynamicEvent, Map map, Vector3 centerAsWorldMeters, Func<WorldEntity, bool> renderCondition)
+		private WorldEntity GetPolygone(DynamicEventService.DynamicEvent dynamicEvent, Map map, Vector3 centerAsWorldMeters, Func<WorldEntity, bool> renderCondition)
 		{
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0150: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0155: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0158: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0160: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
 			Vector3[] points = ((IEnumerable<float[]>)dynamicEvent.Location.Points).Select((Func<float[], Vector3>)delegate(float[] p)
 			{
 				//IL_0015: Unknown result type (might be due to invalid IL or missing references)
@@ -498,15 +557,38 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			_moduleSettings.DisabledDynamicEventIds.remove_SettingChanged((EventHandler<ValueChangedEventArgs<List<string>>>)DisabledDynamicEventIds_SettingChanged);
 		}
 
+		private void CheckLostEntityReferences()
+		{
+			bool hasEntities = (from e in GameService.Graphics.get_World().get_Entities()
+				where e is WorldEntity
+				select e).Any();
+			if (!_notifiedLostEntities && !_moduleSettings.ShowDynamicEventInWorld.get_Value() && hasEntities)
+			{
+				try
+				{
+					this.FoundLostEntities?.Invoke(this, EventArgs.Empty);
+				}
+				catch (Exception)
+				{
+				}
+				_notifiedLostEntities = true;
+			}
+			if (_moduleSettings.ShowDynamicEventInWorld.get_Value())
+			{
+				_notifiedLostEntities = false;
+			}
+		}
+
 		public void Update(GameTime gameTime)
 		{
+			UpdateUtil.Update(CheckLostEntityReferences, gameTime, _checkLostEntitiesInterval.TotalMilliseconds, ref _lastLostEntitiesCheck);
 			(string Key, bool Add) element;
-			DynamicEventState.DynamicEvent dynamicEvent;
+			DynamicEventService.DynamicEvent dynamicEvent;
 			while (_entityQueue.TryDequeue(out element))
 			{
 				try
 				{
-					dynamicEvent = _dynamicEventState.Events.Where((DynamicEventState.DynamicEvent e) => e.ID == element.Key).First();
+					dynamicEvent = _dynamicEventService.Events.Where((DynamicEventService.DynamicEvent e) => e.ID == element.Key).First();
 					if (element.Add)
 					{
 						Task.Run(async delegate

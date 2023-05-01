@@ -2,7 +2,9 @@ using System;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
-using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Controls;
+using Estreya.BlishHUD.Shared.Services;
+using Estreya.BlishHUD.Shared.Settings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -10,22 +12,16 @@ namespace Estreya.BlishHUD.Shared.Utils
 {
 	public static class WindowUtil
 	{
-		public static StandardWindow CreateStandardWindow(string title, Type callingType, Guid guid, IconState iconState, AsyncTexture2D emblem = null)
+		public static StandardWindow CreateStandardWindow(BaseModuleSettings moduleSettings, string title, Type callingType, Guid guid, IconService iconService, AsyncTexture2D emblem = null)
 		{
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d2: Expected O, but got Unknown
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
 			string backgroundTexturePath = "textures\\setting_window_background.png";
-			Texture2D windowBackground = AsyncTexture2D.op_Implicit(iconState?.GetIcon(backgroundTexturePath));
+			Texture2D windowBackground = AsyncTexture2D.op_Implicit(iconService?.GetIcon(backgroundTexturePath));
 			if (windowBackground == null || windowBackground == Textures.get_Error())
 			{
 				throw new ArgumentNullException("windowBackground", "Module does not include texture \"" + backgroundTexturePath + "\".");
@@ -36,30 +32,30 @@ namespace Estreya.BlishHUD.Shared.Utils
 			int contentRegionPaddingX = settingsWindowSize.X;
 			Rectangle contentRegion = default(Rectangle);
 			((Rectangle)(ref contentRegion))._002Ector(contentRegionPaddingX, contentRegionPaddingY, settingsWindowSize.Width - 6, settingsWindowSize.Height - contentRegionPaddingY);
-			StandardWindow val = new StandardWindow(windowBackground, settingsWindowSize, contentRegion);
-			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((WindowBase2)val).set_Title(title);
-			((WindowBase2)val).set_SavesPosition(true);
-			((WindowBase2)val).set_Id($"{callingType.Name}_{guid}");
-			StandardWindow window = val;
+			StandardWindow standardWindow = new StandardWindow(moduleSettings, windowBackground, settingsWindowSize, contentRegion);
+			((Control)standardWindow).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			standardWindow.Title = title;
+			standardWindow.SavesPosition = true;
+			standardWindow.Id = $"{callingType.Name}_{guid}";
+			StandardWindow window = standardWindow;
 			if (emblem != null)
 			{
 				if (emblem.get_HasSwapped())
 				{
-					((WindowBase2)window).set_Emblem(AsyncTexture2D.op_Implicit(emblem));
+					window.Emblem = AsyncTexture2D.op_Implicit(emblem);
 				}
 				else
 				{
 					emblem.add_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)delegate(object s, ValueChangedEventArgs<Texture2D> e)
 					{
-						((WindowBase2)window).set_Emblem(e.get_NewValue());
+						window.Emblem = e.get_NewValue();
 					});
 				}
 			}
 			return window;
 		}
 
-		public static TabbedWindow2 CreateTabbedWindow(string title, Type callingType, Guid guid, IconState iconState, AsyncTexture2D emblem = null)
+		public static TabbedWindow2 CreateTabbedWindow(string title, Type callingType, Guid guid, IconService iconService, AsyncTexture2D emblem = null)
 		{
 			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
@@ -74,7 +70,7 @@ namespace Estreya.BlishHUD.Shared.Utils
 			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d6: Expected O, but got Unknown
 			string backgroundTexturePath = "textures\\setting_window_background.png";
-			Texture2D windowBackground = AsyncTexture2D.op_Implicit(iconState?.GetIcon(backgroundTexturePath));
+			Texture2D windowBackground = AsyncTexture2D.op_Implicit(iconService?.GetIcon(backgroundTexturePath));
 			if (windowBackground == null || windowBackground == Textures.get_Error())
 			{
 				throw new ArgumentNullException("windowBackground", "Module does not include texture \"" + backgroundTexturePath + "\".");

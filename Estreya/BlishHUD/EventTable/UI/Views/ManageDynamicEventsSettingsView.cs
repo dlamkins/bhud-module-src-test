@@ -8,8 +8,8 @@ using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.EventTable.Controls;
-using Estreya.BlishHUD.EventTable.State;
-using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.EventTable.Services;
+using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.UI.Views;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
@@ -26,7 +26,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private static Point MAIN_PADDING = new Point(20, 20);
 
-		private readonly DynamicEventState _dynamicEventState;
+		private readonly DynamicEventService _dynamicEventService;
 
 		private readonly Func<List<string>> _getDisabledEventGuids;
 
@@ -36,10 +36,10 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		public event EventHandler<ManageEventsView.EventChangedArgs> EventChanged;
 
-		public ManageDynamicEventsSettingsView(DynamicEventState dynamicEventState, Func<List<string>> getDisabledEventGuids, Gw2ApiManager apiManager, IconState iconState, TranslationState translationState, BitmapFont font = null)
-			: base(apiManager, iconState, translationState, font)
+		public ManageDynamicEventsSettingsView(DynamicEventService dynamicEventService, Func<List<string>> getDisabledEventGuids, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, BitmapFont font = null)
+			: base(apiManager, iconService, translationService, font)
 		{
-			_dynamicEventState = dynamicEventState;
+			_dynamicEventService = dynamicEventService;
 			_getDisabledEventGuids = getDisabledEventGuids;
 		}
 
@@ -47,7 +47,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 		{
 			GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
 			{
-				button.set_Icon(button.get_Checked() ? base.IconState.GetIcon("784259.png") : base.IconState.GetIcon("784261.png"));
+				button.set_Icon(button.get_Checked() ? base.IconService.GetIcon("784259.png") : base.IconService.GetIcon("784261.png"));
 			});
 		}
 
@@ -140,7 +140,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			val.set_CanScroll(true);
 			Panel = val;
 			Rectangle contentRegion = ((Container)Panel).get_ContentRegion();
-			IEnumerable<Map> maps = _maps.Where((Map m) => _dynamicEventState.Events?.Any((DynamicEventState.DynamicEvent de) => de.MapId == m.get_Id()) ?? false);
+			IEnumerable<Map> maps = _maps.Where((Map m) => _dynamicEventService.Events?.Any((DynamicEventService.DynamicEvent de) => de.MapId == m.get_Id()) ?? false);
 			TextBox val2 = new TextBox();
 			((Control)val2).set_Parent((Container)(object)Panel);
 			((Control)val2).set_Width(((DesignStandard)(ref Panel.MenuStandard)).get_Size().X);
@@ -170,7 +170,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Control)eventPanel).set_Size(new Point(contentRegion.Width - ((Control)eventPanel).get_Location().X - MAIN_PADDING.X, contentRegion.Height - 32));
 			((TextInputBase)searchBox).add_TextChanged((EventHandler<EventArgs>)delegate
 			{
-				eventPanel.FilterChildren<DataDetailsButton<DynamicEventState.DynamicEvent>>((Func<DataDetailsButton<DynamicEventState.DynamicEvent>, bool>)((DataDetailsButton<DynamicEventState.DynamicEvent> detailsButton) => ((DetailsButton)detailsButton).get_Text().ToLowerInvariant().Contains(((TextInputBase)searchBox).get_Text().ToLowerInvariant())));
+				eventPanel.FilterChildren<DataDetailsButton<DynamicEventService.DynamicEvent>>((Func<DataDetailsButton<DynamicEventService.DynamicEvent>, bool>)((DataDetailsButton<DynamicEventService.DynamicEvent> detailsButton) => ((DetailsButton)detailsButton).get_Text().ToLowerInvariant().Contains(((TextInputBase)searchBox).get_Text().ToLowerInvariant())));
 			});
 			Dictionary<string, MenuItem> menus = new Dictionary<string, MenuItem>();
 			MenuItem allEvents = val4.AddMenuItem("Current Map", (Texture2D)null);
@@ -184,7 +184,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					if (menuItem != null)
 					{
 						Map map3 = maps.Where((Map map) => map.get_Name() == menuItem.get_Text()).FirstOrDefault();
-						eventPanel.FilterChildren<DataDetailsButton<DynamicEventState.DynamicEvent>>((Func<DataDetailsButton<DynamicEventState.DynamicEvent>, bool>)((DataDetailsButton<DynamicEventState.DynamicEvent> detailsButton) => menuItem == menus["allEvents"] || detailsButton.Data.MapId == map3.get_Id()));
+						eventPanel.FilterChildren<DataDetailsButton<DynamicEventService.DynamicEvent>>((Func<DataDetailsButton<DynamicEventService.DynamicEvent>, bool>)((DataDetailsButton<DynamicEventService.DynamicEvent> detailsButton) => menuItem == menus["allEvents"] || detailsButton.Data.MapId == map3.get_Id()));
 					}
 				});
 			});
@@ -204,7 +204,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				((Container)eventPanel).get_Children().ToList().ForEach(delegate(Control control)
 				{
 					menus["allEvents"].get_Selected();
-					DataDetailsButton<DynamicEventState.DynamicEvent> dataDetailsButton2 = control as DataDetailsButton<DynamicEventState.DynamicEvent>;
+					DataDetailsButton<DynamicEventService.DynamicEvent> dataDetailsButton2 = control as DataDetailsButton<DynamicEventService.DynamicEvent>;
 					if (dataDetailsButton2 != null && ((Control)dataDetailsButton2).get_Visible())
 					{
 						Control obj3 = ((IEnumerable<Control>)((Container)dataDetailsButton2).get_Children()).Last();
@@ -226,7 +226,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				((Container)eventPanel).get_Children().ToList().ForEach(delegate(Control control)
 				{
 					menus["allEvents"].get_Selected();
-					DataDetailsButton<DynamicEventState.DynamicEvent> dataDetailsButton = control as DataDetailsButton<DynamicEventState.DynamicEvent>;
+					DataDetailsButton<DynamicEventService.DynamicEvent> dataDetailsButton = control as DataDetailsButton<DynamicEventService.DynamicEvent>;
 					if (dataDetailsButton != null && ((Control)dataDetailsButton).get_Visible())
 					{
 						Control obj2 = ((IEnumerable<Control>)((Container)dataDetailsButton).get_Children()).Last();
@@ -238,13 +238,13 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					}
 				});
 			});
-			List<DynamicEventState.DynamicEvent> eventList = _dynamicEventState.Events.ToList();
+			List<DynamicEventService.DynamicEvent> eventList = _dynamicEventService.Events.ToList();
 			foreach (Map map2 in maps.Where((Map m) => m.get_Id() == GameService.Gw2Mumble.get_CurrentMap().get_Id()))
 			{
-				foreach (DynamicEventState.DynamicEvent e2 in eventList.Where((DynamicEventState.DynamicEvent e) => e.MapId == map2.get_Id()))
+				foreach (DynamicEventService.DynamicEvent e2 in eventList.Where((DynamicEventService.DynamicEvent e) => e.MapId == map2.get_Id()))
 				{
 					bool enabled = !_getDisabledEventGuids().Contains(e2.ID);
-					DataDetailsButton<DynamicEventState.DynamicEvent> obj = new DataDetailsButton<DynamicEventState.DynamicEvent>
+					DataDetailsButton<DynamicEventService.DynamicEvent> obj = new DataDetailsButton<DynamicEventService.DynamicEvent>
 					{
 						Data = e2
 					};
@@ -252,8 +252,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					((DetailsButton)obj).set_Text(e2.Name);
 					((DetailsButton)obj).set_ShowToggleButton(true);
 					((DetailsButton)obj).set_FillColor(Color.get_LightBlue());
-					DataDetailsButton<DynamicEventState.DynamicEvent> button = obj;
-					DynamicEventState.DynamicEvent.DynamicEventIcon icon = e2.Icon;
+					DataDetailsButton<DynamicEventService.DynamicEvent> button = obj;
+					DynamicEventService.DynamicEvent.DynamicEventIcon icon = e2.Icon;
 					int num;
 					if (icon == null)
 					{
@@ -268,7 +268,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					{
 						GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
 						{
-							((DetailsButton)button).set_Icon(base.IconState.GetIcon($"{e2.Icon.FileID}.png"));
+							((DetailsButton)button).set_Icon(base.IconService.GetIcon($"{e2.Icon.FileID}.png"));
 						});
 					}
 					GlowButton val9 = new GlowButton();
@@ -281,8 +281,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					{
 						this.EventChanged?.Invoke(this, new ManageEventsView.EventChangedArgs
 						{
-							OldState = !eventArgs.get_Checked(),
-							NewState = eventArgs.get_Checked(),
+							OldService = !eventArgs.get_Checked(),
+							NewService = eventArgs.get_Checked(),
 							EventSettingKey = button.Data.ID
 						});
 						toggleButton.set_Checked(eventArgs.get_Checked());

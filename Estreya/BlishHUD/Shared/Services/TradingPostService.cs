@@ -11,9 +11,9 @@ using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 
-namespace Estreya.BlishHUD.Shared.State
+namespace Estreya.BlishHUD.Shared.Services
 {
-	public class TradingPostState : APIState<TradingPostState.TransactionMapping>
+	public class TradingPostService : APIService<TradingPostService.TransactionMapping>
 	{
 		public enum TransactionMappingType
 		{
@@ -29,7 +29,7 @@ namespace Estreya.BlishHUD.Shared.State
 			public List<Transaction> Transactions;
 		}
 
-		private readonly ItemState _itemState;
+		private readonly ItemService _itemService;
 
 		public TransactionMappingType Scopes { get; set; } = TransactionMappingType.Own;
 
@@ -40,10 +40,10 @@ namespace Estreya.BlishHUD.Shared.State
 
 		public List<PlayerTransaction> OwnTransactions => base.APIObjectList.Where((TransactionMapping mapping) => mapping.Type == TransactionMappingType.Own).SelectMany((TransactionMapping mapping) => mapping.Transactions.Select((Transaction transactions) => transactions as PlayerTransaction)).ToList();
 
-		public TradingPostState(APIStateConfiguration configuration, Gw2ApiManager apiManager, ItemState itemState)
+		public TradingPostService(APIServiceConfiguration configuration, Gw2ApiManager apiManager, ItemService itemService)
 			: base(apiManager, configuration)
 		{
-			_itemState = itemState;
+			_itemService = itemService;
 		}
 
 		protected override async Task<List<TransactionMapping>> Fetch(Gw2ApiManager apiManager, IProgress<string> progress)
@@ -121,13 +121,13 @@ namespace Estreya.BlishHUD.Shared.State
 					}
 				}
 			}
-			if ((transactions.Count > 0 || loadBuy || loadSell) && !(await _itemState.WaitForCompletion(TimeSpan.FromMinutes(10.0))))
+			if ((transactions.Count > 0 || loadBuy || loadSell) && !(await _itemService.WaitForCompletion(TimeSpan.FromMinutes(10.0))))
 			{
-				Logger.Warn("ItemState did not complete in the predefined timespan.");
+				Logger.Warn("ItemService did not complete in the predefined timespan.");
 			}
 			if (loadBuy || loadSell)
 			{
-				List<Item> tradeableItems = _itemState.Items.Where((Item item) => !item.Flags.Any((ItemFlag flag) => (int)flag == 2 || (int)flag == 14)).ToList();
+				List<Item> tradeableItems = _itemService.Items.Where((Item item) => !item.Flags.Any((ItemFlag flag) => (int)flag == 2 || (int)flag == 14)).ToList();
 				progress.Report("Loading global buys/sells...");
 				foreach (IEnumerable<Item> itemChunk in tradeableItems.ChunkBy(200))
 				{
@@ -192,7 +192,7 @@ namespace Estreya.BlishHUD.Shared.State
 			{
 				foreach (Transaction transaction2 in item6.Transactions)
 				{
-					transaction2.Item = _itemState.GetItemById(transaction2.ItemId);
+					transaction2.Item = _itemService.GetItemById(transaction2.ItemId);
 				}
 			}
 			return transactions;

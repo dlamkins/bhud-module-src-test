@@ -8,30 +8,30 @@ using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 
-namespace Estreya.BlishHUD.Shared.State
+namespace Estreya.BlishHUD.Shared.Services
 {
-	public class WorldbossState : APIState<string>
+	public class WorldbossService : APIService<string>
 	{
-		private readonly AccountState _accountState;
+		private readonly AccountService _accountService;
 
 		public event EventHandler<string> WorldbossCompleted;
 
 		public event EventHandler<string> WorldbossRemoved;
 
-		public WorldbossState(APIStateConfiguration configuration, Gw2ApiManager apiManager, AccountState accountState)
+		public WorldbossService(APIServiceConfiguration configuration, Gw2ApiManager apiManager, AccountService accountService)
 			: base(apiManager, configuration)
 		{
-			_accountState = accountState;
-			base.APIObjectAdded += APIState_APIObjectAdded;
-			base.APIObjectRemoved += APIState_APIObjectRemoved;
+			_accountService = accountService;
+			base.APIObjectAdded += APIService_APIObjectAdded;
+			base.APIObjectRemoved += APIService_APIObjectRemoved;
 		}
 
-		private void APIState_APIObjectRemoved(object sender, string e)
+		private void APIService_APIObjectRemoved(object sender, string e)
 		{
 			this.WorldbossRemoved?.Invoke(this, e);
 		}
 
-		private void APIState_APIObjectAdded(object sender, string e)
+		private void APIService_APIObjectAdded(object sender, string e)
 		{
 			this.WorldbossCompleted?.Invoke(this, e);
 		}
@@ -43,13 +43,13 @@ namespace Estreya.BlishHUD.Shared.State
 
 		protected override void DoUnload()
 		{
-			base.APIObjectAdded -= APIState_APIObjectAdded;
-			base.APIObjectRemoved -= APIState_APIObjectRemoved;
+			base.APIObjectAdded -= APIService_APIObjectAdded;
+			base.APIObjectRemoved -= APIService_APIObjectRemoved;
 		}
 
 		protected override async Task<List<string>> Fetch(Gw2ApiManager apiManager, IProgress<string> progress)
 		{
-			Account account = _accountState.Account;
+			Account account = _accountService.Account;
 			DateTime obj = ((account != null) ? account.get_LastModified().UtcDateTime : DateTime.MinValue);
 			DateTime now = DateTime.UtcNow;
 			DateTime lastResetUTC = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0, DateTimeKind.Utc);

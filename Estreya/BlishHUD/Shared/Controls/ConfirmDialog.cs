@@ -8,7 +8,7 @@ using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Estreya.BlishHUD.Shared.Extensions;
-using Estreya.BlishHUD.Shared.State;
+using Estreya.BlishHUD.Shared.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -26,7 +26,7 @@ namespace Estreya.BlishHUD.Shared.Controls
 
 		private readonly string _message;
 
-		private IconState _iconState;
+		private IconService _iconService;
 
 		private DialogResult _dialogResult;
 
@@ -65,7 +65,7 @@ namespace Estreya.BlishHUD.Shared.Controls
 			}
 		}
 
-		public ConfirmDialog(string title, string message, IconState iconState, ButtonDefinition[] buttons = null)
+		public ConfirmDialog(string title, string message, IconService iconService, ButtonDefinition[] buttons = null)
 		{
 			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
@@ -86,7 +86,7 @@ namespace Estreya.BlishHUD.Shared.Controls
 			_parsedTitle = _title;
 			_message = message;
 			_parsedMessage = _message;
-			_iconState = iconState;
+			_iconService = iconService;
 			if (buttons != null)
 			{
 				_buttons = ((IEnumerable<ButtonDefinition>)buttons).Select((Func<ButtonDefinition, (StandardButton, DialogResult)>)delegate(ButtonDefinition x)
@@ -328,7 +328,7 @@ namespace Estreya.BlishHUD.Shared.Controls
 			}
 			_buttonPanel = null;
 			GameService.Input.get_Keyboard().remove_KeyPressed((EventHandler<KeyboardEventArgs>)Keyboard_KeyPressed);
-			_iconState = null;
+			_iconService = null;
 			_waitHandle?.Set();
 			_waitHandle?.Dispose();
 			_waitHandle = null;
