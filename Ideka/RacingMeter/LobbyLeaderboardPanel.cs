@@ -2,7 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.Input;
+using Ideka.NetCommon;
 using Ideka.RacingMeter.Lib;
 using Ideka.RacingMeter.Lib.RacingServer;
 using Microsoft.Xna.Framework;
@@ -12,17 +15,19 @@ namespace Ideka.RacingMeter
 {
 	public class LobbyLeaderboardPanel : Container
 	{
-		private static readonly Color FinishedColor = Color.get_Yellow() * 0.05f;
-
 		private readonly RacingClient Client;
 
-		private readonly List<MenuItem> _itemList = new List<MenuItem>();
+		private readonly List<ProgressMenuItem> _itemList = new List<ProgressMenuItem>();
 
 		private readonly Panel _panel;
 
 		private readonly Scrollbar _scrollbar;
 
 		private readonly ReMenu _menu;
+
+		private readonly GlowButton _configButton;
+
+		private readonly LobbyConfigMenu _configMenu;
 
 		private (int frames, float target) _scrollTarget;
 
@@ -35,6 +40,11 @@ namespace Ideka.RacingMeter
 			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0043: Expected O, but got Unknown
+			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b0: Expected O, but got Unknown
 			Client = client;
 			Panel val = new Panel();
 			((Control)val).set_Parent((Container)(object)this);
@@ -48,38 +58,24 @@ namespace Ideka.RacingMeter
 			((Container)reMenu).set_WidthSizingMode((SizingMode)2);
 			((Container)reMenu).set_HeightSizingMode((SizingMode)1);
 			_menu = reMenu;
+			GlowButton val2 = new GlowButton();
+			((Control)val2).set_Parent((Container)(object)this);
+			val2.set_Icon(AsyncTexture2D.FromAssetId(157109));
+			val2.set_ActiveIcon(AsyncTexture2D.FromAssetId(157110));
+			_configButton = val2;
+			_configMenu = new LobbyConfigMenu();
 			UpdateLayout();
-			Client.RaceStarted += new Action(RaceStarted);
-			Client.RaceCanceled += new Action(RaceCanceled);
-			Client.UserUpdated += new Action<User, bool>(UserUpdated);
-			Client.PositionUpdated += new Action<User>(PositionUpdated);
+			((Control)_configButton).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				_configMenu.Show((Control?)(object)_configButton);
+			});
+			Client.LobbyChanged += new Action<Lobby>(LobbyChanged);
 		}
 
-		private void RaceStarted()
+		public override void UpdateContainer(GameTime gameTime)
 		{
-			UpdatePositions();
-		}
-
-		private void RaceCanceled()
-		{
-			UpdatePositions();
-		}
-
-		private void UserUpdated(User user, bool leaving)
-		{
-			UpdatePositions();
-		}
-
-		private void PositionUpdated(User user)
-		{
-			UpdatePositions();
-		}
-
-		private void UpdatePositions()
-		{
-			//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
-			Lobby lobby = Client?.Lobby;
+			((Container)this).UpdateContainer(gameTime);
+			Lobby lobby = Client.Lobby;
 			if (lobby == null)
 			{
 				return;
@@ -97,38 +93,63 @@ namespace Ideka.RacingMeter
 			lock (_itemList)
 			{
 				int i = 0;
-				foreach (var (racer, percent) in from r in lobby.Racers
-					select (r, route.ProgressPercent(r.RacerData, lobby.Settings.Laps)) into r
-					orderby r.percent descending, r.racer.RacerData.Times.Last()
-					select r)
+				foreach (var (racer, percent) in lobby.GetLeaderboard(route))
 				{
-					if (racer.RacerData.RaceReady || racer.RacerData.Times.Any())
+					if (!racer.RacerData.RaceReady && !racer.RacerData.Times.Any())
 					{
-						MenuItem item;
-						if (_itemList.Count <= i)
-						{
-							SaveScroll(2);
-							OnelineMenuItem onelineMenuItem = new OnelineMenuItem("");
-							((Control)onelineMenuItem).set_Parent((Container)(object)_menu);
-							item = (MenuItem)(object)onelineMenuItem;
-							_itemList.Add(item);
-						}
-						else
-						{
-							item = _itemList[i];
-						}
-						item.set_Text($"{i + 1}. {racer.Id}");
-						((Control)item).set_BasicTooltipText(racer.Id);
-						((Control)item).set_BackgroundColor((percent < 1.0) ? Color.get_Transparent() : FinishedColor);
-						i++;
+						continue;
 					}
+					ProgressMenuItem item;
+					if (_itemList.Count <= i)
+					{
+						SaveScroll(2);
+						ProgressMenuItem progressMenuItem = new ProgressMenuItem("");
+						((Control)progressMenuItem).set_Parent((Container)(object)_menu);
+						item = progressMenuItem;
+						_itemList.Add(item);
+					}
+					else
+					{
+						item = _itemList[i];
+					}
+					ProgressMenuItem progressMenuItem2 = item;
+					string text = $"{i + 1}. {racer.DisplayName}";
+					object obj;
+					if (percent >= 1.0 || lobby.IsAfterRace(racer.RacerData))
+					{
+						RacerTime time = racer.RacerData.LastTime;
+						if (time != null)
+						{
+							obj = " [" + time.Time.Formatted() + "]";
+							goto IL_015f;
+						}
+					}
+					obj = "";
+					goto IL_015f;
+					IL_015f:
+					((MenuItem)progressMenuItem2).set_Text(text + (string)obj);
+					((Control)item).set_BasicTooltipText(racer.IsGuest ? StringExtensions.Format(Strings.LabelGuest, racer.DisplayName) : racer.Id);
+					item.Progress = (lobby.IsAfterRace(racer.RacerData) ? 1.0 : percent);
+					i++;
 				}
-				foreach (MenuItem item2 in _itemList.Skip(i).ToList())
+				foreach (ProgressMenuItem item2 in _itemList.Skip(i).ToList())
 				{
 					_itemList.RemoveAt(i);
 					SaveScroll(2);
 					((Control)item2).Dispose();
 				}
+			}
+		}
+
+		private void LobbyChanged(Lobby? obj)
+		{
+			lock (_itemList)
+			{
+				foreach (ProgressMenuItem item in _itemList)
+				{
+					((Control)item).Dispose();
+				}
+				_itemList.Clear();
 			}
 		}
 
@@ -160,15 +181,15 @@ namespace Ideka.RacingMeter
 			{
 				((Control)(object)_panel).WidthFillRight();
 				((Control)(object)_panel).HeightFillDown();
+				((Control)_configButton).set_Top(((Control)_panel).get_Top() + 2);
+				((Control)_configButton).set_Right(((Control)_panel).get_Right());
 			}
 		}
 
 		protected override void DisposeControl()
 		{
-			Client.RaceStarted -= new Action(RaceStarted);
-			Client.RaceCanceled -= new Action(RaceCanceled);
-			Client.UserUpdated -= new Action<User, bool>(UserUpdated);
-			Client.PositionUpdated -= new Action<User>(PositionUpdated);
+			Client.LobbyChanged -= new Action<Lobby>(LobbyChanged);
+			_configMenu.Dispose();
 			((Container)this).DisposeControl();
 		}
 	}

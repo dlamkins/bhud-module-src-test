@@ -34,9 +34,11 @@ Online features disabled.</value></data>
   <data name="NotifyRaceStartFailed"><value>Race start failed.</value></data>
   <data name="Unavailable"><value>Unavailable</value></data>
   <data name="LabelFinishTime"><value>Finish Time: {0}</value></data>
+  <data name="SettingOnlineDefaultNicknameText"><value>Nickname to use by default when connecting to race online.</value></data>
   <data name="SettingShowGuides"><value>Show Race Guides</value></data>
   <data name="LabelGhostTime"><value>Time: {0}</value></data>
   <data name="LabelRaceUpdated"><value>Updated: {0}</value></data>
+  <data name="SettingOnlineDefaultNickname"><value>Online Default Nickname</value></data>
   <data name="OnlineRacing"><value>Online Racing</value></data>
   <data name="LobbyMaxUsers"><value>Max Users</value></data>
   <data name="ExceptionInvalidRaceMap"><value>Invalid race map.</value></data>
@@ -44,6 +46,7 @@ Online features disabled.</value></data>
   <data name="RaceEditor"><value>Race Editor</value></data>
   <data name="SettingBeetleDriftKeyText"><value>Set this to enable the Roller Beetle drift-hold indicator. It should match the key you use to drift.</value></data>
   <data name="LobbySettings"><value>Lobby Settings</value></data>
+  <data name="NicknameTooltip"><value>Nicknames are optional and not checked for uniqueness.</value></data>
   <data name="SettingAutoLocalGhost"><value>Autoload Best Local Ghost</value></data>
   <data name="UnavailableOffline"><value>Unavailable in offline mode.</value></data>
   <data name="LobbyUsers"><value>Users</value></data>
@@ -73,6 +76,8 @@ Online features disabled.</value></data>
   <data name="SettingShownCheckpoints"><value>Shown Checkpoints</value></data>
   <data name="SwapPrev"><value>Prev Swap</value></data>
   <data name="SwapNext"><value>Next Swap</value></data>
+  <data name="OnlineNoticeLaps"><value>Laps: {0} / {1}
+Lap time: {2}</value></data>
   <data name="RaceTypeOfficial"><value>Official</value></data>
   <data name="SettingSpeedometerAnchorY"><value>Speedometer Position</value></data>
   <data name="SupportStatusFaulted"><value>Couldn't connect to the server.
@@ -91,6 +96,7 @@ Online features disabled.</value></data>
   <data name="Radius"><value>Radius</value></data>
   <data name="RaceId"><value>Race ID</value></data>
   <data name="AvatarSnapXY"><value>Snap to Avatar XY</value></data>
+  <data name="CopyToClipboard"><value>Copy to Clipboard</value></data>
   <data name="NewRace"><value>New Race</value></data>
   <data name="SettingRacerVAlignment"><value>Racing UI Vertical Alignment</value></data>
   <data name="OnlineNoticeGo"><value>GO!</value></data>
@@ -112,6 +118,7 @@ Start a race to see the UI while you adjust it.</value></data>
   <data name="LobbyRaceLaps"><value>Race Laps</value></data>
   <data name="RaceLocal"><value>(local)</value></data>
   <data name="UnsavedChanges"><value>You have unsaved changes.</value></data>
+  <data name="SettingOnlineMarkRacers"><value>Mark Racers</value></data>
   <data name="GhostLocalUploadedTooltip"><value>This is a local ghost.</value></data>
   <data name="NotifyNoRaceSelected"><value>No race selected.</value></data>
   <data name="SettingCheckpointAlphaText"><value>Alpha multiplier of displayed checkpoints.</value></data>
@@ -127,7 +134,10 @@ Start a race to see the UI while you adjust it.</value></data>
   <data name="SupportStatusTooltipFaulted"><value>The server couldn't be reached. This may mean it's currently offline, or an update is required.</value></data>
   <data name="ErrorGhostLoad"><value>Error loading ghost</value></data>
   <data name="LocalRaces"><value>Local Races</value></data>
+  <data name="LabelLap"><value>Lap: {0} / {1}</value></data>
+  <data name="NicknameInput"><value>Nickname</value></data>
   <data name="PointDescription"><value>Point {0}: {1}</value></data>
+  <data name="NotifyConnectingTo"><value>Connecting to {0}...</value></data>
   <data name="LocalGhosts"><value>Local Ghosts</value></data>
   <data name="SettingSFXVolumeMultiplier"><value>SFX Volume Multiplier</value></data>
   <data name="GhostDescribeRemote"><value>{0} (remote)</value></data>
@@ -141,6 +151,7 @@ Start a race to see the UI while you adjust it.</value></data>
   <data name="ExceptionOfflineMode"><value>Unavailable in offline mode.</value></data>
   <data name="SettingShowSpeedometerText"><value>Disable to keep the speedometer hidden</value></data>
   <data name="ExceptionPointRadius"><value>Point radius cannot be zero or negative.</value></data>
+  <data name="ErrorDisconnect"><value>Error disconnecting</value></data>
   <data name="UploadGhost"><value>Upload Ghost</value></data>
   <data name="SettingToggleDebugText"><value>Toggle visibility of debug information.</value></data>
   <data name="RaceIdTooltip"><value>Race ID is randomly generated and not meant to be be changed.</value></data>
@@ -148,6 +159,8 @@ Start a race to see the UI while you adjust it.</value></data>
   <data name="Yes"><value>Yes</value></data>
   <data name="ConfirmRaceDeletion"><value>This action cannot be undone.</value></data>
   <data name="Ghost"><value>Ghost</value></data>
+  <data name="Guest"><value>Guest</value></data>
+  <data name="Disconnect"><value>Disconnect</value></data>
   <data name="ExceptionApiAccount"><value>Failed to get GW2 account from API.</value></data>
   <data name="Races"><value>Races</value></data>
   <data name="SettingSkiffMeter"><value>Skiff Meter</value></data>
@@ -156,6 +169,8 @@ Start a race to see the UI while you adjust it.</value></data>
   <data name="LabelLast"><value>Last: {0}</value></data>
   <data name="LabelPing"><value>Ping: {0}ms</value></data>
   <data name="LabelRace"><value>Race: {0}</value></data>
+  <data name="OnlineNoticeRaceFinished"><value>{0} place
+{1}</value></data>
   <data name="LabelLobbyRacers"><value>Racers: {0} / {1}</value></data>
   <data name="UpdateLeaderboard"><value>Update Leaderboard</value></data>
   <data name="SettingSFXVolumeMultiplierText"><value>Volume multiplier for sound effects. This is applied as a percentage, after Blish's volume setting. Set to 0 to disable all sound effects.</value></data>
@@ -164,6 +179,7 @@ Start a race to see the UI while you adjust it.</value></data>
   <data name="SettingAutoLocalGhostText"><value>Automatically load your best local ghost when starting a race (unless you load a specific one).</value></data>
   <data name="ExceptionUnauthenticated"><value>Authentication failed</value></data>
   <data name="SettingBeetleDriftKey"><value>Beetle Drift Key</value></data>
+  <data name="ErrorMismatchedVersion"><value>Mismatched version: {0} != {1}</value></data>
   <data name="LobbyRaceSet"><value>Set this Race</value></data>
   <data name="InsertAfter"><value>Insert After</value></data>
   <data name="SettingShowSpeedometer"><value>Show Speedometer</value></data>
@@ -178,7 +194,9 @@ Enabling this option also mutes racing SFX, since official races have SFX alread
   <data name="ImportCsv"><value>Import .csv Race</value></data>
   <data name="SettingNormalizedOfficialCheckpoints"><value>Normalized Checkpoints in Official Races</value></data>
   <data name="ExceptionMinimumCheckpoints"><value>The last two checkpoints cannot be removed.</value></data>
+  <data name="SettingOnlineUrl"><value>Online Racing URL</value></data>
   <data name="RaceLocalAuthorTooltip"><value>This is a local race. Author data is only recorded on upload.</value></data>
+  <data name="SettingOnlineUrlText"><value>URL of the server to connect to for online realtime racing. Leave empty to use the default server, if available.</value></data>
   <data name="UnloadRace"><value>Unload Race</value></data>
   <data name="NotifyLogInRequired"><value>Log in required.</value></data>
   <data name="SettingSkimmerMeter"><value>Skimmer Meter</value></data>
@@ -186,8 +204,8 @@ Enabling this option also mutes racing SFX, since official races have SFX alread
   <data name="SettingRacerVAlignmentText"><value>Vertical alignment of the racing UI.
 Start a race to see the UI while you adjust it.</value></data>
   <data name="SettingCheckpointLineThickness"><value>Checkpoint Line Thickness</value></data>
-  <data name="ClickToCopy"><value>Click to copy</value></data>
   <data name="ExceptionStillConnecting"><value>Server connectivity has not yet been verified.</value></data>
+  <data name="ConnectGuest"><value>Connect as a Guest</value></data>
   <data name="UnloadGhost"><value>Unload Ghost</value></data>
   <data name="OnlineNoticeRaceCanceled"><value>Race canceled</value></data>
   <data name="ExceptionInvalidRaceType"><value>Invalid race type.</value></data>
@@ -196,11 +214,12 @@ Start a race to see the UI while you adjust it.</value></data>
   <data name="SupportStatusUnchecked"><value>Connecting to server...</value></data>
   <data name="SupportStatusTooltipNo"><value>Please update the module to continue using online features.</value></data>
   <data name="PointTypeReset"><value>Reset</value></data>
+  <data name="NicknameUpdate"><value>Update Nickname</value></data>
   <data name="PointTypeCheckpoint"><value>Checkpoint</value></data>
   <data name="PointTypeGuide"><value>Guide</value></data>
   <data name="ErrorRaceLoad"><value>Race load failed</value></data>
   <data name="NotifyGhostAlreadyBetter"><value>You already have a better time on this race.</value></data>
-  <data name="SettingShownCheckpointsText"><value>Number of checkpoints to show while racing. Set this to 0 to always show all checkpoints.</value></data>
+  <data name="SettingShownCheckpointsText"><value>Number of checkpoints to show while racing. Set this to -1 to always show all checkpoints.</value></data>
   <data name="SettingRacerAnchorY"><value>Racing UI Vertical Position</value></data>
   <data name="SettingRacerAnchorX"><value>Racing UI Horizontal Position</value></data>
   <data name="ErrorFormat"><value>{0}: {1}</value></data>
@@ -221,6 +240,7 @@ Start a race to see the UI while you adjust it.</value></data>
   <data name="TestRace"><value>Test Race</value></data>
   <data name="AvatarSnapXYZ"><value>Snap to Avatar</value></data>
   <data name="RacePoints"><value>Race Points</value></data>
+  <data name="LabelGuest"><value>Guest: {0}</value></data>
   <data name="LabelRaceCheckpoints"><value>Checkpoints: {0}</value></data>
   <data name="LobbyLeaderboard"><value>Leaderboard</value></data>
   <data name="SettingMumblePollingRate"><value>Mumble Polling Rate</value></data>
@@ -235,6 +255,7 @@ Start a race to see the UI while you adjust it.</value></data>
   <data name="GhostLocal"><value>(local)</value></data>
   <data name="GhostLabel"><value>Ghost: {0}</value></data>
   <data name="LabelCurrentRace"><value>Current race: {0}</value></data>
+  <data name="SettingOnlineMarkRacersText"><value>Draw a mark on all racers. Mostly intended for debugging purposes, useful for racing across regions.</value></data>
   <data name="LabelCurrentGhost"><value>Current ghost: {0}</value></data>
   <data name="None"><value>(none)</value></data>
   <data name="Next"><value>Next</value></data>

@@ -61,22 +61,24 @@ namespace Ideka.RacingMeter
 
 		private static void Report(Logger logger, Exception? exception, string? message, string? errorMessage)
 		{
-			string message2 = message;
 			string errorMessage2 = errorMessage;
+			Exception exception2 = exception;
+			string message2 = message;
 			if (message2 != null)
 			{
 				GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
 				{
-					ScreenNotification.ShowNotification(string.Format(Strings.ErrorFormat, message2, errorMessage2 ?? Strings.ExceptionGeneric), (NotificationType)2, (Texture2D)null, 4);
+					string arg = errorMessage2 ?? (exception2 as AggregateException)?.InnerException.Message ?? exception2?.Message ?? Strings.ExceptionGeneric;
+					ScreenNotification.ShowNotification(string.Format(Strings.ErrorFormat, message2, arg), (NotificationType)2, (Texture2D)null, 4);
 				});
 			}
 			if (errorMessage2 == null)
 			{
-				logger.Error(exception, message2);
+				logger.Error(exception2, message2);
 			}
 			else
 			{
-				logger.Warn(exception, message2 ?? errorMessage2);
+				logger.Warn(exception2, message2 ?? errorMessage2);
 			}
 		}
 	}

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
+using Ideka.NetCommon;
 using Ideka.RacingMeter.Lib.RacingServer;
 using Microsoft.Xna.Framework;
 
@@ -92,8 +93,8 @@ namespace Ideka.RacingMeter
 				return;
 			}
 			((Control)item).set_BackgroundColor((user2.Id == Client.UserId) ? SelfColor : ((!user2.IsOnline) ? OfflineColor : Color.get_Transparent()));
-			item.set_Text("[" + (user2.LobbyData.IsHost ? "H" : "") + (user2.LobbyData.IsRacer ? "R" : "") + "] " + user2.Id);
-			((Control)item).set_BasicTooltipText(user2.Id);
+			item.set_Text("[" + (user2.LobbyData.IsHost ? "H" : "") + (user2.LobbyData.IsRacer ? "R" : "") + "] " + user2.DisplayName);
+			((Control)item).set_BasicTooltipText(user2.IsGuest ? StringExtensions.Format(Strings.LabelGuest, user2.DisplayName) : user2.Id);
 		}
 
 		protected override void DisposeControl()

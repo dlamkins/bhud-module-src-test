@@ -40,10 +40,6 @@ namespace Ideka.RacingMeter
 
 		private RacePoint? _inPoint;
 
-		private readonly Primitive _ghostA;
-
-		private readonly Primitive _ghostB;
-
 		private readonly RectAnchor _hud;
 
 		public FullRace? FullRace { get; private set; }
@@ -117,14 +113,8 @@ namespace Ideka.RacingMeter
 
 		public RaceRunner(MeasurerRealtime measurer, int testCheckpoint = -1)
 		{
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
 			_measurer = measurer;
 			TestCheckpoint = testCheckpoint;
-			_ghostA = Primitive.HorizontalCircle(1f, 100);
-			_ghostB = new Primitive(Vector3.get_Zero(), new Vector3(0f, 1f, 0f));
 			_hud = _dc.Add(new RunnerHUD(this));
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)MapChanged);
 			_measurer.NewPosition += new Action<PosSnapshot>(NewPosition);
@@ -388,24 +378,8 @@ namespace Ideka.RacingMeter
 			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
 			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0154: Unknown result type (might be due to invalid IL or missing references)
 			RaceRunFx runFx = _runFx;
 			if (runFx == null)
 			{
@@ -433,17 +407,13 @@ namespace Ideka.RacingMeter
 			}
 			if (Ghost != null && _racing != null)
 			{
-				GhostSnapshot snapshot = Ghost.SnapshotAt(RaceTime);
-				Matrix trs = Matrix.CreateScale(1f) * Matrix.CreateRotationZ(0f - (float)Math.Atan2(snapshot.Front.X, snapshot.Front.Y)) * Matrix.CreateTranslation(snapshot.Position);
-				_ghostA.Transformed(trs).ToScreen().Draw(spriteBatch, RaceDrawer.GhostColor, 2f);
-				_ghostB.Transformed(trs).ToScreen().Draw(spriteBatch, RaceDrawer.GhostColor, 2f);
+				DrawGhost(spriteBatch, Ghost.SnapshotAt(RaceTime));
 			}
 			spriteBatch.End();
 			SpriteBatchExtensions.Begin(spriteBatch, base.UIParams);
-			Rectangle rect = default(Rectangle);
-			((Rectangle)(ref rect))._002Ector(0, 0, ((Control)Control.get_Graphics().get_SpriteScreen()).get_Width(), ((Control)Control.get_Graphics().get_SpriteScreen()).get_Height());
-			ShapeExtensions.DrawRectangle(spriteBatch, RectangleF.op_Implicit(rect), Color.get_Black(), 1f, 0f);
-			_hud.Draw(spriteBatch, (Control)(object)this, RectangleF.op_Implicit(rect));
+			spriteBatch.End();
+			SpriteBatchExtensions.Begin(spriteBatch, base.UIParams);
+			_hud.Draw(spriteBatch, (Control)(object)this, RectangleF.op_Implicit(new Rectangle(0, 0, ((Control)Control.get_Graphics().get_SpriteScreen()).get_Width(), ((Control)Control.get_Graphics().get_SpriteScreen()).get_Height())));
 		}
 
 		protected override void DrawRaceToMap(SpriteBatch spriteBatch, IMapBounds map)
@@ -474,7 +444,7 @@ namespace Ideka.RacingMeter
 			}
 			if (Ghost != null && _racing != null)
 			{
-				DrawGhost(spriteBatch, map, Ghost.SnapshotAt(RaceTime));
+				DrawMapGhost(spriteBatch, map, Ghost.SnapshotAt(RaceTime));
 			}
 		}
 

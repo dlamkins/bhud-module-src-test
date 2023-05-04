@@ -50,33 +50,32 @@ namespace Ideka.RacingMeter
 			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f0: Expected O, but got Unknown
-			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e9: Expected O, but got Unknown
+			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0110: Expected O, but got Unknown
-			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0109: Expected O, but got Unknown
+			//IL_010a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
 			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0124: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0130: Expected O, but got Unknown
-			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0129: Expected O, but got Unknown
+			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0136: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0154: Expected O, but got Unknown
-			//IL_0155: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014d: Expected O, but got Unknown
+			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
 			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0168: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0174: Expected O, but got Unknown
-			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016d: Expected O, but got Unknown
+			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
 			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0198: Expected O, but got Unknown
+			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0191: Expected O, but got Unknown
 			StandardButton val = new StandardButton();
 			((Control)val).set_Parent((Container)(object)this);
 			val.set_Text(Strings.KoFiButton);
@@ -96,7 +95,6 @@ namespace Ideka.RacingMeter
 			_madeByLabel = val2;
 			StandardButton val3 = new StandardButton();
 			((Control)val3).set_Parent((Container)(object)this);
-			((Control)val3).set_Visible(false);
 			val3.set_Text(Strings.OnlineRacing);
 			_onlineButton = val3;
 			Label val4 = new Label();

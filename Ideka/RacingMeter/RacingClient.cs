@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
+using Ideka.NetCommon;
 using Ideka.RacingMeter.Lib;
 using Ideka.RacingMeter.Lib.RacingServer;
 using Microsoft.AspNetCore.SignalR;
@@ -24,13 +25,46 @@ namespace Ideka.RacingMeter
 			Online
 		}
 
-		private class Internal : IRacingHubClient
+		private class Internal : IRacingHubClient, IDisposable
 		{
 			private readonly RacingClient _outer;
+
+			public readonly HubConnection Conn;
 
 			public Internal(RacingClient outer)
 			{
 				_outer = outer;
+				string url = ((RacingModule.Settings.OnlineUrl.Value != "") ? RacingModule.Settings.OnlineUrl.Value : RacingModule.Server.RacingUrl) ?? "";
+				if (url != "")
+				{
+					GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
+					{
+						ScreenNotification.ShowNotification(StringExtensions.Format(Strings.NotifyConnectingTo, url), (NotificationType)0, (Texture2D)null, 2);
+					});
+				}
+				Conn = new HubConnectionBuilder().WithUrl(url).AddNewtonsoftJsonProtocol(delegate(NewtonsoftJsonHubProtocolOptions options)
+				{
+					JsonSerialization.Configure(options.PayloadSerializerSettings);
+				}).Build();
+				Conn.Closed += delegate
+				{
+					_outer.OnConnectionClosed();
+					return Task.CompletedTask;
+				};
+				Conn.On("Pong", new Func<Task>(Pong));
+				Conn.On("Error", new Func<string, Task>(Error));
+				Conn.On("Validate", new Func<string, Task>(Validate));
+				Conn.On("Authenticate", new Func<string, Task>(Authenticate));
+				Conn.On("JoinLobby", new Func<Lobby, Task>(JoinLobby));
+				Conn.On("LeaveLobby", new Func<Task>(LeaveLobby));
+				Conn.On("UpdateUser", new Func<User, bool, Task>(UpdateUser));
+				Conn.On("UpdateLobbySettings", new Func<LobbySettings, Task>(UpdateLobbySettings));
+				Conn.On("UpdateLobbyRace", new Func<FullRace, Task>(UpdateLobbyRace));
+				Conn.On("StartCountdown", new Func<int, Task>(StartCountdown));
+				Conn.On("StartRace", new Func<long, Task>(StartRace));
+				Conn.On("CancelRace", new Func<Task>(CancelRace));
+				Conn.On("RaceFinished", new Func<Task>(RaceFinished));
+				Conn.On("UpdatePosition", new Func<string, int, Vector3, Vector3, Task>(UpdatePosition));
 			}
 
 			public Task Pong()
@@ -42,6 +76,12 @@ namespace Ideka.RacingMeter
 			public Task Error(string message)
 			{
 				_outer.Error(message);
+				return Task.CompletedTask;
+			}
+
+			public Task Validate(string version)
+			{
+				_outer.Validate(version);
 				return Task.CompletedTask;
 			}
 
@@ -118,6 +158,11 @@ namespace Ideka.RacingMeter
 				_outer.RaceFinished();
 				return Task.CompletedTask;
 			}
+
+			public void Dispose()
+			{
+				Conn?.DisposeAsync();
+			}
 		}
 
 		private static readonly Logger Logger = Logger.GetLogger<RacingClient>();
@@ -125,6 +170,10 @@ namespace Ideka.RacingMeter
 		private Lobby? _lobby;
 
 		public ClientState _state;
+
+		private readonly DisposableCollection _dc = new DisposableCollection();
+
+		private readonly object _lock = new object();
 
 		private DateTime _lastPing = DateTime.MinValue;
 
@@ -136,15 +185,11 @@ namespace Ideka.RacingMeter
 
 		private CancellationTokenSource? _ping;
 
-		private readonly HubConnection _conn;
-
-		private readonly Internal _int;
+		private Internal? _int;
 
 		private const int MaxUpdatesPerSecond = 30;
 
 		private DateTime _lastUpdate;
-
-		private CancellationTokenSource? _countdown;
 
 		public RacingServer Server { get; }
 
@@ -205,6 +250,21 @@ namespace Ideka.RacingMeter
 
 		public int Ping => Latency.Milliseconds;
 
+		private HubConnection Conn
+		{
+			get
+			{
+				lock (_lock)
+				{
+					if (_int == null)
+					{
+						_int = new Internal(this);
+					}
+					return _int!.Conn;
+				}
+			}
+		}
+
 		public event Action<ClientState>? StateChanged;
 
 		public event Action<string>? Authenticated;
@@ -219,59 +279,62 @@ namespace Ideka.RacingMeter
 
 		public event Action<FullRace?>? LobbyRaceUpdated;
 
+		public event Action<int>? CountdownStarted;
+
 		public event Action? RaceStarted;
 
 		public event Action? RaceCanceled;
 
 		public event Action<User>? PositionUpdated;
 
+		public event Action<User>? CheckpointReached;
+
 		public RacingClient(MeasurerRealtime measurer)
 		{
 			_measurer = measurer;
-			_conn = new HubConnectionBuilder().WithUrl("http://localhost:5000/racing").AddNewtonsoftJsonProtocol(delegate(NewtonsoftJsonHubProtocolOptions options)
+			Server = new RacingServer(() => Conn);
+			_dc.Add(RacingModule.Settings.OnlineUrl.OnChanged(delegate
 			{
-				JsonSerialization.Configure(options.PayloadSerializerSettings);
-			}).Build();
-			Server = new RacingServer(_conn);
-			_int = new Internal(this);
-			_conn.Closed += delegate
-			{
-				UserId = null;
-				Lobby = null;
-				State = ClientState.Offline;
-				return Task.CompletedTask;
-			};
-			_conn.On("Pong", new Func<Task>(_int.Pong));
-			_conn.On("Error", new Func<string, Task>(_int.Error));
-			_conn.On("Authenticate", new Func<string, Task>(_int.Authenticate));
-			_conn.On("JoinLobby", new Func<Lobby, Task>(_int.JoinLobby));
-			_conn.On("LeaveLobby", new Func<Task>(_int.LeaveLobby));
-			_conn.On("UpdateUser", new Func<User, bool, Task>(_int.UpdateUser));
-			_conn.On("UpdateLobbySettings", new Func<LobbySettings, Task>(_int.UpdateLobbySettings));
-			_conn.On("UpdateLobbyRace", new Func<FullRace, Task>(_int.UpdateLobbyRace));
-			_conn.On("StartCountdown", new Func<int, Task>(_int.StartCountdown));
-			_conn.On("StartRace", new Func<long, Task>(_int.StartRace));
-			_conn.On("CancelRace", new Func<Task>(_int.CancelRace));
-			_conn.On("RaceFinished", new Func<Task>(_int.RaceFinished));
-			_conn.On("UpdatePosition", new Func<string, int, Vector3, Vector3, Task>(_int.UpdatePosition));
+				lock (_lock)
+				{
+					if (State == ClientState.Offline)
+					{
+						_int?.Dispose();
+						_int = null;
+					}
+				}
+			}));
 			_measurer.NewPosition += new Action<PosSnapshot>(NewPosition);
 		}
 
-		public void Connect()
+		public void Connect(bool asGuest, string? nickname)
 		{
+			string nickname2 = nickname;
+			if (string.IsNullOrWhiteSpace(nickname2))
+			{
+				nickname2 = null;
+			}
 			TaskUtils.Cancel(ref _cts);
-			CancellationToken ct = TaskUtils.New(out _cts);
+			CancellationToken ct2 = TaskUtils.New(out _cts);
 			((Func<Task>)async delegate
 			{
 				State = ClientState.Connecting;
-				await RacingModule.Server.RefreshUser(ct);
-				string accessToken = RacingModule.Server.User.AccessToken;
-				if (accessToken == null)
+				if (asGuest)
 				{
-					throw FriendlyError.Create(new UnauthorizedAccessException(Strings.ExceptionUnauthenticated));
+					await startAsync(ct2);
+					await Server.AuthenticateGuest(nickname2);
 				}
-				await _conn.StartAsync(ct);
-				await Server.Authenticate(accessToken);
+				else
+				{
+					await RacingModule.Server.RefreshUser(ct2);
+					string accessToken = RacingModule.Server.User.AccessToken;
+					if (accessToken == null)
+					{
+						throw FriendlyError.Create(new UnauthorizedAccessException(Strings.ExceptionUnauthenticated));
+					}
+					await startAsync(ct2);
+					await Server.Authenticate(accessToken, nickname2);
+				}
 				TaskUtils.Cancel(ref _ping);
 				CancellationToken pingToken = TaskUtils.New(out _ping);
 				((Func<Task>)async delegate
@@ -288,6 +351,38 @@ namespace Ideka.RacingMeter
 			{
 				State = (t.Result.Success ? ClientState.Online : ClientState.Offline);
 			});
+			async Task startAsync(CancellationToken ct)
+			{
+				await Conn.StartAsync(ct);
+				await Server.Validate("1");
+			}
+		}
+
+		public void Disconnect()
+		{
+			TaskUtils.Cancel(ref _cts);
+			CancellationToken ct = TaskUtils.New(out _cts);
+			((Func<Task>)async delegate
+			{
+				State = ClientState.Connecting;
+				await Conn.StopAsync(ct);
+			})().Done(Logger, Strings.ErrorDisconnect, _cts).ContinueWith(delegate(Task<TaskUtils.TaskState> t)
+			{
+				if (t.Result.Success)
+				{
+					TaskUtils.Cancel(ref _ping);
+					State = ClientState.Offline;
+				}
+			});
+		}
+
+		public async Task UpdateNickname(string? nickname)
+		{
+			if (string.IsNullOrWhiteSpace(nickname))
+			{
+				nickname = null;
+			}
+			await Server.UpdateNickname(nickname);
 		}
 
 		private void NewPosition(PosSnapshot position)
@@ -308,6 +403,15 @@ namespace Ideka.RacingMeter
 			}
 		}
 
+		private void OnConnectionClosed()
+		{
+			UserId = null;
+			Lobby = null;
+			_int?.Dispose();
+			_int = null;
+			State = ClientState.Offline;
+		}
+
 		private void Pong()
 		{
 			_latencies.Push(DateTime.UtcNow - _lastPing);
@@ -319,13 +423,22 @@ namespace Ideka.RacingMeter
 			ScreenNotification.ShowNotification(message, (NotificationType)2, (Texture2D)null, 4);
 		}
 
+		private void Validate(string version)
+		{
+			if (version != "1")
+			{
+				ScreenNotification.ShowNotification(StringExtensions.Format(Strings.ErrorMismatchedVersion, version, "1"), (NotificationType)2, (Texture2D)null, 4);
+				Disconnect();
+			}
+		}
+
 		private void Authenticate(string userId)
 		{
 			UserId = userId;
 			this.Authenticated?.Invoke(userId);
 		}
 
-		private void GetLobbies(IDictionary<string, Lobby> lobbies)
+		private void GetLobbies(IDictionary<string, Lobby> _)
 		{
 		}
 
@@ -344,16 +457,21 @@ namespace Ideka.RacingMeter
 			User user2 = user;
 			WithCurrentLobby(delegate(Lobby lobby)
 			{
-				User value;
+				lobby.Users.TryGetValue(user2.Id, out var value);
+				User value2;
 				if (!leaving)
 				{
 					lobby.Users[user2.Id] = user2;
 				}
-				else if (!lobby.Users.TryRemove(user2.Id, out value))
+				else if (!lobby.Users.TryRemove(user2.Id, out value2))
 				{
 					return;
 				}
 				this.UserUpdated?.Invoke(user2, leaving);
+				if (!leaving && value != null && value.LobbyData.IsRacer && user2.LobbyData.IsRacer && value.RacerData.Times.Count < user2.RacerData.Times.Count)
+				{
+					this.CheckpointReached?.Invoke(user2);
+				}
 			});
 		}
 
@@ -386,21 +504,7 @@ namespace Ideka.RacingMeter
 				{
 					value.RacerData = new RacerUser();
 				}
-				TaskUtils.Cancel(ref _countdown);
-				CancellationToken ct = TaskUtils.New(out _countdown);
-				((Func<Task>)async delegate
-				{
-					int i;
-					for (i = 0; i < seconds; i++)
-					{
-						ct.ThrowIfCancellationRequested();
-						GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
-						{
-							ScreenNotification.ShowNotification($"{seconds - i}", (NotificationType)0, (Texture2D)null, 4);
-						});
-						await Task.Delay(TimeSpan.FromSeconds(1.0));
-					}
-				})();
+				this.CountdownStarted?.Invoke(seconds);
 			});
 		}
 
@@ -408,12 +512,12 @@ namespace Ideka.RacingMeter
 		{
 			WithCurrentLobby(delegate(Lobby lobby)
 			{
-				GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
-				{
-					ScreenNotification.ShowNotification(Strings.OnlineNoticeGo, (NotificationType)0, (Texture2D)null, 4);
-				});
 				lobby.IsRunning = true;
 				lobby.StartTime = new DateTime(time);
+				foreach (User racer in lobby.Racers)
+				{
+					racer.RacerData.AddTime(new RacerTime(TimeSpan.Zero));
+				}
 				this.RaceStarted?.Invoke();
 			});
 		}
@@ -422,11 +526,6 @@ namespace Ideka.RacingMeter
 		{
 			WithCurrentLobby(delegate(Lobby lobby)
 			{
-				GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
-				{
-					ScreenNotification.ShowNotification(Strings.OnlineNoticeRaceCanceled, (NotificationType)0, (Texture2D)null, 4);
-				});
-				TaskUtils.Cancel(ref _countdown);
 				lobby.IsRunning = false;
 				this.RaceCanceled?.Invoke();
 			});
@@ -474,9 +573,9 @@ namespace Ideka.RacingMeter
 		public void Dispose()
 		{
 			_measurer.NewPosition -= new Action<PosSnapshot>(NewPosition);
-			_conn.DisposeAsync();
+			_int?.Dispose();
+			_dc.Dispose();
 			TaskUtils.Cancel(ref _cts);
-			TaskUtils.Cancel(ref _countdown);
 			TaskUtils.Cancel(ref _ping);
 		}
 	}

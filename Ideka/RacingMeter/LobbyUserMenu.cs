@@ -136,7 +136,7 @@ namespace Ideka.RacingMeter
 				{
 					_selected = user;
 					_control = control;
-					_userName.set_Text(user.Id);
+					_userName.set_Text(user.IsGuest ? Strings.Guest : user.Id);
 					_isRacer.set_Checked(user.LobbyData.IsRacer);
 					_isHost.set_Checked(user.LobbyData.IsHost);
 					((Control)_kick).set_Visible(userId != Client.User?.Id);

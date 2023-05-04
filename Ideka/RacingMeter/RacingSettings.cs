@@ -66,6 +66,12 @@ namespace Ideka.RacingMeter
 
 		public GenericSetting<VerticalAlignment> RacerVAlignment { get; }
 
+		public GenericSetting<string> OnlineUrl { get; }
+
+		public GenericSetting<string> OnlineDefaultNickname { get; }
+
+		public GenericSetting<bool> OnlineMarkRacers { get; }
+
 		public KeyBindingSetting ToggleDebug { get; }
 
 		public bool? IsDriftKeyDown()
@@ -88,8 +94,8 @@ namespace Ideka.RacingMeter
 			//IL_018f: Expected O, but got Unknown
 			//IL_02cd: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0315: Expected O, but got Unknown
-			//IL_081e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0866: Expected O, but got Unknown
+			//IL_0937: Unknown result type (might be due to invalid IL or missing references)
+			//IL_097f: Expected O, but got Unknown
 			MumblePollingRate = _dc.Add(settings.Slider("MumblePollingRate", 50, 25, 200, () => Strings.SettingMumblePollingRate, () => Strings.SettingMumblePollingRateText));
 			SpeedometerAnchorY = _dc.Add(settings.PercentageSlider("SpeedometerAnchorY", 0.7f, 0f, 1f, () => Strings.SettingSpeedometerAnchorY, () => Strings.SettingSpeedometerAnchorYText));
 			ShowSpeedometer = _dc.Add(settings.Generic("ShowSpeedometer", defaultValue: true, () => Strings.SettingShowSpeedometer, () => Strings.SettingShowSpeedometerText));
@@ -109,7 +115,7 @@ namespace Ideka.RacingMeter
 			SfxVolumeMultiplier = _dc.Add(settings.PercentageSlider("SFXVolumeMultiplier", 1.5f, 0f, 3f, () => Strings.SettingSFXVolumeMultiplier, () => Strings.SettingSFXVolumeMultiplierText));
 			MaxGhostData = _dc.Add(settings.Slider("MaxGhostData", 3, 0, 10, () => Strings.SettingMaxGhostData, () => Strings.SettingMaxGhostDataText));
 			AutoLocalGhost = _dc.Add(settings.Generic("AutoLocalGhost", defaultValue: true, () => Strings.SettingAutoLocalGhost, () => Strings.SettingAutoLocalGhostText));
-			ShownCheckpoints = _dc.Add(settings.Slider("ShownCheckpoints", 3, 0, 10, () => Strings.SettingShownCheckpoints, () => Strings.SettingShownCheckpointsText));
+			ShownCheckpoints = _dc.Add(settings.Slider("ShownCheckpoints", 3, -1, 10, () => Strings.SettingShownCheckpoints, () => Strings.SettingShownCheckpointsText));
 			CheckpointLineThickness = _dc.Add(settings.PercentageSlider("CheckpointLineThickness", 1.5f, 0f, 3f, () => Strings.SettingCheckpointLineThickness, () => Strings.SettingCheckpointLineThicknessText));
 			CheckpointAlpha = _dc.Add(settings.PercentageSlider("CheckpointAlpha", 1f, 0f, 1f, () => Strings.SettingCheckpointAlpha, () => Strings.SettingCheckpointAlphaText));
 			CheckpointArrow = _dc.Add(settings.Generic("CheckpointArrow", defaultValue: true, () => Strings.SettingCheckpointArrow, () => Strings.SettingCheckpointArrowText));
@@ -119,6 +125,9 @@ namespace Ideka.RacingMeter
 			RacerAnchorY = _dc.Add(settings.PercentageSlider("RacerAnchorY", 0.7f, 0f, 1f, () => Strings.SettingRacerAnchorY, () => Strings.SettingRacerAnchorYText));
 			RacerHAlignment = _dc.Add(settings.Generic("RacerHAlignment", HorizontalAlignment.Center, () => Strings.SettingRacerHAlignment, () => Strings.SettingRacerHAlignmentText));
 			RacerVAlignment = _dc.Add(settings.Generic("RacerVAlignment", VerticalAlignment.TopDown, () => Strings.SettingRacerVAlignment, () => Strings.SettingRacerVAlignmentText));
+			OnlineUrl = _dc.Add(settings.Generic("OnlineUrl", "", () => Strings.SettingOnlineUrl, () => Strings.SettingOnlineUrlText));
+			OnlineDefaultNickname = _dc.Add(settings.Generic("OnlineDefaultNickname", "", () => Strings.SettingOnlineDefaultNickname, () => Strings.SettingOnlineDefaultNicknameText));
+			OnlineMarkRacers = _dc.Add(settings.Generic("OnlineMarkRacers", defaultValue: false, () => Strings.SettingOnlineMarkRacers, () => Strings.SettingOnlineMarkRacersText));
 			ToggleDebug = _dc.Add(settings.KeyBinding("ToggleDebug", new KeyBinding(), () => Strings.SettingToggleDebug, () => Strings.SettingToggleDebugText));
 		}
 

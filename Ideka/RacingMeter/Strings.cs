@@ -60,13 +60,15 @@ namespace Ideka.RacingMeter
 
 		internal static string ChangeToCurrent => ResourceManager.GetString("ChangeToCurrent", resourceCulture);
 
-		internal static string ClickToCopy => ResourceManager.GetString("ClickToCopy", resourceCulture);
-
 		internal static string ConfirmRaceDeletion => ResourceManager.GetString("ConfirmRaceDeletion", resourceCulture);
 
 		internal static string Connect => ResourceManager.GetString("Connect", resourceCulture);
 
+		internal static string ConnectGuest => ResourceManager.GetString("ConnectGuest", resourceCulture);
+
 		internal static string CopyOf => ResourceManager.GetString("CopyOf", resourceCulture);
+
+		internal static string CopyToClipboard => ResourceManager.GetString("CopyToClipboard", resourceCulture);
 
 		internal static string CreatedBy => ResourceManager.GetString("CreatedBy", resourceCulture);
 
@@ -78,6 +80,10 @@ namespace Ideka.RacingMeter
 
 		internal static string Deselect => ResourceManager.GetString("Deselect", resourceCulture);
 
+		internal static string Disconnect => ResourceManager.GetString("Disconnect", resourceCulture);
+
+		internal static string ErrorDisconnect => ResourceManager.GetString("ErrorDisconnect", resourceCulture);
+
 		internal static string ErrorFailedToConnect => ResourceManager.GetString("ErrorFailedToConnect", resourceCulture);
 
 		internal static string ErrorFormat => ResourceManager.GetString("ErrorFormat", resourceCulture);
@@ -87,6 +93,8 @@ namespace Ideka.RacingMeter
 		internal static string ErrorGhostUpload => ResourceManager.GetString("ErrorGhostUpload", resourceCulture);
 
 		internal static string ErrorLeaderboardLoad => ResourceManager.GetString("ErrorLeaderboardLoad", resourceCulture);
+
+		internal static string ErrorMismatchedVersion => ResourceManager.GetString("ErrorMismatchedVersion", resourceCulture);
 
 		internal static string ErrorRaceImport => ResourceManager.GetString("ErrorRaceImport", resourceCulture);
 
@@ -138,6 +146,8 @@ namespace Ideka.RacingMeter
 
 		internal static string GhostLocalUploadedTooltip => ResourceManager.GetString("GhostLocalUploadedTooltip", resourceCulture);
 
+		internal static string Guest => ResourceManager.GetString("Guest", resourceCulture);
+
 		internal static string ImportCsv => ResourceManager.GetString("ImportCsv", resourceCulture);
 
 		internal static string Inches => ResourceManager.GetString("Inches", resourceCulture);
@@ -165,6 +175,10 @@ namespace Ideka.RacingMeter
 		internal static string LabelGhostTime => ResourceManager.GetString("LabelGhostTime", resourceCulture);
 
 		internal static string LabelGhostUploaded => ResourceManager.GetString("LabelGhostUploaded", resourceCulture);
+
+		internal static string LabelGuest => ResourceManager.GetString("LabelGuest", resourceCulture);
+
+		internal static string LabelLap => ResourceManager.GetString("LabelLap", resourceCulture);
 
 		internal static string LabelLast => ResourceManager.GetString("LabelLast", resourceCulture);
 
@@ -244,6 +258,12 @@ namespace Ideka.RacingMeter
 
 		internal static string Next => ResourceManager.GetString("Next", resourceCulture);
 
+		internal static string NicknameInput => ResourceManager.GetString("NicknameInput", resourceCulture);
+
+		internal static string NicknameTooltip => ResourceManager.GetString("NicknameTooltip", resourceCulture);
+
+		internal static string NicknameUpdate => ResourceManager.GetString("NicknameUpdate", resourceCulture);
+
 		internal static string No => ResourceManager.GetString("No", resourceCulture);
 
 		internal static string None => ResourceManager.GetString("None", resourceCulture);
@@ -251,6 +271,8 @@ namespace Ideka.RacingMeter
 		internal static string Nothing => ResourceManager.GetString("Nothing", resourceCulture);
 
 		internal static string NoticeCopied => ResourceManager.GetString("NoticeCopied", resourceCulture);
+
+		internal static string NotifyConnectingTo => ResourceManager.GetString("NotifyConnectingTo", resourceCulture);
 
 		internal static string NotifyGhostAlreadyBetter => ResourceManager.GetString("NotifyGhostAlreadyBetter", resourceCulture);
 
@@ -266,7 +288,11 @@ namespace Ideka.RacingMeter
 
 		internal static string OnlineNoticeGo => ResourceManager.GetString("OnlineNoticeGo", resourceCulture);
 
+		internal static string OnlineNoticeLaps => ResourceManager.GetString("OnlineNoticeLaps", resourceCulture);
+
 		internal static string OnlineNoticeRaceCanceled => ResourceManager.GetString("OnlineNoticeRaceCanceled", resourceCulture);
+
+		internal static string OnlineNoticeRaceFinished => ResourceManager.GetString("OnlineNoticeRaceFinished", resourceCulture);
 
 		internal static string OnlineRacing => ResourceManager.GetString("OnlineRacing", resourceCulture);
 
@@ -363,6 +389,18 @@ namespace Ideka.RacingMeter
 		internal static string SettingNormalizedOfficialCheckpoints => ResourceManager.GetString("SettingNormalizedOfficialCheckpoints", resourceCulture);
 
 		internal static string SettingNormalizedOfficialCheckpointsText => ResourceManager.GetString("SettingNormalizedOfficialCheckpointsText", resourceCulture);
+
+		internal static string SettingOnlineDefaultNickname => ResourceManager.GetString("SettingOnlineDefaultNickname", resourceCulture);
+
+		internal static string SettingOnlineDefaultNicknameText => ResourceManager.GetString("SettingOnlineDefaultNicknameText", resourceCulture);
+
+		internal static string SettingOnlineMarkRacers => ResourceManager.GetString("SettingOnlineMarkRacers", resourceCulture);
+
+		internal static string SettingOnlineMarkRacersText => ResourceManager.GetString("SettingOnlineMarkRacersText", resourceCulture);
+
+		internal static string SettingOnlineUrl => ResourceManager.GetString("SettingOnlineUrl", resourceCulture);
+
+		internal static string SettingOnlineUrlText => ResourceManager.GetString("SettingOnlineUrlText", resourceCulture);
 
 		internal static string SettingRacerAnchorX => ResourceManager.GetString("SettingRacerAnchorX", resourceCulture);
 

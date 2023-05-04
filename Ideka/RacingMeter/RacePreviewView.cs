@@ -412,7 +412,7 @@ namespace Ideka.RacingMeter
 				Ghost ghost = Ghost;
 				if (ghost != null)
 				{
-					DrawGhost(spriteBatch, _bounds, ghost.SnapshotAt(GhostProgress));
+					DrawMapGhost(spriteBatch, _bounds, ghost.SnapshotAt(GhostProgress));
 				}
 			}
 		}

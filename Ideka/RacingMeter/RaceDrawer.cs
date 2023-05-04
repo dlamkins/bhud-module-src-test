@@ -171,6 +171,49 @@ namespace Ideka.RacingMeter
 			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, font, rect, color, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
 		}
 
+		public void DrawGhost(SpriteBatch spriteBatch, GhostSnapshot snapshot)
+		{
+			//IL_0004: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			DrawGhost(spriteBatch, snapshot.Position, snapshot.Front);
+		}
+
+		public void DrawGhost(SpriteBatch spriteBatch, GhostSnapshot snapshot, Color color)
+		{
+			//IL_0004: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			DrawGhost(spriteBatch, snapshot.Position, snapshot.Front, color);
+		}
+
+		public void DrawGhost(SpriteBatch spriteBatch, Vector3 position, Vector3 front)
+		{
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0004: Unknown result type (might be due to invalid IL or missing references)
+			DrawGhost(spriteBatch, position, front, GhostColor);
+		}
+
+		public void DrawGhost(SpriteBatch spriteBatch, Vector3 position, Vector3 front, Color color)
+		{
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+			Matrix trs = Matrix.CreateScale(1f) * Matrix.CreateRotationZ(0f - (float)Math.Atan2(front.X, front.Y)) * Matrix.CreateTranslation(position);
+			GhostA.Transformed(trs).ToScreen().Draw(spriteBatch, color, 2f);
+			GhostB.Transformed(trs).ToScreen().Draw(spriteBatch, color, 2f);
+		}
+
 		public void DrawMapRacePoint(SpriteBatch spriteBatch, IMapBounds map, RacePoint point, Color color, float radius = 10f)
 		{
 			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
@@ -221,36 +264,53 @@ namespace Ideka.RacingMeter
 			}
 		}
 
-		public void DrawGhost(SpriteBatch spriteBatch, IMapBounds map, GhostSnapshot snapshot)
+		public void DrawMapGhost(SpriteBatch spriteBatch, IMapBounds map, GhostSnapshot snapshot)
 		{
-			//IL_0004: Unknown result type (might be due to invalid IL or missing references)
-			DrawGhost(spriteBatch, map, snapshot, GhostColor);
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			DrawMapGhost(spriteBatch, map, snapshot.Position, snapshot.Front);
 		}
 
-		public void DrawGhost(SpriteBatch spriteBatch, IMapBounds map, GhostSnapshot snapshot, Color color)
+		public void DrawMapGhost(SpriteBatch spriteBatch, IMapBounds map, GhostSnapshot snapshot, Color color)
+		{
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			DrawMapGhost(spriteBatch, map, snapshot.Position, snapshot.Front, color);
+		}
+
+		public void DrawMapGhost(SpriteBatch spriteBatch, IMapBounds map, Vector3 position, Vector3 front)
+		{
+			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0004: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			DrawMapGhost(spriteBatch, map, position, front, GhostColor);
+		}
+
+		public void DrawMapGhost(SpriteBatch spriteBatch, IMapBounds map, Vector3 position, Vector3 front, Color color)
 		{
 			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
 			Race race = Race;
 			if (race != null)
 			{
-				Matrix trs = Matrix.CreateScale(10f) * Matrix.CreateRotationZ((float)(Math.Atan2(snapshot.Front.X, snapshot.Front.Y) + Math.PI));
-				Vector2 position = map.FromWorld(race.MapId, snapshot.Position);
-				spriteBatch.DrawPolygon(position, GhostA.Transformed(trs).Flat(), color, 2f);
-				spriteBatch.DrawPolygon(position, GhostB.Transformed(trs).Flat(), color, 2f);
+				Matrix trs = Matrix.CreateScale(10f) * Matrix.CreateRotationZ((float)(Math.Atan2(front.X, front.Y) + Math.PI));
+				Vector2 mapPosition = map.FromWorld(race.MapId, position);
+				spriteBatch.DrawPolygon(mapPosition, GhostA.Transformed(trs).Flat(), color, 2f);
+				spriteBatch.DrawPolygon(mapPosition, GhostB.Transformed(trs).Flat(), color, 2f);
 			}
 		}
 

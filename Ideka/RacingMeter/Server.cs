@@ -53,6 +53,8 @@ namespace Ideka.RacingMeter
 
 		public bool IsOnline => Online == OnlineStatus.Yes;
 
+		public string? RacingUrl { get; private set; }
+
 		public UserData User { get; }
 
 		public RemoteRaces RemoteRaces { get; }
@@ -111,7 +113,9 @@ namespace Ideka.RacingMeter
 			OnlineStatus oldStatus = Online;
 			try
 			{
-				Online = ((await _checkVersion.Call(_client, new CallCheckVersion.Req(version), ct)).Supported ? OnlineStatus.Yes : OnlineStatus.No);
+				CallCheckVersion.Res res = await _checkVersion.Call(_client, new CallCheckVersion.Req(version), ct);
+				Online = (res.Supported ? OnlineStatus.Yes : OnlineStatus.No);
+				RacingUrl = res.RacingUrl;
 			}
 			catch (Exception ex)
 			{

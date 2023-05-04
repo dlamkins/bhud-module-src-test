@@ -39,7 +39,6 @@ namespace Ideka.RacingMeter
 			UpdateLayout();
 			_lobbyBar.BackRequested += new Action(panelStack.GoBack);
 			Client.LobbyChanged += new Action<Lobby>(LobbyChanged);
-			Client.Connect();
 			this.SoftChild((Control)(object)_online);
 		}
 

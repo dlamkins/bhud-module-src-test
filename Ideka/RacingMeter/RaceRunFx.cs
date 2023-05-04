@@ -18,6 +18,10 @@ namespace Ideka.RacingMeter
 
 		private readonly DisposableCollection _dc = new DisposableCollection();
 
+		private readonly SoundEffect _countdownTickSfx;
+
+		private readonly SoundEffect _countdownGoSfx;
+
 		private readonly SoundEffect _raceStartSfx;
 
 		private readonly SoundEffect _raceFinishSfx;
@@ -61,6 +65,8 @@ namespace Ideka.RacingMeter
 		public RaceRunFx(RaceDrawer drawer, Race race)
 		{
 			Drawer = drawer;
+			_countdownTickSfx = _dc.Add<SoundEffect>(RacingModule.ContentsManager.GetSound("SFX/CountdownTick.wav"));
+			_countdownGoSfx = _dc.Add<SoundEffect>(RacingModule.ContentsManager.GetSound("SFX/CountdownGo.wav"));
 			_raceStartSfx = _dc.Add<SoundEffect>(RacingModule.ContentsManager.GetSound("SFX/RaceStart.wav"));
 			_raceFinishSfx = _dc.Add<SoundEffect>(RacingModule.ContentsManager.GetSound("SFX/RaceFinish.wav"));
 			_raceCancelSfx = _dc.Add<SoundEffect>(RacingModule.ContentsManager.GetSound("SFX/RaceCancel.wav"));
@@ -123,6 +129,16 @@ namespace Ideka.RacingMeter
 			}
 		}
 
+		public void CountdownTickSfx()
+		{
+			Play(_countdownTickSfx, forcePlay: true);
+		}
+
+		public void CountdownGoSfx()
+		{
+			Play(_countdownGoSfx, forcePlay: true);
+		}
+
 		public void StartSfx(bool forcePlay)
 		{
 			Play(_raceStartSfx, forcePlay);
@@ -154,16 +170,16 @@ namespace Ideka.RacingMeter
 
 		public void DrawPoints(SpriteBatch spriteBatch, int reachedPoints, int laps = 1)
 		{
-			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0189: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0119: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0212: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021c: Unknown result type (might be due to invalid IL or missing references)
 			(int, int) tuple = Route.Progress(reachedPoints);
 			int currentLap = tuple.Item1;
 			int pointIndex = tuple.Item2;
@@ -176,10 +192,14 @@ namespace Ideka.RacingMeter
 				int i = item.Item1;
 				RacePoint point = item.Item2;
 				RacePoint next = item2.Item2;
+				if (ShownCheckpoints == 0 && i != 0)
+				{
+					break;
+				}
 				bool num = point == lastCheckpoint;
 				bool isFinishLine = num && currentLap + 1 >= laps;
 				Color color = (num ? RaceDrawer.FinalCheckpointColor : ((i <= pointIndex) ? RaceDrawer.NextCheckpointColor : RaceDrawer.CheckpointColor));
-				if (ShownCheckpoints != 1)
+				if (ShownCheckpoints > 1)
 				{
 					((Color)(ref color)).set_A((byte)(MathUtils.Scale(shown, 0.0, ShownCheckpoints, 1.0, 0.1) * 255.0));
 				}
@@ -192,7 +212,7 @@ namespace Ideka.RacingMeter
 					shown++;
 					Drawer.DrawRacePoint(spriteBatch, point.Position, (OfficialPoints && i > 0) ? 7.62f : point.Radius, (!isFinishLine && (CheckpointArrow || (i == 0 && pointIndex == 0))) ? new Vector3?(next.Position) : null, color);
 				}
-				if (isFinishLine || shown >= ShownCheckpoints)
+				if (isFinishLine || (shown >= ShownCheckpoints && ShownCheckpoints >= 0))
 				{
 					break;
 				}

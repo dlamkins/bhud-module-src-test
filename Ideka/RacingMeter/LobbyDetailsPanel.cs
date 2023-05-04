@@ -1,7 +1,6 @@
 using System;
 using Blish_HUD;
 using Blish_HUD.Controls;
-using Blish_HUD.Input;
 using Ideka.RacingMeter.Lib.RacingServer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -14,7 +13,7 @@ namespace Ideka.RacingMeter
 
 		private readonly RacingClient Client;
 
-		private readonly StringBox _idBox;
+		private readonly ButtonBox<string> _idBox;
 
 		private readonly IntBox _sizeBox;
 
@@ -35,11 +34,11 @@ namespace Ideka.RacingMeter
 			((Vector2)(ref val))._002Ector(10f, 10f);
 			((FlowPanel)this).set_OuterControlPadding(val);
 			((FlowPanel)this).set_ControlPadding(val);
-			StringBox stringBox = new StringBox();
-			((Control)stringBox).set_Parent((Container)(object)this);
-			stringBox.Label = Strings.LobbyId;
-			stringBox.ControlEnabled = false;
-			_idBox = stringBox;
+			ButtonBox<string> buttonBox = new ButtonBox<string>("");
+			((Control)buttonBox).set_Parent((Container)(object)this);
+			buttonBox.Label = Strings.LobbyId;
+			buttonBox.ButtonText = Strings.CopyToClipboard;
+			_idBox = buttonBox;
 			RacingServer server = Server;
 			IntBox intBox = new IntBox();
 			((Control)intBox).set_Parent((Container)(object)this);
@@ -55,14 +54,14 @@ namespace Ideka.RacingMeter
 			intBox2.MaxValue = 50;
 			_lapsBox = server2.Register<IntBox>(intBox2);
 			UpdateLayout();
-			((Control)_idBox).add_Click((EventHandler<MouseEventArgs>)delegate
+			_idBox.ButtonClick += delegate
 			{
 				if (!string.IsNullOrEmpty(_idBox.Value))
 				{
 					ClipboardUtil.get_WindowsClipboardService().SetTextAsync(_idBox.Value);
 					ScreenNotification.ShowNotification(Strings.NoticeCopied, (NotificationType)0, (Texture2D)null, 4);
 				}
-			});
+			};
 			_sizeBox.ValueCommitted += async delegate
 			{
 				Lobby lobby2 = Client.Lobby;
@@ -96,7 +95,6 @@ namespace Ideka.RacingMeter
 		private void LobbyChanged(Lobby? lobby)
 		{
 			_idBox.Value = lobby?.Id ?? "";
-			_idBox.AllBasicTooltipText = ((lobby == null) ? null : Strings.ClickToCopy);
 			_sizeBox.Value = lobby?.Settings.Size ?? 0;
 			_lapsBox.Value = lobby?.Settings.Laps ?? 0;
 		}
