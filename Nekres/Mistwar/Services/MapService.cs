@@ -34,6 +34,10 @@ namespace Nekres.Mistwar.Services
 
 		private MapImage _mapControl;
 
+		private StandardWindow _window;
+
+		private const int PADDING_RIGHT = 5;
+
 		public float Opacity
 		{
 			get
@@ -60,40 +64,75 @@ namespace Nekres.Mistwar.Services
 			}
 		}
 
-		public bool IsVisible
-		{
-			get
-			{
-				MapImage mapControl = _mapControl;
-				if (mapControl == null)
-				{
-					return false;
-				}
-				return ((Control)mapControl).get_Visible();
-			}
-		}
-
 		public bool IsLoading { get; private set; }
 
 		public bool IsReady { get; private set; }
 
 		public MapService(DirectoriesManager dir, WvwService wvw, IProgress<string> loadingIndicator)
 		{
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0116: Expected O, but got Unknown
+			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0147: Unknown result type (might be due to invalid IL or missing references)
 			_dir = dir;
 			_wvw = wvw;
 			_loadingIndicator = loadingIndicator;
 			_mapCache = new Dictionary<int, AsyncTexture2D>();
+			StandardWindow val = new StandardWindow(GameService.Content.get_DatAssetCache().GetTextureFromAssetId(155985), new Rectangle(40, 26, 913, 691), new Rectangle(70, 71, 839, 605));
+			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			((WindowBase2)val).set_Title(string.Empty);
+			((WindowBase2)val).set_Emblem(MistwarModule.ModuleInstance.CornerTex);
+			((WindowBase2)val).set_Subtitle(((Module)MistwarModule.ModuleInstance).get_Name());
+			((WindowBase2)val).set_Id("Mistwar_Map_86a367fa-61ba-4bab-ae3b-fb08b407214a");
+			((WindowBase2)val).set_SavesPosition(true);
+			((WindowBase2)val).set_SavesSize(true);
+			((WindowBase2)val).set_CanResize(true);
+			((Control)val).set_Width(800);
+			((Control)val).set_Height(800);
+			((Control)val).set_Left((((Control)GameService.Graphics.get_SpriteScreen()).get_Width() - 800) / 2);
+			((Control)val).set_Top((((Control)GameService.Graphics.get_SpriteScreen()).get_Height() - 800) / 2);
+			_window = val;
 			MapImage mapImage = new MapImage();
-			((Control)mapImage).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)mapImage).set_Size(new Point(0, 0));
-			((Control)mapImage).set_Location(new Point(0, 0));
-			((Control)mapImage).set_Visible(false);
+			((Control)mapImage).set_Parent((Container)(object)_window);
+			((Control)mapImage).set_Width(((Container)_window).get_ContentRegion().Width - 5);
+			((Control)mapImage).set_Height(((Container)_window).get_ContentRegion().Height - 5);
+			((Control)mapImage).set_Left(0);
+			((Control)mapImage).set_Top(0);
 			_mapControl = mapImage;
+			((Container)_window).add_ContentResized((EventHandler<RegionChangedEventArgs>)OnWindowResized);
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
 			GameService.Gw2Mumble.get_UI().add_IsMapOpenChanged((EventHandler<ValueEventArgs<bool>>)OnIsMapOpenChanged);
 			GameService.GameIntegration.get_Gw2Instance().add_IsInGameChanged((EventHandler<ValueEventArgs<bool>>)OnIsInGameChanged);
+		}
+
+		private void OnWindowResized(object sender, RegionChangedEventArgs e)
+		{
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			MapImage mapControl = _mapControl;
+			Rectangle currentRegion = e.get_CurrentRegion();
+			int num = ((Rectangle)(ref currentRegion)).get_Size().X - 5;
+			currentRegion = e.get_CurrentRegion();
+			((Control)mapControl).set_Size(new Point(num, ((Rectangle)(ref currentRegion)).get_Size().Y - 5));
 		}
 
 		public void DownloadMaps(int[] mapIds)
@@ -197,8 +236,9 @@ namespace Nekres.Mistwar.Services
 				}
 			}
 			_mapControl.Texture.SwapTexture(AsyncTexture2D.op_Implicit(tex));
-			MapImage mapControl = _mapControl;
-			mapControl.Map = await GetMap(GameService.Gw2Mumble.get_CurrentMap().get_Id());
+			ContinentFloorRegionMap map = await GetMap(GameService.Gw2Mumble.get_CurrentMap().get_Id());
+			_mapControl.Map = map;
+			((WindowBase2)_window).set_Title(((map != null) ? map.get_Name() : null) ?? string.Empty);
 			List<WvwObjectiveEntity> wvwObjectives = await _wvw.GetObjectives(GameService.Gw2Mumble.get_CurrentMap().get_Id());
 			if (!wvwObjectives.IsNullOrEmpty())
 			{
@@ -213,15 +253,20 @@ namespace Nekres.Mistwar.Services
 			return await MapUtil.GetMapExpanded(obj, obj.get_DefaultFloor());
 		}
 
-		public void Toggle(bool forceHide = false, bool silent = false)
+		public void Toggle(bool forceHide = false)
 		{
-			if (!IsReady)
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			if (forceHide)
+			{
+				((Control)_window).Hide();
+			}
+			else if (!IsReady)
 			{
 				ScreenNotification.ShowNotification("(" + ((Module)MistwarModule.ModuleInstance).get_Name() + ") Map images are being prepared...", (NotificationType)2, (Texture2D)null, 4);
 			}
-			else
+			else if (GameUtil.IsAvailable() && GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch())
 			{
-				_mapControl?.Toggle(forceHide, silent);
+				((WindowBase2)_window).ToggleWindow();
 			}
 		}
 
@@ -229,7 +274,7 @@ namespace Nekres.Mistwar.Services
 		{
 			if (e.get_Value())
 			{
-				Toggle(forceHide: true, silent: true);
+				Toggle(forceHide: true);
 			}
 		}
 
@@ -237,7 +282,7 @@ namespace Nekres.Mistwar.Services
 		{
 			if (!e.get_Value())
 			{
-				Toggle(forceHide: true, silent: true);
+				Toggle(forceHide: true);
 			}
 		}
 
@@ -248,14 +293,11 @@ namespace Nekres.Mistwar.Services
 
 		public void Dispose()
 		{
+			((Container)_window).remove_ContentResized((EventHandler<RegionChangedEventArgs>)OnWindowResized);
 			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
 			GameService.Gw2Mumble.get_UI().remove_IsMapOpenChanged((EventHandler<ValueEventArgs<bool>>)OnIsMapOpenChanged);
 			GameService.GameIntegration.get_Gw2Instance().remove_IsInGameChanged((EventHandler<ValueEventArgs<bool>>)OnIsInGameChanged);
-			MapImage mapControl = _mapControl;
-			if (mapControl != null)
-			{
-				((Control)mapControl).Dispose();
-			}
+			((Control)_window).Dispose();
 			foreach (AsyncTexture2D value in _mapCache.Values)
 			{
 				if (value != null)

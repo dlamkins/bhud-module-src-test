@@ -14,6 +14,7 @@ using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Nekres.Mistwar.Entities;
 using Nekres.Mistwar.Services;
@@ -41,11 +42,7 @@ namespace Nekres.Mistwar
 
 		internal SettingEntry<bool> DrawSectorsSetting;
 
-		internal SettingEntry<float> ScaleRatioSetting;
-
 		internal SettingEntry<bool> DrawObjectiveNamesSetting;
-
-		internal SettingEntry<float> OpacitySetting;
 
 		internal SettingEntry<bool> DrawRuinMapSetting;
 
@@ -69,7 +66,7 @@ namespace Nekres.Mistwar
 
 		internal SettingEntry<bool> MarkerStickySetting;
 
-		private AsyncTexture2D _cornerTex;
+		internal Texture2D CornerTex;
 
 		private CornerIcon _moduleIcon;
 
@@ -117,9 +114,7 @@ namespace Nekres.Mistwar
 			DrawObjectiveNamesSetting = mapSettings.DefineSetting<bool>("DrawObjectiveNames", true, (Func<string>)(() => "Show Objective Names"), (Func<string>)(() => "Indicates if the names of the objectives should be drawn."));
 			DrawRuinMapSetting = mapSettings.DefineSetting<bool>("ShowRuins", true, (Func<string>)(() => "Show Ruins"), (Func<string>)(() => "Indicates if the ruins should be shown."));
 			DrawEmergencyWayPointsSetting = mapSettings.DefineSetting<bool>("ShowEmergencyWayPoints", false, (Func<string>)(() => "Show Emergency Waypoints"), (Func<string>)(() => "Shows your team's Emergency Waypoints."));
-			OpacitySetting = mapSettings.DefineSetting<float>("Opacity", 80f, (Func<string>)(() => "Opacity"), (Func<string>)(() => "Changes the opacity of the tactical map interface."));
 			ColorIntensitySetting = mapSettings.DefineSetting<float>("ColorIntensity", 80f, (Func<string>)(() => "Color Intensity"), (Func<string>)(() => "Intensity of the background color."));
-			ScaleRatioSetting = mapSettings.DefineSetting<float>("ScaleRatio", 80f, (Func<string>)(() => "Scale Ratio"), (Func<string>)(() => "Changes the size of the tactical map interface"));
 			SettingCollection markerSettings = settings.AddSubCollection("Markers", true, false);
 			markerSettings.set_RenderInUi(true);
 			EnableMarkersSetting = markerSettings.DefineSetting<bool>("EnableMarkers", true, (Func<string>)(() => "Enable Markers"), (Func<string>)(() => "Enables the markers overlay which shows objectives at their world position."));
@@ -135,13 +130,11 @@ namespace Nekres.Mistwar
 
 		protected override void Initialize()
 		{
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Expected O, but got Unknown
 			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0043: Expected O, but got Unknown
 			ChatMessageKeySetting.get_Value().set_Enabled(false);
-			_cornerTex = new AsyncTexture2D(ContentsManager.GetTexture("corner_icon.png"));
-			_moduleIcon = new CornerIcon(_cornerTex, ((Module)this).get_Name());
+			CornerTex = ContentsManager.GetTexture("corner_icon.png");
+			_moduleIcon = new CornerIcon(AsyncTexture2D.op_Implicit(CornerTex), ((Module)this).get_Name());
 			WvwService = new WvwService(Gw2ApiManager);
 			if (EnableMarkersSetting.get_Value())
 			{
@@ -165,7 +158,6 @@ namespace Nekres.Mistwar
 			ColorIntensitySetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnColorIntensitySettingChanged);
 			ToggleMapKeySetting.get_Value().add_Activated((EventHandler<EventArgs>)OnToggleKeyActivated);
 			ToggleMarkersKeySetting.get_Value().add_Activated((EventHandler<EventArgs>)OnToggleMarkersKeyActivated);
-			OpacitySetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnOpacitySettingChanged);
 			EnableMarkersSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnEnableMarkersSettingChanged);
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
 			GameService.Gw2Mumble.get_UI().add_IsMapOpenChanged((EventHandler<ValueEventArgs<bool>>)OnIsMapOpenChanged);
@@ -173,7 +165,6 @@ namespace Nekres.Mistwar
 			ToggleMapKeySetting.get_Value().set_Enabled(true);
 			ToggleMarkersKeySetting.get_Value().set_Enabled(true);
 			OnColorIntensitySettingChanged(null, new ValueChangedEventArgs<float>(0f, ColorIntensitySetting.get_Value()));
-			OnOpacitySettingChanged(null, new ValueChangedEventArgs<float>(0f, OpacitySetting.get_Value()));
 			((Control)_moduleIcon).add_Click((EventHandler<MouseEventArgs>)OnModuleIconClick);
 			((Module)this).OnModuleLoaded(e);
 		}
@@ -206,15 +197,9 @@ namespace Nekres.Mistwar
 			return new Progress<string>(UpdateModuleLoading);
 		}
 
-		private void OnOpacitySettingChanged(object o, ValueChangedEventArgs<float> e)
-		{
-			_mapService.Opacity = MathHelper.Clamp(e.get_NewValue() / 100f, 0f, 1f);
-		}
-
 		private void OnToggleKeyActivated(object o, EventArgs e)
 		{
 			_mapService.Toggle();
-			MarkerService?.Toggle(_mapService.IsVisible);
 		}
 
 		private void OnToggleMarkersKeyActivated(object o, EventArgs e)
@@ -245,8 +230,8 @@ namespace Nekres.Mistwar
 		private void OnMapChanged(object o, ValueEventArgs<int> e)
 		{
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Expected O, but got Unknown
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Expected O, but got Unknown
 			if (GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch())
 			{
 				CornerIcon moduleIcon = _moduleIcon;
@@ -254,7 +239,7 @@ namespace Nekres.Mistwar
 				{
 					((Control)moduleIcon).Dispose();
 				}
-				_moduleIcon = new CornerIcon(_cornerTex, ((Module)this).get_Name());
+				_moduleIcon = new CornerIcon(AsyncTexture2D.op_Implicit(CornerTex), ((Module)this).get_Name());
 				((Control)_moduleIcon).add_Click((EventHandler<MouseEventArgs>)OnModuleIconClick);
 				ToggleMapKeySetting.get_Value().set_Enabled(true);
 			}
@@ -272,8 +257,8 @@ namespace Nekres.Mistwar
 		private void OnIsInGameChanged(object o, ValueEventArgs<bool> e)
 		{
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Expected O, but got Unknown
+			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Expected O, but got Unknown
 			if (e.get_Value() && GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch())
 			{
 				CornerIcon moduleIcon = _moduleIcon;
@@ -281,7 +266,7 @@ namespace Nekres.Mistwar
 				{
 					((Control)moduleIcon).Dispose();
 				}
-				_moduleIcon = new CornerIcon(_cornerTex, ((Module)this).get_Name());
+				_moduleIcon = new CornerIcon(AsyncTexture2D.op_Implicit(CornerTex), ((Module)this).get_Name());
 				((Control)_moduleIcon).add_Click((EventHandler<MouseEventArgs>)OnModuleIconClick);
 				ToggleMapKeySetting.get_Value().set_Enabled(true);
 			}
@@ -307,8 +292,11 @@ namespace Nekres.Mistwar
 				if (GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch())
 				{
 					List<WvwObjectiveEntity> obj = await WvwService.GetObjectives(GameService.Gw2Mumble.get_CurrentMap().get_Id());
-					MarkerService?.ReloadMarkers(obj);
-					MarkerService?.Toggle(_mapService.IsVisible);
+					if (MarkerService != null)
+					{
+						MarkerService.ReloadMarkers(obj);
+						MarkerService.Toggle();
+					}
 				}
 			}
 			else
@@ -323,7 +311,6 @@ namespace Nekres.Mistwar
 			ColorIntensitySetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnColorIntensitySettingChanged);
 			ToggleMapKeySetting.get_Value().remove_Activated((EventHandler<EventArgs>)OnToggleKeyActivated);
 			ToggleMarkersKeySetting.get_Value().remove_Activated((EventHandler<EventArgs>)OnToggleMarkersKeyActivated);
-			OpacitySetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnOpacitySettingChanged);
 			EnableMarkersSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnEnableMarkersSettingChanged);
 			ToggleMapKeySetting.get_Value().set_Enabled(false);
 			ToggleMarkersKeySetting.get_Value().set_Enabled(false);
@@ -336,10 +323,10 @@ namespace Nekres.Mistwar
 			{
 				((Control)moduleIcon).Dispose();
 			}
-			AsyncTexture2D cornerTex = _cornerTex;
+			Texture2D cornerTex = CornerTex;
 			if (cornerTex != null)
 			{
-				cornerTex.Dispose();
+				((GraphicsResource)cornerTex).Dispose();
 			}
 			MarkerService?.Dispose();
 			WvwService?.Dispose();
