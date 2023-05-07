@@ -78,11 +78,11 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Control)val2).set_Width(((Control)listPanel).get_Width());
 			val2.set_FlowDirection((ControlFlowDirection)5);
 			FlowPanel buttonGroup = val2;
-			RenderButton((Panel)(object)buttonGroup, "Cancel", delegate
+			RenderButton((Panel)(object)buttonGroup, base.TranslationService.GetTranslation("manageReminderTimesView-btn-cancel", "Cancel"), delegate
 			{
 				this.CancelClicked?.Invoke(this, EventArgs.Empty);
 			});
-			RenderButton((Panel)(object)buttonGroup, "Save", delegate
+			RenderButton((Panel)(object)buttonGroup, base.TranslationService.GetTranslation("manageReminderTimesView-btn-save", "Save"), delegate
 			{
 				this.SaveClicked?.Invoke(this, (_ev, _reminderTimes));
 			});
@@ -115,16 +115,16 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			int x = num.GetValueOrDefault();
 			Panel val = new Panel();
 			((Control)val).set_Parent((Container)(object)parent);
-			((Control)val).set_Width(x + 100);
+			((Control)val).set_Width(x + 120);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
 			Panel addButtonPanel = val;
-			Button button = RenderButton(addButtonPanel, "Add", delegate
+			Button button = RenderButton(addButtonPanel, base.TranslationService.GetTranslation("manageReminderTimesView-btn-add", "Add"), delegate
 			{
 				_reminderTimes.Add(TimeSpan.Zero);
 				RenderTimes(parent);
 			});
 			((Control)button).set_Left(x);
-			((Control)button).set_Width(100);
+			((Control)button).set_Width(120);
 			button.Icon = base.IconService.GetIcon("1444520.png");
 			button.ResizeIcon = false;
 		}
@@ -225,13 +225,13 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					ShowError(ex.Message);
 				}
 			};
-			Button button = RenderButton(timeSectionPanel, "Remove", delegate
+			Button button = RenderButton(timeSectionPanel, base.TranslationService.GetTranslation("manageReminderTimesView-btn-remove", "Remove"), delegate
 			{
 				_reminderTimes.Remove(time);
 				RenderTimes(parent);
 			}, () => disableRemove);
 			((Control)button).set_Left(((Control)seconds).get_Right() + 10);
-			((Control)button).set_Width(100);
+			((Control)button).set_Width(120);
 			button.Icon = base.IconService.GetIcon("1444524.png");
 			button.ResizeIcon = false;
 			return timeSectionPanel;

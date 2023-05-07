@@ -308,7 +308,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Panel)val2).set_CanScroll(true);
 			FlowPanel settingsPanel = val2;
 			((Control)settingsPanel).DoUpdate(GameService.Overlay.get_CurrentGameTime());
-			RenderEnabledSettings(settingsPanel, areaConfiguration);
+			RenderGeneralSettings(settingsPanel, areaConfiguration);
 			RenderEmptyLine((Panel)(object)settingsPanel);
 			RenderLocationAndSizeSettings(settingsPanel, areaConfiguration);
 			RenderEmptyLine((Panel)(object)settingsPanel);
@@ -362,7 +362,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Control)areaName).set_Width(((Control)removeButton).get_Left() - ((Control)areaName).get_Left());
 		}
 
-		private void RenderEnabledSettings(FlowPanel settingsPanel, EventAreaConfiguration areaConfiguration)
+		private void RenderGeneralSettings(FlowPanel settingsPanel, EventAreaConfiguration areaConfiguration)
 		{
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
@@ -375,7 +375,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Expected O, but got Unknown
+			//IL_006f: Expected O, but got Unknown
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)settingsPanel);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
@@ -385,7 +385,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Panel)val).set_ShowBorder(true);
 			((Panel)val).set_CanCollapse(true);
 			((Panel)val).set_Collapsed(false);
-			((Panel)val).set_Title("Enabled");
+			((Panel)val).set_Title(base.TranslationService.GetTranslation("areaSettingsView-group-general", "General"));
 			FlowPanel groupPanel = val;
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.Enabled);
 			RenderKeybindingSetting((Panel)(object)groupPanel, areaConfiguration.EnabledKeybinding);
@@ -406,7 +406,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Expected O, but got Unknown
+			//IL_006f: Expected O, but got Unknown
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)settingsPanel);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
@@ -416,7 +416,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Panel)val).set_ShowBorder(true);
 			((Panel)val).set_CanCollapse(true);
 			((Panel)val).set_Collapsed(true);
-			((Panel)val).set_Title("Location & Size");
+			((Panel)val).set_Title(base.TranslationService.GetTranslation("areaSettingsView-group-locationAndSize", "Location & Size"));
 			FlowPanel groupPanel = val;
 			RenderIntSetting((Panel)(object)groupPanel, areaConfiguration.Location.X);
 			RenderIntSetting((Panel)(object)groupPanel, areaConfiguration.Location.Y);
@@ -439,7 +439,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Expected O, but got Unknown
+			//IL_006f: Expected O, but got Unknown
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)settingsPanel);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
@@ -449,7 +449,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Panel)val).set_ShowBorder(true);
 			((Panel)val).set_CanCollapse(true);
 			((Panel)val).set_Collapsed(true);
-			((Panel)val).set_Title("Layout");
+			((Panel)val).set_Title(base.TranslationService.GetTranslation("areaSettingsView-group-layout", "Layout"));
 			FlowPanel groupPanel = val;
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.DrawBorders);
 			RenderEnumSetting<BuildDirection>((Panel)(object)groupPanel, areaConfiguration.BuildDirection);
@@ -473,7 +473,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Expected O, but got Unknown
+			//IL_006f: Expected O, but got Unknown
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)settingsPanel);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
@@ -483,7 +483,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Panel)val).set_ShowBorder(true);
 			((Panel)val).set_CanCollapse(true);
 			((Panel)val).set_Collapsed(true);
-			((Panel)val).set_Title("Visibility");
+			((Panel)val).set_Title(base.TranslationService.GetTranslation("areaSettingsView-group-visibility", "Visibility"));
 			FlowPanel groupPanel = val;
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.HideOnMissingMumbleTicks);
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.HideOnOpenMap);
@@ -508,7 +508,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Expected O, but got Unknown
+			//IL_006f: Expected O, but got Unknown
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)settingsPanel);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
@@ -518,7 +518,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Panel)val).set_ShowBorder(true);
 			((Panel)val).set_CanCollapse(true);
 			((Panel)val).set_Collapsed(true);
-			((Panel)val).set_Title("Text & Color");
+			((Panel)val).set_Title(base.TranslationService.GetTranslation("areaSettingsView-group-textAndColor", "Text & Color"));
 			FlowPanel groupPanel = val;
 			base.RenderEnumSetting<FontSize>((Panel)(object)groupPanel, areaConfiguration.FontSize);
 			RenderColorSetting((Panel)(object)groupPanel, areaConfiguration.TextColor);
@@ -535,6 +535,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderFloatSetting((Panel)(object)groupPanel, areaConfiguration.EventBackgroundOpacity);
 			RenderEmptyLine((Panel)(object)groupPanel);
 			RenderColorSetting((Panel)(object)groupPanel, areaConfiguration.CategoryNameColor);
+			RenderEmptyLine((Panel)(object)groupPanel);
+			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.EnableColorGradients);
 			RenderEmptyLine((Panel)(object)groupPanel, 20);
 		}
 
@@ -551,7 +553,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Expected O, but got Unknown
+			//IL_0083: Expected O, but got Unknown
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)settingsPanel);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
@@ -561,17 +563,20 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Panel)val).set_ShowBorder(true);
 			((Panel)val).set_CanCollapse(true);
 			((Panel)val).set_Collapsed(true);
-			((Panel)val).set_Title("Behaviours");
+			((Panel)val).set_Title(base.TranslationService.GetTranslation("areaSettingsView-group-behaviours", "Behaviours"));
 			FlowPanel groupPanel = val;
 			RenderEnumSetting<LeftClickAction>((Panel)(object)groupPanel, areaConfiguration.LeftClickAction);
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.AcceptWaypointPrompt);
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.ShowTooltips);
 			RenderEmptyLine((Panel)(object)groupPanel);
+			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.EnableHistorySplitScrolling);
+			RenderIntSetting((Panel)(object)groupPanel, areaConfiguration.HistorySplitScrollingSpeed);
+			RenderEmptyLine((Panel)(object)groupPanel);
 			RenderEnumSetting<EventCompletedAction>((Panel)(object)groupPanel, areaConfiguration.CompletionAction);
 			RenderFloatSetting((Panel)(object)groupPanel, areaConfiguration.CompletedEventsBackgroundOpacity);
 			RenderFloatSetting((Panel)(object)groupPanel, areaConfiguration.CompletedEventsTextOpacity);
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.CompletedEventsInvertTextColor);
-			RenderButton((Panel)(object)groupPanel, "Reset hidden Events", delegate
+			RenderButton((Panel)(object)groupPanel, base.TranslationService.GetTranslation("areaSettingsView-group-behaviours-btn-resetHiddenEvents", "Reset hidden Events"), delegate
 			{
 				_eventStateService.Remove(areaConfiguration.Name, EventStateService.EventStates.Hidden);
 			});
@@ -594,7 +599,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Expected O, but got Unknown
+			//IL_006f: Expected O, but got Unknown
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)settingsPanel);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
@@ -604,7 +609,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Panel)val).set_ShowBorder(true);
 			((Panel)val).set_CanCollapse(true);
 			((Panel)val).set_Collapsed(true);
-			((Panel)val).set_Title("Fillers");
+			((Panel)val).set_Title(base.TranslationService.GetTranslation("areaSettingsView-group-fillers", "Fillers"));
 			FlowPanel groupPanel = val;
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.UseFiller);
 			RenderColorSetting((Panel)(object)groupPanel, areaConfiguration.FillerTextColor);

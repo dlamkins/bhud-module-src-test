@@ -352,6 +352,14 @@ namespace Estreya.BlishHUD.Shared.Settings
 			string registerCornerIconDescriptionDefault = ((SettingEntry)RegisterCornerIcon).get_Description();
 			((SettingEntry)RegisterCornerIcon).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-registerCornerIcon-name", registerCornerIconDisplayNameDefault)));
 			((SettingEntry)RegisterCornerIcon).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-registerCornerIcon-description", registerCornerIconDescriptionDefault)));
+			string cornerIconLeftClickActionDisplayNameDefault = ((SettingEntry)CornerIconLeftClickAction).get_DisplayName();
+			string cornerIconLeftClickActionDescriptionDefault = ((SettingEntry)CornerIconLeftClickAction).get_Description();
+			((SettingEntry)CornerIconLeftClickAction).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-cornerIconLeftClickAction-name", cornerIconLeftClickActionDisplayNameDefault)));
+			((SettingEntry)CornerIconLeftClickAction).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-cornerIconLeftClickAction-description", cornerIconLeftClickActionDescriptionDefault)));
+			string cornerIconRightClickActionDisplayNameDefault = ((SettingEntry)CornerIconRightClickAction).get_DisplayName();
+			string cornerIconRightClickActionDescriptionDefault = ((SettingEntry)CornerIconRightClickAction).get_Description();
+			((SettingEntry)CornerIconRightClickAction).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-cornerIconRightClickAction-name", cornerIconRightClickActionDisplayNameDefault)));
+			((SettingEntry)CornerIconRightClickAction).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-cornerIconRightClickAction-description", cornerIconRightClickActionDescriptionDefault)));
 			string hideOnOpenMapDisplayNameDefault = ((SettingEntry)HideOnOpenMap).get_DisplayName();
 			string hideOnOpenMapDescriptionDefault = ((SettingEntry)HideOnOpenMap).get_Description();
 			((SettingEntry)HideOnOpenMap).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-hideOnOpenMap-name", hideOnOpenMapDisplayNameDefault)));

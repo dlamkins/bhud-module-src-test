@@ -48,13 +48,14 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		protected override void BuildView(FlowPanel parent)
 		{
-			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.ShowDynamicEventsOnMap);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.ShowDynamicEventInWorld, async (bool oldVal, bool newVal) => !newVal || await new ConfirmDialog("Activate \"" + ((SettingEntry)_moduleSettings.ShowDynamicEventInWorld).get_DisplayName() + "\"?", "You are in the process of activating \"" + ((SettingEntry)_moduleSettings.ShowDynamicEventInWorld).get_DisplayName() + "\".\nThis setting will add event boundaries inside your view (only when applicable events are on your map).\n\nDo you want to continue?", base.IconService).ShowDialog() == DialogResult.OK);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.ShowDynamicEventsInWorldOnlyWhenInside);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.IgnoreZAxisOnDynamicEventsInWorld);
 			RenderIntSetting((Panel)(object)parent, _moduleSettings.DynamicEventsRenderDistance);
-			RenderButton((Panel)(object)parent, base.TranslationService.GetTranslation("dynamicEventsSettingsView-manageEvents-btn", "Manage Events"), delegate
+			RenderButton((Panel)(object)parent, base.TranslationService.GetTranslation("dynamicEventsSettingsView-btn-manageEvents", "Manage Events"), delegate
 			{
 				if (_manageEventsWindow == null)
 				{
@@ -71,7 +72,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			if (_dynamicEventsInWorldImage != null)
 			{
 				RenderEmptyLine((Panel)(object)parent, 100);
-				RenderLabel((Panel)(object)parent, "Image of dynamic events inside the game world:");
+				RenderLabel((Panel)(object)parent, base.TranslationService.GetTranslation("dynamicEventsSettingsView-lbl-imageOfDynamicEventsInWorld", "Image of dynamic events inside the game world:"));
 				((Control)new Image(AsyncTexture2D.op_Implicit(_dynamicEventsInWorldImage))).set_Parent((Container)(object)parent);
 			}
 		}

@@ -21,6 +21,10 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		public SettingEntry<int> HistorySplit { get; set; }
 
+		public SettingEntry<bool> EnableHistorySplitScrolling { get; set; }
+
+		public SettingEntry<int> HistorySplitScrollingSpeed { get; set; }
+
 		public SettingEntry<bool> DrawBorders { get; set; }
 
 		public SettingEntry<bool> UseFiller { get; set; }
@@ -80,5 +84,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 		public SettingEntry<bool> ShowCategoryNames { get; set; }
 
 		public SettingEntry<Color> CategoryNameColor { get; set; }
+
+		public SettingEntry<bool> EnableColorGradients { get; set; }
 	}
 }

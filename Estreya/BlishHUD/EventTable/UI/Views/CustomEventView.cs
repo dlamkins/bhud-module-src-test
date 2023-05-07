@@ -67,30 +67,30 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			val.set_FlowDirection((ControlFlowDirection)3);
 			((Panel)val).set_ShowBorder(true);
 			FlowPanel instructionPanel = val;
-			((Control)GetLabelBuilder((Panel)(object)parent).CreatePart("1. Make an account at ", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder builder)
+			((Control)GetLabelBuilder((Panel)(object)parent).CreatePart(base.TranslationService.GetTranslation("customEventView-manual1", "1. Make an account at") + " ", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder builder)
 			{
 				builder.SetFontSize((FontSize)20);
-			}).CreatePart("Estreya BlishHUD API.", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder builder)
+			}).CreatePart(base.TranslationService.GetTranslation("customEventView-manual2", "Estreya BlishHUD API."), (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder builder)
 			{
 				builder.SetFontSize((FontSize)20).SetHyperLink("https://blish-hud.estreya.de/register");
 			}).CreatePart("\n \n", (Action<FormattedLabelPartBuilder>)delegate
 			{
 			})
-				.CreatePart("2. Follow steps send by mail.", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder builder)
+				.CreatePart(base.TranslationService.GetTranslation("customEventView-manual3", "2. Follow steps send by mail."), (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder builder)
 				{
 					builder.SetFontSize((FontSize)20);
 				})
 				.CreatePart("\n \n", (Action<FormattedLabelPartBuilder>)delegate
 				{
 				})
-				.CreatePart("3. Add your own custom events.", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder builder)
+				.CreatePart(base.TranslationService.GetTranslation("customEventView-manual4", "3. Add your own custom events."), (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder builder)
 				{
 					builder.SetFontSize((FontSize)20);
 				})
 				.CreatePart("\n \n", (Action<FormattedLabelPartBuilder>)delegate
 				{
 				})
-				.CreatePart("4. Enter login details below.", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder builder)
+				.CreatePart(base.TranslationService.GetTranslation("customEventView-manual5", "4. Enter login details below."), (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder builder)
 				{
 					builder.SetFontSize((FontSize)20);
 				})
@@ -109,13 +109,13 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0044: Expected O, but got Unknown
 			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e1: Expected O, but got Unknown
+			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0101: Expected O, but got Unknown
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)parent);
 			((Container)val).set_WidthSizingMode((SizingMode)1);
@@ -124,26 +124,26 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			val.set_FlowDirection((ControlFlowDirection)3);
 			FlowPanel loginPanel = val;
 			string password = AsyncHelper.RunSync(() => _blishHudApiService.GetAPIPassword());
-			TextBox usernameTextBox = RenderTextbox((Panel)(object)loginPanel, new Point(0, 0), 250, _blishHudApiService.GetAPIUsername(), "API Username");
-			TextBox passwordTextBox = RenderTextbox((Panel)(object)loginPanel, new Point(0, 0), 250, (!string.IsNullOrWhiteSpace(password)) ? "<<Unchanged>>" : null, "API Password");
+			TextBox usernameTextBox = RenderTextbox((Panel)(object)loginPanel, new Point(0, 0), 250, _blishHudApiService.GetAPIUsername(), base.TranslationService.GetTranslation("customEventView-apiUsername", "API Username"));
+			TextBox passwordTextBox = RenderTextbox((Panel)(object)loginPanel, new Point(0, 0), 250, (!string.IsNullOrWhiteSpace(password)) ? "<<Unchanged>>" : null, base.TranslationService.GetTranslation("customEventView-apiPassword", "API Password"));
 			FlowPanel val2 = new FlowPanel();
 			((Control)val2).set_Parent((Container)(object)loginPanel);
 			((Container)val2).set_WidthSizingMode((SizingMode)1);
 			((Container)val2).set_HeightSizingMode((SizingMode)1);
 			val2.set_FlowDirection((ControlFlowDirection)2);
 			FlowPanel buttonPanel = val2;
-			RenderButtonAsync((Panel)(object)buttonPanel, "Save", async delegate
+			RenderButtonAsync((Panel)(object)buttonPanel, base.TranslationService.GetTranslation("customEventView-btn-save", "Save"), async delegate
 			{
 				_blishHudApiService.SetAPIUsername(((TextInputBase)usernameTextBox).get_Text());
 				await _blishHudApiService.SetAPIPassword((((TextInputBase)passwordTextBox).get_Text() == "<<Unchanged>>") ? password : ((TextInputBase)passwordTextBox).get_Text());
 				await _blishHudApiService.Login();
 			});
-			RenderButtonAsync((Panel)(object)buttonPanel, "Test Login", async delegate
+			RenderButtonAsync((Panel)(object)buttonPanel, base.TranslationService.GetTranslation("customEventView-btn-testLogin", "Test Login"), async delegate
 			{
 				await _blishHudApiService.TestLogin(((TextInputBase)usernameTextBox).get_Text(), (((TextInputBase)passwordTextBox).get_Text() == "<<Unchanged>>") ? password : ((TextInputBase)passwordTextBox).get_Text());
 				ShowInfo("Login successful!");
 			});
-			RenderButtonAsync((Panel)(object)buttonPanel, "Clear Credentials", async delegate
+			RenderButtonAsync((Panel)(object)buttonPanel, base.TranslationService.GetTranslation("customEventView-btn-clearCredentials", "Clear Credentials"), async delegate
 			{
 				_blishHudApiService.SetAPIUsername(null);
 				await _blishHudApiService.SetAPIPassword(null);

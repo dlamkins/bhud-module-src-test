@@ -290,7 +290,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 					{
 						throw new ArgumentNullException("directoryPath", "Module directory is not specified.");
 					}
-					SkillService = new SkillService(configurations.Skills, Gw2ApiManager, IconService, directoryPath, GetFlurlClient(), "https://files.estreya.de/blish-hud");
+					SkillService = new SkillService(configurations.Skills, Gw2ApiManager, IconService, directoryPath, GetFlurlClient(), "https://files.estreya.de");
 					_services.Add(SkillService);
 				}
 				if (configurations.ArcDPS.Enabled)
@@ -513,7 +513,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 						}
 					}
 				}
-				string stateTexts = ((stateLoadingTexts.Count == 0) ? null : ("Services:\n    " + string.Join("\n    ", stateLoadingTexts)));
+				string stateTexts = ((stateLoadingTexts.Count == 0) ? null : ("Services:\n" + new string(' ', 4) + string.Join("\n" + new string(' ', 4), stateLoadingTexts)));
 				ReportLoading("states", stateTexts);
 			}
 			StringBuilder loadingTexts = new StringBuilder();

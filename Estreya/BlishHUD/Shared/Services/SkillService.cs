@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -23,7 +22,14 @@ namespace Estreya.BlishHUD.Shared.Services
 {
 	public class SkillService : FilesystemAPIService<Skill>
 	{
-		private const string SKILL_FOLDER_NAME = "skills";
+		private struct MissingArcDPSSkill
+		{
+			public int ID { get; set; }
+
+			public string Name { get; set; }
+
+			public int HintID { get; set; }
+		}
 
 		private const string MISSING_SKILLS_FILE_NAME = "missing_skills.json";
 
@@ -39,7 +45,7 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		private AsyncRef<double> _lastSaveMissingSkill = new AsyncRef<double>(0.0);
 
-		private ConcurrentDictionary<int, (string Name, int HintId)> _missingSkillsFromAPIReportedByArcDPS;
+		private SynchronizedCollection<MissingArcDPSSkill> _missingSkillsFromAPIReportedByArcDPS;
 
 		protected override string BASE_FOLDER_STRUCTURE => "skills";
 
@@ -63,12 +69,12 @@ namespace Estreya.BlishHUD.Shared.Services
 		{
 			_iconService = iconService;
 			_flurlClient = flurlClient;
-			_webRootUrl = webRootUrl;
+			_webRootUrl = new Uri(new Uri(webRootUrl), "/gw2/api/v2/skills").ToString();
 		}
 
 		protected override Task DoInitialize()
 		{
-			_missingSkillsFromAPIReportedByArcDPS = new ConcurrentDictionary<int, (string, int)>();
+			_missingSkillsFromAPIReportedByArcDPS = new SynchronizedCollection<MissingArcDPSSkill>();
 			return Task.CompletedTask;
 		}
 
@@ -98,11 +104,12 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		protected override async Task OnAfterLoadFromAPIAfterSave()
 		{
+			ReportProgress("Adding missing skills...");
 			await AddMissingSkills(base.APIObjectList);
+			ReportProgress("Remap skills...");
 			await RemapSkillIds(base.APIObjectList);
-			Logger.Debug("Loading skill icons..");
+			ReportProgress("Loading skill icons...");
 			LoadSkillIcons(base.APIObjectList);
-			Logger.Debug("Loaded skill icons..");
 			SignalUpdated();
 		}
 
@@ -127,7 +134,7 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		private async Task RemapSkillIds(List<Skill> skills)
 		{
-			using Stream remappedSkillsStream = await _flurlClient.Request(_webRootUrl, "skills", "remapped_skills.json").GetStreamAsync(default(CancellationToken), (HttpCompletionOption)0);
+			using Stream remappedSkillsStream = await _flurlClient.Request(_webRootUrl, "remapped_skills.json").GetStreamAsync(default(CancellationToken), (HttpCompletionOption)0);
 			using ReadProgressStream progressStream = new ReadProgressStream(remappedSkillsStream);
 			progressStream.ProgressChanged += delegate(object s, ReadProgressStream.ProgressChangedEventArgs e)
 			{
@@ -157,7 +164,7 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		private async Task AddMissingSkills(List<Skill> skills)
 		{
-			using ReadProgressStream progressStream = new ReadProgressStream(await _flurlClient.Request(_webRootUrl, "skills", "missing_skills.json").GetStreamAsync(default(CancellationToken), (HttpCompletionOption)0));
+			using ReadProgressStream progressStream = new ReadProgressStream(await _flurlClient.Request(_webRootUrl, "missing_skills.json").GetStreamAsync(default(CancellationToken), (HttpCompletionOption)0));
 			progressStream.ProgressChanged += delegate(object s, ReadProgressStream.ProgressChangedEventArgs e)
 			{
 				ReportProgress($"Reading missing skills... {Math.Round(e.Progress, 0)}%");
@@ -211,7 +218,7 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		private async Task SaveMissingSkills()
 		{
-			await FileUtil.WriteStringAsync(Path.Combine(base.DirectoryPath, "missingSkills.json"), JsonConvert.SerializeObject(_missingSkillsFromAPIReportedByArcDPS.OrderBy((KeyValuePair<int, (string Name, int HintId)> skill) => skill.Value).ToDictionary((KeyValuePair<int, (string Name, int HintId)> skill) => skill.Key, (KeyValuePair<int, (string Name, int HintId)> skill) => skill.Value), Formatting.Indented));
+			await FileUtil.WriteStringAsync(Path.Combine(base.DirectoryPath, "missingSkills.json"), JsonConvert.SerializeObject(_missingSkillsFromAPIReportedByArcDPS.OrderBy((MissingArcDPSSkill skill) => skill.ID), Formatting.Indented));
 		}
 
 		private async Task LoadMissingSkills()
@@ -221,7 +228,7 @@ namespace Estreya.BlishHUD.Shared.Services
 			{
 				try
 				{
-					_missingSkillsFromAPIReportedByArcDPS = JsonConvert.DeserializeObject<ConcurrentDictionary<int, (string, int)>>(await FileUtil.ReadStringAsync(missingSkillPath));
+					_missingSkillsFromAPIReportedByArcDPS = JsonConvert.DeserializeObject<SynchronizedCollection<MissingArcDPSSkill>>(await FileUtil.ReadStringAsync(missingSkillPath));
 				}
 				catch (Exception)
 				{
@@ -229,7 +236,7 @@ namespace Estreya.BlishHUD.Shared.Services
 			}
 			else
 			{
-				_missingSkillsFromAPIReportedByArcDPS = new ConcurrentDictionary<int, (string, int)>();
+				_missingSkillsFromAPIReportedByArcDPS = new SynchronizedCollection<MissingArcDPSSkill>();
 			}
 		}
 
@@ -285,6 +292,10 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		public bool AddMissingSkill(int id, string name)
 		{
+			if (_missingSkillsFromAPIReportedByArcDPS.Any((MissingArcDPSSkill m) => m.ID == id))
+			{
+				return false;
+			}
 			int hintId = -1;
 			using (_apiObjectListLock.Lock())
 			{
@@ -297,12 +308,26 @@ namespace Estreya.BlishHUD.Shared.Services
 					}
 				}
 			}
-			return _missingSkillsFromAPIReportedByArcDPS?.TryAdd(id, (name, hintId)) ?? false;
+			_missingSkillsFromAPIReportedByArcDPS?.Add(new MissingArcDPSSkill
+			{
+				ID = id,
+				Name = name,
+				HintID = hintId
+			});
+			return true;
 		}
 
 		public void RemoveMissingSkill(int id)
 		{
-			_missingSkillsFromAPIReportedByArcDPS?.TryRemove(id, out var _);
+			List<MissingArcDPSSkill> items = _missingSkillsFromAPIReportedByArcDPS.Where((MissingArcDPSSkill m) => m.ID == id).ToList();
+			if (!items.Any())
+			{
+				return;
+			}
+			foreach (MissingArcDPSSkill item in items)
+			{
+				_missingSkillsFromAPIReportedByArcDPS?.Remove(item);
+			}
 		}
 	}
 }

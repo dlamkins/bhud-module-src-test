@@ -49,7 +49,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderFloatSetting((Panel)(object)parent, _moduleSettings.ReminderDuration);
 			RenderFloatSetting((Panel)(object)parent, _moduleSettings.ReminderOpacity);
 			RenderEmptyLine((Panel)(object)parent);
-			RenderButton((Panel)(object)parent, base.TranslationService.GetTranslation("reminderSettingsView-manageReminders-btn", "Manage Reminders"), delegate
+			RenderButton((Panel)(object)parent, base.TranslationService.GetTranslation("reminderSettingsView-btn-manageReminders", "Manage Reminders"), delegate
 			{
 				if (_manageEventsWindow == null)
 				{
@@ -66,20 +66,17 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					{
 						new ManageEventsView.CustomActionDefinition
 						{
-							Name = "Change Times",
-							Tooltip = "Click to change the times at which reminders happen.",
+							Name = base.TranslationService.GetTranslation("reminderSettingsView-btn-changeTimes-title", "Change Times"),
+							Tooltip = base.TranslationService.GetTranslation("reminderSettingsView-btn-changeTimes-tooltip", "Click to change the times at which reminders happen."),
 							Icon = "1466345.png",
-							Action = delegate(Estreya.BlishHUD.EventTable.Models.Event ev)
-							{
-								ManageReminderTimes(ev);
-							}
+							Action = ManageReminderTimes
 						}
 					}
 				} }, () => _moduleSettings.ReminderDisabledForEvents.get_Value(), _moduleSettings, base.APIManager, base.IconService, base.TranslationService);
 				manageEventsView.EventChanged += ManageView_EventChanged;
 				_manageEventsWindow.Show((IView)(object)manageEventsView);
 			});
-			RenderButton((Panel)(object)parent, base.TranslationService.GetTranslation("reminderSettingsView-testReminder-btn", "Test Reminder"), delegate
+			RenderButton((Panel)(object)parent, base.TranslationService.GetTranslation("reminderSettingsView-btn-testReminder", "Test Reminder"), delegate
 			{
 				EventNotification eventNotification = new EventNotification(new Estreya.BlishHUD.EventTable.Models.Event
 				{
@@ -89,7 +86,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				eventNotification.BackgroundOpacity = _moduleSettings.ReminderOpacity.get_Value();
 				eventNotification.Show(TimeSpan.FromSeconds(_moduleSettings.ReminderDuration.get_Value()));
 			});
-			RenderButton((Panel)(object)parent, "Change all Reminder Times", delegate
+			RenderButton((Panel)(object)parent, base.TranslationService.GetTranslation("reminderSettingsView-btn-changeAllTimes", "Change all Reminder Times"), delegate
 			{
 				ManageReminderTimes(_globalChangeTempEvent);
 			});

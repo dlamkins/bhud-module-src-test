@@ -34,13 +34,15 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private readonly Func<Color> _getTextColor;
 
-		private readonly Func<Color> _getColorAction;
+		private readonly Func<Color[]> _getColorAction;
 
 		private readonly Func<bool> _getDrawShadowAction;
 
 		private readonly Func<Color> _getShadowColor;
 
-		public Estreya.BlishHUD.EventTable.Models.Event Ev { get; private set; }
+		private Texture2D _backgroundColorTexture;
+
+		public Estreya.BlishHUD.EventTable.Models.Event Model { get; private set; }
 
 		public event EventHandler HideRequested;
 
@@ -48,9 +50,9 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		public event EventHandler FinishRequested;
 
-		public Event(Estreya.BlishHUD.EventTable.Models.Event ev, IconService iconService, TranslationService translationService, Func<DateTime> getNowAction, DateTime startTime, DateTime endTime, Func<BitmapFont> getFontAction, Func<bool> getDrawBorders, Func<bool> getDrawCrossout, Func<Color> getTextColor, Func<Color> getColorAction, Func<bool> getDrawShadowAction, Func<Color> getShadowColor)
+		public Event(Estreya.BlishHUD.EventTable.Models.Event ev, IconService iconService, TranslationService translationService, Func<DateTime> getNowAction, DateTime startTime, DateTime endTime, Func<BitmapFont> getFontAction, Func<bool> getDrawBorders, Func<bool> getDrawCrossout, Func<Color> getTextColor, Func<Color[]> getColorAction, Func<bool> getDrawShadowAction, Func<Color> getShadowColor)
 		{
-			Ev = ev;
+			Model = ev;
 			_iconService = iconService;
 			_translationService = translationService;
 			_getNowAction = getNowAction;
@@ -69,33 +71,33 @@ namespace Estreya.BlishHUD.EventTable.Controls
 		{
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Expected O, but got Unknown
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
 			ContextMenuStrip menu = new ContextMenuStrip();
-			ContextMenuStripItem val = new ContextMenuStripItem("Disable");
+			ContextMenuStripItem val = new ContextMenuStripItem(_translationService.GetTranslation("event-contextMenu-disable-title", "Disable"));
 			((Control)val).set_Parent((Container)(object)menu);
-			((Control)val).set_BasicTooltipText("Disables the event entirely.");
+			((Control)val).set_BasicTooltipText(_translationService.GetTranslation("event-contextMenu-disable-tooltip", "Disables the event entirely."));
 			((Control)val).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				this.DisableRequested?.Invoke(this, EventArgs.Empty);
 			});
-			ContextMenuStripItem val2 = new ContextMenuStripItem("Hide");
+			ContextMenuStripItem val2 = new ContextMenuStripItem(_translationService.GetTranslation("event-contextMenu-hide-title", "Hide"));
 			((Control)val2).set_Parent((Container)(object)menu);
-			((Control)val2).set_BasicTooltipText("Hides the event until the next reset.");
+			((Control)val2).set_BasicTooltipText(_translationService.GetTranslation("event-contextMenu-hide-tooltip", "Hides the event until the next reset."));
 			((Control)val2).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				this.HideRequested?.Invoke(this, EventArgs.Empty);
 			});
-			ContextMenuStripItem val3 = new ContextMenuStripItem("Finish");
+			ContextMenuStripItem val3 = new ContextMenuStripItem(_translationService.GetTranslation("event-contextMenu-finish-title", "Finish"));
 			((Control)val3).set_Parent((Container)(object)menu);
-			((Control)val3).set_BasicTooltipText("Completes the event until the next reset.");
+			((Control)val3).set_BasicTooltipText(_translationService.GetTranslation("event-contextMenu-finish-tooltip", "Completes the event until the next reset."));
 			((Control)val3).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				this.FinishRequested?.Invoke(this, EventArgs.Empty);
@@ -108,13 +110,13 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01cd: Expected O, but got Unknown
 			DateTime now = _getNowAction();
-			bool num = _startTime.AddMinutes(Ev.Duration) < now;
+			bool num = _startTime.AddMinutes(Model.Duration) < now;
 			bool isNext = !num && _startTime > now;
 			bool isCurrent = !num && !isNext;
-			string description = Ev.Location + ((!string.IsNullOrWhiteSpace(Ev.Location)) ? "\n" : string.Empty) + "\n";
+			string description = Model.Location + ((!string.IsNullOrWhiteSpace(Model.Location)) ? "\n" : string.Empty) + "\n";
 			if (num)
 			{
-				TimeSpan finishedSince = now - _startTime.AddMinutes(Ev.Duration);
+				TimeSpan finishedSince = now - _startTime.AddMinutes(Model.Duration);
 				description = description + _translationService.GetTranslation("event-tooltip-finishedSince", "Finished since") + ": " + FormatTime(finishedSince);
 			}
 			else if (isNext)
@@ -128,7 +130,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				description = description + _translationService.GetTranslation("event-tooltip-remaining", "Remaining") + ": " + FormatTime(remaining);
 			}
 			description = description + " (" + _translationService.GetTranslation("event-tooltip-startsAt", "Starts at") + ": " + FormatTime(_startTime.ToLocalTime()) + ")";
-			return new Tooltip((ITooltipView)(object)new TooltipView(Ev.Name, description, _iconService.GetIcon(Ev.Icon), _translationService));
+			return new Tooltip((ITooltipView)(object)new TooltipView(Model.Name, description, _iconService.GetIcon(Model.Icon), _translationService));
 		}
 
 		public void Render(SpriteBatch spriteBatch, RectangleF bounds)
@@ -139,17 +141,39 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
 			BitmapFont font = _getFontAction();
 			DrawBackground(spriteBatch, bounds);
-			float nameWidth = (Ev.Filler ? 0f : DrawName(spriteBatch, bounds, font));
+			float nameWidth = (Model.Filler ? 0f : DrawName(spriteBatch, bounds, font));
 			DrawRemainingTime(spriteBatch, bounds, font, nameWidth);
 			DrawCrossout(spriteBatch, bounds);
 		}
 
 		private void DrawBackground(SpriteBatch spriteBatch, RectangleF bounds)
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			spriteBatch.DrawRectangle(Textures.get_Pixel(), bounds, _getColorAction(), _getDrawBorders() ? 1 : 0, Color.get_Black());
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+			Color[] colors = _getColorAction();
+			if (colors.Length == 1)
+			{
+				spriteBatch.DrawRectangle(Textures.get_Pixel(), bounds, colors[0], _getDrawBorders() ? 1 : 0, Color.get_Black());
+				return;
+			}
+			int width = (int)Math.Ceiling(bounds.Width);
+			int height = (int)Math.Ceiling(bounds.Height);
+			if (_backgroundColorTexture == null || _backgroundColorTexture.get_Height() != height || _backgroundColorTexture.get_Width() != width)
+			{
+				Texture2D backgroundColorTexture = _backgroundColorTexture;
+				if (backgroundColorTexture != null)
+				{
+					((GraphicsResource)backgroundColorTexture).Dispose();
+				}
+				_backgroundColorTexture = ColorUtil.CreateColorGradientsTexture(colors, width, height);
+			}
+			spriteBatch.DrawRectangle(_backgroundColorTexture, bounds, Color.get_White(), _getDrawBorders() ? 1 : 0, Color.get_Black());
 		}
 
 		private float DrawName(SpriteBatch spriteBatch, RectangleF bounds, BitmapFont font)
@@ -166,7 +190,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			float xOffset = 5f;
 			float maxWidth = bounds.Width - xOffset * 2f;
 			float nameWidth = 0f;
-			string text = Ev.Name;
+			string text = Model.Name;
 			do
 			{
 				nameWidth = (float)Math.Ceiling(font.MeasureString(text).Width);
@@ -229,7 +253,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 		{
 			if (!(now <= _startTime) && !(now >= _endTime))
 			{
-				return _startTime.AddMinutes(Ev.Duration) - now;
+				return _startTime.AddMinutes(Model.Duration) - now;
 			}
 			return TimeSpan.Zero;
 		}
@@ -275,7 +299,13 @@ namespace Estreya.BlishHUD.EventTable.Controls
 		{
 			_iconService = null;
 			_translationService = null;
-			Ev = null;
+			Model = null;
+			Texture2D backgroundColorTexture = _backgroundColorTexture;
+			if (backgroundColorTexture != null)
+			{
+				((GraphicsResource)backgroundColorTexture).Dispose();
+			}
+			_backgroundColorTexture = null;
 		}
 	}
 }

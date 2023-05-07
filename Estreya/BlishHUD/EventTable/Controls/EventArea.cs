@@ -66,7 +66,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private string _apiRootUrl;
 
-		private Func<DateTime> _getNowAction;
+		private readonly Func<DateTime> _getNowAction;
 
 		private readonly Func<Version> _getVersion;
 
@@ -93,6 +93,12 @@ namespace Estreya.BlishHUD.EventTable.Controls
 		private bool _clearing;
 
 		private Event _activeEvent;
+
+		private int _tempHistorySplit = -1;
+
+		private TimeSpan? _savedDrawInterval;
+
+		private MouseEventType _lastMouseEventType;
 
 		private int DrawXOffset
 		{
@@ -166,6 +172,8 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			Configuration.AllowUnspecifiedMap.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)AllowUnspecifiedMap_SettingChanged);
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)CurrentMap_MapChanged);
 			((Control)this).add_Click((EventHandler<MouseEventArgs>)OnLeftMouseButtonPressed);
+			((Control)this).add_MouseLeft((EventHandler<MouseEventArgs>)OnMouseLeft);
+			((Control)this).add_MouseWheelScrolled((EventHandler<MouseEventArgs>)OnMouseWheelScrolled);
 			Location_SettingChanged(this, null);
 			Size_SettingChanged(this, null);
 			Opacity_SettingChanged(this, new ValueChangedEventArgs<float>(0f, Configuration.Opacity.get_Value()));
@@ -197,6 +205,56 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			{
 				_eventService.StateAdded += EventService_ServiceAdded;
 				_eventService.StateRemoved += EventService_ServiceRemoved;
+			}
+		}
+
+		private void OnMouseWheelScrolled(object sender, MouseEventArgs e)
+		{
+			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			if (!Configuration.EnableHistorySplitScrolling.get_Value())
+			{
+				return;
+			}
+			if (_tempHistorySplit == -1)
+			{
+				_tempHistorySplit = Configuration.HistorySplit.get_Value();
+			}
+			TimeSpan valueOrDefault = _savedDrawInterval.GetValueOrDefault();
+			if (!_savedDrawInterval.HasValue)
+			{
+				valueOrDefault = base.DrawInterval;
+				_savedDrawInterval = valueOrDefault;
+			}
+			base.DrawInterval = TimeSpan.FromMilliseconds(0.0);
+			MouseState state = GameService.Input.get_Mouse().get_State();
+			int scrollDistance = ((MouseState)(ref state)).get_ScrollWheelValue();
+			int scrollValue = Configuration.HistorySplitScrollingSpeed.get_Value() * ((scrollDistance >= 0) ? 1 : (-1));
+			(float, float)? range = Configuration.HistorySplit.GetRange<int>();
+			if (range.HasValue && range.HasValue)
+			{
+				if ((float)(_tempHistorySplit + scrollValue) > range.Value.Item2)
+				{
+					_tempHistorySplit = (int)range.Value.Item2;
+				}
+				else if ((float)(_tempHistorySplit + scrollValue) < range.Value.Item1)
+				{
+					_tempHistorySplit = (int)range.Value.Item1;
+				}
+				else
+				{
+					_tempHistorySplit += scrollValue;
+				}
+			}
+		}
+
+		private void OnMouseLeft(object sender, MouseEventArgs e)
+		{
+			_tempHistorySplit = -1;
+			if (_savedDrawInterval.HasValue)
+			{
+				base.DrawInterval = _savedDrawInterval.Value;
+				_savedDrawInterval = null;
 			}
 		}
 
@@ -365,18 +423,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		protected override CaptureType CapturesInput()
 		{
-			return (CaptureType)22;
-		}
-
-		public override Control TriggerMouseInput(MouseEventType mouseEventType, MouseState ms)
-		{
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			if (_activeEvent == null)
-			{
-				return null;
-			}
-			return ((Control)this).TriggerMouseInput(mouseEventType, ms);
+			return (CaptureType)30;
 		}
 
 		private List<IGrouping<string, string>> GetActiveEventKeysGroupedByCategory()
@@ -440,7 +487,8 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private float GetTimeSpanRatio()
 		{
-			return 0.5f + ((float)Configuration.HistorySplit.get_Value() / 100f - 0.5f);
+			int historySplit = ((_tempHistorySplit != -1) ? _tempHistorySplit : Configuration.HistorySplit.get_Value());
+			return 0.5f + ((float)historySplit / 100f - 0.5f);
 		}
 
 		private async Task UpdateEventOccurences()
@@ -592,7 +640,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			{
 				foreach (List<(DateTime, Event)> controlEventPairs2 in orderedControlEvents)
 				{
-					if (controlEventPairs2.Count > 0 && controlEventPairs2.First().Item2.Ev.Category.TryGetTarget(out var eventCategory2))
+					if (controlEventPairs2.Count > 0 && controlEventPairs2.First().Item2.Model.Category.TryGetTarget(out var eventCategory2))
 					{
 						_drawXOffset = Math.Max((int)GetFont().MeasureString(eventCategory2.Name).Width + 5, _drawXOffset);
 					}
@@ -605,7 +653,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				{
 					continue;
 				}
-				if (Configuration.ShowCategoryNames.get_Value() && controlEventPairs.First().Item2.Ev.Category.TryGetTarget(out var eventCategory))
+				if (Configuration.ShowCategoryNames.get_Value() && controlEventPairs.First().Item2.Model.Category.TryGetTarget(out var eventCategory))
 				{
 					Color color = ((Configuration.CategoryNameColor.get_Value().get_Id() == 1) ? Color.get_Black() : ColorExtensions.ToXnaColor(Configuration.CategoryNameColor.get_Value().get_Cloth()));
 					BitmapFontExtensions.DrawString(spriteBatch, GetFont(), eventCategory.Name, new Vector2(0f, (float)y), color, (Rectangle?)null);
@@ -613,18 +661,18 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				List<(DateTime, Event)> toDelete = new List<(DateTime, Event)>();
 				foreach (var controlEvent in controlEventPairs)
 				{
-					if (EventDisabled(controlEvent.Item2.Ev))
+					if (EventDisabled(controlEvent.Item2.Model))
 					{
 						toDelete.Add(controlEvent);
 						continue;
 					}
-					float width = (float)controlEvent.Item2.Ev.CalculateWidth(controlEvent.Item1, times.Item2, GetWidth(), PixelPerMinute);
+					float width = (float)controlEvent.Item2.Model.CalculateWidth(controlEvent.Item1, times.Item2, GetWidth(), PixelPerMinute);
 					if (width <= 0f)
 					{
 						toDelete.Add(controlEvent);
 						continue;
 					}
-					float x = (float)controlEvent.Item2.Ev.CalculateXPosition(controlEvent.Item1, times.Item2, PixelPerMinute);
+					float x = (float)controlEvent.Item2.Model.CalculateXPosition(controlEvent.Item1, times.Item2, PixelPerMinute);
 					x = ((x < 0f) ? 0f : x) + (float)DrawXOffset;
 					((RectangleF)(ref renderRect))._002Ector(x, (float)y, width, (float)Configuration.EventHeight.get_Value());
 					controlEvent.Item2.Render(spriteBatch, renderRect);
@@ -636,7 +684,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				}
 				foreach (var delete in toDelete)
 				{
-					Logger.Debug("Deleted event " + delete.Item2.Ev.Name);
+					Logger.Debug("Deleted event " + delete.Item2.Model.Name);
 					RemoveEventHooks(delete.Item2);
 					delete.Item2.Dispose();
 					controlEventPairs.Remove(delete);
@@ -644,15 +692,25 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				y += Configuration.EventHeight.get_Value();
 			}
 			_heightFromLastDraw = ((y == 0) ? 1 : y);
-			if (_activeEvent != null && _lastActiveEvent?.Ev?.Key != _activeEvent.Ev.Key)
+			if (_activeEvent != null && _lastActiveEvent?.Model?.Key != _activeEvent.Model.Key)
 			{
-				bool valueOrDefault = (_activeEvent?.Ev?.Filler).GetValueOrDefault();
+				bool valueOrDefault = (_activeEvent?.Model?.Filler).GetValueOrDefault();
 				Tooltip tooltip = ((Control)this).get_Tooltip();
 				if (tooltip != null)
 				{
 					((Control)tooltip).Dispose();
 				}
 				((Control)this).set_Tooltip((Tooltip)null);
+				ContextMenuStrip menu = ((Control)this).get_Menu();
+				if (menu != null && !((Control)menu).get_Visible())
+				{
+					ContextMenuStrip menu2 = ((Control)this).get_Menu();
+					if (menu2 != null)
+					{
+						((Control)menu2).Dispose();
+					}
+					((Control)this).set_Menu((ContextMenuStrip)null);
+				}
 				if (!valueOrDefault)
 				{
 					((Control)this).set_Tooltip((!Configuration.ShowTooltips.get_Value()) ? null : _activeEvent?.BuildTooltip());
@@ -660,9 +718,29 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				}
 				_lastActiveEvent = _activeEvent;
 			}
-			else if (_activeEvent == null)
+			else
 			{
+				if (_activeEvent != null)
+				{
+					return;
+				}
 				_lastActiveEvent = null;
+				Tooltip tooltip2 = ((Control)this).get_Tooltip();
+				if (tooltip2 != null)
+				{
+					((Control)tooltip2).Dispose();
+				}
+				((Control)this).set_Tooltip((Tooltip)null);
+				ContextMenuStrip menu3 = ((Control)this).get_Menu();
+				if (menu3 != null && !((Control)menu3).get_Visible())
+				{
+					ContextMenuStrip menu4 = ((Control)this).get_Menu();
+					if (menu4 != null)
+					{
+						((Control)menu4).Dispose();
+					}
+					((Control)this).set_Menu((ContextMenuStrip)null);
+				}
 			}
 		}
 
@@ -723,8 +801,8 @@ namespace Estreya.BlishHUD.EventTable.Controls
 						}
 						Event newEventControl = new Event(ev2, _iconService, _translationService, _getNowAction, occurence, occurence.AddMinutes(ev2.Duration), GetFont, () => !ev2.Filler && Configuration.DrawBorders.get_Value(), delegate
 						{
-							EventCompletedAction value4 = Configuration.CompletionAction.get_Value();
-							return (value4 == EventCompletedAction.Crossout || value4 == EventCompletedAction.CrossoutAndChangeOpacity) && _eventService.Contains(Configuration.Name, ev2.SettingKey, EventStateService.EventStates.Completed);
+							EventCompletedAction value3 = Configuration.CompletionAction.get_Value();
+							return (value3 == EventCompletedAction.Crossout || value3 == EventCompletedAction.CrossoutAndChangeOpacity) && _eventService.Contains(Configuration.Name, ev2.SettingKey, EventStateService.EventStates.Completed);
 						}, delegate
 						{
 							//IL_0000: Unknown result type (might be due to invalid IL or missing references)
@@ -739,8 +817,8 @@ namespace Estreya.BlishHUD.EventTable.Controls
 							Color black = Color.get_Black();
 							Color val = ((!ev2.Filler) ? ((Configuration.TextColor.get_Value().get_Id() == 1) ? black : ColorExtensions.ToXnaColor(Configuration.TextColor.get_Value().get_Cloth())) : ((Configuration.FillerTextColor.get_Value().get_Id() == 1) ? black : ColorExtensions.ToXnaColor(Configuration.FillerTextColor.get_Value().get_Cloth())));
 							float num2 = (ev2.Filler ? Configuration.FillerTextOpacity.get_Value() : Configuration.EventTextOpacity.get_Value());
-							EventCompletedAction value3 = Configuration.CompletionAction.get_Value();
-							if ((value3 == EventCompletedAction.ChangeOpacity || value3 == EventCompletedAction.CrossoutAndChangeOpacity) && _eventService.Contains(Configuration.Name, ev2.SettingKey, EventStateService.EventStates.Completed))
+							EventCompletedAction value2 = Configuration.CompletionAction.get_Value();
+							if ((value2 == EventCompletedAction.ChangeOpacity || value2 == EventCompletedAction.CrossoutAndChangeOpacity) && _eventService.Contains(Configuration.Name, ev2.SettingKey, EventStateService.EventStates.Completed))
 							{
 								if (Configuration.CompletedEventsInvertTextColor.get_Value())
 								{
@@ -751,21 +829,40 @@ namespace Estreya.BlishHUD.EventTable.Controls
 							return val * num2;
 						}, delegate
 						{
-							//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-							//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-							//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+							//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+							//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+							//IL_0196: Unknown result type (might be due to invalid IL or missing references)
+							//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
+							//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
+							//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
+							//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
+							//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
 							if (ev2.Filler)
 							{
-								return Color.get_Transparent();
+								return (Color[])(object)new Color[1] { Color.get_Transparent() };
 							}
-							float value = Configuration.EventBackgroundOpacity.get_Value();
-							EventCompletedAction value2 = Configuration.CompletionAction.get_Value();
-							if ((value2 == EventCompletedAction.ChangeOpacity || value2 == EventCompletedAction.CrossoutAndChangeOpacity) && _eventService.Contains(Configuration.Name, ev2.SettingKey, EventStateService.EventStates.Completed))
+							float alpha = Configuration.EventBackgroundOpacity.get_Value();
+							EventCompletedAction value = Configuration.CompletionAction.get_Value();
+							if ((value == EventCompletedAction.ChangeOpacity || value == EventCompletedAction.CrossoutAndChangeOpacity) && _eventService.Contains(Configuration.Name, ev2.SettingKey, EventStateService.EventStates.Completed))
 							{
-								value = Configuration.CompletedEventsBackgroundOpacity.get_Value();
+								alpha = Configuration.CompletedEventsBackgroundOpacity.get_Value();
 							}
-							Color color = (string.IsNullOrWhiteSpace(ev2.BackgroundColorCode) ? Color.White : ColorTranslator.FromHtml(ev2.BackgroundColorCode));
-							return new Color((int)color.R, (int)color.G, (int)color.B) * value;
+							if (!Configuration.EnableColorGradients.get_Value() || ev2.BackgroundColorGradientCodes == null || ev2.BackgroundColorGradientCodes.Length == 0)
+							{
+								if (string.IsNullOrWhiteSpace(ev2.BackgroundColorCode))
+								{
+									return (Color[])(object)new Color[1] { Color.get_White() * alpha };
+								}
+								Color color = ColorTranslator.FromHtml(ev2.BackgroundColorCode);
+								return (Color[])(object)new Color[1] { new Color((int)color.R, (int)color.G, (int)color.B) * alpha };
+							}
+							return ev2.BackgroundColorGradientCodes.Select(delegate(string cc)
+							{
+								//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+								//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+								Color color2 = ColorTranslator.FromHtml(cc);
+								return new Color((int)color2.R, (int)color2.G, (int)color2.B) * alpha;
+							}).ToArray();
 						}, () => (!ev2.Filler) ? Configuration.DrawShadows.get_Value() : Configuration.DrawShadowsForFiller.get_Value(), () => (!ev2.Filler) ? (((Configuration.ShadowColor.get_Value().get_Id() == 1) ? Color.get_Black() : ColorExtensions.ToXnaColor(Configuration.ShadowColor.get_Value().get_Cloth())) * Configuration.ShadowOpacity.get_Value()) : (((Configuration.FillerShadowColor.get_Value().get_Id() == 1) ? Color.get_Black() : ColorExtensions.ToXnaColor(Configuration.FillerShadowColor.get_Value().get_Cloth())) * Configuration.FillerShadowOpacity.get_Value()));
 						AddEventHooks(newEventControl);
 						Logger.Debug($"Added event {ev2.Name} with occurence {occurence}");
@@ -780,26 +877,26 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private void OnLeftMouseButtonPressed(object sender, MouseEventArgs e)
 		{
-			if (_activeEvent == null || _activeEvent.Ev.Filler)
+			if (_activeEvent == null || _activeEvent.Model.Filler)
 			{
 				return;
 			}
 			switch (Configuration.LeftClickAction.get_Value())
 			{
 			case LeftClickAction.CopyWaypoint:
-				if (!string.IsNullOrWhiteSpace(_activeEvent.Ev.Waypoint))
+				if (!string.IsNullOrWhiteSpace(_activeEvent.Model.Waypoint))
 				{
-					ClipboardUtil.get_WindowsClipboardService().SetTextAsync(_activeEvent.Ev.Waypoint);
+					ClipboardUtil.get_WindowsClipboardService().SetTextAsync(_activeEvent.Model.Waypoint);
 					ScreenNotification.ShowNotification(new string[2]
 					{
-						_activeEvent.Ev.Name,
+						_activeEvent.Model.Name,
 						"Copied to clipboard!"
 					});
 				}
 				break;
 			case LeftClickAction.NavigateToWaypoint:
 			{
-				if (string.IsNullOrWhiteSpace(_activeEvent.Ev.Waypoint))
+				if (string.IsNullOrWhiteSpace(_activeEvent.Model.Waypoint))
 				{
 					break;
 				}
@@ -808,10 +905,10 @@ namespace Estreya.BlishHUD.EventTable.Controls
 					ScreenNotification.ShowNotification("PointOfInterestService is still loading!", ScreenNotification.NotificationType.Error);
 					break;
 				}
-				PointOfInterest poi = _pointOfInterestService.GetPointOfInterest(_activeEvent.Ev.Waypoint);
+				PointOfInterest poi = _pointOfInterestService.GetPointOfInterest(_activeEvent.Model.Waypoint);
 				if (poi == null)
 				{
-					ScreenNotification.ShowNotification(_activeEvent.Ev.Waypoint + " not found!", ScreenNotification.NotificationType.Error);
+					ScreenNotification.ShowNotification(_activeEvent.Model.Waypoint + " not found!", ScreenNotification.NotificationType.Error);
 					break;
 				}
 				Task.Run(async delegate
@@ -929,7 +1026,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 		private void Ev_FinishRequested(object sender, EventArgs e)
 		{
 			Event ev = sender as Event;
-			FinishEvent(ev.Ev, GetNextReset());
+			FinishEvent(ev.Model, GetNextReset());
 		}
 
 		private void FinishEvent(Estreya.BlishHUD.EventTable.Models.Event ev, DateTime until)
@@ -955,15 +1052,15 @@ namespace Estreya.BlishHUD.EventTable.Controls
 		private void Ev_HideRequested(object sender, EventArgs e)
 		{
 			Event ev = sender as Event;
-			HideEvent(ev.Ev, GetNextReset());
+			HideEvent(ev.Model, GetNextReset());
 		}
 
 		private void Ev_DisableRequested(object sender, EventArgs e)
 		{
 			Event ev = sender as Event;
-			if (!Configuration.DisabledEventKeys.get_Value().Contains(ev.Ev.SettingKey))
+			if (!Configuration.DisabledEventKeys.get_Value().Contains(ev.Model.SettingKey))
 			{
-				Configuration.DisabledEventKeys.set_Value(new List<string>(Configuration.DisabledEventKeys.get_Value()) { ev.Ev.SettingKey });
+				Configuration.DisabledEventKeys.set_Value(new List<string>(Configuration.DisabledEventKeys.get_Value()) { ev.Model.SettingKey });
 			}
 		}
 
@@ -995,11 +1092,14 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			_worldbossService = null;
 			_mapchestService = null;
 			_eventService = null;
+			_translationService = null;
 			_mapUtil = null;
 			_pointOfInterestService = null;
 			_flurlClient = null;
 			_apiRootUrl = null;
 			((Control)this).remove_Click((EventHandler<MouseEventArgs>)OnLeftMouseButtonPressed);
+			((Control)this).remove_MouseLeft((EventHandler<MouseEventArgs>)OnMouseLeft);
+			((Control)this).remove_MouseWheelScrolled((EventHandler<MouseEventArgs>)OnMouseWheelScrolled);
 			Configuration.EnabledKeybinding.get_Value().remove_Activated((EventHandler<EventArgs>)EnabledKeybinding_Activated);
 			Configuration.Size.X.remove_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)Size_SettingChanged);
 			Configuration.Size.Y.remove_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)Size_SettingChanged);
@@ -1015,6 +1115,8 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			Configuration.AllowUnspecifiedMap.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)AllowUnspecifiedMap_SettingChanged);
 			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)CurrentMap_MapChanged);
 			Configuration = null;
+			_allEvents?.Clear();
+			_allEvents = null;
 		}
 	}
 }

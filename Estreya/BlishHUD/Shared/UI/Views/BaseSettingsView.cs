@@ -7,6 +7,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
+using Estreya.BlishHUD.Shared.Attributes;
 using Estreya.BlishHUD.Shared.Controls;
 using Estreya.BlishHUD.Shared.Extensions;
 using Estreya.BlishHUD.Shared.Services;
@@ -243,7 +244,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 		{
 			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0170: Unknown result type (might be due to invalid IL or missing references)
 			Panel panel = GetPanel((Container)(object)parent);
 			(Label, Label) label = RenderLabel(panel, ((SettingEntry)settingEntry).get_DisplayName());
 			LetterCasing casing = LetterCasing.Title;
@@ -259,8 +260,14 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			{
 				values.AddRange((T[])Enum.GetValues(((SettingEntry)settingEntry).get_SettingType()));
 			}
-			string[] formattedValues = values.Select((T value) => value.Humanize(casing)).ToArray();
-			Dropdown dropdown = RenderDropdown(panel, CONTROL_LOCATION, CONTROL_WIDTH, formattedValues, settingEntry.get_Value().Humanize(casing), delegate(string newValue)
+			string[] formattedValues = values.Select(delegate(T value)
+			{
+				TranslationAttribute attributeOfType = value.GetAttributeOfType<TranslationAttribute>();
+				return (attributeOfType == null) ? value.Humanize(casing) : base.TranslationService.GetTranslation(attributeOfType.TranslationKey, attributeOfType.DefaultValue);
+			}).ToArray();
+			TranslationAttribute translationAttribute = settingEntry.get_Value().GetAttributeOfType<TranslationAttribute>();
+			string selectedValue = ((translationAttribute != null) ? base.TranslationService.GetTranslation(translationAttribute.TranslationKey, translationAttribute.DefaultValue) : settingEntry.get_Value().Humanize(casing));
+			Dropdown dropdown = RenderDropdown(panel, CONTROL_LOCATION, CONTROL_WIDTH, formattedValues, selectedValue, delegate(string newValue)
 			{
 				try
 				{

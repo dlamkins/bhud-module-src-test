@@ -54,7 +54,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			val.set_FlowDirection((ControlFlowDirection)3);
 			FlowPanel visibilityOptionGroup = val;
 			((Control)new FormattedLabelBuilder().SetWidth(((Container)visibilityOptionGroup).get_ContentRegion().Width - 20).AutoSizeHeight().Wrap()
-				.CreatePart("These options are global. The individual area options have priority and will hide it if any matches!", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder builder)
+				.CreatePart(base.TranslationService.GetTranslation("generalSettingsView-uiVisibilityWarning", "These options are global. The individual area options have priority and will hide it if any matches!"), (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder builder)
 				{
 					builder.MakeBold().SetFontSize((FontSize)18);
 				})
@@ -69,7 +69,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderBoolSetting((Panel)(object)visibilityOptionGroup, _moduleSettings.HideInPvP);
 			RenderEmptyLine((Panel)(object)visibilityOptionGroup, 20);
 			RenderEmptyLine((Panel)(object)parent);
-			RenderEnumSetting<MenuEventSortMode>((Panel)(object)parent, _moduleSettings.MenuEventSortMenu);
+			RenderEnumSetting<MenuEventSortMode>((Panel)(object)parent, _moduleSettings.MenuEventSortMode);
 		}
 
 		protected override Task<bool> InternalLoad(IProgress<string> progress)

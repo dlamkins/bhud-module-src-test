@@ -231,7 +231,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			IEnumerable<EventCategory> categoryList = from ec in eventCategories
 				group ec by ec.Key into ec
 				select ec.First();
-			switch (_moduleSettings.MenuEventSortMenu.get_Value())
+			switch (_moduleSettings.MenuEventSortMode.get_Value())
 			{
 			case MenuEventSortMode.Alphabetical:
 				categoryList = categoryList.OrderBy((EventCategory c) => c.Name);
