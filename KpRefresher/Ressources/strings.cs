@@ -42,6 +42,12 @@ namespace KpRefresher.Ressources
 			}
 		}
 
+		internal static string BusinessService_CustomIdAccountNotMatching => ResourceManager.GetString("BusinessService_CustomIdAccountNotMatching", resourceCulture);
+
+		internal static string BusinessService_CustomIdNoAccountFound => ResourceManager.GetString("BusinessService_CustomIdNoAccountFound", resourceCulture);
+
+		internal static string BusinessService_CustomIdSet => ResourceManager.GetString("BusinessService_CustomIdSet", resourceCulture);
+
 		internal static string BusinessService_Error => ResourceManager.GetString("BusinessService_Error", resourceCulture);
 
 		internal static string BusinessService_Refreshed => ResourceManager.GetString("BusinessService_Refreshed", resourceCulture);
@@ -92,6 +98,12 @@ namespace KpRefresher.Ressources
 
 		internal static string MainWindow_Configuration_Title => ResourceManager.GetString("MainWindow_Configuration_Title", resourceCulture);
 
+		internal static string MainWindow_CustomId_EditNotif => ResourceManager.GetString("MainWindow_CustomId_EditNotif", resourceCulture);
+
+		internal static string MainWindow_CustomId_Label => ResourceManager.GetString("MainWindow_CustomId_Label", resourceCulture);
+
+		internal static string MainWindow_CustomId_Tooltip => ResourceManager.GetString("MainWindow_CustomId_Tooltip", resourceCulture);
+
 		internal static string MainWindow_DelayBeforeRefreshOnMapChange_Label => ResourceManager.GetString("MainWindow_DelayBeforeRefreshOnMapChange_Label", resourceCulture);
 
 		internal static string MainWindow_DelayBeforeRefreshOnMapChange_Tooltip => ResourceManager.GetString("MainWindow_DelayBeforeRefreshOnMapChange_Tooltip", resourceCulture);
@@ -133,6 +145,8 @@ namespace KpRefresher.Ressources
 		internal static string Notification_AccountNameFetchError => ResourceManager.GetString("Notification_AccountNameFetchError", resourceCulture);
 
 		internal static string Notification_CopiedToClipboard => ResourceManager.GetString("Notification_CopiedToClipboard", resourceCulture);
+
+		internal static string Notification_CustomIdAccountNotMatching => ResourceManager.GetString("Notification_CustomIdAccountNotMatching", resourceCulture);
 
 		internal static string Notification_DataNotAvailable => ResourceManager.GetString("Notification_DataNotAvailable", resourceCulture);
 

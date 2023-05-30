@@ -65,30 +65,30 @@ namespace KpRefresher.UI.Views
 			//IL_003d: Expected O, but got Unknown
 			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_045c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_046c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0737: Unknown result type (might be due to invalid IL or missing references)
-			//IL_073c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0743: Unknown result type (might be due to invalid IL or missing references)
-			//IL_074a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0751: Unknown result type (might be due to invalid IL or missing references)
-			//IL_075d: Expected O, but got Unknown
-			//IL_075e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0763: Unknown result type (might be due to invalid IL or missing references)
-			//IL_076f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0774: Unknown result type (might be due to invalid IL or missing references)
-			//IL_077e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_078a: Expected O, but got Unknown
-			//IL_07a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07e3: Expected O, but got Unknown
 			//IL_07e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0807: Expected O, but got Unknown
+			//IL_07e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0804: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0810: Expected O, but got Unknown
+			//IL_0828: Unknown result type (might be due to invalid IL or missing references)
+			//IL_082d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0846: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0850: Unknown result type (might be due to invalid IL or missing references)
+			//IL_085c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0863: Unknown result type (might be due to invalid IL or missing references)
+			//IL_086a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_087a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0881: Unknown result type (might be due to invalid IL or missing references)
+			//IL_088d: Expected O, but got Unknown
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)this);
 			((Container)val).set_WidthSizingMode((SizingMode)2);
@@ -159,7 +159,7 @@ namespace KpRefresher.UI.Views
 				{
 					_delayTextChangeFlag = true;
 					string text = ((TextInputBase)((s is TextBox) ? s : null)).get_Text().Trim();
-					int result;
+					int result2;
 					if (string.IsNullOrWhiteSpace(text))
 					{
 						_delayTextChangeFlag = false;
@@ -170,29 +170,48 @@ namespace KpRefresher.UI.Views
 						((TextInputBase)control).set_CursorIndex(((TextInputBase)control).get_Text().Length);
 						_delayTextChangeFlag = false;
 					}
-					else if (!int.TryParse(text, out result))
+					else if (!int.TryParse(text, out result2))
 					{
 						((TextInputBase)control).set_Text(((ValueChangedEventArgs<string>)(object)e).get_PreviousValue());
 						_delayTextChangeFlag = false;
 					}
 					else
 					{
-						if (result < 1)
+						if (result2 < 1)
 						{
-							result = 1;
+							result2 = 1;
 							((TextInputBase)control).set_Text("1");
 							((TextInputBase)control).set_CursorIndex(1);
 						}
-						else if (result > 60)
+						else if (result2 > 60)
 						{
-							result = 60;
+							result2 = 60;
 							((TextInputBase)control).set_Text("60");
 							((TextInputBase)control).set_CursorIndex(2);
 						}
-						_moduleSettings.DelayBeforeRefreshOnMapChange.set_Value(result);
+						_moduleSettings.DelayBeforeRefreshOnMapChange.set_Value(result2);
 						_delayTextChangeFlag = false;
 					}
 				}
+			});
+			TextBox item = this.CreateLabeledControl<TextBox>((Func<string>)(() => strings.MainWindow_CustomId_Label), (Func<string>)(() => strings.MainWindow_CustomId_Tooltip), (FlowPanel)(object)configContainer, 2, 50).control;
+			((TextInputBase)item).set_Text(_moduleSettings.CustomId.get_Value());
+			((TextInputBase)item).add_TextChanged((EventHandler<EventArgs>)delegate(object s, EventArgs e)
+			{
+				if (((TextInputBase)((s is TextBox) ? s : null)).get_Text().Trim() == _moduleSettings.CustomId.get_Value())
+				{
+					ClearNotifications();
+				}
+				else
+				{
+					ShowInsideNotification(strings.MainWindow_CustomId_EditNotif, persistMessage: true);
+				}
+			});
+			item.add_EnterPressed((EventHandler<EventArgs>)async delegate(object s, EventArgs e)
+			{
+				string value = ((TextInputBase)((s is TextBox) ? s : null)).get_Text().Trim();
+				(bool, string) result = await _businessService.SetCustomId(value);
+				ShowInsideNotification(result.Item2, persistMessage: true);
 			});
 			FlowPanel flowPanel2 = new FlowPanel();
 			((Control)flowPanel2).set_Parent((Container)(object)mainContainer);

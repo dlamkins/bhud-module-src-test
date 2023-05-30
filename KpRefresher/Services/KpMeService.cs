@@ -25,7 +25,7 @@ namespace KpRefresher.Services
 			_logger = logger;
 		}
 
-		public async Task<KpApiModel> GetAccountData(string kpId)
+		public async Task<KpApiModel> GetAccountData(string kpId, bool showNotification = true)
 		{
 			if (string.IsNullOrWhiteSpace(kpId))
 			{
@@ -45,7 +45,7 @@ namespace KpRefresher.Services
 						{
 							return JsonConvert.DeserializeObject<KpApiModel>(await response.get_Content().ReadAsStringAsync());
 						}
-						if (response.get_StatusCode() == HttpStatusCode.NotFound)
+						if (response.get_StatusCode() == HttpStatusCode.NotFound && showNotification)
 						{
 							ScreenNotification.ShowNotification(string.Format(strings.Notification_KpAccountUnknown, kpId), (NotificationType)2, (Texture2D)null, 4);
 						}

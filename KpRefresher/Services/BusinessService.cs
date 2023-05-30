@@ -57,6 +57,18 @@ namespace KpRefresher.Services
 
 		public double NotificationNextRefreshAvailabledTimerEndValue { get; set; }
 
+		public string KpId
+		{
+			get
+			{
+				if (!string.IsNullOrEmpty(_moduleSettings.CustomId.get_Value()))
+				{
+					return _moduleSettings.CustomId.get_Value();
+				}
+				return _kpId;
+			}
+		}
+
 		public BusinessService(ModuleSettings moduleSettings, Gw2ApiService gw2ApiService, KpMeService kpMeService, Func<LoadingSpinner> getSpinner)
 		{
 			_moduleSettings = moduleSettings;
@@ -125,7 +137,7 @@ namespace KpRefresher.Services
 				ScreenNotification.ShowNotification(strings.Notification_NoClearRefreshAborted, (NotificationType)0, (Texture2D)null, 4);
 				return;
 			}
-			bool? refreshed = await _kpMeService.RefreshApi(_kpId);
+			bool? refreshed = await _kpMeService.RefreshApi(KpId);
 			if (refreshed.HasValue && refreshed.Value)
 			{
 				_lastRefresh = DateTime.UtcNow;
@@ -179,7 +191,7 @@ namespace KpRefresher.Services
 		{
 			if (await DataLoaded())
 			{
-				Clipboard.SetText("KillProof.me id : " + _kpId);
+				Clipboard.SetText("KillProof.me id : " + KpId);
 				ScreenNotification.ShowNotification(strings.Notification_CopiedToClipboard, (NotificationType)0, (Texture2D)null, 4);
 			}
 			else
@@ -196,7 +208,7 @@ namespace KpRefresher.Services
 			}
 			else
 			{
-				Process.Start(_kpMeService.GetBaseUrl() + "proof/" + _kpId);
+				Process.Start(_kpMeService.GetBaseUrl() + "proof/" + KpId);
 			}
 		}
 
@@ -250,7 +262,7 @@ namespace KpRefresher.Services
 				ScreenNotification.ShowNotification(strings.Notification_DataNotAvailable, (NotificationType)1, (Texture2D)null, 4);
 				return null;
 			}
-			List<RaidBoss> baseClears = await _kpMeService.GetClearData(_kpId);
+			List<RaidBoss> baseClears = await _kpMeService.GetClearData(KpId);
 			List<RaidBoss> clears = await _gw2ApiService.GetClears();
 			List<(string, Color?)> res = new List<(string, Color?)>();
 			List<RaidBoss> encounters = _raidBossNames.OrderBy((RaidBoss x) => (int)x).ToList();
@@ -310,6 +322,26 @@ namespace KpRefresher.Services
 			return res;
 		}
 
+		public async Task<(bool, string)> SetCustomId(string value)
+		{
+			if (string.IsNullOrEmpty(value))
+			{
+				_moduleSettings.CustomId.set_Value(value);
+				return (true, strings.BusinessService_CustomIdSet);
+			}
+			KpApiModel accountData = await _kpMeService.GetAccountData(value, showNotification: false);
+			if (accountData == null)
+			{
+				return (false, string.Format(strings.BusinessService_CustomIdNoAccountFound, value));
+			}
+			if (accountData.AccountName != _accountName)
+			{
+				return (false, string.Format(strings.BusinessService_CustomIdAccountNotMatching, value, _accountName));
+			}
+			_moduleSettings.CustomId.set_Value(value);
+			return (true, strings.BusinessService_CustomIdSet);
+		}
+
 		private async Task<bool> RefreshAccountName(bool isFromInit = false)
 		{
 			_accountName = await _gw2ApiService.GetAccountName();
@@ -331,7 +363,8 @@ namespace KpRefresher.Services
 			_kpId = string.Empty;
 			_lastRefresh = null;
 			LinkedKpId = null;
-			KpApiModel accountData = await _kpMeService.GetAccountData(_accountName);
+			string accountName = (string.IsNullOrEmpty(_moduleSettings.CustomId.get_Value()) ? _accountName : _moduleSettings.CustomId.get_Value());
+			KpApiModel accountData = await _kpMeService.GetAccountData(accountName);
 			if (accountData == null)
 			{
 				if (isFromInit)
@@ -340,6 +373,11 @@ namespace KpRefresher.Services
 				}
 				_isRefreshingKpData = false;
 				return;
+			}
+			if (!string.IsNullOrEmpty(_moduleSettings.CustomId.get_Value()) && accountData.AccountName != _accountName)
+			{
+				_moduleSettings.CustomId.set_Value(string.Empty);
+				ScreenNotification.ShowNotification(string.Format(strings.Notification_CustomIdAccountNotMatching, _moduleSettings.CustomId.get_Value(), _accountName), (NotificationType)1, (Texture2D)null, 4);
 			}
 			_kpId = accountData.Id;
 			_lastRefresh = accountData.LastRefresh;
@@ -356,7 +394,7 @@ namespace KpRefresher.Services
 
 		private async Task<bool> CheckRaidClears()
 		{
-			List<RaidBoss> baseClears = await _kpMeService.GetClearData(_kpId);
+			List<RaidBoss> baseClears = await _kpMeService.GetClearData(KpId);
 			List<RaidBoss> clears = await _gw2ApiService.GetClears();
 			if (clears == null || baseClears == null)
 			{
@@ -389,7 +427,7 @@ namespace KpRefresher.Services
 		{
 			if (!date.HasValue)
 			{
-				date = (await _kpMeService.GetAccountData(_kpId))?.LastRefresh;
+				date = (await _kpMeService.GetAccountData(KpId))?.LastRefresh;
 			}
 			_lastRefresh = date.GetValueOrDefault();
 		}
