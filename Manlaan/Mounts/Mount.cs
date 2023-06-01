@@ -39,6 +39,8 @@ namespace Manlaan.Mounts
 
 		public SettingEntry<KeyBinding> KeybindingSetting { get; private set; }
 
+		public SettingEntry<string> ImageFileNameSetting { get; private set; }
+
 		public CornerIcon CornerIcon { get; private set; }
 
 		public bool IsAvailable
@@ -83,6 +85,7 @@ namespace Manlaan.Mounts
 			IsWvWMount = isWvWMount;
 			OrderSetting = settingCollection.DefineSetting<int>("Mount" + name + "Order2", defaultOrderSetting, (Func<string>)(() => displayName + " Order"), (Func<string>)(() => ""));
 			KeybindingSetting = settingCollection.DefineSetting<KeyBinding>("Mount" + name + "Binding", new KeyBinding((Keys)0), (Func<string>)(() => displayName + " Binding"), (Func<string>)(() => ""));
+			ImageFileNameSetting = settingCollection.DefineSetting<string>("Mount" + name + "ImageFileName", "", (Func<string>)(() => displayName + " Image File Name"), (Func<string>)(() => ""));
 		}
 
 		public async Task DoUnmountAction()

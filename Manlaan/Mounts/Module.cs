@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Blish_HUD;
@@ -28,15 +29,17 @@ namespace Manlaan.Mounts
 
 		internal static Collection<Mount> _mounts;
 
+		public static string mountsDirectory;
+
 		private TabbedWindow2 _settingsWindow;
+
+		public static List<MountImageFile> _mountImageFiles = new List<MountImageFile>();
 
 		public static int[] _mountOrder = new int[11]
 		{
 			0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
 			10
 		};
-
-		public static string[] _mountDisplay = new string[3] { "Transparent", "Solid", "SolidText" };
 
 		public static string[] _mountBehaviour = new string[2] { "DefaultMount", "Radial" };
 
@@ -142,25 +145,43 @@ namespace Manlaan.Mounts
 
 		protected override void Initialize()
 		{
-			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Expected O, but got Unknown
-			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ff: Expected O, but got Unknown
+			//IL_0211: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0224: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0229: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0239: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0249: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0258: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0275: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0281: Expected O, but got Unknown
+			//IL_02bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c5: Expected O, but got Unknown
+			List<string> obj = new List<string>
+			{
+				"griffon-text.png", "griffon-trans.png", "griffon.png", "jackal-text.png", "jackal-trans.png", "jackal.png", "raptor-text.png", "raptor-trans.png", "raptor.png", "roller-text.png",
+				"roller-trans.png", "roller.png", "skimmer-text.png", "skimmer-trans.png", "skimmer.png", "skyscale-text.png", "skyscale-trans.png", "skyscale.png", "springer-text.png", "springer-trans.png",
+				"springer.png", "turtle-text.png", "turtle-trans.png", "turtle.png", "warclaw-text.png", "warclaw-trans.png", "warclaw.png"
+			};
+			mountsDirectory = DirectoriesManager.GetFullDirectoryPath("mounts");
+			obj.ForEach(delegate(string f)
+			{
+				ExtractFile(f, mountsDirectory);
+			});
+			_mountImageFiles = (from file in Directory.GetFiles(mountsDirectory, ".")
+				where file.ToLower().Contains(".png")
+				select new MountImageFile
+				{
+					Name = file.Substring(mountsDirectory.Length + 1)
+				}).ToList();
+			_textureCache = new TextureCache(ContentsManager);
 			GameService.Gw2Mumble.get_PlayerCharacter().add_IsInCombatChanged((EventHandler<ValueEventArgs<bool>>)async delegate(object sender, ValueEventArgs<bool> e)
 			{
 				await HandleCombatChangeAsync(sender, e);
 			});
-			Texture2D mountsIcon = ContentsManager.GetTexture("514394-grey.png");
-			TabbedWindow2 val = new TabbedWindow2(ContentsManager.GetTexture("156006-big.png"), new Rectangle(35, 36, 1300, 900), new Rectangle(95, 42, 1221, 792));
+			Texture2D mountsIcon = _textureCache.GetImgFile(TextureCache.MountLogoTextureName);
+			TabbedWindow2 val = new TabbedWindow2(_textureCache.GetImgFile(TextureCache.TabBackgroundTextureName), new Rectangle(35, 36, 1300, 900), new Rectangle(95, 42, 1221, 792));
 			((WindowBase2)val).set_Title("Mounts");
 			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((Control)val).set_Location(new Point(100, 100));
@@ -168,7 +189,18 @@ namespace Manlaan.Mounts
 			((WindowBase2)val).set_Id(((Module)this).get_Namespace() + "_SettingsWindow");
 			((WindowBase2)val).set_SavesPosition(true);
 			_settingsWindow = val;
-			_settingsWindow.get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("155052.png")), (Func<IView>)(() => (IView)(object)new SettingsView(ContentsManager)), Strings.Window_AllSettingsTab, (int?)null));
+			_settingsWindow.get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(_textureCache.GetImgFile(TextureCache.SettingsIconTextureName)), (Func<IView>)(() => (IView)(object)new SettingsView(_textureCache)), Strings.Window_AllSettingsTab, (int?)null));
+		}
+
+		private void ExtractFile(string filePath, string directoryToExtractTo)
+		{
+			string fullPath = Path.Combine(directoryToExtractTo, filePath);
+			using Stream fs = ContentsManager.GetFileStream(filePath);
+			fs.Position = 0L;
+			byte[] buffer = new byte[fs.Length];
+			fs.Read(buffer, 0, (int)fs.Length);
+			Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
+			File.WriteAllBytes(fullPath, buffer);
 		}
 
 		private void MigrateDisplaySettings()
@@ -189,6 +221,31 @@ namespace Manlaan.Mounts
 				{
 					_settingDisplay.set_Value("Transparent");
 				}
+			}
+		}
+
+		private void MigrateMountFileNameSettings()
+		{
+			if (!_mounts.All((Mount m) => m.ImageFileNameSetting.get_Value().Equals("")))
+			{
+				return;
+			}
+			string partOfFileName = "";
+			if (_settingDisplay.get_Value().Equals("Transparent"))
+			{
+				partOfFileName = "-trans";
+			}
+			else if (_settingDisplay.get_Value().Equals("SolidText"))
+			{
+				partOfFileName = "-text";
+			}
+			else if (_settingDisplay.get_Value().Equals("Solid"))
+			{
+				partOfFileName = "";
+			}
+			foreach (Mount mount in _mounts)
+			{
+				mount.ImageFileNameSetting.set_Value(mount.ImageFileName + partOfFileName + ".png");
 			}
 		}
 
@@ -247,10 +304,12 @@ namespace Manlaan.Mounts
 			_settingOpacity = settings.DefineSetting<float>("MountOpacity", 1f, (Func<string>)(() => Strings.Setting_MountOpacity), (Func<string>)(() => ""));
 			SettingComplianceExtensions.SetRange(_settingOpacity, 0f, 1f);
 			MigrateDisplaySettings();
+			MigrateMountFileNameSettings();
 			foreach (Mount mount in _mounts)
 			{
 				mount.OrderSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)UpdateSettings);
 				mount.KeybindingSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<KeyBinding>>)UpdateSettings);
+				mount.ImageFileNameSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateSettings);
 			}
 			_settingDefaultMountChoice.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateSettings);
 			_settingDefaultWaterMountChoice.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateSettings);
@@ -289,7 +348,6 @@ namespace Manlaan.Mounts
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
-			_textureCache = new TextureCache(ContentsManager);
 			DrawUI();
 			((Module)this).OnModuleLoaded(e);
 		}
@@ -427,6 +485,7 @@ namespace Manlaan.Mounts
 			{
 				mount.OrderSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)UpdateSettings);
 				mount.KeybindingSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<KeyBinding>>)UpdateSettings);
+				mount.ImageFileNameSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateSettings);
 				mount.DisposeCornerIcon();
 			}
 			_settingDefaultMountChoice.remove_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateSettings);
@@ -492,27 +551,27 @@ namespace Manlaan.Mounts
 			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0055: Expected O, but got Unknown
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0183: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0218: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0188: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0213: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023a: Unknown result type (might be due to invalid IL or missing references)
 			int curX = 0;
 			int curY = 0;
 			int totalMounts = 0;
@@ -523,7 +582,7 @@ namespace Manlaan.Mounts
 			_mountPanel = val;
 			foreach (Mount mount in _availableOrderedMounts)
 			{
-				Texture2D img = _textureCache.GetMountImgFile(mount.ImageFileName);
+				Texture2D img = _textureCache.GetMountImgFile(mount);
 				Image val2 = new Image();
 				((Control)val2).set_Parent((Container)(object)_mountPanel);
 				val2.set_Texture(AsyncTexture2D.op_Implicit(img));
@@ -581,7 +640,7 @@ namespace Manlaan.Mounts
 		{
 			foreach (Mount mount in _availableOrderedMounts)
 			{
-				mount.CreateCornerIcon(_textureCache.GetMountImgFile(mount.ImageFileName));
+				mount.CreateCornerIcon(_textureCache.GetMountImgFile(mount));
 			}
 		}
 
@@ -656,6 +715,12 @@ namespace Manlaan.Mounts
 				return;
 			}
 			Mount defaultMount = _helper.GetDefaultMount();
+			if (defaultMount != null && GameService.Input.get_Mouse().get_CameraDragging())
+			{
+				await (defaultMount?.DoMountAction() ?? Task.CompletedTask);
+				Logger.Debug("DoDefaultMountActionAsync CameraDragging defaultmount");
+				return;
+			}
 			string value = _settingDefaultMountBehaviour.get_Value();
 			if (!(value == "DefaultMount"))
 			{

@@ -1,5 +1,9 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
+using Blish_HUD;
 using Blish_HUD.Modules.Managers;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Manlaan.Mounts
@@ -10,7 +14,15 @@ namespace Manlaan.Mounts
 
 		private readonly Dictionary<string, Texture2D> _textureCache = new Dictionary<string, Texture2D>();
 
-		public readonly string MouseTexture = "255329.png";
+		public static readonly string MouseTextureName = "255329.png";
+
+		public static readonly string MountLogoTextureName = "514394-grey.png";
+
+		public static readonly string TabBackgroundTextureName = "156006-big.png";
+
+		public static readonly string SettingsIconTextureName = "155052.png";
+
+		public static readonly string AnetIconTextureName = "1441452.png";
 
 		public TextureCache(ContentsManager contentsManager)
 		{
@@ -20,46 +32,67 @@ namespace Manlaan.Mounts
 
 		private void PreCacheTextures()
 		{
-			foreach (Mount mount in Module._mounts)
+			Func<string, Texture2D> getTextureFromRef = (string textureName) => contentsManager.GetTexture(textureName);
+			foreach (MountImageFile mountImageFile in Module._mountImageFiles)
 			{
-				string[] mountDisplay2 = Module._mountDisplay;
-				foreach (string mountDisplay in mountDisplay2)
-				{
-					string textureName = GetTextureName(mount.ImageFileName, mountDisplay);
-					if (!_textureCache.ContainsKey(textureName))
-					{
-						PreCacheTexture(textureName);
-					}
-				}
+				PreCacheTexture(mountImageFile.Name, PremultiplyTexture);
 			}
-			PreCacheTexture(MouseTexture);
+			PreCacheTexture(MouseTextureName, getTextureFromRef);
+			PreCacheTexture(MountLogoTextureName, getTextureFromRef);
+			PreCacheTexture(TabBackgroundTextureName, getTextureFromRef);
+			PreCacheTexture(SettingsIconTextureName, getTextureFromRef);
+			PreCacheTexture(AnetIconTextureName, getTextureFromRef);
 		}
 
-		private void PreCacheTexture(string textureName)
+		private Texture2D PremultiplyTexture(string textureName)
 		{
-			_textureCache[textureName] = contentsManager.GetTexture(textureName);
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			try
+			{
+				FileStream titleStream = File.OpenRead(Path.Combine(Module.mountsDirectory, textureName));
+				Texture2D texture = Texture2D.FromStream(GameService.Graphics.get_GraphicsDevice(), (Stream)titleStream);
+				titleStream.Close();
+				Color[] buffer = (Color[])(object)new Color[texture.get_Width() * texture.get_Height()];
+				texture.GetData<Color>(buffer);
+				for (int i = 0; i < buffer.Length; i++)
+				{
+					buffer[i] = Color.FromNonPremultiplied((int)((Color)(ref buffer[i])).get_R(), (int)((Color)(ref buffer[i])).get_G(), (int)((Color)(ref buffer[i])).get_B(), (int)((Color)(ref buffer[i])).get_A());
+				}
+				texture.SetData<Color>(buffer);
+				return texture;
+			}
+			catch
+			{
+				return Textures.get_Error();
+			}
+		}
+
+		private void PreCacheTexture(string textureName, Func<string, Texture2D> getTextureAction)
+		{
+			if (!_textureCache.ContainsKey(textureName))
+			{
+				_textureCache[textureName] = getTextureAction(textureName);
+			}
 		}
 
 		public Texture2D GetImgFile(string filename)
 		{
-			return _textureCache[filename];
+			return GetTexture(filename);
 		}
 
-		public Texture2D GetMountImgFile(string filename)
+		public Texture2D GetMountImgFile(Mount mount)
 		{
-			string textureName = GetTextureName(filename, Module._settingDisplay.get_Value());
-			return _textureCache[textureName];
+			return GetTexture(mount.ImageFileNameSetting.get_Value());
 		}
 
-		private static string GetTextureName(string filename, string displaySetting)
+		private Texture2D GetTexture(string filename)
 		{
-			string textureName = filename;
-			return displaySetting switch
+			if (_textureCache.ContainsKey(filename))
 			{
-				"Transparent" => textureName + "-trans.png", 
-				"SolidText" => textureName + "-text.png", 
-				_ => textureName + ".png", 
-			};
+				return _textureCache[filename];
+			}
+			return Textures.get_Error();
 		}
 	}
 }

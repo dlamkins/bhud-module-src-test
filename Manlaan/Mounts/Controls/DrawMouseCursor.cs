@@ -13,10 +13,10 @@ namespace Manlaan.Mounts.Controls
 			: this()
 		{
 			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).set_Visible(false);
 			((Control)this).set_Padding(Thickness.Zero);
-			_mouseTexture = textureCache.GetImgFile(textureCache.MouseTexture);
+			_mouseTexture = textureCache.GetImgFile(TextureCache.MouseTextureName);
 			((Control)this).set_Size(new Point(_mouseTexture.get_Width(), _mouseTexture.get_Height()));
 		}
 

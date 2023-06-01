@@ -113,20 +113,20 @@ namespace Manlaan.Mounts.Controls
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0202: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0226: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0236: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0307: Unknown result type (might be due to invalid IL or missing references)
-			//IL_032f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0224: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0231: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0325: Unknown result type (might be due to invalid IL or missing references)
 			RadialMounts.Clear();
 			List<Mount> mounts = Module._availableOrderedMounts;
 			if (!mounts.Any())
@@ -144,7 +144,7 @@ namespace Manlaan.Mounts.Controls
 				{
 					mounts.Remove(mountToPutInCenter);
 				}
-				Texture2D texture2 = _textureCache.GetMountImgFile(mountToPutInCenter.ImageFileName);
+				Texture2D texture2 = _textureCache.GetMountImgFile(mountToPutInCenter);
 				int loc = radius;
 				RadialMounts.Add(new RadialMount
 				{
@@ -162,7 +162,7 @@ namespace Manlaan.Mounts.Controls
 			{
 				double angleMid = currentAngle + partAngleStep / 2.0;
 				double angleEnd = currentAngle + partAngleStep;
-				Texture2D texture = _textureCache.GetMountImgFile(mount.ImageFileName);
+				Texture2D texture = _textureCache.GetMountImgFile(mount);
 				int x = (int)Math.Round((double)radius + (double)radius * Math.Cos(angleMid));
 				int y = (int)Math.Round((double)radius + (double)radius * Math.Sin(angleMid));
 				RadialMounts.Add(new RadialMount
