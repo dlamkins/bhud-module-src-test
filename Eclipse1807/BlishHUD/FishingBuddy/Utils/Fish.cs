@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Blish_HUD;
 using Blish_HUD.Content;
+using Eclipse1807.BlishHUD.FishingBuddy.Properties;
 using Gw2Sharp.WebApi;
 using Gw2Sharp.WebApi.V2.Models;
 using Newtonsoft.Json;
@@ -26,33 +27,6 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 			[EnumMember(Value = "Dusk/Dawn")]
 			DuskDawn = 0x5,
 			Any = 0xF
-		}
-
-		[JsonConverter(typeof(StringEnumConverter))]
-		public enum FishBait
-		{
-			Any,
-			[EnumMember(Value = "Fish Eggs")]
-			FishEggs,
-			[EnumMember(Value = "Glow Worms")]
-			GlowWorms,
-			[EnumMember(Value = "Haiju Minnows")]
-			HaijuMinnows,
-			[EnumMember(Value = "Lava Beetles")]
-			LavaBeetles,
-			Leeches,
-			[EnumMember(Value = "Lightning Bugs")]
-			LightningBugs,
-			Mackerel,
-			Minnows,
-			Nightcrawlers,
-			[EnumMember(Value = "Ramshorn Snails")]
-			RamshornSnails,
-			Sardines,
-			Scorpions,
-			Shrimplings,
-			[EnumMember(Value = "Sparkfly Larvae")]
-			SparkflyLarvae
 		}
 
 		[JsonConverter(typeof(StringEnumConverter))]
@@ -146,5 +120,49 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 		public AsyncTexture2D IconImg { get; set; }
 
 		public string ChatLink { get; set; }
+
+		public static string BuildFishTooltip(Fish fish)
+		{
+			string name = Strings.FishName + ": " + fish.Name;
+			string bait = Strings.FishFavoredBait + ": " + fish.Bait.GetEnumMemberValue();
+			string time = Strings.FishTimeOfDay + ": " + fish.Time.GetEnumMemberValue();
+			string hole = Strings.FishFishingHole + ": " + fish.Hole.GetEnumMemberValue() + (fish.OpenWater ? (", " + Strings.OpenWater) : string.Empty);
+			string achieve = Strings.Achievement + ": " + fish.Achievement;
+			string rarity = Strings.Rarity + ": " + Strings.ResourceManager.GetString(fish.Rarity.ToString(), Strings.Culture);
+			string hiddenReason = string.Empty;
+			if (FishingBuddyModule._useAPIToken)
+			{
+				if (!fish.Visible && fish.Caught)
+				{
+					hiddenReason = Strings.Hidden + ": " + Strings.TimeOfDay + ", " + Strings.HiddenCaught;
+				}
+				else if (!fish.Visible)
+				{
+					hiddenReason = Strings.Hidden + ": " + Strings.TimeOfDay;
+				}
+				else if (fish.Caught)
+				{
+					hiddenReason = Strings.Hidden + ": " + Strings.HiddenCaught;
+				}
+			}
+			string notes = ((!string.IsNullOrWhiteSpace(fish.Notes)) ? (Strings.Notes + ": " + Strings.ResourceManager.GetString(fish.Notes, Strings.Culture)) : string.Empty);
+			return FishingBuddyModule._fishPanelTooltipDisplay.get_Value().Replace("@1", name).Replace("@2", bait)
+				.Replace("@3", time)
+				.Replace("@4", hole)
+				.Replace("@5", achieve)
+				.Replace("@6", rarity)
+				.Replace("@7", hiddenReason)
+				.Replace("@8", notes)
+				.Replace("#1", fish.Name)
+				.Replace("#2", fish.Bait.GetEnumMemberValue())
+				.Replace("#3", fish.Time.GetEnumMemberValue())
+				.Replace("#4", fish.Hole.GetEnumMemberValue() + (fish.OpenWater ? (", " + Strings.OpenWater) : string.Empty))
+				.Replace("#5", fish.Achievement)
+				.Replace("#6", Strings.ResourceManager.GetString(fish.Rarity.ToString(), Strings.Culture))
+				.Replace("#8", Strings.ResourceManager.GetString(fish.Notes, Strings.Culture))
+				.Replace("\\n", "\n")
+				.Replace("\n\n", "\n")
+				.Trim();
+		}
 	}
 }

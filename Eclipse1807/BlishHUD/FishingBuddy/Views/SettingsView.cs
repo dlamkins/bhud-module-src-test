@@ -104,39 +104,51 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Views
 			//IL_0496: Unknown result type (might be due to invalid IL or missing references)
 			//IL_049b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_04a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_050a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_050f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_051c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0526: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04c1: Expected O, but got Unknown
+			//IL_04dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0507: Expected O, but got Unknown
+			//IL_0522: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0527: Unknown result type (might be due to invalid IL or missing references)
 			//IL_052e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0535: Unknown result type (might be due to invalid IL or missing references)
-			//IL_053c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0543: Unknown result type (might be due to invalid IL or missing references)
-			//IL_055a: Expected O, but got Unknown
-			//IL_055b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0560: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0573: Unknown result type (might be due to invalid IL or missing references)
-			//IL_057d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0585: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0591: Expected O, but got Unknown
-			//IL_0602: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0607: Unknown result type (might be due to invalid IL or missing references)
-			//IL_060e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_061a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0624: Unknown result type (might be due to invalid IL or missing references)
-			//IL_062d: Expected O, but got Unknown
-			//IL_0648: Unknown result type (might be due to invalid IL or missing references)
-			//IL_064d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0654: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0660: Unknown result type (might be due to invalid IL or missing references)
-			//IL_066a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_053b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0545: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0565: Unknown result type (might be due to invalid IL or missing references)
+			//IL_056a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0571: Unknown result type (might be due to invalid IL or missing references)
+			//IL_057e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0588: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0596: Unknown result type (might be due to invalid IL or missing references)
+			//IL_059b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05e6: Expected O, but got Unknown
+			//IL_05e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0609: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0611: Unknown result type (might be due to invalid IL or missing references)
+			//IL_061d: Expected O, but got Unknown
+			//IL_068e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0693: Unknown result type (might be due to invalid IL or missing references)
+			//IL_069a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06b9: Expected O, but got Unknown
+			//IL_06d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06f6: Unknown result type (might be due to invalid IL or missing references)
 			Panel val = new Panel();
 			((Control)val).set_Parent(buildPanel);
 			((Control)val).set_Height(((Control)buildPanel).get_Height());
@@ -241,38 +253,52 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Views
 			((Control)val13).set_Parent((Container)(object)parentPanel);
 			ViewContainer settingFishTooltip_Container = val13;
 			settingFishTooltip_Container.Show(settingFishTooltip_View);
-			IView settingClockDrag_View = SettingView.FromType((SettingEntry)(object)FishingBuddyModule._dragTimeOfDayClock, ((Control)buildPanel).get_Width());
+			IView settingBaitDrag_View = SettingView.FromType((SettingEntry)(object)FishingBuddyModule._dragBaitPanel, ((Control)buildPanel).get_Width());
 			ViewContainer val14 = new ViewContainer();
 			((Container)val14).set_WidthSizingMode((SizingMode)2);
-			((Control)val14).set_Location(new Point(10, ((Control)settingFishTooltip_Container).get_Bottom() + 8));
+			((Control)val14).set_Location(new Point(10, ((Control)settingFishTooltip_Container).get_Bottom() + 5));
 			((Control)val14).set_Parent((Container)(object)parentPanel);
-			ViewContainer settingClock_Container = val14;
-			settingClock_Container.Show(settingClockDrag_View);
-			IView settingClockShow_View = SettingView.FromType((SettingEntry)(object)FishingBuddyModule._hideTimeOfDay, ((Control)buildPanel).get_Width());
+			ViewContainer settingBaitDrag_Container = val14;
+			settingBaitDrag_Container.Show(settingBaitDrag_View);
+			IView settingBaitSize_View = SettingView.FromType((SettingEntry)(object)FishingBuddyModule._baitImgSize, ((Control)buildPanel).get_Width());
 			ViewContainer val15 = new ViewContainer();
-			((Container)val15).set_WidthSizingMode((SizingMode)2);
-			((Control)val15).set_Location(new Point(160, ((Control)settingClock_Container).get_Top()));
+			((Container)val15).set_WidthSizingMode((SizingMode)0);
+			((Control)val15).set_Location(new Point(10, ((Control)settingBaitDrag_Container).get_Bottom() + 8));
 			((Control)val15).set_Parent((Container)(object)parentPanel);
-			val15.Show(settingClockShow_View);
-			IView settingTimeLabel_View = SettingView.FromType((SettingEntry)(object)FishingBuddyModule._settingClockLabel, ((Control)buildPanel).get_Width());
+			ViewContainer settingBaitSize_Container = val15;
+			settingBaitSize_Container.Show(settingBaitSize_View);
+			IView settingClockDrag_View = SettingView.FromType((SettingEntry)(object)FishingBuddyModule._dragTimeOfDayClock, ((Control)buildPanel).get_Width());
 			ViewContainer val16 = new ViewContainer();
 			((Container)val16).set_WidthSizingMode((SizingMode)2);
-			((Control)val16).set_Location(new Point(310, ((Control)settingClock_Container).get_Top()));
+			((Control)val16).set_Location(new Point(10, ((Control)settingBaitSize_Container).get_Bottom() + 5));
 			((Control)val16).set_Parent((Container)(object)parentPanel);
-			val16.Show(settingTimeLabel_View);
-			Label val17 = new Label();
-			((Control)val17).set_Location(new Point(470, ((Control)settingClock_Container).get_Top()));
-			((Control)val17).set_Width(75);
-			val17.set_AutoSizeHeight(false);
-			val17.set_WrapText(false);
+			ViewContainer settingClock_Container = val16;
+			settingClock_Container.Show(settingClockDrag_View);
+			IView settingClockShow_View = SettingView.FromType((SettingEntry)(object)FishingBuddyModule._hideTimeOfDay, ((Control)buildPanel).get_Width());
+			ViewContainer val17 = new ViewContainer();
+			((Container)val17).set_WidthSizingMode((SizingMode)2);
+			((Control)val17).set_Location(new Point(160, ((Control)settingClock_Container).get_Top()));
 			((Control)val17).set_Parent((Container)(object)parentPanel);
-			val17.set_Text(Strings.LabelAlign + ": ");
-			Label settingTimeLabelAlign_Label = val17;
-			Dropdown val18 = new Dropdown();
-			((Control)val18).set_Location(new Point(((Control)settingTimeLabelAlign_Label).get_Right() + 8, ((Control)settingTimeLabelAlign_Label).get_Top() - 4));
-			((Control)val18).set_Width(100);
+			val17.Show(settingClockShow_View);
+			IView settingTimeLabel_View = SettingView.FromType((SettingEntry)(object)FishingBuddyModule._settingClockLabel, ((Control)buildPanel).get_Width());
+			ViewContainer val18 = new ViewContainer();
+			((Container)val18).set_WidthSizingMode((SizingMode)2);
+			((Control)val18).set_Location(new Point(310, ((Control)settingClock_Container).get_Top()));
 			((Control)val18).set_Parent((Container)(object)parentPanel);
-			Dropdown settingimeLabelAlign_Dropdown = val18;
+			val18.Show(settingTimeLabel_View);
+			Label val19 = new Label();
+			((Control)val19).set_Location(new Point(470, ((Control)settingClock_Container).get_Top()));
+			((Control)val19).set_Width(75);
+			val19.set_AutoSizeHeight(false);
+			val19.set_WrapText(false);
+			((Control)val19).set_Parent((Container)(object)parentPanel);
+			val19.set_Text(Strings.LabelAlign + ": ");
+			Label settingTimeLabelAlign_Label = val19;
+			Dropdown val20 = new Dropdown();
+			((Control)val20).set_Location(new Point(((Control)settingTimeLabelAlign_Label).get_Right() + 8, ((Control)settingTimeLabelAlign_Label).get_Top() - 4));
+			((Control)val20).set_Width(100);
+			((Control)val20).set_Parent((Container)(object)parentPanel);
+			Dropdown settingimeLabelAlign_Dropdown = val20;
 			fishPanelOrientations = FishingBuddyModule._verticalAlignmentOptions;
 			foreach (string s3 in fishPanelOrientations)
 			{
@@ -284,18 +310,18 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Views
 				FishingBuddyModule._settingClockAlign.set_Value(settingimeLabelAlign_Dropdown.get_SelectedItem());
 			});
 			IView settingClockSize_View = SettingView.FromType((SettingEntry)(object)FishingBuddyModule._timeOfDayImgSize, ((Control)buildPanel).get_Width());
-			ViewContainer val19 = new ViewContainer();
-			((Container)val19).set_WidthSizingMode((SizingMode)2);
-			((Control)val19).set_Location(new Point(10, ((Control)settingClock_Container).get_Bottom() + 8));
-			((Control)val19).set_Parent((Container)(object)parentPanel);
-			ViewContainer settingClockSize_Container = val19;
+			ViewContainer val21 = new ViewContainer();
+			((Container)val21).set_WidthSizingMode((SizingMode)2);
+			((Control)val21).set_Location(new Point(10, ((Control)settingClock_Container).get_Bottom() + 8));
+			((Control)val21).set_Parent((Container)(object)parentPanel);
+			ViewContainer settingClockSize_Container = val21;
 			settingClockSize_Container.Show(settingClockSize_View);
 			IView settingCombat_View = SettingView.FromType((SettingEntry)(object)FishingBuddyModule._hideInCombat, ((Control)buildPanel).get_Width());
-			ViewContainer val20 = new ViewContainer();
-			((Container)val20).set_WidthSizingMode((SizingMode)2);
-			((Control)val20).set_Location(new Point(10, ((Control)settingClockSize_Container).get_Bottom() + 5));
-			((Control)val20).set_Parent((Container)(object)parentPanel);
-			val20.Show(settingCombat_View);
+			ViewContainer val22 = new ViewContainer();
+			((Container)val22).set_WidthSizingMode((SizingMode)2);
+			((Control)val22).set_Location(new Point(10, ((Control)settingClockSize_Container).get_Bottom() + 5));
+			((Control)val22).set_Parent((Container)(object)parentPanel);
+			val22.Show(settingCombat_View);
 		}
 
 		public SettingsView()

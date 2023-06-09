@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 
 namespace Eclipse1807.BlishHUD.FishingBuddy.Properties
 {
-	[GeneratedCode("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+	[GeneratedCode("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
 	[DebuggerNonUserCode]
 	[CompilerGenerated]
 	internal class Strings
@@ -49,6 +49,12 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Properties
 		internal static string Any => ResourceManager.GetString("Any", resourceCulture);
 
 		internal static string Ascended => ResourceManager.GetString("Ascended", resourceCulture);
+
+		internal static string BaitPanelDrag => ResourceManager.GetString("BaitPanelDrag", resourceCulture);
+
+		internal static string BaitPanelLocation => ResourceManager.GetString("BaitPanelLocation", resourceCulture);
+
+		internal static string BaitPanelSize => ResourceManager.GetString("BaitPanelSize", resourceCulture);
 
 		internal static string Basic => ResourceManager.GetString("Basic", resourceCulture);
 

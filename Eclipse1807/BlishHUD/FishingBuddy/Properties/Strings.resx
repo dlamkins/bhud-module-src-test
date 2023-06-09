@@ -48,6 +48,8 @@
   <data name="Lightning Bugs"><value>Lightning Bugs</value></data>
   <data name="Shore Fish"><value>Shore Fish</value></data>
   <data name="Sparkfly Larvae"><value>Sparkfly Larvae</value></data>
+  <data name="BaitPanelDrag"><value>Drag Bait</value></data>
+  <data name="BaitPanelSize"><value>Bait Size</value></data>
   <data name="FishPanelLocation"><value>Fish Panel Location</value></data>
   <data name="SettingsDisplayUncatchable"><value>Display Uncatchable</value></data>
   <data name="Hidden"><value>Hidden</value></data>
@@ -129,6 +131,7 @@
   <data name="Polluted Lake Fish"><value>Polluted Lake Fish</value></data>
   <data name="Lake Fish"><value>Lake Fish</value></data>
   <data name="HiddenCaught"><value>Already Caught</value></data>
+  <data name="BaitPanelLocation"><value>Bait Panel Location</value></data>
   <data name="Release for 2500 karma"><value>Release for 2500 karma</value></data>
   <data name="Rare Fish"><value>Rare Fish</value></data>
   <data name="Used for Shinota Shore renown heart"><value>Used for Shinota Shore renown heart</value></data>

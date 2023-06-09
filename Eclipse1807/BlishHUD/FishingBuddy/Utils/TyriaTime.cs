@@ -78,15 +78,15 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 		public static string CurrentMapPhase(Map map)
 		{
 			DateTime TyriaTime = CalcTyriaTime();
-			if (AlwaysDayMaps.Contains(map.get_Id()))
+			if (AlwaysDayMaps.Contains(map.Id))
 			{
 				return Strings.Day;
 			}
-			if (AlwaysNightMaps.Contains(map.get_Id()))
+			if (AlwaysNightMaps.Contains(map.Id))
 			{
 				return Strings.Night;
 			}
-			if (map.get_RegionId() == FishingMaps.CanthaRegionId)
+			if (map.RegionId == FishingMaps.CanthaRegionId)
 			{
 				if (TyriaTime >= CanthaDawnStart && TyriaTime < CanthaDayStart)
 				{
@@ -122,12 +122,12 @@ namespace Eclipse1807.BlishHUD.FishingBuddy.Utils
 			DateTime tyriaTime = CalcTyriaTime();
 			DateTime now = DateTime.UtcNow;
 			DateTime nowish = new DateTime(2000, 1, 1, now.Hour % 2, now.Minute, now.Second);
-			if (map == null || AlwaysDayMaps.Contains(map.get_Id()) || AlwaysNightMaps.Contains(map.get_Id()))
+			if (map == null || AlwaysDayMaps.Contains(map.Id) || AlwaysNightMaps.Contains(map.Id))
 			{
 				return TimeSpan.Zero;
 			}
 			DateTime currentPhaseEnd;
-			if (map.get_RegionId() == FishingMaps.CanthaRegionId)
+			if (map.RegionId == FishingMaps.CanthaRegionId)
 			{
 				if (tyriaTime >= CanthaDawnStart && tyriaTime < CanthaDayStart)
 				{

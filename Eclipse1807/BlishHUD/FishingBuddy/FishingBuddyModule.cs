@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
-using System.Resources;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
@@ -17,12 +17,10 @@ using Blish_HUD.Settings;
 using Eclipse1807.BlishHUD.FishingBuddy.Properties;
 using Eclipse1807.BlishHUD.FishingBuddy.Utils;
 using Eclipse1807.BlishHUD.FishingBuddy.Views;
-using Gw2Sharp.WebApi;
-using Gw2Sharp.WebApi.V2;
-using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MoreLinq;
 using Newtonsoft.Json;
 
 namespace Eclipse1807.BlishHUD.FishingBuddy
@@ -64,6 +62,34 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 
 		internal static Texture2D _imgNight;
 
+		internal static Texture2D _imgBaitAny;
+
+		internal static Texture2D _imgBaitFishEgg;
+
+		internal static Texture2D _imgBaitGlowWorm;
+
+		internal static Texture2D _imgBaitFreshwaterMinnow;
+
+		internal static Texture2D _imgBaitLavaBeetle;
+
+		internal static Texture2D _imgBaitLeech;
+
+		internal static Texture2D _imgBaitLightningBug;
+
+		internal static Texture2D _imgBaitMackerel;
+
+		internal static Texture2D _imgBaitNightcrawler;
+
+		internal static Texture2D _imgBaitRamshornSnail;
+
+		internal static Texture2D _imgBaitSardine;
+
+		internal static Texture2D _imgBaitScorpion;
+
+		internal static Texture2D _imgBaitShrimpling;
+
+		internal static Texture2D _imgBaitSparkflyLarva;
+
 		private AsyncCache<int, Map> _mapRepository;
 
 		private static ClickThroughPanel _fishPanel;
@@ -98,6 +124,22 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 
 		public static SettingEntry<string> _fishPanelTooltipDisplay;
 
+		public static SettingEntry<bool> _showRarityBorder;
+
+		public static readonly string[] _verticalAlignmentOptions = new string[3] { "Top", "Middle", "Bottom" };
+
+		private static ClickThroughPanel _baitPanel;
+
+		private bool _draggingBaitPanel;
+
+		private Point _dragBaitPanelStart = Point.get_Zero();
+
+		public static SettingEntry<bool> _dragBaitPanel;
+
+		public static SettingEntry<int> _baitImgSize;
+
+		public static SettingEntry<Point> _baitPanelLoc;
+
 		public static SettingEntry<bool> _dragTimeOfDayClock;
 
 		public static SettingEntry<int> _timeOfDayImgSize;
@@ -118,25 +160,25 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 
 		public static SettingEntry<bool> _hideInCombat;
 
-		private List<Fish> catchableFish;
-
-		private FishingMaps _fishingMaps;
+		public static SettingEntry<string> _settingClockAlign;
 
 		private IEnumerable<AccountAchievement> accountFishingAchievements;
 
-		public static SettingEntry<bool> _showRarityBorder;
+		private FishingMaps _fishingMaps;
 
-		public static readonly string[] _verticalAlignmentOptions = new string[3] { "Top", "Middle", "Bottom" };
+		private List<Fish> catchableFish;
 
-		public static SettingEntry<string> _settingClockAlign;
+		private IEnumerable<Fish> catchable;
 
-		private Clock _timeOfDayClock;
+		private OrderedDictionary sharkBait;
 
 		private List<Fish> _allFishList;
 
+		private Clock _timeOfDayClock;
+
 		internal static Map _currentMap;
 
-		private bool _useAPIToken;
+		internal static bool _useAPIToken;
 
 		private readonly SemaphoreSlim _updateFishSemaphore = new SemaphoreSlim(1, 1);
 
@@ -196,12 +238,15 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 		{
 		}//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
 			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
 			//IL_049c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05e5: Unknown result type (might be due to invalid IL or missing references)
 			_ignoreCaughtFish = settings.DefineSetting<bool>("IgnoreCaughtFish", true, (Func<string>)(() => Strings.SettingsIgnoreCaught), (Func<string>)(() => Strings.SettingsIgnoreCaughtDescription));
 			_includeSaltwater = settings.DefineSetting<bool>("IncludeSaltwater", false, (Func<string>)(() => Strings.SettingsDisplaySaltwater), (Func<string>)(() => Strings.SettingsDisplaySaltwaterDescription));
 			_includeWorldClass = settings.DefineSetting<bool>("IncludeWorldClass", false, (Func<string>)(() => Strings.SettingsDisplayWorldClass), (Func<string>)(() => Strings.SettingsDisplayWorldClassDescription));
@@ -225,6 +270,13 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			_fishPanelDirection.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)OnUpdateSettings<string>);
 			_fishPanelTooltipDisplay = settings.DefineSetting<string>("FishPanelTooltipDisplay", "#1\n@2\n@3\n@4\n@5\n@6\n@7", (Func<string>)(() => Strings.TooltipDisplay), (Func<string>)(() => Strings.Default + ": #1\\n@2\\n@3\\n@4\\n@5\\n@6\\n@7\n" + Strings.SimpleTooltip + Strings.CompactTooltip + Strings.FishPanelTooltipDescription + "@#1: " + Strings.FishName + "\n@#2: " + Strings.FishFavoredBait + "\n@#3: " + Strings.FishTimeOfDay + "\n@#4: " + Strings.FishFishingHole + "\n@#5: " + Strings.Achievement + "\n@#6: " + Strings.SettingsRarity + "\n@7:  " + Strings.ReasonForHiding + "\n@#8: " + Strings.FishyNotes + "\n(\\n " + Strings.AddsNewLines + ")"));
 			_fishPanelTooltipDisplay.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)OnUpdateSettings<string>);
+			_baitPanelLoc = settings.DefineSetting<Point>("BaitPanelLoc", new Point(100, 100), (Func<string>)(() => Strings.BaitPanelLocation), (Func<string>)(() => string.Empty));
+			_dragBaitPanel = settings.DefineSetting<bool>("BaitPanelDrag", false, (Func<string>)(() => Strings.BaitPanelDrag), (Func<string>)(() => string.Empty));
+			_baitImgSize = settings.DefineSetting<int>("BaitImgWidth", 30, (Func<string>)(() => Strings.BaitPanelSize), (Func<string>)(() => string.Empty));
+			_baitPanelLoc.add_SettingChanged((EventHandler<ValueChangedEventArgs<Point>>)OnUpdateSettings<Point>);
+			_dragBaitPanel.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateSettings<bool>);
+			_baitImgSize.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)OnUpdateSettings<int>);
+			SettingComplianceExtensions.SetRange(_baitImgSize, 16, 96);
 			_timeOfDayPanelLoc = settings.DefineSetting<Point>("TimeOfDayPanelLoc", new Point(100, 100), (Func<string>)(() => Strings.TimeOfDayPanelLoc), (Func<string>)(() => string.Empty));
 			_dragTimeOfDayClock = settings.DefineSetting<bool>("TimeOfDayPanelDrag", false, (Func<string>)(() => Strings.TimeOfDayPanelDrag), (Func<string>)(() => Strings.TimeOfDayPanelDragDescription));
 			_timeOfDayImgSize = settings.DefineSetting<int>("TimeImgWidth", 64, (Func<string>)(() => Strings.TimeOfDaySize), (Func<string>)(() => string.Empty));
@@ -247,6 +299,8 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 		{
 			Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)OnApiSubTokenUpdated);
 			catchableFish = new List<Fish>();
+			catchable = new List<Fish>();
+			sharkBait = new OrderedDictionary();
 			_fishingMaps = new FishingMaps();
 			_mapRepository = new AsyncCache<int, Map>(RequestMap);
 			_imgBorderBlack = ContentsManager.GetTexture("border_black.png");
@@ -264,6 +318,20 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			_imgDay = ContentsManager.GetTexture("day.png");
 			_imgDusk = ContentsManager.GetTexture("dusk.png");
 			_imgNight = ContentsManager.GetTexture("night.png");
+			_imgBaitAny = ContentsManager.GetTexture("Nightcrawler.png");
+			_imgBaitFishEgg = ContentsManager.GetTexture("Fish_Egg.png");
+			_imgBaitGlowWorm = ContentsManager.GetTexture("Glow_Worm.png");
+			_imgBaitFreshwaterMinnow = ContentsManager.GetTexture("Minnow.png");
+			_imgBaitLavaBeetle = ContentsManager.GetTexture("Lava_Beetle.png");
+			_imgBaitLeech = ContentsManager.GetTexture("Leech.png");
+			_imgBaitLightningBug = ContentsManager.GetTexture("Lightning_Bug.png");
+			_imgBaitMackerel = ContentsManager.GetTexture("Mackerel.png");
+			_imgBaitNightcrawler = ContentsManager.GetTexture("Nightcrawler.png");
+			_imgBaitRamshornSnail = ContentsManager.GetTexture("Ramshorn_Snail.png");
+			_imgBaitSardine = ContentsManager.GetTexture("Sardine.png");
+			_imgBaitScorpion = ContentsManager.GetTexture("Scorpion.png");
+			_imgBaitShrimpling = ContentsManager.GetTexture("Shrimpling.png");
+			_imgBaitSparkflyLarva = ContentsManager.GetTexture("Sparkfly_Larva.png");
 			_allFishList = new List<Fish>();
 			using (StreamReader r = new StreamReader(ContentsManager.GetFileStream("fish.json")))
 			{
@@ -302,16 +370,25 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 
 		protected override void Update(GameTime gameTime)
 		{
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-			UpdateCadenceUtil.UpdateAsyncWithCadence(GetCurrentMapsFish, gameTime, INTERVAL_UPDATE_FISH, ref _lastUpdateFish);
+			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0112: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+			UpdateCadenceUtil.UpdateAsyncWithCadence(GetCurrentMapFishingInfo, gameTime, INTERVAL_UPDATE_FISH, ref _lastUpdateFish);
 			if (UiIsAvailable && !HidingInCombat)
 			{
 				GetCurrentMapTime();
@@ -320,18 +397,27 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 					((Control)_timeOfDayClock).Show();
 				}
 				((Control)_fishPanel).Show();
+				((Control)_baitPanel).Show();
 			}
 			else
 			{
 				((Control)_timeOfDayClock).Hide();
 				((Control)_fishPanel).Hide();
+				((Control)_baitPanel).Hide();
 			}
 			if (_draggingFishPanel)
 			{
-				Point nOffset = GameService.Input.get_Mouse().get_Position() - _dragFishPanelStart;
+				Point fishPanelMoveOffset = GameService.Input.get_Mouse().get_Position() - _dragFishPanelStart;
 				ClickThroughPanel fishPanel = _fishPanel;
-				((Control)fishPanel).set_Location(((Control)fishPanel).get_Location() + nOffset);
+				((Control)fishPanel).set_Location(((Control)fishPanel).get_Location() + fishPanelMoveOffset);
 				_dragFishPanelStart = GameService.Input.get_Mouse().get_Position();
+			}
+			if (_draggingBaitPanel)
+			{
+				Point baitPanelMoveOffset = GameService.Input.get_Mouse().get_Position() - _dragBaitPanelStart;
+				ClickThroughPanel baitPanel = _baitPanel;
+				((Control)baitPanel).set_Location(((Control)baitPanel).get_Location() + baitPanelMoveOffset);
+				_dragBaitPanelStart = GameService.Input.get_Mouse().get_Position();
 			}
 		}
 
@@ -353,6 +439,9 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			{
 				((Control)fishPanel).Dispose();
 			}
+			_baitPanelLoc.remove_SettingChanged((EventHandler<ValueChangedEventArgs<Point>>)OnUpdateSettings<Point>);
+			_dragBaitPanel.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateSettings<bool>);
+			_baitImgSize.remove_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)OnUpdateSettings<int>);
 			_timeOfDayPanelLoc.remove_SettingChanged((EventHandler<ValueChangedEventArgs<Point>>)OnUpdateClockLocation);
 			_dragTimeOfDayClock.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateClockSettings);
 			_timeOfDayImgSize.remove_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)OnUpdateClockSize);
@@ -442,7 +531,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 		{
 			Logger.Debug("Fish settings updated");
 			GetCurrentMapTime();
-			await GetCurrentMapsFish();
+			await GetCurrentMapFishingInfo();
 			DrawIcons();
 		}
 
@@ -507,15 +596,19 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0297: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0329: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0336: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0402: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0421: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0439: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0213: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0298: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0311: Unknown result type (might be due to invalid IL or missing references)
+			//IL_031e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0390: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0518: Unknown result type (might be due to invalid IL or missing references)
+			//IL_052f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_055d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0603: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0610: Unknown result type (might be due to invalid IL or missing references)
 			ClickThroughPanel fishPanel = _fishPanel;
 			if (fishPanel != null)
 			{
@@ -561,11 +654,9 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 				xStart = x;
 				y = ((Control)_fishPanel).get_Size().Y - _fishImgSize.get_Value();
 			}
-			foreach (Fish fish in from f in catchableFish
-				orderby f.Visible descending, f.Caught && f.Visible, f.Rarity, f.Name
-				select f)
+			foreach (Fish fish in catchable)
 			{
-				string fishTooltip = BuildTooltip(fish);
+				string fishTooltip = Fish.BuildFishTooltip(fish);
 				ClickThroughImage clickThroughImage = new ClickThroughImage();
 				((Control)clickThroughImage).set_Parent((Container)(object)_fishPanel);
 				((Image)clickThroughImage).set_Texture(fish.IconImg);
@@ -628,6 +719,47 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 				}
 				count++;
 			}
+			ClickThroughPanel baitPanel = _baitPanel;
+			if (baitPanel != null)
+			{
+				((Control)baitPanel).Dispose();
+			}
+			int baitPanelColumns = 3;
+			x = 0;
+			y = 0;
+			count = 1;
+			xStart = x;
+			ClickThroughPanel clickThroughPanel2 = new ClickThroughPanel();
+			((Control)clickThroughPanel2).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			((Control)clickThroughPanel2).set_Location(_baitPanelLoc.get_Value());
+			((Control)clickThroughPanel2).set_Size(new Point(_baitImgSize.get_Value() * 3));
+			clickThroughPanel2.Capture = _dragBaitPanel.get_Value();
+			_baitPanel = clickThroughPanel2;
+			Logger.Debug($"Bait Panel Size; {((Control)_baitPanel).get_Size()}");
+			foreach (FishBait bait in sharkBait.Keys)
+			{
+				if (bait != 0 || sharkBait.Count <= 1)
+				{
+					string baitTooltip = FishingBait.BuildBaitTooltip(bait, (List<Fish.FishingHole>)sharkBait[bait]);
+					ClickThroughImage clickThroughImage5 = new ClickThroughImage();
+					((Control)clickThroughImage5).set_Parent((Container)(object)_baitPanel);
+					((Image)clickThroughImage5).set_Texture(AsyncTexture2D.op_Implicit(FishingBait.Bait[bait].IconImg));
+					((Control)clickThroughImage5).set_Size(new Point(_baitImgSize.get_Value()));
+					((Control)clickThroughImage5).set_Location(new Point(x, y));
+					((Control)clickThroughImage5).set_ZIndex(0);
+					clickThroughImage5.Capture = _dragBaitPanel.get_Value();
+					((Control)clickThroughImage5).set_BasicTooltipText(baitTooltip);
+					((Control)clickThroughImage5).set_Opacity(1f);
+					x += _baitImgSize.get_Value();
+					if (count == baitPanelColumns)
+					{
+						x = xStart;
+						y += _baitImgSize.get_Value();
+						count = 0;
+					}
+					count++;
+				}
+			}
 			if (_dragFishPanel.get_Value())
 			{
 				_fishPanel.Capture = true;
@@ -647,74 +779,39 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 					((Panel)_fishPanel).set_ShowTint(false);
 				});
 			}
-		}
-
-		private string BuildTooltip(Fish fish)
-		{
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b8: Unknown result type (might be due to invalid IL or missing references)
-			string name = Strings.FishName + ": " + fish.Name;
-			string bait = Strings.FishFavoredBait + ": " + fish.Bait.GetEnumMemberValue();
-			string time = Strings.FishTimeOfDay + ": " + fish.Time.GetEnumMemberValue();
-			string hole = Strings.FishFishingHole + ": " + fish.Hole.GetEnumMemberValue() + (fish.OpenWater ? (", " + Strings.OpenWater) : string.Empty);
-			string achieve = Strings.Achievement + ": " + fish.Achievement;
-			string rarity2 = Strings.Rarity;
-			ResourceManager resourceManager = Strings.ResourceManager;
-			ItemRarity rarity3 = fish.Rarity;
-			string rarity = rarity2 + ": " + resourceManager.GetString(((object)(ItemRarity)(ref rarity3)).ToString(), Strings.Culture);
-			string hiddenReason = string.Empty;
-			if (_useAPIToken)
+			if (_dragBaitPanel.get_Value())
 			{
-				if (!fish.Visible && fish.Caught)
+				_baitPanel.Capture = true;
+				((Control)_baitPanel).add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)delegate
 				{
-					hiddenReason = Strings.Hidden + ": " + Strings.TimeOfDay + ", " + Strings.HiddenCaught;
-				}
-				else if (!fish.Visible)
+					//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+					_draggingBaitPanel = true;
+					_dragBaitPanelStart = GameService.Input.get_Mouse().get_Position();
+					((Panel)_baitPanel).set_ShowTint(true);
+				});
+				((Control)_baitPanel).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
 				{
-					hiddenReason = Strings.Hidden + ": " + Strings.TimeOfDay;
-				}
-				else if (fish.Caught)
-				{
-					hiddenReason = Strings.Hidden + ": " + Strings.HiddenCaught;
-				}
+					//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+					_draggingBaitPanel = false;
+					_baitPanelLoc.set_Value(((Control)_baitPanel).get_Location());
+					((Panel)_baitPanel).set_ShowTint(false);
+				});
 			}
-			string notes = ((!string.IsNullOrWhiteSpace(fish.Notes)) ? (Strings.Notes + ": " + Strings.ResourceManager.GetString(fish.Notes, Strings.Culture)) : string.Empty);
-			string text = _fishPanelTooltipDisplay.get_Value().Replace("@1", name).Replace("@2", bait)
-				.Replace("@3", time)
-				.Replace("@4", hole)
-				.Replace("@5", achieve)
-				.Replace("@6", rarity)
-				.Replace("@7", hiddenReason)
-				.Replace("@8", notes)
-				.Replace("#1", fish.Name)
-				.Replace("#2", fish.Bait.GetEnumMemberValue())
-				.Replace("#3", fish.Time.GetEnumMemberValue())
-				.Replace("#4", fish.Hole.GetEnumMemberValue() + (fish.OpenWater ? (", " + Strings.OpenWater) : string.Empty))
-				.Replace("#5", fish.Achievement);
-			ResourceManager resourceManager2 = Strings.ResourceManager;
-			rarity3 = fish.Rarity;
-			return text.Replace("#6", resourceManager2.GetString(((object)(ItemRarity)(ref rarity3)).ToString(), Strings.Culture)).Replace("#8", Strings.ResourceManager.GetString(fish.Notes, Strings.Culture)).Replace("\\n", "\n")
-				.Replace("\n\n", "\n")
-				.Trim();
 		}
 
 		private Texture2D GetImageBorder(ItemRarity rarity)
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Expected I4, but got Unknown
-			return (Texture2D)((rarity - 1) switch
+			return (Texture2D)(rarity switch
 			{
-				0 => _imgBorderJunk, 
-				1 => _imgBorderBasic, 
-				2 => _imgBorderFine, 
-				3 => _imgBorderMasterwork, 
-				4 => _imgBorderRare, 
-				5 => _imgBorderExotic, 
-				6 => _imgBorderAscended, 
-				7 => _imgBorderLegendary, 
+				ItemRarity.Junk => _imgBorderJunk, 
+				ItemRarity.Basic => _imgBorderBasic, 
+				ItemRarity.Fine => _imgBorderFine, 
+				ItemRarity.Masterwork => _imgBorderMasterwork, 
+				ItemRarity.Rare => _imgBorderRare, 
+				ItemRarity.Exotic => _imgBorderExotic, 
+				ItemRarity.Ascended => _imgBorderAscended, 
+				ItemRarity.Legendary => _imgBorderLegendary, 
 				_ => _imgBorderBlack, 
 			});
 		}
@@ -736,19 +833,19 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 		{
 			Logger.Debug("Map Changed");
 			_currentMap = await _mapRepository.GetItem(e.get_Value());
-			if (_currentMap != null && _currentMap.get_Id() != _prevMapId)
+			if (_currentMap != null && _currentMap.Id != _prevMapId)
 			{
-				Logger.Debug($"Current map {_currentMap.get_Name()} {_currentMap.get_Id()}");
-				_prevMapId = _currentMap.get_Id();
+				Logger.Debug($"Current map {_currentMap.Name} {_currentMap.Id}");
+				_prevMapId = _currentMap.Id;
 				GetCurrentMapTime();
-				await GetCurrentMapsFish();
+				await GetCurrentMapFishingInfo();
 				DrawIcons();
 			}
 		}
 
 		private async void OnTimeOfDayChanged(object sender = null, ValueChangedEventArgs<string> e = null)
 		{
-			await GetCurrentMapsFish();
+			await GetCurrentMapFishingInfo();
 			DrawIcons();
 			_lastUpdateFish = 0.0;
 		}
@@ -775,7 +872,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			}
 			try
 			{
-				await GetCurrentMapsFish();
+				await GetCurrentMapFishingInfo();
 				DrawIcons();
 				_useAPIToken = true;
 			}
@@ -785,13 +882,13 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			}
 		}
 
-		private async Task GetCurrentMapsFish(GameTime gameTime)
+		private async Task GetCurrentMapFishingInfo(GameTime gameTime)
 		{
-			await GetCurrentMapsFish();
+			await GetCurrentMapFishingInfo();
 			DrawIcons();
 		}
 
-		private async Task GetCurrentMapsFish(CancellationToken cancellationToken = default(CancellationToken))
+		private async Task GetCurrentMapFishingInfo(CancellationToken cancellationToken = default(CancellationToken))
 		{
 			await _updateFishSemaphore.WaitAsync(cancellationToken);
 			try
@@ -800,12 +897,11 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 				{
 					if (Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)Gw2ApiManager.get_Permissions()))
 					{
-						accountFishingAchievements = ((IEnumerable<AccountAchievement>)(await ((IBlobClient<IApiV2ObjectList<AccountAchievement>>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
-							.get_Achievements()).GetAsync(default(CancellationToken)))).Where((AccountAchievement achievement) => FishingMaps.FISHER_ACHIEVEMENT_IDS.Contains(achievement.get_Id()) && achievement.get_Current() != achievement.get_Max());
+						accountFishingAchievements = (await Gw2ApiManager.get_Gw2ApiClient().V2.Account.Achievements.GetAsync()).Where((AccountAchievement achievement) => FishingMaps.FISHER_ACHIEVEMENT_IDS.Contains(achievement.Id) && achievement.Current != achievement.Max);
 						_useAPIToken = true;
-						IEnumerable<int> currentAchievementIds = accountFishingAchievements.Select((AccountAchievement achievement) => achievement.get_Id());
-						IEnumerable<int> first = accountFishingAchievements.Select((AccountAchievement achievement) => achievement.get_Current());
-						IEnumerable<int> progressMax = accountFishingAchievements.Select((AccountAchievement achievement) => achievement.get_Max());
+						IEnumerable<int> currentAchievementIds = accountFishingAchievements.Select((AccountAchievement achievement) => achievement.Id);
+						IEnumerable<int> first = accountFishingAchievements.Select((AccountAchievement achievement) => achievement.Current);
+						IEnumerable<int> progressMax = accountFishingAchievements.Select((AccountAchievement achievement) => achievement.Max);
 						IEnumerable<string> currentOfMax = first.Zip(progressMax, (int current, int max) => current + "/" + max);
 						Logger.Debug("All account fishing achievement Ids: " + string.Join(", ", currentAchievementIds));
 						Logger.Debug("Account fishing achievement progress: " + string.Join(", ", currentOfMax));
@@ -822,6 +918,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 					_useAPIToken = false;
 				}
 				catchableFish.Clear();
+				sharkBait.Clear();
 				List<int> achievementsInMap = new List<int>();
 				List<int> verifyMapAchievable = new List<int>();
 				if (_currentMap == null)
@@ -835,10 +932,10 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 						Logger.Debug(ex3, "Couldn't get player's current map.");
 					}
 				}
-				if (_currentMap != null && _fishingMaps.MapAchievements.ContainsKey(_currentMap.get_Id()))
+				if (_currentMap != null && _fishingMaps.MapAchievements.ContainsKey(_currentMap.Id))
 				{
-					achievementsInMap.AddRange(_fishingMaps.MapAchievements[_currentMap.get_Id()]);
-					verifyMapAchievable.AddRange(_fishingMaps.MapAchievements[_currentMap.get_Id()]);
+					achievementsInMap.AddRange(_fishingMaps.MapAchievements[_currentMap.Id]);
+					verifyMapAchievable.AddRange(_fishingMaps.MapAchievements[_currentMap.Id]);
 				}
 				else
 				{
@@ -854,69 +951,72 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 				}
 				if (achievementsInMap.Count == 0)
 				{
-					Logger.Debug("No achievable fish in map.");
+					Logger.Debug($"No achievable fish in map: {_currentMap.Id}");
 					return;
 				}
 				Logger.Debug("All map achievements: " + string.Join(", ", achievementsInMap));
 				if (_useAPIToken)
 				{
 					Logger.Debug("Using API");
-					List<AccountAchievement> currentMapAchievable = accountFishingAchievements.Where((AccountAchievement achievement) => achievementsInMap.Contains(achievement.get_Id())).ToList();
-					if (!currentMapAchievable.Any((AccountAchievement a) => verifyMapAchievable.Contains(a.get_Id())))
+					List<AccountAchievement> currentMapAchievable = accountFishingAchievements.Where((AccountAchievement achievement) => achievementsInMap.Contains(achievement.Id)).ToList();
+					if (!currentMapAchievable.Any((AccountAchievement a) => verifyMapAchievable.Contains(a.Id)))
 					{
-						AccountAchievement val = new AccountAchievement();
-						val.set_Id(_fishingMaps.MapAchievements[_currentMap.get_Id()].First());
-						val.set_Current(0);
-						val.set_Done(false);
-						currentMapAchievable.Add(val);
+						currentMapAchievable.Add(new AccountAchievement
+						{
+							Id = _fishingMaps.MapAchievements[_currentMap.Id].First(),
+							Current = 0,
+							Done = false
+						});
 					}
-					if (_includeSaltwater.get_Value() && !currentMapAchievable.Any((AccountAchievement a) => FishingMaps.SaltwaterFisher.Contains(a.get_Id())))
+					if (_includeSaltwater.get_Value() && !currentMapAchievable.Any((AccountAchievement a) => FishingMaps.SaltwaterFisher.Contains(a.Id)))
 					{
-						AccountAchievement val2 = new AccountAchievement();
-						val2.set_Id(FishingMaps.SaltwaterFisher.First());
-						val2.set_Current(0);
-						val2.set_Done(false);
-						currentMapAchievable.Add(val2);
+						currentMapAchievable.Add(new AccountAchievement
+						{
+							Id = FishingMaps.SaltwaterFisher.First(),
+							Current = 0,
+							Done = false
+						});
 					}
-					if (_includeWorldClass.get_Value() && !currentMapAchievable.Any((AccountAchievement a) => FishingMaps.WorldClassFisher.Contains(a.get_Id())))
+					if (_includeWorldClass.get_Value() && !currentMapAchievable.Any((AccountAchievement a) => FishingMaps.WorldClassFisher.Contains(a.Id)))
 					{
-						AccountAchievement val3 = new AccountAchievement();
-						val3.set_Id(FishingMaps.WorldClassFisher.First());
-						val3.set_Current(0);
-						val3.set_Done(false);
-						currentMapAchievable.Add(val3);
+						currentMapAchievable.Add(new AccountAchievement
+						{
+							Id = FishingMaps.WorldClassFisher.First(),
+							Current = 0,
+							Done = false
+						});
 					}
-					Logger.Debug("Current map achievable: " + string.Join(", ", currentMapAchievable.Select((AccountAchievement achievement) => $"id: {achievement.get_Id()} current: {achievement.get_Current()} done: {achievement.get_Done()}")));
-					int bitsCounter2 = 0;
+					Logger.Debug("Current map achievable: " + string.Join(", ", currentMapAchievable.Select((AccountAchievement achievement) => $"id: {achievement.Id} current: {achievement.Current} done: {achievement.Done}")));
+					int bitsCounter = 0;
 					foreach (AccountAchievement accountAchievement in currentMapAchievable)
 					{
-						Achievement currentAccountAchievement = await RequestAchievement(accountAchievement.get_Id());
+						Achievement currentAccountAchievement = await RequestAchievement(accountAchievement.Id);
 						if (currentAccountAchievement == null)
 						{
-							Logger.Debug($"Requested achievement by id is null, account achievement id: {accountAchievement.get_Id()}");
+							Logger.Debug($"Requested achievement by id is null, account achievement id: {accountAchievement.Id}");
 							continue;
 						}
-						if (currentAccountAchievement.get_Bits() == null)
+						if (currentAccountAchievement.Bits == null)
 						{
-							Logger.Debug($"Requested achievement bits are null, account achievement id: {accountAchievement.get_Id()}");
+							Logger.Debug($"Requested achievement bits are null, account achievement id: {accountAchievement.Id}");
 							continue;
 						}
-						foreach (AchievementBit bit2 in currentAccountAchievement.get_Bits())
+						foreach (AchievementBit bit in currentAccountAchievement.Bits!)
 						{
-							if (bit2 == null)
+							if (bit == null)
 							{
-								Logger.Debug($"Bit in {currentAccountAchievement.get_Id()} is null");
+								Logger.Debug($"Bit in {currentAccountAchievement.Id} is null");
 								continue;
 							}
-							if (_ignoreCaughtFish.get_Value() && accountAchievement.get_Bits() != null && accountAchievement.get_Bits().Contains(bitsCounter2))
+							if (_ignoreCaughtFish.get_Value() && accountAchievement.Bits != null && accountAchievement.Bits.Contains(bitsCounter))
 							{
-								bitsCounter2++;
+								bitsCounter++;
 								continue;
 							}
-							AddCatchableFish(((AchievementItemBit)bit2).get_Id(), currentAccountAchievement, accountAchievement.get_Bits() != null && accountAchievement.get_Bits().Contains(bitsCounter2));
-							bitsCounter2++;
+							AddCatchableFish(((AchievementItemBit)bit).Id, currentAccountAchievement, accountAchievement.Bits != null && accountAchievement.Bits.Contains(bitsCounter));
+							bitsCounter++;
 						}
-						bitsCounter2 = 0;
+						bitsCounter = 0;
 					}
 				}
 				else
@@ -924,23 +1024,23 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 					Logger.Debug("Not using API");
 					IEnumerable<int> currentMapAchievableIds = FishingMaps.BASE_FISHER_ACHIEVEMENT_IDS.Where((int achievementId) => achievementsInMap.Contains(achievementId));
 					Logger.Debug("Current map achievable: " + string.Join(", ", currentMapAchievableIds));
-					foreach (int bitsCounter2 in currentMapAchievableIds)
+					foreach (int bitsCounter in currentMapAchievableIds)
 					{
-						Achievement currentAchievement = await RequestAchievement(bitsCounter2);
+						Achievement currentAchievement = await RequestAchievement(bitsCounter);
 						if (currentAchievement == null)
 						{
-							Logger.Debug($"Requested achievement by id is null, achievement id: {bitsCounter2}");
+							Logger.Debug($"Requested achievement by id is null, achievement id: {bitsCounter}");
 							continue;
 						}
-						foreach (AchievementBit bit in currentAchievement.get_Bits())
+						foreach (AchievementBit bit2 in currentAchievement.Bits!)
 						{
-							if (bit == null)
+							if (bit2 == null)
 							{
-								Logger.Debug($"Bit in {currentAchievement.get_Id()} is null");
+								Logger.Debug($"Bit in {currentAchievement.Id} is null");
 							}
 							else
 							{
-								AddCatchableFish(((AchievementItemBit)bit).get_Id(), currentAchievement, caught: false);
+								AddCatchableFish(((AchievementItemBit)bit2).Id, currentAchievement, caught: false);
 							}
 						}
 					}
@@ -950,10 +1050,23 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 					catchableFish = catchableFish.Where((Fish phish) => phish.Visible).ToList();
 				}
 				Logger.Debug("Shown fish in current map count: " + catchableFish.Count());
+				catchable = from f in catchableFish
+					orderby f.Visible descending, f.Caught && f.Visible, f.Rarity, f.Name
+					select f;
+				IEnumerable<Fish> visibleFish = catchable.Where((Fish fish) => fish.Visible);
+				foreach (Fish fishy in from f in visibleFish.DistinctBy((Fish f) => f.Bait)
+					orderby f.Rarity descending
+					select f)
+				{
+					IEnumerable<Fish.FishingHole> holes = (from fish in visibleFish
+						where fishy.Name == fish.Name
+						select fish.Hole).Distinct();
+					sharkBait.Add(fishy.Bait, holes.ToList());
+				}
 			}
 			catch (Exception ex)
 			{
-				Logger.Debug(ex, $"Unknown exception getting current map ({_currentMap.get_Name()} {_currentMap.get_Id()}) fish");
+				Logger.Debug(ex, $"Unknown exception getting current map ({_currentMap.Name} {_currentMap.Id}) info");
 			}
 			finally
 			{
@@ -969,31 +1082,31 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 				Logger.Debug($"Skipping fish due to API issue. id: '{fishItemId}'");
 				return;
 			}
-			Logger.Debug($"Found Fish '{fish.get_Name()}' id: '{fish.get_Id()}'");
-			IEnumerable<Fish> fishIdMatch = _allFishList.Where((Fish phish) => phish.ItemId == fish.get_Id());
+			Logger.Debug($"Found Fish '{fish.Name}' id: '{fish.Id}'");
+			IEnumerable<Fish> fishIdMatch = _allFishList.Where((Fish phish) => phish.ItemId == fish.Id);
 			Fish ghoti = ((fishIdMatch.Count() != 0) ? fishIdMatch.First() : null);
 			if (ghoti == null)
 			{
-				Logger.Debug($"Missing fish from all fish list: name: '{fish.get_Name()}' id: '{fish.get_Id()}'");
+				Logger.Debug($"Missing fish from all fish list: name: '{fish.Name}' id: '{fish.Id}'");
 				return;
 			}
 			ghoti.Caught = caught;
 			ghoti.Visible = ghoti.Time == Fish.TimeOfDay.Any || _timeOfDayClock.TimePhase.Equals(Strings.Dawn) || _timeOfDayClock.TimePhase.Equals(Strings.Dusk) || object.Equals(ghoti.Time.ToString(), _timeOfDayClock.TimePhase);
-			ghoti.Name = fish.get_Name();
-			ghoti.Icon = fish.get_Icon();
-			ghoti.ItemId = fish.get_Id();
-			ghoti.Achievement = achievement.get_Name();
-			ghoti.AchievementId = achievement.get_Id();
-			ghoti.Rarity = ApiEnum<ItemRarity>.op_Implicit(fish.get_Rarity());
-			ghoti.ChatLink = fish.get_ChatLink();
+			ghoti.Name = fish.Name;
+			ghoti.Icon = fish.Icon;
+			ghoti.ItemId = fish.Id;
+			ghoti.Achievement = achievement.Name;
+			ghoti.AchievementId = achievement.Id;
+			ghoti.Rarity = fish.Rarity;
+			ghoti.ChatLink = fish.ChatLink;
 			ghoti.IconImg = RequestItemIcon(fish);
-			if (ghoti.Locations == null || ghoti.Locations.Contains(_currentMap.get_Id()))
+			if (ghoti.Locations == null || ghoti.Locations.Contains(_currentMap.Id))
 			{
 				catchableFish.Add(ghoti);
 			}
 			else
 			{
-				Logger.Debug($"Skipping {fish.get_Name()} {fish.get_Id()}, not available in current map.");
+				Logger.Debug($"Skipping {fish.Name} {fish.Id}, not available in current map.");
 			}
 		}
 
@@ -1002,7 +1115,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			Logger.Debug($"Requested map id: {id}");
 			try
 			{
-				Task<Map> mapTask = ((IBulkExpandableClient<Map, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Maps()).GetAsync(id, default(CancellationToken));
+				Task<Map> mapTask = Gw2ApiManager.get_Gw2ApiClient().V2.Maps.GetAsync(id);
 				await mapTask;
 				return mapTask.Result;
 			}
@@ -1018,7 +1131,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			Logger.Debug($"Requested achievement id: {id}");
 			try
 			{
-				Task<Achievement> achievementTask = ((IBulkExpandableClient<Achievement, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Achievements()).GetAsync(id, default(CancellationToken));
+				Task<Achievement> achievementTask = Gw2ApiManager.get_Gw2ApiClient().V2.Achievements.GetAsync(id);
 				await achievementTask;
 				return achievementTask.Result;
 			}
@@ -1034,7 +1147,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			Logger.Debug($"Requested item id: {id}");
 			try
 			{
-				Task<Item> itemTask = ((IBulkExpandableClient<Item, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Items()).GetAsync(id, default(CancellationToken));
+				Task<Item> itemTask = Gw2ApiManager.get_Gw2ApiClient().V2.Items.GetAsync(id);
 				await itemTask;
 				return itemTask.Result;
 			}
@@ -1047,8 +1160,7 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 
 		private AsyncTexture2D RequestItemIcon(Item item)
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			return GameService.Content.GetRenderServiceTexture(RenderUrl.op_Implicit(item.get_Icon()));
+			return GameService.Content.GetRenderServiceTexture((string)item.Icon);
 		}
 	}
 }
