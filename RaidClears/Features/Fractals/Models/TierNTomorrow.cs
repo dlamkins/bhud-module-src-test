@@ -32,6 +32,7 @@ namespace RaidClears.Features.Fractals.Models
 			SetGroupLabelReference(labelBox);
 			labelBox.LayoutChange(settings.Style.Layout);
 			labelBox.LabelDisplayChange(settings.Style.LabelDisplay, shortName, shortName);
+			new GridBox((Container)(object)group, "Patch!", "Data may be wrong for up to two(2) weeks while the new fractal rotation is recorded", Settings.Style.GridOpacity, Settings.Style.FontSize);
 		}
 
 		protected void InitTierNFractals()

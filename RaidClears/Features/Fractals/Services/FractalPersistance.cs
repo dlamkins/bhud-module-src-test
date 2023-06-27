@@ -13,7 +13,7 @@ namespace RaidClears.Features.Fractals.Services
 		public static string FILENAME = "fractal_clears.json";
 
 		[JsonProperty("version")]
-		public string Version { get; set; } = "2.0.0";
+		public string Version { get; set; } = "2.2.0";
 
 
 		[JsonProperty("accountClears")]
@@ -66,6 +66,10 @@ namespace RaidClears.Features.Fractals.Services
 				},
 				{
 					Encounters.Fractal.SirensReefFractal,
+					default(DateTime)
+				},
+				{
+					Encounters.Fractal.SilentSurfFractal,
 					default(DateTime)
 				},
 				{

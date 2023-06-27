@@ -109,6 +109,7 @@ namespace RaidClears.Features.Shared.Enums
 			NightmareFractal,
 			ShatteredObservatoryFractal,
 			SirensReefFractal,
+			SilentSurfFractal,
 			SnowblindFractal,
 			SunquaPeakFractal,
 			SolidOceanFractal,
