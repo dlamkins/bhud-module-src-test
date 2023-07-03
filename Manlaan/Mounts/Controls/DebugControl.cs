@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Blish_HUD;
 using Blish_HUD.Controls;
@@ -6,15 +8,15 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Manlaan.Mounts.Controls
 {
-	internal class DebugControl : Control
+	public class DebugControl : Control
 	{
-		public IEnumerable<string> StringsToDisplay { get; set; }
+		private ConcurrentDictionary<string, Func<string>> StringsToDisplay { get; set; }
 
 		public DebugControl()
 			: this()
 		{
 			((Control)this).set_Visible(true);
-			StringsToDisplay = new List<string>();
+			StringsToDisplay = new ConcurrentDictionary<string, Func<string>>();
 		}
 
 		protected override CaptureType CapturesInput()
@@ -22,12 +24,27 @@ namespace Manlaan.Mounts.Controls
 			return (CaptureType)0;
 		}
 
+		public void Add(string key, Func<string> value)
+		{
+			StringsToDisplay[key] = value;
+		}
+
+		public bool Remove(string key)
+		{
+			Func<string> value;
+			return StringsToDisplay.TryRemove(key, out value);
+		}
+
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			int i = 0;
-			foreach (string item in StringsToDisplay)
+			if (!DebugHelper.IsDebugEnabled())
 			{
-				DrawDbg(spriteBatch, i, item);
+				return;
+			}
+			int i = 0;
+			foreach (KeyValuePair<string, Func<string>> item in StringsToDisplay)
+			{
+				DrawDbg(spriteBatch, i, item.Key + ": " + item.Value());
 				i += 30;
 			}
 		}

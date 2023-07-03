@@ -91,6 +91,11 @@ namespace Manlaan.Mounts
 				select m).FirstOrDefault();
 		}
 
+		internal Mount GetCurrentlyActiveMount()
+		{
+			return Module._mounts.Where((Mount m) => m.MountType == GameService.Gw2Mumble.get_PlayerCharacter().get_CurrentMount()).FirstOrDefault();
+		}
+
 		public async Task TriggerKeybind(SettingEntry<KeyBinding> keybindingSetting)
 		{
 			Logger.Debug("TriggerKeybind entered");

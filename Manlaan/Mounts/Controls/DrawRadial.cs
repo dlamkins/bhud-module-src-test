@@ -9,6 +9,7 @@ using Blish_HUD.Input;
 using Blish_HUD.Settings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
 
 namespace Manlaan.Mounts.Controls
 {
@@ -34,6 +35,8 @@ namespace Manlaan.Mounts.Controls
 
 		private Point SpawnPoint;
 
+		private float debugLineThickness = 2f;
+
 		public EventHandler OnSettingsButtonClicked { get; internal set; }
 
 		private RadialMount SelectedMount => RadialMounts.SingleOrDefault((RadialMount m) => m.Selected);
@@ -55,25 +58,25 @@ namespace Manlaan.Mounts.Controls
 		public DrawRadial(Helper helper, TextureCache textureCache)
 			: this()
 		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
 			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00af: Expected O, but got Unknown
-			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ba: Expected O, but got Unknown
+			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e8: Expected O, but got Unknown
+			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f3: Expected O, but got Unknown
 			((Control)this).set_Visible(false);
 			((Control)this).set_Padding(Thickness.Zero);
 			_helper = helper;
@@ -113,20 +116,36 @@ namespace Manlaan.Mounts.Controls
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0224: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0231: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0325: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0135: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0154: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0340: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0346: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0350: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0352: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0386: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0393: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0416: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0425: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0444: Unknown result type (might be due to invalid IL or missing references)
+			//IL_046c: Unknown result type (might be due to invalid IL or missing references)
 			RadialMounts.Clear();
 			List<Mount> mounts = Module._availableOrderedMounts;
 			if (!mounts.Any())
@@ -156,6 +175,14 @@ namespace Manlaan.Mounts.Controls
 				});
 			}
 			double startAngle = Math.PI * Math.Floor(Module._settingMountRadialStartAngle.get_Value() * 360f) / 180.0;
+			if (DebugHelper.IsDebugEnabled())
+			{
+				Vector2 spawnPointVec = ((Point)(ref SpawnPoint)).ToVector2();
+				Vector2 rectpos = spawnPointVec - new Vector2((float)(mountIconSize / 2), (float)(mountIconSize / 2));
+				ShapeExtensions.DrawRectangle(spriteBatch, rectpos, new Size2((float)mountIconSize, (float)mountIconSize), Color.get_Red(), debugLineThickness, 0f);
+				ShapeExtensions.DrawCircle(spriteBatch, spawnPointVec, 1f, 50, Color.get_Red(), debugLineThickness, 0f);
+				ShapeExtensions.DrawCircle(spriteBatch, spawnPointVec, GetRadius(), 50, Color.get_Red(), debugLineThickness, 0f);
+			}
 			double currentAngle = startAngle;
 			double partAngleStep = Math.PI * 2.0 / (double)mounts.Count();
 			foreach (Mount mount in mounts)
@@ -165,6 +192,15 @@ namespace Manlaan.Mounts.Controls
 				Texture2D texture = _textureCache.GetMountImgFile(mount);
 				int x = (int)Math.Round((double)radius + (double)radius * Math.Cos(angleMid));
 				int y = (int)Math.Round((double)radius + (double)radius * Math.Sin(angleMid));
+				if (DebugHelper.IsDebugEnabled())
+				{
+					float xDebugInner = (float)Math.Round((double)GetRadius() * Math.Cos(currentAngle)) + (float)SpawnPoint.X;
+					float yDebugInner = (float)Math.Round((double)GetRadius() * Math.Sin(currentAngle)) + (float)SpawnPoint.Y;
+					int debugRadiusOuter = 250;
+					float xDebugOuter = (float)Math.Round((double)(2 * debugRadiusOuter) * Math.Cos(currentAngle)) + (float)SpawnPoint.X;
+					float yDebugOuter = (float)Math.Round((double)(2 * debugRadiusOuter) * Math.Sin(currentAngle)) + (float)SpawnPoint.Y;
+					ShapeExtensions.DrawLine(spriteBatch, new Vector2(xDebugInner, yDebugInner), new Vector2(xDebugOuter, yDebugOuter), Color.get_Red(), debugLineThickness, 0f);
+				}
 				RadialMounts.Add(new RadialMount
 				{
 					Texture = texture,
@@ -185,7 +221,7 @@ namespace Manlaan.Mounts.Controls
 			float length = ((Vector2)(ref val)).Length();
 			foreach (RadialMount radialMount in RadialMounts)
 			{
-				if ((double)length < (double)mountIconSize * Math.Sqrt(2.0) / 2.0)
+				if (length < GetRadius())
 				{
 					radialMount.Selected = radialMount.Default;
 				}
@@ -198,13 +234,9 @@ namespace Manlaan.Mounts.Controls
 			((Container)this).PaintBeforeChildren(spriteBatch, bounds);
 		}
 
-		private void DrawDbg(SpriteBatch spriteBatch, int position, string s)
+		private float GetRadius()
 		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, s, GameService.Content.get_DefaultFont32(), new Rectangle(new Point(0, position), new Point(400, 400)), Color.get_Red(), false, (HorizontalAlignment)0, (VerticalAlignment)1);
+			return (float)((double)mountIconSize * Math.Sqrt(2.0) / 2.0);
 		}
 
 		public async Task TriggerSelectedMountAsync()

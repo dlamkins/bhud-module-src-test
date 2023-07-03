@@ -97,7 +97,7 @@ namespace Manlaan.Mounts
 
 		private Panel _mountPanel;
 
-		private DebugControl _dbg;
+		public static DebugControl _debug;
 
 		private DrawRadial _radial;
 
@@ -471,6 +471,11 @@ namespace Manlaan.Mounts
 
 		protected override void Unload()
 		{
+			DebugControl debug = _debug;
+			if (debug != null)
+			{
+				((Control)debug).Dispose();
+			}
 			Panel mountPanel = _mountPanel;
 			if (mountPanel != null)
 			{
@@ -646,9 +651,11 @@ namespace Manlaan.Mounts
 
 		private void DrawUI()
 		{
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007d: Expected O, but got Unknown
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c9: Expected O, but got Unknown
+			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
 			Panel mountPanel = _mountPanel;
 			if (mountPanel != null)
 			{
@@ -658,6 +665,16 @@ namespace Manlaan.Mounts
 			{
 				mount.DisposeCornerIcon();
 			}
+			DebugControl debug = _debug;
+			if (debug != null)
+			{
+				((Control)debug).Dispose();
+			}
+			DebugControl debugControl = new DebugControl();
+			((Control)debugControl).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			((Control)debugControl).set_Location(new Point(0, 0));
+			((Control)debugControl).set_Size(new Point(500, 500));
+			_debug = debugControl;
 			if (_settingDisplayCornerIcons.get_Value())
 			{
 				DrawCornerIcons();
@@ -703,7 +720,7 @@ namespace Manlaan.Mounts
 			Logger.Debug("DoDefaultMountActionAsync entered");
 			if ((int)GameService.Gw2Mumble.get_PlayerCharacter().get_CurrentMount() != 0 && IsMountSwitchable())
 			{
-				await (_availableOrderedMounts.FirstOrDefault()?.DoUnmountAction() ?? Task.CompletedTask);
+				await (_helper.GetCurrentlyActiveMount()?.DoUnmountAction() ?? Task.CompletedTask);
 				Logger.Debug("DoDefaultMountActionAsync dismounted");
 				return;
 			}
