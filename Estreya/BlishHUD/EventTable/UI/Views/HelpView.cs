@@ -22,13 +22,13 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 	{
 		private const string DISCORD_USERNAME = "Estreya#0001";
 
-		private static Point PADDING = new Point(25, 25);
-
-		private readonly Func<List<EventCategory>> _getEvents;
+		private static readonly Point PADDING = new Point(25, 25);
 
 		private readonly string _apiUrl;
 
-		private List<string> _autocompleteAPIKeys = new List<string>();
+		private readonly Func<List<EventCategory>> _getEvents;
+
+		private readonly List<string> _autocompleteAPIKeys = new List<string>();
 
 		public HelpView(Func<List<EventCategory>> getEvents, string apiUrl, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, BitmapFont font = null)
 			: base(apiManager, iconService, translationService, font)

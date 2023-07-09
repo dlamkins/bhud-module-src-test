@@ -11,13 +11,13 @@ namespace Estreya.BlishHUD.Shared.Controls.World
 {
 	public class WorldPolygone : WorldEntity
 	{
-		private VertexPositionColor[] _vert;
-
 		private readonly Color _color;
 
 		private readonly Func<WorldEntity, bool> _renderCondition;
 
-		public Vector3[] Points { get; private set; }
+		private readonly VertexPositionColor[] _vert;
+
+		public Vector3[] Points { get; }
 
 		public WorldPolygone(Vector3 position, Vector3[] points, Color color, Func<WorldEntity, bool> renderCondition = null)
 			: base(position, 1f)

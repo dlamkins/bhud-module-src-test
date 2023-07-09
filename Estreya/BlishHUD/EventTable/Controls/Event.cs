@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using Blish_HUD;
 using Blish_HUD.Common.UI.Views;
 using Blish_HUD.Controls;
@@ -16,31 +17,37 @@ namespace Estreya.BlishHUD.EventTable.Controls
 {
 	public class Event : IDisposable
 	{
-		private IconService _iconService;
-
-		private TranslationService _translationService;
-
-		private readonly Func<DateTime> _getNowAction;
-
-		private readonly DateTime _startTime;
+		private static Logger logger = Logger.GetLogger<Event>();
 
 		private readonly DateTime _endTime;
 
-		private readonly Func<BitmapFont> _getFontAction;
+		private readonly Func<Color[]> _getColorAction;
 
 		private readonly Func<bool> _getDrawBorders;
 
 		private readonly Func<bool> _getDrawCrossout;
 
-		private readonly Func<Color> _getTextColor;
-
-		private readonly Func<Color[]> _getColorAction;
-
 		private readonly Func<bool> _getDrawShadowAction;
+
+		private readonly Func<BitmapFont> _getFontAction;
+
+		private readonly Func<DateTime> _getNowAction;
 
 		private readonly Func<Color> _getShadowColor;
 
+		private readonly Func<string> _getAbsoluteTimeFormatStrings;
+
+		private readonly Func<(string DaysFormat, string HoursFormat, string MinutesFormat)> _getTimespanFormatStrings;
+
+		private readonly Func<Color> _getTextColor;
+
+		private readonly DateTime _startTime;
+
 		private Texture2D _backgroundColorTexture;
+
+		private IconService _iconService;
+
+		private TranslationService _translationService;
 
 		public Estreya.BlishHUD.EventTable.Models.Event Model { get; private set; }
 
@@ -48,9 +55,9 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		public event EventHandler DisableRequested;
 
-		public event EventHandler FinishRequested;
+		public event EventHandler ToggleFinishRequested;
 
-		public Event(Estreya.BlishHUD.EventTable.Models.Event ev, IconService iconService, TranslationService translationService, Func<DateTime> getNowAction, DateTime startTime, DateTime endTime, Func<BitmapFont> getFontAction, Func<bool> getDrawBorders, Func<bool> getDrawCrossout, Func<Color> getTextColor, Func<Color[]> getColorAction, Func<bool> getDrawShadowAction, Func<Color> getShadowColor)
+		public Event(Estreya.BlishHUD.EventTable.Models.Event ev, IconService iconService, TranslationService translationService, Func<DateTime> getNowAction, DateTime startTime, DateTime endTime, Func<BitmapFont> getFontAction, Func<bool> getDrawBorders, Func<bool> getDrawCrossout, Func<Color> getTextColor, Func<Color[]> getColorAction, Func<bool> getDrawShadowAction, Func<Color> getShadowColor, Func<string> getDateTimeFormatString, Func<(string DaysFormat, string HoursFormat, string MinutesFormat)> getTimespanFormatStrings)
 		{
 			Model = ev;
 			_iconService = iconService;
@@ -65,6 +72,8 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			_getColorAction = getColorAction;
 			_getDrawShadowAction = getDrawShadowAction;
 			_getShadowColor = getShadowColor;
+			_getAbsoluteTimeFormatStrings = getDateTimeFormatString;
+			_getTimespanFormatStrings = getTimespanFormatStrings;
 		}
 
 		public ContextMenuStrip BuildContextMenu()
@@ -95,20 +104,20 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			{
 				this.HideRequested?.Invoke(this, EventArgs.Empty);
 			});
-			ContextMenuStripItem val3 = new ContextMenuStripItem(_translationService.GetTranslation("event-contextMenu-finish-title", "Finish"));
+			ContextMenuStripItem val3 = new ContextMenuStripItem(_translationService.GetTranslation("event-contextMenu-toggleFinish-title", "Toggle Finish"));
 			((Control)val3).set_Parent((Container)(object)menu);
-			((Control)val3).set_BasicTooltipText(_translationService.GetTranslation("event-contextMenu-finish-tooltip", "Completes the event until the next reset."));
+			((Control)val3).set_BasicTooltipText(_translationService.GetTranslation("event-contextMenu-toggleFinish-tooltip", "Toggles the completed state of the event."));
 			((Control)val3).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				this.FinishRequested?.Invoke(this, EventArgs.Empty);
+				this.ToggleFinishRequested?.Invoke(this, EventArgs.Empty);
 			});
 			return menu;
 		}
 
 		public Tooltip BuildTooltip()
 		{
-			//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cd: Expected O, but got Unknown
+			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c4: Expected O, but got Unknown
 			DateTime now = _getNowAction();
 			bool num = _startTime.AddMinutes(Model.Duration) < now;
 			bool isNext = !num && _startTime > now;
@@ -117,19 +126,19 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			if (num)
 			{
 				TimeSpan finishedSince = now - _startTime.AddMinutes(Model.Duration);
-				description = description + _translationService.GetTranslation("event-tooltip-finishedSince", "Finished since") + ": " + FormatTime(finishedSince);
+				description = description + _translationService.GetTranslation("event-tooltip-finishedSince", "Finished since") + ": " + FormatTimespan(finishedSince);
 			}
 			else if (isNext)
 			{
 				TimeSpan startsIn = _startTime - now;
-				description = description + _translationService.GetTranslation("event-tooltip-startsIn", "Starts in") + ": " + FormatTime(startsIn);
+				description = description + _translationService.GetTranslation("event-tooltip-startsIn", "Starts in") + ": " + FormatTimespan(startsIn);
 			}
 			else if (isCurrent)
 			{
 				TimeSpan remaining = GetTimeRemaining(now);
-				description = description + _translationService.GetTranslation("event-tooltip-remaining", "Remaining") + ": " + FormatTime(remaining);
+				description = description + _translationService.GetTranslation("event-tooltip-remaining", "Remaining") + ": " + FormatTimespan(remaining);
 			}
-			description = description + " (" + _translationService.GetTranslation("event-tooltip-startsAt", "Starts at") + ": " + FormatTime(_startTime.ToLocalTime()) + ")";
+			description = description + " (" + _translationService.GetTranslation("event-tooltip-startsAt", "Starts at") + ": " + FormatAbsoluteTime(_startTime) + ")";
 			return new Tooltip((ITooltipView)(object)new TooltipView(Model.Name, description, _iconService.GetIcon(Model.Icon), _translationService));
 		}
 
@@ -231,7 +240,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			TimeSpan remainingTime = GetTimeRemaining(_getNowAction());
 			if (!(remainingTime == TimeSpan.Zero))
 			{
-				string remainingTimeString = FormatTimeRemaining(remainingTime);
+				string remainingTimeString = FormatTimespan(remainingTime);
 				float timeWidth = (float)Math.Ceiling(font.MeasureString(remainingTimeString).Width);
 				float maxWidth = bounds.Width - nameWidth;
 				float centerX = maxWidth / 2f - timeWidth / 2f;
@@ -268,31 +277,39 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			}
 		}
 
-		private string FormatTimeRemaining(TimeSpan ts)
+		private string FormatTimespan(TimeSpan ts)
 		{
-			if (ts.Days > 0)
+			(string, string, string) formatStrings = _getTimespanFormatStrings();
+			try
 			{
-				return ts.ToString("dd\\.hh\\:mm\\:ss");
+				if (ts.Days > 0)
+				{
+					return ts.ToString(formatStrings.Item1, CultureInfo.InvariantCulture);
+				}
+				if (ts.Hours > 0)
+				{
+					return ts.ToString(formatStrings.Item2, CultureInfo.InvariantCulture);
+				}
+				return ts.ToString(formatStrings.Item3, CultureInfo.InvariantCulture);
 			}
-			if (ts.Hours > 0)
+			catch (Exception ex)
 			{
-				return ts.ToString("hh\\:mm\\:ss");
+				logger.Warn(ex, $"Failed to format timespan {ts}:");
+				return string.Empty;
 			}
-			return ts.ToString("mm\\:ss");
 		}
 
-		private string FormatTime(DateTime dt)
+		private string FormatAbsoluteTime(DateTime dt)
 		{
-			return FormatTime(dt.TimeOfDay);
-		}
-
-		private string FormatTime(TimeSpan ts)
-		{
-			if (ts.Days > 0)
+			try
 			{
-				return ts.ToString("dd\\.hh\\:mm\\:ss");
+				return dt.ToLocalTime().ToString(_getAbsoluteTimeFormatStrings(), CultureInfo.InvariantCulture);
 			}
-			return ts.ToString("hh\\:mm\\:ss");
+			catch (Exception ex)
+			{
+				logger.Warn(ex, $"Failed to format datetime {dt}:");
+				return string.Empty;
+			}
 		}
 
 		public void Dispose()

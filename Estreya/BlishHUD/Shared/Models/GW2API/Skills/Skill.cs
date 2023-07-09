@@ -73,6 +73,11 @@ namespace Estreya.BlishHUD.Shared.Models.GW2API.Skills
 		[JsonIgnore]
 		public AsyncTexture2D IconTexture { get; set; }
 
+		public void Dispose()
+		{
+			IconTexture = null;
+		}
+
 		public static Skill FromAPISkill(Skill skill)
 		{
 			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
@@ -180,11 +185,6 @@ namespace Estreya.BlishHUD.Shared.Models.GW2API.Skills
 			obj.Icon = RenderUrl.op_Implicit(((Item)upgradeComponent).get_Icon());
 			obj.ChatLink = ((Item)upgradeComponent).get_ChatLink();
 			return obj;
-		}
-
-		public void Dispose()
-		{
-			IconTexture = null;
 		}
 
 		public void LoadTexture(IconService iconService)

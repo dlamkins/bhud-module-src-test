@@ -15,14 +15,14 @@ namespace Estreya.BlishHUD.EventTable.Models
 		[IgnoreCopy]
 		private static readonly Logger Logger = Logger.GetLogger<EventCategory>();
 
-		[JsonProperty("events")]
-		private List<Event> _originalEvents = new List<Event>();
+		[JsonIgnore]
+		private AsyncLock _eventLock = new AsyncLock();
 
 		[JsonIgnore]
 		private List<Event> _fillerEvents = new List<Event>();
 
-		[JsonIgnore]
-		private AsyncLock _eventLock = new AsyncLock();
+		[JsonProperty("events")]
+		private List<Event> _originalEvents = new List<Event>();
 
 		[JsonProperty("key")]
 		public string Key { get; set; }

@@ -13,15 +13,25 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 {
 	public class TooltipView : BaseView, ITooltipView, IView
 	{
-		private string Title { get; set; }
+		private string Title { get; }
 
-		private string Description { get; set; }
+		private string Description { get; }
 
-		private AsyncTexture2D Icon { get; set; }
+		private AsyncTexture2D Icon { get; }
+
+		public Color NameTextColor { get; set; } = Color.get_White();
+
+
+		public Color DescriptionTextColor { get; set; } = StandardColors.get_DisabledText();
+
 
 		public TooltipView(string title, string description, TranslationService translationService, Gw2ApiManager apiManager = null, IconService iconService = null)
 			: base(apiManager, iconService, translationService)
 		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 			Title = title;
 			Description = description;
 		}
@@ -55,21 +65,24 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ce: Expected O, but got Unknown
-			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00da: Expected O, but got Unknown
 			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0159: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0160: Unknown result type (might be due to invalid IL or missing references)
 			((Container)parent).set_HeightSizingMode((SizingMode)1);
 			((Container)parent).set_WidthSizingMode((SizingMode)1);
 			Image val = new Image();
@@ -89,6 +102,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			val2.set_Font(GameService.Content.get_DefaultFont16());
 			val2.set_Text(Title);
 			((Control)val2).set_Parent((Container)(object)parent);
+			val2.set_TextColor(NameTextColor);
 			Label nameLabel = val2;
 			Label val3 = new Label();
 			val3.set_AutoSizeHeight(true);
@@ -97,7 +111,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			((Control)val3).set_Padding(new Thickness(0f, 8f, 0f, 0f));
 			val3.set_HorizontalAlignment((HorizontalAlignment)0);
 			val3.set_VerticalAlignment((VerticalAlignment)1);
-			val3.set_TextColor(StandardColors.get_DisabledText());
+			val3.set_TextColor(DescriptionTextColor);
 			val3.set_WrapText(true);
 			val3.set_Text(Description);
 			((Control)val3).set_Parent((Container)(object)parent);

@@ -24,13 +24,13 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 	{
 		private static readonly Logger Logger = Logger.GetLogger<ManageDynamicEventsSettingsView>();
 
-		private static Point MAIN_PADDING = new Point(20, 20);
+		private static readonly Point MAIN_PADDING = new Point(20, 20);
 
 		private readonly DynamicEventService _dynamicEventService;
 
 		private readonly Func<List<string>> _getDisabledEventGuids;
 
-		private List<Map> _maps = new List<Map>();
+		private readonly List<Map> _maps = new List<Map>();
 
 		public Panel Panel { get; private set; }
 

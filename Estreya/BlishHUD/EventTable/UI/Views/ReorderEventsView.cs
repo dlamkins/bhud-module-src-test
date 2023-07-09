@@ -17,15 +17,15 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 {
 	public class ReorderEventsView : BaseView
 	{
-		private static Point MAIN_PADDING = new Point(20, 20);
+		private static readonly Point MAIN_PADDING = new Point(20, 20);
 
 		private static readonly Logger Logger = Logger.GetLogger<ReorderEventsView>();
 
 		private readonly List<EventCategory> _allEvents;
 
-		private readonly List<string> _order;
-
 		private readonly EventAreaConfiguration _areaConfiguration;
+
+		private readonly List<string> _order;
 
 		private Panel Panel { get; set; }
 

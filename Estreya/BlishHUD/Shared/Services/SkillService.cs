@@ -37,13 +37,13 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		private const string LOCAL_MISSING_SKILL_FILE_NAME = "missingSkills.json";
 
-		private IconService _iconService;
-
-		private IFlurlClient _flurlClient;
+		private readonly AsyncRef<double> _lastSaveMissingSkill = new AsyncRef<double>(0.0);
 
 		private readonly string _webRootUrl;
 
-		private AsyncRef<double> _lastSaveMissingSkill = new AsyncRef<double>(0.0);
+		private IFlurlClient _flurlClient;
+
+		private IconService _iconService;
 
 		private SynchronizedCollection<MissingArcDPSSkill> _missingSkillsFromAPIReportedByArcDPS;
 
@@ -113,15 +113,15 @@ namespace Estreya.BlishHUD.Shared.Services
 			SignalUpdated();
 		}
 
-		protected override async Task<List<Skill>> Fetch(Gw2ApiManager apiManager, IProgress<string> progress)
+		protected override async Task<List<Skill>> Fetch(Gw2ApiManager apiManager, IProgress<string> progress, CancellationToken cancellationToken)
 		{
 			progress.Report("Loading normal skills..");
 			Logger.Debug("Loading normal skills..");
-			List<Skill> skills2 = ((IEnumerable<Skill>)(await ((IAllExpandableClient<Skill>)(object)apiManager.get_Gw2ApiClient().get_V2().get_Skills()).AllAsync(_cancellationTokenSource.Token))).Select((Skill skill) => Skill.FromAPISkill(skill)).ToList();
+			List<Skill> skills2 = ((IEnumerable<Skill>)(await ((IAllExpandableClient<Skill>)(object)apiManager.get_Gw2ApiClient().get_V2().get_Skills()).AllAsync(cancellationToken))).Select((Skill skill) => Skill.FromAPISkill(skill)).ToList();
 			Logger.Debug("Loaded normal skills..");
 			progress.Report("Loading traits..");
 			Logger.Debug("Loading traits..");
-			IApiV2ObjectList<Trait> traitResponse = await ((IAllExpandableClient<Trait>)(object)apiManager.get_Gw2ApiClient().get_V2().get_Traits()).AllAsync(_cancellationTokenSource.Token);
+			IApiV2ObjectList<Trait> traitResponse = await ((IAllExpandableClient<Trait>)(object)apiManager.get_Gw2ApiClient().get_V2().get_Traits()).AllAsync(cancellationToken);
 			skills2 = skills2.Concat(((IEnumerable<Trait>)traitResponse).Select((Trait trait) => Skill.FromAPITrait(trait))).ToList();
 			Logger.Debug("Loaded traits..");
 			progress.Report("Loading trait skills..");
@@ -213,7 +213,7 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		protected override void DoUpdate(GameTime gameTime)
 		{
-			UpdateUtil.UpdateAsync(SaveMissingSkills, gameTime, 60000.0, _lastSaveMissingSkill);
+			UpdateUtil.UpdateAsync(SaveMissingSkills, gameTime, 60000.0, _lastSaveMissingSkill, doLogging: false);
 		}
 
 		private async Task SaveMissingSkills()

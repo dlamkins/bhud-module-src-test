@@ -18,37 +18,37 @@ namespace Estreya.BlishHUD.Shared.Controls
 {
 	public class ConfirmDialog : Container
 	{
-		private readonly string _title;
-
-		private string _parsedTitle;
-
-		private string _parsedMessage;
-
-		private readonly string _message;
-
-		private IconService _iconService;
-
-		private DialogResult _dialogResult;
-
 		private static readonly BitmapFont _titleFont = GameService.Content.get_DefaultFont32();
 
 		private static readonly BitmapFont _messageFont = GameService.Content.get_DefaultFont18();
 
-		private EventWaitHandle _waitHandle = new EventWaitHandle(initialState: false, EventResetMode.ManualReset);
+		private readonly string _message;
 
-		private Rectangle _shadowRect;
-
-		private Rectangle _confirmRect;
-
-		private Rectangle _titleRect;
-
-		private Rectangle _messageRect;
+		private readonly string _title;
 
 		private FlowPanel _buttonPanel;
 
 		private (StandardButton Button, DialogResult Result)[] _buttons;
 
+		private Rectangle _confirmRect;
+
+		private DialogResult _dialogResult;
+
+		private IconService _iconService;
+
+		private Rectangle _messageRect;
+
+		private string _parsedMessage;
+
+		private string _parsedTitle;
+
 		private int _selectedButtonIndex;
+
+		private Rectangle _shadowRect;
+
+		private Rectangle _titleRect;
+
+		private EventWaitHandle _waitHandle;
 
 		public DialogResult ESC_Result;
 
@@ -67,12 +67,12 @@ namespace Estreya.BlishHUD.Shared.Controls
 
 		public ConfirmDialog(string title, string message, IconService iconService, ButtonDefinition[] buttons = null)
 		{
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Expected O, but got Unknown
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0049: Expected O, but got Unknown
+			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Expected O, but got Unknown
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Expected O, but got Unknown
 			(StandardButton, DialogResult)[] array = new(StandardButton, DialogResult)[2];
 			StandardButton val = new StandardButton();
 			val.set_Text("OK");
@@ -81,6 +81,7 @@ namespace Estreya.BlishHUD.Shared.Controls
 			val2.set_Text("Cancel");
 			array[1] = (val2, DialogResult.Cancel);
 			_buttons = array;
+			_waitHandle = new EventWaitHandle(initialState: false, EventResetMode.ManualReset);
 			((Container)this)._002Ector();
 			_title = title;
 			_parsedTitle = _title;

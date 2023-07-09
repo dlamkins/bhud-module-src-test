@@ -4,9 +4,9 @@ namespace Estreya.BlishHUD.Shared.Extensions
 {
 	internal class ArrayTraverse
 	{
-		public int[] Position;
+		private readonly int[] maxLengths;
 
-		private int[] maxLengths;
+		public int[] Position;
 
 		public ArrayTraverse(Array array)
 		{

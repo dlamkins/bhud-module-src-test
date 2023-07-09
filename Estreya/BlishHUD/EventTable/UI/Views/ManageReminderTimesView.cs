@@ -18,7 +18,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 	{
 		private Estreya.BlishHUD.EventTable.Models.Event _ev;
 
-		private List<TimeSpan> _reminderTimes = new List<TimeSpan>();
+		private readonly List<TimeSpan> _reminderTimes = new List<TimeSpan>();
 
 		public event EventHandler<(Estreya.BlishHUD.EventTable.Models.Event Event, List<TimeSpan> ReminderTimes)> SaveClicked;
 

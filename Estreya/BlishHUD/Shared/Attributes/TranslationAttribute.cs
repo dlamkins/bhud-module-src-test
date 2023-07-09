@@ -2,7 +2,7 @@ using System;
 
 namespace Estreya.BlishHUD.Shared.Attributes
 {
-	[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
+	[AttributeUsage(AttributeTargets.Field)]
 	public class TranslationAttribute : Attribute
 	{
 		public string TranslationKey { get; }

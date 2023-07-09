@@ -12,27 +12,27 @@ namespace Estreya.BlishHUD.Shared.Controls
 {
 	public class ListEntry<T> : Control
 	{
+		private HorizontalAlignment _alignment = (HorizontalAlignment)1;
+
 		private bool _dragDrop;
 
 		private bool _dragging;
 
-		private string _text;
-
 		private BitmapFont _font = GameService.Content.get_DefaultFont16();
-
-		private Color _textColor = Color.get_Black();
 
 		private AsyncTexture2D _icon;
 
-		private float _iconMinWidth = 32f;
+		private float _iconMaxHeight = 32f;
 
 		private float _iconMaxWidth = 32f;
 
 		private float _iconMinHeight = 32f;
 
-		private float _iconMaxHeight = 32f;
+		private float _iconMinWidth = 32f;
 
-		private HorizontalAlignment _alignment = (HorizontalAlignment)1;
+		private string _text;
+
+		private Color _textColor = Color.get_Black();
 
 		public bool DragDrop
 		{
@@ -263,8 +263,8 @@ namespace Estreya.BlishHUD.Shared.Controls
 		public ListEntry(string title)
 			: this()
 		{
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
 			Text = title;
 		}

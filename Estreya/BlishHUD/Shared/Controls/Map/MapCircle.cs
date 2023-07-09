@@ -9,15 +9,15 @@ namespace Estreya.BlishHUD.Shared.Controls.Map
 	{
 		private static Logger Logger = Logger.GetLogger<MapCircle>();
 
-		private readonly float _x;
-
-		private readonly float _y;
+		private readonly Color _color;
 
 		private readonly float _radius;
 
-		private readonly Color _color;
-
 		private readonly float _thickness;
+
+		private readonly float _x;
+
+		private readonly float _y;
 
 		public MapCircle(float x, float y, float radius, Color color, float thickness = 1f)
 		{

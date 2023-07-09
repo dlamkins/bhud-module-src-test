@@ -112,7 +112,7 @@ namespace Estreya.BlishHUD.Shared.Services
 				if (forceAPI || !shouldLoadFiles)
 				{
 					await LoadFromAPI(!canLoadFiles);
-					if (!_cancellationTokenSource.Token.IsCancellationRequested)
+					if (!base.CancellationToken.IsCancellationRequested)
 					{
 						try
 						{
@@ -202,6 +202,16 @@ namespace Estreya.BlishHUD.Shared.Services
 		private async Task CreateLastUpdatedFile()
 		{
 			await FileUtil.WriteStringAsync(Path.Combine(DirectoryPath, "last_updated.txt"), DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss"));
+		}
+
+		protected override Task DoClear()
+		{
+			if (!Directory.Exists(DirectoryPath))
+			{
+				return Task.CompletedTask;
+			}
+			Directory.Delete(DirectoryPath, recursive: true);
+			return Task.CompletedTask;
 		}
 	}
 }

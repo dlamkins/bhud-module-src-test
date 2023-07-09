@@ -7,45 +7,23 @@ using Estreya.BlishHUD.Shared.Models;
 using Estreya.BlishHUD.Shared.Models.Drawers;
 using Estreya.BlishHUD.Shared.Services;
 using Gw2Sharp.WebApi.V2.Models;
-using Microsoft.Xna.Framework.Input;
 using Newtonsoft.Json;
 
 namespace Estreya.BlishHUD.Shared.Settings
 {
 	public abstract class BaseModuleSettings
 	{
-		public class ModuleSettingsChangedEventArgs
-		{
-			public string Name { get; set; }
-
-			public object NewValue { get; set; }
-
-			public object PreviousValue { get; set; }
-		}
-
-		protected Logger Logger;
+		protected readonly SettingCollection _settings;
 
 		private KeyBinding _globalEnabledKeybinding;
 
-		private Color _defaultColor;
-
-		protected readonly SettingCollection _settings;
+		protected readonly Logger Logger;
 
 		private const string GLOBAL_SETTINGS = "global-settings";
 
 		private const string DRAWER_SETTINGS = "drawer-settings";
 
-		public Color DefaultGW2Color
-		{
-			get
-			{
-				return _defaultColor;
-			}
-			private set
-			{
-				_defaultColor = value;
-			}
-		}
+		public Color DefaultGW2Color { get; private set; }
 
 		public SettingCollection GlobalSettings { get; private set; }
 
@@ -79,9 +57,7 @@ namespace Estreya.BlishHUD.Shared.Settings
 
 		public SettingCollection DrawerSettings { get; private set; }
 
-		public event EventHandler<ModuleSettingsChangedEventArgs> ModuleSettingsChanged;
-
-		public BaseModuleSettings(SettingCollection settings, KeyBinding globalEnabledKeybinding)
+		protected BaseModuleSettings(SettingCollection settings, KeyBinding globalEnabledKeybinding)
 		{
 			Logger = Logger.GetLogger(GetType());
 			_settings = settings;
@@ -176,7 +152,7 @@ namespace Estreya.BlishHUD.Shared.Settings
 			val5.set_Lightness(1.44531);
 			val5.set_Rgb((IReadOnlyList<int>)new List<int> { 124, 108, 83 });
 			val.set_Fur(val5);
-			_defaultColor = val;
+			DefaultGW2Color = val;
 		}
 
 		protected virtual void InitializeAdditionalSettings(SettingCollection settings)
@@ -185,54 +161,54 @@ namespace Estreya.BlishHUD.Shared.Settings
 
 		private void InitializeGlobalSettings(SettingCollection settings)
 		{
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Expected O, but got Unknown
+			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009b: Expected O, but got Unknown
 			GlobalSettings = settings.AddSubCollection("global-settings", false);
 			GlobalDrawerVisible = GlobalSettings.DefineSetting<bool>("GlobalDrawerVisible", true, (Func<string>)(() => "Global Visible"), (Func<string>)(() => "Whether the modules drawers should be visible."));
-			GlobalDrawerVisible.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+			GlobalDrawerVisible.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)LogSettingChanged<bool>);
 			bool globalHotkeyEnabled = _globalEnabledKeybinding != null;
 			if (_globalEnabledKeybinding == null)
 			{
-				_globalEnabledKeybinding = new KeyBinding((ModifierKeys)7, (Keys)13);
-				Logger.Debug("No default keybinding defined. Building temp keybinding. Enabled = {0}", new object[1] { globalHotkeyEnabled });
+				_globalEnabledKeybinding = new KeyBinding();
+				Logger.Debug("No default keybinding defined. Building temp empty keybinding. Enabled = {0}", new object[1] { globalHotkeyEnabled });
 			}
 			GlobalDrawerVisibleHotkey = GlobalSettings.DefineSetting<KeyBinding>("GlobalDrawerVisibleHotkey", _globalEnabledKeybinding, (Func<string>)(() => "Global Visible Hotkey"), (Func<string>)(() => "Defines the hotkey used to toggle the global visibility."));
-			GlobalDrawerVisibleHotkey.add_SettingChanged((EventHandler<ValueChangedEventArgs<KeyBinding>>)SettingChanged<KeyBinding>);
+			GlobalDrawerVisibleHotkey.add_SettingChanged((EventHandler<ValueChangedEventArgs<KeyBinding>>)LogSettingChanged<KeyBinding>);
 			GlobalDrawerVisibleHotkey.get_Value().set_Enabled(globalHotkeyEnabled);
 			GlobalDrawerVisibleHotkey.get_Value().add_Activated((EventHandler<EventArgs>)GlobalEnabledHotkey_Activated);
 			GlobalDrawerVisibleHotkey.get_Value().set_IgnoreWhenInTextField(true);
 			GlobalDrawerVisibleHotkey.get_Value().set_BlockSequenceFromGw2(globalHotkeyEnabled);
 			RegisterCornerIcon = GlobalSettings.DefineSetting<bool>("RegisterCornerIcon", true, (Func<string>)(() => "Register Corner Icon"), (Func<string>)(() => "Whether the module should register a corner icon."));
-			RegisterCornerIcon.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+			RegisterCornerIcon.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)LogSettingChanged<bool>);
 			RegisterCornerIcon.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)RegisterCornerIcon_SettingChanged);
 			CornerIconLeftClickAction = GlobalSettings.DefineSetting<CornerIconClickAction>("CornerIconLeftClickAction", CornerIconClickAction.Settings, (Func<string>)(() => "Corner Icon Left Click Action"), (Func<string>)(() => "Defines the action of the corner icon when left clicked."));
-			CornerIconLeftClickAction.add_SettingChanged((EventHandler<ValueChangedEventArgs<CornerIconClickAction>>)SettingChanged<CornerIconClickAction>);
+			CornerIconLeftClickAction.add_SettingChanged((EventHandler<ValueChangedEventArgs<CornerIconClickAction>>)LogSettingChanged<CornerIconClickAction>);
 			CornerIconRightClickAction = GlobalSettings.DefineSetting<CornerIconClickAction>("CornerIconRightClickAction", CornerIconClickAction.None, (Func<string>)(() => "Corner Icon Right Click Action"), (Func<string>)(() => "Defines the action of the corner icon when right clicked."));
-			CornerIconRightClickAction.add_SettingChanged((EventHandler<ValueChangedEventArgs<CornerIconClickAction>>)SettingChanged<CornerIconClickAction>);
+			CornerIconRightClickAction.add_SettingChanged((EventHandler<ValueChangedEventArgs<CornerIconClickAction>>)LogSettingChanged<CornerIconClickAction>);
 			HideOnOpenMap = GlobalSettings.DefineSetting<bool>("HideOnOpenMap", true, (Func<string>)(() => "Hide on open Map"), (Func<string>)(() => "Whether the modules drawers should hide when the map is open."));
-			HideOnOpenMap.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+			HideOnOpenMap.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)LogSettingChanged<bool>);
 			HideOnMissingMumbleTicks = GlobalSettings.DefineSetting<bool>("HideOnMissingMumbleTicks", true, (Func<string>)(() => "Hide on Cutscenes"), (Func<string>)(() => "Whether the modules drawers should hide when cutscenes are played."));
-			HideOnMissingMumbleTicks.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+			HideOnMissingMumbleTicks.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)LogSettingChanged<bool>);
 			HideInCombat = GlobalSettings.DefineSetting<bool>("HideInCombat", false, (Func<string>)(() => "Hide in Combat"), (Func<string>)(() => "Whether the modules drawers should hide when in combat."));
-			HideInCombat.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+			HideInCombat.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)LogSettingChanged<bool>);
 			HideInPvE_OpenWorld = GlobalSettings.DefineSetting<bool>("HideInPvE_OpenWorld", false, (Func<string>)(() => "Hide in PvE (Open World)"), (Func<string>)(() => "Whether the drawers should hide when in PvE (Open World)."));
-			HideInPvE_OpenWorld.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+			HideInPvE_OpenWorld.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)LogSettingChanged<bool>);
 			HideInPvE_Competetive = GlobalSettings.DefineSetting<bool>("HideInPvE_Competetive", false, (Func<string>)(() => "Hide in PvE (Competetive)"), (Func<string>)(() => "Whether the drawers should hide when in PvE (Competetive)."));
-			HideInPvE_Competetive.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+			HideInPvE_Competetive.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)LogSettingChanged<bool>);
 			HideInWvW = GlobalSettings.DefineSetting<bool>("HideInWvW", false, (Func<string>)(() => "Hide in WvW"), (Func<string>)(() => "Whether the drawers should hide when in world vs. world."));
-			HideInWvW.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+			HideInWvW.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)LogSettingChanged<bool>);
 			HideInPvP = GlobalSettings.DefineSetting<bool>("HideInPvP", false, (Func<string>)(() => "Hide in PvP"), (Func<string>)(() => "Whether the drawers should hide when in player vs. player."));
-			HideInPvP.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+			HideInPvP.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)LogSettingChanged<bool>);
 			DebugEnabled = GlobalSettings.DefineSetting<bool>("DebugEnabled", false, (Func<string>)(() => "Debug Enabled"), (Func<string>)(() => "Whether the module runs in debug mode."));
-			DebugEnabled.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+			DebugEnabled.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)LogSettingChanged<bool>);
 			BlishAPIUsername = GlobalSettings.DefineSetting<string>("BlishAPIUsername", (string)null, (Func<string>)(() => "Blish API Username"), (Func<string>)(() => "Defines the login username for the Estreya Blish HUD API."));
-			HandleEnabledServices();
+			HandleEnabledStates();
 			DoInitializeGlobalSettings(GlobalSettings);
 		}
 
 		private void RegisterCornerIcon_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
 		{
-			HandleEnabledServices();
+			HandleEnabledStates();
 		}
 
 		private void GlobalEnabledHotkey_Activated(object sender, EventArgs e)
@@ -240,17 +216,13 @@ namespace Estreya.BlishHUD.Shared.Settings
 			GlobalDrawerVisible.set_Value(!GlobalDrawerVisible.get_Value());
 		}
 
-		private void HandleEnabledServices()
+		private void HandleEnabledStates()
 		{
 			SettingComplianceExtensions.SetDisabled((SettingEntry)(object)CornerIconLeftClickAction, !RegisterCornerIcon.get_Value());
 			SettingComplianceExtensions.SetDisabled((SettingEntry)(object)CornerIconRightClickAction, !RegisterCornerIcon.get_Value());
 		}
 
 		protected virtual void DoInitializeGlobalSettings(SettingCollection globalSettingCollection)
-		{
-		}
-
-		protected virtual void DoInitializeLocationSettings(SettingCollection locationSettingCollection)
 		{
 		}
 
@@ -332,6 +304,14 @@ namespace Estreya.BlishHUD.Shared.Settings
 			int maxWidth = num - configuration.Location.X.get_Value();
 			int minHeight = 0;
 			int maxHeight = maxResY - configuration.Location.Y.get_Value();
+			if (maxLocationX >= 50)
+			{
+				_ = 50;
+			}
+			if (maxWidth >= 50)
+			{
+				_ = 50;
+			}
 			SettingComplianceExtensions.SetRange(configuration.Location.X, minLocationX, maxLocationX);
 			SettingComplianceExtensions.SetRange(configuration.Location.Y, minLocationY, maxLocationY);
 			SettingComplianceExtensions.SetRange(configuration.Size.X, minWidth, maxWidth);
@@ -440,33 +420,27 @@ namespace Estreya.BlishHUD.Shared.Settings
 
 		public virtual void Unload()
 		{
-			GlobalDrawerVisible.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			GlobalDrawerVisibleHotkey.remove_SettingChanged((EventHandler<ValueChangedEventArgs<KeyBinding>>)SettingChanged<KeyBinding>);
+			GlobalDrawerVisible.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)LogSettingChanged<bool>);
+			GlobalDrawerVisibleHotkey.remove_SettingChanged((EventHandler<ValueChangedEventArgs<KeyBinding>>)LogSettingChanged<KeyBinding>);
 			GlobalDrawerVisibleHotkey.get_Value().set_Enabled(false);
 			GlobalDrawerVisibleHotkey.get_Value().remove_Activated((EventHandler<EventArgs>)GlobalEnabledHotkey_Activated);
-			RegisterCornerIcon.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+			RegisterCornerIcon.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)LogSettingChanged<bool>);
 			RegisterCornerIcon.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)RegisterCornerIcon_SettingChanged);
-			HideOnOpenMap.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			HideOnMissingMumbleTicks.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			HideInPvE_OpenWorld.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			HideInPvE_Competetive.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			HideInCombat.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			HideInPvP.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
-			DebugEnabled.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged<bool>);
+			HideOnOpenMap.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)LogSettingChanged<bool>);
+			HideOnMissingMumbleTicks.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)LogSettingChanged<bool>);
+			HideInPvE_OpenWorld.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)LogSettingChanged<bool>);
+			HideInPvE_Competetive.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)LogSettingChanged<bool>);
+			HideInCombat.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)LogSettingChanged<bool>);
+			HideInPvP.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)LogSettingChanged<bool>);
+			DebugEnabled.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)LogSettingChanged<bool>);
 		}
 
-		protected void SettingChanged<T>(object sender, ValueChangedEventArgs<T> e)
+		protected void LogSettingChanged<T>(object sender, ValueChangedEventArgs<T> e)
 		{
 			SettingEntry<T> settingEntry = (SettingEntry<T>)sender;
-			string prevValue = ((e.get_PreviousValue().GetType() == typeof(string)) ? e.get_PreviousValue().ToString() : JsonConvert.SerializeObject(e.get_PreviousValue()));
-			string newValue = ((e.get_NewValue().GetType() == typeof(string)) ? e.get_NewValue().ToString() : JsonConvert.SerializeObject(e.get_NewValue()));
+			string prevValue = ((e.get_PreviousValue() is string) ? e.get_PreviousValue().ToString() : JsonConvert.SerializeObject(e.get_PreviousValue()));
+			string newValue = ((e.get_NewValue() is string) ? e.get_NewValue().ToString() : JsonConvert.SerializeObject(e.get_NewValue()));
 			Logger.Debug("Changed setting \"" + ((SettingEntry)settingEntry).get_EntryKey() + "\" from \"" + prevValue + "\" to \"" + newValue + "\"");
-			this.ModuleSettingsChanged?.Invoke(this, new ModuleSettingsChangedEventArgs
-			{
-				Name = ((SettingEntry)settingEntry).get_EntryKey(),
-				NewValue = e.get_NewValue(),
-				PreviousValue = e.get_PreviousValue()
-			});
 		}
 	}
 }

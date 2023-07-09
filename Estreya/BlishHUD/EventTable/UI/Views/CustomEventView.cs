@@ -13,9 +13,9 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 {
 	public class CustomEventView : BaseView
 	{
-		private static Point PADDING = new Point(25, 25);
+		private static readonly Point PADDING = new Point(25, 25);
 
-		private BlishHudApiService _blishHudApiService;
+		private readonly BlishHudApiService _blishHudApiService;
 
 		public CustomEventView(Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, BlishHudApiService blishHudApiService, BitmapFont font = null)
 			: base(apiManager, iconService, translationService, font)

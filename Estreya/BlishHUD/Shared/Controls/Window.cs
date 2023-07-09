@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
@@ -17,6 +18,8 @@ namespace Estreya.BlishHUD.Shared.Controls
 {
 	public abstract class Window : Container, IWindow, IViewContainer
 	{
+		private Logger _logger;
+
 		private const int STANDARD_TITLEBAR_HEIGHT = 40;
 
 		private const int STANDARD_TITLEBAR_VERTICAL_OFFSET = 11;
@@ -53,7 +56,9 @@ namespace Estreya.BlishHUD.Shared.Controls
 
 		private static readonly Texture2D _textureBlackFade = Control.get_Content().GetTexture("fade-down-46");
 
-		private readonly SettingCollection _windowSettings;
+		private readonly Tween _animFade;
+
+		private readonly AsyncTexture2D _textureSplitLine = AsyncTexture2D.FromAssetId(605026);
 
 		private readonly AsyncTexture2D _textureWindowCorner = AsyncTexture2D.FromAssetId(156008);
 
@@ -61,11 +66,7 @@ namespace Estreya.BlishHUD.Shared.Controls
 
 		private readonly AsyncTexture2D _textureWindowResizableCornerActive = AsyncTexture2D.FromAssetId(156010);
 
-		private readonly AsyncTexture2D _textureSplitLine = AsyncTexture2D.FromAssetId(605026);
-
-		private string _title = "No Title";
-
-		private string _subtitle = "";
+		private readonly SettingCollection _windowSettings;
 
 		private bool _canClose = true;
 
@@ -73,61 +74,69 @@ namespace Estreya.BlishHUD.Shared.Controls
 
 		private bool _canResize;
 
-		private Point _maxSize = Point.get_Zero();
-
-		private Point _minSize = Point.get_Zero();
-
-		private bool _rebuildViewAfterResize;
-
-		private bool _unloadOnRebuild = true;
-
-		private AsyncTexture2D _emblem;
-
-		private bool _topMost;
-
-		protected bool _savesPosition;
-
-		protected bool _savesSize;
-
-		private string _id;
+		private Point _contentMargin;
 
 		private bool _dragging;
 
-		private bool _resizing;
+		private Point _dragStart = Point.get_Zero();
 
-		private readonly Tween _animFade;
+		private AsyncTexture2D _emblem;
 
-		private bool _savedVisibility;
+		private Rectangle _emblemDrawBounds = Rectangle.get_Empty();
 
-		private bool _showSideBar;
-
-		private int _sideBarHeight = 100;
+		private string _id;
 
 		private double _lastWindowInteract;
 
 		private Rectangle _leftTitleBarDrawBounds = Rectangle.get_Empty();
 
-		private Rectangle _rightTitleBarDrawBounds = Rectangle.get_Empty();
+		private Point _maxSize = Point.get_Zero();
 
-		private Rectangle _subtitleDrawBounds = Rectangle.get_Empty();
+		private Point _minSize = Point.get_Zero();
 
-		private Rectangle _emblemDrawBounds = Rectangle.get_Empty();
+		private CancellationTokenSource _rebuildCancellationTokenSource = new CancellationTokenSource();
 
-		private Rectangle _sidebarInactiveDrawBounds = Rectangle.get_Empty();
+		private int _rebuildDelay = 500;
 
-		private Point _dragStart = Point.get_Zero();
+		private Task _rebuildTask;
+
+		private bool _rebuildViewAfterResize;
 
 		private Point _resizeStart = Point.get_Zero();
 
-		private Point _contentMargin;
+		private bool _resizing;
 
-		private float _windowToTextureWidthRatio;
+		private Rectangle _rightTitleBarDrawBounds = Rectangle.get_Empty();
 
-		private float _windowToTextureHeightRatio;
+		private bool _savedVisibility;
+
+		protected bool _savesPosition;
+
+		protected bool _savesSize;
+
+		private bool _showSideBar;
+
+		private int _sideBarHeight = 100;
+
+		private Rectangle _sidebarInactiveDrawBounds = Rectangle.get_Empty();
+
+		private string _subtitle = "";
+
+		private Rectangle _subtitleDrawBounds = Rectangle.get_Empty();
+
+		private string _title = "No Title";
+
+		private bool _topMost;
+
+		private bool _unloadOnRebuild = true;
 
 		private float _windowLeftOffsetRatio;
 
 		private float _windowTopOffsetRatio;
+
+		private float _windowToTextureHeightRatio;
+
+		private float _windowToTextureWidthRatio;
 
 		public static IWindow ActiveWindow
 		{
@@ -176,30 +185,6 @@ namespace Estreya.BlishHUD.Shared.Controls
 			set
 			{
 				((Control)this).SetProperty<string>(ref _subtitle, value, true, "Subtitle");
-			}
-		}
-
-		public bool CanClose
-		{
-			get
-			{
-				return _canClose;
-			}
-			set
-			{
-				((Control)this).SetProperty<bool>(ref _canClose, value, false, "CanClose");
-			}
-		}
-
-		public bool CanCloseWithEscape
-		{
-			get
-			{
-				return _canCloseWithEscape;
-			}
-			set
-			{
-				((Control)this).SetProperty<bool>(ref _canCloseWithEscape, value, false, "CanCloseWithEscape");
 			}
 		}
 
@@ -255,6 +240,18 @@ namespace Estreya.BlishHUD.Shared.Controls
 			}
 		}
 
+		public int RebuildDelay
+		{
+			get
+			{
+				return _rebuildDelay;
+			}
+			set
+			{
+				((Control)this).SetProperty<int>(ref _rebuildDelay, value, false, "RebuildDelay");
+			}
+		}
+
 		public bool UnloadOnRebuild
 		{
 			get
@@ -276,18 +273,6 @@ namespace Estreya.BlishHUD.Shared.Controls
 			set
 			{
 				((Control)this).SetProperty<AsyncTexture2D>(ref _emblem, AsyncTexture2D.op_Implicit(value), true, "Emblem");
-			}
-		}
-
-		public bool TopMost
-		{
-			get
-			{
-				return _topMost;
-			}
-			set
-			{
-				((Control)this).SetProperty<bool>(ref _topMost, value, false, "TopMost");
 			}
 		}
 
@@ -351,10 +336,6 @@ namespace Estreya.BlishHUD.Shared.Controls
 			}
 		}
 
-		public ViewState ViewState { get; protected set; }
-
-		public IView CurrentView { get; protected set; }
-
 		protected bool ShowSideBar
 		{
 			get
@@ -378,8 +359,6 @@ namespace Estreya.BlishHUD.Shared.Controls
 				((Control)this).SetProperty<int>(ref _sideBarHeight, value, true, "SideBarHeight");
 			}
 		}
-
-		double LastInteraction => _lastWindowInteract;
 
 		protected Rectangle TitleBarBounds { get; private set; } = Rectangle.get_Empty();
 
@@ -408,56 +387,107 @@ namespace Estreya.BlishHUD.Shared.Controls
 
 		protected Rectangle WindowRelativeContentRegion { get; set; }
 
-		public event EventHandler ManualResized;
-
-		public static IEnumerable<IWindow> GetWindows()
+		public Point Size
 		{
-			return ((Container)GameService.Graphics.get_SpriteScreen()).GetChildrenOfType<IWindow>();
-		}
-
-		public static int GetZIndex(IWindow thisWindow)
-		{
-			IWindow[] source = GetWindows().ToArray();
-			if (!source.Contains(thisWindow))
+			get
 			{
-				throw new InvalidOperationException("thisWindow must be a direct child of GameService.Graphics.SpriteScreen before ZIndex can automatically be calculated.");
+				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+				return ((Control)this).get_Size();
 			}
-			return 41 + (from window in source
-				orderby window.get_TopMost(), window.get_LastInteraction()
-				select window).TakeWhile((IWindow window) => window != thisWindow).Count();
+			set
+			{
+				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+				//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+				//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+				Point _size = ((Control)this).get_Size();
+				if (_size.X != value.X || _size.Y != value.Y)
+				{
+					((Control)this).set_Size(value);
+					StartRebuild();
+				}
+			}
 		}
+
+		public ViewState ViewState { get; protected set; }
+
+		public IView CurrentView { get; protected set; }
+
+		public bool CanClose
+		{
+			get
+			{
+				return _canClose;
+			}
+			set
+			{
+				((Control)this).SetProperty<bool>(ref _canClose, value, false, "CanClose");
+			}
+		}
+
+		public bool CanCloseWithEscape
+		{
+			get
+			{
+				return _canCloseWithEscape;
+			}
+			set
+			{
+				((Control)this).SetProperty<bool>(ref _canCloseWithEscape, value, false, "CanCloseWithEscape");
+			}
+		}
+
+		public bool TopMost
+		{
+			get
+			{
+				return _topMost;
+			}
+			set
+			{
+				((Control)this).SetProperty<bool>(ref _topMost, value, false, "TopMost");
+			}
+		}
+
+		double LastInteraction => _lastWindowInteract;
+
+		public event EventHandler ManualResized;
 
 		private Window()
 			: this()
 		{
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0119: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+			_logger = Logger.GetLogger(((object)this).GetType());
 			((Control)this).set_Opacity(0f);
 			((Control)this).set_Visible(false);
 			((Control)this)._zIndex = 41;
@@ -490,6 +520,93 @@ namespace Estreya.BlishHUD.Shared.Controls
 			: this()
 		{
 			_windowSettings = settings.GlobalSettings.AddSubCollection("WindowSettings", false);
+		}
+
+		public override void Show()
+		{
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015b: Unknown result type (might be due to invalid IL or missing references)
+			BringWindowToFront();
+			if (((Control)this).get_Visible())
+			{
+				return;
+			}
+			if (Id != null)
+			{
+				SettingEntry settingEntry = default(SettingEntry);
+				if (SavesPosition && _windowSettings.TryGetSetting(Id, ref settingEntry))
+				{
+					((Control)this).set_Location(((settingEntry as SettingEntry<Point>) ?? new SettingEntry<Point>()).get_Value());
+				}
+				SettingEntry settingEntry2 = default(SettingEntry);
+				if (SavesSize && _windowSettings.TryGetSetting(Id + "_size", ref settingEntry2))
+				{
+					Point savedSize = ((settingEntry2 as SettingEntry<Point>) ?? new SettingEntry<Point>()).get_Value();
+					if (savedSize.X < MinSize.X || savedSize.Y < MinSize.Y)
+					{
+						Size = MinSize;
+					}
+					else if (MaxSize != Point.get_Zero() && (savedSize.X > MaxSize.X || savedSize.Y > MaxSize.Y))
+					{
+						Size = MaxSize;
+					}
+					else
+					{
+						Size = savedSize;
+					}
+				}
+			}
+			((Control)this).set_Location(new Point(MathHelper.Clamp(((Control)this)._location.X, 0, ((Control)GameService.Graphics.get_SpriteScreen()).get_Width() - 64), MathHelper.Clamp(((Control)this)._location.Y, 0, ((Control)GameService.Graphics.get_SpriteScreen()).get_Height() - 64)));
+			((Control)this).set_Opacity(0f);
+			((Control)this).set_Visible(true);
+			_animFade.Resume();
+		}
+
+		public override void Hide()
+		{
+			if (((Control)this).get_Visible())
+			{
+				Dragging = false;
+				_animFade.Resume();
+				Control.get_Content().PlaySoundEffectByName("window-close");
+			}
+		}
+
+		public void BringWindowToFront()
+		{
+			_lastWindowInteract = GameService.Overlay.get_CurrentGameTime().get_TotalGameTime().TotalMilliseconds;
+		}
+
+		public static IEnumerable<IWindow> GetWindows()
+		{
+			return ((Container)GameService.Graphics.get_SpriteScreen()).GetChildrenOfType<IWindow>();
+		}
+
+		public static int GetZIndex(IWindow thisWindow)
+		{
+			IWindow[] source = GetWindows().ToArray();
+			if (!source.Contains(thisWindow))
+			{
+				throw new InvalidOperationException("thisWindow must be a direct child of GameService.Graphics.SpriteScreen before ZIndex can automatically be calculated.");
+			}
+			return 41 + (from window in source
+				orderby window.get_TopMost(), window.get_LastInteraction()
+				select window).TakeWhile((IWindow window) => window != thisWindow).Count();
 		}
 
 		public static void UpdateWindowBaseDynamicHUDCombatState(Window wb)
@@ -556,7 +673,7 @@ namespace Estreya.BlishHUD.Shared.Controls
 			else if (Resizing)
 			{
 				Point point2 = Control.get_Input().get_Mouse().get_Position() - _dragStart;
-				((Control)this).set_Size(HandleWindowResize(_resizeStart + point2));
+				Size = HandleWindowResize(_resizeStart + point2);
 			}
 		}
 
@@ -569,71 +686,6 @@ namespace Estreya.BlishHUD.Shared.Controls
 			else
 			{
 				((Control)this).Show();
-			}
-		}
-
-		public override void Show()
-		{
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015b: Unknown result type (might be due to invalid IL or missing references)
-			BringWindowToFront();
-			if (((Control)this).get_Visible())
-			{
-				return;
-			}
-			if (Id != null)
-			{
-				SettingEntry settingEntry = default(SettingEntry);
-				if (SavesPosition && _windowSettings.TryGetSetting(Id, ref settingEntry))
-				{
-					((Control)this).set_Location(((settingEntry as SettingEntry<Point>) ?? new SettingEntry<Point>()).get_Value());
-				}
-				SettingEntry settingEntry2 = default(SettingEntry);
-				if (SavesSize && _windowSettings.TryGetSetting(Id + "_size", ref settingEntry2))
-				{
-					Point savedSize = ((settingEntry2 as SettingEntry<Point>) ?? new SettingEntry<Point>()).get_Value();
-					if (savedSize.X < MinSize.X || savedSize.Y < MinSize.Y)
-					{
-						((Control)this).set_Size(MinSize);
-					}
-					else if (MaxSize != Point.get_Zero() && (savedSize.X > MaxSize.X || savedSize.Y > MaxSize.Y))
-					{
-						((Control)this).set_Size(MaxSize);
-					}
-					else
-					{
-						((Control)this).set_Size(savedSize);
-					}
-				}
-			}
-			((Control)this).set_Location(new Point(MathHelper.Clamp(((Control)this)._location.X, 0, ((Control)GameService.Graphics.get_SpriteScreen()).get_Width() - 64), MathHelper.Clamp(((Control)this)._location.Y, 0, ((Control)GameService.Graphics.get_SpriteScreen()).get_Height() - 64)));
-			((Control)this).set_Opacity(0f);
-			((Control)this).set_Visible(true);
-			_animFade.Resume();
-		}
-
-		public override void Hide()
-		{
-			if (((Control)this).get_Visible())
-			{
-				Dragging = false;
-				_animFade.Resume();
-				Control.get_Content().PlaySoundEffectByName("window-close");
 			}
 		}
 
@@ -734,7 +786,7 @@ namespace Estreya.BlishHUD.Shared.Controls
 			}
 			ExitButtonBounds = new Rectangle(((Rectangle)(ref _rightTitleBarDrawBounds)).get_Right() - 32 - _textureExitButton.get_Width(), _rightTitleBarDrawBounds.Y + 16, _textureExitButton.get_Width(), _textureExitButton.get_Height());
 			int num2 = ((Rectangle)(ref _leftTitleBarDrawBounds)).get_Bottom() - 11;
-			int num3 = ((Control)this).get_Size().Y - num2;
+			int num3 = Size.Y - num2;
 			SidebarActiveBounds = new Rectangle(_leftTitleBarDrawBounds.X + 3, num2 - 3, 46, SideBarHeight);
 			_sidebarInactiveDrawBounds = new Rectangle(_leftTitleBarDrawBounds.X + 3, num2 - 3 + SideBarHeight, 46, num3 - SideBarHeight);
 			ResizeHandleBounds = new Rectangle(((Control)this).get_Width() - _textureWindowCorner.get_Width(), ((Control)this).get_Height() - _textureWindowCorner.get_Height(), _textureWindowCorner.get_Width(), _textureWindowCorner.get_Height());
@@ -813,10 +865,10 @@ namespace Estreya.BlishHUD.Shared.Controls
 				}
 				else if (SavesSize && Resizing)
 				{
-					((_windowSettings.get_Item(Id + "_size") as SettingEntry<Point>) ?? _windowSettings.DefineSetting<Point>(Id + "_size", ((Control)this).get_Size(), (Func<string>)null, (Func<string>)null)).set_Value(((Control)this).get_Size());
+					((_windowSettings.get_Item(Id + "_size") as SettingEntry<Point>) ?? _windowSettings.DefineSetting<Point>(Id + "_size", Size, (Func<string>)null, (Func<string>)null)).set_Value(Size);
 				}
 			}
-			if (Resizing && _resizeStart != ((Control)this).get_Size())
+			if (Resizing && _resizeStart != Size)
 			{
 				OnManualResized();
 			}
@@ -829,13 +881,51 @@ namespace Estreya.BlishHUD.Shared.Controls
 			try
 			{
 				this.ManualResized?.Invoke(this, EventArgs.Empty);
-				if (RebuildViewAfterResize && CurrentView != null)
-				{
-					SetView(CurrentView, UnloadOnRebuild);
-				}
 			}
 			catch (Exception)
 			{
+			}
+		}
+
+		private void StartRebuild()
+		{
+			try
+			{
+				if (_rebuildTask != null)
+				{
+					_rebuildCancellationTokenSource.Cancel();
+					_rebuildTask = null;
+					_rebuildCancellationTokenSource = null;
+				}
+				_rebuildCancellationTokenSource = new CancellationTokenSource();
+				_rebuildTask = new Task(async delegate
+				{
+					await DelayRebuild(_rebuildCancellationTokenSource.Token);
+				}, _rebuildCancellationTokenSource.Token);
+				_rebuildTask.Start();
+			}
+			catch (Exception)
+			{
+			}
+		}
+
+		private async Task DelayRebuild(CancellationToken cancellationToken)
+		{
+			try
+			{
+				await Task.Delay(RebuildDelay, cancellationToken);
+				Rebuild();
+			}
+			catch (OperationCanceledException)
+			{
+			}
+		}
+
+		private void Rebuild()
+		{
+			if (RebuildViewAfterResize && CurrentView != null)
+			{
+				SetView(CurrentView, UnloadOnRebuild);
 			}
 		}
 
@@ -862,7 +952,7 @@ namespace Estreya.BlishHUD.Shared.Controls
 			else if (MouseOverResizeHandle)
 			{
 				Resizing = true;
-				_resizeStart = ((Control)this).get_Size();
+				_resizeStart = Size;
 				_dragStart = Control.get_Input().get_Mouse().get_Position();
 			}
 			else if (MouseOverExitButton && CanClose)
@@ -879,7 +969,7 @@ namespace Estreya.BlishHUD.Shared.Controls
 			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 			if (MouseOverResizeHandle && e.get_IsDoubleClick())
 			{
-				((Control)this).set_Size(new Point(WindowRegion.Width, WindowRegion.Height + 40));
+				Size = new Point(WindowRegion.Width, WindowRegion.Height + 40);
 			}
 			((Control)this).OnClick(e);
 		}
@@ -911,11 +1001,6 @@ namespace Estreya.BlishHUD.Shared.Controls
 			int minY = Math.Max(ShowSideBar ? (((Rectangle)(ref _sidebarInactiveDrawBounds)).get_Top() + 16) : (((Container)this).get_ContentRegion().Y + _contentMargin.Y + 16), MinSize.Y);
 			int maxY = ((MaxSize != Point.get_Zero()) ? MaxSize.Y : int.MaxValue);
 			return new Point(MathHelper.Clamp(newSize.X, minX, maxX), MathHelper.Clamp(newSize.Y, minY, maxY));
-		}
-
-		public void BringWindowToFront()
-		{
-			_lastWindowInteract = GameService.Overlay.get_CurrentGameTime().get_TotalGameTime().TotalMilliseconds;
 		}
 
 		protected void ConstructWindow(AsyncTexture2D background, Rectangle windowRegion, Rectangle contentRegion)
@@ -971,7 +1056,7 @@ namespace Estreya.BlishHUD.Shared.Controls
 			_windowToTextureHeightRatio = (float)(((Container)this).get_ContentRegion().Height + _contentMargin.Y + ((Container)this).get_ContentRegion().Y - 40) / (float)background.get_Height();
 			_windowLeftOffsetRatio = (float)(-((Rectangle)(ref windowRegion)).get_Left()) / (float)background.get_Width();
 			_windowTopOffsetRatio = (float)(-((Rectangle)(ref windowRegion)).get_Top()) / (float)background.get_Height();
-			((Control)this).set_Size(windowSize);
+			Size = windowSize;
 		}
 
 		protected void ConstructWindow(Texture2D background, Rectangle windowRegion, Rectangle contentRegion, Point windowSize)
@@ -1003,7 +1088,7 @@ namespace Estreya.BlishHUD.Shared.Controls
 			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			TitleBarBounds = new Rectangle(0, 0, ((Control)this).get_Size().X, 40);
+			TitleBarBounds = new Rectangle(0, 0, Size.X, 40);
 			int num = (int)((float)(((Container)this).get_ContentRegion().Width + _contentMargin.X + ((Container)this).get_ContentRegion().X) / _windowToTextureWidthRatio);
 			int num2 = (int)((float)(((Container)this).get_ContentRegion().Height + _contentMargin.Y + ((Container)this).get_ContentRegion().Y - 40) / _windowToTextureHeightRatio);
 			BackgroundDestinationBounds = new Rectangle((int)Math.Floor(_windowLeftOffsetRatio * (float)num), (int)Math.Floor(_windowTopOffsetRatio * (float)num2 + 40f), num, num2);

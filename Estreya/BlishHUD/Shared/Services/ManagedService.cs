@@ -10,13 +10,15 @@ namespace Estreya.BlishHUD.Shared.Services
 {
 	public abstract class ManagedService : IDisposable
 	{
+		private readonly AsyncRef<double> _lastSaved = new AsyncRef<double>(0.0);
+
+		private CancellationTokenSource _cancellationTokenSource;
+
 		protected Logger Logger;
 
-		private readonly AsyncRef<double> _lastSaved = 0.0;
-
-		protected CancellationTokenSource _cancellationTokenSource;
-
 		protected ServiceConfiguration Configuration { get; }
+
+		protected CancellationToken CancellationToken => _cancellationTokenSource.Token;
 
 		public bool Running { get; private set; }
 
@@ -26,6 +28,12 @@ namespace Estreya.BlishHUD.Shared.Services
 		{
 			Logger = Logger.GetLogger(GetType());
 			Configuration = configuration;
+		}
+
+		public void Dispose()
+		{
+			Stop();
+			Unload();
 		}
 
 		public async Task Start()
@@ -80,6 +88,8 @@ namespace Estreya.BlishHUD.Shared.Services
 				return;
 			}
 			Logger.Debug("Reloading state.");
+			_cancellationTokenSource.Cancel();
+			_cancellationTokenSource = new CancellationTokenSource();
 			await Clear();
 			await Load();
 			await InternalReload();
@@ -119,11 +129,5 @@ namespace Estreya.BlishHUD.Shared.Services
 		}
 
 		protected abstract void InternalUnload();
-
-		public void Dispose()
-		{
-			Stop();
-			Unload();
-		}
 	}
 }

@@ -32,9 +32,9 @@ namespace Estreya.BlishHUD.Shared.Services
 		{
 		}
 
-		protected override async Task<List<Account>> Fetch(Gw2ApiManager apiManager, IProgress<string> progress)
+		protected override async Task<List<Account>> Fetch(Gw2ApiManager apiManager, IProgress<string> progress, CancellationToken cancellationToken)
 		{
-			Account account = await ((IBlobClient<Account>)(object)apiManager.get_Gw2ApiClient().get_V2().get_Account()).GetAsync(default(CancellationToken));
+			Account account = await ((IBlobClient<Account>)(object)apiManager.get_Gw2ApiClient().get_V2().get_Account()).GetAsync(cancellationToken);
 			return new List<Account> { account };
 		}
 	}

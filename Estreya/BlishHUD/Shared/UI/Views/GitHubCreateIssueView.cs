@@ -12,11 +12,11 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 {
 	public class GitHubCreateIssueView : BaseView
 	{
+		private readonly string _message;
+
 		private readonly string _moduleName;
 
 		private readonly string _title;
-
-		private readonly string _message;
 
 		public event AsyncEventHandler<(string Title, string Message, string DiscordName, bool IncludeSystemInformation)> CreateClicked;
 

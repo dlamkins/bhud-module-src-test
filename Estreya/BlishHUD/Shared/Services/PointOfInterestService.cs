@@ -40,16 +40,16 @@ namespace Estreya.BlishHUD.Shared.Services
 			}
 		}
 
-		protected override async Task<List<PointOfInterest>> Fetch(Gw2ApiManager apiManager, IProgress<string> progress)
+		protected override async Task<List<PointOfInterest>> Fetch(Gw2ApiManager apiManager, IProgress<string> progress, CancellationToken cancellationToken)
 		{
 			List<PointOfInterest> pointOfInterests = new List<PointOfInterest>();
 			progress.Report("Loading continents...");
-			foreach (ContinentDetails continent in ((IEnumerable<Continent>)(await ((IAllExpandableClient<Continent>)(object)apiManager.get_Gw2ApiClient().get_V2().get_Continents()).AllAsync(default(CancellationToken)))).Select((Continent x) => new ContinentDetails(x)))
+			foreach (ContinentDetails continent in ((IEnumerable<Continent>)(await ((IAllExpandableClient<Continent>)(object)apiManager.get_Gw2ApiClient().get_V2().get_Continents()).AllAsync(cancellationToken))).Select((Continent x) => new ContinentDetails(x)))
 			{
 				progress.Report("Loading floors of continent \"" + continent.Name + "\" ...");
 				IApiV2ObjectList<ContinentFloor> obj = await ((IAllExpandableClient<ContinentFloor>)(object)apiManager.get_Gw2ApiClient().get_V2().get_Continents()
 					.get_Item(continent.Id)
-					.get_Floors()).AllAsync(default(CancellationToken));
+					.get_Floors()).AllAsync(cancellationToken);
 				progress.Report("Parsing floors of continent \"" + continent.Name + "\" ...");
 				foreach (ContinentFloor item in (IEnumerable<ContinentFloor>)obj)
 				{

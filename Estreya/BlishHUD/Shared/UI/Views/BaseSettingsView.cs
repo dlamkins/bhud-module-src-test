@@ -7,12 +7,10 @@ using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
-using Estreya.BlishHUD.Shared.Attributes;
 using Estreya.BlishHUD.Shared.Controls;
 using Estreya.BlishHUD.Shared.Extensions;
 using Estreya.BlishHUD.Shared.Services;
 using Gw2Sharp.WebApi.V2.Models;
-using Humanizer;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended.BitmapFonts;
 
@@ -20,13 +18,13 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 {
 	public abstract class BaseSettingsView : BaseView
 	{
-		private readonly int CONTROL_WIDTH;
-
-		private readonly Point CONTROL_LOCATION;
-
 		private static readonly Logger Logger = Logger.GetLogger<BaseSettingsView>();
 
 		private readonly SettingEventService _settingEventService;
+
+		private readonly Point CONTROL_LOCATION;
+
+		private readonly int CONTROL_WIDTH;
 
 		protected BaseSettingsView(Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService, BitmapFont font = null)
 			: base(apiManager, iconService, translationService, font)
@@ -54,9 +52,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006e: Expected O, but got Unknown
+			//IL_0060: Expected O, but got Unknown
 			Rectangle bounds = ((Container)parent).get_ContentRegion();
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Size(((Rectangle)(ref bounds)).get_Size());
@@ -65,7 +61,6 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			val.set_OuterControlPadding(new Vector2(20f, 15f));
 			((Container)val).set_WidthSizingMode((SizingMode)2);
 			((Container)val).set_HeightSizingMode((SizingMode)2);
-			((Container)val).set_AutoSizePadding(new Point(0, 15));
 			((Control)val).set_Parent((Container)(object)parent);
 			FlowPanel parentPanel = val;
 			BuildView(parentPanel);
@@ -240,14 +235,13 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			return (panel, label.Item1, keybindingAssigner);
 		}
 
-		protected (Panel Panel, Label label, Dropdown dropdown) RenderEnumSetting<T>(Panel parent, SettingEntry<T> settingEntry) where T : Enum
+		protected (Panel Panel, Label label, Dropdown dropdown) RenderEnumSetting<T>(Panel parent, SettingEntry<T> settingEntry) where T : struct, Enum
 		{
-			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0170: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
 			Panel panel = GetPanel((Container)(object)parent);
 			(Label, Label) label = RenderLabel(panel, ((SettingEntry)settingEntry).get_DisplayName());
-			LetterCasing casing = LetterCasing.Title;
 			List<T> values = new List<T>();
 			IEnumerable<EnumInclusionComplianceRequisite<T>> requisite = from cr in SettingComplianceExtensions.GetComplianceRequisite((SettingEntry)(object)settingEntry)
 				where cr is EnumInclusionComplianceRequisite<T>
@@ -260,18 +254,11 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			{
 				values.AddRange((T[])Enum.GetValues(((SettingEntry)settingEntry).get_SettingType()));
 			}
-			string[] formattedValues = values.Select(delegate(T value)
-			{
-				TranslationAttribute attributeOfType = value.GetAttributeOfType<TranslationAttribute>();
-				return (attributeOfType == null) ? value.Humanize(casing) : base.TranslationService.GetTranslation(attributeOfType.TranslationKey, attributeOfType.DefaultValue);
-			}).ToArray();
-			TranslationAttribute translationAttribute = settingEntry.get_Value().GetAttributeOfType<TranslationAttribute>();
-			string selectedValue = ((translationAttribute != null) ? base.TranslationService.GetTranslation(translationAttribute.TranslationKey, translationAttribute.DefaultValue) : settingEntry.get_Value().Humanize(casing));
-			Dropdown dropdown = RenderDropdown(panel, CONTROL_LOCATION, CONTROL_WIDTH, formattedValues, selectedValue, delegate(string newValue)
+			Dropdown dropdown = RenderDropdown(panel, CONTROL_LOCATION, CONTROL_WIDTH, settingEntry.get_Value(), values.ToArray(), delegate(T newValue)
 			{
 				try
 				{
-					settingEntry.set_Value(values[formattedValues.ToList().IndexOf(newValue)]);
+					settingEntry.set_Value(newValue);
 				}
 				catch (Exception ex)
 				{

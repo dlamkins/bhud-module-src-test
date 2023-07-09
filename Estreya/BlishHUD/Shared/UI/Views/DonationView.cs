@@ -23,7 +23,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 {
 	public class DonationView : BaseView
 	{
-		private IFlurlClient _flurlClient;
+		private readonly IFlurlClient _flurlClient;
 
 		private Texture2D _kofiLogo;
 

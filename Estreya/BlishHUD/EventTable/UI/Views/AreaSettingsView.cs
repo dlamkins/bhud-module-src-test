@@ -34,21 +34,21 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private const int PADDING_Y = 20;
 
-		private readonly Func<IEnumerable<EventAreaConfiguration>> _areaConfigurationFunc;
-
 		private readonly Func<List<EventCategory>> _allEvents;
 
-		private readonly ModuleSettings _moduleSettings;
+		private readonly Func<IEnumerable<EventAreaConfiguration>> _areaConfigurationFunc;
 
 		private readonly EventStateService _eventStateService;
 
-		private IEnumerable<EventAreaConfiguration> _areaConfigurations;
+		private readonly ModuleSettings _moduleSettings;
 
-		private Dictionary<string, MenuItem> _menuItems = new Dictionary<string, MenuItem>();
+		private IEnumerable<EventAreaConfiguration> _areaConfigurations;
 
 		private Panel _areaPanel;
 
 		private StandardWindow _manageEventsWindow;
+
+		private Dictionary<string, MenuItem> _menuItems;
 
 		private StandardWindow _reorderEventsWindow;
 
@@ -72,32 +72,33 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		protected override void BuildView(FlowPanel parent)
 		{
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016a: Expected O, but got Unknown
-			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0175: Expected O, but got Unknown
+			//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0221: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0284: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_028f: Unknown result type (might be due to invalid IL or missing references)
+			_menuItems = new Dictionary<string, MenuItem>();
 			LoadConfigurations();
 			Panel newParent = GetPanel(((Control)parent).get_Parent());
 			((Control)newParent).set_Location(((Control)parent).get_Location());
@@ -554,6 +555,18 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0083: Expected O, but got Unknown
+			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fb: Expected O, but got Unknown
+			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)settingsPanel);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
@@ -567,7 +580,29 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			FlowPanel groupPanel = val;
 			RenderEnumSetting<LeftClickAction>((Panel)(object)groupPanel, areaConfiguration.LeftClickAction);
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.AcceptWaypointPrompt);
-			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.ShowTooltips);
+			RenderEmptyLine((Panel)(object)groupPanel);
+			FlowPanel val2 = new FlowPanel();
+			((Control)val2).set_Parent((Container)(object)groupPanel);
+			((Control)val2).set_Width(((Container)groupPanel).get_ContentRegion().Width);
+			((Container)val2).set_HeightSizingMode((SizingMode)1);
+			val2.set_OuterControlPadding(new Vector2(10f, 20f));
+			((Panel)val2).set_ShowBorder(true);
+			val2.set_FlowDirection((ControlFlowDirection)3);
+			FlowPanel tooltipOptionGroup = val2;
+			RenderBoolSetting((Panel)(object)tooltipOptionGroup, areaConfiguration.ShowTooltips);
+			RenderEmptyLine((Panel)(object)tooltipOptionGroup);
+			RenderTextSetting((Panel)(object)tooltipOptionGroup, areaConfiguration.EventAbsoluteTimeFormatString);
+			((Control)new FormattedLabelBuilder().SetWidth(((Container)tooltipOptionGroup).get_ContentRegion().Width - 20).AutoSizeHeight().Wrap()
+				.CreatePart(base.TranslationService.GetTranslation("areaSettingsView-tooltipOptionGroup-absoluteTimeFormatExamples", "Examples:\n24-Hour: HH\\:mm\n12-Hour: hh\\:mm tt"), (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder builder)
+				{
+					builder.MakeBold().SetFontSize((FontSize)16);
+				})
+				.Build()).set_Parent((Container)(object)tooltipOptionGroup);
+			RenderEmptyLine((Panel)(object)tooltipOptionGroup);
+			RenderTextSetting((Panel)(object)tooltipOptionGroup, areaConfiguration.EventTimespanDaysFormatString);
+			RenderTextSetting((Panel)(object)tooltipOptionGroup, areaConfiguration.EventTimespanHoursFormatString);
+			RenderTextSetting((Panel)(object)tooltipOptionGroup, areaConfiguration.EventTimespanMinutesFormatString);
+			RenderEmptyLine((Panel)(object)tooltipOptionGroup, 20);
 			RenderEmptyLine((Panel)(object)groupPanel);
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.EnableHistorySplitScrolling);
 			RenderIntSetting((Panel)(object)groupPanel, areaConfiguration.HistorySplitScrollingSpeed);

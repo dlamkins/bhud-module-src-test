@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Estreya.BlishHUD.Shared.Attributes;
+using Estreya.BlishHUD.Shared.Services;
+using Humanizer;
 
 namespace Estreya.BlishHUD.Shared.Extensions
 {
@@ -19,6 +22,21 @@ namespace Estreya.BlishHUD.Shared.Extensions
 				return null;
 			}
 			return (T)attributes[0];
+		}
+
+		public static string GetTranslatedValue(this Enum enumVal, TranslationService translationService)
+		{
+			return enumVal.GetTranslatedValue(translationService, LetterCasing.Title);
+		}
+
+		public static string GetTranslatedValue(this Enum enumVal, TranslationService translationService, LetterCasing fallbackCasing)
+		{
+			TranslationAttribute translationsAttribute = enumVal.GetAttributeOfType<TranslationAttribute>();
+			if (translationsAttribute == null)
+			{
+				return enumVal.Humanize(fallbackCasing);
+			}
+			return translationService.GetTranslation(translationsAttribute.TranslationKey, translationsAttribute.DefaultValue);
 		}
 	}
 }

@@ -46,7 +46,7 @@ namespace Estreya.BlishHUD.Shared.Services
 			base.APIObjectRemoved -= APIService_APIObjectRemoved;
 		}
 
-		protected override async Task<List<string>> Fetch(Gw2ApiManager apiManager, IProgress<string> progress)
+		protected override async Task<List<string>> Fetch(Gw2ApiManager apiManager, IProgress<string> progress, CancellationToken cancellationToken)
 		{
 			await _accountService.WaitForCompletion(TimeSpan.FromSeconds(30.0));
 			if (_accountService.Account == null)
@@ -63,7 +63,7 @@ namespace Estreya.BlishHUD.Shared.Services
 				return new List<string>();
 			}
 			return ((IEnumerable<string>)(await ((IBlobClient<IApiV2ObjectList<string>>)(object)apiManager.get_Gw2ApiClient().get_V2().get_Account()
-				.get_MapChests()).GetAsync(default(CancellationToken)))).ToList();
+				.get_MapChests()).GetAsync(cancellationToken))).ToList();
 		}
 	}
 }

@@ -19,7 +19,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 			private Dropdown _assocDropdown;
 
-			private int _startTop;
+			private readonly int _startTop;
 
 			private DropdownPanel(Dropdown assocDropdown)
 				: this()
@@ -210,17 +210,17 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		public static readonly DesignStandard Standard = new DesignStandard(new Point(250, 27), new Point(5, 2), ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset());
 
+		private bool _hadPanel;
+
+		private DropdownPanel _lastPanel;
+
+		private string _selectedItem;
+
 		private static readonly Texture2D _textureInputBox = Control.get_Content().GetTexture("input-box");
 
 		private static readonly TextureRegion2D _textureArrow = Control.TextureAtlasControl.GetRegion("inputboxes/dd-arrow");
 
 		private static readonly TextureRegion2D _textureArrowActive = Control.TextureAtlasControl.GetRegion("inputboxes/dd-arrow-active");
-
-		private string _selectedItem;
-
-		private DropdownPanel _lastPanel;
-
-		private bool _hadPanel;
 
 		public ObservableCollection<string> Items { get; }
 
@@ -248,11 +248,6 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 
 		public event EventHandler<ValueChangedEventArgs> ValueChanged;
-
-		protected virtual void OnValueChanged(ValueChangedEventArgs e)
-		{
-			this.ValueChanged?.Invoke(this, e);
-		}
 
 		public Dropdown()
 			: this()
@@ -327,6 +322,11 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _textureInputBox, new Rectangle(base._size.X - 5, 0, 5, base._size.Y), (Rectangle?)new Rectangle(_textureInputBox.get_Width() - 5, 0, 5, _textureInputBox.get_Height()));
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, (((Control)this).get_Enabled() && ((Control)this).get_MouseOver()) ? _textureArrowActive : _textureArrow, new Rectangle(base._size.X - _textureArrow.get_Width() - 5, base._size.Y / 2 - _textureArrow.get_Height() / 2, _textureArrow.get_Width(), _textureArrow.get_Height()));
 			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, _selectedItem, Control.get_Content().get_DefaultFont14(), new Rectangle(5, 0, base._size.X - 10 - _textureArrow.get_Width(), base._size.Y), ((Control)this).get_Enabled() ? Color.FromNonPremultiplied(239, 240, 239, 255) : StandardColors.get_DisabledText(), false, (HorizontalAlignment)0, (VerticalAlignment)1);
+		}
+
+		protected virtual void OnValueChanged(ValueChangedEventArgs e)
+		{
+			this.ValueChanged?.Invoke(this, e);
 		}
 	}
 }

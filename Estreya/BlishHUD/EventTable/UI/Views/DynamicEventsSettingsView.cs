@@ -30,13 +30,13 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 	{
 		private readonly DynamicEventService _dynamicEventService;
 
-		private readonly ModuleSettings _moduleSettings;
-
 		private readonly IFlurlClient _flurlClient;
 
-		private StandardWindow _manageEventsWindow;
+		private readonly ModuleSettings _moduleSettings;
 
 		private Texture2D _dynamicEventsInWorldImage;
+
+		private StandardWindow _manageEventsWindow;
 
 		public DynamicEventsSettingsView(DynamicEventService dynamicEventService, ModuleSettings moduleSettings, IFlurlClient flurlClient, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService, BitmapFont font = null)
 			: base(apiManager, iconService, translationService, settingEventService, font)

@@ -14,7 +14,7 @@ using MonoGame.Extended.BitmapFonts;
 
 namespace Estreya.BlishHUD.EventTable.Controls
 {
-	public class EventNotification : RenderTargetControl
+	public class EventNotification : RenderTarget2DControl
 	{
 		public const int NOTIFICATION_WIDTH = 350;
 
@@ -22,31 +22,31 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private const int ICON_SIZE = 64;
 
-		private static EventNotification _lastShown = null;
+		private static EventNotification _lastShown;
 
-		private Estreya.BlishHUD.EventTable.Models.Event _event;
+		private static readonly BitmapFont _titleFont = GameService.Content.get_DefaultFont18();
+
+		private static readonly BitmapFont _messageFont = GameService.Content.get_DefaultFont16();
+
+		private static readonly Rectangle _fullRect = new Rectangle(0, 0, 350, 96);
+
+		private static readonly Rectangle _iconRect = new Rectangle(10, 16, 64, 64);
+
+		private static readonly Rectangle _titleRect = new Rectangle(((Rectangle)(ref _iconRect)).get_Right() + 5, 10, _fullRect.Width - (((Rectangle)(ref _iconRect)).get_Right() + 5), _titleFont.get_LineHeight());
+
+		private static readonly Rectangle _messageRect = new Rectangle(((Rectangle)(ref _iconRect)).get_Right() + 5, ((Rectangle)(ref _titleRect)).get_Bottom(), _fullRect.Width - (((Rectangle)(ref _iconRect)).get_Right() + 5), 96 - _titleRect.Height);
 
 		private readonly string _message;
 
-		private IconService _iconService;
+		private Estreya.BlishHUD.EventTable.Models.Event _event;
 
 		private AsyncTexture2D _eventIcon;
 
-		private int _x;
+		private IconService _iconService;
 
-		private int _y;
+		private readonly int _x;
 
-		private static BitmapFont _titleFont = GameService.Content.get_DefaultFont18();
-
-		private static BitmapFont _messageFont = GameService.Content.get_DefaultFont16();
-
-		private static Rectangle _fullRect = new Rectangle(0, 0, 350, 96);
-
-		private static Rectangle _iconRect = new Rectangle(10, 16, 64, 64);
-
-		private static Rectangle _titleRect = new Rectangle(((Rectangle)(ref _iconRect)).get_Right() + 5, 10, _fullRect.Width - (((Rectangle)(ref _iconRect)).get_Right() + 5), _titleFont.get_LineHeight());
-
-		private static Rectangle _messageRect = new Rectangle(((Rectangle)(ref _iconRect)).get_Right() + 5, ((Rectangle)(ref _titleRect)).get_Bottom(), _fullRect.Width - (((Rectangle)(ref _iconRect)).get_Right() + 5), 96 - _titleRect.Height);
+		private readonly int _y;
 
 		public float BackgroundOpacity { get; set; } = 1f;
 

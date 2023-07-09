@@ -40,9 +40,9 @@ namespace Estreya.BlishHUD.Shared.Utils
 
 		private static readonly Logger Logger = Logger.GetLogger(typeof(MapUtil));
 
-		private readonly KeyBinding _mapKeybinding;
-
 		private readonly Gw2ApiManager _apiManager;
+
+		private readonly KeyBinding _mapKeybinding;
 
 		private FlatMap _flatMap;
 
@@ -59,6 +59,16 @@ namespace Estreya.BlishHUD.Shared.Utils
 			FlatMap flatMap = new FlatMap();
 			((Control)flatMap).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			_flatMap = flatMap;
+		}
+
+		public void Dispose()
+		{
+			FlatMap flatMap = _flatMap;
+			if (flatMap != null)
+			{
+				((Control)flatMap).Dispose();
+			}
+			_flatMap = null;
 		}
 
 		private double GetDistance(double x1, double y1, double x2, double y2)
@@ -378,16 +388,6 @@ namespace Estreya.BlishHUD.Shared.Utils
 			Mouse.SetPosition(x, y, sendToSystem);
 			await WaitForTick();
 			return new NavigationResult(success: true, null);
-		}
-
-		public void Dispose()
-		{
-			FlatMap flatMap = _flatMap;
-			if (flatMap != null)
-			{
-				((Control)flatMap).Dispose();
-			}
-			_flatMap = null;
 		}
 	}
 }

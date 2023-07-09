@@ -3,6 +3,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
@@ -15,6 +17,9 @@ using Blish_HUD.Input;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
+using Estreya.BlishHUD.Shared.Controls;
+using Estreya.BlishHUD.Shared.Exceptions;
+using Estreya.BlishHUD.Shared.Extensions;
 using Estreya.BlishHUD.Shared.Helpers;
 using Estreya.BlishHUD.Shared.Models;
 using Estreya.BlishHUD.Shared.MumbleInfo.Map;
@@ -46,29 +51,27 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		private const string GITHUB_CLIENT_ID = "Iv1.9e4dc29d43243704";
 
-		protected static TModule Instance;
-
 		private ModuleSettingsView _defaultSettingView;
 
 		private FlurlClient _flurlClient;
 
-		private ConcurrentDictionary<string, string> _loadingTexts = new ConcurrentDictionary<string, string>();
+		private readonly ConcurrentDictionary<string, string> _loadingTexts = new ConcurrentDictionary<string, string>();
 
 		private LoadingSpinner _loadingSpinner;
 
 		private readonly AsyncLock _servicesLock = new AsyncLock();
 
-		private Collection<ManagedService> _services = new Collection<ManagedService>();
+		private readonly SynchronizedCollection<ManagedService> _services = new SynchronizedCollection<ManagedService>();
 
 		protected Logger Logger { get; }
+
+		protected string MODULE_FILE_URL => "https://files.estreya.de/blish-hud/" + UrlModuleName;
+
+		protected string MODULE_API_URL => "https://blish-hud.api.estreya.de/v" + API_VERSION_NO + "/" + UrlModuleName;
 
 		protected GitHubHelper GithubHelper { get; private set; }
 
 		protected PasswordManager PasswordManager { get; private set; }
-
-		public string MODULE_FILE_URL => "https://files.estreya.de/blish-hud/" + UrlModuleName;
-
-		public string MODULE_API_URL => "https://blish-hud.api.estreya.de/v" + API_VERSION_NO + "/" + UrlModuleName;
 
 		public abstract string UrlModuleName { get; }
 
@@ -100,7 +103,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected CornerIcon CornerIcon { get; set; }
 
-		protected TabbedWindow2 SettingsWindow { get; private set; }
+		protected TabbedWindow SettingsWindow { get; private set; }
 
 		public virtual BitmapFont Font => GameService.Content.get_DefaultFont16();
 
@@ -134,6 +137,8 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		public AccountAchievementService AccountAchievementService { get; private set; }
 
+		protected abstract int CornerIconPriority { get; }
+
 		protected IFlurlClient GetFlurlClient()
 		{
 			if (_flurlClient == null)
@@ -144,11 +149,10 @@ namespace Estreya.BlishHUD.Shared.Modules
 			return _flurlClient;
 		}
 
-		public BaseModule(ModuleParameters moduleParameters)
+		protected BaseModule(ModuleParameters moduleParameters)
 			: this(moduleParameters)
 		{
 			Logger = Logger.GetLogger(((object)this).GetType());
-			Instance = this as TModule;
 		}
 
 		protected sealed override void DefineSettings(SettingCollection settings)
@@ -171,19 +175,43 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected override async Task LoadAsync()
 		{
+			await ThrowIfModuleInvalid(showScreenNotification: true);
 			Logger.Debug("Initialize states");
 			await Task.Factory.StartNew((Func<Task>)InitializeServices, TaskCreationOptions.LongRunning).Unwrap();
 			GithubHelper = new GitHubHelper("Tharylia", "Blish-HUD-Modules", "Iv1.9e4dc29d43243704", ((Module)this).get_Name(), PasswordManager, IconService, TranslationService, ModuleSettings);
 			ModuleSettings.UpdateLocalization(TranslationService);
-			ModuleSettings.ModuleSettingsChanged += ModuleSettings_ModuleSettingsChanged;
+			ModuleSettings.RegisterCornerIcon.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)RegisterCornerIcon_SettingChanged);
 		}
 
-		private void ModuleSettings_ModuleSettingsChanged(object sender, BaseModuleSettings.ModuleSettingsChangedEventArgs e)
+		private async Task ThrowIfModuleInvalid(bool showScreenNotification)
 		{
-			if (e.Name == "RegisterCornerIcon")
+			IFlurlRequest flurlRequest = GetFlurlClient().Request(MODULE_API_URL, "validate");
+			flurlRequest.AllowAnyHttpStatus();
+			ModuleValidationRequest data = new ModuleValidationRequest
 			{
-				HandleCornerIcon(ModuleSettings.RegisterCornerIcon.get_Value());
+				Version = ((Module)this).get_Version()
+			};
+			HttpResponseMessage response = await flurlRequest.PostJsonAsync(data, default(CancellationToken), (HttpCompletionOption)0);
+			if (response.get_IsSuccessStatusCode() || response.get_StatusCode() == HttpStatusCode.NotFound)
+			{
+				return;
 			}
+			ModuleValidationResponse validationResponse = await response.GetJsonAsync<ModuleValidationResponse>();
+			if (showScreenNotification)
+			{
+				ScreenNotification.ShowNotification(new List<string>
+				{
+					"[" + ((Module)this).get_Name() + "]",
+					"The current module version is invalid!",
+					validationResponse.Message ?? response.get_ReasonPhrase() ?? "Unknown"
+				}.ToArray(), ScreenNotification.NotificationType.Error, null, 10);
+			}
+			throw new ModuleInvalidException(validationResponse.Message);
+		}
+
+		private void RegisterCornerIcon_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
+		{
+			HandleCornerIcon(ModuleSettings.RegisterCornerIcon.get_Value());
 		}
 
 		protected abstract string GetDirectoryName();
@@ -369,7 +397,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Expected O, but got Unknown
+			//IL_003a: Expected O, but got Unknown
 			if (show)
 			{
 				if (CornerIcon == null)
@@ -377,7 +405,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 					CornerIcon val = new CornerIcon();
 					val.set_IconName(((Module)this).get_Name());
 					val.set_Icon(GetCornerIcon());
-					val.set_Priority(1289351278);
+					val.set_Priority(CornerIconPriority);
 					CornerIcon = val;
 					OnCornerIconBuild();
 				}
@@ -407,7 +435,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 			switch (ModuleSettings.CornerIconLeftClickAction.get_Value())
 			{
 			case CornerIconClickAction.Settings:
-				((WindowBase2)SettingsWindow).ToggleWindow();
+				SettingsWindow.ToggleWindow();
 				break;
 			case CornerIconClickAction.Visibility:
 				ModuleSettings.GlobalDrawerVisible.set_Value(!ModuleSettings.GlobalDrawerVisible.get_Value());
@@ -420,7 +448,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 			switch (ModuleSettings.CornerIconRightClickAction.get_Value())
 			{
 			case CornerIconClickAction.Settings:
-				((WindowBase2)SettingsWindow).ToggleWindow();
+				SettingsWindow.ToggleWindow();
 				break;
 			case CornerIconClickAction.Visibility:
 				ModuleSettings.GlobalDrawerVisible.set_Value(!ModuleSettings.GlobalDrawerVisible.get_Value());
@@ -446,35 +474,35 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		private void DefaultSettingView_OpenClicked(object sender, EventArgs e)
 		{
-			((WindowBase2)SettingsWindow).ToggleWindow();
+			SettingsWindow.ToggleWindow();
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Expected O, but got Unknown
-			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d8: Expected O, but got Unknown
-			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011f: Expected O, but got Unknown
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0098: Expected O, but got Unknown
+			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e3: Expected O, but got Unknown
+			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012a: Expected O, but got Unknown
 			((Module)this).OnModuleLoaded(e);
 			Logger.Debug("Start building settings window.");
 			if (SettingsWindow == null)
 			{
-				TabbedWindow2 val2 = (SettingsWindow = WindowUtil.CreateTabbedWindow(((Module)this).get_Name(), ((object)this).GetType(), Guid.Parse("6bd04be4-dc19-4914-a2c3-8160ce76818b"), IconService, GetEmblem()));
+				TabbedWindow tabbedWindow2 = (SettingsWindow = WindowUtil.CreateTabbedWindow(ModuleSettings, ((Module)this).get_Name(), ((object)this).GetType(), Guid.Parse("6bd04be4-dc19-4914-a2c3-8160ce76818b"), IconService, GetEmblem()));
 			}
-			SettingsWindow.get_Tabs().Add(new Tab(IconService.GetIcon("482926.png"), (Func<IView>)(() => (IView)(object)new NewsView(GetFlurlClient(), Gw2ApiManager, IconService, TranslationService, NewsService, GameService.Content.get_DefaultFont16())
+			SettingsWindow.Tabs.Add(new Tab(IconService.GetIcon("482926.png"), (Func<IView>)(() => (IView)(object)new NewsView(GetFlurlClient(), Gw2ApiManager, IconService, TranslationService, NewsService, GameService.Content.get_DefaultFont16())
 			{
 				DefaultColor = ModuleSettings.DefaultGW2Color
 			}), "News", (int?)null));
 			OnSettingWindowBuild(SettingsWindow);
-			SettingsWindow.get_Tabs().Add(new Tab(IconService.GetIcon("156331.png"), (Func<IView>)(() => (IView)(object)new DonationView(GetFlurlClient(), Gw2ApiManager, IconService, TranslationService, GameService.Content.get_DefaultFont16())
+			SettingsWindow.Tabs.Add(new Tab(IconService.GetIcon("156331.png"), (Func<IView>)(() => (IView)(object)new DonationView(GetFlurlClient(), Gw2ApiManager, IconService, TranslationService, GameService.Content.get_DefaultFont16())
 			{
 				DefaultColor = ModuleSettings.DefaultGW2Color
 			}), "Donations", (int?)null));
 			if (Debug)
 			{
-				SettingsWindow.get_Tabs().Add(new Tab(IconService.GetIcon("155052.png"), (Func<IView>)(() => (IView)(object)new ServiceSettingsView(_services, Gw2ApiManager, IconService, TranslationService, SettingEventService, Font)
+				SettingsWindow.Tabs.Add(new Tab(IconService.GetIcon("155052.png"), (Func<IView>)(() => (IView)(object)new ServiceSettingsView(_services, Gw2ApiManager, IconService, TranslationService, SettingEventService, Font)
 				{
 					DefaultColor = ModuleSettings.DefaultGW2Color
 				}), "Debug", (int?)null));
@@ -487,7 +515,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected abstract AsyncTexture2D GetCornerIcon();
 
-		protected virtual void OnSettingWindowBuild(TabbedWindow2 settingWindow)
+		protected virtual void OnSettingWindowBuild(TabbedWindow settingWindow)
 		{
 		}
 
@@ -612,12 +640,22 @@ namespace Estreya.BlishHUD.Shared.Modules
 			((Control)_loadingSpinner).set_Visible(show);
 		}
 
+		protected async Task ReloadServices()
+		{
+			List<Task> tasks = new List<Task>();
+			using (await _servicesLock.LockAsync())
+			{
+				tasks.AddRange(_services.Select((ManagedService s) => s.Reload()));
+			}
+			await Task.WhenAll(tasks);
+		}
+
 		protected override void Unload()
 		{
 			Logger.Debug("Unload settings...");
 			if (ModuleSettings != null)
 			{
-				ModuleSettings.ModuleSettingsChanged -= ModuleSettings_ModuleSettingsChanged;
+				ModuleSettings.RegisterCornerIcon.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)RegisterCornerIcon_SettingChanged);
 				ModuleSettings.Unload();
 				ModuleSettings = null;
 			}
@@ -632,35 +670,26 @@ namespace Estreya.BlishHUD.Shared.Modules
 			}
 			Logger.Debug("Unloaded default settings view.");
 			Logger.Debug("Unload settings window...");
-			TabbedWindow2 settingsWindow = SettingsWindow;
+			TabbedWindow settingsWindow = SettingsWindow;
 			if (settingsWindow != null)
 			{
 				((Control)settingsWindow).Hide();
 			}
-			TabbedWindow2 settingsWindow2 = SettingsWindow;
+			TabbedWindow settingsWindow2 = SettingsWindow;
 			if (settingsWindow2 != null)
 			{
 				((Control)settingsWindow2).Dispose();
 			}
 			SettingsWindow = null;
 			Logger.Debug("Unloaded settings window.");
-			Logger.Debug("Unload corner icon...");
-			HandleCornerIcon(show: false);
-			LoadingSpinner loadingSpinner = _loadingSpinner;
-			if (loadingSpinner != null)
-			{
-				((Control)loadingSpinner).Dispose();
-			}
-			_loadingSpinner = null;
-			Logger.Debug("Unloaded corner icon.");
 			Logger.Debug("Unloading states...");
 			using (_servicesLock.Lock())
 			{
-				_services.ToList().ForEach(delegate(ManagedService state)
+				_services?.ToList().ForEach(delegate(ManagedService state)
 				{
 					state?.Dispose();
 				});
-				_services.Clear();
+				_services?.Clear();
 				AccountService = null;
 				ArcDPSService = null;
 				IconService = null;
@@ -678,9 +707,16 @@ namespace Estreya.BlishHUD.Shared.Modules
 			_flurlClient?.Dispose();
 			_flurlClient = null;
 			Logger.Debug("Unloaded flurl client.");
-			Logger.Debug("Unload module instance...");
-			Instance = null;
-			Logger.Debug("Unloaded module instance.");
+			Logger.Debug("Unload corner icon...");
+			_loadingTexts?.Clear();
+			HandleCornerIcon(show: false);
+			LoadingSpinner loadingSpinner = _loadingSpinner;
+			if (loadingSpinner != null)
+			{
+				((Control)loadingSpinner).Dispose();
+			}
+			_loadingSpinner = null;
+			Logger.Debug("Unloaded corner icon.");
 		}
 	}
 }

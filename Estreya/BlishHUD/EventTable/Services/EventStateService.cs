@@ -37,13 +37,13 @@ namespace Estreya.BlishHUD.EventTable.Services
 
 		private const string FILE_NAME = "event_states.json";
 
-		private bool dirty;
+		private readonly Func<DateTime> _getNowAction;
 
 		private string _path;
 
-		private readonly Func<DateTime> _getNowAction;
+		private bool dirty;
 
-		private string _basePath { get; set; }
+		private string _basePath { get; }
 
 		private string Path
 		{
@@ -57,7 +57,7 @@ namespace Estreya.BlishHUD.EventTable.Services
 			}
 		}
 
-		public List<VisibleStateInfo> Instances { get; private set; } = new List<VisibleStateInfo>();
+		public List<VisibleStateInfo> Instances { get; } = new List<VisibleStateInfo>();
 
 
 		public event EventHandler<ValueEventArgs<VisibleStateInfo>> StateAdded;
@@ -71,10 +71,9 @@ namespace Estreya.BlishHUD.EventTable.Services
 			_getNowAction = getNowAction;
 		}
 
-		protected override async Task InternalReload()
+		protected override Task InternalReload()
 		{
-			await Clear();
-			await Load();
+			return Task.CompletedTask;
 		}
 
 		protected override void InternalUpdate(GameTime gameTime)

@@ -18,15 +18,15 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 {
 	public class ReminderSettingsView : BaseSettingsView
 	{
-		private readonly ModuleSettings _moduleSettings;
+		private static readonly Estreya.BlishHUD.EventTable.Models.Event _globalChangeTempEvent;
 
 		private readonly Func<List<EventCategory>> _getEvents;
+
+		private readonly ModuleSettings _moduleSettings;
 
 		private StandardWindow _manageEventsWindow;
 
 		private StandardWindow _manageReminderTimesWindow;
-
-		private static Estreya.BlishHUD.EventTable.Models.Event _globalChangeTempEvent;
 
 		static ReminderSettingsView()
 		{
@@ -114,7 +114,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			{
 				_manageReminderTimesWindow = WindowUtil.CreateStandardWindow(_moduleSettings, "Manage Reminder Times", ((object)this).GetType(), Guid.Parse("930702ac-bf87-416c-b5ba-cdf9e0266bf7"), base.IconService, base.IconService.GetIcon("1466345.png"));
 			}
-			((Control)_manageReminderTimesWindow).set_Size(new Point(450, ((Control)_manageReminderTimesWindow).get_Height()));
+			_manageReminderTimesWindow.Size = new Point(450, ((Control)_manageReminderTimesWindow).get_Height());
 			ManageReminderTimesView mrtv = _manageReminderTimesWindow?.CurrentView as ManageReminderTimesView;
 			if (mrtv != null)
 			{

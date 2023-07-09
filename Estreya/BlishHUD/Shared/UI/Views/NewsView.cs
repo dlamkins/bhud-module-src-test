@@ -28,13 +28,13 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		private const string BLISH_HUD_DISCORD_INVITE = "https://discord.gg/nGbd3kU";
 
-		private static Point _importantIconSize = new Point(32, 32);
+		private static readonly Point _importantIconSize = new Point(32, 32);
 
 		private readonly IFlurlClient _flurlClient;
 
-		private NewsService _newsService;
-
 		private Texture2D _discordLogo;
+
+		private NewsService _newsService;
 
 		public NewsView(IFlurlClient flurlClient, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, NewsService newsService, BitmapFont font = null)
 			: base(apiManager, iconService, translationService, font)

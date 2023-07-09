@@ -70,9 +70,9 @@ namespace Estreya.BlishHUD.EventTable.Services
 			public DynamicEventIcon Icon { get; set; }
 		}
 
-		private readonly IFlurlClient _flurlClient;
-
 		private readonly string _apiBaseUrl;
+
+		private readonly IFlurlClient _flurlClient;
 
 		private string API_URL => _apiBaseUrl.TrimEnd('/') + "/v1/gw2/dynamicEvents";
 

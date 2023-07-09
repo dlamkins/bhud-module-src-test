@@ -33,17 +33,17 @@ namespace Estreya.BlishHUD.Shared.Controls
 
 		private static readonly Texture2D _textureButtonBorder = Control.get_Content().GetTexture("button-border");
 
-		private AsyncTexture2D _icon;
-
-		private bool _resizeIcon;
-
 		private Tween _animIn;
 
 		private Tween _animOut;
 
+		private AsyncTexture2D _icon;
+
 		private Rectangle _layoutIconBounds = Rectangle.get_Empty();
 
 		private Rectangle _layoutTextBounds = Rectangle.get_Empty();
+
+		private bool _resizeIcon;
 
 		public string Text
 		{

@@ -34,71 +34,71 @@ using SemVer;
 
 namespace Estreya.BlishHUD.EventTable.Controls
 {
-	public class EventArea : RenderTargetControl
+	public class EventArea : RenderTarget2DControl
 	{
-		private static readonly Logger Logger = Logger.GetLogger<EventArea>();
+		private readonly Logger _logger = Logger.GetLogger<EventArea>();
 
 		private static TimeSpan _updateEventOccurencesInterval = TimeSpan.FromMinutes(15.0);
 
-		private AsyncRef<double> _lastEventOccurencesUpdate = new AsyncRef<double>(0.0);
-
 		private static TimeSpan _checkForNewEventsInterval = TimeSpan.FromMilliseconds(1000.0);
-
-		private double _lastCheckForNewEventsUpdate;
 
 		private static readonly ConcurrentDictionary<FontSize, BitmapFont> _fonts = new ConcurrentDictionary<FontSize, BitmapFont>();
 
-		private IconService _iconService;
-
-		private TranslationService _translationService;
-
-		private EventStateService _eventService;
-
-		private WorldbossService _worldbossService;
-
-		private MapchestService _mapchestService;
-
-		private PointOfInterestService _pointOfInterestService;
-
-		private MapUtil _mapUtil;
-
-		private IFlurlClient _flurlClient;
-
-		private string _apiRootUrl;
+		private readonly Func<string> _getAccessToken;
 
 		private readonly Func<DateTime> _getNowAction;
 
 		private readonly Func<Version> _getVersion;
 
-		private readonly Func<string> _getAccessToken;
-
-		private AsyncLock _eventLock = new AsyncLock();
+		private Event _activeEvent;
 
 		private List<EventCategory> _allEvents = new List<EventCategory>();
 
-		private int _heightFromLastDraw = 1;
-
-		private int _drawXOffset;
-
-		private Event _lastActiveEvent;
-
-		private List<string> _eventCategoryOrdering;
-
-		private List<List<(DateTime Occurence, Event Event)>> _orderedControlEvents;
-
-		private AsyncLock _controlLock = new AsyncLock();
-
-		private ConcurrentDictionary<string, List<(DateTime Occurence, Event Event)>> _controlEvents = new ConcurrentDictionary<string, List<(DateTime, Event)>>();
+		private string _apiRootUrl;
 
 		private bool _clearing;
 
-		private Event _activeEvent;
+		private readonly ConcurrentDictionary<string, List<(DateTime Occurence, Event Event)>> _controlEvents = new ConcurrentDictionary<string, List<(DateTime, Event)>>();
 
-		private int _tempHistorySplit = -1;
+		private readonly AsyncLock _controlLock = new AsyncLock();
+
+		private int _drawXOffset;
+
+		private List<string> _eventCategoryOrdering;
+
+		private readonly AsyncLock _eventLock = new AsyncLock();
+
+		private EventStateService _eventStateService;
+
+		private IFlurlClient _flurlClient;
+
+		private int _heightFromLastDraw = 1;
+
+		private IconService _iconService;
+
+		private Event _lastActiveEvent;
+
+		private double _lastCheckForNewEventsUpdate;
+
+		private readonly AsyncRef<double> _lastEventOccurencesUpdate = new AsyncRef<double>(0.0);
+
+		private MouseEventType _lastMouseEventType;
+
+		private MapchestService _mapchestService;
+
+		private MapUtil _mapUtil;
+
+		private List<List<(DateTime Occurence, Event Event)>> _orderedControlEvents;
+
+		private PointOfInterestService _pointOfInterestService;
 
 		private TimeSpan? _savedDrawInterval;
 
-		private MouseEventType _lastMouseEventType;
+		private int _tempHistorySplit = -1;
+
+		private TranslationService _translationService;
+
+		private WorldbossService _worldbossService;
 
 		private int DrawXOffset
 		{
@@ -184,7 +184,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			_getAccessToken = getAccessToken;
 			_iconService = iconService;
 			_translationService = translationService;
-			_eventService = eventService;
+			_eventStateService = eventService;
 			_worldbossService = worldbossService;
 			_mapchestService = mapchestService;
 			_pointOfInterestService = pointOfInterestService;
@@ -201,10 +201,10 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				_mapchestService.MapchestCompleted += Event_Completed;
 				_mapchestService.MapchestRemoved += Event_Removed;
 			}
-			if (_eventService != null)
+			if (_eventStateService != null)
 			{
-				_eventService.StateAdded += EventService_ServiceAdded;
-				_eventService.StateRemoved += EventService_ServiceRemoved;
+				_eventStateService.StateAdded += EventService_ServiceAdded;
+				_eventStateService.StateRemoved += EventService_ServiceRemoved;
 			}
 		}
 
@@ -356,13 +356,12 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			}
 			events.ForEach(delegate(Estreya.BlishHUD.EventTable.Models.Event ev)
 			{
-				_eventService.Remove(Configuration.Name, ev.SettingKey);
+				_eventStateService.Remove(Configuration.Name, ev.SettingKey);
 			});
 		}
 
 		private void Event_Completed(object sender, string apiCode)
 		{
-			DateTime until = GetNextReset();
 			List<Estreya.BlishHUD.EventTable.Models.Event> events = new List<Estreya.BlishHUD.EventTable.Models.Event>();
 			using (_eventLock.Lock())
 			{
@@ -372,7 +371,8 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			}
 			events.ForEach(delegate(Estreya.BlishHUD.EventTable.Models.Event ev)
 			{
-				FinishEvent(ev, until);
+				DateTime nextReset = GetNextReset(ev);
+				ToggleFinishEvent(ev, nextReset);
 			});
 		}
 
@@ -517,16 +517,16 @@ namespace Estreya.BlishHUD.EventTable.Controls
 		{
 			try
 			{
-				if (activeEventKeys == null || activeEventKeys.Count == 0)
+				if (!Configuration.UseFiller.get_Value() || activeEventKeys == null || activeEventKeys.Count == 0)
 				{
 					return new ConcurrentDictionary<string, List<Estreya.BlishHUD.EventTable.Models.Event>>();
 				}
-				Logger.Info("Load fillers...");
+				_logger.Info("Load fillers...");
 				IFlurlRequest flurlRequest = _flurlClient.Request(_apiRootUrl, "fillers");
 				string accessToken = _getAccessToken();
 				if (!string.IsNullOrWhiteSpace(accessToken))
 				{
-					Logger.Info("Include custom event fillers...");
+					_logger.Info("Include custom event fillers...");
 					flurlRequest.WithOAuthBearerToken(accessToken);
 				}
 				List<Estreya.BlishHUD.EventTable.Models.Event> activeEvents = new List<Estreya.BlishHUD.EventTable.Models.Event>();
@@ -537,7 +537,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 						select ev).ToList());
 				}
 				IEnumerable<string> eventKeys = activeEvents.Select((Estreya.BlishHUD.EventTable.Models.Event a) => a.SettingKey).Distinct();
-				Logger.Debug("Fetch fillers with active keys: " + string.Join(", ", eventKeys.ToArray()));
+				_logger.Debug("Fetch fillers with active keys: " + string.Join(", ", eventKeys.ToArray()));
 				List<OnlineFillerCategory> fillerList = (await (await flurlRequest.PostJsonAsync(new OnlineFillerRequest
 				{
 					Module = new OnlineFillerRequest.OnlineFillerRequestModule
@@ -577,14 +577,14 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			catch (FlurlHttpException ex)
 			{
 				string error = await ex.GetResponseStringAsync();
-				Logger.Warn($"Could not load fillers from {ex.Call.Request.get_RequestUri()}: {error}");
+				_logger.Warn($"Could not load fillers from {ex.Call.Request.get_RequestUri()}: {error}");
 			}
 			return new ConcurrentDictionary<string, List<Estreya.BlishHUD.EventTable.Models.Event>>();
 		}
 
 		private bool EventCategoryDisabled(EventCategory ec)
 		{
-			return _eventService?.Contains(Configuration.Name, ec.Key, EventStateService.EventStates.Completed) ?? false;
+			return _eventStateService?.Contains(Configuration.Name, ec.Key, EventStateService.EventStates.Completed) ?? false;
 		}
 
 		private bool EventDisabled(Estreya.BlishHUD.EventTable.Models.Event ev)
@@ -608,7 +608,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private bool EventDisabled(string settingKey)
 		{
-			return !(!Configuration.DisabledEventKeys.get_Value().Contains(settingKey) & !_eventService.Contains(Configuration.Name, settingKey, EventStateService.EventStates.Hidden));
+			return !(!Configuration.DisabledEventKeys.get_Value().Contains(settingKey) & !_eventStateService.Contains(Configuration.Name, settingKey, EventStateService.EventStates.Hidden));
 		}
 
 		private void UpdateEventsOnScreen(SpriteBatch spriteBatch)
@@ -684,7 +684,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				}
 				foreach (var delete in toDelete)
 				{
-					Logger.Debug("Deleted event " + delete.Item2.Model.Name);
+					_logger.Debug("Deleted event " + delete.Item2.Model.Name);
 					RemoveEventHooks(delete.Item2);
 					delete.Item2.Dispose();
 					controlEventPairs.Remove(delete);
@@ -764,7 +764,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				}
 				else
 				{
-					Logger.Debug("Event lock is busy. Can't update category " + categoryKey);
+					_logger.Debug("Event lock is busy. Can't update category " + categoryKey);
 				}
 				List<Estreya.BlishHUD.EventTable.Models.Event> events = validCategory?.Events.Where((Estreya.BlishHUD.EventTable.Models.Event ev) => activeEventGroup.Any((string aeg) => aeg == ev.SettingKey) || (Configuration.UseFiller.get_Value() && ev.Filler)).ToList();
 				if (events == null || events.Count == 0)
@@ -802,7 +802,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 						Event newEventControl = new Event(ev2, _iconService, _translationService, _getNowAction, occurence, occurence.AddMinutes(ev2.Duration), GetFont, () => !ev2.Filler && Configuration.DrawBorders.get_Value(), delegate
 						{
 							EventCompletedAction value3 = Configuration.CompletionAction.get_Value();
-							return (value3 == EventCompletedAction.Crossout || value3 == EventCompletedAction.CrossoutAndChangeOpacity) && _eventService.Contains(Configuration.Name, ev2.SettingKey, EventStateService.EventStates.Completed);
+							return (value3 == EventCompletedAction.Crossout || value3 == EventCompletedAction.CrossoutAndChangeOpacity) && _eventStateService.Contains(Configuration.Name, ev2.SettingKey, EventStateService.EventStates.Completed);
 						}, delegate
 						{
 							//IL_0000: Unknown result type (might be due to invalid IL or missing references)
@@ -818,7 +818,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 							Color val = ((!ev2.Filler) ? ((Configuration.TextColor.get_Value().get_Id() == 1) ? black : ColorExtensions.ToXnaColor(Configuration.TextColor.get_Value().get_Cloth())) : ((Configuration.FillerTextColor.get_Value().get_Id() == 1) ? black : ColorExtensions.ToXnaColor(Configuration.FillerTextColor.get_Value().get_Cloth())));
 							float num2 = (ev2.Filler ? Configuration.FillerTextOpacity.get_Value() : Configuration.EventTextOpacity.get_Value());
 							EventCompletedAction value2 = Configuration.CompletionAction.get_Value();
-							if ((value2 == EventCompletedAction.ChangeOpacity || value2 == EventCompletedAction.CrossoutAndChangeOpacity) && _eventService.Contains(Configuration.Name, ev2.SettingKey, EventStateService.EventStates.Completed))
+							if ((value2 == EventCompletedAction.ChangeOpacity || value2 == EventCompletedAction.CrossoutAndChangeOpacity) && _eventStateService.Contains(Configuration.Name, ev2.SettingKey, EventStateService.EventStates.Completed))
 							{
 								if (Configuration.CompletedEventsInvertTextColor.get_Value())
 								{
@@ -843,7 +843,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 							}
 							float alpha = Configuration.EventBackgroundOpacity.get_Value();
 							EventCompletedAction value = Configuration.CompletionAction.get_Value();
-							if ((value == EventCompletedAction.ChangeOpacity || value == EventCompletedAction.CrossoutAndChangeOpacity) && _eventService.Contains(Configuration.Name, ev2.SettingKey, EventStateService.EventStates.Completed))
+							if ((value == EventCompletedAction.ChangeOpacity || value == EventCompletedAction.CrossoutAndChangeOpacity) && _eventStateService.Contains(Configuration.Name, ev2.SettingKey, EventStateService.EventStates.Completed))
 							{
 								alpha = Configuration.CompletedEventsBackgroundOpacity.get_Value();
 							}
@@ -863,9 +863,9 @@ namespace Estreya.BlishHUD.EventTable.Controls
 								Color color2 = ColorTranslator.FromHtml(cc);
 								return new Color((int)color2.R, (int)color2.G, (int)color2.B) * alpha;
 							}).ToArray();
-						}, () => (!ev2.Filler) ? Configuration.DrawShadows.get_Value() : Configuration.DrawShadowsForFiller.get_Value(), () => (!ev2.Filler) ? (((Configuration.ShadowColor.get_Value().get_Id() == 1) ? Color.get_Black() : ColorExtensions.ToXnaColor(Configuration.ShadowColor.get_Value().get_Cloth())) * Configuration.ShadowOpacity.get_Value()) : (((Configuration.FillerShadowColor.get_Value().get_Id() == 1) ? Color.get_Black() : ColorExtensions.ToXnaColor(Configuration.FillerShadowColor.get_Value().get_Cloth())) * Configuration.FillerShadowOpacity.get_Value()));
+						}, () => (!ev2.Filler) ? Configuration.DrawShadows.get_Value() : Configuration.DrawShadowsForFiller.get_Value(), () => (!ev2.Filler) ? (((Configuration.ShadowColor.get_Value().get_Id() == 1) ? Color.get_Black() : ColorExtensions.ToXnaColor(Configuration.ShadowColor.get_Value().get_Cloth())) * Configuration.ShadowOpacity.get_Value()) : (((Configuration.FillerShadowColor.get_Value().get_Id() == 1) ? Color.get_Black() : ColorExtensions.ToXnaColor(Configuration.FillerShadowColor.get_Value().get_Cloth())) * Configuration.FillerShadowOpacity.get_Value()), () => Configuration.EventAbsoluteTimeFormatString.get_Value(), () => (Configuration.EventTimespanDaysFormatString.get_Value(), Configuration.EventTimespanHoursFormatString.get_Value(), Configuration.EventTimespanMinutesFormatString.get_Value()));
 						AddEventHooks(newEventControl);
-						Logger.Debug($"Added event {ev2.Name} with occurence {occurence}");
+						_logger.Debug($"Added event {ev2.Name} with occurence {occurence}");
 						using (_controlLock.Lock())
 						{
 							_controlEvents[categoryKey].Add((occurence, newEventControl));
@@ -1012,31 +1012,38 @@ namespace Estreya.BlishHUD.EventTable.Controls
 		private void AddEventHooks(Event ev)
 		{
 			ev.HideRequested += Ev_HideRequested;
-			ev.FinishRequested += Ev_FinishRequested;
+			ev.ToggleFinishRequested += Ev_ToggleFinishRequested;
 			ev.DisableRequested += Ev_DisableRequested;
 		}
 
 		private void RemoveEventHooks(Event ev)
 		{
 			ev.HideRequested -= Ev_HideRequested;
-			ev.FinishRequested -= Ev_FinishRequested;
+			ev.ToggleFinishRequested -= Ev_ToggleFinishRequested;
 			ev.DisableRequested -= Ev_DisableRequested;
 		}
 
-		private void Ev_FinishRequested(object sender, EventArgs e)
+		private void Ev_ToggleFinishRequested(object sender, EventArgs e)
 		{
 			Event ev = sender as Event;
-			FinishEvent(ev.Model, GetNextReset());
+			ToggleFinishEvent(ev.Model, GetNextReset(ev.Model));
 		}
 
-		private void FinishEvent(Estreya.BlishHUD.EventTable.Models.Event ev, DateTime until)
+		private void ToggleFinishEvent(Estreya.BlishHUD.EventTable.Models.Event ev, DateTime until)
 		{
 			switch (Configuration.CompletionAction.get_Value())
 			{
 			case EventCompletedAction.Crossout:
 			case EventCompletedAction.ChangeOpacity:
 			case EventCompletedAction.CrossoutAndChangeOpacity:
-				_eventService.Add(Configuration.Name, ev.SettingKey, until, EventStateService.EventStates.Completed);
+				if (_eventStateService.Contains(Configuration.Name, ev.SettingKey, EventStateService.EventStates.Completed))
+				{
+					_eventStateService.Remove(Configuration.Name, ev.SettingKey);
+				}
+				else
+				{
+					_eventStateService.Add(Configuration.Name, ev.SettingKey, until, EventStateService.EventStates.Completed);
+				}
 				break;
 			case EventCompletedAction.Hide:
 				HideEvent(ev, until);
@@ -1046,13 +1053,13 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private void HideEvent(Estreya.BlishHUD.EventTable.Models.Event ev, DateTime until)
 		{
-			_eventService.Add(Configuration.Name, ev.SettingKey, until, EventStateService.EventStates.Hidden);
+			_eventStateService.Add(Configuration.Name, ev.SettingKey, until, EventStateService.EventStates.Hidden);
 		}
 
 		private void Ev_HideRequested(object sender, EventArgs e)
 		{
 			Event ev = sender as Event;
-			HideEvent(ev.Model, GetNextReset());
+			HideEvent(ev.Model, GetNextReset(ev.Model));
 		}
 
 		private void Ev_DisableRequested(object sender, EventArgs e)
@@ -1064,10 +1071,13 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			}
 		}
 
-		private DateTime GetNextReset()
+		private DateTime GetNextReset(Estreya.BlishHUD.EventTable.Models.Event ev)
 		{
 			DateTime nowUTC = _getNowAction().ToUniversalTime();
-			return new DateTime(nowUTC.Year, nowUTC.Month, nowUTC.Day, 0, 0, 0, DateTimeKind.Utc).AddDays(1.0);
+			TimeSpan addDuration = TimeSpan.FromDays(1.0);
+			_ = (double)ev.Duration;
+			_ = addDuration.TotalMinutes;
+			return new DateTime(nowUTC.Year, nowUTC.Month, nowUTC.Day, 0, 0, 0, DateTimeKind.Utc).AddDays(Math.Ceiling(addDuration.TotalDays));
 		}
 
 		protected override void InternalDispose()
@@ -1083,15 +1093,15 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				_mapchestService.MapchestCompleted -= Event_Completed;
 				_mapchestService.MapchestRemoved -= Event_Removed;
 			}
-			if (_eventService != null)
+			if (_eventStateService != null)
 			{
-				_eventService.StateAdded -= EventService_ServiceAdded;
-				_eventService.StateRemoved -= EventService_ServiceRemoved;
+				_eventStateService.StateAdded -= EventService_ServiceAdded;
+				_eventStateService.StateRemoved -= EventService_ServiceRemoved;
 			}
 			_iconService = null;
 			_worldbossService = null;
 			_mapchestService = null;
-			_eventService = null;
+			_eventStateService = null;
 			_translationService = null;
 			_mapUtil = null;
 			_pointOfInterestService = null;

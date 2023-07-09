@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Blish_HUD.Controls;
 using Blish_HUD.Modules.Managers;
@@ -12,11 +11,11 @@ namespace Estreya.BlishHUD.Shared.UI.Views.Settings
 {
 	public class ServiceSettingsView : BaseSettingsView
 	{
-		private readonly Collection<ManagedService> _stateList;
-
 		private readonly Func<Task> _reloadCalledAction;
 
-		public ServiceSettingsView(Collection<ManagedService> stateList, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService, BitmapFont font = null, Func<Task> reloadCalledAction = null)
+		private readonly IEnumerable<ManagedService> _stateList;
+
+		public ServiceSettingsView(IEnumerable<ManagedService> stateList, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService, BitmapFont font = null, Func<Task> reloadCalledAction = null)
 			: base(apiManager, iconService, translationService, settingEventService, font)
 		{
 			_stateList = stateList;

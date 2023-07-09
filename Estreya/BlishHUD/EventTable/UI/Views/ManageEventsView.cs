@@ -43,17 +43,17 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			public Action<Estreya.BlishHUD.EventTable.Models.Event> Action { get; set; }
 		}
 
-		private static Point MAIN_PADDING = new Point(20, 20);
+		private static readonly Point MAIN_PADDING = new Point(20, 20);
 
 		private static readonly Logger Logger = Logger.GetLogger<ManageEventsView>();
-
-		private readonly List<EventCategory> allEvents;
 
 		private readonly Dictionary<string, object> _additionalData;
 
 		private readonly Func<List<string>> _getDisabledEventKeys;
 
 		private readonly ModuleSettings _moduleSettings;
+
+		private readonly List<EventCategory> allEvents;
 
 		public Panel Panel { get; private set; }
 

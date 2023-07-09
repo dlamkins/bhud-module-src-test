@@ -8,23 +8,22 @@ namespace Estreya.BlishHUD.Shared.Controls.World
 {
 	public abstract class WorldEntity : IEntity, IUpdatable, IRenderable3D
 	{
-		private float _scale = 1f;
-
-		public float DrawOrder => 1f;
-
 		protected Vector3 Position { get; set; }
 
-		protected float Scale => _scale;
+		protected float Scale { get; } = 1f;
+
 
 		public float DistanceToPlayer { get; private set; }
 
 		protected BasicEffect RenderEffect { get; private set; }
 
+		public float DrawOrder => 1f;
+
 		public WorldEntity(Vector3 position, float scale)
 		{
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			Position = position;
-			_scale = scale;
+			Scale = scale;
 		}
 
 		public void Render(GraphicsDevice graphicsDevice, IWorld world, ICamera camera)
@@ -42,14 +41,14 @@ namespace Estreya.BlishHUD.Shared.Controls.World
 			InternalRender(graphicsDevice, world, camera);
 		}
 
-		protected abstract void InternalRender(GraphicsDevice graphicsDevice, IWorld world, ICamera camera);
-
 		public virtual void Update(GameTime gameTime)
 		{
 			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 			DistanceToPlayer = Vector3.Distance(GameService.Gw2Mumble.get_PlayerCharacter().get_Position(), Position);
 		}
+
+		protected abstract void InternalRender(GraphicsDevice graphicsDevice, IWorld world, ICamera camera);
 
 		public abstract bool IsPlayerInside(bool includeZAxis = true);
 	}

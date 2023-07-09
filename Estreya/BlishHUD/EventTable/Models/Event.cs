@@ -22,10 +22,10 @@ namespace Estreya.BlishHUD.EventTable.Models
 		[IgnoreCopy]
 		private static TimeSpan _checkForRemindersInterval = TimeSpan.FromMilliseconds(5000.0);
 
+		private Func<DateTime> _getNowAction;
+
 		[IgnoreCopy]
 		private double _lastCheckForReminders;
-
-		private Func<DateTime> _getNowAction;
 
 		[JsonIgnore]
 		private ConcurrentDictionary<DateTime, List<TimeSpan>> _remindedFor = new ConcurrentDictionary<DateTime, List<TimeSpan>>();
@@ -112,6 +112,11 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		public event EventHandler<TimeSpan> Reminder;
 
+		public void Update(GameTime gameTime)
+		{
+			UpdateUtil.Update(CheckForReminder, gameTime, _checkForRemindersInterval.TotalMilliseconds, ref _lastCheckForReminders);
+		}
+
 		public double CalculateXPosition(DateTime start, DateTime min, double pixelPerMinute)
 		{
 			return start.Subtract(min).TotalMinutes * pixelPerMinute;
@@ -149,11 +154,6 @@ namespace Estreya.BlishHUD.EventTable.Models
 			{
 				Name = translationService.GetTranslation("event-" + ec.Key + "_" + Key + "-name", Name);
 			}
-		}
-
-		public void Update(GameTime gameTime)
-		{
-			UpdateUtil.Update(CheckForReminder, gameTime, _checkForRemindersInterval.TotalMilliseconds, ref _lastCheckForReminders);
 		}
 
 		private void CheckForReminder()

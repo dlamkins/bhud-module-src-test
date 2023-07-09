@@ -16,13 +16,13 @@ namespace Estreya.BlishHUD.Shared.Controls.World
 
 		private readonly Color _color;
 
-		private VertexBuffer vertexBuffer;
+		private readonly List<short> _indices = new List<short>();
+
+		private readonly List<VertexPositionNormal> _vertices = new List<VertexPositionNormal>();
+
+		private readonly VertexBuffer vertexBuffer;
 
 		public IndexBuffer indexBuffer;
-
-		private List<VertexPositionNormal> _vertices = new List<VertexPositionNormal>();
-
-		private List<short> _indices = new List<short>();
 
 		private int CurrentVertex => _vertices.Count;
 

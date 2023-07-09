@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics;
@@ -8,17 +9,17 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Estreya.BlishHUD.Shared.Controls
 {
-	public abstract class RenderTargetControl : Control
+	public abstract class RenderTarget2DControl : Control
 	{
-		private static Logger Logger = Logger.GetLogger<RenderTargetControl>();
-
-		private RenderTarget2D _renderTarget;
-
-		private bool _renderTargetIsEmpty;
+		private static readonly Logger Logger = Logger.GetLogger<RenderTarget2DControl>();
 
 		private readonly AsyncLock _renderTargetLock = new AsyncLock();
 
 		private TimeSpan _lastDraw = TimeSpan.Zero;
+
+		private RenderTarget2D _renderTarget;
+
+		private bool _renderTargetIsEmpty;
 
 		public TimeSpan DrawInterval { get; set; } = TimeSpan.FromMilliseconds(500.0);
 
@@ -64,24 +65,25 @@ namespace Estreya.BlishHUD.Shared.Controls
 			}
 		}
 
-		public RenderTargetControl()
+		public RenderTarget2DControl()
 			: this()
 		{
 			CreateRenderTarget();
 		}
 
-		public override void Invalidate()
+		public sealed override void Invalidate()
 		{
+			_renderTargetIsEmpty = true;
 			_lastDraw = DrawInterval;
 			((Control)this).Invalidate();
 		}
 
 		protected sealed override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
 			((GraphicsResource)spriteBatch).get_GraphicsDevice().get_PresentationParameters().set_RenderTargetUsage((RenderTargetUsage)1);
 			spriteBatch.End();
 			if (_renderTargetLock.IsFree())
@@ -90,12 +92,19 @@ namespace Estreya.BlishHUD.Shared.Controls
 				{
 					if (_renderTarget != null)
 					{
-						if (_renderTargetIsEmpty || _lastDraw >= DrawInterval)
+						if (_renderTargetIsEmpty || (DrawInterval != Timeout.InfiniteTimeSpan && _lastDraw >= DrawInterval))
 						{
 							((GraphicsResource)spriteBatch).get_GraphicsDevice().SetRenderTarget(_renderTarget);
 							spriteBatch.Begin((SpriteSortMode)0, (BlendState)null, SamplerState.PointClamp, (DepthStencilState)null, (RasterizerState)null, (Effect)null, (Matrix?)null);
 							((GraphicsResource)spriteBatch).get_GraphicsDevice().Clear(Color.get_Transparent());
-							DoPaint(spriteBatch, bounds);
+							try
+							{
+								DoPaint(spriteBatch, bounds);
+							}
+							catch (Exception ex)
+							{
+								Logger.Warn(ex, "Failed to draw onto the render target.");
+							}
 							spriteBatch.End();
 							((GraphicsResource)spriteBatch).get_GraphicsDevice().SetRenderTarget((RenderTarget2D)null);
 							_renderTargetIsEmpty = false;
@@ -124,12 +133,13 @@ namespace Estreya.BlishHUD.Shared.Controls
 
 		private void CreateRenderTarget()
 		{
-			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a8: Expected O, but got Unknown
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b8: Expected O, but got Unknown
+			_renderTargetLock.ThrowIfBusy("Deadlock detected.");
 			int width = Math.Max(Width, 1);
 			int height = Math.Max(Height, 1);
 			using (_renderTargetLock.Lock())

@@ -81,7 +81,7 @@ namespace Estreya.BlishHUD.EventTable
 			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0056: Expected O, but got Unknown
 			MapKeybinding = base.GlobalSettings.DefineSetting<KeyBinding>("MapKeybinding", new KeyBinding((Keys)77), (Func<string>)(() => "Open Map Hotkey"), (Func<string>)(() => "Defines the key used to open the fullscreen map."));
-			MapKeybinding.add_SettingChanged((EventHandler<ValueChangedEventArgs<KeyBinding>>)SettingChanged<KeyBinding>);
+			MapKeybinding.add_SettingChanged((EventHandler<ValueChangedEventArgs<KeyBinding>>)LogSettingChanged<KeyBinding>);
 			MapKeybinding.get_Value().set_Enabled(true);
 			MapKeybinding.get_Value().set_BlockSequenceFromGw2(false);
 			RemindersEnabled = base.GlobalSettings.DefineSetting<bool>("RemindersEnabled", true, (Func<string>)(() => "Reminders Enabled"), (Func<string>)(() => "Whether the module should display alerts before an event starts."));
@@ -150,6 +150,10 @@ namespace Estreya.BlishHUD.EventTable
 			int maxLocationX = maxResX - 350;
 			int minLocationY = 0;
 			int maxLocationY = num - 96;
+			if (maxLocationX >= 50)
+			{
+				_ = 50;
+			}
 			EventReminderPositition reminderPosition = ReminderPosition;
 			if (reminderPosition != null)
 			{
@@ -217,6 +221,10 @@ namespace Estreya.BlishHUD.EventTable
 			SettingEntry<bool> showCategoryNames = base.DrawerSettings.DefineSetting<bool>(name + "-showCategoryNames", false, (Func<string>)(() => "Show Category Names"), (Func<string>)(() => "Defines if the category names should be shown before the event bars."));
 			SettingEntry<Color> categoryNameColor = base.DrawerSettings.DefineSetting<Color>(name + "-categoryNameColor", base.DefaultGW2Color, (Func<string>)(() => "Category Name Color"), (Func<string>)(() => "Defines the color of the category names."));
 			SettingEntry<bool> enableColorGradients = base.DrawerSettings.DefineSetting<bool>(name + "-enableColorGradients", false, (Func<string>)(() => "Enable Color Gradients"), (Func<string>)(() => "Defines if supported events should have a smoother color gradient from and to the next event."));
+			SettingEntry<string> eventTimespanDaysFormatString = base.DrawerSettings.DefineSetting<string>(name + "-eventTimespanDaysFormatString", "dd\\.hh\\:mm\\:ss", (Func<string>)(() => "Days Format String"), (Func<string>)(() => "Defines the format strings for timespans over 1 day."));
+			SettingEntry<string> eventTimespanHoursFormatString = base.DrawerSettings.DefineSetting<string>(name + "-eventTimespanHoursFormatString", "hh\\:mm\\:ss", (Func<string>)(() => "Hours Format String"), (Func<string>)(() => "Defines the format strings for timespans over 1 hours."));
+			SettingEntry<string> eventTimespanMinutesFormatString = base.DrawerSettings.DefineSetting<string>(name + "-eventTimespanMinutesFormatString", "mm\\:ss", (Func<string>)(() => "Minutes Format String"), (Func<string>)(() => "Defines the fallback format strings for timespans."));
+			SettingEntry<string> eventAbsoluteTimeFormatString = base.DrawerSettings.DefineSetting<string>(name + "-eventAbsoluteTimeFormatString", "HH\\:mm", (Func<string>)(() => "Absolute Time Format String"), (Func<string>)(() => "Defines the format strings for absolute time."));
 			return new EventAreaConfiguration
 			{
 				Name = drawer.Name,
@@ -268,7 +276,11 @@ namespace Estreya.BlishHUD.EventTable
 				HideInWvW = hideInWvW,
 				ShowCategoryNames = showCategoryNames,
 				CategoryNameColor = categoryNameColor,
-				EnableColorGradients = enableColorGradients
+				EnableColorGradients = enableColorGradients,
+				EventTimespanDaysFormatString = eventTimespanDaysFormatString,
+				EventTimespanHoursFormatString = eventTimespanHoursFormatString,
+				EventTimespanMinutesFormatString = eventTimespanMinutesFormatString,
+				EventAbsoluteTimeFormatString = eventAbsoluteTimeFormatString
 			};
 		}
 
@@ -328,6 +340,10 @@ namespace Estreya.BlishHUD.EventTable
 			base.DrawerSettings.UndefineSetting(name + "-showCategoryNames");
 			base.DrawerSettings.UndefineSetting(name + "-categoryNameColor");
 			base.DrawerSettings.UndefineSetting(name + "-enableColorGradients");
+			base.DrawerSettings.UndefineSetting(name + "-eventTimespanDaysFormatString");
+			base.DrawerSettings.UndefineSetting(name + "-eventTimespanHoursFormatString");
+			base.DrawerSettings.UndefineSetting(name + "-eventTimespanMinutesFormatString");
+			base.DrawerSettings.UndefineSetting(name + "-eventAbsoluteTimeFormatString");
 		}
 
 		public override void UpdateLocalization(TranslationService translationService)
