@@ -41,7 +41,7 @@ namespace RaidClears.Features.Fractals.Services
 				0 => new List<int> { 2, 37, 53 }, 
 				1 => new List<int> { 6, 28, 61 }, 
 				2 => new List<int> { 10, 32, 65 }, 
-				3 => new List<int> { 14, 34, 75 }, 
+				3 => new List<int> { 14, 34, 74 }, 
 				4 => new List<int> { 19, 37, 66 }, 
 				5 => new List<int> { 15, 41, 60 }, 
 				6 => new List<int> { 24, 35, 75 }, 
@@ -52,8 +52,8 @@ namespace RaidClears.Features.Fractals.Services
 				11 => new List<int> { 18, 27, 64 }, 
 				12 => new List<int> { 4, 30, 58 }, 
 				13 => new List<int> { 16, 42, 62 }, 
-				14 => new List<int> { 5, 48, 68 }, 
-				_ => new List<int> { 98, 99, 100 }, 
+				14 => new List<int> { 5, 47, 68 }, 
+				_ => new List<int> { 97, 98, 99, 100 }, 
 			};
 		}
 	}

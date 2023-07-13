@@ -18,6 +18,17 @@ namespace RaidClears.Features.Fractals.Services
 				select new BoxModel(e.Encounter.id ?? "", e.Encounter.name + "\n\n" + Strings.Strike_Tooltip_tomorrow + "\n" + e.TomorrowEncounter.GetLabel(), e.Encounter.shortName);
 		}
 
+		public static IEnumerable<BoxModel> GetCMFractals()
+		{
+			return new List<Encounters.Fractal>
+			{
+				Encounters.Fractal.NightmareFractal,
+				Encounters.Fractal.ShatteredObservatoryFractal,
+				Encounters.Fractal.SunquaPeakFractal,
+				Encounters.Fractal.SilentSurfFractal
+			}.Select((Encounters.Fractal e) => new BoxModel(e.GetApiLabel(), e.GetLabel(), e.GetLabelShort()));
+		}
+
 		public static IEnumerable<BoxModel> GetTomorrowTierN()
 		{
 			return from e in GetTomorrowTierNFractals()
@@ -75,7 +86,7 @@ namespace RaidClears.Features.Fractals.Services
 				{
 					Encounters.Fractal.DeepstoneFractal,
 					Encounters.Fractal.CaptainMaiTrinBossFractal,
-					Encounters.Fractal.SunquaPeakFractal
+					Encounters.Fractal.SilentSurfFractal
 				}, 
 				4 => new List<Encounters.Fractal>
 				{
@@ -105,7 +116,7 @@ namespace RaidClears.Features.Fractals.Services
 				{
 					Encounters.Fractal.VolcanicFractal,
 					Encounters.Fractal.SwamplandFractal,
-					Encounters.Fractal.ShatteredObservatoryFractal
+					Encounters.Fractal.SilentSurfFractal
 				}, 
 				9 => new List<Encounters.Fractal>
 				{

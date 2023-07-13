@@ -60,9 +60,15 @@ namespace RaidClears.Features.Strikes.Services
 			this.CompletedStrikes?.Invoke(this, clearedStrikesThisReset);
 		}
 
-		protected void MarkStrikeCompleted(Encounters.StrikeMission mission)
+		public void MarkStrikeCompleted(Encounters.StrikeMission mission)
 		{
 			Service.StrikePersistance.SaveClear(Service.CurrentAccountName, mission);
+			DispatchCurrentStrikeClears();
+		}
+
+		public void MarkStrikeNotCompleted(Encounters.StrikeMission mission)
+		{
+			Service.StrikePersistance.RemoveClear(Service.CurrentAccountName, mission);
 			DispatchCurrentStrikeClears();
 		}
 

@@ -83,6 +83,18 @@ namespace RaidClears.Features.Strikes.Services
 			Save();
 		}
 
+		public void RemoveClear(string account, Encounters.StrikeMission mission)
+		{
+			if (!AccountClears.TryGetValue(account, out var clears))
+			{
+				clears = GetEmpty();
+				AccountClears.Add(account, clears);
+			}
+			clears[mission] = default(DateTime);
+			AccountClears[account] = clears;
+			Save();
+		}
+
 		public void Save()
 		{
 			FileInfo configFileInfo = GetConfigFileInfo();
