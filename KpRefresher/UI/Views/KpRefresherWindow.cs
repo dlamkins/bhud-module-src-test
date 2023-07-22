@@ -328,10 +328,10 @@ namespace KpRefresher.UI.Views
 			((Control)_loadingSpinner).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
 			{
 				TimeSpan nextScheduledTimer = _businessService.GetNextScheduledTimer();
-				int num = (int)nextScheduledTimer.TotalMinutes;
-				if (num >= 1)
+				double totalMinutes = nextScheduledTimer.TotalMinutes;
+				if (totalMinutes >= 1.0)
 				{
-					((Control)_loadingSpinner).set_BasicTooltipText(string.Format(strings.MainWindow_Spinner_Minutes, num, (num > 1) ? "s" : string.Empty));
+					((Control)_loadingSpinner).set_BasicTooltipText(string.Format(strings.MainWindow_Spinner_Minutes, totalMinutes.ToString("0"), (totalMinutes > 1.0) ? "s" : string.Empty));
 				}
 				else
 				{

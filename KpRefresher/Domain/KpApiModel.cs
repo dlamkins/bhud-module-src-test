@@ -12,6 +12,12 @@ namespace KpRefresher.Domain
 		[JsonProperty("last_refresh")]
 		public DateTime LastRefresh { get; set; }
 
+		[JsonProperty("next_refresh")]
+		public DateTime NextRefresh { get; set; }
+
+		[JsonProperty("next_refresh_seconds")]
+		public double NextRefreshSeconds { get; set; }
+
 		[JsonProperty("account_name")]
 		public string AccountName { get; set; }
 
