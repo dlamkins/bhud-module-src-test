@@ -33,9 +33,9 @@ namespace Nekres.ProofLogix.Core.UI.Table
 			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			Rectangle dest = default(Rectangle);
-			((Rectangle)(ref dest))._002Ector(bounds.X + (bounds.Width - bounds.Height) / 2, bounds.Y, bounds.Height, bounds.Height);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(ProofLogix.Instance.Resources.GetApiIcon(tokenId)), dest);
+			Rectangle centered = default(Rectangle);
+			((Rectangle)(ref centered))._002Ector(bounds.X + (bounds.Width - bounds.Height) / 2, bounds.Y, bounds.Height, bounds.Height);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(ProofLogix.Instance.Resources.GetApiIcon(tokenId)), centered);
 		}
 	}
 }

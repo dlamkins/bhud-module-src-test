@@ -29,7 +29,7 @@ namespace Nekres.ProofLogix.Core.Services.PartySync.Models
 			}
 		}
 
-		public virtual string CharacterName => ((Player)(ref _arcDpsPlayer)).get_CharacterName();
+		public virtual string CharacterName => ((Player)(ref _arcDpsPlayer)).get_CharacterName() ?? string.Empty;
 
 		public bool HasAgent => !string.IsNullOrEmpty(((Player)(ref _arcDpsPlayer)).get_AccountName());
 

@@ -130,10 +130,10 @@ namespace Nekres.ProofLogix.Core.UI.KpProfile
 				//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
 				//IL_017b: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0180: Unknown result type (might be due to invalid IL or missing references)
-				//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
-				//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
-				//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
-				//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
+				//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
+				//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
+				//IL_01b5: Unknown result type (might be due to invalid IL or missing references)
+				//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
 				FlowPanel val = new FlowPanel();
 				((Control)val).set_Parent(parent);
 				((Control)val).set_Width(parent.get_ContentRegion().Width / 2 - 4);
@@ -167,7 +167,7 @@ namespace Nekres.ProofLogix.Core.UI.KpProfile
 					{
 						string text = $"{token.Name} x{token.Amount}";
 						Point size = LabelUtil.GetLabelSize((FontSize)14, text, hasPrefix: true);
-						AsyncTexture2D icon = ProofLogix.Instance.Resources.GetItem(token.Id)?.Icon ?? ProofLogix.Instance.Resources.GetApiIcon(token.Id);
+						AsyncTexture2D icon = ProofLogix.Instance.Resources.GetItem(token.Id).Icon;
 						((Control)new FormattedLabelBuilder().SetWidth(size.X).SetHeight(size.Y + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y).CreatePart(token.Name, (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder o)
 						{
 							o.SetFontSize((FontSize)14);

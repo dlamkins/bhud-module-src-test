@@ -142,68 +142,69 @@ namespace Nekres.ProofLogix.Core.UI.Home
 
 		protected override void Build(Container buildPanel)
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Expected O, but got Unknown
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Expected O, but got Unknown
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Expected O, but got Unknown
-			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0097: Expected O, but got Unknown
+			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f0: Expected O, but got Unknown
-			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0142: Expected O, but got Unknown
-			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0154: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0166: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f4: Expected O, but got Unknown
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0151: Expected O, but got Unknown
+			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0181: Expected O, but got Unknown
-			//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0190: Expected O, but got Unknown
+			//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ef: Expected O, but got Unknown
-			//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0213: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fe: Expected O, but got Unknown
+			//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0204: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0210: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0222: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0241: Expected O, but got Unknown
-			//IL_0242: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0247: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0261: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0231: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0250: Expected O, but got Unknown
+			//IL_0251: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0256: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0270: Unknown result type (might be due to invalid IL or missing references)
+			//IL_028b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_028d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0294: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a4: Expected O, but got Unknown
+			//IL_029c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a8: Expected O, but got Unknown
 			Panel val = new Panel();
 			((Control)val).set_Parent(buildPanel);
 			((Control)val).set_Width(200);
@@ -223,12 +224,14 @@ namespace Nekres.ProofLogix.Core.UI.Home
 			val3.set_Text("Owned Proofs");
 			((Control)val3).set_Width(((Container)navMenu).get_ContentRegion().Width);
 			val3.set_Icon(GameService.Content.get_DatAssetCache().GetTextureFromAssetId(156699));
+			((Control)val3).set_BasicTooltipText("Shows the current snapshot of your inventories.\nEnables you to verify if recent rewarded proofs are\nalready available to be recorded by killproof.me.");
 			MenuItem proofsEntry = val3;
 			MenuItem val4 = new MenuItem();
 			((Control)val4).set_Parent((Container)(object)navMenu);
 			val4.set_Text("Weekly Clears");
 			((Control)val4).set_Width(((Container)navMenu).get_ContentRegion().Width);
 			val4.set_Icon(GameService.Content.get_DatAssetCache().GetTextureFromAssetId(1234912));
+			((Control)val4).set_BasicTooltipText("Shows the current snapshot of your clears.\nEnables you to verify if recent completed encounters are\nalready available to be recorded by killproof.me.");
 			MenuItem clearsEntry = val4;
 			MenuItem val5 = new MenuItem();
 			((Control)val5).set_Parent((Container)(object)navMenu);
@@ -258,7 +261,6 @@ namespace Nekres.ProofLogix.Core.UI.Home
 			((Control)val8).set_Width(buildPanel.get_ContentRegion().Width - ((Control)menuPanel).get_Width());
 			((Control)val8).set_Height(buildPanel.get_ContentRegion().Height);
 			((Panel)val8).set_ShowBorder(true);
-			((Control)val8).set_BasicTooltipText("Shows the current snapshot of your account data.\nEnables you to verify if newly acquired progress is\nalready available for tracking by third-parties.");
 			ViewContainer plyPanel = val8;
 			buildPanel.add_ContentResized((EventHandler<RegionChangedEventArgs>)delegate(object _, RegionChangedEventArgs e)
 			{
@@ -289,7 +291,7 @@ namespace Nekres.ProofLogix.Core.UI.Home
 			});
 			((Control)proofsEntry).add_Click((EventHandler<MouseEventArgs>)async delegate
 			{
-				if (!IsApiAvailable())
+				if (!ProofLogix.Instance.Gw2WebApi.IsApiAvailable())
 				{
 					GameService.Content.PlaySoundEffectByName("error");
 				}
@@ -309,7 +311,7 @@ namespace Nekres.ProofLogix.Core.UI.Home
 			});
 			((Control)clearsEntry).add_Click((EventHandler<MouseEventArgs>)async delegate
 			{
-				if (!IsApiAvailable())
+				if (!ProofLogix.Instance.Gw2WebApi.IsApiAvailable())
 				{
 					GameService.Content.PlaySoundEffectByName("error");
 				}
@@ -348,27 +350,6 @@ namespace Nekres.ProofLogix.Core.UI.Home
 				ProofLogix.Instance.ToggleTable();
 			});
 			((View<IPresenter>)this).Build(buildPanel);
-		}
-
-		private bool IsApiAvailable()
-		{
-			if (string.IsNullOrWhiteSpace(GameService.Gw2Mumble.get_PlayerCharacter().get_Name()))
-			{
-				ScreenNotification.ShowNotification("API unavailable. Please, login to a character.", (NotificationType)2, (Texture2D)null, 4);
-				return false;
-			}
-			if (!ProofLogix.Instance.Gw2WebApi.HasSubtoken)
-			{
-				ScreenNotification.ShowNotification("Missing API key. Please, add an API key to BlishHUD.", (NotificationType)2, (Texture2D)null, 4);
-				return false;
-			}
-			if (ProofLogix.Instance.Gw2WebApi.MissingPermissions.Any())
-			{
-				string missing = string.Join(", ", ProofLogix.Instance.Gw2WebApi.MissingPermissions);
-				ScreenNotification.ShowNotification("Insufficient API permissions.\nRequired: " + missing, (NotificationType)2, (Texture2D)null, 4);
-				return false;
-			}
-			return true;
 		}
 	}
 }

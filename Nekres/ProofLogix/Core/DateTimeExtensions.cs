@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 
 namespace Nekres.ProofLogix.Core
 {
@@ -57,6 +58,22 @@ namespace Nekres.ProofLogix.Core
 				result = "about a minute ago";
 			}
 			return result;
+		}
+
+		public static string AsRelativeTime(this DateTime dateTime)
+		{
+			DateTime now = ((dateTime.Kind == DateTimeKind.Utc) ? DateTime.UtcNow : DateTime.Now);
+			string timePattern = CultureInfo.CurrentUICulture.DateTimeFormat.ShortTimePattern;
+			double totalDays = (now - dateTime).TotalDays;
+			if (!(totalDays < 1.0))
+			{
+				if (totalDays < 2.0)
+				{
+					return ((dateTime.Date > now.Date) ? "Tomorrow" : "Yesterday") + " at " + dateTime.ToString(timePattern);
+				}
+				return dateTime.ToString(CultureInfo.CurrentUICulture.DateTimeFormat.ShortDatePattern + " " + timePattern);
+			}
+			return "Today at " + dateTime.ToString(timePattern);
 		}
 	}
 }

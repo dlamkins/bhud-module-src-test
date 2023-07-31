@@ -37,6 +37,8 @@ namespace Nekres.ProofLogix.Core.UI.Table
 
 		private List<Rectangle> _tokenBounds;
 
+		private const char ELLIPSIS = '…';
+
 		public BitmapFont Font
 		{
 			get
@@ -202,47 +204,52 @@ namespace Nekres.ProofLogix.Core.UI.Table
 			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0204: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0209: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0215: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0261: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0267: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0276: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0199: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0217: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0229: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0234: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0244: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0249: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0280: Unknown result type (might be due to invalid IL or missing references)
+			//IL_028c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0291: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032f: Unknown result type (might be due to invalid IL or missing references)
 			ObservableCollection<TableConfig.Column> columns = ProofLogix.Instance.TableConfig.get_Value().Columns;
 			if (((Collection<TableConfig.Column>)(object)columns).Contains(TableConfig.Column.Timestamp))
 			{
 				string timestamp = Cut(Timestamp, MaxTimestampCellWidth);
 				_timestampBounds = new Rectangle(4, 0, MaxTimestampCellWidth, bounds.Height);
 				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, timestamp, Font, _timestampBounds, Color.get_White(), false, true, 2, (HorizontalAlignment)0, (VerticalAlignment)1);
+				UpdateTooltip(_timestampBounds, GetTimestampTooltip());
 			}
 			else
 			{
@@ -250,8 +257,11 @@ namespace Nekres.ProofLogix.Core.UI.Table
 			}
 			if (((Collection<TableConfig.Column>)(object)columns).Contains(TableConfig.Column.Class))
 			{
-				_classIconBounds = new Rectangle(((Rectangle)(ref _timestampBounds)).get_Right() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, 0, 32, 32);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(ClassIcon), _classIconBounds);
+				_classIconBounds = new Rectangle(((Rectangle)(ref _timestampBounds)).get_Right() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, 0, 36, bounds.Height);
+				Rectangle centered = default(Rectangle);
+				((Rectangle)(ref centered))._002Ector(_classIconBounds.X + (_classIconBounds.Width - _classIconBounds.Height) / 2, _classIconBounds.Y, _classIconBounds.Height, _classIconBounds.Height);
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(ClassIcon), centered);
+				UpdateTooltip(_classIconBounds, GetClassTooltip());
 			}
 			else
 			{
@@ -262,7 +272,7 @@ namespace Nekres.ProofLogix.Core.UI.Table
 				string characterName = Cut(CharacterName, MaxCharacterNameCellWidth);
 				_characterNameBounds = new Rectangle(((Rectangle)(ref _classIconBounds)).get_Right() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, 0, MaxCharacterNameCellWidth, bounds.Height);
 				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, characterName, Font, _characterNameBounds, Color.get_White(), false, true, 2, (HorizontalAlignment)0, (VerticalAlignment)1);
-				UpdateTooltip(_characterNameBounds, string.Empty);
+				UpdateTooltip(_characterNameBounds, GetCharacterTooltip());
 			}
 			else
 			{
@@ -273,7 +283,7 @@ namespace Nekres.ProofLogix.Core.UI.Table
 				string accountName = Cut(AccountName, MaxAccountNameCellWidth);
 				_accountNameBounds = new Rectangle(((Rectangle)(ref _characterNameBounds)).get_Right() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, 0, MaxAccountNameCellWidth, bounds.Height);
 				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, accountName, Font, _accountNameBounds, Color.get_White(), false, true, 2, (HorizontalAlignment)0, (VerticalAlignment)1);
-				UpdateTooltip(_accountNameBounds, string.Empty);
+				UpdateTooltip(_accountNameBounds, GetAccountTooltip());
 			}
 			else
 			{
@@ -286,12 +296,13 @@ namespace Nekres.ProofLogix.Core.UI.Table
 				tokenBounds = new Rectangle(((Rectangle)(ref tokenBounds)).get_Right() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X * 3, 0, MaxTokenCellWidth, bounds.Height);
 				tempTokenBounds.Add(tokenBounds);
 				PaintToken(spriteBatch, tokenBounds, id);
+				UpdateTooltip(tokenBounds, GetTokenTooltip(id));
 			}
 			_tokenBounds = tempTokenBounds;
 			((Control)this).set_Width(((Rectangle)(ref tokenBounds)).get_Right() + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X);
 		}
 
-		private string Cut(string text, int maxWidth)
+		protected string Cut(string text, int maxWidth)
 		{
 			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
@@ -300,12 +311,41 @@ namespace Nekres.ProofLogix.Core.UI.Table
 			{
 				result = result.Substring(0, result.Length - 1);
 			}
-			return result;
+			if (result.Length >= text.Length)
+			{
+				return result;
+			}
+			return result.TrimEnd() + "…";
+		}
+
+		protected virtual string GetTimestampTooltip()
+		{
+			return string.Empty;
+		}
+
+		protected virtual string GetClassTooltip()
+		{
+			return string.Empty;
+		}
+
+		protected virtual string GetCharacterTooltip()
+		{
+			return string.Empty;
+		}
+
+		protected virtual string GetAccountTooltip()
+		{
+			return string.Empty;
+		}
+
+		protected virtual string GetTokenTooltip(int tokenId)
+		{
+			return ProofLogix.Instance.Resources.GetItem(tokenId).Name;
 		}
 
 		protected abstract void PaintToken(SpriteBatch spriteBatch, Rectangle bounds, int tokenId);
 
-		protected void UpdateTooltip(Rectangle bounds, string basicTooltipText)
+		private void UpdateTooltip(Rectangle bounds, string basicTooltipText)
 		{
 			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
 			if (((Rectangle)(ref bounds)).Contains(((Control)this).get_RelativeMousePosition()))

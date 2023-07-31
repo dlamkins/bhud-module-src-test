@@ -153,8 +153,12 @@ namespace Nekres.ProofLogix.Core.Services
 
 		public AsyncTexture2D GetApiIcon(int itemId)
 		{
-			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			if (itemId == 0)
+			{
+				return AsyncTexture2D.op_Implicit(Textures.get_TransparentPixel());
+			}
 			if (_apiIcons.TryGetValue(itemId, out var tex))
 			{
 				return tex;
@@ -235,7 +239,7 @@ namespace Nekres.ProofLogix.Core.Services
 
 		public Resource GetItem(int id)
 		{
-			return _resources.Items.FirstOrDefault((Resource item) => item.Id == id);
+			return _resources.Items.FirstOrDefault((Resource item) => item.Id == id) ?? Resource.Empty;
 		}
 
 		public List<Resource> GetItems()
