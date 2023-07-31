@@ -59,7 +59,8 @@ namespace RaidClears.Features.Strikes.Models
 					new Encounter(Encounters.StrikeMission.VoiceAndClaw),
 					new Encounter(Encounters.StrikeMission.Whisper),
 					new Encounter(Encounters.StrikeMission.Boneskinner),
-					new Encounter(Encounters.StrikeMission.ColdWar)
+					new Encounter(Encounters.StrikeMission.ColdWar),
+					new Encounter(Encounters.StrikeMission.DragonStorm)
 				}),
 				new Strike(Strings.StrikeGroup_EoD, 9, Strings.StrikeGroup_Eod_abbr, new List<BoxModel>
 				{

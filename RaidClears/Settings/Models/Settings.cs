@@ -194,14 +194,15 @@ namespace RaidClears.Settings.Models
 
 			public static class Module
 			{
-				public static Setting<bool>[] ibsMissions = new Setting<bool>[6]
+				public static Setting<bool>[] ibsMissions = new Setting<bool>[7]
 				{
 					new StrikeSetting<bool>("StrikeVis_shiverpeak_pass", DefaultValue: true, () => Strings.Setting_Strike_SP_Label),
 					new StrikeSetting<bool>("StrikeVis_fraenir_of_jormag", DefaultValue: true, () => Strings.Setting_Strike_FoJ_Label),
 					new StrikeSetting<bool>("StrikeVis_voice_and_claw", DefaultValue: true, () => Strings.Setting_Strike_VandC_Label),
 					new StrikeSetting<bool>("StrikeVis_whisper_of_jormag", DefaultValue: true, () => Strings.Setting_Strike_WoJ_Label),
 					new StrikeSetting<bool>("StrikeVis_boneskinner", DefaultValue: true, () => Strings.Setting_Strike_BS_Label),
-					new StrikeSetting<bool>("StrikeVis_cold_war", DefaultValue: true, () => Strings.Setting_Strike_CW_Label)
+					new StrikeSetting<bool>("StrikeVis_cold_war", DefaultValue: true, () => Strings.Setting_Strike_CW_Label),
+					new StrikeSetting<bool>("StrikeVis_dragonstorm", DefaultValue: true, () => "Dragonstorm")
 				};
 
 				public static Setting<bool>[] eodMissions = new Setting<bool>[5]

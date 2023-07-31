@@ -20,6 +20,7 @@ namespace RaidClears.Features.Shared.Enums.Extensions
 				Encounters.StrikeMission.Overlook => Strings.Setting_Strike_KO_Label, 
 				Encounters.StrikeMission.HarvestTemple => Strings.Setting_Strike_HT_Label, 
 				Encounters.StrikeMission.OldLionsCourt => Strings.Setting_Strike_OLC_Label, 
+				Encounters.StrikeMission.DragonStorm => "Dragonstorm", 
 				_ => throw new ArgumentOutOfRangeException("value", value, null), 
 			};
 		}
@@ -39,6 +40,7 @@ namespace RaidClears.Features.Shared.Enums.Extensions
 				Encounters.StrikeMission.Overlook => Strings.Strike_Short_Overlook, 
 				Encounters.StrikeMission.HarvestTemple => Strings.Strike_Short_HarvestTemple, 
 				Encounters.StrikeMission.OldLionsCourt => Strings.Strike_Short_OldLionsCourt, 
+				Encounters.StrikeMission.DragonStorm => "DStm", 
 				_ => throw new ArgumentOutOfRangeException("value", value, null), 
 			};
 		}
@@ -58,6 +60,7 @@ namespace RaidClears.Features.Shared.Enums.Extensions
 				Encounters.StrikeMission.Overlook => "kaineng_overlook", 
 				Encounters.StrikeMission.HarvestTemple => "harvest_temple", 
 				Encounters.StrikeMission.OldLionsCourt => "old_lion_court", 
+				Encounters.StrikeMission.DragonStorm => "dragonstorm", 
 				_ => throw new ArgumentOutOfRangeException("value", value, null), 
 			};
 		}
@@ -77,6 +80,7 @@ namespace RaidClears.Features.Shared.Enums.Extensions
 				Encounters.StrikeMission.Overlook => StrikeMissionType.Eod, 
 				Encounters.StrikeMission.HarvestTemple => StrikeMissionType.Eod, 
 				Encounters.StrikeMission.OldLionsCourt => StrikeMissionType.Eod, 
+				Encounters.StrikeMission.DragonStorm => StrikeMissionType.Ibs, 
 				_ => throw new ArgumentOutOfRangeException("value", value, null), 
 			};
 		}

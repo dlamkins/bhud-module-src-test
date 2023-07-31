@@ -13,7 +13,7 @@ namespace RaidClears.Features.Strikes.Services
 		public static string FILENAME = "strike_clears.json";
 
 		[JsonProperty("version")]
-		public string Version { get; set; } = "2.0.0";
+		public string Version { get; set; } = "2.0.1";
 
 
 		[JsonProperty("accountClears")]
@@ -66,6 +66,10 @@ namespace RaidClears.Features.Strikes.Services
 				},
 				{
 					Encounters.StrikeMission.OldLionsCourt,
+					default(DateTime)
+				},
+				{
+					Encounters.StrikeMission.DragonStorm,
 					default(DateTime)
 				}
 			};

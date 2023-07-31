@@ -18,6 +18,8 @@ namespace RaidClears.Features.Shared.Enums.Extensions
 				MapIds.StrikeMaps.WhisperPublic => Encounters.StrikeMission.Whisper, 
 				MapIds.StrikeMaps.Boneskinner => Encounters.StrikeMission.Boneskinner, 
 				MapIds.StrikeMaps.BoneskinnerPublic => Encounters.StrikeMission.Boneskinner, 
+				MapIds.StrikeMaps.DragonStorm => Encounters.StrikeMission.DragonStorm, 
+				MapIds.StrikeMaps.DragonStormPublic => Encounters.StrikeMission.DragonStorm, 
 				MapIds.StrikeMaps.AetherbladeHideout => Encounters.StrikeMission.AetherbladeHideout, 
 				MapIds.StrikeMaps.Junkyard => Encounters.StrikeMission.Junkyard, 
 				MapIds.StrikeMaps.Overlook => Encounters.StrikeMission.Overlook, 

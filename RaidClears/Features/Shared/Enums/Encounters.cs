@@ -44,7 +44,8 @@ namespace RaidClears.Features.Shared.Enums
 			Junkyard,
 			Overlook,
 			HarvestTemple,
-			OldLionsCourt
+			OldLionsCourt,
+			DragonStorm
 		}
 
 		public enum Dungeons
