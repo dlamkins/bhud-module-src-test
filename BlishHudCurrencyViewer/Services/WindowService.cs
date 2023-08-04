@@ -101,39 +101,35 @@ namespace BlishHudCurrencyViewer.Services
 
 		public void RedrawWindowContent(List<UserCurrency> userCurrencies)
 		{
-			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Expected O, but got Unknown
-			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0187: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cc: Expected O, but got Unknown
-			//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0215: Expected O, but got Unknown
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a9: Expected O, but got Unknown
+			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017d: Expected O, but got Unknown
+			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c6: Expected O, but got Unknown
 			ResetDisplayData();
+			((Container)_window).set_HeightSizingMode((SizingMode)1);
+			((Container)_window).set_WidthSizingMode((SizingMode)1);
 			List<SettingEntry> selectedCurrencySettings = ((IEnumerable<SettingEntry>)_settingsManager.get_ModuleSettings()).Where((SettingEntry s) => s.get_EntryKey().StartsWith("currency-setting-") && ((s as SettingEntry<bool>)?.get_Value() ?? false)).ToList();
 			if (userCurrencies == null || userCurrencies.Count() == 0 || selectedCurrencySettings.Count() == 0)
 			{
-				((Control)_window).set_Height(120);
-				((Control)_window).set_Width(220);
-				((Container)_window).set_HeightSizingMode((SizingMode)0);
-				((Container)_window).set_WidthSizingMode((SizingMode)0);
 				Label val = new Label();
 				val.set_Text("You have not yet selected any currencies to track! Go to BlishHud's CurrencyViewer module settings to select some.");
 				((Control)val).set_Parent((Container)(object)_window);
@@ -144,14 +140,8 @@ namespace BlishHudCurrencyViewer.Services
 				_descriptionText = val;
 				return;
 			}
-			((Container)_window).set_HeightSizingMode((SizingMode)1);
 			for (int i = 0; i < selectedCurrencySettings.Count(); i++)
 			{
-				((Container)_window).set_AutoSizePadding(new Point
-				{
-					X = 70,
-					Y = 0
-				});
 				SettingEntry currency = selectedCurrencySettings[i];
 				UserCurrency userCurrency = userCurrencies.Find((UserCurrency c) => "currency-setting-" + c.CurrencyId == currency.get_EntryKey());
 				if (userCurrency == null)
