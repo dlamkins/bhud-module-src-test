@@ -198,13 +198,20 @@ namespace Nekres.ProofLogix.Core.UI.Home
 			//IL_0250: Expected O, but got Unknown
 			//IL_0251: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0256: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0270: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a8: Expected O, but got Unknown
+			//IL_0262: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0274: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0283: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a2: Expected O, but got Unknown
+			//IL_02a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fa: Expected O, but got Unknown
 			Panel val = new Panel();
 			((Control)val).set_Parent(buildPanel);
 			((Control)val).set_Width(200);
@@ -255,13 +262,19 @@ namespace Nekres.ProofLogix.Core.UI.Home
 			((Control)val7).set_Width(((Container)navMenu).get_ContentRegion().Width);
 			val7.set_Icon(GameService.Content.get_DatAssetCache().GetTextureFromAssetId(156407));
 			MenuItem squadTableEntry = val7;
-			ViewContainer val8 = new ViewContainer();
-			((Control)val8).set_Parent(buildPanel);
-			((Control)val8).set_Left(((Control)menuPanel).get_Right());
-			((Control)val8).set_Width(buildPanel.get_ContentRegion().Width - ((Control)menuPanel).get_Width());
-			((Control)val8).set_Height(buildPanel.get_ContentRegion().Height);
-			((Panel)val8).set_ShowBorder(true);
-			ViewContainer plyPanel = val8;
+			MenuItem val8 = new MenuItem();
+			((Control)val8).set_Parent((Container)(object)separatorEntry);
+			val8.set_Text("Smart Ping");
+			((Control)val8).set_Width(((Container)navMenu).get_ContentRegion().Width);
+			val8.set_Icon(GameService.Content.get_DatAssetCache().GetTextureFromAssetId(155157));
+			MenuItem smartPingEntry = val8;
+			ViewContainer val9 = new ViewContainer();
+			((Control)val9).set_Parent(buildPanel);
+			((Control)val9).set_Left(((Control)menuPanel).get_Right());
+			((Control)val9).set_Width(buildPanel.get_ContentRegion().Width - ((Control)menuPanel).get_Width());
+			((Control)val9).set_Height(buildPanel.get_ContentRegion().Height);
+			((Panel)val9).set_ShowBorder(true);
+			ViewContainer plyPanel = val9;
 			buildPanel.add_ContentResized((EventHandler<RegionChangedEventArgs>)delegate(object _, RegionChangedEventArgs e)
 			{
 				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
@@ -283,11 +296,13 @@ namespace Nekres.ProofLogix.Core.UI.Home
 				//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0049: Unknown result type (might be due to invalid IL or missing references)
 				//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0075: Unknown result type (might be due to invalid IL or missing references)
 				((Control)proofsEntry).set_Width(e.get_CurrentRegion().Width);
 				((Control)clearsEntry).set_Height(e.get_CurrentRegion().Height);
 				((Control)separatorEntry).set_Width(e.get_CurrentRegion().Width);
 				((Control)myProfileEntry).set_Height(e.get_CurrentRegion().Height);
 				((Control)squadTableEntry).set_Height(e.get_CurrentRegion().Height);
+				((Control)smartPingEntry).set_Height(e.get_CurrentRegion().Height);
 			});
 			((Control)proofsEntry).add_Click((EventHandler<MouseEventArgs>)async delegate
 			{
@@ -319,8 +334,8 @@ namespace Nekres.ProofLogix.Core.UI.Home
 				{
 					ProofLogix.Instance.Resources.PlayMenuItemClick();
 					plyPanel.Show((IView)(object)new LoadingView("Loading clears.."));
-					ViewContainer val9 = plyPanel;
-					val9.Show((IView)(object)new ClearsView(await ProofLogix.Instance.Gw2WebApi.GetClears()));
+					ViewContainer val10 = plyPanel;
+					val10.Show((IView)(object)new ClearsView(await ProofLogix.Instance.Gw2WebApi.GetClears()));
 				}
 			});
 			((Control)myProfileEntry).add_Click((EventHandler<MouseEventArgs>)delegate
@@ -348,6 +363,11 @@ namespace Nekres.ProofLogix.Core.UI.Home
 			{
 				ProofLogix.Instance.Resources.PlayMenuItemClick();
 				ProofLogix.Instance.ToggleTable();
+			});
+			((Control)smartPingEntry).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				ProofLogix.Instance.Resources.PlayMenuItemClick();
+				ProofLogix.Instance.ToggleSmartPing();
 			});
 			((View<IPresenter>)this).Build(buildPanel);
 		}

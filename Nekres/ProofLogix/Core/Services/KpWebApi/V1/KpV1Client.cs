@@ -18,37 +18,41 @@ namespace Nekres.ProofLogix.Core.Services.KpWebApi.V1
 
 		public async Task<Profile> GetProfile(string id)
 		{
-			return (await HttpUtil.RetryAsync<Profile>(() => _uri.AppendPathSegments("kp", id).GetAsync(default(CancellationToken), (HttpCompletionOption)0))) ?? Profile.Empty;
+			return (await HttpUtil.RetryAsync<Profile>(() => GeneratedExtensions.GetAsync(StringExtensions.AppendPathSegments(_uri, new object[2] { "kp", id }), default(CancellationToken), (HttpCompletionOption)0))) ?? Profile.Empty;
 		}
 
 		public async Task<Profile> GetProfileByCharacter(string name)
 		{
-			return (await HttpUtil.RetryAsync<Profile>(() => _uri.AppendPathSegments("character", name, "kp").GetAsync(default(CancellationToken), (HttpCompletionOption)0))) ?? Profile.Empty;
+			return (await HttpUtil.RetryAsync<Profile>(() => GeneratedExtensions.GetAsync(StringExtensions.AppendPathSegments(_uri, new object[3] { "character", name, "kp" }), default(CancellationToken), (HttpCompletionOption)0))) ?? Profile.Empty;
 		}
 
 		public async Task<List<Clear>> GetClears(string id)
 		{
-			return FormatClears(await HttpUtil.RetryAsync<JObject>(() => _uri.AppendPathSegments("clear", id).GetAsync(default(CancellationToken), (HttpCompletionOption)0)));
+			return FormatClears(await HttpUtil.RetryAsync<JObject>(() => GeneratedExtensions.GetAsync(StringExtensions.AppendPathSegments(_uri, new object[2] { "clear", id }), default(CancellationToken), (HttpCompletionOption)0)));
 		}
 
 		public async Task<List<Clear>> GetClearsByCharacter(string name)
 		{
-			return FormatClears(await HttpUtil.RetryAsync<JObject>(() => _uri.AppendPathSegments("character", name, "clear").GetAsync(default(CancellationToken), (HttpCompletionOption)0)));
+			return FormatClears(await HttpUtil.RetryAsync<JObject>(() => GeneratedExtensions.GetAsync(StringExtensions.AppendPathSegments(_uri, new object[3] { "character", name, "clear" }), default(CancellationToken), (HttpCompletionOption)0)));
 		}
 
 		public async Task<bool> Refresh(string id)
 		{
-			return (await HttpUtil.RetryAsync<Refresh>(() => ("https://killproof.me/proof/" + id + "/refresh").GetAsync(default(CancellationToken), (HttpCompletionOption)0)))?.Status.Equals("ok") ?? false;
+			return (await HttpUtil.RetryAsync<Refresh>(() => GeneratedExtensions.GetAsync("https://killproof.me/proof/" + id + "/refresh", default(CancellationToken), (HttpCompletionOption)0)))?.Status.Equals("ok") ?? false;
 		}
 
 		public async Task<bool> CheckProofBusy(string id)
 		{
-			return (await HttpUtil.RetryAsync<ProofBusy>(() => ("https://killproof.me/proofbusy/" + id).GetAsync(default(CancellationToken), (HttpCompletionOption)0))).Busy != 2;
+			return (await HttpUtil.RetryAsync<ProofBusy>(() => GeneratedExtensions.GetAsync("https://killproof.me/proofbusy/" + id, default(CancellationToken), (HttpCompletionOption)0))).Busy != 2;
 		}
 
 		public async Task<Opener> GetOpener(string encounter, Opener.ServerRegion region)
 		{
-			Opener response = await HttpUtil.RetryAsync<Opener>(() => _uri.AppendPathSegment("opener").SetQueryParams("encounter=" + encounter, $"region={region}").GetAsync(default(CancellationToken), (HttpCompletionOption)0));
+			Opener response = await HttpUtil.RetryAsync<Opener>(() => GeneratedExtensions.GetAsync(StringExtensions.AppendPathSegment(_uri, (object)"opener", false).SetQueryParams(new string[2]
+			{
+				"encounter=" + encounter,
+				$"region={region}"
+			}), default(CancellationToken), (HttpCompletionOption)0));
 			if (response == null)
 			{
 				return Opener.Empty;
@@ -64,11 +68,11 @@ namespace Nekres.ProofLogix.Core.Services.KpWebApi.V1
 				//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 				//IL_005b: Expected O, but got Unknown
-				Url url = _uri.AppendPathSegment("addkey");
+				Url obj = StringExtensions.AppendPathSegment(_uri, (object)"addkey", false);
 				JObject val = new JObject();
 				val.set_Item("key", JToken.op_Implicit(apiKey));
 				val.set_Item("opener", JToken.op_Implicit(Convert.ToInt32(opener)));
-				return url.PostJsonAsync((object)val, default(CancellationToken), (HttpCompletionOption)0);
+				return GeneratedExtensions.PostJsonAsync(obj, (object)val, default(CancellationToken), (HttpCompletionOption)0);
 			})) ?? new AddKey
 			{
 				Error = "No response."

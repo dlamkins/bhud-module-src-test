@@ -9,6 +9,7 @@ using Blish_HUD.Content;
 using Blish_HUD.Extended;
 using Gw2Sharp.Models;
 using Gw2Sharp.WebApi;
+using Gw2Sharp.WebApi.Exceptions;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
@@ -153,8 +154,8 @@ namespace Nekres.ProofLogix.Core.Services
 
 		public AsyncTexture2D GetApiIcon(int itemId)
 		{
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
 			if (itemId == 0)
 			{
 				return AsyncTexture2D.op_Implicit(Textures.get_TransparentPixel());
@@ -163,19 +164,38 @@ namespace Nekres.ProofLogix.Core.Services
 			{
 				return tex;
 			}
-			Item response = ((IBulkExpandableClient<Item, int>)(object)GameService.Gw2WebApi.get_AnonymousConnection().get_Client().get_V2()
-				.get_Items()).GetAsync(itemId, default(CancellationToken)).Result;
-			int num;
-			if (response == null)
+			Item response = null;
+			try
 			{
-				num = 1;
+				response = ((IBulkExpandableClient<Item, int>)(object)GameService.Gw2WebApi.get_AnonymousConnection().get_Client().get_V2()
+					.get_Items()).GetAsync(itemId, default(CancellationToken)).Result;
 			}
-			else
+			catch (Exception e)
 			{
-				response.get_Icon();
-				num = 0;
+				if (!(e is NotFoundException) && !(e is BadRequestException) && !(e is AuthorizationRequiredException))
+				{
+					if (!(e is TooManyRequestsException))
+					{
+						if (e is RequestException || e is RequestException<string>)
+						{
+							ProofLogix.Logger.Trace(e, e.Message);
+						}
+						else
+						{
+							ProofLogix.Logger.Error(e, e.Message);
+						}
+					}
+					else
+					{
+						ProofLogix.Logger.Warn(e, "No icon could be loaded due to being rate limited by the API.");
+					}
+				}
+				else
+				{
+					ProofLogix.Logger.Trace(e, e.Message);
+				}
 			}
-			if (num != 0)
+			if (response == null || string.IsNullOrEmpty(RenderUrl.op_Implicit(response.get_Icon())))
 			{
 				return AsyncTexture2D.op_Implicit(Textures.get_TransparentPixel());
 			}

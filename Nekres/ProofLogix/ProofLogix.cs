@@ -10,12 +10,14 @@ using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Nekres.ProofLogix.Core.Services;
 using Nekres.ProofLogix.Core.UI;
 using Nekres.ProofLogix.Core.UI.Configs;
 using Nekres.ProofLogix.Core.UI.Home;
 using Nekres.ProofLogix.Core.UI.LookingForOpener;
+using Nekres.ProofLogix.Core.UI.SmartPing;
 using Nekres.ProofLogix.Core.UI.Table;
 
 namespace Nekres.ProofLogix
@@ -39,6 +41,8 @@ namespace Nekres.ProofLogix
 
 		private StandardWindow _registerWindow;
 
+		private StandardWindow _smartPing;
+
 		private CornerIcon _cornerIcon;
 
 		internal AsyncTexture2D Emblem;
@@ -51,7 +55,13 @@ namespace Nekres.ProofLogix
 
 		internal SettingEntry<TableConfig> TableConfig;
 
+		internal SettingEntry<SmartPingConfig> SmartPingConfig;
+
+		internal SettingEntry<KeyBinding> ChatMessageKey;
+
 		private SettingEntry<KeyBinding> _tableKey;
+
+		private SettingEntry<KeyBinding> _smartPingKey;
 
 		internal static ProofLogix Instance { get; private set; }
 
@@ -74,11 +84,18 @@ namespace Nekres.ProofLogix
 		{
 			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 			//IL_007f: Expected O, but got Unknown
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d6: Expected O, but got Unknown
+			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012c: Expected O, but got Unknown
 			SettingCollection keyBindings = settings.AddSubCollection("bindings", true, false, (Func<string>)(() => "Key Bindings"));
 			_tableKey = keyBindings.DefineSetting<KeyBinding>("table_key", new KeyBinding((ModifierKeys)1, (Keys)75), (Func<string>)(() => "Party Table"), (Func<string>)(() => "Open or close the Party Table dialog."));
+			_smartPingKey = keyBindings.DefineSetting<KeyBinding>("smart_ping_key", new KeyBinding((ModifierKeys)1, (Keys)76), (Func<string>)(() => "Smart Ping"), (Func<string>)(() => "Open or close the Smart Ping dialog."));
+			ChatMessageKey = keyBindings.DefineSetting<KeyBinding>("chat_message_key", new KeyBinding((Keys)13), (Func<string>)(() => "Chat Message"), (Func<string>)(() => "Give focus to the chat edit box."));
 			SettingCollection selfManaged = settings.AddSubCollection("configs", false, false);
 			LfoConfig = selfManaged.DefineSetting<LfoConfig>("lfo_config", Nekres.ProofLogix.Core.UI.Configs.LfoConfig.Default, (Func<string>)null, (Func<string>)null);
 			TableConfig = selfManaged.DefineSetting<TableConfig>("table_config", Nekres.ProofLogix.Core.UI.Configs.TableConfig.Default, (Func<string>)null, (Func<string>)null);
+			SmartPingConfig = selfManaged.DefineSetting<SmartPingConfig>("smart_ping_config", Nekres.ProofLogix.Core.UI.Configs.SmartPingConfig.Default, (Func<string>)null, (Func<string>)null);
 		}
 
 		protected override void Initialize()
@@ -107,7 +124,7 @@ namespace Nekres.ProofLogix
 			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
@@ -122,6 +139,20 @@ namespace Nekres.ProofLogix
 			//IL_01e1: Expected O, but got Unknown
 			//IL_021b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_022e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0304: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0314: Unknown result type (might be due to invalid IL or missing references)
+			//IL_031f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0335: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0340: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0357: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0365: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0382: Expected O, but got Unknown
 			GameService.ArcDps.get_Common().Activate();
 			Emblem = AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("emblem.png"));
 			_icon = AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("icon.png"));
@@ -133,8 +164,8 @@ namespace Nekres.ProofLogix
 			TabbedWindow2 val2 = new TabbedWindow2(GameService.Content.get_DatAssetCache().GetTextureFromAssetId(155985), new Rectangle(40, 26, 913, 691), new Rectangle(100, 36, 839, 605));
 			((Control)val2).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((WindowBase2)val2).set_Title(((Module)this).get_Name());
+			((WindowBase2)val2).set_Subtitle("Account");
 			((WindowBase2)val2).set_Emblem(AsyncTexture2D.op_Implicit(Emblem));
-			((WindowBase2)val2).set_Subtitle("Kill Proof");
 			((WindowBase2)val2).set_Id("ProofLogix_KillProof_91702dd39f0340b5bd7883cc566e4f63");
 			((WindowBase2)val2).set_CanResize(true);
 			((WindowBase2)val2).set_SavesSize(true);
@@ -160,11 +191,39 @@ namespace Nekres.ProofLogix
 			((Control)lockableAxisWindow).set_Visible(false);
 			((WindowBase2)lockableAxisWindow).set_Emblem(AsyncTexture2D.op_Implicit(Emblem));
 			_table = lockableAxisWindow;
+			StandardWindow val3 = new StandardWindow(GameService.Content.get_DatAssetCache().GetTextureFromAssetId(155985), new Rectangle(40, 26, 913, 691), new Rectangle(70, 36, 839, 645));
+			((Control)val3).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			((Control)val3).set_Width(500);
+			((Control)val3).set_Height(150);
+			((WindowBase2)val3).set_Id("ProofLogix_SmartPing_1f4fa9243b014915bfb7af4be545cb7b");
+			((WindowBase2)val3).set_Title("Smart Ping");
+			((WindowBase2)val3).set_Subtitle(GetKeyCombinationString(_smartPingKey.get_Value()));
+			((WindowBase2)val3).set_SavesPosition(true);
+			((WindowBase2)val3).set_CanCloseWithEscape(false);
+			((Control)val3).set_Visible(false);
+			((WindowBase2)val3).set_Emblem(AsyncTexture2D.op_Implicit(Emblem));
+			_smartPing = val3;
 			((Control)_cornerIcon).add_Click((EventHandler<MouseEventArgs>)OnCornerIconClick);
 			_tableKey.get_Value().add_Activated((EventHandler<EventArgs>)OnTableKeyActivated);
 			_tableKey.get_Value().add_BindingChanged((EventHandler<EventArgs>)OnTableKeyBindingChanged);
 			_tableKey.get_Value().set_Enabled(true);
+			_smartPingKey.get_Value().add_Activated((EventHandler<EventArgs>)OnSmartPingKeyActivated);
+			_smartPingKey.get_Value().add_BindingChanged((EventHandler<EventArgs>)OnSmartPingKeyBindingChanged);
+			_smartPingKey.get_Value().set_Enabled(true);
 			((Module)this).OnModuleLoaded(e);
+		}
+
+		private void OnSmartPingKeyBindingChanged(object sender, EventArgs e)
+		{
+			if (_smartPing != null)
+			{
+				((WindowBase2)_smartPing).set_Subtitle(GetKeyCombinationString(_smartPingKey.get_Value()));
+			}
+		}
+
+		private void OnSmartPingKeyActivated(object sender, EventArgs e)
+		{
+			ToggleSmartPing();
 		}
 
 		private void OnTableKeyBindingChanged(object sender, EventArgs e)
@@ -175,11 +234,16 @@ namespace Nekres.ProofLogix
 			}
 		}
 
+		private void OnTableKeyActivated(object sender, EventArgs e)
+		{
+			ToggleTable();
+		}
+
 		private string GetKeyCombinationString(KeyBinding keyBinding)
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
@@ -190,11 +254,11 @@ namespace Nekres.ProofLogix
 			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
 			if ((int)keyBinding.get_ModifierKeys() == 0)
 			{
-				if ((int)keyBinding.get_PrimaryKey() == 0)
+				if ((int)keyBinding.get_PrimaryKey() != 0)
 				{
-					return string.Empty;
+					return $"[{keyBinding.get_PrimaryKey()}]";
 				}
-				return $"[{keyBinding.get_PrimaryKey()}]";
+				return string.Empty;
 			}
 			string modifierString = string.Empty;
 			if ((keyBinding.get_ModifierKeys() & 1) != 0)
@@ -212,11 +276,6 @@ namespace Nekres.ProofLogix
 			string text = modifierString;
 			Keys primaryKey = keyBinding.get_PrimaryKey();
 			return "[" + text + ((object)(Keys)(ref primaryKey)).ToString() + "]";
-		}
-
-		private void OnTableKeyActivated(object sender, EventArgs e)
-		{
-			ToggleTable();
 		}
 
 		public void ToggleRegisterWindow()
@@ -261,12 +320,25 @@ namespace Nekres.ProofLogix
 			((StandardWindow)_table).ToggleWindow((IView)(object)new TableView(TableConfig.get_Value()));
 		}
 
+		public void ToggleSmartPing()
+		{
+			if (!PartySync.LocalPlayer.HasKpProfile)
+			{
+				GameService.Content.PlaySoundEffectByName("error");
+				ScreenNotification.ShowNotification("Smart Ping unavailable. Profile not yet loaded.", (NotificationType)2, (Texture2D)null, 4);
+			}
+			else
+			{
+				_smartPing.ToggleWindow((IView)(object)new SmartPingView(SmartPingConfig.get_Value()));
+			}
+		}
+
 		private void OnTabChanged(object sender, ValueChangedEventArgs<Tab> e)
 		{
-			TabbedWindow2 wnd = (TabbedWindow2)((sender is TabbedWindow2) ? sender : null);
+			WindowBase2 wnd = (WindowBase2)((sender is WindowBase2) ? sender : null);
 			if (wnd != null)
 			{
-				((WindowBase2)wnd).set_Subtitle(e.get_NewValue().get_Name());
+				wnd.set_Subtitle(e.get_NewValue().get_Name());
 			}
 		}
 
@@ -277,6 +349,10 @@ namespace Nekres.ProofLogix
 
 		protected override void Unload()
 		{
+			_smartPingKey.get_Value().set_Enabled(false);
+			_smartPingKey.get_Value().remove_BindingChanged((EventHandler<EventArgs>)OnSmartPingKeyBindingChanged);
+			_smartPingKey.get_Value().remove_Activated((EventHandler<EventArgs>)OnSmartPingKeyActivated);
+			_tableKey.get_Value().set_Enabled(false);
 			_tableKey.get_Value().remove_BindingChanged((EventHandler<EventArgs>)OnTableKeyBindingChanged);
 			_tableKey.get_Value().remove_Activated((EventHandler<EventArgs>)OnTableKeyActivated);
 			_window.remove_TabChanged((EventHandler<ValueChangedEventArgs<Tab>>)OnTabChanged);
