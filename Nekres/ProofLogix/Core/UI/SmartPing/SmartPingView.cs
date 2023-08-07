@@ -70,40 +70,40 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 			//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0205: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0215: Expected O, but got Unknown
-			//IL_02cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e3: Expected O, but got Unknown
-			//IL_02e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0304: Expected O, but got Unknown
-			//IL_0305: Expected O, but got Unknown
-			//IL_0327: Unknown result type (might be due to invalid IL or missing references)
-			//IL_032c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0338: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0339: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0343: Expected O, but got Unknown
-			//IL_0345: Expected O, but got Unknown
-			//IL_0368: Unknown result type (might be due to invalid IL or missing references)
-			//IL_036d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0379: Unknown result type (might be due to invalid IL or missing references)
-			//IL_037a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0384: Expected O, but got Unknown
-			//IL_0386: Expected O, but got Unknown
-			//IL_03c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e0: Expected O, but got Unknown
-			//IL_03e2: Expected O, but got Unknown
-			//IL_0460: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0465: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0471: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0472: Unknown result type (might be due to invalid IL or missing references)
-			//IL_047c: Expected O, but got Unknown
-			//IL_047e: Expected O, but got Unknown
+			//IL_02de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ea: Expected O, but got Unknown
+			//IL_02ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0300: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0301: Unknown result type (might be due to invalid IL or missing references)
+			//IL_030b: Expected O, but got Unknown
+			//IL_030c: Expected O, but got Unknown
+			//IL_032e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0333: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0340: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034a: Expected O, but got Unknown
+			//IL_034c: Expected O, but got Unknown
+			//IL_036f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0374: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0380: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0381: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038b: Expected O, but got Unknown
+			//IL_038d: Expected O, but got Unknown
+			//IL_03ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e7: Expected O, but got Unknown
+			//IL_03e9: Expected O, but got Unknown
+			//IL_0467: Unknown result type (might be due to invalid IL or missing references)
+			//IL_046c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0478: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0479: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0483: Expected O, but got Unknown
+			//IL_0485: Expected O, but got Unknown
 			Image val = new Image(_cogWheelIcon);
 			((Control)val).set_Parent(buildPanel);
 			((Control)val).set_Width(32);
@@ -183,53 +183,66 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 			int currentReduction = 0;
 			int currentValue = 0;
 			int currentRepetitions = 0;
+			bool busy = false;
 			((Control)sendBttn).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
 			{
-				//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0102: Expected O, but got Unknown
-				ProofLogix.Instance.Resources.PlayMenuItemClick();
-				int amount2 = ProofLogix.Instance.PartySync.LocalPlayer.KpProfile.GetToken(_config.SelectedToken).Amount;
-				if (!CanSend(amount2, lastTotalReachedTime))
+				//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0119: Expected O, but got Unknown
+				if (!busy)
 				{
-					GameService.Content.PlaySoundEffectByName("error");
-				}
-				else
-				{
-					if (DateTime.UtcNow.Subtract(lastSendTime).TotalMilliseconds > 500.0)
+					busy = true;
+					ProofLogix.Instance.Resources.PlayMenuItemClick();
+					int amount2 = ProofLogix.Instance.PartySync.LocalPlayer.KpProfile.GetToken(_config.SelectedToken).Amount;
+					if (!CanSend(amount2, lastTotalReachedTime))
 					{
-						currentReduction = 0;
-						currentValue = 0;
-						currentRepetitions = 0;
+						GameService.Content.PlaySoundEffectByName("error");
+						busy = false;
 					}
-					lastSendTime = DateTime.UtcNow;
-					ItemChatLink val12 = new ItemChatLink();
-					val12.set_ItemId(_config.SelectedToken);
-					val12.set_Quantity(Convert.ToByte((amount2 <= 250) ? amount2 : GetNext(amount2, ref currentReduction, ref currentValue, ref currentRepetitions, ref lastTotalReachedTime)));
-					ChatUtil.Send(((object)val12).ToString(), ProofLogix.Instance.ChatMessageKey.get_Value());
+					else
+					{
+						if (DateTime.UtcNow.Subtract(lastSendTime).TotalMilliseconds > 500.0)
+						{
+							currentReduction = 0;
+							currentValue = 0;
+							currentRepetitions = 0;
+						}
+						lastSendTime = DateTime.UtcNow;
+						ItemChatLink val12 = new ItemChatLink();
+						val12.set_ItemId(_config.SelectedToken);
+						val12.set_Quantity(Convert.ToByte((amount2 <= 250) ? amount2 : GetNext(amount2, ref currentReduction, ref currentValue, ref currentRepetitions, ref lastTotalReachedTime)));
+						ChatUtil.Send(((object)val12).ToString(), ProofLogix.Instance.ChatMessageKey.get_Value());
+						busy = false;
+					}
 				}
 			});
 			((Control)sendBttn).add_RightMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
 			{
-				//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-				//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0085: Expected O, but got Unknown
-				ProofLogix.Instance.Resources.PlayMenuItemClick();
-				int amount = ProofLogix.Instance.PartySync.LocalPlayer.KpProfile.GetToken(_config.SelectedToken).Amount;
-				if (!CanSend(amount, lastTotalReachedTime))
+				//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+				//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+				//IL_009c: Expected O, but got Unknown
+				if (!busy)
 				{
-					GameService.Content.PlaySoundEffectByName("error");
-				}
-				else
-				{
-					ItemChatLink val10 = new ItemChatLink();
-					val10.set_ItemId(_config.SelectedToken);
-					val10.set_Quantity((byte)1);
-					ItemChatLink val11 = val10;
-					ChatUtil.Send($"{'['}{amount} {val11}{']'}", ProofLogix.Instance.ChatMessageKey.get_Value());
-					lastTotalReachedTime = DateTime.UtcNow;
+					busy = true;
+					ProofLogix.Instance.Resources.PlayMenuItemClick();
+					int amount = ProofLogix.Instance.PartySync.LocalPlayer.KpProfile.GetToken(_config.SelectedToken).Amount;
+					if (!CanSend(amount, lastTotalReachedTime))
+					{
+						GameService.Content.PlaySoundEffectByName("error");
+						busy = false;
+					}
+					else
+					{
+						ItemChatLink val10 = new ItemChatLink();
+						val10.set_ItemId(_config.SelectedToken);
+						val10.set_Quantity((byte)1);
+						ItemChatLink val11 = val10;
+						ChatUtil.Send($"{'['}{amount} {val11}{']'}", ProofLogix.Instance.ChatMessageKey.get_Value());
+						lastTotalReachedTime = DateTime.UtcNow;
+						busy = false;
+					}
 				}
 			});
 			ContextMenuStrip val4 = new ContextMenuStrip();
