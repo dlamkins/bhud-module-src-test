@@ -1,6 +1,7 @@
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.Extended;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.BitmapFonts;
@@ -11,9 +12,11 @@ namespace Nekres.ProofLogix.Core.UI
 	{
 		private int _amount;
 
-		private BitmapFont _font = GameService.Content.get_DefaultFont14();
+		private Color _borderColor;
 
-		private readonly Color _amountColor = new Color(255, 237, 159);
+		private BitmapFont _font = GameService.Content.get_DefaultFont16();
+
+		private readonly Color _amountColor = new Color(255, 247, 169);
 
 		public int Amount
 		{
@@ -24,6 +27,20 @@ namespace Nekres.ProofLogix.Core.UI
 			set
 			{
 				((Control)this).SetProperty<int>(ref _amount, value, false, "Amount");
+			}
+		}
+
+		public Color BorderColor
+		{
+			get
+			{
+				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+				return _borderColor;
+			}
+			set
+			{
+				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+				((Control)this).SetProperty<Color>(ref _borderColor, value, false, "BorderColor");
 			}
 		}
 
@@ -49,14 +66,17 @@ namespace Nekres.ProofLogix.Core.UI
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
 			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 			((Image)this).Paint(spriteBatch, bounds);
+			spriteBatch.DrawRectangleOnCtrl((Control)(object)this, bounds, 2, BorderColor);
 			string text = Amount.ToString();
 			Rectangle dest = default(Rectangle);
-			((Rectangle)(ref dest))._002Ector(-4, 0, bounds.Width, bounds.Height);
+			((Rectangle)(ref dest))._002Ector(-6, 2, bounds.Width, bounds.Height);
 			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, Font, dest, _amountColor, false, true, 2, (HorizontalAlignment)2, (VerticalAlignment)0);
 		}
 	}

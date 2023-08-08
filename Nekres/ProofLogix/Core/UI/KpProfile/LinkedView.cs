@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models;
@@ -40,9 +41,13 @@ namespace Nekres.ProofLogix.Core.UI.KpProfile
 			//IL_011f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
 			//IL_013a: Expected O, but got Unknown
-			//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ce: Expected O, but got Unknown
+			//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021f: Expected O, but got Unknown
 			ViewContainer val = new ViewContainer();
 			((Control)val).set_Parent(buildPanel);
 			((Control)val).set_Width(buildPanel.get_ContentRegion().Width);
@@ -83,8 +88,10 @@ namespace Nekres.ProofLogix.Core.UI.KpProfile
 			((Control)profileContainer).set_Left(((Control)menuPanel).get_Right());
 			foreach (Profile profile in _profile.Accounts)
 			{
-				MenuItem val4 = new MenuItem(profile.Name);
+				MenuItem val4 = new MenuItem(AssetUtil.Truncate(profile.Name, ((Container)menu).get_ContentRegion().Width - 14, GameService.Content.get_DefaultFont16()));
 				((Control)val4).set_Parent((Container)(object)menu);
+				((Control)val4).set_BasicTooltipText(profile.Name);
+				((Control)val4).set_Width(((Container)menu).get_ContentRegion().Width);
 				MenuItem entry = val4;
 				entry.add_ItemSelected((EventHandler<ControlActivatedEventArgs>)delegate
 				{

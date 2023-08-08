@@ -7,6 +7,7 @@ using System.Timers;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.Extended;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
@@ -99,7 +100,7 @@ namespace Nekres.ProofLogix.Core.UI.KpProfile
 				List<Resource> fractalResources = ProofLogix.Instance.Resources.GetItemsForFractals();
 				List<Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Token> source = totals.GetTokens().ToList();
 				IEnumerable<Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Token> fractalTokens = source.Where((Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Token token) => fractalResources.Any((Resource res) => res.Id == token.Id));
-				IEnumerable<Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Token> raidTokens = source.Where((Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Token token) => fractalResources.Any((Resource res) => res.Id != token.Id));
+				IEnumerable<Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Token> raidTokens = source.Where((Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Token token) => fractalResources.All((Resource res) => res.Id != token.Id));
 				ProfileItems fractalResults = new ProfileItems(totals.Titles.Where((Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Title title) => title.Mode == Nekres.ProofLogix.Core.Services.KpWebApi.V1.Models.Title.TitleMode.Fractal), fractalTokens);
 				ProfileItems raidResults = new ProfileItems(totals.Titles.Where((Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Title title) => title.Mode == Nekres.ProofLogix.Core.Services.KpWebApi.V1.Models.Title.TitleMode.Raid), raidTokens);
 				CreateItemPanel((Container)(object)panel, fractalResults, "Fractals");
@@ -123,23 +124,19 @@ namespace Nekres.ProofLogix.Core.UI.KpProfile
 				//IL_0073: Unknown result type (might be due to invalid IL or missing references)
 				//IL_007a: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0086: Expected O, but got Unknown
-				//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-				//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0180: Unknown result type (might be due to invalid IL or missing references)
-				//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
-				//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
-				//IL_01b5: Unknown result type (might be due to invalid IL or missing references)
-				//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0196: Unknown result type (might be due to invalid IL or missing references)
+				//IL_019b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
+				//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
 				FlowPanel val = new FlowPanel();
 				((Control)val).set_Parent(parent);
 				((Control)val).set_Width(parent.get_ContentRegion().Width / 2 - 4);
 				((Control)val).set_Height(parent.get_ContentRegion().Height - 4);
-				val.set_ControlPadding(new Vector2(0f, 4f));
-				val.set_OuterControlPadding(new Vector2(0f, 4f));
+				val.set_ControlPadding(new Vector2(5f, 4f));
+				val.set_OuterControlPadding(new Vector2(5f, 4f));
 				val.set_FlowDirection((ControlFlowDirection)3);
 				((Panel)val).set_CanScroll(true);
 				((Panel)val).set_Title(panelTitle);
@@ -153,11 +150,13 @@ namespace Nekres.ProofLogix.Core.UI.KpProfile
 				});
 				foreach (Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Title title in items.Titles)
 				{
-					Point size2 = LabelUtil.GetLabelSize((FontSize)14, title.Name, hasPrefix: true);
-					((Control)new FormattedLabelBuilder().SetWidth(size2.X).SetHeight(size2.Y).CreatePart(title.Name, (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder o)
+					Point size = LabelUtil.GetLabelSize((FontSize)20, title.Name, hasPrefix: true);
+					((Control)new FormattedLabelBuilder().SetWidth(size.X).SetHeight(size.Y).CreatePart(title.Name, (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder o)
 					{
-						o.SetFontSize((FontSize)14);
+						//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+						o.SetFontSize((FontSize)20);
 						o.SetPrefixImage(AsyncTexture2D.op_Implicit(_iconTitle));
+						o.SetPrefixImageSize(new Point(size.Y, size.Y));
 					})
 						.Build()).set_Parent((Container)(object)flow);
 				}
@@ -165,21 +164,19 @@ namespace Nekres.ProofLogix.Core.UI.KpProfile
 				{
 					if (token.Amount != 0)
 					{
-						string text = $"{token.Name} x{token.Amount}";
-						Point size = LabelUtil.GetLabelSize((FontSize)14, text, hasPrefix: true);
+						string text = AssetUtil.GetItemDisplayName(token.Name, token.Amount);
+						Point size2 = LabelUtil.GetLabelSize((FontSize)20, text, hasPrefix: true);
 						AsyncTexture2D icon = ProofLogix.Instance.Resources.GetItem(token.Id).Icon;
-						((Control)new FormattedLabelBuilder().SetWidth(size.X).SetHeight(size.Y + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y).CreatePart(token.Name, (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder o)
+						((Control)new FormattedLabelBuilder().SetWidth(size2.X).SetHeight(size2.Y + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y).CreatePart(text, (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder o)
 						{
-							o.SetFontSize((FontSize)14);
+							//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+							//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+							//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+							o.SetTextColor(ProofLogix.Instance.Resources.GetItem(token.Id).Rarity.AsColor());
+							o.SetFontSize((FontSize)20);
 							o.SetPrefixImage(icon);
+							o.SetPrefixImageSize(new Point(size2.Y, size2.Y));
 						})
-							.CreatePart($"x{token.Amount}", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder o)
-							{
-								//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-								o.SetFontSize((FontSize)14);
-								o.SetTextColor(Color.get_Green());
-								o.MakeBold();
-							})
 							.Build()).set_Parent((Container)(object)flow);
 					}
 				}

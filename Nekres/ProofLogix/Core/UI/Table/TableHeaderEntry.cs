@@ -32,10 +32,10 @@ namespace Nekres.ProofLogix.Core.UI.Table
 			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
 			Rectangle centered = default(Rectangle);
 			((Rectangle)(ref centered))._002Ector(bounds.X + (bounds.Width - bounds.Height) / 2, bounds.Y, bounds.Height, bounds.Height);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(ProofLogix.Instance.Resources.GetApiIcon(tokenId)), centered);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(ProofLogix.Instance.Resources.GetApiIcon(tokenId).Result), centered);
 		}
 	}
 }

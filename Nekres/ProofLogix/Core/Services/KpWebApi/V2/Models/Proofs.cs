@@ -55,7 +55,9 @@ namespace Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models
 			{
 				tokens = tokens.Concat(Coffers);
 			}
-			return tokens;
+			return from token in tokens
+				group token by token.Id into @group
+				select @group.First();
 		}
 	}
 }

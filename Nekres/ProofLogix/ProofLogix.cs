@@ -327,6 +327,11 @@ namespace Nekres.ProofLogix
 				GameService.Content.PlaySoundEffectByName("error");
 				ScreenNotification.ShowNotification("Smart Ping unavailable. Profile not yet loaded.", (NotificationType)2, (Texture2D)null, 4);
 			}
+			else if (PartySync.LocalPlayer.KpProfile.IsEmpty)
+			{
+				GameService.Content.PlaySoundEffectByName("error");
+				ScreenNotification.ShowNotification("Smart Ping unavailable. Profile has no records.", (NotificationType)2, (Texture2D)null, 4);
+			}
 			else
 			{
 				_smartPing.ToggleWindow((IView)(object)new SmartPingView(SmartPingConfig.get_Value()));

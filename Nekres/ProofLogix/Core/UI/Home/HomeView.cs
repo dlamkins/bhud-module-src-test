@@ -4,6 +4,7 @@ using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.Extended;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Gw2Sharp.Models;
@@ -90,6 +91,8 @@ namespace Nekres.ProofLogix.Core.UI.Home
 				//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0059: Unknown result type (might be due to invalid IL or missing references)
 				//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0172: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0177: Unknown result type (might be due to invalid IL or missing references)
 				if (!items.Any())
 				{
 					return;
@@ -122,6 +125,7 @@ namespace Nekres.ProofLogix.Core.UI.Home
 					((Control)itemWithAmount).set_Height(64);
 					itemWithAmount.Amount = item.get_Count();
 					((Control)itemWithAmount).set_BasicTooltipText(name);
+					itemWithAmount.BorderColor = ProofLogix.Instance.Resources.GetItem(item.get_Id()).Rarity.AsColor();
 				}
 			}
 		}

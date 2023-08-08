@@ -5,6 +5,7 @@ using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.Extended;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
@@ -92,64 +93,64 @@ namespace Nekres.ProofLogix.Core.UI.Table
 			//IL_0448: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0452: Expected O, but got Unknown
 			//IL_0453: Expected O, but got Unknown
-			//IL_04f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0509: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0510: Unknown result type (might be due to invalid IL or missing references)
-			//IL_052f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_054b: Expected O, but got Unknown
-			//IL_059b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0505: Unknown result type (might be due to invalid IL or missing references)
+			//IL_050a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0516: Unknown result type (might be due to invalid IL or missing references)
+			//IL_051d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_053c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0558: Expected O, but got Unknown
+			//IL_05a8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_05ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05b7: Expected O, but got Unknown
-			//IL_05b8: Expected O, but got Unknown
-			//IL_05bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05c4: Expected O, but got Unknown
+			//IL_05c5: Expected O, but got Unknown
+			//IL_05ca: Unknown result type (might be due to invalid IL or missing references)
 			//IL_05cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05d9: Expected O, but got Unknown
-			//IL_05db: Expected O, but got Unknown
-			//IL_062f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0634: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05e6: Expected O, but got Unknown
+			//IL_05e8: Expected O, but got Unknown
+			//IL_063c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0641: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0648: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_064e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0655: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06ae: Unknown result type (might be due to invalid IL or missing references)
 			//IL_06b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06bd: Expected O, but got Unknown
-			//IL_06bf: Expected O, but got Unknown
-			//IL_06c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06ca: Expected O, but got Unknown
+			//IL_06cc: Expected O, but got Unknown
+			//IL_06d1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_06d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06e1: Expected O, but got Unknown
-			//IL_06e3: Expected O, but got Unknown
-			//IL_0700: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0705: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06ee: Expected O, but got Unknown
+			//IL_06f0: Expected O, but got Unknown
+			//IL_070d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0712: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0713: Unknown result type (might be due to invalid IL or missing references)
-			//IL_071d: Expected O, but got Unknown
-			//IL_071f: Expected O, but got Unknown
-			//IL_073c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0741: Unknown result type (might be due to invalid IL or missing references)
+			//IL_071f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0720: Unknown result type (might be due to invalid IL or missing references)
+			//IL_072a: Expected O, but got Unknown
+			//IL_072c: Expected O, but got Unknown
+			//IL_0749: Unknown result type (might be due to invalid IL or missing references)
 			//IL_074e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_074f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0759: Expected O, but got Unknown
-			//IL_075b: Expected O, but got Unknown
-			//IL_0798: Unknown result type (might be due to invalid IL or missing references)
-			//IL_079d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_075b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_075c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0766: Expected O, but got Unknown
+			//IL_0768: Expected O, but got Unknown
+			//IL_07a5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_07aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07b5: Expected O, but got Unknown
-			//IL_07b7: Expected O, but got Unknown
-			//IL_082f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0834: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07c2: Expected O, but got Unknown
+			//IL_07c4: Expected O, but got Unknown
+			//IL_083c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0841: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0842: Unknown result type (might be due to invalid IL or missing references)
-			//IL_084c: Expected O, but got Unknown
-			//IL_084e: Expected O, but got Unknown
+			//IL_084e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_084f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0859: Expected O, but got Unknown
+			//IL_085b: Expected O, but got Unknown
 			Image val = new Image(_cogWheelIcon);
 			((Control)val).set_Parent(buildPanel);
 			((Control)val).set_Width(32);
@@ -290,6 +291,7 @@ namespace Nekres.ProofLogix.Core.UI.Table
 					PartySyncService.ColorGradingMode.LocalPlayerComparison => "your own", 
 					PartySyncService.ColorGradingMode.MedianComparison => "the median", 
 					PartySyncService.ColorGradingMode.LargestComparison => "the largest", 
+					PartySyncService.ColorGradingMode.AverageComparison => "the average", 
 					_ => string.Empty, 
 				};
 				ContextMenuStripItem val7 = new ContextMenuStripItem(mode.ToString().SplitCamelCase());
@@ -392,17 +394,16 @@ namespace Nekres.ProofLogix.Core.UI.Table
 
 		private void AddProofEntries(ContextMenuStripItem parent, IEnumerable<Resource> resources)
 		{
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
 			foreach (Resource resource in resources)
 			{
-				ContextMenuStripItem val = new ContextMenuStripItem(resource.Name);
-				((Control)val).set_Parent((Container)(object)parent.get_Submenu());
-				val.set_CanCheck(true);
-				val.set_Checked(((IEnumerable<int>)((Presenter<TableView, TableConfig>)base.get_Presenter()).get_Model().TokenIds).Any((int id) => id == resource.Id));
-				val.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object _, CheckChangedEvent e)
+				ContextMenuStripItemWithColor contextMenuStripItemWithColor = new ContextMenuStripItemWithColor(resource.Name);
+				((Control)contextMenuStripItemWithColor).set_Parent((Container)(object)parent.get_Submenu());
+				((ContextMenuStripItem)contextMenuStripItemWithColor).set_CanCheck(true);
+				((ContextMenuStripItem)contextMenuStripItemWithColor).set_Checked(((IEnumerable<int>)((Presenter<TableView, TableConfig>)base.get_Presenter()).get_Model().TokenIds).Any((int id) => id == resource.Id));
+				contextMenuStripItemWithColor.TextColor = ProofLogix.Instance.Resources.GetItem(resource.Id).Rarity.AsColor();
+				((ContextMenuStripItem)contextMenuStripItemWithColor).add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object _, CheckChangedEvent e)
 				{
 					if (e.get_Checked())
 					{

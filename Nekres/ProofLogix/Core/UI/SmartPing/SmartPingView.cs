@@ -17,10 +17,6 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 {
 	public class SmartPingView : View
 	{
-		private const char BRACKET_LEFT = '[';
-
-		private const char BRACKET_RIGHT = ']';
-
 		private SmartPingConfig _config;
 
 		private AsyncTexture2D _cogWheelIcon;
@@ -56,54 +52,58 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00fc: Expected O, but got Unknown
-			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0198: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0205: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0215: Expected O, but got Unknown
-			//IL_02d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ea: Expected O, but got Unknown
-			//IL_02ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0300: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0301: Unknown result type (might be due to invalid IL or missing references)
-			//IL_030b: Expected O, but got Unknown
-			//IL_030c: Expected O, but got Unknown
-			//IL_032e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0333: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0340: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034a: Expected O, but got Unknown
-			//IL_034c: Expected O, but got Unknown
-			//IL_036f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0374: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0380: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0381: Unknown result type (might be due to invalid IL or missing references)
-			//IL_038b: Expected O, but got Unknown
-			//IL_038d: Expected O, but got Unknown
+			//IL_013b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0158: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0172: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0191: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0216: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0217: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0221: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023b: Expected O, but got Unknown
+			//IL_02f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0304: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0310: Expected O, but got Unknown
+			//IL_0366: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0377: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0378: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0382: Expected O, but got Unknown
+			//IL_0384: Expected O, but got Unknown
 			//IL_03ca: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03db: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e7: Expected O, but got Unknown
-			//IL_03e9: Expected O, but got Unknown
-			//IL_0467: Unknown result type (might be due to invalid IL or missing references)
-			//IL_046c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0478: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0479: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0483: Expected O, but got Unknown
-			//IL_0485: Expected O, but got Unknown
+			//IL_03e6: Expected O, but got Unknown
+			//IL_03e8: Expected O, but got Unknown
+			//IL_0430: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0435: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0441: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0442: Unknown result type (might be due to invalid IL or missing references)
+			//IL_044c: Expected O, but got Unknown
+			//IL_044e: Expected O, but got Unknown
+			//IL_047b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0480: Unknown result type (might be due to invalid IL or missing references)
+			//IL_048d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_048e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0498: Expected O, but got Unknown
+			//IL_049a: Expected O, but got Unknown
+			//IL_04f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0509: Unknown result type (might be due to invalid IL or missing references)
+			//IL_050a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0514: Expected O, but got Unknown
+			//IL_0516: Expected O, but got Unknown
 			Image val = new Image(_cogWheelIcon);
 			((Control)val).set_Parent(buildPanel);
 			((Control)val).set_Width(32);
@@ -133,8 +133,9 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 			((Control)val2).set_Height(buildPanel.get_ContentRegion().Height);
 			val2.set_ShowBorder(true);
 			Panel labelPanel = val2;
-			int quantity = ProofLogix.Instance.PartySync.LocalPlayer.KpProfile.GetToken(_config.SelectedToken).Amount;
-			FormattedLabel lbl = BuildItemLabel(quantity, _config.SelectedToken);
+			Token token = ProofLogix.Instance.PartySync.LocalPlayer.KpProfile.GetToken(_config.SelectedToken);
+			Color rarity = ProofLogix.Instance.Resources.GetItem(_config.SelectedToken).Rarity.AsColor();
+			Label lbl = BuildItemLabel(AssetUtil.GetItemDisplayName(token.Name, token.Amount), rarity);
 			((Control)lbl).set_Parent((Container)(object)labelPanel);
 			((Control)lbl).set_Top((((Container)labelPanel).get_ContentRegion().Height - ((Control)lbl).get_Height()) / 2);
 			((Control)lbl).set_Left((((Container)labelPanel).get_ContentRegion().Width - ((Control)lbl).get_Width()) / 2);
@@ -146,7 +147,7 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 			((Control)val3).set_Top(((Control)labelPanel).get_Top() + (((Control)labelPanel).get_Height() - 32) / 2);
 			val3.set_SpriteEffects((SpriteEffects)1);
 			val3.set_Tint(Color.get_White() * 0.8f);
-			((Control)val3).set_BasicTooltipText("Send to Chat\nMouse 1: As item with adjusted quantity portion.\nMouse 2: As message.");
+			((Control)val3).set_BasicTooltipText("Send to Chat\nMouse 1: Proportionately each time until total is reached.\nMouse 2: Total with singular item.");
 			Image sendBttn = val3;
 			((Control)sendBttn).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
 			{
@@ -239,7 +240,7 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 						val10.set_ItemId(_config.SelectedToken);
 						val10.set_Quantity((byte)1);
 						ItemChatLink val11 = val10;
-						ChatUtil.Send($"{'['}{amount} {val11}{']'}", ProofLogix.Instance.ChatMessageKey.get_Value());
+						ChatUtil.Send((amount > 1) ? AssetUtil.GetItemDisplayName(((object)val11).ToString(), amount) : ((object)val11).ToString(), ProofLogix.Instance.ChatMessageKey.get_Value());
 						lastTotalReachedTime = DateTime.UtcNow;
 						busy = false;
 					}
@@ -249,36 +250,62 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 			((Control)val4).set_Parent(buildPanel);
 			((Control)val4).set_ClipsBounds(false);
 			ContextMenuStrip menu = val4;
-			ContextMenuStripItem val5 = new ContextMenuStripItem("General");
-			((Control)val5).set_Parent((Container)(object)menu);
-			val5.set_Submenu(new ContextMenuStrip());
-			ContextMenuStripItem generalCategory = val5;
-			AddProofEntries(generalCategory, ProofLogix.Instance.Resources.GetGeneralItems(), (Container)(object)labelPanel);
-			ContextMenuStripItem val6 = new ContextMenuStripItem("Coffers");
-			((Control)val6).set_Parent((Container)(object)menu);
-			val6.set_Submenu(new ContextMenuStrip());
-			ContextMenuStripItem coffersCategory = val6;
-			AddProofEntries(coffersCategory, ProofLogix.Instance.Resources.GetCofferItems(), (Container)(object)labelPanel);
-			ContextMenuStripItem val7 = new ContextMenuStripItem("Raids");
-			((Control)val7).set_Parent((Container)(object)menu);
-			val7.set_Submenu(new ContextMenuStrip());
-			ContextMenuStripItem raidsCategory = val7;
-			int i = 1;
-			foreach (Raid.Wing wing in ProofLogix.Instance.Resources.GetWings())
+			IEnumerable<Token> playerTokens = ProofLogix.Instance.PartySync.LocalPlayer.KpProfile.GetTokens();
+			List<Resource> generalItems = (from resource in ProofLogix.Instance.Resources.GetGeneralItems()
+				where playerTokens.Any((Token item) => item.Id == resource.Id && item.Amount > 0)
+				select resource).ToList();
+			if (generalItems.Any())
 			{
-				ContextMenuStripItem val8 = new ContextMenuStripItem($"Wing {i++}");
-				((Control)val8).set_Parent((Container)(object)raidsCategory.get_Submenu());
-				val8.set_Submenu(new ContextMenuStrip());
-				ContextMenuStripItem wingEntry = val8;
-				AddProofEntries(wingEntry, from ev in wing.Events
-					where ev.Token != null
-					select ev.Token, (Container)(object)labelPanel);
+				ContextMenuStripItem val5 = new ContextMenuStripItem("General");
+				((Control)val5).set_Parent((Container)(object)menu);
+				val5.set_Submenu(new ContextMenuStrip());
+				ContextMenuStripItem generalCategory = val5;
+				AddProofEntries(generalCategory, generalItems, (Container)(object)labelPanel);
 			}
-			ContextMenuStripItem val9 = new ContextMenuStripItem("Fractals");
-			((Control)val9).set_Parent((Container)(object)menu);
-			val9.set_Submenu(new ContextMenuStrip());
-			ContextMenuStripItem fractalsCategory = val9;
-			AddProofEntries(fractalsCategory, ProofLogix.Instance.Resources.GetItemsForFractals(), (Container)(object)labelPanel);
+			List<Resource> cofferItems = (from resource in ProofLogix.Instance.Resources.GetCofferItems()
+				where playerTokens.Any((Token item) => item.Id == resource.Id && item.Amount > 0)
+				select resource).ToList();
+			if (cofferItems.Any())
+			{
+				ContextMenuStripItem val6 = new ContextMenuStripItem("Coffers");
+				((Control)val6).set_Parent((Container)(object)menu);
+				val6.set_Submenu(new ContextMenuStrip());
+				ContextMenuStripItem coffersCategory = val6;
+				AddProofEntries(coffersCategory, cofferItems, (Container)(object)labelPanel);
+			}
+			List<IEnumerable<Resource>> wingTokens = (from wing in ProofLogix.Instance.Resources.GetWings()
+				select from ev in wing.Events
+					where ev.Token != null
+					select ev.Token into resource
+					where playerTokens.Any((Token item) => item.Id == resource.Id && item.Amount > 0)
+					select resource).ToList();
+			if (wingTokens.Any())
+			{
+				ContextMenuStripItem val7 = new ContextMenuStripItem("Raids");
+				((Control)val7).set_Parent((Container)(object)menu);
+				val7.set_Submenu(new ContextMenuStrip());
+				ContextMenuStripItem raidsCategory = val7;
+				int i = 1;
+				foreach (IEnumerable<Resource> wing2 in wingTokens)
+				{
+					ContextMenuStripItem val8 = new ContextMenuStripItem($"Wing {i++}");
+					((Control)val8).set_Parent((Container)(object)raidsCategory.get_Submenu());
+					val8.set_Submenu(new ContextMenuStrip());
+					ContextMenuStripItem wingEntry = val8;
+					AddProofEntries(wingEntry, wing2, (Container)(object)labelPanel);
+				}
+			}
+			List<Resource> fractalItems = (from resource in ProofLogix.Instance.Resources.GetItemsForFractals()
+				where playerTokens.Any((Token item) => item.Id == resource.Id && item.Amount > 0)
+				select resource).ToList();
+			if (fractalItems.Any())
+			{
+				ContextMenuStripItem val9 = new ContextMenuStripItem("Fractals");
+				((Control)val9).set_Parent((Container)(object)menu);
+				val9.set_Submenu(new ContextMenuStrip());
+				ContextMenuStripItem fractalsCategory = val9;
+				AddProofEntries(fractalsCategory, fractalItems, (Container)(object)labelPanel);
+			}
 			((Control)cogWheel).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				//IL_001f: Unknown result type (might be due to invalid IL or missing references)
@@ -310,45 +337,63 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 
 		private void AddProofEntries(ContextMenuStripItem parent, IEnumerable<Resource> resources, Container labelPanel)
 		{
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
 			foreach (Resource resource in resources)
 			{
-				ContextMenuStripItem val = new ContextMenuStripItem(resource.Name);
-				((Control)val).set_Parent((Container)(object)parent.get_Submenu());
-				((Control)val).add_Click((EventHandler<MouseEventArgs>)delegate
+				Token token = ProofLogix.Instance.PartySync.LocalPlayer.KpProfile.GetToken(resource.Id);
+				string displayName = AssetUtil.GetItemDisplayName(resource.Name, token.Amount);
+				Color rarity = ProofLogix.Instance.Resources.GetItem(resource.Id).Rarity.AsColor();
+				ContextMenuStripItemWithColor contextMenuStripItemWithColor = new ContextMenuStripItemWithColor(displayName);
+				((Control)contextMenuStripItemWithColor).set_Parent((Container)(object)parent.get_Submenu());
+				contextMenuStripItemWithColor.TextColor = rarity;
+				((Control)contextMenuStripItemWithColor).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
-					//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-					//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+					//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+					//IL_009e: Unknown result type (might be due to invalid IL or missing references)
 					Control obj = ((IEnumerable<Control>)labelPanel.get_Children()).FirstOrDefault();
 					if (obj != null)
 					{
 						obj.Dispose();
 					}
 					_config.SelectedToken = resource.Id;
-					int amount = ProofLogix.Instance.PartySync.LocalPlayer.KpProfile.GetToken(resource.Id).Amount;
-					FormattedLabel val2 = BuildItemLabel(amount, resource.Id);
-					((Control)val2).set_Parent(labelPanel);
-					((Control)val2).set_Top((labelPanel.get_ContentRegion().Height - ((Control)val2).get_Height()) / 2);
-					((Control)val2).set_Left((labelPanel.get_ContentRegion().Width - ((Control)val2).get_Width()) / 2);
+					Label val = BuildItemLabel(displayName, rarity);
+					((Control)val).set_Parent(labelPanel);
+					((Control)val).set_Top((labelPanel.get_ContentRegion().Height - ((Control)val).get_Height()) / 2);
+					((Control)val).set_Left((labelPanel.get_ContentRegion().Width - ((Control)val).get_Width()) / 2);
+					GameService.Content.PlaySoundEffectByName("color-change");
 				});
 			}
 		}
 
-		private FormattedLabel BuildItemLabel(int quantity, int tokenId)
+		private Label BuildItemLabel(string displayName, Color color)
 		{
-			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			string str = $"{'['}{quantity} {ProofLogix.Instance.Resources.GetItem(tokenId).Name}{']'}";
-			Point size = LabelUtil.GetLabelSize((FontSize)20, str);
-			return new FormattedLabelBuilder().SetWidth(size.X).SetHeight(size.Y).CreatePart(str, (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder o)
-			{
-				o.SetFontSize((FontSize)20);
-			})
-				.Build();
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0058: Expected O, but got Unknown
+			Point size = LabelUtil.GetLabelSize((FontSize)20, displayName);
+			Label val = new Label();
+			val.set_Text(displayName);
+			val.set_TextColor(color);
+			val.set_StrokeText(true);
+			val.set_ShowShadow(true);
+			((Control)val).set_Size(new Point(size.X, size.Y));
+			val.set_Font(GameService.Content.GetFont((FontFace)0, (FontSize)20, (FontStyle)0));
+			return val;
 		}
 
 		private int GetNext(int totalAmount, ref int currentReduction, ref int currentValue, ref int currentRepetitions, ref DateTime lastTotalReachedTime)

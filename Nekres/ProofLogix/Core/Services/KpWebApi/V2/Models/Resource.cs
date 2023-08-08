@@ -1,5 +1,5 @@
-using Blish_HUD;
 using Blish_HUD.Content;
+using Gw2Sharp.WebApi.V2.Models;
 using Newtonsoft.Json;
 
 namespace Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models
@@ -21,16 +21,10 @@ namespace Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models
 		[JsonProperty("id")]
 		public int Id { get; set; }
 
-		public AsyncTexture2D Icon
-		{
-			get
-			{
-				if (string.IsNullOrWhiteSpace(IconUrl))
-				{
-					return ProofLogix.Instance.Resources.GetApiIcon(Id);
-				}
-				return GameService.Content.get_DatAssetCache().GetTextureFromAssetId(AssetUtil.GetId(IconUrl));
-			}
-		}
+		[JsonIgnore]
+		public ItemRarity Rarity { get; set; }
+
+		[JsonIgnore]
+		public AsyncTexture2D Icon { get; set; }
 	}
 }

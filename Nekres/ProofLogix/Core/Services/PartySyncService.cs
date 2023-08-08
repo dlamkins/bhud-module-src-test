@@ -19,7 +19,8 @@ namespace Nekres.ProofLogix.Core.Services
 		{
 			LocalPlayerComparison,
 			MedianComparison,
-			LargestComparison
+			LargestComparison,
+			AverageComparison
 		}
 
 		public readonly MumblePlayer LocalPlayer;
@@ -61,10 +62,10 @@ namespace Nekres.ProofLogix.Core.Services
 
 		public Color GetTokenAmountColor(int id, int amount, ColorGradingMode gradingMode)
 		{
-			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
 			float maxAmount = amount;
 			switch (gradingMode)
 			{
@@ -76,6 +77,9 @@ namespace Nekres.ProofLogix.Core.Services
 				break;
 			case ColorGradingMode.LargestComparison:
 				maxAmount = GetLargestAmount(id);
+				break;
+			case ColorGradingMode.AverageComparison:
+				maxAmount = ((_members.Count > 0) ? ((float)_members.Values.Average((Player member) => member.KpProfile.GetToken(id).Amount)) : ((float)amount));
 				break;
 			}
 			float diff = maxAmount - (float)amount;

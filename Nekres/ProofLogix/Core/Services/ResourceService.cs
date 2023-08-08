@@ -9,7 +9,6 @@ using Blish_HUD.Content;
 using Blish_HUD.Extended;
 using Gw2Sharp.Models;
 using Gw2Sharp.WebApi;
-using Gw2Sharp.WebApi.Exceptions;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
@@ -70,31 +69,36 @@ namespace Nekres.ProofLogix.Core.Services
 			_menuClicks[RandomUtil.GetRandom(0, 3)].Play(GameService.GameIntegration.get_Audio().get_Volume(), 0f, 0f);
 		}
 
-		public void AddNewResources(Profile profile)
+		public async Task AddNewResources(Profile profile)
 		{
 			if (_resources.IsEmpty || profile.IsEmpty)
 			{
 				return;
 			}
 			IEnumerable<Token> coffers = profile.Totals.Coffers;
-			foreach (Token token3 in (coffers ?? Enumerable.Empty<Token>()).Where((Token token) => _resources.Items.All((Resource x) => x.Id != token.Id)))
+			IEnumerable<Token> source = coffers ?? Enumerable.Empty<Token>();
+			List<Resource> newCoffers = new List<Resource>();
+			foreach (Token token3 in source.Where((Token token) => _resources.Items.All((Resource x) => x.Id != token.Id)))
 			{
-				_resources.Coffers.Add(new Resource
+				newCoffers.Add(new Resource
 				{
 					Id = token3.Id,
 					Name = token3.Name
 				});
 			}
-			foreach (Token token2 in from token in profile.Totals.GetTokens(excludeCoffers: true)
-				where _resources.Items.All((Resource x) => x.Id != token.Id)
-				select token)
+			IEnumerable<Token> tokens = profile.Totals.GetTokens(excludeCoffers: true);
+			List<Resource> newTokens = new List<Resource>();
+			foreach (Token token2 in tokens.Where((Token token) => _resources.Items.All((Resource x) => x.Id != token.Id)))
 			{
-				_resources.GeneralTokens.Add(new Resource
+				newTokens.Add(new Resource
 				{
 					Id = token2.Id,
 					Name = token2.Name
 				});
 			}
+			_resources.Coffers.AddRange(newCoffers);
+			_resources.GeneralTokens.AddRange(newTokens);
+			await ExpandResources(newCoffers.Concat(newTokens));
 		}
 
 		public async Task LoadAsync(bool localeChange = false)
@@ -123,7 +127,8 @@ namespace Nekres.ProofLogix.Core.Services
 				Raid.Wing wing2 = wing;
 				wing2.Name = await GetMapName(wing.MapId);
 			}
-			AddNewResources(await ProofLogix.Instance.KpWebApi.GetProfile("Nika"));
+			await ExpandResources(_resources.Items);
+			await AddNewResources(await ProofLogix.Instance.KpWebApi.GetProfile("Nika"));
 		}
 
 		public string GetClassName(int profession, int elite)
@@ -152,10 +157,8 @@ namespace Nekres.ProofLogix.Core.Services
 			return icon;
 		}
 
-		public AsyncTexture2D GetApiIcon(int itemId)
+		public async Task<AsyncTexture2D> GetApiIcon(int itemId)
 		{
-			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
 			if (itemId == 0)
 			{
 				return AsyncTexture2D.op_Implicit(Textures.get_TransparentPixel());
@@ -164,42 +167,17 @@ namespace Nekres.ProofLogix.Core.Services
 			{
 				return tex;
 			}
-			Item response = null;
-			try
-			{
-				response = ((IBulkExpandableClient<Item, int>)(object)GameService.Gw2WebApi.get_AnonymousConnection().get_Client().get_V2()
-					.get_Items()).GetAsync(itemId, default(CancellationToken)).Result;
-			}
-			catch (Exception e)
-			{
-				if (!(e is NotFoundException) && !(e is BadRequestException) && !(e is AuthorizationRequiredException))
-				{
-					if (!(e is TooManyRequestsException))
-					{
-						if (e is RequestException || e is RequestException<string>)
-						{
-							ProofLogix.Logger.Trace(e, e.Message);
-						}
-						else
-						{
-							ProofLogix.Logger.Error(e, e.Message);
-						}
-					}
-					else
-					{
-						ProofLogix.Logger.Warn(e, "No icon could be loaded due to being rate limited by the API.");
-					}
-				}
-				else
-				{
-					ProofLogix.Logger.Trace(e, e.Message);
-				}
-			}
-			if (response == null || string.IsNullOrEmpty(RenderUrl.op_Implicit(response.get_Icon())))
+			IReadOnlyList<Item> response = await ProofLogix.Instance.Gw2WebApi.GetItems(itemId);
+			if (response == null || !response.Any())
 			{
 				return AsyncTexture2D.op_Implicit(Textures.get_TransparentPixel());
 			}
-			int assetId = AssetUtil.GetId(RenderUrl.op_Implicit(response.get_Icon()));
+			Item item = response[0];
+			if (string.IsNullOrEmpty(RenderUrl.op_Implicit(item.get_Icon())))
+			{
+				return AsyncTexture2D.op_Implicit(Textures.get_TransparentPixel());
+			}
+			int assetId = AssetUtil.GetId(RenderUrl.op_Implicit(item.get_Icon()));
 			AsyncTexture2D icon = GameService.Content.get_DatAssetCache().GetTextureFromAssetId(assetId);
 			_apiIcons.Add(itemId, icon);
 			return icon;
@@ -218,6 +196,24 @@ namespace Nekres.ProofLogix.Core.Services
 			foreach (SoundEffect menuClick in _menuClicks)
 			{
 				menuClick.Dispose();
+			}
+		}
+
+		private async Task ExpandResources(IEnumerable<Resource> resources)
+		{
+			IReadOnlyList<Item> items = await ProofLogix.Instance.Gw2WebApi.GetItems(resources.Select((Resource resource) => resource.Id).ToArray());
+			if (items == null || !items.Any())
+			{
+				return;
+			}
+			foreach (Item item in items)
+			{
+				Resource resource2 = _resources.Items.FirstOrDefault((Resource resource) => resource.Id == item.get_Id());
+				if (resource2 != null)
+				{
+					resource2.Rarity = ApiEnum<ItemRarity>.op_Implicit(item.get_Rarity());
+					resource2.Icon = GameService.Content.get_DatAssetCache().GetTextureFromAssetId(AssetUtil.GetId(RenderUrl.op_Implicit(item.get_Icon())));
+				}
 			}
 		}
 

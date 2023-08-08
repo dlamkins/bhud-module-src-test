@@ -112,11 +112,11 @@ namespace Nekres.ProofLogix.Core.UI.Table
 		{
 			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
 			Token token = Player.KpProfile.GetToken(tokenId);
 			Color color = ProofLogix.Instance.PartySync.GetTokenAmountColor(tokenId, token.Amount, ProofLogix.Instance.TableConfig.get_Value().ColorGradingMode);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, Cut(token.Amount.ToString(), base.MaxTokenCellWidth), base.Font, bounds, color, false, true, 2, (HorizontalAlignment)1, (VerticalAlignment)1);
+			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, AssetUtil.Truncate(token.Amount.ToString(), base.MaxTokenCellWidth, base.Font), base.Font, bounds, color, false, true, 2, (HorizontalAlignment)1, (VerticalAlignment)1);
 		}
 	}
 }
