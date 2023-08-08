@@ -91,8 +91,8 @@ namespace Nekres.ProofLogix.Core.UI.Home
 				//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0059: Unknown result type (might be due to invalid IL or missing references)
 				//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0172: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0177: Unknown result type (might be due to invalid IL or missing references)
+				//IL_012e: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0133: Unknown result type (might be due to invalid IL or missing references)
 				if (!items.Any())
 				{
 					return;
@@ -114,17 +114,13 @@ namespace Nekres.ProofLogix.Core.UI.Home
 				});
 				foreach (AccountItem item in items)
 				{
-					string name = ProofLogix.Instance.Resources.GetItems().FirstOrDefault((Resource i) => i.Id.Equals(item.get_Id()))?.Name;
-					if (!string.IsNullOrEmpty(name))
-					{
-						name = $"{item.get_Count()}x {name}";
-					}
+					Resource resource = ProofLogix.Instance.Resources.GetItem(item.get_Id());
 					ItemWithAmount itemWithAmount = new ItemWithAmount(ProofLogix.Instance.Resources.GetItem(item.get_Id()).Icon);
 					((Control)itemWithAmount).set_Parent((Container)(object)slotsCategory);
 					((Control)itemWithAmount).set_Width(64);
 					((Control)itemWithAmount).set_Height(64);
 					itemWithAmount.Amount = item.get_Count();
-					((Control)itemWithAmount).set_BasicTooltipText(name);
+					((Control)itemWithAmount).set_BasicTooltipText(AssetUtil.GetItemDisplayName(resource.Name, item.get_Count(), brackets: false));
 					itemWithAmount.BorderColor = ProofLogix.Instance.Resources.GetItem(item.get_Id()).Rarity.AsColor();
 				}
 			}

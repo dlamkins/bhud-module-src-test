@@ -16,11 +16,19 @@ namespace Nekres.ProofLogix.Core
 			return int.Parse(Path.GetFileNameWithoutExtension(assetUri));
 		}
 
-		public static string GetItemDisplayName(string name, int quantity)
+		public static string GetItemDisplayName(string name, int quantity, bool brackets = true)
 		{
 			if (quantity == 1)
 			{
+				if (!brackets)
+				{
+					return name;
+				}
 				return $"{'['}{name}{']'}";
+			}
+			if (!brackets)
+			{
+				return $"{quantity} {name}";
 			}
 			return $"{'['}{quantity} {name}{']'}";
 		}

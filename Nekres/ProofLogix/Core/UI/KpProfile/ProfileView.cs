@@ -117,26 +117,29 @@ namespace Nekres.ProofLogix.Core.UI.KpProfile
 				//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-				//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-				//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+				//IL_006d: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-				//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0086: Expected O, but got Unknown
-				//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-				//IL_019b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
-				//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+				//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+				//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00b2: Expected O, but got Unknown
+				//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+				//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_01da: Unknown result type (might be due to invalid IL or missing references)
+				//IL_01df: Unknown result type (might be due to invalid IL or missing references)
+				//IL_020b: Unknown result type (might be due to invalid IL or missing references)
 				FlowPanel val = new FlowPanel();
 				((Control)val).set_Parent(parent);
 				((Control)val).set_Width(parent.get_ContentRegion().Width / 2 - 4);
 				((Control)val).set_Height(parent.get_ContentRegion().Height - 4);
-				val.set_ControlPadding(new Vector2(5f, 4f));
-				val.set_OuterControlPadding(new Vector2(5f, 4f));
+				val.set_ControlPadding(new Vector2((float)((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, (float)((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
+				val.set_OuterControlPadding(new Vector2((float)((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().X, (float)((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y));
 				val.set_FlowDirection((ControlFlowDirection)3);
 				((Panel)val).set_CanScroll(true);
 				((Panel)val).set_Title(panelTitle);
@@ -150,8 +153,9 @@ namespace Nekres.ProofLogix.Core.UI.KpProfile
 				});
 				foreach (Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Title title in items.Titles)
 				{
-					Point size = LabelUtil.GetLabelSize((FontSize)20, title.Name, hasPrefix: true);
-					((Control)new FormattedLabelBuilder().SetWidth(size.X).SetHeight(size.Y).CreatePart(title.Name, (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder o)
+					string text2 = " " + title.Name;
+					Point size = LabelUtil.GetLabelSize((FontSize)20, text2, hasPrefix: true);
+					((Control)new FormattedLabelBuilder().SetWidth(size.X).SetHeight(size.Y).CreatePart(text2, (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder o)
 					{
 						//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 						o.SetFontSize((FontSize)20);
@@ -164,10 +168,10 @@ namespace Nekres.ProofLogix.Core.UI.KpProfile
 				{
 					if (token.Amount != 0)
 					{
-						string text = AssetUtil.GetItemDisplayName(token.Name, token.Amount);
+						string text = " " + AssetUtil.GetItemDisplayName(token.Name, token.Amount);
 						Point size2 = LabelUtil.GetLabelSize((FontSize)20, text, hasPrefix: true);
 						AsyncTexture2D icon = ProofLogix.Instance.Resources.GetItem(token.Id).Icon;
-						((Control)new FormattedLabelBuilder().SetWidth(size2.X).SetHeight(size2.Y + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y).CreatePart(text, (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder o)
+						((Control)new FormattedLabelBuilder().SetWidth(size2.X).SetHeight(size2.Y).CreatePart(text, (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder o)
 						{
 							//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 							//IL_0020: Unknown result type (might be due to invalid IL or missing references)

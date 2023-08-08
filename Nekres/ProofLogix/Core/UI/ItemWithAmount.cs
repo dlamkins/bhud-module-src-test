@@ -68,16 +68,19 @@ namespace Nekres.ProofLogix.Core.UI
 			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
 			((Image)this).Paint(spriteBatch, bounds);
 			spriteBatch.DrawRectangleOnCtrl((Control)(object)this, bounds, 2, BorderColor);
-			string text = Amount.ToString();
-			Rectangle dest = default(Rectangle);
-			((Rectangle)(ref dest))._002Ector(-6, 2, bounds.Width, bounds.Height);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, Font, dest, _amountColor, false, true, 2, (HorizontalAlignment)2, (VerticalAlignment)0);
+			if (Amount > 1)
+			{
+				string text = Amount.ToString();
+				Rectangle dest = default(Rectangle);
+				((Rectangle)(ref dest))._002Ector(-6, 2, bounds.Width, bounds.Height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, Font, dest, _amountColor, false, true, 2, (HorizontalAlignment)2, (VerticalAlignment)0);
+			}
 		}
 	}
 }
