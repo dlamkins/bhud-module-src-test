@@ -113,8 +113,13 @@ namespace Nekres.ProofLogix.Core.Services
 
 		public async Task<IReadOnlyList<Item>> GetItems(params int[] itemIds)
 		{
-			return await TaskUtil.RetryAsync(() => ((IBulkExpandableClient<Item, int>)(object)GameService.Gw2WebApi.get_AnonymousConnection().get_Client().get_V2()
-				.get_Items()).ManyAsync((IEnumerable<int>)itemIds.ToList(), default(CancellationToken)));
+			return (await TaskUtil.RetryAsync(() => ((IBulkExpandableClient<Item, int>)(object)GameService.Gw2WebApi.get_AnonymousConnection().get_Client().get_V2()
+				.get_Items()).ManyAsync((IEnumerable<int>)itemIds, default(CancellationToken)))) ?? Enumerable.Empty<Item>().ToList();
+		}
+
+		public async Task<IReadOnlyList<Map>> GetMaps(params int[] mapIds)
+		{
+			return (await TaskUtil.RetryAsync(() => ((IBulkExpandableClient<Map, int>)(object)ProofLogix.Instance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Maps()).ManyAsync((IEnumerable<int>)mapIds, default(CancellationToken)))) ?? Enumerable.Empty<Map>().ToList();
 		}
 
 		private async Task<IEnumerable<Character>> GetCharacters()

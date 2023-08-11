@@ -314,12 +314,12 @@ namespace Nekres.ProofLogix.Core.UI.Home
 				{
 					ProofLogix.Instance.Resources.PlayMenuItemClick();
 					AsyncString loadingText = new AsyncString();
-					plyPanel.Show((IView)(object)new LoadingView("Loading items..", loadingText));
-					loadingText.String = "Turning Bank upside down.";
+					plyPanel.Show((IView)(object)new LoadingView("Loading items…", loadingText));
+					loadingText.String = ProofLogix.Instance.Resources.GetLoadingSubtitle();
 					List<AccountItem> bank = await ProofLogix.Instance.Gw2WebApi.GetBank();
-					loadingText.String = "Borrowing bag slots.";
+					loadingText.String = ProofLogix.Instance.Resources.GetLoadingSubtitle();
 					List<AccountItem> sharedBags = await ProofLogix.Instance.Gw2WebApi.GetSharedBags();
-					loadingText.String = "Tickling characters.";
+					loadingText.String = ProofLogix.Instance.Resources.GetLoadingSubtitle();
 					Dictionary<Character, List<AccountItem>> bagsByCharacters = await ProofLogix.Instance.Gw2WebApi.GetBagsByCharacter();
 					plyPanel.Show((IView)(object)new AccountItemsView(bank, sharedBags, bagsByCharacters));
 				}

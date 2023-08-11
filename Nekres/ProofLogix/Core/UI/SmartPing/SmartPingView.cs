@@ -92,18 +92,18 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 			//IL_0443: Unknown result type (might be due to invalid IL or missing references)
 			//IL_044d: Expected O, but got Unknown
 			//IL_044f: Expected O, but got Unknown
-			//IL_047c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0481: Unknown result type (might be due to invalid IL or missing references)
-			//IL_048e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_048f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0499: Expected O, but got Unknown
-			//IL_049b: Expected O, but got Unknown
-			//IL_04f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_050a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_050b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0515: Expected O, but got Unknown
-			//IL_0517: Expected O, but got Unknown
+			//IL_0480: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0485: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0492: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0493: Unknown result type (might be due to invalid IL or missing references)
+			//IL_049d: Expected O, but got Unknown
+			//IL_049f: Expected O, but got Unknown
+			//IL_0503: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0508: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0514: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0515: Unknown result type (might be due to invalid IL or missing references)
+			//IL_051f: Expected O, but got Unknown
+			//IL_0521: Expected O, but got Unknown
 			Image val = new Image(_cogWheelIcon);
 			((Control)val).set_Parent(buildPanel);
 			((Control)val).set_Width(32);
@@ -273,12 +273,12 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 				ContextMenuStripItem coffersCategory = val6;
 				AddProofEntries(coffersCategory, cofferItems, (Container)(object)labelPanel);
 			}
-			List<IEnumerable<Resource>> wingTokens = (from wing in ProofLogix.Instance.Resources.GetWings()
-				select from ev in wing.Events
+			List<List<Resource>> wingTokens = (from wing in ProofLogix.Instance.Resources.GetWings()
+				select (from ev in wing.Events
 					where ev.Token != null
 					select ev.Token into resource
 					where playerTokens.Any((Token item) => item.Id == resource.Id && item.Amount > 0)
-					select resource).ToList();
+					select resource).ToList()).ToList();
 			if (wingTokens.Any())
 			{
 				ContextMenuStripItem val7 = new ContextMenuStripItem("Raids");
@@ -286,13 +286,17 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 				val7.set_Submenu(new ContextMenuStrip());
 				ContextMenuStripItem raidsCategory = val7;
 				int i = 1;
-				foreach (IEnumerable<Resource> wing2 in wingTokens)
+				foreach (List<Resource> wing2 in wingTokens)
 				{
-					ContextMenuStripItem val8 = new ContextMenuStripItem($"Wing {i++}");
-					((Control)val8).set_Parent((Container)(object)raidsCategory.get_Submenu());
-					val8.set_Submenu(new ContextMenuStrip());
-					ContextMenuStripItem wingEntry = val8;
-					AddProofEntries(wingEntry, wing2, (Container)(object)labelPanel);
+					if (wing2.Any())
+					{
+						ContextMenuStripItem val8 = new ContextMenuStripItem($"Wing {i}");
+						((Control)val8).set_Parent((Container)(object)raidsCategory.get_Submenu());
+						val8.set_Submenu(new ContextMenuStrip());
+						ContextMenuStripItem wingEntry = val8;
+						AddProofEntries(wingEntry, wing2, (Container)(object)labelPanel);
+					}
+					i++;
 				}
 			}
 			List<Resource> fractalItems = (from resource in ProofLogix.Instance.Resources.GetItemsForFractals()

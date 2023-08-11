@@ -168,7 +168,7 @@ namespace Nekres.ProofLogix.Core.UI.KpProfile
 				{
 					if (token.Amount != 0)
 					{
-						string text = " " + AssetUtil.GetItemDisplayName(token.Name, token.Amount);
+						string text = " " + AssetUtil.GetItemDisplayName(token.Name, token.Amount, brackets: false);
 						Point size2 = LabelUtil.GetLabelSize((FontSize)20, text, hasPrefix: true);
 						AsyncTexture2D icon = ProofLogix.Instance.Resources.GetItem(token.Id).Icon;
 						((Control)new FormattedLabelBuilder().SetWidth(size2.X).SetHeight(size2.Y).CreatePart(text, (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder o)
@@ -423,7 +423,7 @@ namespace Nekres.ProofLogix.Core.UI.KpProfile
 					isRefreshing = true;
 					AsyncString basicTooltipText = new AsyncString();
 					AsyncString loadingText = new AsyncString();
-					((ViewContainer)buildPanel).Show((IView)(object)new LoadingView("Refreshing...", loadingText, basicTooltipText));
+					((ViewContainer)buildPanel).Show((IView)(object)new LoadingView("Refreshing…", loadingText, basicTooltipText));
 					if (!(await ProofLogix.Instance.KpWebApi.Refresh(_profile.Id)))
 					{
 						GameService.Content.PlaySoundEffectByName("error");
@@ -447,7 +447,7 @@ namespace Nekres.ProofLogix.Core.UI.KpProfile
 							{
 								retries--;
 								string retryStr = $"({60 - retries} / 60)";
-								basicTooltipText.String = "Checking completion.. " + retryStr;
+								basicTooltipText.String = "Checking completion… " + retryStr;
 								loadingText.String = ProofLogix.Instance.Resources.GetLoadingSubtitle();
 								if (!(await ProofLogix.Instance.KpWebApi.IsProofBusy(_profile.Id)))
 								{

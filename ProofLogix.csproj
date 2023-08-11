@@ -16,10 +16,10 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="MonoGame.Extended" />
+    <Reference Include="Gw2Sharp" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Core" />
     <Reference Include="System.ServiceModel" />
-    <Reference Include="Gw2Sharp" />
     <Reference Include="Gapotchenko.FX" />
     <Reference Include="System.Numerics" />
     <Reference Include="Flurl" />

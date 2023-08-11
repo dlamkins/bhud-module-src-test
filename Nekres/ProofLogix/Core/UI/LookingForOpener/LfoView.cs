@@ -159,7 +159,7 @@ namespace Nekres.ProofLogix.Core.UI.LookingForOpener
 					((Control)val8).add_Click((EventHandler<MouseEventArgs>)async delegate
 					{
 						ProofLogix.Instance.Resources.PlayMenuItemClick();
-						resultContainer.Show((IView)(object)new LoadingView("Searching..."));
+						resultContainer.Show((IView)(object)new LoadingView("Searching…"));
 						ViewContainer val9 = resultContainer;
 						string id = encounter.Id;
 						val9.Show((IView)(object)new LfoResultView(new LfoResults(id, await base.get_Presenter().GetOpener(encounter.Id))));

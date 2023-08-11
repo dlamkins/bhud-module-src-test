@@ -29,6 +29,8 @@ namespace Nekres.ProofLogix.Core.Services
 
 		private Resources _resources;
 
+		private IReadOnlyList<Map> _maps;
+
 		private Dictionary<int, AsyncTexture2D> _apiIcons;
 
 		private IReadOnlyList<SoundEffect> _menuClicks;
@@ -37,9 +39,9 @@ namespace Nekres.ProofLogix.Core.Services
 
 		private readonly IReadOnlyList<string> _loadingText = new List<string>
 		{
-			"Turning Vault upside down...", "Borrowing wallet...", "Tickling characters...", "High-fiving Deimos...", "Checking on Dhuum's cage...", "Throwing rocks into Mystic Forge...", "Lock-picking Ahdashim...", "Mounting Gorseval...", "Knitting Xera's ribbon...", "Caring for the bees...",
-			"Dismantling White Mantle...", "Chasing Skritt...", "Ransacking bags...", "Poking Saul...", "Commanding golems...", "Polishing monocle...", "Running in circles...", "Scratching Slothasor...", "Cleaning Kitty Golem...", "Making sense of inventory...",
-			"Pleading for Glenna's assistance...", "Counting achievements...", "Blowing away dust...", "Calling upon spirits...", "Consulting Order of Shadows...", "Bribing Pact troops...", "Bribing Bankers..."
+			"Turning Vault upside down…", "Borrowing wallet…", "Tickling characters…", "High-fiving Deimos…", "Checking on Dhuum's cage…", "Throwing rocks into Mystic Forge…", "Lock-picking Ahdashim…", "Mounting Gorseval…", "Knitting Xera's ribbon…", "Caring for the bees…",
+			"Dismantling White Mantle…", "Chasing Skritt…", "Ransacking bags…", "Poking Saul…", "Commanding golems…", "Polishing monocle…", "Running in circles…", "Scratching Slothasor…", "Cleaning Kitty Golem…", "Making sense of inventory…",
+			"Pleading for Glenna's assistance…", "Counting achievements…", "Blowing away dust…", "Calling upon spirits…", "Consulting Order of Shadows…", "Bribing Pact troops…", "Bribing Bankers…"
 		};
 
 		public ResourceService()
@@ -52,6 +54,12 @@ namespace Nekres.ProofLogix.Core.Services
 			_resources = Resources.Empty;
 			_apiIcons = new Dictionary<int, AsyncTexture2D>();
 			GameService.Overlay.add_UserLocaleChanged((EventHandler<ValueEventArgs<CultureInfo>>)OnUserLocaleChanged);
+		}
+
+		public async Task LoadAsync(bool localeChange = false)
+		{
+			await LoadProfessions(localeChange);
+			await LoadResources();
 		}
 
 		public string GetLoadingSubtitle()
@@ -69,42 +77,27 @@ namespace Nekres.ProofLogix.Core.Services
 			_menuClicks[RandomUtil.GetRandom(0, 3)].Play(GameService.GameIntegration.get_Audio().get_Volume(), 0f, 0f);
 		}
 
-		public async Task AddNewResources(Profile profile)
+		public void AddNewCoffers(Profile profile)
 		{
-			if (_resources.IsEmpty || profile.IsEmpty)
+			if (!_resources.IsEmpty && !profile.IsEmpty)
 			{
-				return;
+				IEnumerable<Token> coffers2 = profile.Totals.Coffers;
+				IEnumerable<Token> coffers = coffers2 ?? Enumerable.Empty<Token>();
+				coffers2 = profile.Totals.Tokens;
+				IEnumerable<Token> tokens = coffers2 ?? Enumerable.Empty<Token>();
+				_resources.Coffers.AddRange(FetchNew(coffers.Concat(tokens)));
 			}
-			IEnumerable<Token> coffers = profile.Totals.Coffers;
-			IEnumerable<Token> source = coffers ?? Enumerable.Empty<Token>();
-			List<Resource> newCoffers = new List<Resource>();
-			foreach (Token token3 in source.Where((Token token) => _resources.Items.All((Resource x) => x.Id != token.Id)))
-			{
-				newCoffers.Add(new Resource
-				{
-					Id = token3.Id,
-					Name = token3.Name
-				});
-			}
-			IEnumerable<Token> tokens = profile.Totals.GetTokens(excludeCoffers: true);
-			List<Resource> newTokens = new List<Resource>();
-			foreach (Token token2 in tokens.Where((Token token) => _resources.Items.All((Resource x) => x.Id != token.Id)))
-			{
-				newTokens.Add(new Resource
-				{
-					Id = token2.Id,
-					Name = token2.Name
-				});
-			}
-			_resources.Coffers.AddRange(newCoffers);
-			_resources.GeneralTokens.AddRange(newTokens);
-			await ExpandResources(newCoffers.Concat(newTokens));
 		}
 
-		public async Task LoadAsync(bool localeChange = false)
+		private IEnumerable<Resource> FetchNew(IEnumerable<Token> tokens)
 		{
-			await LoadProfessions(localeChange);
-			await LoadResources();
+			return from token in tokens
+				where _resources.Items.All((Resource x) => x.Id != token.Id)
+				select new Resource
+				{
+					Id = token.Id,
+					Name = token.Name
+				};
 		}
 
 		private void LoadSounds()
@@ -122,13 +115,9 @@ namespace Nekres.ProofLogix.Core.Services
 		private async Task LoadResources()
 		{
 			_resources = await ProofLogix.Instance.KpWebApi.GetResources();
-			foreach (Raid.Wing wing in _resources.Wings)
-			{
-				Raid.Wing wing2 = wing;
-				wing2.Name = await GetMapName(wing.MapId);
-			}
+			_maps = await ProofLogix.Instance.Gw2WebApi.GetMaps(_resources.Wings.Select((Raid.Wing wing) => wing.MapId).ToArray());
+			AddNewCoffers(await ProofLogix.Instance.KpWebApi.GetProfile("Nika"));
 			await ExpandResources(_resources.Items);
-			await AddNewResources(await ProofLogix.Instance.KpWebApi.GetProfile("Nika"));
 		}
 
 		public string GetClassName(int profession, int elite)
@@ -183,9 +172,9 @@ namespace Nekres.ProofLogix.Core.Services
 			return icon;
 		}
 
-		public async Task<string> GetMapName(int mapId)
+		public string GetMapName(int mapId)
 		{
-			Map obj = await TaskUtil.RetryAsync(() => ((IBulkExpandableClient<Map, int>)(object)ProofLogix.Instance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Maps()).GetAsync(mapId, default(CancellationToken)));
+			Map obj = _maps.FirstOrDefault((Map map) => map.get_Id() == mapId);
 			return ((obj != null) ? obj.get_Name() : null) ?? string.Empty;
 		}
 

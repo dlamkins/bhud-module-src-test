@@ -78,9 +78,7 @@ namespace Nekres.ProofLogix.Core.Services
 			{
 				return Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Profile.Empty;
 			}
-			Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Profile profile = await _v2Client.GetProfile(id);
-			ProofLogix.Instance.Resources.AddNewResources(profile);
-			return await ExpandProfile(profile);
+			return await ExpandProfile(await _v2Client.GetProfile(id));
 		}
 
 		public async Task<Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Profile> GetProfileByCharacter(string characterName)
