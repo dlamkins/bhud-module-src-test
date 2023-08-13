@@ -175,7 +175,7 @@ namespace Nekres.ProofLogix
 			((Control)val2).set_Visible(false);
 			_window = val2;
 			_window.get_Tabs().Add(new Tab(GameService.Content.get_DatAssetCache().GetTextureFromAssetId(255369), (Func<IView>)(() => (IView)(object)new HomeView()), "Account", (int?)null));
-			_window.get_Tabs().Add(new Tab(GameService.Content.get_DatAssetCache().GetTextureFromAssetId(156680), (Func<IView>)(() => (IView)(object)new LfoView(LfoConfig.get_Value())), "Looking for Opener", (int?)null));
+			_window.get_Tabs().Add(new Tab(GameService.Content.get_DatAssetCache().GetTextureFromAssetId(156680), (Func<IView>)(() => (IView)((!Resources.HasLoaded()) ? ((object)new LoadingView("Service unavailable…", "Please, try again later.")) : ((object)new LfoView(LfoConfig.get_Value())))), "Looking for Opener", (int?)null));
 			_window.add_TabChanged((EventHandler<ValueChangedEventArgs<Tab>>)OnTabChanged);
 			LockableAxisWindow lockableAxisWindow = new LockableAxisWindow(GameService.Content.get_DatAssetCache().GetTextureFromAssetId(155985), new Rectangle(40, 26, 913, 691), new Rectangle(70, 36, 839, 605));
 			((Control)lockableAxisWindow).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
@@ -317,12 +317,23 @@ namespace Nekres.ProofLogix
 
 		public void ToggleTable()
 		{
-			((StandardWindow)_table).ToggleWindow((IView)(object)new TableView(TableConfig.get_Value()));
+			if (!Resources.HasLoaded())
+			{
+				GameService.Content.PlaySoundEffectByName("error");
+			}
+			else
+			{
+				((StandardWindow)_table).ToggleWindow((IView)(object)new TableView(TableConfig.get_Value()));
+			}
 		}
 
 		public void ToggleSmartPing()
 		{
-			if (!PartySync.LocalPlayer.HasKpProfile)
+			if (!Resources.HasLoaded())
+			{
+				GameService.Content.PlaySoundEffectByName("error");
+			}
+			else if (!PartySync.LocalPlayer.HasKpProfile)
 			{
 				GameService.Content.PlaySoundEffectByName("error");
 				ScreenNotification.ShowNotification("Smart Ping unavailable. Profile not yet loaded.", (NotificationType)2, (Texture2D)null, 4);
@@ -354,23 +365,27 @@ namespace Nekres.ProofLogix
 
 		protected override void Unload()
 		{
-			_smartPingKey.get_Value().set_Enabled(false);
-			_smartPingKey.get_Value().remove_BindingChanged((EventHandler<EventArgs>)OnSmartPingKeyBindingChanged);
-			_smartPingKey.get_Value().remove_Activated((EventHandler<EventArgs>)OnSmartPingKeyActivated);
-			_tableKey.get_Value().set_Enabled(false);
-			_tableKey.get_Value().remove_BindingChanged((EventHandler<EventArgs>)OnTableKeyBindingChanged);
-			_tableKey.get_Value().remove_Activated((EventHandler<EventArgs>)OnTableKeyActivated);
-			_window.remove_TabChanged((EventHandler<ValueChangedEventArgs<Tab>>)OnTabChanged);
-			((Control)_cornerIcon).remove_Click((EventHandler<MouseEventArgs>)OnCornerIconClick);
-			CornerIcon cornerIcon = _cornerIcon;
-			if (cornerIcon != null)
+			if (_smartPingKey != null)
 			{
-				((Control)cornerIcon).Dispose();
+				_smartPingKey.get_Value().set_Enabled(false);
+				_smartPingKey.get_Value().remove_BindingChanged((EventHandler<EventArgs>)OnSmartPingKeyBindingChanged);
+				_smartPingKey.get_Value().remove_Activated((EventHandler<EventArgs>)OnSmartPingKeyActivated);
 			}
-			TabbedWindow2 window = _window;
-			if (window != null)
+			if (_tableKey != null)
 			{
-				((Control)window).Dispose();
+				_tableKey.get_Value().set_Enabled(false);
+				_tableKey.get_Value().remove_BindingChanged((EventHandler<EventArgs>)OnTableKeyBindingChanged);
+				_tableKey.get_Value().remove_Activated((EventHandler<EventArgs>)OnTableKeyActivated);
+			}
+			if (_window != null)
+			{
+				_window.remove_TabChanged((EventHandler<ValueChangedEventArgs<Tab>>)OnTabChanged);
+				((Control)_window).Dispose();
+			}
+			if (_cornerIcon != null)
+			{
+				((Control)_cornerIcon).remove_Click((EventHandler<MouseEventArgs>)OnCornerIconClick);
+				((Control)_cornerIcon).Dispose();
 			}
 			StandardWindow registerWindow = _registerWindow;
 			if (registerWindow != null)

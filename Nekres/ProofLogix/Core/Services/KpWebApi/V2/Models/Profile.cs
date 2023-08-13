@@ -72,5 +72,24 @@ namespace Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models
 			linkedProfile = Accounts?.FirstOrDefault((Profile profile) => !string.IsNullOrEmpty(profile.Name) && profile.Name.Equals(accountName, StringComparison.InvariantCultureIgnoreCase));
 			return !(linkedProfile ?? Empty).NotFound;
 		}
+
+		public override Token GetToken(int id)
+		{
+			return HandleOriginalUce(id, base.GetToken(id));
+		}
+
+		private Token HandleOriginalUce(int id, Token token)
+		{
+			if (id != 81743)
+			{
+				return token;
+			}
+			Token originalUce = OriginalUce ?? token;
+			if (token.Amount <= originalUce.Amount)
+			{
+				return originalUce;
+			}
+			return token;
+		}
 	}
 }

@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
+using Blish_HUD.Controls;
 using Blish_HUD.Extended;
 using Gw2Sharp.Models;
 using Gw2Sharp.WebApi;
@@ -13,6 +14,7 @@ using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Graphics;
 using Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models;
 
 namespace Nekres.ProofLogix.Core.Services
@@ -44,6 +46,8 @@ namespace Nekres.ProofLogix.Core.Services
 			"Pleading for Glenna's assistance…", "Counting achievements…", "Blowing away dust…", "Calling upon spirits…", "Consulting Order of Shadows…", "Bribing Pact troops…", "Bribing Bankers…"
 		};
 
+		private const string RESOURCE_PROFILE = "Nika";
+
 		public ResourceService()
 		{
 			LoadSounds();
@@ -54,6 +58,16 @@ namespace Nekres.ProofLogix.Core.Services
 			_resources = Resources.Empty;
 			_apiIcons = new Dictionary<int, AsyncTexture2D>();
 			GameService.Overlay.add_UserLocaleChanged((EventHandler<ValueEventArgs<CultureInfo>>)OnUserLocaleChanged);
+		}
+
+		public bool HasLoaded()
+		{
+			if (_resources.IsEmpty || !_eliteIcons.Any())
+			{
+				ScreenNotification.ShowNotification("Unavailable. Resources not yet loaded.", (NotificationType)2, (Texture2D)null, 4);
+				return false;
+			}
+			return true;
 		}
 
 		public async Task LoadAsync(bool localeChange = false)
@@ -114,7 +128,15 @@ namespace Nekres.ProofLogix.Core.Services
 
 		private async Task LoadResources()
 		{
-			_resources = await ProofLogix.Instance.KpWebApi.GetResources();
+			do
+			{
+				_resources = await ProofLogix.Instance.KpWebApi.GetResources();
+				if (_resources.IsEmpty)
+				{
+					await Task.Delay(TimeSpan.FromSeconds(30.0));
+				}
+			}
+			while (_resources.IsEmpty);
 			_maps = await ProofLogix.Instance.Gw2WebApi.GetMaps(_resources.Wings.Select((Raid.Wing wing) => wing.MapId).ToArray());
 			AddNewCoffers(await ProofLogix.Instance.KpWebApi.GetProfile("Nika"));
 			await ExpandResources(_resources.Items);
@@ -230,15 +252,14 @@ namespace Nekres.ProofLogix.Core.Services
 			_eliteNames = elites.ToDictionary((Specialization x) => x.get_Id(), (Specialization x) => x.get_Name());
 			if (!localeChange)
 			{
-				_profIcons = ((IEnumerable<Profession>)professions).ToDictionary((Profession x) => (int)(ProfessionType)Enum.Parse(typeof(ProfessionType), x.get_Id(), ignoreCase: true), delegate(Profession x)
+				_profIcons = ((IEnumerable<Profession>)professions).ToDictionary((Profession x) => (int)(ProfessionType)Enum.Parse(typeof(ProfessionType), x.get_Id(), ignoreCase: true), (Profession x) => GameService.Content.get_DatAssetCache().GetTextureFromAssetId(AssetUtil.GetId(RenderUrl.op_Implicit(x.get_IconBig()))));
+				_eliteIcons = elites.ToDictionary((Specialization x) => x.get_Id(), delegate(Specialization x)
 				{
-					//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-					//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-					ContentService content = GameService.Content;
-					RenderUrl iconBig = x.get_IconBig();
-					return content.GetRenderServiceTexture(((object)(RenderUrl)(ref iconBig)).ToString());
+					//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+					DatAssetCache datAssetCache = GameService.Content.get_DatAssetCache();
+					RenderUrl? professionIconBig = x.get_ProfessionIconBig();
+					return datAssetCache.GetTextureFromAssetId(AssetUtil.GetId(professionIconBig.HasValue ? RenderUrl.op_Implicit(professionIconBig.GetValueOrDefault()) : null));
 				});
-				_eliteIcons = elites.ToDictionary((Specialization x) => x.get_Id(), (Specialization x) => GameService.Content.GetRenderServiceTexture(x.get_ProfessionIconBig().ToString()));
 			}
 		}
 
@@ -267,7 +288,7 @@ namespace Nekres.ProofLogix.Core.Services
 			return source.ToList();
 		}
 
-		public List<Resource> GetGeneralItems(bool includeOld = false)
+		public List<Resource> GetGeneralItems()
 		{
 			IEnumerable<Resource> source;
 			if (!_resources.IsEmpty)
@@ -282,7 +303,7 @@ namespace Nekres.ProofLogix.Core.Services
 			return source.ToList();
 		}
 
-		public List<Resource> GetCofferItems(bool includeOld = false)
+		public List<Resource> GetCofferItems()
 		{
 			IEnumerable<Resource> source;
 			if (!_resources.IsEmpty)

@@ -14,6 +14,8 @@ namespace Nekres.ProofLogix.Core
 
 		private const char BRACKET_RIGHT = ']';
 
+		private const string WIKI_SEARCH = "https://wiki-{0}.guildwars2.com?search={1}";
+
 		public static int GetId(string assetUri)
 		{
 			return int.Parse(Path.GetFileNameWithoutExtension(assetUri));
@@ -68,9 +70,9 @@ namespace Nekres.ProofLogix.Core
 				if (value - 4 > 1)
 				{
 				}
-				return "https://wiki.guildwars2.com/index.php?search=" + wikiPage;
+				return $"https://wiki-{((Locale)0).Code()}.guildwars2.com?search={wikiPage}";
 			}
-			return "https://wiki-" + GameService.Overlay.get_UserLocale().get_Value().Code() + ".guildwars2.com/wiki/" + wikiPage;
+			return $"https://wiki-{GameService.Overlay.get_UserLocale().get_Value().Code()}.guildwars2.com?search={wikiPage}";
 		}
 	}
 }

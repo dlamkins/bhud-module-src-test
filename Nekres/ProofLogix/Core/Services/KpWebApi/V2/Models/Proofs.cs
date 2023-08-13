@@ -35,7 +35,7 @@ namespace Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models
 		[JsonProperty("titles")]
 		public List<Title> Titles { get; set; }
 
-		public Token GetToken(int id)
+		public virtual Token GetToken(int id)
 		{
 			return Tokens?.FirstOrDefault((Token x) => x.Id == id) ?? Killproofs?.FirstOrDefault((Token x) => x.Id == id) ?? Coffers?.FirstOrDefault((Token x) => x.Id == id) ?? Token.Empty;
 		}

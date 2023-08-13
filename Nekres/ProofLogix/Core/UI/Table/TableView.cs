@@ -127,30 +127,30 @@ namespace Nekres.ProofLogix.Core.UI.Table
 			//IL_06e4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_06ee: Expected O, but got Unknown
 			//IL_06f0: Expected O, but got Unknown
-			//IL_070d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0712: Unknown result type (might be due to invalid IL or missing references)
+			//IL_070c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0711: Unknown result type (might be due to invalid IL or missing references)
+			//IL_071e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_071f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0720: Unknown result type (might be due to invalid IL or missing references)
-			//IL_072a: Expected O, but got Unknown
-			//IL_072c: Expected O, but got Unknown
-			//IL_0749: Unknown result type (might be due to invalid IL or missing references)
-			//IL_074e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_075b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_075c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0729: Expected O, but got Unknown
+			//IL_072b: Expected O, but got Unknown
+			//IL_0747: Unknown result type (might be due to invalid IL or missing references)
+			//IL_074c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0759: Unknown result type (might be due to invalid IL or missing references)
+			//IL_075a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0764: Expected O, but got Unknown
 			//IL_0766: Expected O, but got Unknown
-			//IL_0768: Expected O, but got Unknown
-			//IL_07a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07c0: Expected O, but got Unknown
 			//IL_07c2: Expected O, but got Unknown
-			//IL_07c4: Expected O, but got Unknown
-			//IL_083c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0841: Unknown result type (might be due to invalid IL or missing references)
-			//IL_084e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_084f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_083a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_083f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_084c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_084d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0857: Expected O, but got Unknown
 			//IL_0859: Expected O, but got Unknown
-			//IL_085b: Expected O, but got Unknown
 			Image val = new Image(_cogWheelIcon);
 			((Control)val).set_Parent(buildPanel);
 			((Control)val).set_Width(32);

@@ -6,6 +6,8 @@ namespace Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models
 {
 	public class Resources
 	{
+		public const int UNSTABLE_COSMIC_ESSENCE = 81743;
+
 		public static Resources Empty = new Resources
 		{
 			IsEmpty = true

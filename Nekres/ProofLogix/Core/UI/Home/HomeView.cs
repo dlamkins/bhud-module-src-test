@@ -306,7 +306,11 @@ namespace Nekres.ProofLogix.Core.UI.Home
 			});
 			((Control)proofsEntry).add_Click((EventHandler<MouseEventArgs>)async delegate
 			{
-				if (!ProofLogix.Instance.Gw2WebApi.IsApiAvailable())
+				if (!ProofLogix.Instance.Resources.HasLoaded())
+				{
+					GameService.Content.PlaySoundEffectByName("error");
+				}
+				else if (!ProofLogix.Instance.Gw2WebApi.IsApiAvailable())
 				{
 					GameService.Content.PlaySoundEffectByName("error");
 				}
@@ -326,7 +330,11 @@ namespace Nekres.ProofLogix.Core.UI.Home
 			});
 			((Control)clearsEntry).add_Click((EventHandler<MouseEventArgs>)async delegate
 			{
-				if (!ProofLogix.Instance.Gw2WebApi.IsApiAvailable())
+				if (!ProofLogix.Instance.Resources.HasLoaded())
+				{
+					GameService.Content.PlaySoundEffectByName("error");
+				}
+				else if (!ProofLogix.Instance.Gw2WebApi.IsApiAvailable())
 				{
 					GameService.Content.PlaySoundEffectByName("error");
 				}
@@ -340,22 +348,36 @@ namespace Nekres.ProofLogix.Core.UI.Home
 			});
 			((Control)myProfileEntry).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				MumblePlayer localPlayer = ProofLogix.Instance.PartySync.LocalPlayer;
-				if (!localPlayer.HasKpProfile)
+				if (!ProofLogix.Instance.Resources.HasLoaded())
 				{
 					GameService.Content.PlaySoundEffectByName("error");
-					ScreenNotification.ShowNotification("Not yet loaded. Please, try again.", (NotificationType)2, (Texture2D)null, 4);
 				}
 				else
 				{
-					ProofLogix.Instance.Resources.PlayMenuItemClick();
-					if (localPlayer.KpProfile.NotFound)
+					MumblePlayer localPlayer = ProofLogix.Instance.PartySync.LocalPlayer;
+					if (!localPlayer.HasKpProfile)
 					{
-						ProofLogix.Instance.ToggleRegisterWindow();
+						GameService.Content.PlaySoundEffectByName("error");
+						if (string.IsNullOrWhiteSpace(GameService.Gw2Mumble.get_PlayerCharacter().get_Name()))
+						{
+							ScreenNotification.ShowNotification("Profile unavailable. Please, login to a character.", (NotificationType)2, (Texture2D)null, 4);
+						}
+						else
+						{
+							ScreenNotification.ShowNotification("Not yet loaded. Please, try again.", (NotificationType)2, (Texture2D)null, 4);
+						}
 					}
 					else
 					{
-						ProfileView.Open(localPlayer.KpProfile);
+						ProofLogix.Instance.Resources.PlayMenuItemClick();
+						if (localPlayer.KpProfile.NotFound)
+						{
+							ProofLogix.Instance.ToggleRegisterWindow();
+						}
+						else
+						{
+							ProfileView.Open(localPlayer.KpProfile);
+						}
 					}
 				}
 			});

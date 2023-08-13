@@ -131,9 +131,6 @@ namespace Nekres.ProofLogix.Core.Services
 			GameService.Overlay.remove_UserLocaleChanged((EventHandler<ValueEventArgs<CultureInfo>>)OnUserLocaleChanged);
 			GameService.ArcDps.get_Common().remove_PlayerAdded(new PresentPlayersChange(OnPlayerJoin));
 			GameService.ArcDps.get_Common().remove_PlayerRemoved(new PresentPlayersChange(OnPlayerLeft));
-			this.PlayerAdded = null;
-			this.PlayerRemoved = null;
-			this.PlayerChanged = null;
 		}
 
 		public void AddKpProfile(Profile kpProfile)

@@ -2,12 +2,16 @@ using Newtonsoft.Json;
 
 namespace Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models
 {
-	public sealed class Token
+	public class Token
 	{
 		public static Token Empty = new Token
 		{
-			Name = string.Empty
+			Name = string.Empty,
+			IsEmpty = true
 		};
+
+		[JsonIgnore]
+		public bool IsEmpty { get; private init; }
 
 		[JsonProperty("id")]
 		public int Id { get; set; }
