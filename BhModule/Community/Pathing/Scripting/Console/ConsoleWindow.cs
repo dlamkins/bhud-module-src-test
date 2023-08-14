@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using Blish_HUD;
 using Humanizer;
@@ -14,22 +15,22 @@ namespace BhModule.Community.Pathing.Scripting.Console
 
 		private int _lastLogMessage;
 
-		private readonly Dictionary<int, Color> _logLevelColors = new Dictionary<int, Color>
+		private readonly Dictionary<ScriptMessageLogLevel, Color> _logLevelColors = new Dictionary<ScriptMessageLogLevel, Color>
 		{
 			{
-				-1,
+				ScriptMessageLogLevel.System,
 				Color.SlateGray
 			},
 			{
-				0,
+				ScriptMessageLogLevel.Info,
 				Color.Black
 			},
 			{
-				1,
+				ScriptMessageLogLevel.Warn,
 				Color.Orange
 			},
 			{
-				2,
+				ScriptMessageLogLevel.Error,
 				Color.IndianRed
 			}
 		};
@@ -111,26 +112,34 @@ namespace BhModule.Community.Pathing.Scripting.Console
 
 		private void tOutputPoll_Tick(object sender, EventArgs e)
 		{
-			btnReloadPacks.Enabled = !_module.PackInitiator.IsLoading;
-			tsslScriptFrameTime.Text = _module.ScriptEngine.FrameExecutionTime.Humanize();
-			ToolStripStatusLabel toolStripStatusLabel = tsslScriptFrameTime;
-			double totalMilliseconds = _module.ScriptEngine.FrameExecutionTime.TotalMilliseconds;
-			Color color2 = (toolStripStatusLabel.ForeColor = ((totalMilliseconds > 3.0) ? Color.IndianRed : ((!(totalMilliseconds > 1.0)) ? Color.Black : Color.Orange)));
-			foreach (KeyValuePair<string, object> watchValue in _module.ScriptEngine.Global.Debug.WatchValues)
+			try
 			{
-				CreateOrUpdateNode(watchValue.Key).Refresh(watchValue.Value);
+				btnReloadPacks.Enabled = !_module.PackInitiator.IsLoading;
+				tsslScriptFrameTime.Text = _module.ScriptEngine.FrameExecutionTime.Humanize();
+				ToolStripStatusLabel toolStripStatusLabel = tsslScriptFrameTime;
+				double totalMilliseconds = _module.ScriptEngine.FrameExecutionTime.TotalMilliseconds;
+				Color color2 = (toolStripStatusLabel.ForeColor = ((totalMilliseconds > 3.0) ? Color.IndianRed : ((!(totalMilliseconds > 1.0)) ? Color.Black : Color.Orange)));
+				KeyValuePair<string, object>[] array = _module.ScriptEngine.Global.Debug.WatchValues.ToArray();
+				for (int i = 0; i < array.Length; i++)
+				{
+					KeyValuePair<string, object> watchValue = array[i];
+					CreateOrUpdateNode(watchValue.Key).Refresh(watchValue.Value);
+				}
+				if (_lastLogMessage > _module.ScriptEngine.OutputMessages.Count)
+				{
+					_lastLogMessage = 0;
+				}
+				while (_lastLogMessage < _module.ScriptEngine.OutputMessages.Count)
+				{
+					ScriptMessage newMessage = _module.ScriptEngine.OutputMessages[_lastLogMessage];
+					string metaLine = $"[{newMessage.Timestamp} | {newMessage.Source}] ";
+					AppendScriptConsoleOutput(metaLine, _logLevelColors[ScriptMessageLogLevel.System]);
+					AppendScriptConsoleOutput(newMessage.Message.Replace(Environment.NewLine, Environment.NewLine + new string(' ', metaLine.Length)) ?? "", _logLevelColors[newMessage.LogLevel], addNewLine: true);
+					_lastLogMessage++;
+				}
 			}
-			if (_lastLogMessage > _module.ScriptEngine.OutputMessages.Count)
+			catch (Exception)
 			{
-				_lastLogMessage = 0;
-			}
-			while (_lastLogMessage < _module.ScriptEngine.OutputMessages.Count)
-			{
-				ScriptEngine.ScriptMessage newMessage = _module.ScriptEngine.OutputMessages[_lastLogMessage];
-				string metaLine = $"[{newMessage.Timestamp} | {newMessage.Source}] ";
-				AppendScriptConsoleOutput(metaLine, _logLevelColors[-1]);
-				AppendScriptConsoleOutput(newMessage.Message.Replace(Environment.NewLine, Environment.NewLine + new string(' ', metaLine.Length)) ?? "", _logLevelColors[newMessage.LogLevel], addNewLine: true);
-				_lastLogMessage++;
 			}
 		}
 

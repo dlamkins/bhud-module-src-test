@@ -53,7 +53,7 @@ namespace BhModule.Community.Pathing.State
 				}
 				catch (Exception e)
 				{
-					Logger.Error(e, "Failed to read categories.txt (" + categoryStatePath + ").");
+					Logger.Warn(e, "Failed to read categories.txt (" + categoryStatePath + ").");
 				}
 				rawCategoriesList.Clear();
 				string[] array = recordedCategories;

@@ -34,9 +34,6 @@ namespace BhModule.Community.Pathing.Scripting
 
 		protected override void OnFrameExit()
 		{
-			LastFrameSource = null;
-			LastFrameScope = null;
-			LastFrameLine = 0;
 			base.OnFrameExit();
 		}
 

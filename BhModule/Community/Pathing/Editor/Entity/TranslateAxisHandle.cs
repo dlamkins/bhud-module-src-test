@@ -262,21 +262,11 @@ namespace BhModule.Community.Pathing.Editor.Entity
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Expected O, but got Unknown
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c2: Expected O, but got Unknown
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
 			_axisTransform = axisTransform;
-			BasicEffect val = new BasicEffect(GameService.Graphics.get_GraphicsDevice());
-			val.set_VertexColorEnabled(true);
-			val.set_Alpha(0.4f);
-			_effect = val;
 			VertexPositionColor[] verts = (VertexPositionColor[])(object)new VertexPositionColor[_faceIndexes.Length * 3];
 			for (int i = 0; i < _faceIndexes.Length; i++)
 			{
@@ -286,8 +276,6 @@ namespace BhModule.Community.Pathing.Editor.Entity
 					verts[i * 3 + f] = new VertexPositionColor(_arrowVerts[faceDef[f] - 1], axisColor);
 				}
 			}
-			_buffer = new VertexBuffer(GameService.Graphics.get_GraphicsDevice(), VertexPositionColor.VertexDeclaration, verts.Length, (BufferUsage)1);
-			_buffer.SetData<VertexPositionColor>(verts);
 		}
 
 		public bool RayIntersects(Ray ray)
@@ -307,18 +295,11 @@ namespace BhModule.Community.Pathing.Editor.Entity
 
 		public void Update(GameTime gameTime)
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-			if (_handleActive)
+			if (!_handleActive)
 			{
-				_mouseOffset = PickingUtil.CalculateRay(GameService.Input.get_Mouse().get_Position(), GameService.Gw2Mumble.get_PlayerCamera().get_View(), GameService.Gw2Mumble.get_PlayerCamera().get_Projection()).Position.Z;
-				return;
+				_mouseIndex = 0f;
+				_mouseOffset = 0f;
 			}
-			_mouseIndex = 0f;
-			_mouseOffset = 0f;
 		}
 
 		public void Render(GraphicsDevice graphicsDevice, IWorld world, ICamera camera)

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BhModule.Community.Pathing.Scripting.Lib;
 using BhModule.Community.Pathing.Scripting.Lib.Std;
 using Blish_HUD;
+using Blish_HUD.Modules;
 using Microsoft.Xna.Framework;
 using Neo.IronLua;
 using TmfLib;
@@ -21,8 +22,14 @@ namespace BhModule.Community.Pathing.Scripting
 
 		internal ScriptEngine ScriptEngine { get; set; }
 
+		[LuaMember("PathingVersion", false)]
+		public string PathingVersion => ((Module)ScriptEngine.Module).get_Version().Clean();
+
 		[LuaMember("World", false)]
 		public World World { get; }
+
+		[LuaMember("Storage", false)]
+		public Storage Storage { get; }
 
 		[LuaMember("Packs", false)]
 		public World Packs
@@ -31,7 +38,7 @@ namespace BhModule.Community.Pathing.Scripting
 			{
 				if (!_packsWarning)
 				{
-					ScriptEngine.PushMessage("`Packs` is deprecated.  Use `World` instead.", -1);
+					ScriptEngine.PushMessage("`Packs` is deprecated.  Use `World` instead.", ScriptMessageLogLevel.System);
 					_packsWarning = true;
 				}
 				return World;
@@ -85,6 +92,7 @@ namespace BhModule.Community.Pathing.Scripting
 			Event = new Event(this);
 			User = new User(this);
 			World = new World(this);
+			Storage = new Storage(this);
 			I = new Instance(this);
 		}
 

@@ -16,6 +16,7 @@ using BhModule.Community.Pathing.Utility;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Entities;
+using Blish_HUD.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -361,13 +362,23 @@ namespace BhModule.Community.Pathing.Entity
 
 		private static void CreateSharedVertexBuffer()
 		{
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Expected O, but got Unknown
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			_sharedVertexBuffer = new DynamicVertexBuffer(GameService.Graphics.get_GraphicsDevice(), typeof(VertexPositionTexture), 4, (BufferUsage)1);
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Expected O, but got Unknown
+			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+			GraphicsDeviceContext gdctx = GameService.Graphics.LendGraphicsDeviceContext();
+			try
+			{
+				_sharedVertexBuffer = new DynamicVertexBuffer(((GraphicsDeviceContext)(ref gdctx)).get_GraphicsDevice(), typeof(VertexPositionTexture), 4, (BufferUsage)1);
+			}
+			finally
+			{
+				((GraphicsDeviceContext)(ref gdctx)).Dispose();
+			}
 			VertexPositionTexture[] verts = (VertexPositionTexture[])(object)new VertexPositionTexture[_faceVerts.Length];
 			for (int i = 0; i < _faceVerts.Length; i++)
 			{

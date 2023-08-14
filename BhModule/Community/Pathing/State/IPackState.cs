@@ -36,6 +36,8 @@ namespace BhModule.Community.Pathing.State
 
 		CachedMumbleStates CachedMumbleStates { get; }
 
+		KvStates KvStates { get; }
+
 		SafeList<IPathingEntity> Entities { get; }
 	}
 }

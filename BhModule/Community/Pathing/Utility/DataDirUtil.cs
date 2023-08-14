@@ -8,6 +8,8 @@ namespace BhModule.Community.Pathing.Utility
 
 		public const string COMMON_USER = "user";
 
+		public const string COMMON_KV = "kv";
+
 		private const string MARKER_DIR = "markers";
 
 		private const string DATA_DIR = "data";

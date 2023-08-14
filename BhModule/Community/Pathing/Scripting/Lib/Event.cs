@@ -39,7 +39,7 @@ namespace BhModule.Community.Pathing.Scripting.Lib
 			{
 				if (!_global.ScriptEngine.WrapScriptCall(() => listener(gameTime)).Success)
 				{
-					_global.ScriptEngine.PushMessage("Tick delegate was unregistered because it threw an exception.", -1);
+					_global.ScriptEngine.PushMessage("Tick callback `" + listener.Method.Name + "` was unregistered because it threw an exception.", ScriptMessageLogLevel.System);
 					_tickListeners.Remove(listener);
 				}
 			}

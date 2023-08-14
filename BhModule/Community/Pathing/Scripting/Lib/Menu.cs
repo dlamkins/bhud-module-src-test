@@ -19,14 +19,17 @@ namespace BhModule.Community.Pathing.Scripting.Lib
 
 		public bool Checked { get; set; }
 
+		public string Tooltip { get; set; }
+
 		public IReadOnlyCollection<Menu> Menus => _menus.AsReadOnly();
 
-		public Menu(string name, Func<Menu, LuaResult> onClick, bool canCheck = false, bool @checked = false)
+		public Menu(string name, Func<Menu, LuaResult> onClick, bool canCheck = false, bool @checked = false, string tooltip = null)
 		{
 			Name = name;
 			OnClick = onClick;
 			CanCheck = canCheck;
 			Checked = @checked;
+			Tooltip = tooltip;
 		}
 
 		public Menu Add(string name, Func<Menu, LuaResult> onClick)
@@ -36,6 +39,11 @@ namespace BhModule.Community.Pathing.Scripting.Lib
 
 		public Menu Add(string name, Func<Menu, LuaResult> onClick, bool canCheck, bool @checked)
 		{
+			return Add(name, onClick, canCheck, @checked, null);
+		}
+
+		public Menu Add(string name, Func<Menu, LuaResult> onClick, bool canCheck, bool @checked, string tooltip)
+		{
 			foreach (Menu menu in _menus)
 			{
 				if (string.Equals(menu.Name, name, StringComparison.OrdinalIgnoreCase))
@@ -43,7 +51,7 @@ namespace BhModule.Community.Pathing.Scripting.Lib
 					return menu;
 				}
 			}
-			Menu newMenu = new Menu(name, onClick, canCheck, @checked);
+			Menu newMenu = new Menu(name, onClick, canCheck, @checked, tooltip);
 			_menus.Add(newMenu);
 			return newMenu;
 		}
@@ -59,13 +67,15 @@ namespace BhModule.Community.Pathing.Scripting.Lib
 			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Expected O, but got Unknown
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0066: Expected O, but got Unknown
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Expected O, but got Unknown
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0072: Expected O, but got Unknown
 			ContextMenuStripItem val = new ContextMenuStripItem();
 			val.set_Text(Name);
 			val.set_CanCheck(CanCheck);
 			val.set_Checked(Checked);
+			((Control)val).set_BasicTooltipText(Tooltip);
 			ContextMenuStripItem menu = val;
 			((Control)menu).add_Click((EventHandler<MouseEventArgs>)delegate
 			{

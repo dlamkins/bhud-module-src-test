@@ -13,6 +13,7 @@ using BhModule.Community.Pathing.Utility;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Entities;
+using Blish_HUD.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -193,7 +194,7 @@ namespace BhModule.Community.Pathing.Entity
 			spriteBatch.Draw(Textures.get_Pixel(), position, (Rectangle?)null, color, angle, Vector2.get_Zero(), new Vector2(distance, thickness), (SpriteEffects)0, 0f);
 		}
 
-		private VertexBuffer PostProcessTrailSection(IEnumerable<Vector3> points)
+		private VertexBuffer PostProcessTrailSection(GraphicsDevice graphicsDevice, IEnumerable<Vector3> points)
 		{
 			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
@@ -208,10 +209,10 @@ namespace BhModule.Community.Pathing.Entity
 			{
 				return null;
 			}
-			return BuildTrailSection(pointsArr, distance);
+			return BuildTrailSection(graphicsDevice, pointsArr, distance);
 		}
 
-		private VertexBuffer BuildTrailSection(IEnumerable<Vector3> points, float distance)
+		private VertexBuffer BuildTrailSection(GraphicsDevice graphicsDevice, IEnumerable<Vector3> points, float distance)
 		{
 			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
@@ -274,9 +275,9 @@ namespace BhModule.Community.Pathing.Entity
 			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e3: Expected O, but got Unknown
+			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01da: Expected O, but got Unknown
 			Vector3[] pointsArr = (points as Vector3[]) ?? points.ToArray();
 			VertexPositionColorTexture[] verts = (VertexPositionColorTexture[])(object)new VertexPositionColorTexture[pointsArr.Length * 2];
 			float pastDistance = distance;
@@ -298,21 +299,31 @@ namespace BhModule.Community.Pathing.Entity
 			Vector3 frightPoint = curPoint + offset * -0.508f * TrailScale;
 			verts[pointsArr.Length * 2 - 1] = new VertexPositionColorTexture(fleftPoint, Color.get_White(), new Vector2(0f, pastDistance / 1.016f - 1f));
 			verts[pointsArr.Length * 2 - 2] = new VertexPositionColorTexture(frightPoint, Color.get_White(), new Vector2(1f, pastDistance / 1.016f - 1f));
-			VertexBuffer val = new VertexBuffer(GameService.Graphics.get_GraphicsDevice(), VertexPositionColorTexture.VertexDeclaration, verts.Length, (BufferUsage)1);
+			VertexBuffer val = new VertexBuffer(graphicsDevice, VertexPositionColorTexture.VertexDeclaration, verts.Length, (BufferUsage)1);
 			val.SetData<VertexPositionColorTexture>(verts);
 			return val;
 		}
 
 		private void BuildBuffers(ITrail trail)
 		{
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
 			List<VertexBuffer> buffers = new List<VertexBuffer>();
-			foreach (ITrailSection section in trail.TrailSections)
+			GraphicsDeviceContext gdctx = GameService.Graphics.LendGraphicsDeviceContext();
+			try
 			{
-				VertexBuffer processedBuffer = PostProcessTrailSection(section.TrailPoints.Select((Func<Vector3, Vector3>)((Vector3 v) => new Vector3(v.X, v.Y, v.Z))));
-				if (processedBuffer != null)
+				foreach (ITrailSection section in trail.TrailSections)
 				{
-					buffers.Add(processedBuffer);
+					VertexBuffer processedBuffer = PostProcessTrailSection(((GraphicsDeviceContext)(ref gdctx)).get_GraphicsDevice(), section.TrailPoints.Select((Func<Vector3, Vector3>)((Vector3 v) => new Vector3(v.X, v.Y, v.Z))));
+					if (processedBuffer != null)
+					{
+						buffers.Add(processedBuffer);
+					}
 				}
+			}
+			finally
+			{
+				((GraphicsDeviceContext)(ref gdctx)).Dispose();
 			}
 			_sectionBuffers = buffers.ToArray();
 		}

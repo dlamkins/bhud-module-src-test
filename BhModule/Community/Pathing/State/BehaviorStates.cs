@@ -214,7 +214,7 @@ namespace BhModule.Community.Pathing.State
 			}
 			catch (Exception e)
 			{
-				Logger.Error(e, "Failed to read timers.txt (" + timerStatesPath + ").");
+				Logger.Warn(e, "Failed to read timers.txt (" + timerStatesPath + ").");
 			}
 			lock (_hiddenUntilTimer)
 			{

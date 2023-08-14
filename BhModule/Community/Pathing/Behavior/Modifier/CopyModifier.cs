@@ -47,6 +47,10 @@ namespace BhModule.Community.Pathing.Behavior.Modifier
 				return;
 			}
 			_lastTrigger = GameService.Overlay.get_CurrentGameTime().get_TotalGameTime().TotalMilliseconds;
+			if (string.IsNullOrEmpty(CopyValue))
+			{
+				return;
+			}
 			ClipboardUtil.get_WindowsClipboardService().SetTextAsync(CopyValue).ContinueWith(delegate(Task<bool> t)
 			{
 				if (t.IsCompleted && t.Result)
@@ -62,6 +66,11 @@ namespace BhModule.Community.Pathing.Behavior.Modifier
 		}
 
 		public void Unfocus()
+		{
+			_packState.UiStates.Interact.DisconnectInteract(_pathingEntity);
+		}
+
+		public override void Unload()
 		{
 			_packState.UiStates.Interact.DisconnectInteract(_pathingEntity);
 		}

@@ -33,12 +33,12 @@ namespace BhModule.Community.Pathing.Scripting.Lib
 
 		public void Warn(string message)
 		{
-			_global.ScriptEngine.PushMessage(message, 1);
+			_global.ScriptEngine.PushMessage(message, ScriptMessageLogLevel.Warn);
 		}
 
 		public void Error(string message)
 		{
-			_global.ScriptEngine.PushMessage(message, 2);
+			_global.ScriptEngine.PushMessage(message, ScriptMessageLogLevel.Error);
 		}
 
 		public void Watch(string key, object value)

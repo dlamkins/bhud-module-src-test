@@ -127,11 +127,12 @@ namespace BhModule.Community.Pathing
 			PackAllowMarkersToAnimate = PackSettings.DefineSetting<bool>("PackAllowMarkersToAnimate", true, (Func<string>)(() => Strings.Setting_PackAllowMarkersToAnimate), (Func<string>)(() => "Allows animations such as 'bounce' and trail movements."));
 			PackEnableSmartCategoryFilter = PackSettings.DefineSetting<bool>("PackEnableSmartCategoryFilter", true, (Func<string>)(() => "Enable Smart Categories"), (Func<string>)(() => "If a category doesn't contain markers or trails relevant to the current map, the category is hidden."));
 			PackShowWhenCategoriesAreFiltered = PackSettings.DefineSetting<bool>("PackShowWhenCategoriesAreFiltered", true, (Func<string>)(() => "Indicate when categories are hidden"), (Func<string>)(() => "Shows a note at the bottom of the menu indicating if categories have been hidden.  Clicking the note will show the hidden categories temporarily."));
-			PackShowHiddenMarkersReducedOpacity = PackSettings.DefineSetting<bool>("PackShowHiddenMarkersReducedOpacity", false, (Func<string>)(() => "Show Ghost Markers"), (Func<string>)(() => "Shows hidden markers with a reduced opacity allowing you to unhide them."));
+			PackShowHiddenMarkersReducedOpacity = PackSettings.DefineSetting<bool>("PackShowHiddenMarkersReducedOpacity", false, (Func<string>)(() => "Temporarily Show Ghost Markers"), (Func<string>)(() => "Shows hidden markers with a reduced opacity allowing you to unhide them.  This setting automatically disables on startup."));
 			SettingComplianceExtensions.SetRange(PackMaxOpacityOverride, 0f, 1f);
 			SettingComplianceExtensions.SetRange(PackMaxViewDistance, 25f, 50000f);
 			SettingComplianceExtensions.SetRange(PackMaxTrailAnimationSpeed, 0f, 10f);
 			SettingComplianceExtensions.SetRange(PackMarkerScale, 0.1f, 4f);
+			PackShowHiddenMarkersReducedOpacity.set_Value(false);
 		}
 
 		private void InitMapSettings(SettingCollection settings)
@@ -180,18 +181,34 @@ namespace BhModule.Community.Pathing
 			KeyBindTogglePathables.get_Value().set_Enabled(true);
 			KeyBindToggleWorldPathables.get_Value().set_Enabled(true);
 			KeyBindToggleMapPathables.get_Value().set_Enabled(true);
-			KeyBindTogglePathables.get_Value().add_Activated((EventHandler<EventArgs>)async delegate
-			{
-				GlobalPathablesEnabled.set_Value(!GlobalPathablesEnabled.get_Value());
-			});
-			KeyBindToggleWorldPathables.get_Value().add_Activated((EventHandler<EventArgs>)delegate
-			{
-				PackWorldPathablesEnabled.set_Value(!PackWorldPathablesEnabled.get_Value());
-			});
-			KeyBindToggleMapPathables.get_Value().add_Activated((EventHandler<EventArgs>)delegate
-			{
-				MapPathablesEnabled.set_Value(!MapPathablesEnabled.get_Value());
-			});
+			KeyBindTogglePathables.get_Value().add_Activated((EventHandler<EventArgs>)ToggleGlobalPathablesEnabled);
+			KeyBindToggleWorldPathables.get_Value().add_Activated((EventHandler<EventArgs>)TogglePackWorldPathablesEnabled);
+			KeyBindToggleMapPathables.get_Value().add_Activated((EventHandler<EventArgs>)ToggleMapPathablesEnabled);
+		}
+
+		private void ToggleGlobalPathablesEnabled(object sender, EventArgs e)
+		{
+			GlobalPathablesEnabled.set_Value(!GlobalPathablesEnabled.get_Value());
+		}
+
+		private void TogglePackWorldPathablesEnabled(object sender, EventArgs e)
+		{
+			PackWorldPathablesEnabled.set_Value(!PackWorldPathablesEnabled.get_Value());
+		}
+
+		private void ToggleMapPathablesEnabled(object sender, EventArgs e)
+		{
+			MapPathablesEnabled.set_Value(!MapPathablesEnabled.get_Value());
+		}
+
+		public void Unload()
+		{
+			KeyBindTogglePathables.get_Value().set_Enabled(false);
+			KeyBindToggleWorldPathables.get_Value().set_Enabled(false);
+			KeyBindToggleMapPathables.get_Value().set_Enabled(false);
+			KeyBindTogglePathables.get_Value().remove_Activated((EventHandler<EventArgs>)ToggleGlobalPathablesEnabled);
+			KeyBindToggleWorldPathables.get_Value().remove_Activated((EventHandler<EventArgs>)TogglePackWorldPathablesEnabled);
+			KeyBindToggleMapPathables.get_Value().remove_Activated((EventHandler<EventArgs>)ToggleMapPathablesEnabled);
 		}
 	}
 }

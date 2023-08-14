@@ -1,10 +1,10 @@
 using System;
-using System.Threading.Tasks;
 using BhModule.Community.Pathing.Behavior;
 using BhModule.Community.Pathing.Entity;
+using BhModule.Community.Pathing.Scripting.Lib;
+using Blish_HUD;
 using Blish_HUD.Content;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace BhModule.Community.Pathing.Scripting.Extensions
 {
@@ -97,14 +97,12 @@ namespace BhModule.Community.Pathing.Scripting.Extensions
 
 		public static void SetTexture(this StandardMarker marker, string texturePath)
 		{
-			marker.TextureResourceManager.PreloadTexture(texturePath, shouldSample: false);
-			marker.TextureResourceManager.LoadTextureAsync(texturePath).ContinueWith(delegate(Task<(Texture2D Texture, Color Sample)> textureTaskResult)
-			{
-				if (!textureTaskResult.IsFaulted && textureTaskResult.Result.Texture != null)
-				{
-					marker.Texture = AsyncTexture2D.op_Implicit(textureTaskResult.Result.Texture);
-				}
-			});
+			marker.Texture = Instance.Texture(marker.TextureResourceManager, texturePath);
+		}
+
+		public static void SetTexture(this StandardMarker marker, int textureId)
+		{
+			marker.Texture = AsyncTexture2D.FromAssetId(textureId) ?? AsyncTexture2D.op_Implicit(Textures.get_Error());
 		}
 
 		public static IBehavior GetBehavior(this StandardMarker marker, string behaviorName)

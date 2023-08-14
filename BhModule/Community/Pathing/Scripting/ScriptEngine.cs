@@ -17,25 +17,6 @@ namespace BhModule.Community.Pathing.Scripting
 {
 	public class ScriptEngine
 	{
-		public struct ScriptMessage
-		{
-			public DateTime Timestamp { get; }
-
-			public string Message { get; }
-
-			public string Source { get; }
-
-			public int LogLevel { get; }
-
-			public ScriptMessage(string message, string source, DateTime timestamp, int logLevel = 0)
-			{
-				Message = message;
-				Source = source;
-				Timestamp = timestamp;
-				LogLevel = logLevel;
-			}
-		}
-
 		private static readonly Logger Logger = Logger.GetLogger<ScriptEngine>();
 
 		private Lua _lua;
@@ -74,6 +55,7 @@ namespace BhModule.Community.Pathing.Scripting
 		{
 			Module = module;
 			LuaType.RegisterTypeExtension(typeof(StandardMarkerScriptExtensions));
+			LuaType.RegisterTypeExtension(typeof(StandardTrailScriptExtensions));
 			LuaType.RegisterTypeExtension(typeof(PathingCategoryScriptExtensions));
 			LuaType.RegisterTypeExtension(typeof(GuidExtensions));
 		}
@@ -83,14 +65,15 @@ namespace BhModule.Community.Pathing.Scripting
 			_lua?.Dispose();
 			_lua = new Lua(LuaIntegerType.Int32, LuaFloatType.Float);
 			StandardMarkerScriptExtensions.SetPackInitiator(Module.PackInitiator);
+			StandardTrailScriptExtensions.SetPackInitiator(Module.PackInitiator);
 			PathingCategoryScriptExtensions.SetPackInitiator(Module.PackInitiator);
 			_stackTraceDebugger = new TraceLineDebugger();
 			Global = _lua.CreateEnvironment<PathingGlobal>();
 			Global.ScriptEngine = this;
-			PushMessage("Loaded new environment.", -1);
+			PushMessage("Loaded new environment.", ScriptMessageLogLevel.System);
 		}
 
-		public void PushMessage(string message, int logLevel = 0, DateTime? timestamp = null, string source = null)
+		public void PushMessage(string message, ScriptMessageLogLevel logLevel = ScriptMessageLogLevel.Info, DateTime? timestamp = null, string source = null)
 		{
 			DateTime valueOrDefault = timestamp.GetValueOrDefault();
 			if (!timestamp.HasValue)
@@ -98,7 +81,7 @@ namespace BhModule.Community.Pathing.Scripting
 				valueOrDefault = DateTime.UtcNow;
 				timestamp = valueOrDefault;
 			}
-			if (logLevel == -1)
+			if (logLevel == ScriptMessageLogLevel.System && source == null)
 			{
 				source = "system";
 			}
@@ -121,13 +104,13 @@ namespace BhModule.Community.Pathing.Scripting
 				if (ex is LuaRuntimeException)
 				{
 					source2 = source;
-					PushMessage(message, 2, null, source2);
+					PushMessage(message, ScriptMessageLogLevel.Error, null, source2);
 				}
 			}
 			else
 			{
 				source2 = source;
-				PushMessage(message, 2, null, source2);
+				PushMessage(message, ScriptMessageLogLevel.Error, null, source2);
 			}
 		}
 
@@ -159,7 +142,7 @@ namespace BhModule.Community.Pathing.Scripting
 			catch (Exception ex)
 			{
 				success = false;
-				PushMessage(ex.Message, 2);
+				PushMessage(ex.Message, ScriptMessageLogLevel.Error);
 			}
 			_currentFrameDuration += runClock.Elapsed;
 			return (result, success);
@@ -196,7 +179,7 @@ namespace BhModule.Community.Pathing.Scripting
 				ScriptState newScript = new ScriptState(chunk);
 				newScript.Run(Global, new PackContext(this, resourceManager));
 				Scripts.Add(newScript);
-				PushMessage(newScript.Name + ".lua loaded in " + newScript.LoadTime.Humanize(2) + ".", (newScript.LoadTime.Milliseconds > 500) ? 1 : 0, null, "system");
+				PushMessage(newScript.Name + ".lua loaded in " + newScript.LoadTime.Humanize(2) + ".", (newScript.LoadTime.TotalMilliseconds > 500.0) ? ScriptMessageLogLevel.Warn : ScriptMessageLogLevel.Info, null, "system");
 				return chunk;
 			}
 			catch (LuaException ex2)
@@ -207,7 +190,7 @@ namespace BhModule.Community.Pathing.Scripting
 			{
 				Logger.Warn(ex, "Failed to load script '" + scriptName + "'.");
 			}
-			PushMessage("Failed to load " + scriptName + ".", 2, null, "system");
+			PushMessage("Failed to load " + scriptName + ".", ScriptMessageLogLevel.Error);
 			return null;
 		}
 
@@ -254,6 +237,7 @@ namespace BhModule.Community.Pathing.Scripting
 			Scripts.Clear();
 			_lua?.Dispose();
 			StandardMarkerScriptExtensions.SetPackInitiator(null);
+			StandardTrailScriptExtensions.SetPackInitiator(null);
 			PathingCategoryScriptExtensions.SetPackInitiator(null);
 		}
 	}

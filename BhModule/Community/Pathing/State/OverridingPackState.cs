@@ -38,6 +38,8 @@ namespace BhModule.Community.Pathing.State
 
 		public CachedMumbleStates CachedMumbleStates => _referencePackState.CachedMumbleStates;
 
+		public KvStates KvStates => _referencePackState.KvStates;
+
 		public SafeList<IPathingEntity> Entities => _referencePackState.Entities;
 
 		public OverridingPackState(IPackState referencePackState)

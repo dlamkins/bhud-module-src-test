@@ -149,28 +149,14 @@ namespace BhModule.Community.Pathing.Utility
 
 		public static Color GetValueAsColor(this IAttribute attribute, Color @default = default(Color))
 		{
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-			string attrValue = attribute.GetValueAsString().ToLowerInvariant();
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 			Color color = default(Color);
-			return (Color)(attrValue switch
+			if (!ColorUtil.TryParseHex(attribute.GetValueAsString().ToLowerInvariant(), ref color))
 			{
-				"white" => Color.get_White(), 
-				"yellow" => Color.FromNonPremultiplied(255, 255, 0, 255), 
-				"red" => Color.FromNonPremultiplied(242, 13, 19, 255), 
-				"green" => Color.FromNonPremultiplied(85, 221, 85, 255), 
-				_ => ColorUtil.TryParseHex(attrValue, ref color) ? color : @default, 
-			});
+				return @default;
+			}
+			return color;
 		}
 
 		public static CronExpression GetValueAsCronExpression(this IAttribute attribute)

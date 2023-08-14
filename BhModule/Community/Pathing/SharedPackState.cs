@@ -58,6 +58,8 @@ namespace BhModule.Community.Pathing
 
 		public CachedMumbleStates CachedMumbleStates { get; private set; }
 
+		public KvStates KvStates { get; private set; }
+
 		public SafeList<IPathingEntity> Entities { get; private set; } = new SafeList<IPathingEntity>();
 
 
@@ -103,7 +105,9 @@ namespace BhModule.Community.Pathing
 			ManagedState managedState8 = await editorStates2.Start();
 			CachedMumbleStates cachedMumbleStates2 = (CachedMumbleStates = new CachedMumbleStates(this));
 			ManagedState managedState9 = await cachedMumbleStates2.Start();
-			_managedStates = new ManagedState[9] { managedState, managedState2, managedState3, managedState4, managedState5, managedState6, managedState7, managedState8, managedState9 };
+			KvStates kvStates2 = (KvStates = new KvStates(this));
+			ManagedState managedState10 = await kvStates2.Start();
+			_managedStates = new ManagedState[10] { managedState, managedState2, managedState3, managedState4, managedState5, managedState6, managedState7, managedState8, managedState9, managedState10 };
 			_initialized = true;
 		}
 
@@ -181,9 +185,10 @@ namespace BhModule.Community.Pathing
 
 		private void OnInteractPressed(object sender, EventArgs e)
 		{
-			foreach (IPathingEntity entity in Entities)
+			IPathingEntity[] array = Entities.ToArray();
+			for (int i = 0; i < array.Length; i++)
 			{
-				StandardMarker marker = entity as StandardMarker;
+				StandardMarker marker = array[i] as StandardMarker;
 				if (marker != null && marker.Focused)
 				{
 					marker.Interact(autoTriggered: false);

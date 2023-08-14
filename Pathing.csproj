@@ -34,6 +34,12 @@
     <Reference Include="LiteDB">
       <HintPath>..\..\working\LiteDB.dll</HintPath>
     </Reference>
+    <Reference Include="FASTER.core">
+      <HintPath>..\..\working\FASTER.core.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions">
+      <HintPath>..\..\working\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
     <Reference Include="YamlDotNet">
       <HintPath>..\..\working\YamlDotNet.dll</HintPath>
     </Reference>
@@ -42,16 +48,19 @@
     </Reference>
     <Reference Include="Flurl.Http" />
     <Reference Include="Newtonsoft.Json" />
-    <Reference Include="Flurl">
-      <HintPath>..\..\working\Flurl.dll</HintPath>
-    </Reference>
-    <Reference Include="SemVer" />
+    <Reference Include="Flurl" />
     <Reference Include="AsyncClipboardService" />
     <Reference Include="Humanizer">
       <HintPath>..\..\working\Humanizer.dll</HintPath>
     </Reference>
+    <Reference Include="SemVer">
+      <HintPath>..\..\working\SemVer.dll</HintPath>
+    </Reference>
     <Reference Include="Gapotchenko.FX" />
     <Reference Include="System.IO.Compression" />
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions">
+      <HintPath>..\..\working\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+    </Reference>
     <Reference Include="System.Net.Http" />
   </ItemGroup>
 </Project>

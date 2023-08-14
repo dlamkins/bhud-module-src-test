@@ -14,8 +14,8 @@ namespace BhModule.Community.Pathing.LocalHttp.Routes.API
 			if (context.Request.HttpMethod == "GET")
 			{
 				Status status = this;
-				string overlayVersion = ((object)Program.get_OverlayVersion()).ToString();
-				string pathingVersion = ((object)((Module)PathingModule.Instance).get_Version()).ToString();
+				string overlayVersion = Program.get_OverlayVersion().ToString();
+				string pathingVersion = ((Module)PathingModule.Instance).get_Version().ToString();
 				Coordinates2 mapCenter = GameService.Gw2Mumble.get_UI().get_MapCenter();
 				double x = ((Coordinates2)(ref mapCenter)).get_X();
 				mapCenter = GameService.Gw2Mumble.get_UI().get_MapCenter();

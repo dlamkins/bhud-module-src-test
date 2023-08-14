@@ -21,7 +21,6 @@ using Blish_HUD.Settings;
 using Blish_HUD.Settings.UI.Views;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using SemVer;
 
 namespace BhModule.Community.Pathing
 {
@@ -143,22 +142,19 @@ namespace BhModule.Community.Pathing
 			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bd: Expected O, but got Unknown
-			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0113: Expected O, but got Unknown
-			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014d: Expected O, but got Unknown
-			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0187: Expected O, but got Unknown
-			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c1: Expected O, but got Unknown
-			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fb: Expected O, but got Unknown
-			//IL_022b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0235: Expected O, but got Unknown
+			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00df: Expected O, but got Unknown
+			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0119: Expected O, but got Unknown
+			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0153: Expected O, but got Unknown
+			//IL_0183: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018d: Expected O, but got Unknown
+			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c7: Expected O, but got Unknown
+			//IL_01f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0201: Expected O, but got Unknown
 			CornerIcon val = new CornerIcon();
 			val.set_IconName(Strings.General_UiName);
 			val.set_Icon(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\pathing-icon.png")));
@@ -168,7 +164,6 @@ namespace BhModule.Community.Pathing
 			((WindowBase2)val2).set_Title(Strings.General_UiName);
 			((Control)val2).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((Control)val2).set_Location(new Point(100, 100));
-			((Control)val2).set_ClipsBounds(Program.get_OverlayVersion() == new Version(0, 11, 2, (string)null, (string)null) && GameService.Graphics.GetDpiScaleRatio() != 1f);
 			((WindowBase2)val2).set_Emblem(ContentsManager.GetTexture("png\\controls\\1615829.png"));
 			((WindowBase2)val2).set_Id(((Module)this).get_Namespace() + "_SettingsWindow");
 			((WindowBase2)val2).set_SavesPosition(true);
@@ -287,6 +282,7 @@ namespace BhModule.Community.Pathing
 		{
 			ScriptEngine?.Unload();
 			_apiHost?.Close();
+			Settings?.Unload();
 			PackInitiator?.Unload();
 			CornerIcon pathingIcon = _pathingIcon;
 			if (pathingIcon != null)
