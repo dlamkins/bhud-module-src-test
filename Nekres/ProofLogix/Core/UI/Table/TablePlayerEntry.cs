@@ -15,6 +15,8 @@ namespace Nekres.ProofLogix.Core.UI.Table
 
 		private bool _remember;
 
+		private const int STATUS_ICON_SIZE = 8;
+
 		public Player Player
 		{
 			get
@@ -109,15 +111,34 @@ namespace Nekres.ProofLogix.Core.UI.Table
 			return AssetUtil.GetItemDisplayName(token.Name, token.Amount, brackets: false);
 		}
 
+		protected override void PaintStatus(SpriteBatch spriteBatch, Rectangle bounds)
+		{
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			Rectangle centered = default(Rectangle);
+			((Rectangle)(ref centered))._002Ector(bounds.X + (bounds.Width - 8) / 2, bounds.Y + (bounds.Height - 8) / 2, 8, 8);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), centered, ProofLogix.Instance.PartySync.GetStatusColor(Player.Status));
+		}
+
 		protected override void PaintToken(SpriteBatch spriteBatch, Rectangle bounds, int tokenId)
 		{
 			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
 			Token token = Player.KpProfile.GetToken(tokenId);
 			Color color = ProofLogix.Instance.PartySync.GetTokenAmountColor(tokenId, token.Amount, ProofLogix.Instance.TableConfig.get_Value().ColorGradingMode);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, AssetUtil.Truncate(token.Amount.ToString(), base.MaxTokenCellWidth, base.Font), base.Font, bounds, color, false, true, 2, (HorizontalAlignment)1, (VerticalAlignment)1);
+			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, AssetUtil.Truncate(token.Amount.ToString(), bounds.Width, base.Font), base.Font, bounds, color, false, true, 2, (HorizontalAlignment)1, (VerticalAlignment)1);
+		}
+
+		protected override string GetStatusTooltip()
+		{
+			return Player.Status.ToString();
 		}
 	}
 }

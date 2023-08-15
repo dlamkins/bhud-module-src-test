@@ -416,8 +416,8 @@ namespace Nekres.ProofLogix
 			PartySync.Dispose();
 			Resources.Dispose();
 			Gw2WebApi.Dispose();
-			Instance = null;
 			TrackableWindow.Unset();
+			Instance = null;
 		}
 	}
 }

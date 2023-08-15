@@ -1,14 +1,16 @@
+using System.Collections.ObjectModel;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Nekres.ProofLogix.Core.UI.Configs;
 
 namespace Nekres.ProofLogix.Core.UI.Table
 {
 	internal class TableHeaderEntry : TableEntryBase
 	{
-		private const string TIMESTAMP_TITLE = "#";
+		private const string HASHTAG = "#";
 
 		private readonly AsyncTexture2D _classIcon = GameService.Content.get_DatAssetCache().GetTextureFromAssetId(517179);
 
@@ -16,7 +18,17 @@ namespace Nekres.ProofLogix.Core.UI.Table
 
 		private const string ACCOUNT_TITLE = "Account";
 
-		protected override string Timestamp => "#";
+		protected override string Timestamp
+		{
+			get
+			{
+				if (!((Collection<TableConfig.Column>)(object)ProofLogix.Instance.TableConfig.get_Value().Columns).Contains(TableConfig.Column.Status))
+				{
+					return "#";
+				}
+				return string.Empty;
+			}
+		}
 
 		protected override AsyncTexture2D ClassIcon => _classIcon;
 
@@ -36,6 +48,14 @@ namespace Nekres.ProofLogix.Core.UI.Table
 			Rectangle centered = default(Rectangle);
 			((Rectangle)(ref centered))._002Ector(bounds.X + (bounds.Width - bounds.Height) / 2, bounds.Y, bounds.Height, bounds.Height);
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(ProofLogix.Instance.Resources.GetApiIcon(tokenId).Result), centered);
+		}
+
+		protected override void PaintStatus(SpriteBatch spriteBatch, Rectangle bounds)
+		{
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, AssetUtil.Truncate("#", bounds.Width, base.Font), base.Font, bounds, Color.get_White(), false, true, 2, (HorizontalAlignment)0, (VerticalAlignment)1);
 		}
 	}
 }

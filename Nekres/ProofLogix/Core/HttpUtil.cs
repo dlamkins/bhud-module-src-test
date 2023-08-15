@@ -6,7 +6,7 @@ using Flurl.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace Nekres.ProofLogix.Core.Utils
+namespace Nekres.ProofLogix.Core
 {
 	internal static class HttpUtil
 	{

@@ -53,6 +53,13 @@ namespace Nekres.ProofLogix.Core.UI.Table
 			((Control)table).Invalidate();
 		}
 
+		private void ResetBulkLoadTimer()
+		{
+			_bulkLoadTimer.Stop();
+			_bulkLoadTimer.Interval = 1000.0;
+			_bulkLoadTimer.Start();
+		}
+
 		public void CreatePlayerEntry(Player player)
 		{
 			if (!player.HasKpProfile)
@@ -64,14 +71,12 @@ namespace Nekres.ProofLogix.Core.UI.Table
 				playerEntry.Player = player;
 				return;
 			}
-			_bulkLoadTimer.Stop();
+			ResetBulkLoadTimer();
 			TablePlayerEntry tablePlayerEntry = new TablePlayerEntry(player);
 			((Control)tablePlayerEntry).set_Height(32);
 			tablePlayerEntry.Remember = ((IEnumerable<string>)base.get_Model().ProfileIds).Any((string id) => id.Equals(player.KpProfile.Id)) || player.Equals(ProofLogix.Instance.PartySync.LocalPlayer);
 			TablePlayerEntry entry = tablePlayerEntry;
 			_bulk.Add(entry);
-			_bulkLoadTimer.Interval = 1000.0;
-			_bulkLoadTimer.Start();
 			((Control)entry).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
 			{
 				ProofLogix.Instance.Resources.PlayMenuItemClick();
@@ -98,15 +103,18 @@ namespace Nekres.ProofLogix.Core.UI.Table
 
 		private void PlayerRemoved(object sender, ValueEventArgs<Player> e)
 		{
-			if (TryGetPlayerEntry(e.get_Value(), out var playerEntry) && !playerEntry.Remember)
+			TablePlayerEntry playerEntry;
+			if (base.get_Model().KeepLeavers)
 			{
-				_bulkLoadTimer.Stop();
+				ResetBulkLoadTimer();
+			}
+			else if (TryGetPlayerEntry(e.get_Value(), out playerEntry) && !playerEntry.Remember)
+			{
+				ResetBulkLoadTimer();
 				if (_bulk.Remove(playerEntry))
 				{
 					((Control)playerEntry).Dispose();
 				}
-				_bulkLoadTimer.Interval = 1000.0;
-				_bulkLoadTimer.Start();
 			}
 		}
 
@@ -123,8 +131,31 @@ namespace Nekres.ProofLogix.Core.UI.Table
 
 		private int Comparer(TablePlayerEntry x, TablePlayerEntry y)
 		{
+			if (base.get_Model().AlwaysSortStatus && x.Player.Status.CompareTo(y.Player.Status) != 0)
+			{
+				if (x.Player.Status == Player.OnlineStatus.Unknown)
+				{
+					return 1;
+				}
+				if (y.Player.Status == Player.OnlineStatus.Unknown)
+				{
+					return -1;
+				}
+				if (x.Player.Status == Player.OnlineStatus.Online && y.Player.Status == Player.OnlineStatus.Away)
+				{
+					return -1;
+				}
+				if (x.Player.Status == Player.OnlineStatus.Away && y.Player.Status == Player.OnlineStatus.Online)
+				{
+					return 1;
+				}
+			}
 			int column = base.get_Model().SelectedColumn;
 			int comparison = 0;
+			if (column == 4)
+			{
+				comparison = x.Player.Status.CompareTo(y.Player.Status);
+			}
 			if (column == 0)
 			{
 				comparison = x.Player.Created.CompareTo(y.Player.Created);

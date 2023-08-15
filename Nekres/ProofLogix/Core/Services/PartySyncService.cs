@@ -27,15 +27,15 @@ namespace Nekres.ProofLogix.Core.Services
 
 		private readonly ConcurrentDictionary<string, Player> _members;
 
-		private readonly ConcurrentQueue<Player> _history;
-
-		private const int MAX_HISTORY_LENGTH = 100;
-
 		private readonly Color _redShift = new Color(255, 57, 57);
 
-		public IReadOnlyList<Player> PlayerList => _members.Values.ToList();
+		private readonly Color _unknownColor = new Color(127, 128, 127);
 
-		public IReadOnlyList<Player> HistoryList => _history.ToList();
+		private readonly Color _awayColor = new Color(255, 165, 0);
+
+		private readonly Color _onlineColor = new Color(0, 255, 0);
+
+		public IReadOnlyList<Player> PlayerList => _members.Values.ToList();
 
 		public event EventHandler<ValueEventArgs<Player>> PlayerAdded;
 
@@ -47,13 +47,18 @@ namespace Nekres.ProofLogix.Core.Services
 		{
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0071: Expected O, but got Unknown
-			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008c: Expected O, but got Unknown
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a2: Expected O, but got Unknown
+			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bd: Expected O, but got Unknown
 			LocalPlayer = new MumblePlayer();
 			_members = new ConcurrentDictionary<string, Player>();
-			_history = new ConcurrentQueue<Player>();
 			GameService.Gw2Mumble.get_PlayerCharacter().add_NameChanged((EventHandler<ValueEventArgs<string>>)OnPlayerCharacterNameChanged);
 			GameService.ArcDps.get_Common().add_PlayerAdded(new PresentPlayersChange(OnPlayerJoin));
 			GameService.ArcDps.get_Common().add_PlayerRemoved(new PresentPlayersChange(OnPlayerLeft));
@@ -99,6 +104,24 @@ namespace Nekres.ProofLogix.Core.Services
 			return _members.Values.Max((Player x) => x.KpProfile.GetToken(id).Amount);
 		}
 
+		public Color GetStatusColor(Player.OnlineStatus status)
+		{
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			return (Color)(status switch
+			{
+				Player.OnlineStatus.Unknown => _unknownColor, 
+				Player.OnlineStatus.Away => _awayColor, 
+				Player.OnlineStatus.Online => _onlineColor, 
+				_ => throw new ArgumentOutOfRangeException(), 
+			});
+		}
+
 		public async Task InitSquad()
 		{
 			await GetLocalPlayerProfile();
@@ -117,6 +140,7 @@ namespace Nekres.ProofLogix.Core.Services
 			string key = accountName.ToLowerInvariant();
 			if (!string.IsNullOrEmpty(key) && _members.TryRemove(key, out var member))
 			{
+				member.Status = Player.OnlineStatus.Away;
 				this.PlayerRemoved?.Invoke(this, new ValueEventArgs<Player>(member));
 			}
 		}
@@ -150,7 +174,7 @@ namespace Nekres.ProofLogix.Core.Services
 				this.PlayerChanged?.Invoke(this, new ValueEventArgs<Player>((Player)LocalPlayer));
 				return;
 			}
-			Player member2 = _members.AddOrUpdate(key.ToLowerInvariant(), delegate
+			_members.AddOrUpdate(key.ToLowerInvariant(), delegate
 			{
 				Player player = new Player(kpProfile);
 				this.PlayerAdded?.Invoke(this, new ValueEventArgs<Player>(player));
@@ -161,7 +185,6 @@ namespace Nekres.ProofLogix.Core.Services
 				this.PlayerChanged?.Invoke(this, new ValueEventArgs<Player>(member));
 				return member;
 			});
-			UpdateHistory(member2);
 		}
 
 		private async void OnPlayerCharacterNameChanged(object sender, ValueEventArgs<string> e)
@@ -205,7 +228,7 @@ namespace Nekres.ProofLogix.Core.Services
 				this.PlayerChanged?.Invoke(this, new ValueEventArgs<Player>((Player)LocalPlayer));
 				return;
 			}
-			Player member2 = _members.AddOrUpdate(key.ToLowerInvariant(), delegate
+			_members.AddOrUpdate(key.ToLowerInvariant(), delegate
 			{
 				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				Player player = new Player(arcDpsPlayer);
@@ -217,17 +240,7 @@ namespace Nekres.ProofLogix.Core.Services
 				member.AttachAgent(arcDpsPlayer);
 				this.PlayerChanged?.Invoke(this, new ValueEventArgs<Player>(member));
 				return member;
-			});
-			UpdateHistory(member2);
-		}
-
-		private void UpdateHistory(Player player)
-		{
-			_history.Enqueue(player);
-			if (_history.Count > 100)
-			{
-				_history.TryDequeue(out var _);
-			}
+			}).Status = Player.OnlineStatus.Online;
 		}
 
 		private bool HasAccountInParty(string account, out string existingAccount)

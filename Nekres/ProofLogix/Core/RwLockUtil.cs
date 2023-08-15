@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 
-namespace Nekres.ProofLogix.Core.Utils
+namespace Nekres.ProofLogix.Core
 {
 	public static class RwLockUtil
 	{

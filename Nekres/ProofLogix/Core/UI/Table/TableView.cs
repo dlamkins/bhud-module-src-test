@@ -90,67 +90,77 @@ namespace Nekres.ProofLogix.Core.UI.Table
 			//IL_0436: Unknown result type (might be due to invalid IL or missing references)
 			//IL_043b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0447: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0448: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0452: Expected O, but got Unknown
-			//IL_0453: Expected O, but got Unknown
-			//IL_0505: Unknown result type (might be due to invalid IL or missing references)
-			//IL_050a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0516: Unknown result type (might be due to invalid IL or missing references)
-			//IL_051d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_053c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0558: Expected O, but got Unknown
+			//IL_044e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0464: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0485: Unknown result type (might be due to invalid IL or missing references)
+			//IL_048a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0496: Unknown result type (might be due to invalid IL or missing references)
+			//IL_049d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f0: Expected O, but got Unknown
+			//IL_04f1: Expected O, but got Unknown
+			//IL_05a3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_05a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05c4: Expected O, but got Unknown
-			//IL_05c5: Expected O, but got Unknown
-			//IL_05ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05e6: Expected O, but got Unknown
-			//IL_05e8: Expected O, but got Unknown
-			//IL_063c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0641: Unknown result type (might be due to invalid IL or missing references)
-			//IL_064e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0655: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06ca: Expected O, but got Unknown
-			//IL_06cc: Expected O, but got Unknown
-			//IL_06d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06ee: Expected O, but got Unknown
-			//IL_06f0: Expected O, but got Unknown
-			//IL_070c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0711: Unknown result type (might be due to invalid IL or missing references)
-			//IL_071e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_071f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0729: Expected O, but got Unknown
-			//IL_072b: Expected O, but got Unknown
-			//IL_0747: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05f6: Expected O, but got Unknown
+			//IL_0646: Unknown result type (might be due to invalid IL or missing references)
+			//IL_064b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0657: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0658: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0662: Expected O, but got Unknown
+			//IL_0663: Expected O, but got Unknown
+			//IL_0668: Unknown result type (might be due to invalid IL or missing references)
+			//IL_066d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0679: Unknown result type (might be due to invalid IL or missing references)
+			//IL_067a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0684: Expected O, but got Unknown
+			//IL_0686: Expected O, but got Unknown
+			//IL_06da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06f3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_074c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0759: Unknown result type (might be due to invalid IL or missing references)
-			//IL_075a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0764: Expected O, but got Unknown
-			//IL_0766: Expected O, but got Unknown
-			//IL_07a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07c0: Expected O, but got Unknown
-			//IL_07c2: Expected O, but got Unknown
-			//IL_083a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_083f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_084c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_084d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0857: Expected O, but got Unknown
-			//IL_0859: Expected O, but got Unknown
+			//IL_0751: Unknown result type (might be due to invalid IL or missing references)
+			//IL_075d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_075e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0768: Expected O, but got Unknown
+			//IL_076a: Expected O, but got Unknown
+			//IL_076f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0774: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0781: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0782: Unknown result type (might be due to invalid IL or missing references)
+			//IL_078c: Expected O, but got Unknown
+			//IL_078e: Expected O, but got Unknown
+			//IL_07aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07c7: Expected O, but got Unknown
+			//IL_07c9: Expected O, but got Unknown
+			//IL_07e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0802: Expected O, but got Unknown
+			//IL_0804: Expected O, but got Unknown
+			//IL_0841: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0846: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0853: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0854: Unknown result type (might be due to invalid IL or missing references)
+			//IL_085e: Expected O, but got Unknown
+			//IL_0860: Expected O, but got Unknown
+			//IL_08d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08f5: Expected O, but got Unknown
+			//IL_08f7: Expected O, but got Unknown
 			Image val = new Image(_cogWheelIcon);
 			((Control)val).set_Parent(buildPanel);
 			((Control)val).set_Width(32);
@@ -279,10 +289,31 @@ namespace Nekres.ProofLogix.Core.UI.Table
 			((Control)val5).set_Parent(buildPanel);
 			((Control)val5).set_ClipsBounds(false);
 			ContextMenuStrip menu = val5;
-			ContextMenuStripItem val6 = new ContextMenuStripItem("Color Grading Mode");
+			ContextMenuStripItem val6 = new ContextMenuStripItem("Always Sort by Status");
 			((Control)val6).set_Parent((Container)(object)menu);
-			val6.set_Submenu(new ContextMenuStrip());
-			ContextMenuStripItem colorGradingModeCategory = val6;
+			val6.set_CanCheck(true);
+			val6.set_Checked(((Presenter<TableView, TableConfig>)base.get_Presenter()).get_Model().AlwaysSortStatus);
+			((Control)val6).set_BasicTooltipText("Sorts players by their online status\nbefore sorting by your selected column.");
+			val6.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object _, CheckChangedEvent e)
+			{
+				((Presenter<TableView, TableConfig>)base.get_Presenter()).get_Model().AlwaysSortStatus = e.get_Checked();
+				base.get_Presenter().SortEntries();
+				ProofLogix.Instance.Resources.PlayMenuItemClick();
+			});
+			ContextMenuStripItem val7 = new ContextMenuStripItem("Keep Leavers");
+			((Control)val7).set_Parent((Container)(object)menu);
+			val7.set_CanCheck(true);
+			val7.set_Checked(((Presenter<TableView, TableConfig>)base.get_Presenter()).get_Model().KeepLeavers);
+			((Control)val7).set_BasicTooltipText("Disables the automatic removal of players who have left your party.");
+			val7.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object _, CheckChangedEvent e)
+			{
+				((Presenter<TableView, TableConfig>)base.get_Presenter()).get_Model().KeepLeavers = e.get_Checked();
+				ProofLogix.Instance.Resources.PlayMenuItemClick();
+			});
+			ContextMenuStripItem val8 = new ContextMenuStripItem("Color Grading Mode");
+			((Control)val8).set_Parent((Container)(object)menu);
+			val8.set_Submenu(new ContextMenuStrip());
+			ContextMenuStripItem colorGradingModeCategory = val8;
 			List<ContextMenuStripItem> colorGradingModeEntries = new List<ContextMenuStripItem>();
 			foreach (PartySyncService.ColorGradingMode mode in Enum.GetValues(typeof(PartySyncService.ColorGradingMode)).Cast<PartySyncService.ColorGradingMode>())
 			{
@@ -294,12 +325,12 @@ namespace Nekres.ProofLogix.Core.UI.Table
 					PartySyncService.ColorGradingMode.AverageComparison => "the average", 
 					_ => string.Empty, 
 				};
-				ContextMenuStripItem val7 = new ContextMenuStripItem(mode.ToString().SplitCamelCase());
-				((Control)val7).set_Parent((Container)(object)colorGradingModeCategory.get_Submenu());
-				val7.set_CanCheck(true);
-				val7.set_Checked(((Presenter<TableView, TableConfig>)base.get_Presenter()).get_Model().ColorGradingMode == mode);
-				((Control)val7).set_BasicTooltipText("Highlight low amounts by comparison to " + suffixTooltip + ".");
-				ContextMenuStripItem colorGradingMode = val7;
+				ContextMenuStripItem val9 = new ContextMenuStripItem(mode.ToString().SplitCamelCase());
+				((Control)val9).set_Parent((Container)(object)colorGradingModeCategory.get_Submenu());
+				val9.set_CanCheck(true);
+				val9.set_Checked(((Presenter<TableView, TableConfig>)base.get_Presenter()).get_Model().ColorGradingMode == mode);
+				((Control)val9).set_BasicTooltipText("Highlight low amounts by comparison to " + suffixTooltip + ".");
+				ContextMenuStripItem colorGradingMode = val9;
 				colorGradingMode.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object o, CheckChangedEvent e)
 				{
 					if (!e.get_Checked())
@@ -321,21 +352,21 @@ namespace Nekres.ProofLogix.Core.UI.Table
 				});
 				colorGradingModeEntries.Add(colorGradingMode);
 			}
-			ContextMenuStripItem val8 = new ContextMenuStripItem("Columns");
-			((Control)val8).set_Parent((Container)(object)menu);
-			val8.set_Submenu(new ContextMenuStrip());
-			ContextMenuStripItem columnsCategory = val8;
-			ContextMenuStripItem val9 = new ContextMenuStripItem("Identifier");
-			((Control)val9).set_Parent((Container)(object)columnsCategory.get_Submenu());
-			val9.set_Submenu(new ContextMenuStrip());
-			ContextMenuStripItem identityCategory = val9;
+			ContextMenuStripItem val10 = new ContextMenuStripItem("Columns");
+			((Control)val10).set_Parent((Container)(object)menu);
+			val10.set_Submenu(new ContextMenuStrip());
+			ContextMenuStripItem columnsCategory = val10;
+			ContextMenuStripItem val11 = new ContextMenuStripItem("Identifier");
+			((Control)val11).set_Parent((Container)(object)columnsCategory.get_Submenu());
+			val11.set_Submenu(new ContextMenuStrip());
+			ContextMenuStripItem identityCategory = val11;
 			foreach (TableConfig.Column col in Enum.GetValues(typeof(TableConfig.Column)).Cast<TableConfig.Column>())
 			{
-				ContextMenuStripItem val10 = new ContextMenuStripItem(col.ToString().SplitCamelCase());
-				((Control)val10).set_Parent((Container)(object)identityCategory.get_Submenu());
-				val10.set_CanCheck(true);
-				val10.set_Checked(((IEnumerable<TableConfig.Column>)((Presenter<TableView, TableConfig>)base.get_Presenter()).get_Model().Columns).Any((TableConfig.Column c) => c == col));
-				val10.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object _, CheckChangedEvent e)
+				ContextMenuStripItem val12 = new ContextMenuStripItem(col.ToString().SplitCamelCase());
+				((Control)val12).set_Parent((Container)(object)identityCategory.get_Submenu());
+				val12.set_CanCheck(true);
+				val12.set_Checked(((IEnumerable<TableConfig.Column>)((Presenter<TableView, TableConfig>)base.get_Presenter()).get_Model().Columns).Any((TableConfig.Column c) => c == col));
+				val12.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object _, CheckChangedEvent e)
 				{
 					if (e.get_Checked())
 					{
@@ -349,39 +380,39 @@ namespace Nekres.ProofLogix.Core.UI.Table
 					}
 				});
 			}
-			ContextMenuStripItem val11 = new ContextMenuStripItem("Proofs");
-			((Control)val11).set_Parent((Container)(object)columnsCategory.get_Submenu());
-			val11.set_Submenu(new ContextMenuStrip());
-			ContextMenuStripItem proofsCategory = val11;
-			ContextMenuStripItem val12 = new ContextMenuStripItem("General");
-			((Control)val12).set_Parent((Container)(object)proofsCategory.get_Submenu());
-			val12.set_Submenu(new ContextMenuStrip());
-			ContextMenuStripItem generalCategory = val12;
-			AddProofEntries(generalCategory, ProofLogix.Instance.Resources.GetGeneralItems());
-			ContextMenuStripItem val13 = new ContextMenuStripItem("Coffers");
-			((Control)val13).set_Parent((Container)(object)proofsCategory.get_Submenu());
+			ContextMenuStripItem val13 = new ContextMenuStripItem("Proofs");
+			((Control)val13).set_Parent((Container)(object)columnsCategory.get_Submenu());
 			val13.set_Submenu(new ContextMenuStrip());
-			ContextMenuStripItem coffersCategory = val13;
-			AddProofEntries(coffersCategory, ProofLogix.Instance.Resources.GetCofferItems());
-			ContextMenuStripItem val14 = new ContextMenuStripItem("Raids");
+			ContextMenuStripItem proofsCategory = val13;
+			ContextMenuStripItem val14 = new ContextMenuStripItem("General");
 			((Control)val14).set_Parent((Container)(object)proofsCategory.get_Submenu());
 			val14.set_Submenu(new ContextMenuStrip());
-			ContextMenuStripItem raidsCategory = val14;
+			ContextMenuStripItem generalCategory = val14;
+			AddProofEntries(generalCategory, ProofLogix.Instance.Resources.GetGeneralItems());
+			ContextMenuStripItem val15 = new ContextMenuStripItem("Coffers");
+			((Control)val15).set_Parent((Container)(object)proofsCategory.get_Submenu());
+			val15.set_Submenu(new ContextMenuStrip());
+			ContextMenuStripItem coffersCategory = val15;
+			AddProofEntries(coffersCategory, ProofLogix.Instance.Resources.GetCofferItems());
+			ContextMenuStripItem val16 = new ContextMenuStripItem("Raids");
+			((Control)val16).set_Parent((Container)(object)proofsCategory.get_Submenu());
+			val16.set_Submenu(new ContextMenuStrip());
+			ContextMenuStripItem raidsCategory = val16;
 			int i = 1;
 			foreach (Raid.Wing wing in ProofLogix.Instance.Resources.GetWings())
 			{
-				ContextMenuStripItem val15 = new ContextMenuStripItem($"Wing {i++}");
-				((Control)val15).set_Parent((Container)(object)raidsCategory.get_Submenu());
-				val15.set_Submenu(new ContextMenuStrip());
-				ContextMenuStripItem wingEntry = val15;
+				ContextMenuStripItem val17 = new ContextMenuStripItem($"Wing {i++}");
+				((Control)val17).set_Parent((Container)(object)raidsCategory.get_Submenu());
+				val17.set_Submenu(new ContextMenuStrip());
+				ContextMenuStripItem wingEntry = val17;
 				AddProofEntries(wingEntry, from ev in wing.Events
 					where ev.Token != null
 					select ev.Token);
 			}
-			ContextMenuStripItem val16 = new ContextMenuStripItem("Fractals");
-			((Control)val16).set_Parent((Container)(object)proofsCategory.get_Submenu());
-			val16.set_Submenu(new ContextMenuStrip());
-			ContextMenuStripItem fractalsCategory = val16;
+			ContextMenuStripItem val18 = new ContextMenuStripItem("Fractals");
+			((Control)val18).set_Parent((Container)(object)proofsCategory.get_Submenu());
+			val18.set_Submenu(new ContextMenuStrip());
+			ContextMenuStripItem fractalsCategory = val18;
 			AddProofEntries(fractalsCategory, ProofLogix.Instance.Resources.GetItemsForFractals());
 			((Control)cogWheel).add_Click((EventHandler<MouseEventArgs>)delegate
 			{

@@ -9,11 +9,11 @@ namespace Nekres.ProofLogix.Core.UI
 {
 	internal class TrackableWindow : StandardWindow
 	{
-		private static ConcurrentDictionary<string, StandardWindow> _windows;
+		private static ConcurrentDictionary<string, TrackableWindow> _windows;
 
 		private readonly string _trackId;
 
-		public static bool TryGetById(string id, out StandardWindow wnd)
+		public static bool TryGetById(string id, out TrackableWindow wnd)
 		{
 			ValidateDictionary();
 			return _windows.TryGetValue(id, out wnd);
@@ -25,11 +25,11 @@ namespace Nekres.ProofLogix.Core.UI
 			{
 				return;
 			}
-			foreach (StandardWindow value in _windows.Values)
+			foreach (TrackableWindow value in _windows.Values)
 			{
 				if (value != null)
 				{
-					((Control)value).Dispose();
+					((Control)value).Hide();
 				}
 			}
 			_windows.Clear();
@@ -40,7 +40,7 @@ namespace Nekres.ProofLogix.Core.UI
 		{
 			if (_windows == null)
 			{
-				_windows = new ConcurrentDictionary<string, StandardWindow>();
+				_windows = new ConcurrentDictionary<string, TrackableWindow>();
 			}
 		}
 
@@ -51,7 +51,7 @@ namespace Nekres.ProofLogix.Core.UI
 			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
 			ValidateDictionary();
 			_trackId = id ?? string.Empty;
-			_windows.TryAdd(_trackId, (StandardWindow)(object)this);
+			_windows.TryAdd(_trackId, this);
 		}
 
 		public TrackableWindow(string id, Texture2D background, Rectangle windowRegion, Rectangle contentRegion)
@@ -61,7 +61,7 @@ namespace Nekres.ProofLogix.Core.UI
 			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
 			ValidateDictionary();
 			_trackId = id ?? string.Empty;
-			_windows.TryAdd(_trackId, (StandardWindow)(object)this);
+			_windows.TryAdd(_trackId, this);
 		}
 
 		public TrackableWindow(string id, AsyncTexture2D background, Rectangle windowRegion, Rectangle contentRegion, Point windowSize)
@@ -72,7 +72,7 @@ namespace Nekres.ProofLogix.Core.UI
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
 			ValidateDictionary();
 			_trackId = id ?? string.Empty;
-			_windows.TryAdd(_trackId, (StandardWindow)(object)this);
+			_windows.TryAdd(_trackId, this);
 		}
 
 		public TrackableWindow(string id, Texture2D background, Rectangle windowRegion, Rectangle contentRegion, Point windowSize)
@@ -83,7 +83,7 @@ namespace Nekres.ProofLogix.Core.UI
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
 			ValidateDictionary();
 			_trackId = id ?? string.Empty;
-			_windows.TryAdd(_trackId, (StandardWindow)(object)this);
+			_windows.TryAdd(_trackId, this);
 		}
 
 		protected override void OnHidden(EventArgs e)
@@ -94,7 +94,7 @@ namespace Nekres.ProofLogix.Core.UI
 
 		protected override void DisposeControl()
 		{
-			_windows.TryRemove(_trackId ?? string.Empty, out var _);
+			_windows?.TryRemove(_trackId ?? string.Empty, out var _);
 			((WindowBase2)this).DisposeControl();
 		}
 	}

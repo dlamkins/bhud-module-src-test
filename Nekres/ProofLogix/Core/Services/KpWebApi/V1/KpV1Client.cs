@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Flurl;
 using Flurl.Http;
 using Nekres.ProofLogix.Core.Services.KpWebApi.V1.Models;
-using Nekres.ProofLogix.Core.Utils;
 using Newtonsoft.Json.Linq;
 
 namespace Nekres.ProofLogix.Core.Services.KpWebApi.V1

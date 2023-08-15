@@ -223,7 +223,7 @@ namespace Nekres.ProofLogix.Core.UI.KpProfile
 					((Control)wnd).set_Left((((Control)GameService.Graphics.get_SpriteScreen()).get_Width() - ((Control)wnd).get_Width()) / 2);
 					((Control)wnd).set_Top((((Control)GameService.Graphics.get_SpriteScreen()).get_Height() - ((Control)wnd).get_Height()) / 2);
 					((WindowBase2)wnd).BringWindowToFront();
-					wnd.Show((IView)(object)new LinkedView(profile));
+					((StandardWindow)wnd).Show((IView)(object)new LinkedView(profile));
 					return;
 				}
 			}

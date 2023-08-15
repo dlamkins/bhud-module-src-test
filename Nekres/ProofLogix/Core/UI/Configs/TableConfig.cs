@@ -13,12 +13,17 @@ namespace Nekres.ProofLogix.Core.UI.Configs
 			Timestamp,
 			Class,
 			Character,
-			Account
+			Account,
+			Status
 		}
 
 		private int _selectedColumn;
 
 		private bool _orderDescending;
+
+		private bool _keepLeavers;
+
+		private bool _alwaysSortStatus;
 
 		private PartySyncService.ColorGradingMode _colorGradingMode;
 
@@ -34,6 +39,7 @@ namespace Nekres.ProofLogix.Core.UI.Configs
 			{
 				TableConfig obj = new TableConfig
 				{
+					_alwaysSortStatus = true,
 					_colorGradingMode = PartySyncService.ColorGradingMode.MedianComparison,
 					_profileIds = new ObservableCollection<string>()
 				};
@@ -43,6 +49,7 @@ namespace Nekres.ProofLogix.Core.UI.Configs
 				((Collection<int>)(object)obj2).Add(93781);
 				obj._tokenIds = obj2;
 				ObservableCollection<Column> obj3 = new ObservableCollection<Column>();
+				((Collection<Column>)(object)obj3).Add(Column.Status);
 				((Collection<Column>)(object)obj3).Add(Column.Timestamp);
 				((Collection<Column>)(object)obj3).Add(Column.Class);
 				((Collection<Column>)(object)obj3).Add(Column.Character);
@@ -76,6 +83,34 @@ namespace Nekres.ProofLogix.Core.UI.Configs
 			set
 			{
 				_orderDescending = value;
+				SaveConfig<TableConfig>(ProofLogix.Instance.TableConfig);
+			}
+		}
+
+		[JsonProperty("keep_leavers")]
+		public bool KeepLeavers
+		{
+			get
+			{
+				return _keepLeavers;
+			}
+			set
+			{
+				_keepLeavers = value;
+				SaveConfig<TableConfig>(ProofLogix.Instance.TableConfig);
+			}
+		}
+
+		[JsonProperty("always_sort_status")]
+		public bool AlwaysSortStatus
+		{
+			get
+			{
+				return _alwaysSortStatus;
+			}
+			set
+			{
+				_alwaysSortStatus = value;
 				SaveConfig<TableConfig>(ProofLogix.Instance.TableConfig);
 			}
 		}

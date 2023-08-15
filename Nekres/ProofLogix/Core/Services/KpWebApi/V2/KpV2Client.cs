@@ -6,7 +6,6 @@ using Blish_HUD.Extended;
 using Flurl;
 using Flurl.Http;
 using Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models;
-using Nekres.ProofLogix.Core.Utils;
 
 namespace Nekres.ProofLogix.Core.Services.KpWebApi.V2
 {

@@ -7,11 +7,20 @@ namespace Nekres.ProofLogix.Core.Services.PartySync.Models
 {
 	public class Player
 	{
+		public enum OnlineStatus
+		{
+			Unknown,
+			Away,
+			Online
+		}
+
 		private Player _arcDpsPlayer;
 
-		public Profile KpProfile { get; private set; }
+		public virtual OnlineStatus Status { get; set; }
 
-		public DateTime Created { get; private set; }
+		public DateTime Created { get; }
+
+		public Profile KpProfile { get; private set; }
 
 		public string AccountName
 		{
