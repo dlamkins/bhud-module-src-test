@@ -31,12 +31,6 @@ namespace KpRefresher
 
 		private Texture2D _emblemTexture;
 
-		private Texture2D _cornerIconTexture;
-
-		private Texture2D _cornerIconHoverTexture;
-
-		private CornerIcon _cornerIcon;
-
 		private ContextMenuStrip _cornerIconContextMenu;
 
 		private LoadingSpinner _apiSpinner;
@@ -52,6 +46,8 @@ namespace KpRefresher
 		public static KpMeService KpMeService { get; private set; }
 
 		public static BusinessService BusinessService { get; private set; }
+
+		public static CornerIcon CornerIcon { get; private set; }
 
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
@@ -75,9 +71,13 @@ namespace KpRefresher
 
 		protected override void Initialize()
 		{
+			CornerIcon cornerIcon = new CornerIcon(ContentsManager);
+			((Control)cornerIcon).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			((CornerIcon)cornerIcon).set_Priority(1283537108);
+			CornerIcon = cornerIcon;
 			Gw2ApiService = new Gw2ApiService(Gw2ApiManager, Logger);
 			KpMeService = new KpMeService(Logger);
-			BusinessService = new BusinessService(ModuleSettings, Gw2ApiService, KpMeService, () => (LoadingSpinner)(object)_apiSpinner);
+			BusinessService = new BusinessService(ModuleSettings, Gw2ApiService, KpMeService, () => (LoadingSpinner)(object)_apiSpinner, CornerIcon);
 			Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)OnApiSubTokenUpdated);
 			GameService.Overlay.get_UserLocale().add_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)OnLocaleChanged);
 		}
@@ -96,8 +96,6 @@ namespace KpRefresher
 		{
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)CurrentMap_MapChanged);
 			_emblemTexture = ContentsManager.GetTexture("emblem.png");
-			_cornerIconTexture = ContentsManager.GetTexture("corner.png");
-			_cornerIconHoverTexture = ContentsManager.GetTexture("corner-hover.png");
 			_windowBackgroundTexture = AsyncTexture2D.FromAssetId(155985);
 			KpRefresherWindow kpRefresherWindow = new KpRefresherWindow(_windowBackgroundTexture, new Rectangle(40, 26, 913, 691), new Rectangle(50, 26, 893, 681), AsyncTexture2D.op_Implicit(_emblemTexture), ModuleSettings, BusinessService);
 			((Control)kpRefresherWindow).set_Size(new Point(520, 700));
@@ -122,25 +120,11 @@ namespace KpRefresher
 
 		private void HandleCornerIcon()
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Expected O, but got Unknown
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Expected O, but got Unknown
-			//IL_021f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0250: Unknown result type (might be due to invalid IL or missing references)
-			CornerIcon val = new CornerIcon();
-			val.set_Icon(AsyncTexture2D.op_Implicit(_cornerIconTexture));
-			((Control)val).set_BasicTooltipText(((Module)this).get_Name() ?? "");
-			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			val.set_HoverIcon(AsyncTexture2D.op_Implicit(_cornerIconHoverTexture));
-			val.set_Priority(1283537108);
-			_cornerIcon = val;
-			((Control)_cornerIcon).add_Click((EventHandler<MouseEventArgs>)delegate
+			//IL_0021: Expected O, but got Unknown
+			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
+			((Control)CornerIcon).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				((WindowBase2)_mainWindow).ToggleWindow();
 			});
@@ -192,11 +176,11 @@ namespace KpRefresher
 			_cornerIconContextMenu.AddMenuItem((ContextMenuStripItem)(object)copyKpToClipboard);
 			_cornerIconContextMenu.AddMenuItem((ContextMenuStripItem)(object)_notificationNextRefreshAvailable);
 			_cornerIconContextMenu.AddMenuItem((ContextMenuStripItem)(object)openKpUrl);
-			((Control)_cornerIcon).set_Menu(_cornerIconContextMenu);
+			((Control)CornerIcon).set_Menu(_cornerIconContextMenu);
 			LoadingSpinner loadingSpinner = new LoadingSpinner();
-			((Control)loadingSpinner).set_Location(new Point(((Control)_cornerIcon).get_Left(), ((Control)_cornerIcon).get_Bottom() + 3));
+			((Control)loadingSpinner).set_Location(new Point(((Control)CornerIcon).get_Left(), ((Control)CornerIcon).get_Bottom() + 3));
 			((Control)loadingSpinner).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)loadingSpinner).set_Size(new Point(((Control)_cornerIcon).get_Width(), ((Control)_cornerIcon).get_Height()));
+			((Control)loadingSpinner).set_Size(new Point(((Control)CornerIcon).get_Width(), ((Control)CornerIcon).get_Height()));
 			loadingSpinner.SetLocalizedTooltip = () => strings.LoadingSpinner_Fetch;
 			((Control)loadingSpinner).set_Visible(false);
 			_apiSpinner = loadingSpinner;
@@ -231,7 +215,7 @@ namespace KpRefresher
 		{
 			Gw2ApiManager.remove_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)OnApiSubTokenUpdated);
 			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)CurrentMap_MapChanged);
-			CornerIcon cornerIcon = _cornerIcon;
+			CornerIcon cornerIcon = CornerIcon;
 			if (cornerIcon != null)
 			{
 				((Control)cornerIcon).Dispose();
@@ -260,16 +244,6 @@ namespace KpRefresher
 			if (emblemTexture != null)
 			{
 				((GraphicsResource)emblemTexture).Dispose();
-			}
-			Texture2D cornerIconTexture = _cornerIconTexture;
-			if (cornerIconTexture != null)
-			{
-				((GraphicsResource)cornerIconTexture).Dispose();
-			}
-			Texture2D cornerIconHoverTexture = _cornerIconHoverTexture;
-			if (cornerIconHoverTexture != null)
-			{
-				((GraphicsResource)cornerIconHoverTexture).Dispose();
 			}
 			KpRefresherInstance = null;
 		}

@@ -61,6 +61,7 @@ Please retry later.</value></data>
 If the color is green, it means the clear has been registered on KillProof.me
 If the color is purple, it means that the clear is visible by GW2 API, and can be added to KillProof.me through refresh</value></data>
   <data name="MainWindow_Configuration_Title"><value>Configuration</value></data>
+  <data name="CornerIcon_Tooltip_Warning"><value>KpRefresher - api error, please wait</value></data>
   <data name="MainWindow_Notif_LinkedAccounts"><value>{0} linked account{1} found!
 {2}</value></data>
   <data name="MainWindow_RefreshOnKillOnlyBoss_Label"><value>Refresh on final boss kill</value></data>
@@ -68,8 +69,6 @@ If the color is purple, it means that the clear is visible by GW2 API, and can b
   <data name="Notification_InstanceExitDetected"><value>[KpRefresher] Instance exit detected, refresh scheduled in {0} minute{1}</value></data>
   <data name="MainWindow_RefreshOnKillOnlyBoss_Tooltip"><value>Only refresh if a final raid wing boss was cleared (e.g. Sabetha)</value></data>
   <data name="MainWindow_DelayBeforeRefreshOnMapChange_Label"><value>Delay before refresh</value></data>
-  <data name="Notification_AccountNameFetchError"><value>[KpRefresher] Error while getting Account name from GW2 API.
-Please retry later.</value></data>
   <data name="MainWindow_RefreshOnMapChange_Label"><value>Refresh on map change</value></data>
   <data name="MainWindow_Spinner_Minutes"><value>Next retry in {0} minute{1}.</value></data>
   <data name="MainWindow_Notif_ScheduleDisabled"><value>Scheduled refresh disabled!</value></data>
@@ -94,6 +93,7 @@ in your KillProof.me settings</value></data>
   <data name="Notification_CustomIdAccountNotMatching"><value>[KpRefresher] KillProof.me account {0} does not match
 with current GW2 account {1}.</value></data>
   <data name="MainWindow_DelayBeforeRefreshOnMapChange_Tooltip"><value>Time in minutes before refresh is triggered after map change (between 1 and 60)</value></data>
+  <data name="CornerIcon_Tooltip"><value>KpRefresher</value></data>
   <data name="BusinessService_RefreshNotAvailable"><value>Refresh not available</value></data>
   <data name="BusinessService_CustomIdSet"><value>Custom Id set!</value></data>
   <data name="BusinessService_Error"><value>Error</value></data>

@@ -66,6 +66,10 @@ namespace KpRefresher.Ressources
 
 		internal static string CornerIcon_Refresh => ResourceManager.GetString("CornerIcon_Refresh", resourceCulture);
 
+		internal static string CornerIcon_Tooltip => ResourceManager.GetString("CornerIcon_Tooltip", resourceCulture);
+
+		internal static string CornerIcon_Tooltip_Warning => ResourceManager.GetString("CornerIcon_Tooltip_Warning", resourceCulture);
+
 		internal static string GW2APIService_Bank => ResourceManager.GetString("GW2APIService_Bank", resourceCulture);
 
 		internal static string GW2APIService_SharedSlots => ResourceManager.GetString("GW2APIService_SharedSlots", resourceCulture);
@@ -141,8 +145,6 @@ namespace KpRefresher.Ressources
 		internal static string MainWindow_Spinner_Minutes => ResourceManager.GetString("MainWindow_Spinner_Minutes", resourceCulture);
 
 		internal static string MainWindow_Spinner_Seconds => ResourceManager.GetString("MainWindow_Spinner_Seconds", resourceCulture);
-
-		internal static string Notification_AccountNameFetchError => ResourceManager.GetString("Notification_AccountNameFetchError", resourceCulture);
 
 		internal static string Notification_CopiedToClipboard => ResourceManager.GetString("Notification_CopiedToClipboard", resourceCulture);
 

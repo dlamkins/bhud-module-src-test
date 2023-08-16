@@ -10,6 +10,7 @@ using KpRefresher.Domain;
 using KpRefresher.Domain.Attributes;
 using KpRefresher.Extensions;
 using KpRefresher.Ressources;
+using KpRefresher.UI.Controls;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -24,6 +25,8 @@ namespace KpRefresher.Services
 		private readonly KpMeService _kpMeService;
 
 		private readonly Func<LoadingSpinner> _getSpinner;
+
+		private readonly CornerIcon _cornerIcon;
 
 		private string _accountName { get; set; }
 
@@ -73,12 +76,13 @@ namespace KpRefresher.Services
 			}
 		}
 
-		public BusinessService(ModuleSettings moduleSettings, Gw2ApiService gw2ApiService, KpMeService kpMeService, Func<LoadingSpinner> getSpinner)
+		public BusinessService(ModuleSettings moduleSettings, Gw2ApiService gw2ApiService, KpMeService kpMeService, Func<LoadingSpinner> getSpinner, CornerIcon cornerIcon)
 		{
 			_moduleSettings = moduleSettings;
 			_gw2ApiService = gw2ApiService;
 			_kpMeService = kpMeService;
 			_getSpinner = getSpinner;
+			_cornerIcon = cornerIcon;
 			_raidBossNames = Enum.GetValues(typeof(RaidBoss)).Cast<RaidBoss>().ToList();
 			_raidMapIds = (from RaidMap m in Enum.GetValues(typeof(RaidMap))
 				select (int)m).ToList();
@@ -97,7 +101,7 @@ namespace KpRefresher.Services
 					((Control)obj).Show();
 				}
 			}
-			await RefreshAccountName(isFromInit: true);
+			await RefreshAccountName();
 			await RefreshKpMeData(isFromInit: true);
 			Func<LoadingSpinner> getSpinner2 = _getSpinner;
 			if (getSpinner2 != null)
@@ -356,13 +360,10 @@ namespace KpRefresher.Services
 			return (true, strings.BusinessService_CustomIdSet);
 		}
 
-		private async Task<bool> RefreshAccountName(bool isFromInit = false)
+		private async Task<bool> RefreshAccountName()
 		{
 			_accountName = await _gw2ApiService.GetAccountName();
-			if (string.IsNullOrWhiteSpace(_accountName) && isFromInit)
-			{
-				ScreenNotification.ShowNotification(strings.Notification_AccountNameFetchError, (NotificationType)2, (Texture2D)null, 4);
-			}
+			_cornerIcon.UpdateWarningState(string.IsNullOrWhiteSpace(_accountName));
 			return !string.IsNullOrWhiteSpace(_accountName);
 		}
 
