@@ -62,7 +62,7 @@ namespace Nekres.ProofLogix.Core.Services
 
 		public bool HasLoaded()
 		{
-			if (_resources.IsEmpty || !_eliteIcons.Any())
+			if (_resources.IsEmpty)
 			{
 				ScreenNotification.ShowNotification("Unavailable. Resources not yet loaded.", (NotificationType)2, (Texture2D)null, 4);
 				return false;
