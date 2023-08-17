@@ -157,7 +157,7 @@ namespace BhModule.Community.Pathing
 		private void InitScriptSettings(SettingCollection settings)
 		{
 			ScriptSettings = settings.AddSubCollection("script-settings", false);
-			ScriptsEnabled = ScriptSettings.DefineSetting<bool>("ScriptsEnabled", false, (Func<string>)(() => "Enable Lua Scripts"), (Func<string>)(() => "If enabled, marker packs may load Lua scripts to provide custom functionality."));
+			ScriptsEnabled = ScriptSettings.DefineSetting<bool>("ScriptsEnabled", true, (Func<string>)(() => "Enable Lua Scripts"), (Func<string>)(() => "If enabled, marker packs may load Lua scripts to provide custom functionality."));
 			ScriptsConsoleEnabled = ScriptSettings.DefineSetting<bool>("ScriptsConsoleEnabled", false, (Func<string>)(() => "Enable Script Console"), (Func<string>)(() => "If enabled, the Script Console can be accessed from the Pathing module menu to debug scripts."));
 		}
 
