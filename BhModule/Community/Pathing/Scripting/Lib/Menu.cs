@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Neo.IronLua;
@@ -9,6 +10,8 @@ namespace BhModule.Community.Pathing.Scripting.Lib
 {
 	public class Menu
 	{
+		private static Logger Logger = Logger.GetLogger<Menu>();
+
 		private readonly List<Menu> _menus = new List<Menu>();
 
 		public string Name { get; }
@@ -80,7 +83,14 @@ namespace BhModule.Community.Pathing.Scripting.Lib
 			((Control)menu).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				Checked = menu.get_Checked();
-				OnClick?.Invoke(this);
+				try
+				{
+					OnClick?.Invoke(this);
+				}
+				catch (Exception ex)
+				{
+					Logger.Warn(ex, "Failed to invoke menu delegate.");
+				}
 			});
 			if (_menus.Any())
 			{
