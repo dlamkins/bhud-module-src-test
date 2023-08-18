@@ -49,12 +49,12 @@
     <Reference Include="Flurl.Http" />
     <Reference Include="Newtonsoft.Json" />
     <Reference Include="Flurl" />
+    <Reference Include="SemVer">
+      <HintPath>..\..\working\SemVer.dll</HintPath>
+    </Reference>
     <Reference Include="AsyncClipboardService" />
     <Reference Include="Humanizer">
       <HintPath>..\..\working\Humanizer.dll</HintPath>
-    </Reference>
-    <Reference Include="SemVer">
-      <HintPath>..\..\working\SemVer.dll</HintPath>
     </Reference>
     <Reference Include="Gapotchenko.FX" />
     <Reference Include="System.IO.Compression" />

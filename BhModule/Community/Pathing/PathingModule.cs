@@ -22,6 +22,7 @@ using Blish_HUD.Settings;
 using Blish_HUD.Settings.UI.Views;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using SemVer;
 
 namespace BhModule.Community.Pathing
 {
@@ -130,33 +131,33 @@ namespace BhModule.Community.Pathing
 
 		protected override void Initialize()
 		{
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00aa: Expected O, but got Unknown
-			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c0: Expected O, but got Unknown
+			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
 			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0148: Expected O, but got Unknown
-			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0182: Expected O, but got Unknown
-			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bc: Expected O, but got Unknown
-			//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f6: Expected O, but got Unknown
-			//IL_0226: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0230: Expected O, but got Unknown
-			//IL_0260: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026a: Expected O, but got Unknown
-			if (DateTime.UtcNow.Date > new DateTime(2023, 8, 21, 0, 0, 0, DateTimeKind.Utc))
+			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015e: Expected O, but got Unknown
+			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0198: Expected O, but got Unknown
+			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d2: Expected O, but got Unknown
+			//IL_0202: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020c: Expected O, but got Unknown
+			//IL_023c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0246: Expected O, but got Unknown
+			//IL_0276: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0280: Expected O, but got Unknown
+			if (DateTime.UtcNow.Date >= new DateTime(2023, 8, 22, 0, 0, 0, DateTimeKind.Utc) && Program.get_OverlayVersion() < new SemVer.Version(1, 1, 0))
 			{
 				try
 				{
