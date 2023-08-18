@@ -72,7 +72,7 @@ namespace BhModule.Community.Pathing.State
 				}
 				else
 				{
-					Logger.Error(ex, "Final attempt to pull map data from the Gw2 API failed.  This session won't have map data.");
+					Logger.Warn(ex, "Final attempt to pull map data from the Gw2 API failed.  This session won't have map data.");
 				}
 			}
 			if (maps == null)

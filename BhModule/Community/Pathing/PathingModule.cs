@@ -13,6 +13,7 @@ using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Entities;
+using Blish_HUD.GameIntegration;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Blish_HUD.Modules;
@@ -129,32 +130,42 @@ namespace BhModule.Community.Pathing
 
 		protected override void Initialize()
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Expected O, but got Unknown
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00df: Expected O, but got Unknown
-			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0119: Expected O, but got Unknown
-			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0153: Expected O, but got Unknown
-			//IL_0183: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018d: Expected O, but got Unknown
-			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c7: Expected O, but got Unknown
-			//IL_01f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0201: Expected O, but got Unknown
+			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00aa: Expected O, but got Unknown
+			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0148: Expected O, but got Unknown
+			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0182: Expected O, but got Unknown
+			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bc: Expected O, but got Unknown
+			//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f6: Expected O, but got Unknown
+			//IL_0226: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0230: Expected O, but got Unknown
+			//IL_0260: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026a: Expected O, but got Unknown
+			if (DateTime.UtcNow.Date > new DateTime(2023, 8, 21, 0, 0, 0, DateTimeKind.Utc))
+			{
+				try
+				{
+					typeof(TacOIntegration).GetProperty("TacOIsRunning").GetSetMethod(nonPublic: true)?.Invoke(GameService.GameIntegration.get_TacO(), new object[1] { true });
+				}
+				catch
+				{
+				}
+			}
 			CornerIcon val = new CornerIcon();
 			val.set_IconName(Strings.General_UiName);
 			val.set_Icon(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\pathing-icon.png")));
