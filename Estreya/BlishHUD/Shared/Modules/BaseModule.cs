@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.GameIntegration;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Blish_HUD.Modules;
@@ -164,12 +165,29 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected override void Initialize()
 		{
+			TEMP_FIX_SetTacOAsActive();
 			string directoryName = GetDirectoryName();
 			if (!string.IsNullOrWhiteSpace(directoryName))
 			{
 				string directoryPath = DirectoriesManager.GetFullDirectoryPath(directoryName);
 				PasswordManager = new PasswordManager(directoryPath);
 				PasswordManager.InitializeEntropy(Encoding.UTF8.GetBytes(((Module)this).get_Namespace()));
+			}
+		}
+
+		private void TEMP_FIX_SetTacOAsActive()
+		{
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Expected O, but got Unknown
+			if (DateTime.UtcNow.Date >= new DateTime(2023, 8, 22, 0, 0, 0, DateTimeKind.Utc) && Program.get_OverlayVersion() < new Version(1, 1, 0, (string)null, (string)null))
+			{
+				try
+				{
+					typeof(TacOIntegration).GetProperty("TacOIsRunning").GetSetMethod(nonPublic: true)?.Invoke(GameService.GameIntegration.get_TacO(), new object[1] { true });
+				}
+				catch
+				{
+				}
 			}
 		}
 
