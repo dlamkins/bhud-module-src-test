@@ -21,29 +21,29 @@ namespace Estreya.BlishHUD.Shared.Helpers
 {
 	public class GitHubHelper : IDisposable
 	{
-		private static Logger Logger = Logger.GetLogger<GitHubHelper>();
-
-		private readonly string _owner;
-
-		private readonly string _repository;
-
-		private readonly string _clientId;
-
-		private readonly string _moduleName;
-
-		private readonly PasswordManager _passwordManager;
-
-		private readonly IconService _iconService;
-
-		private readonly TranslationService _translationService;
+		private static readonly Logger Logger = Logger.GetLogger<GitHubHelper>();
 
 		private readonly BaseModuleSettings _baseModuleSettings;
 
-		private StandardWindow _window;
+		private readonly string _clientId;
 
 		private readonly GitHubClient _github;
 
+		private readonly IconService _iconService;
+
+		private readonly string _moduleName;
+
+		private readonly string _owner;
+
+		private readonly PasswordManager _passwordManager;
+
+		private readonly string _repository;
+
+		private readonly TranslationService _translationService;
+
 		private GitHubCreateIssueView _issueView;
+
+		private StandardWindow _window;
 
 		public GitHubHelper(string owner, string repository, string clientId, string moduleName, PasswordManager passwordManager, IconService iconService, TranslationService translationService, BaseModuleSettings baseModuleSettings)
 		{
@@ -57,6 +57,21 @@ namespace Estreya.BlishHUD.Shared.Helpers
 			_baseModuleSettings = baseModuleSettings;
 			_github = new GitHubClient(new ProductHeaderValue(moduleName.Dehumanize()));
 			CreateWindow();
+		}
+
+		public void Dispose()
+		{
+			StandardWindow window = _window;
+			if (window != null)
+			{
+				((Control)window).Hide();
+			}
+			UnloadIssueView();
+			StandardWindow window2 = _window;
+			if (window2 != null)
+			{
+				((Control)window2).Dispose();
+			}
 		}
 
 		private async Task Login()
@@ -194,21 +209,6 @@ namespace Estreya.BlishHUD.Shared.Helpers
 				}
 			}
 			Process.Start(issue.HtmlUrl);
-		}
-
-		public void Dispose()
-		{
-			StandardWindow window = _window;
-			if (window != null)
-			{
-				((Control)window).Hide();
-			}
-			UnloadIssueView();
-			StandardWindow window2 = _window;
-			if (window2 != null)
-			{
-				((Control)window2).Dispose();
-			}
 		}
 	}
 }

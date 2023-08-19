@@ -9,6 +9,7 @@ using Estreya.BlishHUD.Shared.IO;
 using Estreya.BlishHUD.Shared.Json.Converter;
 using Estreya.BlishHUD.Shared.Utils;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Estreya.BlishHUD.Shared.Services
 {
@@ -42,10 +43,11 @@ namespace Estreya.BlishHUD.Shared.Services
 			_serializerSettings = new JsonSerializerSettings
 			{
 				TypeNameHandling = TypeNameHandling.All,
-				Converters = new JsonConverter[2]
+				Converters = new JsonConverter[3]
 				{
 					new RenderUrlConverter(GameService.Gw2WebApi.get_AnonymousConnection().get_Connection()),
-					new NullableRenderUrlConverter(GameService.Gw2WebApi.get_AnonymousConnection().get_Connection())
+					new NullableRenderUrlConverter(GameService.Gw2WebApi.get_AnonymousConnection().get_Connection()),
+					new StringEnumConverter()
 				}
 			};
 		}
@@ -110,7 +112,7 @@ namespace Estreya.BlishHUD.Shared.Services
 				if (forceAPI || !shouldLoadFiles)
 				{
 					await LoadFromAPI(!canLoadFiles);
-					if (!_cancellationTokenSource.Token.IsCancellationRequested)
+					if (!base.CancellationToken.IsCancellationRequested)
 					{
 						try
 						{
@@ -188,10 +190,6 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		protected override async Task Save()
 		{
-			if (Directory.Exists(DirectoryPath))
-			{
-				Directory.Delete(DirectoryPath, recursive: true);
-			}
 			Directory.CreateDirectory(DirectoryPath);
 			using (await _apiObjectListLock.LockAsync())
 			{
@@ -204,6 +202,16 @@ namespace Estreya.BlishHUD.Shared.Services
 		private async Task CreateLastUpdatedFile()
 		{
 			await FileUtil.WriteStringAsync(Path.Combine(DirectoryPath, "last_updated.txt"), DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss"));
+		}
+
+		protected override Task DoClear()
+		{
+			if (!Directory.Exists(DirectoryPath))
+			{
+				return Task.CompletedTask;
+			}
+			Directory.Delete(DirectoryPath, recursive: true);
+			return Task.CompletedTask;
 		}
 	}
 }

@@ -21,11 +21,24 @@ namespace Estreya.BlishHUD.Shared.Utils
 			}
 		}
 
+		public class LockBusyException : Exception
+		{
+			public LockBusyException()
+				: this(null)
+			{
+			}
+
+			public LockBusyException(string message)
+				: base(message ?? "The lock is currently busy and can't be entered.")
+			{
+			}
+		}
+
+		private readonly IDisposable _releaser;
+
 		private readonly Task<IDisposable> _releaserTask;
 
 		private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
-
-		private readonly IDisposable _releaser;
 
 		public AsyncLock()
 		{
@@ -42,6 +55,14 @@ namespace Estreya.BlishHUD.Shared.Utils
 		public bool IsFree()
 		{
 			return _semaphore.CurrentCount > 0;
+		}
+
+		public void ThrowIfBusy(string message = null)
+		{
+			if (!IsFree())
+			{
+				throw new LockBusyException(message);
+			}
 		}
 
 		public Task<IDisposable> LockAsync()

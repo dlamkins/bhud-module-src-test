@@ -46,7 +46,7 @@ namespace Estreya.BlishHUD.Shared.Services
 			_itemService = itemService;
 		}
 
-		protected override async Task<List<TransactionMapping>> Fetch(Gw2ApiManager apiManager, IProgress<string> progress)
+		protected override async Task<List<TransactionMapping>> Fetch(Gw2ApiManager apiManager, IProgress<string> progress, CancellationToken cancellationToken)
 		{
 			bool num = (Scopes & TransactionMappingType.Own) != 0;
 			bool loadBuy = (Scopes & TransactionMappingType.Buy) != 0;
@@ -59,7 +59,7 @@ namespace Estreya.BlishHUD.Shared.Services
 				List<Transaction> buys = ((IEnumerable<CommerceTransactionCurrent>)((IEnumerable<CommerceTransactionCurrent>)(await ((IBlobClient<IApiV2ObjectList<CommerceTransactionCurrent>>)(object)apiManager.get_Gw2ApiClient().get_V2().get_Commerce()
 					.get_Transactions()
 					.get_Current()
-					.get_Buys()).GetAsync(default(CancellationToken)))).ToList()).Select((Func<CommerceTransactionCurrent, Transaction>)((CommerceTransactionCurrent x) => new PlayerTransaction
+					.get_Buys()).GetAsync(cancellationToken))).ToList()).Select((Func<CommerceTransactionCurrent, Transaction>)((CommerceTransactionCurrent x) => new PlayerTransaction
 				{
 					ItemId = x.get_ItemId(),
 					Price = x.get_Price(),
@@ -80,7 +80,7 @@ namespace Estreya.BlishHUD.Shared.Services
 				List<Transaction> sells = ((IEnumerable<CommerceTransactionCurrent>)((IEnumerable<CommerceTransactionCurrent>)(await ((IBlobClient<IApiV2ObjectList<CommerceTransactionCurrent>>)(object)apiManager.get_Gw2ApiClient().get_V2().get_Commerce()
 					.get_Transactions()
 					.get_Current()
-					.get_Sells()).GetAsync(default(CancellationToken)))).ToList()).Select((Func<CommerceTransactionCurrent, Transaction>)((CommerceTransactionCurrent x) => new PlayerTransaction
+					.get_Sells()).GetAsync(cancellationToken))).ToList()).Select((Func<CommerceTransactionCurrent, Transaction>)((CommerceTransactionCurrent x) => new PlayerTransaction
 				{
 					ItemId = x.get_ItemId(),
 					Price = x.get_Price(),
@@ -100,7 +100,7 @@ namespace Estreya.BlishHUD.Shared.Services
 				IEnumerable<int> itemIds = transactions.SelectMany((TransactionMapping transaction) => transaction.Transactions.Select((Transaction transaction) => transaction.ItemId)).Distinct();
 				progress.Report("Check highest transactions...");
 				Dictionary<int, CommercePrices> itemPriceLookup = (await ((IBulkExpandableClient<CommercePrices, int>)(object)apiManager.get_Gw2ApiClient().get_V2().get_Commerce()
-					.get_Prices()).ManyAsync(itemIds, default(CancellationToken))).ToDictionary((CommercePrices item) => item.get_Id());
+					.get_Prices()).ManyAsync(itemIds, cancellationToken)).ToDictionary((CommercePrices item) => item.get_Id());
 				foreach (TransactionMapping item5 in transactions.Where((TransactionMapping mapping) => mapping.Type == TransactionMappingType.Own))
 				{
 					foreach (Transaction transaction3 in item5.Transactions)
@@ -121,9 +121,13 @@ namespace Estreya.BlishHUD.Shared.Services
 					}
 				}
 			}
-			if ((transactions.Count > 0 || loadBuy || loadSell) && !(await _itemService.WaitForCompletion(TimeSpan.FromMinutes(10.0))))
+			if (transactions.Count > 0 || loadBuy || loadSell)
 			{
-				Logger.Warn("ItemService did not complete in the predefined timespan.");
+				progress.Report("Waiting for " + _itemService.GetType().Name + " to complete...");
+				if (!(await _itemService.WaitForCompletion(TimeSpan.FromMinutes(10.0))))
+				{
+					Logger.Warn("ItemService did not complete in the predefined timespan.");
+				}
 			}
 			if (loadBuy || loadSell)
 			{
@@ -133,7 +137,7 @@ namespace Estreya.BlishHUD.Shared.Services
 				{
 					progress.Report($"Loading global buys/sells from items {itemChunk.First().Id} - {itemChunk.Last().Id}...");
 					List<Transaction> mappedListings = (await ((IBulkExpandableClient<CommerceListings, int>)(object)apiManager.get_Gw2ApiClient().get_V2().get_Commerce()
-						.get_Listings()).ManyAsync(itemChunk.Select((Item item) => item.Id), _cancellationTokenSource.Token)).ToList().SelectMany(delegate(CommerceListings itemListing)
+						.get_Listings()).ManyAsync(itemChunk.Select((Item item) => item.Id), cancellationToken)).ToList().SelectMany(delegate(CommerceListings itemListing)
 					{
 						List<Transaction> list = new List<Transaction>();
 						if (loadBuy)

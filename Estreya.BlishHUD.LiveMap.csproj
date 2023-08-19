@@ -13,17 +13,17 @@
   <PropertyGroup />
   <ItemGroup />
   <ItemGroup>
-    <Reference Include="Gw2Sharp" />
-    <Reference Include="Blish HUD" />
     <Reference Include="MonoGame.Framework" />
+    <Reference Include="Blish HUD" />
+    <Reference Include="Gw2Sharp" />
     <Reference Include="MonoGame.Extended" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml" />
-    <Reference Include="Flurl.Http">
-      <HintPath>..\..\working\Flurl.Http.dll</HintPath>
-    </Reference>
     <Reference Include="Humanizer">
       <HintPath>..\..\working\Humanizer.dll</HintPath>
+    </Reference>
+    <Reference Include="Flurl.Http">
+      <HintPath>..\..\working\Flurl.Http.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\working\Newtonsoft.Json.dll</HintPath>

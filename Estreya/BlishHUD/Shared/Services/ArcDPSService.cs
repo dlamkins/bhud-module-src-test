@@ -20,17 +20,17 @@ namespace Estreya.BlishHUD.Shared.Services
 	{
 		private const int MAX_PARSE_PER_LOOP = 50;
 
-		private SkillService _skillState;
-
-		private ConcurrentQueue<RawCombatEventArgs> _rawCombatEventQueue;
-
-		private ConcurrentQueue<(CombatEvent combatEvent, CombatEventType scope)> _parsedCombatEventQueue;
-
 		private bool _checkedFirstFrame;
 
 		private bool _lastState = true;
 
+		private ConcurrentQueue<(CombatEvent combatEvent, CombatEventType scope)> _parsedCombatEventQueue;
+
+		private ConcurrentQueue<RawCombatEventArgs> _rawCombatEventQueue;
+
 		public ushort _selfInstId;
+
+		private SkillService _skillState;
 
 		public event EventHandler Started;
 

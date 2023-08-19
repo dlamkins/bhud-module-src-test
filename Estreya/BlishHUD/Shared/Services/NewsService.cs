@@ -14,9 +14,9 @@ namespace Estreya.BlishHUD.Shared.Services
 	{
 		private const string FILE_NAME = "news.json";
 
-		private readonly IFlurlClient _flurlClient;
-
 		private readonly string _baseFilePath;
+
+		private readonly IFlurlClient _flurlClient;
 
 		public List<News> News { get; private set; }
 
@@ -37,6 +37,12 @@ namespace Estreya.BlishHUD.Shared.Services
 		{
 			News?.Clear();
 			News = null;
+		}
+
+		protected override Task Clear()
+		{
+			News?.Clear();
+			return Task.CompletedTask;
 		}
 
 		protected override void InternalUpdate(GameTime gameTime)

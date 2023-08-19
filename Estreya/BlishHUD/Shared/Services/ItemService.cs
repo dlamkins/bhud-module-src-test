@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.Shared.Extensions;
@@ -62,57 +63,43 @@ namespace Estreya.BlishHUD.Shared.Services
 			}
 		}
 
-		protected override async Task<List<Item>> Fetch(Gw2ApiManager apiManager, IProgress<string> progress)
+		protected override async Task<List<Item>> Fetch(Gw2ApiManager apiManager, IProgress<string> progress, CancellationToken cancellationToken)
 		{
 			List<Item> items = new List<Item>();
 			progress.Report("Load item ids...");
-			IApiV2ObjectList<int> itemIds = await ((IBulkExpandableClient<Item, int>)(object)apiManager.get_Gw2ApiClient().get_V2().get_Items()).IdsAsync(_cancellationTokenSource.Token);
+			IApiV2ObjectList<int> itemIds = await ((IBulkExpandableClient<Item, int>)(object)apiManager.get_Gw2ApiClient().get_V2().get_Items()).IdsAsync(cancellationToken);
+			progress.Report($"Loading items... 0/{((IReadOnlyCollection<int>)itemIds).Count}");
 			Logger.Info($"Start loading items: {((IEnumerable<int>)itemIds).First()} - {((IEnumerable<int>)itemIds).Last()}");
+			int loadedItems = 0;
 			int chunkSize = 200;
-			foreach (IEnumerable<int> itemIdChunk in ((IEnumerable<int>)itemIds).ChunkBy(chunkSize))
+			IEnumerable<IEnumerable<IEnumerable<int>>> chunkGroups = ((IEnumerable<int>)itemIds).ChunkBy(chunkSize).ChunkBy(20);
+			foreach (IEnumerable<IEnumerable<int>> item in chunkGroups)
 			{
-				if (_cancellationTokenSource.Token.IsCancellationRequested)
+				cancellationToken.ThrowIfCancellationRequested();
+				List<Task<List<Item>>> tasks = new List<Task<List<Item>>>();
+				foreach (IEnumerable<int> idChunk in item)
 				{
-					break;
-				}
-				try
-				{
-					try
+					cancellationToken.ThrowIfCancellationRequested();
+					tasks.Add(FetchChunk(apiManager, idChunk, cancellationToken).ContinueWith(delegate(Task<List<Item>> resultTask)
 					{
-						items.AddRange(await FetchChunk(apiManager, progress, itemIdChunk));
-					}
-					catch (Exception ex2)
-					{
-						Logger.Warn(ex2, $"Failed loading items with chunk size {chunkSize}:");
-						chunkSize = 10;
-						Logger.Debug($"Try load failed chunk in smaller chunk size: {chunkSize}");
-						foreach (IEnumerable<int> smallerItemIdChunk in itemIdChunk.ChunkBy(chunkSize))
-						{
-							try
-							{
-								items.AddRange(await FetchChunk(apiManager, progress, smallerItemIdChunk));
-							}
-							catch (Exception smallerEx)
-							{
-								Logger.Warn(smallerEx, $"Failed loading items with chunk size {chunkSize}:");
-							}
-						}
-					}
+						List<Item> list = (resultTask.IsFaulted ? new List<Item>() : resultTask.Result);
+						int num = Interlocked.Add(ref loadedItems, list.Count);
+						progress.Report($"Loading items... {num}/{((IReadOnlyCollection<int>)itemIds).Count}");
+						return list;
+					}));
 				}
-				catch (Exception ex)
-				{
-					Logger.Warn(ex, "Failed loading items:");
-				}
+				List<Item> fetchedItems = (await Task.WhenAll(tasks)).SelectMany((List<Item> i) => i).ToList();
+				items.AddRange(fetchedItems);
 			}
 			return items;
 		}
 
-		private async Task<List<Item>> FetchChunk(Gw2ApiManager apiManager, IProgress<string> progress, IEnumerable<int> itemIdChunk)
+		private async Task<List<Item>> FetchChunk(Gw2ApiManager apiManager, IEnumerable<int> itemIdChunk, CancellationToken cancellationToken)
 		{
-			string message = $"Start loading items by id: {itemIdChunk.First()} - {itemIdChunk.Last()}";
-			progress.Report(message);
-			Logger.Debug(message);
-			return (await ((IBulkExpandableClient<Item, int>)(object)apiManager.get_Gw2ApiClient().get_V2().get_Items()).ManyAsync(itemIdChunk, _cancellationTokenSource.Token)).Select((Item apiItem) => Item.FromAPI(apiItem)).ToList();
+			Logger.Debug($"Start loading items by id: {itemIdChunk.First()} - {itemIdChunk.Last()}");
+			IReadOnlyList<Item> source = await ((IBulkExpandableClient<Item, int>)(object)apiManager.get_Gw2ApiClient().get_V2().get_Items()).ManyAsync(itemIdChunk, cancellationToken);
+			Logger.Debug($"Finished loading items by id: {itemIdChunk.First()} - {itemIdChunk.Last()}");
+			return source.Select(Item.FromAPI).ToList();
 		}
 	}
 }

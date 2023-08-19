@@ -7,7 +7,7 @@ namespace Estreya.BlishHUD.Shared.Json.Converter
 {
 	public class TimeSpanJsonConverter : JsonConverter<TimeSpan>
 	{
-		private IEnumerable<string> Formats { get; set; } = new string[2] { "dd\\.hh\\:mm", "hh\\:mm" };
+		private IEnumerable<string> Formats { get; } = new string[2] { "dd\\.hh\\:mm", "hh\\:mm" };
 
 
 		private string ToStringFormat { get; set; }

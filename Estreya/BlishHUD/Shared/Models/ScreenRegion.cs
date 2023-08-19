@@ -5,11 +5,11 @@ namespace Estreya.BlishHUD.Shared.Models
 {
 	public class ScreenRegion
 	{
-		private Rectangle? _bounds;
-
 		private readonly SettingEntry<Point> _location;
 
 		private readonly SettingEntry<Point> _size;
+
+		private Rectangle? _bounds;
 
 		public Rectangle Bounds => (Rectangle)(((_003F?)_bounds) ?? new Rectangle(Location, Size));
 

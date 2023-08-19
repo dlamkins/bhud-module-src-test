@@ -1,5 +1,5 @@
 using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Blish_HUD.Controls;
 using Blish_HUD.Modules.Managers;
@@ -11,11 +11,11 @@ namespace Estreya.BlishHUD.Shared.UI.Views.Settings
 {
 	public class ServiceSettingsView : BaseSettingsView
 	{
-		private readonly Collection<ManagedService> _stateList;
-
 		private readonly Func<Task> _reloadCalledAction;
 
-		public ServiceSettingsView(Collection<ManagedService> stateList, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService, BitmapFont font = null, Func<Task> reloadCalledAction = null)
+		private readonly IEnumerable<ManagedService> _stateList;
+
+		public ServiceSettingsView(IEnumerable<ManagedService> stateList, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService, BitmapFont font = null, Func<Task> reloadCalledAction = null)
 			: base(apiManager, iconService, translationService, settingEventService, font)
 		{
 			_stateList = stateList;
@@ -24,13 +24,27 @@ namespace Estreya.BlishHUD.Shared.UI.Views.Settings
 
 		protected override void BuildView(FlowPanel parent)
 		{
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013a: Unknown result type (might be due to invalid IL or missing references)
 			foreach (ManagedService state in _stateList)
 			{
-				if (state.GetType().BaseType.IsGenericType && state.GetType().BaseType.GetGenericTypeDefinition() == typeof(APIService<>))
+				List<Type> baseTypes = new List<Type>();
+				Type baseType = state.GetType().BaseType;
+				while (baseType != null)
+				{
+					if (baseType.IsGenericType)
+					{
+						baseTypes.Add(baseType.GetGenericTypeDefinition());
+					}
+					else
+					{
+						baseTypes.Add(baseType);
+					}
+					baseType = baseType.BaseType;
+				}
+				if (state.GetType().BaseType.IsGenericType && baseTypes.Contains(typeof(APIService<>)))
 				{
 					bool loading = (bool)state.GetType().GetProperty("Loading").GetValue(state);
 					bool finished = state.Running && !loading;

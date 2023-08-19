@@ -11,11 +11,11 @@ namespace Estreya.BlishHUD.LiveMap.UI.Views
 {
 	public class SettingsView : BaseSettingsView
 	{
-		private readonly ModuleSettings _moduleSettings;
-
 		private readonly Func<string> _getGlobalUrl;
 
 		private readonly Func<string> _getGuildUrl;
+
+		private readonly ModuleSettings _moduleSettings;
 
 		public SettingsView(Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService, ModuleSettings moduleSettings, Func<string> getGlobalUrl, Func<string> getGuildUrl, BitmapFont font = null)
 			: base(apiManager, iconService, translationService, settingEventService, font)

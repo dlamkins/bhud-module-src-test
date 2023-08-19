@@ -11,9 +11,9 @@ namespace Estreya.BlishHUD.Shared.Security
 	{
 		private static readonly Logger Logger = Logger.GetLogger<PasswordManager>();
 
-		private byte[] _passwordEntroy;
-
 		private readonly string _directoryPath;
+
+		private byte[] _passwordEntroy;
 
 		public PasswordManager(string directoryPath)
 		{

@@ -12,15 +12,15 @@ namespace Estreya.BlishHUD.Shared.Controls.Map
 	{
 		private static Logger Logger = Logger.GetLogger<MapBorder>();
 
-		private readonly float _x;
-
-		private readonly float _y;
+		private readonly Color _color;
 
 		private readonly float[][] _points;
 
-		private readonly Color _color;
-
 		private readonly float _thickness;
+
+		private readonly float _x;
+
+		private readonly float _y;
 
 		public MapBorder(float x, float y, float[][] points, Color color, float thickness = 1f)
 		{

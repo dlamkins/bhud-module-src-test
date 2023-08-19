@@ -12,9 +12,9 @@ namespace Estreya.BlishHUD.Shared.Services
 	{
 		private static readonly Logger _logger = Logger.GetLogger<SettingEventService>();
 
-		private List<(SettingEntry SettingEntry, IComplianceRequisite ComplianceRequisite)> _registeredForRangeUpdates;
-
 		private List<(SettingEntry SettingEntry, IComplianceRequisite ComplianceRequisite)> _registeredForDisabledUpdates;
+
+		private List<(SettingEntry SettingEntry, IComplianceRequisite ComplianceRequisite)> _registeredForRangeUpdates;
 
 		public event EventHandler<ComplianceUpdated> RangeUpdated;
 

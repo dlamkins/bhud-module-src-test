@@ -24,9 +24,9 @@ namespace Estreya.BlishHUD.Shared.Controls.Map
 
 		private const int MAPOFFSET_MIN = 19;
 
-		private double _lastMapViewChanged;
+		private readonly AsyncLock _entityLock = new AsyncLock();
 
-		private AsyncLock _entityLock = new AsyncLock();
+		private readonly double _lastMapViewChanged;
 
 		private MapEntity _activeEntity;
 

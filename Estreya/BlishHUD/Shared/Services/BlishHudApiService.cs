@@ -19,19 +19,19 @@ namespace Estreya.BlishHUD.Shared.Services
 	{
 		private const string API_PASSWORD_KEY = "estreyaBlishHudAPI";
 
-		private SettingEntry<string> _usernameSetting;
-
-		private PasswordManager _passwordManager;
-
-		private IFlurlClient _flurlClient;
+		private static TimeSpan _checkAPITokenInterval = TimeSpan.FromMinutes(5.0);
 
 		private readonly string _apiRootUrl;
 
 		private readonly string _apiVersion;
 
-		private static TimeSpan _checkAPITokenInterval = TimeSpan.FromMinutes(5.0);
+		private readonly AsyncRef<double> _lastAPITokenCheck = new AsyncRef<double>(0.0);
 
-		private AsyncRef<double> _lastAPITokenCheck = new AsyncRef<double>(0.0);
+		private IFlurlClient _flurlClient;
+
+		private PasswordManager _passwordManager;
+
+		private SettingEntry<string> _usernameSetting;
 
 		private APITokens? APITokens { get; set; }
 

@@ -36,7 +36,7 @@ namespace Estreya.BlishHUD.Shared.Utils
 		public static async Task UpdateAsync(Func<GameTime, Task> call, GameTime gameTime, double interval, AsyncRef<double> lastCheck, bool doLogging = true)
 		{
 			lastCheck.Value += gameTime.get_ElapsedGameTime().TotalMilliseconds;
-			if (lastCheck.Value >= interval && !_asyncStateMonitor.Contains(call.Method.MethodHandle.Value))
+			if (!(lastCheck.Value < interval) && !_asyncStateMonitor.Contains(call.Method.MethodHandle.Value))
 			{
 				_asyncStateMonitor.Add(call.Method.MethodHandle.Value);
 				string methodName = call.Target.GetType().FullName + "." + call.Method.Name + "()";
@@ -47,6 +47,7 @@ namespace Estreya.BlishHUD.Shared.Utils
 				try
 				{
 					await call(gameTime);
+					lastCheck.Value = 0.0;
 				}
 				finally
 				{
@@ -56,14 +57,13 @@ namespace Estreya.BlishHUD.Shared.Utils
 				{
 					Logger.Debug("Update function '{0}' finished running.", new object[1] { methodName });
 				}
-				lastCheck.Value = 0.0;
 			}
 		}
 
 		public static async Task UpdateAsync(Func<Task> call, GameTime gameTime, double interval, AsyncRef<double> lastCheck, bool doLogging = true)
 		{
 			lastCheck.Value += gameTime.get_ElapsedGameTime().TotalMilliseconds;
-			if (lastCheck.Value >= interval && !_asyncStateMonitor.Contains(call.Method.MethodHandle.Value))
+			if (!(lastCheck.Value < interval) && !_asyncStateMonitor.Contains(call.Method.MethodHandle.Value))
 			{
 				_asyncStateMonitor.Add(call.Method.MethodHandle.Value);
 				string methodName = call.Target.GetType().FullName + "." + call.Method.Name + "()";
@@ -74,6 +74,7 @@ namespace Estreya.BlishHUD.Shared.Utils
 				try
 				{
 					await call();
+					lastCheck.Value = 0.0;
 				}
 				finally
 				{
@@ -83,7 +84,6 @@ namespace Estreya.BlishHUD.Shared.Utils
 				{
 					Logger.Debug("Update function '{0}' finished running.", new object[1] { methodName });
 				}
-				lastCheck.Value = 0.0;
 			}
 		}
 	}

@@ -9,9 +9,9 @@ namespace Estreya.BlishHUD.Shared.Models.GW2API.Items
 	{
 		public const string LAST_SCHEMA_CHANGE = "2022-09-20";
 
-		public int Id { get; private set; }
+		public int Id { get; }
 
-		public string Name { get; private set; }
+		public string Name { get; }
 
 		public string? Description { get; set; }
 

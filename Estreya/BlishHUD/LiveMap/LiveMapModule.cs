@@ -37,37 +37,37 @@ namespace Estreya.BlishHUD.LiveMap
 	{
 		public const string LIVE_MAP_BROWSER_URL = "https://gw2map.estreya.de/";
 
-		private SocketIO GlobalSocket;
-
-		private TimeSpan _sendInterval = TimeSpan.FromMilliseconds(250.0);
-
-		private AsyncRef<double> _lastSend = new AsyncRef<double>(0.0);
-
-		private Player _lastSendPlayer;
+		private string _accountName;
 
 		private TimeSpan _guildFetchInterval = TimeSpan.FromSeconds(30.0);
 
-		private AsyncRef<double> _lastGuildFetch = new AsyncRef<double>(0.0);
+		private readonly AsyncRef<double> _lastGuildFetch = new AsyncRef<double>(0.0);
 
-		private TimeSpan _wvwFetchInterval = TimeSpan.FromHours(1.0);
+		private readonly AsyncRef<double> _lastSend = new AsyncRef<double>(0.0);
 
-		private AsyncRef<double> _lastWvWFetch = new AsyncRef<double>(0.0);
+		private Player _lastSendPlayer;
 
-		private string _accountName;
-
-		private string _guildId;
-
-		private PlayerWvW _wvw;
+		private readonly AsyncRef<double> _lastWvWFetch = new AsyncRef<double>(0.0);
 
 		private Map _map;
 
+		private TimeSpan _sendInterval = TimeSpan.FromMilliseconds(250.0);
+
+		private PlayerWvW _wvw;
+
+		private TimeSpan _wvwFetchInterval = TimeSpan.FromHours(1.0);
+
+		private SocketIO GlobalSocket;
+
 		private string LIVE_MAP_API_URL => base.MODULE_API_URL + "/write";
 
-		public string GuildId => _guildId;
+		public string GuildId { get; private set; }
 
 		public override string UrlModuleName => "live-map";
 
 		protected override string API_VERSION_NO => "1";
+
+		protected override int CornerIconPriority => 1289351275;
 
 		[ImportingConstructor]
 		public LiveMapModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
@@ -88,7 +88,6 @@ namespace Estreya.BlishHUD.LiveMap
 			GameService.ArcDps.get_Common().Activate();
 			_lastSend.Value = _sendInterval.TotalMilliseconds;
 			_lastGuildFetch.Value = _guildFetchInterval.TotalMilliseconds;
-			BaseModule<LiveMapModule, ModuleSettings>.Instance = this;
 		}
 
 		private void CurrentMap_MapChanged(object sender, ValueEventArgs<int> e)
@@ -140,7 +139,7 @@ namespace Estreya.BlishHUD.LiveMap
 
 		private void PlayerCharacter_NameChanged(object sender, ValueEventArgs<string> e)
 		{
-			_lastGuildFetch = _guildFetchInterval.TotalMilliseconds;
+			_lastGuildFetch.Value = _guildFetchInterval.TotalMilliseconds;
 		}
 
 		private async Task FetchAccountName()
@@ -157,7 +156,7 @@ namespace Estreya.BlishHUD.LiveMap
 			{
 				try
 				{
-					_guildId = (await ((IBulkExpandableClient<Character, string>)(object)base.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Characters()).GetAsync(GameService.Gw2Mumble.get_PlayerCharacter().get_Name(), default(CancellationToken))).get_Guild().ToString();
+					GuildId = (await ((IBulkExpandableClient<Character, string>)(object)base.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Characters()).GetAsync(GameService.Gw2Mumble.get_PlayerCharacter().get_Name(), default(CancellationToken))).get_Guild().ToString();
 				}
 				catch (Exception ex)
 				{
@@ -251,7 +250,6 @@ namespace Estreya.BlishHUD.LiveMap
 			base.Gw2ApiManager.remove_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
 			GameService.Gw2Mumble.get_PlayerCharacter().remove_NameChanged((EventHandler<ValueEventArgs<string>>)PlayerCharacter_NameChanged);
 			AsyncHelper.RunSync(GlobalSocket.DisconnectAsync);
-			BaseModule<LiveMapModule, ModuleSettings>.Instance = null;
 		}
 
 		public Player GetPlayer()
@@ -279,7 +277,7 @@ namespace Estreya.BlishHUD.LiveMap
 				{
 					Account = _accountName,
 					Character = GameService.Gw2Mumble.get_PlayerCharacter().get_Name(),
-					GuildId = _guildId
+					GuildId = GuildId
 				}
 			};
 			PlayerMap obj2 = new PlayerMap

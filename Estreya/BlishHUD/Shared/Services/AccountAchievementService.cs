@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD.Modules.Managers;
 using Gw2Sharp.WebApi.V2;
@@ -16,11 +17,11 @@ namespace Estreya.BlishHUD.Shared.Services
 		{
 		}
 
-		protected override async Task<List<AccountAchievement>> Fetch(Gw2ApiManager apiManager, IProgress<string> progress)
+		protected override async Task<List<AccountAchievement>> Fetch(Gw2ApiManager apiManager, IProgress<string> progress, CancellationToken cancellationToken)
 		{
 			progress.Report("Loading achievements...");
 			return ((IEnumerable<AccountAchievement>)(await ((IBlobClient<IApiV2ObjectList<AccountAchievement>>)(object)apiManager.get_Gw2ApiClient().get_V2().get_Account()
-				.get_Achievements()).GetAsync(_cancellationTokenSource.Token))).ToList();
+				.get_Achievements()).GetAsync(cancellationToken))).ToList();
 		}
 	}
 }

@@ -29,6 +29,20 @@ namespace Estreya.BlishHUD.Shared.Controls
 
 		private const int NOTIFICATION_HEIGHT = 256;
 
+		private int _duration;
+
+		private Texture2D _icon;
+
+		private Rectangle _layoutMessageBounds;
+
+		private string _message;
+
+		private Tween _slideDownTween;
+
+		private int _targetTop;
+
+		private NotificationType _type;
+
 		private static readonly SynchronizedCollection<ScreenNotification> _activeScreenNotifications = new SynchronizedCollection<ScreenNotification>();
 
 		private static readonly BitmapFont _fontMenomonia36Regular = Control.get_Content().GetFont((FontFace)0, (FontSize)36, (FontStyle)0);
@@ -40,24 +54,6 @@ namespace Estreya.BlishHUD.Shared.Controls
 		private static readonly Texture2D _textureGreenBackground = Control.get_Content().GetTexture("controls/notification/notification-green");
 
 		private static readonly Texture2D _textureRedBackground = Control.get_Content().GetTexture("controls/notification/notification-red");
-
-		private NotificationType _type;
-
-		private int _duration;
-
-		private Texture2D _icon;
-
-		private string _message;
-
-		private Tween _animFadeLifecycle;
-
-		private int _targetTop;
-
-		private Tween _slideDownTween;
-
-		private Rectangle _layoutMessageBounds;
-
-		private Rectangle _layoutIconBounds;
 
 		public NotificationType Type
 		{
@@ -226,7 +222,7 @@ namespace Estreya.BlishHUD.Shared.Controls
 
 		public override void Show()
 		{
-			_animFadeLifecycle = ((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<ScreenNotification>(this, (object)new
+			((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<ScreenNotification>(this, (object)new
 			{
 				Opacity = 1f
 			}, 0.2f, 0f, true).Repeat(1).RepeatDelay((float)Duration)
@@ -249,7 +245,7 @@ namespace Estreya.BlishHUD.Shared.Controls
 			}, 0.1f, 0f, true);
 			if (!(base._opacity < 1f))
 			{
-				_animFadeLifecycle = ((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<ScreenNotification>(this, (object)new
+				((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<ScreenNotification>(this, (object)new
 				{
 					Opacity = 0f
 				}, 1f, 0f, true).OnComplete((Action)((Control)this).Dispose);

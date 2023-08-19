@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Blish_HUD.Modules.Managers;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
-using Gw2Sharp.WebApi.V2.Models;
 
 namespace Estreya.BlishHUD.Shared.Services
 {
@@ -47,19 +46,24 @@ namespace Estreya.BlishHUD.Shared.Services
 			base.APIObjectRemoved -= APIService_APIObjectRemoved;
 		}
 
-		protected override async Task<List<string>> Fetch(Gw2ApiManager apiManager, IProgress<string> progress)
+		protected override async Task<List<string>> Fetch(Gw2ApiManager apiManager, IProgress<string> progress, CancellationToken cancellationToken)
 		{
-			Account account = _accountService.Account;
-			DateTime obj = ((account != null) ? account.get_LastModified().UtcDateTime : DateTime.MinValue);
+			await _accountService.WaitForCompletion(TimeSpan.FromSeconds(30.0));
+			if (_accountService.Account == null)
+			{
+				Logger.Warn(_accountService.GetType().Name + " did not return a value. Check can not be performed safely. Abort.");
+				return new List<string>();
+			}
+			DateTime utcDateTime = _accountService.Account.get_LastModified().UtcDateTime;
 			DateTime now = DateTime.UtcNow;
 			DateTime lastResetUTC = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0, DateTimeKind.Utc);
-			if (obj < lastResetUTC)
+			if (utcDateTime < lastResetUTC)
 			{
 				Logger.Warn("Account has not been modified after reset.");
 				return new List<string>();
 			}
 			return ((IEnumerable<string>)(await ((IBlobClient<IApiV2ObjectList<string>>)(object)apiManager.get_Gw2ApiClient().get_V2().get_Account()
-				.get_MapChests()).GetAsync(default(CancellationToken)))).ToList();
+				.get_MapChests()).GetAsync(cancellationToken))).ToList();
 		}
 	}
 }

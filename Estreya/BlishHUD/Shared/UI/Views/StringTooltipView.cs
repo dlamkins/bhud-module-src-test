@@ -6,7 +6,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 {
 	public class StringTooltipView : View, ITooltipView, IView
 	{
-		private string Message { get; set; }
+		private string Message { get; }
 
 		private int MaxWidth { get; } = 200;
 

@@ -24,17 +24,17 @@ namespace Estreya.BlishHUD.Shared.Services
 		{
 		}
 
-		protected override async Task<List<Achievement>> Fetch(Gw2ApiManager apiManager, IProgress<string> progress)
+		protected override async Task<List<Achievement>> Fetch(Gw2ApiManager apiManager, IProgress<string> progress, CancellationToken cancellationToken)
 		{
 			progress.Report("Loading achievement ids...");
-			IApiV2ObjectList<int> ids = await ((IBulkExpandableClient<Achievement, int>)(object)apiManager.get_Gw2ApiClient().get_V2().get_Achievements()).IdsAsync(default(CancellationToken));
+			IApiV2ObjectList<int> ids = await ((IBulkExpandableClient<Achievement, int>)(object)apiManager.get_Gw2ApiClient().get_V2().get_Achievements()).IdsAsync(cancellationToken);
 			progress.Report($"Loading {((IReadOnlyCollection<int>)ids).Count} achievements...");
 			IEnumerable<IEnumerable<int>> enumerable = ((IEnumerable<int>)ids).ChunkBy(200);
 			int loadedCount = 0;
 			List<Task<IReadOnlyList<Achievement>>> tasks = new List<Task<IReadOnlyList<Achievement>>>();
 			foreach (IEnumerable<int> chunk in enumerable)
 			{
-				tasks.Add(((IBulkExpandableClient<Achievement, int>)(object)apiManager.get_Gw2ApiClient().get_V2().get_Achievements()).ManyAsync(chunk, default(CancellationToken)).ContinueWith(delegate(Task<IReadOnlyList<Achievement>> t)
+				tasks.Add(((IBulkExpandableClient<Achievement, int>)(object)apiManager.get_Gw2ApiClient().get_V2().get_Achievements()).ManyAsync(chunk, cancellationToken).ContinueWith(delegate(Task<IReadOnlyList<Achievement>> t)
 				{
 					int num = Interlocked.Add(ref loadedCount, chunk.Count());
 					progress.Report($"Loading achievements... {num}/{((IReadOnlyCollection<int>)ids).Count}");

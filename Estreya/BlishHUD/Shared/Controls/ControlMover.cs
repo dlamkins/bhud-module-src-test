@@ -16,15 +16,15 @@ namespace Estreya.BlishHUD.Shared.Controls
 
 		private readonly SpriteBatchParameters _clearDrawParameters;
 
+		private readonly string _description;
+
+		private readonly Texture2D _handleTexture;
+
 		private readonly ScreenRegion[] _screenRegions;
 
 		private ScreenRegion _activeScreenRegion;
 
 		private Point _grabPosition = Point.get_Zero();
-
-		private readonly Texture2D _handleTexture;
-
-		private readonly string _description;
 
 		public bool TopMost => true;
 
@@ -51,6 +51,15 @@ namespace Estreya.BlishHUD.Shared.Controls
 			_screenRegions = screenPositions.ToArray();
 			_handleTexture = handleTexture;
 			_description = description;
+		}
+
+		public override void Hide()
+		{
+			((Control)this).Dispose();
+		}
+
+		public void BringWindowToFront()
+		{
 		}
 
 		protected override void OnLeftMouseButtonPressed(MouseEventArgs e)
@@ -195,15 +204,6 @@ namespace Estreya.BlishHUD.Shared.Controls
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, handleTexture4, new Rectangle(num3, ((Rectangle)(ref bounds2)).get_Bottom() - 20, 40, 40), (Rectangle?)_handleTexture.get_Bounds(), Color.get_White() * 0.6f, (float)Math.PI, new Vector2(20f, 20f), (SpriteEffects)0);
 			}
 			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, ((!string.IsNullOrWhiteSpace(_description)) ? (_description + "\n") : "Press ESC to close.") ?? "", GameService.Content.get_DefaultFont32(), bounds, Color.get_White(), false, (HorizontalAlignment)1, (VerticalAlignment)1);
-		}
-
-		public override void Hide()
-		{
-			((Control)this).Dispose();
-		}
-
-		public void BringWindowToFront()
-		{
 		}
 	}
 }

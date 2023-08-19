@@ -11,20 +11,20 @@ namespace Estreya.BlishHUD.Shared.Controls
 {
 	public class TextBoxSuggestions : FlowPanel
 	{
+		public enum CaseMatchingMode
+		{
+			IgnoreCase
+		}
+
 		public enum SuggestionMode
 		{
 			StartsWith,
 			Contains
 		}
 
-		public enum CaseMatchingMode
-		{
-			IgnoreCase
-		}
+		private Container _attachToParent;
 
 		private TextBox _textBox;
-
-		private Container _attachToParent;
 
 		private bool UpdateFromCode;
 

@@ -9,9 +9,11 @@ using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.Shared.Controls;
+using Estreya.BlishHUD.Shared.Extensions;
 using Estreya.BlishHUD.Shared.Services;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
+using Humanizer;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 using MonoGame.Extended.BitmapFonts;
@@ -89,13 +91,10 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Expected O, but got Unknown
+			//IL_0021: Expected O, but got Unknown
 			Rectangle bounds = buildPanel.get_ContentRegion();
 			Panel val = new Panel();
 			((Control)val).set_Size(((Rectangle)(ref bounds)).get_Size());
-			((Container)val).set_AutoSizePadding(new Point(15, 15));
 			((Control)val).set_Parent(buildPanel);
 			Panel parentPanel = (MainPanel = val);
 			try
@@ -286,6 +285,46 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 				});
 			}
 			return checkBox;
+		}
+
+		protected Dropdown RenderDropdown<T>(Panel parent, Point location, int width, T? value, T[] values = null, Action<T> onChangeAction = null, Func<string, string, Task<bool>> onBeforeChangeAction = null) where T : struct, Enum
+		{
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			if (onBeforeChangeAction == null)
+			{
+				onBeforeChangeAction = (string _, string _) => Task.FromResult(result: true);
+			}
+			LetterCasing casing = LetterCasing.Title;
+			Dropdown dropdown2 = new Dropdown();
+			((Control)dropdown2).set_Parent((Container)(object)parent);
+			((Control)dropdown2).set_Width(width);
+			((Control)dropdown2).set_Location(location);
+			Dropdown dropdown = dropdown2;
+			if (values == null)
+			{
+				values = (T[])Enum.GetValues(typeof(T));
+			}
+			string[] formattedValues = values.Select((T value) => value.GetTranslatedValue(TranslationService, casing)).ToArray();
+			string selectedValue = null;
+			if (value.HasValue)
+			{
+				selectedValue = value.GetTranslatedValue(TranslationService, casing);
+			}
+			string[] array = formattedValues;
+			foreach (string valueToAdd in array)
+			{
+				dropdown.Items.Add(valueToAdd);
+			}
+			dropdown.SelectedItem = selectedValue;
+			if (onChangeAction != null)
+			{
+				dropdown.ValueChanged += delegate(object s, ValueChangedEventArgs e)
+				{
+					Dropdown dropdown3 = s as Dropdown;
+					onChangeAction?.Invoke(values[formattedValues.ToList().IndexOf(dropdown3.SelectedItem)]);
+				};
+			}
+			return dropdown;
 		}
 
 		protected Dropdown RenderDropdown(Panel parent, Point location, int width, string[] values, string value, Action<string> onChangeAction = null, Func<string, string, Task<bool>> onBeforeChangeAction = null)

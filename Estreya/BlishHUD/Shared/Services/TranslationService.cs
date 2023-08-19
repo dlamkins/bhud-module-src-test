@@ -13,13 +13,13 @@ namespace Estreya.BlishHUD.Shared.Services
 {
 	public class TranslationService : ManagedService
 	{
-		private ConcurrentDictionary<string, ConcurrentDictionary<string, string>> _translations;
-
-		private IFlurlClient _flurlClient;
+		private static readonly List<string> _locales = new List<string> { "en", "de", "es", "fr" };
 
 		private readonly string _rootUrl;
 
-		private static List<string> _locales = new List<string> { "en", "de", "es", "fr" };
+		private IFlurlClient _flurlClient;
+
+		private ConcurrentDictionary<string, ConcurrentDictionary<string, string>> _translations;
 
 		public TranslationService(ServiceConfiguration configuration, IFlurlClient flurlClient, string rootUrl)
 			: base(configuration)

@@ -11,13 +11,13 @@ namespace Estreya.BlishHUD.Shared.Controls
 	{
 		private const int UNIVERSAL_PADDING = 2;
 
-		private int _nameWidth = 183;
+		private Rectangle _hotkeyRegion;
 
 		private KeyBinding _keyBinding;
 
 		private Rectangle _nameRegion;
 
-		private Rectangle _hotkeyRegion;
+		private int _nameWidth = 183;
 
 		private bool _overHotkey;
 
@@ -64,11 +64,6 @@ namespace Estreya.BlishHUD.Shared.Controls
 
 		public event EventHandler<EventArgs> BindingChanged;
 
-		protected void OnBindingChanged(EventArgs e)
-		{
-			this.BindingChanged?.Invoke(this, e);
-		}
-
 		public KeybindingAssigner(KeyBinding keyBinding, bool withName)
 			: this()
 		{
@@ -85,6 +80,11 @@ namespace Estreya.BlishHUD.Shared.Controls
 		public KeybindingAssigner(bool withName)
 			: this(null, withName)
 		{
+		}
+
+		protected void OnBindingChanged(EventArgs e)
+		{
+			this.BindingChanged?.Invoke(this, e);
 		}
 
 		protected override void OnClick(MouseEventArgs e)
