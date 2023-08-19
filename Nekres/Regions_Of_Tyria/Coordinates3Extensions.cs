@@ -7,7 +7,7 @@ namespace Nekres.Regions_Of_Tyria
 	{
 		private const float INCH_TO_METER = 0.0254f;
 
-		public static Coordinates3 SwapYZ(this Coordinates3 coords)
+		public static Coordinates3 SwapYz(this Coordinates3 coords)
 		{
 			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 			return new Coordinates3(((Coordinates3)(ref coords)).get_X(), ((Coordinates3)(ref coords)).get_Z(), ((Coordinates3)(ref coords)).get_Y());
@@ -21,16 +21,27 @@ namespace Nekres.Regions_Of_Tyria
 
 		public static Coordinates3 ToUnit(this Coordinates3 coords, CoordsUnit fromUnit, CoordsUnit toUnit)
 		{
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-			if (fromUnit == CoordsUnit.Meters && toUnit == CoordsUnit.Inches)
+			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			switch (fromUnit)
 			{
-				return new Coordinates3(((Coordinates3)(ref coords)).get_X() / 0.02539999969303608, ((Coordinates3)(ref coords)).get_Y() / 0.02539999969303608, ((Coordinates3)(ref coords)).get_Z() / 0.02539999969303608);
-			}
-			if (fromUnit == CoordsUnit.Inches && toUnit == CoordsUnit.Meters)
-			{
-				return new Coordinates3(((Coordinates3)(ref coords)).get_X() * 0.02539999969303608, ((Coordinates3)(ref coords)).get_Y() * 0.02539999969303608, ((Coordinates3)(ref coords)).get_Z() * 0.02539999969303608);
+			case CoordsUnit.METERS:
+				if (toUnit == CoordsUnit.INCHES)
+				{
+					return new Coordinates3(((Coordinates3)(ref coords)).get_X() / 0.02539999969303608, ((Coordinates3)(ref coords)).get_Y() / 0.02539999969303608, ((Coordinates3)(ref coords)).get_Z() / 0.02539999969303608);
+				}
+				break;
+			case CoordsUnit.INCHES:
+				if (toUnit == CoordsUnit.METERS)
+				{
+					return new Coordinates3(((Coordinates3)(ref coords)).get_X() * 0.02539999969303608, ((Coordinates3)(ref coords)).get_Y() * 0.02539999969303608, ((Coordinates3)(ref coords)).get_Z() * 0.02539999969303608);
+				}
+				break;
 			}
 			return coords;
 		}
@@ -41,7 +52,7 @@ namespace Nekres.Regions_Of_Tyria
 			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			coords = coords.ToUnit(fromUnit, CoordsUnit.Inches);
+			coords = coords.ToUnit(fromUnit, CoordsUnit.INCHES);
 			return new Coordinates3(((Coordinates3)(ref coords)).get_X(), ((Coordinates3)(ref coords)).get_Y(), ((Coordinates3)(ref coords)).get_Z());
 		}
 

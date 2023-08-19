@@ -7,13 +7,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
-using Blish_HUD.Extended.Core.Views;
-using Blish_HUD.Graphics.UI;
+using Blish_HUD.Extended;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Gw2Sharp.Models;
-using Gw2Sharp.WebApi.Exceptions;
+using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
@@ -103,19 +102,17 @@ namespace Nekres.Regions_Of_Tyria
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			SettingCollection toggleCol = settings.AddSubCollection("Toggles", false);
-			toggleCol.set_RenderInUi(true);
-			_toggleMapNotificationSetting = toggleCol.DefineSetting<bool>("EnableMapChangedNotification", true, (Func<string>)(() => "Notify Map Change"), (Func<string>)(() => "Whether a map's name should be shown when entering a map."));
-			_includeRegionInMapNotificationSetting = toggleCol.DefineSetting<bool>("IncludeRegionInMapNotification", true, (Func<string>)(() => "Include Region Name in Map Notification"), (Func<string>)(() => "Whether the corresponding region name of a map should be shown above a map's name."));
-			_toggleSectorNotificationSetting = toggleCol.DefineSetting<bool>("EnableSectorChangedNotification", true, (Func<string>)(() => "Notify Sector Change"), (Func<string>)(() => "Whether a sector's name should be shown when entering a sector."));
-			_includeMapInSectorNotification = toggleCol.DefineSetting<bool>("IncludeMapInSectorNotification", true, (Func<string>)(() => "Include Map Name in Sector Notification"), (Func<string>)(() => "Whether the corresponding map name of a sector should be shown above a sector's name."));
-			SettingCollection durationCol = settings.AddSubCollection("Durations", false);
-			durationCol.set_RenderInUi(true);
-			_showDurationSetting = durationCol.DefineSetting<float>("ShowDuration", 40f, (Func<string>)(() => "Show Duration"), (Func<string>)(() => "The duration in which to stay in full opacity."));
-			_fadeInDurationSetting = durationCol.DefineSetting<float>("FadeInDuration", 20f, (Func<string>)(() => "Fade-In Duration"), (Func<string>)(() => "The duration of the fade-in."));
-			_fadeOutDurationSetting = durationCol.DefineSetting<float>("FadeOutDuration", 20f, (Func<string>)(() => "Fade-Out Duration"), (Func<string>)(() => "The duration of the fade-out."));
-			SettingCollection positionCol = settings.AddSubCollection("Position", false);
-			positionCol.set_RenderInUi(true);
+			SettingCollection mapCol = settings.AddSubCollection("map_alert", true, (Func<string>)(() => "Map Notification"));
+			_toggleMapNotificationSetting = mapCol.DefineSetting<bool>("enabled", true, (Func<string>)(() => "Enabled"), (Func<string>)(() => "Shows a map's name after entering it."));
+			_includeRegionInMapNotificationSetting = mapCol.DefineSetting<bool>("prefix_region", true, (Func<string>)(() => "Include Region"), (Func<string>)(() => "Shows the region's name above the map's name."));
+			SettingCollection sectorCol = settings.AddSubCollection("sector_alert", true, (Func<string>)(() => "Sector Notification"));
+			_toggleSectorNotificationSetting = sectorCol.DefineSetting<bool>("enabled", true, (Func<string>)(() => "Enabled"), (Func<string>)(() => "Shows a sector's name after entering."));
+			_includeMapInSectorNotification = sectorCol.DefineSetting<bool>("prefix_map", true, (Func<string>)(() => "Include Map"), (Func<string>)(() => "Shows the map's name above the sector's name."));
+			SettingCollection durationCol = settings.AddSubCollection("durations", true, (Func<string>)(() => "Durations"));
+			_showDurationSetting = durationCol.DefineSetting<float>("show", 40f, (Func<string>)(() => "Show Duration"), (Func<string>)(() => "The duration in which to stay in full opacity."));
+			_fadeInDurationSetting = durationCol.DefineSetting<float>("fade_in", 20f, (Func<string>)(() => "Fade-In Duration"), (Func<string>)(() => "The duration of the fade-in."));
+			_fadeOutDurationSetting = durationCol.DefineSetting<float>("fade_out", 20f, (Func<string>)(() => "Fade-Out Duration"), (Func<string>)(() => "The duration of the fade-out."));
+			SettingCollection positionCol = settings.AddSubCollection("position", true, (Func<string>)(() => "Position"));
 			VerticalPositionSetting = positionCol.DefineSetting<float>("pos_y", 30f, (Func<string>)(() => "Vertical Position"), (Func<string>)(() => "Sets the vertical position of area notifications."));
 		}
 
@@ -123,11 +120,6 @@ namespace Nekres.Regions_Of_Tyria
 		{
 			_mapRepository = new AsyncCache<int, Map>(RequestMap);
 			_sectorRepository = new AsyncCache<int, RBush<Sector>>(RequestSectors);
-		}
-
-		public override IView GetSettingsView()
-		{
-			return (IView)(object)new SocialsSettingsView(new SocialsSettingsModel(SettingsManager.get_ModuleSettings(), "https://pastebin.com/raw/Kk9DgVmL"));
 		}
 
 		protected override async void Update(GameTime gameTime)
@@ -230,16 +222,16 @@ namespace Nekres.Regions_Of_Tyria
 			}
 			_prevMapId = currentMap.get_Id();
 			string header = currentMap.get_RegionName();
-			string text = currentMap.get_Name();
-			if (text.Equals(header, StringComparison.InvariantCultureIgnoreCase))
+			string mapName = currentMap.get_Name();
+			if (mapName.Equals(header, StringComparison.InvariantCultureIgnoreCase))
 			{
 				Sector currentSector = await GetSector(currentMap);
 				if (currentSector != null && !string.IsNullOrEmpty(currentSector.Name))
 				{
-					text = currentSector.Name;
+					mapName = currentSector.Name;
 				}
 			}
-			MapNotification.ShowNotification(_includeRegionInMapNotificationSetting.get_Value() ? header : null, text, null, _showDuration, _fadeInDuration, _fadeOutDuration);
+			MapNotification.ShowNotification(_includeRegionInMapNotificationSetting.get_Value() ? header : null, mapName, null, _showDuration, _fadeInDuration, _fadeOutDuration);
 		}
 
 		private async Task<Sector> GetSector(Map currentMap)
@@ -248,11 +240,16 @@ namespace Nekres.Regions_Of_Tyria
 			{
 				return null;
 			}
-			Coordinates3 playerPos = (GameService.Gw2Mumble.get_RawClient().get_IsCompetitiveMode() ? GameService.Gw2Mumble.get_RawClient().get_CameraPosition() : GameService.Gw2Mumble.get_RawClient().get_AvatarPosition());
-			Coordinates2 playerLocation = playerPos.ToContinentCoords(CoordsUnit.Meters, currentMap.get_MapRect(), currentMap.get_ContinentRect()).SwapYZ().ToPlane();
-			RBush<Sector> obj = await _sectorRepository.GetItem(GameService.Gw2Mumble.get_CurrentMap().get_Id());
+			Coordinates2 playerLocation = GameService.Gw2Mumble.get_RawClient().get_AvatarPosition().ToContinentCoords(CoordsUnit.METERS, currentMap.get_MapRect(), currentMap.get_ContinentRect())
+				.SwapYz()
+				.ToPlane();
+			RBush<Sector> rtree = await _sectorRepository.GetItem(GameService.Gw2Mumble.get_CurrentMap().get_Id());
+			if (rtree == null)
+			{
+				return null;
+			}
 			Envelope boundingBox = new Envelope(((Coordinates2)(ref playerLocation)).get_X(), ((Coordinates2)(ref playerLocation)).get_Y(), ((Coordinates2)(ref playerLocation)).get_X(), ((Coordinates2)(ref playerLocation)).get_Y());
-			IReadOnlyList<Sector> foundPoints = obj.Search(in boundingBox);
+			IReadOnlyList<Sector> foundPoints = rtree.Search(in boundingBox);
 			if (foundPoints.Count == 0 || _prevSectorId.Equals(foundPoints[0].Id))
 			{
 				return null;
@@ -268,66 +265,35 @@ namespace Nekres.Regions_Of_Tyria
 			{
 				return null;
 			}
-			IEnumerable<Sector> sectors = new HashSet<Sector>();
+			IEnumerable<Sector> geometryZone = new HashSet<Sector>();
 			ProjectionEqualityComparer<Sector, int> comparer = ProjectionEqualityComparer<Sector>.Create((Sector x) => x.Id);
 			foreach (int floor in map.get_Floors())
 			{
-				IEnumerable<Sector> first = sectors;
-				sectors = first.Union(await RequestSectorsForFloor(map.get_ContinentId(), floor, map.get_RegionId(), map.get_Id()), comparer);
-			}
-			RBush<Sector> rBush = new RBush<Sector>();
-			rBush.BulkLoad(sectors);
-			return rBush;
-		}
-
-		private async Task<IEnumerable<Sector>> RequestSectorsForFloor(int continentId, int floor, int regionId, int mapId)
-		{
-			try
-			{
-				return ((IEnumerable<ContinentFloorRegionMapSector>)(await ((IAllExpandableClient<ContinentFloorRegionMapSector>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Continents()
-					.get_Item(continentId)
+				IApiV2ObjectList<ContinentFloorRegionMapSector> sectors = await TaskUtil.RetryAsync(() => ((IAllExpandableClient<ContinentFloorRegionMapSector>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Continents()
+					.get_Item(map.get_ContinentId())
 					.get_Floors()
 					.get_Item(floor)
 					.get_Regions()
-					.get_Item(regionId)
+					.get_Item(map.get_RegionId())
 					.get_Maps()
-					.get_Item(mapId)
-					.get_Sectors()).AllAsync(default(CancellationToken)))).Select((ContinentFloorRegionMapSector x) => new Sector(x));
+					.get_Item(map.get_Id())
+					.get_Sectors()).AllAsync(default(CancellationToken)));
+				if (sectors != null && ((IEnumerable<ContinentFloorRegionMapSector>)sectors).Any())
+				{
+					geometryZone = geometryZone.Union(((IEnumerable<ContinentFloorRegionMapSector>)sectors).Select((ContinentFloorRegionMapSector x) => new Sector(x)), comparer);
+				}
 			}
-			catch (NotFoundException val)
+			RBush<Sector> rtree = new RBush<Sector>();
+			foreach (Sector sector in geometryZone)
 			{
-				NotFoundException e = val;
-				Logger.Debug((Exception)(object)e, "The map id {0} does not exist on floor {1}.", new object[2] { mapId, floor });
-				return Enumerable.Empty<Sector>();
+				rtree.Insert(sector);
 			}
-			catch (BadRequestException)
-			{
-				return Enumerable.Empty<Sector>();
-			}
-			catch (RequestException val3)
-			{
-				RequestException ex = val3;
-				Logger.Debug((Exception)(object)ex, ((Exception)(object)ex).Message);
-				return Enumerable.Empty<Sector>();
-			}
+			return rtree;
 		}
 
 		private async Task<Map> RequestMap(int id)
 		{
-			try
-			{
-				return await ((IBulkExpandableClient<Map, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Maps()).GetAsync(id, default(CancellationToken));
-			}
-			catch (NotFoundException)
-			{
-				return null;
-			}
-			catch (RequestException val2)
-			{
-				RequestException e = val2;
-				Logger.Debug(((Exception)(object)e).Message);
-				return null;
-			}
+			return await TaskUtil.RetryAsync(() => ((IBulkExpandableClient<Map, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Maps()).GetAsync(id, default(CancellationToken)));
 		}
 	}
 }
