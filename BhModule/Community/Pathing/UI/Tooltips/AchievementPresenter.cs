@@ -66,7 +66,7 @@ namespace BhModule.Community.Pathing.UI.Tooltips
 					attempt = num;
 					return await achievementPresenter.AttemptLoadAchievementCategory(progress, num);
 				}
-				Logger.Error(ex, "Failed to load achievement details.");
+				Logger.Warn(ex, "Failed to load achievement details.");
 				return false;
 			}
 			return true;

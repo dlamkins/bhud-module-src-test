@@ -39,8 +39,19 @@ namespace BhModule.Community.Pathing.UI.Views
 			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0056: Expected O, but got Unknown
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
 			StandardButton val = new StandardButton();
 			val.set_Text("Open Settings");
 			((Control)val).set_Width(192);
@@ -51,6 +62,19 @@ namespace BhModule.Community.Pathing.UI.Views
 			((Control)val2).set_Width(((Control)_bttnOpenSettings).get_Width());
 			((Control)val2).set_Parent(buildPanel);
 			_bttnOpenSetupGuide = val2;
+			if (DateTime.UtcNow.Date < new DateTime(2023, 8, 25, 0, 0, 0, DateTimeKind.Utc))
+			{
+				Label val3 = new Label();
+				val3.set_Text("The Guild Wars 2 API is unavailable until some time on August 24th.\nUntil that time, some features such as minimap markers/trails will not work.");
+				((Control)val3).set_Width(((Control)buildPanel).get_Width() - 40);
+				((Control)val3).set_Height(120);
+				val3.set_HorizontalAlignment((HorizontalAlignment)1);
+				val3.set_VerticalAlignment((VerticalAlignment)0);
+				((Control)val3).set_Parent(buildPanel);
+				val3.set_TextColor(Color.get_Yellow());
+				((Control)val3).set_Left(20);
+				((Control)val3).set_Top(150);
+			}
 			((Control)_bttnOpenSettings).set_Location(new Point(Math.Max(((Control)buildPanel).get_Width() / 2 - ((Control)_bttnOpenSettings).get_Width() / 2, 20), Math.Max(((Control)buildPanel).get_Height() / 2 - ((Control)_bttnOpenSettings).get_Height(), 20) - ((Control)_bttnOpenSettings).get_Height() - 10));
 			((Control)_bttnOpenSetupGuide).set_Location(new Point(((Control)_bttnOpenSettings).get_Left(), ((Control)_bttnOpenSettings).get_Bottom() + 10));
 			((Control)_bttnOpenSettings).add_Click((EventHandler<MouseEventArgs>)_bttnOpenSettings_Click);
