@@ -10,67 +10,8 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Nekres.Mistwar.Entities
 {
-	public class WvwObjectiveEntity : IDisposable
+	public class WvwObjectiveEntity
 	{
-		private static Texture2D _textureFortified = MistwarModule.ModuleInstance.ContentsManager.GetTexture("1324351.png");
-
-		private static Texture2D _textureReinforced = MistwarModule.ModuleInstance.ContentsManager.GetTexture("1324350.png");
-
-		private static Texture2D _textureSecured = MistwarModule.ModuleInstance.ContentsManager.GetTexture("1324349.png");
-
-		private static Texture2D _textureClaimed = MistwarModule.ModuleInstance.ContentsManager.GetTexture("1304078.png");
-
-		private static Texture2D _textureClaimedRepGuild = MistwarModule.ModuleInstance.ContentsManager.GetTexture("1304077.png");
-
-		private static Texture2D _textureBuff = MistwarModule.ModuleInstance.ContentsManager.GetTexture("righteous_indignation.png");
-
-		private static Texture2D _textureRuinEstate = MistwarModule.ModuleInstance.ContentsManager.GetTexture("ruin_estate.png");
-
-		private static Texture2D _textureRuinTemple = MistwarModule.ModuleInstance.ContentsManager.GetTexture("ruin_temple.png");
-
-		private static Texture2D _textureRuinOverlook = MistwarModule.ModuleInstance.ContentsManager.GetTexture("ruin_overlook.png");
-
-		private static Texture2D _textureRuinHollow = MistwarModule.ModuleInstance.ContentsManager.GetTexture("ruin_hollow.png");
-
-		private static Texture2D _textureRuinAscent = MistwarModule.ModuleInstance.ContentsManager.GetTexture("ruin_ascent.png");
-
-		private static Texture2D _textureRuinOther = MistwarModule.ModuleInstance.ContentsManager.GetTexture("ruin_other.png");
-
-		private static Texture2D _textureWayPoint = MistwarModule.ModuleInstance.ContentsManager.GetTexture("157353.png");
-
-		private static Texture2D _textureWayPointHover = MistwarModule.ModuleInstance.ContentsManager.GetTexture("60970.png");
-
-		private static Texture2D _textureWayPointContested = MistwarModule.ModuleInstance.ContentsManager.GetTexture("102349.png");
-
-		private static IReadOnlyDictionary<string, Texture2D> _ruinsTexLookUp = new Dictionary<string, Texture2D>
-		{
-			{ "95-62", _textureRuinTemple },
-			{ "96-62", _textureRuinTemple },
-			{ "1099-121", _textureRuinOther },
-			{ "96-66", _textureRuinAscent },
-			{ "95-66", _textureRuinAscent },
-			{ "1099-118", _textureRuinOther },
-			{ "96-63", _textureRuinHollow },
-			{ "95-63", _textureRuinHollow },
-			{ "1099-119", _textureRuinOther },
-			{ "96-65", _textureRuinOverlook },
-			{ "95-65", _textureRuinOverlook },
-			{ "1099-120", _textureRuinOther },
-			{ "96-64", _textureRuinEstate },
-			{ "95-64", _textureRuinEstate },
-			{ "1099-122", _textureRuinOther }
-		};
-
-		private static Color _colorRed = new Color(213, 71, 67);
-
-		private static Color _colorGreen = new Color(73, 190, 111);
-
-		private static Color _colorBlue = new Color(100, 164, 228);
-
-		private static Color _colorNeutral = Color.get_DimGray();
-
-		public static Color BrightGold = new Color(223, 194, 149, 255);
-
 		private DateTime _lastFlipped = DateTime.MinValue;
 
 		private WvwOwner _owner = (WvwOwner)1;
@@ -95,7 +36,7 @@ namespace Nekres.Mistwar.Entities
 			}
 			set
 			{
-				if (_lastFlipped != value)
+				if (!object.Equals(value, _lastFlipped))
 				{
 					_lastFlipped = value;
 					LastModified = DateTime.UtcNow;
@@ -112,11 +53,11 @@ namespace Nekres.Mistwar.Entities
 			}
 			set
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-				if (_owner != value)
+				//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+				//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+				if (!object.Equals(value, _owner))
 				{
 					_owner = value;
 					LastModified = DateTime.UtcNow;
@@ -132,7 +73,7 @@ namespace Nekres.Mistwar.Entities
 			}
 			set
 			{
-				if (_claimedBy != value)
+				if (!object.Equals(value, _claimedBy))
 				{
 					_claimedBy = value;
 					LastModified = DateTime.UtcNow;
@@ -164,35 +105,29 @@ namespace Nekres.Mistwar.Entities
 			}
 			set
 			{
-				if (_guildUpgrades?.SequenceEqual(value) ?? (_guildUpgrades != value))
+				if (value != null && _guildUpgrades != null && !value.OrderBy((int x) => x).SequenceEqual(_guildUpgrades.OrderBy((int x) => x)))
 				{
 					_guildUpgrades = value;
 					LastModified = DateTime.UtcNow;
 				}
+				else if (!object.Equals(value, _guildUpgrades))
+				{
+					_guildUpgrades = value;
+				}
 			}
 		}
 
-		public Color TeamColor => GetColor();
+		public Color TeamColor => MistwarModule.ModuleInstance.Resources.GetTeamColor(Owner);
 
 		public Texture2D Icon { get; }
 
 		public TimeSpan BuffDuration { get; }
 
-		public Texture2D UpgradeTexture => GetUpgradeTierTexture();
+		public Texture2D UpgradeTexture => MistwarModule.ModuleInstance.Resources.GetUpgradeTierTexture(GetTier());
 
-		public Texture2D ClaimedTexture
-		{
-			get
-			{
-				if (!ClaimedBy.Equals(MistwarModule.ModuleInstance.WvwService.CurrentGuild))
-				{
-					return _textureClaimed;
-				}
-				return _textureClaimedRepGuild;
-			}
-		}
+		public Texture2D ClaimedTexture => MistwarModule.ModuleInstance.Resources.GetClaimedTexture(ClaimedBy);
 
-		public Texture2D BuffTexture => _textureBuff;
+		public Texture2D BuffTexture => MistwarModule.ModuleInstance.Resources.GetBuffTexture();
 
 		public IEnumerable<Point> Bounds { get; }
 
@@ -215,103 +150,22 @@ namespace Nekres.Mistwar.Entities
 		public WvwObjectiveEntity(WvwObjective objective, ContinentFloorRegionMap map)
 		{
 			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0350: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0399: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0447: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0452: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0457: Unknown result type (might be due to invalid IL or missing references)
-			//IL_045a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_047c: Unknown result type (might be due to invalid IL or missing references)
-			if (_textureFortified == null)
-			{
-				_textureFortified = MistwarModule.ModuleInstance.ContentsManager.GetTexture("1324351.png");
-			}
-			if (_textureReinforced == null)
-			{
-				_textureReinforced = MistwarModule.ModuleInstance.ContentsManager.GetTexture("1324350.png");
-			}
-			if (_textureSecured == null)
-			{
-				_textureSecured = MistwarModule.ModuleInstance.ContentsManager.GetTexture("1324349.png");
-			}
-			if (_textureClaimed == null)
-			{
-				_textureClaimed = MistwarModule.ModuleInstance.ContentsManager.GetTexture("1304078.png");
-			}
-			if (_textureClaimedRepGuild == null)
-			{
-				_textureClaimedRepGuild = MistwarModule.ModuleInstance.ContentsManager.GetTexture("1304077.png");
-			}
-			if (_textureBuff == null)
-			{
-				_textureBuff = MistwarModule.ModuleInstance.ContentsManager.GetTexture("righteous_indignation.png");
-			}
-			if (_textureRuinEstate == null)
-			{
-				_textureRuinEstate = MistwarModule.ModuleInstance.ContentsManager.GetTexture("ruin_estate.png");
-			}
-			if (_textureRuinTemple == null)
-			{
-				_textureRuinTemple = MistwarModule.ModuleInstance.ContentsManager.GetTexture("ruin_temple.png");
-			}
-			if (_textureRuinOverlook == null)
-			{
-				_textureRuinOverlook = MistwarModule.ModuleInstance.ContentsManager.GetTexture("ruin_overlook.png");
-			}
-			if (_textureRuinHollow == null)
-			{
-				_textureRuinHollow = MistwarModule.ModuleInstance.ContentsManager.GetTexture("ruin_hollow.png");
-			}
-			if (_textureRuinAscent == null)
-			{
-				_textureRuinAscent = MistwarModule.ModuleInstance.ContentsManager.GetTexture("ruin_ascent.png");
-			}
-			if (_textureRuinOther == null)
-			{
-				_textureRuinOther = MistwarModule.ModuleInstance.ContentsManager.GetTexture("ruin_other.png");
-			}
-			if (_textureWayPoint == null)
-			{
-				_textureWayPoint = MistwarModule.ModuleInstance.ContentsManager.GetTexture("157353.png");
-			}
-			if (_textureWayPointHover == null)
-			{
-				_textureWayPointHover = MistwarModule.ModuleInstance.ContentsManager.GetTexture("60970.png");
-			}
-			if (_textureWayPointContested == null)
-			{
-				_textureWayPointContested = MistwarModule.ModuleInstance.ContentsManager.GetTexture("102349.png");
-			}
-			if (_ruinsTexLookUp == null)
-			{
-				_ruinsTexLookUp = new Dictionary<string, Texture2D>
-				{
-					{ "95-62", _textureRuinTemple },
-					{ "96-62", _textureRuinTemple },
-					{ "1099-121", _textureRuinOther },
-					{ "96-66", _textureRuinAscent },
-					{ "95-66", _textureRuinAscent },
-					{ "1099-118", _textureRuinOther },
-					{ "96-63", _textureRuinHollow },
-					{ "95-63", _textureRuinHollow },
-					{ "1099-119", _textureRuinOther },
-					{ "96-65", _textureRuinOverlook },
-					{ "95-65", _textureRuinOverlook },
-					{ "1099-120", _textureRuinOther },
-					{ "96-64", _textureRuinEstate },
-					{ "95-64", _textureRuinEstate },
-					{ "1099-122", _textureRuinOther }
-				};
-			}
+			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0172: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
 			_internalObjective = objective;
 			ContinentFloorRegionMapSector internalSector = map.get_Sectors()[objective.get_SectorId()];
 			_opacity = 1f;
-			Icon = GetTexture(ApiEnum<WvwObjectiveType>.op_Implicit(objective.get_Type()));
+			Icon = MistwarModule.ModuleInstance.Resources.GetObjectiveTexture(ApiEnum<WvwObjectiveType>.op_Implicit(objective.get_Type()), objective.get_Id());
 			MapId = map.get_Id();
 			Bounds = internalSector.get_Bounds().Select(delegate(Coordinates2 coord)
 			{
@@ -346,21 +200,6 @@ namespace Nekres.Mistwar.Entities
 				Point fit = MapUtil.Refit(coord3, ((Rectangle)(ref continentRect)).get_TopLeft());
 				wayPoint.set_Coord(new Coordinates2((double)fit.X, (double)fit.Y));
 			}
-		}
-
-		public Texture2D GetWayPointIcon(bool hover)
-		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			if (Owner != MistwarModule.ModuleInstance.WvwService.CurrentTeam)
-			{
-				return _textureWayPointContested;
-			}
-			if (!hover)
-			{
-				return _textureWayPoint;
-			}
-			return _textureWayPointHover;
 		}
 
 		public bool IsOwned()
@@ -495,69 +334,6 @@ namespace Nekres.Mistwar.Entities
 			return new Vector3(WorldUtil.GameToWorldCoord((float)((((Coordinates3)(ref v)).get_X() - (double)offset.X) * 24.0)), WorldUtil.GameToWorldCoord((float)((0.0 - (((Coordinates3)(ref v)).get_Y() - (double)offset.Z)) * 24.0)), WorldUtil.GameToWorldCoord((float)(0.0 - ((Coordinates3)(ref v)).get_Z())));
 		}
 
-		private Texture2D GetTexture(WvwObjectiveType type)
-		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Expected I4, but got Unknown
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			switch (type - 1)
-			{
-			case 0:
-			case 1:
-			case 2:
-			case 4:
-				return MistwarModule.ModuleInstance.ContentsManager.GetTexture($"{type}.png");
-			case 5:
-			{
-				if (!_ruinsTexLookUp.TryGetValue(Id, out var tex))
-				{
-					return null;
-				}
-				return tex;
-			}
-			default:
-				return null;
-			}
-		}
-
-		private Color GetColor()
-		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Expected I4, but got Unknown
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-			WvwOwner owner = Owner;
-			return (Color)((owner - 2) switch
-			{
-				0 => _colorRed, 
-				1 => _colorBlue, 
-				2 => _colorGreen, 
-				_ => _colorNeutral, 
-			});
-		}
-
-		private Texture2D GetUpgradeTierTexture()
-		{
-			return (Texture2D)(GetTier() switch
-			{
-				WvwObjectiveTier.Fortified => _textureFortified, 
-				WvwObjectiveTier.Reinforced => _textureReinforced, 
-				WvwObjectiveTier.Secured => _textureSecured, 
-				_ => Textures.get_TransparentPixel(), 
-			});
-		}
-
 		private float GetOpacity()
 		{
 			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
@@ -567,106 +343,6 @@ namespace Nekres.Mistwar.Entities
 			Vector3 val = GameService.Gw2Mumble.get_PlayerCamera().get_Position() - WorldPosition;
 			_opacity = MathUtil.Clamp(MathUtil.Map(((Vector3)(ref val)).Length(), MistwarModule.ModuleInstance.MaxViewDistanceSetting.get_Value() * 50f, _opacity, 0f, 1f), 0f, 1f);
 			return _opacity;
-		}
-
-		public void Dispose()
-		{
-			Texture2D icon = Icon;
-			if (icon != null)
-			{
-				((GraphicsResource)icon).Dispose();
-			}
-			Texture2D textureFortified = _textureFortified;
-			if (textureFortified != null)
-			{
-				((GraphicsResource)textureFortified).Dispose();
-			}
-			_textureFortified = null;
-			Texture2D textureReinforced = _textureReinforced;
-			if (textureReinforced != null)
-			{
-				((GraphicsResource)textureReinforced).Dispose();
-			}
-			_textureReinforced = null;
-			Texture2D textureSecured = _textureSecured;
-			if (textureSecured != null)
-			{
-				((GraphicsResource)textureSecured).Dispose();
-			}
-			_textureSecured = null;
-			Texture2D textureClaimed = _textureClaimed;
-			if (textureClaimed != null)
-			{
-				((GraphicsResource)textureClaimed).Dispose();
-			}
-			_textureClaimed = null;
-			Texture2D textureClaimedRepGuild = _textureClaimedRepGuild;
-			if (textureClaimedRepGuild != null)
-			{
-				((GraphicsResource)textureClaimedRepGuild).Dispose();
-			}
-			_textureClaimedRepGuild = null;
-			Texture2D textureBuff = _textureBuff;
-			if (textureBuff != null)
-			{
-				((GraphicsResource)textureBuff).Dispose();
-			}
-			_textureBuff = null;
-			Texture2D textureRuinEstate = _textureRuinEstate;
-			if (textureRuinEstate != null)
-			{
-				((GraphicsResource)textureRuinEstate).Dispose();
-			}
-			_textureRuinEstate = null;
-			Texture2D textureRuinTemple = _textureRuinTemple;
-			if (textureRuinTemple != null)
-			{
-				((GraphicsResource)textureRuinTemple).Dispose();
-			}
-			_textureRuinTemple = null;
-			Texture2D textureRuinOverlook = _textureRuinOverlook;
-			if (textureRuinOverlook != null)
-			{
-				((GraphicsResource)textureRuinOverlook).Dispose();
-			}
-			_textureRuinOverlook = null;
-			Texture2D textureRuinHollow = _textureRuinHollow;
-			if (textureRuinHollow != null)
-			{
-				((GraphicsResource)textureRuinHollow).Dispose();
-			}
-			_textureRuinHollow = null;
-			Texture2D textureRuinAscent = _textureRuinAscent;
-			if (textureRuinAscent != null)
-			{
-				((GraphicsResource)textureRuinAscent).Dispose();
-			}
-			_textureRuinAscent = null;
-			Texture2D textureRuinOther = _textureRuinOther;
-			if (textureRuinOther != null)
-			{
-				((GraphicsResource)textureRuinOther).Dispose();
-			}
-			_textureRuinOther = null;
-			Texture2D textureWayPoint = _textureWayPoint;
-			if (textureWayPoint != null)
-			{
-				((GraphicsResource)textureWayPoint).Dispose();
-			}
-			_textureWayPoint = null;
-			Texture2D textureWayPointHover = _textureWayPointHover;
-			if (textureWayPointHover != null)
-			{
-				((GraphicsResource)textureWayPointHover).Dispose();
-			}
-			_textureWayPointHover = null;
-			Texture2D textureWayPointContested = _textureWayPointContested;
-			if (textureWayPointContested != null)
-			{
-				((GraphicsResource)textureWayPointContested).Dispose();
-			}
-			_textureWayPointContested = null;
-			_ruinsTexLookUp = null;
 		}
 	}
 }

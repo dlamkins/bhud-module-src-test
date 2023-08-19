@@ -7,14 +7,13 @@ using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Extended;
 using Blish_HUD.Modules;
-using Blish_HUD.Modules.Managers;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework.Graphics;
 using Nekres.Mistwar.Entities;
 
-namespace Nekres.Mistwar.Services
+namespace Nekres.Mistwar.Core.Services
 {
 	internal class WvwService : IDisposable
 	{
@@ -25,8 +24,6 @@ namespace Nekres.Mistwar.Services
 			AlpineBorderlandsGreen = 95,
 			EternalBattlegrounds = 38
 		}
-
-		private Gw2ApiManager _api;
 
 		private AsyncCache<int, List<WvwObjectiveEntity>> _wvwObjectiveCache;
 
@@ -42,31 +39,43 @@ namespace Nekres.Mistwar.Services
 
 		public DateTime LastChange { get; private set; }
 
-		public string LoadingMessage { get; private set; }
+		public string RefreshMessage { get; private set; }
 
-		public bool IsLoading => !string.IsNullOrEmpty(LoadingMessage);
+		public bool IsRefreshing => !string.IsNullOrEmpty(RefreshMessage);
 
-		public WvwService(Gw2ApiManager api)
+		public bool IsLoading
+		{
+			get
+			{
+				IEnumerable<World> worlds = _worlds;
+				if (worlds == null)
+				{
+					return true;
+				}
+				return !worlds.Any();
+			}
+		}
+
+		public WvwService()
 		{
 			_prevApiRequestTime = DateTime.MinValue.ToUniversalTime();
-			_api = api;
 			_wvwObjectiveCache = new AsyncCache<int, List<WvwObjectiveEntity>>(RequestObjectives);
 			LastChange = DateTime.MinValue.ToUniversalTime();
 		}
 
 		public async Task LoadAsync()
 		{
-			_worlds = (IEnumerable<World>)(await TaskUtil.RetryAsync(() => ((IAllExpandableClient<World>)(object)_api.get_Gw2ApiClient().get_V2().get_Worlds()).AllAsync(default(CancellationToken))));
+			_worlds = (IEnumerable<World>)(await TaskUtil.RetryAsync(() => ((IAllExpandableClient<World>)(object)MistwarModule.ModuleInstance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Worlds()).AllAsync(default(CancellationToken))));
 		}
 
 		public async Task Update()
 		{
-			if (!GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch() || DateTime.UtcNow.Subtract(_prevApiRequestTime).TotalSeconds < 15.0)
+			if (IsLoading || IsRefreshing || !GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch() || DateTime.UtcNow.Subtract(_prevApiRequestTime).TotalSeconds < 15.0)
 			{
 				return;
 			}
 			_prevApiRequestTime = DateTime.UtcNow;
-			LoadingMessage = "Refreshing";
+			RefreshMessage = "Refreshing";
 			CurrentGuild = await GetRepresentedGuild();
 			int worldId = await GetWorldId();
 			if (worldId >= 0)
@@ -90,12 +99,12 @@ namespace Nekres.Mistwar.Services
 			{
 				ScreenNotification.ShowNotification($"({((Module)MistwarModule.ModuleInstance).get_Name()}) No changes in the last {mins} minutes.", (NotificationType)1, (Texture2D)null, 4);
 			}
-			LoadingMessage = string.Empty;
+			RefreshMessage = string.Empty;
 		}
 
 		public async Task<Guid> GetRepresentedGuild()
 		{
-			if (!_api.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
+			if (!MistwarModule.ModuleInstance.Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
 			{
 				(TokenPermission)1,
 				(TokenPermission)3
@@ -103,7 +112,7 @@ namespace Nekres.Mistwar.Services
 			{
 				return Guid.Empty;
 			}
-			Character obj = await TaskUtil.TryAsync(() => ((IBlobClient<Character>)(object)_api.get_Gw2ApiClient().get_V2().get_Characters()
+			Character obj = await TaskUtil.TryAsync(() => ((IBlobClient<Character>)(object)MistwarModule.ModuleInstance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Characters()
 				.get_Item(GameService.Gw2Mumble.get_PlayerCharacter().get_Name())).GetAsync(default(CancellationToken)));
 			return ((obj != null) ? obj.get_Guild() : null) ?? Guid.Empty;
 		}
@@ -134,11 +143,11 @@ namespace Nekres.Mistwar.Services
 
 		public async Task<int> GetWorldId()
 		{
-			if (!_api.HasPermission((TokenPermission)1))
+			if (!MistwarModule.ModuleInstance.Gw2ApiManager.HasPermission((TokenPermission)1))
 			{
 				return -1;
 			}
-			Account obj = await TaskUtil.TryAsync(() => ((IBlobClient<Account>)(object)_api.get_Gw2ApiClient().get_V2().get_Account()).GetAsync(default(CancellationToken)));
+			Account obj = await TaskUtil.TryAsync(() => ((IBlobClient<Account>)(object)MistwarModule.ModuleInstance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()).GetAsync(default(CancellationToken)));
 			return (obj != null) ? obj.get_World() : (-1);
 		}
 
@@ -155,7 +164,7 @@ namespace Nekres.Mistwar.Services
 		private async Task UpdateObjectives(int worldId, int mapId)
 		{
 			List<WvwObjectiveEntity> objEntities = await GetObjectives(mapId);
-			WvwMatch match = await TaskUtil.TryAsync(() => ((IBlobClient<WvwMatch>)(object)_api.get_Gw2ApiClient().get_V2().get_Wvw()
+			WvwMatch match = await TaskUtil.TryAsync(() => ((IBlobClient<WvwMatch>)(object)MistwarModule.ModuleInstance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Wvw()
 				.get_Matches()
 				.World(worldId)).GetAsync(default(CancellationToken)));
 			if (match == null)
@@ -190,14 +199,14 @@ namespace Nekres.Mistwar.Services
 
 		private async Task<List<WvwObjectiveEntity>> RequestObjectives(int mapId)
 		{
-			IApiV2ObjectList<WvwObjective> wvwObjectives = await TaskUtil.RetryAsync(() => ((IAllExpandableClient<WvwObjective>)(object)_api.get_Gw2ApiClient().get_V2().get_Wvw()
+			IApiV2ObjectList<WvwObjective> wvwObjectives = await TaskUtil.RetryAsync(() => ((IAllExpandableClient<WvwObjective>)(object)MistwarModule.ModuleInstance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Wvw()
 				.get_Objectives()).AllAsync(default(CancellationToken)));
 			if (((IEnumerable<WvwObjective>)wvwObjectives).IsNullOrEmpty())
 			{
 				return Enumerable.Empty<WvwObjectiveEntity>().ToList();
 			}
-			Map obj2 = await MapUtil.GetMap(mapId);
-			ContinentFloorRegionMap mapExpanded = await MapUtil.GetMapExpanded(obj2, obj2.get_DefaultFloor());
+			Map map = await MistwarModule.ModuleInstance.Resources.GetMap(mapId);
+			ContinentFloorRegionMap mapExpanded = await MistwarModule.ModuleInstance.Resources.GetMapExpanded(map, map.get_DefaultFloor());
 			if (mapExpanded == null)
 			{
 				return Enumerable.Empty<WvwObjectiveEntity>().ToList();

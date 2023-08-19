@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Microsoft.Xna.Framework;
+using Nekres.Mistwar.Core.UI.Controls;
 using Nekres.Mistwar.Entities;
-using Nekres.Mistwar.UI.Controls;
 
-namespace Nekres.Mistwar.Services
+namespace Nekres.Mistwar.Core.Services
 {
 	internal class MarkerService : IDisposable
 	{

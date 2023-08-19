@@ -37,7 +37,7 @@ namespace Blish_HUD.Extended
 			}
 			if (retries > 0)
 			{
-				logger.Warn(e, $"Failed to pull data from the GW2 API. Retrying in {delayMs / 1000} second(s) (remaining retries: {retries}).");
+				logger.Warn(e, $"Failed to request data. Retrying in {delayMs / 1000} second(s) (remaining retries: {retries}).");
 				await Task.Delay(delayMs);
 				return await RetryAsync(func, retries - 1, delayMs, logger);
 			}
@@ -61,40 +61,7 @@ namespace Blish_HUD.Extended
 
 		public static async Task<T> TryAsync<T>(Func<Task<T>> func, Logger logger = null)
 		{
-			if (logger == null)
-			{
-				logger = Logger.GetLogger<TaskUtil>();
-			}
-			try
-			{
-				return await func();
-			}
-			catch (Exception e)
-			{
-				if (!(e is NotFoundException) && !(e is BadRequestException) && !(e is AuthorizationRequiredException))
-				{
-					if (!(e is TooManyRequestsException))
-					{
-						if (e is RequestException || e is RequestException<string>)
-						{
-							logger.Trace(e, e.Message);
-						}
-						else
-						{
-							logger.Error(e, e.Message);
-						}
-					}
-					else
-					{
-						logger.Warn(e, "No data could be loaded due to being rate limited by the API.");
-					}
-				}
-				else
-				{
-					logger.Trace(e, e.Message);
-				}
-				return default(T);
-			}
+			return await RetryAsync(func, 0, 0, logger);
 		}
 	}
 }

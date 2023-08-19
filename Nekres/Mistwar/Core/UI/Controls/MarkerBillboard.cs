@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Nekres.Mistwar.Entities;
 
-namespace Nekres.Mistwar.UI.Controls
+namespace Nekres.Mistwar.Core.UI.Controls
 {
 	internal class MarkerBillboard : Control
 	{
@@ -90,7 +90,7 @@ namespace Nekres.Mistwar.UI.Controls
 			IEnumerable<WvwObjectiveEntity> objectives = WvwObjectives.Where((WvwObjectiveEntity x) => x.Icon != null);
 			if (MistwarModule.ModuleInstance.HideAlliedMarkersSetting.get_Value())
 			{
-				objectives = objectives.Where((WvwObjectiveEntity x) => x.Owner != MistwarModule.ModuleInstance.WvwService.CurrentTeam);
+				objectives = objectives.Where((WvwObjectiveEntity x) => x.Owner != MistwarModule.ModuleInstance.WvW.CurrentTeam);
 			}
 			List<WvwObjectiveEntity> distanceSort = objectives.OrderByDescending((WvwObjectiveEntity x) => x.GetDistance()).ToList();
 			if (MistwarModule.ModuleInstance.HideInCombatSetting.get_Value() && GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat())

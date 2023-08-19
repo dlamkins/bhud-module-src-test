@@ -6,12 +6,8 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
-using Blish_HUD;
-using Blish_HUD.Extended;
 using Gw2Sharp.Models;
-using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 
@@ -19,20 +15,6 @@ namespace Nekres.Mistwar
 {
 	internal static class MapUtil
 	{
-		private static AsyncCache<(Map, int), ContinentFloorRegionMap> _mapExpandedCache = new AsyncCache<(Map, int), ContinentFloorRegionMap>(((Map, int) p) => RequestMapExpanded(p.Item1, p.Item2));
-
-		private static AsyncCache<int, Map> _mapCache = new AsyncCache<int, Map>(RequestMap);
-
-		public static async Task<Map> GetMap(int mapId)
-		{
-			return await _mapCache.GetItem(mapId);
-		}
-
-		public static async Task<ContinentFloorRegionMap> GetMapExpanded(Map map, int floorId)
-		{
-			return await _mapExpandedCache.GetItem((map, floorId));
-		}
-
 		public static async Task BuildMap(Map map, string filePath, bool removeBackground = false, IProgress<string> progress = null)
 		{
 			if (map == null)
@@ -68,7 +50,7 @@ namespace Nekres.Mistwar
 				gfx.Flush();
 				if (removeBackground)
 				{
-					ContinentFloorRegionMap obj = await GetMapExpanded(map, map.get_DefaultFloor());
+					ContinentFloorRegionMap obj = await MistwarModule.ModuleInstance.Resources.GetMapExpanded(map, map.get_DefaultFloor());
 					GraphicsPath polygonPath = new GraphicsPath
 					{
 						FillMode = FillMode.Alternate
@@ -97,24 +79,6 @@ namespace Nekres.Mistwar
 			int x = (int)(((Coordinates2)(ref node)).get_X() * (double)tileSize - ((Coordinates2)(ref destTopLeft)).get_X() + (double)padding);
 			int y = (int)(((Coordinates2)(ref node)).get_Y() * (double)tileSize - ((Coordinates2)(ref destTopLeft)).get_Y() + (double)padding);
 			return new Point(x, y);
-		}
-
-		private static async Task<Map> RequestMap(int mapId)
-		{
-			return await TaskUtil.RetryAsync(() => ((IBulkExpandableClient<Map, int>)(object)GameService.Gw2WebApi.get_AnonymousConnection().get_Client().get_V2()
-				.get_Maps()).GetAsync(mapId, default(CancellationToken)));
-		}
-
-		private static async Task<ContinentFloorRegionMap> RequestMapExpanded(Map map, int floorId)
-		{
-			return await TaskUtil.RetryAsync(() => ((IBulkExpandableClient<ContinentFloorRegionMap, int>)(object)GameService.Gw2WebApi.get_AnonymousConnection().get_Client().get_V2()
-				.get_Continents()
-				.get_Item(map.get_ContinentId())
-				.get_Floors()
-				.get_Item(floorId)
-				.get_Regions()
-				.get_Item(map.get_RegionId())
-				.get_Maps()).GetAsync(map.get_Id(), default(CancellationToken)));
 		}
 
 		private static Point FromPixelToTileXy(Coordinates2 p, int zoom = 8)

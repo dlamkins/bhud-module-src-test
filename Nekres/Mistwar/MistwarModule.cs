@@ -14,8 +14,8 @@ using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Nekres.Mistwar.Core.Services;
 using Nekres.Mistwar.Entities;
-using Nekres.Mistwar.Services;
 
 namespace Nekres.Mistwar
 {
@@ -68,11 +68,13 @@ namespace Nekres.Mistwar
 
 		private CornerIcon _moduleIcon;
 
-		internal WvwService WvwService;
+		internal WvwService WvW;
 
-		private MapService _mapService;
+		internal MapService Maps;
 
-		internal MarkerService MarkerService;
+		internal MarkerService Markers;
+
+		internal ResourceService Resources;
 
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
@@ -128,26 +130,27 @@ namespace Nekres.Mistwar
 
 		protected override void Initialize()
 		{
-			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Expected O, but got Unknown
 			ChatMessageKeySetting.get_Value().set_Enabled(false);
-			CornerTex = ContentsManager.GetTexture("corner_icon.png");
-			_moduleIcon = new CornerIcon(AsyncTexture2D.op_Implicit(CornerTex), ((Module)this).get_Name());
-			WvwService = new WvwService(Gw2ApiManager);
+			Resources = new ResourceService();
+			WvW = new WvwService();
+			Maps = new MapService(GetModuleProgressHandler());
 			if (EnableMarkersSetting.get_Value())
 			{
-				MarkerService = new MarkerService();
+				Markers = new MarkerService();
 			}
-			_mapService = new MapService(DirectoriesManager, WvwService, GetModuleProgressHandler());
 		}
 
 		protected override async Task LoadAsync()
 		{
-			await WvwService.LoadAsync();
+			await WvW.LoadAsync();
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Expected O, but got Unknown
+			CornerTex = ContentsManager.GetTexture("corner_icon.png");
+			_moduleIcon = new CornerIcon(AsyncTexture2D.op_Implicit(CornerTex), ((Module)this).get_Name());
 			ColorIntensitySetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnColorIntensitySettingChanged);
 			ToggleMapKeySetting.get_Value().add_Activated((EventHandler<EventArgs>)OnToggleKeyActivated);
 			ToggleMarkersKeySetting.get_Value().add_Activated((EventHandler<EventArgs>)OnToggleMarkersKeyActivated);
@@ -159,12 +162,24 @@ namespace Nekres.Mistwar
 			ToggleMarkersKeySetting.get_Value().set_Enabled(true);
 			OnColorIntensitySettingChanged(null, new ValueChangedEventArgs<float>(0f, ColorIntensitySetting.get_Value()));
 			((Control)_moduleIcon).add_Click((EventHandler<MouseEventArgs>)OnModuleIconClick);
+			Maps.DownloadMaps(WvW.GetWvWMapIds());
 			((Module)this).OnModuleLoaded(e);
 		}
 
 		private void OnModuleIconClick(object o, MouseEventArgs e)
 		{
-			_mapService.Toggle();
+			if (ServicesLoaded())
+			{
+				Maps.Toggle();
+			}
+		}
+
+		private void OnToggleKeyActivated(object o, EventArgs e)
+		{
+			if (ServicesLoaded())
+			{
+				Maps.Toggle();
+			}
 		}
 
 		private void UpdateModuleLoading(string loadingMessage)
@@ -190,9 +205,21 @@ namespace Nekres.Mistwar
 			return new Progress<string>(UpdateModuleLoading);
 		}
 
-		private void OnToggleKeyActivated(object o, EventArgs e)
+		private bool ServicesLoaded()
 		{
-			_mapService.Toggle();
+			if (WvW.IsLoading)
+			{
+				ScreenNotification.ShowNotification(((Module)this).get_Name() + " unavailable. WvW data not loaded.", (NotificationType)2, (Texture2D)null, 4);
+				GameService.Content.PlaySoundEffectByName("error");
+				return false;
+			}
+			if (Maps.IsLoading)
+			{
+				ScreenNotification.ShowNotification(((Module)this).get_Name() + " unavailable. Map not loaded.", (NotificationType)2, (Texture2D)null, 4);
+				GameService.Content.PlaySoundEffectByName("error");
+				return false;
+			}
+			return true;
 		}
 
 		private void OnToggleMarkersKeyActivated(object o, EventArgs e)
@@ -202,16 +229,15 @@ namespace Nekres.Mistwar
 
 		protected override async void Update(GameTime gameTime)
 		{
-			_mapService.DownloadMaps(WvwService.GetWvWMapIds());
 			if (Gw2ApiManager.HasPermission((TokenPermission)1))
 			{
-				await WvwService.Update();
+				await WvW.Update();
 			}
 		}
 
 		private void OnColorIntensitySettingChanged(object o, ValueChangedEventArgs<float> e)
 		{
-			_mapService.ColorIntensity = (100f - e.get_NewValue()) / 100f;
+			Maps.ColorIntensity = (100f - e.get_NewValue()) / 100f;
 		}
 
 		private void OnIsMapOpenChanged(object o, ValueEventArgs<bool> e)
@@ -278,24 +304,24 @@ namespace Nekres.Mistwar
 		{
 			if (e.get_NewValue())
 			{
-				if (MarkerService == null)
+				if (Markers == null)
 				{
-					MarkerService = new MarkerService();
+					Markers = new MarkerService();
 				}
-				if (GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch())
+				if (!WvW.IsLoading && GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch())
 				{
-					List<WvwObjectiveEntity> obj = await WvwService.GetObjectives(GameService.Gw2Mumble.get_CurrentMap().get_Id());
-					if (MarkerService != null)
+					List<WvwObjectiveEntity> obj = await WvW.GetObjectives(GameService.Gw2Mumble.get_CurrentMap().get_Id());
+					if (Markers != null)
 					{
-						MarkerService.ReloadMarkers(obj);
-						MarkerService.Toggle();
+						Markers.ReloadMarkers(obj);
+						Markers.Toggle();
 					}
 				}
 			}
 			else
 			{
-				MarkerService?.Dispose();
-				MarkerService = null;
+				Markers?.Dispose();
+				Markers = null;
 			}
 		}
 
@@ -310,7 +336,7 @@ namespace Nekres.Mistwar
 			GameService.GameIntegration.get_Gw2Instance().remove_IsInGameChanged((EventHandler<ValueEventArgs<bool>>)OnIsInGameChanged);
 			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
 			GameService.Gw2Mumble.get_UI().remove_IsMapOpenChanged((EventHandler<ValueEventArgs<bool>>)OnIsMapOpenChanged);
-			_mapService?.Dispose();
+			Maps?.Dispose();
 			CornerIcon moduleIcon = _moduleIcon;
 			if (moduleIcon != null)
 			{
@@ -321,8 +347,9 @@ namespace Nekres.Mistwar
 			{
 				((GraphicsResource)cornerTex).Dispose();
 			}
-			MarkerService?.Dispose();
-			WvwService?.Dispose();
+			Markers?.Dispose();
+			WvW?.Dispose();
+			Resources?.Dispose();
 			ModuleInstance = null;
 		}
 	}
