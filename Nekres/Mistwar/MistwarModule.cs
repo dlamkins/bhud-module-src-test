@@ -6,8 +6,6 @@ using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Extended;
-using Blish_HUD.Extended.Core.Views;
-using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
@@ -141,11 +139,6 @@ namespace Nekres.Mistwar
 				MarkerService = new MarkerService();
 			}
 			_mapService = new MapService(DirectoriesManager, WvwService, GetModuleProgressHandler());
-		}
-
-		public override IView GetSettingsView()
-		{
-			return (IView)(object)new SocialsSettingsView(new SocialsSettingsModel(SettingsManager.get_ModuleSettings(), "https://pastebin.com/raw/Kk9DgVmL"));
 		}
 
 		protected override async Task LoadAsync()

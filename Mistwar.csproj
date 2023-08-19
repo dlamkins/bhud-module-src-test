@@ -9,27 +9,8 @@
     <LangVersion>Preview</LangVersion>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup>
-    <RootNamespace />
-  </PropertyGroup>
-  <ItemGroup>
-    <None Remove="Nekres\Mistwar\_Submodules.Blish_HUD_Extended.Resources.discord_logo.png" />
-    <None Remove="Nekres\Mistwar\_Submodules.Blish_HUD_Extended.Resources.github_logo.png" />
-    <None Remove="Nekres\Mistwar\_Submodules.Blish_HUD_Extended.Resources.instagram_logo.png" />
-    <None Remove="Nekres\Mistwar\_Submodules.Blish_HUD_Extended.Resources.kofi_logo.png" />
-    <None Remove="Nekres\Mistwar\_Submodules.Blish_HUD_Extended.Resources.patreon_logo.png" />
-    <None Remove="Nekres\Mistwar\_Submodules.Blish_HUD_Extended.Resources.twitch_logo.png" />
-    <None Remove="Nekres\Mistwar\_Submodules.Blish_HUD_Extended.Resources.twitter_logo.png" />
-    <None Remove="Nekres\Mistwar\_Submodules.Blish_HUD_Extended.Resources.youtube_logo.png" />
-    <EmbeddedResource Include="Nekres\Mistwar\_Submodules.Blish_HUD_Extended.Resources.discord_logo.png" />
-    <EmbeddedResource Include="Nekres\Mistwar\_Submodules.Blish_HUD_Extended.Resources.github_logo.png" />
-    <EmbeddedResource Include="Nekres\Mistwar\_Submodules.Blish_HUD_Extended.Resources.instagram_logo.png" />
-    <EmbeddedResource Include="Nekres\Mistwar\_Submodules.Blish_HUD_Extended.Resources.kofi_logo.png" />
-    <EmbeddedResource Include="Nekres\Mistwar\_Submodules.Blish_HUD_Extended.Resources.patreon_logo.png" />
-    <EmbeddedResource Include="Nekres\Mistwar\_Submodules.Blish_HUD_Extended.Resources.twitch_logo.png" />
-    <EmbeddedResource Include="Nekres\Mistwar\_Submodules.Blish_HUD_Extended.Resources.twitter_logo.png" />
-    <EmbeddedResource Include="Nekres\Mistwar\_Submodules.Blish_HUD_Extended.Resources.youtube_logo.png" />
-  </ItemGroup>
+  <PropertyGroup />
+  <ItemGroup />
   <ItemGroup>
     <Reference Include="MonoGame.Framework" />
     <Reference Include="Blish HUD" />
@@ -38,10 +19,7 @@
     <Reference Include="Gw2Sharp" />
     <Reference Include="System.Numerics" />
     <Reference Include="Gapotchenko.FX" />
-    <Reference Include="Newtonsoft.Json" />
-    <Reference Include="Flurl.Http" />
     <Reference Include="System.Core" />
     <Reference Include="AsyncClipboardService" />
-    <Reference Include="System.Net.Http" />
   </ItemGroup>
 </Project>

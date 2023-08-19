@@ -171,8 +171,7 @@ namespace Nekres.Mistwar.Services
 				}
 			}
 			string filePath = Path.Combine(_dir.GetFullDirectoryPath("mistwar"), $"{id}.png");
-			IsReady = LoadFromCache(filePath, tex);
-			if (IsReady)
+			if (LoadFromCache(filePath, tex))
 			{
 				await ReloadMap();
 				return;
@@ -181,8 +180,7 @@ namespace Nekres.Mistwar.Services
 			if (map != null)
 			{
 				await MapUtil.BuildMap(map, filePath, removeBackground: true, _loadingIndicator);
-				IsReady = LoadFromCache(filePath, tex);
-				if (IsReady)
+				if (LoadFromCache(filePath, tex))
 				{
 					await ReloadMap();
 				}
@@ -225,6 +223,8 @@ namespace Nekres.Mistwar.Services
 		{
 			if (!GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch())
 			{
+				IsReady = false;
+				Toggle(forceHide: true);
 				return;
 			}
 			AsyncTexture2D tex;
@@ -232,25 +232,43 @@ namespace Nekres.Mistwar.Services
 			{
 				if (!_mapCache.TryGetValue(GameService.Gw2Mumble.get_CurrentMap().get_Id(), out tex) || tex == null)
 				{
+					IsReady = false;
+					Toggle(forceHide: true);
 					return;
 				}
 			}
 			_mapControl.Texture.SwapTexture(AsyncTexture2D.op_Implicit(tex));
 			ContinentFloorRegionMap map = await GetMap(GameService.Gw2Mumble.get_CurrentMap().get_Id());
+			if (map == null)
+			{
+				IsReady = false;
+				Toggle(forceHide: true);
+				return;
+			}
 			_mapControl.Map = map;
-			((WindowBase2)_window).set_Title(((map != null) ? map.get_Name() : null) ?? string.Empty);
+			((WindowBase2)_window).set_Title(map.get_Name());
 			List<WvwObjectiveEntity> wvwObjectives = await _wvw.GetObjectives(GameService.Gw2Mumble.get_CurrentMap().get_Id());
-			if (!wvwObjectives.IsNullOrEmpty())
+			if (wvwObjectives.IsNullOrEmpty())
+			{
+				IsReady = false;
+				Toggle(forceHide: true);
+			}
+			else
 			{
 				_mapControl.WvwObjectives = wvwObjectives;
 				MistwarModule.ModuleInstance?.MarkerService?.ReloadMarkers(wvwObjectives);
+				IsReady = true;
 			}
 		}
 
 		private async Task<ContinentFloorRegionMap> GetMap(int mapId)
 		{
-			Map obj = await MapUtil.GetMap(mapId);
-			return await MapUtil.GetMapExpanded(obj, obj.get_DefaultFloor());
+			Map map = await MapUtil.GetMap(mapId);
+			if (map == null)
+			{
+				return null;
+			}
+			return await MapUtil.GetMapExpanded(map, map.get_DefaultFloor());
 		}
 
 		public void Toggle(bool forceHide = false)
@@ -262,7 +280,7 @@ namespace Nekres.Mistwar.Services
 			}
 			else if (!IsReady)
 			{
-				ScreenNotification.ShowNotification("(" + ((Module)MistwarModule.ModuleInstance).get_Name() + ") Map images are being prepared...", (NotificationType)2, (Texture2D)null, 4);
+				ScreenNotification.ShowNotification("(" + ((Module)MistwarModule.ModuleInstance).get_Name() + ") Service unavailable. Current match not loaded.", (NotificationType)2, (Texture2D)null, 4);
 			}
 			else if (GameUtil.IsAvailable() && GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch())
 			{
