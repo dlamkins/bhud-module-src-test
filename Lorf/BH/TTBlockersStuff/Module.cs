@@ -2,13 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
-using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using Lorf.BH.TTBlockersStuff.Settings;
 using Lorf.BH.TTBlockersStuff.UI;
@@ -135,6 +133,7 @@ namespace Lorf.BH.TTBlockersStuff
 
 		protected override async Task LoadAsync()
 		{
+			Module module = this;
 			List<Color> list = new List<Color>();
 			Color val = new Color();
 			val.set_Name("Default");
@@ -142,8 +141,7 @@ namespace Lorf.BH.TTBlockersStuff
 			val2.set_Rgb((IReadOnlyList<int>)new List<int> { 237, 121, 38 });
 			val.set_Cloth(val2);
 			list.Add(val);
-			IEnumerable<Color> first = list;
-			Colors = first.Concat((IEnumerable<Color>)(await ((IAllExpandableClient<Color>)(object)Instance.Gw2ApiManager.Gw2ApiClient.get_V2().get_Colors()).AllAsync(default(CancellationToken))));
+			module.Colors = list;
 			SettingsManager.ModuleSettings.DefineSetting<Color>("colorPickerSettingTimerBar0", Colors?.First(), () => Translations.SettingColorSelectionHusksText, () => Translations.SettingColorSelectionHusksTooltipText);
 			SettingsManager.ModuleSettings.DefineSetting<Color>("colorPickerSettingTimerBarRefilling0", Colors?.First(), () => Translations.SettingColorSelectionHusksRefillingText, () => Translations.SettingColorSelectionHusksRefillingTooltipText);
 			SettingsManager.ModuleSettings.DefineSetting<Color>("colorPickerSettingTimerBar1", Colors?.First(), () => Translations.SettingColorSelectionEggsText, () => Translations.SettingColorSelectionEggsTooltipText);
