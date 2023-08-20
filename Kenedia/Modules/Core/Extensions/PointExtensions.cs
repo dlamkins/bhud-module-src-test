@@ -38,6 +38,16 @@ namespace Kenedia.Modules.Core.Extensions
 			return new Point(b.X + p.X, b.Y + p.Y);
 		}
 
+		public static Point Substract(this Point b, Point p)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			return new Point(b.X - p.X, b.Y - p.Y);
+		}
+
 		public static Point Scale(this Point p, double factor)
 		{
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)

@@ -32,6 +32,7 @@ using Kenedia.Modules.Core.Controls;
 using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Models;
 using Kenedia.Modules.Core.Res;
+using Kenedia.Modules.Core.Structs;
 using Kenedia.Modules.Core.Views;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -46,6 +47,10 @@ namespace Kenedia.Modules.Characters
 		public readonly ResourceManager RM = new ResourceManager("Kenedia.Modules.Characters.Res.strings", Assembly.GetExecutingAssembly());
 
 		private readonly Ticks _ticks = new Ticks();
+
+		private AnchoredContainer _cornerContainer;
+
+		private NotificationBadge _notificationBadge;
 
 		private CornerIcon _cornerIcon;
 
@@ -78,7 +83,7 @@ namespace Kenedia.Modules.Characters
 
 		public PotraitCapture PotraitCapture { get; private set; }
 
-		public LoadingSpinner APISpinner { get; private set; }
+		public LoadingSpinner ApiSpinner { get; private set; }
 
 		public TextureManager TextureManager { get; private set; }
 
@@ -217,7 +222,7 @@ namespace Kenedia.Modules.Characters
 		protected override void OnModuleLoaded(EventArgs e)
 		{
 			base.OnModuleLoaded(e);
-			GW2APIHandler = new GW2API_Handler(base.Gw2ApiManager, AddOrUpdateCharacters, () => (LoadingSpinner)(object)APISpinner, base.Paths, Data);
+			GW2APIHandler = new GW2API_Handler(base.Gw2ApiManager, AddOrUpdateCharacters, () => ApiSpinner, base.Paths, Data, () => _notificationBadge);
 			GW2APIHandler.AccountChanged += GW2APIHandler_AccountChanged;
 			base.Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
 			if (base.Settings.ShowCornerIcon.get_Value())
@@ -482,6 +487,7 @@ namespace Kenedia.Modules.Characters
 		protected override void ReloadKey_Activated(object sender, EventArgs e)
 		{
 			base.ReloadKey_Activated(sender, e);
+			CreateCornerIcons();
 			((Control)GameService.Graphics.get_SpriteScreen()).set_Visible(true);
 			MainWindow mainWindow = base.MainWindow;
 			if (mainWindow != null)
@@ -515,8 +521,10 @@ namespace Kenedia.Modules.Characters
 
 		private void CreateCornerIcons()
 		{
-			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
 			DeleteCornerIcons();
 			CornerIcon cornerIcon = new CornerIcon();
 			((CornerIcon)cornerIcon).set_Icon(AsyncTexture2D.FromAssetId(156678));
@@ -533,43 +541,49 @@ namespace Kenedia.Modules.Characters
 				}
 			};
 			_cornerIcon = cornerIcon;
+			AnchoredContainer anchoredContainer = new AnchoredContainer();
+			((Control)anchoredContainer).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			((Container)anchoredContainer).set_WidthSizingMode((SizingMode)1);
+			((Container)anchoredContainer).set_HeightSizingMode((SizingMode)1);
+			anchoredContainer.Anchor = (Control)(object)_cornerIcon;
+			anchoredContainer.AnchorPosition = AnchoredContainer.AnchorPos.Bottom;
+			anchoredContainer.RelativePosition = new RectangleDimensions(0, -((Control)_cornerIcon).get_Height() / 2);
+			anchoredContainer.CaptureInput = (CaptureType)1;
+			_cornerContainer = anchoredContainer;
+			NotificationBadge notificationBadge = new NotificationBadge();
+			((Control)notificationBadge).set_Location(new Point(((Control)_cornerIcon).get_Width() - 15, 0));
+			((Control)notificationBadge).set_Parent((Container)(object)_cornerContainer);
+			((Control)notificationBadge).set_Size(new Point(20));
+			notificationBadge.Opacity = 0.6f;
+			notificationBadge.HoveredOpacity = 1f;
+			notificationBadge.CaptureInput = (CaptureType)1;
+			notificationBadge.Anchor = (Control)(object)_cornerIcon;
+			((Control)notificationBadge).set_Visible(false);
+			_notificationBadge = notificationBadge;
 			LoadingSpinner loadingSpinner = new LoadingSpinner();
-			((Control)loadingSpinner).set_Location(new Point(((Control)_cornerIcon).get_Left(), ((Control)_cornerIcon).get_Bottom() + 3));
-			((Control)loadingSpinner).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)loadingSpinner).set_Size(new Point(((Control)_cornerIcon).get_Width(), ((Control)_cornerIcon).get_Height()));
+			((Control)loadingSpinner).set_Location(new Point(0, ((Control)_notificationBadge).get_Bottom()));
+			((Control)loadingSpinner).set_Parent((Container)(object)_cornerContainer);
+			((Control)loadingSpinner).set_Size(((Control)_cornerIcon).get_Size());
 			((Control)loadingSpinner).set_BasicTooltipText(strings_common.FetchingApiData);
 			((Control)loadingSpinner).set_Visible(false);
-			APISpinner = loadingSpinner;
-			((Control)_cornerIcon).add_Moved((EventHandler<MovedEventArgs>)CornerIcon_Moved);
+			loadingSpinner.CaptureInput = null;
+			ApiSpinner = loadingSpinner;
 		}
 
 		private void DeleteCornerIcons()
 		{
-			if (_cornerIcon != null)
-			{
-				((Control)_cornerIcon).remove_Moved((EventHandler<MovedEventArgs>)CornerIcon_Moved);
-			}
 			CornerIcon cornerIcon = _cornerIcon;
 			if (cornerIcon != null)
 			{
 				((Control)cornerIcon).Dispose();
 			}
 			_cornerIcon = null;
-			LoadingSpinner aPISpinner = APISpinner;
-			if (aPISpinner != null)
+			AnchoredContainer cornerContainer = _cornerContainer;
+			if (cornerContainer != null)
 			{
-				((Control)aPISpinner).Dispose();
+				((Control)cornerContainer).Dispose();
 			}
-			APISpinner = null;
-		}
-
-		private void CornerIcon_Moved(object sender, MovedEventArgs e)
-		{
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			if (APISpinner != null)
-			{
-				((Control)APISpinner).set_Location(new Point(((Control)_cornerIcon).get_Left(), ((Control)_cornerIcon).get_Bottom() + 3));
-			}
+			_cornerContainer = null;
 		}
 
 		private void ShowCornerIcon_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
@@ -621,6 +635,10 @@ namespace Kenedia.Modules.Characters
 				}
 			}
 			BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Update characters for '" + base.Paths.AccountName + "' based on fresh data from the api.");
+			if (base.Paths.AccountName == null || ((IReadOnlyCollection<Character>)characters).Count <= 0)
+			{
+				return;
+			}
 			var freshList = ((IEnumerable<Character>)characters).Select((Character c) => new
 			{
 				Name = c.get_Name(),

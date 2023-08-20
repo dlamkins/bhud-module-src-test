@@ -41,8 +41,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		private string _message;
 
-		private CancellationTokenSource _cancellationTokenSource;
-
 		public string Title { get; private set; }
 
 		public string Message { get; private set; }
@@ -75,9 +73,9 @@ namespace Kenedia.Modules.Core.Controls
 
 		public BaseDialog(string title, string message, ButtonDefinition[] buttons = null)
 		{
-			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019e: Unknown result type (might be due to invalid IL or missing references)
 			(Button, DialogResult)[] array = new(Button, DialogResult)[2];
 			Button button = new Button();
 			((StandardButton)button).set_Text("OK");
@@ -95,6 +93,7 @@ namespace Kenedia.Modules.Core.Controls
 			_buttonPanel = flowPanel;
 			_waitHandle = new EventWaitHandle(initialState: false, EventResetMode.ManualReset);
 			AutoSize = true;
+			DesiredWidth = 300;
 			base._002Ector();
 			Title = title;
 			Message = message;
@@ -116,8 +115,6 @@ namespace Kenedia.Modules.Core.Controls
 			((Container)panel).set_HeightSizingMode((SizingMode)2);
 			((Control)panel).set_Visible(false);
 			_modalBackground = panel;
-			BuildButtons();
-			SelectButton();
 			base.BackgroundImage = _backgroundImage;
 			((Control)this).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((Control)this).set_ZIndex(int.MaxValue);
@@ -129,6 +126,8 @@ namespace Kenedia.Modules.Core.Controls
 			((Control)this).set_Visible(false);
 			((Control)_buttonPanel).set_Parent((Container)(object)this);
 			((Control)_buttonPanel).add_Resized((EventHandler<ResizedEventArgs>)ButtonPanel_Resized);
+			BuildButtons();
+			SelectButton();
 			GameService.Input.get_Keyboard().add_KeyPressed((EventHandler<KeyboardEventArgs>)Keyboard_KeyPressed);
 			((Control)((Control)this).get_Parent()).add_Resized((EventHandler<ResizedEventArgs>)Parent_Resized);
 		}

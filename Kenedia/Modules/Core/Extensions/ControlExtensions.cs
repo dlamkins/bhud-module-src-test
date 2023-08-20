@@ -27,6 +27,50 @@ namespace Kenedia.Modules.Core.Extensions
 			}
 		}
 
+		public static bool IsDrawn(this Control c)
+		{
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+			if (c.get_Parent() != null && ((Control)c.get_Parent()).get_Visible())
+			{
+				Rectangle absoluteBounds = ((Control)c.get_Parent()).get_AbsoluteBounds();
+				Rectangle absoluteBounds2 = c.get_AbsoluteBounds();
+				if (((Rectangle)(ref absoluteBounds)).Contains(((Rectangle)(ref absoluteBounds2)).get_Center()))
+				{
+					if (c.get_Parent() != GameService.Graphics.get_SpriteScreen())
+					{
+						return ((Control)(object)c.get_Parent()).IsDrawn();
+					}
+					return true;
+				}
+			}
+			return false;
+		}
+
+		public static bool IsDrawn(this Control c, Rectangle b)
+		{
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			if (c.get_Parent() != null && ((Control)c.get_Parent()).get_Visible())
+			{
+				Rectangle absoluteBounds = ((Control)c.get_Parent()).get_AbsoluteBounds();
+				if (((Rectangle)(ref absoluteBounds)).Contains(((Rectangle)(ref b)).get_Center()))
+				{
+					if (c.get_Parent() != GameService.Graphics.get_SpriteScreen())
+					{
+						return ((Control)(object)c.get_Parent()).IsDrawn(b);
+					}
+					return true;
+				}
+			}
+			return false;
+		}
+
 		public static bool ToggleVisibility(this Control c, bool? visible = null)
 		{
 			c.set_Visible(visible ?? (!c.get_Visible()));
@@ -81,6 +125,14 @@ namespace Kenedia.Modules.Core.Extensions
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			c.set_Size(size);
+		}
+
+		public static void SetBounds(this Control c, Rectangle bounds)
+		{
+			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			c.SetLocation(((Rectangle)(ref bounds)).get_Location());
+			c.SetSize(((Rectangle)(ref bounds)).get_Size());
 		}
 	}
 }

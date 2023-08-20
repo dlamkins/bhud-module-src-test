@@ -198,6 +198,8 @@ namespace Kenedia.Modules.Core.Controls
 			}
 		}
 
+		public bool CaptureInput { get; set; }
+
 		public FlowPanel()
 		{
 			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
@@ -211,6 +213,7 @@ namespace Kenedia.Modules.Core.Controls
 			_titleIconPadding = new RectangleDimensions(3, 3, 5, 3);
 			_titleBarHeight = 36;
 			BackgroundImageColor = Color.get_White();
+			CaptureInput = true;
 			((FlowPanel)this)._002Ector();
 			LocalizingService.LocaleChanged += UserLocale_SettingChanged;
 			UserLocale_SettingChanged(null, null);
@@ -611,6 +614,16 @@ namespace Kenedia.Modules.Core.Controls
 			{
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), r.Item1, (Rectangle?)Rectangle.get_Empty(), borderColor.Value * r.Item2);
 			}
+		}
+
+		protected override CaptureType CapturesInput()
+		{
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			if (!CaptureInput)
+			{
+				return (CaptureType)0;
+			}
+			return ((Container)this).CapturesInput();
 		}
 	}
 }

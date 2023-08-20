@@ -111,7 +111,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 
 		private void CreateTags()
 		{
-			//IL_020f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0228: Unknown result type (might be due to invalid IL or missing references)
 			IEnumerable<string> tagLlist = _tags.Select((Tag e) => e.Text);
 			IEnumerable<string> deleteTags = tagLlist.Except(_allTags);
 			IEnumerable<string> addTags = _allTags.Except(tagLlist);
@@ -155,7 +155,10 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 					_tagFilters[t.Text].IsEnabled = t.Active;
 					_onFilterChanged?.Invoke();
 				};
-				_tagFilters.Add(tag, new SearchFilter<Character_Model>((Character_Model c) => c.Tags.Contains(tag)));
+				if (!_tagFilters.ContainsKey(tag))
+				{
+					_tagFilters.Add(tag, new SearchFilter<Character_Model>((Character_Model c) => c.Tags.Contains(tag)));
+				}
 				t.SetActive(active: false);
 			}
 			_tagFlowPanel.FitWidestTag(((Container)this).get_ContentRegion().Width);

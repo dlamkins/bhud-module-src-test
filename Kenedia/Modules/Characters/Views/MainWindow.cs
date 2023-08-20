@@ -26,7 +26,6 @@ using Kenedia.Modules.Core.Views;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using SemVer;
 
 namespace Kenedia.Modules.Characters.Views
 {
@@ -36,7 +35,7 @@ namespace Kenedia.Modules.Characters.Views
 
 		private readonly TextureManager _textureManager;
 
-		private readonly ObservableCollection<Character_Model> _characterModels;
+		private readonly ObservableCollection<Character_Model> _rawCharacterModels;
 
 		private readonly SearchFilterCollection _searchFilters;
 
@@ -76,10 +75,6 @@ namespace Kenedia.Modules.Characters.Views
 
 		private double _filterTick;
 
-		private Rectangle _emblemRectangle;
-
-		private Rectangle _titleRectangle;
-
 		private APITimeoutNotification _apiTimeoutNotification;
 
 		private APIPermissionNotification _apiPermissionNotification;
@@ -90,6 +85,18 @@ namespace Kenedia.Modules.Characters.Views
 
 		public List<Character_Model> LoadedModels { get; } = new List<Character_Model>();
 
+
+		private List<Character_Model> CharacterModels
+		{
+			get
+			{
+				if (_settings?.IncludeBetaCharacters.get_Value() ?? false)
+				{
+					return _rawCharacterModels.ToList();
+				}
+				return _rawCharacterModels.Where((Character_Model e) => !e.Beta).ToList();
+			}
+		}
 
 		public SettingsWindow SettingsWindow { get; set; }
 
@@ -133,7 +140,7 @@ namespace Kenedia.Modules.Characters.Views
 			//IL_062d: Unknown result type (might be due to invalid IL or missing references)
 			_settings = settings;
 			_textureManager = textureManager;
-			_characterModels = characterModels;
+			_rawCharacterModels = characterModels;
 			_searchFilters = searchFilters;
 			_tagFilters = tagFilters;
 			_toggleOCR = toggleOCR;
@@ -161,7 +168,7 @@ namespace Kenedia.Modules.Characters.Views
 			((Control)collapseContainer).set_Visible(false);
 			_collapseWrapper = collapseContainer;
 			((Control)_collapseWrapper).add_Hidden((EventHandler<EventArgs>)CollapseWrapper_Hidden);
-			NotificationPanel notificationPanel = new NotificationPanel(_characterModels);
+			NotificationPanel notificationPanel = new NotificationPanel(_rawCharacterModels);
 			((Control)notificationPanel).set_Parent((Container)(object)_collapseWrapper);
 			((Container)notificationPanel).set_WidthSizingMode((SizingMode)2);
 			notificationPanel.MaxSize = new Point(-1, 310);
@@ -216,13 +223,20 @@ namespace Kenedia.Modules.Characters.Views
 			((Control)imageButton2).set_Parent((Container)(object)_buttonPanel);
 			imageButton2.Texture = AsyncTexture2D.FromAssetId(1078535);
 			((Control)imageButton2).set_Size(new Point(25, 25));
-			imageButton2.Color = Colors.ColonialWhite;
+			imageButton2.ImageColor = Colors.ColonialWhite;
 			imageButton2.ColorHovered = Color.get_White();
 			imageButton2.SetLocalizedTooltip = () => strings.LastButton_Tooltip;
 			((Control)imageButton2).set_Visible(_settings.ShowLastButton.get_Value());
 			imageButton2.ClickAction = delegate
 			{
-				_characterModels.Aggregate((Character_Model a, Character_Model b) => (!(b.LastLogin > a.LastLogin)) ? b : a)?.Swap(ignoreOCR: true);
+				if (CharacterModels.Count > 1)
+				{
+					CharacterModels.Aggregate((Character_Model a, Character_Model b) => (!(b.LastLogin > a.LastLogin)) ? b : a)?.Swap(ignoreOCR: true);
+				}
+				else if (CharacterModels.Count == 1)
+				{
+					CharacterModels?.FirstOrDefault()?.Swap(ignoreOCR: true);
+				}
 			};
 			_lastButton = imageButton2;
 			_lastButton.Texture.add_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)Texture_TextureSwapped);
@@ -262,7 +276,7 @@ namespace Kenedia.Modules.Characters.Views
 			((Control)imageButton5).set_Parent((Container)(object)_buttonPanel);
 			imageButton5.Texture = AsyncTexture2D.FromAssetId(605018);
 			((Control)imageButton5).set_Size(new Point(25, 25));
-			imageButton5.Color = Colors.ColonialWhite;
+			imageButton5.ImageColor = Colors.ColonialWhite;
 			imageButton5.ColorHovered = Color.get_White();
 			imageButton5.SetLocalizedTooltip = () => string.Format(strings.Toggle, "Side Menu");
 			imageButton5.ClickAction = delegate
@@ -302,7 +316,20 @@ namespace Kenedia.Modules.Characters.Views
 			_settings.PinSideMenus.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)PinSideMenus_SettingChanged);
 			_settings.ShowRandomButton.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowRandomButton_SettingChanged);
 			_settings.ShowLastButton.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowLastButton_SettingChanged);
+			_settings.IncludeBetaCharacters.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)IncludeBetaCharacters_SettingChanged);
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)CurrentMap_MapChanged);
+		}
+
+		private void IncludeBetaCharacters_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
+		{
+			LoadedModels?.Clear();
+			FlowPanel charactersPanel = CharactersPanel;
+			if (charactersPanel != null)
+			{
+				((Container)charactersPanel).ClearChildren();
+			}
+			CharacterCards?.Clear();
+			CreateCharacterControls();
 		}
 
 		private void CollapseWrapper_Hidden(object sender, EventArgs e)
@@ -371,7 +398,7 @@ namespace Kenedia.Modules.Characters.Views
 			List<Match> strings = regex.Matches(((TextInputBase)_filterBox).get_Text().Trim().ToLower()).Cast<Match>().ToList();
 			new List<string>();
 			List<KeyValuePair<string, SearchFilter<Character_Model>>> stringFilters = new List<KeyValuePair<string, SearchFilter<Character_Model>>>();
-			_003C_003Ec__DisplayClass67_0 CS_0024_003C_003E8__locals0;
+			_003C_003Ec__DisplayClass68_0 CS_0024_003C_003E8__locals0;
 			foreach (Match match in strings)
 			{
 				string string_text = SearchableString(match.ToString().Replace("\"", ""));
@@ -405,7 +432,7 @@ namespace Kenedia.Modules.Characters.Views
 					{
 						//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 						//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-						_003C_003Ec__DisplayClass67_0 _003C_003Ec__DisplayClass67_ = CS_0024_003C_003E8__locals0;
+						_003C_003Ec__DisplayClass68_0 _003C_003Ec__DisplayClass68_ = CS_0024_003C_003E8__locals0;
 						Gender gender = c.Gender;
 						return SearchableString(((object)(Gender)(ref gender)).ToString()).Contains(string_text);
 					}, enabled: true)));
@@ -527,7 +554,7 @@ namespace Kenedia.Modules.Characters.Views
 			{
 				return;
 			}
-			foreach (Character_Model c in _characterModels.Except(LoadedModels))
+			foreach (Character_Model c in CharacterModels.Except(LoadedModels))
 			{
 				LoadedModels.Add(c);
 				List<CharacterCard> characterCards = CharacterCards;
@@ -586,7 +613,7 @@ namespace Kenedia.Modules.Characters.Views
 		public override void UpdateContainer(GameTime gameTime)
 		{
 			base.UpdateContainer(gameTime);
-			((Control)this).set_BasicTooltipText((((WindowBase2)this).get_MouseOverTitleBar() && base.Version != (Version)null) ? $"v. {base.Version}" : null);
+			((Control)this).set_BasicTooltipText((((WindowBase2)this).get_MouseOverTitleBar() && base.Version != null) ? $"v. {base.Version}" : null);
 			if (_filterCharacters && gameTime.get_TotalGameTime().TotalMilliseconds - _filterTick > (double)_settings.FilterDelay.get_Value())
 			{
 				_filterTick = gameTime.get_TotalGameTime().TotalMilliseconds;

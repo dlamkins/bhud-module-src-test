@@ -44,6 +44,10 @@ namespace Kenedia.Modules.Core.Res
 			}
 		}
 
+		internal static Bitmap ImageButtonBackground => (Bitmap)ResourceManager.GetObject("ImageButtonBackground", resourceCulture);
+
+		internal static Bitmap ImageButtonBackground_Hovered => (Bitmap)ResourceManager.GetObject("ImageButtonBackground_Hovered", resourceCulture);
+
 		internal static Bitmap RollingChoya => (Bitmap)ResourceManager.GetObject("RollingChoya", resourceCulture);
 
 		internal textures_common()

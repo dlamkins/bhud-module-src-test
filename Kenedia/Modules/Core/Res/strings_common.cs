@@ -60,6 +60,10 @@ namespace Kenedia.Modules.Core.Res
 
 		internal static string GeneralSettings => ResourceManager.GetString("GeneralSettings", resourceCulture);
 
+		internal static string GW2API_RequestFailed => ResourceManager.GetString("GW2API_RequestFailed", resourceCulture);
+
+		internal static string GW2API_Unavailable => ResourceManager.GetString("GW2API_Unavailable", resourceCulture);
+
 		internal static string ItemSettings => ResourceManager.GetString("ItemSettings", resourceCulture);
 
 		internal static string LeftOffset => ResourceManager.GetString("LeftOffset", resourceCulture);
@@ -69,6 +73,8 @@ namespace Kenedia.Modules.Core.Res
 		internal static string RightOffset => ResourceManager.GetString("RightOffset", resourceCulture);
 
 		internal static Bitmap RollingChoya => (Bitmap)ResourceManager.GetObject("RollingChoya", resourceCulture);
+
+		internal static string Search => ResourceManager.GetString("Search", resourceCulture);
 
 		internal static string Settings => ResourceManager.GetString("Settings", resourceCulture);
 

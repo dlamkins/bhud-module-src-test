@@ -76,6 +76,8 @@ namespace Kenedia.Modules.Characters.Models
 
 		private DateTime _nextBirthday;
 
+		private bool _beta;
+
 		public bool IsCurrentCharacter
 		{
 			get
@@ -85,6 +87,19 @@ namespace Kenedia.Modules.Characters.Models
 			set
 			{
 				SetProperty(ref _isCurrentCharacter, value, "IsCurrentCharacter");
+			}
+		}
+
+		[DataMember]
+		public bool Beta
+		{
+			get
+			{
+				return _beta;
+			}
+			set
+			{
+				SetProperty(ref _beta, value, "Beta");
 			}
 		}
 
@@ -532,14 +547,14 @@ namespace Kenedia.Modules.Characters.Models
 
 		public Character_Model(Character character, CharacterSwapping characterSwapping, string modulePath, Action requestSave, ObservableCollection<Character_Model> characterModels, Data data)
 		{
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0147: Expected I4, but got Unknown
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016e: Expected I4, but got Unknown
 			_characterSwapping = characterSwapping;
 			ModulePath = modulePath;
 			_requestSave = requestSave;
@@ -547,6 +562,7 @@ namespace Kenedia.Modules.Characters.Models
 			_data = data;
 			_name = character.get_Name();
 			_level = character.get_Level();
+			_beta = _beta || character.get_Flags().ToList().Contains(ApiEnum<CharacterFlag>.op_Implicit((CharacterFlag)1));
 			_race = (RaceType)Enum.Parse(typeof(RaceType), character.get_Race());
 			_profession = (ProfessionType)Enum.Parse(typeof(ProfessionType), character.get_Profession());
 			_specialization = SpecializationType.None;
@@ -568,12 +584,12 @@ namespace Kenedia.Modules.Characters.Models
 
 		public Character_Model(Character_Model character, CharacterSwapping characterSwapping, string modulePath, Action requestSave, ObservableCollection<Character_Model> characterModels, Data data)
 		{
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
 			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
 			_characterSwapping = characterSwapping;
 			ModulePath = modulePath;
 			_requestSave = requestSave;
@@ -582,6 +598,7 @@ namespace Kenedia.Modules.Characters.Models
 			_name = character.Name;
 			_level = character.Level;
 			_map = character.Map;
+			_beta = character.Beta;
 			Crafting = character.Crafting;
 			_race = character.Race;
 			_profession = character.Profession;
@@ -718,16 +735,17 @@ namespace Kenedia.Modules.Characters.Models
 
 		public void UpdateCharacter(Character character)
 		{
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0121: Expected I4, but got Unknown
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0148: Expected I4, but got Unknown
 			_name = character.get_Name();
 			_level = character.get_Level();
+			_beta = _beta || character.get_Flags().ToList().Contains(ApiEnum<CharacterFlag>.op_Implicit((CharacterFlag)1));
 			_race = (RaceType)Enum.Parse(typeof(RaceType), character.get_Race());
 			_profession = (ProfessionType)Enum.Parse(typeof(ProfessionType), character.get_Profession());
 			_created = character.get_Created();

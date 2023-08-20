@@ -41,8 +41,6 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private Point _center;
 
-		private Character_Model CurrentCharacter => _currentCharacter?.Invoke();
-
 		public RadialMenu(Settings settings, ObservableCollection<Character_Model> characters, Container parent, Func<Character_Model> currentCharacter, Data data, TextureManager textureManager)
 			: this()
 		{

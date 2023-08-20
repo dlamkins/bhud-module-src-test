@@ -8,6 +8,7 @@ using System.Text;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Gw2Sharp.WebApi;
+using Kenedia.Modules.Core.Models;
 
 namespace Kenedia.Modules.Core.Utility
 {
@@ -18,6 +19,19 @@ namespace Kenedia.Modules.Core.Utility
 		public static double Now()
 		{
 			return GameService.Overlay.get_CurrentGameTime().get_TotalGameTime().TotalMilliseconds;
+		}
+
+		public static bool SetProperty<T>(ref T property, T newValue, ValueChangedEventHandler<T> OnUpdated, bool triggerOnUpdate = true)
+		{
+			if (SetProperty(ref property, newValue))
+			{
+				if (triggerOnUpdate)
+				{
+					OnUpdated?.Invoke(property, new ValueChangedEventArgs<T>(property, newValue));
+				}
+				return true;
+			}
+			return false;
 		}
 
 		public static bool SetProperty<T>(ref T property, T newValue, PropertyChangedEventHandler OnUpdated, bool triggerOnUpdate = true, [CallerMemberName] string propName = null)

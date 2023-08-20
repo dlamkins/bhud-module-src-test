@@ -38,6 +38,8 @@ namespace Kenedia.Modules.Core.Models
 
 		public ModulePaths Paths { get; protected set; }
 
+		public SettingCollection SettingCollection { get; private set; }
+
 		public ServiceCollection Services { get; private set; }
 
 		public SharedSettingsView SharedSettingsView { get; private set; }
@@ -122,6 +124,7 @@ namespace Kenedia.Modules.Core.Models
 		protected override void DefineSettings(SettingCollection settings)
 		{
 			((Module)this).DefineSettings(settings);
+			SettingCollection = settings;
 		}
 
 		protected override void Update(GameTime gameTime)
@@ -142,11 +145,11 @@ namespace Kenedia.Modules.Core.Models
 
 		protected override void Unload()
 		{
-			((Module)this).Unload();
 			UnloadGUI();
 			Services?.Dispose();
 			GameService.Overlay.get_UserLocale().remove_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)OnLocaleChanged);
 			ModuleInstance = default(ModuleType);
+			((Module)this).Unload();
 		}
 
 		protected virtual void ReloadKey_Activated(object sender, EventArgs e)

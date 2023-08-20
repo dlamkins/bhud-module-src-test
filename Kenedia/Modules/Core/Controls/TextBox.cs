@@ -13,6 +13,8 @@ namespace Kenedia.Modules.Core.Controls
 
 		private Func<string> _setLocalizedTooltip;
 
+		private Func<string> _setLocalizedPlaceholder;
+
 		public Func<string> SetLocalizedText
 		{
 			get
@@ -36,6 +38,19 @@ namespace Kenedia.Modules.Core.Controls
 			{
 				_setLocalizedTooltip = value;
 				((Control)this).set_BasicTooltipText(value?.Invoke());
+			}
+		}
+
+		public Func<string> SetLocalizedPlaceholder
+		{
+			get
+			{
+				return _setLocalizedPlaceholder;
+			}
+			set
+			{
+				_setLocalizedPlaceholder = value;
+				((TextInputBase)this).set_PlaceholderText(value?.Invoke());
 			}
 		}
 
@@ -73,6 +88,10 @@ namespace Kenedia.Modules.Core.Controls
 			if (SetLocalizedTooltip != null)
 			{
 				((Control)this).set_BasicTooltipText(SetLocalizedTooltip?.Invoke());
+			}
+			if (SetLocalizedPlaceholder != null)
+			{
+				((TextInputBase)this).set_PlaceholderText(SetLocalizedPlaceholder?.Invoke());
 			}
 		}
 

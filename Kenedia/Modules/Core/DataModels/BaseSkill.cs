@@ -36,6 +36,22 @@ namespace Kenedia.Modules.Core.DataModels
 		}
 
 		[DataMember]
+		public LocalizedString Descriptions { get; protected set; } = new LocalizedString();
+
+
+		public string Description
+		{
+			get
+			{
+				return Descriptions.Text;
+			}
+			set
+			{
+				Descriptions.Text = value;
+			}
+		}
+
+		[DataMember]
 		public List<string> Professions { get; set; } = new List<string>();
 
 
@@ -61,8 +77,8 @@ namespace Kenedia.Modules.Core.DataModels
 
 		public BaseSkill(Skill skill)
 		{
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
 			Id = skill.get_Id();
 			Name = skill.get_Name();
 			AssetId = skill.get_Icon()?.GetAssetIdFromRenderUrl();

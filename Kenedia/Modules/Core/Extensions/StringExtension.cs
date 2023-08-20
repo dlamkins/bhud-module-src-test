@@ -24,6 +24,25 @@ namespace Kenedia.Modules.Core.Extensions
 			return s_namingConventionConvert.Replace(s.Replace("_", ""), " ");
 		}
 
+		public static string RemoveLeadingNumbers(this string input)
+		{
+			return Regex.Replace(input, "^\\d+", "");
+		}
+
+		public static string SplitStringOnUppercase(this string input)
+		{
+			StringBuilder result = new StringBuilder();
+			foreach (char c in input)
+			{
+				if (char.IsUpper(c) && result.Length > 0)
+				{
+					result.Append(' ');
+				}
+				result.Append(c);
+			}
+			return result.ToString();
+		}
+
 		public static int LevenshteinDistance(this string source, string target)
 		{
 			if (string.IsNullOrEmpty(source))

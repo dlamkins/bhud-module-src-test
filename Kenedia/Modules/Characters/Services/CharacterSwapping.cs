@@ -24,7 +24,7 @@ namespace Kenedia.Modules.Characters.Services
 
 		private readonly GameState _gameState;
 
-		private readonly ObservableCollection<Character_Model> _characterModels;
+		private readonly ObservableCollection<Character_Model> _rawCharacterModels;
 
 		private bool _ignoreOCR;
 
@@ -57,6 +57,18 @@ namespace Kenedia.Modules.Characters.Services
 
 		public Character_Model Character { get; set; }
 
+		private List<Character_Model> CharacterModels
+		{
+			get
+			{
+				if (_settings?.IncludeBetaCharacters.get_Value() ?? false)
+				{
+					return _rawCharacterModels.ToList();
+				}
+				return _rawCharacterModels.Where((Character_Model e) => !e.Beta).ToList();
+			}
+		}
+
 		public event EventHandler Succeeded;
 
 		public event EventHandler Failed;
@@ -71,7 +83,7 @@ namespace Kenedia.Modules.Characters.Services
 		{
 			_settings = settings;
 			_gameState = gameState;
-			_characterModels = characterModels;
+			_rawCharacterModels = characterModels;
 		}
 
 		private bool IsTaskCanceled(CancellationToken cancellationToken)
@@ -84,7 +96,7 @@ namespace Kenedia.Modules.Characters.Services
 				}
 				if (_state == SwappingState.MovedToStart)
 				{
-					_movedLeft = _characterModels.Count;
+					_movedLeft = CharacterModels.Count;
 				}
 				_state = SwappingState.Canceled;
 				return true;
@@ -159,8 +171,8 @@ namespace Kenedia.Modules.Characters.Services
 					break;
 				}
 				_state = SwappingState.CharacterLost;
-				await MoveLeft(cancellationToken, Math.Min(_characterModels.Count, _settings.CheckDistance.get_Value()));
-				for (int i = 1; i < Math.Min(_characterModels.Count, _settings.CheckDistance.get_Value() * 2); i++)
+				await MoveLeft(cancellationToken, Math.Min(CharacterModels.Count, _settings.CheckDistance.get_Value()));
+				for (int i = 1; i < Math.Min(CharacterModels.Count, _settings.CheckDistance.get_Value() * 2); i++)
 				{
 					await MoveRight(cancellationToken);
 					await Delay(cancellationToken, 150);
@@ -361,7 +373,7 @@ namespace Kenedia.Modules.Characters.Services
 				return;
 			}
 			Stopwatch stopwatch = Stopwatch.StartNew();
-			int moves = _characterModels.Count - _movedLeft;
+			int moves = CharacterModels.Count - _movedLeft;
 			for (int i = 0; i < moves; i++)
 			{
 				if (stopwatch.ElapsedMilliseconds > 5000)
@@ -386,7 +398,7 @@ namespace Kenedia.Modules.Characters.Services
 			{
 				return;
 			}
-			List<Character_Model> order = _characterModels.OrderByDescending((Character_Model e) => e.LastLogin).ToList();
+			List<Character_Model> order = CharacterModels.OrderByDescending((Character_Model e) => e.LastLogin).ToList();
 			Stopwatch stopwatch = Stopwatch.StartNew();
 			using List<Character_Model>.Enumerator enumerator = order.GetEnumerator();
 			while (enumerator.MoveNext() && enumerator.Current != Character)

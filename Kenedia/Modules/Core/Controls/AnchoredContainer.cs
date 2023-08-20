@@ -1,7 +1,9 @@
 using System;
 using Blish_HUD;
 using Blish_HUD.Controls;
+using Kenedia.Modules.Core.Models;
 using Kenedia.Modules.Core.Structs;
+using Kenedia.Modules.Core.Utility;
 using Microsoft.Xna.Framework;
 
 namespace Kenedia.Modules.Core.Controls
@@ -21,6 +23,8 @@ namespace Kenedia.Modules.Core.Controls
 
 		private Control _anchor;
 
+		public CaptureType? CaptureInput { get; set; }
+
 		public Control Anchor
 		{
 			get
@@ -29,17 +33,7 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				if (_anchor != value)
-				{
-					if (_anchor != null)
-					{
-						_anchor.remove_Moved((EventHandler<MovedEventArgs>)Anchor_Moved);
-						_anchor.remove_Resized((EventHandler<ResizedEventArgs>)Anchor_Moved);
-					}
-					_anchor = value;
-					_anchor.add_Resized((EventHandler<ResizedEventArgs>)Anchor_Moved);
-					_anchor.add_Moved((EventHandler<MovedEventArgs>)Anchor_Moved);
-				}
+				Common.SetProperty(ref _anchor, value, OnAnchorChanged);
 			}
 		}
 
@@ -47,6 +41,20 @@ namespace Kenedia.Modules.Core.Controls
 
 		public RectangleDimensions RelativePosition { get; set; } = new RectangleDimensions(0);
 
+
+		private void OnAnchorChanged(object sender, ValueChangedEventArgs<Control> e)
+		{
+			if (e.OldValue != null)
+			{
+				e.OldValue!.remove_Moved((EventHandler<MovedEventArgs>)Anchor_Moved);
+				e.OldValue!.remove_Resized((EventHandler<ResizedEventArgs>)Anchor_Moved);
+			}
+			if (e.NewValue != null)
+			{
+				e.NewValue!.add_Moved((EventHandler<MovedEventArgs>)Anchor_Moved);
+				e.NewValue!.add_Resized((EventHandler<ResizedEventArgs>)Anchor_Moved);
+			}
+		}
 
 		private void Anchor_Moved(object sender, EventArgs e)
 		{
@@ -113,6 +121,13 @@ namespace Kenedia.Modules.Core.Controls
 		protected override void DisposeControl()
 		{
 			base.DisposeControl();
+		}
+
+		protected override CaptureType CapturesInput()
+		{
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			return (CaptureType)(((_003F?)CaptureInput) ?? ((Container)this).CapturesInput());
 		}
 	}
 }

@@ -24,6 +24,8 @@ namespace Kenedia.Modules.Core.Controls
 			}
 		}
 
+		public CaptureType? CaptureInput { get; set; }
+
 		public LoadingSpinner()
 			: this()
 		{
@@ -43,6 +45,13 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			((Control)this).DisposeControl();
 			GameService.Overlay.get_UserLocale().remove_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)UserLocale_SettingChanged);
+		}
+
+		protected override CaptureType CapturesInput()
+		{
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			return (CaptureType)(((_003F?)CaptureInput) ?? ((Control)this).CapturesInput());
 		}
 	}
 }

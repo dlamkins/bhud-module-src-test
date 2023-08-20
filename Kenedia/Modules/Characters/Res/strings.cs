@@ -306,6 +306,10 @@ namespace Kenedia.Modules.Characters.Res
 
 		internal static string IgnoredPart_Tooltip => ResourceManager.GetString("IgnoredPart_Tooltip", resourceCulture);
 
+		internal static string IncludeBetaCharacters => ResourceManager.GetString("IncludeBetaCharacters", resourceCulture);
+
+		internal static string IncludeBetaCharacters_Tooltip => ResourceManager.GetString("IncludeBetaCharacters_Tooltip", resourceCulture);
+
 		internal static string IncludeMatches => ResourceManager.GetString("IncludeMatches", resourceCulture);
 
 		internal static string InventoryKey => ResourceManager.GetString("InventoryKey", resourceCulture);

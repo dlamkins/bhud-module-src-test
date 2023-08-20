@@ -71,8 +71,8 @@ namespace Kenedia.Modules.Core.DataModels
 			Weapon = c.Weapon;
 			Specialization = c.Specialization;
 			EnvCounter = c.EnviromentalCounterskill;
-			Stealth = ((!(c.Stealth?.Default.HasValue ?? false)) ? c.Chain?.Stealth : c.Stealth?.Default);
-			Malicious = ((!(c.Stealth?.Malicious.HasValue ?? false)) ? c.Chain?.Malicious : c.Stealth?.Malicious);
+			Stealth = ((!(c.Stealth?.Default).HasValue) ? c.Chain?.Stealth : c.Stealth?.Default);
+			Malicious = ((!(c.Stealth?.Malicious).HasValue) ? c.Chain?.Malicious : c.Stealth?.Malicious);
 			Ambush = c.Chain?.Ambush;
 			Unleashed = c.Chain?.Unleashed;
 			if (c.Chain != null)

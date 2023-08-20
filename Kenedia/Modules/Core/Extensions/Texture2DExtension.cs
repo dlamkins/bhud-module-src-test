@@ -1,3 +1,5 @@
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using Blish_HUD;
 using Blish_HUD.Graphics;
@@ -12,6 +14,23 @@ namespace Kenedia.Modules.Core.Extensions
 		{
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+			GraphicsDeviceContext device = GameService.Graphics.LendGraphicsDeviceContext();
+			try
+			{
+				return Texture2D.FromStream(((GraphicsDeviceContext)(ref device)).get_GraphicsDevice(), (Stream)s);
+			}
+			finally
+			{
+				((GraphicsDeviceContext)(ref device)).Dispose();
+			}
+		}
+
+		public static Texture2D CreateTexture2D(this Bitmap bitmap)
+		{
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			MemoryStream s = new MemoryStream();
+			bitmap.Save(s, ImageFormat.Png);
 			GraphicsDeviceContext device = GameService.Graphics.LendGraphicsDeviceContext();
 			try
 			{

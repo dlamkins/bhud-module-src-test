@@ -8,7 +8,7 @@ namespace Kenedia.Modules.Core.Models
 {
 	public class DeepObservableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IDisposable where TValue : INotifyPropertyChanged
 	{
-		private bool _disposed;
+		private bool _isDisposed;
 
 		public new TValue this[TKey key]
 		{
@@ -22,11 +22,13 @@ namespace Kenedia.Modules.Core.Models
 			}
 		}
 
+		public event EventHandler<DictionaryItemChangedEventArgs<TKey, TValue>> ValueChanged;
+
 		public event EventHandler<PropertyChangedEventArgs> ItemChanged;
 
 		public event EventHandler<PropertyChangedEventArgs> CollectionChanged;
 
-		private void OnValueChanged(object sender, PropertyChangedEventArgs e)
+		private void OnItemProperty_Changed(object sender, PropertyChangedEventArgs e)
 		{
 			this.ItemChanged?.Invoke(sender, e);
 		}
@@ -39,22 +41,23 @@ namespace Kenedia.Modules.Core.Models
 				{
 					v.PropertyChanged -= ItemProperty_Changed;
 				}
-				base[key] = value;
-				this.CollectionChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
 				if (value != null)
 				{
 					value.PropertyChanged += ItemProperty_Changed;
 				}
+				base[key] = value;
+				this.ValueChanged?.Invoke(this, new DictionaryItemChangedEventArgs<TKey, TValue>(key, v, value));
+				this.CollectionChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
 			}
 		}
 
 		public void Dispose()
 		{
-			if (_disposed)
+			if (_isDisposed)
 			{
 				return;
 			}
-			_disposed = true;
+			_isDisposed = true;
 			using Enumerator enumerator = GetEnumerator();
 			while (enumerator.MoveNext())
 			{
@@ -69,6 +72,7 @@ namespace Kenedia.Modules.Core.Models
 			{
 				value.PropertyChanged += ItemProperty_Changed;
 				base.Add(key, value);
+				this.ValueChanged?.Invoke(this, new DictionaryItemChangedEventArgs<TKey, TValue>(key, default(TValue), value));
 				this.CollectionChanged?.Invoke(this, new PropertyChangedEventArgs("Items"));
 			}
 		}
@@ -93,7 +97,7 @@ namespace Kenedia.Modules.Core.Models
 
 		protected void ItemProperty_Changed(object sender, PropertyChangedEventArgs e)
 		{
-			OnValueChanged(sender, e);
+			OnItemProperty_Changed(sender, e);
 		}
 	}
 }

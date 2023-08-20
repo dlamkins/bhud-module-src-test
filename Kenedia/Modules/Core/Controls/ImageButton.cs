@@ -16,6 +16,11 @@ namespace Kenedia.Modules.Core.Controls
 	{
 		private Func<string> _setLocalizedTooltip;
 
+		private readonly AsyncTexture2D _background = AsyncTexture2D.FromAssetId(155983);
+
+		public AsyncTexture2D IconFrame { get; set; } = AsyncTexture2D.FromAssetId(1414041);
+
+
 		private bool Clicked
 		{
 			get
@@ -48,7 +53,7 @@ namespace Kenedia.Modules.Core.Controls
 
 		public Color? ColorClicked { get; set; }
 
-		public Color? Color { get; set; } = Color.get_White();
+		public Color? ImageColor { get; set; } = Color.get_White();
 
 
 		public Rectangle? SizeRectangle { get; set; }
@@ -62,6 +67,10 @@ namespace Kenedia.Modules.Core.Controls
 		public AsyncTexture2D HoveredTexture { get; set; }
 
 		public AsyncTexture2D ClickedTexture { get; set; }
+
+		public bool ShowButton { get; set; }
+
+		public bool ShowImageFrame { get; set; }
 
 		public float? TextureRotation { get; set; }
 
@@ -81,7 +90,7 @@ namespace Kenedia.Modules.Core.Controls
 		public ImageButton()
 			: this()
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 			LocalizingService.LocaleChanged += UserLocale_SettingChanged;
 			UserLocale_SettingChanged(null, null);
 		}
@@ -127,7 +136,7 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
 			AsyncTexture2D texture = GetTexture();
-			Color? color = ((ColorHovered.HasValue && ((Control)this).get_MouseOver()) ? ColorHovered : ((ColorClicked.HasValue && Clicked) ? ColorClicked : Color));
+			Color? color = ((ColorHovered.HasValue && ((Control)this).get_MouseOver()) ? ColorHovered : ((ColorClicked.HasValue && Clicked) ? ColorClicked : ImageColor));
 			if (texture != null && color.HasValue)
 			{
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(texture), (Rectangle)(((_003F?)SizeRectangle) ?? bounds), (Rectangle?)(Rectangle)(((_003F?)TextureRectangle) ?? texture.get_Bounds()), color.Value, TextureRotation.GetValueOrDefault(), default(Vector2), (SpriteEffects)0);
@@ -141,6 +150,11 @@ namespace Kenedia.Modules.Core.Controls
 			{
 				ClickAction?.Invoke(e);
 			}
+		}
+
+		public override void RecalculateLayout()
+		{
+			((Control)this).RecalculateLayout();
 		}
 	}
 }

@@ -16,7 +16,11 @@ namespace Kenedia.Modules.Core.Views
 {
 	public class StandardWindow : StandardWindow
 	{
+		private Rectangle _subTitleRectangle;
+
 		protected BitmapFont TitleFont = Control.get_Content().get_DefaultFont32();
+
+		protected BitmapFont SubTitleFont = Control.get_Content().get_DefaultFont18();
 
 		private Rectangle _subEmblemRectangle;
 
@@ -33,6 +37,8 @@ namespace Kenedia.Modules.Core.Views
 		protected BitmapFont VersionFont = Control.get_Content().get_DefaultFont14();
 
 		private Version _version;
+
+		private string _subName;
 
 		private readonly List<AnchoredContainer> _attachedContainers = new List<AnchoredContainer>();
 
@@ -62,6 +68,18 @@ namespace Kenedia.Modules.Core.Views
 			}
 		}
 
+		public string SubName
+		{
+			get
+			{
+				return _subName;
+			}
+			set
+			{
+				Common.SetProperty(ref _subName, value, ((Control)this).RecalculateLayout);
+			}
+		}
+
 		public AsyncTexture2D MainWindowEmblem { get; set; }
 
 		public AsyncTexture2D SubWindowEmblem { get; set; }
@@ -69,8 +87,8 @@ namespace Kenedia.Modules.Core.Views
 		public StandardWindow(AsyncTexture2D background, Rectangle windowRegion, Rectangle contentRegion)
 			: this(background, windowRegion, contentRegion)
 		{
-		}//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+		}//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
 
 
 		public override void RecalculateLayout()
@@ -83,48 +101,59 @@ namespace Kenedia.Modules.Core.Views
 			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0183: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0188: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0224: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0241: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025c: Unknown result type (might be due to invalid IL or missing references)
 			((WindowBase2)this).RecalculateLayout();
 			_subEmblemRectangle = new Rectangle(21, 6, 64, 64);
 			_mainEmblemRectangle = new Rectangle(-43, -58, 128, 128);
 			_titleTextRegion = new Rectangle(Math.Max(Math.Max((MainWindowEmblem != null) ? ((Rectangle)(ref _mainEmblemRectangle)).get_Right() : 0, (SubWindowEmblem != null) ? ((Rectangle)(ref _subEmblemRectangle)).get_Right() : 0) - 16, 0), 5, ((Control)this).get_Width() - Math.Max(((Rectangle)(ref _mainEmblemRectangle)).get_Right(), ((Rectangle)(ref _subEmblemRectangle)).get_Right()) - 30, 30);
 			_versionRectangle = Rectangle.get_Empty();
-			if (Version != (Version)null && !string.IsNullOrEmpty($"v. {Version}"))
+			if (Version != null && !string.IsNullOrEmpty($"v. {Version}"))
 			{
 				RectangleF versionBounds = VersionFont.GetStringRectangle($"v. {Version}");
 				_versionRectangle = new Rectangle(((Rectangle)(ref _titleTextRegion)).get_Right() - (int)versionBounds.Width, ((Rectangle)(ref _titleTextRegion)).get_Top(), (int)versionBounds.Width, _titleTextRegion.Height - 3);
 			}
-			if (string.IsNullOrEmpty(Name))
+			if (!string.IsNullOrEmpty(Name))
 			{
-				return;
-			}
-			Rectangle titleRectangle = default(Rectangle);
-			foreach (BitmapFont font in new List<BitmapFont>
-			{
-				Control.get_Content().get_DefaultFont32(),
-				Control.get_Content().get_DefaultFont18(),
-				Control.get_Content().get_DefaultFont16()
-			})
-			{
-				RectangleF titleBounds = font.GetStringRectangle(Name);
-				((Rectangle)(ref titleRectangle))._002Ector(((Rectangle)(ref _titleTextRegion)).get_Left(), ((Rectangle)(ref _titleTextRegion)).get_Top(), (int)titleBounds.Width, _titleTextRegion.Height);
-				if ((float)_titleTextRegion.Width >= titleBounds.Width + 10f + (float)_versionRectangle.Width)
+				Rectangle titleRectangle = default(Rectangle);
+				foreach (BitmapFont font in new List<BitmapFont>
 				{
-					_titleRectangle = titleRectangle;
-					TitleFont = font;
-					break;
+					Control.get_Content().get_DefaultFont32(),
+					Control.get_Content().get_DefaultFont18(),
+					Control.get_Content().get_DefaultFont16()
+				})
+				{
+					RectangleF titleBounds2 = font.GetStringRectangle(Name);
+					((Rectangle)(ref titleRectangle))._002Ector(((Rectangle)(ref _titleTextRegion)).get_Left(), ((Rectangle)(ref _titleTextRegion)).get_Top(), (int)titleBounds2.Width, _titleTextRegion.Height);
+					if ((float)_titleTextRegion.Width >= titleBounds2.Width + 10f + (float)_versionRectangle.Width)
+					{
+						_titleRectangle = titleRectangle;
+						TitleFont = font;
+						break;
+					}
 				}
+			}
+			if (!string.IsNullOrEmpty(SubName))
+			{
+				RectangleF titleBounds = SubTitleFont.GetStringRectangle(SubName);
+				Rectangle subTitleRectangle = default(Rectangle);
+				((Rectangle)(ref subTitleRectangle))._002Ector(((Rectangle)(ref _titleRectangle)).get_Right() + 25, ((Rectangle)(ref _titleRectangle)).get_Top(), (int)titleBounds.Width, _titleRectangle.Height);
+				_subTitleRectangle = subTitleRectangle;
 			}
 		}
 
@@ -170,8 +199,10 @@ namespace Kenedia.Modules.Core.Views
 			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0168: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
 			((WindowBase2)this).PaintAfterChildren(spriteBatch, bounds);
 			if (MainWindowEmblem != null)
 			{
@@ -185,7 +216,11 @@ namespace Kenedia.Modules.Core.Views
 			{
 				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, Name, TitleFont, _titleRectangle, Colors.ColonialWhite, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
 			}
-			if (Version != (Version)null && _titleTextRegion.Width >= _titleRectangle.Width + 10 + _versionRectangle.Width)
+			if (_subTitleRectangle.Width <= _titleTextRegion.Width && !string.IsNullOrEmpty(SubName))
+			{
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, SubName, SubTitleFont, _subTitleRectangle, Color.get_White(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+			}
+			if (Version != null && _titleTextRegion.Width >= _titleRectangle.Width + 10 + _versionRectangle.Width)
 			{
 				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, $"v. {Version}", VersionFont, _versionRectangle, Color.get_White(), false, true, 1, (HorizontalAlignment)2, (VerticalAlignment)2);
 			}

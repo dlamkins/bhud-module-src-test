@@ -6,9 +6,9 @@ using System.Runtime.CompilerServices;
 
 namespace Kenedia.Modules.Core.Models
 {
-	public class ObservableDictionary<TKey, TValue> : Dictionary<TKey, TValue>
+	public class NotifyPropertyChangedDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IDisposable where TKey : notnull where TValue : INotifyPropertyChanged
 	{
-		public new TValue this[TKey key]
+		public new TValue? this[TKey key]
 		{
 			get
 			{
@@ -20,7 +20,9 @@ namespace Kenedia.Modules.Core.Models
 			}
 		}
 
-		public event PropertyChangedEventHandler? CollectionChanged;
+		public event EventHandler<PropertyChangedEventArgs>? CollectionChanged;
+
+		public event EventHandler<PropertyChangedEventArgs>? ItemPropertyChanged;
 
 		public event EventHandler<DictionaryItemChangedEventArgs<TKey, TValue?>>? ItemChanged;
 
@@ -28,6 +30,14 @@ namespace Kenedia.Modules.Core.Models
 		{
 			if ((!(oldValue?.Equals(newValue))) ?? true)
 			{
+				if (oldValue != null)
+				{
+					oldValue!.PropertyChanged -= ItemProperty_Changed;
+				}
+				if (newValue != null)
+				{
+					newValue!.PropertyChanged += ItemProperty_Changed;
+				}
 				bool num = ContainsKey(key);
 				base[key] = newValue;
 				this.ItemChanged?.Invoke(this, new DictionaryItemChangedEventArgs<TKey, TValue>(key, oldValue, newValue));
@@ -38,10 +48,19 @@ namespace Kenedia.Modules.Core.Models
 			}
 		}
 
+		private void ItemProperty_Changed(object? sender, PropertyChangedEventArgs e)
+		{
+			this.ItemPropertyChanged?.Invoke(sender, e);
+		}
+
 		public new void Add(TKey key, TValue? value)
 		{
 			if (!ContainsKey(key))
 			{
+				if (value != null)
+				{
+					value!.PropertyChanged += ItemProperty_Changed;
+				}
 				base.Add(key, value);
 				this.ItemChanged?.Invoke(this, new DictionaryItemChangedEventArgs<TKey, TValue>(key, default(TValue), value));
 				this.CollectionChanged?.Invoke(this, new PropertyChangedEventArgs("Collection"));
@@ -50,25 +69,28 @@ namespace Kenedia.Modules.Core.Models
 
 		public new bool Remove(TKey key)
 		{
-			bool num = base.Remove(key);
-			if (num)
+			if (ContainsKey(key) && this[key] != null)
 			{
-				PropertyChangedEventHandler? collectionChanged = this.CollectionChanged;
-				if (collectionChanged == null)
-				{
-					return num;
-				}
-				collectionChanged!(this, new PropertyChangedEventArgs("Collection"));
+				TValue val = this[key];
+				val.PropertyChanged -= ItemProperty_Changed;
 			}
-			return num;
+			return base.Remove(key);
 		}
 
-		public void Wipe()
+		public void Dispose()
+		{
+		}
+
+		public virtual void Wipe()
 		{
 			foreach (TKey key in base.Keys.ToList())
 			{
 				this[key] = default(TValue);
 			}
+		}
+
+		protected virtual void OnItemChanged()
+		{
 		}
 	}
 }

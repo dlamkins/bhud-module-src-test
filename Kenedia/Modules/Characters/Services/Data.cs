@@ -223,7 +223,7 @@ namespace Kenedia.Modules.Characters.Services
 			public AsyncTexture2D Icon { get; set; }
 		}
 
-		private bool _disposed;
+		private bool _isDisposed;
 
 		private readonly ContentsManager _contentsManager;
 
@@ -1796,11 +1796,11 @@ namespace Kenedia.Modules.Characters.Services
 
 		public void Dispose()
 		{
-			if (_disposed)
+			if (_isDisposed)
 			{
 				return;
 			}
-			_disposed = true;
+			_isDisposed = true;
 			foreach (Profession value in Professions.Values)
 			{
 				value.Icon.Dispose();

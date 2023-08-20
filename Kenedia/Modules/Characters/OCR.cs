@@ -44,7 +44,7 @@ namespace Kenedia.Modules.Characters
 
 		private readonly Color _ignoredColor = Color.FromArgb(255, 100, 100, 100);
 
-		private bool _disposed;
+		private bool _isDisposed;
 
 		private MainWindow _mainWindow;
 
@@ -115,9 +115,9 @@ namespace Kenedia.Modules.Characters
 
 		public void Dispose()
 		{
-			if (!_disposed)
+			if (!_isDisposed)
 			{
-				_disposed = true;
+				_isDisposed = true;
 				OCRView view = _view;
 				if (view != null)
 				{

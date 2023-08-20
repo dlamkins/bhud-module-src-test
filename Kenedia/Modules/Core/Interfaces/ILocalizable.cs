@@ -5,6 +5,6 @@ namespace Kenedia.Modules.Core.Interfaces
 {
 	public interface ILocalizable
 	{
-		void UserLocale_SettingChanged(object sender, ValueChangedEventArgs<Locale> e);
+		void UserLocale_SettingChanged(object sender = null, ValueChangedEventArgs<Locale> e = null);
 	}
 }

@@ -5,7 +5,7 @@ namespace Kenedia.Modules.Core.Models
 {
 	public class ServiceCollection : IDisposable
 	{
-		private bool _disposed;
+		private bool _isDisposed;
 
 		public GameState GameState { get; }
 
@@ -28,9 +28,9 @@ namespace Kenedia.Modules.Core.Models
 
 		public void Dispose()
 		{
-			if (!_disposed)
+			if (!_isDisposed)
 			{
-				_disposed = true;
+				_isDisposed = true;
 				GameState.Dispose();
 				TexturesService.Dispose();
 			}

@@ -19,7 +19,7 @@ namespace Kenedia.Modules.Core.Services
 {
 	public class GameState : IDisposable
 	{
-		private bool _disposed;
+		private bool _isDisposed;
 
 		private double _lastTick;
 
@@ -322,9 +322,9 @@ namespace Kenedia.Modules.Core.Services
 
 		public void Dispose()
 		{
-			if (!_disposed)
+			if (!_isDisposed)
 			{
-				_disposed = true;
+				_isDisposed = true;
 				MaskedRegion spinnerMask = _spinnerMask;
 				if (spinnerMask != null)
 				{

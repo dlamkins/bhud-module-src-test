@@ -76,6 +76,8 @@ namespace Kenedia.Modules.Characters.Services
 
 		public SettingEntry<bool> PinSideMenus { get; set; }
 
+		public SettingEntry<bool> IncludeBetaCharacters { get; set; }
+
 		public SettingEntry<bool> CloseWindowOnSwap { get; set; }
 
 		public SettingEntry<bool> FilterDiacriticsInsensitive { get; set; }
@@ -252,15 +254,15 @@ namespace Kenedia.Modules.Characters.Services
 			//IL_00a0: Expected O, but got Unknown
 			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b9: Expected O, but got Unknown
-			//IL_0191: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0448: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0405: Unknown result type (might be due to invalid IL or missing references)
+			//IL_045c: Unknown result type (might be due to invalid IL or missing references)
 			SettingCollection internalSettings = settings.AddSubCollection("Internal", false, false);
 			Version = internalSettings.DefineSetting<Version>("Version", new Version("0.0.0", false), (Func<string>)null, (Func<string>)null);
 			LogoutKey = internalSettings.DefineSetting<KeyBinding>("LogoutKey", new KeyBinding((Keys)123), (Func<string>)null, (Func<string>)null);
@@ -274,6 +276,7 @@ namespace Kenedia.Modules.Characters.Services
 			CancelOnlyOnESC = internalSettings.DefineSetting<bool>("CancelOnlyOnESC", false, (Func<string>)null, (Func<string>)null);
 			AutomaticCharacterDelete = internalSettings.DefineSetting<bool>("AutomaticCharacterDelete", false, (Func<string>)null, (Func<string>)null);
 			ShowNotifications = internalSettings.DefineSetting<bool>("ShowNotifications", true, (Func<string>)null, (Func<string>)null);
+			IncludeBetaCharacters = internalSettings.DefineSetting<bool>("IncludeBetaCharacters", true, (Func<string>)null, (Func<string>)null);
 			FilterAsOne = internalSettings.DefineSetting<bool>("FilterAsOne", false, (Func<string>)null, (Func<string>)null);
 			UseBetaGamestate = internalSettings.DefineSetting<bool>("UseBetaGamestate", true, (Func<string>)null, (Func<string>)null);
 			EnableRadialMenu = internalSettings.DefineSetting<bool>("EnableRadialMenu", true, (Func<string>)null, (Func<string>)null);

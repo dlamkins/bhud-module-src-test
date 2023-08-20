@@ -38,6 +38,7 @@
   <data name="DragOverCharacter_Instructions"><value>Drag this control so the yellow frames contain your character portraits</value></data>
   <data name="Armorsmith"><value>Armorsmith</value></data>
   <data name="WindowedMode_Tooltip"><value>Is the game set to Window Mode?</value></data>
+  <data name="IncludeBetaCharacters"><value>Include Beta Characters</value></data>
   <data name="LeftOffset"><value>Left Offset</value></data>
   <data name="ModuleBehavior"><value>Module Behavior</value></data>
   <data name="Updated"><value>Updated {0}</value></data>
@@ -87,6 +88,7 @@
   <data name="OnlyMaxCrafting_Tooltip"><value>Show only crafts that are at a 500 rank (Jeweler &amp; Scribe at 400).</value></data>
   <data name="CoreProfession"><value>Core {0}</value></data>
   <data name="UseOCR"><value>Use OCR</value></data>
+  <data name="IncludeBetaCharacters_Tooltip"><value>Include characters which are only available during a beta. This needs to manually turned on and off</value></data>
   <data name="Update"><value>Update {0}</value></data>
   <data name="ShowCorner_Name"><value>Show Corner Icon</value></data>
   <data name="FilterToggles"><value>Filter Toggles</value></data>

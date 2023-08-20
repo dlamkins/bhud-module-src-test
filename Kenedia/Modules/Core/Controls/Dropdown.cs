@@ -15,8 +15,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		private Func<string> _setLocalizedTooltip;
 
-		private double _lastShown;
-
 		public Func<List<string>> SetLocalizedItems
 		{
 			get

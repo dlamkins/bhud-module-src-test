@@ -31,17 +31,11 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private readonly Data _data;
 
-		private Rectangle _iconRectangle;
-
-		private Rectangle _contentRectangle;
-
 		private Point _textureOffset = new Point(25, 25);
 
 		private Character_Model _character;
 
 		private readonly List<Tag> _tags = new List<Tag>();
-
-		private bool _updateCharacter;
 
 		public Color BackgroundTint { get; set; } = Color.get_Honeydew() * 0.95f;
 

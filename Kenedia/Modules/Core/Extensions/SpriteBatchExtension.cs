@@ -1,5 +1,6 @@
 using Blish_HUD;
 using Blish_HUD.Controls;
+using Kenedia.Modules.Core.Structs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -85,30 +86,59 @@ namespace Kenedia.Modules.Core.Extensions
 
 		public static void DrawFrame(this SpriteBatch spriteBatch, Control ctrl, Rectangle _selectorBounds, Color borderColor, int width = 1)
 		{
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref _selectorBounds)).get_Left(), ((Rectangle)(ref _selectorBounds)).get_Top(), _selectorBounds.Width, width), (Rectangle?)Rectangle.get_Empty(), borderColor * 0.8f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref _selectorBounds)).get_Left(), ((Rectangle)(ref _selectorBounds)).get_Bottom() - width, _selectorBounds.Width, width), (Rectangle?)Rectangle.get_Empty(), borderColor * 0.8f);
+			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref _selectorBounds)).get_Left() + width, ((Rectangle)(ref _selectorBounds)).get_Top(), _selectorBounds.Width - width * 2, width), (Rectangle?)Rectangle.get_Empty(), borderColor * 0.8f);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref _selectorBounds)).get_Left() + width, ((Rectangle)(ref _selectorBounds)).get_Bottom() - width, _selectorBounds.Width - width * 2, width), (Rectangle?)Rectangle.get_Empty(), borderColor * 0.8f);
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref _selectorBounds)).get_Left(), ((Rectangle)(ref _selectorBounds)).get_Top(), width, _selectorBounds.Height), (Rectangle?)Rectangle.get_Empty(), borderColor * 0.8f);
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref _selectorBounds)).get_Right() - width, ((Rectangle)(ref _selectorBounds)).get_Top(), width, _selectorBounds.Height), (Rectangle?)Rectangle.get_Empty(), borderColor * 0.8f);
+		}
+
+		public static void DrawFrame(this SpriteBatch spriteBatch, Control ctrl, Rectangle _selectorBounds, Color borderColor, RectangleDimensions? borderDimensions)
+		{
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0136: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+			RectangleDimensions border = borderDimensions ?? new RectangleDimensions(2);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref _selectorBounds)).get_Left() + border.Left, ((Rectangle)(ref _selectorBounds)).get_Top(), _selectorBounds.Width - border.Horizontal, border.Top), (Rectangle?)Rectangle.get_Empty(), borderColor * 0.8f);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref _selectorBounds)).get_Left() + border.Left, ((Rectangle)(ref _selectorBounds)).get_Bottom() - border.Bottom, _selectorBounds.Width - border.Horizontal, border.Bottom), (Rectangle?)Rectangle.get_Empty(), borderColor * 0.8f);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref _selectorBounds)).get_Left(), ((Rectangle)(ref _selectorBounds)).get_Top(), border.Left, _selectorBounds.Height), (Rectangle?)Rectangle.get_Empty(), borderColor * 0.8f);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref _selectorBounds)).get_Right() - border.Right, ((Rectangle)(ref _selectorBounds)).get_Top(), border.Right, _selectorBounds.Height), (Rectangle?)Rectangle.get_Empty(), borderColor * 0.8f);
 		}
 	}
 }

@@ -1040,57 +1040,66 @@ namespace Kenedia.Modules.Characters.Views
 			FlowPanel cP = flowPanel;
 			Checkbox checkbox = new Checkbox();
 			((Control)checkbox).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox).set_Checked(_settings.LoadCachedAccounts.get_Value());
+			((Checkbox)checkbox).set_Checked(_settings.IncludeBetaCharacters.get_Value());
 			checkbox.CheckedChangedAction = delegate(bool b)
+			{
+				_settings.IncludeBetaCharacters.set_Value(b);
+			};
+			checkbox.SetLocalizedText = () => strings.IncludeBetaCharacters;
+			checkbox.SetLocalizedTooltip = () => strings.IncludeBetaCharacters_Tooltip;
+			Checkbox checkbox2 = new Checkbox();
+			((Control)checkbox2).set_Parent((Container)(object)cP);
+			((Checkbox)checkbox2).set_Checked(_settings.LoadCachedAccounts.get_Value());
+			checkbox2.CheckedChangedAction = delegate(bool b)
 			{
 				_settings.LoadCachedAccounts.set_Value(b);
 			};
-			checkbox.SetLocalizedText = () => strings.LoadCachedAccounts;
-			checkbox.SetLocalizedTooltip = () => strings.LoadCachedAccounts_Tooltip;
-			Checkbox checkbox2 = new Checkbox();
-			((Control)checkbox2).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox2).set_Checked(_settings.ShowStatusWindow.get_Value());
-			checkbox2.SetLocalizedText = () => strings.ShowStatusWindow_Name;
-			checkbox2.SetLocalizedTooltip = () => strings.ShowStatusWindow_Tooltip;
-			checkbox2.CheckedChangedAction = delegate(bool b)
+			checkbox2.SetLocalizedText = () => strings.LoadCachedAccounts;
+			checkbox2.SetLocalizedTooltip = () => strings.LoadCachedAccounts_Tooltip;
+			Checkbox checkbox3 = new Checkbox();
+			((Control)checkbox3).set_Parent((Container)(object)cP);
+			((Checkbox)checkbox3).set_Checked(_settings.ShowStatusWindow.get_Value());
+			checkbox3.SetLocalizedText = () => strings.ShowStatusWindow_Name;
+			checkbox3.SetLocalizedTooltip = () => strings.ShowStatusWindow_Tooltip;
+			checkbox3.CheckedChangedAction = delegate(bool b)
 			{
 				_settings.ShowStatusWindow.set_Value(b);
 			};
-			Checkbox checkbox3 = new Checkbox();
-			((Control)checkbox3).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox3).set_Checked(_settings.ShowChoyaSpinner.get_Value());
-			checkbox3.SetLocalizedText = () => strings.ShowChoyaSpinner;
-			checkbox3.CheckedChangedAction = delegate(bool b)
+			Checkbox checkbox4 = new Checkbox();
+			((Control)checkbox4).set_Parent((Container)(object)cP);
+			((Checkbox)checkbox4).set_Checked(_settings.ShowChoyaSpinner.get_Value());
+			checkbox4.SetLocalizedText = () => strings.ShowChoyaSpinner;
+			checkbox4.CheckedChangedAction = delegate(bool b)
 			{
 				_settings.ShowChoyaSpinner.set_Value(b);
 			};
-			Checkbox checkbox4 = new Checkbox();
-			((Control)checkbox4).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox4).set_Checked(_settings.OpenSidemenuOnSearch.get_Value());
-			checkbox4.CheckedChangedAction = delegate(bool b)
+			Checkbox checkbox5 = new Checkbox();
+			((Control)checkbox5).set_Parent((Container)(object)cP);
+			((Checkbox)checkbox5).set_Checked(_settings.OpenSidemenuOnSearch.get_Value());
+			checkbox5.CheckedChangedAction = delegate(bool b)
 			{
 				_settings.OpenSidemenuOnSearch.set_Value(b);
 			};
-			checkbox4.SetLocalizedText = () => strings.OpenSidemenuOnSearch;
-			checkbox4.SetLocalizedTooltip = () => strings.OpenSidemenuOnSearch_Tooltip;
-			Checkbox checkbox5 = new Checkbox();
-			((Control)checkbox5).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox5).set_Checked(_settings.FocusSearchOnShow.get_Value());
-			checkbox5.CheckedChangedAction = delegate(bool b)
+			checkbox5.SetLocalizedText = () => strings.OpenSidemenuOnSearch;
+			checkbox5.SetLocalizedTooltip = () => strings.OpenSidemenuOnSearch_Tooltip;
+			Checkbox checkbox6 = new Checkbox();
+			((Control)checkbox6).set_Parent((Container)(object)cP);
+			((Checkbox)checkbox6).set_Checked(_settings.FocusSearchOnShow.get_Value());
+			checkbox6.CheckedChangedAction = delegate(bool b)
 			{
 				_settings.FocusSearchOnShow.set_Value(b);
 			};
-			checkbox5.SetLocalizedText = () => strings.FocusSearchOnShow;
-			checkbox5.SetLocalizedTooltip = () => strings.FocusSearchOnShow_Tooltip;
-			Checkbox checkbox6 = new Checkbox();
-			((Control)checkbox6).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox6).set_Checked(_settings.ShowNotifications.get_Value());
-			checkbox6.CheckedChangedAction = delegate(bool b)
+			checkbox6.SetLocalizedText = () => strings.FocusSearchOnShow;
+			checkbox6.SetLocalizedTooltip = () => strings.FocusSearchOnShow_Tooltip;
+			Checkbox checkbox7 = new Checkbox();
+			((Control)checkbox7).set_Parent((Container)(object)cP);
+			((Checkbox)checkbox7).set_Checked(_settings.ShowNotifications.get_Value());
+			checkbox7.CheckedChangedAction = delegate(bool b)
 			{
 				_settings.ShowNotifications.set_Value(b);
 			};
-			checkbox6.SetLocalizedText = () => strings.ShowNotifications;
-			checkbox6.SetLocalizedTooltip = () => strings.ShowNotifications_Tooltip;
+			checkbox7.SetLocalizedText = () => strings.ShowNotifications;
+			checkbox7.SetLocalizedTooltip = () => strings.ShowNotifications_Tooltip;
 		}
 
 		private void GetFontSize(SettingEntry<int> setting, string item)
