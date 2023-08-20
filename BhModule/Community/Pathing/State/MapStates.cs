@@ -61,9 +61,9 @@ namespace BhModule.Community.Pathing.State
 			{
 				if (remainingAttempts > 0)
 				{
-					Logger.Warn(ex, "Failed to pull map data from the Gw2 API.  Trying again in 30 seconds.");
+					Logger.Warn(ex, "Failed to pull map data from the Gw2 API.  Trying again in 2 seconds.");
 					await Task.Yield();
-					await Task.Delay(30000);
+					await Task.Delay(2000);
 					await LoadMapData(remainingAttempts - 1);
 				}
 				else if (ex is TooManyRequestsException)

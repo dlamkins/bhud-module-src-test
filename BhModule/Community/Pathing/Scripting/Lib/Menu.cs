@@ -12,7 +12,7 @@ namespace BhModule.Community.Pathing.Scripting.Lib
 	{
 		private static Logger Logger = Logger.GetLogger<Menu>();
 
-		private readonly List<Menu> _menus = new List<Menu>();
+		private readonly SafeList<Menu> _menus = new SafeList<Menu>();
 
 		public string Name { get; }
 
@@ -24,7 +24,7 @@ namespace BhModule.Community.Pathing.Scripting.Lib
 
 		public string Tooltip { get; set; }
 
-		public IReadOnlyCollection<Menu> Menus => _menus.AsReadOnly();
+		public IReadOnlyCollection<Menu> Menus => _menus.ToList().AsReadOnly();
 
 		public Menu(string name, Func<Menu, LuaResult> onClick, bool canCheck = false, bool @checked = false, string tooltip = null)
 		{
@@ -72,8 +72,8 @@ namespace BhModule.Community.Pathing.Scripting.Lib
 			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0048: Expected O, but got Unknown
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0072: Expected O, but got Unknown
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0079: Expected O, but got Unknown
 			ContextMenuStripItem val = new ContextMenuStripItem();
 			val.set_Text(Name);
 			val.set_CanCheck(CanCheck);
@@ -92,10 +92,12 @@ namespace BhModule.Community.Pathing.Scripting.Lib
 					Logger.Warn(ex, "Failed to invoke menu delegate.");
 				}
 			});
-			if (_menus.Any())
+			Menu[] menus = _menus.ToArray();
+			if (menus.Any())
 			{
 				ContextMenuStrip subMenu = new ContextMenuStrip();
-				foreach (Menu item in _menus)
+				Menu[] array = menus;
+				foreach (Menu item in array)
 				{
 					subMenu.AddMenuItem(item.BuildMenu());
 				}
