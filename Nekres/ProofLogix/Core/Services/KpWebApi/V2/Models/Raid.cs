@@ -7,10 +7,13 @@ using Newtonsoft.Json.Converters;
 
 namespace Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models
 {
+	[JsonObject(/*Could not decode attribute arguments.*/)]
 	public class Raid
 	{
+		[JsonObject(/*Could not decode attribute arguments.*/)]
 		public sealed class Wing
 		{
+			[JsonObject(/*Could not decode attribute arguments.*/)]
 			public sealed class Event
 			{
 				public enum EventType
@@ -38,6 +41,11 @@ namespace Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models
 				[JsonIgnore]
 				public AsyncTexture2D Icon => Miniatures?.FirstOrDefault()?.Icon ?? Token?.Icon ?? GameService.Content.get_DatAssetCache().GetTextureFromAssetId(1302744);
 
+				public Event()
+				{
+					Miniatures = new List<Resource>();
+				}
+
 				public List<Resource> GetTokens()
 				{
 					List<Resource> result = Enumerable.Empty<Resource>().ToList();
@@ -57,6 +65,11 @@ namespace Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models
 
 			[JsonProperty("events")]
 			public List<Event> Events { get; set; }
+
+			public Wing()
+			{
+				Events = new List<Event>();
+			}
 		}
 
 		[JsonProperty("id")]
@@ -67,5 +80,10 @@ namespace Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models
 
 		[JsonProperty("wings")]
 		public List<Wing> Wings { get; set; }
+
+		public Raid()
+		{
+			Wings = new List<Wing>();
+		}
 	}
 }

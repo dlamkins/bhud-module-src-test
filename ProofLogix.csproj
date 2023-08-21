@@ -22,8 +22,8 @@
     <Reference Include="System.ServiceModel" />
     <Reference Include="Gapotchenko.FX" />
     <Reference Include="System.Numerics" />
-    <Reference Include="Flurl" />
     <Reference Include="Flurl.Http" />
+    <Reference Include="Flurl" />
     <Reference Include="AsyncClipboardService" />
   </ItemGroup>
 </Project>

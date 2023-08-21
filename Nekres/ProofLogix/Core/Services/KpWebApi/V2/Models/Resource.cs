@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 
 namespace Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models
 {
+	[JsonObject(/*Could not decode attribute arguments.*/)]
 	public class Resource
 	{
 		public static Resource Empty = new Resource

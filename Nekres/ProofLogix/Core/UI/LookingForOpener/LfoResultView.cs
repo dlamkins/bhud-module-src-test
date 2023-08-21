@@ -95,7 +95,7 @@ namespace Nekres.ProofLogix.Core.UI.LookingForOpener
 			{
 				string text = "No volunteers found.";
 				FontSize fontSize = (FontSize)24;
-				Point labelSize2 = LabelUtil.GetLabelSize(fontSize, text);
+				Point labelSize2 = LabelUtil.GetLabelSize(fontSize, text, hasPrefix: true);
 				((Control)new FormattedLabelBuilder().SetHeight(labelSize2.Y).SetWidth(labelSize2.X).CreatePart(text, (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder o)
 				{
 					//IL_0002: Unknown result type (might be due to invalid IL or missing references)

@@ -51,11 +51,11 @@ namespace Nekres.ProofLogix.Core.Services
 		public ResourceService()
 		{
 			LoadSounds();
+			_resources = Resources.Empty;
 			_profNames = new Dictionary<int, string>();
 			_profIcons = new Dictionary<int, AsyncTexture2D>();
 			_eliteNames = new Dictionary<int, string>();
 			_eliteIcons = new Dictionary<int, AsyncTexture2D>();
-			_resources = Resources.Empty;
 			_apiIcons = new Dictionary<int, AsyncTexture2D>();
 			GameService.Overlay.add_UserLocaleChanged((EventHandler<ValueEventArgs<CultureInfo>>)OnUserLocaleChanged);
 		}
@@ -74,6 +74,7 @@ namespace Nekres.ProofLogix.Core.Services
 		{
 			await LoadProfessions(localeChange);
 			await LoadResources();
+			await LoadApiIcons(_resources.Items.Select((Resource item) => item.Id));
 		}
 
 		public string GetLoadingSubtitle()
@@ -168,8 +169,10 @@ namespace Nekres.ProofLogix.Core.Services
 			return icon;
 		}
 
-		public async Task<AsyncTexture2D> GetApiIcon(int itemId)
+		public AsyncTexture2D GetApiIcon(int itemId)
 		{
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0026: Expected O, but got Unknown
 			if (itemId == 0)
 			{
 				return AsyncTexture2D.op_Implicit(Textures.get_TransparentPixel());
@@ -178,20 +181,18 @@ namespace Nekres.ProofLogix.Core.Services
 			{
 				return tex;
 			}
-			IReadOnlyList<Item> response = await ProofLogix.Instance.Gw2WebApi.GetItems(itemId);
-			if (response == null || !response.Any())
+			tex = new AsyncTexture2D();
+			_apiIcons.Add(itemId, tex);
+			return tex;
+		}
+
+		private async Task LoadApiIcons(IEnumerable<int> itemIds)
+		{
+			IReadOnlyList<Item> response = await ProofLogix.Instance.Gw2WebApi.GetItems(itemIds.ToArray());
+			if (response != null && response.Any())
 			{
-				return AsyncTexture2D.op_Implicit(Textures.get_TransparentPixel());
+				_apiIcons = response.ToDictionary((Item item) => item.get_Id(), (Item item) => GameService.Content.get_DatAssetCache().GetTextureFromAssetId(AssetUtil.GetId(RenderUrl.op_Implicit(item.get_Icon()))));
 			}
-			Item item = response[0];
-			if (string.IsNullOrEmpty(RenderUrl.op_Implicit(item.get_Icon())))
-			{
-				return AsyncTexture2D.op_Implicit(Textures.get_TransparentPixel());
-			}
-			int assetId = AssetUtil.GetId(RenderUrl.op_Implicit(item.get_Icon()));
-			AsyncTexture2D icon = GameService.Content.get_DatAssetCache().GetTextureFromAssetId(assetId);
-			_apiIcons.Add(itemId, icon);
-			return icon;
 		}
 
 		public string GetMapName(int mapId)
@@ -235,13 +236,13 @@ namespace Nekres.ProofLogix.Core.Services
 
 		private async Task LoadProfessions(bool localeChange = false)
 		{
-			IApiV2ObjectList<Profession> professions = await TaskUtil.RetryAsync(() => ((IAllExpandableClient<Profession>)(object)GameService.Gw2WebApi.get_AnonymousConnection().get_Client().get_V2()
+			IApiV2ObjectList<Profession> professions = await TaskUtil.TryAsync(() => ((IAllExpandableClient<Profession>)(object)GameService.Gw2WebApi.get_AnonymousConnection().get_Client().get_V2()
 				.get_Professions()).AllAsync(default(CancellationToken)));
 			if (professions == null)
 			{
 				return;
 			}
-			IApiV2ObjectList<Specialization> specializations = await TaskUtil.RetryAsync(() => ((IAllExpandableClient<Specialization>)(object)GameService.Gw2WebApi.get_AnonymousConnection().get_Client().get_V2()
+			IApiV2ObjectList<Specialization> specializations = await TaskUtil.TryAsync(() => ((IAllExpandableClient<Specialization>)(object)GameService.Gw2WebApi.get_AnonymousConnection().get_Client().get_V2()
 				.get_Specializations()).AllAsync(default(CancellationToken)));
 			if (specializations == null)
 			{

@@ -6,6 +6,8 @@ namespace Nekres.ProofLogix.Core.UI.Configs
 	{
 		private int _selectedToken;
 
+		private bool _sendProfileId;
+
 		public static SmartPingConfig Default => new SmartPingConfig
 		{
 			_selectedToken = 77302
@@ -21,6 +23,20 @@ namespace Nekres.ProofLogix.Core.UI.Configs
 			set
 			{
 				_selectedToken = value;
+				SaveConfig<SmartPingConfig>(ProofLogix.Instance.SmartPingConfig);
+			}
+		}
+
+		[JsonProperty("send_profile_id")]
+		public bool SendProfileId
+		{
+			get
+			{
+				return _sendProfileId;
+			}
+			set
+			{
+				_sendProfileId = value;
 				SaveConfig<SmartPingConfig>(ProofLogix.Instance.SmartPingConfig);
 			}
 		}

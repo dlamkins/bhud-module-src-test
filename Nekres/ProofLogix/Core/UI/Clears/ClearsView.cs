@@ -70,25 +70,15 @@ namespace Nekres.ProofLogix.Core.UI.Clears
 			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005d: Expected O, but got Unknown
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0108: Expected O, but got Unknown
-			//IL_0179: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0191: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0208: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0219: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0225: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent(buildPanel);
 			((Control)val).set_Width(buildPanel.get_ContentRegion().Width);
@@ -106,30 +96,33 @@ namespace Nekres.ProofLogix.Core.UI.Clears
 			});
 			foreach (Clear clear in _clears)
 			{
-				FlowPanel val2 = new FlowPanel();
-				((Control)val2).set_Parent((Container)(object)panel);
-				((Control)val2).set_Width(((Container)panel).get_ContentRegion().Width - 24);
-				((Container)val2).set_HeightSizingMode((SizingMode)1);
-				((Panel)val2).set_Title(clear.Name);
-				((Panel)val2).set_CanCollapse(true);
-				val2.set_ControlPadding(new Vector2(5f, 5f));
-				val2.set_OuterControlPadding(new Vector2(5f, 5f));
-				val2.set_FlowDirection((ControlFlowDirection)3);
-				FlowPanel wingCategory = val2;
+				bool completed = clear.Encounters.All((Boss encounter) => encounter.Cleared);
+				bool none = !clear.Encounters.Any((Boss encounter) => encounter.Cleared);
+				FlowPanelWithIcon flowPanelWithIcon = new FlowPanelWithIcon(AsyncTexture2D.op_Implicit(completed ? _greenTick : (none ? _redCross : Textures.get_TransparentPixel())));
+				((Control)flowPanelWithIcon).set_Parent((Container)(object)panel);
+				((Control)flowPanelWithIcon).set_Width(((Container)panel).get_ContentRegion().Width - 24);
+				((Container)flowPanelWithIcon).set_HeightSizingMode((SizingMode)1);
+				((Panel)flowPanelWithIcon).set_Title(clear.Name);
+				((Panel)flowPanelWithIcon).set_CanCollapse(true);
+				((FlowPanel)flowPanelWithIcon).set_ControlPadding(new Vector2(5f, 5f));
+				((FlowPanel)flowPanelWithIcon).set_OuterControlPadding(new Vector2(5f, 5f));
+				((FlowPanel)flowPanelWithIcon).set_FlowDirection((ControlFlowDirection)3);
+				((Panel)flowPanelWithIcon).set_Collapsed(completed || none);
+				FlowPanelWithIcon wingCategory = flowPanelWithIcon;
 				((Container)panel).add_ContentResized((EventHandler<RegionChangedEventArgs>)delegate(object _, RegionChangedEventArgs e)
 				{
 					//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 					((Control)wingCategory).set_Width(e.get_CurrentRegion().Width - 24);
 				});
-				foreach (Boss encounter in clear.Encounters)
+				foreach (Boss encounter2 in clear.Encounters)
 				{
-					Texture2D icon = (encounter.Cleared ? _greenTick : _redCross);
-					Point size = LabelUtil.GetLabelSize((FontSize)20, encounter.Name, hasPrefix: true);
-					((Control)new FormattedLabelBuilder().SetWidth(size.X).SetHeight(size.Y + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y).CreatePart(encounter.Name, (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder o)
+					Texture2D icon = (encounter2.Cleared ? _greenTick : _redCross);
+					Point size = LabelUtil.GetLabelSize((FontSize)20, encounter2.Name, hasPrefix: true);
+					((Control)new FormattedLabelBuilder().SetWidth(size.X).SetHeight(size.Y + ((DesignStandard)(ref Control.ControlStandard)).get_ControlOffset().Y).CreatePart(encounter2.Name, (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder o)
 					{
 						o.SetFontSize((FontSize)20);
 						o.SetPrefixImage(AsyncTexture2D.op_Implicit(icon));
-						o.SetHyperLink(AssetUtil.GetWikiLink(encounter.Name));
+						o.SetHyperLink(AssetUtil.GetWikiLink(encounter2.Name));
 					})
 						.Build()).set_Parent((Container)(object)wingCategory);
 				}

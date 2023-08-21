@@ -19,5 +19,15 @@ namespace Nekres.ProofLogix.Core
 		{
 			return Regex.Replace(input, "\\s+", replacement);
 		}
+
+		public static string GetTextBetweenTags(this string input, string tagName)
+		{
+			Match match = Regex.Match(input, "<" + tagName + ">(.*?)</" + tagName + ">");
+			if (!match.Success || match.Groups.Count <= 1)
+			{
+				return string.Empty;
+			}
+			return match.Groups[1].Value;
+		}
 	}
 }

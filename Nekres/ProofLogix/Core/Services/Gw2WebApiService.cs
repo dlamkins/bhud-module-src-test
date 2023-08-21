@@ -1,12 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Extended;
+using Flurl.Http;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
@@ -31,6 +34,8 @@ namespace Nekres.ProofLogix.Core.Services
 
 		private Regex _apiKeyPattern = new Regex("^[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{20}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}$");
 
+		private string _baseApiUrl = "https://api.guildwars2.com/";
+
 		public Gw2WebApiService()
 		{
 			MissingPermissions = new List<TokenPermission>();
@@ -42,8 +47,45 @@ namespace Nekres.ProofLogix.Core.Services
 			ProofLogix.Instance.Gw2ApiManager.remove_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)OnSubtokenUpdated);
 		}
 
+		public bool IsApiDown(out string message)
+		{
+			try
+			{
+				HttpResponseMessage response = GeneratedExtensions.GetAsync(SettingsExtensions.AllowHttpStatus<IFlurlRequest>(GeneratedExtensions.AllowHttpStatus(_baseApiUrl, new HttpStatusCode[1] { HttpStatusCode.ServiceUnavailable }), new HttpStatusCode[1] { HttpStatusCode.InternalServerError }), default(CancellationToken), (HttpCompletionOption)1).Result;
+				try
+				{
+					if (response.get_StatusCode() == HttpStatusCode.InternalServerError)
+					{
+						message = "GW2 API is down. Please, try again later.";
+						return true;
+					}
+					if (response.get_StatusCode() == HttpStatusCode.ServiceUnavailable)
+					{
+						string body = response.get_Content().ReadAsStringAsync().Result;
+						message = body.GetTextBetweenTags("p");
+						return true;
+					}
+				}
+				finally
+				{
+					((IDisposable)response)?.Dispose();
+				}
+			}
+			catch (Exception e)
+			{
+				ProofLogix.Logger.Warn(e, "Failed to check API status.");
+			}
+			message = string.Empty;
+			return false;
+		}
+
 		public bool IsApiAvailable()
 		{
+			if (IsApiDown(out var message))
+			{
+				ScreenNotification.ShowNotification(message, (NotificationType)2, (Texture2D)null, 4);
+				return false;
+			}
 			if (string.IsNullOrWhiteSpace(GameService.Gw2Mumble.get_PlayerCharacter().get_Name()))
 			{
 				ScreenNotification.ShowNotification("API unavailable. Please, login to a character.", (NotificationType)2, (Texture2D)null, 4);
@@ -65,19 +107,19 @@ namespace Nekres.ProofLogix.Core.Services
 
 		public async Task<List<string>> GetClears()
 		{
-			return ((IEnumerable<string>)(((object)(await TaskUtil.RetryAsync(() => ((IBlobClient<IApiV2ObjectList<string>>)(object)ProofLogix.Instance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
+			return ((IEnumerable<string>)(((object)(await TaskUtil.TryAsync(() => ((IBlobClient<IApiV2ObjectList<string>>)(object)ProofLogix.Instance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
 				.get_Raids()).GetAsync(default(CancellationToken))))) ?? ((object)Enumerable.Empty<string>()))).ToList();
 		}
 
 		public async Task<List<AccountItem>> GetBank()
 		{
-			return FilterProofs((IEnumerable<AccountItem>)(await TaskUtil.RetryAsync(() => ((IBlobClient<IApiV2ObjectList<AccountItem>>)(object)ProofLogix.Instance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
+			return FilterProofs((IEnumerable<AccountItem>)(await TaskUtil.TryAsync(() => ((IBlobClient<IApiV2ObjectList<AccountItem>>)(object)ProofLogix.Instance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
 				.get_Bank()).GetAsync(default(CancellationToken))))).ToList();
 		}
 
 		public async Task<List<AccountItem>> GetSharedBags()
 		{
-			return FilterProofs((IEnumerable<AccountItem>)(await TaskUtil.RetryAsync(() => ((IBlobClient<IApiV2ObjectList<AccountItem>>)(object)ProofLogix.Instance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
+			return FilterProofs((IEnumerable<AccountItem>)(await TaskUtil.TryAsync(() => ((IBlobClient<IApiV2ObjectList<AccountItem>>)(object)ProofLogix.Instance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
 				.get_Inventory()).GetAsync(default(CancellationToken))))).ToList();
 		}
 
@@ -113,18 +155,18 @@ namespace Nekres.ProofLogix.Core.Services
 
 		public async Task<IReadOnlyList<Item>> GetItems(params int[] itemIds)
 		{
-			return (await TaskUtil.RetryAsync(() => ((IBulkExpandableClient<Item, int>)(object)GameService.Gw2WebApi.get_AnonymousConnection().get_Client().get_V2()
+			return (await TaskUtil.TryAsync(() => ((IBulkExpandableClient<Item, int>)(object)GameService.Gw2WebApi.get_AnonymousConnection().get_Client().get_V2()
 				.get_Items()).ManyAsync((IEnumerable<int>)itemIds, default(CancellationToken)))) ?? Enumerable.Empty<Item>().ToList();
 		}
 
 		public async Task<IReadOnlyList<Map>> GetMaps(params int[] mapIds)
 		{
-			return (await TaskUtil.RetryAsync(() => ((IBulkExpandableClient<Map, int>)(object)ProofLogix.Instance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Maps()).ManyAsync((IEnumerable<int>)mapIds, default(CancellationToken)))) ?? Enumerable.Empty<Map>().ToList();
+			return (await TaskUtil.TryAsync(() => ((IBulkExpandableClient<Map, int>)(object)ProofLogix.Instance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Maps()).ManyAsync((IEnumerable<int>)mapIds, default(CancellationToken)))) ?? Enumerable.Empty<Map>().ToList();
 		}
 
 		private async Task<IEnumerable<Character>> GetCharacters()
 		{
-			return (IEnumerable<Character>)(((object)(await TaskUtil.RetryAsync(() => ((IAllExpandableClient<Character>)(object)ProofLogix.Instance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Characters()).AllAsync(default(CancellationToken))))) ?? ((object)Enumerable.Empty<Character>()));
+			return (IEnumerable<Character>)(((object)(await TaskUtil.TryAsync(() => ((IAllExpandableClient<Character>)(object)ProofLogix.Instance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Characters()).AllAsync(default(CancellationToken))))) ?? ((object)Enumerable.Empty<Character>()));
 		}
 
 		private void OnSubtokenUpdated(object sender, ValueEventArgs<IEnumerable<TokenPermission>> e)

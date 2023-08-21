@@ -81,5 +81,10 @@ namespace Nekres.ProofLogix.Core
 			}
 			return default(T);
 		}
+
+		public static async Task<T> TryAsync<T>(Func<Task<T>> request, Logger logger = null)
+		{
+			return await RetryAsync(request, 0, 0, logger);
+		}
 	}
 }

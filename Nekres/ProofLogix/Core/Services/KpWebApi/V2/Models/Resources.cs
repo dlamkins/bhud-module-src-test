@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 
 namespace Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models
 {
+	[JsonObject(/*Could not decode attribute arguments.*/)]
 	public class Resources
 	{
 		public const int UNSTABLE_COSMIC_ESSENCE = 81743;
@@ -40,6 +41,9 @@ namespace Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models
 		public Resources()
 		{
 			Coffers = new List<Resource>();
+			Raids = new List<Raid>();
+			Fractals = new List<Resource>();
+			GeneralTokens = new List<Resource>();
 		}
 	}
 }
