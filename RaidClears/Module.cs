@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
+using Blish_HUD.GameIntegration;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Blish_HUD.Modules;
@@ -23,6 +24,7 @@ using RaidClears.Localization;
 using RaidClears.Settings.Controls;
 using RaidClears.Settings.Services;
 using RaidClears.Settings.Views;
+using SemVer;
 
 namespace RaidClears
 {
@@ -51,6 +53,11 @@ namespace RaidClears
 		public override IView GetSettingsView()
 		{
 			return (IView)(object)new ModuleMainSettingsView();
+		}
+
+		protected override void Initialize()
+		{
+			TEMP_FIX_SetTacOAsActive();
 		}
 
 		protected override Task LoadAsync()
@@ -88,6 +95,20 @@ namespace RaidClears
 			Service.CornerIcon.IconLeftClicked += new EventHandler<bool>(CornerIcon_IconLeftClicked);
 			Service.Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
 			return Task.CompletedTask;
+		}
+
+		private void TEMP_FIX_SetTacOAsActive()
+		{
+			if (DateTime.UtcNow.Date >= new DateTime(2023, 8, 22, 0, 0, 0, DateTimeKind.Utc) && Program.get_OverlayVersion() < new SemVer.Version(1, 1, 0))
+			{
+				try
+				{
+					typeof(TacOIntegration).GetProperty("TacOIsRunning").GetSetMethod(nonPublic: true)?.Invoke(GameService.GameIntegration.get_TacO(), new object[1] { true });
+				}
+				catch
+				{
+				}
+			}
 		}
 
 		protected override void Unload()

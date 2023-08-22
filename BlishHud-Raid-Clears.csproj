@@ -21,6 +21,9 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\working\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="SemVer">
+      <HintPath>..\..\working\SemVer.dll</HintPath>
+    </Reference>
     <Reference Include="System.Core" />
   </ItemGroup>
 </Project>
