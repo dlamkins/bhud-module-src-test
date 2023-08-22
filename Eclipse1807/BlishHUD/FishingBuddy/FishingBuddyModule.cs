@@ -442,6 +442,11 @@ namespace Eclipse1807.BlishHUD.FishingBuddy
 			_baitPanelLoc.remove_SettingChanged((EventHandler<ValueChangedEventArgs<Point>>)OnUpdateSettings<Point>);
 			_dragBaitPanel.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateSettings<bool>);
 			_baitImgSize.remove_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)OnUpdateSettings<int>);
+			ClickThroughPanel baitPanel = _baitPanel;
+			if (baitPanel != null)
+			{
+				((Control)baitPanel).Dispose();
+			}
 			_timeOfDayPanelLoc.remove_SettingChanged((EventHandler<ValueChangedEventArgs<Point>>)OnUpdateClockLocation);
 			_dragTimeOfDayClock.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUpdateClockSettings);
 			_timeOfDayImgSize.remove_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)OnUpdateClockSize);
