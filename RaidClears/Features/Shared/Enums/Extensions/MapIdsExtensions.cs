@@ -25,6 +25,8 @@ namespace RaidClears.Features.Shared.Enums.Extensions
 				MapIds.StrikeMaps.Overlook => Encounters.StrikeMission.Overlook, 
 				MapIds.StrikeMaps.HarvestTemple => Encounters.StrikeMission.HarvestTemple, 
 				MapIds.StrikeMaps.OldLionsCourt => Encounters.StrikeMission.OldLionsCourt, 
+				MapIds.StrikeMaps.CosmicObservatory => Encounters.StrikeMission.CosmicObservatory, 
+				MapIds.StrikeMaps.TempleOfFebe => Encounters.StrikeMission.TempleOfFebe, 
 				_ => Encounters.StrikeMission.ShiverpeaksPass, 
 			};
 		}

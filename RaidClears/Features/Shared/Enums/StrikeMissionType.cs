@@ -4,6 +4,7 @@ namespace RaidClears.Features.Shared.Enums
 	{
 		Ibs,
 		Eod,
+		SotO,
 		Priority
 	}
 }

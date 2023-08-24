@@ -8,6 +8,7 @@ namespace RaidClears.Features.Shared.Enums.Extensions
 			{
 				StrikeMissionType.Ibs => "IBS", 
 				StrikeMissionType.Eod => "EoD", 
+				StrikeMissionType.SotO => "SotO", 
 				StrikeMissionType.Priority => "Priority", 
 				_ => "unknown", 
 			};

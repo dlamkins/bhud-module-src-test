@@ -10,6 +10,8 @@ namespace RaidClears.Features.Shared.Services
 
 		public Texture2D IBSLogo { get; }
 
+		public Texture2D SotOLogo { get; }
+
 		public Texture2D PoFLogo { get; }
 
 		public Texture2D HoTLogo { get; }
@@ -47,6 +49,7 @@ namespace RaidClears.Features.Shared.Services
 			SettingTabFractals = contentsManager.GetTexture("controls/tab_icons/fotm.png");
 			EoDLogo = contentsManager.GetTexture("eod_strikes_texture.png");
 			IBSLogo = contentsManager.GetTexture("ibs_strikes_texture.png");
+			SotOLogo = contentsManager.GetTexture("soto_strikes_texture.png");
 			PoFLogo = contentsManager.GetTexture("pof_raids_texture.png");
 			HoTLogo = contentsManager.GetTexture("hot_raids_texture.png");
 			BaseLogo = contentsManager.GetTexture("base_game_texture.png");
@@ -65,6 +68,7 @@ namespace RaidClears.Features.Shared.Services
 			((GraphicsResource)SettingTabFractals).Dispose();
 			((GraphicsResource)EoDLogo).Dispose();
 			((GraphicsResource)IBSLogo).Dispose();
+			((GraphicsResource)SotOLogo).Dispose();
 			((GraphicsResource)PoFLogo).Dispose();
 			((GraphicsResource)HoTLogo).Dispose();
 			((GraphicsResource)BaseLogo).Dispose();

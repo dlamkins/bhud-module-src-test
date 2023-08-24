@@ -14,6 +14,8 @@ namespace RaidClears.Features.Strikes.Services
 
 		private static int NUMBER_OF_EOD_STRIKES = 5;
 
+		private static int NUMBER_OF_SOTO_STRIKES = 2;
+
 		public static IEnumerable<BoxModel> GetPriorityEncounters()
 		{
 			return from e in GetPriorityStrikes()
@@ -44,10 +46,12 @@ namespace RaidClears.Features.Strikes.Services
 			int num = DayOfYearIndex();
 			int ibs_index = num % NUMBER_OF_IBS_STRIKES;
 			int eod_index = num % NUMBER_OF_EOD_STRIKES;
+			int soto_index = num % NUMBER_OF_SOTO_STRIKES;
 			return new List<StrikeInfo>
 			{
 				IcebroodStrikeInfo(ibs_index),
-				EndOfDragonsStrikeInfo(eod_index)
+				EndOfDragonsStrikeInfo(eod_index),
+				SecretsOftheObscureStrikeInfo(soto_index)
 			};
 		}
 
@@ -74,6 +78,16 @@ namespace RaidClears.Features.Strikes.Services
 				2 => new StrikeInfo(Encounters.StrikeMission.Overlook, new List<int> { 1451 }, Encounters.StrikeMission.HarvestTemple), 
 				3 => new StrikeInfo(Encounters.StrikeMission.HarvestTemple, new List<int> { 1437 }, Encounters.StrikeMission.OldLionsCourt), 
 				4 => new StrikeInfo(Encounters.StrikeMission.OldLionsCourt, new List<int> { 1485 }, Encounters.StrikeMission.AetherbladeHideout), 
+				_ => new StrikeInfo(Encounters.StrikeMission.AetherbladeHideout, new List<int>(), Encounters.StrikeMission.AetherbladeHideout), 
+			};
+		}
+
+		public static StrikeInfo SecretsOftheObscureStrikeInfo(int index)
+		{
+			return index switch
+			{
+				0 => new StrikeInfo(Encounters.StrikeMission.CosmicObservatory, new List<int> { 1515 }, Encounters.StrikeMission.TempleOfFebe), 
+				1 => new StrikeInfo(Encounters.StrikeMission.TempleOfFebe, new List<int> { 1520 }, Encounters.StrikeMission.CosmicObservatory), 
 				_ => new StrikeInfo(Encounters.StrikeMission.AetherbladeHideout, new List<int>(), Encounters.StrikeMission.AetherbladeHideout), 
 			};
 		}

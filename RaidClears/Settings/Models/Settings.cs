@@ -214,9 +214,17 @@ namespace RaidClears.Settings.Models
 					new StrikeSetting<bool>("StrikeVis_old_lion_court", DefaultValue: true, () => Strings.Setting_Strike_OLC_Label)
 				};
 
+				public static Setting<bool>[] sotoMissions = new Setting<bool>[2]
+				{
+					new StrikeSetting<bool>("StrikeVis_cosmic_observatory", DefaultValue: true, () => "Cosmic Observatory"),
+					new StrikeSetting<bool>("StrikeVis_temple_of_febe", DefaultValue: true, () => "Temple of Febe")
+				};
+
 				public static Setting<bool> showIbs = new Setting<bool>("StrikeVis_ibs", DefaultValue: true, () => Strings.Setting_Strike_IBS);
 
 				public static Setting<bool> showEod = new Setting<bool>("StrikeVis_eod", DefaultValue: true, () => Strings.Setting_Strike_Eod);
+
+				public static Setting<bool> showSotO = new Setting<bool>("StrikeVis_soto", DefaultValue: true, () => "Enable Secrets of the Obscure");
 
 				public static Setting<bool> showPriority = new Setting<bool>("StrikeVis_priority", DefaultValue: true, () => Strings.Setting_Stike_Priority);
 

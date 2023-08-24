@@ -30,7 +30,7 @@ namespace RaidClears.Features.Strikes.Models
 				strike.SetGroupLabelReference(labelBox);
 				labelBox.LayoutChange(settings.Style.Layout);
 				labelBox.LabelDisplayChange(settings.Style.LabelDisplay, strike.shortName, strike.shortName);
-				SettingEntry<bool>[] allStrikes = settings.IbsMissions.Concat<SettingEntry<bool>>(settings.EodMissions).ToArray();
+				SettingEntry<bool>[] allStrikes = settings.IbsMissions.Concat<SettingEntry<bool>>(settings.EodMissions).Concat<SettingEntry<bool>>(settings.SotOMissions).ToArray();
 				foreach (int index in Enumerable.Range(0, strike.boxes.Count()))
 				{
 					BoxModel encounter = strike.boxes.ToArray()[index];
@@ -44,7 +44,7 @@ namespace RaidClears.Features.Strikes.Models
 					encounter.WatchColorSettings(settings.Style.Color.Cleared, settings.Style.Color.NotCleared);
 				}
 			}
-			strikes.Add(new PriorityStrikes(Strings.StrikeGroup_Priority, 10, Strings.StrikeGroup_Priority_abbr, new List<BoxModel>(), (Container)(object)panel));
+			strikes.Add(new PriorityStrikes(Strings.StrikeGroup_Priority, 11, Strings.StrikeGroup_Priority_abbr, new List<BoxModel>(), (Container)(object)panel));
 			return strikes;
 		}
 
@@ -69,6 +69,11 @@ namespace RaidClears.Features.Strikes.Models
 					new Encounter(Encounters.StrikeMission.Overlook),
 					new Encounter(Encounters.StrikeMission.HarvestTemple),
 					new Encounter(Encounters.StrikeMission.OldLionsCourt)
+				}),
+				new Strike("Secrets of the Obscure", 10, "SotO", new List<BoxModel>
+				{
+					new Encounter(Encounters.StrikeMission.CosmicObservatory),
+					new Encounter(Encounters.StrikeMission.TempleOfFebe)
 				})
 			};
 		}
@@ -79,7 +84,8 @@ namespace RaidClears.Features.Strikes.Models
 			{
 				8 => Settings.StrikeVisibleIbs, 
 				9 => Settings.StrikeVisibleEod, 
-				10 => Settings.StrikeVisiblePriority, 
+				10 => Settings.StrikeVisibleSotO, 
+				11 => Settings.StrikeVisiblePriority, 
 				_ => Settings.StrikeVisiblePriority, 
 			});
 		}

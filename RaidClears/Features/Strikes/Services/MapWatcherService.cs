@@ -44,7 +44,7 @@ namespace RaidClears.Features.Strikes.Services
 					clearedStrikesThisReset.Add(entry.Key.GetApiLabel());
 					clearedStrikesThisReset.Add("priority_" + entry.Key.GetApiLabel());
 				}
-				if (entry.Key.GetExpansionType() == StrikeMissionType.Eod && entry.Value >= Service.ResetWatcher.LastWeeklyReset)
+				if ((entry.Key.GetExpansionType() == StrikeMissionType.Eod || entry.Key.GetExpansionType() == StrikeMissionType.SotO) && entry.Value >= Service.ResetWatcher.LastWeeklyReset)
 				{
 					clearedStrikesThisReset.Add(entry.Key.GetApiLabel());
 					if (entry.Value >= Service.ResetWatcher.LastDailyReset)
@@ -52,7 +52,7 @@ namespace RaidClears.Features.Strikes.Services
 						clearedStrikesThisReset.Add("priority_" + entry.Key.GetApiLabel());
 					}
 				}
-				if (entry.Key.GetExpansionType() == StrikeMissionType.Eod && entry.Value >= Service.ResetWatcher.LastDailyReset)
+				if ((entry.Key.GetExpansionType() == StrikeMissionType.Eod || entry.Key.GetExpansionType() == StrikeMissionType.SotO) && entry.Value >= Service.ResetWatcher.LastDailyReset)
 				{
 					clearedStrikesThisReset.Add("priority_" + entry.Key.GetApiLabel());
 				}

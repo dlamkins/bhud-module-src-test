@@ -45,7 +45,9 @@ namespace RaidClears.Features.Shared.Enums
 			Overlook,
 			HarvestTemple,
 			OldLionsCourt,
-			DragonStorm
+			DragonStorm,
+			CosmicObservatory,
+			TempleOfFebe
 		}
 
 		public enum Dungeons

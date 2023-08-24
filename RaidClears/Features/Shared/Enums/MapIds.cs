@@ -22,7 +22,9 @@ namespace RaidClears.Features.Shared.Enums
 			HarvestTemple = 1437,
 			OldLionsCourt = 1485,
 			DragonStorm = 1409,
-			DragonStormPublic = 1411
+			DragonStormPublic = 1411,
+			CosmicObservatory = 1515,
+			TempleOfFebe = 1520
 		}
 
 		public enum FractalMaps

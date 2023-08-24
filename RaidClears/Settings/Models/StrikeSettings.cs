@@ -12,6 +12,8 @@ namespace RaidClears.Settings.Models
 
 		public SettingEntry<bool> StrikeVisibleEod { get; set; }
 
+		public SettingEntry<bool> StrikeVisibleSotO { get; set; }
+
 		public SettingEntry<bool> StrikeVisiblePriority { get; set; }
 
 		public SettingEntry<bool> AnchorToRaidPanel { get; set; }
@@ -21,6 +23,8 @@ namespace RaidClears.Settings.Models
 		public IEnumerable<SettingEntry<bool>> IbsMissions { get; set; }
 
 		public IEnumerable<SettingEntry<bool>> EodMissions { get; set; }
+
+		public IEnumerable<SettingEntry<bool>> SotOMissions { get; set; }
 
 		public DisplayStyle Style { get; set; }
 
@@ -60,8 +64,10 @@ namespace RaidClears.Settings.Models
 			};
 			IbsMissions = ((IEnumerable<Setting<bool>>)Settings.Strikes.Module.ibsMissions).Select((Func<Setting<bool>, SettingEntry<bool>>)settings.DefineSetting);
 			EodMissions = ((IEnumerable<Setting<bool>>)Settings.Strikes.Module.eodMissions).Select((Func<Setting<bool>, SettingEntry<bool>>)settings.DefineSetting);
+			SotOMissions = ((IEnumerable<Setting<bool>>)Settings.Strikes.Module.sotoMissions).Select((Func<Setting<bool>, SettingEntry<bool>>)settings.DefineSetting);
 			StrikeVisibleIbs = settings.DefineSetting(Settings.Strikes.Module.showIbs);
 			StrikeVisibleEod = settings.DefineSetting(Settings.Strikes.Module.showEod);
+			StrikeVisibleSotO = settings.DefineSetting(Settings.Strikes.Module.showSotO);
 			StrikeVisiblePriority = settings.DefineSetting(Settings.Strikes.Module.showPriority);
 			AnchorToRaidPanel = settings.DefineSetting(Settings.Strikes.Module.anchorToRaids);
 			StrikeCompletion = settings.DefineSetting(Settings.Strikes.Module.strikeCompletion);

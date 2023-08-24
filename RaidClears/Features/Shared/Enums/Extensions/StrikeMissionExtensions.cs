@@ -21,6 +21,8 @@ namespace RaidClears.Features.Shared.Enums.Extensions
 				Encounters.StrikeMission.HarvestTemple => Strings.Setting_Strike_HT_Label, 
 				Encounters.StrikeMission.OldLionsCourt => Strings.Setting_Strike_OLC_Label, 
 				Encounters.StrikeMission.DragonStorm => "Dragonstorm", 
+				Encounters.StrikeMission.CosmicObservatory => "Cosmic Observatory", 
+				Encounters.StrikeMission.TempleOfFebe => "Temple of Febe", 
 				_ => throw new ArgumentOutOfRangeException("value", value, null), 
 			};
 		}
@@ -41,6 +43,8 @@ namespace RaidClears.Features.Shared.Enums.Extensions
 				Encounters.StrikeMission.HarvestTemple => Strings.Strike_Short_HarvestTemple, 
 				Encounters.StrikeMission.OldLionsCourt => Strings.Strike_Short_OldLionsCourt, 
 				Encounters.StrikeMission.DragonStorm => "DStm", 
+				Encounters.StrikeMission.CosmicObservatory => "CO", 
+				Encounters.StrikeMission.TempleOfFebe => "ToF", 
 				_ => throw new ArgumentOutOfRangeException("value", value, null), 
 			};
 		}
@@ -61,6 +65,8 @@ namespace RaidClears.Features.Shared.Enums.Extensions
 				Encounters.StrikeMission.HarvestTemple => "harvest_temple", 
 				Encounters.StrikeMission.OldLionsCourt => "old_lion_court", 
 				Encounters.StrikeMission.DragonStorm => "dragonstorm", 
+				Encounters.StrikeMission.CosmicObservatory => "cosmic_Observatory", 
+				Encounters.StrikeMission.TempleOfFebe => "temple_of_febe", 
 				_ => throw new ArgumentOutOfRangeException("value", value, null), 
 			};
 		}
@@ -81,6 +87,8 @@ namespace RaidClears.Features.Shared.Enums.Extensions
 				Encounters.StrikeMission.HarvestTemple => StrikeMissionType.Eod, 
 				Encounters.StrikeMission.OldLionsCourt => StrikeMissionType.Eod, 
 				Encounters.StrikeMission.DragonStorm => StrikeMissionType.Ibs, 
+				Encounters.StrikeMission.CosmicObservatory => StrikeMissionType.SotO, 
+				Encounters.StrikeMission.TempleOfFebe => StrikeMissionType.SotO, 
 				_ => throw new ArgumentOutOfRangeException("value", value, null), 
 			};
 		}

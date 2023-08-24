@@ -71,6 +71,14 @@ namespace RaidClears.Features.Strikes.Services
 				{
 					Encounters.StrikeMission.DragonStorm,
 					default(DateTime)
+				},
+				{
+					Encounters.StrikeMission.CosmicObservatory,
+					default(DateTime)
+				},
+				{
+					Encounters.StrikeMission.TempleOfFebe,
+					default(DateTime)
 				}
 			};
 		}
