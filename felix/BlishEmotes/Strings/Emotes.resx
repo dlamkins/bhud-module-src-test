@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="salute"><value>Salute</value></data>
+  <data name="shiver"><value>Shiver</value></data>
+  <data name="sipcoffee"><value>Sip coffee</value></data>
+  <data name="magicjuggle"><value>Magic Juggle</value></data>
+  <data name="shiverplus"><value>Shiver plus</value></data>
+  <data name="shuffle"><value>Shuffle</value></data>
+  <data name="crossarms"><value>Crossarms</value></data>
+  <data name="geargrind"><value>Geargrind</value></data>
+  <data name="threaten"><value>Threaten</value></data>
+  <data name="possessed"><value>Possessed</value></data>
+  <data name="no"><value>No</value></data>
+  <data name="dance"><value>Dance</value></data>
+  <data name="laugh"><value>Laugh</value></data>
+  <data name="bless"><value>Bless</value></data>
+  <data name="cower"><value>Cower</value></data>
+  <data name="cheer"><value>Cheer</value></data>
+  <data name="kneel"><value>Kneel</value></data>
+  <data name="paper"><value>Paper</value></data>
+  <data name="point"><value>Point</value></data>
+  <data name="bow"><value>Bow</value></data>
+  <data name="cry"><value>Cry</value></data>
+  <data name="sad"><value>Sad</value></data>
+  <data name="sit"><value>Sit</value></data>
+  <data name="yes"><value>Yes</value></data>
+  <data name="serve"><value>Serve</value></data>
+  <data name="sleep"><value>Sleep</value></data>
+  <data name="shrug"><value>Shrug</value></data>
+  <data name="scissors"><value>Scissors</value></data>
+  <data name="rockout"><value>Rockout</value></data>
+  <data name="beckon"><value>Beckon</value></data>
+  <data name="facepalm"><value>Facepalm</value></data>
+  <data name="playdead"><value>Playdead</value></data>
+  <data name="thanks"><value>Thanks</value></data>
+  <data name="ponder"><value>Ponder</value></data>
+  <data name="surprised"><value>Surprised</value></data>
+  <data name="stretch"><value>Stretch</value></data>
+  <data name="hiss"><value>Hiss</value></data>
+  <data name="talk"><value>Talk</value></data>
+  <data name="wave"><value>Wave</value></data>
+  <data name="rock"><value>Rock</value></data>
+  <data name="rank"><value>Rank</value></data>
+  <data name="step"><value>Step</value></data>
+  </root>
