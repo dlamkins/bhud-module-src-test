@@ -7,6 +7,8 @@ namespace KpRefresher.Domain
 		XunlaiJadeJunkyard = 1450,
 		KainengOverlook = 1451,
 		HarvestTemple = 1437,
-		OldLionsCourt = 1485
+		OldLionsCourt = 1485,
+		CosmicObservatory = 1515,
+		TempleOfFebe = 1520
 	}
 }
