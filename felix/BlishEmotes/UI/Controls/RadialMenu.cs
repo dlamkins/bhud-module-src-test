@@ -200,10 +200,5 @@ namespace felix.BlishEmotes.UI.Controls
 				_helper.SendEmoteCommand(selected.Emote);
 			}
 		}
-
-		public override void UpdateContainer(GameTime gameTime)
-		{
-			Logger.Debug("UPDATE CONTAINER");
-		}
 	}
 }
