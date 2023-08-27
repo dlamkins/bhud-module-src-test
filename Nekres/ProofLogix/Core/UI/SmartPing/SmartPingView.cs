@@ -274,6 +274,7 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 			val5.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object _, CheckChangedEvent e)
 			{
 				_config.SendProfileId = e.get_Checked();
+				ProofLogix.Instance.Resources.PlayMenuItemClick();
 			});
 			IEnumerable<Token> playerTokens = ProofLogix.Instance.PartySync.LocalPlayer.KpProfile.GetTokens();
 			List<Resource> generalItems = (from resource in ProofLogix.Instance.Resources.GetGeneralItems()
