@@ -67,7 +67,7 @@ namespace Kenedia.Modules.Core.Models
 			SharedSettings sharedSettings = new SharedSettings();
 			TexturesService texturesService = new TexturesService(ContentsManager);
 			InputDetectionService inputDetectionService = new InputDetectionService();
-			GameState gameState = new GameState(clientWindowService, sharedSettings);
+			GameStateDetectionService gameState = new GameStateDetectionService(clientWindowService, sharedSettings);
 			Services = new ServiceCollection(gameState, clientWindowService, sharedSettings, texturesService, inputDetectionService);
 			SharedSettingsView = new SharedSettingsView(sharedSettings, clientWindowService);
 			GameService.Overlay.get_UserLocale().add_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)OnLocaleChanged);
@@ -130,7 +130,7 @@ namespace Kenedia.Modules.Core.Models
 		protected override void Update(GameTime gameTime)
 		{
 			((Module)this).Update(gameTime);
-			Services.GameState.Run(gameTime);
+			Services.GameStateDetectionService.Run(gameTime);
 			Services.ClientWindowService.Run(gameTime);
 			Services.InputDetectionService.Run(gameTime);
 			if (HasGUI && !IsGUICreated && AutoLoadGUI)

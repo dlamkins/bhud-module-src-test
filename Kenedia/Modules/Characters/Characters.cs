@@ -207,8 +207,8 @@ namespace Kenedia.Modules.Characters
 		protected override async Task LoadAsync()
 		{
 			await base.LoadAsync();
-			CharacterSwapping = new CharacterSwapping(base.Settings, base.Services.GameState, CharacterModels);
-			CharacterSorting = new CharacterSorting(base.Settings, base.Services.GameState, CharacterModels);
+			CharacterSwapping = new CharacterSwapping(base.Settings, base.Services.GameStateDetectionService, CharacterModels);
+			CharacterSorting = new CharacterSorting(base.Settings, base.Services.GameStateDetectionService, CharacterModels);
 			CharacterSwapping.CharacterSorting = CharacterSorting;
 			CharacterSorting.CharacterSwapping = CharacterSwapping;
 			TextureManager = new TextureManager(base.Services.TexturesService);
@@ -217,6 +217,12 @@ namespace Kenedia.Modules.Characters
 			{
 				await LoadCharacters();
 			}
+			Data.StaticInfo.BetaStateChanged += StaticInfo_BetaStateChanged;
+		}
+
+		private void StaticInfo_BetaStateChanged(object sender, bool e)
+		{
+			base.MainWindow?.AdjustForBeta();
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)
@@ -266,7 +272,7 @@ namespace Kenedia.Modules.Characters
 				_ticks.Global = 0.0;
 				PlayerCharacter player = GameService.Gw2Mumble.get_PlayerCharacter();
 				string name = ((player != null) ? player.get_Name() : string.Empty);
-				bool charSelection = (base.Settings.UseBetaGamestate.get_Value() ? base.Services.GameState.IsCharacterSelection : (!GameService.GameIntegration.get_Gw2Instance().get_IsInGame()));
+				bool charSelection = (base.Settings.UseBetaGamestate.get_Value() ? base.Services.GameStateDetectionService.IsCharacterSelection : (!GameService.GameIntegration.get_Gw2Instance().get_IsInGame()));
 				CurrentCharacterModel = ((!charSelection) ? CharacterModels.FirstOrDefault((Character_Model e) => e.Name == name) : null);
 				if (!_mapsUpdated && GameService.Gw2Mumble.get_CurrentMap().get_Id() > 0 && Data.GetMapById(GameService.Gw2Mumble.get_CurrentMap().get_Id()).Id == 0)
 				{
@@ -277,6 +283,7 @@ namespace Kenedia.Modules.Characters
 				{
 					CurrentCharacterModel?.UpdateCharacter(player);
 				}
+				Data?.StaticInfo?.CheckBeta();
 			}
 			if (_ticks.APIUpdate > 300.0)
 			{
@@ -619,7 +626,7 @@ namespace Kenedia.Modules.Characters
 				SearchFilters.Add(e.Value.Name, new SearchFilter<Character_Model>((Character_Model c) => base.Settings.DisplayToggles.get_Value()["Race"].Check && c.Race == e.Key));
 			}
 			SearchFilters.Add("Birthday", new SearchFilter<Character_Model>((Character_Model c) => c.HasBirthdayPresent));
-			SearchFilters.Add("Hidden", new SearchFilter<Character_Model>((Character_Model c) => !c.Show));
+			SearchFilters.Add("Hidden", new SearchFilter<Character_Model>((Character_Model c) => !c.Show || (!Data.StaticInfo.IsBeta && c.Beta)));
 			SearchFilters.Add("Female", new SearchFilter<Character_Model>((Character_Model c) => (int)c.Gender == 2));
 			SearchFilters.Add("Male", new SearchFilter<Character_Model>((Character_Model c) => (int)c.Gender == 1));
 		}
@@ -779,11 +786,8 @@ namespace Kenedia.Modules.Characters
 			}
 			catch (Exception ex)
 			{
-				if (!_characterFileTokenSource.IsCancellationRequested)
-				{
-					BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Warn(ex, "Failed to load the local characters from file '" + CharactersPath + "'.");
-					File.Copy(CharactersPath, CharactersPath.Replace(".json", " [" + DateTimeOffset.Now.ToUnixTimeSeconds() + "].corrupted.json"));
-				}
+				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Warn(ex, "Failed to load the local characters from file '" + CharactersPath + "'.");
+				File.Copy(CharactersPath, CharactersPath.Replace(".json", " [" + DateTimeOffset.Now.ToUnixTimeSeconds() + "].corrupted.json"));
 				return false;
 			}
 		}

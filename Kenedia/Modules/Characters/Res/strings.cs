@@ -316,6 +316,10 @@ namespace Kenedia.Modules.Characters.Res
 
 		internal static string InventoryKey_Tooltip => ResourceManager.GetString("InventoryKey_Tooltip", resourceCulture);
 
+		internal static string IsBeta => ResourceManager.GetString("IsBeta", resourceCulture);
+
+		internal static string IsBeta_Tooltip => ResourceManager.GetString("IsBeta_Tooltip", resourceCulture);
+
 		internal static string ItemSettings => ResourceManager.GetString("ItemSettings", resourceCulture);
 
 		internal static string Jeweler => ResourceManager.GetString("Jeweler", resourceCulture);

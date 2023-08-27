@@ -22,7 +22,7 @@ namespace Kenedia.Modules.Characters.Services
 	{
 		private readonly Settings _settings;
 
-		private readonly GameState _gameState;
+		private readonly GameStateDetectionService _gameState;
 
 		private readonly ObservableCollection<Character_Model> _rawCharacterModels;
 
@@ -61,11 +61,11 @@ namespace Kenedia.Modules.Characters.Services
 		{
 			get
 			{
-				if (_settings?.IncludeBetaCharacters.get_Value() ?? false)
+				if (!BaseModule<Characters, MainWindow, Settings, PathCollection>.ModuleInstance.Data.StaticInfo.IsBeta)
 				{
-					return _rawCharacterModels.ToList();
+					return _rawCharacterModels.Where((Character_Model e) => !e.Beta).ToList();
 				}
-				return _rawCharacterModels.Where((Character_Model e) => !e.Beta).ToList();
+				return _rawCharacterModels.ToList();
 			}
 		}
 
@@ -79,7 +79,7 @@ namespace Kenedia.Modules.Characters.Services
 
 		public event EventHandler StatusChanged;
 
-		public CharacterSwapping(Settings settings, GameState gameState, ObservableCollection<Character_Model> characterModels)
+		public CharacterSwapping(Settings settings, GameStateDetectionService gameState, ObservableCollection<Character_Model> characterModels)
 		{
 			_settings = settings;
 			_gameState = gameState;

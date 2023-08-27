@@ -46,6 +46,8 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private readonly Checkbox _radial;
 
+		private readonly Checkbox _beta;
+
 		private readonly ImageButton _birthdayButton;
 
 		private readonly Panel _buttonContainer;
@@ -99,27 +101,29 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_0299: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0307: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0316: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0393: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_044b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_045a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0505: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0511: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0435: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0447: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_056c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_064d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_065f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_069a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0727: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0736: Unknown result type (might be due to invalid IL or missing references)
-			//IL_078d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0832: Unknown result type (might be due to invalid IL or missing references)
-			//IL_084e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0701: Unknown result type (might be due to invalid IL or missing references)
+			//IL_073c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_082f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0844: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0861: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0871: Unknown result type (might be due to invalid IL or missing references)
+			//IL_087b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_089a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08f0: Unknown result type (might be due to invalid IL or missing references)
 			AccountImagePath = accountPath;
 			_allTags = allTags;
 			_settings = settings;
@@ -196,6 +200,20 @@ namespace Kenedia.Modules.Characters.Controls
 				_refreshCharacters?.Invoke();
 			};
 			_radial = checkbox2;
+			Checkbox checkbox3 = new Checkbox();
+			((Control)checkbox3).set_Parent((Container)(object)this);
+			((Control)checkbox3).set_Location(new Point(((Control)_image).get_Right() + 5 + 2, ((Control)_radial).get_Bottom()));
+			((Control)checkbox3).set_Size(new Point(100, 21));
+			checkbox3.SetLocalizedText = () => strings.IsBeta;
+			checkbox3.SetLocalizedTooltip = () => strings.IsBeta_Tooltip;
+			checkbox3.CheckedChangedAction = delegate(bool b)
+			{
+				if (Character != null)
+				{
+					Character.Beta = b;
+				}
+			};
+			_beta = checkbox3;
 			ImageButton imageButton3 = new ImageButton();
 			((Control)imageButton3).set_Parent((Container)(object)this);
 			((Control)imageButton3).set_Size(new Point(40, 40));
@@ -261,7 +279,7 @@ namespace Kenedia.Modules.Characters.Controls
 			_openFolder = button2;
 			Panel panel2 = new Panel();
 			((Control)panel2).set_Parent((Container)(object)this);
-			((Control)panel2).set_Location(new Point(0, ((Control)_image).get_Bottom() + 5 + 2));
+			((Control)panel2).set_Location(new Point(0, ((Control)_beta).get_Bottom() + 5 + 2));
 			((Control)panel2).set_Width(355);
 			((Container)panel2).set_HeightSizingMode((SizingMode)1);
 			_tagContainer = panel2;
@@ -533,6 +551,7 @@ namespace Kenedia.Modules.Characters.Controls
 			_image.Texture = Character.Icon;
 			((Label)_name).set_Text(Character.Name);
 			((Checkbox)_show).set_Checked(Character.Show);
+			((Checkbox)_beta).set_Checked(Character.Beta);
 			((Checkbox)_radial).set_Checked(Character.ShowOnRadial);
 			((Control)_birthdayButton).set_BasicTooltipText(_birthdayButton.SetLocalizedTooltip?.Invoke());
 			((Control)_birthdayButton).set_Visible(Character.HadBirthday);

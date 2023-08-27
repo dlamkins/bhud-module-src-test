@@ -76,6 +76,7 @@
   <data name="CharacterSwap_MoveTo"><value>Try to move to {0}</value></data>
   <data name="LoadCachedAccounts_Tooltip"><value>Try to get the account name from cached files.</value></data>
   <data name="ItemSettings"><value>{0} Settings</value></data>
+  <data name="IsBeta"><value>Beta Character</value></data>
   <data name="InventoryKey_Tooltip"><value>Open or close the Inventory dialog</value></data>
   <data name="Normal"><value>Normal</value></data>
   <data name="Ascending"><value>Ascending</value></data>
@@ -297,6 +298,7 @@ Notifications in case of:
   <data name="FocusSearchOnShow"><value>Focus search on show</value></data>
   <data name="Radial_Scale"><value>Radial Size Scale</value></data>
   <data name="LevelAmount"><value>Level {0}</value></data>
+  <data name="IsBeta_Tooltip"><value>Is this a beta character?</value></data>
   <data name="ShowLastButton"><value>Show Last Button</value></data>
   <data name="DeletedCharacterNotification_DeleteTooltip"><value>Delete '{0}' permanently.</value></data>
   <data name="IgnoredPart"><value>Ignored Part</value></data>

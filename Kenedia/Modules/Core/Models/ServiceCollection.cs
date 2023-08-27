@@ -7,7 +7,7 @@ namespace Kenedia.Modules.Core.Models
 	{
 		private bool _isDisposed;
 
-		public GameState GameState { get; }
+		public GameStateDetectionService GameStateDetectionService { get; }
 
 		public ClientWindowService ClientWindowService { get; }
 
@@ -17,9 +17,9 @@ namespace Kenedia.Modules.Core.Models
 
 		public InputDetectionService InputDetectionService { get; }
 
-		public ServiceCollection(GameState gameState, ClientWindowService clientWindowService, SharedSettings sharedSettings, TexturesService texturesService, InputDetectionService inputDetectionService)
+		public ServiceCollection(GameStateDetectionService gameState, ClientWindowService clientWindowService, SharedSettings sharedSettings, TexturesService texturesService, InputDetectionService inputDetectionService)
 		{
-			GameState = gameState;
+			GameStateDetectionService = gameState;
 			ClientWindowService = clientWindowService;
 			SharedSettings = sharedSettings;
 			TexturesService = texturesService;
@@ -31,7 +31,7 @@ namespace Kenedia.Modules.Core.Models
 			if (!_isDisposed)
 			{
 				_isDisposed = true;
-				GameState.Dispose();
+				GameStateDetectionService.Dispose();
 				TexturesService.Dispose();
 			}
 		}

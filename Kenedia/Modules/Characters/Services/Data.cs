@@ -8,6 +8,7 @@ using Blish_HUD.Modules.Managers;
 using Gw2Sharp.Models;
 using Gw2Sharp.WebApi;
 using Kenedia.Modules.Characters.Enums;
+using Kenedia.Modules.Characters.Models;
 using Kenedia.Modules.Characters.Views;
 using Kenedia.Modules.Core.DataModels;
 using Kenedia.Modules.Core.Models;
@@ -1739,6 +1740,8 @@ namespace Kenedia.Modules.Characters.Services
 		};
 
 
+		public StaticInfo StaticInfo { get; set; }
+
 		public Data(ContentsManager contentsManager, PathCollection paths)
 		{
 			//IL_0522: Unknown result type (might be due to invalid IL or missing references)
@@ -1773,6 +1776,7 @@ namespace Kenedia.Modules.Characters.Services
 			BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Trying to load Maps from " + path);
 			try
 			{
+				StaticInfo = await StaticInfo.GetStaticInfo();
 				if (File.Exists(path))
 				{
 					string jsonString = await new StreamReader(path).ReadToEndAsync();

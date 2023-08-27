@@ -1,11 +1,14 @@
 namespace Kenedia.Modules.Core.Services
 {
-	public enum GameStatus
+	public enum GameStatusType
 	{
+		None = -1,
 		Unknown,
 		Ingame,
 		CharacterSelection,
 		LoadingScreen,
-		Cutscene
+		Cutscene,
+		Vista,
+		CharacterCreation
 	}
 }

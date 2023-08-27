@@ -9,7 +9,9 @@ using Blish_HUD.Controls.Extern;
 using Blish_HUD.Controls.Intern;
 using Kenedia.Modules.Characters.Models;
 using Kenedia.Modules.Characters.Res;
+using Kenedia.Modules.Characters.Views;
 using Kenedia.Modules.Core.Extensions;
+using Kenedia.Modules.Core.Models;
 using Kenedia.Modules.Core.Services;
 
 namespace Kenedia.Modules.Characters.Services
@@ -20,7 +22,7 @@ namespace Kenedia.Modules.Characters.Services
 
 		private readonly Settings _settings;
 
-		private readonly GameState _gameState;
+		private readonly GameStateDetectionService _gameState;
 
 		private readonly ObservableCollection<Character_Model> _rawCharacterModels;
 
@@ -69,11 +71,11 @@ namespace Kenedia.Modules.Characters.Services
 		{
 			get
 			{
-				if (_settings?.IncludeBetaCharacters.get_Value() ?? false)
+				if (!BaseModule<Kenedia.Modules.Characters.Characters, MainWindow, Settings, PathCollection>.ModuleInstance.Data.StaticInfo.IsBeta)
 				{
-					return _rawCharacterModels.ToList();
+					return _rawCharacterModels.Where((Character_Model e) => !e.Beta).ToList();
 				}
-				return _rawCharacterModels.Where((Character_Model e) => !e.Beta).ToList();
+				return _rawCharacterModels.ToList();
 			}
 		}
 
@@ -98,7 +100,7 @@ namespace Kenedia.Modules.Characters.Services
 
 		public event EventHandler StatusChanged;
 
-		public CharacterSorting(Settings settings, GameState gameState, ObservableCollection<Character_Model> characters)
+		public CharacterSorting(Settings settings, GameStateDetectionService gameState, ObservableCollection<Character_Model> characters)
 		{
 			_settings = settings;
 			_gameState = gameState;

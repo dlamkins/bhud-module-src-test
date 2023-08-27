@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Kenedia.Modules.Core.Controls
 {
-	internal class FramedMaskedRegion : MaskedRegion
+	public class FramedMaskedRegion : MaskedRegion
 	{
 		public Rectangle MaskedRegion;
 
@@ -45,47 +45,48 @@ namespace Kenedia.Modules.Core.Controls
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
 			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0187: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0193: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0222: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0227: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0233: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0274: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0279: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0285: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0189: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0229: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0234: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0240: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0281: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0286: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0292: Unknown result type (might be due to invalid IL or missing references)
 			//IL_029c: Unknown result type (might be due to invalid IL or missing references)
+			base.Paint(spriteBatch, MaskedRegion);
 			Color? borderColor = BorderColor;
 			if (borderColor.HasValue)
 			{
@@ -98,7 +99,6 @@ namespace Kenedia.Modules.Core.Controls
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Right() - 2, ((Rectangle)(ref bounds)).get_Top(), BorderWidth.Right, bounds.Height), (Rectangle?)Rectangle.get_Empty(), borderColor.Value * 0.5f);
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Right() - 1, ((Rectangle)(ref bounds)).get_Top(), BorderWidth.Right / 2, bounds.Height), (Rectangle?)Rectangle.get_Empty(), borderColor.Value * 0.6f);
 			}
-			base.Paint(spriteBatch, MaskedRegion);
 		}
 	}
 }

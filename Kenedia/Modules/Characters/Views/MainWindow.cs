@@ -86,17 +86,7 @@ namespace Kenedia.Modules.Characters.Views
 		public List<Character_Model> LoadedModels { get; } = new List<Character_Model>();
 
 
-		private List<Character_Model> CharacterModels
-		{
-			get
-			{
-				if (_settings?.IncludeBetaCharacters.get_Value() ?? false)
-				{
-					return _rawCharacterModels.ToList();
-				}
-				return _rawCharacterModels.Where((Character_Model e) => !e.Beta).ToList();
-			}
-		}
+		private List<Character_Model> CharacterModels => _rawCharacterModels.ToList();
 
 		public SettingsWindow SettingsWindow { get; set; }
 
@@ -322,14 +312,6 @@ namespace Kenedia.Modules.Characters.Views
 
 		private void IncludeBetaCharacters_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
 		{
-			LoadedModels?.Clear();
-			FlowPanel charactersPanel = CharactersPanel;
-			if (charactersPanel != null)
-			{
-				((Container)charactersPanel).ClearChildren();
-			}
-			CharacterCards?.Clear();
-			CreateCharacterControls();
 		}
 
 		private void CollapseWrapper_Hidden(object sender, EventArgs e)
@@ -472,15 +454,18 @@ namespace Kenedia.Modules.Characters.Views
 			bool include = _settings.ResultFilterBehavior.get_Value() == Settings.FilterBehavior.Include;
 			List<KeyValuePair<string, SearchFilter<Character_Model>>> toggleFilters = _searchFilters.Where((KeyValuePair<string, SearchFilter<Character_Model>> e) => e.Value.IsEnabled).ToList();
 			List<KeyValuePair<string, SearchFilter<Character_Model>>> tagFilters = _tagFilters.Where((KeyValuePair<string, SearchFilter<Character_Model>> e) => e.Value.IsEnabled).ToList();
-			foreach (var (ctrl2, toggleResult, stringsResult, tagsResult) in from CharacterCard ctrl in (IEnumerable)((Container)CharactersPanel).get_Children()
+			foreach (var (ctrl2, toggleResult, stringsResult, tagsResult, betaResult) in from CharacterCard ctrl in (IEnumerable)((Container)CharactersPanel).get_Children()
 				let c = ctrl.Character
 				where c != null
 				let toggleResult = toggleFilters.Count == 0 || include == FilterResult(c)
 				let stringsResult = stringFilters.Count == 0 || include == StringFilterResult(c)
 				let tagsResult = tagFilters.Count == 0 || include == TagResult(c)
-				select (ctrl, toggleResult, stringsResult, tagsResult))
+				let betaResult = (_data.StaticInfo.IsBeta && c.Beta) || (from e in toggleFilters
+					where e.Value.IsEnabled
+					select e.Key).Contains("Hidden") || !c.Beta
+				select (ctrl, toggleResult, stringsResult, tagsResult, betaResult))
 			{
-				((Control)ctrl2).set_Visible(toggleResult && stringsResult && tagsResult);
+				((Control)ctrl2).set_Visible(toggleResult && stringsResult && tagsResult && betaResult);
 			}
 			SortCharacters();
 			((Control)CharactersPanel).Invalidate();
@@ -939,6 +924,18 @@ namespace Kenedia.Modules.Characters.Views
 			{
 				((Control)_collapseWrapper).set_Height(_collapseWrapper.TitleBarHeight);
 			}
+		}
+
+		public void AdjustForBeta()
+		{
+			LoadedModels?.Clear();
+			FlowPanel charactersPanel = CharactersPanel;
+			if (charactersPanel != null)
+			{
+				((Container)charactersPanel).ClearChildren();
+			}
+			CharacterCards?.Clear();
+			CreateCharacterControls();
 		}
 	}
 }

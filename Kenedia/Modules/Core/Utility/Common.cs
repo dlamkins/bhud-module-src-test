@@ -9,6 +9,7 @@ using Blish_HUD;
 using Blish_HUD.Content;
 using Gw2Sharp.WebApi;
 using Kenedia.Modules.Core.Models;
+using Microsoft.Xna.Framework;
 
 namespace Kenedia.Modules.Core.Utility
 {
@@ -23,11 +24,12 @@ namespace Kenedia.Modules.Core.Utility
 
 		public static bool SetProperty<T>(ref T property, T newValue, ValueChangedEventHandler<T> OnUpdated, bool triggerOnUpdate = true)
 		{
+			T temp = property;
 			if (SetProperty(ref property, newValue))
 			{
 				if (triggerOnUpdate)
 				{
-					OnUpdated?.Invoke(property, new ValueChangedEventArgs<T>(property, newValue));
+					OnUpdated?.Invoke(property, new ValueChangedEventArgs<T>(temp, newValue));
 				}
 				return true;
 			}
@@ -195,6 +197,17 @@ namespace Kenedia.Modules.Core.Utility
 				return sb.ToString();
 			}
 			return "_";
+		}
+
+		public static double CalculateDistance(Vector3 vector1, Vector3 vector2)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+			return Math.Sqrt(Math.Pow(vector2.X - vector1.X, 2.0) + Math.Pow(vector2.Y - vector1.Y, 2.0) + Math.Pow(vector2.Z - vector1.Z, 2.0));
 		}
 	}
 }
