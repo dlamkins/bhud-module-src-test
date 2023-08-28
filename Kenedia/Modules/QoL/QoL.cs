@@ -3,243 +3,162 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
-using Blish_HUD.Input;
+using Blish_HUD.Graphics.UI;
 using Blish_HUD.Modules;
-using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
-using Gw2Sharp.Mumble.Models;
-using Gw2Sharp.WebApi;
-using Kenedia.Modules.QoL.Classes;
-using Kenedia.Modules.QoL.Strings;
+using Kenedia.Modules.Core.Controls;
+using Kenedia.Modules.Core.Models;
+using Kenedia.Modules.Core.Views;
+using Kenedia.Modules.QoL.Services;
 using Kenedia.Modules.QoL.SubModules;
-using Kenedia.Modules.QoL.UI;
+using Kenedia.Modules.QoL.SubModules.CopyItemName;
+using Kenedia.Modules.QoL.SubModules.GameResets;
+using Kenedia.Modules.QoL.SubModules.ItemDestruction;
+using Kenedia.Modules.QoL.SubModules.SkipCutscenes;
+using Kenedia.Modules.QoL.SubModules.WaypointPaste;
+using Kenedia.Modules.QoL.SubModules.WikiSearch;
+using Kenedia.Modules.QoL.SubModules.ZoomOut;
+using Kenedia.Modules.QoL.Views;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace Kenedia.Modules.QoL
 {
 	[Export(typeof(Module))]
-	public class QoL : Module
+	public class QoL : BaseModule<QoL, StandardWindow, Settings, PathCollection>
 	{
-		internal static QoL ModuleInstance;
+		private double _tick;
 
-		public static readonly Logger Logger = Logger.GetLogger<QoL>();
+		public Hotbar Hotbar { get; set; }
 
-		public string CultureString;
+		public Dictionary<SubModuleType, SubModule> SubModules { get; } = new Dictionary<SubModuleType, SubModule>();
 
-		public TextureManager TextureManager;
-
-		public Ticks Ticks;
-
-		public WindowBase2 MainWindow;
-
-		public Hotbar Hotbar;
-
-		public List<SubModule> Modules;
-
-		public SettingEntry<KeyBinding> ReloadKey;
-
-		public SettingEntry<ExpandDirection> HotbarExpandDirection;
-
-		public SettingEntry<Point> HotbarPosition;
-
-		public SettingEntry<bool> HotbarForceOnScreen;
-
-		private bool _DataLoaded;
-
-		public bool FetchingAPI;
-
-		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
-
-		internal ContentsManager ContentsManager => base.ModuleParameters.get_ContentsManager();
-
-		internal DirectoriesManager DirectoriesManager => base.ModuleParameters.get_DirectoriesManager();
-
-		internal Gw2ApiManager Gw2ApiManager => base.ModuleParameters.get_Gw2ApiManager();
-
-		public bool DataLoaded
-		{
-			get
-			{
-				return _DataLoaded;
-			}
-			set
-			{
-				_DataLoaded = value;
-				if (value)
-				{
-					ModuleInstance.OnDataLoaded();
-				}
-			}
-		}
-
-		public event EventHandler DataLoaded_Event;
-
-		public event EventHandler LanguageChanged;
 
 		[ImportingConstructor]
 		public QoL([Import("ModuleParameters")] ModuleParameters moduleParameters)
-			: this(moduleParameters)
+			: base(moduleParameters)
 		{
-			ModuleInstance = this;
-			TextureManager = new TextureManager();
-			Ticks = new Ticks();
-			Modules = new List<SubModule>
-			{
-				new ItemDestruction(),
-				new ZoomOut(),
-				new Resets()
-			};
-		}
-
-		private void OnDataLoaded()
-		{
-			this.DataLoaded_Event?.Invoke(this, EventArgs.Empty);
-		}
-
-		public void OnLanguageChanged(object sender, EventArgs e)
-		{
-			this.LanguageChanged?.Invoke(this, EventArgs.Empty);
+			BaseModule<QoL, StandardWindow, Settings, PathCollection>.ModuleInstance = this;
+			HasGUI = true;
+			AutoLoadGUI = true;
 		}
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0127: Expected O, but got Unknown
-			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
-			foreach (SubModule module in Modules)
-			{
-				SettingCollection subSettings = settings.AddSubCollection(module.Name + " - Settings", true, false);
-				module.DefineSettings(subSettings);
-			}
-			HotbarForceOnScreen = settings.DefineSetting<bool>("HotbarForceOnScreen", true, (Func<string>)(() => common.ForceOnScreen_Name), (Func<string>)(() => common.ForceOnScreen_Tooltip));
-			HotbarExpandDirection = settings.DefineSetting<ExpandDirection>("HotbarExpandDirection", ExpandDirection.LeftToRight, (Func<string>)(() => common.ExpandDirection_Name), (Func<string>)(() => common.ExpandDirection_Tooltip));
-			HotbarExpandDirection.add_SettingChanged((EventHandler<ValueChangedEventArgs<ExpandDirection>>)HotbarExpandDirection_SettingChanged);
-			SettingCollection internal_settings = settings.AddSubCollection("Internal Settings", false);
-			ReloadKey = internal_settings.DefineSetting<KeyBinding>("ReloadKey", new KeyBinding((Keys)0), (Func<string>)null, (Func<string>)null);
-			ReloadKey.get_Value().set_Enabled(true);
-			ReloadKey.get_Value().add_Activated((EventHandler<EventArgs>)RebuildUI);
-			HotbarPosition = internal_settings.DefineSetting<Point>("HotbarPosition", new Point(0, 34), (Func<string>)null, (Func<string>)null);
+			base.DefineSettings(settings);
+			base.Settings = new Settings(settings);
+			base.Settings.HotbarExpandDirection.add_SettingChanged((EventHandler<ValueChangedEventArgs<ExpandType>>)HotbarExpandDirection_SettingChanged);
 		}
 
-		private void HotbarExpandDirection_SettingChanged(object sender, ValueChangedEventArgs<ExpandDirection> e)
+		private void HotbarExpandDirection_SettingChanged(object sender, ValueChangedEventArgs<ExpandType> e)
 		{
-			Hotbar.ExpandDirection = e.get_NewValue();
+			if (Hotbar != null)
+			{
+				Hotbar.ExpandType = e.get_NewValue();
+			}
+		}
+
+		public override IView GetSettingsView()
+		{
+			return (IView)(object)new SettingsView(delegate
+			{
+				BaseSettingsWindow settingsWindow = base.SettingsWindow;
+				if (settingsWindow != null)
+				{
+					((WindowBase2)settingsWindow).ToggleWindow();
+				}
+			});
 		}
 
 		protected override void Initialize()
 		{
-			Logger.Info("Starting  " + ((Module)this).get_Name() + " v." + (object)((Module)this).get_Version().BaseVersion());
-			DataLoaded = false;
-		}
-
-		private void ToggleWindow_Activated(object sender, EventArgs e)
-		{
-			WindowBase2 mainWindow = MainWindow;
-			if (mainWindow != null)
-			{
-				mainWindow.ToggleWindow();
-			}
+			base.Initialize();
+			base.Paths = new PathCollection(base.DirectoriesManager, ((Module)this).get_Name());
+			BaseModule<QoL, StandardWindow, Settings, PathCollection>.Logger.Info("Starting " + ((Module)this).get_Name() + " v." + (object)((Module)this).get_Version().BaseVersion());
+			LoadSubModules();
 		}
 
 		protected override async Task LoadAsync()
 		{
+			await base.LoadAsync();
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
-			DataLoaded_Event += QoL_DataLoaded_Event;
-			GameService.Overlay.get_UserLocale().add_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)UserLocale_SettingChanged);
-			((Module)this).OnModuleLoaded(e);
-			foreach (SubModule module in Modules)
-			{
-				if (module.Enabled.get_Value())
-				{
-					module.Initialize();
-				}
-			}
-			GameService.Gw2Mumble.get_UI().add_UISizeChanged((EventHandler<ValueEventArgs<UiSize>>)UI_UISizeChanged);
-			LoadData();
-		}
-
-		private void UI_UISizeChanged(object sender, ValueEventArgs<UiSize> e)
-		{
-			EnsureHotbarOnScreen();
-		}
-
-		private void QoL_DataLoaded_Event(object sender, EventArgs e)
-		{
-			CreateUI();
-		}
-
-		private void ToggleModule(object sender, MouseEventArgs e)
-		{
-			if (MainWindow != null)
-			{
-				MainWindow.ToggleWindow();
-			}
+			base.OnModuleLoaded(e);
 		}
 
 		protected override void Update(GameTime gameTime)
 		{
-			if (!(gameTime.get_TotalGameTime().TotalMilliseconds - Ticks.global >= 5.0))
+			base.Update(gameTime);
+			if (Hotbar != null)
 			{
-				return;
+				((Control)Hotbar).set_Visible(GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && !GameService.Gw2Mumble.get_UI().get_IsMapOpen());
 			}
-			Ticks.global = gameTime.get_TotalGameTime().TotalMilliseconds;
-			foreach (SubModule module in Modules)
+			foreach (KeyValuePair<SubModuleType, SubModule> subModule in SubModules)
 			{
-				if (module.Enabled.get_Value() && module.Loaded && module.Active)
+				subModule.Value.Update(gameTime);
+			}
+		}
+
+		protected override void LoadGUI()
+		{
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
+			base.LoadGUI();
+			Hotbar hotbar = Hotbar;
+			if (hotbar != null)
+			{
+				((Control)hotbar).Dispose();
+			}
+			Hotbar hotbar2 = new Hotbar();
+			((Control)hotbar2).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			hotbar2.TextureRectangle = new Rectangle(new Point(50, 50), new Point(200, 50));
+			((Control)hotbar2).set_Location(base.Settings.HotbarPosition.get_Value());
+			hotbar2.ExpandType = base.Settings.HotbarExpandDirection.get_Value();
+			hotbar2.OnMoveAction = delegate(Point p)
+			{
+				//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+				base.Settings.HotbarPosition.set_Value(p);
+			};
+			hotbar2.OpenSettingsAction = delegate
+			{
+				BaseSettingsWindow settingsWindow2 = base.SettingsWindow;
+				if (settingsWindow2 != null)
 				{
-					module.Update(gameTime);
+					((WindowBase2)settingsWindow2).ToggleWindow();
 				}
-			}
-		}
-
-		protected override void Unload()
-		{
-			DisposeUI();
-			foreach (SubModule module in Modules)
+			};
+			Hotbar = hotbar2;
+			foreach (SubModule subModule in SubModules.Values)
 			{
-				module.Dispose();
+				Hotbar.AddItem((ICheckable)(object)subModule.ToggleControl);
 			}
-			Modules.Clear();
-			TextureManager.Dispose();
-			TextureManager = null;
-			DataLoaded_Event -= QoL_DataLoaded_Event;
-			GameService.Overlay.get_UserLocale().remove_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)UserLocale_SettingChanged);
-			ReloadKey.get_Value().remove_Activated((EventHandler<EventArgs>)RebuildUI);
-			DataLoaded = false;
-			ModuleInstance = null;
+			AsyncTexture2D settingsBg = AsyncTexture2D.FromAssetId(155997);
+			Texture2D cutSettingsBg = Texture2DExtension.GetRegion(settingsBg.get_Texture(), 0, 0, settingsBg.get_Width() - 482, settingsBg.get_Height() - 390);
+			SettingsWindow settingsWindow = new SettingsWindow(settingsBg, new Rectangle(30, 30, cutSettingsBg.get_Width() + 10, cutSettingsBg.get_Height()), new Rectangle(30, 35, cutSettingsBg.get_Width() - 5, cutSettingsBg.get_Height() - 15), base.Settings, base.SharedSettingsView, SubModules);
+			((Control)settingsWindow).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			((WindowBase2)settingsWindow).set_Title("❤");
+			((WindowBase2)settingsWindow).set_Subtitle("❤");
+			((WindowBase2)settingsWindow).set_SavesPosition(true);
+			((WindowBase2)settingsWindow).set_Id(((Module)this).get_Name() + " SettingsWindow");
+			settingsWindow.Version = base.ModuleVersion;
+			base.SettingsWindow = settingsWindow;
 		}
 
-		public async Task Fetch_APIData(bool force = false)
+		protected override void UnloadGUI()
 		{
-		}
-
-		private async Task LoadData()
-		{
-			DataLoaded = true;
-		}
-
-		private async void UserLocale_SettingChanged(object sender, ValueChangedEventArgs<Locale> e)
-		{
-			await LoadData();
-			OnLanguageChanged(null, null);
-		}
-
-		private void RebuildUI(object sender, EventArgs e)
-		{
-		}
-
-		private void DisposeUI()
-		{
-			WindowBase2 mainWindow = MainWindow;
-			if (mainWindow != null)
+			base.UnloadGUI();
+			BaseSettingsWindow settingsWindow = base.SettingsWindow;
+			if (settingsWindow != null)
 			{
-				((Control)mainWindow).Dispose();
+				((Control)settingsWindow).Dispose();
 			}
 			Hotbar hotbar = Hotbar;
 			if (hotbar != null)
@@ -248,70 +167,40 @@ namespace Kenedia.Modules.QoL
 			}
 		}
 
-		private void CreateUI()
+		protected override void Unload()
 		{
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			if (Hotbar != null)
+			base.Unload();
+			foreach (SubModule value in SubModules.Values)
 			{
-				return;
+				value?.Unload();
 			}
-			Hotbar hotbar = new Hotbar();
-			((Control)hotbar).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)hotbar).set_Size(new Point(36, 36));
-			hotbar.ButtonSize = new Point(28, 28);
-			hotbar.ExpandDirection = HotbarExpandDirection.get_Value();
-			((Control)hotbar).set_Location(HotbarPosition.get_Value());
-			Hotbar = hotbar;
-			foreach (SubModule module in Modules)
-			{
-				if (module.Enabled.get_Value() && module.ShowOnBar.get_Value())
-				{
-					Hotbar_Button obj = new Hotbar_Button
-					{
-						SubModule = module
-					};
-					((Control)obj).set_BasicTooltipText(string.Format(common.Toggle, module.Name ?? ""));
-					module.Hotbar_Button = obj;
-					Hotbar.AddButton(module.Hotbar_Button);
-				}
-			}
-			((Control)Hotbar).add_Moved((EventHandler<MovedEventArgs>)Hotbar_Moved);
+			SubModules.Clear();
 		}
 
-		private void Hotbar_Moved(object sender, MovedEventArgs e)
+		protected override void ReloadKey_Activated(object sender, EventArgs e)
 		{
-			EnsureHotbarOnScreen();
+			base.ReloadKey_Activated(sender, e);
+			foreach (SubModule value in SubModules.Values)
+			{
+				value?.Unload();
+			}
+			SubModules.Clear();
+			LoadSubModules();
 		}
 
-		private void EnsureHotbarOnScreen()
+		private void LoadSubModules()
 		{
-			GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
+			SubModules.Add(SubModuleType.GameResets, new GameResets(base.SettingCollection));
+			SubModules.Add(SubModuleType.ZoomOut, new ZoomOut(base.SettingCollection));
+			SubModules.Add(SubModuleType.SkipCutscenes, new SkipCutscenes(base.SettingCollection, base.Services.GameStateDetectionService));
+			SubModules.Add(SubModuleType.ItemDestruction, new ItemDestruction(base.SettingCollection));
+			SubModules.Add(SubModuleType.WikiSearch, new WikiSearch(base.SettingCollection));
+			SubModules.Add(SubModuleType.WaypointPaste, new WaypointPaste(base.SettingCollection));
+			SubModules.Add(SubModuleType.CopyItemName, new CopyItemName(base.SettingCollection));
+			foreach (SubModule value in SubModules.Values)
 			{
-				//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-				Rectangle localBounds = ((Control)GameService.Graphics.get_SpriteScreen()).get_LocalBounds();
-				if (!HotbarForceOnScreen.get_Value() || (((Rectangle)(ref localBounds)).Contains(((Control)Hotbar).get_Location()) && ((Rectangle)(ref localBounds)).Contains(((Control)Hotbar).get_Location().Add(((Control)Hotbar).get_Size()))))
-				{
-					HotbarPosition.set_Value(((Control)Hotbar).get_Location());
-				}
-				else
-				{
-					((Control)Hotbar).set_Location(new Point(Math.Max(0, Math.Min(((Rectangle)(ref localBounds)).get_Right() - Hotbar.CollapsedSize.X, ((Control)Hotbar).get_Location().X)), Math.Max(0, Math.Min(((Rectangle)(ref localBounds)).get_Bottom() - Hotbar.CollapsedSize.Y, ((Control)Hotbar).get_Location().Y))));
-				}
-			});
+				value?.Load();
+			}
 		}
 	}
 }
