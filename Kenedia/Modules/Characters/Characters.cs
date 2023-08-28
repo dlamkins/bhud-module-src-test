@@ -38,6 +38,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Newtonsoft.Json;
+using SemVer;
 
 namespace Kenedia.Modules.Characters
 {
@@ -59,6 +60,8 @@ namespace Kenedia.Modules.Characters
 		private bool _loadedCharacters;
 
 		private bool _mapsUpdated;
+
+		private Version _version;
 
 		private Character_Model _currentCharacterModel;
 
@@ -194,6 +197,7 @@ namespace Kenedia.Modules.Characters
 			base.Settings.RadialKey.get_Value().set_Enabled(true);
 			base.Settings.RadialKey.get_Value().add_Activated((EventHandler<EventArgs>)RadialMenuToggle);
 			Tags.CollectionChanged += Tags_CollectionChanged;
+			_version = base.Settings.Version.get_Value();
 			base.Settings.Version.set_Value(base.ModuleVersion);
 		}
 
@@ -460,9 +464,19 @@ namespace Kenedia.Modules.Characters
 
 		private void InputDetectionService_ClickedOrKey(object sender, double e)
 		{
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 			if (GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus() && (!base.Settings.CancelOnlyOnESC.get_Value() || GameService.Input.get_Keyboard().get_KeysDown().Contains((Keys)27)))
 			{
-				CancelEverything();
+				List<Keys> keys = new List<Keys>
+				{
+					base.Settings.LogoutKey.get_Value().get_PrimaryKey(),
+					(Keys)13
+				};
+				if (GameService.Input.get_Keyboard().get_KeysDown().Except(keys)
+					.Count() > 0)
+				{
+					CancelEverything();
+				}
 			}
 		}
 
@@ -771,10 +785,15 @@ namespace Kenedia.Modules.Characters
 					{
 						characters.ForEach(delegate(Character_Model c)
 						{
+							//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+							//IL_009c: Expected O, but got Unknown
 							if (!names.Contains(c.Name))
 							{
 								Tags.AddTags(c.Tags);
-								CharacterModels.Add(new Character_Model(c, CharacterSwapping, base.Paths.ModulePath, RequestCharacterSave, CharacterModels, Data));
+								CharacterModels.Add(new Character_Model(c, CharacterSwapping, base.Paths.ModulePath, RequestCharacterSave, CharacterModels, Data)
+								{
+									Beta = (_version >= new Version(1, 0, 20, (string)null, (string)null) && c.Beta)
+								});
 								names.Add(c.Name);
 							}
 						});
