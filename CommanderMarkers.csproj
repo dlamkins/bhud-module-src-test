@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>CommanderMarkers</AssemblyName>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <TargetFramework>net48</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>Preview</LangVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace />
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Reference Include="Blish HUD" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="MonoGame.Framework" />
+    <Reference Include="Gw2Sharp" />
+    <Reference Include="MonoGame.Extended" />
+    <Reference Include="System.Text.Json" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\working\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core" />
+  </ItemGroup>
+</Project>
