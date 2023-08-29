@@ -206,6 +206,13 @@ namespace Kenedia.Modules.Characters
 			base.DefineSettings(settings);
 			base.Settings = new Settings(settings);
 			base.Settings.ShowCornerIcon.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowCornerIcon_SettingChanged);
+			base.Settings.UseBetaGamestate.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UseBetaGamestate_SettingChanged);
+			base.Services.GameStateDetectionService.Enabled = base.Settings.UseBetaGamestate.get_Value();
+		}
+
+		private void UseBetaGamestate_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
+		{
+			base.Services.GameStateDetectionService.Enabled = e.get_NewValue();
 		}
 
 		protected override async Task LoadAsync()
@@ -669,18 +676,26 @@ namespace Kenedia.Modules.Characters
 			bool updateMarkedCharacters = false;
 			for (int i = CharacterModels.Count - 1; i >= 0; i--)
 			{
-				Character_Model c2 = CharacterModels[i];
-				if (!freshList.Contains(new { c2.Name, c2.Created }))
+				Character_Model c3 = CharacterModels[i];
+				if (c3 != null && !freshList.Contains(new { c3.Name, c3.Created }))
 				{
 					if (base.Settings.AutomaticCharacterDelete.get_Value())
 					{
-						BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info($"{c2.Name} created on {c2.Created} no longer exists. Delete them!");
-						c2.Delete();
+						Logger logger = BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger;
+						if (logger != null)
+						{
+							logger.Info($"{c3?.Name} created on {c3?.Created} no longer exists. Delete them!");
+						}
+						c3?.Delete();
 					}
-					else if (!c2.MarkedAsDeleted)
+					else if (!c3.MarkedAsDeleted)
 					{
-						BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info($"{c2.Name} created on {c2.Created} does not exist in the api data. Mark them as potentially deleted!");
-						c2.MarkedAsDeleted = true;
+						Logger logger2 = BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger;
+						if (logger2 != null)
+						{
+							logger2.Info($"{c3.Name} created on {c3.Created} does not exist in the api data. Mark them as potentially deleted!");
+						}
+						c3.MarkedAsDeleted = true;
 						updateMarkedCharacters = true;
 					}
 				}
@@ -690,24 +705,24 @@ namespace Kenedia.Modules.Characters
 				base.MainWindow.UpdateMissingNotification();
 			}
 			int pos = 0;
-			foreach (Character c3 in (IEnumerable<Character>)characters)
+			foreach (Character c2 in (IEnumerable<Character>)characters)
 			{
 				if (!oldList.Contains(new
 				{
-					Name = c3.get_Name(),
-					Created = c3.get_Created()
+					Name = c2.get_Name(),
+					Created = c2.get_Created()
 				}))
 				{
-					BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info($"{c3.get_Name()} created on {c3.get_Created()} does not exist yet. Create them!");
-					CharacterModels.Add(new Character_Model(c3, CharacterSwapping, base.Paths.ModulePath, RequestCharacterSave, CharacterModels, Data)
+					BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info($"{c2.get_Name()} created on {c2.get_Created()} does not exist yet. Create them!");
+					CharacterModels.Add(new Character_Model(c2, CharacterSwapping, base.Paths.ModulePath, RequestCharacterSave, CharacterModels, Data)
 					{
 						Position = pos
 					});
 				}
 				else
 				{
-					Character_Model character = CharacterModels.FirstOrDefault((Character_Model e) => e.Name == c3.get_Name());
-					character?.UpdateCharacter(c3);
+					Character_Model character = CharacterModels.FirstOrDefault((Character_Model e) => e.Name == c2.get_Name());
+					character?.UpdateCharacter(c2);
 					if (character != null)
 					{
 						character.Position = pos;

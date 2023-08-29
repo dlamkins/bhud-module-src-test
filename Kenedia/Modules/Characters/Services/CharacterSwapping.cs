@@ -104,9 +104,17 @@ namespace Kenedia.Modules.Characters.Services
 			return false;
 		}
 
+		private void Debug(string txt)
+		{
+			if (_settings.DebugMode.get_Value())
+			{
+				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info(txt);
+			}
+		}
+
 		public async Task MoveRight(CancellationToken cancellationToken, int amount = 1)
 		{
-			BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Move right to find " + (Character?.Name ?? "Unkown Character") + ".");
+			Debug("Move right to find " + (Character?.Name ?? "Unkown Character") + ".");
 			Status = strings.CharacterSwap_Right;
 			for (int i = 0; i < amount; i++)
 			{
@@ -117,7 +125,7 @@ namespace Kenedia.Modules.Characters.Services
 
 		public async Task MoveLeft(CancellationToken cancellationToken, int amount = 1)
 		{
-			BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Move left to find " + (Character?.Name ?? "Unkown Character") + ".");
+			Debug("Move left to find " + (Character?.Name ?? "Unkown Character") + ".");
 			Status = strings.CharacterSwap_Left;
 			for (int i = 0; i < amount; i++)
 			{
@@ -302,7 +310,7 @@ namespace Kenedia.Modules.Characters.Services
 			{
 				return false;
 			}
-			BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Logging out");
+			Debug("Logging out");
 			if (GameService.GameIntegration.get_Gw2Instance().get_IsInGame())
 			{
 				Status = strings.CharacterSwap_Logout;
@@ -329,7 +337,7 @@ namespace Kenedia.Modules.Characters.Services
 							string txt = await OCR.Read();
 							while (stopwatch.ElapsedMilliseconds < 5000 && txt.Length <= 2 && !cancellationToken.IsCancellationRequested)
 							{
-								BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("We are in the character selection but the OCR did only read '" + txt + "'. Waiting a bit longer!");
+								Debug("We are in the character selection but the OCR did only read '" + txt + "'. Waiting a bit longer!");
 								await Delay(cancellationToken, 250);
 								txt = await OCR.Read();
 								if (cancellationToken.IsCancellationRequested)
@@ -340,7 +348,7 @@ namespace Kenedia.Modules.Characters.Services
 						}
 						else
 						{
-							BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("OCR did not load the engine fully. " + (Character?.Name ?? "Character Name") + " can not be confirmed!");
+							Debug("OCR did not load the engine fully. " + (Character?.Name ?? "Character Name") + " can not be confirmed!");
 						}
 					}
 				}
@@ -355,7 +363,7 @@ namespace Kenedia.Modules.Characters.Services
 							string txt2 = await OCR.Read();
 							while (stopwatch.ElapsedMilliseconds < 5000 && txt2.Length <= 2 && !cancellationToken.IsCancellationRequested)
 							{
-								BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("We should be in the character selection but the OCR did only read '" + txt2 + "'. Waiting a bit longer!");
+								Debug("We should be in the character selection but the OCR did only read '" + txt2 + "'. Waiting a bit longer!");
 								await Delay(cancellationToken, 250);
 								txt2 = await OCR.Read();
 								if (cancellationToken.IsCancellationRequested)
@@ -366,7 +374,7 @@ namespace Kenedia.Modules.Characters.Services
 						}
 						else
 						{
-							BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("OCR did not load the engine fully. " + (Character?.Name ?? "Character Name") + " can not be confirmed!");
+							Debug("OCR did not load the engine fully. " + (Character?.Name ?? "Character Name") + " can not be confirmed!");
 						}
 					}
 				}
@@ -382,7 +390,7 @@ namespace Kenedia.Modules.Characters.Services
 			{
 				return;
 			}
-			BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Move to first Character.");
+			Debug("Move to first Character.");
 			Stopwatch stopwatch = Stopwatch.StartNew();
 			int moves = CharacterModels.Count - _movedLeft;
 			for (int i = 0; i < moves; i++)
@@ -409,7 +417,7 @@ namespace Kenedia.Modules.Characters.Services
 			{
 				return;
 			}
-			BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Move to " + (Character?.Name ?? "Unkown Character") + ".");
+			Debug("Move to " + (Character?.Name ?? "Unkown Character") + ".");
 			List<Character_Model> order = CharacterModels.OrderByDescending((Character_Model e) => e.LastLogin).ToList();
 			Stopwatch stopwatch = Stopwatch.StartNew();
 			using List<Character_Model>.Enumerator enumerator = order.GetEnumerator();
@@ -439,20 +447,20 @@ namespace Kenedia.Modules.Characters.Services
 			{
 				return false;
 			}
-			BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Confirm " + (Character?.Name ?? "Unkown Character") + "s name.");
+			Debug("Confirm " + (Character?.Name ?? "Unkown Character") + "s name.");
 			string text = ((!_settings.UseOCR.get_Value()) ? "No OCR" : (await OCR.Read()));
 			string ocr_result = text;
 			(string, int, int, int, bool) isBestMatch = ("No OCR enabled.", 0, 0, 0, false);
 			if (_settings.UseOCR.get_Value())
 			{
 				Status = "Confirm name ..." + Environment.NewLine + ocr_result;
-				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("OCR Result: " + ocr_result + ".");
+				Debug("OCR Result: " + ocr_result + ".");
 				if (_settings.OnlyEnterOnExact.get_Value())
 				{
 					return Character.Name == ocr_result;
 				}
 				isBestMatch = Character.NameMatches(ocr_result);
-				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info($"Swapping to {Character.Name} - Best result for : '{ocr_result}' is '{isBestMatch.Item1}' with edit distance of: {isBestMatch.Item2} and which is {isBestMatch.Item3} steps away in the character list. Resulting in a total difference of {isBestMatch.Item4}.");
+				Debug($"Swapping to {Character.Name} - Best result for : '{ocr_result}' is '{isBestMatch.Item1}' with edit distance of: {isBestMatch.Item2} and which is {isBestMatch.Item3} steps away in the character list. Resulting in a total difference of {isBestMatch.Item4}.");
 				return isBestMatch.Item5;
 			}
 			return isBestMatch.Item5;
@@ -466,7 +474,7 @@ namespace Kenedia.Modules.Characters.Services
 			}
 			if (_settings.EnterOnSwap.get_Value())
 			{
-				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Login to " + (Character?.Name ?? "Unkown Character") + ".");
+				Debug("Login to " + (Character?.Name ?? "Unkown Character") + ".");
 				Status = string.Format(strings.CharacterSwap_LoginTo, Character.Name);
 				Keyboard.Stroke((VirtualKeyShort)13, false);
 				await Delay(cancellationToken);

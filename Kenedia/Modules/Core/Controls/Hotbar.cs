@@ -23,8 +23,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		private readonly Dummy _expandDummy;
 
-		private readonly FlowPanel _itemsPanel;
-
 		private readonly int _itemPadding = 4;
 
 		private bool _resizeBarPending;
@@ -45,6 +43,10 @@ namespace Kenedia.Modules.Core.Controls
 
 		private ExpandType _expandType;
 
+		private SortType _sortType;
+
+		protected readonly FlowPanel ItemsPanel;
+
 		public ExpandType ExpandType
 		{
 			get
@@ -54,6 +56,18 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				Common.SetProperty(ref _expandType, value, OnExpandTypeChanged);
+			}
+		}
+
+		public SortType SortType
+		{
+			get
+			{
+				return _sortType;
+			}
+			set
+			{
+				Common.SetProperty(ref _sortType, value, OnSortTypeCanged);
 			}
 		}
 
@@ -104,7 +118,7 @@ namespace Kenedia.Modules.Core.Controls
 			((Control)flowPanel).set_Parent((Container)(object)this);
 			((FlowPanel)flowPanel).set_FlowDirection((ControlFlowDirection)2);
 			((Container)flowPanel).set_HeightSizingMode((SizingMode)1);
-			_itemsPanel = flowPanel;
+			ItemsPanel = flowPanel;
 			OnExpandTypeChanged(this, new ValueChangedEventArgs<ExpandType>(ExpandType?.LeftToRight, ExpandType?.LeftToRight));
 			ExpandType = ExpandType.BottomToTop;
 			((Control)this).set_BasicTooltipText($"Press {MoveModifier} and drag the hotbar to the desired position");
@@ -114,6 +128,16 @@ namespace Kenedia.Modules.Core.Controls
 			{
 				OpenSettingsAction?.Invoke();
 			}));
+		}
+
+		private void OnSortTypeCanged(object sender, ValueChangedEventArgs<SortType> e)
+		{
+			if (ItemsPanel != null)
+			{
+				SetButtonsExpanded();
+				ForceOnScreen();
+				((Control)this).RecalculateLayout();
+			}
 		}
 
 		private void OnExpandTypeChanged(object sender, ValueChangedEventArgs<ExpandType> e)
@@ -140,10 +164,10 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_02c4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02d8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0325: Unknown result type (might be due to invalid IL or missing references)
-			if (_itemsPanel != null)
+			if (ItemsPanel != null)
 			{
 				_resizeBarPending = true;
-				((Control)_itemsPanel).set_Size(Point.get_Zero());
+				((Control)ItemsPanel).set_Size(Point.get_Zero());
 				((Control)this).set_Size(Point.get_Zero());
 				switch (e.NewValue)
 				{
@@ -152,11 +176,11 @@ namespace Kenedia.Modules.Core.Controls
 					_expander.HoveredTexture = AsyncTexture2D.FromAssetId(155910);
 					_expander.TextureRegion = new Rectangle(new Point(0, 0), new Point(16, 32));
 					((Control)_expandDummy).set_Size(new Point(16, 32));
-					((FlowPanel)_itemsPanel).set_FlowDirection((ControlFlowDirection)2);
-					((Container)_itemsPanel).set_WidthSizingMode((SizingMode)0);
-					((Container)_itemsPanel).set_HeightSizingMode((SizingMode)1);
-					_itemsPanel.ContentPadding = new RectangleDimensions(5, 4, 0, 4);
-					((FlowPanel)_itemsPanel).set_ControlPadding(new Vector2(5f));
+					((FlowPanel)ItemsPanel).set_FlowDirection((ControlFlowDirection)2);
+					((Container)ItemsPanel).set_WidthSizingMode((SizingMode)0);
+					((Container)ItemsPanel).set_HeightSizingMode((SizingMode)1);
+					ItemsPanel.ContentPadding = new RectangleDimensions(5, 4, 0, 4);
+					((FlowPanel)ItemsPanel).set_ControlPadding(new Vector2(5f));
 					base.ContentPadding = new RectangleDimensions(0);
 					break;
 				case ExpandType?.RightToLeft:
@@ -164,11 +188,11 @@ namespace Kenedia.Modules.Core.Controls
 					_expander.HoveredTexture = AsyncTexture2D.FromAssetId(155907);
 					_expander.TextureRegion = new Rectangle(new Point(16, 0), new Point(16, 32));
 					((Control)_expandDummy).set_Size(new Point(16, 32));
-					((FlowPanel)_itemsPanel).set_FlowDirection((ControlFlowDirection)5);
-					((Container)_itemsPanel).set_WidthSizingMode((SizingMode)0);
-					((Container)_itemsPanel).set_HeightSizingMode((SizingMode)1);
-					_itemsPanel.ContentPadding = new RectangleDimensions(-5, 4, 5, 4);
-					((FlowPanel)_itemsPanel).set_ControlPadding(new Vector2(5f));
+					((FlowPanel)ItemsPanel).set_FlowDirection((ControlFlowDirection)5);
+					((Container)ItemsPanel).set_WidthSizingMode((SizingMode)0);
+					((Container)ItemsPanel).set_HeightSizingMode((SizingMode)1);
+					ItemsPanel.ContentPadding = new RectangleDimensions(-5, 4, 5, 4);
+					((FlowPanel)ItemsPanel).set_ControlPadding(new Vector2(5f));
 					base.ContentPadding = new RectangleDimensions(0);
 					break;
 				case ExpandType?.TopToBottom:
@@ -176,11 +200,11 @@ namespace Kenedia.Modules.Core.Controls
 					_expander.HoveredTexture = AsyncTexture2D.FromAssetId(155929);
 					_expander.TextureRegion = new Rectangle(new Point(0, 8), new Point(32, 16));
 					((Control)_expandDummy).set_Size(new Point(32, 16));
-					((Container)_itemsPanel).set_WidthSizingMode((SizingMode)1);
-					((Container)_itemsPanel).set_HeightSizingMode((SizingMode)0);
-					((FlowPanel)_itemsPanel).set_FlowDirection((ControlFlowDirection)3);
-					_itemsPanel.ContentPadding = new RectangleDimensions(5, 4, 5, 4);
-					((FlowPanel)_itemsPanel).set_ControlPadding(new Vector2(5f));
+					((Container)ItemsPanel).set_WidthSizingMode((SizingMode)1);
+					((Container)ItemsPanel).set_HeightSizingMode((SizingMode)0);
+					((FlowPanel)ItemsPanel).set_FlowDirection((ControlFlowDirection)3);
+					ItemsPanel.ContentPadding = new RectangleDimensions(5, 4, 5, 4);
+					((FlowPanel)ItemsPanel).set_ControlPadding(new Vector2(5f));
 					base.ContentPadding = new RectangleDimensions(0, 2);
 					break;
 				case ExpandType?.BottomToTop:
@@ -188,11 +212,11 @@ namespace Kenedia.Modules.Core.Controls
 					_expander.HoveredTexture = AsyncTexture2D.FromAssetId(155929);
 					_expander.TextureRegion = new Rectangle(new Point(0, 8), new Point(32, 16));
 					((Control)_expandDummy).set_Size(new Point(32, 16));
-					((Container)_itemsPanel).set_WidthSizingMode((SizingMode)1);
-					((Container)_itemsPanel).set_HeightSizingMode((SizingMode)0);
-					((FlowPanel)_itemsPanel).set_FlowDirection((ControlFlowDirection)7);
-					_itemsPanel.ContentPadding = new RectangleDimensions(5, 0, 5, 2);
-					((FlowPanel)_itemsPanel).set_ControlPadding(new Vector2(5f));
+					((Container)ItemsPanel).set_WidthSizingMode((SizingMode)1);
+					((Container)ItemsPanel).set_HeightSizingMode((SizingMode)0);
+					((FlowPanel)ItemsPanel).set_FlowDirection((ControlFlowDirection)7);
+					ItemsPanel.ContentPadding = new RectangleDimensions(5, 0, 5, 2);
+					((FlowPanel)ItemsPanel).set_ControlPadding(new Vector2(5f));
 					base.ContentPadding = new RectangleDimensions(0, 2);
 					break;
 				}
@@ -208,13 +232,18 @@ namespace Kenedia.Modules.Core.Controls
 				_ = 1;
 			}
 			else
-				_ = ((IEnumerable<Control>)((Container)_itemsPanel).get_Children()).FirstOrDefault((Control e) => e.get_Visible()) != null;
+				_ = ((IEnumerable<Control>)((Container)ItemsPanel).get_Children()).FirstOrDefault((Control e) => e.get_Visible()) != null;
 			_resizeBarPending = true;
-			foreach (ICheckable c in ((IEnumerable)((Container)_itemsPanel).get_Children()).OfType<ICheckable>())
-			{
-				((Control)((c is Control) ? c : null)).set_Visible(e.NewValue || c.get_Checked());
-			}
+			SetButtonsExpanded();
 			((Control)this).RecalculateLayout();
+		}
+
+		public virtual void SetButtonsExpanded()
+		{
+			foreach (ICheckable c in ((IEnumerable)((Container)ItemsPanel).get_Children()).OfType<ICheckable>())
+			{
+				((Control)((c is Control) ? c : null)).set_Visible(ExpandBar || c.get_Checked());
+			}
 		}
 
 		public void AddItem(ICheckable item)
@@ -222,10 +251,11 @@ namespace Kenedia.Modules.Core.Controls
 			Control control = (Control)(object)((item is Control) ? item : null);
 			if (control != null)
 			{
-				control.set_Parent((Container)(object)_itemsPanel);
+				control.set_Parent((Container)(object)ItemsPanel);
 				item.add_CheckedChanged((EventHandler<CheckChangedEvent>)Item_CheckedChanged);
 			}
 			((Control)this).RecalculateLayout();
+			SetButtonsExpanded();
 		}
 
 		private void Item_CheckedChanged(object sender, CheckChangedEvent e)
@@ -279,6 +309,19 @@ namespace Kenedia.Modules.Core.Controls
 			}
 		}
 
+		protected virtual void SortButtons()
+		{
+			switch (SortType)
+			{
+			case SortType.ActivesFirst:
+				((FlowPanel)ItemsPanel).SortChildren<HotbarButton>((Comparison<HotbarButton>)((HotbarButton a, HotbarButton b) => b.Checked.CompareTo(a.Checked)));
+				break;
+			case SortType.ByModuleName:
+				((FlowPanel)ItemsPanel).SortChildren<HotbarButton>((Comparison<HotbarButton>)((HotbarButton a, HotbarButton b) => ((Control)a).get_BasicTooltipText().CompareTo(((Control)b).get_BasicTooltipText())));
+				break;
+			}
+		}
+
 		public override void RecalculateLayout()
 		{
 			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
@@ -288,16 +331,16 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
-			if (_itemsPanel != null)
+			if (ItemsPanel != null)
 			{
 				if (base.BackgroundImage != null)
 				{
@@ -307,6 +350,7 @@ namespace Kenedia.Modules.Core.Controls
 					bounds = base.BackgroundImage.get_Bounds();
 					base.TextureRectangle = new Rectangle(50, 50, num, Math.Min(height, ((Rectangle)(ref bounds)).get_Size().Y));
 				}
+				SortButtons();
 				switch (ExpandType)
 				{
 				case ExpandType.LeftToRight:
@@ -331,9 +375,9 @@ namespace Kenedia.Modules.Core.Controls
 
 		public int GetItemPanelSize(bool any = false, bool isChecked = false, bool vertical = false)
 		{
-			return (int)(isChecked ? (from e in ((IEnumerable)((Container)_itemsPanel).get_Children()).OfType<ICheckable>()
+			return (int)(isChecked ? (from e in ((IEnumerable)((Container)ItemsPanel).get_Children()).OfType<ICheckable>()
 				where any || e.get_Checked()
-				select e).Cast<Control>() : ((IEnumerable<Control>)((Container)_itemsPanel).get_Children()).Where((Control e) => any || e.get_Visible())).Sum((Control e) => (float)(vertical ? e.get_Height() : e.get_Width()) + (vertical ? ((FlowPanel)_itemsPanel).get_ControlPadding().Y : ((FlowPanel)_itemsPanel).get_ControlPadding().X));
+				select e).Cast<Control>() : ((IEnumerable<Control>)((Container)ItemsPanel).get_Children()).Where((Control e) => any || e.get_Visible())).Sum((Control e) => (float)(vertical ? e.get_Height() : e.get_Width()) + (vertical ? ((FlowPanel)ItemsPanel).get_ControlPadding().Y : ((FlowPanel)ItemsPanel).get_ControlPadding().X));
 		}
 
 		private void CalculateLeftToRight()
@@ -359,18 +403,18 @@ namespace Kenedia.Modules.Core.Controls
 				bounds = base.BackgroundImage.get_Bounds();
 				base.TextureRectangle = new Rectangle(50, 50, num, Math.Min(height, ((Rectangle)(ref bounds)).get_Size().Y));
 			}
-			if (_itemsPanel != null)
+			if (ItemsPanel != null)
 			{
-				IEnumerable<Control> visibleItems = ((IEnumerable<Control>)((Container)_itemsPanel).get_Children()).Where((Control e) => e.get_Visible());
-				((Control)_itemsPanel).set_Size(new Point((int)visibleItems.Sum((Control e) => (float)e.get_Width() + ((FlowPanel)_itemsPanel).get_ControlPadding().X) + ((visibleItems != null && visibleItems.Count() > 0) ? _itemsPanel.ContentPadding.Horizontal : 0), ((Control)this).get_Height() - ((Container)this).get_AutoSizePadding().Y));
-				((Control)_itemsPanel).set_Location(new Point(0, 0));
+				IEnumerable<Control> visibleItems = ((IEnumerable<Control>)((Container)ItemsPanel).get_Children()).Where((Control e) => e.get_Visible());
+				((Control)ItemsPanel).set_Size(new Point((int)visibleItems.Sum((Control e) => (float)e.get_Width() + ((FlowPanel)ItemsPanel).get_ControlPadding().X) + ((visibleItems != null && visibleItems.Count() > 0) ? ItemsPanel.ContentPadding.Horizontal : 0), ((Control)this).get_Height() - ((Container)this).get_AutoSizePadding().Y));
+				((Control)ItemsPanel).set_Location(new Point(0, 0));
 			}
 			if (_expandDummy != null)
 			{
 				Dummy expandDummy = _expandDummy;
-				FlowPanel itemsPanel = _itemsPanel;
+				FlowPanel itemsPanel = ItemsPanel;
 				int num2 = Math.Max((itemsPanel != null) ? ((Control)itemsPanel).get_Right() : 0, 5);
-				FlowPanel itemsPanel2 = _itemsPanel;
+				FlowPanel itemsPanel2 = ItemsPanel;
 				((Control)expandDummy).set_Location(new Point(num2, (((itemsPanel2 != null) ? ((Control)itemsPanel2).get_Height() : ((Control)this).get_Height()) - ((Control)_expandDummy).get_Height()) / 2));
 				_expanderBackgroundBounds = new Rectangle(((Control)_expandDummy).get_Left() - 2, base.BorderWidth.Top, ((Control)_expandDummy).get_Width() + 2, ((Control)this).get_Height() - base.BorderWidth.Vertical);
 			}
@@ -394,10 +438,10 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0179: Unknown result type (might be due to invalid IL or missing references)
 			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01a5: Unknown result type (might be due to invalid IL or missing references)
-			bool isAnyVisible = ((IEnumerable<Control>)((Container)_itemsPanel).get_Children()).Any((Control e) => e.get_Visible());
+			bool isAnyVisible = ((IEnumerable<Control>)((Container)ItemsPanel).get_Children()).Any((Control e) => e.get_Visible());
 			int expandedItemsWidth = GetItemPanelSize(any: true);
 			int checkedItemsWidth = GetItemPanelSize(any: false, isChecked: true);
-			int padding = (isAnyVisible ? _itemsPanel.ContentPadding.Horizontal : 0);
+			int padding = (isAnyVisible ? ItemsPanel.ContentPadding.Horizontal : 0);
 			if (_resizeBarPending)
 			{
 				if (ExpandBar)
@@ -405,21 +449,21 @@ namespace Kenedia.Modules.Core.Controls
 					_start = ((Control)this).get_Location();
 					_start_ItemWidth = new Point(checkedItemsWidth, 0);
 					((Control)this).set_Location(_start.Add(new Point(-(expandedItemsWidth - checkedItemsWidth), 0)));
-					((Control)_itemsPanel).set_Width(expandedItemsWidth + padding);
+					((Control)ItemsPanel).set_Width(expandedItemsWidth + padding);
 				}
 				else
 				{
 					_delta = new Point(_start_ItemWidth.X - checkedItemsWidth, 0);
 					((Control)this).set_Location(_start.Add(_delta));
-					((Control)_itemsPanel).set_Width(isAnyVisible ? (checkedItemsWidth + padding) : 0);
+					((Control)ItemsPanel).set_Width(isAnyVisible ? (checkedItemsWidth + padding) : 0);
 				}
 				_resizeBarPending = false;
 			}
 			Dummy expandDummy = _expandDummy;
-			FlowPanel itemsPanel = _itemsPanel;
+			FlowPanel itemsPanel = ItemsPanel;
 			((Control)expandDummy).set_Location(new Point(0, (((itemsPanel != null) ? ((Control)itemsPanel).get_Height() : ((Control)this).get_Height()) - ((Control)_expandDummy).get_Height()) / 2));
 			_expanderBackgroundBounds = new Rectangle(base.BorderWidth.Left, base.BorderWidth.Top, ((Control)_expandDummy).get_Width() + 2, ((Control)this).get_Height() - base.BorderWidth.Vertical);
-			((Control)_itemsPanel).set_Location(new Point(((Control)_expandDummy).get_Right() + base.BorderWidth.Horizontal, 0));
+			((Control)ItemsPanel).set_Location(new Point(((Control)_expandDummy).get_Right() + base.BorderWidth.Horizontal, 0));
 		}
 
 		private void CalculateTopToBottom()
@@ -446,18 +490,18 @@ namespace Kenedia.Modules.Core.Controls
 				bounds = base.BackgroundImage.get_Bounds();
 				base.TextureRectangle = new Rectangle(50, 50, num, Math.Min(height, ((Rectangle)(ref bounds)).get_Size().Y));
 			}
-			if (_itemsPanel != null)
+			if (ItemsPanel != null)
 			{
-				IEnumerable<Control> visibleItems = ((IEnumerable<Control>)((Container)_itemsPanel).get_Children()).Where((Control e) => e.get_Visible());
-				((Control)_itemsPanel).set_Size(new Point(((Control)this).get_Width() - ((Container)this).get_AutoSizePadding().X, (int)visibleItems.Sum((Control e) => (float)e.get_Width() + ((FlowPanel)_itemsPanel).get_ControlPadding().X) + ((visibleItems != null && visibleItems.Count() > 0) ? _itemsPanel.ContentPadding.Horizontal : 0)));
-				((Control)_itemsPanel).set_Location(new Point(0, 0));
+				IEnumerable<Control> visibleItems = ((IEnumerable<Control>)((Container)ItemsPanel).get_Children()).Where((Control e) => e.get_Visible());
+				((Control)ItemsPanel).set_Size(new Point(((Control)this).get_Width() - ((Container)this).get_AutoSizePadding().X, (int)visibleItems.Sum((Control e) => (float)e.get_Width() + ((FlowPanel)ItemsPanel).get_ControlPadding().X) + ((visibleItems != null && visibleItems.Count() > 0) ? ItemsPanel.ContentPadding.Horizontal : 0)));
+				((Control)ItemsPanel).set_Location(new Point(0, 0));
 			}
 			if (_expandDummy != null)
 			{
 				Dummy expandDummy = _expandDummy;
-				FlowPanel itemsPanel = _itemsPanel;
+				FlowPanel itemsPanel = ItemsPanel;
 				int num2 = (((itemsPanel != null) ? ((Control)itemsPanel).get_Width() : ((Control)this).get_Width()) - ((Control)_expandDummy).get_Width()) / 2;
-				FlowPanel itemsPanel2 = _itemsPanel;
+				FlowPanel itemsPanel2 = ItemsPanel;
 				((Control)expandDummy).set_Location(new Point(num2, Math.Max((itemsPanel2 != null) ? ((Control)itemsPanel2).get_Bottom() : 0, 5) - 5));
 				_expanderBackgroundBounds = new Rectangle(base.BorderWidth.Left, ((Control)this).get_Height() - ((Control)_expandDummy).get_Height() - base.BorderWidth.Bottom, ((Control)this).get_Width() - base.BorderWidth.Horizontal, ((Control)_expandDummy).get_Height());
 			}
@@ -482,10 +526,10 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0172: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
 			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
-			bool isAnyVisible = ((IEnumerable<Control>)((Container)_itemsPanel).get_Children()).Any((Control e) => e.get_Visible());
+			bool isAnyVisible = ((IEnumerable<Control>)((Container)ItemsPanel).get_Children()).Any((Control e) => e.get_Visible());
 			int expandedItemsWidth = GetItemPanelSize(any: true, isChecked: false, vertical: true);
 			int checkedItemsWidth = GetItemPanelSize(any: false, isChecked: true, vertical: true);
-			int padding = (isAnyVisible ? _itemsPanel.ContentPadding.Vertical : 0);
+			int padding = (isAnyVisible ? ItemsPanel.ContentPadding.Vertical : 0);
 			if (_resizeBarPending)
 			{
 				if (ExpandBar)
@@ -493,19 +537,19 @@ namespace Kenedia.Modules.Core.Controls
 					_start = ((Control)this).get_Location();
 					_start_ItemWidth = new Point(checkedItemsWidth, 0);
 					((Control)this).set_Location(_start.Add(new Point(0, -(expandedItemsWidth - checkedItemsWidth))));
-					((Control)_itemsPanel).set_Height(expandedItemsWidth + padding);
+					((Control)ItemsPanel).set_Height(expandedItemsWidth + padding);
 				}
 				else
 				{
 					_delta = new Point(0, _start_ItemWidth.X - checkedItemsWidth);
 					((Control)this).set_Location(_start.Add(_delta));
-					((Control)_itemsPanel).set_Height(isAnyVisible ? (checkedItemsWidth + padding) : 0);
+					((Control)ItemsPanel).set_Height(isAnyVisible ? (checkedItemsWidth + padding) : 0);
 				}
 				_resizeBarPending = false;
 			}
 			((Control)_expandDummy).set_Location(new Point((((Control)this).get_Width() - ((Container)this).get_AutoSizePadding().X - ((Control)_expandDummy).get_Width()) / 2, 0));
 			_expanderBackgroundBounds = new Rectangle(base.BorderWidth.Left, base.BorderWidth.Top, ((Control)this).get_Width() - base.BorderWidth.Horizontal, ((Control)_expandDummy).get_Height());
-			((Control)_itemsPanel).set_Location(new Point(0, ((Control)_expandDummy).get_Bottom()));
+			((Control)ItemsPanel).set_Location(new Point(0, ((Control)_expandDummy).get_Bottom()));
 		}
 
 		protected override void DisposeControl()

@@ -127,9 +127,9 @@ namespace Kenedia.Modules.Core.Utility
 			return id;
 		}
 
-		public static int GetAssetIdFromRenderUrl(string s)
+		public static int GetAssetIdFromRenderUrl(this string s)
 		{
-			int pos = s.ToString().LastIndexOf("/") + 1;
+			int pos = s.LastIndexOf("/") + 1;
 			if (!int.TryParse(s.Substring(pos, s.Length - pos - 4), out var id))
 			{
 				return 0;

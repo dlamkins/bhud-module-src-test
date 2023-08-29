@@ -252,7 +252,7 @@ namespace Kenedia.Modules.Core.Services
 				{
 					return;
 				}
-				if (GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus() && gameTime.get_TotalGameTime().TotalMilliseconds - _lastTick > 100.0)
+				if (GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus() && gameTime.get_TotalGameTime().TotalMilliseconds - _lastTick > 250.0)
 				{
 					ScreenChanging sC = IsScreenChanging();
 					((Control)_topLeftMask).Show();
@@ -289,19 +289,15 @@ namespace Kenedia.Modules.Core.Services
 							{
 								NewStatus = GameStatusType.CharacterCreation;
 							}
-							else
+							else if (GameStatus == GameStatusType.Ingame && characterSelection)
 							{
-								gameStatus = GameStatus;
-								if ((gameStatus == GameStatusType.Ingame || gameStatus == GameStatusType.Cutscene || gameStatus == GameStatusType.Vista) && characterSelection)
-								{
-									NewStatus = GameStatusType.CharacterSelection;
-								}
+								NewStatus = GameStatusType.CharacterSelection;
 							}
 						}
 					}
 				}
 			}
-			if (NewStatus != 0 && StatusConfirmed(NewStatus, _gameStatuses, (NewStatus == GameStatusType.LoadingScreen) ? 3 : 5) && GameStatus != NewStatus)
+			if (NewStatus != 0 && StatusConfirmed(NewStatus, _gameStatuses, (NewStatus == GameStatusType.LoadingScreen) ? 2 : 4) && GameStatus != NewStatus)
 			{
 				GameStatus = NewStatus;
 				_gameStatuses.Clear();

@@ -1005,8 +1005,8 @@ namespace Kenedia.Modules.Characters.Views
 			TrackBar trackBar3 = new TrackBar();
 			((Control)trackBar3).set_Location(new Point(225, 2));
 			((Control)trackBar3).set_Parent((Container)(object)subP);
-			((TrackBar)trackBar3).set_MinValue(0f);
-			((TrackBar)trackBar3).set_MaxValue(60000f);
+			((TrackBar)trackBar3).set_MinValue(500f);
+			((TrackBar)trackBar3).set_MaxValue(30000f);
 			((TrackBar)trackBar3).set_Value((float)_settings.SwapDelay.get_Value());
 			((Control)trackBar3).set_Width(((Container)this).get_ContentRegion().Width - 35 - 225);
 			trackBar3.ValueChangedAction = delegate(int num)
@@ -1091,6 +1091,15 @@ namespace Kenedia.Modules.Characters.Views
 			};
 			checkbox6.SetLocalizedText = () => strings.ShowNotifications;
 			checkbox6.SetLocalizedTooltip = () => strings.ShowNotifications_Tooltip;
+			Checkbox checkbox7 = new Checkbox();
+			((Control)checkbox7).set_Parent((Container)(object)cP);
+			((Checkbox)checkbox7).set_Checked(_settings.DebugMode.get_Value());
+			checkbox7.CheckedChangedAction = delegate(bool b)
+			{
+				_settings.DebugMode.set_Value(b);
+			};
+			checkbox7.SetLocalizedText = () => strings.DebugMode_Name;
+			checkbox7.SetLocalizedTooltip = () => strings.DebugMode_Tooltip;
 		}
 
 		private void GetFontSize(SettingEntry<int> setting, string item)

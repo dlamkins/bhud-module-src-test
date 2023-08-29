@@ -182,6 +182,10 @@ namespace Kenedia.Modules.Characters.Res
 
 		internal static string Deactivated => ResourceManager.GetString("Deactivated", resourceCulture);
 
+		internal static string DebugMode_Name => ResourceManager.GetString("DebugMode_Name", resourceCulture);
+
+		internal static string DebugMode_Tooltip => ResourceManager.GetString("DebugMode_Tooltip", resourceCulture);
+
 		internal static string Delays => ResourceManager.GetString("Delays", resourceCulture);
 
 		internal static string DeletedCharacterNotification => ResourceManager.GetString("DeletedCharacterNotification", resourceCulture);

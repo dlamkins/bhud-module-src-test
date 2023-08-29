@@ -102,6 +102,7 @@
   <data name="TimeSinceLogin"><value>Time since login</value></data>
   <data name="RandomButton_Tooltip"><value>Switch to a random character in your current list</value></data>
   <data name="ShowRandomButton_Name"><value>Show Random Button</value></data>
+  <data name="DebugMode_Tooltip"><value>Enable the debug mode to provide more information through the blish log</value></data>
   <data name="CouldNotFindNamedItem"><value>Could not find any {0} with name {1}</value></data>
   <data name="OpenInventoryOnEnter"><value>Open Inventory</value></data>
   <data name="OnlyText"><value>Only Text</value></data>
@@ -137,6 +138,7 @@
   <data name="Deactivated"><value>deactivated</value></data>
   <data name="CharacterSwap_Left"><value>Check left ...</value></data>
   <data name="Radial_IdleBorderColor"><value>Border Color</value></data>
+  <data name="DebugMode_Name"><value>Enable Debug Mode</value></data>
   <data name="DoubleClickToSwap"><value>Doubleclick to swap to {0}!</value></data>
   <data name="CancelOnlyOnESC"><value>Cancel only on ESC</value></data>
   <data name="AutomaticCharacterDelete"><value>Automatically delete Characters</value></data>

@@ -74,6 +74,8 @@ namespace Kenedia.Modules.Characters.Services
 
 		public SettingEntry<Dictionary<string, ShowCheckPair>> DisplayToggles { get; set; }
 
+		public SettingEntry<bool> DebugMode { get; set; }
+
 		public SettingEntry<bool> PinSideMenus { get; set; }
 
 		public SettingEntry<bool> IncludeBetaCharacters { get; set; }
@@ -254,15 +256,15 @@ namespace Kenedia.Modules.Characters.Services
 			//IL_00a0: Expected O, but got Unknown
 			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b9: Expected O, but got Unknown
-			//IL_01a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0405: Unknown result type (might be due to invalid IL or missing references)
-			//IL_045c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0215: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0419: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0470: Unknown result type (might be due to invalid IL or missing references)
 			SettingCollection internalSettings = settings.AddSubCollection("Internal", false, false);
 			Version = internalSettings.DefineSetting<Version>("Version", new Version("0.0.0", false), (Func<string>)null, (Func<string>)null);
 			LogoutKey = internalSettings.DefineSetting<KeyBinding>("LogoutKey", new KeyBinding((Keys)123), (Func<string>)null, (Func<string>)null);
@@ -278,7 +280,8 @@ namespace Kenedia.Modules.Characters.Services
 			ShowNotifications = internalSettings.DefineSetting<bool>("ShowNotifications", true, (Func<string>)null, (Func<string>)null);
 			IncludeBetaCharacters = internalSettings.DefineSetting<bool>("IncludeBetaCharacters", true, (Func<string>)null, (Func<string>)null);
 			FilterAsOne = internalSettings.DefineSetting<bool>("FilterAsOne", false, (Func<string>)null, (Func<string>)null);
-			UseBetaGamestate = internalSettings.DefineSetting<bool>("UseBetaGamestate", true, (Func<string>)null, (Func<string>)null);
+			UseBetaGamestate = internalSettings.DefineSetting<bool>("UseBetaGamestate", false, (Func<string>)null, (Func<string>)null);
+			DebugMode = internalSettings.DefineSetting<bool>("DebugMode", true, (Func<string>)null, (Func<string>)null);
 			EnableRadialMenu = internalSettings.DefineSetting<bool>("EnableRadialMenu", true, (Func<string>)null, (Func<string>)null);
 			Radial_Scale = internalSettings.DefineSetting<float>("Radial_Scale", 0.66f, (Func<string>)null, (Func<string>)null);
 			Radial_HoveredBorderColor = internalSettings.DefineSetting<Color>("Radial_HoveredBorderColor", Colors.ColonialWhite, (Func<string>)null, (Func<string>)null);
@@ -302,7 +305,7 @@ namespace Kenedia.Modules.Characters.Services
 			DoubleClickToEnter = internalSettings.DefineSetting<bool>("DoubleClickToEnter", false, (Func<string>)null, (Func<string>)null);
 			EnterToLogin = internalSettings.DefineSetting<bool>("EnterToLogin", false, (Func<string>)null, (Func<string>)null);
 			CheckDistance = internalSettings.DefineSetting<int>("CheckDistance", 5, (Func<string>)null, (Func<string>)null);
-			SwapDelay = internalSettings.DefineSetting<int>("SwapDelay", 250, (Func<string>)null, (Func<string>)null);
+			SwapDelay = internalSettings.DefineSetting<int>("SwapDelay", 500, (Func<string>)null, (Func<string>)null);
 			KeyDelay = internalSettings.DefineSetting<int>("KeyDelay", 10, (Func<string>)null, (Func<string>)null);
 			FilterDelay = internalSettings.DefineSetting<int>("FilterDelay", 0, (Func<string>)null, (Func<string>)null);
 			WindowSize = internalSettings.DefineSetting<Point>("CurrentWindowSize", new Point(385, 920), (Func<string>)null, (Func<string>)null);
