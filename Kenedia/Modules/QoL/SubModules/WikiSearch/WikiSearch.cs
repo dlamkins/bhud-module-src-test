@@ -35,18 +35,18 @@ namespace Kenedia.Modules.QoL.SubModules.WikiSearch
 		{
 			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0199: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0206: Unknown result type (might be due to invalid IL or missing references)
 			MouseContainer mouseContainer = new MouseContainer();
 			((Control)mouseContainer).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((Container)mouseContainer).set_WidthSizingMode((SizingMode)1);
@@ -58,6 +58,7 @@ namespace Kenedia.Modules.QoL.SubModules.WikiSearch
 			((Control)mouseContainer).set_Visible(base.Enabled);
 			mouseContainer.ContentPadding = new RectangleDimensions(5);
 			mouseContainer.MouseOffset = new Point(25);
+			((Control)mouseContainer).set_ZIndex(int.MaxValue);
 			_mouseContainer = mouseContainer;
 			Rectangle p = default(Rectangle);
 			((Rectangle)(ref p))._002Ector(0, 0, 0, 0);
@@ -171,36 +172,41 @@ namespace Kenedia.Modules.QoL.SubModules.WikiSearch
 					}
 					await Task.Delay(5);
 				}
-				if (isReady)
+				if (!isReady)
 				{
-					for (int j = 0; j < 5; j++)
-					{
-						Keyboard.Release((VirtualKeyShort)160, false);
-						await Task.Delay(10);
-					}
-					int delay = 40;
-					Keyboard.Press((VirtualKeyShort)162, true);
+					return;
+				}
+				for (int j = 0; j < 5; j++)
+				{
+					Keyboard.Release((VirtualKeyShort)160, false);
+					await Task.Delay(10);
+				}
+				int delay = 40;
+				Keyboard.Press((VirtualKeyShort)162, true);
+				await Task.Delay(delay);
+				Keyboard.Stroke((VirtualKeyShort)37, true);
+				await Task.Delay(delay);
+				bool hasWiki = await ClipboardUtil.get_WindowsClipboardService().SetTextAsync("/wiki ");
+				if (hasWiki)
+				{
+					Keyboard.Stroke((VirtualKeyShort)86, true);
 					await Task.Delay(delay);
-					Keyboard.Stroke((VirtualKeyShort)37, true);
-					await Task.Delay(delay);
-					bool hasWiki = await ClipboardUtil.get_WindowsClipboardService().SetTextAsync("/wiki ");
-					if (hasWiki)
-					{
-						Keyboard.Stroke((VirtualKeyShort)86, true);
-						await Task.Delay(delay);
-					}
-					Keyboard.Release((VirtualKeyShort)162, true);
-					if (!hasWiki)
-					{
-						Keyboard.Stroke((VirtualKeyShort)8, true);
-						Keyboard.Stroke((VirtualKeyShort)13, true);
-						return;
-					}
-					await Task.Delay(delay);
+				}
+				Keyboard.Release((VirtualKeyShort)162, true);
+				if (!hasWiki)
+				{
+					Keyboard.Stroke((VirtualKeyShort)8, true);
 					Keyboard.Stroke((VirtualKeyShort)13, true);
-					await Task.Delay(delay);
-					await Task.Delay(300);
-					GameService.GameIntegration.get_Gw2Instance().FocusGw2();
+					return;
+				}
+				await Task.Delay(delay);
+				Keyboard.Stroke((VirtualKeyShort)13, true);
+				await Task.Delay(delay);
+				await Task.Delay(300);
+				GameService.GameIntegration.get_Gw2Instance().FocusGw2();
+				if (_disableOnSearch.get_Value())
+				{
+					Disable();
 				}
 			}
 			catch
@@ -228,6 +234,17 @@ namespace Kenedia.Modules.QoL.SubModules.WikiSearch
 			flowPanel2.ContentPadding = new RectangleDimensions(5, 2);
 			((FlowPanel)flowPanel2).set_ControlPadding(new Vector2(0f, 2f));
 			FlowPanel contentFlowPanel = flowPanel2;
+			Func<string> localizedLabelContent = () => string.Format(strings.ShowInHotbar_Name, $"{SubModuleType}");
+			Func<string> localizedTooltip = () => string.Format(strings.ShowInHotbar_Description, $"{SubModuleType}");
+			int width2 = width - 16;
+			Checkbox checkbox = new Checkbox();
+			((Control)checkbox).set_Height(20);
+			((Checkbox)checkbox).set_Checked(base.ShowInHotbar.get_Value());
+			checkbox.CheckedChangedAction = delegate(bool b)
+			{
+				base.ShowInHotbar.set_Value(b);
+			};
+			UI.WrapWithLabel(localizedLabelContent, localizedTooltip, (Container)(object)contentFlowPanel, width2, (Control)(object)checkbox);
 			KeybindingAssigner keybindingAssigner = new KeybindingAssigner();
 			((Control)keybindingAssigner).set_Parent((Container)(object)contentFlowPanel);
 			((Control)keybindingAssigner).set_Width(width - 16);
@@ -252,28 +269,28 @@ namespace Kenedia.Modules.QoL.SubModules.WikiSearch
 			};
 			keybindingAssigner.SetLocalizedKeyBindingName = () => string.Format(strings.HotkeyEntry_Name, $"{SubModuleType}");
 			keybindingAssigner.SetLocalizedTooltip = () => string.Format(strings.HotkeyEntry_Description, $"{SubModuleType}");
-			Func<string> localizedLabelContent = () => strings.DisableOnSearch_Name;
-			Func<string> localizedTooltip = () => strings.DisableOnSearch_Tooltip;
-			int width2 = width - 16;
-			Checkbox checkbox = new Checkbox();
-			((Control)checkbox).set_Height(20);
-			((Checkbox)checkbox).set_Checked(_disableOnSearch.get_Value());
-			checkbox.CheckedChangedAction = delegate(bool b)
-			{
-				_disableOnSearch.set_Value(b);
-			};
-			UI.WrapWithLabel(localizedLabelContent, localizedTooltip, (Container)(object)contentFlowPanel, width2, (Control)(object)checkbox);
-			Func<string> localizedLabelContent2 = () => strings.DisableOnRightClick_Name;
-			Func<string> localizedTooltip2 = () => strings.DisableOnRightClick_Tooltip;
+			Func<string> localizedLabelContent2 = () => strings.DisableOnSearch_Name;
+			Func<string> localizedTooltip2 = () => strings.DisableOnSearch_Tooltip;
 			int width3 = width - 16;
 			Checkbox checkbox2 = new Checkbox();
 			((Control)checkbox2).set_Height(20);
-			((Checkbox)checkbox2).set_Checked(_disableOnRightClick.get_Value());
+			((Checkbox)checkbox2).set_Checked(_disableOnSearch.get_Value());
 			checkbox2.CheckedChangedAction = delegate(bool b)
+			{
+				_disableOnSearch.set_Value(b);
+			};
+			UI.WrapWithLabel(localizedLabelContent2, localizedTooltip2, (Container)(object)contentFlowPanel, width3, (Control)(object)checkbox2);
+			Func<string> localizedLabelContent3 = () => strings.DisableOnRightClick_Name;
+			Func<string> localizedTooltip3 = () => strings.DisableOnRightClick_Tooltip;
+			int width4 = width - 16;
+			Checkbox checkbox3 = new Checkbox();
+			((Control)checkbox3).set_Height(20);
+			((Checkbox)checkbox3).set_Checked(_disableOnRightClick.get_Value());
+			checkbox3.CheckedChangedAction = delegate(bool b)
 			{
 				_disableOnRightClick.set_Value(b);
 			};
-			UI.WrapWithLabel(localizedLabelContent2, localizedTooltip2, (Container)(object)contentFlowPanel, width3, (Control)(object)checkbox2);
+			UI.WrapWithLabel(localizedLabelContent3, localizedTooltip3, (Container)(object)contentFlowPanel, width4, (Control)(object)checkbox3);
 		}
 	}
 }

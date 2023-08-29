@@ -73,17 +73,17 @@ namespace Kenedia.Modules.QoL.SubModules.ItemDestruction
 		{
 			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0244: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0119: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0198: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024f: Unknown result type (might be due to invalid IL or missing references)
 			SubModuleUI uI_Elements = UI_Elements;
 			MouseContainer mouseContainer = new MouseContainer();
 			((Control)mouseContainer).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
@@ -96,6 +96,7 @@ namespace Kenedia.Modules.QoL.SubModules.ItemDestruction
 			((Control)mouseContainer).set_Visible(base.Enabled);
 			mouseContainer.ContentPadding = new RectangleDimensions(5);
 			mouseContainer.MouseOffset = new Point(25);
+			((Control)mouseContainer).set_ZIndex(int.MaxValue);
 			MouseContainer item = mouseContainer;
 			_mouseContainer = mouseContainer;
 			uI_Elements.Add((Control)(object)item);
@@ -233,6 +234,7 @@ namespace Kenedia.Modules.QoL.SubModules.ItemDestruction
 		{
 			if (base.Enabled && _disableOnRightClick.get_Value())
 			{
+				Disable();
 				State = ItemDestructionState.None;
 			}
 		}
@@ -357,6 +359,17 @@ namespace Kenedia.Modules.QoL.SubModules.ItemDestruction
 			flowPanel2.ContentPadding = new RectangleDimensions(5, 2);
 			((FlowPanel)flowPanel2).set_ControlPadding(new Vector2(0f, 2f));
 			FlowPanel contentFlowPanel = flowPanel2;
+			Func<string> localizedLabelContent = () => string.Format(strings.ShowInHotbar_Name, $"{SubModuleType}");
+			Func<string> localizedTooltip = () => string.Format(strings.ShowInHotbar_Description, $"{SubModuleType}");
+			int width2 = width - 16;
+			Checkbox checkbox = new Checkbox();
+			((Control)checkbox).set_Height(20);
+			((Checkbox)checkbox).set_Checked(base.ShowInHotbar.get_Value());
+			checkbox.CheckedChangedAction = delegate(bool b)
+			{
+				base.ShowInHotbar.set_Value(b);
+			};
+			UI.WrapWithLabel(localizedLabelContent, localizedTooltip, (Container)(object)contentFlowPanel, width2, (Control)(object)checkbox);
 			KeybindingAssigner keybindingAssigner = new KeybindingAssigner();
 			((Control)keybindingAssigner).set_Parent((Container)(object)contentFlowPanel);
 			((Control)keybindingAssigner).set_Width(width - 16);
@@ -381,17 +394,17 @@ namespace Kenedia.Modules.QoL.SubModules.ItemDestruction
 			};
 			keybindingAssigner.SetLocalizedKeyBindingName = () => string.Format(strings.HotkeyEntry_Name, $"{SubModuleType}");
 			keybindingAssigner.SetLocalizedTooltip = () => string.Format(strings.HotkeyEntry_Description, $"{SubModuleType}");
-			Func<string> localizedLabelContent = () => strings.DisableOnRightClick_Name;
-			Func<string> localizedTooltip = () => strings.DisableOnRightClick_Tooltip;
-			int width2 = width - 16;
-			Checkbox checkbox = new Checkbox();
-			((Control)checkbox).set_Height(20);
-			((Checkbox)checkbox).set_Checked(_disableOnRightClick.get_Value());
-			checkbox.CheckedChangedAction = delegate(bool b)
+			Func<string> localizedLabelContent2 = () => strings.DisableOnRightClick_Name;
+			Func<string> localizedTooltip2 = () => strings.DisableOnRightClick_Tooltip;
+			int width3 = width - 16;
+			Checkbox checkbox2 = new Checkbox();
+			((Control)checkbox2).set_Height(20);
+			((Checkbox)checkbox2).set_Checked(_disableOnRightClick.get_Value());
+			checkbox2.CheckedChangedAction = delegate(bool b)
 			{
 				_disableOnRightClick.set_Value(b);
 			};
-			UI.WrapWithLabel(localizedLabelContent, localizedTooltip, (Container)(object)contentFlowPanel, width2, (Control)(object)checkbox);
+			UI.WrapWithLabel(localizedLabelContent2, localizedTooltip2, (Container)(object)contentFlowPanel, width3, (Control)(object)checkbox2);
 		}
 	}
 }

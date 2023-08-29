@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
@@ -9,6 +10,7 @@ using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Models;
 using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.Core.Utility;
+using Kenedia.Modules.QoL.Controls;
 using Kenedia.Modules.QoL.Res;
 using Kenedia.Modules.QoL.Services;
 using Microsoft.Xna.Framework;
@@ -72,7 +74,7 @@ namespace Kenedia.Modules.QoL.SubModules
 			}
 		}
 
-		public HotbarButton ToggleControl { get; }
+		public ModuleButton ToggleControl { get; }
 
 		public DetailedTexture Icon { get; }
 
@@ -88,15 +90,16 @@ namespace Kenedia.Modules.QoL.SubModules
 
 		public SubModule(SettingCollection settings)
 		{
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
 			_settings = settings;
 			DefineSettings(_settings);
+			Name = SubModuleType.ToString();
 			Icon = new DetailedTexture
 			{
 				Texture = AsyncTexture2D.op_Implicit(BaseModule<QoL, StandardWindow, Kenedia.Modules.QoL.Services.Settings, PathCollection>.ModuleInstance.ContentsManager.GetTexture($"textures\\{SubModuleType}.png")),
 				HoveredTexture = AsyncTexture2D.op_Implicit(BaseModule<QoL, StandardWindow, Kenedia.Modules.QoL.Services.Settings, PathCollection>.ModuleInstance.ContentsManager.GetTexture($"textures\\{SubModuleType}_Hovered.png"))
 			};
-			HotbarButton obj = new HotbarButton
+			ModuleButton obj = new ModuleButton
 			{
 				Icon = Icon
 			};
@@ -108,6 +111,7 @@ namespace Kenedia.Modules.QoL.SubModules
 			{
 				Enabled = b;
 			};
+			obj.Module = this;
 			ToggleControl = obj;
 		}
 
@@ -125,7 +129,7 @@ namespace Kenedia.Modules.QoL.SubModules
 				return;
 			}
 			toggle.Checked = Enabled;
-			HotbarButton toggleControl = ToggleControl;
+			ModuleButton toggleControl = ToggleControl;
 			if (toggleControl != null)
 			{
 				Container parent = ((Control)toggleControl).get_Parent();
@@ -143,10 +147,12 @@ namespace Kenedia.Modules.QoL.SubModules
 
 		protected virtual void Enable()
 		{
+			Enabled = true;
 		}
 
 		protected virtual void Disable()
 		{
+			Enabled = false;
 		}
 
 		protected virtual void SwitchLanguage()
@@ -166,6 +172,31 @@ namespace Kenedia.Modules.QoL.SubModules
 			ShowInHotbar = Settings.DefineSetting<bool>("ShowInHotbar", true, (Func<string>)(() => string.Format(strings.ShowInHotbar_Name, $"{SubModuleType}")), (Func<string>)(() => string.Format(strings.ShowInHotbar_Description, $"{SubModuleType}")));
 			HotKey.get_Value().set_Enabled(true);
 			HotKey.get_Value().add_Activated((EventHandler<EventArgs>)HotKey_Activated);
+			ShowInHotbar.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowInHotbar_SettingChanged);
+		}
+
+		private void ShowInHotbar_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
+		{
+			if (ToggleControl != null)
+			{
+				ModuleButton toggleControl = ToggleControl;
+				object obj;
+				if (toggleControl == null)
+				{
+					obj = null;
+				}
+				else
+				{
+					Container parent = ((Control)toggleControl).get_Parent();
+					obj = ((parent != null) ? ((Control)parent).get_Parent() : null);
+				}
+				ModuleHotbar moduleHotbar = obj as ModuleHotbar;
+				if (moduleHotbar != null)
+				{
+					moduleHotbar.SetButtonsExpanded();
+					((Control)moduleHotbar).RecalculateLayout();
+				}
+			}
 		}
 
 		private void HotKey_Activated(object sender, EventArgs e)
@@ -189,7 +220,7 @@ namespace Kenedia.Modules.QoL.SubModules
 			if (!_unloaded)
 			{
 				_unloaded = true;
-				HotbarButton toggleControl = ToggleControl;
+				ModuleButton toggleControl = ToggleControl;
 				if (toggleControl != null)
 				{
 					((Control)toggleControl).Dispose();

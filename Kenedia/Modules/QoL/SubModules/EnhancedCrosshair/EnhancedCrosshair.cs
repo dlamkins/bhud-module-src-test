@@ -8,6 +8,7 @@ using Blish_HUD.Settings;
 using Kenedia.Modules.Core.Controls;
 using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Models;
+using Kenedia.Modules.Core.Utility;
 using Kenedia.Modules.QoL.Res;
 using Kenedia.Modules.QoL.Services;
 using Microsoft.Xna.Framework;
@@ -109,6 +110,17 @@ namespace Kenedia.Modules.QoL.SubModules.EnhancedCrosshair
 			((FlowPanel)flowPanel2).set_FlowDirection((ControlFlowDirection)3);
 			((FlowPanel)flowPanel2).set_ControlPadding(new Vector2(10f));
 			FlowPanel contentFlowPanel = flowPanel2;
+			Func<string> localizedLabelContent = () => string.Format(strings.ShowInHotbar_Name, $"{SubModuleType}");
+			Func<string> localizedTooltip = () => string.Format(strings.ShowInHotbar_Description, $"{SubModuleType}");
+			int width2 = width - 16;
+			Checkbox checkbox = new Checkbox();
+			((Control)checkbox).set_Height(20);
+			((Checkbox)checkbox).set_Checked(base.ShowInHotbar.get_Value());
+			checkbox.CheckedChangedAction = delegate(bool b)
+			{
+				base.ShowInHotbar.set_Value(b);
+			};
+			UI.WrapWithLabel(localizedLabelContent, localizedTooltip, (Container)(object)contentFlowPanel, width2, (Control)(object)checkbox);
 			KeybindingAssigner keybindingAssigner = new KeybindingAssigner();
 			((Control)keybindingAssigner).set_Parent((Container)(object)contentFlowPanel);
 			((Control)keybindingAssigner).set_Width(width);

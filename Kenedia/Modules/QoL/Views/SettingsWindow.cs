@@ -65,6 +65,8 @@ namespace Kenedia.Modules.QoL.Views
 			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
 			Panel panel = new Panel();
 			((Control)panel).set_Parent((Container)(object)_contentPanel);
 			((Control)panel).set_Width(((Container)this).get_ContentRegion().Width - 20);
@@ -98,9 +100,26 @@ namespace Kenedia.Modules.QoL.Views
 			((Dropdown)dropdown).set_SelectedItem($"{_settings.HotbarExpandDirection.get_Value()}".SplitStringOnUppercase());
 			dropdown.ValueChangedAction = delegate(string b)
 			{
-				_settings.HotbarExpandDirection.set_Value(Enum.TryParse<ExpandType>(b.RemoveSpaces(), out var result) ? result : _settings.HotbarExpandDirection.get_Value());
+				_settings.HotbarExpandDirection.set_Value(Enum.TryParse<ExpandType>(b.RemoveSpaces(), out var result2) ? result2 : _settings.HotbarExpandDirection.get_Value());
 			};
 			UI.WrapWithLabel(localizedLabelContent, localizedTooltip, (Container)(object)contentFlowPanel, width, (Control)(object)dropdown);
+			Func<string> localizedLabelContent2 = () => strings.HotbarButtonSorting_Name;
+			Func<string> localizedTooltip2 = () => strings.HotbarButtonSorting_Tooltip;
+			int width2 = ((Container)this).get_ContentRegion().Width - 20 - 16;
+			Dropdown dropdown2 = new Dropdown();
+			((Control)dropdown2).set_Location(new Point(250, 0));
+			((Control)dropdown2).set_Parent((Container)(object)contentFlowPanel);
+			dropdown2.SetLocalizedItems = () => new List<string>
+			{
+				$"{SortType.ActivesFirst}".SplitStringOnUppercase(),
+				$"{SortType.ByModuleName}".SplitStringOnUppercase()
+			};
+			((Dropdown)dropdown2).set_SelectedItem($"{_settings.HotbarButtonSorting.get_Value()}".SplitStringOnUppercase());
+			dropdown2.ValueChangedAction = delegate(string b)
+			{
+				_settings.HotbarButtonSorting.set_Value(Enum.TryParse<SortType>(b.RemoveSpaces(), out var result) ? result : _settings.HotbarButtonSorting.get_Value());
+			};
+			UI.WrapWithLabel(localizedLabelContent2, localizedTooltip2, (Container)(object)contentFlowPanel, width2, (Control)(object)dropdown2);
 		}
 
 		private void CreateClientSettings()

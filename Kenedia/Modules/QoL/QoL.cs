@@ -11,6 +11,7 @@ using Blish_HUD.Settings;
 using Kenedia.Modules.Core.Controls;
 using Kenedia.Modules.Core.Models;
 using Kenedia.Modules.Core.Views;
+using Kenedia.Modules.QoL.Controls;
 using Kenedia.Modules.QoL.Services;
 using Kenedia.Modules.QoL.SubModules;
 using Kenedia.Modules.QoL.SubModules.CopyItemName;
@@ -31,7 +32,7 @@ namespace Kenedia.Modules.QoL
 	{
 		private double _tick;
 
-		public Hotbar Hotbar { get; set; }
+		public ModuleHotbar Hotbar { get; set; }
 
 		public Dictionary<SubModuleType, SubModule> SubModules { get; } = new Dictionary<SubModuleType, SubModule>();
 
@@ -50,6 +51,15 @@ namespace Kenedia.Modules.QoL
 			base.DefineSettings(settings);
 			base.Settings = new Settings(settings);
 			base.Settings.HotbarExpandDirection.add_SettingChanged((EventHandler<ValueChangedEventArgs<ExpandType>>)HotbarExpandDirection_SettingChanged);
+			base.Settings.HotbarButtonSorting.add_SettingChanged((EventHandler<ValueChangedEventArgs<SortType>>)HotbarButtonSorting_SettingChanged);
+		}
+
+		private void HotbarButtonSorting_SettingChanged(object sender, ValueChangedEventArgs<SortType> e)
+		{
+			if (Hotbar != null)
+			{
+				Hotbar.SortType = e.get_NewValue();
+			}
 		}
 
 		private void HotbarExpandDirection_SettingChanged(object sender, ValueChangedEventArgs<ExpandType> e)
@@ -109,25 +119,26 @@ namespace Kenedia.Modules.QoL
 			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
 			base.LoadGUI();
-			Hotbar hotbar = Hotbar;
+			ModuleHotbar hotbar = Hotbar;
 			if (hotbar != null)
 			{
 				((Control)hotbar).Dispose();
 			}
-			Hotbar hotbar2 = new Hotbar();
-			((Control)hotbar2).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			hotbar2.TextureRectangle = new Rectangle(new Point(50, 50), new Point(200, 50));
-			((Control)hotbar2).set_Location(base.Settings.HotbarPosition.get_Value());
-			hotbar2.ExpandType = base.Settings.HotbarExpandDirection.get_Value();
-			hotbar2.OnMoveAction = delegate(Point p)
+			ModuleHotbar moduleHotbar = new ModuleHotbar();
+			((Control)moduleHotbar).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			moduleHotbar.TextureRectangle = new Rectangle(new Point(50, 50), new Point(200, 50));
+			((Control)moduleHotbar).set_Location(base.Settings.HotbarPosition.get_Value());
+			moduleHotbar.ExpandType = base.Settings.HotbarExpandDirection.get_Value();
+			moduleHotbar.SortType = base.Settings.HotbarButtonSorting.get_Value();
+			moduleHotbar.OnMoveAction = delegate(Point p)
 			{
 				//IL_000b: Unknown result type (might be due to invalid IL or missing references)
 				base.Settings.HotbarPosition.set_Value(p);
 			};
-			hotbar2.OpenSettingsAction = delegate
+			moduleHotbar.OpenSettingsAction = delegate
 			{
 				BaseSettingsWindow settingsWindow2 = base.SettingsWindow;
 				if (settingsWindow2 != null)
@@ -135,7 +146,7 @@ namespace Kenedia.Modules.QoL
 					((WindowBase2)settingsWindow2).ToggleWindow();
 				}
 			};
-			Hotbar = hotbar2;
+			Hotbar = moduleHotbar;
 			foreach (SubModule subModule in SubModules.Values)
 			{
 				Hotbar.AddItem((ICheckable)(object)subModule.ToggleControl);
@@ -160,7 +171,7 @@ namespace Kenedia.Modules.QoL
 			{
 				((Control)settingsWindow).Dispose();
 			}
-			Hotbar hotbar = Hotbar;
+			ModuleHotbar hotbar = Hotbar;
 			if (hotbar != null)
 			{
 				((Control)hotbar).Dispose();
@@ -175,6 +186,8 @@ namespace Kenedia.Modules.QoL
 				value?.Unload();
 			}
 			SubModules.Clear();
+			base.Settings.HotbarExpandDirection.remove_SettingChanged((EventHandler<ValueChangedEventArgs<ExpandType>>)HotbarExpandDirection_SettingChanged);
+			base.Settings.HotbarButtonSorting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<SortType>>)HotbarButtonSorting_SettingChanged);
 		}
 
 		protected override void ReloadKey_Activated(object sender, EventArgs e)

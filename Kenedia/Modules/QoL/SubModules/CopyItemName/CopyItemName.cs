@@ -38,7 +38,7 @@ namespace Kenedia.Modules.QoL.SubModules.CopyItemName
 
 		private readonly Label _destroyLabel;
 
-		private SettingEntry<bool> _disableOnSearch;
+		private SettingEntry<bool> _disableOnCopy;
 
 		private SettingEntry<bool> _disableOnRightClick;
 
@@ -53,17 +53,17 @@ namespace Kenedia.Modules.QoL.SubModules.CopyItemName
 		{
 			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0243: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0119: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0198: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024e: Unknown result type (might be due to invalid IL or missing references)
 			SubModuleUI uI_Elements = UI_Elements;
 			MouseContainer mouseContainer = new MouseContainer();
 			((Control)mouseContainer).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
@@ -76,6 +76,7 @@ namespace Kenedia.Modules.QoL.SubModules.CopyItemName
 			((Control)mouseContainer).set_Visible(base.Enabled);
 			mouseContainer.ContentPadding = new RectangleDimensions(5);
 			mouseContainer.MouseOffset = new Point(25);
+			((Control)mouseContainer).set_ZIndex(int.MaxValue);
 			MouseContainer item = mouseContainer;
 			_mouseContainer = mouseContainer;
 			uI_Elements.Add((Control)(object)item);
@@ -128,7 +129,7 @@ namespace Kenedia.Modules.QoL.SubModules.CopyItemName
 			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0047: Expected O, but got Unknown
 			base.DefineSettings(settings);
-			_disableOnSearch = settings.DefineSetting<bool>("_disableOnSearch", true, (Func<string>)null, (Func<string>)null);
+			_disableOnCopy = settings.DefineSetting<bool>("_disableOnCopy", true, (Func<string>)null, (Func<string>)null);
 			_disableOnRightClick = settings.DefineSetting<bool>("_disableOnRightClick", true, (Func<string>)null, (Func<string>)null);
 			_modifierToChat = settings.DefineSetting<KeyBinding>("_modifierToChat", new KeyBinding((Keys)160), (Func<string>)null, (Func<string>)null);
 			_returnType = settings.DefineSetting<ReturnType>("_returnType", ReturnType.Name, (Func<string>)null, (Func<string>)null);
@@ -239,6 +240,10 @@ namespace Kenedia.Modules.QoL.SubModules.CopyItemName
 				}
 				await ClipboardUtil.get_WindowsClipboardService().SetTextAsync(text3);
 				((Label)_destroyLabel).set_Text(text3);
+				if (_disableOnCopy.get_Value())
+				{
+					Disable();
+				}
 			}
 			catch
 			{
@@ -248,7 +253,7 @@ namespace Kenedia.Modules.QoL.SubModules.CopyItemName
 		public override void CreateSettingsPanel(FlowPanel flowPanel, int width)
 		{
 			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0233: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0285: Unknown result type (might be due to invalid IL or missing references)
 			Panel panel = new Panel();
 			((Control)panel).set_Parent((Container)(object)flowPanel);
 			((Control)panel).set_Width(width);
@@ -266,6 +271,17 @@ namespace Kenedia.Modules.QoL.SubModules.CopyItemName
 			flowPanel2.ContentPadding = new RectangleDimensions(5, 2);
 			((FlowPanel)flowPanel2).set_ControlPadding(new Vector2(0f, 2f));
 			FlowPanel contentFlowPanel = flowPanel2;
+			Func<string> localizedLabelContent = () => string.Format(strings.ShowInHotbar_Name, $"{SubModuleType}");
+			Func<string> localizedTooltip = () => string.Format(strings.ShowInHotbar_Description, $"{SubModuleType}");
+			int width2 = width - 16;
+			Checkbox checkbox = new Checkbox();
+			((Control)checkbox).set_Height(20);
+			((Checkbox)checkbox).set_Checked(base.ShowInHotbar.get_Value());
+			checkbox.CheckedChangedAction = delegate(bool b)
+			{
+				base.ShowInHotbar.set_Value(b);
+			};
+			UI.WrapWithLabel(localizedLabelContent, localizedTooltip, (Container)(object)contentFlowPanel, width2, (Control)(object)checkbox);
 			KeybindingAssigner keybindingAssigner = new KeybindingAssigner();
 			((Control)keybindingAssigner).set_Parent((Container)(object)contentFlowPanel);
 			((Control)keybindingAssigner).set_Width(width - 16);
@@ -290,31 +306,31 @@ namespace Kenedia.Modules.QoL.SubModules.CopyItemName
 			};
 			keybindingAssigner.SetLocalizedKeyBindingName = () => string.Format(strings.HotkeyEntry_Name, $"{SubModuleType}");
 			keybindingAssigner.SetLocalizedTooltip = () => string.Format(strings.HotkeyEntry_Description, $"{SubModuleType}");
-			Func<string> localizedLabelContent = () => strings.DisableOnSearch_Name;
-			Func<string> localizedTooltip = () => strings.DisableOnSearch_Tooltip;
-			int width2 = width - 16;
-			Checkbox checkbox = new Checkbox();
-			((Control)checkbox).set_Height(20);
-			((Checkbox)checkbox).set_Checked(_disableOnSearch.get_Value());
-			checkbox.CheckedChangedAction = delegate(bool b)
-			{
-				_disableOnSearch.set_Value(b);
-			};
-			UI.WrapWithLabel(localizedLabelContent, localizedTooltip, (Container)(object)contentFlowPanel, width2, (Control)(object)checkbox);
-			Func<string> localizedLabelContent2 = () => strings.DisableOnRightClick_Name;
-			Func<string> localizedTooltip2 = () => strings.DisableOnRightClick_Tooltip;
+			Func<string> localizedLabelContent2 = () => strings.DisableOnCopy_Name;
+			Func<string> localizedTooltip2 = () => strings.DisableOnCopy_Tooltip;
 			int width3 = width - 16;
 			Checkbox checkbox2 = new Checkbox();
 			((Control)checkbox2).set_Height(20);
-			((Checkbox)checkbox2).set_Checked(_disableOnRightClick.get_Value());
+			((Checkbox)checkbox2).set_Checked(_disableOnCopy.get_Value());
 			checkbox2.CheckedChangedAction = delegate(bool b)
+			{
+				_disableOnCopy.set_Value(b);
+			};
+			UI.WrapWithLabel(localizedLabelContent2, localizedTooltip2, (Container)(object)contentFlowPanel, width3, (Control)(object)checkbox2);
+			Func<string> localizedLabelContent3 = () => strings.DisableOnRightClick_Name;
+			Func<string> localizedTooltip3 = () => strings.DisableOnRightClick_Tooltip;
+			int width4 = width - 16;
+			Checkbox checkbox3 = new Checkbox();
+			((Control)checkbox3).set_Height(20);
+			((Checkbox)checkbox3).set_Checked(_disableOnRightClick.get_Value());
+			checkbox3.CheckedChangedAction = delegate(bool b)
 			{
 				_disableOnRightClick.set_Value(b);
 			};
-			UI.WrapWithLabel(localizedLabelContent2, localizedTooltip2, (Container)(object)contentFlowPanel, width3, (Control)(object)checkbox2);
-			Func<string> localizedLabelContent3 = () => strings.ReturnType_Name;
-			Func<string> localizedTooltip3 = () => strings.ReturnType_Tooltip;
-			int width4 = width - 16;
+			UI.WrapWithLabel(localizedLabelContent3, localizedTooltip3, (Container)(object)contentFlowPanel, width4, (Control)(object)checkbox3);
+			Func<string> localizedLabelContent4 = () => strings.ReturnType_Name;
+			Func<string> localizedTooltip4 = () => strings.ReturnType_Tooltip;
+			int width5 = width - 16;
 			Dropdown dropdown = new Dropdown();
 			((Control)dropdown).set_Location(new Point(250, 0));
 			((Control)dropdown).set_Parent((Container)(object)contentFlowPanel);
@@ -329,7 +345,7 @@ namespace Kenedia.Modules.QoL.SubModules.CopyItemName
 			{
 				_returnType.set_Value(Enum.TryParse<ReturnType>(b.RemoveSpaces(), out var result) ? result : _returnType.get_Value());
 			};
-			UI.WrapWithLabel(localizedLabelContent3, localizedTooltip3, (Container)(object)contentFlowPanel, width4, (Control)(object)dropdown);
+			UI.WrapWithLabel(localizedLabelContent4, localizedTooltip4, (Container)(object)contentFlowPanel, width5, (Control)(object)dropdown);
 		}
 	}
 }

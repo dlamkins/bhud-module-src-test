@@ -191,6 +191,17 @@ namespace Kenedia.Modules.QoL.SubModules.ZoomOut
 			flowPanel2.ContentPadding = new RectangleDimensions(5, 2);
 			((FlowPanel)flowPanel2).set_ControlPadding(new Vector2(0f, 2f));
 			FlowPanel contentFlowPanel = flowPanel2;
+			Func<string> localizedLabelContent = () => string.Format(strings.ShowInHotbar_Name, $"{SubModuleType}");
+			Func<string> localizedTooltip = () => string.Format(strings.ShowInHotbar_Description, $"{SubModuleType}");
+			int width2 = width - 16;
+			Checkbox checkbox = new Checkbox();
+			((Control)checkbox).set_Height(20);
+			((Checkbox)checkbox).set_Checked(base.ShowInHotbar.get_Value());
+			checkbox.CheckedChangedAction = delegate(bool b)
+			{
+				base.ShowInHotbar.set_Value(b);
+			};
+			UI.WrapWithLabel(localizedLabelContent, localizedTooltip, (Container)(object)contentFlowPanel, width2, (Control)(object)checkbox);
 			KeybindingAssigner keybindingAssigner = new KeybindingAssigner();
 			((Control)keybindingAssigner).set_Parent((Container)(object)contentFlowPanel);
 			((Control)keybindingAssigner).set_Width(width - 16);
@@ -263,39 +274,39 @@ namespace Kenedia.Modules.QoL.SubModules.ZoomOut
 			};
 			keybindingAssigner3.SetLocalizedKeyBindingName = () => strings.ManualZoom_Name;
 			keybindingAssigner3.SetLocalizedTooltip = () => strings.ManualZoom_Tooltip;
-			Func<string> localizedLabelContent = () => strings.ZoomOnCameraChange_Name;
-			Func<string> localizedTooltip = () => strings.ZoomOnCameraChange_Tooltip;
-			int width2 = width - 16;
-			Checkbox checkbox = new Checkbox();
-			((Control)checkbox).set_Height(20);
-			((Checkbox)checkbox).set_Checked(_zoomOnCameraChange.get_Value());
-			checkbox.CheckedChangedAction = delegate(bool b)
-			{
-				_zoomOnCameraChange.set_Value(b);
-			};
-			UI.WrapWithLabel(localizedLabelContent, localizedTooltip, (Container)(object)contentFlowPanel, width2, (Control)(object)checkbox);
-			Func<string> localizedLabelContent2 = () => strings.ZoomOnFoVChange_Name;
-			Func<string> localizedTooltip2 = () => strings.ZoomOnFoVChange_Tooltip;
+			Func<string> localizedLabelContent2 = () => strings.ZoomOnCameraChange_Name;
+			Func<string> localizedTooltip2 = () => strings.ZoomOnCameraChange_Tooltip;
 			int width3 = width - 16;
 			Checkbox checkbox2 = new Checkbox();
 			((Control)checkbox2).set_Height(20);
-			((Checkbox)checkbox2).set_Checked(_zoomOnFoVChange.get_Value());
+			((Checkbox)checkbox2).set_Checked(_zoomOnCameraChange.get_Value());
 			checkbox2.CheckedChangedAction = delegate(bool b)
 			{
-				_zoomOnFoVChange.set_Value(b);
+				_zoomOnCameraChange.set_Value(b);
 			};
 			UI.WrapWithLabel(localizedLabelContent2, localizedTooltip2, (Container)(object)contentFlowPanel, width3, (Control)(object)checkbox2);
-			Func<string> localizedLabelContent3 = () => strings.AllowManualZoom_Name;
-			Func<string> localizedTooltip3 = () => strings.AllowManualZoom_Tooltip;
+			Func<string> localizedLabelContent3 = () => strings.ZoomOnFoVChange_Name;
+			Func<string> localizedTooltip3 = () => strings.ZoomOnFoVChange_Tooltip;
 			int width4 = width - 16;
 			Checkbox checkbox3 = new Checkbox();
 			((Control)checkbox3).set_Height(20);
-			((Checkbox)checkbox3).set_Checked(_allowManualZoom.get_Value());
+			((Checkbox)checkbox3).set_Checked(_zoomOnFoVChange.get_Value());
 			checkbox3.CheckedChangedAction = delegate(bool b)
+			{
+				_zoomOnFoVChange.set_Value(b);
+			};
+			UI.WrapWithLabel(localizedLabelContent3, localizedTooltip3, (Container)(object)contentFlowPanel, width4, (Control)(object)checkbox3);
+			Func<string> localizedLabelContent4 = () => strings.AllowManualZoom_Name;
+			Func<string> localizedTooltip4 = () => strings.AllowManualZoom_Tooltip;
+			int width5 = width - 16;
+			Checkbox checkbox4 = new Checkbox();
+			((Control)checkbox4).set_Height(20);
+			((Checkbox)checkbox4).set_Checked(_allowManualZoom.get_Value());
+			checkbox4.CheckedChangedAction = delegate(bool b)
 			{
 				_allowManualZoom.set_Value(b);
 			};
-			UI.WrapWithLabel(localizedLabelContent3, localizedTooltip3, (Container)(object)contentFlowPanel, width4, (Control)(object)checkbox3);
+			UI.WrapWithLabel(localizedLabelContent4, localizedTooltip4, (Container)(object)contentFlowPanel, width5, (Control)(object)checkbox4);
 		}
 	}
 }

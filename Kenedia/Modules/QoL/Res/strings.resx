@@ -32,7 +32,8 @@
   <data name="ReturnType_Name"><value>Return Type</value></data>
   <data name="ShowWeeklyReset_Tooltip"><value>Show the time until weekly reset on the bottom left of the minimap</value></data>
   <data name="CrosshairSize_Tooltip"><value>Size of the Crosshair</value></data>
-  <data name="ShowInHotbar_Name"><value>Show in hotbar</value></data>
+  <data name="ShowInHotbar_Name"><value>Show {0} on hotbar</value></data>
+  <data name="HotbarButtonSorting_Tooltip"><value>Order of the hotbars buttons</value></data>
   <data name="ModifierToSendToChat_Tooltip"><value>The Modifier (Default: SHIFT) to link an item to the chat</value></data>
   <data name="ZoomOnCameraChange_Tooltip"><value>Trigger the zoom out on camera changes</value></data>
   <data name="DisableOnSearch_Tooltip"><value>Disables the module after a wiki search</value></data>
@@ -43,6 +44,8 @@
   <data name="WaypointChatcode_Name"><value>Waypoint Chatcode</value></data>
   <data name="CrosshairSize_Name"><value>Crosshair Size</value></data>
   <data name="ShowDailyReset_Name"><value>Show Daily Reset</value></data>
+  <data name="PasteWaypointFromClipboard_Tooltip"><value>Check if the clipboard content is a waypoint chatlink, if so use that instead of the waypoint code</value></data>
+  <data name="PasteWaypointFromClipboard_Name"><value>Use Clipboard first</value></data>
   <data name="HotkeyEntry_Description"><value>Hotkey to toggle {0}</value></data>
   <data name="HotbarExpandDirection_Tooltip"><value>Direction the hotbar should expand towards</value></data>
   <data name="DisableOnSearch_Name"><value>Disable after Search</value></data>
@@ -57,10 +60,13 @@
   <data name="ModifierToSendToChat_Name"><value>Modifier to link item to chat</value></data>
   <data name="ShowServerTime_Tooltip"><value>Show the server time on the bottom left of the minimap</value></data>
   <data name="PasteWaypointHotkey_Tooltip"><value>Hotkey to trigger the waypoint paste</value></data>
+  <data name="HotbarButtonSorting_Name"><value>Hotbar Button Order</value></data>
   <data name="ManualZoom_Tooltip"><value>Manual trigger to zoom out the furthest possible.</value></data>
-  <data name="ShowInHotbar_Description"><value>Show {0} in the hotbar</value></data>
+  <data name="ShowInHotbar_Description"><value>Show {0} on the hotbar</value></data>
   <data name="ZoomOutKey_Name"><value>Zoom Out</value></data>
+  <data name="DisableOnCopy_Tooltip"><value>Disable the sub module after copying a items name</value></data>
   <data name="ShowDailyReset_Tooltip"><value>Show the time until daily reset on the bottom left of the minimap</value></data>
+  <data name="DisableOnCopy_Name"><value>Disable after copy</value></data>
   <data name="AllowManualZoom_Name"><value>Allow manual zoom</value></data>
   <data name="Days"><value>days</value></data>
   <data name="HotkeyEntry_Name"><value>{0} Hotkey</value></data>

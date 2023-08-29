@@ -52,6 +52,10 @@ namespace Kenedia.Modules.QoL.Res
 
 		internal static string Days => ResourceManager.GetString("Days", resourceCulture);
 
+		internal static string DisableOnCopy_Name => ResourceManager.GetString("DisableOnCopy_Name", resourceCulture);
+
+		internal static string DisableOnCopy_Tooltip => ResourceManager.GetString("DisableOnCopy_Tooltip", resourceCulture);
+
 		internal static string DisableOnRightClick_Name => ResourceManager.GetString("DisableOnRightClick_Name", resourceCulture);
 
 		internal static string DisableOnRightClick_Tooltip => ResourceManager.GetString("DisableOnRightClick_Tooltip", resourceCulture);
@@ -59,6 +63,10 @@ namespace Kenedia.Modules.QoL.Res
 		internal static string DisableOnSearch_Name => ResourceManager.GetString("DisableOnSearch_Name", resourceCulture);
 
 		internal static string DisableOnSearch_Tooltip => ResourceManager.GetString("DisableOnSearch_Tooltip", resourceCulture);
+
+		internal static string HotbarButtonSorting_Name => ResourceManager.GetString("HotbarButtonSorting_Name", resourceCulture);
+
+		internal static string HotbarButtonSorting_Tooltip => ResourceManager.GetString("HotbarButtonSorting_Tooltip", resourceCulture);
 
 		internal static string HotbarExpandDirection_Name => ResourceManager.GetString("HotbarExpandDirection_Name", resourceCulture);
 
@@ -75,6 +83,10 @@ namespace Kenedia.Modules.QoL.Res
 		internal static string ModifierToSendToChat_Name => ResourceManager.GetString("ModifierToSendToChat_Name", resourceCulture);
 
 		internal static string ModifierToSendToChat_Tooltip => ResourceManager.GetString("ModifierToSendToChat_Tooltip", resourceCulture);
+
+		internal static string PasteWaypointFromClipboard_Name => ResourceManager.GetString("PasteWaypointFromClipboard_Name", resourceCulture);
+
+		internal static string PasteWaypointFromClipboard_Tooltip => ResourceManager.GetString("PasteWaypointFromClipboard_Tooltip", resourceCulture);
 
 		internal static string PasteWaypointHotkey_Name => ResourceManager.GetString("PasteWaypointHotkey_Name", resourceCulture);
 
