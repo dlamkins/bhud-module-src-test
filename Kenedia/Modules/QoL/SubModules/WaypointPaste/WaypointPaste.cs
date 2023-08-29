@@ -156,8 +156,8 @@ namespace Kenedia.Modules.QoL.SubModules.WaypointPaste
 			flowPanel2.ContentPadding = new RectangleDimensions(5, 2);
 			((FlowPanel)flowPanel2).set_ControlPadding(new Vector2(0f, 2f));
 			FlowPanel contentFlowPanel = flowPanel2;
-			Func<string> localizedLabelContent = () => strings.ShowInHotbar_Name;
-			Func<string> localizedTooltip = () => strings.ShowInHotbar_Description;
+			Func<string> localizedLabelContent = () => string.Format(strings.ShowInHotbar_Name, base.Name);
+			Func<string> localizedTooltip = () => string.Format(strings.ShowInHotbar_Description, base.Name);
 			int width2 = width - 16;
 			Checkbox checkbox = new Checkbox();
 			((Control)checkbox).set_Height(20);
