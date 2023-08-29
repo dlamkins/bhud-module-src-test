@@ -220,64 +220,62 @@ namespace Kenedia.Modules.Characters.Services
 			return result;
 		}
 
-		public void Start(Character_Model character, bool ignoreOCR = false, Logger logger = null)
+		public async void Start(Character_Model character, bool ignoreOCR = false, Logger logger = null)
 		{
-			Task.Run(async delegate
+			try
 			{
-				try
+				PlayerCharacter player = GameService.Gw2Mumble.get_PlayerCharacter();
+				bool inCharSelection = (_settings.UseBetaGamestate.get_Value() ? (!_gameState.IsIngame) : (!GameService.GameIntegration.get_Gw2Instance().get_IsInGame()));
+				if (player != null && player.get_Name() == character.Name && !inCharSelection)
 				{
-					PlayerCharacter player = GameService.Gw2Mumble.get_PlayerCharacter();
-					bool inCharSelection = (_settings.UseBetaGamestate.get_Value() ? (!_gameState.IsIngame) : (!GameService.GameIntegration.get_Gw2Instance().get_IsInGame()));
-					if (player == null || !(player.get_Name() == character.Name) || inCharSelection)
+					return;
+				}
+				_cancellationTokenSource?.Cancel();
+				_cancellationTokenSource = new CancellationTokenSource();
+				_cancellationTokenSource.CancelAfter(90000);
+				Character = character;
+				_state = ((!GameService.GameIntegration.get_Gw2Instance().get_IsInGame()) ? SwappingState.LoggedOut : SwappingState.None);
+				_ignoreOCR = ignoreOCR;
+				this.Started?.Invoke(null, null);
+				Status = string.Format(strings.CharacterSwap_SwitchTo, Character.Name);
+				while (true)
+				{
+					SwappingState state = _state;
+					if (state == SwappingState.Done || state == SwappingState.CharacterFullyLost || state == SwappingState.Canceled || _cancellationTokenSource.Token.IsCancellationRequested)
 					{
-						_cancellationTokenSource?.Cancel();
-						_cancellationTokenSource = new CancellationTokenSource();
-						_cancellationTokenSource.CancelAfter(90000);
-						Character = character;
-						_state = ((!GameService.GameIntegration.get_Gw2Instance().get_IsInGame()) ? SwappingState.LoggedOut : SwappingState.None);
-						_ignoreOCR = ignoreOCR;
-						this.Started?.Invoke(null, null);
-						Status = string.Format(strings.CharacterSwap_SwitchTo, Character.Name);
-						while (true)
+						break;
+					}
+					try
+					{
+						await Run(_cancellationTokenSource.Token);
+						switch (_state)
 						{
-							SwappingState state = _state;
-							if (state == SwappingState.Done || state == SwappingState.CharacterFullyLost || state == SwappingState.Canceled || _cancellationTokenSource.Token.IsCancellationRequested)
+						case SwappingState.Done:
+							Status = strings.Status_Done;
+							if (GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && _settings.CloseWindowOnSwap.get_Value())
 							{
-								break;
+								HideMainWindow?.Invoke();
 							}
-							try
+							break;
+						case SwappingState.CharacterFullyLost:
+							Status = string.Format(strings.CharacterSwap_FailedSwap, Character.Name);
+							this.Failed?.Invoke(null, null);
+							if (_settings.AutoSortCharacters.get_Value())
 							{
-								await Run(_cancellationTokenSource.Token);
-								switch (_state)
-								{
-								case SwappingState.Done:
-									Status = strings.Status_Done;
-									if (GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && _settings.CloseWindowOnSwap.get_Value())
-									{
-										HideMainWindow?.Invoke();
-									}
-									break;
-								case SwappingState.CharacterFullyLost:
-									Status = string.Format(strings.CharacterSwap_FailedSwap, Character.Name);
-									this.Failed?.Invoke(null, null);
-									if (_settings.AutoSortCharacters.get_Value())
-									{
-										CharacterSorting.Start();
-									}
-									break;
-								}
+								CharacterSorting.Start();
 							}
-							catch (TaskCanceledException)
-							{
-							}
+							break;
 						}
-						this.Finished?.Invoke(null, null);
+					}
+					catch (TaskCanceledException)
+					{
 					}
 				}
-				catch
-				{
-				}
-			});
+				this.Finished?.Invoke(null, null);
+			}
+			catch
+			{
+			}
 		}
 
 		private async Task Delay(CancellationToken cancellationToken, int? delay = null, double? partial = null)

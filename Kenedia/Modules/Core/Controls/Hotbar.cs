@@ -8,6 +8,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Models;
+using Kenedia.Modules.Core.Res;
 using Kenedia.Modules.Core.Structs;
 using Kenedia.Modules.Core.Utility;
 using Microsoft.Xna.Framework;
@@ -76,6 +77,8 @@ namespace Kenedia.Modules.Core.Controls
 
 		public Action<Point> OnMoveAction { get; set; }
 
+		public Action OpenSettingsAction { get; set; }
+
 		public Hotbar()
 		{
 			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
@@ -83,6 +86,10 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0121: Expected O, but got Unknown
 			((Container)this).set_WidthSizingMode((SizingMode)1);
 			((Container)this).set_HeightSizingMode((SizingMode)1);
 			base.BorderColor = Color.get_Black();
@@ -100,6 +107,13 @@ namespace Kenedia.Modules.Core.Controls
 			_itemsPanel = flowPanel;
 			OnExpandTypeChanged(this, new ValueChangedEventArgs<ExpandType>(ExpandType?.LeftToRight, ExpandType?.LeftToRight));
 			ExpandType = ExpandType.BottomToTop;
+			((Control)this).set_BasicTooltipText($"Press {MoveModifier} and drag the hotbar to the desired position");
+			((Control)_expandDummy).set_BasicTooltipText($"Press {MoveModifier} and drag the hotbar to the desired position");
+			((Control)this).set_Menu(new ContextMenuStrip());
+			((Control)this).get_Menu().AddMenuItem((ContextMenuStripItem)(object)new ContextMenuItem(() => strings_common.OpenSettings, delegate
+			{
+				OpenSettingsAction?.Invoke();
+			}));
 		}
 
 		private void OnExpandTypeChanged(object sender, ValueChangedEventArgs<ExpandType> e)
@@ -182,6 +196,7 @@ namespace Kenedia.Modules.Core.Controls
 					base.ContentPadding = new RectangleDimensions(0, 2);
 					break;
 				}
+				ForceOnScreen();
 				((Control)this).RecalculateLayout();
 			}
 		}
@@ -597,29 +612,29 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
 			Rectangle screen = ((Control)Control.get_Graphics().get_SpriteScreen()).get_LocalBounds();
 			if (((Control)this).get_Location().X < ((Rectangle)(ref screen)).get_Left())
 			{
 				((Control)this).set_Location(new Point(((Rectangle)(ref screen)).get_Left(), ((Control)this).get_Location().Y));
 			}
-			else if (((Control)this).get_Location().X + ((Control)this).get_Width() > ((Rectangle)(ref screen)).get_Right())
+			if (((Control)this).get_Location().X + ((Control)this).get_Width() > ((Rectangle)(ref screen)).get_Right())
 			{
 				((Control)this).set_Location(new Point(((Rectangle)(ref screen)).get_Right() - ((Control)this).get_Width(), ((Control)this).get_Location().Y));
 			}
-			else if (((Control)this).get_Location().Y < ((Rectangle)(ref screen)).get_Top())
+			if (((Control)this).get_Location().Y < ((Rectangle)(ref screen)).get_Top())
 			{
 				((Control)this).set_Location(new Point(((Control)this).get_Location().X, ((Rectangle)(ref screen)).get_Top()));
 			}
-			else if (((Control)this).get_Location().Y + ((Control)this).get_Height() > ((Rectangle)(ref screen)).get_Bottom())
+			if (((Control)this).get_Location().Y + ((Control)this).get_Height() > ((Rectangle)(ref screen)).get_Bottom())
 			{
 				((Control)this).set_Location(new Point(((Control)this).get_Location().X, ((Rectangle)(ref screen)).get_Bottom() - ((Control)this).get_Height()));
 			}

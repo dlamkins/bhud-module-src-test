@@ -67,6 +67,8 @@ namespace Kenedia.Modules.Core.Controls
 			}
 		}
 
+		public Func<string> SetLocalizedTooltip { get; set; }
+
 		public NotificationBadge()
 			: this()
 		{

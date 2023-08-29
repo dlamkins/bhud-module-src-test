@@ -2,6 +2,7 @@ using System;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Kenedia.Modules.Core.Controls;
+using Kenedia.Modules.Core.Interfaces;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended.BitmapFonts;
 
@@ -46,6 +47,33 @@ namespace Kenedia.Modules.Core.Utility
 				((Control)num).Dispose();
 				((Control)label).Dispose();
 				((Control)p).Dispose();
+			}
+		}
+
+		public static void WrapWithLabel(Func<string> localizedLabelContent, Func<string> localizedTooltip, Container parent, int width, Control ctrl)
+		{
+			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+			FlowPanel flowPanel2 = new FlowPanel();
+			((Control)flowPanel2).set_Parent(parent);
+			((Control)flowPanel2).set_Width(width);
+			((Container)flowPanel2).set_HeightSizingMode((SizingMode)1);
+			((FlowPanel)flowPanel2).set_FlowDirection((ControlFlowDirection)2);
+			flowPanel2.SetLocalizedTooltip = localizedTooltip;
+			FlowPanel flowPanel = flowPanel2;
+			Label label2 = new Label();
+			((Control)label2).set_Parent((Container)(object)flowPanel);
+			((Control)label2).set_Height(ctrl.get_Height());
+			((Control)label2).set_Width((width - flowPanel.ContentPadding.Horizontal - (int)((FlowPanel)flowPanel).get_ControlPadding().X * 2) / 2);
+			label2.SetLocalizedText = localizedLabelContent;
+			label2.SetLocalizedTooltip = localizedTooltip;
+			((Label)label2).set_VerticalAlignment((VerticalAlignment)1);
+			Label label = label2;
+			ctrl.set_Parent((Container)(object)flowPanel);
+			ctrl.set_Width(((Control)label).get_Width());
+			ILocalizable localizable = ctrl as ILocalizable;
+			if (localizable != null)
+			{
+				localizable.SetLocalizedTooltip = localizedTooltip;
 			}
 		}
 	}

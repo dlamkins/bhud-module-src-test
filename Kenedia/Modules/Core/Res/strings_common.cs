@@ -78,6 +78,8 @@ namespace Kenedia.Modules.Core.Res
 
 		internal static string Settings => ResourceManager.GetString("Settings", resourceCulture);
 
+		internal static string SharedSettings => ResourceManager.GetString("SharedSettings", resourceCulture);
+
 		internal static string ShowCornerIcon => ResourceManager.GetString("ShowCornerIcon", resourceCulture);
 
 		internal static string ShowCornerIcon_ttp => ResourceManager.GetString("ShowCornerIcon_ttp", resourceCulture);
