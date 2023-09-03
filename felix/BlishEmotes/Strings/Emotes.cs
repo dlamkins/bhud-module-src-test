@@ -62,6 +62,8 @@ namespace felix.BlishEmotes.Strings
 
 		internal static string geargrind => ResourceManager.GetString("geargrind", resourceCulture);
 
+		internal static string heroic => ResourceManager.GetString("heroic", resourceCulture);
+
 		internal static string hiss => ResourceManager.GetString("hiss", resourceCulture);
 
 		internal static string kneel => ResourceManager.GetString("kneel", resourceCulture);

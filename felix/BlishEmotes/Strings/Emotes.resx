@@ -57,6 +57,7 @@
   <data name="scissors"><value>Scissors</value></data>
   <data name="rockout"><value>Rockout</value></data>
   <data name="beckon"><value>Beckon</value></data>
+  <data name="heroic"><value>Heroic</value></data>
   <data name="facepalm"><value>Facepalm</value></data>
   <data name="playdead"><value>Playdead</value></data>
   <data name="thanks"><value>Thanks</value></data>
