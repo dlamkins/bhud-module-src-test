@@ -1,27 +1,33 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Input;
 using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Controls.Extern;
 using Blish_HUD.Controls.Intern;
+using Blish_HUD.Input;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
+using Gw2Sharp.Models;
 using Gw2Sharp.WebApi;
+using Gw2Sharp.WebApi.V2;
+using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using WindowsInput;
 
 namespace EmoteTome
 {
-	[Export(typeof(Blish_HUD.Modules.Module))]
-	public class Module : Blish_HUD.Modules.Module
+	[Export(typeof(Module))]
+	public class Module : Module
 	{
 		private CornerIcon tomeCornerIcon;
 
@@ -43,111 +49,121 @@ namespace EmoteTome
 
 		private List<Emote> rankEmoteList = new List<Emote>();
 
-		private Microsoft.Xna.Framework.Color activatedColor = new Microsoft.Xna.Framework.Color(250, 250, 250);
+		private Color activatedColor = new Color(250, 250, 250);
 
-		private Microsoft.Xna.Framework.Color lockedColor = new Microsoft.Xna.Framework.Color(30, 30, 30);
+		private Color lockedColor = new Color(30, 30, 30);
 
-		private Microsoft.Xna.Framework.Color noTargetColor = new Microsoft.Xna.Framework.Color(130, 130, 130);
+		private Color noTargetColor = new Color(130, 130, 130);
 
-		private Microsoft.Xna.Framework.Color cooldownColor = new Microsoft.Xna.Framework.Color(50, 50, 50);
+		private Color cooldownColor = new Color(50, 50, 50);
 
 		private bool checkedAPIForUnlock;
 
 		private static readonly Logger Logger = Logger.GetLogger<Module>();
 
-		internal SettingsManager SettingsManager => ModuleParameters.SettingsManager;
+		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
-		internal ContentsManager ContentsManager => ModuleParameters.ContentsManager;
+		internal ContentsManager ContentsManager => base.ModuleParameters.get_ContentsManager();
 
-		internal DirectoriesManager DirectoriesManager => ModuleParameters.DirectoriesManager;
+		internal DirectoriesManager DirectoriesManager => base.ModuleParameters.get_DirectoriesManager();
 
-		internal Gw2ApiManager Gw2ApiManager => ModuleParameters.Gw2ApiManager;
-
-		[DllImport("user32.dll")]
-		public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
-
-		[DllImport("user32.dll")]
-		public static extern bool PostMessage(int hWnd, uint Msg, int wParam, int lParam);
+		internal Gw2ApiManager Gw2ApiManager => base.ModuleParameters.get_Gw2ApiManager();
 
 		[ImportingConstructor]
 		public Module([Import("ModuleParameters")] ModuleParameters moduleParameters)
-			: base(moduleParameters)
+			: this(moduleParameters)
 		{
-		}
+		}//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
 		}
 
-		protected override void Initialize()
+		protected override async Task LoadAsync()
 		{
-			switch (GameService.Overlay.UserLocale.Value)
+			Locale value = GameService.Overlay.get_UserLocale().get_Value();
+			switch ((int)value)
 			{
-			case Locale.English:
+			case 0:
 				language = BadLocalization.ENGLISH;
 				break;
-			case Locale.French:
+			case 3:
 				language = BadLocalization.FRENCH;
 				break;
-			case Locale.German:
+			case 2:
 				language = BadLocalization.GERMAN;
 				break;
-			case Locale.Spanish:
+			case 1:
 				language = BadLocalization.SPANISH;
 				break;
 			default:
 				language = BadLocalization.ENGLISH;
 				break;
 			}
-		}
-
-		protected override async Task LoadAsync()
-		{
-			tomeWindow = new StandardWindow(ContentsManager.GetTexture("WindowBackground.png"), new Microsoft.Xna.Framework.Rectangle(40, 26, 913, 691), new Microsoft.Xna.Framework.Rectangle(70, 71, 839, 605))
+			Module module = this;
+			CornerIcon val = new CornerIcon();
+			val.set_Icon(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("CornerIcon.png")));
+			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			((Control)val).set_Visible(false);
+			module.tomeCornerIcon = val;
+			((Control)tomeCornerIcon).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				Parent = GameService.Graphics.SpriteScreen,
-				Title = BadLocalization.WINDOWTITLE[language],
-				SavesPosition = true,
-				SavesSize = true,
-				Id = "0001",
-				CanResize = true
-			};
-			Checkbox targetCheckbox = new Checkbox
-			{
-				Text = BadLocalization.TARGETCHECKBOXTEXT[language],
-				Location = new Point(0, 0),
-				BasicTooltipText = BadLocalization.TARGETCHECKBOXTOOLTIP[language],
-				Parent = tomeWindow
-			};
-			Checkbox synchronCheckbox = new Checkbox
-			{
-				Text = BadLocalization.SYNCHRONCHECKBOXTEXT[language],
-				Location = new Point(0, 20),
-				BasicTooltipText = BadLocalization.SYNCHRONCHECKBOXTOOLTIP[language],
-				Parent = tomeWindow
-			};
-			FlowPanel mainPanel = new FlowPanel
-			{
-				Size = new Point(tomeWindow.ContentRegion.Width, tomeWindow.ContentRegion.Height),
-				Location = new Point(0, 50),
-				FlowDirection = ControlFlowDirection.SingleTopToBottom,
-				Parent = tomeWindow,
-				CanScroll = true,
-				Padding = new Thickness(20f)
-			};
-			FlowPanel corePanel = new FlowPanel
-			{
-				ShowBorder = true,
-				Title = BadLocalization.COREPANELTITLE[language],
-				Size = new Point(mainPanel.ContentRegion.Width, mainPanel.ContentRegion.Height),
-				Parent = mainPanel,
-				CanCollapse = true,
-				FlowDirection = ControlFlowDirection.LeftToRight,
-				HeightSizingMode = SizingMode.AutoSize,
-				AutoSizePadding = new Point(5, 5),
-				ControlPadding = new Vector2(5f, 5f),
-				OuterControlPadding = new Vector2(5f, 5f)
-			};
+				((WindowBase2)tomeWindow).ToggleWindow();
+				if (((Control)tomeWindow).get_Visible() && !checkedAPIForUnlock)
+				{
+					checkUnlockedEmotesByAPI();
+					checkedAPIForUnlock = true;
+				}
+			});
+			Module module2 = this;
+			StandardWindow val2 = new StandardWindow(ContentsManager.GetTexture("WindowBackground.png"), new Rectangle(40, 26, 913, 691), new Rectangle(70, 71, 839, 605));
+			((Control)val2).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			((WindowBase2)val2).set_Title(BadLocalization.WINDOWTITLE[language]);
+			((WindowBase2)val2).set_SavesPosition(true);
+			((WindowBase2)val2).set_SavesSize(true);
+			((WindowBase2)val2).set_Id("0001");
+			((WindowBase2)val2).set_CanResize(true);
+			module2.tomeWindow = val2;
+			Checkbox val3 = new Checkbox();
+			val3.set_Text(BadLocalization.TARGETCHECKBOXTEXT[language]);
+			((Control)val3).set_Location(new Point(0, 0));
+			((Control)val3).set_BasicTooltipText(BadLocalization.TARGETCHECKBOXTOOLTIP[language]);
+			((Control)val3).set_Parent((Container)(object)tomeWindow);
+			Checkbox targetCheckbox = val3;
+			Checkbox val4 = new Checkbox();
+			val4.set_Text(BadLocalization.SYNCHRONCHECKBOXTEXT[language]);
+			((Control)val4).set_Location(new Point(0, 20));
+			((Control)val4).set_BasicTooltipText(BadLocalization.SYNCHRONCHECKBOXTOOLTIP[language]);
+			((Control)val4).set_Parent((Container)(object)tomeWindow);
+			Checkbox synchronCheckbox = val4;
+			FlowPanel val5 = new FlowPanel();
+			((Control)val5).set_Size(new Point(((Container)tomeWindow).get_ContentRegion().Width, ((Container)tomeWindow).get_ContentRegion().Height));
+			((Control)val5).set_Location(new Point(0, 50));
+			val5.set_FlowDirection((ControlFlowDirection)3);
+			((Control)val5).set_Parent((Container)(object)tomeWindow);
+			((Panel)val5).set_CanScroll(true);
+			((Control)val5).set_Padding(new Thickness(20f));
+			FlowPanel mainPanel = val5;
+			FlowPanel val6 = new FlowPanel();
+			((Panel)val6).set_ShowBorder(true);
+			((Panel)val6).set_Title(BadLocalization.COREPANELTITLE[language]);
+			((Control)val6).set_Size(new Point(((Container)mainPanel).get_ContentRegion().Width, ((Container)mainPanel).get_ContentRegion().Height));
+			((Control)val6).set_Parent((Container)(object)mainPanel);
+			((Panel)val6).set_CanCollapse(true);
+			val6.set_FlowDirection((ControlFlowDirection)0);
+			((Container)val6).set_HeightSizingMode((SizingMode)1);
+			((Container)val6).set_AutoSizePadding(new Point(5, 5));
+			val6.set_ControlPadding(new Vector2(5f, 5f));
+			val6.set_OuterControlPadding(new Vector2(5f, 5f));
+			FlowPanel corePanel = val6;
 			EmoteLibrary library = new EmoteLibrary(ContentsManager);
 			coreEmoteList = library.loadCoreEmotes();
 			int size = 64;
@@ -158,35 +174,33 @@ namespace EmoteTome
 				{
 					continue;
 				}
-				Image emoteImage3 = new Image(ContentsManager.GetTexture(emote3.getImagePath()))
-				{
-					Size = new Point(size, size),
-					BasicTooltipText = emote3.getToolTipp()[language],
-					Parent = corePanel
-				};
-				emoteImage3.Click += delegate
+				Image val7 = new Image(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture(emote3.getImagePath())));
+				((Control)val7).set_Size(new Point(size, size));
+				((Control)val7).set_BasicTooltipText(emote3.getToolTipp()[language]);
+				((Control)val7).set_Parent((Container)(object)corePanel);
+				Image emoteImage3 = val7;
+				((Control)emoteImage3).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
 					if (emoteAllowed())
 					{
-						activateEmote(emote3.getChatCode(), targetCheckbox.Checked, synchronCheckbox.Checked);
+						activateEmote(emote3.getChatCode(), targetCheckbox.get_Checked(), synchronCheckbox.get_Checked());
 					}
-				};
+				});
 				coreEmoteImages.Add(emoteImage3);
 				emote3.setImg(emoteImage3);
 			}
-			FlowPanel unlockablePanel = new FlowPanel
-			{
-				ShowBorder = true,
-				Title = BadLocalization.UNLOCKABLEPANELTITLE[language],
-				Size = new Point(mainPanel.ContentRegion.Width, mainPanel.ContentRegion.Height),
-				Parent = mainPanel,
-				CanCollapse = true,
-				FlowDirection = ControlFlowDirection.LeftToRight,
-				HeightSizingMode = SizingMode.AutoSize,
-				AutoSizePadding = new Point(5, 5),
-				ControlPadding = new Vector2(5f, 5f),
-				OuterControlPadding = new Vector2(5f, 5f)
-			};
+			FlowPanel val8 = new FlowPanel();
+			((Panel)val8).set_ShowBorder(true);
+			((Panel)val8).set_Title(BadLocalization.UNLOCKABLEPANELTITLE[language]);
+			((Control)val8).set_Size(new Point(((Container)mainPanel).get_ContentRegion().Width, ((Container)mainPanel).get_ContentRegion().Height));
+			((Control)val8).set_Parent((Container)(object)mainPanel);
+			((Panel)val8).set_CanCollapse(true);
+			val8.set_FlowDirection((ControlFlowDirection)0);
+			((Container)val8).set_HeightSizingMode((SizingMode)1);
+			((Container)val8).set_AutoSizePadding(new Point(5, 5));
+			val8.set_ControlPadding(new Vector2(5f, 5f));
+			val8.set_OuterControlPadding(new Vector2(5f, 5f));
+			FlowPanel unlockablePanel = val8;
 			unlockEmoteList = library.loadUnlockEmotes();
 			List<Image> unlockEmoteImages = new List<Image>();
 			foreach (Emote emote2 in unlockEmoteList)
@@ -195,38 +209,36 @@ namespace EmoteTome
 				{
 					continue;
 				}
-				Image emoteImage2 = new Image(ContentsManager.GetTexture(emote2.getImagePath()))
-				{
-					Size = new Point(size, size),
-					BasicTooltipText = emote2.getToolTipp()[language],
-					Parent = unlockablePanel,
-					Tint = lockedColor,
-					Enabled = false
-				};
-				emoteImage2.Click += delegate
+				Image val9 = new Image(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture(emote2.getImagePath())));
+				((Control)val9).set_Size(new Point(size, size));
+				((Control)val9).set_BasicTooltipText(emote2.getToolTipp()[language]);
+				((Control)val9).set_Parent((Container)(object)unlockablePanel);
+				val9.set_Tint(lockedColor);
+				((Control)val9).set_Enabled(false);
+				Image emoteImage2 = val9;
+				((Control)emoteImage2).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
 					if (emoteAllowed())
 					{
-						activateEmote(emote2.getChatCode(), targetCheckbox.Checked, synchronCheckbox.Checked);
+						activateEmote(emote2.getChatCode(), targetCheckbox.get_Checked(), synchronCheckbox.get_Checked());
 					}
-				};
+				});
 				unlockEmoteImages.Add(emoteImage2);
 				emote2.setImg(emoteImage2);
 				emote2.isDeactivatedByLocked(newBool: true);
 			}
-			FlowPanel rankPanel = new FlowPanel
-			{
-				ShowBorder = true,
-				Title = BadLocalization.RANKPANELTITLE[language],
-				Size = new Point(mainPanel.ContentRegion.Width, mainPanel.ContentRegion.Height),
-				Parent = mainPanel,
-				CanCollapse = true,
-				FlowDirection = ControlFlowDirection.LeftToRight,
-				HeightSizingMode = SizingMode.AutoSize,
-				AutoSizePadding = new Point(5, 5),
-				ControlPadding = new Vector2(5f, 5f),
-				OuterControlPadding = new Vector2(5f, 5f)
-			};
+			FlowPanel val10 = new FlowPanel();
+			((Panel)val10).set_ShowBorder(true);
+			((Panel)val10).set_Title(BadLocalization.RANKPANELTITLE[language]);
+			((Control)val10).set_Size(new Point(((Container)mainPanel).get_ContentRegion().Width, ((Container)mainPanel).get_ContentRegion().Height));
+			((Control)val10).set_Parent((Container)(object)mainPanel);
+			((Panel)val10).set_CanCollapse(true);
+			val10.set_FlowDirection((ControlFlowDirection)0);
+			((Container)val10).set_HeightSizingMode((SizingMode)1);
+			((Container)val10).set_AutoSizePadding(new Point(5, 5));
+			val10.set_ControlPadding(new Vector2(5f, 5f));
+			val10.set_OuterControlPadding(new Vector2(5f, 5f));
+			FlowPanel rankPanel = val10;
 			rankEmoteList = library.loadRankEmotes();
 			List<Image> cooldownEmoteImages = new List<Image>();
 			foreach (Emote emote in rankEmoteList)
@@ -235,49 +247,59 @@ namespace EmoteTome
 				{
 					continue;
 				}
-				Image emoteImage = new Image(ContentsManager.GetTexture(emote.getImagePath()))
-				{
-					Size = new Point(size, size),
-					BasicTooltipText = emote.getToolTipp()[language],
-					Parent = rankPanel,
-					Tint = lockedColor,
-					Enabled = false
-				};
-				emoteImage.Click += delegate
+				Image val11 = new Image(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture(emote.getImagePath())));
+				((Control)val11).set_Size(new Point(size, size));
+				((Control)val11).set_BasicTooltipText(emote.getToolTipp()[language]);
+				((Control)val11).set_Parent((Container)(object)rankPanel);
+				val11.set_Tint(lockedColor);
+				((Control)val11).set_Enabled(false);
+				Image emoteImage = val11;
+				((Control)emoteImage).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
 					if (emoteAllowed())
 					{
-						activateEmote(emote.getChatCode(), targetCheckbox.Checked, synchronCheckbox.Checked);
+						activateEmote(emote.getChatCode(), targetCheckbox.get_Checked(), synchronCheckbox.get_Checked());
 						activateCooldown();
 					}
-				};
+				});
 				cooldownEmoteImages.Add(emoteImage);
 				emote.setImg(emoteImage);
 				emote.isDeactivatedByLocked(newBool: true);
 			}
-			Panel spacePanel = new Panel
+			Panel val12 = new Panel();
+			((Control)val12).set_Size(new Point(((Container)mainPanel).get_ContentRegion().Width, 50));
+			((Control)val12).set_Parent((Container)(object)mainPanel);
+			Panel spacePanel = val12;
+			((Control)tomeWindow).add_Resized((EventHandler<ResizedEventArgs>)delegate
 			{
-				Size = new Point(mainPanel.ContentRegion.Width, 50),
-				Parent = mainPanel
-			};
-			tomeWindow.Resized += delegate
+				//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+				//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+				//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+				((Control)mainPanel).set_Width(((Container)tomeWindow).get_ContentRegion().Width);
+				((Control)mainPanel).set_Height(((Container)tomeWindow).get_ContentRegion().Height);
+				((Control)corePanel).set_Width(((Container)mainPanel).get_ContentRegion().Width);
+				((Control)unlockablePanel).set_Width(((Container)mainPanel).get_ContentRegion().Width);
+				((Control)rankPanel).set_Width(((Container)mainPanel).get_ContentRegion().Width);
+				((Control)spacePanel).set_Width(((Container)mainPanel).get_ContentRegion().Width);
+			});
+			targetCheckbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
 			{
-				mainPanel.Width = tomeWindow.ContentRegion.Width;
-				mainPanel.Height = tomeWindow.ContentRegion.Height;
-				corePanel.Width = mainPanel.ContentRegion.Width;
-				unlockablePanel.Width = mainPanel.ContentRegion.Width;
-				rankPanel.Width = mainPanel.ContentRegion.Width;
-				spacePanel.Width = mainPanel.ContentRegion.Width;
-			};
-			targetCheckbox.CheckedChanged += delegate
-			{
-				if (targetCheckbox.Checked)
+				//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+				//IL_015c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
+				//IL_021d: Unknown result type (might be due to invalid IL or missing references)
+				if (targetCheckbox.get_Checked())
 				{
 					foreach (Emote current in coreEmoteList)
 					{
 						if (!current.hasTarget())
 						{
-							current.getImg().Tint = noTargetColor;
+							current.getImg().set_Tint(noTargetColor);
 							current.isDeactivatedByTargeting(newBool: true);
 						}
 					}
@@ -285,7 +307,7 @@ namespace EmoteTome
 					{
 						if (!current2.hasTarget() && !current2.isDeactivatedByLocked())
 						{
-							current2.getImg().Tint = noTargetColor;
+							current2.getImg().set_Tint(noTargetColor);
 							current2.isDeactivatedByTargeting(newBool: true);
 						}
 					}
@@ -295,7 +317,7 @@ namespace EmoteTome
 						{
 							if (!current3.isDeactivatedByCooldown())
 							{
-								current3.getImg().Tint = noTargetColor;
+								current3.getImg().set_Tint(noTargetColor);
 							}
 							current3.isDeactivatedByTargeting(newBool: true);
 						}
@@ -305,14 +327,14 @@ namespace EmoteTome
 				{
 					foreach (Emote coreEmote in coreEmoteList)
 					{
-						coreEmote.getImg().Tint = activatedColor;
+						coreEmote.getImg().set_Tint(activatedColor);
 						coreEmote.isDeactivatedByTargeting(newBool: false);
 					}
 					foreach (Emote current5 in unlockEmoteList)
 					{
 						if (!current5.isDeactivatedByLocked())
 						{
-							current5.getImg().Tint = activatedColor;
+							current5.getImg().set_Tint(activatedColor);
 						}
 						current5.isDeactivatedByTargeting(newBool: false);
 					}
@@ -320,20 +342,22 @@ namespace EmoteTome
 					{
 						if (!current6.isDeactivatedByCooldown() && !current6.isDeactivatedByLocked())
 						{
-							current6.getImg().Tint = activatedColor;
+							current6.getImg().set_Tint(activatedColor);
 						}
 						current6.isDeactivatedByTargeting(newBool: false);
 					}
 				}
-			};
+			});
+			((Control)tomeCornerIcon).set_Visible(true);
 			void activateCooldown()
 			{
+				//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 				foreach (Emote emote4 in rankEmoteList)
 				{
 					if (!emote4.isDeactivatedByLocked())
 					{
-						emote4.getImg().Tint = cooldownColor;
-						emote4.getImg().Enabled = false;
+						emote4.getImg().set_Tint(cooldownColor);
+						((Control)emote4.getImg()).set_Enabled(false);
 						emote4.isDeactivatedByCooldown(newBool: true);
 					}
 				}
@@ -343,6 +367,8 @@ namespace EmoteTome
 				aTimer.Enabled = true;
 				void OnTimedEvent(object source, ElapsedEventArgs e)
 				{
+					//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+					//IL_006a: Unknown result type (might be due to invalid IL or missing references)
 					aTimer.Enabled = false;
 					foreach (Emote emote5 in rankEmoteList)
 					{
@@ -350,13 +376,13 @@ namespace EmoteTome
 						{
 							if (emote5.isDeactivatedByTargeting())
 							{
-								emote5.getImg().Tint = noTargetColor;
+								emote5.getImg().set_Tint(noTargetColor);
 							}
 							else
 							{
-								emote5.getImg().Tint = activatedColor;
+								emote5.getImg().set_Tint(activatedColor);
 							}
-							emote5.getImg().Enabled = true;
+							((Control)emote5.getImg()).set_Enabled(true);
 							emote5.isDeactivatedByCooldown(newBool: false);
 						}
 					}
@@ -364,44 +390,26 @@ namespace EmoteTome
 			}
 		}
 
-		private void TomeWindow_ContentResized(object sender, RegionChangedEventArgs e)
-		{
-			throw new NotImplementedException();
-		}
-
-		protected override void OnModuleLoaded(EventArgs e)
-		{
-			tomeCornerIcon = new CornerIcon
-			{
-				Icon = ContentsManager.GetTexture("CornerIcon.png"),
-				Parent = GameService.Graphics.SpriteScreen
-			};
-			tomeCornerIcon.Click += delegate
-			{
-				tomeWindow.ToggleWindow();
-				if (tomeWindow.Visible && !checkedAPIForUnlock)
-				{
-					checkUnlockedEmotesByAPI();
-					checkedAPIForUnlock = true;
-				}
-			};
-			base.OnModuleLoaded(e);
-		}
-
 		protected override void Update(GameTime gameTime)
 		{
-			if (tomeWindow.Visible)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			if (((Control)tomeWindow).get_Visible())
 			{
 				switch (checkPositionSwitch)
 				{
 				case 0:
-					currentPositionA = GameService.Gw2Mumble.PlayerCharacter.Position;
+					currentPositionA = GameService.Gw2Mumble.get_PlayerCharacter().get_Position();
 					break;
 				case 1:
-					currentPositionB = GameService.Gw2Mumble.PlayerCharacter.Position;
+					currentPositionB = GameService.Gw2Mumble.get_PlayerCharacter().get_Position();
 					break;
 				case 2:
-					currentPositionC = GameService.Gw2Mumble.PlayerCharacter.Position;
+					currentPositionC = GameService.Gw2Mumble.get_PlayerCharacter().get_Position();
 					break;
 				}
 				if (checkPositionSwitch >= 2)
@@ -417,28 +425,37 @@ namespace EmoteTome
 
 		protected override void Unload()
 		{
+			((Control)tomeWindow).set_Visible(false);
+			CornerIcon obj = tomeCornerIcon;
+			if (obj != null)
+			{
+				((Control)obj).Dispose();
+			}
 		}
 
 		private bool emoteAllowed()
 		{
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
 			if (IsAnyKeyDown())
 			{
-				ScreenNotification.ShowNotification(BadLocalization.NOEMOTEONKEYPRESSED[language]);
+				ScreenNotification.ShowNotification(BadLocalization.NOEMOTEONKEYPRESSED[language], (NotificationType)0, (Texture2D)null, 4);
 				return false;
 			}
 			if (isPlayerMoving())
 			{
-				ScreenNotification.ShowNotification(BadLocalization.NOEMOTEWHENMOVING[language]);
+				ScreenNotification.ShowNotification(BadLocalization.NOEMOTEWHENMOVING[language], (NotificationType)0, (Texture2D)null, 4);
 				return false;
 			}
-			if (GameService.Gw2Mumble.PlayerCharacter.IsInCombat)
+			if (GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat())
 			{
-				ScreenNotification.ShowNotification(BadLocalization.NOEMOTEINCOMBAT[language]);
+				ScreenNotification.ShowNotification(BadLocalization.NOEMOTEINCOMBAT[language], (NotificationType)0, (Texture2D)null, 4);
 				return false;
 			}
-			if (!GameService.Gw2Mumble.PlayerCharacter.CurrentMount.ToString().Equals("None"))
+			MountType currentMount = GameService.Gw2Mumble.get_PlayerCharacter().get_CurrentMount();
+			if (!((object)(MountType)(ref currentMount)).ToString().Equals("None"))
 			{
-				ScreenNotification.ShowNotification(BadLocalization.NOEMOTEONMOUNT[language]);
+				ScreenNotification.ShowNotification(BadLocalization.NOEMOTEONMOUNT[language], (NotificationType)0, (Texture2D)null, 4);
 				return false;
 			}
 			return true;
@@ -455,25 +472,27 @@ namespace EmoteTome
 			{
 				chatCommand += " *";
 			}
-			if (!GameService.Gw2Mumble.UI.IsTextInputFocused)
+			if (!GameService.Gw2Mumble.get_UI().get_IsTextInputFocused())
 			{
-				Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.RETURN);
+				Keyboard.Stroke((VirtualKeyShort)13, false);
 				Thread.Sleep(25);
 			}
-			Blish_HUD.Controls.Intern.Keyboard.Press(VirtualKeyShort.CONTROL, sendToSystem: true);
-			Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.KEY_A, sendToSystem: true);
+			Keyboard.Press((VirtualKeyShort)17, true);
+			Keyboard.Stroke((VirtualKeyShort)65, true);
 			Thread.Sleep(25);
-			Blish_HUD.Controls.Intern.Keyboard.Release(VirtualKeyShort.CONTROL, sendToSystem: true);
-			Blish_HUD.Controls.Intern.Keyboard.Release(VirtualKeyShort.KEY_A);
-			Blish_HUD.Controls.Intern.Keyboard.Release(VirtualKeyShort.KEY_D);
+			Keyboard.Release((VirtualKeyShort)17, true);
+			Keyboard.Release((VirtualKeyShort)65, false);
+			Keyboard.Release((VirtualKeyShort)68, false);
 			new InputSimulator().Keyboard.TextEntry(chatCommand);
 			Thread.Sleep(50);
-			Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.RETURN);
+			Keyboard.Stroke((VirtualKeyShort)13, false);
 		}
 
 		private bool isPlayerMoving()
 		{
-			if (currentPositionA.Equals(currentPositionB) && currentPositionA.Equals(currentPositionC))
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			if (((Vector3)(ref currentPositionA)).Equals(currentPositionB) && ((Vector3)(ref currentPositionA)).Equals(currentPositionC))
 			{
 				return false;
 			}
@@ -482,11 +501,17 @@ namespace EmoteTome
 
 		public bool IsAnyKeyDown()
 		{
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
 			foreach (object v in Enum.GetValues(typeof(Key)))
 			{
-				if ((Key)v != 0 && System.Windows.Input.Keyboard.IsKeyDown((Key)v))
+				if ((Key)v != 0)
 				{
-					return true;
+					KeyboardState state = Keyboard.GetState();
+					if (((KeyboardState)(ref state)).IsKeyDown((Keys)(Key)v))
+					{
+						return true;
+					}
 				}
 			}
 			return false;
@@ -496,17 +521,19 @@ namespace EmoteTome
 		{
 			List<TokenPermission> apiKeyPermissions = new List<TokenPermission>
 			{
-				TokenPermission.Account,
-				TokenPermission.Progression,
-				TokenPermission.Unlocks,
-				TokenPermission.Pvp
+				(TokenPermission)1,
+				(TokenPermission)6,
+				(TokenPermission)9,
+				(TokenPermission)7
 			};
 			try
 			{
-				if (Gw2ApiManager.HasPermissions(apiKeyPermissions))
+				if (Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)apiKeyPermissions))
 				{
-					await Gw2ApiManager.Gw2ApiClient.V2.Account.Finishers.GetAsync();
-					PvpStats ranks = await Gw2ApiManager.Gw2ApiClient.V2.Pvp.Stats.GetAsync();
+					await ((IBlobClient<IApiV2ObjectList<AccountFinisher>>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
+						.get_Finishers()).GetAsync(default(CancellationToken));
+					PvpStats ranks = await ((IBlobClient<PvpStats>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Pvp()
+						.get_Stats()).GetAsync(default(CancellationToken));
 					foreach (Emote emote7 in rankEmoteList)
 					{
 						if (emote7.getChatCode().Equals("rank"))
@@ -517,53 +544,54 @@ namespace EmoteTome
 						{
 							enableRankEmote(emote7);
 						}
-						else if (emote7.getChatCode().Equals("rank 10") && ranks.PvpRank >= 10)
+						else if (emote7.getChatCode().Equals("rank 10") && ranks.get_PvpRank() >= 10)
 						{
 							enableRankEmote(emote7);
 						}
-						else if (emote7.getChatCode().Equals("rank 20") && ranks.PvpRank >= 20)
+						else if (emote7.getChatCode().Equals("rank 20") && ranks.get_PvpRank() >= 20)
 						{
 							enableRankEmote(emote7);
 						}
-						else if (emote7.getChatCode().Equals("rank 30") && ranks.PvpRank >= 30)
+						else if (emote7.getChatCode().Equals("rank 30") && ranks.get_PvpRank() >= 30)
 						{
 							enableRankEmote(emote7);
 						}
-						else if (emote7.getChatCode().Equals("rank 40") && ranks.PvpRank >= 40)
+						else if (emote7.getChatCode().Equals("rank 40") && ranks.get_PvpRank() >= 40)
 						{
 							enableRankEmote(emote7);
 						}
-						else if (emote7.getChatCode().Equals("rank 50") && ranks.PvpRank >= 50)
+						else if (emote7.getChatCode().Equals("rank 50") && ranks.get_PvpRank() >= 50)
 						{
 							enableRankEmote(emote7);
 						}
-						else if (emote7.getChatCode().Equals("rank 60") && ranks.PvpRank >= 60)
+						else if (emote7.getChatCode().Equals("rank 60") && ranks.get_PvpRank() >= 60)
 						{
 							enableRankEmote(emote7);
 						}
-						else if (emote7.getChatCode().Equals("rank 70") && ranks.PvpRank >= 70)
+						else if (emote7.getChatCode().Equals("rank 70") && ranks.get_PvpRank() >= 70)
 						{
 							enableRankEmote(emote7);
 						}
-						else if (emote7.getChatCode().Equals("rank 80") && ranks.PvpRank >= 80)
+						else if (emote7.getChatCode().Equals("rank 80") && ranks.get_PvpRank() >= 80)
 						{
 							enableRankEmote(emote7);
 						}
 					}
-					List<string> unlockedEmotes = new List<string>(await Gw2ApiManager.Gw2ApiClient.V2.Account.Emotes.GetAsync());
+					List<string> unlockedEmotes = new List<string>((IEnumerable<string>)(await ((IBlobClient<IApiV2ObjectList<string>>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
+						.get_Emotes()).GetAsync(default(CancellationToken))));
 					unlockedEmotes = unlockedEmotes.ConvertAll((string d) => d.ToLower());
 					foreach (Emote emote6 in unlockEmoteList)
 					{
 						if (emote6.getChatCode().Equals("bless") || emote6.getChatCode().Equals("heroic") || emote6.getChatCode().Equals("hiss") || emote6.getChatCode().Equals("magicjuggle") || emote6.getChatCode().Equals("paper") || emote6.getChatCode().Equals("possessed") || emote6.getChatCode().Equals("readbook") || emote6.getChatCode().Equals("rock") || emote6.getChatCode().Equals("scissors") || emote6.getChatCode().Equals("serve") || emote6.getChatCode().Equals("sipcoffee"))
 						{
-							emote6.getImg().Enabled = true;
-							emote6.getImg().Tint = activatedColor;
+							((Control)emote6.getImg()).set_Enabled(true);
+							emote6.getImg().set_Tint(activatedColor);
 							emote6.isDeactivatedByLocked(newBool: false);
 						}
 						if (unlockedEmotes.Contains(emote6.getChatCode()))
 						{
-							emote6.getImg().Enabled = true;
-							emote6.getImg().Tint = activatedColor;
+							((Control)emote6.getImg()).set_Enabled(true);
+							emote6.getImg().set_Tint(activatedColor);
 							emote6.isDeactivatedByLocked(newBool: false);
 						}
 					}
@@ -591,20 +619,23 @@ namespace EmoteTome
 			}
 			void enableLockedEmote(Emote emote)
 			{
-				emote.getImg().Tint = activatedColor;
-				emote.getImg().Enabled = true;
+				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+				emote.getImg().set_Tint(activatedColor);
+				((Control)emote.getImg()).set_Enabled(true);
 				emote.isDeactivatedByLocked(newBool: false);
 			}
 			void enableLockedEmote(Emote emote)
 			{
-				emote.getImg().Tint = activatedColor;
-				emote.getImg().Enabled = true;
+				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+				emote.getImg().set_Tint(activatedColor);
+				((Control)emote.getImg()).set_Enabled(true);
 				emote.isDeactivatedByLocked(newBool: false);
 			}
 			void enableRankEmote(Emote emote)
 			{
-				emote.getImg().Tint = activatedColor;
-				emote.getImg().Enabled = true;
+				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+				emote.getImg().set_Tint(activatedColor);
+				((Control)emote.getImg()).set_Enabled(true);
 				emote.isDeactivatedByLocked(newBool: false);
 			}
 		}

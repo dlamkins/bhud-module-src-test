@@ -45,8 +45,16 @@ namespace EmoteTome
 				fileStream.Position = 0L;
 				fileStream.Read(buffer, 0, filesize);
 				fileStream.Close();
-				string[] array = Encoding.UTF8.GetString(buffer).Split(new string[1] { Environment.NewLine }, StringSplitOptions.None);
-				foreach (string name in array)
+				List<string> emoteStreamString = new List<string>();
+				using (StringReader reader = new StringReader(Encoding.UTF8.GetString(buffer)))
+				{
+					string line;
+					while ((line = reader.ReadLine()) != null)
+					{
+						emoteStreamString.Add(line);
+					}
+				}
+				foreach (string name in emoteStreamString)
 				{
 					try
 					{

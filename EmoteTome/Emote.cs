@@ -25,6 +25,8 @@ namespace EmoteTome
 
 		public Emote(string imagePath, List<string> toolTipp, string chatCode, bool canTarget, string category)
 		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000b: Expected O, but got Unknown
 			this.imagePath = imagePath;
 			this.toolTipp = toolTipp;
 			this.chatCode = chatCode;
