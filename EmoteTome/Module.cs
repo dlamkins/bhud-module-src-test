@@ -59,6 +59,18 @@ namespace EmoteTome
 
 		private bool checkedAPIForUnlock;
 
+		private EventHandler<MouseEventArgs> coreEmoteClickEvent = delegate
+		{
+		};
+
+		private EventHandler<MouseEventArgs> unlockEmoteClickEvent = delegate
+		{
+		};
+
+		private EventHandler<MouseEventArgs> rankEmoteClickEvent = delegate
+		{
+		};
+
 		private static readonly Logger Logger = Logger.GetLogger<Module>();
 
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
@@ -179,13 +191,14 @@ namespace EmoteTome
 				((Control)val7).set_BasicTooltipText(emote3.getToolTipp()[language]);
 				((Control)val7).set_Parent((Container)(object)corePanel);
 				Image emoteImage3 = val7;
-				((Control)emoteImage3).add_Click((EventHandler<MouseEventArgs>)delegate
+				coreEmoteClickEvent = delegate
 				{
 					if (emoteAllowed())
 					{
 						activateEmote(emote3.getChatCode(), targetCheckbox.get_Checked(), synchronCheckbox.get_Checked());
 					}
-				});
+				};
+				((Control)emoteImage3).add_Click(coreEmoteClickEvent);
 				coreEmoteImages.Add(emoteImage3);
 				emote3.setImg(emoteImage3);
 			}
@@ -216,13 +229,14 @@ namespace EmoteTome
 				val9.set_Tint(lockedColor);
 				((Control)val9).set_Enabled(false);
 				Image emoteImage2 = val9;
-				((Control)emoteImage2).add_Click((EventHandler<MouseEventArgs>)delegate
+				unlockEmoteClickEvent = delegate
 				{
 					if (emoteAllowed())
 					{
 						activateEmote(emote2.getChatCode(), targetCheckbox.get_Checked(), synchronCheckbox.get_Checked());
 					}
-				});
+				};
+				((Control)emoteImage2).add_Click(unlockEmoteClickEvent);
 				unlockEmoteImages.Add(emoteImage2);
 				emote2.setImg(emoteImage2);
 				emote2.isDeactivatedByLocked(newBool: true);
@@ -254,14 +268,15 @@ namespace EmoteTome
 				val11.set_Tint(lockedColor);
 				((Control)val11).set_Enabled(false);
 				Image emoteImage = val11;
-				((Control)emoteImage).add_Click((EventHandler<MouseEventArgs>)delegate
+				rankEmoteClickEvent = delegate
 				{
 					if (emoteAllowed())
 					{
 						activateEmote(emote.getChatCode(), targetCheckbox.get_Checked(), synchronCheckbox.get_Checked());
 						activateCooldown();
 					}
-				});
+				};
+				((Control)emoteImage).add_Click(rankEmoteClickEvent);
 				cooldownEmoteImages.Add(emoteImage);
 				emote.setImg(emoteImage);
 				emote.isDeactivatedByLocked(newBool: true);
@@ -425,11 +440,42 @@ namespace EmoteTome
 
 		protected override void Unload()
 		{
-			((Control)tomeWindow).set_Visible(false);
-			CornerIcon obj = tomeCornerIcon;
+			foreach (Emote coreEmote in coreEmoteList)
+			{
+				((Control)coreEmote.getImg()).remove_Click(coreEmoteClickEvent);
+				Image img = coreEmote.getImg();
+				if (img != null)
+				{
+					((Control)img).Dispose();
+				}
+			}
+			foreach (Emote unlockEmote in unlockEmoteList)
+			{
+				((Control)unlockEmote.getImg()).remove_Click(unlockEmoteClickEvent);
+				Image img2 = unlockEmote.getImg();
+				if (img2 != null)
+				{
+					((Control)img2).Dispose();
+				}
+			}
+			foreach (Emote rankEmote in rankEmoteList)
+			{
+				((Control)rankEmote.getImg()).remove_Click(rankEmoteClickEvent);
+				Image img3 = rankEmote.getImg();
+				if (img3 != null)
+				{
+					((Control)img3).Dispose();
+				}
+			}
+			StandardWindow obj = tomeWindow;
 			if (obj != null)
 			{
 				((Control)obj).Dispose();
+			}
+			CornerIcon obj2 = tomeCornerIcon;
+			if (obj2 != null)
+			{
+				((Control)obj2).Dispose();
 			}
 		}
 
