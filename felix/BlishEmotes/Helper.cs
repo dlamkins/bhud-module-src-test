@@ -16,6 +16,10 @@ namespace felix.BlishEmotes
 
 		public ResourceManager EmotesResourceManager { get; private set; }
 
+		public bool IsEmoteSynchronized { get; set; }
+
+		public bool IsEmoteTargeted { get; set; }
+
 		public static bool IsDebugEnabled()
 		{
 			if (0 == 0)
@@ -38,7 +42,17 @@ namespace felix.BlishEmotes
 			}
 			else if (GameService.GameIntegration.Gw2Instance.IsInGame && !GameService.Gw2Mumble.UI.IsMapOpen)
 			{
-				GameService.GameIntegration.Chat.Send(emote.Command);
+				string command = emote.Command;
+				if (IsEmoteSynchronized)
+				{
+					command += " *";
+				}
+				if (IsEmoteTargeted)
+				{
+					command += " @";
+				}
+				Logger.Debug(command);
+				GameService.GameIntegration.Chat.Send(command);
 			}
 		}
 

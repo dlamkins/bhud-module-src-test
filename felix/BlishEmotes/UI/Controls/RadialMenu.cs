@@ -8,6 +8,7 @@ using Blish_HUD.Controls.Intern;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
+using felix.BlishEmotes.Strings;
 
 namespace felix.BlishEmotes.UI.Controls
 {
@@ -36,6 +37,10 @@ namespace felix.BlishEmotes.UI.Controls
 		private Label _noEmotesLabel;
 
 		private Label _selectedEmoteLabel;
+
+		private Label _synchronizeToggleActiveLabel;
+
+		private Label _targetToggleActiveLabel;
 
 		private Point RadialSpawnPoint;
 
@@ -81,6 +86,30 @@ namespace felix.BlishEmotes.UI.Controls
 				Text = "",
 				BackgroundColor = Color.Black * 0.5f
 			};
+			_synchronizeToggleActiveLabel = new Label
+			{
+				Parent = this,
+				Visible = false,
+				Location = new Point(0, 0),
+				Size = new Point(200, 30),
+				HorizontalAlignment = HorizontalAlignment.Center,
+				VerticalAlignment = VerticalAlignment.Middle,
+				Font = GameService.Content.DefaultFont14,
+				Text = Common.emote_synchronizeActive,
+				BackgroundColor = Color.Black * 0.3f
+			};
+			_targetToggleActiveLabel = new Label
+			{
+				Parent = this,
+				Visible = false,
+				Location = new Point(0, 0),
+				Size = new Point(200, 30),
+				HorizontalAlignment = HorizontalAlignment.Center,
+				VerticalAlignment = VerticalAlignment.Middle,
+				Font = GameService.Content.DefaultFont14,
+				Text = Common.emote_targetingActive,
+				BackgroundColor = Color.Black * 0.3f
+			};
 		}
 
 		protected override CaptureType CapturesInput()
@@ -98,6 +127,22 @@ namespace felix.BlishEmotes.UI.Controls
 				return;
 			}
 			_noEmotesLabel.Hide();
+			if (_helper.IsEmoteSynchronized)
+			{
+				_synchronizeToggleActiveLabel.Show();
+			}
+			else
+			{
+				_synchronizeToggleActiveLabel.Hide();
+			}
+			if (_helper.IsEmoteTargeted)
+			{
+				_targetToggleActiveLabel.Show();
+			}
+			else
+			{
+				_targetToggleActiveLabel.Hide();
+			}
 			double startAngle = Math.PI * Math.Floor(270.0) / 180.0;
 			if (Helper.IsDebugEnabled())
 			{
@@ -182,6 +227,8 @@ namespace felix.BlishEmotes.UI.Controls
 			}
 			base.Location = new Point(RadialSpawnPoint.X - _radius - _iconSize / 2, RadialSpawnPoint.Y - _radius - _iconSize / 2);
 			_selectedEmoteLabel.Location = new Point(RadialSpawnPoint.X - base.Location.X - _selectedEmoteLabel.Size.X / 2, RadialSpawnPoint.Y - base.Location.Y - _selectedEmoteLabel.Size.Y / 2 - 20);
+			_synchronizeToggleActiveLabel.Location = new Point(_selectedEmoteLabel.Location.X, _selectedEmoteLabel.Location.Y + _selectedEmoteLabel.Size.Y);
+			_targetToggleActiveLabel.Location = new Point(_synchronizeToggleActiveLabel.Location.X, _synchronizeToggleActiveLabel.Location.Y + _synchronizeToggleActiveLabel.Size.Y);
 		}
 
 		private async Task HandleHidden(object sender, EventArgs e)

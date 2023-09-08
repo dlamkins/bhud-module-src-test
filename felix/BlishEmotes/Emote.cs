@@ -1,6 +1,5 @@
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace felix.BlishEmotes
 {
@@ -12,12 +11,8 @@ namespace felix.BlishEmotes
 		[JsonProperty("command", Required = Required.Always)]
 		public string Command { get; set; }
 
-		[JsonProperty("locked", DefaultValueHandling = DefaultValueHandling.Populate)]
+		[JsonIgnore]
 		public bool Locked { get; set; }
-
-		[JsonConverter(typeof(StringEnumConverter))]
-		[JsonProperty("category", Required = Required.Always)]
-		public Category Category { get; set; }
 
 		[JsonIgnore]
 		public Texture2D Texture { get; set; }

@@ -44,17 +44,11 @@ namespace felix.BlishEmotes.Strings
 
 		public static string cornerIcon_tooltip => ResourceManager.GetString("cornerIcon_tooltip", resourceCulture);
 
-		public static string emote_categoryDance => ResourceManager.GetString("emote_categoryDance", resourceCulture);
+		public static string emote_categoryFavourite => ResourceManager.GetString("emote_categoryFavourite", resourceCulture);
 
-		public static string emote_categoryFun => ResourceManager.GetString("emote_categoryFun", resourceCulture);
+		public static string emote_synchronizeActive => ResourceManager.GetString("emote_synchronizeActive", resourceCulture);
 
-		public static string emote_categoryGreeting => ResourceManager.GetString("emote_categoryGreeting", resourceCulture);
-
-		public static string emote_categoryMiscellaneous => ResourceManager.GetString("emote_categoryMiscellaneous", resourceCulture);
-
-		public static string emote_categoryPose => ResourceManager.GetString("emote_categoryPose", resourceCulture);
-
-		public static string emote_categoryReaction => ResourceManager.GetString("emote_categoryReaction", resourceCulture);
+		public static string emote_targetingActive => ResourceManager.GetString("emote_targetingActive", resourceCulture);
 
 		public static string settings_button => ResourceManager.GetString("settings_button", resourceCulture);
 
@@ -63,6 +57,10 @@ namespace felix.BlishEmotes.Strings
 		public static string settings_global_hideCornerIcon => ResourceManager.GetString("settings_global_hideCornerIcon", resourceCulture);
 
 		public static string settings_global_keybindToggleEmoteList => ResourceManager.GetString("settings_global_keybindToggleEmoteList", resourceCulture);
+
+		public static string settings_global_keybindToggleSynchronize => ResourceManager.GetString("settings_global_keybindToggleSynchronize", resourceCulture);
+
+		public static string settings_global_keybindToggleTargeting => ResourceManager.GetString("settings_global_keybindToggleTargeting", resourceCulture);
 
 		public static string settings_global_useCategories => ResourceManager.GetString("settings_global_useCategories", resourceCulture);
 

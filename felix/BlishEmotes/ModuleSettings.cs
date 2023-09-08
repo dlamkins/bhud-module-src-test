@@ -26,6 +26,10 @@ namespace felix.BlishEmotes
 
 		public SettingEntry<KeyBinding> GlobalKeyBindToggleEmoteList { get; private set; }
 
+		public SettingEntry<KeyBinding> GlobalKeyBindToggleSynchronize { get; private set; }
+
+		public SettingEntry<KeyBinding> GlobalKeyBindToggleTargeting { get; private set; }
+
 		public SettingEntry<bool> GlobalUseCategories { get; private set; }
 
 		public SettingEntry<bool> GlobalUseRadialMenu { get; private set; }
@@ -72,6 +76,8 @@ namespace felix.BlishEmotes
 			GlobalKeyBindToggleEmoteList = GlobalSettings.DefineSetting("GlobalKeyBindToggleEmoteList", new KeyBinding(), () => Common.settings_global_keybindToggleEmoteList);
 			GlobalUseCategories = GlobalSettings.DefineSetting("GlobalUseCategories", defaultValue: false, () => Common.settings_global_useCategories);
 			GlobalUseRadialMenu = GlobalSettings.DefineSetting("GlobalUseRadialMenu", defaultValue: false, () => Common.settings_global_useRadialMenu);
+			GlobalKeyBindToggleSynchronize = GlobalSettings.DefineSetting("GlobalKeyBindToggleSynchronize", new KeyBinding(), () => Common.settings_global_keybindToggleSynchronize);
+			GlobalKeyBindToggleTargeting = GlobalSettings.DefineSetting("GlobalKeyBindToggleTargeting", new KeyBinding(), () => Common.settings_global_keybindToggleTargeting);
 		}
 
 		private void DefineEmotesKeybindSettings(SettingCollection settings)
@@ -140,6 +146,8 @@ namespace felix.BlishEmotes
 		public void Unload()
 		{
 			GlobalKeyBindToggleEmoteList.Value.Enabled = false;
+			GlobalKeyBindToggleSynchronize.Value.Enabled = false;
+			GlobalKeyBindToggleTargeting.Value.Enabled = false;
 			foreach (KeyValuePair<Emote, SettingEntry<KeyBinding>> item in EmotesShortcutsKeybindsMap)
 			{
 				item.Value.Value.Enabled = false;

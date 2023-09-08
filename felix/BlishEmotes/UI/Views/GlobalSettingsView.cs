@@ -131,6 +131,38 @@ namespace felix.BlishEmotes.UI.Views
 				Size = new Point(150, 20),
 				Location = new Point(198, 0)
 			};
+			FlowPanel _toggleSynchronizeKeybindRow = CreateRowPanel(_globalPanel);
+			new Label
+			{
+				Parent = _toggleSynchronizeKeybindRow,
+				Text = Common.settings_global_keybindToggleSynchronize,
+				Size = new Point(200, 20),
+				Location = new Point(0, 0)
+			};
+			new KeybindingAssigner(_settings.GlobalKeyBindToggleSynchronize.Value)
+			{
+				Parent = _toggleSynchronizeKeybindRow,
+				NameWidth = 0,
+				Padding = Thickness.Zero,
+				Size = new Point(150, 20),
+				Location = new Point(198, 0)
+			};
+			FlowPanel _toggleTargetingKeybindRow = CreateRowPanel(_globalPanel);
+			new Label
+			{
+				Parent = _toggleTargetingKeybindRow,
+				Text = Common.settings_global_keybindToggleTargeting,
+				Size = new Point(200, 20),
+				Location = new Point(0, 0)
+			};
+			new KeybindingAssigner(_settings.GlobalKeyBindToggleTargeting.Value)
+			{
+				Parent = _toggleTargetingKeybindRow,
+				NameWidth = 0,
+				Padding = Thickness.Zero,
+				Size = new Point(150, 20),
+				Location = new Point(198, 0)
+			};
 			FlowPanel _useRadialRow = CreateRowPanel(_globalPanel);
 			new Label
 			{

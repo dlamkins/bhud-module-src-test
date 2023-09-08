@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
+using Blish_HUD.GameIntegration;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
@@ -13,7 +14,9 @@ using Blish_HUD.Settings;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
+using SemVer;
 using felix.BlishEmotes;
+using felix.BlishEmotes.Exceptions;
 using felix.BlishEmotes.Strings;
 using felix.BlishEmotes.UI.Controls;
 using felix.BlishEmotes.UI.Views;
@@ -33,6 +36,10 @@ namespace BlishEmotesList
 		private static readonly Logger Logger = Logger.GetLogger<EmoteLisModule>();
 
 		private Helper _helper;
+
+		internal PersistenceManager PersistenceManager;
+
+		internal CategoriesManager CategoriesManager;
 
 		private CornerIcon _cornerIcon;
 
@@ -54,7 +61,7 @@ namespace BlishEmotesList
 
 		internal Gw2ApiManager Gw2ApiManager => ModuleParameters.Gw2ApiManager;
 
-		private List<felix.BlishEmotes.Emote> _radialEnabledEmotes => new List<felix.BlishEmotes.Emote>(_emotes.Where((felix.BlishEmotes.Emote el) => !Settings.EmotesRadialEnabledMap.ContainsKey(el) || Settings.EmotesRadialEnabledMap[el].Value));
+		private List<felix.BlishEmotes.Emote> _radialEnabledEmotes => _emotes.Where((felix.BlishEmotes.Emote el) => !Settings.EmotesRadialEnabledMap.ContainsKey(el) || Settings.EmotesRadialEnabledMap[el].Value).ToList();
 
 		[ImportingConstructor]
 		public EmoteLisModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
@@ -97,6 +104,20 @@ namespace BlishEmotesList
 					ShowEmoteList(atCornerIcon: false);
 				}
 			};
+			Settings.GlobalKeyBindToggleSynchronize.Value.Enabled = true;
+			Settings.GlobalKeyBindToggleSynchronize.Value.Activated += delegate
+			{
+				_helper.IsEmoteSynchronized = !_helper.IsEmoteSynchronized;
+				DrawUI(excludeRadial: true);
+				Logger.Debug("Toggled IsEmoteSynchronized");
+			};
+			Settings.GlobalKeyBindToggleTargeting.Value.Enabled = true;
+			Settings.GlobalKeyBindToggleTargeting.Value.Activated += delegate
+			{
+				_helper.IsEmoteTargeted = !_helper.IsEmoteTargeted;
+				DrawUI(excludeRadial: true);
+				Logger.Debug("Toggled IsEmoteTargeted");
+			};
 			Settings.OnAnyEmotesRadialSettingsChanged += delegate
 			{
 				if (_radialMenu != null)
@@ -108,7 +129,30 @@ namespace BlishEmotesList
 
 		protected override void Initialize()
 		{
+			if (Program.OverlayVersion < new SemVer.Version(1, 1, 0))
+			{
+				try
+				{
+					typeof(TacOIntegration).GetProperty("TacOIsRunning").GetSetMethod(nonPublic: true)?.Invoke(GameService.GameIntegration.TacO, new object[1] { true });
+				}
+				catch
+				{
+				}
+			}
 			Gw2ApiManager.SubtokenUpdated += OnApiSubTokenUpdated;
+			try
+			{
+				PersistenceManager = new PersistenceManager(DirectoriesManager);
+			}
+			catch (Exception e)
+			{
+				Logger.Fatal("Failed to init PersistenceManager!");
+				Logger.Fatal(e.Message);
+				Logger.Fatal(e.StackTrace);
+				Unload();
+				return;
+			}
+			CategoriesManager = new CategoriesManager(PersistenceManager);
 			_emotes = new List<felix.BlishEmotes.Emote>();
 			if (!Settings.GlobalHideCornerIcon.Value)
 			{
@@ -137,8 +181,9 @@ namespace BlishEmotesList
 		{
 			try
 			{
-				_emotes = LoadEmotesResource();
+				_emotes = LoadEmotes();
 				await UpdateEmotesFromApi();
+				CategoriesManager.ResolveEmoteIds(_emotes);
 				Settings.InitEmotesSettings(_emotes);
 				DrawUI();
 			}
@@ -181,18 +226,21 @@ namespace BlishEmotesList
 			};
 		}
 
-		private void DrawUI()
+		private void DrawUI(bool excludeRadial = false)
 		{
 			_emoteListMenuStrip?.Dispose();
 			_emoteListMenuStrip = new ContextMenuStrip();
 			List<ContextMenuStripItem> menuItems = (Settings.GlobalUseCategories.Value ? GetCategoryMenuItems() : GetEmotesMenuItems(_emotes));
 			_emoteListMenuStrip.AddMenuItems(menuItems);
-			_radialMenu?.Dispose();
-			_radialMenu = new RadialMenu(_helper, Settings, ContentsManager.GetTexture("textures/2107931.png"))
+			if (!excludeRadial)
 			{
-				Parent = GameService.Graphics.SpriteScreen,
-				Emotes = _radialEnabledEmotes
-			};
+				_radialMenu?.Dispose();
+				_radialMenu = new RadialMenu(_helper, Settings, ContentsManager.GetTexture("textures/2107931.png"))
+				{
+					Parent = GameService.Graphics.SpriteScreen,
+					Emotes = _radialEnabledEmotes
+				};
+			}
 		}
 
 		private async void OnApiSubTokenUpdated(object sender, ValueEventArgs<IEnumerable<TokenPermission>> e)
@@ -216,22 +264,61 @@ namespace BlishEmotesList
 			}
 		}
 
+		private void AddEmoteModifierStatus(ref List<ContextMenuStripItem> items)
+		{
+			if (_helper.IsEmoteSynchronized)
+			{
+				items.Insert(0, new ContextMenuStripItem("[ " + Common.emote_synchronizeActive.ToUpper() + " ]"));
+			}
+			if (_helper.IsEmoteTargeted)
+			{
+				items.Insert(0, new ContextMenuStripItem("[ " + Common.emote_targetingActive.ToUpper() + " ]"));
+			}
+		}
+
 		private List<ContextMenuStripItem> GetCategoryMenuItems()
 		{
 			List<ContextMenuStripItem> items = new List<ContextMenuStripItem>();
-			foreach (Category categoryEnum in Enum.GetValues(typeof(Category)))
+			foreach (Category category in CategoriesManager.GetAll())
 			{
-				List<felix.BlishEmotes.Emote> emotesForCategory = _emotes.Where((felix.BlishEmotes.Emote emote) => emote.Category == categoryEnum).ToList();
 				ContextMenuStrip categorySubMenu = new ContextMenuStrip();
-				categorySubMenu.AddMenuItems(GetEmotesMenuItems(emotesForCategory));
+				categorySubMenu.AddMenuItems(GetEmotesMenuItems(category.Emotes));
 				ContextMenuStripItem menuItem = new ContextMenuStripItem
 				{
-					Text = categoryEnum.Label(),
+					Text = category.Name,
 					Submenu = categorySubMenu
 				};
 				items.Add(menuItem);
 			}
+			AddEmoteModifierStatus(ref items);
 			return items;
+		}
+
+		private ContextMenuStrip GetToggleFavContextMenu(felix.BlishEmotes.Emote emote)
+		{
+			bool isFav = false;
+			try
+			{
+				isFav = CategoriesManager.IsEmoteInCategory(CategoriesManager.FavouriteCategoryId, emote);
+			}
+			catch (NotFoundException)
+			{
+			}
+			ContextMenuStripItem toggleFavMenuItem = new ContextMenuStripItem
+			{
+				Text = Common.emote_categoryFavourite,
+				CanCheck = true,
+				Checked = isFav
+			};
+			toggleFavMenuItem.CheckedChanged += delegate(object sender, CheckChangedEvent args)
+			{
+				CategoriesManager.ToggleEmoteFromCategory(CategoriesManager.FavouriteCategoryId, emote);
+				DrawUI();
+				Logger.Debug($"Toggled favourite for {emote.Id} to ${args.Checked}");
+			};
+			ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
+			contextMenuStrip.AddMenuItem(toggleFavMenuItem);
+			return contextMenuStrip;
 		}
 
 		private List<ContextMenuStripItem> GetEmotesMenuItems(List<felix.BlishEmotes.Emote> emotes)
@@ -242,7 +329,8 @@ namespace BlishEmotesList
 				ContextMenuStripItem menuItem = new ContextMenuStripItem
 				{
 					Text = _helper.EmotesResourceManager.GetString(emote.Id),
-					Enabled = !emote.Locked
+					Enabled = !emote.Locked,
+					Submenu = GetToggleFavContextMenu(emote)
 				};
 				menuItem.Click += delegate
 				{
@@ -251,6 +339,7 @@ namespace BlishEmotesList
 				items.Add(menuItem);
 			}
 			items.Sort((ContextMenuStripItem x, ContextMenuStripItem y) => x.Text.CompareTo(y.Text));
+			AddEmoteModifierStatus(ref items);
 			return items;
 		}
 
@@ -268,7 +357,7 @@ namespace BlishEmotesList
 			}
 		}
 
-		private List<felix.BlishEmotes.Emote> LoadEmotesResource()
+		private List<felix.BlishEmotes.Emote> LoadEmotes()
 		{
 			string fileContents;
 			using (StreamReader reader = new StreamReader(ContentsManager.GetFileStream("json/emotes.json")))
@@ -321,6 +410,7 @@ namespace BlishEmotesList
 			_cornerIcon?.Dispose();
 			_settingsWindow?.Dispose();
 			_radialMenu?.Dispose();
+			CategoriesManager.Unload();
 		}
 	}
 }
