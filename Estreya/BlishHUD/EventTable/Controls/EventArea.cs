@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
+using Blish_HUD.Modules.Managers;
 using Blish_HUD._Extensions;
 using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.EventTable.Services;
@@ -42,9 +44,13 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private static TimeSpan _checkForNewEventsInterval = TimeSpan.FromMilliseconds(1000.0);
 
-		private static readonly ConcurrentDictionary<FontSize, BitmapFont> _fonts = new ConcurrentDictionary<FontSize, BitmapFont>();
+		private BitmapFont _defaultFont;
+
+		private ConcurrentDictionary<FontSize, BitmapFont> _fonts = new ConcurrentDictionary<FontSize, BitmapFont>();
 
 		private readonly Func<string> _getAccessToken;
+
+		private ContentsManager _contentsManager;
 
 		private readonly Func<DateTime> _getNowAction;
 
@@ -63,6 +69,8 @@ namespace Estreya.BlishHUD.EventTable.Controls
 		private readonly AsyncLock _controlLock = new AsyncLock();
 
 		private int _drawXOffset;
+
+		private int _drawYOffset;
 
 		private List<string> _eventCategoryOrdering;
 
@@ -116,6 +124,22 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			}
 		}
 
+		private int DrawYOffset
+		{
+			get
+			{
+				if (!Configuration.ShowTopTimeline.get_Value())
+				{
+					return 0;
+				}
+				return _drawYOffset;
+			}
+			set
+			{
+				_drawYOffset = value;
+			}
+		}
+
 		private List<string> EventCategoryOrdering
 		{
 			get
@@ -152,7 +176,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		public EventAreaConfiguration Configuration { get; private set; }
 
-		public EventArea(EventAreaConfiguration configuration, IconService iconService, TranslationService translationService, EventStateService eventService, WorldbossService worldbossService, MapchestService mapchestService, PointOfInterestService pointOfInterestService, MapUtil mapUtil, IFlurlClient flurlClient, string apiRootUrl, Func<DateTime> getNowAction, Func<Version> getVersion, Func<string> getAccessToken)
+		public EventArea(EventAreaConfiguration configuration, IconService iconService, TranslationService translationService, EventStateService eventService, WorldbossService worldbossService, MapchestService mapchestService, PointOfInterestService pointOfInterestService, MapUtil mapUtil, IFlurlClient flurlClient, string apiRootUrl, Func<DateTime> getNowAction, Func<Version> getVersion, Func<string> getAccessToken, ContentsManager contentsManager)
 		{
 			Configuration = configuration;
 			Configuration.EnabledKeybinding.get_Value().add_Activated((EventHandler<EventArgs>)EnabledKeybinding_Activated);
@@ -170,6 +194,8 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			Configuration.DrawInterval.add_SettingChanged((EventHandler<ValueChangedEventArgs<DrawInterval>>)DrawInterval_SettingChanged);
 			Configuration.LimitToCurrentMap.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)LimitToCurrentMap_SettingChanged);
 			Configuration.AllowUnspecifiedMap.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)AllowUnspecifiedMap_SettingChanged);
+			Configuration.FontFace.add_SettingChanged((EventHandler<ValueChangedEventArgs<FontFace>>)FontFace_SettingChanged);
+			Configuration.CustomFontPath.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)CustomFontPath_SettingChanged);
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)CurrentMap_MapChanged);
 			((Control)this).add_Click((EventHandler<MouseEventArgs>)OnLeftMouseButtonPressed);
 			((Control)this).add_MouseLeft((EventHandler<MouseEventArgs>)OnMouseLeft);
@@ -182,6 +208,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			_getNowAction = getNowAction;
 			_getVersion = getVersion;
 			_getAccessToken = getAccessToken;
+			_contentsManager = contentsManager;
 			_iconService = iconService;
 			_translationService = translationService;
 			_eventStateService = eventService;
@@ -191,6 +218,8 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			_mapUtil = mapUtil;
 			_flurlClient = flurlClient;
 			_apiRootUrl = apiRootUrl;
+			using Stream defaultFontStream = _contentsManager.GetFileStream("fonts\\Menomonia.ttf") ?? throw new FileNotFoundException("Memonia Font is not included in module ref folder.");
+			_defaultFont = FontUtils.FromTrueTypeFont(defaultFontStream.ToByteArray(), 18f, 256, 256).ToBitmapFont();
 			if (_worldbossService != null)
 			{
 				_worldbossService.WorldbossCompleted += Event_Completed;
@@ -287,6 +316,19 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			if (Configuration.LimitToCurrentMap.get_Value())
 			{
 				ReAddEvents();
+			}
+		}
+
+		private void FontFace_SettingChanged(object sender, ValueChangedEventArgs<FontFace> e)
+		{
+			_fonts?.Clear();
+		}
+
+		private void CustomFontPath_SettingChanged(object sender, ValueChangedEventArgs<string> e)
+		{
+			if (Configuration.FontFace.get_Value() == FontFace.Custom)
+			{
+				_fonts?.Clear();
 			}
 		}
 
@@ -460,8 +502,45 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private BitmapFont GetFont()
 		{
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			return _fonts.GetOrAdd(Configuration.FontSize.get_Value(), (Func<FontSize, BitmapFont>)((FontSize fontSize) => GameService.Content.GetFont((FontFace)0, fontSize, (FontStyle)0)));
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			BitmapFont font = _fonts.GetOrAdd(Configuration.FontSize.get_Value(), (Func<FontSize, BitmapFont>)delegate(FontSize fontSize)
+			{
+				//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+				try
+				{
+					if (Configuration.FontFace.get_Value() == FontFace.Custom)
+					{
+						string value = Configuration.CustomFontPath.get_Value();
+						string extension = Path.GetExtension(value);
+						if (extension == ".ttf")
+						{
+							FileStream fileStream = FileUtil.ReadStream(value);
+							SpriteFont spriteFont = FontUtils.FromTrueTypeFont(fileStream?.ToByteArray(), (float)fontSize, 256, 256);
+							fileStream.Dispose();
+							return spriteFont.ToBitmapFont();
+						}
+						if (extension == ".fnt")
+						{
+							return FontUtils.FromBMFont(value).ToBitmapFont();
+						}
+						return null;
+					}
+					Stream fileStream2 = _contentsManager.GetFileStream("fonts\\" + Configuration.FontFace.get_Value().ToString() + ".ttf");
+					SpriteFont spriteFont2 = FontUtils.FromTrueTypeFont(fileStream2?.ToByteArray(), (float)fontSize, 256, 256);
+					fileStream2.Dispose();
+					return spriteFont2.ToBitmapFont();
+				}
+				catch (Exception)
+				{
+					return null;
+				}
+			});
+			if (font == null)
+			{
+				font = _defaultFont;
+			}
+			return font;
 		}
 
 		private void ReAddEvents()
@@ -613,27 +692,27 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private void UpdateEventsOnScreen(SpriteBatch spriteBatch)
 		{
-			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0260: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0267: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0167: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0265: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_026f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0274: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0279: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0287: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_028c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0291: Unknown result type (might be due to invalid IL or missing references)
 			if (_clearing)
 			{
 				return;
 			}
 			(DateTime, DateTime, DateTime) times = GetTimes();
 			_activeEvent = null;
-			int y = 0;
+			int y = DrawYOffset;
 			_drawXOffset = 0;
 			List<List<(DateTime, Event)>> orderedControlEvents = OrderedControlEvents;
 			if (Configuration.ShowCategoryNames.get_Value())
@@ -759,7 +838,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				{
 					using (_eventLock.Lock())
 					{
-						validCategory = _allEvents.Find((EventCategory ec) => ec.Key == categoryKey);
+						validCategory = _allEvents?.Find((EventCategory ec) => ec.Key == categoryKey);
 					}
 				}
 				else
@@ -980,7 +1059,58 @@ namespace Estreya.BlishHUD.EventTable.Controls
 		protected override void DoPaint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
 			UpdateEventsOnScreen(spriteBatch);
+			DrawTopTimeLine(spriteBatch);
 			DrawTimeLine(spriteBatch);
+		}
+
+		private void DrawTopTimeLine(SpriteBatch spriteBatch)
+		{
+			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0168: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0208: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0227: Unknown result type (might be due to invalid IL or missing references)
+			_drawYOffset = 0;
+			if (Configuration.ShowTopTimeline.get_Value())
+			{
+				float width = GetWidth();
+				(DateTime, DateTime, DateTime) times = GetTimes();
+				RectangleF rect = default(RectangleF);
+				((RectangleF)(ref rect))._002Ector((float)DrawXOffset, 0f, width, 30f);
+				Color backgroundColor = ((Configuration.TopTimelineBackgroundColor.get_Value().get_Id() == 1) ? Color.get_Transparent() : ColorExtensions.ToXnaColor(Configuration.TopTimelineBackgroundColor.get_Value().get_Cloth())) * Configuration.TopTimelineBackgroundOpacity.get_Value();
+				spriteBatch.DrawRectangle(Textures.get_Pixel(), rect, backgroundColor);
+				int timeInterval = 15;
+				int timeSteps = (int)Math.Floor((times.Item3 - times.Item2).TotalMinutes) / timeInterval;
+				float timeStepLineHeight = rect.Height;
+				Color lineColor = ((Configuration.TopTimelineLineColor.get_Value().get_Id() == 1) ? Color.get_Black() : ColorExtensions.ToXnaColor(Configuration.TopTimelineLineColor.get_Value().get_Cloth())) * Configuration.TopTimelineLineOpacity.get_Value();
+				Color timeColor = ((Configuration.TopTimelineTimeColor.get_Value().get_Id() == 1) ? Color.get_Red() : ColorExtensions.ToXnaColor(Configuration.TopTimelineTimeColor.get_Value().get_Cloth())) * Configuration.TopTimelineTimeOpacity.get_Value();
+				RectangleF timeStepRect = default(RectangleF);
+				for (int i = 0; i < timeSteps; i++)
+				{
+					float x = (float)PixelPerMinute * (float)timeInterval * (float)i + (float)DrawXOffset;
+					((RectangleF)(ref timeStepRect))._002Ector(x, 0f, 2f, timeStepLineHeight);
+					DateTime time = times.Item2.AddMinutes(timeInterval * i);
+					spriteBatch.DrawLine(Textures.get_Pixel(), timeStepRect, lineColor);
+					spriteBatch.DrawString(time.ToString(Configuration.TopTimelineTimeFormatString.get_Value()), GetFont(), new RectangleF(timeStepRect.X + 5f, 5f, (float)PixelPerMinute * (float)timeInterval, 20f), timeColor, wrap: false, (HorizontalAlignment)0, (VerticalAlignment)1);
+				}
+				_drawYOffset = (int)rect.Height;
+			}
 		}
 
 		private void DrawTimeLine(SpriteBatch spriteBatch)
@@ -1098,6 +1228,11 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				_eventStateService.StateAdded -= EventService_ServiceAdded;
 				_eventStateService.StateRemoved -= EventService_ServiceRemoved;
 			}
+			if (_fonts != null)
+			{
+				_fonts.Clear();
+				_fonts = null;
+			}
 			_iconService = null;
 			_worldbossService = null;
 			_mapchestService = null;
@@ -1105,6 +1240,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			_translationService = null;
 			_mapUtil = null;
 			_pointOfInterestService = null;
+			_contentsManager = null;
 			_flurlClient = null;
 			_apiRootUrl = null;
 			((Control)this).remove_Click((EventHandler<MouseEventArgs>)OnLeftMouseButtonPressed);
@@ -1123,10 +1259,15 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			Configuration.DrawInterval.remove_SettingChanged((EventHandler<ValueChangedEventArgs<DrawInterval>>)DrawInterval_SettingChanged);
 			Configuration.LimitToCurrentMap.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)LimitToCurrentMap_SettingChanged);
 			Configuration.AllowUnspecifiedMap.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)AllowUnspecifiedMap_SettingChanged);
+			Configuration.FontFace.remove_SettingChanged((EventHandler<ValueChangedEventArgs<FontFace>>)FontFace_SettingChanged);
+			Configuration.CustomFontPath.remove_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)CustomFontPath_SettingChanged);
 			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)CurrentMap_MapChanged);
 			Configuration = null;
-			_allEvents?.Clear();
-			_allEvents = null;
+			using (_eventLock.Lock())
+			{
+				_allEvents?.Clear();
+				_allEvents = null;
+			}
 		}
 	}
 }

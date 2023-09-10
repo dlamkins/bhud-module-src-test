@@ -10,6 +10,8 @@ namespace Estreya.BlishHUD.Shared.Utils
 {
 	public static class ColorUtil
 	{
+		private static Random random = new Random();
+
 		private static Color[][] CreateColorGradientRows(Color start, Color end, int width, int height)
 		{
 			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
@@ -129,6 +131,12 @@ namespace Estreya.BlishHUD.Shared.Utils
 			{
 				((GraphicsDeviceContext)(ref ctx)).Dispose();
 			}
+		}
+
+		public static Color GetRandom()
+		{
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			return new Color(random.Next(256), random.Next(256), random.Next(256));
 		}
 	}
 }

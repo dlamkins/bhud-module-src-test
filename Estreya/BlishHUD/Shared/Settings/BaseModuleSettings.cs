@@ -250,6 +250,8 @@ namespace Estreya.BlishHUD.Shared.Settings
 			SettingComplianceExtensions.SetRange(opacity, 0f, 1f);
 			SettingEntry<Color> backgroundColor = DrawerSettings.DefineSetting<Color>(name + "-backgroundColor", DefaultGW2Color, (Func<string>)(() => "Background Color"), (Func<string>)(() => "The background color of the drawer."));
 			SettingEntry<FontSize> fontSize = DrawerSettings.DefineSetting<FontSize>(name + "-fontSize", (FontSize)16, (Func<string>)(() => "Font Size"), (Func<string>)(() => "The font size of the drawer."));
+			SettingEntry<FontFace> fontFace = DrawerSettings.DefineSetting<FontFace>(name + "-fontFace", FontFace.Menomonia, (Func<string>)(() => "Font Face"), (Func<string>)(() => "The font face of the drawer."));
+			SettingEntry<string> customFontPath = DrawerSettings.DefineSetting<string>(name + "-customFontPath", (string)null, (Func<string>)(() => "Custom Font Path"), (Func<string>)(() => "The path to a custom font file."));
 			SettingEntry<Color> textColor = DrawerSettings.DefineSetting<Color>(name + "-textColor", DefaultGW2Color, (Func<string>)(() => "Text Color"), (Func<string>)(() => "The text color of the drawer."));
 			return new DrawerConfiguration
 			{
@@ -270,6 +272,8 @@ namespace Estreya.BlishHUD.Shared.Settings
 				Opacity = opacity,
 				BackgroundColor = backgroundColor,
 				FontSize = fontSize,
+				FontFace = fontFace,
+				CustomFontPath = customFontPath,
 				TextColor = textColor
 			};
 		}
@@ -286,22 +290,38 @@ namespace Estreya.BlishHUD.Shared.Settings
 			DrawerSettings.UndefineSetting(name + "-opacity");
 			DrawerSettings.UndefineSetting(name + "-backgroundColor");
 			DrawerSettings.UndefineSetting(name + "-fontSize");
+			DrawerSettings.UndefineSetting(name + "-fontFace");
+			DrawerSettings.UndefineSetting(name + "-customFontPath");
 			DrawerSettings.UndefineSetting(name + "-textColor");
+		}
+
+		public bool IsMaxResolutionValid(int width, int height)
+		{
+			if (width >= 100)
+			{
+				return height >= 100;
+			}
+			return false;
 		}
 
 		public void CheckDrawerSizeAndPosition(DrawerConfiguration configuration)
 		{
 			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 			bool buildFromBottom = configuration.BuildDirection.get_Value() == BuildDirection.Bottom;
-			int num = (int)((float)GameService.Graphics.get_Resolution().X / GameService.Graphics.get_UIScaleMultiplier());
+			int maxResX = (int)((float)GameService.Graphics.get_Resolution().X / GameService.Graphics.get_UIScaleMultiplier());
 			int maxResY = (int)((float)GameService.Graphics.get_Resolution().Y / GameService.Graphics.get_UIScaleMultiplier());
+			if (!IsMaxResolutionValid(maxResX, maxResY))
+			{
+				Logger.Warn($"Max drawer size and position resolution is invalid. X: {maxResX} - Y: {maxResY}");
+				return;
+			}
 			int minLocationX = 0;
-			int maxLocationX = num - configuration.Size.X.get_Value();
+			int maxLocationX = maxResX - configuration.Size.X.get_Value();
 			int minLocationY = (buildFromBottom ? configuration.Size.Y.get_Value() : 0);
 			int maxLocationY = (buildFromBottom ? maxResY : (maxResY - configuration.Size.Y.get_Value()));
 			int minWidth = 0;
-			int maxWidth = num - configuration.Location.X.get_Value();
+			int maxWidth = maxResX - configuration.Location.X.get_Value();
 			int minHeight = 0;
 			int maxHeight = maxResY - configuration.Location.Y.get_Value();
 			if (maxLocationX >= 50)

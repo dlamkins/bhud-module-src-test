@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
@@ -14,6 +15,7 @@ using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
+using Blish_HUD.Input;
 using Blish_HUD.Modules;
 using Blish_HUD.Settings;
 using Estreya.BlishHUD.EventTable.Controls;
@@ -22,6 +24,8 @@ using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.EventTable.Services;
 using Estreya.BlishHUD.EventTable.UI.Views;
 using Estreya.BlishHUD.Shared.Controls;
+using Estreya.BlishHUD.Shared.Extensions;
+using Estreya.BlishHUD.Shared.Models.GW2API.PointOfInterest;
 using Estreya.BlishHUD.Shared.Modules;
 using Estreya.BlishHUD.Shared.MumbleInfo.Map;
 using Estreya.BlishHUD.Shared.Services;
@@ -33,6 +37,7 @@ using Gw2Sharp.Models;
 using Humanizer;
 using Humanizer.Localisation;
 using Microsoft.Xna.Framework;
+using MonoGame.Extended.BitmapFonts;
 
 namespace Estreya.BlishHUD.EventTable
 {
@@ -53,7 +58,11 @@ namespace Estreya.BlishHUD.EventTable
 
 		private AsyncRef<double> _lastEventUpdate;
 
+		private BitmapFont _defaultFont;
+
 		public override string UrlModuleName => "event-table";
+
+		protected override bool FailIfBackendDown => true;
 
 		private DateTime NowUTC => DateTime.UtcNow;
 
@@ -62,6 +71,19 @@ namespace Estreya.BlishHUD.EventTable
 		private DynamicEventHandler DynamicEventHandler { get; set; }
 
 		protected override string API_VERSION_NO => "1";
+
+		public override BitmapFont Font
+		{
+			get
+			{
+				if (_defaultFont == null)
+				{
+					using Stream defaultFontStream = base.ContentsManager.GetFileStream("fonts\\Anonymous.ttf");
+					_defaultFont = ((defaultFontStream != null) ? FontUtils.FromTrueTypeFont(defaultFontStream.ToByteArray(), 18f, 256, 256).ToBitmapFont() : GameService.Content.get_DefaultFont16());
+				}
+				return _defaultFont;
+			}
+		}
 
 		protected override int CornerIconPriority => 1289351278;
 
@@ -310,9 +332,66 @@ namespace Estreya.BlishHUD.EventTable
 					return;
 				}
 				string startsInTranslation = base.TranslationService.GetTranslation("reminder-startsIn", "Starts in");
-				EventNotification eventNotification = new EventNotification(ev, startsInTranslation + " " + e.Humanize(2, null, TimeUnit.Week, TimeUnit.Second) + "!", base.ModuleSettings.ReminderPosition.X.get_Value(), base.ModuleSettings.ReminderPosition.Y.get_Value(), base.IconService);
-				eventNotification.BackgroundOpacity = base.ModuleSettings.ReminderOpacity.get_Value();
-				eventNotification.Show(TimeSpan.FromSeconds(base.ModuleSettings.ReminderDuration.get_Value()));
+				EventNotification obj = new EventNotification(ev, startsInTranslation + " " + e.Humanize(2, null, TimeUnit.Week, TimeUnit.Second) + "!", base.ModuleSettings.ReminderPosition.X.get_Value(), base.ModuleSettings.ReminderPosition.Y.get_Value(), base.ModuleSettings.ReminderStackDirection.get_Value(), base.IconService, base.ModuleSettings.ReminderLeftClickAction.get_Value() != LeftClickAction.None)
+				{
+					BackgroundOpacity = base.ModuleSettings.ReminderOpacity.get_Value()
+				};
+				((Control)obj).add_Click((EventHandler<MouseEventArgs>)EventNotification_Click);
+				((Control)obj).add_Disposed((EventHandler<EventArgs>)EventNotification_Disposed);
+				obj.Show(TimeSpan.FromSeconds(base.ModuleSettings.ReminderDuration.get_Value()));
+			}
+		}
+
+		private void EventNotification_Disposed(object sender, EventArgs e)
+		{
+			EventNotification obj = sender as EventNotification;
+			((Control)obj).remove_Click((EventHandler<MouseEventArgs>)EventNotification_Click);
+			((Control)obj).remove_Disposed((EventHandler<EventArgs>)EventNotification_Disposed);
+		}
+
+		private void EventNotification_Click(object sender, MouseEventArgs e)
+		{
+			EventNotification notification = sender as EventNotification;
+			switch (base.ModuleSettings.ReminderLeftClickAction.get_Value())
+			{
+			case LeftClickAction.CopyWaypoint:
+				if (!string.IsNullOrWhiteSpace(notification.Model.Waypoint))
+				{
+					ClipboardUtil.get_WindowsClipboardService().SetTextAsync(notification.Model.Waypoint);
+					ScreenNotification.ShowNotification(new string[2]
+					{
+						notification.Model.Name,
+						"Copied to clipboard!"
+					});
+				}
+				break;
+			case LeftClickAction.NavigateToWaypoint:
+			{
+				if (string.IsNullOrWhiteSpace(notification.Model.Waypoint))
+				{
+					break;
+				}
+				if (base.PointOfInterestService.Loading)
+				{
+					ScreenNotification.ShowNotification("PointOfInterestService is still loading!", ScreenNotification.NotificationType.Error);
+					break;
+				}
+				PointOfInterest poi = base.PointOfInterestService.GetPointOfInterest(notification.Model.Waypoint);
+				if (poi == null)
+				{
+					ScreenNotification.ShowNotification(notification.Model.Waypoint + " not found!", ScreenNotification.NotificationType.Error);
+					break;
+				}
+				Task.Run(async delegate
+				{
+					MapUtil.NavigationResult result = await (MapUtil?.NavigateToPosition(poi, base.ModuleSettings.AcceptWaypointPrompt.get_Value()) ?? Task.FromResult(new MapUtil.NavigationResult(success: false, "Variable null.")));
+					if (!result.Success)
+					{
+						ScreenNotification.ShowNotification("Navigation failed: " + (result.Message ?? "Unknown"), ScreenNotification.NotificationType.Error);
+					}
+				});
+				break;
+			}
 			}
 		}
 
@@ -342,7 +421,7 @@ namespace Estreya.BlishHUD.EventTable
 				base.ModuleSettings.EventAreaNames.set_Value(new List<string>(base.ModuleSettings.EventAreaNames.get_Value()) { configuration.Name });
 			}
 			base.ModuleSettings.UpdateDrawerLocalization(configuration, base.TranslationService);
-			EventArea eventArea = new EventArea(configuration, base.IconService, base.TranslationService, EventStateService, base.WorldbossService, base.MapchestService, base.PointOfInterestService, MapUtil, GetFlurlClient(), base.MODULE_API_URL, () => NowUTC, () => ((Module)this).get_Version(), () => base.BlishHUDAPIService.AccessToken);
+			EventArea eventArea = new EventArea(configuration, base.IconService, base.TranslationService, EventStateService, base.WorldbossService, base.MapchestService, base.PointOfInterestService, MapUtil, GetFlurlClient(), base.MODULE_API_URL, () => NowUTC, () => ((Module)this).get_Version(), () => base.BlishHUDAPIService.AccessToken, base.ContentsManager);
 			((Control)eventArea).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			EventArea area = eventArea;
 			_areas.AddOrUpdate(configuration.Name, area, (string name, EventArea prev) => area);
@@ -373,16 +452,16 @@ namespace Estreya.BlishHUD.EventTable
 			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00aa: Expected O, but got Unknown
-			//IL_017f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0189: Expected O, but got Unknown
-			//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d8: Expected O, but got Unknown
-			//IL_021d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0227: Expected O, but got Unknown
-			//IL_026c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0276: Expected O, but got Unknown
-			//IL_02bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c5: Expected O, but got Unknown
+			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017f: Expected O, but got Unknown
+			//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ce: Expected O, but got Unknown
+			//IL_0213: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021d: Expected O, but got Unknown
+			//IL_0262: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026c: Expected O, but got Unknown
+			//IL_02b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02bb: Expected O, but got Unknown
 			settingWindow.SavesSize = true;
 			settingWindow.CanResize = true;
 			settingWindow.RebuildViewAfterResize = true;
@@ -390,11 +469,11 @@ namespace Estreya.BlishHUD.EventTable
 			settingWindow.MinSize = settingWindow.Size;
 			settingWindow.MaxSize = new Point(((Control)settingWindow).get_Width() * 2, ((Control)settingWindow).get_Height() * 3);
 			settingWindow.RebuildDelay = 500;
-			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("156736.png"), (Func<IView>)(() => (IView)(object)new GeneralSettingsView(base.ModuleSettings, base.Gw2ApiManager, base.IconService, base.TranslationService, base.SettingEventService, GameService.Content.get_DefaultFont16())
+			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("156736.png"), (Func<IView>)(() => (IView)(object)new GeneralSettingsView(base.ModuleSettings, base.Gw2ApiManager, base.IconService, base.TranslationService, base.SettingEventService)
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			}), base.TranslationService.GetTranslation("generalSettingsView-title", "General"), (int?)null));
-			AreaSettingsView areaSettingsView = new AreaSettingsView(() => _areas.Values.Select((EventArea area) => area.Configuration), () => _eventCategories, base.ModuleSettings, base.Gw2ApiManager, base.IconService, base.TranslationService, base.SettingEventService, EventStateService, GameService.Content.get_DefaultFont16())
+			AreaSettingsView areaSettingsView = new AreaSettingsView(() => _areas.Values.Select((EventArea area) => area.Configuration), () => _eventCategories, base.ModuleSettings, base.Gw2ApiManager, base.IconService, base.TranslationService, base.SettingEventService, EventStateService)
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			};
@@ -412,11 +491,11 @@ namespace Estreya.BlishHUD.EventTable
 				RemoveArea(e);
 			};
 			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("605018.png"), (Func<IView>)(() => (IView)(object)areaSettingsView), base.TranslationService.GetTranslation("areaSettingsView-title", "Event Areas"), (int?)null));
-			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("1466345.png"), (Func<IView>)(() => (IView)(object)new ReminderSettingsView(base.ModuleSettings, () => _eventCategories, base.Gw2ApiManager, base.IconService, base.TranslationService, base.SettingEventService, GameService.Content.get_DefaultFont16())
+			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("1466345.png"), (Func<IView>)(() => (IView)(object)new ReminderSettingsView(base.ModuleSettings, () => _eventCategories, base.Gw2ApiManager, base.IconService, base.TranslationService, base.SettingEventService)
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			}), base.TranslationService.GetTranslation("reminderSettingsView-title", "Reminders"), (int?)null));
-			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("759448.png"), (Func<IView>)(() => (IView)(object)new DynamicEventsSettingsView(DynamicEventService, base.ModuleSettings, GetFlurlClient(), base.Gw2ApiManager, base.IconService, base.TranslationService, base.SettingEventService, GameService.Content.get_DefaultFont16())
+			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("759448.png"), (Func<IView>)(() => (IView)(object)new DynamicEventsSettingsView(DynamicEventService, base.ModuleSettings, GetFlurlClient(), base.Gw2ApiManager, base.IconService, base.TranslationService, base.SettingEventService)
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			}), base.TranslationService.GetTranslation("dynamicEventsSettingsView-title", "Dynamic Events"), (int?)null));
@@ -424,7 +503,7 @@ namespace Estreya.BlishHUD.EventTable
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			}), base.TranslationService.GetTranslation("customEventView-title", "Custom Events"), (int?)null));
-			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("157097.png"), (Func<IView>)(() => (IView)(object)new HelpView(() => _eventCategories, base.MODULE_API_URL, base.Gw2ApiManager, base.IconService, base.TranslationService, GameService.Content.get_DefaultFont16())
+			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("157097.png"), (Func<IView>)(() => (IView)(object)new HelpView(() => _eventCategories, base.MODULE_API_URL, base.Gw2ApiManager, base.IconService, base.TranslationService)
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			}), base.TranslationService.GetTranslation("helpView-title", "Help"), (int?)null));
@@ -469,7 +548,7 @@ namespace Estreya.BlishHUD.EventTable
 				AwaitLoading = false,
 				Enabled = true,
 				SaveInterval = Timeout.InfiniteTimeSpan
-			}, base.Gw2ApiManager, GetFlurlClient(), "https://blish-hud.api.estreya.de");
+			}, base.Gw2ApiManager, GetFlurlClient(), "https://api.estreya.de/blish-hud", directoryPath);
 			collection.Add(EventStateService);
 			collection.Add(DynamicEventService);
 			return collection;

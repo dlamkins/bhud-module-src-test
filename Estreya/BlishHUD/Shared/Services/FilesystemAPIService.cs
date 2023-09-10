@@ -118,9 +118,11 @@ namespace Estreya.BlishHUD.Shared.Services
 						{
 							base.Loading = true;
 							ReportProgress("Saving...");
-							await OnAfterLoadFromAPIBeforeSave();
-							await Save();
-							await OnAfterLoadFromAPIAfterSave();
+							if (await OnAfterLoadFromAPIBeforeSave())
+							{
+								await Save();
+								await OnAfterLoadFromAPIAfterSave();
+							}
 						}
 						finally
 						{
@@ -146,9 +148,9 @@ namespace Estreya.BlishHUD.Shared.Services
 			return Task.CompletedTask;
 		}
 
-		protected virtual Task OnAfterLoadFromAPIBeforeSave()
+		protected virtual Task<bool> OnAfterLoadFromAPIBeforeSave()
 		{
-			return Task.CompletedTask;
+			return Task.FromResult(result: true);
 		}
 
 		protected virtual Task OnAfterLoadFromAPIAfterSave()

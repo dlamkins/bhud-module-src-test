@@ -5,7 +5,6 @@ using Blish_HUD.Controls;
 using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.Shared.Services;
 using Microsoft.Xna.Framework;
-using MonoGame.Extended.BitmapFonts;
 
 namespace Estreya.BlishHUD.Shared.UI.Views.Settings
 {
@@ -15,8 +14,8 @@ namespace Estreya.BlishHUD.Shared.UI.Views.Settings
 
 		private readonly IEnumerable<ManagedService> _stateList;
 
-		public ServiceSettingsView(IEnumerable<ManagedService> stateList, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService, BitmapFont font = null, Func<Task> reloadCalledAction = null)
-			: base(apiManager, iconService, translationService, settingEventService, font)
+		public ServiceSettingsView(IEnumerable<ManagedService> stateList, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService, Func<Task> reloadCalledAction = null)
+			: base(apiManager, iconService, translationService, settingEventService)
 		{
 			_stateList = stateList;
 			_reloadCalledAction = reloadCalledAction;

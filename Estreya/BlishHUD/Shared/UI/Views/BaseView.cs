@@ -10,6 +10,7 @@ using Blish_HUD.Input;
 using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.Shared.Controls;
 using Estreya.BlishHUD.Shared.Extensions;
+using Estreya.BlishHUD.Shared.Models;
 using Estreya.BlishHUD.Shared.Services;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
@@ -22,7 +23,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 {
 	public abstract class BaseView : View
 	{
-		private static readonly Logger Logger = Logger.GetLogger<BaseView>();
+		protected readonly Logger _logger;
 
 		private CancellationTokenSource _messageCancellationTokenSource;
 
@@ -36,8 +37,6 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		protected Gw2ApiManager APIManager { get; }
 
-		protected BitmapFont Font { get; }
-
 		public Color DefaultColor { get; set; }
 
 		protected IconService IconService { get; }
@@ -46,13 +45,34 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		protected Panel MainPanel { get; private set; }
 
-		public BaseView(Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, BitmapFont font = null)
+		protected virtual Dictionary<ControlType, BitmapFont> ControlFonts { get; } = new Dictionary<ControlType, BitmapFont>
+		{
+			{
+				ControlType.Label,
+				GameService.Content.get_DefaultFont16()
+			},
+			{
+				ControlType.Dropdown,
+				GameService.Content.get_DefaultFont16()
+			},
+			{
+				ControlType.Button,
+				GameService.Content.get_DefaultFont16()
+			},
+			{
+				ControlType.TextBox,
+				GameService.Content.get_DefaultFont16()
+			}
+		};
+
+
+		public BaseView(Gw2ApiManager apiManager, IconService iconService, TranslationService translationService)
 			: this()
 		{
+			_logger = Logger.GetLogger(((object)this).GetType());
 			APIManager = apiManager;
 			IconService = iconService;
 			TranslationService = translationService;
-			Font = font ?? GameService.Content.get_DefaultFont16();
 		}
 
 		protected sealed override async Task<bool> Load(IProgress<string> progress)
@@ -69,10 +89,10 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 				}
 				catch (Exception ex)
 				{
-					Logger.Warn("Could not load gw2 colors: " + ex.Message);
+					_logger.Warn("Could not load gw2 colors: " + ex.Message);
 					if (DefaultColor != null)
 					{
-						Logger.Debug("Adding default color: " + DefaultColor.get_Name());
+						_logger.Debug("Adding default color: " + DefaultColor.get_Name());
 						Colors = new List<Color> { DefaultColor };
 					}
 				}
@@ -103,7 +123,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			}
 			catch (Exception ex)
 			{
-				Logger.Warn(ex, "Failed building view " + ((object)this).GetType().FullName);
+				_logger.Warn(ex, "Failed building view " + ((object)this).GetType().FullName);
 			}
 		}
 
@@ -130,7 +150,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
 			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Expected O, but got Unknown
+			//IL_009c: Expected O, but got Unknown
 			if (onBeforeChangeAction == null)
 			{
 				onBeforeChangeAction = (string _, string _) => Task.FromResult(result: true);
@@ -142,7 +162,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			((TextInputBase)val).set_Text(value);
 			((Control)val).set_Location(location);
 			((Control)val).set_Width(width);
-			((TextInputBase)val).set_Font(Font);
+			((TextInputBase)val).set_Font(ControlFonts[ControlType.TextBox]);
 			TextBox textBox = val;
 			if (onChangeAction != null)
 			{
@@ -165,7 +185,6 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 							}
 							changing = false;
 						});
-						onChangeAction?.Invoke(((TextInputBase)scopeTextBox).get_Text());
 					}
 				});
 			}
@@ -287,7 +306,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			return checkBox;
 		}
 
-		protected Dropdown RenderDropdown<T>(Panel parent, Point location, int width, T? value, T[] values = null, Action<T> onChangeAction = null, Func<string, string, Task<bool>> onBeforeChangeAction = null) where T : struct, Enum
+		protected Dropdown<string> RenderDropdown<T>(Panel parent, Point location, int width, T? value, T[] values = null, Action<T> onChangeAction = null, Func<string, string, Task<bool>> onBeforeChangeAction = null) where T : struct, Enum
 		{
 			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
 			if (onBeforeChangeAction == null)
@@ -295,11 +314,12 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 				onBeforeChangeAction = (string _, string _) => Task.FromResult(result: true);
 			}
 			LetterCasing casing = LetterCasing.Title;
-			Dropdown dropdown2 = new Dropdown();
+			Dropdown<string> dropdown2 = new Dropdown<string>();
 			((Control)dropdown2).set_Parent((Container)(object)parent);
 			((Control)dropdown2).set_Width(width);
 			((Control)dropdown2).set_Location(location);
-			Dropdown dropdown = dropdown2;
+			dropdown2.Font = ControlFonts[ControlType.Dropdown];
+			Dropdown<string> dropdown = dropdown2;
 			if (values == null)
 			{
 				values = (T[])Enum.GetValues(typeof(T));
@@ -318,30 +338,31 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			dropdown.SelectedItem = selectedValue;
 			if (onChangeAction != null)
 			{
-				dropdown.ValueChanged += delegate(object s, ValueChangedEventArgs e)
+				dropdown.ValueChanged += delegate(object s, ValueChangedEventArgs<string> e)
 				{
-					Dropdown dropdown3 = s as Dropdown;
+					Dropdown<string> dropdown3 = s as Dropdown<string>;
 					onChangeAction?.Invoke(values[formattedValues.ToList().IndexOf(dropdown3.SelectedItem)]);
 				};
 			}
 			return dropdown;
 		}
 
-		protected Dropdown RenderDropdown(Panel parent, Point location, int width, string[] values, string value, Action<string> onChangeAction = null, Func<string, string, Task<bool>> onBeforeChangeAction = null)
+		protected Dropdown<T> RenderDropdown<T>(Panel parent, Point location, int width, T[] values, T value, Action<T> onChangeAction = null, Func<T, T, Task<bool>> onBeforeChangeAction = null)
 		{
 			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 			if (onBeforeChangeAction == null)
 			{
-				onBeforeChangeAction = (string _, string _) => Task.FromResult(result: true);
+				onBeforeChangeAction = (T _, T _) => Task.FromResult(result: true);
 			}
-			Dropdown dropdown2 = new Dropdown();
+			Dropdown<T> dropdown2 = new Dropdown<T>();
 			((Control)dropdown2).set_Parent((Container)(object)parent);
 			((Control)dropdown2).set_Width(width);
 			((Control)dropdown2).set_Location(location);
-			Dropdown dropdown = dropdown2;
+			dropdown2.Font = ControlFonts[ControlType.Dropdown];
+			Dropdown<T> dropdown = dropdown2;
 			if (values != null)
 			{
-				foreach (string valueToAdd in values)
+				foreach (T valueToAdd in values)
 				{
 					dropdown.Items.Add(valueToAdd);
 				}
@@ -349,9 +370,9 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			}
 			if (onChangeAction != null)
 			{
-				dropdown.ValueChanged += delegate(object s, ValueChangedEventArgs e)
+				dropdown.ValueChanged += delegate(object s, ValueChangedEventArgs<T> e)
 				{
-					Dropdown dropdown3 = s as Dropdown;
+					Dropdown<T> dropdown3 = s as Dropdown<T>;
 					onChangeAction?.Invoke(dropdown3.SelectedItem);
 				};
 			}
@@ -398,20 +419,20 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		protected Label GetLabel(Panel parent, string text, Color? color = null, BitmapFont font = null)
 		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006d: Expected O, but got Unknown
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Expected O, but got Unknown
 			if (font == null)
 			{
-				font = Font;
+				font = ControlFonts[ControlType.Label];
 			}
 			Label val = new Label();
 			((Control)val).set_Parent((Container)(object)parent);
@@ -425,13 +446,14 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		private Button BuildButton(Panel parent, string text, Func<bool> disabledCallback = null)
 		{
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 			Button button2 = new Button();
 			((Control)button2).set_Parent((Container)(object)parent);
 			button2.Text = text;
 			((Control)button2).set_Enabled(disabledCallback == null || !disabledCallback());
+			button2.Font = ControlFonts[ControlType.Button];
 			Button button = button2;
-			int measuredWidth = (int)Font.MeasureString(text).Width + 10;
+			int measuredWidth = (int)button.Font.MeasureString(text).Width + 10;
 			if (((Control)button).get_Width() < measuredWidth)
 			{
 				((Control)button).set_Width(measuredWidth);
@@ -450,7 +472,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 				}
 				catch (Exception ex)
 				{
-					Logger.Warn(ex, "Failed executing action:");
+					_logger.Warn(ex, "Failed executing action:");
 					ShowError(ex.Message);
 				}
 			});
@@ -471,7 +493,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 					}
 					catch (Exception ex)
 					{
-						Logger.Warn(ex, "Failed executing action:");
+						_logger.Warn(ex, "Failed executing action:");
 						ShowError(ex.Message);
 					}
 					finally
@@ -487,11 +509,13 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 		{
 			Panel panel = GetPanel((Container)(object)parent);
 			Label titleLabel = GetLabel(panel, title, textColorTitle);
+			titleLabel.set_VerticalAlignment((VerticalAlignment)1);
 			Label valueLabel = null;
 			if (value != null)
 			{
 				valueLabel = GetLabel(panel, value, textColorValue);
 				((Control)valueLabel).set_Left(valueXLocation ?? (((Control)titleLabel).get_Right() + CONTROL_X_SPACING));
+				valueLabel.set_VerticalAlignment((VerticalAlignment)1);
 			}
 			else
 			{
@@ -502,23 +526,23 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		protected ColorBox RenderColorBox(Panel parent, Point location, Color initialColor, Action<Color> onChange, Panel selectorPanel = null, Thickness? innerSelectorPanelPadding = null)
 		{
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Expected O, but got Unknown
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Expected O, but got Unknown
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
 			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c7: Expected O, but got Unknown
+			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ce: Expected O, but got Unknown
 			Panel panel = GetPanel((Container)(object)parent);
 			ColorBox val = new ColorBox();
 			((Control)val).set_Location(location);
@@ -571,7 +595,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 				}
 				catch (Exception ex)
 				{
-					Logger.Warn(ex, "Hacky colorpicker resize failed.. Nothing to prevent this..");
+					_logger.Warn(ex, "Hacky colorpicker resize failed.. Nothing to prevent this..");
 				}
 			});
 			colorPicker.add_SelectedColorChanged((EventHandler<EventArgs>)delegate(object sender, EventArgs eArgs)
@@ -590,19 +614,19 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		private void ShowMessage(string message, Color color, int durationMS, BitmapFont font = null)
 		{
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Expected O, but got Unknown
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Expected O, but got Unknown
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
 			_messageCancellationTokenSource?.Cancel();
 			_messageCancellationTokenSource = new CancellationTokenSource();
 			if (font == null)
 			{
-				font = Font;
+				font = ControlFonts[ControlType.Label];
 			}
 			Size2 textSize = font.MeasureString(message);
 			Panel messagePanel = new Panel();
@@ -628,8 +652,13 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		protected void ShowError(string message)
 		{
+			ShowError(message, 5000);
+		}
+
+		protected void ShowError(string message, int durationMS)
+		{
 			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			ShowMessage(message, Color.get_Red(), 5000, GameService.Content.get_DefaultFont18());
+			ShowMessage(message, Color.get_Red(), durationMS, GameService.Content.get_DefaultFont18());
 		}
 
 		protected void ShowInfo(string message)

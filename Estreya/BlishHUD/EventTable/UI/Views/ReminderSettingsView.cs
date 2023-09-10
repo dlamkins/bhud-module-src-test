@@ -12,7 +12,6 @@ using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.UI.Views;
 using Estreya.BlishHUD.Shared.Utils;
 using Microsoft.Xna.Framework;
-using MonoGame.Extended.BitmapFonts;
 
 namespace Estreya.BlishHUD.EventTable.UI.Views
 {
@@ -34,8 +33,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			_globalChangeTempEvent.UpdateReminderTimes(new TimeSpan[1] { TimeSpan.Zero });
 		}
 
-		public ReminderSettingsView(ModuleSettings moduleSettings, Func<List<EventCategory>> getEvents, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService, BitmapFont font = null)
-			: base(apiManager, iconService, translationService, settingEventService, font)
+		public ReminderSettingsView(ModuleSettings moduleSettings, Func<List<EventCategory>> getEvents, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService)
+			: base(apiManager, iconService, translationService, settingEventService)
 		{
 			_moduleSettings = moduleSettings;
 			_getEvents = getEvents;
@@ -48,6 +47,10 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderIntSetting((Panel)(object)parent, _moduleSettings.ReminderPosition.Y);
 			RenderFloatSetting((Panel)(object)parent, _moduleSettings.ReminderDuration);
 			RenderFloatSetting((Panel)(object)parent, _moduleSettings.ReminderOpacity);
+			RenderEnumSetting<ReminderStackDirection>((Panel)(object)parent, _moduleSettings.ReminderStackDirection);
+			RenderEmptyLine((Panel)(object)parent);
+			RenderEnumSetting<LeftClickAction>((Panel)(object)parent, _moduleSettings.ReminderLeftClickAction);
+			RenderBoolSetting((Panel)(object)parent, _moduleSettings.AcceptWaypointPrompt);
 			RenderEmptyLine((Panel)(object)parent);
 			RenderButton((Panel)(object)parent, base.TranslationService.GetTranslation("reminderSettingsView-btn-manageReminders", "Manage Reminders"), delegate
 			{
@@ -82,13 +85,17 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				{
 					Name = "Test Event",
 					Icon = "textures/maintenance.png"
-				}, "Test description!", _moduleSettings.ReminderPosition.X.get_Value(), _moduleSettings.ReminderPosition.Y.get_Value(), base.IconService);
+				}, "Test description!", _moduleSettings.ReminderPosition.X.get_Value(), _moduleSettings.ReminderPosition.Y.get_Value(), _moduleSettings.ReminderStackDirection.get_Value(), base.IconService);
 				eventNotification.BackgroundOpacity = _moduleSettings.ReminderOpacity.get_Value();
 				eventNotification.Show(TimeSpan.FromSeconds(_moduleSettings.ReminderDuration.get_Value()));
 			});
 			RenderButton((Panel)(object)parent, base.TranslationService.GetTranslation("reminderSettingsView-btn-changeAllTimes", "Change all Reminder Times"), delegate
 			{
 				ManageReminderTimes(_globalChangeTempEvent);
+			});
+			RenderButton((Panel)(object)parent, base.TranslationService.GetTranslation("reminderSettingsView-btn-resetAllTimes", "Reset all Reminder Times"), delegate
+			{
+				ManageReminderTimesView_SaveClicked(this, (_globalChangeTempEvent, new List<TimeSpan> { TimeSpan.FromMinutes(10.0) }, false));
 			});
 			RenderEmptyLine((Panel)(object)parent);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideRemindersOnMissingMumbleTicks);
@@ -102,7 +109,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private void ManageView_EventChanged(object sender, ManageEventsView.EventChangedArgs e)
 		{
-			_moduleSettings.ReminderDisabledForEvents.set_Value(e.NewService ? new List<string>(from s in _moduleSettings.ReminderDisabledForEvents.get_Value()
+			_moduleSettings.ReminderDisabledForEvents.set_Value(e.NewState ? new List<string>(from s in _moduleSettings.ReminderDisabledForEvents.get_Value()
 				where s != e.EventSettingKey
 				select s) : new List<string>(_moduleSettings.ReminderDisabledForEvents.get_Value()) { e.EventSettingKey });
 		}
@@ -119,15 +126,15 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			if (mrtv != null)
 			{
 				mrtv.CancelClicked -= ManageReminderTimesView_CancelClicked;
-				mrtv.SaveClicked -= new EventHandler<(Estreya.BlishHUD.EventTable.Models.Event, List<TimeSpan>)>(ManageReminderTimesView_SaveClicked);
+				mrtv.SaveClicked -= new EventHandler<(Estreya.BlishHUD.EventTable.Models.Event, List<TimeSpan>, bool)>(ManageReminderTimesView_SaveClicked);
 			}
-			ManageReminderTimesView view = new ManageReminderTimesView(ev, base.APIManager, base.IconService, base.TranslationService);
+			ManageReminderTimesView view = new ManageReminderTimesView(ev, ev == _globalChangeTempEvent, base.APIManager, base.IconService, base.TranslationService);
 			view.CancelClicked += ManageReminderTimesView_CancelClicked;
-			view.SaveClicked += new EventHandler<(Estreya.BlishHUD.EventTable.Models.Event, List<TimeSpan>)>(ManageReminderTimesView_SaveClicked);
+			view.SaveClicked += new EventHandler<(Estreya.BlishHUD.EventTable.Models.Event, List<TimeSpan>, bool)>(ManageReminderTimesView_SaveClicked);
 			_manageReminderTimesWindow.Show((IView)(object)view);
 		}
 
-		private void ManageReminderTimesView_SaveClicked(object sender, (Estreya.BlishHUD.EventTable.Models.Event Event, List<TimeSpan> ReminderTimes) e)
+		private void ManageReminderTimesView_SaveClicked(object sender, (Estreya.BlishHUD.EventTable.Models.Event Event, List<TimeSpan> ReminderTimes, bool KeepCustomized) e)
 		{
 			if (e.Event == _globalChangeTempEvent)
 			{
@@ -135,8 +142,11 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					where !ev.Filler
 					select ev)
 				{
-					_moduleSettings.ReminderTimesOverride.get_Value()[ev2.SettingKey] = e.ReminderTimes;
-					ev2.UpdateReminderTimes(e.ReminderTimes.ToArray());
+					if (!_moduleSettings.ReminderTimesOverride.get_Value().ContainsKey(ev2.SettingKey) || !e.KeepCustomized)
+					{
+						_moduleSettings.ReminderTimesOverride.get_Value()[ev2.SettingKey] = e.ReminderTimes;
+						ev2.UpdateReminderTimes(e.ReminderTimes.ToArray());
+					}
 				}
 				_moduleSettings.ReminderTimesOverride.set_Value(new Dictionary<string, List<TimeSpan>>(_moduleSettings.ReminderTimesOverride.get_Value()));
 				_globalChangeTempEvent.UpdateReminderTimes(e.ReminderTimes.ToArray());
@@ -185,7 +195,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			if (mrtv != null)
 			{
 				mrtv.CancelClicked -= ManageReminderTimesView_CancelClicked;
-				mrtv.SaveClicked -= new EventHandler<(Estreya.BlishHUD.EventTable.Models.Event, List<TimeSpan>)>(ManageReminderTimesView_SaveClicked);
+				mrtv.SaveClicked -= new EventHandler<(Estreya.BlishHUD.EventTable.Models.Event, List<TimeSpan>, bool)>(ManageReminderTimesView_SaveClicked);
 			}
 			StandardWindow manageReminderTimesWindow = _manageReminderTimesWindow;
 			if (manageReminderTimesWindow != null)

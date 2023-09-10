@@ -38,26 +38,32 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private readonly string _message;
 
-		private Estreya.BlishHUD.EventTable.Models.Event _event;
-
 		private AsyncTexture2D _eventIcon;
 
 		private IconService _iconService;
+
+		private readonly bool _captureMouseClicks;
 
 		private readonly int _x;
 
 		private readonly int _y;
 
+		private readonly ReminderStackDirection _stackDirection;
+
+		public Estreya.BlishHUD.EventTable.Models.Event Model { get; private set; }
+
 		public float BackgroundOpacity { get; set; } = 1f;
 
 
-		public EventNotification(Estreya.BlishHUD.EventTable.Models.Event ev, string message, int x, int y, IconService iconService)
+		public EventNotification(Estreya.BlishHUD.EventTable.Models.Event ev, string message, int x, int y, ReminderStackDirection stackDirection, IconService iconService, bool captureMouseClicks = false)
 		{
-			_event = ev;
+			Model = ev;
 			_message = message;
 			_x = x;
 			_y = y;
+			_stackDirection = stackDirection;
 			_iconService = iconService;
+			_captureMouseClicks = captureMouseClicks;
 			_eventIcon = _iconService?.GetIcon(ev.Icon);
 			base.Width = 350;
 			base.Height = 96;
@@ -68,8 +74,23 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		public void Show(TimeSpan duration)
 		{
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).set_Location(new Point(_x, (_lastShown != null) ? (((Control)_lastShown).get_Bottom() + 15) : _y));
+			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+			((Control)this).set_Location((Point)(_stackDirection switch
+			{
+				ReminderStackDirection.Top => new Point((_lastShown != null) ? ((Control)_lastShown).get_Left() : _x, (_lastShown != null) ? (((Control)_lastShown).get_Top() - base.Height - 15) : _y), 
+				ReminderStackDirection.Down => new Point((_lastShown != null) ? ((Control)_lastShown).get_Left() : _x, (_lastShown != null) ? (((Control)_lastShown).get_Bottom() + 15) : _y), 
+				ReminderStackDirection.Left => new Point((_lastShown != null) ? (((Control)_lastShown).get_Left() - base.Width - 15) : _x, (_lastShown != null) ? ((Control)_lastShown).get_Top() : _y), 
+				ReminderStackDirection.Right => new Point((_lastShown != null) ? (((Control)_lastShown).get_Right() + 15) : _x, (_lastShown != null) ? ((Control)_lastShown).get_Top() : _y), 
+				_ => throw new ArgumentException($"Invalid stack direction: {_stackDirection}"), 
+			}));
 			((Control)this).Show();
 			_lastShown = this;
 			((TweenerImpl)GameService.Animation.get_Tweener()).Tween<EventNotification>(this, (object)new
@@ -77,10 +98,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				Opacity = 1f
 			}, 0.2f, 0f, true).Repeat(1).RepeatDelay((float)duration.TotalSeconds)
 				.Reflect()
-				.OnComplete((Action)delegate
-				{
-					Hide();
-				});
+				.OnComplete((Action)Hide);
 		}
 
 		public void Hide()
@@ -104,31 +122,35 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
 			spriteBatch.Draw(Textures.get_Pixel(), _fullRect, Color.get_Black() * BackgroundOpacity);
-			if (_eventIcon != null && _eventIcon.get_HasSwapped())
+			if (_eventIcon != null)
 			{
 				spriteBatch.Draw(AsyncTexture2D.op_Implicit(_eventIcon), _iconRect, Color.get_White());
 			}
-			spriteBatch.DrawString(_event.Name, _titleFont, RectangleF.op_Implicit(_titleRect), Color.get_White(), wrap: false, (HorizontalAlignment)0, (VerticalAlignment)1);
+			spriteBatch.DrawString(Model.Name, _titleFont, RectangleF.op_Implicit(_titleRect), Color.get_White(), wrap: false, (HorizontalAlignment)0, (VerticalAlignment)1);
 			spriteBatch.DrawString(_message, _messageFont, RectangleF.op_Implicit(_messageRect), Color.get_White(), wrap: false, (HorizontalAlignment)0, (VerticalAlignment)1);
 		}
 
 		protected override CaptureType CapturesInput()
 		{
+			if (_captureMouseClicks)
+			{
+				return (CaptureType)4;
+			}
 			return (CaptureType)0;
 		}
 
 		protected override void InternalDispose()
 		{
-			_event = null;
+			Model = null;
 			_iconService = null;
 			_eventIcon = null;
 		}

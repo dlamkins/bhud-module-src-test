@@ -7,7 +7,6 @@ using Estreya.BlishHUD.Shared.Helpers;
 using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.UI.Views;
 using Microsoft.Xna.Framework;
-using MonoGame.Extended.BitmapFonts;
 
 namespace Estreya.BlishHUD.EventTable.UI.Views
 {
@@ -17,8 +16,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private readonly BlishHudApiService _blishHudApiService;
 
-		public CustomEventView(Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, BlishHudApiService blishHudApiService, BitmapFont font = null)
-			: base(apiManager, iconService, translationService, font)
+		public CustomEventView(Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, BlishHudApiService blishHudApiService)
+			: base(apiManager, iconService, translationService)
 		{
 			_blishHudApiService = blishHudApiService;
 		}

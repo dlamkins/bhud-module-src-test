@@ -5,18 +5,23 @@ using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
+using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.EventTable.Controls;
+using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.EventTable.Services;
+using Estreya.BlishHUD.Shared.Controls;
+using Estreya.BlishHUD.Shared.Extensions;
 using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.UI.Views;
+using Estreya.BlishHUD.Shared.Utils;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended.BitmapFonts;
+using Newtonsoft.Json;
 
 namespace Estreya.BlishHUD.EventTable.UI.Views
 {
@@ -30,17 +35,30 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private readonly Func<List<string>> _getDisabledEventGuids;
 
+		private readonly ModuleSettings _moduleSettings;
+
 		private readonly List<Map> _maps = new List<Map>();
+
+		private StandardWindow _editEventWindow;
 
 		public Panel Panel { get; private set; }
 
 		public event EventHandler<ManageEventsView.EventChangedArgs> EventChanged;
 
-		public ManageDynamicEventsSettingsView(DynamicEventService dynamicEventService, Func<List<string>> getDisabledEventGuids, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, BitmapFont font = null)
-			: base(apiManager, iconService, translationService, font)
+		public ManageDynamicEventsSettingsView(DynamicEventService dynamicEventService, Func<List<string>> getDisabledEventGuids, ModuleSettings moduleSettings, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService)
+			: base(apiManager, iconService, translationService)
 		{
 			_dynamicEventService = dynamicEventService;
 			_getDisabledEventGuids = getDisabledEventGuids;
+			_moduleSettings = moduleSettings;
+			_dynamicEventService.CustomEventsUpdated += DynamicEventService_CustomEventsUpdated;
+		}
+
+		private Task DynamicEventService_CustomEventsUpdated(object sender)
+		{
+			((Container)base.MainPanel).ClearChildren();
+			InternalBuild(base.MainPanel);
+			return Task.CompletedTask;
 		}
 
 		private void UpdateToggleButton(GlowButton button)
@@ -126,12 +144,21 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_0328: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0330: Unknown result type (might be due to invalid IL or missing references)
 			//IL_033d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0464: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ce: Expected O, but got Unknown
+			//IL_04ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0505: Unknown result type (might be due to invalid IL or missing references)
+			//IL_050c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_054c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0551: Unknown result type (might be due to invalid IL or missing references)
+			//IL_055e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0565: Unknown result type (might be due to invalid IL or missing references)
+			//IL_057b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0589: Unknown result type (might be due to invalid IL or missing references)
+			//IL_058e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_059b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05af: Expected O, but got Unknown
 			Panel val = new Panel();
 			((Control)val).set_Parent((Container)(object)parent);
 			((Control)val).set_Location(new Point(MAIN_PADDING.X, MAIN_PADDING.Y));
@@ -140,7 +167,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			val.set_CanScroll(true);
 			Panel = val;
 			Rectangle contentRegion = ((Container)Panel).get_ContentRegion();
-			IEnumerable<Map> maps = _maps.Where((Map m) => _dynamicEventService.Events?.Any((DynamicEventService.DynamicEvent de) => de.MapId == m.get_Id()) ?? false);
+			IEnumerable<Map> maps = _maps.Where((Map m) => _dynamicEventService.Events?.Any((DynamicEvent de) => de.MapId == m.get_Id()) ?? false);
 			TextBox val2 = new TextBox();
 			((Control)val2).set_Parent((Container)(object)Panel);
 			((Control)val2).set_Width(((DesignStandard)(ref Panel.MenuStandard)).get_Size().X);
@@ -170,7 +197,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Control)eventPanel).set_Size(new Point(contentRegion.Width - ((Control)eventPanel).get_Location().X - MAIN_PADDING.X, contentRegion.Height - 32));
 			((TextInputBase)searchBox).add_TextChanged((EventHandler<EventArgs>)delegate
 			{
-				eventPanel.FilterChildren<DataDetailsButton<DynamicEventService.DynamicEvent>>((Func<DataDetailsButton<DynamicEventService.DynamicEvent>, bool>)((DataDetailsButton<DynamicEventService.DynamicEvent> detailsButton) => ((DetailsButton)detailsButton).get_Text().ToLowerInvariant().Contains(((TextInputBase)searchBox).get_Text().ToLowerInvariant())));
+				eventPanel.FilterChildren<DataDetailsButton<DynamicEvent>>((Func<DataDetailsButton<DynamicEvent>, bool>)((DataDetailsButton<DynamicEvent> detailsButton) => ((DetailsButton)detailsButton).get_Text().ToLowerInvariant().Contains(((TextInputBase)searchBox).get_Text().ToLowerInvariant())));
 			});
 			Dictionary<string, MenuItem> menus = new Dictionary<string, MenuItem>();
 			MenuItem allEvents = val4.AddMenuItem("Current Map", (Texture2D)null);
@@ -184,7 +211,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					if (menuItem != null)
 					{
 						Map map3 = maps.Where((Map map) => map.get_Name() == menuItem.get_Text()).FirstOrDefault();
-						eventPanel.FilterChildren<DataDetailsButton<DynamicEventService.DynamicEvent>>((Func<DataDetailsButton<DynamicEventService.DynamicEvent>, bool>)((DataDetailsButton<DynamicEventService.DynamicEvent> detailsButton) => menuItem == menus["allEvents"] || detailsButton.Data.MapId == map3.get_Id()));
+						eventPanel.FilterChildren<DataDetailsButton<DynamicEvent>>((Func<DataDetailsButton<DynamicEvent>, bool>)((DataDetailsButton<DynamicEvent> detailsButton) => menuItem == menus["allEvents"] || detailsButton.Data.MapId == map3.get_Id()));
 					}
 				});
 			});
@@ -204,14 +231,14 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				((Container)eventPanel).get_Children().ToList().ForEach(delegate(Control control)
 				{
 					menus["allEvents"].get_Selected();
-					DataDetailsButton<DynamicEventService.DynamicEvent> dataDetailsButton2 = control as DataDetailsButton<DynamicEventService.DynamicEvent>;
+					DataDetailsButton<DynamicEvent> dataDetailsButton2 = control as DataDetailsButton<DynamicEvent>;
 					if (dataDetailsButton2 != null && ((Control)dataDetailsButton2).get_Visible())
 					{
-						Control obj3 = ((IEnumerable<Control>)((Container)dataDetailsButton2).get_Children()).Last();
-						GlowButton val11 = (GlowButton)(object)((obj3 is GlowButton) ? obj3 : null);
-						if (val11 != null)
+						Control obj4 = ((IEnumerable<Control>)((Container)dataDetailsButton2).get_Children()).Last();
+						GlowButton val13 = (GlowButton)(object)((obj4 is GlowButton) ? obj4 : null);
+						if (val13 != null)
 						{
-							val11.set_Checked(true);
+							val13.set_Checked(true);
 						}
 					}
 				});
@@ -226,25 +253,28 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				((Container)eventPanel).get_Children().ToList().ForEach(delegate(Control control)
 				{
 					menus["allEvents"].get_Selected();
-					DataDetailsButton<DynamicEventService.DynamicEvent> dataDetailsButton = control as DataDetailsButton<DynamicEventService.DynamicEvent>;
+					DataDetailsButton<DynamicEvent> dataDetailsButton = control as DataDetailsButton<DynamicEvent>;
 					if (dataDetailsButton != null && ((Control)dataDetailsButton).get_Visible())
 					{
-						Control obj2 = ((IEnumerable<Control>)((Container)dataDetailsButton).get_Children()).Last();
-						GlowButton val10 = (GlowButton)(object)((obj2 is GlowButton) ? obj2 : null);
-						if (val10 != null)
+						Control obj3 = ((IEnumerable<Control>)((Container)dataDetailsButton).get_Children()).Last();
+						GlowButton val12 = (GlowButton)(object)((obj3 is GlowButton) ? obj3 : null);
+						if (val12 != null)
 						{
-							val10.set_Checked(false);
+							val12.set_Checked(false);
 						}
 					}
 				});
 			});
-			List<DynamicEventService.DynamicEvent> eventList = _dynamicEventService.Events.ToList();
+			List<DynamicEvent> eventList = _dynamicEventService.Events.ToList();
 			foreach (Map map2 in maps.Where((Map m) => m.get_Id() == GameService.Gw2Mumble.get_CurrentMap().get_Id()))
 			{
-				foreach (DynamicEventService.DynamicEvent e2 in eventList.Where((DynamicEventService.DynamicEvent e) => e.MapId == map2.get_Id()))
+				foreach (DynamicEvent e2 in from e in eventList
+					where e.MapId == map2.get_Id()
+					orderby e.IsCustom descending
+					select e)
 				{
 					bool enabled = !_getDisabledEventGuids().Contains(e2.ID);
-					DataDetailsButton<DynamicEventService.DynamicEvent> obj = new DataDetailsButton<DynamicEventService.DynamicEvent>
+					DataDetailsButton<DynamicEvent> obj = new DataDetailsButton<DynamicEvent>
 					{
 						Data = e2
 					};
@@ -252,8 +282,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					((DetailsButton)obj).set_Text(e2.Name);
 					((DetailsButton)obj).set_ShowToggleButton(true);
 					((DetailsButton)obj).set_FillColor(Color.get_LightBlue());
-					DataDetailsButton<DynamicEventService.DynamicEvent> button = obj;
-					DynamicEventService.DynamicEvent.DynamicEventIcon icon = e2.Icon;
+					DataDetailsButton<DynamicEvent> button = obj;
+					DynamicEvent.DynamicEventIcon icon = e2.Icon;
 					int num;
 					if (icon == null)
 					{
@@ -273,16 +303,47 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					}
 					GlowButton val9 = new GlowButton();
 					((Control)val9).set_Parent((Container)(object)button);
-					val9.set_Checked(enabled);
 					val9.set_ToggleGlow(false);
-					GlowButton toggleButton = val9;
+					val9.set_Icon(base.IconService.GetIcon("156706.png"));
+					((Control)val9).add_Click((EventHandler<MouseEventArgs>)delegate
+					{
+						if (_editEventWindow == null)
+						{
+							_editEventWindow = WindowUtil.CreateStandardWindow(_moduleSettings, "Edit Dynamic Event", ((object)this).GetType(), Guid.Parse("5e20b5b0-d0a8-4e36-b65b-3bfc9c971d3d"), base.IconService);
+						}
+						if (_editEventWindow.CurrentView != null)
+						{
+							EditDynamicEventView obj2 = _editEventWindow.CurrentView as EditDynamicEventView;
+							obj2.SaveClicked -= EditEventView_SaveClicked;
+							obj2.RemoveClicked -= EditEventView_RemoveClicked;
+							obj2.CloseRequested -= EditEventView_CloseRequested;
+						}
+						EditDynamicEventView editDynamicEventView = new EditDynamicEventView(e2.CopyWithJson(new JsonSerializerSettings()), base.APIManager, base.IconService, base.TranslationService);
+						editDynamicEventView.SaveClicked += EditEventView_SaveClicked;
+						editDynamicEventView.RemoveClicked += EditEventView_RemoveClicked;
+						editDynamicEventView.CloseRequested += EditEventView_CloseRequested;
+						_editEventWindow.Show((IView)(object)editDynamicEventView);
+					});
+					if (e2.IsCustom)
+					{
+						GlowButton val10 = new GlowButton();
+						((Control)val10).set_Parent((Container)(object)button);
+						val10.set_ToggleGlow(false);
+						val10.set_Icon(base.IconService.GetIcon("440023.png"));
+						((Control)val10).set_BasicTooltipText("This event is customized!");
+					}
+					GlowButton val11 = new GlowButton();
+					((Control)val11).set_Parent((Container)(object)button);
+					val11.set_Checked(enabled);
+					val11.set_ToggleGlow(false);
+					GlowButton toggleButton = val11;
 					UpdateToggleButton(toggleButton);
 					toggleButton.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object s, CheckChangedEvent eventArgs)
 					{
 						this.EventChanged?.Invoke(this, new ManageEventsView.EventChangedArgs
 						{
-							OldService = !eventArgs.get_Checked(),
-							NewService = eventArgs.get_Checked(),
+							OldState = !eventArgs.get_Checked(),
+							NewState = eventArgs.get_Checked(),
 							EventSettingKey = button.Data.ID
 						});
 						toggleButton.set_Checked(eventArgs.get_Checked());
@@ -296,6 +357,23 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			}
 		}
 
+		private void EditEventView_CloseRequested(object sender, EventArgs e)
+		{
+			((Control)_editEventWindow).Hide();
+		}
+
+		private async Task EditEventView_RemoveClicked(object sender, DynamicEvent e)
+		{
+			await _dynamicEventService.RemoveCustomEvent(e.ID);
+			await _dynamicEventService.NotifyCustomEventsUpdated();
+		}
+
+		private async Task EditEventView_SaveClicked(object sender, DynamicEvent e)
+		{
+			await _dynamicEventService.AddCustomEvent(e);
+			await _dynamicEventService.NotifyCustomEventsUpdated();
+		}
+
 		protected override async Task<bool> InternalLoad(IProgress<string> progress)
 		{
 			try
@@ -306,9 +384,21 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			}
 			catch (Exception ex)
 			{
-				Logger.Debug(ex, "Failed to add maps:");
+				Logger.Warn(ex, "Failed to add maps:");
 				return false;
 			}
+		}
+
+		protected override void Unload()
+		{
+			base.Unload();
+			_dynamicEventService.CustomEventsUpdated -= DynamicEventService_CustomEventsUpdated;
+			StandardWindow editEventWindow = _editEventWindow;
+			if (editEventWindow != null)
+			{
+				((Control)editEventWindow).Dispose();
+			}
+			_editEventWindow = null;
 		}
 	}
 }

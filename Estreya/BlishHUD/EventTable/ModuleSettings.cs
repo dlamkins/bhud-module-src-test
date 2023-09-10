@@ -35,6 +35,12 @@ namespace Estreya.BlishHUD.EventTable
 
 		public SettingEntry<Dictionary<string, List<TimeSpan>>> ReminderTimesOverride { get; private set; }
 
+		public SettingEntry<LeftClickAction> ReminderLeftClickAction { get; private set; }
+
+		public SettingEntry<bool> AcceptWaypointPrompt { get; set; }
+
+		public SettingEntry<ReminderStackDirection> ReminderStackDirection { get; set; }
+
 		public SettingEntry<bool> ShowDynamicEventsOnMap { get; private set; }
 
 		public SettingEntry<bool> ShowDynamicEventInWorld { get; private set; }
@@ -98,6 +104,9 @@ namespace Estreya.BlishHUD.EventTable
 			ReminderTimesOverride = base.GlobalSettings.DefineSetting<Dictionary<string, List<TimeSpan>>>("ReminderTimesOverride", new Dictionary<string, List<TimeSpan>>(), (Func<string>)(() => "Reminder Times Override"), (Func<string>)(() => "Defines the overridden times for reminders per event."));
 			ReminderOpacity = base.GlobalSettings.DefineSetting<float>("ReminderOpacity", 0.5f, (Func<string>)(() => "Reminder Opacity"), (Func<string>)(() => "Defines the background opacity for reminders."));
 			SettingComplianceExtensions.SetRange(ReminderOpacity, 0.1f, 1f);
+			ReminderLeftClickAction = base.GlobalSettings.DefineSetting<LeftClickAction>("ReminderLeftClickAction", LeftClickAction.CopyWaypoint, (Func<string>)(() => "Reminder Left Click Action"), (Func<string>)(() => "Defines the action to execute on a left click."));
+			AcceptWaypointPrompt = base.GlobalSettings.DefineSetting<bool>("AcceptWaypointPrompt", true, (Func<string>)(() => "Accept Waypoint Prompt"), (Func<string>)(() => "Defines if the waypoint prompt should be auto accepted"));
+			ReminderStackDirection = base.GlobalSettings.DefineSetting<ReminderStackDirection>("ReminderStackDirection", Estreya.BlishHUD.EventTable.Models.ReminderStackDirection.Down, (Func<string>)(() => "Reminder Stack Direction"), (Func<string>)(() => "Defines the direction in which reminders stack."));
 			ShowDynamicEventsOnMap = base.GlobalSettings.DefineSetting<bool>("ShowDynamicEventsOnMap", false, (Func<string>)(() => "Show Dynamic Events on Map"), (Func<string>)(() => "Whether the dynamic events of the map should be shown."));
 			ShowDynamicEventInWorld = base.GlobalSettings.DefineSetting<bool>("ShowDynamicEventInWorld", false, (Func<string>)(() => "Show Dynamic Events in World"), (Func<string>)(() => "Whether dynamic events should be shown inside the world."));
 			ShowDynamicEventInWorld.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowDynamicEventInWorld_SettingChanged);
@@ -145,11 +154,16 @@ namespace Estreya.BlishHUD.EventTable
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 			int maxResX = (int)((float)GameService.Graphics.get_Resolution().X / GameService.Graphics.get_UIScaleMultiplier());
-			int num = (int)((float)GameService.Graphics.get_Resolution().Y / GameService.Graphics.get_UIScaleMultiplier());
+			int maxResY = (int)((float)GameService.Graphics.get_Resolution().Y / GameService.Graphics.get_UIScaleMultiplier());
+			if (!IsMaxResolutionValid(maxResX, maxResY))
+			{
+				Logger.Warn($"Max Global size and position resolution is invalid. X: {maxResX} - Y: {maxResY}");
+				return;
+			}
 			int minLocationX = 0;
 			int maxLocationX = maxResX - 350;
 			int minLocationY = 0;
-			int maxLocationY = num - 96;
+			int maxLocationY = maxResY - 96;
 			if (maxLocationX >= 50)
 			{
 				_ = 50;
@@ -225,6 +239,14 @@ namespace Estreya.BlishHUD.EventTable
 			SettingEntry<string> eventTimespanHoursFormatString = base.DrawerSettings.DefineSetting<string>(name + "-eventTimespanHoursFormatString", "hh\\:mm\\:ss", (Func<string>)(() => "Hours Format String"), (Func<string>)(() => "Defines the format strings for timespans over 1 hours."));
 			SettingEntry<string> eventTimespanMinutesFormatString = base.DrawerSettings.DefineSetting<string>(name + "-eventTimespanMinutesFormatString", "mm\\:ss", (Func<string>)(() => "Minutes Format String"), (Func<string>)(() => "Defines the fallback format strings for timespans."));
 			SettingEntry<string> eventAbsoluteTimeFormatString = base.DrawerSettings.DefineSetting<string>(name + "-eventAbsoluteTimeFormatString", "HH\\:mm", (Func<string>)(() => "Absolute Time Format String"), (Func<string>)(() => "Defines the format strings for absolute time."));
+			SettingEntry<bool> showTopTimeline = base.DrawerSettings.DefineSetting<bool>(name + "-showTopTimeline", false, (Func<string>)(() => "Show Top Timeline"), (Func<string>)(() => "Defines whether the top timeline is visible."));
+			SettingEntry<string> topTimelineTimeFormatString = base.DrawerSettings.DefineSetting<string>(name + "-topTimelineTimeFormatString", "HH\\:mm", (Func<string>)(() => "Top Timeline Time Format String"), (Func<string>)(() => "Defines the format strings for absolute time."));
+			SettingEntry<Color> topTimelineBackgroundColor = base.DrawerSettings.DefineSetting<Color>(name + "-topTimelineBackgroundColor", base.DefaultGW2Color, (Func<string>)(() => "Top Timeline Background Color"), (Func<string>)(() => "Defines the background color of the top timeline."));
+			SettingEntry<Color> topTimelineLineColor = base.DrawerSettings.DefineSetting<Color>(name + "-topTimelineLineColor", base.DefaultGW2Color, (Func<string>)(() => "Top Timeline Line Color"), (Func<string>)(() => "Defines the line color of the top timeline."));
+			SettingEntry<Color> topTimelineTimeColor = base.DrawerSettings.DefineSetting<Color>(name + "-topTimelineTimeColor", base.DefaultGW2Color, (Func<string>)(() => "Top Timeline Time Color"), (Func<string>)(() => "Defines the time color of the top timeline."));
+			SettingEntry<float> topTimelineBackgroundOpacity = base.DrawerSettings.DefineSetting<float>(name + "-topTimelineBackgroundOpacity", 1f, (Func<string>)(() => "Top Timeline Background Opacity"), (Func<string>)(() => "Defines the background color opacity of the top timeline."));
+			SettingEntry<float> topTimelineLineOpacity = base.DrawerSettings.DefineSetting<float>(name + "-topTimelineLineOpacity", 1f, (Func<string>)(() => "Top Timeline Line Opacity"), (Func<string>)(() => "Defines the line color opacity of the top timeline."));
+			SettingEntry<float> topTimelineTimeOpacity = base.DrawerSettings.DefineSetting<float>(name + "-topTimelineTimeOpacity", 1f, (Func<string>)(() => "Top Timeline Time Opacity"), (Func<string>)(() => "Defines the time color opacity of the top timeline."));
 			return new EventAreaConfiguration
 			{
 				Name = drawer.Name,
@@ -233,6 +255,8 @@ namespace Estreya.BlishHUD.EventTable
 				BuildDirection = drawer.BuildDirection,
 				BackgroundColor = drawer.BackgroundColor,
 				FontSize = drawer.FontSize,
+				FontFace = drawer.FontFace,
+				CustomFontPath = drawer.CustomFontPath,
 				TextColor = drawer.TextColor,
 				Location = drawer.Location,
 				Opacity = drawer.Opacity,
@@ -280,7 +304,15 @@ namespace Estreya.BlishHUD.EventTable
 				EventTimespanDaysFormatString = eventTimespanDaysFormatString,
 				EventTimespanHoursFormatString = eventTimespanHoursFormatString,
 				EventTimespanMinutesFormatString = eventTimespanMinutesFormatString,
-				EventAbsoluteTimeFormatString = eventAbsoluteTimeFormatString
+				EventAbsoluteTimeFormatString = eventAbsoluteTimeFormatString,
+				ShowTopTimeline = showTopTimeline,
+				TopTimelineTimeFormatString = topTimelineTimeFormatString,
+				TopTimelineBackgroundColor = topTimelineBackgroundColor,
+				TopTimelineLineColor = topTimelineLineColor,
+				TopTimelineTimeColor = topTimelineTimeColor,
+				TopTimelineBackgroundOpacity = topTimelineBackgroundOpacity,
+				TopTimelineLineOpacity = topTimelineLineOpacity,
+				TopTimelineTimeOpacity = topTimelineTimeOpacity
 			};
 		}
 
@@ -344,6 +376,14 @@ namespace Estreya.BlishHUD.EventTable
 			base.DrawerSettings.UndefineSetting(name + "-eventTimespanHoursFormatString");
 			base.DrawerSettings.UndefineSetting(name + "-eventTimespanMinutesFormatString");
 			base.DrawerSettings.UndefineSetting(name + "-eventAbsoluteTimeFormatString");
+			base.DrawerSettings.UndefineSetting(name + "-showTopTimeline");
+			base.DrawerSettings.UndefineSetting(name + "-topTimeLineTimeFormatString");
+			base.DrawerSettings.UndefineSetting(name + "-topTimelineBackgroundColor");
+			base.DrawerSettings.UndefineSetting(name + "-topTimelineLineColor");
+			base.DrawerSettings.UndefineSetting(name + "-topTimelineTimeColor");
+			base.DrawerSettings.UndefineSetting(name + "-topTimelineBackgroundOpacity");
+			base.DrawerSettings.UndefineSetting(name + "-topTimelineLineOpacity");
+			base.DrawerSettings.UndefineSetting(name + "-topTimelineTimeOpacity");
 		}
 
 		public override void UpdateLocalization(TranslationService translationService)

@@ -44,7 +44,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected const string FILE_BLISH_ROOT_URL = "https://files.estreya.de/blish-hud";
 
-		protected const string API_ROOT_URL = "https://blish-hud.api.estreya.de";
+		protected const string API_ROOT_URL = "https://api.estreya.de/blish-hud";
 
 		protected const string GITHUB_OWNER = "Tharylia";
 
@@ -68,7 +68,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected string MODULE_FILE_URL => "https://files.estreya.de/blish-hud/" + UrlModuleName;
 
-		protected string MODULE_API_URL => "https://blish-hud.api.estreya.de/v" + API_VERSION_NO + "/" + UrlModuleName;
+		protected string MODULE_API_URL => "https://api.estreya.de/blish-hud/v" + API_VERSION_NO + "/" + UrlModuleName;
 
 		protected GitHubHelper GithubHelper { get; private set; }
 
@@ -77,6 +77,8 @@ namespace Estreya.BlishHUD.Shared.Modules
 		public abstract string UrlModuleName { get; }
 
 		protected abstract string API_VERSION_NO { get; }
+
+		protected virtual bool FailIfBackendDown { get; }
 
 		public bool IsPrerelease
 		{
@@ -203,26 +205,53 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		private async Task ThrowIfModuleInvalid(bool showScreenNotification)
 		{
-			IFlurlRequest flurlRequest = GetFlurlClient().Request(MODULE_API_URL, "validate");
-			flurlRequest.AllowAnyHttpStatus();
-			ModuleValidationRequest data = new ModuleValidationRequest
+			IFlurlRequest request = GetFlurlClient().Request(MODULE_API_URL, "validate").AllowAnyHttpStatus();
+			ModuleValidationRequest moduleValidationRequest = default(ModuleValidationRequest);
+			moduleValidationRequest.Version = ((Module)this).get_Version();
+			ModuleValidationRequest data = moduleValidationRequest;
+			HttpResponseMessage response = null;
+			try
 			{
-				Version = ((Module)this).get_Version()
-			};
-			HttpResponseMessage response = await flurlRequest.PostJsonAsync(data, default(CancellationToken), (HttpCompletionOption)0);
-			if (response.get_IsSuccessStatusCode() || response.get_StatusCode() == HttpStatusCode.NotFound)
+				response = await request.PostJsonAsync(data, default(CancellationToken), (HttpCompletionOption)0);
+			}
+			catch (Exception ex)
+			{
+				Logger.Debug(ex, "Failed to validate module.");
+				if (FailIfBackendDown)
+				{
+					throw new ModuleBackendUnavailableException();
+				}
+			}
+			if (response == null || response.get_IsSuccessStatusCode() || response.get_StatusCode() == HttpStatusCode.NotFound)
 			{
 				return;
 			}
-			ModuleValidationResponse validationResponse = await response.GetJsonAsync<ModuleValidationResponse>();
+			if (response.get_StatusCode() != HttpStatusCode.Forbidden)
+			{
+				string content = await response.get_Content().ReadAsStringAsync();
+				throw new ModuleBackendUnavailableException($"Module validation failed with unexpected status code {response.get_StatusCode()}: {content}");
+			}
+			ModuleValidationResponse validationResponse;
+			try
+			{
+				validationResponse = await response.GetJsonAsync<ModuleValidationResponse>();
+			}
+			catch (Exception)
+			{
+				throw new ModuleBackendUnavailableException("Could not read module validation response: " + await response.get_Content().ReadAsStringAsync());
+			}
 			if (showScreenNotification)
 			{
-				ScreenNotification.ShowNotification(new List<string>
+				List<string> messages = new List<string>
 				{
 					"[" + ((Module)this).get_Name() + "]",
-					"The current module version is invalid!",
-					validationResponse.Message ?? response.get_ReasonPhrase() ?? "Unknown"
-				}.ToArray(), ScreenNotification.NotificationType.Error, null, 10);
+					"The current module version is invalid!"
+				};
+				if (!string.IsNullOrWhiteSpace(validationResponse.Message) || !string.IsNullOrWhiteSpace(response.get_ReasonPhrase()))
+				{
+					messages.Add(validationResponse.Message ?? response.get_ReasonPhrase());
+				}
+				ScreenNotification.ShowNotification(messages.ToArray(), ScreenNotification.NotificationType.Error, null, 10);
 			}
 			throw new ModuleInvalidException(validationResponse.Message);
 		}
@@ -252,7 +281,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 					{
 						throw new ArgumentNullException("PasswordManager");
 					}
-					BlishHUDAPIService = new BlishHudApiService(configurations.BlishHUDAPI, ModuleSettings.BlishAPIUsername, PasswordManager, GetFlurlClient(), "https://blish-hud.api.estreya.de", API_VERSION_NO);
+					BlishHUDAPIService = new BlishHudApiService(configurations.BlishHUDAPI, ModuleSettings.BlishAPIUsername, PasswordManager, GetFlurlClient(), "https://api.estreya.de/blish-hud", API_VERSION_NO);
 					_services.Add(BlishHUDAPIService);
 				}
 				if (configurations.Account.Enabled)
@@ -509,18 +538,18 @@ namespace Estreya.BlishHUD.Shared.Modules
 			{
 				TabbedWindow tabbedWindow2 = (SettingsWindow = WindowUtil.CreateTabbedWindow(ModuleSettings, ((Module)this).get_Name(), ((object)this).GetType(), Guid.Parse("6bd04be4-dc19-4914-a2c3-8160ce76818b"), IconService, GetEmblem()));
 			}
-			SettingsWindow.Tabs.Add(new Tab(IconService.GetIcon("482926.png"), (Func<IView>)(() => (IView)(object)new NewsView(GetFlurlClient(), Gw2ApiManager, IconService, TranslationService, NewsService, GameService.Content.get_DefaultFont16())
+			SettingsWindow.Tabs.Add(new Tab(IconService.GetIcon("482926.png"), (Func<IView>)(() => (IView)(object)new NewsView(GetFlurlClient(), Gw2ApiManager, IconService, TranslationService, NewsService)
 			{
 				DefaultColor = ModuleSettings.DefaultGW2Color
 			}), "News", (int?)null));
 			OnSettingWindowBuild(SettingsWindow);
-			SettingsWindow.Tabs.Add(new Tab(IconService.GetIcon("156331.png"), (Func<IView>)(() => (IView)(object)new DonationView(GetFlurlClient(), Gw2ApiManager, IconService, TranslationService, GameService.Content.get_DefaultFont16())
+			SettingsWindow.Tabs.Add(new Tab(IconService.GetIcon("156331.png"), (Func<IView>)(() => (IView)(object)new DonationView(GetFlurlClient(), Gw2ApiManager, IconService, TranslationService)
 			{
 				DefaultColor = ModuleSettings.DefaultGW2Color
 			}), "Donations", (int?)null));
 			if (Debug)
 			{
-				SettingsWindow.Tabs.Add(new Tab(IconService.GetIcon("155052.png"), (Func<IView>)(() => (IView)(object)new ServiceSettingsView(_services, Gw2ApiManager, IconService, TranslationService, SettingEventService, Font)
+				SettingsWindow.Tabs.Add(new Tab(IconService.GetIcon("155052.png"), (Func<IView>)(() => (IView)(object)new ServiceSettingsView(_services, Gw2ApiManager, IconService, TranslationService, SettingEventService)
 				{
 					DefaultColor = ModuleSettings.DefaultGW2Color
 				}), "Debug", (int?)null));

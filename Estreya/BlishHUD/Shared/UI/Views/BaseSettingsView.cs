@@ -12,7 +12,6 @@ using Estreya.BlishHUD.Shared.Extensions;
 using Estreya.BlishHUD.Shared.Services;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
-using MonoGame.Extended.BitmapFonts;
 
 namespace Estreya.BlishHUD.Shared.UI.Views
 {
@@ -22,19 +21,24 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		private readonly SettingEventService _settingEventService;
 
-		private readonly Point CONTROL_LOCATION;
+		private Point CONTROL_LOCATION;
 
-		private readonly int CONTROL_WIDTH;
+		protected int CONTROL_WIDTH;
 
-		protected BaseSettingsView(Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService, BitmapFont font = null)
-			: base(apiManager, iconService, translationService, font)
+		protected BaseSettingsView(Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService)
+			: base(apiManager, iconService, translationService)
 		{
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 			base.LABEL_WIDTH = 250;
 			CONTROL_WIDTH = 250;
-			CONTROL_LOCATION = new Point(base.LABEL_WIDTH + 20, 0);
+			UpdateControlLocation();
 			_settingEventService = settingEventService;
+		}
+
+		protected void UpdateControlLocation()
+		{
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			CONTROL_LOCATION = new Point(base.LABEL_WIDTH + 20, 0);
 		}
 
 		protected sealed override void InternalBuild(Panel parent)
@@ -235,7 +239,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			return (panel, label.Item1, keybindingAssigner);
 		}
 
-		protected (Panel Panel, Label label, Dropdown dropdown) RenderEnumSetting<T>(Panel parent, SettingEntry<T> settingEntry) where T : struct, Enum
+		protected (Panel Panel, Label label, Dropdown<string> dropdown) RenderEnumSetting<T>(Panel parent, SettingEntry<T> settingEntry) where T : struct, Enum
 		{
 			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
@@ -254,7 +258,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			{
 				values.AddRange((T[])Enum.GetValues(((SettingEntry)settingEntry).get_SettingType()));
 			}
-			Dropdown dropdown = RenderDropdown(panel, CONTROL_LOCATION, CONTROL_WIDTH, settingEntry.get_Value(), values.ToArray(), delegate(T newValue)
+			Dropdown<string> dropdown = RenderDropdown(panel, CONTROL_LOCATION, CONTROL_WIDTH, settingEntry.get_Value(), values.ToArray(), delegate(T newValue)
 			{
 				try
 				{

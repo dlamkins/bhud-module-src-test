@@ -15,7 +15,6 @@ using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.UI.Views;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended.BitmapFonts;
 
 namespace Estreya.BlishHUD.EventTable.UI.Views
 {
@@ -23,9 +22,9 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 	{
 		public class EventChangedArgs
 		{
-			public bool OldService { get; set; }
+			public bool OldState { get; set; }
 
-			public bool NewService { get; set; }
+			public bool NewState { get; set; }
 
 			public Dictionary<string, object> AdditionalData { get; set; }
 
@@ -59,8 +58,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		public event EventHandler<EventChangedArgs> EventChanged;
 
-		public ManageEventsView(List<EventCategory> allEvents, Dictionary<string, object> additionalData, Func<List<string>> getDisabledEventKeys, ModuleSettings moduleSettings, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, BitmapFont font = null)
-			: base(apiManager, iconService, translationService, font)
+		public ManageEventsView(List<EventCategory> allEvents, Dictionary<string, object> additionalData, Func<List<string>> getDisabledEventKeys, ModuleSettings moduleSettings, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService)
+			: base(apiManager, iconService, translationService)
 		{
 			this.allEvents = allEvents;
 			_additionalData = additionalData ?? new Dictionary<string, object>();
@@ -432,8 +431,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					{
 						this.EventChanged?.Invoke(this, new EventChangedArgs
 						{
-							OldService = !eventArgs.get_Checked(),
-							NewService = eventArgs.get_Checked(),
+							OldState = !eventArgs.get_Checked(),
+							NewState = eventArgs.get_Checked(),
 							EventSettingKey = button.Event.SettingKey,
 							AdditionalData = _additionalData
 						});

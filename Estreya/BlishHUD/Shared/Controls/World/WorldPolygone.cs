@@ -15,7 +15,7 @@ namespace Estreya.BlishHUD.Shared.Controls.World
 
 		private readonly Func<WorldEntity, bool> _renderCondition;
 
-		private readonly VertexPositionColor[] _vert;
+		private readonly VertexPositionColor[] _vertexData;
 
 		public Vector3[] Points { get; }
 
@@ -32,7 +32,7 @@ namespace Estreya.BlishHUD.Shared.Controls.World
 			Points = points;
 			_color = color;
 			_renderCondition = renderCondition;
-			_vert = BuildVertices();
+			_vertexData = BuildVertices();
 		}
 
 		public WorldPolygone(Vector3 position, Vector3[] points)
@@ -44,31 +44,17 @@ namespace Estreya.BlishHUD.Shared.Controls.World
 
 		private VertexPositionColor[] BuildVertices()
 		{
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
 			VertexPositionColor[] verts = (VertexPositionColor[])(object)new VertexPositionColor[Points.Length];
-			Vector3 curPoint = Points[0];
-			for (int i = 0; i < Points.Length - 1; i++)
+			for (int i = 0; i < Points.Length; i++)
 			{
-				Vector3 nextPoint = Points[i + 1];
-				verts[i] = new VertexPositionColor(curPoint, _color);
-				verts[i + 1] = new VertexPositionColor(nextPoint, _color);
-				curPoint = nextPoint;
+				verts[i] = new VertexPositionColor(Points[i], _color);
 			}
 			GraphicsDeviceContext ctx = GameService.Graphics.LendGraphicsDeviceContext();
 			try
@@ -116,7 +102,7 @@ namespace Estreya.BlishHUD.Shared.Controls.World
 				while (((Enumerator)(ref enumerator)).MoveNext())
 				{
 					((Enumerator)(ref enumerator)).get_Current().Apply();
-					graphicsDevice.DrawUserPrimitives<VertexPositionColor>((PrimitiveType)2, _vert, 0, _vert.Length / 2);
+					graphicsDevice.DrawUserPrimitives<VertexPositionColor>((PrimitiveType)2, _vertexData, 0, _vertexData.Length / 2);
 				}
 			}
 			finally

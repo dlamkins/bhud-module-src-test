@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Entities;
 using Blish_HUD.Modules.Managers;
+using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.EventTable.Services;
 using Estreya.BlishHUD.Shared.Controls.Map;
 using Estreya.BlishHUD.Shared.Controls.World;
@@ -55,6 +56,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			_moduleSettings.ShowDynamicEventsOnMap.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowDynamicEventsOnMap_SettingChanged);
 			_moduleSettings.ShowDynamicEventInWorld.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowDynamicEventsInWorldSetting_SettingChanged);
 			_moduleSettings.DisabledDynamicEventIds.add_SettingChanged((EventHandler<ValueChangedEventArgs<List<string>>>)DisabledDynamicEventIds_SettingChanged);
+			_dynamicEventService.CustomEventsUpdated += DynamicEventService_CustomEventsUpdated;
 		}
 
 		public void Dispose()
@@ -70,18 +72,19 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			_moduleSettings.ShowDynamicEventsOnMap.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowDynamicEventsOnMap_SettingChanged);
 			_moduleSettings.ShowDynamicEventInWorld.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowDynamicEventsInWorldSetting_SettingChanged);
 			_moduleSettings.DisabledDynamicEventIds.remove_SettingChanged((EventHandler<ValueChangedEventArgs<List<string>>>)DisabledDynamicEventIds_SettingChanged);
+			_dynamicEventService.CustomEventsUpdated -= DynamicEventService_CustomEventsUpdated;
 		}
 
 		public void Update(GameTime gameTime)
 		{
 			UpdateUtil.Update(CheckLostEntityReferences, gameTime, _checkLostEntitiesInterval.TotalMilliseconds, ref _lastLostEntitiesCheck);
 			(string Key, bool Add) element;
-			DynamicEventService.DynamicEvent dynamicEvent;
+			DynamicEvent dynamicEvent;
 			while (_entityQueue.TryDequeue(out element))
 			{
 				try
 				{
-					dynamicEvent = _dynamicEventService.Events.Where((DynamicEventService.DynamicEvent e) => e.ID == element.Key).First();
+					dynamicEvent = _dynamicEventService.Events.Where((DynamicEvent e) => e.ID == element.Key).First();
 					if (element.Add)
 					{
 						Task.Run(async delegate
@@ -137,6 +140,12 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			await AddDynamicEventsToWorld();
 		}
 
+		private async Task DynamicEventService_CustomEventsUpdated(object sender)
+		{
+			await AddDynamicEventsToMap();
+			await AddDynamicEventsToWorld();
+		}
+
 		public async Task AddDynamicEventsToMap()
 		{
 			_ = 1;
@@ -157,18 +166,18 @@ namespace Estreya.BlishHUD.EventTable.Managers
 					return;
 				}
 				int mapId = GameService.Gw2Mumble.get_CurrentMap().get_Id();
-				IOrderedEnumerable<DynamicEventService.DynamicEvent> events = _dynamicEventService.GetEventsByMap(mapId)?.Where((DynamicEventService.DynamicEvent de) => !_moduleSettings.DisabledDynamicEventIds.get_Value().Contains(de.ID)).OrderByDescending(delegate(DynamicEventService.DynamicEvent d)
+				IOrderedEnumerable<DynamicEvent> events = _dynamicEventService.GetEventsByMap(mapId)?.Where((DynamicEvent de) => !_moduleSettings.DisabledDynamicEventIds.get_Value().Contains(de.ID)).OrderByDescending(delegate(DynamicEvent d)
 				{
 					float[][] points = d.Location.Points;
 					return (points != null) ? points.Length : 0;
-				}).ThenByDescending((DynamicEventService.DynamicEvent d) => d.Location.Radius);
+				}).ThenByDescending((DynamicEvent d) => d.Location.Radius);
 				if (events == null)
 				{
 					Logger.Debug($"No events found for map {mapId}");
 					return;
 				}
 				new List<MapEntity>();
-				foreach (DynamicEventService.DynamicEvent ev in events)
+				foreach (DynamicEvent ev in events)
 				{
 					await AddDynamicEventToMap(ev);
 				}
@@ -179,7 +188,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			}
 		}
 
-		private void RemoveDynamicEventFromMap(DynamicEventService.DynamicEvent dynamicEvent)
+		private void RemoveDynamicEventFromMap(DynamicEvent dynamicEvent)
 		{
 			if (_mapEntities.ContainsKey(dynamicEvent.ID))
 			{
@@ -188,7 +197,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			}
 		}
 
-		public async Task AddDynamicEventToMap(DynamicEventService.DynamicEvent dynamicEvent)
+		public async Task AddDynamicEventToMap(DynamicEvent dynamicEvent)
 		{
 			RemoveDynamicEventFromMap(dynamicEvent);
 			if (!_moduleSettings.ShowDynamicEventsOnMap.get_Value() || !GameService.Gw2Mumble.get_IsAvailable())
@@ -260,7 +269,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 				return;
 			}
 			int mapId = GameService.Gw2Mumble.get_CurrentMap().get_Id();
-			IEnumerable<DynamicEventService.DynamicEvent> events = from de in _dynamicEventService.GetEventsByMap(mapId)
+			IEnumerable<DynamicEvent> events = from de in _dynamicEventService.GetEventsByMap(mapId)
 				where !_moduleSettings.DisabledDynamicEventIds.get_Value().Contains(de.ID)
 				select de;
 			if (events == null)
@@ -269,7 +278,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 				return;
 			}
 			Stopwatch sw = Stopwatch.StartNew();
-			foreach (DynamicEventService.DynamicEvent ev in events)
+			foreach (DynamicEvent ev in events)
 			{
 				await AddDynamicEventToWorld(ev);
 			}
@@ -277,7 +286,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			Logger.Debug($"Added events in {sw.ElapsedMilliseconds}ms");
 		}
 
-		private void RemoveDynamicEventFromWorld(DynamicEventService.DynamicEvent dynamicEvent)
+		private void RemoveDynamicEventFromWorld(DynamicEvent dynamicEvent)
 		{
 			if (_worldEntities.ContainsKey(dynamicEvent.ID))
 			{
@@ -286,7 +295,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			}
 		}
 
-		public async Task AddDynamicEventToWorld(DynamicEventService.DynamicEvent dynamicEvent)
+		public async Task AddDynamicEventToWorld(DynamicEvent dynamicEvent)
 		{
 			RemoveDynamicEventFromWorld(dynamicEvent);
 			if (!_moduleSettings.ShowDynamicEventInWorld.get_Value() || !GameService.Gw2Mumble.get_IsAvailable())
@@ -322,7 +331,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			}
 		}
 
-		private WorldEntity GetSphere(DynamicEventService.DynamicEvent ev, Map map, Vector3 centerAsWorldMeters, Func<WorldEntity, bool> renderCondition)
+		private WorldEntity GetSphere(DynamicEvent ev, Map map, Vector3 centerAsWorldMeters, Func<WorldEntity, bool> renderCondition)
 		{
 			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
@@ -365,7 +374,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			//IL_0256: Unknown result type (might be due to invalid IL or missing references)
 			//IL_025a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d6: Unknown result type (might be due to invalid IL or missing references)
 			int tessellation = 50;
 			int connections = tessellation / 5;
 			if (connections > tessellation)
@@ -446,10 +455,10 @@ namespace Estreya.BlishHUD.EventTable.Managers
 				connectionPoints.AddRange(bendPointsDown);
 			}
 			IEnumerable<Vector3> allPoints = points.Concat(connectionPoints);
-			return new WorldPolygone(centerAsWorldMeters, allPoints.ToArray(), Color.get_White(), renderCondition);
+			return new WorldPolygone(centerAsWorldMeters, allPoints.ToArray(), ev.GetColorAsXnaColor(), renderCondition);
 		}
 
-		private WorldEntity GetCylinder(DynamicEventService.DynamicEvent ev, Map map, Vector3 centerAsWorldMeters, Func<WorldEntity, bool> renderCondition)
+		private WorldEntity GetCylinder(DynamicEvent ev, Map map, Vector3 centerAsWorldMeters, Func<WorldEntity, bool> renderCondition)
 		{
 			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
@@ -457,7 +466,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_022c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0234: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0235: Unknown result type (might be due to invalid IL or missing references)
 			int tessellation = 50;
 			int connections = tessellation / 4;
 			if (connections > tessellation)
@@ -509,13 +518,13 @@ namespace Estreya.BlishHUD.EventTable.Managers
 				}
 			}
 			IEnumerable<Vector3> allPoints = perZRangePoints.SelectMany((Vector3[] x) => x).Concat(connectPoints);
-			return new WorldPolygone(centerAsWorldMeters, allPoints.ToArray(), Color.get_White(), renderCondition);
+			return new WorldPolygone(centerAsWorldMeters, allPoints.ToArray(), ev.GetColorAsXnaColor(), renderCondition);
 		}
 
-		private WorldEntity GetPolygone(DynamicEventService.DynamicEvent dynamicEvent, Map map, Vector3 centerAsWorldMeters, Func<WorldEntity, bool> renderCondition)
+		private WorldEntity GetPolygone(DynamicEvent dynamicEvent, Map map, Vector3 centerAsWorldMeters, Func<WorldEntity, bool> renderCondition)
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
 			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
@@ -523,28 +532,27 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0155: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0158: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0160: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0168: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
 			Vector3[] points = ((IEnumerable<float[]>)dynamicEvent.Location.Points).Select((Func<float[], Vector3>)delegate(float[] p)
 			{
-				//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-				//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-				//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-				Vector2 val = default(Vector2);
-				((Vector2)(ref val))._002Ector(p[0], p[1]);
-				Vector3 val2 = map.MapCoordsToWorldMeters(new Vector2(val.X, val.Y));
-				return new Vector3(val2.X, val2.Y, centerAsWorldMeters.Z);
+				//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+				//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+				//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+				float num = ((p.Length >= 3 && p[2] != 0f) ? Math.Abs(p[2].ToMeters()) : centerAsWorldMeters.Z);
+				Vector2 mapCoords = default(Vector2);
+				((Vector2)(ref mapCoords))._002Ector(p[0], p[1]);
+				Vector3 val = map.MapCoordsToWorldMeters(mapCoords);
+				return new Vector3(val.X, val.Y, num);
 			}).ToArray();
 			bool first = true;
 			points = points.SelectMany(delegate(Vector3 t)
@@ -565,8 +573,8 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			}
 			Vector3[][] perZRangePoints = (from z in dynamicEvent.Location.ZRange
 				orderby z
-				select centerAsWorldMeters.Z + z.ToMeters() into z
-				select ((IEnumerable<Vector3>)mappedPoints).Select((Func<Vector3, Vector3>)((Vector3 mp) => new Vector3(mp.X, mp.Y, z))).ToArray()).ToArray();
+				select z.ToMeters() into z
+				select ((IEnumerable<Vector3>)mappedPoints).Select((Func<Vector3, Vector3>)((Vector3 mp) => new Vector3(mp.X, mp.Y, mp.Z + z))).ToArray()).ToArray();
 			List<Vector3> connectPoints = new List<Vector3>();
 			for (int i = 0; i < perZRangePoints.Length - 1; i++)
 			{
@@ -585,7 +593,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 				}
 			}
 			IEnumerable<Vector3> allPoints = perZRangePoints.SelectMany((Vector3[] x) => x).Concat(connectPoints);
-			return new WorldPolygone(centerAsWorldMeters, allPoints.ToArray(), Color.get_White(), renderCondition);
+			return new WorldPolygone(centerAsWorldMeters, allPoints.ToArray(), dynamicEvent.GetColorAsXnaColor(), renderCondition);
 		}
 
 		private void CheckLostEntityReferences()

@@ -14,13 +14,12 @@ using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
-using MonoGame.Extended.BitmapFonts;
 
 namespace Estreya.BlishHUD.EventTable.UI.Views
 {
 	public class HelpView : BaseView
 	{
-		private const string DISCORD_USERNAME = "Estreya#0001";
+		private const string DISCORD_USERNAME = "estreya";
 
 		private static readonly Point PADDING = new Point(25, 25);
 
@@ -30,8 +29,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private readonly List<string> _autocompleteAPIKeys = new List<string>();
 
-		public HelpView(Func<List<EventCategory>> getEvents, string apiUrl, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, BitmapFont font = null)
-			: base(apiManager, iconService, translationService, font)
+		public HelpView(Func<List<EventCategory>> getEvents, string apiUrl, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService)
+			: base(apiManager, iconService, translationService)
 		{
 			_getEvents = getEvents;
 			_apiUrl = apiUrl;
@@ -97,12 +96,10 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			}).CreatePart("\n \n", (Action<FormattedLabelPartBuilder>)delegate
 			{
 			});
-			List<EventCategory> events = _getEvents();
+			IEnumerable<Event> events = _getEvents().SelectMany((EventCategory ec) => ec.Events);
 			foreach (string apiKey in _autocompleteAPIKeys)
 			{
-				foreach (Event ev2 in (from ev in events.SelectMany((EventCategory ec) => ec.Events)
-					where ev.APICode == apiKey
-					select ev).DistinctBy((Event ev) => ev.Key))
+				foreach (Event ev2 in events.Where((Event ev) => ev.APICode == apiKey).DistinctBy((Event ev) => ev.Key))
 				{
 					labelBuilder.CreatePart("- " + ev2.Name, (Action<FormattedLabelPartBuilder>)delegate
 					{
@@ -268,7 +265,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				.CreatePart("\n \n", (Action<FormattedLabelPartBuilder>)delegate
 				{
 				})
-				.CreatePart("In case you can't figure it out, ping Estreya#0001 on BlishHUD Discord.", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder builder)
+				.CreatePart("In case you can't figure it out, ping estreya on BlishHUD Discord.", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder builder)
 				{
 					builder.MakeBold();
 				})
@@ -347,7 +344,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				.CreatePart("If you are missing a specific translation over a long period, please ping ", (Action<FormattedLabelPartBuilder>)delegate
 				{
 				})
-				.CreatePart("Estreya#0001", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder builder)
+				.CreatePart("estreya", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder builder)
 				{
 					builder.MakeBold();
 				})
@@ -416,7 +413,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			}).CreatePart("Ping ", (Action<FormattedLabelPartBuilder>)delegate
 			{
 			})
-				.CreatePart("Estreya#0001", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder builder)
+				.CreatePart("estreya", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder builder)
 				{
 					builder.MakeBold();
 				})

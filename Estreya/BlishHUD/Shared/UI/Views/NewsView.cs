@@ -36,8 +36,8 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		private NewsService _newsService;
 
-		public NewsView(IFlurlClient flurlClient, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, NewsService newsService, BitmapFont font = null)
-			: base(apiManager, iconService, translationService, font)
+		public NewsView(IFlurlClient flurlClient, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, NewsService newsService)
+			: base(apiManager, iconService, translationService)
 		{
 			_flurlClient = flurlClient;
 			_newsService = newsService;

@@ -2,8 +2,10 @@ using System;
 using System.Threading.Tasks;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
+using Estreya.BlishHUD.Shared.Models;
 using Estreya.BlishHUD.Shared.Services;
 using Microsoft.Xna.Framework;
+using MonoGame.Extended.BitmapFonts;
 
 namespace Estreya.BlishHUD.Shared.UI.Views
 {
@@ -50,14 +52,14 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b4: Expected O, but got Unknown
-			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0147: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0151: Expected O, but got Unknown
-			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0198: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0157: Expected O, but got Unknown
+			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
 			Rectangle bounds = ((Container)parent).get_ContentRegion();
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Size(((Rectangle)(ref bounds)).get_Size());
@@ -79,9 +81,10 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			((Control)val3).set_Parent((Container)(object)settingContainer);
 			val3.set_Text(buttonText);
 			StandardButton openSettingsButton = val3;
-			if (base.Font != null)
+			BitmapFont font = ControlFonts[ControlType.Button];
+			if (font != null)
 			{
-				((Control)openSettingsButton).set_Width((int)base.Font.MeasureString(buttonText).Width);
+				((Control)openSettingsButton).set_Width((int)font.MeasureString(buttonText).Width);
 			}
 			((Control)openSettingsButton).set_Location(new Point(Math.Max(((Control)parentPanel).get_Width() / 2 - ((Control)openSettingsButton).get_Width() / 2, 20), Math.Max(((Control)parentPanel).get_Height() / 2 - ((Control)openSettingsButton).get_Height(), 20)));
 			((Control)openSettingsButton).add_Click((EventHandler<MouseEventArgs>)delegate
@@ -93,9 +96,9 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			((Control)val4).set_Parent((Container)(object)settingContainer);
 			val4.set_Text(githubIssueText);
 			StandardButton createGithubIssue = val4;
-			if (base.Font != null)
+			if (font != null)
 			{
-				((Control)createGithubIssue).set_Width((int)base.Font.MeasureString(githubIssueText).Width);
+				((Control)createGithubIssue).set_Width((int)font.MeasureString(githubIssueText).Width);
 			}
 			((Control)createGithubIssue).set_Location(new Point(Math.Max(((Control)parentPanel).get_Width() / 2 - ((Control)createGithubIssue).get_Width() / 2, 20), ((Control)openSettingsButton).get_Bottom() + 10));
 			((Control)createGithubIssue).add_Click((EventHandler<MouseEventArgs>)delegate

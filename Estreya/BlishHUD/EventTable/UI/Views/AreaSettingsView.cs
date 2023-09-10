@@ -17,7 +17,6 @@ using Estreya.BlishHUD.Shared.UI.Views;
 using Estreya.BlishHUD.Shared.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended.BitmapFonts;
 
 namespace Estreya.BlishHUD.EventTable.UI.Views
 {
@@ -56,8 +55,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		public event EventHandler<EventAreaConfiguration> RemoveArea;
 
-		public AreaSettingsView(Func<IEnumerable<EventAreaConfiguration>> areaConfiguration, Func<List<EventCategory>> allEvents, ModuleSettings moduleSettings, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService, EventStateService eventStateService, BitmapFont font = null)
-			: base(apiManager, iconService, translationService, settingEventService, font)
+		public AreaSettingsView(Func<IEnumerable<EventAreaConfiguration>> areaConfiguration, Func<List<EventCategory>> allEvents, ModuleSettings moduleSettings, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService, EventStateService eventStateService)
+			: base(apiManager, iconService, translationService, settingEventService)
 		{
 			_areaConfigurationFunc = areaConfiguration;
 			_allEvents = allEvents;
@@ -189,6 +188,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0071: Expected O, but got Unknown
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
 			CreateAreaPanel(parent, bounds);
 			Rectangle panelBounds = ((Container)_areaPanel).get_ContentRegion();
 			TextBox val = new TextBox();
@@ -196,12 +197,17 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Control)val).set_Location(new Point(20, 20));
 			((TextInputBase)val).set_PlaceholderText("Area Name");
 			TextBox areaName = val;
+			Label copyFromTemplateLabel = RenderLabel(_areaPanel, "Template").TitleLabel;
+			((Control)copyFromTemplateLabel).set_Location(new Point(((Control)areaName).get_Left(), ((Control)areaName).get_Bottom() + 20));
+			((Control)copyFromTemplateLabel).set_Width(base.LABEL_WIDTH);
+			Dropdown<string> copyFromTemplate = RenderDropdown(_areaPanel, new Point(((Control)copyFromTemplateLabel).get_Right() + 20, ((Control)copyFromTemplateLabel).get_Top()), 350, _areaConfigurations.Select((EventAreaConfiguration x) => x.Name).ToArray(), null);
 			string name;
+			string copyFromTemplateName;
 			EventAreaConfiguration configuration2;
 			MenuItem menuItem;
 			Estreya.BlishHUD.Shared.Controls.Button saveButton = RenderButton(_areaPanel, base.TranslationService.GetTranslation("areaSettingsView-save-btn", "Save"), delegate
 			{
-				//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0152: Unknown result type (might be due to invalid IL or missing references)
 				try
 				{
 					name = ((TextInputBase)areaName).get_Text();
@@ -211,19 +217,31 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					}
 					else
 					{
-						AddAreaEventArgs addAreaEventArgs = new AddAreaEventArgs
+						copyFromTemplateName = copyFromTemplate.SelectedItem;
+						if (copyFromTemplateName != null && !_areaConfigurations.Any((EventAreaConfiguration x) => x.Name == copyFromTemplateName))
 						{
-							Name = name
-						};
-						this.AddArea?.Invoke(this, addAreaEventArgs);
-						configuration2 = addAreaEventArgs.AreaConfiguration ?? throw new ArgumentNullException("Area configuration could not be created.");
-						menuItem = ((Menu)menu).AddMenuItem(name, (Texture2D)null);
-						((Control)menuItem).add_Click((EventHandler<MouseEventArgs>)delegate
+							ShowError("Selected template does not exist.");
+						}
+						else
 						{
-							//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+							AddAreaEventArgs addAreaEventArgs = new AddAreaEventArgs
+							{
+								Name = name
+							};
+							this.AddArea?.Invoke(this, addAreaEventArgs);
+							configuration2 = addAreaEventArgs.AreaConfiguration ?? throw new ArgumentNullException("Area configuration could not be created.");
+							if (copyFromTemplateName != null)
+							{
+								_areaConfigurations.First((EventAreaConfiguration x) => x.Name == copyFromTemplateName).CopyTo(configuration2);
+							}
+							menuItem = ((Menu)menu).AddMenuItem(name, (Texture2D)null);
+							((Control)menuItem).add_Click((EventHandler<MouseEventArgs>)delegate
+							{
+								//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+								BuildEditPanel(parent, bounds, menuItem, configuration2);
+							});
 							BuildEditPanel(parent, bounds, menuItem, configuration2);
-						});
-						BuildEditPanel(parent, bounds, menuItem, configuration2);
+						}
 					}
 				}
 				catch (Exception ex)
@@ -458,6 +476,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderIntSetting((Panel)(object)groupPanel, areaConfiguration.HistorySplit);
 			RenderEmptyLine((Panel)(object)groupPanel);
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.ShowCategoryNames);
+			RenderEmptyLine((Panel)(object)groupPanel);
+			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.ShowTopTimeline);
 			RenderEmptyLine((Panel)(object)groupPanel, 20);
 		}
 
@@ -510,6 +530,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006f: Expected O, but got Unknown
+			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)settingsPanel);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
@@ -521,7 +542,10 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Panel)val).set_Collapsed(true);
 			((Panel)val).set_Title(base.TranslationService.GetTranslation("areaSettingsView-group-textAndColor", "Text & Color"));
 			FlowPanel groupPanel = val;
+			((Control)RenderEnumSetting<FontFace>((Panel)(object)groupPanel, areaConfiguration.FontFace).dropdown).set_Width(500);
 			base.RenderEnumSetting<FontSize>((Panel)(object)groupPanel, areaConfiguration.FontSize);
+			TextBox customFontPathTextBox = RenderTextSetting((Panel)(object)groupPanel, areaConfiguration.CustomFontPath).textBox;
+			((Control)customFontPathTextBox).set_Width(((Container)groupPanel).get_ContentRegion().Width - ((Control)customFontPathTextBox).get_Left());
 			RenderColorSetting((Panel)(object)groupPanel, areaConfiguration.TextColor);
 			RenderFloatSetting((Panel)(object)groupPanel, areaConfiguration.EventTextOpacity);
 			RenderEmptyLine((Panel)(object)groupPanel);
@@ -538,6 +562,13 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderColorSetting((Panel)(object)groupPanel, areaConfiguration.CategoryNameColor);
 			RenderEmptyLine((Panel)(object)groupPanel);
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.EnableColorGradients);
+			RenderEmptyLine((Panel)(object)groupPanel);
+			RenderColorSetting((Panel)(object)groupPanel, areaConfiguration.TopTimelineBackgroundColor);
+			RenderColorSetting((Panel)(object)groupPanel, areaConfiguration.TopTimelineLineColor);
+			RenderColorSetting((Panel)(object)groupPanel, areaConfiguration.TopTimelineTimeColor);
+			RenderFloatSetting((Panel)(object)groupPanel, areaConfiguration.TopTimelineBackgroundOpacity);
+			RenderFloatSetting((Panel)(object)groupPanel, areaConfiguration.TopTimelineLineOpacity);
+			RenderFloatSetting((Panel)(object)groupPanel, areaConfiguration.TopTimelineTimeOpacity);
 			RenderEmptyLine((Panel)(object)groupPanel, 20);
 		}
 
@@ -603,6 +634,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderTextSetting((Panel)(object)tooltipOptionGroup, areaConfiguration.EventTimespanHoursFormatString);
 			RenderTextSetting((Panel)(object)tooltipOptionGroup, areaConfiguration.EventTimespanMinutesFormatString);
 			RenderEmptyLine((Panel)(object)tooltipOptionGroup, 20);
+			RenderEmptyLine((Panel)(object)groupPanel);
+			RenderTextSetting((Panel)(object)groupPanel, areaConfiguration.TopTimelineTimeFormatString);
 			RenderEmptyLine((Panel)(object)groupPanel);
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.EnableHistorySplitScrolling);
 			RenderIntSetting((Panel)(object)groupPanel, areaConfiguration.HistorySplitScrollingSpeed);
@@ -703,7 +736,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 		private void ManageView_EventChanged(object sender, ManageEventsView.EventChangedArgs e)
 		{
 			EventAreaConfiguration configuration = e.AdditionalData["configuration"] as EventAreaConfiguration;
-			configuration.DisabledEventKeys.set_Value(e.NewService ? new List<string>(from aek in configuration.DisabledEventKeys.get_Value()
+			configuration.DisabledEventKeys.set_Value(e.NewState ? new List<string>(from aek in configuration.DisabledEventKeys.get_Value()
 				where aek != e.EventSettingKey
 				select aek) : new List<string>(configuration.DisabledEventKeys.get_Value()) { e.EventSettingKey });
 		}
