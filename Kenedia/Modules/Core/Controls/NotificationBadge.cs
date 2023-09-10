@@ -69,6 +69,8 @@ namespace Kenedia.Modules.Core.Controls
 
 		public Func<string> SetLocalizedTooltip { get; set; }
 
+		public Action ClickAction { get; set; }
+
 		public NotificationBadge()
 			: this()
 		{
@@ -131,6 +133,12 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			((Control)this).OnMouseEntered(e);
 			SetHoveredOpacity();
+		}
+
+		protected override void OnClick(MouseEventArgs e)
+		{
+			((Control)this).OnClick(e);
+			ClickAction?.Invoke();
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)

@@ -1782,7 +1782,7 @@ namespace Kenedia.Modules.Characters.Services
 					string jsonString = await new StreamReader(path).ReadToEndAsync();
 					if (jsonString != null && jsonString != string.Empty)
 					{
-						Maps = JsonConvert.DeserializeObject<Dictionary<int, Map>>(jsonString);
+						Maps = JsonConvert.DeserializeObject<Dictionary<int, Map>>(jsonString, SerializerSettings.Default);
 						BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Loaded Maps from " + path);
 					}
 				}

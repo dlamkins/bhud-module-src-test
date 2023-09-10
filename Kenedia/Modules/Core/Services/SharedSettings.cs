@@ -2,6 +2,7 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Kenedia.Modules.Core.Extensions;
+using Kenedia.Modules.Core.Models;
 using Kenedia.Modules.Core.Structs;
 using Newtonsoft.Json;
 
@@ -41,14 +42,14 @@ namespace Kenedia.Modules.Core.Services
 			if (File.Exists(_path) && await FileExtension.WaitForFileUnlock(_path))
 			{
 				using StreamReader reader = File.OpenText(_path);
-				JsonConvert.DeserializeObject<SharedSettings>(await reader.ReadToEndAsync());
+				JsonConvert.DeserializeObject<SharedSettings>(await reader.ReadToEndAsync(), SerializerSettings.Default);
 			}
 			_loaded = true;
 		}
 
 		private async void Save()
 		{
-			string json = JsonConvert.SerializeObject((object)this, (Formatting)1);
+			string json = JsonConvert.SerializeObject((object)this, SerializerSettings.Default);
 			if (await FileExtension.WaitForFileUnlock(_path))
 			{
 				using StreamWriter writer = new StreamWriter(_path);

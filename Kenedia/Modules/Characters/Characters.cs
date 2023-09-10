@@ -514,6 +514,7 @@ namespace Kenedia.Modules.Characters
 
 		protected override void ReloadKey_Activated(object sender, EventArgs e)
 		{
+			BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Debug("ReloadKey_Activated: " + ((Module)this).get_Name());
 			base.ReloadKey_Activated(sender, e);
 			CreateCornerIcons();
 			((Control)GameService.Graphics.get_SpriteScreen()).set_Visible(true);
@@ -768,7 +769,7 @@ namespace Kenedia.Modules.Characters
 					string path = GlobalAccountsPath;
 					if (File.Exists(path))
 					{
-						return JsonConvert.DeserializeObject<List<AccountSummary>>(File.ReadAllText(path)).Find((AccountSummary e) => e.CharacterNames.Contains(player.get_Name()));
+						return JsonConvert.DeserializeObject<List<AccountSummary>>(File.ReadAllText(path), SerializerSettings.Default).Find((AccountSummary e) => e.CharacterNames.Contains(player.get_Name()));
 					}
 				}
 				catch (Exception)
@@ -794,7 +795,7 @@ namespace Kenedia.Modules.Characters
 					new FileInfo(CharactersPath);
 					string text = File.ReadAllText(CharactersPath);
 					GameService.Gw2Mumble.get_PlayerCharacter();
-					List<Character_Model> characters = JsonConvert.DeserializeObject<List<Character_Model>>(text);
+					List<Character_Model> characters = JsonConvert.DeserializeObject<List<Character_Model>>(text, SerializerSettings.Default);
 					List<string> names = CharacterModels.Select((Character_Model c) => c.Name).ToList();
 					if (characters != null)
 					{
@@ -834,7 +835,7 @@ namespace Kenedia.Modules.Characters
 				_characterFileTokenSource = new CancellationTokenSource();
 				if (await FileExtension.WaitForFileUnlock(CharactersPath, 2500, _characterFileTokenSource.Token))
 				{
-					string json = JsonConvert.SerializeObject((object)CharacterModels, (Formatting)1);
+					string json = JsonConvert.SerializeObject((object)CharacterModels, SerializerSettings.Default);
 					File.WriteAllText(CharactersPath, json);
 				}
 				else if (!_characterFileTokenSource.IsCancellationRequested)

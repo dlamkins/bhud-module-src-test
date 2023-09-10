@@ -92,7 +92,7 @@ namespace Kenedia.Modules.Characters.Services
 				AccountSummary accountEntry;
 				if (File.Exists(_accountFilePath))
 				{
-					accounts = JsonConvert.DeserializeObject<List<AccountSummary>>(File.ReadAllText(_accountFilePath));
+					accounts = JsonConvert.DeserializeObject<List<AccountSummary>>(File.ReadAllText(_accountFilePath), SerializerSettings.Default);
 					accountEntry = accounts.Find((AccountSummary e) => e.AccountName == account.get_Name());
 					if (accountEntry != null)
 					{
@@ -136,7 +136,7 @@ namespace Kenedia.Modules.Characters.Services
 						accountEntry.CharacterNames.Add(c.get_Name());
 					});
 				}
-				string json = JsonConvert.SerializeObject((object)accounts, (Formatting)1);
+				string json = JsonConvert.SerializeObject((object)accounts, SerializerSettings.Default);
 				File.WriteAllText(_accountFilePath, json);
 			}
 			catch
@@ -281,7 +281,7 @@ namespace Kenedia.Modules.Characters.Services
 						_maps.Add(i.get_Id(), map);
 					}
 				}
-				string json = JsonConvert.SerializeObject((object)_maps, (Formatting)1);
+				string json = JsonConvert.SerializeObject((object)_maps, SerializerSettings.Default);
 				File.WriteAllText(_paths.ModuleDataPath + "\\Maps.json", json);
 			}
 			catch (Exception ex)
@@ -325,7 +325,7 @@ namespace Kenedia.Modules.Characters.Services
 		{
 			try
 			{
-				_lastApiCheck = Common.Now();
+				_lastApiCheck = Common.Now;
 				await ((IBlobClient<Build>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Build()).GetAsync(default(CancellationToken));
 				return null;
 			}

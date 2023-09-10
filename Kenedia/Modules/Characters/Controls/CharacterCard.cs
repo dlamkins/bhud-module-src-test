@@ -266,7 +266,7 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-			double now = Common.Now();
+			double now = Common.Now;
 			Update();
 			if (!(_lastUniform != now || force))
 			{

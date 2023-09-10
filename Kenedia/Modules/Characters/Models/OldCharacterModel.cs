@@ -35,7 +35,7 @@ namespace Kenedia.Modules.Characters.Models
 				{
 					Directory.CreateDirectory(imagePath);
 				}
-				List<OldCharacterModel> old_characters = JsonConvert.DeserializeObject<List<OldCharacterModel>>(File.ReadAllText(path));
+				List<OldCharacterModel> old_characters = JsonConvert.DeserializeObject<List<OldCharacterModel>>(File.ReadAllText(path), SerializerSettings.Default);
 				string basePath = path.Replace("\\" + accountName + "\\characters.json", "");
 				imagePath = imagePath.Replace("\\" + accountName + "\\images", "");
 				foreach (Character_Model character in characters)

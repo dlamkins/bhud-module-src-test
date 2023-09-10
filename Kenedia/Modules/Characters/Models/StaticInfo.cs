@@ -59,7 +59,7 @@ namespace Kenedia.Modules.Characters.Models
 				HttpClient httpClient = new HttpClient();
 				try
 				{
-					return JsonConvert.DeserializeObject<StaticInfo>(await httpClient.GetStringAsync(Url));
+					return JsonConvert.DeserializeObject<StaticInfo>(await httpClient.GetStringAsync(Url), SerializerSettings.Default);
 				}
 				finally
 				{

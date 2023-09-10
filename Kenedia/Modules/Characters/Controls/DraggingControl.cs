@@ -85,7 +85,7 @@ namespace Kenedia.Modules.Characters.Controls
 		public void StartDragging(CharacterCard characterCard)
 		{
 			CharacterControl = characterCard;
-			_lastlayoutRefreshed = Common.Now() + 5.0;
+			_lastlayoutRefreshed = Common.Now + 5.0;
 			_layoutRefreshed = false;
 			((Control)this).Show();
 		}
