@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -11,6 +13,7 @@ using Blish_HUD;
 using Blish_HUD.Modules.Managers;
 using Denrage.AchievementTrackerModule.Interfaces;
 using Denrage.AchievementTrackerModule.Libs.Achievement;
+using Denrage.AchievementTrackerModule.Models;
 using Flurl.Http;
 using Gw2Sharp.WebApi;
 using Gw2Sharp.WebApi.V2;
@@ -21,7 +24,7 @@ namespace Denrage.AchievementTrackerModule.Services
 {
 	public class AchievementService : IAchievementService, IDisposable
 	{
-		private const string DataVersionUrl = "https://bhm.blishhud.com/Denrage.AchievementTrackerModule/data/version.txt";
+		private const string DataVersionUrl = "https://bhm.blishhud.com/Denrage.AchievementTrackerModule/data/version.json";
 
 		private const string AchievementDataUrl = "https://bhm.blishhud.com/Denrage.AchievementTrackerModule/data/achievement_data.json";
 
@@ -29,7 +32,7 @@ namespace Denrage.AchievementTrackerModule.Services
 
 		private const string SubPagesUrl = "https://bhm.blishhud.com/Denrage.AchievementTrackerModule/data/subPages.json";
 
-		private const string VersionFileName = "version.txt";
+		private const string VersionFileName = "version.json";
 
 		private const string AchievementDataFileName = "achievement_data.json";
 
@@ -235,6 +238,40 @@ namespace Denrage.AchievementTrackerModule.Services
 			this.PlayerAchievementsLoaded?.Invoke();
 		}
 
+		public static string ByteArrayToString(byte[] ba)
+		{
+			StringBuilder hex = new StringBuilder(ba.Length * 2);
+			foreach (byte b in ba)
+			{
+				hex.AppendFormat("{0:x2}", b);
+			}
+			return hex.ToString();
+		}
+
+		private bool CheckMd5(string md5ToCheck, string filePath)
+		{
+			using MD5 md5 = MD5.Create();
+			using FileStream fileStream = File.Open(filePath, FileMode.Open);
+			return md5ToCheck.Equals(ByteArrayToString(md5.ComputeHash(fileStream)), StringComparison.OrdinalIgnoreCase);
+		}
+
+		private async Task<bool> DownloadFile(string url, string folder, string fileName, string md5)
+		{
+			int tries = 0;
+			do
+			{
+				if (tries == 3)
+				{
+					logger.Error("Couldn't download file, please download it manually! " + url);
+					return false;
+				}
+				await url.DownloadFileAsync(folder, fileName);
+				tries++;
+			}
+			while (!File.Exists(Path.Combine(folder, fileName)) || !CheckMd5(md5, Path.Combine(folder, fileName)));
+			return true;
+		}
+
 		public async Task LoadAsync(CancellationToken cancellationToken = default(CancellationToken))
 		{
 			logger.Info("Reading saved achievement information");
@@ -253,14 +290,15 @@ namespace Denrage.AchievementTrackerModule.Services
 				string dataFolder = directoriesManager.GetFullDirectoryPath("achievement_module");
 				Directory.CreateDirectory(dataFolder);
 				bool downloadData = false;
-				if (!File.Exists(Path.Combine(dataFolder, "version.txt")) || !File.Exists(Path.Combine(dataFolder, "achievement_data.json")) || !File.Exists(Path.Combine(dataFolder, "achievement_tables.json")) || !File.Exists(Path.Combine(dataFolder, "subPages.json")))
+				if (!File.Exists(Path.Combine(dataFolder, "version.json")) || !File.Exists(Path.Combine(dataFolder, "achievement_data.json")) || !File.Exists(Path.Combine(dataFolder, "achievement_tables.json")) || !File.Exists(Path.Combine(dataFolder, "subPages.json")))
 				{
 					downloadData = true;
 				}
 				else
 				{
-					int githubVersion = int.Parse(await "https://bhm.blishhud.com/Denrage.AchievementTrackerModule/data/version.txt".GetStringAsync(cancellationToken, (HttpCompletionOption)0));
-					if (int.Parse(File.ReadAllText(Path.Combine(dataFolder, "version.txt"))) != githubVersion)
+					AchievementDataMetadata githubMetadata2 = await "https://bhm.blishhud.com/Denrage.AchievementTrackerModule/data/version.json".GetJsonAsync<AchievementDataMetadata>(default(CancellationToken), (HttpCompletionOption)0);
+					using FileStream utf8Json = File.Open(Path.Combine(dataFolder, "version.json"), FileMode.Open);
+					if ((await JsonSerializer.DeserializeAsync<AchievementDataMetadata>(utf8Json, serializerOptions, cancellationToken)).Version != githubMetadata2.Version)
 					{
 						downloadData = true;
 					}
@@ -268,10 +306,23 @@ namespace Denrage.AchievementTrackerModule.Services
 				if (downloadData)
 				{
 					logger.Info("Downloading AchievementData");
-					await "https://bhm.blishhud.com/Denrage.AchievementTrackerModule/data/version.txt".DownloadFileAsync(dataFolder, "version.txt");
-					await "https://bhm.blishhud.com/Denrage.AchievementTrackerModule/data/achievement_data.json".DownloadFileAsync(dataFolder, "achievement_data.json");
-					await "https://bhm.blishhud.com/Denrage.AchievementTrackerModule/data/achievement_tables.json".DownloadFileAsync(dataFolder, "achievement_tables.json");
-					await "https://bhm.blishhud.com/Denrage.AchievementTrackerModule/data/subPages.json".DownloadFileAsync(dataFolder, "subPages.json");
+					await "https://bhm.blishhud.com/Denrage.AchievementTrackerModule/data/version.json".DownloadFileAsync(dataFolder, "version.json");
+					using FileStream utf8Json = File.Open(Path.Combine(dataFolder, "version.json"), FileMode.Open);
+					AchievementDataMetadata githubMetadata2 = await JsonSerializer.DeserializeAsync<AchievementDataMetadata>(utf8Json, serializerOptions, cancellationToken);
+					bool flag = !(await DownloadFile("https://bhm.blishhud.com/Denrage.AchievementTrackerModule/data/achievement_data.json", dataFolder, "achievement_data.json", githubMetadata2.AchievementDataMd5));
+					if (!flag)
+					{
+						flag = !(await DownloadFile("https://bhm.blishhud.com/Denrage.AchievementTrackerModule/data/achievement_tables.json", dataFolder, "achievement_tables.json", githubMetadata2.AchievementTablesMd5));
+					}
+					bool flag2 = flag;
+					if (!flag2)
+					{
+						flag2 = !(await DownloadFile("https://bhm.blishhud.com/Denrage.AchievementTrackerModule/data/subPages.json", dataFolder, "subPages.json", githubMetadata2.SubPagesMd5));
+					}
+					if (flag2)
+					{
+						return;
+					}
 				}
 				using (FileStream utf8Json = File.Open(Path.Combine(dataFolder, "achievement_data.json"), FileMode.Open))
 				{
