@@ -13,15 +13,15 @@ namespace Nekres.Regions_Of_Tyria
 	{
 		public static SpriteFont GetSpriteFont(this ContentsManager manager, string fontPath, int fontSize)
 		{
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
 			if (fontSize <= 0)
 			{
 				throw new ArgumentException("Font size must be greater than 0.", "fontSize");
 			}
-			Stream fileStream = manager.GetFileStream(fontPath);
-			byte[] fontData = new byte[fileStream.Length];
-			if (fileStream.Read(fontData, 0, fontData.Length) > 0)
+			using Stream fontStream = manager.GetFileStream(fontPath);
+			byte[] fontData = new byte[fontStream.Length];
+			if (fontStream.Read(fontData, 0, fontData.Length) > 0)
 			{
 				GraphicsDeviceContext ctx = GameService.Graphics.LendGraphicsDeviceContext();
 				try
