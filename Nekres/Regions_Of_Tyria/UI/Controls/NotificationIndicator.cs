@@ -7,9 +7,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Nekres.Regions_Of_Tyria.UI.Controls
 {
-	internal sealed class ControlPositionIndicator : Container
+	internal sealed class NotificationIndicator : Container
 	{
-		public ControlPositionIndicator()
+		public NotificationIndicator()
 			: this()
 		{
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
@@ -42,9 +42,9 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			if (RegionsOfTyriaModule.ModuleInstance != null)
+			if (RegionsOfTyria.Instance != null)
 			{
-				int height = (int)(RegionsOfTyriaModule.ModuleInstance.VerticalPositionSetting.get_Value() / 100f * (float)bounds.Height);
+				int height = (int)(RegionsOfTyria.Instance.VerticalPositionSetting.get_Value() / 100f * (float)bounds.Height);
 				Rectangle rect = default(Rectangle);
 				((Rectangle)(ref rect))._002Ector(0, height + 24, 500, 100);
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), rect, Color.get_White() * 0.4f);

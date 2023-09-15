@@ -12,17 +12,20 @@
   <PropertyGroup />
   <ItemGroup />
   <ItemGroup>
+    <Reference Include="MonoGame.Framework" />
     <Reference Include="Blish HUD" />
+    <Reference Include="MonoGame.Extended" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="Gw2Sharp" />
     <Reference Include="RBush">
       <HintPath>..\..\working\RBush.dll</HintPath>
     </Reference>
-    <Reference Include="MonoGame.Framework" />
     <Reference Include="System.Core" />
-    <Reference Include="MonoGame.Extended" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Numerics" />
+    <Reference Include="SpriteFontPlus">
+      <HintPath>..\..\working\SpriteFontPlus.dll</HintPath>
+    </Reference>
     <Reference Include="AsyncClipboardService" />
   </ItemGroup>
 </Project>
