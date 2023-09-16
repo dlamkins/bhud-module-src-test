@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Nekres.Regions_Of_Tyria
 {
-	internal static class IEnumerableExtensions
+	internal static class EnumerableExtensions
 	{
 		public static IEnumerable<TSource> DistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
 		{

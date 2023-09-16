@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
@@ -9,9 +10,11 @@ namespace Nekres.Regions_Of_Tyria
 	{
 		public static IReadOnlyList<(Color, string)> FetchMarkupColoredText(this string input, Color? regularTextColor = null)
 		{
+			Color valueOrDefault = regularTextColor.GetValueOrDefault();
 			if (!regularTextColor.HasValue)
 			{
-				regularTextColor = Color.White;
+				valueOrDefault = Color.White;
+				regularTextColor = valueOrDefault;
 			}
 			if (string.IsNullOrEmpty(input))
 			{
@@ -60,6 +63,16 @@ namespace Nekres.Regions_Of_Tyria
 				input = input.Replace(match.Value, text);
 			}
 			return input;
+		}
+
+		public static IEnumerable<string> SplitClean(this string input, string delimiter = "<br>")
+		{
+			return input.Split(new string[1] { delimiter }, StringSplitOptions.RemoveEmptyEntries).ForEach((string x) => x.Trim());
+		}
+
+		public static string Wrap(this string input, string delimiter = "<br>")
+		{
+			return input.Replace(delimiter, "\n");
 		}
 	}
 }

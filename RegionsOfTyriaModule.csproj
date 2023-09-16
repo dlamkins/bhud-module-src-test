@@ -17,9 +17,6 @@
     <Reference Include="MonoGame.Extended" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="Gw2Sharp" />
-    <Reference Include="RBush">
-      <HintPath>..\..\working\RBush.dll</HintPath>
-    </Reference>
     <Reference Include="System.Core" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Numerics" />

@@ -35,21 +35,17 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 
 		private static readonly SynchronizedCollection<MapNotification> _activeMapNotifications;
 
-		private static readonly BitmapFont _krytanFont;
+		private static BitmapFont _krytanFont;
 
-		private static readonly BitmapFont _krytanFontSmall;
+		private static BitmapFont _krytanFontSmall;
 
-		private static readonly BitmapFont _titlingFont;
+		internal static BitmapFont TitlingFont;
 
-		private static readonly BitmapFont _titlingFontSmall;
+		internal static BitmapFont TitlingFontSmall;
 
 		private static SpriteBatchParameters _defaultParams;
 
-		private IEnumerable<string> _headerLines;
-
 		private string _header;
-
-		private IEnumerable<string> _textLines;
 
 		private string _text;
 
@@ -73,21 +69,26 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 
 		static MapNotification()
 		{
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Expected O, but got Unknown
-			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002d: Expected O, but got Unknown
+			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
 			_lastNotificationTime = DateTime.UtcNow;
 			_activeMapNotifications = new SynchronizedCollection<MapNotification>();
-			_krytanFont = RegionsOfTyria.Instance.ContentsManager.GetBitmapFont("fonts/NewKrytan.ttf", 46);
-			_krytanFontSmall = RegionsOfTyria.Instance.ContentsManager.GetBitmapFont("fonts/NewKrytan.ttf", 34, 30);
-			_titlingFont = RegionsOfTyria.Instance.ContentsManager.GetBitmapFont("fonts/StoweTitling.ttf", 36);
-			_titlingFontSmall = RegionsOfTyria.Instance.ContentsManager.GetBitmapFont("fonts/StoweTitling.ttf", 24);
 			_defaultParams = new SpriteBatchParameters((SpriteSortMode)0, (BlendState)null, (SamplerState)null, (DepthStencilState)null, (RasterizerState)null, (Effect)null, (Matrix?)null);
 			_brightGold = new Color(223, 194, 149, 255);
 			_darkGold = new Color(168, 150, 135, 255);
+		}
+
+		public static void UpdateFonts(float fontSize = 0.92f)
+		{
+			int size = (int)Math.Round((fontSize + 0.35f) * 37f);
+			_krytanFont = RegionsOfTyria.Instance.ContentsManager.GetBitmapFont("fonts/NewKrytan.ttf", size + 10);
+			_krytanFontSmall = RegionsOfTyria.Instance.ContentsManager.GetBitmapFont("fonts/NewKrytan.ttf", size - 2, 30);
+			TitlingFont = RegionsOfTyria.Instance.ContentsManager.GetBitmapFont("fonts/StoweTitling.ttf", size);
+			TitlingFontSmall = RegionsOfTyria.Instance.ContentsManager.GetBitmapFont("fonts/StoweTitling.ttf", size - 12);
 		}
 
 		public static void ShowNotification(string header, string footer, Texture2D icon = null, float showDuration = 4f, float fadeInDuration = 2f, float fadeOutDuration = 2f, float effectDuration = 0.85f)
@@ -103,7 +104,7 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 			((Control)nNot).set_ZIndex(_activeMapNotifications.DefaultIfEmpty(nNot).Max((MapNotification n) => ((Control)n).get_ZIndex()) + 1);
 			foreach (MapNotification activeMapNotification in _activeMapNotifications)
 			{
-				activeMapNotification.SlideDown((int)((float)(_titlingFontSmall.get_LineHeight() + _titlingFont.get_LineHeight()) + 21f));
+				activeMapNotification.SlideDown((int)((float)(TitlingFontSmall.get_LineHeight() + TitlingFont.get_LineHeight()) + 21f));
 			}
 			_activeMapNotifications.Add(nNot);
 			((Control)nNot).Show();
@@ -112,29 +113,25 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 		private MapNotification(string header, string text, float showDuration = 4f, float fadeInDuration = 2f, float fadeOutDuration = 2f, float effectDuration = 0.85f)
 			: this()
 		{
-			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0129: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014d: Expected O, but got Unknown
-			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0181: Expected O, but got Unknown
-			//IL_01da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Expected O, but got Unknown
+			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ea: Expected O, but got Unknown
+			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
 			_showDuration = showDuration;
 			_fadeInDuration = fadeInDuration;
 			_fadeOutDuration = fadeOutDuration;
 			_effectDuration = effectDuration;
 			_text = text;
-			_textLines = text?.Split(new string[1] { "<br>" }, StringSplitOptions.RemoveEmptyEntries).ForEach((string x) => x.Trim());
 			_header = header;
-			_headerLines = header?.Split(new string[1] { "<br>" }, StringSplitOptions.RemoveEmptyEntries).ForEach((string x) => x.Trim());
 			((Control)this).set_ClipsBounds(true);
 			((Control)this).set_Opacity(0f);
 			((Control)this).set_Size(new Point(((Control)GameService.Graphics.get_SpriteScreen()).get_Width(), ((Control)GameService.Graphics.get_SpriteScreen()).get_Height()));
 			((Control)this).set_ZIndex(30);
-			((Control)this).set_Location(new Point(0, 0));
 			_targetTop = ((Control)this).get_Top();
 			SpriteBatchParameters val = new SpriteBatchParameters((SpriteSortMode)0, (BlendState)null, (SamplerState)null, (DepthStencilState)null, (RasterizerState)null, (Effect)null, (Matrix?)null);
 			val.set_Effect(RegionsOfTyria.Instance.ContentsManager.GetEffect("effects/dissolve.mgfx"));
@@ -175,10 +172,10 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
 			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
 			if (RegionsOfTyria.Instance != null)
 			{
-				bool slide = RegionsOfTyria.Instance.RevealEffectSetting.get_Value() == RevealEffect.Decode;
+				bool slide = RegionsOfTyria.Instance.RevealEffect.get_Value() == RevealEffect.Decode;
 				_dissolve.get_Effect().get_Parameters().get_Item("Slide")
 					.SetValue(slide);
 				_reveal.get_Effect().get_Parameters().get_Item("Slide")
@@ -192,79 +189,65 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 				_reveal.get_Effect().get_Parameters().get_Item("Amount")
 					.SetValue(1f - _amount);
 				spriteBatch.End();
-				if (RegionsOfTyria.Instance.TranslateSetting.get_Value())
+				if (RegionsOfTyria.Instance.Translate.get_Value())
 				{
 					SpriteBatchExtensions.Begin(spriteBatch, _dissolve);
-					PaintText(spriteBatch, bounds, _krytanFont, _krytanFontSmall, underline: false);
+					PaintText((Control)(object)this, spriteBatch, bounds, _krytanFont, _krytanFontSmall, underline: false, _header, _text);
 					spriteBatch.End();
 				}
 				SpriteBatchExtensions.Begin(spriteBatch, _reveal);
-				PaintText(spriteBatch, bounds, _titlingFont, _titlingFontSmall, underline: false);
+				PaintText((Control)(object)this, spriteBatch, bounds, TitlingFont, TitlingFontSmall, underline: false, _header, _text);
 				spriteBatch.End();
 				SpriteBatchExtensions.Begin(spriteBatch, _defaultParams);
 			}
 		}
 
-		private void PaintText(SpriteBatch spriteBatch, Rectangle bounds, BitmapFont font, BitmapFont smallFont, bool underline)
+		internal static void PaintText(Control ctrl, SpriteBatch spriteBatch, Rectangle bounds, BitmapFont font, BitmapFont smallFont, bool underline, string header, string text)
 		{
 			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0170: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
-			int height = (int)(RegionsOfTyria.Instance.VerticalPositionSetting.get_Value() / 100f * (float)bounds.Height);
-			if (!string.IsNullOrEmpty(_header) && !_header.Equals(_text, StringComparison.InvariantCultureIgnoreCase))
+			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
+			int height = (int)(RegionsOfTyria.Instance.VerticalPosition.get_Value() / 100f * (float)bounds.Height);
+			Rectangle rect = default(Rectangle);
+			if (!string.IsNullOrEmpty(header) && !header.Equals(text, StringComparison.InvariantCultureIgnoreCase))
 			{
-				foreach (string headerLine in _headerLines)
+				string str = header.Wrap();
+				Size2 val = smallFont.MeasureString(str);
+				int lineWidth = (int)val.Width;
+				int lineHeight = (int)val.Height;
+				((Rectangle)(ref rect))._002Ector(0, 20 + height, bounds.Width, bounds.Height);
+				height += smallFont.get_LineHeight();
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, ctrl, str, smallFont, rect, _darkGold, false, true, 1, (HorizontalAlignment)1, (VerticalAlignment)0);
+				if (underline)
 				{
-					Size2 val = smallFont.MeasureString(headerLine);
-					int lineWidth = (int)val.Width;
-					int lineHeight = (int)val.Height;
-					Rectangle rect = new Rectangle(0, 20 + height, bounds.Width, bounds.Height);
-					height += smallFont.get_LineHeight();
-					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, headerLine, smallFont, rect, _darkGold, false, true, 1, (HorizontalAlignment)1, (VerticalAlignment)0);
-					if (underline)
-					{
-						rect = new Rectangle((bounds.Width - (lineWidth + 2)) / 2, rect.Y + lineHeight + 5, lineWidth + 2, 3);
-						SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), rect, Color.get_Black() * 0.8f);
-						rect = new Rectangle(rect.X + 1, rect.Y + 1, lineWidth, 1);
-						SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), rect, _darkGold);
-					}
+					((Rectangle)(ref rect))._002Ector((bounds.Width - (lineWidth + 2)) / 2, rect.Y + lineHeight + 5, lineWidth + 2, 3);
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, Textures.get_Pixel(), rect, Color.get_Black() * 0.8f);
+					((Rectangle)(ref rect))._002Ector(rect.X + 1, rect.Y + 1, lineWidth, 1);
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, Textures.get_Pixel(), rect, _darkGold);
 				}
 				height += 20;
 			}
-			if (string.IsNullOrEmpty(_text))
+			if (!string.IsNullOrEmpty(text))
 			{
-				return;
-			}
-			foreach (string textLine in _textLines)
-			{
-				Rectangle rect = new Rectangle(0, 20 + height, bounds.Width, bounds.Height);
-				height += font.get_LineHeight();
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, textLine, font, rect, _brightGold, false, true, 1, (HorizontalAlignment)1, (VerticalAlignment)0);
+				((Rectangle)(ref rect))._002Ector(0, 20 + height, bounds.Width, bounds.Height);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, ctrl, text.Wrap(), font, rect, _brightGold, false, true, 1, (HorizontalAlignment)1, (VerticalAlignment)0);
 			}
 		}
 
@@ -298,12 +281,12 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 		private void SlideDown(int distance)
 		{
 			_targetTop += distance;
-			((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<MapNotification>(this, (object)new
-			{
-				Top = _targetTop
-			}, _fadeOutDuration, 0f, true);
 			if (!(((Control)this)._opacity < 1f))
 			{
+				((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<MapNotification>(this, (object)new
+				{
+					Top = _targetTop
+				}, _fadeOutDuration, 0f, true);
 				_animFadeLifecycle = ((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<MapNotification>(this, (object)new
 				{
 					Opacity = 0f

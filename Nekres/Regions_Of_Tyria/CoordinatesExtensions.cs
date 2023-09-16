@@ -1,9 +1,11 @@
+using System;
 using Gw2Sharp.Models;
 using Gw2Sharp.WebApi.V2.Models;
+using Microsoft.Xna.Framework;
 
 namespace Nekres.Regions_Of_Tyria
 {
-	internal static class Coordinates3Extensions
+	internal static class CoordinatesExtensions
 	{
 		private const float INCH_TO_METER = 0.0254f;
 
@@ -82,6 +84,12 @@ namespace Nekres.Regions_Of_Tyria
 			val = ((Rectangle)(ref continentRectangle)).get_TopRight();
 			double z = num3 + ((Coordinates2)(ref val)).get_Y();
 			return new Coordinates3(num2, ((Coordinates3)(ref mapCoords)).get_Y(), z);
+		}
+
+		public static Point ToPoint(this Coordinates2 coords)
+		{
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			return new Point((int)Math.Round(((Coordinates2)(ref coords)).get_X()), (int)Math.Round(((Coordinates2)(ref coords)).get_Y()));
 		}
 	}
 }

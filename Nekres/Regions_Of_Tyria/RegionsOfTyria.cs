@@ -18,7 +18,6 @@ using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using Nekres.Regions_Of_Tyria.Geometry;
 using Nekres.Regions_Of_Tyria.UI.Controls;
-using RBush;
 
 namespace Nekres.Regions_Of_Tyria
 {
@@ -29,53 +28,51 @@ namespace Nekres.Regions_Of_Tyria
 
 		internal static RegionsOfTyria Instance;
 
-		private static int _prevSectorId;
+		private SettingEntry<float> _showDuration;
 
-		private SettingEntry<float> _showDurationSetting;
+		private SettingEntry<float> _fadeInDuration;
 
-		private SettingEntry<float> _fadeInDurationSetting;
+		private SettingEntry<float> _fadeOutDuration;
 
-		private SettingEntry<float> _fadeOutDurationSetting;
+		private SettingEntry<float> _effectDuration;
 
-		private SettingEntry<float> _effectDurationSetting;
+		private SettingEntry<bool> _toggleMapNotification;
 
-		private SettingEntry<bool> _toggleMapNotificationSetting;
+		private SettingEntry<bool> _toggleSectorNotification;
 
-		private SettingEntry<bool> _toggleSectorNotificationSetting;
-
-		private SettingEntry<bool> _includeRegionInMapNotificationSetting;
+		private SettingEntry<bool> _includeRegionInMapNotification;
 
 		private SettingEntry<bool> _includeMapInSectorNotification;
 
-		private SettingEntry<bool> _hideInCombatSetting;
+		private SettingEntry<bool> _hideInCombat;
 
-		internal SettingEntry<bool> TranslateSetting;
+		internal SettingEntry<bool> Translate;
 
-		internal SettingEntry<MapNotification.RevealEffect> RevealEffectSetting;
+		internal SettingEntry<MapNotification.RevealEffect> RevealEffect;
 
-		internal SettingEntry<float> VerticalPositionSetting;
+		internal SettingEntry<float> VerticalPosition;
+
+		internal SettingEntry<float> FontSize;
+
+		private AsyncCache<int, Map> _mapRepository;
+
+		private AsyncCache<int, List<Sector>> _sectorRepository;
+
+		private string _currentMap;
+
+		private string _currentSector;
+
+		private int _prevSectorId;
+
+		private int _prevMapId;
 
 		private DateTime _lastIndicatorChange = DateTime.UtcNow;
 
 		private NotificationIndicator _notificationIndicator;
 
-		private float _showDuration;
-
-		private float _fadeInDuration;
-
-		private float _fadeOutDuration;
-
-		private float _effectDuration;
-
-		private AsyncCache<int, Map> _mapRepository;
-
-		private AsyncCache<int, RBush<Sector>> _sectorRepository;
-
-		private int _prevMapId;
-
 		private double _lastRun;
 
-		private DateTime _lastUpdate;
+		private DateTime _lastUpdate = DateTime.UtcNow;
 
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
@@ -84,24 +81,6 @@ namespace Nekres.Regions_Of_Tyria
 		internal DirectoriesManager DirectoriesManager => base.ModuleParameters.get_DirectoriesManager();
 
 		internal Gw2ApiManager Gw2ApiManager => base.ModuleParameters.get_Gw2ApiManager();
-
-		public static int CurrentSector
-		{
-			get
-			{
-				return _prevSectorId;
-			}
-			private set
-			{
-				if (value != _prevSectorId)
-				{
-					_prevSectorId = value;
-					RegionsOfTyria.SectorChanged?.Invoke(Instance, new ValueEventArgs<int>(value));
-				}
-			}
-		}
-
-		public static event EventHandler<ValueEventArgs<int>> SectorChanged;
 
 		[ImportingConstructor]
 		public RegionsOfTyria([Import("ModuleParameters")] ModuleParameters moduleParameters)
@@ -113,41 +92,39 @@ namespace Nekres.Regions_Of_Tyria
 		protected override void DefineSettings(SettingCollection settings)
 		{
 			SettingCollection generalCol = settings.AddSubCollection("general", true, (Func<string>)(() => "General"));
-			TranslateSetting = generalCol.DefineSetting<bool>("translate", true, (Func<string>)(() => "Translate from New Krytan"), (Func<string>)(() => "Makes zone names appear in New Krytan before they are revealed to you."));
-			RevealEffectSetting = generalCol.DefineSetting<MapNotification.RevealEffect>("reveal_effect", MapNotification.RevealEffect.Decode, (Func<string>)(() => "Reveal Effect"), (Func<string>)(() => "The type of transition to use for revealing zone names."));
-			VerticalPositionSetting = generalCol.DefineSetting<float>("pos_y", 25f, (Func<string>)(() => "Vertical Position"), (Func<string>)(() => "Sets the vertical position of area notifications."));
-			_hideInCombatSetting = generalCol.DefineSetting<bool>("hide_zones_in_combat", true, (Func<string>)(() => "Disable Zone Notifications in Combat"), (Func<string>)(() => "Disables zone notifications during combat."));
+			Translate = generalCol.DefineSetting<bool>("translate", true, (Func<string>)(() => "Translate from New Krytan"), (Func<string>)(() => "Makes zone notifications appear in New Krytan before they are revealed to you."));
+			RevealEffect = generalCol.DefineSetting<MapNotification.RevealEffect>("reveal_effect", MapNotification.RevealEffect.Decode, (Func<string>)(() => "Reveal Effect"), (Func<string>)(() => "The type of transition to use for revealing zone names."));
+			VerticalPosition = generalCol.DefineSetting<float>("pos_y", 25f, (Func<string>)(() => "Vertical Position"), (Func<string>)(() => "Sets the vertical position of area notifications."));
+			FontSize = generalCol.DefineSetting<float>("font_size", 76f, (Func<string>)(() => "Font Size"), (Func<string>)(() => "Sets the size of the zone notification text."));
+			_hideInCombat = generalCol.DefineSetting<bool>("hide_if_combat", true, (Func<string>)(() => "Disable Zone Notifications in Combat"), (Func<string>)(() => "Disables zone notifications during combat."));
 			SettingCollection durationCol = settings.AddSubCollection("durations", true, (Func<string>)(() => "Durations"));
-			_showDurationSetting = durationCol.DefineSetting<float>("show", 80f, (Func<string>)(() => "Show Duration"), (Func<string>)(() => "The duration in which to stay in full opacity."));
-			_fadeInDurationSetting = durationCol.DefineSetting<float>("fade_in", 45f, (Func<string>)(() => "Fade-In Duration"), (Func<string>)(() => "The duration of the fade-in."));
-			_fadeOutDurationSetting = durationCol.DefineSetting<float>("fade_out", 65f, (Func<string>)(() => "Fade-Out Duration"), (Func<string>)(() => "The duration of the fade-out."));
-			_effectDurationSetting = durationCol.DefineSetting<float>("effect", 30f, (Func<string>)(() => "Reveal Effect Duration"), (Func<string>)(() => "The duration of the reveal or translation effect."));
+			_showDuration = durationCol.DefineSetting<float>("show", 80f, (Func<string>)(() => "Show Duration"), (Func<string>)(() => "The duration in which to stay in full opacity."));
+			_fadeInDuration = durationCol.DefineSetting<float>("fade_in", 45f, (Func<string>)(() => "Fade-In Duration"), (Func<string>)(() => "The duration of the fade-in."));
+			_fadeOutDuration = durationCol.DefineSetting<float>("fade_out", 65f, (Func<string>)(() => "Fade-Out Duration"), (Func<string>)(() => "The duration of the fade-out."));
+			_effectDuration = durationCol.DefineSetting<float>("effect", 30f, (Func<string>)(() => "Reveal Effect Duration"), (Func<string>)(() => "The duration of the reveal or translation effect."));
 			SettingCollection mapCol = settings.AddSubCollection("map_alert", true, (Func<string>)(() => "Map Notification"));
-			_toggleMapNotificationSetting = mapCol.DefineSetting<bool>("enabled", true, (Func<string>)(() => "Enabled"), (Func<string>)(() => "Shows a map's name after entering it."));
-			_includeRegionInMapNotificationSetting = mapCol.DefineSetting<bool>("prefix_region", true, (Func<string>)(() => "Include Region"), (Func<string>)(() => "Shows the region's name above the map's name."));
+			_toggleMapNotification = mapCol.DefineSetting<bool>("enabled", true, (Func<string>)(() => "Enabled"), (Func<string>)(() => "Shows a map's name after entering it."));
+			_includeRegionInMapNotification = mapCol.DefineSetting<bool>("prefix_region", true, (Func<string>)(() => "Include Region"), (Func<string>)(() => "Shows the region's name above the map's name."));
 			SettingCollection sectorCol = settings.AddSubCollection("sector_alert", true, (Func<string>)(() => "Sector Notification"));
-			_toggleSectorNotificationSetting = sectorCol.DefineSetting<bool>("enabled", true, (Func<string>)(() => "Enabled"), (Func<string>)(() => "Shows a sector's name after entering."));
+			_toggleSectorNotification = sectorCol.DefineSetting<bool>("enabled", true, (Func<string>)(() => "Enabled"), (Func<string>)(() => "Shows a sector's name after entering."));
 			_includeMapInSectorNotification = sectorCol.DefineSetting<bool>("prefix_map", true, (Func<string>)(() => "Include Map"), (Func<string>)(() => "Shows the map's name above the sector's name."));
 		}
 
 		protected override void Initialize()
 		{
 			_mapRepository = new AsyncCache<int, Map>(RequestMap);
-			_sectorRepository = new AsyncCache<int, RBush<Sector>>(RequestSectors);
+			_sectorRepository = new AsyncCache<int, List<Sector>>(RequestSectors);
 		}
 
 		protected override async void Update(GameTime gameTime)
 		{
-			if (DateTime.UtcNow.Subtract(_lastIndicatorChange).TotalMilliseconds > 250.0)
+			float playerSpeed = GameService.Gw2Mumble.get_PlayerCharacter().GetSpeed(gameTime);
+			if (DateTime.UtcNow.Subtract(_lastIndicatorChange).TotalMilliseconds > 250.0 && _notificationIndicator != null)
 			{
-				NotificationIndicator notificationIndicator = _notificationIndicator;
-				if (notificationIndicator != null)
-				{
-					((Control)notificationIndicator).Dispose();
-				}
+				((Control)_notificationIndicator).Dispose();
 				_notificationIndicator = null;
 			}
-			if (GameService.Gw2Mumble.get_IsAvailable() && GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && _toggleSectorNotificationSetting.get_Value() && (!_hideInCombatSetting.get_Value() || !GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat()) && !(gameTime.get_TotalGameTime().TotalMilliseconds - _lastRun < 10.0) && !(DateTime.UtcNow.Subtract(_lastUpdate).TotalMilliseconds < 1000.0))
+			if (GameService.Gw2Mumble.get_IsAvailable() && GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && _toggleSectorNotification.get_Value() && !(playerSpeed > 55f) && (!_hideInCombat.get_Value() || !GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat()) && !(gameTime.get_TotalGameTime().TotalMilliseconds - _lastRun < 10.0) && !(DateTime.UtcNow.Subtract(_lastUpdate).TotalSeconds < 20.0))
 			{
 				_lastRun = gameTime.get_ElapsedGameTime().TotalMilliseconds;
 				_lastUpdate = DateTime.UtcNow;
@@ -155,45 +132,21 @@ namespace Nekres.Regions_Of_Tyria
 				Sector currentSector = await GetSector(currentMap);
 				if (currentSector != null)
 				{
-					MapNotification.ShowNotification(_includeMapInSectorNotification.get_Value() ? currentMap.get_Name() : null, currentSector.Name, null, _showDuration, _fadeInDuration, _fadeOutDuration, _effectDuration);
+					_currentMap = currentMap.get_Name();
+					_currentSector = currentSector.Name;
+					MapNotification.ShowNotification(_includeMapInSectorNotification.get_Value() ? currentMap.get_Name() : null, currentSector.Name, null, _showDuration.get_Value() / 100f * 5f, _fadeInDuration.get_Value() / 100f * 3f, _fadeOutDuration.get_Value() / 100f * 3f, _effectDuration.get_Value() / 100f * 3f);
 				}
 			}
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
+			MapNotification.UpdateFonts(FontSize.get_Value() / 100f);
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
 			GameService.Overlay.add_UserLocaleChanged((EventHandler<ValueEventArgs<CultureInfo>>)OnUserLocaleChanged);
-			OnShowDurationSettingChanged(_showDurationSetting, new ValueChangedEventArgs<float>(0f, _showDurationSetting.get_Value()));
-			OnFadeInDurationSettingChanged(_fadeInDurationSetting, new ValueChangedEventArgs<float>(0f, _fadeInDurationSetting.get_Value()));
-			OnFadeOutDurationSettingChanged(_fadeOutDurationSetting, new ValueChangedEventArgs<float>(0f, _fadeOutDurationSetting.get_Value()));
-			OnEffectDurationSettingChanged(_effectDurationSetting, new ValueChangedEventArgs<float>(0f, _effectDurationSetting.get_Value()));
-			_showDurationSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnShowDurationSettingChanged);
-			_fadeInDurationSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnFadeInDurationSettingChanged);
-			_fadeOutDurationSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnFadeOutDurationSettingChanged);
-			_effectDurationSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnEffectDurationSettingChanged);
-			VerticalPositionSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnVerticalPositionSettingChanged);
+			VerticalPosition.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnVerticalPositionChanged);
+			FontSize.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnFontSizeChanged);
 			((Module)this).OnModuleLoaded(e);
-		}
-
-		private void OnShowDurationSettingChanged(object o, ValueChangedEventArgs<float> e)
-		{
-			_showDuration = MathHelper.Clamp(e.get_NewValue(), 0f, 100f) / 100f * 5f;
-		}
-
-		private void OnFadeInDurationSettingChanged(object o, ValueChangedEventArgs<float> e)
-		{
-			_fadeInDuration = MathHelper.Clamp(e.get_NewValue(), 0f, 100f) / 100f * 3f;
-		}
-
-		private void OnFadeOutDurationSettingChanged(object o, ValueChangedEventArgs<float> e)
-		{
-			_fadeOutDuration = MathHelper.Clamp(e.get_NewValue(), 0f, 100f) / 100f * 3f;
-		}
-
-		private void OnEffectDurationSettingChanged(object o, ValueChangedEventArgs<float> e)
-		{
-			_effectDuration = MathHelper.Clamp(e.get_NewValue(), 0f, 100f) / 100f * 3f;
 		}
 
 		protected override void Unload()
@@ -203,22 +156,30 @@ namespace Nekres.Regions_Of_Tyria
 			{
 				((Control)notificationIndicator).Dispose();
 			}
-			VerticalPositionSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnVerticalPositionSettingChanged);
-			_showDurationSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnShowDurationSettingChanged);
-			_fadeInDurationSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnFadeInDurationSettingChanged);
-			_fadeOutDurationSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnFadeOutDurationSettingChanged);
-			_effectDurationSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnEffectDurationSettingChanged);
+			VerticalPosition.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnVerticalPositionChanged);
+			FontSize.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnFontSizeChanged);
 			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
 			GameService.Overlay.remove_UserLocaleChanged((EventHandler<ValueEventArgs<CultureInfo>>)OnUserLocaleChanged);
 			Instance = null;
 		}
 
-		private void OnVerticalPositionSettingChanged(object o, ValueChangedEventArgs<float> e)
+		private void OnFontSizeChanged(object sender, ValueChangedEventArgs<float> e)
+		{
+			MapNotification.UpdateFonts(e.get_NewValue() / 100f);
+			ShowPreviewSettingIndicator();
+		}
+
+		private void OnVerticalPositionChanged(object sender, ValueChangedEventArgs<float> e)
+		{
+			ShowPreviewSettingIndicator();
+		}
+
+		private void ShowPreviewSettingIndicator()
 		{
 			_lastIndicatorChange = DateTime.UtcNow;
 			if (_notificationIndicator == null)
 			{
-				NotificationIndicator notificationIndicator = new NotificationIndicator();
+				NotificationIndicator notificationIndicator = new NotificationIndicator(_currentMap, _currentSector);
 				((Control)notificationIndicator).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 				_notificationIndicator = notificationIndicator;
 			}
@@ -227,12 +188,12 @@ namespace Nekres.Regions_Of_Tyria
 		private void OnUserLocaleChanged(object o, ValueEventArgs<CultureInfo> e)
 		{
 			_mapRepository = new AsyncCache<int, Map>(RequestMap);
-			_sectorRepository = new AsyncCache<int, RBush<Sector>>(RequestSectors);
+			_sectorRepository = new AsyncCache<int, List<Sector>>(RequestSectors);
 		}
 
 		private async void OnMapChanged(object o, ValueEventArgs<int> e)
 		{
-			if (!_toggleMapNotificationSetting.get_Value())
+			if (!_toggleMapNotification.get_Value())
 			{
 				return;
 			}
@@ -252,7 +213,7 @@ namespace Nekres.Regions_Of_Tyria
 					mapName = currentSector.Name;
 				}
 			}
-			MapNotification.ShowNotification(_includeRegionInMapNotificationSetting.get_Value() ? header : null, mapName, null, _showDuration, _fadeInDuration, _fadeOutDuration, _effectDuration);
+			MapNotification.ShowNotification(_includeRegionInMapNotification.get_Value() ? header : null, mapName, null, _showDuration.get_Value() / 100f * 5f, _fadeInDuration.get_Value() / 100f * 3f, _fadeOutDuration.get_Value() / 100f * 3f, _effectDuration.get_Value() / 100f * 3f);
 		}
 
 		private async Task<Sector> GetSector(Map currentMap)
@@ -264,30 +225,24 @@ namespace Nekres.Regions_Of_Tyria
 			Coordinates2 playerLocation = GameService.Gw2Mumble.get_RawClient().get_AvatarPosition().ToContinentCoords(CoordsUnit.METERS, currentMap.get_MapRect(), currentMap.get_ContinentRect())
 				.SwapYz()
 				.ToPlane();
-			RBush<Sector> rtree = await _sectorRepository.GetItem(GameService.Gw2Mumble.get_CurrentMap().get_Id());
-			if (rtree == null)
+			Sector sector2 = (await _sectorRepository.GetItem(GameService.Gw2Mumble.get_CurrentMap().get_Id()))?.FirstOrDefault((Sector sector) => PolygonUtil.IsPointInsidePolygon(playerLocation.ToPoint(), sector.Bounds));
+			if (sector2 == null || _prevSectorId == sector2.Id)
 			{
 				return null;
 			}
-			Envelope boundingBox = new Envelope(((Coordinates2)(ref playerLocation)).get_X(), ((Coordinates2)(ref playerLocation)).get_Y(), ((Coordinates2)(ref playerLocation)).get_X(), ((Coordinates2)(ref playerLocation)).get_Y());
-			IReadOnlyList<Sector> foundPoints = rtree.Search(in boundingBox);
-			if (foundPoints.Count == 0 || _prevSectorId.Equals(foundPoints[0].Id))
-			{
-				return null;
-			}
-			CurrentSector = foundPoints[0].Id;
-			return foundPoints[0];
+			_currentSector = sector2.Name;
+			_prevSectorId = sector2.Id;
+			return sector2;
 		}
 
-		private async Task<RBush<Sector>> RequestSectors(int mapId)
+		private async Task<List<Sector>> RequestSectors(int mapId)
 		{
 			Map map = await _mapRepository.GetItem(mapId);
 			if (map == null)
 			{
 				return null;
 			}
-			IEnumerable<Sector> geometryZone = new HashSet<Sector>();
-			ProjectionEqualityComparer<Sector, int> comparer = ProjectionEqualityComparer<Sector>.Create((Sector x) => x.Id);
+			List<Sector> geometryZone = new List<Sector>();
 			foreach (int floor in map.get_Floors())
 			{
 				IApiV2ObjectList<ContinentFloorRegionMapSector> sectors = await TaskUtil.RetryAsync(() => ((IAllExpandableClient<ContinentFloorRegionMapSector>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Continents()
@@ -301,15 +256,11 @@ namespace Nekres.Regions_Of_Tyria
 					.get_Sectors()).AllAsync(default(CancellationToken)));
 				if (sectors != null && ((IEnumerable<ContinentFloorRegionMapSector>)sectors).Any())
 				{
-					geometryZone = geometryZone.Union(((IEnumerable<ContinentFloorRegionMapSector>)sectors).Select((ContinentFloorRegionMapSector x) => new Sector(x)), comparer);
+					geometryZone.AddRange(from sector in ((IEnumerable<ContinentFloorRegionMapSector>)sectors).DistinctBy((ContinentFloorRegionMapSector sector) => sector.get_Id())
+						select new Sector(sector));
 				}
 			}
-			RBush<Sector> rtree = new RBush<Sector>();
-			foreach (Sector sector in geometryZone)
-			{
-				rtree.Insert(sector);
-			}
-			return rtree;
+			return geometryZone;
 		}
 
 		private async Task<Map> RequestMap(int id)
