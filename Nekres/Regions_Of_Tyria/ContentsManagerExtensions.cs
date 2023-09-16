@@ -11,7 +11,7 @@ namespace Nekres.Regions_Of_Tyria
 {
 	internal static class ContentsManagerExtensions
 	{
-		public static SpriteFont GetSpriteFont(this ContentsManager manager, string fontPath, int fontSize)
+		public static SpriteFont GetSpriteFont(this ContentsManager manager, string fontPath, int fontSize, int textureSize = 1392)
 		{
 			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
@@ -26,7 +26,7 @@ namespace Nekres.Regions_Of_Tyria
 				GraphicsDeviceContext ctx = GameService.Graphics.LendGraphicsDeviceContext();
 				try
 				{
-					return TtfFontBaker.Bake(fontData, fontSize, 1024, 1024, new CharacterRange[3]
+					return TtfFontBaker.Bake(fontData, fontSize, textureSize, textureSize, new CharacterRange[3]
 					{
 						CharacterRange.BasicLatin,
 						CharacterRange.Latin1Supplement,
