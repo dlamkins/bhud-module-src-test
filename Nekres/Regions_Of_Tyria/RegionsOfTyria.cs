@@ -197,6 +197,7 @@ namespace Nekres.Regions_Of_Tyria
 			{
 				return;
 			}
+			_lastUpdate = DateTime.UtcNow;
 			Map currentMap = await _mapRepository.GetItem(e.get_Value());
 			if (currentMap == null || currentMap.get_Id() == _prevMapId)
 			{
