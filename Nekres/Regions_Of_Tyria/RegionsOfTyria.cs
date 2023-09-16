@@ -124,7 +124,7 @@ namespace Nekres.Regions_Of_Tyria
 				((Control)_notificationIndicator).Dispose();
 				_notificationIndicator = null;
 			}
-			if (GameService.Gw2Mumble.get_IsAvailable() && GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && _toggleSectorNotification.get_Value() && !(playerSpeed > 55f) && (!_hideInCombat.get_Value() || !GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat()) && !(gameTime.get_TotalGameTime().TotalMilliseconds - _lastRun < 10.0) && !(DateTime.UtcNow.Subtract(_lastUpdate).TotalSeconds < 20.0))
+			if (GameService.Gw2Mumble.get_IsAvailable() && GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && _toggleSectorNotification.get_Value() && !(playerSpeed > 55f) && (!_hideInCombat.get_Value() || !GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat()) && !(gameTime.get_TotalGameTime().TotalMilliseconds - _lastRun < 10.0) && !(DateTime.UtcNow.Subtract(_lastUpdate).TotalSeconds < 5.0))
 			{
 				_lastRun = gameTime.get_ElapsedGameTime().TotalMilliseconds;
 				_lastUpdate = DateTime.UtcNow;
@@ -225,7 +225,7 @@ namespace Nekres.Regions_Of_Tyria
 			Coordinates2 playerLocation = GameService.Gw2Mumble.get_RawClient().get_AvatarPosition().ToContinentCoords(CoordsUnit.METERS, currentMap.get_MapRect(), currentMap.get_ContinentRect())
 				.SwapYz()
 				.ToPlane();
-			Sector sector2 = (await _sectorRepository.GetItem(GameService.Gw2Mumble.get_CurrentMap().get_Id()))?.FirstOrDefault((Sector sector) => PolygonUtil.IsPointInsidePolygon(playerLocation.ToPoint(), sector.Bounds));
+			Sector sector2 = (await _sectorRepository.GetItem(GameService.Gw2Mumble.get_CurrentMap().get_Id()))?.FirstOrDefault((Sector sector) => sector.Contains(((Coordinates2)(ref playerLocation)).get_X(), ((Coordinates2)(ref playerLocation)).get_Y()));
 			if (sector2 == null || _prevSectorId == sector2.Id)
 			{
 				return null;
