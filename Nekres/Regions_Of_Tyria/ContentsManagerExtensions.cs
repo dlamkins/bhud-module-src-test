@@ -4,7 +4,6 @@ using Blish_HUD;
 using Blish_HUD.Graphics;
 using Blish_HUD.Modules.Managers;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended.BitmapFonts;
 using SpriteFontPlus;
 
 namespace Nekres.Regions_Of_Tyria
@@ -43,10 +42,6 @@ namespace Nekres.Regions_Of_Tyria
 
 		public static BitmapFont GetBitmapFont(this ContentsManager manager, string fontPath, int fontSize, int lineHeight = 0)
 		{
-			if (lineHeight < 0)
-			{
-				throw new ArgumentException("Line height cannot be negative.", "lineHeight");
-			}
 			return manager.GetSpriteFont(fontPath, fontSize)?.ToBitmapFont(lineHeight);
 		}
 	}

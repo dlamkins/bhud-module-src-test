@@ -16,6 +16,7 @@ using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Nekres.Regions_Of_Tyria.Geometry;
 using Nekres.Regions_Of_Tyria.UI.Controls;
 
@@ -48,7 +49,7 @@ namespace Nekres.Regions_Of_Tyria
 
 		internal SettingEntry<bool> Translate;
 
-		internal SettingEntry<MapNotification.RevealEffect> RevealEffect;
+		internal SettingEntry<bool> Dissolve;
 
 		internal SettingEntry<float> VerticalPosition;
 
@@ -57,6 +58,16 @@ namespace Nekres.Regions_Of_Tyria
 		private AsyncCache<int, Map> _mapRepository;
 
 		private AsyncCache<int, List<Sector>> _sectorRepository;
+
+		internal Effect DissolveEffect;
+
+		internal BitmapFont KrytanFont;
+
+		internal BitmapFont KrytanFontSmall;
+
+		internal BitmapFont TitlingFont;
+
+		internal BitmapFont TitlingFontSmall;
 
 		private string _currentMap;
 
@@ -73,6 +84,8 @@ namespace Nekres.Regions_Of_Tyria
 		private double _lastRun;
 
 		private DateTime _lastUpdate = DateTime.UtcNow;
+
+		private bool _unloading;
 
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
@@ -93,10 +106,10 @@ namespace Nekres.Regions_Of_Tyria
 		{
 			SettingCollection generalCol = settings.AddSubCollection("general", true, (Func<string>)(() => "General"));
 			Translate = generalCol.DefineSetting<bool>("translate", true, (Func<string>)(() => "Translate from New Krytan"), (Func<string>)(() => "Makes zone notifications appear in New Krytan before they are revealed to you."));
-			RevealEffect = generalCol.DefineSetting<MapNotification.RevealEffect>("reveal_effect", MapNotification.RevealEffect.Decode, (Func<string>)(() => "Reveal Effect"), (Func<string>)(() => "The type of transition to use for revealing zone names."));
+			Dissolve = generalCol.DefineSetting<bool>("dissolve", true, (Func<string>)(() => "Dissolve when Fading Out"), (Func<string>)(() => "Makes zone notifications burn up when they fade out."));
 			VerticalPosition = generalCol.DefineSetting<float>("pos_y", 25f, (Func<string>)(() => "Vertical Position"), (Func<string>)(() => "Sets the vertical position of area notifications."));
 			FontSize = generalCol.DefineSetting<float>("font_size", 76f, (Func<string>)(() => "Font Size"), (Func<string>)(() => "Sets the size of the zone notification text."));
-			_hideInCombat = generalCol.DefineSetting<bool>("hide_if_combat", true, (Func<string>)(() => "Disable Zone Notifications in Combat"), (Func<string>)(() => "Disables zone notifications during combat."));
+			_hideInCombat = generalCol.DefineSetting<bool>("hide_if_combat", true, (Func<string>)(() => "Disable during Combat"), (Func<string>)(() => "Disables zone notifications during combat."));
 			SettingCollection durationCol = settings.AddSubCollection("durations", true, (Func<string>)(() => "Durations"));
 			_showDuration = durationCol.DefineSetting<float>("show", 80f, (Func<string>)(() => "Show Duration"), (Func<string>)(() => "The duration in which to stay in full opacity."));
 			_fadeInDuration = durationCol.DefineSetting<float>("fade_in", 45f, (Func<string>)(() => "Fade-In Duration"), (Func<string>)(() => "The duration of the fade-in."));
@@ -114,6 +127,7 @@ namespace Nekres.Regions_Of_Tyria
 		{
 			_mapRepository = new AsyncCache<int, Map>(RequestMap);
 			_sectorRepository = new AsyncCache<int, List<Sector>>(RequestSectors);
+			DissolveEffect = ContentsManager.GetEffect("effects/dissolve.mgfx");
 		}
 
 		protected override async void Update(GameTime gameTime)
@@ -130,27 +144,39 @@ namespace Nekres.Regions_Of_Tyria
 				_lastUpdate = DateTime.UtcNow;
 				Map currentMap = await _mapRepository.GetItem(GameService.Gw2Mumble.get_CurrentMap().get_Id());
 				Sector currentSector = await GetSector(currentMap);
-				if (currentSector != null)
+				if (!_unloading && currentSector != null)
 				{
 					_currentMap = currentMap.get_Name();
 					_currentSector = currentSector.Name;
-					MapNotification.ShowNotification(_includeMapInSectorNotification.get_Value() ? currentMap.get_Name() : null, currentSector.Name, null, _showDuration.get_Value() / 100f * 5f, _fadeInDuration.get_Value() / 100f * 3f, _fadeOutDuration.get_Value() / 100f * 3f, _effectDuration.get_Value() / 100f * 3f);
+					ShowNotification(_includeMapInSectorNotification.get_Value() ? currentMap.get_Name() : null, currentSector.Name);
 				}
 			}
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
-			MapNotification.UpdateFonts(FontSize.get_Value() / 100f);
+			UpdateFonts(FontSize.get_Value() / 100f);
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
 			GameService.Overlay.add_UserLocaleChanged((EventHandler<ValueEventArgs<CultureInfo>>)OnUserLocaleChanged);
 			VerticalPosition.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnVerticalPositionChanged);
 			FontSize.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnFontSizeChanged);
+			Dissolve.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)PopNotification);
+			Translate.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)PopNotification);
 			((Module)this).OnModuleLoaded(e);
 		}
 
 		protected override void Unload()
 		{
+			_unloading = true;
+			Effect dissolveEffect = DissolveEffect;
+			if (dissolveEffect != null)
+			{
+				((GraphicsResource)dissolveEffect).Dispose();
+			}
+			KrytanFont?.Dispose();
+			KrytanFontSmall?.Dispose();
+			TitlingFont?.Dispose();
+			TitlingFontSmall?.Dispose();
 			NotificationIndicator notificationIndicator = _notificationIndicator;
 			if (notificationIndicator != null)
 			{
@@ -158,6 +184,8 @@ namespace Nekres.Regions_Of_Tyria
 			}
 			VerticalPosition.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnVerticalPositionChanged);
 			FontSize.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnFontSizeChanged);
+			Dissolve.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)PopNotification);
+			Translate.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)PopNotification);
 			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
 			GameService.Overlay.remove_UserLocaleChanged((EventHandler<ValueEventArgs<CultureInfo>>)OnUserLocaleChanged);
 			Instance = null;
@@ -165,7 +193,7 @@ namespace Nekres.Regions_Of_Tyria
 
 		private void OnFontSizeChanged(object sender, ValueChangedEventArgs<float> e)
 		{
-			MapNotification.UpdateFonts(e.get_NewValue() / 100f);
+			UpdateFonts(e.get_NewValue() / 100f);
 			ShowPreviewSettingIndicator();
 		}
 
@@ -183,6 +211,29 @@ namespace Nekres.Regions_Of_Tyria
 				((Control)notificationIndicator).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 				_notificationIndicator = notificationIndicator;
 			}
+		}
+
+		private void PopNotification(object sender, ValueChangedEventArgs<bool> e)
+		{
+			ShowNotification(_includeMapInSectorNotification.get_Value() ? _currentMap : null, _currentSector);
+		}
+
+		private void ShowNotification(string header, string text)
+		{
+			MapNotification.ShowNotification(header, text, _showDuration.get_Value() / 100f * 5f, _fadeInDuration.get_Value() / 100f * 3f, _fadeOutDuration.get_Value() / 100f * 3f, _effectDuration.get_Value() / 100f * 3f);
+		}
+
+		private void UpdateFonts(float fontSize = 0.92f)
+		{
+			int size = (int)Math.Round((fontSize + 0.35f) * 37f);
+			KrytanFont?.Dispose();
+			KrytanFontSmall?.Dispose();
+			KrytanFont = ContentsManager.GetBitmapFont("fonts/NewKrytan.ttf", size + 10);
+			KrytanFontSmall = ContentsManager.GetBitmapFont("fonts/NewKrytan.ttf", size - 2, 30);
+			TitlingFont?.Dispose();
+			TitlingFontSmall?.Dispose();
+			TitlingFont = ContentsManager.GetBitmapFont("fonts/StoweTitling.ttf", size);
+			TitlingFontSmall = ContentsManager.GetBitmapFont("fonts/StoweTitling.ttf", size - (int)(MathHelper.Clamp(fontSize, 0.2f, 1f) * 12f));
 		}
 
 		private void OnUserLocaleChanged(object o, ValueEventArgs<CultureInfo> e)
@@ -214,7 +265,7 @@ namespace Nekres.Regions_Of_Tyria
 					mapName = currentSector.Name;
 				}
 			}
-			MapNotification.ShowNotification(_includeRegionInMapNotification.get_Value() ? header : null, mapName, null, _showDuration.get_Value() / 100f * 5f, _fadeInDuration.get_Value() / 100f * 3f, _fadeOutDuration.get_Value() / 100f * 3f, _effectDuration.get_Value() / 100f * 3f);
+			ShowNotification(_includeRegionInMapNotification.get_Value() ? header : null, mapName);
 		}
 
 		private async Task<Sector> GetSector(Map currentMap)
