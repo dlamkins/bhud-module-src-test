@@ -136,7 +136,7 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 			if (!RegionsOfTyria.Instance.MuteVanish.get_Value())
 			{
 				_vanishSound = RegionsOfTyria.Instance.VanishSound.CreateInstance();
-				_vanishSound.set_Volume(0.5f * GameService.GameIntegration.get_Audio().get_Volume());
+				_vanishSound.set_Volume(0.7f * GameService.GameIntegration.get_Audio().get_Volume());
 			}
 			_decode.get_Effect().get_Parameters().get_Item("Amount")
 				.SetValue(0f);
@@ -165,7 +165,7 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
 			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
 			if (RegionsOfTyria.Instance != null)
 			{
 				_decode.get_Effect().get_Parameters().get_Item("Opacity")
@@ -185,17 +185,17 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 				else if (RegionsOfTyria.Instance.Translate.get_Value())
 				{
 					SpriteBatchExtensions.Begin(spriteBatch, _decode);
-					PaintText((Control)(object)this, spriteBatch, bounds, RegionsOfTyria.Instance.KrytanFont, RegionsOfTyria.Instance.KrytanFontSmall, _header, _text, underline: false);
+					PaintText((Control)(object)this, spriteBatch, bounds, RegionsOfTyria.Instance.KrytanFont, RegionsOfTyria.Instance.KrytanFontSmall, _header, _text, RegionsOfTyria.Instance.OverlapHeader.get_Value(), underline: false);
 					spriteBatch.End();
 				}
 				SpriteBatchExtensions.Begin(spriteBatch, _reveal);
-				PaintText((Control)(object)this, spriteBatch, bounds, RegionsOfTyria.Instance.TitlingFont, RegionsOfTyria.Instance.TitlingFontSmall, _header, _text, underline: true, _amount);
+				PaintText((Control)(object)this, spriteBatch, bounds, RegionsOfTyria.Instance.TitlingFont, RegionsOfTyria.Instance.TitlingFontSmall, _header, _text, RegionsOfTyria.Instance.OverlapHeader.get_Value(), RegionsOfTyria.Instance.UnderlineHeader.get_Value(), _amount);
 				spriteBatch.End();
 				SpriteBatchExtensions.Begin(spriteBatch, _defaultParams);
 			}
 		}
 
-		internal static void PaintText(Control ctrl, SpriteBatch spriteBatch, Rectangle bounds, BitmapFont font, BitmapFont smallFont, string header, string text, bool underline = true, float deltaAmount = 1f)
+		internal static void PaintText(Control ctrl, SpriteBatch spriteBatch, Rectangle bounds, BitmapFont font, BitmapFont smallFont, string header, string text, bool overlap = false, bool underline = true, float deltaAmount = 1f)
 		{
 			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
@@ -219,11 +219,11 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0179: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0204: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0205: Unknown result type (might be due to invalid IL or missing references)
 			int height = (int)Math.Round(RegionsOfTyria.Instance.VerticalPosition.get_Value() / 100f * (float)bounds.Height);
 			Rectangle rect = default(Rectangle);
 			if (!string.IsNullOrEmpty(header) && !header.Equals(text, StringComparison.InvariantCultureIgnoreCase))
@@ -244,15 +244,15 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, Textures.get_Pixel(), rect, _darkGold);
 				}
 				((Rectangle)(ref rect))._002Ector(0, height, bounds.Width, bounds.Height);
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, ctrl, header.Wrap(), (BitmapFont)(object)smallFont, rect, _darkGold, false, true, 1, (HorizontalAlignment)1, (VerticalAlignment)0);
-				height = bottom - ((BitmapFont)smallFont).get_LineHeight();
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, ctrl, header.Wrap("<br>"), (BitmapFont)(object)smallFont, rect, _darkGold, false, true, 1, (HorizontalAlignment)1, (VerticalAlignment)0);
+				height = bottom - ((BitmapFont)smallFont).get_LineHeight() * ((!overlap) ? 1 : 2);
 			}
 			if (string.IsNullOrEmpty(text))
 			{
 				return;
 			}
 			((Rectangle)(ref rect))._002Ector(0, height, bounds.Width, bounds.Height);
-			foreach (string line in text.SplitClean())
+			foreach (string line in text.Split("<br>"))
 			{
 				rect.Y += (int)Math.Round(((BitmapFont)font).MeasureString(line).Height * 2.5f);
 				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, ctrl, line, (BitmapFont)(object)font, rect, _brightGold, false, true, 1, (HorizontalAlignment)1, (VerticalAlignment)0);

@@ -52,6 +52,10 @@ namespace Nekres.Regions_Of_Tyria
 
 		internal SettingEntry<bool> Dissolve;
 
+		internal SettingEntry<bool> UnderlineHeader;
+
+		internal SettingEntry<bool> OverlapHeader;
+
 		internal SettingEntry<bool> MuteReveal;
 
 		internal SettingEntry<bool> MuteVanish;
@@ -116,6 +120,8 @@ namespace Nekres.Regions_Of_Tyria
 			SettingCollection generalCol = settings.AddSubCollection("general", true, (Func<string>)(() => "General"));
 			Translate = generalCol.DefineSetting<bool>("translate", true, (Func<string>)(() => "Translate from New Krytan"), (Func<string>)(() => "Makes zone notifications appear in New Krytan before they are revealed to you."));
 			Dissolve = generalCol.DefineSetting<bool>("dissolve", true, (Func<string>)(() => "Dissolve when Fading Out"), (Func<string>)(() => "Makes zone notifications burn up when they fade out."));
+			UnderlineHeader = generalCol.DefineSetting<bool>("underline_heading", true, (Func<string>)(() => "Underline Heading"), (Func<string>)(() => "Underlines the top text if a notification has one."));
+			OverlapHeader = generalCol.DefineSetting<bool>("overlap_heading", false, (Func<string>)(() => "Overlap Heading"), (Func<string>)(() => "Makes the bottom text stylishly overlap the top text."));
 			MuteReveal = generalCol.DefineSetting<bool>("mute_reveal", false, (Func<string>)(() => "Mute Reveal Sound"), (Func<string>)(() => "Mutes the sound effect which plays during reveal."));
 			MuteVanish = generalCol.DefineSetting<bool>("mute_vanish", false, (Func<string>)(() => "Mute Vanish Sound"), (Func<string>)(() => "Mutes the sound effect which plays during fade-out."));
 			VerticalPosition = generalCol.DefineSetting<float>("pos_y", 25f, (Func<string>)(() => "Vertical Position"), (Func<string>)(() => "Sets the vertical position of area notifications."));
@@ -156,7 +162,7 @@ namespace Nekres.Regions_Of_Tyria
 				((Control)_notificationIndicator).Dispose();
 				_notificationIndicator = null;
 			}
-			if (GameService.Gw2Mumble.get_IsAvailable() && GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && _toggleSectorNotification.get_Value() && !(playerSpeed > 50f) && (!_hideInCombat.get_Value() || !GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat()) && !(gameTime.get_TotalGameTime().TotalMilliseconds - _lastRun < 10.0) && !(DateTime.UtcNow.Subtract(_lastUpdate).TotalSeconds < 5.0))
+			if (GameService.Gw2Mumble.get_IsAvailable() && GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && _toggleSectorNotification.get_Value() && !(playerSpeed > 54f) && (!_hideInCombat.get_Value() || !GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat()) && !(gameTime.get_TotalGameTime().TotalMilliseconds - _lastRun < 10.0) && !(DateTime.UtcNow.Subtract(_lastUpdate).TotalSeconds < 5.0))
 			{
 				_lastRun = gameTime.get_ElapsedGameTime().TotalMilliseconds;
 				_lastUpdate = DateTime.UtcNow;
@@ -182,6 +188,10 @@ namespace Nekres.Regions_Of_Tyria
 			FontSize.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnFontSizeChanged);
 			Dissolve.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)PopNotification);
 			Translate.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)PopNotification);
+			UnderlineHeader.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)PopNotification);
+			OverlapHeader.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)PopNotification);
+			MuteReveal.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)PopNotification);
+			MuteVanish.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)PopNotification);
 			((Module)this).OnModuleLoaded(e);
 		}
 
@@ -207,15 +217,19 @@ namespace Nekres.Regions_Of_Tyria
 			KrytanFontSmall?.Dispose();
 			TitlingFont?.Dispose();
 			TitlingFontSmall?.Dispose();
+			VerticalPosition.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnVerticalPositionChanged);
+			FontSize.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnFontSizeChanged);
+			Dissolve.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)PopNotification);
+			Translate.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)PopNotification);
+			UnderlineHeader.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)PopNotification);
+			OverlapHeader.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)PopNotification);
+			MuteReveal.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)PopNotification);
+			MuteVanish.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)PopNotification);
 			NotificationIndicator notificationIndicator = _notificationIndicator;
 			if (notificationIndicator != null)
 			{
 				((Control)notificationIndicator).Dispose();
 			}
-			VerticalPosition.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnVerticalPositionChanged);
-			FontSize.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnFontSizeChanged);
-			Dissolve.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)PopNotification);
-			Translate.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)PopNotification);
 			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
 			GameService.Overlay.remove_UserLocaleChanged((EventHandler<ValueEventArgs<CultureInfo>>)OnUserLocaleChanged);
 			Instance = null;
@@ -259,7 +273,7 @@ namespace Nekres.Regions_Of_Tyria
 			KrytanFont?.Dispose();
 			KrytanFontSmall?.Dispose();
 			KrytanFont = ContentsManager.GetBitmapFont("fonts/NewKrytan.ttf", size + 10);
-			KrytanFontSmall = ContentsManager.GetBitmapFont("fonts/NewKrytan.ttf", size - 2, 25);
+			KrytanFontSmall = ContentsManager.GetBitmapFont("fonts/NewKrytan.ttf", size - 2);
 			TitlingFont?.Dispose();
 			TitlingFontSmall?.Dispose();
 			TitlingFont = ContentsManager.GetBitmapFont("fonts/StoweTitling.ttf", size);

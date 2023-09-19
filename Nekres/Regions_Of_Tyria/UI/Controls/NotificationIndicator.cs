@@ -42,7 +42,7 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 			if (RegionsOfTyria.Instance != null)
 			{
-				MapNotification.PaintText((Control)(object)this, spriteBatch, bounds, RegionsOfTyria.Instance.TitlingFont, RegionsOfTyria.Instance.TitlingFontSmall, _header, _text);
+				MapNotification.PaintText((Control)(object)this, spriteBatch, bounds, RegionsOfTyria.Instance.TitlingFont, RegionsOfTyria.Instance.TitlingFontSmall, _header, _text, RegionsOfTyria.Instance.OverlapHeader.get_Value(), RegionsOfTyria.Instance.UnderlineHeader.get_Value());
 			}
 		}
 
