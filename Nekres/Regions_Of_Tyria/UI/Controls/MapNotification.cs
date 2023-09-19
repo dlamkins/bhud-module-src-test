@@ -72,27 +72,33 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 			_darkGold = new Color(178, 160, 145, 255);
 		}
 
-		public static void ShowNotification(string header, string footer, float showDuration = 4f, float fadeInDuration = 2f, float fadeOutDuration = 2f, float effectDuration = 0.85f)
+		public static void ShowNotification(string header, string text, float showDuration = 4f, float fadeInDuration = 2f, float fadeOutDuration = 2f, float effectDuration = 0.85f)
 		{
 			if (DateTime.UtcNow.Subtract(_lastNotificationTime).TotalMilliseconds < 2000.0)
 			{
 				return;
 			}
 			_lastNotificationTime = DateTime.UtcNow;
-			if (string.IsNullOrEmpty(header) && string.IsNullOrEmpty(footer))
+			if (string.IsNullOrEmpty(text))
 			{
 				return;
 			}
-			MapNotification mapNotification = new MapNotification(header, footer, showDuration, fadeInDuration, fadeOutDuration, effectDuration);
-			((Control)mapNotification).set_Parent((Container)(object)Control.get_Graphics().get_SpriteScreen());
-			MapNotification nNot = mapNotification;
-			((Control)nNot).set_ZIndex(_activeMapNotifications.DefaultIfEmpty(nNot).Max((MapNotification n) => ((Control)n).get_ZIndex()) + 1);
-			foreach (MapNotification activeMapNotification in _activeMapNotifications)
+			try
 			{
-				activeMapNotification.SlideDown(150);
+				MapNotification mapNotification = new MapNotification(header, text, showDuration, fadeInDuration, fadeOutDuration, effectDuration);
+				((Control)mapNotification).set_Parent((Container)(object)Control.get_Graphics().get_SpriteScreen());
+				MapNotification nNot = mapNotification;
+				((Control)nNot).set_ZIndex(_activeMapNotifications.DefaultIfEmpty(nNot).Max((MapNotification n) => ((Control)n).get_ZIndex()) + 1);
+				foreach (MapNotification activeMapNotification in _activeMapNotifications)
+				{
+					activeMapNotification.SlideDown(150);
+				}
+				_activeMapNotifications.Add(nNot);
+				((Control)nNot).Show();
 			}
-			_activeMapNotifications.Add(nNot);
-			((Control)nNot).Show();
+			catch (Exception)
+			{
+			}
 		}
 
 		private MapNotification(string header, string text, float showDuration = 4f, float fadeInDuration = 2f, float fadeOutDuration = 2f, float effectDuration = 0.85f)
