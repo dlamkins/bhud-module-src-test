@@ -5,15 +5,15 @@ using Blish_HUD;
 using Blish_HUD.Controls;
 using Glide;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended;
 using MonoGame.Extended.BitmapFonts;
 
 namespace Nekres.Regions_Of_Tyria.UI.Controls
 {
 	internal sealed class MapNotification : Container
 	{
-		private const int TOP_MARGIN = 20;
+		private const string BREAKRULE = "<br>";
 
 		private const int STROKE_DIST = 1;
 
@@ -47,6 +47,10 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 
 		private SpriteBatchParameters _reveal;
 
+		private SoundEffectInstance _decodeSound;
+
+		private SoundEffectInstance _vanishSound;
+
 		private int _targetTop;
 
 		private float _amount;
@@ -75,6 +79,10 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 				return;
 			}
 			_lastNotificationTime = DateTime.UtcNow;
+			if (string.IsNullOrEmpty(header) && string.IsNullOrEmpty(footer))
+			{
+				return;
+			}
 			MapNotification mapNotification = new MapNotification(header, footer, showDuration, fadeInDuration, fadeOutDuration, effectDuration);
 			((Control)mapNotification).set_Parent((Container)(object)Control.get_Graphics().get_SpriteScreen());
 			MapNotification nNot = mapNotification;
@@ -114,6 +122,16 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 			SpriteBatchParameters val2 = new SpriteBatchParameters((SpriteSortMode)0, (BlendState)null, (SamplerState)null, (DepthStencilState)null, (RasterizerState)null, (Effect)null, (Matrix?)null);
 			val2.set_Effect(RegionsOfTyria.Instance.DissolveEffect.Clone());
 			_reveal = val2;
+			if (!RegionsOfTyria.Instance.MuteReveal.get_Value())
+			{
+				_decodeSound = RegionsOfTyria.Instance.DecodeSound.CreateInstance();
+				_decodeSound.set_Volume(GameService.GameIntegration.get_Audio().get_Volume());
+			}
+			if (!RegionsOfTyria.Instance.MuteVanish.get_Value())
+			{
+				_vanishSound = RegionsOfTyria.Instance.VanishSound.CreateInstance();
+				_vanishSound.set_Volume(0.5f * GameService.GameIntegration.get_Audio().get_Volume());
+			}
 			_decode.get_Effect().get_Parameters().get_Item("Amount")
 				.SetValue(0f);
 			_decode.get_Effect().get_Parameters().get_Item("Slide")
@@ -174,61 +192,64 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 		internal static void PaintText(Control ctrl, SpriteBatch spriteBatch, Rectangle bounds, BitmapFont font, BitmapFont smallFont, string header, string text, bool underline = true, float deltaAmount = 1f)
 		{
 			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0179: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fc: Unknown result type (might be due to invalid IL or missing references)
 			int height = (int)Math.Round(RegionsOfTyria.Instance.VerticalPosition.get_Value() / 100f * (float)bounds.Height);
 			Rectangle rect = default(Rectangle);
 			if (!string.IsNullOrEmpty(header) && !header.Equals(text, StringComparison.InvariantCultureIgnoreCase))
 			{
-				string str = header.Wrap();
-				Size2 size = ((BitmapFont)smallFont).MeasureString(str);
-				int lineHeight = (int)size.Height;
+				int lines = 1 + header.Count("<br>");
+				int bottom = height + lines * ((BitmapFont)smallFont).get_LineHeight();
 				if (underline)
 				{
-					int lineWidth = (int)Math.Round(deltaAmount * size.Width);
-					((Rectangle)(ref rect))._002Ector((bounds.Width - lineWidth) / 2, height + lineHeight + 15, (lineWidth + 2) / 2, 4);
+					int maxWidth = (int)Math.Round(((BitmapFont)smallFont).MeasureString(header).Width);
+					int lineWidth = (int)Math.Round(deltaAmount * (float)maxWidth);
+					((Rectangle)(ref rect))._002Ector((bounds.Width - lineWidth) / 2, bottom + 15, (lineWidth + 2) / 2, 4);
 					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, Textures.get_Pixel(), rect, Color.get_Black() * 0.8f);
 					((Rectangle)(ref rect))._002Ector(rect.X + 1, rect.Y + 1, lineWidth / 2, 2);
 					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, Textures.get_Pixel(), rect, _darkGold);
-					((Rectangle)(ref rect))._002Ector(bounds.Width / 2, height + lineHeight + 15, (lineWidth + 1) / 2, 4);
+					((Rectangle)(ref rect))._002Ector(bounds.Width / 2, bottom + 15, (lineWidth + 1) / 2, 4);
 					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, Textures.get_Pixel(), rect, Color.get_Black() * 0.8f);
 					((Rectangle)(ref rect))._002Ector(rect.X - 1, rect.Y + 1, lineWidth / 2, 2);
 					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, Textures.get_Pixel(), rect, _darkGold);
 				}
 				((Rectangle)(ref rect))._002Ector(0, height, bounds.Width, bounds.Height);
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, ctrl, str, (BitmapFont)(object)smallFont, rect, _darkGold, false, true, 1, (HorizontalAlignment)1, (VerticalAlignment)0);
-				height += ((BitmapFont)font).get_LineHeight() * 2 + 20;
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, ctrl, header.Wrap(), (BitmapFont)(object)smallFont, rect, _darkGold, false, true, 1, (HorizontalAlignment)1, (VerticalAlignment)0);
+				height = bottom - ((BitmapFont)smallFont).get_LineHeight();
 			}
-			if (!string.IsNullOrEmpty(text))
+			if (string.IsNullOrEmpty(text))
 			{
-				((Rectangle)(ref rect))._002Ector(0, height, bounds.Width, bounds.Height);
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, ctrl, text.Wrap(), (BitmapFont)(object)font, rect, _brightGold, false, true, 1, (HorizontalAlignment)1, (VerticalAlignment)0);
+				return;
+			}
+			((Rectangle)(ref rect))._002Ector(0, height, bounds.Width, bounds.Height);
+			foreach (string line in text.SplitClean())
+			{
+				rect.Y += (int)Math.Round(((BitmapFont)font).MeasureString(line).Height * 2.5f);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, ctrl, line, (BitmapFont)(object)font, rect, _brightGold, false, true, 1, (HorizontalAlignment)1, (VerticalAlignment)0);
 			}
 		}
 
@@ -241,17 +262,32 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 			{
 				((TweenerImpl)Control.get_Animation().get_Tweener()).Timer(0.2f, 0f).OnComplete((Action)delegate
 				{
+					SoundEffectInstance decodeSound = _decodeSound;
+					if (decodeSound != null)
+					{
+						decodeSound.Play();
+					}
 					((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<MapNotification>(this, (object)new
 					{
 						_amount = 1f
 					}, _effectDuration, 0f, true).OnComplete((Action)delegate
 					{
+						SoundEffectInstance decodeSound2 = _decodeSound;
+						if (decodeSound2 != null)
+						{
+							decodeSound2.Stop();
+						}
 						((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<MapNotification>(this, (object)new
 						{
 							Opacity = 1f
 						}, _showDuration, 0f, true).OnComplete((Action)delegate
 						{
 							_isFading = true;
+							SoundEffectInstance vanishSound = _vanishSound;
+							if (vanishSound != null)
+							{
+								vanishSound.Play();
+							}
 							((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<MapNotification>(this, RegionsOfTyria.Instance.Dissolve.get_Value() ? ((object)new
 							{
 								Opacity = 0.9f,
@@ -259,7 +295,15 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 							}) : ((object)new
 							{
 								Opacity = 0f
-							}), _fadeOutDuration, 0f, true).OnComplete((Action)((Control)this).Dispose);
+							}), _fadeOutDuration, 0f, true).OnComplete((Action)delegate
+							{
+								SoundEffectInstance vanishSound2 = _vanishSound;
+								if (vanishSound2 != null)
+								{
+									vanishSound2.Stop();
+								}
+								((Control)this).Dispose();
+							});
 						});
 					});
 				});
@@ -282,6 +326,16 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 
 		protected override void DisposeControl()
 		{
+			SoundEffectInstance vanishSound = _vanishSound;
+			if (vanishSound != null)
+			{
+				vanishSound.Dispose();
+			}
+			SoundEffectInstance decodeSound = _decodeSound;
+			if (decodeSound != null)
+			{
+				decodeSound.Dispose();
+			}
 			Effect effect = _reveal.get_Effect();
 			if (effect != null)
 			{

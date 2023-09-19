@@ -70,6 +70,18 @@ namespace Nekres.Regions_Of_Tyria
 			return input.Split(new string[1] { delimiter }, StringSplitOptions.RemoveEmptyEntries).ForEach((string x) => x.Trim());
 		}
 
+		public static int Count(this string input, string needle)
+		{
+			int count = 0;
+			int i = 0;
+			while ((i = input.IndexOf(needle, i, StringComparison.Ordinal)) != -1)
+			{
+				i++;
+				count++;
+			}
+			return count;
+		}
+
 		public static string Wrap(this string input, string delimiter = "<br>")
 		{
 			return input.Replace(delimiter, "\n");
