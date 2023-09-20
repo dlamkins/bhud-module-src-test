@@ -51,6 +51,8 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 
 		private SoundEffectInstance _vanishSound;
 
+		private Tween _anim;
+
 		private int _targetTop;
 
 		private float _amount;
@@ -131,12 +133,12 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 			if (!RegionsOfTyria.Instance.MuteReveal.get_Value())
 			{
 				_decodeSound = RegionsOfTyria.Instance.DecodeSound.CreateInstance();
-				_decodeSound.set_Volume(GameService.GameIntegration.get_Audio().get_Volume());
+				_decodeSound.set_Volume(RegionsOfTyria.Instance.RevealVolume.get_Value() / 100f * GameService.GameIntegration.get_Audio().get_Volume());
 			}
 			if (!RegionsOfTyria.Instance.MuteVanish.get_Value())
 			{
 				_vanishSound = RegionsOfTyria.Instance.VanishSound.CreateInstance();
-				_vanishSound.set_Volume(0.7f * GameService.GameIntegration.get_Audio().get_Volume());
+				_vanishSound.set_Volume(RegionsOfTyria.Instance.VanishVolume.get_Value() / 100f * GameService.GameIntegration.get_Audio().get_Volume());
 			}
 			_decode.get_Effect().get_Parameters().get_Item("Amount")
 				.SetValue(0f);
@@ -261,19 +263,19 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 
 		public override void Show()
 		{
-			((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<MapNotification>(this, (object)new
+			_anim = ((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<MapNotification>(this, (object)new
 			{
 				Opacity = 1f
 			}, _fadeInDuration, 0f, true).OnComplete((Action)delegate
 			{
-				((TweenerImpl)Control.get_Animation().get_Tweener()).Timer(0.2f, 0f).OnComplete((Action)delegate
+				_anim = ((TweenerImpl)Control.get_Animation().get_Tweener()).Timer(0.2f, 0f).OnComplete((Action)delegate
 				{
 					SoundEffectInstance decodeSound = _decodeSound;
 					if (decodeSound != null)
 					{
 						decodeSound.Play();
 					}
-					((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<MapNotification>(this, (object)new
+					_anim = ((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<MapNotification>(this, (object)new
 					{
 						_amount = 1f
 					}, _effectDuration, 0f, true).OnComplete((Action)delegate
@@ -283,7 +285,7 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 						{
 							decodeSound2.Stop();
 						}
-						((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<MapNotification>(this, (object)new
+						_anim = ((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<MapNotification>(this, (object)new
 						{
 							Opacity = 1f
 						}, _showDuration, 0f, true).OnComplete((Action)delegate
@@ -294,22 +296,14 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 							{
 								vanishSound.Play();
 							}
-							((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<MapNotification>(this, RegionsOfTyria.Instance.Dissolve.get_Value() ? ((object)new
+							_anim = ((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<MapNotification>(this, RegionsOfTyria.Instance.Dissolve.get_Value() ? ((object)new
 							{
 								Opacity = 0.9f,
 								_amount = 0f
 							}) : ((object)new
 							{
 								Opacity = 0f
-							}), _fadeOutDuration, 0f, true).OnComplete((Action)delegate
-							{
-								SoundEffectInstance vanishSound2 = _vanishSound;
-								if (vanishSound2 != null)
-								{
-									vanishSound2.Stop();
-								}
-								((Control)this).Dispose();
-							});
+							}), _fadeOutDuration, 0f, true).OnComplete((Action)((Control)this).Dispose);
 						});
 					});
 				});
@@ -322,7 +316,12 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 			_targetTop += distance;
 			if (!(((Control)this)._opacity < 1f))
 			{
-				((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<MapNotification>(this, (object)new
+				Tween anim = _anim;
+				if (anim != null)
+				{
+					anim.Cancel();
+				}
+				_anim = ((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<MapNotification>(this, (object)new
 				{
 					Opacity = 0f,
 					Top = _targetTop
@@ -332,6 +331,13 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 
 		protected override void DisposeControl()
 		{
+			_activeMapNotifications.Remove(this);
+			((Control)GameService.Graphics.get_SpriteScreen()).remove_Resized((EventHandler<ResizedEventArgs>)UpdateLocation);
+			Tween anim = _anim;
+			if (anim != null)
+			{
+				anim.Cancel();
+			}
 			SoundEffectInstance vanishSound = _vanishSound;
 			if (vanishSound != null)
 			{
@@ -352,8 +358,6 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 			{
 				((GraphicsResource)effect2).Dispose();
 			}
-			_activeMapNotifications.Remove(this);
-			((Control)GameService.Graphics.get_SpriteScreen()).remove_Resized((EventHandler<ResizedEventArgs>)UpdateLocation);
 			((Container)this).DisposeControl();
 		}
 	}

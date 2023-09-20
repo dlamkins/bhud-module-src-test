@@ -56,13 +56,17 @@ namespace Nekres.Regions_Of_Tyria
 
 		internal SettingEntry<bool> OverlapHeader;
 
-		internal SettingEntry<bool> MuteReveal;
-
-		internal SettingEntry<bool> MuteVanish;
-
 		internal SettingEntry<float> VerticalPosition;
 
 		internal SettingEntry<float> FontSize;
+
+		internal SettingEntry<float> RevealVolume;
+
+		internal SettingEntry<float> VanishVolume;
+
+		internal SettingEntry<bool> MuteReveal;
+
+		internal SettingEntry<bool> MuteVanish;
 
 		private AsyncCache<int, Map> _mapRepository;
 
@@ -122,11 +126,14 @@ namespace Nekres.Regions_Of_Tyria
 			Dissolve = generalCol.DefineSetting<bool>("dissolve", true, (Func<string>)(() => "Dissolve when Fading Out"), (Func<string>)(() => "Makes zone notifications burn up when they fade out."));
 			UnderlineHeader = generalCol.DefineSetting<bool>("underline_heading", true, (Func<string>)(() => "Underline Heading"), (Func<string>)(() => "Underlines the top text if a notification has one."));
 			OverlapHeader = generalCol.DefineSetting<bool>("overlap_heading", false, (Func<string>)(() => "Overlap Heading"), (Func<string>)(() => "Makes the bottom text stylishly overlap the top text."));
-			MuteReveal = generalCol.DefineSetting<bool>("mute_reveal", false, (Func<string>)(() => "Mute Reveal Sound"), (Func<string>)(() => "Mutes the sound effect which plays during reveal."));
-			MuteVanish = generalCol.DefineSetting<bool>("mute_vanish", false, (Func<string>)(() => "Mute Vanish Sound"), (Func<string>)(() => "Mutes the sound effect which plays during fade-out."));
 			VerticalPosition = generalCol.DefineSetting<float>("pos_y", 25f, (Func<string>)(() => "Vertical Position"), (Func<string>)(() => "Sets the vertical position of area notifications."));
 			FontSize = generalCol.DefineSetting<float>("font_size", 76f, (Func<string>)(() => "Font Size"), (Func<string>)(() => "Sets the size of the zone notification text."));
 			_hideInCombat = generalCol.DefineSetting<bool>("hide_if_combat", true, (Func<string>)(() => "Disable during Combat"), (Func<string>)(() => "Disables zone notifications during combat."));
+			SettingCollection soundCol = settings.AddSubCollection("sound", true, (Func<string>)(() => "Sound"));
+			RevealVolume = soundCol.DefineSetting<float>("reveal_vol", 70f, (Func<string>)(() => "Reveal Volume"), (Func<string>)(() => "Sets the reveal sound volume."));
+			VanishVolume = soundCol.DefineSetting<float>("vanish_vol", 50f, (Func<string>)(() => "Vanish Volume"), (Func<string>)(() => "Sets the vanish sound volume."));
+			MuteReveal = soundCol.DefineSetting<bool>("mute_reveal", false, (Func<string>)(() => "Mute Reveal Sound"), (Func<string>)(() => "Mutes the sound effect which plays during reveal."));
+			MuteVanish = soundCol.DefineSetting<bool>("mute_vanish", false, (Func<string>)(() => "Mute Vanish Sound"), (Func<string>)(() => "Mutes the sound effect which plays during fade-out."));
 			SettingCollection durationCol = settings.AddSubCollection("durations", true, (Func<string>)(() => "Durations"));
 			_showDuration = durationCol.DefineSetting<float>("show", 80f, (Func<string>)(() => "Show Duration"), (Func<string>)(() => "The duration in which to stay in full opacity."));
 			_fadeInDuration = durationCol.DefineSetting<float>("fade_in", 45f, (Func<string>)(() => "Fade-In Duration"), (Func<string>)(() => "The duration of the fade-in."));
