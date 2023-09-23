@@ -7,11 +7,11 @@ namespace Lorf.BH.TTBlockersStuff
 {
 	internal class GatheringSpot
 	{
-		public static readonly GatheringSpot Amber = new GatheringSpot(Translations.GatheringSpotTitleAmber, 90, new Vector2(670.07f, -606.34f), isWurm: true, 100f);
+		public static readonly GatheringSpot Amber = new GatheringSpot(Translations.GatheringSpotTitleAmber, 90, new Vector2(670.43536f, -606.38696f), isWurm: true, 100f);
 
-		public static readonly GatheringSpot Crimson = new GatheringSpot(Translations.GatheringSpotTitleCrimson, 90, new Vector2(198.5f, -438.5f), isWurm: true, 100f);
+		public static readonly GatheringSpot Crimson = new GatheringSpot(Translations.GatheringSpotTitleCrimson, 90, new Vector2(198.4921f, -438.15326f), isWurm: true, 100f);
 
-		public static readonly GatheringSpot Cobalt = new GatheringSpot(Translations.GatheringSpotTitleCobalt, 80, new Vector2(-277.5f, -878.2f), isWurm: true, 150f);
+		public static readonly GatheringSpot Cobalt = new GatheringSpot(Translations.GatheringSpotTitleCobalt, 80, new Vector2(-277.49643f, -878.2016f), isWurm: true, 150f);
 
 		public static readonly GatheringSpot General = new GatheringSpot(Translations.GatheringspotTitleMain, 90, new Vector2(185f, -83f), isWurm: false, 100f);
 

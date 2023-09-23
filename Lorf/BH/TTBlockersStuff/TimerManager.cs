@@ -3,6 +3,7 @@ using Blish_HUD;
 using Blish_HUD.Controls;
 using Lorf.BH.TTBlockersStuff.UI;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using TTBlockersStuff.Language;
 
 namespace Lorf.BH.TTBlockersStuff
@@ -45,8 +46,8 @@ namespace Lorf.BH.TTBlockersStuff
 				targetTime = DateTime.MinValue;
 				return;
 			}
-			Vector3 pos = GameService.Gw2Mumble.PlayerCharacter.Position;
-			Logger.Debug($"Timer {Name} activated (x: {pos.X}, y: {pos.Y}, z: {pos.Z}, time: {time})");
+			Vector3 position = GameService.Gw2Mumble.get_PlayerCharacter().get_Position();
+			Logger.Debug($"Timer {Name} activated (x: {position.X}, y: {position.Y}, z: {position.Z}, time: {time})");
 			targetTime = DateTime.UtcNow.AddSeconds(time);
 			TimerBar.MaxValue = time;
 			Active = true;
@@ -61,16 +62,16 @@ namespace Lorf.BH.TTBlockersStuff
 			{
 				return;
 			}
-			DateTime now = DateTime.UtcNow;
-			double secondsRemaining = (targetTime - now).TotalSeconds;
-			if (targetTime > now && secondsRemaining > 1.0)
+			DateTime utcNow = DateTime.UtcNow;
+			double totalSeconds = (targetTime - utcNow).TotalSeconds;
+			if (targetTime > utcNow && totalSeconds > 1.0)
 			{
-				TimerBar.BarText = $"{Name} ({(int)secondsRemaining}s)";
-				TimerBar.Value = TimerBar.MaxValue - (float)((targetTime - now).TotalMilliseconds / 1000.0);
-				if (TimerBar.MaxValue != (float)(int)secondsRemaining && ((int)secondsRemaining % 10 == 0 || secondsRemaining < 10.0) && lastBlinkRequestTime == TimeSpan.Zero && lastBlinkRequestSecond != (int)secondsRemaining)
+				TimerBar.BarText = $"{Name} ({(int)totalSeconds}s)";
+				TimerBar.Value = TimerBar.MaxValue - (float)((targetTime - utcNow).TotalMilliseconds / 1000.0);
+				if (TimerBar.MaxValue != (float)(int)totalSeconds && ((int)totalSeconds % 10 == 0 || totalSeconds < 10.0) && lastBlinkRequestTime == TimeSpan.Zero && lastBlinkRequestSecond != (int)totalSeconds)
 				{
 					lastBlinkRequestTime = gameTime.get_TotalGameTime();
-					lastBlinkRequestSecond = (int)secondsRemaining;
+					lastBlinkRequestSecond = (int)totalSeconds;
 				}
 				if (lastBlinkRequestTime.Add(textBlinkDuration) > gameTime.get_TotalGameTime())
 				{
@@ -83,7 +84,7 @@ namespace Lorf.BH.TTBlockersStuff
 			else
 			{
 				Active = false;
-				ScreenNotification.ShowNotification(Name + " " + Translations.TimerBarTextReady + "!");
+				ScreenNotification.ShowNotification(Name + " " + Translations.TimerBarTextReady + "!", (NotificationType)0, (Texture2D)null, 4);
 				TimerBar.BarText = Name + " (" + Translations.TimerBarTextReady + ")";
 				TimerBar.Value = TimerBar.MaxValue;
 				TimerBar.TextColor = Color.get_White();

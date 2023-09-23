@@ -1,6 +1,7 @@
 using System;
 using Blish_HUD;
 using Blish_HUD.Controls;
+using Blish_HUD.Input;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -51,17 +52,18 @@ namespace Lorf.BH.TTBlockersStuff.Settings
 		private void OnAssignmentAccepted(EventArgs e)
 		{
 			this.AssignmentAccepted?.Invoke(this, e);
-			Dispose();
+			((Control)this).Dispose();
 		}
 
 		private void OnAssignmentCanceled(EventArgs e)
 		{
-			colorBox.Color = originalColor;
+			colorBox.set_Color(originalColor);
 			this.AssignmentCanceled?.Invoke(this, e);
-			Dispose();
+			((Control)this).Dispose();
 		}
 
 		public ColorPickerWindow(string name, ColorBox box)
+			: this()
 		{
 			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
@@ -70,82 +72,103 @@ namespace Lorf.BH.TTBlockersStuff.Settings
 			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
 			pickName = name;
 			colorBox = box;
-			originalColor = colorBox.Color;
-			base.BackgroundColor = Color.get_Black() * 0.3f;
-			base.Size = new Point(_normalizedWindowRegion.Width, _normalizedWindowRegion.Height);
-			ZIndex = 2147483614;
-			base.Visible = false;
+			originalColor = colorBox.get_Color();
+			((Control)this).set_BackgroundColor(Color.get_Black() * 0.3f);
+			((Control)this).set_Size(new Point(_normalizedWindowRegion.Width, _normalizedWindowRegion.Height));
+			((Control)this).set_ZIndex(2147483614);
+			((Control)this).set_Visible(false);
 			BuildChildElements();
 		}
 
 		protected override void OnShown(EventArgs e)
 		{
-			Invalidate();
-			base.OnShown(e);
+			((Control)this).Invalidate();
+			((Control)this).OnShown(e);
 		}
 
 		private int doABitOfMath(float size, bool height)
 		{
-			float originalSize = (height ? _textureWindowTexture.get_Height() : _textureWindowTexture.get_Width());
-			float newSize = (height ? base.Height : base.Width);
-			return (int)(size * (newSize / originalSize));
+			float num = (height ? _textureWindowTexture.get_Height() : _textureWindowTexture.get_Width());
+			float num2 = (height ? ((Control)this).get_Height() : ((Control)this).get_Width());
+			return (int)(size * (num2 / num));
 		}
 
 		private void BuildChildElements()
 		{
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a3: Expected O, but got Unknown
+			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0101: Expected O, but got Unknown
+			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0112: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012e: Expected O, but got Unknown
 			//IL_0158: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0191: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019b: Expected O, but got Unknown
 			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0209: Unknown result type (might be due to invalid IL or missing references)
 			textureMarginLeft = doABitOfMath(36f, height: false);
 			textureMarginTop = doABitOfMath(26f, height: true);
 			textureMarginRight = doABitOfMath(72f, height: false);
 			textureMarginBottom = doABitOfMath(35f, height: true);
-			Label assignInputsLbl = new Label
-			{
-				Text = pickName,
-				Location = new Point(textureMarginLeft + 18, textureMarginTop + 18),
-				ShowShadow = true,
-				AutoSizeWidth = true,
-				AutoSizeHeight = true,
-				Parent = this,
-				Font = GameService.Content.DefaultFont16
-			};
-			_cancelBttn = new StandardButton
-			{
-				Text = Translations.ColorSelectionButtonTextCancel,
-				Location = new Point(base.Width - textureMarginRight - 100 - 18, base.Height - textureMarginBottom - 18 - 25),
-				Width = 100,
-				Height = 25,
-				Parent = this
-			};
-			_acceptBttn = new StandardButton
-			{
-				Text = Translations.ColorSelectionButtonTextOk,
-				Width = 100,
-				Height = 25,
-				Parent = this
-			};
-			_acceptBttn.Location = new Point(_cancelBttn.Left - 8 - _acceptBttn.Width, _cancelBttn.Top);
-			_cancelBttn.Click += delegate
+			Label val = new Label();
+			val.set_Text(pickName);
+			((Control)val).set_Location(new Point(textureMarginLeft + 18, textureMarginTop + 18));
+			val.set_ShowShadow(true);
+			val.set_AutoSizeWidth(true);
+			val.set_AutoSizeHeight(true);
+			((Control)val).set_Parent((Container)(object)this);
+			val.set_Font(GameService.Content.get_DefaultFont16());
+			Label val2 = val;
+			StandardButton val3 = new StandardButton();
+			val3.set_Text(Translations.ColorSelectionButtonTextCancel);
+			((Control)val3).set_Location(new Point(((Control)this).get_Width() - textureMarginRight - 100 - 18, ((Control)this).get_Height() - textureMarginBottom - 18 - 25));
+			((Control)val3).set_Width(100);
+			((Control)val3).set_Height(25);
+			((Control)val3).set_Parent((Container)(object)this);
+			_cancelBttn = val3;
+			StandardButton val4 = new StandardButton();
+			val4.set_Text(Translations.ColorSelectionButtonTextOk);
+			((Control)val4).set_Width(100);
+			((Control)val4).set_Height(25);
+			((Control)val4).set_Parent((Container)(object)this);
+			_acceptBttn = val4;
+			((Control)_acceptBttn).set_Location(new Point(((Control)_cancelBttn).get_Left() - 8 - ((Control)_acceptBttn).get_Width(), ((Control)_cancelBttn).get_Top()));
+			((Control)_cancelBttn).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				OnAssignmentCanceled(EventArgs.Empty);
-			};
-			_acceptBttn.Click += delegate
+			});
+			((Control)_acceptBttn).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				OnAssignmentAccepted(EventArgs.Empty);
-			};
+			});
 			picker = new ColorPicker();
-			picker.Visible = true;
-			picker.Parent = this;
-			picker.Size = new Point(base.Width - assignInputsLbl.Left - 36, _cancelBttn.Top - assignInputsLbl.Bottom - 36);
-			picker.CanScroll = true;
-			picker.Location = new Point(assignInputsLbl.Left, assignInputsLbl.Bottom + 18);
-			picker.AssociatedColorBox = colorBox;
+			((Control)picker).set_Visible(true);
+			((Control)picker).set_Parent((Container)(object)this);
+			((Control)picker).set_Size(new Point(((Control)this).get_Width() - ((Control)val2).get_Left() - 36, ((Control)_cancelBttn).get_Top() - ((Control)val2).get_Bottom() - 36));
+			((Panel)picker).set_CanScroll(true);
+			((Control)picker).set_Location(new Point(((Control)val2).get_Left(), ((Control)val2).get_Bottom() + 18));
+			picker.set_AssociatedColorBox(colorBox);
 			foreach (Color color in Module.Instance.Colors)
 			{
-				picker.Colors.Add(color);
+				picker.get_Colors().Add(color);
 			}
 		}
 
@@ -158,22 +181,22 @@ namespace Lorf.BH.TTBlockersStuff.Settings
 			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-			base.RecalculateLayout();
-			Container parent = base.Parent;
+			((Control)this).RecalculateLayout();
+			Container parent = ((Control)this).get_Parent();
 			if (parent != null)
 			{
-				_size = parent.Size;
-				Point distanceInwards = default(Point);
-				((Point)(ref distanceInwards))._002Ector(_size.X / 2 - _normalizedWindowRegion.Width / 2, _size.Y / 2 - _normalizedWindowRegion.Height / 2);
-				_windowRegion = _normalizedWindowRegion.OffsetBy(distanceInwards);
-				base.ContentRegion = _windowRegion;
+				((Control)this)._size = ((Control)parent).get_Size();
+				Point val = default(Point);
+				((Point)(ref val))._002Ector(((Control)this)._size.X / 2 - _normalizedWindowRegion.Width / 2, ((Control)this)._size.Y / 2 - _normalizedWindowRegion.Height / 2);
+				_windowRegion = RectangleExtension.OffsetBy(_normalizedWindowRegion, val);
+				((Container)this).set_ContentRegion(_windowRegion);
 			}
 		}
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
 			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-			spriteBatch.DrawOnCtrl(this, _textureWindowTexture, _windowRegion);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _textureWindowTexture, _windowRegion);
 		}
 
 		public void BringWindowToFront()
