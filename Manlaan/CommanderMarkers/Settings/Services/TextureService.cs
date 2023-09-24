@@ -6,6 +6,8 @@ namespace Manlaan.CommanderMarkers.Settings.Services
 {
 	public class TextureService : IDisposable
 	{
+		public Texture2D SettingWindowBackground;
+
 		public Texture2D _imgArrow;
 
 		public Texture2D _imgCircle;
@@ -24,16 +26,35 @@ namespace Manlaan.CommanderMarkers.Settings.Services
 
 		public Texture2D _imgClear;
 
+		public Texture2D _imgCheck;
+
 		public Texture2D _blishHeart;
 
-		public Texture2D CornerIconTexture { get; }
+		public Texture2D _blishHeartSmall;
 
-		public Texture2D CornerIconHoverTexture { get; }
+		public Texture2D IconEye;
+
+		public Texture2D IconCopy;
+
+		public Texture2D IconDelete;
+
+		public Texture2D IconDeleteLarge;
+
+		public Texture2D IconEdit;
+
+		public Texture2D IconExport;
+
+		public Texture2D IconGoBack;
+
+		public Texture2D IconImport;
+
+		public Texture2D IconSave;
+
+		public Texture2D IconCorner;
 
 		public TextureService(ContentsManager contentsManager)
 		{
-			CornerIconTexture = contentsManager.GetTexture("raids\\textures\\raidIconDark.png");
-			CornerIconHoverTexture = contentsManager.GetTexture("raids\\textures\\raidIconBright.png");
+			SettingWindowBackground = contentsManager.GetTexture("window\\background.png");
 			_imgArrow = contentsManager.GetTexture("arrow.png");
 			_imgCircle = contentsManager.GetTexture("circle.png");
 			_imgHeart = contentsManager.GetTexture("heart.png");
@@ -43,23 +64,138 @@ namespace Manlaan.CommanderMarkers.Settings.Services
 			_imgTriangle = contentsManager.GetTexture("triangle.png");
 			_imgX = contentsManager.GetTexture("x.png");
 			_imgClear = contentsManager.GetTexture("clear.png");
+			_imgCheck = contentsManager.GetTexture("check.png");
 			_blishHeart = contentsManager.GetTexture("mapmarker.png");
+			_blishHeartSmall = contentsManager.GetTexture("mapmarker20.png");
+			IconEye = contentsManager.GetTexture("eye.png");
+			IconCopy = contentsManager.GetTexture("iconCopy.png");
+			IconDelete = contentsManager.GetTexture("iconDelete.png");
+			IconDeleteLarge = contentsManager.GetTexture("iconDelete48.png");
+			IconEdit = contentsManager.GetTexture("iconEdit.png");
+			IconExport = contentsManager.GetTexture("iconExport.png");
+			IconGoBack = contentsManager.GetTexture("iconGoBack.png");
+			IconImport = contentsManager.GetTexture("iconImport.png");
+			IconSave = contentsManager.GetTexture("iconSave.png");
+			IconCorner = contentsManager.GetTexture("cornerIcon.png");
 		}
 
 		public void Dispose()
 		{
-			((GraphicsResource)CornerIconTexture).Dispose();
-			((GraphicsResource)CornerIconHoverTexture).Dispose();
-			((GraphicsResource)_imgArrow).Dispose();
-			((GraphicsResource)_imgCircle).Dispose();
-			((GraphicsResource)_imgHeart).Dispose();
-			((GraphicsResource)_imgSpiral).Dispose();
-			((GraphicsResource)_imgSquare).Dispose();
-			((GraphicsResource)_imgStar).Dispose();
-			((GraphicsResource)_imgTriangle).Dispose();
-			((GraphicsResource)_imgX).Dispose();
-			((GraphicsResource)_imgClear).Dispose();
-			((GraphicsResource)_blishHeart).Dispose();
+			Texture2D settingWindowBackground = SettingWindowBackground;
+			if (settingWindowBackground != null)
+			{
+				((GraphicsResource)settingWindowBackground).Dispose();
+			}
+			Texture2D imgArrow = _imgArrow;
+			if (imgArrow != null)
+			{
+				((GraphicsResource)imgArrow).Dispose();
+			}
+			Texture2D imgCircle = _imgCircle;
+			if (imgCircle != null)
+			{
+				((GraphicsResource)imgCircle).Dispose();
+			}
+			Texture2D imgHeart = _imgHeart;
+			if (imgHeart != null)
+			{
+				((GraphicsResource)imgHeart).Dispose();
+			}
+			Texture2D imgSpiral = _imgSpiral;
+			if (imgSpiral != null)
+			{
+				((GraphicsResource)imgSpiral).Dispose();
+			}
+			Texture2D imgSquare = _imgSquare;
+			if (imgSquare != null)
+			{
+				((GraphicsResource)imgSquare).Dispose();
+			}
+			Texture2D imgStar = _imgStar;
+			if (imgStar != null)
+			{
+				((GraphicsResource)imgStar).Dispose();
+			}
+			Texture2D imgTriangle = _imgTriangle;
+			if (imgTriangle != null)
+			{
+				((GraphicsResource)imgTriangle).Dispose();
+			}
+			Texture2D imgX = _imgX;
+			if (imgX != null)
+			{
+				((GraphicsResource)imgX).Dispose();
+			}
+			Texture2D imgClear = _imgClear;
+			if (imgClear != null)
+			{
+				((GraphicsResource)imgClear).Dispose();
+			}
+			Texture2D imgCheck = _imgCheck;
+			if (imgCheck != null)
+			{
+				((GraphicsResource)imgCheck).Dispose();
+			}
+			Texture2D blishHeart = _blishHeart;
+			if (blishHeart != null)
+			{
+				((GraphicsResource)blishHeart).Dispose();
+			}
+			Texture2D blishHeartSmall = _blishHeartSmall;
+			if (blishHeartSmall != null)
+			{
+				((GraphicsResource)blishHeartSmall).Dispose();
+			}
+			Texture2D iconEye = IconEye;
+			if (iconEye != null)
+			{
+				((GraphicsResource)iconEye).Dispose();
+			}
+			Texture2D iconCopy = IconCopy;
+			if (iconCopy != null)
+			{
+				((GraphicsResource)iconCopy).Dispose();
+			}
+			Texture2D iconDelete = IconDelete;
+			if (iconDelete != null)
+			{
+				((GraphicsResource)iconDelete).Dispose();
+			}
+			Texture2D iconDeleteLarge = IconDeleteLarge;
+			if (iconDeleteLarge != null)
+			{
+				((GraphicsResource)iconDeleteLarge).Dispose();
+			}
+			Texture2D iconEdit = IconEdit;
+			if (iconEdit != null)
+			{
+				((GraphicsResource)iconEdit).Dispose();
+			}
+			Texture2D iconExport = IconExport;
+			if (iconExport != null)
+			{
+				((GraphicsResource)iconExport).Dispose();
+			}
+			Texture2D iconGoBack = IconGoBack;
+			if (iconGoBack != null)
+			{
+				((GraphicsResource)iconGoBack).Dispose();
+			}
+			Texture2D iconImport = IconImport;
+			if (iconImport != null)
+			{
+				((GraphicsResource)iconImport).Dispose();
+			}
+			Texture2D iconSave = IconSave;
+			if (iconSave != null)
+			{
+				((GraphicsResource)iconSave).Dispose();
+			}
+			Texture2D iconCorner = IconCorner;
+			if (iconCorner != null)
+			{
+				((GraphicsResource)iconCorner).Dispose();
+			}
 		}
 	}
 }

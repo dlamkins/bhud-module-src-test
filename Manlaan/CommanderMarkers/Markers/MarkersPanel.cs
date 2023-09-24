@@ -22,13 +22,17 @@ namespace Manlaan.CommanderMarkers.Markers
 
 		private bool _isDraggedByMouse;
 
+		private bool _mouseEventsEnabled;
+
+		private bool _mouseIsInsidePanel;
+
 		private bool _panelEnabled = true;
 
 		private Point _dragStart = Point.get_Zero();
 
-		private KeyBinding _tmpBinding;
+		private KeyBinding? _tmpBinding;
 
-		private Image _tmpButton;
+		private Image? _tmpButton;
 
 		protected SettingService _settings;
 
@@ -36,12 +40,13 @@ namespace Manlaan.CommanderMarkers.Markers
 
 		private static readonly BitmapFont _dragFont = GameService.Content.get_DefaultFont16();
 
-		public MarkersPanel(SettingService settings, TextureService textures)
+		public MarkersPanel(SettingService settings, TextureService textures, bool mouseEventsEnabled = true)
 			: this()
 		{
 			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			_mouseEventsEnabled = mouseEventsEnabled;
 			_settings = settings;
 			_textures = textures;
 			((Control)this).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
@@ -54,7 +59,9 @@ namespace Manlaan.CommanderMarkers.Markers
 			int size = settings._settingImgWidth.get_Value();
 			float opacity = settings._settingOpacity.get_Value();
 			FlowPanel groundIcons = CreateGroupingFlowPanel();
+			groundIcons.VisiblityChanged(_settings._settingGroundMarkersEnabled);
 			FlowPanel objectIcons = CreateGroupingFlowPanel();
+			objectIcons.VisiblityChanged(_settings._settingTargetMarkersEnabled);
 			CreateIconButton((Container)(object)groundIcons, AsyncTexture2D.op_Implicit(_textures._imgArrow), size, opacity, "Arrow Ground", _settings._settingArrowGndBinding);
 			CreateIconButton((Container)(object)objectIcons, AsyncTexture2D.op_Implicit(_textures._imgArrow), size, opacity, "Arrow Object", _settings._settingArrowObjBinding, groundTarget: false);
 			CreateIconButton((Container)(object)groundIcons, AsyncTexture2D.op_Implicit(_textures._imgCircle), size, opacity, "Circle Ground", _settings._settingCircleGndBinding);
@@ -73,7 +80,10 @@ namespace Manlaan.CommanderMarkers.Markers
 			CreateIconButton((Container)(object)objectIcons, AsyncTexture2D.op_Implicit(_textures._imgX), size, opacity, "X Object", _settings._settingXObjBinding, groundTarget: false);
 			CreateIconButton((Container)(object)groundIcons, AsyncTexture2D.op_Implicit(_textures._imgClear), size, opacity, "Clear Ground", _settings._settingClearGndBinding, groundTarget: false);
 			CreateIconButton((Container)(object)objectIcons, AsyncTexture2D.op_Implicit(_textures._imgClear), size, opacity, "Clear Object", _settings._settingClearObjBinding, groundTarget: false);
-			AddDragDelegates();
+			if (_mouseEventsEnabled)
+			{
+				AddDragDelegates();
+			}
 			_settings._settingDrag.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object s, ValueChangedEventArgs<bool> e)
 			{
 				_draggable = e.get_NewValue();
@@ -84,47 +94,53 @@ namespace Manlaan.CommanderMarkers.Markers
 			{
 				_panelEnabled = e.get_NewValue();
 			});
-			GameService.Input.get_Mouse().add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)OnMouseClick);
+			if (_mouseEventsEnabled)
+			{
+				GameService.Input.get_Mouse().add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)OnMouseClick);
+			}
 		}
 
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			if (_draggable)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+			if (_draggable && _mouseEventsEnabled)
 			{
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(0, 0, ((Control)this).get_Width(), ((Control)this).get_Height()), new Color(96, 96, 96, 192));
 				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, "Drag", _dragFont, new Rectangle(0, 0, ((Control)this).get_Width(), ((Control)this).get_Height()), Color.get_Black(), false, (HorizontalAlignment)1, (VerticalAlignment)1);
 			}
 		}
 
-		public void Dispose()
+		protected override void DisposeControl()
 		{
-			GameService.Input.get_Mouse().remove_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)OnMouseClick);
-			((Control)this).Dispose();
+			if (_mouseEventsEnabled)
+			{
+				GameService.Input.get_Mouse().remove_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)OnMouseClick);
+			}
 		}
 
 		public void Update(GameTime gt)
 		{
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+			((Control)this).Update(gt);
 			bool shouldBeVisible = _panelEnabled && GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() && GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && GameService.Gw2Mumble.get_IsAvailable();
 			if (GameService.Gw2Mumble.get_UI().get_IsMapOpen())
 			{
 				shouldBeVisible = false;
 			}
-			if (_settings._settingOnlyWhenCommander.get_Value())
+			if (_settings._settingOnlyWhenCommander.get_Value() || Service.LtMode.get_Value())
 			{
-				shouldBeVisible = shouldBeVisible && GameService.Gw2Mumble.get_PlayerCharacter().get_IsCommander();
+				shouldBeVisible = shouldBeVisible && (GameService.Gw2Mumble.get_PlayerCharacter().get_IsCommander() || Service.LtMode.get_Value());
 			}
 			if (!((Control)this).get_Visible() && shouldBeVisible)
 			{
@@ -205,6 +221,10 @@ namespace Manlaan.CommanderMarkers.Markers
 			((Control)val).set_Opacity(opacity);
 			((Control)val).set_BasicTooltipText(tooltip);
 			Image button = val;
+			if (!_mouseEventsEnabled)
+			{
+				return;
+			}
 			if (groundTarget)
 			{
 				((Control)button).add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)delegate
@@ -231,35 +251,55 @@ namespace Manlaan.CommanderMarkers.Markers
 
 		private void OnMouseClick(object o, MouseEventArgs e)
 		{
-			if (!_draggable && _tmpBinding != null)
+			if (!_draggable && _tmpBinding != null && !_mouseIsInsidePanel)
 			{
 				DoHotKey(_tmpBinding);
 				ResetGroundIcon();
 			}
 		}
 
+		protected override void OnMouseEntered(MouseEventArgs e)
+		{
+			((Control)this).OnMouseEntered(e);
+			_mouseIsInsidePanel = true;
+		}
+
+		protected override void OnMouseLeft(MouseEventArgs e)
+		{
+			((Control)this).OnMouseLeft(e);
+			_mouseIsInsidePanel = false;
+		}
+
 		protected void ResetGroundIcon()
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			((Control)_tmpButton).set_BackgroundColor(Color.get_Transparent());
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			if (_tmpButton != null)
+			{
+				((Control)_tmpButton).set_BackgroundColor(Color.get_Transparent());
+				_tmpButton = null;
+			}
 			_tmpBinding = null;
-			_tmpButton = null;
 		}
 
 		protected void AddGround(Image btn, KeyBinding key)
 		{
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			if (!_draggable)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			if (_draggable)
 			{
-				if (_tmpBinding == key)
-				{
-					ResetGroundIcon();
-					return;
-				}
-				_tmpBinding = key;
-				_tmpButton = btn;
-				((Control)btn).set_BackgroundColor(Color.get_Yellow());
+				return;
 			}
+			if (_tmpBinding == key)
+			{
+				ResetGroundIcon();
+				return;
+			}
+			if (_tmpBinding != null)
+			{
+				ResetGroundIcon();
+			}
+			_tmpBinding = key;
+			_tmpButton = btn;
+			((Control)btn).set_BackgroundColor(Color.get_Yellow());
 		}
 
 		protected void RemoveGround(KeyBinding key)

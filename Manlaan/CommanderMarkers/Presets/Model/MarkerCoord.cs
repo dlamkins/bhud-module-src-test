@@ -1,4 +1,5 @@
 using System;
+using Manlaan.CommanderMarkers.Library.Enums;
 using Newtonsoft.Json;
 
 namespace Manlaan.CommanderMarkers.Presets.Model
@@ -19,6 +20,11 @@ namespace Manlaan.CommanderMarkers.Presets.Model
 				return SquadMarker.None;
 			}
 			return (SquadMarker)icon;
+		}
+
+		public override string? ToString()
+		{
+			return ((SquadMarker)icon).EnumValue() + " - " + name;
 		}
 	}
 }

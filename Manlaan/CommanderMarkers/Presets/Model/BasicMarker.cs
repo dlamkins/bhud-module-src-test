@@ -1,3 +1,4 @@
+using System;
 using Blish_HUD.Controls;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -34,19 +35,23 @@ namespace Manlaan.CommanderMarkers.Presets.Model
 			return ((Vector3)(ref val)).Length();
 		}
 
-		public void DrawToMap(SpriteBatch spriteBatch, IMapBounds map, Control control)
+		public void DrawToMap(SpriteBatch spriteBatch, IMapBounds map, Control control, Vector3 playerPosition)
 		{
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			Vector2 mapCoordinates = _mapData.WorldToScreenMap(_trigger);
-			Rectangle blishIcon = default(Rectangle);
-			((Rectangle)(ref blishIcon))._002Ector((int)mapCoordinates.X - 16, (int)mapCoordinates.Y - 16, 32, 32);
-			spriteBatch.Draw(Manlaan.CommanderMarkers.Service.Textures!._blishHeart, blishIcon, Color.get_White());
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			if (!(Math.Abs(playerPosition.Z - _trigger.Z) > 30f))
+			{
+				Vector2 mapCoordinates = _mapData.WorldToScreenMap(_trigger);
+				Rectangle blishIcon = default(Rectangle);
+				((Rectangle)(ref blishIcon))._002Ector((int)mapCoordinates.X - 16, (int)mapCoordinates.Y - 16, 32, 32);
+				spriteBatch.Draw(Service.Textures!._blishHeart, blishIcon, Color.get_White());
+			}
 		}
 
 		public string GetMarkerText()

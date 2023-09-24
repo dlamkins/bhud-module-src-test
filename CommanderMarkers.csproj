@@ -1,7 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <AssemblyName>CommanderMarkers</AssemblyName>
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <UseWindowsForms>True</UseWindowsForms>
     <TargetFramework>net48</TargetFramework>
   </PropertyGroup>
   <PropertyGroup>

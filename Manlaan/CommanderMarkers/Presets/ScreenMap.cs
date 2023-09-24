@@ -75,6 +75,8 @@ namespace Manlaan.CommanderMarkers.Presets
 
 		private readonly ScreenMapBounds _mapBounds;
 
+		private bool _previewActive;
+
 		private BitmapFont _bitmapFont = GameService.Content.get_DefaultFont32();
 
 		public ScreenMap(MapData mapData)
@@ -121,12 +123,13 @@ namespace Manlaan.CommanderMarkers.Presets
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			if (!GameService.GameIntegration.get_Gw2Instance().get_IsInGame() || _mapData.Current == null || GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat() || (Manlaan.CommanderMarkers.Service.Settings._settingOnlyWhenCommander.get_Value() && !GameService.Gw2Mumble.get_PlayerCharacter().get_IsCommander()))
+			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+			if (!GameService.GameIntegration.get_Gw2Instance().get_IsInGame() || _mapData.Current == null || GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat() || (Service.Settings.AutoMarker_OnlyWhenCommander.get_Value() && !GameService.Gw2Mumble.get_PlayerCharacter().get_IsCommander() && !Service.LtMode.get_Value()))
 			{
 				return;
 			}
@@ -136,25 +139,36 @@ namespace Manlaan.CommanderMarkers.Presets
 			bool promptDrawn = !GameService.Gw2Mumble.get_UI().get_IsMapOpen();
 			foreach (IMapEntity entity in _entities)
 			{
-				entity.DrawToMap(spriteBatch, _mapBounds, (Control)(object)this);
+				entity.DrawToMap(spriteBatch, _mapBounds, (Control)(object)this, playerPosition);
 				if (!promptDrawn && entity.DistanceFrom(playerPosition) < 15f)
 				{
 					promptDrawn = true;
 					DrawPrompt(spriteBatch, entity);
 				}
 			}
+			if (promptDrawn && !_previewActive && GameService.Gw2Mumble.get_UI().get_IsMapOpen())
+			{
+				Service.MapWatch.PreviewClosestMarkerSet();
+				_previewActive = true;
+			}
+			if (_previewActive && (!promptDrawn || !GameService.Gw2Mumble.get_UI().get_IsMapOpen()))
+			{
+				Service.MapWatch.RemovePreviewMarkerSet();
+				_previewActive = false;
+			}
 		}
 
 		protected void DrawPrompt(SpriteBatch spriteBatch, IMapEntity marker)
 		{
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+			string interactKey = Service.Settings._settingInteractKeyBinding.get_Value().GetBindingDisplayText();
 			Rectangle _promptRectangle = default(Rectangle);
 			((Rectangle)(ref _promptRectangle))._002Ector(((Control)GameService.Graphics.get_SpriteScreen()).get_Width() / 2 - 150, ((Control)GameService.Graphics.get_SpriteScreen()).get_Height() - 120, 300, 120);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, "Press Interact to place markers\n" + marker.GetMarkerText(), _bitmapFont, _promptRectangle, Color.get_Black(), false, true, 3, (HorizontalAlignment)1, (VerticalAlignment)0);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, "Press Interact to place markers\n" + marker.GetMarkerText(), _bitmapFont, _promptRectangle, Color.get_Orange(), false, (HorizontalAlignment)1, (VerticalAlignment)0);
+			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, "Press '" + interactKey + "' to place markers\n" + marker.GetMarkerText(), _bitmapFont, _promptRectangle, Color.get_Black(), false, true, 3, (HorizontalAlignment)1, (VerticalAlignment)0);
+			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, "Press '" + interactKey + "' to place markers\n" + marker.GetMarkerText(), _bitmapFont, _promptRectangle, Color.get_Orange(), false, (HorizontalAlignment)1, (VerticalAlignment)0);
 		}
 	}
 }

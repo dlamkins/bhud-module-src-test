@@ -5,7 +5,7 @@ using System.Linq;
 using Manlaan.CommanderMarkers.Presets.Model;
 using Newtonsoft.Json;
 
-namespace Manlaan.CommanderMarkers.Presets.Service
+namespace Manlaan.CommanderMarkers.Presets.Services
 {
 	[Serializable]
 	public class MarkerListing
@@ -14,12 +14,14 @@ namespace Manlaan.CommanderMarkers.Presets.Service
 		public static string FILENAME = "custom_markers.json";
 
 		[JsonProperty("version")]
-		public string Version { get; set; } = "1.0.0";
+		public string Version { get; set; } = "2.0.0";
 
 
 		[JsonProperty("squadMarkerPreset")]
 		public List<MarkerSet> presets { get; set; } = new List<MarkerSet>();
 
+
+		public event EventHandler? MarkersChanged;
 
 		public List<MarkerSet> GetEmpty()
 		{
@@ -35,9 +37,36 @@ namespace Manlaan.CommanderMarkers.Presets.Service
 			}
 		}
 
+		public void EditMarker(int index, MarkerSet markerSet)
+		{
+			presets[index] = markerSet;
+			Save();
+		}
+
+		public void DeleteMarker(MarkerSet markerSet)
+		{
+			presets.Remove(markerSet);
+			Save();
+		}
+
+		public List<MarkerSet> GetAllMarkerSets()
+		{
+			return presets.ToList();
+		}
+
 		public List<MarkerSet> GetMarkersForMap(int mapId)
 		{
+			if (!Service.Settings.AutoMarker_FeatureEnabled.get_Value())
+			{
+				return new List<MarkerSet>();
+			}
 			return presets.Where((MarkerSet m) => m.mapId == mapId).ToList();
+		}
+
+		public void ResetToDefault()
+		{
+			presets.Clear();
+			InitEmptyFile();
 		}
 
 		public void Save()
@@ -47,11 +76,18 @@ namespace Manlaan.CommanderMarkers.Presets.Service
 			using StreamWriter writer = new StreamWriter(configFileInfo.FullName);
 			writer.Write(serializedContents);
 			writer.Close();
+			this.MarkersChanged?.Invoke(this, null);
 		}
 
 		private static FileInfo GetConfigFileInfo()
 		{
-			return new FileInfo(Manlaan.CommanderMarkers.Service.DirectoriesManager.GetFullDirectoryPath(Module.DIRECTORY_PATH) + "\\" + FILENAME);
+			return new FileInfo(Service.DirectoriesManager.GetFullDirectoryPath(Module.DIRECTORY_PATH) + "\\" + FILENAME);
+		}
+
+		public void ReloadFromFile()
+		{
+			MarkerListing temp = Load();
+			presets = temp.presets;
 		}
 
 		public static MarkerListing Load()
@@ -76,6 +112,10 @@ namespace Manlaan.CommanderMarkers.Presets.Service
 			{
 				loadedCharacterConfiguration = new MarkerListing();
 			}
+			if (loadedCharacterConfiguration.Version == "1.0.0")
+			{
+				loadedCharacterConfiguration = MigrateToVersion2(loadedCharacterConfiguration);
+			}
 			return loadedCharacterConfiguration;
 		}
 
@@ -87,12 +127,20 @@ namespace Manlaan.CommanderMarkers.Presets.Service
 			return markerListing;
 		}
 
+		protected static MarkerListing MigrateToVersion2(MarkerListing loadedFromFile)
+		{
+			loadedFromFile.ResetToDefault();
+			loadedFromFile.Version = "2.0.0";
+			loadedFromFile.Save();
+			return loadedFromFile;
+		}
+
 		public void InitEmptyFile()
 		{
 			MarkerSet ms = new MarkerSet
 			{
-				name = "Sabetha Cannons",
-				description = "Cannon jumppads",
+				name = "Sabetha",
+				description = "Cannon bomb launch platforms",
 				mapId = 1062,
 				trigger = new WorldCoord
 				{
@@ -235,54 +283,6 @@ namespace Manlaan.CommanderMarkers.Presets.Service
 			SaveMarker(ms);
 			ms = new MarkerSet
 			{
-				name = "Bandit Trio",
-				description = "Boss Spawns, Square-Mortar",
-				mapId = 1149,
-				trigger = new WorldCoord
-				{
-					x = 64.95536f,
-					y = -270.91f,
-					z = 0.9945363f
-				},
-				marks = new List<MarkerCoord>
-				{
-					new MarkerCoord
-					{
-						x = -1.953f,
-						y = -235.489f,
-						z = -0.132f,
-						icon = 1,
-						name = "Berg"
-					},
-					new MarkerCoord
-					{
-						x = -0.567f,
-						y = -290.812f,
-						z = -0.619f,
-						icon = 2,
-						name = "Zane"
-					},
-					new MarkerCoord
-					{
-						x = -32.935f,
-						y = -221.024f,
-						z = 4.176f,
-						icon = 3,
-						name = "Narella"
-					},
-					new MarkerCoord
-					{
-						x = 64.95536f,
-						y = -270.91f,
-						z = 0.9945363f,
-						icon = 4,
-						name = "Placement location"
-					}
-				}
-			};
-			SaveMarker(ms);
-			ms = new MarkerSet
-			{
 				name = "Mathias Gabriel",
 				description = "Fountain Locations",
 				mapId = 1149,
@@ -331,35 +331,40 @@ namespace Manlaan.CommanderMarkers.Presets.Service
 			SaveMarker(ms);
 			ms = new MarkerSet
 			{
-				name = "keepconstruct",
+				name = "Keep Construct",
 				description = "Green Circles",
-				mapId = 1,
-				trigger = new WorldCoord(),
+				mapId = 1156,
+				trigger = new WorldCoord
+				{
+					x = -81.049f,
+					y = 228.662f,
+					z = 148.556f
+				},
 				marks = new List<MarkerCoord>
 				{
-					new MarkerCoord
-					{
-						x = -97.019f,
-						y = 255.827f,
-						z = 148.556f,
-						icon = 1,
-						name = ""
-					},
 					new MarkerCoord
 					{
 						x = -81.049f,
 						y = 228.662f,
 						z = 148.556f,
-						icon = 2,
-						name = ""
+						icon = 1,
+						name = "DPS"
 					},
 					new MarkerCoord
 					{
 						x = -114.034f,
 						y = 229.05f,
 						z = 148.556f,
+						icon = 2,
+						name = "SupportDPS"
+					},
+					new MarkerCoord
+					{
+						x = -97.019f,
+						y = 255.827f,
+						z = 148.556f,
 						icon = 3,
-						name = ""
+						name = "Healers"
 					}
 				}
 			};
@@ -368,11 +373,11 @@ namespace Manlaan.CommanderMarkers.Presets.Service
 			{
 				name = "Xera",
 				description = "Tanking Locations",
-				mapId = 1,
+				mapId = 1156,
 				trigger = new WorldCoord
 				{
-					x = -55.524f,
-					y = -92.326f,
+					x = -43.524f,
+					y = -17.326f,
 					z = 512.354f
 				},
 				marks = new List<MarkerCoord>
@@ -462,142 +467,6 @@ namespace Manlaan.CommanderMarkers.Presets.Service
 			SaveMarker(ms);
 			ms = new MarkerSet
 			{
-				name = "Soulless Horror",
-				description = "Orientation Markers",
-				mapId = 1264,
-				trigger = new WorldCoord
-				{
-					x = -325.844f,
-					y = 7.587688f,
-					z = 40.9939f
-				},
-				marks = new List<MarkerCoord>
-				{
-					new MarkerCoord
-					{
-						x = -282.6898f,
-						y = 18.40989f,
-						z = 20.76256f,
-						icon = 1,
-						name = "W"
-					},
-					new MarkerCoord
-					{
-						x = -266.5454f,
-						y = 8.738229f,
-						z = 20.76256f,
-						icon = 2,
-						name = "S"
-					},
-					new MarkerCoord
-					{
-						x = -256.4738f,
-						y = 24.84775f,
-						z = 20.76256f,
-						icon = 3,
-						name = "E"
-					},
-					new MarkerCoord
-					{
-						x = -272.7182f,
-						y = 34.73028f,
-						z = 20.76256f,
-						icon = 4,
-						name = "N"
-					}
-				}
-			};
-			SaveMarker(ms);
-			ms = new MarkerSet
-			{
-				name = "Eater of Souls",
-				description = "Orientation Markers",
-				mapId = 1264,
-				trigger = new WorldCoord
-				{
-					x = 97.81354f,
-					y = -161.2347f,
-					z = 99.95564f
-				},
-				marks = new List<MarkerCoord>
-				{
-					new MarkerCoord
-					{
-						x = 100.8575f,
-						y = -206.0857f,
-						z = 99.77229f,
-						icon = 1,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = 62.8086f,
-						y = -219.2261f,
-						z = 99.59798f,
-						icon = 2,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = 51.52459f,
-						y = -187.0098f,
-						z = 99.71339f,
-						icon = 3,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = 88.6095f,
-						y = -173.703f,
-						z = 99.68482f,
-						icon = 3,
-						name = ""
-					}
-				}
-			};
-			SaveMarker(ms);
-			ms = new MarkerSet
-			{
-				name = "lightorbs",
-				description = "",
-				mapId = 1264,
-				trigger = new WorldCoord
-				{
-					x = 367.6696f,
-					y = 37.40068f,
-					z = 98.90854f
-				},
-				marks = new List<MarkerCoord>
-				{
-					new MarkerCoord
-					{
-						x = 344.051f,
-						y = 28.717f,
-						z = 97.308f,
-						icon = 1,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = 364.521f,
-						y = 24.811f,
-						z = 97.308f,
-						icon = 2,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = 384.933f,
-						y = 20.685f,
-						z = 97.308f,
-						icon = 3,
-						name = ""
-					}
-				}
-			};
-			SaveMarker(ms);
-			ms = new MarkerSet
-			{
 				name = "Dhuum",
 				description = "Reaper/Green Locations",
 				mapId = 1264,
@@ -670,8 +539,8 @@ namespace Manlaan.CommanderMarkers.Presets.Service
 			SaveMarker(ms);
 			ms = new MarkerSet
 			{
-				name = "qadim1",
-				description = "Stab/Prot pyres, Heart-Lamp3, Square-portal/stack",
+				name = "Qadim",
+				description = "Stab/Prot pyres, Heart:Lamp3, Square:portal/stack",
 				mapId = 1303,
 				trigger = new WorldCoord
 				{
@@ -687,7 +556,7 @@ namespace Manlaan.CommanderMarkers.Presets.Service
 						y = 330.8714f,
 						z = 120.1684f,
 						icon = 1,
-						name = "//stability Pyre,"
+						name = "Stability Pyre,"
 					},
 					new MarkerCoord
 					{
@@ -703,7 +572,7 @@ namespace Manlaan.CommanderMarkers.Presets.Service
 						y = 295.0649f,
 						z = 120.1684f,
 						icon = 3,
-						name = "//lamp3"
+						name = "Lamp3"
 					},
 					new MarkerCoord
 					{
@@ -711,7 +580,7 @@ namespace Manlaan.CommanderMarkers.Presets.Service
 						y = 294.9296f,
 						z = 120.1688f,
 						icon = 4,
-						name = " //portal/stack"
+						name = "Portal/Stack"
 					}
 				}
 			};
@@ -774,72 +643,8 @@ namespace Manlaan.CommanderMarkers.Presets.Service
 			SaveMarker(ms);
 			ms = new MarkerSet
 			{
-				name = "Qadim The Peerless - complex",
-				description = "First fire clockwise, second counter-clockwise",
-				mapId = 1323,
-				trigger = new WorldCoord
-				{
-					x = 65.85422f,
-					y = 187.6384f,
-					z = 16.6768f
-				},
-				marks = new List<MarkerCoord>
-				{
-					new MarkerCoord
-					{
-						x = 22.89519f,
-						y = 289.5503f,
-						z = 16.81249f,
-						icon = 1,
-						name = " //"
-					},
-					new MarkerCoord
-					{
-						x = 59.32327f,
-						y = 277.8169f,
-						z = 16.81249f,
-						icon = 2,
-						name = " //"
-					},
-					new MarkerCoord
-					{
-						x = 79.97083f,
-						y = 256.7198f,
-						z = 16.81204f,
-						icon = 3,
-						name = " //"
-					},
-					new MarkerCoord
-					{
-						x = 51.55045f,
-						y = 229.2897f,
-						z = 16.81205f,
-						icon = 4,
-						name = " //"
-					},
-					new MarkerCoord
-					{
-						x = 22.88567f,
-						y = 222.5481f,
-						z = 16.81205f,
-						icon = 5,
-						name = " //"
-					},
-					new MarkerCoord
-					{
-						x = 13.20081f,
-						y = 261.1675f,
-						z = 16.81205f,
-						icon = 6,
-						name = " // "
-					}
-				}
-			};
-			SaveMarker(ms);
-			ms = new MarkerSet
-			{
-				name = "Qadim The Peerless - simple",
-				description = "",
+				name = "Qadim The Peerless (PUG Fires)",
+				description = "First fires on marker, second on opposite side",
 				mapId = 1323,
 				trigger = new WorldCoord
 				{
@@ -950,30 +755,6 @@ namespace Manlaan.CommanderMarkers.Presets.Service
 			SaveMarker(ms);
 			ms = new MarkerSet
 			{
-				name = "IBS - Cold War",
-				description = "Boss spawn location",
-				mapId = 1374,
-				trigger = new WorldCoord
-				{
-					x = 104.9626f,
-					y = -151.5361f,
-					z = 18.22491f
-				},
-				marks = new List<MarkerCoord>
-				{
-					new MarkerCoord
-					{
-						x = 34.9f,
-						y = -89.992f,
-						z = 17.272f,
-						icon = 1,
-						name = "Varina"
-					}
-				}
-			};
-			SaveMarker(ms);
-			ms = new MarkerSet
-			{
 				name = "EoD - Aetherblade CM Setup",
 				description = "Assign color groups for green circles",
 				mapId = 1432,
@@ -991,7 +772,7 @@ namespace Manlaan.CommanderMarkers.Presets.Service
 						y = 48.16092f,
 						z = 46.28915f,
 						icon = 1,
-						name = "//cm setup Arrow"
+						name = "CM setup Arrow"
 					},
 					new MarkerCoord
 					{
@@ -999,7 +780,7 @@ namespace Manlaan.CommanderMarkers.Presets.Service
 						y = 39.81492f,
 						z = 45.88486f,
 						icon = 2,
-						name = " //CM setup Circle"
+						name = "CM setup Circle"
 					},
 					new MarkerCoord
 					{
@@ -1007,7 +788,7 @@ namespace Manlaan.CommanderMarkers.Presets.Service
 						y = 30.82986f,
 						z = 46.10174f,
 						icon = 3,
-						name = " //CM seteup heart"
+						name = "CM seteup heart"
 					}
 				}
 			};
@@ -1015,7 +796,7 @@ namespace Manlaan.CommanderMarkers.Presets.Service
 			ms = new MarkerSet
 			{
 				name = "EoD - Aetherblade CM Markers",
-				description = "Kill X, Stack at for color groups",
+				description = "Destroy X, Stack at color groups",
 				mapId = 1432,
 				trigger = new WorldCoord
 				{
@@ -1031,7 +812,7 @@ namespace Manlaan.CommanderMarkers.Presets.Service
 						y = 55.76778f,
 						z = 45.73673f,
 						icon = 1,
-						name = "//CM Arrow"
+						name = "CM Arrow"
 					},
 					new MarkerCoord
 					{
@@ -1039,7 +820,7 @@ namespace Manlaan.CommanderMarkers.Presets.Service
 						y = 48.54653f,
 						z = 45.7366f,
 						icon = 2,
-						name = " //CM Circle"
+						name = "CM Circle"
 					},
 					new MarkerCoord
 					{
@@ -1047,7 +828,7 @@ namespace Manlaan.CommanderMarkers.Presets.Service
 						y = 47.29297f,
 						z = 45.73663f,
 						icon = 3,
-						name = " //CM heart"
+						name = "CM Heart"
 					},
 					new MarkerCoord
 					{
@@ -1055,14 +836,14 @@ namespace Manlaan.CommanderMarkers.Presets.Service
 						y = 32.88283f,
 						z = 45.73687f,
 						icon = 8,
-						name = "//X bomb"
+						name = "X bomb"
 					}
 				}
 			};
 			SaveMarker(ms);
 			ms = new MarkerSet
 			{
-				name = "eod_xunlaijade2",
+				name = "EoD Xunlai Jade Phase2",
 				description = "Phase2CC",
 				mapId = 1450,
 				trigger = new WorldCoord
@@ -1102,7 +883,7 @@ namespace Manlaan.CommanderMarkers.Presets.Service
 			SaveMarker(ms);
 			ms = new MarkerSet
 			{
-				name = "eod_xunlaijade3",
+				name = "EoD Xunlai Jade Phase 3",
 				description = "Phase3CC",
 				mapId = 1450,
 				trigger = new WorldCoord
@@ -1174,296 +955,80 @@ namespace Manlaan.CommanderMarkers.Presets.Service
 			SaveMarker(ms);
 			ms = new MarkerSet
 			{
-				name = "Aerodrome Wing Test",
+				name = "Aerodrome Wing",
 				description = "Demo of automarker feature",
 				mapId = 1155,
 				trigger = new WorldCoord
 				{
-					x = 116.4f,
-					y = -356.3632f,
-					z = 34.18457f
+					x = 116.939705f,
+					y = -366.00604f,
+					z = 34.18379f
 				},
 				marks = new List<MarkerCoord>
 				{
 					new MarkerCoord
 					{
-						x = 57.05506f,
-						y = -345.271f,
-						z = 39.51918f,
+						x = 59.378746f,
+						y = -342.32507f,
+						z = 34.184486f,
 						icon = 1,
 						name = "Spirit Vale"
 					},
 					new MarkerCoord
 					{
-						x = 65.95273f,
-						y = -370.6219f,
+						x = 67.14233f,
+						y = -370.32257f,
 						z = 39.56038f,
 						icon = 2,
 						name = "Salvation Pass"
 					},
 					new MarkerCoord
 					{
-						x = 84.03487f,
-						y = -386.6116f,
-						z = 39.55384f,
+						x = 86.796165f,
+						y = -385.27414f,
+						z = 34.18382f,
 						icon = 3,
 						name = "Stronghold of the Faithful"
 					},
 					new MarkerCoord
 					{
-						x = 92.82407f,
-						y = -414.263f,
+						x = 93.753494f,
+						y = -413.13828f,
 						z = 39.59739f,
 						icon = 4,
 						name = "Bastion of the Penitent"
 					},
 					new MarkerCoord
 					{
-						x = 127.0165f,
-						y = -410.97f,
-						z = 39.55385f,
+						x = 126.13493f,
+						y = -407.56625f,
+						z = 34.18382f,
 						icon = 5,
 						name = "Hall of Chains"
 					},
 					new MarkerCoord
 					{
-						x = 165.5569f,
-						y = -390.4695f,
-						z = 39.63842f,
+						x = 161.81755f,
+						y = -388.35556f,
+						z = 34.204132f,
 						icon = 6,
 						name = "Mythwright Gambit"
 					},
 					new MarkerCoord
 					{
-						x = 156.8735f,
-						y = -412.6107f,
-						z = 39.71187f,
+						x = 156.10579f,
+						y = -411.95383f,
+						z = 39.698986f,
 						icon = 7,
 						name = "The Key of Ahdashim"
 					},
 					new MarkerCoord
 					{
-						x = 195.1904f,
-						y = -323.7846f,
-						z = 39.07505f,
+						x = 195.51254f,
+						y = -324.111f,
+						z = 39.075733f,
 						icon = 8,
 						name = "Special Forces Training"
-					}
-				}
-			};
-			SaveMarker(ms);
-			ms = new MarkerSet
-			{
-				name = "Arborstone Test",
-				description = "Test marker keybinds",
-				mapId = 1428,
-				trigger = new WorldCoord
-				{
-					x = -783.0035f,
-					y = 485.4295f,
-					z = 1.958099f
-				},
-				marks = new List<MarkerCoord>
-				{
-					new MarkerCoord
-					{
-						x = -790.0322f,
-						y = 485.1069f,
-						z = 1.959626f,
-						icon = 1,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = -786.5455f,
-						y = 488.7949f,
-						z = 1.958098f,
-						icon = 2,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = -782.1669f,
-						y = 493.2789f,
-						z = 2.037168f,
-						icon = 3,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = -777.7001f,
-						y = 487.6703f,
-						z = (float)Math.PI * 91f / 146f,
-						icon = 4,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = -773.0765f,
-						y = 482.8819f,
-						z = 1.958126f,
-						icon = 5,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = -776.7319f,
-						y = 479.2359f,
-						z = 1.956693f,
-						icon = 6,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = -780.2802f,
-						y = 475.6377f,
-						z = 2.015322f,
-						icon = 7,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = -784.8472f,
-						y = 480.3472f,
-						z = 1.96817f,
-						icon = 8,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = -790.0322f,
-						y = 485.1069f,
-						z = 1.959626f,
-						icon = 1,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = -786.5455f,
-						y = 488.7949f,
-						z = 1.958098f,
-						icon = 2,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = -782.1669f,
-						y = 493.2789f,
-						z = 2.037168f,
-						icon = 3,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = -777.7001f,
-						y = 487.6703f,
-						z = (float)Math.PI * 91f / 146f,
-						icon = 4,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = -773.0765f,
-						y = 482.8819f,
-						z = 1.958126f,
-						icon = 5,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = -776.7319f,
-						y = 479.2359f,
-						z = 1.956693f,
-						icon = 6,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = -780.2802f,
-						y = 475.6377f,
-						z = 2.015322f,
-						icon = 7,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = -784.8472f,
-						y = 480.3472f,
-						z = 1.96817f,
-						icon = 8,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = -790.0322f,
-						y = 485.1069f,
-						z = 1.959626f,
-						icon = 1,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = -786.5455f,
-						y = 488.7949f,
-						z = 1.958098f,
-						icon = 2,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = -782.1669f,
-						y = 493.2789f,
-						z = 2.037168f,
-						icon = 3,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = -777.7001f,
-						y = 487.6703f,
-						z = (float)Math.PI * 91f / 146f,
-						icon = 4,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = -773.0765f,
-						y = 482.8819f,
-						z = 1.958126f,
-						icon = 5,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = -776.7319f,
-						y = 479.2359f,
-						z = 1.956693f,
-						icon = 6,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = -780.2802f,
-						y = 475.6377f,
-						z = 2.015322f,
-						icon = 7,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = -784.8472f,
-						y = 480.3472f,
-						z = 1.96817f,
-						icon = 8,
-						name = ""
-					},
-					new MarkerCoord
-					{
-						x = -784.8472f,
-						y = 480.3472f,
-						z = 1.96817f,
-						icon = 9,
-						name = "clear"
 					}
 				}
 			};
