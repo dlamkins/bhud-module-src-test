@@ -298,7 +298,7 @@ namespace Denrage.AchievementTrackerModule.Services
 				{
 					AchievementDataMetadata githubMetadata2 = await "https://bhm.blishhud.com/Denrage.AchievementTrackerModule/data/version.json".GetJsonAsync<AchievementDataMetadata>(default(CancellationToken), (HttpCompletionOption)0);
 					using FileStream utf8Json = File.Open(Path.Combine(dataFolder, "version.json"), FileMode.Open);
-					if ((await JsonSerializer.DeserializeAsync<AchievementDataMetadata>(utf8Json, serializerOptions, cancellationToken)).Version != githubMetadata2.Version)
+					if ((await JsonSerializer.DeserializeAsync<AchievementDataMetadata>(utf8Json, serializerOptions, cancellationToken)).Version != githubMetadata2.Version || !CheckMd5(githubMetadata2.AchievementDataMd5, Path.Combine(dataFolder, "achievement_data.json")) || !CheckMd5(githubMetadata2.AchievementTablesMd5, Path.Combine(dataFolder, "achievement_tables.json")) || !CheckMd5(githubMetadata2.SubPagesMd5, Path.Combine(dataFolder, "subPages.json")))
 					{
 						downloadData = true;
 					}
