@@ -59,6 +59,8 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 
 		private bool _isFading;
 
+		private bool _dissolve;
+
 		static MapNotification()
 		{
 			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
@@ -140,6 +142,7 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 				_vanishSound = RegionsOfTyria.Instance.VanishSound.CreateInstance();
 				_vanishSound.set_Volume(RegionsOfTyria.Instance.VanishVolume.get_Value() / 100f * GameService.GameIntegration.get_Audio().get_Volume());
 			}
+			_dissolve = RegionsOfTyria.Instance.Dissolve.get_Value();
 			_decode.get_Effect().get_Parameters().get_Item("Amount")
 				.SetValue(0f);
 			_decode.get_Effect().get_Parameters().get_Item("Slide")
@@ -296,7 +299,7 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 							{
 								vanishSound.Play();
 							}
-							_anim = ((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<MapNotification>(this, RegionsOfTyria.Instance.Dissolve.get_Value() ? ((object)new
+							_anim = ((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<MapNotification>(this, _dissolve ? ((object)new
 							{
 								Opacity = 0.9f,
 								_amount = 0f
