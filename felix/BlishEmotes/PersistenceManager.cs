@@ -18,16 +18,6 @@ namespace felix.BlishEmotes
 		public PersistenceManager(DirectoriesManager directoriesManager)
 		{
 			IReadOnlyList<string> registeredDirectories = directoriesManager.RegisteredDirectories;
-			if (registeredDirectories.Count == 0)
-			{
-				Logger.Fatal("No directories registered!");
-				throw new Exception("Failed to initialize - No directories registered");
-			}
-			if (registeredDirectories.Count != 1)
-			{
-				Logger.Fatal($"Wrong number of registered directories: {registeredDirectories.Count}");
-				throw new Exception("Failed to initialize - Wrong number of registered directories");
-			}
 			_baseDirectoryPath = directoriesManager.GetFullDirectoryPath(registeredDirectories[0]);
 		}
 
@@ -52,18 +42,18 @@ namespace felix.BlishEmotes
 		{
 			try
 			{
-				SaveJson(categories, _categoriesFile);
+				SaveJson(categories, Category.VERSION, _categoriesFile);
 			}
 			catch (Exception)
 			{
 			}
 		}
 
-		private void SaveJson<T>(T json, string file)
+		private void SaveJson<T>(T json, string version, string file)
 		{
 			try
 			{
-				string serialized = JsonConvert.SerializeObject(json);
+				string serialized = JsonConvert.SerializeObject(new JsonVersionWrapper<T>(version, json));
 				File.WriteAllText(file, serialized);
 				Logger.Debug("Successfully saved json to " + file);
 			}
@@ -87,9 +77,9 @@ namespace felix.BlishEmotes
 		{
 			try
 			{
-				T? result = JsonConvert.DeserializeObject<T>(File.ReadAllText(file));
+				JsonVersionWrapper<T>? jsonVersionWrapper = JsonConvert.DeserializeObject<JsonVersionWrapper<T>>(File.ReadAllText(file));
 				Logger.Debug("Successfully loaded json from " + file);
-				return result;
+				return jsonVersionWrapper!.Data;
 			}
 			catch (FileNotFoundException ex)
 			{
@@ -99,7 +89,7 @@ namespace felix.BlishEmotes
 			catch (JsonException e2)
 			{
 				Logger.Error("Failed to deserialize json!");
-				Logger.Debug(e2.Message);
+				Logger.Error(e2.Message);
 				Logger.Debug(e2.StackTrace);
 				throw e2;
 			}

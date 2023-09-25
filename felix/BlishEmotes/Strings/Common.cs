@@ -42,6 +42,8 @@ namespace felix.BlishEmotes.Strings
 			}
 		}
 
+		public static string category_add => ResourceManager.GetString("category_add", resourceCulture);
+
 		public static string cornerIcon_tooltip => ResourceManager.GetString("cornerIcon_tooltip", resourceCulture);
 
 		public static string emote_categoryFavourite => ResourceManager.GetString("emote_categoryFavourite", resourceCulture);
@@ -82,9 +84,15 @@ namespace felix.BlishEmotes.Strings
 
 		public static string settings_radial_spawnAtCursor => ResourceManager.GetString("settings_radial_spawnAtCursor", resourceCulture);
 
+		public static string settings_ui_categories_tab => ResourceManager.GetString("settings_ui_categories_tab", resourceCulture);
+
+		public static string settings_ui_delete => ResourceManager.GetString("settings_ui_delete", resourceCulture);
+
 		public static string settings_ui_emoteHotkeys_tab => ResourceManager.GetString("settings_ui_emoteHotkeys_tab", resourceCulture);
 
 		public static string settings_ui_global_tab => ResourceManager.GetString("settings_ui_global_tab", resourceCulture);
+
+		public static string settings_ui_save => ResourceManager.GetString("settings_ui_save", resourceCulture);
 
 		public static string settings_ui_title => ResourceManager.GetString("settings_ui_title", resourceCulture);
 

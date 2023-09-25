@@ -27,10 +27,10 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\working\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="System.Core" />
     <Reference Include="SemVer">
       <HintPath>..\..\working\SemVer.dll</HintPath>
     </Reference>
+    <Reference Include="System.Core" />
     <Reference Include="MonoGame.Extended">
       <HintPath>..\..\working\MonoGame.Extended.dll</HintPath>
     </Reference>

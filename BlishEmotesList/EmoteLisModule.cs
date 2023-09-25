@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
@@ -13,7 +11,6 @@ using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
-using Newtonsoft.Json;
 using SemVer;
 using felix.BlishEmotes;
 using felix.BlishEmotes.Exceptions;
@@ -41,6 +38,8 @@ namespace BlishEmotesList
 
 		internal CategoriesManager CategoriesManager;
 
+		internal EmotesManager EmotesManager;
+
 		private CornerIcon _cornerIcon;
 
 		private ContextMenuStrip _emoteListMenuStrip;
@@ -51,8 +50,6 @@ namespace BlishEmotesList
 
 		public ModuleSettings Settings;
 
-		private List<felix.BlishEmotes.Emote> _emotes;
-
 		internal SettingsManager SettingsManager => ModuleParameters.SettingsManager;
 
 		internal ContentsManager ContentsManager => ModuleParameters.ContentsManager;
@@ -60,8 +57,6 @@ namespace BlishEmotesList
 		internal DirectoriesManager DirectoriesManager => ModuleParameters.DirectoriesManager;
 
 		internal Gw2ApiManager Gw2ApiManager => ModuleParameters.Gw2ApiManager;
-
-		private List<felix.BlishEmotes.Emote> _radialEnabledEmotes => _emotes.Where((felix.BlishEmotes.Emote el) => !Settings.EmotesRadialEnabledMap.ContainsKey(el) || Settings.EmotesRadialEnabledMap[el].Value).ToList();
 
 		[ImportingConstructor]
 		public EmoteLisModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
@@ -122,7 +117,7 @@ namespace BlishEmotesList
 			{
 				if (_radialMenu != null)
 				{
-					_radialMenu.Emotes = _radialEnabledEmotes;
+					_radialMenu.Emotes = EmotesManager?.GetRadial();
 				}
 			};
 		}
@@ -140,20 +135,13 @@ namespace BlishEmotesList
 				}
 			}
 			Gw2ApiManager.SubtokenUpdated += OnApiSubTokenUpdated;
-			try
-			{
-				PersistenceManager = new PersistenceManager(DirectoriesManager);
-			}
-			catch (Exception e)
-			{
-				Logger.Fatal("Failed to init PersistenceManager!");
-				Logger.Fatal(e.Message);
-				Logger.Fatal(e.StackTrace);
-				Unload();
-				return;
-			}
+			PersistenceManager = new PersistenceManager(DirectoriesManager);
+			EmotesManager = new EmotesManager(ContentsManager, Settings);
 			CategoriesManager = new CategoriesManager(PersistenceManager);
-			_emotes = new List<felix.BlishEmotes.Emote>();
+			CategoriesManager.CategoriesUpdated += delegate
+			{
+				DrawUI(excludeRadial: true);
+			};
 			if (!Settings.GlobalHideCornerIcon.Value)
 			{
 				InitCornerIcon();
@@ -168,6 +156,7 @@ namespace BlishEmotesList
 				SavesPosition = true
 			};
 			_settingsWindow.Tabs.Add(new Tab(ContentsManager.GetTexture("textures\\155052.png"), () => new GlobalSettingsView(Settings), Common.settings_ui_global_tab));
+			_settingsWindow.Tabs.Add(new Tab(ContentsManager.GetTexture("textures\\156909.png"), () => new CategorySettingsView(CategoriesManager, EmotesManager, _helper), Common.settings_ui_categories_tab));
 			_settingsWindow.Tabs.Add(new Tab(ContentsManager.GetTexture("textures\\156734+155150.png"), () => new EmoteHotkeySettingsView(Settings), Common.settings_ui_emoteHotkeys_tab));
 		}
 
@@ -181,10 +170,11 @@ namespace BlishEmotesList
 		{
 			try
 			{
-				_emotes = LoadEmotes();
+				CategoriesManager.Load();
+				EmotesManager.Load();
 				await UpdateEmotesFromApi();
-				CategoriesManager.ResolveEmoteIds(_emotes);
-				Settings.InitEmotesSettings(_emotes);
+				CategoriesManager.ResolveEmoteIds(EmotesManager.GetAll());
+				Settings.InitEmotesSettings(EmotesManager.GetAll());
 				DrawUI();
 			}
 			catch (Exception e)
@@ -230,7 +220,7 @@ namespace BlishEmotesList
 		{
 			_emoteListMenuStrip?.Dispose();
 			_emoteListMenuStrip = new ContextMenuStrip();
-			List<ContextMenuStripItem> menuItems = (Settings.GlobalUseCategories.Value ? GetCategoryMenuItems() : GetEmotesMenuItems(_emotes));
+			List<ContextMenuStripItem> menuItems = (Settings.GlobalUseCategories.Value ? GetCategoryMenuItems() : GetEmotesMenuItems(EmotesManager.GetAll()));
 			_emoteListMenuStrip.AddMenuItems(menuItems);
 			if (!excludeRadial)
 			{
@@ -238,7 +228,7 @@ namespace BlishEmotesList
 				_radialMenu = new RadialMenu(_helper, Settings, ContentsManager.GetTexture("textures/2107931.png"))
 				{
 					Parent = GameService.Graphics.SpriteScreen,
-					Emotes = _radialEnabledEmotes
+					Emotes = EmotesManager.GetRadial()
 				};
 			}
 		}
@@ -347,7 +337,8 @@ namespace BlishEmotesList
 		{
 			Logger.Debug("Update emotes from api");
 			ApiEmotesReturn apiEmotes = await LoadEmotesFromApi();
-			foreach (felix.BlishEmotes.Emote emote in _emotes)
+			List<felix.BlishEmotes.Emote> emotes = EmotesManager.GetAll();
+			foreach (felix.BlishEmotes.Emote emote in emotes)
 			{
 				emote.Locked = false;
 				if (apiEmotes.UnlockableEmotesIds.Contains(emote.Id) && !apiEmotes.UnlockedEmotesIds.Contains(emote.Id))
@@ -355,21 +346,7 @@ namespace BlishEmotesList
 					emote.Locked = true;
 				}
 			}
-		}
-
-		private List<felix.BlishEmotes.Emote> LoadEmotes()
-		{
-			string fileContents;
-			using (StreamReader reader = new StreamReader(ContentsManager.GetFileStream("json/emotes.json")))
-			{
-				fileContents = reader.ReadToEnd();
-			}
-			List<felix.BlishEmotes.Emote> emotes = JsonConvert.DeserializeObject<List<felix.BlishEmotes.Emote>>(fileContents);
-			foreach (felix.BlishEmotes.Emote emote in emotes)
-			{
-				emote.Texture = ContentsManager.GetTexture("textures/emotes/" + emote.TextureRef, ContentsManager.GetTexture("textures/missing-texture.png"));
-			}
-			return emotes;
+			EmotesManager.UpdateAll(emotes);
 		}
 
 		private async Task<ApiEmotesReturn> LoadEmotesFromApi()

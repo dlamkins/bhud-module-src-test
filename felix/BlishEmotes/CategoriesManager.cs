@@ -9,6 +9,8 @@ namespace felix.BlishEmotes
 {
 	internal class CategoriesManager
 	{
+		public static readonly string NEW_CATEGORY_NAME = "New Category";
+
 		private static readonly Logger Logger = Logger.GetLogger<CategoriesManager>();
 
 		private PersistenceManager PersistenceManager;
@@ -17,10 +19,16 @@ namespace felix.BlishEmotes
 
 		public Guid FavouriteCategoryId { get; private set; }
 
+		public event EventHandler<List<Category>> CategoriesUpdated;
+
 		public CategoriesManager(PersistenceManager persistenceManager)
 		{
 			PersistenceManager = persistenceManager;
 			categories = new Dictionary<Guid, Category>();
+		}
+
+		public void Load()
+		{
 			try
 			{
 				foreach (Category category in PersistenceManager.LoadCategories())
@@ -45,15 +53,41 @@ namespace felix.BlishEmotes
 			}
 		}
 
+		public void ReorderCategories(List<Category> newOrder, bool saveToFile = true)
+		{
+			if (newOrder.Count != categories.Count)
+			{
+				Logger.Error("Reordered category list length does not match current category list length.");
+				return;
+			}
+			categories.Clear();
+			foreach (Category category in newOrder)
+			{
+				categories.Add(category.Id, category);
+			}
+			if (saveToFile)
+			{
+				PersistenceManager.SaveCategories(categories.Values.ToList());
+			}
+		}
+
 		public Category CreateCategory(string name, List<Emote> emotes = null, bool saveToFile = true)
 		{
-			return CreateCategory(name, emotes.Select((Emote emote) => emote.Id).ToList(), emotes, isFavourite: false, saveToFile);
+			return CreateCategory(name, emotes?.Select((Emote emote) => emote.Id).ToList(), emotes, isFavourite: false, saveToFile);
 		}
 
 		private Category CreateCategory(string name, List<string> emoteIds = null, List<Emote> emotes = null, bool isFavourite = false, bool saveToFile = true)
 		{
 			emoteIds = emoteIds ?? new List<string>();
 			emotes = emotes ?? new List<Emote>();
+			if (name == NEW_CATEGORY_NAME)
+			{
+				int next = GetNextNewCategoryNumber();
+				if (next > 0)
+				{
+					name = $"{name} {next}";
+				}
+			}
 			AssertUniqueName(name);
 			Category newCategory = new Category
 			{
@@ -73,6 +107,7 @@ namespace felix.BlishEmotes
 				PersistenceManager.SaveCategories(categories.Values.ToList());
 			}
 			Logger.Debug($"Created category {newCategory.Id}-{newCategory.Name}");
+			this.CategoriesUpdated?.Invoke(this, GetAll());
 			return newCategory.Clone();
 		}
 
@@ -81,6 +116,7 @@ namespace felix.BlishEmotes
 			categories.TryGetValue(category.Id, out var current);
 			if (current == null)
 			{
+				Logger.Debug($"No category found for id {category.Id}");
 				throw new NotFoundException($"No category found for id {category.Id}");
 			}
 			if (current.Name != category.Name)
@@ -93,7 +129,32 @@ namespace felix.BlishEmotes
 				PersistenceManager.SaveCategories(categories.Values.ToList());
 			}
 			Logger.Debug($"Updated category {category.Id}-{category.Name}");
+			this.CategoriesUpdated?.Invoke(this, GetAll());
 			return category.Clone();
+		}
+
+		public bool DeleteCategory(Category category, bool saveToFile = true)
+		{
+			categories.TryGetValue(category.Id, out var current);
+			if (current == null)
+			{
+				Logger.Debug($"Tried deleting non-existing category with id {category.Id}");
+				return true;
+			}
+			if (current.IsFavourite)
+			{
+				Logger.Debug("Tried to delete favourite category -> abort.");
+				return false;
+			}
+			categories.Remove(category.Id);
+			categories = new Dictionary<Guid, Category>(categories);
+			if (saveToFile)
+			{
+				PersistenceManager.SaveCategories(categories.Values.ToList());
+			}
+			Logger.Debug($"Deleted category {category.Id}-{category.Name}");
+			this.CategoriesUpdated?.Invoke(this, GetAll());
+			return true;
 		}
 
 		public Category GetById(Guid id)
@@ -101,6 +162,7 @@ namespace felix.BlishEmotes
 			categories.TryGetValue(id, out var category);
 			if (category == null)
 			{
+				Logger.Debug($"No category found for id {id}");
 				throw new NotFoundException($"No category found for id {id}");
 			}
 			return category.Clone();
@@ -116,6 +178,7 @@ namespace felix.BlishEmotes
 			categories.TryGetValue(categoryId, out var category);
 			if (category == null)
 			{
+				Logger.Debug($"No category found for id {categoryId}");
 				throw new NotFoundException($"No category found for id {categoryId}");
 			}
 			return category.EmoteIds.Contains(emote.Id);
@@ -127,7 +190,7 @@ namespace felix.BlishEmotes
 			{
 				if (IsEmoteInCategory(categoryId, emote))
 				{
-					categories[categoryId].RemoveEmote(emote.Id);
+					categories[categoryId].RemoveEmote(emote);
 				}
 				else
 				{
@@ -174,7 +237,7 @@ namespace felix.BlishEmotes
 				"stretch", "threaten"
 			}, null, isFavourite: false, saveToFile: false);
 			CreateCategory("Dance", new List<string> { "dance", "geargrind", "shuffle", "step" }, null, isFavourite: false, saveToFile: false);
-			CreateCategory("Miscellaneous", new List<string> { "ponder", "possessed", "rank", "sipcoffee", "talk" }, null, isFavourite: false, saveToFile: false);
+			CreateCategory("Miscellaneous", new List<string> { "ponder", "possessed", "rank", "readbook", "sipcoffee", "talk" }, null, isFavourite: false, saveToFile: false);
 			PersistenceManager.SaveCategories(categories.Values.ToList());
 		}
 
@@ -182,8 +245,28 @@ namespace felix.BlishEmotes
 		{
 			if (categories.Values.Any((Category category) => category.Name == name))
 			{
+				Logger.Debug("Name must be unique - " + name + " already in use.");
 				throw new UniqueViolationException("Name must be unique - " + name + " already in use.");
 			}
+		}
+
+		private int GetNextNewCategoryNumber()
+		{
+			List<int> newCategoryNumbers = categories.Values.Where((Category category) => category.Name.StartsWith(NEW_CATEGORY_NAME)).Select(delegate(Category category)
+			{
+				string text = category.Name.Replace(NEW_CATEGORY_NAME, "").Trim();
+				if (text.Length == 0)
+				{
+					text = "0";
+				}
+				int result;
+				return int.TryParse(text, out result) ? result : 0;
+			}).ToList();
+			if (newCategoryNumbers.Count != 0)
+			{
+				return newCategoryNumbers.Max() + 1;
+			}
+			return 0;
 		}
 	}
 }

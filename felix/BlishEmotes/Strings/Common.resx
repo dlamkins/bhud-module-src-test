@@ -33,12 +33,14 @@
   <data name="settings_ui_global_tab"><value>Global Settings</value></data>
   <data name="settings_radial_iconSizeModifier"><value>Icon size modifier</value></data>
   <data name="settings_global_useRadialMenu"><value>Use radial menu</value></data>
+  <data name="settings_ui_save"><value>Save</value></data>
   <data name="settings_global_keybindToggleTargeting"><value>Targeting Emote Toggle</value></data>
   <data name="settings_radial_spawnAtCursor"><value>Spawn at cursor</value></data>
   <data name="settings_radial_innerRadiusPercentage_description"><value>Defines the radius where no emotes get selected in precentage of the radial radius</value></data>
   <data name="settings_radial_emotesEnabled"><value>Display in radial menu</value></data>
   <data name="settings_radial_radiusModifier"><value>Radius modifier</value></data>
   <data name="settings_global_hideCornerIcon"><value>Hide Corner Icon</value></data>
+  <data name="settings_ui_delete"><value>Delete</value></data>
   <data name="settings_button"><value>Open Settings</value></data>
   <data name="emote_targetingActive"><value>Target emotes</value></data>
   <data name="emote_categoryFavourite"><value>Favourite</value></data>
@@ -47,7 +49,9 @@
   <data name="settings_ui_title"><value>Emotes Settings</value></data>
   <data name="settings_radial_iconOpacity"><value>Icon opacity</value></data>
   <data name="settings_radial_innerRadiusPercentage"><value>Disabled radius percentage</value></data>
+  <data name="category_add"><value>Add</value></data>
   <data name="settings_radial_actionCamKeybind"><value>Action camera keybind</value></data>
+  <data name="settings_ui_categories_tab"><value>Category Settings</value></data>
   <data name="cornerIcon_tooltip"><value>Open emotes list</value></data>
   <data name="settings_global_useCategories"><value>Enable categories</value></data>
   </root>

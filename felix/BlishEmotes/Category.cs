@@ -9,6 +9,9 @@ namespace felix.BlishEmotes
 		[JsonIgnore]
 		public static readonly string FAVOURITES_CATEGORY_NAME = "Favourites";
 
+		[JsonIgnore]
+		public static readonly string VERSION = "V1";
+
 		[JsonProperty("id", Required = Required.Always)]
 		public Guid Id { get; set; }
 
@@ -32,7 +35,8 @@ namespace felix.BlishEmotes
 				Id = Id,
 				Name = Name,
 				EmoteIds = new List<string>(EmoteIds),
-				Emotes = new List<Emote>(Emotes)
+				Emotes = new List<Emote>(Emotes),
+				IsFavourite = IsFavourite
 			};
 		}
 
@@ -45,10 +49,10 @@ namespace felix.BlishEmotes
 			}
 		}
 
-		public void RemoveEmote(string id)
+		public void RemoveEmote(Emote emote)
 		{
-			EmoteIds.Remove(id);
-			Emotes.RemoveAll((Emote emote) => emote.Id == id);
+			EmoteIds.Remove(emote.Id);
+			Emotes.RemoveAll((Emote e) => e.Id == emote.Id);
 		}
 	}
 }

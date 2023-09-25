@@ -86,6 +86,8 @@ namespace felix.BlishEmotes.Strings
 
 		internal static string rank => ResourceManager.GetString("rank", resourceCulture);
 
+		internal static string readbook => ResourceManager.GetString("readbook", resourceCulture);
+
 		internal static string rock => ResourceManager.GetString("rock", resourceCulture);
 
 		internal static string rockout => ResourceManager.GetString("rockout", resourceCulture);
