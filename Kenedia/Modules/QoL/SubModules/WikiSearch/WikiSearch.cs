@@ -101,7 +101,7 @@ namespace Kenedia.Modules.QoL.SubModules.WikiSearch
 		{
 			if (base.Enabled)
 			{
-				((Control)_mouseContainer).set_Visible(GameService.Input.get_Keyboard().get_KeysDown().Contains((Keys)160));
+				((Control)_mouseContainer).set_Visible(GameService.Input.get_Keyboard().get_KeysDown().Contains((Keys)160) || GameService.Input.get_Keyboard().get_KeysDown().Contains((Keys)161));
 			}
 		}
 
@@ -150,7 +150,7 @@ namespace Kenedia.Modules.QoL.SubModules.WikiSearch
 
 		private async void Mouse_LeftMouseButtonPressed(object sender, MouseEventArgs e)
 		{
-			if (base.Enabled && GameService.Input.get_Keyboard().get_KeysDown().Contains((Keys)160))
+			if (base.Enabled && (GameService.Input.get_Keyboard().get_KeysDown().Contains((Keys)160) || GameService.Input.get_Keyboard().get_KeysDown().Contains((Keys)161)))
 			{
 				await OpenWikiForItemFromChat();
 			}

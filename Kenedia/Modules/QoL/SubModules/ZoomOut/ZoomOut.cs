@@ -141,7 +141,7 @@ namespace Kenedia.Modules.QoL.SubModules.ZoomOut
 			if (_allowManualZoom.get_Value())
 			{
 				float distance = (_distance = ComputeCameraDistance());
-				_saveDistanceTicks = Common.Now() + 1000.0;
+				_saveDistanceTicks = Common.Now + 1000.0;
 			}
 		}
 

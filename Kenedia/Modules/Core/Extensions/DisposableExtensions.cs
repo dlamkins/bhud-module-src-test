@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Kenedia.Modules.Core.Extensions
 {
@@ -7,9 +8,9 @@ namespace Kenedia.Modules.Core.Extensions
 	{
 		public static void DisposeAll(this IEnumerable<IDisposable> disposables)
 		{
-			foreach (IDisposable disposable in disposables)
+			foreach (IDisposable item in disposables.ToList())
 			{
-				disposable?.Dispose();
+				item?.Dispose();
 			}
 		}
 	}

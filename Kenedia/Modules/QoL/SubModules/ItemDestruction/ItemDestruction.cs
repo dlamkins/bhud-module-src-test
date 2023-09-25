@@ -146,7 +146,7 @@ namespace Kenedia.Modules.QoL.SubModules.ItemDestruction
 
 		private void OnStateSwitched(object sender, ValueChangedEventArgs<ItemDestructionState> e)
 		{
-			_lastAction = Common.Now();
+			_lastAction = Common.Now;
 			Dictionary<ItemDestructionState, string> instructions = new Dictionary<ItemDestructionState, string>
 			{
 				{
@@ -241,7 +241,7 @@ namespace Kenedia.Modules.QoL.SubModules.ItemDestruction
 
 		private async void Mouse_LeftMouseButtonReleased(object sender, MouseEventArgs e)
 		{
-			if (!(Common.Now() - _lastAction < 150.0) && base.Enabled && State == ItemDestructionState.Selected)
+			if (!(Common.Now - _lastAction < 150.0) && base.Enabled && State == ItemDestructionState.Selected)
 			{
 				await Task.Delay(50);
 				if (GameService.Gw2Mumble.get_UI().get_IsTextInputFocused())
@@ -254,9 +254,9 @@ namespace Kenedia.Modules.QoL.SubModules.ItemDestruction
 
 		private async void Mouse_LeftMouseButtonPressed(object sender, MouseEventArgs e)
 		{
-			if (!(Common.Now() - _lastAction < 150.0) && base.Enabled)
+			if (!(Common.Now - _lastAction < 150.0) && base.Enabled)
 			{
-				if (GameService.Input.get_Keyboard().get_KeysDown().Contains((Keys)160))
+				if (GameService.Input.get_Keyboard().get_KeysDown().Contains((Keys)160) || GameService.Input.get_Keyboard().get_KeysDown().Contains((Keys)161))
 				{
 					ClientWindowService clientWindowService = BaseModule<QoL, StandardWindow, Kenedia.Modules.QoL.Services.Settings, PathCollection>.ModuleInstance.Services.ClientWindowService;
 					SharedSettings _sharedSettings = BaseModule<QoL, StandardWindow, Kenedia.Modules.QoL.Services.Settings, PathCollection>.ModuleInstance.Services.SharedSettings;
@@ -297,7 +297,7 @@ namespace Kenedia.Modules.QoL.SubModules.ItemDestruction
 			string text = string.Empty;
 			try
 			{
-				_lastAction = Common.Now();
+				_lastAction = Common.Now;
 				await Task.Delay(50);
 				Keyboard.Release((VirtualKeyShort)160, true);
 				await Task.Delay(5);
@@ -326,7 +326,7 @@ namespace Kenedia.Modules.QoL.SubModules.ItemDestruction
 					text = text.Substring(0, text.Length - 1);
 				}
 				await ClipboardUtil.get_WindowsClipboardService().SetTextAsync(text);
-				_lastAction = Common.Now();
+				_lastAction = Common.Now;
 			}
 			catch
 			{

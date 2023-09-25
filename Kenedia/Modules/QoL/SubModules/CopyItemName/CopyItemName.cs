@@ -137,10 +137,9 @@ namespace Kenedia.Modules.QoL.SubModules.CopyItemName
 
 		public override void Update(GameTime gameTime)
 		{
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 			if (base.Enabled)
 			{
-				((Control)_mouseContainer).set_Visible(GameService.Input.get_Keyboard().get_KeysDown().Contains(_modifierToChat.get_Value().get_PrimaryKey()));
+				((Control)_mouseContainer).set_Visible(GameService.Input.get_Keyboard().get_KeysDown().Contains((Keys)160) || GameService.Input.get_Keyboard().get_KeysDown().Contains((Keys)161));
 			}
 		}
 
@@ -180,7 +179,7 @@ namespace Kenedia.Modules.QoL.SubModules.CopyItemName
 
 		private async void Mouse_LeftMouseButtonPressed(object sender, MouseEventArgs e)
 		{
-			if (base.Enabled && GameService.Input.get_Keyboard().get_KeysDown().Contains(_modifierToChat.get_Value().get_PrimaryKey()))
+			if (base.Enabled && (GameService.Input.get_Keyboard().get_KeysDown().Contains((Keys)160) || GameService.Input.get_Keyboard().get_KeysDown().Contains((Keys)161)))
 			{
 				ClientWindowService clientWindowService = BaseModule<QoL, StandardWindow, Kenedia.Modules.QoL.Services.Settings, PathCollection>.ModuleInstance.Services.ClientWindowService;
 				SharedSettings _sharedSettings = BaseModule<QoL, StandardWindow, Kenedia.Modules.QoL.Services.Settings, PathCollection>.ModuleInstance.Services.SharedSettings;
@@ -200,7 +199,9 @@ namespace Kenedia.Modules.QoL.SubModules.CopyItemName
 			try
 			{
 				await Task.Delay(50);
-				Keyboard.Release((VirtualKeyShort)(short)_modifierToChat.get_Value().get_PrimaryKey(), true);
+				_modifierToChat.get_Value().get_PrimaryKey();
+				Keyboard.Release((VirtualKeyShort)160, true);
+				Keyboard.Release((VirtualKeyShort)161, true);
 				await Task.Delay(5);
 				Keyboard.Press((VirtualKeyShort)162, true);
 				Keyboard.Stroke((VirtualKeyShort)65, true);

@@ -21,8 +21,8 @@
     <Reference Include="Gw2Sharp" />
     <Reference Include="Newtonsoft.Json" />
     <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="AsyncClipboardService" />
   </ItemGroup>
 </Project>

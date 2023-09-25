@@ -56,7 +56,7 @@ namespace Kenedia.Modules.Core.Views
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
 			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			((WindowBase2)this).PaintBeforeChildren(spriteBatch, bounds);
+			base.PaintBeforeChildren(spriteBatch, bounds);
 		}
 
 		protected (Panel, Label, TrackBar) LabeledTrackbar(Container parent, Func<string> setLocalizedText, Func<string> setLocalizedTooltip)

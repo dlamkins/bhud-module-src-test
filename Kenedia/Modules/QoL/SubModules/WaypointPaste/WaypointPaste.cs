@@ -59,7 +59,7 @@ namespace Kenedia.Modules.QoL.SubModules.WaypointPaste
 			}
 			try
 			{
-				_ticks = Common.Now();
+				_ticks = Common.Now;
 				string waypoint = _waypoint.get_Value();
 				if (_pasteCurrentClipboardWaypointFirst.get_Value())
 				{
@@ -115,7 +115,7 @@ namespace Kenedia.Modules.QoL.SubModules.WaypointPaste
 					{
 						await Input.SendKey((Keys[])(object)new Keys[1] { (Keys)162 }, (Keys)86, sendToSystem: true);
 						await Input.SendKey((Keys)13);
-						_ticks = Common.Now();
+						_ticks = Common.Now;
 						base.Enabled = false;
 					}
 				}

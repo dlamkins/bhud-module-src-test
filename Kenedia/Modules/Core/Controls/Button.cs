@@ -14,9 +14,9 @@ namespace Kenedia.Modules.Core.Controls
 {
 	public class Button : StandardButton, ILocalizable
 	{
-		private readonly Texture2D _textureButtonIdle = Control.get_Content().GetTexture("common/button-states");
+		private Texture2D _textureButtonIdle = Control.get_Content().GetTexture("common/button-states");
 
-		private readonly Texture2D _textureButtonBorder = Control.get_Content().GetTexture("button-border");
+		private Texture2D _textureButtonBorder = Control.get_Content().GetTexture("button-border");
 
 		private Func<string> _setLocalizedText;
 
@@ -88,6 +88,8 @@ namespace Kenedia.Modules.Core.Controls
 		protected override void DisposeControl()
 		{
 			((Control)this).DisposeControl();
+			_textureButtonBorder = null;
+			_textureButtonIdle = null;
 			GameService.Overlay.get_UserLocale().remove_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)UserLocale_SettingChanged);
 		}
 
@@ -96,43 +98,49 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0112: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
 			((StandardButton)this).RecalculateLayout();
 			Size2 textDimensions = ((LabelBase)this).GetTextDimensions((string)null);
 			int num = (int)((float)(((Control)this)._size.X / 2) - textDimensions.Width / 2f);
 			if (((StandardButton)this).get_Icon() != null)
 			{
 				num = ((!(textDimensions.Width > 0f)) ? (num + 8) : (num + 10));
-				_003F val;
+				Point val2;
 				if (!((StandardButton)this).get_ResizeIcon())
 				{
 					Rectangle bounds = ((StandardButton)this).get_Icon().get_Texture().get_Bounds();
-					val = ((Rectangle)(ref bounds)).get_Size();
+					int val = Math.Min(((Rectangle)(ref bounds)).get_Size().X, ((Control)this).get_Width());
+					bounds = ((StandardButton)this).get_Icon().get_Texture().get_Bounds();
+					val2 = new Point(Math.Min(val, Math.Min(((Rectangle)(ref bounds)).get_Size().Y, ((Control)this).get_Height() - 7)));
 				}
 				else
 				{
-					val = new Point(16);
+					val2 = new Point(16);
 				}
-				Point point = (Point)val;
+				Point point = val2;
 				_layoutIconBounds = new Rectangle(num - point.X - 4, ((Control)this)._size.Y / 2 - point.Y / 2, point.X, point.Y);
 			}
 			_layoutTextBounds = new Rectangle(num, (((Control)this).get_Height() - (int)textDimensions.Height) / 2, (int)textDimensions.Width, (int)textDimensions.Height);

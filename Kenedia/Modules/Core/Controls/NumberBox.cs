@@ -6,6 +6,7 @@ using Blish_HUD.Input;
 using Gw2Sharp.WebApi;
 using Kenedia.Modules.Core.Interfaces;
 using Kenedia.Modules.Core.Services;
+using Kenedia.Modules.Core.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -32,6 +33,8 @@ namespace Kenedia.Modules.Core.Controls
 		private int _value;
 
 		private Func<string> _setLocalizedTooltip;
+
+		private bool _showButtons = true;
 
 		public Action<int> ValueChangedAction { get; set; }
 
@@ -73,6 +76,18 @@ namespace Kenedia.Modules.Core.Controls
 			}
 		}
 
+		public bool ShowButtons
+		{
+			get
+			{
+				return _showButtons;
+			}
+			set
+			{
+				Common.SetProperty(ref _showButtons, value, ((Control)this).RecalculateLayout);
+			}
+		}
+
 		public int Step { get; set; } = 1;
 
 
@@ -98,41 +113,47 @@ namespace Kenedia.Modules.Core.Controls
 
 		public override void RecalculateLayout()
 		{
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			int size = Math.Min(((Control)this).get_Height(), ((Control)this).get_Width());
-			_addRectangle = new Rectangle(((Control)this).get_Width() - size, (((Control)this).get_Height() - size) / 2, size, size);
-			_minusRectangle = new Rectangle(((Control)this).get_Width() - size * 2, (((Control)this).get_Height() - size) / 2, size, size);
-			((Control)_inputField).set_Width(Math.Max(0, ((Control)this).get_Width() - size * 2 - 2));
+			_addRectangle = (Rectangle)(ShowButtons ? new Rectangle(((Control)this).get_Width() - size, (((Control)this).get_Height() - size) / 2, size, size) : Rectangle.get_Empty());
+			_minusRectangle = (Rectangle)(ShowButtons ? new Rectangle(((Control)this).get_Width() - size * 2, (((Control)this).get_Height() - size) / 2, size, size) : Rectangle.get_Empty());
+			int spacing = (ShowButtons ? 2 : 0);
+			((Control)_inputField).set_Width(Math.Max(0, ((Control)this).get_Width() - (_addRectangle.Width + _minusRectangle.Width) - spacing));
 			((Control)_inputField).set_Height(((Control)this).get_Height());
 		}
 
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
 			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
 			((Container)this).PaintAfterChildren(spriteBatch, bounds);
-			if (_addRectangle.Width > 0 && _addRectangle.Height > 0)
+			if (ShowButtons)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(((Rectangle)(ref _addRectangle)).Contains(((Control)this).get_RelativeMousePosition()) ? _addButtonHovered : _addButton), _addRectangle, (Rectangle?)new Rectangle(6, 6, 20, 20), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
-			}
-			if (_minusRectangle.Width > 0 && _minusRectangle.Height > 0)
-			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(((Rectangle)(ref _minusRectangle)).Contains(((Control)this).get_RelativeMousePosition()) ? _minusButtonHovered : _minusButton), _minusRectangle, (Rectangle?)new Rectangle(6, 6, 20, 20), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+				if (_addRectangle.Width > 0 && _addRectangle.Height > 0)
+				{
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(((Rectangle)(ref _addRectangle)).Contains(((Control)this).get_RelativeMousePosition()) ? _addButtonHovered : _addButton), _addRectangle, (Rectangle?)new Rectangle(6, 6, 20, 20), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+				}
+				if (_minusRectangle.Width > 0 && _minusRectangle.Height > 0)
+				{
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(((Rectangle)(ref _minusRectangle)).Contains(((Control)this).get_RelativeMousePosition()) ? _minusButtonHovered : _minusButton), _minusRectangle, (Rectangle?)new Rectangle(6, 6, 20, 20), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+				}
 			}
 		}
 
@@ -140,7 +161,7 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			((Panel)this).OnClick(e);
+			base.OnClick(e);
 			if (((Rectangle)(ref _addRectangle)).Contains(((Control)this).get_RelativeMousePosition()))
 			{
 				Value += Step;

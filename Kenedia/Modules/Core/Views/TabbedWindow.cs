@@ -14,7 +14,7 @@ using SemVer;
 
 namespace Kenedia.Modules.Core.Views
 {
-	public class StandardWindow : StandardWindow
+	public class TabbedWindow : TabbedWindow2
 	{
 		private Rectangle _subTitleRectangle;
 
@@ -90,7 +90,7 @@ namespace Kenedia.Modules.Core.Views
 		public Color SubNameColor { get; set; } = Color.get_White();
 
 
-		public StandardWindow(AsyncTexture2D background, Rectangle windowRegion, Rectangle contentRegion)
+		public TabbedWindow(AsyncTexture2D background, Rectangle windowRegion, Rectangle contentRegion)
 			: this(background, windowRegion, contentRegion)
 		{
 		}//IL_003c: Unknown result type (might be due to invalid IL or missing references)
@@ -169,7 +169,7 @@ namespace Kenedia.Modules.Core.Views
 
 		public override void UpdateContainer(GameTime gameTime)
 		{
-			((WindowBase2)this).UpdateContainer(gameTime);
+			((TabbedWindow2)this).UpdateContainer(gameTime);
 			foreach (AnchoredContainer container in _attachedContainers)
 			{
 				if (((Control)container).get_ZIndex() != ((Control)this).get_ZIndex())
@@ -213,7 +213,7 @@ namespace Kenedia.Modules.Core.Views
 			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
 			//IL_016a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
-			((WindowBase2)this).PaintAfterChildren(spriteBatch, bounds);
+			((TabbedWindow2)this).PaintAfterChildren(spriteBatch, bounds);
 			if (MainWindowEmblem != null)
 			{
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(MainWindowEmblem), _mainEmblemRectangle, (Rectangle?)MainWindowEmblem.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
@@ -246,7 +246,17 @@ namespace Kenedia.Modules.Core.Views
 		{
 			((WindowBase2)this).DisposeControl();
 			((IEnumerable<IDisposable>)((Container)this).get_Children()).DisposeAll();
+			AsyncTexture2D subWindowEmblem = SubWindowEmblem;
+			if (subWindowEmblem != null)
+			{
+				subWindowEmblem.Dispose();
+			}
 			SubWindowEmblem = null;
+			AsyncTexture2D mainWindowEmblem = MainWindowEmblem;
+			if (mainWindowEmblem != null)
+			{
+				mainWindowEmblem.Dispose();
+			}
 			MainWindowEmblem = null;
 		}
 

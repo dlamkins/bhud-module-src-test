@@ -16,11 +16,6 @@ namespace Kenedia.Modules.Core.Controls
 	{
 		private Func<string> _setLocalizedTooltip;
 
-		private readonly AsyncTexture2D _background = AsyncTexture2D.FromAssetId(155983);
-
-		public AsyncTexture2D IconFrame { get; set; } = AsyncTexture2D.FromAssetId(1414041);
-
-
 		private bool Clicked
 		{
 			get
@@ -90,7 +85,7 @@ namespace Kenedia.Modules.Core.Controls
 		public ImageButton()
 			: this()
 		{
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			LocalizingService.LocaleChanged += UserLocale_SettingChanged;
 			UserLocale_SettingChanged(null, null);
 		}
@@ -106,6 +101,10 @@ namespace Kenedia.Modules.Core.Controls
 		protected override void DisposeControl()
 		{
 			((Control)this).DisposeControl();
+			Texture = null;
+			DisabledTexture = null;
+			HoveredTexture = null;
+			ClickedTexture = null;
 			GameService.Overlay.get_UserLocale().remove_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)UserLocale_SettingChanged);
 		}
 
@@ -145,9 +144,9 @@ namespace Kenedia.Modules.Core.Controls
 
 		protected override void OnClick(MouseEventArgs e)
 		{
-			((Control)this).OnClick(e);
 			if (((Control)this).get_Enabled())
 			{
+				((Control)this).OnClick(e);
 				ClickAction?.Invoke(e);
 			}
 		}

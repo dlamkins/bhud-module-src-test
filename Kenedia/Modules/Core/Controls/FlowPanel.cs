@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.Input;
 using Gw2Sharp.WebApi;
 using Kenedia.Modules.Core.Interfaces;
 using Kenedia.Modules.Core.Services;
@@ -55,8 +56,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		private Rectangle _layoutLeftAccentSrc;
 
-		private Rectangle _layoutHeaderBounds;
-
 		private Rectangle _layoutHeaderTextBounds;
 
 		private Rectangle _layoutHeaderIconBounds;
@@ -74,6 +73,8 @@ namespace Kenedia.Modules.Core.Controls
 		private int _titleBarHeight;
 
 		private bool _resized;
+
+		protected Rectangle LayoutHeaderBounds;
 
 		public bool ShowRightBorder { get; set; }
 
@@ -198,6 +199,10 @@ namespace Kenedia.Modules.Core.Controls
 			}
 		}
 
+		public Action OnCollapse { get; set; }
+
+		public Action OnExpand { get; set; }
+
 		public bool CaptureInput { get; set; }
 
 		public FlowPanel()
@@ -217,6 +222,23 @@ namespace Kenedia.Modules.Core.Controls
 			((FlowPanel)this)._002Ector();
 			LocalizingService.LocaleChanged += UserLocale_SettingChanged;
 			UserLocale_SettingChanged(null, null);
+		}
+
+		protected override void OnClick(MouseEventArgs e)
+		{
+			bool collapsed = ((Panel)this).get_Collapsed();
+			((Panel)this).OnClick(e);
+			if (collapsed != ((Panel)this).get_Collapsed())
+			{
+				if (((Panel)this).get_Collapsed())
+				{
+					OnCollapse?.Invoke();
+				}
+				else
+				{
+					OnExpand?.Invoke();
+				}
+			}
 		}
 
 		public override void RecalculateLayout()
@@ -270,13 +292,13 @@ namespace Kenedia.Modules.Core.Controls
 				_layoutLeftAccentSrc = new Rectangle(0, 0, _textureLeftSideAccent.get_Width(), _layoutLeftAccentBounds.Height);
 			}
 			((Container)this).set_ContentRegion(new Rectangle(_contentPadding.Left + num4, _contentPadding.Top + num, ((Control)this)._size.X - num4 - num2 - _contentPadding.Horizontal, ((Control)this)._size.Y - num - num3 - _contentPadding.Vertical));
-			_layoutHeaderBounds = new Rectangle(num4, 0, ((Control)this).get_Width(), num);
-			_layoutHeaderIconBounds = (Rectangle)((TitleIcon != null) ? new Rectangle(((Rectangle)(ref _layoutHeaderBounds)).get_Left() + _titleIconPadding.Left, _titleIconPadding.Top, num - _titleIconPadding.Vertical, num - _titleIconPadding.Vertical) : Rectangle.get_Empty());
-			_layoutHeaderTextBounds = new Rectangle(((Rectangle)(ref _layoutHeaderIconBounds)).get_Right() + _titleIconPadding.Right, 0, _layoutHeaderBounds.Width - _layoutHeaderIconBounds.Width, num);
+			LayoutHeaderBounds = new Rectangle(num4, 0, ((Control)this).get_Width(), num);
+			_layoutHeaderIconBounds = (Rectangle)((TitleIcon != null) ? new Rectangle(((Rectangle)(ref LayoutHeaderBounds)).get_Left() + _titleIconPadding.Left, _titleIconPadding.Top, num - _titleIconPadding.Vertical, num - _titleIconPadding.Vertical) : Rectangle.get_Empty());
+			_layoutHeaderTextBounds = new Rectangle(((Rectangle)(ref _layoutHeaderIconBounds)).get_Right() + _titleIconPadding.Right, 0, LayoutHeaderBounds.Width - _layoutHeaderIconBounds.Width, num);
 			int arrowSize = num - 4;
 			_layoutAccordionArrowOrigin = new Vector2(16f, 16f);
-			_layoutAccordionArrowBounds = RectangleExtension.OffsetBy(new Rectangle(((Rectangle)(ref _layoutHeaderBounds)).get_Right() - arrowSize, (num - arrowSize) / 2, arrowSize, arrowSize), new Point(arrowSize / 2, arrowSize / 2));
-			if (((Panel)this).get_Collapsed() && ((Control)this)._size.Y > _layoutHeaderBounds.Height && !_resized)
+			_layoutAccordionArrowBounds = RectangleExtension.OffsetBy(new Rectangle(((Rectangle)(ref LayoutHeaderBounds)).get_Right() - arrowSize, (num - arrowSize) / 2, arrowSize, arrowSize), new Point(arrowSize / 2, arrowSize / 2));
+			if (((Panel)this).get_Collapsed() && ((Control)this)._size.Y > LayoutHeaderBounds.Height && !_resized)
 			{
 				_resized = true;
 				Task.Run(async delegate
@@ -288,7 +310,7 @@ namespace Kenedia.Modules.Core.Controls
 					}
 					else
 					{
-						((Control)this).set_Size(new Point(((Control)this).get_Width(), _layoutHeaderBounds.Height));
+						((Control)this).set_Size(new Point(((Control)this).get_Width(), LayoutHeaderBounds.Height));
 						_resized = false;
 					}
 				});
@@ -357,15 +379,15 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			if (!string.IsNullOrEmpty(((Panel)this)._title))
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_texturePanelHeader), _layoutHeaderBounds);
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_texturePanelHeader), LayoutHeaderBounds);
 				if (((Panel)this)._canCollapse && ((Control)this)._mouseOver && ((Control)this).get_RelativeMousePosition().Y <= 36)
 				{
 					((Control)_tooltip).set_Visible(true);
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_texturePanelHeaderActive), _layoutHeaderBounds);
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_texturePanelHeaderActive), LayoutHeaderBounds);
 				}
 				else
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_texturePanelHeader), _layoutHeaderBounds);
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_texturePanelHeader), LayoutHeaderBounds);
 				}
 				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, ((Panel)this)._title, Control.get_Content().get_DefaultFont16(), _layoutHeaderTextBounds, Color.get_White(), false, (HorizontalAlignment)0, (VerticalAlignment)1);
 				if (TitleIcon != null)
@@ -577,40 +599,40 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void DrawBorders(SpriteBatch spriteBatch)
 		{
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0170: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0124: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0189: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0195: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
 			Color? borderColor = ((HoveredBorderColor.HasValue && ((Control)this).get_MouseOver()) ? HoveredBorderColor : BorderColor);
 			if (!borderColor.HasValue)
 			{
 				return;
 			}
-			foreach (var r4 in _topBorders)
+			foreach (var r4 in new List<(Rectangle, float)>(_topBorders))
 			{
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), r4.Item1, (Rectangle?)Rectangle.get_Empty(), borderColor.Value * r4.Item2);
 			}
-			foreach (var r3 in _leftBorders)
+			foreach (var r3 in new List<(Rectangle, float)>(_leftBorders))
 			{
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), r3.Item1, (Rectangle?)Rectangle.get_Empty(), borderColor.Value * r3.Item2);
 			}
-			foreach (var r2 in _bottomBorders)
+			foreach (var r2 in new List<(Rectangle, float)>(_bottomBorders))
 			{
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), r2.Item1, (Rectangle?)Rectangle.get_Empty(), borderColor.Value * r2.Item2);
 			}
-			foreach (var r in _rightBorders)
+			foreach (var r in new List<(Rectangle, float)>(_rightBorders))
 			{
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), r.Item1, (Rectangle?)Rectangle.get_Empty(), borderColor.Value * r.Item2);
 			}

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Controls.Extern;
+using Blish_HUD.GameIntegration;
 using Blish_HUD.Gw2Mumble;
 using Blish_HUD.Input;
 using Blish_HUD.Modules;
@@ -13,7 +14,6 @@ using Gw2Sharp.WebApi;
 using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.Core.Views;
 using Microsoft.Xna.Framework;
-using Newtonsoft.Json;
 using SemVer;
 
 namespace Kenedia.Modules.Core.Models
@@ -65,16 +65,18 @@ namespace Kenedia.Modules.Core.Models
 		{
 			ClientWindowService clientWindowService = new ClientWindowService();
 			SharedSettings sharedSettings = new SharedSettings();
-			TexturesService texturesService = new TexturesService(ContentsManager);
 			InputDetectionService inputDetectionService = new InputDetectionService();
 			GameStateDetectionService gameState = new GameStateDetectionService(clientWindowService, sharedSettings);
-			Services = new ServiceCollection(gameState, clientWindowService, sharedSettings, texturesService, inputDetectionService);
+			Services = new ServiceCollection(gameState, clientWindowService, sharedSettings, inputDetectionService);
 			SharedSettingsView = new SharedSettingsView(sharedSettings, clientWindowService);
 			GameService.Overlay.get_UserLocale().add_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)OnLocaleChanged);
+			TexturesService.Initilize(ContentsManager);
 		}
 
 		protected override void Initialize()
 		{
+			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006f: Expected O, but got Unknown
 			((Module)this).Initialize();
 			ModuleVersion = ((Module)this).get_Version();
 			Logger.Info($"Initializing {((Module)this).get_Name()} {ModuleVersion}");
@@ -82,17 +84,16 @@ namespace Kenedia.Modules.Core.Models
 			ModKeyMapping[1] = (VirtualKeyShort)17;
 			ModKeyMapping[2] = (VirtualKeyShort)18;
 			ModKeyMapping[4] = (VirtualKeyShort)160;
-			JsonConvert.set_DefaultSettings((Func<JsonSerializerSettings>)delegate
+			if (Program.get_OverlayVersion() < new Version(1, 1, 0, (string)null, (string)null))
 			{
-				//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0014: Expected O, but got Unknown
-				JsonSerializerSettings val = new JsonSerializerSettings();
-				val.set_Formatting((Formatting)1);
-				val.set_NullValueHandling((NullValueHandling)1);
-				return val;
-			});
+				try
+				{
+					typeof(TacOIntegration).GetProperty("TacOIsRunning").GetSetMethod(nonPublic: true)?.Invoke(GameService.GameIntegration.get_TacO(), new object[1] { true });
+				}
+				catch
+				{
+				}
+			}
 		}
 
 		protected override async Task LoadAsync()
@@ -154,7 +155,6 @@ namespace Kenedia.Modules.Core.Models
 
 		protected virtual void ReloadKey_Activated(object sender, EventArgs e)
 		{
-			LoadGUI();
 		}
 	}
 }

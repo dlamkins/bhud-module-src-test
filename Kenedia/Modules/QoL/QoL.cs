@@ -192,6 +192,7 @@ namespace Kenedia.Modules.QoL
 
 		protected override void ReloadKey_Activated(object sender, EventArgs e)
 		{
+			BaseModule<QoL, StandardWindow, Settings, PathCollection>.Logger.Debug("ReloadKey_Activated: " + ((Module)this).get_Name());
 			base.ReloadKey_Activated(sender, e);
 			foreach (SubModule value in SubModules.Values)
 			{

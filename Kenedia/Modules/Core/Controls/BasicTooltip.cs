@@ -159,6 +159,12 @@ namespace Kenedia.Modules.Core.Controls
 			}
 		}
 
+		protected override void DisposeControl()
+		{
+			((Control)this).DisposeControl();
+			Background = null;
+		}
+
 		public BasicTooltip()
 			: this()
 		{
