@@ -111,6 +111,10 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		public SettingEntry<float> TopTimelineTimeOpacity { get; set; }
 
+		public SettingEntry<bool> TopTimelineLinesOverWholeHeight { get; set; }
+
+		public SettingEntry<bool> TopTimelineLinesInBackground { get; set; }
+
 		public void CopyTo(EventAreaConfiguration other)
 		{
 			CopyTo((DrawerConfiguration)other);
@@ -165,6 +169,8 @@ namespace Estreya.BlishHUD.EventTable.Models
 			other.TopTimelineBackgroundOpacity.set_Value(TopTimelineBackgroundOpacity.get_Value());
 			other.TopTimelineLineOpacity.set_Value(TopTimelineLineOpacity.get_Value());
 			other.TopTimelineTimeOpacity.set_Value(TopTimelineTimeOpacity.get_Value());
+			other.TopTimelineLinesOverWholeHeight.set_Value(TopTimelineLinesOverWholeHeight.get_Value());
+			other.TopTimelineLinesInBackground.set_Value(TopTimelineLinesInBackground.get_Value());
 		}
 	}
 }

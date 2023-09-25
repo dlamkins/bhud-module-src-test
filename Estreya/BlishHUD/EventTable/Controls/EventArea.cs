@@ -1058,8 +1058,15 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		protected override void DoPaint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
+			if (Configuration.TopTimelineLinesInBackground.get_Value())
+			{
+				DrawTopTimeLine(spriteBatch);
+			}
 			UpdateEventsOnScreen(spriteBatch);
-			DrawTopTimeLine(spriteBatch);
+			if (!Configuration.TopTimelineLinesInBackground.get_Value())
+			{
+				DrawTopTimeLine(spriteBatch);
+			}
 			DrawTimeLine(spriteBatch);
 		}
 
@@ -1071,46 +1078,55 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0168: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0208: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0227: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0167: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0183: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0188: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0241: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025b: Unknown result type (might be due to invalid IL or missing references)
 			_drawYOffset = 0;
-			if (Configuration.ShowTopTimeline.get_Value())
+			if (!Configuration.ShowTopTimeline.get_Value())
 			{
-				float width = GetWidth();
-				(DateTime, DateTime, DateTime) times = GetTimes();
-				RectangleF rect = default(RectangleF);
-				((RectangleF)(ref rect))._002Ector((float)DrawXOffset, 0f, width, 30f);
-				Color backgroundColor = ((Configuration.TopTimelineBackgroundColor.get_Value().get_Id() == 1) ? Color.get_Transparent() : ColorExtensions.ToXnaColor(Configuration.TopTimelineBackgroundColor.get_Value().get_Cloth())) * Configuration.TopTimelineBackgroundOpacity.get_Value();
-				spriteBatch.DrawRectangle(Textures.get_Pixel(), rect, backgroundColor);
-				int timeInterval = 15;
-				int timeSteps = (int)Math.Floor((times.Item3 - times.Item2).TotalMinutes) / timeInterval;
-				float timeStepLineHeight = rect.Height;
-				Color lineColor = ((Configuration.TopTimelineLineColor.get_Value().get_Id() == 1) ? Color.get_Black() : ColorExtensions.ToXnaColor(Configuration.TopTimelineLineColor.get_Value().get_Cloth())) * Configuration.TopTimelineLineOpacity.get_Value();
-				Color timeColor = ((Configuration.TopTimelineTimeColor.get_Value().get_Id() == 1) ? Color.get_Red() : ColorExtensions.ToXnaColor(Configuration.TopTimelineTimeColor.get_Value().get_Cloth())) * Configuration.TopTimelineTimeOpacity.get_Value();
-				RectangleF timeStepRect = default(RectangleF);
-				for (int i = 0; i < timeSteps; i++)
-				{
-					float x = (float)PixelPerMinute * (float)timeInterval * (float)i + (float)DrawXOffset;
-					((RectangleF)(ref timeStepRect))._002Ector(x, 0f, 2f, timeStepLineHeight);
-					DateTime time = times.Item2.AddMinutes(timeInterval * i);
-					spriteBatch.DrawLine(Textures.get_Pixel(), timeStepRect, lineColor);
-					spriteBatch.DrawString(time.ToString(Configuration.TopTimelineTimeFormatString.get_Value()), GetFont(), new RectangleF(timeStepRect.X + 5f, 5f, (float)PixelPerMinute * (float)timeInterval, 20f), timeColor, wrap: false, (HorizontalAlignment)0, (VerticalAlignment)1);
-				}
-				_drawYOffset = (int)rect.Height;
+				return;
 			}
+			float width = GetWidth();
+			(DateTime, DateTime, DateTime) times = GetTimes();
+			RectangleF rect = default(RectangleF);
+			((RectangleF)(ref rect))._002Ector((float)DrawXOffset, 0f, width, 30f);
+			Color backgroundColor = ((Configuration.TopTimelineBackgroundColor.get_Value().get_Id() == 1) ? Color.get_Transparent() : ColorExtensions.ToXnaColor(Configuration.TopTimelineBackgroundColor.get_Value().get_Cloth())) * Configuration.TopTimelineBackgroundOpacity.get_Value();
+			spriteBatch.DrawRectangle(Textures.get_Pixel(), rect, backgroundColor);
+			int timeInterval = 15;
+			int timeSteps = (int)Math.Floor((times.Item3 - times.Item2).TotalMinutes) / timeInterval;
+			float timeStepLineHeight = (Configuration.TopTimelineLinesOverWholeHeight.get_Value() ? ((float)base.Height) : rect.Height);
+			Color lineColor = ((Configuration.TopTimelineLineColor.get_Value().get_Id() == 1) ? Color.get_Black() : ColorExtensions.ToXnaColor(Configuration.TopTimelineLineColor.get_Value().get_Cloth())) * Configuration.TopTimelineLineOpacity.get_Value();
+			Color timeColor = ((Configuration.TopTimelineTimeColor.get_Value().get_Id() == 1) ? Color.get_Red() : ColorExtensions.ToXnaColor(Configuration.TopTimelineTimeColor.get_Value().get_Cloth())) * Configuration.TopTimelineTimeOpacity.get_Value();
+			RectangleF timeStepRect = default(RectangleF);
+			for (int i = 0; i < timeSteps; i++)
+			{
+				float x = (float)PixelPerMinute * (float)timeInterval * (float)i + (float)DrawXOffset;
+				((RectangleF)(ref timeStepRect))._002Ector(x, 0f, 2f, timeStepLineHeight);
+				DateTime time = times.Item2.AddMinutes(timeInterval * i).ToLocalTime();
+				spriteBatch.DrawLine(Textures.get_Pixel(), timeStepRect, lineColor);
+				string formattedString = "FORMAT";
+				try
+				{
+					formattedString = time.ToString(Configuration.TopTimelineTimeFormatString.get_Value());
+				}
+				catch
+				{
+				}
+				spriteBatch.DrawString(formattedString, GetFont(), new RectangleF(timeStepRect.X + 5f, 5f, (float)PixelPerMinute * (float)timeInterval, 20f), timeColor, wrap: false, (HorizontalAlignment)0, (VerticalAlignment)1);
+			}
+			_drawYOffset = (int)rect.Height;
 		}
 
 		private void DrawTimeLine(SpriteBatch spriteBatch)
@@ -1120,7 +1136,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 			float middleLineX = (float)GetWidth() * GetTimeSpanRatio() + (float)DrawXOffset;
 			float width = 2f;
-			SpriteBatchUtil.DrawLine(spriteBatch, Textures.get_Pixel(), new RectangleF(middleLineX - width / 2f, 0f, width, (float)base.Height), Color.get_LightGray() * Configuration.TimeLineOpacity.get_Value());
+			SpriteBatchExtensions.DrawLine(spriteBatch, Textures.get_Pixel(), new RectangleF(middleLineX - width / 2f, 0f, width, (float)base.Height), Color.get_LightGray() * Configuration.TimeLineOpacity.get_Value());
 		}
 
 		private void ClearEventControls()

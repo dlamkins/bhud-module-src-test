@@ -12,9 +12,9 @@ using MonoGame.Extended.BitmapFonts;
 
 namespace Estreya.BlishHUD.Shared.Utils
 {
-	public static class SpriteBatchUtil
+	public static class SpriteBatchExtensions
 	{
-		private static readonly Logger Logger = Logger.GetLogger(typeof(SpriteBatchUtil));
+		private static readonly Logger Logger = Logger.GetLogger(typeof(SpriteBatchExtensions));
 
 		public static void Draw(this SpriteBatch spriteBatch, Texture2D texture, RectangleF destinationRectangle)
 		{

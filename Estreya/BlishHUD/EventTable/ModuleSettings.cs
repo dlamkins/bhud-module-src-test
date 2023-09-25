@@ -247,6 +247,8 @@ namespace Estreya.BlishHUD.EventTable
 			SettingEntry<float> topTimelineBackgroundOpacity = base.DrawerSettings.DefineSetting<float>(name + "-topTimelineBackgroundOpacity", 1f, (Func<string>)(() => "Top Timeline Background Opacity"), (Func<string>)(() => "Defines the background color opacity of the top timeline."));
 			SettingEntry<float> topTimelineLineOpacity = base.DrawerSettings.DefineSetting<float>(name + "-topTimelineLineOpacity", 1f, (Func<string>)(() => "Top Timeline Line Opacity"), (Func<string>)(() => "Defines the line color opacity of the top timeline."));
 			SettingEntry<float> topTimelineTimeOpacity = base.DrawerSettings.DefineSetting<float>(name + "-topTimelineTimeOpacity", 1f, (Func<string>)(() => "Top Timeline Time Opacity"), (Func<string>)(() => "Defines the time color opacity of the top timeline."));
+			SettingEntry<bool> topTimelineLinesOverWholeHeight = base.DrawerSettings.DefineSetting<bool>(name + "-topTimelineLinesOverWholeHeight", false, (Func<string>)(() => "Top Timeline Lines Over Whole Height"), (Func<string>)(() => "Defines if the top timeline lines should cover the whole event area height."));
+			SettingEntry<bool> topTimelineLinesInBackground = base.DrawerSettings.DefineSetting<bool>(name + "-topTimelineLinesInBackground", true, (Func<string>)(() => "Top Timeline Lines in Background"), (Func<string>)(() => "Defines if the top timeline lines should be in the background or foreground."));
 			return new EventAreaConfiguration
 			{
 				Name = drawer.Name,
@@ -312,7 +314,9 @@ namespace Estreya.BlishHUD.EventTable
 				TopTimelineTimeColor = topTimelineTimeColor,
 				TopTimelineBackgroundOpacity = topTimelineBackgroundOpacity,
 				TopTimelineLineOpacity = topTimelineLineOpacity,
-				TopTimelineTimeOpacity = topTimelineTimeOpacity
+				TopTimelineTimeOpacity = topTimelineTimeOpacity,
+				TopTimelineLinesOverWholeHeight = topTimelineLinesOverWholeHeight,
+				TopTimelineLinesInBackground = topTimelineLinesInBackground
 			};
 		}
 
@@ -384,6 +388,8 @@ namespace Estreya.BlishHUD.EventTable
 			base.DrawerSettings.UndefineSetting(name + "-topTimelineBackgroundOpacity");
 			base.DrawerSettings.UndefineSetting(name + "-topTimelineLineOpacity");
 			base.DrawerSettings.UndefineSetting(name + "-topTimelineTimeOpacity");
+			base.DrawerSettings.UndefineSetting(name + "-topTimelineLinesOverWholeHeight");
+			base.DrawerSettings.UndefineSetting(name + "-topTimelineLinesInBackground");
 		}
 
 		public override void UpdateLocalization(TranslationService translationService)

@@ -111,6 +111,7 @@ namespace Estreya.BlishHUD.EventTable
 			Stopwatch sw = Stopwatch.StartNew();
 			await base.LoadAsync();
 			base.BlishHUDAPIService.NewLogin += BlishHUDAPIService_NewLogin;
+			base.BlishHUDAPIService.RefreshedLogin += BlishHUDAPIService_RefreshedLogin;
 			base.BlishHUDAPIService.LoggedOut += BlishHUDAPIService_LoggedOut;
 			MapUtil = new MapUtil(base.ModuleSettings.MapKeybinding.get_Value(), base.Gw2ApiManager);
 			DynamicEventHandler = new DynamicEventHandler(MapUtil, DynamicEventService, base.Gw2ApiManager, base.ModuleSettings);
@@ -525,6 +526,11 @@ namespace Estreya.BlishHUD.EventTable
 		}
 
 		private void BlishHUDAPIService_NewLogin(object sender, EventArgs e)
+		{
+			_lastEventUpdate.Value = _updateEventsInterval.TotalMilliseconds;
+		}
+
+		private void BlishHUDAPIService_RefreshedLogin(object sender, EventArgs e)
 		{
 			_lastEventUpdate.Value = _updateEventsInterval.TotalMilliseconds;
 		}

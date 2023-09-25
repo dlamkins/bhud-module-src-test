@@ -478,6 +478,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.ShowCategoryNames);
 			RenderEmptyLine((Panel)(object)groupPanel);
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.ShowTopTimeline);
+			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.TopTimelineLinesOverWholeHeight);
+			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.TopTimelineLinesInBackground);
 			RenderEmptyLine((Panel)(object)groupPanel, 20);
 		}
 
