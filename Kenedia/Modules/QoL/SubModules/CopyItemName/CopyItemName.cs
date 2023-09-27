@@ -198,13 +198,15 @@ namespace Kenedia.Modules.QoL.SubModules.CopyItemName
 			_ = 6;
 			try
 			{
+				KeyboardLayoutType layout = BaseModule<QoL, StandardWindow, Kenedia.Modules.QoL.Services.Settings, PathCollection>.ModuleInstance.Settings.KeyboardLayout.get_Value();
 				await Task.Delay(50);
 				_modifierToChat.get_Value().get_PrimaryKey();
 				Keyboard.Release((VirtualKeyShort)160, true);
 				Keyboard.Release((VirtualKeyShort)161, true);
 				await Task.Delay(5);
 				Keyboard.Press((VirtualKeyShort)162, true);
-				Keyboard.Stroke((VirtualKeyShort)65, true);
+				VirtualKeyShort val = ((layout != KeyboardLayoutType.AZERTY) ? ((VirtualKeyShort)65) : ((VirtualKeyShort)81));
+				Keyboard.Stroke(val, true);
 				await Task.Delay(25);
 				Keyboard.Stroke((VirtualKeyShort)67, true);
 				await Task.Delay(50);

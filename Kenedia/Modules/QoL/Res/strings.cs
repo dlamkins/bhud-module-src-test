@@ -76,6 +76,10 @@ namespace Kenedia.Modules.QoL.Res
 
 		internal static string HotkeyEntry_Name => ResourceManager.GetString("HotkeyEntry_Name", resourceCulture);
 
+		internal static string KeyboardLayout_Name => ResourceManager.GetString("KeyboardLayout_Name", resourceCulture);
+
+		internal static string KeyboardLayout_Tooltip => ResourceManager.GetString("KeyboardLayout_Tooltip", resourceCulture);
+
 		internal static string ManualZoom_Name => ResourceManager.GetString("ManualZoom_Name", resourceCulture);
 
 		internal static string ManualZoom_Tooltip => ResourceManager.GetString("ManualZoom_Tooltip", resourceCulture);
@@ -100,6 +104,10 @@ namespace Kenedia.Modules.QoL.Res
 
 		internal static string ShowDailyReset_Tooltip => ResourceManager.GetString("ShowDailyReset_Tooltip", resourceCulture);
 
+		internal static string ShowIcons_Name => ResourceManager.GetString("ShowIcons_Name", resourceCulture);
+
+		internal static string ShowIcons_Tooltip => ResourceManager.GetString("ShowIcons_Tooltip", resourceCulture);
+
 		internal static string ShowInHotbar_Description => ResourceManager.GetString("ShowInHotbar_Description", resourceCulture);
 
 		internal static string ShowInHotbar_Name => ResourceManager.GetString("ShowInHotbar_Name", resourceCulture);
@@ -107,6 +115,10 @@ namespace Kenedia.Modules.QoL.Res
 		internal static string ShowServerTime_Name => ResourceManager.GetString("ShowServerTime_Name", resourceCulture);
 
 		internal static string ShowServerTime_Tooltip => ResourceManager.GetString("ShowServerTime_Tooltip", resourceCulture);
+
+		internal static string ShowTooltips_Name => ResourceManager.GetString("ShowTooltips_Name", resourceCulture);
+
+		internal static string ShowTooltips_Tooltip => ResourceManager.GetString("ShowTooltips_Tooltip", resourceCulture);
 
 		internal static string ShowWeeklyReset_Name => ResourceManager.GetString("ShowWeeklyReset_Name", resourceCulture);
 

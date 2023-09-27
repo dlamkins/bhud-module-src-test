@@ -67,6 +67,8 @@ namespace Kenedia.Modules.QoL.Views
 			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b6: Unknown result type (might be due to invalid IL or missing references)
 			Panel panel = new Panel();
 			((Control)panel).set_Parent((Container)(object)_contentPanel);
 			((Control)panel).set_Width(((Container)this).get_ContentRegion().Width - 20);
@@ -100,7 +102,7 @@ namespace Kenedia.Modules.QoL.Views
 			((Dropdown)dropdown).set_SelectedItem($"{_settings.HotbarExpandDirection.get_Value()}".SplitStringOnUppercase());
 			dropdown.ValueChangedAction = delegate(string b)
 			{
-				_settings.HotbarExpandDirection.set_Value(Enum.TryParse<ExpandType>(b.RemoveSpaces(), out var result2) ? result2 : _settings.HotbarExpandDirection.get_Value());
+				_settings.HotbarExpandDirection.set_Value(Enum.TryParse<ExpandType>(b.RemoveSpaces(), out var result3) ? result3 : _settings.HotbarExpandDirection.get_Value());
 			};
 			UI.WrapWithLabel(localizedLabelContent, localizedTooltip, (Container)(object)contentFlowPanel, width, (Control)(object)dropdown);
 			Func<string> localizedLabelContent2 = () => strings.HotbarButtonSorting_Name;
@@ -117,9 +119,27 @@ namespace Kenedia.Modules.QoL.Views
 			((Dropdown)dropdown2).set_SelectedItem($"{_settings.HotbarButtonSorting.get_Value()}".SplitStringOnUppercase());
 			dropdown2.ValueChangedAction = delegate(string b)
 			{
-				_settings.HotbarButtonSorting.set_Value(Enum.TryParse<SortType>(b.RemoveSpaces(), out var result) ? result : _settings.HotbarButtonSorting.get_Value());
+				_settings.HotbarButtonSorting.set_Value(Enum.TryParse<SortType>(b.RemoveSpaces(), out var result2) ? result2 : _settings.HotbarButtonSorting.get_Value());
 			};
 			UI.WrapWithLabel(localizedLabelContent2, localizedTooltip2, (Container)(object)contentFlowPanel, width2, (Control)(object)dropdown2);
+			Func<string> localizedLabelContent3 = () => strings.KeyboardLayout_Name;
+			Func<string> localizedTooltip3 = () => strings.KeyboardLayout_Tooltip;
+			int width3 = ((Container)this).get_ContentRegion().Width - 20 - 16;
+			Dropdown dropdown3 = new Dropdown();
+			((Control)dropdown3).set_Location(new Point(250, 0));
+			((Control)dropdown3).set_Parent((Container)(object)contentFlowPanel);
+			dropdown3.SetLocalizedItems = () => new List<string>
+			{
+				$"{KeyboardLayoutType.QWETY}".SplitStringOnUppercase(),
+				$"{KeyboardLayoutType.AZERTY}".SplitStringOnUppercase(),
+				$"{KeyboardLayoutType.QWERTZ}".SplitStringOnUppercase()
+			};
+			((Dropdown)dropdown3).set_SelectedItem($"{_settings.KeyboardLayout.get_Value()}".SplitStringOnUppercase());
+			dropdown3.ValueChangedAction = delegate(string b)
+			{
+				_settings.KeyboardLayout.set_Value(Enum.TryParse<KeyboardLayoutType>(b.RemoveSpaces(), out var result) ? result : _settings.KeyboardLayout.get_Value());
+			};
+			UI.WrapWithLabel(localizedLabelContent3, localizedTooltip3, (Container)(object)contentFlowPanel, width3, (Control)(object)dropdown3);
 		}
 
 		private void CreateClientSettings()

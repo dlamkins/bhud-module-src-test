@@ -16,6 +16,8 @@ namespace Kenedia.Modules.QoL.Services
 
 		public SettingEntry<SortType> HotbarButtonSorting { get; }
 
+		public SettingEntry<KeyboardLayoutType> KeyboardLayout { get; }
+
 		public SettingEntry<Point> HotbarPosition { get; }
 
 		public Settings(SettingCollection settings)
@@ -26,6 +28,7 @@ namespace Kenedia.Modules.QoL.Services
 			HotbarPosition = _internal_settings.DefineSetting<Point>("HotbarPosition", new Point(0, 32), (Func<string>)null, (Func<string>)null);
 			HotbarExpandDirection = _settings.DefineSetting<ExpandType>("HotbarExpandDirection", ExpandType.LeftToRight, (Func<string>)null, (Func<string>)null);
 			HotbarButtonSorting = _settings.DefineSetting<SortType>("HotbarButtonSorting", SortType.ActivesFirst, (Func<string>)null, (Func<string>)null);
+			KeyboardLayout = _settings.DefineSetting<KeyboardLayoutType>("KeyboardLayout", KeyboardLayoutType.QWERTZ, (Func<string>)null, (Func<string>)null);
 		}
 	}
 }

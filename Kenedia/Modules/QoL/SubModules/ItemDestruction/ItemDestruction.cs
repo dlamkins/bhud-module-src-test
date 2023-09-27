@@ -297,12 +297,14 @@ namespace Kenedia.Modules.QoL.SubModules.ItemDestruction
 			string text = string.Empty;
 			try
 			{
+				KeyboardLayoutType layout = BaseModule<QoL, StandardWindow, Kenedia.Modules.QoL.Services.Settings, PathCollection>.ModuleInstance.Settings.KeyboardLayout.get_Value();
 				_lastAction = Common.Now;
 				await Task.Delay(50);
 				Keyboard.Release((VirtualKeyShort)160, true);
 				await Task.Delay(5);
 				Keyboard.Press((VirtualKeyShort)162, true);
-				Keyboard.Stroke((VirtualKeyShort)65, true);
+				VirtualKeyShort val = ((layout != KeyboardLayoutType.AZERTY) ? ((VirtualKeyShort)65) : ((VirtualKeyShort)81));
+				Keyboard.Stroke(val, true);
 				await Task.Delay(25);
 				Keyboard.Stroke((VirtualKeyShort)67, true);
 				await Task.Delay(50);

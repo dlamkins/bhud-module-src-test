@@ -218,6 +218,8 @@ namespace Kenedia.Modules.Core.Controls
 
 		public bool CaptureInput { get; set; }
 
+		public CaptureType? Capture { get; set; }
+
 		public Action OnCollapse { get; set; }
 
 		public Action OnExpand { get; set; }
@@ -662,12 +664,18 @@ namespace Kenedia.Modules.Core.Controls
 
 		protected override CaptureType CapturesInput()
 		{
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			if (!CaptureInput)
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			CaptureType? capture = Capture;
+			if (!capture.HasValue)
 			{
-				return (CaptureType)0;
+				if (!CaptureInput)
+				{
+					return (CaptureType)0;
+				}
+				return ((Container)this).CapturesInput();
 			}
-			return ((Container)this).CapturesInput();
+			return capture.GetValueOrDefault();
 		}
 	}
 }

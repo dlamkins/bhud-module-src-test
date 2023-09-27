@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
 using Gw2Sharp.Models;
 using Kenedia.Modules.Core.Controls;
+using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Models;
 using Kenedia.Modules.Core.Structs;
 using Kenedia.Modules.Core.Utility;
@@ -24,11 +26,17 @@ namespace Kenedia.Modules.QoL.SubModules.GameResets
 
 		private readonly IconLabel _weeklyReset;
 
+		private SettingEntry<bool> _showTooltips;
+
 		private SettingEntry<bool> _showServerTime;
 
 		private SettingEntry<bool> _showDailyReset;
 
 		private SettingEntry<bool> _showWeeklyReset;
+
+		private SettingEntry<bool> _showIcons;
+
+		private SettingEntry<DateDisplayType> _dateDisplay;
 
 		public override SubModuleType SubModuleType => SubModuleType.GameResets;
 
@@ -39,10 +47,10 @@ namespace Kenedia.Modules.QoL.SubModules.GameResets
 			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
 			SubModuleUI uI_Elements = UI_Elements;
 			FlowPanel flowPanel = new FlowPanel();
 			((Control)flowPanel).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
@@ -54,7 +62,6 @@ namespace Kenedia.Modules.QoL.SubModules.GameResets
 			((FlowPanel)flowPanel).set_ControlPadding(new Vector2(0f, 2f));
 			Rectangle localBounds = ((Control)GameService.Graphics.get_SpriteScreen()).get_LocalBounds();
 			((Control)flowPanel).set_Location(((Rectangle)(ref localBounds)).get_Center());
-			((Control)flowPanel).set_Enabled(false);
 			flowPanel.CaptureInput = false;
 			FlowPanel item = flowPanel;
 			_container = flowPanel;
@@ -68,8 +75,6 @@ namespace Kenedia.Modules.QoL.SubModules.GameResets
 			iconLabel.Text = "0 days 00:00:00";
 			((Control)iconLabel).set_BasicTooltipText("Weekly Reset");
 			iconLabel.AutoSize = true;
-			((Control)iconLabel).set_Enabled(false);
-			iconLabel.CaptureInput = false;
 			_weeklyReset = iconLabel;
 			IconLabel iconLabel2 = new IconLabel();
 			((Control)iconLabel2).set_Parent((Container)(object)_container);
@@ -80,8 +85,6 @@ namespace Kenedia.Modules.QoL.SubModules.GameResets
 			iconLabel2.Text = "00:00:00";
 			((Control)iconLabel2).set_BasicTooltipText("Server Reset");
 			iconLabel2.AutoSize = true;
-			((Control)iconLabel2).set_Enabled(false);
-			iconLabel2.CaptureInput = false;
 			_serverReset = iconLabel2;
 			IconLabel iconLabel3 = new IconLabel();
 			((Control)iconLabel3).set_Parent((Container)(object)_container);
@@ -93,8 +96,7 @@ namespace Kenedia.Modules.QoL.SubModules.GameResets
 			iconLabel3.Text = "00:00:00";
 			((Control)iconLabel3).set_BasicTooltipText("Server Time");
 			iconLabel3.AutoSize = true;
-			((Control)iconLabel3).set_Enabled(false);
-			iconLabel3.CaptureInput = false;
+			iconLabel3.ShowIcon = (_serverReset.ShowIcon = (_weeklyReset.ShowIcon = _showIcons.get_Value()));
 			_serverTime = iconLabel3;
 			SetPositions();
 		}
@@ -129,12 +131,29 @@ namespace Kenedia.Modules.QoL.SubModules.GameResets
 		protected override void DefineSettings(SettingCollection settings)
 		{
 			base.DefineSettings(settings);
+			_showTooltips = settings.DefineSetting<bool>("_showTooltips", true, (Func<string>)null, (Func<string>)null);
 			_showServerTime = settings.DefineSetting<bool>("_showServerTime", true, (Func<string>)null, (Func<string>)null);
 			_showDailyReset = settings.DefineSetting<bool>("_showDailyReset", true, (Func<string>)null, (Func<string>)null);
 			_showWeeklyReset = settings.DefineSetting<bool>("_showWeeklyReset", true, (Func<string>)null, (Func<string>)null);
+			_showIcons = settings.DefineSetting<bool>("_showIcons", true, (Func<string>)null, (Func<string>)null);
+			_dateDisplay = settings.DefineSetting<DateDisplayType>("_dateDisplay", DateDisplayType.Long, (Func<string>)null, (Func<string>)null);
 			_showServerTime.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ChangeServerTimeVisibility);
 			_showDailyReset.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ChangeServerResetVisibility);
 			_showWeeklyReset.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ChangeWeeklyResetVisibility);
+			_showIcons.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ChangeShowIcons);
+			_dateDisplay.add_SettingChanged((EventHandler<ValueChangedEventArgs<DateDisplayType>>)DateDisplay_SettingChanged);
+		}
+
+		private void DateDisplay_SettingChanged(object sender, ValueChangedEventArgs<DateDisplayType> e)
+		{
+			SetTexts();
+		}
+
+		private void ChangeShowIcons(object sender, ValueChangedEventArgs<bool> e)
+		{
+			_serverTime.ShowIcon = e.get_NewValue();
+			_serverReset.ShowIcon = e.get_NewValue();
+			_weeklyReset.ShowIcon = e.get_NewValue();
 		}
 
 		private void ChangeServerTimeVisibility(object sender, ValueChangedEventArgs<bool> e)
@@ -191,9 +210,30 @@ namespace Kenedia.Modules.QoL.SubModules.GameResets
 
 		public override void Update(GameTime gameTime)
 		{
+			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
 			if (base.Enabled)
 			{
 				((Control)_container).set_Visible(base.Enabled && GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && !GameService.Gw2Mumble.get_UI().get_IsMapOpen());
+				IconLabel serverTime = _serverTime;
+				IconLabel serverReset = _serverReset;
+				IconLabel weeklyReset = _weeklyReset;
+				FlowPanel container = _container;
+				int num;
+				if (!_showTooltips.get_Value())
+				{
+					num = 0;
+				}
+				else
+				{
+					Rectangle absoluteBounds = ((Control)_container).get_AbsoluteBounds();
+					num = (((Rectangle)(ref absoluteBounds)).Contains(GameService.Input.get_Mouse().get_Position()) ? 22 : 0);
+				}
+				CaptureType? val = (CaptureType)num;
+				container.Capture = val;
+				CaptureType? val3 = (weeklyReset.Capture = val);
+				CaptureType? val6 = (serverTime.Capture = (serverReset.Capture = val3));
 				SetTexts();
 				SetPositions();
 			}
@@ -233,7 +273,7 @@ namespace Kenedia.Modules.QoL.SubModules.GameResets
 			DateTime w = new DateTime(nextWeek.Year, nextWeek.Month, nextWeek.Day, 7, 30, 0);
 			_serverTime.Text = $"{now.Hour}:{now.Minute:00}";
 			TimeSpan weeklyReset = w.Subtract(now);
-			_weeklyReset.Text = string.Format("{1:0} {0} {2:00}:{3:00}:{4:00}", strings.Days, weeklyReset.Days, weeklyReset.Hours, weeklyReset.Minutes, weeklyReset.Seconds);
+			_weeklyReset.Text = ((_dateDisplay.get_Value() == DateDisplayType.Long) ? string.Format("{1:0} {0} {2:00}:{3:00}:{4:00}", strings.Days, weeklyReset.Days, weeklyReset.Hours, weeklyReset.Minutes, weeklyReset.Seconds) : ((_dateDisplay.get_Value() == DateDisplayType.ShortDays) ? string.Format("{1:0}{0} {2:00}:{3:00}:{4:00}", strings.Days.Substring(0, 1), weeklyReset.Days, weeklyReset.Hours, weeklyReset.Minutes, weeklyReset.Seconds) : ((weeklyReset.Days > 0) ? string.Format("{1:0} {0}", strings.Days, weeklyReset.Days) : $"{weeklyReset.Hours:00}:{weeklyReset.Minutes:00}:{weeklyReset.Seconds:00}")));
 			TimeSpan serverReset = t.Subtract(now);
 			_serverReset.Text = $"{serverReset.Hours:00}:{serverReset.Minutes:00}:{serverReset.Seconds:00}";
 		}
@@ -241,6 +281,7 @@ namespace Kenedia.Modules.QoL.SubModules.GameResets
 		public override void CreateSettingsPanel(FlowPanel flowPanel, int width)
 		{
 			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ed: Unknown result type (might be due to invalid IL or missing references)
 			Panel panel = new Panel();
 			((Control)panel).set_Parent((Container)(object)flowPanel);
 			((Control)panel).set_Width(width);
@@ -326,6 +367,46 @@ namespace Kenedia.Modules.QoL.SubModules.GameResets
 				_showWeeklyReset.set_Value(b);
 			};
 			UI.WrapWithLabel(localizedLabelContent4, localizedTooltip4, (Container)(object)contentFlowPanel, width5, (Control)(object)checkbox4);
+			Func<string> localizedLabelContent5 = () => strings.ShowIcons_Name;
+			Func<string> localizedTooltip5 = () => strings.ShowIcons_Tooltip;
+			int width6 = width - 16;
+			Checkbox checkbox5 = new Checkbox();
+			((Control)checkbox5).set_Height(20);
+			((Checkbox)checkbox5).set_Checked(_showIcons.get_Value());
+			checkbox5.CheckedChangedAction = delegate(bool b)
+			{
+				_showIcons.set_Value(b);
+			};
+			UI.WrapWithLabel(localizedLabelContent5, localizedTooltip5, (Container)(object)contentFlowPanel, width6, (Control)(object)checkbox5);
+			Func<string> localizedLabelContent6 = () => strings.ShowTooltips_Name;
+			Func<string> localizedTooltip6 = () => strings.ShowTooltips_Tooltip;
+			int width7 = width - 16;
+			Checkbox checkbox6 = new Checkbox();
+			((Control)checkbox6).set_Height(20);
+			((Checkbox)checkbox6).set_Checked(_showTooltips.get_Value());
+			checkbox6.CheckedChangedAction = delegate(bool b)
+			{
+				_showTooltips.set_Value(b);
+			};
+			UI.WrapWithLabel(localizedLabelContent6, localizedTooltip6, (Container)(object)contentFlowPanel, width7, (Control)(object)checkbox6);
+			Func<string> localizedLabelContent7 = () => strings.KeyboardLayout_Name;
+			Func<string> localizedTooltip7 = () => strings.KeyboardLayout_Tooltip;
+			int width8 = width - 16;
+			Dropdown dropdown = new Dropdown();
+			((Control)dropdown).set_Location(new Point(250, 0));
+			((Control)dropdown).set_Parent((Container)(object)contentFlowPanel);
+			dropdown.SetLocalizedItems = () => new List<string>
+			{
+				$"{DateDisplayType.Short}".SplitStringOnUppercase(),
+				$"{DateDisplayType.ShortDays}".SplitStringOnUppercase(),
+				$"{DateDisplayType.Long}".SplitStringOnUppercase()
+			};
+			((Dropdown)dropdown).set_SelectedItem($"{_dateDisplay.get_Value()}".SplitStringOnUppercase());
+			dropdown.ValueChangedAction = delegate(string b)
+			{
+				_dateDisplay.set_Value(Enum.TryParse<DateDisplayType>(b.RemoveSpaces(), out var result) ? result : _dateDisplay.get_Value());
+			};
+			UI.WrapWithLabel(localizedLabelContent7, localizedTooltip7, (Container)(object)contentFlowPanel, width8, (Control)(object)dropdown);
 		}
 	}
 }
