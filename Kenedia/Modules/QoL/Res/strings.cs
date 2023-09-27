@@ -50,6 +50,10 @@ namespace Kenedia.Modules.QoL.Res
 
 		internal static string CrosshairSize_Tooltip => ResourceManager.GetString("CrosshairSize_Tooltip", resourceCulture);
 
+		internal static string DateFormat_Name => ResourceManager.GetString("DateFormat_Name", resourceCulture);
+
+		internal static string DateFormat_Tooltip => ResourceManager.GetString("DateFormat_Tooltip", resourceCulture);
+
 		internal static string Days => ResourceManager.GetString("Days", resourceCulture);
 
 		internal static string DisableOnCopy_Name => ResourceManager.GetString("DisableOnCopy_Name", resourceCulture);

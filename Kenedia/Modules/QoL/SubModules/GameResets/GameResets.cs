@@ -389,8 +389,8 @@ namespace Kenedia.Modules.QoL.SubModules.GameResets
 				_showTooltips.set_Value(b);
 			};
 			UI.WrapWithLabel(localizedLabelContent6, localizedTooltip6, (Container)(object)contentFlowPanel, width7, (Control)(object)checkbox6);
-			Func<string> localizedLabelContent7 = () => strings.KeyboardLayout_Name;
-			Func<string> localizedTooltip7 = () => strings.KeyboardLayout_Tooltip;
+			Func<string> localizedLabelContent7 = () => strings.DateFormat_Name;
+			Func<string> localizedTooltip7 = () => strings.DateFormat_Tooltip;
 			int width8 = width - 16;
 			Dropdown dropdown = new Dropdown();
 			((Control)dropdown).set_Location(new Point(250, 0));
