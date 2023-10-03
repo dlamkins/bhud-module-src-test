@@ -46,6 +46,10 @@ namespace Kenedia.Modules.QoL.Res
 
 		internal static string AllowManualZoom_Tooltip => ResourceManager.GetString("AllowManualZoom_Tooltip", resourceCulture);
 
+		internal static string AutoPosition_Name => ResourceManager.GetString("AutoPosition_Name", resourceCulture);
+
+		internal static string AutoPosition_Tooltip => ResourceManager.GetString("AutoPosition_Tooltip", resourceCulture);
+
 		internal static string CrosshairSize_Name => ResourceManager.GetString("CrosshairSize_Name", resourceCulture);
 
 		internal static string CrosshairSize_Tooltip => ResourceManager.GetString("CrosshairSize_Tooltip", resourceCulture);
@@ -67,6 +71,10 @@ namespace Kenedia.Modules.QoL.Res
 		internal static string DisableOnSearch_Name => ResourceManager.GetString("DisableOnSearch_Name", resourceCulture);
 
 		internal static string DisableOnSearch_Tooltip => ResourceManager.GetString("DisableOnSearch_Tooltip", resourceCulture);
+
+		internal static string EditPosition_Name => ResourceManager.GetString("EditPosition_Name", resourceCulture);
+
+		internal static string EditPosition_Tooltip => ResourceManager.GetString("EditPosition_Tooltip", resourceCulture);
 
 		internal static string HotbarButtonSorting_Name => ResourceManager.GetString("HotbarButtonSorting_Name", resourceCulture);
 

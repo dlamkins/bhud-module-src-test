@@ -130,7 +130,7 @@ namespace Kenedia.Modules.QoL.Views
 			((Control)dropdown3).set_Parent((Container)(object)contentFlowPanel);
 			dropdown3.SetLocalizedItems = () => new List<string>
 			{
-				$"{KeyboardLayoutType.QWETY}".SplitStringOnUppercase(),
+				$"{KeyboardLayoutType.QWERTY}".SplitStringOnUppercase(),
 				$"{KeyboardLayoutType.AZERTY}".SplitStringOnUppercase(),
 				$"{KeyboardLayoutType.QWERTZ}".SplitStringOnUppercase()
 			};

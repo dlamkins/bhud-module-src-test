@@ -6,11 +6,13 @@ using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Gw2Sharp.WebApi;
+using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Interfaces;
 using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.Core.Structs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Kenedia.Modules.Core.Controls
 {
@@ -75,6 +77,12 @@ namespace Kenedia.Modules.Core.Controls
 		private bool _resized;
 
 		protected Rectangle LayoutHeaderBounds;
+
+		private Point _dragStart;
+
+		private Point _draggingStart;
+
+		private bool _dragging;
 
 		public bool ShowRightBorder { get; set; }
 
@@ -207,6 +215,8 @@ namespace Kenedia.Modules.Core.Controls
 
 		public CaptureType? Capture { get; set; }
 
+		public bool CanDrag { get; set; }
+
 		public FlowPanel()
 		{
 			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
@@ -228,6 +238,9 @@ namespace Kenedia.Modules.Core.Controls
 
 		protected override void OnClick(MouseEventArgs e)
 		{
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 			bool collapsed = ((Panel)this).get_Collapsed();
 			((Panel)this).OnClick(e);
 			if (collapsed != ((Panel)this).get_Collapsed())
@@ -240,6 +253,12 @@ namespace Kenedia.Modules.Core.Controls
 				{
 					OnExpand?.Invoke();
 				}
+			}
+			if (CanDrag)
+			{
+				MouseState state = GameService.Input.get_Mouse().get_State();
+				((MouseState)(ref state)).get_LeftButton();
+				_ = 1;
 			}
 		}
 
@@ -638,6 +657,35 @@ namespace Kenedia.Modules.Core.Controls
 			{
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), r.Item1, (Rectangle?)Rectangle.get_Empty(), borderColor.Value * r.Item2);
 			}
+		}
+
+		public override void UpdateContainer(GameTime gameTime)
+		{
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			((Container)this).UpdateContainer(gameTime);
+			_dragging = CanDrag && _dragging && ((Control)this).get_MouseOver();
+			if (_dragging)
+			{
+				((Control)this).set_Location(GameService.Input.get_Mouse().get_Position().Add(new Point(-_draggingStart.X, -_draggingStart.Y)));
+			}
+		}
+
+		protected override void OnLeftMouseButtonReleased(MouseEventArgs e)
+		{
+			((Control)this).OnLeftMouseButtonReleased(e);
+			_dragging = false;
+		}
+
+		protected override void OnLeftMouseButtonPressed(MouseEventArgs e)
+		{
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			((Control)this).OnLeftMouseButtonPressed(e);
+			_dragging = CanDrag;
+			_draggingStart = (_dragging ? ((Control)this).get_RelativeMousePosition() : Point.get_Zero());
 		}
 
 		protected override CaptureType CapturesInput()

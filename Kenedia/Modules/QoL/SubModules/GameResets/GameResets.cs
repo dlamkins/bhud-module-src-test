@@ -36,7 +36,13 @@ namespace Kenedia.Modules.QoL.SubModules.GameResets
 
 		private SettingEntry<bool> _showIcons;
 
+		private SettingEntry<bool> _autoPosition;
+
 		private SettingEntry<DateDisplayType> _dateDisplay;
+
+		private SettingEntry<Point> _resetPosition;
+
+		private bool _editPosition;
 
 		public override SubModuleType SubModuleType => SubModuleType.GameResets;
 
@@ -44,13 +50,11 @@ namespace Kenedia.Modules.QoL.SubModules.GameResets
 			: base(settings)
 		{
 			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
 			SubModuleUI uI_Elements = UI_Elements;
 			FlowPanel flowPanel = new FlowPanel();
 			((Control)flowPanel).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
@@ -60,9 +64,9 @@ namespace Kenedia.Modules.QoL.SubModules.GameResets
 			((Control)flowPanel).set_Height(GameService.Content.get_DefaultFont14().get_LineHeight() * 3 + 6);
 			((FlowPanel)flowPanel).set_FlowDirection((ControlFlowDirection)7);
 			((FlowPanel)flowPanel).set_ControlPadding(new Vector2(0f, 2f));
-			Rectangle localBounds = ((Control)GameService.Graphics.get_SpriteScreen()).get_LocalBounds();
-			((Control)flowPanel).set_Location(((Rectangle)(ref localBounds)).get_Center());
-			flowPanel.CaptureInput = false;
+			((Control)flowPanel).set_Location(_resetPosition.get_Value());
+			flowPanel.CaptureInput = !_autoPosition.get_Value();
+			flowPanel.CanDrag = !_autoPosition.get_Value();
 			FlowPanel item = flowPanel;
 			_container = flowPanel;
 			uI_Elements.Add((Control)(object)item);
@@ -99,6 +103,16 @@ namespace Kenedia.Modules.QoL.SubModules.GameResets
 			iconLabel3.ShowIcon = (_serverReset.ShowIcon = (_weeklyReset.ShowIcon = _showIcons.get_Value()));
 			_serverTime = iconLabel3;
 			SetPositions();
+			((Control)_container).add_Moved((EventHandler<MovedEventArgs>)Container_Moved);
+		}
+
+		private void Container_Moved(object sender, MovedEventArgs e)
+		{
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			if (!_autoPosition.get_Value())
+			{
+				_resetPosition.set_Value(((Control)_container).get_Location());
+			}
 		}
 
 		public override void Load()
@@ -130,18 +144,30 @@ namespace Kenedia.Modules.QoL.SubModules.GameResets
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
+			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
 			base.DefineSettings(settings);
 			_showTooltips = settings.DefineSetting<bool>("_showTooltips", true, (Func<string>)null, (Func<string>)null);
 			_showServerTime = settings.DefineSetting<bool>("_showServerTime", true, (Func<string>)null, (Func<string>)null);
 			_showDailyReset = settings.DefineSetting<bool>("_showDailyReset", true, (Func<string>)null, (Func<string>)null);
 			_showWeeklyReset = settings.DefineSetting<bool>("_showWeeklyReset", true, (Func<string>)null, (Func<string>)null);
 			_showIcons = settings.DefineSetting<bool>("_showIcons", true, (Func<string>)null, (Func<string>)null);
+			_autoPosition = settings.DefineSetting<bool>("_autoPosition", true, (Func<string>)null, (Func<string>)null);
 			_dateDisplay = settings.DefineSetting<DateDisplayType>("_dateDisplay", DateDisplayType.Long, (Func<string>)null, (Func<string>)null);
+			Rectangle localBounds = ((Control)GameService.Graphics.get_SpriteScreen()).get_LocalBounds();
+			_resetPosition = settings.DefineSetting<Point>("_resetPosition", ((Rectangle)(ref localBounds)).get_Center(), (Func<string>)null, (Func<string>)null);
 			_showServerTime.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ChangeServerTimeVisibility);
 			_showDailyReset.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ChangeServerResetVisibility);
 			_showWeeklyReset.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ChangeWeeklyResetVisibility);
 			_showIcons.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ChangeShowIcons);
+			_autoPosition.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)AutoPosition_SettingChanged);
 			_dateDisplay.add_SettingChanged((EventHandler<ValueChangedEventArgs<DateDisplayType>>)DateDisplay_SettingChanged);
+		}
+
+		private void AutoPosition_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
+		{
+			SetPositions();
 		}
 
 		private void DateDisplay_SettingChanged(object sender, ValueChangedEventArgs<DateDisplayType> e)
@@ -210,16 +236,15 @@ namespace Kenedia.Modules.QoL.SubModules.GameResets
 
 		public override void Update(GameTime gameTime)
 		{
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
 			if (base.Enabled)
 			{
 				((Control)_container).set_Visible(base.Enabled && GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && !GameService.Gw2Mumble.get_UI().get_IsMapOpen());
 				IconLabel serverTime = _serverTime;
 				IconLabel serverReset = _serverReset;
 				IconLabel weeklyReset = _weeklyReset;
-				FlowPanel container = _container;
 				int num;
 				if (!_showTooltips.get_Value())
 				{
@@ -231,9 +256,9 @@ namespace Kenedia.Modules.QoL.SubModules.GameResets
 					num = (((Rectangle)(ref absoluteBounds)).Contains(GameService.Input.get_Mouse().get_Position()) ? 22 : 0);
 				}
 				CaptureType? val = (CaptureType)num;
-				container.Capture = val;
-				CaptureType? val3 = (weeklyReset.Capture = val);
-				CaptureType? val6 = (serverTime.Capture = (serverReset.Capture = val3));
+				weeklyReset.Capture = val;
+				CaptureType? val4 = (serverTime.Capture = (serverReset.Capture = val));
+				_container.Capture = (_autoPosition.get_Value() ? _serverTime.Capture : null);
 				SetTexts();
 				SetPositions();
 			}
@@ -241,19 +266,22 @@ namespace Kenedia.Modules.QoL.SubModules.GameResets
 
 		private void SetPositions()
 		{
-			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-			Size s = GameService.Gw2Mumble.get_UI().get_CompassSize();
-			float scale = (float)((Size)(ref s)).get_Height() / 362f;
-			scale = (((double)scale < 0.5) ? (scale - 0.3f) : scale);
-			int y = (GameService.Gw2Mumble.get_UI().get_IsCompassTopRight() ? (((Size)(ref s)).get_Height() - ((Control)_container).get_Height() + (int)(24f * scale)) : (((Control)GameService.Graphics.get_SpriteScreen()).get_Height() - ((Control)_container).get_Height() - 60));
-			FlowPanel container = _container;
-			int num = ((Control)GameService.Graphics.get_SpriteScreen()).get_Width() - ((Size)(ref s)).get_Width();
-			Size compassSize = GameService.Gw2Mumble.get_UI().get_CompassSize();
-			((Control)container).set_Location(new Point(num - (int)((double)((Size)(ref compassSize)).get_Width() * 0.1), y));
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+			if (_autoPosition.get_Value())
+			{
+				Size s = GameService.Gw2Mumble.get_UI().get_CompassSize();
+				float scale = (float)((Size)(ref s)).get_Height() / 362f;
+				scale = (((double)scale < 0.5) ? (scale - 0.3f) : scale);
+				int y = (GameService.Gw2Mumble.get_UI().get_IsCompassTopRight() ? (((Size)(ref s)).get_Height() - ((Control)_container).get_Height() + (int)(24f * scale)) : (((Control)GameService.Graphics.get_SpriteScreen()).get_Height() - ((Control)_container).get_Height() - 60));
+				FlowPanel container = _container;
+				int num = ((Control)GameService.Graphics.get_SpriteScreen()).get_Width() - ((Size)(ref s)).get_Width();
+				Size compassSize = GameService.Gw2Mumble.get_UI().get_CompassSize();
+				((Control)container).set_Location(new Point(num - (int)((double)((Size)(ref compassSize)).get_Width() * 0.1), y));
+			}
 		}
 
 		private void SetTexts()
@@ -280,8 +308,8 @@ namespace Kenedia.Modules.QoL.SubModules.GameResets
 
 		public override void CreateSettingsPanel(FlowPanel flowPanel, int width)
 		{
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0509: Unknown result type (might be due to invalid IL or missing references)
 			Panel panel = new Panel();
 			((Control)panel).set_Parent((Container)(object)flowPanel);
 			((Control)panel).set_Width(width);
@@ -316,14 +344,14 @@ namespace Kenedia.Modules.QoL.SubModules.GameResets
 			((KeybindingAssigner)keybindingAssigner).set_KeyBinding(base.HotKey.get_Value());
 			keybindingAssigner.KeybindChangedAction = delegate(KeyBinding kb)
 			{
-				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 				//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-				//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_003b: Expected O, but got Unknown
+				//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+				//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0040: Expected O, but got Unknown
 				SettingEntry<KeyBinding> hotKey = base.HotKey;
 				KeyBinding val = new KeyBinding();
 				val.set_ModifierKeys(kb.get_ModifierKeys());
@@ -378,20 +406,55 @@ namespace Kenedia.Modules.QoL.SubModules.GameResets
 				_showIcons.set_Value(b);
 			};
 			UI.WrapWithLabel(localizedLabelContent5, localizedTooltip5, (Container)(object)contentFlowPanel, width6, (Control)(object)checkbox5);
-			Func<string> localizedLabelContent6 = () => strings.ShowTooltips_Name;
-			Func<string> localizedTooltip6 = () => strings.ShowTooltips_Tooltip;
+			Checkbox autoPosCheckbox = null;
+			Checkbox editPosCheckbox = null;
+			Func<string> localizedLabelContent6 = () => strings.AutoPosition_Name;
+			Func<string> localizedTooltip6 = () => strings.AutoPosition_Tooltip;
 			int width7 = width - 16;
 			Checkbox checkbox6 = new Checkbox();
 			((Control)checkbox6).set_Height(20);
-			((Checkbox)checkbox6).set_Checked(_showTooltips.get_Value());
+			((Checkbox)checkbox6).set_Checked(_autoPosition.get_Value());
 			checkbox6.CheckedChangedAction = delegate(bool b)
+			{
+				_autoPosition.set_Value(b);
+				((Checkbox)editPosCheckbox).set_Checked(!b && ((Checkbox)editPosCheckbox).get_Checked());
+			};
+			Checkbox ctrl = checkbox6;
+			autoPosCheckbox = checkbox6;
+			UI.WrapWithLabel(localizedLabelContent6, localizedTooltip6, (Container)(object)contentFlowPanel, width7, (Control)(object)ctrl);
+			Func<string> localizedLabelContent7 = () => strings.EditPosition_Name;
+			Func<string> localizedTooltip7 = () => strings.EditPosition_Tooltip;
+			int width8 = width - 16;
+			Checkbox checkbox7 = new Checkbox();
+			((Control)checkbox7).set_Height(20);
+			((Checkbox)checkbox7).set_Checked(_editPosition);
+			checkbox7.CheckedChangedAction = delegate(bool b)
+			{
+				//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+				_container.CaptureInput = b;
+				_container.CanDrag = b;
+				((Control)_container).set_Location(b ? _resetPosition.get_Value() : ((Control)_container).get_Location());
+				((Checkbox)autoPosCheckbox).set_Checked(!b && _autoPosition.get_Value());
+				_editPosition = b;
+			};
+			ctrl = checkbox7;
+			editPosCheckbox = checkbox7;
+			UI.WrapWithLabel(localizedLabelContent7, localizedTooltip7, (Container)(object)contentFlowPanel, width8, (Control)(object)ctrl);
+			Func<string> localizedLabelContent8 = () => strings.ShowTooltips_Name;
+			Func<string> localizedTooltip8 = () => strings.ShowTooltips_Tooltip;
+			int width9 = width - 16;
+			Checkbox checkbox8 = new Checkbox();
+			((Control)checkbox8).set_Height(20);
+			((Checkbox)checkbox8).set_Checked(_showTooltips.get_Value());
+			checkbox8.CheckedChangedAction = delegate(bool b)
 			{
 				_showTooltips.set_Value(b);
 			};
-			UI.WrapWithLabel(localizedLabelContent6, localizedTooltip6, (Container)(object)contentFlowPanel, width7, (Control)(object)checkbox6);
-			Func<string> localizedLabelContent7 = () => strings.DateFormat_Name;
-			Func<string> localizedTooltip7 = () => strings.DateFormat_Tooltip;
-			int width8 = width - 16;
+			UI.WrapWithLabel(localizedLabelContent8, localizedTooltip8, (Container)(object)contentFlowPanel, width9, (Control)(object)checkbox8);
+			Func<string> localizedLabelContent9 = () => strings.DateFormat_Name;
+			Func<string> localizedTooltip9 = () => strings.DateFormat_Tooltip;
+			int width10 = width - 16;
 			Dropdown dropdown = new Dropdown();
 			((Control)dropdown).set_Location(new Point(250, 0));
 			((Control)dropdown).set_Parent((Container)(object)contentFlowPanel);
@@ -406,7 +469,7 @@ namespace Kenedia.Modules.QoL.SubModules.GameResets
 			{
 				_dateDisplay.set_Value(Enum.TryParse<DateDisplayType>(b.RemoveSpaces(), out var result) ? result : _dateDisplay.get_Value());
 			};
-			UI.WrapWithLabel(localizedLabelContent7, localizedTooltip7, (Container)(object)contentFlowPanel, width8, (Control)(object)dropdown);
+			UI.WrapWithLabel(localizedLabelContent9, localizedTooltip9, (Container)(object)contentFlowPanel, width10, (Control)(object)dropdown);
 		}
 	}
 }

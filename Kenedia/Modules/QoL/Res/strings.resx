@@ -40,9 +40,11 @@
   <data name="ModifierToSendToChat_Tooltip"><value>The Modifier (Default: SHIFT) to link an item to the chat</value></data>
   <data name="ZoomOnCameraChange_Tooltip"><value>Trigger the zoom out on camera changes</value></data>
   <data name="DisableOnSearch_Tooltip"><value>Disables the module after a wiki search</value></data>
+  <data name="AutoPosition_Name"><value>Auto Position</value></data>
   <data name="ShowServerTime_Name"><value>Show Server Time</value></data>
   <data name="AllowManualZoom_Tooltip"><value>When using the scroll wheel of your mouse the camera won't zoom out until the next trigger</value></data>
   <data name="DateFormat_Tooltip"><value>Date format to use for the weekly reset.</value></data>
+  <data name="AutoPosition_Tooltip"><value>Automatically position the resets over the bottom left of the minimap</value></data>
   <data name="ShowWeeklyReset_Name"><value>Show Weekly Reset</value></data>
   <data name="ZoomOnFoVChange_Tooltip"><value>Trigger on any Field of View change</value></data>
   <data name="WaypointChatcode_Name"><value>Waypoint Chatcode</value></data>
@@ -71,7 +73,9 @@
   <data name="KeyboardLayout_Tooltip"><value>Keyboard Layout you use</value></data>
   <data name="DisableOnCopy_Tooltip"><value>Disable the sub module after copying a items name</value></data>
   <data name="ShowDailyReset_Tooltip"><value>Show the time until daily reset on the bottom left of the minimap</value></data>
+  <data name="EditPosition_Name"><value>Edit Position</value></data>
   <data name="DisableOnCopy_Name"><value>Disable after copy</value></data>
+  <data name="EditPosition_Tooltip"><value>While checked the resets can be moved</value></data>
   <data name="DateFormat_Name"><value>Date Format</value></data>
   <data name="ShowIcons_Tooltip"><value>Show Icons before the reset countdown</value></data>
   <data name="AllowManualZoom_Name"><value>Allow manual zoom</value></data>
