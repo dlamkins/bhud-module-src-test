@@ -374,17 +374,18 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		public void UpdateAllEvents(List<EventCategory> allEvents)
 		{
+			_logger.Debug("Receiving new events..");
 			using (_eventLock.Lock())
 			{
 				_allEvents.Clear();
 				_allEvents.AddRange(JsonConvert.DeserializeObject<List<EventCategory>>(JsonConvert.SerializeObject(allEvents)));
-				GetTimes();
 				_allEvents.ForEach(delegate(EventCategory ec)
 				{
 					ec.Load(_getNowAction, _translationService);
 				});
 			}
 			ReAddEvents();
+			_logger.Debug("Finished Receiving new events..");
 		}
 
 		private void Event_Removed(object sender, string apiCode)
@@ -612,7 +613,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				using (_eventLock.Lock())
 				{
 					activeEvents.AddRange((from ev in _allEvents.SelectMany((EventCategory a) => a.Events)
-						where activeEventKeys.Any((string aeg) => aeg == ev.SettingKey)
+						where ev.Filler || activeEventKeys.Any((string aeg) => aeg == ev.SettingKey)
 						select ev).ToList());
 				}
 				IEnumerable<string> eventKeys = activeEvents.Select((Estreya.BlishHUD.EventTable.Models.Event a) => a.SettingKey).Distinct();
@@ -631,7 +632,12 @@ namespace Estreya.BlishHUD.EventTable.Controls
 					},
 					EventKeys = activeEvents.Select((Estreya.BlishHUD.EventTable.Models.Event a) => a.SettingKey).ToArray()
 				}, default(CancellationToken), (HttpCompletionOption)0)).GetJsonAsync<OnlineFillerCategory[]>()).ToList();
-				ConcurrentDictionary<string, List<Estreya.BlishHUD.EventTable.Models.Event>> parsedFillers = new ConcurrentDictionary<string, List<Estreya.BlishHUD.EventTable.Models.Event>>();
+				ConcurrentDictionary<string, List<Estreya.BlishHUD.EventTable.Models.Event>> parsedFillers = new ConcurrentDictionary<string, List<Estreya.BlishHUD.EventTable.Models.Event>>(activeEvents.Where((Estreya.BlishHUD.EventTable.Models.Event ev) => ev.Filler).GroupBy(delegate(Estreya.BlishHUD.EventTable.Models.Event ev)
+				{
+					ev.Category.TryGetTarget(out var target);
+					return target.Key;
+				}).ToDictionary((IGrouping<string, Estreya.BlishHUD.EventTable.Models.Event> group) => group.Key, (IGrouping<string, Estreya.BlishHUD.EventTable.Models.Event> group) => group.Where((Estreya.BlishHUD.EventTable.Models.Event ev) => ev.Filler).ToList())
+					.ToList());
 				for (int i = 0; i < fillerList.Count; i++)
 				{
 					OnlineFillerCategory currentCategory = fillerList[i];
@@ -653,10 +659,14 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				}
 				return parsedFillers;
 			}
-			catch (FlurlHttpException ex)
+			catch (FlurlHttpException ex2)
 			{
-				string error = await ex.GetResponseStringAsync();
-				_logger.Warn($"Could not load fillers from {ex.Call.Request.get_RequestUri()}: {error}");
+				string error = await ex2.GetResponseStringAsync();
+				_logger.Warn($"Could not load fillers from {ex2.Call.Request.get_RequestUri()}: {error}");
+			}
+			catch (Exception ex)
+			{
+				_logger.Warn(ex, "Could not load fillers.");
 			}
 			return new ConcurrentDictionary<string, List<Estreya.BlishHUD.EventTable.Models.Event>>();
 		}
@@ -1145,7 +1155,10 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			{
 				_allEvents?.ForEach(delegate(EventCategory a)
 				{
-					a.UpdateFillers(new List<Estreya.BlishHUD.EventTable.Models.Event>());
+					if (!a.FromContext)
+					{
+						a.UpdateFillers(new List<Estreya.BlishHUD.EventTable.Models.Event>());
+					}
 				});
 			}
 			using (_controlLock.Lock())
@@ -1153,6 +1166,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				_controlEvents?.Clear();
 			}
 			_orderedControlEvents = null;
+			_logger.Debug("Cleared filler and controls.");
 		}
 
 		private void AddEventHooks(Event ev)

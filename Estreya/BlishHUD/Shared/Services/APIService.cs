@@ -181,7 +181,7 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		protected override async Task<bool> FetchFromAPI(Gw2ApiManager apiManager, IProgress<string> progress)
 		{
-			Logger.Info("Check for api objects.");
+			Logger.Debug("Check for api objects.");
 			if (apiManager == null)
 			{
 				Logger.Warn("API Manager is null");
@@ -251,7 +251,7 @@ namespace Estreya.BlishHUD.Shared.Services
 						}
 					}
 				}
-				Logger.Info("Check for api objects finished.");
+				Logger.Debug("Check for api objects finished.");
 				return true;
 			}
 			catch (MissingScopesException val)

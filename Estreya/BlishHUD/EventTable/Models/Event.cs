@@ -87,7 +87,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 		[JsonProperty("apiCode")]
 		public string APICode { get; set; }
 
-		[JsonIgnore]
+		[JsonProperty("filler")]
 		public bool Filler { get; set; }
 
 		[JsonProperty("occurences")]

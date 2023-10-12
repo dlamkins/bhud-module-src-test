@@ -36,9 +36,11 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private static readonly Rectangle _messageRect = new Rectangle(((Rectangle)(ref _iconRect)).get_Right() + 5, ((Rectangle)(ref _titleRect)).get_Bottom(), _fullRect.Width - (((Rectangle)(ref _iconRect)).get_Right() + 5), 96 - _titleRect.Height);
 
+		private readonly string _title;
+
 		private readonly string _message;
 
-		private AsyncTexture2D _eventIcon;
+		private AsyncTexture2D _icon;
 
 		private IconService _iconService;
 
@@ -55,21 +57,34 @@ namespace Estreya.BlishHUD.EventTable.Controls
 		public float BackgroundOpacity { get; set; } = 1f;
 
 
-		public EventNotification(Estreya.BlishHUD.EventTable.Models.Event ev, string message, int x, int y, ReminderStackDirection stackDirection, IconService iconService, bool captureMouseClicks = false)
+		public EventNotification(Estreya.BlishHUD.EventTable.Models.Event ev, string title, string message, AsyncTexture2D icon, int x, int y, ReminderStackDirection stackDirection, IconService iconService, bool captureMouseClicks = false)
 		{
 			Model = ev;
+			_title = title;
 			_message = message;
 			_x = x;
 			_y = y;
 			_stackDirection = stackDirection;
 			_iconService = iconService;
 			_captureMouseClicks = captureMouseClicks;
-			_eventIcon = _iconService?.GetIcon(ev.Icon);
+			if (icon != null)
+			{
+				_icon = icon;
+			}
+			else if (ev != null && ev.Icon != null)
+			{
+				_icon = ((ev == null || ev.Icon == null) ? null : _iconService?.GetIcon(ev.Icon));
+			}
 			base.Width = 350;
 			base.Height = 96;
 			((Control)this).set_Visible(false);
 			((Control)this).set_Opacity(0f);
 			((Control)this).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+		}
+
+		public EventNotification(Estreya.BlishHUD.EventTable.Models.Event ev, string message, int x, int y, ReminderStackDirection stackDirection, IconService iconService, bool captureMouseClicks = false)
+			: this(ev, ev?.Name, message, null, x, y, stackDirection, iconService, captureMouseClicks)
+		{
 		}
 
 		public void Show(TimeSpan duration)
@@ -124,19 +139,25 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
 			spriteBatch.Draw(Textures.get_Pixel(), _fullRect, Color.get_Black() * BackgroundOpacity);
-			if (_eventIcon != null)
+			if (_icon != null)
 			{
-				spriteBatch.Draw(AsyncTexture2D.op_Implicit(_eventIcon), _iconRect, Color.get_White());
+				spriteBatch.Draw(AsyncTexture2D.op_Implicit(_icon), _iconRect, Color.get_White());
 			}
-			spriteBatch.DrawString(Model.Name, _titleFont, RectangleF.op_Implicit(_titleRect), Color.get_White(), wrap: false, (HorizontalAlignment)0, (VerticalAlignment)1);
-			spriteBatch.DrawString(_message, _messageFont, RectangleF.op_Implicit(_messageRect), Color.get_White(), wrap: false, (HorizontalAlignment)0, (VerticalAlignment)1);
+			if (!string.IsNullOrWhiteSpace(_title))
+			{
+				spriteBatch.DrawString(_title, _titleFont, RectangleF.op_Implicit(_titleRect), Color.get_White(), wrap: false, (HorizontalAlignment)0, (VerticalAlignment)1);
+			}
+			if (!string.IsNullOrWhiteSpace(_message))
+			{
+				spriteBatch.DrawString(_message, _messageFont, RectangleF.op_Implicit(_messageRect), Color.get_White(), wrap: false, (HorizontalAlignment)0, (VerticalAlignment)1);
+			}
 		}
 
 		protected override CaptureType CapturesInput()
@@ -152,7 +173,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 		{
 			Model = null;
 			_iconService = null;
-			_eventIcon = null;
+			_icon = null;
 		}
 	}
 }

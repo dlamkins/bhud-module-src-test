@@ -18,13 +18,16 @@ using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Blish_HUD.Modules;
 using Blish_HUD.Settings;
+using Estreya.BlishHUD.EventTable.Contexts;
 using Estreya.BlishHUD.EventTable.Controls;
 using Estreya.BlishHUD.EventTable.Managers;
 using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.EventTable.Services;
 using Estreya.BlishHUD.EventTable.UI.Views;
+using Estreya.BlishHUD.Shared.Contexts;
 using Estreya.BlishHUD.Shared.Controls;
 using Estreya.BlishHUD.Shared.Extensions;
+using Estreya.BlishHUD.Shared.Helpers;
 using Estreya.BlishHUD.Shared.Models.GW2API.PointOfInterest;
 using Estreya.BlishHUD.Shared.Modules;
 using Estreya.BlishHUD.Shared.MumbleInfo.Map;
@@ -52,11 +55,17 @@ namespace Estreya.BlishHUD.EventTable
 
 		private List<EventCategory> _eventCategories;
 
+		private List<EventCategory> _temporaryEventCategories = new List<EventCategory>();
+
 		private readonly AsyncLock _eventCategoryLock = new AsyncLock();
 
 		private double _lastCheckDrawerSettings;
 
 		private AsyncRef<double> _lastEventUpdate;
+
+		private EventTableContext _eventTableContext;
+
+		private ContextHandle<EventTableContext> _eventTableContextHandle;
 
 		private BitmapFont _defaultFont;
 
@@ -147,6 +156,142 @@ namespace Estreya.BlishHUD.EventTable
 			area.UpdateAllEvents(_eventCategories);
 		}
 
+		protected override void OnModuleLoaded(EventArgs e)
+		{
+			base.OnModuleLoaded(e);
+			RegisterContext();
+		}
+
+		private void RegisterContext()
+		{
+			if (!base.ModuleSettings.RegisterContext.get_Value())
+			{
+				base.Logger.Info("Event Table context was not registered due to user preferences.");
+				return;
+			}
+			_eventTableContext = new EventTableContext();
+			_eventTableContext.RequestAddCategory += EventTableContext_RequestAddCategory;
+			_eventTableContext.RequestAddEvent += EventTableContext_RequestAddEvent;
+			_eventTableContext.RequestRemoveCategory += EventTableContext_RequestRemoveCategory;
+			_eventTableContext.RequestRemoveEvent += EventTableContext_RequestRemoveEvent;
+			_eventTableContext.RequestReloadEvents += EventTableContext_RequestReloadEvents;
+			_eventTableContext.RequestShowReminder += EventTableContext_RequestShowReminder;
+			_eventTableContextHandle = GameService.Contexts.RegisterContext<EventTableContext>(_eventTableContext);
+			base.Logger.Info("Event Table context registered.");
+		}
+
+		private Task EventTableContext_RequestShowReminder(object sender, ContextEventArgs<ShowReminder> e)
+		{
+			ShowReminder eArgsContent = e.Content;
+			EventNotification eventNotification = new EventNotification(null, eArgsContent.Title, eArgsContent.Message, (!string.IsNullOrWhiteSpace(eArgsContent.Icon)) ? base.IconService.GetIcon(eArgsContent.Icon) : null, base.ModuleSettings.ReminderPosition.X.get_Value(), base.ModuleSettings.ReminderPosition.Y.get_Value(), base.ModuleSettings.ReminderStackDirection.get_Value(), base.IconService, base.ModuleSettings.ReminderLeftClickAction.get_Value() != LeftClickAction.None);
+			eventNotification.BackgroundOpacity = base.ModuleSettings.ReminderOpacity.get_Value();
+			eventNotification.Show(TimeSpan.FromSeconds(base.ModuleSettings.ReminderDuration.get_Value()));
+			return Task.CompletedTask;
+		}
+
+		private async Task EventTableContext_RequestReloadEvents(object sender, ContextEventArgs e)
+		{
+			base.Logger.Info("\"" + e.Caller.FullName + "\" trggered a event reload via context.");
+			_lastEventUpdate.Value = _updateEventsInterval.TotalMilliseconds;
+			await AsyncHelper.WaitUntil(() => _lastEventUpdate.Value < _updateEventsInterval.TotalMilliseconds, TimeSpan.FromSeconds(15.0));
+		}
+
+		private async Task EventTableContext_RequestRemoveEvent(object sender, ContextEventArgs<RemoveEvent> e)
+		{
+			RemoveEvent eArgsContent = e.Content;
+			using (await _eventCategoryLock.LockAsync())
+			{
+				EventCategory obj = _temporaryEventCategories.FirstOrDefault((EventCategory ec) => ec.Key == eArgsContent.CategoryKey) ?? throw new ArgumentException("Category with key \"" + eArgsContent.CategoryKey + "\" does not exist.");
+				if (!obj.Events.Any((Estreya.BlishHUD.EventTable.Models.Event ev) => ev.Key == eArgsContent.EventKey))
+				{
+					throw new ArgumentException("Event with the key \"" + eArgsContent.EventKey + "\" does not exist.");
+				}
+				obj.UpdateOriginalEvents(obj.OriginalEvents.Where((Estreya.BlishHUD.EventTable.Models.Event ev) => ev.Key != eArgsContent.EventKey).ToList());
+				obj.UpdateFillers(obj.FillerEvents.Where((Estreya.BlishHUD.EventTable.Models.Event ev) => ev.Key != eArgsContent.EventKey).ToList());
+				base.Logger.Info("Event \"" + eArgsContent.EventKey + "\" of category \"" + eArgsContent.CategoryKey + "\" was removed via context.");
+			}
+		}
+
+		private async Task EventTableContext_RequestRemoveCategory(object sender, ContextEventArgs<string> e)
+		{
+			using (await _eventCategoryLock.LockAsync())
+			{
+				EventCategory category = _temporaryEventCategories.FirstOrDefault((EventCategory ec) => ec.Key == e.Content) ?? throw new ArgumentException("Category with key \"" + e.Content + "\" does not exist.");
+				_temporaryEventCategories.Remove(category);
+				base.Logger.Info("Category \"" + category.Name + "\" (" + category.Key + ") was removed via context.");
+			}
+		}
+
+		private async Task EventTableContext_RequestAddEvent(object sender, ContextEventArgs<AddEvent> e)
+		{
+			AddEvent eArgsContent = e.Content;
+			using (await _eventCategoryLock.LockAsync())
+			{
+				EventCategory category = _temporaryEventCategories.FirstOrDefault((EventCategory ec) => ec.Key == eArgsContent.CategoryKey) ?? throw new ArgumentException("Category with key \"" + eArgsContent.Key + "\" does not exist.");
+				if (category.Events.Any((Estreya.BlishHUD.EventTable.Models.Event ev) => ev.Key == eArgsContent.Key))
+				{
+					throw new ArgumentException("Event with the key \"" + eArgsContent.Key + "\" already exists.");
+				}
+				Estreya.BlishHUD.EventTable.Models.Event newEvent = new Estreya.BlishHUD.EventTable.Models.Event
+				{
+					Key = eArgsContent.Key,
+					Name = eArgsContent.Name,
+					APICode = eArgsContent.APICode,
+					APICodeType = eArgsContent.APICodeType,
+					BackgroundColorCode = eArgsContent.BackgroundColorCode,
+					BackgroundColorGradientCodes = eArgsContent.BackgroundColorGradientCodes,
+					Duration = eArgsContent.Duration,
+					Filler = eArgsContent.Filler,
+					Icon = eArgsContent.Icon,
+					Location = eArgsContent.Location,
+					MapIds = eArgsContent.MapIds,
+					Offset = eArgsContent.Offset,
+					Repeat = eArgsContent.Repeat,
+					StartingDate = eArgsContent.StartingDate,
+					Waypoint = eArgsContent.Waypoint,
+					Wiki = eArgsContent.Wiki
+				};
+				if (eArgsContent.Occurences != null)
+				{
+					newEvent.Occurences.AddRange(eArgsContent.Occurences);
+				}
+				if (eArgsContent.ReminderTimes != null)
+				{
+					newEvent.UpdateReminderTimes(eArgsContent.ReminderTimes);
+				}
+				if (newEvent.Filler)
+				{
+					category.UpdateFillers(new List<Estreya.BlishHUD.EventTable.Models.Event>(category.FillerEvents) { newEvent });
+				}
+				else
+				{
+					category.UpdateOriginalEvents(new List<Estreya.BlishHUD.EventTable.Models.Event>(category.OriginalEvents) { newEvent });
+				}
+				base.Logger.Info("Event \"" + eArgsContent.Name + "\" (" + eArgsContent.Key + ") of category \"" + category.Name + "\" (" + category.Key + ") was registered via context.");
+			}
+		}
+
+		private async Task EventTableContext_RequestAddCategory(object sender, ContextEventArgs<AddCategory> e)
+		{
+			AddCategory eArgsContent = e.Content;
+			using (await _eventCategoryLock.LockAsync())
+			{
+				if (_temporaryEventCategories.Any((EventCategory ec) => ec.Key == eArgsContent.Key))
+				{
+					throw new ArgumentException("Category with key \"" + eArgsContent.Key + "\" already exists.");
+				}
+				_temporaryEventCategories.Add(new EventCategory
+				{
+					Key = eArgsContent.Key,
+					Name = eArgsContent.Name,
+					Icon = eArgsContent.Icon,
+					ShowCombined = eArgsContent.ShowCombined,
+					FromContext = true
+				});
+				base.Logger.Info("Category \"" + eArgsContent.Name + "\" (" + eArgsContent.Key + ") was registered via context.");
+			}
+		}
+
 		public async Task LoadEvents()
 		{
 			base.Logger.Info("Load events...");
@@ -167,6 +312,11 @@ namespace Estreya.BlishHUD.EventTable
 					int eventCategoryCount = categories.Count;
 					int eventCount = categories.Sum((EventCategory ec) => ec.Events.Count);
 					base.Logger.Info($"Loaded {eventCategoryCount} Categories with {eventCount} Events.");
+					if (_temporaryEventCategories != null && _temporaryEventCategories.Count > 0)
+					{
+						base.Logger.Info($"Include {_temporaryEventCategories.Count} temporary categories with {_temporaryEventCategories.Sum((EventCategory ec) => ec.Events?.Count ?? 0)}.");
+						categories.AddRange(_temporaryEventCategories);
+					}
 					categories.ForEach(delegate(EventCategory ec)
 					{
 						ec.Load(() => NowUTC, base.TranslationService);
@@ -578,6 +728,18 @@ namespace Estreya.BlishHUD.EventTable
 				DynamicEventHandler.FoundLostEntities -= DynamicEventHandler_FoundLostEntities;
 				DynamicEventHandler.Dispose();
 				DynamicEventHandler = null;
+			}
+			_eventTableContextHandle?.Expire();
+			base.Logger.Info("Event Table context expired.");
+			if (_eventTableContext != null)
+			{
+				_eventTableContext.RequestAddCategory -= EventTableContext_RequestAddCategory;
+				_eventTableContext.RequestAddEvent -= EventTableContext_RequestAddEvent;
+				_eventTableContext.RequestRemoveCategory -= EventTableContext_RequestRemoveCategory;
+				_eventTableContext.RequestRemoveEvent -= EventTableContext_RequestRemoveEvent;
+				_eventTableContext.RequestReloadEvents -= EventTableContext_RequestReloadEvents;
+				_eventTableContext.RequestShowReminder -= EventTableContext_RequestShowReminder;
+				_eventTableContext = null;
 			}
 			MapUtil?.Dispose();
 			MapUtil = null;

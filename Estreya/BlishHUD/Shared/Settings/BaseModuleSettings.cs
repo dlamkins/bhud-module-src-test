@@ -55,6 +55,8 @@ namespace Estreya.BlishHUD.Shared.Settings
 
 		public SettingEntry<string> BlishAPIUsername { get; private set; }
 
+		public SettingEntry<bool> RegisterContext { get; private set; }
+
 		public SettingCollection DrawerSettings { get; private set; }
 
 		protected BaseModuleSettings(SettingCollection settings, KeyBinding globalEnabledKeybinding)
@@ -202,6 +204,7 @@ namespace Estreya.BlishHUD.Shared.Settings
 			DebugEnabled = GlobalSettings.DefineSetting<bool>("DebugEnabled", false, (Func<string>)(() => "Debug Enabled"), (Func<string>)(() => "Whether the module runs in debug mode."));
 			DebugEnabled.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)LogSettingChanged<bool>);
 			BlishAPIUsername = GlobalSettings.DefineSetting<string>("BlishAPIUsername", (string)null, (Func<string>)(() => "Blish API Username"), (Func<string>)(() => "Defines the login username for the Estreya Blish HUD API."));
+			RegisterContext = GlobalSettings.DefineSetting<bool>("RegisterContext", true, (Func<string>)(() => "Register Context"), (Func<string>)(() => "Whether the module should register an api context for cross module interaction. Requires a restart."));
 			HandleEnabledStates();
 			DoInitializeGlobalSettings(GlobalSettings);
 		}

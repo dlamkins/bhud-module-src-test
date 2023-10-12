@@ -600,6 +600,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_00fb: Expected O, but got Unknown
 			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023c: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)settingsPanel);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
@@ -630,12 +631,19 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				{
 					builder.MakeBold().SetFontSize((FontSize)16);
 				})
+				.CreatePart("\n\n", (Action<FormattedLabelPartBuilder>)delegate
+				{
+				})
+				.CreatePart(base.TranslationService.GetTranslation("areaSettingsView-tooltipOptionGroup-absoluteTimeFormatTestLink", "Click here for testing."), (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder builder)
+				{
+					builder.SetHyperLink("https://www.homedev.com.au/Online/DateFormat");
+				})
 				.Build()).set_Parent((Container)(object)tooltipOptionGroup);
 			RenderEmptyLine((Panel)(object)tooltipOptionGroup);
 			RenderTextSetting((Panel)(object)tooltipOptionGroup, areaConfiguration.EventTimespanDaysFormatString);
 			RenderTextSetting((Panel)(object)tooltipOptionGroup, areaConfiguration.EventTimespanHoursFormatString);
 			RenderTextSetting((Panel)(object)tooltipOptionGroup, areaConfiguration.EventTimespanMinutesFormatString);
-			RenderEmptyLine((Panel)(object)tooltipOptionGroup, 20);
+			RenderEmptyLine((Panel)(object)tooltipOptionGroup, (int)tooltipOptionGroup.get_OuterControlPadding().Y);
 			RenderEmptyLine((Panel)(object)groupPanel);
 			RenderTextSetting((Panel)(object)groupPanel, areaConfiguration.TopTimelineTimeFormatString);
 			RenderEmptyLine((Panel)(object)groupPanel);

@@ -18,11 +18,13 @@ namespace Estreya.BlishHUD.EventTable.Models
 		[JsonIgnore]
 		private AsyncLock _eventLock = new AsyncLock();
 
-		[JsonIgnore]
-		private List<Event> _fillerEvents = new List<Event>();
+		[JsonProperty("fillers")]
+		public List<Event> FillerEvents { get; private set; } = new List<Event>();
+
 
 		[JsonProperty("events")]
-		private List<Event> _originalEvents = new List<Event>();
+		public List<Event> OriginalEvents { get; private set; } = new List<Event>();
+
 
 		[JsonProperty("key")]
 		public string Key { get; set; }
@@ -36,27 +38,32 @@ namespace Estreya.BlishHUD.EventTable.Models
 		[JsonProperty("showCombined")]
 		public bool ShowCombined { get; set; }
 
+		[JsonProperty("fromContext")]
+		internal bool FromContext { get; set; }
+
 		[JsonIgnore]
-		public List<Event> Events
-		{
-			get
-			{
-				return _originalEvents.Concat(_fillerEvents).ToList();
-			}
-			set
-			{
-				_originalEvents = value;
-			}
-		}
+		public List<Event> Events => OriginalEvents.Concat(FillerEvents).ToList();
 
 		public void UpdateFillers(List<Event> fillers)
 		{
-			lock (_fillerEvents)
+			lock (FillerEvents)
 			{
-				_fillerEvents.Clear();
+				FillerEvents.Clear();
 				if (fillers != null)
 				{
-					_fillerEvents.AddRange(fillers);
+					FillerEvents.AddRange(fillers);
+				}
+			}
+		}
+
+		public void UpdateOriginalEvents(List<Event> events)
+		{
+			lock (OriginalEvents)
+			{
+				OriginalEvents.Clear();
+				if (events != null)
+				{
+					OriginalEvents.AddRange(events);
 				}
 			}
 		}

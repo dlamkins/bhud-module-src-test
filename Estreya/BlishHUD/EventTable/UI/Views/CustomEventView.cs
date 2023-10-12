@@ -71,7 +71,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				builder.SetFontSize((FontSize)20);
 			}).CreatePart(base.TranslationService.GetTranslation("customEventView-manual2", "Estreya BlishHUD API."), (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder builder)
 			{
-				builder.SetFontSize((FontSize)20).SetHyperLink("https://blish-hud.estreya.de/register");
+				//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+				builder.SetFontSize((FontSize)20).SetTextColor(Color.get_CornflowerBlue()).SetHyperLink("https://blish-hud.estreya.de/register");
 			}).CreatePart("\n \n", (Action<FormattedLabelPartBuilder>)delegate
 			{
 			})
