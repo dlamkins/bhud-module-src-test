@@ -1,9 +1,8 @@
-using Etm.Sdk;
 using Sentry;
 
 namespace BhModule.Community.ErrorSubmissionModule
 {
-	public class PerformanceTransaction : IPerformanceTransaction
+	public class PerformanceTransaction
 	{
 		private readonly ISpan _transaction;
 
@@ -14,7 +13,7 @@ namespace BhModule.Community.ErrorSubmissionModule
 			_transaction = transaction;
 		}
 
-		public IPerformanceTransaction StartChildPerformanceTransaction(string operation, string description = null)
+		public PerformanceTransaction StartChildPerformanceTransaction(string operation, string description = null)
 		{
 			if (_transaction.IsFinished)
 			{

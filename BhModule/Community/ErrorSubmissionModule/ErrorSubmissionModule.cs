@@ -5,11 +5,13 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using BhModule.Community.ErrorSubmissionModule.WebHooks;
 using Blish_HUD;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Flurl.Http;
+using Microsoft.Xna.Framework;
 using NLog;
 using NLog.Config;
 using NLog.Layouts;
@@ -36,6 +38,8 @@ namespace BhModule.Community.ErrorSubmissionModule
 		private EtmConfig _config;
 
 		private SentryNLogOptions _loggerOptions;
+
+		private WebApi _webApiHook;
 
 		private int _maxReports = 10;
 
@@ -70,6 +74,7 @@ namespace BhModule.Community.ErrorSubmissionModule
 			{
 				ApplyEtmConfig();
 			}
+			HookApi();
 		}
 
 		protected override void DefineSettings(SettingCollection settings)
@@ -95,6 +100,19 @@ namespace BhModule.Community.ErrorSubmissionModule
 			object value = typeof(DebugService).GetField("_logConfiguration", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
 			((LoggingConfiguration)((value is LoggingConfiguration) ? value : null)).AddSentry(new Action<SentryNLogOptions>(ConfigureSentry));
 			LogManager.ReconfigExistingLoggers();
+		}
+
+		private void HookApi()
+		{
+			if (_config.ApiHookEnabled)
+			{
+				_webApiHook = new WebApi(_config, this);
+			}
+		}
+
+		protected override void Update(GameTime gameTime)
+		{
+			_webApiHook?.Update(gameTime);
 		}
 
 		private void ApplyEtmConfig()
@@ -204,6 +222,7 @@ namespace BhModule.Community.ErrorSubmissionModule
 		protected override void Unload()
 		{
 			_etmContextHandle?.Expire();
+			_webApiHook?.UnloadHooks();
 			if (_userDiscordId != null)
 			{
 				_userDiscordId.remove_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateUser);

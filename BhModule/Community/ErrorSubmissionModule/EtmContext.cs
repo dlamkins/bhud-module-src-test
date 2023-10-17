@@ -1,12 +1,11 @@
 using Blish_HUD.Contexts;
-using Etm.Sdk;
 using Sentry;
 
 namespace BhModule.Community.ErrorSubmissionModule
 {
-	public class EtmContext : Context, IEtmContext
+	public class EtmContext : Context
 	{
-		public IPerformanceTransaction StartPerformanceTransaction(string name, string operation, string description = null)
+		public PerformanceTransaction StartPerformanceTransaction(string name, string operation, string description = null)
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0007: Invalid comparison between Unknown and I4

@@ -17,18 +17,17 @@
     <Reference Include="Sentry.NLog">
       <HintPath>..\..\working\Sentry.NLog.dll</HintPath>
     </Reference>
+    <Reference Include="MonoGame.Framework" />
     <Reference Include="Sentry">
       <HintPath>..\..\working\Sentry.dll</HintPath>
     </Reference>
-    <Reference Include="Etm.Sdk">
-      <HintPath>..\..\working\Etm.Sdk.dll</HintPath>
-    </Reference>
+    <Reference Include="Gw2Sharp" />
     <Reference Include="NLog" />
     <Reference Include="SemVer">
       <HintPath>..\..\working\SemVer.dll</HintPath>
     </Reference>
+    <Reference Include="System.Core" />
     <Reference Include="Flurl.Http" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="System.Core" />
   </ItemGroup>
 </Project>
