@@ -5,6 +5,8 @@ using Blish_HUD;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
 using Estreya.BlishHUD.EventTable.Models;
+using Estreya.BlishHUD.EventTable.Models.Reminders;
+using Estreya.BlishHUD.Shared.Extensions;
 using Estreya.BlishHUD.Shared.Models.Drawers;
 using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Settings;
@@ -25,7 +27,11 @@ namespace Estreya.BlishHUD.EventTable
 
 		public SettingEntry<bool> RemindersEnabled { get; private set; }
 
-		public EventReminderPositition ReminderPosition { get; private set; }
+		public EventReminderPosition ReminderPosition { get; private set; }
+
+		public EventReminderSize ReminderSize { get; private set; }
+
+		public EventReminderFonts ReminderFonts { get; private set; }
 
 		public SettingEntry<float> ReminderDuration { get; private set; }
 
@@ -37,9 +43,11 @@ namespace Estreya.BlishHUD.EventTable
 
 		public SettingEntry<LeftClickAction> ReminderLeftClickAction { get; private set; }
 
+		public SettingEntry<EventReminderRightClickAction> ReminderRightClickAction { get; private set; }
+
 		public SettingEntry<bool> AcceptWaypointPrompt { get; set; }
 
-		public SettingEntry<ReminderStackDirection> ReminderStackDirection { get; set; }
+		public SettingEntry<EventReminderStackDirection> ReminderStackDirection { get; set; }
 
 		public SettingEntry<bool> ShowDynamicEventsOnMap { get; private set; }
 
@@ -80,6 +88,7 @@ namespace Estreya.BlishHUD.EventTable
 		{
 			EventAreaSettings = settings.AddSubCollection("event-area-settings", false);
 			EventAreaNames = EventAreaSettings.DefineSetting<List<string>>("EventAreaNames", new List<string>(), (Func<string>)(() => "Event Area Names"), (Func<string>)(() => "Defines the event area names."));
+			EventAreaSettings.AddLoggingEvents();
 		}
 
 		protected override void DoInitializeGlobalSettings(SettingCollection globalSettingCollection)
@@ -87,14 +96,24 @@ namespace Estreya.BlishHUD.EventTable
 			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0056: Expected O, but got Unknown
 			MapKeybinding = base.GlobalSettings.DefineSetting<KeyBinding>("MapKeybinding", new KeyBinding((Keys)77), (Func<string>)(() => "Open Map Hotkey"), (Func<string>)(() => "Defines the key used to open the fullscreen map."));
-			MapKeybinding.add_SettingChanged((EventHandler<ValueChangedEventArgs<KeyBinding>>)LogSettingChanged<KeyBinding>);
 			MapKeybinding.get_Value().set_Enabled(true);
 			MapKeybinding.get_Value().set_BlockSequenceFromGw2(false);
 			RemindersEnabled = base.GlobalSettings.DefineSetting<bool>("RemindersEnabled", true, (Func<string>)(() => "Reminders Enabled"), (Func<string>)(() => "Whether the module should display alerts before an event starts."));
-			ReminderPosition = new EventReminderPositition
+			ReminderPosition = new EventReminderPosition
 			{
 				X = base.GlobalSettings.DefineSetting<int>("ReminderPositionX", 200, (Func<string>)(() => "Location X"), (Func<string>)(() => "Defines the position of reminders on the x axis.")),
 				Y = base.GlobalSettings.DefineSetting<int>("ReminderPositionY", 200, (Func<string>)(() => "Location Y"), (Func<string>)(() => "Defines the position of reminders on the y axis."))
+			};
+			ReminderSize = new EventReminderSize
+			{
+				X = base.GlobalSettings.DefineSetting<int>("ReminderSizeX", 350, (Func<string>)(() => "Size X"), (Func<string>)(() => "Defines the size of reminders on the x axis.")),
+				Y = base.GlobalSettings.DefineSetting<int>("ReminderSizeY", 96, (Func<string>)(() => "Size Y"), (Func<string>)(() => "Defines the size of reminders on the y axis.")),
+				Icon = base.GlobalSettings.DefineSetting<int>("ReminderSizeIcon", 64, (Func<string>)(() => "Icon Width/Height"), (Func<string>)(() => "Defines the size of the reminder icon on the x and y axis."))
+			};
+			ReminderFonts = new EventReminderFonts
+			{
+				TitleSize = base.GlobalSettings.DefineSetting<FontSize>("ReminderFontsTitleSize", (FontSize)18, (Func<string>)(() => "Title Font Size"), (Func<string>)(() => "Defines the size the reminder title font.")),
+				MessageSize = base.GlobalSettings.DefineSetting<FontSize>("ReminderFontsMessageSize", (FontSize)16, (Func<string>)(() => "Message Font Size"), (Func<string>)(() => "Defines the size the reminder message font."))
 			};
 			int reminderDurationMin = 1;
 			int reminderDurationMax = 15;
@@ -105,8 +124,9 @@ namespace Estreya.BlishHUD.EventTable
 			ReminderOpacity = base.GlobalSettings.DefineSetting<float>("ReminderOpacity", 0.5f, (Func<string>)(() => "Reminder Opacity"), (Func<string>)(() => "Defines the background opacity for reminders."));
 			SettingComplianceExtensions.SetRange(ReminderOpacity, 0.1f, 1f);
 			ReminderLeftClickAction = base.GlobalSettings.DefineSetting<LeftClickAction>("ReminderLeftClickAction", LeftClickAction.CopyWaypoint, (Func<string>)(() => "Reminder Left Click Action"), (Func<string>)(() => "Defines the action to execute on a left click."));
+			ReminderRightClickAction = base.GlobalSettings.DefineSetting<EventReminderRightClickAction>("ReminderRightClickAction", EventReminderRightClickAction.Dismiss, (Func<string>)(() => "Reminder Right Click Action"), (Func<string>)(() => "Defines the action to execute on a right click."));
 			AcceptWaypointPrompt = base.GlobalSettings.DefineSetting<bool>("AcceptWaypointPrompt", true, (Func<string>)(() => "Accept Waypoint Prompt"), (Func<string>)(() => "Defines if the waypoint prompt should be auto accepted"));
-			ReminderStackDirection = base.GlobalSettings.DefineSetting<ReminderStackDirection>("ReminderStackDirection", Estreya.BlishHUD.EventTable.Models.ReminderStackDirection.Down, (Func<string>)(() => "Reminder Stack Direction"), (Func<string>)(() => "Defines the direction in which reminders stack."));
+			ReminderStackDirection = base.GlobalSettings.DefineSetting<EventReminderStackDirection>("ReminderStackDirection", EventReminderStackDirection.Down, (Func<string>)(() => "Reminder Stack Direction"), (Func<string>)(() => "Defines the direction in which reminders stack."));
 			ShowDynamicEventsOnMap = base.GlobalSettings.DefineSetting<bool>("ShowDynamicEventsOnMap", false, (Func<string>)(() => "Show Dynamic Events on Map"), (Func<string>)(() => "Whether the dynamic events of the map should be shown."));
 			ShowDynamicEventInWorld = base.GlobalSettings.DefineSetting<bool>("ShowDynamicEventInWorld", false, (Func<string>)(() => "Show Dynamic Events in World"), (Func<string>)(() => "Whether dynamic events should be shown inside the world."));
 			ShowDynamicEventInWorld.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowDynamicEventInWorld_SettingChanged);
@@ -161,22 +181,37 @@ namespace Estreya.BlishHUD.EventTable
 				return;
 			}
 			int minLocationX = 0;
-			int maxLocationX = maxResX - 350;
+			int maxLocationX = maxResX - ReminderSize.X.get_Value();
 			int minLocationY = 0;
-			int maxLocationY = maxResY - 96;
-			if (maxLocationX >= 50)
-			{
-				_ = 50;
-			}
-			EventReminderPositition reminderPosition = ReminderPosition;
+			int maxLocationY = maxResY - ReminderSize.Y.get_Value();
+			int minWidth = 0;
+			int maxWidth = maxResX - ReminderPosition.X.get_Value();
+			int minHeight = 0;
+			int maxHeight = maxResY - ReminderPosition.Y.get_Value();
+			EventReminderPosition reminderPosition = ReminderPosition;
 			if (reminderPosition != null)
 			{
 				SettingComplianceExtensions.SetRange(reminderPosition.X, minLocationX, maxLocationX);
 			}
-			EventReminderPositition reminderPosition2 = ReminderPosition;
+			EventReminderPosition reminderPosition2 = ReminderPosition;
 			if (reminderPosition2 != null)
 			{
 				SettingComplianceExtensions.SetRange(reminderPosition2.Y, minLocationY, maxLocationY);
+			}
+			EventReminderSize reminderSize = ReminderSize;
+			if (reminderSize != null)
+			{
+				SettingComplianceExtensions.SetRange(reminderSize.X, minWidth, maxWidth);
+			}
+			EventReminderSize reminderSize2 = ReminderSize;
+			if (reminderSize2 != null)
+			{
+				SettingComplianceExtensions.SetRange(reminderSize2.Y, minHeight, maxHeight);
+			}
+			EventReminderSize reminderSize3 = ReminderSize;
+			if (reminderSize3 != null)
+			{
+				SettingComplianceExtensions.SetRange(reminderSize3.Icon, 0, ReminderSize.Y.get_Value());
 			}
 		}
 
@@ -249,6 +284,7 @@ namespace Estreya.BlishHUD.EventTable
 			SettingEntry<float> topTimelineTimeOpacity = base.DrawerSettings.DefineSetting<float>(name + "-topTimelineTimeOpacity", 1f, (Func<string>)(() => "Top Timeline Time Opacity"), (Func<string>)(() => "Defines the time color opacity of the top timeline."));
 			SettingEntry<bool> topTimelineLinesOverWholeHeight = base.DrawerSettings.DefineSetting<bool>(name + "-topTimelineLinesOverWholeHeight", false, (Func<string>)(() => "Top Timeline Lines Over Whole Height"), (Func<string>)(() => "Defines if the top timeline lines should cover the whole event area height."));
 			SettingEntry<bool> topTimelineLinesInBackground = base.DrawerSettings.DefineSetting<bool>(name + "-topTimelineLinesInBackground", true, (Func<string>)(() => "Top Timeline Lines in Background"), (Func<string>)(() => "Defines if the top timeline lines should be in the background or foreground."));
+			base.DrawerSettings.AddLoggingEvents();
 			return new EventAreaConfiguration
 			{
 				Name = drawer.Name,
@@ -635,6 +671,7 @@ namespace Estreya.BlishHUD.EventTable
 			base.Unload();
 			ShowDynamicEventInWorld.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowDynamicEventInWorld_SettingChanged);
 			ShowDynamicEventsInWorldOnlyWhenInside.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowDynamicEventsInWorldOnlyWhenInside_SettingChanged);
+			EventAreaSettings.RemoveLoggingEvents();
 		}
 	}
 }

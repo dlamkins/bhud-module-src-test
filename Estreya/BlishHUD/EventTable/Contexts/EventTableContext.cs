@@ -19,6 +19,10 @@ namespace Estreya.BlishHUD.EventTable.Contexts
 
 		internal event AsyncEventHandler<ContextEventArgs<ShowReminder>> RequestShowReminder;
 
+		internal event AsyncEventHandler<ContextEventArgs<AddDynamicEvent>> RequestAddDynamicEvent;
+
+		internal event AsyncEventHandler<ContextEventArgs<Guid>> RequestRemoveDynamicEvent;
+
 		public async Task AddCategory(AddCategory newCategory)
 		{
 			CheckReady();
@@ -65,6 +69,22 @@ namespace Estreya.BlishHUD.EventTable.Contexts
 			Type caller = GetCaller();
 			base.Logger.Info("\"" + caller.FullName + "\" triggered a context action: ShowReminder().");
 			await (this.RequestShowReminder?.Invoke(this, new ContextEventArgs<ShowReminder>(caller, reminder)) ?? Task.FromException(new NotImplementedException()));
+		}
+
+		public async Task AddDynamicEvent(AddDynamicEvent addDynamicEvent)
+		{
+			CheckReady();
+			Type caller = GetCaller();
+			base.Logger.Info(string.Format("\"{0}\" triggered a context action: {1}(\"{2} ({3})\").", caller.FullName, "AddDynamicEvent", addDynamicEvent.Name, addDynamicEvent.Id));
+			await (this.RequestAddDynamicEvent?.Invoke(this, new ContextEventArgs<AddDynamicEvent>(caller, addDynamicEvent)) ?? Task.FromException(new NotImplementedException()));
+		}
+
+		public async Task RemoveDynamicEvent(Guid id)
+		{
+			CheckReady();
+			Type caller = GetCaller();
+			base.Logger.Info(string.Format("\"{0}\" triggered a context action: {1}(\"{2}\").", caller.FullName, "RemoveDynamicEvent", id));
+			await (this.RequestRemoveDynamicEvent?.Invoke(this, new ContextEventArgs<Guid>(caller, id)) ?? Task.FromException(new NotImplementedException()));
 		}
 	}
 }

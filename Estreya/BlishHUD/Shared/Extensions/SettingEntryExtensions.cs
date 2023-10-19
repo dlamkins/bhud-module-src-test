@@ -1,11 +1,48 @@
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using Blish_HUD;
 using Blish_HUD.Settings;
+using Newtonsoft.Json;
 
 namespace Estreya.BlishHUD.Shared.Extensions
 {
 	public static class SettingEntryExtensions
 	{
+		private static Logger _logger = Logger.GetLogger(typeof(SettingEntryExtensions));
+
+		private static ConcurrentDictionary<string, Delegate> _loggingDelegates = new ConcurrentDictionary<string, Delegate>();
+
+		public static void AddLoggingEvent<T>(this SettingEntry<T> setting)
+		{
+			if (!_loggingDelegates.ContainsKey(((SettingEntry)setting).get_EntryKey()))
+			{
+				MethodInfo handlerMethodInfo = typeof(SettingEntryExtensions).GetMethod("OnSettingChanged", BindingFlags.Static | BindingFlags.NonPublic);
+				EventInfo eventInfo = ((object)setting).GetType().GetEvent("SettingChanged");
+				Delegate handlerDelegate = Delegate.CreateDelegate(eventInfo.EventHandlerType, handlerMethodInfo.MakeGenericMethod(((SettingEntry)setting).get_SettingType()));
+				eventInfo.AddEventHandler(setting, handlerDelegate);
+				_loggingDelegates.AddOrUpdate(((SettingEntry)setting).get_EntryKey(), handlerDelegate, (string key, Delegate old) => handlerDelegate);
+			}
+		}
+
+		public static void RemoveLoggingEvent<T>(this SettingEntry<T> setting)
+		{
+			if (_loggingDelegates.TryRemove(((SettingEntry)setting).get_EntryKey(), out var handlerDelegate))
+			{
+				((object)setting).GetType().GetEvent("SettingChanged").RemoveEventHandler(setting, handlerDelegate);
+			}
+		}
+
+		private static void OnSettingChanged<T>(object sender, ValueChangedEventArgs<T> e)
+		{
+			SettingEntry<T> settingEntry = (SettingEntry<T>)sender;
+			string prevValue = ((e.get_PreviousValue() is string) ? e.get_PreviousValue().ToString() : JsonConvert.SerializeObject(e.get_PreviousValue()));
+			string newValue = ((e.get_NewValue() is string) ? e.get_NewValue().ToString() : JsonConvert.SerializeObject(e.get_NewValue()));
+			_logger.Debug("Changed setting \"" + ((SettingEntry)settingEntry).get_EntryKey() + "\" from \"" + prevValue + "\" to \"" + newValue + "\"");
+		}
+
 		public static float GetValue(this SettingEntry<float> settingEntry)
 		{
 			if (settingEntry == null)

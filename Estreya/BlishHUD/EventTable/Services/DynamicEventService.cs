@@ -62,6 +62,22 @@ namespace Estreya.BlishHUD.EventTable.Services
 
 		public async Task AddCustomEvent(DynamicEvent dynamicEvent)
 		{
+			if (dynamicEvent == null)
+			{
+				throw new ArgumentNullException("dynamicEvent", "Dynamic event can't be null.");
+			}
+			if (string.IsNullOrWhiteSpace(dynamicEvent.ID))
+			{
+				throw new ArgumentNullException("ID", "Id can't be null or empty.");
+			}
+			if (string.IsNullOrWhiteSpace(dynamicEvent.Location?.Type))
+			{
+				throw new ArgumentNullException("Type", "Location.Type can't be null or empty.");
+			}
+			if (dynamicEvent.MapId == 0)
+			{
+				throw new ArgumentNullException("MapId", "Map id can't be empty.");
+			}
 			_customEvents.RemoveAll((DynamicEvent e) => e.ID == dynamicEvent.ID);
 			dynamicEvent.IsCustom = true;
 			_customEvents.Add(dynamicEvent);

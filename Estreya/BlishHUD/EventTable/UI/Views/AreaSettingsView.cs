@@ -13,6 +13,7 @@ using Estreya.BlishHUD.EventTable.Services;
 using Estreya.BlishHUD.Shared.Controls;
 using Estreya.BlishHUD.Shared.Models;
 using Estreya.BlishHUD.Shared.Services;
+using Estreya.BlishHUD.Shared.Threading.Events;
 using Estreya.BlishHUD.Shared.UI.Views;
 using Estreya.BlishHUD.Shared.Utils;
 using Microsoft.Xna.Framework;
@@ -54,6 +55,12 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 		public event EventHandler<AddAreaEventArgs> AddArea;
 
 		public event EventHandler<EventAreaConfiguration> RemoveArea;
+
+		public event AsyncEventHandler<EventAreaConfiguration> SyncEnabledEventsToReminders;
+
+		public event AsyncEventHandler<EventAreaConfiguration> SyncEnabledEventsFromReminders;
+
+		public event AsyncEventHandler<EventAreaConfiguration> SyncEnabledEventsToOtherAreas;
 
 		public AreaSettingsView(Func<IEnumerable<EventAreaConfiguration>> areaConfiguration, Func<List<EventCategory>> allEvents, ModuleSettings moduleSettings, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService, EventStateService eventStateService)
 			: base(apiManager, iconService, translationService, settingEventService)
@@ -340,6 +347,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderBehaviourSettings(settingsPanel, areaConfiguration);
 			RenderEmptyLine((Panel)(object)settingsPanel);
 			RenderFillerSettings(settingsPanel, areaConfiguration);
+			RenderEmptyLine((Panel)(object)settingsPanel);
+			RenderSynchronizationSettings(settingsPanel, areaConfiguration);
 			RenderEmptyLine((Panel)(object)settingsPanel);
 			((IEnumerable<Control>)((Container)settingsPanel).get_Children()).Last();
 			Estreya.BlishHUD.Shared.Controls.Button manageEventsButton = RenderButton(_areaPanel, base.TranslationService.GetTranslation("areaSettingsView-manageEvents-btn", "Manage Events"), delegate
@@ -697,6 +706,68 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderColorSetting((Panel)(object)groupPanel, areaConfiguration.FillerShadowColor);
 			RenderFloatSetting((Panel)(object)groupPanel, areaConfiguration.FillerShadowOpacity);
 			RenderEmptyLine((Panel)(object)groupPanel, 20);
+		}
+
+		private void RenderSynchronizationSettings(FlowPanel settingsPanel, EventAreaConfiguration areaConfiguration)
+		{
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Expected O, but got Unknown
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			FlowPanel val = new FlowPanel();
+			((Control)val).set_Parent((Container)(object)settingsPanel);
+			((Container)val).set_HeightSizingMode((SizingMode)1);
+			((Control)val).set_Width(((Control)settingsPanel).get_Width() - 30);
+			val.set_FlowDirection((ControlFlowDirection)3);
+			val.set_OuterControlPadding(new Vector2(20f, 20f));
+			((Panel)val).set_ShowBorder(true);
+			((Panel)val).set_CanCollapse(true);
+			((Panel)val).set_Collapsed(true);
+			((Panel)val).set_Title(base.TranslationService.GetTranslation("areaSettingsView-group-synchronization", "Synchronization"));
+			FlowPanel groupPanel = val;
+			RenderButtonAsync((Panel)(object)groupPanel, "Sync enabled Events to Reminders", async delegate
+			{
+				if (await new ConfirmDialog("Synchronizing", "You are in the process of synchronizing the enabled events of this area to the reminders.\n\nThis will override all previously configured enabled/disabled reminder settings.", base.IconService)
+				{
+					SelectedButtonIndex = 1
+				}.ShowDialog() == DialogResult.OK)
+				{
+					await (this.SyncEnabledEventsToReminders?.Invoke(this, areaConfiguration) ?? Task.FromException(new NotImplementedException()));
+					ScreenNotification.ShowNotification("Synchronization complete!", (NotificationType)0, (Texture2D)null, 4);
+				}
+			});
+			RenderButtonAsync((Panel)(object)groupPanel, "Sync enabled Events from Reminders", async delegate
+			{
+				if (await new ConfirmDialog("Synchronizing", "You are in the process of synchronizing the enabled events for reminders to this area.\n\nThis will override all previously configured enabled/disabled event settings of this area.", base.IconService)
+				{
+					SelectedButtonIndex = 1
+				}.ShowDialog() == DialogResult.OK)
+				{
+					await (this.SyncEnabledEventsFromReminders?.Invoke(this, areaConfiguration) ?? Task.FromException(new NotImplementedException()));
+					ScreenNotification.ShowNotification("Synchronization complete!", (NotificationType)0, (Texture2D)null, 4);
+				}
+			});
+			RenderButtonAsync((Panel)(object)groupPanel, "Sync enabled Events to other Areas", async delegate
+			{
+				if (await new ConfirmDialog("Synchronizing", "You are in the process of synchronizing the enabled events of this area to all other areas.\n\nThis will override all previously configured enabled/disabled event settings of other areas.", base.IconService)
+				{
+					SelectedButtonIndex = 1
+				}.ShowDialog() == DialogResult.OK)
+				{
+					await (this.SyncEnabledEventsToOtherAreas?.Invoke(this, areaConfiguration) ?? Task.FromException(new NotImplementedException()));
+					ScreenNotification.ShowNotification("Synchronization complete!", (NotificationType)0, (Texture2D)null, 4);
+				}
+			});
+			RenderEmptyLine((Panel)(object)groupPanel, (int)groupPanel.get_OuterControlPadding().Y);
 		}
 
 		private void ReorderEvents(EventAreaConfiguration configuration)

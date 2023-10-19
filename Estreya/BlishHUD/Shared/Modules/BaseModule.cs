@@ -74,7 +74,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected PasswordManager PasswordManager { get; private set; }
 
-		public abstract string UrlModuleName { get; }
+		protected abstract string UrlModuleName { get; }
 
 		protected abstract string API_VERSION_NO { get; }
 
@@ -102,43 +102,43 @@ namespace Estreya.BlishHUD.Shared.Modules
 		protected bool ShowUI { get; private set; } = true;
 
 
-		public TSettings ModuleSettings { get; private set; }
+		protected TSettings ModuleSettings { get; private set; }
 
 		protected CornerIcon CornerIcon { get; set; }
 
 		protected TabbedWindow SettingsWindow { get; private set; }
 
-		public virtual BitmapFont Font => GameService.Content.get_DefaultFont16();
+		protected virtual BitmapFont Font => GameService.Content.get_DefaultFont16();
 
-		public IconService IconService { get; private set; }
+		protected IconService IconService { get; private set; }
 
-		public TranslationService TranslationService { get; private set; }
+		protected TranslationService TranslationService { get; private set; }
 
-		public SettingEventService SettingEventService { get; private set; }
+		protected SettingEventService SettingEventService { get; private set; }
 
-		public NewsService NewsService { get; private set; }
+		protected NewsService NewsService { get; private set; }
 
-		public WorldbossService WorldbossService { get; private set; }
+		protected WorldbossService WorldbossService { get; private set; }
 
-		public MapchestService MapchestService { get; private set; }
+		protected MapchestService MapchestService { get; private set; }
 
-		public PointOfInterestService PointOfInterestService { get; private set; }
+		protected PointOfInterestService PointOfInterestService { get; private set; }
 
-		public AccountService AccountService { get; private set; }
+		protected AccountService AccountService { get; private set; }
 
-		public SkillService SkillService { get; private set; }
+		protected SkillService SkillService { get; private set; }
 
-		public TradingPostService TradingPostService { get; private set; }
+		protected TradingPostService TradingPostService { get; private set; }
 
-		public ItemService ItemService { get; private set; }
+		protected ItemService ItemService { get; private set; }
 
-		public ArcDPSService ArcDPSService { get; private set; }
+		protected ArcDPSService ArcDPSService { get; private set; }
 
-		public BlishHudApiService BlishHUDAPIService { get; private set; }
+		protected BlishHudApiService BlishHUDAPIService { get; private set; }
 
-		public AchievementService AchievementService { get; private set; }
+		protected AchievementService AchievementService { get; private set; }
 
-		public AccountAchievementService AccountAchievementService { get; private set; }
+		protected AccountAchievementService AccountAchievementService { get; private set; }
 
 		protected abstract int CornerIconPriority { get; }
 

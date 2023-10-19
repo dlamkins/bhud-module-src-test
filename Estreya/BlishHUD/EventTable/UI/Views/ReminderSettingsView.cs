@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.EventTable.Controls;
 using Estreya.BlishHUD.EventTable.Models;
+using Estreya.BlishHUD.EventTable.Models.Reminders;
 using Estreya.BlishHUD.Shared.Controls;
 using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.UI.Views;
@@ -43,11 +45,20 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 		protected override void BuildView(FlowPanel parent)
 		{
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.RemindersEnabled);
+			RenderEmptyLine((Panel)(object)parent);
 			RenderIntSetting((Panel)(object)parent, _moduleSettings.ReminderPosition.X);
 			RenderIntSetting((Panel)(object)parent, _moduleSettings.ReminderPosition.Y);
+			RenderEmptyLine((Panel)(object)parent);
+			RenderIntSetting((Panel)(object)parent, _moduleSettings.ReminderSize.X);
+			RenderIntSetting((Panel)(object)parent, _moduleSettings.ReminderSize.Y);
+			RenderIntSetting((Panel)(object)parent, _moduleSettings.ReminderSize.Icon);
+			RenderEmptyLine((Panel)(object)parent);
 			RenderFloatSetting((Panel)(object)parent, _moduleSettings.ReminderDuration);
 			RenderFloatSetting((Panel)(object)parent, _moduleSettings.ReminderOpacity);
-			RenderEnumSetting<ReminderStackDirection>((Panel)(object)parent, _moduleSettings.ReminderStackDirection);
+			RenderEnumSetting<EventReminderStackDirection>((Panel)(object)parent, _moduleSettings.ReminderStackDirection);
+			RenderEmptyLine((Panel)(object)parent);
+			base.RenderEnumSetting<FontSize>((Panel)(object)parent, _moduleSettings.ReminderFonts.TitleSize);
+			base.RenderEnumSetting<FontSize>((Panel)(object)parent, _moduleSettings.ReminderFonts.MessageSize);
 			RenderEmptyLine((Panel)(object)parent);
 			RenderEnumSetting<LeftClickAction>((Panel)(object)parent, _moduleSettings.ReminderLeftClickAction);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.AcceptWaypointPrompt);
@@ -81,11 +92,13 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			});
 			RenderButton((Panel)(object)parent, base.TranslationService.GetTranslation("reminderSettingsView-btn-testReminder", "Test Reminder"), delegate
 			{
+				//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00be: Unknown result type (might be due to invalid IL or missing references)
 				EventNotification eventNotification = new EventNotification(new Estreya.BlishHUD.EventTable.Models.Event
 				{
 					Name = "Test Event",
 					Icon = "textures/maintenance.png"
-				}, "Test description!", _moduleSettings.ReminderPosition.X.get_Value(), _moduleSettings.ReminderPosition.Y.get_Value(), _moduleSettings.ReminderStackDirection.get_Value(), base.IconService);
+				}, "Test description!", _moduleSettings.ReminderPosition.X.get_Value(), _moduleSettings.ReminderPosition.Y.get_Value(), _moduleSettings.ReminderSize.X.get_Value(), _moduleSettings.ReminderSize.Y.get_Value(), _moduleSettings.ReminderSize.Icon.get_Value(), _moduleSettings.ReminderStackDirection.get_Value(), _moduleSettings.ReminderFonts.TitleSize.get_Value(), _moduleSettings.ReminderFonts.MessageSize.get_Value(), base.IconService);
 				eventNotification.BackgroundOpacity = _moduleSettings.ReminderOpacity.get_Value();
 				eventNotification.Show(TimeSpan.FromSeconds(_moduleSettings.ReminderDuration.get_Value()));
 			});
