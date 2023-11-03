@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Blish_HUD;
+using Blish_HUD.Graphics;
 using Blish_HUD.Modules.Managers;
+using Manlaan.Mounts.Things;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -16,11 +18,19 @@ namespace Manlaan.Mounts
 
 		public static readonly string MouseTextureName = "255329.png";
 
-		public static readonly string MountLogoTextureName = "514394-grey.png";
+		public static readonly string MountLogoTextureName = "514394-grey-plus-plus100.png";
 
 		public static readonly string TabBackgroundTextureName = "156006-big.png";
 
-		public static readonly string SettingsIconTextureName = "155052.png";
+		public static readonly string SettingsTextureName = "155052.png";
+
+		public static readonly string RadialSettingsTextureName = "1130623-32.png";
+
+		public static readonly string IconSettingsTextureName = "2208345.png";
+
+		public static readonly string SupportMeTabTextureName = "156127-32-grey.png";
+
+		public static readonly string KofiTextureName = "kofi-small.png";
 
 		public static readonly string AnetIconTextureName = "1441452.png";
 
@@ -33,34 +43,48 @@ namespace Manlaan.Mounts
 		private void PreCacheTextures()
 		{
 			Func<string, Texture2D> getTextureFromRef = (string textureName) => contentsManager.GetTexture(textureName);
-			foreach (MountImageFile mountImageFile in Module._mountImageFiles)
+			foreach (ThingImageFile mountImageFile in Module._thingImageFiles)
 			{
 				PreCacheTexture(mountImageFile.Name, PremultiplyTexture);
 			}
 			PreCacheTexture(MouseTextureName, getTextureFromRef);
 			PreCacheTexture(MountLogoTextureName, getTextureFromRef);
 			PreCacheTexture(TabBackgroundTextureName, getTextureFromRef);
-			PreCacheTexture(SettingsIconTextureName, getTextureFromRef);
+			PreCacheTexture(SettingsTextureName, getTextureFromRef);
+			PreCacheTexture(RadialSettingsTextureName, getTextureFromRef);
+			PreCacheTexture(IconSettingsTextureName, getTextureFromRef);
+			PreCacheTexture(SupportMeTabTextureName, getTextureFromRef);
+			PreCacheTexture(KofiTextureName, getTextureFromRef);
 			PreCacheTexture(AnetIconTextureName, getTextureFromRef);
 		}
 
 		private Texture2D PremultiplyTexture(string textureName)
 		{
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
 			try
 			{
-				FileStream titleStream = File.OpenRead(Path.Combine(Module.mountsDirectory, textureName));
-				Texture2D texture = Texture2D.FromStream(GameService.Graphics.get_GraphicsDevice(), (Stream)titleStream);
-				titleStream.Close();
-				Color[] buffer = (Color[])(object)new Color[texture.get_Width() * texture.get_Height()];
-				texture.GetData<Color>(buffer);
-				for (int i = 0; i < buffer.Length; i++)
+				using FileStream titleStream = File.OpenRead(Path.Combine(Module.mountsDirectory, textureName));
+				GraphicsDeviceContext gdc = GameService.Graphics.LendGraphicsDeviceContext();
+				try
 				{
-					buffer[i] = Color.FromNonPremultiplied((int)((Color)(ref buffer[i])).get_R(), (int)((Color)(ref buffer[i])).get_G(), (int)((Color)(ref buffer[i])).get_B(), (int)((Color)(ref buffer[i])).get_A());
+					Texture2D texture = Texture2D.FromStream(((GraphicsDeviceContext)(ref gdc)).get_GraphicsDevice(), (Stream)titleStream);
+					titleStream.Close();
+					Color[] buffer = (Color[])(object)new Color[texture.get_Width() * texture.get_Height()];
+					texture.GetData<Color>(buffer);
+					for (int i = 0; i < buffer.Length; i++)
+					{
+						buffer[i] = Color.FromNonPremultiplied((int)((Color)(ref buffer[i])).get_R(), (int)((Color)(ref buffer[i])).get_G(), (int)((Color)(ref buffer[i])).get_B(), (int)((Color)(ref buffer[i])).get_A());
+					}
+					texture.SetData<Color>(buffer);
+					return texture;
 				}
-				texture.SetData<Color>(buffer);
-				return texture;
+				finally
+				{
+					((GraphicsDeviceContext)(ref gdc)).Dispose();
+				}
 			}
 			catch
 			{
@@ -81,9 +105,9 @@ namespace Manlaan.Mounts
 			return GetTexture(filename);
 		}
 
-		public Texture2D GetMountImgFile(Mount mount)
+		public Texture2D GetMountImgFile(Thing thing)
 		{
-			return GetTexture(mount.ImageFileNameSetting.get_Value());
+			return GetTexture(thing.ImageFileNameSetting.get_Value());
 		}
 
 		private Texture2D GetTexture(string filename)

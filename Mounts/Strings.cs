@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Resources;
 using System.Runtime.CompilerServices;
 
-namespace Manlaan.Mounts
+namespace Mounts
 {
 	[GeneratedCode("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
 	[DebuggerNonUserCode]
@@ -23,7 +23,7 @@ namespace Manlaan.Mounts
 			{
 				if (resourceMan == null)
 				{
-					resourceMan = new ResourceManager("Manlaan.Mounts.Strings", typeof(Strings).Assembly);
+					resourceMan = new ResourceManager("Mounts.Strings", typeof(Strings).Assembly);
 				}
 				return resourceMan;
 			}
@@ -42,9 +42,17 @@ namespace Manlaan.Mounts
 			}
 		}
 
-		internal static string Setting_DefaultFlyingMountChoice => ResourceManager.GetString("Setting_DefaultFlyingMountChoice", resourceCulture);
+		internal static string Add => ResourceManager.GetString("Add", resourceCulture);
 
-		internal static string Setting_DefaultMountBehaviour => ResourceManager.GetString("Setting_DefaultMountBehaviour", resourceCulture);
+		internal static string Add_UserDefined_Radial => ResourceManager.GetString("Add_UserDefined_Radial", resourceCulture);
+
+		internal static string Delete => ResourceManager.GetString("Delete", resourceCulture);
+
+		internal static string Documentation_Button_Label => ResourceManager.GetString("Documentation_Button_Label", resourceCulture);
+
+		internal static string Edit => ResourceManager.GetString("Edit", resourceCulture);
+
+		internal static string Setting_DefaultFlyingMountChoice => ResourceManager.GetString("Setting_DefaultFlyingMountChoice", resourceCulture);
 
 		internal static string Setting_DefaultMountBinding => ResourceManager.GetString("Setting_DefaultMountBinding", resourceCulture);
 
@@ -94,7 +102,13 @@ namespace Manlaan.Mounts
 
 		internal static string Settings_Button_Label => ResourceManager.GetString("Settings_Button_Label", resourceCulture);
 
-		internal static string Window_AllSettingsTab => ResourceManager.GetString("Window_AllSettingsTab", resourceCulture);
+		internal static string Window_GeneralSettingsTab => ResourceManager.GetString("Window_GeneralSettingsTab", resourceCulture);
+
+		internal static string Window_IconSettingsTab => ResourceManager.GetString("Window_IconSettingsTab", resourceCulture);
+
+		internal static string Window_RadialSettingsTab => ResourceManager.GetString("Window_RadialSettingsTab", resourceCulture);
+
+		internal static string Window_SupportMeTab => ResourceManager.GetString("Window_SupportMeTab", resourceCulture);
 
 		internal Strings()
 		{

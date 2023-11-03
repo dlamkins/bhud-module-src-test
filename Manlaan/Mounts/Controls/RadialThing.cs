@@ -1,14 +1,15 @@
+using Manlaan.Mounts.Things;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Manlaan.Mounts.Controls
 {
-	internal class RadialMount
+	internal class RadialThing
 	{
 		public double AngleBegin { get; set; }
 
 		public double AngleEnd { get; set; }
 
-		public Mount Mount { get; set; }
+		public Thing Thing { get; set; }
 
 		public Texture2D Texture { get; set; }
 

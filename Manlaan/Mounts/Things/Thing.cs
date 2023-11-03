@@ -1,39 +1,27 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
-using Gw2Sharp.Models;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace Manlaan.Mounts
+namespace Manlaan.Mounts.Things
 {
-	public abstract class Mount
+	public abstract class Thing : IEquatable<Thing>
 	{
-		private readonly Helper _helper;
+		protected static readonly Logger Logger = Logger.GetLogger<Thing>();
 
-		private static readonly Logger Logger = Logger.GetLogger<Mount>();
+		protected readonly Helper _helper;
 
 		public string Name { get; private set; }
 
 		public string DisplayName { get; private set; }
 
 		public string ImageFileName { get; private set; }
-
-		public MountType MountType { get; set; }
-
-		public DateTime? QueuedTimestamp { get; internal set; }
-
-		public DateTime? LastUsedTimestamp { get; internal set; }
-
-		public bool IsWaterMount { get; private set; }
-
-		public bool IsFlyingMount { get; private set; }
-
-		public bool IsWvWMount { get; private set; }
 
 		public SettingEntry<int> OrderSetting { get; private set; }
 
@@ -43,17 +31,9 @@ namespace Manlaan.Mounts
 
 		public CornerIcon CornerIcon { get; private set; }
 
-		public bool IsAvailable
-		{
-			get
-			{
-				if (OrderSetting.get_Value() != 0)
-				{
-					return IsKeybindSet;
-				}
-				return false;
-			}
-		}
+		public DateTime? QueuedTimestamp { get; internal set; }
+
+		public DateTime? LastUsedTimestamp { get; internal set; }
 
 		public bool IsKeybindSet
 		{
@@ -70,47 +50,18 @@ namespace Manlaan.Mounts
 			}
 		}
 
-		public Mount(SettingCollection settingCollection, Helper helper, string name, string displayName, string imageFileName, MountType mountType, bool isUnderwaterMount, bool isFlyingMount, bool isWvWMount, int defaultOrderSetting)
+		public bool IsAvailable => IsKeybindSet;
+
+		public Thing(SettingCollection settingCollection, Helper helper, string name, string displayName, string imageFileName)
 		{
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e7: Expected O, but got Unknown
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007e: Expected O, but got Unknown
 			_helper = helper;
 			Name = name;
 			DisplayName = displayName;
 			ImageFileName = imageFileName;
-			MountType = mountType;
-			IsWaterMount = isUnderwaterMount;
-			IsFlyingMount = isFlyingMount;
-			IsWvWMount = isWvWMount;
-			OrderSetting = settingCollection.DefineSetting<int>("Mount" + name + "Order2", defaultOrderSetting, (Func<string>)(() => displayName + " Order"), (Func<string>)(() => ""));
 			KeybindingSetting = settingCollection.DefineSetting<KeyBinding>("Mount" + name + "Binding", new KeyBinding((Keys)0), (Func<string>)(() => displayName + " Binding"), (Func<string>)(() => ""));
-			ImageFileNameSetting = settingCollection.DefineSetting<string>("Mount" + name + "ImageFileName", "", (Func<string>)(() => displayName + " Image File Name"), (Func<string>)(() => ""));
-		}
-
-		public async Task DoUnmountAction()
-		{
-			await _helper.TriggerKeybind(KeybindingSetting);
-		}
-
-		public async Task DoMountAction()
-		{
-			if (GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat())
-			{
-				QueuedTimestamp = DateTime.UtcNow;
-				return;
-			}
-			if (!Module.IsMountSwitchable())
-			{
-				_helper.StoreMountForLaterUse(this, GameService.Gw2Mumble.get_PlayerCharacter().get_Name());
-				Logger.Debug("DoMountAction StoreMountForLaterUse: " + DisplayName);
-				return;
-			}
-			if ((int)GameService.Gw2Mumble.get_PlayerCharacter().get_CurrentMount() == 0)
-			{
-				LastUsedTimestamp = DateTime.UtcNow;
-			}
-			await _helper.TriggerKeybind(KeybindingSetting);
+			ImageFileNameSetting = settingCollection.DefineSetting<string>("Mount" + name + "ImageFileName", imageFileName + ".png", (Func<string>)(() => displayName + " Image File Name"), (Func<string>)(() => ""));
 		}
 
 		public void CreateCornerIcon(Texture2D img)
@@ -134,7 +85,7 @@ namespace Manlaan.Mounts
 			CornerIcon = val;
 			((Control)CornerIcon).add_Click((EventHandler<MouseEventArgs>)async delegate
 			{
-				await DoMountAction();
+				await DoAction();
 			});
 		}
 
@@ -145,6 +96,53 @@ namespace Manlaan.Mounts
 			{
 				((Control)cornerIcon).Dispose();
 			}
+		}
+
+		public async Task DoAction()
+		{
+			if (GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat() && Module._settingEnableMountQueueing.get_Value() && !IsUsableInCombat())
+			{
+				Logger.Debug("DoAction Set queued for out of combat: " + Name);
+				QueuedTimestamp = DateTime.UtcNow;
+			}
+			else if (!Module.CanThingBeActivated())
+			{
+				_helper.StoreThingForLaterActivation(this, GameService.Gw2Mumble.get_PlayerCharacter().get_Name(), "NotAbleToActivate");
+			}
+			else
+			{
+				LastUsedTimestamp = DateTime.UtcNow;
+				await Helper.TriggerKeybind(KeybindingSetting);
+			}
+		}
+
+		public async Task DoReverseAction()
+		{
+			await Helper.TriggerKeybind(KeybindingSetting);
+		}
+
+		public virtual bool IsInUse()
+		{
+			return false;
+		}
+
+		public virtual bool IsUsableInCombat()
+		{
+			return false;
+		}
+
+		public bool Equals(Thing other)
+		{
+			if (other != null)
+			{
+				return Name == other.Name;
+			}
+			return false;
+		}
+
+		public override int GetHashCode()
+		{
+			return 657878212 * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
 		}
 	}
 }

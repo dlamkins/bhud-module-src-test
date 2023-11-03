@@ -2,11 +2,11 @@ using System;
 
 namespace Manlaan.Mounts
 {
-	public class MountImageFile : IEquatable<MountImageFile>, IComparable<MountImageFile>
+	public class ThingImageFile : IEquatable<ThingImageFile>, IComparable<ThingImageFile>
 	{
 		public string Name { get; set; }
 
-		public MountImageFile()
+		public ThingImageFile()
 		{
 			Name = "";
 		}
@@ -22,7 +22,7 @@ namespace Manlaan.Mounts
 			{
 				return false;
 			}
-			MountImageFile objAsCls = obj as MountImageFile;
+			ThingImageFile objAsCls = obj as ThingImageFile;
 			if (objAsCls == null)
 			{
 				return false;
@@ -30,7 +30,7 @@ namespace Manlaan.Mounts
 			return Equals(objAsCls);
 		}
 
-		public bool Equals(MountImageFile other)
+		public bool Equals(ThingImageFile other)
 		{
 			if (other == null)
 			{
@@ -49,7 +49,7 @@ namespace Manlaan.Mounts
 			return name1.CompareTo(name2);
 		}
 
-		public int CompareTo(MountImageFile compare)
+		public int CompareTo(ThingImageFile compare)
 		{
 			if (compare == null)
 			{

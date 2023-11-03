@@ -13,12 +13,16 @@ using Blish_HUD.Input;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
-using Gw2Sharp.Models;
+using Gw2Sharp.WebApi.V2.Models;
 using Manlaan.Mounts.Controls;
+using Manlaan.Mounts.Things;
+using Manlaan.Mounts.Things.Mounts;
 using Manlaan.Mounts.Views;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Mounts;
+using Mounts.Settings;
 
 namespace Manlaan.Mounts
 {
@@ -27,37 +31,43 @@ namespace Manlaan.Mounts
 	{
 		private static readonly Logger Logger = Logger.GetLogger<Module>();
 
-		internal static Collection<Mount> _mounts;
+		internal static SettingCollection settingscollection;
+
+		internal static Collection<Thing> _things = new Collection<Thing>();
+
+		internal static List<ContextualRadialThingSettings> ContextualRadialSettings;
+
+		internal static List<UserDefinedRadialThingSettings> UserDefinedRadialSettings;
+
+		public static SettingEntry<List<int>> _settingUserDefinedRadialIds;
+
+		internal static List<IconThingSettings> IconThingSettings;
+
+		public static SettingEntry<List<int>> _settingDrawIconIds;
+
+		public static List<ThingImageFile> _thingImageFiles = new List<ThingImageFile>();
 
 		public static string mountsDirectory;
 
-		private TabbedWindow2 _settingsWindow;
+		public static string[] _keybindBehaviours = new string[2] { "Default", "Radial" };
 
-		public static List<MountImageFile> _mountImageFiles = new List<MountImageFile>();
-
-		public static int[] _mountOrder = new int[11]
-		{
-			0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
-			10
-		};
-
-		public static string[] _mountBehaviour = new string[2] { "DefaultMount", "Radial" };
-
-		public static string[] _mountOrientation = new string[2] { "Horizontal", "Vertical" };
-
-		public static string[] _mountRadialCenterMountBehavior = new string[3] { "None", "Default", "LastUsed" };
-
-		public static SettingEntry<string> _settingDefaultMountChoice;
-
-		public static SettingEntry<string> _settingDefaultWaterMountChoice;
-
-		public static SettingEntry<string> _settingDefaultFlyingMountChoice;
+		public static SettingEntry<int> _settingsLastRunMigrationVersion;
 
 		public static SettingEntry<KeyBinding> _settingDefaultMountBinding;
 
 		public static SettingEntry<bool> _settingDisplayMountQueueing;
 
+		public static SettingEntry<bool> _settingEnableMountQueueing;
+
+		public static SettingEntry<Point> _settingDisplayMountQueueingLocation;
+
+		public static SettingEntry<bool> _settingDragMountQueueing;
+
+		public static SettingEntry<bool> _settingCombatLaunchMasteryUnlocked;
+
 		public static SettingEntry<string> _settingDefaultMountBehaviour;
+
+		public static SettingEntry<string> _settingKeybindBehaviour;
 
 		public static SettingEntry<bool> _settingMountRadialSpawnAtMouse;
 
@@ -69,39 +79,21 @@ namespace Manlaan.Mounts
 
 		public static SettingEntry<float> _settingMountRadialIconOpacity;
 
-		public static SettingEntry<string> _settingMountRadialCenterMountBehavior;
-
-		public static SettingEntry<bool> _settingMountRadialRemoveCenterMount;
-
 		public static SettingEntry<KeyBinding> _settingMountRadialToggleActionCameraKeyBinding;
 
 		public static SettingEntry<bool> _settingDisplayModuleOnLoadingScreen;
 
 		public static SettingEntry<bool> _settingMountAutomaticallyAfterLoadingScreen;
 
-		public static SettingEntry<string> _settingDisplay;
-
-		public static SettingEntry<bool> _settingDisplayCornerIcons;
-
-		public static SettingEntry<bool> _settingDisplayManualIcons;
-
-		public static SettingEntry<string> _settingOrientation;
-
-		private SettingEntry<Point> _settingLoc;
-
-		public static SettingEntry<bool> _settingDrag;
-
-		public static SettingEntry<int> _settingImgWidth;
-
-		public static SettingEntry<float> _settingOpacity;
-
-		private Panel _mountPanel;
+		private TabbedWindow2 _settingsWindow;
 
 		public static DebugControl _debug;
 
 		private DrawRadial _radial;
 
-		private LoadingSpinner _queueingSpinner;
+		private ICollection<DrawIcons> _drawIcons = new List<DrawIcons>();
+
+		private DrawOutOfCombat _drawOutOfCombat;
 
 		private DrawMouseCursor _drawMouseCursor;
 
@@ -109,19 +101,9 @@ namespace Manlaan.Mounts
 
 		private TextureCache _textureCache;
 
-		private float _lastZPosition;
-
-		private double _lastUpdateSeconds;
-
-		public static bool IsPlayerGlidingOrFalling;
-
 		private bool _lastIsMountSwitchable;
 
-		private bool _dragging;
-
-		private Point _dragStart = Point.get_Zero();
-
-		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
+		private int _lastInUseMountsCount;
 
 		internal ContentsManager ContentsManager => base.ModuleParameters.get_ContentsManager();
 
@@ -129,49 +111,50 @@ namespace Manlaan.Mounts
 
 		internal Gw2ApiManager Gw2ApiManager => base.ModuleParameters.get_Gw2ApiManager();
 
-		internal static List<Mount> _availableOrderedMounts => (from m in _mounts
-			where m.IsAvailable
-			orderby m.OrderSetting.get_Value()
-			select m).ToList();
-
 		[ImportingConstructor]
 		public Module([Import("ModuleParameters")] ModuleParameters moduleParameters)
 			: this(moduleParameters)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			_helper = new Helper();
+			_debug = new DebugControl();
+			_helper = new Helper(Gw2ApiManager);
 		}
 
 		protected override void Initialize()
 		{
-			//IL_0211: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0224: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0229: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0239: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0249: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0258: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0275: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0281: Expected O, but got Unknown
-			//IL_02bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c5: Expected O, but got Unknown
+			//IL_028a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fa: Expected O, but got Unknown
+			//IL_0334: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033e: Expected O, but got Unknown
+			//IL_0378: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0382: Expected O, but got Unknown
+			//IL_03cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d9: Expected O, but got Unknown
+			//IL_0413: Unknown result type (might be due to invalid IL or missing references)
+			//IL_041d: Expected O, but got Unknown
 			List<string> obj = new List<string>
 			{
 				"griffon-text.png", "griffon-trans.png", "griffon.png", "jackal-text.png", "jackal-trans.png", "jackal.png", "raptor-text.png", "raptor-trans.png", "raptor.png", "roller-text.png",
 				"roller-trans.png", "roller.png", "skimmer-text.png", "skimmer-trans.png", "skimmer.png", "skyscale-text.png", "skyscale-trans.png", "skyscale.png", "springer-text.png", "springer-trans.png",
-				"springer.png", "turtle-text.png", "turtle-trans.png", "turtle.png", "warclaw-text.png", "warclaw-trans.png", "warclaw.png"
+				"springer.png", "turtle-text.png", "turtle-trans.png", "turtle.png", "warclaw-text.png", "warclaw-trans.png", "warclaw.png", "fishing.png", "skiff.png", "jadebotwaypoint.png",
+				"chair.png", "music.png", "held.png", "toy.png", "tonic.png", "scanforrift.png", "skyscaleleap.png", "unmount.png"
 			};
 			mountsDirectory = DirectoriesManager.GetFullDirectoryPath("mounts");
 			obj.ForEach(delegate(string f)
 			{
 				ExtractFile(f, mountsDirectory);
 			});
-			_mountImageFiles = (from file in Directory.GetFiles(mountsDirectory, ".")
+			_thingImageFiles = (from file in Directory.GetFiles(mountsDirectory, ".")
 				where file.ToLower().Contains(".png")
-				select new MountImageFile
+				select new ThingImageFile
 				{
 					Name = file.Substring(mountsDirectory.Length + 1)
 				}).ToList();
@@ -181,15 +164,18 @@ namespace Manlaan.Mounts
 				await HandleCombatChangeAsync(sender, e);
 			});
 			Texture2D mountsIcon = _textureCache.GetImgFile(TextureCache.MountLogoTextureName);
-			TabbedWindow2 val = new TabbedWindow2(_textureCache.GetImgFile(TextureCache.TabBackgroundTextureName), new Rectangle(35, 36, 1300, 900), new Rectangle(95, 42, 1221, 792));
-			((WindowBase2)val).set_Title("Mounts");
+			TabbedWindow2 val = new TabbedWindow2(_textureCache.GetImgFile(TextureCache.TabBackgroundTextureName), new Rectangle(35, 36, 1300, 900), new Rectangle(95, 42, 1221, 900));
+			((WindowBase2)val).set_Title("Mounts & More");
 			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((Control)val).set_Location(new Point(100, 100));
 			((WindowBase2)val).set_Emblem(mountsIcon);
 			((WindowBase2)val).set_Id(((Module)this).get_Namespace() + "_SettingsWindow");
 			((WindowBase2)val).set_SavesPosition(true);
 			_settingsWindow = val;
-			_settingsWindow.get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(_textureCache.GetImgFile(TextureCache.SettingsIconTextureName)), (Func<IView>)(() => (IView)(object)new SettingsView(_textureCache)), Strings.Window_AllSettingsTab, (int?)null));
+			_settingsWindow.get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(_textureCache.GetImgFile(TextureCache.SettingsTextureName)), (Func<IView>)(() => (IView)(object)new SettingsView(_textureCache)), Strings.Window_GeneralSettingsTab, (int?)null));
+			_settingsWindow.get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(_textureCache.GetImgFile(TextureCache.RadialSettingsTextureName)), (Func<IView>)(() => (IView)(object)new RadialThingSettingsView(DoKeybindActionAsync)), Strings.Window_RadialSettingsTab, (int?)null));
+			_settingsWindow.get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(_textureCache.GetImgFile(TextureCache.IconSettingsTextureName)), (Func<IView>)(() => (IView)(object)new IconThingSettingsView()), Strings.Window_IconSettingsTab, (int?)null));
+			_settingsWindow.get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(_textureCache.GetImgFile(TextureCache.SupportMeTabTextureName)), (Func<IView>)(() => (IView)(object)new SupportMeView(_textureCache)), Strings.Window_SupportMeTab, (int?)null));
 		}
 
 		private void ExtractFile(string filePath, string directoryToExtractTo)
@@ -203,61 +189,110 @@ namespace Manlaan.Mounts
 			File.WriteAllBytes(fullPath, buffer);
 		}
 
-		private void MigrateDisplaySettings()
+		private void MigrateAwayFromMount(SettingCollection settings)
 		{
-			if (_settingDisplay.get_Value().Contains("Corner") || _settingDisplay.get_Value().Contains("Manual"))
+			if (_settingDefaultMountBehaviour.get_Value() == "DefaultMount")
 			{
-				_settingDisplayCornerIcons.set_Value(_settingDisplay.get_Value().Contains("Corner"));
-				_settingDisplayManualIcons.set_Value(_settingDisplay.get_Value().Contains("Solid"));
-				if (_settingDisplay.get_Value().Contains("Text"))
-				{
-					_settingDisplay.set_Value("SolidText");
-				}
-				else if (_settingDisplay.get_Value().Contains("Solid"))
-				{
-					_settingDisplay.set_Value("Solid");
-				}
-				else if (_settingDisplay.get_Value().Contains("Transparent"))
-				{
-					_settingDisplay.set_Value("Transparent");
-				}
+				_settingKeybindBehaviour.set_Value("Default");
+			}
+			if (_settingDefaultMountBehaviour.get_Value() == "Radial")
+			{
+				_settingKeybindBehaviour.set_Value("Radial");
 			}
 		}
 
-		private void MigrateMountFileNameSettings()
+		private void MigrateRadialThingSettings(SettingCollection settings)
 		{
-			if (!_mounts.All((Mount m) => m.ImageFileNameSetting.get_Value().Equals("")))
+			if (settings.ContainsSetting("DefaultFlyingMountChoice"))
 			{
-				return;
+				ContextualRadialThingSettings flyingRadialSettings = ContextualRadialSettings.Single((ContextualRadialThingSettings c) => c.Name == "IsPlayerGlidingOrFalling");
+				SettingEntry<string> settingDefaultFlyingMountChoice = settings.get_Item("DefaultFlyingMountChoice") as SettingEntry<string>;
+				if (settingDefaultFlyingMountChoice.get_Value() != "Disabled" && _things.Count((Thing t) => t.Name == settingDefaultFlyingMountChoice.get_Value()) == 1)
+				{
+					flyingRadialSettings.ApplyInstantlyIfSingle.set_Value(true);
+					flyingRadialSettings.IsEnabled.set_Value(true);
+					flyingRadialSettings.SetThings(new List<Thing> { _things.Single((Thing t) => t.Name == settingDefaultFlyingMountChoice.get_Value()) });
+				}
 			}
-			string partOfFileName = "";
-			if (_settingDisplay.get_Value().Equals("Transparent"))
+			if (settings.ContainsSetting("DefaultWaterMountChoice"))
 			{
-				partOfFileName = "-trans";
+				ContextualRadialThingSettings underwaterRadialSettings = ContextualRadialSettings.Single((ContextualRadialThingSettings c) => c.Name == "IsPlayerUnderWater");
+				SettingEntry<string> settingDefaultWaterMountChoice = settings.get_Item("DefaultWaterMountChoice") as SettingEntry<string>;
+				if (settingDefaultWaterMountChoice.get_Value() != "Disabled" && _things.Count((Thing t) => t.Name == settingDefaultWaterMountChoice.get_Value()) == 1)
+				{
+					underwaterRadialSettings.ApplyInstantlyIfSingle.set_Value(true);
+					underwaterRadialSettings.IsEnabled.set_Value(true);
+					underwaterRadialSettings.SetThings(new List<Thing> { _things.Single((Thing t) => t.Name == settingDefaultWaterMountChoice.get_Value()) });
+				}
 			}
-			else if (_settingDisplay.get_Value().Equals("SolidText"))
+			ContextualRadialThingSettings defaultRadialSettings = ContextualRadialSettings.Single((ContextualRadialThingSettings c) => c.Name == "Default");
+			if (settings.ContainsSetting("DefaultMountChoice"))
 			{
-				partOfFileName = "-text";
+				SettingEntry<string> settingDefaultMountChoice = settings.get_Item("DefaultMountChoice") as SettingEntry<string>;
+				defaultRadialSettings.DefaultThingChoice.set_Value(settingDefaultMountChoice.get_Value());
 			}
-			else if (_settingDisplay.get_Value().Equals("Solid"))
+			if (settings.ContainsSetting("MountRadialRemoveCenterMount"))
 			{
-				partOfFileName = "";
+				SettingEntry<bool> settingMountRadialRemoveCenterMount = settings.get_Item("MountRadialRemoveCenterMount") as SettingEntry<bool>;
+				defaultRadialSettings.RemoveCenterMount.set_Value(settingMountRadialRemoveCenterMount.get_Value());
 			}
-			foreach (Mount mount in _mounts)
+			if (settings.ContainsSetting("MountRadialCenterMountBehavior") && Enum.TryParse<CenterBehavior>((settings.get_Item("MountRadialCenterMountBehavior") as SettingEntry<string>).get_Value(), out var result))
 			{
-				mount.ImageFileNameSetting.set_Value(mount.ImageFileName + partOfFileName + ".png");
+				defaultRadialSettings.CenterThingBehavior.set_Value(result);
+			}
+		}
+
+		private void MigrateIconThingSettings(SettingCollection settings)
+		{
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			IconThingSettings defaultIconThingSettings = IconThingSettings.Single((IconThingSettings c) => c.IsDefault);
+			if (settings.ContainsSetting("MountDisplayManualIcons"))
+			{
+				SettingEntry<bool> settingMountDisplayManualIcons = settings.get_Item("MountDisplayManualIcons") as SettingEntry<bool>;
+				defaultIconThingSettings.IsEnabled.set_Value(settingMountDisplayManualIcons.get_Value());
+			}
+			if (settings.ContainsSetting("MountDisplayCornerIcons"))
+			{
+				SettingEntry<bool> settingMountDisplayCornerIcons = settings.get_Item("MountDisplayCornerIcons") as SettingEntry<bool>;
+				defaultIconThingSettings.DisplayCornerIcons.set_Value(settingMountDisplayCornerIcons.get_Value());
+			}
+			if (settings.ContainsSetting("Orientation") && Enum.TryParse<IconOrientation>((settings.get_Item("Orientation") as SettingEntry<string>).get_Value(), out var result))
+			{
+				defaultIconThingSettings.Orientation.set_Value(result);
+			}
+			if (settings.ContainsSetting("MountLoc"))
+			{
+				SettingEntry<Point> _settingLoc = settings.get_Item("MountLoc") as SettingEntry<Point>;
+				defaultIconThingSettings.Location.set_Value(_settingLoc.get_Value());
+			}
+			if (settings.ContainsSetting("MountDrag"))
+			{
+				SettingEntry<bool> _settingDrag = settings.get_Item("MountDrag") as SettingEntry<bool>;
+				defaultIconThingSettings.IsDraggingEnabled.set_Value(_settingDrag.get_Value());
+			}
+			if (settings.ContainsSetting("MountImgWidth"))
+			{
+				SettingEntry<int> _settingMountImgWidth = settings.get_Item("MountImgWidth") as SettingEntry<int>;
+				defaultIconThingSettings.Size.set_Value(_settingMountImgWidth.get_Value());
+			}
+			if (settings.ContainsSetting("MountOpacity"))
+			{
+				SettingEntry<float> _settingMountOpacity = settings.get_Item("MountOpacity") as SettingEntry<float>;
+				defaultIconThingSettings.Opacity.set_Value(_settingMountOpacity.get_Value());
 			}
 		}
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fb: Expected O, but got Unknown
-			//IL_055b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05a3: Expected O, but got Unknown
-			//IL_0795: Unknown result type (might be due to invalid IL or missing references)
-			_mounts = new Collection<Mount>
+			//IL_0249: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0291: Expected O, but got Unknown
+			//IL_0389: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05f3: Expected O, but got Unknown
+			settingscollection = settings;
+			List<Thing> obj = new List<Thing>
 			{
+				new UnMount(settings, _helper),
 				new Raptor(settings, _helper),
 				new Springer(settings, _helper),
 				new Skimmer(settings, _helper),
@@ -266,73 +301,93 @@ namespace Manlaan.Mounts
 				new RollerBeetle(settings, _helper),
 				new Warclaw(settings, _helper),
 				new Skyscale(settings, _helper),
-				new SiegeTurtle(settings, _helper)
+				new SiegeTurtle(settings, _helper),
+				new Fishing(settings, _helper),
+				new Skiff(settings, _helper),
+				new JadeBotWaypoint(settings, _helper),
+				new ScanForRift(settings, _helper),
+				new SkyscaleLeap(settings, _helper),
+				new Chair(settings, _helper),
+				new Music(settings, _helper),
+				new Held(settings, _helper),
+				new Toy(settings, _helper),
+				new Tonic(settings, _helper)
 			};
+			_things = new Collection<Thing>(obj);
+			List<Thing> thingsForMigration = obj.Where((Thing t) => t.IsAvailable).ToList();
+			_settingsLastRunMigrationVersion = settings.DefineSetting<int>("LastRunMigrationVersion", 0, (Func<string>)null, (Func<string>)null);
 			_settingDefaultMountBinding = settings.DefineSetting<KeyBinding>("DefaultMountBinding", new KeyBinding((Keys)0), (Func<string>)(() => Strings.Setting_DefaultMountBinding), (Func<string>)(() => ""));
 			_settingDefaultMountBinding.get_Value().set_Enabled(true);
 			_settingDefaultMountBinding.get_Value().add_Activated((EventHandler<EventArgs>)async delegate
 			{
-				await DoDefaultMountActionAsync();
+				await DoKeybindActionAsync();
 			});
-			_settingDefaultMountChoice = settings.DefineSetting<string>("DefaultMountChoice", "Disabled", (Func<string>)(() => Strings.Setting_DefaultMountChoice), (Func<string>)(() => ""));
-			_settingDefaultWaterMountChoice = settings.DefineSetting<string>("DefaultWaterMountChoice", "Disabled", (Func<string>)(() => Strings.Setting_DefaultWaterMountChoice), (Func<string>)(() => ""));
-			_settingDefaultFlyingMountChoice = settings.DefineSetting<string>("DefaultFlyingMountChoice", "Disabled", (Func<string>)(() => Strings.Setting_DefaultFlyingMountChoice), (Func<string>)(() => ""));
-			_settingDefaultMountBehaviour = settings.DefineSetting<string>("DefaultMountBehaviour", "Radial", (Func<string>)(() => Strings.Setting_DefaultMountBehaviour), (Func<string>)(() => ""));
-			_settingDisplayMountQueueing = settings.DefineSetting<bool>("DisplayMountQueueing", false, (Func<string>)(() => Strings.Setting_DisplayMountQueueing), (Func<string>)(() => ""));
+			_settingDefaultMountBinding.get_Value().add_BindingChanged((EventHandler<EventArgs>)UpdateSettings);
+			_settingDefaultMountBehaviour = settings.DefineSetting<string>("DefaultMountBehaviour", "Radial", (Func<string>)null, (Func<string>)null);
+			_settingKeybindBehaviour = settings.DefineSetting<string>("KeybindBehaviour", "Radial", (Func<string>)null, (Func<string>)null);
+			_settingDisplayMountQueueing = settings.DefineSetting<bool>("DisplayMountQueueing", false, (Func<string>)null, (Func<string>)null);
+			_settingEnableMountQueueing = settings.DefineSetting<bool>("EnableMountQueueing", false, (Func<string>)null, (Func<string>)null);
+			_settingDragMountQueueing = settings.DefineSetting<bool>("DragMountQueueing", false, (Func<string>)null, (Func<string>)null);
+			_settingCombatLaunchMasteryUnlocked = settings.DefineSetting<bool>("CombatLaunchMasteryUnlocked", false, (Func<string>)null, (Func<string>)null);
+			_settingDisplayMountQueueingLocation = settings.DefineSetting<Point>("DisplayMountQueueingLocation", new Point(200, 200), (Func<string>)null, (Func<string>)null);
 			_settingMountRadialSpawnAtMouse = settings.DefineSetting<bool>("MountRadialSpawnAtMouse", false, (Func<string>)(() => Strings.Setting_MountRadialSpawnAtMouse), (Func<string>)(() => ""));
-			_settingMountRadialIconSizeModifier = settings.DefineSetting<float>("MountRadialIconSizeModifier", 0.5f, (Func<string>)(() => Strings.Setting_MountRadialIconSizeModifier), (Func<string>)(() => ""));
+			_settingMountRadialIconSizeModifier = settings.DefineSetting<float>("MountRadialIconSizeModifier", 0.28f, (Func<string>)(() => Strings.Setting_MountRadialIconSizeModifier), (Func<string>)(() => ""));
 			SettingComplianceExtensions.SetRange(_settingMountRadialIconSizeModifier, 0.05f, 1f);
-			_settingMountRadialRadiusModifier = settings.DefineSetting<float>("MountRadialRadiusModifier", 0.5f, (Func<string>)(() => Strings.Setting_MountRadialRadiusModifier), (Func<string>)(() => ""));
+			_settingMountRadialRadiusModifier = settings.DefineSetting<float>("MountRadialRadiusModifier", 0.6f, (Func<string>)(() => Strings.Setting_MountRadialRadiusModifier), (Func<string>)(() => ""));
 			SettingComplianceExtensions.SetRange(_settingMountRadialRadiusModifier, 0.2f, 1f);
 			_settingMountRadialStartAngle = settings.DefineSetting<float>("MountRadialStartAngle", 0f, (Func<string>)(() => Strings.Setting_MountRadialStartAngle), (Func<string>)(() => ""));
 			SettingComplianceExtensions.SetRange(_settingMountRadialStartAngle, 0f, 1f);
-			_settingMountRadialIconOpacity = settings.DefineSetting<float>("MountRadialIconOpacity", 0.5f, (Func<string>)(() => Strings.Setting_MountRadialIconOpacity), (Func<string>)(() => ""));
+			_settingMountRadialIconOpacity = settings.DefineSetting<float>("MountRadialIconOpacity", 0.7f, (Func<string>)(() => Strings.Setting_MountRadialIconOpacity), (Func<string>)(() => ""));
 			SettingComplianceExtensions.SetRange(_settingMountRadialIconOpacity, 0.05f, 1f);
-			_settingMountRadialCenterMountBehavior = settings.DefineSetting<string>("MountRadialCenterMountBehavior", "Default", (Func<string>)(() => Strings.Setting_MountRadialCenterMountBehavior), (Func<string>)(() => ""));
-			_settingMountRadialRemoveCenterMount = settings.DefineSetting<bool>("MountRadialRemoveCenterMount", true, (Func<string>)(() => Strings.Setting_MountRadialRemoveCenterMount), (Func<string>)(() => ""));
 			_settingMountRadialToggleActionCameraKeyBinding = settings.DefineSetting<KeyBinding>("MountRadialToggleActionCameraKeyBinding", new KeyBinding((Keys)121), (Func<string>)(() => Strings.Setting_MountRadialToggleActionCameraKeyBinding), (Func<string>)(() => ""));
+			_settingDrawIconIds = settings.DefineSetting<List<int>>("DrawIconIds", new List<int> { 0 }, (Func<string>)null, (Func<string>)null);
+			_settingUserDefinedRadialIds = settings.DefineSetting<List<int>>("UserDefinedRadialIds", new List<int>(), (Func<string>)null, (Func<string>)null);
 			_settingDisplayModuleOnLoadingScreen = settings.DefineSetting<bool>("DisplayModuleOnLoadingScreen", false, (Func<string>)(() => Strings.Setting_DisplayModuleOnLoadingScreen), (Func<string>)(() => ""));
 			_settingMountAutomaticallyAfterLoadingScreen = settings.DefineSetting<bool>("MountAutomaticallyAfterLoadingScreen", false, (Func<string>)(() => Strings.Setting_MountAutomaticallyAfterLoadingScreen), (Func<string>)(() => ""));
-			_settingDisplay = settings.DefineSetting<string>("MountDisplay", "Transparent", (Func<string>)(() => Strings.Setting_MountDisplay), (Func<string>)(() => ""));
-			_settingDisplayCornerIcons = settings.DefineSetting<bool>("MountDisplayCornerIcons", false, (Func<string>)(() => Strings.Setting_MountDisplayCornerIcons), (Func<string>)(() => ""));
-			_settingDisplayManualIcons = settings.DefineSetting<bool>("MountDisplayManualIcons", false, (Func<string>)(() => Strings.Setting_MountDisplayManualIcons), (Func<string>)(() => ""));
-			_settingOrientation = settings.DefineSetting<string>("Orientation", "Horizontal", (Func<string>)(() => Strings.Setting_Orientation), (Func<string>)(() => ""));
-			_settingLoc = settings.DefineSetting<Point>("MountLoc", new Point(100, 100), (Func<string>)(() => Strings.Setting_MountLoc), (Func<string>)(() => ""));
-			_settingDrag = settings.DefineSetting<bool>("MountDrag", false, (Func<string>)(() => Strings.Setting_MountDrag), (Func<string>)(() => ""));
-			_settingImgWidth = settings.DefineSetting<int>("MountImgWidth", 50, (Func<string>)(() => Strings.Setting_MountImgWidth), (Func<string>)(() => ""));
-			SettingComplianceExtensions.SetRange(_settingImgWidth, 0, 200);
-			_settingOpacity = settings.DefineSetting<float>("MountOpacity", 1f, (Func<string>)(() => Strings.Setting_MountOpacity), (Func<string>)(() => ""));
-			SettingComplianceExtensions.SetRange(_settingOpacity, 0f, 1f);
-			MigrateDisplaySettings();
-			MigrateMountFileNameSettings();
-			foreach (Mount mount in _mounts)
+			ContextualRadialSettings = new List<ContextualRadialThingSettings>
 			{
-				mount.OrderSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)UpdateSettings);
-				mount.KeybindingSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<KeyBinding>>)UpdateSettings);
-				mount.ImageFileNameSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateSettings);
+				new ContextualRadialThingSettings(settings, "IsPlayerMounted", 0, _helper.IsPlayerMounted, defaultIsEnabled: true, defaultApplyInstantlyIfSingle: true, _things.Where((Thing t) => t is UnMount).ToList()),
+				new ContextualRadialThingSettings(settings, "IsPlayerInWvwMap", 1, _helper.IsPlayerInWvwMap, defaultIsEnabled: true, defaultApplyInstantlyIfSingle: true, _things.Where((Thing t) => t is Warclaw).ToList()),
+				new ContextualRadialThingSettings(settings, "IsPlayerInCombat", 2, _helper.IsPlayerInCombat, defaultIsEnabled: false, defaultApplyInstantlyIfSingle: true, _things.Where((Thing t) => t is Skyscale).ToList()),
+				new ContextualRadialThingSettings(settings, "IsPlayerGlidingOrFalling", 3, _helper.IsPlayerGlidingOrFalling, defaultIsEnabled: false, defaultApplyInstantlyIfSingle: false, _things.Where((Thing t) => t is Griffon || t is Skyscale).ToList()),
+				new ContextualRadialThingSettings(settings, "IsPlayerUnderWater", 4, _helper.IsPlayerUnderWater, defaultIsEnabled: false, defaultApplyInstantlyIfSingle: false, _things.Where((Thing t) => t is Skimmer || t is SiegeTurtle).ToList()),
+				new ContextualRadialThingSettings(settings, "IsPlayerOnWaterSurface", 5, _helper.IsPlayerOnWaterSurface, defaultIsEnabled: false, defaultApplyInstantlyIfSingle: true, _things.Where((Thing t) => t is Skiff).ToList()),
+				new ContextualRadialThingSettings(settings, "Default", 99, () => true, defaultIsEnabled: true, defaultApplyInstantlyIfSingle: false, thingsForMigration)
+			};
+			IconThingSettings = new List<IconThingSettings>
+			{
+				new IconThingSettings(settings, 0, "Default", thingsForMigration)
+			};
+			IconThingSettings.AddRange(from id in _settingDrawIconIds.get_Value().Skip(1)
+				select new IconThingSettings(settings, id));
+			UserDefinedRadialSettings = (from id in _settingUserDefinedRadialIds.get_Value()
+				select new UserDefinedRadialThingSettings(settings, id, DoKeybindActionAsync)).ToList();
+			if (_settingsLastRunMigrationVersion.get_Value() < 1)
+			{
+				MigrateRadialThingSettings(settings);
+				MigrateIconThingSettings(settings);
+				MigrateAwayFromMount(settings);
+				_settingsLastRunMigrationVersion.set_Value(1);
 			}
-			_settingDefaultMountChoice.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateSettings);
-			_settingDefaultWaterMountChoice.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateSettings);
-			_settingDefaultFlyingMountChoice.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateSettings);
+			foreach (Thing thing in _things)
+			{
+				thing.KeybindingSetting.get_Value().add_BindingChanged((EventHandler<EventArgs>)UpdateSettings);
+				thing.ImageFileNameSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateSettings);
+			}
 			_settingDisplayModuleOnLoadingScreen.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
 			_settingMountAutomaticallyAfterLoadingScreen.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
 			_settingDisplayMountQueueing.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
+			_settingEnableMountQueueing.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
+			_settingDragMountQueueing.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
+			_settingDisplayMountQueueingLocation.add_SettingChanged((EventHandler<ValueChangedEventArgs<Point>>)UpdateSettings);
 			_settingMountRadialSpawnAtMouse.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
 			_settingMountRadialIconSizeModifier.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)UpdateSettings);
 			_settingMountRadialRadiusModifier.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)UpdateSettings);
 			_settingMountRadialStartAngle.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)UpdateSettings);
-			_settingMountRadialCenterMountBehavior.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateSettings);
-			_settingMountRadialToggleActionCameraKeyBinding.add_SettingChanged((EventHandler<ValueChangedEventArgs<KeyBinding>>)UpdateSettings);
+			_settingMountRadialToggleActionCameraKeyBinding.get_Value().add_BindingChanged((EventHandler<EventArgs>)UpdateSettings);
 			_settingMountRadialIconOpacity.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)UpdateSettings);
-			_settingMountRadialRemoveCenterMount.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
-			_settingDisplay.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateSettings);
-			_settingDisplayCornerIcons.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
-			_settingDisplayManualIcons.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
-			_settingOrientation.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateSettings);
-			_settingLoc.add_SettingChanged((EventHandler<ValueChangedEventArgs<Point>>)UpdateSettings);
-			_settingDrag.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
-			_settingImgWidth.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)UpdateSettings);
-			_settingOpacity.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)UpdateSettings);
+			_settingDrawIconIds.add_SettingChanged((EventHandler<ValueChangedEventArgs<List<int>>>)UpdateSettings);
+			_settingUserDefinedRadialIds.add_SettingChanged((EventHandler<ValueChangedEventArgs<List<int>>>)UpdateSettings);
 		}
 
 		public override IView GetSettingsView()
@@ -348,104 +403,64 @@ namespace Manlaan.Mounts
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
+			_debug.Add("GetTriggeredRadialSettings Name", () => _helper.GetTriggeredRadialSettings()?.Name ?? "");
+			ContextualRadialSettings.ForEach(delegate(ContextualRadialThingSettings c)
+			{
+				_debug.Add($"Contextual RadialSettings {c.Order} {c.Name}", () => $"IsApplicable: {c.IsApplicable()}, Center: {c.GetCenterThing()?.Name}, CenterBehavior: {c.CenterThingBehavior.get_Value()}, ApplyInstantlyIfSingle: {c.ApplyInstantlyIfSingle.get_Value()}, LastUsed: {c.GetLastUsedThing()?.Name}");
+			});
+			_debug.Add("Applicable Contextual RadialSettings Name", () => _helper.GetApplicableContextualRadialThingSettings()?.Name ?? "");
+			_debug.Add("Applicable Contextual RadialSettings Things", () => string.Join(", ", _helper.GetApplicableContextualRadialThingSettings()?.AvailableThings.Select((Thing t) => t.Name)) ?? "");
+			_debug.Add("Queued for out of combat", () => $"{_helper.GetQueuedThing()}");
+			Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)async delegate
+			{
+				await _helper.IsCombatLaunchUnlockedAsync();
+			});
 			DrawUI();
 			((Module)this).OnModuleLoaded(e);
 		}
 
 		protected override void Update(GameTime gameTime)
 		{
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0202: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0207: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0215: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0231: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0236: Unknown result type (might be due to invalid IL or missing references)
-			float currentZPosition = GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Z;
-			double currentUpdateSeconds = gameTime.get_TotalGameTime().TotalSeconds;
-			double secondsDiff = currentUpdateSeconds - _lastUpdateSeconds;
-			float zPositionDiff = currentZPosition - _lastZPosition;
-			if ((double)zPositionDiff < -0.0001 && secondsDiff != 0.0)
-			{
-				IsPlayerGlidingOrFalling = (double)zPositionDiff / secondsDiff < -2.5;
-			}
-			else
-			{
-				IsPlayerGlidingOrFalling = false;
-			}
-			_lastZPosition = currentZPosition;
-			_lastUpdateSeconds = currentUpdateSeconds;
-			bool isMountSwitchable = IsMountSwitchable();
-			bool num = _lastIsMountSwitchable && !isMountSwitchable;
+			_helper.UpdatePlayerGlidingOrFalling(gameTime);
+			bool isMountSwitchable = CanThingBeActivated();
+			bool moduleHidden = _lastIsMountSwitchable && !isMountSwitchable;
 			bool moduleShown = !_lastIsMountSwitchable && isMountSwitchable;
-			MountType currentMount = GameService.Gw2Mumble.get_PlayerCharacter().get_CurrentMount();
 			string currentCharacterName = GameService.Gw2Mumble.get_PlayerCharacter().get_Name();
-			if (num && (int)currentMount != 0 && _settingMountAutomaticallyAfterLoadingScreen.get_Value())
+			int inUseMountsCount = _things.Count((Thing m) => m.IsInUse());
+			if (inUseMountsCount == 0 && _lastInUseMountsCount > 0 && !moduleHidden && !moduleShown)
 			{
-				_helper.StoreMountForLaterUse(_mounts.Single((Mount m) => m.MountType == currentMount), currentCharacterName);
+				_helper.ClearSomethingStoredForLaterActivation(currentCharacterName);
 			}
-			if (moduleShown && (int)currentMount == 0 && _helper.IsCharacterTheSameAfterMapLoad(currentCharacterName))
+			if (moduleHidden && inUseMountsCount == 1 && _settingMountAutomaticallyAfterLoadingScreen.get_Value() && GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus())
 			{
-				_helper.DoMountActionForLaterUse();
-				_helper.ClearMountForLaterUse();
+				_helper.StoreThingForLaterActivation(_things.Single((Thing m) => m.IsInUse()), currentCharacterName, "ModuleHidden");
 			}
+			if (moduleShown && inUseMountsCount == 0 && _helper.IsSomethingStoredForLaterActivation(currentCharacterName) && GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus())
+			{
+				_helper.DoThingActionForLaterActivation(currentCharacterName);
+			}
+			_lastInUseMountsCount = inUseMountsCount;
 			_lastIsMountSwitchable = isMountSwitchable;
 			bool shouldShowModule = ShouldShowModule();
 			if (shouldShowModule)
 			{
-				Panel mountPanel = _mountPanel;
-				if (mountPanel != null)
+				foreach (DrawIcons drawIcon in _drawIcons)
 				{
-					((Control)mountPanel).Show();
-				}
-				foreach (Mount availableOrderedMount in _availableOrderedMounts)
-				{
-					CornerIcon cornerIcon = availableOrderedMount.CornerIcon;
-					if (cornerIcon != null)
-					{
-						((Control)cornerIcon).Show();
-					}
+					((Control)drawIcon).Show();
 				}
 			}
 			else
 			{
-				Panel mountPanel2 = _mountPanel;
-				if (mountPanel2 != null)
+				foreach (DrawIcons drawIcon2 in _drawIcons)
 				{
-					((Control)mountPanel2).Hide();
-				}
-				foreach (Mount availableOrderedMount2 in _availableOrderedMounts)
-				{
-					CornerIcon cornerIcon2 = availableOrderedMount2.CornerIcon;
-					if (cornerIcon2 != null)
-					{
-						((Control)cornerIcon2).Hide();
-					}
+					((Control)drawIcon2).Hide();
 				}
 			}
-			if (_dragging)
+			if (_things.Any((Thing m) => m.QueuedTimestamp.HasValue))
 			{
-				Point nOffset = GameService.Input.get_Mouse().get_Position() - _dragStart;
-				Panel mountPanel3 = _mountPanel;
-				((Control)mountPanel3).set_Location(((Control)mountPanel3).get_Location() + nOffset);
-				_dragStart = GameService.Input.get_Mouse().get_Position();
+				_drawOutOfCombat?.ShowSpinner();
 			}
-			if (_settingDisplayMountQueueing.get_Value() && _mounts.Any((Mount m) => m.QueuedTimestamp.HasValue))
-			{
-				LoadingSpinner queueingSpinner = _queueingSpinner;
-				if (queueingSpinner != null)
-				{
-					((Control)queueingSpinner).Show();
-				}
-			}
-			if ((((Control)_radial).get_Visible() && !_settingDefaultMountBinding.get_Value().get_IsTriggering()) || !shouldShowModule)
+			if ((((Control)_radial).get_Visible() && !_settingDefaultMountBinding.get_Value().get_IsTriggering() && !UserDefinedRadialSettings.Any((UserDefinedRadialThingSettings s) => s.Keybind.get_Value().get_IsTriggering())) || !shouldShowModule)
 			{
 				((Control)_radial).Hide();
 			}
@@ -455,12 +470,12 @@ namespace Manlaan.Mounts
 		{
 			if (!_settingDisplayModuleOnLoadingScreen.get_Value())
 			{
-				return IsMountSwitchable();
+				return CanThingBeActivated();
 			}
 			return true;
 		}
 
-		public static bool IsMountSwitchable()
+		public static bool CanThingBeActivated()
 		{
 			if (GameService.GameIntegration.get_Gw2Instance().get_IsInGame())
 			{
@@ -476,45 +491,35 @@ namespace Manlaan.Mounts
 			{
 				((Control)debug).Dispose();
 			}
-			Panel mountPanel = _mountPanel;
-			if (mountPanel != null)
+			foreach (DrawIcons drawIcon in _drawIcons)
 			{
-				((Control)mountPanel).Dispose();
+				((Control)drawIcon).Dispose();
 			}
 			DrawRadial radial = _radial;
 			if (radial != null)
 			{
 				((Control)radial).Dispose();
 			}
-			foreach (Mount mount in _mounts)
+			foreach (Thing thing in _things)
 			{
-				mount.OrderSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)UpdateSettings);
-				mount.KeybindingSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<KeyBinding>>)UpdateSettings);
-				mount.ImageFileNameSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateSettings);
-				mount.DisposeCornerIcon();
+				thing.KeybindingSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<KeyBinding>>)UpdateSettings);
+				thing.ImageFileNameSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateSettings);
+				thing.DisposeCornerIcon();
 			}
-			_settingDefaultMountChoice.remove_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateSettings);
-			_settingDefaultWaterMountChoice.remove_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateSettings);
-			_settingDefaultFlyingMountChoice.remove_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateSettings);
 			_settingDisplayMountQueueing.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
-			_settingMountRadialSpawnAtMouse.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
+			_settingEnableMountQueueing.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
+			_settingDragMountQueueing.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
+			_settingDisplayMountQueueingLocation.remove_SettingChanged((EventHandler<ValueChangedEventArgs<Point>>)UpdateSettings);
+			_settingMountRadialSpawnAtMouse.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
 			_settingMountRadialIconSizeModifier.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)UpdateSettings);
 			_settingMountRadialRadiusModifier.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)UpdateSettings);
 			_settingMountRadialStartAngle.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)UpdateSettings);
-			_settingMountRadialCenterMountBehavior.remove_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateSettings);
 			_settingMountRadialToggleActionCameraKeyBinding.remove_SettingChanged((EventHandler<ValueChangedEventArgs<KeyBinding>>)UpdateSettings);
 			_settingMountRadialIconOpacity.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)UpdateSettings);
-			_settingMountRadialRemoveCenterMount.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
 			_settingDisplayModuleOnLoadingScreen.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
 			_settingMountAutomaticallyAfterLoadingScreen.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
-			_settingDisplay.remove_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateSettings);
-			_settingDisplayCornerIcons.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
-			_settingDisplayManualIcons.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
-			_settingOrientation.remove_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateSettings);
-			_settingLoc.remove_SettingChanged((EventHandler<ValueChangedEventArgs<Point>>)UpdateSettings);
-			_settingDrag.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
-			_settingImgWidth.remove_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)UpdateSettings);
-			_settingOpacity.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)UpdateSettings);
+			_settingDrawIconIds.remove_SettingChanged((EventHandler<ValueChangedEventArgs<List<int>>>)UpdateSettings);
+			_settingUserDefinedRadialIds.remove_SettingChanged((EventHandler<ValueChangedEventArgs<List<int>>>)UpdateSettings);
 		}
 
 		private void UpdateSettings(object sender = null, ValueChangedEventArgs<string> e = null)
@@ -522,7 +527,7 @@ namespace Manlaan.Mounts
 			DrawUI();
 		}
 
-		private void UpdateSettings(object sender = null, ValueChangedEventArgs<KeyBinding> e = null)
+		private void UpdateSettings(object sender = null, EventArgs e = null)
 		{
 			DrawUI();
 		}
@@ -547,151 +552,24 @@ namespace Manlaan.Mounts
 			DrawUI();
 		}
 
-		internal void DrawManualIcons()
+		private void UpdateSettings(object sender, ValueChangedEventArgs<List<int>> e)
 		{
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0055: Expected O, but got Unknown
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0188: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0213: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023a: Unknown result type (might be due to invalid IL or missing references)
-			int curX = 0;
-			int curY = 0;
-			int totalMounts = 0;
-			Panel val = new Panel();
-			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)val).set_Location(_settingLoc.get_Value());
-			((Control)val).set_Size(new Point(_settingImgWidth.get_Value() * 8, _settingImgWidth.get_Value() * 8));
-			_mountPanel = val;
-			foreach (Mount mount in _availableOrderedMounts)
-			{
-				Texture2D img = _textureCache.GetMountImgFile(mount);
-				Image val2 = new Image();
-				((Control)val2).set_Parent((Container)(object)_mountPanel);
-				val2.set_Texture(AsyncTexture2D.op_Implicit(img));
-				((Control)val2).set_Size(new Point(_settingImgWidth.get_Value(), _settingImgWidth.get_Value()));
-				((Control)val2).set_Location(new Point(curX, curY));
-				((Control)val2).set_Opacity(_settingOpacity.get_Value());
-				((Control)val2).set_BasicTooltipText(mount.DisplayName);
-				((Control)val2).add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)async delegate
-				{
-					await mount.DoMountAction();
-				});
-				if (_settingOrientation.get_Value().Equals("Horizontal"))
-				{
-					curX += _settingImgWidth.get_Value();
-				}
-				else
-				{
-					curY += _settingImgWidth.get_Value();
-				}
-				totalMounts++;
-			}
-			if (_settingDrag.get_Value())
-			{
-				Panel val3 = new Panel();
-				((Control)val3).set_Parent((Container)(object)_mountPanel);
-				((Control)val3).set_Location(new Point(0, 0));
-				((Control)val3).set_Size(new Point(_settingImgWidth.get_Value() / 2, _settingImgWidth.get_Value() / 2));
-				((Control)val3).set_BackgroundColor(Color.get_White());
-				((Control)val3).set_ZIndex(10);
-				((Control)val3).add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)delegate
-				{
-					//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-					_dragging = true;
-					_dragStart = GameService.Input.get_Mouse().get_Position();
-				});
-				((Control)val3).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
-				{
-					//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-					_dragging = false;
-					_settingLoc.set_Value(((Control)_mountPanel).get_Location());
-				});
-			}
-			if (_settingOrientation.get_Value().Equals("Horizontal"))
-			{
-				((Control)_mountPanel).set_Size(new Point(_settingImgWidth.get_Value() * totalMounts, _settingImgWidth.get_Value()));
-			}
-			else
-			{
-				((Control)_mountPanel).set_Size(new Point(_settingImgWidth.get_Value(), _settingImgWidth.get_Value() * totalMounts));
-			}
-		}
-
-		private void DrawCornerIcons()
-		{
-			foreach (Mount mount in _availableOrderedMounts)
-			{
-				mount.CreateCornerIcon(_textureCache.GetMountImgFile(mount));
-			}
+			DrawUI();
 		}
 
 		private void DrawUI()
 		{
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c9: Expected O, but got Unknown
-			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-			Panel mountPanel = _mountPanel;
-			if (mountPanel != null)
+			foreach (DrawIcons drawIcon in _drawIcons)
 			{
-				((Control)mountPanel).Dispose();
+				((Control)drawIcon).Dispose();
 			}
-			foreach (Mount mount in _mounts)
+			_drawIcons = IconThingSettings.Select((IconThingSettings iconSetting) => new DrawIcons(iconSetting, _helper, _textureCache)).ToList();
+			DrawOutOfCombat drawOutOfCombat = _drawOutOfCombat;
+			if (drawOutOfCombat != null)
 			{
-				mount.DisposeCornerIcon();
+				((Control)drawOutOfCombat).Dispose();
 			}
-			DebugControl debug = _debug;
-			if (debug != null)
-			{
-				((Control)debug).Dispose();
-			}
-			DebugControl debugControl = new DebugControl();
-			((Control)debugControl).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)debugControl).set_Location(new Point(0, 0));
-			((Control)debugControl).set_Size(new Point(500, 500));
-			_debug = debugControl;
-			if (_settingDisplayCornerIcons.get_Value())
-			{
-				DrawCornerIcons();
-			}
-			if (_settingDisplayManualIcons.get_Value())
-			{
-				DrawManualIcons();
-			}
-			LoadingSpinner queueingSpinner = _queueingSpinner;
-			if (queueingSpinner != null)
-			{
-				((Control)queueingSpinner).Dispose();
-			}
-			_queueingSpinner = new LoadingSpinner();
-			((Control)_queueingSpinner).set_Location(new Point(((Control)GameService.Graphics.get_SpriteScreen()).get_Width() / 2 + 400, ((Control)GameService.Graphics.get_SpriteScreen()).get_Height() - ((Control)_queueingSpinner).get_Height() - 25));
-			((Control)_queueingSpinner).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)_queueingSpinner).Hide();
+			_drawOutOfCombat = new DrawOutOfCombat();
 			DrawMouseCursor drawMouseCursor = _drawMouseCursor;
 			if (drawMouseCursor != null)
 			{
@@ -715,31 +593,27 @@ namespace Manlaan.Mounts
 			});
 		}
 
-		private async Task DoDefaultMountActionAsync()
+		private async Task DoKeybindActionAsync()
 		{
-			Logger.Debug("DoDefaultMountActionAsync entered");
-			if ((int)GameService.Gw2Mumble.get_PlayerCharacter().get_CurrentMount() != 0 && IsMountSwitchable())
+			Logger.Debug("DoKeybindActionAsync entered");
+			ContextualRadialThingSettings selectedRadialSettings = _helper.GetApplicableContextualRadialThingSettings();
+			Logger.Debug("DoKeybindActionAsync radial applicable settings: " + selectedRadialSettings.Name);
+			ICollection<Thing> things = selectedRadialSettings.AvailableThings;
+			if (things.Count() == 1 && selectedRadialSettings.ApplyInstantlyIfSingle.get_Value())
 			{
-				await (_helper.GetCurrentlyActiveMount()?.DoUnmountAction() ?? Task.CompletedTask);
-				Logger.Debug("DoDefaultMountActionAsync dismounted");
+				await (things.FirstOrDefault()?.DoAction());
+				Logger.Debug("DoKeybindActionAsync not showing radial selected thing: " + selectedRadialSettings.Things.First().Name);
 				return;
 			}
-			Mount instantMount = _helper.GetInstantMount();
-			if (instantMount != null)
+			Thing defaultThing = selectedRadialSettings.GetDefaultThing();
+			if (defaultThing != null && GameService.Input.get_Mouse().get_CameraDragging())
 			{
-				await instantMount.DoMountAction();
-				Logger.Debug("DoDefaultMountActionAsync instantmount");
+				await (defaultThing?.DoAction() ?? Task.CompletedTask);
+				Logger.Debug("DoKeybindActionAsync CameraDragging default");
 				return;
 			}
-			Mount defaultMount = _helper.GetDefaultMount();
-			if (defaultMount != null && GameService.Input.get_Mouse().get_CameraDragging())
-			{
-				await (defaultMount?.DoMountAction() ?? Task.CompletedTask);
-				Logger.Debug("DoDefaultMountActionAsync CameraDragging defaultmount");
-				return;
-			}
-			string value = _settingDefaultMountBehaviour.get_Value();
-			if (!(value == "DefaultMount"))
+			string value = _settingKeybindBehaviour.get_Value();
+			if (!(value == "Default"))
 			{
 				if (value == "Radial" && ShouldShowModule())
 				{
@@ -748,13 +622,13 @@ namespace Manlaan.Mounts
 					{
 						((Control)radial).Show();
 					}
-					Logger.Debug("DoDefaultMountActionAsync DefaultMountBehaviour radial");
+					Logger.Debug("DoKeybindActionAsync KeybindBehaviour radial");
 				}
 			}
 			else
 			{
-				await (defaultMount?.DoMountAction() ?? Task.CompletedTask);
-				Logger.Debug("DoDefaultMountActionAsync DefaultMountBehaviour defaultmount");
+				await (defaultThing?.DoAction() ?? Task.CompletedTask);
+				Logger.Debug("DoKeybindActionAsync KeybindBehaviour default");
 			}
 		}
 
@@ -764,19 +638,14 @@ namespace Manlaan.Mounts
 			{
 				return;
 			}
-			await ((from m in _mounts
-				where m.QueuedTimestamp.HasValue
-				orderby m.QueuedTimestamp descending
-				select m).FirstOrDefault()?.DoMountAction() ?? Task.CompletedTask);
-			foreach (Mount mount in _mounts)
+			Thing thingInCombat = _helper.GetQueuedThing();
+			Logger.Debug("HandleCombatChangeAsync Applied queued for out of combat: " + thingInCombat?.Name);
+			await (thingInCombat?.DoAction() ?? Task.CompletedTask);
+			foreach (Thing thing in _things)
 			{
-				mount.QueuedTimestamp = null;
+				thing.QueuedTimestamp = null;
 			}
-			LoadingSpinner queueingSpinner = _queueingSpinner;
-			if (queueingSpinner != null)
-			{
-				((Control)queueingSpinner).Hide();
-			}
+			_drawOutOfCombat?.HideSpinner();
 		}
 	}
 }

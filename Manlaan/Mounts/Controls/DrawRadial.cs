@@ -7,9 +7,11 @@ using Blish_HUD.Controls;
 using Blish_HUD.Controls.Intern;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
+using Manlaan.Mounts.Things;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
+using Mounts;
 
 namespace Manlaan.Mounts.Controls
 {
@@ -23,13 +25,13 @@ namespace Manlaan.Mounts.Controls
 
 		private StandardButton _settingsButton;
 
-		private Label _noMountsLabel;
+		private Label _noThingsLabel;
 
-		private List<RadialMount> RadialMounts = new List<RadialMount>();
+		private List<RadialThing> RadialThings = new List<RadialThing>();
 
 		private int radius;
 
-		private int mountIconSize;
+		private int thingIconSize;
 
 		private int _maxRadialDiameter;
 
@@ -39,7 +41,7 @@ namespace Manlaan.Mounts.Controls
 
 		public EventHandler OnSettingsButtonClicked { get; internal set; }
 
-		private RadialMount SelectedMount => RadialMounts.SingleOrDefault((RadialMount m) => m.Selected);
+		private RadialThing SelectedMount => RadialThings.SingleOrDefault((RadialThing m) => m.Selected);
 
 		public override int ZIndex
 		{
@@ -95,8 +97,8 @@ namespace Manlaan.Mounts.Controls
 			((Control)val).set_Size(new Point(800, 500));
 			val.set_Font(GameService.Content.get_DefaultFont32());
 			val.set_TextColor(Color.get_Red());
-			val.set_Text("NO MOUNTS CONFIGURED, GO TO SETTINGS: ");
-			_noMountsLabel = val;
+			val.set_Text("NOTHING CONFIGURED, GO TO SETTINGS: ");
+			_noThingsLabel = val;
 			StandardButton val2 = new StandardButton();
 			((Control)val2).set_Parent((Container)(object)this);
 			((Control)val2).set_Location(new Point(250, 300));
@@ -116,59 +118,64 @@ namespace Manlaan.Mounts.Controls
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0135: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0154: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0340: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0346: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0350: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0352: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_037e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0386: Unknown result type (might be due to invalid IL or missing references)
-			//IL_038e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0393: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0416: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0425: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0444: Unknown result type (might be due to invalid IL or missing references)
-			//IL_046c: Unknown result type (might be due to invalid IL or missing references)
-			RadialMounts.Clear();
-			List<Mount> mounts = Module._availableOrderedMounts;
-			if (!mounts.Any())
+			//IL_010a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0147: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0166: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0186: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0361: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0366: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0375: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0399: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0431: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0440: Unknown result type (might be due to invalid IL or missing references)
+			//IL_045f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0487: Unknown result type (might be due to invalid IL or missing references)
+			RadialThings.Clear();
+			RadialThingSettings applicableRadialSettings = _helper.GetTriggeredRadialSettings();
+			if (applicableRadialSettings == null)
 			{
-				((Control)_noMountsLabel).Show();
+				return;
+			}
+			List<Thing> things = applicableRadialSettings.AvailableThings.ToList();
+			if (!things.Any())
+			{
+				((Control)_noThingsLabel).Show();
 				((Control)_settingsButton).Show();
 				return;
 			}
-			((Control)_noMountsLabel).Hide();
+			((Control)_noThingsLabel).Hide();
 			((Control)_settingsButton).Hide();
-			Mount mountToPutInCenter = _helper.GetCenterMount();
-			if (mountToPutInCenter != null && mountToPutInCenter.IsAvailable)
+			Thing thingToPutInCenter = applicableRadialSettings.GetCenterThing();
+			if (thingToPutInCenter != null && thingToPutInCenter.IsAvailable)
 			{
-				if (Module._settingMountRadialRemoveCenterMount.get_Value())
+				if (applicableRadialSettings.RemoveCenterMount.get_Value())
 				{
-					mounts.Remove(mountToPutInCenter);
+					things.Remove(thingToPutInCenter);
 				}
-				Texture2D texture2 = _textureCache.GetMountImgFile(mountToPutInCenter);
+				Texture2D texture2 = _textureCache.GetMountImgFile(thingToPutInCenter);
 				int loc = radius;
-				RadialMounts.Add(new RadialMount
+				RadialThings.Add(new RadialThing
 				{
 					Texture = texture2,
-					Mount = mountToPutInCenter,
+					Thing = thingToPutInCenter,
 					ImageX = loc,
 					ImageY = loc,
 					Default = true
@@ -178,18 +185,18 @@ namespace Manlaan.Mounts.Controls
 			if (DebugHelper.IsDebugEnabled())
 			{
 				Vector2 spawnPointVec = ((Point)(ref SpawnPoint)).ToVector2();
-				Vector2 rectpos = spawnPointVec - new Vector2((float)(mountIconSize / 2), (float)(mountIconSize / 2));
-				ShapeExtensions.DrawRectangle(spriteBatch, rectpos, new Size2((float)mountIconSize, (float)mountIconSize), Color.get_Red(), debugLineThickness, 0f);
+				Vector2 rectpos = spawnPointVec - new Vector2((float)(thingIconSize / 2), (float)(thingIconSize / 2));
+				ShapeExtensions.DrawRectangle(spriteBatch, rectpos, new Size2((float)thingIconSize, (float)thingIconSize), Color.get_Red(), debugLineThickness, 0f);
 				ShapeExtensions.DrawCircle(spriteBatch, spawnPointVec, 1f, 50, Color.get_Red(), debugLineThickness, 0f);
 				ShapeExtensions.DrawCircle(spriteBatch, spawnPointVec, GetRadius(), 50, Color.get_Red(), debugLineThickness, 0f);
 			}
 			double currentAngle = startAngle;
-			double partAngleStep = Math.PI * 2.0 / (double)mounts.Count();
-			foreach (Mount mount in mounts)
+			double partAngleStep = Math.PI * 2.0 / (double)things.Count();
+			foreach (Thing thing in things)
 			{
 				double angleMid = currentAngle + partAngleStep / 2.0;
 				double angleEnd = currentAngle + partAngleStep;
-				Texture2D texture = _textureCache.GetMountImgFile(mount);
+				Texture2D texture = _textureCache.GetMountImgFile(thing);
 				int x = (int)Math.Round((double)radius + (double)radius * Math.Cos(angleMid));
 				int y = (int)Math.Round((double)radius + (double)radius * Math.Sin(angleMid));
 				if (DebugHelper.IsDebugEnabled())
@@ -201,10 +208,10 @@ namespace Manlaan.Mounts.Controls
 					float yDebugOuter = (float)Math.Round((double)(2 * debugRadiusOuter) * Math.Sin(currentAngle)) + (float)SpawnPoint.Y;
 					ShapeExtensions.DrawLine(spriteBatch, new Vector2(xDebugInner, yDebugInner), new Vector2(xDebugOuter, yDebugOuter), Color.get_Red(), debugLineThickness, 0f);
 				}
-				RadialMounts.Add(new RadialMount
+				RadialThings.Add(new RadialThing
 				{
 					Texture = texture,
-					Mount = mount,
+					Thing = thing,
 					ImageX = x,
 					ImageY = y,
 					AngleBegin = currentAngle,
@@ -219,7 +226,7 @@ namespace Manlaan.Mounts.Controls
 			}
 			Vector2 val = new Vector2((float)diff.Y, (float)diff.X);
 			float length = ((Vector2)(ref val)).Length();
-			foreach (RadialMount radialMount in RadialMounts)
+			foreach (RadialThing radialMount in RadialThings)
 			{
 				if (length < GetRadius())
 				{
@@ -229,19 +236,19 @@ namespace Manlaan.Mounts.Controls
 				{
 					radialMount.Selected = radialMount.AngleBegin <= angle && radialMount.AngleEnd > angle;
 				}
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, radialMount.Texture, new Rectangle(radialMount.ImageX, radialMount.ImageY, mountIconSize, mountIconSize), (Rectangle?)null, Color.get_White() * (radialMount.Selected ? 1f : Module._settingMountRadialIconOpacity.get_Value()));
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, radialMount.Texture, new Rectangle(radialMount.ImageX, radialMount.ImageY, thingIconSize, thingIconSize), (Rectangle?)null, Color.get_White() * (radialMount.Selected ? 1f : Module._settingMountRadialIconOpacity.get_Value()));
 			}
 			((Container)this).PaintBeforeChildren(spriteBatch, bounds);
 		}
 
 		private float GetRadius()
 		{
-			return (float)((double)mountIconSize * Math.Sqrt(2.0) / 2.0);
+			return (float)((double)thingIconSize * Math.Sqrt(2.0) / 2.0);
 		}
 
 		public async Task TriggerSelectedMountAsync()
 		{
-			await (SelectedMount?.Mount.DoMountAction() ?? Task.CompletedTask);
+			await (SelectedMount?.Thing.DoAction() ?? Task.CompletedTask);
 		}
 
 		private async Task HandleShown(object sender, EventArgs e)
@@ -250,12 +257,12 @@ namespace Manlaan.Mounts.Controls
 			if (!GameService.Input.get_Mouse().get_CursorIsVisible() && !((SettingEntry)Module._settingMountRadialToggleActionCameraKeyBinding).get_IsNull())
 			{
 				IsActionCamToggledOnMount = true;
-				await _helper.TriggerKeybind(Module._settingMountRadialToggleActionCameraKeyBinding);
+				await Helper.TriggerKeybind(Module._settingMountRadialToggleActionCameraKeyBinding);
 				Logger.Debug("HandleShown turned off action cam");
 			}
 			_maxRadialDiameter = Math.Min(((Control)GameService.Graphics.get_SpriteScreen()).get_Width(), ((Control)GameService.Graphics.get_SpriteScreen()).get_Height());
-			mountIconSize = (int)((float)(_maxRadialDiameter / 4) * Module._settingMountRadialIconSizeModifier.get_Value());
-			radius = (int)((float)(_maxRadialDiameter / 2 - mountIconSize / 2) * Module._settingMountRadialRadiusModifier.get_Value());
+			thingIconSize = (int)((float)(_maxRadialDiameter / 4) * Module._settingMountRadialIconSizeModifier.get_Value());
+			radius = (int)((float)(_maxRadialDiameter / 2 - thingIconSize / 2) * Module._settingMountRadialRadiusModifier.get_Value());
 			((Control)this).set_Size(new Point(_maxRadialDiameter, _maxRadialDiameter));
 			if (Module._settingMountRadialSpawnAtMouse.get_Value())
 			{
@@ -266,7 +273,7 @@ namespace Manlaan.Mounts.Controls
 				Mouse.SetPosition(GameService.Graphics.get_WindowWidth() / 2, GameService.Graphics.get_WindowHeight() / 2, true);
 				SpawnPoint = new Point(((Control)GameService.Graphics.get_SpriteScreen()).get_Width() / 2, ((Control)GameService.Graphics.get_SpriteScreen()).get_Height() / 2);
 			}
-			((Control)this).set_Location(new Point(SpawnPoint.X - radius - mountIconSize / 2, SpawnPoint.Y - radius - mountIconSize / 2));
+			((Control)this).set_Location(new Point(SpawnPoint.X - radius - thingIconSize / 2, SpawnPoint.Y - radius - thingIconSize / 2));
 		}
 
 		private async Task HandleHidden(object sender, EventArgs e)
@@ -274,7 +281,7 @@ namespace Manlaan.Mounts.Controls
 			Logger.Debug("HandleHidden entered");
 			if (IsActionCamToggledOnMount)
 			{
-				await _helper.TriggerKeybind(Module._settingMountRadialToggleActionCameraKeyBinding);
+				await Helper.TriggerKeybind(Module._settingMountRadialToggleActionCameraKeyBinding);
 				IsActionCamToggledOnMount = false;
 				Logger.Debug("HandleHidden turned back on action cam");
 			}

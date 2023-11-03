@@ -27,15 +27,17 @@
       </xsd:complexType>
     </xsd:element>
   </xsd:schema>
-<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="Setting_DisplayModuleOnLoadingScreen"><value>Display module on loading screen</value></data>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="Delete"><value>Delete</value></data>
+  <data name="Setting_DisplayModuleOnLoadingScreen"><value>Display module on loading screen</value></data>
   <data name="Setting_MountImgWidth"><value>Manual Icon Width</value></data>
   <data name="Setting_MountRadialStartAngle"><value>Radial start angle</value></data>
+  <data name="Documentation_Button_Label"><value>Documentation</value></data>
   <data name="Setting_MountDisplay"><value>Display Type</value></data>
   <data name="Setting_DisplayMountQueueing"><value>Display Mount queuing</value></data>
   <data name="Setting_MountRadialToggleActionCameraKeyBinding"><value>Ingame KeyBind to toggle action camera</value></data>
   <data name="Setting_MountRadialCenterMountBehavior"><value>Determines the mount in the center of the radial</value></data>
   <data name="Settings_Button_Label"><value>Settings</value></data>
-  <data name="Setting_DefaultMountBehaviour"><value>Default Mount button behaviour</value></data>
+  <data name="Window_GeneralSettingsTab"><value>General Settings</value></data>
   <data name="Setting_MountRadialRadiusModifier"><value>Radial radius</value></data>
   <data name="Setting_DefaultMountBinding"><value>Default Mount Binding</value></data>
   <data name="Setting_MountOpacity"><value>Manual Opacity</value></data>
@@ -43,15 +45,20 @@
   <data name="Setting_MountLoc"><value>Window Location</value></data>
   <data name="Setting_Orientation"><value>Manual Orientation</value></data>
   <data name="Setting_MountDisplayManualIcons"><value>Display manual icons</value></data>
+  <data name="Add_UserDefined_Radial"><value>Add user defined radial</value></data>
+  <data name="Add"><value>Add</value></data>
   <data name="Setting_MountRadialIconSizeModifier"><value>Radial Icon Size</value></data>
   <data name="Setting_MountAutomaticallyAfterLoadingScreen"><value>Mount automatically after loading screen</value></data>
   <data name="Setting_MountRadialSpawnAtMouse"><value>Radial spawn at mouse</value></data>
+  <data name="Window_RadialSettingsTab"><value>Radial Settings</value></data>
   <data name="Setting_DefaultMountChoice"><value>Default Mount Choice</value></data>
   <data name="Setting_MountRadialRemoveCenterMount"><value>Removes center mount from radial</value></data>
   <data name="Setting_MountRadialIconOpacity"><value>Radial Icon Opacity</value></data>
-  <data name="Window_AllSettingsTab"><value>All Settings</value></data>
   <data name="Setting_MountDrag"><value>Enable Dragging (White Box)</value></data>
   <data name="Setting_MountBlockKeybindFromGame"><value>Do not send keybind to game</value></data>
+  <data name="Window_SupportMeTab"><value>Support me</value></data>
   <data name="Setting_DefaultFlyingMountChoice"><value>Default Flying Mount Choice</value></data>
+  <data name="Window_IconSettingsTab"><value>Icon Settings</value></data>
   <data name="Setting_MountDisplayCornerIcons"><value>Display corner icons</value></data>
+  <data name="Edit"><value>Edit</value></data>
   </root>

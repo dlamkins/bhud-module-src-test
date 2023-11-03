@@ -1,14 +1,22 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls.Extern;
 using Blish_HUD.Controls.Intern;
 using Blish_HUD.Input;
+using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Gw2Sharp.Models;
+using Gw2Sharp.WebApi.V2.Clients;
+using Gw2Sharp.WebApi.V2.Models;
+using Manlaan.Mounts.Things;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Mounts.Settings;
 
 namespace Manlaan.Mounts
 {
@@ -16,87 +24,112 @@ namespace Manlaan.Mounts
 	{
 		private static readonly Logger Logger = Logger.GetLogger<Helper>();
 
-		private Mount MountOnHide;
+		private Dictionary<string, Thing> StoredThingForLater = new Dictionary<string, Thing>();
 
-		private string CharacterNameOnHide;
+		private float _lastZPosition;
 
-		private MapType[] warclawOnlyMaps;
+		private double _lastUpdateSeconds;
 
-		private bool IsPlayerInWvWMap()
+		private bool _isPlayerGlidingOrFalling;
+
+		private Gw2ApiManager Gw2ApiManager;
+
+		private bool _isCombatLaunchUnlocked;
+
+		public Helper(Gw2ApiManager gw2ApiManager)
 		{
-			return Array.Exists(warclawOnlyMaps, (MapType mapType) => mapType == GameService.Gw2Mumble.get_CurrentMap().get_Type());
+			Gw2ApiManager = gw2ApiManager;
+			Module._debug.Add("StoreThingForLaterActivation", () => string.Join(", ", StoredThingForLater.Select((KeyValuePair<string, Thing> x) => x.Key + "=" + x.Value.Name).ToArray()) ?? "");
 		}
 
-		private bool IsPlayerGlidingOrFalling()
+		public bool IsCombatLaunchUnlocked()
 		{
-			return Module.IsPlayerGlidingOrFalling;
+			if (!_isCombatLaunchUnlocked)
+			{
+				return Module._settingCombatLaunchMasteryUnlocked.get_Value();
+			}
+			return true;
 		}
 
-		private bool IsPlayerUnderOrCloseToWater()
+		public async Task IsCombatLaunchUnlockedAsync()
+		{
+			if (!Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)new List<TokenPermission> { (TokenPermission)6 }))
+			{
+				_isCombatLaunchUnlocked = false;
+			}
+			_isCombatLaunchUnlocked = ((IEnumerable<Mastery>)(await ((IAllExpandableClient<Mastery>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Masteries()).AllAsync(default(CancellationToken)))).Any((Mastery m) => m.get_Name() == "Combat Launch");
+		}
+
+		public bool IsPlayerGlidingOrFalling()
+		{
+			return _isPlayerGlidingOrFalling;
+		}
+
+		public bool IsPlayerInWvwMap()
+		{
+			MapType[] array = new MapType[6];
+			RuntimeHelpers.InitializeArray(array, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);
+			return Array.Exists((MapType[])(object)array, (MapType mapType) => mapType == GameService.Gw2Mumble.get_CurrentMap().get_Type());
+		}
+
+		public bool IsPlayerUnderWater()
 		{
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			return GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Z <= 0f;
+			return (double)GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Z <= -1.2;
 		}
 
-		private Mount GetFlyingMount()
+		public bool IsPlayerOnWaterSurface()
 		{
-			return Module._mounts.SingleOrDefault((Mount m) => m.IsFlyingMount && m.Name == Module._settingDefaultFlyingMountChoice.get_Value());
-		}
-
-		private static Mount GetWaterMount()
-		{
-			return Module._mounts.SingleOrDefault((Mount m) => m.IsWaterMount && m.Name == Module._settingDefaultWaterMountChoice.get_Value());
-		}
-
-		internal Mount GetInstantMount()
-		{
-			if (IsPlayerInWvWMap())
+			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+			float zpos = GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Z;
+			if ((double)zpos > -1.2)
 			{
-				return Module._mounts.Single((Mount m) => m.IsWvWMount);
+				return zpos < 0f;
 			}
-			if (IsPlayerGlidingOrFalling())
-			{
-				return GetFlyingMount();
-			}
-			if (IsPlayerUnderOrCloseToWater())
-			{
-				return GetWaterMount();
-			}
-			return null;
+			return false;
 		}
 
-		internal Mount GetCenterMount()
+		public bool IsPlayerInCombat()
 		{
-			if (Module._settingMountRadialCenterMountBehavior.get_Value() == "Default")
+			return GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat();
+		}
+
+		public bool IsPlayerMounted()
+		{
+			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Invalid comparison between Unknown and I4
+			return (int)GameService.Gw2Mumble.get_PlayerCharacter().get_CurrentMount() > 0;
+		}
+
+		public void UpdatePlayerGlidingOrFalling(GameTime gameTime)
+		{
+			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+			float currentZPosition = GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Z;
+			double currentUpdateSeconds = gameTime.get_TotalGameTime().TotalSeconds;
+			double secondsDiff = currentUpdateSeconds - _lastUpdateSeconds;
+			double velocity = (double)(currentZPosition - _lastZPosition) / secondsDiff;
+			if (secondsDiff < 0.015)
 			{
-				return GetDefaultMount();
+				return;
 			}
-			if (Module._settingMountRadialCenterMountBehavior.get_Value() == "LastUsed")
+			double v1 = velocity;
+			if (v1 > 5.0 || v1 < -4.0)
 			{
-				return GetLastUsedMount();
+				_isPlayerGlidingOrFalling = true;
 			}
-			return null;
+			else
+			{
+				double v2 = v1;
+				if (v2 >= 0.0 && v2 < 1.0)
+				{
+					_isPlayerGlidingOrFalling = false;
+				}
+			}
+			_lastZPosition = currentZPosition;
+			_lastUpdateSeconds = currentUpdateSeconds;
 		}
 
-		internal Mount GetDefaultMount()
-		{
-			return Module._mounts.SingleOrDefault((Mount m) => m.Name == Module._settingDefaultMountChoice.get_Value());
-		}
-
-		internal Mount GetLastUsedMount()
-		{
-			return (from m in Module._mounts
-				where m.LastUsedTimestamp.HasValue
-				orderby m.LastUsedTimestamp descending
-				select m).FirstOrDefault();
-		}
-
-		internal Mount GetCurrentlyActiveMount()
-		{
-			return Module._mounts.Where((Mount m) => m.MountType == GameService.Gw2Mumble.get_PlayerCharacter().get_CurrentMount()).FirstOrDefault();
-		}
-
-		public async Task TriggerKeybind(SettingEntry<KeyBinding> keybindingSetting)
+		public static async Task TriggerKeybind(SettingEntry<KeyBinding> keybindingSetting)
 		{
 			Logger.Debug("TriggerKeybind entered");
 			if ((int)keybindingSetting.get_Value().get_ModifierKeys() != 0)
@@ -138,7 +171,7 @@ namespace Manlaan.Mounts
 			}
 		}
 
-		private VirtualKeyShort ToVirtualKey(Keys key)
+		private static VirtualKeyShort ToVirtualKey(Keys key)
 		{
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
@@ -154,34 +187,58 @@ namespace Manlaan.Mounts
 			}
 		}
 
-		internal void StoreMountForLaterUse(Mount mount, string characterName)
+		internal Thing GetQueuedThing()
 		{
-			MountOnHide = mount;
-			CharacterNameOnHide = characterName;
+			return (from m in Module._things
+				where m.QueuedTimestamp.HasValue
+				orderby m.QueuedTimestamp descending
+				select m).FirstOrDefault();
 		}
 
-		internal bool IsCharacterTheSameAfterMapLoad(string characterName)
+		internal void StoreThingForLaterActivation(Thing thing, string characterName, string reason)
 		{
-			return CharacterNameOnHide == characterName;
+			Logger.Debug("StoreThingForLaterActivation: " + thing.Name + " for character: " + characterName + " with reason: " + reason);
+			StoredThingForLater[characterName] = thing;
 		}
 
-		internal Task DoMountActionForLaterUse()
+		internal bool IsSomethingStoredForLaterActivation(string characterName)
 		{
-			return MountOnHide?.DoMountAction();
+			bool result = StoredThingForLater.ContainsKey(characterName);
+			Logger.Debug(string.Format("{0} for character {1} : {2}", "IsSomethingStoredForLaterActivation", characterName, result));
+			return result;
 		}
 
-		internal void ClearMountForLaterUse()
+		internal void ClearSomethingStoredForLaterActivation(string characterName)
 		{
-			MountOnHide = null;
-			CharacterNameOnHide = null;
+			Logger.Debug("ClearSomethingStoredForLaterActivation for character: " + characterName);
+			StoredThingForLater.Remove(characterName);
 		}
 
-		public Helper()
+		internal async Task DoThingActionForLaterActivation(string characterName)
 		{
-			MapType[] array = new MapType[6];
-			RuntimeHelpers.InitializeArray(array, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);
-			warclawOnlyMaps = (MapType[])(object)array;
-			base._002Ector();
+			Thing thing = StoredThingForLater[characterName];
+			Logger.Debug("ClearSomethingStoredForLaterActivation " + thing?.Name + " for character: " + characterName);
+			await (thing?.DoAction());
+			ClearSomethingStoredForLaterActivation(characterName);
+		}
+
+		internal ContextualRadialThingSettings GetApplicableContextualRadialThingSettings()
+		{
+			return Module.ContextualRadialSettings.OrderBy((ContextualRadialThingSettings c) => c.Order).FirstOrDefault((ContextualRadialThingSettings c) => c.IsEnabled.get_Value() && c.IsApplicable());
+		}
+
+		internal RadialThingSettings GetTriggeredRadialSettings()
+		{
+			if (!((SettingEntry)Module._settingDefaultMountBinding).get_IsNull() && Module._settingDefaultMountBinding.get_Value().get_IsTriggering())
+			{
+				return GetApplicableContextualRadialThingSettings();
+			}
+			IEnumerable<UserDefinedRadialThingSettings> userdefinedList = Module.UserDefinedRadialSettings.Where((UserDefinedRadialThingSettings s) => !((SettingEntry)s.Keybind).get_IsNull() && s.Keybind.get_Value().get_IsTriggering());
+			if (userdefinedList.Count() == 1)
+			{
+				return userdefinedList.Single();
+			}
+			return null;
 		}
 	}
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Microsoft.Xna.Framework;
@@ -15,6 +16,11 @@ namespace Manlaan.Mounts.Controls
 		public DebugControl()
 			: this()
 		{
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			((Control)this).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			((Control)this).set_Location(new Point(0, 0));
+			((Control)this).set_Size(new Point(1920, 1920));
 			((Control)this).set_Visible(true);
 			StringsToDisplay = new ConcurrentDictionary<string, Func<string>>();
 		}
@@ -42,7 +48,7 @@ namespace Manlaan.Mounts.Controls
 				return;
 			}
 			int i = 0;
-			foreach (KeyValuePair<string, Func<string>> item in StringsToDisplay)
+			foreach (KeyValuePair<string, Func<string>> item in StringsToDisplay.OrderBy((KeyValuePair<string, Func<string>> s) => s.Key))
 			{
 				DrawDbg(spriteBatch, i, item.Key + ": " + item.Value());
 				i += 30;
