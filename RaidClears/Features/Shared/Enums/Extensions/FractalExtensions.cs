@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 namespace RaidClears.Features.Shared.Enums.Extensions
 {
@@ -19,7 +18,7 @@ namespace RaidClears.Features.Shared.Enums.Extensions
 				Encounters.Fractal.MoltenFurnaceFractal => "Molten Furnace", 
 				Encounters.Fractal.NightmareFractal => "Nightmare", 
 				Encounters.Fractal.ShatteredObservatoryFractal => "Shattered Observatory", 
-				Encounters.Fractal.SirensReefFractal => "Siren' Reef", 
+				Encounters.Fractal.SirensReefFractal => "Siren's Reef", 
 				Encounters.Fractal.SilentSurfFractal => "Silent Surf", 
 				Encounters.Fractal.SnowblindFractal => "Snowblind", 
 				Encounters.Fractal.SunquaPeakFractal => "Sunqua Peak", 
@@ -95,36 +94,6 @@ namespace RaidClears.Features.Shared.Enums.Extensions
 			};
 		}
 
-		public static List<int> GetScales(this Encounters.Fractal value)
-		{
-			return value switch
-			{
-				Encounters.Fractal.AetherbladeFractal => new List<int> { 14, 46, 65, 71, 96 }, 
-				Encounters.Fractal.AquaticRuinsFractal => new List<int> { 7, 26, 61, 76 }, 
-				Encounters.Fractal.CaptainMaiTrinBossFractal => new List<int> { 18, 42, 72, 95 }, 
-				Encounters.Fractal.ChaosFractal => new List<int> { 13, 30, 38, 63, 88, 97 }, 
-				Encounters.Fractal.CliffsideFractal => new List<int> { 6, 21, 47, 69, 94 }, 
-				Encounters.Fractal.DeepstoneFractal => new List<int> { 11, 33, 67, 84 }, 
-				Encounters.Fractal.MoltenBossFractal => new List<int> { 10, 40, 70, 90 }, 
-				Encounters.Fractal.MoltenFurnaceFractal => new List<int> { 9, 22, 39, 58, 83 }, 
-				Encounters.Fractal.NightmareFractal => new List<int> { 23, 48, 73, 98 }, 
-				Encounters.Fractal.ShatteredObservatoryFractal => new List<int> { 24, 49, 74, 99 }, 
-				Encounters.Fractal.SirensReefFractal => new List<int> { 12, 37, 54, 78 }, 
-				Encounters.Fractal.SilentSurfFractal => new List<int> { 12, 37, 54, 78 }, 
-				Encounters.Fractal.SnowblindFractal => new List<int> { 3, 27, 51, 68, 86, 93 }, 
-				Encounters.Fractal.SunquaPeakFractal => new List<int> { 25, 50, 75, 100 }, 
-				Encounters.Fractal.SolidOceanFractal => new List<int> { 20, 35, 45, 60, 80 }, 
-				Encounters.Fractal.SwamplandFractal => new List<int> { 5, 17, 32, 56, 77, 89 }, 
-				Encounters.Fractal.ThaumanovaReactorFractal => new List<int> { 15, 34, 43, 55, 64, 82 }, 
-				Encounters.Fractal.TwilightOasisFractal => new List<int> { 16, 41, 59, 87 }, 
-				Encounters.Fractal.UncategorizedFractal => new List<int> { 2, 36, 44, 62, 79, 91 }, 
-				Encounters.Fractal.UndergroundFacilityFractal => new List<int> { 8, 29, 53, 81 }, 
-				Encounters.Fractal.UrbanBattlegroundFractal => new List<int> { 4, 31, 57, 66, 85 }, 
-				Encounters.Fractal.VolcanicFractal => new List<int> { 1, 19, 28, 52, 92 }, 
-				_ => throw new ArgumentOutOfRangeException("value", value, null), 
-			};
-		}
-
 		public static Encounters.Fractal GetFractalForScale(int scale)
 		{
 			return scale switch
@@ -175,7 +144,7 @@ namespace RaidClears.Features.Shared.Enums.Extensions
 				44 => Encounters.Fractal.SolidOceanFractal, 
 				45 => Encounters.Fractal.AetherbladeFractal, 
 				46 => Encounters.Fractal.CliffsideFractal, 
-				47 => Encounters.Fractal.CliffsideFractal, 
+				47 => Encounters.Fractal.NightmareFractal, 
 				48 => Encounters.Fractal.ShatteredObservatoryFractal, 
 				49 => Encounters.Fractal.SunquaPeakFractal, 
 				50 => Encounters.Fractal.SilentSurfFractal, 
@@ -227,8 +196,8 @@ namespace RaidClears.Features.Shared.Enums.Extensions
 				96 => Encounters.Fractal.AetherbladeFractal, 
 				97 => Encounters.Fractal.NightmareFractal, 
 				98 => Encounters.Fractal.ShatteredObservatoryFractal, 
-				99 => Encounters.Fractal.SilentSurfFractal, 
-				100 => Encounters.Fractal.SunquaPeakFractal, 
+				99 => Encounters.Fractal.SunquaPeakFractal, 
+				100 => Encounters.Fractal.SilentSurfFractal, 
 				_ => throw new ArgumentOutOfRangeException("fractal for scale", scale, null), 
 			};
 		}

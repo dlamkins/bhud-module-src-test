@@ -204,7 +204,7 @@
   <data name="Setting_Strike_GridOpacity_Label"><value>Grid opacity</value></data>
   <data name="Settings_Fractals_Completion"><value>Mark complete</value></data>
   <data name="SettingsPanel_Subtitle"><value>customization options</value></data>
-  <data name="Setting_Strike_Visible_Tooltip"><value>Show the fractals overlay on screen</value></data>
+  <data name="Setting_Strike_Visible_Tooltip"><value>Show the strikes overlay on screen</value></data>
   <data name="Raid_Wing_7_2_Short"><value>A</value></data>
   <data name="Raid_Wing_4_Short"><value>BotP</value></data>
   <data name="Setting_Dun_Tooltips_Tooltip"><value>Hovering the mouse over an path will display the full name</value></data>
