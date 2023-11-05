@@ -284,11 +284,11 @@ namespace Manlaan.Mounts
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			//IL_0249: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0291: Expected O, but got Unknown
-			//IL_0389: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05f3: Expected O, but got Unknown
+			//IL_0225: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026d: Expected O, but got Unknown
+			//IL_0365: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0587: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05cf: Expected O, but got Unknown
 			settingscollection = settings;
 			List<Thing> obj = new List<Thing>
 			{
@@ -314,7 +314,7 @@ namespace Manlaan.Mounts
 				new Tonic(settings, _helper)
 			};
 			_things = new Collection<Thing>(obj);
-			List<Thing> thingsForMigration = obj.Where((Thing t) => t.IsAvailable).ToList();
+			List<Thing> thingsForMigration = obj.ToList();
 			_settingsLastRunMigrationVersion = settings.DefineSetting<int>("LastRunMigrationVersion", 0, (Func<string>)null, (Func<string>)null);
 			_settingDefaultMountBinding = settings.DefineSetting<KeyBinding>("DefaultMountBinding", new KeyBinding((Keys)0), (Func<string>)(() => Strings.Setting_DefaultMountBinding), (Func<string>)(() => ""));
 			_settingDefaultMountBinding.get_Value().set_Enabled(true);
@@ -459,6 +459,10 @@ namespace Manlaan.Mounts
 			if (_things.Any((Thing m) => m.QueuedTimestamp.HasValue))
 			{
 				_drawOutOfCombat?.ShowSpinner();
+			}
+			else
+			{
+				_drawOutOfCombat?.HideSpinner();
 			}
 			if ((((Control)_radial).get_Visible() && !_settingDefaultMountBinding.get_Value().get_IsTriggering() && !UserDefinedRadialSettings.Any((UserDefinedRadialThingSettings s) => s.Keybind.get_Value().get_IsTriggering())) || !shouldShowModule)
 			{
@@ -645,7 +649,6 @@ namespace Manlaan.Mounts
 			{
 				thing.QueuedTimestamp = null;
 			}
-			_drawOutOfCombat?.HideSpinner();
 		}
 	}
 }

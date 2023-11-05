@@ -53,25 +53,25 @@ namespace Manlaan.Mounts.Views
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0072: Expected O, but got Unknown
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Expected O, but got Unknown
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
 			Label val = new Label();
 			((Control)val).set_Location(new Point(10, 10));
-			((Control)val).set_Width(totalWidth);
+			((Control)val).set_Width(800);
 			val.set_AutoSizeHeight(true);
 			val.set_WrapText(true);
 			((Control)val).set_Parent(buildPanel);
@@ -91,7 +91,7 @@ namespace Manlaan.Mounts.Views
 			int panelPadding = 20;
 			IconSettingsListPanel = CreateDefaultPanel(buildPanel, new Point(panelPadding, ((Control)labelExplanation).get_Bottom() + panelPadding), totalWidth);
 			BuildIconSettingsListPanel();
-			currentIconSettings = Module.IconThingSettings.First();
+			currentIconSettings = Module.IconThingSettings.Single((IconThingSettings settings) => settings.IsDefault);
 			IconSettingsDetailPanel = CreateDefaultPanel(buildPanel, new Point(10, 500), totalWidth);
 			BuildIconSettingsDetailPanel();
 		}
