@@ -2,7 +2,8 @@ namespace KpRefresher.Domain
 {
 	public enum StrikeMap
 	{
-		Boneskinner = 1351,
+		Boneskinner_Squad = 1339,
+		Boneskinner_Public = 1351,
 		AetherbladeHideout = 1432,
 		XunlaiJadeJunkyard = 1450,
 		KainengOverlook = 1451,

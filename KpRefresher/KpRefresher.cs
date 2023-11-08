@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.GameIntegration;
 using Blish_HUD.Input;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
@@ -17,6 +18,7 @@ using KpRefresher.UI.Controls;
 using KpRefresher.UI.Views;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SemVer;
 
 namespace KpRefresher
 {
@@ -71,6 +73,16 @@ namespace KpRefresher
 
 		protected override void Initialize()
 		{
+			if (Program.get_OverlayVersion() < new SemVer.Version(1, 1, 0))
+			{
+				try
+				{
+					typeof(TacOIntegration).GetProperty("TacOIsRunning").GetSetMethod(nonPublic: true)?.Invoke(GameService.GameIntegration.get_TacO(), new object[1] { true });
+				}
+				catch
+				{
+				}
+			}
 			CornerIcon cornerIcon = new CornerIcon(ContentsManager);
 			((Control)cornerIcon).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((CornerIcon)cornerIcon).set_Priority(1283537108);
