@@ -1,11 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Runtime.InteropServices;
+using System.Globalization;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.Extended;
 using Blish_HUD.Input;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
@@ -14,6 +14,7 @@ using Glide;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Nekres.QuickSurrender.Properties;
 
 namespace Nekres.Quick_Surrender_Module
 {
@@ -25,46 +26,48 @@ namespace Nekres.Quick_Surrender_Module
 			GG,
 			FF,
 			QQ,
-			Resign,
 			Surrender,
-			Forfeit,
 			Concede,
+			Forfeit,
+			Resign,
+			Capituler,
+			Abandonner,
+			Renoncer,
+			Concéder,
+			Kapitulieren,
+			Resignieren,
+			Ergeben,
 			Aufgeben,
 			Rendirse,
+			Renunciar,
 			Capitular
 		}
 
 		private static readonly Logger Logger = Logger.GetLogger(typeof(QuickSurrenderModule));
 
-		internal static QuickSurrenderModule ModuleInstance;
+		internal static QuickSurrenderModule Instance;
 
-		private const uint KEY_PRESSED = 32768u;
+		private Texture2D _surrenderFlagHover;
 
-		private const uint VK_LCONTROL = 162u;
+		private Texture2D _surrenderFlag;
 
-		private const uint VK_LSHIFT = 160u;
-
-		private AsyncTexture2D _surrenderTooltip_texture;
-
-		private AsyncTexture2D _surrenderFlag_hover;
-
-		private AsyncTexture2D _surrenderFlag;
-
-		private AsyncTexture2D _surrenderFlag_pressed;
+		private Texture2D _surrenderFlagPressed;
 
 		private Image _surrenderButton;
 
-		private SettingEntry<bool> SurrenderButtonEnabled;
+		private SettingEntry<bool> _surrenderButtonEnabled;
 
-		private SettingEntry<KeyBinding> SurrenderBinding;
+		private SettingEntry<KeyBinding> _surrenderBinding;
 
-		private SettingEntry<Ping> SurrenderPing;
+		private SettingEntry<Ping> _surrenderPing;
+
+		private SettingEntry<KeyBinding> _chatMessageKeySetting;
+
+		private const string SURRENDER_TEXT = "/gg";
+
+		private const int COOLDOWN_MS = 1500;
 
 		private DateTime _lastSurrenderTime;
-
-		private int _cooldownMs;
-
-		private Dictionary<Ping, string> _pingMap;
 
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
@@ -78,162 +81,103 @@ namespace Nekres.Quick_Surrender_Module
 		public QuickSurrenderModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
 			: this(moduleParameters)
 		{
-			ModuleInstance = this;
+			Instance = this;
 		}
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0103: Expected O, but got Unknown
-			SurrenderButtonEnabled = settings.DefineSetting<bool>("SurrenderButtonEnabled", true, (Func<string>)(() => "Show Surrender Skill"), (Func<string>)(() => "Shows a skill with a white flag to the right of\nyour skill bar while in an instance. Clicking it defeats you.\n(Sends \"/gg\" into chat when in supported modes.)"));
-			SurrenderPing = settings.DefineSetting<Ping>("SurrenderButtonPing", Ping.GG, (Func<string>)(() => "Chat Display"), (Func<string>)(() => "Determines how the surrender skill is displayed in chat using [Ctrl]/[Left Shift] + [Left Mouse]."));
-			SettingCollection keyBindingCol = settings.AddSubCollection("Hotkey", true, false);
-			SurrenderBinding = keyBindingCol.DefineSetting<KeyBinding>("SurrenderButtonKey", new KeyBinding((Keys)190), (Func<string>)(() => "Surrender"), (Func<string>)(() => "Defeats you.\n(Sends \"/gg\" into chat when in supported modes.)"));
-		}
-
-		[DllImport("USER32.dll")]
-		private static extern short GetKeyState(uint vk);
-
-		private bool IsPressed(uint key)
-		{
-			return Convert.ToBoolean((long)GetKeyState(key) & 0x8000L);
+			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0120: Expected O, but got Unknown
+			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a2: Expected O, but got Unknown
+			_surrenderButtonEnabled = settings.DefineSetting<bool>("SurrenderButtonEnabled", true, (Func<string>)(() => Resources.Show_Surrender_Skill), (Func<string>)(() => Resources.Displays_a_skill_to_assist_in_conceding_defeat_));
+			_surrenderPing = settings.DefineSetting<Ping>("SurrenderButtonPing", Ping.GG, (Func<string>)(() => Resources.Chat_Display), (Func<string>)(() => Resources.Determines_how_the_surrender_skill_is_displayed_in_chat_using__Ctrl__or__Shift_____Left_Mouse__));
+			SettingCollection keyBindingCol = settings.AddSubCollection("Hotkey", true, (Func<string>)(() => Resources.Hotkeys));
+			_surrenderBinding = keyBindingCol.DefineSetting<KeyBinding>("SurrenderButtonKey", new KeyBinding((Keys)190), (Func<string>)(() => Resources.Surrender), (Func<string>)(() => Resources.Concede_defeat_by_finishing_yourself_));
+			SettingCollection controlOptions = settings.AddSubCollection("control_options", true, (Func<string>)(() => Resources.Control_Options + " (" + Resources.User_Interface + ")"));
+			_chatMessageKeySetting = controlOptions.DefineSetting<KeyBinding>("ChatMessageKey", new KeyBinding((Keys)13), (Func<string>)(() => Resources.Chat_Message), (Func<string>)(() => Resources.Give_focus_to_the_chat_edit_box_));
 		}
 
 		protected override void Initialize()
 		{
-			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009a: Expected O, but got Unknown
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a5: Expected O, but got Unknown
-			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b0: Expected O, but got Unknown
-			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Expected O, but got Unknown
-			_pingMap = new Dictionary<Ping, string>
-			{
-				{
-					Ping.GG,
-					"[/gg]"
-				},
-				{
-					Ping.FF,
-					"[/ff]"
-				},
-				{
-					Ping.QQ,
-					"[/qq]"
-				},
-				{
-					Ping.Resign,
-					"[/resign]"
-				},
-				{
-					Ping.Surrender,
-					"[/surrender]"
-				},
-				{
-					Ping.Forfeit,
-					"[/forfeit]"
-				},
-				{
-					Ping.Concede,
-					"[/concede]"
-				},
-				{
-					Ping.Aufgeben,
-					"[/aufgeben]"
-				},
-				{
-					Ping.Rendirse,
-					"[/rendirse]"
-				},
-				{
-					Ping.Capitular,
-					"[/capitular]"
-				}
-			};
-			_surrenderTooltip_texture = new AsyncTexture2D();
-			_surrenderFlag = new AsyncTexture2D();
-			_surrenderFlag_hover = new AsyncTexture2D();
-			_surrenderFlag_pressed = new AsyncTexture2D();
-			_lastSurrenderTime = DateTime.Now;
-			_cooldownMs = 2000;
+			LoadTextures();
 		}
 
-		protected override async Task LoadAsync()
+		private void LoadTextures()
 		{
-			await LoadTextures();
-		}
-
-		private Task LoadTextures()
-		{
-			return Task.Run(delegate
-			{
-				_surrenderTooltip_texture.SwapTexture(ContentsManager.GetTexture("surrender_tooltip.png"));
-				_surrenderFlag.SwapTexture(ContentsManager.GetTexture("surrender_flag.png"));
-				_surrenderFlag_hover.SwapTexture(ContentsManager.GetTexture("surrender_flag_hover.png"));
-				_surrenderFlag_pressed.SwapTexture(ContentsManager.GetTexture("surrender_flag_pressed.png"));
-			});
+			_surrenderFlag = ContentsManager.GetTexture("surrender_flag.png");
+			_surrenderFlagHover = ContentsManager.GetTexture("surrender_flag_hover.png");
+			_surrenderFlagPressed = ContentsManager.GetTexture("surrender_flag_pressed.png");
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
-			SurrenderBinding.get_Value().set_Enabled(true);
-			SurrenderBinding.get_Value().add_Activated((EventHandler<EventArgs>)OnSurrenderBindingActivated);
-			SurrenderButtonEnabled.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnSurrenderButtonEnabledSettingChanged);
+			_surrenderBinding.get_Value().set_Enabled(true);
+			_surrenderBinding.get_Value().add_Activated((EventHandler<EventArgs>)OnSurrenderBindingActivated);
+			_surrenderButtonEnabled.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnSurrenderButtonEnabledSettingChanged);
 			GameService.Gw2Mumble.get_UI().add_IsMapOpenChanged((EventHandler<ValueEventArgs<bool>>)OnIsMapOpenChanged);
 			GameService.GameIntegration.get_Gw2Instance().add_IsInGameChanged((EventHandler<ValueEventArgs<bool>>)OnIsInGameChanged);
+			((Control)GameService.Graphics.get_SpriteScreen()).add_Resized((EventHandler<ResizedEventArgs>)OnSpriteScreenResized);
+			GameService.Overlay.add_UserLocaleChanged((EventHandler<ValueEventArgs<CultureInfo>>)OnUserLocaleChanged);
 			BuildSurrenderButton();
 			((Module)this).OnModuleLoaded(e);
 		}
 
-		protected override void Update(GameTime gameTime)
+		private void OnUserLocaleChanged(object sender, ValueEventArgs<CultureInfo> e)
 		{
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			if (_surrenderButton != null)
-			{
-				((Control)_surrenderButton).set_Location(new Point(((Control)GameService.Graphics.get_SpriteScreen()).get_Width() / 2 - ((Control)_surrenderButton).get_Width() / 2 + 431, ((Control)GameService.Graphics.get_SpriteScreen()).get_Height() - ((Control)_surrenderButton).get_Height() * 2 + 7));
-			}
+			BuildSurrenderButton();
 		}
 
 		protected override void Unload()
 		{
-			SurrenderBinding.get_Value().remove_Activated((EventHandler<EventArgs>)OnSurrenderBindingActivated);
-			SurrenderButtonEnabled.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnSurrenderButtonEnabledSettingChanged);
+			_surrenderBinding.get_Value().remove_Activated((EventHandler<EventArgs>)OnSurrenderBindingActivated);
+			_surrenderButtonEnabled.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnSurrenderButtonEnabledSettingChanged);
 			GameService.Gw2Mumble.get_UI().remove_IsMapOpenChanged((EventHandler<ValueEventArgs<bool>>)OnIsMapOpenChanged);
 			GameService.GameIntegration.get_Gw2Instance().remove_IsInGameChanged((EventHandler<ValueEventArgs<bool>>)OnIsInGameChanged);
+			((Control)GameService.Graphics.get_SpriteScreen()).remove_Resized((EventHandler<ResizedEventArgs>)OnSpriteScreenResized);
+			GameService.Overlay.remove_UserLocaleChanged((EventHandler<ValueEventArgs<CultureInfo>>)OnUserLocaleChanged);
 			Image surrenderButton = _surrenderButton;
 			if (surrenderButton != null)
 			{
 				((Control)surrenderButton).Dispose();
 			}
-			ModuleInstance = null;
+			Texture2D surrenderFlag = _surrenderFlag;
+			if (surrenderFlag != null)
+			{
+				((GraphicsResource)surrenderFlag).Dispose();
+			}
+			Texture2D surrenderFlagHover = _surrenderFlagHover;
+			if (surrenderFlagHover != null)
+			{
+				((GraphicsResource)surrenderFlagHover).Dispose();
+			}
+			Texture2D surrenderFlagPressed = _surrenderFlagPressed;
+			if (surrenderFlagPressed != null)
+			{
+				((GraphicsResource)surrenderFlagPressed).Dispose();
+			}
+			Instance = null;
 		}
 
-		private void DoSurrender()
+		private async Task DoSurrender()
 		{
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Invalid comparison between Unknown and I4
-			if (IsUiAvailable() && !GameService.Gw2Mumble.get_UI().get_IsTextInputFocused() && (int)GameService.Gw2Mumble.get_CurrentMap().get_Type() == 4)
+			if ((int)GameService.Gw2Mumble.get_CurrentMap().get_Type() == 4)
 			{
-				if (DateTimeOffset.Now.Subtract(_lastSurrenderTime).TotalMilliseconds < (double)_cooldownMs)
+				if (DateTime.UtcNow.Subtract(_lastSurrenderTime).TotalMilliseconds < 1500.0)
 				{
-					ScreenNotification.ShowNotification("Skill recharging.", (NotificationType)2, (Texture2D)null, 4);
+					ScreenNotification.ShowNotification(Resources.Skill_recharging_, (NotificationType)2, (Texture2D)null, 4);
 					return;
 				}
-				GameService.GameIntegration.get_Chat().Send("/gg");
-				_lastSurrenderTime = DateTime.Now;
+				_lastSurrenderTime = DateTime.UtcNow;
+				_surrenderBinding.get_Value().set_Enabled(false);
+				await ChatUtil.Send("/gg", _chatMessageKeySetting.get_Value(), Logger);
+				_surrenderBinding.get_Value().set_Enabled(true);
 			}
 		}
 
-		private bool IsUiAvailable()
+		private async void OnSurrenderBindingActivated(object o, EventArgs e)
 		{
-			return GameService.Gw2Mumble.get_IsAvailable() && GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && !GameService.Gw2Mumble.get_UI().get_IsMapOpen();
-		}
-
-		private void OnSurrenderBindingActivated(object o, EventArgs e)
-		{
-			DoSurrender();
+			await DoSurrender();
 		}
 
 		private void OnIsMapOpenChanged(object o, ValueEventArgs<bool> e)
@@ -279,91 +223,138 @@ namespace Nekres.Quick_Surrender_Module
 
 		private void BuildSurrenderButton()
 		{
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Invalid comparison between Unknown and I4
 			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0045: Invalid comparison between Unknown and I4
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0061: Expected O, but got Unknown
-			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Expected O, but got Unknown
-			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0124: Expected O, but got Unknown
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Expected O, but got Unknown
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ff: Expected O, but got Unknown
 			Image surrenderButton = _surrenderButton;
 			if (surrenderButton != null)
 			{
 				((Control)surrenderButton).Dispose();
 			}
-			if (!SurrenderButtonEnabled.get_Value() || !IsUiAvailable() || (int)GameService.Gw2Mumble.get_CurrentMap().get_Type() != 4)
+			if (!_surrenderButtonEnabled.get_Value() || (int)GameService.Gw2Mumble.get_CurrentMap().get_Type() != 4)
 			{
 				return;
 			}
-			Tooltip surrenderButtonTooltip = new Tooltip();
-			_surrenderTooltip_texture.add_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)delegate
-			{
-				//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-				((Control)surrenderButtonTooltip).set_Size(new Point(_surrenderTooltip_texture.get_Texture().get_Width(), _surrenderTooltip_texture.get_Texture().get_Height()));
-			});
-			Image val = new Image(_surrenderTooltip_texture);
-			((Control)val).set_Parent((Container)(object)surrenderButtonTooltip);
-			((Control)val).set_Location(new Point(0, 0));
-			Image surrenderButtonTooltipImage = val;
+			Point tooltipSize = default(Point);
+			((Point)(ref tooltipSize))._002Ector(300, 100);
+			Tooltip val = new Tooltip();
+			((Control)val).set_Size(tooltipSize);
+			Tooltip surrenderButtonTooltip = val;
+			((Control)new FormattedLabelBuilder().SetWidth(tooltipSize.X).SetHeight(tooltipSize.Y).SetHorizontalAlignment((HorizontalAlignment)2)
+				.SetVerticalAlignment((VerticalAlignment)0)
+				.CreatePart($"{Math.Round(1.5)}", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder o)
+				{
+					//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+					o.SetFontSize((FontSize)16);
+					o.SetSuffixImageSize(new Point(18, 18));
+					o.SetSuffixImage(GameService.Content.get_DatAssetCache().GetTextureFromAssetId(156651));
+				})
+				.Build()).set_Parent((Container)(object)surrenderButtonTooltip);
+			((Control)new FormattedLabelBuilder().SetWidth(tooltipSize.X).SetHeight(tooltipSize.Y).SetVerticalAlignment((VerticalAlignment)0)
+				.CreatePart(Resources.Surrender + "\n", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder o)
+				{
+					//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+					o.SetTextColor(new Color(255, 204, 119));
+					o.MakeBold();
+					o.SetFontSize((FontSize)20);
+				})
+				.CreatePart(Resources.Chat_Command + ". ", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder o)
+				{
+					//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+					o.SetTextColor(new Color(240, 224, 129));
+					o.SetFontSize((FontSize)16);
+				})
+				.CreatePart(Resources.Concede_defeat_by_finishing_yourself_ + "\n", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder o)
+				{
+					o.SetFontSize((FontSize)16);
+				})
+				.CreatePart(Resources.You_are_defeated_, (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder o)
+				{
+					//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+					o.SetTextColor(new Color(175, 175, 175));
+					o.SetFontSize((FontSize)16);
+					o.SetPrefixImage(GameService.Content.get_DatAssetCache().GetTextureFromAssetId(102540));
+				})
+				.Wrap()
+				.Build()).set_Parent((Container)(object)surrenderButtonTooltip);
 			Image val2 = new Image();
 			((Control)val2).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((Control)val2).set_Size(new Point(45, 45));
-			((Control)val2).set_Location(new Point(((Control)GameService.Graphics.get_SpriteScreen()).get_Width() / 2 - 22, ((Control)GameService.Graphics.get_SpriteScreen()).get_Height() - 45));
-			val2.set_Texture(_surrenderFlag);
+			val2.set_Texture(AsyncTexture2D.op_Implicit(_surrenderFlag));
 			((Control)val2).set_Tooltip(surrenderButtonTooltip);
 			((Control)val2).set_Opacity(0f);
 			_surrenderButton = val2;
 			((Control)_surrenderButton).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
 			{
-				_surrenderButton.set_Texture(_surrenderFlag_hover);
+				_surrenderButton.set_Texture(AsyncTexture2D.op_Implicit(_surrenderFlagHover));
 			});
 			((Control)_surrenderButton).add_MouseLeft((EventHandler<MouseEventArgs>)delegate
 			{
-				_surrenderButton.set_Texture(_surrenderFlag);
+				_surrenderButton.set_Texture(AsyncTexture2D.op_Implicit(_surrenderFlag));
 			});
 			((Control)_surrenderButton).add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)delegate
 			{
-				//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+				//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 				((Control)_surrenderButton).set_Size(new Point(43, 43));
-				_surrenderButton.set_Texture(_surrenderFlag_pressed);
+				_surrenderButton.set_Texture(AsyncTexture2D.op_Implicit(_surrenderFlagPressed));
 			});
 			((Control)_surrenderButton).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
 			{
-				//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+				//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 				((Control)_surrenderButton).set_Size(new Point(45, 45));
-				_surrenderButton.set_Texture(_surrenderFlag);
+				_surrenderButton.set_Texture(AsyncTexture2D.op_Implicit(_surrenderFlag));
 			});
-			((Control)_surrenderButton).add_Click((EventHandler<MouseEventArgs>)delegate(object o, MouseEventArgs e)
+			((Control)_surrenderButton).add_Click((EventHandler<MouseEventArgs>)async delegate(object o, MouseEventArgs e)
 			{
-				if (IsPressed(162u))
+				if (KeyboardUtil.IsCtrlPressed())
 				{
-					GameService.GameIntegration.get_Chat().Send(_pingMap[SurrenderPing.get_Value()]);
+					await ChatUtil.Send($"[/{_surrenderPing.get_Value()}]", _chatMessageKeySetting.get_Value(), Logger);
 				}
-				else if (IsPressed(160u))
+				else if (KeyboardUtil.IsShiftPressed())
 				{
-					GameService.GameIntegration.get_Chat().Paste(_pingMap[SurrenderPing.get_Value()]);
+					await ChatUtil.Insert($"[/{_surrenderPing.get_Value()}]", _chatMessageKeySetting.get_Value(), Logger);
 				}
 				else
 				{
 					OnSurrenderBindingActivated(o, (EventArgs)(object)e);
 				}
 			});
+			ValidatePosition();
 			((TweenerImpl)GameService.Animation.get_Tweener()).Tween<Image>(_surrenderButton, (object)new
 			{
 				Opacity = 1f
 			}, 0.35f, 0f, true);
+		}
+
+		private void ValidatePosition()
+		{
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			if (_surrenderButton != null)
+			{
+				((Control)_surrenderButton).set_Location(new Point(((Control)GameService.Graphics.get_SpriteScreen()).get_Width() / 2 - ((Control)_surrenderButton).get_Width() / 2 + 431, ((Control)GameService.Graphics.get_SpriteScreen()).get_Height() - ((Control)_surrenderButton).get_Height() * 2 + 7));
+			}
+		}
+
+		private void OnSpriteScreenResized(object sender, ResizedEventArgs e)
+		{
+			ValidatePosition();
 		}
 	}
 }
