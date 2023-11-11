@@ -65,7 +65,7 @@ namespace Nekres.Quick_Surrender_Module
 
 		private const string SURRENDER_TEXT = "/gg";
 
-		private const int COOLDOWN_MS = 1500;
+		private const int COOLDOWN_MS = 5000;
 
 		private DateTime _lastSurrenderTime;
 
@@ -163,7 +163,7 @@ namespace Nekres.Quick_Surrender_Module
 		{
 			if ((int)GameService.Gw2Mumble.get_CurrentMap().get_Type() == 4)
 			{
-				if (DateTime.UtcNow.Subtract(_lastSurrenderTime).TotalMilliseconds < 1500.0)
+				if (DateTime.UtcNow.Subtract(_lastSurrenderTime).TotalMilliseconds < 5000.0)
 				{
 					ScreenNotification.ShowNotification(Resources.Skill_recharging_, (NotificationType)2, (Texture2D)null, 4);
 					return;
@@ -225,24 +225,26 @@ namespace Nekres.Quick_Surrender_Module
 		{
 			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002e: Invalid comparison between Unknown and I4
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Expected O, but got Unknown
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ff: Expected O, but got Unknown
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Invalid comparison between Unknown and I4
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0062: Expected O, but got Unknown
+			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0205: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0215: Expected O, but got Unknown
 			Image surrenderButton = _surrenderButton;
 			if (surrenderButton != null)
 			{
@@ -253,13 +255,13 @@ namespace Nekres.Quick_Surrender_Module
 				return;
 			}
 			Point tooltipSize = default(Point);
-			((Point)(ref tooltipSize))._002Ector(300, 100);
+			((Point)(ref tooltipSize))._002Ector(300, ((int)GameService.Overlay.get_UserLocale().get_Value() == 3) ? 120 : 100);
 			Tooltip val = new Tooltip();
 			((Control)val).set_Size(tooltipSize);
 			Tooltip surrenderButtonTooltip = val;
 			((Control)new FormattedLabelBuilder().SetWidth(tooltipSize.X).SetHeight(tooltipSize.Y).SetHorizontalAlignment((HorizontalAlignment)2)
 				.SetVerticalAlignment((VerticalAlignment)0)
-				.CreatePart($"{Math.Round(1.5)}", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder o)
+				.CreatePart($"{Math.Round(5.0)}", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder o)
 				{
 					//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 					o.SetFontSize((FontSize)16);
@@ -321,7 +323,7 @@ namespace Nekres.Quick_Surrender_Module
 				((Control)_surrenderButton).set_Size(new Point(45, 45));
 				_surrenderButton.set_Texture(AsyncTexture2D.op_Implicit(_surrenderFlag));
 			});
-			((Control)_surrenderButton).add_Click((EventHandler<MouseEventArgs>)async delegate(object o, MouseEventArgs e)
+			((Control)_surrenderButton).add_Click((EventHandler<MouseEventArgs>)async delegate
 			{
 				if (KeyboardUtil.IsCtrlPressed())
 				{
@@ -333,7 +335,7 @@ namespace Nekres.Quick_Surrender_Module
 				}
 				else
 				{
-					OnSurrenderBindingActivated(o, (EventArgs)(object)e);
+					await DoSurrender();
 				}
 			});
 			ValidatePosition();
