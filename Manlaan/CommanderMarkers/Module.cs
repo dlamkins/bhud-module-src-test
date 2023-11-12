@@ -102,6 +102,9 @@ namespace Manlaan.CommanderMarkers
 			case CornerIconActions.LIBRARY:
 				Service.SettingsWindow.ShowLibrary();
 				break;
+			case CornerIconActions.CLICKMARKER_TOGGLE:
+				Service.Settings._settingShowMarkersPanel.set_Value(!Service.Settings._settingShowMarkersPanel.get_Value());
+				break;
 			}
 		}
 

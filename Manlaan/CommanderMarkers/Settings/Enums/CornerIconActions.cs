@@ -11,6 +11,8 @@ namespace Manlaan.CommanderMarkers.Settings.Enums
 		[Description("Open The Marker library")]
 		LIBRARY,
 		[Description("Lieutenant's Mode")]
-		LIEUTENANT
+		LIEUTENANT,
+		[Description("Toggle Markers Panel Visibility")]
+		CLICKMARKER_TOGGLE
 	}
 }
