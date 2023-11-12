@@ -14,7 +14,7 @@ namespace BhModule.Community.Pathing.UI.Tooltips
 	{
 		private static readonly Logger Logger = Logger.GetLogger<AchievementPresenter>();
 
-		private const int LOAD_ATTEMPTS = 3;
+		private const int LOAD_ATTEMPTS = 1;
 
 		private AchievementCategory _achievementCategories;
 
@@ -25,7 +25,7 @@ namespace BhModule.Community.Pathing.UI.Tooltips
 		{
 		}
 
-		private async Task<bool> AttemptLoadAchievement(IProgress<string> progress, int attempt = 3)
+		private async Task<bool> AttemptLoadAchievement(IProgress<string> progress, int attempt = 1)
 		{
 			progress.Report("Loading achievement details...");
 			try
@@ -48,7 +48,7 @@ namespace BhModule.Community.Pathing.UI.Tooltips
 			return true;
 		}
 
-		private async Task<bool> AttemptLoadAchievementCategory(IProgress<string> progress, int attempt = 3)
+		private async Task<bool> AttemptLoadAchievementCategory(IProgress<string> progress, int attempt = 1)
 		{
 			progress.Report("Loading achievement group details...");
 			try
@@ -74,12 +74,18 @@ namespace BhModule.Community.Pathing.UI.Tooltips
 
 		protected override async Task<bool> Load(IProgress<string> progress)
 		{
-			if (!(await AttemptLoadAchievement(progress)) && _achievement != null)
+			Task.Run(async delegate
 			{
-				progress.Report("Failed to load achievement details.");
-				return false;
-			}
-			await AttemptLoadAchievementCategory(progress);
+				if (!(await AttemptLoadAchievement(progress)) && _achievement != null)
+				{
+					progress.Report("Failed to load achievement details.");
+				}
+				else
+				{
+					await AttemptLoadAchievementCategory(progress);
+					((Presenter<AchievementTooltipView, int>)this).UpdateView();
+				}
+			});
 			return true;
 		}
 

@@ -15,6 +15,7 @@ using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended;
 using TmfLib.Pathable;
 using TmfLib.Prototype;
 
@@ -49,7 +50,31 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		private void BuildCategoryMenu()
 		{
-			((ContextMenuStripItem)this).set_Text(_pathingCategory.DisplayName);
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			if (!_packState.UserConfiguration.PackTruncateLongCategoryNames.get_Value())
+			{
+				((ContextMenuStripItem)this).set_Text(_pathingCategory.DisplayName);
+			}
+			else
+			{
+				string text = _pathingCategory.DisplayName;
+				Size2 textSize = GameService.Content.get_DefaultFont14().MeasureString(text);
+				while (textSize.Width > (float)_packState.UserResourceStates.Advanced.CategoryNameTruncateWidth)
+				{
+					if (text.Length <= 1)
+					{
+						text = _pathingCategory.DisplayName;
+						break;
+					}
+					text = text.Substring(0, text.Length - 2);
+					textSize = GameService.Content.get_DefaultFont14().MeasureString(text + "...");
+				}
+				((ContextMenuStripItem)this).set_Text((text == _pathingCategory.DisplayName) ? text : (text.Trim() + "..."));
+			}
 			if (_packState.CategoryStates != null)
 			{
 				if ((_forceShowAll && _pathingCategory.Any()) || _pathingCategory.Any((PathingCategory c) => CategoryUtil.UiCategoryIsNotFiltered(c, _packState)))

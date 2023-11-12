@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using BhModule.Community.Pathing.Editor;
 using BhModule.Community.Pathing.State;
 using BhModule.Community.Pathing.UI.Tooltips;
 using Blish_HUD;
@@ -63,14 +62,6 @@ namespace BhModule.Community.Pathing.Entity
 				((Control)newMenu.AddMenuItem("Copy Parent Category Namespace")).add_Click((EventHandler<MouseEventArgs>)async delegate
 				{
 					await ClipboardUtil.get_WindowsClipboardService().SetTextAsync(pathingEntry.Category.Namespace);
-				});
-				((Control)newMenu.AddMenuItem("Edit Marker")).add_Click((EventHandler<MouseEventArgs>)delegate
-				{
-					MarkerEditWindow.SetPathingEntity(_packState, pathingEntry);
-				});
-				((Control)newMenu.AddMenuItem("Delete Marker")).add_Click((EventHandler<MouseEventArgs>)delegate
-				{
-					ScreenNotification.ShowNotification("Not yet supported", (NotificationType)1, (Texture2D)null, 5);
 				});
 			}
 			((Control)newMenu).add_Hidden((EventHandler<EventArgs>)delegate
@@ -264,8 +255,22 @@ namespace BhModule.Community.Pathing.Entity
 			string tooltipTitle;
 			if (pathable != null && isAlternativeMenu)
 			{
-				tooltipTitle = ((pathable.Category != null) ? string.Join("\n > ", (from category in pathable.Category?.GetParentsDesc()
-					select category.DisplayName.Trim())) : "Unassigned Category");
+				if (pathable.Category == null)
+				{
+					tooltipTitle = "Unassigned Category";
+				}
+				else
+				{
+					try
+					{
+						tooltipTitle = string.Join("\n > ", (from category in pathable.Category?.GetParentsDesc()
+							select category.DisplayName.Trim()));
+					}
+					catch (Exception)
+					{
+						tooltipTitle = "Failed to retrieve tooltip.";
+					}
+				}
 				tooltipDescription = null;
 			}
 			else

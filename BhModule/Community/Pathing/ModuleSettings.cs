@@ -54,6 +54,8 @@ namespace BhModule.Community.Pathing
 
 		public SettingEntry<bool> PackShowWhenCategoriesAreFiltered { get; private set; }
 
+		public SettingEntry<bool> PackTruncateLongCategoryNames { get; private set; }
+
 		public SettingEntry<bool> PackShowHiddenMarkersReducedOpacity { get; private set; }
 
 		public SettingCollection MapSettings { get; private set; }
@@ -126,7 +128,8 @@ namespace BhModule.Community.Pathing
 			PackAllowInteractIcon = PackSettings.DefineSetting<bool>("PackAllowInteractIcon", true, (Func<string>)(() => "Allow Markers to Show Interact Gear On-Screen"), (Func<string>)(() => "If enabled, interactable markers will show a small gear icon on-screen to show what the interaction will do."));
 			PackAllowMarkersToAnimate = PackSettings.DefineSetting<bool>("PackAllowMarkersToAnimate", true, (Func<string>)(() => Strings.Setting_PackAllowMarkersToAnimate), (Func<string>)(() => "Allows animations such as 'bounce' and trail movements."));
 			PackEnableSmartCategoryFilter = PackSettings.DefineSetting<bool>("PackEnableSmartCategoryFilter", true, (Func<string>)(() => "Enable Smart Categories"), (Func<string>)(() => "If a category doesn't contain markers or trails relevant to the current map, the category is hidden."));
-			PackShowWhenCategoriesAreFiltered = PackSettings.DefineSetting<bool>("PackShowWhenCategoriesAreFiltered", true, (Func<string>)(() => "Indicate when categories are hidden"), (Func<string>)(() => "Shows a note at the bottom of the menu indicating if categories have been hidden.  Clicking the note will show the hidden categories temporarily."));
+			PackShowWhenCategoriesAreFiltered = PackSettings.DefineSetting<bool>("PackShowWhenCategoriesAreFiltered", true, (Func<string>)(() => "Indicate When Categories Are Hidden"), (Func<string>)(() => "Shows a note at the bottom of the menu indicating if categories have been hidden.  Clicking the note will show the hidden categories temporarily."));
+			PackTruncateLongCategoryNames = PackSettings.DefineSetting<bool>("PackTruncateLongCategoryNames", false, (Func<string>)(() => "Truncate Long Category Names"), (Func<string>)(() => "Shortens long category names so that more nested menus can be shown on screen."));
 			PackShowHiddenMarkersReducedOpacity = PackSettings.DefineSetting<bool>("PackShowHiddenMarkersReducedOpacity", false, (Func<string>)(() => "Temporarily Show Ghost Markers"), (Func<string>)(() => "Shows hidden markers with a reduced opacity allowing you to unhide them.  This setting automatically disables on startup."));
 			SettingComplianceExtensions.SetRange(PackMaxOpacityOverride, 0f, 1f);
 			SettingComplianceExtensions.SetRange(PackMaxViewDistance, 25f, 50000f);

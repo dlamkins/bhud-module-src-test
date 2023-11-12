@@ -173,7 +173,7 @@ namespace BhModule.Community.Pathing.Entity
 			{
 				return true;
 			}
-			if (_packState.CategoryStates.GetNamespaceInactive(Category.Namespace))
+			if (Category != null && _packState.CategoryStates.GetNamespaceInactive(Category.Namespace))
 			{
 				return true;
 			}
