@@ -65,7 +65,7 @@ namespace Manlaan.Mounts.Controls
 			}
 			foreach (Thing thing in _iconThingSettings.AvailableThings)
 			{
-				thing.CreateCornerIcon(_textureCache.GetMountImgFile(thing));
+				thing.CreateCornerIcon(_textureCache.GetThingImgFile(thing));
 			}
 		}
 
@@ -101,7 +101,7 @@ namespace Manlaan.Mounts.Controls
 			ICollection<Thing> things = _iconThingSettings.AvailableThings;
 			foreach (Thing thing in things)
 			{
-				Texture2D img = _textureCache.GetMountImgFile(thing);
+				Texture2D img = _textureCache.GetThingImgFile(thing);
 				Image val = new Image();
 				((Control)val).set_Parent((Container)(object)this);
 				val.set_Texture(AsyncTexture2D.op_Implicit(img));
@@ -161,7 +161,11 @@ namespace Manlaan.Mounts.Controls
 
 		protected override CaptureType CapturesInput()
 		{
-			return (CaptureType)4;
+			if (_iconThingSettings.IsEnabled.get_Value())
+			{
+				return (CaptureType)4;
+			}
+			return (CaptureType)0;
 		}
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)

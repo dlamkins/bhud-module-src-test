@@ -104,19 +104,16 @@ namespace Manlaan.Mounts.Things
 			{
 				Logger.Debug("DoAction Set queued for out of combat: " + Name);
 				QueuedTimestamp = DateTime.UtcNow;
-				return;
 			}
-			if (!Module.CanThingBeActivated())
+			else if (!Module.CanThingBeActivated())
 			{
 				_helper.StoreThingForLaterActivation(this, GameService.Gw2Mumble.get_PlayerCharacter().get_Name(), "NotAbleToActivate");
-				return;
 			}
-			LastUsedTimestamp = DateTime.UtcNow;
-			foreach (Thing thing in Module._things)
+			else
 			{
-				thing.QueuedTimestamp = null;
+				LastUsedTimestamp = DateTime.UtcNow;
+				await Helper.TriggerKeybind(KeybindingSetting);
 			}
-			await Helper.TriggerKeybind(KeybindingSetting);
 		}
 
 		public virtual bool IsInUse()

@@ -47,7 +47,7 @@ namespace Manlaan.Mounts
 
 		public static List<ThingImageFile> _thingImageFiles = new List<ThingImageFile>();
 
-		public static string mountsDirectory;
+		public static string thingsDirectory;
 
 		public static string[] _keybindBehaviours = new string[2] { "Default", "Radial" };
 
@@ -85,6 +85,8 @@ namespace Manlaan.Mounts
 
 		public static SettingEntry<bool> _settingMountAutomaticallyAfterLoadingScreen;
 
+		public static SettingEntry<KeyBinding> _settingJumpBinding;
+
 		private TabbedWindow2 _settingsWindow;
 
 		public static DebugControl _debug;
@@ -101,9 +103,9 @@ namespace Manlaan.Mounts
 
 		private TextureCache _textureCache;
 
-		private bool _lastIsMountSwitchable;
+		private bool _lastIsThingSwitchable;
 
-		private int _lastInUseMountsCount;
+		private int _lastInUseThingsCount;
 
 		internal ContentsManager ContentsManager => base.ModuleParameters.get_ContentsManager();
 
@@ -147,23 +149,23 @@ namespace Manlaan.Mounts
 				"springer.png", "turtle-text.png", "turtle-trans.png", "turtle.png", "warclaw-text.png", "warclaw-trans.png", "warclaw.png", "fishing.png", "skiff.png", "jadebotwaypoint.png",
 				"chair.png", "music.png", "held.png", "toy.png", "tonic.png", "scanforrift.png", "skyscaleleap.png", "unmount.png"
 			};
-			mountsDirectory = DirectoriesManager.GetFullDirectoryPath("mounts");
+			thingsDirectory = DirectoriesManager.GetFullDirectoryPath("mounts");
 			obj.ForEach(delegate(string f)
 			{
-				ExtractFile(f, mountsDirectory);
+				ExtractFile(f, thingsDirectory);
 			});
-			_thingImageFiles = (from file in Directory.GetFiles(mountsDirectory, ".")
+			_thingImageFiles = (from file in Directory.GetFiles(thingsDirectory, ".")
 				where file.ToLower().Contains(".png")
 				select new ThingImageFile
 				{
-					Name = file.Substring(mountsDirectory.Length + 1)
+					Name = file.Substring(thingsDirectory.Length + 1)
 				}).ToList();
 			_textureCache = new TextureCache(ContentsManager);
 			GameService.Gw2Mumble.get_PlayerCharacter().add_IsInCombatChanged((EventHandler<ValueEventArgs<bool>>)async delegate(object sender, ValueEventArgs<bool> e)
 			{
 				await HandleCombatChangeAsync(sender, e);
 			});
-			Texture2D mountsIcon = _textureCache.GetImgFile(TextureCache.MountLogoTextureName);
+			Texture2D mountsIcon = _textureCache.GetImgFile(TextureCache.ModuleLogoTextureName);
 			TabbedWindow2 val = new TabbedWindow2(_textureCache.GetImgFile(TextureCache.TabBackgroundTextureName), new Rectangle(35, 36, 1300, 900), new Rectangle(95, 42, 1221, 900));
 			((WindowBase2)val).set_Title("Mounts & More");
 			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
@@ -173,7 +175,7 @@ namespace Manlaan.Mounts
 			((WindowBase2)val).set_SavesPosition(true);
 			_settingsWindow = val;
 			_settingsWindow.get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(_textureCache.GetImgFile(TextureCache.SettingsTextureName)), (Func<IView>)(() => (IView)(object)new SettingsView(_textureCache)), Strings.Window_GeneralSettingsTab, (int?)null));
-			_settingsWindow.get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(_textureCache.GetImgFile(TextureCache.RadialSettingsTextureName)), (Func<IView>)(() => (IView)(object)new RadialThingSettingsView(DoKeybindActionAsync)), Strings.Window_RadialSettingsTab, (int?)null));
+			_settingsWindow.get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(_textureCache.GetImgFile(TextureCache.RadialSettingsTextureName)), (Func<IView>)(() => (IView)(object)new RadialThingSettingsView(DoKeybindActionAsync, _helper)), Strings.Window_RadialSettingsTab, (int?)null));
 			_settingsWindow.get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(_textureCache.GetImgFile(TextureCache.IconSettingsTextureName)), (Func<IView>)(() => (IView)(object)new IconThingSettingsView()), Strings.Window_IconSettingsTab, (int?)null));
 			_settingsWindow.get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(_textureCache.GetImgFile(TextureCache.SupportMeTabTextureName)), (Func<IView>)(() => (IView)(object)new SupportMeView(_textureCache)), Strings.Window_SupportMeTab, (int?)null));
 		}
@@ -234,7 +236,7 @@ namespace Manlaan.Mounts
 			if (settings.ContainsSetting("MountRadialRemoveCenterMount"))
 			{
 				SettingEntry<bool> settingMountRadialRemoveCenterMount = settings.get_Item("MountRadialRemoveCenterMount") as SettingEntry<bool>;
-				defaultRadialSettings.RemoveCenterMount.set_Value(settingMountRadialRemoveCenterMount.get_Value());
+				defaultRadialSettings.RemoveCenterThing.set_Value(settingMountRadialRemoveCenterMount.get_Value());
 			}
 			if (settings.ContainsSetting("MountRadialCenterMountBehavior") && Enum.TryParse<CenterBehavior>((settings.get_Item("MountRadialCenterMountBehavior") as SettingEntry<string>).get_Value(), out var result))
 			{
@@ -289,6 +291,8 @@ namespace Manlaan.Mounts
 			//IL_0365: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0587: Unknown result type (might be due to invalid IL or missing references)
 			//IL_05cf: Expected O, but got Unknown
+			//IL_06c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06d4: Expected O, but got Unknown
 			settingscollection = settings;
 			List<Thing> obj = new List<Thing>
 			{
@@ -344,14 +348,20 @@ namespace Manlaan.Mounts
 			_settingUserDefinedRadialIds = settings.DefineSetting<List<int>>("UserDefinedRadialIds", new List<int>(), (Func<string>)null, (Func<string>)null);
 			_settingDisplayModuleOnLoadingScreen = settings.DefineSetting<bool>("DisplayModuleOnLoadingScreen", false, (Func<string>)(() => Strings.Setting_DisplayModuleOnLoadingScreen), (Func<string>)(() => ""));
 			_settingMountAutomaticallyAfterLoadingScreen = settings.DefineSetting<bool>("MountAutomaticallyAfterLoadingScreen", false, (Func<string>)(() => Strings.Setting_MountAutomaticallyAfterLoadingScreen), (Func<string>)(() => ""));
+			_settingJumpBinding = settings.DefineSetting<KeyBinding>("JumpKeybinding", new KeyBinding((Keys)32), (Func<string>)null, (Func<string>)null);
+			_settingJumpBinding.get_Value().set_Enabled(true);
+			_settingJumpBinding.get_Value().add_Activated((EventHandler<EventArgs>)delegate
+			{
+				_helper.UpdateLastJumped();
+			});
 			ContextualRadialSettings = new List<ContextualRadialThingSettings>
 			{
 				new ContextualRadialThingSettings(settings, "IsPlayerMounted", 0, _helper.IsPlayerMounted, defaultIsEnabled: true, defaultApplyInstantlyIfSingle: true, _things.Where((Thing t) => t is UnMount).ToList()),
 				new ContextualRadialThingSettings(settings, "IsPlayerInWvwMap", 1, _helper.IsPlayerInWvwMap, defaultIsEnabled: true, defaultApplyInstantlyIfSingle: true, _things.Where((Thing t) => t is Warclaw).ToList()),
 				new ContextualRadialThingSettings(settings, "IsPlayerInCombat", 2, _helper.IsPlayerInCombat, defaultIsEnabled: false, defaultApplyInstantlyIfSingle: true, _things.Where((Thing t) => t is Skyscale).ToList()),
-				new ContextualRadialThingSettings(settings, "IsPlayerGlidingOrFalling", 3, _helper.IsPlayerGlidingOrFalling, defaultIsEnabled: false, defaultApplyInstantlyIfSingle: false, _things.Where((Thing t) => t is Griffon || t is Skyscale).ToList()),
-				new ContextualRadialThingSettings(settings, "IsPlayerUnderWater", 4, _helper.IsPlayerUnderWater, defaultIsEnabled: false, defaultApplyInstantlyIfSingle: false, _things.Where((Thing t) => t is Skimmer || t is SiegeTurtle).ToList()),
-				new ContextualRadialThingSettings(settings, "IsPlayerOnWaterSurface", 5, _helper.IsPlayerOnWaterSurface, defaultIsEnabled: false, defaultApplyInstantlyIfSingle: true, _things.Where((Thing t) => t is Skiff).ToList()),
+				new ContextualRadialThingSettings(settings, "IsPlayerUnderWater", 3, _helper.IsPlayerUnderWater, defaultIsEnabled: false, defaultApplyInstantlyIfSingle: false, _things.Where((Thing t) => t is Skimmer || t is SiegeTurtle).ToList()),
+				new ContextualRadialThingSettings(settings, "IsPlayerOnWaterSurface", 4, _helper.IsPlayerOnWaterSurface, defaultIsEnabled: false, defaultApplyInstantlyIfSingle: true, _things.Where((Thing t) => t is Skiff).ToList()),
+				new ContextualRadialThingSettings(settings, "IsPlayerGlidingOrFalling", 5, _helper.IsPlayerGlidingOrFalling, defaultIsEnabled: false, defaultApplyInstantlyIfSingle: false, _things.Where((Thing t) => t is Griffon || t is Skyscale).ToList()),
 				new ContextualRadialThingSettings(settings, "Default", 99, () => true, defaultIsEnabled: true, defaultApplyInstantlyIfSingle: false, thingsForMigration)
 			};
 			IconThingSettings = new List<IconThingSettings>
@@ -410,7 +420,7 @@ namespace Manlaan.Mounts
 			});
 			_debug.Add("Applicable Contextual RadialSettings Name", () => _helper.GetApplicableContextualRadialThingSettings()?.Name ?? "");
 			_debug.Add("Applicable Contextual RadialSettings Things", () => string.Join(", ", _helper.GetApplicableContextualRadialThingSettings()?.AvailableThings.Select((Thing t) => t.Name)) ?? "");
-			_debug.Add("Queued for out of combat", () => $"{_helper.GetQueuedThing()}");
+			_debug.Add("Queued for out of combat", () => _helper.GetQueuedThing()?.Name ?? "");
 			Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)async delegate
 			{
 				await _helper.IsCombatLaunchUnlockedAsync();
@@ -422,25 +432,25 @@ namespace Manlaan.Mounts
 		protected override void Update(GameTime gameTime)
 		{
 			_helper.UpdatePlayerGlidingOrFalling(gameTime);
-			bool isMountSwitchable = CanThingBeActivated();
-			bool moduleHidden = _lastIsMountSwitchable && !isMountSwitchable;
-			bool moduleShown = !_lastIsMountSwitchable && isMountSwitchable;
+			bool isThingSwitchable = CanThingBeActivated();
+			bool moduleHidden = _lastIsThingSwitchable && !isThingSwitchable;
+			bool moduleShown = !_lastIsThingSwitchable && isThingSwitchable;
 			string currentCharacterName = GameService.Gw2Mumble.get_PlayerCharacter().get_Name();
-			int inUseMountsCount = _things.Count((Thing m) => m.IsInUse());
-			if (inUseMountsCount == 0 && _lastInUseMountsCount > 0 && !moduleHidden && !moduleShown)
+			int inUseThingsCount = _things.Count((Thing m) => m.IsInUse());
+			if (inUseThingsCount == 0 && _lastInUseThingsCount > 0 && !moduleHidden && !moduleShown)
 			{
 				_helper.ClearSomethingStoredForLaterActivation(currentCharacterName);
 			}
-			if (moduleHidden && inUseMountsCount == 1 && _settingMountAutomaticallyAfterLoadingScreen.get_Value() && GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus())
+			if (moduleHidden && inUseThingsCount == 1 && _settingMountAutomaticallyAfterLoadingScreen.get_Value() && GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus())
 			{
 				_helper.StoreThingForLaterActivation(_things.Single((Thing m) => m.IsInUse()), currentCharacterName, "ModuleHidden");
 			}
-			if (moduleShown && inUseMountsCount == 0 && _helper.IsSomethingStoredForLaterActivation(currentCharacterName) && GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus())
+			if (moduleShown && inUseThingsCount == 0 && _helper.IsSomethingStoredForLaterActivation(currentCharacterName) && GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus())
 			{
 				_helper.DoThingActionForLaterActivation(currentCharacterName);
 			}
-			_lastInUseMountsCount = inUseMountsCount;
-			_lastIsMountSwitchable = isMountSwitchable;
+			_lastInUseThingsCount = inUseThingsCount;
+			_lastIsThingSwitchable = isThingSwitchable;
 			bool shouldShowModule = ShouldShowModule();
 			if (shouldShowModule)
 			{
@@ -456,7 +466,7 @@ namespace Manlaan.Mounts
 					((Control)drawIcon2).Hide();
 				}
 			}
-			if (_things.Any((Thing m) => m.QueuedTimestamp.HasValue))
+			if (_things.Any((Thing m) => m.QueuedTimestamp.HasValue) || _settingDragMountQueueing.get_Value())
 			{
 				_drawOutOfCombat?.ShowSpinner();
 			}
@@ -592,7 +602,7 @@ namespace Manlaan.Mounts
 			DrawRadial radial2 = _radial;
 			radial2.OnSettingsButtonClicked = (EventHandler)Delegate.Combine(radial2.OnSettingsButtonClicked, (EventHandler)delegate
 			{
-				_settingsWindow.set_SelectedTab(((IEnumerable<Tab>)_settingsWindow.get_Tabs()).First());
+				_settingsWindow.set_SelectedTab(((IEnumerable<Tab>)_settingsWindow.get_Tabs()).Skip(1).First());
 				((Control)_settingsWindow).Show();
 			});
 		}
@@ -642,9 +652,12 @@ namespace Manlaan.Mounts
 			{
 				return;
 			}
-			Thing thingInCombat = _helper.GetQueuedThing();
-			Logger.Debug("HandleCombatChangeAsync Applied queued for out of combat: " + thingInCombat?.Name);
-			await (thingInCombat?.DoAction() ?? Task.CompletedTask);
+			if (_helper.IsPlayerMounted())
+			{
+				Thing thingInCombat = _helper.GetQueuedThing();
+				Logger.Debug("HandleCombatChangeAsync Applied queued for out of combat: " + thingInCombat?.Name);
+				await (thingInCombat?.DoAction() ?? Task.CompletedTask);
+			}
 			foreach (Thing thing in _things)
 			{
 				thing.QueuedTimestamp = null;

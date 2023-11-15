@@ -36,6 +36,8 @@ namespace Manlaan.Mounts
 
 		private bool _isCombatLaunchUnlocked;
 
+		private DateTime lastTimeJumped = DateTime.MinValue;
+
 		public Helper(Gw2ApiManager gw2ApiManager)
 		{
 			Gw2ApiManager = gw2ApiManager;
@@ -58,11 +60,6 @@ namespace Manlaan.Mounts
 				_isCombatLaunchUnlocked = false;
 			}
 			_isCombatLaunchUnlocked = ((IEnumerable<Mastery>)(await ((IAllExpandableClient<Mastery>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Masteries()).AllAsync(default(CancellationToken)))).Any((Mastery m) => m.get_Name() == "Combat Launch");
-		}
-
-		public bool IsPlayerGlidingOrFalling()
-		{
-			return _isPlayerGlidingOrFalling;
 		}
 
 		public bool IsPlayerInWvwMap()
@@ -101,6 +98,21 @@ namespace Manlaan.Mounts
 			return (int)GameService.Gw2Mumble.get_PlayerCharacter().get_CurrentMount() > 0;
 		}
 
+		public bool IsPlayerGlidingOrFalling()
+		{
+			return _isPlayerGlidingOrFalling;
+		}
+
+		public void UpdateLastJumped()
+		{
+			lastTimeJumped = DateTime.UtcNow;
+		}
+
+		private bool DidPlayerJumpRecently()
+		{
+			return DateTime.UtcNow.Subtract(lastTimeJumped).TotalMilliseconds < 5000.0;
+		}
+
 		public void UpdatePlayerGlidingOrFalling(GameTime gameTime)
 		{
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
@@ -108,25 +120,23 @@ namespace Manlaan.Mounts
 			double currentUpdateSeconds = gameTime.get_TotalGameTime().TotalSeconds;
 			double secondsDiff = currentUpdateSeconds - _lastUpdateSeconds;
 			double velocity = (double)(currentZPosition - _lastZPosition) / secondsDiff;
-			if (secondsDiff < 0.015)
+			if (!(secondsDiff < 0.015))
 			{
-				return;
-			}
-			double v1 = velocity;
-			if (v1 > 5.0 || v1 < -4.0)
-			{
-				_isPlayerGlidingOrFalling = true;
-			}
-			else
-			{
-				double v2 = v1;
-				if (v2 >= 0.0 && v2 < 1.0)
+				if (velocity > 10.0 || velocity < -10.0)
+				{
+					_isPlayerGlidingOrFalling = true;
+				}
+				else if (DidPlayerJumpRecently() && velocity < -2.0)
+				{
+					_isPlayerGlidingOrFalling = true;
+				}
+				else if (velocity >= 0.0 && velocity < 1.0)
 				{
 					_isPlayerGlidingOrFalling = false;
 				}
+				_lastZPosition = currentZPosition;
+				_lastUpdateSeconds = currentUpdateSeconds;
 			}
-			_lastZPosition = currentZPosition;
-			_lastUpdateSeconds = currentUpdateSeconds;
 		}
 
 		public static async Task TriggerKeybind(SettingEntry<KeyBinding> keybindingSetting)

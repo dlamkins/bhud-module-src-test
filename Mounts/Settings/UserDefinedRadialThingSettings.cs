@@ -41,6 +41,7 @@ namespace Mounts.Settings
 		{
 			settingCollection.UndefineSetting($"RadialThingSettings{Id}Name");
 			settingCollection.UndefineSetting($"RadialThingSettings{Id}Keybind");
+			Keybind.get_Value().set_Enabled(false);
 			base.DeleteFromSettings(settingCollection);
 		}
 	}
