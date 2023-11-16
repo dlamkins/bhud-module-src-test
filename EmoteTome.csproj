@@ -16,9 +16,10 @@
     <Reference Include="MonoGame.Framework" />
     <Reference Include="Gw2Sharp" />
     <Reference Include="Newtonsoft.Json" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="MonoGame.Extended" />
     <Reference Include="WindowsInput_Std">
       <HintPath>..\..\working\WindowsInput_Std.dll</HintPath>
     </Reference>
-    <Reference Include="WindowsBase" />
   </ItemGroup>
 </Project>

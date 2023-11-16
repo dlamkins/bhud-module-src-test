@@ -13,7 +13,7 @@ namespace EmoteTome
 
 		private bool canTarget;
 
-		private Image img = new Image();
+		private EmoteContainer emoCon = new EmoteContainer();
 
 		private string category;
 
@@ -25,8 +25,6 @@ namespace EmoteTome
 
 		public Emote(string imagePath, List<string> toolTipp, string chatCode, bool canTarget, string category)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000b: Expected O, but got Unknown
 			this.imagePath = imagePath;
 			this.toolTipp = toolTipp;
 			this.chatCode = chatCode;
@@ -54,14 +52,14 @@ namespace EmoteTome
 			return canTarget;
 		}
 
-		public void setImg(Image img)
+		public void setContainer(EmoteContainer container)
 		{
-			this.img = img;
+			emoCon = container;
 		}
 
-		public Image getImg()
+		public EmoteContainer getContainer()
 		{
-			return img;
+			return emoCon;
 		}
 
 		public string getCategory()
