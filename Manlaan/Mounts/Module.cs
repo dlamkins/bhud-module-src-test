@@ -123,31 +123,33 @@ namespace Manlaan.Mounts
 
 		protected override void Initialize()
 		{
-			//IL_028a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02fa: Expected O, but got Unknown
-			//IL_0334: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033e: Expected O, but got Unknown
-			//IL_0378: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0382: Expected O, but got Unknown
-			//IL_03cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d9: Expected O, but got Unknown
-			//IL_0413: Unknown result type (might be due to invalid IL or missing references)
-			//IL_041d: Expected O, but got Unknown
+			//IL_0371: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0384: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0389: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0399: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e1: Expected O, but got Unknown
+			//IL_041b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0425: Expected O, but got Unknown
+			//IL_045f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0469: Expected O, but got Unknown
+			//IL_04b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04c0: Expected O, but got Unknown
+			//IL_04fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0504: Expected O, but got Unknown
 			List<string> obj = new List<string>
 			{
 				"griffon-text.png", "griffon-trans.png", "griffon.png", "jackal-text.png", "jackal-trans.png", "jackal.png", "raptor-text.png", "raptor-trans.png", "raptor.png", "roller-text.png",
 				"roller-trans.png", "roller.png", "skimmer-text.png", "skimmer-trans.png", "skimmer.png", "skyscale-text.png", "skyscale-trans.png", "skyscale.png", "springer-text.png", "springer-trans.png",
 				"springer.png", "turtle-text.png", "turtle-trans.png", "turtle.png", "warclaw-text.png", "warclaw-trans.png", "warclaw.png", "fishing.png", "skiff.png", "jadebotwaypoint.png",
-				"chair.png", "music.png", "held.png", "toy.png", "tonic.png", "scanforrift.png", "skyscaleleap.png", "unmount.png"
+				"chair.png", "music.png", "held.png", "toy.png", "tonic.png", "scanforrift.png", "skyscaleleap.png", "unmount.png", "unmount-trans.png", "fishing-trans.png",
+				"fishing-trans-color.png", "jadebotwaypoint-trans.png", "jadebotwaypoint-trans-color.png", "scanforrift-trans.png", "scanforrift-trans-color.png", "skiff-trans.png", "skiff-trans-color.png", "skyscaleleap-trans.png", "skyscaleleap-trans-color.png", "tonic-paint.png",
+				"tonic-white.png", "toy-paint.png", "toy-white.png", "chair-paint.png", "chair-whiite.png", "held-paint.png", "held-white.png", "music-paint.png", "music-white.png"
 			};
 			thingsDirectory = DirectoriesManager.GetFullDirectoryPath("mounts");
 			obj.ForEach(delegate(string f)
