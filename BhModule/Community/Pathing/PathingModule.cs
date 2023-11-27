@@ -269,7 +269,15 @@ namespace BhModule.Community.Pathing
 
 		public override IView GetSettingsView()
 		{
-			return (IView)(object)new SettingsHintView(((Action)((Control)_settingsWindow).Show, PackInitiator));
+			return (IView)(object)new SettingsHintView((delegate
+			{
+				_settingsWindow.set_SelectedTab(_packSettingsTab);
+				((Control)_settingsWindow).Show();
+			}, delegate
+			{
+				_settingsWindow.set_SelectedTab(_markerRepoTab);
+				((Control)_settingsWindow).Show();
+			}, PackInitiator));
 		}
 
 		protected override void Update(GameTime gameTime)

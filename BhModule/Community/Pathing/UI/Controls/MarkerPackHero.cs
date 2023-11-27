@@ -55,10 +55,9 @@ namespace BhModule.Community.Pathing.UI.Controls
 			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
 			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b4: Expected O, but got Unknown
-			//IL_022e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009a: Expected O, but got Unknown
+			//IL_0214: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0233: Unknown result type (might be due to invalid IL or missing references)
 			_module = module;
 			_markerPackPkg = markerPackPkg;
 			if (markerPackPkg.LastUpdate != default(DateTime))
@@ -71,7 +70,6 @@ namespace BhModule.Community.Pathing.UI.Controls
 			((Control)val).set_BasicTooltipText("If checked, new pack versions will be automatically downloaded on launch.");
 			((Control)val).set_Parent((Container)(object)this);
 			val.set_Checked(markerPackPkg.AutoUpdate.get_Value());
-			((Control)val).set_Enabled(markerPackPkg.CurrentDownloadDate != default(DateTime));
 			_keepUpdatedCheckbox = val;
 			BlueButton obj = new BlueButton
 			{
