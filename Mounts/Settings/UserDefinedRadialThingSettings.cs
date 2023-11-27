@@ -17,11 +17,11 @@ namespace Mounts.Settings
 
 		public int Id { get; }
 
-		public Func<Task> _callback { get; }
+		public Func<KeybindTriggerType, Task> _callback { get; }
 
 		public override string Name => NameSetting.get_Value();
 
-		public UserDefinedRadialThingSettings(SettingCollection settingCollection, int id, Func<Task> callback)
+		public UserDefinedRadialThingSettings(SettingCollection settingCollection, int id, Func<KeybindTriggerType, Task> callback)
 			: base(settingCollection, $"RadialThingSettings{id}", defaultIsEnabled: true, new List<Thing>())
 		{
 			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
@@ -33,7 +33,7 @@ namespace Mounts.Settings
 			Keybind.get_Value().set_Enabled(true);
 			Keybind.get_Value().add_Activated((EventHandler<EventArgs>)async delegate
 			{
-				await _callback();
+				await _callback(KeybindTriggerType.UserDefined);
 			});
 		}
 

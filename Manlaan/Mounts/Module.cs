@@ -123,25 +123,25 @@ namespace Manlaan.Mounts
 
 		protected override void Initialize()
 		{
-			//IL_0371: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0384: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0389: Unknown result type (might be due to invalid IL or missing references)
-			//IL_038e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0399: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e1: Expected O, but got Unknown
-			//IL_041b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0425: Expected O, but got Unknown
-			//IL_045f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0469: Expected O, but got Unknown
-			//IL_04b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04c0: Expected O, but got Unknown
-			//IL_04fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0504: Expected O, but got Unknown
+			//IL_044d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0460: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0465: Unknown result type (might be due to invalid IL or missing references)
+			//IL_046a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0475: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0485: Unknown result type (might be due to invalid IL or missing references)
+			//IL_048a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0494: Unknown result type (might be due to invalid IL or missing references)
+			//IL_049b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04bd: Expected O, but got Unknown
+			//IL_04f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0501: Expected O, but got Unknown
+			//IL_053b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0545: Expected O, but got Unknown
+			//IL_0592: Unknown result type (might be due to invalid IL or missing references)
+			//IL_059c: Expected O, but got Unknown
+			//IL_05d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05e0: Expected O, but got Unknown
 			List<string> obj = new List<string>
 			{
 				"griffon-text.png", "griffon-trans.png", "griffon.png", "jackal-text.png", "jackal-trans.png", "jackal.png", "raptor-text.png", "raptor-trans.png", "raptor.png", "roller-text.png",
@@ -149,7 +149,9 @@ namespace Manlaan.Mounts
 				"springer.png", "turtle-text.png", "turtle-trans.png", "turtle.png", "warclaw-text.png", "warclaw-trans.png", "warclaw.png", "fishing.png", "skiff.png", "jadebotwaypoint.png",
 				"chair.png", "music.png", "held.png", "toy.png", "tonic.png", "scanforrift.png", "skyscaleleap.png", "unmount.png", "unmount-trans.png", "fishing-trans.png",
 				"fishing-trans-color.png", "jadebotwaypoint-trans.png", "jadebotwaypoint-trans-color.png", "scanforrift-trans.png", "scanforrift-trans-color.png", "skiff-trans.png", "skiff-trans-color.png", "skyscaleleap-trans.png", "skyscaleleap-trans-color.png", "tonic-paint.png",
-				"tonic-white.png", "toy-paint.png", "toy-white.png", "chair-paint.png", "chair-whiite.png", "held-paint.png", "held-white.png", "music-paint.png", "music-white.png"
+				"tonic-white.png", "toy-paint.png", "toy-white.png", "chair-paint.png", "chair-whiite.png", "held-paint.png", "held-white.png", "music-paint.png", "music-white.png", "skimmer-remix.png",
+				"skyscaleleap-remix.png", "skyscale-remix.png", "springer-remix.png", "tonic-remix.png", "toy-remix.png", "turtle-remix.png", "unmount-remix.png", "warclaw-remix.png", "chair-remix.png", "fishing-remix.png",
+				"griffon-remix.png", "held-remix.png", "jackal-remix.png", "jadebotwaypoint-remix.png", "music-remix.png", "raptor-remix.png", "roller-remix.png", "scanforrift-remix.png", "skiff-remix.png"
 			};
 			thingsDirectory = DirectoriesManager.GetFullDirectoryPath("mounts");
 			obj.ForEach(delegate(string f)
@@ -326,7 +328,7 @@ namespace Manlaan.Mounts
 			_settingDefaultMountBinding.get_Value().set_Enabled(true);
 			_settingDefaultMountBinding.get_Value().add_Activated((EventHandler<EventArgs>)async delegate
 			{
-				await DoKeybindActionAsync();
+				await DoKeybindActionAsync(KeybindTriggerType.Module);
 			});
 			_settingDefaultMountBinding.get_Value().add_BindingChanged((EventHandler<EventArgs>)UpdateSettings);
 			_settingDefaultMountBehaviour = settings.DefineSetting<string>("DefaultMountBehaviour", "Radial", (Func<string>)null, (Func<string>)null);
@@ -609,9 +611,14 @@ namespace Manlaan.Mounts
 			});
 		}
 
-		private async Task DoKeybindActionAsync()
+		private async Task DoKeybindActionAsync(KeybindTriggerType caller)
 		{
 			Logger.Debug("DoKeybindActionAsync entered");
+			if (caller == KeybindTriggerType.UserDefined)
+			{
+				ShowRadial(caller);
+				return;
+			}
 			ContextualRadialThingSettings selectedRadialSettings = _helper.GetApplicableContextualRadialThingSettings();
 			Logger.Debug("DoKeybindActionAsync radial applicable settings: " + selectedRadialSettings.Name);
 			ICollection<Thing> things = selectedRadialSettings.AvailableThings;
@@ -631,20 +638,28 @@ namespace Manlaan.Mounts
 			string value = _settingKeybindBehaviour.get_Value();
 			if (!(value == "Default"))
 			{
-				if (value == "Radial" && ShouldShowModule())
+				if (value == "Radial")
 				{
-					DrawRadial radial = _radial;
-					if (radial != null)
-					{
-						((Control)radial).Show();
-					}
-					Logger.Debug("DoKeybindActionAsync KeybindBehaviour radial");
+					ShowRadial(caller);
 				}
 			}
 			else
 			{
 				await (defaultThing?.DoAction() ?? Task.CompletedTask);
 				Logger.Debug("DoKeybindActionAsync KeybindBehaviour default");
+			}
+		}
+
+		private void ShowRadial(KeybindTriggerType caller)
+		{
+			if (ShouldShowModule())
+			{
+				DrawRadial radial = _radial;
+				if (radial != null)
+				{
+					((Control)radial).Show();
+				}
+				Logger.Debug(string.Format("{0} KeybindBehaviour radial, caller {1}", "DoKeybindActionAsync", caller));
 			}
 		}
 

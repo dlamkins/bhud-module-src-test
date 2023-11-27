@@ -28,11 +28,11 @@ namespace Manlaan.Mounts.Views
 
 		private RadialThingSettings currentRadialSettings;
 
-		private readonly Func<Task> _keybindCallback;
+		private readonly Func<KeybindTriggerType, Task> _keybindCallback;
 
 		private readonly Helper _helper;
 
-		public RadialThingSettingsView(Func<Task> keybindCallback, Helper helper)
+		public RadialThingSettingsView(Func<KeybindTriggerType, Task> keybindCallback, Helper helper)
 			: this()
 		{
 			_keybindCallback = keybindCallback;
