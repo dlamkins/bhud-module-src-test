@@ -4,12 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
-using Blish_HUD.Controls.Intern;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
 using Manlaan.Mounts.Things;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using Mounts;
 
@@ -269,7 +269,7 @@ namespace Manlaan.Mounts.Controls
 			}
 			else
 			{
-				Mouse.SetPosition(GameService.Graphics.get_WindowWidth() / 2, GameService.Graphics.get_WindowHeight() / 2, true);
+				Mouse.SetPosition(GameService.Graphics.get_WindowWidth() / 2, GameService.Graphics.get_WindowHeight() / 2);
 				SpawnPoint = new Point(((Control)GameService.Graphics.get_SpriteScreen()).get_Width() / 2, ((Control)GameService.Graphics.get_SpriteScreen()).get_Height() / 2);
 			}
 			((Control)this).set_Location(new Point(SpawnPoint.X - radius - thingIconSize / 2, SpawnPoint.Y - radius - thingIconSize / 2));
