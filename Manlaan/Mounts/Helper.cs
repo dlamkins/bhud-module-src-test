@@ -120,7 +120,7 @@ namespace Manlaan.Mounts
 			double currentUpdateSeconds = gameTime.get_TotalGameTime().TotalSeconds;
 			double secondsDiff = currentUpdateSeconds - _lastUpdateSeconds;
 			double velocity = (double)(currentZPosition - _lastZPosition) / secondsDiff;
-			if (!(secondsDiff < 0.015))
+			if (!(secondsDiff < 0.10000000149011612))
 			{
 				if (velocity > 10.0 || velocity < -10.0)
 				{
