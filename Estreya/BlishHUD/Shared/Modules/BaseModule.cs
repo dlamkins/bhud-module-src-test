@@ -329,7 +329,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 				{
 					Enabled = true,
 					AwaitLoading = true
-				}, GetFlurlClient(), "https://api.estreya.de/blish-hud", ((Module)this).get_Name(), ((Module)this).get_Namespace(), ((Module)this).get_Version(), ModuleSettings, IconService);
+				}, GetFlurlClient(), "https://api.estreya.de/blish-hud", ((Module)this).get_Name(), ((Module)this).get_Namespace(), ModuleSettings, IconService);
 				_services.Add(MetricsService);
 				if (configurations.Items.Enabled)
 				{

@@ -16,6 +16,8 @@ namespace Estreya.BlishHUD.Shared.Services
 {
 	public class MetricsService : ManagedService
 	{
+		private static Version CURRENT_VERSION = new Version("4.0.0", false);
+
 		private readonly IFlurlClient _flurlClient;
 
 		private readonly string _apiBaseUrl;
@@ -23,8 +25,6 @@ namespace Estreya.BlishHUD.Shared.Services
 		private readonly string _moduleName;
 
 		private readonly string _moduleNamespace;
-
-		private readonly Version _moduleVersion;
 
 		private readonly BaseModuleSettings _moduleSettings;
 
@@ -52,24 +52,21 @@ namespace Estreya.BlishHUD.Shared.Services
 		{
 			get
 			{
-				//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0044: Expected O, but got Unknown
 				if (_moduleSettings.SendMetrics.get_Value() && _moduleSettings.MetricsConsentGivenVersion.get_Value() != null)
 				{
-					return _moduleSettings.MetricsConsentGivenVersion.get_Value() < new Version("3.6.1", false);
+					return _moduleSettings.MetricsConsentGivenVersion.get_Value() < CURRENT_VERSION;
 				}
 				return false;
 			}
 		}
 
-		public MetricsService(ServiceConfiguration configuration, IFlurlClient flurlClient, string apiBaseUrl, string moduleName, string moduleNamespace, Version moduleVersion, BaseModuleSettings moduleSettings, IconService iconService)
+		public MetricsService(ServiceConfiguration configuration, IFlurlClient flurlClient, string apiBaseUrl, string moduleName, string moduleNamespace, BaseModuleSettings moduleSettings, IconService iconService)
 			: base(configuration)
 		{
 			_flurlClient = flurlClient;
 			_apiBaseUrl = apiBaseUrl;
 			_moduleName = moduleName;
 			_moduleNamespace = moduleNamespace;
-			_moduleVersion = moduleVersion;
 			_moduleSettings = moduleSettings;
 			_iconService = iconService;
 		}
@@ -145,7 +142,7 @@ namespace Estreya.BlishHUD.Shared.Services
 				}.ShowDialog() == DialogResult.Yes;
 				_moduleSettings.AskedMetricsConsent.set_Value(true);
 				_moduleSettings.SendMetrics.set_Value(consentGiven);
-				_moduleSettings.MetricsConsentGivenVersion.set_Value((Version)(consentGiven ? ((object)_moduleVersion) : ((object)new Version("0.0.0", false))));
+				_moduleSettings.MetricsConsentGivenVersion.set_Value((Version)(consentGiven ? ((object)CURRENT_VERSION) : ((object)new Version("0.0.0", false))));
 			}
 		}
 	}

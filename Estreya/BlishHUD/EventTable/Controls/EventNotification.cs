@@ -251,12 +251,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				.Reflect()
 				.OnComplete((Action)delegate
 				{
-					((Control)this).Hide();
 					((Control)this).Dispose();
-					if (_lastShown == this)
-					{
-						_lastShown = null;
-					}
 				});
 		}
 
@@ -299,6 +294,11 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		protected override void InternalDispose()
 		{
+			((Control)this).Hide();
+			if (_lastShown == this)
+			{
+				_lastShown = null;
+			}
 			Tween showAnimation = _showAnimation;
 			if (showAnimation != null)
 			{

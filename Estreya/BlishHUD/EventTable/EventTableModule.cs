@@ -392,7 +392,7 @@ namespace Estreya.BlishHUD.EventTable
 				ReminderType value = base.ModuleSettings.ReminderType.get_Value();
 				if (value == ReminderType.Control || value == ReminderType.Both)
 				{
-					EventNotification obj = new EventNotification(null, title, message, icon, base.ModuleSettings.ReminderPosition.X.get_Value(), base.ModuleSettings.ReminderPosition.Y.get_Value(), base.ModuleSettings.ReminderSize.X.get_Value(), base.ModuleSettings.ReminderSize.Y.get_Value(), base.ModuleSettings.ReminderSize.Icon.get_Value(), base.ModuleSettings.ReminderStackDirection.get_Value(), base.ModuleSettings.ReminderOverflowStackDirection.get_Value(), base.ModuleSettings.ReminderFonts.TitleSize.get_Value(), base.ModuleSettings.ReminderFonts.MessageSize.get_Value(), base.IconService, base.ModuleSettings.ReminderLeftClickAction.get_Value() != 0 || base.ModuleSettings.ReminderRightClickAction.get_Value() != EventReminderRightClickAction.None)
+					EventNotification obj = new EventNotification(ev, title, message, icon, base.ModuleSettings.ReminderPosition.X.get_Value(), base.ModuleSettings.ReminderPosition.Y.get_Value(), base.ModuleSettings.ReminderSize.X.get_Value(), base.ModuleSettings.ReminderSize.Y.get_Value(), base.ModuleSettings.ReminderSize.Icon.get_Value(), base.ModuleSettings.ReminderStackDirection.get_Value(), base.ModuleSettings.ReminderOverflowStackDirection.get_Value(), base.ModuleSettings.ReminderFonts.TitleSize.get_Value(), base.ModuleSettings.ReminderFonts.MessageSize.get_Value(), base.IconService, base.ModuleSettings.ReminderLeftClickAction.get_Value() != 0 || base.ModuleSettings.ReminderRightClickAction.get_Value() != EventReminderRightClickAction.None)
 					{
 						BackgroundOpacity = base.ModuleSettings.ReminderOpacity.get_Value()
 					};
@@ -427,7 +427,7 @@ namespace Estreya.BlishHUD.EventTable
 			switch (base.ModuleSettings.ReminderLeftClickAction.get_Value())
 			{
 			case LeftClickAction.CopyWaypoint:
-				if (!string.IsNullOrWhiteSpace(notification.Model.Waypoint))
+				if (notification != null && notification.Model != null && !string.IsNullOrWhiteSpace(notification.Model.Waypoint))
 				{
 					ClipboardUtil.get_WindowsClipboardService().SetTextAsync(notification.Model.Waypoint);
 					ScreenNotification.ShowNotification(new string[2]
@@ -439,7 +439,7 @@ namespace Estreya.BlishHUD.EventTable
 				break;
 			case LeftClickAction.NavigateToWaypoint:
 			{
-				if (string.IsNullOrWhiteSpace(notification.Model.Waypoint))
+				if (notification == null || notification.Model == null || string.IsNullOrWhiteSpace(notification.Model.Waypoint))
 				{
 					break;
 				}
