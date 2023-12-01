@@ -8,6 +8,7 @@ using Estreya.BlishHUD.Shared.Models;
 using Estreya.BlishHUD.Shared.Models.Drawers;
 using Estreya.BlishHUD.Shared.Services;
 using Gw2Sharp.WebApi.V2.Models;
+using SemVer;
 
 namespace Estreya.BlishHUD.Shared.Settings
 {
@@ -56,6 +57,12 @@ namespace Estreya.BlishHUD.Shared.Settings
 		public SettingEntry<string> BlishAPIUsername { get; private set; }
 
 		public SettingEntry<bool> RegisterContext { get; private set; }
+
+		public SettingEntry<bool> SendMetrics { get; private set; }
+
+		public SettingEntry<bool> AskedMetricsConsent { get; private set; }
+
+		public SettingEntry<Version> MetricsConsentGivenVersion { get; private set; }
 
 		public SettingCollection DrawerSettings { get; private set; }
 
@@ -165,6 +172,8 @@ namespace Estreya.BlishHUD.Shared.Settings
 		{
 			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0084: Expected O, but got Unknown
+			//IL_0670: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06b8: Expected O, but got Unknown
 			GlobalSettings = settings.AddSubCollection("global-settings", false);
 			GlobalDrawerVisible = GlobalSettings.DefineSetting<bool>("GlobalDrawerVisible", true, (Func<string>)(() => "Global Visible"), (Func<string>)(() => "Whether the modules drawers should be visible."));
 			bool globalHotkeyEnabled = _globalEnabledKeybinding != null;
@@ -192,6 +201,9 @@ namespace Estreya.BlishHUD.Shared.Settings
 			DebugEnabled = GlobalSettings.DefineSetting<bool>("DebugEnabled", false, (Func<string>)(() => "Debug Enabled"), (Func<string>)(() => "Whether the module runs in debug mode."));
 			BlishAPIUsername = GlobalSettings.DefineSetting<string>("BlishAPIUsername", (string)null, (Func<string>)(() => "Blish API Username"), (Func<string>)(() => "Defines the login username for the Estreya Blish HUD API."));
 			RegisterContext = GlobalSettings.DefineSetting<bool>("RegisterContext", true, (Func<string>)(() => "Register Context"), (Func<string>)(() => "Whether the module should register an api context for cross module interaction. Requires a restart."));
+			SendMetrics = GlobalSettings.DefineSetting<bool>("SendMetrics", false, (Func<string>)(() => "Send Anonymous Metrics"), (Func<string>)(() => "Allows the module to send anonymous metric data to a backend server to view advanced usage statistics."));
+			AskedMetricsConsent = GlobalSettings.DefineSetting<bool>("AskedMetricsConsent", false, (Func<string>)(() => "Asked Metrics Consent"), (Func<string>)(() => "Whether the module asked for metric consent."));
+			MetricsConsentGivenVersion = GlobalSettings.DefineSetting<Version>("MetricsConsentGivenVersion", new Version("0.0.0", false), (Func<string>)(() => "Metrics Consent Version"), (Func<string>)(() => "Defines the version at which point a metric consent was given."));
 			HandleEnabledStates();
 			DoInitializeGlobalSettings(GlobalSettings);
 			GlobalSettings.AddLoggingEvents();

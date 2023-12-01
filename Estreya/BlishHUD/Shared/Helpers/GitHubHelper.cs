@@ -8,6 +8,7 @@ using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Estreya.BlishHUD.Shared.Controls;
+using Estreya.BlishHUD.Shared.Controls.Input;
 using Estreya.BlishHUD.Shared.Security;
 using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Settings;

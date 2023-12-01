@@ -30,6 +30,8 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		public bool Loading { get; protected set; }
 
+		public DateTimeOffset LastUpdated { get; protected set; }
+
 		public string ProgressText { get; private set; } = string.Empty;
 
 
@@ -71,6 +73,12 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		protected virtual void DoUnload()
 		{
+		}
+
+		public override Task Reload()
+		{
+			_timeSinceUpdate.Value = 0.0;
+			return base.Reload();
 		}
 
 		protected sealed override void InternalUpdate(GameTime gameTime)
@@ -130,6 +138,7 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		protected void SignalUpdated()
 		{
+			LastUpdated = DateTimeOffset.UtcNow;
 			this.Updated?.Invoke(this, EventArgs.Empty);
 		}
 
@@ -207,46 +216,52 @@ namespace Estreya.BlishHUD.Shared.Services
 					List<T> apiObjects = await Fetch(apiManager, progress, base.CancellationToken).ConfigureAwait(continueOnCapturedContext: false);
 					Logger.Debug("API returned {0} objects.", new object[1] { apiObjects.Count });
 					APIObjectList.AddRange(apiObjects);
-					progress.Report($"Check what api objects are new.. 0/{apiObjects.Count}");
-					for (int j = 0; j < apiObjects.Count; j++)
+					if (this.APIObjectAdded != null)
 					{
-						progress.Report($"Check what api objects are new.. {j}/{apiObjects.Count}");
-						T apiObject2 = apiObjects[j];
-						if (!oldAPIObjectList.Any((T oldApiObject) => oldApiObject.GetHashCode() == apiObject2.GetHashCode()))
+						progress.Report($"Check what api objects are new.. 0/{apiObjects.Count}");
+						for (int j = 0; j < apiObjects.Count; j++)
 						{
-							if (apiObjects.Count <= 25)
+							progress.Report($"Check what api objects are new.. {j}/{apiObjects.Count}");
+							T apiObject2 = apiObjects[j];
+							if (!oldAPIObjectList.Any((T oldApiObject) => oldApiObject.GetHashCode() == apiObject2.GetHashCode()))
 							{
-								Logger.Debug($"API Object added: {apiObject2}");
-							}
-							try
-							{
-								this.APIObjectAdded?.Invoke(this, apiObject2);
-							}
-							catch (Exception ex2)
-							{
-								Logger.Error(ex2, "Error handling api object added event:");
+								if (apiObjects.Count <= 25)
+								{
+									Logger.Debug($"API Object added: {apiObject2}");
+								}
+								try
+								{
+									this.APIObjectAdded?.Invoke(this, apiObject2);
+								}
+								catch (Exception ex3)
+								{
+									Logger.Error(ex3, "Error handling api object added event:");
+								}
 							}
 						}
 					}
-					progress.Report($"Check what api objects are removed.. 0/{oldAPIObjectList.Count}");
-					for (int i = oldAPIObjectList.Count - 1; i >= 0; i--)
+					if (this.APIObjectRemoved != null)
 					{
-						progress.Report($"Check what api objects are removed.. {oldAPIObjectList.Count - i}/{oldAPIObjectList.Count}");
-						T oldApiObject2 = oldAPIObjectList[i];
-						if (!apiObjects.Any((T apiObject) => apiObject.GetHashCode() == oldApiObject2.GetHashCode()))
+						progress.Report($"Check what api objects are removed.. 0/{oldAPIObjectList.Count}");
+						for (int i = oldAPIObjectList.Count - 1; i >= 0; i--)
 						{
-							if (apiObjects.Count <= 25)
+							progress.Report($"Check what api objects are removed.. {oldAPIObjectList.Count - i}/{oldAPIObjectList.Count}");
+							T oldApiObject2 = oldAPIObjectList[i];
+							if (!apiObjects.Any((T apiObject) => apiObject.GetHashCode() == oldApiObject2.GetHashCode()))
 							{
-								Logger.Debug($"API Object disappeared from the api: {oldApiObject2}");
-							}
-							oldAPIObjectList.Remove(oldApiObject2);
-							try
-							{
-								this.APIObjectRemoved?.Invoke(this, oldApiObject2);
-							}
-							catch (Exception ex3)
-							{
-								Logger.Error(ex3, "Error handling api object removed event:");
+								if (apiObjects.Count <= 25)
+								{
+									Logger.Debug($"API Object disappeared from the api: {oldApiObject2}");
+								}
+								oldAPIObjectList.Remove(oldApiObject2);
+								try
+								{
+									this.APIObjectRemoved?.Invoke(this, oldApiObject2);
+								}
+								catch (Exception ex2)
+								{
+									Logger.Error(ex2, "Error handling api object removed event:");
+								}
 							}
 						}
 					}

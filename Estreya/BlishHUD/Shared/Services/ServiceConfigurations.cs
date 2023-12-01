@@ -62,7 +62,7 @@ namespace Estreya.BlishHUD.Shared.Services
 		};
 
 
-		public APIServiceConfiguration TradingPost { get; } = new APIServiceConfiguration
+		public APIServiceConfiguration PlayerTransactions { get; } = new APIServiceConfiguration
 		{
 			Enabled = false,
 			AwaitLoading = false,
@@ -71,6 +71,14 @@ namespace Estreya.BlishHUD.Shared.Services
 				(TokenPermission)1,
 				(TokenPermission)8
 			},
+			UpdateInterval = TimeSpan.FromMinutes(2.0)
+		};
+
+
+		public APIServiceConfiguration Transactions { get; } = new APIServiceConfiguration
+		{
+			Enabled = false,
+			AwaitLoading = false,
 			UpdateInterval = TimeSpan.FromMinutes(2.0)
 		};
 

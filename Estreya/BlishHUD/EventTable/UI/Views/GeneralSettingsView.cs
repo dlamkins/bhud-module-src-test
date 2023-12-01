@@ -15,27 +15,30 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 	{
 		private readonly ModuleSettings _moduleSettings;
 
-		public GeneralSettingsView(ModuleSettings moduleSettings, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService)
+		private readonly MetricsService _metricsService;
+
+		public GeneralSettingsView(ModuleSettings moduleSettings, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService, MetricsService metricsService)
 			: base(apiManager, iconService, translationService, settingEventService)
 		{
 			_moduleSettings = moduleSettings;
+			_metricsService = metricsService;
 		}
 
 		protected override void BuildView(FlowPanel parent)
 		{
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0108: Expected O, but got Unknown
-			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0122: Expected O, but got Unknown
+			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.GlobalDrawerVisible);
 			RenderKeybindingSetting((Panel)(object)parent, _moduleSettings.GlobalDrawerVisibleHotkey);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.RegisterCornerIcon);
@@ -43,6 +46,10 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderEnumSetting<CornerIconClickAction>((Panel)(object)parent, _moduleSettings.CornerIconRightClickAction);
 			RenderEmptyLine((Panel)(object)parent);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.RegisterContext);
+			RenderButtonAsync((Panel)(object)parent, "Change Metrics Consent", async delegate
+			{
+				await _metricsService.AskMetricsConsent(forceAsk: true);
+			});
 			RenderEmptyLine((Panel)(object)parent);
 			RenderKeybindingSetting((Panel)(object)parent, _moduleSettings.MapKeybinding);
 			RenderEmptyLine((Panel)(object)parent);

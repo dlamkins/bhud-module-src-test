@@ -73,6 +73,8 @@ namespace Estreya.BlishHUD.EventTable
 
 		protected override bool FailIfBackendDown => true;
 
+		protected override bool EnableMetrics => true;
+
 		private DateTime NowUTC => DateTime.UtcNow;
 
 		private MapUtil MapUtil { get; set; }
@@ -171,8 +173,14 @@ namespace Estreya.BlishHUD.EventTable
 			}
 			_eventTableContext = new EventTableContext();
 			_contextManager = new ContextManager(_eventTableContext, base.ModuleSettings, DynamicEventService, base.IconService);
+			_contextManager.ReloadEvents += ContextManager_ReloadEvents;
 			_eventTableContextHandle = GameService.Contexts.RegisterContext<EventTableContext>(_eventTableContext);
 			base.Logger.Info("Event Table context registered.");
+		}
+
+		private async Task ContextManager_ReloadEvents(object sender)
+		{
+			await ReloadEvents();
 		}
 
 		private async Task ReloadEvents()
@@ -363,27 +371,45 @@ namespace Estreya.BlishHUD.EventTable
 			ev.Reminder -= Ev_Reminder;
 		}
 
-		private void Ev_Reminder(object sender, TimeSpan e)
+		private async void Ev_Reminder(object sender, TimeSpan e)
 		{
-			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0135: Unknown result type (might be due to invalid IL or missing references)
 			Estreya.BlishHUD.EventTable.Models.Event ev = sender as Estreya.BlishHUD.EventTable.Models.Event;
-			if (base.ModuleSettings.RemindersEnabled.get_Value() && !base.ModuleSettings.ReminderDisabledForEvents.get_Value().Contains(ev.SettingKey))
+			if (!base.ModuleSettings.RemindersEnabled.get_Value() || base.ModuleSettings.ReminderDisabledForEvents.get_Value().Contains(ev.SettingKey))
 			{
-				if (!CalculateReminderUIVisibility())
+				return;
+			}
+			if (!CalculateReminderUIVisibility())
+			{
+				base.Logger.Debug("Reminder " + ev.SettingKey + " was not displayed due to UI Visibility settings.");
+				return;
+			}
+			try
+			{
+				string translation = base.TranslationService.GetTranslation("reminder-startsIn", "Starts in");
+				string title = ev.Name;
+				string message = translation + " " + e.Humanize(6, null, TimeUnit.Week, base.ModuleSettings.ReminderMinTimeUnit.get_Value()) + "!";
+				AsyncTexture2D icon = (AsyncTexture2D)(string.IsNullOrWhiteSpace(ev.Icon) ? ((object)new AsyncTexture2D()) : ((object)base.IconService.GetIcon(ev.Icon)));
+				ReminderType value = base.ModuleSettings.ReminderType.get_Value();
+				if (value == ReminderType.Control || value == ReminderType.Both)
 				{
-					base.Logger.Debug("Reminder " + ev.SettingKey + " was not displayed due to UI Visibility settings.");
-					return;
+					EventNotification obj = new EventNotification(null, title, message, icon, base.ModuleSettings.ReminderPosition.X.get_Value(), base.ModuleSettings.ReminderPosition.Y.get_Value(), base.ModuleSettings.ReminderSize.X.get_Value(), base.ModuleSettings.ReminderSize.Y.get_Value(), base.ModuleSettings.ReminderSize.Icon.get_Value(), base.ModuleSettings.ReminderStackDirection.get_Value(), base.ModuleSettings.ReminderOverflowStackDirection.get_Value(), base.ModuleSettings.ReminderFonts.TitleSize.get_Value(), base.ModuleSettings.ReminderFonts.MessageSize.get_Value(), base.IconService, base.ModuleSettings.ReminderLeftClickAction.get_Value() != 0 || base.ModuleSettings.ReminderRightClickAction.get_Value() != EventReminderRightClickAction.None)
+					{
+						BackgroundOpacity = base.ModuleSettings.ReminderOpacity.get_Value()
+					};
+					((Control)obj).add_Click((EventHandler<MouseEventArgs>)EventNotification_Click);
+					((Control)obj).add_RightMouseButtonPressed((EventHandler<MouseEventArgs>)EventNotification_RightMouseButtonPressed);
+					((Control)obj).add_Disposed((EventHandler<EventArgs>)EventNotification_Disposed);
+					obj.Show(TimeSpan.FromSeconds(base.ModuleSettings.ReminderDuration.get_Value()));
 				}
-				string startsInTranslation = base.TranslationService.GetTranslation("reminder-startsIn", "Starts in");
-				EventNotification obj = new EventNotification(ev, startsInTranslation + " " + e.Humanize(2, null, TimeUnit.Week, TimeUnit.Second) + "!", base.ModuleSettings.ReminderPosition.X.get_Value(), base.ModuleSettings.ReminderPosition.Y.get_Value(), base.ModuleSettings.ReminderSize.X.get_Value(), base.ModuleSettings.ReminderSize.Y.get_Value(), base.ModuleSettings.ReminderSize.Icon.get_Value(), base.ModuleSettings.ReminderStackDirection.get_Value(), base.ModuleSettings.ReminderFonts.TitleSize.get_Value(), base.ModuleSettings.ReminderFonts.MessageSize.get_Value(), base.IconService, base.ModuleSettings.ReminderLeftClickAction.get_Value() != 0 || base.ModuleSettings.ReminderRightClickAction.get_Value() != EventReminderRightClickAction.None)
+				value = base.ModuleSettings.ReminderType.get_Value();
+				if (value == ReminderType.Windows || value == ReminderType.Both)
 				{
-					BackgroundOpacity = base.ModuleSettings.ReminderOpacity.get_Value()
-				};
-				((Control)obj).add_Click((EventHandler<MouseEventArgs>)EventNotification_Click);
-				((Control)obj).add_RightMouseButtonPressed((EventHandler<MouseEventArgs>)EventNotification_RightMouseButtonPressed);
-				((Control)obj).add_Disposed((EventHandler<EventArgs>)EventNotification_Disposed);
-				obj.Show(TimeSpan.FromSeconds(base.ModuleSettings.ReminderDuration.get_Value()));
+					await EventNotification.ShowAsWindowsNotification(title, message, icon);
+				}
+			}
+			catch (Exception ex)
+			{
+				base.Logger.Warn(ex, "Failed to show reminder for event \"" + ev.SettingKey + "\"");
 			}
 		}
 
@@ -509,14 +535,14 @@ namespace Estreya.BlishHUD.EventTable
 			//IL_00aa: Expected O, but got Unknown
 			//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01c4: Expected O, but got Unknown
-			//IL_0209: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0213: Expected O, but got Unknown
-			//IL_0258: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0262: Expected O, but got Unknown
-			//IL_02a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b1: Expected O, but got Unknown
-			//IL_02f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0300: Expected O, but got Unknown
+			//IL_0266: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0270: Expected O, but got Unknown
+			//IL_02b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02bf: Expected O, but got Unknown
+			//IL_0304: Unknown result type (might be due to invalid IL or missing references)
+			//IL_030e: Expected O, but got Unknown
+			//IL_0353: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035d: Expected O, but got Unknown
 			settingWindow.SavesSize = true;
 			settingWindow.CanResize = true;
 			settingWindow.RebuildViewAfterResize = true;
@@ -524,7 +550,7 @@ namespace Estreya.BlishHUD.EventTable
 			settingWindow.MinSize = settingWindow.Size;
 			settingWindow.MaxSize = new Point(((Control)settingWindow).get_Width() * 2, ((Control)settingWindow).get_Height() * 3);
 			settingWindow.RebuildDelay = 500;
-			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("156736.png"), (Func<IView>)(() => (IView)(object)new GeneralSettingsView(base.ModuleSettings, base.Gw2ApiManager, base.IconService, base.TranslationService, base.SettingEventService)
+			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("156736.png"), (Func<IView>)(() => (IView)(object)new GeneralSettingsView(base.ModuleSettings, base.Gw2ApiManager, base.IconService, base.TranslationService, base.SettingEventService, base.MetricsService)
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			}), base.TranslationService.GetTranslation("generalSettingsView-title", "General"), (int?)null));
@@ -571,10 +597,23 @@ namespace Estreya.BlishHUD.EventTable
 				return Task.CompletedTask;
 			};
 			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("605018.png"), (Func<IView>)(() => (IView)(object)areaSettingsView), base.TranslationService.GetTranslation("areaSettingsView-title", "Event Areas"), (int?)null));
-			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("1466345.png"), (Func<IView>)(() => (IView)(object)new ReminderSettingsView(base.ModuleSettings, () => _eventCategories, base.Gw2ApiManager, base.IconService, base.TranslationService, base.SettingEventService)
+			ReminderSettingsView reminderSettingsView = new ReminderSettingsView(base.ModuleSettings, () => _eventCategories, base.Gw2ApiManager, base.IconService, base.TranslationService, base.SettingEventService)
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
-			}), base.TranslationService.GetTranslation("reminderSettingsView-title", "Reminders"), (int?)null));
+			};
+			reminderSettingsView.SyncEnabledEventsToAreas += delegate
+			{
+				if (_areas == null)
+				{
+					throw new ArgumentNullException("_areas", "Areas are not available.");
+				}
+				foreach (EventArea value in _areas.Values)
+				{
+					value.Configuration.DisabledEventKeys.set_Value(new List<string>(base.ModuleSettings.ReminderDisabledForEvents.get_Value()));
+				}
+				return Task.CompletedTask;
+			};
+			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("1466345.png"), (Func<IView>)(() => (IView)(object)reminderSettingsView), base.TranslationService.GetTranslation("reminderSettingsView-title", "Reminders"), (int?)null));
 			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("759448.png"), (Func<IView>)(() => (IView)(object)new DynamicEventsSettingsView(DynamicEventService, base.ModuleSettings, GetFlurlClient(), base.Gw2ApiManager, base.IconService, base.TranslationService, base.SettingEventService)
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
@@ -653,7 +692,12 @@ namespace Estreya.BlishHUD.EventTable
 		{
 			_eventTableContextHandle?.Expire();
 			base.Logger.Info("Event Table context expired.");
-			_contextManager?.Dispose();
+			if (_contextManager != null)
+			{
+				_contextManager.Dispose();
+				_contextManager.ReloadEvents -= ContextManager_ReloadEvents;
+				_contextManager = null;
+			}
 			_eventTableContext = null;
 			_eventTableContextHandle = null;
 		}

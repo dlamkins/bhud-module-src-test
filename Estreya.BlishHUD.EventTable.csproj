@@ -31,13 +31,19 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\working\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="System.Net.Http" />
     <Reference Include="SemVer" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Core" />
     <Reference Include="Octokit">
       <HintPath>..\..\working\Octokit.dll</HintPath>
     </Reference>
-    <Reference Include="System.Core" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="Windows.Foundation.UniversalApiContract">
+      <HintPath>C:\Program Files (x86)\Windows Kits\10\References\10.0.19041.0\Windows.Foundation.UniversalApiContract\10.0.0.0\Windows.Foundation.UniversalApiContract.winmd</HintPath>
+    </Reference>
+    <Reference Include="Windows.Foundation.FoundationContract">
+      <HintPath>C:\Program Files (x86)\Windows Kits\10\References\10.0.19041.0\Windows.Foundation.FoundationContract\4.0.0.0\Windows.Foundation.FoundationContract.winmd</HintPath>
+    </Reference>
     <Reference Include="jose-jwt">
       <HintPath>..\..\working\jose-jwt.dll</HintPath>
     </Reference>

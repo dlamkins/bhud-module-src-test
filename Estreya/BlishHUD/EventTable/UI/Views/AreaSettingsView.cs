@@ -11,6 +11,7 @@ using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.EventTable.Services;
 using Estreya.BlishHUD.Shared.Controls;
+using Estreya.BlishHUD.Shared.Controls.Input;
 using Estreya.BlishHUD.Shared.Models;
 using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Threading.Events;
@@ -214,7 +215,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			MenuItem menuItem;
 			Estreya.BlishHUD.Shared.Controls.Button saveButton = RenderButton(_areaPanel, base.TranslationService.GetTranslation("areaSettingsView-save-btn", "Save"), delegate
 			{
-				//IL_0152: Unknown result type (might be due to invalid IL or missing references)
+				//IL_015d: Unknown result type (might be due to invalid IL or missing references)
 				try
 				{
 					name = ((TextInputBase)areaName).get_Text();
@@ -241,6 +242,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 							{
 								_areaConfigurations.First((EventAreaConfiguration x) => x.Name == copyFromTemplateName).CopyTo(configuration2);
 							}
+							LoadConfigurations();
 							menuItem = ((Menu)menu).AddMenuItem(name, (Texture2D)null);
 							((Control)menuItem).add_Click((EventHandler<MouseEventArgs>)delegate
 							{

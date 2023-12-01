@@ -48,13 +48,15 @@ namespace Estreya.BlishHUD.Shared.Controls
 			((Control)this).set_BackgroundColor(Color.get_Black());
 			((FlowPanel)this).set_FlowDirection((ControlFlowDirection)3);
 			((TextInputBase)_textBox).add_TextChanged((EventHandler<EventArgs>)TextBox_TextChanged);
-			((Control)_textBox).add_Resized((EventHandler<ResizedEventArgs>)_textBox_Resized);
-			((Control)_textBox).add_Moved((EventHandler<MovedEventArgs>)_textBox_Moved);
-			((TextInputBase)_textBox).add_InputFocusChanged((EventHandler<ValueEventArgs<bool>>)_textBox_InputFocusChanged);
+			((Control)_textBox).add_Resized((EventHandler<ResizedEventArgs>)TextBox_Resized);
+			((Control)_textBox).add_Moved((EventHandler<MovedEventArgs>)TextBox_Moved);
+			((TextInputBase)_textBox).add_InputFocusChanged((EventHandler<ValueEventArgs<bool>>)TextBox_InputFocusChanged);
+			((Control)_textBox).add_Disposed((EventHandler<EventArgs>)TextBox_Disposed);
 			GameService.Input.get_Mouse().add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)Mouse_LeftMouseButtonPressed);
+			UpdateSizeAndLocation();
 		}
 
-		private void _textBox_InputFocusChanged(object sender, ValueEventArgs<bool> e)
+		private void TextBox_InputFocusChanged(object sender, ValueEventArgs<bool> e)
 		{
 			if (e.get_Value())
 			{
@@ -62,12 +64,12 @@ namespace Estreya.BlishHUD.Shared.Controls
 			}
 		}
 
-		private void _textBox_Moved(object sender, MovedEventArgs e)
+		private void TextBox_Moved(object sender, MovedEventArgs e)
 		{
 			UpdateSizeAndLocation();
 		}
 
-		private void _textBox_Resized(object sender, ResizedEventArgs e)
+		private void TextBox_Resized(object sender, ResizedEventArgs e)
 		{
 			UpdateSizeAndLocation();
 		}
@@ -106,6 +108,11 @@ namespace Estreya.BlishHUD.Shared.Controls
 			{
 				RemoveSuggestionList();
 			}
+		}
+
+		private void TextBox_Disposed(object sender, EventArgs e)
+		{
+			((Control)this).Dispose();
 		}
 
 		private void BuildSuggestionList(List<string> suggestions)
@@ -157,9 +164,10 @@ namespace Estreya.BlishHUD.Shared.Controls
 		{
 			RemoveSuggestionList();
 			((TextInputBase)_textBox).remove_TextChanged((EventHandler<EventArgs>)TextBox_TextChanged);
-			((Control)_textBox).remove_Resized((EventHandler<ResizedEventArgs>)_textBox_Resized);
-			((Control)_textBox).remove_Moved((EventHandler<MovedEventArgs>)_textBox_Moved);
-			((TextInputBase)_textBox).remove_InputFocusChanged((EventHandler<ValueEventArgs<bool>>)_textBox_InputFocusChanged);
+			((Control)_textBox).remove_Resized((EventHandler<ResizedEventArgs>)TextBox_Resized);
+			((Control)_textBox).remove_Moved((EventHandler<MovedEventArgs>)TextBox_Moved);
+			((TextInputBase)_textBox).remove_InputFocusChanged((EventHandler<ValueEventArgs<bool>>)TextBox_InputFocusChanged);
+			((Control)_textBox).remove_Disposed((EventHandler<EventArgs>)TextBox_Disposed);
 			GameService.Input.get_Mouse().remove_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)Mouse_LeftMouseButtonPressed);
 			Suggestions = null;
 			_attachToParent = null;

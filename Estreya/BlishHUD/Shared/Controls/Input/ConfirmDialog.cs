@@ -14,7 +14,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.BitmapFonts;
 
-namespace Estreya.BlishHUD.Shared.Controls
+namespace Estreya.BlishHUD.Shared.Controls.Input
 {
 	public class ConfirmDialog : Container
 	{
@@ -274,7 +274,11 @@ namespace Estreya.BlishHUD.Shared.Controls
 
 		public override void UpdateContainer(GameTime gameTime)
 		{
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+			Container parent = ((Control)this).get_Parent();
+			((Control)this).set_Height((parent != null) ? ((Control)parent).get_Height() : 0);
+			Container parent2 = ((Control)this).get_Parent();
+			((Control)this).set_Width((parent2 != null) ? ((Control)parent2).get_Width() : 0);
 			int buttonY = _confirmRect.Y + _confirmRect.Height / 2 + _confirmRect.Height / 4;
 			((Control)_buttonPanel).set_Location(new Point(_confirmRect.X + _confirmRect.Width / 2 - ((Control)_buttonPanel).get_Width() / 2, buttonY));
 		}

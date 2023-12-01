@@ -26,6 +26,7 @@ using Estreya.BlishHUD.Shared.Models;
 using Estreya.BlishHUD.Shared.MumbleInfo.Map;
 using Estreya.BlishHUD.Shared.Security;
 using Estreya.BlishHUD.Shared.Services;
+using Estreya.BlishHUD.Shared.Services.TradingPost;
 using Estreya.BlishHUD.Shared.Settings;
 using Estreya.BlishHUD.Shared.UI.Views;
 using Estreya.BlishHUD.Shared.UI.Views.Settings;
@@ -80,6 +81,8 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected virtual bool FailIfBackendDown { get; }
 
+		protected virtual bool EnableMetrics => false;
+
 		public bool IsPrerelease
 		{
 			get
@@ -128,7 +131,9 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected SkillService SkillService { get; private set; }
 
-		protected TradingPostService TradingPostService { get; private set; }
+		protected PlayerTransactionsService PlayerTransactionsService { get; private set; }
+
+		protected TransactionsService TransactionsService { get; private set; }
 
 		protected ItemService ItemService { get; private set; }
 
@@ -139,6 +144,8 @@ namespace Estreya.BlishHUD.Shared.Modules
 		protected AchievementService AchievementService { get; private set; }
 
 		protected AccountAchievementService AccountAchievementService { get; private set; }
+
+		protected MetricsService MetricsService { get; private set; }
 
 		protected abstract int CornerIconPriority { get; }
 
@@ -196,8 +203,11 @@ namespace Estreya.BlishHUD.Shared.Modules
 		protected override async Task LoadAsync()
 		{
 			await ThrowIfModuleInvalid(showScreenNotification: true);
-			Logger.Debug("Initialize states");
 			await Task.Factory.StartNew((Func<Task>)InitializeServices, TaskCreationOptions.LongRunning).Unwrap();
+			if (EnableMetrics)
+			{
+				await MetricsService.AskMetricsConsent();
+			}
 			GithubHelper = new GitHubHelper("Tharylia", "Blish-HUD-Modules", "Iv1.9e4dc29d43243704", ((Module)this).get_Name(), PasswordManager, IconService, TranslationService, ModuleSettings);
 			ModuleSettings.UpdateLocalization(TranslationService);
 			ModuleSettings.RegisterCornerIcon.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)RegisterCornerIcon_SettingChanged);
@@ -265,6 +275,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		private async Task InitializeServices()
 		{
+			Logger.Debug("Initialize states");
 			string directoryName = GetDirectoryName();
 			string directoryPath = null;
 			if (!string.IsNullOrWhiteSpace(directoryName))
@@ -314,15 +325,26 @@ namespace Estreya.BlishHUD.Shared.Modules
 					Enabled = true
 				}, GetFlurlClient(), MODULE_FILE_URL);
 				_services.Add(NewsService);
+				MetricsService = new MetricsService(new ServiceConfiguration
+				{
+					Enabled = true,
+					AwaitLoading = true
+				}, GetFlurlClient(), "https://api.estreya.de/blish-hud", ((Module)this).get_Name(), ((Module)this).get_Namespace(), ((Module)this).get_Version(), ModuleSettings, IconService);
+				_services.Add(MetricsService);
 				if (configurations.Items.Enabled)
 				{
 					ItemService = new ItemService(configurations.Items, Gw2ApiManager, directoryPath);
 					_services.Add(ItemService);
 				}
-				if (configurations.TradingPost.Enabled)
+				if (configurations.PlayerTransactions.Enabled)
 				{
-					TradingPostService = new TradingPostService(configurations.TradingPost, Gw2ApiManager, ItemService);
-					_services.Add(TradingPostService);
+					PlayerTransactionsService = new PlayerTransactionsService(configurations.PlayerTransactions, ItemService, Gw2ApiManager);
+					_services.Add(PlayerTransactionsService);
+				}
+				if (configurations.Transactions.Enabled)
+				{
+					TransactionsService = new TransactionsService(configurations.Transactions, ItemService, Gw2ApiManager);
+					_services.Add(TransactionsService);
 				}
 				if (configurations.Worldbosses.Enabled)
 				{
@@ -556,6 +578,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 			}
 			Logger.Debug("Finished building settings window.");
 			HandleCornerIcon(ModuleSettings.RegisterCornerIcon.get_Value());
+			MetricsService.SendMetricAsync("loaded");
 		}
 
 		protected abstract AsyncTexture2D GetEmblem();
@@ -746,7 +769,8 @@ namespace Estreya.BlishHUD.Shared.Modules
 				PointOfInterestService = null;
 				SettingEventService = null;
 				SkillService = null;
-				TradingPostService = null;
+				PlayerTransactionsService = null;
+				TransactionsService = null;
 				TranslationService = null;
 			}
 			Logger.Debug("Unloaded states.");

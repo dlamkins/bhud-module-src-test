@@ -56,7 +56,8 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Expected O, but got Unknown
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Expected O, but got Unknown
 			Rectangle bounds = ((Container)parent).get_ContentRegion();
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Size(((Rectangle)(ref bounds)).get_Size());
@@ -66,6 +67,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			((Container)val).set_WidthSizingMode((SizingMode)2);
 			((Container)val).set_HeightSizingMode((SizingMode)2);
 			((Control)val).set_Parent((Container)(object)parent);
+			((Panel)val).set_CanScroll(true);
 			FlowPanel parentPanel = val;
 			BuildView(parentPanel);
 		}

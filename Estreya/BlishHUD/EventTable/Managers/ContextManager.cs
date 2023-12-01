@@ -111,10 +111,10 @@ namespace Estreya.BlishHUD.EventTable.Managers
 
 		private Task RequestShowReminder(object sender, ContextEventArgs<ShowReminder> e)
 		{
-			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
 			ShowReminder eArgsContent = e.Content;
-			EventNotification eventNotification = new EventNotification(null, eArgsContent.Title, eArgsContent.Message, (!string.IsNullOrWhiteSpace(eArgsContent.Icon)) ? _iconService.GetIcon(eArgsContent.Icon) : null, _moduleSettings.ReminderPosition.X.get_Value(), _moduleSettings.ReminderPosition.Y.get_Value(), _moduleSettings.ReminderSize.X.get_Value(), _moduleSettings.ReminderSize.Y.get_Value(), _moduleSettings.ReminderSize.Icon.get_Value(), _moduleSettings.ReminderStackDirection.get_Value(), _moduleSettings.ReminderFonts.TitleSize.get_Value(), _moduleSettings.ReminderFonts.MessageSize.get_Value(), _iconService, _moduleSettings.ReminderLeftClickAction.get_Value() != LeftClickAction.None);
+			EventNotification eventNotification = new EventNotification(null, eArgsContent.Title, eArgsContent.Message, (!string.IsNullOrWhiteSpace(eArgsContent.Icon)) ? _iconService.GetIcon(eArgsContent.Icon) : null, _moduleSettings.ReminderPosition.X.get_Value(), _moduleSettings.ReminderPosition.Y.get_Value(), _moduleSettings.ReminderSize.X.get_Value(), _moduleSettings.ReminderSize.Y.get_Value(), _moduleSettings.ReminderSize.Icon.get_Value(), _moduleSettings.ReminderStackDirection.get_Value(), _moduleSettings.ReminderOverflowStackDirection.get_Value(), _moduleSettings.ReminderFonts.TitleSize.get_Value(), _moduleSettings.ReminderFonts.MessageSize.get_Value(), _iconService, _moduleSettings.ReminderLeftClickAction.get_Value() != LeftClickAction.None);
 			eventNotification.BackgroundOpacity = _moduleSettings.ReminderOpacity.get_Value();
 			eventNotification.Show(TimeSpan.FromSeconds(_moduleSettings.ReminderDuration.get_Value()));
 			return Task.CompletedTask;

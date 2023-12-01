@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Modules.Managers;
@@ -10,10 +12,15 @@ using Estreya.BlishHUD.EventTable.Controls;
 using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.EventTable.Models.Reminders;
 using Estreya.BlishHUD.Shared.Controls;
+using Estreya.BlishHUD.Shared.Controls.Input;
 using Estreya.BlishHUD.Shared.Services;
+using Estreya.BlishHUD.Shared.Threading.Events;
 using Estreya.BlishHUD.Shared.UI.Views;
 using Estreya.BlishHUD.Shared.Utils;
+using Humanizer;
+using Humanizer.Localisation;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Estreya.BlishHUD.EventTable.UI.Views
 {
@@ -29,6 +36,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private StandardWindow _manageReminderTimesWindow;
 
+		public event AsyncEventHandler SyncEnabledEventsToAreas;
+
 		static ReminderSettingsView()
 		{
 			_globalChangeTempEvent = new Estreya.BlishHUD.EventTable.Models.Event();
@@ -40,6 +49,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 		{
 			_moduleSettings = moduleSettings;
 			_getEvents = getEvents;
+			CONTROL_WIDTH = 500;
 		}
 
 		protected override void BuildView(FlowPanel parent)
@@ -56,12 +66,18 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderFloatSetting((Panel)(object)parent, _moduleSettings.ReminderDuration);
 			RenderFloatSetting((Panel)(object)parent, _moduleSettings.ReminderOpacity);
 			RenderEnumSetting<EventReminderStackDirection>((Panel)(object)parent, _moduleSettings.ReminderStackDirection);
+			RenderEnumSetting<EventReminderStackDirection>((Panel)(object)parent, _moduleSettings.ReminderOverflowStackDirection);
 			RenderEmptyLine((Panel)(object)parent);
 			base.RenderEnumSetting<FontSize>((Panel)(object)parent, _moduleSettings.ReminderFonts.TitleSize);
 			base.RenderEnumSetting<FontSize>((Panel)(object)parent, _moduleSettings.ReminderFonts.MessageSize);
 			RenderEmptyLine((Panel)(object)parent);
+			RenderEnumSetting<TimeUnit>((Panel)(object)parent, _moduleSettings.ReminderMinTimeUnit);
+			RenderEmptyLine((Panel)(object)parent);
+			RenderEnumSetting<ReminderType>((Panel)(object)parent, _moduleSettings.ReminderType);
+			RenderEmptyLine((Panel)(object)parent);
 			RenderEnumSetting<LeftClickAction>((Panel)(object)parent, _moduleSettings.ReminderLeftClickAction);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.AcceptWaypointPrompt);
+			RenderEnumSetting<EventReminderRightClickAction>((Panel)(object)parent, _moduleSettings.ReminderRightClickAction);
 			RenderEmptyLine((Panel)(object)parent);
 			RenderButton((Panel)(object)parent, base.TranslationService.GetTranslation("reminderSettingsView-btn-manageReminders", "Manage Reminders"), delegate
 			{
@@ -90,17 +106,23 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				manageEventsView.EventChanged += ManageView_EventChanged;
 				_manageEventsWindow.Show((IView)(object)manageEventsView);
 			});
-			RenderButton((Panel)(object)parent, base.TranslationService.GetTranslation("reminderSettingsView-btn-testReminder", "Test Reminder"), delegate
+			RenderButtonAsync((Panel)(object)parent, base.TranslationService.GetTranslation("reminderSettingsView-btn-testReminder", "Test Reminder"), async delegate
 			{
-				//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-				EventNotification eventNotification = new EventNotification(new Estreya.BlishHUD.EventTable.Models.Event
+				string title = "Test Event";
+				string message = "Test starts in " + TimeSpan.FromHours(5.0).Add(TimeSpan.FromMinutes(21.0).Add(TimeSpan.FromSeconds(23.0))).Humanize(6, null, TimeUnit.Week, _moduleSettings.ReminderMinTimeUnit.get_Value()) + "!";
+				AsyncTexture2D icon = base.IconService.GetIcon("textures/maintenance.png");
+				ReminderType value = _moduleSettings.ReminderType.get_Value();
+				if (value == ReminderType.Control || value == ReminderType.Both)
 				{
-					Name = "Test Event",
-					Icon = "textures/maintenance.png"
-				}, "Test description!", _moduleSettings.ReminderPosition.X.get_Value(), _moduleSettings.ReminderPosition.Y.get_Value(), _moduleSettings.ReminderSize.X.get_Value(), _moduleSettings.ReminderSize.Y.get_Value(), _moduleSettings.ReminderSize.Icon.get_Value(), _moduleSettings.ReminderStackDirection.get_Value(), _moduleSettings.ReminderFonts.TitleSize.get_Value(), _moduleSettings.ReminderFonts.MessageSize.get_Value(), base.IconService);
-				eventNotification.BackgroundOpacity = _moduleSettings.ReminderOpacity.get_Value();
-				eventNotification.Show(TimeSpan.FromSeconds(_moduleSettings.ReminderDuration.get_Value()));
+					EventNotification eventNotification = new EventNotification(null, title, message, icon, _moduleSettings.ReminderPosition.X.get_Value(), _moduleSettings.ReminderPosition.Y.get_Value(), _moduleSettings.ReminderSize.X.get_Value(), _moduleSettings.ReminderSize.Y.get_Value(), _moduleSettings.ReminderSize.Icon.get_Value(), _moduleSettings.ReminderStackDirection.get_Value(), _moduleSettings.ReminderOverflowStackDirection.get_Value(), _moduleSettings.ReminderFonts.TitleSize.get_Value(), _moduleSettings.ReminderFonts.MessageSize.get_Value(), base.IconService);
+					eventNotification.BackgroundOpacity = _moduleSettings.ReminderOpacity.get_Value();
+					eventNotification.Show(TimeSpan.FromSeconds(_moduleSettings.ReminderDuration.get_Value()));
+				}
+				value = _moduleSettings.ReminderType.get_Value();
+				if (value == ReminderType.Windows || value == ReminderType.Both)
+				{
+					await EventNotification.ShowAsWindowsNotification(title, message, icon);
+				}
 			});
 			RenderButton((Panel)(object)parent, base.TranslationService.GetTranslation("reminderSettingsView-btn-changeAllTimes", "Change all Reminder Times"), delegate
 			{
@@ -109,6 +131,17 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderButton((Panel)(object)parent, base.TranslationService.GetTranslation("reminderSettingsView-btn-resetAllTimes", "Reset all Reminder Times"), delegate
 			{
 				ManageReminderTimesView_SaveClicked(this, (_globalChangeTempEvent, new List<TimeSpan> { TimeSpan.FromMinutes(10.0) }, false));
+			});
+			RenderButtonAsync((Panel)(object)parent, base.TranslationService.GetTranslation("reminderSettingsView-btn-syncEnabledEventsToAreas", "Sync enabled Events to Areas"), async delegate
+			{
+				if (await new ConfirmDialog("Synchronizing", "You are in the process of synchronizing the enabled events of reminders to all event areas.\n\nThis will override all previously configured enabled/disabled settings in event areas.", base.IconService)
+				{
+					SelectedButtonIndex = 1
+				}.ShowDialog() == DialogResult.OK)
+				{
+					await (this.SyncEnabledEventsToAreas?.Invoke(this) ?? Task.FromException(new NotImplementedException()));
+					ScreenNotification.ShowNotification("Synchronization complete!", (NotificationType)0, (Texture2D)null, 4);
+				}
 			});
 			RenderEmptyLine((Panel)(object)parent);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideRemindersOnMissingMumbleTicks);

@@ -18,6 +18,7 @@ using Blish_HUD.Settings;
 using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.EventTable.Services;
 using Estreya.BlishHUD.Shared.Controls;
+using Estreya.BlishHUD.Shared.Controls.Input;
 using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.UI.Views;
 using Estreya.BlishHUD.Shared.Utils;

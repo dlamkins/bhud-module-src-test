@@ -11,6 +11,7 @@ using Estreya.BlishHUD.Shared.Models.Drawers;
 using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Settings;
 using Gw2Sharp.WebApi.V2.Models;
+using Humanizer.Localisation;
 using Microsoft.Xna.Framework.Input;
 
 namespace Estreya.BlishHUD.EventTable
@@ -45,9 +46,15 @@ namespace Estreya.BlishHUD.EventTable
 
 		public SettingEntry<EventReminderRightClickAction> ReminderRightClickAction { get; private set; }
 
-		public SettingEntry<bool> AcceptWaypointPrompt { get; set; }
+		public SettingEntry<TimeUnit> ReminderMinTimeUnit { get; private set; }
 
-		public SettingEntry<EventReminderStackDirection> ReminderStackDirection { get; set; }
+		public SettingEntry<EventReminderStackDirection> ReminderStackDirection { get; private set; }
+
+		public SettingEntry<EventReminderStackDirection> ReminderOverflowStackDirection { get; private set; }
+
+		public SettingEntry<ReminderType> ReminderType { get; private set; }
+
+		public SettingEntry<bool> AcceptWaypointPrompt { get; private set; }
 
 		public SettingEntry<bool> ShowDynamicEventsOnMap { get; private set; }
 
@@ -125,8 +132,17 @@ namespace Estreya.BlishHUD.EventTable
 			SettingComplianceExtensions.SetRange(ReminderOpacity, 0.1f, 1f);
 			ReminderLeftClickAction = base.GlobalSettings.DefineSetting<LeftClickAction>("ReminderLeftClickAction", LeftClickAction.CopyWaypoint, (Func<string>)(() => "Reminder Left Click Action"), (Func<string>)(() => "Defines the action to execute on a left click."));
 			ReminderRightClickAction = base.GlobalSettings.DefineSetting<EventReminderRightClickAction>("ReminderRightClickAction", EventReminderRightClickAction.Dismiss, (Func<string>)(() => "Reminder Right Click Action"), (Func<string>)(() => "Defines the action to execute on a right click."));
-			AcceptWaypointPrompt = base.GlobalSettings.DefineSetting<bool>("AcceptWaypointPrompt", true, (Func<string>)(() => "Accept Waypoint Prompt"), (Func<string>)(() => "Defines if the waypoint prompt should be auto accepted"));
 			ReminderStackDirection = base.GlobalSettings.DefineSetting<EventReminderStackDirection>("ReminderStackDirection", EventReminderStackDirection.Down, (Func<string>)(() => "Reminder Stack Direction"), (Func<string>)(() => "Defines the direction in which reminders stack."));
+			ReminderOverflowStackDirection = base.GlobalSettings.DefineSetting<EventReminderStackDirection>("ReminderOverflowStackDirection", EventReminderStackDirection.Right, (Func<string>)(() => "Reminder Overflow Stack Direction"), (Func<string>)(() => "Defines the direction in which reminders stack if they overflow off the screen."));
+			ReminderMinTimeUnit = base.GlobalSettings.DefineSetting<TimeUnit>("ReminderMinTimeUnit", TimeUnit.Second, (Func<string>)(() => "Reminder min. Timeunit"), (Func<string>)(() => "Defines what min. timeunit should be used for reminders."));
+			SettingComplianceExtensions.SetIncluded<TimeUnit>(ReminderMinTimeUnit, new TimeUnit[3]
+			{
+				TimeUnit.Second,
+				TimeUnit.Minute,
+				TimeUnit.Hour
+			});
+			ReminderType = base.GlobalSettings.DefineSetting<ReminderType>("ReminderType", Estreya.BlishHUD.EventTable.Models.Reminders.ReminderType.Control, (Func<string>)(() => "Reminder Type"), (Func<string>)(() => "Defines what type the reminder should be displayed as."));
+			AcceptWaypointPrompt = base.GlobalSettings.DefineSetting<bool>("AcceptWaypointPrompt", true, (Func<string>)(() => "Accept Waypoint Prompt"), (Func<string>)(() => "Defines if the waypoint prompt should be auto accepted"));
 			ShowDynamicEventsOnMap = base.GlobalSettings.DefineSetting<bool>("ShowDynamicEventsOnMap", false, (Func<string>)(() => "Show Dynamic Events on Map"), (Func<string>)(() => "Whether the dynamic events of the map should be shown."));
 			ShowDynamicEventInWorld = base.GlobalSettings.DefineSetting<bool>("ShowDynamicEventInWorld", false, (Func<string>)(() => "Show Dynamic Events in World"), (Func<string>)(() => "Whether dynamic events should be shown inside the world."));
 			ShowDynamicEventInWorld.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowDynamicEventInWorld_SettingChanged);
