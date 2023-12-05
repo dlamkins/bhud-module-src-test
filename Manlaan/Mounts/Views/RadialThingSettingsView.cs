@@ -434,7 +434,25 @@ namespace Manlaan.Mounts.Views
 			//IL_072d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0740: Unknown result type (might be due to invalid IL or missing references)
 			//IL_074f: Expected O, but got Unknown
-			//IL_07a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0790: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0795: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07e8: Expected O, but got Unknown
+			//IL_07ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_080a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0826: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0839: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0848: Expected O, but got Unknown
+			//IL_0873: Unknown result type (might be due to invalid IL or missing references)
 			if (newCurrentRadialSettings != null)
 			{
 				if (currentRadialSettings != null)
@@ -579,8 +597,8 @@ namespace Manlaan.Mounts.Views
 				BuildRadialSettingsListPanel();
 			});
 			radialThingSettings = currentRadialSettings;
-			ContextualRadialThingSettings contextualRadialSettingsApplyInstantlyIfSingle = radialThingSettings as ContextualRadialThingSettings;
-			if (contextualRadialSettingsApplyInstantlyIfSingle != null)
+			ContextualRadialThingSettings contextualRadialSettingsAtBottom = radialThingSettings as ContextualRadialThingSettings;
+			if (contextualRadialSettingsAtBottom != null)
 			{
 				Label val13 = new Label();
 				((Control)val13).set_Location(new Point(0, ((Control)radialSettingsIsEnabled_Label).get_Bottom() + 6));
@@ -594,16 +612,35 @@ namespace Manlaan.Mounts.Views
 				Checkbox val14 = new Checkbox();
 				((Control)val14).set_Size(new Point(20, 20));
 				((Control)val14).set_Parent((Container)(object)RadialSettingsDetailPanel);
-				val14.set_Checked(contextualRadialSettingsApplyInstantlyIfSingle.ApplyInstantlyIfSingle.get_Value());
+				val14.set_Checked(contextualRadialSettingsAtBottom.ApplyInstantlyIfSingle.get_Value());
 				((Control)val14).set_Location(new Point(((Control)radialSettingsApplyInstantlyIfSingle_Label).get_Right() + 5, ((Control)radialSettingsApplyInstantlyIfSingle_Label).get_Top() - 1));
 				Checkbox radialSettingsApplyInstantlyIfSingle_Checkbox = val14;
 				radialSettingsApplyInstantlyIfSingle_Checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
 				{
-					contextualRadialSettingsApplyInstantlyIfSingle.ApplyInstantlyIfSingle.set_Value(radialSettingsApplyInstantlyIfSingle_Checkbox.get_Checked());
+					contextualRadialSettingsAtBottom.ApplyInstantlyIfSingle.set_Value(radialSettingsApplyInstantlyIfSingle_Checkbox.get_Checked());
 				});
-				contextualRadialSettingsApplyInstantlyIfSingle.ApplyInstantlyIfSingle.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate
+				contextualRadialSettingsAtBottom.ApplyInstantlyIfSingle.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate
 				{
 					BuildRadialSettingsDetailPanel();
+				});
+				Label val15 = new Label();
+				((Control)val15).set_Location(new Point(0, ((Control)radialSettingsApplyInstantlyIfSingle_Label).get_Bottom() + 6));
+				((Control)val15).set_Width(labelWidth);
+				val15.set_AutoSizeHeight(false);
+				val15.set_WrapText(false);
+				((Control)val15).set_Parent((Container)(object)RadialSettingsDetailPanel);
+				val15.set_Text("Unconditionally Do Action");
+				((Control)val15).set_BasicTooltipText("Used to disable \"out of combat queuing\", \"LastUsed\" and \"mount automatically\" functionality. Only useful when the user has configured a mount action (e.g.: Raptor) instead of the dismount action to dismount in the IsPlayerMounted contextual radial settings.");
+				Label radialSettingsUnconditionallyDoAction_Label = val15;
+				Checkbox val16 = new Checkbox();
+				((Control)val16).set_Size(new Point(20, 20));
+				((Control)val16).set_Parent((Container)(object)RadialSettingsDetailPanel);
+				val16.set_Checked(contextualRadialSettingsAtBottom.UnconditionallyDoAction.get_Value());
+				((Control)val16).set_Location(new Point(((Control)radialSettingsUnconditionallyDoAction_Label).get_Right() + 5, ((Control)radialSettingsUnconditionallyDoAction_Label).get_Top() - 1));
+				Checkbox radialSettingsUnconditionallyDoAction_Checkbox = val16;
+				radialSettingsUnconditionallyDoAction_Checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+				{
+					contextualRadialSettingsAtBottom.UnconditionallyDoAction.set_Value(radialSettingsUnconditionallyDoAction_Checkbox.get_Checked());
 				});
 			}
 			ThingSettingsView thingSettingsView = new ThingSettingsView(currentRadialSettings);

@@ -360,13 +360,13 @@ namespace Manlaan.Mounts
 			});
 			ContextualRadialSettings = new List<ContextualRadialThingSettings>
 			{
-				new ContextualRadialThingSettings(settings, "IsPlayerMounted", 0, _helper.IsPlayerMounted, defaultIsEnabled: true, defaultApplyInstantlyIfSingle: true, _things.Where((Thing t) => t is UnMount).ToList()),
-				new ContextualRadialThingSettings(settings, "IsPlayerInWvwMap", 1, _helper.IsPlayerInWvwMap, defaultIsEnabled: true, defaultApplyInstantlyIfSingle: true, _things.Where((Thing t) => t is Warclaw).ToList()),
-				new ContextualRadialThingSettings(settings, "IsPlayerInCombat", 2, _helper.IsPlayerInCombat, defaultIsEnabled: false, defaultApplyInstantlyIfSingle: true, _things.Where((Thing t) => t is Skyscale).ToList()),
-				new ContextualRadialThingSettings(settings, "IsPlayerUnderWater", 3, _helper.IsPlayerUnderWater, defaultIsEnabled: false, defaultApplyInstantlyIfSingle: false, _things.Where((Thing t) => t is Skimmer || t is SiegeTurtle).ToList()),
-				new ContextualRadialThingSettings(settings, "IsPlayerOnWaterSurface", 4, _helper.IsPlayerOnWaterSurface, defaultIsEnabled: false, defaultApplyInstantlyIfSingle: true, _things.Where((Thing t) => t is Skiff).ToList()),
-				new ContextualRadialThingSettings(settings, "IsPlayerGlidingOrFalling", 5, _helper.IsPlayerGlidingOrFalling, defaultIsEnabled: false, defaultApplyInstantlyIfSingle: false, _things.Where((Thing t) => t is Griffon || t is Skyscale).ToList()),
-				new ContextualRadialThingSettings(settings, "Default", 99, () => true, defaultIsEnabled: true, defaultApplyInstantlyIfSingle: false, thingsForMigration)
+				new ContextualRadialThingSettings(settings, "IsPlayerMounted", 0, _helper.IsPlayerMounted, defaultIsEnabled: true, defaultApplyInstantlyIfSingle: true, defaultUnconditionallyDoAction: true, _things.Where((Thing t) => t is Raptor).ToList()),
+				new ContextualRadialThingSettings(settings, "IsPlayerInWvwMap", 1, _helper.IsPlayerInWvwMap, defaultIsEnabled: true, defaultApplyInstantlyIfSingle: true, defaultUnconditionallyDoAction: false, _things.Where((Thing t) => t is Warclaw).ToList()),
+				new ContextualRadialThingSettings(settings, "IsPlayerInCombat", 2, _helper.IsPlayerInCombat, defaultIsEnabled: false, defaultApplyInstantlyIfSingle: true, defaultUnconditionallyDoAction: false, _things.Where((Thing t) => t is Skyscale).ToList()),
+				new ContextualRadialThingSettings(settings, "IsPlayerUnderWater", 3, _helper.IsPlayerUnderWater, defaultIsEnabled: false, defaultApplyInstantlyIfSingle: false, defaultUnconditionallyDoAction: false, _things.Where((Thing t) => t is Skimmer || t is SiegeTurtle).ToList()),
+				new ContextualRadialThingSettings(settings, "IsPlayerOnWaterSurface", 4, _helper.IsPlayerOnWaterSurface, defaultIsEnabled: false, defaultApplyInstantlyIfSingle: true, defaultUnconditionallyDoAction: false, _things.Where((Thing t) => t is Skiff).ToList()),
+				new ContextualRadialThingSettings(settings, "IsPlayerGlidingOrFalling", 5, _helper.IsPlayerGlidingOrFalling, defaultIsEnabled: false, defaultApplyInstantlyIfSingle: false, defaultUnconditionallyDoAction: false, _things.Where((Thing t) => t is Griffon || t is Skyscale).ToList()),
+				new ContextualRadialThingSettings(settings, "Default", 99, () => true, defaultIsEnabled: true, defaultApplyInstantlyIfSingle: false, defaultUnconditionallyDoAction: false, thingsForMigration)
 			};
 			IconThingSettings = new List<IconThingSettings>
 			{
@@ -624,14 +624,14 @@ namespace Manlaan.Mounts
 			ICollection<Thing> things = selectedRadialSettings.AvailableThings;
 			if (things.Count() == 1 && selectedRadialSettings.ApplyInstantlyIfSingle.get_Value())
 			{
-				await (things.FirstOrDefault()?.DoAction());
+				await (things.FirstOrDefault()?.DoAction(selectedRadialSettings.UnconditionallyDoAction.get_Value()));
 				Logger.Debug("DoKeybindActionAsync not showing radial selected thing: " + selectedRadialSettings.Things.First().Name);
 				return;
 			}
 			Thing defaultThing = selectedRadialSettings.GetDefaultThing();
 			if (defaultThing != null && GameService.Input.get_Mouse().get_CameraDragging())
 			{
-				await (defaultThing?.DoAction() ?? Task.CompletedTask);
+				await (defaultThing?.DoAction(unconditionallyDoAction: false) ?? Task.CompletedTask);
 				Logger.Debug("DoKeybindActionAsync CameraDragging default");
 				return;
 			}
@@ -645,7 +645,7 @@ namespace Manlaan.Mounts
 			}
 			else
 			{
-				await (defaultThing?.DoAction() ?? Task.CompletedTask);
+				await (defaultThing?.DoAction(unconditionallyDoAction: false) ?? Task.CompletedTask);
 				Logger.Debug("DoKeybindActionAsync KeybindBehaviour default");
 			}
 		}
@@ -674,7 +674,7 @@ namespace Manlaan.Mounts
 			{
 				Thing thingInCombat = _helper.GetQueuedThing();
 				Logger.Debug("HandleCombatChangeAsync Applied queued for out of combat: " + thingInCombat?.Name);
-				await (thingInCombat?.DoAction() ?? Task.CompletedTask);
+				await (thingInCombat?.DoAction(unconditionallyDoAction: false) ?? Task.CompletedTask);
 			}
 			else
 			{

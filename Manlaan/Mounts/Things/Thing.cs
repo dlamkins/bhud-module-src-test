@@ -85,7 +85,7 @@ namespace Manlaan.Mounts.Things
 			CornerIcon = val;
 			((Control)CornerIcon).add_Click((EventHandler<MouseEventArgs>)async delegate
 			{
-				await DoAction();
+				await DoAction(unconditionallyDoAction: false);
 			});
 		}
 
@@ -98,9 +98,13 @@ namespace Manlaan.Mounts.Things
 			}
 		}
 
-		public async Task DoAction()
+		public async Task DoAction(bool unconditionallyDoAction)
 		{
-			if (GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat() && Module._settingEnableMountQueueing.get_Value() && !IsUsableInCombat())
+			if (unconditionallyDoAction)
+			{
+				await Helper.TriggerKeybind(KeybindingSetting);
+			}
+			else if (GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat() && Module._settingEnableMountQueueing.get_Value() && !IsUsableInCombat())
 			{
 				Logger.Debug("DoAction Set queued for out of combat: " + Name);
 				QueuedTimestamp = DateTime.UtcNow;

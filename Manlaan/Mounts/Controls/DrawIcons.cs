@@ -111,7 +111,7 @@ namespace Manlaan.Mounts.Controls
 				((Control)val).set_BasicTooltipText(thing.DisplayName);
 				((Control)val).add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)async delegate
 				{
-					await thing.DoAction();
+					await thing.DoAction(unconditionallyDoAction: false);
 				});
 				if (_iconThingSettings.Orientation.get_Value() == IconOrientation.Horizontal)
 				{
