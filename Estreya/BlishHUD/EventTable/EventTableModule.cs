@@ -309,8 +309,8 @@ namespace Estreya.BlishHUD.EventTable
 					}
 				}
 			}
-			DynamicEventHandler.Update(gameTime);
-			_contextManager.Update(gameTime);
+			DynamicEventHandler?.Update(gameTime);
+			_contextManager?.Update(gameTime);
 			UpdateUtil.Update(CheckDrawerSettings, gameTime, _checkDrawerSettingInterval.TotalMilliseconds, ref _lastCheckDrawerSettings);
 			UpdateUtil.UpdateAsync(LoadEvents, gameTime, _updateEventsInterval.TotalMilliseconds, _lastEventUpdate);
 		}
