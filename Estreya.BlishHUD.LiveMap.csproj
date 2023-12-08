@@ -15,6 +15,9 @@
   <ItemGroup>
     <Reference Include="MonoGame.Framework" />
     <Reference Include="Blish HUD" />
+    <Reference Include="SpriteFontPlus">
+      <HintPath>..\..\working\SpriteFontPlus.dll</HintPath>
+    </Reference>
     <Reference Include="Gw2Sharp" />
     <Reference Include="MonoGame.Extended" />
     <Reference Include="System.ServiceModel" />
@@ -28,12 +31,13 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\working\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="System.Net.Http" />
     <Reference Include="SemVer" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Core" />
     <Reference Include="Octokit">
       <HintPath>..\..\working\Octokit.dll</HintPath>
     </Reference>
-    <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="SocketIOClient">
       <HintPath>..\..\working\SocketIOClient.dll</HintPath>
@@ -45,6 +49,7 @@
       <HintPath>..\..\working\jose-jwt.dll</HintPath>
     </Reference>
     <Reference Include="System.Security" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="Flurl">
       <HintPath>..\..\working\Flurl.dll</HintPath>
     </Reference>

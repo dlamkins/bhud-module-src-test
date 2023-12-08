@@ -45,6 +45,8 @@ namespace Estreya.BlishHUD.Shared.Controls
 
 		private bool _resizeIcon;
 
+		private bool _drawBackground = true;
+
 		public string Text
 		{
 			get
@@ -81,6 +83,18 @@ namespace Estreya.BlishHUD.Shared.Controls
 			}
 		}
 
+		public bool DrawBackground
+		{
+			get
+			{
+				return _drawBackground;
+			}
+			set
+			{
+				((Control)this).SetProperty<bool>(ref _drawBackground, value, true, "DrawBackground");
+			}
+		}
+
 		public BitmapFont Font
 		{
 			get
@@ -103,11 +117,11 @@ namespace Estreya.BlishHUD.Shared.Controls
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 			base._textColor = Color.get_Black();
 			base._horizontalAlignment = (HorizontalAlignment)0;
 			base._verticalAlignment = (VerticalAlignment)1;
@@ -208,35 +222,38 @@ namespace Estreya.BlishHUD.Shared.Controls
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0183: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0188: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
-			if (((Control)this)._enabled)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0187: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0193: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
+			if (DrawBackground)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _textureButtonIdle, new Rectangle(3, 3, ((Control)this)._size.X - 6, ((Control)this)._size.Y - 5), (Rectangle?)new Rectangle(AnimationState * 350, 0, 350, 20));
+				if (((Control)this)._enabled)
+				{
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _textureButtonIdle, new Rectangle(3, 3, ((Control)this)._size.X - 6, ((Control)this)._size.Y - 5), (Rectangle?)new Rectangle(AnimationState * 350, 0, 350, 20));
+				}
+				else
+				{
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(3, 3, ((Control)this)._size.X - 6, ((Control)this)._size.Y - 5), Color.FromNonPremultiplied(121, 121, 121, 255));
+				}
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _textureButtonBorder, new Rectangle(2, 0, ((Control)this).get_Width() - 5, 4), (Rectangle?)new Rectangle(0, 0, 1, 4));
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _textureButtonBorder, new Rectangle(((Control)this).get_Width() - 4, 2, 4, ((Control)this).get_Height() - 3), (Rectangle?)new Rectangle(0, 1, 4, 1));
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _textureButtonBorder, new Rectangle(3, ((Control)this).get_Height() - 4, ((Control)this).get_Width() - 6, 4), (Rectangle?)new Rectangle(1, 0, 1, 4));
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _textureButtonBorder, new Rectangle(0, 2, 4, ((Control)this).get_Height() - 3), (Rectangle?)new Rectangle(0, 3, 4, 1));
 			}
-			else
-			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(3, 3, ((Control)this)._size.X - 6, ((Control)this)._size.Y - 5), Color.FromNonPremultiplied(121, 121, 121, 255));
-			}
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _textureButtonBorder, new Rectangle(2, 0, ((Control)this).get_Width() - 5, 4), (Rectangle?)new Rectangle(0, 0, 1, 4));
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _textureButtonBorder, new Rectangle(((Control)this).get_Width() - 4, 2, 4, ((Control)this).get_Height() - 3), (Rectangle?)new Rectangle(0, 1, 4, 1));
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _textureButtonBorder, new Rectangle(3, ((Control)this).get_Height() - 4, ((Control)this).get_Width() - 6, 4), (Rectangle?)new Rectangle(1, 0, 1, 4));
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _textureButtonBorder, new Rectangle(0, 2, 4, ((Control)this).get_Height() - 3), (Rectangle?)new Rectangle(0, 3, 4, 1));
 			if (_icon != null)
 			{
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_icon), _layoutIconBounds);

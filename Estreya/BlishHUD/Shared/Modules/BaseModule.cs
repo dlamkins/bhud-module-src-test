@@ -26,6 +26,7 @@ using Estreya.BlishHUD.Shared.Models;
 using Estreya.BlishHUD.Shared.MumbleInfo.Map;
 using Estreya.BlishHUD.Shared.Security;
 using Estreya.BlishHUD.Shared.Services;
+using Estreya.BlishHUD.Shared.Services.TradingPost;
 using Estreya.BlishHUD.Shared.Settings;
 using Estreya.BlishHUD.Shared.UI.Views;
 using Estreya.BlishHUD.Shared.UI.Views.Settings;
@@ -44,7 +45,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected const string FILE_BLISH_ROOT_URL = "https://files.estreya.de/blish-hud";
 
-		protected const string API_ROOT_URL = "https://blish-hud.api.estreya.de";
+		protected const string API_ROOT_URL = "https://api.estreya.de/blish-hud";
 
 		protected const string GITHUB_OWNER = "Tharylia";
 
@@ -68,15 +69,19 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected string MODULE_FILE_URL => "https://files.estreya.de/blish-hud/" + UrlModuleName;
 
-		protected string MODULE_API_URL => "https://blish-hud.api.estreya.de/v" + API_VERSION_NO + "/" + UrlModuleName;
+		protected string MODULE_API_URL => "https://api.estreya.de/blish-hud/v" + API_VERSION_NO + "/" + UrlModuleName;
 
 		protected GitHubHelper GithubHelper { get; private set; }
 
 		protected PasswordManager PasswordManager { get; private set; }
 
-		public abstract string UrlModuleName { get; }
+		protected abstract string UrlModuleName { get; }
 
 		protected abstract string API_VERSION_NO { get; }
+
+		protected virtual bool FailIfBackendDown => false;
+
+		protected virtual bool EnableMetrics => false;
 
 		public bool IsPrerelease
 		{
@@ -100,43 +105,47 @@ namespace Estreya.BlishHUD.Shared.Modules
 		protected bool ShowUI { get; private set; } = true;
 
 
-		public TSettings ModuleSettings { get; private set; }
+		protected TSettings ModuleSettings { get; private set; }
 
 		protected CornerIcon CornerIcon { get; set; }
 
 		protected TabbedWindow SettingsWindow { get; private set; }
 
-		public virtual BitmapFont Font => GameService.Content.get_DefaultFont16();
+		protected virtual BitmapFont Font => GameService.Content.get_DefaultFont16();
 
-		public IconService IconService { get; private set; }
+		protected IconService IconService { get; private set; }
 
-		public TranslationService TranslationService { get; private set; }
+		protected TranslationService TranslationService { get; private set; }
 
-		public SettingEventService SettingEventService { get; private set; }
+		protected SettingEventService SettingEventService { get; private set; }
 
-		public NewsService NewsService { get; private set; }
+		protected NewsService NewsService { get; private set; }
 
-		public WorldbossService WorldbossService { get; private set; }
+		protected WorldbossService WorldbossService { get; private set; }
 
-		public MapchestService MapchestService { get; private set; }
+		protected MapchestService MapchestService { get; private set; }
 
-		public PointOfInterestService PointOfInterestService { get; private set; }
+		protected PointOfInterestService PointOfInterestService { get; private set; }
 
-		public AccountService AccountService { get; private set; }
+		protected AccountService AccountService { get; private set; }
 
-		public SkillService SkillService { get; private set; }
+		protected SkillService SkillService { get; private set; }
 
-		public TradingPostService TradingPostService { get; private set; }
+		protected PlayerTransactionsService PlayerTransactionsService { get; private set; }
 
-		public ItemService ItemService { get; private set; }
+		protected TransactionsService TransactionsService { get; private set; }
 
-		public ArcDPSService ArcDPSService { get; private set; }
+		protected ItemService ItemService { get; private set; }
 
-		public BlishHudApiService BlishHUDAPIService { get; private set; }
+		protected ArcDPSService ArcDPSService { get; private set; }
 
-		public AchievementService AchievementService { get; private set; }
+		protected BlishHudApiService BlishHUDAPIService { get; private set; }
 
-		public AccountAchievementService AccountAchievementService { get; private set; }
+		protected AchievementService AchievementService { get; private set; }
+
+		protected AccountAchievementService AccountAchievementService { get; private set; }
+
+		protected MetricsService MetricsService { get; private set; }
 
 		protected abstract int CornerIconPriority { get; }
 
@@ -194,8 +203,11 @@ namespace Estreya.BlishHUD.Shared.Modules
 		protected override async Task LoadAsync()
 		{
 			await ThrowIfModuleInvalid(showScreenNotification: true);
-			Logger.Debug("Initialize states");
 			await Task.Factory.StartNew((Func<Task>)InitializeServices, TaskCreationOptions.LongRunning).Unwrap();
+			if (EnableMetrics)
+			{
+				await MetricsService.AskMetricsConsent();
+			}
 			GithubHelper = new GitHubHelper("Tharylia", "Blish-HUD-Modules", "Iv1.9e4dc29d43243704", ((Module)this).get_Name(), PasswordManager, IconService, TranslationService, ModuleSettings);
 			ModuleSettings.UpdateLocalization(TranslationService);
 			ModuleSettings.RegisterCornerIcon.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)RegisterCornerIcon_SettingChanged);
@@ -203,26 +215,53 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		private async Task ThrowIfModuleInvalid(bool showScreenNotification)
 		{
-			IFlurlRequest flurlRequest = GetFlurlClient().Request(MODULE_API_URL, "validate");
-			flurlRequest.AllowAnyHttpStatus();
-			ModuleValidationRequest data = new ModuleValidationRequest
+			IFlurlRequest request = GetFlurlClient().Request(MODULE_API_URL, "validate").AllowAnyHttpStatus();
+			ModuleValidationRequest moduleValidationRequest = default(ModuleValidationRequest);
+			moduleValidationRequest.Version = ((Module)this).get_Version();
+			ModuleValidationRequest data = moduleValidationRequest;
+			HttpResponseMessage response = null;
+			try
 			{
-				Version = ((Module)this).get_Version()
-			};
-			HttpResponseMessage response = await flurlRequest.PostJsonAsync(data, default(CancellationToken), (HttpCompletionOption)0);
-			if (response.get_IsSuccessStatusCode() || response.get_StatusCode() == HttpStatusCode.NotFound)
+				response = await request.PostJsonAsync(data, default(CancellationToken), (HttpCompletionOption)0);
+			}
+			catch (Exception ex)
+			{
+				Logger.Debug(ex, "Failed to validate module.");
+				if (FailIfBackendDown)
+				{
+					throw new ModuleBackendUnavailableException();
+				}
+			}
+			if (response == null || response.get_IsSuccessStatusCode() || response.get_StatusCode() == HttpStatusCode.NotFound)
 			{
 				return;
 			}
-			ModuleValidationResponse validationResponse = await response.GetJsonAsync<ModuleValidationResponse>();
+			if (response.get_StatusCode() != HttpStatusCode.Forbidden)
+			{
+				string content = await response.get_Content().ReadAsStringAsync();
+				throw new ModuleBackendUnavailableException($"Module validation failed with unexpected status code {response.get_StatusCode()}: {content}");
+			}
+			ModuleValidationResponse validationResponse;
+			try
+			{
+				validationResponse = await response.GetJsonAsync<ModuleValidationResponse>();
+			}
+			catch (Exception)
+			{
+				throw new ModuleBackendUnavailableException("Could not read module validation response: " + await response.get_Content().ReadAsStringAsync());
+			}
 			if (showScreenNotification)
 			{
-				ScreenNotification.ShowNotification(new List<string>
+				List<string> messages = new List<string>
 				{
 					"[" + ((Module)this).get_Name() + "]",
-					"The current module version is invalid!",
-					validationResponse.Message ?? response.get_ReasonPhrase() ?? "Unknown"
-				}.ToArray(), ScreenNotification.NotificationType.Error, null, 10);
+					"The current module version is invalid!"
+				};
+				if (!string.IsNullOrWhiteSpace(validationResponse.Message) || !string.IsNullOrWhiteSpace(response.get_ReasonPhrase()))
+				{
+					messages.Add(validationResponse.Message ?? response.get_ReasonPhrase());
+				}
+				ScreenNotification.ShowNotification(messages.ToArray(), ScreenNotification.NotificationType.Error, null, 10);
 			}
 			throw new ModuleInvalidException(validationResponse.Message);
 		}
@@ -236,6 +275,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		private async Task InitializeServices()
 		{
+			Logger.Debug("Initialize states");
 			string directoryName = GetDirectoryName();
 			string directoryPath = null;
 			if (!string.IsNullOrWhiteSpace(directoryName))
@@ -252,7 +292,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 					{
 						throw new ArgumentNullException("PasswordManager");
 					}
-					BlishHUDAPIService = new BlishHudApiService(configurations.BlishHUDAPI, ModuleSettings.BlishAPIUsername, PasswordManager, GetFlurlClient(), "https://blish-hud.api.estreya.de", API_VERSION_NO);
+					BlishHUDAPIService = new BlishHudApiService(configurations.BlishHUDAPI, ModuleSettings.BlishAPIUsername, PasswordManager, GetFlurlClient(), "https://api.estreya.de/blish-hud", API_VERSION_NO);
 					_services.Add(BlishHUDAPIService);
 				}
 				if (configurations.Account.Enabled)
@@ -285,15 +325,26 @@ namespace Estreya.BlishHUD.Shared.Modules
 					Enabled = true
 				}, GetFlurlClient(), MODULE_FILE_URL);
 				_services.Add(NewsService);
+				MetricsService = new MetricsService(new ServiceConfiguration
+				{
+					Enabled = true,
+					AwaitLoading = true
+				}, GetFlurlClient(), "https://api.estreya.de/blish-hud", ((Module)this).get_Name(), ((Module)this).get_Namespace(), ModuleSettings, IconService);
+				_services.Add(MetricsService);
 				if (configurations.Items.Enabled)
 				{
 					ItemService = new ItemService(configurations.Items, Gw2ApiManager, directoryPath);
 					_services.Add(ItemService);
 				}
-				if (configurations.TradingPost.Enabled)
+				if (configurations.PlayerTransactions.Enabled)
 				{
-					TradingPostService = new TradingPostService(configurations.TradingPost, Gw2ApiManager, ItemService);
-					_services.Add(TradingPostService);
+					PlayerTransactionsService = new PlayerTransactionsService(configurations.PlayerTransactions, ItemService, Gw2ApiManager);
+					_services.Add(PlayerTransactionsService);
+				}
+				if (configurations.Transactions.Enabled)
+				{
+					TransactionsService = new TransactionsService(configurations.Transactions, ItemService, Gw2ApiManager);
+					_services.Add(TransactionsService);
 				}
 				if (configurations.Worldbosses.Enabled)
 				{
@@ -509,24 +560,25 @@ namespace Estreya.BlishHUD.Shared.Modules
 			{
 				TabbedWindow tabbedWindow2 = (SettingsWindow = WindowUtil.CreateTabbedWindow(ModuleSettings, ((Module)this).get_Name(), ((object)this).GetType(), Guid.Parse("6bd04be4-dc19-4914-a2c3-8160ce76818b"), IconService, GetEmblem()));
 			}
-			SettingsWindow.Tabs.Add(new Tab(IconService.GetIcon("482926.png"), (Func<IView>)(() => (IView)(object)new NewsView(GetFlurlClient(), Gw2ApiManager, IconService, TranslationService, NewsService, GameService.Content.get_DefaultFont16())
+			SettingsWindow.Tabs.Add(new Tab(IconService.GetIcon("482926.png"), (Func<IView>)(() => (IView)(object)new NewsView(GetFlurlClient(), Gw2ApiManager, IconService, TranslationService, NewsService)
 			{
 				DefaultColor = ModuleSettings.DefaultGW2Color
 			}), "News", (int?)null));
 			OnSettingWindowBuild(SettingsWindow);
-			SettingsWindow.Tabs.Add(new Tab(IconService.GetIcon("156331.png"), (Func<IView>)(() => (IView)(object)new DonationView(GetFlurlClient(), Gw2ApiManager, IconService, TranslationService, GameService.Content.get_DefaultFont16())
+			SettingsWindow.Tabs.Add(new Tab(IconService.GetIcon("156331.png"), (Func<IView>)(() => (IView)(object)new DonationView(GetFlurlClient(), Gw2ApiManager, IconService, TranslationService)
 			{
 				DefaultColor = ModuleSettings.DefaultGW2Color
 			}), "Donations", (int?)null));
 			if (Debug)
 			{
-				SettingsWindow.Tabs.Add(new Tab(IconService.GetIcon("155052.png"), (Func<IView>)(() => (IView)(object)new ServiceSettingsView(_services, Gw2ApiManager, IconService, TranslationService, SettingEventService, Font)
+				SettingsWindow.Tabs.Add(new Tab(IconService.GetIcon("155052.png"), (Func<IView>)(() => (IView)(object)new ServiceSettingsView(_services, Gw2ApiManager, IconService, TranslationService, SettingEventService)
 				{
 					DefaultColor = ModuleSettings.DefaultGW2Color
 				}), "Debug", (int?)null));
 			}
 			Logger.Debug("Finished building settings window.");
 			HandleCornerIcon(ModuleSettings.RegisterCornerIcon.get_Value());
+			MetricsService.SendMetricAsync("loaded");
 		}
 
 		protected abstract AsyncTexture2D GetEmblem();
@@ -717,7 +769,8 @@ namespace Estreya.BlishHUD.Shared.Modules
 				PointOfInterestService = null;
 				SettingEventService = null;
 				SkillService = null;
-				TradingPostService = null;
+				PlayerTransactionsService = null;
+				TransactionsService = null;
 				TranslationService = null;
 			}
 			Logger.Debug("Unloaded states.");

@@ -38,6 +38,7 @@ namespace Estreya.BlishHUD.Shared.Controls.World
 				BasicEffect val2 = val;
 				RenderEffect = val;
 			}
+			RenderEffect.set_VertexColorEnabled(true);
 			InternalRender(graphicsDevice, world, camera);
 		}
 

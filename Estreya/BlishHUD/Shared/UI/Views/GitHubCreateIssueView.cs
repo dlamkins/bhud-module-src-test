@@ -6,7 +6,6 @@ using Estreya.BlishHUD.Shared.Controls;
 using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Threading.Events;
 using Microsoft.Xna.Framework;
-using MonoGame.Extended.BitmapFonts;
 
 namespace Estreya.BlishHUD.Shared.UI.Views
 {
@@ -22,14 +21,14 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		public event EventHandler CancelClicked;
 
-		public GitHubCreateIssueView(string moduleName, IconService iconService, TranslationService translationService, BitmapFont font = null)
-			: base(null, iconService, translationService, font)
+		public GitHubCreateIssueView(string moduleName, IconService iconService, TranslationService translationService)
+			: base(null, iconService, translationService)
 		{
 			_moduleName = moduleName;
 		}
 
-		public GitHubCreateIssueView(string moduleName, IconService iconService, TranslationService translationService, BitmapFont font = null, string title = null, string message = null)
-			: this(moduleName, iconService, translationService, font)
+		public GitHubCreateIssueView(string moduleName, IconService iconService, TranslationService translationService, string title = null, string message = null)
+			: this(moduleName, iconService, translationService)
 		{
 			_title = title;
 			_message = message;

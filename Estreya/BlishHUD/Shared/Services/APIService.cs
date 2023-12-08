@@ -30,6 +30,8 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		public bool Loading { get; protected set; }
 
+		public DateTimeOffset LastUpdated { get; protected set; }
+
 		public string ProgressText { get; private set; } = string.Empty;
 
 
@@ -73,6 +75,12 @@ namespace Estreya.BlishHUD.Shared.Services
 		{
 		}
 
+		public override Task Reload()
+		{
+			_timeSinceUpdate.Value = 0.0;
+			return base.Reload();
+		}
+
 		protected sealed override void InternalUpdate(GameTime gameTime)
 		{
 			if (Configuration.UpdateInterval != Timeout.InfiniteTimeSpan)
@@ -91,12 +99,12 @@ namespace Estreya.BlishHUD.Shared.Services
 			await LoadFromAPI();
 		}
 
-		protected async Task LoadFromAPI(bool resetCompletion = true)
+		protected async Task<bool> LoadFromAPI(bool resetCompletion = true)
 		{
 			if (!_loadingLock.IsFree())
 			{
 				Logger.Warn("Tried to load again while already loading.");
-				return;
+				return false;
 			}
 			using (await _loadingLock.LockAsync())
 			{
@@ -109,8 +117,9 @@ namespace Estreya.BlishHUD.Shared.Services
 				{
 					IProgress<string> progress = new Progress<string>(ReportProgress);
 					progress.Report("Loading " + GetType().Name);
-					await FetchFromAPI(_apiManager, progress);
+					bool result = await FetchFromAPI(_apiManager, progress);
 					SignalUpdated();
+					return result;
 				}
 				finally
 				{
@@ -125,10 +134,11 @@ namespace Estreya.BlishHUD.Shared.Services
 			ProgressText = status;
 		}
 
-		protected abstract Task FetchFromAPI(Gw2ApiManager apiManager, IProgress<string> progress);
+		protected abstract Task<bool> FetchFromAPI(Gw2ApiManager apiManager, IProgress<string> progress);
 
 		protected void SignalUpdated()
 		{
+			LastUpdated = DateTimeOffset.UtcNow;
 			this.Updated?.Invoke(this, EventArgs.Empty);
 		}
 
@@ -178,18 +188,18 @@ namespace Estreya.BlishHUD.Shared.Services
 			return Task.CompletedTask;
 		}
 
-		protected override async Task FetchFromAPI(Gw2ApiManager apiManager, IProgress<string> progress)
+		protected override async Task<bool> FetchFromAPI(Gw2ApiManager apiManager, IProgress<string> progress)
 		{
-			Logger.Info("Check for api objects.");
+			Logger.Debug("Check for api objects.");
 			if (apiManager == null)
 			{
 				Logger.Warn("API Manager is null");
-				return;
+				return false;
 			}
 			if (base.Configuration.NeededPermissions.Count > 0 && !apiManager.HasPermission((TokenPermission)1))
 			{
 				Logger.Debug("No token yet.");
-				return;
+				return false;
 			}
 			try
 			{
@@ -201,53 +211,63 @@ namespace Estreya.BlishHUD.Shared.Services
 					if (!_apiManager.HasPermissions((IEnumerable<TokenPermission>)base.Configuration.NeededPermissions))
 					{
 						Logger.Warn("API Manager does not have needed permissions: {0}", new object[1] { base.Configuration.NeededPermissions.Humanize() });
-						return;
+						return false;
 					}
 					List<T> apiObjects = await Fetch(apiManager, progress, base.CancellationToken).ConfigureAwait(continueOnCapturedContext: false);
 					Logger.Debug("API returned {0} objects.", new object[1] { apiObjects.Count });
 					APIObjectList.AddRange(apiObjects);
-					progress.Report($"Check what api objects are new.. 0/{apiObjects.Count}");
-					for (int j = 0; j < apiObjects.Count; j++)
+					if (this.APIObjectAdded != null)
 					{
-						progress.Report($"Check what api objects are new.. {j}/{apiObjects.Count}");
-						T apiObject2 = apiObjects[j];
-						if (!oldAPIObjectList.Any((T oldApiObject) => oldApiObject.GetHashCode() == apiObject2.GetHashCode()))
+						progress.Report($"Check what api objects are new.. 0/{apiObjects.Count}");
+						for (int j = 0; j < apiObjects.Count; j++)
 						{
-							if (apiObjects.Count <= 25)
+							progress.Report($"Check what api objects are new.. {j}/{apiObjects.Count}");
+							T apiObject2 = apiObjects[j];
+							if (!oldAPIObjectList.Any((T oldApiObject) => oldApiObject.GetHashCode() == apiObject2.GetHashCode()))
 							{
-								Logger.Debug($"API Object added: {apiObject2}");
-							}
-							try
-							{
-								this.APIObjectAdded?.Invoke(this, apiObject2);
-							}
-							catch (Exception ex2)
-							{
-								Logger.Error(ex2, "Error handling api object added event:");
+								if (apiObjects.Count <= 25)
+								{
+									Logger.Debug($"API Object added: {apiObject2}");
+								}
+								try
+								{
+									this.APIObjectAdded?.Invoke(this, apiObject2);
+								}
+								catch (Exception ex3)
+								{
+									Logger.Error(ex3, "Error handling api object added event:");
+								}
 							}
 						}
 					}
-					progress.Report($"Check what api objects are removed.. 0/{oldAPIObjectList.Count}");
-					for (int i = oldAPIObjectList.Count - 1; i >= 0; i--)
+					if (this.APIObjectRemoved != null)
 					{
-						progress.Report($"Check what api objects are removed.. {oldAPIObjectList.Count - i}/{oldAPIObjectList.Count}");
-						T oldApiObject2 = oldAPIObjectList[i];
-						if (!apiObjects.Any((T apiObject) => apiObject.GetHashCode() == oldApiObject2.GetHashCode()))
+						progress.Report($"Check what api objects are removed.. 0/{oldAPIObjectList.Count}");
+						for (int i = oldAPIObjectList.Count - 1; i >= 0; i--)
 						{
-							Logger.Debug($"API Object disappeared from the api: {oldApiObject2}");
-							oldAPIObjectList.Remove(oldApiObject2);
-							try
+							progress.Report($"Check what api objects are removed.. {oldAPIObjectList.Count - i}/{oldAPIObjectList.Count}");
+							T oldApiObject2 = oldAPIObjectList[i];
+							if (!apiObjects.Any((T apiObject) => apiObject.GetHashCode() == oldApiObject2.GetHashCode()))
 							{
-								this.APIObjectRemoved?.Invoke(this, oldApiObject2);
-							}
-							catch (Exception ex3)
-							{
-								Logger.Error(ex3, "Error handling api object removed event:");
+								if (apiObjects.Count <= 25)
+								{
+									Logger.Debug($"API Object disappeared from the api: {oldApiObject2}");
+								}
+								oldAPIObjectList.Remove(oldApiObject2);
+								try
+								{
+									this.APIObjectRemoved?.Invoke(this, oldApiObject2);
+								}
+								catch (Exception ex2)
+								{
+									Logger.Error(ex2, "Error handling api object removed event:");
+								}
 							}
 						}
 					}
 				}
-				Logger.Info("Check for api objects finished.");
+				Logger.Debug("Check for api objects finished.");
+				return true;
 			}
 			catch (MissingScopesException val)
 			{
@@ -263,6 +283,7 @@ namespace Estreya.BlishHUD.Shared.Services
 			{
 				Logger.Warn(ex, "Error updating api objects:");
 			}
+			return false;
 		}
 
 		protected abstract Task<List<T>> Fetch(Gw2ApiManager apiManager, IProgress<string> progress, CancellationToken cancellationToken);

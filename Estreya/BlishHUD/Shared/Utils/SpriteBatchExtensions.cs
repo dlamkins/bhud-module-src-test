@@ -1,4 +1,6 @@
 using System.IO;
+using System.Linq;
+using System.Text;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Estreya.BlishHUD.Shared.Extensions;
@@ -10,9 +12,9 @@ using MonoGame.Extended.BitmapFonts;
 
 namespace Estreya.BlishHUD.Shared.Utils
 {
-	public static class SpriteBatchUtil
+	public static class SpriteBatchExtensions
 	{
-		private static readonly Logger Logger = Logger.GetLogger(typeof(SpriteBatchUtil));
+		private static readonly Logger Logger = Logger.GetLogger(typeof(SpriteBatchExtensions));
 
 		public static void Draw(this SpriteBatch spriteBatch, Texture2D texture, RectangleF destinationRectangle)
 		{
@@ -68,6 +70,34 @@ namespace Estreya.BlishHUD.Shared.Utils
 				spriteBatch.DrawRectangleOnCtrl(null, baseTexture, new RectangleF(((RectangleF)(ref coords)).get_Left(), ((RectangleF)(ref coords)).get_Bottom() - (float)borderSize, coords.Width, (float)borderSize), borderColor);
 				spriteBatch.DrawRectangleOnCtrl(null, baseTexture, new RectangleF(((RectangleF)(ref coords)).get_Left(), ((RectangleF)(ref coords)).get_Top(), (float)borderSize, coords.Height), borderColor);
 			}
+		}
+
+		public static void DrawString(this SpriteBatch spriteBatch, string text, SpriteFont font, RectangleF destinationRectangle, Color color, bool wrap = false, HorizontalAlignment horizontalAlignment = 0, VerticalAlignment verticalAlignment = 1)
+		{
+			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0004: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			spriteBatch.DrawString(text, font, destinationRectangle, color, wrap, stroke: false, 1, horizontalAlignment, verticalAlignment);
+		}
+
+		public static void DrawString(this SpriteBatch spriteBatch, string text, SpriteFont font, RectangleF destinationRectangle, Color color, bool wrap, bool stroke, int strokeDistance = 1, HorizontalAlignment horizontalAlignment = 0, VerticalAlignment verticalAlignment = 1)
+		{
+			//IL_0004: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			spriteBatch.DrawStringOnCtrl(null, text, font, destinationRectangle, color, wrap, stroke, strokeDistance, horizontalAlignment, verticalAlignment);
+		}
+
+		public static void DrawString(this SpriteBatch spriteBatch, string text, SpriteFont font, RectangleF destinationRectangle, Color color, bool wrap, bool stroke, int strokeDistance, Color strokeColor, HorizontalAlignment horizontalAlignment = 0, VerticalAlignment verticalAlignment = 1)
+		{
+			//IL_0004: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			spriteBatch.DrawStringOnCtrl(null, text, font, destinationRectangle, color, wrap, stroke, strokeDistance, strokeColor, horizontalAlignment, verticalAlignment);
 		}
 
 		public static void DrawString(this SpriteBatch spriteBatch, string text, BitmapFont font, RectangleF destinationRectangle, Color color, bool wrap = false, HorizontalAlignment horizontalAlignment = 0, VerticalAlignment verticalAlignment = 1)
@@ -210,6 +240,200 @@ namespace Estreya.BlishHUD.Shared.Utils
 			}
 		}
 
+		public static void DrawStringOnCtrl(this SpriteBatch spriteBatch, Control ctrl, string text, SpriteFont font, RectangleF destinationRectangle, Color color, bool wrap = false, HorizontalAlignment horizontalAlignment = 0, VerticalAlignment verticalAlignment = 1)
+		{
+			//IL_0004: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			spriteBatch.DrawStringOnCtrl(ctrl, text, font, destinationRectangle, color, wrap, stroke: false, 1, horizontalAlignment, verticalAlignment);
+		}
+
+		public static void DrawStringOnCtrl(this SpriteBatch spriteBatch, Control ctrl, string text, SpriteFont font, RectangleF destinationRectangle, Color color, bool wrap, bool stroke, int strokeDistance = 1, HorizontalAlignment horizontalAlignment = 0, VerticalAlignment verticalAlignment = 1)
+		{
+			//IL_0004: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			spriteBatch.DrawStringOnCtrl(ctrl, text, font, destinationRectangle, color, wrap, stroke, strokeDistance, Color.get_Black(), horizontalAlignment, verticalAlignment);
+		}
+
+		private static string WrapTextSegment(SpriteFont spriteFont, string text, float maxLineWidth)
+		{
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+			string[] array = text.Split(' ');
+			StringBuilder stringBuilder = new StringBuilder();
+			float num = 0f;
+			float width = spriteFont.MeasureString(" ").X;
+			string[] array2 = array;
+			foreach (string text2 in array2)
+			{
+				Vector2 vector = spriteFont.MeasureString(text2);
+				if (num + vector.X < maxLineWidth)
+				{
+					stringBuilder.Append(text2 + " ");
+					num += vector.X + width;
+				}
+				else
+				{
+					stringBuilder.Append("\n" + text2 + " ");
+					num = vector.X + width;
+				}
+			}
+			return stringBuilder.ToString();
+		}
+
+		private static string WrapText(SpriteFont spriteFont, string text, float maxLineWidth)
+		{
+			if (string.IsNullOrEmpty(text))
+			{
+				return "";
+			}
+			return string.Join("\n", from s in text.Split('\n')
+				select WrapTextSegment(spriteFont, s, maxLineWidth));
+		}
+
+		public static void DrawStringOnCtrl(this SpriteBatch spriteBatch, Control ctrl, string text, SpriteFont font, RectangleF destinationRectangle, Color color, bool wrap, bool stroke, int strokeDistance, Color strokeColor, HorizontalAlignment horizontalAlignment = 0, VerticalAlignment verticalAlignment = 1)
+		{
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e9: Invalid comparison between Unknown and I4
+			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ee: Invalid comparison between Unknown and I4
+			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0112: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0119: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0125: Invalid comparison between Unknown and I4
+			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012a: Invalid comparison between Unknown and I4
+			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0155: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0183: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0224: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0229: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0244: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0249: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0263: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0268: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0279: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027e: Unknown result type (might be due to invalid IL or missing references)
+			if (string.IsNullOrEmpty(text))
+			{
+				return;
+			}
+			text = (wrap ? WrapText(font, text, destinationRectangle.Width) : text);
+			if ((int)horizontalAlignment != 0 && (wrap || text.Contains("\n")))
+			{
+				using (StringReader stringReader = new StringReader(text))
+				{
+					for (int i = 0; destinationRectangle.Height - (float)i > 0f; i += font.get_LineSpacing())
+					{
+						string text2;
+						if ((text2 = stringReader.ReadLine()) == null)
+						{
+							break;
+						}
+						spriteBatch.DrawStringOnCtrl(ctrl, text2, font, destinationRectangle.Add(0f, i, 0f, 0f), color, wrap, stroke, strokeDistance, horizontalAlignment, verticalAlignment);
+					}
+				}
+				return;
+			}
+			Vector2 vector = font.MeasureString(text);
+			destinationRectangle = ((ctrl != null) ? destinationRectangle.ToBounds(RectangleF.op_Implicit(ctrl.get_AbsoluteBounds())) : destinationRectangle);
+			float num = destinationRectangle.X;
+			float num2 = destinationRectangle.Y;
+			if ((int)horizontalAlignment != 1)
+			{
+				if ((int)horizontalAlignment == 2)
+				{
+					num += destinationRectangle.Width - vector.X;
+				}
+			}
+			else
+			{
+				num += destinationRectangle.Width / 2f - vector.X / 2f;
+			}
+			if ((int)verticalAlignment != 1)
+			{
+				if ((int)verticalAlignment == 2)
+				{
+					num2 += destinationRectangle.Height - vector.Y;
+				}
+			}
+			else
+			{
+				num2 += destinationRectangle.Height / 2f - vector.Y / 2f;
+			}
+			Vector2 vector2 = default(Vector2);
+			((Vector2)(ref vector2))._002Ector(num, num2);
+			float scale = ((ctrl != null) ? ctrl.AbsoluteOpacity() : 1f);
+			if (stroke)
+			{
+				spriteBatch.DrawString(font, text, Vector2Extension.OffsetBy(vector2, 0f, (float)(-strokeDistance)), strokeColor * scale);
+				spriteBatch.DrawString(font, text, Vector2Extension.OffsetBy(vector2, (float)strokeDistance, (float)(-strokeDistance)), strokeColor * scale);
+				spriteBatch.DrawString(font, text, Vector2Extension.OffsetBy(vector2, (float)strokeDistance, 0f), strokeColor * scale);
+				spriteBatch.DrawString(font, text, Vector2Extension.OffsetBy(vector2, (float)strokeDistance, (float)strokeDistance), strokeColor * scale);
+				spriteBatch.DrawString(font, text, Vector2Extension.OffsetBy(vector2, 0f, (float)strokeDistance), strokeColor * scale);
+				spriteBatch.DrawString(font, text, Vector2Extension.OffsetBy(vector2, (float)(-strokeDistance), (float)strokeDistance), strokeColor * scale);
+				spriteBatch.DrawString(font, text, Vector2Extension.OffsetBy(vector2, (float)(-strokeDistance), 0f), strokeColor * scale);
+				spriteBatch.DrawString(font, text, Vector2Extension.OffsetBy(vector2, (float)(-strokeDistance), (float)(-strokeDistance)), strokeColor * scale);
+			}
+			spriteBatch.DrawString(font, text, vector2, color * scale);
+		}
+
 		public static void DrawStringOnCtrl(this SpriteBatch spriteBatch, Control ctrl, string text, BitmapFont font, RectangleF destinationRectangle, Color color, bool wrap = false, HorizontalAlignment horizontalAlignment = 0, VerticalAlignment verticalAlignment = 1)
 		{
 			//IL_0004: Unknown result type (might be due to invalid IL or missing references)
@@ -227,6 +451,47 @@ namespace Estreya.BlishHUD.Shared.Utils
 			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 			spriteBatch.DrawStringOnCtrl(ctrl, text, font, destinationRectangle, color, wrap, stroke, strokeDistance, Color.get_Black(), horizontalAlignment, verticalAlignment);
+		}
+
+		private static string WrapTextSegment(BitmapFont spriteFont, string text, float maxLineWidth)
+		{
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			string[] array = text.Split(' ');
+			StringBuilder stringBuilder = new StringBuilder();
+			float num = 0f;
+			float width = spriteFont.MeasureString(" ").Width;
+			string[] array2 = array;
+			foreach (string text2 in array2)
+			{
+				Vector2 vector = Size2.op_Implicit(spriteFont.MeasureString(text2));
+				if (num + vector.X < maxLineWidth)
+				{
+					stringBuilder.Append(text2 + " ");
+					num += vector.X + width;
+				}
+				else
+				{
+					stringBuilder.Append("\n" + text2 + " ");
+					num = vector.X + width;
+				}
+			}
+			return stringBuilder.ToString();
+		}
+
+		private static string WrapText(BitmapFont spriteFont, string text, float maxLineWidth)
+		{
+			if (string.IsNullOrEmpty(text))
+			{
+				return "";
+			}
+			return string.Join("\n", from s in text.Split('\n')
+				select WrapTextSegment(spriteFont, s, maxLineWidth));
 		}
 
 		public static void DrawStringOnCtrl(this SpriteBatch spriteBatch, Control ctrl, string text, BitmapFont font, RectangleF destinationRectangle, Color color, bool wrap, bool stroke, int strokeDistance, Color strokeColor, HorizontalAlignment horizontalAlignment = 0, VerticalAlignment verticalAlignment = 1)
@@ -305,7 +570,7 @@ namespace Estreya.BlishHUD.Shared.Utils
 			{
 				return;
 			}
-			text = (wrap ? DrawUtil.WrapText(font, text, destinationRectangle.Width) : text);
+			text = (wrap ? WrapText(font, text, destinationRectangle.Width) : text);
 			if ((int)horizontalAlignment != 0 && (wrap || text.Contains("\n")))
 			{
 				using (StringReader stringReader = new StringReader(text))

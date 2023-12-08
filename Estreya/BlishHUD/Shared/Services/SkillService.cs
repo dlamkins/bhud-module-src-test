@@ -292,7 +292,7 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		public bool AddMissingSkill(int id, string name)
 		{
-			if (_missingSkillsFromAPIReportedByArcDPS.Any((MissingArcDPSSkill m) => m.ID == id))
+			if (_missingSkillsFromAPIReportedByArcDPS == null || _missingSkillsFromAPIReportedByArcDPS.Any((MissingArcDPSSkill m) => m.ID == id))
 			{
 				return false;
 			}
@@ -319,8 +319,8 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		public void RemoveMissingSkill(int id)
 		{
-			List<MissingArcDPSSkill> items = _missingSkillsFromAPIReportedByArcDPS.Where((MissingArcDPSSkill m) => m.ID == id).ToList();
-			if (!items.Any())
+			List<MissingArcDPSSkill> items = _missingSkillsFromAPIReportedByArcDPS?.Where((MissingArcDPSSkill m) => m.ID == id).ToList();
+			if (items == null || !items.Any())
 			{
 				return;
 			}

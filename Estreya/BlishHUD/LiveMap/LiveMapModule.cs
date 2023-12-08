@@ -63,9 +63,11 @@ namespace Estreya.BlishHUD.LiveMap
 
 		public string GuildId { get; private set; }
 
-		public override string UrlModuleName => "live-map";
+		protected override string UrlModuleName => "live-map";
 
 		protected override string API_VERSION_NO => "1";
+
+		protected override bool FailIfBackendDown => true;
 
 		protected override int CornerIconPriority => 1289351275;
 
@@ -80,6 +82,7 @@ namespace Estreya.BlishHUD.LiveMap
 			base.Initialize();
 			GlobalSocket = new SocketIO(LIVE_MAP_API_URL, new SocketIOOptions
 			{
+				Path = "/blish-hud/socket.io",
 				Transport = TransportProtocol.WebSocket
 			});
 			base.Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);

@@ -1,6 +1,6 @@
 using System.Windows.Forms;
 
-namespace Estreya.BlishHUD.Shared.Controls
+namespace Estreya.BlishHUD.Shared.Controls.Input
 {
 	public class ButtonDefinition
 	{

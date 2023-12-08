@@ -2,11 +2,13 @@ using System;
 using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Estreya.BlishHUD.Shared.Controls;
+using Estreya.BlishHUD.Shared.Controls.Input;
 using Estreya.BlishHUD.Shared.Security;
 using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Settings;
@@ -99,30 +101,21 @@ namespace Estreya.BlishHUD.Shared.Helpers
 					needNewToken = true;
 				}
 			}
-			if (!needNewToken)
+			if (needNewToken)
 			{
-				return;
-			}
-			OauthDeviceFlowRequest request = new OauthDeviceFlowRequest(_clientId);
-			OauthDeviceFlowResponse deviceFlowResponse = await _github.Oauth.InitiateDeviceFlow(request);
-			ScreenNotification screenNotification = new ScreenNotification("GITHUB: Enter the code " + deviceFlowResponse.UserCode, ScreenNotification.NotificationType.Info, null, TimeSpan.FromMinutes(15.0).Seconds);
-			((Control)screenNotification).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)screenNotification).set_Opacity(1f);
-			((Control)screenNotification).set_Visible(true);
-			ScreenNotification notification = screenNotification;
-			Process.Start(deviceFlowResponse.VerificationUri);
-			try
-			{
+				OauthDeviceFlowRequest request = new OauthDeviceFlowRequest(_clientId);
+				OauthDeviceFlowResponse deviceFlowResponse = await _github.Oauth.InitiateDeviceFlow(request);
+				Process.Start(deviceFlowResponse.VerificationUri);
+				if (await new ConfirmDialog("GitHub Login", "Enter the code \"" + deviceFlowResponse.UserCode + "\" in the opened GitHub browser window.", _iconService).ShowDialog() != DialogResult.OK)
+				{
+					throw new Exception("Login cancelled");
+				}
 				OauthToken token = await _github.Oauth.CreateAccessTokenForDeviceFlow(_clientId, deviceFlowResponse);
 				if (_passwordManager != null)
 				{
 					await _passwordManager.Save("github", Encoding.UTF8.GetBytes(token.AccessToken), silent: true);
 				}
 				_github.Credentials = new Credentials(token.AccessToken);
-			}
-			finally
-			{
-				((Control)notification).Dispose();
 			}
 		}
 
@@ -147,7 +140,7 @@ namespace Estreya.BlishHUD.Shared.Helpers
 		public void OpenIssueWindow(string title = null, string message = null)
 		{
 			UnloadIssueView();
-			_issueView = new GitHubCreateIssueView(_moduleName, _iconService, _translationService, GameService.Content.get_DefaultFont18(), title, message);
+			_issueView = new GitHubCreateIssueView(_moduleName, _iconService, _translationService, title, message);
 			_issueView.CreateClicked += new AsyncEventHandler<(string, string, string, bool)>(IssueView_CreateClicked);
 			_issueView.CancelClicked += IssueView_CancelClicked;
 			_window.Show((IView)(object)_issueView);

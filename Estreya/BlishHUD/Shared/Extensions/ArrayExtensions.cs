@@ -16,5 +16,22 @@ namespace Estreya.BlishHUD.Shared.Extensions
 				while (walker.Step());
 			}
 		}
+
+		public static void MoveEntry<T>(this T[] array, int oldIndex, int newIndex)
+		{
+			if (oldIndex != newIndex)
+			{
+				T tmp = array[oldIndex];
+				if (newIndex < oldIndex)
+				{
+					Array.Copy(array, newIndex, array, newIndex + 1, oldIndex - newIndex);
+				}
+				else
+				{
+					Array.Copy(array, oldIndex + 1, array, oldIndex, newIndex - oldIndex);
+				}
+				array[newIndex] = tmp;
+			}
+		}
 	}
 }

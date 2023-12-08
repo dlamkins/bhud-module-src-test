@@ -5,7 +5,6 @@ using Blish_HUD.Controls;
 using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.UI.Views;
-using MonoGame.Extended.BitmapFonts;
 
 namespace Estreya.BlishHUD.LiveMap.UI.Views
 {
@@ -17,8 +16,8 @@ namespace Estreya.BlishHUD.LiveMap.UI.Views
 
 		private readonly ModuleSettings _moduleSettings;
 
-		public SettingsView(Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService, ModuleSettings moduleSettings, Func<string> getGlobalUrl, Func<string> getGuildUrl, BitmapFont font = null)
-			: base(apiManager, iconService, translationService, settingEventService, font)
+		public SettingsView(Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService, ModuleSettings moduleSettings, Func<string> getGlobalUrl, Func<string> getGuildUrl)
+			: base(apiManager, iconService, translationService, settingEventService)
 		{
 			_moduleSettings = moduleSettings;
 			_getGlobalUrl = getGlobalUrl;

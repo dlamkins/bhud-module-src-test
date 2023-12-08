@@ -80,7 +80,7 @@ namespace Estreya.BlishHUD.Shared.Services
 			}
 		}
 
-		public async Task Reload()
+		public virtual async Task Reload()
 		{
 			if (!Running)
 			{
