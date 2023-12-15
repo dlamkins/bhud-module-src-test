@@ -60,10 +60,17 @@ namespace BhModule.Community.Pathing.State.UserResources
 			}
 			GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate(GraphicsDevice graphicsDevice)
 			{
-				FileStream fileStream = File.Open(trailOut, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-				FileStream fileStream2 = File.Open(markerOut, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-				DefaultTrailTexture.SwapTexture(TextureUtil.FromStreamPremultiplied(graphicsDevice, (Stream)fileStream));
-				DefaultMarkerTexture.SwapTexture(TextureUtil.FromStreamPremultiplied(graphicsDevice, (Stream)fileStream2));
+				try
+				{
+					FileStream fileStream = File.Open(trailOut, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+					FileStream fileStream2 = File.Open(markerOut, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+					DefaultTrailTexture.SwapTexture(TextureUtil.FromStreamPremultiplied(graphicsDevice, (Stream)fileStream));
+					DefaultMarkerTexture.SwapTexture(TextureUtil.FromStreamPremultiplied(graphicsDevice, (Stream)fileStream2));
+				}
+				catch (Exception ex3)
+				{
+					Logger.Warn(ex3, "Failed to load default textures from file.");
+				}
 			});
 		}
 	}

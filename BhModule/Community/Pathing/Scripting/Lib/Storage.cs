@@ -1,5 +1,4 @@
 using System;
-using FASTER.core;
 
 namespace BhModule.Community.Pathing.Scripting.Lib
 {
@@ -36,10 +35,7 @@ namespace BhModule.Community.Pathing.Scripting.Lib
 		public string UpsertValue(string ns, string name, string value)
 		{
 			string key = ValidateKey(ns, name);
-			using ClientSession<string, string, string, string, Empty, IFunctions<string, string, string, string, Empty>> session = _global.ScriptEngine.Module.PackInitiator.PackState.KvStates.GetSession();
-			session.Upsert(ref key, ref value, default(Empty), 0L);
-			_global.ScriptEngine.Module.PackInitiator.PackState.KvStates.Invalidate();
-			return value;
+			return _global.ScriptEngine.Module.PackInitiator.PackState.KvStates.UpsertValue(key, value);
 		}
 
 		public string UpsertValue(string name, string value)
@@ -50,10 +46,7 @@ namespace BhModule.Community.Pathing.Scripting.Lib
 		public string ReadValue(string ns, string name)
 		{
 			string key = ValidateKey(ns, name);
-			using ClientSession<string, string, string, string, Empty, IFunctions<string, string, string, string, Empty>> session = _global.ScriptEngine.Module.PackInitiator.PackState.KvStates.GetSession();
-			string output = null;
-			session.Read(ref key, ref output, default(Empty), 0L);
-			return output;
+			return _global.ScriptEngine.Module.PackInitiator.PackState.KvStates.ReadValue(key);
 		}
 
 		public string ReadValue(string name)
@@ -64,9 +57,7 @@ namespace BhModule.Community.Pathing.Scripting.Lib
 		public void DeleteValue(string ns, string name)
 		{
 			string key = ValidateKey(ns, name);
-			using ClientSession<string, string, string, string, Empty, IFunctions<string, string, string, string, Empty>> session = _global.ScriptEngine.Module.PackInitiator.PackState.KvStates.GetSession();
-			session.Delete(ref key, default(Empty), 0L);
-			_global.ScriptEngine.Module.PackInitiator.PackState.KvStates.Invalidate();
+			_global.ScriptEngine.Module.PackInitiator.PackState.KvStates.DeleteValue(key);
 		}
 
 		public void DeleteValue(string name)

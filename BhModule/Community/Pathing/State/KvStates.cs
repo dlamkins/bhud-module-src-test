@@ -1,24 +1,31 @@
 using System;
+using System.Collections.Concurrent;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 using BhModule.Community.Pathing.Utility;
-using FASTER.core;
+using Blish_HUD;
 using Microsoft.Xna.Framework;
+using Newtonsoft.Json;
 
 namespace BhModule.Community.Pathing.State
 {
 	public class KvStates : ManagedState
 	{
+		private static readonly Logger Logger = Logger.GetLogger<KvStates>();
+
+		private const string KVFILE = "kv.json";
+
 		private const double INTERVAL_CHECKPOINT = 5000.0;
 
 		private string _kvDir;
 
-		private FasterKV<string, string> _kvStore;
+		private string _kvFile;
 
 		private bool _dirty;
 
 		private double _lastCheckpointCheck = 5000.0;
+
+		private ConcurrentDictionary<string, string> _kvStore;
 
 		public KvStates(IRootPackState rootPackState)
 			: base(rootPackState)
@@ -28,26 +35,71 @@ namespace BhModule.Community.Pathing.State
 		protected override async Task<bool> Initialize()
 		{
 			_kvDir = DataDirUtil.GetSafeDataDir("kv");
-			IDevice defLog = Devices.CreateLogDevice(Path.Combine(_kvDir, "bkv.db"), preallocateFile: false, deleteOnClose: false, -1L);
-			IDevice objLog = Devices.CreateLogDevice(Path.Combine(_kvDir, "okv.db"), preallocateFile: false, deleteOnClose: false, -1L);
-			_kvStore = new FasterKV<string, string>(new FasterKVSettings<string, string>(_kvDir)
-			{
-				LogDevice = defLog,
-				ObjectLogDevice = objLog
-			});
-			try
-			{
-				await _kvStore.RecoverAsync(-1, undoNextVersion: true, -1L);
-			}
-			catch (Exception)
-			{
-			}
+			_kvFile = Path.Combine(_kvDir, "kv.json");
+			LoadKv();
 			return true;
 		}
 
-		public ClientSession<string, string, string, string, Empty, IFunctions<string, string, string, string, Empty>> GetSession()
+		private void LoadKv()
 		{
-			return _kvStore.NewSession(new SimpleFunctions<string, string>());
+			try
+			{
+				if (File.Exists(_kvFile))
+				{
+					_kvStore = JsonConvert.DeserializeObject<ConcurrentDictionary<string, string>>(File.ReadAllText(_kvFile)) ?? new ConcurrentDictionary<string, string>();
+				}
+				else
+				{
+					_kvStore = new ConcurrentDictionary<string, string>();
+				}
+			}
+			catch (Exception ex)
+			{
+				_kvStore = new ConcurrentDictionary<string, string>();
+				Logger.Warn(ex, "Failed to load kv.json.  Settings will not be restored!");
+			}
+		}
+
+		private async Task FlushKv(GameTime gameTime)
+		{
+			if (_dirty)
+			{
+				_dirty = false;
+				File.WriteAllText(_kvFile, JsonConvert.SerializeObject((object)_kvStore, (Formatting)1));
+			}
+		}
+
+		public string UpsertValue(string key, string value)
+		{
+			bool updated = false;
+			_kvStore.AddOrUpdate(key, value, delegate(string _, string existingVal)
+			{
+				if (existingVal != value)
+				{
+					updated = true;
+					return value;
+				}
+				return existingVal;
+			});
+			if (updated)
+			{
+				Invalidate();
+			}
+			return value;
+		}
+
+		public string ReadValue(string name)
+		{
+			_kvStore.TryGetValue(name, out var value);
+			return value;
+		}
+
+		public void DeleteValue(string key)
+		{
+			if (_kvStore.TryRemove(key, out var _))
+			{
+				Invalidate();
+			}
 		}
 
 		public void Invalidate()
@@ -61,24 +113,14 @@ namespace BhModule.Community.Pathing.State
 			await Initialize();
 		}
 
-		private async Task FlushCheckpoint(GameTime gameTime)
-		{
-			if (_dirty)
-			{
-				_dirty = false;
-				await _kvStore.TakeHybridLogCheckpointAsync(CheckpointType.FoldOver, tryIncremental: true, default(CancellationToken), -1L);
-			}
-		}
-
 		public override void Update(GameTime gameTime)
 		{
-			UpdateCadenceUtil.UpdateAsyncWithCadence(FlushCheckpoint, gameTime, 5000.0, ref _lastCheckpointCheck);
+			UpdateCadenceUtil.UpdateAsyncWithCadence(FlushKv, gameTime, 5000.0, ref _lastCheckpointCheck);
 		}
 
 		public override async Task Unload()
 		{
-			await _kvStore.CompleteCheckpointAsync();
-			_kvStore.Dispose();
+			await FlushKv(null);
 		}
 	}
 }
