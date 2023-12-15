@@ -131,12 +131,12 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
-			if (_packState.UserConfiguration.PackAllowInteractIcon.get_Value() && _activePathingEntity != null && !_activePathingEntity.IsFiltered(EntityRenderTarget.World))
+			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
+			if (GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && _packState.UserConfiguration.PackAllowInteractIcon.get_Value() && _activePathingEntity != null && !_activePathingEntity.IsFiltered(EntityRenderTarget.World))
 			{
 				float baseOpacity = 0.4f;
 				double tCTS = Math.Max(GameService.Overlay.get_CurrentGameTime().get_TotalGameTime().TotalSeconds - _subtleTimer, 0.05);

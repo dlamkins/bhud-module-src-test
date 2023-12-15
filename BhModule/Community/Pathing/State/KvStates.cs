@@ -71,7 +71,7 @@ namespace BhModule.Community.Pathing.State
 
 		public string UpsertValue(string key, string value)
 		{
-			bool updated = false;
+			bool updated = !_kvStore.ContainsKey(key);
 			_kvStore.AddOrUpdate(key, value, delegate(string _, string existingVal)
 			{
 				if (existingVal != value)
