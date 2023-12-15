@@ -79,7 +79,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected abstract string API_VERSION_NO { get; }
 
-		protected virtual bool FailIfBackendDown { get; }
+		protected virtual bool FailIfBackendDown => false;
 
 		protected virtual bool EnableMetrics => false;
 
@@ -292,7 +292,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 					{
 						throw new ArgumentNullException("PasswordManager");
 					}
-					BlishHUDAPIService = new BlishHudApiService(configurations.BlishHUDAPI, ModuleSettings.BlishAPIUsername, PasswordManager, GetFlurlClient(), "https://api.estreya.de/blish-hud", API_VERSION_NO);
+					BlishHUDAPIService = new BlishHudApiService(configurations.BlishHUDAPI, ModuleSettings.BlishAPIUsername, PasswordManager, GetFlurlClient(), "https://api.estreya.de/blish-hud");
 					_services.Add(BlishHUDAPIService);
 				}
 				if (configurations.Account.Enabled)

@@ -59,6 +59,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			FlowPanel flowPanel = val;
 			BuildEditEventSection(flowPanel);
 			RenderEmptyLine((Panel)(object)flowPanel);
+			BuildCustomEventSection(flowPanel);
+			RenderEmptyLine((Panel)(object)flowPanel);
 			BuildSettingSliderSection(flowPanel);
 			RenderEmptyLine((Panel)(object)flowPanel);
 			BuildNoEventsSection(flowPanel);
@@ -185,6 +187,38 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				.CreatePart("CLICK HERE", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder builder)
 				{
 					builder.SetHyperLink("https://files.estreya.de/blish-hud/event-table/v1/events.json");
+				})
+				.Build()).set_Parent((Container)(object)panel);
+		}
+
+		private void BuildCustomEventSection(FlowPanel parent)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Expected O, but got Unknown
+			Panel val = new Panel();
+			((Control)val).set_Parent((Container)(object)parent);
+			((Container)val).set_WidthSizingMode((SizingMode)1);
+			((Container)val).set_HeightSizingMode((SizingMode)1);
+			val.set_ShowBorder(true);
+			Panel panel = val;
+			((Control)GetLabelBuilder((Panel)(object)parent).CreatePart("Can I create custom events?", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder builder)
+			{
+				builder.SetFontSize((FontSize)20).MakeUnderlined();
+			}).CreatePart("\n \n", (Action<FormattedLabelPartBuilder>)delegate
+			{
+			}).CreatePart("Yes.", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder builder)
+			{
+				builder.MakeBold();
+			})
+				.CreatePart("\n", (Action<FormattedLabelPartBuilder>)delegate
+				{
+				})
+				.CreatePart("Head over to the tab called \"Estreya BlishHUD API\" and login there.", (Action<FormattedLabelPartBuilder>)delegate
+				{
 				})
 				.Build()).set_Parent((Container)(object)panel);
 		}

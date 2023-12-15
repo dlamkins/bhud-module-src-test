@@ -19,11 +19,13 @@ namespace Estreya.BlishHUD.Shared.Services
 	{
 		private const string API_PASSWORD_KEY = "estreyaBlishHudAPI";
 
+		private const int API_VERSION_AUTH = 1;
+
+		private const int API_VERSION_KOFI = 1;
+
 		private static TimeSpan _checkAPITokenInterval = TimeSpan.FromMinutes(5.0);
 
 		private readonly string _apiRootUrl;
-
-		private readonly string _apiVersion;
 
 		private readonly AsyncRef<double> _lastAPITokenCheck = new AsyncRef<double>(0.0);
 
@@ -43,14 +45,13 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		public event EventHandler LoggedOut;
 
-		public BlishHudApiService(ServiceConfiguration configuration, SettingEntry<string> usernameSetting, PasswordManager passwordManager, IFlurlClient flurlClient, string apiRootUrl, string apiVersion)
+		public BlishHudApiService(ServiceConfiguration configuration, SettingEntry<string> usernameSetting, PasswordManager passwordManager, IFlurlClient flurlClient, string apiRootUrl)
 			: base(configuration)
 		{
 			_usernameSetting = usernameSetting;
 			_passwordManager = passwordManager;
 			_flurlClient = flurlClient;
 			_apiRootUrl = apiRootUrl;
-			_apiVersion = apiVersion;
 		}
 
 		protected override Task Initialize()
@@ -164,7 +165,7 @@ namespace Estreya.BlishHUD.Shared.Services
 					}
 					return;
 				}
-				APITokens tokens = JsonConvert.DeserializeObject<APITokens>(await (await _flurlClient.Request(_apiRootUrl, "v" + _apiVersion, "auth", "login").PostJsonAsync(new { username, password }, default(CancellationToken), (HttpCompletionOption)0)).get_Content().ReadAsStringAsync());
+				APITokens tokens = JsonConvert.DeserializeObject<APITokens>(await (await _flurlClient.Request(_apiRootUrl, $"v{1}", "auth", "login").PostJsonAsync(new { username, password }, default(CancellationToken), (HttpCompletionOption)0)).get_Content().ReadAsStringAsync());
 				if (!dryRun)
 				{
 					ApiJwtPayload? priorPayload = GetTokenPayload();
@@ -207,7 +208,7 @@ namespace Estreya.BlishHUD.Shared.Services
 				{
 					throw new ArgumentNullException("Refresh API Token");
 				}
-				APITokens tokens = JsonConvert.DeserializeObject<APITokens>(await (await _flurlClient.Request(_apiRootUrl, "v" + _apiVersion, "auth", "refresh").PostJsonAsync(new
+				APITokens tokens = JsonConvert.DeserializeObject<APITokens>(await (await _flurlClient.Request(_apiRootUrl, $"v{1}", "auth", "refresh").PostJsonAsync(new
 				{
 					refreshToken = APITokens.Value.RefreshToken
 				}, default(CancellationToken), (HttpCompletionOption)0)).get_Content().ReadAsStringAsync());
@@ -258,6 +259,16 @@ namespace Estreya.BlishHUD.Shared.Services
 					await RefreshAPILogin();
 				}
 			}
+		}
+
+		public async Task<KofiStatus> GetKofiStatus()
+		{
+			return await _flurlClient.Request(_apiRootUrl, $"v{1}", "ko-fi", "status").WithOAuthBearerToken(AccessToken).GetJsonAsync<KofiStatus>(default(CancellationToken), (HttpCompletionOption)0);
+		}
+
+		public async Task<bool> IsSubscriptionActive()
+		{
+			return (await GetKofiStatus()).Active;
 		}
 	}
 }

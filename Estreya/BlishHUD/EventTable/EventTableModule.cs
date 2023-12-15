@@ -34,6 +34,7 @@ using Estreya.BlishHUD.Shared.MumbleInfo.Map;
 using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Settings;
 using Estreya.BlishHUD.Shared.Threading;
+using Estreya.BlishHUD.Shared.UI.Views;
 using Estreya.BlishHUD.Shared.Utils;
 using Flurl.Http;
 using Gw2Sharp.Models;
@@ -172,7 +173,13 @@ namespace Estreya.BlishHUD.EventTable
 				return;
 			}
 			_eventTableContext = new EventTableContext();
-			_contextManager = new ContextManager(_eventTableContext, base.ModuleSettings, DynamicEventService, base.IconService);
+			_contextManager = new ContextManager(_eventTableContext, base.ModuleSettings, DynamicEventService, base.IconService, EventStateService, async delegate
+			{
+				using (await _eventCategoryLock.LockAsync())
+				{
+					return _eventCategories.SelectMany((EventCategory ec) => ec.Events);
+				}
+			});
 			_contextManager.ReloadEvents += ContextManager_ReloadEvents;
 			_eventTableContextHandle = GameService.Contexts.RegisterContext<EventTableContext>(_eventTableContext);
 			base.Logger.Info("Event Table context registered.");
@@ -539,10 +546,10 @@ namespace Estreya.BlishHUD.EventTable
 			//IL_0270: Expected O, but got Unknown
 			//IL_02b5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02bf: Expected O, but got Unknown
-			//IL_0304: Unknown result type (might be due to invalid IL or missing references)
-			//IL_030e: Expected O, but got Unknown
-			//IL_0353: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035d: Expected O, but got Unknown
+			//IL_02f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fe: Expected O, but got Unknown
+			//IL_0343: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034d: Expected O, but got Unknown
 			settingWindow.SavesSize = true;
 			settingWindow.CanResize = true;
 			settingWindow.RebuildViewAfterResize = true;
@@ -618,10 +625,10 @@ namespace Estreya.BlishHUD.EventTable
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			}), base.TranslationService.GetTranslation("dynamicEventsSettingsView-title", "Dynamic Events"), (int?)null));
-			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("156764.png"), (Func<IView>)(() => (IView)(object)new CustomEventView(base.Gw2ApiManager, base.IconService, base.TranslationService, base.BlishHUDAPIService)
+			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("156764.png"), (Func<IView>)(() => (IView)(object)new BlishHUDAPIView(base.Gw2ApiManager, base.IconService, base.TranslationService, base.BlishHUDAPIService, GetFlurlClient())
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
-			}), base.TranslationService.GetTranslation("customEventView-title", "Custom Events"), (int?)null));
+			}), "Estreya BlishHUD API", (int?)null));
 			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("157097.png"), (Func<IView>)(() => (IView)(object)new HelpView(() => _eventCategories, base.MODULE_API_URL, base.Gw2ApiManager, base.IconService, base.TranslationService)
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color

@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Blish_HUD.Content;
 using Estreya.BlishHUD.EventTable.Contexts;
 using Estreya.BlishHUD.EventTable.Controls;
 using Estreya.BlishHUD.EventTable.Models;
+using Estreya.BlishHUD.EventTable.Models.Reminders;
 using Estreya.BlishHUD.EventTable.Services;
 using Estreya.BlishHUD.Shared.Contexts;
 using Estreya.BlishHUD.Shared.Services;
@@ -31,9 +33,13 @@ namespace Estreya.BlishHUD.EventTable.Managers
 
 		private readonly IconService _iconService;
 
+		private readonly EventStateService _eventStateService;
+
+		private readonly Func<Task<IEnumerable<Estreya.BlishHUD.EventTable.Models.Event>>> _getEvents;
+
 		public event AsyncEventHandler ReloadEvents;
 
-		public ContextManager(EventTableContext context, ModuleSettings moduleSettings, DynamicEventService dynamicEventService, IconService iconService)
+		public ContextManager(EventTableContext context, ModuleSettings moduleSettings, DynamicEventService dynamicEventService, IconService iconService, EventStateService eventStateService, Func<Task<IEnumerable<Estreya.BlishHUD.EventTable.Models.Event>>> getEvents)
 		{
 			if (context == null)
 			{
@@ -55,6 +61,8 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			_moduleSettings = moduleSettings;
 			_dynamicEventService = dynamicEventService;
 			_iconService = iconService;
+			_eventStateService = eventStateService;
+			_getEvents = getEvents;
 			_context.RequestAddCategory += RequestAddCategory;
 			_context.RequestAddEvent += RequestAddEvent;
 			_context.RequestRemoveCategory += RequestRemoveCategory;
@@ -63,6 +71,10 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			_context.RequestShowReminder += RequestShowReminder;
 			_context.RequestAddDynamicEvent += RequestAddDynamicEvent;
 			_context.RequestRemoveDynamicEvent += RequestRemoveDynamicEvent;
+			_context.RequestEventSettingKeys += RequestEventSettingKeys;
+			_context.RequestAreaNames += RequestAreaNames;
+			_context.RequestAddEventState += RequestAddEventState;
+			_context.RequestRemoveEventState += RequestRemoveEventState;
 		}
 
 		public List<EventCategory> GetContextCategories()
@@ -71,6 +83,44 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			{
 				return _temporaryEventCategories;
 			}
+		}
+
+		private Task RequestRemoveEventState(object sender, ContextEventArgs<RemoveEventState> e)
+		{
+			_eventStateService.Remove(e.Content.AreaName, e.Content.EventKey);
+			return Task.CompletedTask;
+		}
+
+		private Task RequestAddEventState(object sender, ContextEventArgs<AddEventState> e)
+		{
+			_eventStateService.Add(e.Content.AreaName, e.Content.EventKey, e.Content.Until, e.Content.State);
+			return Task.CompletedTask;
+		}
+
+		private async Task<IEnumerable<string>> RequestEventSettingKeys(object sender, ContextEventArgs e)
+		{
+			if (_getEvents == null)
+			{
+				throw new ArgumentNullException("_getEvents", "Method to get events is null.");
+			}
+			IEnumerable<Estreya.BlishHUD.EventTable.Models.Event> events = await _getEvents();
+			return (events == null) ? Enumerable.Empty<string>() : events.Select((Estreya.BlishHUD.EventTable.Models.Event e) => e.SettingKey);
+		}
+
+		private Task<IEnumerable<string>> RequestAreaNames(object sender, ContextEventArgs e)
+		{
+			List<string> areaNames = _moduleSettings.EventAreaNames.get_Value();
+			IEnumerable<string> result;
+			if (areaNames != null)
+			{
+				IEnumerable<string> enumerable = areaNames;
+				result = enumerable;
+			}
+			else
+			{
+				result = Enumerable.Empty<string>();
+			}
+			return Task.FromResult(result);
 		}
 
 		private async Task RequestRemoveDynamicEvent(object sender, ContextEventArgs<Guid> e)
@@ -109,15 +159,22 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			await _dynamicEventService.NotifyCustomEventsUpdated();
 		}
 
-		private Task RequestShowReminder(object sender, ContextEventArgs<ShowReminder> e)
+		private async Task RequestShowReminder(object sender, ContextEventArgs<ShowReminder> e)
 		{
-			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
 			ShowReminder eArgsContent = e.Content;
-			EventNotification eventNotification = new EventNotification(null, eArgsContent.Title, eArgsContent.Message, (!string.IsNullOrWhiteSpace(eArgsContent.Icon)) ? _iconService.GetIcon(eArgsContent.Icon) : null, _moduleSettings.ReminderPosition.X.get_Value(), _moduleSettings.ReminderPosition.Y.get_Value(), _moduleSettings.ReminderSize.X.get_Value(), _moduleSettings.ReminderSize.Y.get_Value(), _moduleSettings.ReminderSize.Icon.get_Value(), _moduleSettings.ReminderStackDirection.get_Value(), _moduleSettings.ReminderOverflowStackDirection.get_Value(), _moduleSettings.ReminderFonts.TitleSize.get_Value(), _moduleSettings.ReminderFonts.MessageSize.get_Value(), _iconService, _moduleSettings.ReminderLeftClickAction.get_Value() != LeftClickAction.None);
-			eventNotification.BackgroundOpacity = _moduleSettings.ReminderOpacity.get_Value();
-			eventNotification.Show(TimeSpan.FromSeconds(_moduleSettings.ReminderDuration.get_Value()));
-			return Task.CompletedTask;
+			AsyncTexture2D icon = ((!string.IsNullOrWhiteSpace(eArgsContent.Icon)) ? _iconService.GetIcon(eArgsContent.Icon) : null);
+			ReminderType value = _moduleSettings.ReminderType.get_Value();
+			if (value == ReminderType.Control || value == ReminderType.Both)
+			{
+				EventNotification eventNotification = new EventNotification(null, eArgsContent.Title, eArgsContent.Message, icon, _moduleSettings.ReminderPosition.X.get_Value(), _moduleSettings.ReminderPosition.Y.get_Value(), _moduleSettings.ReminderSize.X.get_Value(), _moduleSettings.ReminderSize.Y.get_Value(), _moduleSettings.ReminderSize.Icon.get_Value(), _moduleSettings.ReminderStackDirection.get_Value(), _moduleSettings.ReminderOverflowStackDirection.get_Value(), _moduleSettings.ReminderFonts.TitleSize.get_Value(), _moduleSettings.ReminderFonts.MessageSize.get_Value(), _iconService, _moduleSettings.ReminderLeftClickAction.get_Value() != LeftClickAction.None);
+				eventNotification.BackgroundOpacity = _moduleSettings.ReminderOpacity.get_Value();
+				eventNotification.Show(TimeSpan.FromSeconds(_moduleSettings.ReminderDuration.get_Value()));
+			}
+			value = _moduleSettings.ReminderType.get_Value();
+			if (value == ReminderType.Windows || value == ReminderType.Both)
+			{
+				await EventNotification.ShowAsWindowsNotification(eArgsContent.Title, eArgsContent.Message, icon);
+			}
 		}
 
 		private async Task RequestReloadEvents(object sender, ContextEventArgs e)
@@ -242,6 +299,10 @@ namespace Estreya.BlishHUD.EventTable.Managers
 				_context.RequestShowReminder -= RequestShowReminder;
 				_context.RequestAddDynamicEvent -= RequestAddDynamicEvent;
 				_context.RequestRemoveDynamicEvent -= RequestRemoveDynamicEvent;
+				_context.RequestEventSettingKeys -= RequestEventSettingKeys;
+				_context.RequestAreaNames -= RequestAreaNames;
+				_context.RequestAddEventState -= RequestAddEventState;
+				_context.RequestRemoveEventState -= RequestRemoveEventState;
 			}
 			_context = null;
 		}
