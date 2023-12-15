@@ -37,10 +37,12 @@
     <Reference Include="Octokit">
       <HintPath>..\..\working\Octokit.dll</HintPath>
     </Reference>
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="jose-jwt">
       <HintPath>..\..\working\jose-jwt.dll</HintPath>
     </Reference>
     <Reference Include="System.Security" />
+    <Reference Include="System.IO.Compression.FileSystem" />
   </ItemGroup>
 </Project>

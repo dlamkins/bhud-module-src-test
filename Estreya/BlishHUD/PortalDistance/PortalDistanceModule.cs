@@ -19,6 +19,7 @@ using Estreya.BlishHUD.Shared.Modules;
 using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Settings;
 using Estreya.BlishHUD.Shared.UI.Views;
+using Gw2Sharp.Models;
 using Microsoft.Xna.Framework;
 
 namespace Estreya.BlishHUD.PortalDistance
@@ -34,9 +35,19 @@ namespace Estreya.BlishHUD.PortalDistance
 
 		private List<PortalDefinition> _portals = new List<PortalDefinition>
 		{
-			new PortalDefinition(10198, 5000f),
-			new PortalDefinition(16437, 5000f),
-			new PortalDefinition(34978, 5000f)
+			new PortalDefinition(10198, delegate
+			{
+				//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0012: Invalid comparison between Unknown and I4
+				//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0016: Invalid comparison between Unknown and I4
+				MapType type = GameService.Gw2Mumble.get_CurrentMap().get_Type();
+				return ((int)type == 2 || (int)type == 6) ? 6000 : 5000;
+			}),
+			new PortalDefinition(16437, () => 5000f),
+			new PortalDefinition(34978, () => 5000f)
 		};
 
 		protected override string UrlModuleName => "portal-distance";
@@ -117,9 +128,9 @@ namespace Estreya.BlishHUD.PortalDistance
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
 			if (_portalPosition == Vector3.get_Zero())
 			{
 				DistanceMessageControl messageControl = _messageControl;
@@ -138,7 +149,7 @@ namespace Estreya.BlishHUD.PortalDistance
 			_messageControl?.UpdateDistance(distance);
 			if (_activePortal != null)
 			{
-				_messageControl?.UpdateColor((distance > _activePortal.MaxDistance) ? Color.get_Red() : Color.get_Green());
+				_messageControl?.UpdateColor((distance > _activePortal.GetMaxDistance()) ? Color.get_Red() : Color.get_Green());
 			}
 			else
 			{

@@ -1,15 +1,17 @@
+using System;
+
 namespace Estreya.BlishHUD.PortalDistance.Models
 {
 	public class PortalDefinition
 	{
-		public int SkillID { get; set; }
+		public int SkillID { get; }
 
-		public float MaxDistance { get; set; }
+		public Func<float> GetMaxDistance { get; }
 
-		public PortalDefinition(int skillId, float maxDistance)
+		public PortalDefinition(int skillId, Func<float> getMaxDistance)
 		{
 			SkillID = skillId;
-			MaxDistance = maxDistance;
+			GetMaxDistance = getMaxDistance;
 		}
 	}
 }

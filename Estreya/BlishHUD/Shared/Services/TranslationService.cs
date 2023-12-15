@@ -53,17 +53,14 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		protected override async Task Load()
 		{
-			foreach (string locale in _locales)
-			{
-				await LoadLocale(locale);
-			}
+			await Task.WhenAll(_locales.Select(LoadLocale));
 		}
 
 		private async Task LoadLocale(string locale)
 		{
 			try
 			{
-				string obj = await _flurlClient.Request(_rootUrl, "translation." + locale + ".properties").GetStringAsync(default(CancellationToken), (HttpCompletionOption)0);
+				string obj = await _flurlClient.Request(_rootUrl, "translation." + locale + ".properties").WithTimeout(TimeSpan.FromSeconds(5.0)).GetStringAsync(default(CancellationToken), (HttpCompletionOption)0);
 				ConcurrentDictionary<string, string> localeTranslations = new ConcurrentDictionary<string, string>();
 				string[] array = obj.Split(new char[1] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
 				for (int i = 0; i < array.Length; i++)
@@ -80,6 +77,7 @@ namespace Estreya.BlishHUD.Shared.Services
 					}
 				}
 				_translations.TryAdd(locale, localeTranslations);
+				Logger.Debug($"Loaded {localeTranslations.Count} translations for locale {locale}");
 			}
 			catch (Exception ex)
 			{

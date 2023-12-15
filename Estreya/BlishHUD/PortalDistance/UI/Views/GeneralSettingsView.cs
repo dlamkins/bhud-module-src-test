@@ -19,8 +19,10 @@ namespace Estreya.BlishHUD.PortalDistance.UI.Views
 
 		protected override void BuildView(FlowPanel parent)
 		{
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			RenderBoolSetting((Panel)(object)parent, _moduleSettings.RegisterCornerIcon);
+			RenderEmptyLine((Panel)(object)parent);
 			RenderKeybindingSetting((Panel)(object)parent, _moduleSettings.ManualKeyBinding);
 			RenderEmptyLine((Panel)(object)parent, 10);
 			((Control)new FormattedLabelBuilder().AutoSizeHeight().SetWidth(((Container)parent).get_ContentRegion().Width).CreatePart("This should not be the same key as your portal in-game keybind. It will prevent you from pressing it.", (Action<FormattedLabelPartBuilder>)delegate
