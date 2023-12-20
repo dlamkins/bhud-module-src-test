@@ -399,6 +399,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			}
 			events.ForEach(delegate(Estreya.BlishHUD.EventTable.Models.Event ev)
 			{
+				_logger.Info("Event \"" + ev.SettingKey + "\" no longer marked completed via api.");
 				_eventStateService.Remove(Configuration.Name, ev.SettingKey);
 			});
 		}
@@ -415,7 +416,8 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			events.ForEach(delegate(Estreya.BlishHUD.EventTable.Models.Event ev)
 			{
 				DateTime nextReset = GetNextReset(ev);
-				ToggleFinishEvent(ev, nextReset);
+				_logger.Info($"Event \"{ev.SettingKey}\" marked completed via api until: {nextReset.ToUniversalTime()}");
+				FinishEvent(ev, nextReset);
 			});
 		}
 
@@ -1204,6 +1206,21 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				{
 					_eventStateService.Add(Configuration.Name, ev.SettingKey, until, EventStateService.EventStates.Completed);
 				}
+				break;
+			case EventCompletedAction.Hide:
+				HideEvent(ev, until);
+				break;
+			}
+		}
+
+		private void FinishEvent(Estreya.BlishHUD.EventTable.Models.Event ev, DateTime until)
+		{
+			switch (Configuration.CompletionAction.get_Value())
+			{
+			case EventCompletedAction.Crossout:
+			case EventCompletedAction.ChangeOpacity:
+			case EventCompletedAction.CrossoutAndChangeOpacity:
+				_eventStateService.Add(Configuration.Name, ev.SettingKey, until, EventStateService.EventStates.Completed);
 				break;
 			case EventCompletedAction.Hide:
 				HideEvent(ev, until);

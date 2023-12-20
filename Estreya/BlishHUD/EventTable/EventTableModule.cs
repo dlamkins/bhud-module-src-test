@@ -446,7 +446,7 @@ namespace Estreya.BlishHUD.EventTable
 				break;
 			case LeftClickAction.NavigateToWaypoint:
 			{
-				if (notification == null || notification.Model == null || string.IsNullOrWhiteSpace(notification.Model.Waypoint))
+				if (notification == null || notification.Model == null || string.IsNullOrWhiteSpace(notification.Model.Waypoint) || base.PointOfInterestService == null)
 				{
 					break;
 				}
