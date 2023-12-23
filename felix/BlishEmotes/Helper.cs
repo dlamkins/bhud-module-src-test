@@ -1,4 +1,3 @@
-using System.Resources;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls.Extern;
@@ -6,19 +5,12 @@ using Blish_HUD.Controls.Intern;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
 using Microsoft.Xna.Framework.Input;
-using felix.BlishEmotes.Strings;
 
 namespace felix.BlishEmotes
 {
 	public class Helper
 	{
 		private static readonly Logger Logger = Logger.GetLogger<Helper>();
-
-		public ResourceManager EmotesResourceManager { get; private set; }
-
-		public bool IsEmoteSynchronized { get; set; }
-
-		public bool IsEmoteTargeted { get; set; }
 
 		public static bool IsDebugEnabled()
 		{
@@ -27,33 +19,6 @@ namespace felix.BlishEmotes
 				return GameService.Debug.EnableAdditionalDebugDisplay.Value;
 			}
 			return true;
-		}
-
-		public Helper()
-		{
-			EmotesResourceManager = new ResourceManager("felix.BlishEmotes.Strings.Emotes", typeof(Common).Assembly);
-		}
-
-		public void SendEmoteCommand(Emote emote)
-		{
-			if (emote.Locked)
-			{
-				Logger.Debug("SendEmoteCommand: Emote locked.");
-			}
-			else if (GameService.GameIntegration.Gw2Instance.IsInGame && !GameService.Gw2Mumble.UI.IsMapOpen)
-			{
-				string command = emote.Command;
-				if (IsEmoteSynchronized)
-				{
-					command += " *";
-				}
-				if (IsEmoteTargeted)
-				{
-					command += " @";
-				}
-				Logger.Debug(command);
-				GameService.GameIntegration.Chat.Send(command);
-			}
 		}
 
 		public async Task TriggerKeybind(SettingEntry<KeyBinding> keybindingSetting)

@@ -8,8 +8,6 @@ namespace felix.BlishEmotes
 {
 	public class ModuleSettings
 	{
-		private Helper _helper;
-
 		private const string GLOBAL_SETTINGS = "global-settings";
 
 		private const string EMOTES_SHORTCUT_SETTINGS = "emotes-shortcuts-settings";
@@ -56,13 +54,14 @@ namespace felix.BlishEmotes
 
 		public Dictionary<Emote, SettingEntry<bool>> EmotesRadialEnabledMap { get; private set; }
 
+		public event EventHandler<Emote> EmoteShortcutActivated;
+
 		public event EventHandler OnAnyEmotesRadialSettingsChanged;
 
 		public event EventHandler<bool> OnEmotesLoaded;
 
-		public ModuleSettings(SettingCollection settings, Helper helper)
+		public ModuleSettings(SettingCollection settings)
 		{
-			_helper = helper;
 			RootSettings = settings;
 			DefineGlobalSettings(settings);
 			DefineEmotesKeybindSettings(settings);
@@ -91,11 +90,11 @@ namespace felix.BlishEmotes
 			EmotesShortcutsKeybindsMap.Clear();
 			foreach (Emote emote in emotes)
 			{
-				EmotesShortcutsKeybindsMap.Add(emote, EmotesShortcutsSettings.DefineSetting("EmotesShortcutsKeybindsMap_" + emote.Id, new KeyBinding(), () => _helper.EmotesResourceManager.GetString(emote.Id)));
+				EmotesShortcutsKeybindsMap.Add(emote, EmotesShortcutsSettings.DefineSetting("EmotesShortcutsKeybindsMap_" + emote.Id, new KeyBinding(), () => emote.Label));
 				EmotesShortcutsKeybindsMap[emote].Value.Enabled = !emote.Locked;
 				EmotesShortcutsKeybindsMap[emote].Value.Activated += delegate
 				{
-					_helper.SendEmoteCommand(emote);
+					this.EmoteShortcutActivated(this, emote);
 				};
 			}
 		}
@@ -127,7 +126,7 @@ namespace felix.BlishEmotes
 			EmotesRadialEnabledMap.Clear();
 			foreach (Emote emote in emotes)
 			{
-				SettingEntry<bool> newSetting = EmotesRadialSettings.DefineSetting("EmotesRadialEnabledMap_" + emote.Id, defaultValue: true, () => _helper.EmotesResourceManager.GetString(emote.Id));
+				SettingEntry<bool> newSetting = EmotesRadialSettings.DefineSetting("EmotesRadialEnabledMap_" + emote.Id, defaultValue: true, () => emote.Label);
 				EmotesRadialEnabledMap.Add(emote, newSetting);
 				newSetting.SettingChanged += delegate
 				{

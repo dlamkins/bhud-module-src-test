@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Blish_HUD;
+using Microsoft.Xna.Framework.Graphics;
 using felix.BlishEmotes.Exceptions;
+using felix.BlishEmotes.Services;
 
 namespace felix.BlishEmotes
 {
@@ -13,6 +15,8 @@ namespace felix.BlishEmotes
 
 		private static readonly Logger Logger = Logger.GetLogger<CategoriesManager>();
 
+		private TexturesManager TexturesManager;
+
 		private PersistenceManager PersistenceManager;
 
 		private Dictionary<Guid, Category> categories;
@@ -21,8 +25,9 @@ namespace felix.BlishEmotes
 
 		public event EventHandler<List<Category>> CategoriesUpdated;
 
-		public CategoriesManager(PersistenceManager persistenceManager)
+		public CategoriesManager(TexturesManager texturesManager, PersistenceManager persistenceManager)
 		{
+			TexturesManager = texturesManager;
 			PersistenceManager = persistenceManager;
 			categories = new Dictionary<Guid, Category>();
 		}
@@ -33,6 +38,7 @@ namespace felix.BlishEmotes
 			{
 				foreach (Category category in PersistenceManager.LoadCategories())
 				{
+					category.Texture = GetTexture(category);
 					if (category.IsFavourite)
 					{
 						FavouriteCategoryId = category.Id;
@@ -53,6 +59,26 @@ namespace felix.BlishEmotes
 			}
 		}
 
+		private Texture2D GetTexture(Category category)
+		{
+			return GetTexture(category.TextureFileName);
+		}
+
+		private Texture2D GetTexture(string textureFileName)
+		{
+			return TexturesManager.GetTexture(GetTexturesManagerKey(textureFileName));
+		}
+
+		private string GetTexturesManagerKey(Category category)
+		{
+			return GetTexturesManagerKey(category.TextureFileName);
+		}
+
+		private string GetTexturesManagerKey(string textureFileName)
+		{
+			return Path.GetFileNameWithoutExtension(textureFileName);
+		}
+
 		public void ReorderCategories(List<Category> newOrder, bool saveToFile = true)
 		{
 			if (newOrder.Count != categories.Count)
@@ -71,15 +97,16 @@ namespace felix.BlishEmotes
 			}
 		}
 
-		public Category CreateCategory(string name, List<Emote> emotes = null, bool saveToFile = true)
+		public Category CreateCategory(string name, string textureFileName, List<Emote> emotes = null, bool saveToFile = true)
 		{
-			return CreateCategory(name, emotes?.Select((Emote emote) => emote.Id).ToList(), emotes, isFavourite: false, saveToFile);
+			return CreateCategory(name, textureFileName, emotes?.Select((Emote emote) => emote.Id).ToList(), emotes, isFavourite: false, saveToFile);
 		}
 
-		private Category CreateCategory(string name, List<string> emoteIds = null, List<Emote> emotes = null, bool isFavourite = false, bool saveToFile = true)
+		private Category CreateCategory(string name, string textureFileName = null, List<string> emoteIds = null, List<Emote> emotes = null, bool isFavourite = false, bool saveToFile = true)
 		{
 			emoteIds = emoteIds ?? new List<string>();
 			emotes = emotes ?? new List<Emote>();
+			textureFileName = textureFileName ?? Textures.CategorySettingsIcon.ToString();
 			if (name == NEW_CATEGORY_NAME)
 			{
 				int next = GetNextNewCategoryNumber();
@@ -95,7 +122,9 @@ namespace felix.BlishEmotes
 				Name = name,
 				IsFavourite = isFavourite,
 				EmoteIds = emoteIds,
-				Emotes = emotes
+				Emotes = emotes,
+				TextureFileName = textureFileName,
+				Texture = GetTexture(textureFileName)
 			};
 			categories.Add(newCategory.Id, newCategory);
 			if (isFavourite)
@@ -123,6 +152,26 @@ namespace felix.BlishEmotes
 			{
 				AssertUniqueName(category.Name);
 			}
+			if (current.TextureFileName != category.TextureFileName)
+			{
+				if (File.Exists(category.TextureFileName))
+				{
+					string newTextureFileName = category.Name + Path.GetExtension(category.TextureFileName);
+					string absoluteFilePath = Path.Combine(TexturesManager.ModuleDataTexturesDirectory, newTextureFileName);
+					if (File.Exists(absoluteFilePath))
+					{
+						File.Delete(absoluteFilePath);
+					}
+					File.Copy(category.TextureFileName, absoluteFilePath);
+					category.TextureFileName = newTextureFileName;
+					string cacheKey = GetTexturesManagerKey(category);
+					TexturesManager.UpdateTexture(cacheKey, category.Texture);
+				}
+				else
+				{
+					Logger.Error("Unable to update texture - " + category.TextureFileName + " not found!");
+				}
+			}
 			categories[category.Id] = category;
 			if (saveToFile)
 			{
@@ -145,6 +194,10 @@ namespace felix.BlishEmotes
 			{
 				Logger.Debug("Tried to delete favourite category -> abort.");
 				return false;
+			}
+			if (category.TextureFileName != Textures.CategorySettingsIcon.ToString())
+			{
+				File.Delete(Path.Combine(TexturesManager.ModuleDataTexturesDirectory, category.TextureFileName));
 			}
 			categories.Remove(category.Id);
 			categories = new Dictionary<Guid, Category>(categories);
@@ -220,24 +273,29 @@ namespace felix.BlishEmotes
 			PersistenceManager.SaveCategories(categories.Values.ToList());
 		}
 
+		private void CreateFavouriteCategory()
+		{
+			CreateCategory(Category.FAVOURITES_CATEGORY_NAME, null, null, null, isFavourite: true, saveToFile: false);
+		}
+
 		private void SetupDefaultCategories()
 		{
 			Logger.Debug("SetupDefaultCategories");
-			CreateCategory(Category.FAVOURITES_CATEGORY_NAME, null, null, isFavourite: true, saveToFile: false);
-			CreateCategory("Greeting", new List<string> { "beckon", "bow", "salute", "wave" }, null, isFavourite: false, saveToFile: false);
-			CreateCategory("Reaction", new List<string>
+			CreateFavouriteCategory();
+			CreateCategory("Greeting", null, new List<string> { "beckon", "bow", "salute", "wave" }, null, isFavourite: false, saveToFile: false);
+			CreateCategory("Reaction", null, new List<string>
 			{
 				"cower", "cry", "facepalm", "hiss", "no", "sad", "shiver", "shiverplus", "shrug", "surprised",
 				"thanks", "yes"
 			}, null, isFavourite: false, saveToFile: false);
-			CreateCategory("Fun", new List<string> { "cheer", "laugh", "paper", "rock", "rockout", "scissors" }, null, isFavourite: false, saveToFile: false);
-			CreateCategory("Pose", new List<string>
+			CreateCategory("Fun", null, new List<string> { "cheer", "laugh", "paper", "rock", "rockout", "scissors" }, null, isFavourite: false, saveToFile: false);
+			CreateCategory("Pose", null, new List<string>
 			{
 				"bless", "crossarms", "heroic", "kneel", "magicjuggle", "playdead", "point", "serve", "sit", "sleep",
 				"stretch", "threaten"
 			}, null, isFavourite: false, saveToFile: false);
-			CreateCategory("Dance", new List<string> { "dance", "geargrind", "shuffle", "step" }, null, isFavourite: false, saveToFile: false);
-			CreateCategory("Miscellaneous", new List<string> { "ponder", "possessed", "rank", "readbook", "sipcoffee", "talk" }, null, isFavourite: false, saveToFile: false);
+			CreateCategory("Dance", null, new List<string> { "dance", "geargrind", "shuffle", "step" }, null, isFavourite: false, saveToFile: false);
+			CreateCategory("Miscellaneous", null, new List<string> { "ponder", "possessed", "rank", "readbook", "sipcoffee", "talk" }, null, isFavourite: false, saveToFile: false);
 			PersistenceManager.SaveCategories(categories.Values.ToList());
 		}
 

@@ -22,11 +22,17 @@ namespace felix.BlishEmotes.UI.Controls
 
 		private Texture2D _lockedTexture;
 
-		private List<RadialEmote> _radialEmotes = new List<RadialEmote>();
+		private List<RadialContainer<Emote>> _radialEmotes = new List<RadialContainer<Emote>>();
+
+		private List<RadialContainer<Category>> _radialCategories = new List<RadialContainer<Category>>();
 
 		private bool _isActionCamToggled;
 
-		private int _innerRadius = 100;
+		private double _startAngle = Math.PI * Math.Floor(270.0) / 180.0;
+
+		private int _disabledRadius = 100;
+
+		private int _categoryRadius;
 
 		private int _radius;
 
@@ -48,11 +54,21 @@ namespace felix.BlishEmotes.UI.Controls
 
 		public List<Emote> Emotes { private get; set; }
 
-		private RadialEmote SelectedEmote => _radialEmotes.SingleOrDefault((RadialEmote m) => m.Selected);
+		public List<Category> Categories { private get; set; }
 
-		public RadialMenu(Helper helper, ModuleSettings settings, Texture2D LockedTexture)
+		public bool IsEmoteSynchronized { private get; set; }
+
+		public bool IsEmoteTargeted { private get; set; }
+
+		private RadialContainer<Emote> SelectedEmote => _radialEmotes.SingleOrDefault((RadialContainer<Emote> m) => m.Selected);
+
+		private RadialContainer<Category> SelectedCategory => _radialCategories.SingleOrDefault((RadialContainer<Category> m) => m.Selected);
+
+		public event EventHandler<Emote> EmoteSelected;
+
+		public RadialMenu(ModuleSettings settings, Texture2D LockedTexture)
 		{
-			_helper = helper;
+			_helper = new Helper();
 			_settings = settings;
 			Emotes = new List<Emote>();
 			_lockedTexture = LockedTexture;
@@ -119,7 +135,6 @@ namespace felix.BlishEmotes.UI.Controls
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			_radialEmotes.Clear();
 			_selectedEmoteLabel.Text = "";
 			if (Emotes.Count == 0)
 			{
@@ -127,7 +142,7 @@ namespace felix.BlishEmotes.UI.Controls
 				return;
 			}
 			_noEmotesLabel.Hide();
-			if (_helper.IsEmoteSynchronized)
+			if (IsEmoteSynchronized)
 			{
 				_synchronizeToggleActiveLabel.Show();
 			}
@@ -135,7 +150,7 @@ namespace felix.BlishEmotes.UI.Controls
 			{
 				_synchronizeToggleActiveLabel.Hide();
 			}
-			if (_helper.IsEmoteTargeted)
+			if (IsEmoteTargeted)
 			{
 				_targetToggleActiveLabel.Show();
 			}
@@ -143,63 +158,112 @@ namespace felix.BlishEmotes.UI.Controls
 			{
 				_targetToggleActiveLabel.Hide();
 			}
-			double startAngle = Math.PI * Math.Floor(270.0) / 180.0;
+			List<Emote> emotes = Emotes;
+			int emotesInnerRadius = _disabledRadius;
+			if (_settings.GlobalUseCategories.Value && Categories.Count > 0)
+			{
+				PaintEmoteCategories(spriteBatch, Categories);
+				emotes = ((SelectedCategory != null) ? SelectedCategory.Value.Emotes : new List<Emote>());
+				emotesInnerRadius = _categoryRadius;
+			}
+			PaintEmotes(spriteBatch, emotesInnerRadius, emotes);
+			base.PaintBeforeChildren(spriteBatch, bounds);
+		}
+
+		private void PaintEmoteCategories(SpriteBatch spriteBatch, List<Category> categories)
+		{
 			if (Helper.IsDebugEnabled())
 			{
-				spriteBatch.DrawCircle(RadialSpawnPoint.ToVector2(), _innerRadius, 50, Color.Red, _debugLineThickness);
+				spriteBatch.DrawCircle(RadialSpawnPoint.ToVector2(), _disabledRadius, 50, Color.Red, _debugLineThickness);
 			}
-			double currentAngle = startAngle;
-			double sweepAngle = Math.PI * 2.0 / (double)Emotes.Count;
-			foreach (Emote emote in Emotes)
+			List<RadialContainer<Category>> newList = CreateRadialContainerList(_categoryRadius, (Category category) => SelectedCategory?.Value == category, categories);
+			_radialCategories.Clear();
+			_radialCategories.AddRange(newList);
+			DrawRadialContainerItems(spriteBatch, _disabledRadius, _categoryRadius, _radialCategories);
+		}
+
+		private void PaintEmotes(SpriteBatch spriteBatch, int innerRadius, List<Emote> emotes)
+		{
+			if (Helper.IsDebugEnabled())
+			{
+				spriteBatch.DrawCircle(RadialSpawnPoint.ToVector2(), innerRadius, 50, Color.Red, _debugLineThickness);
+			}
+			List<RadialContainer<Emote>> newList = CreateRadialContainerList(_radius, (Emote emote) => false, emotes);
+			_radialEmotes.Clear();
+			_radialEmotes.AddRange(newList);
+			DrawRadialContainerItems(spriteBatch, innerRadius, int.MaxValue, _radialEmotes);
+		}
+
+		private void DrawRadialContainerItems<T>(SpriteBatch spriteBatch, int innerRadius, int outerRadius, List<RadialContainer<T>> radialContainerItems) where T : RadialBase
+		{
+			Point diff = Control.Input.Mouse.Position - RadialSpawnPoint;
+			double angle;
+			for (angle = Math.Atan2(diff.Y, diff.X); angle < _startAngle; angle += Math.PI * 2.0)
+			{
+			}
+			float length = new Vector2(diff.Y, diff.X).Length();
+			foreach (RadialContainer<T> item in radialContainerItems)
+			{
+				DrawDebugSectionSeparators(spriteBatch, innerRadius, Math.Min(_radius, outerRadius), item);
+				if (length >= (float)innerRadius && length <= (float)outerRadius)
+				{
+					item.Selected = item.StartAngle <= angle && item.EndAngle > angle;
+					if (item.Selected)
+					{
+						_selectedEmoteLabel.Text = item.Text;
+					}
+				}
+				else if (length < (float)innerRadius)
+				{
+					item.Selected = false;
+				}
+				spriteBatch.DrawOnCtrl(this, item.Texture, new Rectangle(item.X, item.Y, _iconSize, _iconSize), null, item.Locked ? (Color.White * 0.25f) : (Color.White * (item.Selected ? 1f : _settings.RadialIconOpacity.Value)));
+				if (item.Locked)
+				{
+					spriteBatch.DrawOnCtrl(this, _lockedTexture, new Rectangle(item.X, item.Y, _iconSize, _iconSize), null, Color.White * (item.Selected ? 1f : _settings.RadialIconOpacity.Value));
+				}
+			}
+		}
+
+		private List<RadialContainer<T>> CreateRadialContainerList<T>(int outerRadius, Func<T, bool> IsSelected, List<T> items) where T : RadialBase
+		{
+			double currentAngle = _startAngle;
+			double sweepAngle = Math.PI * 2.0 / (double)items.Count;
+			List<RadialContainer<T>> newList = new List<RadialContainer<T>>();
+			foreach (T item in items)
 			{
 				double midAngle = currentAngle + sweepAngle / 2.0;
 				double endAngle = currentAngle + sweepAngle;
-				int x = (int)Math.Round((double)_radius + (double)_radius * Math.Cos(midAngle));
-				int y = (int)Math.Round((double)_radius + (double)_radius * Math.Sin(midAngle));
-				if (Helper.IsDebugEnabled())
+				int offset = _iconSize / 2;
+				int x = (int)Math.Round((double)_radius + (double)(outerRadius - offset) * Math.Cos(midAngle));
+				int y = (int)Math.Round((double)_radius + (double)(outerRadius - offset) * Math.Sin(midAngle));
+				newList.Add(new RadialContainer<T>
 				{
-					float xDebugInner = (float)Math.Round((double)_innerRadius * Math.Cos(currentAngle)) + (float)RadialSpawnPoint.X;
-					float yDebugInner = (float)Math.Round((double)_innerRadius * Math.Sin(currentAngle)) + (float)RadialSpawnPoint.Y;
-					int debugRadiusOuter = 250;
-					float xDebugOuter = (float)Math.Round((double)(2 * debugRadiusOuter) * Math.Cos(currentAngle)) + (float)RadialSpawnPoint.X;
-					float yDebugOuter = (float)Math.Round((double)(2 * debugRadiusOuter) * Math.Sin(currentAngle)) + (float)RadialSpawnPoint.Y;
-					spriteBatch.DrawLine(new Vector2(xDebugInner, yDebugInner), new Vector2(xDebugOuter, yDebugOuter), Color.Red, _debugLineThickness);
-				}
-				_radialEmotes.Add(new RadialEmote
-				{
-					Emote = emote,
+					Value = item,
 					StartAngle = currentAngle,
 					EndAngle = endAngle,
 					X = x,
 					Y = y,
-					Text = _helper.EmotesResourceManager.GetString(emote.Id),
-					Texture = emote.Texture
+					Text = item.Label,
+					Texture = item.Texture,
+					Selected = IsSelected(item),
+					Locked = item.Locked
 				});
 				currentAngle = endAngle;
 			}
-			Point diff = Control.Input.Mouse.Position - RadialSpawnPoint;
-			double angle;
-			for (angle = Math.Atan2(diff.Y, diff.X); angle < startAngle; angle += Math.PI * 2.0)
+			return newList;
+		}
+
+		private void DrawDebugSectionSeparators<T>(SpriteBatch spriteBatch, int innerRadius, int outerRadius, RadialContainer<T> item) where T : RadialBase
+		{
+			if (Helper.IsDebugEnabled())
 			{
+				float xDebugInner = (float)Math.Round((double)innerRadius * Math.Cos(item.StartAngle)) + (float)RadialSpawnPoint.X;
+				float yDebugInner = (float)Math.Round((double)innerRadius * Math.Sin(item.StartAngle)) + (float)RadialSpawnPoint.Y;
+				float xDebugOuter = (float)Math.Round((double)outerRadius * Math.Cos(item.StartAngle)) + (float)RadialSpawnPoint.X;
+				float yDebugOuter = (float)Math.Round((double)outerRadius * Math.Sin(item.StartAngle)) + (float)RadialSpawnPoint.Y;
+				spriteBatch.DrawLine(new Vector2(xDebugInner, yDebugInner), new Vector2(xDebugOuter, yDebugOuter), Color.Red, _debugLineThickness);
 			}
-			float length = new Vector2(diff.Y, diff.X).Length();
-			foreach (RadialEmote radialEmote in _radialEmotes)
-			{
-				if (length >= (float)_innerRadius)
-				{
-					radialEmote.Selected = radialEmote.StartAngle <= angle && radialEmote.EndAngle > angle;
-					if (radialEmote.Selected)
-					{
-						_selectedEmoteLabel.Text = radialEmote.Text;
-					}
-				}
-				spriteBatch.DrawOnCtrl(this, radialEmote.Texture, new Rectangle(radialEmote.X, radialEmote.Y, _iconSize, _iconSize), null, radialEmote.Emote.Locked ? (Color.White * 0.25f) : (Color.White * (radialEmote.Selected ? 1f : _settings.RadialIconOpacity.Value)));
-				if (radialEmote.Emote.Locked)
-				{
-					spriteBatch.DrawOnCtrl(this, _lockedTexture, new Rectangle(radialEmote.X, radialEmote.Y, _iconSize, _iconSize), null, Color.White * (radialEmote.Selected ? 1f : _settings.RadialIconOpacity.Value));
-				}
-			}
-			base.PaintBeforeChildren(spriteBatch, bounds);
 		}
 
 		private async Task HandleShown(object sender, EventArgs e)
@@ -214,7 +278,8 @@ namespace felix.BlishEmotes.UI.Controls
 			_maxRadialDiameter = Math.Min(GameService.Graphics.SpriteScreen.Width, GameService.Graphics.SpriteScreen.Height);
 			_iconSize = (int)((float)(_maxRadialDiameter / 8) * _settings.RadialIconSizeModifier.Value);
 			_radius = (int)(((double)_maxRadialDiameter * 0.75 - (double)(_iconSize / 2)) * (double)_settings.RadialRadiusModifier.Value);
-			_innerRadius = (int)((float)_radius * _settings.RadialInnerRadiusPercentage.Value);
+			_categoryRadius = _disabledRadius + (int)((double)(_radius - _disabledRadius) * 0.5);
+			_disabledRadius = (int)((float)_radius * _settings.RadialInnerRadiusPercentage.Value);
 			base.Size = new Point(_maxRadialDiameter, _maxRadialDiameter);
 			if (_settings.RadialSpawnAtCursor.Value)
 			{
@@ -240,12 +305,17 @@ namespace felix.BlishEmotes.UI.Controls
 				_isActionCamToggled = false;
 				Logger.Debug("HandleHidden turned back on action cam");
 			}
-			RadialEmote selected = SelectedEmote;
+			RadialContainer<Emote> selected = SelectedEmote;
 			if (selected != null)
 			{
-				Logger.Debug("Sending command for " + selected.Emote.Id);
-				_helper.SendEmoteCommand(selected.Emote);
+				Logger.Debug("Sending command for " + selected.Value.Id);
+				this.EmoteSelected(this, selected.Value);
 			}
+		}
+
+		protected override void DisposeControl()
+		{
+			base.DisposeControl();
 		}
 	}
 }

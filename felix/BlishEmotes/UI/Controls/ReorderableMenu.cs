@@ -55,10 +55,10 @@ namespace felix.BlishEmotes.UI.Controls
 				if (draggedOnIndex >= 0)
 				{
 					DragItem(draggedEntry, draggedOnIndex);
+					this.Reordered?.Invoke(this, ReorderableChildren);
 				}
 			}
 			draggedEntry.Dragging = false;
-			this.Reordered?.Invoke(this, ReorderableChildren);
 		}
 
 		private void ChangedChild_LeftMouseButtonPressed(object sender, MouseEventArgs e)
