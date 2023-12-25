@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Linq;
 using Blish_HUD.Controls;
+using Ideka.BHUDCommon;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 

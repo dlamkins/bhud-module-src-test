@@ -1,6 +1,7 @@
 using System;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
+using Ideka.BHUDCommon;
 using Ideka.NetCommon;
 using Ideka.RacingMeter.Lib;
 using Microsoft.Xna.Framework;
@@ -46,31 +47,31 @@ namespace Ideka.RacingMeter
 			//IL_0093: Expected O, but got Unknown
 			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ca: Expected O, but got Unknown
-			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0133: Expected O, but got Unknown
-			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0150: Expected O, but got Unknown
-			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016d: Expected O, but got Unknown
-			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018a: Expected O, but got Unknown
-			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a7: Expected O, but got Unknown
-			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cb: Expected O, but got Unknown
+			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0131: Expected O, but got Unknown
+			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014e: Expected O, but got Unknown
+			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0154: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016b: Expected O, but got Unknown
+			//IL_016c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0171: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0188: Expected O, but got Unknown
+			//IL_0189: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0195: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a5: Expected O, but got Unknown
+			//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c9: Expected O, but got Unknown
 			_editor = editor;
 			((Panel)this).set_ShowTint(true);
 			((Panel)this).set_Title(" ");
@@ -94,7 +95,7 @@ namespace Ideka.RacingMeter
 			((Control)val).set_Parent((Container)(object)this);
 			val.set_Text(Strings.Meters.Format(15));
 			_radius15mButton = val;
-			EnumDropdown<RacePointType> enumDropdown = new EnumDropdown<RacePointType>(null, RacePointType.Checkpoint);
+			EnumDropdown<RacePointType> enumDropdown = new EnumDropdown<RacePointType>();
 			((Control)enumDropdown).set_Parent((Container)(object)this);
 			enumDropdown.Label = Strings.PointType;
 			_typeSelect = enumDropdown;

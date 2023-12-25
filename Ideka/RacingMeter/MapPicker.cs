@@ -2,6 +2,7 @@ using System;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
+using Ideka.BHUDCommon;
 
 namespace Ideka.RacingMeter
 {

@@ -1,4 +1,5 @@
 using Blish_HUD.Controls;
+using Ideka.BHUDCommon;
 
 namespace Ideka.RacingMeter
 {

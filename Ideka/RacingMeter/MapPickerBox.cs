@@ -1,3 +1,5 @@
+using Ideka.BHUDCommon;
+
 namespace Ideka.RacingMeter
 {
 	public class MapPickerBox : ValueControl<int, int, MapPicker>

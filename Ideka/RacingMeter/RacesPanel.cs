@@ -104,6 +104,7 @@ namespace Ideka.RacingMeter
 			_remoteRacesMenu.SetRaces(RacingModule.Server.RemoteRaces.Races.Values);
 			RacingModule.Server.RemoteRacesChanged += new Action<RemoteRaces>(RemoteRacesChanged);
 			RacingModule.LocalData.RacesChanged += new Action<IReadOnlyDictionary<string, FullRace>>(RacesChanged);
+			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)MapChanged);
 			RacingModule.LocalData.ReloadRaces();
 		}
 
@@ -121,6 +122,12 @@ namespace Ideka.RacingMeter
 		private void RemoteRacesChanged(RemoteRaces remoteRaces)
 		{
 			_remoteRacesMenu.SetRaces(remoteRaces.Races.Values);
+		}
+
+		private void MapChanged(object sender, ValueEventArgs<int> e)
+		{
+			_remoteRacesMenu.SetRaces(RacingModule.Server.RemoteRaces.Races.Values);
+			_localRacesMenu.SetRaces(RacingModule.LocalData.Races.Values);
 		}
 
 		private void OnRaceSelected(FullRace? fullRace)
@@ -185,6 +192,7 @@ namespace Ideka.RacingMeter
 		{
 			RacingModule.Server.RemoteRacesChanged -= new Action<RemoteRaces>(RemoteRacesChanged);
 			RacingModule.LocalData.RacesChanged -= new Action<IReadOnlyDictionary<string, FullRace>>(RacesChanged);
+			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)MapChanged);
 			((Container)this).DisposeControl();
 		}
 	}

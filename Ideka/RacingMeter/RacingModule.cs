@@ -3,6 +3,7 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
@@ -85,22 +86,14 @@ namespace Ideka.RacingMeter
 
 		protected override async Task LoadAsync()
 		{
-			if (File.Exists(MapCachePath))
-			{
-				return;
-			}
-			using Stream file = ContentsManager.GetFileStream("Cache/Maps.json");
-			using StreamReader reader = new StreamReader(file);
-			Directory.CreateDirectory(Path.GetDirectoryName(MapCachePath));
-			string mapCachePath = MapCachePath;
-			File.WriteAllText(mapCachePath, await reader.ReadToEndAsync());
+			_mapData = _dc.Add(new MapData());
+			await _mapData.StartLoad(MapCachePath, ContentsManager, "Cache/Maps.json");
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
 			((Module)this).OnModuleLoaded(e);
-			_confirmationModal = _dc.Add<ConfirmationModal>(new ConfirmationModal(ContentsManager.GetTexture("Tooltip.png")));
-			_mapData = _dc.Add(new MapData(MapCachePath));
+			_confirmationModal = _dc.Add<ConfirmationModal>(new ConfirmationModal(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("Tooltip.png"))));
 			DisposableCollection dc = _dc;
 			ScreenMap screenMap = new ScreenMap(_mapData);
 			((Control)screenMap).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
