@@ -8,6 +8,7 @@ using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Modules.Managers;
+using Blish_HUD.Settings;
 using Estreya.BlishHUD.EventTable.Controls;
 using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.EventTable.Models.Reminders;
@@ -30,6 +31,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private readonly Func<List<EventCategory>> _getEvents;
 
+		private readonly Func<List<string>> _getAreaNames;
+
 		private readonly ModuleSettings _moduleSettings;
 
 		private StandardWindow _manageEventsWindow;
@@ -44,17 +47,21 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			_globalChangeTempEvent.UpdateReminderTimes(new TimeSpan[1] { TimeSpan.Zero });
 		}
 
-		public ReminderSettingsView(ModuleSettings moduleSettings, Func<List<EventCategory>> getEvents, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService)
+		public ReminderSettingsView(ModuleSettings moduleSettings, Func<List<EventCategory>> getEvents, Func<List<string>> getAreaNames, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService)
 			: base(apiManager, iconService, translationService, settingEventService)
 		{
 			_moduleSettings = moduleSettings;
 			_getEvents = getEvents;
+			_getAreaNames = getAreaNames;
 			CONTROL_WIDTH = 500;
 		}
 
 		protected override void BuildView(FlowPanel parent)
 		{
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.RemindersEnabled);
+			RenderBoolSetting((Panel)(object)parent, _moduleSettings.DisableRemindersWhenEventFinished);
+			RenderEmptyLine((Panel)(object)parent);
+			RenderDisableRemindersWhenEventFinishedArea(parent);
 			RenderEmptyLine((Panel)(object)parent);
 			RenderIntSetting((Panel)(object)parent, _moduleSettings.ReminderPosition.X);
 			RenderIntSetting((Panel)(object)parent, _moduleSettings.ReminderPosition.Y);
@@ -151,6 +158,28 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideRemindersInPvE_Competetive);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideRemindersInWvW);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideRemindersInPvP);
+		}
+
+		private void RenderDisableRemindersWhenEventFinishedArea(FlowPanel parent)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Expected O, but got Unknown
+			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+			Panel val = new Panel();
+			((Control)val).set_Parent((Container)(object)parent);
+			((Container)val).set_WidthSizingMode((SizingMode)1);
+			((Container)val).set_HeightSizingMode((SizingMode)1);
+			Panel panel = val;
+			RenderLabel(panel, ((SettingEntry)_moduleSettings.DisableRemindersWhenEventFinishedArea).get_DisplayName());
+			List<string> values = new List<string> { "Any" };
+			values.AddRange(_getAreaNames());
+			((Control)RenderDropdown(panel, base.CONTROL_LOCATION, CONTROL_WIDTH, values.ToArray(), _moduleSettings.DisableRemindersWhenEventFinishedArea.get_Value(), delegate(string newVal)
+			{
+				_moduleSettings.DisableRemindersWhenEventFinishedArea.set_Value(newVal);
+			})).set_BasicTooltipText(((SettingEntry)_moduleSettings.DisableRemindersWhenEventFinishedArea).get_Description());
 		}
 
 		private void ManageView_EventChanged(object sender, ManageEventsView.EventChangedArgs e)

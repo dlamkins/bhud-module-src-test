@@ -90,8 +90,6 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private readonly AsyncRef<double> _lastEventOccurencesUpdate = new AsyncRef<double>(0.0);
 
-		private MouseEventType _lastMouseEventType;
-
 		private MapchestService _mapchestService;
 
 		private MapUtil _mapUtil;
@@ -671,11 +669,6 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				_logger.Warn(ex, "Could not load fillers.");
 			}
 			return new ConcurrentDictionary<string, List<Estreya.BlishHUD.EventTable.Models.Event>>();
-		}
-
-		private bool EventCategoryDisabled(EventCategory ec)
-		{
-			return _eventStateService?.Contains(Configuration.Name, ec.Key, EventStateService.EventStates.Completed) ?? false;
 		}
 
 		private bool EventDisabled(Estreya.BlishHUD.EventTable.Models.Event ev)

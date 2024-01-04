@@ -248,11 +248,11 @@ namespace Estreya.BlishHUD.EventTable.Managers
 
 		private bool WorldEventRenderCondition(WorldEntity worldEntity)
 		{
-			if (_moduleSettings.ShowDynamicEventsInWorldOnlyWhenInside.get_Value())
+			if (!_moduleSettings.ShowDynamicEventsInWorldOnlyWhenInside.get_Value())
 			{
-				return worldEntity.IsPlayerInside(!_moduleSettings.IgnoreZAxisOnDynamicEventsInWorld.get_Value());
+				return (float)_moduleSettings.DynamicEventsRenderDistance.get_Value() >= worldEntity.DistanceToPlayer;
 			}
-			return (float)_moduleSettings.DynamicEventsRenderDistance.get_Value() >= worldEntity.DistanceToPlayer;
+			return worldEntity.IsPlayerInside(!_moduleSettings.IgnoreZAxisOnDynamicEventsInWorld.get_Value());
 		}
 
 		public async Task AddDynamicEventsToWorld()

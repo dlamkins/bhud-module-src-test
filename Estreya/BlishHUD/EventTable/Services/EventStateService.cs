@@ -177,6 +177,30 @@ namespace Estreya.BlishHUD.EventTable.Services
 			return Task.CompletedTask;
 		}
 
+		public bool Contains(string eventKey)
+		{
+			lock (Instances)
+			{
+				return Instances.Any((VisibleStateInfo instance) => instance.EventKey == eventKey);
+			}
+		}
+
+		public bool Contains(string eventKey, EventStates state)
+		{
+			lock (Instances)
+			{
+				return Instances.Any((VisibleStateInfo instance) => instance.EventKey == eventKey && instance.State == state);
+			}
+		}
+
+		public bool Contains(string areaName, string eventKey)
+		{
+			lock (Instances)
+			{
+				return Instances.Any((VisibleStateInfo instance) => instance.AreaName == areaName && instance.EventKey == eventKey);
+			}
+		}
+
 		public bool Contains(string areaName, string eventKey, EventStates state)
 		{
 			lock (Instances)

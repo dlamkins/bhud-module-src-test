@@ -65,6 +65,8 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		private readonly SynchronizedCollection<ManagedService> _services = new SynchronizedCollection<ManagedService>();
 
+		private CancellationTokenSource _cancellationTokenSource;
+
 		protected Logger Logger { get; }
 
 		protected string MODULE_FILE_URL => "https://files.estreya.de/blish-hud/" + UrlModuleName;
@@ -147,6 +149,8 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected MetricsService MetricsService { get; private set; }
 
+		protected CancellationToken CancellationToken => _cancellationTokenSource.Token;
+
 		protected abstract int CornerIconPriority { get; }
 
 		protected IFlurlClient GetFlurlClient()
@@ -174,6 +178,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected override void Initialize()
 		{
+			_cancellationTokenSource = new CancellationTokenSource();
 			TEMP_FIX_SetTacOAsActive();
 			string directoryName = GetDirectoryName();
 			if (!string.IsNullOrWhiteSpace(directoryName))
@@ -722,6 +727,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected override void Unload()
 		{
+			_cancellationTokenSource?.Cancel();
 			Logger.Debug("Unload settings...");
 			if (ModuleSettings != null)
 			{

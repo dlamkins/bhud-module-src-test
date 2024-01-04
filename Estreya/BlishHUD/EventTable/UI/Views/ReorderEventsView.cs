@@ -132,24 +132,24 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Control)val3).set_Right(((Control)buttons).get_Width());
 			((Control)val3).set_Bottom(((Control)buttons).get_Height());
 			StandardButton saveButton = val3;
-			((Control)saveButton).add_Click((EventHandler<MouseEventArgs>)async delegate
+			((Control)saveButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				Logger.Debug("Save reordered categories.");
-				List<EventCategory> orderedCategories = (from child in ((Container)listView).get_Children().ToList()
+				List<EventCategory> list = (from child in ((Container)listView).get_Children().ToList()
 					select ((ListEntry<EventCategory>)(object)child).Data).ToList();
-				List<EventCategory> currentCategories = _allEvents;
-				foreach (EventCategory category in orderedCategories)
+				List<EventCategory> allEvents = _allEvents;
+				foreach (EventCategory category in list)
 				{
-					int oldIndex = currentCategories.IndexOf(currentCategories.Where((EventCategory ec) => ec.Key == category.Key).First());
-					int newIndex = orderedCategories.IndexOf(category);
-					currentCategories.RemoveAt(oldIndex);
-					if (newIndex > oldIndex)
+					int num = allEvents.IndexOf(allEvents.Where((EventCategory ec) => ec.Key == category.Key).First());
+					int num2 = list.IndexOf(category);
+					allEvents.RemoveAt(num);
+					if (num2 > num)
 					{
-						newIndex--;
+						num2--;
 					}
-					currentCategories.Insert(newIndex, category);
+					allEvents.Insert(num2, category);
 				}
-				this.SaveClicked?.Invoke(this, (_areaConfiguration, currentCategories.Select((EventCategory x) => x.Key).ToArray()));
+				this.SaveClicked?.Invoke(this, (_areaConfiguration, allEvents.Select((EventCategory x) => x.Key).ToArray()));
 			});
 			StandardButton val4 = new StandardButton();
 			val4.set_Text("Reset");

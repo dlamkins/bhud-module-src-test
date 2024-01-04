@@ -20,6 +20,8 @@ namespace Estreya.BlishHUD.EventTable
 	{
 		private const string EVENT_AREA_SETTINGS = "event-area-settings";
 
+		public const string ANY_AREA_NAME = "Any";
+
 		private SettingCollection EventAreaSettings { get; set; }
 
 		public SettingEntry<List<string>> EventAreaNames { get; private set; }
@@ -53,6 +55,10 @@ namespace Estreya.BlishHUD.EventTable
 		public SettingEntry<EventReminderStackDirection> ReminderOverflowStackDirection { get; private set; }
 
 		public SettingEntry<ReminderType> ReminderType { get; private set; }
+
+		public SettingEntry<bool> DisableRemindersWhenEventFinished { get; private set; }
+
+		public SettingEntry<string> DisableRemindersWhenEventFinishedArea { get; private set; }
 
 		public SettingEntry<bool> AcceptWaypointPrompt { get; private set; }
 
@@ -142,6 +148,8 @@ namespace Estreya.BlishHUD.EventTable
 				TimeUnit.Hour
 			});
 			ReminderType = base.GlobalSettings.DefineSetting<ReminderType>("ReminderType", Estreya.BlishHUD.EventTable.Models.Reminders.ReminderType.Control, (Func<string>)(() => "Reminder Type"), (Func<string>)(() => "Defines what type the reminder should be displayed as."));
+			DisableRemindersWhenEventFinished = base.GlobalSettings.DefineSetting<bool>("DisableRemindersWhenEventFinished", false, (Func<string>)(() => "Disable Reminders for finished Events"), (Func<string>)(() => "Disabled the reminders for events with are either completed or hidden."));
+			DisableRemindersWhenEventFinishedArea = base.GlobalSettings.DefineSetting<string>("DisableRemindersWhenEventFinishedArea", "Any", (Func<string>)(() => "Check finished Events in Area"), (Func<string>)(() => "Defines the area name which is checked for completed/finished events"));
 			AcceptWaypointPrompt = base.GlobalSettings.DefineSetting<bool>("AcceptWaypointPrompt", true, (Func<string>)(() => "Accept Waypoint Prompt"), (Func<string>)(() => "Defines if the waypoint prompt should be auto accepted"));
 			ShowDynamicEventsOnMap = base.GlobalSettings.DefineSetting<bool>("ShowDynamicEventsOnMap", false, (Func<string>)(() => "Show Dynamic Events on Map"), (Func<string>)(() => "Whether the dynamic events of the map should be shown."));
 			ShowDynamicEventInWorld = base.GlobalSettings.DefineSetting<bool>("ShowDynamicEventInWorld", false, (Func<string>)(() => "Show Dynamic Events in World"), (Func<string>)(() => "Whether dynamic events should be shown inside the world."));
@@ -680,6 +688,22 @@ namespace Estreya.BlishHUD.EventTable
 			string enableColorGradientsDescriptionDefault = ((SettingEntry)drawerConfiguration.EnableColorGradients).get_Description();
 			((SettingEntry)drawerConfiguration.EnableColorGradients).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerEnableColorGradients-name", enableColorGradientsDisplayNameDefault)));
 			((SettingEntry)drawerConfiguration.EnableColorGradients).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerEnableColorGradients-description", enableColorGradientsDescriptionDefault)));
+		}
+
+		public void ValidateAndTryFixSettings()
+		{
+			ValidateAndFixDisableRemindersWhenEventFinishedArea();
+		}
+
+		private void ValidateAndFixDisableRemindersWhenEventFinishedArea()
+		{
+			List<string> areaNames = EventAreaNames.get_Value().ToArray().ToList();
+			string disableRemindersWhenEventFinishedArea = DisableRemindersWhenEventFinishedArea.get_Value();
+			if (disableRemindersWhenEventFinishedArea != "Any" && !areaNames.Contains(disableRemindersWhenEventFinishedArea))
+			{
+				Logger.Warn("Setting \"DisableRemindersWhenEventFinishedArea\" has the invalid area \"" + disableRemindersWhenEventFinishedArea + "\" set and will be reset to \"Any\".");
+				DisableRemindersWhenEventFinishedArea.set_Value("Any");
+			}
 		}
 
 		public override void Unload()

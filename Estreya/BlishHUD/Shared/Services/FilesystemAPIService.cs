@@ -54,7 +54,7 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		protected override async Task Load()
 		{
-			_ = 6;
+			_ = 7;
 			try
 			{
 				bool forceAPI = ForceAPI;
@@ -91,7 +91,7 @@ namespace Estreya.BlishHUD.Shared.Services
 						using JsonReader reader = new JsonTextReader(sr);
 						List<T> entities = serializer.Deserialize<List<T>>(reader);
 						await OnAfterFilesystemLoad(entities);
-						using (_apiObjectListLock.Lock())
+						using (await _apiObjectListLock.LockAsync())
 						{
 							base.APIObjectList.Clear();
 							base.APIObjectList.AddRange(entities);
@@ -111,14 +111,15 @@ namespace Estreya.BlishHUD.Shared.Services
 				}
 				if (forceAPI || !shouldLoadFiles)
 				{
-					await LoadFromAPI(!canLoadFiles);
+					bool result = await LoadFromAPI(!canLoadFiles);
 					if (!base.CancellationToken.IsCancellationRequested)
 					{
 						try
 						{
 							base.Loading = true;
 							ReportProgress("Saving...");
-							if (await OnAfterLoadFromAPIBeforeSave())
+							bool flag2 = result;
+							if (flag2 | await OnAfterLoadFromAPIBeforeSave())
 							{
 								await Save();
 								await OnAfterLoadFromAPIAfterSave();
@@ -150,7 +151,7 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		protected virtual Task<bool> OnAfterLoadFromAPIBeforeSave()
 		{
-			return Task.FromResult(result: true);
+			return Task.FromResult(result: false);
 		}
 
 		protected virtual Task OnAfterLoadFromAPIAfterSave()
