@@ -62,8 +62,9 @@ namespace RaidClears
 
 		protected override Task LoadAsync()
 		{
-			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0092: Expected O, but got Unknown
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009c: Expected O, but got Unknown
+			Service.InstabilitiesData = InstabilitiesData.Load();
 			Service.StrikePersistance = StrikePersistance.Load();
 			Service.FractalPersistance = FractalPersistance.Load();
 			Service.ApiPollingService = new ApiPollService(Service.Settings.ApiPollingPeriod);

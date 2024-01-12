@@ -20,13 +20,21 @@ namespace RaidClears.Features.Fractals.Services
 
 		public static IEnumerable<BoxModel> GetCMFractals()
 		{
-			return new List<Encounters.Fractal>
+			int today = DayOfYearIndexService.DayOfYearIndex();
+			return new List<(Encounters.Fractal, int)>
 			{
-				Encounters.Fractal.NightmareFractal,
-				Encounters.Fractal.ShatteredObservatoryFractal,
-				Encounters.Fractal.SunquaPeakFractal,
-				Encounters.Fractal.SilentSurfFractal
-			}.Select((Encounters.Fractal e) => new BoxModel(e.GetApiLabel(), e.GetLabel(), e.GetLabelShort()));
+				(Encounters.Fractal.NightmareFractal, 97),
+				(Encounters.Fractal.ShatteredObservatoryFractal, 98),
+				(Encounters.Fractal.SunquaPeakFractal, 99),
+				(Encounters.Fractal.SilentSurfFractal, 100)
+			}.Select<(Encounters.Fractal, int), BoxModel>(((Encounters.Fractal fractal, int scale) e) => new BoxModel(e.fractal.GetApiLabel(), GetCMTooltip(e.fractal, e.scale, today), e.fractal.GetLabelShort()));
+		}
+
+		private static string GetCMTooltip(Encounters.Fractal fractal, int scale, int today)
+		{
+			string instab = string.Join("\n\t", Service.InstabilitiesData.GetInstabsForLevelOnDay(scale, today).ToArray());
+			string tomInstab = string.Join("\n\t", Service.InstabilitiesData.GetInstabsForLevelOnDay(scale, (today + 1) % 366).ToArray());
+			return fractal.GetLabel() + "\n\nInstabilities\n\t" + instab + "\n\nTomorrow's Instabilities\n\t" + tomInstab;
 		}
 
 		public static IEnumerable<BoxModel> GetTomorrowTierN()

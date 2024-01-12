@@ -5,6 +5,8 @@ namespace RaidClears.Settings.Models
 {
 	public class FractalSettings
 	{
+		public SettingEntry<bool> ChallengeMotes { get; set; }
+
 		public SettingEntry<bool> DailyTierN { get; set; }
 
 		public SettingEntry<bool> DailyRecs { get; set; }
@@ -49,6 +51,7 @@ namespace RaidClears.Settings.Models
 				Visible = settings.DefineSetting(Settings.Fractal.General.visible),
 				Tooltips = settings.DefineSetting(Settings.Fractal.General.tooltips)
 			};
+			ChallengeMotes = settings.DefineSetting(Settings.Fractal.Module.showCMs);
 			DailyTierN = settings.DefineSetting(Settings.Fractal.Module.showTierN);
 			DailyRecs = settings.DefineSetting(Settings.Fractal.Module.showRecs);
 			TomorrowTierN = settings.DefineSetting(Settings.Fractal.Module.tomorrow);

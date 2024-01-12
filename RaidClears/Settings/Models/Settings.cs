@@ -281,6 +281,8 @@ namespace RaidClears.Settings.Models
 
 			public static class Module
 			{
+				public static Setting<bool> showCMs = new Setting<bool>("FractalCM", DefaultValue: true, () => "Show Challenge Motes", () => "Display the CM fractals, hover tooltip shows Instabilities");
+
 				public static Setting<bool> showTierN = new Setting<bool>("FractalTierN", DefaultValue: true, () => Strings.Fractals_DailyTierN);
 
 				public static Setting<bool> showRecs = new Setting<bool>("FractalRecs", DefaultValue: true, () => Strings.Fractals_DailyRecommended);

@@ -13,9 +13,10 @@ namespace RaidClears.Features.Fractals.Models
 		{
 			return new List<Fractal>
 			{
+				new CMFractals("Challenge Motes", 4, "CM", new List<BoxModel>(), (Container)(object)panel),
 				new TierNFractals("Tier #", 0, "T#", new List<BoxModel>(), (Container)(object)panel),
 				new DailyFractal("Daily Recommended", 1, "Rec", new List<BoxModel>(), (Container)(object)panel),
-				new TierNTomorrow("Tomorrow T#", 1, "Tom", new List<BoxModel>(), (Container)(object)panel)
+				new TierNTomorrow("Tomorrow T#", 2, "Tom", new List<BoxModel>(), (Container)(object)panel)
 			};
 		}
 	}
