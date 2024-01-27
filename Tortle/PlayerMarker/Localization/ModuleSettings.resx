@@ -30,14 +30,16 @@
 <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="PlayerMarkerEnable_Tooltip"><value /></data>
   <data name="PlayerMarkerSize_Tooltip"><value>The size of the marker.</value></data>
   <data name="PlayerMarkerEnable_Name"><value>Enabled</value></data>
-  <data name="PlayerMarkerVerticalOffset_Name"><value>Vertical Offset</value></data>
+  <data name="PlayerMarkerVerticalOffset_Name"><value>Vertical Offset:</value></data>
+  <data name="CleanupDuplicates_Name"><value>Cleanup Duplicate Images</value></data>
+  <data name="CleanupDuplicates_Tooltip"><value>{0} duplicates to cleanup.</value></data>
   <data name="PlayerMarkerImage_Description"><value>Custom images can be placed in the module's 'tortle/playermarkers' directory.</value></data>
-  <data name="PlayerMarkerOpacity_Name"><value>Opacity</value></data>
-  <data name="PlayerMarkerSize_Name"><value>Size</value></data>
+  <data name="PlayerMarkerOpacity_Name"><value>Opacity:</value></data>
+  <data name="PlayerMarkerSize_Name"><value>Size:</value></data>
   <data name="PlayerMarkerVerticalOffset_Tooltip"><value>The vertical position of the marker.</value></data>
   <data name="PlayerMarkerColor_Tooltip"><value>The color of the marker.</value></data>
   <data name="PlayerMarkerColor_Name"><value>Color</value></data>
   <data name="PlayerMarkerImage_Tooltip"><value>The displayed marker image.</value></data>
   <data name="PlayerMarkerOpacity_Tooltip"><value>The transparency of the marker.</value></data>
-  <data name="PlayerMarkerImage_Name"><value>Image</value></data>
+  <data name="PlayerMarkerImage_Name"><value>Image:</value></data>
   </root>

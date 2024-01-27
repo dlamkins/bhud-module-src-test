@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Settings;
 using Microsoft.Xna.Framework;
@@ -14,7 +15,7 @@ namespace Tortle.PlayerMarker.Services
 
 		private readonly Tortle.PlayerMarker.Entity.PlayerMarker _playerMarker;
 
-		private readonly TextureCache _textureCache;
+		private readonly MarkerTextureManager _markerTextureManager;
 
 		public SettingEntry<bool> Enabled { get; private set; }
 
@@ -28,12 +29,9 @@ namespace Tortle.PlayerMarker.Services
 
 		public SettingEntry<string> ImageName { get; private set; }
 
-		public string[] DefaultMarkerFileNames { get; } = new string[10] { "gw2PersonalTarget.png", "circleFill.png", "gw2CommanderArrow.png", "gw2CommanderCircle.png", "gw2CommanderHeart.png", "gw2CommanderSquare.png", "gw2CommanderStar.png", "gw2CommanderSpiral.png", "gw2CommanderTriangle.png", "gw2CommanderX.png" };
-
-
-		public ModuleSettings(TextureCache textureCache, Tortle.PlayerMarker.Entity.PlayerMarker playerMarker)
+		public ModuleSettings(MarkerTextureManager markerTextureManager, Tortle.PlayerMarker.Entity.PlayerMarker playerMarker)
 		{
-			_textureCache = textureCache;
+			_markerTextureManager = markerTextureManager;
 			_playerMarker = playerMarker;
 		}
 
@@ -45,7 +43,7 @@ namespace Tortle.PlayerMarker.Services
 			Size = settingCollection.DefineSetting<float>("PlayerMarkerSize", 0.25f, (Func<string>)(() => Tortle.PlayerMarker.Localization.ModuleSettings.PlayerMarkerSize_Name), (Func<string>)(() => Tortle.PlayerMarker.Localization.ModuleSettings.PlayerMarkerSize_Tooltip));
 			Opacity = settingCollection.DefineSetting<float>("PlayerMarkerOpacity", 1f, (Func<string>)(() => Tortle.PlayerMarker.Localization.ModuleSettings.PlayerMarkerOpacity_Name), (Func<string>)(() => Tortle.PlayerMarker.Localization.ModuleSettings.PlayerMarkerOpacity_Tooltip));
 			VerticalOffset = settingCollection.DefineSetting<float>("PlayerMarkerVerticalOffset", 2.5f, (Func<string>)(() => Tortle.PlayerMarker.Localization.ModuleSettings.PlayerMarkerVerticalOffset_Name), (Func<string>)(() => Tortle.PlayerMarker.Localization.ModuleSettings.PlayerMarkerVerticalOffset_Tooltip));
-			ImageName = settingCollection.DefineSetting<string>("PlayerMarkerImage", DefaultMarkerFileNames[0], (Func<string>)(() => Tortle.PlayerMarker.Localization.ModuleSettings.PlayerMarkerImage_Name), (Func<string>)(() => Tortle.PlayerMarker.Localization.ModuleSettings.PlayerMarkerImage_Tooltip));
+			ImageName = settingCollection.DefineSetting<string>("PlayerMarkerImage", _markerTextureManager.DefaultTextures.First().Id, (Func<string>)(() => Tortle.PlayerMarker.Localization.ModuleSettings.PlayerMarkerImage_Name), (Func<string>)(() => Tortle.PlayerMarker.Localization.ModuleSettings.PlayerMarkerImage_Tooltip));
 			Enabled.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings_Enabled);
 			Color.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateSettings_Color);
 			Size.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)UpdateSettings_Size);
@@ -96,7 +94,7 @@ namespace Tortle.PlayerMarker.Services
 
 		private void UpdateSettings_Image(object sender, ValueChangedEventArgs<string> e)
 		{
-			_playerMarker.MarkerTexture = _textureCache.Get(e.get_NewValue());
+			_playerMarker.MarkerTexture = _markerTextureManager.Get(e.get_NewValue());
 		}
 	}
 }

@@ -1,17 +1,32 @@
 using System;
 using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Entities;
 using Blish_HUD.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Tortle.PlayerMarker.Models;
 
 namespace Tortle.PlayerMarker.Entity
 {
-	public class PlayerMarker : IEntity, IUpdatable, IRenderable3D
+	internal class PlayerMarker : IEntity, IUpdatable, IRenderable3D
 	{
 		private readonly VertexPositionColorTexture[] _vertex;
 
-		public Texture2D MarkerTexture { get; set; }
+		private ITexture _markerTexture;
+
+		public ITexture MarkerTexture
+		{
+			get
+			{
+				return _markerTexture;
+			}
+			set
+			{
+				_markerTexture?.Dispose();
+				_markerTexture = value;
+			}
+		}
 
 		public float MarkerOpacity { get; set; }
 
@@ -125,11 +140,11 @@ namespace Tortle.PlayerMarker.Entity
 			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
 			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0119: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0134: Expected O, but got Unknown
-			//IL_0154: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0159: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013e: Expected O, but got Unknown
+			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
 			if (!Visible || MarkerTexture == null)
 			{
 				return;
@@ -148,7 +163,7 @@ namespace Tortle.PlayerMarker.Entity
 			val2.set_View(GameService.Gw2Mumble.get_PlayerCamera().get_View());
 			val2.set_Projection(GameService.Gw2Mumble.get_PlayerCamera().get_Projection());
 			val2.set_World(worldMatrix);
-			val2.set_Texture(MarkerTexture);
+			val2.set_Texture(AsyncTexture2D.op_Implicit(MarkerTexture.Get()));
 			val2.set_Alpha(MarkerOpacity);
 			VertexBuffer geometryBuffer = new VertexBuffer(graphicsDevice, VertexPositionColorTexture.VertexDeclaration, 4, (BufferUsage)1);
 			geometryBuffer.SetData<VertexPositionColorTexture>(_vertex);

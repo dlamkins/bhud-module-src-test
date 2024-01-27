@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.Composition;
+using System.Linq;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Entities;
@@ -23,7 +24,7 @@ namespace Tortle.PlayerMarker
 
 		private readonly Tortle.PlayerMarker.Entity.PlayerMarker _playerMarker;
 
-		private readonly TextureCache _textureCache;
+		private readonly MarkerTextureManager _markerTextureManager;
 
 		private readonly ModuleSettings _moduleSettings;
 
@@ -36,9 +37,9 @@ namespace Tortle.PlayerMarker
 			ContentsManager contentsManager = base.ModuleParameters.get_ContentsManager();
 			DirectoriesManager directoriesManager = base.ModuleParameters.get_DirectoriesManager();
 			_playerMarker = new Tortle.PlayerMarker.Entity.PlayerMarker();
-			_textureCache = new TextureCache(directoriesManager, contentsManager);
-			_moduleSettings = new ModuleSettings(_textureCache, _playerMarker);
-			_settingsView = new SettingsView(_textureCache, _moduleSettings, contentsManager);
+			_markerTextureManager = new MarkerTextureManager(directoriesManager, contentsManager);
+			_moduleSettings = new ModuleSettings(_markerTextureManager, _playerMarker);
+			_settingsView = new SettingsView(_markerTextureManager, _moduleSettings, contentsManager);
 		}
 
 		protected override void DefineSettings(SettingCollection settings)
@@ -53,14 +54,14 @@ namespace Tortle.PlayerMarker
 			return (IView)(object)_settingsView;
 		}
 
-		protected override async Task LoadAsync()
+		protected override Task LoadAsync()
 		{
 			Logger.Info("Loading module");
-			await _textureCache.Load(_moduleSettings.DefaultMarkerFileNames);
+			_markerTextureManager.Load();
 			NormalizeSettings();
-			_textureCache.Get(_moduleSettings.ImageName.get_Value());
 			_settingsView.LoadTextures();
 			GameService.Graphics.get_World().AddEntity((IEntity)(object)_playerMarker);
+			return Task.CompletedTask;
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)
@@ -71,7 +72,7 @@ namespace Tortle.PlayerMarker
 			_playerMarker.Visible = _moduleSettings.Enabled.get_Value();
 			_playerMarker.MarkerColor = ConversionUtil.ToRgb(_moduleSettings.Color.get_Value());
 			_playerMarker.MarkerOpacity = _moduleSettings.Opacity.get_Value();
-			_playerMarker.MarkerTexture = _textureCache.Get(_moduleSettings.ImageName.get_Value());
+			_playerMarker.MarkerTexture = _markerTextureManager.Get(_moduleSettings.ImageName.get_Value());
 			_playerMarker.Size = new Vector3(diameterPx, diameterPx, 0f);
 			_playerMarker.VerticalOffset = _moduleSettings.VerticalOffset.get_Value();
 			Logger.Info("Marker properties set");
@@ -83,17 +84,17 @@ namespace Tortle.PlayerMarker
 		protected override void Unload()
 		{
 			_moduleSettings.Dispose();
-			_textureCache.Dispose();
+			_markerTextureManager.Dispose();
 			_settingsView.Dispose();
 			GameService.Graphics.get_World().RemoveEntity((IEntity)(object)_playerMarker);
 		}
 
 		private void NormalizeSettings()
 		{
-			if (!_textureCache.ContainsKey(_moduleSettings.ImageName.get_Value()))
+			if (!_markerTextureManager.ContainsKey(_moduleSettings.ImageName.get_Value()))
 			{
 				Logger.Warn("Resetting {setting} setting back to default", new object[1] { "ImageName" });
-				_moduleSettings.ImageName.set_Value(_moduleSettings.DefaultMarkerFileNames[0]);
+				_moduleSettings.ImageName.set_Value(_markerTextureManager.DefaultTextures.First().Id);
 			}
 			if (!ColorPresets.Colors.ContainsKey(_moduleSettings.Color.get_Value()))
 			{

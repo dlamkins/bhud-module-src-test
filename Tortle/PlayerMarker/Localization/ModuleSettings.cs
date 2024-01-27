@@ -42,6 +42,10 @@ namespace Tortle.PlayerMarker.Localization
 			}
 		}
 
+		internal static string CleanupDuplicates_Name => ResourceManager.GetString("CleanupDuplicates_Name", resourceCulture);
+
+		internal static string CleanupDuplicates_Tooltip => ResourceManager.GetString("CleanupDuplicates_Tooltip", resourceCulture);
+
 		internal static string PlayerMarkerColor_Name => ResourceManager.GetString("PlayerMarkerColor_Name", resourceCulture);
 
 		internal static string PlayerMarkerColor_Tooltip => ResourceManager.GetString("PlayerMarkerColor_Tooltip", resourceCulture);
