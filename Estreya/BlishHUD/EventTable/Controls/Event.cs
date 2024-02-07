@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using Blish_HUD;
 using Blish_HUD.Common.UI.Views;
@@ -51,11 +52,15 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		public Estreya.BlishHUD.EventTable.Models.Event Model { get; private set; }
 
-		public event EventHandler HideRequested;
+		public event EventHandler HideClicked;
 
-		public event EventHandler DisableRequested;
+		public event EventHandler DisableClicked;
 
-		public event EventHandler ToggleFinishRequested;
+		public event EventHandler ToggleFinishClicked;
+
+		public event EventHandler<string> MoveToAreaClicked;
+
+		public event EventHandler<string> CopyToAreaClicked;
 
 		public Event(Estreya.BlishHUD.EventTable.Models.Event ev, IconService iconService, TranslationService translationService, Func<DateTime> getNowAction, DateTime startTime, DateTime endTime, Func<BitmapFont> getFontAction, Func<bool> getDrawBorders, Func<bool> getDrawCrossout, Func<Color> getTextColor, Func<Color[]> getColorAction, Func<bool> getDrawShadowAction, Func<Color> getShadowColor, Func<string> getDateTimeFormatString, Func<(string DaysFormat, string HoursFormat, string MinutesFormat)> getTimespanFormatStrings)
 		{
@@ -76,7 +81,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			_getTimespanFormatStrings = getTimespanFormatStrings;
 		}
 
-		public ContextMenuStrip BuildContextMenu()
+		public ContextMenuStrip BuildContextMenu(Func<List<string>> getAreaNames, string currentAreaName)
 		{
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Expected O, but got Unknown
@@ -89,28 +94,87 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0112: Expected O, but got Unknown
+			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015c: Expected O, but got Unknown
+			//IL_0171: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0176: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0198: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0224: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0229: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0230: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024b: Unknown result type (might be due to invalid IL or missing references)
 			ContextMenuStrip menu = new ContextMenuStrip();
 			ContextMenuStripItem val = new ContextMenuStripItem(_translationService.GetTranslation("event-contextMenu-disable-title", "Disable"));
 			((Control)val).set_Parent((Container)(object)menu);
 			((Control)val).set_BasicTooltipText(_translationService.GetTranslation("event-contextMenu-disable-tooltip", "Disables the event entirely."));
 			((Control)val).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				this.DisableRequested?.Invoke(this, EventArgs.Empty);
+				this.DisableClicked?.Invoke(this, EventArgs.Empty);
 			});
 			ContextMenuStripItem val2 = new ContextMenuStripItem(_translationService.GetTranslation("event-contextMenu-hide-title", "Hide"));
 			((Control)val2).set_Parent((Container)(object)menu);
 			((Control)val2).set_BasicTooltipText(_translationService.GetTranslation("event-contextMenu-hide-tooltip", "Hides the event until the next reset."));
 			((Control)val2).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				this.HideRequested?.Invoke(this, EventArgs.Empty);
+				this.HideClicked?.Invoke(this, EventArgs.Empty);
 			});
 			ContextMenuStripItem val3 = new ContextMenuStripItem(_translationService.GetTranslation("event-contextMenu-toggleFinish-title", "Toggle Finish"));
 			((Control)val3).set_Parent((Container)(object)menu);
 			((Control)val3).set_BasicTooltipText(_translationService.GetTranslation("event-contextMenu-toggleFinish-tooltip", "Toggles the completed state of the event."));
 			((Control)val3).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				this.ToggleFinishRequested?.Invoke(this, EventArgs.Empty);
+				this.ToggleFinishClicked?.Invoke(this, EventArgs.Empty);
 			});
+			if (getAreaNames != null && currentAreaName != null)
+			{
+				List<string> areaNames = getAreaNames();
+				if (areaNames.Count > 1)
+				{
+					ContextMenuStrip moveToAreaMenu = new ContextMenuStrip();
+					ContextMenuStripItem val4 = new ContextMenuStripItem(_translationService.GetTranslation("event-contextMenu-moveToArea-title", "Move to Area..."));
+					((Control)val4).set_Parent((Container)(object)menu);
+					((Control)val4).set_BasicTooltipText(_translationService.GetTranslation("event-contextMenu-moveToArea-tooltip", "Moves the selected event to the selected area and disables it in the current area."));
+					val4.set_Submenu(moveToAreaMenu);
+					ContextMenuStrip copyToAreaMenu = new ContextMenuStrip();
+					ContextMenuStripItem val5 = new ContextMenuStripItem(_translationService.GetTranslation("event-contextMenu-copyToArea-title", "Copy to Area..."));
+					((Control)val5).set_Parent((Container)(object)menu);
+					((Control)val5).set_BasicTooltipText(_translationService.GetTranslation("event-contextMenu-copyToArea-tooltip", "Copies the selected event to the selected area."));
+					val5.set_Submenu(copyToAreaMenu);
+					{
+						foreach (string areaName in areaNames)
+						{
+							ContextMenuStripItem val6 = new ContextMenuStripItem(areaName);
+							((Control)val6).set_Parent((Container)(object)moveToAreaMenu);
+							((Control)val6).set_BasicTooltipText(_translationService.GetTranslation("event-contextMenu-moveToArea-tooltip", "Moves the selected event to the selected area and disables it in the current area."));
+							((Control)val6).set_Enabled(areaName != currentAreaName);
+							((Control)val6).add_Click((EventHandler<MouseEventArgs>)delegate
+							{
+								this.MoveToAreaClicked?.Invoke(this, areaName);
+							});
+							ContextMenuStripItem val7 = new ContextMenuStripItem(areaName);
+							((Control)val7).set_Parent((Container)(object)copyToAreaMenu);
+							((Control)val7).set_BasicTooltipText(_translationService.GetTranslation("event-contextMenu-copyToArea-tooltip", "Copies the selected event to the selected area."));
+							((Control)val7).set_Enabled(areaName != currentAreaName);
+							((Control)val7).add_Click((EventHandler<MouseEventArgs>)delegate
+							{
+								this.CopyToAreaClicked?.Invoke(this, areaName);
+							});
+						}
+						return menu;
+					}
+				}
+			}
 			return menu;
 		}
 
@@ -159,12 +223,12 @@ namespace Estreya.BlishHUD.EventTable.Controls
 		{
 			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
 			Color[] colors = _getColorAction();
 			if (colors.Length == 1)
 			{

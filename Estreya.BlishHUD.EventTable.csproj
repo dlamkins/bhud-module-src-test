@@ -48,6 +48,7 @@
     <Reference Include="jose-jwt">
       <HintPath>..\..\working\jose-jwt.dll</HintPath>
     </Reference>
+    <Reference Include="NAudio.Wasapi" />
     <Reference Include="System.Security" />
     <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="AsyncClipboardService" />

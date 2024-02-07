@@ -11,6 +11,8 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		public SettingEntry<EventCompletedAction> CompletionAction { get; set; }
 
+		public SettingEntry<bool> EnableLinkedCompletion { get; set; }
+
 		public SettingEntry<bool> ShowTooltips { get; set; }
 
 		public SettingEntry<LeftClickAction> LeftClickAction { get; set; }
@@ -120,6 +122,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 			CopyTo((DrawerConfiguration)other);
 			other.DisabledEventKeys.set_Value(DisabledEventKeys.get_Value());
 			other.CompletionAction.set_Value(CompletionAction.get_Value());
+			other.EnableLinkedCompletion.set_Value(EnableLinkedCompletion.get_Value());
 			other.ShowTooltips.set_Value(ShowTooltips.get_Value());
 			other.LeftClickAction.set_Value(LeftClickAction.get_Value());
 			other.AcceptWaypointPrompt.set_Value(AcceptWaypointPrompt.get_Value());

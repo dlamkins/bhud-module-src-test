@@ -90,6 +90,8 @@ namespace Estreya.BlishHUD.EventTable
 
 		public SettingEntry<bool> HideRemindersInPvP { get; private set; }
 
+		public SettingEntry<bool> IncludeSelfHostedEvents { get; private set; }
+
 		public ModuleSettings(SettingCollection settings)
 			: base(settings, new KeyBinding((ModifierKeys)2, (Keys)69))
 		{
@@ -168,6 +170,7 @@ namespace Estreya.BlishHUD.EventTable
 			HideRemindersInPvE_Competetive = base.GlobalSettings.DefineSetting<bool>("HideRemindersInPvE_Competetive", false, (Func<string>)(() => "Hide Reminders in PvE (Competetive)"), (Func<string>)(() => "Whether the reminders should hide when in PvE (Competetive)."));
 			HideRemindersInWvW = base.GlobalSettings.DefineSetting<bool>("HideRemindersInWvW", false, (Func<string>)(() => "Hide Reminders in WvW"), (Func<string>)(() => "Whether the reminders should hide when in world vs. world."));
 			HideRemindersInPvP = base.GlobalSettings.DefineSetting<bool>("HideRemindersInPvP", false, (Func<string>)(() => "Hide Reminders in PvP"), (Func<string>)(() => "Whether the reminders should hide when in player vs. player."));
+			IncludeSelfHostedEvents = base.GlobalSettings.DefineSetting<bool>("IncludeSelfHostedEvents", true, (Func<string>)(() => "Include Self Hosted Events"), (Func<string>)(() => "Whether to include events hosted by other players inside the areas."));
 			HandleEnabledStates();
 		}
 
@@ -256,6 +259,7 @@ namespace Estreya.BlishHUD.EventTable
 			SettingEntry<Color> fillerTextColor = base.DrawerSettings.DefineSetting<Color>(name + "-fillerTextColor", base.DefaultGW2Color, (Func<string>)(() => "Filler Text Color"), (Func<string>)(() => "Defines the text color used by filler events."));
 			SettingEntry<bool> acceptWaypointPrompt = base.DrawerSettings.DefineSetting<bool>(name + "-acceptWaypointPrompt", true, (Func<string>)(() => "Accept Waypoint Prompt"), (Func<string>)(() => "Whether the waypoint prompt should be accepted automatically when performing an automated teleport."));
 			SettingEntry<EventCompletedAction> completionAction = base.DrawerSettings.DefineSetting<EventCompletedAction>(name + "-completionAction", EventCompletedAction.Crossout, (Func<string>)(() => "Completion Action"), (Func<string>)(() => "Defines the action to perform if an event has been completed."));
+			SettingEntry<bool> enableLinkedCompletion = base.DrawerSettings.DefineSetting<bool>(name + "-enableLinkedCompletion", true, (Func<string>)(() => "Enable Linked Completion"), (Func<string>)(() => "Enables the completion of events that are linked to the completed event. (e.g. Auric Basin)"));
 			SettingEntry<List<string>> disabledEventKeys = base.DrawerSettings.DefineSetting<List<string>>(name + "-disabledEventKeys", new List<string>(), (Func<string>)(() => "Active Event Keys"), (Func<string>)(() => "Defines the active event keys."));
 			SettingEntry<int> eventHeight = base.DrawerSettings.DefineSetting<int>(name + "-eventHeight", 30, (Func<string>)(() => "Event Height"), (Func<string>)(() => "Defines the height of the individual event rows."));
 			SettingComplianceExtensions.SetRange(eventHeight, 5, 30);
@@ -335,6 +339,7 @@ namespace Estreya.BlishHUD.EventTable
 				AcceptWaypointPrompt = acceptWaypointPrompt,
 				DisabledEventKeys = disabledEventKeys,
 				CompletionAction = completionAction,
+				EnableLinkedCompletion = enableLinkedCompletion,
 				EventHeight = eventHeight,
 				EventOrder = eventOrder,
 				EventBackgroundOpacity = eventBackgroundOpacity,

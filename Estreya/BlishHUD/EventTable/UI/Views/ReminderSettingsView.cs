@@ -119,14 +119,14 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				string message = "Test starts in " + TimeSpan.FromHours(5.0).Add(TimeSpan.FromMinutes(21.0).Add(TimeSpan.FromSeconds(23.0))).Humanize(6, null, TimeUnit.Week, _moduleSettings.ReminderMinTimeUnit.get_Value()) + "!";
 				AsyncTexture2D icon = base.IconService.GetIcon("textures/maintenance.png");
 				ReminderType value = _moduleSettings.ReminderType.get_Value();
-				if (value == ReminderType.Control || value == ReminderType.Both)
+				if ((value == ReminderType.Control || value == ReminderType.Both) ? true : false)
 				{
 					EventNotification eventNotification = new EventNotification(null, title, message, icon, _moduleSettings.ReminderPosition.X.get_Value(), _moduleSettings.ReminderPosition.Y.get_Value(), _moduleSettings.ReminderSize.X.get_Value(), _moduleSettings.ReminderSize.Y.get_Value(), _moduleSettings.ReminderSize.Icon.get_Value(), _moduleSettings.ReminderStackDirection.get_Value(), _moduleSettings.ReminderOverflowStackDirection.get_Value(), _moduleSettings.ReminderFonts.TitleSize.get_Value(), _moduleSettings.ReminderFonts.MessageSize.get_Value(), base.IconService);
 					eventNotification.BackgroundOpacity = _moduleSettings.ReminderOpacity.get_Value();
 					eventNotification.Show(TimeSpan.FromSeconds(_moduleSettings.ReminderDuration.get_Value()));
 				}
 				value = _moduleSettings.ReminderType.get_Value();
-				if (value == ReminderType.Windows || value == ReminderType.Both)
+				if ((value == ReminderType.Windows || value == ReminderType.Both) ? true : false)
 				{
 					await EventNotification.ShowAsWindowsNotification(title, message, icon);
 				}

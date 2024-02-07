@@ -26,6 +26,7 @@ using Estreya.BlishHUD.Shared.Models;
 using Estreya.BlishHUD.Shared.MumbleInfo.Map;
 using Estreya.BlishHUD.Shared.Security;
 using Estreya.BlishHUD.Shared.Services;
+using Estreya.BlishHUD.Shared.Services.Audio;
 using Estreya.BlishHUD.Shared.Services.TradingPost;
 using Estreya.BlishHUD.Shared.Settings;
 using Estreya.BlishHUD.Shared.UI.Views;
@@ -148,6 +149,8 @@ namespace Estreya.BlishHUD.Shared.Modules
 		protected AccountAchievementService AccountAchievementService { get; private set; }
 
 		protected MetricsService MetricsService { get; private set; }
+
+		protected AudioService AudioService { get; private set; }
 
 		protected CancellationToken CancellationToken => _cancellationTokenSource.Token;
 
@@ -336,6 +339,11 @@ namespace Estreya.BlishHUD.Shared.Modules
 					AwaitLoading = true
 				}, GetFlurlClient(), "https://api.estreya.de/blish-hud", ((Module)this).get_Name(), ((Module)this).get_Namespace(), ModuleSettings, IconService);
 				_services.Add(MetricsService);
+				if (configurations.Audio.Enabled)
+				{
+					AudioService = new AudioService(configurations.Audio, directoryPath);
+					_services.Add(AudioService);
+				}
 				if (configurations.Items.Enabled)
 				{
 					ItemService = new ItemService(configurations.Items, Gw2ApiManager, directoryPath);

@@ -50,6 +50,8 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private readonly Func<string> _getAccessToken;
 
+		private readonly Func<List<string>> _getAreaNames;
+
 		private ContentsManager _contentsManager;
 
 		private readonly Func<DateTime> _getNowAction;
@@ -174,7 +176,11 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		public EventAreaConfiguration Configuration { get; private set; }
 
-		public EventArea(EventAreaConfiguration configuration, IconService iconService, TranslationService translationService, EventStateService eventService, WorldbossService worldbossService, MapchestService mapchestService, PointOfInterestService pointOfInterestService, MapUtil mapUtil, IFlurlClient flurlClient, string apiRootUrl, Func<DateTime> getNowAction, Func<Version> getVersion, Func<string> getAccessToken, ContentsManager contentsManager)
+		public event EventHandler<(string EventSettingKey, string DestinationArea)> MoveToAreaClicked;
+
+		public event EventHandler<(string EventSettingKey, string DestinationArea)> CopyToAreaClicked;
+
+		public EventArea(EventAreaConfiguration configuration, IconService iconService, TranslationService translationService, EventStateService eventService, WorldbossService worldbossService, MapchestService mapchestService, PointOfInterestService pointOfInterestService, MapUtil mapUtil, IFlurlClient flurlClient, string apiRootUrl, Func<DateTime> getNowAction, Func<Version> getVersion, Func<string> getAccessToken, Func<List<string>> getAreaNames, ContentsManager contentsManager)
 		{
 			Configuration = configuration;
 			Configuration.EnabledKeybinding.get_Value().add_Activated((EventHandler<EventArgs>)EnabledKeybinding_Activated);
@@ -206,6 +212,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			_getNowAction = getNowAction;
 			_getVersion = getVersion;
 			_getAccessToken = getAccessToken;
+			_getAreaNames = getAreaNames;
 			_contentsManager = contentsManager;
 			_iconService = iconService;
 			_translationService = translationService;
@@ -409,6 +416,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			{
 				events.AddRange(from ev in _allEvents.SelectMany((EventCategory ec) => ec.Events)
 					where ev.APICode == apiCode
+					where Configuration.EnableLinkedCompletion.get_Value() || !ev.LinkedCompletion
 					select ev);
 			}
 			events.ForEach(delegate(Estreya.BlishHUD.EventTable.Models.Event ev)
@@ -798,7 +806,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				if (!valueOrDefault)
 				{
 					((Control)this).set_Tooltip((!Configuration.ShowTooltips.get_Value()) ? null : _activeEvent?.BuildTooltip());
-					((Control)this).set_Menu(_activeEvent?.BuildContextMenu());
+					((Control)this).set_Menu(_activeEvent?.BuildContextMenu(_getAreaNames, Configuration.Name));
 				}
 				_lastActiveEvent = _activeEvent;
 			}
@@ -886,7 +894,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 						Event newEventControl = new Event(ev2, _iconService, _translationService, _getNowAction, occurence, occurence.AddMinutes(ev2.Duration), GetFont, () => !ev2.Filler && Configuration.DrawBorders.get_Value(), delegate
 						{
 							EventCompletedAction value3 = Configuration.CompletionAction.get_Value();
-							return (value3 == EventCompletedAction.Crossout || value3 == EventCompletedAction.CrossoutAndChangeOpacity) && _eventStateService.Contains(Configuration.Name, ev2.SettingKey, EventStateService.EventStates.Completed);
+							return ((value3 == EventCompletedAction.Crossout || value3 == EventCompletedAction.CrossoutAndChangeOpacity) ? true : false) && _eventStateService.Contains(Configuration.Name, ev2.SettingKey, EventStateService.EventStates.Completed);
 						}, delegate
 						{
 							//IL_0000: Unknown result type (might be due to invalid IL or missing references)
@@ -896,13 +904,14 @@ namespace Estreya.BlishHUD.EventTable.Controls
 							//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
 							//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
 							//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-							//IL_0203: Unknown result type (might be due to invalid IL or missing references)
-							//IL_0205: Unknown result type (might be due to invalid IL or missing references)
+							//IL_020d: Unknown result type (might be due to invalid IL or missing references)
+							//IL_020f: Unknown result type (might be due to invalid IL or missing references)
 							Color black = Color.get_Black();
 							Color val = ((!ev2.Filler) ? ((Configuration.TextColor.get_Value().get_Id() == 1) ? black : ColorExtensions.ToXnaColor(Configuration.TextColor.get_Value().get_Cloth())) : ((Configuration.FillerTextColor.get_Value().get_Id() == 1) ? black : ColorExtensions.ToXnaColor(Configuration.FillerTextColor.get_Value().get_Cloth())));
 							float num2 = (ev2.Filler ? Configuration.FillerTextOpacity.get_Value() : Configuration.EventTextOpacity.get_Value());
 							EventCompletedAction value2 = Configuration.CompletionAction.get_Value();
-							if ((value2 == EventCompletedAction.ChangeOpacity || value2 == EventCompletedAction.CrossoutAndChangeOpacity) && _eventStateService.Contains(Configuration.Name, ev2.SettingKey, EventStateService.EventStates.Completed))
+							bool flag2 = (((uint)(value2 - 2) <= 1u) ? true : false);
+							if (flag2 && _eventStateService.Contains(Configuration.Name, ev2.SettingKey, EventStateService.EventStates.Completed))
 							{
 								if (Configuration.CompletedEventsInvertTextColor.get_Value())
 								{
@@ -915,19 +924,20 @@ namespace Estreya.BlishHUD.EventTable.Controls
 						{
 							//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 							//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-							//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-							//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
-							//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
-							//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
-							//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
-							//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
+							//IL_019d: Unknown result type (might be due to invalid IL or missing references)
+							//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
+							//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
+							//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
+							//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
+							//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
 							if (ev2.Filler)
 							{
 								return (Color[])(object)new Color[1] { Color.get_Transparent() };
 							}
 							float alpha = Configuration.EventBackgroundOpacity.get_Value();
 							EventCompletedAction value = Configuration.CompletionAction.get_Value();
-							if ((value == EventCompletedAction.ChangeOpacity || value == EventCompletedAction.CrossoutAndChangeOpacity) && _eventStateService.Contains(Configuration.Name, ev2.SettingKey, EventStateService.EventStates.Completed))
+							bool flag = (((uint)(value - 2) <= 1u) ? true : false);
+							if (flag && _eventStateService.Contains(Configuration.Name, ev2.SettingKey, EventStateService.EventStates.Completed))
 							{
 								alpha = Configuration.CompletedEventsBackgroundOpacity.get_Value();
 							}
@@ -1166,19 +1176,35 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private void AddEventHooks(Event ev)
 		{
-			ev.HideRequested += Ev_HideRequested;
-			ev.ToggleFinishRequested += Ev_ToggleFinishRequested;
-			ev.DisableRequested += Ev_DisableRequested;
+			ev.HideClicked += Ev_HideClicked;
+			ev.ToggleFinishClicked += Ev_ToggleFinishClicked;
+			ev.DisableClicked += Ev_DisableClicked;
+			ev.CopyToAreaClicked += Ev_CopyToAreaClicked;
+			ev.MoveToAreaClicked += Ev_MoveToAreaClicked;
 		}
 
 		private void RemoveEventHooks(Event ev)
 		{
-			ev.HideRequested -= Ev_HideRequested;
-			ev.ToggleFinishRequested -= Ev_ToggleFinishRequested;
-			ev.DisableRequested -= Ev_DisableRequested;
+			ev.HideClicked -= Ev_HideClicked;
+			ev.ToggleFinishClicked -= Ev_ToggleFinishClicked;
+			ev.DisableClicked -= Ev_DisableClicked;
+			ev.CopyToAreaClicked -= Ev_CopyToAreaClicked;
+			ev.MoveToAreaClicked -= Ev_MoveToAreaClicked;
 		}
 
-		private void Ev_ToggleFinishRequested(object sender, EventArgs e)
+		private void Ev_MoveToAreaClicked(object sender, string e)
+		{
+			Event ev = sender as Event;
+			this.MoveToAreaClicked?.Invoke(this, (ev.Model.SettingKey, e));
+		}
+
+		private void Ev_CopyToAreaClicked(object sender, string e)
+		{
+			Event ev = sender as Event;
+			this.CopyToAreaClicked?.Invoke(this, (ev.Model.SettingKey, e));
+		}
+
+		private void Ev_ToggleFinishClicked(object sender, EventArgs e)
 		{
 			Event ev = sender as Event;
 			ToggleFinishEvent(ev.Model, GetNextReset(ev.Model));
@@ -1226,18 +1252,33 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			_eventStateService.Add(Configuration.Name, ev.SettingKey, until, EventStateService.EventStates.Hidden);
 		}
 
-		private void Ev_HideRequested(object sender, EventArgs e)
+		private void Ev_HideClicked(object sender, EventArgs e)
 		{
 			Event ev = sender as Event;
 			HideEvent(ev.Model, GetNextReset(ev.Model));
 		}
 
-		private void Ev_DisableRequested(object sender, EventArgs e)
+		private void Ev_DisableClicked(object sender, EventArgs e)
 		{
 			Event ev = sender as Event;
-			if (!Configuration.DisabledEventKeys.get_Value().Contains(ev.Model.SettingKey))
+			DisableEvent(ev.Model.SettingKey);
+		}
+
+		public void EnableEvent(string eventSettingKey)
+		{
+			if (Configuration.DisabledEventKeys.get_Value().Contains(eventSettingKey))
 			{
-				Configuration.DisabledEventKeys.set_Value(new List<string>(Configuration.DisabledEventKeys.get_Value()) { ev.Model.SettingKey });
+				Configuration.DisabledEventKeys.set_Value(new List<string>(from dek in Configuration.DisabledEventKeys.get_Value()
+					where dek != eventSettingKey
+					select dek));
+			}
+		}
+
+		public void DisableEvent(string eventSettingKey)
+		{
+			if (!Configuration.DisabledEventKeys.get_Value().Contains(eventSettingKey))
+			{
+				Configuration.DisabledEventKeys.set_Value(new List<string>(Configuration.DisabledEventKeys.get_Value()) { eventSettingKey });
 			}
 		}
 

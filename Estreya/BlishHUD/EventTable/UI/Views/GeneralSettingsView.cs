@@ -77,6 +77,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderBoolSetting((Panel)(object)visibilityOptionGroup, _moduleSettings.HideInPvP);
 			RenderEmptyLine((Panel)(object)visibilityOptionGroup, 20);
 			RenderEmptyLine((Panel)(object)parent);
+			RenderBoolSetting((Panel)(object)parent, _moduleSettings.IncludeSelfHostedEvents);
+			RenderEmptyLine((Panel)(object)parent);
 			RenderEnumSetting<MenuEventSortMode>((Panel)(object)parent, _moduleSettings.MenuEventSortMode);
 		}
 

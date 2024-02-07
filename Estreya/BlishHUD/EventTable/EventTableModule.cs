@@ -131,11 +131,17 @@ namespace Estreya.BlishHUD.EventTable
 			DynamicEventHandler.FoundLostEntities += DynamicEventHandler_FoundLostEntities;
 			await DynamicEventHandler.AddDynamicEventsToMap();
 			await DynamicEventHandler.AddDynamicEventsToWorld();
+			base.ModuleSettings.IncludeSelfHostedEvents.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)IncludeSelfHostedEvents_SettingChanged);
 			await LoadEvents();
 			AddAllAreas();
 			SetAreaEvents();
 			sw.Stop();
 			base.Logger.Debug("Loaded in " + sw.Elapsed.TotalMilliseconds.ToString(CultureInfo.InvariantCulture) + "ms");
+		}
+
+		private async void IncludeSelfHostedEvents_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
+		{
+			await ReloadEvents();
 		}
 
 		private void DynamicEventHandler_FoundLostEntities(object sender, EventArgs e)
@@ -223,6 +229,33 @@ namespace Estreya.BlishHUD.EventTable
 						base.Logger.Info($"Include {contextEvents.Count} context categories with {contextEvents.Sum((EventCategory ec) => ec.Events?.Count ?? 0)} events.");
 						categories.AddRange(contextEvents);
 					}
+					if (base.ModuleSettings.IncludeSelfHostedEvents.get_Value())
+					{
+						Dictionary<string, List<SelfHostedEventEntry>> selfHostedEvents = await LoadSelfHostedEvents();
+						if (selfHostedEvents != null)
+						{
+							foreach (KeyValuePair<string, List<SelfHostedEventEntry>> selfHostedCategory in selfHostedEvents)
+							{
+								if (!categories.Any((EventCategory c) => c.Key == selfHostedCategory.Key))
+								{
+									continue;
+								}
+								EventCategory category = categories.Find((EventCategory c) => c.Key == selfHostedCategory.Key);
+								foreach (SelfHostedEventEntry selfHostedEvent in selfHostedCategory.Value)
+								{
+									Estreya.BlishHUD.EventTable.Models.Event ev2 = new Estreya.BlishHUD.EventTable.Models.Event
+									{
+										Key = selfHostedEvent.EventKey,
+										Name = (selfHostedEvent.EventName ?? selfHostedEvent.EventKey),
+										Duration = selfHostedEvent.Duration,
+										HostedBySystem = false
+									};
+									ev2.Occurences.Add(selfHostedEvent.StartTime.UtcDateTime);
+									category.OriginalEvents.Add(ev2);
+								}
+							}
+						}
+					}
 					categories.ForEach(delegate(EventCategory ec)
 					{
 						ec.Load(() => NowUTC, base.TranslationService);
@@ -248,6 +281,28 @@ namespace Estreya.BlishHUD.EventTable
 					base.Logger.Error(ex, "Failed loading events.");
 				}
 			}
+		}
+
+		private async Task<Dictionary<string, List<SelfHostedEventEntry>>> LoadSelfHostedEvents()
+		{
+			try
+			{
+				Dictionary<string, List<SelfHostedEventEntry>> obj = await GetFlurlClient().Request(base.MODULE_API_URL, "self-hosting").GetJsonAsync<Dictionary<string, List<SelfHostedEventEntry>>>(default(CancellationToken), (HttpCompletionOption)0);
+				int eventCategoryCount = obj.Count;
+				int eventCount = obj.Sum((KeyValuePair<string, List<SelfHostedEventEntry>> ec) => ec.Value.Count);
+				base.Logger.Info($"Loaded {eventCategoryCount} self hosted categories with {eventCount} events.");
+				return obj;
+			}
+			catch (FlurlHttpException ex2)
+			{
+				string message = await ex2.GetResponseStringAsync();
+				base.Logger.Warn((Exception)ex2, "Failed loading self hosted events: " + message);
+			}
+			catch (Exception ex)
+			{
+				base.Logger.Warn(ex, "Failed loading self hosted events.");
+			}
+			return null;
 		}
 
 		private void AssignEventReminderTimes(List<EventCategory> categories)
@@ -407,7 +462,7 @@ namespace Estreya.BlishHUD.EventTable
 				string message = translation + " " + e.Humanize(6, null, TimeUnit.Week, base.ModuleSettings.ReminderMinTimeUnit.get_Value()) + "!";
 				AsyncTexture2D icon = (AsyncTexture2D)(string.IsNullOrWhiteSpace(ev.Icon) ? ((object)new AsyncTexture2D()) : ((object)base.IconService.GetIcon(ev.Icon)));
 				ReminderType value = base.ModuleSettings.ReminderType.get_Value();
-				if (value == ReminderType.Control || value == ReminderType.Both)
+				if ((value == ReminderType.Control || value == ReminderType.Both) ? true : false)
 				{
 					EventNotification obj = new EventNotification(ev, title, message, icon, base.ModuleSettings.ReminderPosition.X.get_Value(), base.ModuleSettings.ReminderPosition.Y.get_Value(), base.ModuleSettings.ReminderSize.X.get_Value(), base.ModuleSettings.ReminderSize.Y.get_Value(), base.ModuleSettings.ReminderSize.Icon.get_Value(), base.ModuleSettings.ReminderStackDirection.get_Value(), base.ModuleSettings.ReminderOverflowStackDirection.get_Value(), base.ModuleSettings.ReminderFonts.TitleSize.get_Value(), base.ModuleSettings.ReminderFonts.MessageSize.get_Value(), base.IconService, base.ModuleSettings.ReminderLeftClickAction.get_Value() != 0 || base.ModuleSettings.ReminderRightClickAction.get_Value() != EventReminderRightClickAction.None)
 					{
@@ -419,10 +474,11 @@ namespace Estreya.BlishHUD.EventTable
 					obj.Show(TimeSpan.FromSeconds(base.ModuleSettings.ReminderDuration.get_Value()));
 				}
 				value = base.ModuleSettings.ReminderType.get_Value();
-				if (value == ReminderType.Windows || value == ReminderType.Both)
+				if ((value == ReminderType.Windows || value == ReminderType.Both) ? true : false)
 				{
 					await EventNotification.ShowAsWindowsNotification(title, message, icon);
 				}
+				base.AudioService.PlaySoundFromFile("reminder", silent: true);
 			}
 			catch (Exception ex)
 			{
@@ -519,10 +575,34 @@ namespace Estreya.BlishHUD.EventTable
 				base.ModuleSettings.EventAreaNames.set_Value(new List<string>(base.ModuleSettings.EventAreaNames.get_Value()) { configuration.Name });
 			}
 			base.ModuleSettings.UpdateDrawerLocalization(configuration, base.TranslationService);
-			EventArea eventArea = new EventArea(configuration, base.IconService, base.TranslationService, EventStateService, base.WorldbossService, base.MapchestService, base.PointOfInterestService, MapUtil, GetFlurlClient(), base.MODULE_API_URL, () => NowUTC, () => ((Module)this).get_Version(), () => base.BlishHUDAPIService.AccessToken, base.ContentsManager);
+			EventArea eventArea = new EventArea(configuration, base.IconService, base.TranslationService, EventStateService, base.WorldbossService, base.MapchestService, base.PointOfInterestService, MapUtil, GetFlurlClient(), base.MODULE_API_URL, () => NowUTC, () => ((Module)this).get_Version(), () => base.BlishHUDAPIService.AccessToken, () => base.ModuleSettings.EventAreaNames.get_Value().ToArray().ToList(), base.ContentsManager);
 			((Control)eventArea).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			EventArea area = eventArea;
+			area.CopyToAreaClicked += new EventHandler<(string, string)>(EventArea_CopyToAreaClicked);
+			area.MoveToAreaClicked += new EventHandler<(string, string)>(EventArea_MoveToAreaClicked);
+			((Control)area).add_Disposed((EventHandler<EventArgs>)EventArea_Disposed);
 			_areas.AddOrUpdate(configuration.Name, area, (string name, EventArea prev) => area);
+		}
+
+		private void EventArea_MoveToAreaClicked(object sender, (string EventSettingKey, string DestinationArea) e)
+		{
+			EventArea sourceArea = sender as EventArea;
+			EventArea value = _areas.First((KeyValuePair<string, EventArea> a) => a.Key == e.DestinationArea).Value;
+			sourceArea.DisableEvent(e.EventSettingKey);
+			value.EnableEvent(e.EventSettingKey);
+		}
+
+		private void EventArea_CopyToAreaClicked(object sender, (string EventSettingKey, string DestinationArea) e)
+		{
+			_areas.First((KeyValuePair<string, EventArea> a) => a.Key == e.DestinationArea).Value.EnableEvent(e.EventSettingKey);
+		}
+
+		private void EventArea_Disposed(object sender, EventArgs e)
+		{
+			EventArea obj = sender as EventArea;
+			obj.CopyToAreaClicked -= new EventHandler<(string, string)>(EventArea_CopyToAreaClicked);
+			obj.MoveToAreaClicked -= new EventHandler<(string, string)>(EventArea_MoveToAreaClicked);
+			((Control)obj).remove_Disposed((EventHandler<EventArgs>)EventArea_Disposed);
 		}
 
 		private void RemoveArea(EventAreaConfiguration configuration)
@@ -658,6 +738,7 @@ namespace Estreya.BlishHUD.EventTable
 			configurations.Worldbosses.Enabled = true;
 			configurations.Mapchests.Enabled = true;
 			configurations.PointOfInterests.Enabled = true;
+			configurations.Audio.Enabled = true;
 		}
 
 		private void BlishHUDAPIService_NewLogin(object sender, EventArgs e)
@@ -722,12 +803,31 @@ namespace Estreya.BlishHUD.EventTable
 		protected override void Unload()
 		{
 			base.Logger.Debug("Unload module.");
+			base.Logger.Debug("Unload events.");
+			using (_eventCategoryLock.Lock())
+			{
+				foreach (EventCategory eventCategory in _eventCategories)
+				{
+					eventCategory.Events.ForEach(delegate(Estreya.BlishHUD.EventTable.Models.Event ev)
+					{
+						RemoveEventHooks(ev);
+					});
+				}
+				_eventCategories?.Clear();
+			}
 			if (DynamicEventHandler != null)
 			{
 				DynamicEventHandler.FoundLostEntities -= DynamicEventHandler_FoundLostEntities;
 				DynamicEventHandler.Dispose();
 				DynamicEventHandler = null;
 			}
+			if (base.BlishHUDAPIService != null)
+			{
+				base.BlishHUDAPIService.NewLogin -= BlishHUDAPIService_NewLogin;
+				base.BlishHUDAPIService.LoggedOut -= BlishHUDAPIService_LoggedOut;
+			}
+			base.ModuleSettings.IncludeSelfHostedEvents.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)IncludeSelfHostedEvents_SettingChanged);
+			base.Logger.Debug("Unloaded events.");
 			UnloadContext();
 			MapUtil?.Dispose();
 			MapUtil = null;
@@ -744,24 +844,6 @@ namespace Estreya.BlishHUD.EventTable
 				_areas?.Clear();
 			}
 			base.Logger.Debug("Unloaded drawer.");
-			base.Logger.Debug("Unload events.");
-			using (_eventCategoryLock.Lock())
-			{
-				foreach (EventCategory eventCategory in _eventCategories)
-				{
-					eventCategory.Events.ForEach(delegate(Estreya.BlishHUD.EventTable.Models.Event ev)
-					{
-						RemoveEventHooks(ev);
-					});
-				}
-				_eventCategories?.Clear();
-			}
-			base.Logger.Debug("Unloaded events.");
-			if (base.BlishHUDAPIService != null)
-			{
-				base.BlishHUDAPIService.NewLogin -= BlishHUDAPIService_NewLogin;
-				base.BlishHUDAPIService.LoggedOut -= BlishHUDAPIService_LoggedOut;
-			}
 			base.Logger.Debug("Unload base.");
 			base.Unload();
 			base.Logger.Debug("Unloaded base.");

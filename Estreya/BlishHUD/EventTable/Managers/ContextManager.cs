@@ -164,14 +164,14 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			ShowReminder eArgsContent = e.Content;
 			AsyncTexture2D icon = ((!string.IsNullOrWhiteSpace(eArgsContent.Icon)) ? _iconService.GetIcon(eArgsContent.Icon) : null);
 			ReminderType value = _moduleSettings.ReminderType.get_Value();
-			if (value == ReminderType.Control || value == ReminderType.Both)
+			if ((value == ReminderType.Control || value == ReminderType.Both) ? true : false)
 			{
 				EventNotification eventNotification = new EventNotification(null, eArgsContent.Title, eArgsContent.Message, icon, _moduleSettings.ReminderPosition.X.get_Value(), _moduleSettings.ReminderPosition.Y.get_Value(), _moduleSettings.ReminderSize.X.get_Value(), _moduleSettings.ReminderSize.Y.get_Value(), _moduleSettings.ReminderSize.Icon.get_Value(), _moduleSettings.ReminderStackDirection.get_Value(), _moduleSettings.ReminderOverflowStackDirection.get_Value(), _moduleSettings.ReminderFonts.TitleSize.get_Value(), _moduleSettings.ReminderFonts.MessageSize.get_Value(), _iconService, _moduleSettings.ReminderLeftClickAction.get_Value() != LeftClickAction.None);
 				eventNotification.BackgroundOpacity = _moduleSettings.ReminderOpacity.get_Value();
 				eventNotification.Show(TimeSpan.FromSeconds(_moduleSettings.ReminderDuration.get_Value()));
 			}
 			value = _moduleSettings.ReminderType.get_Value();
-			if (value == ReminderType.Windows || value == ReminderType.Both)
+			if ((value == ReminderType.Windows || value == ReminderType.Both) ? true : false)
 			{
 				await EventNotification.ShowAsWindowsNotification(eArgsContent.Title, eArgsContent.Message, icon);
 			}

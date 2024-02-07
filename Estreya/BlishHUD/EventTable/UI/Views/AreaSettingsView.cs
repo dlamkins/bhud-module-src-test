@@ -346,7 +346,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderEmptyLine((Panel)(object)settingsPanel);
 			RenderTextAndColorSettings(settingsPanel, areaConfiguration);
 			RenderEmptyLine((Panel)(object)settingsPanel);
-			RenderBehaviourSettings(settingsPanel, areaConfiguration);
+			RenderBehaviorSettings(settingsPanel, areaConfiguration);
 			RenderEmptyLine((Panel)(object)settingsPanel);
 			RenderFillerSettings(settingsPanel, areaConfiguration);
 			RenderEmptyLine((Panel)(object)settingsPanel);
@@ -585,7 +585,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderEmptyLine((Panel)(object)groupPanel, 20);
 		}
 
-		private void RenderBehaviourSettings(FlowPanel settingsPanel, EventAreaConfiguration areaConfiguration)
+		private void RenderBehaviorSettings(FlowPanel settingsPanel, EventAreaConfiguration areaConfiguration)
 		{
 			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
@@ -621,7 +621,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Panel)val).set_ShowBorder(true);
 			((Panel)val).set_CanCollapse(true);
 			((Panel)val).set_Collapsed(true);
-			((Panel)val).set_Title(base.TranslationService.GetTranslation("areaSettingsView-group-behaviours", "Behaviours"));
+			((Panel)val).set_Title(base.TranslationService.GetTranslation("areaSettingsView-group-behaviours", "Behaviors"));
 			FlowPanel groupPanel = val;
 			RenderEnumSetting<LeftClickAction>((Panel)(object)groupPanel, areaConfiguration.LeftClickAction);
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.AcceptWaypointPrompt);
@@ -662,6 +662,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderIntSetting((Panel)(object)groupPanel, areaConfiguration.HistorySplitScrollingSpeed);
 			RenderEmptyLine((Panel)(object)groupPanel);
 			RenderEnumSetting<EventCompletedAction>((Panel)(object)groupPanel, areaConfiguration.CompletionAction);
+			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.EnableLinkedCompletion);
 			RenderFloatSetting((Panel)(object)groupPanel, areaConfiguration.CompletedEventsBackgroundOpacity);
 			RenderFloatSetting((Panel)(object)groupPanel, areaConfiguration.CompletedEventsTextOpacity);
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.CompletedEventsInvertTextColor);
