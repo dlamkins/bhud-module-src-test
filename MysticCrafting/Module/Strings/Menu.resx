@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="Hammers"><value>Hammers</value></data>
+  <data name="Weapons"><value>Weapons</value></data>
+  <data name="Warhorns"><value>Warhorns</value></data>
+  <data name="Armor Runes"><value>Armor Runes</value></data>
+  <data name="Gloves"><value>Gloves</value></data>
+  <data name="Scepters"><value>Scepters</value></data>
+  <data name="Longsbows"><value>Longsbows</value></data>
+  <data name="Shields"><value>Shields</value></data>
+  <data name="Rifles"><value>Rifles</value></data>
+  <data name="Swords"><value>Swords</value></data>
+  <data name="Staffs"><value>Staffs</value></data>
+  <data name="Spears"><value>Spears</value></data>
+  <data name="Short Bows"><value>Short Bows</value></data>
+  <data name="Torches"><value>Torches</value></data>
+  <data name="Daggers"><value>Daggers</value></data>
+  <data name="Pistols"><value>Pistols</value></data>
+  <data name="Trinkets"><value>Trinkets</value></data>
+  <data name="Tridents"><value>Tridents</value></data>
+  <data name="Armor"><value>Armor</value></data>
+  <data name="Maces"><value>Maces</value></data>
+  <data name="Boots"><value>Boots</value></data>
+  <data name="Chest"><value>Chest</value></data>
+  <data name="Rings"><value>Rings</value></data>
+  <data name="Backpieces"><value>Backpieces</value></data>
+  <data name="Leggings"><value>Leggings</value></data>
+  <data name="Amulets"><value>Amulets</value></data>
+  <data name="Accessories"><value>Accessories</value></data>
+  <data name="Upgrade Components"><value>Upgrade Components</value></data>
+  <data name="Favorites"><value>Favorites</value></data>
+  <data name="Greatswords"><value>Greatswords</value></data>
+  <data name="Harpoon guns"><value>Harpoon Guns</value></data>
+  <data name="Weapon Sigils"><value>Weapon Sigils</value></data>
+  <data name="Shoulders"><value>Shoulders</value></data>
+  <data name="Headgear"><value>Headgear</value></data>
+  <data name="Axes"><value>Axes</value></data>
+  <data name="Foci"><value>Foci</value></data>
+  </root>
