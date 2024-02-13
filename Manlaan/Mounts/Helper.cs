@@ -119,24 +119,49 @@ namespace Manlaan.Mounts
 			float currentZPosition = GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Z;
 			double currentUpdateSeconds = gameTime.get_TotalGameTime().TotalSeconds;
 			double secondsDiff = currentUpdateSeconds - _lastUpdateSeconds;
-			double velocity = (double)(currentZPosition - _lastZPosition) / secondsDiff;
-			if (!(secondsDiff < 0.10000000149011612))
+			float zPositionDiff = currentZPosition - _lastZPosition;
+			bool shouldUpdate = false;
+			if (NewStuff(zPositionDiff, secondsDiff))
 			{
-				if (velocity > 10.0 || velocity < -10.0)
-				{
-					_isPlayerGlidingOrFalling = true;
-				}
-				else if (DidPlayerJumpRecently() && velocity < -2.0)
-				{
-					_isPlayerGlidingOrFalling = true;
-				}
-				else if (velocity >= 0.0 && velocity < 1.0)
-				{
-					_isPlayerGlidingOrFalling = false;
-				}
 				_lastZPosition = currentZPosition;
 				_lastUpdateSeconds = currentUpdateSeconds;
 			}
+		}
+
+		private bool NewStuff(float zPositionDiff, double secondsDiff)
+		{
+			double velocity = (double)zPositionDiff / secondsDiff;
+			if (secondsDiff < 0.10000000149011612)
+			{
+				return false;
+			}
+			if (velocity > 10.0 || velocity < -10.0)
+			{
+				_isPlayerGlidingOrFalling = true;
+			}
+			else if (DidPlayerJumpRecently() && velocity < -2.0)
+			{
+				_isPlayerGlidingOrFalling = true;
+			}
+			else
+			{
+				_isPlayerGlidingOrFalling = false;
+			}
+			return true;
+		}
+
+		private bool OldStuff(float zPositionDiff, double secondsDiff)
+		{
+			if ((double)zPositionDiff < -0.0001 && secondsDiff != 0.0)
+			{
+				double velocity = (double)zPositionDiff / secondsDiff;
+				_isPlayerGlidingOrFalling = velocity < -2.5;
+			}
+			else
+			{
+				_isPlayerGlidingOrFalling = false;
+			}
+			return true;
 		}
 
 		public static async Task TriggerKeybind(SettingEntry<KeyBinding> keybindingSetting)
