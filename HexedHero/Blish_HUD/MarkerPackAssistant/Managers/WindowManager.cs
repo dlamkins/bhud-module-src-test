@@ -65,7 +65,7 @@ namespace HexedHero.Blish_HUD.MarkerPackAssistant.Managers
 			//IL_0113: Expected O, but got Unknown
 			iconTexture = MarkerPackAssistant.Instance.Module.get_ContentsManager().GetTexture("102348_modified.png");
 			emblemTexture = AsyncTexture2D.FromAssetId(102348);
-			backgroundTexture = AsyncTexture2D.FromAssetId(155985);
+			backgroundTexture = AsyncTexture2D.FromAssetId(155983);
 			CornerIcon val = new CornerIcon();
 			val.set_Icon(AsyncTexture2D.op_Implicit(iconTexture));
 			((Control)val).set_BasicTooltipText("Marker Pack Assistant");
@@ -110,7 +110,7 @@ namespace HexedHero.Blish_HUD.MarkerPackAssistant.Managers
 			void injectBackground()
 			{
 				//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-				Reflection.InjectNewBackground((WindowBase2)(object)MainWindow, AsyncTexture2D.op_Implicit(backgroundTexture), new Rectangle(-10, 30, 340, 320));
+				Reflection.InjectNewBackground((WindowBase2)(object)MainWindow, AsyncTexture2D.op_Implicit(backgroundTexture), new Rectangle(-10, 30, 340, 340));
 			}
 			void injectEmblem()
 			{
