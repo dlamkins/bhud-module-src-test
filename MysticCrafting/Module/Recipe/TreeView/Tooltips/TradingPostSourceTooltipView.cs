@@ -5,6 +5,7 @@ using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Microsoft.Xna.Framework;
+using MysticCrafting.Module.Extensions;
 using MysticCrafting.Module.Models;
 using MysticCrafting.Module.Recipe.TreeView.Controls;
 using MysticCrafting.Module.Services;
@@ -86,6 +87,14 @@ namespace MysticCrafting.Module.Recipe.TreeView.Tooltips
 				Location = new Point(sellLabel.Right + 5, 65),
 				UnitPrice = TradingPostSource.SellPrice.UnitPrice
 			});
+		}
+
+		protected override void Unload()
+		{
+			_controls?.SafeDispose();
+			_controls?.Clear();
+			BuildPanel = null;
+			base.Unload();
 		}
 	}
 }

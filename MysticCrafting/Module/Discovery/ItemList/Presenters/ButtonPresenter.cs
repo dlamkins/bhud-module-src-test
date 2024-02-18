@@ -3,12 +3,12 @@ using Blish_HUD;
 using Blish_HUD.Controls;
 using Microsoft.Xna.Framework;
 using MysticCrafting.Models.Items;
+using MysticCrafting.Module.Discovery.ItemList.Controls;
 using MysticCrafting.Module.Helpers;
-using MysticCrafting.Module.Items.Controls;
 using MysticCrafting.Module.Repositories;
 using MysticCrafting.Module.Services;
 
-namespace MysticCrafting.Module.Items.Presenters
+namespace MysticCrafting.Module.Discovery.ItemList.Presenters
 {
 	public class ButtonPresenter
 	{

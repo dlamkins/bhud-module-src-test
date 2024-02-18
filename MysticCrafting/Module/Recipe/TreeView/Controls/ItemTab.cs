@@ -46,19 +46,19 @@ namespace MysticCrafting.Module.Recipe.TreeView.Controls
 			RecipeSource recipeSource = itemSource as RecipeSource;
 			if (recipeSource != null)
 			{
-				base.Tooltip = new Blish_HUD.Controls.Tooltip(new RecipeSourceTooltipView(recipeSource));
+				base.Tooltip = new DisposableTooltip(new RecipeSourceTooltipView(recipeSource));
 				return;
 			}
 			TradingPostSource tpSource = itemSource as TradingPostSource;
 			if (tpSource != null)
 			{
-				base.Tooltip = new Blish_HUD.Controls.Tooltip(new TradingPostSourceTooltipView(tpSource));
+				base.Tooltip = new DisposableTooltip(new TradingPostSourceTooltipView(tpSource));
 				return;
 			}
 			VendorSource vendorSource = itemSource as VendorSource;
 			if (vendorSource != null)
 			{
-				base.Tooltip = new Blish_HUD.Controls.Tooltip(new VendorSourceTooltipView(vendorSource));
+				base.Tooltip = new DisposableTooltip(new VendorSourceTooltipView(vendorSource));
 			}
 			else
 			{
@@ -88,6 +88,12 @@ namespace MysticCrafting.Module.Recipe.TreeView.Controls
 			{
 				spriteBatch.DrawFrame(this, new Rectangle((int)base.Padding.Left, (int)base.Padding.Top, base.Size.X, base.Size.Y), ContentService.Colors.ColonialWhite * 0.5f, 2);
 			}
+		}
+
+		protected override void DisposeControl()
+		{
+			base.Tooltip?.Dispose();
+			base.DisposeControl();
 		}
 	}
 }

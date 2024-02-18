@@ -66,7 +66,7 @@ namespace MysticCrafting.Module.Menu
 					return;
 				}
 				base.Height = _menuItemHeight;
-				foreach (IMenuItem item in _children.Cast<IMenuItem>().ToList())
+				foreach (ICategoryMenuItem item in _children.Cast<ICategoryMenuItem>().ToList())
 				{
 					item.MenuItemHeight = _menuItemHeight;
 				}
@@ -307,11 +307,7 @@ namespace MysticCrafting.Module.Menu
 				ServiceContainer.AudioService.PlayMenuItemClick();
 				OnItemClicked(new ControlActivatedEventArgs(this));
 			}
-			if (Selected && _overSection)
-			{
-				Deselect();
-			}
-			else
+			if (!Selected || !_overSection)
 			{
 				Select();
 			}

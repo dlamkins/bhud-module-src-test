@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using Blish_HUD.Controls;
 using MysticCrafting.Models.Commerce;
 using MysticCrafting.Models.Vendor;
 using MysticCrafting.Module.Services;
@@ -57,6 +59,22 @@ namespace MysticCrafting.Module.Extensions
 		public static IEnumerable<MysticCurrencyQuantity> ExcludingCoins(this IEnumerable<MysticCurrencyQuantity> prices)
 		{
 			return prices.Where((MysticCurrencyQuantity p) => p.Currency != null && p.Currency.GameId != 1);
+		}
+
+		public static void SafeDispose(this IEnumerable<Control> controls, CancellationTokenSource token = null)
+		{
+			if (controls == null)
+			{
+				return;
+			}
+			foreach (Control control in controls.ToList())
+			{
+				if (token != null && token.IsCancellationRequested)
+				{
+					break;
+				}
+				control?.Dispose();
+			}
 		}
 	}
 }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Common.UI.Views;
 using Blish_HUD.Content;
@@ -124,10 +125,21 @@ namespace MysticCrafting.Module.Recipe.TreeView.Tooltips
 
 		protected override void Build(Container buildPanel)
 		{
-			foreach (Control control in Controls)
+			foreach (Control control in Controls.ToList())
 			{
-				control.Parent = buildPanel;
+				if (control != null)
+				{
+					control.Parent = buildPanel;
+				}
 			}
+		}
+
+		protected override void Unload()
+		{
+			Controls?.SafeDispose();
+			Controls?.Clear();
+			Quantities = null;
+			base.Unload();
 		}
 	}
 }

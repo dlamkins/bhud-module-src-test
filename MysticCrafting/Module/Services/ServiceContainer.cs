@@ -113,6 +113,7 @@ namespace MysticCrafting.Module.Services
 			ItemSourceService = null;
 			WalletService = null;
 			AudioService = null;
+			Store?.Dispose();
 		}
 	}
 }

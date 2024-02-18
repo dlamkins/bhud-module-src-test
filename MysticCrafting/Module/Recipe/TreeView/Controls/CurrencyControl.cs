@@ -25,6 +25,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Controls
 			{
 				_quantity = value;
 				WalletQuantity = ServiceContainer.WalletService.GetQuantity(_quantity.Currency.GameId);
+				Icon = ServiceContainer.TextureRepository.GetTexture(_quantity.Currency.Icon);
 				base.Width = CalculateWidth();
 			}
 		}
@@ -52,24 +53,20 @@ namespace MysticCrafting.Module.Recipe.TreeView.Controls
 		public int CalculateWidth()
 		{
 			string text = AmountToText(Quantity.Count);
-			return (int)Math.Ceiling(TextFont.MeasureString(text).Width) + IconSize.X;
+			int width = (int)Math.Ceiling(TextFont.MeasureString(text).Width) + IconSize.X + 3;
+			if (base.Size.X != width)
+			{
+				base.Size = new Point(width, base.Size.Y);
+				RecalculateLayout();
+			}
+			return width;
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
 			if (Quantity != null && Quantity.Count != 0)
 			{
-				if (Icon == null)
-				{
-					Icon = ServiceContainer.TextureRepository.GetTexture(Quantity.Currency.Icon);
-				}
 				PaintCurrency(Quantity.Count, Icon, spriteBatch, bounds);
-				int width = CalculateWidth();
-				if (base.Size.X != width)
-				{
-					base.Size = new Point(width, base.Size.Y);
-					RecalculateLayout();
-				}
 			}
 		}
 
@@ -88,8 +85,17 @@ namespace MysticCrafting.Module.Recipe.TreeView.Controls
 			}
 			spriteBatch.DrawStringOnCtrl(this, text, GameService.Content.DefaultFont16, new Rectangle(position.X, position.Y, textWidth, 20).OffsetBy(1, 1), Color.Black);
 			spriteBatch.DrawStringOnCtrl(this, text, GameService.Content.DefaultFont16, new Rectangle(position.X, position.Y, textWidth, 20), color);
-			spriteBatch.DrawOnCtrl(this, texture, new Rectangle(position.X + textWidth, position.Y, IconSize.X, IconSize.Y));
+			if (texture != null)
+			{
+				spriteBatch.DrawOnCtrl(this, texture, new Rectangle(position.X + textWidth, position.Y, IconSize.X, IconSize.Y));
+			}
 			return textWidth + IconSize.X;
+		}
+
+		protected override void DisposeControl()
+		{
+			base.Tooltip?.Dispose();
+			base.DisposeControl();
 		}
 	}
 }

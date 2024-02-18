@@ -3,7 +3,7 @@ using Blish_HUD.Controls;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace MysticCrafting.Module.Items.Controls
+namespace MysticCrafting.Module.Discovery.ItemList.Controls
 {
 	public class ArmorItemButton : ItemButton
 	{

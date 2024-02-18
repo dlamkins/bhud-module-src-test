@@ -8,12 +8,12 @@ namespace MysticCrafting.Module.Extensions
 	{
 		public static string LocalizedName(this MysticCurrency currency)
 		{
-			return currency.Localizations.FirstOrDefault((MysticCurrencyLocalization l) => l.Locale == GameService.Overlay.UserLocale.Value)?.Name ?? currency.Name;
+			return currency.Localizations?.FirstOrDefault((MysticCurrencyLocalization l) => l.Locale == GameService.Overlay.UserLocale.Value)?.Name ?? currency.Name;
 		}
 
 		public static string LocalizedDescription(this MysticCurrency currency)
 		{
-			return currency.Localizations.FirstOrDefault((MysticCurrencyLocalization l) => l.Locale == GameService.Overlay.UserLocale.Value)?.Description ?? currency.Description;
+			return currency.Localizations?.FirstOrDefault((MysticCurrencyLocalization l) => l.Locale == GameService.Overlay.UserLocale.Value)?.Description ?? currency.Description;
 		}
 	}
 }

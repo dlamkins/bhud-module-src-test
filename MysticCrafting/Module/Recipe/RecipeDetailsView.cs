@@ -7,10 +7,10 @@ using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
 using MysticCrafting.Models.Items;
-using MysticCrafting.Module.Items.Controls;
+using MysticCrafting.Module.Discovery.ItemList.Controls;
+using MysticCrafting.Module.Discovery.Loading;
 using MysticCrafting.Module.Recipe.TreeView;
 using MysticCrafting.Module.Recipe.TreeView.Presenters;
-using MysticCrafting.Module.Recipe.TreeView.Tooltip;
 using MysticCrafting.Module.Services;
 using MysticCrafting.Module.Services.Recurring;
 
@@ -24,7 +24,7 @@ namespace MysticCrafting.Module.Recipe
 
 		private IIngredientNodePresenter _ingredientNodePresenter;
 
-		private List<string> _breadcrumbs;
+		private IList<string> _breadcrumbs;
 
 		private static readonly Logger Logger = Logger.GetLogger<RecipeDetailsView>();
 
@@ -56,7 +56,7 @@ namespace MysticCrafting.Module.Recipe
 			}
 		}
 
-		public RecipeDetailsView(MysticItem item, List<string> breadcrumbs)
+		public RecipeDetailsView(MysticItem item, IList<string> breadcrumbs)
 		{
 			Item = item;
 			RecipeDetailsViewPresenter presenter = new RecipeDetailsViewPresenter(this, item);

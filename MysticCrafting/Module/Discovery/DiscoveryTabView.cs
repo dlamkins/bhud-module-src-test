@@ -4,16 +4,16 @@ using System.Timers;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Microsoft.Xna.Framework;
-using MysticCrafting.Module.Items;
+using MysticCrafting.Module.Discovery.ItemList;
+using MysticCrafting.Module.Discovery.Loading;
 using MysticCrafting.Module.Menu;
-using MysticCrafting.Module.Overview.Loading;
 using MysticCrafting.Module.Services;
 using MysticCrafting.Module.Services.Recurring;
 using MysticCrafting.Module.Strings;
 
-namespace MysticCrafting.Module.Overview
+namespace MysticCrafting.Module.Discovery
 {
-	public class MainView : View<IMainViewPresenter>
+	public class DiscoveryTabView : View<IDiscoveryTabPresenter>
 	{
 		private TextBox _searchBar;
 
@@ -27,19 +27,21 @@ namespace MysticCrafting.Module.Overview
 
 		public ItemListView ItemList { get; set; }
 
+		public ItemListModel ItemListModel { get; set; }
+
 		public ViewContainer ItemListContainer { get; set; }
 
 		public string NameFilter
 		{
 			get
 			{
-				return ItemList?.ItemFilter.NameContainsText ?? string.Empty;
+				return ItemListModel?.Filter.NameContainsText ?? string.Empty;
 			}
 			set
 			{
-				if (ItemList?.ItemFilter != null)
+				if (ItemListModel?.Filter != null)
 				{
-					ItemList.ItemFilter.NameContainsText = value;
+					ItemListModel.Filter.NameContainsText = value;
 				}
 			}
 		}
@@ -59,9 +61,11 @@ namespace MysticCrafting.Module.Overview
 			}
 		}
 
-		public MainView()
+		public event EventHandler<ControlActivatedEventArgs> MenuItemSelected;
+
+		public DiscoveryTabView()
 		{
-			WithPresenter(new MainViewPresenter(this, new MainViewModel(), ServiceContainer.MenuItemRepository));
+			WithPresenter(new DiscoveryTabPresenter(this, new DiscoveryTabMenuModel(ServiceContainer.MenuItemRepository)));
 		}
 
 		protected override void Build(Container buildPanel)
@@ -81,7 +85,14 @@ namespace MysticCrafting.Module.Overview
 				Location = new Point(Panel.MenuStandard.Size.X, 0),
 				ShowBorder = true
 			};
-			ItemList = new ItemListView(null);
+			ReloadItemList(new ItemListModel(ServiceContainer.ItemRepository));
+		}
+
+		public void ReloadItemList(ItemListModel model)
+		{
+			ItemListContainer.ClearChildren();
+			ItemListModel = model;
+			ItemList = new ItemListView(ItemListModel);
 			ItemListContainer.Show(ItemList);
 		}
 
@@ -104,15 +115,22 @@ namespace MysticCrafting.Module.Overview
 				CanSelect = true,
 				Parent = _menuPanel
 			};
-			base.Presenter.InitializeMenu();
+			Menu.ItemSelected += delegate(object sender, ControlActivatedEventArgs e)
+			{
+				this.MenuItemSelected?.Invoke(sender, e);
+			};
 		}
 
-		public void Menu_ItemClicked(object sender, ControlActivatedEventArgs e)
+		public void SetMenuItems(IList<CategoryMenuItem> menuItems)
 		{
-			CategoryMenuItem menuItem = sender as CategoryMenuItem;
-			if (menuItem != null)
+			if (Menu == null)
 			{
-				base.Presenter.GoToMenuItem(menuItem);
+				return;
+			}
+			Menu.ClearChildren();
+			foreach (CategoryMenuItem menuItem in menuItems)
+			{
+				menuItem.Parent = Menu;
 			}
 		}
 

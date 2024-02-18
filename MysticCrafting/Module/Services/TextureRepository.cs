@@ -29,6 +29,11 @@ namespace MysticCrafting.Module.Services
 			_contentsManager = contentsManager;
 		}
 
+		public void ClearTextures()
+		{
+			_textures.Clear();
+		}
+
 		public AsyncTexture2D GetTexture(string url)
 		{
 			if (url == null || !url.StartsWith("https://render.guildwars2.com/file"))

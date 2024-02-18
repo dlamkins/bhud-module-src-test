@@ -11,8 +11,6 @@ namespace MysticCrafting.Module.Recipe.TreeView
 	{
 		public List<IngredientNode> IngredientNodes = new List<IngredientNode>();
 
-		public List<IngredientNode> SingleUseIngredientNodes = new List<IngredientNode>();
-
 		public event EventHandler<EventArgs> OnRecalculate;
 
 		public override void RecalculateLayout()
@@ -37,10 +35,18 @@ namespace MysticCrafting.Module.Recipe.TreeView
 			IngredientNode node = e.ChangedChild as IngredientNode;
 			if (node != null)
 			{
+				RemoveNode(node);
+			}
+			base.OnChildRemoved(e);
+		}
+
+		public void RemoveNode(IngredientNode node)
+		{
+			if (IngredientNodes != null)
+			{
 				IngredientNodes.RemoveNodeAndDescendants(node);
 				node.UpdateRelatedNodesAndDescendants();
 			}
-			base.OnChildRemoved(e);
 		}
 
 		public void ClearChildIngredientNodes()
@@ -49,6 +55,12 @@ namespace MysticCrafting.Module.Recipe.TreeView
 			{
 				IngredientNodes.FirstOrDefault()?.Dispose();
 			}
+		}
+
+		protected override void DisposeControl()
+		{
+			IngredientNodes = null;
+			base.DisposeControl();
 		}
 	}
 }

@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 using MysticCrafting.Module.Services;
 using MysticCrafting.Module.Strings;
 
-namespace MysticCrafting.Module.Overview.Loading
+namespace MysticCrafting.Module.Discovery.Loading
 {
 	public class LoadingStatusTooltipControl : Container
 	{

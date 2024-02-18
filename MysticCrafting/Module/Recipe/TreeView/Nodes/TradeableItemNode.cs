@@ -106,7 +106,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 
 		private VendorCurrencyControl _vendorCurrencyControl { get; set; }
 
-		private Blish_HUD.Controls.Tooltip VendorCurrencyTooltip { get; set; }
+		private Tooltip VendorCurrencyTooltip { get; set; }
 
 		public bool HasTradableChildren => base.Nodes.OfType<TradeableItemNode>().Any();
 
@@ -150,20 +150,32 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 				Location = location,
 				Size = new Point(100, 20)
 			};
-			VendorCurrencyTooltip = new Blish_HUD.Controls.Tooltip(new CurrenciesTooltipView(TotalVendorPrice));
+			VendorCurrencyTooltip = new DisposableTooltip(new CurrenciesTooltipView(TotalVendorPrice));
 			_vendorCurrencyControl.Tooltip = VendorCurrencyTooltip;
 			_currencyContainer = new CurrenciesContainer(this)
 			{
 				Location = location,
 				Price = TotalVendorPrice
 			};
-			_currencyContainer.Build(TotalVendorPrice);
 			SwitchVendorPriceControls();
+		}
+
+		private bool ShowMinifiedVendorCurrencies()
+		{
+			if (HasTradableChildren || TotalVendorPrice.Count > 2)
+			{
+				if (_coinsControl.UnitPrice == 0)
+				{
+					return TotalVendorPrice.Count > 3;
+				}
+				return true;
+			}
+			return false;
 		}
 
 		private void SwitchVendorPriceControls()
 		{
-			if (HasTradableChildren || TotalVendorPrice.Count > 2)
+			if (ShowMinifiedVendorCurrencies())
 			{
 				_vendorCurrencyControl.Show();
 				_currencyContainer.Hide();
@@ -187,18 +199,19 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 			}
 			if (TotalVendorPrice.Any((MysticCurrencyQuantity p) => p.Count > 0))
 			{
-				if (HasTradableChildren || TotalVendorPrice.Count > 2)
+				if (ShowMinifiedVendorCurrencies())
 				{
 					_vendorCurrencyControl.Location = new Point(PriceLocation.X + 150, PriceLocation.Y);
 					_vendorCurrencyControl.Price = TotalVendorPrice;
 					VendorCurrencyTooltip?.Dispose();
-					VendorCurrencyTooltip = new Blish_HUD.Controls.Tooltip(new CurrenciesTooltipView(TotalVendorPrice));
+					VendorCurrencyTooltip = new DisposableTooltip(new CurrenciesTooltipView(TotalVendorPrice));
 					_vendorCurrencyControl.Tooltip = VendorCurrencyTooltip;
 					_vendorCurrencyControl.Show();
 				}
 				else
 				{
-					_currencyContainer.Location = new Point(PriceLocation.X + 150, PriceLocation.Y);
+					int xPosition = ((_coinsControl.UnitPrice != 0) ? (PriceLocation.X + 150) : (PriceLocation.X - 5));
+					_currencyContainer.Location = new Point(xPosition, PriceLocation.Y);
 					_currencyContainer.Price = TotalVendorPrice;
 				}
 				SwitchVendorPriceControls();
@@ -214,6 +227,15 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 					_vendorCurrencyControl.Price = TotalVendorPrice;
 				}
 			}
+		}
+
+		protected override void DisposeControl()
+		{
+			VendorCurrencyTooltip?.Dispose();
+			_vendorCurrencyControl?.Dispose();
+			_coinsControl?.Dispose();
+			MenuStrip?.Dispose();
+			base.DisposeControl();
 		}
 	}
 }

@@ -178,5 +178,13 @@ namespace MysticCrafting.Module.Recipe.TreeView.Tooltips
 				yPosition += 25;
 			}
 		}
+
+		protected override void Unload()
+		{
+			_controls?.SafeDispose();
+			_controls?.Clear();
+			BuildPanel = null;
+			base.Unload();
+		}
 	}
 }

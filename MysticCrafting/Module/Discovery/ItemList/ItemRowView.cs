@@ -5,11 +5,11 @@ using Blish_HUD.Input;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using MysticCrafting.Models.Items;
-using MysticCrafting.Module.Items.Controls;
-using MysticCrafting.Module.Items.Presenters;
+using MysticCrafting.Module.Discovery.ItemList.Controls;
+using MysticCrafting.Module.Discovery.ItemList.Presenters;
 using MysticCrafting.Module.Services;
 
-namespace MysticCrafting.Module.Items
+namespace MysticCrafting.Module.Discovery.ItemList
 {
 	public class ItemRowView : View
 	{

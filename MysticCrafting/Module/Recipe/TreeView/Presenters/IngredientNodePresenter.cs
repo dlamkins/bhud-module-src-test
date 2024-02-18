@@ -29,7 +29,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Presenters
 
 		private readonly IChoiceRepository _choiceRepository;
 
-		private readonly List<int> _excludedItems = new List<int> { 19675, 96978, 79410, 20797, 19925, 86093, 68063 };
+		private readonly List<int> _excludedItems = new List<int> { 19675, 96978, 79410, 20797, 19925, 86093, 19678 };
 
 		public IngredientNodePresenter(IRecipeDetailsViewPresenter recipeDetailsPresenter, IItemRepository itemRepository, IChoiceRepository choiceRepository)
 		{

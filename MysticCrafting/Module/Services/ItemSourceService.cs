@@ -51,6 +51,10 @@ namespace MysticCrafting.Module.Services
 
 		public IEnumerable<IItemSource> GetItemSources(int itemId)
 		{
+			if (itemId == 68063)
+			{
+				return new List<IItemSource> { GetTradingPostSource(itemId) };
+			}
 			List<IItemSource> sources = new List<IItemSource>();
 			sources.AddRange(GetRecipeSources(itemId));
 			TradingPostSource prices = GetTradingPostSource(itemId);

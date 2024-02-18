@@ -11,7 +11,7 @@ using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
-using MysticCrafting.Module.Overview;
+using MysticCrafting.Module.Discovery;
 using MysticCrafting.Module.Services;
 using MysticCrafting.Module.Settings;
 using MysticCrafting.Module.Strings;
@@ -31,7 +31,7 @@ namespace MysticCrafting.Module
 
 		private StandardWindow _mainWindow;
 
-		private MainView _mainView;
+		private DiscoveryTabView _discoveryTabView;
 
 		private bool dataLoaded;
 
@@ -167,7 +167,7 @@ namespace MysticCrafting.Module
 				Height = 64
 			};
 			_mainWindow = BuildWindow();
-			_mainView = new MainView();
+			_discoveryTabView = new DiscoveryTabView();
 			_cornerIcon.Click += delegate
 			{
 				ToggleWindow();
@@ -178,7 +178,7 @@ namespace MysticCrafting.Module
 		{
 			if (_mainWindow.CurrentView == null)
 			{
-				_mainWindow.Show(_mainView);
+				_mainWindow.Show(_discoveryTabView);
 			}
 			_mainWindow.ToggleWindow();
 		}
@@ -218,7 +218,7 @@ namespace MysticCrafting.Module
 		{
 			Settings = null;
 			_cornerIcon?.Dispose();
-			_mainView?.DoUnload();
+			_discoveryTabView?.DoUnload();
 			_mainWindow?.Dispose();
 			ServiceContainer.Dispose();
 			ServiceCollection = null;

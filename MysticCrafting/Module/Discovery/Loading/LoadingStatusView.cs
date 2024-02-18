@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 using MysticCrafting.Module.Services;
 using MysticCrafting.Module.Services.Recurring;
 
-namespace MysticCrafting.Module.Overview.Loading
+namespace MysticCrafting.Module.Discovery.Loading
 {
 	public class LoadingStatusView : View
 	{

@@ -2,14 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Microsoft.Xna.Framework;
 using MysticCrafting.Module.Extensions;
-using MysticCrafting.Module.Recipe.TreeView.Tooltip;
+using MysticCrafting.Module.Recipe.TreeView.Controls;
 using MysticCrafting.Module.Services.Recurring;
 
-namespace MysticCrafting.Module.Overview.Loading
+namespace MysticCrafting.Module.Discovery.Loading
 {
 	public class LoadingStatusPresenter : IPresenter
 	{
@@ -80,7 +79,7 @@ namespace MysticCrafting.Module.Overview.Loading
 			if (_loadingStatusTooltipView == null)
 			{
 				_loadingStatusTooltipView = new LoadingStatusTooltipView(_recurringServices);
-				Tooltip _tooltip = new Tooltip(_loadingStatusTooltipView);
+				DisposableTooltip _tooltip = new DisposableTooltip(_loadingStatusTooltipView);
 				_view._statusImage.Tooltip = _tooltip;
 				_view._nameLabel.Tooltip = _tooltip;
 				_view._dateLabel.Tooltip = _tooltip;

@@ -7,6 +7,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Microsoft.Xna.Framework;
 using MysticCrafting.Models.Vendor;
+using MysticCrafting.Module.Extensions;
 using MysticCrafting.Module.Models;
 using MysticCrafting.Module.Services;
 using MysticCrafting.Module.Strings;
@@ -87,6 +88,14 @@ namespace MysticCrafting.Module.Recipe.TreeView.Tooltips
 				};
 				_controls.Add(moreLabel);
 			}
+		}
+
+		protected override void Unload()
+		{
+			_controls?.SafeDispose();
+			_controls?.Clear();
+			BuildPanel = null;
+			base.Unload();
 		}
 	}
 }

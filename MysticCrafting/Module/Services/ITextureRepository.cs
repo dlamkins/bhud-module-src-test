@@ -7,6 +7,8 @@ namespace MysticCrafting.Module.Services
 	{
 		TextureResources Textures { get; }
 
+		void ClearTextures();
+
 		AsyncTexture2D GetTexture(string url);
 
 		AsyncTexture2D GetRefTexture(string fileName);

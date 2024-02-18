@@ -10,8 +10,6 @@ namespace MysticCrafting.Module.Recipe
 {
 	public class RecipeDetailsViewPresenter : Presenter<RecipeDetailsView, MysticItem>, IRecipeDetailsViewPresenter, IPresenter
 	{
-		private readonly IList<IRecurringService> _recurringServices;
-
 		private float TargetScrollDistance { get; set; }
 
 		public RecipeDetailsViewPresenter(RecipeDetailsView view, MysticItem model)

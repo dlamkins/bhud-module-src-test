@@ -117,17 +117,20 @@ namespace MysticCrafting.Module.Recipe.TreeView.Tooltips
 				};
 				yPosition += descriptionLabel.Height + 10;
 			}
-			ItemCountLabel = new Label
+			if (PlayerItemCount != 0 && RequiredQuantity != 0)
 			{
-				Parent = BuildPanel,
-				Text = PlayerCountText,
-				Location = new Point(0, yPosition),
-				Font = GameService.Content.DefaultFont18,
-				StrokeText = true,
-				TextColor = Color.LightYellow,
-				AutoSizeWidth = true
-			};
-			yPosition = ItemCountLabel.Bottom + 5;
+				ItemCountLabel = new Label
+				{
+					Parent = BuildPanel,
+					Text = PlayerCountText,
+					Location = new Point(0, yPosition),
+					Font = GameService.Content.DefaultFont18,
+					StrokeText = true,
+					TextColor = Color.LightYellow,
+					AutoSizeWidth = true
+				};
+				yPosition = ItemCountLabel.Bottom + 5;
+			}
 			if (RequiredQuantity > 0)
 			{
 				RequiredQuantityLabel = new Label
@@ -162,6 +165,20 @@ namespace MysticCrafting.Module.Recipe.TreeView.Tooltips
 					TextColor = Color.White,
 					AutoSizeWidth = true
 				};
+				int totalPlayerItemCount = ServiceContainer.PlayerItemService.GetItemCount(Item.Id);
+				if (AccountTitleLabel != null)
+				{
+					new Label
+					{
+						Parent = BuildPanel,
+						Text = $"({totalPlayerItemCount})",
+						Location = new Point(AccountTitleLabel.Right + 5, AccountTitleLabel.Top),
+						Font = GameService.Content.DefaultFont16,
+						ShowShadow = true,
+						TextColor = Color.LightGray,
+						AutoSizeWidth = true
+					};
+				}
 				yPosition += 25;
 			}
 			if (BankCount != 0)
@@ -223,6 +240,15 @@ namespace MysticCrafting.Module.Recipe.TreeView.Tooltips
 					yPosition += 20;
 				}
 			}
+		}
+
+		protected override void Unload()
+		{
+			ItemCountLabel?.Dispose();
+			RequiredQuantityLabel?.Dispose();
+			AccountTitleLabel?.Dispose();
+			BuildPanel = null;
+			base.Unload();
 		}
 	}
 }

@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.BitmapFonts;
 using MysticCrafting.Module.Services;
 
-namespace MysticCrafting.Module.Items.Controls
+namespace MysticCrafting.Module.Discovery.ItemList.Controls
 {
 	public class PanelHeaderButton : Container
 	{
@@ -22,7 +22,7 @@ namespace MysticCrafting.Module.Items.Controls
 
 		public string Text { get; set; }
 
-		public List<string> Breadcrumbs { get; set; }
+		public IList<string> Breadcrumbs { get; set; }
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{

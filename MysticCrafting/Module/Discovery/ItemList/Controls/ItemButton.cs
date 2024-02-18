@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework.Graphics;
 using MysticCrafting.Models.Items;
 using MysticCrafting.Module.Extensions;
 
-namespace MysticCrafting.Module.Items.Controls
+namespace MysticCrafting.Module.Discovery.ItemList.Controls
 {
 	public class ItemButton : FlowPanel
 	{

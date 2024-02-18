@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Common.UI.Views;
 using Blish_HUD.Content;
@@ -17,7 +18,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Tooltips
 	{
 		private MysticCurrencyQuantity Quantity { get; set; }
 
-		private IList<Control> Controls { get; set; } = new List<Control>();
+		private IList<Control> _controls { get; set; } = new List<Control>();
 
 
 		public Point IconSize { get; set; } = new Point(30, 30);
@@ -31,7 +32,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Tooltips
 				AsyncTexture2D texture = ServiceContainer.TextureRepository.GetTexture(Quantity.Currency.Icon);
 				if (texture != null)
 				{
-					Controls.Add(new Image(texture)
+					_controls.Add(new Image(texture)
 					{
 						Size = IconSize,
 						Location = new Point(0, 0)
@@ -47,7 +48,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Tooltips
 					nameColor = ColorHelper.FromRarity(currencyItem.Rarity);
 				}
 			}
-			Controls.Add(new Label
+			_controls.Add(new Label
 			{
 				Text = Quantity.Currency.LocalizedName(),
 				Font = GameService.Content.DefaultFont18,
@@ -67,7 +68,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Tooltips
 				WrapText = true,
 				StrokeText = true
 			};
-			Controls.Add(descriptionLabel);
+			_controls.Add(descriptionLabel);
 			if (Quantity.Currency.Name == "Coin")
 			{
 				return;
@@ -95,12 +96,12 @@ namespace MysticCrafting.Module.Recipe.TreeView.Tooltips
 					AutoSizeWidth = true
 				};
 				yPosition += textLabel.Height + 5;
-				Controls.Add(textLabel);
-				Controls.Add(totalLabel);
+				_controls.Add(textLabel);
+				_controls.Add(totalLabel);
 				int moreRequired = Quantity.Count - walletQuantity.Count;
 				if (moreRequired > 0)
 				{
-					Controls.Add(new Label
+					_controls.Add(new Label
 					{
 						Text = string.Format(MysticCrafting.Module.Strings.Recipe.MoreRequired, moreRequired),
 						Font = GameService.Content.DefaultFont16,
@@ -114,7 +115,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Tooltips
 				yPosition += 5;
 				if (!Quantity.Currency.IsItem)
 				{
-					Controls.Add(new Label
+					_controls.Add(new Label
 					{
 						Text = MysticCrafting.Module.Strings.Recipe.WalletLabel,
 						Font = GameService.Content.DefaultFont16,
@@ -129,10 +130,24 @@ namespace MysticCrafting.Module.Recipe.TreeView.Tooltips
 
 		protected override void Build(Container buildPanel)
 		{
-			foreach (Control control in Controls)
+			foreach (Control control in _controls.ToList())
 			{
-				control.Parent = buildPanel;
+				if (control != null)
+				{
+					control.Parent = buildPanel;
+				}
 			}
+		}
+
+		protected override void Unload()
+		{
+			foreach (Control control in _controls)
+			{
+				control.Dispose();
+			}
+			_controls?.Clear();
+			Quantity = null;
+			base.Unload();
 		}
 	}
 }

@@ -19,13 +19,15 @@ namespace MysticCrafting.Module.Recipe.TreeView.Controls
 
 		private CoinsControl _coinsControl;
 
-		private List<Label> _plusLabels;
+		private List<Label> _plusLabels = new List<Label>();
 
 		private List<Control> _controls = new List<Control>();
 
-		private List<CurrencyControl> _currencyControls;
+		private List<CurrencyControl> _currencyControls = new List<CurrencyControl>();
 
-		private IList<MysticCurrencyQuantity> _price;
+		private IList<MysticCurrencyQuantity> _price = new List<MysticCurrencyQuantity>();
+
+		private bool _isInitialized;
 
 		public IList<MysticCurrencyQuantity> Price
 		{
@@ -36,7 +38,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Controls
 			set
 			{
 				_price = value;
-				if (!Initialized())
+				if (!_isInitialized)
 				{
 					Build(_price);
 				}
@@ -54,27 +56,15 @@ namespace MysticCrafting.Module.Recipe.TreeView.Controls
 			base.ControlPadding = new Vector2(4f, 0f);
 		}
 
-		public bool Initialized()
-		{
-			if (_coinsControl != null && _currencyControls != null)
-			{
-				return _currencyControls.Any();
-			}
-			return false;
-		}
-
 		public void Build(IList<MysticCurrencyQuantity> prices)
 		{
 			int coinPrice = prices.CoinCount();
 			_coinsControl?.Dispose();
-			if (coinPrice != 0)
+			_coinsControl = new CoinsControl(this)
 			{
-				_coinsControl = new CoinsControl(this)
-				{
-					UnitPrice = coinPrice
-				};
-			}
-			else if (prices.ExcludingCoins().Count() < 2)
+				UnitPrice = coinPrice
+			};
+			if (prices.ExcludingCoins().Count() < 2)
 			{
 				MinifyPricing = false;
 			}
@@ -86,18 +76,18 @@ namespace MysticCrafting.Module.Recipe.TreeView.Controls
 			{
 				BuildCurrencies(prices);
 			}
+			_isInitialized = true;
 		}
 
 		private void BuildMinifiedCurrencies(IList<MysticCurrencyQuantity> prices)
 		{
 			prices = prices.ExcludingCoins().ToList();
-			DisposeCurrencyControls();
-			if (prices.Count() != 0)
+			if (prices.Count != 0)
 			{
 				Label numberLabel = new Label
 				{
 					Parent = this,
-					Text = prices.Count().ToString(),
+					Text = prices.Count.ToString(),
 					Font = GameService.Content.DefaultFont14,
 					AutoSizeWidth = true
 				};
@@ -122,27 +112,20 @@ namespace MysticCrafting.Module.Recipe.TreeView.Controls
 				});
 			}
 			_plusLabels = new List<Label>();
-			if (_currencyControls != null)
+			(_currencyControls?.ToList())?.ForEach(delegate(CurrencyControl l)
 			{
-				_currencyControls.ForEach(delegate(CurrencyControl l)
-				{
-					l.Dispose();
-				});
-			}
-			if (_controls != null)
+				l.Dispose();
+			});
+			_currencyControls = new List<CurrencyControl>();
+			_controls.ToList().ForEach(delegate(Control l)
 			{
-				_controls.ForEach(delegate(Control l)
-				{
-					l.Dispose();
-				});
-			}
+				l.Dispose();
+			});
 			_controls = new List<Control>();
 		}
 
 		private void BuildCurrencies(IList<MysticCurrencyQuantity> prices)
 		{
-			DisposeCurrencyControls();
-			_currencyControls = new List<CurrencyControl>();
 			bool showPlusSign = _coinsControl != null && _coinsControl.UnitPrice != 0;
 			foreach (MysticCurrencyQuantity price in prices.Where((MysticCurrencyQuantity p) => p.Currency != null && p.Currency.GameId != 1))
 			{
@@ -177,12 +160,12 @@ namespace MysticCrafting.Module.Recipe.TreeView.Controls
 				MysticItem item = ServiceContainer.ItemRepository.GetItem(price.Currency.GameId);
 				if (item != null)
 				{
-					currencyControl.Tooltip = new Blish_HUD.Controls.Tooltip(new ItemTooltipView(item, price.Count));
+					currencyControl.Tooltip = new DisposableTooltip(new ItemTooltipView(item, price.Count));
 				}
 			}
 			if (currencyControl.Tooltip == null)
 			{
-				currencyControl.Tooltip = new Blish_HUD.Controls.Tooltip(new CurrencyTooltipView(price));
+				currencyControl.Tooltip = new DisposableTooltip(new CurrencyTooltipView(price));
 			}
 		}
 
@@ -190,14 +173,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Controls
 		{
 			int coinPrice = prices.CoinCount();
 			_coinsControl.UnitPrice = coinPrice;
-			foreach (Label plusLabel in _plusLabels)
-			{
-				plusLabel.Dispose();
-			}
-			foreach (CurrencyControl currencyControl in _currencyControls)
-			{
-				currencyControl.Dispose();
-			}
+			DisposeCurrencyControls();
 			if (MinifyPricing)
 			{
 				BuildMinifiedCurrencies(prices);
@@ -220,9 +196,9 @@ namespace MysticCrafting.Module.Recipe.TreeView.Controls
 			};
 		}
 
-		private int CalculateWidth()
+		public int CalculateWidth()
 		{
-			float padding = (float)(base.Children.Count() + 1) * base.ControlPadding.X;
+			float padding = (float)(base.Children.Count + 1) * base.ControlPadding.X;
 			return base.Children.Sum((Control c) => c.Width) + (int)padding;
 		}
 
@@ -233,6 +209,12 @@ namespace MysticCrafting.Module.Recipe.TreeView.Controls
 			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(0, base.Height - 2, base.Width, 1), lineColor);
 			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(0, 0, 1, base.Height - 1), lineColor);
 			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(base.Width - 1, 0, 1, base.Height - 1), lineColor);
+		}
+
+		protected override void DisposeControl()
+		{
+			DisposeCurrencyControls();
+			base.DisposeControl();
 		}
 	}
 }

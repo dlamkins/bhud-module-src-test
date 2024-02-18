@@ -5,12 +5,11 @@ using Blish_HUD.Common.UI.Views;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Microsoft.Xna.Framework;
-using MysticCrafting.Module.Overview.Loading;
 using MysticCrafting.Module.Services.Recurring;
 
-namespace MysticCrafting.Module.Recipe.TreeView.Tooltip
+namespace MysticCrafting.Module.Discovery.Loading
 {
-	public class LoadingStatusDetailedView : View, ITooltipView, IView
+	public class LoadingStatusTooltipView : View, ITooltipView, IView
 	{
 		private List<LoadingStatusTooltipControl> ServiceControls = new List<LoadingStatusTooltipControl>();
 
@@ -18,7 +17,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Tooltip
 
 		private FlowPanel _panel;
 
-		public LoadingStatusDetailedView(IEnumerable<IRecurringService> services)
+		public LoadingStatusTooltipView(IEnumerable<IRecurringService> services)
 		{
 			_recurringServices = services;
 			foreach (IRecurringService service in services)
@@ -58,9 +57,9 @@ namespace MysticCrafting.Module.Recipe.TreeView.Tooltip
 				LoadingStatusTooltipControl control = ServiceControls.FirstOrDefault((LoadingStatusTooltipControl s) => s.Name.Equals(service.Name, StringComparison.OrdinalIgnoreCase));
 				if (control != null)
 				{
-					control.Loading = service.Loading;
 					control.LastLoaded = service.LastLoaded;
 					control.LastFailed = service.LastFailed;
+					control.Loading = service.Loading;
 				}
 			}
 		}
