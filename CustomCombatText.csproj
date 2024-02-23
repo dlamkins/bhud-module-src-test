@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>CustomCombatText</AssemblyName>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <TargetFramework>net48</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>Preview</LangVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace />
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Reference Include="CustomCombatText.NetCommon">
+      <HintPath>..\..\working\CustomCombatText.NetCommon.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Extended" />
+    <Reference Include="Blish HUD" />
+    <Reference Include="MonoGame.Framework" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="CustomCombatText.BHUDCommon">
+      <HintPath>..\..\working\CustomCombatText.BHUDCommon.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json" />
+    <Reference Include="Gw2Sharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="SpriteFontPlus">
+      <HintPath>..\..\working\SpriteFontPlus.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

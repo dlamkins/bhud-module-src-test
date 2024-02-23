@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="SettingMasterToPetIsSelfText"><value>Enable to consider skills targetting a pet used by its master as self messages.</value></data>
+  <data name="SettingMergeAttackChainsText"><value>Enable to allow merging chain attacks with previous attacks in the chain.</value></data>
+  <data name="SettingMinIconMargin"><value>Minimum Icon Margin</value></data>
+  <data name="SettingFontNameText"><value>Default font.
+Must be in the appropriate folder, and must be in .ttf format.
+Leave it blank to use the default built-in font.
+A fallback will be used if the given font can't be loaded.</value></data>
+  <data name="SettingAutocropIconsText"><value>Automatically crop icons to remove margins.</value></data>
+  <data name="SettingMergeMaxMsStrikes"><value>Max ms to Merge Strikes</value></data>
+  <data name="SettingMergeMaxMsBuffs"><value>Max ms to Merge Buffs</value></data>
+  <data name="SettingFontSizeText"><value>Default font size.</value></data>
+  <data name="SettingMergeMaxMsStrikesText"><value>In milliseconds, the oldest a message can be to be considered for merging with a new message. Only applies to strikes (so no damage over time nor heals over time).
+Set to -1 to disallow this type of merging altogether.</value></data>
+  <data name="SettingFontName"><value>Font Name</value></data>
+  <data name="SettingFontSize"><value>Font Size</value></data>
+  <data name="SettingMasterToPetIsSelf"><value>Master to Pet is Self</value></data>
+  <data name="SettingPetToMasterIsSelf"><value>Pet to Master is Self</value></data>
+  <data name="SettingMergeMaxMsBuffsText"><value>In milliseconds, the oldest a message can be to be considered for merging with a new message. Only applies to buffs (so damage over time or heals over time).
+Set to -1 to disallow this type of merging altogether.</value></data>
+  <data name="SettingAutocropToleranceText"><value>When cropping icons, any pixel closer to the background color than this value will beconsidered background.</value></data>
+  <data name="SettingMergeAttackChains"><value>Merge Attack Chains</value></data>
+  <data name="SettingAutocropTolerance"><value>Autocrop Tolerance</value></data>
+  <data name="SettingMinIconMarginText"><value>When cropping icons, leave this much margin (in icon size relative units).</value></data>
+  <data name="SettingAutocropIcons"><value>Autocrop Icons</value></data>
+  <data name="SettingDebug"><value>Debug</value></data>
+  <data name="SettingDebugText"><value>Enable some debug visualizations.</value></data>
+  <data name="SettingPetToMasterIsSelfText"><value>Enable to consider skills used by a pet tragetting its master as self messages.</value></data>
+  </root>

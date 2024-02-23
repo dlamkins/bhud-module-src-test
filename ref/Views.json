@@ -1,0 +1,534 @@
+[
+  {
+    "Name": "Default Areas",
+    "Enabled": true,
+    "Anchoring": {
+      "AnchorMin": {
+        "X": 0.0,
+        "Y": 0.0
+      },
+      "AnchorMax": {
+        "X": 1.0,
+        "Y": 1.0
+      },
+      "Pivot": {
+        "X": 0.5,
+        "Y": 0.5
+      },
+      "Position": {
+        "X": 0.0,
+        "Y": 0.0
+      },
+      "SizeDelta": {
+        "X": 0.0,
+        "Y": 0.0
+      }
+    },
+    "Children": [
+      {
+        "Name": "Outgoing",
+        "Enabled": true,
+        "Anchoring": {
+          "AnchorMin": {
+            "X": 0.5,
+            "Y": 0.3
+          },
+          "AnchorMax": {
+            "X": 0.5,
+            "Y": 0.7
+          },
+          "Pivot": {
+            "X": 0.0,
+            "Y": 0.5
+          },
+          "Position": {
+            "X": 200.0,
+            "Y": 0.0
+          },
+          "SizeDelta": {
+            "X": 80.0,
+            "Y": 0.0
+          }
+        },
+        "Children": [
+          {
+            "Name": "Breakbar",
+            "Enabled": true,
+            "Anchoring": {
+              "AnchorMin": {
+                "X": 0.0,
+                "Y": 0.5
+              },
+              "AnchorMax": {
+                "X": 1.0,
+                "Y": 0.5
+              },
+              "Pivot": {
+                "X": 1.0,
+                "Y": 1.0
+              },
+              "Position": {
+                "X": 0.0,
+                "Y": -250.0
+              },
+              "SizeDelta": {
+                "X": 0.0,
+                "Y": 100.0
+              }
+            },
+            "Children": [],
+            "Receivers": [
+              {
+                "Name": "player out, pet out / breakbar / target",
+                "Enabled": true,
+                "Categories": [
+                  "VIEa0rBA-kO5lpsiQNTRXA",
+                  "2r3hGh4P3UGpxAEY28VuAw"
+                ],
+                "Results": [
+                  "eAqruxsURl-GaMAx3z_ORA"
+                ],
+                "EntityFilter": "IrGj7gO6RNuxfxmuFcN43w",
+                "Template": "%i %v[ %r][ %s][ (%nx)]",
+                "Color": null,
+                "FontName": null,
+                "FontSize": null
+              }
+            ],
+            "ModelType": {
+              "Type": "sCweSx62RveRsLuuhmNqOA",
+              "MessagePivotX": 0.0,
+              "MessageTimeout": 50000000,
+              "AnimateOnHit": true
+            }
+          },
+          {
+            "Name": "Heals",
+            "Enabled": false,
+            "Anchoring": {
+              "AnchorMin": {
+                "X": 0.0,
+                "Y": 0.5
+              },
+              "AnchorMax": {
+                "X": 1.0,
+                "Y": 0.5
+              },
+              "Pivot": {
+                "X": 0.0,
+                "Y": 1.0
+              },
+              "Position": {
+                "X": 0.0,
+                "Y": -80.0
+              },
+              "SizeDelta": {
+                "X": 0.0,
+                "Y": 160.0
+              }
+            },
+            "Children": [],
+            "Receivers": [
+              {
+                "Name": "player out, pet out / heal tick / non self",
+                "Enabled": true,
+                "Categories": [
+                  "VIEa0rBA-kO5lpsiQNTRXA",
+                  "2r3hGh4P3UGpxAEY28VuAw"
+                ],
+                "Results": [
+                  "Qq5274QvQ6-4qqoZOwni0w"
+                ],
+                "EntityFilter": "NWtqNOkPSCKjpxUg_0T9Bg",
+                "Template": "%i %v[ %b][ %s][ %t][ (%nx)]",
+                "Color": null,
+                "FontName": null,
+                "FontSize": null
+              },
+              {
+                "Name": "player out, pet out / heal, barrier / non self",
+                "Enabled": true,
+                "Categories": [
+                  "VIEa0rBA-kO5lpsiQNTRXA",
+                  "2r3hGh4P3UGpxAEY28VuAw"
+                ],
+                "Results": [
+                  "a00CCNo3RECpwniLnuVo0g",
+                  "9wriGSeNQ12qEJ1ZRo4R0Q"
+                ],
+                "EntityFilter": "NWtqNOkPSCKjpxUg_0T9Bg",
+                "Template": "%i %v[ %s][ %t][ (%nx)]",
+                "Color": null,
+                "FontName": null,
+                "FontSize": null
+              }
+            ],
+            "ModelType": {
+              "Type": "sCweSx62RveRsLuuhmNqOA",
+              "MessagePivotX": 0.0,
+              "MessageTimeout": 50000000,
+              "AnimateOnHit": true
+            }
+          },
+          {
+            "Name": "Condi (target)",
+            "Enabled": true,
+            "Anchoring": {
+              "AnchorMin": {
+                "X": 0.0,
+                "Y": 0.5
+              },
+              "AnchorMax": {
+                "X": 0.5,
+                "Y": 0.5
+              },
+              "Pivot": {
+                "X": 1.0,
+                "Y": 0.5
+              },
+              "Position": {
+                "X": 0.0,
+                "Y": 40.0
+              },
+              "SizeDelta": {
+                "X": 0.0,
+                "Y": 220.0
+              }
+            },
+            "Children": [],
+            "Receivers": [
+              {
+                "Name": "player out, pet out / condi, dot / target",
+                "Enabled": true,
+                "Categories": [
+                  "VIEa0rBA-kO5lpsiQNTRXA",
+                  "2r3hGh4P3UGpxAEY28VuAw"
+                ],
+                "Results": [
+                  "YSfSsoHOmEyP7rePsCsu0A",
+                  "MExazeLNnEeA4_SS68fZ_A",
+                  "UaDPUpkrFk6olYhHgEVDwA",
+                  "JHqBj1MRsEaDl69OMFwxYg",
+                  "y6sJZ6TIvkSnNbB7GfyD5g",
+                  "p5MbQ3xISauRbPuaEzHxNQ"
+                ],
+                "EntityFilter": "IrGj7gO6RNuxfxmuFcN43w",
+                "Template": "[(%nx) ][%s ][%b ]%v %i",
+                "Color": null,
+                "FontName": null,
+                "FontSize": null
+              }
+            ],
+            "ModelType": {
+              "Type": "sCweSx62RveRsLuuhmNqOA",
+              "MessagePivotX": 1.0,
+              "MessageTimeout": 50000000,
+              "AnimateOnHit": true
+            }
+          },
+          {
+            "Name": "Player Power (target)",
+            "Enabled": true,
+            "Anchoring": {
+              "AnchorMin": {
+                "X": 0.5,
+                "Y": 0.5
+              },
+              "AnchorMax": {
+                "X": 1.0,
+                "Y": 0.5
+              },
+              "Pivot": {
+                "X": 0.0,
+                "Y": 0.5
+              },
+              "Position": {
+                "X": 0.0,
+                "Y": 40.0
+              },
+              "SizeDelta": {
+                "X": 0.0,
+                "Y": 220.0
+              }
+            },
+            "Children": [],
+            "Receivers": [
+              {
+                "Name": "player out / strike, interrupt / target",
+                "Enabled": true,
+                "Categories": [
+                  "VIEa0rBA-kO5lpsiQNTRXA"
+                ],
+                "Results": [
+                  "1DcrUSv8QpKhW0AJ5OBaDg",
+                  "KSinNkd4EEifSJLHR-HFpg",
+                  "Tr6954TcQG-0hq2HRwzqGA",
+                  "KYwIP2__CUqbTq2_TTospQ",
+                  "zSIAvAY9lUKySRTexRrAgQ",
+                  "PmLrIl1Zsk-cz5sOw3Jlkw",
+                  "1uHogwDh_0Chd8rxwVikXA",
+                  "9UxBDq9TSceVn_Tncf2sDA"
+                ],
+                "EntityFilter": "IrGj7gO6RNuxfxmuFcN43w",
+                "Template": "%i[ %v][ %b][ %r][ %s][ (%nx)]",
+                "Color": null,
+                "FontName": null,
+                "FontSize": null
+              }
+            ],
+            "ModelType": {
+              "Type": "PI0Kpa6NQxacdz7zKKkgQw",
+              "MessagePivotX": 0.0,
+              "CurveType": "M6HqFU0EQxuRcxjouBABiQ",
+              "ScrollSpeed": 30,
+              "MaxQueueSize": 0
+            }
+          },
+          {
+            "Name": "Pet Power (target)",
+            "Enabled": false,
+            "Anchoring": {
+              "AnchorMin": {
+                "X": 0.5,
+                "Y": 0.5
+              },
+              "AnchorMax": {
+                "X": 1.0,
+                "Y": 0.5
+              },
+              "Pivot": {
+                "X": 0.0,
+                "Y": 0.0
+              },
+              "Position": {
+                "X": 0.0,
+                "Y": 160.0
+              },
+              "SizeDelta": {
+                "X": 0.0,
+                "Y": 170.0
+              }
+            },
+            "Children": [],
+            "Receivers": [
+              {
+                "Name": "pet out / strike, dot, interrupt / target",
+                "Enabled": true,
+                "Categories": [
+                  "2r3hGh4P3UGpxAEY28VuAw"
+                ],
+                "Results": [
+                  "1DcrUSv8QpKhW0AJ5OBaDg",
+                  "KSinNkd4EEifSJLHR-HFpg",
+                  "Tr6954TcQG-0hq2HRwzqGA",
+                  "KYwIP2__CUqbTq2_TTospQ",
+                  "zSIAvAY9lUKySRTexRrAgQ",
+                  "PmLrIl1Zsk-cz5sOw3Jlkw",
+                  "1uHogwDh_0Chd8rxwVikXA",
+                  "9UxBDq9TSceVn_Tncf2sDA"
+                ],
+                "EntityFilter": "IrGj7gO6RNuxfxmuFcN43w",
+                "Template": "%i[ %v][ %b][ %r][ %s][ (%nx)]",
+                "Color": null,
+                "FontName": null,
+                "FontSize": null
+              }
+            ],
+            "ModelType": {
+              "Type": "PI0Kpa6NQxacdz7zKKkgQw",
+              "MessagePivotX": 0.0,
+              "CurveType": "M6HqFU0EQxuRcxjouBABiQ",
+              "ScrollSpeed": 30,
+              "MaxQueueSize": 0
+            }
+          }
+        ],
+        "Receivers": [],
+        "ModelType": {
+          "Type": "Mx09eVdDRr2lAjaaEM-NhA"
+        }
+      },
+      {
+        "Name": "Incoming",
+        "Enabled": true,
+        "Anchoring": {
+          "AnchorMin": {
+            "X": 0.5,
+            "Y": 0.3
+          },
+          "AnchorMax": {
+            "X": 0.5,
+            "Y": 0.7
+          },
+          "Pivot": {
+            "X": 1.0,
+            "Y": 0.5
+          },
+          "Position": {
+            "X": -200.0,
+            "Y": 0.0
+          },
+          "SizeDelta": {
+            "X": 80.0,
+            "Y": 0.0
+          }
+        },
+        "Children": [
+          {
+            "Name": "Condi and Heals",
+            "Enabled": true,
+            "Anchoring": {
+              "AnchorMin": {
+                "X": 0.0,
+                "Y": 0.5
+              },
+              "AnchorMax": {
+                "X": 1.0,
+                "Y": 0.5
+              },
+              "Pivot": {
+                "X": 1.0,
+                "Y": 1.0
+              },
+              "Position": {
+                "X": 0.0,
+                "Y": -80.0
+              },
+              "SizeDelta": {
+                "X": 0.0,
+                "Y": 200.0
+              }
+            },
+            "Children": [],
+            "Receivers": [
+              {
+                "Name": "player in / condi, dot / any",
+                "Enabled": true,
+                "Categories": [
+                  "WEVcwa9dg0iluzuWIfPfag"
+                ],
+                "Results": [
+                  "YSfSsoHOmEyP7rePsCsu0A",
+                  "MExazeLNnEeA4_SS68fZ_A",
+                  "UaDPUpkrFk6olYhHgEVDwA",
+                  "JHqBj1MRsEaDl69OMFwxYg",
+                  "y6sJZ6TIvkSnNbB7GfyD5g",
+                  "p5MbQ3xISauRbPuaEzHxNQ"
+                ],
+                "EntityFilter": "-aS4Lvy8Rd2bfsygi1Rzzg",
+                "Template": "[(%nx) ][%f ][%s ][%b ]%v %i",
+                "Color": null,
+                "FontName": null,
+                "FontSize": null
+              },
+              {
+                "Name": "player in / heal, barrier / any",
+                "Enabled": true,
+                "Categories": [
+                  "WEVcwa9dg0iluzuWIfPfag"
+                ],
+                "Results": [
+                  "a00CCNo3RECpwniLnuVo0g",
+                  "9wriGSeNQ12qEJ1ZRo4R0Q"
+                ],
+                "EntityFilter": "-aS4Lvy8Rd2bfsygi1Rzzg",
+                "Template": "[(%nx) ][%f ][%s ]%v %i",
+                "Color": null,
+                "FontName": null,
+                "FontSize": null
+              },
+              {
+                "Name": "player in / heal tick / any",
+                "Enabled": true,
+                "Categories": [
+                  "WEVcwa9dg0iluzuWIfPfag"
+                ],
+                "Results": [
+                  "Qq5274QvQ6-4qqoZOwni0w"
+                ],
+                "EntityFilter": "-aS4Lvy8Rd2bfsygi1Rzzg",
+                "Template": "[(%nx) ][%f ][%s ][%b ]%v %i",
+                "Color": null,
+                "FontName": null,
+                "FontSize": null
+              }
+            ],
+            "ModelType": {
+              "Type": "sCweSx62RveRsLuuhmNqOA",
+              "MessagePivotX": 1.0,
+              "MessageTimeout": 50000000,
+              "AnimateOnHit": true
+            }
+          },
+          {
+            "Name": "Power",
+            "Enabled": true,
+            "Anchoring": {
+              "AnchorMin": {
+                "X": 0.0,
+                "Y": 0.5
+              },
+              "AnchorMax": {
+                "X": 0.5,
+                "Y": 0.5
+              },
+              "Pivot": {
+                "X": 1.0,
+                "Y": 0.5
+              },
+              "Position": {
+                "X": 0.0,
+                "Y": 40.0
+              },
+              "SizeDelta": {
+                "X": 0.0,
+                "Y": 220.0
+              }
+            },
+            "Children": [],
+            "Receivers": [
+              {
+                "Name": "player in / strike, interrupt, breakbar / any",
+                "Enabled": true,
+                "Categories": [
+                  "WEVcwa9dg0iluzuWIfPfag"
+                ],
+                "Results": [
+                  "1DcrUSv8QpKhW0AJ5OBaDg",
+                  "KSinNkd4EEifSJLHR-HFpg",
+                  "Tr6954TcQG-0hq2HRwzqGA",
+                  "KYwIP2__CUqbTq2_TTospQ",
+                  "zSIAvAY9lUKySRTexRrAgQ",
+                  "PmLrIl1Zsk-cz5sOw3Jlkw",
+                  "1uHogwDh_0Chd8rxwVikXA",
+                  "9UxBDq9TSceVn_Tncf2sDA",
+                  "eAqruxsURl-GaMAx3z_ORA"
+                ],
+                "EntityFilter": "-aS4Lvy8Rd2bfsygi1Rzzg",
+                "Template": "[(%nx) ][%f ][%s ][%r ][%b ][%v ]%i",
+                "Color": null,
+                "FontName": null,
+                "FontSize": null
+              }
+            ],
+            "ModelType": {
+              "Type": "PI0Kpa6NQxacdz7zKKkgQw",
+              "MessagePivotX": 1.0,
+              "CurveType": "qCV5_z4TQnm2k06GHKxTVg",
+              "ScrollSpeed": 30,
+              "MaxQueueSize": 0
+            }
+          }
+        ],
+        "Receivers": [],
+        "ModelType": {
+          "Type": "Mx09eVdDRr2lAjaaEM-NhA"
+        }
+      }
+    ],
+    "Receivers": [],
+    "ModelType": {
+      "Type": "Mx09eVdDRr2lAjaaEM-NhA"
+    }
+  }
+]
