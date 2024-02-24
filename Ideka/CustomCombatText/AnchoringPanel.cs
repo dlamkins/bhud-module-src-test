@@ -396,15 +396,15 @@ namespace Ideka.CustomCombatText
 				},
 				[Preset.CenterTop] = new PresetValue
 				{
-					AnchorMin = new Vector2(0f, 0.5f),
-					AnchorMax = new Vector2(0f, 0.5f),
-					Pivot = new Vector2(0f, 0.5f)
+					AnchorMin = new Vector2(0.5f, 0f),
+					AnchorMax = new Vector2(0.5f, 0f),
+					Pivot = new Vector2(0.5f, 0f)
 				},
 				[Preset.CenterBottom] = new PresetValue
 				{
-					AnchorMin = new Vector2(1f, 0.5f),
-					AnchorMax = new Vector2(1f, 0.5f),
-					Pivot = new Vector2(1f, 0.5f)
+					AnchorMin = new Vector2(0.5f, 1f),
+					AnchorMax = new Vector2(0.5f, 1f),
+					Pivot = new Vector2(0.5f, 1f)
 				}
 			};
 
