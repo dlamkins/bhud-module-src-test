@@ -76,7 +76,7 @@ namespace HexedHero.Blish_HUD.MarkerPackAssistant.Managers
 			{
 				MainWindow.ToggleWindow((IView)(object)AssistanceView);
 			});
-			StandardWindow val2 = new StandardWindow(Textures.get_TransparentPixel(), new Rectangle(5, 5, 310, 220), new Rectangle(30, 30, 260, 180));
+			StandardWindow val2 = new StandardWindow(Textures.get_TransparentPixel(), new Rectangle(5, 5, 330, 220), new Rectangle(30, 30, 300, 180));
 			((WindowBase2)val2).set_Emblem(Textures.get_TransparentPixel());
 			((WindowBase2)val2).set_Title("MPA");
 			((Control)val2).set_Location(new Point(100, 100));
@@ -110,7 +110,7 @@ namespace HexedHero.Blish_HUD.MarkerPackAssistant.Managers
 			void injectBackground()
 			{
 				//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-				Reflection.InjectNewBackground((WindowBase2)(object)MainWindow, AsyncTexture2D.op_Implicit(backgroundTexture), new Rectangle(-10, 30, 340, 340));
+				Reflection.InjectNewBackground((WindowBase2)(object)MainWindow, AsyncTexture2D.op_Implicit(backgroundTexture), new Rectangle(-10, 30, 365, 340));
 			}
 			void injectEmblem()
 			{

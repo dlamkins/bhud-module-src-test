@@ -376,7 +376,7 @@ namespace HexedHero.Blish_HUD.MarkerPackAssistant.Objects
 			UpdaterTaskToken = new CancellationTokenSource();
 			FlowPanel val = new FlowPanel();
 			val.set_FlowDirection((ControlFlowDirection)3);
-			((Control)val).set_Size(new Point(260, 180));
+			((Control)val).set_Size(new Point(280, 180));
 			((Control)val).set_Parent(container);
 			GlobalFlowPanel = val;
 			Label val2 = new Label();
@@ -387,7 +387,7 @@ namespace HexedHero.Blish_HUD.MarkerPackAssistant.Objects
 			StatsLabel = val2;
 			FlowPanel val3 = new FlowPanel();
 			val3.set_FlowDirection((ControlFlowDirection)2);
-			((Control)val3).set_Size(new Point(220, 25));
+			((Control)val3).set_Size(new Point(280, 25));
 			((Control)val3).set_Parent((Container)(object)GlobalFlowPanel);
 			MapIDFlowPanel = val3;
 			StandardButton val4 = new StandardButton();
@@ -419,7 +419,7 @@ namespace HexedHero.Blish_HUD.MarkerPackAssistant.Objects
 			MapIDLabel = val6;
 			FlowPanel val7 = new FlowPanel();
 			val7.set_FlowDirection((ControlFlowDirection)2);
-			((Control)val7).set_Size(new Point(260, 25));
+			((Control)val7).set_Size(new Point(280, 25));
 			((Control)val7).set_Parent((Container)(object)GlobalFlowPanel);
 			CordsFlowPanel = val7;
 			StandardButton val8 = new StandardButton();
@@ -446,7 +446,7 @@ namespace HexedHero.Blish_HUD.MarkerPackAssistant.Objects
 			Label val10 = new Label();
 			val10.set_Text("ERROR");
 			((Control)val10).set_Location(new Point(0, 0));
-			((Control)val10).set_Size(new Point(200, 25));
+			((Control)val10).set_Size(new Point(260, 25));
 			((Control)val10).set_Parent((Container)(object)CordsFlowPanel);
 			CordsLabel = val10;
 			Label val11 = new Label();
@@ -457,7 +457,7 @@ namespace HexedHero.Blish_HUD.MarkerPackAssistant.Objects
 			ToolsLabel = val11;
 			FlowPanel val12 = new FlowPanel();
 			val12.set_FlowDirection((ControlFlowDirection)2);
-			((Control)val12).set_Size(new Point(260, 25));
+			((Control)val12).set_Size(new Point(280, 25));
 			((Control)val12).set_Parent((Container)(object)GlobalFlowPanel);
 			RunFlowPanel = val12;
 			StandardButton val13 = new StandardButton();
@@ -517,7 +517,7 @@ namespace HexedHero.Blish_HUD.MarkerPackAssistant.Objects
 			((TextInputBase)val15).set_Text(ModuleSettingsManager.Instance.ModuleSettings.MarkerPackBuildPath.get_Value());
 			((TextInputBase)val15).set_Font(GameService.Content.get_DefaultFont12());
 			((Control)val15).set_Location(new Point(0, 0));
-			((Control)val15).set_Size(new Point(160, 25));
+			((Control)val15).set_Size(new Point(180, 25));
 			((Control)val15).set_Parent((Container)(object)RunFlowPanel);
 			RunTextBox = val15;
 			((TextInputBase)RunTextBox).add_TextChanged((EventHandler<EventArgs>)delegate
@@ -526,7 +526,7 @@ namespace HexedHero.Blish_HUD.MarkerPackAssistant.Objects
 			});
 			FlowPanel val16 = new FlowPanel();
 			val16.set_FlowDirection((ControlFlowDirection)2);
-			((Control)val16).set_Size(new Point(260, 25));
+			((Control)val16).set_Size(new Point(280, 25));
 			((Control)val16).set_Parent((Container)(object)GlobalFlowPanel);
 			RandomGUIDFlowPanel = val16;
 			StandardButton val17 = new StandardButton();
@@ -558,7 +558,7 @@ namespace HexedHero.Blish_HUD.MarkerPackAssistant.Objects
 			RandomGUIDLabel = val19;
 			FlowPanel val20 = new FlowPanel();
 			val20.set_FlowDirection((ControlFlowDirection)2);
-			((Control)val20).set_Size(new Point(260, 25));
+			((Control)val20).set_Size(new Point(280, 25));
 			((Control)val20).set_Parent((Container)(object)GlobalFlowPanel);
 			POIFlowPanel = val20;
 			StandardButton val21 = new StandardButton();
