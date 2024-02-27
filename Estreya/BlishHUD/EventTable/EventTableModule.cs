@@ -72,7 +72,7 @@ namespace Estreya.BlishHUD.EventTable
 
 		protected override string UrlModuleName => "event-table";
 
-		protected override bool FailIfBackendDown => true;
+		protected override bool NotifyIfBackendDown => true;
 
 		protected override bool EnableMetrics => true;
 
@@ -132,9 +132,8 @@ namespace Estreya.BlishHUD.EventTable
 			await DynamicEventHandler.AddDynamicEventsToMap();
 			await DynamicEventHandler.AddDynamicEventsToWorld();
 			base.ModuleSettings.IncludeSelfHostedEvents.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)IncludeSelfHostedEvents_SettingChanged);
-			await LoadEvents();
 			AddAllAreas();
-			SetAreaEvents();
+			await LoadEvents();
 			sw.Stop();
 			base.Logger.Debug("Loaded in " + sw.Elapsed.TotalMilliseconds.ToString(CultureInfo.InvariantCulture) + "ms");
 		}
@@ -205,6 +204,10 @@ namespace Estreya.BlishHUD.EventTable
 
 		private async Task LoadEvents()
 		{
+			if (base.ModuleState == ModuleState.Error)
+			{
+				return;
+			}
 			base.Logger.Info("Load events...");
 			using (await _eventCategoryLock.LockAsync())
 			{
@@ -770,7 +773,7 @@ namespace Estreya.BlishHUD.EventTable
 				AwaitLoading = false,
 				Enabled = true,
 				SaveInterval = Timeout.InfiniteTimeSpan
-			}, base.Gw2ApiManager, GetFlurlClient(), "https://api.estreya.de/blish-hud", directoryPath);
+			}, base.Gw2ApiManager, GetFlurlClient(), base.API_ROOT_URL, directoryPath);
 			collection.Add(EventStateService);
 			collection.Add(DynamicEventService);
 			return collection;
@@ -784,6 +787,11 @@ namespace Estreya.BlishHUD.EventTable
 		protected override AsyncTexture2D GetCornerIcon()
 		{
 			return base.IconService.GetIcon("textures/event_boss_grey" + (base.IsPrerelease ? "_demo" : "") + ".png");
+		}
+
+		protected override AsyncTexture2D GetErrorCornerIcon()
+		{
+			return base.IconService.GetIcon("textures/event_boss_grey_error.png");
 		}
 
 		private void UnloadContext()

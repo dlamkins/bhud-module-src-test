@@ -46,7 +46,9 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected const string FILE_BLISH_ROOT_URL = "https://files.estreya.de/blish-hud";
 
-		protected const string API_ROOT_URL = "https://api.estreya.de/blish-hud";
+		protected const string LIVE_API_HOSTNAME = "api.estreya.de";
+
+		protected const string DEBUG_API_HOSTNAME = "api.estreya.dev";
 
 		protected const string GITHUB_OWNER = "Tharylia";
 
@@ -72,7 +74,9 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected string MODULE_FILE_URL => "https://files.estreya.de/blish-hud/" + UrlModuleName;
 
-		protected string MODULE_API_URL => "https://api.estreya.de/blish-hud/v" + API_VERSION_NO + "/" + UrlModuleName;
+		protected string API_ROOT_URL => "https://" + (ModuleSettings.UseDebugAPI.get_Value() ? "api.estreya.dev" : "api.estreya.de") + "/blish-hud";
+
+		protected string MODULE_API_URL => API_ROOT_URL + "/v" + API_VERSION_NO + "/" + UrlModuleName;
 
 		protected GitHubHelper GithubHelper { get; private set; }
 
@@ -82,9 +86,13 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected abstract string API_VERSION_NO { get; }
 
-		protected virtual bool FailIfBackendDown => false;
+		protected virtual bool NotifyIfBackendDown => false;
 
 		protected virtual bool EnableMetrics => false;
+
+		protected ModuleState ModuleState { get; private set; }
+
+		protected string ModuleStateText { get; private set; }
 
 		public bool IsPrerelease
 		{
@@ -210,7 +218,11 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected override async Task LoadAsync()
 		{
-			await ThrowIfModuleInvalid(showScreenNotification: true);
+			if (ModuleSettings.UseDebugAPI.get_Value())
+			{
+				Logger.Info("User configured module to use debug api: " + MODULE_API_URL);
+			}
+			await VerifyModuleState(showScreenNotification: true);
 			await Task.Factory.StartNew((Func<Task>)InitializeServices, TaskCreationOptions.LongRunning).Unwrap();
 			if (EnableMetrics)
 			{
@@ -221,7 +233,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 			ModuleSettings.RegisterCornerIcon.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)RegisterCornerIcon_SettingChanged);
 		}
 
-		private async Task ThrowIfModuleInvalid(bool showScreenNotification)
+		private async Task VerifyModuleState(bool showScreenNotification)
 		{
 			IFlurlRequest request = GetFlurlClient().Request(MODULE_API_URL, "validate").AllowAnyHttpStatus();
 			ModuleValidationRequest moduleValidationRequest = default(ModuleValidationRequest);
@@ -235,19 +247,61 @@ namespace Estreya.BlishHUD.Shared.Modules
 			catch (Exception ex)
 			{
 				Logger.Debug(ex, "Failed to validate module.");
-				if (FailIfBackendDown)
-				{
-					throw new ModuleBackendUnavailableException();
-				}
 			}
-			if (response == null || response.get_IsSuccessStatusCode() || response.get_StatusCode() == HttpStatusCode.NotFound)
+			if (response != null && (response.get_IsSuccessStatusCode() || response.get_StatusCode() == HttpStatusCode.NotFound))
+			{
+				return;
+			}
+			bool flag = NotifyIfBackendDown;
+			if (flag)
+			{
+				bool flag2 = response == null;
+				if (!flag2)
+				{
+					HttpStatusCode statusCode = response.get_StatusCode();
+					bool flag3 = (((uint)(statusCode - 502) <= 1u) ? true : false);
+					flag2 = flag3;
+				}
+				flag = flag2;
+			}
+			if (flag)
+			{
+				if (showScreenNotification)
+				{
+					ScreenNotification.ShowNotification(new string[2]
+					{
+						"The backend for \"" + ((Module)this).get_Name() + "\" is currently unvailable.",
+						"Please check the Estreya BlishHUD Discord for news."
+					}, ScreenNotification.NotificationType.Error, null, 10);
+				}
+				SetModuleState(ModuleState.Error, "Backend unavailable.\n\nCheck Estreya BlishHUD Discord.");
+				return;
+			}
+			flag = response == null;
+			if (!flag)
+			{
+				HttpStatusCode statusCode = response.get_StatusCode();
+				bool flag2 = (((uint)(statusCode - 502) <= 1u) ? true : false);
+				flag = flag2;
+			}
+			if (flag)
 			{
 				return;
 			}
 			if (response.get_StatusCode() != HttpStatusCode.Forbidden)
 			{
-				string content = await response.get_Content().ReadAsStringAsync();
-				throw new ModuleBackendUnavailableException($"Module validation failed with unexpected status code {response.get_StatusCode()}: {content}");
+				string content2 = await response.get_Content().ReadAsStringAsync();
+				if (showScreenNotification)
+				{
+					ScreenNotification.ShowNotification(new string[2]
+					{
+						"The module \"" + ((Module)this).get_Name() + "\" entered fault mode.",
+						"Please check the latest log for more information."
+					}, ScreenNotification.NotificationType.Error, null, 10);
+				}
+				Logger.Error($"Module validation failed with unexpected status code {response.get_StatusCode()}: {content2}");
+				SetModuleState(ModuleState.Error, "Module validation failed.\n\nCheck latest log for more information.");
+				return;
 			}
 			ModuleValidationResponse validationResponse;
 			try
@@ -256,7 +310,16 @@ namespace Estreya.BlishHUD.Shared.Modules
 			}
 			catch (Exception)
 			{
-				throw new ModuleBackendUnavailableException("Could not read module validation response: " + await response.get_Content().ReadAsStringAsync());
+				string content = await response.get_Content().ReadAsStringAsync();
+				if (showScreenNotification)
+				{
+					ScreenNotification.ShowNotification(new string[2]
+					{
+						"The module \"" + ((Module)this).get_Name() + "\" could not verify itself.",
+						"Please check the latest log for more information."
+					}, ScreenNotification.NotificationType.Error, null, 10);
+				}
+				throw new ModuleInvalidException("Could not read module validation response: " + content);
 			}
 			if (showScreenNotification)
 			{
@@ -300,7 +363,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 					{
 						throw new ArgumentNullException("PasswordManager");
 					}
-					BlishHUDAPIService = new BlishHudApiService(configurations.BlishHUDAPI, ModuleSettings.BlishAPIUsername, PasswordManager, GetFlurlClient(), "https://api.estreya.de/blish-hud");
+					BlishHUDAPIService = new BlishHudApiService(configurations.BlishHUDAPI, ModuleSettings.BlishAPIUsername, PasswordManager, GetFlurlClient(), API_ROOT_URL);
 					_services.Add(BlishHUDAPIService);
 				}
 				if (configurations.Account.Enabled)
@@ -337,7 +400,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 				{
 					Enabled = true,
 					AwaitLoading = true
-				}, GetFlurlClient(), "https://api.estreya.de/blish-hud", ((Module)this).get_Name(), ((Module)this).get_Namespace(), ModuleSettings, IconService);
+				}, GetFlurlClient(), API_ROOT_URL, ((Module)this).get_Name(), ((Module)this).get_Namespace(), ModuleSettings, IconService);
 				_services.Add(MetricsService);
 				if (configurations.Audio.Enabled)
 				{
@@ -478,17 +541,16 @@ namespace Estreya.BlishHUD.Shared.Modules
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Expected O, but got Unknown
+			//IL_002e: Expected O, but got Unknown
 			if (show)
 			{
 				if (CornerIcon == null)
 				{
 					CornerIcon val = new CornerIcon();
 					val.set_IconName(((Module)this).get_Name());
-					val.set_Icon(GetCornerIcon());
 					val.set_Priority(CornerIconPriority);
 					CornerIcon = val;
+					UpdateCornerIcon();
 					OnCornerIconBuild();
 				}
 			}
@@ -497,6 +559,15 @@ namespace Estreya.BlishHUD.Shared.Modules
 				OnCornerIconDispose();
 				((Control)CornerIcon).Dispose();
 				CornerIcon = null;
+			}
+		}
+
+		private void UpdateCornerIcon()
+		{
+			if (CornerIcon != null)
+			{
+				CornerIcon.set_Icon((ModuleState == ModuleState.Error) ? GetErrorCornerIcon() : GetCornerIcon());
+				((Control)CornerIcon).set_BasicTooltipText(ModuleStateText);
 			}
 		}
 
@@ -597,6 +668,16 @@ namespace Estreya.BlishHUD.Shared.Modules
 		protected abstract AsyncTexture2D GetEmblem();
 
 		protected abstract AsyncTexture2D GetCornerIcon();
+
+		protected virtual AsyncTexture2D GetErrorEmblem()
+		{
+			return GetEmblem();
+		}
+
+		protected virtual AsyncTexture2D GetErrorCornerIcon()
+		{
+			return GetCornerIcon();
+		}
 
 		protected virtual void OnSettingWindowBuild(TabbedWindow settingWindow)
 		{
@@ -721,6 +802,13 @@ namespace Estreya.BlishHUD.Shared.Modules
 			}
 			((Control)_loadingSpinner).set_BasicTooltipText(text);
 			((Control)_loadingSpinner).set_Visible(show);
+		}
+
+		protected void SetModuleState(ModuleState state, string text = null)
+		{
+			ModuleState = state;
+			ModuleStateText = text;
+			UpdateCornerIcon();
 		}
 
 		protected async Task ReloadServices()

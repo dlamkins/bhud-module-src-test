@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Modules.Managers;
+using Blish_HUD.Settings;
 using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.Shared.Models;
 using Estreya.BlishHUD.Shared.Services;
@@ -80,6 +81,73 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.IncludeSelfHostedEvents);
 			RenderEmptyLine((Panel)(object)parent);
 			RenderEnumSetting<MenuEventSortMode>((Panel)(object)parent, _moduleSettings.MenuEventSortMode);
+			RenderEmptyLine((Panel)(object)parent);
+			RenderDebugGroup(parent);
+			RenderEmptyLine((Panel)(object)parent);
+		}
+
+		private void RenderDebugGroup(FlowPanel parent)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0074: Expected O, but got Unknown
+			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024c: Unknown result type (might be due to invalid IL or missing references)
+			FlowPanel val = new FlowPanel();
+			((Control)val).set_Parent((Container)(object)parent);
+			val.set_OuterControlPadding(new Vector2(20f, 20f));
+			((Panel)val).set_ShowBorder(true);
+			((Panel)val).set_Title("Debug");
+			((Panel)val).set_CanCollapse(true);
+			((Panel)val).set_Collapsed(true);
+			((Container)val).set_HeightSizingMode((SizingMode)1);
+			((Control)val).set_Width(((Container)parent).get_ContentRegion().Width - (int)(parent.get_OuterControlPadding().X * 2f));
+			val.set_FlowDirection((ControlFlowDirection)3);
+			FlowPanel groupPanel = val;
+			FormattedLabelBuilder obj = new FormattedLabelBuilder().SetWidth(((Container)groupPanel).get_ContentRegion().Width).AutoSizeHeight().SetVerticalAlignment((VerticalAlignment)0);
+			obj.CreatePart("Use the Debug API happens on your own risk!", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder b)
+			{
+				b.MakeBold();
+			}).CreatePart("\n", (Action<FormattedLabelPartBuilder>)delegate
+			{
+			}).CreatePart("The API can be offline or in a broken state for your module version at any given time!", (Action<FormattedLabelPartBuilder>)delegate
+			{
+			})
+				.CreatePart("\n", (Action<FormattedLabelPartBuilder>)delegate
+				{
+				})
+				.CreatePart("This could lead to you not being able to use the module at all to reset this setting via the UI.", (Action<FormattedLabelPartBuilder>)delegate
+				{
+				})
+				.CreatePart("\n \n", (Action<FormattedLabelPartBuilder>)delegate
+				{
+				})
+				.CreatePart("In this case open the settings.json file and set the option \"" + ((SettingEntry)_moduleSettings.UseDebugAPI).get_EntryKey() + "\" back to false.", (Action<FormattedLabelPartBuilder>)delegate
+				{
+				})
+				.CreatePart("\n \n", (Action<FormattedLabelPartBuilder>)delegate
+				{
+				})
+				.CreatePart("Changing this option needs a complete restart of BlishHUD!", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder b)
+				{
+					b.MakeItalic();
+				});
+			((Control)obj.Build()).set_Parent((Container)(object)groupPanel);
+			RenderEmptyLine((Panel)(object)groupPanel);
+			RenderBoolSetting((Panel)(object)groupPanel, _moduleSettings.UseDebugAPI);
+			RenderEmptyLine((Panel)(object)groupPanel, (int)groupPanel.get_OuterControlPadding().Y);
 		}
 
 		protected override Task<bool> InternalLoad(IProgress<string> progress)
