@@ -8,7 +8,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Extensions
 	{
 		public static IEnumerable<IngredientNode> GetByItemId(this IList<IngredientNode> nodes, int itemId)
 		{
-			return nodes?.Where((IngredientNode n) => n.Item.Id == itemId)?.OrderBy((IngredientNode n) => n.NodeIndex);
+			return nodes?.Where((IngredientNode n) => n.Item.GameId == itemId)?.OrderBy((IngredientNode n) => n.NodeIndex);
 		}
 
 		public static void RemoveNodeAndDescendants(this IList<IngredientNode> allNodes, IngredientNode node)

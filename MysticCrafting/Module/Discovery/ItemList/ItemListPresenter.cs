@@ -6,6 +6,7 @@ using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using MysticCrafting.Models.Items;
 using MysticCrafting.Module.Discovery.ItemList.Controls;
+using MysticCrafting.Module.Extensions;
 using MysticCrafting.Module.Recipe;
 using MysticCrafting.Module.Services;
 
@@ -13,6 +14,8 @@ namespace MysticCrafting.Module.Discovery.ItemList
 {
 	public class ItemListPresenter : Presenter<ItemListView, ItemListModel>, IItemListPresenter, IPresenter
 	{
+		private static List<string> ArmorTypes = new List<string> { "Helm", "Shoulders", "Coat", "Gloves", "Leggings", "Boots", "Back" };
+
 		private RecipeDetailsView _recipeDetailsView;
 
 		public ItemListPresenter(ItemListView view, ItemListModel model)
@@ -26,24 +29,41 @@ namespace MysticCrafting.Module.Discovery.ItemList
 			{
 				throw new NullReferenceException("Model cannot be null.");
 			}
+			if (base.Model.Filter == null)
+			{
+				return;
+			}
+			base.View.Panel.ClearChildren();
+			if (!string.IsNullOrEmpty(base.Model.Filter?.Rarity) && base.View.RarityDropdown != null)
+			{
+				base.Model.Filter.Rarity = (base.View.RarityDropdown.SelectedItem.Equals("All rarities") ? null : base.View.RarityDropdown.SelectedItem);
+			}
 			if (base.Model.Filter != null)
 			{
-				base.View.Panel.ClearChildren();
-				if (base.View.RarityDropdown != null)
+				if (base.Model.Filter.Type == "Armor" || ArmorTypes.Contains(base.Model.Filter.DetailsType))
 				{
-					base.View.RarityDropdown.ValueChanged += RarityDropdown_ValueChanged;
+					base.View.WeightDropdown.Visible = true;
+					base.View.LegendaryTypeDropdown.Visible = true;
+					base.Model.Filter.WeightFilterDisabled = false;
 				}
-				if (base.Model.Filter != null && base.View.RarityDropdown != null)
+				else
 				{
-					base.Model.Filter.Rarity = (base.View.RarityDropdown.SelectedItem.Equals("All rarities") ? null : base.View.RarityDropdown.SelectedItem);
+					base.View.WeightDropdown.Visible = false;
+					base.View.LegendaryTypeDropdown.Visible = false;
+					base.Model.Filter.WeightFilterDisabled = true;
 				}
-				List<MysticItem> items = base.Model.GetFilteredItems().ToList();
-				if (items.Count == base.Model.ItemLimit)
+				if (base.Model.Filter.Weight != 0 && base.View.WeightDropdown.Visible)
 				{
-					base.View.LimitReached = true;
+					base.View.WeightDropdown.SelectedItem = base.Model.Filter.Weight.ToString();
 				}
-				UpdateList(items);
 			}
+			List<MysticItem> items = base.Model.GetFilteredItems().ToList();
+			if (items.Count == base.Model.ItemLimit)
+			{
+				base.View.LimitReached = true;
+			}
+			base.View.UpdateFilterLabel();
+			UpdateList(items);
 		}
 
 		public void UpdateList(List<MysticItem> items)
@@ -54,10 +74,23 @@ namespace MysticCrafting.Module.Discovery.ItemList
 				return;
 			}
 			List<ItemRowView> rows = new List<ItemRowView>();
-			foreach (MysticItem item in items)
+			items = items.Where(delegate(MysticItem i)
 			{
-				bool displayDetailsType = string.IsNullOrEmpty(base.Model.Filter?.DetailsType);
-				rows.Add(new ItemRowView(item, displayDetailsType)
+				bool flag = ServiceContainer.PlayerUnlocksService.ItemUnlocked(i.DefaultSkin.GetValueOrDefault());
+				if (base.Model.Filter.HideSkinUnlocked && flag)
+				{
+					return false;
+				}
+				if (base.Model.Filter.HideSkinLocked && !flag)
+				{
+					return false;
+				}
+				return (!base.Model.Filter.HideMaxItemsCollected || !(ServiceContainer.PlayerUnlocksService.LegendaryUnlockedCount(i.GameId) >= i.GetMaxCount())) ? true : false;
+			}).ToList();
+			foreach (MysticItem item in items.Take(100))
+			{
+				string.IsNullOrEmpty(base.Model.Filter?.DetailsType);
+				rows.Add(new ItemRowView(item, displayDetailsType: true)
 				{
 					OnClick = ItemRow_Click
 				});
@@ -65,7 +98,7 @@ namespace MysticCrafting.Module.Discovery.ItemList
 			base.View.SetItemRows(rows);
 		}
 
-		private void RarityDropdown_ValueChanged(object sender, ValueChangedEventArgs e)
+		public void RarityDropdown_ValueChanged(object sender, ValueChangedEventArgs e)
 		{
 			Dropdown dropdown = sender as Dropdown;
 			if (dropdown != null)
@@ -89,7 +122,7 @@ namespace MysticCrafting.Module.Discovery.ItemList
 			{
 				base.View.Container.ClearChildren();
 				base.View.LimitReached = false;
-				_recipeDetailsView?.RecipeItemList.Dispose();
+				_recipeDetailsView?.RecipeItemList?.Dispose();
 				_recipeDetailsView = new RecipeDetailsView(listItem.Item, BuildBreadcrumbs());
 				RecipeDetailsView recipeDetailsView = _recipeDetailsView;
 				recipeDetailsView.OnBackButtonClick = (EventHandler<MouseEventArgs>)Delegate.Combine(recipeDetailsView.OnBackButtonClick, new EventHandler<MouseEventArgs>(ItemDetails_BackButton_Click));
@@ -101,7 +134,7 @@ namespace MysticCrafting.Module.Discovery.ItemList
 		private IList<string> BuildBreadcrumbs()
 		{
 			IList<string> breadcrumbs = base.Model.Breadcrumbs ?? new List<string>();
-			string existingSearchCrumb = breadcrumbs.FirstOrDefault((string b) => b.Contains("Search"));
+			string existingSearchCrumb = breadcrumbs.FirstOrDefault((string b) => b?.Contains("Search") ?? false);
 			if (existingSearchCrumb != null)
 			{
 				breadcrumbs.Remove(existingSearchCrumb);
@@ -120,6 +153,10 @@ namespace MysticCrafting.Module.Discovery.ItemList
 			base.View.LimitReached = false;
 			base.View.Panel.Parent = base.View.Container;
 			base.View.RarityDropdown.Parent = base.View.Container;
+			base.View.SettingsMenuButton.Parent = base.View.Container;
+			base.View.FiltersLabel.Parent = base.View.Container;
+			base.View.WeightDropdown.Parent = base.View.Container;
+			base.View.LegendaryTypeDropdown.Parent = base.View.Container;
 			base.View.SetLimitLabelParent(base.View.Container);
 			ServiceContainer.TextureRepository.ClearTextures();
 		}

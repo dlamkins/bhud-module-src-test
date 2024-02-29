@@ -2,8 +2,12 @@ using Blish_HUD;
 using Blish_HUD.Controls;
 using MysticCrafting.Models.Items;
 using MysticCrafting.Module.Helpers;
+using MysticCrafting.Module.Recipe.TreeView.Extensions;
 using MysticCrafting.Module.Recipe.TreeView.Nodes;
 using MysticCrafting.Module.Repositories;
+using MysticCrafting.Module.Services;
+using MysticCrafting.Module.Settings;
+using MysticCrafting.Module.Strings;
 
 namespace MysticCrafting.Module.Recipe.TreeView.Presenters
 {
@@ -16,17 +20,54 @@ namespace MysticCrafting.Module.Recipe.TreeView.Presenters
 			_wikiLinkRepository = wikiLinkRepository;
 		}
 
-		public ContextMenuStrip BuildMenuStrip(MysticItem item)
+		public ContextMenuStrip BuildMenuStrip(MysticItem item, IngredientNode node)
 		{
 			ContextMenuStrip menuStrip = new ContextMenuStrip();
-			ContextMenuStripItem wikiItem = BuildWikiItem(item.Id);
+			ContextMenuStripItem wikiItem = BuildWikiItem(item.GameId);
 			if (wikiItem != null)
 			{
 				menuStrip.AddMenuItem(wikiItem);
 			}
-			menuStrip.AddMenuItem(BuildGw2Bltc(item.Id));
+			menuStrip.AddMenuItem(BuildGw2Bltc(item.GameId));
 			menuStrip.AddMenuItem(BuildCopyChatLink(item.ChatLink));
+			menuStrip.AddMenuItem(BuildTradingPostItem(node));
 			return menuStrip;
+		}
+
+		public ContextMenuStripItem BuildClearChoices(IngredientNode node)
+		{
+			ContextMenuStrip Submenu = new ContextMenuStrip();
+			ContextMenuStripItem confirmation = new ContextMenuStripItem("Yes I'm sure");
+			confirmation.Click += delegate
+			{
+				ServiceContainer.ChoiceRepository.DeleteAllChoices(node.FullPath);
+			};
+			Submenu.AddMenuItem(confirmation);
+			return new ContextMenuStripItem("Clear my choices")
+			{
+				Submenu = Submenu
+			};
+		}
+
+		public ContextMenuStripItem BuildTradingPostItem(IngredientNode node)
+		{
+			ContextMenuStrip Submenu = new ContextMenuStrip();
+			ContextMenuStripItem buyAll = new ContextMenuStripItem(MysticCrafting.Module.Strings.Recipe.ContextMenuBuyAll);
+			buyAll.Click += delegate
+			{
+				node.UpdateTradingPostOptions(TradingPostOptions.Buy);
+			};
+			Submenu.AddMenuItem(buyAll);
+			ContextMenuStripItem sellAll = new ContextMenuStripItem(MysticCrafting.Module.Strings.Recipe.ContextMenuSellAll);
+			sellAll.Click += delegate
+			{
+				node.UpdateTradingPostOptions(TradingPostOptions.Sell);
+			};
+			Submenu.AddMenuItem(sellAll);
+			return new ContextMenuStripItem(MysticCrafting.Module.Strings.Recipe.ContextMenuUpdateTradingPost)
+			{
+				Submenu = Submenu
+			};
 		}
 
 		public ContextMenuStripItem BuildWikiItem(int itemId)

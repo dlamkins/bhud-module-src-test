@@ -1,4 +1,6 @@
 using System;
+using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
@@ -7,7 +9,12 @@ using Microsoft.Xna.Framework;
 using MysticCrafting.Models.Items;
 using MysticCrafting.Module.Discovery.ItemList.Controls;
 using MysticCrafting.Module.Discovery.ItemList.Presenters;
+using MysticCrafting.Module.Extensions;
+using MysticCrafting.Module.Helpers;
+using MysticCrafting.Module.Recipe.TreeView.Controls;
+using MysticCrafting.Module.Recipe.TreeView.Tooltips;
 using MysticCrafting.Module.Services;
+using MysticCrafting.Module.Strings;
 
 namespace MysticCrafting.Module.Discovery.ItemList
 {
@@ -29,43 +36,98 @@ namespace MysticCrafting.Module.Discovery.ItemList
 
 		protected override void Build(Container buildPanel)
 		{
-			if (Item != null)
+			if (Item == null)
 			{
-				ItemButton detailsButton = new ItemButton
+				return;
+			}
+			ItemButton detailsButton = new ItemButton
+			{
+				Parent = buildPanel,
+				Text = Item.LocalizedName().Truncate(35),
+				Rarity = Item.Rarity,
+				Type = LocalizationHelper.TranslateMenuItem(Item.DetailsType),
+				Item = Item,
+				Size = new Point(344, 60)
+			};
+			AsyncTexture2D iconTexture = ServiceContainer.TextureRepository.GetTexture(Item.Icon);
+			if (iconTexture != null)
+			{
+				try
+				{
+					new Image(iconTexture)
+					{
+						Parent = buildPanel,
+						Location = new Point(3, 4),
+						Size = new Point(52, 52),
+						Tooltip = new DisposableTooltip(new ItemTooltipView(Item, 0))
+					};
+				}
+				catch (Exception)
+				{
+				}
+			}
+			if (Item.WeightClass != 0)
+			{
+				new Label
 				{
 					Parent = buildPanel,
-					Text = Item.Name,
-					Icon = ServiceContainer.TextureRepository.GetTexture(Item.Icon),
-					Rarity = Item.Rarity,
-					Type = Item.DetailsType,
-					Item = Item
+					AutoSizeWidth = true,
+					Location = new Point(buildPanel.Size.X - 300, buildPanel.Size.Y / 2 - 10),
+					Text = Item.WeightClass.ToString()
 				};
-				MysticArmorItem armorItem = Item as MysticArmorItem;
-				if (armorItem != null)
+			}
+			if (DisplayDetailsType)
+			{
+				new Label
 				{
-					new Label
-					{
-						Parent = buildPanel,
-						AutoSizeWidth = true,
-						Location = new Point(buildPanel.Size.X - 200, buildPanel.Size.Y / 2 - 5),
-						Text = armorItem.WeightClass.ToString()
-					};
-				}
-				if (DisplayDetailsType)
+					Parent = buildPanel,
+					AutoSizeWidth = true,
+					Location = new Point(buildPanel.Size.X - 450, buildPanel.Size.Y / 2 - 10),
+					Text = Item.DetailsType
+				};
+			}
+			if (Item.HasSkin() && Item.DefaultSkin.HasValue)
+			{
+				bool skinUnlocked = ServiceContainer.PlayerUnlocksService.ItemUnlocked(Item.DefaultSkin.GetValueOrDefault());
+				new Image(skinUnlocked ? ServiceContainer.TextureRepository.Textures.Checkmark : ServiceContainer.TextureRepository.Textures.Lock)
 				{
-					new Label
-					{
-						Parent = buildPanel,
-						AutoSizeWidth = true,
-						Location = new Point(buildPanel.Size.X - 350, buildPanel.Size.Y / 2 - 5),
-						Text = Item.DetailsType
-					};
-				}
-				new ButtonPresenter().BuildFavoriteButton(Item.Id, buildPanel).Location = new Point(buildPanel.Size.X - 80, 15);
-				if (OnClick != null)
+					Parent = buildPanel,
+					Location = new Point(buildPanel.Size.X - 190, buildPanel.Size.Y / 2 - 20),
+					Size = new Point(40, 40),
+					BasicTooltipText = (skinUnlocked ? Common.SkinUnlocked : Common.SkinLocked)
+				};
+			}
+			if (Item.RarityEnum == MysticItemRarity.Legendary)
+			{
+				int unlockedCount2 = ServiceContainer.PlayerUnlocksService.LegendaryUnlockedCount(Item.GameId);
+				int? maxCount = Item.GetMaxCount();
+				new Label
 				{
-					detailsButton.Click += OnClick;
-				}
+					Parent = buildPanel,
+					AutoSizeWidth = true,
+					Location = new Point(buildPanel.Size.X - 110, buildPanel.Size.Y / 2 - 10),
+					Font = GameService.Content.DefaultFont14,
+					Text = $"{unlockedCount2}/{maxCount}",
+					BasicTooltipText = string.Format(MysticCrafting.Module.Strings.Recipe.TooltipUnlockedItem, unlockedCount2, maxCount)
+				};
+			}
+			else
+			{
+				int unlockedCount = ServiceContainer.PlayerItemService.GetItemCount(Item.GameId);
+				new Label
+				{
+					Parent = buildPanel,
+					AutoSizeWidth = true,
+					Location = new Point(buildPanel.Size.X - 110, buildPanel.Size.Y / 2 - 10),
+					Font = GameService.Content.DefaultFont14,
+					Text = $"{unlockedCount}",
+					BasicTooltipText = string.Format(MysticCrafting.Module.Strings.Recipe.TooltipCollectedItem, unlockedCount)
+				};
+			}
+			new ButtonPresenter().BuildFavoriteButton(Item.GameId, buildPanel).Location = new Point(buildPanel.Size.X - 60, buildPanel.Size.Y / 2 - 20);
+			if (OnClick != null)
+			{
+				detailsButton.Click += OnClick;
 			}
 		}
 	}

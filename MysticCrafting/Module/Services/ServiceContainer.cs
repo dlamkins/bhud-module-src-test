@@ -29,6 +29,8 @@ namespace MysticCrafting.Module.Services
 
 		internal static IChoiceRepository ChoiceRepository { get; set; }
 
+		internal static IWizardsVaultRepository WizardsVaultRepository { get; set; }
+
 		internal static ITextureRepository TextureRepository { get; set; }
 
 		internal static ITradingPostService TradingPostService { get; set; }
@@ -51,18 +53,15 @@ namespace MysticCrafting.Module.Services
 		internal static void Register(Gw2ApiManager apiManager, DirectoriesManager directoriesManager, ContentsManager contentsManager)
 		{
 			DataService = new DataService(directoriesManager);
-			ItemRepository = new LoggingItemRepository(new ItemRepository(DataService));
-			DataService.RegisterRepository(ItemRepository);
-			RecipeRepository = new LoggingRecipeRepository(new RecipeRepository(DataService));
-			DataService.RegisterRepository(RecipeRepository);
+			Store = new DataStore(DataService.GetFilePath(MysticCrafting.Module.Services.DataService.DataFileName));
+			ItemRepository = new ItemRepository();
 			MenuItemRepository = new LoggingMenuRepository(new MenuRepository(DataService));
 			DataService.RegisterRepository(MenuItemRepository);
-			VendorRepository = new LoggingVendorRepository(new VendorRepository(DataService));
-			DataService.RegisterRepository(VendorRepository);
-			CurrencyRepository = new FlatCurrencyRepository(DataService);
-			DataService.RegisterRepository(CurrencyRepository);
-			WikiLinkRepository = new LoggingWikiLinkRepository(new WikiLinkRepository(DataService));
-			DataService.RegisterRepository(WikiLinkRepository);
+			RecipeRepository = new RecipeRepository();
+			VendorRepository = new VendorRepository();
+			CurrencyRepository = new CurrencyRepository();
+			WizardsVaultRepository = new WizardsVaultRepository();
+			WikiLinkRepository = new WikiLinkRepository();
 			FavoritesRepository = new LoggingFavoritesRepository(new FavoritesRepository(DataService));
 			DataService.RegisterRepository(FavoritesRepository);
 			ChoiceRepository = new LoggingChoiceRepository(new ChoiceRepository(DataService));
@@ -71,7 +70,7 @@ namespace MysticCrafting.Module.Services
 			TradingPostService = new TradingPostService(apiManager, ItemRepository);
 			PlayerItemService = new PlayerItemService(apiManager);
 			PlayerUnlocksService = new PlayerUnlocksService(apiManager);
-			ItemSourceService = new ItemSourceService(TradingPostService, RecipeRepository, VendorRepository, ChoiceRepository, ItemRepository);
+			ItemSourceService = new ItemSourceService(TradingPostService, RecipeRepository, VendorRepository, ChoiceRepository, ItemRepository, WizardsVaultRepository);
 			WalletService = new WalletService(apiManager, CurrencyRepository, PlayerItemService);
 			AudioService = new AudioService(contentsManager);
 			RecurringServices.Add(TradingPostService);
@@ -85,8 +84,21 @@ namespace MysticCrafting.Module.Services
 			if (DataService != null)
 			{
 				await DataService.DownloadRepositoryFilesAsync();
-				Store = new DataStore(DataService.GetFilePath("data.json"));
 				await DataService.LoadAsync();
+				await DataService.DownloadDataFile();
+				DataService.DeleteFile("currency_data.json");
+				DataService.DeleteFile("items_data.json");
+				DataService.DeleteFile("items_data_de.json");
+				DataService.DeleteFile("items_data_kr.json");
+				DataService.DeleteFile("items_data_fr.json");
+				DataService.DeleteFile("items_data_sp.json");
+				DataService.DeleteFile("items_data_cn.json");
+				DataService.DeleteFile("recipes_data.json");
+				DataService.DeleteFile("vendor_data.json");
+				DataService.DeleteFile("wiki_links_data.json");
+				DataService.DeleteFile("data_version.txt");
+				DataService.DeleteFile("data.json");
+				Store?.Reload();
 			}
 			if (AudioService != null)
 			{

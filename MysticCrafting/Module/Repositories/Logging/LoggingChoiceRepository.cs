@@ -17,6 +17,11 @@ namespace MysticCrafting.Module.Repositories.Logging
 			return _choiceRepository.GetChoice(uniqueId, type);
 		}
 
+		public void DeleteAllChoices(string uniqueId)
+		{
+			_choiceRepository.DeleteAllChoices(uniqueId);
+		}
+
 		public void SaveChoice(string itemSourceId, string value, ChoiceType type)
 		{
 			_choiceRepository.SaveChoice(itemSourceId, value, type);

@@ -21,7 +21,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 
 		private MysticCurrencyQuantity _totalCoinPrice = new MysticCurrencyQuantity();
 
-		private ITradeableNodePresenter _tradeableNodePresenter = new TradeableNodePresenter(ServiceContainer.CurrencyRepository);
+		private readonly ITradeableNodePresenter _tradeableNodePresenter = new TradeableNodePresenter(ServiceContainer.CurrencyRepository);
 
 		public IEnumerable<TradeableItemNode> TradeableNodes => base.Nodes.OfType<TradeableItemNode>();
 
@@ -100,15 +100,17 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 
 		public abstract int RequiredQuantity { get; }
 
-		private CurrenciesContainer _currencyContainer { get; set; }
+		private CurrenciesContainer CurrencyContainer { get; set; }
 
-		private CoinsControl _coinsControl { get; set; }
+		private CoinsControl CoinsControl { get; set; }
 
-		private VendorCurrencyControl _vendorCurrencyControl { get; set; }
+		private VendorCurrencyControl VendorCurrencyControl { get; set; }
+
+		public FlowPanel RequirementsPanel { get; set; }
 
 		private Tooltip VendorCurrencyTooltip { get; set; }
 
-		public bool HasTradableChildren => base.Nodes.OfType<TradeableItemNode>().Any();
+		public bool HasTradeableChildren => base.Nodes.OfType<TradeableItemNode>().Any();
 
 		public virtual Point PriceLocation { get; set; } = new Point(310, 10);
 
@@ -133,7 +135,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 
 		public virtual void BuildPriceControls()
 		{
-			_coinsControl = new CoinsControl(this)
+			CoinsControl = new CoinsControl(this)
 			{
 				UnitPrice = TotalCoinPrice.Count,
 				Location = PriceLocation
@@ -141,30 +143,54 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 			BuildVendorPriceControls();
 		}
 
+		private Point GetRequirementsLocation()
+		{
+			return new Point((_totalCoinPrice.Count != 0) ? (PriceLocation.X + 150) : (PriceLocation.X - 5), PriceLocation.Y);
+		}
+
+		public void UpdateRequirementsLocation()
+		{
+			if (RequirementsPanel != null)
+			{
+				RequirementsPanel.Location = GetRequirementsLocation();
+			}
+		}
+
 		private void BuildVendorPriceControls()
 		{
-			Point location = new Point(PriceLocation.X + 100, 10);
-			_vendorCurrencyControl = new VendorCurrencyControl(this)
+			if (RequirementsPanel == null)
+			{
+				RequirementsPanel = new FlowPanel
+				{
+					FlowDirection = ControlFlowDirection.LeftToRight,
+					Size = new Point(120, 25),
+					Location = GetRequirementsLocation(),
+					ControlPadding = new Vector2(10f, 0f),
+					Parent = this,
+					CanScroll = false
+				};
+			}
+			VendorCurrencyControl = new VendorCurrencyControl(RequirementsPanel)
 			{
 				Price = TotalVendorPrice,
-				Location = location,
-				Size = new Point(100, 20)
+				Size = new Point(30, 25),
+				Visible = false
 			};
 			VendorCurrencyTooltip = new DisposableTooltip(new CurrenciesTooltipView(TotalVendorPrice));
-			_vendorCurrencyControl.Tooltip = VendorCurrencyTooltip;
-			_currencyContainer = new CurrenciesContainer(this)
+			VendorCurrencyControl.Tooltip = VendorCurrencyTooltip;
+			CurrencyContainer = new CurrenciesContainer(RequirementsPanel)
 			{
-				Location = location,
-				Price = TotalVendorPrice
+				Price = TotalVendorPrice,
+				Visible = false
 			};
 			SwitchVendorPriceControls();
 		}
 
 		private bool ShowMinifiedVendorCurrencies()
 		{
-			if (HasTradableChildren || TotalVendorPrice.Count > 2)
+			if (HasTradeableChildren || TotalVendorPrice.Count > 2)
 			{
-				if (_coinsControl.UnitPrice == 0)
+				if (CoinsControl.UnitPrice == 0)
 				{
 					return TotalVendorPrice.Count > 3;
 				}
@@ -177,63 +203,64 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 		{
 			if (ShowMinifiedVendorCurrencies())
 			{
-				_vendorCurrencyControl.Show();
-				_currencyContainer.Hide();
+				VendorCurrencyControl.Show();
+				CurrencyContainer.Hide();
 			}
 			else
 			{
-				_vendorCurrencyControl.Hide();
-				_currencyContainer.Show();
+				VendorCurrencyControl.Hide();
+				CurrencyContainer.Show();
 			}
 		}
 
 		public virtual void UpdatePriceControls()
 		{
-			if (_coinsControl == null)
+			if (CoinsControl == null)
 			{
 				BuildPriceControls();
 			}
 			if (TotalCoinPrice.Count >= 0)
 			{
-				_coinsControl.UnitPrice = TotalCoinPrice.Count;
+				if (CoinsControl.Parent == null)
+				{
+					CoinsControl.Parent = this;
+				}
+				CoinsControl.UnitPrice = TotalCoinPrice.Count;
 			}
 			if (TotalVendorPrice.Any((MysticCurrencyQuantity p) => p.Count > 0))
 			{
 				if (ShowMinifiedVendorCurrencies())
 				{
-					_vendorCurrencyControl.Location = new Point(PriceLocation.X + 150, PriceLocation.Y);
-					_vendorCurrencyControl.Price = TotalVendorPrice;
+					VendorCurrencyControl.Price = TotalVendorPrice;
 					VendorCurrencyTooltip?.Dispose();
 					VendorCurrencyTooltip = new DisposableTooltip(new CurrenciesTooltipView(TotalVendorPrice));
-					_vendorCurrencyControl.Tooltip = VendorCurrencyTooltip;
-					_vendorCurrencyControl.Show();
+					VendorCurrencyControl.Tooltip = VendorCurrencyTooltip;
 				}
 				else
 				{
-					int xPosition = ((_coinsControl.UnitPrice != 0) ? (PriceLocation.X + 150) : (PriceLocation.X - 5));
-					_currencyContainer.Location = new Point(xPosition, PriceLocation.Y);
-					_currencyContainer.Price = TotalVendorPrice;
+					CurrencyContainer.Price = TotalVendorPrice;
 				}
 				SwitchVendorPriceControls();
 			}
 			else
 			{
-				if (_currencyContainer != null)
+				if (CurrencyContainer != null)
 				{
-					_currencyContainer.Price = TotalVendorPrice;
+					CurrencyContainer.Price = TotalVendorPrice;
 				}
-				if (_vendorCurrencyControl != null)
+				if (VendorCurrencyControl != null)
 				{
-					_vendorCurrencyControl.Price = TotalVendorPrice;
+					VendorCurrencyControl.Price = TotalVendorPrice;
 				}
 			}
+			UpdateRequirementsLocation();
 		}
 
 		protected override void DisposeControl()
 		{
 			VendorCurrencyTooltip?.Dispose();
-			_vendorCurrencyControl?.Dispose();
-			_coinsControl?.Dispose();
+			VendorCurrencyControl?.Dispose();
+			CoinsControl?.Dispose();
 			MenuStrip?.Dispose();
 			base.DisposeControl();
 		}

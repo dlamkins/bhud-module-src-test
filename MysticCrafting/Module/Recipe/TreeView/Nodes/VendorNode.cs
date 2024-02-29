@@ -26,7 +26,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 		public override void Build()
 		{
 			ClearChildren();
-			Label nameLabel = new Label
+			new Label
 			{
 				Parent = this,
 				Text = VendorItem.VendorName.Truncate(30),
@@ -38,7 +38,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 			};
 			CurrenciesContainer currencyContainer = new CurrenciesContainer(this)
 			{
-				Location = new Point(350, 10),
+				Location = new Point(300, 10),
 				Price = VendorItem.MapToCurrencyQuantities().ToList()
 			};
 			string quantityText = "";
@@ -70,7 +70,8 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 					Texture = ServiceContainer.TextureRepository.Textures.ExclamationMark,
 					BasicTooltipText = MysticCrafting.Module.Strings.Recipe.Requirement + ": " + VendorItem.Requirement,
 					Size = new Point(30, 30),
-					Location = new Point(40 + nameLabel.Width, 5)
+					Location = new Point(base.Parent.Width - 62, 5),
+					Tint = Color.OrangeRed
 				};
 			}
 			base.Build();

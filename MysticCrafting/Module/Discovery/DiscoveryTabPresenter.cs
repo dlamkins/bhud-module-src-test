@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
+using MysticCrafting.Models.Items;
 using MysticCrafting.Module.Discovery.ItemList;
 using MysticCrafting.Module.Menu;
 using MysticCrafting.Module.Services;
@@ -30,7 +31,14 @@ namespace MysticCrafting.Module.Discovery
 				CategoryMenuItem menuItem = menu.SelectedMenuItem;
 				base.View.SearchText = string.Empty;
 				base.View.NameFilter = string.Empty;
-				UpdateItemList(menuItem);
+				if (menuItem.Text == "Home")
+				{
+					base.View.ItemListContainer.Show(base.View.HomeView);
+				}
+				else
+				{
+					UpdateItemList(menuItem);
+				}
 			}
 		}
 
@@ -39,7 +47,7 @@ namespace MysticCrafting.Module.Discovery
 			base.View.SetMenuItems(base.Model.GetMenuItems(base.View.Menu));
 		}
 
-		private void UpdateItemList(CategoryMenuItem menuItem)
+		public void UpdateItemList(CategoryMenuItem menuItem)
 		{
 			if (menuItem != null && base.View.ItemList?.Presenter != null)
 			{
@@ -47,6 +55,18 @@ namespace MysticCrafting.Module.Discovery
 				{
 					Filter = menuItem.ItemFilter,
 					Breadcrumbs = GetBreadcrumbs(menuItem)
+				});
+			}
+		}
+
+		public void ShowItemList(MysticItemFilter filter, List<string> breadcrumbs)
+		{
+			if (filter != null)
+			{
+				base.View.ReloadItemList(new ItemListModel(ServiceContainer.ItemRepository)
+				{
+					Filter = filter,
+					Breadcrumbs = breadcrumbs
 				});
 			}
 		}

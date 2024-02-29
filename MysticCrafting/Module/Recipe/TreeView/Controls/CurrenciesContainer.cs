@@ -129,27 +129,24 @@ namespace MysticCrafting.Module.Recipe.TreeView.Controls
 			bool showPlusSign = _coinsControl != null && _coinsControl.UnitPrice != 0;
 			foreach (MysticCurrencyQuantity price in prices.Where((MysticCurrencyQuantity p) => p.Currency != null && p.Currency.GameId != 1))
 			{
-				if (price.Currency != null)
+				if (showPlusSign)
 				{
-					if (showPlusSign)
+					_plusLabels.Add(new Label
 					{
-						_plusLabels.Add(new Label
-						{
-							Parent = this,
-							Text = "+",
-							Font = GameService.Content.DefaultFont16,
-							AutoSizeWidth = true
-						});
-					}
-					showPlusSign = true;
-					CurrencyControl currencyControl = new CurrencyControl(this)
-					{
-						Quantity = price,
-						IconSize = new Point(20, 20)
-					};
-					BuildCurrencyTooltip(currencyControl, price);
-					_currencyControls.Add(currencyControl);
+						Parent = this,
+						Text = "+",
+						Font = GameService.Content.DefaultFont16,
+						AutoSizeWidth = true
+					});
 				}
+				showPlusSign = true;
+				CurrencyControl currencyControl = new CurrencyControl(this)
+				{
+					Quantity = price,
+					IconSize = new Point(20, 20)
+				};
+				BuildCurrencyTooltip(currencyControl, price);
+				_currencyControls.Add(currencyControl);
 			}
 		}
 
@@ -199,7 +196,12 @@ namespace MysticCrafting.Module.Recipe.TreeView.Controls
 		public int CalculateWidth()
 		{
 			float padding = (float)(base.Children.Count + 1) * base.ControlPadding.X;
-			return base.Children.Sum((Control c) => c.Width) + (int)padding;
+			return base.Children.Sum((Control c) => c.Width) + (int)padding + 5;
+		}
+
+		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
+		{
+			base.PaintAfterChildren(spriteBatch, bounds);
 		}
 
 		private void DrawOutline(SpriteBatch spriteBatch)

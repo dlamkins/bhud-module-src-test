@@ -7,5 +7,7 @@ namespace MysticCrafting.Module.Services
 		void SaveChoice(string itemSourceId, string value, ChoiceType type);
 
 		NodeChoice GetChoice(string uniqueId, ChoiceType type);
+
+		void DeleteAllChoices(string uniqueId);
 	}
 }

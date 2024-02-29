@@ -3,7 +3,7 @@ using MysticCrafting.Models;
 
 namespace MysticCrafting.Module.Repositories
 {
-	public interface IRecipeRepository : IRepository
+	public interface IRecipeRepository
 	{
 		IEnumerable<MysticRecipe> GetRecipes(int itemId);
 	}

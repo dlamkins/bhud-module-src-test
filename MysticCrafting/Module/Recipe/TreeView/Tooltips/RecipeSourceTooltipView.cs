@@ -119,7 +119,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Tooltips
 
 		public virtual void Initialize()
 		{
-			if (RecipeSource.Recipe.MysticForgeId != 0)
+			if (RecipeSource.Recipe.IsMysticForgeRecipe)
 			{
 				InitializeMysticForge();
 			}
@@ -164,7 +164,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Tooltips
 				Label itemNameLabel = new Label
 				{
 					Parent = BuildPanel,
-					Text = ((item != null) ? item.Name : ingredient.Name),
+					Text = ((item != null) ? item.LocalizedName() : ingredient.Name),
 					Font = GameService.Content.DefaultFont16,
 					Location = new Point(countLabel.Right + 5, yPosition),
 					StrokeText = true,

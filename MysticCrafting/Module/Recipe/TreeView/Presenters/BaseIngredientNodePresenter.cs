@@ -51,7 +51,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Presenters
 		public void BuildNodes(MysticRecipe recipe, Container primaryParent, MysticIngredientLevel parentIngredientLevel = null)
 		{
 			IEnumerable<BaseIngredientNode> existingNodes = primaryParent.Children.OfType<BaseIngredientNode>();
-			if (recipe?.Ingredients == null || (recipe.HasBaseIngredients != "t" && recipe.MysticForgeId == 0))
+			if (recipe?.Ingredients == null || (!recipe.HasBaseIngredients && !recipe.IsMysticForgeRecipe))
 			{
 				return;
 			}
@@ -77,7 +77,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Presenters
 						continue;
 					}
 				}
-				BaseIngredientNode node = existingNodes.FirstOrDefault((BaseIngredientNode b) => b.Item.Id == ingredient.GameId);
+				BaseIngredientNode node = existingNodes.FirstOrDefault((BaseIngredientNode b) => b.Item.GameId == ingredient.GameId);
 				if (node == null)
 				{
 					node = BuildNode(ingredient.Item, primaryParent);
@@ -89,7 +89,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Presenters
 					continue;
 				}
 				node.BuildItemCountControls();
-				node.UpdateItemTooltip();
+				node.BuildItemCountTooltip();
 			}
 		}
 

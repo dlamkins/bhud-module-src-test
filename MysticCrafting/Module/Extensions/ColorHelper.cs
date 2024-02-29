@@ -7,11 +7,15 @@ namespace MysticCrafting.Module.Extensions
 {
 	public static class ColorHelper
 	{
+		public static Color BrightGreen = new Color(3, 240, 2);
+
+		public static Color BrightBlue = new Color(143, 211, 206);
+
 		public static Color FromRarity(string rarity)
 		{
 			if (string.IsNullOrEmpty(rarity))
 			{
-				return default(Color);
+				return Color.White;
 			}
 			string text = rarity.ToLower();
 			if (text != null)

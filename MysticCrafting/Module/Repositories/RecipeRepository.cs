@@ -1,34 +1,15 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using JsonFlatFileDataStore;
 using MysticCrafting.Models;
 using MysticCrafting.Module.Services;
 
 namespace MysticCrafting.Module.Repositories
 {
-	public class RecipeRepository : IRecipeRepository, IRepository
+	public class RecipeRepository : IRecipeRepository
 	{
-		private readonly IDataService _dataService;
+		private IDocumentCollection<MysticRecipe> Recipes { get; } = ServiceContainer.Store.GetCollection<MysticRecipe>();
 
-		private IList<MysticRecipe> Recipes { get; set; }
-
-		public bool LocalOnly => false;
-
-		public bool Loaded { get; set; }
-
-		public string FileName => "recipes_data.json";
-
-		public RecipeRepository(IDataService dataService)
-		{
-			_dataService = dataService;
-		}
-
-		public async Task<string> LoadAsync()
-		{
-			Recipes = (await _dataService.LoadFromFileAsync<IList<MysticRecipe>>(FileName)) ?? new List<MysticRecipe>();
-			Loaded = true;
-			return $"{Recipes.Count} recipes loaded";
-		}
 
 		public IEnumerable<MysticRecipe> GetRecipes(int itemId)
 		{
@@ -36,7 +17,9 @@ namespace MysticCrafting.Module.Repositories
 			{
 				return new List<MysticRecipe>();
 			}
-			return Recipes.Where((MysticRecipe r) => r.OutputItemId == itemId);
+			return from r in Recipes.AsQueryable()
+				where r.OutputItemId == itemId
+				select r;
 		}
 	}
 }

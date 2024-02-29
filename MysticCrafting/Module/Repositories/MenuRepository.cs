@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Blish_HUD;
 using MysticCrafting.Models.Menu;
 using MysticCrafting.Module.Services;
 
@@ -16,15 +15,7 @@ namespace MysticCrafting.Module.Repositories
 
 		public bool Loaded { get; private set; }
 
-		public string FileName
-		{
-			get
-			{
-				_ = GameService.Overlay.UserLocale.Value;
-				_ = 2;
-				return "menu_data.json";
-			}
-		}
+		public string FileName => "menu_data.json";
 
 		public MenuRepository(IDataService dataService)
 		{

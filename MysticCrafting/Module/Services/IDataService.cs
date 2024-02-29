@@ -7,6 +7,8 @@ namespace MysticCrafting.Module.Services
 	{
 		Task LoadAsync();
 
+		Task DownloadDataFile();
+
 		Task DownloadRepositoryFilesAsync();
 
 		void RegisterRepository(IRepository repository);
@@ -14,6 +16,8 @@ namespace MysticCrafting.Module.Services
 		string GetFilePath(string fileName);
 
 		void SaveFile(string fileName, object data);
+
+		void DeleteFile(string fileName);
 
 		Task SaveFileAsync(string fileName, object data);
 

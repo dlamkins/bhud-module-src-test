@@ -42,7 +42,7 @@ namespace MysticCrafting.Module.Models
 			}
 		}
 
-		public string UniqueTitle => $"{base.Index}-{base.Item.Id}";
+		public string UniqueTitle => $"{base.Index}-{base.Item.GameId}";
 
 		public virtual string FullPath => _fullPath ?? (_fullPath = GetFullPath());
 

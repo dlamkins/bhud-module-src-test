@@ -16,16 +16,16 @@ namespace MysticCrafting.Module.Models
 			{
 				ITextureRepository textureRepo = ServiceContainer.TextureRepository;
 				AsyncTexture2D icon = textureRepo.GetRefTexture("mystic_forge.png");
-				if (base.DisplayName == "Automatic" || base.DisplayName == "Recipe sheet")
+				if (this != null && Recipe.Disciplines != null)
 				{
-					if (this != null)
+					if (Recipe.Disciplines.Count() == 1)
 					{
-						icon = ((Recipe.Disciplines.Count() != 1) ? textureRepo.Textures.CraftingIcon : IconHelper.GetIcon(Recipe.Disciplines.FirstOrDefault()));
+						icon = IconHelper.GetIcon(Recipe.Disciplines.FirstOrDefault());
 					}
-				}
-				else if (base.DisplayName == "Other")
-				{
-					icon = textureRepo.Textures.QuestionMark;
+					else if (Recipe.Disciplines.Count() > 1)
+					{
+						icon = textureRepo.Textures.CraftingIcon;
+					}
 				}
 				return icon;
 			}

@@ -74,6 +74,8 @@ namespace MysticCrafting.Module.Strings
 
 		internal static string Headgear => ResourceManager.GetString("Headgear", resourceCulture);
 
+		internal static string Home => ResourceManager.GetString("Home", resourceCulture);
+
 		internal static string Leggings => ResourceManager.GetString("Leggings", resourceCulture);
 
 		internal static string Longsbows => ResourceManager.GetString("Longsbows", resourceCulture);
@@ -81,6 +83,8 @@ namespace MysticCrafting.Module.Strings
 		internal static string Maces => ResourceManager.GetString("Maces", resourceCulture);
 
 		internal static string Pistols => ResourceManager.GetString("Pistols", resourceCulture);
+
+		internal static string Relics => ResourceManager.GetString("Relics", resourceCulture);
 
 		internal static string Rifles => ResourceManager.GetString("Rifles", resourceCulture);
 

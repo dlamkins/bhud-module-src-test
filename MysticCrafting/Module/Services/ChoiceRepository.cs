@@ -91,6 +91,13 @@ namespace MysticCrafting.Module.Services
 			return Choices.FirstOrDefault((NodeChoice c) => c.UniqueId.Equals(uniqueId, StringComparison.InvariantCultureIgnoreCase) && c.Type.Equals(type));
 		}
 
+		public void DeleteAllChoices(string uniqueId)
+		{
+			IEnumerable<NodeChoice> choices = Choices.Where((NodeChoice c) => c.UniqueId.StartsWith(uniqueId));
+			Choices = Choices.Where((NodeChoice c) => !choices.Select((NodeChoice z) => z.UniqueId).Contains(c.UniqueId)).ToList();
+			SaveToFile();
+		}
+
 		private void SaveToFile()
 		{
 			if (_saveTimer == null)

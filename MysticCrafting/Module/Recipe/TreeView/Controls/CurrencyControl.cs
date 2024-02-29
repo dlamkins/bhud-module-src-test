@@ -6,7 +6,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.BitmapFonts;
 using MysticCrafting.Models.Commerce;
-using MysticCrafting.Module.Extensions;
 using MysticCrafting.Module.Services;
 
 namespace MysticCrafting.Module.Recipe.TreeView.Controls
@@ -78,11 +77,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Controls
 			}
 			string text = AmountToText(amount);
 			int textWidth = (int)Math.Ceiling(TextFont.MeasureString(text).Width);
-			Color color = Color.White;
-			if (WalletQuantity != null)
-			{
-				color = ColorHelper.FromItemCount(WalletQuantity.Count, Quantity.Count);
-			}
+			Color color = Color.LightYellow;
 			spriteBatch.DrawStringOnCtrl(this, text, GameService.Content.DefaultFont16, new Rectangle(position.X, position.Y, textWidth, 20).OffsetBy(1, 1), Color.Black);
 			spriteBatch.DrawStringOnCtrl(this, text, GameService.Content.DefaultFont16, new Rectangle(position.X, position.Y, textWidth, 20), color);
 			if (texture != null)

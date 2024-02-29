@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Atzie.MysticCrafting.Models.Items;
 using MysticCrafting.Models;
 using MysticCrafting.Models.Items;
 using MysticCrafting.Models.TradingPost;
@@ -23,6 +24,8 @@ namespace MysticCrafting.Module.Services
 
 		private readonly IItemRepository _itemRepository;
 
+		private readonly IWizardsVaultRepository _wizardsVaultRepository;
+
 		private Dictionary<int, List<int>> SwappableItems = new Dictionary<int, List<int>> { 
 		{
 			79410,
@@ -35,18 +38,19 @@ namespace MysticCrafting.Module.Services
 			19652, 29180, 19654, 97519, 19655
 		};
 
-		public ItemSourceService(ITradingPostService tradingPostService, IRecipeRepository recipeRepository, IVendorRepository vendorRepository, IChoiceRepository choiceRepository, IItemRepository itemRepository)
+		public ItemSourceService(ITradingPostService tradingPostService, IRecipeRepository recipeRepository, IVendorRepository vendorRepository, IChoiceRepository choiceRepository, IItemRepository itemRepository, IWizardsVaultRepository wizardsVaultRepository)
 		{
 			_tradingPostService = tradingPostService;
 			_recipeRepository = recipeRepository;
 			_vendorRepository = vendorRepository;
 			_choiceRepository = choiceRepository;
 			_itemRepository = itemRepository;
+			_wizardsVaultRepository = wizardsVaultRepository;
 		}
 
 		public IEnumerable<IItemSource> GetItemSources(MysticItem item)
 		{
-			return GetItemSources(item.Id);
+			return GetItemSources(item.GameId);
 		}
 
 		public IEnumerable<IItemSource> GetItemSources(int itemId)
@@ -66,6 +70,11 @@ namespace MysticCrafting.Module.Services
 			if (vendorPrices != null)
 			{
 				sources.Add(vendorPrices);
+			}
+			IList<ItemContainerSource> itemContainerSource = GetItemContainerSource(itemId);
+			if (itemContainerSource != null && itemContainerSource.Any())
+			{
+				sources.AddRange(itemContainerSource);
 			}
 			return sources;
 		}
@@ -118,16 +127,23 @@ namespace MysticCrafting.Module.Services
 			};
 		}
 
-		private WizardsVaultSource GetWizardsVaultSource(int itemId)
+		private IList<ItemContainerSource> GetItemContainerSource(int itemId)
 		{
-			if (_wizardsVaultIds.Contains(itemId))
+			IEnumerable<MysticVaultContainer> containers = _wizardsVaultRepository.GetContainers(itemId);
+			if (containers == null)
 			{
-				return new WizardsVaultSource($"wizards_vault_{itemId}")
-				{
-					Item = _itemRepository.GetItem(itemId)
-				};
+				return null;
 			}
-			return null;
+			List<ItemContainerSource> sources = new List<ItemContainerSource>();
+			foreach (MysticVaultContainer container in containers)
+			{
+				sources.Add(new ItemContainerSource($"item_container_{container.Id}")
+				{
+					Container = container,
+					ContainerItem = _itemRepository.GetItem(container.ItemId)
+				});
+			}
+			return sources;
 		}
 
 		private VendorSource GetVendorSource(int itemId)
@@ -163,11 +179,7 @@ namespace MysticCrafting.Module.Services
 		public IItemSource GetDefaultItemSource(int itemId)
 		{
 			List<IItemSource> itemSources = GetItemSources(itemId).ToList();
-			return itemSources.FirstOrDefault(delegate(IItemSource i)
-			{
-				RecipeSource recipeSource = i as RecipeSource;
-				return recipeSource != null && recipeSource.Recipe.HasBaseIngredients == "t";
-			}) ?? itemSources.FirstOrDefault((IItemSource i) => i is TradingPostSource) ?? itemSources.FirstOrDefault();
+			return itemSources.FirstOrDefault((IItemSource i) => (i as RecipeSource)?.Recipe.HasBaseIngredients ?? false) ?? itemSources.FirstOrDefault((IItemSource i) => i is TradingPostSource) ?? itemSources.FirstOrDefault();
 		}
 	}
 }

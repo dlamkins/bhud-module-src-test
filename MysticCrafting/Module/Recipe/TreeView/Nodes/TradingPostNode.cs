@@ -2,6 +2,7 @@ using Blish_HUD;
 using Blish_HUD.Controls;
 using Microsoft.Xna.Framework;
 using MysticCrafting.Module.Recipe.TreeView.Controls;
+using MysticCrafting.Module.Settings;
 using MysticCrafting.Module.Strings;
 
 namespace MysticCrafting.Module.Recipe.TreeView.Nodes
@@ -16,10 +17,13 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 
 		public override string PathName => Name ?? DisplayName;
 
-		public TradingPostNode(int unitPrice, string displayName, Container parent)
+		public TradingPostOptions Option { get; set; }
+
+		public TradingPostNode(int unitPrice, string displayName, TradingPostOptions option, Container parent)
 		{
 			UnitPrice = unitPrice;
 			DisplayName = displayName;
+			Option = option;
 			base.Parent = parent;
 			Build();
 		}

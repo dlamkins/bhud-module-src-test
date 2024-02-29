@@ -22,7 +22,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Presenters
 
 		public void BuildNode(MysticRecipe recipe, Container parent)
 		{
-			if (recipe.RecipeSheetIds == null || !recipe.RecipeSheetIds.Any())
+			if (ServiceContainer.PlayerUnlocksService.RecipeUnlocked(recipe) || recipe.RecipeSheetIds == null || !recipe.RecipeSheetIds.Any())
 			{
 				return;
 			}
@@ -30,15 +30,15 @@ namespace MysticCrafting.Module.Recipe.TreeView.Presenters
 			MysticItem item = ServiceContainer.ItemRepository.GetItem(sheetId);
 			if (item != null)
 			{
-				new LabelNode("Learned from", parent).Width = 200;
-				IngredientNode node = new IngredientNode(new MysticIngredient
+				MysticIngredient ingredient = new MysticIngredient
 				{
 					Quantity = 1,
 					GameId = recipe.RecipeSheetIds.FirstOrDefault(),
 					Item = item,
 					Index = 0,
 					Name = item.Name
-				}, item, parent)
+				};
+				RecipeSheetNode node = new RecipeSheetNode(recipe, ingredient, item, parent)
 				{
 					Parent = parent,
 					Width = parent.Width - 25,
@@ -46,6 +46,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Presenters
 					PanelExtensionHeight = 0,
 					IsSharedItem = true
 				};
+				node.Build(parent);
 				node.OnPanelClick += delegate
 				{
 					_recipeDetailsPresenter.SaveScrollDistance();
@@ -53,7 +54,11 @@ namespace MysticCrafting.Module.Recipe.TreeView.Presenters
 				ItemTab selectedTab = _ingredientNodePresenter.BuildTabs(node, node.Item);
 				if (selectedTab != null)
 				{
-					_ingredientNodePresenter.BuildChildren(selectedTab.ItemSource, selectedTab.Parent);
+					_ingredientNodePresenter.BuildChildren(selectedTab.ItemSource, selectedTab.Parent.Parent);
+				}
+				else
+				{
+					node.BuildMissingTabsLabel();
 				}
 			}
 		}

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using Blish_HUD;
@@ -18,6 +19,7 @@ using MysticCrafting.Module.Recipe.TreeView.Extensions;
 using MysticCrafting.Module.Recipe.TreeView.Presenters;
 using MysticCrafting.Module.Recipe.TreeView.Tooltips;
 using MysticCrafting.Module.Services;
+using MysticCrafting.Module.Strings;
 
 namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 {
@@ -27,6 +29,10 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 		private int _nodeIndex;
 
 		private bool _isLinked;
+
+		private bool _enoughCollected;
+
+		private Image _missingTabs;
 
 		public int? IngredientIndex { get; set; }
 
@@ -46,7 +52,10 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 			}
 		}
 
-		public TreeView TreeView { get; }
+		public BitmapFont Font { get; set; } = GameService.Content.DefaultFont16;
+
+
+		public TreeView TreeView { get; private set; }
 
 		public MysticItem Item { get; set; }
 
@@ -54,27 +63,34 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 
 		public IngredientNode ParentNode { get; set; }
 
+		public Image IconBackground { get; set; }
+
 		public Image Icon { get; set; }
 
 		public Image IconChain { get; set; }
 
 		public Image IconSwap { get; set; }
 
-		private Tooltip ItemCountTooltip { get; set; }
-
 		public int IconSize { get; set; } = 35;
 
 
-		public BitmapFont Font { get; set; } = GameService.Content.DefaultFont16;
-
-
-		private Label ItemNameLabel { get; set; }
+		protected Label ItemNameLabel { get; set; }
 
 		private LoadingSpinner LoadingSpinner { get; set; }
 
 		private Label ItemCountLabel { get; set; }
 
+		protected Tooltip ItemCountTooltip { get; set; }
+
+		public ItemNodeTooltipView ItemCountTooltipView { get; set; }
+
 		private Label ItemRecipeRequiredCountLabel { get; set; }
+
+		private NumberBox ItemCountNumberBox { get; set; }
+
+		private NumberBoxTooltipView ItemCountNumberTooltipView { get; set; }
+
+		private Label ItemCountNumberLabel { get; set; }
 
 		public IEnumerable<IngredientNode> IngredientNodes => _children.OfType<IngredientNode>();
 
@@ -99,7 +115,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 
 		public bool IsSharedItem { get; set; }
 
-		public bool IsTopItem { get; }
+		public bool IsTopItem { get; private set; }
 
 		public virtual int RecipeRequiredQuantity { get; set; } = 1;
 
@@ -124,9 +140,9 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 
 		public int TotalPlayerItemCount => Math.Max(0, PlayerItemCount - ReservedQuantity);
 
-		public override string PathName => $"{IngredientIndex}-{Item.Id}";
+		public override string PathName => $"{IngredientIndex}-{Item.GameId}";
 
-		public ItemNodeTooltipView TooltipView { get; set; }
+		private CraftingDisciplinesControl RequirementsControl { get; set; }
 
 		public IngredientNode(MysticItem item, int? quantity = null, int? index = null)
 		{
@@ -136,16 +152,16 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 			IngredientIndex = index;
 			Ingredient = new MysticIngredient
 			{
-				GameId = item.Id,
+				GameId = item.GameId,
 				Quantity = quantity,
 				Index = index,
-				Name = item.Name,
+				Name = item.LocalizedName(),
 				Item = item
 			};
 			UpdateItemDetails();
 		}
 
-		public IngredientNode(MysticIngredient ingredient, MysticItem item, Container parent, bool loadingChildren = false)
+		public IngredientNode(MysticIngredient ingredient, MysticItem item, Blish_HUD.Controls.Container parent, bool loadingChildren = false)
 		{
 			base.EffectBehind = new ScrollingHighlightEffect(this);
 			LoadingChildren = loadingChildren;
@@ -153,32 +169,44 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 			Item = item;
 			IngredientIndex = ingredient.Index;
 			Ingredient = ingredient;
-			PlayerItemCount = ServiceContainer.PlayerItemService.GetItemCount(item.Id);
+			PlayerItemCount = ServiceContainer.PlayerItemService.GetItemCount(item.GameId);
+			SetParentProperties(parent);
+		}
+
+		private void SetParentProperties(Blish_HUD.Controls.Container parent)
+		{
 			IngredientNode parentNode = parent as IngredientNode;
 			if (parentNode != null)
 			{
 				ParentNode = parentNode;
 				TreeView = parentNode.TreeView;
+				return;
+			}
+			TreeView treeView = parent as TreeView;
+			if (treeView != null)
+			{
+				IsTopItem = true;
+				TotalRequiredQuantity = 1;
+				TreeView = treeView;
+				Font = GameService.Content.DefaultFont18;
+				BackgroundOpaqueColor = ColorHelper.FromRarity(Item.Rarity) * 0.2f;
+				FrameColor = ColorHelper.FromRarity(Item.Rarity) * 0.8f;
+			}
+		}
+
+		public virtual void Build(Blish_HUD.Controls.Container parent)
+		{
+			UpdateTotalRequiredQuantity();
+			UpdateItemDetails();
+			if (IsTopItem)
+			{
+				BuildItemCountEditControls();
 			}
 			else
 			{
-				TreeView treeview = parent as TreeView;
-				if (treeview != null)
-				{
-					IsTopItem = true;
-					TreeView = treeview;
-					Font = GameService.Content.DefaultFont18;
-					BackgroundOpaqueColor = ColorHelper.FromRarity(item.Rarity) * 0.2f;
-					FrameColor = ColorHelper.FromRarity(item.Rarity) * 0.8f;
-				}
-			}
-			UpdateTotalRequiredQuantity();
-			UpdateItemDetails();
-			if (!IsTopItem)
-			{
 				BuildItemCountControls();
 			}
-			UpdateItemTooltip();
+			BuildItemCountTooltip();
 			base.Parent = parent;
 			UpdateItemCountControls();
 		}
@@ -197,18 +225,40 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 			ClearChildren();
 			if (Icon == null)
 			{
-				Icon = new Image(ServiceContainer.TextureRepository.GetTexture(Item.Icon))
+				IconBackground = new Image(ServiceContainer.TextureRepository.Textures.ItemBackground)
 				{
 					Parent = this,
-					Size = new Point(IconSize, IconSize),
-					Location = new Point(IsTopItem ? 12 : 30, 5)
+					Size = new Point(IconSize + 8, IconSize + 8),
+					Location = new Point(IsTopItem ? 3 : 24, 1)
 				};
+				if (!string.IsNullOrEmpty(Item.Icon))
+				{
+					AsyncTexture2D icon = ServiceContainer.TextureRepository.GetTexture(Item.Icon);
+					if (icon != null)
+					{
+						Icon = new Image(icon)
+						{
+							Parent = this,
+							Size = new Point(IconSize, IconSize),
+							Location = new Point(IsTopItem ? 7 : 28, 5)
+						};
+					}
+				}
+				else
+				{
+					Icon = new Image(AsyncTexture2D.FromAssetId(1318604))
+					{
+						Parent = this,
+						Size = new Point(IconSize, IconSize),
+						Location = new Point(IsTopItem ? 7 : 28, 5)
+					};
+				}
 			}
-			int paddingLeft = (ItemCountLabel?.Right ?? ItemRecipeRequiredCountLabel?.Right ?? Icon?.Right ?? 30) + 5;
+			int paddingLeft = (ItemCountLabel?.Right ?? ItemRecipeRequiredCountLabel?.Right ?? Icon?.Right ?? (30 + IconSize)) + 5;
 			ItemNameLabel = new Label
 			{
 				Parent = this,
-				Text = (Item.Name ?? "").Truncate(27),
+				Text = (Item.LocalizedName() ?? "").Truncate(24),
 				Location = new Point(paddingLeft, 12),
 				Width = 200,
 				Font = Font,
@@ -216,7 +266,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 				StrokeText = true,
 				AutoSizeHeight = true
 			};
-			UpdateMenuStrip();
+			BuildMenuStrip();
 			if (!LoadingChildren)
 			{
 				OnChildrenLoaded();
@@ -244,8 +294,8 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 				IconChain = new Image(iconTexture)
 				{
 					Parent = this,
-					Size = new Point(IconSize + 20, IconSize + 20),
-					Location = new Point(30, 5),
+					Size = new Point(IconSize + 7, IconSize + 7),
+					Location = new Point(28, 5),
 					Visible = true
 				};
 				if (ItemCountTooltip != null)
@@ -263,20 +313,32 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 			}
 			if (IsLinked)
 			{
-				TooltipView?.UpdateLinkedNodes();
+				ItemCountTooltipView?.UpdateLinkedNodes();
 			}
 		}
 
-		private void UpdateMenuStrip()
+		private void BuildMenuStrip()
 		{
 			ContextMenuPresenter menuStripPresenter = new ContextMenuPresenter(ServiceContainer.WikiLinkRepository);
-			MenuStrip = menuStripPresenter.BuildMenuStrip(Item);
+			MenuStrip = menuStripPresenter.BuildMenuStrip(Item, this);
 		}
 
-		public void UpdateItemTooltip()
+		public void BuildMissingTabsLabel()
 		{
-			TooltipView = new ItemNodeTooltipView(this);
-			ItemCountTooltip = new DisposableTooltip(TooltipView);
+			_missingTabs?.Dispose();
+			_missingTabs = new Image(ServiceContainer.TextureRepository.Textures.ExclamationMark)
+			{
+				Parent = this,
+				Location = new Point(base.Width - 40, 5),
+				Tint = Color.Orange,
+				BasicTooltipText = "The module does not currently support the methods to acquire this item. Right click on this item to easily open the wiki."
+			};
+		}
+
+		public virtual void BuildItemCountTooltip()
+		{
+			ItemCountTooltipView = new ItemNodeTooltipView(this);
+			ItemCountTooltip = new DisposableTooltip(ItemCountTooltipView);
 			if (ItemNameLabel != null)
 			{
 				ItemNameLabel.Tooltip = ItemCountTooltip;
@@ -288,6 +350,14 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 			if (ItemCountLabel != null)
 			{
 				ItemCountLabel.Tooltip = ItemCountTooltip;
+			}
+		}
+
+		public void UpdateItemCountTooltip()
+		{
+			if (ItemCountTooltipView != null)
+			{
+				ItemCountTooltipView.RequiredQuantity = RequiredQuantity;
 			}
 		}
 
@@ -305,9 +375,65 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 			return $"{GetPlayerItemCount()}/{TotalRequiredQuantity}";
 		}
 
+		public void BuildItemCountEditControls()
+		{
+			ItemCountNumberBox?.Dispose();
+			ItemCountNumberLabel?.Dispose();
+			int? maxValue = Item.GetMaxCount();
+			if (maxValue > 1)
+			{
+				ItemCountNumberBox = new NumberBox
+				{
+					Value = TotalRequiredQuantity,
+					MinValue = 1,
+					MaxValue = (maxValue ?? int.MaxValue),
+					Font = GameService.Content.DefaultFont18,
+					Parent = this,
+					Location = new Point(Icon.Right + 5, 10),
+					Size = new Point(30, 27)
+				};
+				ItemCountNumberTooltipView = new NumberBoxTooltipView
+				{
+					Text = MysticCrafting.Module.Strings.Recipe.ItemCountBoxTooltipText
+				};
+				ItemCountNumberBox.Tooltip = new DisposableTooltip(ItemCountNumberTooltipView);
+				ItemCountNumberBox.AfterTextChanged += delegate
+				{
+					UpdateTotalRequiredQuantity();
+				};
+				if (Item.RarityEnum != MysticItemRarity.Legendary)
+				{
+					return;
+				}
+				int unlockedCount = ServiceContainer.PlayerUnlocksService.LegendaryUnlockedCount(Item.GameId);
+				NumberBox itemCountNumberBox = ItemCountNumberBox;
+				itemCountNumberBox.MaxValueChanged = (EventHandler<PropertyChangedEventArgs>)Delegate.Combine(itemCountNumberBox.MaxValueChanged, (EventHandler<PropertyChangedEventArgs>)delegate(object sender, PropertyChangedEventArgs args)
+				{
+					if (ItemCountNumberTooltipView != null && sender is NumberBox)
+					{
+						ItemCountNumberTooltipView.Title = string.Format(MysticCrafting.Module.Strings.Recipe.TooltipUnlockedItem, unlockedCount, maxValue);
+					}
+				});
+				ItemCountNumberBox.MaxValue -= unlockedCount;
+			}
+			else
+			{
+				ItemCountNumberLabel = new Label
+				{
+					Parent = this,
+					Text = "1",
+					Location = new Point(60, 12),
+					Font = Font,
+					StrokeText = true,
+					AutoSizeWidth = true
+				};
+				UpdateNameLabelPosition();
+			}
+		}
+
 		public virtual void BuildItemCountControls()
 		{
-			UpdateBackgroundColor();
+			UpdateCollectionStatus();
 			Color itemCountColor = Color.White;
 			if (RequiredQuantity == 0 && TotalRequiredQuantity == 0)
 			{
@@ -345,53 +471,86 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 					AutoSizeWidth = true
 				};
 			}
-			if (ItemNameLabel != null)
-			{
-				int paddingLeft = (ItemCountLabel?.Right ?? ItemRecipeRequiredCountLabel?.Right ?? Icon?.Right ?? 30) + 5;
-				ItemNameLabel.Location = new Point(paddingLeft, 12);
-			}
+			UpdateNameLabelPosition();
 			ResetPrices();
 		}
 
-		public void UpdateBackgroundColor()
+		private void UpdateNameLabelPosition()
+		{
+			if (ItemNameLabel != null)
+			{
+				int paddingLeft = (ItemCountLabel?.Right ?? ItemRecipeRequiredCountLabel?.Right ?? ItemCountNumberLabel?.Right ?? ItemCountNumberBox?.Right ?? Icon?.Right ?? 30) + 5;
+				ItemNameLabel.Location = new Point(paddingLeft, 12);
+			}
+		}
+
+		public void UpdateCollectionStatus()
 		{
 			if (RequiredQuantity == 0 && TotalRequiredQuantity != 0)
 			{
-				FrameColor = Color.DarkGreen;
-				BackgroundOpaqueColor = Color.DarkGreen;
+				_enoughCollected = true;
 			}
 			else
 			{
-				FrameColor = Color.Black;
-				BackgroundOpaqueColor = Color.Black;
+				_enoughCollected = false;
 			}
 		}
 
 		public virtual void UpdateItemCountControls()
 		{
-			UpdateBackgroundColor();
-			UpdateTotalRequiredQuantity();
+			UpdateCollectionStatus();
 			if (ItemCountLabel != null)
 			{
 				ItemCountLabel.Text = GetPlayerCountAsText();
 			}
-			if (ItemNameLabel != null)
-			{
-				int paddingLeft = (ItemCountLabel?.Right ?? ItemRecipeRequiredCountLabel?.Right ?? Icon?.Right ?? 30) + 5;
-				ItemNameLabel.Location = new Point(paddingLeft, 12);
-			}
+			UpdateNameLabelPosition();
+			UpdateItemCountTooltip();
 		}
 
 		public void UpdateTotalRequiredQuantity()
 		{
+			int totalRequiredQuantity = TotalRequiredQuantity;
 			if (ParentNode == null)
 			{
-				TotalRequiredQuantity = RecipeRequiredQuantity;
+				TotalRequiredQuantity = ItemCountNumberBox?.Value ?? RecipeRequiredQuantity;
 			}
 			else
 			{
-				TotalRequiredQuantity = RecipeRequiredQuantity * ParentNode.RequiredQuantity;
+				TotalRequiredQuantity = (IsSharedItem ? 1 : (RecipeRequiredQuantity * ParentNode.RequiredQuantity));
 			}
+			if (totalRequiredQuantity == TotalRequiredQuantity)
+			{
+				return;
+			}
+			foreach (IngredientNode ingredientNode in IngredientNodes)
+			{
+				ingredientNode.UpdateTotalRequiredQuantity();
+			}
+			CalculateTotalPrices();
+			UpdateItemCountControls();
+			this.UpdateRelatedNodes();
+		}
+
+		public void UpdateProfessionRequirements()
+		{
+			IList<CraftingDisciplineRequirement> requirements = GetCraftingRequirements();
+			if (requirements.Count != 0)
+			{
+				RequirementsControl?.Dispose();
+				RequirementsControl = new CraftingDisciplinesControl(base.RequirementsPanel)
+				{
+					Size = new Point(60, 25),
+					DisciplineCount = requirements.Count,
+					Tooltip = new Tooltip(new CraftingDisciplinesTooltipView(requirements))
+				};
+			}
+		}
+
+		public virtual IList<CraftingDisciplineRequirement> GetCraftingRequirements()
+		{
+			return (from c in _children.OfType<RecipeSheetNode>().SelectMany((RecipeSheetNode n) => n.GetCraftingRequirements()).Concat(IngredientNodes.SelectMany((IngredientNode n) => n.GetCraftingRequirements()))
+				group c by c.DisciplineName into c
+				select c.First()).ToList();
 		}
 
 		protected override void OnChildAdded(ChildChangedEventArgs e)
@@ -399,6 +558,10 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 			IngredientNode node = e.ChangedChild as IngredientNode;
 			if (node != null)
 			{
+				if (TreeView.IngredientNodes == null)
+				{
+					return;
+				}
 				TreeView.IngredientNodes.Add(node);
 				node.UpdateRelatedNodes();
 			}
@@ -415,17 +578,12 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 			base.OnChildRemoved(e);
 		}
 
-		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
-		{
-			if (Icon != null)
-			{
-				Color lineColor = Color.DarkGray * 0.7f;
-				spriteBatch.DrawFrame(this, Icon.LocalBounds, lineColor);
-			}
-		}
-
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
+			if (_enoughCollected)
+			{
+				spriteBatch.DrawFrame(this, new Rectangle(base.PanelRectangle.Left, base.PanelRectangle.Top, 3, base.PanelRectangle.Height), ColorHelper.BrightGreen, 2);
+			}
 			base.PaintBeforeChildren(spriteBatch, bounds);
 		}
 
@@ -439,7 +597,8 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 			ItemCountLabel?.Dispose();
 			ItemRecipeRequiredCountLabel?.Dispose();
 			MenuStrip?.Dispose();
-			TooltipView?.DoUnload();
+			RequirementsControl?.Dispose();
+			ItemCountTooltipView?.DoUnload();
 			ItemCountTooltip?.Dispose();
 			base.DisposeControl();
 		}

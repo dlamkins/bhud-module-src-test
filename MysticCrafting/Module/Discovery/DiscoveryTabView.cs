@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Timers;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Microsoft.Xna.Framework;
+using MysticCrafting.Models.Items;
+using MysticCrafting.Module.Discovery.Home;
 using MysticCrafting.Module.Discovery.ItemList;
 using MysticCrafting.Module.Discovery.Loading;
 using MysticCrafting.Module.Menu;
@@ -30,6 +33,8 @@ namespace MysticCrafting.Module.Discovery
 		public ItemListModel ItemListModel { get; set; }
 
 		public ViewContainer ItemListContainer { get; set; }
+
+		public HomeView HomeView { get; set; }
 
 		public string NameFilter
 		{
@@ -74,6 +79,7 @@ namespace MysticCrafting.Module.Discovery
 			BuildItemList(buildPanel);
 			BuildMenu(buildPanel);
 			BuildLoadingStatusView(buildPanel);
+			BuildHomeView();
 		}
 
 		private void BuildItemList(Container parent)
@@ -91,9 +97,62 @@ namespace MysticCrafting.Module.Discovery
 		public void ReloadItemList(ItemListModel model)
 		{
 			ItemListContainer.ClearChildren();
+			string rarity = ItemListModel?.Filter.Rarity;
+			bool? collectionOption1 = ItemListModel?.Filter.HideSkinUnlocked;
+			bool? collectionOption2 = ItemListModel?.Filter.HideSkinUnlocked;
+			bool? collectionOption3 = ItemListModel?.Filter.HideMaxItemsCollected;
+			WeightClass? weightClass = ItemListModel?.Filter.Weight;
+			string legendaryType = ItemListModel?.Filter.LegendaryType;
 			ItemListModel = model;
+			if (ItemListModel.Filter == null)
+			{
+				ItemListModel.Filter = new MysticItemFilter();
+			}
+			ItemListModel.Filter.Rarity = rarity;
+			ItemListModel.Filter.HideSkinUnlocked = collectionOption1.GetValueOrDefault();
+			ItemListModel.Filter.HideSkinUnlocked = collectionOption2.GetValueOrDefault();
+			ItemListModel.Filter.HideMaxItemsCollected = collectionOption3.GetValueOrDefault();
+			ItemListModel.Filter.Weight = weightClass.GetValueOrDefault();
+			ItemListModel.Filter.LegendaryType = legendaryType ?? string.Empty;
 			ItemList = new ItemListView(ItemListModel);
 			ItemListContainer.Show(ItemList);
+		}
+
+		public void BuildHomeView()
+		{
+			if (HomeView == null)
+			{
+				HomeView = new HomeView(new HomeViewModel(), base.Presenter);
+				HomeView homeView = HomeView;
+				homeView.LightClick = (EventHandler)Delegate.Combine(homeView.LightClick, (EventHandler)delegate
+				{
+					ItemListModel.Filter.Weight = WeightClass.Light;
+					ItemListModel.Filter.Rarity = "Legendary";
+					ItemListModel.Filter.LegendaryType = "Obsidian (PvE)";
+					GoToArmorMenuItem();
+				});
+				HomeView homeView2 = HomeView;
+				homeView2.MediumClick = (EventHandler)Delegate.Combine(homeView2.MediumClick, (EventHandler)delegate
+				{
+					ItemListModel.Filter.Weight = WeightClass.Medium;
+					ItemListModel.Filter.Rarity = "Legendary";
+					ItemListModel.Filter.LegendaryType = "Obsidian (PvE)";
+					GoToArmorMenuItem();
+				});
+				HomeView homeView3 = HomeView;
+				homeView3.HeavyClick = (EventHandler)Delegate.Combine(homeView3.HeavyClick, (EventHandler)delegate
+				{
+					ItemListModel.Filter.Weight = WeightClass.Heavy;
+					ItemListModel.Filter.Rarity = "Legendary";
+					ItemListModel.Filter.LegendaryType = "Obsidian (PvE)";
+					GoToArmorMenuItem();
+				});
+			}
+		}
+
+		private void GoToArmorMenuItem()
+		{
+			Menu.Children.OfType<CategoryMenuItem>().FirstOrDefault((CategoryMenuItem c) => c.ItemFilter.Type == "Armor")?.Select();
 		}
 
 		private void BuildMenu(Container parent)
@@ -146,6 +205,7 @@ namespace MysticCrafting.Module.Discovery
 			{
 				ServiceContainer.TradingPostService,
 				ServiceContainer.PlayerItemService,
+				ServiceContainer.PlayerUnlocksService,
 				ServiceContainer.WalletService
 			});
 			obj.Show(_loadingStatusView);

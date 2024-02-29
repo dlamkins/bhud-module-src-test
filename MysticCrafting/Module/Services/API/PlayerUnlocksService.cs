@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Blish_HUD.Modules.Managers;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Models;
+using MysticCrafting.Models;
 using MysticCrafting.Module.Services.Recurring;
 using MysticCrafting.Module.Strings;
 
@@ -15,6 +16,9 @@ namespace MysticCrafting.Module.Services.API
 		private readonly Gw2ApiManager _gw2ApiManager;
 
 		public override string Name => Common.LoadingPlayerUnlocks;
+
+		public IList<int> UnlockedMiniatures { get; set; } = new List<int>();
+
 
 		public IList<int> UnlockedRecipes { get; set; } = new List<int>();
 
@@ -30,9 +34,36 @@ namespace MysticCrafting.Module.Services.API
 			_gw2ApiManager = apiManager;
 		}
 
+		public bool MiniUnlocked(int itemId)
+		{
+			return UnlockedMiniatures.Contains(itemId);
+		}
+
 		public bool RecipeUnlocked(int itemId)
 		{
 			return UnlockedRecipes.Contains(itemId);
+		}
+
+		public bool RecipeUnlocked(MysticRecipe recipe)
+		{
+			if (recipe != null)
+			{
+				_ = recipe.Id;
+				if (!recipe.IsMysticForgeRecipe && recipe.RecipeSheetIds != null && recipe.RecipeSheetIds.Any())
+				{
+					return RecipeUnlocked(recipe.GameId ?? 999);
+				}
+			}
+			return true;
+		}
+
+		public bool ItemUnlocked(int itemId)
+		{
+			if (!SkinUnlocked(itemId) && !LegendaryUnlocked(itemId))
+			{
+				return MiniUnlocked(itemId);
+			}
+			return true;
 		}
 
 		public bool SkinUnlocked(int itemId)
@@ -64,10 +95,12 @@ namespace MysticCrafting.Module.Services.API
 				TokenPermission.Inventories
 			}))
 			{
+				Task<IApiV2ObjectList<int>> miniatures = _gw2ApiManager.Gw2ApiClient.V2.Account.Minis.GetAsync();
 				Task<IApiV2ObjectList<int>> recipes = _gw2ApiManager.Gw2ApiClient.V2.Account.Recipes.GetAsync();
 				Task<IApiV2ObjectList<int>> skins = _gw2ApiManager.Gw2ApiClient.V2.Account.Skins.GetAsync();
 				Task<IApiV2ObjectList<AccountLegendaryArmory>> legendaries = _gw2ApiManager.Gw2ApiClient.V2.Account.LegendaryArmory.GetAsync();
-				await Task.WhenAll(recipes, skins, legendaries);
+				await Task.WhenAll(miniatures, recipes, skins, legendaries);
+				UnlockedMiniatures = (await miniatures).ToList();
 				UnlockedRecipes = (await recipes).ToList();
 				UnlockedSkins = (await skins).ToList();
 				UnlockedLegendaries = (await legendaries).ToDictionary((AccountLegendaryArmory x) => x.Id, (AccountLegendaryArmory x) => x.Count);

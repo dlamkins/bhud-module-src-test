@@ -13,7 +13,7 @@ namespace MysticCrafting.Module.Discovery.ItemList
 
 		public MysticItemFilter Filter { get; set; }
 
-		public int ItemLimit { get; set; } = 50;
+		public int ItemLimit { get; set; } = 100;
 
 
 		public ItemListModel(IItemRepository itemRepository)

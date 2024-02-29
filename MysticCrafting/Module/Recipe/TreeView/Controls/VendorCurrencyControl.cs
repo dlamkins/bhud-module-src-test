@@ -41,5 +41,14 @@ namespace MysticCrafting.Module.Recipe.TreeView.Controls
 				spriteBatch.DrawOnCtrl(this, Icon, new Rectangle(textWidth, 0, IconSize.X, IconSize.Y), Color.LightYellow);
 			}
 		}
+
+		private void DrawOutline(SpriteBatch spriteBatch)
+		{
+			Color lineColor = Color.Yellow * 0.5f;
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(0, 0, base.Width, 1), lineColor);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(0, base.Height - 2, base.Width, 1), lineColor);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(0, 0, 1, base.Height - 1), lineColor);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(base.Width - 1, 0, 1, base.Height - 1), lineColor);
+		}
 	}
 }

@@ -26,6 +26,8 @@ namespace MysticCrafting.Module.Recipe
 			List<IRecurringService> _recurringServices = new List<IRecurringService>
 			{
 				ServiceContainer.TradingPostService,
+				ServiceContainer.PlayerItemService,
+				ServiceContainer.PlayerUnlocksService,
 				ServiceContainer.WalletService
 			};
 			if (_recurringServices.Any((IRecurringService s) => !s.Loaded))

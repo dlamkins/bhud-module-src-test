@@ -10,6 +10,7 @@ using MysticCrafting.Module.Recipe.TreeView.Extensions;
 using MysticCrafting.Module.Recipe.TreeView.Nodes;
 using MysticCrafting.Module.Repositories;
 using MysticCrafting.Module.Services;
+using MysticCrafting.Module.Strings;
 
 namespace MysticCrafting.Module.Recipe.TreeView.Presenters
 {
@@ -29,7 +30,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Presenters
 
 		private readonly IChoiceRepository _choiceRepository;
 
-		private readonly List<int> _excludedItems = new List<int> { 19675, 96978, 79410, 20797, 19925, 86093, 19678 };
+		private readonly List<int> _excludedItems = new List<int> { 19675, 96978, 79410, 20797, 19925, 86093 };
 
 		public IngredientNodePresenter(IRecipeDetailsViewPresenter recipeDetailsPresenter, IItemRepository itemRepository, IChoiceRepository choiceRepository)
 		{
@@ -43,7 +44,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Presenters
 
 		public void BuildNodes(MysticRecipe recipe, Container parent)
 		{
-			if (recipe?.Ingredients == null || (recipe.HasBaseIngredients != "t" && recipe.MysticForgeId == 0) || parent == null)
+			if (recipe?.Ingredients == null || (!recipe.HasBaseIngredients && !recipe.IsMysticForgeRecipe) || parent == null)
 			{
 				return;
 			}
@@ -54,42 +55,58 @@ namespace MysticCrafting.Module.Recipe.TreeView.Presenters
 				{
 					continue;
 				}
-				if (!_excludedItems.Contains(node.Item.Id))
+				if (!_excludedItems.Contains(node.Item.GameId))
 				{
 					ItemTab selectedTab = BuildTabs(node, node.Item);
 					if (selectedTab != null)
 					{
 						BuildChildren(selectedTab.ItemSource, node);
 					}
+					else
+					{
+						node.BuildMissingTabsLabel();
+					}
+				}
+				else
+				{
+					node.BuildMissingTabsLabel();
 				}
 				node.LoadingChildren = false;
 				node.OnChildrenLoaded();
 			}
 		}
 
-		public IngredientNode BuildNode(MysticItem item, Container parent, bool expandable = false)
+		public IngredientNode BuildNode(MysticItem item, Container parent, bool expandable = false, bool isPrimaryNode = false)
 		{
 			IngredientNode node = new IngredientNode(new MysticIngredient
 			{
-				GameId = item.Id,
+				GameId = item.GameId,
 				Quantity = 1,
 				Index = 0,
 				Name = item.Name,
 				Item = item
 			}, item, parent, loadingChildren: true)
 			{
-				Width = parent.Width - 50,
+				Width = parent.Width - (isPrimaryNode ? 50 : 25),
 				PanelHeight = 45,
 				PanelExtensionHeight = 0,
 				Expandable = expandable
 			};
+			node.Build(parent);
 			node.OnPanelClick += delegate
 			{
 				_recipeDetailsPresenter.SaveScrollDistance();
 			};
 			node.Toggle();
 			ItemTab selectedTab = BuildTabs(node, item);
-			BuildChildren(selectedTab.ItemSource, node);
+			if (selectedTab != null)
+			{
+				BuildChildren(selectedTab.ItemSource, node);
+			}
+			else
+			{
+				node.BuildMissingTabsLabel();
+			}
 			node.LoadingChildren = false;
 			node.OnChildrenLoaded();
 			return node;
@@ -106,6 +123,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Presenters
 			ingredientNode.Width = parent.Width - 25;
 			ingredientNode.PanelHeight = 45;
 			ingredientNode.PanelExtensionHeight = 0;
+			ingredientNode.Build(parent);
 			ingredientNode.OnPanelClick += delegate
 			{
 				_recipeDetailsPresenter.SaveScrollDistance();
@@ -120,6 +138,21 @@ namespace MysticCrafting.Module.Recipe.TreeView.Presenters
 			RecipeSource recipeSource = itemSource as RecipeSource;
 			if (recipeSource != null && recipeSource.Recipe != null)
 			{
+				IEnumerable<int> recipeSheetIds = recipeSource.Recipe.RecipeSheetIds;
+				int num;
+				if (recipeSheetIds == null)
+				{
+					num = 0;
+				}
+				else
+				{
+					recipeSheetIds.FirstOrDefault();
+					num = 1;
+				}
+				if (num != 0)
+				{
+					_recipeSheetPresenter.BuildNode(recipeSource.Recipe, parent);
+				}
 				BuildNodes(recipeSource.Recipe, parent);
 			}
 			TradingPostSource tradingPostSource = itemSource as TradingPostSource;
@@ -132,32 +165,38 @@ namespace MysticCrafting.Module.Recipe.TreeView.Presenters
 			{
 				_vendorPresenter.Build(parent, vendorSource);
 			}
-			WizardsVaultSource wizardsVaultSource = itemSource as WizardsVaultSource;
-			if (wizardsVaultSource == null)
+			ItemContainerSource containerSource = itemSource as ItemContainerSource;
+			if (containerSource == null)
 			{
 				return;
 			}
-			IngredientNode parentNode = parent as IngredientNode;
-			if (parentNode != null)
+			if (containerSource.Container != null)
 			{
-				if (parentNode.Item.Id == 19673 || parentNode.Item.Id == 19672)
+				IngredientNode parentNode = parent as IngredientNode;
+				if (parentNode != null)
 				{
-					new LabelNode("50% chance to get this item.", parent)
+					if (containerSource.Container.ContainedChoiceItemIds != null && containerSource.Container.ContainedChoiceItemIds.Contains(parentNode.Item.GameId))
 					{
-						Width = 200,
-						TextColor = Color.Yellow
-					};
-				}
-				if (parentNode.Item.Id == 96054)
-				{
-					new LabelNode("Limit 1 per account.", parent)
+						new LabelNode(MysticCrafting.Module.Strings.Recipe.ChoiceOfItem, parent)
+						{
+							Width = 300,
+							TextColor = Color.Red
+						};
+					}
+					if (containerSource.Container.ContainedChanceItemIds != null && containerSource.Container.ContainedChanceItemIds.Contains(parentNode.Item.GameId))
 					{
-						Width = 200,
-						TextColor = Color.Yellow
-					};
+						new LabelNode(MysticCrafting.Module.Strings.Recipe.RandomItemChance, parent)
+						{
+							Width = 300,
+							TextColor = Color.Red
+						};
+					}
 				}
 			}
-			BuildNode(wizardsVaultSource.Item, parent, expandable: true);
+			if (containerSource.ContainerItem != null)
+			{
+				BuildNode(containerSource.ContainerItem, parent, expandable: true);
+			}
 		}
 
 		public ItemTab BuildTabs(TreeNodeBase node, MysticItem item)
@@ -196,39 +235,6 @@ namespace MysticCrafting.Module.Recipe.TreeView.Presenters
 				{
 					node.Toggle();
 				}
-			}
-		}
-
-		private void BuildRecipeSheet(MysticRecipe recipe, Container parent)
-		{
-			if (recipe.RecipeSheetIds == null || !recipe.RecipeSheetIds.Any())
-			{
-				return;
-			}
-			int sheetId = recipe.RecipeSheetIds.FirstOrDefault();
-			MysticItem item = ServiceContainer.ItemRepository.GetItem(sheetId);
-			if (item != null)
-			{
-				new LabelNode("Learned from", parent).Width = 200;
-				IngredientNode node = new IngredientNode(new MysticIngredient
-				{
-					Quantity = 1,
-					GameId = recipe.RecipeSheetIds.FirstOrDefault(),
-					Item = item,
-					Index = 0,
-					Name = item.Name
-				}, item, parent)
-				{
-					Parent = parent,
-					Width = parent.Width - 25,
-					PanelHeight = 45,
-					PanelExtensionHeight = 0
-				};
-				node.OnPanelClick += delegate
-				{
-					_recipeDetailsPresenter.SaveScrollDistance();
-				};
-				BuildTabs(node, node.Item);
 			}
 		}
 

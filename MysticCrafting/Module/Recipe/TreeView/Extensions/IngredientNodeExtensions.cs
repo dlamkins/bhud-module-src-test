@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using MysticCrafting.Module.Recipe.TreeView.Nodes;
+using MysticCrafting.Module.Settings;
 
 namespace MysticCrafting.Module.Recipe.TreeView.Extensions
 {
@@ -22,7 +23,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Extensions
 			node.ReservedQuantity = reservedQuantity;
 			node.IsLinked = linked;
 			node.UpdateItemCountControls();
-			node.TooltipView?.UpdateLinkedNodes();
+			node.ItemCountTooltipView?.UpdateLinkedNodes();
 		}
 
 		public static void Link(this IngredientNode node, int reservedQuantity)
@@ -46,7 +47,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Extensions
 
 		public static void UpdateRelatedNodes(this IngredientNode node)
 		{
-			List<IngredientNode> relatedNodes = node.TreeView.IngredientNodes.GetByItemId(node.Item.Id).ToList();
+			List<IngredientNode> relatedNodes = node.TreeView.IngredientNodes.GetByItemId(node.Item.GameId).ToList();
 			int nodeCount = relatedNodes.Count;
 			int reservedQuantity = 0;
 			foreach (IngredientNode relatedNode in relatedNodes)
@@ -64,7 +65,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Extensions
 			}
 			foreach (IngredientNode item in relatedNodes)
 			{
-				item.TooltipView?.UpdateLinkedNodes();
+				item.ItemCountTooltipView?.UpdateLinkedNodes();
 			}
 		}
 
@@ -92,6 +93,21 @@ namespace MysticCrafting.Module.Recipe.TreeView.Extensions
 		public static int GetDescendantCount(this IngredientNode node)
 		{
 			return 1 + (node.IngredientNodes?.Sum((Func<IngredientNode, int>)GetDescendantCount) ?? 0);
+		}
+
+		public static void UpdateTradingPostOptions(this IngredientNode node, TradingPostOptions option)
+		{
+			foreach (TradingPostNode child in node.Children.OfType<TradingPostNode>())
+			{
+				if (child.Option == option && !child.Selected)
+				{
+					child.ToggleSelect();
+				}
+			}
+			foreach (IngredientNode ingredientNode in node.IngredientNodes)
+			{
+				ingredientNode.UpdateTradingPostOptions(option);
+			}
 		}
 	}
 }

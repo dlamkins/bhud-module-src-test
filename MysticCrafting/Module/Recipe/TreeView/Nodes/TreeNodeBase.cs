@@ -231,7 +231,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 		{
 			if (Expanded)
 			{
-				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(0, PanelCollapsedHeight, base.Width, PanelExtensionHeight), Color.Black * 0.5f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(0, PanelCollapsedHeight, base.Width, PanelExtensionHeight), Color.Black * 0.05f);
 			}
 		}
 

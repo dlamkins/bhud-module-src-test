@@ -27,11 +27,15 @@ namespace MysticCrafting.Module
 
 		internal SettingEntry<KeyBinding> ToggleWindowSetting;
 
+		internal static SettingEntry<TradingPostOptions> TradingPostPreference;
+
 		private CornerIcon _cornerIcon;
 
 		private StandardWindow _mainWindow;
 
 		private DiscoveryTabView _discoveryTabView;
+
+		private TabbedWindow2 _mainTabbedWindow;
 
 		private bool dataLoaded;
 
@@ -63,6 +67,7 @@ namespace MysticCrafting.Module
 		{
 			Settings = new ModuleSettings(settings);
 			ToggleWindowSetting = settings.DefineSetting("Toggle main window", new KeyBinding(), () => Common.ToggleWindow, () => "Open and close crafting window");
+			TradingPostPreference = settings.DefineSetting("Trading post preference", TradingPostOptions.Buy, () => Common.TradingPostDefault, () => "Default selection for items bought from the trading post");
 			ToggleWindowSetting.Value.Enabled = true;
 			ToggleWindowSetting.Value.Activated += delegate
 			{
@@ -183,11 +188,34 @@ namespace MysticCrafting.Module
 			_mainWindow.ToggleWindow();
 		}
 
+		private void ToggleTabbedWindow()
+		{
+			if (_mainTabbedWindow.CurrentView == null)
+			{
+				_mainTabbedWindow.Show();
+			}
+			_mainTabbedWindow.ToggleWindow();
+		}
+
 		private StandardWindow BuildWindow()
 		{
 			AsyncTexture2D refTexture = ServiceContainer.TextureRepository.GetRefTexture("155978.png");
 			int width = refTexture.Width + 80;
 			return new StandardWindow(windowSize: new Point(width, refTexture.Height - 150), background: refTexture, windowRegion: new Microsoft.Xna.Framework.Rectangle(40, 26, 925, 730), contentRegion: new Microsoft.Xna.Framework.Rectangle(50, 50, 900, 720))
+			{
+				Parent = GameService.Graphics.SpriteScreen,
+				Title = "Mystic Crafting",
+				Emblem = ServiceContainer.TextureRepository.GetRefTexture("102529.png"),
+				SavesPosition = true,
+				Id = "StandardWindow_ExampleModule_38d37290-b5f9-447d-97ea-45b0b50e5f56"
+			};
+		}
+
+		private TabbedWindow2 BuildTabbedWindow()
+		{
+			AsyncTexture2D refTexture = ServiceContainer.TextureRepository.GetRefTexture("155978.png");
+			int width = refTexture.Width + 80;
+			return new TabbedWindow2(windowSize: new Point(width, refTexture.Height - 150), background: refTexture, windowRegion: new Microsoft.Xna.Framework.Rectangle(40, 26, 970, 730), contentRegion: new Microsoft.Xna.Framework.Rectangle(96, 50, 945, 720))
 			{
 				Parent = GameService.Graphics.SpriteScreen,
 				Title = "Mystic Crafting",

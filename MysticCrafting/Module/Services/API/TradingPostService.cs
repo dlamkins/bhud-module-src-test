@@ -37,7 +37,7 @@ namespace MysticCrafting.Module.Services.API
 
 		public override async Task<string> LoadAsync()
 		{
-			List<int> itemIds2 = _itemRepository.GetItems()?.Select((MysticItem i) => i.Id)?.ToList();
+			List<int> itemIds2 = _itemRepository.GetItems()?.Select((MysticItem i) => i.GameId)?.ToList();
 			if (_gw2ApiManager == null || itemIds2 == null || !itemIds2.Any())
 			{
 				throw new Exception("No items were found in the ItemRepository.");

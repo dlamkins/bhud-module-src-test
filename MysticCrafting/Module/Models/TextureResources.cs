@@ -4,6 +4,8 @@ namespace MysticCrafting.Module.Models
 {
 	public class TextureResources
 	{
+		public AsyncTexture2D Book = AsyncTexture2D.FromAssetId(102357);
+
 		public AsyncTexture2D ModuleIcon = AsyncTexture2D.FromAssetId(156684);
 
 		public AsyncTexture2D ModuleHoverIcon = AsyncTexture2D.FromAssetId(156685);
@@ -54,6 +56,8 @@ namespace MysticCrafting.Module.Models
 
 		public AsyncTexture2D ExclamationMark = AsyncTexture2D.FromAssetId(482924);
 
+		public AsyncTexture2D RecipeSheet = AsyncTexture2D.FromAssetId(156702);
+
 		public AsyncTexture2D QuestionMark = AsyncTexture2D.FromAssetId(157097);
 
 		public AsyncTexture2D BlackFade = AsyncTexture2D.FromAssetId(156044);
@@ -61,5 +65,41 @@ namespace MysticCrafting.Module.Models
 		public AsyncTexture2D Chain = AsyncTexture2D.FromAssetId(2163909);
 
 		public AsyncTexture2D ChainGold = AsyncTexture2D.FromAssetId(2378287);
+
+		public AsyncTexture2D EditFeatherIcon = AsyncTexture2D.FromAssetId(2175781);
+
+		public AsyncTexture2D Chest = AsyncTexture2D.FromAssetId(784330);
+
+		public AsyncTexture2D Lock = AsyncTexture2D.FromAssetId(733262);
+
+		public AsyncTexture2D Background = AsyncTexture2D.FromAssetId(155976);
+
+		public AsyncTexture2D Checkmark = AsyncTexture2D.FromAssetId(1318605);
+
+		public AsyncTexture2D CheckmarkDisabled = AsyncTexture2D.FromAssetId(1318606);
+
+		public AsyncTexture2D Checkmark1 = AsyncTexture2D.FromAssetId(1318605);
+
+		public AsyncTexture2D Checkmark2 = AsyncTexture2D.FromAssetId(1318606);
+
+		public AsyncTexture2D Checkmark3 = AsyncTexture2D.FromAssetId(1444520);
+
+		public AsyncTexture2D Checkmark4 = AsyncTexture2D.FromAssetId(156153);
+
+		public AsyncTexture2D Checkmark5 = AsyncTexture2D.FromAssetId(156108);
+
+		public AsyncTexture2D Checkmark6 = AsyncTexture2D.FromAssetId(154979);
+
+		public AsyncTexture2D Checkmark7 = AsyncTexture2D.FromAssetId(154981);
+
+		public AsyncTexture2D Checkmark8 = AsyncTexture2D.FromAssetId(156950);
+
+		public AsyncTexture2D Checkmark9 = AsyncTexture2D.FromAssetId(157012);
+
+		public AsyncTexture2D ItemBackground = AsyncTexture2D.FromAssetId(156900);
+
+		public AsyncTexture2D ItemTabBackground = AsyncTexture2D.FromAssetId(993606);
+
+		public AsyncTexture2D ItemTabBackgroundHover = AsyncTexture2D.FromAssetId(993602);
 	}
 }

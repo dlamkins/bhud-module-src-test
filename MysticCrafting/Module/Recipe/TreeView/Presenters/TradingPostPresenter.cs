@@ -4,6 +4,7 @@ using Blish_HUD.Controls;
 using MysticCrafting.Module.Models;
 using MysticCrafting.Module.Recipe.TreeView.Nodes;
 using MysticCrafting.Module.Services;
+using MysticCrafting.Module.Settings;
 using MysticCrafting.Module.Strings;
 
 namespace MysticCrafting.Module.Recipe.TreeView.Presenters
@@ -24,7 +25,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Presenters
 		public void Build(Container parent, TradingPostSource source)
 		{
 			Source = source;
-			TradingPostNode buyItem = new TradingPostNode(source.BuyPrice.UnitPrice, MysticCrafting.Module.Strings.Recipe.TradingPostBuy, parent)
+			TradingPostNode buyItem = new TradingPostNode(source.BuyPrice.UnitPrice, MysticCrafting.Module.Strings.Recipe.TradingPostBuy, TradingPostOptions.Buy, parent)
 			{
 				PanelHeight = 40,
 				Name = "buy",
@@ -32,7 +33,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Presenters
 				Width = parent.Width - 25,
 				PanelExtensionHeight = 0
 			};
-			TradingPostNode sellItem = new TradingPostNode(source.SellPrice.UnitPrice, MysticCrafting.Module.Strings.Recipe.TradingPostSell, parent)
+			TradingPostNode sellItem = new TradingPostNode(source.SellPrice.UnitPrice, MysticCrafting.Module.Strings.Recipe.TradingPostSell, TradingPostOptions.Sell, parent)
 			{
 				Parent = parent,
 				Name = "sell",
@@ -47,7 +48,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Presenters
 				string choiceValue = _choiceRepository.GetChoice(GetFullPath(parentNode), ChoiceType.TradingPost)?.Value;
 				if (choiceValue == null)
 				{
-					if (buyItem.UnitPrice != 0)
+					if (buyItem.UnitPrice != 0 && MysticCraftingModule.TradingPostPreference.Value == TradingPostOptions.Buy)
 					{
 						choiceValue = buyItem.PathName;
 					}

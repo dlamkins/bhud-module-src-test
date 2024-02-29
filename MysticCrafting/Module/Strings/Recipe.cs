@@ -46,6 +46,14 @@ namespace MysticCrafting.Module.Strings
 
 		internal static string AllRecipes => ResourceManager.GetString("AllRecipes", resourceCulture);
 
+		internal static string ChoiceOfItem => ResourceManager.GetString("ChoiceOfItem", resourceCulture);
+
+		internal static string ContextMenuBuyAll => ResourceManager.GetString("ContextMenuBuyAll", resourceCulture);
+
+		internal static string ContextMenuSellAll => ResourceManager.GetString("ContextMenuSellAll", resourceCulture);
+
+		internal static string ContextMenuUpdateTradingPost => ResourceManager.GetString("ContextMenuUpdateTradingPost", resourceCulture);
+
 		internal static string CountInBank => ResourceManager.GetString("CountInBank", resourceCulture);
 
 		internal static string CountInInventoryCharacter => ResourceManager.GetString("CountInInventoryCharacter", resourceCulture);
@@ -58,6 +66,8 @@ namespace MysticCrafting.Module.Strings
 
 		internal static string Ingredients => ResourceManager.GetString("Ingredients", resourceCulture);
 
+		internal static string ItemCountBoxTooltipText => ResourceManager.GetString("ItemCountBoxTooltipText", resourceCulture);
+
 		internal static string MoreRequired => ResourceManager.GetString("MoreRequired", resourceCulture);
 
 		internal static string MysticForge => ResourceManager.GetString("MysticForge", resourceCulture);
@@ -65,6 +75,8 @@ namespace MysticCrafting.Module.Strings
 		internal static string PriceEach => ResourceManager.GetString("PriceEach", resourceCulture);
 
 		internal static string PricePerNumber => ResourceManager.GetString("PricePerNumber", resourceCulture);
+
+		internal static string RandomItemChance => ResourceManager.GetString("RandomItemChance", resourceCulture);
 
 		internal static string RecipeRequiredLevel => ResourceManager.GetString("RecipeRequiredLevel", resourceCulture);
 
@@ -79,6 +91,12 @@ namespace MysticCrafting.Module.Strings
 		internal static string Requirement => ResourceManager.GetString("Requirement", resourceCulture);
 
 		internal static string SoldByVendors => ResourceManager.GetString("SoldByVendors", resourceCulture);
+
+		internal static string TooltipCollectedItem => ResourceManager.GetString("TooltipCollectedItem", resourceCulture);
+
+		internal static string TooltipOpenMenuText => ResourceManager.GetString("TooltipOpenMenuText", resourceCulture);
+
+		internal static string TooltipUnlockedItem => ResourceManager.GetString("TooltipUnlockedItem", resourceCulture);
 
 		internal static string TradingPost => ResourceManager.GetString("TradingPost", resourceCulture);
 

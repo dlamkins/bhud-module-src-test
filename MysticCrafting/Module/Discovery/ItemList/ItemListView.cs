@@ -1,8 +1,12 @@
+using System;
 using System.Collections.Generic;
 using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
+using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
+using MysticCrafting.Models.Items;
 using MysticCrafting.Module.Services;
 using MysticCrafting.Module.Strings;
 
@@ -18,8 +22,11 @@ namespace MysticCrafting.Module.Discovery.ItemList
 
 		private Label _limitLabel;
 
-		public int ItemLimit { get; set; } = 50;
+		private ContextMenuStripItem _hideLockedSkinsStripItem;
 
+		private ContextMenuStripItem _hideUnlockedSkinsStripItem;
+
+		private ContextMenuStripItem _hideMaxCollectedStripItem;
 
 		public ViewContainer Container { get; set; }
 
@@ -28,6 +35,12 @@ namespace MysticCrafting.Module.Discovery.ItemList
 		public ItemListModel Model { get; set; }
 
 		public Dropdown RarityDropdown { get; set; }
+
+		public Dropdown LegendaryTypeDropdown { get; set; }
+
+		public Dropdown WeightDropdown { get; set; }
+
+		public ContextMenuStrip SettingsMenu { get; set; }
 
 		public bool LimitReached
 		{
@@ -65,6 +78,10 @@ namespace MysticCrafting.Module.Discovery.ItemList
 
 		public Container BuildPanel { get; set; }
 
+		public GlowButton SettingsMenuButton { get; set; }
+
+		public Label FiltersLabel { get; set; }
+
 		public ItemListView(ItemListModel itemListModel)
 		{
 			Model = itemListModel;
@@ -82,7 +99,10 @@ namespace MysticCrafting.Module.Discovery.ItemList
 				Padding = new Thickness(0f),
 				Location = new Point(0, 0)
 			};
-			BuildFilters();
+			BuildRarityFilter();
+			BuildAmorWeightFilter();
+			BuildMoreFilters();
+			BuildLegendaryTypeFilter();
 			Panel = new FlowPanel
 			{
 				Parent = Container,
@@ -93,45 +113,184 @@ namespace MysticCrafting.Module.Discovery.ItemList
 				CanScroll = true
 			};
 			BuildNoResultsPanel();
-			_limitLabel = new Label
-			{
-				Text = Common.MaximumResultsReached,
-				Parent = buildPanel,
-				Width = 800,
-				TextColor = Color.Orange,
-				Font = GameService.Content.DefaultFont16,
-				Top = 5,
-				Left = 160,
-				StrokeText = true,
-				Visible = false
-			};
 		}
 
-		public void BuildFilters()
+		public void UpdateFilterLabel()
 		{
-			Dropdown dropdown = new Dropdown
+			int enabledCount = 0;
+			if (Model.Filter.HideSkinLocked)
+			{
+				enabledCount++;
+			}
+			if (Model.Filter.HideSkinUnlocked)
+			{
+				enabledCount++;
+			}
+			if (Model.Filter.HideMaxItemsCollected)
+			{
+				enabledCount++;
+			}
+			FiltersLabel.Text = $"{Common.MoreFilters} ({enabledCount})";
+		}
+
+		public void BuildRarityFilter()
+		{
+			RarityDropdown = new Dropdown
 			{
 				Parent = Container,
 				Width = 120,
+				Location = new Point(5, 5),
 				Visible = true
 			};
-			dropdown.Items.Add("All rarities");
-			dropdown.Items.Add("Basic");
-			dropdown.Items.Add("Fine");
-			dropdown.Items.Add("Masterwork");
-			dropdown.Items.Add("Rare");
-			dropdown.Items.Add("Exotic");
-			dropdown.Items.Add("Ascended");
-			dropdown.Items.Add("Legendary");
+			RarityDropdown.Items.Add("All rarities");
+			RarityDropdown.Items.Add("Exotic");
+			RarityDropdown.Items.Add("Ascended");
+			RarityDropdown.Items.Add("Legendary");
 			if (string.IsNullOrEmpty(Model?.Filter?.Rarity))
 			{
-				dropdown.SelectedItem = "All rarities";
+				RarityDropdown.SelectedItem = "All rarities";
 			}
 			else
 			{
-				dropdown.SelectedItem = Model?.Filter.Rarity;
+				RarityDropdown.SelectedItem = Model?.Filter.Rarity;
 			}
-			RarityDropdown = dropdown;
+			RarityDropdown.ValueChanged += base.Presenter.RarityDropdown_ValueChanged;
+		}
+
+		public void BuildLegendaryTypeFilter()
+		{
+			LegendaryTypeDropdown = new Dropdown
+			{
+				Parent = Container,
+				Width = 150,
+				Location = new Point(130, 5),
+				Visible = true
+			};
+			LegendaryTypeDropdown.Items.Add("All types");
+			LegendaryTypeDropdown.Items.Add("Perfected Envoy (Raid)");
+			LegendaryTypeDropdown.Items.Add("Triumphant (WvW)");
+			LegendaryTypeDropdown.Items.Add("Glorious (PvP)");
+			LegendaryTypeDropdown.Items.Add("Obsidian (PvE)");
+			if (string.IsNullOrEmpty(Model?.Filter?.LegendaryType))
+			{
+				LegendaryTypeDropdown.SelectedItem = "All types";
+			}
+			else
+			{
+				LegendaryTypeDropdown.SelectedItem = Model?.Filter.LegendaryType;
+			}
+			LegendaryTypeDropdown.ValueChanged += delegate(object sender, ValueChangedEventArgs args)
+			{
+				Dropdown dropdown = sender as Dropdown;
+				if (dropdown != null)
+				{
+					if (dropdown.SelectedItem.Equals("All types", StringComparison.InvariantCultureIgnoreCase))
+					{
+						Model.Filter.LegendaryType = null;
+					}
+					else
+					{
+						Model.Filter.LegendaryType = dropdown.SelectedItem;
+					}
+					base.Presenter.DoUpdateView();
+				}
+			};
+		}
+
+		public void BuildAmorWeightFilter()
+		{
+			WeightDropdown = new Dropdown
+			{
+				Parent = Container,
+				Width = 100,
+				Location = new Point(480, 5),
+				Visible = false
+			};
+			WeightDropdown.Items.Add("All weights");
+			WeightDropdown.Items.Add("Light");
+			WeightDropdown.Items.Add("Medium");
+			WeightDropdown.Items.Add("Heavy");
+			WeightDropdown.SelectedItem = "All weights";
+			WeightDropdown.ValueChanged += delegate(object sender, ValueChangedEventArgs args)
+			{
+				Dropdown dropdown = sender as Dropdown;
+				if (dropdown != null)
+				{
+					if (!Enum.IsDefined(typeof(WeightClass), dropdown.SelectedItem))
+					{
+						Model.Filter.Weight = WeightClass.Unknown;
+					}
+					else
+					{
+						Model.Filter.Weight = (WeightClass)Enum.Parse(typeof(WeightClass), dropdown.SelectedItem);
+					}
+					base.Presenter.DoUpdateView();
+				}
+			};
+		}
+
+		public void BuildMoreFilters()
+		{
+			SettingsMenuButton = new GlowButton
+			{
+				Location = new Point(Container.Width - 60, 5),
+				Icon = AsyncTexture2D.FromAssetId(157109),
+				ActiveIcon = AsyncTexture2D.FromAssetId(157110),
+				Visible = true,
+				BasicTooltipText = Common.MoreFilters,
+				Parent = Container
+			};
+			FiltersLabel = new Label
+			{
+				Parent = Container,
+				Location = new Point(SettingsMenuButton.Location.X - 90, 10),
+				Text = Common.MoreFilters,
+				AutoSizeWidth = true
+			};
+			SettingsMenu = new ContextMenuStrip();
+			_hideLockedSkinsStripItem?.Dispose();
+			_hideLockedSkinsStripItem = SettingsMenu.AddMenuItem(new ContextMenuStripItem(Common.HideLockedSkins));
+			_hideLockedSkinsStripItem.CanCheck = true;
+			_hideLockedSkinsStripItem.Checked = Model.Filter.HideSkinLocked;
+			_hideLockedSkinsStripItem.Click += delegate(object sender, MouseEventArgs args)
+			{
+				ContextMenuStripItem contextMenuStripItem3 = sender as ContextMenuStripItem;
+				if (contextMenuStripItem3 != null)
+				{
+					Model.Filter.HideSkinLocked = !contextMenuStripItem3.Checked;
+					base.Presenter.DoUpdateView();
+				}
+			};
+			_hideUnlockedSkinsStripItem?.Dispose();
+			_hideUnlockedSkinsStripItem = SettingsMenu.AddMenuItem(new ContextMenuStripItem(Common.HideUnlockedSkins));
+			_hideUnlockedSkinsStripItem.CanCheck = true;
+			_hideUnlockedSkinsStripItem.Checked = Model.Filter.HideSkinUnlocked;
+			_hideUnlockedSkinsStripItem.Click += delegate(object sender, MouseEventArgs args)
+			{
+				ContextMenuStripItem contextMenuStripItem2 = sender as ContextMenuStripItem;
+				if (contextMenuStripItem2 != null)
+				{
+					Model.Filter.HideSkinUnlocked = !contextMenuStripItem2.Checked;
+					base.Presenter.DoUpdateView();
+				}
+			};
+			_hideMaxCollectedStripItem?.Dispose();
+			_hideMaxCollectedStripItem = SettingsMenu.AddMenuItem(new ContextMenuStripItem(Common.HideMaxCollectedItems));
+			_hideMaxCollectedStripItem.CanCheck = true;
+			_hideMaxCollectedStripItem.Checked = Model.Filter.HideMaxItemsCollected;
+			_hideMaxCollectedStripItem.Click += delegate(object sender, MouseEventArgs args)
+			{
+				ContextMenuStripItem contextMenuStripItem = sender as ContextMenuStripItem;
+				if (contextMenuStripItem != null)
+				{
+					Model.Filter.HideMaxItemsCollected = !contextMenuStripItem.Checked;
+					base.Presenter.DoUpdateView();
+				}
+			};
+			SettingsMenuButton.Click += delegate(object sender, MouseEventArgs args)
+			{
+				SettingsMenu.Show((Control)sender);
+			};
 		}
 
 		public void BuildNoResultsPanel()
@@ -169,7 +328,7 @@ namespace MysticCrafting.Module.Discovery.ItemList
 			foreach (ItemRowView row in rows)
 			{
 				ViewContainer viewContainer = new ViewContainer();
-				viewContainer.Size = new Point(Panel.Width, 65);
+				viewContainer.Size = new Point(Panel.Width - 25, 60);
 				viewContainer.Parent = Panel;
 				viewContainer.Show(row);
 			}

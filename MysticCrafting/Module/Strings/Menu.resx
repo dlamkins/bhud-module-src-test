@@ -35,6 +35,7 @@
   <data name="Scepters"><value>Scepters</value></data>
   <data name="Longsbows"><value>Longsbows</value></data>
   <data name="Shields"><value>Shields</value></data>
+  <data name="Relics"><value>Relics</value></data>
   <data name="Rifles"><value>Rifles</value></data>
   <data name="Swords"><value>Swords</value></data>
   <data name="Staffs"><value>Staffs</value></data>
@@ -63,4 +64,5 @@
   <data name="Headgear"><value>Headgear</value></data>
   <data name="Axes"><value>Axes</value></data>
   <data name="Foci"><value>Foci</value></data>
+  <data name="Home"><value>Home</value></data>
   </root>

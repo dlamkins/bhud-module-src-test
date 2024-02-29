@@ -11,7 +11,7 @@ namespace MysticCrafting.Module.Recipe.TreeView.Presenters
 	{
 		void BuildChildren(IItemSource itemSource, Container parent);
 
-		IngredientNode BuildNode(MysticItem item, Container parent, bool expandable = false);
+		IngredientNode BuildNode(MysticItem item, Container parent, bool expandable = false, bool isPrimaryNode = false);
 
 		IngredientNode BuildNode(MysticIngredient ingredient, Container parent, bool loadingChildren = false, bool expandable = false);
 

@@ -3,7 +3,7 @@ using MysticCrafting.Models.Items;
 
 namespace MysticCrafting.Module.Repositories
 {
-	public interface IItemRepository : IRepository
+	public interface IItemRepository
 	{
 		MysticItem GetItem(int itemId);
 

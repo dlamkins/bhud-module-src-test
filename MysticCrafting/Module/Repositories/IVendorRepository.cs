@@ -3,7 +3,7 @@ using MysticCrafting.Models.Vendor;
 
 namespace MysticCrafting.Module.Repositories
 {
-	public interface IVendorRepository : IRepository
+	public interface IVendorRepository
 	{
 		IList<VendorSellsItem> GetVendorItems();
 

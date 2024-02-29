@@ -3,7 +3,7 @@ using MysticCrafting.Models.Commerce;
 
 namespace MysticCrafting.Module.Repositories
 {
-	public interface ICurrencyRepository : IRepository
+	public interface ICurrencyRepository
 	{
 		IList<MysticCurrency> GetCurrencies();
 

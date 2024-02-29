@@ -62,7 +62,6 @@ namespace MysticCrafting.Module.Discovery.ItemList.Controls
 
 		public ItemButton()
 		{
-			base.Size = new Point(354, 100);
 			base.ControlPadding = new Vector2(6f, 1f);
 			base.PadLeftBeforeControl = true;
 			base.PadTopBeforeControl = true;
@@ -102,7 +101,6 @@ namespace MysticCrafting.Module.Discovery.ItemList.Controls
 			{
 				spriteBatch.DrawOnCtrl(this, Icon, new Microsoft.Xna.Framework.Rectangle(1, 1, 62, 62));
 			}
-			spriteBatch.DrawOnCtrl(this, _textureVignette, new Microsoft.Xna.Framework.Rectangle(0, 0, num2, num2));
 			spriteBatch.DrawOnCtrl(this, _textureBottomSectionSeparator, new Microsoft.Xna.Framework.Rectangle(base.ContentRegion.Left, _size.Y, base.ContentRegion.Width, _textureBottomSectionSeparator.Height));
 			spriteBatch.DrawStringOnCtrl(this, Text, Control.Content.DefaultFont16, new Microsoft.Xna.Framework.Rectangle(num2 + 15, 0, _size.X - num2 - 35, base.Height), ColorHelper.FromRarity(Rarity), wrap: true, stroke: true);
 			if (Prices != null)

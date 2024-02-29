@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Blish_HUD.Controls;
 using Microsoft.Xna.Framework;
@@ -9,7 +8,6 @@ using MysticCrafting.Module.Recipe.TreeView.Nodes;
 
 namespace MysticCrafting.Module.Recipe.TreeView.Controls
 {
-	[DebuggerDisplay("Name = {ItemSource.DisplayName}")]
 	public class ItemTabsContainer : FlowPanel
 	{
 		public IList<IItemSource> ItemSources { get; set; }

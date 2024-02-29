@@ -149,7 +149,7 @@ namespace MysticCrafting.Module.Recipe
 			};
 			try
 			{
-				_ingredientNodePresenter.BuildNode(Item, RecipeItemList);
+				_ingredientNodePresenter.BuildNode(Item, RecipeItemList, expandable: false, isPrimaryNode: true);
 			}
 			catch (Exception ex)
 			{

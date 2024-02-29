@@ -33,6 +33,7 @@
   <data name="MoreRequired"><value>{0} more required</value></data>
   <data name="CountInMaterialStorage"><value>{0} in Material Storage</value></data>
   <data name="PriceEach"><value>each</value></data>
+  <data name="ItemCountBoxTooltipText"><value>Limited by item type</value></data>
   <data name="RecipeSourceOther"><value>Other</value></data>
   <data name="RecipeSourceRecipeSheet"><value>Recipe sheet</value></data>
   <data name="TradingPost"><value>Trading Post</value></data>
@@ -41,11 +42,19 @@
   <data name="CurrentRecipe"><value>current</value></data>
   <data name="TradingPostSell"><value>Sell</value></data>
   <data name="Ingredients"><value>Ingredients</value></data>
+  <data name="TooltipUnlockedItem"><value>{0} unlocked out of a maximum of {1}</value></data>
+  <data name="TooltipOpenMenuText"><value>Right click for more options</value></data>
   <data name="RecipeRequiredLevel"><value>Required Level</value></data>
+  <data name="ContextMenuUpdateTradingPost"><value>Update Trading Post options</value></data>
   <data name="VendorsMore"><value>{0} more</value></data>
   <data name="Account"><value>Account</value></data>
+  <data name="TooltipCollectedItem"><value>I have {0} of this item.</value></data>
+  <data name="ContextMenuSellAll"><value>Sell all</value></data>
+  <data name="RandomItemChance"><value>Random chance to get item from container</value></data>
   <data name="WalletLabel"><value>Available in Wallet</value></data>
+  <data name="ContextMenuBuyAll"><value>Buy all</value></data>
   <data name="Requirement"><value>Requirement</value></data>
+  <data name="ChoiceOfItem"><value>Item is one of the choices from container</value></data>
   <data name="TradingPostBuy"><value>Buy</value></data>
   <data name="RecipeSource"><value>Source</value></data>
   <data name="CountInBank"><value>{0} in Bank</value></data>

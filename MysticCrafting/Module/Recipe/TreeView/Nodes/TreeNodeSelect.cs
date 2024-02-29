@@ -96,10 +96,10 @@ namespace MysticCrafting.Module.Recipe.TreeView.Nodes
 		private void DrawOutline(SpriteBatch spriteBatch)
 		{
 			Color lineColor = Color.LightYellow * 0.8f;
-			int lineSize = 2;
+			int lineSize = 1;
 			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(base.PanelRectangle.X, 0, base.PanelRectangle.Width, lineSize), lineColor);
 			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(base.PanelRectangle.X, base.PanelCollapsedHeight - lineSize, base.PanelRectangle.Width, lineSize), lineColor);
-			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(0, 0, lineSize, base.PanelRectangle.Height + lineSize * 2), lineColor);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(0, 0, lineSize, base.PanelRectangle.Height + lineSize * 4), lineColor);
 			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(base.PanelRectangle.Width - lineSize, 0, lineSize, base.PanelCollapsedHeight), lineColor);
 		}
 	}
