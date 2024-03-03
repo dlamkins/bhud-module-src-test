@@ -151,12 +151,12 @@ namespace BhModule.Community.Pathing
 			//IL_0198: Expected O, but got Unknown
 			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01d2: Expected O, but got Unknown
-			//IL_0202: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020c: Expected O, but got Unknown
-			//IL_023c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0246: Expected O, but got Unknown
-			//IL_0276: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0280: Expected O, but got Unknown
+			//IL_01f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0201: Expected O, but got Unknown
+			//IL_0231: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023b: Expected O, but got Unknown
+			//IL_0260: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026a: Expected O, but got Unknown
 			if (DateTime.UtcNow.Date >= new DateTime(2023, 8, 22, 0, 0, 0, DateTimeKind.Utc) && Program.get_OverlayVersion() < new SemVer.Version(1, 1, 0))
 			{
 				try
@@ -170,7 +170,7 @@ namespace BhModule.Community.Pathing
 			CornerIcon val = new CornerIcon();
 			val.set_IconName(Strings.General_UiName);
 			val.set_Icon(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\pathing-icon.png")));
-			val.set_Priority(Strings.General_UiName.GetHashCode());
+			val.set_Priority("Markers & Trails".GetHashCode());
 			_pathingIcon = val;
 			TabbedWindow2 val2 = new TabbedWindow2(ContentsManager.GetTexture("png\\controls\\156006.png"), new Rectangle(35, 36, 900, 640), new Rectangle(95, 42, 821, 592));
 			((WindowBase2)val2).set_Title(Strings.General_UiName);
@@ -182,9 +182,9 @@ namespace BhModule.Community.Pathing
 			_settingsWindow = val2;
 			_packSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156740+155150.png")), (Func<IView>)(() => (IView)new SettingsView(Settings.PackSettings, -1)), Strings.Window_MainSettingsTab, (int?)null);
 			_mapSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\157123+155150.png")), (Func<IView>)(() => (IView)new SettingsView(Settings.MapSettings, -1)), Strings.Window_MapSettingsTab, (int?)null);
-			_scriptSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156701.png")), (Func<IView>)(() => (IView)new SettingsView(Settings.ScriptSettings, -1)), "Script Options", (int?)null);
+			_scriptSettingsTab = new Tab(AsyncTexture2D.FromAssetId(156701), (Func<IView>)(() => (IView)new SettingsView(Settings.ScriptSettings, -1)), "Script Options", (int?)null);
 			_keybindSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156734+155150.png")), (Func<IView>)(() => (IView)new SettingsView(Settings.KeyBindSettings, -1)), Strings.Window_KeyBindSettingsTab, (int?)null);
-			_markerRepoTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156909.png")), (Func<IView>)(() => (IView)(object)new PackRepoView(this)), Strings.Window_DownloadMarkerPacks, (int?)null);
+			_markerRepoTab = new Tab(AsyncTexture2D.FromAssetId(156909), (Func<IView>)(() => (IView)(object)new PackRepoView(this)), Strings.Window_DownloadMarkerPacks, (int?)null);
 			_settingsWindow.get_Tabs().Add(_packSettingsTab);
 			_settingsWindow.get_Tabs().Add(_mapSettingsTab);
 			_settingsWindow.get_Tabs().Add(_scriptSettingsTab);

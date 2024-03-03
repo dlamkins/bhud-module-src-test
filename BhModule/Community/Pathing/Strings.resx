@@ -31,7 +31,7 @@
   <data name="Setting_MapShowMarkersOnCompass"><value>Show Markers on the Minimap</value></data>
   <data name="Setting_MapShowTrailsOnFullscreen"><value>Show Trails on Fullscreen Map</value></data>
   <data name="Setting_PackMaxOpacityOverride"><value>Max Opacity Override</value></data>
-  <data name="General_UiName"><value>Markers &amp; Trails</value></data>
+  <data name="General_UiName"><value>Pathing</value></data>
   <data name="Repo_Download"><value>Download</value></data>
   <data name="Setting_PackMarkerConsentToClipboardDescription"><value>Some markers support copying text to your clipboard (such as waypoints or build templates).
 

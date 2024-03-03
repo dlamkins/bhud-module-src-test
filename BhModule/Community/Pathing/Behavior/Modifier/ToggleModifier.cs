@@ -10,6 +10,8 @@ namespace BhModule.Community.Pathing.Behavior.Modifier
 	{
 		public const string PRIMARY_ATTR_NAME = "toggle";
 
+		public const string ALT_ATTR_NAME = "togglecategory";
+
 		private readonly IPackState _packState;
 
 		public PathingCategory Category { get; set; }
@@ -23,11 +25,20 @@ namespace BhModule.Community.Pathing.Behavior.Modifier
 
 		public static IBehavior BuildFromAttributes(AttributeCollection attributes, StandardMarker marker, IPackState packState)
 		{
-			if (!attributes.TryGetAttribute("toggle", out var attribute))
+			IAttribute toggleAttr = null;
+			if (attributes.TryGetAttribute("toggle", out var attribute))
 			{
-				return null;
+				toggleAttr = attribute;
 			}
-			return new ToggleModifier(packState.RootCategory.GetOrAddCategoryFromNamespace(attribute.GetValueAsString()), marker, packState);
+			if (attributes.TryGetAttribute("togglecategory", out var altAttribute))
+			{
+				toggleAttr = altAttribute;
+			}
+			if (toggleAttr != null)
+			{
+				return new ToggleModifier(packState.RootCategory.GetOrAddCategoryFromNamespace(toggleAttr.GetValueAsString()), marker, packState);
+			}
+			return null;
 		}
 
 		public void Interact(bool autoTriggered)

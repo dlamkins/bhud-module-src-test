@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using BhModule.Community.Pathing.Content;
 using BhModule.Community.Pathing.Entity;
@@ -138,12 +137,20 @@ namespace BhModule.Community.Pathing
 		private static async Task PreloadTextures(IPointOfInterest pointOfInterest)
 		{
 			PointOfInterestType type = pointOfInterest.Type;
-			var (texture, shouldSample) = type switch
+			(string, bool) tuple = default((string, bool));
+			switch (type)
 			{
-				PointOfInterestType.Marker => (pointOfInterest.GetAggregatedAttributeValue("iconfile"), false), 
-				PointOfInterestType.Trail => (pointOfInterest.GetAggregatedAttributeValue("texture"), true), 
-				_ => throw new SwitchExpressionException((object)type), 
-			};
+			case PointOfInterestType.Marker:
+				tuple = (pointOfInterest.GetAggregatedAttributeValue("iconfile"), false);
+				break;
+			case PointOfInterestType.Trail:
+				tuple = (pointOfInterest.GetAggregatedAttributeValue("texture"), true);
+				break;
+			default:
+				_003CPrivateImplementationDetails_003E.ThrowSwitchExpressionException(type);
+				break;
+			}
+			var (texture, shouldSample) = tuple;
 			if (texture != null)
 			{
 				await TextureResourceManager.GetTextureResourceManager(pointOfInterest.ResourceManager).PreloadTexture(texture, shouldSample);

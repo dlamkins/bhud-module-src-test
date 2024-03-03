@@ -161,7 +161,7 @@ namespace BhModule.Community.Pathing.Scripting.Lib.Std
 					["sec"] = dt.Second,
 					["wday"] = (int)dt.DayOfWeek,
 					["yday"] = dt.DayOfYear,
-					["isdst"] = ((dt.Kind == DateTimeKind.Local) ? true : false)
+					["isdst"] = dt.Kind == DateTimeKind.Local
 				};
 			}
 			return ToStrFTime(dt, format);

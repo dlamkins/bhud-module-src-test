@@ -34,5 +34,16 @@ namespace BhModule.Community.Pathing.Scripting.Lib
 			});
 			return true;
 		}
+
+		public string ShowInfo(string message)
+		{
+			_global.ScriptEngine.Module.PackInitiator.PackState.UiStates.AddInfoString(message);
+			return message;
+		}
+
+		public void HideInfo(string key)
+		{
+			_global.ScriptEngine.Module.PackInitiator.PackState.UiStates.RemoveInfoString(key);
+		}
 	}
 }

@@ -79,6 +79,8 @@ namespace BhModule.Community.Pathing.Entity
 
 		private const string ATTR_SCALEONMAPWITHZOOM = "scaleonmapwithzoom";
 
+		private const string ATTR_OCCLUDE = "occlude";
+
 		private const string ATTR_MINIMAPVISIBILITY = "minimapvisibility";
 
 		private const string ATTR_MAPVISIBILITY = "mapvisibility";
@@ -177,6 +179,8 @@ namespace BhModule.Community.Pathing.Entity
 		public float MapDisplaySize { get; set; }
 
 		public bool ScaleOnMapWithZoom { get; set; }
+
+		public bool Occlude { get; set; }
 
 		public bool MiniMapVisibility { get; set; }
 
@@ -367,9 +371,9 @@ namespace BhModule.Community.Pathing.Entity
 			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0028: Expected O, but got Unknown
 			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
 			GraphicsDeviceContext gdctx = GameService.Graphics.LendGraphicsDeviceContext();
 			try
 			{
@@ -470,8 +474,8 @@ namespace BhModule.Community.Pathing.Entity
 			//IL_0381: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0392: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0393: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d8: Unknown result type (might be due to invalid IL or missing references)
 			if (IsFiltered(EntityRenderTarget.World))
 			{
 				return;
@@ -512,6 +516,11 @@ namespace BhModule.Community.Pathing.Entity
 			}
 			_packState.SharedMarkerEffect.SetEntityState(modelMatrix, AsyncTexture2D.op_Implicit(Texture), GetOpacity(), minRender, maxRender, CanFade && _packState.UserConfiguration.PackFadeMarkersBetweenCharacterAndCamera.get_Value() && !base.BehaviorFiltered, Tint, base.DebugRender);
 			_modelMatrix = modelMatrix;
+			BlendState prevBlendState = graphicsDevice.get_BlendState();
+			if (Occlude)
+			{
+				graphicsDevice.set_BlendState(BlendState.Opaque);
+			}
 			graphicsDevice.SetVertexBuffer((VertexBuffer)(object)_sharedVertexBuffer);
 			Enumerator enumerator = ((Effect)_packState.SharedMarkerEffect).get_CurrentTechnique().get_Passes().GetEnumerator();
 			try
@@ -526,6 +535,7 @@ namespace BhModule.Community.Pathing.Entity
 			{
 				((IDisposable)(Enumerator)(ref enumerator)).Dispose();
 			}
+			graphicsDevice.set_BlendState(prevBlendState);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -658,6 +668,10 @@ namespace BhModule.Community.Pathing.Entity
 					}
 				});
 			}
+			else if (Occlude)
+			{
+				Texture = AsyncTexture2D.op_Implicit(Textures.get_TransparentPixel());
+			}
 			else
 			{
 				Texture = _packState.UserResourceStates.Textures.DefaultMarkerTexture;
@@ -700,6 +714,15 @@ namespace BhModule.Community.Pathing.Entity
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private void Populate_Occlude(TmfLib.Prototype.AttributeCollection collection, IPackResourceManager resourceManager)
+		{
+			if (collection.TryPopAttribute("occlude", out var attribute))
+			{
+				Occlude = attribute.GetValueAsBool();
+			}
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private void Populate_MapVisibility(TmfLib.Prototype.AttributeCollection collection, IPackResourceManager resourceManager)
 		{
 			MiniMapVisibility = _packState.UserResourceStates.Population.MarkerPopulationDefaults.MiniMapVisibility;
@@ -737,7 +760,7 @@ namespace BhModule.Community.Pathing.Entity
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private void Populate_Rotation(TmfLib.Prototype.AttributeCollection collection, IPackResourceManager resourceManager)
 		{
-			//IL_011f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
 			float? rotationX = null;
 			float? rotationY = null;
 			float? rotationZ = null;
@@ -1039,6 +1062,7 @@ namespace BhModule.Community.Pathing.Entity
 			Populate_Triggers(collection, resourceManager);
 			Populate_MinMaxSize(collection, resourceManager);
 			Populate_IconSize(collection, resourceManager);
+			Populate_Occlude(collection, resourceManager);
 			Populate_IconFile(collection, resourceManager);
 			Populate_Title(collection, resourceManager);
 			Populate_Tint(collection, resourceManager);

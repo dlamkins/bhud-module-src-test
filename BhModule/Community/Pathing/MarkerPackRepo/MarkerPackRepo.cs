@@ -40,7 +40,7 @@ namespace BhModule.Community.Pathing.MarkerPackRepo
 		{
 			Thread thread = new Thread((ThreadStart)async delegate
 			{
-				await Task.Delay(3000);
+				await Task.Delay(5000);
 				if ((int)((Module)_module).get_RunState() != 3 && (int)((Module)_module).get_RunState() != 0)
 				{
 					await Load(_module.GetModuleProgressHandler());
@@ -90,7 +90,7 @@ namespace BhModule.Community.Pathing.MarkerPackRepo
 					pack.CurrentDownloadDate = File.GetLastWriteTimeUtc(associatedLocalPack);
 					if (pack.AutoUpdate.get_Value() && pack.CurrentDownloadDate != default(DateTime) && pack.LastUpdate > pack.CurrentDownloadDate)
 					{
-						PackHandlingUtil.DownloadPack(_module, pack, OnUpdateComplete);
+						PackHandlingUtil.DownloadPack(_module, pack, OnUpdateComplete, skipReload: true);
 					}
 				}
 			}

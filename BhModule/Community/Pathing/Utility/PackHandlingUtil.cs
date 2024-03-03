@@ -18,11 +18,11 @@ namespace BhModule.Community.Pathing.Utility
 
 		private const string DOWNLOAD_UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36";
 
-		public static void DownloadPack(PathingModule module, MarkerPackPkg markerPackPkg, Action<MarkerPackPkg, bool> funcOnComplete)
+		public static void DownloadPack(PathingModule module, MarkerPackPkg markerPackPkg, Action<MarkerPackPkg, bool> funcOnComplete, bool skipReload = false)
 		{
 			Thread thread = new Thread((ThreadStart)async delegate
 			{
-				await BeginPackDownload(module, markerPackPkg, module.GetModuleProgressHandler(), funcOnComplete);
+				await BeginPackDownload(module, markerPackPkg, module.GetModuleProgressHandler(), funcOnComplete, skipReload);
 			});
 			thread.IsBackground = true;
 			thread.Start();
@@ -48,6 +48,8 @@ namespace BhModule.Community.Pathing.Utility
 				{
 					Logger.Warn("Attempted to delete pack '{packPath}' that doesn't exist.", new object[1] { mpPath });
 				}
+				module.PackInitiator.UnloadPackByName(Path.GetFileNameWithoutExtension(markerPackPkg.FileName));
+				module.PackInitiator.ReloadPacks();
 				markerPackPkg.CurrentDownloadDate = default(DateTime);
 			}
 			catch (Exception ex)
@@ -86,7 +88,7 @@ namespace BhModule.Community.Pathing.Utility
 			return Path.Combine(dir, file);
 		}
 
-		private static async Task BeginPackDownload(PathingModule module, MarkerPackPkg markerPackPkg, IProgress<string> progress, Action<MarkerPackPkg, bool> funcOnComplete)
+		private static async Task BeginPackDownload(PathingModule module, MarkerPackPkg markerPackPkg, IProgress<string> progress, Action<MarkerPackPkg, bool> funcOnComplete, bool skipReload = false)
 		{
 			Logger.Info("Downloading pack '" + markerPackPkg.Name + "'...");
 			progress.Report("Downloading pack '" + markerPackPkg.Name + "'...");
@@ -167,6 +169,10 @@ namespace BhModule.Community.Pathing.Utility
 				}
 				await module.PackInitiator.LoadPack(newPack);
 				newPack.ReleaseLocks();
+				if (!skipReload)
+				{
+					module.PackInitiator.ReloadPacks();
+				}
 			}
 			catch (InvalidDataException ex2)
 			{

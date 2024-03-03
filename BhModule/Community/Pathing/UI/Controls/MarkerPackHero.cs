@@ -42,6 +42,8 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		private bool _isUpToDate;
 
+		public MarkerPackPkg MarkerPackPkg => _markerPackPkg;
+
 		static MarkerPackHero()
 		{
 			_textureHeroBackground = PathingModule.Instance.ContentsManager.GetTexture("png\\controls\\155209.png");

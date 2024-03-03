@@ -14,11 +14,7 @@ namespace BhModule.Community.Pathing.Utility.ColorThief
 			int b = bCount * bVolume;
 			if (a >= b)
 			{
-				if (a <= b)
-				{
-					return 0;
-				}
-				return 1;
+				return (a > b) ? 1 : 0;
 			}
 			return -1;
 		}
