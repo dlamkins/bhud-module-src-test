@@ -42,6 +42,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			public Action<Estreya.BlishHUD.EventTable.Models.Event> Action { get; set; }
 		}
 
+		public const int BEST_WIDTH = 1060;
+
 		private static readonly Point MAIN_PADDING = new Point(20, 20);
 
 		private static readonly Logger Logger = Logger.GetLogger<ManageEventsView>();
@@ -294,8 +296,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					EventDetailsButton eventDetailsButton2 = control as EventDetailsButton;
 					if (eventDetailsButton2 != null && ((Control)eventDetailsButton2).get_Visible())
 					{
-						Control obj3 = ((IEnumerable<Control>)((Container)eventDetailsButton2).get_Children()).Last();
-						GlowButton val15 = (GlowButton)(object)((obj3 is GlowButton) ? obj3 : null);
+						Control obj5 = ((IEnumerable<Control>)((Container)eventDetailsButton2).get_Children()).Last();
+						GlowButton val15 = (GlowButton)(object)((obj5 is GlowButton) ? obj5 : null);
 						if (val15 != null)
 						{
 							val15.set_Checked(true);
@@ -316,8 +318,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					EventDetailsButton eventDetailsButton = control as EventDetailsButton;
 					if (eventDetailsButton != null && ((Control)eventDetailsButton).get_Visible())
 					{
-						Control obj2 = ((IEnumerable<Control>)((Container)eventDetailsButton).get_Children()).Last();
-						GlowButton val14 = (GlowButton)(object)((obj2 is GlowButton) ? obj2 : null);
+						Control obj4 = ((IEnumerable<Control>)((Container)eventDetailsButton).get_Children()).Last();
+						GlowButton val14 = (GlowButton)(object)((obj4 is GlowButton) ? obj4 : null);
 						if (val14 != null)
 						{
 							val14.set_Checked(false);
@@ -457,6 +459,10 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					});
 				}
 			}
+			FlowPanel obj2 = eventPanel;
+			((Control)obj2).set_Height(((Control)obj2).get_Height() - 1);
+			FlowPanel obj3 = eventPanel;
+			((Control)obj3).set_Height(((Control)obj3).get_Height() + 1);
 		}
 
 		protected override Task<bool> InternalLoad(IProgress<string> progress)

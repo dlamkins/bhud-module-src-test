@@ -72,7 +72,7 @@ namespace Estreya.BlishHUD.EventTable
 
 		protected override string UrlModuleName => "event-table";
 
-		protected override bool NotifyIfBackendDown => true;
+		protected override bool NeedsBackend => true;
 
 		protected override bool EnableMetrics => true;
 
@@ -116,6 +116,12 @@ namespace Estreya.BlishHUD.EventTable
 			_eventCategories = new List<EventCategory>();
 			_lastEventUpdate = new AsyncRef<double>(0.0);
 			_lastCheckDrawerSettings = 0.0;
+			base.BackendConnectionRestored += EventTableModule_BackendConnectionRestored;
+		}
+
+		private async Task EventTableModule_BackendConnectionRestored(object sender)
+		{
+			await ReloadEvents();
 		}
 
 		protected override async Task LoadAsync()
@@ -204,10 +210,6 @@ namespace Estreya.BlishHUD.EventTable
 
 		private async Task LoadEvents()
 		{
-			if (base.ModuleState == ModuleState.Error)
-			{
-				return;
-			}
 			base.Logger.Info("Load events...");
 			using (await _eventCategoryLock.LockAsync())
 			{
@@ -216,6 +218,12 @@ namespace Estreya.BlishHUD.EventTable
 				{
 					_eventCategories?.SelectMany((EventCategory ec) => ec.Events).ToList().ForEach(RemoveEventHooks);
 					_eventCategories?.Clear();
+					if (HasErrorState(Estreya.BlishHUD.Shared.Modules.ModuleErrorStateGroup.BACKEND_UNAVAILABLE))
+					{
+						base.Logger.Warn($"Abort event loading due to error state \"{Estreya.BlishHUD.Shared.Modules.ModuleErrorStateGroup.BACKEND_UNAVAILABLE}\".");
+						SetAreaEvents();
+						return;
+					}
 					IFlurlRequest request = GetFlurlClient().Request(base.MODULE_API_URL, "events");
 					if (!string.IsNullOrWhiteSpace(base.BlishHUDAPIService.AccessToken))
 					{
@@ -273,15 +281,18 @@ namespace Estreya.BlishHUD.EventTable
 					_lastCheckDrawerSettings = _checkDrawerSettingInterval.TotalMilliseconds;
 					SetAreaEvents();
 					base.Logger.Debug("Updated events in all areas.");
+					ReportErrorState(Estreya.BlishHUD.EventTable.Models.ModuleErrorStateGroup.LOADING_EVENTS, null);
 				}
 				catch (FlurlHttpException ex2)
 				{
 					string message = await ex2.GetResponseStringAsync();
 					base.Logger.Warn((Exception)ex2, "Failed loading events: " + message);
+					ReportErrorState(Estreya.BlishHUD.EventTable.Models.ModuleErrorStateGroup.LOADING_EVENTS, "Failed loading events: " + message);
 				}
 				catch (Exception ex)
 				{
 					base.Logger.Error(ex, "Failed loading events.");
+					ReportErrorState(Estreya.BlishHUD.EventTable.Models.ModuleErrorStateGroup.LOADING_EVENTS, "Failed loading events.");
 				}
 			}
 		}
@@ -578,13 +589,27 @@ namespace Estreya.BlishHUD.EventTable
 				base.ModuleSettings.EventAreaNames.set_Value(new List<string>(base.ModuleSettings.EventAreaNames.get_Value()) { configuration.Name });
 			}
 			base.ModuleSettings.UpdateDrawerLocalization(configuration, base.TranslationService);
-			EventArea eventArea = new EventArea(configuration, base.IconService, base.TranslationService, EventStateService, base.WorldbossService, base.MapchestService, base.PointOfInterestService, MapUtil, GetFlurlClient(), base.MODULE_API_URL, () => NowUTC, () => ((Module)this).get_Version(), () => base.BlishHUDAPIService.AccessToken, () => base.ModuleSettings.EventAreaNames.get_Value().ToArray().ToList(), base.ContentsManager);
+			EventArea eventArea = new EventArea(configuration, base.IconService, base.TranslationService, EventStateService, base.WorldbossService, base.MapchestService, base.PointOfInterestService, MapUtil, GetFlurlClient(), base.MODULE_API_URL, () => NowUTC, () => ((Module)this).get_Version(), () => base.BlishHUDAPIService.AccessToken, () => base.ModuleSettings.EventAreaNames.get_Value().ToArray().ToList(), () => base.ModuleSettings.ReminderDisabledForEvents.get_Value().ToArray().ToList(), base.ContentsManager);
 			((Control)eventArea).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			EventArea area = eventArea;
 			area.CopyToAreaClicked += new EventHandler<(string, string)>(EventArea_CopyToAreaClicked);
 			area.MoveToAreaClicked += new EventHandler<(string, string)>(EventArea_MoveToAreaClicked);
+			area.EnableReminderClicked += EventArea_EnableReminderClicked;
+			area.DisableReminderClicked += EventArea_DisableReminderClicked;
 			((Control)area).add_Disposed((EventHandler<EventArgs>)EventArea_Disposed);
 			_areas.AddOrUpdate(configuration.Name, area, (string name, EventArea prev) => area);
+		}
+
+		private void EventArea_DisableReminderClicked(object sender, string e)
+		{
+			base.ModuleSettings.ReminderDisabledForEvents.set_Value(new List<string>(base.ModuleSettings.ReminderDisabledForEvents.get_Value()) { e });
+		}
+
+		private void EventArea_EnableReminderClicked(object sender, string e)
+		{
+			base.ModuleSettings.ReminderDisabledForEvents.set_Value(new List<string>(from k in base.ModuleSettings.ReminderDisabledForEvents.get_Value()
+				where k != e
+				select k));
 		}
 
 		private void EventArea_MoveToAreaClicked(object sender, (string EventSettingKey, string DestinationArea) e)
@@ -605,6 +630,8 @@ namespace Estreya.BlishHUD.EventTable
 			EventArea obj = sender as EventArea;
 			obj.CopyToAreaClicked -= new EventHandler<(string, string)>(EventArea_CopyToAreaClicked);
 			obj.MoveToAreaClicked -= new EventHandler<(string, string)>(EventArea_MoveToAreaClicked);
+			obj.EnableReminderClicked -= EventArea_EnableReminderClicked;
+			obj.DisableReminderClicked -= EventArea_DisableReminderClicked;
 			((Control)obj).remove_Disposed((EventHandler<EventArgs>)EventArea_Disposed);
 		}
 

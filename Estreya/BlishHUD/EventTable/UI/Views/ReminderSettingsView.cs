@@ -81,7 +81,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				if (_manageEventsWindow == null)
 				{
 					_manageEventsWindow = WindowUtil.CreateStandardWindow(_moduleSettings, "Manage Events", ((object)this).GetType(), Guid.Parse("37e3f99c-f413-469c-b0f5-e2e6e31e4789"), base.IconService);
-					((Control)_manageEventsWindow).set_Width(1040);
+					((Control)_manageEventsWindow).set_Width(1060);
 				}
 				if (_manageEventsWindow.CurrentView != null)
 				{

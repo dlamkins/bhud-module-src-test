@@ -52,6 +52,8 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private readonly Func<List<string>> _getAreaNames;
 
+		private readonly Func<List<string>> _getDisabledReminderKeys;
+
 		private ContentsManager _contentsManager;
 
 		private readonly Func<DateTime> _getNowAction;
@@ -180,7 +182,11 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		public event EventHandler<(string EventSettingKey, string DestinationArea)> CopyToAreaClicked;
 
-		public EventArea(EventAreaConfiguration configuration, IconService iconService, TranslationService translationService, EventStateService eventService, WorldbossService worldbossService, MapchestService mapchestService, PointOfInterestService pointOfInterestService, MapUtil mapUtil, IFlurlClient flurlClient, string apiRootUrl, Func<DateTime> getNowAction, Func<Version> getVersion, Func<string> getAccessToken, Func<List<string>> getAreaNames, ContentsManager contentsManager)
+		public event EventHandler<string> EnableReminderClicked;
+
+		public event EventHandler<string> DisableReminderClicked;
+
+		public EventArea(EventAreaConfiguration configuration, IconService iconService, TranslationService translationService, EventStateService eventService, WorldbossService worldbossService, MapchestService mapchestService, PointOfInterestService pointOfInterestService, MapUtil mapUtil, IFlurlClient flurlClient, string apiRootUrl, Func<DateTime> getNowAction, Func<Version> getVersion, Func<string> getAccessToken, Func<List<string>> getAreaNames, Func<List<string>> getDisabledReminderKeys, ContentsManager contentsManager)
 		{
 			Configuration = configuration;
 			Configuration.EnabledKeybinding.get_Value().add_Activated((EventHandler<EventArgs>)EnabledKeybinding_Activated);
@@ -213,6 +219,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			_getVersion = getVersion;
 			_getAccessToken = getAccessToken;
 			_getAreaNames = getAreaNames;
+			_getDisabledReminderKeys = getDisabledReminderKeys;
 			_contentsManager = contentsManager;
 			_iconService = iconService;
 			_translationService = translationService;
@@ -806,7 +813,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				if (!valueOrDefault)
 				{
 					((Control)this).set_Tooltip((!Configuration.ShowTooltips.get_Value()) ? null : _activeEvent?.BuildTooltip());
-					((Control)this).set_Menu(_activeEvent?.BuildContextMenu(_getAreaNames, Configuration.Name));
+					((Control)this).set_Menu(_activeEvent?.BuildContextMenu(_getAreaNames, Configuration.Name, _getDisabledReminderKeys));
 				}
 				_lastActiveEvent = _activeEvent;
 			}
@@ -1181,6 +1188,8 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			ev.DisableClicked += Ev_DisableClicked;
 			ev.CopyToAreaClicked += Ev_CopyToAreaClicked;
 			ev.MoveToAreaClicked += Ev_MoveToAreaClicked;
+			ev.EnableReminderClicked += Ev_EnableReminderClicked;
+			ev.DisableReminderClicked += Ev_DisableReminderClicked;
 		}
 
 		private void RemoveEventHooks(Event ev)
@@ -1190,6 +1199,20 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			ev.DisableClicked -= Ev_DisableClicked;
 			ev.CopyToAreaClicked -= Ev_CopyToAreaClicked;
 			ev.MoveToAreaClicked -= Ev_MoveToAreaClicked;
+			ev.EnableReminderClicked -= Ev_EnableReminderClicked;
+			ev.DisableReminderClicked -= Ev_DisableReminderClicked;
+		}
+
+		private void Ev_DisableReminderClicked(object sender, EventArgs e)
+		{
+			Event ev = sender as Event;
+			this.DisableReminderClicked?.Invoke(this, ev.Model.SettingKey);
+		}
+
+		private void Ev_EnableReminderClicked(object sender, EventArgs e)
+		{
+			Event ev = sender as Event;
+			this.EnableReminderClicked?.Invoke(this, ev.Model.SettingKey);
 		}
 
 		private void Ev_MoveToAreaClicked(object sender, string e)
