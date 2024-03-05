@@ -173,17 +173,17 @@ namespace Charr.Timers_BlishHUD.Controls.BigWigs
 			float remainingTime = MaxFill - CurrentFill;
 			string timerFormat = "0";
 			Color timerColor = TextColor;
-			if (remainingTime > 0f)
+			if (remainingTime != -1f && !(remainingTime > 5f))
 			{
-				if (!(remainingTime > 5f))
+				if (!(remainingTime > 0f))
 				{
-					timerFormat = "0.0";
-					timerColor = TimerTextColor;
+					if (remainingTime <= 0f)
+					{
+					}
+					goto IL_01ac;
 				}
-			}
-			else if (!(remainingTime <= 0f) || remainingTime != -1f)
-			{
-				goto IL_01ac;
+				timerFormat = "0.0";
+				timerColor = TimerTextColor;
 			}
 			spriteBatch.DrawStringOnCtrl(this, remainingTime.ToString(timerFormat), GameService.Content.DefaultFont18, _timerBounds.OffsetBy(1, 1), Color.get_Black(), wrap: false, HorizontalAlignment.Center);
 			spriteBatch.DrawStringOnCtrl(this, remainingTime.ToString(timerFormat), GameService.Content.DefaultFont18, _timerBounds, timerColor, wrap: false, HorizontalAlignment.Center);

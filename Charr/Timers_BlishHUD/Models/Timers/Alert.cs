@@ -9,17 +9,10 @@ using Charr.Timers_BlishHUD.Pathing.Content;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 
-namespace Charr.Timers_BlishHUD.Models
+namespace Charr.Timers_BlishHUD.Models.Timers
 {
-	public class Alert : IDisposable
+	public class Alert : Timer, IDisposable
 	{
-		private bool _activated;
-
-		private bool _showAlert = true;
-
-		[JsonProperty("uid")]
-		public string UID { get; set; }
-
 		[JsonProperty("warningDuration")]
 		public float WarningDuration { get; set; } = 15f;
 
@@ -47,33 +40,11 @@ namespace Charr.Timers_BlishHUD.Models
 		[JsonProperty("fillColor")]
 		public List<float> FillColor { get; set; }
 
-		[JsonProperty("timestamps")]
-		public List<float> Timestamps { get; set; }
-
-		public bool Activated
-		{
-			get
-			{
-				return _activated;
-			}
-			set
-			{
-				if (value)
-				{
-					Activate();
-				}
-				else
-				{
-					Deactivate();
-				}
-			}
-		}
-
 		public bool ShowAlert
 		{
 			get
 			{
-				return _showAlert;
+				return _showTimer;
 			}
 			set
 			{
@@ -84,7 +55,7 @@ namespace Charr.Timers_BlishHUD.Models
 						activePanel.Value.ShouldShow = value;
 					}
 				}
-				_showAlert = value;
+				_showTimer = value;
 			}
 		}
 
@@ -100,6 +71,18 @@ namespace Charr.Timers_BlishHUD.Models
 		public AsyncTexture2D Icon { get; set; }
 
 		public Dictionary<float, IAlertPanel> activePanels { get; set; }
+
+		public Alert()
+		{
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			base.Name = "Unnamed Alert";
+			_showTimer = true;
+		}
 
 		public string Initialize(PathableResourceManager resourceManager)
 		{
@@ -117,7 +100,7 @@ namespace Charr.Timers_BlishHUD.Models
 			{
 				AlertDuration = 0f;
 			}
-			if (Timestamps == null || Timestamps.Count == 0)
+			if (base.Timestamps == null || base.Timestamps.Count == 0)
 			{
 				return WarningText + "/" + AlertText + " timestamps property invalid";
 			}
@@ -133,25 +116,25 @@ namespace Charr.Timers_BlishHUD.Models
 			return null;
 		}
 
-		public void Activate()
+		public override void Activate()
 		{
-			if (!Activated && activePanels != null)
+			if (!base.Activated && activePanels != null)
 			{
 				_activated = true;
 			}
 		}
 
-		public void Stop()
+		public override void Stop()
 		{
-			if (Activated)
+			if (base.Activated)
 			{
 				Dispose();
 			}
 		}
 
-		public void Deactivate()
+		public override void Deactivate()
 		{
-			if (Activated)
+			if (base.Activated)
 			{
 				Dispose();
 				_activated = false;
@@ -191,15 +174,15 @@ namespace Charr.Timers_BlishHUD.Models
 			return alertPanel2;
 		}
 
-		public void Update(float elapsedTime)
+		public override void Update(float elapsedTime)
 		{
 			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_018f: Unknown result type (might be due to invalid IL or missing references)
-			if (!Activated)
+			if (!base.Activated)
 			{
 				return;
 			}
-			foreach (float time in Timestamps)
+			foreach (float time in base.Timestamps)
 			{
 				if (!activePanels.TryGetValue(time, out var activePanel))
 				{

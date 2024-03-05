@@ -319,7 +319,7 @@ namespace Charr.Timers_BlishHUD.Models
 					State = EncounterStates.Running;
 				}
 			}
-			else if (Phases[_currentPhase].FinishTrigger != null && Phases[_currentPhase].FinishTrigger.Triggered())
+			else if (State != EncounterStates.Suspended && Phases[_currentPhase].FinishTrigger != null && Phases[_currentPhase].FinishTrigger.Triggered())
 			{
 				Phases[_currentPhase].Stop();
 				if (_currentPhase + 1 < Phases.Count)

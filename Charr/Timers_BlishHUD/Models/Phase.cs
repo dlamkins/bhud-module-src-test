@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using Blish_HUD;
+using Charr.Timers_BlishHUD.Models.Actions;
+using Charr.Timers_BlishHUD.Models.Timers;
 using Charr.Timers_BlishHUD.Models.Triggers;
 using Charr.Timers_BlishHUD.Pathing.Content;
-using Charr.Timers_BlishHUD.State;
 using Newtonsoft.Json;
 
 namespace Charr.Timers_BlishHUD.Models
@@ -34,7 +35,8 @@ namespace Charr.Timers_BlishHUD.Models
 		public Trigger FinishTrigger { get; set; }
 
 		[JsonProperty("alerts")]
-		public List<Alert> Alerts { get; set; }
+		public List<Alert> Alerts { get; set; } = new List<Alert>();
+
 
 		[JsonProperty("directions")]
 		public List<Direction> Directions { get; set; } = new List<Direction>();
@@ -46,6 +48,10 @@ namespace Charr.Timers_BlishHUD.Models
 
 		[JsonProperty("sounds")]
 		public List<Sound> Sounds { get; set; } = new List<Sound>();
+
+
+		[JsonProperty("actions")]
+		public List<SkipAction> Actions { get; set; } = new List<SkipAction>();
 
 
 		public bool Activated
@@ -134,6 +140,17 @@ namespace Charr.Timers_BlishHUD.Models
 				if (message != null)
 				{
 					return message;
+				}
+			}
+			if (Actions != null)
+			{
+				foreach (SkipAction action in Actions)
+				{
+					message = action.Initialize();
+					if (message != null)
+					{
+						return message;
+					}
 				}
 			}
 			if (Alerts != null)
@@ -294,6 +311,10 @@ namespace Charr.Timers_BlishHUD.Models
 				StartTrigger?.Reset();
 				StartTrigger?.Disable();
 				FinishTrigger?.Enable();
+				Actions?.ForEach(delegate(SkipAction ac)
+				{
+					ac.Start();
+				});
 				Active = true;
 			}
 		}
@@ -308,6 +329,11 @@ namespace Charr.Timers_BlishHUD.Models
 			StartTrigger?.Disable();
 			FinishTrigger?.Reset();
 			FinishTrigger?.Disable();
+			Actions?.ForEach(delegate(SkipAction ac)
+			{
+				ac.Stop();
+				ac.Reset();
+			});
 			Alerts?.ForEach(delegate(Alert al)
 			{
 				if (!string.IsNullOrEmpty(al.UID) && TimersModule.ModuleInstance._activeAlertIds.TryGetValue(al.UID, out var value3) && value3 == al)
@@ -341,31 +367,69 @@ namespace Charr.Timers_BlishHUD.Models
 
 		public void Update(float elapsedTime)
 		{
+			Dictionary<string, float> skippedTime = new Dictionary<string, float>();
+			Dictionary<string, float> elapsedTimes = new Dictionary<string, float> { ["default"] = elapsedTime };
+			if (Actions != null)
+			{
+				foreach (SkipAction action in Actions)
+				{
+					if (action.Type != "skipTime")
+					{
+						continue;
+					}
+					if (action.ActionTrigger != null && action.ActionTrigger.Triggered())
+					{
+						action.Update();
+					}
+					foreach (string set in action.TimerSets)
+					{
+						if (skippedTime.ContainsKey(set))
+						{
+							skippedTime[set] += action.SkippedTime;
+						}
+						else
+						{
+							skippedTime[set] = action.SkippedTime;
+						}
+					}
+				}
+				foreach (KeyValuePair<string, float> timeSkip in skippedTime)
+				{
+					elapsedTimes[timeSkip.Key] = elapsedTime + timeSkip.Value;
+				}
+			}
 			Alerts?.ForEach(delegate(Alert al)
 			{
-				al.Update(elapsedTime);
+				al.Update(elapsedTimes);
 			});
 			Directions?.ForEach(delegate(Direction dir)
 			{
-				dir.Update(elapsedTime);
+				dir.Update(elapsedTimes);
 			});
 			Markers?.ForEach(delegate(Marker mark)
 			{
-				mark.Update(elapsedTime);
+				mark.Update(elapsedTimes);
 			});
 			Sounds?.ForEach(delegate(Sound voice)
 			{
-				voice.Update(elapsedTime);
+				voice.Update(elapsedTimes);
 			});
+			skippedTime.Clear();
+			elapsedTimes.Clear();
 		}
 
 		public void Dispose()
 		{
 			Deactivate();
+			Actions?.ForEach(delegate(SkipAction ac)
+			{
+				ac?.Dispose();
+			});
 			Alerts?.ForEach(delegate(Alert al)
 			{
 				al?.Dispose();
 			});
+			Actions?.Clear();
 			Directions?.Clear();
 			Markers?.Clear();
 			Alerts?.Clear();

@@ -2,7 +2,7 @@ using System;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 
-namespace Charr.Timers_BlishHUD.State
+namespace Charr.Timers_BlishHUD.Models
 {
 	[JsonObject(/*Could not decode attribute arguments.*/)]
 	public class Update

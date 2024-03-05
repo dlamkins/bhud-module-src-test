@@ -5,23 +5,12 @@ using Charr.Timers_BlishHUD.Pathing.Entities;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 
-namespace Charr.Timers_BlishHUD.Models
+namespace Charr.Timers_BlishHUD.Models.Timers
 {
 	[JsonObject(/*Could not decode attribute arguments.*/)]
-	public class Direction
+	public class Direction : Timer
 	{
 		private TrailPathable _trail;
-
-		private bool _activated;
-
-		private bool _showDirection = true;
-
-		[JsonProperty("uid")]
-		public string UID { get; set; }
-
-		[JsonProperty("name")]
-		public string Name { get; set; } = "Unnamed Direction";
-
 
 		[JsonProperty("position")]
 		public List<float> Position { get; set; }
@@ -50,33 +39,11 @@ namespace Charr.Timers_BlishHUD.Models
 		[JsonProperty("texture")]
 		public string TextureString { get; set; }
 
-		[JsonProperty("timestamps")]
-		public List<float> Timestamps { get; set; }
-
-		public bool Activated
-		{
-			get
-			{
-				return _activated;
-			}
-			set
-			{
-				if (value)
-				{
-					Activate();
-				}
-				else
-				{
-					Deactivate();
-				}
-			}
-		}
-
 		public bool ShowDirection
 		{
 			get
 			{
-				return _showDirection;
+				return _showTimer;
 			}
 			set
 			{
@@ -84,8 +51,14 @@ namespace Charr.Timers_BlishHUD.Models
 				{
 					_trail.ShouldShow = value;
 				}
-				_showDirection = value;
+				_showTimer = value;
 			}
+		}
+
+		public Direction()
+		{
+			base.Name = "Unnamed Direction";
+			_showTimer = true;
 		}
 
 		public string Initialize(PathableResourceManager resourceManager)
@@ -94,15 +67,15 @@ namespace Charr.Timers_BlishHUD.Models
 			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
 			if (Position == null || Position.Count != 3)
 			{
-				return Name + " invalid position property";
+				return base.Name + " invalid position property";
 			}
-			if (Timestamps == null || Timestamps.Count == 0)
+			if (base.Timestamps == null || base.Timestamps.Count == 0)
 			{
-				return Name + " invalid timestamps property";
+				return base.Name + " invalid timestamps property";
 			}
 			if (string.IsNullOrEmpty(TextureString))
 			{
-				return Name + " invalid texture property";
+				return base.Name + " invalid texture property";
 			}
 			_trail = new TrailPathable
 			{
@@ -117,7 +90,7 @@ namespace Charr.Timers_BlishHUD.Models
 			return null;
 		}
 
-		public void Activate()
+		public override void Activate()
 		{
 			if (_trail != null && !_activated)
 			{
@@ -126,7 +99,7 @@ namespace Charr.Timers_BlishHUD.Models
 			}
 		}
 
-		public void Deactivate()
+		public override void Deactivate()
 		{
 			if (_trail != null && _activated)
 			{
@@ -135,7 +108,7 @@ namespace Charr.Timers_BlishHUD.Models
 			}
 		}
 
-		public void Stop()
+		public override void Stop()
 		{
 			if (_trail != null)
 			{
@@ -143,7 +116,7 @@ namespace Charr.Timers_BlishHUD.Models
 			}
 		}
 
-		public void Update(float elapsedTime)
+		public override void Update(float elapsedTime)
 		{
 			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
 			if (_trail == null || !_activated)
@@ -151,7 +124,7 @@ namespace Charr.Timers_BlishHUD.Models
 				return;
 			}
 			bool enabled = false;
-			foreach (float time in Timestamps)
+			foreach (float time in base.Timestamps)
 			{
 				if (elapsedTime >= time && elapsedTime <= time + Duration)
 				{

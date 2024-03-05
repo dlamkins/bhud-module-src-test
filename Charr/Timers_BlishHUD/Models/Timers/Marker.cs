@@ -5,22 +5,11 @@ using Charr.Timers_BlishHUD.Pathing.Entities;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 
-namespace Charr.Timers_BlishHUD.Models
+namespace Charr.Timers_BlishHUD.Models.Timers
 {
-	public class Marker
+	public class Marker : Timer
 	{
 		private MarkerPathable _markerPathable;
-
-		private bool _activated;
-
-		private bool _showMarker = true;
-
-		[JsonProperty("uid")]
-		public string UID { get; set; }
-
-		[JsonProperty("name")]
-		public string Name { get; set; } = "Unnamed Marker";
-
 
 		[JsonProperty("position")]
 		public List<float> Position { get; set; }
@@ -50,33 +39,11 @@ namespace Charr.Timers_BlishHUD.Models
 		public bool FadeCenter { get; set; } = true;
 
 
-		[JsonProperty("timestamps")]
-		public List<float> Timestamps { get; set; }
-
-		public bool Activated
-		{
-			get
-			{
-				return _activated;
-			}
-			set
-			{
-				if (value)
-				{
-					Activate();
-				}
-				else
-				{
-					Deactivate();
-				}
-			}
-		}
-
 		public bool ShowMarker
 		{
 			get
 			{
-				return _showMarker;
+				return _showTimer;
 			}
 			set
 			{
@@ -84,8 +51,14 @@ namespace Charr.Timers_BlishHUD.Models
 				{
 					_markerPathable.ShouldShow = value;
 				}
-				_showMarker = value;
+				_showTimer = value;
 			}
+		}
+
+		public Marker()
+		{
+			base.Name = "Unnamed Marker";
+			_showTimer = true;
 		}
 
 		public string Initialize(PathableResourceManager resourceManager)
@@ -96,15 +69,15 @@ namespace Charr.Timers_BlishHUD.Models
 			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
 			if (Position == null || Position.Count != 3)
 			{
-				return Name + " invalid position property";
+				return base.Name + " invalid position property";
 			}
-			if (Timestamps == null || Timestamps.Count == 0)
+			if (base.Timestamps == null || base.Timestamps.Count == 0)
 			{
-				return Name + " invalid timestamps property";
+				return base.Name + " invalid timestamps property";
 			}
 			if (string.IsNullOrEmpty(TextureString))
 			{
-				return Name + " invalid texture property";
+				return base.Name + " invalid texture property";
 			}
 			_markerPathable = new MarkerPathable
 			{
@@ -121,7 +94,7 @@ namespace Charr.Timers_BlishHUD.Models
 			return null;
 		}
 
-		public void Activate()
+		public override void Activate()
 		{
 			if (_markerPathable != null && !_activated)
 			{
@@ -130,7 +103,7 @@ namespace Charr.Timers_BlishHUD.Models
 			}
 		}
 
-		public void Deactivate()
+		public override void Deactivate()
 		{
 			if (_markerPathable != null && _activated)
 			{
@@ -139,7 +112,7 @@ namespace Charr.Timers_BlishHUD.Models
 			}
 		}
 
-		public void Stop()
+		public override void Stop()
 		{
 			if (_markerPathable != null)
 			{
@@ -147,14 +120,14 @@ namespace Charr.Timers_BlishHUD.Models
 			}
 		}
 
-		public void Update(float elapsedTime)
+		public override void Update(float elapsedTime)
 		{
 			if (_markerPathable == null || !_activated)
 			{
 				return;
 			}
 			bool enabled = false;
-			foreach (float time in Timestamps)
+			foreach (float time in base.Timestamps)
 			{
 				if (elapsedTime >= time && elapsedTime <= time + Duration)
 				{
