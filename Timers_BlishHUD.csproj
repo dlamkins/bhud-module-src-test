@@ -20,10 +20,10 @@
     <Reference Include="Newtonsoft.Json" />
     <Reference Include="System.Core" />
     <Reference Include="MonoGame.Framework" />
+    <Reference Include="System.Speech" />
     <Reference Include="Octokit">
       <HintPath>..\..\working\Octokit.dll</HintPath>
     </Reference>
-    <Reference Include="System.Speech" />
     <Reference Include="MonoGame.Extended" />
     <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="Microsoft.IdentityModel.Tokens">

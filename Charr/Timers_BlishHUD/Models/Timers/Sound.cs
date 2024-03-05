@@ -1,3 +1,4 @@
+using System;
 using System.Speech.Synthesis;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
@@ -31,8 +32,14 @@ namespace Charr.Timers_BlishHUD.Models.Timers
 			base.Timestamps.Sort();
 			_synthesizer = new SpeechSynthesizer();
 			_synthesizer.Rate = -2;
-			_synthesizer.Volume = 100;
+			_synthesizer.Volume = TimersModule.ModuleInstance._volumeSetting?.Value ?? 100;
+			TimersModule.ModuleInstance._volumeSetting.SettingChanged += HandleVolumeSettingChanged;
 			return null;
+		}
+
+		private void HandleVolumeSettingChanged(object sender = null, EventArgs e = null)
+		{
+			_synthesizer.Volume = TimersModule.ModuleInstance._volumeSetting.Value;
 		}
 
 		public override void Activate()

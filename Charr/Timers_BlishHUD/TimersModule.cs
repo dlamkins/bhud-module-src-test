@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Speech.Synthesis;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
@@ -88,6 +89,8 @@ namespace Charr.Timers_BlishHUD
 
 		public SettingEntry<bool> _debugModeSetting;
 
+		public SettingEntry<int> _volumeSetting;
+
 		private Dictionary<string, SettingEntry<bool>> _encounterEnableSettings;
 
 		private SettingEntry<bool> _sortCategorySetting;
@@ -135,6 +138,8 @@ namespace Charr.Timers_BlishHUD
 		public Update update = new Update();
 
 		public TimerLoader timerLoader;
+
+		private SpeechSynthesizer synthesizer = new SpeechSynthesizer();
 
 		private bool _timersNeedUpdate;
 
@@ -194,6 +199,7 @@ namespace Charr.Timers_BlishHUD
 			_alertMoveDelaySetting = _alertSettingCollection.DefineSetting("AlertMoveSpeed", 0.75f);
 			_alertFadeDelaySetting = _alertSettingCollection.DefineSetting("AlertFadeSpeed", 1f);
 			_alertFillDirection = _alertSettingCollection.DefineSetting("FillDirection", defaultValue: true);
+			_volumeSetting = _alertSettingCollection.DefineSetting("Volume", 100);
 		}
 
 		private void _showResetTimerButton_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
@@ -703,11 +709,18 @@ namespace Charr.Timers_BlishHUD
 			//IL_130f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_1321: Unknown result type (might be due to invalid IL or missing references)
 			//IL_1344: Unknown result type (might be due to invalid IL or missing references)
-			//IL_13da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_13e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1416: Unknown result type (might be due to invalid IL or missing references)
-			//IL_141b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_141f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_13bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_13d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_13dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1414: Unknown result type (might be due to invalid IL or missing references)
+			//IL_14bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_14ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_14f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1587: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1592: Unknown result type (might be due to invalid IL or missing references)
+			//IL_15c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_15c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_15cc: Unknown result type (might be due to invalid IL or missing references)
 			Panel mainPanel = new Panel
 			{
 				CanScroll = false,
@@ -936,7 +949,7 @@ namespace Charr.Timers_BlishHUD
 			obj.Location = new Point(menuSection.Right + Panel.MenuStandard.ControlOffset.X, timerPanel.Bottom + Control.ControlStandard.ControlOffset.Y);
 			enableAllButton.Location = new Point(timerPanel.Right - enableAllButton.Width - disableAllButton.Width - Control.ControlStandard.ControlOffset.X * 2, timerPanel.Bottom + Control.ControlStandard.ControlOffset.Y);
 			disableAllButton.Location = new Point(enableAllButton.Right + Control.ControlStandard.ControlOffset.X, timerPanel.Bottom + Control.ControlStandard.ControlOffset.Y);
-			_alertSettingsWindow = new StandardWindow(Resources.AlertSettingsBackground, new Rectangle(24, 17, 500, 500), new Rectangle(40, 40, 480, 480))
+			_alertSettingsWindow = new StandardWindow(Resources.AlertSettingsBackground, new Rectangle(24, 17, 500, 500), new Rectangle(40, 40, 500, 500))
 			{
 				Parent = GameService.Graphics.SpriteScreen,
 				Title = "Alert Settings",
@@ -1138,8 +1151,8 @@ namespace Charr.Timers_BlishHUD
 			addTestAlertButton.Click += delegate
 			{
 				//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0119: Unknown result type (might be due to invalid IL or missing references)
 				IAlertPanel alertPanel2;
 				if (_alertSizeSetting.Value != AlertType.BigWigStyle)
 				{
@@ -1157,6 +1170,9 @@ namespace Charr.Timers_BlishHUD
 					alertPanel2 = alertPanel;
 				}
 				IAlertPanel alertPanel3 = alertPanel2;
+				synthesizer.Volume = _volumeSetting.Value;
+				synthesizer.Rate = -2;
+				synthesizer.SpeakAsync("Test Alert Added");
 				alertPanel3.Text = "Test Alert " + (_testAlertPanels.Count + 1);
 				alertPanel3.TextColor = Color.get_White();
 				alertPanel3.Icon = Texture2DExtension.Duplicate(Resources.GetIcon("raid"));
@@ -1234,25 +1250,25 @@ namespace Charr.Timers_BlishHUD
 			};
 			alertMoveDelayTextBox.TextChanged += delegate
 			{
-				int cursorIndex2 = alertMoveDelayTextBox.CursorIndex;
-				if (float.TryParse(alertMoveDelayTextBox.Text, out var result2) && result2 >= alertMoveDelaySlider.MinValue && result2 <= alertMoveDelaySlider.MaxValue)
+				int cursorIndex3 = alertMoveDelayTextBox.CursorIndex;
+				if (float.TryParse(alertMoveDelayTextBox.Text, out var result3) && result3 >= alertMoveDelaySlider.MinValue && result3 <= alertMoveDelaySlider.MaxValue)
 				{
-					result2 = (float)Math.Round(result2, 2);
-					_alertMoveDelaySetting.Value = result2;
-					alertMoveDelaySlider.Value = result2;
-					alertMoveDelayTextBox.Text = $"{result2:0.00}";
+					result3 = (float)Math.Round(result3, 2);
+					_alertMoveDelaySetting.Value = result3;
+					alertMoveDelaySlider.Value = result3;
+					alertMoveDelayTextBox.Text = $"{result3:0.00}";
 				}
 				else
 				{
 					alertMoveDelayTextBox.Text = $"{_alertMoveDelaySetting.Value:0.00}";
 				}
-				alertMoveDelayTextBox.CursorIndex = cursorIndex2;
+				alertMoveDelayTextBox.CursorIndex = cursorIndex3;
 			};
 			alertMoveDelaySlider.ValueChanged += delegate
 			{
-				float num2 = (float)Math.Round(alertMoveDelaySlider.Value, 2);
-				_alertMoveDelaySetting.Value = num2;
-				alertMoveDelayTextBox.Text = $"{num2:0.00}";
+				float num3 = (float)Math.Round(alertMoveDelaySlider.Value, 2);
+				_alertMoveDelaySetting.Value = num3;
+				alertMoveDelayTextBox.Text = $"{num3:0.00}";
 			};
 			Blish_HUD.Controls.Label alertFadeDelayLabel = new Blish_HUD.Controls.Label
 			{
@@ -1284,32 +1300,81 @@ namespace Charr.Timers_BlishHUD
 			};
 			alertFadeDelayTextBox.TextChanged += delegate
 			{
-				int cursorIndex = alertFadeDelayTextBox.CursorIndex;
-				if (float.TryParse(alertFadeDelayTextBox.Text, out var result) && result >= alertFadeDelaySlider.MinValue && result <= alertFadeDelaySlider.MaxValue)
+				int cursorIndex2 = alertFadeDelayTextBox.CursorIndex;
+				if (float.TryParse(alertFadeDelayTextBox.Text, out var result2) && result2 >= alertFadeDelaySlider.MinValue && result2 <= alertFadeDelaySlider.MaxValue)
 				{
-					result = (float)Math.Round(result, 2);
-					_alertFadeDelaySetting.Value = result;
-					alertFadeDelaySlider.Value = result;
-					alertFadeDelayTextBox.Text = $"{result:0.00}";
+					result2 = (float)Math.Round(result2, 2);
+					_alertFadeDelaySetting.Value = result2;
+					alertFadeDelaySlider.Value = result2;
+					alertFadeDelayTextBox.Text = $"{result2:0.00}";
 				}
 				else
 				{
 					alertFadeDelayTextBox.Text = $"{_alertFadeDelaySetting.Value:0.00}";
 				}
-				alertFadeDelayTextBox.CursorIndex = cursorIndex;
+				alertFadeDelayTextBox.CursorIndex = cursorIndex2;
 			};
 			alertFadeDelaySlider.ValueChanged += delegate
 			{
-				float num = (float)Math.Round(alertFadeDelaySlider.Value, 2);
-				_alertFadeDelaySetting.Value = num;
-				alertFadeDelayTextBox.Text = $"{num:0.00}";
+				float num2 = (float)Math.Round(alertFadeDelaySlider.Value, 2);
+				_alertFadeDelaySetting.Value = num2;
+				alertFadeDelayTextBox.Text = $"{num2:0.00}";
+			};
+			Blish_HUD.Controls.Label volumeLabel = new Blish_HUD.Controls.Label
+			{
+				Parent = _alertSettingsWindow,
+				Text = "Volume",
+				BasicTooltipText = "Volume controls for alerts with sound.",
+				AutoSizeWidth = true,
+				Location = new Point(Control.ControlStandard.ControlOffset.X, alertFadeDelayLabel.Bottom + Control.ControlStandard.ControlOffset.Y)
+			};
+			TextBox volumeTextBox = new TextBox
+			{
+				Parent = _alertSettingsWindow,
+				BasicTooltipText = "Volume controls for alert with sound.",
+				Location = new Point(resetAlertContainerPositionButton.Left, volumeLabel.Top),
+				Width = resetAlertContainerPositionButton.Width / 5,
+				Height = volumeLabel.Height,
+				Text = $"{_volumeSetting.Value}"
+			};
+			TrackBar volumeSlider = new TrackBar
+			{
+				Parent = _alertSettingsWindow,
+				BasicTooltipText = "Volume controls for alert with sound.",
+				MinValue = 0f,
+				MaxValue = 100f,
+				Value = _volumeSetting.Value,
+				SmallStep = true,
+				Location = new Point(volumeTextBox.Right + Control.ControlStandard.ControlOffset.X, volumeLabel.Top),
+				Width = resetAlertContainerPositionButton.Width - volumeTextBox.Width - Control.ControlStandard.ControlOffset.X
+			};
+			volumeTextBox.TextChanged += delegate
+			{
+				int cursorIndex = volumeTextBox.CursorIndex;
+				if (int.TryParse(volumeTextBox.Text, out var result) && (float)result >= volumeSlider.MinValue && (float)result <= volumeSlider.MaxValue)
+				{
+					_alertFadeDelaySetting.Value = result;
+					volumeSlider.Value = result;
+					volumeTextBox.Text = $"{result}";
+				}
+				else
+				{
+					volumeTextBox.Text = $"{_volumeSetting.Value}";
+				}
+				volumeTextBox.CursorIndex = cursorIndex;
+			};
+			volumeSlider.ValueChanged += delegate
+			{
+				int num = (int)volumeSlider.Value;
+				_volumeSetting.Value = num;
+				volumeTextBox.Text = $"{num}";
 			};
 			StandardButton closeAlertSettingsButton = new StandardButton
 			{
 				Parent = _alertSettingsWindow,
 				Text = "Close"
 			};
-			closeAlertSettingsButton.Location = new Point((_alertSettingsWindow.Left + _alertSettingsWindow.Right) / 2 - closeAlertSettingsButton.Width / 2, alertFadeDelayTextBox.Bottom + Control.ControlStandard.ControlOffset.Y);
+			closeAlertSettingsButton.Location = new Point((_alertSettingsWindow.Left + _alertSettingsWindow.Right) / 2 - closeAlertSettingsButton.Width / 2, volumeTextBox.Bottom + Control.ControlStandard.ControlOffset.Y);
 			closeAlertSettingsButton.Click += delegate
 			{
 				_alertSettingsWindow.Hide();
