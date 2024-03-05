@@ -6,6 +6,13 @@ namespace Estreya.BlishHUD.Shared.Services
 {
 	public class ServiceConfigurations
 	{
+		public ServiceConfiguration Audio { get; } = new ServiceConfiguration
+		{
+			Enabled = false,
+			AwaitLoading = false
+		};
+
+
 		public ServiceConfiguration BlishHUDAPI { get; } = new ServiceConfiguration
 		{
 			Enabled = false,

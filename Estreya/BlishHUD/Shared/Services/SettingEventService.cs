@@ -151,9 +151,9 @@ namespace Estreya.BlishHUD.Shared.Services
 					SettingEntry setting = settingPair.Item1;
 					IComplianceRequisite priorRange = settingPair.Item2;
 					IEnumerable<IComplianceRequisite> ranges = SettingComplianceExtensions.GetComplianceRequisite(setting);
-					if (setting is SettingEntry<int> || setting is SettingEntry<float>)
+					if ((setting is SettingEntry<int> || setting is SettingEntry<float>) ? true : false)
 					{
-						IEnumerable<IComplianceRequisite> numberRanges = ranges.Where((IComplianceRequisite r) => r is IntRangeRangeComplianceRequisite || r is FloatRangeRangeComplianceRequisite);
+						IEnumerable<IComplianceRequisite> numberRanges = ranges.Where((IComplianceRequisite r) => (r is IntRangeRangeComplianceRequisite || r is FloatRangeRangeComplianceRequisite) ? true : false);
 						if (!numberRanges.Any())
 						{
 							if (priorRange != null)

@@ -44,7 +44,8 @@ namespace Estreya.BlishHUD.PortalDistance
 				//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0016: Invalid comparison between Unknown and I4
 				MapType type = GameService.Gw2Mumble.get_CurrentMap().get_Type();
-				return ((int)type == 2 || (int)type == 6) ? 6000 : 5000;
+				bool flag = (((int)type == 2 || (int)type == 6) ? true : false);
+				return flag ? 6000 : 5000;
 			}),
 			new PortalDefinition(16437, () => 5000f),
 			new PortalDefinition(34978, () => 5000f)
@@ -54,7 +55,7 @@ namespace Estreya.BlishHUD.PortalDistance
 
 		protected override string API_VERSION_NO => "1";
 
-		protected override bool FailIfBackendDown => false;
+		protected override bool NeedsBackend => false;
 
 		protected override int CornerIconPriority => 1289351269;
 
@@ -170,7 +171,7 @@ namespace Estreya.BlishHUD.PortalDistance
 			base.ModuleSettings.ManualKeyBinding.get_Value().remove_Activated((EventHandler<EventArgs>)ManualKeyBinding_Activated);
 			if (base.ArcDPSService != null)
 			{
-				base.ArcDPSService.AreaCombatEvent += ArcDPSService_AreaCombatEvent;
+				base.ArcDPSService.AreaCombatEvent -= ArcDPSService_AreaCombatEvent;
 			}
 			_activePortal = null;
 			DistanceMessageControl messageControl = _messageControl;
@@ -240,6 +241,11 @@ namespace Estreya.BlishHUD.PortalDistance
 		protected override AsyncTexture2D GetCornerIcon()
 		{
 			return base.IconService.GetIcon("textures/102338-grey.png");
+		}
+
+		protected override AsyncTexture2D GetErrorCornerIcon()
+		{
+			return base.IconService.GetIcon("textures/102338-grey-error.png");
 		}
 	}
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -26,14 +27,18 @@ using Estreya.BlishHUD.Shared.Models;
 using Estreya.BlishHUD.Shared.MumbleInfo.Map;
 using Estreya.BlishHUD.Shared.Security;
 using Estreya.BlishHUD.Shared.Services;
+using Estreya.BlishHUD.Shared.Services.Audio;
 using Estreya.BlishHUD.Shared.Services.TradingPost;
 using Estreya.BlishHUD.Shared.Settings;
+using Estreya.BlishHUD.Shared.Threading;
+using Estreya.BlishHUD.Shared.Threading.Events;
 using Estreya.BlishHUD.Shared.UI.Views;
 using Estreya.BlishHUD.Shared.UI.Views.Settings;
 using Estreya.BlishHUD.Shared.Utils;
 using Flurl.Http;
 using Gw2Sharp.Models;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.BitmapFonts;
 using SemVer;
 
@@ -41,11 +46,17 @@ namespace Estreya.BlishHUD.Shared.Modules
 {
 	public abstract class BaseModule<TModule, TSettings> : Module where TModule : class where TSettings : BaseModuleSettings
 	{
+		private static TimeSpan _checkBackendInterval = TimeSpan.FromMinutes(2.0);
+
+		private AsyncRef<double> _lastBackendCheck = new AsyncRef<double>(0.0);
+
 		protected const string FILE_ROOT_URL = "https://files.estreya.de";
 
 		protected const string FILE_BLISH_ROOT_URL = "https://files.estreya.de/blish-hud";
 
-		protected const string API_ROOT_URL = "https://api.estreya.de/blish-hud";
+		protected const string LIVE_API_HOSTNAME = "api.estreya.de";
+
+		protected const string DEBUG_API_HOSTNAME = "api.estreya.dev";
 
 		protected const string GITHUB_OWNER = "Tharylia";
 
@@ -53,11 +64,15 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		private const string GITHUB_CLIENT_ID = "Iv1.9e4dc29d43243704";
 
+		private string ErrorStateText;
+
 		private ModuleSettingsView _defaultSettingView;
 
 		private FlurlClient _flurlClient;
 
 		private readonly ConcurrentDictionary<string, string> _loadingTexts = new ConcurrentDictionary<string, string>();
+
+		private readonly ConcurrentDictionary<ModuleErrorStateGroup, string> _errorStates = new ConcurrentDictionary<ModuleErrorStateGroup, string>();
 
 		private LoadingSpinner _loadingSpinner;
 
@@ -65,11 +80,17 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		private readonly SynchronizedCollection<ManagedService> _services = new SynchronizedCollection<ManagedService>();
 
+		private CancellationTokenSource _cancellationTokenSource;
+
 		protected Logger Logger { get; }
 
 		protected string MODULE_FILE_URL => "https://files.estreya.de/blish-hud/" + UrlModuleName;
 
-		protected string MODULE_API_URL => "https://api.estreya.de/blish-hud/v" + API_VERSION_NO + "/" + UrlModuleName;
+		protected string API_ROOT_URL => "https://" + (ModuleSettings.UseDebugAPI.get_Value() ? "api.estreya.dev" : "api.estreya.de") + "/blish-hud";
+
+		private string API_HEALTH_URL => API_ROOT_URL + "/health";
+
+		protected string MODULE_API_URL => API_ROOT_URL + "/v" + API_VERSION_NO + "/" + UrlModuleName;
 
 		protected GitHubHelper GithubHelper { get; private set; }
 
@@ -79,9 +100,21 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected abstract string API_VERSION_NO { get; }
 
-		protected virtual bool FailIfBackendDown => false;
+		protected virtual bool NeedsBackend => false;
 
 		protected virtual bool EnableMetrics => false;
+
+		protected ModuleState ModuleState
+		{
+			get
+			{
+				if (!_errorStates.Any((KeyValuePair<ModuleErrorStateGroup, string> e) => !string.IsNullOrWhiteSpace(e.Value)))
+				{
+					return ModuleState.Normal;
+				}
+				return ModuleState.Error;
+			}
+		}
 
 		public bool IsPrerelease
 		{
@@ -147,7 +180,15 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected MetricsService MetricsService { get; private set; }
 
+		protected AudioService AudioService { get; private set; }
+
+		protected CancellationToken CancellationToken => _cancellationTokenSource.Token;
+
 		protected abstract int CornerIconPriority { get; }
+
+		protected event AsyncEventHandler BackendConnectionRestored;
+
+		protected event AsyncEventHandler BackendConnectionLost;
 
 		protected IFlurlClient GetFlurlClient()
 		{
@@ -174,6 +215,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected override void Initialize()
 		{
+			_cancellationTokenSource = new CancellationTokenSource();
 			TEMP_FIX_SetTacOAsActive();
 			string directoryName = GetDirectoryName();
 			if (!string.IsNullOrWhiteSpace(directoryName))
@@ -202,7 +244,22 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected override async Task LoadAsync()
 		{
-			await ThrowIfModuleInvalid(showScreenNotification: true);
+			if (ModuleSettings.UseDebugAPI.get_Value())
+			{
+				Logger.Info("User configured module to use debug api: " + MODULE_API_URL);
+			}
+			await CheckBackendHealth();
+			try
+			{
+				await VerifyModuleState();
+			}
+			catch (Exception ex)
+			{
+				Logger.Warn(ex, "Failed to verify module. Disabling module.");
+				DisableSelf();
+				await Task.Delay(1000);
+				return;
+			}
 			await Task.Factory.StartNew((Func<Task>)InitializeServices, TaskCreationOptions.LongRunning).Unwrap();
 			if (EnableMetrics)
 			{
@@ -213,8 +270,12 @@ namespace Estreya.BlishHUD.Shared.Modules
 			ModuleSettings.RegisterCornerIcon.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)RegisterCornerIcon_SettingChanged);
 		}
 
-		private async Task ThrowIfModuleInvalid(bool showScreenNotification)
+		private async Task VerifyModuleState()
 		{
+			if (HasErrorState(ModuleErrorStateGroup.BACKEND_UNAVAILABLE))
+			{
+				return;
+			}
 			IFlurlRequest request = GetFlurlClient().Request(MODULE_API_URL, "validate").AllowAnyHttpStatus();
 			ModuleValidationRequest moduleValidationRequest = default(ModuleValidationRequest);
 			moduleValidationRequest.Version = ((Module)this).get_Version();
@@ -227,20 +288,51 @@ namespace Estreya.BlishHUD.Shared.Modules
 			catch (Exception ex)
 			{
 				Logger.Debug(ex, "Failed to validate module.");
-				if (FailIfBackendDown)
-				{
-					throw new ModuleBackendUnavailableException();
-				}
 			}
-			if (response == null || response.get_IsSuccessStatusCode() || response.get_StatusCode() == HttpStatusCode.NotFound)
+			if (response != null && (response.get_IsSuccessStatusCode() || response.get_StatusCode() == HttpStatusCode.NotFound))
+			{
+				return;
+			}
+			bool flag = NeedsBackend;
+			if (flag)
+			{
+				bool flag2 = response == null;
+				if (!flag2)
+				{
+					HttpStatusCode statusCode = response.get_StatusCode();
+					bool flag3 = (((uint)(statusCode - 502) <= 1u) ? true : false);
+					flag2 = flag3;
+				}
+				flag = flag2;
+			}
+			if (flag)
+			{
+				return;
+			}
+			flag = response == null;
+			if (!flag)
+			{
+				HttpStatusCode statusCode = response.get_StatusCode();
+				bool flag2 = (((uint)(statusCode - 502) <= 1u) ? true : false);
+				flag = flag2;
+			}
+			if (flag)
 			{
 				return;
 			}
 			if (response.get_StatusCode() != HttpStatusCode.Forbidden)
 			{
-				string content = await response.get_Content().ReadAsStringAsync();
-				throw new ModuleBackendUnavailableException($"Module validation failed with unexpected status code {response.get_StatusCode()}: {content}");
+				string content2 = await response.get_Content().ReadAsStringAsync();
+				ScreenNotification.ShowNotification(new string[2]
+				{
+					"The module \"" + ((Module)this).get_Name() + "\" could not verify itself.",
+					"Please check the latest log for more information."
+				}, ScreenNotification.NotificationType.Error, null, 10);
+				Logger.Error($"Module validation failed with unexpected status code {response.get_StatusCode()}: {content2}");
+				ReportErrorState(ModuleErrorStateGroup.MODULE_VALIDATION, "Module validation failed. Check latest log for more information.");
+				return;
 			}
+			ReportErrorState(ModuleErrorStateGroup.MODULE_VALIDATION, null);
 			ModuleValidationResponse validationResponse;
 			try
 			{
@@ -248,22 +340,90 @@ namespace Estreya.BlishHUD.Shared.Modules
 			}
 			catch (Exception)
 			{
-				throw new ModuleBackendUnavailableException("Could not read module validation response: " + await response.get_Content().ReadAsStringAsync());
+				string content = await response.get_Content().ReadAsStringAsync();
+				ScreenNotification.ShowNotification(new string[2]
+				{
+					"The module \"" + ((Module)this).get_Name() + "\" could not verify itself.",
+					"Please check the latest log for more information."
+				}, ScreenNotification.NotificationType.Error, null, 10);
+				throw new ModuleInvalidException("Could not read module validation response: " + content);
 			}
-			if (showScreenNotification)
+			List<string> messages = new List<string>
 			{
-				List<string> messages = new List<string>
-				{
-					"[" + ((Module)this).get_Name() + "]",
-					"The current module version is invalid!"
-				};
-				if (!string.IsNullOrWhiteSpace(validationResponse.Message) || !string.IsNullOrWhiteSpace(response.get_ReasonPhrase()))
-				{
-					messages.Add(validationResponse.Message ?? response.get_ReasonPhrase());
-				}
-				ScreenNotification.ShowNotification(messages.ToArray(), ScreenNotification.NotificationType.Error, null, 10);
+				"[" + ((Module)this).get_Name() + "]",
+				"The current module version is invalid!"
+			};
+			if (!string.IsNullOrWhiteSpace(validationResponse.Message) || !string.IsNullOrWhiteSpace(response.get_ReasonPhrase()))
+			{
+				messages.Add(validationResponse.Message ?? response.get_ReasonPhrase());
 			}
+			ScreenNotification.ShowNotification(messages.ToArray(), ScreenNotification.NotificationType.Error, null, 10);
 			throw new ModuleInvalidException(validationResponse.Message);
+		}
+
+		protected void DisableSelf()
+		{
+			GameService.Module.get_Modules().ToList().Find((ModuleManager m) => m.get_ModuleInstance() == this)
+				.Disable();
+		}
+
+		private async Task CheckBackendHealth()
+		{
+			if (!NeedsBackend)
+			{
+				return;
+			}
+			IFlurlRequest request = GetFlurlClient().Request(API_HEALTH_URL);
+			HttpResponseMessage response = null;
+			Stopwatch sw = Stopwatch.StartNew();
+			try
+			{
+				response = await request.GetAsync(default(CancellationToken), (HttpCompletionOption)0);
+			}
+			catch (Exception ex2)
+			{
+				Logger.Debug(ex2, "Failed to validate backend health.");
+			}
+			sw.Stop();
+			Logger logger = Logger;
+			object[] obj = new object[4]
+			{
+				request.Url,
+				(int)((response == null) ? ((HttpStatusCode)999) : response.get_StatusCode()),
+				null,
+				null
+			};
+			HttpResponseMessage obj2 = response;
+			obj[2] = ((obj2 != null) ? obj2.get_ReasonPhrase() : null) ?? string.Empty;
+			obj[3] = sw.Elapsed.TotalMilliseconds;
+			logger.Debug(string.Format("Checked API backend at \"{0}\". Response: {1} - {2} | Duration: {3}ms", obj));
+			bool wasUnavailable = HasErrorState(ModuleErrorStateGroup.BACKEND_UNAVAILABLE);
+			if (!wasUnavailable && (response == null || !response.get_IsSuccessStatusCode()))
+			{
+				ReportErrorState(ModuleErrorStateGroup.BACKEND_UNAVAILABLE, "Backend unavailable.");
+				ScreenNotification.ShowNotification(new string[2]
+				{
+					"The backend for \"" + ((Module)this).get_Name() + "\" is unavailable.",
+					"Check Estreya BlishHUD Discord for news."
+				}, ScreenNotification.NotificationType.Error, null, 10);
+				await (this.BackendConnectionLost?.Invoke(this) ?? Task.CompletedTask);
+			}
+			else if (wasUnavailable)
+			{
+				ReportErrorState(ModuleErrorStateGroup.BACKEND_UNAVAILABLE, null);
+				try
+				{
+					await VerifyModuleState();
+				}
+				catch (Exception ex)
+				{
+					Logger.Warn(ex, "Failed to verify module. Disabling module.");
+					DisableSelf();
+					return;
+				}
+				ScreenNotification.ShowNotification("The backend for \"" + ((Module)this).get_Name() + "\" is back online.", (NotificationType)0, (Texture2D)null, 5);
+				await (this.BackendConnectionRestored?.Invoke(this) ?? Task.CompletedTask);
+			}
 		}
 
 		private void RegisterCornerIcon_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
@@ -292,7 +452,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 					{
 						throw new ArgumentNullException("PasswordManager");
 					}
-					BlishHUDAPIService = new BlishHudApiService(configurations.BlishHUDAPI, ModuleSettings.BlishAPIUsername, PasswordManager, GetFlurlClient(), "https://api.estreya.de/blish-hud");
+					BlishHUDAPIService = new BlishHudApiService(configurations.BlishHUDAPI, ModuleSettings.BlishAPIUsername, PasswordManager, GetFlurlClient(), API_ROOT_URL);
 					_services.Add(BlishHUDAPIService);
 				}
 				if (configurations.Account.Enabled)
@@ -329,8 +489,13 @@ namespace Estreya.BlishHUD.Shared.Modules
 				{
 					Enabled = true,
 					AwaitLoading = true
-				}, GetFlurlClient(), "https://api.estreya.de/blish-hud", ((Module)this).get_Name(), ((Module)this).get_Namespace(), ModuleSettings, IconService);
+				}, GetFlurlClient(), API_ROOT_URL, ((Module)this).get_Name(), ((Module)this).get_Namespace(), ModuleSettings, IconService);
 				_services.Add(MetricsService);
+				if (configurations.Audio.Enabled)
+				{
+					AudioService = new AudioService(configurations.Audio, directoryPath);
+					_services.Add(AudioService);
+				}
 				if (configurations.Items.Enabled)
 				{
 					ItemService = new ItemService(configurations.Items, Gw2ApiManager, directoryPath);
@@ -465,17 +630,16 @@ namespace Estreya.BlishHUD.Shared.Modules
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Expected O, but got Unknown
+			//IL_002e: Expected O, but got Unknown
 			if (show)
 			{
 				if (CornerIcon == null)
 				{
 					CornerIcon val = new CornerIcon();
 					val.set_IconName(((Module)this).get_Name());
-					val.set_Icon(GetCornerIcon());
 					val.set_Priority(CornerIconPriority);
 					CornerIcon = val;
+					UpdateCornerIcon();
 					OnCornerIconBuild();
 				}
 			}
@@ -484,6 +648,15 @@ namespace Estreya.BlishHUD.Shared.Modules
 				OnCornerIconDispose();
 				((Control)CornerIcon).Dispose();
 				CornerIcon = null;
+			}
+		}
+
+		private void UpdateCornerIcon()
+		{
+			if (CornerIcon != null)
+			{
+				CornerIcon.set_Icon((ModuleState == ModuleState.Error) ? GetErrorCornerIcon() : GetCornerIcon());
+				((Control)CornerIcon).set_BasicTooltipText(ErrorStateText);
 			}
 		}
 
@@ -585,12 +758,23 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected abstract AsyncTexture2D GetCornerIcon();
 
+		protected virtual AsyncTexture2D GetErrorEmblem()
+		{
+			return GetEmblem();
+		}
+
+		protected virtual AsyncTexture2D GetErrorCornerIcon()
+		{
+			return GetCornerIcon();
+		}
+
 		protected virtual void OnSettingWindowBuild(TabbedWindow settingWindow)
 		{
 		}
 
 		protected override void Update(GameTime gameTime)
 		{
+			UpdateUtil.UpdateAsync(CheckBackendHealth, gameTime, _checkBackendInterval.TotalMilliseconds, _lastBackendCheck, doLogging: false);
 			ShowUI = CalculateUIVisibility();
 			using (_servicesLock.Lock())
 			{
@@ -628,6 +812,33 @@ namespace Estreya.BlishHUD.Shared.Modules
 		protected void ReportLoading(string group, string loadingText)
 		{
 			_loadingTexts.AddOrUpdate(group, loadingText, (string key, string oldVal) => loadingText);
+		}
+
+		protected void ReportErrorState(ModuleErrorStateGroup group, string errorText)
+		{
+			_errorStates.AddOrUpdate(group, errorText, (ModuleErrorStateGroup key, string oldVal) => errorText);
+			StringBuilder errorStates = new StringBuilder();
+			foreach (KeyValuePair<ModuleErrorStateGroup, string> errorState in _errorStates)
+			{
+				if (errorState.Value != null)
+				{
+					if (_errorStates.Count > 1)
+					{
+						errorStates.AppendLine("- " + errorState.Value.Trim());
+					}
+					else
+					{
+						errorStates.AppendLine(errorState.Value.Trim());
+					}
+				}
+			}
+			ErrorStateText = errorStates.ToString().Trim();
+			UpdateCornerIcon();
+		}
+
+		protected bool HasErrorState(ModuleErrorStateGroup group)
+		{
+			return _errorStates.Any((KeyValuePair<ModuleErrorStateGroup, string> e) => e.Key == group && !string.IsNullOrWhiteSpace(e.Value));
 		}
 
 		protected virtual bool CalculateUIVisibility()
@@ -722,6 +933,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected override void Unload()
 		{
+			_cancellationTokenSource?.Cancel();
 			Logger.Debug("Unload settings...");
 			if (ModuleSettings != null)
 			{
