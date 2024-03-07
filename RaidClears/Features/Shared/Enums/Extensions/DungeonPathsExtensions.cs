@@ -6,43 +6,81 @@ namespace RaidClears.Features.Shared.Enums.Extensions
 	{
 		public static string GetLabel(this Encounters.DungeonPaths value)
 		{
-			return value switch
+			switch (value)
 			{
-				Encounters.DungeonPaths.AscalonianCatacombsStory => "Story", 
-				Encounters.DungeonPaths.AscalonianCatacombsHodgins => "hodgins", 
-				Encounters.DungeonPaths.AscalonianCatacombsDetha => "detha", 
-				Encounters.DungeonPaths.AscalonianCatacombsTzark => "tzark", 
-				Encounters.DungeonPaths.CaudecusManorStory => "Story", 
-				Encounters.DungeonPaths.CaudecusManorAsura => "asura", 
-				Encounters.DungeonPaths.CaudecusManorSeraph => "seraph", 
-				Encounters.DungeonPaths.CaudecusManorButler => "butler", 
-				Encounters.DungeonPaths.TwilightArborStory => "Story", 
-				Encounters.DungeonPaths.TwilightArborLeurent => "leurent (Up)", 
-				Encounters.DungeonPaths.TwilightArborVevina => "vevina (Forward)", 
-				Encounters.DungeonPaths.TwilightArborAetherPath => "aetherpath", 
-				Encounters.DungeonPaths.SorrowsEmbraceStory => "Story", 
-				Encounters.DungeonPaths.SorrowsEmbraceFergg => "fergg", 
-				Encounters.DungeonPaths.SorrowsEmbraceRasalov => "rasalov", 
-				Encounters.DungeonPaths.SorrowsEmbraceKoptev => "koptev", 
-				Encounters.DungeonPaths.CitadelOfFlameStory => "Story", 
-				Encounters.DungeonPaths.CitadelOfFlameFerrah => "ferrah", 
-				Encounters.DungeonPaths.CitadelOfFlameMagg => "magg", 
-				Encounters.DungeonPaths.CitadelOfFlameRhiannon => "rhiannon", 
-				Encounters.DungeonPaths.HonorOfTheWavesStory => "Story", 
-				Encounters.DungeonPaths.HonorOfTheWavesButcher => "butcher", 
-				Encounters.DungeonPaths.HonorOfTheWavesPlunderer => "plunderer", 
-				Encounters.DungeonPaths.HonorOfTheWavesZealot => "zealot", 
-				Encounters.DungeonPaths.CrucibleOfEternityStory => "Story", 
-				Encounters.DungeonPaths.CrucibleOfEternitySubmarine => "submarine", 
-				Encounters.DungeonPaths.CrucibleOfEternityTeleporter => "teleporter", 
-				Encounters.DungeonPaths.CrucibleOfEternityFrontDoor => "front_door", 
-				Encounters.DungeonPaths.RuinedCityOfArahStory => "Story", 
-				Encounters.DungeonPaths.RuinedCityOfArahJotun => "jotun", 
-				Encounters.DungeonPaths.RuinedCityOfArahMursaat => "mursaat", 
-				Encounters.DungeonPaths.RuinedCityOfArahForgotten => "forgotten", 
-				Encounters.DungeonPaths.RuinedCityOfArahSeer => "seer", 
-				_ => throw new InvalidOperationException(), 
-			};
+			case Encounters.DungeonPaths.AscalonianCatacombsStory:
+				return "Story";
+			case Encounters.DungeonPaths.AscalonianCatacombsHodgins:
+				return "hodgins";
+			case Encounters.DungeonPaths.AscalonianCatacombsDetha:
+				return "detha";
+			case Encounters.DungeonPaths.AscalonianCatacombsTzark:
+				return "tzark";
+			case Encounters.DungeonPaths.CaudecusManorStory:
+				return "Story";
+			case Encounters.DungeonPaths.CaudecusManorAsura:
+				return "asura";
+			case Encounters.DungeonPaths.CaudecusManorSeraph:
+				return "seraph";
+			case Encounters.DungeonPaths.CaudecusManorButler:
+				return "butler";
+			case Encounters.DungeonPaths.TwilightArborStory:
+				return "Story";
+			case Encounters.DungeonPaths.TwilightArborLeurent:
+				return "leurent (Up)";
+			case Encounters.DungeonPaths.TwilightArborVevina:
+				return "vevina (Forward)";
+			case Encounters.DungeonPaths.TwilightArborAetherPath:
+				return "aetherpath";
+			case Encounters.DungeonPaths.SorrowsEmbraceStory:
+				return "Story";
+			case Encounters.DungeonPaths.SorrowsEmbraceFergg:
+				return "fergg";
+			case Encounters.DungeonPaths.SorrowsEmbraceRasalov:
+				return "rasalov";
+			case Encounters.DungeonPaths.SorrowsEmbraceKoptev:
+				return "koptev";
+			case Encounters.DungeonPaths.CitadelOfFlameStory:
+				return "Story";
+			case Encounters.DungeonPaths.CitadelOfFlameFerrah:
+				return "ferrah";
+			case Encounters.DungeonPaths.CitadelOfFlameMagg:
+				return "magg";
+			case Encounters.DungeonPaths.CitadelOfFlameRhiannon:
+				return "rhiannon";
+			case Encounters.DungeonPaths.HonorOfTheWavesStory:
+				return "Story";
+			case Encounters.DungeonPaths.HonorOfTheWavesButcher:
+				return "butcher";
+			case Encounters.DungeonPaths.HonorOfTheWavesPlunderer:
+				return "plunderer";
+			case Encounters.DungeonPaths.HonorOfTheWavesZealot:
+				return "zealot";
+			case Encounters.DungeonPaths.CrucibleOfEternityStory:
+				return "Story";
+			case Encounters.DungeonPaths.CrucibleOfEternitySubmarine:
+				return "submarine";
+			case Encounters.DungeonPaths.CrucibleOfEternityTeleporter:
+				return "teleporter";
+			case Encounters.DungeonPaths.CrucibleOfEternityFrontDoor:
+				return "front_door";
+			case Encounters.DungeonPaths.RuinedCityOfArahStory:
+				return "Story";
+			case Encounters.DungeonPaths.RuinedCityOfArahJotun:
+				return "jotun";
+			case Encounters.DungeonPaths.RuinedCityOfArahMursaat:
+				return "mursaat";
+			case Encounters.DungeonPaths.RuinedCityOfArahForgotten:
+				return "forgotten";
+			case Encounters.DungeonPaths.RuinedCityOfArahSeer:
+				return "seer";
+			default:
+			{
+				_003CPrivateImplementationDetails_003E.ThrowInvalidOperationException();
+				string result = default(string);
+				return result;
+			}
+			}
 		}
 
 		public static string GetLabelShort(this Encounters.DungeonPaths value)

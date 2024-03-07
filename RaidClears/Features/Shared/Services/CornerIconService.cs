@@ -33,15 +33,25 @@ namespace RaidClears.Features.Shared.Services
 			_cornerIconHoverTexture = hoverTexture;
 			_contextMenuItems = contextMenuItems;
 			cornerIconIsVisibleSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnCornerIconIsVisibleSettingChanged);
+			Service.Settings.CornerIconPriority.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)CornerIconPriority_SettingChanged);
 			if (cornerIconIsVisibleSetting.get_Value())
 			{
 				CreateCornerIcon();
 			}
 		}
 
+		public void UpdateAccountName(string name)
+		{
+			if (_cornerIcon != null)
+			{
+				((Control)_cornerIcon).set_BasicTooltipText(_tooltip + "\n\nProfile: " + name);
+			}
+		}
+
 		public void Dispose()
 		{
 			_cornerIconIsVisibleSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnCornerIconIsVisibleSettingChanged);
+			Service.Settings.CornerIconPriority.remove_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)CornerIconPriority_SettingChanged);
 			RemoveCornerIcon();
 		}
 
@@ -51,18 +61,18 @@ namespace RaidClears.Features.Shared.Services
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Expected O, but got Unknown
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Expected O, but got Unknown
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0089: Expected O, but got Unknown
+			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bc: Expected O, but got Unknown
 			RemoveCornerIcon();
 			CornerIcon val = new CornerIcon();
 			val.set_Icon(AsyncTexture2D.op_Implicit(_cornerIconTexture));
 			val.set_HoverIcon(AsyncTexture2D.op_Implicit(_cornerIconHoverTexture));
-			((Control)val).set_BasicTooltipText(_tooltip);
+			((Control)val).set_BasicTooltipText(_tooltip + "\n\nAccount: " + Service.CurrentAccountName);
 			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			val.set_Priority(2033877237);
+			val.set_Priority((int)(2.1474836E+09f * ((1000f - (float)Service.Settings.CornerIconPriority.get_Value()) / 1000f)) - 1);
 			_cornerIcon = val;
 			((Control)_cornerIcon).add_Click((EventHandler<MouseEventArgs>)OnCornerIconClicked);
 			((Control)_cornerIcon).set_Menu(new ContextMenuStrip((Func<IEnumerable<ContextMenuStripItem>>)(() => _contextMenuItems)));
@@ -74,6 +84,14 @@ namespace RaidClears.Features.Shared.Services
 			{
 				((Control)_cornerIcon).remove_Click((EventHandler<MouseEventArgs>)OnCornerIconClicked);
 				((Control)_cornerIcon).Dispose();
+			}
+		}
+
+		private void CornerIconPriority_SettingChanged(object sender, ValueChangedEventArgs<int> e)
+		{
+			if (Service.Settings.GlobalCornerIconEnabled.get_Value())
+			{
+				_cornerIcon.set_Priority((int)(2.1474836E+09f * ((1000f - (float)e.get_NewValue()) / 1000f)) - 1);
 			}
 		}
 

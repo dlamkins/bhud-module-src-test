@@ -61,6 +61,7 @@ namespace RaidClears.Settings.Views.SubViews
 			panel.AddChildPanel((Panel)(object)FlowPanelExtensions.AddString(val3, Strings.Setting_cornerIconHelpText).AddSetting((SettingEntry)(object)Service.Settings.RaidSettings.Generic.ToolbarIcon).AddSetting((SettingEntry)(object)Service.Settings.DungeonSettings.Generic.ToolbarIcon)
 				.AddSetting((SettingEntry)(object)Service.Settings.StrikeSettings.Generic.ToolbarIcon)
 				.AddSetting((SettingEntry)(object)Service.Settings.FractalSettings.Generic.ToolbarIcon));
+			panel.AddSpace().AddString(Strings.CornerIconPriority_Help).AddSetting((SettingEntry)(object)Service.Settings.CornerIconPriority);
 			refreshButton.add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				Service.ApiPollingService?.Invoke();

@@ -42,6 +42,12 @@ namespace RaidClears.Localization
 			}
 		}
 
+		internal static string CornerIconPriority_Help => ResourceManager.GetString("CornerIconPriority_Help", resourceCulture);
+
+		internal static string CornerIconPriority_Label => ResourceManager.GetString("CornerIconPriority_Label", resourceCulture);
+
+		internal static string CornerIconPriority_Tooltlp => ResourceManager.GetString("CornerIconPriority_Tooltlp", resourceCulture);
+
 		internal static string Fractals_DailyRecommended => ResourceManager.GetString("Fractals_DailyRecommended", resourceCulture);
 
 		internal static string Fractals_DailyTierN => ResourceManager.GetString("Fractals_DailyTierN", resourceCulture);

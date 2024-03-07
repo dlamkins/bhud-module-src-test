@@ -179,6 +179,7 @@ namespace RaidClears
 				Service.CurrentAccountName = await AccountNameService.UpdateAccountName();
 				Service.MapWatcher.DispatchCurrentStrikeClears();
 				Service.FractalMapWatcher.DispatchCurrentClears();
+				Service.CornerIcon?.UpdateAccountName(Service.CurrentAccountName);
 			});
 			Service.ApiPollingService?.Invoke();
 		}

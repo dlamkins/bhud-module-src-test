@@ -20,6 +20,8 @@ namespace RaidClears.Settings.Services
 
 		public SettingEntry<bool> GlobalCornerIconEnabled { get; }
 
+		public SettingEntry<int> CornerIconPriority { get; }
+
 		public RaidSettings RaidSettings { get; }
 
 		public DungeonSettings DungeonSettings { get; }
@@ -30,9 +32,11 @@ namespace RaidClears.Settings.Services
 
 		public SettingService(SettingCollection settings)
 		{
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Expected O, but got Unknown
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0108: Expected O, but got Unknown
 			ApiPollingPeriod = settings.DefineSetting<ApiPollPeriod>("RCPoll", ApiPollPeriod.MINUTES_5, (Func<string>)(() => Strings.Setting_APIPoll_Label), (Func<string>)(() => Strings.Setting_APIPoll_Tooltip));
+			CornerIconPriority = settings.DefineSetting<int>("RCCornerPriority", 53, (Func<string>)(() => Strings.CornerIconPriority_Label), (Func<string>)(() => Strings.CornerIconPriority_Tooltlp));
+			SettingComplianceExtensions.SetRange(CornerIconPriority, 0, 1000);
 			SettingsPanelKeyBind = settings.DefineSetting<KeyBinding>("RCsettingsKeybind", new KeyBinding((Keys)0), (Func<string>)(() => Strings.Settings_Keybind_Label), (Func<string>)(() => Strings.Settings_Keybind_tooltip));
 			SettingsPanelKeyBind.get_Value().set_Enabled(true);
 			GlobalCornerIconEnabled = settings.DefineSetting<bool>("RCGlobalCornerIcon", true, (Func<string>)(() => Strings.Setting_CornerIconEnable), (Func<string>)(() => Strings.Setting_CornerIconEnableTooltip));

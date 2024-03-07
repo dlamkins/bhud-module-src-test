@@ -152,6 +152,7 @@
   <data name="Settings_Strike_CompletionTooltip"><value>Determine how strikes are marked as cleared</value></data>
   <data name="Setting_Fractals_LabelDisplay_Tooltip"><value /></data>
   <data name="Strike_Short_HarvestTemple"><value>HT</value></data>
+  <data name="CornerIconPriority_Help"><value>Adjust where Raid Clears top-left icon appears after the Blish Icon</value></data>
   <data name="Fractals_Message"><value>Did you complete the encounter successfully?</value></data>
   <data name="Setting_Fractals_ColBG_Tooltip"><value>Fractals overlay background color</value></data>
   <data name="Setting_Strike_Tooltips_Label"><value>Enable mouse hover tooltips on overlay</value></data>
@@ -194,6 +195,7 @@
   <data name="Raid_Wing_6_3_Short"><value>Q1</value></data>
   <data name="Setting_Strike_ColNotClear_Tooltip"><value>Hex color code (#rrggbb) for Encounters that have not been cleared this week</value></data>
   <data name="Setting_Strike_Visible_Label"><value>Show strikes overlay</value></data>
+  <data name="CornerIconPriority_Label"><value>Top-left icon sort order</value></data>
   <data name="Setting_Dun_Enabled_Tooltip"><value>Enable/Disable all dungeon features</value></data>
   <data name="Setting_Raid_ColBG_Tooltip"><value>Raid overlay background color</value></data>
   <data name="Setting_Raid_GridOpactiy_Tooltip"><value>Hidden &lt;---&gt; Fully Visible</value></data>
@@ -263,6 +265,7 @@
   <data name="Setting_Raid_W3_Label"><value>W3 / Stronghold of the Faithful</value></data>
   <data name="SettingsPanel_Raids_Heading_General"><value>Options / Keybind</value></data>
   <data name="Setting_Raid_ColEmbolden_Label"><value>Emboldened text color</value></data>
+  <data name="CornerIconPriority_Tooltlp"><value>Left &lt;----&gt; Right</value></data>
   <data name="Raid_Wing_3_1_Short"><value>E</value></data>
   <data name="Setting_Raid_W6_Label"><value>W6 / Mythwright Gambit</value></data>
   <data name="Raid_Wing_6_1_Short"><value>CA</value></data>
