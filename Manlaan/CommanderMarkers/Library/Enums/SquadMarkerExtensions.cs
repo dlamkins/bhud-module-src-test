@@ -22,20 +22,88 @@ namespace Manlaan.CommanderMarkers.Library.Enums
 
 		public static SquadMarker EnumValue(this SquadMarker e, string readable)
 		{
-			return readable switch
+			if (readable != null)
 			{
-				"None" => SquadMarker.None, 
-				"Arrow" => SquadMarker.Arrow, 
-				"Circle" => SquadMarker.Circle, 
-				"Heart" => SquadMarker.Heart, 
-				"Square" => SquadMarker.Square, 
-				"STAR" => SquadMarker.Star, 
-				"Sprial" => SquadMarker.Spiral, 
-				"Triangle" => SquadMarker.Triangle, 
-				"Cross" => SquadMarker.Cross, 
-				"Clear" => SquadMarker.Clear, 
-				_ => SquadMarker.None, 
-			};
+				switch (readable.Length)
+				{
+				case 4:
+					switch (readable[0])
+					{
+					case 'N':
+						if (!(readable == "None"))
+						{
+							break;
+						}
+						return SquadMarker.None;
+					case 'S':
+						if (!(readable == "STAR"))
+						{
+							break;
+						}
+						return SquadMarker.Star;
+					}
+					break;
+				case 5:
+					switch (readable[2])
+					{
+					case 'r':
+						if (!(readable == "Arrow"))
+						{
+							break;
+						}
+						return SquadMarker.Arrow;
+					case 'a':
+						if (!(readable == "Heart"))
+						{
+							break;
+						}
+						return SquadMarker.Heart;
+					case 'o':
+						if (!(readable == "Cross"))
+						{
+							break;
+						}
+						return SquadMarker.Cross;
+					case 'e':
+						if (!(readable == "Clear"))
+						{
+							break;
+						}
+						return SquadMarker.Clear;
+					}
+					break;
+				case 6:
+					switch (readable[1])
+					{
+					case 'i':
+						if (!(readable == "Circle"))
+						{
+							break;
+						}
+						return SquadMarker.Circle;
+					case 'q':
+						if (!(readable == "Square"))
+						{
+							break;
+						}
+						return SquadMarker.Square;
+					case 'p':
+						if (!(readable == "Sprial"))
+						{
+							break;
+						}
+						return SquadMarker.Spiral;
+					}
+					break;
+				case 8:
+					if (!(readable == "Triangle"))
+					{
+						break;
+					}
+					return SquadMarker.Triangle;
+				}
+			}
+			return SquadMarker.None;
 		}
 	}
 }

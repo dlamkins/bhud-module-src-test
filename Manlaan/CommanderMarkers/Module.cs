@@ -76,7 +76,7 @@ namespace Manlaan.CommanderMarkers
 			{
 				Service.LtMode.set_Value(e.get_Checked());
 			});
-			Service.CornerIcon = new CornerIconService(Service.Settings.CornerIconEnabled, "Commander Markers", Service.Textures!.IconCorner, Service.Textures!._imgHeart, new List<ContextMenuStripItem>
+			Service.CornerIcon = new CornerIconService(Service.Settings.CornerIconEnabled, "Commander Markers", new List<ContextMenuStripItem>
 			{
 				(ContextMenuStripItem)(object)new CornerIconToggleMenuItem((Control)(object)Service.SettingsWindow, "Open Settings"),
 				(ContextMenuStripItem)(object)new LibrayCornerIconMenuItem(Service.Settings.AutoMarker_FeatureEnabled, "Open Library"),

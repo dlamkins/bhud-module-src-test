@@ -24,6 +24,22 @@ namespace Manlaan.CommanderMarkers.Settings.Services
 
 		public Texture2D _imgX;
 
+		public Texture2D _imgArrowFade;
+
+		public Texture2D _imgCircleFade;
+
+		public Texture2D _imgHeartFade;
+
+		public Texture2D _imgSpiralFade;
+
+		public Texture2D _imgSquareFade;
+
+		public Texture2D _imgStarFade;
+
+		public Texture2D _imgTriangleFade;
+
+		public Texture2D _imgXFade;
+
 		public Texture2D _imgClear;
 
 		public Texture2D _imgCheck;
@@ -63,6 +79,14 @@ namespace Manlaan.CommanderMarkers.Settings.Services
 			_imgStar = contentsManager.GetTexture("star.png");
 			_imgTriangle = contentsManager.GetTexture("triangle.png");
 			_imgX = contentsManager.GetTexture("x.png");
+			_imgArrowFade = contentsManager.GetTexture("arrow_fade.png");
+			_imgCircleFade = contentsManager.GetTexture("circle_fade.png");
+			_imgHeartFade = contentsManager.GetTexture("heart_fade.png");
+			_imgSpiralFade = contentsManager.GetTexture("spiral_fade.png");
+			_imgSquareFade = contentsManager.GetTexture("square_fade.png");
+			_imgStarFade = contentsManager.GetTexture("star_fade.png");
+			_imgTriangleFade = contentsManager.GetTexture("triangle_fade.png");
+			_imgXFade = contentsManager.GetTexture("x_fade.png");
 			_imgClear = contentsManager.GetTexture("clear.png");
 			_imgCheck = contentsManager.GetTexture("check.png");
 			_blishHeart = contentsManager.GetTexture("mapmarker.png");
@@ -125,6 +149,46 @@ namespace Manlaan.CommanderMarkers.Settings.Services
 			if (imgX != null)
 			{
 				((GraphicsResource)imgX).Dispose();
+			}
+			Texture2D imgArrowFade = _imgArrowFade;
+			if (imgArrowFade != null)
+			{
+				((GraphicsResource)imgArrowFade).Dispose();
+			}
+			Texture2D imgCircleFade = _imgCircleFade;
+			if (imgCircleFade != null)
+			{
+				((GraphicsResource)imgCircleFade).Dispose();
+			}
+			Texture2D imgHeartFade = _imgHeartFade;
+			if (imgHeartFade != null)
+			{
+				((GraphicsResource)imgHeartFade).Dispose();
+			}
+			Texture2D imgSpiralFade = _imgSpiralFade;
+			if (imgSpiralFade != null)
+			{
+				((GraphicsResource)imgSpiralFade).Dispose();
+			}
+			Texture2D imgSquareFade = _imgSquareFade;
+			if (imgSquareFade != null)
+			{
+				((GraphicsResource)imgSquareFade).Dispose();
+			}
+			Texture2D imgStarFade = _imgStarFade;
+			if (imgStarFade != null)
+			{
+				((GraphicsResource)imgStarFade).Dispose();
+			}
+			Texture2D imgTriangleFade = _imgTriangleFade;
+			if (imgTriangleFade != null)
+			{
+				((GraphicsResource)imgTriangleFade).Dispose();
+			}
+			Texture2D imgXFade = _imgXFade;
+			if (imgXFade != null)
+			{
+				((GraphicsResource)imgXFade).Dispose();
 			}
 			Texture2D imgClear = _imgClear;
 			if (imgClear != null)

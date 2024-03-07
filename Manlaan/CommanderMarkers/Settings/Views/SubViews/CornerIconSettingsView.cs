@@ -18,21 +18,25 @@ namespace Manlaan.CommanderMarkers.Settings.Views.SubViews
 		{
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001d: Expected O, but got Unknown
-			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Expected O, but got Unknown
-			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a2: Expected O, but got Unknown
+			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
 			_settings = Service.Settings;
 			((View<IPresenter>)this).Build(buildPanel);
 			FlowPanel panel = FlowPanelExtensions.BeginFlow(new FlowPanel(), buildPanel).AddString("Top-left menu bar icon settings").AddSetting((SettingEntry)(object)_settings.CornerIconEnabled)
 				.AddSpace()
 				.AddSettingEnum((SettingEntry)(object)_settings.CornerIconLeftClickAction)
-				.AddSpace(100);
+				.AddSpace()
+				.AddSettingEnum((SettingEntry)(object)_settings.CornerIconTexture)
+				.AddSpace()
+				.AddSetting((SettingEntry)(object)_settings.CornerIconPriority)
+				.AddSpace(40);
 			StandardButton val = new StandardButton();
 			val.set_Text("Update Notes");
 			((Control)val).set_BasicTooltipText("Open the module update notes in your default web browser");

@@ -4,6 +4,7 @@ using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Settings;
+using Manlaan.CommanderMarkers.Library.Enums;
 using Manlaan.CommanderMarkers.Settings.Views.Generic;
 using Manlaan.CommanderMarkers.Settings.Views.Tabs;
 using Microsoft.Xna.Framework;
@@ -80,9 +81,9 @@ namespace Manlaan.CommanderMarkers.Settings.Controls
 
 		private void BuildTabs()
 		{
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Expected O, but got Unknown
-			((TabbedWindow2)this).get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(Service.Textures?._imgHeart), (Func<IView>)(() => (IView)(object)new CustomSettingMenuView((ISettingsMenuRegistrar)(object)modSettingsTab)), "Settings", (int?)null));
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Expected O, but got Unknown
+			((TabbedWindow2)this).get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(Service.Settings.CornerIconTexture.get_Value().GetIcon()), (Func<IView>)(() => (IView)(object)new CustomSettingMenuView((ISettingsMenuRegistrar)(object)modSettingsTab)), "Settings", (int?)null));
 		}
 
 		public void ShowLibrary()

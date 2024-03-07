@@ -1,6 +1,7 @@
 using System;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
+using Manlaan.CommanderMarkers.Library.Enums;
 using Manlaan.CommanderMarkers.Settings.Enums;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -81,49 +82,61 @@ namespace Manlaan.CommanderMarkers.Settings.Services
 
 		public SettingEntry<CornerIconActions> CornerIconLeftClickAction { get; private set; }
 
+		public SettingEntry<int> CornerIconPriority { get; }
+
+		public SettingEntry<SquadMarker> CornerIconTexture { get; }
+
 		public SettingService(SettingCollection settings)
 		{
-			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f8: Expected O, but got Unknown
-			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014f: Expected O, but got Unknown
-			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a6: Expected O, but got Unknown
-			//IL_01b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fd: Expected O, but got Unknown
-			//IL_020c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0254: Expected O, but got Unknown
-			//IL_0263: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ab: Expected O, but got Unknown
-			//IL_02ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0302: Expected O, but got Unknown
-			//IL_0311: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0359: Expected O, but got Unknown
-			//IL_0368: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b0: Expected O, but got Unknown
-			//IL_03bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0407: Expected O, but got Unknown
-			//IL_0416: Unknown result type (might be due to invalid IL or missing references)
-			//IL_045e: Expected O, but got Unknown
-			//IL_046d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04b5: Expected O, but got Unknown
-			//IL_04c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_050c: Expected O, but got Unknown
-			//IL_051b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0563: Expected O, but got Unknown
-			//IL_0572: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ba: Expected O, but got Unknown
-			//IL_05c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0611: Expected O, but got Unknown
-			//IL_0620: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0668: Expected O, but got Unknown
-			//IL_0677: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06bf: Expected O, but got Unknown
-			//IL_06ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0716: Expected O, but got Unknown
-			//IL_0724: Unknown result type (might be due to invalid IL or missing references)
-			//IL_076c: Expected O, but got Unknown
-			//IL_077c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c3: Expected O, but got Unknown
+			//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021a: Expected O, but got Unknown
+			//IL_0229: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0271: Expected O, but got Unknown
+			//IL_0280: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c8: Expected O, but got Unknown
+			//IL_02d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_031f: Expected O, but got Unknown
+			//IL_032e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0376: Expected O, but got Unknown
+			//IL_0385: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03cd: Expected O, but got Unknown
+			//IL_03dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0424: Expected O, but got Unknown
+			//IL_0433: Unknown result type (might be due to invalid IL or missing references)
+			//IL_047b: Expected O, but got Unknown
+			//IL_048a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d2: Expected O, but got Unknown
+			//IL_04e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0529: Expected O, but got Unknown
+			//IL_0538: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0580: Expected O, but got Unknown
+			//IL_058f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05d7: Expected O, but got Unknown
+			//IL_05e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_062e: Expected O, but got Unknown
+			//IL_063d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0685: Expected O, but got Unknown
+			//IL_0694: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06dc: Expected O, but got Unknown
+			//IL_06eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0733: Expected O, but got Unknown
+			//IL_0742: Unknown result type (might be due to invalid IL or missing references)
+			//IL_078a: Expected O, but got Unknown
+			//IL_0799: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07e1: Expected O, but got Unknown
+			//IL_07ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0837: Expected O, but got Unknown
+			//IL_0847: Unknown result type (might be due to invalid IL or missing references)
+			CornerIconPriority = settings.DefineSetting<int>("CmdMrkCornerPriority", 478, (Func<string>)(() => "Top-left icon sort order"), (Func<string>)(() => "Left <----> Right"));
+			SettingComplianceExtensions.SetRange(CornerIconPriority, 0, 1000);
+			CornerIconTexture = settings.DefineSetting<SquadMarker>("CmdMrkCornerTexture", SquadMarker.Heart, (Func<string>)(() => "Top-left icon image"), (Func<string>)(() => "Choose a marker to appear in the top-left icon bar"));
+			SettingComplianceExtensions.SetExcluded<SquadMarker>(CornerIconTexture, new SquadMarker[2]
+			{
+				SquadMarker.None,
+				SquadMarker.Clear
+			});
 			_settingGroundMarkersEnabled = settings.DefineSetting<bool>("CmdMrkGnnEnabled", true, (Func<string>)(() => "Show icons for placing Ground Markers"), (Func<string>)(() => ""));
 			_settingTargetMarkersEnabled = settings.DefineSetting<bool>("CmdMrkTgtEnabled", true, (Func<string>)(() => "Show icons for placing Target/Object Markers"), (Func<string>)(() => ""));
 			_settingArrowGndBinding = settings.DefineSetting<KeyBinding>("CmdMrkArrowGndBinding", new KeyBinding((ModifierKeys)2, (Keys)49), (Func<string>)(() => "Arrow Ground Binding"), (Func<string>)(() => ""));
