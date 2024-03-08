@@ -113,6 +113,9 @@ namespace KpRefresher.Domain
 		TempleOfFebe = 100858,
 		[Display(Description = "CosmicObservatoryCM", ResourceType = typeof(tokens))]
 		[Order(36)]
-		CosmicObservatoryCM = 101172
+		CosmicObservatoryCM = 101172,
+		[Display(Description = "TempleOfFebeCM", ResourceType = typeof(tokens))]
+		[Order(37)]
+		TempleOfFebeCM = 101542
 	}
 }
