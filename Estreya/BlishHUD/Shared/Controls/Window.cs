@@ -893,15 +893,16 @@ namespace Estreya.BlishHUD.Shared.Controls
 			{
 				if (_rebuildTask != null)
 				{
-					_rebuildCancellationTokenSource.Cancel();
+					_rebuildCancellationTokenSource?.Cancel();
 					_rebuildTask = null;
 					_rebuildCancellationTokenSource = null;
 				}
 				_rebuildCancellationTokenSource = new CancellationTokenSource();
+				CancellationToken token = _rebuildCancellationTokenSource.Token;
 				_rebuildTask = new Task(async delegate
 				{
-					await DelayRebuild(_rebuildCancellationTokenSource.Token);
-				}, _rebuildCancellationTokenSource.Token);
+					await DelayRebuild(token);
+				}, token);
 				_rebuildTask.Start();
 			}
 			catch (Exception)

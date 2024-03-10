@@ -95,12 +95,13 @@ namespace Estreya.BlishHUD.Shared.Services
 		private async Task HandleQueue()
 		{
 			int max = 50;
-			int handled = 0;
-			string metricKey;
-			while (_metricsQueue.TryDequeue(out metricKey) && handled <= max)
+			for (int handled = 0; handled <= max; handled++)
 			{
+				if (!_metricsQueue.TryDequeue(out var metricKey))
+				{
+					break;
+				}
 				await SendMetricAsync(metricKey);
-				handled++;
 			}
 		}
 

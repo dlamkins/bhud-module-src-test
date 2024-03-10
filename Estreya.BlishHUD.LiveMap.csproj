@@ -13,12 +13,12 @@
   <PropertyGroup />
   <ItemGroup />
   <ItemGroup>
+    <Reference Include="Gw2Sharp" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="Blish HUD" />
     <Reference Include="SpriteFontPlus">
       <HintPath>..\..\working\SpriteFontPlus.dll</HintPath>
     </Reference>
-    <Reference Include="Gw2Sharp" />
     <Reference Include="MonoGame.Extended" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml" />
@@ -32,7 +32,13 @@
       <HintPath>..\..\working\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="SemVer" />
+    <Reference Include="System.Text.Json">
+      <HintPath>..\..\working\System.Text.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System.Net.Http" />
+    <Reference Include="System.Threading.Tasks.Extensions">
+      <HintPath>..\..\working\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
     <Reference Include="System.Core" />
     <Reference Include="Octokit">
       <HintPath>..\..\working\Octokit.dll</HintPath>
@@ -42,12 +48,10 @@
     <Reference Include="SocketIOClient">
       <HintPath>..\..\working\SocketIOClient.dll</HintPath>
     </Reference>
-    <Reference Include="System.Text.Json">
-      <HintPath>..\..\working\System.Text.Json.dll</HintPath>
-    </Reference>
     <Reference Include="jose-jwt">
       <HintPath>..\..\working\jose-jwt.dll</HintPath>
     </Reference>
+    <Reference Include="NAudio.Wasapi" />
     <Reference Include="System.Security" />
     <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="Flurl">

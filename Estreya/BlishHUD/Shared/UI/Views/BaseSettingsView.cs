@@ -21,9 +21,9 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		private readonly SettingEventService _settingEventService;
 
-		private Point CONTROL_LOCATION;
-
 		protected int CONTROL_WIDTH;
+
+		protected Point CONTROL_LOCATION { get; private set; }
 
 		protected BaseSettingsView(Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService)
 			: base(apiManager, iconService, translationService)
@@ -37,7 +37,6 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 		protected void UpdateControlLocation()
 		{
 			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
 			CONTROL_LOCATION = new Point(base.LABEL_WIDTH + 20, 0);
 		}
 

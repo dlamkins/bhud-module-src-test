@@ -39,10 +39,6 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		private readonly AsyncRef<double> _lastSaveMissingSkill = new AsyncRef<double>(0.0);
 
-		private readonly string _webRootUrl;
-
-		private IFlurlClient _flurlClient;
-
 		private IconService _iconService;
 
 		private SynchronizedCollection<MissingArcDPSSkill> _missingSkillsFromAPIReportedByArcDPS;
@@ -64,12 +60,10 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		protected override bool ForceAPI => true;
 
-		public SkillService(APIServiceConfiguration configuration, Gw2ApiManager apiManager, IconService iconService, string baseFolderPath, IFlurlClient flurlClient, string webRootUrl)
-			: base(apiManager, configuration, baseFolderPath)
+		public SkillService(APIServiceConfiguration configuration, Gw2ApiManager apiManager, IconService iconService, string baseFolderPath, IFlurlClient flurlClient, string fileRootUrl)
+			: base(apiManager, configuration, baseFolderPath, flurlClient, fileRootUrl)
 		{
 			_iconService = iconService;
-			_flurlClient = flurlClient;
-			_webRootUrl = new Uri(new Uri(webRootUrl), "/gw2/api/v2/skills").ToString();
 		}
 
 		protected override Task DoInitialize()
@@ -83,7 +77,6 @@ namespace Estreya.BlishHUD.Shared.Services
 			_missingSkillsFromAPIReportedByArcDPS?.Clear();
 			_missingSkillsFromAPIReportedByArcDPS = null;
 			_iconService = null;
-			_flurlClient = null;
 		}
 
 		protected override async Task Load()
@@ -134,7 +127,7 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		private async Task RemapSkillIds(List<Skill> skills)
 		{
-			using Stream remappedSkillsStream = await _flurlClient.Request(_webRootUrl, "remapped_skills.json").GetStreamAsync(default(CancellationToken), (HttpCompletionOption)0);
+			using Stream remappedSkillsStream = await _flurlClient.Request(_fileRootUrl, "/gw2/api/v2/skills", "remapped_skills.json").GetStreamAsync(default(CancellationToken), (HttpCompletionOption)0);
 			using ReadProgressStream progressStream = new ReadProgressStream(remappedSkillsStream);
 			progressStream.ProgressChanged += delegate(object s, ReadProgressStream.ProgressChangedEventArgs e)
 			{
@@ -164,7 +157,7 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		private async Task AddMissingSkills(List<Skill> skills)
 		{
-			using ReadProgressStream progressStream = new ReadProgressStream(await _flurlClient.Request(_webRootUrl, "missing_skills.json").GetStreamAsync(default(CancellationToken), (HttpCompletionOption)0));
+			using ReadProgressStream progressStream = new ReadProgressStream(await _flurlClient.Request(_fileRootUrl, "/gw2/api/v2/skills", "missing_skills.json").GetStreamAsync(default(CancellationToken), (HttpCompletionOption)0));
 			progressStream.ProgressChanged += delegate(object s, ReadProgressStream.ProgressChangedEventArgs e)
 			{
 				ReportProgress($"Reading missing skills... {Math.Round(e.Progress, 0)}%");

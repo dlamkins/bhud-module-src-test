@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.Shared.Extensions;
 using Estreya.BlishHUD.Shared.Models.GW2API.PointOfInterest;
+using Flurl.Http;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
@@ -20,8 +21,8 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		public List<PointOfInterest> PointOfInterests => base.APIObjectList;
 
-		public PointOfInterestService(APIServiceConfiguration configuration, Gw2ApiManager apiManager, string baseFolderPath)
-			: base(apiManager, configuration, baseFolderPath)
+		public PointOfInterestService(APIServiceConfiguration configuration, Gw2ApiManager apiManager, string baseFolderPath, IFlurlClient flurlClient, string fileRootUrl)
+			: base(apiManager, configuration, baseFolderPath, flurlClient, fileRootUrl)
 		{
 		}
 

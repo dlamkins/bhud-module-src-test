@@ -67,7 +67,7 @@ namespace Estreya.BlishHUD.LiveMap
 
 		protected override string API_VERSION_NO => "1";
 
-		protected override bool FailIfBackendDown => true;
+		protected override bool NeedsBackend => true;
 
 		protected override int CornerIconPriority => 1289351275;
 

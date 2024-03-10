@@ -12,17 +12,17 @@ using MonoGame.Extended.TextureAtlases;
 
 namespace Estreya.BlishHUD.Shared.Controls
 {
-	public class Dropdown<T> : Control
+	public class Dropdown<TItem> : Control
 	{
-		private class DropdownPanel<T> : FlowPanel
+		private class DropdownPanel : FlowPanel
 		{
 			private const int SCROLL_CLOSE_THRESHOLD = 20;
 
 			private readonly int _startTop;
 
-			private Dropdown<T> _assocDropdown;
+			private Dropdown<TItem> _assocDropdown;
 
-			private DropdownPanel(Dropdown<T> assocDropdown, int panelHeight = -1)
+			private DropdownPanel(Dropdown<TItem> assocDropdown, int panelHeight = -1)
 				: this()
 			{
 				//IL_003c: Unknown result type (might be due to invalid IL or missing references)
@@ -45,9 +45,9 @@ namespace Estreya.BlishHUD.Shared.Controls
 
 			private void AddItems()
 			{
-				foreach (T item in _assocDropdown.Items)
+				foreach (TItem item in _assocDropdown.Items)
 				{
-					DropdownPanelItem<T> dropdownPanelItem = new DropdownPanelItem<T>(item);
+					DropdownPanelItem dropdownPanelItem = new DropdownPanelItem(item);
 					((Control)dropdownPanelItem).set_Parent((Container)(object)this);
 					((Control)dropdownPanelItem).set_Height((_assocDropdown.ItemHeight == -1) ? ((Control)_assocDropdown).get_Height() : _assocDropdown.ItemHeight);
 					((Control)dropdownPanelItem).set_Width(((Control)_assocDropdown).get_Width());
@@ -58,7 +58,7 @@ namespace Estreya.BlishHUD.Shared.Controls
 
 			private void DropdownPanelItem_Click(object sender, MouseEventArgs e)
 			{
-				DropdownPanelItem<T> panelItem = sender as DropdownPanelItem<T>;
+				DropdownPanelItem panelItem = sender as DropdownPanelItem;
 				if (panelItem != null)
 				{
 					_assocDropdown.SelectedItem = panelItem.Value;
@@ -91,9 +91,9 @@ namespace Estreya.BlishHUD.Shared.Controls
 				return dropdownLocation + new Point(0, ((Control)_assocDropdown).get_Height() - 1);
 			}
 
-			public static DropdownPanel<T> ShowPanel(Dropdown<T> assocDropdown, int panelHeight = -1)
+			public static DropdownPanel ShowPanel(Dropdown<TItem> assocDropdown, int panelHeight = -1)
 			{
-				return new DropdownPanel<T>(assocDropdown, panelHeight);
+				return new DropdownPanel(assocDropdown, panelHeight);
 			}
 
 			private void InputOnMousedOffDropdownPanel(object sender, MouseEventArgs e)
@@ -133,7 +133,7 @@ namespace Estreya.BlishHUD.Shared.Controls
 			{
 				((Container)this).get_Children()?.ToList().ForEach(delegate(Control child)
 				{
-					DropdownPanelItem<T> dropdownPanelItem = child as DropdownPanelItem<T>;
+					DropdownPanelItem dropdownPanelItem = child as DropdownPanelItem;
 					if (dropdownPanelItem != null)
 					{
 						((Control)dropdownPanelItem).remove_Click((EventHandler<MouseEventArgs>)DropdownPanelItem_Click);
@@ -154,7 +154,7 @@ namespace Estreya.BlishHUD.Shared.Controls
 			}
 		}
 
-		private class DropdownPanelItem<T> : Control
+		private class DropdownPanelItem : Control
 		{
 			private const int TOOLTIP_HOVER_DELAY = 800;
 
@@ -163,9 +163,9 @@ namespace Estreya.BlishHUD.Shared.Controls
 			public BitmapFont Font { get; set; } = GameService.Content.get_DefaultFont14();
 
 
-			public T Value { get; }
+			public TItem Value { get; }
 
-			public DropdownPanelItem(T value)
+			public DropdownPanelItem(TItem value)
 				: this()
 			{
 				//IL_001e: Unknown result type (might be due to invalid IL or missing references)
@@ -190,7 +190,7 @@ namespace Estreya.BlishHUD.Shared.Controls
 				}
 				else
 				{
-					T value = Value;
+					TItem value = Value;
 					basicTooltipText = ((value != null) ? value.ToString() : null);
 				}
 				((Control)this).set_BasicTooltipText((string)basicTooltipText);
@@ -213,14 +213,14 @@ namespace Estreya.BlishHUD.Shared.Controls
 				//IL_010d: Unknown result type (might be due to invalid IL or missing references)
 				if (((Control)this).get_MouseOver())
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(2, 2, base._size.X - 12 - Dropdown<T>._textureArrow.get_Width(), ((Control)this).get_Height() - 4), new Color(45, 37, 25, 255));
-					T value = Value;
-					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, (value != null) ? value.ToString() : null, Font, new Rectangle(8, 0, bounds.Width - 13 - Dropdown<T>._textureArrow.get_Width(), ((Control)this).get_Height()), Colors.Chardonnay, false, (HorizontalAlignment)0, (VerticalAlignment)1);
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(2, 2, base._size.X - 12 - Dropdown<TItem>._textureArrow.get_Width(), ((Control)this).get_Height() - 4), new Color(45, 37, 25, 255));
+					TItem value = Value;
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, (value != null) ? value.ToString() : null, Font, new Rectangle(8, 0, bounds.Width - 13 - Dropdown<TItem>._textureArrow.get_Width(), ((Control)this).get_Height()), Colors.Chardonnay, false, (HorizontalAlignment)0, (VerticalAlignment)1);
 				}
 				else
 				{
-					T value = Value;
-					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, (value != null) ? value.ToString() : null, Font, new Rectangle(8, 0, bounds.Width - 13 - Dropdown<T>._textureArrow.get_Width(), ((Control)this).get_Height()), Color.FromNonPremultiplied(239, 240, 239, 255), false, (HorizontalAlignment)0, (VerticalAlignment)1);
+					TItem value = Value;
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, (value != null) ? value.ToString() : null, Font, new Rectangle(8, 0, bounds.Width - 13 - Dropdown<TItem>._textureArrow.get_Width(), ((Control)this).get_Height()), Color.FromNonPremultiplied(239, 240, 239, 255), false, (HorizontalAlignment)0, (VerticalAlignment)1);
 				}
 			}
 		}
@@ -229,9 +229,9 @@ namespace Estreya.BlishHUD.Shared.Controls
 
 		private bool _hadPanel;
 
-		private DropdownPanel<T> _lastPanel;
+		private DropdownPanel _lastPanel;
 
-		private T _selectedItem;
+		private TItem _selectedItem;
 
 		private static readonly Texture2D _textureInputBox = Control.get_Content().GetTexture("input-box");
 
@@ -239,9 +239,9 @@ namespace Estreya.BlishHUD.Shared.Controls
 
 		private static readonly TextureRegion2D _textureArrowActive = Control.TextureAtlasControl.GetRegion("inputboxes/dd-arrow-active");
 
-		public ObservableCollection<T> Items { get; }
+		public ObservableCollection<TItem> Items { get; }
 
-		public T SelectedItem
+		public TItem SelectedItem
 		{
 			get
 			{
@@ -249,10 +249,10 @@ namespace Estreya.BlishHUD.Shared.Controls
 			}
 			set
 			{
-				T previousValue = _selectedItem;
-				if (((Control)this).SetProperty<T>(ref _selectedItem, value, false, "SelectedItem"))
+				TItem previousValue = _selectedItem;
+				if (((Control)this).SetProperty<TItem>(ref _selectedItem, value, false, "SelectedItem"))
 				{
-					OnValueChanged(new ValueChangedEventArgs<T>(previousValue, _selectedItem));
+					OnValueChanged(new ValueChangedEventArgs<TItem>(previousValue, _selectedItem));
 				}
 			}
 		}
@@ -268,13 +268,13 @@ namespace Estreya.BlishHUD.Shared.Controls
 		public BitmapFont Font { get; set; } = GameService.Content.get_DefaultFont14();
 
 
-		public event EventHandler<ValueChangedEventArgs<T>> ValueChanged;
+		public event EventHandler<ValueChangedEventArgs<TItem>> ValueChanged;
 
 		public Dropdown()
 			: this()
 		{
 			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			Items = new ObservableCollection<T>();
+			Items = new ObservableCollection<TItem>();
 			Items.CollectionChanged += delegate
 			{
 				ItemsUpdated();
@@ -286,7 +286,7 @@ namespace Estreya.BlishHUD.Shared.Controls
 		public void HideDropdownPanel()
 		{
 			_hadPanel = base._mouseOver;
-			DropdownPanel<T> lastPanel = _lastPanel;
+			DropdownPanel lastPanel = _lastPanel;
 			if (lastPanel != null)
 			{
 				((Control)lastPanel).Dispose();
@@ -304,7 +304,7 @@ namespace Estreya.BlishHUD.Shared.Controls
 			((Control)this).OnClick(e);
 			if (_lastPanel == null && !_hadPanel)
 			{
-				_lastPanel = DropdownPanel<T>.ShowPanel(this, Math.Min(PanelHeight, Items.Sum((T x) => ((Control)this).get_Height())));
+				_lastPanel = DropdownPanel.ShowPanel(this, Math.Min(PanelHeight, Items.Sum((TItem x) => ((Control)this).get_Height())));
 				if (PanelHeight != -1)
 				{
 					((Panel)_lastPanel).set_CanScroll(true);
@@ -318,10 +318,10 @@ namespace Estreya.BlishHUD.Shared.Controls
 
 		private void ItemsUpdated()
 		{
-			T selectedItem = SelectedItem;
+			TItem selectedItem = SelectedItem;
 			if (selectedItem == null)
 			{
-				T val2 = (SelectedItem = Items.FirstOrDefault());
+				TItem val2 = (SelectedItem = Items.FirstOrDefault());
 			}
 		}
 
@@ -342,11 +342,11 @@ namespace Estreya.BlishHUD.Shared.Controls
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _textureInputBox, RectangleExtension.Subtract(new Rectangle(Point.get_Zero(), base._size), new Rectangle(0, 0, 5, 0)), (Rectangle?)new Rectangle(0, 0, Math.Min(_textureInputBox.get_Width() - 5, ((Control)this).get_Width() - 5), _textureInputBox.get_Height()));
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _textureInputBox, new Rectangle(base._size.X - 5, 0, 5, base._size.Y), (Rectangle?)new Rectangle(_textureInputBox.get_Width() - 5, 0, 5, _textureInputBox.get_Height()));
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, (((Control)this).get_Enabled() && ((Control)this).get_MouseOver()) ? _textureArrowActive : _textureArrow, new Rectangle(base._size.X - _textureArrow.get_Width() - 5, base._size.Y / 2 - _textureArrow.get_Height() / 2, _textureArrow.get_Width(), _textureArrow.get_Height()));
-			T selectedItem = SelectedItem;
+			TItem selectedItem = SelectedItem;
 			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, (selectedItem != null) ? selectedItem.ToString() : null, Font, new Rectangle(5, 0, base._size.X - 10 - _textureArrow.get_Width(), base._size.Y), ((Control)this).get_Enabled() ? Color.FromNonPremultiplied(239, 240, 239, 255) : StandardColors.get_DisabledText(), false, (HorizontalAlignment)0, (VerticalAlignment)1);
 		}
 
-		protected virtual void OnValueChanged(ValueChangedEventArgs<T> e)
+		protected virtual void OnValueChanged(ValueChangedEventArgs<TItem> e)
 		{
 			this.ValueChanged?.Invoke(this, e);
 		}
