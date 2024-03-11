@@ -24,7 +24,7 @@ namespace Estreya.BlishHUD.EventTable.Contexts
 
 		public int[] MapIds { get; set; }
 
-		public string Waypoint { get; set; }
+		public EventWaypoints Waypoints { get; set; }
 
 		public string Wiki { get; set; }
 
@@ -55,7 +55,7 @@ namespace Estreya.BlishHUD.EventTable.Contexts
 			StartingDate = null;
 			Location = null;
 			MapIds = null;
-			Waypoint = null;
+			Waypoints = default(EventWaypoints);
 			Wiki = null;
 			Duration = 0;
 			BackgroundColorCode = null;

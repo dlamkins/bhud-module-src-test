@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.Shared.Extensions;
+using Flurl.Http;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
@@ -19,8 +20,8 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		public List<Achievement> Achievements => base.APIObjectList;
 
-		public AchievementService(Gw2ApiManager apiManager, APIServiceConfiguration configuration, string baseFolderPath)
-			: base(apiManager, configuration, baseFolderPath)
+		public AchievementService(Gw2ApiManager apiManager, APIServiceConfiguration configuration, string baseFolderPath, IFlurlClient flurlClient, string fileRootUrl)
+			: base(apiManager, configuration, baseFolderPath, flurlClient, fileRootUrl)
 		{
 		}
 

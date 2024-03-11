@@ -54,19 +54,22 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private readonly ModuleSettings _moduleSettings;
 
+		private readonly AccountService _accountService;
+
 		private readonly List<EventCategory> allEvents;
 
 		public Panel Panel { get; private set; }
 
 		public event EventHandler<EventChangedArgs> EventChanged;
 
-		public ManageEventsView(List<EventCategory> allEvents, Dictionary<string, object> additionalData, Func<List<string>> getDisabledEventKeys, ModuleSettings moduleSettings, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService)
+		public ManageEventsView(List<EventCategory> allEvents, Dictionary<string, object> additionalData, Func<List<string>> getDisabledEventKeys, ModuleSettings moduleSettings, AccountService accountService, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService)
 			: base(apiManager, iconService, translationService)
 		{
 			this.allEvents = allEvents;
 			_additionalData = additionalData ?? new Dictionary<string, object>();
 			_getDisabledEventKeys = getDisabledEventKeys;
 			_moduleSettings = moduleSettings;
+			_accountService = accountService;
 		}
 
 		private void UpdateToggleButton(GlowButton button)
@@ -154,36 +157,36 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_0477: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0484: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0608: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0641: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0646: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0653: Unknown result type (might be due to invalid IL or missing references)
 			//IL_065a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0674: Unknown result type (might be due to invalid IL or missing references)
-			//IL_067e: Expected O, but got Unknown
-			//IL_067e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_065f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_066c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0673: Unknown result type (might be due to invalid IL or missing references)
+			//IL_068d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0697: Expected O, but got Unknown
+			//IL_0697: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06db: Unknown result type (might be due to invalid IL or missing references)
 			//IL_06e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0704: Expected O, but got Unknown
-			//IL_0704: Unknown result type (might be due to invalid IL or missing references)
-			//IL_076a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_076f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_077c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_070e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0718: Expected O, but got Unknown
+			//IL_0718: Unknown result type (might be due to invalid IL or missing references)
+			//IL_077e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0783: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0799: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_082c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0831: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0843: Unknown result type (might be due to invalid IL or missing references)
-			//IL_084a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0878: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08e0: Expected O, but got Unknown
+			//IL_0790: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0797: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0840: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0845: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0857: Unknown result type (might be due to invalid IL or missing references)
+			//IL_085e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_088c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08f4: Expected O, but got Unknown
 			Panel val = new Panel();
 			((Control)val).set_Parent((Container)(object)parent);
 			((Control)val).set_Location(new Point(MAIN_PADDING.X, MAIN_PADDING.Y));
@@ -358,7 +361,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					((DetailsButton)obj).set_ShowToggleButton(true);
 					((DetailsButton)obj).set_FillColor(Color.get_LightBlue());
 					EventDetailsButton button = obj;
-					if (!string.IsNullOrWhiteSpace(e2.Waypoint))
+					string waypoint = e2.GetWaypoint(_accountService.Account);
+					if (!string.IsNullOrWhiteSpace(waypoint))
 					{
 						AsyncTexture2D icon2 = base.IconService.GetIcon("102348.png");
 						GlowButton val9 = new GlowButton();
@@ -368,7 +372,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 						val9.set_Icon(icon2);
 						((Control)val9).add_Click((EventHandler<MouseEventArgs>)delegate
 						{
-							ClipboardUtil.get_WindowsClipboardService().SetTextAsync(e2.Waypoint).ContinueWith(delegate(Task<bool> clipboardTask)
+							ClipboardUtil.get_WindowsClipboardService().SetTextAsync(waypoint).ContinueWith(delegate(Task<bool> clipboardTask)
 							{
 								//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 								//IL_0033: Unknown result type (might be due to invalid IL or missing references)

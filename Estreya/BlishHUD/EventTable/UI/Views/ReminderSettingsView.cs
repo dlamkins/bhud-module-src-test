@@ -33,6 +33,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private readonly Func<List<string>> _getAreaNames;
 
+		private readonly AccountService _accountService;
+
 		private readonly ModuleSettings _moduleSettings;
 
 		private StandardWindow _manageEventsWindow;
@@ -47,12 +49,13 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			_globalChangeTempEvent.UpdateReminderTimes(new TimeSpan[1] { TimeSpan.Zero });
 		}
 
-		public ReminderSettingsView(ModuleSettings moduleSettings, Func<List<EventCategory>> getEvents, Func<List<string>> getAreaNames, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService)
+		public ReminderSettingsView(ModuleSettings moduleSettings, Func<List<EventCategory>> getEvents, Func<List<string>> getAreaNames, AccountService accountService, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService)
 			: base(apiManager, iconService, translationService, settingEventService)
 		{
 			_moduleSettings = moduleSettings;
 			_getEvents = getEvents;
 			_getAreaNames = getAreaNames;
+			_accountService = accountService;
 			CONTROL_WIDTH = 500;
 		}
 
@@ -100,7 +103,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 							Action = ManageReminderTimes
 						}
 					}
-				} }, () => _moduleSettings.ReminderDisabledForEvents.get_Value(), _moduleSettings, base.APIManager, base.IconService, base.TranslationService);
+				} }, () => _moduleSettings.ReminderDisabledForEvents.get_Value(), _moduleSettings, _accountService, base.APIManager, base.IconService, base.TranslationService);
 				manageEventsView.EventChanged += ManageView_EventChanged;
 				_manageEventsWindow.Show((IView)(object)manageEventsView);
 			});

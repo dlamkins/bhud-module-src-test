@@ -8,6 +8,7 @@ using Estreya.BlishHUD.Shared.Attributes;
 using Estreya.BlishHUD.Shared.Json.Converter;
 using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Utils;
+using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 
@@ -63,8 +64,8 @@ namespace Estreya.BlishHUD.EventTable.Models
 		[JsonProperty("mapIds")]
 		public int[] MapIds { get; set; }
 
-		[JsonProperty("waypoint")]
-		public string Waypoint { get; set; }
+		[JsonProperty("waypoints")]
+		public EventWaypoints Waypoints { get; set; }
 
 		[JsonProperty("wiki")]
 		public string Wiki { get; set; }
@@ -89,6 +90,9 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		[JsonProperty("linkedCompletion")]
 		public bool LinkedCompletion { get; set; }
+
+		[JsonProperty("linkedCompletionKeys")]
+		public string[] LinkedCompletionKeys { get; set; }
 
 		[JsonProperty("filler")]
 		public bool Filler { get; set; }
@@ -202,6 +206,20 @@ namespace Estreya.BlishHUD.EventTable.Models
 		{
 			ReminderTimes = reminderTimes;
 			_remindedFor.Clear();
+		}
+
+		public string GetWaypoint(Account account)
+		{
+			if (account == null)
+			{
+				Logger.Warn("Account is null. Returning EU waypoint.");
+				return Waypoints.EU;
+			}
+			if (account.get_World().ToString().First() == '1')
+			{
+				return Waypoints.NA;
+			}
+			return Waypoints.EU;
 		}
 
 		public override string ToString()

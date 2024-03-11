@@ -13,12 +13,12 @@
   <PropertyGroup />
   <ItemGroup />
   <ItemGroup>
+    <Reference Include="Gw2Sharp" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="Blish HUD" />
     <Reference Include="SpriteFontPlus">
       <HintPath>..\..\working\SpriteFontPlus.dll</HintPath>
     </Reference>
-    <Reference Include="Gw2Sharp" />
     <Reference Include="MonoGame.Extended" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml" />
@@ -32,7 +32,9 @@
       <HintPath>..\..\working\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="SemVer" />
+    <Reference Include="System.Text.Json" />
     <Reference Include="System.Net.Http" />
+    <Reference Include="System.Threading.Tasks.Extensions" />
     <Reference Include="System.Core" />
     <Reference Include="Octokit">
       <HintPath>..\..\working\Octokit.dll</HintPath>

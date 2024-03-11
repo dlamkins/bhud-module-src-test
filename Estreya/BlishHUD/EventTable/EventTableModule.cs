@@ -511,12 +511,13 @@ namespace Estreya.BlishHUD.EventTable
 		private void EventNotification_Click(object sender, MouseEventArgs e)
 		{
 			EventNotification notification = sender as EventNotification;
+			string waypoint = notification?.Model?.GetWaypoint(base.AccountService.Account);
 			switch (base.ModuleSettings.ReminderLeftClickAction.get_Value())
 			{
 			case LeftClickAction.CopyWaypoint:
-				if (notification != null && notification.Model != null && !string.IsNullOrWhiteSpace(notification.Model.Waypoint))
+				if (notification != null && notification.Model != null && !string.IsNullOrWhiteSpace(waypoint))
 				{
-					ClipboardUtil.get_WindowsClipboardService().SetTextAsync(notification.Model.Waypoint);
+					ClipboardUtil.get_WindowsClipboardService().SetTextAsync(waypoint);
 					ScreenNotification.ShowNotification(new string[2]
 					{
 						notification.Model.Name,
@@ -526,7 +527,7 @@ namespace Estreya.BlishHUD.EventTable
 				break;
 			case LeftClickAction.NavigateToWaypoint:
 			{
-				if (notification == null || notification.Model == null || string.IsNullOrWhiteSpace(notification.Model.Waypoint) || base.PointOfInterestService == null)
+				if (notification == null || notification.Model == null || string.IsNullOrWhiteSpace(waypoint) || base.PointOfInterestService == null)
 				{
 					break;
 				}
@@ -535,10 +536,10 @@ namespace Estreya.BlishHUD.EventTable
 					ScreenNotification.ShowNotification("PointOfInterestService is still loading!", ScreenNotification.NotificationType.Error);
 					break;
 				}
-				PointOfInterest poi = base.PointOfInterestService.GetPointOfInterest(notification.Model.Waypoint);
+				PointOfInterest poi = base.PointOfInterestService.GetPointOfInterest(waypoint);
 				if (poi == null)
 				{
-					ScreenNotification.ShowNotification(notification.Model.Waypoint + " not found!", ScreenNotification.NotificationType.Error);
+					ScreenNotification.ShowNotification(waypoint + " not found!", ScreenNotification.NotificationType.Error);
 					break;
 				}
 				Task.Run(async delegate
@@ -589,7 +590,7 @@ namespace Estreya.BlishHUD.EventTable
 				base.ModuleSettings.EventAreaNames.set_Value(new List<string>(base.ModuleSettings.EventAreaNames.get_Value()) { configuration.Name });
 			}
 			base.ModuleSettings.UpdateDrawerLocalization(configuration, base.TranslationService);
-			EventArea eventArea = new EventArea(configuration, base.IconService, base.TranslationService, EventStateService, base.WorldbossService, base.MapchestService, base.PointOfInterestService, MapUtil, GetFlurlClient(), base.MODULE_API_URL, () => NowUTC, () => ((Module)this).get_Version(), () => base.BlishHUDAPIService.AccessToken, () => base.ModuleSettings.EventAreaNames.get_Value().ToArray().ToList(), () => base.ModuleSettings.ReminderDisabledForEvents.get_Value().ToArray().ToList(), base.ContentsManager);
+			EventArea eventArea = new EventArea(configuration, base.IconService, base.TranslationService, EventStateService, base.WorldbossService, base.MapchestService, base.PointOfInterestService, base.AccountService, MapUtil, GetFlurlClient(), base.MODULE_API_URL, () => NowUTC, () => ((Module)this).get_Version(), () => base.BlishHUDAPIService.AccessToken, () => base.ModuleSettings.EventAreaNames.get_Value().ToArray().ToList(), () => base.ModuleSettings.ReminderDisabledForEvents.get_Value().ToArray().ToList(), base.ContentsManager);
 			((Control)eventArea).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			EventArea area = eventArea;
 			area.CopyToAreaClicked += new EventHandler<(string, string)>(EventArea_CopyToAreaClicked);
@@ -660,16 +661,16 @@ namespace Estreya.BlishHUD.EventTable
 			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00aa: Expected O, but got Unknown
-			//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c4: Expected O, but got Unknown
-			//IL_0272: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027c: Expected O, but got Unknown
-			//IL_02c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02cb: Expected O, but got Unknown
-			//IL_0300: Unknown result type (might be due to invalid IL or missing references)
-			//IL_030a: Expected O, but got Unknown
-			//IL_034f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0359: Expected O, but got Unknown
+			//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ca: Expected O, but got Unknown
+			//IL_027e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0288: Expected O, but got Unknown
+			//IL_02cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d7: Expected O, but got Unknown
+			//IL_030c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0316: Expected O, but got Unknown
+			//IL_035b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0365: Expected O, but got Unknown
 			settingWindow.SavesSize = true;
 			settingWindow.CanResize = true;
 			settingWindow.RebuildViewAfterResize = true;
@@ -681,7 +682,7 @@ namespace Estreya.BlishHUD.EventTable
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			}), base.TranslationService.GetTranslation("generalSettingsView-title", "General"), (int?)null));
-			AreaSettingsView areaSettingsView = new AreaSettingsView(() => _areas.Values.Select((EventArea area) => area.Configuration), () => _eventCategories, base.ModuleSettings, base.Gw2ApiManager, base.IconService, base.TranslationService, base.SettingEventService, EventStateService)
+			AreaSettingsView areaSettingsView = new AreaSettingsView(() => _areas.Values.Select((EventArea area) => area.Configuration), () => _eventCategories, base.ModuleSettings, base.AccountService, base.Gw2ApiManager, base.IconService, base.TranslationService, base.SettingEventService, EventStateService)
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			};
@@ -724,7 +725,7 @@ namespace Estreya.BlishHUD.EventTable
 				return Task.CompletedTask;
 			};
 			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("605018.png"), (Func<IView>)(() => (IView)(object)areaSettingsView), base.TranslationService.GetTranslation("areaSettingsView-title", "Event Areas"), (int?)null));
-			ReminderSettingsView reminderSettingsView = new ReminderSettingsView(base.ModuleSettings, () => _eventCategories, () => _areas.Keys.ToList(), base.Gw2ApiManager, base.IconService, base.TranslationService, base.SettingEventService)
+			ReminderSettingsView reminderSettingsView = new ReminderSettingsView(base.ModuleSettings, () => _eventCategories, () => _areas.Keys.ToList(), base.AccountService, base.Gw2ApiManager, base.IconService, base.TranslationService, base.SettingEventService)
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			};

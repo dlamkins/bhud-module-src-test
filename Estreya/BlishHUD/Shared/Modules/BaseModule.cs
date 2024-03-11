@@ -25,6 +25,7 @@ using Estreya.BlishHUD.Shared.Extensions;
 using Estreya.BlishHUD.Shared.Helpers;
 using Estreya.BlishHUD.Shared.Models;
 using Estreya.BlishHUD.Shared.MumbleInfo.Map;
+using Estreya.BlishHUD.Shared.Net;
 using Estreya.BlishHUD.Shared.Security;
 using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Services.Audio;
@@ -36,6 +37,7 @@ using Estreya.BlishHUD.Shared.UI.Views;
 using Estreya.BlishHUD.Shared.UI.Views.Settings;
 using Estreya.BlishHUD.Shared.Utils;
 using Flurl.Http;
+using Flurl.Http.Configuration;
 using Gw2Sharp.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -195,7 +197,10 @@ namespace Estreya.BlishHUD.Shared.Modules
 			if (_flurlClient == null)
 			{
 				_flurlClient = new FlurlClient();
-				_flurlClient.WithHeader("User-Agent", $"{((Module)this).get_Name()} {((Module)this).get_Version()}");
+				_flurlClient.WithHeader("User-Agent", $"{((Module)this).get_Name()} {((Module)this).get_Version()}").WithHeader("Accept-Encoding", "gzip, delate").Configure(delegate(ClientFlurlHttpSettings c)
+				{
+					c.HttpClientFactory = new FlurlHttpClientFactory();
+				});
 			}
 			return _flurlClient;
 		}
@@ -276,59 +281,43 @@ namespace Estreya.BlishHUD.Shared.Modules
 			{
 				return;
 			}
+			Func<HttpResponseMessage, bool> isBackendUnavailable = delegate(HttpResponseMessage response)
+			{
+				bool flag = response == null;
+				if (!flag)
+				{
+					HttpStatusCode statusCode = response.get_StatusCode();
+					bool flag2 = (((uint)(statusCode - 502) <= 1u) ? true : false);
+					flag = flag2;
+				}
+				return flag;
+			};
 			IFlurlRequest request = GetFlurlClient().Request(MODULE_API_URL, "validate").AllowAnyHttpStatus();
 			ModuleValidationRequest moduleValidationRequest = default(ModuleValidationRequest);
 			moduleValidationRequest.Version = ((Module)this).get_Version();
 			ModuleValidationRequest data = moduleValidationRequest;
-			HttpResponseMessage response = null;
+			HttpResponseMessage response2 = null;
 			try
 			{
-				response = await request.PostJsonAsync(data, default(CancellationToken), (HttpCompletionOption)0);
+				response2 = await request.PostJsonAsync(data, default(CancellationToken), (HttpCompletionOption)0);
 			}
 			catch (Exception ex)
 			{
 				Logger.Debug(ex, "Failed to validate module.");
 			}
-			if (response != null && (response.get_IsSuccessStatusCode() || response.get_StatusCode() == HttpStatusCode.NotFound))
+			if ((response2 != null && (response2.get_IsSuccessStatusCode() || response2.get_StatusCode() == HttpStatusCode.NotFound)) || isBackendUnavailable(response2))
 			{
 				return;
 			}
-			bool flag = NeedsBackend;
-			if (flag)
+			if (response2.get_StatusCode() != HttpStatusCode.Forbidden)
 			{
-				bool flag2 = response == null;
-				if (!flag2)
-				{
-					HttpStatusCode statusCode = response.get_StatusCode();
-					bool flag3 = (((uint)(statusCode - 502) <= 1u) ? true : false);
-					flag2 = flag3;
-				}
-				flag = flag2;
-			}
-			if (flag)
-			{
-				return;
-			}
-			flag = response == null;
-			if (!flag)
-			{
-				HttpStatusCode statusCode = response.get_StatusCode();
-				bool flag2 = (((uint)(statusCode - 502) <= 1u) ? true : false);
-				flag = flag2;
-			}
-			if (flag)
-			{
-				return;
-			}
-			if (response.get_StatusCode() != HttpStatusCode.Forbidden)
-			{
-				string content2 = await response.get_Content().ReadAsStringAsync();
+				string content2 = await response2.get_Content().ReadAsStringAsync();
 				ScreenNotification.ShowNotification(new string[2]
 				{
 					"The module \"" + ((Module)this).get_Name() + "\" could not verify itself.",
 					"Please check the latest log for more information."
 				}, ScreenNotification.NotificationType.Error, null, 10);
-				Logger.Error($"Module validation failed with unexpected status code {response.get_StatusCode()}: {content2}");
+				Logger.Error($"Module validation failed with unexpected status code {response2.get_StatusCode()}: {content2}");
 				ReportErrorState(ModuleErrorStateGroup.MODULE_VALIDATION, "Module validation failed. Check latest log for more information.");
 				return;
 			}
@@ -336,11 +325,11 @@ namespace Estreya.BlishHUD.Shared.Modules
 			ModuleValidationResponse validationResponse;
 			try
 			{
-				validationResponse = await response.GetJsonAsync<ModuleValidationResponse>();
+				validationResponse = await response2.GetJsonAsync<ModuleValidationResponse>();
 			}
 			catch (Exception)
 			{
-				string content = await response.get_Content().ReadAsStringAsync();
+				string content = await response2.get_Content().ReadAsStringAsync();
 				ScreenNotification.ShowNotification(new string[2]
 				{
 					"The module \"" + ((Module)this).get_Name() + "\" could not verify itself.",
@@ -353,9 +342,9 @@ namespace Estreya.BlishHUD.Shared.Modules
 				"[" + ((Module)this).get_Name() + "]",
 				"The current module version is invalid!"
 			};
-			if (!string.IsNullOrWhiteSpace(validationResponse.Message) || !string.IsNullOrWhiteSpace(response.get_ReasonPhrase()))
+			if (!string.IsNullOrWhiteSpace(validationResponse.Message) || !string.IsNullOrWhiteSpace(response2.get_ReasonPhrase()))
 			{
-				messages.Add(validationResponse.Message ?? response.get_ReasonPhrase());
+				messages.Add(validationResponse.Message ?? response2.get_ReasonPhrase());
 			}
 			ScreenNotification.ShowNotification(messages.ToArray(), ScreenNotification.NotificationType.Error, null, 10);
 			throw new ModuleInvalidException(validationResponse.Message);
@@ -498,7 +487,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 				}
 				if (configurations.Items.Enabled)
 				{
-					ItemService = new ItemService(configurations.Items, Gw2ApiManager, directoryPath);
+					ItemService = new ItemService(configurations.Items, Gw2ApiManager, directoryPath, GetFlurlClient(), "https://files.estreya.de");
 					_services.Add(ItemService);
 				}
 				if (configurations.PlayerTransactions.Enabled)
@@ -543,7 +532,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 					{
 						throw new ArgumentNullException("directoryPath", "Module directory is not specified.");
 					}
-					PointOfInterestService = new PointOfInterestService(configurations.PointOfInterests, Gw2ApiManager, directoryPath);
+					PointOfInterestService = new PointOfInterestService(configurations.PointOfInterests, Gw2ApiManager, directoryPath, GetFlurlClient(), "https://files.estreya.de");
 					_services.Add(PointOfInterestService);
 				}
 				if (configurations.Skills.Enabled)
@@ -570,7 +559,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 				}
 				if (configurations.Achievements.Enabled)
 				{
-					AchievementService = new AchievementService(Gw2ApiManager, configurations.Achievements, directoryPath);
+					AchievementService = new AchievementService(Gw2ApiManager, configurations.Achievements, directoryPath, GetFlurlClient(), "https://files.estreya.de");
 					_services.Add(AchievementService);
 				}
 				if (configurations.AccountAchievements.Enabled)

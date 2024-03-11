@@ -43,6 +43,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private readonly ModuleSettings _moduleSettings;
 
+		private readonly AccountService _accountService;
+
 		private IEnumerable<EventAreaConfiguration> _areaConfigurations;
 
 		private Panel _areaPanel;
@@ -63,12 +65,13 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		public event AsyncEventHandler<EventAreaConfiguration> SyncEnabledEventsToOtherAreas;
 
-		public AreaSettingsView(Func<IEnumerable<EventAreaConfiguration>> areaConfiguration, Func<List<EventCategory>> allEvents, ModuleSettings moduleSettings, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService, EventStateService eventStateService)
+		public AreaSettingsView(Func<IEnumerable<EventAreaConfiguration>> areaConfiguration, Func<List<EventCategory>> allEvents, ModuleSettings moduleSettings, AccountService accountService, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService, EventStateService eventStateService)
 			: base(apiManager, iconService, translationService, settingEventService)
 		{
 			_areaConfigurationFunc = areaConfiguration;
 			_allEvents = allEvents;
 			_moduleSettings = moduleSettings;
+			_accountService = accountService;
 			_eventStateService = eventStateService;
 		}
 
@@ -813,7 +816,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 						where x.AreaName == configuration.Name && x.State == EventStateService.EventStates.Hidden
 						select x.EventKey).ToList()
 				}
-			}, () => configuration.DisabledEventKeys.get_Value(), _moduleSettings, base.APIManager, base.IconService, base.TranslationService);
+			}, () => configuration.DisabledEventKeys.get_Value(), _moduleSettings, _accountService, base.APIManager, base.IconService, base.TranslationService);
 			view.EventChanged += ManageView_EventChanged;
 			_manageEventsWindow.Show((IView)(object)view);
 		}

@@ -234,7 +234,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 					Offset = eArgsContent.Offset,
 					Repeat = eArgsContent.Repeat,
 					StartingDate = eArgsContent.StartingDate,
-					Waypoint = eArgsContent.Waypoint,
+					Waypoints = eArgsContent.Waypoints,
 					Wiki = eArgsContent.Wiki
 				};
 				if (eArgsContent.Occurences != null)

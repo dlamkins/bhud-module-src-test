@@ -102,6 +102,8 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private PointOfInterestService _pointOfInterestService;
 
+		private AccountService _accountService;
+
 		private TimeSpan? _savedDrawInterval;
 
 		private int _tempHistorySplit = -1;
@@ -186,7 +188,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		public event EventHandler<string> DisableReminderClicked;
 
-		public EventArea(EventAreaConfiguration configuration, IconService iconService, TranslationService translationService, EventStateService eventService, WorldbossService worldbossService, MapchestService mapchestService, PointOfInterestService pointOfInterestService, MapUtil mapUtil, IFlurlClient flurlClient, string apiRootUrl, Func<DateTime> getNowAction, Func<Version> getVersion, Func<string> getAccessToken, Func<List<string>> getAreaNames, Func<List<string>> getDisabledReminderKeys, ContentsManager contentsManager)
+		public EventArea(EventAreaConfiguration configuration, IconService iconService, TranslationService translationService, EventStateService eventService, WorldbossService worldbossService, MapchestService mapchestService, PointOfInterestService pointOfInterestService, AccountService accountService, MapUtil mapUtil, IFlurlClient flurlClient, string apiRootUrl, Func<DateTime> getNowAction, Func<Version> getVersion, Func<string> getAccessToken, Func<List<string>> getAreaNames, Func<List<string>> getDisabledReminderKeys, ContentsManager contentsManager)
 		{
 			Configuration = configuration;
 			Configuration.EnabledKeybinding.get_Value().add_Activated((EventHandler<EventArgs>)EnabledKeybinding_Activated);
@@ -227,6 +229,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			_worldbossService = worldbossService;
 			_mapchestService = mapchestService;
 			_pointOfInterestService = pointOfInterestService;
+			_accountService = accountService;
 			_mapUtil = mapUtil;
 			_flurlClient = flurlClient;
 			_apiRootUrl = apiRootUrl;
@@ -407,7 +410,14 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			{
 				events.AddRange(from ev in _allEvents.SelectMany((EventCategory ec) => ec.Events)
 					where ev.APICode == apiCode
+					where Configuration.EnableLinkedCompletion.get_Value() || !ev.LinkedCompletion
 					select ev);
+				if (Configuration.EnableLinkedCompletion.get_Value())
+				{
+					events.AddRange(from ev in _allEvents.SelectMany((EventCategory ec) => ec.Events)
+						where events.Any((Estreya.BlishHUD.EventTable.Models.Event ce) => ce.LinkedCompletionKeys?.Contains(ev.SettingKey) ?? false)
+						select ev);
+				}
 			}
 			events.ForEach(delegate(Estreya.BlishHUD.EventTable.Models.Event ev)
 			{
@@ -425,6 +435,12 @@ namespace Estreya.BlishHUD.EventTable.Controls
 					where ev.APICode == apiCode
 					where Configuration.EnableLinkedCompletion.get_Value() || !ev.LinkedCompletion
 					select ev);
+				if (Configuration.EnableLinkedCompletion.get_Value())
+				{
+					events.AddRange(from ev in _allEvents.SelectMany((EventCategory ec) => ec.Events)
+						where events.Any((Estreya.BlishHUD.EventTable.Models.Event ce) => ce.LinkedCompletionKeys?.Contains(ev.SettingKey) ?? false)
+						select ev);
+				}
 			}
 			events.ForEach(delegate(Estreya.BlishHUD.EventTable.Models.Event ev)
 			{
@@ -982,12 +998,13 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			{
 				return;
 			}
+			string waypoint = _activeEvent?.Model?.GetWaypoint(_accountService.Account);
 			switch (Configuration.LeftClickAction.get_Value())
 			{
 			case LeftClickAction.CopyWaypoint:
-				if (!string.IsNullOrWhiteSpace(_activeEvent.Model.Waypoint))
+				if (!string.IsNullOrWhiteSpace(waypoint))
 				{
-					ClipboardUtil.get_WindowsClipboardService().SetTextAsync(_activeEvent.Model.Waypoint);
+					ClipboardUtil.get_WindowsClipboardService().SetTextAsync(waypoint);
 					ScreenNotification.ShowNotification(new string[2]
 					{
 						_activeEvent.Model.Name,
@@ -997,7 +1014,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				break;
 			case LeftClickAction.NavigateToWaypoint:
 			{
-				if (string.IsNullOrWhiteSpace(_activeEvent.Model.Waypoint))
+				if (string.IsNullOrWhiteSpace(waypoint))
 				{
 					break;
 				}
@@ -1006,10 +1023,10 @@ namespace Estreya.BlishHUD.EventTable.Controls
 					ScreenNotification.ShowNotification("PointOfInterestService is still loading!", ScreenNotification.NotificationType.Error);
 					break;
 				}
-				PointOfInterest poi = _pointOfInterestService.GetPointOfInterest(_activeEvent.Model.Waypoint);
+				PointOfInterest poi = _pointOfInterestService.GetPointOfInterest(waypoint);
 				if (poi == null)
 				{
-					ScreenNotification.ShowNotification(_activeEvent.Model.Waypoint + " not found!", ScreenNotification.NotificationType.Error);
+					ScreenNotification.ShowNotification(waypoint + " not found!", ScreenNotification.NotificationType.Error);
 					break;
 				}
 				Task.Run(async delegate
@@ -1229,8 +1246,31 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private void Ev_ToggleFinishClicked(object sender, EventArgs e)
 		{
-			Event ev = sender as Event;
-			ToggleFinishEvent(ev.Model, GetNextReset(ev.Model));
+			Event ev3 = sender as Event;
+			List<Estreya.BlishHUD.EventTable.Models.Event> events = new List<Estreya.BlishHUD.EventTable.Models.Event> { ev3.Model };
+			using (_eventLock.Lock())
+			{
+				if (!string.IsNullOrWhiteSpace(ev3.Model.APICode))
+				{
+					events.AddRange(from ev2 in _allEvents.SelectMany((EventCategory ec) => ec.Events)
+						where ev2.SettingKey != ev3.Model.SettingKey && ev2.APICode == ev3.Model.APICode
+						select ev2 into ev
+						where Configuration.EnableLinkedCompletion.get_Value() || !ev.LinkedCompletion
+						select ev);
+				}
+				if (Configuration.EnableLinkedCompletion.get_Value())
+				{
+					events.AddRange(from ev2 in _allEvents.SelectMany((EventCategory ec) => ec.Events)
+						where ev2.SettingKey != ev3.Model.SettingKey && events.Any((Estreya.BlishHUD.EventTable.Models.Event ce) => ce.LinkedCompletionKeys?.Contains(ev2.SettingKey) ?? false)
+						select ev2);
+				}
+			}
+			events.ForEach(delegate(Estreya.BlishHUD.EventTable.Models.Event ev)
+			{
+				DateTime nextReset = GetNextReset(ev);
+				_logger.Info($"Event \"{ev.SettingKey}\" marked completed manually until: {nextReset.ToUniversalTime()}");
+				ToggleFinishEvent(ev, nextReset);
+			});
 		}
 
 		private void ToggleFinishEvent(Estreya.BlishHUD.EventTable.Models.Event ev, DateTime until)
@@ -1344,6 +1384,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			_translationService = null;
 			_mapUtil = null;
 			_pointOfInterestService = null;
+			_accountService = null;
 			_contentsManager = null;
 			_flurlClient = null;
 			_apiRootUrl = null;
