@@ -28,7 +28,7 @@ namespace Ideka.CustomCombatText
 		public MainPanel()
 			: this()
 		{
-			_tab = GameService.Overlay.get_BlishHudWindow().AddTab("Custom Combat Text", AsyncTexture2D.FromAssetId(1414035), (Panel)(object)this);
+			_tab = GameService.Overlay.get_BlishHudWindow().AddTab("Custom Combat Text", AsyncTexture2D.FromAssetId(1414035), (Panel)(object)this, CTextModule.Name.GetHashCode());
 			AreasPanel areasPanel = new AreasPanel();
 			((Control)areasPanel).set_Parent((Container)(object)this);
 			_areasPanel = areasPanel;

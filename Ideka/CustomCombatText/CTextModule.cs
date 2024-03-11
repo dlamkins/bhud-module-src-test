@@ -13,7 +13,9 @@ using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Ideka.BHUDCommon;
+using Ideka.CustomCombatText.Bridge;
 using Ideka.NetCommon;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
 
@@ -47,6 +49,10 @@ namespace Ideka.CustomCombatText
 		private ViewControl _viewControl;
 
 		private MainPanel _mainPanel;
+
+		private BridgeService _bridgeService;
+
+		private SettingsView? _settingsView;
 
 		private static CTextModule Instance { get; set; } = null;
 
@@ -104,7 +110,7 @@ namespace Ideka.CustomCombatText
 
 		public override IView GetSettingsView()
 		{
-			return (IView)(object)new SettingsView(base.ModuleParameters.get_SettingsManager().get_ModuleSettings());
+			return (IView)(object)(_settingsView = new SettingsView(base.ModuleParameters.get_SettingsManager().get_ModuleSettings()));
 		}
 
 		public static string ExtractAndRead(string builtinPath)
@@ -151,9 +157,19 @@ namespace Ideka.CustomCombatText
 			((Control)viewControl).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((Control)viewControl).set_ZIndex(50);
 			_viewControl = dc.Add<ViewControl>(viewControl);
-			GameService.ArcDps.add_RawCombatEvent((EventHandler<RawCombatEventArgs>)ArcDpsEvent);
 			_mainPanel = _dc.Add<MainPanel>(new MainPanel());
 			LocalData.ReloadViews();
+			_bridgeService = _dc.Add(new BridgeService());
+			_bridgeService.RawCombatEvent += new EventHandler<RawCombatEventArgs>(ArcDpsEvent);
+		}
+
+		protected override void Update(GameTime gameTime)
+		{
+			((Module)this).Update(gameTime);
+			if (_settingsView != null)
+			{
+				_settingsView!.Status = "Bridge Status: " + (_bridgeService.IsActive ? "active" : "inactive") + "\n" + $"Restarts: {_bridgeService.Loops}";
+			}
 		}
 
 		private void ArcDpsEvent(object sender, RawCombatEventArgs e)
@@ -176,7 +192,6 @@ namespace Ideka.CustomCombatText
 
 		protected override void Unload()
 		{
-			GameService.ArcDps.remove_RawCombatEvent((EventHandler<RawCombatEventArgs>)ArcDpsEvent);
 			try
 			{
 				_dc.Dispose();

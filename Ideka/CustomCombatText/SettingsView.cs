@@ -18,6 +18,19 @@ namespace Ideka.CustomCombatText
 
 		private ViewContainer? _lastSettingContainer;
 
+		private Label? _statusLabel;
+
+		public string Status
+		{
+			set
+			{
+				if (_statusLabel != null)
+				{
+					_statusLabel!.set_Text(value);
+				}
+			}
+		}
+
 		public bool LockBounds
 		{
 			get
@@ -73,11 +86,17 @@ namespace Ideka.CustomCombatText
 			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006b: Expected O, but got Unknown
-			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0102: Expected O, but got Unknown
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009b: Expected O, but got Unknown
+			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0132: Expected O, but got Unknown
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Size(((Control)buildPanel).get_Size());
 			val.set_FlowDirection((ControlFlowDirection)3);
@@ -88,6 +107,12 @@ namespace Ideka.CustomCombatText
 			((Container)val).set_AutoSizePadding(new Point(0, 15));
 			((Control)val).set_Parent(buildPanel);
 			_settingFlowPanel = val;
+			Label val2 = new Label();
+			val2.set_AutoSizeWidth(true);
+			val2.set_AutoSizeHeight(true);
+			((Control)val2).set_Parent((Container)(object)_settingFlowPanel);
+			val2.set_Text("\n");
+			_statusLabel = val2;
 			foreach (SettingEntry item in ((IEnumerable<SettingEntry>)_settings).Where((SettingEntry s) => s.get_SessionDefined()))
 			{
 				SettingEntry<Color> colorItem = item as SettingEntry<Color>;
@@ -98,17 +123,17 @@ namespace Ideka.CustomCombatText
 				}
 				else
 				{
-					IView val2 = (IView)(object)new ColorSettingView(colorItem, ((Control)_settingFlowPanel).get_Width());
-					obj = val2;
+					IView val3 = (IView)(object)new ColorSettingView(colorItem, ((Control)_settingFlowPanel).get_Width());
+					obj = val3;
 				}
 				IView view = obj;
 				if (view != null)
 				{
-					ViewContainer val3 = new ViewContainer();
-					((Container)val3).set_WidthSizingMode((SizingMode)2);
-					((Container)val3).set_HeightSizingMode((SizingMode)1);
-					((Control)val3).set_Parent((Container)(object)_settingFlowPanel);
-					_lastSettingContainer = val3;
+					ViewContainer val4 = new ViewContainer();
+					((Container)val4).set_WidthSizingMode((SizingMode)2);
+					((Container)val4).set_HeightSizingMode((SizingMode)1);
+					((Control)val4).set_Parent((Container)(object)_settingFlowPanel);
+					_lastSettingContainer = val4;
 					_lastSettingContainer!.Show(view);
 					SettingsView settingsView = view as SettingsView;
 					if (settingsView != null)
