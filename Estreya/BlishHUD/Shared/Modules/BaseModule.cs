@@ -386,8 +386,9 @@ namespace Estreya.BlishHUD.Shared.Modules
 			obj[2] = ((obj2 != null) ? obj2.get_ReasonPhrase() : null) ?? string.Empty;
 			obj[3] = sw.Elapsed.TotalMilliseconds;
 			logger.Debug(string.Format("Checked API backend at \"{0}\". Response: {1} - {2} | Duration: {3}ms", obj));
+			bool backendOnline = response != null && response.get_IsSuccessStatusCode();
 			bool wasUnavailable = HasErrorState(ModuleErrorStateGroup.BACKEND_UNAVAILABLE);
-			if (!wasUnavailable && (response == null || !response.get_IsSuccessStatusCode()))
+			if (!wasUnavailable && !backendOnline)
 			{
 				ReportErrorState(ModuleErrorStateGroup.BACKEND_UNAVAILABLE, "Backend unavailable.");
 				ScreenNotification.ShowNotification(new string[2]
@@ -397,7 +398,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 				}, ScreenNotification.NotificationType.Error, null, 10);
 				await (this.BackendConnectionLost?.Invoke(this) ?? Task.CompletedTask);
 			}
-			else if (wasUnavailable)
+			else if (wasUnavailable && backendOnline)
 			{
 				ReportErrorState(ModuleErrorStateGroup.BACKEND_UNAVAILABLE, null);
 				try

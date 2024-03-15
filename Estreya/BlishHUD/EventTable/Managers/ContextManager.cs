@@ -166,9 +166,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			ReminderType value = _moduleSettings.ReminderType.get_Value();
 			if ((value == ReminderType.Control || value == ReminderType.Both) ? true : false)
 			{
-				EventNotification eventNotification = new EventNotification(null, eArgsContent.Title, eArgsContent.Message, icon, _moduleSettings.ReminderPosition.X.get_Value(), _moduleSettings.ReminderPosition.Y.get_Value(), _moduleSettings.ReminderSize.X.get_Value(), _moduleSettings.ReminderSize.Y.get_Value(), _moduleSettings.ReminderSize.Icon.get_Value(), _moduleSettings.ReminderStackDirection.get_Value(), _moduleSettings.ReminderOverflowStackDirection.get_Value(), _moduleSettings.ReminderFonts.TitleSize.get_Value(), _moduleSettings.ReminderFonts.MessageSize.get_Value(), _iconService, _moduleSettings.ReminderLeftClickAction.get_Value() != LeftClickAction.None);
-				eventNotification.BackgroundOpacity = _moduleSettings.ReminderOpacity.get_Value();
-				eventNotification.Show(TimeSpan.FromSeconds(_moduleSettings.ReminderDuration.get_Value()));
+				EventNotification.ShowAsControl(null, eArgsContent.Title, eArgsContent.Message, icon, _iconService, _moduleSettings);
 			}
 			value = _moduleSettings.ReminderType.get_Value();
 			if ((value == ReminderType.Windows || value == ReminderType.Both) ? true : false)

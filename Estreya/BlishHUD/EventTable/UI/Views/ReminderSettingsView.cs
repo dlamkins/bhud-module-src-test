@@ -41,6 +41,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private StandardWindow _manageReminderTimesWindow;
 
+		private SynchronizedCollection<EventNotification> _activeTestNotifications;
+
 		public event AsyncEventHandler SyncEnabledEventsToAreas;
 
 		static ReminderSettingsView()
@@ -61,18 +63,18 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		protected override void BuildView(FlowPanel parent)
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Expected O, but got Unknown
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Expected O, but got Unknown
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Expected O, but got Unknown
+			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010b: Expected O, but got Unknown
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)parent);
 			((Container)val).set_WidthSizingMode((SizingMode)1);
@@ -107,7 +109,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				manageEventsView.EventChanged += ManageView_EventChanged;
 				_manageEventsWindow.Show((IView)(object)manageEventsView);
 			});
-			RenderButtonAsync((Panel)(object)manageFlowPanel, base.TranslationService.GetTranslation("reminderSettingsView-btn-testReminder", "Test Reminder"), async delegate
+			Func<bool, Task> addTestReminder = async delegate(bool permanentControl)
 			{
 				string title = "Test Event";
 				string message = "Test starts in " + TimeSpan.FromHours(5.0).Add(TimeSpan.FromMinutes(21.0).Add(TimeSpan.FromSeconds(23.0))).Humanize(6, null, TimeUnit.Week, _moduleSettings.ReminderMinTimeUnit.get_Value()) + "!";
@@ -115,14 +117,35 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				ReminderType value = _moduleSettings.ReminderType.get_Value();
 				if ((value == ReminderType.Control || value == ReminderType.Both) ? true : false)
 				{
-					EventNotification eventNotification = new EventNotification(null, title, message, icon, _moduleSettings.ReminderPosition.X.get_Value(), _moduleSettings.ReminderPosition.Y.get_Value(), _moduleSettings.ReminderSize.X.get_Value(), _moduleSettings.ReminderSize.Y.get_Value(), _moduleSettings.ReminderSize.Icon.get_Value(), _moduleSettings.ReminderStackDirection.get_Value(), _moduleSettings.ReminderOverflowStackDirection.get_Value(), _moduleSettings.ReminderFonts.TitleSize.get_Value(), _moduleSettings.ReminderFonts.MessageSize.get_Value(), base.IconService);
-					eventNotification.BackgroundOpacity = _moduleSettings.ReminderOpacity.get_Value();
-					eventNotification.Show(TimeSpan.FromSeconds(_moduleSettings.ReminderDuration.get_Value()));
+					if (permanentControl)
+					{
+						EventNotification reminder = EventNotification.ShowAsControlTest(title, message, icon, base.IconService, _moduleSettings);
+						_activeTestNotifications.Add(reminder);
+					}
+					else
+					{
+						EventNotification.ShowAsControl(title, message, icon, base.IconService, _moduleSettings);
+					}
 				}
 				value = _moduleSettings.ReminderType.get_Value();
 				if ((value == ReminderType.Windows || value == ReminderType.Both) ? true : false)
 				{
 					await EventNotification.ShowAsWindowsNotification(title, message, icon);
+				}
+			};
+			RenderButtonAsync((Panel)(object)manageFlowPanel, base.TranslationService.GetTranslation("reminderSettingsView-btn-addTestReminderPermanent", "Add Test Reminder"), async delegate
+			{
+				await addTestReminder(arg: false);
+			});
+			RenderButtonAsync((Panel)(object)manageFlowPanel, base.TranslationService.GetTranslation("reminderSettingsView-btn-addTestReminderPermanent", "Add Test Reminder (Permanent)"), async delegate
+			{
+				await addTestReminder(arg: true);
+			});
+			RenderButton((Panel)(object)manageFlowPanel, base.TranslationService.GetTranslation("reminderSettingsView-btn-clearTestReminder", "Clear Permanent Test Reminders"), delegate
+			{
+				foreach (EventNotification activeTestNotification in _activeTestNotifications)
+				{
+					((Control)activeTestNotification).Dispose();
 				}
 			});
 			FlowPanel val2 = new FlowPanel();
@@ -164,12 +187,18 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderIntSetting((Panel)(object)parent, _moduleSettings.ReminderSize.Icon);
 			RenderEmptyLine((Panel)(object)parent);
 			RenderFloatSetting((Panel)(object)parent, _moduleSettings.ReminderDuration);
-			RenderFloatSetting((Panel)(object)parent, _moduleSettings.ReminderOpacity);
 			RenderEnumSetting<EventReminderStackDirection>((Panel)(object)parent, _moduleSettings.ReminderStackDirection);
 			RenderEnumSetting<EventReminderStackDirection>((Panel)(object)parent, _moduleSettings.ReminderOverflowStackDirection);
 			RenderEmptyLine((Panel)(object)parent);
 			base.RenderEnumSetting<FontSize>((Panel)(object)parent, _moduleSettings.ReminderFonts.TitleSize);
 			base.RenderEnumSetting<FontSize>((Panel)(object)parent, _moduleSettings.ReminderFonts.MessageSize);
+			RenderEmptyLine((Panel)(object)parent);
+			RenderColorSetting((Panel)(object)parent, _moduleSettings.ReminderColors.Background);
+			RenderColorSetting((Panel)(object)parent, _moduleSettings.ReminderColors.TitleText);
+			RenderColorSetting((Panel)(object)parent, _moduleSettings.ReminderColors.MessageText);
+			RenderFloatSetting((Panel)(object)parent, _moduleSettings.ReminderBackgroundOpacity);
+			RenderFloatSetting((Panel)(object)parent, _moduleSettings.ReminderTitleOpacity);
+			RenderFloatSetting((Panel)(object)parent, _moduleSettings.ReminderMessageOpacity);
 			RenderEmptyLine((Panel)(object)parent);
 			RenderEnumSetting<TimeUnit>((Panel)(object)parent, _moduleSettings.ReminderMinTimeUnit);
 			RenderEmptyLine((Panel)(object)parent);
@@ -278,12 +307,22 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		protected override Task<bool> InternalLoad(IProgress<string> progress)
 		{
+			_activeTestNotifications = new SynchronizedCollection<EventNotification>();
 			return Task.FromResult(result: true);
 		}
 
 		protected override void Unload()
 		{
 			base.Unload();
+			if (_activeTestNotifications != null)
+			{
+				foreach (EventNotification activeTestNotification in _activeTestNotifications)
+				{
+					((Control)activeTestNotification).Dispose();
+				}
+				_activeTestNotifications.Clear();
+				_activeTestNotifications = null;
+			}
 			if (_manageEventsWindow?.CurrentView != null)
 			{
 				(_manageEventsWindow.CurrentView as ManageEventsView).EventChanged -= ManageView_EventChanged;

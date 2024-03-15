@@ -36,9 +36,15 @@ namespace Estreya.BlishHUD.EventTable
 
 		public EventReminderFonts ReminderFonts { get; private set; }
 
+		public EventReminderColors ReminderColors { get; private set; }
+
 		public SettingEntry<float> ReminderDuration { get; private set; }
 
-		public SettingEntry<float> ReminderOpacity { get; private set; }
+		public SettingEntry<float> ReminderBackgroundOpacity { get; private set; }
+
+		public SettingEntry<float> ReminderTitleOpacity { get; private set; }
+
+		public SettingEntry<float> ReminderMessageOpacity { get; private set; }
 
 		public SettingEntry<List<string>> ReminderDisabledForEvents { get; private set; }
 
@@ -130,14 +136,24 @@ namespace Estreya.BlishHUD.EventTable
 				TitleSize = base.GlobalSettings.DefineSetting<FontSize>("ReminderFontsTitleSize", (FontSize)18, (Func<string>)(() => "Title Font Size"), (Func<string>)(() => "Defines the size the reminder title font.")),
 				MessageSize = base.GlobalSettings.DefineSetting<FontSize>("ReminderFontsMessageSize", (FontSize)16, (Func<string>)(() => "Message Font Size"), (Func<string>)(() => "Defines the size the reminder message font."))
 			};
+			ReminderColors = new EventReminderColors
+			{
+				Background = base.GlobalSettings.DefineSetting<Color>("ReminderColorsBackground", base.DefaultGW2Color, (Func<string>)(() => "Background Color"), (Func<string>)(() => "Defines the color in which the background is drawn.")),
+				TitleText = base.GlobalSettings.DefineSetting<Color>("ReminderColorsTitleText", base.DefaultGW2Color, (Func<string>)(() => "Title Text Color"), (Func<string>)(() => "Defines the text color in which the titles are drawn.")),
+				MessageText = base.GlobalSettings.DefineSetting<Color>("ReminderColorsMessageText", base.DefaultGW2Color, (Func<string>)(() => "Message Text Color"), (Func<string>)(() => "Defines the text color in which the messages are drawn."))
+			};
 			int reminderDurationMin = 1;
 			int reminderDurationMax = 15;
 			ReminderDuration = base.GlobalSettings.DefineSetting<float>("ReminderDuration", 5f, (Func<string>)(() => "Reminder Duration"), (Func<string>)(() => "Defines the reminder duration."));
 			SettingComplianceExtensions.SetRange(ReminderDuration, (float)reminderDurationMin, (float)reminderDurationMax);
 			ReminderDisabledForEvents = base.GlobalSettings.DefineSetting<List<string>>("ReminderDisabledForEvents", new List<string>(), (Func<string>)(() => "Reminder disabled for Events"), (Func<string>)(() => "Defines the events for which NO reminder should be displayed."));
 			ReminderTimesOverride = base.GlobalSettings.DefineSetting<Dictionary<string, List<TimeSpan>>>("ReminderTimesOverride", new Dictionary<string, List<TimeSpan>>(), (Func<string>)(() => "Reminder Times Override"), (Func<string>)(() => "Defines the overridden times for reminders per event."));
-			ReminderOpacity = base.GlobalSettings.DefineSetting<float>("ReminderOpacity", 0.5f, (Func<string>)(() => "Reminder Opacity"), (Func<string>)(() => "Defines the background opacity for reminders."));
-			SettingComplianceExtensions.SetRange(ReminderOpacity, 0.1f, 1f);
+			ReminderBackgroundOpacity = base.GlobalSettings.DefineSetting<float>("ReminderBackgroundOpacity", 0.5f, (Func<string>)(() => "Reminder Background Opacity"), (Func<string>)(() => "Defines the background opacity for reminders."));
+			SettingComplianceExtensions.SetRange(ReminderBackgroundOpacity, 0.1f, 1f);
+			ReminderTitleOpacity = base.GlobalSettings.DefineSetting<float>("ReminderTitleOpacity", 1f, (Func<string>)(() => "Reminder Title Opacity"), (Func<string>)(() => "Defines the title opacity for reminders."));
+			SettingComplianceExtensions.SetRange(ReminderTitleOpacity, 0.1f, 1f);
+			ReminderMessageOpacity = base.GlobalSettings.DefineSetting<float>("ReminderMessageOpacity", 1f, (Func<string>)(() => "Reminder Message Opacity"), (Func<string>)(() => "Defines the message opacity for reminders."));
+			SettingComplianceExtensions.SetRange(ReminderMessageOpacity, 0.1f, 1f);
 			ReminderLeftClickAction = base.GlobalSettings.DefineSetting<LeftClickAction>("ReminderLeftClickAction", LeftClickAction.CopyWaypoint, (Func<string>)(() => "Reminder Left Click Action"), (Func<string>)(() => "Defines the action to execute on a left click."));
 			ReminderRightClickAction = base.GlobalSettings.DefineSetting<EventReminderRightClickAction>("ReminderRightClickAction", EventReminderRightClickAction.Dismiss, (Func<string>)(() => "Reminder Right Click Action"), (Func<string>)(() => "Defines the action to execute on a right click."));
 			ReminderStackDirection = base.GlobalSettings.DefineSetting<EventReminderStackDirection>("ReminderStackDirection", EventReminderStackDirection.Down, (Func<string>)(() => "Reminder Stack Direction"), (Func<string>)(() => "Defines the direction in which reminders stack."));
@@ -480,10 +496,10 @@ namespace Estreya.BlishHUD.EventTable
 			string reminderDurationDescriptionDefault = ((SettingEntry)ReminderDuration).get_Description();
 			((SettingEntry)ReminderDuration).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-reminderDuration-name", reminderDurationDisplayNameDefault)));
 			((SettingEntry)ReminderDuration).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-reminderDuration-description", reminderDurationDescriptionDefault)));
-			string reminderOpacityDisplayNameDefault = ((SettingEntry)ReminderOpacity).get_DisplayName();
-			string reminderOpacityDescriptionDefault = ((SettingEntry)ReminderOpacity).get_Description();
-			((SettingEntry)ReminderOpacity).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-reminderOpacity-name", reminderOpacityDisplayNameDefault)));
-			((SettingEntry)ReminderOpacity).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-reminderOpacity-description", reminderOpacityDescriptionDefault)));
+			string reminderOpacityDisplayNameDefault = ((SettingEntry)ReminderBackgroundOpacity).get_DisplayName();
+			string reminderOpacityDescriptionDefault = ((SettingEntry)ReminderBackgroundOpacity).get_Description();
+			((SettingEntry)ReminderBackgroundOpacity).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-reminderOpacity-name", reminderOpacityDisplayNameDefault)));
+			((SettingEntry)ReminderBackgroundOpacity).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-reminderOpacity-description", reminderOpacityDescriptionDefault)));
 			string showDynamicEventsOnMapDisplayNameDefault = ((SettingEntry)ShowDynamicEventsOnMap).get_DisplayName();
 			string showDynamicEventsOnMapDescriptionDefault = ((SettingEntry)ShowDynamicEventsOnMap).get_Description();
 			((SettingEntry)ShowDynamicEventsOnMap).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-showDynamicEventsOnMap-name", showDynamicEventsOnMapDisplayNameDefault)));

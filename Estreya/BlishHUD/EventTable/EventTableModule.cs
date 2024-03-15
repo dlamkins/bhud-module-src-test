@@ -478,14 +478,10 @@ namespace Estreya.BlishHUD.EventTable
 				ReminderType value = base.ModuleSettings.ReminderType.get_Value();
 				if ((value == ReminderType.Control || value == ReminderType.Both) ? true : false)
 				{
-					EventNotification obj = new EventNotification(ev, title, message, icon, base.ModuleSettings.ReminderPosition.X.get_Value(), base.ModuleSettings.ReminderPosition.Y.get_Value(), base.ModuleSettings.ReminderSize.X.get_Value(), base.ModuleSettings.ReminderSize.Y.get_Value(), base.ModuleSettings.ReminderSize.Icon.get_Value(), base.ModuleSettings.ReminderStackDirection.get_Value(), base.ModuleSettings.ReminderOverflowStackDirection.get_Value(), base.ModuleSettings.ReminderFonts.TitleSize.get_Value(), base.ModuleSettings.ReminderFonts.MessageSize.get_Value(), base.IconService, base.ModuleSettings.ReminderLeftClickAction.get_Value() != 0 || base.ModuleSettings.ReminderRightClickAction.get_Value() != EventReminderRightClickAction.None)
-					{
-						BackgroundOpacity = base.ModuleSettings.ReminderOpacity.get_Value()
-					};
-					((Control)obj).add_Click((EventHandler<MouseEventArgs>)EventNotification_Click);
-					((Control)obj).add_RightMouseButtonPressed((EventHandler<MouseEventArgs>)EventNotification_RightMouseButtonPressed);
-					((Control)obj).add_Disposed((EventHandler<EventArgs>)EventNotification_Disposed);
-					obj.Show(TimeSpan.FromSeconds(base.ModuleSettings.ReminderDuration.get_Value()));
+					EventNotification eventNotification = EventNotification.ShowAsControl(ev, title, message, icon, base.IconService, base.ModuleSettings);
+					((Control)eventNotification).add_Click((EventHandler<MouseEventArgs>)EventNotification_Click);
+					((Control)eventNotification).add_RightMouseButtonPressed((EventHandler<MouseEventArgs>)EventNotification_RightMouseButtonPressed);
+					((Control)eventNotification).add_Disposed((EventHandler<EventArgs>)EventNotification_Disposed);
 				}
 				value = base.ModuleSettings.ReminderType.get_Value();
 				if ((value == ReminderType.Windows || value == ReminderType.Both) ? true : false)
