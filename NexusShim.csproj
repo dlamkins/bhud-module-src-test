@@ -13,8 +13,8 @@
   <ItemGroup />
   <ItemGroup>
     <Reference Include="Blish HUD" />
-    <Reference Include="MonoGame.Framework" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="MonoGame.Framework" />
     <Reference Include="System.Core" />
   </ItemGroup>
 </Project>

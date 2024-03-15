@@ -1,7 +1,6 @@
 using System;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
-using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Modules;
@@ -22,7 +21,7 @@ namespace NexusShim
 
 		private NexusIntegration _nexus;
 
-		private LeftOffsetTrick _lot;
+		private uint _iconCount;
 
 		[ImportingConstructor]
 		public NexusShim([Import("ModuleParameters")] ModuleParameters moduleParameters)
@@ -32,9 +31,6 @@ namespace NexusShim
 
 		protected override async Task LoadAsync()
 		{
-			LeftOffsetTrick leftOffsetTrick = new LeftOffsetTrick();
-			((Control)leftOffsetTrick).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			_lot = leftOffsetTrick;
 			_nexus = new NexusIntegration();
 		}
 
@@ -58,17 +54,18 @@ namespace NexusShim
 				_nexus.TryOpen();
 				_lastUpdate = tm;
 			}
+			CornerIcon.set_LeftOffset((int)(35.3 * (double)(_iconCount + 1)) + 2);
 		}
 
 		private void UpdateCornerIcons()
 		{
 			if (_nexus.IconMode == IconMode.Extend)
 			{
-				_lot.IconCount = (_nexus.IconVertical ? 1u : _nexus.IconQuantity);
+				_iconCount = (_nexus.IconVertical ? 1u : _nexus.IconQuantity);
 			}
 			else
 			{
-				_lot.IconCount = 0u;
+				_iconCount = 0u;
 			}
 		}
 
@@ -79,11 +76,6 @@ namespace NexusShim
 
 		protected override void Unload()
 		{
-			LeftOffsetTrick lot = _lot;
-			if (lot != null)
-			{
-				((Control)lot).Dispose();
-			}
 			_nexus?.Unload();
 		}
 	}
