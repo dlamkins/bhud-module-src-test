@@ -133,13 +133,10 @@ namespace Ideka.CustomCombatText
 			static bool byGroup<TKey, TValue>(IEnumerable<Message> source, Func<Message, TKey> selector, IReadOnlyDictionary<TKey, TValue> dict, out List<List<Message>> groups, out TValue value) where TKey : notnull where TValue : notnull
 			{
 				List<List<Message>> list = new List<List<Message>>();
-				foreach (List<Message> item2 in from x in source.GroupBy(selector)
+				list.AddRange(from x in source.GroupBy(selector)
 					select x.ToList() into x
 					orderby x.Count descending
-					select x)
-				{
-					list.Add(item2);
-				}
+					select x);
 				groups = list;
 				TKey mostCommonResult = selector(groups[0][0]);
 				return dict.TryGetValue(mostCommonResult, out value);

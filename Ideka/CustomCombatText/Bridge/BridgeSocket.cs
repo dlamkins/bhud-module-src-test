@@ -11,6 +11,8 @@ namespace Ideka.CustomCombatText.Bridge
 	{
 		private static readonly Logger Logger = Logger.GetLogger<BridgeSocket>();
 
+		private const int MessageHeaderSize = 8;
+
 		private const int BufferSize = 204800;
 
 		private const int ConnectRetries = 10;
@@ -55,9 +57,9 @@ namespace Ideka.CustomCombatText.Bridge
 							socket.Shutdown(SocketShutdown.Receive);
 						}
 					}
-					catch (Exception ex3)
+					catch (Exception ex2)
 					{
-						Logger.Warn(ex3, "Socket disconnect failed.");
+						Logger.Warn(ex2, "Socket disconnect failed.");
 					}
 					finally
 					{
@@ -79,75 +81,84 @@ namespace Ideka.CustomCombatText.Bridge
 				}
 				catch
 				{
-					goto IL_01fe;
+					goto IL_0202;
 				}
 				break;
-				IL_01fe:
+				IL_0202:
 				await Task.Delay(TimeSpan.FromSeconds(5.0), ct);
 			}
 			ct.ThrowIfCancellationRequested();
 			Logger.Info($"Socket connected to {socket.RemoteEndPoint}");
-			int retries = 6;
-			BridgeBuffer buffer = new BridgeBuffer();
 			while (true)
 			{
-				int bytesRead;
+				int messageSize;
+				using (RentedArray<byte> rentedArray = new RentedArray<byte>(8))
+				{
+					if (!(await Receive(socket, rentedArray.Array, rentedArray.Length, ct)))
+					{
+						break;
+					}
+					messageSize = BitConverter.ToInt32(rentedArray.Array, 0);
+					goto IL_031f;
+				}
+				IL_031f:
+				if (messageSize <= 0)
+				{
+					Logger.Warn("Received message with negative or zero size.");
+					break;
+				}
+				using (RentedArray<byte> rentedArray = new RentedArray<byte>(messageSize))
+				{
+					if (!(await Receive(socket, rentedArray.Array, rentedArray.Length, ct)))
+					{
+						break;
+					}
+					this.RawMessage?.Invoke(this, rentedArray.Array);
+					goto IL_0410;
+				}
+				IL_0410:
+				ct.ThrowIfCancellationRequested();
+			}
+			cts.Cancel();
+		}
+
+		private static async Task<bool> Receive(Socket socket, byte[] buffer, int length, CancellationToken ct)
+		{
+			int retries = 6;
+			int bytesRead = 0;
+			while (bytesRead < length)
+			{
+				ct.ThrowIfCancellationRequested();
 				try
 				{
-					Task<int> receive = socket.ReceiveAsync(buffer.NextSegment, SocketFlags.None);
+					Task<int> receive = socket.ReceiveAsync(new ArraySegment<byte>(buffer, bytesRead, length - bytesRead), SocketFlags.None);
 					if (await Task.WhenAny(receive, Task.Delay(ReceiveTimeout, ct)) != receive)
 					{
 						int num = retries - 1;
 						retries = num;
-						if (num > 0)
+						if (num <= 0)
 						{
-							continue;
+							Logger.Info("Receive timed out too many times.");
+							return false;
 						}
-						Logger.Info("Receive timed out too many times.");
-						break;
 					}
-					bytesRead = receive.Result;
-					goto IL_03d5;
-				}
-				catch (SocketException ex2) when (ex2.SocketErrorCode == SocketError.ConnectionReset)
-				{
-					int num = retries - 1;
-					retries = num;
-					if (num > 0)
+					else
 					{
-						Logger.Info((Exception)ex2, "Receive failed, retrying.");
-						continue;
-					}
-					Logger.Warn((Exception)ex2, "Receive failed too many times.");
-					break;
-				}
-				catch (Exception e2)
-				{
-					Logger.Error(e2, "Receive failed.");
-					break;
-				}
-				IL_03d5:
-				if (bytesRead <= 0)
-				{
-					Logger.Info("Connection closed.");
-					break;
-				}
-				retries = 6;
-				try
-				{
-					foreach (byte[] messageData in buffer.ProcessReceivedData(bytesRead))
-					{
-						this.RawMessage?.Invoke(this, messageData);
+						if (receive.Result <= 0)
+						{
+							Logger.Info("Connection closed.");
+							return false;
+						}
+						bytesRead += receive.Result;
 					}
 				}
 				catch (Exception e)
 				{
-					Logger.Error(e, "Failed processing data.");
-					break;
+					Logger.Warn(e, "Receive failed.");
+					return false;
 				}
-				ct.ThrowIfCancellationRequested();
 			}
-			cts.Cancel();
+			return true;
 		}
 
 		public void Dispose()

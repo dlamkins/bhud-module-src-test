@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Text;
 using Blish_HUD.ArcDps;
 using Blish_HUD.ArcDps.Models;
@@ -18,152 +19,88 @@ namespace Ideka.CustomCombatText.Bridge
 
 		public static CombatEvent ProcessCombat(byte[] data)
 		{
-			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e1: Expected O, but got Unknown
-			CombatMessageFlags flags = (CombatMessageFlags)data[1];
-			int offset = 2;
+			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b4: Expected O, but got Unknown
+			using MemoryStream stream = new MemoryStream(data);
+			using BinaryReader reader = new BinaryReader(stream);
+			reader.ReadByte();
+			CombatMessageFlags flags = (CombatMessageFlags)reader.ReadByte();
 			Ev ev = null;
 			if (flags.HasFlag(CombatMessageFlags.Ev))
 			{
-				(ev, offset) = ParseEv(data, offset);
+				ev = ReadEv(reader);
 			}
 			Ag src = null;
 			if (flags.HasFlag(CombatMessageFlags.Src))
 			{
-				(src, offset) = ParseAg(data, offset);
+				src = ReadAg(reader);
 			}
 			Ag dst = null;
 			if (flags.HasFlag(CombatMessageFlags.Dst))
 			{
-				(dst, offset) = ParseAg(data, offset);
+				dst = ReadAg(reader);
 			}
 			string skillName = null;
 			if (flags.HasFlag(CombatMessageFlags.SkillName))
 			{
-				(skillName, offset) = ParseString(data, offset);
+				skillName = ReadString(reader);
 			}
-			(ulong, int) tuple5 = U64(data, offset);
-			ulong id = tuple5.Item1;
-			offset = tuple5.Item2;
-			ulong revision = U64(data, offset).Item1;
+			ulong id = reader.ReadUInt64();
+			ulong revision = reader.ReadUInt64();
 			return new CombatEvent(ev, src, dst, skillName, id, revision);
 		}
 
-		private static (Ev, int) ParseEv(byte[] data, int offset)
+		private static Ev ReadEv(BinaryReader reader)
 		{
-			//IL_0280: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028b: Expected O, but got Unknown
-			ulong time;
-			(time, offset) = U64(data, offset);
-			ulong srcAgent;
-			(srcAgent, offset) = U64(data, offset);
-			ulong dstAgent;
-			(dstAgent, offset) = U64(data, offset);
-			int value;
-			(value, offset) = I32(data, offset);
-			int buffDmg;
-			(buffDmg, offset) = I32(data, offset);
-			uint overStackValue;
-			(overStackValue, offset) = U32(data, offset);
-			uint skillId;
-			(skillId, offset) = U32(data, offset);
-			ushort srcInstId;
-			(srcInstId, offset) = U16(data, offset);
-			ushort dstInstId;
-			(dstInstId, offset) = U16(data, offset);
-			ushort srcMasterInstId;
-			(srcMasterInstId, offset) = U16(data, offset);
-			ushort dstMasterInstId;
-			(dstMasterInstId, offset) = U16(data, offset);
-			byte iff;
-			(iff, offset) = U8(data, offset);
-			bool buff;
-			(buff, offset) = B(data, offset);
-			byte result;
-			(result, offset) = U8(data, offset);
-			byte isActivation;
-			(isActivation, offset) = U8(data, offset);
-			byte isBuffRemove;
-			(isBuffRemove, offset) = U8(data, offset);
-			bool isNinety;
-			(isNinety, offset) = B(data, offset);
-			bool isFifty;
-			(isFifty, offset) = B(data, offset);
-			bool isMoving;
-			(isMoving, offset) = B(data, offset);
-			byte isStateChange;
-			(isStateChange, offset) = U8(data, offset);
-			bool isFlanking;
-			(isFlanking, offset) = B(data, offset);
-			bool isShields;
-			(isShields, offset) = B(data, offset);
-			bool isOffCycle;
-			(isOffCycle, offset) = B(data, offset);
-			byte pad61;
-			(pad61, offset) = U8(data, offset);
-			byte pad62;
-			(pad62, offset) = U8(data, offset);
-			byte pad63;
-			(pad63, offset) = U8(data, offset);
-			byte pad64;
-			(pad64, offset) = U8(data, offset);
-			return (new Ev(time, srcAgent, dstAgent, value, buffDmg, overStackValue, skillId, srcInstId, dstInstId, srcMasterInstId, dstMasterInstId, (IFF)iff, buff, result, (Activation)isActivation, (BuffRemove)isBuffRemove, isNinety, isFifty, isMoving, (StateChange)isStateChange, isFlanking, isShields, isOffCycle, pad61, pad62, pad63, pad64), offset);
+			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011d: Expected O, but got Unknown
+			ulong num = reader.ReadUInt64();
+			ulong srcAgent = reader.ReadUInt64();
+			ulong dstAgent = reader.ReadUInt64();
+			int value = reader.ReadInt32();
+			int buffDmg = reader.ReadInt32();
+			uint overStackValue = reader.ReadUInt32();
+			uint skillId = reader.ReadUInt32();
+			ushort srcInstId = reader.ReadUInt16();
+			ushort dstInstId = reader.ReadUInt16();
+			ushort srcMasterInstId = reader.ReadUInt16();
+			ushort dstMasterInstId = reader.ReadUInt16();
+			byte iff = reader.ReadByte();
+			bool buff = reader.ReadByte() == 1;
+			byte result = reader.ReadByte();
+			byte isActivation = reader.ReadByte();
+			byte isBuffRemove = reader.ReadByte();
+			bool isNinety = reader.ReadByte() == 1;
+			bool isFifty = reader.ReadByte() == 1;
+			bool isMoving = reader.ReadByte() == 1;
+			byte isStateChange = reader.ReadByte();
+			bool isFlanking = reader.ReadByte() == 1;
+			bool isShields = reader.ReadByte() == 1;
+			bool isOffCycle = reader.ReadByte() == 1;
+			byte pad61 = reader.ReadByte();
+			byte pad62 = reader.ReadByte();
+			byte pad63 = reader.ReadByte();
+			byte pad64 = reader.ReadByte();
+			return new Ev(num, srcAgent, dstAgent, value, buffDmg, overStackValue, skillId, srcInstId, dstInstId, srcMasterInstId, dstMasterInstId, (IFF)iff, buff, result, (Activation)isActivation, (BuffRemove)isBuffRemove, isNinety, isFifty, isMoving, (StateChange)isStateChange, isFlanking, isShields, isOffCycle, pad61, pad62, pad63, pad64);
 		}
 
-		private static (Ag, int) ParseAg(byte[] data, int offset)
+		private static Ag ReadAg(BinaryReader reader)
 		{
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0093: Expected O, but got Unknown
-			string name;
-			(name, offset) = ParseString(data, offset);
-			ulong id;
-			(id, offset) = U64(data, offset);
-			uint profession;
-			(profession, offset) = U32(data, offset);
-			uint elite;
-			(elite, offset) = U32(data, offset);
-			uint self;
-			(self, offset) = U32(data, offset);
-			ushort team;
-			(team, offset) = U16(data, offset);
-			return (new Ag(name, id, profession, elite, self, team), offset);
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Expected O, but got Unknown
+			string text = ReadString(reader);
+			ulong id = reader.ReadUInt64();
+			uint profession = reader.ReadUInt32();
+			uint elite = reader.ReadUInt32();
+			uint self = reader.ReadUInt32();
+			ushort team = reader.ReadUInt16();
+			return new Ag(text, id, profession, elite, self, team);
 		}
 
-		private static (string, int) ParseString(byte[] data, int offset)
+		private static string ReadString(BinaryReader reader)
 		{
-			ulong length;
-			(length, offset) = U64(data, offset);
-			return (Encoding.UTF8.GetString(data, offset, (int)length), offset + (int)length);
-		}
-
-		private static (ulong, int) U64(byte[] data, int offset)
-		{
-			return (BitConverter.ToUInt64(data, offset), offset + 8);
-		}
-
-		private static (uint, int) U32(byte[] data, int offset)
-		{
-			return (BitConverter.ToUInt32(data, offset), offset + 4);
-		}
-
-		private static (int, int) I32(byte[] data, int offset)
-		{
-			return (BitConverter.ToInt32(data, offset), offset + 4);
-		}
-
-		private static (ushort, int) U16(byte[] data, int offset)
-		{
-			return (BitConverter.ToUInt16(data, offset), offset + 2);
-		}
-
-		private static (byte, int) U8(byte[] data, int offset)
-		{
-			return (data[offset], offset + 1);
-		}
-
-		private static (bool, int) B(byte[] data, int offset)
-		{
-			return (data[offset] != 0, offset + 1);
+			ulong length = reader.ReadUInt64();
+			return Encoding.UTF8.GetString(reader.ReadBytes((int)length));
 		}
 	}
 }

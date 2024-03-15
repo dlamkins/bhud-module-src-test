@@ -79,7 +79,7 @@
             "Children": [],
             "Receivers": [
               {
-                "Name": "player out, pet out / breakbar / target",
+                "Name": "player out, pet out / breakbar / others",
                 "Enabled": true,
                 "Categories": [
                   "VIEa0rBA-kO5lpsiQNTRXA",
@@ -88,7 +88,7 @@
                 "Results": [
                   "eAqruxsURl-GaMAx3z_ORA"
                 ],
-                "EntityFilter": "IrGj7gO6RNuxfxmuFcN43w",
+                "EntityFilter": "NWtqNOkPSCKjpxUg_0T9Bg",
                 "Template": "%i %v[ %r][ %s][ (%nx)]",
                 "Color": null,
                 "FontName": null,
@@ -130,7 +130,7 @@
             "Children": [],
             "Receivers": [
               {
-                "Name": "player out, pet out / heal tick / non self",
+                "Name": "player out, pet out / heal tick / others",
                 "Enabled": true,
                 "Categories": [
                   "VIEa0rBA-kO5lpsiQNTRXA",
@@ -171,7 +171,7 @@
             }
           },
           {
-            "Name": "Condi (target)",
+            "Name": "Condi",
             "Enabled": true,
             "Anchoring": {
               "AnchorMin": {
@@ -198,7 +198,7 @@
             "Children": [],
             "Receivers": [
               {
-                "Name": "player out, pet out / condi, dot / target",
+                "Name": "player out, pet out / condi, dot / others",
                 "Enabled": true,
                 "Categories": [
                   "VIEa0rBA-kO5lpsiQNTRXA",
@@ -212,7 +212,7 @@
                   "y6sJZ6TIvkSnNbB7GfyD5g",
                   "p5MbQ3xISauRbPuaEzHxNQ"
                 ],
-                "EntityFilter": "IrGj7gO6RNuxfxmuFcN43w",
+                "EntityFilter": "NWtqNOkPSCKjpxUg_0T9Bg",
                 "Template": "[(%nx) ][%s ][%b ]%v %i",
                 "Color": null,
                 "FontName": null,
@@ -227,7 +227,7 @@
             }
           },
           {
-            "Name": "Player Power (target)",
+            "Name": "Player Power",
             "Enabled": true,
             "Anchoring": {
               "AnchorMin": {
@@ -254,7 +254,7 @@
             "Children": [],
             "Receivers": [
               {
-                "Name": "player out / strike, interrupt / target",
+                "Name": "player out / strike, interrupt / others",
                 "Enabled": true,
                 "Categories": [
                   "VIEa0rBA-kO5lpsiQNTRXA"
@@ -269,7 +269,7 @@
                   "1uHogwDh_0Chd8rxwVikXA",
                   "9UxBDq9TSceVn_Tncf2sDA"
                 ],
-                "EntityFilter": "IrGj7gO6RNuxfxmuFcN43w",
+                "EntityFilter": "NWtqNOkPSCKjpxUg_0T9Bg",
                 "Template": "%i[ %v][ %b][ %r][ %s][ (%nx)]",
                 "Color": null,
                 "FontName": null,
@@ -285,7 +285,7 @@
             }
           },
           {
-            "Name": "Pet Power (target)",
+            "Name": "Pet Power",
             "Enabled": false,
             "Anchoring": {
               "AnchorMin": {
@@ -312,7 +312,7 @@
             "Children": [],
             "Receivers": [
               {
-                "Name": "pet out / strike, dot, interrupt / target",
+                "Name": "pet out / strike, dot, interrupt / others",
                 "Enabled": true,
                 "Categories": [
                   "2r3hGh4P3UGpxAEY28VuAw"
@@ -327,7 +327,7 @@
                   "1uHogwDh_0Chd8rxwVikXA",
                   "9UxBDq9TSceVn_Tncf2sDA"
                 ],
-                "EntityFilter": "IrGj7gO6RNuxfxmuFcN43w",
+                "EntityFilter": "NWtqNOkPSCKjpxUg_0T9Bg",
                 "Template": "%i[ %v][ %b][ %r][ %s][ (%nx)]",
                 "Color": null,
                 "FontName": null,
