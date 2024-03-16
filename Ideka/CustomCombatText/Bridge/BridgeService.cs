@@ -46,7 +46,7 @@ namespace Ideka.CustomCombatText.Bridge
 			{
 				cts = (_cts = new CancellationTokenSource());
 				bridge = (_bridge = new BridgeSocket());
-				bridge.RawMessage += new EventHandler<byte[]>(RawMessage);
+				bridge.RawMessage += new EventHandler<ArraySegment<byte>>(RawMessage);
 			}
 			((Func<Task>)async delegate
 			{
@@ -62,21 +62,21 @@ namespace Ideka.CustomCombatText.Bridge
 			})();
 		}
 
-		private void RawMessage(object sender, byte[] messageData)
+		private void RawMessage(object _, ArraySegment<byte> segment)
 		{
 			_lastMessage = GameService.Overlay.get_CurrentGameTime().get_TotalGameTime();
 			try
 			{
-				switch (messageData[0])
+				switch (segment.Array[segment.Offset])
 				{
 				case 1:
-					HudIsActive = messageData[1] != 0;
+					HudIsActive = segment.Array[segment.Offset + 1] != 0;
 					break;
 				case 2:
-					triggerCombatEvent(messageData, (CombatEventType)0);
+					triggerCombatEvent((CombatEventType)0);
 					break;
 				case 3:
-					triggerCombatEvent(messageData, (CombatEventType)1);
+					triggerCombatEvent((CombatEventType)1);
 					break;
 				}
 			}
@@ -84,12 +84,12 @@ namespace Ideka.CustomCombatText.Bridge
 			{
 				Logger.Warn(e, "Failed processing received message.");
 			}
-			void triggerCombatEvent(byte[] data, CombatEventType eventType)
+			void triggerCombatEvent(CombatEventType eventType)
 			{
-				//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-				//IL_001f: Expected O, but got Unknown
-				CombatEvent message = CombatParser.ProcessCombat(data);
+				//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0036: Expected O, but got Unknown
+				CombatEvent message = CombatParser.ProcessCombat(segment.Array, segment.Offset + 1);
 				this.RawCombatEvent?.Invoke(this, new RawCombatEventArgs(message, eventType));
 			}
 		}
@@ -103,7 +103,7 @@ namespace Ideka.CustomCombatText.Bridge
 				_cts = null;
 				if (_bridge != null)
 				{
-					_bridge!.RawMessage -= new EventHandler<byte[]>(RawMessage);
+					_bridge!.RawMessage -= new EventHandler<ArraySegment<byte>>(RawMessage);
 					_bridge!.Dispose();
 					_bridge = null;
 				}

@@ -30,6 +30,5 @@
     <Reference Include="SpriteFontPlus">
       <HintPath>..\..\working\SpriteFontPlus.dll</HintPath>
     </Reference>
-    <Reference Include="System.Buffers" />
   </ItemGroup>
 </Project>
