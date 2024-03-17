@@ -15,6 +15,8 @@ using Estreya.BlishHUD.EventTable.Models.Reminders;
 using Estreya.BlishHUD.Shared.Controls;
 using Estreya.BlishHUD.Shared.Controls.Input;
 using Estreya.BlishHUD.Shared.Services;
+using Estreya.BlishHUD.Shared.Services.Audio;
+using Estreya.BlishHUD.Shared.Threading;
 using Estreya.BlishHUD.Shared.Threading.Events;
 using Estreya.BlishHUD.Shared.UI.Views;
 using Estreya.BlishHUD.Shared.Utils;
@@ -35,6 +37,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private readonly AccountService _accountService;
 
+		private readonly AudioService _audioService;
+
 		private readonly ModuleSettings _moduleSettings;
 
 		private StandardWindow _manageEventsWindow;
@@ -48,16 +52,25 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 		static ReminderSettingsView()
 		{
 			_globalChangeTempEvent = new Estreya.BlishHUD.EventTable.Models.Event();
+			_globalChangeTempEvent.Key = "test";
+			_globalChangeTempEvent.Load(new EventCategory
+			{
+				Key = "reminderSettingsView"
+			}, delegate
+			{
+				throw new NotImplementedException();
+			});
 			_globalChangeTempEvent.UpdateReminderTimes(new TimeSpan[1] { TimeSpan.Zero });
 		}
 
-		public ReminderSettingsView(ModuleSettings moduleSettings, Func<List<EventCategory>> getEvents, Func<List<string>> getAreaNames, AccountService accountService, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService)
+		public ReminderSettingsView(ModuleSettings moduleSettings, Func<List<EventCategory>> getEvents, Func<List<string>> getAreaNames, AccountService accountService, AudioService audioService, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService)
 			: base(apiManager, iconService, translationService, settingEventService)
 		{
 			_moduleSettings = moduleSettings;
 			_getEvents = getEvents;
 			_getAreaNames = getAreaNames;
 			_accountService = accountService;
+			_audioService = audioService;
 			CONTROL_WIDTH = 500;
 		}
 
@@ -69,12 +82,18 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002f: Expected O, but got Unknown
-			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010b: Expected O, but got Unknown
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a5: Expected O, but got Unknown
+			//IL_0135: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0157: Expected O, but got Unknown
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)parent);
 			((Container)val).set_WidthSizingMode((SizingMode)1);
@@ -103,13 +122,39 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 							Tooltip = base.TranslationService.GetTranslation("reminderSettingsView-btn-changeTimes-tooltip", "Click to change the times at which reminders happen."),
 							Icon = "1466345.png",
 							Action = ManageReminderTimes
+						},
+						new ManageEventsView.CustomActionDefinition
+						{
+							Name = base.TranslationService.GetTranslation("reminderSettingsView-btn-uploadEventSoundFile-title", "Upload Sound File"),
+							Tooltip = base.TranslationService.GetTranslation("reminderSettingsView-btn-uploadEventSoundFile-tooltip", "Click to upload a specific sound file for this event."),
+							Icon = "156764.png",
+							Action = UploadEventSoundFile
 						}
 					}
 				} }, () => _moduleSettings.ReminderDisabledForEvents.get_Value(), _moduleSettings, _accountService, base.APIManager, base.IconService, base.TranslationService);
 				manageEventsView.EventChanged += ManageView_EventChanged;
 				_manageEventsWindow.Show((IView)(object)manageEventsView);
 			});
-			Func<bool, Task> addTestReminder = async delegate(bool permanentControl)
+			RenderButtonAsync((Panel)(object)manageFlowPanel, base.TranslationService.GetTranslation("reminderSettingsView-btn-uploadRemindersSoundFile", "Upload Sound File"), async delegate
+			{
+				AsyncFileDialog<OpenFileDialog> ofd = new AsyncFileDialog<OpenFileDialog>(new OpenFileDialog
+				{
+					Filter = "wav files (*.wav)|*.wav",
+					Multiselect = false,
+					CheckFileExists = true
+				});
+				if (await ofd.ShowAsync() == DialogResult.OK)
+				{
+					await _audioService.UploadFile(ofd.Dialog.FileName, EventNotification.GetSoundFileName(), EventNotification.GetAudioServiceBaseSubfolder());
+				}
+			});
+			FlowPanel val2 = new FlowPanel();
+			((Control)val2).set_Parent((Container)(object)parent);
+			((Container)val2).set_WidthSizingMode((SizingMode)1);
+			((Container)val2).set_HeightSizingMode((SizingMode)1);
+			val2.set_FlowDirection((ControlFlowDirection)2);
+			FlowPanel testRemindersFlowPanel = val2;
+			Func<bool, bool, Task> addTestReminder = async delegate(bool permanentControl, bool awaitAudio)
 			{
 				string title = "Test Event";
 				string message = "Test starts in " + TimeSpan.FromHours(5.0).Add(TimeSpan.FromMinutes(21.0).Add(TimeSpan.FromSeconds(23.0))).Humanize(6, null, TimeUnit.Week, _moduleSettings.ReminderMinTimeUnit.get_Value()) + "!";
@@ -126,6 +171,11 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					{
 						EventNotification.ShowAsControl(title, message, icon, base.IconService, _moduleSettings);
 					}
+					Task audioTask = EventNotification.PlaySound(_audioService, _globalChangeTempEvent);
+					if (awaitAudio)
+					{
+						await audioTask;
+					}
 				}
 				value = _moduleSettings.ReminderType.get_Value();
 				if ((value == ReminderType.Windows || value == ReminderType.Both) ? true : false)
@@ -133,27 +183,27 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					await EventNotification.ShowAsWindowsNotification(title, message, icon);
 				}
 			};
-			RenderButtonAsync((Panel)(object)manageFlowPanel, base.TranslationService.GetTranslation("reminderSettingsView-btn-addTestReminderPermanent", "Add Test Reminder"), async delegate
+			RenderButtonAsync((Panel)(object)testRemindersFlowPanel, base.TranslationService.GetTranslation("reminderSettingsView-btn-addTestReminderPermanent", "Add Test Reminder"), async delegate
 			{
-				await addTestReminder(arg: false);
+				await addTestReminder(arg1: false, arg2: false);
 			});
-			RenderButtonAsync((Panel)(object)manageFlowPanel, base.TranslationService.GetTranslation("reminderSettingsView-btn-addTestReminderPermanent", "Add Test Reminder (Permanent)"), async delegate
+			RenderButtonAsync((Panel)(object)testRemindersFlowPanel, base.TranslationService.GetTranslation("reminderSettingsView-btn-addTestReminderPermanent", "Add Test Reminder (Permanent)"), async delegate
 			{
-				await addTestReminder(arg: true);
+				await addTestReminder(arg1: true, arg2: false);
 			});
-			RenderButton((Panel)(object)manageFlowPanel, base.TranslationService.GetTranslation("reminderSettingsView-btn-clearTestReminder", "Clear Permanent Test Reminders"), delegate
+			RenderButton((Panel)(object)testRemindersFlowPanel, base.TranslationService.GetTranslation("reminderSettingsView-btn-clearTestReminder", "Clear Permanent Test Reminders"), delegate
 			{
 				foreach (EventNotification activeTestNotification in _activeTestNotifications)
 				{
 					((Control)activeTestNotification).Dispose();
 				}
 			});
-			FlowPanel val2 = new FlowPanel();
-			((Control)val2).set_Parent((Container)(object)parent);
-			((Container)val2).set_WidthSizingMode((SizingMode)1);
-			((Container)val2).set_HeightSizingMode((SizingMode)1);
-			val2.set_FlowDirection((ControlFlowDirection)2);
-			FlowPanel changeTimesFlowPanel = val2;
+			FlowPanel val3 = new FlowPanel();
+			((Control)val3).set_Parent((Container)(object)parent);
+			((Container)val3).set_WidthSizingMode((SizingMode)1);
+			((Container)val3).set_HeightSizingMode((SizingMode)1);
+			val3.set_FlowDirection((ControlFlowDirection)2);
+			FlowPanel changeTimesFlowPanel = val3;
 			RenderButton((Panel)(object)changeTimesFlowPanel, base.TranslationService.GetTranslation("reminderSettingsView-btn-changeAllTimes", "Change all Reminder Times"), delegate
 			{
 				ManageReminderTimes(_globalChangeTempEvent);
@@ -246,7 +296,29 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				select s) : new List<string>(_moduleSettings.ReminderDisabledForEvents.get_Value()) { e.EventSettingKey });
 		}
 
-		private void ManageReminderTimes(Estreya.BlishHUD.EventTable.Models.Event ev)
+		private async Task UploadEventSoundFile(Estreya.BlishHUD.EventTable.Models.Event ev)
+		{
+			_ = 1;
+			try
+			{
+				AsyncFileDialog<OpenFileDialog> ofd = new AsyncFileDialog<OpenFileDialog>(new OpenFileDialog
+				{
+					Filter = "wav files (*.wav)|*.wav",
+					Multiselect = false,
+					CheckFileExists = true
+				});
+				if (await ofd.ShowAsync() == DialogResult.OK)
+				{
+					await _audioService.UploadFile(ofd.Dialog.FileName, ev.SettingKey, EventNotification.GetAudioServiceEventsSubfolder());
+				}
+			}
+			catch (Exception ex)
+			{
+				ShowError(ex.Message);
+			}
+		}
+
+		private Task ManageReminderTimes(Estreya.BlishHUD.EventTable.Models.Event ev)
 		{
 			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
 			if (_manageReminderTimesWindow == null)
@@ -264,6 +336,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			view.CancelClicked += ManageReminderTimesView_CancelClicked;
 			view.SaveClicked += new EventHandler<(Estreya.BlishHUD.EventTable.Models.Event, List<TimeSpan>, bool)>(ManageReminderTimesView_SaveClicked);
 			_manageReminderTimesWindow.Show((IView)(object)view);
+			return Task.CompletedTask;
 		}
 
 		private void ManageReminderTimesView_SaveClicked(object sender, (Estreya.BlishHUD.EventTable.Models.Event Event, List<TimeSpan> ReminderTimes, bool KeepCustomized) e)

@@ -129,6 +129,8 @@ namespace Estreya.BlishHUD.EventTable
 			Stopwatch sw = Stopwatch.StartNew();
 			base.ModuleSettings.ValidateAndTryFixSettings();
 			await base.LoadAsync();
+			await base.AudioService.RegisterSubfolder(EventNotification.GetAudioServiceBaseSubfolder());
+			await base.AudioService.RegisterSubfolder(EventNotification.GetAudioServiceEventsSubfolder());
 			base.BlishHUDAPIService.NewLogin += BlishHUDAPIService_NewLogin;
 			base.BlishHUDAPIService.RefreshedLogin += BlishHUDAPIService_RefreshedLogin;
 			base.BlishHUDAPIService.LoggedOut += BlishHUDAPIService_LoggedOut;
@@ -185,7 +187,7 @@ namespace Estreya.BlishHUD.EventTable
 				return;
 			}
 			_eventTableContext = new EventTableContext();
-			_contextManager = new ContextManager(_eventTableContext, base.ModuleSettings, DynamicEventService, base.IconService, EventStateService, async delegate
+			_contextManager = new ContextManager(_eventTableContext, base.ModuleSettings, DynamicEventService, base.IconService, EventStateService, base.AudioService, async delegate
 			{
 				using (await _eventCategoryLock.LockAsync())
 				{
@@ -488,7 +490,7 @@ namespace Estreya.BlishHUD.EventTable
 				{
 					await EventNotification.ShowAsWindowsNotification(title, message, icon);
 				}
-				base.AudioService.PlaySoundFromFile("reminder", silent: true);
+				await EventNotification.PlaySound(base.AudioService, ev);
 			}
 			catch (Exception ex)
 			{
@@ -659,14 +661,14 @@ namespace Estreya.BlishHUD.EventTable
 			//IL_00aa: Expected O, but got Unknown
 			//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01ca: Expected O, but got Unknown
-			//IL_027e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0288: Expected O, but got Unknown
-			//IL_02cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d7: Expected O, but got Unknown
-			//IL_030c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0316: Expected O, but got Unknown
-			//IL_035b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0365: Expected O, but got Unknown
+			//IL_0284: Unknown result type (might be due to invalid IL or missing references)
+			//IL_028e: Expected O, but got Unknown
+			//IL_02d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02dd: Expected O, but got Unknown
+			//IL_0312: Unknown result type (might be due to invalid IL or missing references)
+			//IL_031c: Expected O, but got Unknown
+			//IL_0361: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036b: Expected O, but got Unknown
 			settingWindow.SavesSize = true;
 			settingWindow.CanResize = true;
 			settingWindow.RebuildViewAfterResize = true;
@@ -721,7 +723,7 @@ namespace Estreya.BlishHUD.EventTable
 				return Task.CompletedTask;
 			};
 			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("605018.png"), (Func<IView>)(() => (IView)(object)areaSettingsView), base.TranslationService.GetTranslation("areaSettingsView-title", "Event Areas"), (int?)null));
-			ReminderSettingsView reminderSettingsView = new ReminderSettingsView(base.ModuleSettings, () => _eventCategories, () => _areas.Keys.ToList(), base.AccountService, base.Gw2ApiManager, base.IconService, base.TranslationService, base.SettingEventService)
+			ReminderSettingsView reminderSettingsView = new ReminderSettingsView(base.ModuleSettings, () => _eventCategories, () => _areas.Keys.ToList(), base.AccountService, base.AudioService, base.Gw2ApiManager, base.IconService, base.TranslationService, base.SettingEventService)
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			};

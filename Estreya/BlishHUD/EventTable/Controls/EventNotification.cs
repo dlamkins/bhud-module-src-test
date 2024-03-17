@@ -14,6 +14,7 @@ using Estreya.BlishHUD.EventTable.Models.Reminders;
 using Estreya.BlishHUD.Shared.Controls;
 using Estreya.BlishHUD.Shared.Extensions;
 using Estreya.BlishHUD.Shared.Services;
+using Estreya.BlishHUD.Shared.Services.Audio;
 using Estreya.BlishHUD.Shared.Utils;
 using Glide;
 using Microsoft.Xna.Framework;
@@ -237,15 +238,22 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			int indexInNotifications = notifications.IndexOf(this);
 			bool flag = (((uint)(indexInNotifications - -1) <= 1u) ? true : false);
 			EventNotification lastShown = (flag ? null : notifications[indexInNotifications - 1]);
-			((Control)this).set_Location((Point)(_moduleSettings.ReminderStackDirection.get_Value() switch
+			try
 			{
-				EventReminderStackDirection.Top => new Point((lastShown != null) ? ((Control)lastShown).get_Left() : initialXLocation, (lastShown != null) ? (((Control)lastShown).get_Top() - base.Height - spacing) : initialYLocation), 
-				EventReminderStackDirection.Down => new Point((lastShown != null) ? ((Control)lastShown).get_Left() : initialXLocation, (lastShown != null) ? (((Control)lastShown).get_Bottom() + spacing) : initialYLocation), 
-				EventReminderStackDirection.Left => new Point((lastShown != null) ? (((Control)lastShown).get_Left() - base.Width - spacing) : initialXLocation, (lastShown != null) ? ((Control)lastShown).get_Top() : initialYLocation), 
-				EventReminderStackDirection.Right => new Point((lastShown != null) ? (((Control)lastShown).get_Right() + spacing) : initialXLocation, (lastShown != null) ? ((Control)lastShown).get_Top() : initialYLocation), 
-				_ => throw new ArgumentException($"Invalid stack direction: {_moduleSettings.ReminderStackDirection.get_Value()}"), 
-			}));
-			((Control)this).set_Location(GetOverflowLocation(spacing));
+				((Control)this).set_Location((Point)(_moduleSettings.ReminderStackDirection.get_Value() switch
+				{
+					EventReminderStackDirection.Top => new Point((lastShown != null) ? ((Control)lastShown).get_Left() : initialXLocation, (lastShown != null) ? (((Control)lastShown).get_Top() - base.Height - spacing) : initialYLocation), 
+					EventReminderStackDirection.Down => new Point((lastShown != null) ? ((Control)lastShown).get_Left() : initialXLocation, (lastShown != null) ? (((Control)lastShown).get_Bottom() + spacing) : initialYLocation), 
+					EventReminderStackDirection.Left => new Point((lastShown != null) ? (((Control)lastShown).get_Left() - base.Width - spacing) : initialXLocation, (lastShown != null) ? ((Control)lastShown).get_Top() : initialYLocation), 
+					EventReminderStackDirection.Right => new Point((lastShown != null) ? (((Control)lastShown).get_Right() + spacing) : initialXLocation, (lastShown != null) ? ((Control)lastShown).get_Top() : initialYLocation), 
+					_ => throw new ArgumentException($"Invalid stack direction: {_moduleSettings.ReminderStackDirection.get_Value()}"), 
+				}));
+				((Control)this).set_Location(GetOverflowLocation(spacing));
+			}
+			catch (Exception ex)
+			{
+				Logger.Warn(ex, "Failed to calculate location from stack directions.");
+			}
 		}
 
 		private void UpdateFonts()
@@ -408,6 +416,29 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				});
 				_toastNotifier.Show(toastNotification);
 			});
+		}
+
+		public static string GetAudioServiceBaseSubfolder()
+		{
+			return "reminders";
+		}
+
+		public static string GetAudioServiceEventsSubfolder()
+		{
+			return GetAudioServiceBaseSubfolder() + "/events";
+		}
+
+		public static string GetSoundFileName()
+		{
+			return "reminder";
+		}
+
+		public static async Task PlaySound(AudioService audioService, Estreya.BlishHUD.EventTable.Models.Event ev = null)
+		{
+			if (ev == null || await audioService.PlaySoundFromFile(ev.SettingKey, GetAudioServiceEventsSubfolder(), failSilent: true) != 0)
+			{
+				await audioService.PlaySoundFromFile(GetSoundFileName(), GetAudioServiceBaseSubfolder(), failSilent: true);
+			}
 		}
 	}
 }

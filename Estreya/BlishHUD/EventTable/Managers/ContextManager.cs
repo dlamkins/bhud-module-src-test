@@ -11,6 +11,7 @@ using Estreya.BlishHUD.EventTable.Models.Reminders;
 using Estreya.BlishHUD.EventTable.Services;
 using Estreya.BlishHUD.Shared.Contexts;
 using Estreya.BlishHUD.Shared.Services;
+using Estreya.BlishHUD.Shared.Services.Audio;
 using Estreya.BlishHUD.Shared.Threading.Events;
 using Estreya.BlishHUD.Shared.Utils;
 using Microsoft.Xna.Framework;
@@ -35,11 +36,13 @@ namespace Estreya.BlishHUD.EventTable.Managers
 
 		private readonly EventStateService _eventStateService;
 
+		private readonly AudioService _audioService;
+
 		private readonly Func<Task<IEnumerable<Estreya.BlishHUD.EventTable.Models.Event>>> _getEvents;
 
 		public event AsyncEventHandler ReloadEvents;
 
-		public ContextManager(EventTableContext context, ModuleSettings moduleSettings, DynamicEventService dynamicEventService, IconService iconService, EventStateService eventStateService, Func<Task<IEnumerable<Estreya.BlishHUD.EventTable.Models.Event>>> getEvents)
+		public ContextManager(EventTableContext context, ModuleSettings moduleSettings, DynamicEventService dynamicEventService, IconService iconService, EventStateService eventStateService, AudioService audioService, Func<Task<IEnumerable<Estreya.BlishHUD.EventTable.Models.Event>>> getEvents)
 		{
 			if (context == null)
 			{
@@ -62,6 +65,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			_dynamicEventService = dynamicEventService;
 			_iconService = iconService;
 			_eventStateService = eventStateService;
+			_audioService = audioService;
 			_getEvents = getEvents;
 			_context.RequestAddCategory += RequestAddCategory;
 			_context.RequestAddEvent += RequestAddEvent;
@@ -167,6 +171,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			if ((value == ReminderType.Control || value == ReminderType.Both) ? true : false)
 			{
 				EventNotification.ShowAsControl(null, eArgsContent.Title, eArgsContent.Message, icon, _iconService, _moduleSettings);
+				await EventNotification.PlaySound(_audioService);
 			}
 			value = _moduleSettings.ReminderType.get_Value();
 			if ((value == ReminderType.Windows || value == ReminderType.Both) ? true : false)

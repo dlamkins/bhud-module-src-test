@@ -39,7 +39,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 			public string Icon { get; set; }
 
-			public Action<Estreya.BlishHUD.EventTable.Models.Event> Action { get; set; }
+			public Func<Estreya.BlishHUD.EventTable.Models.Event, Task> Action { get; set; }
 		}
 
 		public const int BEST_WIDTH = 1060;
@@ -424,18 +424,29 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 						{
 							foreach (CustomActionDefinition customAction in customActions)
 							{
-								if (!string.IsNullOrWhiteSpace(customAction.Name) && customAction.Action != null)
+								if (string.IsNullOrWhiteSpace(customAction.Name) || customAction.Action == null)
 								{
-									GlowButton val12 = new GlowButton();
-									((Control)val12).set_Parent((Container)(object)button);
-									val12.set_ToggleGlow(false);
-									val12.set_Icon((customAction.Icon != null) ? base.IconService.GetIcon(customAction.Icon) : null);
-									((Control)val12).set_BasicTooltipText(customAction.Tooltip);
-									((Control)val12).add_Click((EventHandler<MouseEventArgs>)delegate
-									{
-										customAction.Action?.Invoke(e2);
-									});
+									continue;
 								}
+								GlowButton val12 = new GlowButton();
+								((Control)val12).set_Parent((Container)(object)button);
+								val12.set_ToggleGlow(false);
+								val12.set_Icon((customAction.Icon != null) ? base.IconService.GetIcon(customAction.Icon) : null);
+								((Control)val12).set_BasicTooltipText(customAction.Tooltip);
+								((Control)val12).add_Click((EventHandler<MouseEventArgs>)async delegate(object s, MouseEventArgs ea)
+								{
+									GlowButton button2 = (GlowButton)((s is GlowButton) ? s : null);
+									bool oldEnabled = ((Control)button2).get_Enabled();
+									((Control)button2).set_Enabled(false);
+									try
+									{
+										await (customAction.Action?.Invoke(e2));
+									}
+									finally
+									{
+										((Control)button2).set_Enabled(oldEnabled);
+									}
+								});
 							}
 						}
 					}
