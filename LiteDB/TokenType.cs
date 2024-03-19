@@ -1,0 +1,41 @@
+namespace LiteDB
+{
+	internal enum TokenType
+	{
+		OpenBrace,
+		CloseBrace,
+		OpenBracket,
+		CloseBracket,
+		OpenParenthesis,
+		CloseParenthesis,
+		Comma,
+		Colon,
+		SemiColon,
+		At,
+		Hashtag,
+		Til,
+		Period,
+		Ampersand,
+		Dollar,
+		Exclamation,
+		NotEquals,
+		Equals,
+		Greater,
+		GreaterOrEquals,
+		Less,
+		LessOrEquals,
+		Minus,
+		Plus,
+		Asterisk,
+		Slash,
+		Backslash,
+		Percent,
+		String,
+		Int,
+		Double,
+		Whitespace,
+		Word,
+		EOF,
+		Unknown
+	}
+}

@@ -1,0 +1,25 @@
+using System;
+using System.Reflection;
+
+namespace LiteDB
+{
+	public class DefaultTypeNameBinder : ITypeNameBinder
+	{
+		public static DefaultTypeNameBinder Instance { get; } = new DefaultTypeNameBinder();
+
+
+		private DefaultTypeNameBinder()
+		{
+		}
+
+		public string GetName(Type type)
+		{
+			return type.FullName + ", " + type.GetTypeInfo().Assembly.GetName().Name;
+		}
+
+		public Type GetType(string name)
+		{
+			return Type.GetType(name);
+		}
+	}
+}
