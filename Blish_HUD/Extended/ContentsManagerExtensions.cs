@@ -12,6 +12,31 @@ namespace Blish_HUD.Extended
 	{
 		private static Logger Logger = Logger.GetLogger<ContentsManager>();
 
+		internal static CharacterRange GeneralPunctuation = new CharacterRange('\u2000', '\u206f');
+
+		internal static CharacterRange Arrows = new CharacterRange('←', '⇿');
+
+		internal static CharacterRange MathematicalOperators = new CharacterRange('∀', '⋿');
+
+		internal static CharacterRange BoxDrawing = new CharacterRange('─', '╰');
+
+		internal static CharacterRange GeometricShapes = new CharacterRange('■', '◿');
+
+		internal static CharacterRange MiscellaneousSymbols = new CharacterRange('☀', '⛿');
+
+		internal static readonly CharacterRange[] Gw2CharacterRange = new CharacterRange[9]
+		{
+			CharacterRange.BasicLatin,
+			CharacterRange.Latin1Supplement,
+			CharacterRange.LatinExtendedA,
+			GeneralPunctuation,
+			Arrows,
+			MathematicalOperators,
+			BoxDrawing,
+			GeometricShapes,
+			MiscellaneousSymbols
+		};
+
 		public static async Task Extract(this ContentsManager contentsManager, string refFilePath, string outFilePath, bool overwrite = true)
 		{
 			if (string.IsNullOrEmpty(refFilePath))
@@ -60,12 +85,7 @@ namespace Blish_HUD.Extended
 				GraphicsDeviceContext ctx = GameService.Graphics.LendGraphicsDeviceContext();
 				try
 				{
-					return TtfFontBaker.Bake(fontData, fontSize, textureSize, textureSize, new CharacterRange[3]
-					{
-						CharacterRange.BasicLatin,
-						CharacterRange.Latin1Supplement,
-						CharacterRange.LatinExtendedA
-					}).CreateSpriteFont(((GraphicsDeviceContext)(ref ctx)).get_GraphicsDevice());
+					return TtfFontBaker.Bake(fontData, fontSize, textureSize, textureSize, Gw2CharacterRange).CreateSpriteFont(((GraphicsDeviceContext)(ref ctx)).get_GraphicsDevice());
 				}
 				finally
 				{

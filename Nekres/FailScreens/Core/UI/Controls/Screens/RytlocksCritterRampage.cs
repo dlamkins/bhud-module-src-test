@@ -109,7 +109,7 @@ namespace Nekres.FailScreens.Core.UI.Controls.Screens
 			SoundEffect soundEffect = _soundEffect;
 			if (soundEffect != null)
 			{
-				soundEffect.Play(GameService.GameIntegration.get_Audio().get_Volume(), 0f, 0f);
+				soundEffect.Play(FailScreensModule.Instance.SoundVolume, 0f, 0f);
 			}
 			((TweenerImpl)GameService.Animation.get_Tweener()).Tween<RytlocksCritterRampage>(this, (object)new
 			{

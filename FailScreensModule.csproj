@@ -8,19 +8,21 @@
     <LangVersion>Preview</LangVersion>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup />
+  <PropertyGroup>
+    <RootNamespace />
+  </PropertyGroup>
   <ItemGroup />
   <ItemGroup>
     <Reference Include="Blish HUD" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="MonoGame.Framework" />
-    <Reference Include="Gw2Sharp" />
     <Reference Include="MonoGame.Extended" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Core" />
     <Reference Include="SpriteFontPlus">
       <HintPath>..\..\working\SpriteFontPlus.dll</HintPath>
     </Reference>
+    <Reference Include="Gw2Sharp" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Core" />
     <Reference Include="AsyncClipboardService" />
     <Reference Include="Newtonsoft.Json" />
   </ItemGroup>
