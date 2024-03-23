@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <AssemblyName>WindowResize</AssemblyName>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <UseWindowsForms>True</UseWindowsForms>
+    <TargetFramework>net472</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>Preview</LangVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemGroup />
+  <ItemGroup>
+    <Reference Include="Blish HUD" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="MonoGame.Framework" />
+    <Reference Include="System.Runtime.Serialization" />
+  </ItemGroup>
+</Project>
