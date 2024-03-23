@@ -12,10 +12,6 @@ namespace BhModule.Community.Pathing.UI.Views
 {
 	public class SettingsHintView : View
 	{
-		private StandardButton _bttnOpenSettings;
-
-		private StandardButton _bttnOpenSetupGuide;
-
 		public event EventHandler<EventArgs> OpenSettingsClicked;
 
 		public event EventHandler<EventArgs> OpenMarkerPacksClicked;
@@ -70,7 +66,13 @@ namespace BhModule.Community.Pathing.UI.Views
 			((Control)obj3).set_Parent(buildPanel);
 			((Control)obj3).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				Process.Start("https://link.blishhud.com/pathingsetup");
+				try
+				{
+					Process.Start("https://link.blishhud.com/pathingsetup");
+				}
+				catch (Exception)
+				{
+				}
 			});
 			DonateHero donateHero = new DonateHero();
 			((Control)donateHero).set_Size(new Point(((Control)buildPanel).get_Width(), 48));

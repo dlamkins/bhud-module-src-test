@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
@@ -51,30 +49,13 @@ namespace BhModule.Community.Pathing.UI.Tooltips
 		private async Task<bool> AttemptLoadAchievementCategory(IProgress<string> progress, int attempt = 1)
 		{
 			progress.Report("Loading achievement group details...");
-			try
-			{
-				_achievementCategories = ((IEnumerable<AchievementCategory>)(await ((IAllExpandableClient<AchievementCategory>)(object)GameService.Gw2WebApi.get_AnonymousConnection().get_Client().get_V2()
-					.get_Achievements()
-					.get_Categories()).AllAsync(default(CancellationToken)))).FirstOrDefault((AchievementCategory category) => category.get_Achievements().Contains(base.get_Model()));
-			}
-			catch (Exception ex)
-			{
-				if (attempt > 0)
-				{
-					AchievementPresenter achievementPresenter = this;
-					int num = attempt - 1;
-					attempt = num;
-					return await achievementPresenter.AttemptLoadAchievementCategory(progress, num);
-				}
-				Logger.Warn(ex, "Failed to load achievement details.");
-				return false;
-			}
-			return true;
+			_achievementCategories = PathingModule.Instance.PackInitiator.PackState.AchievementStates.GetAchievementCategory(base.get_Model());
+			return _achievement != null;
 		}
 
 		protected override async Task<bool> Load(IProgress<string> progress)
 		{
-			Task.Run(async delegate
+			Thread thread = new Thread((ThreadStart)async delegate
 			{
 				if (!(await AttemptLoadAchievement(progress)) && _achievement != null)
 				{
@@ -86,6 +67,8 @@ namespace BhModule.Community.Pathing.UI.Tooltips
 					((Presenter<AchievementTooltipView, int>)this).UpdateView();
 				}
 			});
+			thread.IsBackground = true;
+			thread.Start();
 			return true;
 		}
 

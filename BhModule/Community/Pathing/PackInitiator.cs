@@ -246,7 +246,7 @@ namespace BhModule.Community.Pathing
 				array = packs;
 				foreach (Pack pack2 in array)
 				{
-					await _packState.Module.ScriptEngine.LoadScript("pack.lua", pack2.ResourceManager);
+					await _packState.Module.ScriptEngine.LoadScript("pack.lua", pack2.ResourceManager, pack2.Name);
 				}
 			}
 			Pack[] array2 = packs;

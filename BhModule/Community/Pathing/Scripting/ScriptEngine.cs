@@ -158,7 +158,7 @@ namespace BhModule.Community.Pathing.Scripting
 			return CallFunction(funcName, args.ToArray());
 		}
 
-		public async Task<LuaChunk> LoadScript(string scriptName, IPackResourceManager resourceManager)
+		public async Task<LuaChunk> LoadScript(string scriptName, IPackResourceManager resourceManager, string scriptPackSource = null)
 		{
 			if (!resourceManager.ResourceExists(scriptName))
 			{
@@ -179,7 +179,7 @@ namespace BhModule.Community.Pathing.Scripting
 				ScriptState newScript = new ScriptState(chunk);
 				newScript.Run(Global, new PackContext(this, resourceManager));
 				Scripts.Add(newScript);
-				PushMessage(newScript.Name + ".lua loaded in " + newScript.LoadTime.Humanize(2) + ".", (newScript.LoadTime.TotalMilliseconds > 500.0) ? ScriptMessageLogLevel.Warn : ScriptMessageLogLevel.Info, null, "system");
+				PushMessage(scriptPackSource + "/" + newScript.Name + ".lua loaded in " + newScript.LoadTime.Humanize(2) + ".", (newScript.LoadTime.TotalMilliseconds > 500.0) ? ScriptMessageLogLevel.Warn : ScriptMessageLogLevel.Info, null, "system");
 				return chunk;
 			}
 			catch (LuaException ex2)
@@ -190,7 +190,7 @@ namespace BhModule.Community.Pathing.Scripting
 			{
 				Logger.Warn(ex, "Failed to load script '" + scriptName + "'.");
 			}
-			PushMessage("Failed to load " + scriptName + ".", ScriptMessageLogLevel.Error);
+			PushMessage("Failed to load " + scriptPackSource + "/" + scriptName + ".", ScriptMessageLogLevel.Error);
 			return null;
 		}
 

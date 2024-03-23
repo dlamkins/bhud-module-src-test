@@ -118,10 +118,10 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		private void DetectAndBuildContexts()
 		{
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005c: Expected O, but got Unknown
-			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cf: Expected O, but got Unknown
+			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Expected O, but got Unknown
+			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Expected O, but got Unknown
 			IAttribute descriptionAttr;
 			if (_pathingCategory.TryGetAggregatedAttributeValue("achievementid", out var achievementAttr))
 			{
@@ -136,7 +136,10 @@ namespace BhModule.Community.Pathing.UI.Controls
 				{
 					return;
 				}
-				((Control)this).set_Tooltip(new Tooltip((ITooltipView)(object)new AchievementTooltipView(achievementId, achievementBit)));
+				if (_packState.UserConfiguration.PackShowTooltipsOnAchievements.get_Value())
+				{
+					((Control)this).set_Tooltip(new Tooltip((ITooltipView)(object)new AchievementTooltipView(achievementId, achievementBit)));
+				}
 				if (_packState.UserConfiguration.PackAllowMarkersToAutomaticallyHide.get_Value())
 				{
 					((Control)this).set_Enabled(!_packState.AchievementStates.IsAchievementHidden(achievementId, achievementBit));

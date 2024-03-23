@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BhModule.Community.Pathing.Behavior;
@@ -23,6 +24,8 @@ namespace BhModule.Community.Pathing.State
 
 		private readonly ConcurrentDictionary<int, AchievementStatus> _achievementStates = new ConcurrentDictionary<int, AchievementStatus>();
 
+		private IApiV2ObjectList<AchievementCategory> _achievementCategories;
+
 		public AchievementStates(IRootPackState rootPackState)
 			: base(rootPackState)
 		{
@@ -38,10 +41,13 @@ namespace BhModule.Community.Pathing.State
 			UpdateCadenceUtil.UpdateAsyncWithCadence(UpdateAchievements, gameTime, 300010.0, ref _lastAchievementCheck);
 		}
 
-		protected override Task<bool> Initialize()
+		protected override async Task<bool> Initialize()
 		{
 			PathingModule.Instance.Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
-			return Task.FromResult(result: true);
+			_achievementCategories = await ((IAllExpandableClient<AchievementCategory>)(object)GameService.Gw2WebApi.get_AnonymousConnection().get_Client().get_V2()
+				.get_Achievements()
+				.get_Categories()).AllAsync(default(CancellationToken));
+			return true;
 		}
 
 		private void Gw2ApiManager_SubtokenUpdated(object sender, ValueEventArgs<IEnumerable<TokenPermission>> e)
@@ -74,6 +80,15 @@ namespace BhModule.Community.Pathing.State
 				return true;
 			}
 			return achievement.AchievementBits.Contains(achievementBit);
+		}
+
+		public AchievementCategory GetAchievementCategory(int achievementId)
+		{
+			if (_achievementCategories == null)
+			{
+				return null;
+			}
+			return ((IEnumerable<AchievementCategory>)_achievementCategories).FirstOrDefault((AchievementCategory category) => category.get_Achievements().Contains(achievementId));
 		}
 
 		private async Task UpdateAchievements(GameTime gameTime)

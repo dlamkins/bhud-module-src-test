@@ -31,6 +31,9 @@
     <Reference Include="Cronos">
       <HintPath>..\..\working\Cronos.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Dynamic">
+      <HintPath>..\..\working\Microsoft.Dynamic.dll</HintPath>
+    </Reference>
     <Reference Include="LiteDB">
       <HintPath>..\..\working\LiteDB.dll</HintPath>
     </Reference>

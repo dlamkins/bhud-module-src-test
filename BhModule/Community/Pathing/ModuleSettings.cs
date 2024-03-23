@@ -58,6 +58,8 @@ namespace BhModule.Community.Pathing
 
 		public SettingEntry<bool> PackShowHiddenMarkersReducedOpacity { get; private set; }
 
+		public SettingEntry<bool> PackShowTooltipsOnAchievements { get; private set; }
+
 		public SettingCollection MapSettings { get; private set; }
 
 		public SettingEntry<bool> MapPathablesEnabled { get; private set; }
@@ -131,6 +133,7 @@ namespace BhModule.Community.Pathing
 			PackShowWhenCategoriesAreFiltered = PackSettings.DefineSetting<bool>("PackShowWhenCategoriesAreFiltered", true, (Func<string>)(() => "Indicate When Categories Are Hidden"), (Func<string>)(() => "Shows a note at the bottom of the menu indicating if categories have been hidden.  Clicking the note will show the hidden categories temporarily."));
 			PackTruncateLongCategoryNames = PackSettings.DefineSetting<bool>("PackTruncateLongCategoryNames", false, (Func<string>)(() => "Truncate Long Category Names"), (Func<string>)(() => "Shortens long category names so that more nested menus can be shown on screen."));
 			PackShowHiddenMarkersReducedOpacity = PackSettings.DefineSetting<bool>("PackShowHiddenMarkersReducedOpacity", false, (Func<string>)(() => "Temporarily Show Ghost Markers"), (Func<string>)(() => "Shows hidden markers with a reduced opacity allowing you to unhide them.  This setting automatically disables on startup."));
+			PackShowTooltipsOnAchievements = PackSettings.DefineSetting<bool>("PackShowTooltipsOnAchievements", false, (Func<string>)(() => "Show Tooltips for Achievements"), (Func<string>)(() => "Warning: This can cause performance issues when browsing categories."));
 			SettingComplianceExtensions.SetRange(PackMaxOpacityOverride, 0f, 1f);
 			SettingComplianceExtensions.SetRange(PackMaxViewDistance, 25f, 50000f);
 			SettingComplianceExtensions.SetRange(PackMaxTrailAnimationSpeed, 0f, 10f);

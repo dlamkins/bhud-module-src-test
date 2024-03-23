@@ -17,7 +17,7 @@ namespace BhModule.Community.Pathing.Behavior
 			Done = accountAchievement.get_Done() && !accountAchievement.get_Repeated().HasValue;
 			IEnumerable<int> bits = accountAchievement.get_Bits();
 			AchievementBits = new HashSet<int>(bits ?? Enumerable.Empty<int>());
-			Unlocked = accountAchievement.get_Unlocked() ?? true;
+			Unlocked = accountAchievement.get_Unlocked().GetValueOrDefault(true);
 		}
 	}
 }
