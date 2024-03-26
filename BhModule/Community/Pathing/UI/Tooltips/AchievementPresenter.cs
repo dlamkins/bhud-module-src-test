@@ -55,7 +55,7 @@ namespace BhModule.Community.Pathing.UI.Tooltips
 
 		protected override async Task<bool> Load(IProgress<string> progress)
 		{
-			Thread thread = new Thread((ThreadStart)async delegate
+			Task.Run(async delegate
 			{
 				if (!(await AttemptLoadAchievement(progress)) && _achievement != null)
 				{
@@ -67,8 +67,6 @@ namespace BhModule.Community.Pathing.UI.Tooltips
 					((Presenter<AchievementTooltipView, int>)this).UpdateView();
 				}
 			});
-			thread.IsBackground = true;
-			thread.Start();
 			return true;
 		}
 
