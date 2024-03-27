@@ -125,7 +125,7 @@ namespace Nekres.FailScreens.Core.UI.Controls.Screens
 							_timer = ((TweenerImpl)GameService.Animation.get_Tweener()).Tween<WinXp>(this, (object)new
 							{
 								_blueScreenOpacity = 0f
-							}, 2f, 1.25f, true);
+							}, 2f, 1.25f, true).OnComplete((Action)((Control)this).Dispose);
 						});
 					});
 				});
