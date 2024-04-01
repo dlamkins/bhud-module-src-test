@@ -317,6 +317,7 @@ namespace Ideka.CustomCombatText
 					{
 						results.Add(EventResult.Breakbar);
 					}
+					value /= 10;
 				}
 				else if (value > 0)
 				{

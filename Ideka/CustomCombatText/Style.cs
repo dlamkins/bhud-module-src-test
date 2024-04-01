@@ -105,12 +105,12 @@ namespace Ideka.CustomCombatText
 			},
 			[EventResult.Interrupt] = new ResultFormat
 			{
-				Color = new Color(68, 136, 136),
+				Color = new Color(85, 170, 153),
 				Text = "interrupt"
 			},
 			[EventResult.Breakbar] = new ResultFormat
 			{
-				Color = new Color(68, 136, 136),
+				Color = new Color(85, 170, 153),
 				Text = "break"
 			}
 		};
