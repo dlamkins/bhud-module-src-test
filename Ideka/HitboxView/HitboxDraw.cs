@@ -22,13 +22,14 @@ namespace Ideka.HitboxView
 
 			public TimePos(TimeSpan time, Vector3 position, Vector3 forward)
 			{
-				//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0009: Unknown result type (might be due to invalid IL or missing references)
 				//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0010: Unknown result type (might be due to invalid IL or missing references)
 				Time = time;
 				Position = position;
 				Forward = forward;
+				base._002Ector();
 			}
 
 			public TimePos(Vector3 position, Vector3 forward)
@@ -80,17 +81,17 @@ namespace Ideka.HitboxView
 
 		private static readonly TimeSpan SmoothingCompensation = TimeSpan.FromMilliseconds(16.0);
 
+		private static readonly Primitive Circle = Primitive.HorizontalCircle(0.5f, 100);
+
+		private static readonly Primitive Slice = new Primitive(new Vector3(-0.5f, 0f, 0f), new Vector3(0f, 0f, 0f), new Vector3(0f, 0.5f, 0f)).Transformed(Matrix.CreateRotationZ(MathHelper.ToRadians(-45f)));
+
 		private TimeSpan _delay;
-
-		private readonly Primitive _circle;
-
-		private readonly Primitive _slice;
 
 		private int _lastTick;
 
 		private TimePos _lastPopped;
 
-		private TimePos _lastQueued;
+		private TimePos? _lastQueued;
 
 		private readonly Queue<TimePos> _timePosQueue = new Queue<TimePos>();
 
@@ -155,17 +156,14 @@ namespace Ideka.HitboxView
 		public HitboxDraw()
 			: this()
 		{
-			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).set_ClipsBounds(false);
-			_circle = Primitive.HorizontalCircle(0.5f, 100);
-			_slice = new Primitive(new Vector3(-0.5f, 0f, 0f), new Vector3(0f, 0f, 0f), new Vector3(0f, 0.5f, 0f)).Transformed(Matrix.CreateRotationZ(MathHelper.ToRadians(-45f)));
+			_lastPopped = new TimePos(TimeSpan.Zero);
 			Reset();
+		}
+
+		protected override CaptureType CapturesInput()
+		{
+			return (CaptureType)0;
 		}
 
 		public void Reset()
@@ -211,44 +209,43 @@ namespace Ideka.HitboxView
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-			Vector2 s;
-			Vector2 scale = (Sizes.TryGetValue(GameService.Gw2Mumble.get_PlayerCharacter().get_CurrentMount(), out s) ? s : Vector2.get_One());
-			Matrix trs = Matrix.CreateScale(scale.X, scale.Y, 1f) * Matrix.CreateRotationZ(0f - (float)Math.Atan2(Forward.X, Forward.Y)) * Matrix.CreateTranslation(Position);
-			IEnumerable<Vector2> circle = _circle.Transformed(trs).ToScreen();
-			spriteBatch.DrawPolygon(Vector2.get_Zero(), circle, Color.get_Black(), 3f);
-			spriteBatch.DrawPolygon(Vector2.get_Zero(), circle, Color.get_White(), 2f);
-			if (scale.X == scale.Y)
+			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+			if (!GameService.Gw2Mumble.get_UI().get_IsMapOpen() && GameService.GameIntegration.get_Gw2Instance().get_IsInGame())
 			{
-				IEnumerable<Vector2> slice = _slice.Transformed(trs).ToScreen();
-				spriteBatch.DrawPolygon(Vector2.get_Zero(), slice, Color.get_Black(), 3f, 0f, open: true);
-				spriteBatch.DrawPolygon(Vector2.get_Zero(), slice, Color.get_White(), 2f, 0f, open: true);
+				Vector2 s;
+				Vector2 scale = (Sizes.TryGetValue(GameService.Gw2Mumble.get_PlayerCharacter().get_CurrentMount(), out s) ? s : Vector2.get_One());
+				Matrix trs = Matrix.CreateScale(scale.X, scale.Y, 1f) * Matrix.CreateRotationZ(0f - (float)Math.Atan2(Forward.X, Forward.Y)) * Matrix.CreateTranslation(Position);
+				Primitive.ScreenPrimitive screenPrimitive = Circle.Transformed(trs).ToScreen();
+				screenPrimitive.Draw(spriteBatch, Color.get_Black(), 3f);
+				screenPrimitive.Draw(spriteBatch, Color.get_White(), 2f);
+				if (scale.X == scale.Y)
+				{
+					Primitive.ScreenPrimitive screenPrimitive2 = Slice.Transformed(trs).ToScreen();
+					screenPrimitive2.Draw(spriteBatch, Color.get_Black(), 3f);
+					screenPrimitive2.Draw(spriteBatch, Color.get_White(), 2f);
+				}
 			}
 		}
 	}

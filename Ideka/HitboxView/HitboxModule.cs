@@ -5,6 +5,7 @@ using Blish_HUD.Input;
 using Blish_HUD.Modules;
 using Blish_HUD.Settings;
 using Ideka.BHUDCommon;
+using Ideka.NetCommon;
 using Microsoft.Xna.Framework;
 
 namespace Ideka.HitboxView
@@ -26,6 +27,8 @@ namespace Ideka.HitboxView
 
 		private SliderSetting _gamePing;
 
+		private readonly DisposableCollection _dc = new DisposableCollection();
+
 		[ImportingConstructor]
 		public HitboxModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
 			: this(moduleParameters)
@@ -34,70 +37,54 @@ namespace Ideka.HitboxView
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f7: Expected O, but got Unknown
-			_hitboxColor = settings.Generic<Color>("HitboxColor", Color.get_White(), () => Strings.SettingHitboxColor, () => Strings.SettingHitboxColorText);
-			_hitboxOutlineColor = settings.Generic<Color>("HitboxOutlineColor", Color.get_Black(), () => Strings.SettingHitboxOutlineColor, () => Strings.SettingHitboxOutlineColorText);
-			_toggleHitboxKey = settings.KeyBinding("ToggleHitboxKey", new KeyBinding(), () => Strings.SettingToggleHitboxKey, () => Strings.SettingToggleHitboxKeyText);
-			_hitboxVisible = settings.Generic("HitboxVisible", defaultValue: true, () => Strings.SettingHitboxVisible, () => Strings.SettingHitboxVisibleText);
-			_hitboxSmoothing = settings.Generic("HitboxSmoothing", defaultValue: true, () => Strings.SettingHitboxSmoothing, () => Strings.SettingHitboxSmoothingText);
-			_gamePing = settings.Slider("GamePing", 100, 0, 1000, () => Strings.SettingGamePing, () => Strings.SettingGamePingText, (int min, int max) => string.Format(Strings.SettingGamePingValidation, min, max));
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0113: Expected O, but got Unknown
+			_hitboxColor = _dc.Add(settings.Generic<Color>("HitboxColor", Color.get_White(), () => Strings.SettingHitboxColor, () => Strings.SettingHitboxColorText));
+			_hitboxOutlineColor = _dc.Add(settings.Generic<Color>("HitboxOutlineColor", Color.get_Black(), () => Strings.SettingHitboxOutlineColor, () => Strings.SettingHitboxOutlineColorText));
+			_toggleHitboxKey = _dc.Add(settings.KeyBinding("ToggleHitboxKey", new KeyBinding(), () => Strings.SettingToggleHitboxKey, () => Strings.SettingToggleHitboxKeyText));
+			_hitboxVisible = _dc.Add(settings.Generic("HitboxVisible", defaultValue: true, () => Strings.SettingHitboxVisible, () => Strings.SettingHitboxVisibleText));
+			_hitboxSmoothing = _dc.Add(settings.Generic("HitboxSmoothing", defaultValue: true, () => Strings.SettingHitboxSmoothing, () => Strings.SettingHitboxSmoothingText));
+			_gamePing = _dc.Add(settings.Slider("GamePing", 100, 0, 1000, () => Strings.SettingGamePing, () => Strings.SettingGamePingText, (int min, int max) => string.Format(Strings.SettingGamePingValidation, min, max)));
 		}
 
 		protected override void Initialize()
 		{
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 			HitboxDraw hitboxDraw = new HitboxDraw();
 			((Control)hitboxDraw).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			hitboxDraw.Color = _hitboxColor.Value;
-			hitboxDraw.OutlineColor = _hitboxOutlineColor.Value;
-			((Control)hitboxDraw).set_Visible(_hitboxVisible.Value);
-			hitboxDraw.Smoothing = _hitboxSmoothing.Value;
-			hitboxDraw.Ping = _gamePing.Value;
 			_hitbox = hitboxDraw;
-			_hitboxColor.Changed = delegate(Color value)
+			_dc.Add(_hitboxColor.OnChangedAndNow(delegate(Color value)
 			{
 				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 				_hitbox.Color = value;
-			};
-			_hitboxOutlineColor.Changed = delegate(Color value)
+			}));
+			_dc.Add(_hitboxOutlineColor.OnChangedAndNow(delegate(Color value)
 			{
 				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 				_hitbox.OutlineColor = value;
-			};
-			_toggleHitboxKey.OnTrigger(delegate
+			}));
+			_dc.Add(_toggleHitboxKey.OnActivated(delegate
 			{
 				_hitboxVisible.Value = !_hitboxVisible.Value;
-			});
-			_hitboxVisible.Changed = delegate(bool value)
+			}));
+			_dc.Add(_hitboxVisible.OnChangedAndNow(delegate(bool value)
 			{
 				((Control)_hitbox).set_Visible(value);
-			};
-			_hitboxSmoothing.Changed = delegate(bool value)
+			}));
+			_dc.Add(_hitboxSmoothing.OnChangedAndNow(delegate(bool value)
 			{
 				_hitbox.Smoothing = value;
-			};
-			_gamePing.Changed = delegate(int value)
+			}));
+			_dc.Add(_gamePing.OnChangedAndNow(delegate(int value)
 			{
 				_hitbox.Ping = value;
-			};
+			}));
 		}
 
 		protected override void Unload()
 		{
-			_hitboxColor?.Dispose();
-			_toggleHitboxKey?.Dispose();
-			_hitboxVisible?.Dispose();
-			_hitboxSmoothing?.Dispose();
-			_gamePing?.Dispose();
-			HitboxDraw hitbox = _hitbox;
-			if (hitbox != null)
-			{
-				((Control)hitbox).Dispose();
-			}
+			_dc.Dispose();
 		}
 	}
 }

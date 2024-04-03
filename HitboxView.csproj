@@ -15,9 +15,15 @@
   <ItemGroup />
   <ItemGroup>
     <Reference Include="Blish HUD" />
+    <Reference Include="HitboxView.BHUDCommon">
+      <HintPath>..\..\working\HitboxView.BHUDCommon.dll</HintPath>
+    </Reference>
     <Reference Include="MonoGame.Framework" />
     <Reference Include="Gw2Sharp" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="HitboxView.NetCommon">
+      <HintPath>..\..\working\HitboxView.NetCommon.dll</HintPath>
+    </Reference>
     <Reference Include="System.Core" />
   </ItemGroup>
 </Project>
