@@ -51,9 +51,10 @@ namespace Ideka.HitboxView
 
 		protected override void Initialize()
 		{
+			DisposableCollection dc = _dc;
 			HitboxDraw hitboxDraw = new HitboxDraw();
 			((Control)hitboxDraw).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			_hitbox = hitboxDraw;
+			_hitbox = dc.Add<HitboxDraw>(hitboxDraw);
 			_dc.Add(_hitboxColor.OnChangedAndNow(delegate(Color value)
 			{
 				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
