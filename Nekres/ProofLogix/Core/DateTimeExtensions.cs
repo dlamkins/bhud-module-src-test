@@ -9,55 +9,55 @@ namespace Nekres.ProofLogix.Core
 		{
 			TimeSpan timeSpan = DateTime.Now.Subtract(dateTime);
 			double totalSeconds = timeSpan.TotalSeconds;
-			if (totalSeconds <= 4.0)
+			if (!(totalSeconds <= 2.0))
 			{
-				if (totalSeconds <= 2.0)
+				if (!(totalSeconds <= 4.0))
 				{
-					return "just now";
-				}
-				return "a few seconds ago";
-			}
-			if (totalSeconds <= 60.0)
-			{
-				return $"{timeSpan.Seconds} seconds ago";
-			}
-			double totalMinutes = timeSpan.TotalMinutes;
-			string result;
-			if (!(totalMinutes <= 2.0))
-			{
-				if (totalMinutes < 60.0)
-				{
-					result = $"about {timeSpan.Minutes} minutes ago";
-				}
-				else
-				{
-					double totalHours = timeSpan.TotalHours;
-					string text;
-					if (!(totalHours <= 2.0))
+					if (totalSeconds <= 60.0)
 					{
-						if (totalHours < 24.0)
+						return $"{timeSpan.Seconds} seconds ago";
+					}
+					double totalMinutes = timeSpan.TotalMinutes;
+					string result;
+					if (!(totalMinutes <= 2.0))
+					{
+						if (totalMinutes < 60.0)
 						{
-							text = $"about {timeSpan.Hours} hours ago";
+							result = $"about {timeSpan.Minutes} minutes ago";
 						}
 						else
 						{
-							double totalDays = timeSpan.TotalDays;
-							string text2 = ((totalDays < 365.0) ? ((totalDays <= 30.0) ? ((!(totalDays <= 2.0)) ? $"about {timeSpan.Days} days ago" : "yesterday") : ((!(totalDays <= 60.0)) ? $"about {timeSpan.Days / 30} months ago" : "about a month ago")) : ((!(totalDays <= 730.0)) ? $"about {timeSpan.Days / 365} years ago" : "about a year ago"));
-							text = text2;
+							double totalHours = timeSpan.TotalHours;
+							string text;
+							if (!(totalHours <= 2.0))
+							{
+								if (totalHours < 24.0)
+								{
+									text = $"about {timeSpan.Hours} hours ago";
+								}
+								else
+								{
+									double totalDays = timeSpan.TotalDays;
+									string text2 = ((totalDays <= 2.0) ? "yesterday" : ((totalDays <= 30.0) ? $"about {timeSpan.Days} days ago" : ((totalDays <= 60.0) ? "about a month ago" : ((totalDays < 365.0) ? $"about {timeSpan.Days / 30} months ago" : ((!(totalDays <= 730.0)) ? $"about {timeSpan.Days / 365} years ago" : "about a year ago")))));
+									text = text2;
+								}
+							}
+							else
+							{
+								text = "about an hour ago";
+							}
+							result = text;
 						}
 					}
 					else
 					{
-						text = "about an hour ago";
+						result = "about a minute ago";
 					}
-					result = text;
+					return result;
 				}
+				return "a few seconds ago";
 			}
-			else
-			{
-				result = "about a minute ago";
-			}
-			return result;
+			return "just now";
 		}
 
 		public static string AsRelativeTime(this DateTime dateTime)

@@ -274,7 +274,6 @@ namespace Nekres.ProofLogix.Core.UI.Table
 			});
 			headerEntry.ColumnClick += delegate(object _, ValueEventArgs<int> e)
 			{
-				ProofLogix.Instance.Resources.PlayMenuItemClick();
 				((Presenter<TableView, TableConfig>)base.get_Presenter()).get_Model().SelectedColumn = e.get_Value();
 				((Presenter<TableView, TableConfig>)base.get_Presenter()).get_Model().OrderDescending = !((Presenter<TableView, TableConfig>)base.get_Presenter()).get_Model().OrderDescending;
 				base.get_Presenter().SortEntries();
@@ -298,7 +297,6 @@ namespace Nekres.ProofLogix.Core.UI.Table
 			{
 				((Presenter<TableView, TableConfig>)base.get_Presenter()).get_Model().AlwaysSortStatus = e.get_Checked();
 				base.get_Presenter().SortEntries();
-				ProofLogix.Instance.Resources.PlayMenuItemClick();
 			});
 			ContextMenuStripItem val7 = new ContextMenuStripItem("Keep Leavers");
 			((Control)val7).set_Parent((Container)(object)menu);
@@ -308,7 +306,6 @@ namespace Nekres.ProofLogix.Core.UI.Table
 			val7.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object _, CheckChangedEvent e)
 			{
 				((Presenter<TableView, TableConfig>)base.get_Presenter()).get_Model().KeepLeavers = e.get_Checked();
-				ProofLogix.Instance.Resources.PlayMenuItemClick();
 			});
 			ContextMenuStripItem val8 = new ContextMenuStripItem("Color Grading Mode");
 			((Control)val8).set_Parent((Container)(object)menu);
@@ -376,7 +373,6 @@ namespace Nekres.ProofLogix.Core.UI.Table
 					else
 					{
 						((IList<TableConfig.Column>)((Presenter<TableView, TableConfig>)base.get_Presenter()).get_Model().Columns).RemoveAll((Enum)col);
-						ProofLogix.Instance.Resources.PlayMenuItemClick();
 					}
 				});
 			}
@@ -444,7 +440,6 @@ namespace Nekres.ProofLogix.Core.UI.Table
 					else
 					{
 						((IList<int>)((Presenter<TableView, TableConfig>)base.get_Presenter()).get_Model().TokenIds).RemoveAll(resource.Id);
-						ProofLogix.Instance.Resources.PlayMenuItemClick();
 					}
 				});
 			}

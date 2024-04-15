@@ -31,7 +31,7 @@ namespace Blish_HUD.Extended
 				return result;
 			}
 			Exception e = (Exception)obj;
-			if (e is NotFoundException || e is BadRequestException || e is AuthorizationRequiredException || e is ServiceUnavailableException)
+			if ((e is NotFoundException || e is BadRequestException || e is AuthorizationRequiredException || e is ServiceUnavailableException) ? true : false)
 			{
 				logger.Trace(e, e.Message);
 				return default(T);

@@ -66,12 +66,12 @@ namespace Nekres.ProofLogix.Core.UI.LookingForOpener
 			//IL_0267: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0273: Unknown result type (might be due to invalid IL or missing references)
 			//IL_028b: Expected O, but got Unknown
-			//IL_02dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_030d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_031a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f4: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent(buildPanel);
 			((Control)val).set_Width(buildPanel.get_ContentRegion().Width);
@@ -145,10 +145,6 @@ namespace Nekres.ProofLogix.Core.UI.LookingForOpener
 				((Control)val7).set_Parent((Container)(object)menu);
 				val7.set_Text($"Wing {wingNr}");
 				MenuItem wingItem = val7;
-				((Control)wingItem).add_Click((EventHandler<MouseEventArgs>)delegate
-				{
-					ProofLogix.Instance.Resources.PlayMenuClick();
-				});
 				foreach (Raid.Wing.Event encounter in item.Events)
 				{
 					MenuItem val8 = new MenuItem();
@@ -158,7 +154,6 @@ namespace Nekres.ProofLogix.Core.UI.LookingForOpener
 					((Control)val8).set_Width(((Container)menu).get_ContentRegion().Width);
 					((Control)val8).add_Click((EventHandler<MouseEventArgs>)async delegate
 					{
-						ProofLogix.Instance.Resources.PlayMenuItemClick();
 						resultContainer.Show((IView)(object)new LoadingView("Searching…"));
 						ViewContainer val9 = resultContainer;
 						string id = encounter.Id;

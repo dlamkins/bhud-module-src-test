@@ -191,14 +191,13 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 			bool busy = false;
 			((Control)sendBttn).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
 			{
-				//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0119: Expected O, but got Unknown
+				//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+				//IL_010a: Expected O, but got Unknown
 				if (!busy)
 				{
 					busy = true;
-					ProofLogix.Instance.Resources.PlayMenuItemClick();
 					int amount2 = ProofLogix.Instance.PartySync.LocalPlayer.KpProfile.GetToken(_config.SelectedToken).Amount;
 					if (!CanSend(amount2, lastTotalReachedTime))
 					{
@@ -224,13 +223,12 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 			});
 			((Control)sendBttn).add_RightMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
 			{
-				//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-				//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0095: Expected O, but got Unknown
+				//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0086: Expected O, but got Unknown
 				if (!busy)
 				{
 					busy = true;
-					ProofLogix.Instance.Resources.PlayMenuItemClick();
 					int amount = ProofLogix.Instance.PartySync.LocalPlayer.KpProfile.GetToken(_config.SelectedToken).Amount;
 					if (!CanSend(amount, lastTotalReachedTime))
 					{
@@ -274,7 +272,6 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 			val5.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object _, CheckChangedEvent e)
 			{
 				_config.SendProfileId = e.get_Checked();
-				ProofLogix.Instance.Resources.PlayMenuItemClick();
 			});
 			IEnumerable<Token> playerTokens = ProofLogix.Instance.PartySync.LocalPlayer.KpProfile.GetTokens();
 			List<Resource> generalItems = (from resource in ProofLogix.Instance.Resources.GetGeneralItems()

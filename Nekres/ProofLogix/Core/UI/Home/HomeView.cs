@@ -182,36 +182,36 @@ namespace Nekres.ProofLogix.Core.UI.Home
 			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0190: Expected O, but got Unknown
-			//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fe: Expected O, but got Unknown
-			//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0204: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0210: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0222: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0231: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0250: Expected O, but got Unknown
-			//IL_0251: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0256: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0262: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0274: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0283: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a2: Expected O, but got Unknown
-			//IL_02a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02fa: Expected O, but got Unknown
+			//IL_0191: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d4: Expected O, but got Unknown
+			//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0207: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0226: Expected O, but got Unknown
+			//IL_0227: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0238: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0243: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0259: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0278: Expected O, but got Unknown
+			//IL_0279: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0285: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0296: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0298: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d0: Expected O, but got Unknown
 			Panel val = new Panel();
 			((Control)val).set_Parent(buildPanel);
 			((Control)val).set_Width(200);
@@ -246,10 +246,6 @@ namespace Nekres.ProofLogix.Core.UI.Home
 			((Control)val5).set_Width(((Container)navMenu).get_ContentRegion().Width);
 			val5.set_Collapsed(false);
 			MenuItem separatorEntry = val5;
-			((Control)separatorEntry).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
-				ProofLogix.Instance.Resources.PlayMenuClick();
-			});
 			MenuItem val6 = new MenuItem();
 			((Control)val6).set_Parent((Container)(object)separatorEntry);
 			val6.set_Text("My Profile");
@@ -316,7 +312,6 @@ namespace Nekres.ProofLogix.Core.UI.Home
 				}
 				else
 				{
-					ProofLogix.Instance.Resources.PlayMenuItemClick();
 					AsyncString loadingText = new AsyncString();
 					plyPanel.Show((IView)(object)new LoadingView("Loading items…", loadingText));
 					loadingText.String = ProofLogix.Instance.Resources.GetLoadingSubtitle();
@@ -340,7 +335,6 @@ namespace Nekres.ProofLogix.Core.UI.Home
 				}
 				else
 				{
-					ProofLogix.Instance.Resources.PlayMenuItemClick();
 					plyPanel.Show((IView)(object)new LoadingView("Loading clears.."));
 					ViewContainer val10 = plyPanel;
 					val10.Show((IView)(object)new ClearsView(await ProofLogix.Instance.Gw2WebApi.GetClears()));
@@ -367,28 +361,22 @@ namespace Nekres.ProofLogix.Core.UI.Home
 							ScreenNotification.ShowNotification("Not yet loaded. Please, try again.", (NotificationType)2, (Texture2D)null, 4);
 						}
 					}
+					else if (localPlayer.KpProfile.NotFound)
+					{
+						ProofLogix.Instance.ToggleRegisterWindow();
+					}
 					else
 					{
-						ProofLogix.Instance.Resources.PlayMenuItemClick();
-						if (localPlayer.KpProfile.NotFound)
-						{
-							ProofLogix.Instance.ToggleRegisterWindow();
-						}
-						else
-						{
-							ProfileView.Open(localPlayer.KpProfile);
-						}
+						ProfileView.Open(localPlayer.KpProfile);
 					}
 				}
 			});
 			((Control)squadTableEntry).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				ProofLogix.Instance.Resources.PlayMenuItemClick();
 				ProofLogix.Instance.ToggleTable();
 			});
 			((Control)smartPingEntry).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				ProofLogix.Instance.Resources.PlayMenuItemClick();
 				ProofLogix.Instance.ToggleSmartPing();
 			});
 			((View<IPresenter>)this).Build(buildPanel);

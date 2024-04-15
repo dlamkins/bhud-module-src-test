@@ -79,7 +79,6 @@ namespace Nekres.ProofLogix.Core.UI.Table
 			_bulk.Add(entry);
 			((Control)entry).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
 			{
-				ProofLogix.Instance.Resources.PlayMenuItemClick();
 				ProfileView.Open(entry.Player.KpProfile);
 			});
 			((Control)entry).add_RightMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
