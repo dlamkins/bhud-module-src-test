@@ -20,7 +20,7 @@ namespace Nekres.FailScreens.Core.UI.Controls.Screens
 
 		private float _textOpacityPercent;
 
-		private float _textScalePercent = 0.5f;
+		private float _textScalePercent = 1f;
 
 		private float _bgOpacityPercent;
 
@@ -82,7 +82,7 @@ namespace Nekres.FailScreens.Core.UI.Controls.Screens
 				.Reflect();
 			((TweenerImpl)GameService.Animation.get_Tweener()).Tween<DarkSouls>(this, (object)new
 			{
-				_textScalePercent = 1.2f
+				_textScalePercent = 1.7f
 			}, 7f, 0f, true);
 			((TweenerImpl)GameService.Animation.get_Tweener()).Tween<DarkSouls>(this, (object)new
 			{

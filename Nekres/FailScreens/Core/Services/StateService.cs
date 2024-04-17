@@ -3,6 +3,8 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Blish_HUD.ArcDps;
+using Blish_HUD.ArcDps.Models;
 using Blish_HUD.Controls;
 using Blish_HUD.Extended;
 using Microsoft.Xna.Framework.Graphics;
@@ -24,6 +26,34 @@ namespace Nekres.FailScreens.Core.Services
 		public State CurrentState { get; private set; }
 
 		public event EventHandler<ValueEventArgs<State>> StateChanged;
+
+		public StateService()
+		{
+			GameService.ArcDps.get_Common().Activate();
+			GameService.ArcDps.add_RawCombatEvent((EventHandler<RawCombatEventArgs>)ArcDps_RawCombatEvent);
+		}
+
+		private void ArcDps_RawCombatEvent(object sender, RawCombatEventArgs e)
+		{
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Invalid comparison between Unknown and I4
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Invalid comparison between Unknown and I4
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Invalid comparison between Unknown and I4
+			CombatEvent combatEvent = e.get_CombatEvent();
+			if (((combatEvent != null) ? combatEvent.get_Ev() : null) != null && (int)e.get_EventType() == 1 && Convert.ToBoolean(e.get_CombatEvent().get_Src().get_Self()))
+			{
+				if ((int)e.get_CombatEvent().get_Ev().get_IsStateChange() == 4)
+				{
+					ChangeState(State.Defeated);
+				}
+				else if ((int)e.get_CombatEvent().get_Ev().get_IsStateChange() == 3)
+				{
+					ChangeState(State.StandBy);
+				}
+			}
+		}
 
 		public async Task SetupLockFiles(State state)
 		{
@@ -69,13 +99,12 @@ namespace Nekres.FailScreens.Core.Services
 				if (File.Exists(backupPath))
 				{
 					File.Copy(backupPath, path, overwrite: true);
-					File.Delete(backupPath);
+					ScreenNotification.ShowNotification($"{state} playlist reverted. Game restart required.", (NotificationType)1, (Texture2D)null, 4);
 				}
 				else if (File.Exists(path))
 				{
 					File.Delete(path);
 				}
-				ScreenNotification.ShowNotification($"{state} playlist reverted. Game restart required.", (NotificationType)1, (Texture2D)null, 4);
 			}
 			catch (Exception e)
 			{
@@ -85,7 +114,7 @@ namespace Nekres.FailScreens.Core.Services
 
 		public void Update()
 		{
-			if (DateTime.UtcNow.Subtract(_lastLockFileCheck).TotalMilliseconds > 100.0)
+			if (!GameService.ArcDps.get_Running() && DateTime.UtcNow.Subtract(_lastLockFileCheck).TotalMilliseconds > 100.0)
 			{
 				_lastLockFileCheck = DateTime.UtcNow;
 				CheckLockFile(State.Defeated);
@@ -115,6 +144,7 @@ namespace Nekres.FailScreens.Core.Services
 
 		public void Dispose()
 		{
+			GameService.ArcDps.remove_RawCombatEvent((EventHandler<RawCombatEventArgs>)ArcDps_RawCombatEvent);
 		}
 	}
 }

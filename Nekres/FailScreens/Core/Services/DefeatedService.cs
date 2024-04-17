@@ -26,29 +26,28 @@ namespace Nekres.FailScreens.Core.Services
 
 		private void OnStateChanged(object sender, ValueEventArgs<StateService.State> e)
 		{
-			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-			if (e.get_Value() != StateService.State.Defeated)
+			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+			Control failScreen = _failScreen;
+			if (failScreen != null)
 			{
-				Control failScreen = _failScreen;
-				if (failScreen != null)
+				failScreen.Dispose();
+			}
+			if (e.get_Value() == StateService.State.Defeated)
+			{
+				FailScreens screen = FailScreensModule.Instance.FailScreen.get_Value();
+				if (FailScreensModule.Instance.Random.get_Value())
 				{
-					failScreen.Dispose();
+					int num = Enum.GetValues(typeof(FailScreens)).Cast<int>().Min();
+					int max = Enum.GetValues(typeof(FailScreens)).Cast<int>().Max();
+					screen = (FailScreens)RandomUtil.GetRandom(num, max);
 				}
-				return;
-			}
-			FailScreens screen = FailScreensModule.Instance.FailScreen.get_Value();
-			if (FailScreensModule.Instance.Random.get_Value())
-			{
-				int num = Enum.GetValues(typeof(FailScreens)).Cast<int>().Min();
-				int max = Enum.GetValues(typeof(FailScreens)).Cast<int>().Max();
-				screen = (FailScreens)RandomUtil.GetRandom(num, max);
-			}
-			Control buildScreen = CreateFailScreen(screen);
-			if (buildScreen != null)
-			{
-				buildScreen.set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-				buildScreen.set_Size(((Control)GameService.Graphics.get_SpriteScreen()).get_Size());
-				_failScreen = buildScreen;
+				Control buildScreen = CreateFailScreen(screen);
+				if (buildScreen != null)
+				{
+					buildScreen.set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+					buildScreen.set_Size(((Control)GameService.Graphics.get_SpriteScreen()).get_Size());
+					_failScreen = buildScreen;
+				}
 			}
 		}
 
