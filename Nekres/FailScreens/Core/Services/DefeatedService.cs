@@ -1,11 +1,14 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
+using Microsoft.Xna.Framework;
 using Nekres.FailScreens.Core.UI.Controls.Screens;
 
 namespace Nekres.FailScreens.Core.Services
@@ -27,23 +30,56 @@ namespace Nekres.FailScreens.Core.Services
 
 		private int _dblClickCount;
 
+		private Stopwatch _dblClickWatch;
+
+		private uint _dblClickMs;
+
+		private Point _dblClickPos;
+
 		public DefeatedService()
 		{
 			OnMapChanged(GameService.Gw2Mumble.get_CurrentMap(), new ValueEventArgs<int>(GameService.Gw2Mumble.get_CurrentMap().get_Id()));
 			FailScreensModule.Instance.State.StateChanged += OnStateChanged;
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
 			GameService.Input.get_Mouse().add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)OnLeftMouseButtonReleased);
+			_dblClickWatch = new Stopwatch();
 		}
+
+		[DllImport("user32.dll")]
+		private static extern uint GetDoubleClickTime();
 
 		private void OnLeftMouseButtonReleased(object sender, MouseEventArgs e)
 		{
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
 			if (_failScreen == null)
 			{
 				_dblClickCount = 0;
 				return;
 			}
+			if (_dblClickCount == 0)
+			{
+				_dblClickPos = GameService.Input.get_Mouse().get_PositionRaw();
+				_dblClickMs = GetDoubleClickTime();
+				_dblClickWatch.Restart();
+			}
+			Point pos = GameService.Input.get_Mouse().get_PositionRaw();
+			if (Math.Abs(_dblClickPos.X - pos.X) > 5 && Math.Abs(_dblClickPos.Y - pos.Y) > 5)
+			{
+				_dblClickCount = 0;
+				return;
+			}
 			_dblClickCount++;
-			if (_dblClickCount > 1)
+			if (_dblClickCount <= 1)
+			{
+				return;
+			}
+			_dblClickCount = 0;
+			if (_dblClickWatch.ElapsedMilliseconds < _dblClickMs)
 			{
 				Control failScreen = _failScreen;
 				if (failScreen != null)
@@ -51,7 +87,6 @@ namespace Nekres.FailScreens.Core.Services
 					failScreen.Dispose();
 				}
 				_failScreen = null;
-				_dblClickCount = 0;
 			}
 		}
 
