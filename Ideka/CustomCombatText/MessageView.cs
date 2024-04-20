@@ -66,15 +66,15 @@ namespace Ideka.CustomCombatText
 			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01fa: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0246: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0247: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0314: Unknown result type (might be due to invalid IL or missing references)
+			//IL_031e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_031f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_039d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c9: Unknown result type (might be due to invalid IL or missing references)
 			LastTime = time;
 			if (!_messages.Any())
 			{
@@ -84,39 +84,43 @@ namespace Ideka.CustomCombatText
 			List<List<Message>> resultGroups;
 			Style.ResultFormat x4;
 			Style.ResultFormat resultFormat = (byGroup<EventResult, Style.ResultFormat>(_messages, (Message x) => x.Result, CTextModule.Style.ResultFormats, out resultGroups, out x4) ? x4 : null);
-			List<List<Message>> groups3;
+			List<List<Message>> groups5;
 			Color x3;
-			Color srcProfColor = (byGroup<ProfessionType, Color>(_messages, (Message x) => (ProfessionType)(byte)x.Src.get_Profession(), CTextModule.Style.ProfessionColors, out groups3, out x3) ? x3 : CTextModule.Style.DefaultEntityColor);
+			Color srcProfColor = (byGroup<ProfessionType, Color>(_messages, (Message x) => (ProfessionType)(byte)x.Src.get_Profession(), CTextModule.Style.ProfessionColors, out groups5, out x3) ? x3 : CTextModule.Style.DefaultEntityColor);
 			Color? petColor3 = CTextModule.Style.PetColor;
 			if (petColor3.HasValue)
 			{
 				Color petColor2 = petColor3.GetValueOrDefault();
-				if ((from x in groups3.First()
+				if ((from x in groups5.First()
 					where !x.SrcIsPet
 					select x).Count() < _messages.Where((Message x) => x.SrcIsPet).Count())
 				{
 					srcProfColor = petColor2;
 				}
 			}
-			List<List<Message>> groups2;
+			List<List<Message>> groups4;
 			Color x2;
-			Color dstProfColor = (byGroup<ProfessionType, Color>(_messages, (Message x) => (ProfessionType)(byte)x.Dst.get_Profession(), CTextModule.Style.ProfessionColors, out groups2, out x2) ? x2 : CTextModule.Style.DefaultEntityColor);
+			Color dstProfColor = (byGroup<ProfessionType, Color>(_messages, (Message x) => (ProfessionType)(byte)x.Dst.get_Profession(), CTextModule.Style.ProfessionColors, out groups4, out x2) ? x2 : CTextModule.Style.DefaultEntityColor);
 			petColor3 = CTextModule.Style.PetColor;
 			if (petColor3.HasValue)
 			{
 				Color petColor = petColor3.GetValueOrDefault();
-				if ((from x in groups2.First()
+				if ((from x in groups4.First()
 					where !x.DstIsPet
 					select x).Count() < _messages.Where((Message x) => x.DstIsPet).Count())
 				{
 					dstProfColor = petColor;
 				}
 			}
+			byGroup<(uint, uint), object>(_messages, (Message x) => (x.Src.get_Profession(), x.Src.get_Elite()), new Dictionary<(uint, uint), object>(), out var groups3, out var value2);
+			(ProfessionType, uint) srcSpec = ((ProfessionType)(byte)groups3[0][0].Src.get_Profession(), groups3[0][0].Src.get_Elite());
+			byGroup<(uint, uint), object>(_messages, (Message x) => (x.Dst.get_Profession(), x.Dst.get_Elite()), new Dictionary<(uint, uint), object>(), out var groups2, out value2);
+			(ProfessionType, uint) dstSpec = ((ProfessionType)(byte)groups2[0][0].Dst.get_Profession(), groups2[0][0].Dst.get_Elite());
 			SizeDeltaX = 0f;
 			_parsedFragments.Clear();
 			foreach (TemplateParser.PreFragment item in _parsedTemplate)
 			{
-				foreach (TemplateParser.Fragment parsed in TemplateParser.FinalParse(item, resultFormat?.Color, srcProfColor, dstProfColor, _receiver.Color, _font, message, _messages, resultGroups))
+				foreach (TemplateParser.Fragment parsed in TemplateParser.FinalParse(item, resultFormat?.Color, srcProfColor, dstProfColor, srcSpec, dstSpec, _receiver.Color, _font, message, _messages, resultGroups))
 				{
 					TemplateParser.StringFragment s = parsed as TemplateParser.StringFragment;
 					if (s != null && s.Text.EndsWith(" "))

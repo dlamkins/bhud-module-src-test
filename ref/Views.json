@@ -416,7 +416,7 @@
                   "p5MbQ3xISauRbPuaEzHxNQ"
                 ],
                 "EntityFilter": "-aS4Lvy8Rd2bfsygi1Rzzg",
-                "Template": "[(%nx) ][%f ][%s ][%b ]%v %i",
+                "Template": "[(%nx) ][%m ][%f ][%s ][%b ]%v %i",
                 "Color": null,
                 "FontName": null,
                 "FontSize": null
@@ -432,7 +432,7 @@
                   "9wriGSeNQ12qEJ1ZRo4R0Q"
                 ],
                 "EntityFilter": "-aS4Lvy8Rd2bfsygi1Rzzg",
-                "Template": "[(%nx) ][%f ][%s ]%v %i",
+                "Template": "[(%nx) ][%m ][%f ][%s ]%v %i",
                 "Color": null,
                 "FontName": null,
                 "FontSize": null
@@ -447,7 +447,7 @@
                   "Qq5274QvQ6-4qqoZOwni0w"
                 ],
                 "EntityFilter": "-aS4Lvy8Rd2bfsygi1Rzzg",
-                "Template": "[(%nx) ][%f ][%s ][%b ]%v %i",
+                "Template": "[(%nx) ][%m ][%f ][%s ][%b ]%v %i",
                 "Color": null,
                 "FontName": null,
                 "FontSize": null
@@ -505,7 +505,7 @@
                   "eAqruxsURl-GaMAx3z_ORA"
                 ],
                 "EntityFilter": "-aS4Lvy8Rd2bfsygi1Rzzg",
-                "Template": "[(%nx) ][%f ][%s ][%r ][%b ][%v ]%i",
+                "Template": "[(%nx) ][%m ][%f ][%s ][%r ][%b ][%v ]%i",
                 "Color": null,
                 "FontName": null,
                 "FontSize": null

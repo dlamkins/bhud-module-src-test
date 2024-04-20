@@ -4,6 +4,7 @@ using System.Linq;
 using Blish_HUD;
 using Blish_HUD.ArcDps.Models;
 using Blish_HUD.Content;
+using Gw2Sharp.Models;
 using Gw2Sharp.WebApi;
 using Gw2Sharp.WebApi.V2.Models;
 using Ideka.BHUDCommon;
@@ -61,13 +62,20 @@ namespace Ideka.CustomCombatText
 
 			public int? AssetId { get; set; }
 
+			public bool Autocropped { get; set; }
+
+			public Color Color { get; set; } = Color.get_White();
+
+
 			public override Size2 Size { get; } = new Size2(side, side);
 
 
 			public IconFragment(float side)
 			{
-			}//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+			}//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 
 		}
 
@@ -213,21 +221,21 @@ namespace Ideka.CustomCombatText
 				//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 				//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-				//IL_011a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0144: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0106: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0123: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0130: Unknown result type (might be due to invalid IL or missing references)
+				//IL_014d: Unknown result type (might be due to invalid IL or missing references)
 				StringFragment stringFragment = frag as StringFragment;
 				if (stringFragment != null)
 				{
@@ -242,11 +250,11 @@ namespace Ideka.CustomCombatText
 						Texture2D val2 = ((icon != null) ? icon!.get_Texture() : null);
 						if (val2 != null)
 						{
-							Rectangle? val3 = (CTextModule.Settings.AutocropIcons.Value ? CTextModule.IconBBoxes.GetIconBBox(iconFragment.AssetId) : null);
+							Rectangle? val3 = ((iconFragment.Autocropped && CTextModule.Settings.AutocropIcons.Value) ? CTextModule.IconBBoxes.GetIconBBox(iconFragment.AssetId) : null);
 							SpriteBatch spriteBatch = target.SpriteBatch;
 							Point2 val4 = new Point2(position.X, rect.Y);
 							Rectangle absoluteBounds2 = target.Control.get_AbsoluteBounds();
-							spriteBatch.Draw(val2, Point2.op_Implicit(val4 + Size2.op_Implicit(((Rectangle)(ref absoluteBounds2)).get_Location())), val3, Color.get_White() * alpha, 0f, Vector2.get_Zero(), Math.Min(iconFragment.Size.Width / (float)(val3?.Width ?? val2.get_Width()), iconFragment.Size.Height / (float)(val3?.Height ?? val2.get_Height())), (SpriteEffects)0, 0f);
+							spriteBatch.Draw(val2, Point2.op_Implicit(val4 + Size2.op_Implicit(((Rectangle)(ref absoluteBounds2)).get_Location())), val3, iconFragment.Color * alpha, 0f, Vector2.get_Zero(), Math.Min(iconFragment.Size.Width / (float)(val3?.Width ?? val2.get_Width()), iconFragment.Size.Height / (float)(val3?.Height ?? val2.get_Height())), (SpriteEffects)0, 0f);
 						}
 					}
 				}
@@ -369,6 +377,89 @@ namespace Ideka.CustomCombatText
 			return assetId;
 		}
 
+		public static (int id, bool knownElite)? GetProfIcon(ProfessionType prof, uint eliteId)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Expected I4, but got Unknown
+			return (prof - 1) switch
+			{
+				0 => eliteId switch
+				{
+					0u => new(int, bool)?((156634, true)), 
+					27u => new(int, bool)?((1128573, true)), 
+					62u => new(int, bool)?((1770211, true)), 
+					65u => new(int, bool)?((2479354, true)), 
+					_ => new(int, bool)?((156634, false)), 
+				}, 
+				1 => eliteId switch
+				{
+					0u => new(int, bool)?((156643, true)), 
+					18u => new(int, bool)?((1128567, true)), 
+					61u => new(int, bool)?((1770223, true)), 
+					68u => new(int, bool)?((2491566, true)), 
+					_ => new(int, bool)?((156643, false)), 
+				}, 
+				2 => eliteId switch
+				{
+					0u => new(int, bool)?((156632, true)), 
+					43u => new(int, bool)?((1128581, true)), 
+					57u => new(int, bool)?((1770225, true)), 
+					70u => new(int, bool)?((2503659, true)), 
+					_ => new(int, bool)?((156632, false)), 
+				}, 
+				3 => eliteId switch
+				{
+					0u => new(int, bool)?((156640, true)), 
+					5u => new(int, bool)?((1128575, true)), 
+					55u => new(int, bool)?((1770215, true)), 
+					72u => new(int, bool)?((2503663, true)), 
+					_ => new(int, bool)?((156640, false)), 
+				}, 
+				4 => eliteId switch
+				{
+					0u => new(int, bool)?((156641, true)), 
+					7u => new(int, bool)?((1128571, true)), 
+					58u => new(int, bool)?((1770213, true)), 
+					71u => new(int, bool)?((2503667, true)), 
+					_ => new(int, bool)?((156641, false)), 
+				}, 
+				5 => eliteId switch
+				{
+					0u => new(int, bool)?((156630, true)), 
+					48u => new(int, bool)?((1128583, true)), 
+					56u => new(int, bool)?((1670506, true)), 
+					67u => new(int, bool)?((2491558, true)), 
+					_ => new(int, bool)?((156630, false)), 
+				}, 
+				6 => eliteId switch
+				{
+					0u => new(int, bool)?((156636, true)), 
+					40u => new(int, bool)?((1128569, true)), 
+					59u => new(int, bool)?((1770217, true)), 
+					66u => new(int, bool)?((2479358, true)), 
+					_ => new(int, bool)?((156636, false)), 
+				}, 
+				7 => eliteId switch
+				{
+					0u => new(int, bool)?((156638, true)), 
+					34u => new(int, bool)?((1128579, true)), 
+					60u => new(int, bool)?((1770221, true)), 
+					64u => new(int, bool)?((2479362, true)), 
+					_ => new(int, bool)?((156638, false)), 
+				}, 
+				8 => eliteId switch
+				{
+					0u => new(int, bool)?((961390, true)), 
+					52u => new(int, bool)?((1128577, true)), 
+					63u => new(int, bool)?((1770219, true)), 
+					69u => new(int, bool)?((2491562, true)), 
+					_ => new(int, bool)?((961390, false)), 
+				}, 
+				_ => null, 
+			};
+		}
+
 		private static Style.ResultFormat? GetResultFormat(EventResult result)
 		{
 			if (!CTextModule.Style.ResultFormats.TryGetValue(result, out var format))
@@ -378,7 +469,7 @@ namespace Ideka.CustomCombatText
 			return format;
 		}
 
-		public static IEnumerable<Fragment> FinalParse(PreFragment frag, Color? resultColor, Color srcProfColor, Color dstProfColor, Color? receiverColor, BitmapFont font, Message message, IReadOnlyList<Message> messages, List<List<Message>> resultGroups)
+		public static IEnumerable<Fragment> FinalParse(PreFragment frag, Color? resultColor, Color srcProfColor, Color dstProfColor, (ProfessionType prof, uint eliteId) srcSpec, (ProfessionType prof, uint eliteId) dstSpec, Color? receiverColor, BitmapFont font, Message message, IReadOnlyList<Message> messages, List<List<Message>> resultGroups)
 		{
 			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
@@ -393,85 +484,21 @@ namespace Ideka.CustomCombatText
 			{
 				["%v"] = delegate
 				{
-					int num4 = messages2.Sum((Message x) => x.Value);
-					return (new List<Fragment>(1) { newString($"{num4:N0}", resultColor) }, num4 != 0 || messages2.Any((Message x) => x.LandedDamage));
+					int num3 = messages2.Sum((Message x) => x.Value);
+					return (new List<Fragment>(1) { newString($"{num3:N0}", resultColor) }, num3 != 0 || messages2.Any((Message x) => x.LandedDamage));
 				},
 				["%b"] = delegate
 				{
-					int num3 = messages2.Sum((Message x) => x.Barrier);
-					return (new List<Fragment>(1) { newString(string.Format("{0}{1:N0}{2}", "{", num3, "}"), CTextModule.Style.BarrierColor) }, num3 != 0);
+					int num2 = messages2.Sum((Message x) => x.Barrier);
+					return (new List<Fragment>(1) { newString(string.Format("{0}{1:N0}{2}", "{", num2, "}"), CTextModule.Style.BarrierColor) }, num2 != 0);
 				},
 				["%r"] = delegate
 				{
-					string text6 = ((resultGroups2.Count != 1) ? null : GetResultFormat(message.Result)?.Text);
-					return (new List<Fragment>(1) { newString(text6 ?? "", resultColor) }, text6 != null);
+					string text2 = ((resultGroups2.Count != 1) ? null : GetResultFormat(message.Result)?.Text);
+					return (new List<Fragment>(1) { newString(text2 ?? "", resultColor) }, text2 != null);
 				},
-				["%f"] = delegate
-				{
-					//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-					(string? text, int count) tuple6 = joinNames(messages2.Select((Message x) => x.Src));
-					string item3 = tuple6.text;
-					int item4 = tuple6.count;
-					string text4 = item3;
-					int num2 = item4;
-					(string, bool) tuple7;
-					if (text4 != null)
-					{
-						if (num2 != 1)
-						{
-							goto IL_006f;
-						}
-						tuple7 = (text4, true);
-					}
-					else
-					{
-						if (num2 != 1)
-						{
-							goto IL_006f;
-						}
-						tuple7 = ("???", false);
-					}
-					goto IL_0088;
-					IL_0088:
-					var (text5, flag2) = tuple7;
-					return (new List<Fragment>(1) { newString(text5, srcProfColor) }, (item4 > 1 || flag2) && text5 != GameService.Gw2Mumble.get_PlayerCharacter().get_Name());
-					IL_006f:
-					tuple7 = ($"({num2} sources)", true);
-					goto IL_0088;
-				},
-				["%t"] = delegate
-				{
-					//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-					(string? text, int count) tuple3 = joinNames(messages2.Select((Message x) => x.Dst));
-					string item = tuple3.text;
-					int item2 = tuple3.count;
-					string text2 = item;
-					int num = item2;
-					(string, bool) tuple4;
-					if (text2 != null)
-					{
-						if (num != 1)
-						{
-							goto IL_006f;
-						}
-						tuple4 = (text2, true);
-					}
-					else
-					{
-						if (num != 1)
-						{
-							goto IL_006f;
-						}
-						tuple4 = ("???", false);
-					}
-					goto IL_0088;
-					IL_0088:
-					var (text3, flag) = tuple4;
-					return (new List<Fragment>(1) { newString(text3, dstProfColor) }, (item2 > 1 || flag) && text3 != GameService.Gw2Mumble.get_PlayerCharacter().get_Name());
-					IL_006f:
-					tuple4 = ($"({num} targets)", true);
-					goto IL_0088;
-				},
+				["%f"] = () => combinedAgents(messages2.Select((Message x) => x.Src), srcProfColor, "sources"),
+				["%t"] = () => combinedAgents(messages2.Select((Message x) => x.Dst), dstProfColor, "targets"),
 				["%s"] = delegate
 				{
 					string skillName = GetSkillName(message);
@@ -492,10 +519,13 @@ namespace Ideka.CustomCombatText
 						new IconFragment(height)
 						{
 							Icon = val,
+							Autocropped = true,
 							AssetId = iconAssetId
 						}
 					}, ((val != null) ? val.get_Texture() : null) != null);
-				}
+				},
+				["%m"] = () => agentIcon(messages2.Select((Message x) => x.Src), srcSpec),
+				["%o"] = () => agentIcon(messages2.Select((Message x) => x.Dst), dstSpec)
 			};
 			StringFragment fragment = newString();
 			int optionStart = -1;
@@ -573,10 +603,58 @@ namespace Ideka.CustomCombatText
 			{
 				yield return fragment;
 			}
-			static (string? text, int count) joinNames(IEnumerable<Ag> agents)
+			(List<Fragment> result, bool isSignificant) agentIcon(IEnumerable<Ag> agents, (ProfessionType prof, uint eliteId) spec)
 			{
+				//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+				int num = agents.DistinctBy((Ag x) => x.get_Id()).Count();
+				(int, bool)? profIcon = GetProfIcon(spec.prof, spec.eliteId);
+				bool isSelf = num == 1 && agents.First().get_Self() == 1;
+				AsyncTexture2D icon = ((!profIcon.HasValue) ? null : AsyncTexture2D.FromAssetId(profIcon.Value.Item1));
+				return (new List<Fragment>(1)
+				{
+					new IconFragment(height)
+					{
+						Icon = icon,
+						Autocropped = false,
+						Color = ((profIcon.HasValue && !profIcon.GetValueOrDefault().Item2) ? CTextModule.Style.DefaultEntityColor : Color.get_White()),
+						AssetId = profIcon?.Item1
+					}
+				}, ((icon != null) ? icon.get_Texture() : null) != null && !isSelf);
+			}
+			(List<Fragment> result, bool isSignificant) combinedAgents(IEnumerable<Ag> agents, Color color, string plural)
+			{
+				//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
 				int count = agents.DistinctBy((Ag x) => x.get_Id()).Count();
-				return ((count != 1 || agents.First().get_Name() == "0") ? null : agents.First().get_Name(), count);
+				string obj = ((count == 1 && agents.First().get_Name() != "0") ? agents.First().get_Name() : null);
+				bool isSelf2 = count == 1 && agents.First().get_Self() == 1;
+				string j = obj;
+				int c = count;
+				(string, bool) tuple3;
+				if (j != null)
+				{
+					if (c != 1)
+					{
+						goto IL_009c;
+					}
+					tuple3 = (j, true);
+				}
+				else
+				{
+					if (c != 1)
+					{
+						goto IL_009c;
+					}
+					tuple3 = ("???", false);
+				}
+				goto IL_00b6;
+				IL_00b6:
+				var (value, known) = tuple3;
+				return (new List<Fragment>(1) { newString(value, color) }, (count > 1 || known) && !isSelf2);
+				IL_009c:
+				tuple3 = ($"({c} {plural})", true);
+				goto IL_00b6;
 			}
 			StringFragment newString(string text = "", Color? color = null)
 			{
