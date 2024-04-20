@@ -140,7 +140,7 @@
                   "Qq5274QvQ6-4qqoZOwni0w"
                 ],
                 "EntityFilter": "NWtqNOkPSCKjpxUg_0T9Bg",
-                "Template": "%i %v[ %b][ %s][ %t][ (%nx)]",
+                "Template": "%i %v[ %b][ %s][ %t][ %o][ (%nx)]",
                 "Color": null,
                 "FontName": null,
                 "FontSize": null
@@ -157,7 +157,7 @@
                   "9wriGSeNQ12qEJ1ZRo4R0Q"
                 ],
                 "EntityFilter": "NWtqNOkPSCKjpxUg_0T9Bg",
-                "Template": "%i %v[ %s][ %t][ (%nx)]",
+                "Template": "%i %v[ %s][ %t][ %o][ (%nx)]",
                 "Color": null,
                 "FontName": null,
                 "FontSize": null
