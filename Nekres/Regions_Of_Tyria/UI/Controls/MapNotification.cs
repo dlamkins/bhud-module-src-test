@@ -108,19 +108,24 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 		private MapNotification(string header, string text, float showDuration = 4f, float fadeInDuration = 2f, float fadeOutDuration = 2f, float effectDuration = 0.85f)
 			: this()
 		{
-			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Expected O, but got Unknown
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e0: Expected O, but got Unknown
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00df: Expected O, but got Unknown
+			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010e: Expected O, but got Unknown
 			_showDuration = showDuration;
 			_fadeInDuration = fadeInDuration;
 			_fadeOutDuration = fadeOutDuration;
 			_effectDuration = effectDuration;
-			_text = text;
-			_header = header;
+			_text = FilterDisplayName(text);
+			_header = FilterDisplayName(header);
+			if (string.IsNullOrEmpty(_text))
+			{
+				_text = _header;
+				_header = string.Empty;
+			}
 			((Control)this).set_ClipsBounds(true);
 			((Control)this).set_Opacity(0f);
 			((Control)this).set_Size(new Point(((Control)GameService.Graphics.get_SpriteScreen()).get_Width(), ((Control)GameService.Graphics.get_SpriteScreen()).get_Height()));
@@ -152,6 +157,29 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 			_reveal.get_Effect().get_Parameters().get_Item("Slide")
 				.SetValue(true);
 			((Control)GameService.Graphics.get_SpriteScreen()).add_Resized((EventHandler<ResizedEventArgs>)UpdateLocation);
+		}
+
+		internal static string FilterDisplayName(string text)
+		{
+			if (string.IsNullOrEmpty(text))
+			{
+				return text;
+			}
+			if (text.StartsWith("(("))
+			{
+				return string.Empty;
+			}
+			int idx = text.IndexOf(':');
+			if (idx >= 0 && idx++ < text.Length)
+			{
+				text = text.Substring(idx);
+			}
+			idx = text.IndexOf('(');
+			if (idx >= 0)
+			{
+				text = text.Substring(0, idx);
+			}
+			return text.Trim();
 		}
 
 		private void UpdateLocation(object o, ResizedEventArgs e)

@@ -51,7 +51,7 @@ namespace Blish_HUD.Extended
 			{
 				Process.Start(psi);
 			}
-			catch (Exception ex) when (ex is IOException || ex is Win32Exception)
+			catch (Exception ex) when (((ex is IOException || ex is Win32Exception) ? 1 : 0) != 0)
 			{
 				Logger.Warn("Failed to run '" + exe + "' with arguments '" + argString + "': " + ex.Message);
 				Process.Start(url);

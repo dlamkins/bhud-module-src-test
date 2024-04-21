@@ -30,7 +30,7 @@ namespace Blish_HUD.Extended
 				return result;
 			}
 			Exception e = (Exception)obj;
-			if (e is NotFoundException || e is BadRequestException || e is AuthorizationRequiredException)
+			if ((e is NotFoundException || e is BadRequestException || e is AuthorizationRequiredException) ? true : false)
 			{
 				logger.Trace(e, e.Message);
 				return default(T);

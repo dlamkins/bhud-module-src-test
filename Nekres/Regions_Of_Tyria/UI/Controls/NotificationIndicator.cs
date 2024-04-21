@@ -15,9 +15,14 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 		public NotificationIndicator(string header, string text)
 			: this()
 		{
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			_header = header;
-			_text = text;
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			_header = MapNotification.FilterDisplayName(header);
+			_text = MapNotification.FilterDisplayName(text);
+			if (string.IsNullOrEmpty(_text))
+			{
+				_text = _header;
+				_header = string.Empty;
+			}
 			((Control)this).set_Size(new Point(((Control)GameService.Graphics.get_SpriteScreen()).get_Width(), ((Control)GameService.Graphics.get_SpriteScreen()).get_Height()));
 			((Control)this).set_ZIndex(30);
 			((Control)this).set_ClipsBounds(true);

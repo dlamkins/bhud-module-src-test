@@ -58,7 +58,7 @@ namespace Blish_HUD.Extended
 				KeyboardUtil.Stroke(13);
 				SetUnicodeBytesAsync(prevClipboardContent);
 			}
-			catch (Exception ex) when (ex is ClipboardWindowsApiException || ex is ClipboardTimeoutException)
+			catch (Exception ex) when (((ex is ClipboardWindowsApiException || ex is ClipboardTimeoutException) ? 1 : 0) != 0)
 			{
 				_logger.Info(ex, ex.Message);
 			}
@@ -85,7 +85,7 @@ namespace Blish_HUD.Extended
 				KeyboardUtil.Release(162, sendToSystem: true);
 				SetUnicodeBytesAsync(prevClipboardContent);
 			}
-			catch (Exception ex) when (ex is ClipboardWindowsApiException || ex is ClipboardTimeoutException)
+			catch (Exception ex) when (((ex is ClipboardWindowsApiException || ex is ClipboardTimeoutException) ? 1 : 0) != 0)
 			{
 				_logger.Info(ex, ex.Message);
 			}
@@ -130,7 +130,7 @@ namespace Blish_HUD.Extended
 				{
 					await ClipboardUtil.get_WindowsClipboardService().SetUnicodeBytesAsync(clipboardContent);
 				}
-				catch (Exception ex) when (ex is ClipboardWindowsApiException || ex is ClipboardTimeoutException)
+				catch (Exception ex) when (((ex is ClipboardWindowsApiException || ex is ClipboardTimeoutException) ? 1 : 0) != 0)
 				{
 					_logger.Info(ex, ex.Message);
 				}
