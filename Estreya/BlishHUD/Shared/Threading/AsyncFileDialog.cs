@@ -25,8 +25,9 @@ namespace Estreya.BlishHUD.Shared.Threading
 					GameService.GameIntegration.get_Gw2Instance().add_Gw2AcquiredFocus((EventHandler<EventArgs>)abort);
 					DialogResult result = Dialog.ShowDialog();
 					_result.SetResult(result);
-					static void abort(object sender, EventArgs e)
+					void abort(object sender, EventArgs e)
 					{
+						AbortThread();
 					}
 				}
 				catch (ThreadAbortException)
@@ -43,6 +44,10 @@ namespace Estreya.BlishHUD.Shared.Threading
 				}
 			});
 			_thread.SetApartmentState(ApartmentState.STA);
+		}
+
+		private void AbortThread()
+		{
 		}
 
 		public Task<DialogResult> ShowAsync()

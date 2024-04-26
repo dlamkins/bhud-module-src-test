@@ -29,6 +29,7 @@ using Estreya.BlishHUD.Shared.Net;
 using Estreya.BlishHUD.Shared.Security;
 using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Services.Audio;
+using Estreya.BlishHUD.Shared.Services.GameIntegration;
 using Estreya.BlishHUD.Shared.Services.TradingPost;
 using Estreya.BlishHUD.Shared.Settings;
 using Estreya.BlishHUD.Shared.Threading;
@@ -183,6 +184,8 @@ namespace Estreya.BlishHUD.Shared.Modules
 		protected MetricsService MetricsService { get; private set; }
 
 		protected AudioService AudioService { get; private set; }
+
+		protected ChatService ChatService { get; private set; }
 
 		protected CancellationToken CancellationToken => _cancellationTokenSource.Token;
 
@@ -371,7 +374,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 			}
 			catch (Exception ex2)
 			{
-				Logger.Debug(ex2, "Failed to validate backend health.");
+				Logger.Warn(ex2, "Failed to validate backend health.");
 			}
 			sw.Stop();
 			Logger logger = Logger;
@@ -486,6 +489,12 @@ namespace Estreya.BlishHUD.Shared.Modules
 					AudioService = new AudioService(configurations.Audio, directoryPath);
 					_services.Add(AudioService);
 				}
+				ChatService = new ChatService(new ServiceConfiguration
+				{
+					Enabled = true,
+					AwaitLoading = true
+				});
+				_services.Add(ChatService);
 				if (configurations.Items.Enabled)
 				{
 					ItemService = new ItemService(configurations.Items, Gw2ApiManager, directoryPath, GetFlurlClient(), "https://files.estreya.de");

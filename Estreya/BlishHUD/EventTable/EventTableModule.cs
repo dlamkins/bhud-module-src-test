@@ -29,6 +29,7 @@ using Estreya.BlishHUD.Shared.Controls;
 using Estreya.BlishHUD.Shared.Extensions;
 using Estreya.BlishHUD.Shared.Helpers;
 using Estreya.BlishHUD.Shared.Models.GW2API.PointOfInterest;
+using Estreya.BlishHUD.Shared.Models.GameIntegration.Chat;
 using Estreya.BlishHUD.Shared.Modules;
 using Estreya.BlishHUD.Shared.MumbleInfo.Map;
 using Estreya.BlishHUD.Shared.Services;
@@ -103,6 +104,8 @@ namespace Estreya.BlishHUD.EventTable
 
 		public DynamicEventService DynamicEventService { get; private set; }
 
+		public EventTimerHandler EventTimerHandler { get; private set; }
+
 		[ImportingConstructor]
 		public EventTableModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
 			: base(moduleParameters)
@@ -157,6 +160,15 @@ namespace Estreya.BlishHUD.EventTable
 			{
 				base.TranslationService.GetTranslation("dynamicEventHandler-foundLostEntities1", "GameService.Graphics.World.Entities has lost references."),
 				base.TranslationService.GetTranslation("dynamicEventHandler-foundLostEntities2", "Expect dynamic event boundaries on screen.")
+			}, ScreenNotification.NotificationType.Warning);
+		}
+
+		private void EventTimerHandler_FoundLostEntities(object sender, EventArgs e)
+		{
+			ScreenNotification.ShowNotification(new string[2]
+			{
+				base.TranslationService.GetTranslation("eventTimerHandler-foundLostEntities1", "GameService.Graphics.World.Entities has lost references."),
+				base.TranslationService.GetTranslation("eventTimerHandler-foundLostEntities2", "Expect event timers on map or in world.")
 			}, ScreenNotification.NotificationType.Warning);
 		}
 
@@ -506,16 +518,36 @@ namespace Estreya.BlishHUD.EventTable
 			((Control)obj).remove_Disposed((EventHandler<EventArgs>)EventNotification_Disposed);
 		}
 
-		private void EventNotification_Click(object sender, MouseEventArgs e)
+		private async void EventNotification_Click(object sender, MouseEventArgs e)
 		{
 			EventNotification notification = sender as EventNotification;
 			string waypoint = notification?.Model?.GetWaypoint(base.AccountService.Account);
 			switch (base.ModuleSettings.ReminderLeftClickAction.get_Value())
 			{
 			case LeftClickAction.CopyWaypoint:
-				if (notification != null && notification.Model != null && !string.IsNullOrWhiteSpace(waypoint))
+			{
+				if (notification == null || notification.Model == null || string.IsNullOrWhiteSpace(waypoint))
 				{
-					ClipboardUtil.get_WindowsClipboardService().SetTextAsync(waypoint);
+					break;
+				}
+				string eventChatFormat = notification.Model.GetChatText(base.ModuleSettings.ReminderEventChatFormat.get_Value(), notification.Model.GetNextOccurence(), base.AccountService.Account);
+				if ((int)GameService.Input.get_Keyboard().get_ActiveModifiers() == 1)
+				{
+					try
+					{
+						await base.ChatService.ChangeChannel(ChatChannel.Squad);
+						await base.ChatService.ChangeChannel(base.ModuleSettings.ReminderWaypointSendingChannel.get_Value(), base.ModuleSettings.ReminderWaypointSendingGuild.get_Value(), GameService.Gw2Mumble.get_PlayerCharacter().get_Name());
+						await base.ChatService.Send(eventChatFormat);
+					}
+					catch (Exception ex)
+					{
+						base.Logger.Warn(ex, "Could not paste waypoint into chat. Event: " + notification.Model.SettingKey);
+						ScreenNotification.ShowNotification(new string[2] { "Waypoint could not be pasted in chat.", "See log for more information." }, ScreenNotification.NotificationType.Error, null, 5);
+					}
+				}
+				else
+				{
+					await ClipboardUtil.get_WindowsClipboardService().SetTextAsync(eventChatFormat);
 					ScreenNotification.ShowNotification(new string[2]
 					{
 						notification.Model.Name,
@@ -523,6 +555,7 @@ namespace Estreya.BlishHUD.EventTable
 					});
 				}
 				break;
+			}
 			case LeftClickAction.NavigateToWaypoint:
 			{
 				if (notification == null || notification.Model == null || string.IsNullOrWhiteSpace(waypoint) || base.PointOfInterestService == null)
@@ -588,7 +621,7 @@ namespace Estreya.BlishHUD.EventTable
 				base.ModuleSettings.EventAreaNames.set_Value(new List<string>(base.ModuleSettings.EventAreaNames.get_Value()) { configuration.Name });
 			}
 			base.ModuleSettings.UpdateDrawerLocalization(configuration, base.TranslationService);
-			EventArea eventArea = new EventArea(configuration, base.IconService, base.TranslationService, EventStateService, base.WorldbossService, base.MapchestService, base.PointOfInterestService, base.AccountService, MapUtil, GetFlurlClient(), base.MODULE_API_URL, () => NowUTC, () => ((Module)this).get_Version(), () => base.BlishHUDAPIService.AccessToken, () => base.ModuleSettings.EventAreaNames.get_Value().ToArray().ToList(), () => base.ModuleSettings.ReminderDisabledForEvents.get_Value().ToArray().ToList(), base.ContentsManager);
+			EventArea eventArea = new EventArea(configuration, base.IconService, base.TranslationService, EventStateService, base.WorldbossService, base.MapchestService, base.PointOfInterestService, base.AccountService, base.ChatService, MapUtil, GetFlurlClient(), base.MODULE_API_URL, () => NowUTC, () => ((Module)this).get_Version(), () => base.BlishHUDAPIService.AccessToken, () => base.ModuleSettings.EventAreaNames.get_Value().ToArray().ToList(), () => base.ModuleSettings.ReminderDisabledForEvents.get_Value().ToArray().ToList(), base.ContentsManager);
 			((Control)eventArea).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			EventArea area = eventArea;
 			area.CopyToAreaClicked += new EventHandler<(string, string)>(EventArea_CopyToAreaClicked);
@@ -854,6 +887,12 @@ namespace Estreya.BlishHUD.EventTable
 				DynamicEventHandler.FoundLostEntities -= DynamicEventHandler_FoundLostEntities;
 				DynamicEventHandler.Dispose();
 				DynamicEventHandler = null;
+			}
+			if (EventTimerHandler != null)
+			{
+				EventTimerHandler.FoundLostEntities -= EventTimerHandler_FoundLostEntities;
+				EventTimerHandler.Dispose();
+				EventTimerHandler = null;
 			}
 			if (base.BlishHUDAPIService != null)
 			{

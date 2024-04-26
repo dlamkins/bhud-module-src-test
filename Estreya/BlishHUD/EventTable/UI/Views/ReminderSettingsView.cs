@@ -14,6 +14,8 @@ using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.EventTable.Models.Reminders;
 using Estreya.BlishHUD.Shared.Controls;
 using Estreya.BlishHUD.Shared.Controls.Input;
+using Estreya.BlishHUD.Shared.Models.GameIntegration.Chat;
+using Estreya.BlishHUD.Shared.Models.GameIntegration.Guild;
 using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Services.Audio;
 using Estreya.BlishHUD.Shared.Threading;
@@ -257,6 +259,9 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderEnumSetting<LeftClickAction>((Panel)(object)parent, _moduleSettings.ReminderLeftClickAction);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.AcceptWaypointPrompt);
 			RenderEnumSetting<EventReminderRightClickAction>((Panel)(object)parent, _moduleSettings.ReminderRightClickAction);
+			RenderEnumSetting<ChatChannel>((Panel)(object)parent, _moduleSettings.ReminderWaypointSendingChannel);
+			RenderEnumSetting<GuildNumber>((Panel)(object)parent, _moduleSettings.ReminderWaypointSendingGuild);
+			RenderEnumSetting<EventChatFormat>((Panel)(object)parent, _moduleSettings.ReminderEventChatFormat);
 			RenderEmptyLine((Panel)(object)parent);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideRemindersOnMissingMumbleTicks);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideRemindersOnOpenMap);

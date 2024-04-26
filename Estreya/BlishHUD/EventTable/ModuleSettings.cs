@@ -8,6 +8,8 @@ using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.EventTable.Models.Reminders;
 using Estreya.BlishHUD.Shared.Extensions;
 using Estreya.BlishHUD.Shared.Models.Drawers;
+using Estreya.BlishHUD.Shared.Models.GameIntegration.Chat;
+using Estreya.BlishHUD.Shared.Models.GameIntegration.Guild;
 using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Settings;
 using Gw2Sharp.WebApi.V2.Models;
@@ -67,6 +69,16 @@ namespace Estreya.BlishHUD.EventTable
 		public SettingEntry<string> DisableRemindersWhenEventFinishedArea { get; private set; }
 
 		public SettingEntry<bool> AcceptWaypointPrompt { get; private set; }
+
+		public SettingEntry<ChatChannel> ReminderWaypointSendingChannel { get; private set; }
+
+		public SettingEntry<GuildNumber> ReminderWaypointSendingGuild { get; private set; }
+
+		public SettingEntry<EventChatFormat> ReminderEventChatFormat { get; private set; }
+
+		public SettingEntry<bool> ShowEventTimersOnMap { get; private set; }
+
+		public SettingEntry<bool> ShowEventTimersInWorld { get; private set; }
 
 		public SettingEntry<bool> ShowDynamicEventsOnMap { get; private set; }
 
@@ -169,6 +181,11 @@ namespace Estreya.BlishHUD.EventTable
 			DisableRemindersWhenEventFinished = base.GlobalSettings.DefineSetting<bool>("DisableRemindersWhenEventFinished", false, (Func<string>)(() => "Disable Reminders for finished Events"), (Func<string>)(() => "Disabled the reminders for events with are either completed or hidden."));
 			DisableRemindersWhenEventFinishedArea = base.GlobalSettings.DefineSetting<string>("DisableRemindersWhenEventFinishedArea", "Any", (Func<string>)(() => "Check finished Events in Area"), (Func<string>)(() => "Defines the area name which is checked for completed/finished events"));
 			AcceptWaypointPrompt = base.GlobalSettings.DefineSetting<bool>("AcceptWaypointPrompt", true, (Func<string>)(() => "Accept Waypoint Prompt"), (Func<string>)(() => "Defines if the waypoint prompt should be auto accepted"));
+			ReminderWaypointSendingChannel = base.GlobalSettings.DefineSetting<ChatChannel>("ReminderWaypointSendingChannel", ChatChannel.Private, (Func<string>)(() => "Send Waypoint to Channel"), (Func<string>)(() => "Defines the channel in which waypoints are pasted automatically."));
+			ReminderWaypointSendingGuild = base.GlobalSettings.DefineSetting<GuildNumber>("ReminderWaypointSendingGuild", GuildNumber.Guild_1, (Func<string>)(() => "Send Waypoint to Guild"), (Func<string>)(() => "Defines the guild in which waypoints are pasted automatically if guild is selected as channel."));
+			ReminderEventChatFormat = base.GlobalSettings.DefineSetting<EventChatFormat>("ReminderEventChatFormat", EventChatFormat.OnlyWaypoint, (Func<string>)(() => "Event Chat Format"), (Func<string>)(() => "Defines the chat format to use when copying events."));
+			ShowEventTimersOnMap = base.GlobalSettings.DefineSetting<bool>("ShowEventTimersOnMap", true, (Func<string>)(() => "Show Event Timers on Map"), (Func<string>)(() => "Whether the event timers should be shown on the map."));
+			ShowEventTimersInWorld = base.GlobalSettings.DefineSetting<bool>("ShowEventTimersInWorld", true, (Func<string>)(() => "Show Event Timers in World"), (Func<string>)(() => "Whether event timers should be shown inside the world."));
 			ShowDynamicEventsOnMap = base.GlobalSettings.DefineSetting<bool>("ShowDynamicEventsOnMap", false, (Func<string>)(() => "Show Dynamic Events on Map"), (Func<string>)(() => "Whether the dynamic events of the map should be shown."));
 			ShowDynamicEventInWorld = base.GlobalSettings.DefineSetting<bool>("ShowDynamicEventInWorld", false, (Func<string>)(() => "Show Dynamic Events in World"), (Func<string>)(() => "Whether dynamic events should be shown inside the world."));
 			ShowDynamicEventInWorld.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowDynamicEventInWorld_SettingChanged);
@@ -274,6 +291,9 @@ namespace Estreya.BlishHUD.EventTable
 			SettingEntry<bool> useFillers = base.DrawerSettings.DefineSetting<bool>(name + "-useFillers", true, (Func<string>)(() => "Use Filler Events"), (Func<string>)(() => "Whether the empty spaces should be filled by filler events."));
 			SettingEntry<Color> fillerTextColor = base.DrawerSettings.DefineSetting<Color>(name + "-fillerTextColor", base.DefaultGW2Color, (Func<string>)(() => "Filler Text Color"), (Func<string>)(() => "Defines the text color used by filler events."));
 			SettingEntry<bool> acceptWaypointPrompt = base.DrawerSettings.DefineSetting<bool>(name + "-acceptWaypointPrompt", true, (Func<string>)(() => "Accept Waypoint Prompt"), (Func<string>)(() => "Whether the waypoint prompt should be accepted automatically when performing an automated teleport."));
+			SettingEntry<ChatChannel> waypointSendingChannel = base.DrawerSettings.DefineSetting<ChatChannel>(name + "-waypointSendingChannel", ChatChannel.Private, (Func<string>)(() => "Send Waypoint to Channel"), (Func<string>)(() => "Defines the channel in which the waypoint is pasted automatically."));
+			SettingEntry<GuildNumber> waypointSendingGuild = base.DrawerSettings.DefineSetting<GuildNumber>(name + "-waypointSendingGuild", GuildNumber.Guild_1, (Func<string>)(() => "Send Waypoint to Guild"), (Func<string>)(() => "Defines the guild in which the waypoint is pasted automatically if channel guild is selected."));
+			SettingEntry<EventChatFormat> eventChatFormat = base.DrawerSettings.DefineSetting<EventChatFormat>(name + "-eventChatFormat", EventChatFormat.OnlyWaypoint, (Func<string>)(() => "Event Chat Format"), (Func<string>)(() => "Defines the chat format when event waypoints are copied or pasted."));
 			SettingEntry<EventCompletedAction> completionAction = base.DrawerSettings.DefineSetting<EventCompletedAction>(name + "-completionAction", EventCompletedAction.Crossout, (Func<string>)(() => "Completion Action"), (Func<string>)(() => "Defines the action to perform if an event has been completed."));
 			SettingEntry<bool> enableLinkedCompletion = base.DrawerSettings.DefineSetting<bool>(name + "-enableLinkedCompletion", true, (Func<string>)(() => "Enable Linked Completion"), (Func<string>)(() => "Enables the completion of events that are linked to the completed event. (e.g. Auric Basin)"));
 			SettingEntry<List<string>> disabledEventKeys = base.DrawerSettings.DefineSetting<List<string>>(name + "-disabledEventKeys", new List<string>(), (Func<string>)(() => "Active Event Keys"), (Func<string>)(() => "Defines the active event keys."));
@@ -353,6 +373,9 @@ namespace Estreya.BlishHUD.EventTable
 				UseFiller = useFillers,
 				FillerTextColor = fillerTextColor,
 				AcceptWaypointPrompt = acceptWaypointPrompt,
+				WaypointSendingChannel = waypointSendingChannel,
+				WaypointSendingGuild = waypointSendingGuild,
+				EventChatFormat = eventChatFormat,
 				DisabledEventKeys = disabledEventKeys,
 				CompletionAction = completionAction,
 				EnableLinkedCompletion = enableLinkedCompletion,
@@ -427,6 +450,9 @@ namespace Estreya.BlishHUD.EventTable
 			base.DrawerSettings.UndefineSetting(name + "-useFillers");
 			base.DrawerSettings.UndefineSetting(name + "-fillerTextColor");
 			base.DrawerSettings.UndefineSetting(name + "-acceptWaypointPrompt");
+			base.DrawerSettings.UndefineSetting(name + "-waypointSendingChannel");
+			base.DrawerSettings.UndefineSetting(name + "-waypointSendingGuild");
+			base.DrawerSettings.UndefineSetting(name + "-eventChatFormat");
 			base.DrawerSettings.UndefineSetting(name + "-completionAction");
 			base.DrawerSettings.UndefineSetting(name + "-disabledEventKeys");
 			base.DrawerSettings.UndefineSetting(name + "-eventHeight");

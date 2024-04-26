@@ -42,13 +42,13 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private readonly Func<Color> _getTextColor;
 
-		private readonly DateTime _startTime;
-
 		private Texture2D _backgroundColorTexture;
 
 		private IconService _iconService;
 
 		private TranslationService _translationService;
+
+		public DateTime StartTime { get; private set; }
 
 		public Estreya.BlishHUD.EventTable.Models.Event Model { get; private set; }
 
@@ -72,7 +72,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			_iconService = iconService;
 			_translationService = translationService;
 			_getNowAction = getNowAction;
-			_startTime = startTime;
+			StartTime = startTime;
 			_endTime = endTime;
 			_getFontAction = getFontAction;
 			_getDrawBorders = getDrawBorders;
@@ -218,21 +218,21 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		public Tooltip BuildTooltip()
 		{
-			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c4: Expected O, but got Unknown
+			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ce: Expected O, but got Unknown
 			DateTime now = _getNowAction();
-			bool num = _startTime.AddMinutes(Model.Duration) < now;
-			bool isNext = !num && _startTime > now;
+			bool num = StartTime.AddMinutes(Model.Duration) < now;
+			bool isNext = !num && StartTime > now;
 			bool isCurrent = !num && !isNext;
-			string description = Model.Location + ((!string.IsNullOrWhiteSpace(Model.Location)) ? "\n" : string.Empty) + "\n";
+			string description = Model.Locations.Tooltip + ((!string.IsNullOrWhiteSpace(Model.Locations.Tooltip)) ? "\n" : string.Empty) + "\n";
 			if (num)
 			{
-				TimeSpan finishedSince = now - _startTime.AddMinutes(Model.Duration);
+				TimeSpan finishedSince = now - StartTime.AddMinutes(Model.Duration);
 				description = description + _translationService.GetTranslation("event-tooltip-finishedSince", "Finished since") + ": " + FormatTimespan(finishedSince);
 			}
 			else if (isNext)
 			{
-				TimeSpan startsIn = _startTime - now;
+				TimeSpan startsIn = StartTime - now;
 				description = description + _translationService.GetTranslation("event-tooltip-startsIn", "Starts in") + ": " + FormatTimespan(startsIn);
 			}
 			else if (isCurrent)
@@ -240,7 +240,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				TimeSpan remaining = GetTimeRemaining(now);
 				description = description + _translationService.GetTranslation("event-tooltip-remaining", "Remaining") + ": " + FormatTimespan(remaining);
 			}
-			description = description + " (" + _translationService.GetTranslation("event-tooltip-startsAt", "Starts at") + ": " + FormatAbsoluteTime(_startTime) + ")";
+			description = description + " (" + _translationService.GetTranslation("event-tooltip-startsAt", "Starts at") + ": " + FormatAbsoluteTime(StartTime) + ")";
 			return new Tooltip((ITooltipView)(object)new TooltipView(Model.Name, description, _iconService.GetIcon(Model.Icon), _translationService));
 		}
 
@@ -297,7 +297,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
 			float xOffset = 5f;
 			float maxWidth = bounds.Width - xOffset * 2f;
 			float nameWidth = 0f;
@@ -317,7 +317,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			while (nameWidth > maxWidth);
 			RectangleF nameRect = default(RectangleF);
 			((RectangleF)(ref nameRect))._002Ector(bounds.X + xOffset, bounds.Y, nameWidth, bounds.Height);
-			spriteBatch.DrawString(text, font, nameRect, _getTextColor(), wrap: false, _getDrawShadowAction(), 1, _getShadowColor(), (HorizontalAlignment)0, (VerticalAlignment)1);
+			spriteBatch.DrawString(text, font, nameRect, _getTextColor(), wrap: false, _getDrawShadowAction(), 1, _getShadowColor(), 1f, (HorizontalAlignment)0, (VerticalAlignment)1);
 			return nameRect.Width;
 		}
 
@@ -355,16 +355,16 @@ namespace Estreya.BlishHUD.EventTable.Controls
 					RectangleF timeRect = default(RectangleF);
 					((RectangleF)(ref timeRect))._002Ector(centerX + bounds.X, bounds.Y, maxWidth, bounds.Height);
 					Color textColor = _getTextColor();
-					spriteBatch.DrawString(remainingTimeString, font, timeRect, textColor, wrap: false, _getDrawShadowAction(), 1, _getShadowColor(), (HorizontalAlignment)0, (VerticalAlignment)1);
+					spriteBatch.DrawString(remainingTimeString, font, timeRect, textColor, wrap: false, _getDrawShadowAction(), 1, _getShadowColor(), 1f, (HorizontalAlignment)0, (VerticalAlignment)1);
 				}
 			}
 		}
 
 		private TimeSpan GetTimeRemaining(DateTime now)
 		{
-			if (!(now <= _startTime) && !(now >= _endTime))
+			if (!(now <= StartTime) && !(now >= _endTime))
 			{
-				return _startTime.AddMinutes(Model.Duration) - now;
+				return StartTime.AddMinutes(Model.Duration) - now;
 			}
 			return TimeSpan.Zero;
 		}

@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using Blish_HUD.Settings;
 using Estreya.BlishHUD.Shared.Models.Drawers;
+using Estreya.BlishHUD.Shared.Models.GameIntegration.Chat;
+using Estreya.BlishHUD.Shared.Models.GameIntegration.Guild;
 using Gw2Sharp.WebApi.V2.Models;
 
 namespace Estreya.BlishHUD.EventTable.Models
@@ -18,6 +20,12 @@ namespace Estreya.BlishHUD.EventTable.Models
 		public SettingEntry<LeftClickAction> LeftClickAction { get; set; }
 
 		public SettingEntry<bool> AcceptWaypointPrompt { get; set; }
+
+		public SettingEntry<ChatChannel> WaypointSendingChannel { get; set; }
+
+		public SettingEntry<GuildNumber> WaypointSendingGuild { get; set; }
+
+		public SettingEntry<EventChatFormat> EventChatFormat { get; set; }
 
 		public SettingEntry<int> TimeSpan { get; set; }
 
@@ -126,6 +134,9 @@ namespace Estreya.BlishHUD.EventTable.Models
 			other.ShowTooltips.set_Value(ShowTooltips.get_Value());
 			other.LeftClickAction.set_Value(LeftClickAction.get_Value());
 			other.AcceptWaypointPrompt.set_Value(AcceptWaypointPrompt.get_Value());
+			other.WaypointSendingChannel.set_Value(WaypointSendingChannel.get_Value());
+			other.WaypointSendingGuild.set_Value(WaypointSendingGuild.get_Value());
+			other.EventChatFormat.set_Value(EventChatFormat.get_Value());
 			other.TimeSpan.set_Value(TimeSpan.get_Value());
 			other.HistorySplit.set_Value(HistorySplit.get_Value());
 			other.EnableHistorySplitScrolling.set_Value(EnableHistorySplitScrolling.get_Value());

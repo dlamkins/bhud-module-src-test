@@ -13,6 +13,8 @@ using Estreya.BlishHUD.EventTable.Services;
 using Estreya.BlishHUD.Shared.Controls;
 using Estreya.BlishHUD.Shared.Controls.Input;
 using Estreya.BlishHUD.Shared.Models;
+using Estreya.BlishHUD.Shared.Models.GameIntegration.Chat;
+using Estreya.BlishHUD.Shared.Models.GameIntegration.Guild;
 using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Threading.Events;
 using Estreya.BlishHUD.Shared.UI.Views;
@@ -602,19 +604,19 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0083: Expected O, but got Unknown
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fb: Expected O, but got Unknown
+			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
 			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0134: Expected O, but got Unknown
+			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0275: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)settingsPanel);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
@@ -628,6 +630,9 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			FlowPanel groupPanel = val;
 			RenderEnumSetting<LeftClickAction>((Panel)(object)groupPanel, areaConfiguration.LeftClickAction);
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.AcceptWaypointPrompt);
+			RenderEnumSetting<ChatChannel>((Panel)(object)groupPanel, areaConfiguration.WaypointSendingChannel);
+			RenderEnumSetting<GuildNumber>((Panel)(object)groupPanel, areaConfiguration.WaypointSendingGuild);
+			RenderEnumSetting<EventChatFormat>((Panel)(object)groupPanel, areaConfiguration.EventChatFormat);
 			RenderEmptyLine((Panel)(object)groupPanel);
 			FlowPanel val2 = new FlowPanel();
 			((Control)val2).set_Parent((Container)(object)groupPanel);

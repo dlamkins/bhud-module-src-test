@@ -123,15 +123,15 @@ namespace Estreya.BlishHUD.Shared.Controls
 			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
 			List<Control> draggingEntries = ((IEnumerable<Control>)((Container)this).get_Children()).Where((Control child) => (child as ListEntry<T>)?.Dragging ?? false).ToList();
 			if (draggingEntries.Count > 0)
 			{
 				ListEntry<T> entry = draggingEntries.First() as ListEntry<T>;
 				RectangleF nameRectangle = default(RectangleF);
 				((RectangleF)(ref nameRectangle))._002Ector((float)((Control)this).get_RelativeMousePosition().X, (float)(((Control)this).get_RelativeMousePosition().Y - 20), (float)((Control)entry).get_Width(), (float)((Control)entry).get_Height());
-				spriteBatch.DrawStringOnCtrl((Control)(object)this, entry.Text, entry.Font, nameRectangle, entry.TextColor, wrap: false, (HorizontalAlignment)0, (VerticalAlignment)1);
+				spriteBatch.DrawStringOnCtrl((Control)(object)this, entry.Text, entry.Font, nameRectangle, entry.TextColor, wrap: false, 1f, (HorizontalAlignment)0, (VerticalAlignment)1);
 				int draggedOnIndex = GetCurrentDragOverIndex();
 				if (draggedOnIndex != -1)
 				{

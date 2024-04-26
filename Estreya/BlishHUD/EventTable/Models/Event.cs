@@ -9,6 +9,8 @@ using Estreya.BlishHUD.Shared.Json.Converter;
 using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Utils;
 using Gw2Sharp.WebApi.V2.Models;
+using Humanizer;
+using Humanizer.Localisation;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 
@@ -23,7 +25,13 @@ namespace Estreya.BlishHUD.EventTable.Models
 		[IgnoreCopy]
 		private static TimeSpan _checkForRemindersInterval = TimeSpan.FromMilliseconds(5000.0);
 
+		[JsonIgnore]
+		[IgnoreCopy]
 		private Func<DateTime> _getNowAction;
+
+		[JsonIgnore]
+		[IgnoreCopy]
+		private TranslationService _translationService;
 
 		[IgnoreCopy]
 		private double _lastCheckForReminders;
@@ -58,8 +66,8 @@ namespace Estreya.BlishHUD.EventTable.Models
 		[JsonConverter(typeof(DateJsonConverter))]
 		public DateTime? StartingDate { get; set; }
 
-		[JsonProperty("location")]
-		public string Location { get; set; }
+		[JsonProperty("locations")]
+		public EventLocations Locations { get; set; }
 
 		[JsonProperty("mapIds")]
 		public int[] MapIds { get; set; }
@@ -161,7 +169,8 @@ namespace Estreya.BlishHUD.EventTable.Models
 			SettingKey = ec.Key + "_" + Key;
 			Category = new WeakReference<EventCategory>(ec);
 			_getNowAction = getNowAction;
-			if (translationService != null)
+			_translationService = translationService;
+			if (_translationService != null)
 			{
 				Name = translationService.GetTranslation("event-" + ec.Key + "_" + Key + "-name", Name);
 			}
@@ -208,6 +217,12 @@ namespace Estreya.BlishHUD.EventTable.Models
 			_remindedFor.Clear();
 		}
 
+		public DateTime GetNextOccurence()
+		{
+			DateTime now = _getNowAction();
+			return Occurences.OrderBy((DateTime x) => x).FirstOrDefault((DateTime x) => x >= now);
+		}
+
 		public string GetWaypoint(Account account)
 		{
 			if (account == null)
@@ -220,6 +235,40 @@ namespace Estreya.BlishHUD.EventTable.Models
 				return Waypoints.NA;
 			}
 			return Waypoints.EU;
+		}
+
+		public string GetChatText(EventChatFormat format, DateTime occurence, Account account)
+		{
+			DateTime now = _getNowAction();
+			DateTime occurenceLocal = occurence.ToLocalTime();
+			DateTime endTime = occurence.AddMinutes(Duration);
+			bool num = endTime < now;
+			bool isNext = !num && occurence > now;
+			bool isCurrent = !num && !isNext;
+			string timeString = occurenceLocal.ToString("HH:mm zzz");
+			if (num)
+			{
+				TimeSpan finishedSince = now - occurence.AddMinutes(Duration);
+				timeString = _translationService.GetTranslation("event-chatText-finishedXAgo", "finished {0} ago").FormatWith(finishedSince.Humanize(2, null, TimeUnit.Week, TimeUnit.Second)) ?? "";
+			}
+			else if (isNext)
+			{
+				TimeSpan startsIn = occurence - now;
+				timeString = _translationService.GetTranslation("event-chatText-startsInX", "starts in {0}").FormatWith(startsIn.Humanize(2, null, TimeUnit.Week, TimeUnit.Second)) ?? "";
+			}
+			else if (isCurrent)
+			{
+				TimeSpan remaining = endTime - now;
+				timeString = _translationService.GetTranslation("event-chatText-hasXRemaining", "has {0} remaining").FormatWith(remaining.Humanize(2, null, TimeUnit.Week, TimeUnit.Second)) ?? "";
+			}
+			string waypoint = GetWaypoint(account);
+			return format switch
+			{
+				EventChatFormat.Full => _translationService.GetTranslation("event-chatText-format-full", "Event \"{0}\" {1} in \"{2}\": {3}").FormatWith(Name, timeString, Locations.Tooltip, waypoint), 
+				EventChatFormat.WithTime => _translationService.GetTranslation("event-chatText-format-withTime", "Event \"{0}\" {1}: {2}").FormatWith(Name, timeString, waypoint), 
+				EventChatFormat.WithLocation => _translationService.GetTranslation("event-chatText-format-withLocation", "Event \"{0}\" in \"{1}\": {2}").FormatWith(Name, Locations.Tooltip, waypoint), 
+				_ => waypoint, 
+			};
 		}
 
 		public override string ToString()

@@ -505,6 +505,18 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			return button;
 		}
 
+		protected FormattedLabel RenderFormattedLabel(Panel parent, Action<FormattedLabelBuilder> formattedLabelBuilderAction)
+		{
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+			Panel panel = GetPanel((Container)(object)parent);
+			FormattedLabelBuilder formattedLabelBuilder = new FormattedLabelBuilder().SetVerticalAlignment((VerticalAlignment)0).SetHorizontalAlignment((HorizontalAlignment)0).AutoSizeHeight()
+				.AutoSizeWidth();
+			formattedLabelBuilderAction(formattedLabelBuilder);
+			FormattedLabel obj = formattedLabelBuilder.Build();
+			((Control)obj).set_Parent((Container)(object)panel);
+			return obj;
+		}
+
 		protected (Label TitleLabel, Label ValueLabel) RenderLabel(Panel parent, string title, string value = null, Color? textColorTitle = null, Color? textColorValue = null, int? valueXLocation = null)
 		{
 			Panel panel = GetPanel((Container)(object)parent);

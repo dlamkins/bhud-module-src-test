@@ -317,13 +317,13 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0166: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_017f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0195: Unknown result type (might be due to invalid IL or missing references)
 			Color backgroundColor = ((_moduleSettings.ReminderColors.Background.get_Value().get_Id() == 1) ? Color.get_Black() : ColorExtensions.ToXnaColor(_moduleSettings.ReminderColors.Background.get_Value().get_Cloth()));
 			spriteBatch.Draw(Textures.get_Pixel(), _fullRect, backgroundColor * _moduleSettings.ReminderBackgroundOpacity.get_Value());
 			if (_icon != null)
@@ -333,12 +333,12 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			if (!string.IsNullOrWhiteSpace(_formattedTitle))
 			{
 				Color titleColor = ((_moduleSettings.ReminderColors.TitleText.get_Value().get_Id() == 1) ? Color.get_White() : ColorExtensions.ToXnaColor(_moduleSettings.ReminderColors.TitleText.get_Value().get_Cloth()));
-				spriteBatch.DrawString(_formattedTitle, _titleFont, RectangleF.op_Implicit(_titleRect), titleColor * _moduleSettings.ReminderTitleOpacity.get_Value(), wrap: false, (HorizontalAlignment)0, (VerticalAlignment)1);
+				spriteBatch.DrawString(_formattedTitle, _titleFont, RectangleF.op_Implicit(_titleRect), titleColor * _moduleSettings.ReminderTitleOpacity.get_Value(), wrap: false, 1f, (HorizontalAlignment)0, (VerticalAlignment)1);
 			}
 			if (!string.IsNullOrWhiteSpace(_formattedMessage))
 			{
 				Color messageColor = ((_moduleSettings.ReminderColors.MessageText.get_Value().get_Id() == 1) ? Color.get_White() : ColorExtensions.ToXnaColor(_moduleSettings.ReminderColors.MessageText.get_Value().get_Cloth()));
-				spriteBatch.DrawString(_formattedMessage, _messageFont, RectangleF.op_Implicit(_messageRect), messageColor * _moduleSettings.ReminderMessageOpacity.get_Value(), wrap: false, (HorizontalAlignment)0, (VerticalAlignment)1);
+				spriteBatch.DrawString(_formattedMessage, _messageFont, RectangleF.op_Implicit(_messageRect), messageColor * _moduleSettings.ReminderMessageOpacity.get_Value(), wrap: false, 1f, (HorizontalAlignment)0, (VerticalAlignment)1);
 			}
 		}
 

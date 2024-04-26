@@ -19,8 +19,10 @@ using Estreya.BlishHUD.Shared.Controls;
 using Estreya.BlishHUD.Shared.Extensions;
 using Estreya.BlishHUD.Shared.Models;
 using Estreya.BlishHUD.Shared.Models.GW2API.PointOfInterest;
+using Estreya.BlishHUD.Shared.Models.GameIntegration.Chat;
 using Estreya.BlishHUD.Shared.MumbleInfo.Map;
 using Estreya.BlishHUD.Shared.Services;
+using Estreya.BlishHUD.Shared.Services.GameIntegration;
 using Estreya.BlishHUD.Shared.Threading;
 using Estreya.BlishHUD.Shared.Utils;
 using Flurl.Http;
@@ -103,6 +105,8 @@ namespace Estreya.BlishHUD.EventTable.Controls
 		private PointOfInterestService _pointOfInterestService;
 
 		private AccountService _accountService;
+
+		private readonly ChatService _chatService;
 
 		private TimeSpan? _savedDrawInterval;
 
@@ -188,7 +192,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		public event EventHandler<string> DisableReminderClicked;
 
-		public EventArea(EventAreaConfiguration configuration, IconService iconService, TranslationService translationService, EventStateService eventService, WorldbossService worldbossService, MapchestService mapchestService, PointOfInterestService pointOfInterestService, AccountService accountService, MapUtil mapUtil, IFlurlClient flurlClient, string apiRootUrl, Func<DateTime> getNowAction, Func<Version> getVersion, Func<string> getAccessToken, Func<List<string>> getAreaNames, Func<List<string>> getDisabledReminderKeys, ContentsManager contentsManager)
+		public EventArea(EventAreaConfiguration configuration, IconService iconService, TranslationService translationService, EventStateService eventService, WorldbossService worldbossService, MapchestService mapchestService, PointOfInterestService pointOfInterestService, AccountService accountService, ChatService chatService, MapUtil mapUtil, IFlurlClient flurlClient, string apiRootUrl, Func<DateTime> getNowAction, Func<Version> getVersion, Func<string> getAccessToken, Func<List<string>> getAreaNames, Func<List<string>> getDisabledReminderKeys, ContentsManager contentsManager)
 		{
 			Configuration = configuration;
 			Configuration.EnabledKeybinding.get_Value().add_Activated((EventHandler<EventArgs>)EnabledKeybinding_Activated);
@@ -230,6 +234,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			_mapchestService = mapchestService;
 			_pointOfInterestService = pointOfInterestService;
 			_accountService = accountService;
+			_chatService = chatService;
 			_mapUtil = mapUtil;
 			_flurlClient = flurlClient;
 			_apiRootUrl = apiRootUrl;
@@ -992,26 +997,48 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			}
 		}
 
-		private void OnLeftMouseButtonPressed(object sender, MouseEventArgs e)
+		private async void OnLeftMouseButtonPressed(object sender, MouseEventArgs e)
 		{
-			if (_activeEvent == null || _activeEvent.Model.Filler)
+			Event currentEvent = _activeEvent;
+			if (currentEvent == null || currentEvent.Model.Filler)
 			{
 				return;
 			}
-			string waypoint = _activeEvent?.Model?.GetWaypoint(_accountService.Account);
+			string waypoint = currentEvent.Model?.GetWaypoint(_accountService.Account);
 			switch (Configuration.LeftClickAction.get_Value())
 			{
 			case LeftClickAction.CopyWaypoint:
-				if (!string.IsNullOrWhiteSpace(waypoint))
+			{
+				if (string.IsNullOrWhiteSpace(waypoint))
 				{
-					ClipboardUtil.get_WindowsClipboardService().SetTextAsync(waypoint);
+					break;
+				}
+				string eventChatFormat = currentEvent.Model.GetChatText(Configuration.EventChatFormat.get_Value(), currentEvent.StartTime, _accountService.Account);
+				if ((int)GameService.Input.get_Keyboard().get_ActiveModifiers() == 1)
+				{
+					try
+					{
+						await _chatService.ChangeChannel(ChatChannel.Squad);
+						await _chatService.ChangeChannel(Configuration.WaypointSendingChannel.get_Value(), Configuration.WaypointSendingGuild.get_Value(), GameService.Gw2Mumble.get_PlayerCharacter().get_Name());
+						await _chatService.Send(eventChatFormat);
+					}
+					catch (Exception ex)
+					{
+						_logger.Warn(ex, "Could not paste waypoint into chat. Event: " + currentEvent.Model.SettingKey);
+						ScreenNotification.ShowNotification(new string[2] { "Waypoint could not be pasted in chat.", "See log for more information." }, ScreenNotification.NotificationType.Error, null, 5);
+					}
+				}
+				else
+				{
+					await ClipboardUtil.get_WindowsClipboardService().SetTextAsync(eventChatFormat);
 					ScreenNotification.ShowNotification(new string[2]
 					{
-						_activeEvent.Model.Name,
+						currentEvent.Model.Name,
 						"Copied to clipboard!"
 					});
 				}
 				break;
+			}
 			case LeftClickAction.NavigateToWaypoint:
 			{
 				if (string.IsNullOrWhiteSpace(waypoint))
@@ -1131,7 +1158,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			//IL_021a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_023c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0241: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0260: Unknown result type (might be due to invalid IL or missing references)
 			_drawYOffset = 0;
 			if (!Configuration.ShowTopTimeline.get_Value())
 			{
@@ -1163,7 +1190,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				catch
 				{
 				}
-				spriteBatch.DrawString(formattedString, GetFont(), new RectangleF(timeStepRect.X + 5f, 5f, (float)PixelPerMinute * (float)timeInterval, 20f), timeColor, wrap: false, (HorizontalAlignment)0, (VerticalAlignment)1);
+				spriteBatch.DrawString(formattedString, GetFont(), new RectangleF(timeStepRect.X + 5f, 5f, (float)PixelPerMinute * (float)timeInterval, 20f), timeColor, wrap: false, 1f, (HorizontalAlignment)0, (VerticalAlignment)1);
 			}
 			_drawYOffset = (int)rect.Height;
 		}

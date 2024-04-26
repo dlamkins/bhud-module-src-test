@@ -20,7 +20,7 @@ namespace Estreya.BlishHUD.EventTable.Contexts
 
 		public DateTime? StartingDate { get; set; }
 
-		public string Location { get; set; }
+		public EventLocations Locations { get; set; }
 
 		public int[] MapIds { get; set; }
 
@@ -53,7 +53,7 @@ namespace Estreya.BlishHUD.EventTable.Contexts
 			Offset = TimeSpan.Zero;
 			Repeat = TimeSpan.Zero;
 			StartingDate = null;
-			Location = null;
+			Locations = default(EventLocations);
 			MapIds = null;
 			Waypoints = default(EventWaypoints);
 			Wiki = null;

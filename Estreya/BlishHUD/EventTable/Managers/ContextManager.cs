@@ -232,7 +232,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 					Duration = eArgsContent.Duration,
 					Filler = eArgsContent.Filler,
 					Icon = eArgsContent.Icon,
-					Location = eArgsContent.Location,
+					Locations = eArgsContent.Locations,
 					MapIds = eArgsContent.MapIds,
 					Offset = eArgsContent.Offset,
 					Repeat = eArgsContent.Repeat,

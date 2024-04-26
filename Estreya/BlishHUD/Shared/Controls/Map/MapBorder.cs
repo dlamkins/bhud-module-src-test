@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Blish_HUD;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -10,8 +9,6 @@ namespace Estreya.BlishHUD.Shared.Controls.Map
 {
 	public class MapBorder : MapEntity
 	{
-		private static Logger Logger = Logger.GetLogger<MapBorder>();
-
 		private readonly Color _color;
 
 		private readonly float[][] _points;
