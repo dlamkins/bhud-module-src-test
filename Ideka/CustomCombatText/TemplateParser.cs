@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.ArcDps.Models;
 using Blish_HUD.Content;
 using Gw2Sharp.Models;
-using Gw2Sharp.WebApi;
-using Gw2Sharp.WebApi.V2.Models;
-using Ideka.BHUDCommon;
 using Ideka.BHUDCommon.AnchoredRect;
 using Ideka.NetCommon;
 using Microsoft.Xna.Framework;
@@ -22,6 +20,8 @@ namespace Ideka.CustomCombatText
 		public abstract class Fragment
 		{
 			public abstract Size2 Size { get; }
+
+			public abstract void Draw(AnchoredRect.RectTarget target, Vector2 position, float alpha);
 		}
 
 		public class StringFragment : Fragment
@@ -54,6 +54,81 @@ namespace Ideka.CustomCombatText
 				Font = font;
 				base._002Ector();
 			}
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			private void Draw(SpriteBatch spriteBatch, Vector2 position, Color color)
+			{
+				//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+				//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+				BitmapFontExtensions.DrawString(spriteBatch, Font, Text, position, color, (Rectangle?)null);
+			}
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public void DrawShadow(SpriteBatch spriteBatch, Vector2 position, Vector2 shadowDistance, float alpha)
+			{
+				//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+				//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+				Color color = Color.get_Black() * alpha;
+				Draw(spriteBatch, position, color);
+				Draw(spriteBatch, position + shadowDistance, color);
+			}
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public void DrawStroke(SpriteBatch spriteBatch, Vector2 position, float strokeDistance, float alpha)
+			{
+				//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+				//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+				//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+				//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+				//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+				//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+				//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+				//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+				//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+				Color color = Color.get_Black() * alpha;
+				Draw(spriteBatch, Vector2Extension.OffsetBy(position, 0f, 0f - strokeDistance), color);
+				Draw(spriteBatch, Vector2Extension.OffsetBy(position, strokeDistance, 0f - strokeDistance), color);
+				Draw(spriteBatch, Vector2Extension.OffsetBy(position, strokeDistance, 0f), color);
+				Draw(spriteBatch, Vector2Extension.OffsetBy(position, strokeDistance, strokeDistance), color);
+				Draw(spriteBatch, Vector2Extension.OffsetBy(position, 0f, strokeDistance), color);
+				Draw(spriteBatch, Vector2Extension.OffsetBy(position, 0f - strokeDistance, strokeDistance), color);
+				Draw(spriteBatch, Vector2Extension.OffsetBy(position, 0f - strokeDistance, 0f), color);
+				Draw(spriteBatch, Vector2Extension.OffsetBy(position, 0f - strokeDistance, 0f - strokeDistance), color);
+			}
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public override void Draw(AnchoredRect.RectTarget target, Vector2 position, float alpha)
+			{
+				//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+				//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+				Draw(target.SpriteBatch, position, Color * alpha);
+			}
 		}
 
 		public class IconFragment : Fragment
@@ -77,6 +152,87 @@ namespace Ideka.CustomCombatText
 			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public override void Draw(AnchoredRect.RectTarget target, Vector2 position, float alpha)
+			{
+				//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+				//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+				//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0101: Unknown result type (might be due to invalid IL or missing references)
+				//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0111: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+				//IL_011c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+				//IL_012a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_012f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0133: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0138: Unknown result type (might be due to invalid IL or missing references)
+				//IL_013d: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0142: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0149: Unknown result type (might be due to invalid IL or missing references)
+				//IL_014f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0159: Unknown result type (might be due to invalid IL or missing references)
+				//IL_015f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_016c: Unknown result type (might be due to invalid IL or missing references)
+				AsyncTexture2D? icon = Icon;
+				Texture2D texture = ((icon != null) ? icon!.get_Texture() : null);
+				if (texture != null)
+				{
+					Rectangle? bbox = ((Autocropped && CTextModule.Settings.AutocropIcons.Value) ? CTextModule.IconBBoxes.GetIconBBox(AssetId) : null);
+					float width = bbox?.Width ?? texture.get_Width();
+					float height = bbox?.Height ?? texture.get_Height();
+					float aspectRatio = width / height;
+					Vector2 offset = ((aspectRatio > Size.Width / Size.Height) ? new Vector2(0f, (Size.Height - Size.Width / aspectRatio) / 2f) : new Vector2((Size.Width - Size.Height * aspectRatio) / 2f, 0f));
+					SpriteBatch spriteBatch = target.SpriteBatch;
+					Point2 val = new Point2(position.X, position.Y) + offset;
+					Rectangle absoluteBounds = target.Control.get_AbsoluteBounds();
+					spriteBatch.Draw(texture, Point2.op_Implicit(val + Size2.op_Implicit(((Rectangle)(ref absoluteBounds)).get_Location())), bbox, Color * alpha, 0f, Vector2.get_Zero(), Math.Min(Size.Width / width, Size.Height / height), (SpriteEffects)0, 0f);
+				}
+			}
+		}
+
+		public class MultiIconFragment : Fragment
+		{
+			public IconFragment[] Inner { get; set; } = Array.Empty<IconFragment>();
+
+
+			public override Size2 Size { get; } = new Size2(side, side);
+
+
+			public MultiIconFragment(float side)
+			{
+			}//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public override void Draw(AnchoredRect.RectTarget target, Vector2 position, float alpha)
+			{
+				//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+				if (!CTextModule.Settings.MultiIconMessages.Value && Inner.Any())
+				{
+					Inner.Last().Draw(target, position, alpha);
+					return;
+				}
+				foreach (var item2 in Inner.Enumerate())
+				{
+					int i = item2.index;
+					IconFragment item = item2.item;
+					float offset = ((float)i - (float)(Inner.Length - 1) / 2f) * 4f;
+					item.Draw(target, Vector2Extension.OffsetBy(position, offset, offset), alpha);
+				}
+			}
 		}
 
 		public class PreFragment
@@ -89,295 +245,7 @@ namespace Ideka.CustomCombatText
 			public Color? Color { get; set; }
 		}
 
-		public static readonly Dictionary<int, int> StaticIcons = new Dictionary<int, int>
-		{
-			[717] = 102834,
-			[718] = 102835,
-			[719] = 102836,
-			[720] = 102837,
-			[721] = 102838,
-			[722] = 102839,
-			[723] = 102840,
-			[725] = 102842,
-			[726] = 102843,
-			[727] = 102844,
-			[736] = 102848,
-			[737] = 102849,
-			[738] = 102850,
-			[740] = 102852,
-			[742] = 102853,
-			[743] = 102854,
-			[791] = 102869,
-			[861] = 102880,
-			[873] = 2440718,
-			[1122] = 415959,
-			[1187] = 1012835,
-			[19426] = 598887,
-			[26766] = 961397,
-			[26980] = 961398,
-			[27705] = 1228472,
-			[30328] = 1938787,
-			[17495] = 102835,
-			[17674] = 102835,
-			[21632] = 598887
-		};
-
-		public static void DrawFragments(this AnchoredRect.RectTarget target, IEnumerable<Fragment> text, float alpha, bool shadow, Vector2 shadowDistance, bool stroke, float strokeDistance = 1f)
-		{
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			IEnumerable<Fragment> text2 = text;
-			RectangleF rect2 = target.Rect;
-			Point2 position2 = ((RectangleF)(ref rect2)).get_Position();
-			Rectangle absoluteBounds = target.Control.get_AbsoluteBounds();
-			Point2 val = position2 + Size2.op_Implicit(((Rectangle)(ref absoluteBounds)).get_Location());
-			rect2 = target.Rect;
-			RectangleF rect = new RectangleF(val, ((RectangleF)(ref rect2)).get_Size());
-			if (shadow)
-			{
-				loop(delegate(Fragment frag, Vector2 position)
-				{
-					//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-					//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-					//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-					//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-					//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-					StringFragment stringFragment3 = frag as StringFragment;
-					if (stringFragment3 != null)
-					{
-						BitmapFontExtensions.DrawString(target.SpriteBatch, stringFragment3.Font, stringFragment3.Text, position, Color.get_Black() * alpha, (Rectangle?)null);
-						BitmapFontExtensions.DrawString(target.SpriteBatch, stringFragment3.Font, stringFragment3.Text, position + shadowDistance, Color.get_Black() * alpha, (Rectangle?)null);
-					}
-				});
-			}
-			if (stroke)
-			{
-				loop(delegate(Fragment frag, Vector2 position)
-				{
-					//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-					//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-					//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-					//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-					//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-					//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-					//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-					//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-					//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0114: Unknown result type (might be due to invalid IL or missing references)
-					//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-					//IL_014a: Unknown result type (might be due to invalid IL or missing references)
-					//IL_014f: Unknown result type (might be due to invalid IL or missing references)
-					//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0184: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0192: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0197: Unknown result type (might be due to invalid IL or missing references)
-					//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
-					//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
-					//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
-					//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-					//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0213: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0222: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0227: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0232: Unknown result type (might be due to invalid IL or missing references)
-					StringFragment stringFragment2 = frag as StringFragment;
-					if (stringFragment2 != null)
-					{
-						BitmapFontExtensions.DrawString(target.SpriteBatch, stringFragment2.Font, stringFragment2.Text, Vector2Extension.OffsetBy(position, 0f, 0f - strokeDistance), Color.get_Black() * alpha, (Rectangle?)null);
-						BitmapFontExtensions.DrawString(target.SpriteBatch, stringFragment2.Font, stringFragment2.Text, Vector2Extension.OffsetBy(position, strokeDistance, 0f - strokeDistance), Color.get_Black() * alpha, (Rectangle?)null);
-						BitmapFontExtensions.DrawString(target.SpriteBatch, stringFragment2.Font, stringFragment2.Text, Vector2Extension.OffsetBy(position, strokeDistance, 0f), Color.get_Black() * alpha, (Rectangle?)null);
-						BitmapFontExtensions.DrawString(target.SpriteBatch, stringFragment2.Font, stringFragment2.Text, Vector2Extension.OffsetBy(position, strokeDistance, strokeDistance), Color.get_Black() * alpha, (Rectangle?)null);
-						BitmapFontExtensions.DrawString(target.SpriteBatch, stringFragment2.Font, stringFragment2.Text, Vector2Extension.OffsetBy(position, 0f, strokeDistance), Color.get_Black() * alpha, (Rectangle?)null);
-						BitmapFontExtensions.DrawString(target.SpriteBatch, stringFragment2.Font, stringFragment2.Text, Vector2Extension.OffsetBy(position, 0f - strokeDistance, strokeDistance), Color.get_Black() * alpha, (Rectangle?)null);
-						BitmapFontExtensions.DrawString(target.SpriteBatch, stringFragment2.Font, stringFragment2.Text, Vector2Extension.OffsetBy(position, 0f - strokeDistance, 0f), Color.get_Black() * alpha, (Rectangle?)null);
-						BitmapFontExtensions.DrawString(target.SpriteBatch, stringFragment2.Font, stringFragment2.Text, Vector2Extension.OffsetBy(position, 0f - strokeDistance, 0f - strokeDistance), Color.get_Black() * alpha, (Rectangle?)null);
-					}
-				});
-			}
-			loop(delegate(Fragment frag, Vector2 position)
-			{
-				//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-				//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0130: Unknown result type (might be due to invalid IL or missing references)
-				//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-				StringFragment stringFragment = frag as StringFragment;
-				if (stringFragment != null)
-				{
-					BitmapFontExtensions.DrawString(target.SpriteBatch, stringFragment.Font, stringFragment.Text, position, stringFragment.Color * alpha, (Rectangle?)null);
-				}
-				else
-				{
-					IconFragment iconFragment = frag as IconFragment;
-					if (iconFragment != null)
-					{
-						AsyncTexture2D? icon = iconFragment.Icon;
-						Texture2D val2 = ((icon != null) ? icon!.get_Texture() : null);
-						if (val2 != null)
-						{
-							Rectangle? val3 = ((iconFragment.Autocropped && CTextModule.Settings.AutocropIcons.Value) ? CTextModule.IconBBoxes.GetIconBBox(iconFragment.AssetId) : null);
-							SpriteBatch spriteBatch = target.SpriteBatch;
-							Point2 val4 = new Point2(position.X, rect.Y);
-							Rectangle absoluteBounds2 = target.Control.get_AbsoluteBounds();
-							spriteBatch.Draw(val2, Point2.op_Implicit(val4 + Size2.op_Implicit(((Rectangle)(ref absoluteBounds2)).get_Location())), val3, iconFragment.Color * alpha, 0f, Vector2.get_Zero(), Math.Min(iconFragment.Size.Width / (float)(val3?.Width ?? val2.get_Width()), iconFragment.Size.Height / (float)(val3?.Height ?? val2.get_Height())), (SpriteEffects)0, 0f);
-						}
-					}
-				}
-			}, populateSpacings: true);
-			void loop(Action<Fragment, Vector2> act, bool populateSpacings = false)
-			{
-				//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-				float x = rect.X;
-				foreach (Fragment frag2 in text2)
-				{
-					float y = rect.Y + rect.Height / 2f - frag2.Size.Height / 2f;
-					act(frag2, new Vector2(x, y));
-					x += frag2.Size.Width;
-				}
-			}
-		}
-
-		public static List<PreFragment> PreParse(string template)
-		{
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			PreFragment frag = new PreFragment();
-			List<PreFragment> frags = new List<PreFragment>();
-			int i = 0;
-			Color color = default(Color);
-			while (i < template.Length)
-			{
-				string sub = template.Substring(i);
-				if (sub.StartsWith("[col="))
-				{
-					int end = sub.IndexOf(']');
-					if (end > 0)
-					{
-						finishFragment();
-						string colorString = sub.Substring(5, end - 5);
-						if (colorString == "%c")
-						{
-							frag.IsProfessionColor = true;
-						}
-						else
-						{
-							frag.Color = (ColorUtil.TryParseHex(colorString, ref color) ? new Color?(color) : null);
-						}
-						i += end + 1;
-						continue;
-					}
-				}
-				if (sub.StartsWith("[/col]"))
-				{
-					finishFragment();
-					i += 6;
-				}
-				else
-				{
-					frag.Text += sub[0];
-					i++;
-				}
-			}
-			finishFragment();
-			return frags;
-			void finishFragment()
-			{
-				if (frag.Text != "")
-				{
-					frags.Add(frag);
-					frag = new PreFragment();
-				}
-			}
-		}
-
-		public static string? GetSkillName(Message cbt)
-		{
-			int skillId = (int)cbt.Ev.get_SkillId();
-			object obj;
-			if (StaticIcons.ContainsKey(skillId))
-			{
-				string name = cbt.SkillName;
-				if (name != null)
-				{
-					obj = name;
-					goto IL_0057;
-				}
-			}
-			Skill? skill = cbt.Skill;
-			obj = ((skill != null) ? skill!.get_Name() : null);
-			if (obj == null)
-			{
-				Trait? trait = cbt.Trait;
-				obj = ((trait != null) ? trait!.get_Name() : null);
-				if (obj == null)
-				{
-					return cbt.SkillName;
-				}
-			}
-			goto IL_0057;
-			IL_0057:
-			return (string?)obj;
-		}
-
-		public static int? GetIconAssetId(Message message)
-		{
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			if (!StaticIcons.TryGetValue((int)message.Ev.get_SkillId(), out var assetId))
-			{
-				Skill? skill = message.Skill;
-				RenderUrl? val = ((skill != null) ? skill!.get_Icon() : null);
-				RenderUrl? url;
-				if (!val.HasValue)
-				{
-					Trait? trait = message.Trait;
-					url = ((trait != null) ? new RenderUrl?(trait!.get_Icon()) : null);
-				}
-				else
-				{
-					url = val;
-				}
-				return ApiCache.TryExtractAssetId(url) ?? message.SkillFallback?.AssetId;
-			}
-			return assetId;
-		}
-
-		public static (int id, bool knownElite)? GetProfIcon(ProfessionType prof, uint eliteId)
+		private static (int id, bool knownElite)? GetProfIcon(ProfessionType prof, uint eliteId)
 		{
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
@@ -469,148 +337,168 @@ namespace Ideka.CustomCombatText
 			return format;
 		}
 
-		public static IEnumerable<Fragment> FinalParse(PreFragment frag, Color? resultColor, Color srcProfColor, Color dstProfColor, (ProfessionType prof, uint eliteId) srcSpec, (ProfessionType prof, uint eliteId) dstSpec, Color? receiverColor, BitmapFont font, Message message, IReadOnlyList<Message> messages, List<List<Message>> resultGroups)
+		public static IEnumerable<Fragment> FinalParse(IEnumerable<PreFragment> pFrags, Color? receiverColor, BitmapFont font, Message lastMessage, IReadOnlyList<Message> allMessages)
 		{
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 			BitmapFont font2 = font;
-			IReadOnlyList<Message> messages2 = messages;
-			List<List<Message>> resultGroups2 = resultGroups;
-			Color? fragColor = (frag.IsProfessionColor ? new Color?(srcProfColor) : frag.Color);
-			float height = font2.MeasureString(" ").Height;
-			Dictionary<string, Func<(List<Fragment> result, bool isSignificant)>> repDict = new Dictionary<string, Func<(List<Fragment>, bool)>>
+			List<List<Message>> resultGroups;
+			Style.ResultFormat x2;
+			Style.ResultFormat resultFormat = (byGroup<EventResult, Style.ResultFormat>(allMessages, (Message x) => x.Result, CTextModule.Style.ResultFormats, out resultGroups, out x2) ? x2 : null);
+			List<List<Message>> groups2;
+			Color x3;
+			Color srcProfColor = (byGroup<ProfessionType, Color>(allMessages, (Message x) => (ProfessionType)(byte)x.Src.get_Profession(), CTextModule.Style.ProfessionColors, out groups2, out x3) ? x3 : CTextModule.Style.DefaultEntityColor);
+			Color? petColor3 = CTextModule.Style.PetColor;
+			if (petColor3.HasValue)
 			{
-				["%v"] = delegate
+				Color petColor = petColor3.GetValueOrDefault();
+				if ((from x in groups2.First()
+					where !x.SrcIsPet
+					select x).Count() < allMessages.Where((Message x) => x.SrcIsPet).Count())
 				{
-					int num3 = messages2.Sum((Message x) => x.Value);
-					return (new List<Fragment>(1) { newString($"{num3:N0}", resultColor) }, num3 != 0 || messages2.Any((Message x) => x.LandedDamage));
-				},
-				["%b"] = delegate
-				{
-					int num2 = messages2.Sum((Message x) => x.Barrier);
-					return (new List<Fragment>(1) { newString(string.Format("{0}{1:N0}{2}", "{", num2, "}"), CTextModule.Style.BarrierColor) }, num2 != 0);
-				},
-				["%r"] = delegate
-				{
-					string text2 = ((resultGroups2.Count != 1) ? null : GetResultFormat(message.Result)?.Text);
-					return (new List<Fragment>(1) { newString(text2 ?? "", resultColor) }, text2 != null);
-				},
-				["%f"] = () => combinedAgents(messages2.Select((Message x) => x.Src), srcProfColor, "sources"),
-				["%t"] = () => combinedAgents(messages2.Select((Message x) => x.Dst), dstProfColor, "targets"),
-				["%s"] = delegate
-				{
-					string skillName = GetSkillName(message);
-					return (new List<Fragment>(1) { newString(skillName ?? $"(({(int)message.Ev.get_SkillId()}))") }, skillName != null && !StaticIcons.ContainsKey((int)message.Ev.get_SkillId()));
-				},
-				["%n"] = () => ((from x in resultGroups2.SelectMany((List<Message> x) => new List<(string, Color?)>
-					{
-						("/", null),
-						($"{x.Count}", GetResultFormat(x.First().Result)?.Color)
-					}).Skip(1)
-					select newString(x.text, x.color)).Cast<Fragment>().ToList(), messages2.Skip(1).Any()),
-				["%i"] = delegate
-				{
-					int? iconAssetId = GetIconAssetId(message);
-					AsyncTexture2D val = ((!iconAssetId.HasValue) ? null : AsyncTexture2D.FromAssetId(iconAssetId.Value));
-					return (new List<Fragment>(1)
-					{
-						new IconFragment(height)
-						{
-							Icon = val,
-							Autocropped = true,
-							AssetId = iconAssetId
-						}
-					}, ((val != null) ? val.get_Texture() : null) != null);
-				},
-				["%m"] = () => agentIcon(messages2.Select((Message x) => x.Src), srcSpec),
-				["%o"] = () => agentIcon(messages2.Select((Message x) => x.Dst), dstSpec)
-			};
-			StringFragment fragment = newString();
-			int optionStart = -1;
-			int repStart = -1;
-			for (int i = 0; i < frag.Text.Length; i++)
-			{
-				char chr = frag.Text[i];
-				if (chr == ']' && optionStart >= 0 && repStart > 0 && repDict.TryGetValue(frag.Text.Substring(repStart, 2), out var func2))
-				{
-					(List<Fragment>, bool) tuple = func2();
-					List<Fragment> result2;
-					(result2, _) = tuple;
-					if (tuple.Item2)
-					{
-						fragment.Text += frag.Text.Substring(optionStart + 1, repStart - optionStart - 1);
-						if (fragment.Text != "")
-						{
-							yield return fragment;
-						}
-						foreach (Fragment r2 in result2)
-						{
-							StringFragment s2 = r2 as StringFragment;
-							if (s2 == null || s2.Text != "")
-							{
-								yield return r2;
-							}
-						}
-						fragment = newString();
-						fragment.Text += frag.Text.Substring(repStart + 2, i - repStart - 2);
-					}
-					repStart = -1;
-					optionStart = -1;
-					continue;
-				}
-				if (chr == '%' && i + 1 < frag.Text.Length)
-				{
-					repStart = i;
-					if (optionStart >= 0)
-					{
-						i++;
-						continue;
-					}
-					if (repDict.TryGetValue(frag.Text.Substring(repStart, 2), out var func))
-					{
-						if (fragment.Text != "")
-						{
-							yield return fragment;
-							fragment = newString();
-						}
-						List<Fragment> result = func().Item1;
-						foreach (Fragment r in result)
-						{
-							StringFragment s = r as StringFragment;
-							if (s == null || s.Text != "")
-							{
-								yield return r;
-							}
-						}
-						repStart = -1;
-						i++;
-						continue;
-					}
-					func = null;
-				}
-				if (chr == '[')
-				{
-					optionStart = i;
-				}
-				else if (optionStart < 0)
-				{
-					fragment.Text += chr;
+					srcProfColor = petColor;
 				}
 			}
-			if (fragment.Text != "")
+			List<List<Message>> groups3;
+			Color x4;
+			Color dstProfColor = (byGroup<ProfessionType, Color>(allMessages, (Message x) => (ProfessionType)(byte)x.Dst.get_Profession(), CTextModule.Style.ProfessionColors, out groups3, out x4) ? x4 : CTextModule.Style.DefaultEntityColor);
+			petColor3 = CTextModule.Style.PetColor;
+			if (petColor3.HasValue)
 			{
-				yield return fragment;
+				Color petColor2 = petColor3.GetValueOrDefault();
+				if ((from x in groups3.First()
+					where !x.DstIsPet
+					select x).Count() < allMessages.Where((Message x) => x.DstIsPet).Count())
+				{
+					dstProfColor = petColor2;
+				}
+			}
+			byGroup<(uint, uint), object>(allMessages, (Message x) => (x.Src.get_Profession(), x.Src.get_Elite()), new Dictionary<(uint, uint), object>(), out var groups4, out var value4);
+			(ProfessionType, uint) srcSpec = ((ProfessionType)(byte)groups4[0][0].Src.get_Profession(), groups4[0][0].Src.get_Elite());
+			byGroup<(uint, uint), object>(allMessages, (Message x) => (x.Dst.get_Profession(), x.Dst.get_Elite()), new Dictionary<(uint, uint), object>(), out var groups5, out value4);
+			(ProfessionType, uint) dstSpec = ((ProfessionType)(byte)groups5[0][0].Dst.get_Profession(), groups5[0][0].Dst.get_Elite());
+			float height = font2.MeasureString(" ").Height;
+			Dictionary<string, (List<Fragment> result, bool isSignificant)> templates = new Dictionary<string, (List<Fragment>, bool)>();
+			int value3 = allMessages.Sum((Message x) => x.Value);
+			templates["%v"] = (new List<Fragment>(1) { newString($"{value3:N0}", resultFormat?.Color) }, value3 != 0 || allMessages.Any((Message x) => x.LandedDamage));
+			int value2 = allMessages.Sum((Message x) => x.Barrier);
+			templates["%b"] = (new List<Fragment>(1) { newString(string.Format("{0}{1:N0}{2}", "{", value2, "}"), CTextModule.Style.BarrierColor) }, value2 != 0);
+			string text2 = ((resultGroups.Count != 1) ? null : GetResultFormat(lastMessage.Result)?.Text);
+			templates["%r"] = (new List<Fragment>(1) { newString(text2 ?? "", resultFormat?.Color) }, text2 != null);
+			templates["%f"] = combinedAgents(allMessages.Select((Message x) => x.Src), srcProfColor, "sources");
+			templates["%t"] = combinedAgents(allMessages.Select((Message x) => x.Dst), dstProfColor, "targets");
+			templates["%s"] = (new List<Fragment>(1) { newString(lastMessage.SkillName ?? $"(({(int)lastMessage.Ev.get_SkillId()}))") }, lastMessage.SkillName != null && !lastMessage.IsBoonOrCondi);
+			IEnumerable<(string, Color?)> parts = resultGroups.SelectMany((List<Message> x) => new List<(string, Color?)>
+			{
+				("/", null),
+				($"{x.Count}", GetResultFormat(x.First().Result)?.Color)
+			});
+			templates["%n"] = ((from x in parts.Skip(1)
+				select newString(x.text, x.color)).Cast<Fragment>().ToList(), allMessages.Skip(1).Any());
+			MultiIconFragment mi = new MultiIconFragment(height)
+			{
+				Inner = allMessages.DistinctBy((Message x) => x.SkillId).Select(delegate(Message message)
+				{
+					AsyncTexture2D icon3 = ((!message.SkillIconId.HasValue) ? null : AsyncTexture2D.FromAssetId(message.SkillIconId.Value));
+					return new IconFragment(height)
+					{
+						Icon = icon3,
+						Autocropped = true,
+						AssetId = message.SkillIconId
+					};
+				}).ToArray()
+			};
+			templates["%i"] = (new List<Fragment>(1) { mi }, mi.Inner.Any(delegate(IconFragment x)
+			{
+				AsyncTexture2D? icon2 = x.Icon;
+				return ((icon2 != null) ? icon2!.get_Texture() : null) != null;
+			}));
+			templates["%m"] = agentIcon(allMessages.Select((Message x) => x.Src), srcSpec);
+			templates["%o"] = agentIcon(allMessages.Select((Message x) => x.Dst), dstSpec);
+			foreach (PreFragment pFrag2 in pFrags)
+			{
+				PreFragment pFrag = pFrag2;
+				Color? fragColor = (pFrag.IsProfessionColor ? new Color?(srcProfColor) : pFrag.Color);
+				foreach (Fragment frag in process())
+				{
+					StringFragment str = frag as StringFragment;
+					if (str != null)
+					{
+						if (str.Text == "")
+						{
+							continue;
+						}
+						str.Color = (Color)(((_003F?)fragColor) ?? str.Color);
+					}
+					yield return frag;
+				}
+				IEnumerable<Fragment> process()
+				{
+					StringFragment frag2 = newString();
+					int optionStart = -1;
+					int templateStart = -1;
+					for (int i = 0; i < pFrag.Text.Length; i++)
+					{
+						char chr = pFrag.Text[i];
+						if (chr == ']' && optionStart >= 0 && templateStart > 0 && templates.TryGetValue(pFrag.Text.Substring(templateStart, 2), out var template))
+						{
+							if (template.isSignificant)
+							{
+								frag2.Text += pFrag.Text.Substring(optionStart + 1, templateStart - optionStart - 1);
+								yield return frag2;
+								foreach (Fragment item in template.result)
+								{
+									yield return item;
+								}
+								frag2 = newString();
+								frag2.Text += pFrag.Text.Substring(templateStart + 2, i - templateStart - 2);
+							}
+							templateStart = -1;
+							optionStart = -1;
+						}
+						else
+						{
+							template = default((List<Fragment>, bool));
+							if (chr == '%' && i + 1 < pFrag.Text.Length)
+							{
+								templateStart = i;
+								if (optionStart >= 0)
+								{
+									i++;
+									continue;
+								}
+								if (templates.TryGetValue(pFrag.Text.Substring(templateStart, 2), out template))
+								{
+									yield return frag2;
+									frag2 = newString();
+									foreach (Fragment item2 in template.result)
+									{
+										yield return item2;
+									}
+									templateStart = -1;
+									i++;
+									continue;
+								}
+								template = default((List<Fragment>, bool));
+							}
+							if (chr == '[')
+							{
+								optionStart = i;
+							}
+							else if (optionStart < 0)
+							{
+								frag2.Text += chr;
+							}
+						}
+					}
+					yield return frag2;
+				}
 			}
 			(List<Fragment> result, bool isSignificant) agentIcon(IEnumerable<Ag> agents, (ProfessionType prof, uint eliteId) spec)
 			{
-				//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0040: Unknown result type (might be due to invalid IL or missing references)
 				//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
 				//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-				int num = agents.DistinctBy((Ag x) => x.get_Id()).Count();
+				bool isSelf = agents.DistinctBy((Ag x) => x.get_Id()).Count() == 1 && agents.First().get_Self() == 1;
 				(int, bool)? profIcon = GetProfIcon(spec.prof, spec.eliteId);
-				bool isSelf = num == 1 && agents.First().get_Self() == 1;
 				AsyncTexture2D icon = ((!profIcon.HasValue) ? null : AsyncTexture2D.FromAssetId(profIcon.Value.Item1));
 				return (new List<Fragment>(1)
 				{
@@ -623,50 +511,181 @@ namespace Ideka.CustomCombatText
 					}
 				}, ((icon != null) ? icon.get_Texture() : null) != null && !isSelf);
 			}
+			static bool byGroup<TKey, TValue>(IEnumerable<Message> source, Func<Message, TKey> selector, IReadOnlyDictionary<TKey, TValue> dict, out List<List<Message>> groups, out TValue value) where TKey : notnull where TValue : notnull
+			{
+				List<List<Message>> list = new List<List<Message>>();
+				list.AddRange(from x in source.GroupBy(selector)
+					select x.ToList() into x
+					orderby x.Count descending
+					select x);
+				groups = list;
+				TKey mostCommonResult = selector(groups[0][0]);
+				return dict.TryGetValue(mostCommonResult, out value);
+			}
 			(List<Fragment> result, bool isSignificant) combinedAgents(IEnumerable<Ag> agents, Color color, string plural)
 			{
-				//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
 				int count = agents.DistinctBy((Ag x) => x.get_Id()).Count();
 				string obj = ((count == 1 && agents.First().get_Name() != "0") ? agents.First().get_Name() : null);
 				bool isSelf2 = count == 1 && agents.First().get_Self() == 1;
 				string j = obj;
 				int c = count;
-				(string, bool) tuple3;
-				if (j != null)
+				(string, bool) tuple;
+				if (j == null || j == "")
 				{
 					if (c != 1)
 					{
-						goto IL_009c;
+						goto IL_00aa;
 					}
-					tuple3 = (j, true);
+					tuple = ("???", false);
 				}
 				else
 				{
 					if (c != 1)
 					{
-						goto IL_009c;
+						goto IL_00aa;
 					}
-					tuple3 = ("???", false);
+					tuple = (j, true);
 				}
-				goto IL_00b6;
-				IL_00b6:
-				var (value, known) = tuple3;
-				return (new List<Fragment>(1) { newString(value, color) }, (count > 1 || known) && !isSelf2);
-				IL_009c:
-				tuple3 = ($"({c} {plural})", true);
-				goto IL_00b6;
+				goto IL_00c4;
+				IL_00aa:
+				tuple = ($"({c} {plural})", true);
+				goto IL_00c4;
+				IL_00c4:
+				var (value5, known) = tuple;
+				return (new List<Fragment>(1) { newString(value5, color) }, (count > 1 || known) && !isSelf2);
 			}
 			StringFragment newString(string text = "", Color? color = null)
 			{
-				//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-				//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-				//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+				//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 				return new StringFragment(font2)
 				{
 					Text = text,
-					Color = (Color)(((_003F?)fragColor) ?? ((_003F?)color) ?? ((_003F?)receiverColor) ?? CTextModule.Style.BaseColor)
+					Color = (Color)(((_003F?)color) ?? ((_003F?)receiverColor) ?? CTextModule.Style.BaseColor)
 				};
+			}
+		}
+
+		public static void DrawFragments(this AnchoredRect.RectTarget target, IEnumerable<Fragment> text, float alpha, bool shadow, Vector2 shadowDistance, bool stroke, float strokeDistance = 1f)
+		{
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			IEnumerable<Fragment> text2 = text;
+			RectangleF rect2 = target.Rect;
+			Point2 position2 = ((RectangleF)(ref rect2)).get_Position();
+			Rectangle absoluteBounds = target.Control.get_AbsoluteBounds();
+			Point2 val = position2 + Size2.op_Implicit(((Rectangle)(ref absoluteBounds)).get_Location());
+			rect2 = target.Rect;
+			RectangleF rect = new RectangleF(val, ((RectangleF)(ref rect2)).get_Size());
+			loop(delegate(Fragment frag, Vector2 position)
+			{
+				//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+				//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+				if (CTextModule.Settings.Debug.Value)
+				{
+					ShapeExtensions.DrawRectangle(target.SpriteBatch, position, frag.Size, Color.get_Black(), 1f, 0f);
+				}
+				StringFragment stringFragment = frag as StringFragment;
+				if (stringFragment != null)
+				{
+					if (shadow)
+					{
+						stringFragment.DrawShadow(target.SpriteBatch, position, shadowDistance, alpha);
+					}
+					if (stroke)
+					{
+						stringFragment.DrawStroke(target.SpriteBatch, position, strokeDistance, alpha);
+					}
+				}
+			});
+			loop(delegate(Fragment frag, Vector2 position)
+			{
+				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+				frag.Draw(target, position, alpha);
+			});
+			void loop(Action<Fragment, Vector2> act)
+			{
+				//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+				float x = rect.X;
+				foreach (Fragment frag2 in text2)
+				{
+					float y = rect.Y + rect.Height / 2f - frag2.Size.Height / 2f;
+					act(frag2, new Vector2(x, y));
+					x += frag2.Size.Width;
+				}
+			}
+		}
+
+		public static List<PreFragment> PreParse(string template)
+		{
+			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			PreFragment frag = new PreFragment();
+			List<PreFragment> frags = new List<PreFragment>();
+			int i = 0;
+			Color color = default(Color);
+			while (i < template.Length)
+			{
+				string sub = template.Substring(i);
+				if (sub.StartsWith("[col="))
+				{
+					int end = sub.IndexOf(']');
+					if (end > 0)
+					{
+						finishFragment();
+						string colorString = sub.Substring(5, end - 5);
+						if (colorString == "%c")
+						{
+							frag.IsProfessionColor = true;
+						}
+						else
+						{
+							frag.Color = (ColorUtil.TryParseHex(colorString, ref color) ? new Color?(color) : null);
+						}
+						i += end + 1;
+						continue;
+					}
+				}
+				if (sub.StartsWith("[/col]"))
+				{
+					finishFragment();
+					i += 6;
+				}
+				else
+				{
+					frag.Text += sub[0];
+					i++;
+				}
+			}
+			finishFragment();
+			return frags;
+			void finishFragment()
+			{
+				if (frag.Text != "")
+				{
+					frags.Add(frag);
+					frag = new PreFragment();
+				}
 			}
 		}
 	}

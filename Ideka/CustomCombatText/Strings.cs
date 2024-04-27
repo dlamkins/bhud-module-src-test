@@ -82,6 +82,10 @@ namespace Ideka.CustomCombatText
 
 		internal static string SettingMinIconMarginText => ResourceManager.GetString("SettingMinIconMarginText", resourceCulture);
 
+		internal static string SettingMultiIconMessages => ResourceManager.GetString("SettingMultiIconMessages", resourceCulture);
+
+		internal static string SettingMultiIconMessagesText => ResourceManager.GetString("SettingMultiIconMessagesText", resourceCulture);
+
 		internal static string SettingPetToMasterIsSelf => ResourceManager.GetString("SettingPetToMasterIsSelf", resourceCulture);
 
 		internal static string SettingPetToMasterIsSelfText => ResourceManager.GetString("SettingPetToMasterIsSelfText", resourceCulture);

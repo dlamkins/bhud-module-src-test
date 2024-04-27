@@ -25,6 +25,8 @@ namespace Ideka.CustomCombatText
 
 		public GenericSetting<bool> MergeAttackChains { get; }
 
+		public GenericSetting<bool> MultiIconMessages { get; }
+
 		public GenericSetting<bool> PetToMasterIsSelf { get; }
 
 		public GenericSetting<bool> MasterToPetIsSelf { get; }
@@ -41,6 +43,7 @@ namespace Ideka.CustomCombatText
 			MergeMaxMsStrikes = _dc.Add(settings.Slider("MergeMaxMsStrikes", 1500, -1, 2000, () => Strings.SettingMergeMaxMsStrikes, () => Strings.SettingMergeMaxMsStrikesText));
 			MergeMaxMsBuffs = _dc.Add(settings.Slider("MergeMaxMsBuffs", 200, -1, 2000, () => Strings.SettingMergeMaxMsBuffs, () => Strings.SettingMergeMaxMsBuffsText));
 			MergeAttackChains = _dc.Add(settings.Generic("MergeAttackChains", defaultValue: true, () => Strings.SettingMergeAttackChains, () => Strings.SettingMergeAttackChainsText));
+			MultiIconMessages = _dc.Add(settings.Generic("MultiIconMessages", defaultValue: true, () => Strings.SettingMultiIconMessages, () => Strings.SettingMultiIconMessagesText));
 			PetToMasterIsSelf = _dc.Add(settings.Generic("PetToMasterIsSelf", defaultValue: true, () => Strings.SettingPetToMasterIsSelf, () => Strings.SettingPetToMasterIsSelfText));
 			MasterToPetIsSelf = _dc.Add(settings.Generic("MasterToPetIsSelf", defaultValue: true, () => Strings.SettingMasterToPetIsSelf, () => Strings.SettingMasterToPetIsSelfText));
 			Debug = _dc.Add(settings.Generic("Debug", defaultValue: false, () => Strings.SettingDebug, () => Strings.SettingDebugText));

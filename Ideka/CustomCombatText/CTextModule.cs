@@ -36,7 +36,7 @@ namespace Ideka.CustomCombatText
 
 		private TraitData _traitData;
 
-		private IReadOnlyDictionary<int, SkillFallback> _skillFallbacks;
+		private SpecializationData _specData;
 
 		private ConfirmationModal _confirmationModal;
 
@@ -53,6 +53,8 @@ namespace Ideka.CustomCombatText
 		private BridgeService _bridgeService;
 
 		private SettingsView? _settingsView;
+
+		public static readonly Dictionary<uint, HsSkill> HsSkills = new Dictionary<uint, HsSkill>();
 
 		private static CTextModule Instance { get; set; } = null;
 
@@ -71,11 +73,11 @@ namespace Ideka.CustomCombatText
 
 		internal static string TraitCachePath => Path.Combine(CachePath, "Traits.json");
 
+		internal static string SpecCachePath => Path.Combine(CachePath, "Specs.json");
+
 		internal static string FontPath => "Fonts";
 
 		internal static string DefaultFontPath => Path.Combine("Fonts", "ITC Avant Garde Gothic Medium.ttf");
-
-		internal static string SkillFallbacksPath => "SkillFallbacks.json";
 
 		internal static string StylePath => "Style.json";
 
@@ -89,7 +91,7 @@ namespace Ideka.CustomCombatText
 
 		internal static TraitData TraitData => Instance._traitData;
 
-		internal static IReadOnlyDictionary<int, SkillFallback> SkillFallbacks => Instance._skillFallbacks;
+		internal static SpecializationData SpecData => Instance._specData;
 
 		internal static ConfirmationModal ConfirmationModal => Instance._confirmationModal;
 
@@ -100,6 +102,8 @@ namespace Ideka.CustomCombatText
 		internal static FontAssets FontAssets => Instance._fontAssets;
 
 		internal static AreaView? Selected => Instance._mainPanel.Selected;
+
+		internal static string HsSkillCachePath => Path.Combine(CachePath, "HsSkills.json");
 
 		[ImportingConstructor]
 		public CTextModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
@@ -138,12 +142,21 @@ namespace Ideka.CustomCombatText
 			await _skillData.StartLoad(Path.Combine(BasePath, SkillCachePath), ContentsManager, SkillCachePath);
 			_traitData = _dc.Add(new TraitData());
 			await _traitData.StartLoad(Path.Combine(BasePath, TraitCachePath), ContentsManager, TraitCachePath);
-			Dictionary<int, SkillFallback> read = JsonConvert.DeserializeObject<Dictionary<int, SkillFallback>>(ExtractAndRead(SkillFallbacksPath));
-			if (read == null)
+			_specData = _dc.Add(new SpecializationData());
+			await _specData.StartLoad(Path.Combine(BasePath, SpecCachePath), ContentsManager, SpecCachePath);
+			try
 			{
-				Logger.Warn("Failed to load Skill Fallbacks.");
+				using Stream file = ContentsManager.GetFileStream(HsSkillCachePath);
+				using StreamReader reader = new StreamReader(file);
+				foreach (HsSkill skill in JsonConvert.DeserializeObject<List<HsSkill>>(await reader.ReadToEndAsync()) ?? throw new Exception("HsSkill cache load resulted in null."))
+				{
+					HsSkills[skill.Id] = skill;
+				}
 			}
-			_skillFallbacks = read ?? new Dictionary<int, SkillFallback>();
+			catch (Exception e)
+			{
+				Logger.Warn(e, "Exception when loading HsSkill cache.");
+			}
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)
