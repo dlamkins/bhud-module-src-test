@@ -31,6 +31,7 @@
   <data name="The process terminated unexpectedly."><value>The process terminated unexpectedly.</value></data>
   <data name="{0} complete"><value>{0} complete</value></data>
   <data name="Error"><value>Error</value></data>
+  <data name="Death"><value>Death</value></data>
   <data name="{0} ran into a problem and needs to revive. We're just collecting some tears, and then we'll grief with you."><value>{0} ran into a problem and needs to revive. We're just collecting some tears, and then we'll grief with you.</value></data>
   <data name="Fail"><value>Fail</value></data>
   </root>

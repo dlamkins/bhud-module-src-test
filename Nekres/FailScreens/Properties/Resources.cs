@@ -46,6 +46,8 @@ namespace Nekres.FailScreens.Properties
 
 		internal static string _0__ran_into_a_problem_and_needs_to_revive__We_re_just_collecting_some_tears__and_then_we_ll_grief_with_you_ => ResourceManager.GetString("{0} ran into a problem and needs to revive. We're just collecting some tears, and then we'll grief with you.", resourceCulture);
 
+		internal static string Death => ResourceManager.GetString("Death", resourceCulture);
+
 		internal static string Error => ResourceManager.GetString("Error", resourceCulture);
 
 		internal static string Fail => ResourceManager.GetString("Fail", resourceCulture);

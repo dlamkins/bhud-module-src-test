@@ -21,7 +21,8 @@ namespace Nekres.FailScreens.Core.Services
 			GrandTheftAuto,
 			RytlocksCritterRampage,
 			Windows,
-			AngryPepe
+			AngryPepe,
+			SekiroShadowsDieTwice
 		}
 
 		private Control _failScreen;
@@ -68,7 +69,7 @@ namespace Nekres.FailScreens.Core.Services
 				_dblClickWatch.Restart();
 			}
 			Point pos = GameService.Input.get_Mouse().get_PositionRaw();
-			if (Math.Abs(_dblClickPos.X - pos.X) > 5 && Math.Abs(_dblClickPos.Y - pos.Y) > 5)
+			if (Math.Abs(_dblClickPos.X - pos.X) > 5 || Math.Abs(_dblClickPos.Y - pos.Y) > 5)
 			{
 				_dblClickCount = 0;
 				return;
@@ -107,7 +108,7 @@ namespace Nekres.FailScreens.Core.Services
 
 		private void OnStateChanged(object sender, ValueEventArgs<StateService.State> e)
 		{
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
 			if (e.get_Value() != StateService.State.Defeated)
 			{
 				if (!_isSuperAdventureBox)
@@ -134,7 +135,16 @@ namespace Nekres.FailScreens.Core.Services
 				int max = Enum.GetValues(typeof(FailScreens)).Cast<int>().Max();
 				screen = (FailScreens)RandomUtil.GetRandom(num, max);
 			}
-			Control buildScreen = CreateFailScreen(screen);
+			Control buildScreen;
+			try
+			{
+				buildScreen = CreateFailScreen(screen);
+			}
+			catch (Exception ex)
+			{
+				FailScreensModule.Logger.Warn(ex, $"Failed to construct {screen}.");
+				return;
+			}
 			if (buildScreen != null)
 			{
 				buildScreen.set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
@@ -152,6 +162,7 @@ namespace Nekres.FailScreens.Core.Services
 				FailScreens.RytlocksCritterRampage => new RytlocksCritterRampage(), 
 				FailScreens.Windows => new WinXp(), 
 				FailScreens.AngryPepe => new AngryPepe(), 
+				FailScreens.SekiroShadowsDieTwice => new Sekiro(), 
 				_ => null, 
 			});
 		}
