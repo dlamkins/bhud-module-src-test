@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing.Design;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -9,8 +8,6 @@ using BhModule.Community.Pathing.Behavior;
 using BhModule.Community.Pathing.Behavior.Filter;
 using BhModule.Community.Pathing.Behavior.Modifier;
 using BhModule.Community.Pathing.Content;
-using BhModule.Community.Pathing.Editor.TypeConverters;
-using BhModule.Community.Pathing.Editor.TypeEditors;
 using BhModule.Community.Pathing.State;
 using BhModule.Community.Pathing.Utility;
 using Blish_HUD;
@@ -136,10 +133,6 @@ namespace BhModule.Community.Pathing.Entity
 		public bool CanFade { get; set; } = true;
 
 
-		[Description("Tints the marker or trail with the color provided. Powerful when reusing existing marker icons or trail textures to make them differ in color.")]
-		[Category("Appearance")]
-		[Editor(typeof(ColorEditor), typeof(UITypeEditor))]
-		[TypeConverter(typeof(ColorConverter))]
 		public Color Tint { get; set; }
 
 		[Description("By default markers and trails are rendered without culling meaning that both sides are rendered at all times. Alternative culling settings allow you to disable culling for one side or the other. For example, a trail can be made to be visible from only below.")]
@@ -198,14 +191,8 @@ namespace BhModule.Community.Pathing.Entity
 		[Category("Appearance")]
 		public Vector3? RotationXyz { get; set; }
 
-		[DisplayName("Title")]
-		[Category("Appearance")]
 		public string BillboardText { get; set; }
 
-		[DisplayName("Title-Color")]
-		[Category("Appearance")]
-		[Editor(typeof(ColorEditor), typeof(UITypeEditor))]
-		[TypeConverter(typeof(ColorConverter))]
 		public Color BillboardTextColor { get; set; }
 
 		[DisplayName("Tip-Name")]
@@ -216,9 +203,6 @@ namespace BhModule.Community.Pathing.Entity
 		[Category("Appearance")]
 		public string TipDescription { get; set; }
 
-		[Description("The primary attributes used to determine where to position a marker.")]
-		[Category("Appearance")]
-		[Editor(typeof(Vector3Editor), typeof(UITypeEditor))]
 		public Vector3 Position { get; set; }
 
 		[Description("This attribute is used by multiple other attributes to define a distance from the marker in which those attributes will activate their functionality or behavior.")]

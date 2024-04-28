@@ -4,7 +4,6 @@ using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using BhModule.Community.Pathing.Entity;
-using BhModule.Community.Pathing.LocalHttp;
 using BhModule.Community.Pathing.MarkerPackRepo;
 using BhModule.Community.Pathing.Scripting;
 using BhModule.Community.Pathing.Scripting.Console;
@@ -46,8 +45,6 @@ namespace BhModule.Community.Pathing
 		private Tab _scriptSettingsTab;
 
 		private Tab _markerRepoTab;
-
-		private HttpHost _apiHost;
 
 		private ConsoleWindow _scriptConsoleWindow;
 
@@ -301,7 +298,6 @@ namespace BhModule.Community.Pathing
 		protected override void Unload()
 		{
 			ScriptEngine?.Unload();
-			_apiHost?.Close();
 			Settings?.Unload();
 			PackInitiator?.Unload();
 			CornerIcon pathingIcon = _pathingIcon;

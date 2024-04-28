@@ -218,85 +218,100 @@ namespace BhModule.Community.Pathing.Entity
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
 			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0112: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0136: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0189: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01da: Expected O, but got Unknown
+			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0160: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0167: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0171: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0199: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ea: Expected O, but got Unknown
 			Vector3[] pointsArr = (points as Vector3[]) ?? points.ToArray();
 			VertexPositionColorTexture[] verts = (VertexPositionColorTexture[])(object)new VertexPositionColorTexture[pointsArr.Length * 2];
 			float pastDistance = distance;
 			Vector3 curPoint = pointsArr[0];
 			Vector3 offset = Vector3.get_Zero();
+			Vector3 lastOffset = Vector3.get_Zero();
+			float flipOver = 1f;
+			float normalOffset = 0.508f * TrailScale;
+			Vector3 modDistance = Vector3.get_Zero();
 			for (int i = 0; i < pointsArr.Length - 1; i++)
 			{
 				Vector3 nextPoint = pointsArr[i + 1];
-				offset = Vector3.Cross(nextPoint - curPoint, IsWall ? Vector3.get_Up() : Vector3.get_Forward());
+				Vector3 pathDirection = nextPoint - curPoint;
+				offset = Vector3.Cross(pathDirection, IsWall ? Vector3.Cross(pathDirection, Vector3.get_Forward()) : Vector3.get_Forward());
 				((Vector3)(ref offset)).Normalize();
-				Vector3 leftPoint = curPoint + offset * 0.508f * TrailScale;
-				Vector3 rightPoint = curPoint + offset * -0.508f * TrailScale;
-				verts[i * 2 + 1] = new VertexPositionColorTexture(leftPoint, Color.get_White(), new Vector2(0f, pastDistance / 1.016f - 1f));
-				verts[i * 2] = new VertexPositionColorTexture(rightPoint, Color.get_White(), new Vector2(1f, pastDistance / 1.016f - 1f));
+				if (lastOffset != Vector3.get_Zero() && Vector3.Dot(offset, lastOffset) < 0f)
+				{
+					flipOver *= -1f;
+				}
+				modDistance = offset * normalOffset * flipOver;
+				verts[i * 2 + 1] = new VertexPositionColorTexture(curPoint + modDistance, Color.get_White(), new Vector2(0f, pastDistance / 1.016f - 1f));
+				verts[i * 2] = new VertexPositionColorTexture(curPoint - modDistance, Color.get_White(), new Vector2(1f, pastDistance / 1.016f - 1f));
 				pastDistance -= Vector3.Distance(curPoint, nextPoint);
+				lastOffset = offset;
 				curPoint = nextPoint;
 			}
-			Vector3 fleftPoint = curPoint + offset * 0.508f * TrailScale;
-			Vector3 frightPoint = curPoint + offset * -0.508f * TrailScale;
+			Vector3 fleftPoint = curPoint + modDistance;
+			Vector3 frightPoint = curPoint - modDistance;
 			verts[pointsArr.Length * 2 - 1] = new VertexPositionColorTexture(fleftPoint, Color.get_White(), new Vector2(0f, pastDistance / 1.016f - 1f));
 			verts[pointsArr.Length * 2 - 2] = new VertexPositionColorTexture(frightPoint, Color.get_White(), new Vector2(1f, pastDistance / 1.016f - 1f));
 			VertexBuffer val = new VertexBuffer(graphicsDevice, VertexPositionColorTexture.VertexDeclaration, verts.Length, (BufferUsage)1);
@@ -364,10 +379,9 @@ namespace BhModule.Community.Pathing.Entity
 
 		public override void Render(GraphicsDevice graphicsDevice, IWorld world, ICamera camera)
 		{
-			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
 			if (IsFiltered(EntityRenderTarget.World))
 			{
 				return;
@@ -378,7 +392,7 @@ namespace BhModule.Community.Pathing.Entity
 				return;
 			}
 			graphicsDevice.set_RasterizerState(CullDirection);
-			_packState.SharedTrailEffect.SetEntityState(AsyncTexture2D.op_Implicit(Texture), Math.Min(AnimationSpeed, _packState.UserConfiguration.PackMaxTrailAnimationSpeed.get_Value()), Math.Min(FadeNear, _packState.UserConfiguration.PackMaxViewDistance.get_Value() - (FadeFar - FadeNear)), Math.Min(FadeFar, _packState.UserConfiguration.PackMaxViewDistance.get_Value()), GetOpacity(), 0.25f, CanFade && _packState.UserConfiguration.PackFadeTrailsAroundCharacter.get_Value(), base.DebugRender ? Color.get_Red() : Tint);
+			_packState.SharedTrailEffect.SetEntityState(AsyncTexture2D.op_Implicit(Texture), Math.Min(AnimationSpeed, _packState.UserConfiguration.PackMaxTrailAnimationSpeed.get_Value()), Math.Min(FadeNear, _packState.UserConfiguration.PackMaxViewDistance.get_Value() - (FadeFar - FadeNear)), Math.Min(FadeFar, _packState.UserConfiguration.PackMaxViewDistance.get_Value()), GetOpacity(), _packState.UserResourceStates.Advanced.CharacterTrailFadeMultiplier, CanFade && _packState.UserConfiguration.PackFadeTrailsAroundCharacter.get_Value(), Tint);
 			for (int i = 0; i < _sectionBuffers.Length; i++)
 			{
 				ref VertexBuffer vertexBuffer = ref _sectionBuffers[i];

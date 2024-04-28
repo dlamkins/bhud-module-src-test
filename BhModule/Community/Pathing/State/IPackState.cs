@@ -32,8 +32,6 @@ namespace BhModule.Community.Pathing.State
 
 		UiStates UiStates { get; }
 
-		EditorStates EditorStates { get; }
-
 		CachedMumbleStates CachedMumbleStates { get; }
 
 		KvStates KvStates { get; }

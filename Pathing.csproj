@@ -34,9 +34,6 @@
     <Reference Include="Microsoft.Dynamic">
       <HintPath>..\..\working\Microsoft.Dynamic.dll</HintPath>
     </Reference>
-    <Reference Include="LiteDB">
-      <HintPath>..\..\working\LiteDB.dll</HintPath>
-    </Reference>
     <Reference Include="YamlDotNet">
       <HintPath>..\..\working\YamlDotNet.dll</HintPath>
     </Reference>

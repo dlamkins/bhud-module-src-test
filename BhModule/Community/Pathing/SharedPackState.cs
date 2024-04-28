@@ -53,8 +53,6 @@ namespace BhModule.Community.Pathing
 
 		public UiStates UiStates { get; private set; }
 
-		public EditorStates EditorStates { get; private set; }
-
 		public CachedMumbleStates CachedMumbleStates { get; private set; }
 
 		public KvStates KvStates { get; private set; }
@@ -100,13 +98,11 @@ namespace BhModule.Community.Pathing
 			ManagedState managedState6 = await userResourceStates2.Start();
 			UiStates uiStates2 = (UiStates = new UiStates(this));
 			ManagedState managedState7 = await uiStates2.Start();
-			EditorStates editorStates2 = (EditorStates = new EditorStates(this));
-			ManagedState managedState8 = await editorStates2.Start();
 			CachedMumbleStates cachedMumbleStates2 = (CachedMumbleStates = new CachedMumbleStates(this));
-			ManagedState managedState9 = await cachedMumbleStates2.Start();
+			ManagedState managedState8 = await cachedMumbleStates2.Start();
 			KvStates kvStates2 = (KvStates = new KvStates(this));
-			ManagedState managedState10 = await kvStates2.Start();
-			_managedStates = new ManagedState[10] { managedState, managedState2, managedState3, managedState4, managedState5, managedState6, managedState7, managedState8, managedState9, managedState10 };
+			ManagedState managedState9 = await kvStates2.Start();
+			_managedStates = new ManagedState[9] { managedState, managedState2, managedState3, managedState4, managedState5, managedState6, managedState7, managedState8, managedState9 };
 			_initialized = true;
 		}
 
