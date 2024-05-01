@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Ideka.CustomCombatText
 {
-	public class AreasPanel : Container
+	public class AreasPanel : Panel, IUIPanel
 	{
 		private static readonly Logger Logger = Logger.GetLogger<AreasPanel>();
 
@@ -25,6 +25,8 @@ namespace Ideka.CustomCombatText
 		private AreaView? _opened;
 
 		private AreaView? _selected;
+
+		private readonly PanelStack _panelStack;
 
 		private readonly StandardButton _koFiButton;
 
@@ -45,6 +47,8 @@ namespace Ideka.CustomCombatText
 		private readonly StandardButton _deleteButton;
 
 		private readonly StandardButton _saveButton;
+
+		private readonly StandardButton _logButton;
 
 		private readonly AreaPanel _areaPanel;
 
@@ -83,49 +87,61 @@ namespace Ideka.CustomCombatText
 			}
 		}
 
-		public AreasPanel()
+		public Panel Panel => (Panel)(object)this;
+
+		public AsyncTexture2D Icon { get; } = AsyncTexture2D.FromAssetId(1414035);
+
+
+		public string Caption => "Custom Combat Text";
+
+		public AreasPanel(PanelStack panelStack)
 			: this()
 		{
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Expected O, but got Unknown
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Expected O, but got Unknown
 			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b4: Expected O, but got Unknown
-			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011f: Expected O, but got Unknown
-			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013c: Expected O, but got Unknown
-			//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0159: Expected O, but got Unknown
-			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0166: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0176: Expected O, but got Unknown
-			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0183: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0193: Expected O, but got Unknown
-			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0199: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b0: Expected O, but got Unknown
-			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cd: Expected O, but got Unknown
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cb: Expected O, but got Unknown
+			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0136: Expected O, but got Unknown
+			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0153: Expected O, but got Unknown
+			//IL_0154: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0159: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0160: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0170: Expected O, but got Unknown
+			//IL_0171: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0176: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018d: Expected O, but got Unknown
+			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0193: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01aa: Expected O, but got Unknown
+			//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c7: Expected O, but got Unknown
+			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e4: Expected O, but got Unknown
+			//IL_01e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0201: Expected O, but got Unknown
+			_panelStack = panelStack;
 			StandardButton val = new StandardButton();
 			((Control)val).set_Parent((Container)(object)this);
 			val.set_Text("Ko-fi");
@@ -179,6 +195,10 @@ namespace Ideka.CustomCombatText
 			((Control)val9).set_Parent((Container)(object)this);
 			val9.set_Text("Save Changes");
 			_saveButton = val9;
+			StandardButton val10 = new StandardButton();
+			((Control)val10).set_Parent((Container)(object)this);
+			val10.set_Text("Message Log");
+			_logButton = val10;
 			AreaPanel areaPanel = new AreaPanel();
 			((Control)areaPanel).set_Parent((Container)(object)this);
 			_areaPanel = areaPanel;
@@ -255,6 +275,10 @@ namespace Ideka.CustomCombatText
 				}
 				ScreenNotification.ShowNotification("Saved", (NotificationType)0, (Texture2D)null, 4);
 			});
+			((Control)_logButton).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				_panelStack.Push(new LogPanel(_panelStack));
+			});
 			_areaPanel.HierarchyChanged += delegate
 			{
 				AreaView selected = Selected;
@@ -285,18 +309,18 @@ namespace Ideka.CustomCombatText
 		private void UpdateLayout()
 		{
 			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
 			if (_backButton != null)
 			{
 				((Control)_backButton).set_Location(Point.get_Zero());
 				((Control)(object)_backButton).ArrangeLeftRight(10, (Control)_openButton);
 				((Control)_koFiButton).set_Left(0);
-				((Control)_koFiButton).set_Bottom(((Container)this).get_ContentRegion().Height);
+				((Control)(object)_koFiButton).AlignBottom();
 				StandardButton koFiButton = _koFiButton;
 				int height;
 				((Control)_discordButton).set_Height(height = 50);
 				((Control)koFiButton).set_Height(height);
-				((Control)(object)_koFiButton).ArrangeLeftRight(10, (Control)_discordButton);
+				((Control)(object)_koFiButton).ArrangeLeftRight(10, (Control)_discordButton, (Control)_logButton);
+				((Control)(object)_logButton).AlignBottom();
 				((Control)(object)_koFiButton).ArrangeBottomUp(10, (Control)_saveButton, (Control)_createNewButton, (Control)_reloadButton);
 				((Control)(object)_createNewButton).ArrangeLeftRight(10, (Control)_deleteButton);
 				((Control)(object)_reloadButton).ArrangeLeftRight(10, (Control)_stopEditingButton);
@@ -307,7 +331,7 @@ namespace Ideka.CustomCombatText
 				((Control)(object)_areasMenu).ArrangeLeftRight(10, (Control)_areaPanel);
 				((Control)_areaPanel).set_Top(0);
 				((Control)(object)_areaPanel).WidthFillRight();
-				((Control)(object)_areaPanel).HeightFillDown();
+				((Control)_areaPanel).set_Height(650);
 			}
 		}
 
@@ -316,7 +340,7 @@ namespace Ideka.CustomCombatText
 			CTextModule.LocalData.ViewsReloaded -= new Action(ViewsReloaded);
 			_koFiButton.get_Icon().Dispose();
 			_discordButton.get_Icon().Dispose();
-			((Container)this).DisposeControl();
+			((Panel)this).DisposeControl();
 		}
 	}
 }

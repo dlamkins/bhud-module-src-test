@@ -15,23 +15,48 @@ namespace Ideka.CustomCombatText
 {
 	internal static class FontUtils
 	{
-		public static SpriteFont? GetSpriteFont(this ContentsManager manager, string fontPath, int fontSize, int textureSize = 1392)
+		internal static CharacterRange GeneralPunctuation = new CharacterRange('\u2000', '\u206f');
+
+		internal static CharacterRange Arrows = new CharacterRange('←', '⇿');
+
+		internal static CharacterRange MathematicalOperators = new CharacterRange('∀', '⋿');
+
+		internal static CharacterRange BoxDrawing = new CharacterRange('─', '╰');
+
+		internal static CharacterRange GeometricShapes = new CharacterRange('■', '◿');
+
+		internal static CharacterRange MiscellaneousSymbols = new CharacterRange('☀', '⛿');
+
+		internal static readonly CharacterRange[] Gw2CharacterRange = new CharacterRange[9]
+		{
+			CharacterRange.BasicLatin,
+			CharacterRange.Latin1Supplement,
+			CharacterRange.LatinExtendedA,
+			GeneralPunctuation,
+			Arrows,
+			MathematicalOperators,
+			BoxDrawing,
+			GeometricShapes,
+			MiscellaneousSymbols
+		};
+
+		public static SpriteFont? GetSpriteFont(this ContentsManager manager, string fontPath, float fontSize, int textureSize = 1392)
 		{
 			using Stream file = manager.GetFileStream(fontPath);
 			return GetSpriteFont(file, fontSize, textureSize);
 		}
 
-		public static SpriteFont? GetSpriteFont(string fontPath, int fontSize, int textureSize = 1392)
+		public static SpriteFont? GetSpriteFont(string fontPath, float fontSize, int textureSize = 1392)
 		{
 			using FileStream file = File.OpenRead(fontPath);
 			return GetSpriteFont(file, fontSize, textureSize);
 		}
 
-		public static SpriteFont? GetSpriteFont(Stream file, int fontSize, int textureSize = 1392)
+		public static SpriteFont? GetSpriteFont(Stream file, float fontSize, int textureSize = 1392)
 		{
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-			if (fontSize <= 0)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+			if (fontSize <= 0f)
 			{
 				throw new ArgumentException("Font size must be greater than 0.", "fontSize");
 			}
@@ -43,12 +68,7 @@ namespace Ideka.CustomCombatText
 			GraphicsDeviceContext ctx = GameService.Graphics.LendGraphicsDeviceContext();
 			try
 			{
-				return TtfFontBaker.Bake(fontData, fontSize, textureSize, textureSize, new _003C_003Ez__ReadOnlyArray<CharacterRange>(new CharacterRange[3]
-				{
-					CharacterRange.BasicLatin,
-					CharacterRange.Latin1Supplement,
-					CharacterRange.LatinExtendedA
-				})).CreateSpriteFont(((GraphicsDeviceContext)(ref ctx)).get_GraphicsDevice());
+				return TtfFontBaker.Bake(fontData, fontSize, textureSize, textureSize, Gw2CharacterRange).CreateSpriteFont(((GraphicsDeviceContext)(ref ctx)).get_GraphicsDevice());
 			}
 			finally
 			{

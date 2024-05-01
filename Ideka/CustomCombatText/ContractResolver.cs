@@ -1,5 +1,4 @@
 using System;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
 namespace Ideka.CustomCombatText
@@ -8,17 +7,12 @@ namespace Ideka.CustomCombatText
 	{
 		protected override JsonContract CreateContract(Type objectType)
 		{
-			JsonContract contract = ((DefaultContractResolver)this).CreateContract(objectType);
+			JsonContract contract = base.CreateContract(objectType);
 			if (objectType == typeof(IAreaModelType))
 			{
-				contract.set_Converter((JsonConverter)(object)new AreaModelTypeConverter());
+				contract.Converter = new AreaModelTypeConverter();
 			}
 			return contract;
-		}
-
-		public ContractResolver()
-			: this()
-		{
 		}
 	}
 }

@@ -21,7 +21,7 @@ namespace Ideka.CustomCombatText
 		public List<MessageReceiver> Receivers { get; set; } = new List<MessageReceiver>();
 
 
-		[JsonProperty(/*Could not decode attribute arguments.*/)]
+		[JsonProperty(ObjectCreationHandling = ObjectCreationHandling.Replace)]
 		public IAreaModelType ModelType { get; set; } = new ModelTypeContainer();
 
 

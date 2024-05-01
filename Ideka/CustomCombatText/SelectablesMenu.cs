@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Blish_HUD.Controls;
+using Ideka.BHUDCommon;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Ideka.CustomCombatText
@@ -14,6 +17,12 @@ namespace Ideka.CustomCombatText
 		private readonly Dictionary<TId, MenuItem> _items = new Dictionary<TId, MenuItem>();
 
 		private bool _reflecting;
+
+		private float _scrollTarget = -1f;
+
+		private float _relativeScrollTarget = -1f;
+
+		private Control? _scrollItem;
 
 		public TSelectable? Selected
 		{
@@ -40,17 +49,21 @@ namespace Ideka.CustomCombatText
 			}
 		}
 
+		public Scrollbar? Scrollbar { get; set; }
+
+		public bool Empty => !_items.Any();
+
 		public event Action<TSelectable?>? ItemSelected;
 
 		public SelectablesMenu()
 			: this()
 		{
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Expected O, but got Unknown
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Expected O, but got Unknown
 			Menu val = new Menu();
 			((Control)val).set_Parent((Container)(object)this);
 			((Container)val).set_WidthSizingMode((SizingMode)2);
@@ -112,6 +125,49 @@ namespace Ideka.CustomCombatText
 			{
 				_selected = selectable;
 				this.ItemSelected?.Invoke(selectable);
+			}
+		}
+
+		public void SaveScroll()
+		{
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			_scrollTarget = ((Scrollbar == null) ? (-1f) : (Scrollbar!.get_ScrollDistance() * (float)(((Control)_menu).get_Bottom() - ((Container)this).get_ContentRegion().Height)));
+		}
+
+		public void SetScroll(float scroll)
+		{
+			_relativeScrollTarget = scroll;
+		}
+
+		public bool HasScrollbar()
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			return ((Container)this).get_ContentRegion().Height < ((Control)_menu).get_Bottom();
+		}
+
+		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
+		{
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+			((Panel)this).PaintBeforeChildren(spriteBatch, bounds);
+			if (Scrollbar != null)
+			{
+				if (_relativeScrollTarget >= 0f)
+				{
+					_scrollTarget = _relativeScrollTarget * (float)(((Control)_menu).get_Bottom() - ((Container)this).get_ContentRegion().Height);
+					_relativeScrollTarget = -1f;
+				}
+				if (_scrollItem != null)
+				{
+					_scrollTarget = ((Panel)(object)this).NearestScrollTarget(_scrollItem);
+					_scrollItem = null;
+				}
+				if (_scrollTarget >= 0f)
+				{
+					Scrollbar!.set_ScrollDistance(_scrollTarget / (float)(((Control)_menu).get_Bottom() - ((Container)this).get_ContentRegion().Height));
+					_scrollTarget = -1f;
+				}
 			}
 		}
 	}

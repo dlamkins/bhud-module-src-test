@@ -27,8 +27,7 @@ namespace Ideka.CustomCombatText
 		public override IAreaModelType? ReadJson(JsonReader reader, Type objectType, IAreaModelType? existingValue, bool hasExistingValue, JsonSerializer serializer)
 		{
 			JToken token = JToken.ReadFrom(reader);
-			JToken obj = token.get_Item((object)"Type");
-			AreaType? areaType = ((obj != null) ? new AreaType?(obj.ToObject<AreaType>(serializer)) : null);
+			AreaType? areaType = token["Type"]?.ToObject<AreaType>(serializer);
 			if (areaType.HasValue)
 			{
 				AreaType type = areaType.GetValueOrDefault();

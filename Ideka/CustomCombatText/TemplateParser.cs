@@ -172,17 +172,12 @@ namespace Ideka.CustomCombatText
 				//IL_0117: Unknown result type (might be due to invalid IL or missing references)
 				//IL_011c: Unknown result type (might be due to invalid IL or missing references)
 				//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0123: Unknown result type (might be due to invalid IL or missing references)
 				//IL_012a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0133: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-				//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-				//IL_014f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0159: Unknown result type (might be due to invalid IL or missing references)
-				//IL_015f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_016c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0130: Unknown result type (might be due to invalid IL or missing references)
+				//IL_013a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0140: Unknown result type (might be due to invalid IL or missing references)
+				//IL_014d: Unknown result type (might be due to invalid IL or missing references)
 				AsyncTexture2D? icon = Icon;
 				Texture2D texture = ((icon != null) ? icon!.get_Texture() : null);
 				if (texture != null)
@@ -192,10 +187,7 @@ namespace Ideka.CustomCombatText
 					float height = bbox?.Height ?? texture.get_Height();
 					float aspectRatio = width / height;
 					Vector2 offset = ((aspectRatio > Size.Width / Size.Height) ? new Vector2(0f, (Size.Height - Size.Width / aspectRatio) / 2f) : new Vector2((Size.Width - Size.Height * aspectRatio) / 2f, 0f));
-					SpriteBatch spriteBatch = target.SpriteBatch;
-					Point2 val = new Point2(position.X, position.Y) + offset;
-					Rectangle absoluteBounds = target.Control.get_AbsoluteBounds();
-					spriteBatch.Draw(texture, Point2.op_Implicit(val + Size2.op_Implicit(((Rectangle)(ref absoluteBounds)).get_Location())), bbox, Color * alpha, 0f, Vector2.get_Zero(), Math.Min(Size.Width / width, Size.Height / height), (SpriteEffects)0, 0f);
+					target.SpriteBatch.Draw(texture, Point2.op_Implicit(new Point2(position.X, position.Y) + offset), bbox, Color * alpha, 0f, Vector2.get_Zero(), Math.Min(Size.Width / width, Size.Height / height), (SpriteEffects)0, 0f);
 				}
 			}
 		}
@@ -235,15 +227,45 @@ namespace Ideka.CustomCombatText
 			}
 		}
 
-		public class PreFragment
+		public class PreFrag
 		{
 			public string Text { get; set; } = "";
 
 
-			public bool IsProfessionColor { get; set; }
-
 			public Color? Color { get; set; }
 		}
+
+		public class TemplatePreFrag : PreFrag
+		{
+			public bool IsProfessionColor { get; set; }
+		}
+
+		public readonly struct Syntax<T> where T : PreFrag
+		{
+			public string ColorTagOpenA { get; init; }
+
+			public char ColorTagOpenB { get; init; }
+
+			public string ColorTagClose { get; init; }
+
+			public Dictionary<string, Color> KnownColors { get; init; }
+
+			public Dictionary<string, Action<string, T>> SpecialColors { get; init; }
+		}
+
+		public const string Help = "Templates:\n%i - skill icon\n%v - damage taken/damage healed/barrier applied\n%b - barrier damage taken\n%r - result's associated text, if any (e.g. block, invuln)\n%f - message source\n%t - message target\n%s - skill name\n%n - number of messages (for combined messages)\n%m - mesage source elite spec icon\n%o - mesage target elite spec icon\n\n[col=XXXXXX][/col] tags can be used to override default colors.\n%c can be used in [col] tags to use the source profession's color.\nSquare brackets can be used around templates (e.g. [%b]) to mark them as \"optional\". The content of the brackets will only be shown if the template within is relevant to the current message.\nOptional brackets must contain exactly one template.\n[col] tags only work outside optional brackets (but can have optional brackets inside).";
+
+		private static readonly Syntax<TemplatePreFrag> BaseSyntax = new Syntax<TemplatePreFrag>
+		{
+			ColorTagOpenA = "[col=",
+			ColorTagOpenB = ']',
+			ColorTagClose = "[/col]",
+			KnownColors = new Dictionary<string, Color>(),
+			SpecialColors = new Dictionary<string, Action<string, TemplatePreFrag>> { ["%c"] = delegate(string _, TemplatePreFrag frag)
+			{
+				frag.IsProfessionColor = true;
+			} }
+		};
 
 		private static (int id, bool knownElite)? GetProfIcon(ProfessionType prof, uint eliteId)
 		{
@@ -337,7 +359,7 @@ namespace Ideka.CustomCombatText
 			return format;
 		}
 
-		public static IEnumerable<Fragment> FinalParse(IEnumerable<PreFragment> pFrags, Color? receiverColor, BitmapFont font, Message lastMessage, IReadOnlyList<Message> allMessages)
+		public static IEnumerable<Fragment> FinalParse(IEnumerable<TemplatePreFrag> pFrags, Color? receiverColor, BitmapFont font, Message lastMessage, IReadOnlyList<Message> allMessages)
 		{
 			BitmapFont font2 = font;
 			List<List<Message>> resultGroups;
@@ -413,9 +435,9 @@ namespace Ideka.CustomCombatText
 			}));
 			templates["%m"] = agentIcon(allMessages.Select((Message x) => x.Src), srcSpec);
 			templates["%o"] = agentIcon(allMessages.Select((Message x) => x.Dst), dstSpec);
-			foreach (PreFragment pFrag2 in pFrags)
+			foreach (TemplatePreFrag pFrag2 in pFrags)
 			{
-				PreFragment pFrag = pFrag2;
+				TemplatePreFrag pFrag = pFrag2;
 				Color? fragColor = (pFrag.IsProfessionColor ? new Color?(srcProfColor) : pFrag.Color);
 				foreach (Fragment frag in process())
 				{
@@ -425,6 +447,10 @@ namespace Ideka.CustomCombatText
 						if (str.Text == "")
 						{
 							continue;
+						}
+						if (str.Text.EndsWith(" "))
+						{
+							str.Text += " ";
 						}
 						str.Color = (Color)(((_003F?)fragColor) ?? str.Color);
 					}
@@ -575,23 +601,16 @@ namespace Ideka.CustomCombatText
 			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
 			IEnumerable<Fragment> text2 = text;
 			RectangleF rect2 = target.Rect;
 			Point2 position2 = ((RectangleF)(ref rect2)).get_Position();
-			Rectangle absoluteBounds = target.Control.get_AbsoluteBounds();
-			Point2 val = position2 + Size2.op_Implicit(((Rectangle)(ref absoluteBounds)).get_Location());
 			rect2 = target.Rect;
-			RectangleF rect = new RectangleF(val, ((RectangleF)(ref rect2)).get_Size());
+			RectangleF rect = new RectangleF(position2, ((RectangleF)(ref rect2)).get_Size());
 			loop(delegate(Fragment frag, Vector2 position)
 			{
 				//IL_001c: Unknown result type (might be due to invalid IL or missing references)
@@ -637,43 +656,47 @@ namespace Ideka.CustomCombatText
 			}
 		}
 
-		public static List<PreFragment> PreParse(string template)
+		public static List<TemplatePreFrag> PreParse(string template)
 		{
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			PreFragment frag = new PreFragment();
-			List<PreFragment> frags = new List<PreFragment>();
+			return PreParse(template, BaseSyntax);
+		}
+
+		public static List<T> PreParse<T>(string template, Syntax<T> syntax) where T : PreFrag, new()
+		{
+			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+			T frag = new T();
+			List<T> frags = new List<T>();
 			int i = 0;
-			Color color = default(Color);
+			Color y = default(Color);
 			while (i < template.Length)
 			{
 				string sub = template.Substring(i);
-				if (sub.StartsWith("[col="))
+				if (sub.StartsWith(syntax.ColorTagOpenA))
 				{
-					int end = sub.IndexOf(']');
+					int end = sub.IndexOf(syntax.ColorTagOpenB);
 					if (end > 0)
 					{
 						finishFragment();
-						string colorString = sub.Substring(5, end - 5);
-						if (colorString == "%c")
+						string colorString = sub.Substring(syntax.ColorTagOpenA.Length, end - syntax.ColorTagOpenA.Length);
+						frag.Color = (syntax.KnownColors.TryGetValue(colorString.ToLower(), out var x) ? new Color?(x) : null) ?? (ColorUtil.TryParseHex(colorString, ref y) ? new Color?(y) : null);
+						if (syntax.SpecialColors.TryGetValue(colorString, out var f))
 						{
-							frag.IsProfessionColor = true;
-						}
-						else
-						{
-							frag.Color = (ColorUtil.TryParseHex(colorString, ref color) ? new Color?(color) : null);
+							f(colorString, frag);
 						}
 						i += end + 1;
 						continue;
 					}
 				}
-				if (sub.StartsWith("[/col]"))
+				if (sub.StartsWith(syntax.ColorTagClose))
 				{
 					finishFragment();
-					i += 6;
+					i += syntax.ColorTagClose.Length;
 				}
 				else
 				{
-					frag.Text += sub[0];
+					ref T reference = ref frag;
+					reference.Text += sub[0];
 					i++;
 				}
 			}
@@ -684,7 +707,7 @@ namespace Ideka.CustomCombatText
 				if (frag.Text != "")
 				{
 					frags.Add(frag);
-					frag = new PreFragment();
+					frag = new T();
 				}
 			}
 		}

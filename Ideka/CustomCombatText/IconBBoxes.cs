@@ -53,6 +53,21 @@ namespace Ideka.CustomCombatText
 			return null;
 		}
 
+		public async Task<Rectangle> GetIconBBoxAsync(int assetId, CancellationToken ct)
+		{
+			Rectangle? bbox;
+			while (true)
+			{
+				bbox = GetIconBBox(assetId);
+				if (bbox.HasValue)
+				{
+					break;
+				}
+				await Task.Delay(100, ct);
+			}
+			return bbox.Value;
+		}
+
 		private async Task ProcessQueue(CancellationToken ct)
 		{
 			try

@@ -4,7 +4,6 @@ using System.IO;
 using Blish_HUD;
 using Ideka.BHUDCommon;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace Ideka.CustomCombatText
 {
@@ -12,7 +11,17 @@ namespace Ideka.CustomCombatText
 	{
 		private static readonly Logger Logger = Logger.GetLogger<LocalData>();
 
-		private readonly JsonSerializerSettings _serializerSettings;
+		private readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings
+		{
+			TypeNameHandling = TypeNameHandling.None,
+			Formatting = Formatting.Indented,
+			ContractResolver = new ContractResolver(),
+			Converters = 
+			{
+				(JsonConverter)new Vector2Converter(),
+				(JsonConverter)new TimeSpanConverter()
+			}
+		};
 
 		public AreaViewBase AreaViewParent { get; } = new AreaViewBase();
 
@@ -48,7 +57,7 @@ namespace Ideka.CustomCombatText
 		public void SaveViews()
 		{
 			List<AreaModel> models = new List<AreaModel>(ViewsToModels(RootAreaViews));
-			File.WriteAllText(Path.Combine(CTextModule.BasePath, CTextModule.ViewsDataPath), JsonConvert.SerializeObject((object)models, _serializerSettings));
+			File.WriteAllText(Path.Combine(CTextModule.BasePath, CTextModule.ViewsDataPath), JsonConvert.SerializeObject(models, _serializerSettings));
 		}
 
 		private static IEnumerable<AreaView> ModelsToViews(IEnumerable<AreaModel> models)
@@ -87,25 +96,6 @@ namespace Ideka.CustomCombatText
 				}
 				yield return view.Model;
 			}
-		}
-
-		public LocalData()
-		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Expected O, but got Unknown
-			JsonSerializerSettings val = new JsonSerializerSettings();
-			val.set_TypeNameHandling((TypeNameHandling)0);
-			val.set_Formatting((Formatting)1);
-			val.set_ContractResolver((IContractResolver)(object)new ContractResolver());
-			val.get_Converters().Add((JsonConverter)(object)new Vector2Converter());
-			val.get_Converters().Add((JsonConverter)(object)new TimeSpanConverter());
-			_serializerSettings = val;
-			base._002Ector();
 		}
 	}
 }

@@ -10,7 +10,7 @@ namespace Ideka.CustomCombatText
 	{
 		private (BitmapFont font, float height)? _heightCache;
 
-		private (string template, List<TemplateParser.PreFragment> preFragments)? _preFragCache;
+		private (string template, List<TemplateParser.TemplatePreFrag> preFragments)? _preFragCache;
 
 		public string Name { get; set; } = "";
 
@@ -66,13 +66,13 @@ namespace Ideka.CustomCombatText
 		}
 
 		[JsonIgnore]
-		public IReadOnlyList<TemplateParser.PreFragment> PreFragments
+		public IReadOnlyList<TemplateParser.TemplatePreFrag> PreFragments
 		{
 			get
 			{
 				if (_preFragCache?.template != Template)
 				{
-					_preFragCache = new(string, List<TemplateParser.PreFragment>)?((Template, TemplateParser.PreParse(Template)));
+					_preFragCache = new(string, List<TemplateParser.TemplatePreFrag>)?((Template, TemplateParser.PreParse(Template)));
 				}
 				return _preFragCache.Value.preFragments;
 			}

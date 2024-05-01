@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.ArcDps;
@@ -12,6 +13,7 @@ using Blish_HUD.Graphics.UI;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
+using HsAPI;
 using Ideka.BHUDCommon;
 using Ideka.CustomCombatText.Bridge;
 using Ideka.NetCommon;
@@ -25,6 +27,10 @@ namespace Ideka.CustomCombatText
 	public class CTextModule : Module
 	{
 		private static readonly Logger Logger = Logger.GetLogger<CTextModule>();
+
+		internal static readonly Dictionary<int, Skill> HsSkills = new Dictionary<int, Skill>();
+
+		internal static readonly Dictionary<int, Palette> HsPalettes = new Dictionary<int, Palette>();
 
 		private readonly DisposableCollection _dc = new DisposableCollection();
 
@@ -48,13 +54,13 @@ namespace Ideka.CustomCombatText
 
 		private ViewControl _viewControl;
 
-		private MainPanel _mainPanel;
+		private PanelStack _panelStack;
 
 		private BridgeService _bridgeService;
 
-		private SettingsView? _settingsView;
+		private readonly FixedSizedQueue<LogEntry> _log = new FixedSizedQueue<LogEntry>(100);
 
-		public static readonly Dictionary<uint, HsSkill> HsSkills = new Dictionary<uint, HsSkill>();
+		private SettingsView? _settingsView;
 
 		private static CTextModule Instance { get; set; } = null;
 
@@ -74,6 +80,10 @@ namespace Ideka.CustomCombatText
 		internal static string TraitCachePath => Path.Combine(CachePath, "Traits.json");
 
 		internal static string SpecCachePath => Path.Combine(CachePath, "Specs.json");
+
+		internal static string HsSkillCachePath => Path.Combine(CachePath, "HsSkills.json");
+
+		internal static string HsPaletteCachePath => Path.Combine(CachePath, "HsPalettes.json");
 
 		internal static string FontPath => "Fonts";
 
@@ -101,9 +111,22 @@ namespace Ideka.CustomCombatText
 
 		internal static FontAssets FontAssets => Instance._fontAssets;
 
-		internal static AreaView? Selected => Instance._mainPanel.Selected;
+		internal static AreaView? Selected
+		{
+			get
+			{
+				AreasPanel areasPanel = Instance._panelStack.CurrentPanel as AreasPanel;
+				if (areasPanel == null || !((Control)(object)areasPanel).IsVisible())
+				{
+					return null;
+				}
+				return areasPanel.Selected;
+			}
+		}
 
-		internal static string HsSkillCachePath => Path.Combine(CachePath, "HsSkills.json");
+		internal static FixedSizedQueue<LogEntry> Log => Instance._log;
+
+		internal static event Action<LogEntry>? EntryLogged;
 
 		[ImportingConstructor]
 		public CTextModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
@@ -139,23 +162,24 @@ namespace Ideka.CustomCombatText
 		protected override async Task LoadAsync()
 		{
 			_skillData = _dc.Add(new SkillData());
-			await _skillData.StartLoad(Path.Combine(BasePath, SkillCachePath), ContentsManager, SkillCachePath);
 			_traitData = _dc.Add(new TraitData());
-			await _traitData.StartLoad(Path.Combine(BasePath, TraitCachePath), ContentsManager, TraitCachePath);
 			_specData = _dc.Add(new SpecializationData());
-			await _specData.StartLoad(Path.Combine(BasePath, SpecCachePath), ContentsManager, SpecCachePath);
-			try
+			await Task.WhenAll(_skillData.StartLoad(Path.Combine(BasePath, SkillCachePath), ContentsManager, SkillCachePath), _traitData.StartLoad(Path.Combine(BasePath, TraitCachePath), ContentsManager, TraitCachePath), _specData.StartLoad(Path.Combine(BasePath, SpecCachePath), ContentsManager, SpecCachePath), loadHsCache<Skill>(HsSkillCachePath, HsSkills, (Skill x) => x.Id), loadHsCache<Palette>(HsPaletteCachePath, HsPalettes, (Palette x) => x.Id));
+			static async Task loadHsCache<T>(string path, Dictionary<int, T> dict, Func<T, int> idGetter) where T : notnull
 			{
-				using Stream file = ContentsManager.GetFileStream(HsSkillCachePath);
-				using StreamReader reader = new StreamReader(file);
-				foreach (HsSkill skill in JsonConvert.DeserializeObject<List<HsSkill>>(await reader.ReadToEndAsync()) ?? throw new Exception("HsSkill cache load resulted in null."))
+				try
 				{
-					HsSkills[skill.Id] = skill;
+					using Stream file = ContentsManager.GetFileStream(path);
+					using StreamReader reader = new StreamReader(file);
+					foreach (T item in (JsonConvert.DeserializeObject<List<T>>(await reader.ReadToEndAsync()) ?? throw new Exception("Hs cache load resulted in null."))!)
+					{
+						dict[idGetter(item)] = item;
+					}
 				}
-			}
-			catch (Exception e)
-			{
-				Logger.Warn(e, "Exception when loading HsSkill cache.");
+				catch (Exception e)
+				{
+					Logger.Warn(e, "Exception when loading Hs cache.");
+				}
 			}
 		}
 
@@ -170,10 +194,10 @@ namespace Ideka.CustomCombatText
 			((Control)viewControl).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((Control)viewControl).set_ZIndex(50);
 			_viewControl = dc.Add<ViewControl>(viewControl);
-			_mainPanel = _dc.Add<MainPanel>(new MainPanel());
+			_panelStack = _dc.Add<PanelStack>(new PanelStack(GameService.Overlay.get_BlishHudWindow(), (PanelStack panelStack) => new AreasPanel(panelStack)));
 			LocalData.ReloadViews();
 			_bridgeService = _dc.Add(new BridgeService());
-			_bridgeService.RawCombatEvent += new EventHandler<RawCombatEventArgs>(ArcDpsEvent);
+			_bridgeService.RawCombatEvent += new BridgeService.CombatEventDelegate(ArcDpsEvent);
 		}
 
 		protected override void Update(GameTime gameTime)
@@ -185,19 +209,28 @@ namespace Ideka.CustomCombatText
 			}
 		}
 
-		private void ArcDpsEvent(object sender, RawCombatEventArgs e)
+		private void ArcDpsEvent(ArraySegment<byte> data, CombatEventType type, CombatEvent cbt)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0007: Invalid comparison between Unknown and I4
-			if ((int)e.get_EventType() != 1)
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0002: Invalid comparison between Unknown and I4
+			if ((int)type != 1)
 			{
-				Ev ev = e.get_CombatEvent().get_Ev();
+				Ev ev = cbt.get_Ev();
 				if (((ev != null) ? new byte?(ev.get_Result()) : null) != 10)
 				{
 					return;
 				}
 			}
-			foreach (Message message in Message.Interpret(e.get_CombatEvent()))
+			IEnumerable<Message> enumerable = Message.Interpret(cbt);
+			if (enumerable.Any())
+			{
+				byte[] buffer = new byte[data.Count];
+				Array.Copy(data.Array, data.Offset, buffer, 0, data.Count);
+				LogEntry entry = Message.Log(buffer);
+				_log.Enqueue(entry);
+				CTextModule.EntryLogged?.Invoke(entry);
+			}
+			foreach (Message message in enumerable)
 			{
 				_viewControl.ReceiveMessage(message);
 			}

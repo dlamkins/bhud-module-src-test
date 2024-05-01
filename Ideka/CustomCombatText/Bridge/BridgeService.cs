@@ -9,6 +9,8 @@ namespace Ideka.CustomCombatText.Bridge
 {
 	public class BridgeService : IDisposable
 	{
+		public delegate void CombatEventDelegate(ArraySegment<byte> data, CombatEventType type, CombatEvent cbt);
+
 		private static readonly Logger Logger = Logger.GetLogger<BridgeService>();
 
 		private TimeSpan _lastMessage = TimeSpan.Zero;
@@ -25,7 +27,7 @@ namespace Ideka.CustomCombatText.Bridge
 
 		public bool IsActive => GameService.Overlay.get_CurrentGameTime().get_TotalGameTime() - _lastMessage <= TimeSpan.FromSeconds(1.0);
 
-		public event EventHandler<RawCombatEventArgs>? RawCombatEvent;
+		public event CombatEventDelegate? RawCombatEvent;
 
 		public BridgeService()
 		{
@@ -86,11 +88,9 @@ namespace Ideka.CustomCombatText.Bridge
 			}
 			void triggerCombatEvent(CombatEventType eventType)
 			{
-				//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0036: Expected O, but got Unknown
+				//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 				CombatEvent message = CombatParser.ProcessCombat(segment.Array, segment.Offset + 1);
-				this.RawCombatEvent?.Invoke(this, new RawCombatEventArgs(message, eventType));
+				this.RawCombatEvent?.Invoke(segment, eventType, message);
 			}
 		}
 

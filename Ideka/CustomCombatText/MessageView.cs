@@ -14,7 +14,7 @@ namespace Ideka.CustomCombatText
 
 		private readonly BitmapFont _font;
 
-		private readonly IReadOnlyList<TemplateParser.PreFragment> _parsedTemplate;
+		private readonly IReadOnlyList<TemplateParser.TemplatePreFrag> _parsedTemplate;
 
 		private readonly List<TemplateParser.Fragment> _parsedFragments;
 
@@ -51,12 +51,12 @@ namespace Ideka.CustomCombatText
 
 		public void AddMessage(TimeSpan time, Message message)
 		{
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
 			LastTime = time;
 			if (!_messages.Any())
 			{
@@ -67,11 +67,6 @@ namespace Ideka.CustomCombatText
 			_parsedFragments.Clear();
 			foreach (TemplateParser.Fragment parsed in TemplateParser.FinalParse(_parsedTemplate, _receiver.Color, _font, message, _messages))
 			{
-				TemplateParser.StringFragment s = parsed as TemplateParser.StringFragment;
-				if (s != null && s.Text.EndsWith(" "))
-				{
-					s.Text += " ";
-				}
 				_parsedFragments.Add(parsed);
 				Size2 size = parsed.Size;
 				SizeDeltaX = SizeDelta.X + size.Width;
