@@ -69,6 +69,10 @@ namespace BhModule.Community.Pathing.Behavior
 			{
 				_packState.Module.ScriptEngine.CallFunction(FocusFunc.Name, new object[2] { _pathingEntity, true }.Concat(FocusFunc.Args));
 			}
+			if (TriggerFunc.Name != null)
+			{
+				_packState.UiStates.Interact.ShowInteract(_pathingEntity, "Will trigger a script {0}");
+			}
 		}
 
 		public void Unfocus()
@@ -77,6 +81,7 @@ namespace BhModule.Community.Pathing.Behavior
 			{
 				_packState.Module.ScriptEngine.CallFunction(FocusFunc.Name, new object[2] { _pathingEntity, false }.Concat(FocusFunc.Args));
 			}
+			_packState.UiStates.Interact.DisconnectInteract(_pathingEntity);
 		}
 
 		public void Interact(bool autoTriggered)
@@ -179,6 +184,11 @@ namespace BhModule.Community.Pathing.Behavior
 					_packState.Module.ScriptEngine.CallFunction(TickFunc.Name, new object[2] { _pathingEntity, gameTime }.Concat(TickFunc.Args));
 				}
 			}
+		}
+
+		public override void Unload()
+		{
+			_packState.UiStates.Interact.DisconnectInteract(_pathingEntity);
 		}
 	}
 }
