@@ -67,7 +67,6 @@ namespace Ideka.CustomCombatText
 				((Panel)_areasMenu).set_Title((value != null) ? ("/ " + string.Join(" / ", from x in value.GetAncestors().Reverse()
 					select x.Model.Describe)) : "Areas");
 				_opened = value;
-				Selected = value;
 			}
 		}
 
@@ -289,7 +288,7 @@ namespace Ideka.CustomCombatText
 			};
 			_areaPanel.NameChanged += delegate(AreaView target)
 			{
-				_areasMenu.UpdateName(target, Opened != null && Opened != target);
+				_areasMenu.UpdateName(target);
 			};
 			CTextModule.LocalData.ViewsReloaded += new Action(ViewsReloaded);
 		}

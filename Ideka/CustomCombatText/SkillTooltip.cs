@@ -21,11 +21,11 @@ namespace Ideka.CustomCombatText
 
 		private static readonly Color FactTextColor = new Color(170, 170, 170);
 
-		private static readonly TemplateParser.Syntax<TemplateParser.TemplatePreFrag> Syntax = new TemplateParser.Syntax<TemplateParser.TemplatePreFrag>
+		private static readonly MarkupParser.Syntax<MarkupParser.Fragment> Syntax = new MarkupParser.Syntax<MarkupParser.Fragment>
 		{
 			ColorTagOpenA = "<c=",
 			ColorTagOpenB = '>',
-			ColorTagClose = "</c>",
+			ColorTagClose = new HashSet<string> { "</c>", "<c/>" },
 			KnownColors = new Dictionary<string, Color>
 			{
 				["@abilitytype"] = new Color(255, 238, 136),
@@ -36,7 +36,7 @@ namespace Ideka.CustomCombatText
 				["@task"] = new Color(255, 255, 255),
 				["@event"] = new Color(255, 255, 255)
 			},
-			SpecialColors = new Dictionary<string, Action<string, TemplateParser.TemplatePreFrag>>()
+			SpecialColors = new Dictionary<string, Action<string, MarkupParser.Fragment>>()
 		};
 
 		private readonly List<(Label label, Image icon)> _topRightIcons = new List<(Label, Image)>();
@@ -45,11 +45,11 @@ namespace Ideka.CustomCombatText
 
 		private readonly Image _icon;
 
-		private readonly LabelEx _title;
+		private readonly MarkupLabel _title;
 
-		private readonly LabelEx _description;
+		private readonly MarkupLabel _description;
 
-		private readonly List<(Image? prefix, Image icon, Label? stacks, LabelEx text)> _facts = new List<(Image, Image, Label, LabelEx)>();
+		private readonly List<(Image? prefix, Image icon, Label? stacks, MarkupLabel text)> _facts = new List<(Image, Image, Label, MarkupLabel)>();
 
 		private readonly CancellationTokenSource _cts = new CancellationTokenSource();
 
@@ -72,42 +72,42 @@ namespace Ideka.CustomCombatText
 
 		public SkillTooltip(SkillTooltipData data)
 		{
-			//IL_0187: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0193: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0188: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d6: Expected O, but got Unknown
-			//IL_01dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0217: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0227: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023a: Expected O, but got Unknown
-			//IL_029d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0353: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0367: Unknown result type (might be due to invalid IL or missing references)
-			//IL_036f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0377: Unknown result type (might be due to invalid IL or missing references)
-			//IL_037c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0383: Unknown result type (might be due to invalid IL or missing references)
-			//IL_039e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0422: Unknown result type (might be due to invalid IL or missing references)
-			//IL_043c: Expected O, but got Unknown
+			//IL_0195: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d7: Expected O, but got Unknown
+			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0218: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0220: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0228: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023b: Expected O, but got Unknown
+			//IL_029e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0354: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0368: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0370: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0378: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0384: Unknown result type (might be due to invalid IL or missing references)
+			//IL_039f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0423: Unknown result type (might be due to invalid IL or missing references)
+			//IL_043d: Expected O, but got Unknown
 			SkillTooltipData data2 = data;
 			((Container)this)._002Ector();
 			SkillTooltip skillTooltip = this;
@@ -169,26 +169,26 @@ namespace Ideka.CustomCombatText
 					icon.set_SourceRectangle(await CTextModule.IconBBoxes.GetIconBBoxAsync(data2.IconId.Value, skillTooltip._cts.Token));
 				})();
 			}
-			LabelEx labelEx = new LabelEx(Syntax);
-			((Control)labelEx).set_Parent((Container)(object)this);
-			labelEx.RawText = data2.Title;
-			labelEx.ShowShadow = true;
-			labelEx.BaseColor = TitleColor;
-			labelEx.Font = TitleFont;
-			_title = labelEx;
-			LabelEx labelEx2 = new LabelEx(Syntax);
-			((Control)labelEx2).set_Parent((Container)(object)this);
-			labelEx2.RawText = data2.Description;
-			labelEx2.ShowShadow = true;
-			labelEx2.Font = BasicFont;
-			_description = labelEx2;
+			MarkupLabel markupLabel = new MarkupLabel(Syntax);
+			((Control)markupLabel).set_Parent((Container)(object)this);
+			markupLabel.RawText = data2.Title;
+			markupLabel.ShowShadow = true;
+			markupLabel.BaseColor = TitleColor;
+			markupLabel.Font = TitleFont;
+			_title = markupLabel;
+			MarkupLabel markupLabel2 = new MarkupLabel(Syntax);
+			((Control)markupLabel2).set_Parent((Container)(object)this);
+			markupLabel2.RawText = data2.Description;
+			markupLabel2.ShowShadow = true;
+			markupLabel2.Font = BasicFont;
+			_description = markupLabel2;
 			using (List<BlockTooltipData>.Enumerator enumerator = data2.Blocks.GetEnumerator())
 			{
 				if (enumerator.MoveNext())
 				{
 					foreach (FactTooltipData fact in enumerator.Current.Facts)
 					{
-						List<(Image? prefix, Image icon, Label? stacks, LabelEx text)> facts = _facts;
+						List<(Image? prefix, Image icon, Label? stacks, MarkupLabel text)> facts = _facts;
 						recharge2 = fact.PrefixIconId;
 						object item;
 						if (recharge2.HasValue)
@@ -225,13 +225,13 @@ namespace Ideka.CustomCombatText
 							val5.set_AutoSizeHeight(true);
 							val5.set_AutoSizeWidth(true);
 						}
-						LabelEx labelEx3 = new LabelEx(Syntax);
-						((Control)labelEx3).set_Parent((Container)(object)this);
-						labelEx3.RawText = fact.Text;
-						labelEx3.ShowShadow = true;
-						labelEx3.BaseColor = FactTextColor;
-						labelEx3.Font = BasicFont;
-						facts.Add(((Image)item, val4, (Label)item2, labelEx3));
+						MarkupLabel markupLabel3 = new MarkupLabel(Syntax);
+						((Control)markupLabel3).set_Parent((Container)(object)this);
+						markupLabel3.RawText = fact.Text;
+						markupLabel3.ShowShadow = true;
+						markupLabel3.BaseColor = FactTextColor;
+						markupLabel3.Font = BasicFont;
+						facts.Add(((Image)item, val4, (Label)item2, markupLabel3));
 					}
 				}
 			}
@@ -296,7 +296,7 @@ namespace Ideka.CustomCombatText
 			((Control)_iconContainer).set_Top(0);
 			((Control)_title).set_Left(((Control)_iconContainer).get_Visible() ? (((Control)_iconContainer).get_Right() + 5) : 3);
 			((Control)_title).set_Top(4);
-			LabelEx title = _title;
+			MarkupLabel title = _title;
 			Label item = _topRightIcons.LastOrDefault().label;
 			((Control)title).set_Width(((item != null) ? ((Control)item).get_Left() : ((Container)this).get_ContentRegion().Width) - ((Control)_title).get_Left());
 			if (((Control)_iconContainer).get_Visible())

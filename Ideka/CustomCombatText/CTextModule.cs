@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.ArcDps;
@@ -28,10 +29,6 @@ namespace Ideka.CustomCombatText
 	{
 		private static readonly Logger Logger = Logger.GetLogger<CTextModule>();
 
-		internal static readonly Dictionary<int, Skill> HsSkills = new Dictionary<int, Skill>();
-
-		internal static readonly Dictionary<int, Palette> HsPalettes = new Dictionary<int, Palette>();
-
 		private readonly DisposableCollection _dc = new DisposableCollection();
 
 		private ModuleSettings _settings;
@@ -43,6 +40,10 @@ namespace Ideka.CustomCombatText
 		private TraitData _traitData;
 
 		private SpecializationData _specData;
+
+		private readonly Dictionary<int, Skill> _hsSkills = new Dictionary<int, Skill>();
+
+		private readonly Dictionary<int, Palette> _hsPalettes = new Dictionary<int, Palette>();
 
 		private ConfirmationModal _confirmationModal;
 
@@ -56,9 +57,9 @@ namespace Ideka.CustomCombatText
 
 		private PanelStack _panelStack;
 
-		private BridgeService _bridgeService;
+		private readonly FixedSizedQueue<LogEntry> _log = new FixedSizedQueue<LogEntry>();
 
-		private readonly FixedSizedQueue<LogEntry> _log = new FixedSizedQueue<LogEntry>(100);
+		private BridgeService _bridgeService;
 
 		private SettingsView? _settingsView;
 
@@ -102,6 +103,10 @@ namespace Ideka.CustomCombatText
 		internal static TraitData TraitData => Instance._traitData;
 
 		internal static SpecializationData SpecData => Instance._specData;
+
+		internal static IReadOnlyDictionary<int, Skill> HsSkills => Instance._hsSkills;
+
+		internal static IReadOnlyDictionary<int, Palette> HsPalettes => Instance._hsPalettes;
 
 		internal static ConfirmationModal ConfirmationModal => Instance._confirmationModal;
 
@@ -159,19 +164,28 @@ namespace Ideka.CustomCombatText
 			_style = _dc.Add(new StyleSettings(settings));
 		}
 
-		protected override async Task LoadAsync()
+		protected override void Initialize()
 		{
+			((Module)this).Initialize();
+			CancellationTokenSource cts = new CancellationTokenSource();
+			_dc.Add(new WhenDisposed(new Action(cts.Cancel)));
 			_skillData = _dc.Add(new SkillData());
 			_traitData = _dc.Add(new TraitData());
 			_specData = _dc.Add(new SpecializationData());
-			await Task.WhenAll(_skillData.StartLoad(Path.Combine(BasePath, SkillCachePath), ContentsManager, SkillCachePath), _traitData.StartLoad(Path.Combine(BasePath, TraitCachePath), ContentsManager, TraitCachePath), _specData.StartLoad(Path.Combine(BasePath, SpecCachePath), ContentsManager, SpecCachePath), loadHsCache<Skill>(HsSkillCachePath, HsSkills, (Skill x) => x.Id), loadHsCache<Palette>(HsPaletteCachePath, HsPalettes, (Palette x) => x.Id));
-			static async Task loadHsCache<T>(string path, Dictionary<int, T> dict, Func<T, int> idGetter) where T : notnull
+			Task.Run(async delegate
+			{
+				await Task.WhenAll(_skillData.StartLoad(Path.Combine(BasePath, SkillCachePath), ContentsManager, SkillCachePath, cts.Token), _traitData.StartLoad(Path.Combine(BasePath, TraitCachePath), ContentsManager, TraitCachePath, cts.Token), _specData.StartLoad(Path.Combine(BasePath, SpecCachePath), ContentsManager, SpecCachePath, cts.Token), loadHsCache<Skill>(HsSkillCachePath, _hsSkills, (Skill x) => x.Id, cts.Token), loadHsCache<Palette>(HsPaletteCachePath, _hsPalettes, (Palette x) => x.Id, cts.Token));
+			}, cts.Token);
+			static async Task loadHsCache<T>(string path, Dictionary<int, T> dict, Func<T, int> idGetter, CancellationToken ct) where T : notnull
 			{
 				try
 				{
 					using Stream file = ContentsManager.GetFileStream(path);
 					using StreamReader reader = new StreamReader(file);
-					foreach (T item in (JsonConvert.DeserializeObject<List<T>>(await reader.ReadToEndAsync()) ?? throw new Exception("Hs cache load resulted in null."))!)
+					List<T>? obj = JsonConvert.DeserializeObject<List<T>>(await reader.ReadToEndAsync()) ?? throw new Exception("Hs cache load resulted in null.");
+					ct.ThrowIfCancellationRequested();
+					dict.Clear();
+					foreach (T item in obj!)
 					{
 						dict[idGetter(item)] = item;
 					}
@@ -194,8 +208,12 @@ namespace Ideka.CustomCombatText
 			((Control)viewControl).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((Control)viewControl).set_ZIndex(50);
 			_viewControl = dc.Add<ViewControl>(viewControl);
-			_panelStack = _dc.Add<PanelStack>(new PanelStack(GameService.Overlay.get_BlishHudWindow(), (PanelStack panelStack) => new AreasPanel(panelStack)));
+			_panelStack = _dc.Add<PanelStack>(new PanelStack(GameService.Overlay.get_BlishHudWindow(), Name.GetHashCode(), (PanelStack panelStack) => new AreasPanel(panelStack)));
 			LocalData.ReloadViews();
+			_dc.Add(_settings.MessageLogLength.OnChangedAndNow(delegate(int x)
+			{
+				_log.Size = x;
+			}));
 			_bridgeService = _dc.Add(new BridgeService());
 			_bridgeService.RawCombatEvent += new BridgeService.CombatEventDelegate(ArcDpsEvent);
 		}
@@ -221,12 +239,12 @@ namespace Ideka.CustomCombatText
 					return;
 				}
 			}
-			IEnumerable<Message> enumerable = Message.Interpret(cbt);
+			IEnumerable<Message> enumerable = MessageContext.Interpret(cbt);
 			if (enumerable.Any())
 			{
 				byte[] buffer = new byte[data.Count];
 				Array.Copy(data.Array, data.Offset, buffer, 0, data.Count);
-				LogEntry entry = Message.Log(buffer);
+				LogEntry entry = MessageContext.Log(buffer);
 				_log.Enqueue(entry);
 				CTextModule.EntryLogged?.Invoke(entry);
 			}

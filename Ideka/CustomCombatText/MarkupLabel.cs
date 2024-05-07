@@ -10,7 +10,7 @@ using MonoGame.Extended.BitmapFonts;
 
 namespace Ideka.CustomCombatText
 {
-	public class LabelEx : Control
+	public class MarkupLabel : Control
 	{
 		private class Fragment
 		{
@@ -22,13 +22,15 @@ namespace Ideka.CustomCombatText
 			public Color? Color { get; set; }
 		}
 
+		private static readonly Point ShadowDistance = new Point(1, 1);
+
 		private string _rawText = "";
 
 		public BitmapFont _font = Control.get_Content().get_DefaultFont16();
 
 		private bool _showShadow;
 
-		private readonly TemplateParser.Syntax<TemplateParser.TemplatePreFrag> _syntax;
+		private readonly MarkupParser.Syntax<MarkupParser.Fragment> _syntax;
 
 		private List<Fragment>? _final;
 
@@ -77,7 +79,7 @@ namespace Ideka.CustomCombatText
 		public Color ShadowColor { get; set; } = Color.get_Black();
 
 
-		public LabelEx(TemplateParser.Syntax<TemplateParser.TemplatePreFrag> syntax)
+		public MarkupLabel(MarkupParser.Syntax<MarkupParser.Fragment> syntax)
 		{
 			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
@@ -89,43 +91,38 @@ namespace Ideka.CustomCombatText
 
 		public override void RecalculateLayout()
 		{
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0155: Unknown result type (might be due to invalid IL or missing references)
 			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0167: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0171: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0248: Unknown result type (might be due to invalid IL or missing references)
-			int widthLimit = ((Control)this).get_Width() - (ShowShadow ? 1 : 0);
+			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0236: Unknown result type (might be due to invalid IL or missing references)
+			int widthLimit = ((Control)this).get_Width() - (ShowShadow ? ShadowDistance.X : 0);
 			_final = new List<Fragment>();
-			float spaceWidth = Font.MeasureString(" ").Width;
-			if (spaceWidth == 0f)
-			{
-				spaceWidth = Font.MeasureString("  ").Width;
-			}
+			float spaceWidth = Font.MeasureStringFixed(" ").Width;
 			Point2 pos = Point2.Zero;
 			StringBuilder sb = new StringBuilder();
 			Fragment last = new Fragment
 			{
 				Point = pos
 			};
-			TemplateParser.TemplatePreFrag lastFrag = null;
-			foreach (TemplateParser.TemplatePreFrag pFrag in TemplateParser.PreParse(RawText, _syntax))
+			MarkupParser.Fragment lastFrag = null;
+			foreach (MarkupParser.Fragment frag in MarkupParser.Parse(RawText, _syntax))
 			{
-				string[] array = pFrag.Text.Split('\n');
+				string[] array = frag.Text.Split('\n');
 				foreach (string line in array)
 				{
-					if (lastFrag == pFrag)
+					if (lastFrag == frag)
 					{
 						pos.X = 0f;
 						pos.Y += Font.get_LineHeight();
 					}
-					lastFrag = pFrag;
-					finishFragment(pFrag.Color);
+					lastFrag = frag;
+					finishFragment(frag.Color);
 					if (string.IsNullOrWhiteSpace(line))
 					{
 						continue;
@@ -135,22 +132,22 @@ namespace Ideka.CustomCombatText
 					{
 						if (!string.IsNullOrWhiteSpace(word))
 						{
-							Size2 wordSize = Font.MeasureString(word);
+							Size2 wordSize = Font.MeasureStringFixed(word);
 							if (pos.X + wordSize.Width > (float)widthLimit)
 							{
 								pos.Y += Font.get_LineHeight();
 								pos.X = 0f;
-								finishFragment(pFrag.Color);
+								finishFragment(frag.Color);
 							}
 							sb.Append(word + " ");
 							pos.X += wordSize.Width + spaceWidth;
 						}
 					}
-					finishFragment(pFrag.Color);
+					finishFragment(frag.Color);
 				}
-				finishFragment(pFrag.Color);
+				finishFragment(frag.Color);
 			}
-			((Control)this).set_Height((int)Math.Ceiling(pos.Y + (float)Font.get_LineHeight() + (float)(ShowShadow ? 1 : 0)));
+			((Control)this).set_Height((int)Math.Ceiling(pos.Y + (float)Font.get_LineHeight() + (float)(ShowShadow ? ShadowDistance.Y : 0)));
 			void finishFragment(Color? color)
 			{
 				//IL_0059: Unknown result type (might be due to invalid IL or missing references)
@@ -171,15 +168,16 @@ namespace Ideka.CustomCombatText
 		private void DrawText(SpriteBatch spriteBatch, Rectangle bounds, string text, Color color)
 		{
 			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 			if (!string.IsNullOrEmpty(text))
 			{
 				if (ShowShadow)
 				{
-					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, Font, RectangleExtension.OffsetBy(bounds, 1, 1), ShadowColor, false, false, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, Font, RectangleExtension.OffsetBy(bounds, ShadowDistance), ShadowColor, false, false, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
 				}
 				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, Font, bounds, color, false, false, 1, (HorizontalAlignment)0, (VerticalAlignment)0);
 			}

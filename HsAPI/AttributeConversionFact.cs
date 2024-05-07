@@ -9,10 +9,10 @@ namespace HsAPI
 		public override FactType Type { get; } = FactType.AttributeConversion;
 
 
-		public BaseAttribute Source { get; }
+		public BaseAttribute Source { get; init; }
 
-		public BaseAttribute Target { get; }
+		public BaseAttribute Target { get; init; }
 
-		public float Percent { get; }
+		public float Percent { get; init; }
 	}
 }

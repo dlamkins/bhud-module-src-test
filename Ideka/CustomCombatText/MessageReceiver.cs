@@ -8,9 +8,7 @@ namespace Ideka.CustomCombatText
 {
 	public class MessageReceiver
 	{
-		private (BitmapFont font, float height)? _heightCache;
-
-		private (string template, List<TemplateParser.TemplatePreFrag> preFragments)? _preFragCache;
+		private (string template, List<TemplateParser.MarkupFragment> preFragments)? _markupCache;
 
 		public string Name { get; set; } = "";
 
@@ -52,29 +50,15 @@ namespace Ideka.CustomCombatText
 		public BitmapFont Font => CTextModule.FontAssets.Get(FontName, FontSize);
 
 		[JsonIgnore]
-		public float Height
+		public IReadOnlyList<TemplateParser.MarkupFragment> MarkupFrags
 		{
 			get
 			{
-				//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-				if (_heightCache?.font != Font)
+				if (_markupCache?.template != Template)
 				{
-					_heightCache = new(BitmapFont, float)?((Font, Font.MeasureString(" ").Height));
+					_markupCache = new(string, List<TemplateParser.MarkupFragment>)?((Template, TemplateParser.ParseMarkup(Template)));
 				}
-				return _heightCache.Value.height;
-			}
-		}
-
-		[JsonIgnore]
-		public IReadOnlyList<TemplateParser.TemplatePreFrag> PreFragments
-		{
-			get
-			{
-				if (_preFragCache?.template != Template)
-				{
-					_preFragCache = new(string, List<TemplateParser.TemplatePreFrag>)?((Template, TemplateParser.PreParse(Template)));
-				}
-				return _preFragCache.Value.preFragments;
+				return _markupCache.Value.preFragments;
 			}
 		}
 

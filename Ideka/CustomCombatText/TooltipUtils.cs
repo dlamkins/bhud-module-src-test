@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
+using Gw2Sharp.WebApi.V2.Models;
 using HsAPI;
 using Ideka.NetCommon;
 using Newtonsoft.Json;
@@ -10,55 +12,59 @@ namespace Ideka.CustomCombatText
 {
 	public static class TooltipUtils
 	{
-		public static string FormatRound(float value)
+		private static readonly Regex PluralRegex = new Regex("(\\S+)\\[pl:\"(.+?)\"]");
+
+		private static readonly Regex GenderRegex = new Regex("(\\S+)\\[f:\"(.+?)\"]");
+
+		public static string FormatRound(double value)
 		{
 			return $"{value:#,##0}";
 		}
 
-		public static string FormatN3(float value)
+		public static string FormatN3(double value)
 		{
 			return $"{value:#,##0.###}";
 		}
 
-		public static string FormatN3S(float value)
+		public static string FormatN3S(double value)
 		{
-			return ((value >= 0f) ? "+" : "") + FormatN3(value);
+			return ((value >= 0.0) ? "+" : "") + FormatN3(value);
 		}
 
-		public static string FormatFraction(float value)
+		public static string FormatFraction(double value)
 		{
-			if (value == 0f)
+			if (value == 0.0)
 			{
 				return "0";
 			}
-			string sign = ((value < 0f) ? "-" : "");
+			string sign = ((value < 0.0) ? "-" : "");
 			value = Math.Abs(value);
-			(float, string) tuple;
-			switch ((int)Math.Round(value % 1f * 4f))
+			(double, string) tuple;
+			switch ((int)Math.Round(value % 1.0 * 4.0))
 			{
 			case 0:
-				if (value % 1f == 0f)
+				if (value % 1.0 == 0.0)
 				{
 					tuple = (value, "");
 					break;
 				}
 				goto case 1;
 			case 1:
-				tuple = ((float)Math.Floor(value), "¼");
+				tuple = (Math.Floor(value), "¼");
 				break;
 			case 2:
-				tuple = ((float)Math.Floor(value), "½");
+				tuple = (Math.Floor(value), "½");
 				break;
 			case 3:
-				tuple = ((float)Math.Floor(value), "¾");
+				tuple = (Math.Floor(value), "¾");
 				break;
 			default:
-				tuple = ((float)Math.Ceiling(value), "");
+				tuple = (Math.Ceiling(value), "");
 				break;
 			}
 			string fraction;
 			(value, fraction) = tuple;
-			return string.Format("{0}{1}{2}", sign, (value > 0f) ? ((object)value) : "", fraction);
+			return string.Format("{0}{1}{2}", sign, (value > 0.0) ? ((object)value) : "", fraction);
 		}
 
 		public static string? FormatText(string? text, params string[] args)
@@ -94,9 +100,14 @@ namespace Ideka.CustomCombatText
 			return FormatFraction(x / 3600f) + "h";
 		}
 
-		public static string ResolveInflections(string text, int count = 1)
+		public static string ResolveInflections(string text, Gender gender, int count = 1)
 		{
-			return text.Replace("[s]", (count > 1) ? "s" : "");
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0042: Invalid comparison between Unknown and I4
+			text = text.Replace("[s]", (count > 1) ? "s" : "");
+			text = PluralRegex.Replace(text, (count > 1) ? "$2" : "$1");
+			text = GenderRegex.Replace(text, ((int)gender == 2) ? "$2" : "$1");
+			return text;
 		}
 
 		public static Skill ResolveOverrides(Skill skill, TooltipContext context)

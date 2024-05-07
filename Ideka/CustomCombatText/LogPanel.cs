@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
@@ -16,6 +16,12 @@ namespace Ideka.CustomCombatText
 
 		private const string DefaultTemplate = "%i %s [%v ][%b ][%r ]%m %f %o %t";
 
+		private bool _uniqueSkills;
+
+		private bool _incoming = true;
+
+		private bool _outgoing = true;
+
 		private readonly PanelStack _panelStack;
 
 		private readonly StandardButton _backButton;
@@ -27,6 +33,8 @@ namespace Ideka.CustomCombatText
 		private readonly BoolBox _stickToBottomBox;
 
 		private readonly BoolBox _debugTooltipsBox;
+
+		private readonly GlowButton _filterButton;
 
 		private readonly MessagesMenu _messagesMenu;
 
@@ -40,14 +48,19 @@ namespace Ideka.CustomCombatText
 		public LogPanel(PanelStack panelStack)
 			: this()
 		{
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Expected O, but got Unknown
-			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Expected O, but got Unknown
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Expected O, but got Unknown
+			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0098: Expected O, but got Unknown
+			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011d: Expected O, but got Unknown
 			_panelStack = panelStack;
 			StandardButton val = new StandardButton();
 			((Control)val).set_Parent((Container)(object)this);
@@ -74,6 +87,11 @@ namespace Ideka.CustomCombatText
 			boolBox2.Value = false;
 			boolBox2.AllBasicTooltipText = "Enable to show debug information when hovering over events, instead of skill tooltips.";
 			_debugTooltipsBox = boolBox2;
+			GlowButton val3 = new GlowButton();
+			((Control)val3).set_Parent((Container)(object)this);
+			val3.set_Icon(AsyncTexture2D.FromAssetId(157109));
+			val3.set_ActiveIcon(AsyncTexture2D.FromAssetId(157110));
+			_filterButton = val3;
 			MessagesMenu messagesMenu = new MessagesMenu();
 			((Control)messagesMenu).set_Parent((Container)(object)this);
 			((Panel)messagesMenu).set_CanScroll(true);
@@ -107,12 +125,54 @@ namespace Ideka.CustomCombatText
 				_messagesMenu.DebugTooltips = value;
 			};
 			_messagesMenu.Template = _templateBox.Value;
-			Task.Run(delegate
-			{
-				_messagesMenu.Repopulate(CTextModule.Log);
-				_messagesMenu.SetScroll(1f);
-			});
+			_messagesMenu.Repopulate(CTextModule.Log);
+			_messagesMenu.SetScroll(1f);
 			CTextModule.EntryLogged += new Action<LogEntry>(EntryLogged);
+			((Control)_filterButton).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+				new ContextMenuStrip((Func<IEnumerable<ContextMenuStripItem>>)build).Show((Control)(object)_filterButton);
+				IEnumerable<ContextMenuStripItem> build()
+				{
+					yield return forBool("Unique skills only", () => _uniqueSkills, delegate(bool value)
+					{
+						_uniqueSkills = value;
+						_messagesMenu.Refresh();
+					});
+					yield return forBool("Show incoming", () => _incoming, delegate(bool value)
+					{
+						_incoming = value;
+						_messagesMenu.Refresh();
+					});
+					yield return forBool("Show outgoing", () => _outgoing, delegate(bool value)
+					{
+						_outgoing = value;
+						_messagesMenu.Refresh();
+					});
+					static ContextMenuStripItem forBool(string text, Func<bool> get, Action<bool> set)
+					{
+						//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+						//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+						//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+						//IL_002c: Expected O, but got Unknown
+						Action<bool> set2 = set;
+						ContextMenuStripItem val4 = new ContextMenuStripItem(text);
+						val4.set_CanCheck(true);
+						val4.set_Checked(get());
+						ContextMenuStripItem item = val4;
+						item.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+						{
+							set2(item.get_Checked());
+						});
+						return item;
+					}
+				}
+			});
+			_messagesMenu.Filter = delegate(IEnumerable<MessagesMenu.MessageKey> list)
+			{
+				HashSet<uint> skills = new HashSet<uint>();
+				return list.Where((MessagesMenu.MessageKey x) => (!_uniqueSkills || skills.Add(x.Message.Ev.get_SkillId())) && (_incoming || !x.Message.IsIn) && (_outgoing || !x.Message.IsOut));
+			};
 		}
 
 		private void EntryLogged(LogEntry entry)
@@ -123,12 +183,12 @@ namespace Ideka.CustomCombatText
 				if ((scrollbar != null && scrollbar!.get_ScrollDistance() == 1f) || !_messagesMenu.HasScrollbar())
 				{
 					_messagesMenu.SetScroll(1f);
-					goto IL_0054;
+					goto IL_0056;
 				}
 			}
 			_messagesMenu.SaveScroll();
-			goto IL_0054;
-			IL_0054:
+			goto IL_0056;
+			IL_0056:
 			_messagesMenu.PushEntry(entry);
 		}
 
@@ -151,6 +211,10 @@ namespace Ideka.CustomCombatText
 				((Control)(object)_templateBox).MiddleWith((Control)(object)_backButton);
 				((Control)(object)_stickToBottomBox).MiddleWith((Control)(object)_backButton);
 				((Control)(object)_debugTooltipsBox).MiddleWith((Control)(object)_backButton);
+				((Control)(object)_filterButton).MiddleWith((Control)(object)_backButton);
+				((Control)(object)_filterButton).AlignRight();
+				GlowButton filterButton = _filterButton;
+				((Control)filterButton).set_Left(((Control)filterButton).get_Left() - 10);
 				((Control)(object)_backButton).ArrangeTopDown(10, (Control)_messagesMenu);
 				((Control)(object)_messagesMenu).WidthFillRight(10);
 				((Control)(object)_messagesMenu).HeightFillDown(10);

@@ -31,6 +31,8 @@ namespace Ideka.CustomCombatText
 
 		public GenericSetting<bool> MasterToPetIsSelf { get; }
 
+		public GenericSetting<int> MessageLogLength { get; }
+
 		public GenericSetting<bool> Debug { get; }
 
 		public ModuleSettings(SettingCollection settings)
@@ -46,6 +48,7 @@ namespace Ideka.CustomCombatText
 			MultiIconMessages = _dc.Add(settings.Generic("MultiIconMessages", defaultValue: true, () => Strings.SettingMultiIconMessages, () => Strings.SettingMultiIconMessagesText));
 			PetToMasterIsSelf = _dc.Add(settings.Generic("PetToMasterIsSelf", defaultValue: true, () => Strings.SettingPetToMasterIsSelf, () => Strings.SettingPetToMasterIsSelfText));
 			MasterToPetIsSelf = _dc.Add(settings.Generic("MasterToPetIsSelf", defaultValue: true, () => Strings.SettingMasterToPetIsSelf, () => Strings.SettingMasterToPetIsSelfText));
+			MessageLogLength = _dc.Add(settings.Slider("MessageLogLength", 100, 0, 1000, () => "Message Log Length", () => "Number of messages to log."));
 			Debug = _dc.Add(settings.Generic("Debug", defaultValue: false, () => Strings.SettingDebug, () => Strings.SettingDebugText));
 		}
 

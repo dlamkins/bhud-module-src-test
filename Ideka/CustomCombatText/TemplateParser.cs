@@ -17,6 +17,11 @@ namespace Ideka.CustomCombatText
 {
 	public static class TemplateParser
 	{
+		public class MarkupFragment : MarkupParser.Fragment
+		{
+			public bool IsProfessionColor { get; set; }
+		}
+
 		public abstract class Fragment
 		{
 			public abstract Size2 Size { get; }
@@ -43,7 +48,7 @@ namespace Ideka.CustomCombatText
 					//IL_0085: Unknown result type (might be due to invalid IL or missing references)
 					if (_cache?.font != Font || _cache?.text != Text)
 					{
-						_cache = new(BitmapFont, string, Size2)?((Font, Text, Font.MeasureString(Text)));
+						_cache = new(BitmapFont, string, Size2)?((Font, Text, Font.MeasureStringFixed(Text)));
 					}
 					return _cache.Value.size;
 				}
@@ -227,45 +232,24 @@ namespace Ideka.CustomCombatText
 			}
 		}
 
-		public class PreFrag
-		{
-			public string Text { get; set; } = "";
-
-
-			public Color? Color { get; set; }
-		}
-
-		public class TemplatePreFrag : PreFrag
-		{
-			public bool IsProfessionColor { get; set; }
-		}
-
-		public readonly struct Syntax<T> where T : PreFrag
-		{
-			public string ColorTagOpenA { get; init; }
-
-			public char ColorTagOpenB { get; init; }
-
-			public string ColorTagClose { get; init; }
-
-			public Dictionary<string, Color> KnownColors { get; init; }
-
-			public Dictionary<string, Action<string, T>> SpecialColors { get; init; }
-		}
-
 		public const string Help = "Templates:\n%i - skill icon\n%v - damage taken/damage healed/barrier applied\n%b - barrier damage taken\n%r - result's associated text, if any (e.g. block, invuln)\n%f - message source\n%t - message target\n%s - skill name\n%n - number of messages (for combined messages)\n%m - mesage source elite spec icon\n%o - mesage target elite spec icon\n\n[col=XXXXXX][/col] tags can be used to override default colors.\n%c can be used in [col] tags to use the source profession's color.\nSquare brackets can be used around templates (e.g. [%b]) to mark them as \"optional\". The content of the brackets will only be shown if the template within is relevant to the current message.\nOptional brackets must contain exactly one template.\n[col] tags only work outside optional brackets (but can have optional brackets inside).";
 
-		private static readonly Syntax<TemplatePreFrag> BaseSyntax = new Syntax<TemplatePreFrag>
+		private static readonly MarkupParser.Syntax<MarkupFragment> BaseSyntax = new MarkupParser.Syntax<MarkupFragment>
 		{
 			ColorTagOpenA = "[col=",
 			ColorTagOpenB = ']',
-			ColorTagClose = "[/col]",
+			ColorTagClose = new HashSet<string> { "[/col]" },
 			KnownColors = new Dictionary<string, Color>(),
-			SpecialColors = new Dictionary<string, Action<string, TemplatePreFrag>> { ["%c"] = delegate(string _, TemplatePreFrag frag)
+			SpecialColors = new Dictionary<string, Action<string, MarkupFragment>> { ["%c"] = delegate(string _, MarkupFragment frag)
 			{
 				frag.IsProfessionColor = true;
 			} }
 		};
+
+		public static List<MarkupFragment> ParseMarkup(string template)
+		{
+			return MarkupParser.Parse(template, BaseSyntax);
+		}
 
 		private static (int id, bool knownElite)? GetProfIcon(ProfessionType prof, uint eliteId)
 		{
@@ -359,7 +343,7 @@ namespace Ideka.CustomCombatText
 			return format;
 		}
 
-		public static IEnumerable<Fragment> FinalParse(IEnumerable<TemplatePreFrag> pFrags, Color? receiverColor, BitmapFont font, Message lastMessage, IReadOnlyList<Message> allMessages)
+		public static IEnumerable<Fragment> FinalParse(IEnumerable<MarkupFragment> markupFrags, Color? receiverColor, BitmapFont font, Message lastMessage, IReadOnlyList<Message> allMessages)
 		{
 			BitmapFont font2 = font;
 			List<List<Message>> resultGroups;
@@ -397,7 +381,6 @@ namespace Ideka.CustomCombatText
 			(ProfessionType, uint) srcSpec = ((ProfessionType)(byte)groups4[0][0].Src.get_Profession(), groups4[0][0].Src.get_Elite());
 			byGroup<(uint, uint), object>(allMessages, (Message x) => (x.Dst.get_Profession(), x.Dst.get_Elite()), new Dictionary<(uint, uint), object>(), out var groups5, out value4);
 			(ProfessionType, uint) dstSpec = ((ProfessionType)(byte)groups5[0][0].Dst.get_Profession(), groups5[0][0].Dst.get_Elite());
-			float height = font2.MeasureString(" ").Height;
 			Dictionary<string, (List<Fragment> result, bool isSignificant)> templates = new Dictionary<string, (List<Fragment>, bool)>();
 			int value3 = allMessages.Sum((Message x) => x.Value);
 			templates["%v"] = (new List<Fragment>(1) { newString($"{value3:N0}", resultFormat?.Color) }, value3 != 0 || allMessages.Any((Message x) => x.LandedDamage));
@@ -415,12 +398,12 @@ namespace Ideka.CustomCombatText
 			});
 			templates["%n"] = ((from x in parts.Skip(1)
 				select newString(x.text, x.color)).Cast<Fragment>().ToList(), allMessages.Skip(1).Any());
-			MultiIconFragment mi = new MultiIconFragment(height)
+			MultiIconFragment mi = new MultiIconFragment(font2.get_LineHeight())
 			{
 				Inner = allMessages.DistinctBy((Message x) => x.SkillId).Select(delegate(Message message)
 				{
 					AsyncTexture2D icon3 = ((!message.SkillIconId.HasValue) ? null : AsyncTexture2D.FromAssetId(message.SkillIconId.Value));
-					return new IconFragment(height)
+					return new IconFragment(font2.get_LineHeight())
 					{
 						Icon = icon3,
 						Autocropped = true,
@@ -435,10 +418,10 @@ namespace Ideka.CustomCombatText
 			}));
 			templates["%m"] = agentIcon(allMessages.Select((Message x) => x.Src), srcSpec);
 			templates["%o"] = agentIcon(allMessages.Select((Message x) => x.Dst), dstSpec);
-			foreach (TemplatePreFrag pFrag2 in pFrags)
+			foreach (MarkupFragment markupFrag in markupFrags)
 			{
-				TemplatePreFrag pFrag = pFrag2;
-				Color? fragColor = (pFrag.IsProfessionColor ? new Color?(srcProfColor) : pFrag.Color);
+				MarkupFragment mFrag = markupFrag;
+				Color? fragColor = (mFrag.IsProfessionColor ? new Color?(srcProfColor) : mFrag.Color);
 				foreach (Fragment frag in process())
 				{
 					StringFragment str = frag as StringFragment;
@@ -447,10 +430,6 @@ namespace Ideka.CustomCombatText
 						if (str.Text == "")
 						{
 							continue;
-						}
-						if (str.Text.EndsWith(" "))
-						{
-							str.Text += " ";
 						}
 						str.Color = (Color)(((_003F?)fragColor) ?? str.Color);
 					}
@@ -461,21 +440,21 @@ namespace Ideka.CustomCombatText
 					StringFragment frag2 = newString();
 					int optionStart = -1;
 					int templateStart = -1;
-					for (int i = 0; i < pFrag.Text.Length; i++)
+					for (int i = 0; i < mFrag.Text.Length; i++)
 					{
-						char chr = pFrag.Text[i];
-						if (chr == ']' && optionStart >= 0 && templateStart > 0 && templates.TryGetValue(pFrag.Text.Substring(templateStart, 2), out var template))
+						char chr = mFrag.Text[i];
+						if (chr == ']' && optionStart >= 0 && templateStart > 0 && templates.TryGetValue(mFrag.Text.Substring(templateStart, 2), out var template))
 						{
 							if (template.isSignificant)
 							{
-								frag2.Text += pFrag.Text.Substring(optionStart + 1, templateStart - optionStart - 1);
+								frag2.Text += mFrag.Text.Substring(optionStart + 1, templateStart - optionStart - 1);
 								yield return frag2;
 								foreach (Fragment item in template.result)
 								{
 									yield return item;
 								}
 								frag2 = newString();
-								frag2.Text += pFrag.Text.Substring(templateStart + 2, i - templateStart - 2);
+								frag2.Text += mFrag.Text.Substring(templateStart + 2, i - templateStart - 2);
 							}
 							templateStart = -1;
 							optionStart = -1;
@@ -483,7 +462,7 @@ namespace Ideka.CustomCombatText
 						else
 						{
 							template = default((List<Fragment>, bool));
-							if (chr == '%' && i + 1 < pFrag.Text.Length)
+							if (chr == '%' && i + 1 < mFrag.Text.Length)
 							{
 								templateStart = i;
 								if (optionStart >= 0)
@@ -491,7 +470,7 @@ namespace Ideka.CustomCombatText
 									i++;
 									continue;
 								}
-								if (templates.TryGetValue(pFrag.Text.Substring(templateStart, 2), out template))
+								if (templates.TryGetValue(mFrag.Text.Substring(templateStart, 2), out template))
 								{
 									yield return frag2;
 									frag2 = newString();
@@ -521,14 +500,14 @@ namespace Ideka.CustomCombatText
 			(List<Fragment> result, bool isSignificant) agentIcon(IEnumerable<Ag> agents, (ProfessionType prof, uint eliteId) spec)
 			{
 				//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
 				bool isSelf = agents.DistinctBy((Ag x) => x.get_Id()).Count() == 1 && agents.First().get_Self() == 1;
 				(int, bool)? profIcon = GetProfIcon(spec.prof, spec.eliteId);
 				AsyncTexture2D icon = ((!profIcon.HasValue) ? null : AsyncTexture2D.FromAssetId(profIcon.Value.Item1));
 				return (new List<Fragment>(1)
 				{
-					new IconFragment(height)
+					new IconFragment(font2.get_LineHeight())
 					{
 						Icon = icon,
 						Autocropped = false,
@@ -540,7 +519,7 @@ namespace Ideka.CustomCombatText
 			static bool byGroup<TKey, TValue>(IEnumerable<Message> source, Func<Message, TKey> selector, IReadOnlyDictionary<TKey, TValue> dict, out List<List<Message>> groups, out TValue value) where TKey : notnull where TValue : notnull
 			{
 				List<List<Message>> list = new List<List<Message>>();
-				list.AddRange(from x in source.GroupBy(selector)
+				list.AddRange(from x in source.GroupBy<Message, TKey>(selector)
 					select x.ToList() into x
 					orderby x.Count descending
 					select x);
@@ -652,62 +631,6 @@ namespace Ideka.CustomCombatText
 					float y = rect.Y + rect.Height / 2f - frag2.Size.Height / 2f;
 					act(frag2, new Vector2(x, y));
 					x += frag2.Size.Width;
-				}
-			}
-		}
-
-		public static List<TemplatePreFrag> PreParse(string template)
-		{
-			return PreParse(template, BaseSyntax);
-		}
-
-		public static List<T> PreParse<T>(string template, Syntax<T> syntax) where T : PreFrag, new()
-		{
-			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-			T frag = new T();
-			List<T> frags = new List<T>();
-			int i = 0;
-			Color y = default(Color);
-			while (i < template.Length)
-			{
-				string sub = template.Substring(i);
-				if (sub.StartsWith(syntax.ColorTagOpenA))
-				{
-					int end = sub.IndexOf(syntax.ColorTagOpenB);
-					if (end > 0)
-					{
-						finishFragment();
-						string colorString = sub.Substring(syntax.ColorTagOpenA.Length, end - syntax.ColorTagOpenA.Length);
-						frag.Color = (syntax.KnownColors.TryGetValue(colorString.ToLower(), out var x) ? new Color?(x) : null) ?? (ColorUtil.TryParseHex(colorString, ref y) ? new Color?(y) : null);
-						if (syntax.SpecialColors.TryGetValue(colorString, out var f))
-						{
-							f(colorString, frag);
-						}
-						i += end + 1;
-						continue;
-					}
-				}
-				if (sub.StartsWith(syntax.ColorTagClose))
-				{
-					finishFragment();
-					i += syntax.ColorTagClose.Length;
-				}
-				else
-				{
-					ref T reference = ref frag;
-					reference.Text += sub[0];
-					i++;
-				}
-			}
-			finishFragment();
-			return frags;
-			void finishFragment()
-			{
-				if (frag.Text != "")
-				{
-					frags.Add(frag);
-					frag = new T();
 				}
 			}
 		}

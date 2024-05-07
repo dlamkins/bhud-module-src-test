@@ -1,42 +1,38 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Blish_HUD;
+using Blish_HUD.ArcDps.Models;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
-using Gw2Sharp.Models;
-using Microsoft.Xna.Framework;
 
 namespace Ideka.CustomCombatText
 {
-	public class MessagesMenu : SelectablesMenu<MessagesMenu.MessageKey, MessagesMenu.MessageKey>
+	public class MessagesMenu : SelectablesMenu<MessagesMenu.MessageKey, MessagesMenu.MessageKey, MessagesMenuItem>
 	{
 		public class MessageKey
 		{
 			public readonly LogEntry LogEntry;
 
+			public readonly CombatEvent Cbt;
+
 			public readonly Message Message;
 
-			public MessageKey(LogEntry entry, Message message)
+			public MessageKey(LogEntry entry, CombatEvent cbt, Message message)
 			{
 				LogEntry = entry;
+				Cbt = cbt;
 				Message = message;
 				base._002Ector();
 			}
 		}
 
-		private static readonly Logger Logger = Logger.GetLogger<MessagesMenu>();
-
 		private string _template = "";
 
-		private List<TemplateParser.TemplatePreFrag> _preFrags = new List<TemplateParser.TemplatePreFrag>();
+		private List<TemplateParser.MarkupFragment> _markupFrags = new List<TemplateParser.MarkupFragment>();
 
 		private int _fontSize = 25;
 
 		public bool DebugTooltips { get; set; }
-
-		public int Limit { get; set; } = 100;
-
 
 		public string Template
 		{
@@ -47,7 +43,7 @@ namespace Ideka.CustomCombatText
 			set
 			{
 				_template = value;
-				_preFrags = TemplateParser.PreParse(_template);
+				_markupFrags = TemplateParser.ParseMarkup(_template);
 				UpdateItemVisuals();
 			}
 		}
@@ -65,9 +61,39 @@ namespace Ideka.CustomCombatText
 			}
 		}
 
-		protected override MessageKey? ExtractId(MessageKey? item)
+		protected override MessageKey ExtractId(MessageKey item)
 		{
 			return item;
+		}
+
+		protected override MessagesMenuItem Construct(MessagesMenuItem? item, MessageKey key)
+		{
+			MessagesMenuItem item2 = item;
+			if (item2 == null)
+			{
+				item2 = new MessagesMenuItem(key, _markupFrags, FontSize);
+				((Control)item2).add_Click((EventHandler<MouseEventArgs>)delegate
+				{
+					Select(item2.Key);
+				});
+				((Control)item2).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
+				{
+					if (DebugTooltips)
+					{
+						item2.CreateDebugTooltip();
+					}
+					else
+					{
+						item2.CreateSkillTooltip();
+					}
+				});
+			}
+			else
+			{
+				item2.UpdateVisuals(key, _markupFrags, FontSize);
+			}
+			base.MenuItemHeight = Math.Max((int)item2.InnerHeight, base.MenuItemHeight);
+			return item2;
 		}
 
 		public void Repopulate(IEnumerable<LogEntry> entries)
@@ -75,8 +101,7 @@ namespace Ideka.CustomCombatText
 			IEnumerable<LogEntry> entries2 = entries;
 			Repopulate(delegate
 			{
-				_menu.set_CanSelect(false);
-				_menu.set_MenuItemHeight(32);
+				base.MenuItemHeight = 32;
 				if (!entries2.Any())
 				{
 					Placeholder("Nothing");
@@ -95,81 +120,30 @@ namespace Ideka.CustomCombatText
 		{
 			if (base.Empty)
 			{
-				Repopulate(delegate
-				{
-				});
-				_menu.set_MenuItemHeight(1);
+				base.MenuItemHeight = 1;
 			}
-			_menu.set_CanSelect(true);
 			var (cbt, messages) = entry.ProcessAndInterpret();
-			if (!messages.Any())
+			if (messages.Any())
 			{
-				return;
-			}
-			Message message = messages.First();
-			MessageKey key = new MessageKey(entry, message);
-			MessageMenuItem item = new MessageMenuItem(message, _preFrags, FontSize);
-			_menu.set_MenuItemHeight(Math.Max((int)item.InnerHeight, _menu.get_MenuItemHeight()));
-			((Control)item).set_Parent((Container)(object)_menu);
-			SetItem(key, item);
-			((Control)item).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
-			{
-				//IL_027d: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0282: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0289: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0295: Expected O, but got Unknown
-				//IL_02e4: Unknown result type (might be due to invalid IL or missing references)
-				if (DebugTooltips)
+				Message message = messages.First();
+				MessageKey key = new MessageKey(entry, cbt, message);
+				SetSelectable(key, key);
+				while (base.Selectables.Count > CTextModule.Settings.MessageLogLength.Value && base.Selectables.Count > 0)
 				{
-					if (((Control)item).get_BasicTooltipText() == null)
-					{
-						Tooltip tooltip = ((Control)item).get_Tooltip();
-						if (tooltip != null)
-						{
-							((Control)tooltip).Dispose();
-						}
-						((Control)item).set_Tooltip((Tooltip)null);
-						((Control)item).set_BasicTooltipText($"ID: {cbt.get_Id()}\n" + $"Skill ID: raw: {cbt.get_Ev().get_SkillId()} used: {message.SkillId}\n" + "Raw Skill Name: " + cbt.get_SkillName() + "\n" + $"Icon ID: {message.SkillIconId}\n" + "\n" + $"Src ID: {cbt.get_Src().get_Id()} / {cbt.get_Ev().get_SrcInstId()} (self: {message.Src.get_Self() == 1})\n" + "Src Raw Name: " + cbt.get_Src().get_Name() + "\n" + $"Src Prof: {(object)(ProfessionType)(byte)cbt.get_Src().get_Profession()} / {message.Src.get_Elite()}\n" + "\n" + $"Dst ID: {cbt.get_Dst().get_Id()} / {cbt.get_Ev().get_DstInstId()} (self: {message.Dst.get_Self() == 1})\n" + "Dst Raw Name: " + cbt.get_Dst().get_Name() + "\n" + $"Dst Prof: {(object)(ProfessionType)(byte)cbt.get_Dst().get_Profession()} / {message.Dst.get_Elite()}");
-					}
+					RemoveSelectable(base.Selectables.First().Key);
 				}
-				else
-				{
-					((Control)item).set_BasicTooltipText((string)null);
-					if (((Control)item).get_Tooltip() == null && message.HsSkill != null)
-					{
-						try
-						{
-							MessageMenuItem messageMenuItem = item;
-							Tooltip val = new Tooltip();
-							((Container)val).set_HeightSizingMode((SizingMode)1);
-							((Container)val).set_WidthSizingMode((SizingMode)1);
-							((Control)messageMenuItem).set_Tooltip(val);
-							SkillTooltip skillTooltip = new SkillTooltip(new SkillTooltipData(message.HsSkill, message.HsSkill!.Icon ?? message.SkillIconId));
-							((Control)skillTooltip).set_Parent((Container)(object)((Control)item).get_Tooltip());
-							((Control)skillTooltip).set_Location(Point.get_Zero());
-						}
-						catch (Exception ex)
-						{
-							Logger.Warn(ex, "Tooltip generation failed.");
-						}
-					}
-				}
-			});
-			((Control)item).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
-				Select(key);
-			});
-			while (((Container)_menu).get_Children().get_Count() > Limit)
-			{
-				((Container)_menu).RemoveChild(((IEnumerable<Control>)((Container)_menu).get_Children()).First());
 			}
 		}
 
 		private void UpdateItemVisuals()
 		{
-			foreach (Control child in ((Container)_menu).get_Children())
+			foreach (MessagesMenuItem item in base.Items.Values)
 			{
-				(child as MessageMenuItem)?.UpdateVisuals(_preFrags, FontSize);
+				if (item != null)
+				{
+					MessagesMenuItem messageItem = item;
+					messageItem.UpdateVisuals(_markupFrags, FontSize);
+				}
 			}
 		}
 	}

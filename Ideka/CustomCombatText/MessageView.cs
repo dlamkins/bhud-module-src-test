@@ -14,7 +14,7 @@ namespace Ideka.CustomCombatText
 
 		private readonly BitmapFont _font;
 
-		private readonly IReadOnlyList<TemplateParser.TemplatePreFrag> _parsedTemplate;
+		private readonly IReadOnlyList<TemplateParser.MarkupFragment> _markupFrags;
 
 		private readonly List<TemplateParser.Fragment> _parsedFragments;
 
@@ -43,7 +43,7 @@ namespace Ideka.CustomCombatText
 		{
 			_receiver = receiver;
 			_font = receiver.Font;
-			_parsedTemplate = receiver.PreFragments;
+			_markupFrags = receiver.MarkupFrags;
 			_parsedFragments = new List<TemplateParser.Fragment>();
 			_messages = new List<Message>();
 			base._002Ector();
@@ -65,7 +65,7 @@ namespace Ideka.CustomCombatText
 			_messages.Add(message);
 			SizeDeltaX = 0f;
 			_parsedFragments.Clear();
-			foreach (TemplateParser.Fragment parsed in TemplateParser.FinalParse(_parsedTemplate, _receiver.Color, _font, message, _messages))
+			foreach (TemplateParser.Fragment parsed in TemplateParser.FinalParse(_markupFrags, _receiver.Color, _font, message, _messages))
 			{
 				_parsedFragments.Add(parsed);
 				Size2 size = parsed.Size;

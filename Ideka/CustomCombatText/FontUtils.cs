@@ -7,6 +7,7 @@ using Blish_HUD.Graphics;
 using Blish_HUD.Modules.Managers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
 using MonoGame.Extended.BitmapFonts;
 using MonoGame.Extended.TextureAtlases;
 using SpriteFontPlus;
@@ -91,6 +92,13 @@ namespace Ideka.CustomCombatText
 				return new BitmapFont($"{typeof(BitmapFont)}_{Guid.NewGuid():n}", ((IEnumerable<Glyph>)font2.GetGlyphs().Values).Select((Func<Glyph, BitmapFontRegion>)((Glyph glyph) => new BitmapFontRegion(new TextureRegion2D(font2.get_Texture(), ((Rectangle)(ref glyph.BoundsInTexture)).get_Left(), ((Rectangle)(ref glyph.BoundsInTexture)).get_Top(), glyph.BoundsInTexture.Width, glyph.BoundsInTexture.Height), (int)glyph.Character, ((Rectangle)(ref glyph.Cropping)).get_Left(), ((Rectangle)(ref glyph.Cropping)).get_Top(), (int)glyph.WidthIncludingBearings))), (lineHeight > 0) ? lineHeight : font2.get_LineSpacing());
 			}
 			throw new ArgumentException("Line height cannot be negative.", "lineHeight");
+		}
+
+		public static Size2 MeasureStringFixed(this BitmapFont font, string str)
+		{
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			return font.MeasureString((str.EndsWith(" ") && font.MeasureString(" ").Width == 0f) ? (str + " ") : str);
 		}
 	}
 }

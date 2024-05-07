@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Gw2Sharp.WebApi.V2.Models;
 using HsAPI;
 
 namespace Ideka.CustomCombatText
@@ -16,26 +17,27 @@ namespace Ideka.CustomCombatText
 		public int CharacterLevel { get; set; } = 80;
 
 
+		public Gender CharacterGender { get; set; }
+
 		public ProfessionId? Profession { get; set; }
 
-		public Dictionary<BaseAttribute, float> Stats { get; set; } = new Dictionary<BaseAttribute, float>
+		public Dictionary<BaseAttribute, double> Stats { get; set; } = new Dictionary<BaseAttribute, double>
 		{
-			[BaseAttribute.Power] = 1000f,
-			[BaseAttribute.Toughness] = 1000f,
-			[BaseAttribute.Vitality] = 1000f,
-			[BaseAttribute.Precision] = 1000f,
-			[BaseAttribute.Ferocity] = 1000f,
-			[BaseAttribute.ConditionDamage] = 0f,
-			[BaseAttribute.Expertise] = 0f,
-			[BaseAttribute.Concentration] = 0f,
-			[BaseAttribute.HealingPower] = 0f,
-			[BaseAttribute.AgonyResistance] = 0f
+			[BaseAttribute.Power] = 1000.0,
+			[BaseAttribute.Toughness] = 1000.0,
+			[BaseAttribute.Vitality] = 1000.0,
+			[BaseAttribute.Precision] = 1000.0,
+			[BaseAttribute.Ferocity] = 1000.0,
+			[BaseAttribute.ConditionDamage] = 0.0,
+			[BaseAttribute.Expertise] = 0.0,
+			[BaseAttribute.Concentration] = 0.0,
+			[BaseAttribute.HealingPower] = 0.0,
+			[BaseAttribute.AgonyResistance] = 0.0
 		};
 
 
 		public int BaseHealth => Profession switch
 		{
-			null => 1000, 
 			ProfessionId.Guardian => 1645, 
 			ProfessionId.Thief => 1645, 
 			ProfessionId.Elementalist => 1645, 
@@ -45,9 +47,9 @@ namespace Ideka.CustomCombatText
 			ProfessionId.Revenant => 5922, 
 			ProfessionId.Necromancer => 9212, 
 			ProfessionId.Warrior => 9212, 
-			_ => 1000, 
+			_ => 5922, 
 		};
 
-		public int Health => BaseHealth + (int)Math.Round(Stats[BaseAttribute.Vitality] * 10f);
+		public int Health => BaseHealth + (int)Math.Round(Stats[BaseAttribute.Vitality] * 10.0);
 	}
 }

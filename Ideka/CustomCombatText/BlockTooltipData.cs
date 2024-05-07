@@ -10,7 +10,7 @@ namespace Ideka.CustomCombatText
 
 		public List<FactTooltipData> Facts { get; }
 
-		public BlockTooltipData(FactBlock block, float weaponStrength, TooltipContext context)
+		public BlockTooltipData(FactBlock block, double weaponStrength, TooltipContext context)
 		{
 			TooltipContext context2 = context;
 			Description = TooltipUtils.FormatText(block.Description) ?? "";

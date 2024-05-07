@@ -18,37 +18,37 @@ namespace Ideka.CustomCombatText
 
 		public int? IconId { get; }
 
-		public int BuffApplyCount { get; }
+		public int BuffApplyCount { get; } = 1;
+
 
 		public int BuffDuration { get; }
 
 		public string Text { get; }
 
-		public FactTooltipData(Fact fact, float weaponStrength, TooltipContext context)
+		public FactTooltipData(Fact fact, double weaponStrength, TooltipContext context)
 		{
+			//IL_01f5: Unknown result type (might be due to invalid IL or missing references)
 			IconId = fact.Icon;
-			BuffApplyCount = 1;
-			BuffDuration = (fact as BuffFact)?.Duration ?? (fact as PrefixedBuffFact)?.Duration ?? 0;
 			Text = "Unknown Fact";
 			AdjustByAttributeAndLevelFact alFact = fact as AdjustByAttributeAndLevelFact;
 			if (alFact != null)
 			{
-				float value = (alFact.Value + (float)Math.Pow(context.CharacterLevel, alFact.LevelExponent) * alFact.LevelMultiplier) * (float)alFact.HitCount;
+				double value2 = ((double)alFact.Value + Math.Pow(context.CharacterLevel, alFact.LevelExponent) * (double)alFact.LevelMultiplier) * (double)alFact.HitCount;
 				BaseAttribute? attribute = alFact.Attribute;
 				if (attribute.HasValue)
 				{
 					BaseAttribute attr = attribute.GetValueOrDefault();
-					float attrVal = context.Stats[attr];
-					value += attrVal * alFact.AttributeMultiplier.GetValueOrDefault() * (float)alFact.HitCount;
+					double attrVal = context.Stats[attr];
+					value2 += attrVal * (double)alFact.AttributeMultiplier.GetValueOrDefault() * (double)alFact.HitCount;
 				}
-				Text = (TooltipUtils.FormatText(alFact.Text) ?? alFact.Attribute?.ToString()) + ": " + TooltipUtils.FormatRound(value);
+				Text = (TooltipUtils.FormatText(alFact.Text) ?? alFact.Attribute?.ToString()) + ": " + TooltipUtils.FormatRound(value2);
 				return;
 			}
 			AttributeAdjustFact adFact = fact as AttributeAdjustFact;
 			if (adFact != null)
 			{
-				float value2 = (float)MathUtils.Scale(context.CharacterLevel, 0.0, 80.0, adFact.Range[0], adFact.Range[1]);
-				Text = (TooltipUtils.FormatText(adFact.Text) ?? adFact.Target.ToString()) + ": " + TooltipUtils.FormatN3S(value2);
+				double value = MathUtils.Scale(context.CharacterLevel, 0.0, 80.0, adFact.Range[0], adFact.Range[1]);
+				Text = (TooltipUtils.FormatText(adFact.Text) ?? adFact.Target.ToString()) + ": " + TooltipUtils.FormatN3S(value);
 				return;
 			}
 			BuffFact bFact = fact as BuffFact;
@@ -58,7 +58,7 @@ namespace Ideka.CustomCombatText
 				IconId = buff4.Icon ?? IconId;
 				BuffApplyCount = bFact.ApplyCount;
 				BuffDuration = bFact.Duration;
-				Text = TooltipUtils.FormatText(TooltipUtils.ResolveInflections(fact.Text ?? buff4.NameBrief ?? buff4.Name, -1)) + ((BuffDuration > 0) ? ("(" + TooltipUtils.FormatDuration(BuffDuration) + ")") : "") + ": " + DescribeBuff(buff4, BuffApplyCount, BuffDuration, context);
+				Text = TooltipUtils.FormatText(TooltipUtils.ResolveInflections(fact.Text ?? buff4.NameBrief ?? buff4.Name, context.CharacterGender, -1)) + ((BuffDuration > 0) ? ("(" + TooltipUtils.FormatDuration(BuffDuration) + ")") : "") + ": " + DescribeBuff(buff4, BuffApplyCount, BuffDuration, context);
 				return;
 			}
 			BuffBriefFact bbFact = fact as BuffBriefFact;
@@ -87,31 +87,37 @@ namespace Ideka.CustomCombatText
 				Text = TooltipUtils.FormatText(pctFact.Text) + ": " + TooltipUtils.FormatFraction(pctFact.Percent) + "%";
 				return;
 			}
+			PercentHpSelfDamageFact phsFact = fact as PercentHpSelfDamageFact;
+			if (phsFact != null)
+			{
+				Text = TooltipUtils.FormatText(phsFact.Text) + ": " + $"{Math.Floor((double)((float)context.Health * phsFact.Percent) * 0.01)} " + "(" + TooltipUtils.FormatFraction(phsFact.Percent) + "% HP pool)";
+				return;
+			}
 			PercentLifeForceCostFact plcFact = fact as PercentLifeForceCostFact;
 			if (plcFact != null)
 			{
-				Text = TooltipUtils.FormatText(plcFact.Text) + ": $" + TooltipUtils.FormatN3((float)Math.Round((float)context.BaseHealth * plcFact.Percent * 0.01f)) + "%";
+				Text = TooltipUtils.FormatText(plcFact.Text) + ": " + TooltipUtils.FormatN3(Math.Round((double)((float)context.BaseHealth * plcFact.Percent) * 0.01));
 				return;
 			}
 			PercentHealthFact phFact = fact as PercentHealthFact;
 			if (phFact != null)
 			{
-				Text = TooltipUtils.FormatText(phFact.Text) + ": " + TooltipUtils.FormatFraction(phFact.Percent) + "% (" + TooltipUtils.FormatRound((float)context.Health * phFact.Percent * 0.01f) + " HP)";
+				Text = TooltipUtils.FormatText(phFact.Text) + ": " + TooltipUtils.FormatFraction(phFact.Percent) + "% (" + TooltipUtils.FormatRound((double)((float)context.Health * phFact.Percent) * 0.01) + " HP)";
 				return;
 			}
 			PercentLifeForceGainFact plgFact = fact as PercentLifeForceGainFact;
 			if (plgFact != null)
 			{
-				Text = TooltipUtils.FormatText(plgFact.Text) + ": " + TooltipUtils.FormatFraction(plgFact.Percent) + "% (" + TooltipUtils.FormatRound((float)context.Health * 0.69f * plgFact.Percent * 0.01f) + " HP)";
+				Text = TooltipUtils.FormatText(plgFact.Text) + ": " + TooltipUtils.FormatFraction(plgFact.Percent) + "% (" + TooltipUtils.FormatRound((double)context.Health * 0.69 * (double)plgFact.Percent * 0.01) + " HP)";
 				return;
 			}
 			DamageFact dmgFact = fact as DamageFact;
 			if (dmgFact != null)
 			{
-				float damage = dmgFact.DmgMultiplier * (float)dmgFact.HitCount * weaponStrength * context.Stats[BaseAttribute.Power] / (float)context.TargetArmor;
-				float critChance = Math.Min(0.05f + (context.Stats[BaseAttribute.Precision] - 1000f) / 21f * 0.01f, 1f);
-				float critDamage = 1.5f * context.Stats[BaseAttribute.Ferocity] / 15f * 0.01f;
-				float damageFromCrit = damage * critChance * (critDamage - 1f);
+				double damage = (double)(dmgFact.DmgMultiplier * (float)dmgFact.HitCount) * weaponStrength * context.Stats[BaseAttribute.Power] / (double)context.TargetArmor;
+				double critChance = Math.Min(0.05 + (context.Stats[BaseAttribute.Precision] - 1000.0) / 21.0 * 0.01, 1.0);
+				double critDamage = 1.5 * context.Stats[BaseAttribute.Ferocity] / 15.0 * 0.01;
+				double damageFromCrit = damage * critChance * (critDamage - 1.0);
 				damage += damageFromCrit;
 				Text = TooltipUtils.FormatText(dmgFact.Text) + ((dmgFact.HitCount > 1) ? $"({dmgFact.HitCount}x)" : "") + ": " + TooltipUtils.FormatRound(damage);
 				return;
@@ -119,7 +125,7 @@ namespace Ideka.CustomCombatText
 			TimeFact timeFact = fact as TimeFact;
 			if (timeFact != null)
 			{
-				Text = TooltipUtils.FormatText(timeFact.Text) + ": " + TooltipUtils.FormatFraction((float)timeFact.Duration / 1000f) + " " + ((timeFact.Duration == 1000) ? "second" : "seconds");
+				Text = TooltipUtils.FormatText(timeFact.Text) + ": " + TooltipUtils.FormatFraction((double)timeFact.Duration * 0.001) + " " + ((timeFact.Duration == 1000) ? "second" : "seconds");
 				return;
 			}
 			ComboFieldFact fieldFact = fact as ComboFieldFact;
@@ -231,11 +237,11 @@ namespace Ideka.CustomCombatText
 				return buff.Description;
 			}
 			List<Modifier> modifiers = buff.Modifiers.Where((Modifier m) => !m.TargetTraitReq.HasValue && !m.SourceTraitReq.HasValue && (!m.Mode.HasValue || m.Mode == context2.GameMode)).ToList();
-			Dictionary<int, (Modifier, float)> merged = new Dictionary<int, (Modifier, float)>();
+			Dictionary<int, (Modifier, double)> merged = new Dictionary<int, (Modifier, double)>();
 			for (int i = 0; i < modifiers.Count; i++)
 			{
 				Modifier modifier = modifiers[i];
-				float value = CalculateModifier(modifier, context2);
+				double value = CalculateModifier(modifier, context2);
 				BaseAttribute? sourceAttribute = modifier.SourceAttribute;
 				if (sourceAttribute.HasValue)
 				{
@@ -254,29 +260,29 @@ namespace Ideka.CustomCombatText
 				var (modifier2, value2) = value3;
 				if (modifier2.Flags.Contains(ModifierFlag.Subtract))
 				{
-					value2 -= 100f;
+					value2 -= 100.0;
 				}
 				if (duration > 0 && modifier2.Flags.Contains(ModifierFlag.MulByDuration))
 				{
-					float thisDuration = (float)duration / 1000f;
+					double thisDuration = (double)duration * 0.001;
 					if (modifier2.Flags.Contains(ModifierFlag.DivDurationBy3))
 					{
-						thisDuration /= 3f;
+						thisDuration /= 3.0;
 					}
 					if (modifier2.Flags.Contains(ModifierFlag.DivDurationBy10))
 					{
-						thisDuration /= 10f;
+						thisDuration /= 10.0;
 					}
 					value2 *= thisDuration;
 				}
 				if (!modifier2.Flags.Contains(ModifierFlag.NonStacking))
 				{
-					value2 *= (float)applyCount;
+					value2 *= (double)applyCount;
 				}
 				string strValue = (modifier2.Flags.Contains(ModifierFlag.FormatFraction) ? TooltipUtils.FormatFraction(value2) : TooltipUtils.FormatRound(value2));
 				if (modifier2.Flags.Contains(ModifierFlag.FormatPercent))
 				{
-					strValue = ((value2 > 0f) ? "+" : "") + strValue + "%";
+					strValue = ((value2 > 0.0) ? "+" : "") + strValue + "%";
 				}
 				strValue = strValue + " " + modifier2.Description;
 				final.Add(strValue);
@@ -284,21 +290,21 @@ namespace Ideka.CustomCombatText
 			return string.Join(", ", final);
 		}
 
-		private static float CalculateModifier(Modifier modifier, TooltipContext context)
+		private static double CalculateModifier(Modifier modifier, TooltipContext context)
 		{
 			if (modifier.SourceAttribute.HasValue)
 			{
-				return context.Stats[modifier.SourceAttribute.Value] * modifier.BaseAmount / 100f;
+				return context.Stats[modifier.SourceAttribute.Value] * (double)modifier.BaseAmount * 0.01;
 			}
 			int level = context.CharacterLevel;
-			float attribute = 0f;
+			double attribute = 0.0;
 			switch (modifier.Formula)
 			{
 			case BuffScaling.NoScaling:
 				level = 0;
 				break;
 			case BuffScaling.BuffFormulaType11:
-				attribute = -1f;
+				attribute = -1.0;
 				break;
 			case BuffScaling.ConditionDamageSquared:
 				level *= level;
@@ -332,7 +338,7 @@ namespace Ideka.CustomCombatText
 			case BuffScaling.TargetLevelLinear:
 				break;
 			}
-			return modifier.BaseAmount + (float)level * modifier.FormulaParam1 + attribute * modifier.FormulaParam2;
+			return (double)(modifier.BaseAmount + (float)level * modifier.FormulaParam1) + attribute * (double)modifier.FormulaParam2;
 		}
 	}
 }
