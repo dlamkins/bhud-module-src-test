@@ -1,3 +1,4 @@
+using RaidClears.Features.Fractals.Services;
 using RaidClears.Features.Shared.Enums;
 using RaidClears.Features.Shared.Enums.Extensions;
 using RaidClears.Features.Shared.Models;
@@ -16,8 +17,8 @@ namespace RaidClears.Features.Raids.Models
 		{
 		}
 
-		public Encounter(Encounters.Fractal fractal)
-			: base(fractal.GetApiLabel(), fractal.GetLabel(), fractal.GetLabelShort())
+		public Encounter(FractalMap fractal)
+			: base(fractal.ApiLabel, fractal.Label, fractal.ShortLabel)
 		{
 		}
 	}

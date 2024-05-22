@@ -62,8 +62,9 @@ namespace RaidClears
 
 		protected override Task LoadAsync()
 		{
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009c: Expected O, but got Unknown
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a6: Expected O, but got Unknown
+			Service.FractalMapData = FractalMapData.Load();
 			Service.InstabilitiesData = InstabilitiesData.Load();
 			Service.StrikePersistance = StrikePersistance.Load();
 			Service.FractalPersistance = FractalPersistance.Load();
@@ -95,7 +96,19 @@ namespace RaidClears
 			});
 			Service.CornerIcon.IconLeftClicked += new EventHandler<bool>(CornerIcon_IconLeftClicked);
 			Service.Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
+			DispatchClears();
 			return Task.CompletedTask;
+		}
+
+		private void DispatchClears()
+		{
+			Task.Run(async delegate
+			{
+				Service.CurrentAccountName = await AccountNameService.UpdateAccountName();
+				Service.MapWatcher.DispatchCurrentStrikeClears();
+				Service.FractalMapWatcher.DispatchCurrentClears();
+				Service.CornerIcon?.UpdateAccountName(Service.CurrentAccountName);
+			});
 		}
 
 		private void TEMP_FIX_SetTacOAsActive()
@@ -174,13 +187,7 @@ namespace RaidClears
 
 		private void Gw2ApiManager_SubtokenUpdated(object sender, ValueEventArgs<IEnumerable<TokenPermission>> e)
 		{
-			Task.Run(async delegate
-			{
-				Service.CurrentAccountName = await AccountNameService.UpdateAccountName();
-				Service.MapWatcher.DispatchCurrentStrikeClears();
-				Service.FractalMapWatcher.DispatchCurrentClears();
-				Service.CornerIcon?.UpdateAccountName(Service.CurrentAccountName);
-			});
+			DispatchClears();
 			Service.ApiPollingService?.Invoke();
 		}
 	}

@@ -2,6 +2,7 @@ using System;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
+using Blish_HUD.Settings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using RaidClears.Features.Shared.Services;
@@ -14,6 +15,8 @@ namespace RaidClears.Features.Shared.Controls
 		private static Vector2 DefaultPadding = new Vector2(2f, 2f);
 
 		private readonly GenericSettings _settings;
+
+		private readonly SettingEntry<bool> _screenClamp;
 
 		private CornerIconService? _cornerIconService;
 
@@ -38,9 +41,10 @@ namespace RaidClears.Features.Shared.Controls
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
 			_settings = settings;
+			_screenClamp = Service.Settings.ScreenClamp;
 			((FlowPanel)this).set_ControlPadding(DefaultPadding);
 			IgnoreMouseInput = ShouldIgnoreMouse();
 			((Control)this).set_Location(_settings.Location.get_Value());
@@ -61,6 +65,13 @@ namespace RaidClears.Features.Shared.Controls
 			_settings.Tooltips.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate
 			{
 				IgnoreMouseInput = ShouldIgnoreMouse();
+			});
+			_screenClamp.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object _, ValueChangedEventArgs<bool> e)
+			{
+				if (e.get_NewValue())
+				{
+					ClampToSpriteScreen();
+				}
 			});
 		}
 
@@ -104,13 +115,60 @@ namespace RaidClears.Features.Shared.Controls
 			});
 			((Control)this).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
 			{
-				//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 				if (_settings.PositionLock.get_Value())
 				{
 					_isDraggedByMouse = false;
-					_settings.Location.set_Value(((Control)this).get_Location());
+					ClampToSpriteScreen();
 				}
 			});
+		}
+
+		private void ClampToSpriteScreen()
+		{
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+			if (_screenClamp.get_Value())
+			{
+				Point screenSize = ((Control)GameService.Graphics.get_SpriteScreen()).get_Size();
+				if (((Control)this).get_Location().X < 0)
+				{
+					((Control)this).set_Location(new Point(0, ((Control)this).get_Location().Y));
+				}
+				if (((Control)this).get_Location().X + ((Control)this).get_Size().X > screenSize.X)
+				{
+					((Control)this).set_Location(new Point(screenSize.X - ((Control)this).get_Size().X, ((Control)this).get_Location().Y));
+				}
+				if (((Control)this).get_Location().Y < 0)
+				{
+					((Control)this).set_Location(new Point(((Control)this).get_Location().X, 0));
+				}
+				if (((Control)this).get_Location().Y + ((Control)this).get_Size().Y > screenSize.Y)
+				{
+					((Control)this).set_Location(new Point(((Control)this).get_Location().X, screenSize.Y - ((Control)this).get_Size().Y));
+				}
+			}
+			_settings.Location.set_Value(((Control)this).get_Location());
 		}
 
 		private bool ShouldIgnoreMouse()

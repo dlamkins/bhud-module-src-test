@@ -25,16 +25,16 @@ namespace RaidClears.Settings.Views.SubViews
 			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
 			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0091: Expected O, but got Unknown
-			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0102: Expected O, but got Unknown
+			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0111: Expected O, but got Unknown
 			((View<IPresenter>)this).Build(buildPanel);
 			FlowPanel panel2 = FlowPanelExtensions.BeginFlow(new FlowPanel(), buildPanel, new Point(-95, 0), new Point(0, 5));
 			StandardButton val = new StandardButton();
@@ -48,7 +48,8 @@ namespace RaidClears.Settings.Views.SubViews
 			StandardButton val2 = new StandardButton();
 			val2.set_Text(Strings.Settings_RefreshNow);
 			Control refreshButton;
-			FlowPanel panel = panel3.AddFlowControl((Control)val2, out refreshButton).AddSpace().AddSpace()
+			FlowPanel panel = panel3.AddFlowControl((Control)val2, out refreshButton).AddSpace().AddSetting((SettingEntry)(object)Service.Settings.ScreenClamp)
+				.AddSpace()
 				.AddSetting((SettingEntry)(object)Service.Settings.GlobalCornerIconEnabled);
 			FlowPanel val3 = new FlowPanel();
 			val3.set_FlowDirection((ControlFlowDirection)3);

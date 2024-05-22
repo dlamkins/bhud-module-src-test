@@ -17,10 +17,10 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="Gw2Sharp" />
-    <Reference Include="MonoGame.Extended" />
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\working\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="MonoGame.Extended" />
     <Reference Include="SemVer">
       <HintPath>..\..\working\SemVer.dll</HintPath>
     </Reference>

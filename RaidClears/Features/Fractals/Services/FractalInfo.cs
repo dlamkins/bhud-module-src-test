@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using RaidClears.Features.Raids.Models;
-using RaidClears.Features.Shared.Enums;
 
 namespace RaidClears.Features.Fractals.Services
 {
@@ -8,19 +7,19 @@ namespace RaidClears.Features.Fractals.Services
 	{
 		public Encounter Encounter;
 
-		public Encounters.Fractal TomorrowEncounter;
+		public FractalMap TomorrowEncounter;
 
 		public List<string>? Instabilities;
 
 		public List<string>? TomorrowInstabilities;
 
-		public FractalInfo(Encounters.Fractal mission, Encounters.Fractal tomorrow)
+		public FractalInfo(FractalMap mission, FractalMap tomorrow)
 		{
 			Encounter = new Encounter(mission);
 			TomorrowEncounter = tomorrow;
 		}
 
-		public FractalInfo(Encounters.Fractal mission, Encounters.Fractal tomorrow, List<string> instab, List<string> tomorrowInstab)
+		public FractalInfo(FractalMap mission, FractalMap tomorrow, List<string> instab, List<string> tomorrowInstab)
 		{
 			Encounter = new Encounter(mission);
 			TomorrowEncounter = tomorrow;

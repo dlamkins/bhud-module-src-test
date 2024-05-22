@@ -13,7 +13,7 @@ namespace RaidClears.Features.Fractals.Services
 		public static string FILENAME = "instabilities.json";
 
 		[JsonIgnore]
-		public static string FILE_URL = "https://raw.githubusercontent.com/Invisi/gw2-fotm-instabilities/master/data.json";
+		public static string FILE_URL = "https://bhm.blishhud.com/Soeed.RaidClears/static/fractal_instabilities.json";
 
 		[JsonProperty("instabilities")]
 		public Dictionary<string, int[][]> Instabilities { get; set; } = new Dictionary<string, int[][]>();
@@ -60,11 +60,15 @@ namespace RaidClears.Features.Fractals.Services
 			FileInfo configFileInfo = GetConfigFileInfo();
 			if (configFileInfo != null && configFileInfo.Exists)
 			{
-				using (StreamReader reader = new StreamReader(configFileInfo.FullName))
+				DateTime lastWriteTime = configFileInfo.LastWriteTime;
+				if ((DateTime.Now - lastWriteTime).TotalDays < 1.0)
 				{
-					string fileText = reader.ReadToEnd();
-					reader.Close();
-					return LoadFileFromCache(fileText);
+					using (StreamReader reader = new StreamReader(configFileInfo.FullName))
+					{
+						string fileText = reader.ReadToEnd();
+						reader.Close();
+						return LoadFileFromCache(fileText);
+					}
 				}
 			}
 			return DownloadFile();

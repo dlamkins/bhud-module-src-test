@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
-using RaidClears.Features.Shared.Enums;
 using RaidClears.Utils;
 
 namespace RaidClears.Settings.Views.SubViews
@@ -21,16 +20,16 @@ namespace RaidClears.Settings.Views.SubViews
 			//IL_0012: Expected O, but got Unknown
 			((View<IPresenter>)this).Build(buildPanel);
 			FlowPanel panel = FlowPanelExtensions.BeginFlow(new FlowPanel(), buildPanel);
-			Dictionary<Encounters.Fractal, DateTime> clears = new Dictionary<Encounters.Fractal, DateTime>();
+			Dictionary<string, DateTime> clears = new Dictionary<string, DateTime>();
 			if (!Service.FractalPersistance.AccountClears.TryGetValue(Service.CurrentAccountName, out clears))
 			{
-				clears = new Dictionary<Encounters.Fractal, DateTime>();
+				clears = new Dictionary<string, DateTime>();
 			}
-			foreach (KeyValuePair<Encounters.Fractal, DateTime> entry in clears.OrderBy((KeyValuePair<Encounters.Fractal, DateTime> p) => p.Key))
+			foreach (KeyValuePair<string, DateTime> entry in clears.OrderBy((KeyValuePair<string, DateTime> p) => p.Key))
 			{
-				panel.AddEncounterClearStatus(entry.Key, entry.Value);
+				panel.AddEncounterClearStatus(Service.FractalMapData.GetFractalByApiName(entry.Key), entry.Value);
 			}
-			panel.AddString("Last Fractal Clears");
+			panel.AddString("Last Fractal Clears (Profile: " + Service.CurrentAccountName + ")");
 		}
 	}
 }

@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using Blish_HUD;
 using Blish_HUD.Controls;
-using RaidClears.Features.Shared.Enums;
-using RaidClears.Features.Shared.Enums.Extensions;
 using RaidClears.Localization;
 using RaidClears.Settings.Enums;
 using RaidClears.Shared.Controls;
@@ -14,7 +12,7 @@ namespace RaidClears.Features.Fractals.Services
 	{
 		protected bool _isOnFractalMap;
 
-		protected Encounters.Fractal? _fractal;
+		protected FractalMap? _fractal;
 
 		protected string _fractalApiName = string.Empty;
 
@@ -31,29 +29,29 @@ namespace RaidClears.Features.Fractals.Services
 
 		public void DispatchCurrentClears()
 		{
-			Dictionary<Encounters.Fractal, DateTime> clears = new Dictionary<Encounters.Fractal, DateTime>();
+			Dictionary<string, DateTime> clears = new Dictionary<string, DateTime>();
 			if (!Service.FractalPersistance.AccountClears.TryGetValue(Service.CurrentAccountName, out clears))
 			{
-				clears = new Dictionary<Encounters.Fractal, DateTime>();
+				clears = new Dictionary<string, DateTime>();
 			}
 			List<string> clearedStrikesThisReset = new List<string>();
-			foreach (KeyValuePair<Encounters.Fractal, DateTime> entry in clears)
+			foreach (KeyValuePair<string, DateTime> entry in clears)
 			{
 				if (entry.Value >= Service.ResetWatcher.LastDailyReset)
 				{
-					clearedStrikesThisReset.Add(entry.Key.GetApiLabel());
+					clearedStrikesThisReset.Add(entry.Key);
 				}
 			}
 			this.CompletedFractal?.Invoke(this, clearedStrikesThisReset);
 		}
 
-		public void MarkCompleted(Encounters.Fractal fractal)
+		public void MarkCompleted(FractalMap fractal)
 		{
 			Service.FractalPersistance.SaveClear(Service.CurrentAccountName, fractal);
 			DispatchCurrentClears();
 		}
 
-		public void MarkNotCompleted(Encounters.Fractal fractal)
+		public void MarkNotCompleted(FractalMap fractal)
 		{
 			Service.FractalPersistance.RemoveClear(Service.CurrentAccountName, fractal);
 			DispatchCurrentClears();
@@ -69,13 +67,14 @@ namespace RaidClears.Features.Fractals.Services
 
 		private async void CurrentMap_MapChanged(object sender, ValueEventArgs<int> e)
 		{
-			if (Enum.IsDefined(typeof(MapIds.FractalMaps), e.get_Value()))
+			FractalMap _fractalMap = Service.FractalMapData.GetFractalMapById(e.get_Value());
+			if (_fractalMap != null)
 			{
 				Reset();
 				_isOnFractalMap = true;
-				_fractalApiName = ((MapIds.FractalMaps)e.get_Value()).GetApiLabel();
-				_fractalName = ((MapIds.FractalMaps)e.get_Value()).GetLabel();
-				_fractal = ((MapIds.FractalMaps)e.get_Value()).GetFractal();
+				_fractalApiName = _fractalMap.ApiLabel;
+				_fractalName = _fractalMap.Label;
+				_fractal = _fractalMap;
 			}
 			else
 			{
@@ -87,9 +86,9 @@ namespace RaidClears.Features.Fractals.Services
 				{
 				case StrikeComplete.MAP_CHANGE:
 					this.FractalComplete?.Invoke(this, _fractalApiName);
-					if (_fractal.HasValue)
+					if (_fractal != null)
 					{
-						MarkCompleted(_fractal.Value);
+						MarkCompleted(_fractal);
 					}
 					break;
 				case StrikeComplete.POPUP:
@@ -104,9 +103,9 @@ namespace RaidClears.Features.Fractals.Services
 					if (num == DialogResult.OK)
 					{
 						this.FractalComplete?.Invoke(this, _fractalApiName);
-						if (_fractal.HasValue)
+						if (_fractal != null)
 						{
-							MarkCompleted(_fractal.Value);
+							MarkCompleted(_fractal);
 						}
 					}
 					break;

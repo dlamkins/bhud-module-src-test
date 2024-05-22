@@ -47,6 +47,9 @@ namespace RaidClears
 		public static InstabilitiesData InstabilitiesData { get; set; } = null;
 
 
+		public static FractalMapData FractalMapData { get; set; } = null;
+
+
 		public static RaidPanel RaidWindow { get; set; } = null;
 
 

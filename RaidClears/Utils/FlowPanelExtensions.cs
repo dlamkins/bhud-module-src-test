@@ -6,6 +6,7 @@ using Blish_HUD.Graphics.UI;
 using Blish_HUD.Settings;
 using Blish_HUD.Settings.UI.Views;
 using Microsoft.Xna.Framework;
+using RaidClears.Features.Fractals.Services;
 using RaidClears.Features.Shared.Enums;
 using RaidClears.Settings.Controls;
 using RaidClears.Settings.Enums;
@@ -203,7 +204,7 @@ namespace RaidClears.Utils
 			return panel;
 		}
 
-		public static FlowPanel AddEncounterClearStatus(this FlowPanel panel, Encounters.Fractal encounter, DateTime clearDate)
+		public static FlowPanel AddEncounterClearStatus(this FlowPanel panel, FractalMap encounter, DateTime clearDate)
 		{
 			new EncounterClearStatus(panel, encounter, clearDate);
 			return panel;

@@ -2,6 +2,7 @@ using System;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
+using RaidClears.Features.Fractals.Services;
 using RaidClears.Features.Shared.Enums;
 using RaidClears.Features.Shared.Enums.Extensions;
 
@@ -11,7 +12,7 @@ namespace RaidClears.Settings.Controls
 	{
 		private bool IsFractal;
 
-		private Encounters.Fractal fractal;
+		private FractalMap fractal;
 
 		private Encounters.StrikeMission mission;
 
@@ -19,7 +20,7 @@ namespace RaidClears.Settings.Controls
 
 		private Label clearDate = new Label();
 
-		public EncounterClearStatus(FlowPanel parent, Encounters.Fractal encounter, DateTime lastClear)
+		public EncounterClearStatus(FlowPanel parent, FractalMap encounter, DateTime lastClear)
 			: this()
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
@@ -30,7 +31,7 @@ namespace RaidClears.Settings.Controls
 			fractal = encounter;
 			((Control)this).set_Parent((Container)(object)parent);
 			((Control)this).set_Width(((Control)parent).get_Width());
-			Build(encounter.GetLabel(), lastClear);
+			Build(encounter.Label, lastClear);
 		}
 
 		public EncounterClearStatus(FlowPanel parent, Encounters.StrikeMission encounter, DateTime lastClear)
