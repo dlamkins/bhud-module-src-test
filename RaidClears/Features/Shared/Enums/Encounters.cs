@@ -32,24 +32,6 @@ namespace RaidClears.Features.Shared.Enums
 			QadimThePeerless
 		}
 
-		public enum StrikeMission
-		{
-			ShiverpeaksPass,
-			Fraenir,
-			VoiceAndClaw,
-			Whisper,
-			Boneskinner,
-			ColdWar,
-			AetherbladeHideout,
-			Junkyard,
-			Overlook,
-			HarvestTemple,
-			OldLionsCourt,
-			DragonStorm,
-			CosmicObservatory,
-			TempleOfFebe
-		}
-
 		public enum Dungeons
 		{
 			AscalonianCatacombs,

@@ -24,6 +24,7 @@ using RaidClears.Localization;
 using RaidClears.Settings.Controls;
 using RaidClears.Settings.Services;
 using RaidClears.Settings.Views;
+using RaidClears.Shared.Services;
 using SemVer;
 
 namespace RaidClears
@@ -32,6 +33,8 @@ namespace RaidClears
 	public class Module : Module
 	{
 		public static string DIRECTORY_PATH = "clearsTracker";
+
+		public static string STATIC_HOST_URL = "https://bhm.blishhud.com/Soeed.RaidClears/static";
 
 		internal static readonly Logger ModuleLogger = Logger.GetLogger<Module>();
 
@@ -62,8 +65,11 @@ namespace RaidClears
 
 		protected override Task LoadAsync()
 		{
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Expected O, but got Unknown
+			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Expected O, but got Unknown
+			ModuleMetaDataService.CheckVersions();
+			Service.StrikeData = StrikeData.Load();
+			Service.StrikeSettings = StrikeSettingsPersistance.Load();
 			Service.FractalMapData = FractalMapData.Load();
 			Service.InstabilitiesData = InstabilitiesData.Load();
 			Service.StrikePersistance = StrikePersistance.Load();

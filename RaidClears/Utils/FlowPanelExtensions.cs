@@ -7,7 +7,7 @@ using Blish_HUD.Settings;
 using Blish_HUD.Settings.UI.Views;
 using Microsoft.Xna.Framework;
 using RaidClears.Features.Fractals.Services;
-using RaidClears.Features.Shared.Enums;
+using RaidClears.Features.Strikes.Services;
 using RaidClears.Settings.Controls;
 using RaidClears.Settings.Enums;
 using RaidClears.Settings.Views;
@@ -210,7 +210,7 @@ namespace RaidClears.Utils
 			return panel;
 		}
 
-		public static FlowPanel AddEncounterClearStatus(this FlowPanel panel, Encounters.StrikeMission encounter, DateTime clearDate)
+		public static FlowPanel AddEncounterClearStatus(this FlowPanel panel, StrikeMission encounter, DateTime clearDate)
 		{
 			new EncounterClearStatus(panel, encounter, clearDate);
 			return panel;
@@ -249,6 +249,12 @@ namespace RaidClears.Utils
 
 		public static FlowPanel AddString(this FlowPanel panel, string text)
 		{
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			return panel.AddString(text, Color.get_White());
+		}
+
+		public static FlowPanel AddString(this FlowPanel panel, string text, Color color)
+		{
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
@@ -257,6 +263,8 @@ namespace RaidClears.Utils
 			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 			Label val = new Label();
 			((Control)val).set_Parent((Container)(object)panel);
 			val.set_AutoSizeWidth(true);
@@ -264,6 +272,7 @@ namespace RaidClears.Utils
 			val.set_Text(text);
 			val.set_WrapText(false);
 			((Control)val).set_Location(new Point(25, 0));
+			val.set_TextColor(color);
 			return panel;
 		}
 

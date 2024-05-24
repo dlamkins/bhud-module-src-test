@@ -60,15 +60,11 @@ namespace RaidClears.Features.Fractals.Services
 			FileInfo configFileInfo = GetConfigFileInfo();
 			if (configFileInfo != null && configFileInfo.Exists)
 			{
-				DateTime lastWriteTime = configFileInfo.LastWriteTime;
-				if ((DateTime.Now - lastWriteTime).TotalDays < 1.0)
+				using (StreamReader reader = new StreamReader(configFileInfo.FullName))
 				{
-					using (StreamReader reader = new StreamReader(configFileInfo.FullName))
-					{
-						string fileText = reader.ReadToEnd();
-						reader.Close();
-						return LoadFileFromCache(fileText);
-					}
+					string fileText = reader.ReadToEnd();
+					reader.Close();
+					return LoadFileFromCache(fileText);
 				}
 			}
 			return DownloadFile();
@@ -84,7 +80,7 @@ namespace RaidClears.Features.Fractals.Services
 			return loadedCharacterConfiguration;
 		}
 
-		private static InstabilitiesData DownloadFile()
+		public static InstabilitiesData DownloadFile()
 		{
 			try
 			{

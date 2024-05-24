@@ -38,6 +38,12 @@ namespace RaidClears
 		public static SettingsPanel SettingsWindow { get; set; } = null;
 
 
+		public static StrikeData StrikeData { get; set; } = null;
+
+
+		public static StrikeSettingsPersistance StrikeSettings { get; set; } = null;
+
+
 		public static StrikePersistance StrikePersistance { get; set; } = null;
 
 

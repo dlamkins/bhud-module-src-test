@@ -1,7 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using Newtonsoft.Json;
+using RaidClears.Features.Fractals.Services;
+using RaidClears.Features.Shared.Services;
+using RaidClears.Features.Strikes.Services;
 
 namespace RaidClears.Shared.Services
 {
@@ -14,11 +18,18 @@ namespace RaidClears.Shared.Services
 		[JsonIgnore]
 		public static string FILE_URL = "https://bhm.blishhud.com/Soeed.RaidClears/static/clears_tracker.json";
 
-		[JsonProperty("fracal_instabilities")]
-		public string Instabilities { get; set; }
+		[JsonProperty("fractal_instabilities")]
+		public string InstabilitiesVersion { get; set; }
 
 		[JsonProperty("fractal_map_data")]
-		public string MapData { get; set; }
+		public string FractalMapVersion { get; set; }
+
+		[JsonProperty("strike_data")]
+		public string StrikeDataVersion { get; set; }
+
+		[JsonProperty("assets")]
+		public List<string> Assets { get; set; } = new List<string>();
+
 
 		private static FileInfo GetConfigFileInfo()
 		{
@@ -34,23 +45,63 @@ namespace RaidClears.Shared.Services
 			writer.Close();
 		}
 
+		public static void CheckVersions()
+		{
+			ModuleMetaDataService webFile = DownloadFile();
+			ModuleMetaDataService localFile = Load();
+			if (webFile.InstabilitiesVersion != localFile.InstabilitiesVersion)
+			{
+				InstabilitiesData.DownloadFile();
+				Module.ModuleLogger.Info("JSON File: Instababilites UPDATED to version " + webFile.InstabilitiesVersion);
+			}
+			else
+			{
+				Module.ModuleLogger.Info("JSON File: Instababilites are current on version " + webFile.InstabilitiesVersion);
+			}
+			if (webFile.FractalMapVersion != localFile.FractalMapVersion)
+			{
+				FractalMapData.DownloadFile();
+				Module.ModuleLogger.Info("JSON File: Fractal Map Data UPDATED to version " + webFile.FractalMapVersion);
+			}
+			else
+			{
+				Module.ModuleLogger.Info("JSON File: Fractal Map Data is current on version " + webFile.FractalMapVersion);
+			}
+			if (webFile.StrikeDataVersion != localFile.StrikeDataVersion)
+			{
+				StrikeData.DownloadFile();
+				Module.ModuleLogger.Info("JSON File: Strike Data UPDATED to version " + webFile.StrikeDataVersion);
+			}
+			else
+			{
+				Module.ModuleLogger.Info("JSON File: Strike Data is current on version " + webFile.StrikeDataVersion);
+			}
+			webFile.Save();
+			webFile.ValidateAssetCache(webFile.Assets);
+		}
+
+		public void ValidateAssetCache(List<string> assets)
+		{
+			DownloadTextureService _textures = new DownloadTextureService();
+			foreach (string asset in assets)
+			{
+				_textures.ValidateTextureCache(asset);
+			}
+		}
+
 		public static ModuleMetaDataService Load()
 		{
 			FileInfo configFileInfo = GetConfigFileInfo();
 			if (configFileInfo != null && configFileInfo.Exists)
 			{
-				DateTime lastWriteTime = configFileInfo.LastWriteTime;
-				if ((DateTime.Now - lastWriteTime).TotalDays < 1.0)
+				using (StreamReader reader = new StreamReader(configFileInfo.FullName))
 				{
-					using (StreamReader reader = new StreamReader(configFileInfo.FullName))
-					{
-						string fileText = reader.ReadToEnd();
-						reader.Close();
-						return LoadFileFromCache(fileText);
-					}
+					string fileText = reader.ReadToEnd();
+					reader.Close();
+					return LoadFileFromCache(fileText);
 				}
 			}
-			return DownloadFile();
+			return new ModuleMetaDataService();
 		}
 
 		private static ModuleMetaDataService LoadFileFromCache(string fileText)
@@ -68,13 +119,12 @@ namespace RaidClears.Shared.Services
 			try
 			{
 				using WebClient webClient = new WebClient();
-				ModuleMetaDataService instabs = JsonConvert.DeserializeObject<ModuleMetaDataService>(webClient.DownloadString(FILE_URL));
-				if (instabs == null)
+				ModuleMetaDataService metaFile = JsonConvert.DeserializeObject<ModuleMetaDataService>(webClient.DownloadString(FILE_URL));
+				if (metaFile == null)
 				{
 					return new ModuleMetaDataService();
 				}
-				instabs.Save();
-				return instabs;
+				return metaFile;
 			}
 			catch (Exception)
 			{

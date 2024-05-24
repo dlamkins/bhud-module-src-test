@@ -33,7 +33,7 @@ namespace RaidClears.Settings.Views.Tabs
 				(SettingEntry)(object)Service.Settings.StrikeSettings.AnchorToRaidPanel
 			})));
 			_registeredMenuItems.Add(new MenuViewItem(new MenuItem(Strings.SettingsPanel_Raids_Heading_Layout), (MenuItem _) => (IView)(object)new GenericStyleView(Service.Settings.StrikeSettings.Style, null, showCopyRaids: true)));
-			_registeredMenuItems.Add(new MenuViewItem(new MenuItem(Strings.SettingsPanel_Strikes_Heading_Selection), (MenuItem _) => (IView)(object)new StrikeSelectionView(Service.Settings.StrikeSettings)));
+			_registeredMenuItems.Add(new MenuViewItem(new MenuItem(Strings.SettingsPanel_Strikes_Heading_Selection), (MenuItem _) => (IView)(object)new DynamicStrikeSelectionView()));
 			_registeredMenuItems.Add(new MenuViewItem(new MenuItem("Manage Clears"), (MenuItem _) => (IView)(object)new StrikeClearCorrectionView()));
 		}
 

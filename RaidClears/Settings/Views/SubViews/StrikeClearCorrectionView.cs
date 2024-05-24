@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
-using RaidClears.Features.Shared.Enums;
+using Microsoft.Xna.Framework;
+using RaidClears.Features.Strikes.Services;
 using RaidClears.Utils;
 
 namespace RaidClears.Settings.Views.SubViews
@@ -19,18 +20,31 @@ namespace RaidClears.Settings.Views.SubViews
 		{
 			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0012: Expected O, but got Unknown
+			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
 			((View<IPresenter>)this).Build(buildPanel);
 			FlowPanel panel = FlowPanelExtensions.BeginFlow(new FlowPanel(), buildPanel);
-			Dictionary<Encounters.StrikeMission, DateTime> clears = new Dictionary<Encounters.StrikeMission, DateTime>();
+			((Panel)panel).set_CanScroll(true);
+			Dictionary<string, DateTime> clears = new Dictionary<string, DateTime>();
 			if (!Service.StrikePersistance.AccountClears.TryGetValue(Service.CurrentAccountName, out clears))
 			{
-				clears = new Dictionary<Encounters.StrikeMission, DateTime>();
+				clears = new Dictionary<string, DateTime>();
 			}
-			foreach (KeyValuePair<Encounters.StrikeMission, DateTime> entry in clears.OrderBy((KeyValuePair<Encounters.StrikeMission, DateTime> p) => p.Key))
+			foreach (ExpansionStrikes expansion in Service.StrikeData.Expansions.OrderBy((ExpansionStrikes x) => x.Name))
 			{
-				panel.AddEncounterClearStatus(entry.Key, entry.Value);
+				panel.AddString(expansion.Name, Color.get_Gold());
+				foreach (StrikeMission mission in expansion.Missions.OrderBy((StrikeMission x) => x.Name))
+				{
+					if (clears.ContainsKey(mission.Id))
+					{
+						panel.AddEncounterClearStatus(mission, clears[mission.Id]);
+					}
+					else
+					{
+						panel.AddEncounterClearStatus(mission, default(DateTime));
+					}
+				}
 			}
-			panel.AddString("Last Strike Mission Clears");
+			panel.AddString("Last Strike Mission Clears (Profile: " + Service.CurrentAccountName + ")");
 		}
 	}
 }

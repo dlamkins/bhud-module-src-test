@@ -14,7 +14,7 @@ namespace RaidClears.Features.Strikes
 {
 	public class StrikesPanel : GridPanel
 	{
-		private readonly IEnumerable<Strike> _strikes;
+		private IEnumerable<Strike> _strikes;
 
 		private readonly MapWatcherService _mapService;
 

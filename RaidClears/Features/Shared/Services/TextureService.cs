@@ -1,4 +1,5 @@
 using System;
+using Blish_HUD.Content;
 using Blish_HUD.Modules.Managers;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -6,11 +7,7 @@ namespace RaidClears.Features.Shared.Services
 {
 	public class TextureService : IDisposable
 	{
-		public Texture2D EoDLogo { get; }
-
-		public Texture2D IBSLogo { get; }
-
-		public Texture2D SotOLogo { get; }
+		protected DownloadTextureService _downloadTextures { get; set; }
 
 		public Texture2D PoFLogo { get; }
 
@@ -38,21 +35,24 @@ namespace RaidClears.Features.Shared.Services
 
 		public TextureService(ContentsManager contentsManager)
 		{
+			_downloadTextures = new DownloadTextureService();
 			CornerIconTexture = contentsManager.GetTexture("raids\\textures\\raidIconDark.png");
 			CornerIconHoverTexture = contentsManager.GetTexture("raids\\textures\\raidIconBright.png");
-			SettingWindowBackground = contentsManager.GetTexture("controls/window/background.png");
+			SettingWindowBackground = AsyncTexture2D.op_Implicit(GetDynamicTexture("texture_background.png"));
 			SettingWindowEmblem = contentsManager.GetTexture("module_profile_hero_icon.png");
 			SettingTabRaid = contentsManager.GetTexture("controls/tab_icons/raid.png");
 			SettingTabDungeon = contentsManager.GetTexture("controls/tab_icons/dungeon.png");
 			SettingTabGeneral = contentsManager.GetTexture("controls/tab_icons/cog.png");
 			SettingTabStrikes = contentsManager.GetTexture("controls/tab_icons/strikes.png");
 			SettingTabFractals = contentsManager.GetTexture("controls/tab_icons/fotm.png");
-			EoDLogo = contentsManager.GetTexture("eod_strikes_texture.png");
-			IBSLogo = contentsManager.GetTexture("ibs_strikes_texture.png");
-			SotOLogo = contentsManager.GetTexture("soto_strikes_texture.png");
-			PoFLogo = contentsManager.GetTexture("pof_raids_texture.png");
-			HoTLogo = contentsManager.GetTexture("hot_raids_texture.png");
-			BaseLogo = contentsManager.GetTexture("base_game_texture.png");
+			PoFLogo = AsyncTexture2D.op_Implicit(GetDynamicTexture("texture_raids_pof.png"));
+			HoTLogo = AsyncTexture2D.op_Implicit(GetDynamicTexture("texture_raids_hot.png"));
+			BaseLogo = AsyncTexture2D.op_Implicit(GetDynamicTexture("texture_base_logo.png"));
+		}
+
+		public AsyncTexture2D GetDynamicTexture(string path)
+		{
+			return AsyncTexture2D.op_Implicit(_downloadTextures.GetDynamicTexture(path));
 		}
 
 		public void Dispose()
@@ -66,12 +66,10 @@ namespace RaidClears.Features.Shared.Services
 			((GraphicsResource)SettingTabGeneral).Dispose();
 			((GraphicsResource)SettingTabStrikes).Dispose();
 			((GraphicsResource)SettingTabFractals).Dispose();
-			((GraphicsResource)EoDLogo).Dispose();
-			((GraphicsResource)IBSLogo).Dispose();
-			((GraphicsResource)SotOLogo).Dispose();
 			((GraphicsResource)PoFLogo).Dispose();
 			((GraphicsResource)HoTLogo).Dispose();
 			((GraphicsResource)BaseLogo).Dispose();
+			_downloadTextures.Dispose();
 		}
 	}
 }

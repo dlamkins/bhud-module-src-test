@@ -26,7 +26,7 @@ namespace RaidClears.Features.Strikes.Models
 		protected void InitGroup(Container panel)
 		{
 			GridGroup group = new GridGroup(panel, settings.Style.Layout);
-			((FlowPanel)(object)group).VisiblityChanged(settings.StrikeVisiblePriority);
+			((FlowPanel)(object)group).VisiblityChanged(Service.StrikeData.GetPriorityVisible());
 			SetGridGroupReference(group);
 			GridBox labelBox = new GridBox((Container)(object)group, shortName, name, settings.Style.LabelOpacity, settings.Style.FontSize);
 			SetGroupLabelReference(labelBox);

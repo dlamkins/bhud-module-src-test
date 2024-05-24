@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using Blish_HUD;
 using Blish_HUD.Controls;
-using RaidClears.Features.Shared.Enums;
-using RaidClears.Features.Shared.Enums.Extensions;
 using RaidClears.Localization;
 using RaidClears.Settings.Enums;
 using RaidClears.Shared.Controls;
@@ -14,7 +12,7 @@ namespace RaidClears.Features.Strikes.Services
 	{
 		protected bool _isOnStrikeMap;
 
-		protected Encounters.StrikeMission? _strikeMission;
+		protected StrikeMission? _strikeMission;
 
 		protected string _strikeApiName = string.Empty;
 
@@ -31,42 +29,42 @@ namespace RaidClears.Features.Strikes.Services
 
 		public void DispatchCurrentStrikeClears()
 		{
-			Dictionary<Encounters.StrikeMission, DateTime> clears = new Dictionary<Encounters.StrikeMission, DateTime>();
+			Dictionary<string, DateTime> clears = new Dictionary<string, DateTime>();
 			if (!Service.StrikePersistance.AccountClears.TryGetValue(Service.CurrentAccountName, out clears))
 			{
-				clears = new Dictionary<Encounters.StrikeMission, DateTime>();
+				clears = new Dictionary<string, DateTime>();
 			}
 			List<string> clearedStrikesThisReset = new List<string>();
-			foreach (KeyValuePair<Encounters.StrikeMission, DateTime> entry in clears)
+			foreach (KeyValuePair<string, DateTime> entry in clears)
 			{
-				if (entry.Key.GetExpansionType() == StrikeMissionType.Ibs && entry.Value >= Service.ResetWatcher.LastDailyReset)
+				if (Service.StrikeData.GetStrikeMissionResetById(entry.Key) == "daily")
 				{
-					clearedStrikesThisReset.Add(entry.Key.GetApiLabel());
-					clearedStrikesThisReset.Add("priority_" + entry.Key.GetApiLabel());
-				}
-				if ((entry.Key.GetExpansionType() == StrikeMissionType.Eod || entry.Key.GetExpansionType() == StrikeMissionType.SotO) && entry.Value >= Service.ResetWatcher.LastWeeklyReset)
-				{
-					clearedStrikesThisReset.Add(entry.Key.GetApiLabel());
 					if (entry.Value >= Service.ResetWatcher.LastDailyReset)
 					{
-						clearedStrikesThisReset.Add("priority_" + entry.Key.GetApiLabel());
+						clearedStrikesThisReset.Add(entry.Key);
+						clearedStrikesThisReset.Add("priority_" + entry.Key);
 					}
+					continue;
 				}
-				if ((entry.Key.GetExpansionType() == StrikeMissionType.Eod || entry.Key.GetExpansionType() == StrikeMissionType.SotO) && entry.Value >= Service.ResetWatcher.LastDailyReset)
+				if (entry.Value >= Service.ResetWatcher.LastWeeklyReset)
 				{
-					clearedStrikesThisReset.Add("priority_" + entry.Key.GetApiLabel());
+					clearedStrikesThisReset.Add(entry.Key);
+				}
+				if (entry.Value >= Service.ResetWatcher.LastDailyReset)
+				{
+					clearedStrikesThisReset.Add("priority_" + entry.Key);
 				}
 			}
 			this.CompletedStrikes?.Invoke(this, clearedStrikesThisReset);
 		}
 
-		public void MarkStrikeCompleted(Encounters.StrikeMission mission)
+		public void MarkStrikeCompleted(StrikeMission mission)
 		{
 			Service.StrikePersistance.SaveClear(Service.CurrentAccountName, mission);
 			DispatchCurrentStrikeClears();
 		}
 
-		public void MarkStrikeNotCompleted(Encounters.StrikeMission mission)
+		public void MarkStrikeNotCompleted(StrikeMission mission)
 		{
 			Service.StrikePersistance.RemoveClear(Service.CurrentAccountName, mission);
 			DispatchCurrentStrikeClears();
@@ -82,13 +80,14 @@ namespace RaidClears.Features.Strikes.Services
 
 		private async void CurrentMap_MapChanged(object sender, ValueEventArgs<int> e)
 		{
-			if (Enum.IsDefined(typeof(MapIds.StrikeMaps), e.get_Value()))
+			StrikeMission _strikeMap = Service.StrikeData.GetStrikeMisisonByMapId(e.get_Value());
+			if (_strikeMap != null)
 			{
 				Reset();
 				_isOnStrikeMap = true;
-				_strikeApiName = ((MapIds.StrikeMaps)e.get_Value()).GetApiLabel();
-				_strikeName = ((MapIds.StrikeMaps)e.get_Value()).GetLabel();
-				_strikeMission = ((MapIds.StrikeMaps)e.get_Value()).GetStrikeMission();
+				_strikeApiName = _strikeMap.Id;
+				_strikeName = _strikeMap.Name;
+				_strikeMission = _strikeMap;
 			}
 			else
 			{
@@ -100,9 +99,9 @@ namespace RaidClears.Features.Strikes.Services
 				{
 				case StrikeComplete.MAP_CHANGE:
 					this.StrikeCompleted?.Invoke(this, _strikeApiName);
-					if (_strikeMission.HasValue)
+					if (_strikeMission != null)
 					{
-						MarkStrikeCompleted(_strikeMission.Value);
+						MarkStrikeCompleted(_strikeMission);
 					}
 					break;
 				case StrikeComplete.POPUP:
@@ -117,9 +116,9 @@ namespace RaidClears.Features.Strikes.Services
 					if (num == DialogResult.OK)
 					{
 						this.StrikeCompleted?.Invoke(this, _strikeApiName);
-						if (_strikeMission.HasValue)
+						if (_strikeMission != null)
 						{
-							MarkStrikeCompleted(_strikeMission.Value);
+							MarkStrikeCompleted(_strikeMission);
 						}
 					}
 					break;

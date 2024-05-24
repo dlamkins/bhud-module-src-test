@@ -3,8 +3,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
 using RaidClears.Features.Fractals.Services;
-using RaidClears.Features.Shared.Enums;
-using RaidClears.Features.Shared.Enums.Extensions;
+using RaidClears.Features.Strikes.Services;
 
 namespace RaidClears.Settings.Controls
 {
@@ -14,7 +13,7 @@ namespace RaidClears.Settings.Controls
 
 		private FractalMap fractal;
 
-		private Encounters.StrikeMission mission;
+		private StrikeMission mission;
 
 		private Label title = new Label();
 
@@ -30,11 +29,11 @@ namespace RaidClears.Settings.Controls
 			IsFractal = true;
 			fractal = encounter;
 			((Control)this).set_Parent((Container)(object)parent);
-			((Control)this).set_Width(((Control)parent).get_Width());
+			((Control)this).set_Width(((Control)parent).get_Width() - 10);
 			Build(encounter.Label, lastClear);
 		}
 
-		public EncounterClearStatus(FlowPanel parent, Encounters.StrikeMission encounter, DateTime lastClear)
+		public EncounterClearStatus(FlowPanel parent, StrikeMission encounter, DateTime lastClear)
 			: this()
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
@@ -44,8 +43,8 @@ namespace RaidClears.Settings.Controls
 			IsFractal = false;
 			mission = encounter;
 			((Control)this).set_Parent((Container)(object)parent);
-			((Control)this).set_Width(((Control)parent).get_Width());
-			Build(encounter.GetLabel(), lastClear);
+			((Control)this).set_Width(((Control)parent).get_Width() - 10);
+			Build(encounter.Name, lastClear);
 		}
 
 		protected void MarkClear()
