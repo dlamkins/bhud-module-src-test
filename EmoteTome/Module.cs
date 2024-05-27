@@ -317,6 +317,7 @@ namespace EmoteTome
 			Module module = this;
 			CornerIcon val = new CornerIcon();
 			val.set_Icon(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("CornerIcon.png")));
+			val.set_Priority(61747774);
 			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((Control)val).set_Visible(false);
 			module.tomeCornerIcon = val;
