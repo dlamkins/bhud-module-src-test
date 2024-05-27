@@ -1,9 +1,13 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Gw2Sharp.WebApi;
-using Kenedia.Modules.Core.Interfaces;
+using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Models;
 using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.Core.Utility;
@@ -12,32 +16,26 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Kenedia.Modules.Core.Controls
 {
-	public class NotificationBadge : Control, ILocalizable
+	public class NotificationBadge : Control
 	{
-		private readonly DetailedTexture _badge = new DetailedTexture(222246);
+		private readonly List<ConditionalNotification> _removeNotifications = new List<ConditionalNotification>();
 
-		private Func<string> _setLocalizedText;
+		private DetailedTexture _badge = new DetailedTexture(222246);
 
 		private Control _anchor;
 
 		private float _opcacity = 1f;
 
+		private double _lastChecked;
+
+		private bool _deleting;
+
+		private string _message;
+
 		public CaptureType? CaptureInput { get; set; }
 
-		public Func<string> SetLocalizedText
-		{
-			get
-			{
-				return _setLocalizedText;
-			}
-			set
-			{
-				Common.SetProperty(ref _setLocalizedText, value, (Action)delegate
-				{
-					UserLocale_SettingChanged();
-				}, triggerOnUpdate: true);
-			}
-		}
+		public ObservableCollection<ConditionalNotification> Notifications { get; } = new ObservableCollection<ConditionalNotification>();
+
 
 		public float HoveredOpacity { get; set; } = 1f;
 
@@ -67,16 +65,38 @@ namespace Kenedia.Modules.Core.Controls
 			}
 		}
 
-		public Func<string> SetLocalizedTooltip { get; set; }
-
 		public Action ClickAction { get; set; }
 
 		public NotificationBadge()
 			: this()
 		{
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).set_Size(new Point(32));
 			LocalizingService.LocaleChanged += UserLocale_SettingChanged;
+			Notifications.CollectionChanged += Notifications_CollectionChanged;
+		}
+
+		private void Notifications_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			if (!_deleting)
+			{
+				e.OldItems?.Cast<ConditionalNotification>().ForEach(delegate(ConditionalNotification n)
+				{
+					n.ConditionMatched -= Notification_ConditionMatched;
+				});
+				e.NewItems?.Cast<ConditionalNotification>().ForEach(delegate(ConditionalNotification n)
+				{
+					n.ConditionMatched += Notification_ConditionMatched;
+				});
+				_message = ((Notifications.Count > 0) ? string.Join(Environment.NewLine, Notifications.Select((ConditionalNotification e) => e.NotificationText).Distinct().Enumerate(Environment.NewLine, "[{0}]: ")) : string.Empty);
+				((Control)this).set_BasicTooltipText(_message);
+				((Control)this).set_Visible(Notifications.Count > 0);
+			}
+		}
+
+		private void Notification_ConditionMatched(object sender, EventArgs e)
+		{
+			_removeNotifications.Add(sender as ConditionalNotification);
 		}
 
 		private void OnAnchorChanged(object sender, ValueChangedEventArgs<Control> e)
@@ -114,7 +134,8 @@ namespace Kenedia.Modules.Core.Controls
 
 		public void UserLocale_SettingChanged(object sender = null, ValueChangedEventArgs<Locale> e = null)
 		{
-			((Control)this).set_BasicTooltipText(SetLocalizedText?.Invoke());
+			_message = ((Notifications.Count > 0) ? string.Join(Environment.NewLine, Notifications.Select((ConditionalNotification e) => e.NotificationText).Distinct().Enumerate(Environment.NewLine, "[{0}]: ")) : string.Empty);
+			((Control)this).set_BasicTooltipText(_message);
 		}
 
 		protected override void OnMouseMoved(MouseEventArgs e)
@@ -150,6 +171,8 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			((Control)this).DisposeControl();
 			Anchor = null;
+			_badge = null;
+			Notifications?.Clear();
 			LocalizingService.LocaleChanged -= UserLocale_SettingChanged;
 		}
 
@@ -163,6 +186,33 @@ namespace Kenedia.Modules.Core.Controls
 				return ((Control)this).CapturesInput();
 			}
 			return (CaptureType)(((_003F?)CaptureInput) ?? ((Control)this).CapturesInput());
+		}
+
+		public override void DoUpdate(GameTime gameTime)
+		{
+			((Control)this).DoUpdate(gameTime);
+			if (gameTime.get_TotalGameTime().TotalMilliseconds - _lastChecked < 1000.0 || Notifications.Count <= 0)
+			{
+				return;
+			}
+			_lastChecked = gameTime.get_TotalGameTime().TotalMilliseconds;
+			foreach (ConditionalNotification notification in Notifications)
+			{
+				notification.CheckCondition();
+			}
+			for (int i = 0; i < _removeNotifications.Count; i++)
+			{
+				_deleting = i < _removeNotifications.Count - 1;
+				Notifications.Remove(_removeNotifications[i]);
+			}
+		}
+
+		public void AddNotification(ConditionalNotification notification)
+		{
+			if (notification != null)
+			{
+				Notifications.Add(notification);
+			}
 		}
 	}
 }

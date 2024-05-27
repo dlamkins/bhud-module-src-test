@@ -65,12 +65,12 @@ namespace Kenedia.Modules.Core.Models
 		{
 			ClientWindowService clientWindowService = new ClientWindowService();
 			SharedSettings sharedSettings = new SharedSettings();
-			TexturesService texturesService = new TexturesService(ContentsManager);
 			InputDetectionService inputDetectionService = new InputDetectionService();
 			GameStateDetectionService gameState = new GameStateDetectionService(clientWindowService, sharedSettings);
-			Services = new ServiceCollection(gameState, clientWindowService, sharedSettings, texturesService, inputDetectionService);
+			Services = new ServiceCollection(gameState, clientWindowService, sharedSettings, inputDetectionService);
 			SharedSettingsView = new SharedSettingsView(sharedSettings, clientWindowService);
 			GameService.Overlay.get_UserLocale().add_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)OnLocaleChanged);
+			TexturesService.Initilize(ContentsManager);
 		}
 
 		protected override void Initialize()

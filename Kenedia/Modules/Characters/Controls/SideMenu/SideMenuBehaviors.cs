@@ -105,8 +105,19 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 				KeyValuePair<string, DisplayCheckToggle> t = _toggles[i];
 				Settings settings2 = _settings;
 				string key = t.Key;
-				string key2 = t.Key;
-				DisplayCheckToggle displayCheckToggle2 = new DisplayCheckToggle(textureManager, settings2, key, key2 == "Name" || key2 == "Profession" || key2 == "LastLogin");
+				bool show;
+				switch (t.Key)
+				{
+				case "Name":
+				case "Profession":
+				case "LastLogin":
+					show = true;
+					break;
+				default:
+					show = false;
+					break;
+				}
+				DisplayCheckToggle displayCheckToggle2 = new DisplayCheckToggle(textureManager, settings2, key, show);
 				((Control)displayCheckToggle2).set_Parent((Container)(object)this);
 				DisplayCheckToggle ctrl = displayCheckToggle2;
 				ctrl.Changed += Toggle_Changed;

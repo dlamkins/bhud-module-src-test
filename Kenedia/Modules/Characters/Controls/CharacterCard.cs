@@ -649,7 +649,7 @@ namespace Kenedia.Modules.Characters.Controls
 			{
 				return;
 			}
-			_003C_003En__0(e);
+			base.OnClick(e);
 			if (e.get_IsDoubleClick() && _settings.DoubleClickToEnter.get_Value())
 			{
 				Character.Swap();

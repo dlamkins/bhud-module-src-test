@@ -13,16 +13,13 @@ namespace Kenedia.Modules.Core.Models
 
 		public SharedSettings SharedSettings { get; }
 
-		public TexturesService TexturesService { get; }
-
 		public InputDetectionService InputDetectionService { get; }
 
-		public ServiceCollection(GameStateDetectionService gameState, ClientWindowService clientWindowService, SharedSettings sharedSettings, TexturesService texturesService, InputDetectionService inputDetectionService)
+		public ServiceCollection(GameStateDetectionService gameState, ClientWindowService clientWindowService, SharedSettings sharedSettings, InputDetectionService inputDetectionService)
 		{
 			GameStateDetectionService = gameState;
 			ClientWindowService = clientWindowService;
 			SharedSettings = sharedSettings;
-			TexturesService = texturesService;
 			InputDetectionService = inputDetectionService;
 		}
 

@@ -19,9 +19,9 @@ namespace Kenedia.Modules.Core.Controls
 	{
 		private readonly Panel _modalBackground;
 
-		private readonly AsyncTexture2D _backgroundImage = AsyncTexture2D.FromAssetId(156003);
+		private AsyncTexture2D _backgroundImage = AsyncTexture2D.FromAssetId(156003);
 
-		private readonly AsyncTexture2D _alertImage = AsyncTexture2D.FromAssetId(222246);
+		private AsyncTexture2D _alertImage = AsyncTexture2D.FromAssetId(222246);
 
 		private readonly (Button Button, DialogResult Result)[] _buttons;
 
@@ -333,6 +333,8 @@ namespace Kenedia.Modules.Core.Controls
 		protected override void DisposeControl()
 		{
 			base.DisposeControl();
+			_backgroundImage = null;
+			_alertImage = null;
 			Panel modalBackground = _modalBackground;
 			if (modalBackground != null)
 			{

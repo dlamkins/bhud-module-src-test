@@ -46,6 +46,10 @@ namespace Kenedia.Modules.Characters.Services
 
 		private double _lastApiCheck = double.MinValue;
 
+		private StatusType _apiStatus;
+
+		private StatusType _mapStatus;
+
 		private CancellationTokenSource _cancellationTokenSource;
 
 		private Account _account;
@@ -180,10 +184,9 @@ namespace Kenedia.Modules.Characters.Services
 				}
 			}
 			NotificationBadge notificationBadge = _notificationBadge();
-			if (notificationBadge != null)
-			{
-				((Control)notificationBadge).set_Visible(false);
-			}
+			bool result = default(bool);
+			object obj;
+			int num;
 			try
 			{
 				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Fetching new API Data ...");
@@ -197,7 +200,8 @@ namespace Kenedia.Modules.Characters.Services
 					if (cancellationToken.IsCancellationRequested)
 					{
 						Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
-						return false;
+						result = false;
+						return result;
 					}
 					Account = account;
 					BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Fetching characters for '" + Account.get_Name() + "' ...");
@@ -205,41 +209,57 @@ namespace Kenedia.Modules.Characters.Services
 					if (cancellationToken.IsCancellationRequested)
 					{
 						Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
-						return false;
+						result = false;
+						return result;
 					}
 					UpdateAccountsList(account, characters);
 					_callBack?.Invoke(characters);
 					Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
-					return true;
+					_apiStatus = StatusType.Success;
+					result = true;
+					return result;
 				}
 				if (!cancellationToken.IsCancellationRequested)
 				{
 					BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Warn(strings.Error_InvalidPermissions);
 					MainWindow?.SendAPIPermissionNotification();
-					HandleAPIExceptions(new Gw2ApiInvalidPermissionsException());
+					Task<Func<string>> text3 = HandleAPIExceptions(new Gw2ApiInvalidPermissionsException());
+					_apiStatus = StatusType.Error;
+					notificationBadge?.AddNotification(new ConditionalNotification(await text3, () => _apiStatus == StatusType.Success));
 				}
 				Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
-				return false;
+				result = false;
+				return result;
 			}
 			catch (UnexpectedStatusException val)
 			{
-				UnexpectedStatusException ex2 = val;
-				HandleAPIExceptions((Exception)(object)ex2);
-				MainWindow?.SendAPITimeoutNotification();
-				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Warn((Exception)(object)ex2, strings.APITimeoutNotification);
-				Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
-				return false;
+				obj = (object)val;
+				num = 1;
 			}
-			catch (Exception ex)
+			catch (Exception ex2)
 			{
 				if (!cancellationToken.IsCancellationRequested)
 				{
-					_logger.Warn(ex, strings.Error_FailedAPIFetch);
+					_logger.Warn(ex2, strings.Error_FailedAPIFetch);
 				}
-				HandleAPIExceptions(ex);
+				_apiStatus = StatusType.Error;
+				Task<Func<string>> text2 = HandleAPIExceptions(ex2);
+				notificationBadge?.AddNotification(new ConditionalNotification(await text2, () => _apiStatus == StatusType.Success));
 				Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
 				return false;
 			}
+			if (num != 1)
+			{
+				return result;
+			}
+			UnexpectedStatusException ex = (UnexpectedStatusException)obj;
+			Task<Func<string>> text = HandleAPIExceptions((Exception)(object)ex);
+			MainWindow?.SendAPITimeoutNotification();
+			BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Warn((Exception)(object)ex, strings.APITimeoutNotification);
+			Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
+			_apiStatus = StatusType.Error;
+			notificationBadge?.AddNotification(new ConditionalNotification(await text, () => _apiStatus == StatusType.Success));
+			return false;
 		}
 
 		public async Task FetchLocale(Locale? locale = null, bool force = false)
@@ -260,10 +280,6 @@ namespace Kenedia.Modules.Characters.Services
 		public async Task GetMaps()
 		{
 			NotificationBadge notificationBadge = _notificationBadge();
-			if (notificationBadge != null)
-			{
-				((Control)notificationBadge).set_Visible(false);
-			}
 			try
 			{
 				Dictionary<int, Map> _maps = _data.Maps;
@@ -283,42 +299,42 @@ namespace Kenedia.Modules.Characters.Services
 				}
 				string json = JsonConvert.SerializeObject((object)_maps, SerializerSettings.Default);
 				File.WriteAllText(_paths.ModuleDataPath + "\\Maps.json", json);
+				_mapStatus = StatusType.Success;
 			}
 			catch (Exception ex)
 			{
 				_logger.Warn("Failed to fetch armory items.");
 				_logger.Warn($"{ex}");
-				HandleAPIExceptions(ex);
+				Task<Func<string>> text = HandleAPIExceptions(ex);
+				_mapStatus = StatusType.Error;
+				notificationBadge?.AddNotification(new ConditionalNotification(await text, () => _mapStatus == StatusType.Success));
 			}
 		}
 
-		private async void HandleAPIExceptions(Exception ex)
+		private static string? GetExceptionMessage(Exception ex)
 		{
-			NotificationBadge notificationBadge = _notificationBadge();
-			if (notificationBadge != null)
+			string lineBreakPattern = "<\\/h[0-9]>";
+			string lineBreakReplacement = Environment.NewLine;
+			string result = Regex.Replace(ex?.Message ?? string.Empty, lineBreakPattern, lineBreakReplacement);
+			string pattern = "<[^>]+>";
+			string replacement = "";
+			result = Regex.Replace(result, pattern, replacement);
+			if (!string.IsNullOrEmpty(result))
 			{
-				((Control)notificationBadge).set_Visible(true);
-				if (ex is Gw2ApiInvalidPermissionsException)
-				{
-					ex = (await TestAPI()) ?? ex;
-				}
-				Func<string> func2 = (notificationBadge.SetLocalizedText = ((ex is ServiceUnavailableException) ? ((Func<string>)(() => strings_common.GW2API_Unavailable + GetExceptionMessage(ex))) : ((ex is RequestException) ? ((Func<string>)(() => strings_common.GW2API_RequestFailed + GetExceptionMessage(ex))) : ((ex is RequestException<string>) ? ((Func<string>)(() => strings_common.GW2API_RequestFailed + GetExceptionMessage(ex))) : ((!(ex is Gw2ApiInvalidPermissionsException)) ? ((Func<string>)(() => GetExceptionMessage(ex) ?? "")) : ((Func<string>)(() => strings.Error_InvalidPermissions + "\nIf you have a valid API Key added there are probably issues with the API currently.")))))));
+				return "\n\n" + result;
 			}
+			return null;
+		}
+
+		private async Task<Func<string>> HandleAPIExceptions(Exception ex)
+		{
+			if (ex is Gw2ApiInvalidPermissionsException)
+			{
+				ex = (await TestAPI()) ?? ex;
+			}
+			Func<string> result = ((ex is ServiceUnavailableException) ? ((Func<string>)(() => strings_common.GW2API_Unavailable + GetExceptionMessage(ex))) : ((ex is RequestException) ? ((Func<string>)(() => strings_common.GW2API_RequestFailed + GetExceptionMessage(ex))) : ((ex is RequestException<string>) ? ((Func<string>)(() => strings_common.GW2API_RequestFailed + GetExceptionMessage(ex))) : ((!(ex is Gw2ApiInvalidPermissionsException)) ? ((Func<string>)(() => GetExceptionMessage(ex) ?? "")) : ((Func<string>)(() => strings.Error_InvalidPermissions + "\nIf you have a valid API Key added there are probably issues with the API currently."))))));
 			_lastException = ex;
-			static string? GetExceptionMessage(Exception ex)
-			{
-				string lineBreakPattern = "<\\/h[0-9]>";
-				string lineBreakReplacement = Environment.NewLine;
-				string result = Regex.Replace(ex.Message ?? string.Empty, lineBreakPattern, lineBreakReplacement);
-				string pattern = "<[^>]+>";
-				string replacement = "";
-				result = Regex.Replace(result, pattern, replacement);
-				if (!string.IsNullOrEmpty(result))
-				{
-					return "\n\n" + result;
-				}
-				return null;
-			}
+			return result;
 		}
 
 		private async Task<Exception> TestAPI()

@@ -269,6 +269,7 @@ namespace Kenedia.Modules.Core.Controls
 		protected override void DisposeControl()
 		{
 			((Control)this).DisposeControl();
+			ChoyaTexture = null;
 			if (InputDetectionService != null)
 			{
 				InputDetectionService.MouseClicked -= InputDetectionService_MouseClicked;

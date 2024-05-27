@@ -1,6 +1,7 @@
 using System;
 using Blish_HUD;
 using Blish_HUD.Controls;
+using Blish_HUD.Input;
 using Gw2Sharp.WebApi;
 using Kenedia.Modules.Core.Interfaces;
 using Kenedia.Modules.Core.Services;
@@ -105,6 +106,24 @@ namespace Kenedia.Modules.Core.Controls
 		private void OnTextChanged(object sender, EventArgs e)
 		{
 			TextChangedAction?.Invoke(((TextInputBase)this).get_Text());
+		}
+
+		protected override void OnClick(MouseEventArgs e)
+		{
+			if (((Control)this).get_Enabled())
+			{
+				((TextInputBase)this).OnClick(e);
+			}
+		}
+
+		protected override CaptureType CapturesInput()
+		{
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			if (!((Control)this).get_Enabled())
+			{
+				return (CaptureType)0;
+			}
+			return ((Control)this).CapturesInput();
 		}
 	}
 }

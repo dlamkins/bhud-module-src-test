@@ -61,32 +61,22 @@ namespace Kenedia.Modules.Characters.Services
 			MainWindow
 		}
 
-		private readonly TexturesService _texturesService;
-
-		public TextureManager(TexturesService texturesService)
-		{
-			_texturesService = texturesService;
-		}
-
 		public Texture2D GetBackground(Backgrounds background)
 		{
-			TexturesService texturesService = _texturesService;
 			int num = (int)background;
-			return texturesService.GetTexture("textures\\backgrounds\\" + num + ".png", $"Background {background}");
+			return TexturesService.GetTextureFromRef("textures\\backgrounds\\" + num + ".png", $"Background {background}");
 		}
 
 		public Texture2D GetIcon(Icons icon)
 		{
-			TexturesService texturesService = _texturesService;
 			int num = (int)icon;
-			return texturesService.GetTexture("textures\\icons\\" + num + ".png", $"Icon {icon}");
+			return TexturesService.GetTextureFromRef("textures\\icons\\" + num + ".png", $"Icon {icon}");
 		}
 
 		public Texture2D GetControlTexture(ControlTextures control)
 		{
-			TexturesService texturesService = _texturesService;
 			int num = (int)control;
-			return texturesService.GetTexture("textures\\controls\\" + num + ".png", $"Control {control}");
+			return TexturesService.GetTextureFromRef("textures\\controls\\" + num + ".png", $"Control {control}");
 		}
 	}
 }

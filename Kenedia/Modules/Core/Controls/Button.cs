@@ -14,9 +14,9 @@ namespace Kenedia.Modules.Core.Controls
 {
 	public class Button : StandardButton, ILocalizable
 	{
-		private readonly Texture2D _textureButtonIdle = Control.get_Content().GetTexture("common/button-states");
+		private Texture2D _textureButtonIdle = Control.get_Content().GetTexture("common/button-states");
 
-		private readonly Texture2D _textureButtonBorder = Control.get_Content().GetTexture("button-border");
+		private Texture2D _textureButtonBorder = Control.get_Content().GetTexture("button-border");
 
 		private Func<string> _setLocalizedText;
 
@@ -88,6 +88,8 @@ namespace Kenedia.Modules.Core.Controls
 		protected override void DisposeControl()
 		{
 			((Control)this).DisposeControl();
+			_textureButtonBorder = null;
+			_textureButtonIdle = null;
 			GameService.Overlay.get_UserLocale().remove_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)UserLocale_SettingChanged);
 		}
 

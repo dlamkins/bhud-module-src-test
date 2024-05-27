@@ -1,76 +1,79 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using Blish_HUD;
-using Blish_HUD.Graphics;
+using Blish_HUD.Content;
 using Blish_HUD.Modules.Managers;
 using Kenedia.Modules.Core.Extensions;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Kenedia.Modules.Core.Services
 {
-	public class TexturesService : IDisposable
+	public static class TexturesService
 	{
-		private readonly Dictionary<string, Texture2D> _loadedTextures = new Dictionary<string, Texture2D>();
+		private static readonly Dictionary<string, Texture2D> s_loadedTextures = new Dictionary<string, Texture2D>();
 
-		private readonly ContentsManager _contentsManager;
+		private static ContentsManager s_contentsManager;
 
-		private bool _isDisposed;
-
-		public TexturesService(ContentsManager contentsManager)
+		public static void Initilize(ContentsManager contentsManager)
 		{
-			_contentsManager = contentsManager;
+			s_contentsManager = contentsManager;
 		}
 
-		public void Dispose()
+		public static void Dispose()
 		{
-			if (_isDisposed)
+			if (s_loadedTextures.Count > 0)
 			{
-				return;
+				((IEnumerable<IDisposable>)s_loadedTextures.Select((KeyValuePair<string, Texture2D> e) => e.Value)).DisposeAll();
 			}
-			_isDisposed = true;
-			if (_loadedTextures.Count > 0)
-			{
-				((IEnumerable<IDisposable>)_loadedTextures.Select((KeyValuePair<string, Texture2D> e) => e.Value)).DisposeAll();
-			}
-			_loadedTextures.Clear();
+			s_loadedTextures.Clear();
 		}
 
-		public Texture2D GetTexture(string path, string key)
+		public static Texture2D GetTextureFromRef(string path, string key)
 		{
-			if (_loadedTextures.ContainsKey(key))
+			if (s_contentsManager != null)
 			{
-				return _loadedTextures[key];
+				if (s_loadedTextures.ContainsKey(key))
+				{
+					return s_loadedTextures[key];
+				}
+				Texture2D texture = s_contentsManager.GetTexture(path);
+				s_loadedTextures.Add(key, texture);
+				return texture;
 			}
-			Texture2D texture = _contentsManager.GetTexture(path);
-			_loadedTextures.Add(key, texture);
+			return null;
+		}
+
+		public static Texture2D GetTextureFromRef(Bitmap bitmap, string key)
+		{
+			if (s_loadedTextures.ContainsKey(key))
+			{
+				return s_loadedTextures[key];
+			}
+			Texture2D texture;
+			s_loadedTextures.Add(key, texture = bitmap.CreateTexture2D());
 			return texture;
 		}
 
-		public Texture2D GetTexture(Bitmap bitmap, string key)
+		public static AsyncTexture2D GetTextureFromDisk(string path)
 		{
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			if (_loadedTextures.ContainsKey(key))
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Expected O, but got Unknown
+			if (s_loadedTextures.ContainsKey(path))
 			{
-				return _loadedTextures[key];
+				return AsyncTexture2D.op_Implicit(s_loadedTextures[path]);
 			}
-			GraphicsDeviceContext device = GameService.Graphics.LendGraphicsDeviceContext();
-			try
+			AsyncTexture2D texture = new AsyncTexture2D();
+			if (File.Exists(path))
 			{
-				using MemoryStream s = new MemoryStream();
-				bitmap.Save(s, ImageFormat.Png);
-				Texture2D texture = Texture2D.FromStream(((GraphicsDeviceContext)(ref device)).get_GraphicsDevice(), (Stream)s);
-				_loadedTextures.Add(key, texture);
-				return texture;
+				GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate(GraphicsDevice graphicsDevice)
+				{
+					texture.SwapTexture(TextureUtil.FromStreamPremultiplied(graphicsDevice, (Stream)new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)));
+				});
 			}
-			finally
-			{
-				((GraphicsDeviceContext)(ref device)).Dispose();
-			}
+			return texture;
 		}
 	}
 }

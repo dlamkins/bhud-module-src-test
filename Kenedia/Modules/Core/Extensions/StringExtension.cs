@@ -65,9 +65,8 @@ namespace Kenedia.Modules.Core.Extensions
 			if (source.Length > target.Length)
 			{
 				string text = target;
-				string text2 = source;
+				target = source;
 				source = text;
-				target = text2;
 			}
 			int l = target.Length;
 			int m = source.Length;

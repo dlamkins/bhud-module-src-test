@@ -222,7 +222,7 @@ namespace Kenedia.Modules.Characters
 			CharacterSorting = new CharacterSorting(base.Settings, base.Services.GameStateDetectionService, CharacterModels);
 			CharacterSwapping.CharacterSorting = CharacterSorting;
 			CharacterSorting.CharacterSwapping = CharacterSwapping;
-			TextureManager = new TextureManager(base.Services.TexturesService);
+			TextureManager = new TextureManager();
 			await Data.Load();
 			if (base.Settings.LoadCachedAccounts.get_Value())
 			{
@@ -550,15 +550,16 @@ namespace Kenedia.Modules.Characters
 
 		private void CreateCornerIcons()
 		{
-			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
 			DeleteCornerIcons();
 			CornerIcon cornerIcon = new CornerIcon();
 			((CornerIcon)cornerIcon).set_Icon(AsyncTexture2D.FromAssetId(156678));
 			((CornerIcon)cornerIcon).set_HoverIcon(AsyncTexture2D.FromAssetId(156679));
 			cornerIcon.SetLocalizedTooltip = () => string.Format(strings.Toggle, ((Module)this).get_Name() ?? "");
+			((CornerIcon)cornerIcon).set_Priority(51294256);
 			((Control)cornerIcon).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((Control)cornerIcon).set_Visible(base.Settings.ShowCornerIcon.get_Value());
 			cornerIcon.ClickAction = delegate

@@ -246,17 +246,7 @@ namespace Kenedia.Modules.Core.Views
 		{
 			((WindowBase2)this).DisposeControl();
 			((IEnumerable<IDisposable>)((Container)this).get_Children()).DisposeAll();
-			AsyncTexture2D subWindowEmblem = SubWindowEmblem;
-			if (subWindowEmblem != null)
-			{
-				subWindowEmblem.Dispose();
-			}
 			SubWindowEmblem = null;
-			AsyncTexture2D mainWindowEmblem = MainWindowEmblem;
-			if (mainWindowEmblem != null)
-			{
-				mainWindowEmblem.Dispose();
-			}
 			MainWindowEmblem = null;
 		}
 

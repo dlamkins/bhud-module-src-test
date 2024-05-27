@@ -559,7 +559,7 @@ namespace Kenedia.Modules.Characters.Views
 		{
 			Settings.SortBy sortby = _settings.SortType.get_Value();
 			bool asc = _settings.SortOrder.get_Value() == Settings.SortDirection.Ascending;
-			bool isNum = sortby == Settings.SortBy.Level || sortby == Settings.SortBy.TimeSinceLogin || sortby == Settings.SortBy.Map || sortby == Settings.SortBy.NextBirthday || sortby == Settings.SortBy.Age;
+			bool isNum = ((sortby == Settings.SortBy.Level || (uint)(sortby - 4) <= 1u || (uint)(sortby - 10) <= 1u) ? true : false);
 			if (_settings.SortType.get_Value() != Settings.SortBy.Custom)
 			{
 				((FlowPanel)CharactersPanel).SortChildren<CharacterCard>((Comparison<CharacterCard>)delegate(CharacterCard a, CharacterCard b)

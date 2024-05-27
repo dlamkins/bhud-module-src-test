@@ -5,6 +5,7 @@ using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Res;
+using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.Core.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -37,26 +38,26 @@ namespace Kenedia.Modules.Core.Controls
 
 		public ButtonImage()
 		{
-			_buttonImage = AsyncTexture2D.op_Implicit(textures_common.ImageButtonBackground.CreateTexture2D());
-			_hoveredButton = AsyncTexture2D.op_Implicit(textures_common.ImageButtonBackground_Hovered.CreateTexture2D());
+			_buttonImage = AsyncTexture2D.op_Implicit(TexturesService.GetTextureFromRef(textures_common.ImageButtonBackground, "ImageButtonBackground"));
+			_hoveredButton = AsyncTexture2D.op_Implicit(TexturesService.GetTextureFromRef(textures_common.ImageButtonBackground_Hovered, "ImageButtonBackground_Hovered"));
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
 			if (_buttonImage != null)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(((Control)this).get_MouseOver() ? _hoveredButton : _buttonImage), bounds, (Rectangle?)_buttonImage.get_Bounds(), Color.get_White());
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit((((Control)this).get_MouseOver() && ((Control)this).get_Enabled()) ? _hoveredButton : _buttonImage), bounds, (Rectangle?)_buttonImage.get_Bounds(), Color.get_White());
 			}
-			if (((Control)this).get_MouseOver())
+			if (((Control)this).get_MouseOver() && ((Control)this).get_Enabled())
 			{
 				for (int i = 0; i < _frameBounds.Count; i++)
 				{
@@ -101,17 +102,7 @@ namespace Kenedia.Modules.Core.Controls
 		protected override void DisposeControl()
 		{
 			base.DisposeControl();
-			AsyncTexture2D hoveredButton = _hoveredButton;
-			if (hoveredButton != null)
-			{
-				hoveredButton.Dispose();
-			}
 			_hoveredButton = null;
-			AsyncTexture2D buttonImage = _buttonImage;
-			if (buttonImage != null)
-			{
-				buttonImage.Dispose();
-			}
 			_buttonImage = null;
 		}
 	}

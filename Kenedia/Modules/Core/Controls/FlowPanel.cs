@@ -4,12 +4,15 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.Input;
 using Gw2Sharp.WebApi;
+using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Interfaces;
 using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.Core.Structs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Kenedia.Modules.Core.Controls
 {
@@ -55,8 +58,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		private Rectangle _layoutLeftAccentSrc;
 
-		private Rectangle _layoutHeaderBounds;
-
 		private Rectangle _layoutHeaderTextBounds;
 
 		private Rectangle _layoutHeaderIconBounds;
@@ -74,6 +75,14 @@ namespace Kenedia.Modules.Core.Controls
 		private int _titleBarHeight;
 
 		private bool _resized;
+
+		protected Rectangle LayoutHeaderBounds;
+
+		private Point _dragStart;
+
+		private Point _draggingStart;
+
+		private bool _dragging;
 
 		public bool ShowRightBorder { get; set; }
 
@@ -198,7 +207,15 @@ namespace Kenedia.Modules.Core.Controls
 			}
 		}
 
+		public Action OnCollapse { get; set; }
+
+		public Action OnExpand { get; set; }
+
 		public bool CaptureInput { get; set; }
+
+		public CaptureType? Capture { get; set; }
+
+		public bool CanDrag { get; set; }
 
 		public FlowPanel()
 		{
@@ -217,6 +234,32 @@ namespace Kenedia.Modules.Core.Controls
 			((FlowPanel)this)._002Ector();
 			LocalizingService.LocaleChanged += UserLocale_SettingChanged;
 			UserLocale_SettingChanged(null, null);
+		}
+
+		protected override void OnClick(MouseEventArgs e)
+		{
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			bool collapsed = ((Panel)this).get_Collapsed();
+			((Panel)this).OnClick(e);
+			if (collapsed != ((Panel)this).get_Collapsed())
+			{
+				if (((Panel)this).get_Collapsed())
+				{
+					OnCollapse?.Invoke();
+				}
+				else
+				{
+					OnExpand?.Invoke();
+				}
+			}
+			if (CanDrag)
+			{
+				MouseState state = GameService.Input.get_Mouse().get_State();
+				((MouseState)(ref state)).get_LeftButton();
+				_ = 1;
+			}
 		}
 
 		public override void RecalculateLayout()
@@ -270,13 +313,13 @@ namespace Kenedia.Modules.Core.Controls
 				_layoutLeftAccentSrc = new Rectangle(0, 0, _textureLeftSideAccent.get_Width(), _layoutLeftAccentBounds.Height);
 			}
 			((Container)this).set_ContentRegion(new Rectangle(_contentPadding.Left + num4, _contentPadding.Top + num, ((Control)this)._size.X - num4 - num2 - _contentPadding.Horizontal, ((Control)this)._size.Y - num - num3 - _contentPadding.Vertical));
-			_layoutHeaderBounds = new Rectangle(num4, 0, ((Control)this).get_Width(), num);
-			_layoutHeaderIconBounds = (Rectangle)((TitleIcon != null) ? new Rectangle(((Rectangle)(ref _layoutHeaderBounds)).get_Left() + _titleIconPadding.Left, _titleIconPadding.Top, num - _titleIconPadding.Vertical, num - _titleIconPadding.Vertical) : Rectangle.get_Empty());
-			_layoutHeaderTextBounds = new Rectangle(((Rectangle)(ref _layoutHeaderIconBounds)).get_Right() + _titleIconPadding.Right, 0, _layoutHeaderBounds.Width - _layoutHeaderIconBounds.Width, num);
+			LayoutHeaderBounds = new Rectangle(num4, 0, ((Control)this).get_Width(), num);
+			_layoutHeaderIconBounds = (Rectangle)((TitleIcon != null) ? new Rectangle(((Rectangle)(ref LayoutHeaderBounds)).get_Left() + _titleIconPadding.Left, _titleIconPadding.Top, num - _titleIconPadding.Vertical, num - _titleIconPadding.Vertical) : Rectangle.get_Empty());
+			_layoutHeaderTextBounds = new Rectangle(((Rectangle)(ref _layoutHeaderIconBounds)).get_Right() + _titleIconPadding.Right, 0, LayoutHeaderBounds.Width - _layoutHeaderIconBounds.Width, num);
 			int arrowSize = num - 4;
 			_layoutAccordionArrowOrigin = new Vector2(16f, 16f);
-			_layoutAccordionArrowBounds = RectangleExtension.OffsetBy(new Rectangle(((Rectangle)(ref _layoutHeaderBounds)).get_Right() - arrowSize, (num - arrowSize) / 2, arrowSize, arrowSize), new Point(arrowSize / 2, arrowSize / 2));
-			if (((Panel)this).get_Collapsed() && ((Control)this)._size.Y > _layoutHeaderBounds.Height && !_resized)
+			_layoutAccordionArrowBounds = RectangleExtension.OffsetBy(new Rectangle(((Rectangle)(ref LayoutHeaderBounds)).get_Right() - arrowSize, (num - arrowSize) / 2, arrowSize, arrowSize), new Point(arrowSize / 2, arrowSize / 2));
+			if (((Panel)this).get_Collapsed() && ((Control)this)._size.Y > LayoutHeaderBounds.Height && !_resized)
 			{
 				_resized = true;
 				Task.Run(async delegate
@@ -288,7 +331,7 @@ namespace Kenedia.Modules.Core.Controls
 					}
 					else
 					{
-						((Control)this).set_Size(new Point(((Control)this).get_Width(), _layoutHeaderBounds.Height));
+						((Control)this).set_Size(new Point(((Control)this).get_Width(), LayoutHeaderBounds.Height));
 						_resized = false;
 					}
 				});
@@ -357,15 +400,15 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			if (!string.IsNullOrEmpty(((Panel)this)._title))
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_texturePanelHeader), _layoutHeaderBounds);
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_texturePanelHeader), LayoutHeaderBounds);
 				if (((Panel)this)._canCollapse && ((Control)this)._mouseOver && ((Control)this).get_RelativeMousePosition().Y <= 36)
 				{
 					((Control)_tooltip).set_Visible(true);
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_texturePanelHeaderActive), _layoutHeaderBounds);
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_texturePanelHeaderActive), LayoutHeaderBounds);
 				}
 				else
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_texturePanelHeader), _layoutHeaderBounds);
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_texturePanelHeader), LayoutHeaderBounds);
 				}
 				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, ((Panel)this)._title, Control.get_Content().get_DefaultFont16(), _layoutHeaderTextBounds, Color.get_White(), false, (HorizontalAlignment)0, (VerticalAlignment)1);
 				if (TitleIcon != null)
@@ -616,14 +659,49 @@ namespace Kenedia.Modules.Core.Controls
 			}
 		}
 
+		public override void UpdateContainer(GameTime gameTime)
+		{
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			((Container)this).UpdateContainer(gameTime);
+			_dragging = CanDrag && _dragging && ((Control)this).get_MouseOver();
+			if (_dragging)
+			{
+				((Control)this).set_Location(GameService.Input.get_Mouse().get_Position().Add(new Point(-_draggingStart.X, -_draggingStart.Y)));
+			}
+		}
+
+		protected override void OnLeftMouseButtonReleased(MouseEventArgs e)
+		{
+			((Control)this).OnLeftMouseButtonReleased(e);
+			_dragging = false;
+		}
+
+		protected override void OnLeftMouseButtonPressed(MouseEventArgs e)
+		{
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			((Control)this).OnLeftMouseButtonPressed(e);
+			_dragging = CanDrag;
+			_draggingStart = (_dragging ? ((Control)this).get_RelativeMousePosition() : Point.get_Zero());
+		}
+
 		protected override CaptureType CapturesInput()
 		{
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			if (!CaptureInput)
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			CaptureType? capture = Capture;
+			if (!capture.HasValue)
 			{
-				return (CaptureType)0;
+				if (!CaptureInput)
+				{
+					return (CaptureType)0;
+				}
+				return ((Container)this).CapturesInput();
 			}
-			return ((Container)this).CapturesInput();
+			return capture.GetValueOrDefault();
 		}
 	}
 }
