@@ -61,7 +61,7 @@ namespace Nekres.Musician
 						}
 						return true;
 					}
-					catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is SecurityException)
+					catch (Exception ex) when (((ex is IOException || ex is UnauthorizedAccessException || ex is SecurityException) ? 1 : 0) != 0)
 					{
 						if (!(DateTime.UtcNow < dateTime))
 						{
