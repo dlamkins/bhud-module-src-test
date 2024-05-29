@@ -19,7 +19,7 @@ namespace Ideka.CustomCombatText
 
 		public readonly Ag Dst;
 
-		public readonly uint SkillId;
+		public readonly int SkillId;
 
 		public readonly string? SkillName;
 
@@ -143,9 +143,9 @@ namespace Ideka.CustomCombatText
 			Ev = cbt2.get_Ev();
 			Src = cbt2.get_Src();
 			Dst = cbt2.get_Dst();
-			SkillId = (StaticData.SkillRedirects.TryGetValue(Ev.get_SkillId(), out var id) ? id : Ev.get_SkillId());
-			Skill = (CTextModule.SkillData.Items.TryGetValue((int)SkillId, out var x4) ? x4 : null);
-			HsSkill = (CTextModule.HsSkills.TryGetValue((int)SkillId, out var x3) ? x3 : null);
+			SkillId = (StaticData.SkillRedirects.TryGetValue((int)Ev.get_SkillId(), out var id) ? id : ((int)Ev.get_SkillId()));
+			Skill = (CTextModule.SkillData.Items.TryGetValue(SkillId, out var x4) ? x4 : null);
+			HsSkill = (CTextModule.HsSkills.TryGetValue(SkillId, out var x3) ? x3 : null);
 			HsInfo = HsSkill?.Palettes.SelectMany((int paletteId) => (!CTextModule.HsPalettes.TryGetValue(paletteId, out var palette)) ? Array.Empty<(Palette, SlotGroup, SkillInfo)>() : palette.Groups.SelectMany((SlotGroup group) => from info in @group.Candidates
 				where info.Skill == message.SkillId
 				select (palette, @group, info))).ToArray() ?? Array.Empty<(Palette, SlotGroup, SkillInfo)>();

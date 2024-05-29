@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Gw2Sharp.WebApi.V2.Models;
 using HsAPI;
-using Ideka.NetCommon;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -12,6 +11,8 @@ namespace Ideka.CustomCombatText
 {
 	public static class TooltipUtils
 	{
+		private static readonly Regex ArgRegex = new Regex("%(?:str|num)(\\d)%");
+
 		private static readonly Regex PluralRegex = new Regex("(\\S+)\\[pl:\"(.+?)\"]");
 
 		private static readonly Regex GenderRegex = new Regex("(\\S+)\\[f:\"(.+?)\"]");
@@ -64,21 +65,35 @@ namespace Ideka.CustomCombatText
 			}
 			string fraction;
 			(value, fraction) = tuple;
-			return string.Format("{0}{1}{2}", sign, (value > 0.0) ? ((object)value) : "", fraction);
+			return sign + ((value > 0.0) ? FormatRound(value) : "") + fraction;
 		}
 
 		public static string? FormatText(string? text, params string[] args)
 		{
+			HashSet<int> consumed;
+			return FormatText(text, out consumed, args);
+		}
+
+		public static string? FormatText(string? text, out HashSet<int> consumed, params string[] args)
+		{
+			string[] args2 = args;
 			if (text == null)
 			{
+				consumed = new HashSet<int>();
 				return null;
 			}
-			foreach (var item in args.Enumerate())
+			HashSet<int> localConsumed = new HashSet<int>();
+			text = ArgRegex.Replace(text, delegate(Match match)
 			{
-				int i = item.index;
-				string arg = item.item;
-				text = text!.Replace($"%str{i + 1}%", arg);
-			}
+				if (match.Groups.Count <= 1 || !int.TryParse(match.Groups[1].Value, out var result))
+				{
+					return "";
+				}
+				result--;
+				localConsumed.Add(result);
+				return (args2.Length <= result) ? "" : args2[result];
+			});
+			consumed = localConsumed;
 			text = text!.Replace("[lbracket]", "[").Replace("[rbracket]", "]").Replace("[null]", "")
 				.Replace("<BR>", "\n")
 				.Replace("<br>", "\n")

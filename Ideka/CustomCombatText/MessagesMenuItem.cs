@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Controls;
+using Blish_HUD.Input;
 using Gw2Sharp.Models;
+using Gw2Sharp.WebApi.V2.Models;
 using Ideka.BHUDCommon.AnchoredRect;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -49,6 +51,47 @@ namespace Ideka.CustomCombatText
 			Key = key;
 			_rect = new MessageDraw();
 			UpdateVisuals(key, mFrags, fontSize);
+			((Control)this).add_RightMouseButtonPressed((EventHandler<MouseEventArgs>)delegate(object _, MouseEventArgs e)
+			{
+				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+				new ContextMenuStrip((Func<IEnumerable<ContextMenuStripItem>>)build).Show(e.get_MousePosition());
+				IEnumerable<ContextMenuStripItem> build()
+				{
+					ContextMenuStripItem val = new ContextMenuStripItem(Key.Message.SkillName ?? "(unknown)");
+					((Control)val).set_Enabled(false);
+					yield return val;
+					yield return create($"Copy skill chat link ({Key.Message.SkillId})", null, ChatLinkUtil.Skill(Key.Message.SkillId));
+					if (Key.Message.SkillId != Key.Message.Ev.get_SkillId())
+					{
+						yield return create($"Copy base skill chat link ({Key.Message.Ev.get_SkillId()})", "This skill is overriden by another.", ChatLinkUtil.Skill((int)Key.Message.Ev.get_SkillId()));
+					}
+					Trait trait = Key.Message.Trait;
+					if (trait != null)
+					{
+						yield return create($"Copy trait chat link ({trait.get_Id()})", null, ChatLinkUtil.Trait(trait.get_Id()));
+					}
+					static ContextMenuStripItem create(string text, string? tooltipText, string chatCode)
+					{
+						//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+						//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+						//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+						//IL_002d: Expected O, but got Unknown
+						string chatCode2 = chatCode;
+						ContextMenuStripItem val2 = new ContextMenuStripItem(text);
+						((Control)val2).set_BasicTooltipText(tooltipText);
+						((Control)val2).add_Click((EventHandler<MouseEventArgs>)async delegate
+						{
+							await ClipboardUtil.get_WindowsClipboardService().SetTextAsync(chatCode2);
+							GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
+							{
+								ScreenNotification.ShowNotification("Chat link copied to clipboard", (NotificationType)0, (Texture2D)null, 4);
+							});
+						});
+						return val2;
+					}
+				}
+			});
 		}
 
 		public void UpdateVisuals(MessagesMenu.MessageKey key, List<TemplateParser.MarkupFragment> mFrags, int fontSize)
@@ -93,7 +136,7 @@ namespace Ideka.CustomCombatText
 			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003c: Expected O, but got Unknown
-			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).set_BasicTooltipText((string)null);
 			if (((Control)this).get_Tooltip() == null && Key.Message.HsSkill != null)
 			{
@@ -103,7 +146,7 @@ namespace Ideka.CustomCombatText
 					((Container)val).set_HeightSizingMode((SizingMode)1);
 					((Container)val).set_WidthSizingMode((SizingMode)1);
 					((Control)this).set_Tooltip(val);
-					SkillTooltip skillTooltip = new SkillTooltip(new SkillTooltipData(Key.Message.HsSkill, Key.Message.HsSkill!.Icon ?? Key.Message.SkillIconId));
+					SkillTooltip skillTooltip = new SkillTooltip(new SkillTooltipData(Key.Message.HsSkill));
 					((Control)skillTooltip).set_Parent((Container)(object)((Control)this).get_Tooltip());
 					((Control)skillTooltip).set_Location(Point.get_Zero());
 				}

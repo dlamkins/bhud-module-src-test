@@ -27,7 +27,7 @@ namespace Ideka.CustomCombatText
 
 		public FactTooltipData(Fact fact, double weaponStrength, TooltipContext context)
 		{
-			//IL_01f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
 			IconId = fact.Icon;
 			Text = "Unknown Fact";
 			AdjustByAttributeAndLevelFact alFact = fact as AdjustByAttributeAndLevelFact;
@@ -56,9 +56,10 @@ namespace Ideka.CustomCombatText
 			{
 				Skill buff4 = getBuffOrFallback(bFact.Buff);
 				IconId = buff4.Icon ?? IconId;
-				BuffApplyCount = bFact.ApplyCount;
 				BuffDuration = bFact.Duration;
-				Text = TooltipUtils.FormatText(TooltipUtils.ResolveInflections(fact.Text ?? buff4.NameBrief ?? buff4.Name, context.CharacterGender, -1)) + ((BuffDuration > 0) ? ("(" + TooltipUtils.FormatDuration(BuffDuration) + ")") : "") + ": " + DescribeBuff(buff4, BuffApplyCount, BuffDuration, context);
+				int applyCount2 = bFact.ApplyCount;
+				Text = TooltipUtils.FormatText(TooltipUtils.ResolveInflections(fact.Text ?? buff4.NameBrief ?? buff4.Name, context.CharacterGender)) + ((BuffDuration > 0) ? ("(" + TooltipUtils.FormatDuration(BuffDuration) + ")") : "") + ": " + DescribeBuff(buff4, ref applyCount2, BuffDuration, context);
+				BuffApplyCount = applyCount2;
 				return;
 			}
 			BuffBriefFact bbFact = fact as BuffBriefFact;
@@ -181,9 +182,10 @@ namespace Ideka.CustomCombatText
 				PrefixIconId = getBuffOrFallback(pbFact.Prefix).Icon ?? IconId;
 				Skill buff2 = getBuffOrFallback(pbFact.Buff);
 				IconId = buff2.Icon;
-				BuffApplyCount = pbFact.ApplyCount;
 				BuffDuration = pbFact.Duration;
-				Text = TooltipUtils.FormatText(fact.Text ?? buff2.NameBrief ?? buff2.Name) + ((BuffDuration > 0) ? ("(" + TooltipUtils.FormatDuration(BuffDuration) + ")") : "") + ": " + DescribeBuff(buff2, BuffApplyCount, BuffDuration, context);
+				int applyCount = pbFact.ApplyCount;
+				Text = TooltipUtils.FormatText(fact.Text ?? buff2.NameBrief ?? buff2.Name) + ((BuffDuration > 0) ? ("(" + TooltipUtils.FormatDuration(BuffDuration) + ")") : "") + ": " + DescribeBuff(buff2, ref applyCount, BuffDuration, context);
+				BuffApplyCount = applyCount;
 				return;
 			}
 			PrefixedBuffBriefFact pbbFact = fact as PrefixedBuffBriefFact;
@@ -225,16 +227,28 @@ namespace Ideka.CustomCombatText
 			}
 		}
 
-		private static string? DescribeBuff(Skill buff, int applyCount, int duration, TooltipContext context)
+		private static string? DescribeBuff(Skill buff, ref int applyCount, int duration, TooltipContext context)
 		{
 			TooltipContext context2 = context;
 			if (buff.DescriptionBrief != null)
 			{
-				return buff.DescriptionBrief;
+				HashSet<int> consumed2;
+				string? result = TooltipUtils.FormatText(buff.DescriptionBrief, out consumed2, TooltipUtils.FormatFraction(applyCount));
+				if (consumed2.Contains(0))
+				{
+					applyCount = 0;
+				}
+				return result;
 			}
 			if (!buff.Modifiers.Any())
 			{
-				return buff.Description;
+				HashSet<int> consumed;
+				string? result2 = TooltipUtils.FormatText(buff.Description, out consumed, TooltipUtils.FormatFraction(applyCount));
+				if (consumed.Contains(0))
+				{
+					applyCount = 0;
+				}
+				return result2;
 			}
 			List<Modifier> modifiers = buff.Modifiers.Where((Modifier m) => !m.TargetTraitReq.HasValue && !m.SourceTraitReq.HasValue && (!m.Mode.HasValue || m.Mode == context2.GameMode)).ToList();
 			Dictionary<int, (Modifier, double)> merged = new Dictionary<int, (Modifier, double)>();

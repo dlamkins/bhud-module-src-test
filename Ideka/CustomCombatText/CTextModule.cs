@@ -140,11 +140,6 @@ namespace Ideka.CustomCombatText
 			Instance = this;
 		}
 
-		public override IView GetSettingsView()
-		{
-			return (IView)(object)(_settingsView = new SettingsView(base.ModuleParameters.get_SettingsManager().get_ModuleSettings()));
-		}
-
 		public static string ExtractAndRead(string builtinPath)
 		{
 			string outer = Path.Combine(BasePath, builtinPath);
@@ -162,6 +157,11 @@ namespace Ideka.CustomCombatText
 		{
 			_settings = _dc.Add(new ModuleSettings(settings));
 			_style = _dc.Add(new StyleSettings(settings));
+		}
+
+		public override IView GetSettingsView()
+		{
+			return (IView)(object)(_settingsView = new SettingsView(base.ModuleParameters.get_SettingsManager().get_ModuleSettings()));
 		}
 
 		protected override void Initialize()

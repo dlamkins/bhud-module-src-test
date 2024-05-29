@@ -72,46 +72,50 @@ namespace Ideka.CustomCombatText
 
 		public SkillTooltip(SkillTooltipData data)
 		{
-			//IL_0188: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0195: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d7: Expected O, but got Unknown
-			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0218: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0220: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0228: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023b: Expected O, but got Unknown
-			//IL_029e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0354: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0368: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0370: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0378: Unknown result type (might be due to invalid IL or missing references)
-			//IL_037d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0384: Unknown result type (might be due to invalid IL or missing references)
-			//IL_039f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0423: Unknown result type (might be due to invalid IL or missing references)
-			//IL_043d: Expected O, but got Unknown
+			//IL_01f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0222: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0234: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0241: Expected O, but got Unknown
+			//IL_0247: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0252: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0257: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0263: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0282: Unknown result type (might be due to invalid IL or missing references)
+			//IL_028a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0292: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0299: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a5: Expected O, but got Unknown
+			//IL_0308: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0401: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0409: Unknown result type (might be due to invalid IL or missing references)
+			//IL_040e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0415: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0430: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0438: Unknown result type (might be due to invalid IL or missing references)
+			//IL_044d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0452: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0459: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0475: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0480: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0487: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ce: Expected O, but got Unknown
 			SkillTooltipData data2 = data;
 			((Container)this)._002Ector();
 			SkillTooltip skillTooltip = this;
 			((Control)this).set_Width(310);
+			if (data2.SupplyCost > 0)
+			{
+				cornerIcon($"{data2.SupplyCost}", 2111003);
+			}
 			int? recharge2 = data2.Recharge;
 			if (recharge2.HasValue)
 			{
@@ -128,6 +132,10 @@ namespace Ideka.CustomCombatText
 			if (data2.EnergyCost > 0)
 			{
 				cornerIcon($"{data2.EnergyCost}", 156647);
+			}
+			if (data2.EnduranceCost > 0f)
+			{
+				cornerIcon(TooltipUtils.FormatFraction(data2.EnduranceCost) ?? "", 156647);
 			}
 			if (data2.InitiativeCost > 0)
 			{
@@ -148,7 +156,7 @@ namespace Ideka.CustomCombatText
 			}
 			Panel val = new Panel();
 			((Control)val).set_Parent((Container)(object)this);
-			((Control)val).set_BackgroundColor(IconBorderColor * (float)((!StaticData.BoonAndCondi.Contains((uint)data2.Skill.Id)) ? 1 : 0));
+			((Control)val).set_BackgroundColor(IconBorderColor * (float)((!StaticData.BoonAndCondi.Contains(data2.Skill.Id)) ? 1 : 0));
 			((Control)val).set_Width(37);
 			((Control)val).set_Height(37);
 			_iconContainer = val;
@@ -182,6 +190,10 @@ namespace Ideka.CustomCombatText
 			markupLabel2.ShowShadow = true;
 			markupLabel2.Font = BasicFont;
 			_description = markupLabel2;
+			if (_description.RawText == "")
+			{
+				_description.RawText = "...";
+			}
 			using (List<BlockTooltipData>.Enumerator enumerator = data2.Blocks.GetEnumerator())
 			{
 				if (enumerator.MoveNext())
@@ -236,6 +248,7 @@ namespace Ideka.CustomCombatText
 				}
 			}
 			UpdateLayout();
+			ShowIcon = data2.IconId.HasValue;
 			void cornerIcon(string text, int iconId)
 			{
 				//IL_000b: Unknown result type (might be due to invalid IL or missing references)
@@ -280,7 +293,7 @@ namespace Ideka.CustomCombatText
 		private void UpdateLayout()
 		{
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
 			if (_iconContainer == null)
 			{
 				return;
@@ -291,6 +304,9 @@ namespace Ideka.CustomCombatText
 				((Control)icon2).set_Right(x2);
 				((Control)label).set_Right(((Control)icon2).get_Left() - 2);
 				x2 = ((label.get_Text() != "") ? ((Control)label).get_Left() : ((Control)icon2).get_Left()) - 10;
+				((Control)icon2).set_Top(1);
+				((Control)(object)label).MiddleWith((Control)(object)icon2);
+				((Control)label).set_Top(((Control)label).get_Top() - 3);
 			}
 			((Control)_iconContainer).set_Left(0);
 			((Control)_iconContainer).set_Top(0);

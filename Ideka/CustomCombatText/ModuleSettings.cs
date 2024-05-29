@@ -35,6 +35,12 @@ namespace Ideka.CustomCombatText
 
 		public GenericSetting<bool> Debug { get; }
 
+		public GenericSetting<bool> LogPanelUniqueSkillsOnly { get; }
+
+		public GenericSetting<bool> LogPanelShowIncoming { get; }
+
+		public GenericSetting<bool> LogPanelShowOutgoing { get; }
+
 		public ModuleSettings(SettingCollection settings)
 		{
 			FontName = _dc.Add(settings.Generic("FontName", "", () => Strings.SettingFontName, () => Strings.SettingFontNameText));
@@ -50,6 +56,10 @@ namespace Ideka.CustomCombatText
 			MasterToPetIsSelf = _dc.Add(settings.Generic("MasterToPetIsSelf", defaultValue: true, () => Strings.SettingMasterToPetIsSelf, () => Strings.SettingMasterToPetIsSelfText));
 			MessageLogLength = _dc.Add(settings.Slider("MessageLogLength", 100, 0, 1000, () => "Message Log Length", () => "Number of messages to log."));
 			Debug = _dc.Add(settings.Generic("Debug", defaultValue: false, () => Strings.SettingDebug, () => Strings.SettingDebugText));
+			SettingCollection logPanel = settings.AddSubCollection("LogPanel", false);
+			LogPanelUniqueSkillsOnly = logPanel.Generic("UniqueSkillsOnly", defaultValue: false);
+			LogPanelShowIncoming = logPanel.Generic("ShowIncoming", defaultValue: true);
+			LogPanelShowOutgoing = logPanel.Generic("ShowOutgoing", defaultValue: true);
 		}
 
 		public void Dispose()

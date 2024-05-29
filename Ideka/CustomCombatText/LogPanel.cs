@@ -16,12 +16,6 @@ namespace Ideka.CustomCombatText
 
 		private const string DefaultTemplate = "%i %s [%v ][%b ][%r ]%m %f %o %t";
 
-		private bool _uniqueSkills;
-
-		private bool _incoming = true;
-
-		private bool _outgoing = true;
-
 		private readonly PanelStack _panelStack;
 
 		private readonly StandardButton _backButton;
@@ -48,19 +42,19 @@ namespace Ideka.CustomCombatText
 		public LogPanel(PanelStack panelStack)
 			: this()
 		{
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Expected O, but got Unknown
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Expected O, but got Unknown
-			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011d: Expected O, but got Unknown
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Expected O, but got Unknown
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Expected O, but got Unknown
+			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010f: Expected O, but got Unknown
 			_panelStack = panelStack;
 			StandardButton val = new StandardButton();
 			((Control)val).set_Parent((Container)(object)this);
@@ -134,19 +128,19 @@ namespace Ideka.CustomCombatText
 				new ContextMenuStrip((Func<IEnumerable<ContextMenuStripItem>>)build).Show((Control)(object)_filterButton);
 				IEnumerable<ContextMenuStripItem> build()
 				{
-					yield return forBool("Unique skills only", () => _uniqueSkills, delegate(bool value)
+					yield return forBool("Unique skills only", () => CTextModule.Settings.LogPanelUniqueSkillsOnly.Value, delegate(bool value)
 					{
-						_uniqueSkills = value;
+						CTextModule.Settings.LogPanelUniqueSkillsOnly.Value = value;
 						_messagesMenu.Refresh();
 					});
-					yield return forBool("Show incoming", () => _incoming, delegate(bool value)
+					yield return forBool("Show incoming", () => CTextModule.Settings.LogPanelShowIncoming.Value, delegate(bool value)
 					{
-						_incoming = value;
+						CTextModule.Settings.LogPanelShowIncoming.Value = value;
 						_messagesMenu.Refresh();
 					});
-					yield return forBool("Show outgoing", () => _outgoing, delegate(bool value)
+					yield return forBool("Show outgoing", () => CTextModule.Settings.LogPanelShowOutgoing.Value, delegate(bool value)
 					{
-						_outgoing = value;
+						CTextModule.Settings.LogPanelShowOutgoing.Value = value;
 						_messagesMenu.Refresh();
 					});
 					static ContextMenuStripItem forBool(string text, Func<bool> get, Action<bool> set)
@@ -171,7 +165,7 @@ namespace Ideka.CustomCombatText
 			_messagesMenu.Filter = delegate(IEnumerable<MessagesMenu.MessageKey> list)
 			{
 				HashSet<uint> skills = new HashSet<uint>();
-				return list.Where((MessagesMenu.MessageKey x) => (!_uniqueSkills || skills.Add(x.Message.Ev.get_SkillId())) && (_incoming || !x.Message.IsIn) && (_outgoing || !x.Message.IsOut));
+				return list.Where((MessagesMenu.MessageKey x) => (!CTextModule.Settings.LogPanelUniqueSkillsOnly.Value || skills.Add(x.Message.Ev.get_SkillId())) && (CTextModule.Settings.LogPanelShowIncoming.Value || !x.Message.IsIn) && (CTextModule.Settings.LogPanelShowOutgoing.Value || !x.Message.IsOut));
 			};
 		}
 

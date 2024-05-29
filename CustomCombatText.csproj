@@ -35,5 +35,6 @@
     <Reference Include="SpriteFontPlus">
       <HintPath>..\..\working\SpriteFontPlus.dll</HintPath>
     </Reference>
+    <Reference Include="AsyncClipboardService" />
   </ItemGroup>
 </Project>
