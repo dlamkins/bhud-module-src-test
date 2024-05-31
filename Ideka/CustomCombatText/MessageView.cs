@@ -51,19 +51,21 @@ namespace Ideka.CustomCombatText
 
 		public void AddMessage(TimeSpan time, Message message)
 		{
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
 			LastTime = time;
 			if (!_messages.Any())
 			{
 				Time = time;
 			}
 			_messages.Add(message);
-			SizeDeltaX = 0f;
+			SizeDelta = Size2.op_Implicit(Size2.Empty);
 			_parsedFragments.Clear();
 			foreach (TemplateParser.Fragment parsed in TemplateParser.FinalParse(_markupFrags, _receiver.Color, _font, message, _messages))
 			{
@@ -72,6 +74,7 @@ namespace Ideka.CustomCombatText
 				SizeDeltaX = SizeDelta.X + size.Width;
 				SizeDeltaY = Math.Max(SizeDelta.Y, size.Height);
 			}
+			SizeDeltaY += CTextModule.Settings.MessageHeightDelta.Value;
 			Value += message.Value;
 		}
 

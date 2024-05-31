@@ -78,6 +78,10 @@ namespace Ideka.CustomCombatText
 
 		internal static string SettingMergeMaxMsStrikesText => ResourceManager.GetString("SettingMergeMaxMsStrikesText", resourceCulture);
 
+		internal static string SettingMessageHeightDelta => ResourceManager.GetString("SettingMessageHeightDelta", resourceCulture);
+
+		internal static string SettingMessageHeightDeltaText => ResourceManager.GetString("SettingMessageHeightDeltaText", resourceCulture);
+
 		internal static string SettingMinIconMargin => ResourceManager.GetString("SettingMinIconMargin", resourceCulture);
 
 		internal static string SettingMinIconMarginText => ResourceManager.GetString("SettingMinIconMarginText", resourceCulture);

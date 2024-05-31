@@ -16,29 +16,17 @@ namespace Ideka.CustomCombatText
 {
 	internal static class FontUtils
 	{
-		internal static CharacterRange GeneralPunctuation = new CharacterRange('\u2000', '\u206f');
-
-		internal static CharacterRange Arrows = new CharacterRange('←', '⇿');
-
-		internal static CharacterRange MathematicalOperators = new CharacterRange('∀', '⋿');
-
-		internal static CharacterRange BoxDrawing = new CharacterRange('─', '╰');
-
-		internal static CharacterRange GeometricShapes = new CharacterRange('■', '◿');
-
-		internal static CharacterRange MiscellaneousSymbols = new CharacterRange('☀', '⛿');
-
 		internal static readonly CharacterRange[] Gw2CharacterRange = new CharacterRange[9]
 		{
 			CharacterRange.BasicLatin,
 			CharacterRange.Latin1Supplement,
 			CharacterRange.LatinExtendedA,
-			GeneralPunctuation,
-			Arrows,
-			MathematicalOperators,
-			BoxDrawing,
-			GeometricShapes,
-			MiscellaneousSymbols
+			new CharacterRange('₣', '₾'),
+			new CharacterRange('←', '⇿'),
+			new CharacterRange('∀', '⋿'),
+			new CharacterRange('①', '⓿'),
+			new CharacterRange('─', '╿'),
+			new CharacterRange('■', '◿')
 		};
 
 		public static SpriteFont? GetSpriteFont(this ContentsManager manager, string fontPath, float fontSize, int textureSize = 1392)
@@ -96,9 +84,32 @@ namespace Ideka.CustomCombatText
 
 		public static Size2 MeasureStringFixed(this BitmapFont font, string str)
 		{
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			return font.MeasureString((str.EndsWith(" ") && font.MeasureString(" ").Width == 0f) ? (str + " ") : str);
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
+			if (!str.EndsWith(" "))
+			{
+				return font.MeasureString(str);
+			}
+			string trimmed = str.Trim(' ');
+			int spaceCount = str.Length - trimmed.Length;
+			Size2 size = font.MeasureString(trimmed);
+			if (spaceCount == 0)
+			{
+				return size;
+			}
+			float spaceWidth = font.MeasureString(" ").Width;
+			float aWidth = font.MeasureString("a").Width;
+			spaceWidth = Math.Max(spaceWidth, font.MeasureString("a ").Width - aWidth);
+			spaceWidth = Math.Max(spaceWidth, font.MeasureString(" a").Width - aWidth);
+			size.Width += spaceWidth * (float)spaceCount;
+			return size;
 		}
 	}
 }

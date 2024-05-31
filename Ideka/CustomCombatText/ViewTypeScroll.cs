@@ -29,8 +29,9 @@ namespace Ideka.CustomCombatText
 
 		protected override void EarlyUpdate(GameTime gameTime)
 		{
-			//IL_020f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0210: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02db: Unknown result type (might be due to invalid IL or missing references)
 			GameTime gameTime2 = gameTime;
 			base.EarlyUpdate(gameTime2);
 			lock (_lock)
@@ -49,8 +50,9 @@ namespace Ideka.CustomCombatText
 						showMessage(merge2);
 						continue;
 					}
-					TimeSpan timeSpan = TimeSpan.FromSeconds(receiver.Font.get_LineHeight() / Settings.ScrollSpeed);
-					TimeSpan lastMessageTime = gameTime2.get_TotalGameTime() - _shownMessages.Last().Time;
+					MessageView lastMessage = _shownMessages.Last();
+					TimeSpan timeSpan = TimeSpan.FromSeconds(lastMessage.SizeDelta.Y / (float)Settings.ScrollSpeed);
+					TimeSpan lastMessageTime = gameTime2.get_TotalGameTime() - lastMessage.Time;
 					TimeSpan timeUntilNextMessageCanBeShown = timeSpan - lastMessageTime;
 					if (timeUntilNextMessageCanBeShown <= TimeSpan.Zero)
 					{

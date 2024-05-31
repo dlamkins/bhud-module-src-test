@@ -35,6 +35,7 @@ Must be in the appropriate folder, and must be in .ttf format.
 Leave it blank to use the default built-in font.
 A fallback will be used if the given font can't be loaded.</value></data>
   <data name="SettingAutocropIconsText"><value>Automatically crop icons to remove margins.</value></data>
+  <data name="SettingMessageHeightDelta"><value>Message Height Delta</value></data>
   <data name="SettingMergeMaxMsStrikes"><value>Max ms to Merge Strikes</value></data>
   <data name="SettingMergeMaxMsBuffs"><value>Max ms to Merge Buffs</value></data>
   <data name="SettingFontSizeText"><value>Default font size.</value></data>
@@ -45,6 +46,7 @@ Set to -1 to disallow this type of merging altogether.</value></data>
   <data name="SettingFontSize"><value>Font Size</value></data>
   <data name="SettingMasterToPetIsSelf"><value>Master to Pet is Self</value></data>
   <data name="SettingPetToMasterIsSelf"><value>Pet to Master is Self</value></data>
+  <data name="SettingMessageHeightDeltaText"><value>Modify message height by this value. Negative values make messages smaller so they may overlap one another, while positive values make them bigger, creating some spacing between them.</value></data>
   <data name="SettingMergeMaxMsBuffsText"><value>In milliseconds, the oldest a message can be to be considered for merging with a new message. Only applies to buffs (so damage over time or heals over time).
 Set to -1 to disallow this type of merging altogether.</value></data>
   <data name="SettingMultiIconMessages"><value>Multi Icon Messages</value></data>

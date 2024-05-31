@@ -13,6 +13,8 @@ namespace Ideka.CustomCombatText
 
 		public SliderSetting FontSize { get; }
 
+		public SliderSetting MessageHeightDelta { get; }
+
 		public GenericSetting<bool> AutocropIcons { get; }
 
 		public GenericSetting<float> AutocropTolerance { get; }
@@ -45,6 +47,7 @@ namespace Ideka.CustomCombatText
 		{
 			FontName = _dc.Add(settings.Generic("FontName", "", () => Strings.SettingFontName, () => Strings.SettingFontNameText));
 			FontSize = _dc.Add(settings.Slider("FontSize", 32, 1, 100, () => Strings.SettingFontSize, () => Strings.SettingFontSizeText));
+			MessageHeightDelta = _dc.Add(settings.Slider("MessageHeightDelta", 0, -25, 25, () => Strings.SettingMessageHeightDelta, () => Strings.SettingMessageHeightDeltaText));
 			AutocropIcons = _dc.Add(settings.Generic("AutocropIcons", defaultValue: true, () => Strings.SettingAutocropIcons, () => Strings.SettingAutocropIconsText));
 			AutocropTolerance = _dc.Add(settings.PercentageSlider("AutocropTolerance", 0.12f, 0f, 0.5f, () => Strings.SettingAutocropTolerance, () => Strings.SettingAutocropToleranceText));
 			MinIconMargin = _dc.Add(settings.Slider("MinIconMargin", 5, 0, 20, () => Strings.SettingMinIconMargin, () => Strings.SettingMinIconMarginText));
