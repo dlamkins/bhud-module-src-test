@@ -23,7 +23,7 @@ namespace Nekres.ProofLogix.Core
 				success = false;
 				args.get_ErrorContext().set_Handled(true);
 			});
-			val.set_MissingMemberHandling((MissingMemberHandling)1);
+			val.set_MissingMemberHandling((MissingMemberHandling)0);
 			JsonSerializerSettings settings = val;
 			result = JsonConvert.DeserializeObject<T>(json, settings);
 			return success;
@@ -34,7 +34,8 @@ namespace Nekres.ProofLogix.Core
 			return await RetryAsync(HttpResponseWrapper, retries, delayMs, logger);
 			async Task<T> HttpResponseWrapper()
 			{
-				return JsonConvert.DeserializeObject<T>(await (await request()).get_Content().ReadAsStringAsync());
+				T result;
+				return TryParseJson<T>(await (await request()).get_Content().ReadAsStringAsync(), out result) ? result : default(T);
 			}
 		}
 
@@ -52,7 +53,7 @@ namespace Nekres.ProofLogix.Core
 			{
 				if (retries > 0)
 				{
-					logger.Warn(e, $"Failed to request data. Retrying in {delayMs / 1000} second(s) (remaining retries: {retries}).");
+					logger.Info(e, $"Failed to request data. Retrying in {delayMs / 1000} second(s) (remaining retries: {retries}).");
 					await Task.Delay(delayMs);
 					return await RetryAsync(request, retries - 1, delayMs, logger);
 				}

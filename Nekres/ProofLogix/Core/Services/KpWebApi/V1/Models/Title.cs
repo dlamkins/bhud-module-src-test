@@ -9,7 +9,8 @@ namespace Nekres.ProofLogix.Core.Services.KpWebApi.V1.Models
 		{
 			Unknown,
 			Raid,
-			Fractal
+			Fractal,
+			Strike
 		}
 
 		public string Name { get; set; }
