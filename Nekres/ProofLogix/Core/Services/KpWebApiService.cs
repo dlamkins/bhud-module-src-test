@@ -98,16 +98,39 @@ namespace Nekres.ProofLogix.Core.Services
 			}
 			Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Profile profile2 = profile;
 			profile2.Clears = await _v1Client.GetClears(profile.Id);
+			int totalUce = HandleOriginalUce(profile);
 			if (profile.Linked == null)
 			{
 				return profile;
 			}
-			foreach (Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Profile link in profile.Linked)
+			foreach (Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Profile item in profile.Linked)
 			{
-				profile2 = link;
-				profile2.Clears = await _v1Client.GetClears(link.Id);
+				Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Profile profile3 = item;
+				profile3.Clears = await _v1Client.GetClears(item.Id);
+				totalUce += HandleOriginalUce(item);
+			}
+			Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Token uce = profile.Totals.GetToken(81743);
+			if (uce != null && !uce.IsEmpty)
+			{
+				uce.Amount = totalUce;
 			}
 			return profile;
+		}
+
+		private int HandleOriginalUce(Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Profile profile)
+		{
+			if (profile.OriginalUce == null)
+			{
+				return 0;
+			}
+			Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Token uce = profile.GetToken(81743);
+			if (uce == null || uce.IsEmpty)
+			{
+				profile.Tokens.Add(profile.OriginalUce);
+				uce = profile.OriginalUce;
+			}
+			uce.Amount = Math.Max(uce.Amount, profile.OriginalUce.Amount);
+			return uce.Amount;
 		}
 	}
 }

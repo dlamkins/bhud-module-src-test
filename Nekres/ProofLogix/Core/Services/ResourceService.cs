@@ -78,25 +78,30 @@ namespace Nekres.ProofLogix.Core.Services
 
 		public void AddNewCoffers(Profile profile)
 		{
-			if (!_resources.IsEmpty && !profile.IsEmpty)
+			if (_resources.IsEmpty || profile.IsEmpty)
 			{
-				IEnumerable<Token> coffers2 = profile.Totals.Coffers;
-				IEnumerable<Token> coffers = coffers2 ?? Enumerable.Empty<Token>();
-				coffers2 = profile.Totals.Tokens;
-				IEnumerable<Token> tokens = coffers2 ?? Enumerable.Empty<Token>();
-				_resources.Coffers.AddRange(FetchNew(coffers.Concat(tokens)));
+				return;
 			}
-		}
-
-		private IEnumerable<Resource> FetchNew(IEnumerable<Token> tokens)
-		{
-			return from token in tokens
+			IEnumerable<Token> tokens = profile.Totals.Tokens;
+			IEnumerable<Token> source = (tokens ?? Enumerable.Empty<Token>()).Where((Token x) => x.Id != 12251 && x.Id != 12773);
+			List<Resource> raidResources = GetItemsForRaids();
+			IEnumerable<Resource> strikeResources = from token in source
+				where raidResources.All((Resource x) => x.Id != token.Id)
+				select new Resource
+				{
+					Id = token.Id,
+					Name = token.Name
+				};
+			_resources.Strikes.AddRange(strikeResources);
+			tokens = profile.Totals.Coffers;
+			IEnumerable<Resource> newCoffers = from token in tokens ?? Enumerable.Empty<Token>()
 				where _resources.Items.All((Resource x) => x.Id != token.Id)
 				select new Resource
 				{
 					Id = token.Id,
 					Name = token.Name
 				};
+			_resources.Coffers.AddRange(newCoffers);
 		}
 
 		private async Task LoadResources()
@@ -192,6 +197,7 @@ namespace Nekres.ProofLogix.Core.Services
 				{
 					resource2.Rarity = ApiEnum<ItemRarity>.op_Implicit(item.get_Rarity());
 					resource2.Icon = GameService.Content.get_DatAssetCache().GetTextureFromAssetId(AssetUtil.GetId(RenderUrl.op_Implicit(item.get_Icon())));
+					resource2.Name = item.get_Name();
 				}
 			}
 		}
@@ -236,9 +242,13 @@ namespace Nekres.ProofLogix.Core.Services
 			return _resources.Items.FirstOrDefault((Resource item) => item.Id == id) ?? Resource.Empty;
 		}
 
-		public List<Resource> GetItems()
+		public List<Resource> GetItems(params int[] ids)
 		{
-			return _resources.Items.ToList();
+			if (ids == null || !ids.Any())
+			{
+				return _resources.Items.ToList();
+			}
+			return _resources.Items.Where((Resource x) => ids.Contains(x.Id)).ToList();
 		}
 
 		public List<Resource> GetItemsForFractals()
@@ -256,19 +266,36 @@ namespace Nekres.ProofLogix.Core.Services
 			return source.ToList();
 		}
 
-		public List<Resource> GetGeneralItems()
+		public List<Resource> GetItemsForStrikes()
 		{
 			IEnumerable<Resource> source;
 			if (!_resources.IsEmpty)
 			{
-				IEnumerable<Resource> generalTokens = _resources.GeneralTokens;
-				source = generalTokens;
+				IEnumerable<Resource> strikes = _resources.Strikes;
+				source = strikes;
 			}
 			else
 			{
 				source = Enumerable.Empty<Resource>();
 			}
 			return source.ToList();
+		}
+
+		public List<Resource> GetItemsForRaids()
+		{
+			IEnumerable<Resource> first = _resources.Raids.SelectMany((Raid x) => x.Wings).SelectMany((Raid.Wing x) => x.Events).SelectMany((Raid.Wing.Event x) => x.GetTokens());
+			List<Resource> strikeResources = GetItemsForStrikes();
+			IEnumerable<Resource> coffers = _resources.Coffers.Where((Resource coffer) => strikeResources.All((Resource strikeCoffer) => strikeCoffer.Id != coffer.Id));
+			return first.Concat(coffers).ToList();
+		}
+
+		public List<Resource> GetGeneralItems()
+		{
+			if (!_resources.IsEmpty)
+			{
+				return _resources.GeneralTokens;
+			}
+			return Enumerable.Empty<Resource>().ToList();
 		}
 
 		public List<Resource> GetCofferItems()

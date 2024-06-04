@@ -39,7 +39,26 @@ namespace Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models
 				public List<Resource> Miniatures { get; set; }
 
 				[JsonIgnore]
-				public AsyncTexture2D Icon => Miniatures?.FirstOrDefault()?.Icon ?? Token?.Icon ?? GameService.Content.get_DatAssetCache().GetTextureFromAssetId(1302744);
+				public AsyncTexture2D Icon
+				{
+					get
+					{
+						object obj;
+						if (!(Miniatures?.Any() ?? false))
+						{
+							obj = Token?.Icon;
+							if (obj == null)
+							{
+								return GameService.Content.get_DatAssetCache().GetTextureFromAssetId(1302744);
+							}
+						}
+						else
+						{
+							obj = GameService.Content.GetRenderServiceTexture(Miniatures.First().IconUrl);
+						}
+						return (AsyncTexture2D)obj;
+					}
+				}
 
 				public Event()
 				{

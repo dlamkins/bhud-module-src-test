@@ -137,30 +137,36 @@ namespace Nekres.ProofLogix.Core.UI.Table
 			//IL_0782: Unknown result type (might be due to invalid IL or missing references)
 			//IL_078c: Expected O, but got Unknown
 			//IL_078e: Expected O, but got Unknown
-			//IL_07aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07c7: Expected O, but got Unknown
-			//IL_07c9: Expected O, but got Unknown
-			//IL_07e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0802: Expected O, but got Unknown
-			//IL_0804: Expected O, but got Unknown
-			//IL_0841: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0846: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0853: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0854: Unknown result type (might be due to invalid IL or missing references)
-			//IL_085e: Expected O, but got Unknown
-			//IL_0860: Expected O, but got Unknown
-			//IL_08d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08f5: Expected O, but got Unknown
-			//IL_08f7: Expected O, but got Unknown
+			//IL_07ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07eb: Expected O, but got Unknown
+			//IL_07ed: Expected O, but got Unknown
+			//IL_0809: Unknown result type (might be due to invalid IL or missing references)
+			//IL_080e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_081b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_081c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0826: Expected O, but got Unknown
+			//IL_0828: Expected O, but got Unknown
+			//IL_082d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0832: Unknown result type (might be due to invalid IL or missing references)
+			//IL_083f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0840: Unknown result type (might be due to invalid IL or missing references)
+			//IL_084a: Expected O, but got Unknown
+			//IL_084c: Expected O, but got Unknown
+			//IL_08a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08bd: Expected O, but got Unknown
+			//IL_08bf: Expected O, but got Unknown
+			//IL_094e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0953: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0960: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0961: Unknown result type (might be due to invalid IL or missing references)
+			//IL_096b: Expected O, but got Unknown
+			//IL_096d: Expected O, but got Unknown
 			Image val = new Image(_cogWheelIcon);
 			((Control)val).set_Parent(buildPanel);
 			((Control)val).set_Width(32);
@@ -380,42 +386,49 @@ namespace Nekres.ProofLogix.Core.UI.Table
 			((Control)val13).set_Parent((Container)(object)columnsCategory.get_Submenu());
 			val13.set_Submenu(new ContextMenuStrip());
 			ContextMenuStripItem proofsCategory = val13;
-			ContextMenuStripItem val14 = new ContextMenuStripItem("General");
+			ContextMenuStripItem val14 = new ContextMenuStripItem("Generic");
 			((Control)val14).set_Parent((Container)(object)proofsCategory.get_Submenu());
 			val14.set_Submenu(new ContextMenuStrip());
 			ContextMenuStripItem generalCategory = val14;
-			AddProofEntries(generalCategory, ProofLogix.Instance.Resources.GetGeneralItems());
-			ContextMenuStripItem val15 = new ContextMenuStripItem("Coffers");
+			AddProofEntries(generalCategory, from x in ProofLogix.Instance.Resources.GetGeneralItems()
+				where x.Id != 93781 && x.Id != 88485
+				select x);
+			ContextMenuStripItem val15 = new ContextMenuStripItem("Fractals");
 			((Control)val15).set_Parent((Container)(object)proofsCategory.get_Submenu());
 			val15.set_Submenu(new ContextMenuStrip());
-			ContextMenuStripItem coffersCategory = val15;
-			AddProofEntries(coffersCategory, ProofLogix.Instance.Resources.GetCofferItems());
+			ContextMenuStripItem fractalsCategory = val15;
+			AddProofEntries(fractalsCategory, ProofLogix.Instance.Resources.GetItemsForFractals());
 			ContextMenuStripItem val16 = new ContextMenuStripItem("Raids");
 			((Control)val16).set_Parent((Container)(object)proofsCategory.get_Submenu());
 			val16.set_Submenu(new ContextMenuStrip());
 			ContextMenuStripItem raidsCategory = val16;
+			ContextMenuStripItem val17 = new ContextMenuStripItem("Coffers");
+			((Control)val17).set_Parent((Container)(object)raidsCategory.get_Submenu());
+			val17.set_Submenu(new ContextMenuStrip());
+			ContextMenuStripItem coffersCategory = val17;
+			AddProofEntries(coffersCategory, ProofLogix.Instance.Resources.GetCofferItems());
 			int i = 1;
 			foreach (Raid.Wing wing in ProofLogix.Instance.Resources.GetWings())
 			{
-				ContextMenuStripItem val17 = new ContextMenuStripItem($"Wing {i++}");
-				((Control)val17).set_Parent((Container)(object)raidsCategory.get_Submenu());
-				val17.set_Submenu(new ContextMenuStrip());
-				ContextMenuStripItem wingEntry = val17;
+				ContextMenuStripItem val18 = new ContextMenuStripItem($"Wing {i++}");
+				((Control)val18).set_Parent((Container)(object)raidsCategory.get_Submenu());
+				val18.set_Submenu(new ContextMenuStrip());
+				ContextMenuStripItem wingEntry = val18;
 				AddProofEntries(wingEntry, from ev in wing.Events
 					where ev.Token != null
 					select ev.Token);
 			}
-			ContextMenuStripItem val18 = new ContextMenuStripItem("Fractals");
-			((Control)val18).set_Parent((Container)(object)proofsCategory.get_Submenu());
-			val18.set_Submenu(new ContextMenuStrip());
-			ContextMenuStripItem fractalsCategory = val18;
-			AddProofEntries(fractalsCategory, ProofLogix.Instance.Resources.GetItemsForFractals());
 			((Control)cogWheel).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 				GameService.Content.PlaySoundEffectByName("button-click");
 				menu.Show(GameService.Input.get_Mouse().get_Position());
 			});
+			ContextMenuStripItem val19 = new ContextMenuStripItem("Strikes");
+			((Control)val19).set_Parent((Container)(object)proofsCategory.get_Submenu());
+			val19.set_Submenu(new ContextMenuStrip());
+			ContextMenuStripItem strikesCategory = val19;
+			AddProofEntries(strikesCategory, ProofLogix.Instance.Resources.GetItemsForStrikes());
 			base.Build(buildPanel);
 		}
 

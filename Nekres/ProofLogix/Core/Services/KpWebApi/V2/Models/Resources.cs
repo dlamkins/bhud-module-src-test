@@ -9,6 +9,16 @@ namespace Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models
 	{
 		public const int UNSTABLE_COSMIC_ESSENCE = 81743;
 
+		public const int LEGENDARY_DIVINATION = 88485;
+
+		public const int BONESKINNER_RITUAL_VIAL = 93781;
+
+		public const int LEGENDARY_INSIGHT = 77302;
+
+		public const int BANANAS_IN_BULK = 12773;
+
+		public const int BANANAS = 12251;
+
 		public static Resources Empty = new Resources
 		{
 			IsEmpty = true
@@ -29,12 +39,16 @@ namespace Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models
 		[JsonProperty("coffers")]
 		public List<Resource> Coffers { get; set; }
 
+		[JsonIgnore]
+		public List<Resource> Strikes { get; set; }
+
 		public IEnumerable<Raid.Wing> Wings => Raids.SelectMany((Raid raid) => raid.Wings);
 
 		public IEnumerable<Resource> Items => from resource in Raids.SelectMany((Raid raid) => raid.Wings).SelectMany((Raid.Wing wing) => wing.Events).SelectMany((Raid.Wing.Event ev) => ev.GetTokens())
 				.Concat(Fractals)
 				.Concat(GeneralTokens)
 				.Concat(Coffers)
+				.Concat(Strikes)
 			group resource by resource.Id into @group
 			select @group.First();
 
@@ -44,6 +58,23 @@ namespace Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models
 			Raids = new List<Raid>();
 			Fractals = new List<Resource>();
 			GeneralTokens = new List<Resource>();
+			Strikes = new List<Resource>();
+			LoadDefaults();
+		}
+
+		private void LoadDefaults()
+		{
+			GeneralTokens.AddRange(new Resource[2]
+			{
+				new Resource
+				{
+					Id = 12251
+				},
+				new Resource
+				{
+					Id = 12773
+				}
+			});
 		}
 	}
 }

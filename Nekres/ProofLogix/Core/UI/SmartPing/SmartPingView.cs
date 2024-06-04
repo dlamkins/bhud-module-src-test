@@ -78,36 +78,42 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 			//IL_031b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0327: Unknown result type (might be due to invalid IL or missing references)
 			//IL_032e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03aa: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c1: Expected O, but got Unknown
-			//IL_03c3: Expected O, but got Unknown
-			//IL_0408: Unknown result type (might be due to invalid IL or missing references)
-			//IL_040d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d2: Expected O, but got Unknown
+			//IL_03d4: Expected O, but got Unknown
 			//IL_0419: Unknown result type (might be due to invalid IL or missing references)
-			//IL_041a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0424: Expected O, but got Unknown
-			//IL_0426: Expected O, but got Unknown
-			//IL_046e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0473: Unknown result type (might be due to invalid IL or missing references)
-			//IL_047f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0480: Unknown result type (might be due to invalid IL or missing references)
-			//IL_048a: Expected O, but got Unknown
-			//IL_048c: Expected O, but got Unknown
-			//IL_04bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04da: Expected O, but got Unknown
-			//IL_04dc: Expected O, but got Unknown
-			//IL_0540: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0545: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0551: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0552: Unknown result type (might be due to invalid IL or missing references)
-			//IL_055c: Expected O, but got Unknown
-			//IL_055e: Expected O, but got Unknown
+			//IL_041e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_042a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_042b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0435: Expected O, but got Unknown
+			//IL_0437: Expected O, but got Unknown
+			//IL_047c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0481: Unknown result type (might be due to invalid IL or missing references)
+			//IL_048d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_048e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0498: Expected O, but got Unknown
+			//IL_049a: Expected O, but got Unknown
+			//IL_04e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04fe: Expected O, but got Unknown
+			//IL_0500: Expected O, but got Unknown
+			//IL_0531: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0536: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0543: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0544: Unknown result type (might be due to invalid IL or missing references)
+			//IL_054e: Expected O, but got Unknown
+			//IL_0550: Expected O, but got Unknown
+			//IL_05b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05d0: Expected O, but got Unknown
+			//IL_05d2: Expected O, but got Unknown
 			Image val = new Image(_cogWheelIcon);
 			((Control)val).set_Parent(buildPanel);
 			((Control)val).set_Width(32);
@@ -213,10 +219,10 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 							currentRepetitions = 0;
 						}
 						lastSendTime = DateTime.UtcNow;
-						ItemChatLink val13 = new ItemChatLink();
-						val13.set_ItemId(_config.SelectedToken);
-						val13.set_Quantity(Convert.ToByte((amount2 <= 250) ? amount2 : GetNext(amount2, ref currentReduction, ref currentValue, ref currentRepetitions, ref lastTotalReachedTime)));
-						ChatUtil.Send(((object)val13).ToString(), ProofLogix.Instance.ChatMessageKey.get_Value());
+						ItemChatLink val14 = new ItemChatLink();
+						val14.set_ItemId(_config.SelectedToken);
+						val14.set_Quantity(Convert.ToByte((amount2 <= 250) ? amount2 : GetNext(amount2, ref currentReduction, ref currentValue, ref currentRepetitions, ref lastTotalReachedTime)));
+						ChatUtil.Send(((object)val14).ToString(), ProofLogix.Instance.ChatMessageKey.get_Value());
 						busy = false;
 					}
 				}
@@ -237,19 +243,19 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 					}
 					else
 					{
-						ItemChatLink val11 = new ItemChatLink();
-						val11.set_ItemId(_config.SelectedToken);
-						ItemChatLink val12 = val11;
+						ItemChatLink val12 = new ItemChatLink();
+						val12.set_ItemId(_config.SelectedToken);
+						ItemChatLink val13 = val12;
 						string text;
 						if (amount > 255)
 						{
-							val12.set_Quantity((byte)1);
-							text = AssetUtil.GetItemDisplayName(((object)val12).ToString(), amount);
+							val13.set_Quantity((byte)1);
+							text = AssetUtil.GetItemDisplayName(((object)val13).ToString(), amount);
 						}
 						else
 						{
-							val12.set_Quantity(Convert.ToByte(amount));
-							text = ((object)val12).ToString();
+							val13.set_Quantity(Convert.ToByte(amount));
+							text = ((object)val13).ToString();
 						}
 						if (_config.SendProfileId)
 						{
@@ -274,7 +280,7 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 				_config.SendProfileId = e.get_Checked();
 			});
 			IEnumerable<Token> playerTokens = ProofLogix.Instance.PartySync.LocalPlayer.KpProfile.GetTokens();
-			List<Resource> generalItems = (from resource in ProofLogix.Instance.Resources.GetGeneralItems()
+			List<Resource> generalItems = (from resource in ProofLogix.Instance.Resources.GetItems(12251, 12773, 77302)
 				where playerTokens.Any((Token item) => item.Id == resource.Id && item.Amount > 0)
 				select resource).ToList();
 			if (generalItems.Any())
@@ -296,6 +302,17 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 				ContextMenuStripItem coffersCategory = val7;
 				AddProofEntries(coffersCategory, cofferItems, (Container)(object)labelPanel);
 			}
+			List<Resource> strikeItems = (from resource in ProofLogix.Instance.Resources.GetItemsForStrikes()
+				where playerTokens.Any((Token item) => item.Id == resource.Id && item.Amount > 0)
+				select resource).ToList();
+			if (strikeItems.Any())
+			{
+				ContextMenuStripItem val8 = new ContextMenuStripItem("Strikes");
+				((Control)val8).set_Parent((Container)(object)menu);
+				val8.set_Submenu(new ContextMenuStrip());
+				ContextMenuStripItem strikesCategory = val8;
+				AddProofEntries(strikesCategory, strikeItems, (Container)(object)labelPanel);
+			}
 			List<List<Resource>> wingTokens = (from wing in ProofLogix.Instance.Resources.GetWings()
 				select (from ev in wing.Events
 					where ev.Token != null
@@ -304,19 +321,19 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 					select resource).ToList()).ToList();
 			if (wingTokens.Any())
 			{
-				ContextMenuStripItem val8 = new ContextMenuStripItem("Raids");
-				((Control)val8).set_Parent((Container)(object)menu);
-				val8.set_Submenu(new ContextMenuStrip());
-				ContextMenuStripItem raidsCategory = val8;
+				ContextMenuStripItem val9 = new ContextMenuStripItem("Raids");
+				((Control)val9).set_Parent((Container)(object)menu);
+				val9.set_Submenu(new ContextMenuStrip());
+				ContextMenuStripItem raidsCategory = val9;
 				int i = 1;
 				foreach (List<Resource> wing2 in wingTokens)
 				{
 					if (wing2.Any())
 					{
-						ContextMenuStripItem val9 = new ContextMenuStripItem($"Wing {i}");
-						((Control)val9).set_Parent((Container)(object)raidsCategory.get_Submenu());
-						val9.set_Submenu(new ContextMenuStrip());
-						ContextMenuStripItem wingEntry = val9;
+						ContextMenuStripItem val10 = new ContextMenuStripItem($"Wing {i}");
+						((Control)val10).set_Parent((Container)(object)raidsCategory.get_Submenu());
+						val10.set_Submenu(new ContextMenuStrip());
+						ContextMenuStripItem wingEntry = val10;
 						AddProofEntries(wingEntry, wing2, (Container)(object)labelPanel);
 					}
 					i++;
@@ -327,10 +344,10 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 				select resource).ToList();
 			if (fractalItems.Any())
 			{
-				ContextMenuStripItem val10 = new ContextMenuStripItem("Fractals");
-				((Control)val10).set_Parent((Container)(object)menu);
-				val10.set_Submenu(new ContextMenuStrip());
-				ContextMenuStripItem fractalsCategory = val10;
+				ContextMenuStripItem val11 = new ContextMenuStripItem("Fractals");
+				((Control)val11).set_Parent((Container)(object)menu);
+				val11.set_Submenu(new ContextMenuStrip());
+				ContextMenuStripItem fractalsCategory = val11;
 				AddProofEntries(fractalsCategory, fractalItems, (Container)(object)labelPanel);
 			}
 			((Control)cogWheel).add_Click((EventHandler<MouseEventArgs>)delegate

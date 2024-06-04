@@ -4,14 +4,12 @@ using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
-using Blish_HUD.Extended;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Gw2Sharp.Models;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models;
 using Nekres.ProofLogix.Core.Services.PartySync.Models;
 using Nekres.ProofLogix.Core.UI.Clears;
 using Nekres.ProofLogix.Core.UI.KpProfile;
@@ -91,8 +89,6 @@ namespace Nekres.ProofLogix.Core.UI.Home
 				//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0059: Unknown result type (might be due to invalid IL or missing references)
 				//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-				//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0133: Unknown result type (might be due to invalid IL or missing references)
 				if (!items.Any())
 				{
 					return;
@@ -114,14 +110,7 @@ namespace Nekres.ProofLogix.Core.UI.Home
 				});
 				foreach (AccountItem item in items)
 				{
-					Resource resource = ProofLogix.Instance.Resources.GetItem(item.get_Id());
-					ItemWithAmount itemWithAmount = new ItemWithAmount(ProofLogix.Instance.Resources.GetItem(item.get_Id()).Icon);
-					((Control)itemWithAmount).set_Parent((Container)(object)slotsCategory);
-					((Control)itemWithAmount).set_Width(64);
-					((Control)itemWithAmount).set_Height(64);
-					itemWithAmount.Amount = item.get_Count();
-					((Control)itemWithAmount).set_BasicTooltipText(AssetUtil.GetItemDisplayName(resource.Name, item.get_Count(), brackets: false));
-					itemWithAmount.BorderColor = ProofLogix.Instance.Resources.GetItem(item.get_Id()).Rarity.AsColor();
+					((Control)ItemWithAmount.Create(item.get_Id(), item.get_Count())).set_Parent((Container)(object)slotsCategory);
 				}
 			}
 		}
