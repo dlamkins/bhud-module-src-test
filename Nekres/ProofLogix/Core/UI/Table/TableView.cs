@@ -149,24 +149,24 @@ namespace Nekres.ProofLogix.Core.UI.Table
 			//IL_081c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0826: Expected O, but got Unknown
 			//IL_0828: Expected O, but got Unknown
-			//IL_082d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0832: Unknown result type (might be due to invalid IL or missing references)
-			//IL_083f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0840: Unknown result type (might be due to invalid IL or missing references)
-			//IL_084a: Expected O, but got Unknown
-			//IL_084c: Expected O, but got Unknown
-			//IL_08a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08bd: Expected O, but got Unknown
-			//IL_08bf: Expected O, but got Unknown
-			//IL_094e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0953: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0960: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0961: Unknown result type (might be due to invalid IL or missing references)
-			//IL_096b: Expected O, but got Unknown
-			//IL_096d: Expected O, but got Unknown
+			//IL_0852: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0857: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0864: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0865: Unknown result type (might be due to invalid IL or missing references)
+			//IL_086f: Expected O, but got Unknown
+			//IL_0871: Expected O, but got Unknown
+			//IL_08c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08e2: Expected O, but got Unknown
+			//IL_08e4: Expected O, but got Unknown
+			//IL_0973: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0978: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0985: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0986: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0990: Expected O, but got Unknown
+			//IL_0992: Expected O, but got Unknown
 			Image val = new Image(_cogWheelIcon);
 			((Control)val).set_Parent(buildPanel);
 			((Control)val).set_Width(32);
@@ -402,6 +402,7 @@ namespace Nekres.ProofLogix.Core.UI.Table
 			((Control)val16).set_Parent((Container)(object)proofsCategory.get_Submenu());
 			val16.set_Submenu(new ContextMenuStrip());
 			ContextMenuStripItem raidsCategory = val16;
+			AddProofEntries(raidsCategory, ProofLogix.Instance.Resources.GetItems(88485));
 			ContextMenuStripItem val17 = new ContextMenuStripItem("Coffers");
 			((Control)val17).set_Parent((Container)(object)raidsCategory.get_Submenu());
 			val17.set_Submenu(new ContextMenuStrip());
@@ -428,7 +429,7 @@ namespace Nekres.ProofLogix.Core.UI.Table
 			((Control)val19).set_Parent((Container)(object)proofsCategory.get_Submenu());
 			val19.set_Submenu(new ContextMenuStrip());
 			ContextMenuStripItem strikesCategory = val19;
-			AddProofEntries(strikesCategory, ProofLogix.Instance.Resources.GetItemsForStrikes());
+			AddProofEntries(strikesCategory, ProofLogix.Instance.Resources.GetItems(93781).Concat(ProofLogix.Instance.Resources.GetItemsForStrikes()));
 			base.Build(buildPanel);
 		}
 

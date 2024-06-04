@@ -90,30 +90,30 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 			//IL_042b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0435: Expected O, but got Unknown
 			//IL_0437: Expected O, but got Unknown
-			//IL_047c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0481: Unknown result type (might be due to invalid IL or missing references)
-			//IL_048d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_048e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0498: Expected O, but got Unknown
-			//IL_049a: Expected O, but got Unknown
-			//IL_04e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04fe: Expected O, but got Unknown
-			//IL_0500: Expected O, but got Unknown
-			//IL_0531: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0536: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0543: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0544: Unknown result type (might be due to invalid IL or missing references)
-			//IL_054e: Expected O, but got Unknown
-			//IL_0550: Expected O, but got Unknown
+			//IL_049e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ba: Expected O, but got Unknown
+			//IL_04bc: Expected O, but got Unknown
+			//IL_0542: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0547: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0553: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0554: Unknown result type (might be due to invalid IL or missing references)
+			//IL_055e: Expected O, but got Unknown
+			//IL_0560: Expected O, but got Unknown
+			//IL_05a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05b3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_05b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05d0: Expected O, but got Unknown
-			//IL_05d2: Expected O, but got Unknown
+			//IL_05be: Expected O, but got Unknown
+			//IL_05c0: Expected O, but got Unknown
+			//IL_0624: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0629: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0635: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0636: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0640: Expected O, but got Unknown
+			//IL_0642: Expected O, but got Unknown
 			Image val = new Image(_cogWheelIcon);
 			((Control)val).set_Parent(buildPanel);
 			((Control)val).set_Width(32);
@@ -302,7 +302,7 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 				ContextMenuStripItem coffersCategory = val7;
 				AddProofEntries(coffersCategory, cofferItems, (Container)(object)labelPanel);
 			}
-			List<Resource> strikeItems = (from resource in ProofLogix.Instance.Resources.GetItemsForStrikes()
+			List<Resource> strikeItems = (from resource in ProofLogix.Instance.Resources.GetItems(93781).Concat(ProofLogix.Instance.Resources.GetItemsForStrikes())
 				where playerTokens.Any((Token item) => item.Id == resource.Id && item.Amount > 0)
 				select resource).ToList();
 			if (strikeItems.Any())
@@ -319,12 +319,16 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 					select ev.Token into resource
 					where playerTokens.Any((Token item) => item.Id == resource.Id && item.Amount > 0)
 					select resource).ToList()).ToList();
-			if (wingTokens.Any())
+			List<Resource> raidItems = (from resource in ProofLogix.Instance.Resources.GetItems(88485)
+				where playerTokens.Any((Token item) => item.Id == resource.Id && item.Amount > 0)
+				select resource).ToList();
+			if (wingTokens.Any() || raidItems.Any())
 			{
 				ContextMenuStripItem val9 = new ContextMenuStripItem("Raids");
 				((Control)val9).set_Parent((Container)(object)menu);
 				val9.set_Submenu(new ContextMenuStrip());
 				ContextMenuStripItem raidsCategory = val9;
+				AddProofEntries(raidsCategory, raidItems, (Container)(object)labelPanel);
 				int i = 1;
 				foreach (List<Resource> wing2 in wingTokens)
 				{
