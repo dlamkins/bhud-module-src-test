@@ -96,41 +96,76 @@ namespace Nekres.ProofLogix.Core.Services
 			{
 				return profile;
 			}
+			AddUceToUfe(profile);
+			AddLdToLi(profile);
 			Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Profile profile2 = profile;
 			profile2.Clears = await _v1Client.GetClears(profile.Id);
-			int totalUce = HandleOriginalUce(profile);
 			if (profile.Linked == null)
 			{
 				return profile;
 			}
-			foreach (Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Profile item in profile.Linked)
+			foreach (Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Profile link in profile.Linked)
 			{
-				Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Profile profile3 = item;
-				profile3.Clears = await _v1Client.GetClears(item.Id);
-				totalUce += HandleOriginalUce(item);
-			}
-			Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Token uce = profile.Totals.GetToken(81743);
-			if (uce != null && !uce.IsEmpty)
-			{
-				uce.Amount = totalUce;
+				AddUceToUfe(link);
+				AddLdToLi(link);
+				profile2 = link;
+				profile2.Clears = await _v1Client.GetClears(link.Id);
 			}
 			return profile;
 		}
 
-		private int HandleOriginalUce(Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Profile profile)
+		private void AddUceToUfe(Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Profile profile)
 		{
-			if (profile.OriginalUce == null)
+			if (profile.IsEmpty || profile.OriginalUce == null)
 			{
-				return 0;
+				return;
 			}
 			Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Token uce = profile.GetToken(81743);
 			if (uce == null || uce.IsEmpty)
 			{
-				profile.Tokens.Add(profile.OriginalUce);
+				profile.Killproofs.Add(profile.OriginalUce);
 				uce = profile.OriginalUce;
 			}
 			uce.Amount = Math.Max(uce.Amount, profile.OriginalUce.Amount);
-			return uce.Amount;
+			if (!uce.IsEmpty && uce.Amount > 0)
+			{
+				Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Token ufe = profile.GetToken(94020);
+				if (ufe == null || ufe.IsEmpty)
+				{
+					string ufeRes = ProofLogix.Instance.Resources.GetItem(94020).Name;
+					ufe = new Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Token
+					{
+						Id = 94020,
+						Name = (string.IsNullOrEmpty(ufeRes) ? "Unstable Fractal Essence" : ufeRes)
+					};
+					profile.Killproofs.Add(ufe);
+				}
+				ufe.Amount += 5 * uce.Amount;
+			}
+		}
+
+		private void AddLdToLi(Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Profile profile)
+		{
+			if (profile.IsEmpty)
+			{
+				return;
+			}
+			Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Token ld = profile.GetToken(88485);
+			if (!ld.IsEmpty && ld.Amount > 0)
+			{
+				Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Token li = profile.GetToken(77302);
+				if (li == null || li.IsEmpty)
+				{
+					string liRes = ProofLogix.Instance.Resources.GetItem(77302).Name;
+					li = new Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Token
+					{
+						Id = 77302,
+						Name = (string.IsNullOrEmpty(liRes) ? "Legendary Insight" : liRes)
+					};
+					profile.Killproofs.Add(li);
+				}
+				li.Amount += ld.Amount;
+			}
 		}
 	}
 }

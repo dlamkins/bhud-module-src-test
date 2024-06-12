@@ -19,35 +19,34 @@ namespace Nekres.ProofLogix.Core.UI.KpProfile
 
 		protected override void Build(Container buildPanel)
 		{
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Expected O, but got Unknown
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Expected O, but got Unknown
+			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f7: Expected O, but got Unknown
-			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Expected O, but got Unknown
+			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
 			//IL_011f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013a: Expected O, but got Unknown
-			//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021f: Expected O, but got Unknown
+			//IL_0133: Expected O, but got Unknown
+			//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0212: Unknown result type (might be due to invalid IL or missing references)
 			ViewContainer val = new ViewContainer();
 			((Control)val).set_Parent(buildPanel);
 			((Control)val).set_Width(buildPanel.get_ContentRegion().Width);
@@ -92,13 +91,9 @@ namespace Nekres.ProofLogix.Core.UI.KpProfile
 				((Control)val4).set_Parent((Container)(object)menu);
 				((Control)val4).set_BasicTooltipText(profile.Name);
 				((Control)val4).set_Width(((Container)menu).get_ContentRegion().Width);
-				MenuItem entry = val4;
-				entry.add_ItemSelected((EventHandler<ControlActivatedEventArgs>)delegate
+				val4.add_ItemSelected((EventHandler<ControlActivatedEventArgs>)delegate
 				{
-					if (_profile.BelongsTo(entry.get_Text(), out var linkedProfile))
-					{
-						profileContainer.Show((IView)(object)new ProfileView(linkedProfile));
-					}
+					profileContainer.Show((IView)(object)new ProfileView(profile));
 				});
 			}
 			buildPanel.add_ContentResized((EventHandler<RegionChangedEventArgs>)delegate(object _, RegionChangedEventArgs e)

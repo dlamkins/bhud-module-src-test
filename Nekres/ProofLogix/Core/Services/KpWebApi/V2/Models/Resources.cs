@@ -9,6 +9,8 @@ namespace Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models
 	{
 		public const int UNSTABLE_COSMIC_ESSENCE = 81743;
 
+		public const int UNSTABLE_FRACTAL_ESSENCE = 94020;
+
 		public const int LEGENDARY_DIVINATION = 88485;
 
 		public const int BONESKINNER_RITUAL_VIAL = 93781;

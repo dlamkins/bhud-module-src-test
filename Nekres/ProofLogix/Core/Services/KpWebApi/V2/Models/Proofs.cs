@@ -37,7 +37,15 @@ namespace Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models
 
 		public virtual Token GetToken(int id)
 		{
-			return Tokens?.FirstOrDefault((Token x) => x.Id == id) ?? Killproofs?.FirstOrDefault((Token x) => x.Id == id) ?? Coffers?.FirstOrDefault((Token x) => x.Id == id) ?? Token.Empty;
+			return Killproofs?.FirstOrDefault((Token x) => x.Id == id) ?? Tokens?.FirstOrDefault((Token x) => x.Id == id) ?? Coffers?.FirstOrDefault((Token x) => x.Id == id) ?? Token.Empty;
+		}
+
+		public Proofs()
+		{
+			Tokens = new List<Token>();
+			Killproofs = new List<Token>();
+			Coffers = new List<Token>();
+			Titles = new List<Title>();
 		}
 
 		public IEnumerable<Token> GetTokens(bool excludeCoffers = false)
