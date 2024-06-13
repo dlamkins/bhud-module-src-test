@@ -96,7 +96,7 @@ namespace Nekres.ProofLogix.Core.Services
 			{
 				return profile;
 			}
-			AddUceToUfe(profile);
+			HandleOriginalUce(profile);
 			AddLdToLi(profile);
 			Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Profile profile2 = profile;
 			profile2.Clears = await _v1Client.GetClears(profile.Id);
@@ -106,7 +106,7 @@ namespace Nekres.ProofLogix.Core.Services
 			}
 			foreach (Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Profile link in profile.Linked)
 			{
-				AddUceToUfe(link);
+				HandleOriginalUce(link);
 				AddLdToLi(link);
 				profile2 = link;
 				profile2.Clears = await _v1Client.GetClears(link.Id);
@@ -114,19 +114,27 @@ namespace Nekres.ProofLogix.Core.Services
 			return profile;
 		}
 
+		private void HandleOriginalUce(Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Profile profile)
+		{
+			if (!profile.IsEmpty && profile.OriginalUce != null && !profile.OriginalUce.IsEmpty)
+			{
+				Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Token uce = profile.GetToken(81743);
+				if (uce == null || uce.IsEmpty)
+				{
+					profile.Killproofs.Add(profile.OriginalUce);
+					uce = profile.OriginalUce;
+				}
+				uce.Amount = Math.Max(uce.Amount, profile.OriginalUce.Amount);
+			}
+		}
+
 		private void AddUceToUfe(Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Profile profile)
 		{
-			if (profile.IsEmpty || profile.OriginalUce == null)
+			if (profile.IsEmpty)
 			{
 				return;
 			}
 			Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Token uce = profile.GetToken(81743);
-			if (uce == null || uce.IsEmpty)
-			{
-				profile.Killproofs.Add(profile.OriginalUce);
-				uce = profile.OriginalUce;
-			}
-			uce.Amount = Math.Max(uce.Amount, profile.OriginalUce.Amount);
 			if (!uce.IsEmpty && uce.Amount > 0)
 			{
 				Nekres.ProofLogix.Core.Services.KpWebApi.V2.Models.Token ufe = profile.GetToken(94020);
