@@ -15,7 +15,8 @@ namespace Nekres.ProofLogix.Core
 			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Expected O, but got Unknown
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Expected O, but got Unknown
 			bool success = true;
 			JsonSerializerSettings val = new JsonSerializerSettings();
 			val.set_Error((EventHandler<ErrorEventArgs>)delegate(object _, ErrorEventArgs args)
@@ -24,6 +25,7 @@ namespace Nekres.ProofLogix.Core
 				args.get_ErrorContext().set_Handled(true);
 			});
 			val.set_MissingMemberHandling((MissingMemberHandling)0);
+			val.set_NullValueHandling((NullValueHandling)1);
 			JsonSerializerSettings settings = val;
 			result = JsonConvert.DeserializeObject<T>(json, settings);
 			return success;
