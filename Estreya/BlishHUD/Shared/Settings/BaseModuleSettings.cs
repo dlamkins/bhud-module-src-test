@@ -54,7 +54,7 @@ namespace Estreya.BlishHUD.Shared.Settings
 
 		public SettingEntry<bool> DebugEnabled { get; private set; }
 
-		public SettingEntry<bool> UseDebugAPI { get; private set; }
+		public SettingEntry<bool> UseDevelopmentAPI { get; private set; }
 
 		public SettingEntry<string> BlishAPIUsername { get; private set; }
 
@@ -201,7 +201,7 @@ namespace Estreya.BlishHUD.Shared.Settings
 			HideInWvW = GlobalSettings.DefineSetting<bool>("HideInWvW", false, (Func<string>)(() => "Hide in WvW"), (Func<string>)(() => "Whether the drawers should hide when in world vs. world."));
 			HideInPvP = GlobalSettings.DefineSetting<bool>("HideInPvP", false, (Func<string>)(() => "Hide in PvP"), (Func<string>)(() => "Whether the drawers should hide when in player vs. player."));
 			DebugEnabled = GlobalSettings.DefineSetting<bool>("DebugEnabled", false, (Func<string>)(() => "Debug Enabled"), (Func<string>)(() => "Whether the module runs in debug mode."));
-			UseDebugAPI = GlobalSettings.DefineSetting<bool>("UseDebugAPI", false, (Func<string>)(() => "Use Debug API"), (Func<string>)(() => "Whether the module connects to the debug blish-hud api.\nRequires a restart to take full effect."));
+			UseDevelopmentAPI = GlobalSettings.DefineSetting<bool>("UseDevelopmentAPI", false, (Func<string>)(() => "Use Development API"), (Func<string>)(() => "Whether the module connects to the dev blish-hud api.\nRequires a restart to take full effect."));
 			BlishAPIUsername = GlobalSettings.DefineSetting<string>("BlishAPIUsername", (string)null, (Func<string>)(() => "Blish API Username"), (Func<string>)(() => "Defines the login username for the Estreya Blish HUD API."));
 			RegisterContext = GlobalSettings.DefineSetting<bool>("RegisterContext", true, (Func<string>)(() => "Register Context"), (Func<string>)(() => "Whether the module should register an api context for cross module interaction. Requires a restart."));
 			SendMetrics = GlobalSettings.DefineSetting<bool>("SendMetrics", false, (Func<string>)(() => "Send Anonymous Metrics"), (Func<string>)(() => "Allows the module to send anonymous metric data to a backend server to view advanced usage statistics."));

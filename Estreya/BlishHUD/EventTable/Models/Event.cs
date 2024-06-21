@@ -66,8 +66,11 @@ namespace Estreya.BlishHUD.EventTable.Models
 		[JsonConverter(typeof(DateJsonConverter))]
 		public DateTime? StartingDate { get; set; }
 
-		[JsonProperty("locations")]
-		public EventLocations Locations { get; set; }
+		[JsonProperty("location")]
+		public string Location { get; set; }
+
+		[JsonProperty("timers")]
+		public EventTimers[] Timers { get; set; }
 
 		[JsonProperty("mapIds")]
 		public int[] MapIds { get; set; }
@@ -217,7 +220,13 @@ namespace Estreya.BlishHUD.EventTable.Models
 			_remindedFor.Clear();
 		}
 
-		public DateTime GetNextOccurence()
+		public DateTime GetCurrentOccurrence()
+		{
+			DateTime now = _getNowAction();
+			return Occurences.OrderBy((DateTime x) => x).FirstOrDefault((DateTime x) => x <= now && x.AddMinutes(Duration) >= now);
+		}
+
+		public DateTime GetNextOccurrence()
 		{
 			DateTime now = _getNowAction();
 			return Occurences.OrderBy((DateTime x) => x).FirstOrDefault((DateTime x) => x >= now);
@@ -264,9 +273,9 @@ namespace Estreya.BlishHUD.EventTable.Models
 			string waypoint = GetWaypoint(account);
 			return format switch
 			{
-				EventChatFormat.Full => _translationService.GetTranslation("event-chatText-format-full", "Event \"{0}\" {1} in \"{2}\": {3}").FormatWith(Name, timeString, Locations.Tooltip, waypoint), 
+				EventChatFormat.Full => _translationService.GetTranslation("event-chatText-format-full", "Event \"{0}\" {1} in \"{2}\": {3}").FormatWith(Name, timeString, Location, waypoint), 
 				EventChatFormat.WithTime => _translationService.GetTranslation("event-chatText-format-withTime", "Event \"{0}\" {1}: {2}").FormatWith(Name, timeString, waypoint), 
-				EventChatFormat.WithLocation => _translationService.GetTranslation("event-chatText-format-withLocation", "Event \"{0}\" in \"{1}\": {2}").FormatWith(Name, Locations.Tooltip, waypoint), 
+				EventChatFormat.WithLocation => _translationService.GetTranslation("event-chatText-format-withLocation", "Event \"{0}\" in \"{1}\": {2}").FormatWith(Name, Location, waypoint), 
 				_ => waypoint, 
 			};
 		}

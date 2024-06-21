@@ -80,6 +80,10 @@ namespace Estreya.BlishHUD.EventTable
 
 		public SettingEntry<bool> ShowEventTimersInWorld { get; private set; }
 
+		public SettingEntry<int> EventTimersRenderDistance { get; private set; }
+
+		public SettingEntry<List<string>> DisabledEventTimerSettingKeys { get; private set; }
+
 		public SettingEntry<bool> ShowDynamicEventsOnMap { get; private set; }
 
 		public SettingEntry<bool> ShowDynamicEventInWorld { get; private set; }
@@ -186,6 +190,9 @@ namespace Estreya.BlishHUD.EventTable
 			ReminderEventChatFormat = base.GlobalSettings.DefineSetting<EventChatFormat>("ReminderEventChatFormat", EventChatFormat.OnlyWaypoint, (Func<string>)(() => "Event Chat Format"), (Func<string>)(() => "Defines the chat format to use when copying events."));
 			ShowEventTimersOnMap = base.GlobalSettings.DefineSetting<bool>("ShowEventTimersOnMap", true, (Func<string>)(() => "Show Event Timers on Map"), (Func<string>)(() => "Whether the event timers should be shown on the map."));
 			ShowEventTimersInWorld = base.GlobalSettings.DefineSetting<bool>("ShowEventTimersInWorld", true, (Func<string>)(() => "Show Event Timers in World"), (Func<string>)(() => "Whether event timers should be shown inside the world."));
+			EventTimersRenderDistance = base.GlobalSettings.DefineSetting<int>("EventTimersRenderDistance", 75, (Func<string>)(() => "Event Timer Render Distance"), (Func<string>)(() => "Defines the max render distance for in-world event timers."));
+			SettingComplianceExtensions.SetRange(EventTimersRenderDistance, 25, 500);
+			DisabledEventTimerSettingKeys = base.GlobalSettings.DefineSetting<List<string>>("DisabledEventTimerSettingKeys", new List<string>(), (Func<string>)(() => "Disabled Event Timers"), (Func<string>)(() => "Defines which event timers are disabled."));
 			ShowDynamicEventsOnMap = base.GlobalSettings.DefineSetting<bool>("ShowDynamicEventsOnMap", false, (Func<string>)(() => "Show Dynamic Events on Map"), (Func<string>)(() => "Whether the dynamic events of the map should be shown."));
 			ShowDynamicEventInWorld = base.GlobalSettings.DefineSetting<bool>("ShowDynamicEventInWorld", false, (Func<string>)(() => "Show Dynamic Events in World"), (Func<string>)(() => "Whether dynamic events should be shown inside the world."));
 			ShowDynamicEventInWorld.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowDynamicEventInWorld_SettingChanged);

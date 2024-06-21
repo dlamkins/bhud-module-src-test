@@ -15,9 +15,11 @@ using MonoGame.Extended.BitmapFonts;
 
 namespace Estreya.BlishHUD.EventTable.Controls.Map
 {
-	public class EventTimer : MapEntity
+	public class EventMapTimer : MapEntity
 	{
 		private readonly Estreya.BlishHUD.EventTable.Models.Event _ev;
+
+		private readonly Estreya.BlishHUD.EventTable.Models.EventMapTimer _mapTimer;
 
 		private readonly Color _color;
 
@@ -27,17 +29,18 @@ namespace Estreya.BlishHUD.EventTable.Controls.Map
 
 		private readonly TranslationService _translationService;
 
-		private float X => _ev.Locations.Map.X;
+		private float X => _mapTimer.X;
 
-		private float Y => _ev.Locations.Map.Y;
+		private float Y => _mapTimer.Y;
 
-		private float Radius => _ev.Locations.Map.Radius * 0.041666668f;
+		private float Radius => _mapTimer.Radius * 0.041666668f;
 
-		public EventTimer(Estreya.BlishHUD.EventTable.Models.Event ev, Color color, Func<DateTime> getNow, TranslationService translationService, float thickness = 1f)
+		public EventMapTimer(Estreya.BlishHUD.EventTable.Models.Event ev, Estreya.BlishHUD.EventTable.Models.EventMapTimer mapTimer, Color color, Func<DateTime> getNow, TranslationService translationService, float thickness = 1f)
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 			_ev = ev;
+			_mapTimer = mapTimer;
 			_color = color;
 			_thickness = thickness;
 			_getNow = getNow;
@@ -54,37 +57,22 @@ namespace Estreya.BlishHUD.EventTable.Controls.Map
 			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0208: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0209: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0219: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0227: Unknown result type (might be due to invalid IL or missing references)
 			//IL_022c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0231: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0292: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0297: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0299: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0233: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0234: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0244: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0249: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0252: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0259: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0267: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0274: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0281: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0298: Unknown result type (might be due to invalid IL or missing references)
 			//IL_029a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0308: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ae: Unknown result type (might be due to invalid IL or missing references)
 			Vector2 location = GetScaledLocation(X, Y, scale, offsetX, offsetY);
 			float radius = Radius / (float)scale;
 			CircleF circle = default(CircleF);
@@ -105,21 +93,19 @@ namespace Estreya.BlishHUD.EventTable.Controls.Map
 			(TimeSpan, TimeSpan) remainingTime = GetTime(now2, startTime2, endTime2, flag ? null : new DateTime?(_ev.Occurences[occurenceIndex - 1]));
 			double degree = remainingTime.Item2.TotalSeconds.Remap(0.0, remainingTime.Item1.TotalSeconds, 0.0, 360.0) * -1.0;
 			double angle = Math.PI * (degree - 90.0) / 180.0;
-			float angleX = (radius - _thickness) * (float)Math.Cos(angle);
-			float angleY = (radius - _thickness) * (float)Math.Sin(angle);
-			int angleLineThickness = 3;
-			spriteBatch.DrawAngledLine(Textures.get_Pixel(), circle.Center, circle.Center + new Vector2(angleX, angleY), Color.get_Red(), angleLineThickness);
-			int topLineThickness = 3;
-			spriteBatch.DrawAngledLine(Textures.get_Pixel(), circle.Center, circle.Center + new Vector2(0f, 0f - (circle.Radius - _thickness)), Color.get_Gray(), topLineThickness);
-			if (GameService.Gw2Mumble.get_UI().get_MapScale() <= 0.800000011920929)
+			_ = _thickness;
+			Math.Cos(angle);
+			_ = _thickness;
+			Math.Sin(angle);
+			if (!GameService.Gw2Mumble.get_UI().get_IsMapOpen() || GameService.Gw2Mumble.get_UI().get_MapScale() <= 1.0)
 			{
-				string text = _ev.Name + ": " + GetEventDescription(now, startTime, endTime);
+				string text = _ev.Name + "\n" + GetEventDescription(now, startTime, endTime);
 				BitmapFont font = GameService.Content.get_DefaultFont18();
 				Size2 textSize = font.MeasureString(text);
 				Point2 circleBottomCenter = circle.Center + new Vector2(0f, circle.Radius);
 				RectangleF textLocation = default(RectangleF);
-				((RectangleF)(ref textLocation))._002Ector(circleBottomCenter.X - textSize.Width / 2f, circleBottomCenter.Y + 5f, textSize.Width, textSize.Height);
-				spriteBatch.DrawString(text, font, textLocation, Color.get_Red(), wrap: false, 1f, (HorizontalAlignment)0, (VerticalAlignment)1);
+				((RectangleF)(ref textLocation))._002Ector(circleBottomCenter.X - textSize.Width / 2f, circleBottomCenter.Y + 10f, textSize.Width + 5f, textSize.Height + 5f);
+				spriteBatch.DrawString(text, font, textLocation, Color.get_Red(), wrap: false, 1f, (HorizontalAlignment)1, (VerticalAlignment)0);
 			}
 			return ((CircleF)(ref circle)).ToRectangleF();
 		}
@@ -152,7 +138,7 @@ namespace Estreya.BlishHUD.EventTable.Controls.Map
 			bool num = endTime < now;
 			bool isNext = !num && startTime > now;
 			bool isCurrent = !num && !isNext;
-			string description = _ev.Locations.Tooltip + "\n";
+			string description = "";
 			if (num)
 			{
 				TimeSpan finishedSince = now - endTime;

@@ -41,7 +41,6 @@ using Flurl.Http;
 using Flurl.Http.Configuration;
 using Gw2Sharp.Models;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.BitmapFonts;
 using SemVer;
 
@@ -53,13 +52,13 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		private AsyncRef<double> _lastBackendCheck = new AsyncRef<double>(0.0);
 
-		protected const string FILE_ROOT_URL = "https://files.estreya.de";
+		protected const string LIVE_FILE_SERVER_HOSTNAME = "files.estreya.de";
 
-		protected const string FILE_BLISH_ROOT_URL = "https://files.estreya.de/blish-hud";
+		protected const string DEV_FILE_SERVER_HOSTNAME = "files.estreya.dev";
 
 		protected const string LIVE_API_HOSTNAME = "api.estreya.de";
 
-		protected const string DEBUG_API_HOSTNAME = "api.estreya.dev";
+		protected const string DEV_API_HOSTNAME = "api.estreya.dev";
 
 		protected const string GITHUB_OWNER = "Tharylia";
 
@@ -87,9 +86,13 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected Logger Logger { get; }
 
-		protected string MODULE_FILE_URL => "https://files.estreya.de/blish-hud/" + UrlModuleName;
+		protected string FILE_ROOT_URL => "https://" + (ModuleSettings.UseDevelopmentAPI.get_Value() ? "files.estreya.dev" : "files.estreya.de");
 
-		protected string API_ROOT_URL => "https://" + (ModuleSettings.UseDebugAPI.get_Value() ? "api.estreya.dev" : "api.estreya.de") + "/blish-hud";
+		protected string FILE_BLISH_ROOT_URL => FILE_ROOT_URL + "/blish-hud";
+
+		protected string MODULE_FILE_URL => FILE_BLISH_ROOT_URL + "/" + UrlModuleName;
+
+		protected string API_ROOT_URL => "https://" + (ModuleSettings.UseDevelopmentAPI.get_Value() ? "api.estreya.dev" : "api.estreya.de") + "/blish-hud";
 
 		private string API_HEALTH_URL => API_ROOT_URL + "/health";
 
@@ -144,6 +147,8 @@ namespace Estreya.BlishHUD.Shared.Modules
 		protected TSettings ModuleSettings { get; private set; }
 
 		protected CornerIcon CornerIcon { get; set; }
+
+		protected MessageContainer MessageContainer { get; private set; }
 
 		protected TabbedWindow SettingsWindow { get; private set; }
 
@@ -252,9 +257,11 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected override async Task LoadAsync()
 		{
-			if (ModuleSettings.UseDebugAPI.get_Value())
+			await Task.Factory.StartNew((Func<Task>)InitializeEssentialServices, TaskCreationOptions.LongRunning).Unwrap();
+			if (ModuleSettings.UseDevelopmentAPI.get_Value())
 			{
-				Logger.Info("User configured module to use debug api: " + MODULE_API_URL);
+				Logger.Info("User configured module to use development api: " + MODULE_API_URL);
+				await MessageContainer.Add((Module)(object)this, MessageContainer.MessageType.Warning, "Using Development API");
 			}
 			await CheckBackendHealth();
 			try
@@ -315,11 +322,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 			if (response2.get_StatusCode() != HttpStatusCode.Forbidden)
 			{
 				string content2 = await response2.get_Content().ReadAsStringAsync();
-				ScreenNotification.ShowNotification(new string[2]
-				{
-					"The module \"" + ((Module)this).get_Name() + "\" could not verify itself.",
-					"Please check the latest log for more information."
-				}, ScreenNotification.NotificationType.Error, null, 10);
+				await MessageContainer.Add((Module)(object)this, MessageContainer.MessageType.Error, "The module \"" + ((Module)this).get_Name() + "\" could not verify itself. Please check the latest log for more information.");
 				Logger.Error($"Module validation failed with unexpected status code {response2.get_StatusCode()}: {content2}");
 				ReportErrorState(ModuleErrorStateGroup.MODULE_VALIDATION, "Module validation failed. Check latest log for more information.");
 				return;
@@ -332,13 +335,9 @@ namespace Estreya.BlishHUD.Shared.Modules
 			}
 			catch (Exception)
 			{
-				string content = await response2.get_Content().ReadAsStringAsync();
-				ScreenNotification.ShowNotification(new string[2]
-				{
-					"The module \"" + ((Module)this).get_Name() + "\" could not verify itself.",
-					"Please check the latest log for more information."
-				}, ScreenNotification.NotificationType.Error, null, 10);
-				throw new ModuleInvalidException("Could not read module validation response: " + content);
+				string content2 = await response2.get_Content().ReadAsStringAsync();
+				await MessageContainer.Add((Module)(object)this, MessageContainer.MessageType.Error, "The module \"" + ((Module)this).get_Name() + "\" could not verify itself. Please check the latest log for more information.");
+				throw new ModuleInvalidException("Could not read module validation response: " + content2);
 			}
 			List<string> messages = new List<string>
 			{
@@ -349,7 +348,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 			{
 				messages.Add(validationResponse.Message ?? response2.get_ReasonPhrase());
 			}
-			ScreenNotification.ShowNotification(messages.ToArray(), ScreenNotification.NotificationType.Error, null, 10);
+			await MessageContainer.Add((Module)(object)this, MessageContainer.MessageType.Error, "\n" + string.Join("\n", messages));
 			throw new ModuleInvalidException(validationResponse.Message);
 		}
 
@@ -394,11 +393,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 			if (!wasUnavailable && !backendOnline)
 			{
 				ReportErrorState(ModuleErrorStateGroup.BACKEND_UNAVAILABLE, "Backend unavailable.");
-				ScreenNotification.ShowNotification(new string[2]
-				{
-					"The backend for \"" + ((Module)this).get_Name() + "\" is unavailable.",
-					"Check Estreya BlishHUD Discord for news."
-				}, ScreenNotification.NotificationType.Error, null, 10);
+				await MessageContainer.Add((Module)(object)this, MessageContainer.MessageType.Error, "The backend for \"" + ((Module)this).get_Name() + "\" is unavailable. Check Estreya BlishHUD Discord for news.");
 				await (this.BackendConnectionLost?.Invoke(this) ?? Task.CompletedTask);
 			}
 			else if (wasUnavailable && backendOnline)
@@ -414,7 +409,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 					DisableSelf();
 					return;
 				}
-				ScreenNotification.ShowNotification("The backend for \"" + ((Module)this).get_Name() + "\" is back online.", (NotificationType)0, (Texture2D)null, 5);
+				await MessageContainer.Add((Module)(object)this, MessageContainer.MessageType.Info, "The backend for \"" + ((Module)this).get_Name() + "\" is back online.");
 				await (this.BackendConnectionRestored?.Invoke(this) ?? Task.CompletedTask);
 			}
 		}
@@ -426,33 +421,18 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected abstract string GetDirectoryName();
 
-		private async Task InitializeServices()
+		protected virtual Task OnAfterEssentialsServicesInitialized()
 		{
-			Logger.Debug("Initialize states");
-			string directoryName = GetDirectoryName();
-			string directoryPath = null;
-			if (!string.IsNullOrWhiteSpace(directoryName))
-			{
-				directoryPath = DirectoriesManager.GetFullDirectoryPath(directoryName);
-			}
+			MessageContainer = new MessageContainer(Gw2ApiManager, ModuleSettings, TranslationService, IconService);
+			return Task.CompletedTask;
+		}
+
+		private async Task InitializeEssentialServices()
+		{
 			using (await _servicesLock.LockAsync())
 			{
 				ServiceConfigurations configurations = new ServiceConfigurations();
 				ConfigureServices(configurations);
-				if (configurations.BlishHUDAPI.Enabled)
-				{
-					if (PasswordManager == null)
-					{
-						throw new ArgumentNullException("PasswordManager");
-					}
-					BlishHUDAPIService = new BlishHudApiService(configurations.BlishHUDAPI, ModuleSettings.BlishAPIUsername, PasswordManager, GetFlurlClient(), API_ROOT_URL);
-					_services.Add(BlishHUDAPIService);
-				}
-				if (configurations.Account.Enabled)
-				{
-					AccountService = new AccountService(configurations.Account, Gw2ApiManager);
-					_services.Add(AccountService);
-				}
 				IconService = new IconService(new APIServiceConfiguration
 				{
 					Enabled = true,
@@ -484,20 +464,52 @@ namespace Estreya.BlishHUD.Shared.Modules
 					AwaitLoading = true
 				}, GetFlurlClient(), API_ROOT_URL, ((Module)this).get_Name(), ((Module)this).get_Namespace(), ModuleSettings, IconService);
 				_services.Add(MetricsService);
-				if (configurations.Audio.Enabled)
-				{
-					AudioService = new AudioService(configurations.Audio, directoryPath);
-					_services.Add(AudioService);
-				}
 				ChatService = new ChatService(new ServiceConfiguration
 				{
 					Enabled = true,
 					AwaitLoading = true
 				});
 				_services.Add(ChatService);
+				await OnAfterEssentialsServicesInitialized();
+			}
+			await StartServices();
+		}
+
+		private async Task InitializeServices()
+		{
+			Logger.Debug("Initialize services");
+			string directoryName = GetDirectoryName();
+			string directoryPath = null;
+			if (!string.IsNullOrWhiteSpace(directoryName))
+			{
+				directoryPath = DirectoriesManager.GetFullDirectoryPath(directoryName);
+			}
+			using (await _servicesLock.LockAsync())
+			{
+				ServiceConfigurations configurations = new ServiceConfigurations();
+				ConfigureServices(configurations);
+				if (configurations.BlishHUDAPI.Enabled)
+				{
+					if (PasswordManager == null)
+					{
+						throw new ArgumentNullException("PasswordManager");
+					}
+					BlishHUDAPIService = new BlishHudApiService(configurations.BlishHUDAPI, ModuleSettings.BlishAPIUsername, PasswordManager, GetFlurlClient(), API_ROOT_URL);
+					_services.Add(BlishHUDAPIService);
+				}
+				if (configurations.Account.Enabled)
+				{
+					AccountService = new AccountService(configurations.Account, Gw2ApiManager);
+					_services.Add(AccountService);
+				}
+				if (configurations.Audio.Enabled)
+				{
+					AudioService = new AudioService(configurations.Audio, directoryPath);
+					_services.Add(AudioService);
+				}
 				if (configurations.Items.Enabled)
 				{
-					ItemService = new ItemService(configurations.Items, Gw2ApiManager, directoryPath, GetFlurlClient(), "https://files.estreya.de");
+					ItemService = new ItemService(configurations.Items, Gw2ApiManager, directoryPath, GetFlurlClient(), FILE_ROOT_URL);
 					_services.Add(ItemService);
 				}
 				if (configurations.PlayerTransactions.Enabled)
@@ -542,7 +554,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 					{
 						throw new ArgumentNullException("directoryPath", "Module directory is not specified.");
 					}
-					PointOfInterestService = new PointOfInterestService(configurations.PointOfInterests, Gw2ApiManager, directoryPath, GetFlurlClient(), "https://files.estreya.de");
+					PointOfInterestService = new PointOfInterestService(configurations.PointOfInterests, Gw2ApiManager, directoryPath, GetFlurlClient(), FILE_ROOT_URL);
 					_services.Add(PointOfInterestService);
 				}
 				if (configurations.Skills.Enabled)
@@ -551,7 +563,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 					{
 						throw new ArgumentNullException("directoryPath", "Module directory is not specified.");
 					}
-					SkillService = new SkillService(configurations.Skills, Gw2ApiManager, IconService, directoryPath, GetFlurlClient(), "https://files.estreya.de");
+					SkillService = new SkillService(configurations.Skills, Gw2ApiManager, IconService, directoryPath, GetFlurlClient(), FILE_ROOT_URL);
 					_services.Add(SkillService);
 				}
 				if (configurations.ArcDPS.Enabled)
@@ -569,7 +581,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 				}
 				if (configurations.Achievements.Enabled)
 				{
-					AchievementService = new AchievementService(Gw2ApiManager, configurations.Achievements, directoryPath, GetFlurlClient(), "https://files.estreya.de");
+					AchievementService = new AchievementService(Gw2ApiManager, configurations.Achievements, directoryPath, GetFlurlClient(), FILE_ROOT_URL);
 					_services.Add(AchievementService);
 				}
 				if (configurations.AccountAchievements.Enabled)
@@ -586,6 +598,14 @@ namespace Estreya.BlishHUD.Shared.Modules
 					}
 				}
 				OnBeforeServicesStarted();
+			}
+			await StartServices();
+		}
+
+		private async Task StartServices()
+		{
+			using (await _servicesLock.LockAsync())
+			{
 				foreach (ManagedService state2 in _services.Where((ManagedService state) => !state.Running))
 				{
 					if (state2.AwaitLoading)
@@ -704,8 +724,14 @@ namespace Estreya.BlishHUD.Shared.Modules
 				_defaultSettingView = new ModuleSettingsView(IconService, TranslationService);
 				_defaultSettingView.OpenClicked += DefaultSettingView_OpenClicked;
 				_defaultSettingView.CreateGithubIssueClicked += DefaultSettingView_CreateGithubIssueClicked;
+				_defaultSettingView.OpenMessageLogClicked += DefaultSettingView_OpenMessageLogClicked;
 			}
 			return (IView)(object)_defaultSettingView;
+		}
+
+		private void DefaultSettingView_OpenMessageLogClicked(object sender, EventArgs e)
+		{
+			MessageContainer?.Show();
 		}
 
 		private void DefaultSettingView_CreateGithubIssueClicked(object sender, EventArgs e)
@@ -892,17 +918,17 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected void HandleLoadingSpinner(bool show, string text = null)
 		{
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0055: Expected O, but got Unknown
-			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-			show &= CornerIcon != null;
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0062: Expected O, but got Unknown
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			show &= CornerIcon != null && ((Control)CornerIcon).get_Visible();
 			if (_loadingSpinner == null)
 			{
 				LoadingSpinner val = new LoadingSpinner();
@@ -946,6 +972,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 			{
 				_defaultSettingView.OpenClicked -= DefaultSettingView_OpenClicked;
 				_defaultSettingView.CreateGithubIssueClicked -= DefaultSettingView_CreateGithubIssueClicked;
+				_defaultSettingView.OpenMessageLogClicked -= DefaultSettingView_OpenMessageLogClicked;
 				((View<IPresenter>)(object)_defaultSettingView).DoUnload();
 				_defaultSettingView = null;
 			}
@@ -999,6 +1026,8 @@ namespace Estreya.BlishHUD.Shared.Modules
 			}
 			_loadingSpinner = null;
 			Logger.Debug("Unloaded corner icon.");
+			MessageContainer?.Dispose();
+			MessageContainer = null;
 		}
 	}
 }

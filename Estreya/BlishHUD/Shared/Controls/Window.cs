@@ -689,12 +689,12 @@ namespace Estreya.BlishHUD.Shared.Controls
 			}
 		}
 
-		public void SetView(IView view)
+		public async Task SetView(IView view)
 		{
-			SetView(view, unloadCurrent: true);
+			await SetView(view, unloadCurrent: true);
 		}
 
-		private void SetView(IView view, bool unloadCurrent = true)
+		private async Task SetView(IView view, bool unloadCurrent = true)
 		{
 			ClearView(view == null || unloadCurrent);
 			if (view != null)
@@ -705,13 +705,13 @@ namespace Estreya.BlishHUD.Shared.Controls
 				{
 				});
 				view.add_Loaded((EventHandler<EventArgs>)OnViewBuilt);
-				view.DoLoad((IProgress<string>)progress).ContinueWith(BuildView);
+				await view.DoLoad((IProgress<string>)progress).ContinueWith(BuildView);
 			}
 		}
 
-		public void Show(IView view)
+		public async Task Show(IView view)
 		{
-			SetView(view);
+			await SetView(view);
 			((Control)this).Show();
 		}
 
@@ -912,21 +912,22 @@ namespace Estreya.BlishHUD.Shared.Controls
 
 		private async Task DelayRebuild(CancellationToken cancellationToken)
 		{
+			_ = 1;
 			try
 			{
 				await Task.Delay(RebuildDelay, cancellationToken);
-				Rebuild();
+				await Rebuild();
 			}
 			catch (OperationCanceledException)
 			{
 			}
 		}
 
-		private void Rebuild()
+		private async Task Rebuild()
 		{
 			if (RebuildViewAfterResize && CurrentView != null)
 			{
-				SetView(CurrentView, UnloadOnRebuild);
+				await SetView(CurrentView, UnloadOnRebuild);
 			}
 		}
 

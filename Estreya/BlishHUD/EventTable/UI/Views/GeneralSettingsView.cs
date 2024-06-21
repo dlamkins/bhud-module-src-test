@@ -1,10 +1,12 @@
 using System;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Estreya.BlishHUD.EventTable.Models;
+using Estreya.BlishHUD.Shared.Controls.Input;
 using Estreya.BlishHUD.Shared.Models;
 using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.UI.Views;
@@ -82,11 +84,11 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderEmptyLine((Panel)(object)parent);
 			RenderEnumSetting<MenuEventSortMode>((Panel)(object)parent, _moduleSettings.MenuEventSortMode);
 			RenderEmptyLine((Panel)(object)parent);
-			RenderDebugGroup(parent);
+			RenderDevelopmentGroup(parent);
 			RenderEmptyLine((Panel)(object)parent);
 		}
 
-		private void RenderDebugGroup(FlowPanel parent)
+		private void RenderDevelopmentGroup(FlowPanel parent)
 		{
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
@@ -104,12 +106,12 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_0074: Expected O, but got Unknown
 			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
 			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0257: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)parent);
 			val.set_OuterControlPadding(new Vector2(20f, 20f));
 			((Panel)val).set_ShowBorder(true);
-			((Panel)val).set_Title("Debug");
+			((Panel)val).set_Title("Development");
 			((Panel)val).set_CanCollapse(true);
 			((Panel)val).set_Collapsed(true);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
@@ -117,10 +119,10 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			val.set_FlowDirection((ControlFlowDirection)3);
 			FlowPanel groupPanel = val;
 			FormattedLabelBuilder obj = new FormattedLabelBuilder().SetWidth(((Container)groupPanel).get_ContentRegion().Width).AutoSizeHeight().SetVerticalAlignment((VerticalAlignment)0);
-			obj.CreatePart("Use the Debug API happens on your own risk!", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder b)
+			obj.CreatePart("Using the Development API happens on your own risk!", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder b)
 			{
-				b.MakeBold();
-			}).CreatePart("\n", (Action<FormattedLabelPartBuilder>)delegate
+				b.MakeBold().SetFontSize((FontSize)24);
+			}).CreatePart("\n \n", (Action<FormattedLabelPartBuilder>)delegate
 			{
 			}).CreatePart("The API can be offline or in a broken state for your module version at any given time!", (Action<FormattedLabelPartBuilder>)delegate
 			{
@@ -134,7 +136,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				.CreatePart("\n \n", (Action<FormattedLabelPartBuilder>)delegate
 				{
 				})
-				.CreatePart("In this case open the settings.json file and set the option \"" + ((SettingEntry)_moduleSettings.UseDebugAPI).get_EntryKey() + "\" back to false.", (Action<FormattedLabelPartBuilder>)delegate
+				.CreatePart("In this case open the settings.json file and set the option \"" + ((SettingEntry)_moduleSettings.UseDevelopmentAPI).get_EntryKey() + "\" back to false.", (Action<FormattedLabelPartBuilder>)delegate
 				{
 				})
 				.CreatePart("\n \n", (Action<FormattedLabelPartBuilder>)delegate
@@ -146,7 +148,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				});
 			((Control)obj.Build()).set_Parent((Container)(object)groupPanel);
 			RenderEmptyLine((Panel)(object)groupPanel);
-			RenderBoolSetting((Panel)(object)groupPanel, _moduleSettings.UseDebugAPI);
+			RenderBoolSetting((Panel)(object)groupPanel, _moduleSettings.UseDevelopmentAPI, async (bool oldVal, bool newVal) => !newVal || await new ConfirmDialog("Activating Development API", "You are in the process of enabling the development api.\n\nThis API can be offline at any time preventing you from using the module!", base.IconService).ShowDialog() == DialogResult.OK);
 			RenderEmptyLine((Panel)(object)groupPanel, (int)groupPanel.get_OuterControlPadding().Y);
 		}
 

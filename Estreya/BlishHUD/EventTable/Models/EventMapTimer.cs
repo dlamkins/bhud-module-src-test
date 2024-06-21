@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace Estreya.BlishHUD.EventTable.Models
 {
-	public struct EventMapLocation
+	public class EventMapTimer
 	{
 		[JsonProperty("x")]
 		public float X;

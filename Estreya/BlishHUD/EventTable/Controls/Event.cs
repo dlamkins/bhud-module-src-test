@@ -218,13 +218,13 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		public Tooltip BuildTooltip()
 		{
-			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ce: Expected O, but got Unknown
+			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c4: Expected O, but got Unknown
 			DateTime now = _getNowAction();
 			bool num = StartTime.AddMinutes(Model.Duration) < now;
 			bool isNext = !num && StartTime > now;
 			bool isCurrent = !num && !isNext;
-			string description = Model.Locations.Tooltip + ((!string.IsNullOrWhiteSpace(Model.Locations.Tooltip)) ? "\n" : string.Empty) + "\n";
+			string description = Model.Location + ((!string.IsNullOrWhiteSpace(Model.Location)) ? "\n" : string.Empty) + "\n";
 			if (num)
 			{
 				TimeSpan finishedSince = now - StartTime.AddMinutes(Model.Duration);

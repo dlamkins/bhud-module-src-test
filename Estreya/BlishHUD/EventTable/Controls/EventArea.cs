@@ -908,7 +908,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 					{
 						using (_controlLock.Lock())
 						{
-							if (_controlEvents[categoryKey].Any(((DateTime Occurence, Event Event) addedEvent) => addedEvent.Occurence == occurence))
+							if (_controlEvents.TryGetValue(categoryKey, out var controlEvent) && controlEvent.Any<(DateTime, Event)>(((DateTime Occurence, Event Event) addedEvent) => addedEvent.Occurence == occurence))
 							{
 								continue;
 							}

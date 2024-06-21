@@ -77,7 +77,6 @@ namespace Estreya.BlishHUD.EventTable.Managers
 
 		public void Update(GameTime gameTime)
 		{
-			UpdateUtil.Update(CheckLostEntityReferences, gameTime, _checkLostEntitiesInterval.TotalMilliseconds, ref _lastLostEntitiesCheck);
 			(string Key, bool Add) element;
 			DynamicEvent dynamicEvent;
 			while (_entityQueue.TryDequeue(out element))
@@ -455,7 +454,10 @@ namespace Estreya.BlishHUD.EventTable.Managers
 				connectionPoints.AddRange(bendPointsDown);
 			}
 			IEnumerable<Vector3> allPoints = points.Concat(connectionPoints);
-			return new WorldPolygone(centerAsWorldMeters, allPoints.ToArray(), ev.GetColorAsXnaColor(), renderCondition);
+			return new WorldPolygone(centerAsWorldMeters, allPoints.ToArray(), ev.GetColorAsXnaColor())
+			{
+				RenderCondition = renderCondition
+			};
 		}
 
 		private WorldEntity GetCylinder(DynamicEvent ev, Map map, Vector3 centerAsWorldMeters, Func<WorldEntity, bool> renderCondition)
@@ -518,7 +520,10 @@ namespace Estreya.BlishHUD.EventTable.Managers
 				}
 			}
 			IEnumerable<Vector3> allPoints = perZRangePoints.SelectMany((Vector3[] x) => x).Concat(connectPoints);
-			return new WorldPolygone(centerAsWorldMeters, allPoints.ToArray(), ev.GetColorAsXnaColor(), renderCondition);
+			return new WorldPolygone(centerAsWorldMeters, allPoints.ToArray(), ev.GetColorAsXnaColor())
+			{
+				RenderCondition = renderCondition
+			};
 		}
 
 		private WorldEntity GetPolygone(DynamicEvent dynamicEvent, Map map, Vector3 centerAsWorldMeters, Func<WorldEntity, bool> renderCondition)
@@ -593,7 +598,10 @@ namespace Estreya.BlishHUD.EventTable.Managers
 				}
 			}
 			IEnumerable<Vector3> allPoints = perZRangePoints.SelectMany((Vector3[] x) => x).Concat(connectPoints);
-			return new WorldPolygone(centerAsWorldMeters, allPoints.ToArray(), dynamicEvent.GetColorAsXnaColor(), renderCondition);
+			return new WorldPolygone(centerAsWorldMeters, allPoints.ToArray(), dynamicEvent.GetColorAsXnaColor())
+			{
+				RenderCondition = renderCondition
+			};
 		}
 
 		private void CheckLostEntityReferences()

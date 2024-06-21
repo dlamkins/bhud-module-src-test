@@ -385,7 +385,15 @@ namespace Estreya.BlishHUD.Shared.Utils
 
 		public void RemoveEntity(MapEntity mapEntity)
 		{
-			_flatMap.RemoveEntity(mapEntity);
+			RemoveEntities(mapEntity);
+		}
+
+		public void RemoveEntities(params MapEntity[] mapEntity)
+		{
+			foreach (MapEntity entity in mapEntity)
+			{
+				_flatMap.RemoveEntity(entity);
+			}
 		}
 
 		private async Task<NavigationResult> MoveMouse(int x, int y, bool sendToSystem = false)

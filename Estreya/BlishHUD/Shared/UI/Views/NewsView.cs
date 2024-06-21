@@ -56,20 +56,20 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005b: Expected O, but got Unknown
-			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0115: Expected O, but got Unknown
-			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014e: Expected O, but got Unknown
-			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0124: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012c: Expected O, but got Unknown
+			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0158: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0165: Expected O, but got Unknown
+			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)parent);
 			val.set_FlowDirection((ControlFlowDirection)3);
@@ -78,7 +78,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			((Control)val).set_Width(((Container)parent).get_ContentRegion().Width - 50);
 			((Panel)val).set_CanScroll(true);
 			FlowPanel newsList = val;
-			List<News> sortedNews = _newsService.News.OrderByDescending((News n) => n.Timestamp).ToList();
+			List<News> sortedNews = _newsService?.News?.OrderByDescending((News n) => n.Timestamp).ToList() ?? new List<News>();
 			if (sortedNews.Count > 0)
 			{
 				foreach (News news in sortedNews)

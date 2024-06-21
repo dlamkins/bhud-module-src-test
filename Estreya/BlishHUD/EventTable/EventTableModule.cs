@@ -142,6 +142,14 @@ namespace Estreya.BlishHUD.EventTable
 			DynamicEventHandler.FoundLostEntities += DynamicEventHandler_FoundLostEntities;
 			await DynamicEventHandler.AddDynamicEventsToMap();
 			await DynamicEventHandler.AddDynamicEventsToWorld();
+			EventTimerHandler = new EventTimerHandler(async delegate
+			{
+				using (await _eventCategoryLock.LockAsync())
+				{
+					return _eventCategories.SelectMany((EventCategory ec) => ec.Events).ToList();
+				}
+			}, () => NowUTC, MapUtil, base.Gw2ApiManager, base.ModuleSettings, base.TranslationService, base.IconService);
+			EventTimerHandler.FoundLostEntities += EventTimerHandler_FoundLostEntities;
 			base.ModuleSettings.IncludeSelfHostedEvents.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)IncludeSelfHostedEvents_SettingChanged);
 			AddAllAreas();
 			await LoadEvents();
@@ -199,13 +207,7 @@ namespace Estreya.BlishHUD.EventTable
 				return;
 			}
 			_eventTableContext = new EventTableContext();
-			_contextManager = new ContextManager(_eventTableContext, base.ModuleSettings, DynamicEventService, base.IconService, EventStateService, base.AudioService, async delegate
-			{
-				using (await _eventCategoryLock.LockAsync())
-				{
-					return _eventCategories.SelectMany((EventCategory ec) => ec.Events);
-				}
-			});
+			_contextManager = new ContextManager(_eventTableContext, base.ModuleSettings, DynamicEventService, base.IconService, EventStateService, base.AudioService, async () => (await GetAllEvents()).SelectMany((EventCategory ec) => ec.Events));
 			_contextManager.ReloadEvents += ContextManager_ReloadEvents;
 			_eventTableContextHandle = GameService.Contexts.RegisterContext<EventTableContext>(_eventTableContext);
 			base.Logger.Info("Event Table context registered.");
@@ -309,6 +311,7 @@ namespace Estreya.BlishHUD.EventTable
 					ReportErrorState(Estreya.BlishHUD.EventTable.Models.ModuleErrorStateGroup.LOADING_EVENTS, "Failed loading events.");
 				}
 			}
+			await (EventTimerHandler?.NotifyUpdatedEvents() ?? Task.CompletedTask);
 		}
 
 		private async Task<Dictionary<string, List<SelfHostedEventEntry>>> LoadSelfHostedEvents()
@@ -401,6 +404,7 @@ namespace Estreya.BlishHUD.EventTable
 				}
 			}
 			DynamicEventHandler?.Update(gameTime);
+			EventTimerHandler?.Update(gameTime);
 			_contextManager?.Update(gameTime);
 			UpdateUtil.Update(CheckDrawerSettings, gameTime, _checkDrawerSettingInterval.TotalMilliseconds, ref _lastCheckDrawerSettings);
 			UpdateUtil.UpdateAsync(LoadEvents, gameTime, _updateEventsInterval.TotalMilliseconds, _lastEventUpdate);
@@ -450,6 +454,14 @@ namespace Estreya.BlishHUD.EventTable
 				show &= !GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode() || !pvpMapTypes.Any((MapType type) => type == GameService.Gw2Mumble.get_CurrentMap().get_Type());
 			}
 			return show;
+		}
+
+		private async Task<List<EventCategory>> GetAllEvents()
+		{
+			using (await _eventCategoryLock.LockAsync())
+			{
+				return _eventCategories.ToArray().ToList();
+			}
 		}
 
 		private void AddEventHooks(Estreya.BlishHUD.EventTable.Models.Event ev)
@@ -520,17 +532,17 @@ namespace Estreya.BlishHUD.EventTable
 
 		private async void EventNotification_Click(object sender, MouseEventArgs e)
 		{
-			EventNotification notification = sender as EventNotification;
-			string waypoint = notification?.Model?.GetWaypoint(base.AccountService.Account);
+			Estreya.BlishHUD.EventTable.Models.Event model = (sender as EventNotification)?.Model;
+			string waypoint = model?.GetWaypoint(base.AccountService?.Account);
 			switch (base.ModuleSettings.ReminderLeftClickAction.get_Value())
 			{
 			case LeftClickAction.CopyWaypoint:
 			{
-				if (notification == null || notification.Model == null || string.IsNullOrWhiteSpace(waypoint))
+				if (model == null || string.IsNullOrWhiteSpace(waypoint))
 				{
 					break;
 				}
-				string eventChatFormat = notification.Model.GetChatText(base.ModuleSettings.ReminderEventChatFormat.get_Value(), notification.Model.GetNextOccurence(), base.AccountService.Account);
+				string eventChatFormat = model.GetChatText(base.ModuleSettings.ReminderEventChatFormat.get_Value(), model.GetNextOccurrence(), base.AccountService?.Account);
 				if ((int)GameService.Input.get_Keyboard().get_ActiveModifiers() == 1)
 				{
 					try
@@ -541,24 +553,20 @@ namespace Estreya.BlishHUD.EventTable
 					}
 					catch (Exception ex)
 					{
-						base.Logger.Warn(ex, "Could not paste waypoint into chat. Event: " + notification.Model.SettingKey);
+						base.Logger.Warn(ex, "Could not paste waypoint into chat. Event: " + model.SettingKey);
 						ScreenNotification.ShowNotification(new string[2] { "Waypoint could not be pasted in chat.", "See log for more information." }, ScreenNotification.NotificationType.Error, null, 5);
 					}
 				}
 				else
 				{
 					await ClipboardUtil.get_WindowsClipboardService().SetTextAsync(eventChatFormat);
-					ScreenNotification.ShowNotification(new string[2]
-					{
-						notification.Model.Name,
-						"Copied to clipboard!"
-					});
+					ScreenNotification.ShowNotification(new string[2] { model.Name, "Copied to clipboard!" });
 				}
 				break;
 			}
 			case LeftClickAction.NavigateToWaypoint:
 			{
-				if (notification == null || notification.Model == null || string.IsNullOrWhiteSpace(waypoint) || base.PointOfInterestService == null)
+				if (string.IsNullOrWhiteSpace(waypoint) || base.PointOfInterestService == null)
 				{
 					break;
 				}
@@ -698,10 +706,12 @@ namespace Estreya.BlishHUD.EventTable
 			//IL_028e: Expected O, but got Unknown
 			//IL_02d3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02dd: Expected O, but got Unknown
-			//IL_0312: Unknown result type (might be due to invalid IL or missing references)
-			//IL_031c: Expected O, but got Unknown
+			//IL_0322: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032c: Expected O, but got Unknown
 			//IL_0361: Unknown result type (might be due to invalid IL or missing references)
 			//IL_036b: Expected O, but got Unknown
+			//IL_03b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ba: Expected O, but got Unknown
 			settingWindow.SavesSize = true;
 			settingWindow.CanResize = true;
 			settingWindow.RebuildViewAfterResize = true;
@@ -777,6 +787,10 @@ namespace Estreya.BlishHUD.EventTable
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			}), base.TranslationService.GetTranslation("dynamicEventsSettingsView-title", "Dynamic Events"), (int?)null));
+			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("759448.png"), (Func<IView>)(() => (IView)(object)new EventTimersSettingsView(base.ModuleSettings, GetAllEvents, base.Gw2ApiManager, base.IconService, base.TranslationService, base.SettingEventService, base.AccountService)
+			{
+				DefaultColor = base.ModuleSettings.DefaultGW2Color
+			}), base.TranslationService.GetTranslation("eventTimersSettingsView-title", "Event Timers"), (int?)null));
 			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("156764.png"), (Func<IView>)(() => (IView)(object)new BlishHUDAPIView(base.Gw2ApiManager, base.IconService, base.TranslationService, base.BlishHUDAPIService, GetFlurlClient())
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color

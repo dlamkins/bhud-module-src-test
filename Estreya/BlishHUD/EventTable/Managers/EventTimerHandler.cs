@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Entities;
 using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.EventTable.Controls.Map;
@@ -12,8 +13,13 @@ using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.Shared.Controls.Map;
 using Estreya.BlishHUD.Shared.Controls.World;
 using Estreya.BlishHUD.Shared.Services;
+using Estreya.BlishHUD.Shared.Threading;
 using Estreya.BlishHUD.Shared.Utils;
+using Humanizer;
+using Humanizer.Localisation;
 using Microsoft.Xna.Framework;
+using MonoGame.Extended;
+using MonoGame.Extended.BitmapFonts;
 
 namespace Estreya.BlishHUD.EventTable.Managers
 {
@@ -24,6 +30,10 @@ namespace Estreya.BlishHUD.EventTable.Managers
 		private static TimeSpan _checkLostEntitiesInterval = TimeSpan.FromSeconds(5.0);
 
 		private double _lastLostEntitiesCheck;
+
+		private static TimeSpan _readdInterval = TimeSpan.FromSeconds(5.0);
+
+		private AsyncRef<double> _lastReadd = new AsyncRef<double>(0.0);
 
 		private bool _notifiedLostEntities;
 
@@ -39,15 +49,17 @@ namespace Estreya.BlishHUD.EventTable.Managers
 
 		private readonly TranslationService _translationService;
 
+		private readonly IconService _iconService;
+
 		private readonly ConcurrentQueue<(string Key, bool Add)> _entityQueue = new ConcurrentQueue<(string, bool)>();
 
-		private readonly ConcurrentDictionary<string, MapEntity> _mapEntities = new ConcurrentDictionary<string, MapEntity>();
+		private readonly ConcurrentDictionary<string, List<MapEntity>> _mapEntities = new ConcurrentDictionary<string, List<MapEntity>>();
 
 		private readonly ConcurrentDictionary<string, List<WorldEntity>> _worldEntities = new ConcurrentDictionary<string, List<WorldEntity>>();
 
 		public event EventHandler FoundLostEntities;
 
-		public EventTimerHandler(Func<Task<List<Event>>> getEvents, Func<DateTime> getNow, MapUtil mapUtil, Gw2ApiManager apiManager, ModuleSettings moduleSettings, TranslationService translationService)
+		public EventTimerHandler(Func<Task<List<Event>>> getEvents, Func<DateTime> getNow, MapUtil mapUtil, Gw2ApiManager apiManager, ModuleSettings moduleSettings, TranslationService translationService, IconService iconService)
 		{
 			_getEvents = getEvents;
 			_getNow = getNow;
@@ -55,40 +67,37 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			_apiManager = apiManager;
 			_moduleSettings = moduleSettings;
 			_translationService = translationService;
+			_iconService = iconService;
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)CurrentMap_MapChanged);
+			_moduleSettings.ShowEventTimersOnMap.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowEventTimersOnMap_SettingChanged);
+			_moduleSettings.ShowEventTimersInWorld.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowEventTimersInWorld_SettingChanged);
+			_moduleSettings.DisabledEventTimerSettingKeys.add_SettingChanged((EventHandler<ValueChangedEventArgs<List<string>>>)DisabledEventTimerSettingKeys_SettingChanged);
 		}
 
 		public void Update(GameTime gameTime)
 		{
-			UpdateUtil.Update(CheckLostEntityReferences, gameTime, _checkLostEntitiesInterval.TotalMilliseconds, ref _lastLostEntitiesCheck);
-			(string, bool) element;
-			while (_entityQueue.TryDequeue(out element))
-			{
-				try
-				{
-					if (element.Item2)
-					{
-						Task.Run(async delegate
-						{
-						});
-					}
-				}
-				catch (Exception ex)
-				{
-					Logger.Debug(ex, "Failed updating event " + element.Item1);
-				}
-			}
 		}
 
-		private async void CurrentMap_MapChanged(object sender, ValueEventArgs<int> e)
+		private async Task AddAll()
 		{
 			await AddEventTimersToMap();
 			await AddEventTimersToWorld();
 		}
 
-		private async Task<List<Event>> GetEventForMap(int mapId)
+		private async void CurrentMap_MapChanged(object sender, ValueEventArgs<int> e)
 		{
-			return (await _getEvents()).Where((Event ev) => ev.MapIds.Contains(mapId)).ToList();
+			Logger.Debug($"Changed map to id {e.get_Value()}");
+			await AddAll();
+		}
+
+		private async Task<List<Event>> GetAllEvents()
+		{
+			return (await _getEvents()).Where((Event ev) => ev.Timers != null).ToList();
+		}
+
+		private async Task<List<Event>> GetEventsForMap(int mapId)
+		{
+			return (await GetAllEvents()).Where((Event ev) => ev.MapIds.Contains(mapId)).ToList();
 		}
 
 		public async Task AddEventTimersToMap()
@@ -96,9 +105,9 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			_ = 1;
 			try
 			{
-				_mapEntities?.Values.ToList().ForEach(delegate(MapEntity m)
+				_mapEntities?.Values.ToList().ForEach(delegate(List<MapEntity> m)
 				{
-					_mapUtil.RemoveEntity(m);
+					_mapUtil.RemoveEntities(m.ToArray());
 				});
 				_mapEntities?.Clear();
 				if (!_moduleSettings.ShowEventTimersOnMap.get_Value() || !GameService.Gw2Mumble.get_IsAvailable())
@@ -106,7 +115,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 					return;
 				}
 				int mapId = GameService.Gw2Mumble.get_CurrentMap().get_Id();
-				List<Event> events = await GetEventForMap(mapId);
+				List<Event> events = await GetAllEvents();
 				if (events == null || events.Count == 0)
 				{
 					Logger.Debug($"No events found for map {mapId}");
@@ -119,7 +128,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			}
 			catch (Exception ex)
 			{
-				Logger.Warn(ex, "Failed to add dynamic events to map.");
+				Logger.Warn(ex, "Failed to add event timers to map.");
 			}
 		}
 
@@ -127,28 +136,36 @@ namespace Estreya.BlishHUD.EventTable.Managers
 		{
 			if (_mapEntities.ContainsKey(ev.SettingKey))
 			{
-				_mapUtil.RemoveEntity(_mapEntities[ev.SettingKey]);
+				_mapUtil.RemoveEntities(_mapEntities[ev.SettingKey].ToArray());
 				_mapEntities.TryRemove(ev.SettingKey, out var _);
 			}
 		}
 
-		public async Task AddEventTimerToMap(Event ev)
+		public Task AddEventTimerToMap(Event ev)
 		{
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
 			RemoveEventTimerFromMap(ev);
-			if (!_moduleSettings.ShowEventTimersOnMap.get_Value() || !GameService.Gw2Mumble.get_IsAvailable())
+			if (!_moduleSettings.ShowEventTimersOnMap.get_Value() || !GameService.Gw2Mumble.get_IsAvailable() || ev.Timers == null || (_moduleSettings.DisabledEventTimerSettingKeys.get_Value()?.Contains(ev.SettingKey) ?? false))
 			{
-				return;
+				return Task.CompletedTask;
 			}
 			try
 			{
-				MapEntity circle = _mapUtil.AddEntity(new EventTimer(ev, Color.get_DarkOrange(), _getNow, _translationService, 3f));
-				circle.TooltipText = ev.Name ?? "";
-				_mapEntities.AddOrUpdate(ev.SettingKey, circle, (string _, MapEntity _) => circle);
+				List<Estreya.BlishHUD.EventTable.Models.EventMapTimer> list = ev.Timers.Where((EventTimers t) => t.Map != null && t.Map.Length != 0).SelectMany((EventTimers t) => t.Map).ToList();
+				List<MapEntity> entities = new List<MapEntity>();
+				foreach (Estreya.BlishHUD.EventTable.Models.EventMapTimer mapTimer in list)
+				{
+					MapEntity circle = _mapUtil.AddEntity(new Estreya.BlishHUD.EventTable.Controls.Map.EventMapTimer(ev, mapTimer, Color.get_DarkOrange(), _getNow, _translationService, 3f));
+					circle.TooltipText = ev.Name ?? "";
+					entities.Add(circle);
+				}
+				_mapEntities.AddOrUpdate(ev.SettingKey, entities, (string _, List<MapEntity> prev) => prev.Concat(entities).ToList());
 			}
 			catch (Exception ex)
 			{
 				Logger.Debug(ex, "Failed to add " + ev.SettingKey + " to map.");
 			}
+			return Task.CompletedTask;
 		}
 
 		public async Task AddEventTimersToWorld()
@@ -160,7 +177,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 				return;
 			}
 			int mapId = GameService.Gw2Mumble.get_CurrentMap().get_Id();
-			List<Event> events = await GetEventForMap(mapId);
+			List<Event> events = await GetEventsForMap(mapId);
 			if (events == null || events.Count == 0)
 			{
 				Logger.Debug($"No events found for map {mapId}");
@@ -172,7 +189,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 				await AddEventTimerToWorld(ev);
 			}
 			sw.Stop();
-			Logger.Debug($"Added events in {sw.ElapsedMilliseconds}ms");
+			Logger.Debug($"Added events for map {mapId} in {sw.ElapsedMilliseconds}ms");
 		}
 
 		private void RemoveEventTimerFromWorld(Event ev)
@@ -184,13 +201,312 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			}
 		}
 
-		public async Task AddEventTimerToWorld(Event ev)
+		public Task AddEventTimerToWorld(Event ev)
 		{
+			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0213: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0221: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0226: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0235: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0236: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0238: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0251: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0256: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0281: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0310: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0315: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0348: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0433: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0438: Unknown result type (might be due to invalid IL or missing references)
+			//IL_043a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0487: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0498: Unknown result type (might be due to invalid IL or missing references)
+			//IL_049d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_050b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0510: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0515: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0517: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0526: Unknown result type (might be due to invalid IL or missing references)
+			//IL_052b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0530: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0532: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0541: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0546: Unknown result type (might be due to invalid IL or missing references)
+			//IL_054b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_054d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0561: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0566: Unknown result type (might be due to invalid IL or missing references)
+			//IL_057b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0631: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0635: Unknown result type (might be due to invalid IL or missing references)
+			//IL_066a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_066e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0721: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0725: Unknown result type (might be due to invalid IL or missing references)
+			//IL_075b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_075f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_079b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_079f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0815: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0819: Unknown result type (might be due to invalid IL or missing references)
+			//IL_084f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0853: Unknown result type (might be due to invalid IL or missing references)
+			//IL_088f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0893: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08cd: Unknown result type (might be due to invalid IL or missing references)
 			RemoveEventTimerFromWorld(ev);
-			if (_moduleSettings.ShowEventTimersInWorld.get_Value())
+			if (!_moduleSettings.ShowEventTimersInWorld.get_Value() || !GameService.Gw2Mumble.get_IsAvailable() || ev.Timers == null || (_moduleSettings.DisabledEventTimerSettingKeys.get_Value()?.Contains(ev.SettingKey) ?? false))
 			{
-				GameService.Gw2Mumble.get_IsAvailable();
+				return Task.CompletedTask;
 			}
+			try
+			{
+				Func<WorldEntity, bool> renderCondition = (WorldEntity entity) => entity.DistanceToPlayer <= (float)_moduleSettings.EventTimersRenderDistance.get_Value();
+				int mapId = GameService.Gw2Mumble.get_CurrentMap().get_Id();
+				_getNow();
+				List<EventWorldTimer> list = ev.Timers.Where((EventTimers t) => t.MapID == mapId && t.World != null && t.World.Length != 0).SelectMany((EventTimers t) => t.World).ToList();
+				List<WorldEntity> entites = new List<WorldEntity>();
+				Vector3 centerAsWorldMeters = default(Vector3);
+				foreach (EventWorldTimer worldTimer in list)
+				{
+					((Vector3)(ref centerAsWorldMeters))._002Ector(worldTimer.X, worldTimer.Y, worldTimer.Z);
+					float width = 5f;
+					float boxHeight = 3.5f;
+					List<Vector3> statuePoints = new List<Vector3>
+					{
+						new Vector3(0f - width / 2f, 0f, 0f),
+						new Vector3(width / 2f, 0f, 0f),
+						new Vector3(width / 2f, 0f, boxHeight),
+						new Vector3(0f - width / 2f, 0f, boxHeight),
+						new Vector3(0f - width / 2f, 0f, 0f)
+					};
+					bool first = true;
+					statuePoints = statuePoints.SelectMany(delegate(Vector3 t)
+					{
+						//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+						IEnumerable<Vector3> result = Enumerable.Repeat<Vector3>(t, first ? 1 : 2);
+						first = false;
+						return result;
+					}).ToList();
+					statuePoints = statuePoints.Take(statuePoints.Count - 1).ToList();
+					Vector3 val = centerAsWorldMeters + new Vector3(0f, 0f, boxHeight);
+					float halfCircleRadius = width / 2f;
+					Vector3 halfCirclePosition = val;
+					Vector3 texturePosition = halfCirclePosition + new Vector3(0f, 0f, halfCircleRadius * 0.75f);
+					float textureScale = 1f;
+					AsyncTexture2D textureIcon = _iconService.GetIcon(ev.Icon);
+					new Size(128, 128);
+					Func<string> remainingText = delegate
+					{
+						DateTime currentOccurrence = ev.GetCurrentOccurrence();
+						string text = "---";
+						if (currentOccurrence != default(DateTime))
+						{
+							text = (currentOccurrence.AddMinutes(ev.Duration) - _getNow()).Humanize(2, null, TimeUnit.Week, TimeUnit.Second);
+						}
+						return "Current remaining: " + text;
+					};
+					BitmapFont remainingFont = GameService.Content.GetFont((FontFace)0, (FontSize)36, (FontStyle)0);
+					float remainingScale = 0.4f;
+					float remainingScaleWidth = 2.75f;
+					Color remainingColor = Color.get_Red();
+					Func<string> startsInText = () => "Next in: " + (ev.GetNextOccurrence() - _getNow()).Humanize(2, null, TimeUnit.Week, TimeUnit.Second);
+					BitmapFont startsInFont = GameService.Content.GetFont((FontFace)0, (FontSize)36, (FontStyle)0);
+					float startsInScale = 0.4f;
+					float startsInScaleWidth = 2.5f;
+					Color startsInColor = Color.get_Red();
+					float nextOccurrenceScale = 0.4f;
+					float nextOccurrenceScaleWidth = 2f;
+					Func<string> nextOccurrenceText = () => ev.GetNextOccurrence().ToLocalTime().ToString();
+					Color nextOccurrenceColor = Color.get_Red();
+					BitmapFont nextOccurrenceFont = GameService.Content.GetFont((FontFace)0, (FontSize)36, (FontStyle)0);
+					Func<string> nameText = () => ev.Name ?? "";
+					BitmapFont nameFont = GameService.Content.GetFont((FontFace)0, (FontSize)36, (FontStyle)0);
+					float nameScale = 0.6f;
+					float nameScaleWidth = width / 1.5f;
+					Color nameColor = Color.get_Red();
+					Func<string> durationText = () => $"Duration: {ev.Duration}min";
+					BitmapFont durationFont = GameService.Content.GetFont((FontFace)0, (FontSize)36, (FontStyle)0);
+					float durationScale = 0.4f;
+					float durationScaleWidth = 2f;
+					Color durationColor = Color.get_Red();
+					Func<string> repeatText = () => "Repeats every: " + ev.Repeat.Humanize();
+					BitmapFont repeatFont = GameService.Content.GetFont((FontFace)0, (FontSize)36, (FontStyle)0);
+					float repeatScale = 0.4f;
+					float repeatScaleWidth = 2f;
+					Color repeatColor = Color.get_Red();
+					Color.get_Red();
+					if (_003C_003Ec._003C_003E9__30_11 == null)
+					{
+						_003C_003Ec._003C_003E9__30_11 = () => "FRONT";
+					}
+					if (_003C_003Ec._003C_003E9__30_12 == null)
+					{
+						_003C_003Ec._003C_003E9__30_12 = () => "BACK";
+					}
+					GameService.Content.GetFont((FontFace)0, (FontSize)36, (FontStyle)0);
+					Vector3 namePosition = texturePosition + new Vector3(0f, 0f, -0.75f);
+					Vector3 durationPosition = namePosition + new Vector3(0f, 0f, 0f - (nameScale / 2f + durationScale / 2f));
+					Vector3 repeatPosition = durationPosition + new Vector3(0f, 0f, 0f - (durationScale / 2f + repeatScale / 2f));
+					Vector3 remainingPosition = val + new Vector3(0f, 0f, 0f - nameScale / 2f);
+					Vector3 startsInPosition = remainingPosition + new Vector3(0f, 0f, 0f - remainingScale);
+					Vector3 nextOccurrencePosition = startsInPosition + new Vector3(0f, 0f, 0f - startsInScale);
+					_ = halfCirclePosition + new Vector3(0f, 0f, halfCircleRadius + 0.5f);
+					entites.AddRange(new WorldEntity[16]
+					{
+						new WorldPolygone(centerAsWorldMeters, statuePoints.ToArray())
+						{
+							RotationZ = worldTimer.Rotation,
+							RenderCondition = renderCondition
+						},
+						new WorldHalfCircle(halfCirclePosition, halfCircleRadius)
+						{
+							RotationZ = worldTimer.Rotation,
+							RotationX = 90f,
+							RenderCondition = renderCondition
+						},
+						new WorldTexture(textureIcon, texturePosition, textureScale)
+						{
+							RotationZ = worldTimer.Rotation,
+							RotationX = 90f,
+							RenderCondition = renderCondition
+						},
+						new WorldTexture(textureIcon, texturePosition, textureScale)
+						{
+							RotationZ = worldTimer.Rotation + 180f,
+							RotationX = 90f,
+							RenderCondition = renderCondition
+						},
+						new WorldText(remainingText, remainingFont, remainingPosition, remainingScale, remainingColor)
+						{
+							RotationZ = worldTimer.Rotation,
+							RotationX = 90f,
+							ScaleX = remainingScaleWidth,
+							RenderCondition = renderCondition
+						},
+						new WorldText(remainingText, remainingFont, remainingPosition, remainingScale, remainingColor)
+						{
+							RotationZ = worldTimer.Rotation + 180f,
+							RotationX = 90f,
+							ScaleX = remainingScaleWidth,
+							RenderCondition = renderCondition
+						},
+						new WorldText(startsInText, startsInFont, startsInPosition, startsInScale, startsInColor)
+						{
+							RotationZ = worldTimer.Rotation,
+							RotationX = 90f,
+							ScaleX = startsInScaleWidth,
+							RenderCondition = renderCondition
+						},
+						new WorldText(startsInText, startsInFont, startsInPosition, startsInScale, startsInColor)
+						{
+							RotationZ = worldTimer.Rotation + 180f,
+							RotationX = 90f,
+							ScaleX = startsInScaleWidth,
+							RenderCondition = renderCondition
+						},
+						new WorldText(nextOccurrenceText, nextOccurrenceFont, nextOccurrencePosition, nextOccurrenceScale, nextOccurrenceColor)
+						{
+							RotationZ = worldTimer.Rotation,
+							RotationX = 90f,
+							ScaleX = nextOccurrenceScaleWidth,
+							RenderCondition = renderCondition
+						},
+						new WorldText(nextOccurrenceText, nextOccurrenceFont, nextOccurrencePosition, nextOccurrenceScale, nextOccurrenceColor)
+						{
+							RotationZ = worldTimer.Rotation + 180f,
+							RotationX = 90f,
+							ScaleX = nextOccurrenceScaleWidth,
+							RenderCondition = renderCondition
+						},
+						new WorldText(nameText, nameFont, namePosition, nameScale, nameColor)
+						{
+							RotationZ = worldTimer.Rotation,
+							RotationX = 90f,
+							ScaleX = nameScaleWidth,
+							RenderCondition = renderCondition
+						},
+						new WorldText(nameText, nameFont, namePosition, nameScale, nameColor)
+						{
+							RotationZ = worldTimer.Rotation + 180f,
+							RotationX = 90f,
+							ScaleX = nameScaleWidth,
+							RenderCondition = renderCondition
+						},
+						new WorldText(durationText, durationFont, durationPosition, durationScale, durationColor)
+						{
+							RotationZ = worldTimer.Rotation,
+							RotationX = 90f,
+							ScaleX = durationScaleWidth,
+							RenderCondition = renderCondition
+						},
+						new WorldText(durationText, durationFont, durationPosition, durationScale, durationColor)
+						{
+							RotationZ = worldTimer.Rotation + 180f,
+							RotationX = 90f,
+							ScaleX = durationScaleWidth,
+							RenderCondition = renderCondition
+						},
+						new WorldText(repeatText, repeatFont, repeatPosition, repeatScale, repeatColor)
+						{
+							RotationZ = worldTimer.Rotation,
+							RotationX = 90f,
+							ScaleX = repeatScaleWidth,
+							RenderCondition = renderCondition
+						},
+						new WorldText(repeatText, repeatFont, repeatPosition, repeatScale, repeatColor)
+						{
+							RotationZ = worldTimer.Rotation + 180f,
+							RotationX = 90f,
+							ScaleX = repeatScaleWidth,
+							RenderCondition = renderCondition
+						}
+					});
+				}
+				_worldEntities.AddOrUpdate(ev.SettingKey, entites, (string _, List<WorldEntity> prev) => prev.Concat(entites).ToList());
+				GameService.Graphics.get_World().AddEntities((IEnumerable<IEntity>)entites);
+			}
+			catch (Exception ex)
+			{
+				Logger.Debug(ex, "Failed to add " + ev.SettingKey + " to world.");
+			}
+			return Task.CompletedTask;
+		}
+
+		public async Task NotifyUpdatedEvents()
+		{
+			await AddAll();
 		}
 
 		private void CheckLostEntityReferences()
@@ -215,16 +531,34 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			}
 		}
 
+		private async void DisabledEventTimerSettingKeys_SettingChanged(object sender, ValueChangedEventArgs<List<string>> e)
+		{
+			await AddAll();
+		}
+
+		private async void ShowEventTimersInWorld_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
+		{
+			await AddAll();
+		}
+
+		private async void ShowEventTimersOnMap_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
+		{
+			await AddAll();
+		}
+
 		public void Dispose()
 		{
 			GameService.Graphics.get_World().RemoveEntities((IEnumerable<IEntity>)_worldEntities.Values.SelectMany((List<WorldEntity> v) => v));
 			_worldEntities?.Clear();
-			_mapEntities?.Values.ToList().ForEach(delegate(MapEntity me)
+			_mapEntities?.Values.ToList().ForEach(delegate(List<MapEntity> me)
 			{
-				_mapUtil.RemoveEntity(me);
+				_mapUtil.RemoveEntities(me.ToArray());
 			});
 			_mapEntities?.Clear();
 			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)CurrentMap_MapChanged);
+			_moduleSettings.ShowEventTimersOnMap.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowEventTimersOnMap_SettingChanged);
+			_moduleSettings.ShowEventTimersInWorld.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowEventTimersInWorld_SettingChanged);
+			_moduleSettings.DisabledEventTimerSettingKeys.remove_SettingChanged((EventHandler<ValueChangedEventArgs<List<string>>>)DisabledEventTimerSettingKeys_SettingChanged);
 		}
 	}
 }
