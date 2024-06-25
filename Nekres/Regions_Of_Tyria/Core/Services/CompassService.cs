@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
@@ -20,6 +19,14 @@ namespace Nekres.Regions_Of_Tyria.Core.Services
 
 			public BitmapFont Font;
 
+			private Texture2D _bgTex;
+
+			public CompassRegionDisplay()
+				: this()
+			{
+				_bgTex = GameService.Content.GetTexture("fade-down-46");
+			}
+
 			protected override CaptureType CapturesInput()
 			{
 				return (CaptureType)22;
@@ -27,37 +34,28 @@ namespace Nekres.Regions_Of_Tyria.Core.Services
 
 			protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 			{
-				//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+				//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+				//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+				//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+				//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+				//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0090: Unknown result type (might be due to invalid IL or missing references)
 				if (string.IsNullOrWhiteSpace(Text))
 				{
 					return;
 				}
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), bounds, Color.get_Black() * 0.25f);
-				List<string> lines = Text.Split("<br>").ToList();
-				int height = 0;
-				for (int i = 0; i < lines.Count; i++)
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _bgTex, new Rectangle(bounds.X, bounds.Y, bounds.Width, 30), (Rectangle?)_bgTex.get_Bounds(), Color.get_White() * 0.7f);
+				int height = 5;
+				foreach (string line in Text.Split("<br>"))
 				{
-					string line = lines[i];
-					int lineHeight = (int)Math.Round(Font.MeasureString(line).Height) + 4;
-					if (i > 0)
-					{
-						lineHeight += Font.get_LineHeight();
-					}
-					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, line, Font, new Rectangle(0, 0, bounds.Width, lineHeight + height), Color.get_White(), false, true, 1, (HorizontalAlignment)1, (VerticalAlignment)1);
-					height += 20;
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, line, Font, new Rectangle(0, height, bounds.Width, bounds.Height), Color.get_White(), false, true, 1, (HorizontalAlignment)1, (VerticalAlignment)0);
+					height += Font.get_LineHeight();
 				}
-				((Control)this).set_Height(height);
-			}
-
-			public CompassRegionDisplay()
-				: this()
-			{
 			}
 		}
 
@@ -78,6 +76,8 @@ namespace Nekres.Regions_Of_Tyria.Core.Services
 		private Rectangle _compass;
 
 		private bool _isMouseOver;
+
+		private HashSet<int> _noCompassMaps = new HashSet<int>(new int[3] { 935, 895, 934 });
 
 		public bool IsMouseOver
 		{
@@ -111,6 +111,20 @@ namespace Nekres.Regions_Of_Tyria.Core.Services
 			GameService.Gw2Mumble.get_UI().add_IsMapOpenChanged((EventHandler<ValueEventArgs<bool>>)OnMapOpenChanged);
 			GameService.GameIntegration.get_Gw2Instance().add_IsInGameChanged((EventHandler<ValueEventArgs<bool>>)OnIsInGameChanged);
 			GameService.Input.get_Mouse().add_MouseMoved((EventHandler<MouseEventArgs>)OnMouseMoved);
+			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
+		}
+
+		private void OnMapChanged(object sender, ValueEventArgs<int> e)
+		{
+			if (!HasCompass())
+			{
+				CompassRegionDisplay label = _label;
+				if (label != null)
+				{
+					((Control)label).Dispose();
+				}
+				_label = null;
+			}
 		}
 
 		private void OnMouseMoved(object sender, MouseEventArgs e)
@@ -127,24 +141,38 @@ namespace Nekres.Regions_Of_Tyria.Core.Services
 			}
 		}
 
+		private bool HasCompass()
+		{
+			return !_noCompassMaps.Contains(GameService.Gw2Mumble.get_CurrentMap().get_Id());
+		}
+
 		public void Show(string text)
 		{
-			if (_label == null)
+			if (string.IsNullOrEmpty(text))
 			{
-				CompassRegionDisplay obj = new CompassRegionDisplay
+				CompassRegionDisplay label = _label;
+				if (label != null)
 				{
-					Font = GameService.Content.get_DefaultFont14()
-				};
-				((Control)obj).set_Height(20);
-				((Control)obj).set_ZIndex(30);
-				_label = obj;
+					((Control)label).Dispose();
+				}
+				_label = null;
 			}
-			((Control)_label).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			_label.Text = text;
-			UpdateCompass();
-			((Control)_label).set_Left(((Rectangle)(ref _compass)).get_Left());
-			((Control)_label).set_Top(((Rectangle)(ref _compass)).get_Top());
-			((Control)_label).set_Width(_compass.Width);
+			else if (HasCompass())
+			{
+				if (_label == null)
+				{
+					CompassRegionDisplay obj = new CompassRegionDisplay
+					{
+						Font = GameService.Content.get_DefaultFont16()
+					};
+					((Control)obj).set_Height(20);
+					((Control)obj).set_ZIndex(30);
+					_label = obj;
+				}
+				((Control)_label).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+				_label.Text = text;
+				UpdateCompass();
+			}
 		}
 
 		private void OnCompassSizeChanged(object sender, ValueEventArgs<Size> e)
@@ -210,6 +238,7 @@ namespace Nekres.Regions_Of_Tyria.Core.Services
 				((Control)_label).set_Left(((Rectangle)(ref _compass)).get_Left());
 				((Control)_label).set_Top(((Rectangle)(ref _compass)).get_Top());
 				((Control)_label).set_Width(_compass.Width);
+				((Control)_label).set_Height(_compass.Height);
 			}
 		}
 
@@ -220,11 +249,13 @@ namespace Nekres.Regions_Of_Tyria.Core.Services
 			GameService.Gw2Mumble.get_UI().remove_IsMapOpenChanged((EventHandler<ValueEventArgs<bool>>)OnMapOpenChanged);
 			GameService.GameIntegration.get_Gw2Instance().remove_IsInGameChanged((EventHandler<ValueEventArgs<bool>>)OnIsInGameChanged);
 			GameService.Input.get_Mouse().remove_MouseMoved((EventHandler<MouseEventArgs>)OnMouseMoved);
+			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
 			CompassRegionDisplay label = _label;
 			if (label != null)
 			{
 				((Control)label).Dispose();
 			}
+			_label = null;
 		}
 	}
 }
