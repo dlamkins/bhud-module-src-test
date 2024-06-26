@@ -34,18 +34,18 @@ namespace Nekres.Regions_Of_Tyria.Core.Services
 
 			protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 			{
-				//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-				//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-				//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-				//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-				//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+				//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+				//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 				//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-				if (string.IsNullOrWhiteSpace(Text))
+				//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+				//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+				if (string.IsNullOrWhiteSpace(Text) || !GameService.Gw2Mumble.get_IsAvailable())
 				{
 					return;
 				}
@@ -143,7 +143,18 @@ namespace Nekres.Regions_Of_Tyria.Core.Services
 
 		private bool HasCompass()
 		{
-			return !_noCompassMaps.Contains(GameService.Gw2Mumble.get_CurrentMap().get_Id());
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			if (!_noCompassMaps.Contains(GameService.Gw2Mumble.get_CurrentMap().get_Id()))
+			{
+				Size compass = GameService.Gw2Mumble.get_RawClient().get_Compass();
+				if (((Size)(ref compass)).get_Width() > 0)
+				{
+					return ((Size)(ref compass)).get_Height() > 0;
+				}
+				return false;
+			}
+			return false;
 		}
 
 		public void Show(string text)
@@ -215,9 +226,10 @@ namespace Nekres.Regions_Of_Tyria.Core.Services
 			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
 			Size compassSize = GameService.Gw2Mumble.get_UI().get_CompassSize();
 			int offsetWidth = GetOffset(((Size)(ref compassSize)).get_Width(), 362f, 170f, 40f);
 			compassSize = GameService.Gw2Mumble.get_UI().get_CompassSize();
@@ -228,6 +240,7 @@ namespace Nekres.Regions_Of_Tyria.Core.Services
 			int height = ((Size)(ref compassSize)).get_Height() + offsetHeight;
 			int x = ((Container)GameService.Graphics.get_SpriteScreen()).get_ContentRegion().Width - width;
 			int y = 0;
+			GameService.Gw2Mumble.get_RawClient().get_Compass();
 			if (!GameService.Gw2Mumble.get_UI().get_IsCompassTopRight())
 			{
 				y += ((Container)GameService.Graphics.get_SpriteScreen()).get_ContentRegion().Height - height - 40;

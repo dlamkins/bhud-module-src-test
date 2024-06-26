@@ -23,7 +23,7 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 
 		private static readonly Color _darkGold;
 
-		private const int NOTIFICATION_COOLDOWN_MS = 2000;
+		internal const int NOTIFICATION_COOLDOWN_MS = 2000;
 
 		private static DateTime _lastNotificationTime;
 
@@ -63,13 +63,13 @@ namespace Nekres.Regions_Of_Tyria.UI.Controls
 
 		static MapNotification()
 		{
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Expected O, but got Unknown
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-			_lastNotificationTime = DateTime.UtcNow;
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Expected O, but got Unknown
+			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+			_lastNotificationTime = DateTime.UtcNow.AddMilliseconds(-2000.0);
 			_activeMapNotifications = new SynchronizedCollection<MapNotification>();
 			_defaultParams = new SpriteBatchParameters((SpriteSortMode)0, (BlendState)null, (SamplerState)null, (DepthStencilState)null, (RasterizerState)null, (Effect)null, (Matrix?)null);
 			_brightGold = new Color(223, 194, 149, 255);

@@ -101,9 +101,9 @@ namespace Nekres.Regions_Of_Tyria
 
 		private double _lastRun;
 
-		private DateTime _lastUpdate = DateTime.UtcNow;
-
 		private bool _unloading;
+
+		private DateTime _delaySectorUntil = DateTime.UtcNow;
 
 		private string _lastSectorName;
 
@@ -167,34 +167,37 @@ namespace Nekres.Regions_Of_Tyria
 
 		protected override async void Update(GameTime gameTime)
 		{
-			if (_currentMap.get_Id() == 0)
+			if (DateTime.UtcNow.Subtract(_lastIndicatorChange).TotalMilliseconds > 250.0 && _notificationIndicator != null)
+			{
+				((Control)_notificationIndicator).Dispose();
+				_notificationIndicator = null;
+			}
+			if (!_toggleSectorNotification.get_Value())
+			{
+				return;
+			}
+			float playerSpeed = GameService.Gw2Mumble.get_PlayerCharacter().GetSpeed(gameTime);
+			if (DateTime.UtcNow < _delaySectorUntil || gameTime.get_TotalGameTime().TotalMilliseconds - _lastRun < 10.0)
+			{
+				return;
+			}
+			_lastRun = gameTime.get_ElapsedGameTime().TotalMilliseconds;
+			if (_currentMap.get_Id() == 0 || !GameService.Gw2Mumble.get_IsAvailable() || !GameService.GameIntegration.get_Gw2Instance().get_IsInGame() || (_hideInCombat.get_Value() && GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat()))
 			{
 				return;
 			}
 			Sector sector = await GetSector(_currentMap);
-			if (sector == Sector.Zero || _unloading)
+			if (sector != Sector.Zero && !_unloading)
 			{
-				return;
-			}
-			_lastSectorName = MapNotification.FilterDisplayName(sector.Name);
-			if (_showSectorOnCompass.get_Value())
-			{
-				Compass?.Show(_lastSectorName);
-			}
-			if (_currentSector.Id != sector.Id && _previousSector.Id != sector.Id)
-			{
-				_previousSector = _currentSector;
-				_currentSector = sector;
-				float playerSpeed = GameService.Gw2Mumble.get_PlayerCharacter().GetSpeed(gameTime);
-				if (DateTime.UtcNow.Subtract(_lastIndicatorChange).TotalMilliseconds > 250.0 && _notificationIndicator != null)
+				_lastSectorName = MapNotification.FilterDisplayName(sector.Name);
+				if (_showSectorOnCompass.get_Value())
 				{
-					((Control)_notificationIndicator).Dispose();
-					_notificationIndicator = null;
+					Compass?.Show(_lastSectorName);
 				}
-				if (GameService.Gw2Mumble.get_IsAvailable() && GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && _toggleSectorNotification.get_Value() && !(playerSpeed > 54f) && (!_hideInCombat.get_Value() || !GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat()) && !(gameTime.get_TotalGameTime().TotalMilliseconds - _lastRun < 10.0) && !(DateTime.UtcNow.Subtract(_lastUpdate).TotalSeconds < 5.0))
+				if (!(playerSpeed > 54f) && _currentSector.Id != sector.Id && _previousSector.Id != sector.Id)
 				{
-					_lastRun = gameTime.get_ElapsedGameTime().TotalMilliseconds;
-					_lastUpdate = DateTime.UtcNow;
+					_previousSector = _currentSector;
+					_currentSector = sector;
 					ShowNotification(_includeMapInSectorNotification.get_Value() ? _currentMap.get_Name() : null, sector.Name);
 				}
 			}
@@ -347,7 +350,6 @@ namespace Nekres.Regions_Of_Tyria
 
 		private async void OnMapChanged(object o, ValueEventArgs<int> e)
 		{
-			_lastUpdate = DateTime.UtcNow;
 			Map map = (_currentMap = await _mapRepository.GetItem(e.get_Value()));
 			if (_toggleMapNotification.get_Value())
 			{
@@ -358,6 +360,8 @@ namespace Nekres.Regions_Of_Tyria
 					Compass?.Show(_lastSectorName);
 				}
 				ShowNotification(_includeRegionInMapNotification.get_Value() ? map.get_RegionName() : null, mapName);
+				int delaySectorMs = (int)Math.Round(_showDuration.get_Value() * 10f * 5f + _fadeOutDuration.get_Value() * 10f * 3f);
+				_delaySectorUntil = DateTime.UtcNow.AddMilliseconds(delaySectorMs);
 			}
 		}
 
@@ -366,11 +370,19 @@ namespace Nekres.Regions_Of_Tyria
 			Coordinates2 playerLocation = GameService.Gw2Mumble.get_RawClient().get_AvatarPosition().ToContinentCoords(CoordsUnit.METERS, map.get_MapRect(), map.get_ContinentRect())
 				.SwapYz()
 				.ToPlane();
-			return (await _sectorRepository.GetItem(GameService.Gw2Mumble.get_CurrentMap().get_Id()))?.FirstOrDefault((Sector sector) => sector.Contains(((Coordinates2)(ref playerLocation)).get_X(), ((Coordinates2)(ref playerLocation)).get_Y())) ?? Sector.Zero;
+			if (_sectorRepository.HasItem(map.get_Id()) && !_sectorRepository.ItemComplete(map.get_Id()))
+			{
+				return Sector.Zero;
+			}
+			return (await _sectorRepository.GetItem(map.get_Id()))?.FirstOrDefault((Sector sector) => sector.Contains(((Coordinates2)(ref playerLocation)).get_X(), ((Coordinates2)(ref playerLocation)).get_Y())) ?? Sector.Zero;
 		}
 
 		private async Task<List<Sector>> RequestSectors(int mapId)
 		{
+			if (_mapRepository.HasItem(mapId) && !_mapRepository.ItemComplete(mapId))
+			{
+				return Enumerable.Empty<Sector>().ToList();
+			}
 			Map map = await _mapRepository.GetItem(mapId);
 			List<Sector> geometryZone = new List<Sector>();
 			foreach (int floor in map.get_Floors())

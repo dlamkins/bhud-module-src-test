@@ -34,6 +34,20 @@ namespace Nekres.Regions_Of_Tyria
 			return await newSource.Task;
 		}
 
+		public bool HasItem(TKey key)
+		{
+			return _completionSourceCache.ContainsKey(key);
+		}
+
+		public bool ItemComplete(TKey key)
+		{
+			if (_completionSourceCache.TryGetValue(key, out var item))
+			{
+				return item.Task.IsCompleted;
+			}
+			return false;
+		}
+
 		public async Task<TValue> RemoveItem(TKey key)
 		{
 			TaskCompletionSource<TValue> item;
