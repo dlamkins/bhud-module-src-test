@@ -21,10 +21,25 @@ namespace Nekres.Regions_Of_Tyria.Core.Services
 
 			private Texture2D _bgTex;
 
+			private bool _showBackground;
+
 			public CompassRegionDisplay()
 				: this()
 			{
 				_bgTex = GameService.Content.GetTexture("fade-down-46");
+				_showBackground = RegionsOfTyria.Instance.ShowBackgroundOnCompass.get_Value();
+				RegionsOfTyria.Instance.ShowBackgroundOnCompass.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnShowBackgroundOnCompassChanged);
+			}
+
+			private void OnShowBackgroundOnCompassChanged(object sender, ValueChangedEventArgs<bool> e)
+			{
+				_showBackground = e.get_NewValue();
+			}
+
+			protected override void DisposeControl()
+			{
+				RegionsOfTyria.Instance.ShowBackgroundOnCompass.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnShowBackgroundOnCompassChanged);
+				((Control)this).DisposeControl();
 			}
 
 			protected override CaptureType CapturesInput()
@@ -34,22 +49,25 @@ namespace Nekres.Regions_Of_Tyria.Core.Services
 
 			protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 			{
-				//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-				//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+				//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-				//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-				//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-				//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+				//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+				//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
 				if (string.IsNullOrWhiteSpace(Text) || !GameService.Gw2Mumble.get_IsAvailable())
 				{
 					return;
 				}
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _bgTex, new Rectangle(bounds.X, bounds.Y, bounds.Width, 30), (Rectangle?)_bgTex.get_Bounds(), Color.get_White() * 0.7f);
+				if (_showBackground)
+				{
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _bgTex, new Rectangle(bounds.X, bounds.Y, bounds.Width, 30), (Rectangle?)_bgTex.get_Bounds(), Color.get_White() * 0.7f);
+				}
 				int height = 5;
 				foreach (string line in Text.Split("<br>"))
 				{
@@ -112,6 +130,12 @@ namespace Nekres.Regions_Of_Tyria.Core.Services
 			GameService.GameIntegration.get_Gw2Instance().add_IsInGameChanged((EventHandler<ValueEventArgs<bool>>)OnIsInGameChanged);
 			GameService.Input.get_Mouse().add_MouseMoved((EventHandler<MouseEventArgs>)OnMouseMoved);
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
+			((Container)GameService.Graphics.get_SpriteScreen()).add_ContentResized((EventHandler<RegionChangedEventArgs>)OnScreenResized);
+		}
+
+		private void OnScreenResized(object sender, RegionChangedEventArgs e)
+		{
+			UpdateCompass();
 		}
 
 		private void OnMapChanged(object sender, ValueEventArgs<int> e)
@@ -226,10 +250,9 @@ namespace Nekres.Regions_Of_Tyria.Core.Services
 			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
 			Size compassSize = GameService.Gw2Mumble.get_UI().get_CompassSize();
 			int offsetWidth = GetOffset(((Size)(ref compassSize)).get_Width(), 362f, 170f, 40f);
 			compassSize = GameService.Gw2Mumble.get_UI().get_CompassSize();
@@ -240,7 +263,6 @@ namespace Nekres.Regions_Of_Tyria.Core.Services
 			int height = ((Size)(ref compassSize)).get_Height() + offsetHeight;
 			int x = ((Container)GameService.Graphics.get_SpriteScreen()).get_ContentRegion().Width - width;
 			int y = 0;
-			GameService.Gw2Mumble.get_RawClient().get_Compass();
 			if (!GameService.Gw2Mumble.get_UI().get_IsCompassTopRight())
 			{
 				y += ((Container)GameService.Graphics.get_SpriteScreen()).get_ContentRegion().Height - height - 40;
@@ -263,6 +285,7 @@ namespace Nekres.Regions_Of_Tyria.Core.Services
 			GameService.GameIntegration.get_Gw2Instance().remove_IsInGameChanged((EventHandler<ValueEventArgs<bool>>)OnIsInGameChanged);
 			GameService.Input.get_Mouse().remove_MouseMoved((EventHandler<MouseEventArgs>)OnMouseMoved);
 			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
+			((Container)GameService.Graphics.get_SpriteScreen()).remove_ContentResized((EventHandler<RegionChangedEventArgs>)OnScreenResized);
 			CompassRegionDisplay label = _label;
 			if (label != null)
 			{

@@ -51,6 +51,8 @@ namespace Nekres.Regions_Of_Tyria
 
 		private SettingEntry<bool> _hideInCombat;
 
+		internal SettingEntry<bool> ShowBackgroundOnCompass;
+
 		internal SettingEntry<bool> Translate;
 
 		internal SettingEntry<bool> Dissolve;
@@ -152,7 +154,9 @@ namespace Nekres.Regions_Of_Tyria
 			SettingCollection sectorCol = settings.AddSubCollection("sector_alert", true, (Func<string>)(() => "Sector Notification"));
 			_toggleSectorNotification = sectorCol.DefineSetting<bool>("enabled", true, (Func<string>)(() => "Enabled"), (Func<string>)(() => "Shows a sector's name after entering."));
 			_includeMapInSectorNotification = sectorCol.DefineSetting<bool>("prefix_map", true, (Func<string>)(() => "Include Map"), (Func<string>)(() => "Shows the map's name above the sector's name."));
-			_showSectorOnCompass = sectorCol.DefineSetting<bool>("compass", true, (Func<string>)(() => "Show Sector on Compass"), (Func<string>)(() => "Shows a sector's name at the top of your compass (ie. minimap)."));
+			SettingCollection compassCol = settings.AddSubCollection("compass", true, (Func<string>)(() => "Compass / Minimap"));
+			_showSectorOnCompass = compassCol.DefineSetting<bool>("enabled", true, (Func<string>)(() => "Show Sector on Compass"), (Func<string>)(() => "Shows a sector's name at the top of your compass (ie. minimap)."));
+			ShowBackgroundOnCompass = compassCol.DefineSetting<bool>("background", false, (Func<string>)(() => "Show Sector with Background"), (Func<string>)(() => "Displays the black faded bar behind a sector's name at the top of your compass (ie. minimap)."));
 		}
 
 		protected override void Initialize()
@@ -172,10 +176,6 @@ namespace Nekres.Regions_Of_Tyria
 				((Control)_notificationIndicator).Dispose();
 				_notificationIndicator = null;
 			}
-			if (!_toggleSectorNotification.get_Value())
-			{
-				return;
-			}
 			float playerSpeed = GameService.Gw2Mumble.get_PlayerCharacter().GetSpeed(gameTime);
 			if (DateTime.UtcNow < _delaySectorUntil || gameTime.get_TotalGameTime().TotalMilliseconds - _lastRun < 10.0)
 			{
@@ -194,7 +194,7 @@ namespace Nekres.Regions_Of_Tyria
 				{
 					Compass?.Show(_lastSectorName);
 				}
-				if (!(playerSpeed > 54f) && _currentSector.Id != sector.Id && _previousSector.Id != sector.Id)
+				if (_toggleSectorNotification.get_Value() && !(playerSpeed > 54f) && _currentSector.Id != sector.Id && _previousSector.Id != sector.Id)
 				{
 					_previousSector = _currentSector;
 					_currentSector = sector;
