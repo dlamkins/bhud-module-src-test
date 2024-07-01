@@ -1,8 +1,9 @@
+using Ideka.BHUDCommon.AnchoredRect;
 using Microsoft.Xna.Framework;
 
 namespace Ideka.RacingMeter
 {
-	public abstract class MeterChild<T> : RectAnchor where T : RectAnchor, IMeter, new()
+	public abstract class MeterChild<T> : AnchoredRect where T : AnchoredRect, IMeter, new()
 	{
 		private static readonly T EmptyMeter = new T();
 

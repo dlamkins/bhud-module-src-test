@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Blish_HUD.Controls;
+using Ideka.BHUDCommon;
 using Ideka.NetCommon;
 using Ideka.RacingMeter.Lib;
 using Microsoft.Xna.Framework;

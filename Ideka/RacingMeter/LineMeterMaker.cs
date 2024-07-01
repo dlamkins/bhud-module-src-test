@@ -1,4 +1,5 @@
 using System;
+using Ideka.BHUDCommon.AnchoredRect;
 using Microsoft.Xna.Framework;
 
 namespace Ideka.RacingMeter
@@ -14,11 +15,11 @@ namespace Ideka.RacingMeter
 
 		public void TackOn(bool right, float spacing = 5f, float width = 20f)
 		{
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
 			int side = (right ? 1 : 0);
 			base.Meter.AnchorMin = new Vector2((float)side, 0f);
 			base.Meter.AnchorMax = new Vector2((float)side, 1f);
@@ -101,7 +102,7 @@ namespace Ideka.RacingMeter
 			});
 		}
 
-		public RectAnchor AddLevelScroll(Projection projection, RectAnchor container)
+		public AnchoredRect AddLevelScroll(Projection projection, AnchoredRect container)
 		{
 			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
@@ -127,21 +128,21 @@ namespace Ideka.RacingMeter
 				{
 					SimpleRectangle simpleRectangle = white;
 					SimpleRectangle simpleRectangle2 = black;
-					simpleRectangle3 = simpleRectangle;
-					simpleRectangle4 = simpleRectangle2;
+					simpleRectangle3 = simpleRectangle2;
+					simpleRectangle4 = simpleRectangle;
 				}
 				else
 				{
 					SimpleRectangle simpleRectangle5 = black;
 					SimpleRectangle simpleRectangle2 = white;
-					simpleRectangle3 = simpleRectangle5;
-					simpleRectangle4 = simpleRectangle2;
+					simpleRectangle3 = simpleRectangle2;
+					simpleRectangle4 = simpleRectangle5;
 				}
 				float num = 1f - (float)(anchorLevel % 1.0);
-				simpleRectangle4.AnchorMax = new Vector2(1f, 1f);
-				simpleRectangle4.AnchorMin = new Vector2(0f, num);
-				simpleRectangle3.AnchorMax = new Vector2(1f, num);
-				simpleRectangle3.AnchorMin = new Vector2(0f, 0f);
+				simpleRectangle3.AnchorMax = new Vector2(1f, 1f);
+				simpleRectangle3.AnchorMin = new Vector2(0f, num);
+				simpleRectangle4.AnchorMax = new Vector2(1f, num);
+				simpleRectangle4.AnchorMin = new Vector2(0f, 0f);
 			});
 		}
 

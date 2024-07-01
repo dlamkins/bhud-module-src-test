@@ -1,3 +1,4 @@
+using Ideka.BHUDCommon.AnchoredRect;
 using Ideka.NetCommon;
 using Microsoft.Xna.Framework;
 
@@ -22,7 +23,7 @@ namespace Ideka.RacingMeter
 			return (float)(-4.06707E-09 * MathUtils.Biquadrated(ips) + 8.34847E-06 * MathUtils.Cubed(ips) - 0.000873353 * MathUtils.Squared(ips) + 0.241738 * ips - 1.43113);
 		}
 
-		public static RectAnchor Construct(IMeasurer measurer)
+		public static AnchoredRect Construct(IMeasurer measurer)
 		{
 			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009c: Unknown result type (might be due to invalid IL or missing references)

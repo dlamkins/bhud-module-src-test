@@ -106,7 +106,7 @@ namespace Ideka.RacingMeter
 			((Control)speedometer).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((Control)speedometer).set_ZIndex(50);
 			dc2.Add<Speedometer>(speedometer);
-			_dc.Add<PanelStack>(new PanelStack(GameService.Overlay.get_BlishHudWindow(), (PanelStack panelStack) => new MainPanel(panelStack, measurer)));
+			_dc.Add<PanelStack>(new PanelStack(GameService.Overlay.get_BlishHudWindow(), Name.GetHashCode(), (PanelStack panelStack) => new MainPanel(panelStack, measurer)));
 			Server.CheckVersion(Version.ToString()).Done(Logger, null);
 		}
 

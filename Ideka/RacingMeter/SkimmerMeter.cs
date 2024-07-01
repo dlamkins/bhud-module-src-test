@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Ideka.BHUDCommon.AnchoredRect;
 using Microsoft.Xna.Framework;
 
 namespace Ideka.RacingMeter
@@ -25,7 +26,7 @@ namespace Ideka.RacingMeter
 
 		public const double VSpeedRange = 1024.0;
 
-		public static RectAnchor Construct(IMeasurer measurer)
+		public static AnchoredRect Construct(IMeasurer measurer)
 		{
 			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
@@ -43,9 +44,9 @@ namespace Ideka.RacingMeter
 			//IL_0402: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0411: Unknown result type (might be due to invalid IL or missing references)
 			IMeasurer measurer2 = measurer;
-			RectAnchor meter = new RectAnchor();
-			List<RectAnchor> airComponents = new List<RectAnchor>();
-			List<RectAnchor> waterComponents = new List<RectAnchor>();
+			AnchoredRect meter = new AnchoredRect();
+			List<AnchoredRect> airComponents = new List<AnchoredRect>();
+			List<AnchoredRect> waterComponents = new List<AnchoredRect>();
 			ArcMeterMaker arc = new ArcMeterMaker(measurer2);
 			Projection speedP = arc.Meter.AddProjection(Projection.ZeroTo(1100.0)).WithSoftMax(935.0);
 			Projection angleP = arc.Meter.AddProjection(Projection.Symmetric(1.2222222222222223));
@@ -77,7 +78,7 @@ namespace Ideka.RacingMeter
 			heightP.AddAnchor(right.AddWaterLevelNeedle(heightP));
 			right.AddHeightNeedle(heightP);
 			right.AddOutline();
-			right.AddLevelScroll(heightP, new RectAnchor
+			right.AddLevelScroll(heightP, new AnchoredRect
 			{
 				AnchorMin = new Vector2(1f, 0f),
 				AnchorMax = new Vector2(1f, 1f),
@@ -109,11 +110,11 @@ namespace Ideka.RacingMeter
 			meter.WithUpdate(delegate
 			{
 				bool flag = (double)measurer2.Pos.HeightIn < -40.0;
-				foreach (RectAnchor item in airComponents)
+				foreach (AnchoredRect item in airComponents)
 				{
 					item.Visible = !flag;
 				}
-				foreach (RectAnchor item2 in waterComponents)
+				foreach (AnchoredRect item2 in waterComponents)
 				{
 					item2.Visible = flag;
 				}

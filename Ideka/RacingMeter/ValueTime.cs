@@ -25,12 +25,13 @@ namespace Ideka.RacingMeter
 
 		public bool IsDouble { get; }
 
-		public ValueTime(TData first, TData second, TimeSpan deltaTime, bool isDouble = false)
+		protected ValueTime(TData first, TData second, TimeSpan deltaTime, bool isDouble = false)
 		{
 			First = first;
 			Second = second;
-			IsDouble = isDouble;
 			DeltaTime = (isDouble ? (deltaTime + deltaTime) : deltaTime);
+			IsDouble = isDouble;
+			base._002Ector();
 		}
 	}
 }

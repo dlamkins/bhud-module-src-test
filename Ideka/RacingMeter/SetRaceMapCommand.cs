@@ -1,8 +1,11 @@
+using System.Runtime.CompilerServices;
+
 namespace Ideka.RacingMeter
 {
 	public class SetRaceMapCommand : IEditorCommand
 	{
-		private readonly int _mapId;
+		[CompilerGenerated]
+		private int _003CmapId_003EP;
 
 		private int _prevMapId;
 
@@ -10,15 +13,16 @@ namespace Ideka.RacingMeter
 
 		public SetRaceMapCommand(int mapId)
 		{
-			_mapId = mapId;
+			_003CmapId_003EP = mapId;
+			base._002Ector();
 		}
 
 		public bool Do(EditState state)
 		{
 			_prevMapId = state.Race.MapId;
-			if (_prevMapId != _mapId)
+			if (_prevMapId != _003CmapId_003EP)
 			{
-				return state.SetRaceMap(_mapId);
+				return state.SetRaceMap(_003CmapId_003EP);
 			}
 			return false;
 		}

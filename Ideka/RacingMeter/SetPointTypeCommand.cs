@@ -1,12 +1,15 @@
+using System.Runtime.CompilerServices;
 using Ideka.RacingMeter.Lib;
 
 namespace Ideka.RacingMeter
 {
 	public class SetPointTypeCommand : IEditorCommand
 	{
-		private readonly RacePoint _point;
+		[CompilerGenerated]
+		private RacePoint _003Cpoint_003EP;
 
-		private readonly RacePointType _type;
+		[CompilerGenerated]
+		private RacePointType _003Ctype_003EP;
 
 		private RacePointType _prevType;
 
@@ -14,23 +17,24 @@ namespace Ideka.RacingMeter
 
 		public SetPointTypeCommand(RacePoint point, RacePointType type)
 		{
-			_point = point;
-			_type = type;
+			_003Cpoint_003EP = point;
+			_003Ctype_003EP = type;
+			base._002Ector();
 		}
 
 		public bool Do(EditState state)
 		{
-			_prevType = _point.Type;
-			if (_prevType != _type)
+			_prevType = _003Cpoint_003EP.Type;
+			if (_prevType != _003Ctype_003EP)
 			{
-				return state.SetPointType(_point, _type);
+				return state.SetPointType(_003Cpoint_003EP, _003Ctype_003EP);
 			}
 			return false;
 		}
 
 		public void Undo(EditState state)
 		{
-			state.SetPointType(_point, _prevType);
+			state.SetPointType(_003Cpoint_003EP, _prevType);
 		}
 	}
 }

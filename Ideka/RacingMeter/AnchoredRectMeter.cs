@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using Ideka.BHUDCommon.AnchoredRect;
 
 namespace Ideka.RacingMeter
 {
-	public abstract class RectAnchorMeter : RectAnchor, IMeter
+	public abstract class AnchoredRectMeter : AnchoredRect, IMeter
 	{
 		private readonly List<Projection> _projections = new List<Projection>();
 

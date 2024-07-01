@@ -4,6 +4,7 @@ using Blish_HUD;
 using Blish_HUD.Controls;
 using Gw2Sharp.Models;
 using Ideka.BHUDCommon;
+using Ideka.BHUDCommon.AnchoredRect;
 using Ideka.NetCommon;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -14,15 +15,15 @@ namespace Ideka.RacingMeter
 {
 	public class Speedometer : Control
 	{
-		private readonly Dictionary<MountType, RectAnchor?> _meters = new Dictionary<MountType, RectAnchor>();
+		private readonly Dictionary<MountType, AnchoredRect?> _meters = new Dictionary<MountType, AnchoredRect>();
 
 		private readonly DisposableCollection _dc = new DisposableCollection();
 
 		private readonly MeasurerRealtime _measurer;
 
-		private readonly RectAnchor _meterContainer;
+		private readonly AnchoredRect _meterContainer;
 
-		private RectAnchor? _currentMeter;
+		private AnchoredRect? _currentMeter;
 
 		private float AnchorY
 		{
@@ -30,8 +31,8 @@ namespace Ideka.RacingMeter
 			{
 				//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 				//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-				RectAnchor meterContainer = _meterContainer;
-				RectAnchor meterContainer2 = _meterContainer;
+				AnchoredRect meterContainer = _meterContainer;
+				AnchoredRect meterContainer2 = _meterContainer;
 				Vector2 val = default(Vector2);
 				((Vector2)(ref val))._002Ector(0.5f, value);
 				meterContainer2.Pivot = val;
@@ -51,7 +52,7 @@ namespace Ideka.RacingMeter
 			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
 			_measurer = measurer;
 			((Control)this).set_ClipsBounds(false);
-			_meterContainer = new RectAnchor
+			_meterContainer = new AnchoredRect
 			{
 				SizeDelta = new Vector2(400f, 100f),
 				Anchor = new Vector2(0.5f, 0.5f)
@@ -68,7 +69,7 @@ namespace Ideka.RacingMeter
 			{
 				Debug = !Debug;
 			}));
-			Dictionary<MountType, RectAnchor> meters = new Dictionary<MountType, RectAnchor>
+			Dictionary<MountType, AnchoredRect> meters = new Dictionary<MountType, AnchoredRect>
 			{
 				[(MountType)4] = SkimmerMeter.Construct(measurer),
 				[(MountType)2] = GriffonMeter.Construct(measurer),
@@ -92,10 +93,10 @@ namespace Ideka.RacingMeter
 
 		protected override CaptureType CapturesInput()
 		{
-			return (CaptureType)0;
+			return (CaptureType)22;
 		}
 
-		public void SetMeter(MountType mount, RectAnchor? meter)
+		public void SetMeter(MountType mount, AnchoredRect? meter)
 		{
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			_meters[mount] = meter;
@@ -116,6 +117,12 @@ namespace Ideka.RacingMeter
 			{
 				_meterContainer.AddChild(_currentMeter);
 			}
+		}
+
+		public override void DoUpdate(GameTime gameTime)
+		{
+			((Control)this).DoUpdate(gameTime);
+			_meterContainer.Update(gameTime);
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)

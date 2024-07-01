@@ -1,4 +1,5 @@
 using Ideka.BHUDCommon;
+using Ideka.BHUDCommon.AnchoredRect;
 using Microsoft.Xna.Framework;
 
 namespace Ideka.RacingMeter
@@ -27,6 +28,11 @@ namespace Ideka.RacingMeter
 			Vector2 point = Point(Value, Clamp);
 			Vector2 position = base.Origin + point;
 			target.SpriteBatch.DrawRectangleFill(ThicknessRect(position, Thickness), Color);
+		}
+
+		bool IProjectionAnchor.get_Visible()
+		{
+			return base.Visible;
 		}
 	}
 }

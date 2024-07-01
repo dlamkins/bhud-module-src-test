@@ -1,4 +1,5 @@
 using Ideka.BHUDCommon;
+using Ideka.BHUDCommon.AnchoredRect;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 

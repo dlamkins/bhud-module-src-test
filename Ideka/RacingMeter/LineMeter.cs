@@ -1,9 +1,10 @@
+using Ideka.BHUDCommon.AnchoredRect;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 
 namespace Ideka.RacingMeter
 {
-	public class LineMeter : RectAnchorMeter
+	public class LineMeter : AnchoredRectMeter
 	{
 		public bool Horizontal { get; set; }
 

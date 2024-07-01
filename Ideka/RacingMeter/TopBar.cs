@@ -162,9 +162,7 @@ namespace Ideka.RacingMeter
 			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
 			Label statusLabel = _statusLabel;
 			Label statusLabel2 = _statusLabel;
 			Label statusLabel3 = _statusLabel;
@@ -175,11 +173,9 @@ namespace Ideka.RacingMeter
 				Server.OnlineStatus.No => (Strings.SupportStatusNo, Color.get_DarkOrange(), Strings.SupportStatusTooltipNo), 
 				_ => (Strings.SupportStatusFaulted, Color.get_DarkOrange(), Strings.SupportStatusTooltipFaulted), 
 			};
-			string item;
-			statusLabel.set_Text(item = tuple.Item1);
-			Color item2;
-			statusLabel2.set_TextColor(item2 = tuple.Item2);
-			((Control)statusLabel3).set_BasicTooltipText(item = tuple.Item3);
+			statusLabel.set_Text(tuple.Item1);
+			statusLabel2.set_TextColor(tuple.Item2);
+			((Control)statusLabel3).set_BasicTooltipText(tuple.Item3);
 		}
 
 		protected override void OnResized(ResizedEventArgs e)

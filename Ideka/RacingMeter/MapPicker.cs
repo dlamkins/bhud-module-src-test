@@ -12,7 +12,7 @@ namespace Ideka.RacingMeter
 
 		private int _value;
 
-		private readonly TextBox _textBox;
+		private readonly TextBoxFix _textBox;
 
 		private readonly StandardButton _button;
 
@@ -27,7 +27,7 @@ namespace Ideka.RacingMeter
 				if (_value != value)
 				{
 					_value = value;
-					TextBox textBox = _textBox;
+					TextBoxFix textBox = _textBox;
 					string text;
 					((Control)_textBox).set_BasicTooltipText(text = RacingModule.MapData.Describe(Value));
 					((TextInputBase)textBox).set_Text(text);
@@ -42,22 +42,18 @@ namespace Ideka.RacingMeter
 		public MapPicker()
 			: this()
 		{
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Expected O, but got Unknown
 			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003c: Expected O, but got Unknown
-			TextBox val = new TextBox();
+			TextBoxFix textBoxFix = new TextBoxFix();
+			((Control)textBoxFix).set_Parent((Container)(object)this);
+			((Control)textBoxFix).set_Enabled(false);
+			_textBox = textBoxFix;
+			StandardButton val = new StandardButton();
 			((Control)val).set_Parent((Container)(object)this);
-			((Control)val).set_Enabled(false);
-			_textBox = val;
-			StandardButton val2 = new StandardButton();
-			((Control)val2).set_Parent((Container)(object)this);
-			val2.set_Text(Strings.ChangeToCurrent);
-			_button = val2;
+			val.set_Text(Strings.ChangeToCurrent);
+			_button = val;
 			UpdateLayout();
 			UpdateButton();
 			((Control)_button).add_Click((EventHandler<MouseEventArgs>)delegate

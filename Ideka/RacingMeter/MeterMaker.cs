@@ -1,5 +1,6 @@
 using System;
 using Blish_HUD;
+using Ideka.BHUDCommon.AnchoredRect;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended.BitmapFonts;
 
@@ -35,9 +36,10 @@ namespace Ideka.RacingMeter
 
 		public IMeasurer Measurer { get; }
 
-		public MeterMaker(IMeasurer measurer)
+		protected MeterMaker(IMeasurer measurer)
 		{
 			Measurer = measurer;
+			base._002Ector();
 		}
 
 		public static int RoundedDegrees(double angle)
@@ -50,14 +52,14 @@ namespace Ideka.RacingMeter
 			return Math.Abs(r);
 		}
 	}
-	public abstract class MeterMaker<T> : MeterMaker where T : RectAnchor, IMeter, new()
+	public abstract class MeterMaker<T> : MeterMaker where T : AnchoredRect, IMeter, new()
 	{
-		public T Meter { get; }
+		public T Meter { get; } = new T();
 
-		public MeterMaker(IMeasurer measurer)
+
+		protected MeterMaker(IMeasurer measurer)
 			: base(measurer)
 		{
-			Meter = new T();
 		}
 
 		public SizedTextLabel AddText(Vector2 anchor, Vector2 pivot, BitmapFont? font = null)

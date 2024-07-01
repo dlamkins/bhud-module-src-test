@@ -1,4 +1,5 @@
 using System;
+using Ideka.BHUDCommon.AnchoredRect;
 using Microsoft.Xna.Framework;
 
 namespace Ideka.RacingMeter
@@ -25,7 +26,7 @@ namespace Ideka.RacingMeter
 
 		public static readonly Color DriftHoldMaxColor = Color.get_DarkRed();
 
-		public static RectAnchor Construct(IMeasurer measurer, Func<bool?> isDriftKeyDown)
+		public static AnchoredRect Construct(IMeasurer measurer, Func<bool?> isDriftKeyDown)
 		{
 			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
@@ -35,12 +36,12 @@ namespace Ideka.RacingMeter
 			//IL_0241: Unknown result type (might be due to invalid IL or missing references)
 			Func<bool?> isDriftKeyDown2 = isDriftKeyDown;
 			IMeasurer measurer2 = measurer;
-			RectAnchor rectAnchor = new RectAnchor();
+			AnchoredRect anchoredRect = new AnchoredRect();
 			ArcMeterMaker arc = new ArcMeterMaker(measurer2);
 			Projection speedP = arc.Meter.AddProjection(Projection.ZeroTo(2500.0)).WithSoftMax(1800.0);
 			Projection angleP = arc.Meter.AddProjection(Projection.Symmetric(1.2222222222222223));
 			arc.AddSoftMaxSpeedIndicator(speedP);
-			rectAnchor.AddChild(arc.Meter);
+			anchoredRect.AddChild(arc.Meter);
 			arc.AddZone(speedP, Color.get_Goldenrod(), 800.0);
 			arc.AddZone(speedP, Color.get_MediumPurple(), 1000.0);
 			arc.AddSoftMaxSpeedZone(speedP);
@@ -58,7 +59,7 @@ namespace Ideka.RacingMeter
 			LineMeterMaker left = new LineMeterMaker(measurer2);
 			Projection driftHoldP = left.Meter.AddProjection(Projection.ZeroTo(1.2));
 			left.TackOn(right: false);
-			rectAnchor.AddChild(left.Meter);
+			anchoredRect.AddChild(left.Meter);
 			LineMeterZone driftHold = left.Meter.AddChild(new LineMeterZone
 			{
 				Projection = driftHoldP,
@@ -105,7 +106,7 @@ namespace Ideka.RacingMeter
 					left.Meter.Visible = false;
 				}
 			});
-			return rectAnchor;
+			return anchoredRect;
 		}
 	}
 }

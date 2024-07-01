@@ -43,11 +43,11 @@ namespace Ideka.RacingMeter
 			}
 		}
 
-		private readonly List<IEditorCommand> _commands = new List<IEditorCommand>();
+		private readonly List<IEditorCommand> _commands;
 
-		private int _index = -1;
+		private int _index;
 
-		private int _saved = -1;
+		private int _saved;
 
 		public bool CanUndo => _index >= 0;
 
@@ -85,6 +85,10 @@ namespace Ideka.RacingMeter
 		public CommandList(EditState state)
 		{
 			State = state;
+			_commands = new List<IEditorCommand>();
+			_index = -1;
+			_saved = -1;
+			base._002Ector();
 		}
 
 		public void Clear()

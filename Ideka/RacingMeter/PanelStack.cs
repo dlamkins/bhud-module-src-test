@@ -38,11 +38,11 @@ namespace Ideka.RacingMeter
 			}
 		}
 
-		public PanelStack(TabbedWindow targetWindow, Func<PanelStack, IUIPanel> makeHomePanel)
+		public PanelStack(TabbedWindow targetWindow, int priority, Func<PanelStack, IUIPanel> makeHomePanel)
 			: this()
 		{
 			_targetWindow = targetWindow;
-			_tab = _targetWindow.AddTab("", (AsyncTexture2D)null, (Panel)(object)this);
+			_tab = _targetWindow.AddTab("", (AsyncTexture2D)null, (Panel)(object)this, priority);
 			CurrentPanel = (_currentPanel = (_homePanel = makeHomePanel(this)));
 		}
 

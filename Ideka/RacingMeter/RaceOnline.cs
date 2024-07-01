@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Ideka.BHUDCommon;
+using Ideka.BHUDCommon.AnchoredRect;
 using Ideka.NetCommon;
 using Ideka.RacingMeter.Lib;
 using Ideka.RacingMeter.Lib.RacingServer;
@@ -25,7 +26,7 @@ namespace Ideka.RacingMeter
 
 		private RaceRunFx? _runFx;
 
-		private readonly RectAnchor _hud;
+		private readonly AnchoredRect _hud;
 
 		private CancellationTokenSource? _countdown;
 
@@ -268,9 +269,19 @@ namespace Ideka.RacingMeter
 			Lobby lobby = client2.Lobby;
 			if (lobby == null)
 			{
-				return Enumerable.Empty<User>();
+				return Array.Empty<User>();
 			}
 			return lobby.Racers.Where((User r) => r.IsOnline && r.RacerData.Sent && r.RacerData.MapId == GameService.Gw2Mumble.get_CurrentMap().get_Id() && r.Id != client2.UserId);
+		}
+
+		public override void DoUpdate(GameTime gameTime)
+		{
+			((Control)this).DoUpdate(gameTime);
+			User user = Client.User;
+			if (user != null && user.LobbyData.IsRacer)
+			{
+				_hud.Update(gameTime);
+			}
 		}
 
 		protected override void DrawRaceToWorld(SpriteBatch spriteBatch)

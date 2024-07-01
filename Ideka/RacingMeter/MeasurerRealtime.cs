@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Ideka.NetCommon;
 
 namespace Ideka.RacingMeter
 {

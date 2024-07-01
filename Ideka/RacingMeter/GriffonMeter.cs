@@ -1,4 +1,5 @@
 using System;
+using Ideka.BHUDCommon.AnchoredRect;
 using Microsoft.Xna.Framework;
 
 namespace Ideka.RacingMeter
@@ -29,7 +30,7 @@ namespace Ideka.RacingMeter
 
 		public const double VSpeedRange = 2000.0;
 
-		public static RectAnchor Construct(IMeasurer measurer)
+		public static AnchoredRect Construct(IMeasurer measurer)
 		{
 			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
@@ -42,10 +43,10 @@ namespace Ideka.RacingMeter
 			//IL_0213: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0234: Unknown result type (might be due to invalid IL or missing references)
 			IMeasurer measurer2 = measurer;
-			RectAnchor rectAnchor = new RectAnchor();
+			AnchoredRect anchoredRect = new AnchoredRect();
 			ArcMeterMaker arc = new ArcMeterMaker(measurer2);
 			Projection speedP = arc.Meter.AddProjection(Projection.ZeroTo(2500.0)).WithSoftMax(2000.0);
-			rectAnchor.AddChild(arc.Meter);
+			anchoredRect.AddChild(arc.Meter);
 			arc.AddSoftMaxSpeedIndicator(speedP);
 			arc.AddZone(speedP, Color.get_MediumPurple(), 1000.0);
 			arc.AddZone(speedP, Color.get_DarkGreen(), 1310.0);
@@ -59,7 +60,7 @@ namespace Ideka.RacingMeter
 			Projection heightP = right.Meter.AddProjection(new Projection()).WithAnchors(new ProjectionAnchors(() => measurer2.Pos.HeightIn));
 			Projection vSpeedP = right.Meter.AddProjection(Projection.ZeroTo(2000.0));
 			right.TackOn(right: true);
-			rectAnchor.AddChild(right.Meter);
+			anchoredRect.AddChild(right.Meter);
 			right.AddWaterZone(heightP);
 			right.AddUpSpeedZone(vSpeedP);
 			right.AddDownSpeedZone(vSpeedP);
@@ -67,7 +68,7 @@ namespace Ideka.RacingMeter
 			LineMeterNeedle diveHeight = heightP.AddAnchor(right.AddNeedle(heightP, Color.get_DarkRed()));
 			right.AddHeightNeedle(heightP);
 			right.AddOutline();
-			right.AddLevelScroll(heightP, new RectAnchor
+			right.AddLevelScroll(heightP, new AnchoredRect
 			{
 				AnchorMin = new Vector2(1f, 0f),
 				AnchorMax = new Vector2(1f, 1f),
@@ -75,7 +76,7 @@ namespace Ideka.RacingMeter
 				SizeDelta = new Vector2(5f, 0f)
 			});
 			right.AddLevelText(heightP, new Vector2(0.5f, 0f), new Vector2(0.5f, 1f));
-			rectAnchor.AddChild(new EnduranceMarker
+			anchoredRect.AddChild(new EnduranceMarker
 			{
 				Percentage = 0.76,
 				Color = Color.get_Black(),
@@ -84,11 +85,11 @@ namespace Ideka.RacingMeter
 			bool preClimb = false;
 			bool diving = false;
 			bool climbing = false;
-			rectAnchor.DebugData.Add(("3ips", () => $"{measurer2.Speed.Speed3D:0}"));
-			rectAnchor.DebugData.Add(("preclimb", () => $"{preClimb}"));
-			rectAnchor.DebugData.Add(("diving", () => $"{diving}"));
-			rectAnchor.DebugData.Add(("climbing", () => $"{climbing}"));
-			rectAnchor.WithUpdate(delegate
+			anchoredRect.DebugData.Add(("3ips", () => $"{measurer2.Speed.Speed3D:0}"));
+			anchoredRect.DebugData.Add(("preclimb", () => $"{preClimb}"));
+			anchoredRect.DebugData.Add(("diving", () => $"{diving}"));
+			anchoredRect.DebugData.Add(("climbing", () => $"{climbing}"));
+			anchoredRect.WithUpdate(delegate
 			{
 				float speed2D = measurer2.Speed.Speed2D;
 				float speed3D = measurer2.Speed.Speed3D;
@@ -111,7 +112,7 @@ namespace Ideka.RacingMeter
 					diveHeight.Visible = false;
 				}
 			});
-			return rectAnchor;
+			return anchoredRect;
 		}
 	}
 }

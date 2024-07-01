@@ -1,29 +1,35 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Ideka.NetCommon;
 
 namespace Ideka.RacingMeter
 {
 	public class ProjectionAnchors
 	{
+		[CompilerGenerated]
+		private Func<double> _003CvalueGet_003EP;
+
+		[CompilerGenerated]
+		private double _003CviewSlack_003EP;
+
+		[CompilerGenerated]
+		private double _003ClevelScrollBase_003EP;
+
 		public const double DefaultViewSlack = 500.0;
 
 		public const double DefaultScrollBase = 1000.0;
 
-		private readonly Func<double> _valueGet;
-
-		private readonly double _viewSlack;
-
-		private readonly double _levelScrollBase;
-
-		private readonly List<IProjectionAnchor> _anchors = new List<IProjectionAnchor>();
+		private readonly List<IProjectionAnchor> _anchors;
 
 		public ProjectionAnchors(Func<double> valueGet, double viewSlack = 500.0, double levelScrollBase = 1000.0)
 		{
-			_valueGet = valueGet;
-			_viewSlack = viewSlack;
-			_levelScrollBase = levelScrollBase;
+			_003CvalueGet_003EP = valueGet;
+			_003CviewSlack_003EP = viewSlack;
+			_003ClevelScrollBase_003EP = levelScrollBase;
+			_anchors = new List<IProjectionAnchor>();
+			base._002Ector();
 		}
 
 		public double GetLevel()
@@ -31,7 +37,7 @@ namespace Ideka.RacingMeter
 			IProjectionAnchor anchor = GetFurthestAnchor();
 			if (anchor != null)
 			{
-				return Math.Max(0.0, Math.Abs(anchor.Value - _valueGet()) / _levelScrollBase);
+				return Math.Max(0.0, Math.Abs(anchor.Value - _003CvalueGet_003EP()) / _003ClevelScrollBase_003EP);
 			}
 			return 0.0;
 		}
@@ -44,7 +50,7 @@ namespace Ideka.RacingMeter
 
 		public IProjectionAnchor? GetFurthestAnchor()
 		{
-			double value = _valueGet();
+			double value = _003CvalueGet_003EP();
 			IEnumerable<IProjectionAnchor> visible = _anchors.Where((IProjectionAnchor a) => a.Visible);
 			if (!visible.Any())
 			{
@@ -55,18 +61,18 @@ namespace Ideka.RacingMeter
 
 		public void Update(Projection projection)
 		{
-			double currentHeight = _valueGet();
+			double currentHeight = _003CvalueGet_003EP();
 			IProjectionAnchor anchor = GetFurthestAnchor();
 			if (anchor != null)
 			{
-				double padding = Math.Max(Math.Abs(anchor.Value - currentHeight) / 2.0, _viewSlack);
+				double padding = Math.Max(Math.Abs(anchor.Value - currentHeight) / 2.0, _003CviewSlack_003EP);
 				projection.MaxValue = Math.Max(anchor.Value, currentHeight) + padding;
 				projection.MinValue = Math.Min(anchor.Value, currentHeight) - padding;
 			}
 			else
 			{
-				projection.MaxValue = currentHeight + _viewSlack;
-				projection.MinValue = currentHeight - _viewSlack;
+				projection.MaxValue = currentHeight + _003CviewSlack_003EP;
+				projection.MinValue = currentHeight - _003CviewSlack_003EP;
 			}
 		}
 	}

@@ -1,10 +1,11 @@
 using System;
+using Ideka.BHUDCommon.AnchoredRect;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 
 namespace Ideka.RacingMeter
 {
-	public class ArcMeter : RectAnchorMeter
+	public class ArcMeter : AnchoredRectMeter
 	{
 		public double ArcAmplitude { get; set; } = 0.6;
 

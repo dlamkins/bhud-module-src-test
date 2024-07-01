@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
@@ -47,17 +48,21 @@ namespace Ideka.RacingMeter
 			}
 		}
 
+		[CompilerGenerated]
+		private Func<HubConnection> _003CgetConn_003EP;
+
 		private static readonly Logger Logger = Logger.GetLogger<RacingServer>();
 
-		private readonly Func<HubConnection> _getConn;
+		private readonly ConcurrentDictionary<Control, bool> _controls;
 
-		private readonly ConcurrentDictionary<Control, bool> _controls = new ConcurrentDictionary<Control, bool>();
-
-		private readonly ConcurrentDictionary<UILock, bool> _locks = new ConcurrentDictionary<UILock, bool>();
+		private readonly ConcurrentDictionary<UILock, bool> _locks;
 
 		public RacingServer(Func<HubConnection> getConn)
 		{
-			_getConn = getConn;
+			_003CgetConn_003EP = getConn;
+			_controls = new ConcurrentDictionary<Control, bool>();
+			_locks = new ConcurrentDictionary<UILock, bool>();
+			base._002Ector();
 		}
 
 		public T Register<T>(T control) where T : Control
@@ -85,99 +90,99 @@ namespace Ideka.RacingMeter
 
 		public Task Ping()
 		{
-			return _getConn().SendAsync("Ping");
+			return _003CgetConn_003EP().SendAsync("Ping");
 		}
 
 		public Task Validate(string version)
 		{
-			return _getConn().InvokeAsync("Validate", version);
+			return _003CgetConn_003EP().InvokeAsync("Validate", version);
 		}
 
 		public Task Authenticate(string accessToken, string? nickname)
 		{
-			return _getConn().InvokeAsync("Authenticate", accessToken, nickname);
+			return _003CgetConn_003EP().InvokeAsync("Authenticate", accessToken, nickname);
 		}
 
 		public Task AuthenticateGuest(string? nickname)
 		{
-			return _getConn().InvokeAsync("AuthenticateGuest", nickname);
+			return _003CgetConn_003EP().InvokeAsync("AuthenticateGuest", nickname);
 		}
 
 		public Task UpdateNickname(string? nickname)
 		{
-			return _getConn().InvokeAsync("UpdateNickname", nickname).Done(Logger, Strings.ErrorSendFailed);
+			return _003CgetConn_003EP().InvokeAsync("UpdateNickname", nickname).Done(Logger, Strings.ErrorSendFailed);
 		}
 
 		public Task GetLobbies()
 		{
-			return _getConn().InvokeAsync("GetLobbies").Done(Logger, Strings.ErrorSendFailed);
+			return _003CgetConn_003EP().InvokeAsync("GetLobbies").Done(Logger, Strings.ErrorSendFailed);
 		}
 
 		public Task CreateLobby()
 		{
-			return _getConn().InvokeAsync("CreateLobby").Done(Logger, Strings.ErrorSendFailed);
+			return _003CgetConn_003EP().InvokeAsync("CreateLobby").Done(Logger, Strings.ErrorSendFailed);
 		}
 
 		public Task JoinLobby(string lobbyId)
 		{
-			return _getConn().InvokeAsync("JoinLobby", lobbyId).Done(Logger, Strings.ErrorSendFailed);
+			return _003CgetConn_003EP().InvokeAsync("JoinLobby", lobbyId).Done(Logger, Strings.ErrorSendFailed);
 		}
 
 		public Task LeaveLobby()
 		{
-			return _getConn().InvokeAsync("LeaveLobby").Done(Logger, Strings.ErrorSendFailed);
+			return _003CgetConn_003EP().InvokeAsync("LeaveLobby").Done(Logger, Strings.ErrorSendFailed);
 		}
 
 		public Task KickUser(string userId)
 		{
-			return _getConn().InvokeAsync("KickUser", userId).Done(Logger, Strings.ErrorSendFailed);
+			return _003CgetConn_003EP().InvokeAsync("KickUser", userId).Done(Logger, Strings.ErrorSendFailed);
 		}
 
 		public Task SetHost(string userId, bool value)
 		{
-			return _getConn().InvokeAsync("SetHost", userId, value).Done(Logger, Strings.ErrorSendFailed);
+			return _003CgetConn_003EP().InvokeAsync("SetHost", userId, value).Done(Logger, Strings.ErrorSendFailed);
 		}
 
 		public Task SetRacer(string userId, bool value)
 		{
-			return _getConn().InvokeAsync("SetRacer", userId, value).Done(Logger, Strings.ErrorSendFailed);
+			return _003CgetConn_003EP().InvokeAsync("SetRacer", userId, value).Done(Logger, Strings.ErrorSendFailed);
 		}
 
 		public Task SetLobbyName(string name)
 		{
-			return _getConn().InvokeAsync("SetLobbyName", name).Done(Logger, Strings.ErrorSendFailed);
+			return _003CgetConn_003EP().InvokeAsync("SetLobbyName", name).Done(Logger, Strings.ErrorSendFailed);
 		}
 
 		public Task SetLobbySize(int size)
 		{
-			return _getConn().InvokeAsync("SetLobbySize", size).Done(Logger, Strings.ErrorSendFailed);
+			return _003CgetConn_003EP().InvokeAsync("SetLobbySize", size).Done(Logger, Strings.ErrorSendFailed);
 		}
 
 		public Task SetLobbyLaps(int laps)
 		{
-			return _getConn().InvokeAsync("SetLobbyLaps", laps).Done(Logger, Strings.ErrorSendFailed);
+			return _003CgetConn_003EP().InvokeAsync("SetLobbyLaps", laps).Done(Logger, Strings.ErrorSendFailed);
 		}
 
 		public Task SetLobbyRace(FullRace fullRace)
 		{
-			return _getConn().InvokeAsync("SetLobbyRace", fullRace).Done(Logger, Strings.ErrorSendFailed);
+			return _003CgetConn_003EP().InvokeAsync("SetLobbyRace", fullRace).Done(Logger, Strings.ErrorSendFailed);
 		}
 
 		public Task StartCountdown()
 		{
-			return _getConn().InvokeAsync("StartCountdown").Done(Logger, Strings.ErrorSendFailed);
+			return _003CgetConn_003EP().InvokeAsync("StartCountdown").Done(Logger, Strings.ErrorSendFailed);
 		}
 
 		public Task CancelRace()
 		{
-			return _getConn().InvokeAsync("CancelRace").Done(Logger, Strings.ErrorSendFailed);
+			return _003CgetConn_003EP().InvokeAsync("CancelRace").Done(Logger, Strings.ErrorSendFailed);
 		}
 
 		public Task UpdatePosition(int mapId, Vector3 position, Vector3 front)
 		{
 			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			return _getConn().SendAsync("UpdatePosition", mapId, position, front);
+			return _003CgetConn_003EP().SendAsync("UpdatePosition", mapId, position, front);
 		}
 	}
 }

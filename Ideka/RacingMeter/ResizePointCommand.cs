@@ -1,12 +1,15 @@
+using System.Runtime.CompilerServices;
 using Ideka.RacingMeter.Lib;
 
 namespace Ideka.RacingMeter
 {
 	public class ResizePointCommand : IEditorCommand
 	{
-		private readonly RacePoint _point;
+		[CompilerGenerated]
+		private RacePoint _003Cpoint_003EP;
 
-		private readonly float _radius;
+		[CompilerGenerated]
+		private float _003Cradius_003EP;
 
 		private float _prevRadius;
 
@@ -14,23 +17,24 @@ namespace Ideka.RacingMeter
 
 		public ResizePointCommand(RacePoint point, float radius)
 		{
-			_point = point;
-			_radius = radius;
+			_003Cpoint_003EP = point;
+			_003Cradius_003EP = radius;
+			base._002Ector();
 		}
 
 		public bool Do(EditState state)
 		{
-			_prevRadius = _point.Radius;
-			if (_prevRadius != _radius)
+			_prevRadius = _003Cpoint_003EP.Radius;
+			if (_prevRadius != _003Cradius_003EP)
 			{
-				return state.ResizePoint(_point, _radius);
+				return state.ResizePoint(_003Cpoint_003EP, _003Cradius_003EP);
 			}
 			return false;
 		}
 
 		public void Undo(EditState state)
 		{
-			state.ResizePoint(_point, _prevRadius);
+			state.ResizePoint(_003Cpoint_003EP, _prevRadius);
 		}
 	}
 }

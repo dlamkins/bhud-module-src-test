@@ -20,6 +20,11 @@ namespace Ideka.RacingMeter
 					inner(((Control)panel2.Panel).get_Parent() != null);
 				}
 			});
+			((Control)panel2.Panel).add_Disposed((EventHandler<EventArgs>)delegate
+			{
+				inner(enabled: false);
+				child2.Dispose();
+			});
 			void inner(bool enabled)
 			{
 				child2.set_Parent((Container)(object)(enabled ? GameService.Graphics.get_SpriteScreen() : null));

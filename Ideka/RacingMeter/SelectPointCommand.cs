@@ -1,10 +1,12 @@
+using System.Runtime.CompilerServices;
 using Ideka.RacingMeter.Lib;
 
 namespace Ideka.RacingMeter
 {
 	public class SelectPointCommand : IEditorCommand
 	{
-		private readonly RacePoint? _selection;
+		[CompilerGenerated]
+		private RacePoint? _003Cselection_003EP;
 
 		private RacePoint? _prevSelection;
 
@@ -12,18 +14,19 @@ namespace Ideka.RacingMeter
 
 		public SelectPointCommand(RacePoint? selection)
 		{
-			_selection = selection;
+			_003Cselection_003EP = selection;
+			base._002Ector();
 		}
 
 		public bool Do(EditState state)
 		{
-			if (state.Selected == _selection)
+			if (state.Selected == _003Cselection_003EP)
 			{
 				return false;
 			}
 			_prevSelection = state.Selected;
-			state.Selected = _selection;
-			return state.Selected == _selection;
+			state.Selected = _003Cselection_003EP;
+			return state.Selected == _003Cselection_003EP;
 		}
 
 		public void Undo(EditState state)

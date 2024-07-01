@@ -1,13 +1,14 @@
 using System;
 using Blish_HUD;
 using Blish_HUD.Controls;
+using Ideka.BHUDCommon.AnchoredRect;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 using MonoGame.Extended.BitmapFonts;
 
 namespace Ideka.RacingMeter
 {
-	public class SizedTextLabel : RectAnchor
+	public class SizedTextLabel : AnchoredRect
 	{
 		public string? SuffixModel;
 

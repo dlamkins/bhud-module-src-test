@@ -1,9 +1,11 @@
+using Ideka.BHUDCommon;
+using Ideka.BHUDCommon.AnchoredRect;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 
 namespace Ideka.RacingMeter
 {
-	public class EnduranceMarker : RectAnchor
+	public class EnduranceMarker : AnchoredRect
 	{
 		public double Percentage { get; set; }
 

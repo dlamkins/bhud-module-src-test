@@ -1,10 +1,11 @@
 using Ideka.BHUDCommon;
+using Ideka.BHUDCommon.AnchoredRect;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 
 namespace Ideka.RacingMeter
 {
-	public class SimpleRectangle : RectAnchor
+	public class SimpleRectangle : AnchoredRect
 	{
 		public float Thickness { get; set; }
 

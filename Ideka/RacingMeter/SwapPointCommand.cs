@@ -1,29 +1,33 @@
+using System.Runtime.CompilerServices;
 using Ideka.RacingMeter.Lib;
 
 namespace Ideka.RacingMeter
 {
 	public class SwapPointCommand : IEditorCommand
 	{
-		private readonly RacePoint _checkpoint;
+		[CompilerGenerated]
+		private RacePoint _003Ccheckpoint_003EP;
 
-		private readonly bool _previous;
+		[CompilerGenerated]
+		private bool _003Cprevious_003EP;
 
 		public bool Modifying => true;
 
 		public SwapPointCommand(RacePoint checkpoint, bool previous)
 		{
-			_checkpoint = checkpoint;
-			_previous = previous;
+			_003Ccheckpoint_003EP = checkpoint;
+			_003Cprevious_003EP = previous;
+			base._002Ector();
 		}
 
 		public bool Do(EditState state)
 		{
-			return state.SwapPoint(_checkpoint, _previous);
+			return state.SwapPoint(_003Ccheckpoint_003EP, _003Cprevious_003EP);
 		}
 
 		public void Undo(EditState state)
 		{
-			state.SwapPoint(_checkpoint, !_previous);
+			state.SwapPoint(_003Ccheckpoint_003EP, !_003Cprevious_003EP);
 		}
 	}
 }

@@ -1,3 +1,5 @@
+using Ideka.BHUDCommon.AnchoredRect;
+
 namespace Ideka.RacingMeter
 {
 	public class ArcMeterZone : ArcMeterAbstractZone

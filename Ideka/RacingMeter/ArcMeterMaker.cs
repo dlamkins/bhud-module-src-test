@@ -1,4 +1,5 @@
 using Blish_HUD;
+using Ideka.BHUDCommon.AnchoredRect;
 using Microsoft.Xna.Framework;
 
 namespace Ideka.RacingMeter
@@ -19,11 +20,10 @@ namespace Ideka.RacingMeter
 				Start = double.NaN,
 				End = double.NaN,
 				Thickness = 15f,
-				Color = MeterMaker.SoftMaxColor,
-				Update = delegate(RectAnchor x)
-				{
-					x.Visible = projection2.OverSoftMax(base.Measurer.Speed.Speed2D);
-				}
+				Color = MeterMaker.SoftMaxColor
+			}).WithUpdate(delegate(ArcMeterZone x)
+			{
+				x.Visible = projection2.OverSoftMax(base.Measurer.Speed.Speed2D);
 			});
 		}
 

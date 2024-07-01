@@ -1,10 +1,12 @@
+using System.Runtime.CompilerServices;
 using Ideka.RacingMeter.Lib;
 
 namespace Ideka.RacingMeter
 {
 	public class RemovePointCommand : IEditorCommand
 	{
-		private readonly RacePoint _remove;
+		[CompilerGenerated]
+		private RacePoint _003Cremove_003EP;
 
 		private bool _selected;
 
@@ -14,13 +16,14 @@ namespace Ideka.RacingMeter
 
 		public RemovePointCommand(RacePoint remove)
 		{
-			_remove = remove;
+			_003Cremove_003EP = remove;
+			base._002Ector();
 		}
 
 		public bool Do(EditState state)
 		{
-			_selected = state.Selected == _remove;
-			_index = state.RemovePoint(_remove);
+			_selected = state.Selected == _003Cremove_003EP;
+			_index = state.RemovePoint(_003Cremove_003EP);
 			if (_index >= 0 && _selected)
 			{
 				state.SelectedPointIndex = _index;
@@ -30,10 +33,10 @@ namespace Ideka.RacingMeter
 
 		public void Undo(EditState state)
 		{
-			state.InsertPoint(_index, _remove);
+			state.InsertPoint(_index, _003Cremove_003EP);
 			if (_selected)
 			{
-				state.Selected = _remove;
+				state.Selected = _003Cremove_003EP;
 			}
 		}
 	}

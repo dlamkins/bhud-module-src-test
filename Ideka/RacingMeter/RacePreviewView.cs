@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Glide;
@@ -19,11 +20,13 @@ namespace Ideka.RacingMeter
 	{
 		private class PreviewBounds : MapBounds
 		{
-			private readonly RacePreviewView _view;
+			[CompilerGenerated]
+			private RacePreviewView _003Cview_003EP;
 
 			public PreviewBounds(RacePreviewView view)
 			{
-				_view = view;
+				_003Cview_003EP = view;
+				base._002Ector();
 			}
 
 			public override Vector2 FromWorld(int mapId, Vector3 worldMeters)
@@ -36,8 +39,8 @@ namespace Ideka.RacingMeter
 				//IL_002b: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 				MapData mapData = RacingModule.MapData;
-				Vector2 mapCenter = _view.MapCenter;
-				float scale = _view.Scale;
+				Vector2 mapCenter = _003Cview_003EP.MapCenter;
+				float scale = _003Cview_003EP.Scale;
 				Matrix identity = Matrix.get_Identity();
 				Point center = base.Center;
 				return mapData.WorldToScreenMap(mapId, worldMeters, mapCenter, scale, identity, ((Point)(ref center)).ToVector2());
@@ -52,8 +55,8 @@ namespace Ideka.RacingMeter
 				//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 				//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-				Vector2 mapCenter = _view.MapCenter;
-				float scale = _view.Scale;
+				Vector2 mapCenter = _003Cview_003EP.MapCenter;
+				float scale = _003Cview_003EP.Scale;
 				Matrix identity = Matrix.get_Identity();
 				Point center = base.Center;
 				return MapData.MapToScreenMap(mapCoords, mapCenter, scale, identity, ((Point)(ref center)).ToVector2());

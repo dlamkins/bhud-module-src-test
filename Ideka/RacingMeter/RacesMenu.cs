@@ -5,6 +5,7 @@ using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Gw2Sharp.WebApi.V2.Models;
+using Ideka.BHUDCommon;
 using Ideka.RacingMeter.Lib;
 
 namespace Ideka.RacingMeter

@@ -1,9 +1,10 @@
 using Ideka.BHUDCommon;
+using Ideka.BHUDCommon.AnchoredRect;
 using Microsoft.Xna.Framework;
 
 namespace Ideka.RacingMeter
 {
-	public abstract class WorldPrimitive : RectAnchor
+	public abstract class WorldPrimitive : AnchoredRect
 	{
 		public Vector3 WorldPosition { get; set; }
 

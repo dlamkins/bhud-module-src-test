@@ -1,5 +1,6 @@
 using System;
 using Blish_HUD;
+using Ideka.BHUDCommon.AnchoredRect;
 using Ideka.NetCommon;
 using Ideka.RacingMeter.Lib;
 using Microsoft.Xna.Framework;
@@ -7,7 +8,7 @@ using MonoGame.Extended.BitmapFonts;
 
 namespace Ideka.RacingMeter
 {
-	public class OnlineHUD : RectAnchor, IDisposable
+	public class OnlineHUD : AnchoredRect, IDisposable
 	{
 		private readonly DisposableCollection _dc = new DisposableCollection();
 
@@ -18,7 +19,7 @@ namespace Ideka.RacingMeter
 			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
 			RaceOnline racer2 = racer;
 			base._002Ector();
-			RectAnchor inner = AddChild(new RectAnchor());
+			AnchoredRect inner = AddChild(new AnchoredRect());
 			inner.AddChild(new SimpleRectangle
 			{
 				Color = Color.get_Black(),
@@ -77,7 +78,7 @@ namespace Ideka.RacingMeter
 				//IL_0035: Unknown result type (might be due to invalid IL or missing references)
 				//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 				float num = RacingSettings.AlignmentPercentage(v);
-				foreach (RectAnchor current in inner.Children)
+				foreach (AnchoredRect current in inner.Children)
 				{
 					Vector2 val3 = (current.Anchor = (current.Pivot = new Vector2(num, current.Pivot.Y)));
 				}

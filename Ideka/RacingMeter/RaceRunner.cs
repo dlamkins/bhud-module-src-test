@@ -4,6 +4,7 @@ using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Ideka.BHUDCommon;
+using Ideka.BHUDCommon.AnchoredRect;
 using Ideka.NetCommon;
 using Ideka.RacingMeter.Lib;
 using Microsoft.Xna.Framework;
@@ -40,7 +41,7 @@ namespace Ideka.RacingMeter
 
 		private RacePoint? _inPoint;
 
-		private readonly RectAnchor _hud;
+		private readonly AnchoredRect _hud;
 
 		public FullRace? FullRace { get; private set; }
 
@@ -369,6 +370,12 @@ namespace Ideka.RacingMeter
 					this.RaceCancelled?.Invoke(race);
 				}
 			}
+		}
+
+		public override void DoUpdate(GameTime gameTime)
+		{
+			((Control)this).DoUpdate(gameTime);
+			_hud.Update(gameTime);
 		}
 
 		protected override void DrawRaceToWorld(SpriteBatch spriteBatch)
