@@ -247,11 +247,6 @@ namespace KpRefresher
 			{
 				((Control)mainWindow).Dispose();
 			}
-			AsyncTexture2D windowBackgroundTexture = _windowBackgroundTexture;
-			if (windowBackgroundTexture != null)
-			{
-				windowBackgroundTexture.Dispose();
-			}
 			Texture2D emblemTexture = _emblemTexture;
 			if (emblemTexture != null)
 			{

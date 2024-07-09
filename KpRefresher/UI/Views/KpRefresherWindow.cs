@@ -363,7 +363,7 @@ namespace KpRefresher.UI.Views
 			StandardButton obj = _buttons.FirstOrDefault();
 			Container obj2 = ((obj != null) ? ((Control)obj).get_Parent() : null);
 			Container obj3 = ((obj2 is FlowPanel) ? obj2 : null);
-			int width = ((((obj3 != null) ? new int?(obj3.get_ContentRegion().Width) : null) - (int)((FlowPanel)obj3).get_OuterControlPadding().X - (int)((FlowPanel)obj3).get_ControlPadding().X * (columns - 1)) / columns) ?? 100;
+			int width = ((((obj3 != null) ? new int?(obj3.get_ContentRegion().Width) : null) - (int)((FlowPanel)obj3).get_OuterControlPadding().X - (int)((FlowPanel)obj3).get_ControlPadding().X * (columns - 1)) / columns).GetValueOrDefault(100);
 			foreach (StandardButton button in _buttons)
 			{
 				((Control)button).set_Width(width);
