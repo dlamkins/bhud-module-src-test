@@ -27,6 +27,8 @@ namespace Nekres.FailScreens
 
 		internal SettingEntry<bool> Muted;
 
+		internal SettingEntry<bool> UseArcDps;
+
 		internal float SoundVolume = 1f;
 
 		internal static FailScreensModule Instance { get; private set; }
@@ -48,14 +50,16 @@ namespace Nekres.FailScreens
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0250: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0255: Unknown result type (might be due to invalid IL or missing references)
 			SettingCollection visualsCol = settings.AddSubCollection("visuals", true, (Func<string>)(() => "Defeated Screen"));
 			FailScreen = visualsCol.DefineSetting<DefeatedService.FailScreens>("fail_screen", DefeatedService.FailScreens.DarkSouls, (Func<string>)(() => "Appearance"), (Func<string>)(() => "Visual to display upon defeat."));
 			Random = visualsCol.DefineSetting<bool>("random", true, (Func<string>)(() => "Randomize"), (Func<string>)(() => "Ignores selection if set."));
 			SettingCollection soundCol = settings.AddSubCollection("sound", true, (Func<string>)(() => "Sound Options"));
 			Volume = soundCol.DefineSetting<float>("volume", 0.05f, (Func<string>)(() => "Volume"), (Func<string>)(() => "Adjusts the audio volume."));
 			Muted = soundCol.DefineSetting<bool>("mute", false, (Func<string>)(() => "Mute"), (Func<string>)(() => "Mutes the audio."));
+			SettingCollection generalCol = settings.AddSubCollection("general", true, (Func<string>)(() => "General"));
+			UseArcDps = generalCol.DefineSetting<bool>("use_arcdps", false, (Func<string>)(() => "Use ArcDps for Detection"), (Func<string>)(() => "Use ArcDps Bridge for Defeated state detection if available.\nBy default (ie. disabled), the module checks if the game accesses a dummy sound file referenced in /Documents/Guild Wars 2/music/Defeated.m3u."));
 			SettingComplianceExtensions.SetRange(Volume, 0f, 0.1f);
 			SettingComplianceExtensions.SetValidation<float>(Volume, (Func<float, SettingValidationResult>)ValidateVolume);
 			SettingValidationResult val = ValidateVolume(Volume.get_Value());

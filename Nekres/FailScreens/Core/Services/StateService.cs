@@ -29,8 +29,26 @@ namespace Nekres.FailScreens.Core.Services
 
 		public StateService()
 		{
-			GameService.ArcDps.get_Common().Activate();
-			GameService.ArcDps.add_RawCombatEvent((EventHandler<RawCombatEventArgs>)ArcDps_RawCombatEvent);
+			FailScreensModule.Instance.UseArcDps.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUseArcDpsChanged);
+			ToggleArcDps(FailScreensModule.Instance.UseArcDps.get_Value());
+		}
+
+		private void OnUseArcDpsChanged(object sender, ValueChangedEventArgs<bool> e)
+		{
+			ToggleArcDps(e.get_NewValue());
+		}
+
+		private void ToggleArcDps(bool enabled)
+		{
+			if (enabled)
+			{
+				GameService.ArcDps.get_Common().Activate();
+				GameService.ArcDps.add_RawCombatEvent((EventHandler<RawCombatEventArgs>)ArcDps_RawCombatEvent);
+			}
+			else
+			{
+				GameService.ArcDps.remove_RawCombatEvent((EventHandler<RawCombatEventArgs>)ArcDps_RawCombatEvent);
+			}
 		}
 
 		private void ArcDps_RawCombatEvent(object sender, RawCombatEventArgs e)
@@ -114,7 +132,7 @@ namespace Nekres.FailScreens.Core.Services
 
 		public void Update()
 		{
-			if (!GameService.ArcDps.get_Running() && DateTime.UtcNow.Subtract(_lastLockFileCheck).TotalMilliseconds > 100.0)
+			if ((!FailScreensModule.Instance.UseArcDps.get_Value() || !GameService.ArcDps.get_Running()) && DateTime.UtcNow.Subtract(_lastLockFileCheck).TotalMilliseconds > 100.0)
 			{
 				_lastLockFileCheck = DateTime.UtcNow;
 				CheckLockFile(State.Defeated);
@@ -144,6 +162,7 @@ namespace Nekres.FailScreens.Core.Services
 
 		public void Dispose()
 		{
+			FailScreensModule.Instance.UseArcDps.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnUseArcDpsChanged);
 			GameService.ArcDps.remove_RawCombatEvent((EventHandler<RawCombatEventArgs>)ArcDps_RawCombatEvent);
 		}
 	}
