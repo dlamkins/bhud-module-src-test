@@ -174,6 +174,8 @@ namespace EmoteTome
 
 		private SettingEntry<bool> _showStretch;
 
+		private SettingEntry<bool> _showUnleash;
+
 		private List<Tuple<SettingEntry<bool>, Emote>> unlockEmoteSettingMap = new List<Tuple<SettingEntry<bool>, Emote>>();
 
 		private SettingEntry<string> _rankEmoteSeparator;
@@ -280,6 +282,7 @@ namespace EmoteTome
 			_showSipcoffee = settings.DefineSetting<bool>("Show Sipcoffee", true, (Func<string>)(() => BadLocalization.SIPCOFFEE[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
 			_showStep = settings.DefineSetting<bool>("Show Step", true, (Func<string>)(() => BadLocalization.STEP[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
 			_showStretch = settings.DefineSetting<bool>("Show Stretch", true, (Func<string>)(() => BadLocalization.STRETCH[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
+			_showUnleash = settings.DefineSetting<bool>("Show Stretch", true, (Func<string>)(() => BadLocalization.UNLEASH[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
 			_rankEmoteSeparator = settings.DefineSetting<string>("Rank Separator", "", (Func<string>)(() => BadLocalization.RANKPANELTITLE[language]), (Func<string>)(() => ""));
 			_showYourRank = settings.DefineSetting<bool>("Show Your Rank", true, (Func<string>)(() => BadLocalization.YOURRANK[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
 			_showRankRabbit = settings.DefineSetting<bool>("Show Rank Rabbit", true, (Func<string>)(() => BadLocalization.RABBIT[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));

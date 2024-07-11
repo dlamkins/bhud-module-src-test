@@ -136,6 +136,8 @@ namespace EmoteTome
 
 		public static readonly List<string> STRETCH = new List<string> { "Stretch", "Étirement", "Dehnen", "Estirarse" };
 
+		public static readonly List<string> UNLEASH = new List<string> { "Unleash", "Libere", "Entfesseln", "Desatar" };
+
 		public static readonly List<string> BEAR = new List<string> { "Bear", "Ours", "Baer", "Osa" };
 
 		public static readonly List<string> DEER = new List<string> { "Deer", "Daim", "Hirsch", "Ciervo" };
