@@ -603,7 +603,7 @@ namespace EmoteTome
 			}
 			catch (Exception)
 			{
-				ScreenNotification.ShowNotification("Some Error occured on loading.", (NotificationType)0, (Texture2D)null, 4);
+				ScreenNotification.ShowNotification("Emote Tome: Some Error occured on loading core emotes.", (NotificationType)0, (Texture2D)null, 4);
 			}
 			((Panel)corePanel).Collapse();
 			await Task.Delay(75);
@@ -628,6 +628,7 @@ namespace EmoteTome
 			unlockSettingList.Add(_showSipcoffee);
 			unlockSettingList.Add(_showStep);
 			unlockSettingList.Add(_showStretch);
+			unlockSettingList.Add(_showUnleash);
 			try
 			{
 				for (int j = 0; j < unlockEmoteList.Count; j++)
@@ -644,7 +645,7 @@ namespace EmoteTome
 			}
 			catch (Exception)
 			{
-				ScreenNotification.ShowNotification("Some Error occured on loading.", (NotificationType)0, (Texture2D)null, 4);
+				ScreenNotification.ShowNotification("Emote Tome: Some Error occured on loading unlockable emotes.", (NotificationType)0, (Texture2D)null, 4);
 			}
 			((Panel)unlockablePanel).Collapse();
 			await Task.Delay(75);
@@ -676,7 +677,7 @@ namespace EmoteTome
 			}
 			catch (Exception)
 			{
-				ScreenNotification.ShowNotification("Some Error occured on loading.", (NotificationType)0, (Texture2D)null, 4);
+				ScreenNotification.ShowNotification("Emote Tome: Some Error occured on loading rank emotes.", (NotificationType)0, (Texture2D)null, 4);
 			}
 			((Panel)rankPanel).Collapse();
 			await Task.Delay(75);
