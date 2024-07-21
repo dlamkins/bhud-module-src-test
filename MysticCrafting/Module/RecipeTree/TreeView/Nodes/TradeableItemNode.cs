@@ -340,7 +340,10 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			{
 				nodeId = base.NodeIndex;
 			}
-			CurrencyContainer.UpdateReservedQuantity(nodeId);
+			if (CurrencyContainer != null)
+			{
+				CurrencyContainer.UpdateReservedQuantity(nodeId);
+			}
 			(((Control)this).get_Parent() as TradeableItemNode)?.UpdateReservedQuantityTooltip(nodeId);
 		}
 

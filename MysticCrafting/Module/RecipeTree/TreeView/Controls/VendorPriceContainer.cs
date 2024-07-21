@@ -113,15 +113,19 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Controls
 
 		private void BuildPlusSignControl()
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Expected O, but got Unknown
+			List<Label> plusLabels = _plusLabels;
 			Label val = new Label();
 			((Control)val).set_Parent((Container)(object)this);
 			val.set_Text("+");
 			val.set_Font(GameService.Content.get_DefaultFont16());
 			val.set_AutoSizeWidth(true);
+			plusLabels.Add(val);
 		}
 
 		private void BuildVendorCostControl(VendorSellsItemCost cost)
