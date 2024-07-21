@@ -1,11 +1,11 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using Atzie.MysticCrafting.Models.Crafting;
 using Atzie.MysticCrafting.Models.Items;
-using MysticCrafting.Models;
-using MysticCrafting.Models.Items;
+using Atzie.MysticCrafting.Models.Vendor;
 using MysticCrafting.Models.TradingPost;
 using MysticCrafting.Models.Vendor;
+using MysticCrafting.Module.Extensions;
 using MysticCrafting.Module.Models;
 using MysticCrafting.Module.Repositories;
 using MysticCrafting.Module.Services.API;
@@ -48,30 +48,29 @@ namespace MysticCrafting.Module.Services
 			_wizardsVaultRepository = wizardsVaultRepository;
 		}
 
-		public IEnumerable<IItemSource> GetItemSources(MysticItem item)
+		public IEnumerable<IItemSource> GetItemSources(Item item)
 		{
-			return GetItemSources(item.GameId);
-		}
-
-		public IEnumerable<IItemSource> GetItemSources(int itemId)
-		{
-			if (itemId == 68063)
+			if (item.Id == 68063 || item.Id == 89105 || item.Id == 92687)
 			{
-				return new List<IItemSource> { GetTradingPostSource(itemId) };
+				return new List<IItemSource> { GetTradingPostSource(item.Id) };
 			}
 			List<IItemSource> sources = new List<IItemSource>();
-			sources.AddRange(GetRecipeSources(itemId));
-			TradingPostSource prices = GetTradingPostSource(itemId);
+			IEnumerable<RecipeSource> recipes = GetRecipeSources(item);
+			if (recipes != null)
+			{
+				sources.AddRange(recipes);
+			}
+			TradingPostSource prices = GetTradingPostSource(item.Id);
 			if (prices != null)
 			{
 				sources.Add(prices);
 			}
-			VendorSource vendorPrices = GetVendorSource(itemId);
+			VendorSource vendorPrices = GetVendorSource(item);
 			if (vendorPrices != null)
 			{
 				sources.Add(vendorPrices);
 			}
-			IList<ItemContainerSource> itemContainerSource = GetItemContainerSource(itemId);
+			IList<ItemContainerSource> itemContainerSource = GetItemContainerSource(item.Id);
 			if (itemContainerSource != null && itemContainerSource.Any())
 			{
 				sources.AddRange(itemContainerSource);
@@ -85,7 +84,7 @@ namespace MysticCrafting.Module.Services
 			{
 				return sources;
 			}
-			List<MysticRecipe> recipes = (from s in sources
+			List<Recipe> recipes = (from s in sources
 				where s != null
 				select s into r
 				select r.Recipe).ToList();
@@ -103,13 +102,14 @@ namespace MysticCrafting.Module.Services
 			return null;
 		}
 
-		private IEnumerable<RecipeSource> GetRecipeSources(int itemId)
+		private IEnumerable<RecipeSource> GetRecipeSources(Item item)
 		{
-			return _recipeRepository.GetRecipes(itemId)?.Where((MysticRecipe r) => r.OutputQuantity < 2)?.Select((MysticRecipe recipe) => new RecipeSource(recipe.FullText)
-			{
-				Recipe = recipe,
-				DisplayName = recipe.Source
-			})?.ToList() ?? new List<RecipeSource>();
+			return (from r in item.Recipes?.Where((Recipe r) => r.OutputQuantity < 2)
+				select new RecipeSource(r.FullText)
+				{
+					Recipe = r,
+					DisplayName = r.Source.ToString()
+				});
 		}
 
 		private TradingPostSource GetTradingPostSource(int itemId)
@@ -137,7 +137,7 @@ namespace MysticCrafting.Module.Services
 			List<ItemContainerSource> sources = new List<ItemContainerSource>();
 			foreach (MysticVaultContainer container in containers)
 			{
-				sources.Add(new ItemContainerSource($"item_container_{container.Id}")
+				sources.Add(new ItemContainerSource($"item_container_{container.ItemId}")
 				{
 					Container = container,
 					ContainerItem = _itemRepository.GetItem(container.ItemId)
@@ -146,16 +146,18 @@ namespace MysticCrafting.Module.Services
 			return sources;
 		}
 
-		private VendorSource GetVendorSource(int itemId)
+		private VendorSource GetVendorSource(Item item)
 		{
-			IList<VendorSellsItem> vendorObjects = _vendorRepository.GetVendorItems(itemId);
-			if (vendorObjects == null || !vendorObjects.Any())
+			if (item.VendorListings == null || item.VendorListings.All((VendorSellsItem v) => v.IsHistorical))
 			{
 				return null;
 			}
-			return new VendorSource($"vendor_{itemId}")
+			List<VendorSellsItem> vendorObjects = item.VendorListings.Where((VendorSellsItem v) => !v.IsHistorical).ToList();
+			IList<VendorSellsItemGroup> groups = vendorObjects.CombineVendorSellsItems();
+			return new VendorSource($"vendor_{item.Id}")
 			{
 				VendorItems = vendorObjects,
+				VendorGroups = groups,
 				DisplayName = "Vendor"
 			};
 		}
@@ -163,23 +165,6 @@ namespace MysticCrafting.Module.Services
 		public string GetPreferredItemSource(string path)
 		{
 			return _choiceRepository.GetChoice(path, ChoiceType.ItemSource)?.Value;
-		}
-
-		public IItemSource GetPreferredItemSource(string path, int itemId)
-		{
-			NodeChoice choice = _choiceRepository.GetChoice(path, ChoiceType.ItemSource);
-			if (choice == null)
-			{
-				return GetDefaultItemSource(itemId);
-			}
-			IItemSource itemSource = GetItemSources(itemId).FirstOrDefault((IItemSource i) => i.UniqueId.Equals(choice.Value, StringComparison.InvariantCultureIgnoreCase));
-			return itemSource ?? GetDefaultItemSource(itemId);
-		}
-
-		public IItemSource GetDefaultItemSource(int itemId)
-		{
-			List<IItemSource> itemSources = GetItemSources(itemId).ToList();
-			return itemSources.FirstOrDefault((IItemSource i) => (i as RecipeSource)?.Recipe.HasBaseIngredients ?? false) ?? itemSources.FirstOrDefault((IItemSource i) => i is TradingPostSource) ?? itemSources.FirstOrDefault();
 		}
 	}
 }

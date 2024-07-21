@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Atzie.MysticCrafting.Models.Items;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
-using MysticCrafting.Models.Items;
 using MysticCrafting.Module.Discovery.ItemList.Controls;
 using MysticCrafting.Module.Extensions;
-using MysticCrafting.Module.Recipe;
+using MysticCrafting.Module.RecipeTree;
+using MysticCrafting.Module.RecipeTree.TreeView;
 using MysticCrafting.Module.Services;
 
 namespace MysticCrafting.Module.Discovery.ItemList
@@ -25,147 +26,152 @@ namespace MysticCrafting.Module.Discovery.ItemList
 
 		protected override void UpdateView()
 		{
-			if (base.Model == null)
+			if (base.get_Model() == null)
 			{
 				throw new NullReferenceException("Model cannot be null.");
 			}
-			if (base.Model.Filter == null)
+			if (base.get_Model().Filter == null)
 			{
 				return;
 			}
-			base.View.Panel.ClearChildren();
-			if (!string.IsNullOrEmpty(base.Model.Filter?.Rarity) && base.View.RarityDropdown != null)
+			((Container)base.get_View().Panel).ClearChildren();
+			if (base.get_Model().Filter.Rarity != 0 && base.get_View().RarityDropdown != null)
 			{
-				base.Model.Filter.Rarity = (base.View.RarityDropdown.SelectedItem.Equals("All rarities") ? null : base.View.RarityDropdown.SelectedItem);
+				base.get_Model().Filter.Rarity = ((!base.get_View().RarityDropdown.get_SelectedItem().Equals("All rarities")) ? ((ItemRarity)Enum.Parse(typeof(ItemRarity), base.get_View().RarityDropdown.get_SelectedItem())) : ItemRarity.Unknown);
 			}
-			if (base.Model.Filter != null)
+			if (base.get_Model().Filter != null)
 			{
-				if (base.Model.Filter.Type == "Armor" || ArmorTypes.Contains(base.Model.Filter.DetailsType))
+				if (base.get_Model().Filter.Type == ItemType.Armor || ArmorTypes.Contains(base.get_Model().Filter.DetailsType))
 				{
-					base.View.WeightDropdown.Visible = true;
-					base.View.LegendaryTypeDropdown.Visible = true;
-					base.Model.Filter.WeightFilterDisabled = false;
+					((Control)base.get_View().WeightDropdown).set_Visible(true);
+					((Control)base.get_View().LegendaryTypeDropdown).set_Visible(true);
+					base.get_Model().Filter.WeightFilterDisabled = false;
 				}
 				else
 				{
-					base.View.WeightDropdown.Visible = false;
-					base.View.LegendaryTypeDropdown.Visible = false;
-					base.Model.Filter.WeightFilterDisabled = true;
+					((Control)base.get_View().WeightDropdown).set_Visible(false);
+					((Control)base.get_View().LegendaryTypeDropdown).set_Visible(false);
+					base.get_Model().Filter.WeightFilterDisabled = true;
 				}
-				if (base.Model.Filter.Weight != 0 && base.View.WeightDropdown.Visible)
+				if (base.get_Model().Filter.Weight != 0 && ((Control)base.get_View().WeightDropdown).get_Visible())
 				{
-					base.View.WeightDropdown.SelectedItem = base.Model.Filter.Weight.ToString();
+					base.get_View().WeightDropdown.set_SelectedItem(base.get_Model().Filter.Weight.ToString());
 				}
 			}
-			List<MysticItem> items = base.Model.GetFilteredItems().ToList();
-			if (items.Count == base.Model.ItemLimit)
+			List<Item> items = base.get_Model().GetFilteredItems().ToList();
+			if (items.Count == base.get_Model().ItemLimit)
 			{
-				base.View.LimitReached = true;
+				base.get_View().LimitReached = true;
 			}
-			base.View.UpdateFilterLabel();
-			UpdateList(items);
+			base.get_View().UpdateFilterLabel();
+			try
+			{
+				UpdateList(items);
+			}
+			catch (Exception)
+			{
+			}
 		}
 
-		public void UpdateList(List<MysticItem> items)
+		public void UpdateList(List<Item> items)
 		{
-			if (!items.Any() && base.Model.Filter != null && base.Model.Filter.IsFavorite)
+			if (!items.Any() && base.get_Model().Filter != null && base.get_Model().Filter.IsFavorite)
 			{
-				base.View.NoResults = true;
+				base.get_View().NoResults = true;
 				return;
 			}
 			List<ItemRowView> rows = new List<ItemRowView>();
-			items = items.Where(delegate(MysticItem i)
+			items = items.Where(delegate(Item i)
 			{
-				bool flag = ServiceContainer.PlayerUnlocksService.ItemUnlocked(i.DefaultSkin.GetValueOrDefault());
-				if (base.Model.Filter.HideSkinUnlocked && flag)
+				bool flag = ServiceContainer.PlayerUnlocksService.ItemUnlocked(i.DefaultSkin);
+				if (base.get_Model().Filter.HideSkinUnlocked && flag)
 				{
 					return false;
 				}
-				if (base.Model.Filter.HideSkinLocked && !flag)
+				if (base.get_Model().Filter.HideSkinLocked && !flag)
 				{
 					return false;
 				}
-				return (!base.Model.Filter.HideMaxItemsCollected || !(ServiceContainer.PlayerUnlocksService.LegendaryUnlockedCount(i.GameId) >= i.GetMaxCount())) ? true : false;
+				return (!base.get_Model().Filter.HideMaxItemsCollected || !(ServiceContainer.PlayerUnlocksService.LegendaryUnlockedCount(i.Id) >= i.GetMaxCount())) ? true : false;
 			}).ToList();
-			foreach (MysticItem item in items.Take(100))
+			foreach (Item item in items.Take(100))
 			{
-				string.IsNullOrEmpty(base.Model.Filter?.DetailsType);
 				rows.Add(new ItemRowView(item, displayDetailsType: true)
 				{
 					OnClick = ItemRow_Click
 				});
 			}
-			base.View.SetItemRows(rows);
+			base.get_View().SetItemRows(rows);
 		}
 
 		public void RarityDropdown_ValueChanged(object sender, ValueChangedEventArgs e)
 		{
-			Dropdown dropdown = sender as Dropdown;
+			Dropdown dropdown = (Dropdown)((sender is Dropdown) ? sender : null);
 			if (dropdown != null)
 			{
-				if (dropdown.SelectedItem.Equals("All rarities", StringComparison.InvariantCultureIgnoreCase))
+				if (dropdown.get_SelectedItem().Equals("All rarities", StringComparison.InvariantCultureIgnoreCase))
 				{
-					base.Model.Filter.Rarity = null;
+					base.get_Model().Filter.Rarity = ItemRarity.Unknown;
 				}
 				else
 				{
-					base.Model.Filter.Rarity = dropdown.SelectedItem;
+					base.get_Model().Filter.Rarity = (ItemRarity)Enum.Parse(typeof(ItemRarity), dropdown.get_SelectedItem());
 				}
-				UpdateView();
+				((Presenter<ItemListView, ItemListModel>)this).UpdateView();
 			}
 		}
 
 		private void ItemRow_Click(object sender, MouseEventArgs e)
 		{
-			ItemButton listItem = sender as ItemButton;
-			if (listItem != null)
+			if (sender is ItemButton)
 			{
-				base.View.Container.ClearChildren();
-				base.View.LimitReached = false;
-				_recipeDetailsView?.RecipeItemList?.Dispose();
-				_recipeDetailsView = new RecipeDetailsView(listItem.Item, BuildBreadcrumbs());
-				RecipeDetailsView recipeDetailsView = _recipeDetailsView;
-				recipeDetailsView.OnBackButtonClick = (EventHandler<MouseEventArgs>)Delegate.Combine(recipeDetailsView.OnBackButtonClick, new EventHandler<MouseEventArgs>(ItemDetails_BackButton_Click));
-				ServiceContainer.AudioService.PlayMenuItemClick();
-				base.View.Container.Show(_recipeDetailsView);
+				base.get_View().ItemClicked?.Invoke(sender, (EventArgs)(object)e);
 			}
 		}
 
-		private IList<string> BuildBreadcrumbs()
+		public IList<string> BuildBreadcrumbs()
 		{
-			IList<string> breadcrumbs = base.Model.Breadcrumbs ?? new List<string>();
+			IList<string> breadcrumbs = base.get_Model().Breadcrumbs ?? new List<string>();
 			string existingSearchCrumb = breadcrumbs.FirstOrDefault((string b) => b?.Contains("Search") ?? false);
 			if (existingSearchCrumb != null)
 			{
 				breadcrumbs.Remove(existingSearchCrumb);
 			}
-			if (!string.IsNullOrWhiteSpace(base.Model.Filter.NameContainsText))
+			if (!string.IsNullOrWhiteSpace(base.get_Model().Filter.NameContainsText))
 			{
-				breadcrumbs.Add("Search: \"" + base.Model.Filter.NameContainsText + "\"");
+				breadcrumbs.Add("Search: \"" + base.get_Model().Filter.NameContainsText + "\"");
 			}
 			return breadcrumbs;
 		}
 
 		private void ItemDetails_BackButton_Click(object sender, MouseEventArgs e)
 		{
-			base.View.Container.ClearChildren();
-			_recipeDetailsView?.RecipeItemList?.Dispose();
-			base.View.LimitReached = false;
-			base.View.Panel.Parent = base.View.Container;
-			base.View.RarityDropdown.Parent = base.View.Container;
-			base.View.SettingsMenuButton.Parent = base.View.Container;
-			base.View.FiltersLabel.Parent = base.View.Container;
-			base.View.WeightDropdown.Parent = base.View.Container;
-			base.View.LegendaryTypeDropdown.Parent = base.View.Container;
-			base.View.SetLimitLabelParent(base.View.Container);
+			((Container)base.get_View().Container).ClearChildren();
+			RecipeDetailsView recipeDetailsView = _recipeDetailsView;
+			if (recipeDetailsView != null)
+			{
+				TreeView treeView = recipeDetailsView.TreeView;
+				if (treeView != null)
+				{
+					((Control)treeView).Dispose();
+				}
+			}
+			base.get_View().LimitReached = false;
+			((Control)base.get_View().Panel).set_Parent((Container)(object)base.get_View().Container);
+			((Control)base.get_View().RarityDropdown).set_Parent((Container)(object)base.get_View().Container);
+			((Control)base.get_View().SettingsMenuButton).set_Parent((Container)(object)base.get_View().Container);
+			((Control)base.get_View().FiltersLabel).set_Parent((Container)(object)base.get_View().Container);
+			((Control)base.get_View().WeightDropdown).set_Parent((Container)(object)base.get_View().Container);
+			((Control)base.get_View().LegendaryTypeDropdown).set_Parent((Container)(object)base.get_View().Container);
+			base.get_View().SetLimitLabelParent((Container)(object)base.get_View().Container);
 			ServiceContainer.TextureRepository.ClearTextures();
 		}
 
 		public void Reload()
 		{
-			base.View.Container.ClearChildren();
-			base.View.LimitReached = false;
-			base.View.DoBuild(base.View.Container);
+			((Container)base.get_View().Container).ClearChildren();
+			base.get_View().LimitReached = false;
+			((View<IItemListPresenter>)base.get_View()).DoBuild((Container)(object)base.get_View().Container);
 		}
 	}
 }

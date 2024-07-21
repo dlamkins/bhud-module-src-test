@@ -1,28 +1,28 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using JsonFlatFileDataStore;
 using MysticCrafting.Models.Vendor;
 using MysticCrafting.Module.Services;
+using SQLite;
 
 namespace MysticCrafting.Module.Repositories
 {
-	public class VendorRepository : IVendorRepository
+	public class VendorRepository : IVendorRepository, IDisposable
 	{
-		private IDocumentCollection<VendorSellsItem> VendorItems { get; } = ServiceContainer.Store.GetCollection<VendorSellsItem>();
+		private SQLiteConnection Connection { get; set; }
 
-
-		public IList<VendorSellsItem> GetVendorItems()
+		public void Initialize(IDataService service)
 		{
-			return (from v in VendorItems.AsQueryable()
-				where !v.IsHistorical
-				select v).ToList();
+			Connection = new SQLiteConnection(service.DatabaseFilePath);
 		}
 
 		public IList<VendorSellsItem> GetVendorItems(int itemId)
 		{
-			return (from v in VendorItems.AsQueryable().ToList()
-				where v.ItemId.HasValue && v.ItemId == itemId && !v.IsHistorical
-				select v).ToList();
+			return Connection.Query<VendorSellsItem>(string.Format("SELECT * FROM {0} WHERE {1} = {2} AND {3} = 0", "VendorSellsItem", "ItemId", itemId, "IsHistorical"), Array.Empty<object>());
+		}
+
+		public void Dispose()
+		{
+			Connection.Dispose();
 		}
 	}
 }

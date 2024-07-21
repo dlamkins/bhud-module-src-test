@@ -1,3 +1,4 @@
+using Atzie.MysticCrafting.Models.Crafting;
 using Blish_HUD.Content;
 
 namespace MysticCrafting.Module.Helpers
@@ -111,6 +112,23 @@ namespace MysticCrafting.Module.Helpers
 			return ArmorSmithing;
 		}
 
+		public static AsyncTexture2D GetIcon(Discipline profession)
+		{
+			return (AsyncTexture2D)(profession switch
+			{
+				Discipline.Armorsmith => ArmorSmithing, 
+				Discipline.Weaponsmith => WeaponSmithing, 
+				Discipline.Jeweler => Jewelery, 
+				Discipline.Artificer => Artificer, 
+				Discipline.Huntsman => Huntsman, 
+				Discipline.Chef => Cooking, 
+				Discipline.Leatherworker => Leatherworking, 
+				Discipline.Tailor => Tailoring, 
+				Discipline.Scribe => Scribing, 
+				_ => ArmorSmithing, 
+			});
+		}
+
 		public static AsyncTexture2D GetIconColor(string profession)
 		{
 			string text = profession.ToLower();
@@ -180,6 +198,23 @@ namespace MysticCrafting.Module.Helpers
 				}
 			}
 			return ArmorSmithingColor;
+		}
+
+		public static AsyncTexture2D GetIconColor(Discipline profession)
+		{
+			return (AsyncTexture2D)(profession switch
+			{
+				Discipline.Armorsmith => ArmorSmithingColor, 
+				Discipline.Weaponsmith => WeaponSmithingColor, 
+				Discipline.Jeweler => JeweleryColor, 
+				Discipline.Artificer => ArtificerColor, 
+				Discipline.Huntsman => HuntsmanColor, 
+				Discipline.Chef => CookingColor, 
+				Discipline.Leatherworker => LeatherworkingColor, 
+				Discipline.Tailor => TailoringColor, 
+				Discipline.Scribe => ScribingColor, 
+				_ => ArmorSmithingColor, 
+			});
 		}
 	}
 }

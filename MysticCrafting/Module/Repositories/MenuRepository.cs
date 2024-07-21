@@ -1,5 +1,10 @@
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
+using Blish_HUD;
 using MysticCrafting.Models.Menu;
 using MysticCrafting.Module.Services;
 
@@ -7,7 +12,7 @@ namespace MysticCrafting.Module.Repositories
 {
 	public class MenuRepository : IMenuRepository, IRepository
 	{
-		private readonly IDataService _dataService;
+		private readonly Logger Logger = Logger.GetLogger<MenuRepository>();
 
 		private IList<MysticMenuItem> MenuItems { get; set; }
 
@@ -17,14 +22,19 @@ namespace MysticCrafting.Module.Repositories
 
 		public string FileName => "menu_data.json";
 
-		public MenuRepository(IDataService dataService)
-		{
-			_dataService = dataService;
-		}
+		public string DatabaseFileResourceName => "MysticCrafting.Module.EmbeddedResources." + FileName;
 
 		public async Task<string> LoadAsync()
 		{
-			MenuItems = (await _dataService.LoadFromFileAsync<List<MysticMenuItem>>(FileName)) ?? new List<MysticMenuItem>();
+			using (Stream resourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(DatabaseFileResourceName))
+			{
+				if (resourceStream == null)
+				{
+					Logger.Error("Could not find embedded resource " + FileName);
+					return string.Empty;
+				}
+				MenuItems = await JsonSerializer.DeserializeAsync<List<MysticMenuItem>>(resourceStream, DataService._serializerOptions, default(CancellationToken));
+			}
 			Loaded = true;
 			return $"{MenuItems.Count} menu items loaded";
 		}

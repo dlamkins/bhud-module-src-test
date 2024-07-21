@@ -1,16 +1,20 @@
+using System;
 using System.Collections.Generic;
-using MysticCrafting.Models.Commerce;
+using Atzie.MysticCrafting.Models.Currencies;
+using MysticCrafting.Module.Services;
 
 namespace MysticCrafting.Module.Repositories
 {
-	public interface ICurrencyRepository
+	public interface ICurrencyRepository : IDisposable
 	{
-		IList<MysticCurrency> GetCurrencies();
+		void Initialize(IDataService service);
 
-		MysticCurrency GetCurrency(int id);
+		IList<Currency> GetCurrencies();
 
-		MysticCurrency GetCurrency(string name);
+		Currency GetCurrency(int id);
 
-		MysticCurrency GetCoinCurrency();
+		Currency GetCurrency(string name);
+
+		Currency GetCoinCurrency();
 	}
 }

@@ -1,5 +1,4 @@
 using Atzie.MysticCrafting.Models.Items;
-using MysticCrafting.Models.Items;
 using MysticCrafting.Module.Services;
 
 namespace MysticCrafting.Module.Models
@@ -8,7 +7,7 @@ namespace MysticCrafting.Module.Models
 	{
 		public MysticVaultContainer Container { get; set; }
 
-		public MysticItem ContainerItem { get; set; }
+		public Item ContainerItem { get; set; }
 
 		public ItemContainerSource(string uniqueId)
 			: base(uniqueId)

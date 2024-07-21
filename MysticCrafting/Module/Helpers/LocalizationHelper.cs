@@ -1,3 +1,4 @@
+using Atzie.MysticCrafting.Models.Crafting;
 using MysticCrafting.Module.Strings;
 
 namespace MysticCrafting.Module.Helpers
@@ -75,12 +76,29 @@ namespace MysticCrafting.Module.Helpers
 			return string.Empty;
 		}
 
+		public static string TranslateProfession(Discipline profession)
+		{
+			return profession switch
+			{
+				Discipline.Armorsmith => Professions.Armorsmith, 
+				Discipline.Weaponsmith => Professions.Weaponsmith, 
+				Discipline.Jeweler => Professions.Jeweler, 
+				Discipline.Artificer => Professions.Artificer, 
+				Discipline.Huntsman => Professions.Huntsman, 
+				Discipline.Chef => Professions.Chef, 
+				Discipline.Leatherworker => Professions.Leatherworker, 
+				Discipline.Tailor => Professions.Tailor, 
+				Discipline.Scribe => Professions.Scribe, 
+				_ => string.Empty, 
+			};
+		}
+
 		public static string TranslateRecipeSource(string source)
 		{
 			return source.ToLower() switch
 			{
 				"automatic" => MysticCrafting.Module.Strings.Recipe.RecipeSourceAutomatic, 
-				"recipe sheet" => MysticCrafting.Module.Strings.Recipe.RecipeSourceRecipeSheet, 
+				"recipesheet" => MysticCrafting.Module.Strings.Recipe.RecipeSourceRecipeSheet, 
 				"other" => MysticCrafting.Module.Strings.Recipe.RecipeSourceOther, 
 				_ => string.Empty, 
 			};

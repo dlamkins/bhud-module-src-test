@@ -37,12 +37,12 @@ namespace MysticCrafting.Module.Services
 
 		public void PlayMenuItemClick()
 		{
-			_menuItemClickSfx.Play(GameService.GameIntegration.Audio.Volume, 0f, 0f);
+			_menuItemClickSfx.Play(GameService.GameIntegration.get_Audio().get_Volume(), 0f, 0f);
 		}
 
 		public void PlayMenuClick()
 		{
-			_menuClicks[RandomUtil.GetRandom(0, 3)].Play(GameService.GameIntegration.Audio.Volume, 0f, 0f);
+			_menuClicks[RandomUtil.GetRandom(0, 3)].Play(GameService.GameIntegration.get_Audio().get_Volume(), 0f, 0f);
 		}
 	}
 }

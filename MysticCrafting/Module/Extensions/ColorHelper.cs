@@ -11,11 +11,26 @@ namespace MysticCrafting.Module.Extensions
 
 		public static Color BrightBlue = new Color(143, 211, 206);
 
+		public static Color CurrencyName = new Color(252, 201, 117);
+
+		public static Color VendorName = new Color(75, 163, 77);
+
+		public static Color VendorNameHighlight = new Color(34, 221, 34);
+
 		public static Color FromRarity(string rarity)
 		{
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0147: Unknown result type (might be due to invalid IL or missing references)
 			if (string.IsNullOrEmpty(rarity))
 			{
-				return Color.White;
+				return Color.get_White();
 			}
 			string text = rarity.ToLower();
 			if (text != null)
@@ -44,7 +59,7 @@ namespace MysticCrafting.Module.Extensions
 					{
 						break;
 					}
-					return Color.White;
+					return Color.get_White();
 				case 10:
 					if (!(text == "masterwork"))
 					{
@@ -71,26 +86,36 @@ namespace MysticCrafting.Module.Extensions
 					return new Color(160, 46, 247);
 				}
 			}
-			return Color.White;
+			return Color.get_White();
 		}
 
 		public static Color FromItemCount(int totalItemCount, int totalRequiredItemCount)
 		{
-			Color materialColor = Color.Red;
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			Color materialColor = default(Color);
+			((Color)(ref materialColor))._002Ector(237, 2, 2);
 			if (totalItemCount >= totalRequiredItemCount)
 			{
-				materialColor = new Color(45, 197, 7);
-			}
-			else if (totalItemCount > 0)
-			{
-				materialColor = new Color(255, 170, 0);
+				materialColor = Color.get_White();
+				return materialColor;
 			}
 			return materialColor;
 		}
 
 		public static Color FromServicesLoading(IEnumerable<IRecurringService> services)
 		{
-			Color color = Color.White;
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+			Color color = Color.get_White();
 			if (services.All(delegate(IRecurringService s)
 			{
 				_ = s.LastFailed;
@@ -98,7 +123,7 @@ namespace MysticCrafting.Module.Extensions
 				return s.LastFailed > s.LastLoaded;
 			}))
 			{
-				color = Color.Red;
+				color = Color.get_Red();
 			}
 			if (services.Any(delegate(IRecurringService s)
 			{
@@ -107,11 +132,11 @@ namespace MysticCrafting.Module.Extensions
 				return s.LastFailed > s.LastLoaded;
 			}))
 			{
-				color = Color.Orange;
+				color = Color.get_Orange();
 			}
 			else if (services.Any((IRecurringService s) => s.Loaded))
 			{
-				color = Color.LightGreen;
+				color = Color.get_LightGreen();
 			}
 			return color;
 		}

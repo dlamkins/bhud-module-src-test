@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Blish_HUD.Common.UI.Views;
+using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Microsoft.Xna.Framework;
 using MysticCrafting.Module.Extensions;
-using MysticCrafting.Module.Recipe.TreeView.Controls;
+using MysticCrafting.Module.RecipeTree.TreeView.Controls;
 using MysticCrafting.Module.Services.Recurring;
 
 namespace MysticCrafting.Module.Discovery.Loading
@@ -46,30 +48,33 @@ namespace MysticCrafting.Module.Discovery.Loading
 
 		private void UpdateLoadingControls()
 		{
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
 			if (_view._loadingSpinner == null || _view._dateLabel == null)
 			{
 				return;
 			}
 			if (_recurringServices.Any((IRecurringService s) => s.Loading))
 			{
-				if (string.IsNullOrEmpty(_view._dateLabel.Text))
+				if (string.IsNullOrEmpty(_view._dateLabel.get_Text()))
 				{
-					_view._loadingSpinner.Location = new Point(90, 7);
+					((Control)_view._loadingSpinner).set_Location(new Point(90, 7));
 				}
 				else
 				{
-					_view._loadingSpinner.Location = new Point(140, 7);
+					((Control)_view._loadingSpinner).set_Location(new Point(140, 7));
 				}
-				_view._loadingSpinner.Show();
+				((Control)_view._loadingSpinner).Show();
 			}
 			else
 			{
-				_view._loadingSpinner.Hide();
-				_view._statusImage.Tint = ColorHelper.FromServicesLoading(_recurringServices);
-				_view._statusImage.Show();
+				((Control)_view._loadingSpinner).Hide();
+				_view._statusImage.set_Tint(ColorHelper.FromServicesLoading(_recurringServices));
+				((Control)_view._statusImage).Show();
 				DateTime lastLoaded = _recurringServices.Max((IRecurringService s) => s.LastLoaded);
-				_view._dateLabel.Text = $"{lastLoaded:t}";
-				_view._dateLabel.Show();
+				_view._dateLabel.set_Text($"{lastLoaded:t}");
+				((Control)_view._dateLabel).Show();
 			}
 			BuildTooltip();
 		}
@@ -79,11 +84,11 @@ namespace MysticCrafting.Module.Discovery.Loading
 			if (_loadingStatusTooltipView == null)
 			{
 				_loadingStatusTooltipView = new LoadingStatusTooltipView(_recurringServices);
-				DisposableTooltip _tooltip = new DisposableTooltip(_loadingStatusTooltipView);
-				_view._statusImage.Tooltip = _tooltip;
-				_view._nameLabel.Tooltip = _tooltip;
-				_view._dateLabel.Tooltip = _tooltip;
-				_view._loadingSpinner.Tooltip = _tooltip;
+				DisposableTooltip _tooltip = new DisposableTooltip((ITooltipView)(object)_loadingStatusTooltipView);
+				((Control)_view._statusImage).set_Tooltip((Tooltip)(object)_tooltip);
+				((Control)_view._nameLabel).set_Tooltip((Tooltip)(object)_tooltip);
+				((Control)_view._dateLabel).set_Tooltip((Tooltip)(object)_tooltip);
+				((Control)_view._loadingSpinner).set_Tooltip((Tooltip)(object)_tooltip);
 			}
 		}
 

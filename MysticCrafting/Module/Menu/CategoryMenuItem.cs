@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Content;
@@ -43,7 +45,7 @@ namespace MysticCrafting.Module.Menu
 
 		protected bool _collapsed = true;
 
-		protected Color _textColor = Color.White;
+		protected Color _textColor = Color.get_White();
 
 		protected bool _overSection;
 
@@ -61,12 +63,12 @@ namespace MysticCrafting.Module.Menu
 			}
 			set
 			{
-				if (!SetProperty(ref _menuItemHeight, value, invalidateLayout: true, "MenuItemHeight"))
+				if (!((Control)this).SetProperty<int>(ref _menuItemHeight, value, true, "MenuItemHeight"))
 				{
 					return;
 				}
-				base.Height = _menuItemHeight;
-				foreach (ICategoryMenuItem item in _children.Cast<ICategoryMenuItem>().ToList())
+				((Control)this).set_Height(_menuItemHeight);
+				foreach (ICategoryMenuItem item in ((IEnumerable)base._children).Cast<ICategoryMenuItem>().ToList())
 				{
 					item.MenuItemHeight = _menuItemHeight;
 				}
@@ -81,7 +83,7 @@ namespace MysticCrafting.Module.Menu
 			}
 			set
 			{
-				SetProperty(ref _shouldShift, value, invalidateLayout: true, "ShouldShift");
+				((Control)this).SetProperty<bool>(ref _shouldShift, value, true, "ShouldShift");
 			}
 		}
 
@@ -97,7 +99,7 @@ namespace MysticCrafting.Module.Menu
 			}
 			set
 			{
-				SetProperty(ref _menuDepth, value, invalidateLayout: false, "MenuDepth");
+				((Control)this).SetProperty<int>(ref _menuDepth, value, false, "MenuDepth");
 			}
 		}
 
@@ -109,7 +111,7 @@ namespace MysticCrafting.Module.Menu
 			}
 			set
 			{
-				SetProperty(ref _text, value, invalidateLayout: false, "Text");
+				((Control)this).SetProperty<string>(ref _text, value, false, "Text");
 			}
 		}
 
@@ -121,7 +123,7 @@ namespace MysticCrafting.Module.Menu
 			}
 			set
 			{
-				SetProperty(ref _icon, value, invalidateLayout: false, "Icon");
+				((Control)this).SetProperty<AsyncTexture2D>(ref _icon, value, false, "Icon");
 			}
 		}
 
@@ -133,7 +135,7 @@ namespace MysticCrafting.Module.Menu
 			}
 			set
 			{
-				SetProperty(ref _canCheck, value, invalidateLayout: false, "CanCheck");
+				((Control)this).SetProperty<bool>(ref _canCheck, value, false, "CanCheck");
 			}
 		}
 
@@ -162,11 +164,13 @@ namespace MysticCrafting.Module.Menu
 		{
 			get
 			{
+				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				return _textColor;
 			}
 			set
 			{
-				SetProperty(ref _textColor, value, invalidateLayout: false, "TextColor");
+				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+				((Control)this).SetProperty<Color>(ref _textColor, value, false, "TextColor");
 			}
 		}
 
@@ -181,7 +185,7 @@ namespace MysticCrafting.Module.Menu
 				if (_overSection != value)
 				{
 					_overSection = value;
-					OnPropertyChanged("OverSection");
+					((Control)this).OnPropertyChanged("OverSection");
 				}
 			}
 		}
@@ -196,7 +200,7 @@ namespace MysticCrafting.Module.Menu
 			get
 			{
 				int leftSideBuilder = 10;
-				if (!_children.IsEmpty)
+				if (!base._children.get_IsEmpty())
 				{
 					leftSideBuilder += 16;
 				}
@@ -227,7 +231,10 @@ namespace MysticCrafting.Module.Menu
 		}
 
 		public CategoryMenuItem(string text, AsyncTexture2D icon)
+			: this()
 		{
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 			_text = text;
 			_icon = icon;
 			Initialize();
@@ -235,10 +242,13 @@ namespace MysticCrafting.Module.Menu
 
 		private void Initialize()
 		{
-			_scrollEffect = new ScrollingHighlightEffect(this);
-			base.EffectBehind = _scrollEffect;
-			base.Height = MenuItemHeight;
-			base.ContentRegion = new Rectangle(0, MenuItemHeight, base.Width, 0);
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Expected O, but got Unknown
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			_scrollEffect = new ScrollingHighlightEffect((Control)(object)this);
+			((Control)this).set_EffectBehind((ControlEffect)(object)_scrollEffect);
+			((Control)this).set_Height(MenuItemHeight);
+			((Container)this).set_ContentRegion(new Rectangle(0, MenuItemHeight, ((Control)this).get_Width(), 0));
 		}
 
 		public void Select()
@@ -246,9 +256,9 @@ namespace MysticCrafting.Module.Menu
 			if (!Selected)
 			{
 				_selectedMenuItem = this;
-				_scrollEffect.ForceActive = true;
+				_scrollEffect.set_ForceActive(true);
 				Select(this);
-				OnPropertyChanged("Selected");
+				((Control)this).OnPropertyChanged("Selected");
 			}
 		}
 
@@ -259,103 +269,138 @@ namespace MysticCrafting.Module.Menu
 
 		public void Select(CategoryMenuItem menuItem, List<CategoryMenuItem> itemPath)
 		{
+			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Expected O, but got Unknown
 			itemPath.Add(this);
-			OnItemSelected(new ControlActivatedEventArgs(menuItem));
-			if (!_children.IsEmpty)
+			OnItemSelected(new ControlActivatedEventArgs((Control)(object)menuItem));
+			if (!base._children.get_IsEmpty())
 			{
 				Expand();
 			}
-			(base.Parent as ICategoryMenuItem)?.Select(menuItem, itemPath);
+			(((Control)this).get_Parent() as ICategoryMenuItem)?.Select(menuItem, itemPath);
 			_selectedMenuItem = this;
-			_scrollEffect.ForceActive = true;
+			_scrollEffect.set_ForceActive(true);
 		}
 
 		public void Deselect()
 		{
 			bool selected = Selected;
 			_selectedMenuItem = null;
-			_scrollEffect.ForceActive = false;
+			_scrollEffect.set_ForceActive(false);
 			if (selected)
 			{
-				OnPropertyChanged("Selected");
+				((Control)this).OnPropertyChanged("Selected");
 			}
 		}
 
 		public override void RecalculateLayout()
 		{
-			_scrollEffect.Size = new Vector2(_size.X, _menuItemHeight);
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			((ControlEffect)_scrollEffect).set_Size(new Vector2((float)((Control)this)._size.X, (float)_menuItemHeight));
 			UpdateContentRegion();
 		}
 
 		private void UpdateContentRegion()
 		{
-			Control[] children = _children.ToArray();
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			Control[] children = base._children.ToArray();
 			int bottomChild = ReflowChildLayout(children);
-			base.ContentRegion = (children.Any() ? new Rectangle(0, MenuItemHeight, _size.X, bottomChild) : new Rectangle(0, MenuItemHeight, _size.X, 0));
-			base.Height = ((!_collapsed) ? base.ContentRegion.Bottom : MenuItemHeight);
+			((Container)this).set_ContentRegion(children.Any() ? new Rectangle(0, MenuItemHeight, ((Control)this)._size.X, bottomChild) : new Rectangle(0, MenuItemHeight, ((Control)this)._size.X, 0));
+			int height;
+			if (_collapsed)
+			{
+				height = MenuItemHeight;
+			}
+			else
+			{
+				Rectangle contentRegion = ((Container)this).get_ContentRegion();
+				height = ((Rectangle)(ref contentRegion)).get_Bottom();
+			}
+			((Control)this).set_Height(height);
 		}
 
 		protected override void OnClick(MouseEventArgs e)
 		{
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Expected O, but got Unknown
 			if (_overSection)
 			{
-				if (!_children.IsEmpty)
+				if (!base._children.get_IsEmpty())
 				{
 					ToggleAccordionState();
 					ServiceContainer.AudioService.PlayMenuClick();
 				}
 				ServiceContainer.AudioService.PlayMenuItemClick();
-				OnItemClicked(new ControlActivatedEventArgs(this));
+				OnItemClicked(new ControlActivatedEventArgs((Control)(object)this));
 			}
 			if (!Selected || !_overSection)
 			{
 				Select();
 			}
-			base.OnClick(e);
+			((Control)this).OnClick(e);
 		}
 
 		protected override void OnMouseMoved(MouseEventArgs e)
 		{
-			OverSection = base.RelativeMousePosition.Y <= _menuItemHeight;
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			OverSection = ((Control)this).get_RelativeMousePosition().Y <= _menuItemHeight;
 			if (OverSection)
 			{
-				_scrollEffect.Enable();
+				((ControlEffect)_scrollEffect).Enable();
 			}
-			else if (!_scrollEffect.ForceActive)
+			else if (!_scrollEffect.get_ForceActive())
 			{
-				_scrollEffect.Disable();
+				((ControlEffect)_scrollEffect).Disable();
 			}
-			MouseOverIconBox = _canCheck && _overSection && FirstItemBoxRegion.OffsetBy(LeftSidePadding, 0).Contains(base.RelativeMousePosition);
-			base.OnMouseMoved(e);
+			int mouseOverIconBox;
+			if (_canCheck && _overSection)
+			{
+				Rectangle val = RectangleExtension.OffsetBy(FirstItemBoxRegion, LeftSidePadding, 0);
+				mouseOverIconBox = (((Rectangle)(ref val)).Contains(((Control)this).get_RelativeMousePosition()) ? 1 : 0);
+			}
+			else
+			{
+				mouseOverIconBox = 0;
+			}
+			MouseOverIconBox = (byte)mouseOverIconBox != 0;
+			((Control)this).OnMouseMoved(e);
 		}
 
 		protected override void OnMouseLeft(MouseEventArgs e)
 		{
 			OverSection = false;
-			base.OnMouseLeft(e);
+			((Control)this).OnMouseLeft(e);
 		}
 
 		protected override void OnChildAdded(ChildChangedEventArgs e)
 		{
-			CategoryMenuItem newChild = e.ChangedChild as CategoryMenuItem;
+			CategoryMenuItem newChild = e.get_ChangedChild() as CategoryMenuItem;
 			if (newChild == null)
 			{
-				e.Cancel = true;
+				((CancelEventArgs)(object)e).Cancel = true;
 				return;
 			}
 			newChild.MenuItemHeight = MenuItemHeight;
 			newChild.MenuDepth = MenuDepth + 1;
-			ReflowChildLayout(_children.ToArray());
+			ReflowChildLayout(base._children.ToArray());
 		}
 
 		private int ReflowChildLayout(IEnumerable<Control> allChildren)
 		{
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 			int lastBottom = 0;
-			foreach (Control item in allChildren.Where((Control c) => c.Visible))
+			foreach (Control item in allChildren.Where((Control c) => c.get_Visible()))
 			{
-				item.Location = new Point(0, lastBottom);
-				item.Width = base.Width;
-				lastBottom = item.Bottom;
+				item.set_Location(new Point(0, lastBottom));
+				item.set_Width(((Control)this).get_Width());
+				lastBottom = item.get_Bottom();
 			}
 			return lastBottom;
 		}
@@ -368,15 +413,22 @@ namespace MysticCrafting.Module.Menu
 
 		public void Expand()
 		{
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
 			if (_collapsed)
 			{
-				_slideAnim?.CancelAndComplete();
-				SetProperty(ref _collapsed, newValue: false, invalidateLayout: false, "Expand");
-				_slideAnim = Control.Animation.Tweener.Tween(this, new
+				Tween slideAnim = _slideAnim;
+				if (slideAnim != null)
+				{
+					slideAnim.CancelAndComplete();
+				}
+				((Control)this).SetProperty<bool>(ref _collapsed, false, false, "Expand");
+				_slideAnim = ((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<CategoryMenuItem>(this, (object)new
 				{
 					ArrowRotation = 0f
-				}, 0.3f).Ease(Ease.QuadOut);
-				base.Height = base.ContentRegion.Bottom;
+				}, 0.3f, 0f, true).Ease((Func<float, float>)Ease.QuadOut);
+				Rectangle contentRegion = ((Container)this).get_ContentRegion();
+				((Control)this).set_Height(((Rectangle)(ref contentRegion)).get_Bottom());
 			}
 		}
 
@@ -384,42 +436,59 @@ namespace MysticCrafting.Module.Menu
 		{
 			if (!_collapsed)
 			{
-				_slideAnim?.CancelAndComplete();
-				SetProperty(ref _collapsed, newValue: true, invalidateLayout: false, "Collapse");
-				_slideAnim = Control.Animation.Tweener.Tween(this, new
+				Tween slideAnim = _slideAnim;
+				if (slideAnim != null)
+				{
+					slideAnim.CancelAndComplete();
+				}
+				((Control)this).SetProperty<bool>(ref _collapsed, true, false, "Collapse");
+				_slideAnim = ((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<CategoryMenuItem>(this, (object)new
 				{
 					ArrowRotation = -(float)Math.PI / 2f
-				}, 0.3f).Ease(Ease.QuadOut);
-				base.Height = MenuItemHeight;
+				}, 0.3f, 0f, true).Ease((Func<float, float>)Ease.QuadOut);
+				((Control)this).set_Height(MenuItemHeight);
 			}
 		}
 
 		private void DrawDropdownArrow(SpriteBatch spriteBatch)
 		{
-			SpriteBatchExtensions.DrawOnCtrl(origin: new Vector2(8f, 8f), destinationRectangle: new Rectangle(13, MenuItemHeight / 2, 16, 16), spriteBatch: spriteBatch, ctrl: this, texture: _textureArrow, sourceRectangle: null, color: Color.White, rotation: ArrowRotation);
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			Vector2 arrowOrigin = default(Vector2);
+			((Vector2)(ref arrowOrigin))._002Ector(8f, 8f);
+			Rectangle arrowDest = default(Rectangle);
+			((Rectangle)(ref arrowDest))._002Ector(13, MenuItemHeight / 2, 16, 16);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_textureArrow), arrowDest, (Rectangle?)null, Color.get_White(), ArrowRotation, arrowOrigin, (SpriteEffects)0);
 		}
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Expected O, but got Unknown
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
 			int currentLeftSidePadding = LeftSidePadding;
-			if (!_children.IsEmpty)
+			if (!base._children.get_IsEmpty())
 			{
 				DrawDropdownArrow(spriteBatch);
 			}
 			TextureRegion2D firstItemSprite = null;
-			if (Icon != null && _children.IsEmpty)
+			if (Icon != null && base._children.get_IsEmpty())
 			{
-				firstItemSprite = new TextureRegion2D(Icon);
+				firstItemSprite = new TextureRegion2D(AsyncTexture2D.op_Implicit(Icon));
 			}
 			if (firstItemSprite != null)
 			{
-				spriteBatch.DrawOnCtrl(this, firstItemSprite, FirstItemBoxRegion.OffsetBy(currentLeftSidePadding - 10, 0));
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, firstItemSprite, RectangleExtension.OffsetBy(FirstItemBoxRegion, currentLeftSidePadding - 10, 0));
 			}
 			if (_canCheck)
 			{
 				currentLeftSidePadding += 42;
 			}
-			else if (!_children.IsEmpty)
+			else if (!base._children.get_IsEmpty())
 			{
 				currentLeftSidePadding += 10;
 			}
@@ -427,7 +496,7 @@ namespace MysticCrafting.Module.Menu
 			{
 				currentLeftSidePadding += 25;
 			}
-			spriteBatch.DrawStringOnCtrl(this, _text, Control.Content.DefaultFont18, new Rectangle(currentLeftSidePadding, 0, base.Width - (currentLeftSidePadding - 10), MenuItemHeight), _textColor, wrap: true, stroke: true);
+			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, _text, Control.get_Content().get_DefaultFont18(), new Rectangle(currentLeftSidePadding, 0, ((Control)this).get_Width() - (currentLeftSidePadding - 10), MenuItemHeight), _textColor, true, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
 		}
 	}
 }

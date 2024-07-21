@@ -1,0 +1,19 @@
+﻿#Vendor changes
+Vendors have been updated to display the required currencies and items underneath the vendor to make it easier to see the total cost (for example, the cost of acquiring the items to buy things from Lyhr). They are also grouped based on price and have an updated UI.
+#Currency changes
+Currencies are now displayed as nodes in the tree view and they function similarly to items. The number of currency you have is now also divided across the recipes.
+#New version update window
+A new window will be displayed after every new update with details about the latest changes. 
+#Reduced RAM usage
+The data storage was migrated to significantly reduce the overall RAM usage. Yay!
+#Bugs & other changes
+- Home screen has been removed.
+- The Legendary Start Kit (Wizard's Vault) options have been updated.
+- Data has been updated and now includes new vendors, currencies and items such the Wizard's Tower Exchange.
+- Updated the wiki right-click option to support the French and German wiki's.
+- Added right-click option to copy the item/vendor name.
+- Box of Grandmaster Marks has been added as an option to obtain Grandmaster Marks.
+- Fixed an issue that stopped the Legendary Recipe sheets from displaying as unlocked. 
+- Fixed an issue that caused historical items to be displayed.
+- Corner icon tooltip now displays the hotkey to toggle the window.
+- Recipe tree has been widened to accomodate the new vendor and currency UI changes.

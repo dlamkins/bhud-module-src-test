@@ -1,11 +1,13 @@
+using System;
 using System.Collections.Generic;
 using MysticCrafting.Models.Vendor;
+using MysticCrafting.Module.Services;
 
 namespace MysticCrafting.Module.Repositories
 {
-	public interface IVendorRepository
+	public interface IVendorRepository : IDisposable
 	{
-		IList<VendorSellsItem> GetVendorItems();
+		void Initialize(IDataService service);
 
 		IList<VendorSellsItem> GetVendorItems(int itemId);
 	}

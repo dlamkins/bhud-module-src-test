@@ -18,21 +18,47 @@ namespace MysticCrafting.Module.Discovery.ItemList.Controls
 		protected override void OnClick(MouseEventArgs e)
 		{
 			Active = !Active;
-			base.OnClick(e);
+			((Control)this).OnClick(e);
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			Color tint = (HasActiveState ? (Color.White * 0.3f) : Color.LightYellow);
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			Color tint = (HasActiveState ? (Color.get_White() * 0.3f) : Color.get_LightYellow());
 			if (Active)
 			{
-				tint = Color.LightYellow;
+				tint = Color.get_LightYellow();
 			}
-			if (base.MouseOver)
+			if (((Control)this).get_MouseOver())
 			{
-				tint = Color.LightYellow * 0.6f;
+				tint = Color.get_LightYellow() * 0.6f;
 			}
-			spriteBatch.DrawOnCtrl(this, Texture, new Rectangle((int)base.Padding.Left, (int)base.Padding.Top, base.Size.X, base.Size.Y), tint);
+			Texture2D obj = AsyncTexture2D.op_Implicit(Texture);
+			Thickness padding = ((Control)this).get_Padding();
+			int num = (int)((Thickness)(ref padding)).get_Left();
+			padding = ((Control)this).get_Padding();
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, obj, new Rectangle(num, (int)((Thickness)(ref padding)).get_Top(), ((Control)this).get_Size().X, ((Control)this).get_Size().Y), tint);
+		}
+
+		public TextureButton()
+			: this()
+		{
 		}
 	}
 }

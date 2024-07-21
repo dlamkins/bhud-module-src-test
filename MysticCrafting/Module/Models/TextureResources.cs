@@ -16,6 +16,8 @@ namespace MysticCrafting.Module.Models
 
 		public AsyncTexture2D CraftingIcon = AsyncTexture2D.FromAssetId(156685);
 
+		public AsyncTexture2D CraftingCalculatorIcon = AsyncTexture2D.FromAssetId(1654244);
+
 		public AsyncTexture2D BltcIcon = AsyncTexture2D.FromAssetId(2222178);
 
 		public AsyncTexture2D TpIcon = AsyncTexture2D.FromAssetId(255378);
@@ -57,6 +59,8 @@ namespace MysticCrafting.Module.Models
 		public AsyncTexture2D ExclamationMark = AsyncTexture2D.FromAssetId(482924);
 
 		public AsyncTexture2D RecipeSheet = AsyncTexture2D.FromAssetId(156702);
+
+		public AsyncTexture2D RecipeBook = AsyncTexture2D.FromAssetId(347191);
 
 		public AsyncTexture2D QuestionMark = AsyncTexture2D.FromAssetId(157097);
 
@@ -101,5 +105,11 @@ namespace MysticCrafting.Module.Models
 		public AsyncTexture2D ItemTabBackground = AsyncTexture2D.FromAssetId(993606);
 
 		public AsyncTexture2D ItemTabBackgroundHover = AsyncTexture2D.FromAssetId(993602);
+
+		public AsyncTexture2D Location = AsyncTexture2D.FromAssetId(358406);
+
+		public AsyncTexture2D HeroRelease = AsyncTexture2D.FromAssetId(2468318);
+
+		public AsyncTexture2D TitleBanner = AsyncTexture2D.FromAssetId(2468319);
 	}
 }

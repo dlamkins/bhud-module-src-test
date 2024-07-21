@@ -19,7 +19,7 @@ namespace MysticCrafting.Module.Discovery
 
 		protected override Task<bool> Load(IProgress<string> progress)
 		{
-			base.View.MenuItemSelected += OnMenuItemSelected;
+			base.get_View().MenuItemSelected += OnMenuItemSelected;
 			return base.Load(progress);
 		}
 
@@ -29,11 +29,11 @@ namespace MysticCrafting.Module.Discovery
 			if (menu != null)
 			{
 				CategoryMenuItem menuItem = menu.SelectedMenuItem;
-				base.View.SearchText = string.Empty;
-				base.View.NameFilter = string.Empty;
+				base.get_View().SearchText = string.Empty;
+				base.get_View().NameFilter = string.Empty;
 				if (menuItem.Text == "Home")
 				{
-					base.View.ItemListContainer.Show(base.View.HomeView);
+					base.get_View().ItemListContainer.Show((IView)(object)base.get_View().HomeView);
 				}
 				else
 				{
@@ -44,14 +44,14 @@ namespace MysticCrafting.Module.Discovery
 
 		protected override void UpdateView()
 		{
-			base.View.SetMenuItems(base.Model.GetMenuItems(base.View.Menu));
+			base.get_View().SetMenuItems(base.get_Model().GetMenuItems((Container)(object)base.get_View().Menu));
 		}
 
 		public void UpdateItemList(CategoryMenuItem menuItem)
 		{
-			if (menuItem != null && base.View.ItemList?.Presenter != null)
+			if (menuItem != null && ((View<IItemListPresenter>)base.get_View().ItemList)?.get_Presenter() != null)
 			{
-				base.View.ReloadItemList(new ItemListModel(ServiceContainer.ItemRepository)
+				base.get_View().ReloadItemList(new ItemListModel(ServiceContainer.ItemRepository)
 				{
 					Filter = menuItem.ItemFilter,
 					Breadcrumbs = GetBreadcrumbs(menuItem)
@@ -63,7 +63,7 @@ namespace MysticCrafting.Module.Discovery
 		{
 			if (filter != null)
 			{
-				base.View.ReloadItemList(new ItemListModel(ServiceContainer.ItemRepository)
+				base.get_View().ReloadItemList(new ItemListModel(ServiceContainer.ItemRepository)
 				{
 					Filter = filter,
 					Breadcrumbs = breadcrumbs
@@ -74,7 +74,7 @@ namespace MysticCrafting.Module.Discovery
 		private List<string> GetBreadcrumbs(CategoryMenuItem menuItem)
 		{
 			List<string> breadcrumbs = new List<string>();
-			CategoryMenuItem parent = menuItem.Parent as CategoryMenuItem;
+			CategoryMenuItem parent = ((Control)menuItem).get_Parent() as CategoryMenuItem;
 			if (parent != null)
 			{
 				breadcrumbs.AddRange(GetBreadcrumbs(parent));
@@ -87,17 +87,17 @@ namespace MysticCrafting.Module.Discovery
 		{
 			Task.Run(delegate
 			{
-				lock (base.View.ItemList)
+				lock (base.get_View().ItemList)
 				{
-					base.View.NameFilter = text;
-					base.View.ReloadItemList(base.View.ItemListModel);
+					base.get_View().NameFilter = text;
+					base.get_View().ReloadItemList(base.get_View().ItemListModel);
 				}
 			});
 		}
 
 		protected override void Unload()
 		{
-			base.View.MenuItemSelected -= OnMenuItemSelected;
+			base.get_View().MenuItemSelected -= OnMenuItemSelected;
 		}
 	}
 }

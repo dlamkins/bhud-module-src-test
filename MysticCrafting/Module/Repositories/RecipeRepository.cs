@@ -1,25 +1,34 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using JsonFlatFileDataStore;
-using MysticCrafting.Models;
+using Atzie.MysticCrafting.Models.Crafting;
+using Atzie.MysticCrafting.Models.Items;
 using MysticCrafting.Module.Services;
+using SQLite;
+using SQLiteNetExtensions.Extensions;
 
 namespace MysticCrafting.Module.Repositories
 {
-	public class RecipeRepository : IRecipeRepository
+	public class RecipeRepository : IRecipeRepository, IDisposable
 	{
-		private IDocumentCollection<MysticRecipe> Recipes { get; } = ServiceContainer.Store.GetCollection<MysticRecipe>();
+		private SQLiteConnection Connection { get; set; }
 
-
-		public IEnumerable<MysticRecipe> GetRecipes(int itemId)
+		public void Initialize(IDataService service)
 		{
-			if (Recipes == null)
+			Connection = new SQLiteConnection(service.DatabaseFilePath);
+		}
+
+		public IList<Recipe> GetRecipes(int itemId)
+		{
+			if (ReadOperations.GetWithChildren<Item>(Connection, (object)itemId, true)?.Recipes == null)
 			{
-				return new List<MysticRecipe>();
+				new List<Recipe>();
 			}
-			return from r in Recipes.AsQueryable()
-				where r.OutputItemId == itemId
-				select r;
+			return ReadOperations.GetWithChildren<Item>(Connection, (object)itemId, true)?.Recipes ?? new List<Recipe>();
+		}
+
+		public void Dispose()
+		{
+			Connection.Dispose();
 		}
 	}
 }

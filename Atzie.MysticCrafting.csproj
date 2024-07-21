@@ -1,7 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <AssemblyName>Atzie.MysticCrafting</AssemblyName>
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <UseWindowsForms>True</UseWindowsForms>
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
   <PropertyGroup>
@@ -11,37 +12,133 @@
   <PropertyGroup>
     <RootNamespace />
   </PropertyGroup>
-  <ItemGroup />
   <ItemGroup>
-    <Reference Include="Blish HUD">
-      <HintPath>..\..\working\Blish HUD.exe</HintPath>
-    </Reference>
+    <None Remove="MysticCrafting\Module\EmbeddedResources.data.db" />
+    <None Remove="MysticCrafting\Module\EmbeddedResources.menu_data.json" />
+    <None Remove="MysticCrafting\Module\changelog.txt" />
+    <None Remove="costura64.e_sqlite3.dll" />
+    <None Remove="costura\asyncclipboardservice.dll.compressed" />
+    <None Remove="costura\blish-hud.exe.compressed" />
+    <None Remove="costura\de.blish-hud.resources.dll.compressed" />
+    <None Remove="costura\es.blish-hud.resources.dll.compressed" />
+    <None Remove="costura\fr.blish-hud.resources.dll.compressed" />
+    <None Remove="costura\costura.dll.compressed" />
+    <None Remove="costura\entityframework.sqlserver.dll.compressed" />
+    <None Remove="costura\entityframework.dll.compressed" />
+    <None Remove="costura\gw2sharp.dll.compressed" />
+    <None Remove="costura\jsonflatfiledatastore.dll.compressed" />
+    <None Remove="costura\microsoft.bcl.asyncinterfaces.dll.compressed" />
+    <None Remove="costura\monogame.extended.dll.compressed" />
+    <None Remove="costura\monogame.framework.dll.compressed" />
+    <None Remove="costura\naudio.core.dll.compressed" />
+    <None Remove="costura\naudio.wasapi.dll.compressed" />
+    <None Remove="costura\newtonsoft.json.dll.compressed" />
+    <None Remove="costura\semver.dll.compressed" />
+    <None Remove="costura\sharpdx.dll.compressed" />
+    <None Remove="costura\sharpdx.direct2d1.dll.compressed" />
+    <None Remove="costura\sharpdx.direct3d11.dll.compressed" />
+    <None Remove="costura\sharpdx.direct3d9.dll.compressed" />
+    <None Remove="costura\sharpdx.dxgi.dll.compressed" />
+    <None Remove="costura\sharpdx.mathematics.dll.compressed" />
+    <None Remove="costura\sharpdx.mediafoundation.dll.compressed" />
+    <None Remove="costura\sharpdx.xaudio2.dll.compressed" />
+    <None Remove="costura\sharpdx.xinput.dll.compressed" />
+    <None Remove="costura\sqlitenetextensions.dll.compressed" />
+    <None Remove="costura\sqlitenetextensionsasync.dll.compressed" />
+    <None Remove="costura\sqlitepclraw.batteries_green.dll.compressed" />
+    <None Remove="costura\sqlitepclraw.provider.dynamic_cdecl.dll.compressed" />
+    <None Remove="costura\sqlitepclraw.provider.e_sqlite3.dll.compressed" />
+    <None Remove="costura\system.data.sqlite.dll.compressed" />
+    <None Remove="costura\system.buffers.dll.compressed" />
+    <None Remove="costura\system.data.sqlite.ef6.dll.compressed" />
+    <None Remove="costura\system.data.sqlite.linq.dll.compressed" />
+    <None Remove="costura\system.diagnostics.diagnosticsource.dll.compressed" />
+    <None Remove="costura\system.memory.dll.compressed" />
+    <None Remove="costura\system.numerics.vectors.dll.compressed" />
+    <None Remove="costura\system.resources.extensions.dll.compressed" />
+    <None Remove="costura\system.runtime.compilerservices.unsafe.dll.compressed" />
+    <None Remove="costura\system.servicemodel.primitives.dll.compressed" />
+    <None Remove="costura\system.text.encodings.web.dll.compressed" />
+    <None Remove="costura\system.text.json.dll.compressed" />
+    <None Remove="costura\system.threading.tasks.extensions.dll.compressed" />
+    <None Remove="costura\system.valuetuple.dll.compressed" />
+    <None Remove="costura\metadata" />
+    <EmbeddedResource Include="MysticCrafting\Module\EmbeddedResources.data.db" />
+    <EmbeddedResource Include="MysticCrafting\Module\EmbeddedResources.menu_data.json" />
+    <EmbeddedResource Include="MysticCrafting\Module\changelog.txt" />
+    <EmbeddedResource Include="costura64.e_sqlite3.dll" />
+    <EmbeddedResource Include="costura\asyncclipboardservice.dll.compressed" />
+    <EmbeddedResource Include="costura\blish-hud.exe.compressed" />
+    <EmbeddedResource Include="costura\de.blish-hud.resources.dll.compressed" />
+    <EmbeddedResource Include="costura\es.blish-hud.resources.dll.compressed" />
+    <EmbeddedResource Include="costura\fr.blish-hud.resources.dll.compressed" />
+    <EmbeddedResource Include="costura\costura.dll.compressed" />
+    <EmbeddedResource Include="costura\entityframework.sqlserver.dll.compressed" />
+    <EmbeddedResource Include="costura\entityframework.dll.compressed" />
+    <EmbeddedResource Include="costura\gw2sharp.dll.compressed" />
+    <EmbeddedResource Include="costura\jsonflatfiledatastore.dll.compressed" />
+    <EmbeddedResource Include="costura\microsoft.bcl.asyncinterfaces.dll.compressed" />
+    <EmbeddedResource Include="costura\monogame.extended.dll.compressed" />
+    <EmbeddedResource Include="costura\monogame.framework.dll.compressed" />
+    <EmbeddedResource Include="costura\naudio.core.dll.compressed" />
+    <EmbeddedResource Include="costura\naudio.wasapi.dll.compressed" />
+    <EmbeddedResource Include="costura\newtonsoft.json.dll.compressed" />
+    <EmbeddedResource Include="costura\semver.dll.compressed" />
+    <EmbeddedResource Include="costura\sharpdx.dll.compressed" />
+    <EmbeddedResource Include="costura\sharpdx.direct2d1.dll.compressed" />
+    <EmbeddedResource Include="costura\sharpdx.direct3d11.dll.compressed" />
+    <EmbeddedResource Include="costura\sharpdx.direct3d9.dll.compressed" />
+    <EmbeddedResource Include="costura\sharpdx.dxgi.dll.compressed" />
+    <EmbeddedResource Include="costura\sharpdx.mathematics.dll.compressed" />
+    <EmbeddedResource Include="costura\sharpdx.mediafoundation.dll.compressed" />
+    <EmbeddedResource Include="costura\sharpdx.xaudio2.dll.compressed" />
+    <EmbeddedResource Include="costura\sharpdx.xinput.dll.compressed" />
+    <EmbeddedResource Include="costura\sqlitenetextensions.dll.compressed" />
+    <EmbeddedResource Include="costura\sqlitenetextensionsasync.dll.compressed" />
+    <EmbeddedResource Include="costura\sqlitepclraw.batteries_green.dll.compressed" />
+    <EmbeddedResource Include="costura\sqlitepclraw.provider.dynamic_cdecl.dll.compressed" />
+    <EmbeddedResource Include="costura\sqlitepclraw.provider.e_sqlite3.dll.compressed" />
+    <EmbeddedResource Include="costura\system.data.sqlite.dll.compressed" />
+    <EmbeddedResource Include="costura\system.buffers.dll.compressed" />
+    <EmbeddedResource Include="costura\system.data.sqlite.ef6.dll.compressed" />
+    <EmbeddedResource Include="costura\system.data.sqlite.linq.dll.compressed" />
+    <EmbeddedResource Include="costura\system.diagnostics.diagnosticsource.dll.compressed" />
+    <EmbeddedResource Include="costura\system.memory.dll.compressed" />
+    <EmbeddedResource Include="costura\system.numerics.vectors.dll.compressed" />
+    <EmbeddedResource Include="costura\system.resources.extensions.dll.compressed" />
+    <EmbeddedResource Include="costura\system.runtime.compilerservices.unsafe.dll.compressed" />
+    <EmbeddedResource Include="costura\system.servicemodel.primitives.dll.compressed" />
+    <EmbeddedResource Include="costura\system.text.encodings.web.dll.compressed" />
+    <EmbeddedResource Include="costura\system.text.json.dll.compressed" />
+    <EmbeddedResource Include="costura\system.threading.tasks.extensions.dll.compressed" />
+    <EmbeddedResource Include="costura\system.valuetuple.dll.compressed" />
+    <EmbeddedResource Include="costura\metadata" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Blish HUD" />
     <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="Gw2Sharp">
-      <HintPath>..\..\working\Gw2Sharp.dll</HintPath>
+    <Reference Include="SemVer" />
+    <Reference Include="Gw2Sharp" />
+    <Reference Include="MonoGame.Framework" />
+    <Reference Include="SQLitePCLRaw.core">
+      <HintPath>..\..\working\SQLitePCLRaw.core.dll</HintPath>
     </Reference>
-    <Reference Include="MonoGame.Framework">
-      <HintPath>..\..\working\MonoGame.Framework.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Text.Json">
-      <HintPath>..\..\working\System.Text.Json.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Text.Json" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="System.Threading.Tasks.Extensions">
-      <HintPath>..\..\working\System.Threading.Tasks.Extensions.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions" />
     <Reference Include="Atzie.MysticCrafting.Models">
       <HintPath>..\..\working\Atzie.MysticCrafting.Models.dll</HintPath>
     </Reference>
-    <Reference Include="JsonFlatFileDataStore">
-      <HintPath>..\..\working\JsonFlatFileDataStore.dll</HintPath>
-    </Reference>
-    <Reference Include="MonoGame.Extended">
-      <HintPath>..\..\working\MonoGame.Extended.dll</HintPath>
+    <Reference Include="SQLite-net">
+      <HintPath>..\..\working\SQLite-net.dll</HintPath>
     </Reference>
     <Reference Include="System.Core" />
-    <Reference Include="AsyncClipboardService">
-      <HintPath>..\..\working\AsyncClipboardService.dll</HintPath>
+    <Reference Include="MonoGame.Extended" />
+    <Reference Include="SQLitePCLRaw.provider.dynamic_cdecl" />
+    <Reference Include="SQLitePCLRaw.batteries_v2">
+      <HintPath>..\..\working\SQLitePCLRaw.batteries_v2.dll</HintPath>
     </Reference>
+    <Reference Include="SQLiteNetExtensions" />
+    <Reference Include="AsyncClipboardService" />
   </ItemGroup>
 </Project>

@@ -18,18 +18,22 @@ namespace MysticCrafting.Module.Discovery.Loading
 		private FlowPanel _panel;
 
 		public LoadingStatusDetailedView(IEnumerable<IRecurringService> services)
+			: this()
 		{
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 			_recurringServices = services;
 			foreach (IRecurringService service in services)
 			{
-				ServiceControls.Add(new LoadingStatusTooltipControl
+				List<LoadingStatusTooltipControl> serviceControls = ServiceControls;
+				LoadingStatusTooltipControl obj = new LoadingStatusTooltipControl
 				{
-					Loading = service.Loading,
-					Size = new Point(170, 40),
-					Name = service.Name,
-					LastLoaded = service.LastLoaded,
-					LastFailed = service.LastFailed
-				});
+					Loading = service.Loading
+				};
+				((Control)obj).set_Size(new Point(170, 40));
+				obj.Name = service.Name;
+				obj.LastLoaded = service.LastLoaded;
+				obj.LastFailed = service.LastFailed;
+				serviceControls.Add(obj);
 				service.LoadingStarted += LoadingChanged;
 				service.LoadingFinished += LoadingChanged;
 			}
@@ -37,16 +41,22 @@ namespace MysticCrafting.Module.Discovery.Loading
 
 		protected override void Build(Container buildPanel)
 		{
-			_panel = new FlowPanel
-			{
-				Parent = buildPanel,
-				Width = 170,
-				HeightSizingMode = SizingMode.AutoSize,
-				ControlPadding = new Vector2(0f, 10f)
-			};
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Expected O, but got Unknown
+			FlowPanel val = new FlowPanel();
+			((Control)val).set_Parent(buildPanel);
+			((Control)val).set_Width(170);
+			((Container)val).set_HeightSizingMode((SizingMode)1);
+			val.set_ControlPadding(new Vector2(0f, 10f));
+			_panel = val;
 			foreach (LoadingStatusTooltipControl serviceControl in ServiceControls)
 			{
-				serviceControl.Parent = _panel;
+				((Control)serviceControl).set_Parent((Container)(object)_panel);
 			}
 		}
 

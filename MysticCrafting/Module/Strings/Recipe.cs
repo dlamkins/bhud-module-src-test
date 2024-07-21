@@ -110,6 +110,10 @@ namespace MysticCrafting.Module.Strings
 
 		internal static string WalletLabel => ResourceManager.GetString("WalletLabel", resourceCulture);
 
+		internal static string WalletQuantityReserved => ResourceManager.GetString("WalletQuantityReserved", resourceCulture);
+
+		internal static string WalletQuantityReservedShort => ResourceManager.GetString("WalletQuantityReservedShort", resourceCulture);
+
 		internal Recipe()
 		{
 		}

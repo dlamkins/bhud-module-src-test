@@ -1,12 +1,12 @@
 using System.Collections.Generic;
-using MysticCrafting.Models;
+using Atzie.MysticCrafting.Models.Crafting;
 using MysticCrafting.Module.Services;
 
 namespace MysticCrafting.Module.Models
 {
 	public class SwapItemSource : ItemSource
 	{
-		public IList<MysticRecipe> Recipes { get; set; }
+		public IList<Recipe> Recipes { get; set; }
 
 		public IList<int> SwappableItemIds { get; set; }
 

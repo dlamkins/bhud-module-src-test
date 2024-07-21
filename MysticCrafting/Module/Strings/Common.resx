@@ -38,8 +38,10 @@
   <data name="ToggleWindow"><value>Toggle window</value></data>
   <data name="HideLockedSkins"><value>Hide locked skins</value></data>
   <data name="HideMaxCollectedItems"><value>Hide max collected items</value></data>
+  <data name="Dismiss"><value>Dismiss</value></data>
   <data name="LoadingPlayerItems"><value>Player Items</value></data>
   <data name="LoadingWallet"><value>Wallet</value></data>
+  <data name="VersionClick"><value>Click to view update window</value></data>
   <data name="MoreFilters"><value>More filters</value></data>
   <data name="LastLoaded"><value>Last loaded</value></data>
   <data name="LoadingTradingPost"><value>Trading Post</value></data>

@@ -1,35 +1,44 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JsonFlatFileDataStore;
-using MysticCrafting.Models.Commerce;
+using Atzie.MysticCrafting.Models.Currencies;
 using MysticCrafting.Module.Services;
+using SQLite;
 
 namespace MysticCrafting.Module.Repositories
 {
-	public class CurrencyRepository : ICurrencyRepository
+	public class CurrencyRepository : ICurrencyRepository, IDisposable
 	{
-		private IDocumentCollection<MysticCurrency> Currencies { get; } = ServiceContainer.Store.GetCollection<MysticCurrency>();
+		private SQLiteConnection Connection { get; set; }
 
-
-		public IList<MysticCurrency> GetCurrencies()
+		public void Initialize(IDataService service)
 		{
-			return Currencies.AsQueryable().ToList();
+			Connection = new SQLiteConnection(service.DatabaseFilePath);
 		}
 
-		public MysticCurrency GetCurrency(int id)
+		public IList<Currency> GetCurrencies()
 		{
-			return Currencies.AsQueryable().FirstOrDefault((MysticCurrency v) => v.GameId == id);
+			return Connection.Table<Currency>().ToList();
 		}
 
-		public MysticCurrency GetCurrency(string name)
+		public Currency GetCurrency(int id)
 		{
-			return Currencies.AsQueryable().FirstOrDefault((MysticCurrency v) => v.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+			return Connection.Find<Currency>(id);
 		}
 
-		public MysticCurrency GetCoinCurrency()
+		public Currency GetCurrency(string name)
 		{
-			return Currencies.AsQueryable().FirstOrDefault((MysticCurrency v) => v.GameId == 1);
+			return Connection.Query<Currency>("SELECT * FROM Currency WHERE Name LIKE '" + name + "' LIMIT 1 COLLATE NOCASE", Array.Empty<object>()).FirstOrDefault();
+		}
+
+		public Currency GetCoinCurrency()
+		{
+			return Connection.Find<Currency>(1);
+		}
+
+		public void Dispose()
+		{
+			Connection.Dispose();
 		}
 	}
 }

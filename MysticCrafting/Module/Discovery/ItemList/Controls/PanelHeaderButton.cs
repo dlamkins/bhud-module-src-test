@@ -17,7 +17,7 @@ namespace MysticCrafting.Module.Discovery.ItemList.Controls
 
 		private AsyncTexture2D ActiveTexture = ServiceContainer.TextureRepository.Textures.PanelHeaderBgActive;
 
-		public BitmapFont TextFont { get; set; } = GameService.Content.DefaultFont18;
+		public BitmapFont TextFont { get; set; } = GameService.Content.get_DefaultFont18();
 
 
 		public string Text { get; set; }
@@ -26,32 +26,49 @@ namespace MysticCrafting.Module.Discovery.ItemList.Controls
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			if (base.MouseOver)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0170: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0199: Unknown result type (might be due to invalid IL or missing references)
+			if (((Control)this).get_MouseOver())
 			{
-				spriteBatch.DrawOnCtrl(this, ActiveTexture, new Rectangle(0, 0, base.Width, base.Height));
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(ActiveTexture), new Rectangle(0, 0, ((Control)this).get_Width(), ((Control)this).get_Height()));
 			}
 			else
 			{
-				spriteBatch.DrawOnCtrl(this, DefaultTexture, new Rectangle(0, 0, base.Width, base.Height));
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(DefaultTexture), new Rectangle(0, 0, ((Control)this).get_Width(), ((Control)this).get_Height()));
 			}
-			spriteBatch.DrawOnCtrl(this, ServiceContainer.TextureRepository.Textures.BackButton, new Rectangle(10, 0, 35, 35));
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(ServiceContainer.TextureRepository.Textures.BackButton), new Rectangle(10, 0, 35, 35));
 			if (!string.IsNullOrWhiteSpace(Text))
 			{
-				spriteBatch.DrawStringOnCtrl(this, Text, TextFont, new Rectangle(60, 0, 150, 35), Color.White, wrap: false, stroke: true);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, Text, TextFont, new Rectangle(60, 0, 150, 35), Color.get_White(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
 			}
 			int xPosition = 60;
 			foreach (string breadcrumb in Breadcrumbs)
 			{
-				spriteBatch.DrawStringOnCtrl(this, breadcrumb, TextFont, new Rectangle(xPosition, 0, 150, 35), Color.White, wrap: false, stroke: true);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, breadcrumb, TextFont, new Rectangle(xPosition, 0, 150, 35), Color.get_White(), false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
 				int textWidth = (int)Math.Ceiling(TextFont.MeasureString(breadcrumb).Width);
 				xPosition += textWidth + 10;
 				if (Breadcrumbs.IndexOf(breadcrumb) + 1 != Breadcrumbs.Count())
 				{
-					spriteBatch.DrawOnCtrl(this, ServiceContainer.TextureRepository.Textures.BreadcrumbArrow, new Rectangle(xPosition, 19, 25, 25), null, Color.White, (float)Math.PI, new Vector2(16f, 16f));
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(ServiceContainer.TextureRepository.Textures.BreadcrumbArrow), new Rectangle(xPosition, 19, 25, 25), (Rectangle?)null, Color.get_White(), (float)Math.PI, new Vector2(16f, 16f), (SpriteEffects)0);
 					xPosition += 15;
 				}
 			}
-			base.PaintBeforeChildren(spriteBatch, bounds);
+			((Container)this).PaintBeforeChildren(spriteBatch, bounds);
+		}
+
+		public PanelHeaderButton()
+			: this()
+		{
 		}
 	}
 }

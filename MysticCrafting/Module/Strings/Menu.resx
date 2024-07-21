@@ -28,12 +28,12 @@
     </xsd:element>
   </xsd:schema>
 <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="Hammers"><value>Hammers</value></data>
+  <data name="Longbows"><value>Longsbows</value></data>
   <data name="Weapons"><value>Weapons</value></data>
   <data name="Warhorns"><value>Warhorns</value></data>
   <data name="Armor Runes"><value>Armor Runes</value></data>
   <data name="Gloves"><value>Gloves</value></data>
   <data name="Scepters"><value>Scepters</value></data>
-  <data name="Longsbows"><value>Longsbows</value></data>
   <data name="Shields"><value>Shields</value></data>
   <data name="Relics"><value>Relics</value></data>
   <data name="Rifles"><value>Rifles</value></data>

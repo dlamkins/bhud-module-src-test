@@ -1,14 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JsonFlatFileDataStore;
-using MysticCrafting.Models;
+using Atzie.MysticCrafting.Models.Items;
+using Blish_HUD;
 using MysticCrafting.Models.Items;
 using MysticCrafting.Module.Services;
+using SQLite;
+using SQLiteNetExtensions.Extensions;
 
 namespace MysticCrafting.Module.Repositories
 {
-	public class ItemRepository : IItemRepository
+	public class ItemRepository : IItemRepository, IDisposable
 	{
 		private List<int> IgnoreIds = new List<int>
 		{
@@ -16,68 +18,74 @@ namespace MysticCrafting.Module.Repositories
 			91196, 91206, 91115, 91178, 91197, 37104
 		};
 
-		private IDocumentCollection<MysticItem> Items { get; } = ServiceContainer.Store.GetCollection<MysticItem>();
+		private SQLiteConnection Connection { get; set; }
 
-
-		public MysticItem GetItem(int itemId)
+		public void Initialize(IDataService service)
 		{
-			return Items.AsQueryable().FirstOrDefault((MysticItem i) => i.GameId == itemId);
+			Connection = new SQLiteConnection(service.DatabaseFilePath);
 		}
 
-		public IList<MysticItem> GetItems()
+		public Item GetItem(int itemId)
 		{
-			return Items.AsQueryable().ToList();
+			return ReadOperations.FindWithChildren<Item>(Connection, (object)itemId, true);
 		}
 
-		public IEnumerable<MysticItem> FilterItems(MysticItemFilter filter)
+		public IList<int> GetItemIds()
 		{
-			IEnumerable<MysticItem> items = Items.AsQueryable();
-			if (filter == null)
-			{
-				return FilterByAvailable(items);
-			}
+			return (from i in Connection.Query<Item>("SELECT Id from Item", Array.Empty<object>())
+				select i.Id).ToList();
+		}
+
+		public IEnumerable<Item> FilterItems(MysticItemFilter filter)
+		{
+			//IL_0179: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0183: Expected I4, but got Unknown
+			List<string> whereClauses = new List<string>();
 			if (filter.IsFavorite)
 			{
-				items = items.Where((MysticItem i) => ServiceContainer.FavoritesRepository.IsFavorite(i.GameId));
+				IList<int> favoriteIds = ServiceContainer.FavoritesRepository.GetAll();
+				whereClauses.Add("Id IN (" + string.Join(",", favoriteIds) + ")");
 			}
-			if (!string.IsNullOrEmpty(filter.Type))
+			if (filter.Type != 0)
 			{
-				items = items.Where((MysticItem i) => !string.IsNullOrEmpty(i.Type) && i.Type.Equals(filter.Type, StringComparison.InvariantCultureIgnoreCase));
+				whereClauses.Add($"Type = {(int)filter.Type}");
 			}
 			if (!string.IsNullOrEmpty(filter.DetailsType))
 			{
-				items = items.Where((MysticItem i) => !string.IsNullOrEmpty(i.DetailsType) && i.DetailsType.Equals(filter.DetailsType, StringComparison.InvariantCultureIgnoreCase));
+				whereClauses.Add("DetailsType = '" + filter.DetailsType + "'");
 			}
-			if (filter.Flags != null && filter.Flags.Any())
+			if (filter.Rarity != 0)
 			{
-				items = items.Where((MysticItem i) => i.Flags != null && i.Flags.Intersect(filter.Flags).Any());
-			}
-			if (!string.IsNullOrEmpty(filter.Rarity))
-			{
-				items = items.Where((MysticItem i) => i.Rarity != null && i.Rarity.Equals(filter.Rarity, StringComparison.InvariantCultureIgnoreCase));
+				whereClauses.Add($"Rarity = {(int)filter.Rarity}");
 			}
 			if (!string.IsNullOrEmpty(filter.NameContainsText))
 			{
-				items = items.Where((MysticItem i) => i.Name != null && i.Name.ToLower().Contains(filter.NameContainsText.ToLower()));
+				whereClauses.Add("UPPER(Item.Name) LIKE '%" + filter.NameContainsText.ToUpper().Replace("'", "''") + "%'");
 			}
 			if (filter.Weight != 0 && !filter.WeightFilterDisabled)
 			{
-				items = items.Where((MysticItem i) => i.WeightClass == filter.Weight);
+				whereClauses.Add($"ArmorWeight = {(int)filter.Weight}");
 			}
 			if (!string.IsNullOrEmpty(filter.LegendaryType) && !filter.WeightFilterDisabled)
 			{
 				string type = filter.LegendaryType.Split(' ')[0];
 				if (!string.IsNullOrEmpty(type))
 				{
-					items = items.Where((MysticItem i) => i.Name.ToLower().StartsWith(type.ToLower()));
+					whereClauses.Add("Item.Name LIKE '" + type + "%'");
 				}
 			}
-			return FilterByAvailable(items);
+			string query = "SELECT DISTINCT * from Item LEFT JOIN (SELECT Recipe.OutputItemId, COUNT(1) AS RecipeCount FROM Recipe WHERE Recipe.IsMysticForgeRecipe = 1 OR Recipe.Name LIKE 'Obsidian%' GROUP BY Recipe.Id) as Recipe ON Recipe.OutputItemId = Item.Id" + $" LEFT JOIN (SELECT Locale, Name, Description, ItemId FROM ItemLocalization) as ItemLocalization ON ItemLocalization.ItemId = Item.Id AND ItemLocalization.Locale = {(int)GameService.Overlay.get_UserLocale().get_Value()}" + " WHERE " + string.Join(" AND ", whereClauses) + " AND RecipeCount > 0 GROUP BY Item.Id";
+			return FilterByAvailable(Connection.Query<Item>(query, Array.Empty<object>())).ToList();
 		}
 
-		private IEnumerable<MysticItem> FilterByAvailable(IEnumerable<MysticItem> items)
+		private IEnumerable<Item> FilterByAvailable(IEnumerable<Item> items)
 		{
-			return items?.Where((MysticItem i) => ServiceContainer.RecipeRepository.GetRecipes(i.GameId).FirstOrDefault((MysticRecipe r) => r.IsMysticForgeRecipe) != null || (i.Rarity.Equals("Legendary", StringComparison.InvariantCultureIgnoreCase) && i.Name.StartsWith("Obsidian") && !IgnoreIds.Contains(i.GameId) && !i.Name.Contains("Mistforged") && !i.Name.Contains("Infusion") && !i.Name.Contains("Infused") && !i.Name.Contains("Attuned") && !i.Name.Contains("Rurik") && !i.Name.Contains("Eingestimmt") && !i.Name.Contains("eingestimmt") && !i.Name.Contains("Infundiert") && !i.Name.Contains("infundiert") && !i.Name.Contains("Nebelgeschmiedeter")));
+			return items?.Where((Item i) => !IgnoreIds.Contains(i.Id) && !i.Name.Contains("Mistforged") && !i.Name.Contains("Infusion") && !i.Name.Contains("Infused") && !i.Name.Contains("Attuned") && !i.Name.Contains("Rurik") && !i.Name.Contains("Eingestimmt") && !i.Name.Contains("eingestimmt") && !i.Name.Contains("Infundiert") && !i.Name.Contains("infundiert") && !i.Name.Contains("Nebelgeschmiedeter"));
+		}
+
+		public void Dispose()
+		{
+			Connection.Dispose();
 		}
 	}
 }

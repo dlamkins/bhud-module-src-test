@@ -64,12 +64,21 @@ namespace MysticCrafting.Module.Services
 			{
 				return texture;
 			}
-			texture = _contentsManager.GetTexture(fileName);
+			texture = AsyncTexture2D.op_Implicit(_contentsManager.GetTexture(fileName));
 			if (texture != null)
 			{
 				_refTextures.AddOrUpdate(fileName, texture, (string key, AsyncTexture2D value) => value = texture);
 			}
 			return texture;
+		}
+
+		public AsyncTexture2D GetVendorIconTexture(string icon)
+		{
+			if (string.IsNullOrEmpty(icon))
+			{
+				return GetRefTexture("VendorIcons/Merchant.png");
+			}
+			return GetRefTexture("VendorIcons/" + icon.Replace("File:", "")) ?? GetRefTexture("VendorIcons/Merchant.png");
 		}
 
 		public void Dispose()

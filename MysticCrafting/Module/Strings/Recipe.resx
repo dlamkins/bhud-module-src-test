@@ -50,6 +50,8 @@
   <data name="Account"><value>Account</value></data>
   <data name="TooltipCollectedItem"><value>I have {0} of this item.</value></data>
   <data name="ContextMenuSellAll"><value>Sell all</value></data>
+  <data name="WalletQuantityReserved"><value>{0} reserved for other purchases</value></data>
+  <data name="WalletQuantityReservedShort"><value>{0} reserved</value></data>
   <data name="RandomItemChance"><value>Random chance to get item from container</value></data>
   <data name="WalletLabel"><value>Available in Wallet</value></data>
   <data name="ContextMenuBuyAll"><value>Buy all</value></data>

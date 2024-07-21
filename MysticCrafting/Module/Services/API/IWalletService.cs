@@ -1,13 +1,13 @@
 using System.Collections.Generic;
-using MysticCrafting.Models.Commerce;
+using Atzie.MysticCrafting.Models.Currencies;
 using MysticCrafting.Module.Services.Recurring;
 
 namespace MysticCrafting.Module.Services.API
 {
 	public interface IWalletService : IRecurringService
 	{
-		IEnumerable<MysticCurrencyQuantity> GetQuantities();
+		IEnumerable<CurrencyQuantity> GetQuantities();
 
-		MysticCurrencyQuantity GetQuantity(int id);
+		CurrencyQuantity GetQuantity(int id);
 	}
 }

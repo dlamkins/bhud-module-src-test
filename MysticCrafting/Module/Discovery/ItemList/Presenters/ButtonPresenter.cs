@@ -1,10 +1,8 @@
 using System;
-using Blish_HUD;
 using Blish_HUD.Controls;
+using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
-using MysticCrafting.Models.Items;
 using MysticCrafting.Module.Discovery.ItemList.Controls;
-using MysticCrafting.Module.Helpers;
 using MysticCrafting.Module.Repositories;
 using MysticCrafting.Module.Services;
 
@@ -12,17 +10,16 @@ namespace MysticCrafting.Module.Discovery.ItemList.Presenters
 {
 	public class ButtonPresenter
 	{
-		public event EventHandler<CheckChangedEvent> SelectChanged;
-
 		public TextureButton BuildFavoriteButton(int itemId, Container parent)
 		{
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
 			bool isFavorite = ServiceContainer.FavoritesRepository.IsFavorite(itemId);
 			TextureButton textureButton = new TextureButton();
-			textureButton.Parent = parent;
+			((Control)textureButton).set_Parent(parent);
 			textureButton.Active = isFavorite;
-			textureButton.Size = new Point(40, 40);
+			((Control)textureButton).set_Size(new Point(40, 40));
 			textureButton.Texture = ServiceContainer.TextureRepository.Textures.HeartDisabled;
-			textureButton.Click += delegate
+			((Control)textureButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				IFavoritesRepository favoritesRepository = ServiceContainer.FavoritesRepository;
 				isFavorite = favoritesRepository.IsFavorite(itemId);
@@ -34,57 +31,7 @@ namespace MysticCrafting.Module.Discovery.ItemList.Presenters
 				{
 					favoritesRepository.RemoveFavorite(itemId);
 				}
-			};
-			return textureButton;
-		}
-
-		public TextureButton BuildWikiButton(int itemId, Container parent)
-		{
-			MysticWikiLink wikiLink = ServiceContainer.WikiLinkRepository.GetLink(itemId);
-			if (wikiLink != null)
-			{
-				TextureButton textureButton = new TextureButton();
-				textureButton.Texture = ServiceContainer.TextureRepository.GetRefTexture("wiki-new.png");
-				textureButton.Size = new Point(30, 30);
-				textureButton.Padding = new Thickness(2f, 0f);
-				textureButton.Parent = parent;
-				textureButton.HasActiveState = false;
-				textureButton.Click += delegate
-				{
-					LinkHelper.OpenWiki(wikiLink);
-				};
-				return textureButton;
-			}
-			return null;
-		}
-
-		public TextureButton BuildGw2BLTCButton(int itemId, Container parent)
-		{
-			TextureButton textureButton = new TextureButton();
-			textureButton.Texture = ServiceContainer.TextureRepository.Textures.BltcIcon;
-			textureButton.Size = new Point(25, 25);
-			textureButton.Padding = new Thickness(6f, 0f);
-			textureButton.Parent = parent;
-			textureButton.HasActiveState = false;
-			textureButton.Click += delegate
-			{
-				LinkHelper.OpenGw2Bltc(itemId);
-			};
-			return textureButton;
-		}
-
-		public TextureButton BuildCopyChatLinkButton(string chatLink, Container parent)
-		{
-			TextureButton textureButton = new TextureButton();
-			textureButton.Texture = ServiceContainer.TextureRepository.GetRefTexture("link.png");
-			textureButton.Size = new Point(25, 25);
-			textureButton.Padding = new Thickness(6f, 0f);
-			textureButton.Parent = parent;
-			textureButton.HasActiveState = false;
-			textureButton.Click += delegate
-			{
-				_ = ClipboardUtil.WindowsClipboardService.SetTextAsync(chatLink).Result;
-			};
+			});
 			return textureButton;
 		}
 	}

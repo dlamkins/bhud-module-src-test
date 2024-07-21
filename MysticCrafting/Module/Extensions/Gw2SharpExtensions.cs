@@ -9,7 +9,9 @@ namespace MysticCrafting.Module.Extensions
 	{
 		public static IEnumerable<ItemAmount> SelectItemAmounts(this IReadOnlyList<CharacterInventoryBag> bags)
 		{
-			return bags.Where((CharacterInventoryBag b) => b?.Inventory != null).SelectMany((CharacterInventoryBag b) => b.Inventory.Where((AccountItem i) => i != null).Select(ItemAmount.From).ToList());
+			return bags.Where((CharacterInventoryBag b) => ((b != null) ? b.get_Inventory() : null) != null).SelectMany((CharacterInventoryBag b) => (from i in b.get_Inventory()
+				where i != null
+				select i).Select(ItemAmount.From).ToList());
 		}
 
 		public static int GetItemCountSum(this IList<ItemAmount> itemAmounts, int itemId)

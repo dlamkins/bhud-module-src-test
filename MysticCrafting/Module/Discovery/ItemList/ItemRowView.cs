@@ -1,18 +1,19 @@
 using System;
+using Atzie.MysticCrafting.Models.Items;
 using Blish_HUD;
+using Blish_HUD.Common.UI.Views;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
-using MysticCrafting.Models.Items;
 using MysticCrafting.Module.Discovery.ItemList.Controls;
 using MysticCrafting.Module.Discovery.ItemList.Presenters;
 using MysticCrafting.Module.Extensions;
 using MysticCrafting.Module.Helpers;
-using MysticCrafting.Module.Recipe.TreeView.Controls;
-using MysticCrafting.Module.Recipe.TreeView.Tooltips;
+using MysticCrafting.Module.RecipeTree.TreeView.Controls;
+using MysticCrafting.Module.RecipeTree.TreeView.Tooltips;
 using MysticCrafting.Module.Services;
 using MysticCrafting.Module.Strings;
 
@@ -22,13 +23,14 @@ namespace MysticCrafting.Module.Discovery.ItemList
 	{
 		public EventHandler<MouseEventArgs> OnClick;
 
-		private MysticItem Item { get; set; }
+		private Item Item { get; set; }
 
 		private bool DisplayDetailsType { get; set; }
 
 		public CommercePrices Prices { get; set; }
 
-		public ItemRowView(MysticItem item, bool displayDetailsType = false)
+		public ItemRowView(Item item, bool displayDetailsType = false)
+			: this()
 		{
 			Item = item;
 			DisplayDetailsType = displayDetailsType;
@@ -36,98 +38,141 @@ namespace MysticCrafting.Module.Discovery.ItemList
 
 		protected override void Build(Container buildPanel)
 		{
+			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0204: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0237: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0246: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0292: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0297: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0337: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0343: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0369: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0373: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0383: Unknown result type (might be due to invalid IL or missing references)
+			//IL_039a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e6: Unknown result type (might be due to invalid IL or missing references)
 			if (Item == null)
 			{
 				return;
 			}
-			ItemButton detailsButton = new ItemButton
-			{
-				Parent = buildPanel,
-				Text = Item.LocalizedName().Truncate(35),
-				Rarity = Item.Rarity,
-				Type = LocalizationHelper.TranslateMenuItem(Item.DetailsType),
-				Item = Item,
-				Size = new Point(344, 60)
-			};
+			ItemButton itemButton = new ItemButton();
+			((Control)itemButton).set_Parent(buildPanel);
+			itemButton.Text = Item.LocalizedName().Truncate(35);
+			itemButton.Rarity = Item.Rarity.ToString();
+			itemButton.Type = LocalizationHelper.TranslateMenuItem(Item.DetailsType);
+			itemButton.Item = Item;
+			((Control)itemButton).set_Size(new Point(344, 60));
+			ItemButton detailsButton = itemButton;
 			AsyncTexture2D iconTexture = ServiceContainer.TextureRepository.GetTexture(Item.Icon);
 			if (iconTexture != null)
 			{
 				try
 				{
-					new Image(iconTexture)
-					{
-						Parent = buildPanel,
-						Location = new Point(3, 4),
-						Size = new Point(52, 52),
-						Tooltip = new DisposableTooltip(new ItemTooltipView(Item, 0))
-					};
+					Image val = new Image(iconTexture);
+					((Control)val).set_Parent(buildPanel);
+					((Control)val).set_Location(new Point(3, 4));
+					((Control)val).set_Size(new Point(52, 52));
+					((Control)val).set_Tooltip((Tooltip)(object)new DisposableTooltip((ITooltipView)(object)new ItemTooltipView(Item, 0)));
 				}
 				catch (Exception)
 				{
 				}
 			}
-			if (Item.WeightClass != 0)
+			if (Item.ArmorWeight != 0)
 			{
-				new Label
-				{
-					Parent = buildPanel,
-					AutoSizeWidth = true,
-					Location = new Point(buildPanel.Size.X - 300, buildPanel.Size.Y / 2 - 10),
-					Text = Item.WeightClass.ToString()
-				};
+				Label val2 = new Label();
+				((Control)val2).set_Parent(buildPanel);
+				val2.set_AutoSizeWidth(true);
+				((Control)val2).set_Location(new Point(((Control)buildPanel).get_Size().X - 300, ((Control)buildPanel).get_Size().Y / 2 - 10));
+				val2.set_Text(Item.ArmorWeight.ToString());
 			}
 			if (DisplayDetailsType)
 			{
-				new Label
-				{
-					Parent = buildPanel,
-					AutoSizeWidth = true,
-					Location = new Point(buildPanel.Size.X - 450, buildPanel.Size.Y / 2 - 10),
-					Text = Item.DetailsType
-				};
+				Label val3 = new Label();
+				((Control)val3).set_Parent(buildPanel);
+				val3.set_AutoSizeWidth(true);
+				((Control)val3).set_Location(new Point(((Control)buildPanel).get_Size().X - 450, ((Control)buildPanel).get_Size().Y / 2 - 10));
+				val3.set_Text(Item.DetailsType);
 			}
-			if (Item.HasSkin() && Item.DefaultSkin.HasValue)
+			if (Item.HasSkin())
 			{
-				bool skinUnlocked = ServiceContainer.PlayerUnlocksService.ItemUnlocked(Item.DefaultSkin.GetValueOrDefault());
-				new Image(skinUnlocked ? ServiceContainer.TextureRepository.Textures.Checkmark : ServiceContainer.TextureRepository.Textures.Lock)
-				{
-					Parent = buildPanel,
-					Location = new Point(buildPanel.Size.X - 190, buildPanel.Size.Y / 2 - 20),
-					Size = new Point(40, 40),
-					BasicTooltipText = (skinUnlocked ? Common.SkinUnlocked : Common.SkinLocked)
-				};
+				_ = Item.DefaultSkin;
+				bool skinUnlocked = ServiceContainer.PlayerUnlocksService.ItemUnlocked(Item.DefaultSkin);
+				Image val4 = new Image(skinUnlocked ? ServiceContainer.TextureRepository.Textures.Checkmark : ServiceContainer.TextureRepository.Textures.Lock);
+				((Control)val4).set_Parent(buildPanel);
+				((Control)val4).set_Location(new Point(((Control)buildPanel).get_Size().X - 190, ((Control)buildPanel).get_Size().Y / 2 - 20));
+				((Control)val4).set_Size(new Point(40, 40));
+				((Control)val4).set_BasicTooltipText(skinUnlocked ? Common.SkinUnlocked : Common.SkinLocked);
 			}
-			if (Item.RarityEnum == MysticItemRarity.Legendary)
+			if (Item.Rarity == ItemRarity.Legendary)
 			{
-				int unlockedCount2 = ServiceContainer.PlayerUnlocksService.LegendaryUnlockedCount(Item.GameId);
+				int unlockedCount2 = ServiceContainer.PlayerUnlocksService.LegendaryUnlockedCount(Item.Id);
 				int? maxCount = Item.GetMaxCount();
-				new Label
-				{
-					Parent = buildPanel,
-					AutoSizeWidth = true,
-					Location = new Point(buildPanel.Size.X - 110, buildPanel.Size.Y / 2 - 10),
-					Font = GameService.Content.DefaultFont14,
-					Text = $"{unlockedCount2}/{maxCount}",
-					BasicTooltipText = string.Format(MysticCrafting.Module.Strings.Recipe.TooltipUnlockedItem, unlockedCount2, maxCount)
-				};
+				Label val5 = new Label();
+				((Control)val5).set_Parent(buildPanel);
+				val5.set_AutoSizeWidth(true);
+				((Control)val5).set_Location(new Point(((Control)buildPanel).get_Size().X - 110, ((Control)buildPanel).get_Size().Y / 2 - 10));
+				val5.set_Font(GameService.Content.get_DefaultFont14());
+				val5.set_Text($"{unlockedCount2}/{maxCount}");
+				((Control)val5).set_BasicTooltipText(string.Format(Recipe.TooltipUnlockedItem, unlockedCount2, maxCount));
 			}
 			else
 			{
-				int unlockedCount = ServiceContainer.PlayerItemService.GetItemCount(Item.GameId);
-				new Label
-				{
-					Parent = buildPanel,
-					AutoSizeWidth = true,
-					Location = new Point(buildPanel.Size.X - 110, buildPanel.Size.Y / 2 - 10),
-					Font = GameService.Content.DefaultFont14,
-					Text = $"{unlockedCount}",
-					BasicTooltipText = string.Format(MysticCrafting.Module.Strings.Recipe.TooltipCollectedItem, unlockedCount)
-				};
+				int unlockedCount = ServiceContainer.PlayerItemService.GetItemCount(Item.Id);
+				Label val6 = new Label();
+				((Control)val6).set_Parent(buildPanel);
+				val6.set_AutoSizeWidth(true);
+				((Control)val6).set_Location(new Point(((Control)buildPanel).get_Size().X - 110, ((Control)buildPanel).get_Size().Y / 2 - 10));
+				val6.set_Font(GameService.Content.get_DefaultFont14());
+				val6.set_Text($"{unlockedCount}");
+				((Control)val6).set_BasicTooltipText(string.Format(Recipe.TooltipCollectedItem, unlockedCount));
 			}
-			new ButtonPresenter().BuildFavoriteButton(Item.GameId, buildPanel).Location = new Point(buildPanel.Size.X - 60, buildPanel.Size.Y / 2 - 20);
+			((Control)new ButtonPresenter().BuildFavoriteButton(Item.Id, buildPanel)).set_Location(new Point(((Control)buildPanel).get_Size().X - 60, ((Control)buildPanel).get_Size().Y / 2 - 20));
 			if (OnClick != null)
 			{
-				detailsButton.Click += OnClick;
+				((Control)detailsButton).add_Click(OnClick);
 			}
 		}
 	}

@@ -1,10 +1,14 @@
+using System;
 using System.Collections.Generic;
-using MysticCrafting.Models;
+using Atzie.MysticCrafting.Models.Crafting;
+using MysticCrafting.Module.Services;
 
 namespace MysticCrafting.Module.Repositories
 {
-	public interface IRecipeRepository
+	public interface IRecipeRepository : IDisposable
 	{
-		IEnumerable<MysticRecipe> GetRecipes(int itemId);
+		void Initialize(IDataService service);
+
+		IList<Recipe> GetRecipes(int itemId);
 	}
 }

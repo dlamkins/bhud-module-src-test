@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection;
+using System.Security.Cryptography;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Modules.Managers;
@@ -19,17 +22,11 @@ namespace MysticCrafting.Module.Services
 
 		private const string VersionFileName = "version.txt";
 
-		private const string VersionDataFileName = "data_version_1.2.0.txt";
-
-		public static string DataFileName = "data_1.2.0.json";
+		public static string DatabaseFileName = "data.db";
 
 		private string _remoteVersion;
 
-		private string _remoteDataVersion;
-
 		private string _localVersion;
-
-		private string _localDataVersion;
 
 		private const string BaseRemoteUrl = "https://bhm.blishhud.com/MysticCrafting.Module/Data/";
 
@@ -37,11 +34,11 @@ namespace MysticCrafting.Module.Services
 
 		private IList<IRepository> _repositoryList = new List<IRepository>();
 
-		private JsonSerializerOptions _serializerOptions = new JsonSerializerOptions
-		{
-			PropertyNamingPolicy = null,
-			PropertyNameCaseInsensitive = true
-		};
+		public static JsonSerializerOptions _serializerOptions;
+
+		public string DatabaseFilePath => GetFilePath(DatabaseFileName);
+
+		public string DatabaseFileResourceName => "MysticCrafting.Module.EmbeddedResources." + DatabaseFileName;
 
 		private string BaseDirectory => _directoriesManager.GetFullDirectoryPath("mystic_crafting");
 
@@ -79,7 +76,8 @@ namespace MysticCrafting.Module.Services
 			try
 			{
 				using FileStream createStream = File.Create(filePath);
-				await JsonSerializer.SerializeAsync(createStream, data, _serializerOptions);
+				await JsonSerializer.SerializeAsync<object>((Stream)createStream, data, _serializerOptions, default(CancellationToken));
+				Logger.Info($"File '{fileName}' saved to disk with size {createStream.Length}.");
 			}
 			catch (Exception ex)
 			{
@@ -95,6 +93,7 @@ namespace MysticCrafting.Module.Services
 				using FileStream fileStream = File.Create(filePath);
 				await data.CopyToAsync(fileStream);
 				data.Position = 0L;
+				Logger.Info($"File '{fileName}' has been saved to the disk with size {fileStream.Length}.");
 			}
 			catch (Exception ex)
 			{
@@ -129,7 +128,7 @@ namespace MysticCrafting.Module.Services
 			try
 			{
 				using FileStream data = File.Open(filePath, FileMode.Open);
-				return await JsonSerializer.DeserializeAsync<T>(data, _serializerOptions);
+				return await JsonSerializer.DeserializeAsync<T>((Stream)data, _serializerOptions, default(CancellationToken));
 			}
 			catch (Exception ex)
 			{
@@ -138,18 +137,40 @@ namespace MysticCrafting.Module.Services
 			return await Task.FromResult<T>(null);
 		}
 
-		public async Task DownloadDataFile()
+		public async Task CopyDatabaseResource()
 		{
-			if (!string.IsNullOrEmpty(DataFileName))
+			string databaseFileName = "data.db";
+			if (!NewDatabaseFileAvailable())
 			{
-				bool newVersionAvailable = await NewDataVersionAvailable();
-				if (!File.Exists(GetFilePath(DataFileName)) || newVersionAvailable)
-				{
-					await DownloadFileAsync<object>(DataFileName, storeLocally: true);
-				}
-				await SaveFileAsync("data_version_1.2.0.txt", _remoteDataVersion);
-				_localDataVersion = _remoteDataVersion;
+				return;
 			}
+			using Stream resourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(DatabaseFileResourceName);
+			if (resourceStream == null)
+			{
+				Logger.Error("Could not find embedded resource " + databaseFileName);
+				return;
+			}
+			using FileStream file = new FileStream(GetFilePath(databaseFileName), FileMode.Create, FileAccess.Write);
+			await resourceStream.CopyToAsync(file);
+		}
+
+		private bool NewDatabaseFileAvailable()
+		{
+			if (!File.Exists(DatabaseFilePath))
+			{
+				return true;
+			}
+			using MD5 md5 = MD5.Create();
+			using FileStream stream = File.OpenRead(DatabaseFilePath);
+			using Stream resourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(DatabaseFileResourceName);
+			if (resourceStream == null)
+			{
+				Logger.Error("Could not find embedded resource " + DatabaseFileName);
+				return false;
+			}
+			byte[] first = md5.ComputeHash(stream);
+			byte[] resourceFileHash = md5.ComputeHash(resourceStream);
+			return !first.SequenceEqual(resourceFileHash);
 		}
 
 		public async Task DownloadRepositoryFilesAsync()
@@ -190,7 +211,7 @@ namespace MysticCrafting.Module.Services
 					{
 						return (await response.get_Content().ReadAsStringAsync()) as T;
 					}
-					return await JsonSerializer.DeserializeAsync<T>(input, _serializerOptions);
+					return await JsonSerializer.DeserializeAsync<T>(input, _serializerOptions, default(CancellationToken));
 				}
 				finally
 				{
@@ -219,19 +240,16 @@ namespace MysticCrafting.Module.Services
 			return !_remoteVersion.Equals(_localVersion, StringComparison.InvariantCultureIgnoreCase);
 		}
 
-		public async Task<bool> NewDataVersionAvailable()
+		static DataService()
 		{
-			if (!string.IsNullOrWhiteSpace(_remoteDataVersion) && !string.IsNullOrEmpty(_localDataVersion))
-			{
-				return await Task.FromResult(!_remoteDataVersion.Equals(_localDataVersion, StringComparison.InvariantCultureIgnoreCase));
-			}
-			_remoteDataVersion = await DownloadFileAsync<string>("data_version_1.2.0.txt", storeLocally: false);
-			_localDataVersion = await LoadFromFileAsync<string>("data_version_1.2.0.txt");
-			if (string.IsNullOrEmpty(_remoteDataVersion))
-			{
-				return await Task.FromResult(result: false);
-			}
-			return !_remoteDataVersion.Equals(_localDataVersion, StringComparison.InvariantCultureIgnoreCase);
+			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Expected O, but got Unknown
+			JsonSerializerOptions val = new JsonSerializerOptions();
+			val.set_PropertyNamingPolicy((JsonNamingPolicy)null);
+			val.set_PropertyNameCaseInsensitive(true);
+			_serializerOptions = val;
 		}
 	}
 }

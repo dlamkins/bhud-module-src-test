@@ -34,10 +34,9 @@ namespace MysticCrafting.Module.Discovery
 				{
 					item.Filters = new MysticItemFilter();
 				}
-				CategoryMenuItem menuItem = new CategoryMenuItem(LocalizationHelper.TranslateMenuItem(item.Name), item.Filters)
-				{
-					Parent = parent
-				};
+				CategoryMenuItem categoryMenuItem = new CategoryMenuItem(LocalizationHelper.TranslateMenuItem(item.Name), item.Filters);
+				((Control)categoryMenuItem).set_Parent(parent);
+				CategoryMenuItem menuItem = categoryMenuItem;
 				if (item.Icon.HasValue && item.Icon != 0)
 				{
 					menuItem.Icon = AsyncTexture2D.FromAssetId(item.Icon.Value);
@@ -49,7 +48,7 @@ namespace MysticCrafting.Module.Discovery
 				categoryMenuItems.Add(menuItem);
 				if (item.Children != null && item.Children.Any())
 				{
-					GetMenuItemsRecursively(item.Children.ToList(), menuItem);
+					GetMenuItemsRecursively(item.Children.ToList(), (Container)(object)menuItem);
 				}
 			}
 			return categoryMenuItems;

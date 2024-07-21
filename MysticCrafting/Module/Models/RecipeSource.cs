@@ -1,6 +1,6 @@
 using System.Linq;
+using Atzie.MysticCrafting.Models.Crafting;
 using Blish_HUD.Content;
-using MysticCrafting.Models;
 using MysticCrafting.Module.Helpers;
 using MysticCrafting.Module.Services;
 
@@ -8,7 +8,7 @@ namespace MysticCrafting.Module.Models
 {
 	public class RecipeSource : ItemSource
 	{
-		public MysticRecipe Recipe { get; set; }
+		public Recipe Recipe { get; set; }
 
 		public override AsyncTexture2D Icon
 		{

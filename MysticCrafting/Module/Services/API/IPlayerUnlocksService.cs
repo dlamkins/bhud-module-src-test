@@ -1,11 +1,11 @@
-using MysticCrafting.Models;
+using Atzie.MysticCrafting.Models.Crafting;
 using MysticCrafting.Module.Services.Recurring;
 
 namespace MysticCrafting.Module.Services.API
 {
 	public interface IPlayerUnlocksService : IRecurringService
 	{
-		bool RecipeUnlocked(MysticRecipe recipe);
+		bool RecipeUnlocked(Recipe recipe);
 
 		bool RecipeUnlocked(int itemId);
 

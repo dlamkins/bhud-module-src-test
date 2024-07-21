@@ -1,14 +1,19 @@
+using System;
 using System.Collections.Generic;
+using Atzie.MysticCrafting.Models.Items;
 using MysticCrafting.Models.Items;
+using MysticCrafting.Module.Services;
 
 namespace MysticCrafting.Module.Repositories
 {
-	public interface IItemRepository
+	public interface IItemRepository : IDisposable
 	{
-		MysticItem GetItem(int itemId);
+		void Initialize(IDataService service);
 
-		IList<MysticItem> GetItems();
+		Item GetItem(int itemId);
 
-		IEnumerable<MysticItem> FilterItems(MysticItemFilter filter);
+		IList<int> GetItemIds();
+
+		IEnumerable<Item> FilterItems(MysticItemFilter filter);
 	}
 }

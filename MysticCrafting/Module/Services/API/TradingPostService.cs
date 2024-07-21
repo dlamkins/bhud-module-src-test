@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD.Modules.Managers;
 using Gw2Sharp.WebApi.V2;
+using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
-using MysticCrafting.Models.Items;
 using MysticCrafting.Models.TradingPost;
 using MysticCrafting.Module.Repositories;
 using MysticCrafting.Module.Services.Recurring;
@@ -37,16 +38,18 @@ namespace MysticCrafting.Module.Services.API
 
 		public override async Task<string> LoadAsync()
 		{
-			List<int> itemIds2 = _itemRepository.GetItems()?.Select((MysticItem i) => i.GameId)?.ToList();
+			IList<int> itemIds2 = _itemRepository.GetItemIds();
 			if (_gw2ApiManager == null || itemIds2 == null || !itemIds2.Any())
 			{
 				throw new Exception("No items were found in the ItemRepository.");
 			}
-			if (_gw2ApiManager.HasPermission(TokenPermission.Tradingpost))
+			if (_gw2ApiManager.HasPermission((TokenPermission)8))
 			{
-				IApiV2ObjectList<int> allItemIds = await _gw2ApiManager.Gw2ApiClient.V2.Commerce.Prices.IdsAsync();
-				itemIds2 = itemIds2.Where((int id) => allItemIds.Contains(id)).ToList();
-				ItemPrices = (await _gw2ApiManager.Gw2ApiClient.V2.Commerce.Prices.ManyAsync(itemIds2)).Select(TradingPostItemPrices.From).ToList();
+				IApiV2ObjectList<int> allItemIds = await ((IBulkExpandableClient<CommercePrices, int>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Commerce()
+					.get_Prices()).IdsAsync(default(CancellationToken));
+				itemIds2 = itemIds2.Where((int id) => ((IEnumerable<int>)allItemIds).Contains(id)).ToList();
+				ItemPrices = (await ((IBulkExpandableClient<CommercePrices, int>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Commerce()
+					.get_Prices()).ManyAsync((IEnumerable<int>)itemIds2, default(CancellationToken))).Select(TradingPostItemPrices.From).ToList();
 				return $"{ItemPrices.Count} prices loaded";
 			}
 			throw new Exception("One or more of the required permissions are missing: Tradingpost.");

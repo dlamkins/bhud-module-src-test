@@ -78,7 +78,7 @@ namespace MysticCrafting.Module.Strings
 
 		internal static string Leggings => ResourceManager.GetString("Leggings", resourceCulture);
 
-		internal static string Longsbows => ResourceManager.GetString("Longsbows", resourceCulture);
+		internal static string Longbows => ResourceManager.GetString("Longbows", resourceCulture);
 
 		internal static string Maces => ResourceManager.GetString("Maces", resourceCulture);
 

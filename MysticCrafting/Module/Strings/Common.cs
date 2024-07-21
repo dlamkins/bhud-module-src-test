@@ -42,6 +42,8 @@ namespace MysticCrafting.Module.Strings
 			}
 		}
 
+		internal static string Dismiss => ResourceManager.GetString("Dismiss", resourceCulture);
+
 		internal static string FavoritesEmpty => ResourceManager.GetString("FavoritesEmpty", resourceCulture);
 
 		internal static string HideLockedSkins => ResourceManager.GetString("HideLockedSkins", resourceCulture);
@@ -77,6 +79,8 @@ namespace MysticCrafting.Module.Strings
 		internal static string ToggleWindow => ResourceManager.GetString("ToggleWindow", resourceCulture);
 
 		internal static string TradingPostDefault => ResourceManager.GetString("TradingPostDefault", resourceCulture);
+
+		internal static string VersionClick => ResourceManager.GetString("VersionClick", resourceCulture);
 
 		internal Common()
 		{

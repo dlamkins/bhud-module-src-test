@@ -12,5 +12,7 @@ namespace MysticCrafting.Module.Services
 		AsyncTexture2D GetTexture(string url);
 
 		AsyncTexture2D GetRefTexture(string fileName);
+
+		AsyncTexture2D GetVendorIconTexture(string icon);
 	}
 }
