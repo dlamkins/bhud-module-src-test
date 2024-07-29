@@ -32,19 +32,7 @@ namespace BhModule.Community.Pathing
 
 		private CornerIcon _pathingIcon;
 
-		private TabbedWindow2 _settingsWindow;
-
 		private bool _packsLoading;
-
-		private Tab _packSettingsTab;
-
-		private Tab _mapSettingsTab;
-
-		private Tab _keybindSettingsTab;
-
-		private Tab _scriptSettingsTab;
-
-		private Tab _markerRepoTab;
 
 		private ConsoleWindow _scriptConsoleWindow;
 
@@ -62,9 +50,21 @@ namespace BhModule.Community.Pathing
 
 		public ModuleSettings Settings { get; private set; }
 
+		public TabbedWindow2 SettingsWindow { get; private set; }
+
 		public PackInitiator PackInitiator { get; private set; }
 
 		public BhModule.Community.Pathing.MarkerPackRepo.MarkerPackRepo MarkerPackRepo { get; private set; }
+
+		public Tab PackSettingsTab { get; private set; }
+
+		public Tab MapSettingsTab { get; private set; }
+
+		public Tab KeybindSettingsTab { get; private set; }
+
+		public Tab ScriptSettingsTab { get; private set; }
+
+		public Tab MarkerRepoTab { get; private set; }
 
 		[ImportingConstructor]
 		public PathingModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
@@ -75,7 +75,7 @@ namespace BhModule.Community.Pathing
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			Settings = new ModuleSettings(settings);
+			Settings = new ModuleSettings(this, settings);
 		}
 
 		private IEnumerable<ContextMenuStripItem> GetPathingMenuItems()
@@ -88,40 +88,31 @@ namespace BhModule.Community.Pathing
 					yield return menuItem;
 				}
 			}
-			ContextMenuStripItem val = new ContextMenuStripItem();
-			val.set_Text("Download Marker Packs");
-			ContextMenuStripItem downloadMarkers = val;
-			((Control)downloadMarkers).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
-				_settingsWindow.set_SelectedTab(_markerRepoTab);
-				((Control)_settingsWindow).Show();
-			});
-			yield return downloadMarkers;
 			if (Settings.ScriptsConsoleEnabled.get_Value() || ((Enum)GameService.Input.get_Keyboard().get_ActiveModifiers()).HasFlag((Enum)(object)(ModifierKeys)4))
 			{
-				ContextMenuStripItem val2 = new ContextMenuStripItem();
-				val2.set_Text("Script Console");
-				ContextMenuStripItem scriptConsole = val2;
+				ContextMenuStripItem val = new ContextMenuStripItem();
+				val.set_Text("Script Console");
+				ContextMenuStripItem scriptConsole = val;
 				((Control)scriptConsole).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
 					ShowScriptWindow();
 				});
 				yield return scriptConsole;
 			}
-			ContextMenuStripItem val3 = new ContextMenuStripItem();
-			val3.set_Text("Pathing Module Settings");
-			ContextMenuStripItem openSettings = val3;
+			ContextMenuStripItem val2 = new ContextMenuStripItem();
+			val2.set_Text("Pathing Module Settings");
+			ContextMenuStripItem openSettings = val2;
 			((Control)openSettings).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				if (_settingsWindow.get_SelectedTab() == _markerRepoTab)
+				if (SettingsWindow.get_SelectedTab() == MarkerRepoTab)
 				{
-					_settingsWindow.set_SelectedTab(_packSettingsTab);
-					if (((Control)_settingsWindow).get_Visible())
+					SettingsWindow.set_SelectedTab(PackSettingsTab);
+					if (((Control)SettingsWindow).get_Visible())
 					{
 						return;
 					}
 				}
-				((WindowBase2)_settingsWindow).ToggleWindow();
+				((WindowBase2)SettingsWindow).ToggleWindow();
 			});
 			yield return openSettings;
 		}
@@ -176,17 +167,17 @@ namespace BhModule.Community.Pathing
 			((WindowBase2)val2).set_Emblem(ContentsManager.GetTexture("png\\controls\\1615829.png"));
 			((WindowBase2)val2).set_Id(((Module)this).get_Namespace() + "_SettingsWindow");
 			((WindowBase2)val2).set_SavesPosition(true);
-			_settingsWindow = val2;
-			_packSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156740+155150.png")), (Func<IView>)(() => (IView)new SettingsView(Settings.PackSettings, -1)), Strings.Window_MainSettingsTab, (int?)null);
-			_mapSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\157123+155150.png")), (Func<IView>)(() => (IView)new SettingsView(Settings.MapSettings, -1)), Strings.Window_MapSettingsTab, (int?)null);
-			_scriptSettingsTab = new Tab(AsyncTexture2D.FromAssetId(156701), (Func<IView>)(() => (IView)new SettingsView(Settings.ScriptSettings, -1)), "Script Options", (int?)null);
-			_keybindSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156734+155150.png")), (Func<IView>)(() => (IView)new SettingsView(Settings.KeyBindSettings, -1)), Strings.Window_KeyBindSettingsTab, (int?)null);
-			_markerRepoTab = new Tab(AsyncTexture2D.FromAssetId(156909), (Func<IView>)(() => (IView)(object)new PackRepoView(this)), Strings.Window_DownloadMarkerPacks, (int?)null);
-			_settingsWindow.get_Tabs().Add(_packSettingsTab);
-			_settingsWindow.get_Tabs().Add(_mapSettingsTab);
-			_settingsWindow.get_Tabs().Add(_scriptSettingsTab);
-			_settingsWindow.get_Tabs().Add(_keybindSettingsTab);
-			_settingsWindow.get_Tabs().Add(_markerRepoTab);
+			SettingsWindow = val2;
+			PackSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156740+155150.png")), (Func<IView>)(() => (IView)new SettingsView(Settings.PackSettings, -1)), Strings.Window_MainSettingsTab, (int?)null);
+			MapSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\157123+155150.png")), (Func<IView>)(() => (IView)new SettingsView(Settings.MapSettings, -1)), Strings.Window_MapSettingsTab, (int?)null);
+			ScriptSettingsTab = new Tab(AsyncTexture2D.FromAssetId(156701), (Func<IView>)(() => (IView)new SettingsView(Settings.ScriptSettings, -1)), "Script Options", (int?)null);
+			KeybindSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156734+155150.png")), (Func<IView>)(() => (IView)new SettingsView(Settings.KeyBindSettings, -1)), Strings.Window_KeyBindSettingsTab, (int?)null);
+			MarkerRepoTab = new Tab(AsyncTexture2D.FromAssetId(156909), (Func<IView>)(() => (IView)(object)new PackRepoView(this)), Strings.Window_DownloadMarkerPacks, (int?)null);
+			SettingsWindow.get_Tabs().Add(PackSettingsTab);
+			SettingsWindow.get_Tabs().Add(MapSettingsTab);
+			SettingsWindow.get_Tabs().Add(ScriptSettingsTab);
+			SettingsWindow.get_Tabs().Add(KeybindSettingsTab);
+			SettingsWindow.get_Tabs().Add(MarkerRepoTab);
 			((Control)_pathingIcon).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				//IL_000a: Unknown result type (might be due to invalid IL or missing references)
@@ -194,16 +185,16 @@ namespace BhModule.Community.Pathing
 				{
 					Settings.GlobalPathablesEnabled.set_Value(!Settings.GlobalPathablesEnabled.get_Value());
 				}
-				else
+				else if (((Control)_pathingIcon).get_Enabled())
 				{
-					ShowPathingContextMenu();
+					TogglePathingContextMenu();
 				}
 			});
 			((Control)_pathingIcon).add_RightMouseButtonPressed((EventHandler<MouseEventArgs>)delegate
 			{
 				if (((Control)_pathingIcon).get_Enabled())
 				{
-					ShowPathingContextMenu();
+					TogglePathingContextMenu();
 				}
 			});
 		}
@@ -222,7 +213,7 @@ namespace BhModule.Community.Pathing
 			};
 		}
 
-		private void ShowPathingContextMenu()
+		private void TogglePathingContextMenu()
 		{
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
@@ -268,12 +259,12 @@ namespace BhModule.Community.Pathing
 		{
 			return (IView)(object)new SettingsHintView((delegate
 			{
-				_settingsWindow.set_SelectedTab(_packSettingsTab);
-				((Control)_settingsWindow).Show();
+				SettingsWindow.set_SelectedTab(PackSettingsTab);
+				((Control)SettingsWindow).Show();
 			}, delegate
 			{
-				_settingsWindow.set_SelectedTab(_markerRepoTab);
-				((Control)_settingsWindow).Show();
+				SettingsWindow.set_SelectedTab(MarkerRepoTab);
+				((Control)SettingsWindow).Show();
 			}, PackInitiator));
 		}
 
@@ -305,7 +296,7 @@ namespace BhModule.Community.Pathing
 			{
 				((Control)pathingIcon).Dispose();
 			}
-			TabbedWindow2 settingsWindow = _settingsWindow;
+			TabbedWindow2 settingsWindow = SettingsWindow;
 			if (settingsWindow != null)
 			{
 				((Control)settingsWindow).Dispose();

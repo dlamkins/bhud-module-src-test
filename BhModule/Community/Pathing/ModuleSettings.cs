@@ -8,6 +8,8 @@ namespace BhModule.Community.Pathing
 {
 	public class ModuleSettings
 	{
+		private readonly PathingModule _module;
+
 		private const string GLOBAL_SETTINGS = "global-settings";
 
 		private const string PACK_SETTINGS = "pack-settings";
@@ -43,6 +45,8 @@ namespace BhModule.Community.Pathing
 		public SettingEntry<bool> PackAllowMarkersToAutomaticallyHide { get; private set; }
 
 		public SettingEntry<MarkerClipboardConsentLevel> PackMarkerConsentToClipboard { get; private set; }
+
+		public SettingEntry<MarkerInfoDisplayMode> PackInfoDisplayMode { get; private set; }
 
 		public SettingEntry<bool> PackAllowInfoText { get; private set; }
 
@@ -98,8 +102,11 @@ namespace BhModule.Community.Pathing
 
 		public SettingEntry<KeyBinding> KeyBindToggleMapPathables { get; private set; }
 
-		public ModuleSettings(SettingCollection settings)
+		public SettingEntry<KeyBinding> KeyBindReloadMarkerPacks { get; private set; }
+
+		public ModuleSettings(PathingModule module, SettingCollection settings)
 		{
+			_module = module;
 			InitGlobalSettings(settings);
 			InitPackSettings(settings);
 			InitMapSettings(settings);
@@ -126,7 +133,7 @@ namespace BhModule.Community.Pathing
 			PackFadeMarkersBetweenCharacterAndCamera = PackSettings.DefineSetting<bool>("PackFadeMarkersBetweenCharacterAndCamera", true, (Func<string>)(() => Strings.Setting_PackFadeMarkersBetweenCharacterAndCamera), (Func<string>)(() => "If enabled, markers will be drawn with less opacity if they are directly between your character and the camera to avoid obscuring your vision."));
 			PackAllowMarkersToAutomaticallyHide = PackSettings.DefineSetting<bool>("PackAllowMarkersToAutomaticallyHide", true, (Func<string>)(() => Strings.Setting_PackAllowMarkersToAutomaticallyHide), (Func<string>)(() => "If enabled, markers and trails may hide themselves as a result of interactions, API data, current festival, etc.  Disabling this feature forces all markers on the map to be shown."));
 			PackMarkerConsentToClipboard = PackSettings.DefineSetting<MarkerClipboardConsentLevel>("PackMarkerConsentToClipboard", MarkerClipboardConsentLevel.Always, (Func<string>)(() => Strings.Setting_PackMarkerConsentToClipboard), (Func<string>)(() => string.Format(Strings.Setting_PackMarkerConsentToClipboardDescription, KeyBindings.Interact.GetBindingDisplayText())));
-			PackAllowInfoText = PackSettings.DefineSetting<bool>("PackAllowInfoText", true, (Func<string>)(() => "Allow Markers to Show Info Text On-Screen"), (Func<string>)(() => "If enabled, certain markers will be able to show information when your character is nearby to the marker."));
+			PackInfoDisplayMode = PackSettings.DefineSetting<MarkerInfoDisplayMode>("PackInfoDisplayMode", MarkerInfoDisplayMode.Default, (Func<string>)(() => "Marker Info Display Mode"), (Func<string>)(() => "Default - Popups with extra info will show when you are near certain markers.\r\n\r\nWithout Background - Extra info will show when you are near certain markers, but there won't be a background behind the text.\r\n\r\nNever Display - Markers will not show popup info text on your screen."));
 			PackAllowInteractIcon = PackSettings.DefineSetting<bool>("PackAllowInteractIcon", true, (Func<string>)(() => "Allow Markers to Show Interact Gear On-Screen"), (Func<string>)(() => "If enabled, interactable markers will show a small gear icon on-screen to show what the interaction will do."));
 			PackAllowMarkersToAnimate = PackSettings.DefineSetting<bool>("PackAllowMarkersToAnimate", true, (Func<string>)(() => Strings.Setting_PackAllowMarkersToAnimate), (Func<string>)(() => "Allows animations such as 'bounce' and trail movements."));
 			PackEnableSmartCategoryFilter = PackSettings.DefineSetting<bool>("PackEnableSmartCategoryFilter", true, (Func<string>)(() => "Enable Smart Categories"), (Func<string>)(() => "If a category doesn't contain markers or trails relevant to the current map, the category is hidden."));
@@ -175,21 +182,38 @@ namespace BhModule.Community.Pathing
 			//IL_00cb: Expected O, but got Unknown
 			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_012a: Expected O, but got Unknown
+			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0186: Expected O, but got Unknown
 			KeyBindSettings = settings.AddSubCollection("keybind-settings", false);
 			KeyBindTogglePathables = KeyBindSettings.DefineSetting<KeyBinding>("KeyBindTogglePathables", new KeyBinding((ModifierKeys)6, (Keys)220), (Func<string>)(() => "Toggle Markers"), (Func<string>)(() => ""));
 			KeyBindToggleWorldPathables = KeyBindSettings.DefineSetting<KeyBinding>("KeyBindToggleWorldPathables", new KeyBinding((ModifierKeys)6, (Keys)219), (Func<string>)(() => "Toggle Markers in World"), (Func<string>)(() => ""));
 			KeyBindToggleMapPathables = KeyBindSettings.DefineSetting<KeyBinding>("KeyBindToggleMapPathables", new KeyBinding((ModifierKeys)6, (Keys)221), (Func<string>)(() => "Toggle Markers on Map"), (Func<string>)(() => ""));
+			KeyBindReloadMarkerPacks = KeyBindSettings.DefineSetting<KeyBinding>("KeyBindReloadMarkerPacks", new KeyBinding((ModifierKeys)6, (Keys)82), (Func<string>)(() => "Reload Marker Packs"), (Func<string>)(() => ""));
 			HandleInternalKeyBinds();
 		}
 
 		private void HandleInternalKeyBinds()
 		{
+			KeyBindTogglePathables.get_Value().set_BlockSequenceFromGw2(true);
 			KeyBindTogglePathables.get_Value().set_Enabled(true);
+			KeyBindToggleWorldPathables.get_Value().set_BlockSequenceFromGw2(true);
 			KeyBindToggleWorldPathables.get_Value().set_Enabled(true);
+			KeyBindToggleMapPathables.get_Value().set_BlockSequenceFromGw2(true);
 			KeyBindToggleMapPathables.get_Value().set_Enabled(true);
+			KeyBindReloadMarkerPacks.get_Value().set_BlockSequenceFromGw2(true);
+			KeyBindReloadMarkerPacks.get_Value().set_Enabled(true);
 			KeyBindTogglePathables.get_Value().add_Activated((EventHandler<EventArgs>)ToggleGlobalPathablesEnabled);
 			KeyBindToggleWorldPathables.get_Value().add_Activated((EventHandler<EventArgs>)TogglePackWorldPathablesEnabled);
 			KeyBindToggleMapPathables.get_Value().add_Activated((EventHandler<EventArgs>)ToggleMapPathablesEnabled);
+			KeyBindReloadMarkerPacks.get_Value().add_Activated((EventHandler<EventArgs>)ReloadMarkerPacks);
+		}
+
+		private void ReloadMarkerPacks(object sender, EventArgs e)
+		{
+			if (_module.PackInitiator != null)
+			{
+				_module.PackInitiator.ReloadPacks();
+			}
 		}
 
 		private void ToggleGlobalPathablesEnabled(object sender, EventArgs e)
@@ -212,9 +236,11 @@ namespace BhModule.Community.Pathing
 			KeyBindTogglePathables.get_Value().set_Enabled(false);
 			KeyBindToggleWorldPathables.get_Value().set_Enabled(false);
 			KeyBindToggleMapPathables.get_Value().set_Enabled(false);
+			KeyBindReloadMarkerPacks.get_Value().set_Enabled(false);
 			KeyBindTogglePathables.get_Value().remove_Activated((EventHandler<EventArgs>)ToggleGlobalPathablesEnabled);
 			KeyBindToggleWorldPathables.get_Value().remove_Activated((EventHandler<EventArgs>)TogglePackWorldPathablesEnabled);
 			KeyBindToggleMapPathables.get_Value().remove_Activated((EventHandler<EventArgs>)ToggleMapPathablesEnabled);
+			KeyBindReloadMarkerPacks.get_Value().remove_Activated((EventHandler<EventArgs>)ReloadMarkerPacks);
 		}
 	}
 }

@@ -5,6 +5,7 @@ using BhModule.Community.Pathing.Entity;
 using BhModule.Community.Pathing.UI.Controls;
 using Blish_HUD;
 using Blish_HUD.Controls;
+using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
 
 namespace BhModule.Community.Pathing.State
@@ -56,6 +57,7 @@ namespace BhModule.Community.Pathing.State
 		{
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)CurrentMapChanged);
 			GameService.Gw2Mumble.get_UI().add_IsMapOpenChanged((EventHandler<ValueEventArgs<bool>>)MapOpenedChanged);
+			GameService.Input.get_Keyboard().add_KeyReleased((EventHandler<KeyboardEventArgs>)KeyboardKeyReleased);
 			if (Map == null)
 			{
 				FlatMap flatMap = new FlatMap(_rootPackState);
@@ -157,10 +159,22 @@ namespace BhModule.Community.Pathing.State
 			Interact = smallInteract;
 		}
 
+		private void KeyboardKeyReleased(object sender, KeyboardEventArgs e)
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0008: Invalid comparison between Unknown and I4
+			if ((int)e.get_Key() == 27)
+			{
+				_infoList.Clear();
+				UpdateInfoText();
+			}
+		}
+
 		public override Task Unload()
 		{
 			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)CurrentMapChanged);
 			GameService.Gw2Mumble.get_UI().remove_IsMapOpenChanged((EventHandler<ValueEventArgs<bool>>)MapOpenedChanged);
+			GameService.Input.get_Keyboard().remove_KeyReleased((EventHandler<KeyboardEventArgs>)KeyboardKeyReleased);
 			InfoWindow info = _info;
 			if (info != null)
 			{

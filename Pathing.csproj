@@ -20,8 +20,8 @@
     </Reference>
     <Reference Include="MonoGame.Framework" />
     <Reference Include="MonoGame.Extended" />
-    <Reference Include="System.Core" />
     <Reference Include="Blish HUD" />
+    <Reference Include="System.Core" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="Neo.Lua">
       <HintPath>..\..\working\Neo.Lua.dll</HintPath>

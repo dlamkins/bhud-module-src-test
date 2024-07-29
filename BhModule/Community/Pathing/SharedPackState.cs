@@ -169,7 +169,7 @@ namespace BhModule.Community.Pathing
 
 		private async Task InitPointsOfInterest(IEnumerable<PointOfInterest> pointsOfInterest)
 		{
-			PointOfInterest[] pois = pointsOfInterest.ToArray();
+			PointOfInterest[] pois = (pointsOfInterest as PointOfInterest[]) ?? pointsOfInterest.ToArray();
 			PointOfInterest[] array = pois;
 			foreach (PointOfInterest poi in array)
 			{

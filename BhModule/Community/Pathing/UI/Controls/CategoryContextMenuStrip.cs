@@ -82,6 +82,10 @@ namespace BhModule.Community.Pathing.UI.Controls
 			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c4: Expected O, but got Unknown
+			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0108: Expected O, but got Unknown
 			var (subCategories, skipped) = GetSubCategories(_forceShowAll);
 			foreach (PathingCategory subCategory in subCategories)
 			{
@@ -97,6 +101,13 @@ namespace BhModule.Community.Pathing.UI.Controls
 				ContextMenuStripItem showAllSkippedCategories = val;
 				((ContextMenuStrip)this).AddMenuItem(showAllSkippedCategories);
 				((Control)showAllSkippedCategories).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)ShowAllSkippedCategories_LeftMouseButtonReleased);
+			}
+			if (skipped == 0 && !subCategories.Any())
+			{
+				ContextMenuStripItem val2 = new ContextMenuStripItem();
+				val2.set_Text("No marker packs loaded...");
+				((Control)val2).set_Enabled(false);
+				((ContextMenuStrip)this).AddMenuItem(val2);
 			}
 			((ContextMenuStrip)this).OnShown(e);
 			if (((Control)this).get_Bottom() > ((Control)GameService.Graphics.get_SpriteScreen()).get_Bottom())
