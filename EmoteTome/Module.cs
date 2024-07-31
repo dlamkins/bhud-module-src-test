@@ -176,6 +176,8 @@ namespace EmoteTome
 
 		private SettingEntry<bool> _showUnleash;
 
+		private SettingEntry<bool> _showPetalthrow;
+
 		private List<Tuple<SettingEntry<bool>, Emote>> unlockEmoteSettingMap = new List<Tuple<SettingEntry<bool>, Emote>>();
 
 		private SettingEntry<string> _rankEmoteSeparator;
@@ -282,7 +284,8 @@ namespace EmoteTome
 			_showSipcoffee = settings.DefineSetting<bool>("Show Sipcoffee", true, (Func<string>)(() => BadLocalization.SIPCOFFEE[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
 			_showStep = settings.DefineSetting<bool>("Show Step", true, (Func<string>)(() => BadLocalization.STEP[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
 			_showStretch = settings.DefineSetting<bool>("Show Stretch", true, (Func<string>)(() => BadLocalization.STRETCH[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
-			_showUnleash = settings.DefineSetting<bool>("Show Stretch", true, (Func<string>)(() => BadLocalization.UNLEASH[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
+			_showUnleash = settings.DefineSetting<bool>("Show Unleash", true, (Func<string>)(() => BadLocalization.UNLEASH[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
+			_showPetalthrow = settings.DefineSetting<bool>("Show Petalthrow", true, (Func<string>)(() => BadLocalization.PETALTHROW[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
 			_rankEmoteSeparator = settings.DefineSetting<string>("Rank Separator", "", (Func<string>)(() => BadLocalization.RANKPANELTITLE[language]), (Func<string>)(() => ""));
 			_showYourRank = settings.DefineSetting<bool>("Show Your Rank", true, (Func<string>)(() => BadLocalization.YOURRANK[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
 			_showRankRabbit = settings.DefineSetting<bool>("Show Rank Rabbit", true, (Func<string>)(() => BadLocalization.RABBIT[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
@@ -629,6 +632,7 @@ namespace EmoteTome
 			unlockSettingList.Add(_showStep);
 			unlockSettingList.Add(_showStretch);
 			unlockSettingList.Add(_showUnleash);
+			unlockSettingList.Add(_showPetalthrow);
 			try
 			{
 				for (int j = 0; j < unlockEmoteList.Count; j++)
@@ -1201,7 +1205,7 @@ namespace EmoteTome
 					unlockedEmotes = unlockedEmotes.ConvertAll((string d) => d.ToLower());
 					foreach (Emote emote6 in unlockEmoteList)
 					{
-						if (emote6.getChatCode().Equals("bless") || emote6.getChatCode().Equals("heroic") || emote6.getChatCode().Equals("hiss") || emote6.getChatCode().Equals("magicjuggle") || emote6.getChatCode().Equals("paper") || emote6.getChatCode().Equals("possessed") || emote6.getChatCode().Equals("readbook") || emote6.getChatCode().Equals("rock") || emote6.getChatCode().Equals("scissors") || emote6.getChatCode().Equals("serve") || emote6.getChatCode().Equals("sipcoffee"))
+						if (emote6.getChatCode().Equals("hiss") || emote6.getChatCode().Equals("magicjuggle") || emote6.getChatCode().Equals("possessed") || emote6.getChatCode().Equals("readbook") || emote6.getChatCode().Equals("serve") || emote6.getChatCode().Equals("sipcoffee") || emote6.getChatCode().Equals("unleash") || emote6.getChatCode().Equals("petalthrow"))
 						{
 							((Control)emote6.getContainer()).set_Enabled(true);
 							emote6.getContainer().getImage().set_Tint(activatedColor);

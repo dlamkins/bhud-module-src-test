@@ -112,9 +112,9 @@ namespace EmoteTome
 
 		public static readonly List<string> PLAYDEAD = new List<string> { "Playdead", "Faitlemort", "Totstellen", "Yacer" };
 
-		public static readonly List<string> POSSESSED = new List<string> { "Possessed", "Possessed", "Besessen", "Possessed" };
+		public static readonly List<string> POSSESSED = new List<string> { "Possessed", "Possede", "Besessen", "Poseido" };
 
-		public static readonly List<string> READBOOK = new List<string> { "Readbook", "Readbook", "Buchlesen", "Readbook" };
+		public static readonly List<string> READBOOK = new List<string> { "Readbook", "Lecture", "Buchlesen", "Leerlibro" };
 
 		public static readonly List<string> ROCK = new List<string> { "Rock", "Pierre", "Stein", "Piedra" };
 
@@ -130,13 +130,15 @@ namespace EmoteTome
 
 		public static readonly List<string> SHUFFLE = new List<string> { "Shuffle", "Shuffle", "Shuffle", "Mezclador" };
 
-		public static readonly List<string> SIPCOFFEE = new List<string> { "Sipcoffee", "Sipcoffee", "Kaffeeschluerf", "Sipcoffee" };
+		public static readonly List<string> SIPCOFFEE = new List<string> { "Sipcoffee", "Boirecafe", "Kaffeeschluerf", "Sipcoffee" };
 
 		public static readonly List<string> STEP = new List<string> { "Step", "Esquive", "Schritt", "Paso" };
 
 		public static readonly List<string> STRETCH = new List<string> { "Stretch", "Étirement", "Dehnen", "Estirarse" };
 
 		public static readonly List<string> UNLEASH = new List<string> { "Unleash", "Libere", "Entfesseln", "Desatar" };
+
+		public static readonly List<string> PETALTHROW = new List<string> { "Petalthrow", "Petalthrow", "Blumenblätterwerfen", "Petalthrow" };
 
 		public static readonly List<string> BEAR = new List<string> { "Bear", "Ours", "Baer", "Osa" };
 
