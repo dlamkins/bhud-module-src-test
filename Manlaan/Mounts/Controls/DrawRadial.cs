@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
@@ -23,6 +24,8 @@ namespace Manlaan.Mounts.Controls
 		private readonly Helper _helper;
 
 		private readonly TextureCache _textureCache;
+
+		private SemaphoreSlim handleShownHiddenSemaphore = new SemaphoreSlim(1, 1);
 
 		private StandardButton _settingsButton;
 
@@ -63,24 +66,24 @@ namespace Manlaan.Mounts.Controls
 		public DrawRadial(Helper helper, TextureCache textureCache)
 			: this()
 		{
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
 			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00af: Expected O, but got Unknown
-			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e8: Expected O, but got Unknown
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bc: Expected O, but got Unknown
+			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Expected O, but got Unknown
 			((Control)this).set_Visible(false);
 			((Control)this).set_Padding(Thickness.Zero);
 			_helper = helper;
@@ -262,39 +265,55 @@ namespace Manlaan.Mounts.Controls
 
 		private async Task HandleShown(object sender, EventArgs e)
 		{
-			Logger.Debug("HandleShown entered");
-			if (!GameService.Input.get_Mouse().get_CursorIsVisible() && !((SettingEntry)Module._settingMountRadialToggleActionCameraKeyBinding).get_IsNull())
+			await handleShownHiddenSemaphore.WaitAsync();
+			try
 			{
-				IsActionCamToggledOnMount = true;
-				await Helper.TriggerKeybind(Module._settingMountRadialToggleActionCameraKeyBinding);
-				Logger.Debug("HandleShown turned off action cam");
+				Logger.Debug("HandleShown entered");
+				if (!GameService.Input.get_Mouse().get_CursorIsVisible() && !((SettingEntry)Module._settingMountRadialToggleActionCameraKeyBinding).get_IsNull())
+				{
+					IsActionCamToggledOnMount = true;
+					await _helper.TriggerKeybind(Module._settingMountRadialToggleActionCameraKeyBinding);
+					Logger.Debug("HandleShown turned off action cam");
+				}
+				_maxRadialDiameter = Math.Min(((Control)GameService.Graphics.get_SpriteScreen()).get_Width(), ((Control)GameService.Graphics.get_SpriteScreen()).get_Height());
+				thingIconSize = (int)((float)(_maxRadialDiameter / 4) * Module._settingMountRadialIconSizeModifier.get_Value());
+				radius = (int)((float)(_maxRadialDiameter / 2 - thingIconSize / 2) * Module._settingMountRadialRadiusModifier.get_Value());
+				((Control)this).set_Size(new Point(_maxRadialDiameter, _maxRadialDiameter));
+				if (Module._settingMountRadialSpawnAtMouse.get_Value())
+				{
+					SpawnPoint = Control.get_Input().get_Mouse().get_Position();
+				}
+				else
+				{
+					Mouse.SetPosition(GameService.Graphics.get_WindowWidth() / 2, GameService.Graphics.get_WindowHeight() / 2);
+					SpawnPoint = new Point(((Control)GameService.Graphics.get_SpriteScreen()).get_Width() / 2, ((Control)GameService.Graphics.get_SpriteScreen()).get_Height() / 2);
+				}
+				((Control)this).set_Location(new Point(SpawnPoint.X - radius - thingIconSize / 2, SpawnPoint.Y - radius - thingIconSize / 2));
 			}
-			_maxRadialDiameter = Math.Min(((Control)GameService.Graphics.get_SpriteScreen()).get_Width(), ((Control)GameService.Graphics.get_SpriteScreen()).get_Height());
-			thingIconSize = (int)((float)(_maxRadialDiameter / 4) * Module._settingMountRadialIconSizeModifier.get_Value());
-			radius = (int)((float)(_maxRadialDiameter / 2 - thingIconSize / 2) * Module._settingMountRadialRadiusModifier.get_Value());
-			((Control)this).set_Size(new Point(_maxRadialDiameter, _maxRadialDiameter));
-			if (Module._settingMountRadialSpawnAtMouse.get_Value())
+			finally
 			{
-				SpawnPoint = Control.get_Input().get_Mouse().get_Position();
+				handleShownHiddenSemaphore.Release();
 			}
-			else
-			{
-				Mouse.SetPosition(GameService.Graphics.get_WindowWidth() / 2, GameService.Graphics.get_WindowHeight() / 2);
-				SpawnPoint = new Point(((Control)GameService.Graphics.get_SpriteScreen()).get_Width() / 2, ((Control)GameService.Graphics.get_SpriteScreen()).get_Height() / 2);
-			}
-			((Control)this).set_Location(new Point(SpawnPoint.X - radius - thingIconSize / 2, SpawnPoint.Y - radius - thingIconSize / 2));
 		}
 
 		private async Task HandleHidden(object sender, EventArgs e)
 		{
-			Logger.Debug("HandleHidden entered");
-			if (IsActionCamToggledOnMount)
+			await handleShownHiddenSemaphore.WaitAsync();
+			try
 			{
-				await Helper.TriggerKeybind(Module._settingMountRadialToggleActionCameraKeyBinding);
-				IsActionCamToggledOnMount = false;
-				Logger.Debug("HandleHidden turned back on action cam");
+				Logger.Debug("HandleHidden entered");
+				if (IsActionCamToggledOnMount)
+				{
+					await _helper.TriggerKeybind(Module._settingMountRadialToggleActionCameraKeyBinding);
+					IsActionCamToggledOnMount = false;
+					Logger.Debug("HandleHidden turned back on action cam");
+				}
+				await TriggerSelectedMountAsync();
 			}
-			await TriggerSelectedMountAsync();
+			finally
+			{
+				handleShownHiddenSemaphore.Release();
+			}
 		}
 	}
 }

@@ -87,6 +87,8 @@ namespace Manlaan.Mounts
 
 		public static SettingEntry<KeyBinding> _settingJumpBinding;
 
+		public static SettingEntry<float> _settingFallingOrGlidingUpdateFrequency;
+
 		private TabbedWindow2 _settingsWindow;
 
 		public static DebugControl _debug;
@@ -292,11 +294,11 @@ namespace Manlaan.Mounts
 		{
 			//IL_0225: Unknown result type (might be due to invalid IL or missing references)
 			//IL_026d: Expected O, but got Unknown
-			//IL_0365: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0587: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05cf: Expected O, but got Unknown
-			//IL_06c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06d4: Expected O, but got Unknown
+			//IL_0375: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0597: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05df: Expected O, but got Unknown
+			//IL_06d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06e4: Expected O, but got Unknown
 			settingscollection = settings;
 			List<Thing> obj = new List<Thing>
 			{
@@ -326,6 +328,7 @@ namespace Manlaan.Mounts
 			_settingsLastRunMigrationVersion = settings.DefineSetting<int>("LastRunMigrationVersion", 0, (Func<string>)null, (Func<string>)null);
 			_settingDefaultMountBinding = settings.DefineSetting<KeyBinding>("DefaultMountBinding", new KeyBinding((Keys)0), (Func<string>)(() => Strings.Setting_DefaultMountBinding), (Func<string>)(() => ""));
 			_settingDefaultMountBinding.get_Value().set_Enabled(true);
+			_settingDefaultMountBinding.get_Value().set_BlockSequenceFromGw2(true);
 			_settingDefaultMountBinding.get_Value().add_Activated((EventHandler<EventArgs>)async delegate
 			{
 				await DoKeybindActionAsync(KeybindTriggerType.Module);
@@ -358,6 +361,7 @@ namespace Manlaan.Mounts
 			{
 				_helper.UpdateLastJumped();
 			});
+			_settingFallingOrGlidingUpdateFrequency = settings.DefineSetting<float>("FallingOrGlidingUpdateFrequency", 0.1f, (Func<string>)null, (Func<string>)null);
 			ContextualRadialSettings = new List<ContextualRadialThingSettings>
 			{
 				new ContextualRadialThingSettings(settings, "IsPlayerMounted", 0, _helper.IsPlayerMounted, defaultIsEnabled: true, defaultApplyInstantlyIfSingle: true, defaultUnconditionallyDoAction: true, _things.Where((Thing t) => t is Raptor).ToList()),

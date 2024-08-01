@@ -102,7 +102,7 @@ namespace Manlaan.Mounts.Things
 		{
 			if (unconditionallyDoAction)
 			{
-				await Helper.TriggerKeybind(KeybindingSetting);
+				await _helper.TriggerKeybind(KeybindingSetting);
 			}
 			else if (GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat() && Module._settingEnableMountQueueing.get_Value() && !IsUsableInCombat())
 			{
@@ -116,7 +116,7 @@ namespace Manlaan.Mounts.Things
 			else
 			{
 				LastUsedTimestamp = DateTime.UtcNow;
-				await Helper.TriggerKeybind(KeybindingSetting);
+				await _helper.TriggerKeybind(KeybindingSetting);
 			}
 		}
 

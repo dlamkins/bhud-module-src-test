@@ -375,101 +375,122 @@ namespace Manlaan.Mounts.Views
 			//IL_02ee: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02f5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0309: Expected O, but got Unknown
-			//IL_030a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_030f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0313: Unknown result type (might be due to invalid IL or missing references)
-			//IL_031d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0324: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0334: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0307: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0314: Expected O, but got Unknown
+			//IL_0315: Unknown result type (might be due to invalid IL or missing references)
+			//IL_031a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0335: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0347: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0356: Expected O, but got Unknown
-			//IL_036d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0372: Unknown result type (might be due to invalid IL or missing references)
-			//IL_037d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0387: Unknown result type (might be due to invalid IL or missing references)
-			//IL_038e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0395: Unknown result type (might be due to invalid IL or missing references)
-			//IL_039c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b0: Expected O, but got Unknown
-			//IL_03b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03fd: Expected O, but got Unknown
-			//IL_0414: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0359: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0369: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0370: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0394: Expected O, but got Unknown
+			//IL_03ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ee: Expected O, but got Unknown
+			//IL_03ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0402: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0409: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0419: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0424: Unknown result type (might be due to invalid IL or missing references)
-			//IL_042e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0435: Unknown result type (might be due to invalid IL or missing references)
-			//IL_043c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0443: Unknown result type (might be due to invalid IL or missing references)
-			//IL_044a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0457: Expected O, but got Unknown
-			//IL_0458: Unknown result type (might be due to invalid IL or missing references)
-			//IL_045d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0461: Unknown result type (might be due to invalid IL or missing references)
-			//IL_046b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0472: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0482: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0495: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04a4: Expected O, but got Unknown
-			//IL_04bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_042c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_043b: Expected O, but got Unknown
+			//IL_0452: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0457: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0462: Unknown result type (might be due to invalid IL or missing references)
+			//IL_046c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0473: Unknown result type (might be due to invalid IL or missing references)
+			//IL_047a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0481: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0488: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0495: Expected O, but got Unknown
+			//IL_0496: Unknown result type (might be due to invalid IL or missing references)
+			//IL_049b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_049f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_04c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04fe: Expected O, but got Unknown
-			//IL_04ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0504: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0508: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0512: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0519: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0529: Unknown result type (might be due to invalid IL or missing references)
-			//IL_053c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_054b: Expected O, but got Unknown
-			//IL_0562: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e2: Expected O, but got Unknown
+			//IL_04f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0509: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0513: Unknown result type (might be due to invalid IL or missing references)
+			//IL_051a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0521: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0528: Unknown result type (might be due to invalid IL or missing references)
+			//IL_052f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_053c: Expected O, but got Unknown
+			//IL_053d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0542: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0546: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0550: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0557: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0567: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0572: Unknown result type (might be due to invalid IL or missing references)
-			//IL_057c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0583: Unknown result type (might be due to invalid IL or missing references)
-			//IL_058a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0591: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0598: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05a5: Expected O, but got Unknown
-			//IL_05a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_057a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0589: Expected O, but got Unknown
+			//IL_05a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05a5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_05b0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_05ba: Unknown result type (might be due to invalid IL or missing references)
 			//IL_05c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05e3: Expected O, but got Unknown
 			//IL_05e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05f3: Expected O, but got Unknown
-			//IL_060a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_060f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_061a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0624: Unknown result type (might be due to invalid IL or missing references)
-			//IL_062b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0632: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0639: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0640: Unknown result type (might be due to invalid IL or missing references)
-			//IL_064b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0658: Expected O, but got Unknown
-			//IL_0659: Unknown result type (might be due to invalid IL or missing references)
-			//IL_065e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0663: Unknown result type (might be due to invalid IL or missing references)
-			//IL_066d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0674: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0684: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0697: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06a6: Expected O, but got Unknown
+			//IL_05e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_060e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0621: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0630: Expected O, but got Unknown
+			//IL_0647: Unknown result type (might be due to invalid IL or missing references)
+			//IL_064c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0657: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0661: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0668: Unknown result type (might be due to invalid IL or missing references)
+			//IL_066f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0676: Unknown result type (might be due to invalid IL or missing references)
+			//IL_067d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_068a: Expected O, but got Unknown
+			//IL_068b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0690: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0695: Unknown result type (might be due to invalid IL or missing references)
+			//IL_069f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06d8: Expected O, but got Unknown
+			//IL_06ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0709: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0710: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0717: Unknown result type (might be due to invalid IL or missing references)
+			//IL_071e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0725: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0730: Unknown result type (might be due to invalid IL or missing references)
+			//IL_073d: Expected O, but got Unknown
+			//IL_073e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0743: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0748: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0752: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0759: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0769: Unknown result type (might be due to invalid IL or missing references)
+			//IL_077c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_078b: Expected O, but got Unknown
 			Label val = new Label();
 			((Control)val).set_Location(new Point(0, 0));
 			((Control)val).set_Width(labelWidth2);
@@ -537,105 +558,129 @@ namespace Manlaan.Mounts.Views
 			val8.set_AutoSizeHeight(false);
 			val8.set_WrapText(false);
 			((Control)val8).set_Parent((Container)(object)defaultMountPanel);
-			val8.set_Text("Display module on loading screen:");
-			Label settingDisplayModuleOnLoadingScreen_Label = val8;
-			Checkbox val9 = new Checkbox();
-			((Control)val9).set_Size(new Point(labelWidth2, 20));
+			val8.set_Text("Falling or gliding update frequency:");
+			((Control)val8).set_BasicTooltipText("Lower: faster reaction (might cause flickering). Higher: vice versa. Default 0.1.");
+			Label settingFallingOrGlidingUpdateFrequency_Label = val8;
+			TrackBar val9 = new TrackBar();
+			((Control)val9).set_Location(new Point(((Control)settingFallingOrGlidingUpdateFrequency_Label).get_Right() + 5, ((Control)settingFallingOrGlidingUpdateFrequency_Label).get_Top()));
+			((Control)val9).set_Width(mountsAndRadialInputWidth);
+			val9.set_MaxValue(1f);
+			val9.set_SmallStep(true);
+			val9.set_MinValue(0f);
+			val9.set_Value(Module._settingFallingOrGlidingUpdateFrequency.get_Value());
 			((Control)val9).set_Parent((Container)(object)defaultMountPanel);
-			val9.set_Checked(Module._settingDisplayModuleOnLoadingScreen.get_Value());
-			((Control)val9).set_Location(new Point(((Control)settingDisplayModuleOnLoadingScreen_Label).get_Right() + 5, ((Control)settingDisplayModuleOnLoadingScreen_Label).get_Top() - 1));
-			Checkbox settingDisplayModuleOnLoadingScreen_Checkbox = val9;
-			settingDisplayModuleOnLoadingScreen_Checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+			((Control)val9).set_BasicTooltipText($"{Module._settingFallingOrGlidingUpdateFrequency.get_Value()}");
+			TrackBar settingFallingOrGlidingUpdateFrequency_Slider = val9;
+			settingFallingOrGlidingUpdateFrequency_Slider.add_ValueChanged((EventHandler<ValueEventArgs<float>>)delegate
 			{
-				Module._settingDisplayModuleOnLoadingScreen.set_Value(settingDisplayModuleOnLoadingScreen_Checkbox.get_Checked());
+				Module._settingFallingOrGlidingUpdateFrequency.set_Value(settingFallingOrGlidingUpdateFrequency_Slider.get_Value());
+				((Control)settingFallingOrGlidingUpdateFrequency_Slider).set_BasicTooltipText($"{Module._settingFallingOrGlidingUpdateFrequency.get_Value()}");
 			});
 			Label val10 = new Label();
-			((Control)val10).set_Location(new Point(0, ((Control)settingDisplayModuleOnLoadingScreen_Label).get_Bottom() + 6));
+			((Control)val10).set_Location(new Point(0, ((Control)settingFallingOrGlidingUpdateFrequency_Label).get_Bottom() + 6));
 			((Control)val10).set_Width(labelWidth2);
 			val10.set_AutoSizeHeight(false);
 			val10.set_WrapText(false);
 			((Control)val10).set_Parent((Container)(object)defaultMountPanel);
-			val10.set_Text("Mount automatically after loading screen:");
-			Label settingMountAutomaticallyAfterLoadingScreen_Label = val10;
+			val10.set_Text("Display module on loading screen:");
+			Label settingDisplayModuleOnLoadingScreen_Label = val10;
 			Checkbox val11 = new Checkbox();
 			((Control)val11).set_Size(new Point(labelWidth2, 20));
 			((Control)val11).set_Parent((Container)(object)defaultMountPanel);
-			val11.set_Checked(Module._settingMountAutomaticallyAfterLoadingScreen.get_Value());
-			((Control)val11).set_Location(new Point(((Control)settingMountAutomaticallyAfterLoadingScreen_Label).get_Right() + 5, ((Control)settingMountAutomaticallyAfterLoadingScreen_Label).get_Top() - 1));
-			Checkbox settingMountAutomaticallyAfterLoadingScreen_Checkbox = val11;
-			settingMountAutomaticallyAfterLoadingScreen_Checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+			val11.set_Checked(Module._settingDisplayModuleOnLoadingScreen.get_Value());
+			((Control)val11).set_Location(new Point(((Control)settingDisplayModuleOnLoadingScreen_Label).get_Right() + 5, ((Control)settingDisplayModuleOnLoadingScreen_Label).get_Top() - 1));
+			Checkbox settingDisplayModuleOnLoadingScreen_Checkbox = val11;
+			settingDisplayModuleOnLoadingScreen_Checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
 			{
-				Module._settingMountAutomaticallyAfterLoadingScreen.set_Value(settingMountAutomaticallyAfterLoadingScreen_Checkbox.get_Checked());
+				Module._settingDisplayModuleOnLoadingScreen.set_Value(settingDisplayModuleOnLoadingScreen_Checkbox.get_Checked());
 			});
 			Label val12 = new Label();
-			((Control)val12).set_Location(new Point(0, ((Control)settingMountAutomaticallyAfterLoadingScreen_Label).get_Bottom() + 6));
+			((Control)val12).set_Location(new Point(0, ((Control)settingDisplayModuleOnLoadingScreen_Label).get_Bottom() + 6));
 			((Control)val12).set_Width(labelWidth2);
 			val12.set_AutoSizeHeight(false);
 			val12.set_WrapText(false);
 			((Control)val12).set_Parent((Container)(object)defaultMountPanel);
-			val12.set_Text("Enable out of combat queueing:");
-			Label settingEnableMountQueueing_Label = val12;
+			val12.set_Text("Mount automatically after loading screen:");
+			Label settingMountAutomaticallyAfterLoadingScreen_Label = val12;
 			Checkbox val13 = new Checkbox();
 			((Control)val13).set_Size(new Point(labelWidth2, 20));
 			((Control)val13).set_Parent((Container)(object)defaultMountPanel);
-			val13.set_Checked(Module._settingEnableMountQueueing.get_Value());
-			((Control)val13).set_Location(new Point(((Control)settingEnableMountQueueing_Label).get_Right() + 5, ((Control)settingEnableMountQueueing_Label).get_Top() - 1));
-			Checkbox settingEnableMountQueueing_Checkbox = val13;
-			settingEnableMountQueueing_Checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+			val13.set_Checked(Module._settingMountAutomaticallyAfterLoadingScreen.get_Value());
+			((Control)val13).set_Location(new Point(((Control)settingMountAutomaticallyAfterLoadingScreen_Label).get_Right() + 5, ((Control)settingMountAutomaticallyAfterLoadingScreen_Label).get_Top() - 1));
+			Checkbox settingMountAutomaticallyAfterLoadingScreen_Checkbox = val13;
+			settingMountAutomaticallyAfterLoadingScreen_Checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
 			{
-				Module._settingEnableMountQueueing.set_Value(settingEnableMountQueueing_Checkbox.get_Checked());
+				Module._settingMountAutomaticallyAfterLoadingScreen.set_Value(settingMountAutomaticallyAfterLoadingScreen_Checkbox.get_Checked());
 			});
 			Label val14 = new Label();
-			((Control)val14).set_Location(new Point(0, ((Control)settingEnableMountQueueing_Label).get_Bottom() + 6));
+			((Control)val14).set_Location(new Point(0, ((Control)settingMountAutomaticallyAfterLoadingScreen_Label).get_Bottom() + 6));
 			((Control)val14).set_Width(labelWidth2);
 			val14.set_AutoSizeHeight(false);
 			val14.set_WrapText(false);
 			((Control)val14).set_Parent((Container)(object)defaultMountPanel);
-			val14.set_Text("Display out of combat queueing:");
-			Label settingDisplayMountQueueing_Label = val14;
+			val14.set_Text("Enable out of combat queueing:");
+			Label settingEnableMountQueueing_Label = val14;
 			Checkbox val15 = new Checkbox();
 			((Control)val15).set_Size(new Point(labelWidth2, 20));
 			((Control)val15).set_Parent((Container)(object)defaultMountPanel);
-			val15.set_Checked(Module._settingDisplayMountQueueing.get_Value());
-			((Control)val15).set_Location(new Point(((Control)settingDisplayMountQueueing_Label).get_Right() + 5, ((Control)settingDisplayMountQueueing_Label).get_Top() - 1));
-			Checkbox settingDisplayMountQueueing_Checkbox = val15;
-			settingDisplayMountQueueing_Checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+			val15.set_Checked(Module._settingEnableMountQueueing.get_Value());
+			((Control)val15).set_Location(new Point(((Control)settingEnableMountQueueing_Label).get_Right() + 5, ((Control)settingEnableMountQueueing_Label).get_Top() - 1));
+			Checkbox settingEnableMountQueueing_Checkbox = val15;
+			settingEnableMountQueueing_Checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
 			{
-				Module._settingDisplayMountQueueing.set_Value(settingDisplayMountQueueing_Checkbox.get_Checked());
+				Module._settingEnableMountQueueing.set_Value(settingEnableMountQueueing_Checkbox.get_Checked());
 			});
 			Label val16 = new Label();
-			((Control)val16).set_Location(new Point(0, ((Control)settingDisplayMountQueueing_Label).get_Bottom() + 6));
+			((Control)val16).set_Location(new Point(0, ((Control)settingEnableMountQueueing_Label).get_Bottom() + 6));
 			((Control)val16).set_Width(labelWidth2);
 			val16.set_AutoSizeHeight(false);
 			val16.set_WrapText(false);
 			((Control)val16).set_Parent((Container)(object)defaultMountPanel);
-			val16.set_Text("Drag out of combat queueing: ");
-			Label dragMountQueueing_Label = val16;
+			val16.set_Text("Display out of combat queueing:");
+			Label settingDisplayMountQueueing_Label = val16;
 			Checkbox val17 = new Checkbox();
-			((Control)val17).set_Size(new Point(20, 20));
+			((Control)val17).set_Size(new Point(labelWidth2, 20));
 			((Control)val17).set_Parent((Container)(object)defaultMountPanel);
-			val17.set_Checked(Module._settingDragMountQueueing.get_Value());
-			((Control)val17).set_Location(new Point(((Control)dragMountQueueing_Label).get_Right() + 5, ((Control)dragMountQueueing_Label).get_Top() - 1));
-			Checkbox dragMountQueueing_Checkbox = val17;
-			dragMountQueueing_Checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+			val17.set_Checked(Module._settingDisplayMountQueueing.get_Value());
+			((Control)val17).set_Location(new Point(((Control)settingDisplayMountQueueing_Label).get_Right() + 5, ((Control)settingDisplayMountQueueing_Label).get_Top() - 1));
+			Checkbox settingDisplayMountQueueing_Checkbox = val17;
+			settingDisplayMountQueueing_Checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
 			{
-				Module._settingDragMountQueueing.set_Value(dragMountQueueing_Checkbox.get_Checked());
+				Module._settingDisplayMountQueueing.set_Value(settingDisplayMountQueueing_Checkbox.get_Checked());
 			});
 			Label val18 = new Label();
-			((Control)val18).set_Location(new Point(0, ((Control)dragMountQueueing_Label).get_Bottom() + 6));
+			((Control)val18).set_Location(new Point(0, ((Control)settingDisplayMountQueueing_Label).get_Bottom() + 6));
 			((Control)val18).set_Width(labelWidth2);
 			val18.set_AutoSizeHeight(false);
 			val18.set_WrapText(false);
 			((Control)val18).set_Parent((Container)(object)defaultMountPanel);
-			val18.set_Text("Combat Launch mastery unlocked: ");
-			((Control)val18).set_BasicTooltipText("EoD and SotO masteries are not detectable in the API yet, see documentation for more info.");
-			Label combatLaunchMasteryUnlocked_Label = val18;
+			val18.set_Text("Drag out of combat queueing: ");
+			Label dragMountQueueing_Label = val18;
 			Checkbox val19 = new Checkbox();
 			((Control)val19).set_Size(new Point(20, 20));
 			((Control)val19).set_Parent((Container)(object)defaultMountPanel);
-			val19.set_Checked(Module._settingCombatLaunchMasteryUnlocked.get_Value());
-			((Control)val19).set_Location(new Point(((Control)combatLaunchMasteryUnlocked_Label).get_Right() + 5, ((Control)combatLaunchMasteryUnlocked_Label).get_Top() - 1));
-			Checkbox combatLaunchMasteryUnlocked_Checkbox = val19;
+			val19.set_Checked(Module._settingDragMountQueueing.get_Value());
+			((Control)val19).set_Location(new Point(((Control)dragMountQueueing_Label).get_Right() + 5, ((Control)dragMountQueueing_Label).get_Top() - 1));
+			Checkbox dragMountQueueing_Checkbox = val19;
+			dragMountQueueing_Checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+			{
+				Module._settingDragMountQueueing.set_Value(dragMountQueueing_Checkbox.get_Checked());
+			});
+			Label val20 = new Label();
+			((Control)val20).set_Location(new Point(0, ((Control)dragMountQueueing_Label).get_Bottom() + 6));
+			((Control)val20).set_Width(labelWidth2);
+			val20.set_AutoSizeHeight(false);
+			val20.set_WrapText(false);
+			((Control)val20).set_Parent((Container)(object)defaultMountPanel);
+			val20.set_Text("Combat Launch mastery unlocked: ");
+			((Control)val20).set_BasicTooltipText("EoD and SotO masteries are not detectable in the API yet, see documentation for more info.");
+			Label combatLaunchMasteryUnlocked_Label = val20;
+			Checkbox val21 = new Checkbox();
+			((Control)val21).set_Size(new Point(20, 20));
+			((Control)val21).set_Parent((Container)(object)defaultMountPanel);
+			val21.set_Checked(Module._settingCombatLaunchMasteryUnlocked.get_Value());
+			((Control)val21).set_Location(new Point(((Control)combatLaunchMasteryUnlocked_Label).get_Right() + 5, ((Control)combatLaunchMasteryUnlocked_Label).get_Top() - 1));
+			Checkbox combatLaunchMasteryUnlocked_Checkbox = val21;
 			combatLaunchMasteryUnlocked_Checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
 			{
 				Module._settingCombatLaunchMasteryUnlocked.set_Value(combatLaunchMasteryUnlocked_Checkbox.get_Checked());

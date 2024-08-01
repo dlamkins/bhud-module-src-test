@@ -26,6 +26,8 @@ namespace Manlaan.Mounts
 
 		private Dictionary<string, Thing> StoredThingForLater = new Dictionary<string, Thing>();
 
+		private readonly Dictionary<(Keys, ModifierKeys), SemaphoreSlim> _semaphores;
+
 		private float _lastZPosition;
 
 		private double _lastUpdateSeconds;
@@ -40,6 +42,7 @@ namespace Manlaan.Mounts
 
 		public Helper(Gw2ApiManager gw2ApiManager)
 		{
+			_semaphores = new Dictionary<(Keys, ModifierKeys), SemaphoreSlim>();
 			Gw2ApiManager = gw2ApiManager;
 			Module._debug.Add("StoreThingForLaterActivation", () => string.Join(", ", StoredThingForLater.Select((KeyValuePair<string, Thing> x) => x.Key + "=" + x.Value.Name).ToArray()) ?? "");
 		}
@@ -134,7 +137,7 @@ namespace Manlaan.Mounts
 		private bool NewStuff(float zPositionDiff, double secondsDiff)
 		{
 			double velocity = (double)zPositionDiff / secondsDiff;
-			if (secondsDiff < 0.10000000149011612)
+			if (secondsDiff < (double)Module._settingFallingOrGlidingUpdateFrequency.get_Value())
 			{
 				return false;
 			}
@@ -168,45 +171,71 @@ namespace Manlaan.Mounts
 			return true;
 		}
 
-		public static async Task TriggerKeybind(SettingEntry<KeyBinding> keybindingSetting)
+		private SemaphoreSlim GetOrCreateSemaphore(KeyBinding keyBinding)
 		{
-			Logger.Debug("TriggerKeybind entered");
-			if ((int)keybindingSetting.get_Value().get_ModifierKeys() != 0)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			lock (_semaphores)
 			{
-				Logger.Debug($"TriggerKeybind press modifiers {keybindingSetting.get_Value().get_ModifierKeys()}");
-				if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)2))
+				if (!_semaphores.TryGetValue((keyBinding.get_PrimaryKey(), keyBinding.get_ModifierKeys()), out var semaphore))
 				{
-					Keyboard.Press((VirtualKeyShort)18, false);
+					semaphore = new SemaphoreSlim(1, 1);
+					_semaphores[(keyBinding.get_PrimaryKey(), keyBinding.get_ModifierKeys())] = semaphore;
 				}
-				if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)1))
+				return semaphore;
+			}
+		}
+
+		public async Task TriggerKeybind(SettingEntry<KeyBinding> keybindingSetting)
+		{
+			SemaphoreSlim semaphore = GetOrCreateSemaphore(keybindingSetting.get_Value());
+			await semaphore.WaitAsync();
+			try
+			{
+				Logger.Debug("TriggerKeybind entered");
+				if ((int)keybindingSetting.get_Value().get_ModifierKeys() != 0)
 				{
-					Keyboard.Press((VirtualKeyShort)17, false);
+					Logger.Debug($"TriggerKeybind press modifiers {keybindingSetting.get_Value().get_ModifierKeys()}");
+					if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)2))
+					{
+						Keyboard.Press((VirtualKeyShort)18, false);
+					}
+					if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)1))
+					{
+						Keyboard.Press((VirtualKeyShort)17, false);
+					}
+					if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)4))
+					{
+						Keyboard.Press((VirtualKeyShort)16, false);
+					}
 				}
-				if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)4))
+				Logger.Debug($"TriggerKeybind press PrimaryKey {keybindingSetting.get_Value().get_PrimaryKey()}");
+				Keyboard.Press(ToVirtualKey(keybindingSetting.get_Value().get_PrimaryKey()), false);
+				await Task.Delay(50);
+				Logger.Debug($"TriggerKeybind release PrimaryKey {keybindingSetting.get_Value().get_PrimaryKey()}");
+				Keyboard.Release(ToVirtualKey(keybindingSetting.get_Value().get_PrimaryKey()), false);
+				if ((int)keybindingSetting.get_Value().get_ModifierKeys() != 0)
 				{
-					Keyboard.Press((VirtualKeyShort)16, false);
+					Logger.Debug($"TriggerKeybind release modifiers {keybindingSetting.get_Value().get_ModifierKeys()}");
+					if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)4))
+					{
+						Keyboard.Release((VirtualKeyShort)16, false);
+					}
+					if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)1))
+					{
+						Keyboard.Release((VirtualKeyShort)17, false);
+					}
+					if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)2))
+					{
+						Keyboard.Release((VirtualKeyShort)18, false);
+					}
 				}
 			}
-			Logger.Debug($"TriggerKeybind press PrimaryKey {keybindingSetting.get_Value().get_PrimaryKey()}");
-			Keyboard.Press(ToVirtualKey(keybindingSetting.get_Value().get_PrimaryKey()), false);
-			await Task.Delay(50);
-			Logger.Debug($"TriggerKeybind release PrimaryKey {keybindingSetting.get_Value().get_PrimaryKey()}");
-			Keyboard.Release(ToVirtualKey(keybindingSetting.get_Value().get_PrimaryKey()), false);
-			if ((int)keybindingSetting.get_Value().get_ModifierKeys() != 0)
+			finally
 			{
-				Logger.Debug($"TriggerKeybind release modifiers {keybindingSetting.get_Value().get_ModifierKeys()}");
-				if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)4))
-				{
-					Keyboard.Release((VirtualKeyShort)16, false);
-				}
-				if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)1))
-				{
-					Keyboard.Release((VirtualKeyShort)17, false);
-				}
-				if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)2))
-				{
-					Keyboard.Release((VirtualKeyShort)18, false);
-				}
+				semaphore.Release();
 			}
 		}
 

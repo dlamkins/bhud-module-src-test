@@ -469,7 +469,7 @@ namespace Manlaan.Mounts.Views
 				val6.set_AutoSizeHeight(false);
 				val6.set_WrapText(false);
 				((Control)val6).set_Parent((Container)(object)IconSettingsDetailPanel);
-				val6.set_Text("Enable corner iccons: ");
+				val6.set_Text("Enable corner icons: ");
 				Label radialSettingsDisplayCornerIcons_Label = val6;
 				Checkbox val7 = new Checkbox();
 				((Control)val7).set_Size(new Point(20, 20));
