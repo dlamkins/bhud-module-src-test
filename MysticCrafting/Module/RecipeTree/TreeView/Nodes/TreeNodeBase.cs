@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Timers;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -10,6 +11,7 @@ using Blish_HUD.Input;
 using Glide;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MysticCrafting.Module.Extensions;
 using MysticCrafting.Module.RecipeTree.TreeView.Controls;
 using MysticCrafting.Module.Services;
 
@@ -193,6 +195,25 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			{
 				ArrowRotation = rotation
 			}, 0.3f, 0f, true).Ease((Func<float, float>)Ease.QuadOut);
+		}
+
+		public void FlashBackground()
+		{
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			Color bgColor = BackgroundOpaqueColor;
+			BackgroundOpaqueColor = ColorHelper.BrightGreen;
+			Timer timer = new Timer(800.0);
+			timer.Elapsed += delegate
+			{
+				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+				BackgroundOpaqueColor = bgColor;
+				timer.Dispose();
+			};
+			timer.Start();
 		}
 
 		public override void RecalculateLayout()

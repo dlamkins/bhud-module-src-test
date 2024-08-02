@@ -31,8 +31,10 @@
   <data name="SkinLocked"><value>Skin Locked</value></data>
   <data name="TradingPostDefault"><value>Trading Post preference</value></data>
   <data name="HideUnlockedSkins"><value>Hide unlocked skins</value></data>
+  <data name="LoadingIntroMessage"><value>Data is loaded from the API every few minutes when the module window is open.</value></data>
   <data name="LoadingPlayerUnlocks"><value>Player Unlocks</value></data>
-  <data name="LoadingErrorMessage"><value>Check logs for details.</value></data>
+  <data name="LoadingErrorMessage"><value>Check logs for error details.</value></data>
+  <data name="LoadingPlayerAchievements"><value>Player Achievements</value></data>
   <data name="SkinUnlocked"><value>Skin Unlocked</value></data>
   <data name="SearchBarPlaceholder"><value>Search</value></data>
   <data name="ToggleWindow"><value>Toggle window</value></data>
@@ -41,6 +43,7 @@
   <data name="Dismiss"><value>Dismiss</value></data>
   <data name="LoadingPlayerItems"><value>Player Items</value></data>
   <data name="LoadingWallet"><value>Wallet</value></data>
+  <data name="LoadingMinuteInterval"><value>{0} minute interval</value></data>
   <data name="VersionClick"><value>Click to view update window</value></data>
   <data name="MoreFilters"><value>More filters</value></data>
   <data name="LastLoaded"><value>Last loaded</value></data>

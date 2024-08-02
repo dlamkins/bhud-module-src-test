@@ -21,6 +21,8 @@ namespace MysticCrafting.Module.Discovery.Loading
 
 		private Label _nameLabel;
 
+		private Label _versionLabel;
+
 		private Label _dateLabel;
 
 		private Image _statusImage;
@@ -48,6 +50,14 @@ namespace MysticCrafting.Module.Discovery.Loading
 			{
 				_name = value;
 				_nameLabel.set_Text(_name);
+			}
+		}
+
+		public int LoadingIntervalMin
+		{
+			set
+			{
+				_versionLabel.set_Text(string.Format(Common.LoadingMinuteInterval, value));
 			}
 		}
 
@@ -112,15 +122,27 @@ namespace MysticCrafting.Module.Discovery.Loading
 			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0129: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014d: Expected O, but got Unknown
+			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013e: Expected O, but got Unknown
+			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0195: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01af: Expected O, but got Unknown
 			LoadingSpinner val = new LoadingSpinner();
 			((Control)val).set_Parent((Container)(object)this);
 			((Control)val).set_Size(new Point(25, 25));
@@ -145,13 +167,23 @@ namespace MysticCrafting.Module.Discovery.Loading
 			_nameLabel = val3;
 			Label val4 = new Label();
 			((Control)val4).set_Parent((Container)(object)this);
-			val4.set_Text("Last updated: " + LastLoaded.ToString("t"));
+			val4.set_Text(string.Empty);
+			val4.set_Font(GameService.Content.get_DefaultFont14());
 			((Control)val4).set_Location(new Point(25, 22));
-			val4.set_TextColor(Color.get_White() * 0.5f);
 			val4.set_AutoSizeWidth(true);
+			val4.set_TextColor(Color.get_White() * 0.7f);
 			val4.set_ShowShadow(true);
-			((Control)val4).set_Visible(false);
-			_dateLabel = val4;
+			_versionLabel = val4;
+			Label val5 = new Label();
+			((Control)val5).set_Parent((Container)(object)this);
+			val5.set_Text($"{Common.LastLoaded}: {LastLoaded:t}");
+			val5.set_Font(GameService.Content.get_DefaultFont14());
+			((Control)val5).set_Location(new Point(25, 40));
+			val5.set_TextColor(Color.get_LightYellow());
+			val5.set_AutoSizeWidth(true);
+			val5.set_ShowShadow(true);
+			((Control)val5).set_Visible(false);
+			_dateLabel = val5;
 		}
 
 		private void UpdateLoadingStatus()

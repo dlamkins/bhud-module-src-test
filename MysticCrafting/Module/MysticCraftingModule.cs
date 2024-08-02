@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Globalization;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
@@ -33,7 +32,7 @@ namespace MysticCrafting.Module
 
 		private CornerIcon _cornerIcon;
 
-		private StandardWindow _mainWindow;
+		private static StandardWindow _mainWindow;
 
 		private DiscoveryTabView _discoveryTabView;
 
@@ -42,8 +41,6 @@ namespace MysticCrafting.Module
 		private TabbedWindow2 _mainTabbedWindow;
 
 		private static VersionUpdateWindow _updateWindow;
-
-		private bool dataLoaded;
 
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
@@ -113,64 +110,22 @@ namespace MysticCrafting.Module
 
 		private void Gw2ApiManager_SubtokenUpdated(object sender, ValueEventArgs<IEnumerable<TokenPermission>> e)
 		{
-			LoadData();
+			LoadApiServices();
 		}
 
-		private void LoadData()
+		private void LoadApiServices()
 		{
-			if (dataLoaded)
+			Task.Run(async delegate
 			{
-				return;
-			}
-			Gw2ApiManager gw2ApiManager = Gw2ApiManager;
-			TokenPermission[] array = new TokenPermission[3];
-			RuntimeHelpers.InitializeArray(array, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);
-			if (gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)array) && !PlayerItemsLoaded)
-			{
-				PlayerItemsLoaded = true;
-				Task.Run(async delegate
-				{
-					await ServiceContainer.PlayerItemService.StartTimedLoadingAsync(300000);
-				});
-			}
-			Gw2ApiManager gw2ApiManager2 = Gw2ApiManager;
-			TokenPermission[] array2 = new TokenPermission[3];
-			RuntimeHelpers.InitializeArray(array2, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);
-			if (gw2ApiManager2.HasPermissions((IEnumerable<TokenPermission>)(object)array2) && !PlayerUnlocksLoaded)
-			{
-				PlayerUnlocksLoaded = true;
-				Task.Run(async delegate
-				{
-					await ServiceContainer.PlayerUnlocksService.StartTimedLoadingAsync(300000);
-				});
-			}
-			if (Gw2ApiManager.HasPermission((TokenPermission)8) && !TradingPostLoaded)
-			{
-				TradingPostLoaded = true;
-				Task.Run(async delegate
-				{
-					await ServiceContainer.TradingPostService.StartTimedLoadingAsync(300000);
-				});
-			}
-			if (Gw2ApiManager.HasPermission((TokenPermission)10) && !WalletLoaded)
-			{
-				WalletLoaded = true;
-				Task.Run(async delegate
-				{
-					await ServiceContainer.WalletService.StartTimedLoadingAsync(300000);
-				});
-			}
-			if (Gw2ApiManager.HasPermission((TokenPermission)10))
-			{
-				dataLoaded = true;
-			}
+				await ServiceContainer.ApiServiceManager.LoadServicesAsync();
+			});
 		}
 
 		protected override async Task LoadAsync()
 		{
 			ServiceContainer.Register(Gw2ApiManager, DirectoriesManager, ContentsManager);
 			await ServiceContainer.LoadAsync();
-			LoadData();
+			LoadApiServices();
 		}
 
 		private void BuildCornerIcon()
@@ -237,12 +192,18 @@ namespace MysticCrafting.Module
 			}
 		}
 
+		public static bool WindowIsOpen()
+		{
+			return ((Control)_mainWindow).get_Visible();
+		}
+
 		private void ToggleWindow()
 		{
 			if (((WindowBase2)_mainWindow).get_CurrentView() == null)
 			{
 				_mainWindow.Show((IView)(object)_discoveryTabView);
 			}
+			LoadApiServices();
 			((WindowBase2)_mainWindow).ToggleWindow();
 		}
 

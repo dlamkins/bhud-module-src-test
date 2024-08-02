@@ -3,7 +3,7 @@ using System.Linq;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using MysticCrafting.Module.Services;
-using MysticCrafting.Module.Services.Recurring;
+using MysticCrafting.Module.Services.API;
 
 namespace MysticCrafting.Module.RecipeTree
 {
@@ -22,20 +22,20 @@ namespace MysticCrafting.Module.RecipeTree
 
 		public void HandleServiceLoading(Container parent)
 		{
-			List<IRecurringService> _recurringServices = new List<IRecurringService>
+			List<IApiService> _recurringServices = new List<IApiService>
 			{
 				ServiceContainer.TradingPostService,
 				ServiceContainer.PlayerItemService,
 				ServiceContainer.PlayerUnlocksService,
 				ServiceContainer.WalletService
 			};
-			if (_recurringServices.Any((IRecurringService s) => !s.Loaded))
+			if (_recurringServices.Any((IApiService s) => !s.Loaded))
 			{
-				foreach (IRecurringService item in _recurringServices)
+				foreach (IApiService item in _recurringServices)
 				{
 					item.LoadingFinished += delegate
 					{
-						if (!_recurringServices.Any((IRecurringService s) => s.Loading) && !base.get_View().RecipeDetailsLoaded)
+						if (!_recurringServices.Any((IApiService s) => s.Loading) && !base.get_View().RecipeDetailsLoaded)
 						{
 							base.get_View().LoadRecipeDetails();
 						}

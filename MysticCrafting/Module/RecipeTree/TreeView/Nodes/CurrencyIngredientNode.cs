@@ -11,7 +11,7 @@ using MysticCrafting.Module.Services;
 
 namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 {
-	public class CurrencyIngredientNode : IngredientNode
+	public sealed class CurrencyIngredientNode : IngredientNode
 	{
 		public CurrencyQuantity CurrencyQuantity { get; set; }
 
@@ -32,10 +32,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 				OrderUnitCount = vendorNode.OrderUnitCount;
 				VendorPriceUnitCount = vendorNode.VendorGroup.VendorItem.ItemQuantity;
 			}
-			if (CurrencyQuantity.Currency.Id != 1)
-			{
-				base.PlayerUnitCount = ServiceContainer.WalletService.GetQuantity(currencyQuantity.Currency.Id).Count;
-			}
+			UpdatePlayerUnitCount();
 			base.LoadingChildren = loadingChildren;
 		}
 
@@ -87,6 +84,21 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 		{
 			ContextMenuPresenter menuStripPresenter = new ContextMenuPresenter();
 			MenuStrip = menuStripPresenter.BuildMenuStrip(CurrencyQuantity.Currency, this);
+		}
+
+		public override bool UpdatePlayerUnitCount()
+		{
+			if (CurrencyQuantity == null || CurrencyQuantity.Currency.Id == 1)
+			{
+				return false;
+			}
+			int newPlayerCount = ServiceContainer.WalletService.GetQuantity(CurrencyQuantity.Currency.Id).Count;
+			if (newPlayerCount == base.PlayerUnitCount)
+			{
+				return false;
+			}
+			base.PlayerUnitCount = newPlayerCount;
+			return true;
 		}
 	}
 }

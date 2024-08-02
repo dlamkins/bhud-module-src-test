@@ -8,7 +8,7 @@ using Blish_HUD.Graphics.UI;
 using Microsoft.Xna.Framework;
 using MysticCrafting.Module.Extensions;
 using MysticCrafting.Module.RecipeTree.TreeView.Controls;
-using MysticCrafting.Module.Services.Recurring;
+using MysticCrafting.Module.Services.API;
 
 namespace MysticCrafting.Module.Discovery.Loading
 {
@@ -16,15 +16,15 @@ namespace MysticCrafting.Module.Discovery.Loading
 	{
 		private readonly LoadingStatusView _view;
 
-		private readonly IList<IRecurringService> _recurringServices;
+		private readonly IList<IApiService> _recurringServices;
 
 		private LoadingStatusTooltipView _loadingStatusTooltipView;
 
-		public LoadingStatusPresenter(LoadingStatusView view, IList<IRecurringService> recurringServices)
+		public LoadingStatusPresenter(LoadingStatusView view, IList<IApiService> recurringServices)
 		{
 			_view = view;
 			_recurringServices = recurringServices;
-			foreach (IRecurringService recurringService in recurringServices)
+			foreach (IApiService recurringService in recurringServices)
 			{
 				recurringService.LoadingStarted += LoadingChanged;
 				recurringService.LoadingFinished += LoadingChanged;
@@ -55,7 +55,7 @@ namespace MysticCrafting.Module.Discovery.Loading
 			{
 				return;
 			}
-			if (_recurringServices.Any((IRecurringService s) => s.Loading))
+			if (_recurringServices.Any((IApiService s) => s.Loading))
 			{
 				if (string.IsNullOrEmpty(_view._dateLabel.get_Text()))
 				{
@@ -72,7 +72,7 @@ namespace MysticCrafting.Module.Discovery.Loading
 				((Control)_view._loadingSpinner).Hide();
 				_view._statusImage.set_Tint(ColorHelper.FromServicesLoading(_recurringServices));
 				((Control)_view._statusImage).Show();
-				DateTime lastLoaded = _recurringServices.Max((IRecurringService s) => s.LastLoaded);
+				DateTime lastLoaded = _recurringServices.Max((IApiService s) => s.LastLoaded);
 				_view._dateLabel.set_Text($"{lastLoaded:t}");
 				((Control)_view._dateLabel).Show();
 			}

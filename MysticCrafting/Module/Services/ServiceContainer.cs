@@ -1,10 +1,8 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Blish_HUD.Modules.Managers;
 using MysticCrafting.Module.Repositories;
 using MysticCrafting.Module.Repositories.Logging;
 using MysticCrafting.Module.Services.API;
-using MysticCrafting.Module.Services.Recurring;
 
 namespace MysticCrafting.Module.Services
 {
@@ -36,14 +34,15 @@ namespace MysticCrafting.Module.Services
 
 		internal static IPlayerUnlocksService PlayerUnlocksService { get; set; }
 
+		internal static IPlayerAchievementsService PlayerAchievementsService { get; set; }
+
 		internal static IItemSourceService ItemSourceService { get; set; }
 
 		internal static IWalletService WalletService { get; set; }
 
 		internal static IAudioService AudioService { get; set; }
 
-		internal static List<IRecurringService> RecurringServices { get; set; } = new List<IRecurringService>();
-
+		internal static IApiServiceManager ApiServiceManager { get; set; }
 
 		internal static void Register(Gw2ApiManager apiManager, DirectoriesManager directoriesManager, ContentsManager contentsManager)
 		{
@@ -63,13 +62,16 @@ namespace MysticCrafting.Module.Services
 			TradingPostService = new TradingPostService(apiManager, ItemRepository);
 			PlayerItemService = new PlayerItemService(apiManager);
 			PlayerUnlocksService = new PlayerUnlocksService(apiManager);
+			PlayerAchievementsService = new PlayerAchievementsService(apiManager);
 			ItemSourceService = new ItemSourceService(TradingPostService, RecipeRepository, VendorRepository, ChoiceRepository, ItemRepository, WizardsVaultRepository);
 			WalletService = new WalletService(apiManager, CurrencyRepository, PlayerItemService);
 			AudioService = new AudioService(contentsManager);
-			RecurringServices.Add(TradingPostService);
-			RecurringServices.Add(PlayerItemService);
-			RecurringServices.Add(PlayerUnlocksService);
-			RecurringServices.Add(WalletService);
+			ApiServiceManager = new ApiServiceManager();
+			ApiServiceManager.RegisterService(TradingPostService);
+			ApiServiceManager.RegisterService(PlayerItemService);
+			ApiServiceManager.RegisterService(PlayerUnlocksService);
+			ApiServiceManager.RegisterService(PlayerAchievementsService);
+			ApiServiceManager.RegisterService(WalletService);
 		}
 
 		internal static async Task LoadAsync()
@@ -121,11 +123,7 @@ namespace MysticCrafting.Module.Services
 			MenuItemRepository = null;
 			FavoritesRepository = null;
 			FavoritesRepository = null;
-			foreach (IRecurringService recurringService in RecurringServices)
-			{
-				recurringService?.StopTimedLoading();
-			}
-			RecurringServices = new List<IRecurringService>();
+			ApiServiceManager = null;
 			TradingPostService = null;
 			PlayerItemService = null;
 			PlayerUnlocksService = null;

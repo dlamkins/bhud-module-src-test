@@ -4,6 +4,7 @@ using System.Linq;
 using Blish_HUD.Controls;
 using MysticCrafting.Module.RecipeTree.TreeView.Extensions;
 using MysticCrafting.Module.RecipeTree.TreeView.Nodes;
+using MysticCrafting.Module.Services;
 
 namespace MysticCrafting.Module.RecipeTree.TreeView
 {
@@ -13,7 +14,38 @@ namespace MysticCrafting.Module.RecipeTree.TreeView
 
 		public event EventHandler<EventArgs> OnRecalculate;
 
-		public event EventHandler<EventArgs> NodeChanged;
+		public TreeView()
+			: this()
+		{
+			ServiceContainer.WalletService.LoadingFinished += WalletService_CurrenciesUpdated;
+			ServiceContainer.PlayerItemService.LoadingFinished += PlayerItemService_LoadingFinished;
+		}
+
+		private void PlayerItemService_LoadingFinished(object sender, EventArgs e)
+		{
+			foreach (ItemIngredientNode node in IngredientNodes.OfType<ItemIngredientNode>())
+			{
+				if (node.UpdatePlayerUnitCount())
+				{
+					node.UpdateItemCountControls();
+					node.PlayerCountTooltipView?.UpdateLinkedNodes();
+					node.FlashBackground();
+				}
+			}
+		}
+
+		private void WalletService_CurrenciesUpdated(object sender, EventArgs e)
+		{
+			foreach (CurrencyIngredientNode node in IngredientNodes.OfType<CurrencyIngredientNode>())
+			{
+				if (node.UpdatePlayerUnitCount())
+				{
+					node.UpdateItemCountControls();
+					node.PlayerCountTooltipView?.UpdateLinkedNodes();
+					node.FlashBackground();
+				}
+			}
+		}
 
 		public override void RecalculateLayout()
 		{
@@ -66,12 +98,9 @@ namespace MysticCrafting.Module.RecipeTree.TreeView
 		protected override void DisposeControl()
 		{
 			IngredientNodes = null;
+			ServiceContainer.WalletService.LoadingFinished -= WalletService_CurrenciesUpdated;
+			ServiceContainer.PlayerItemService.LoadingFinished -= PlayerItemService_LoadingFinished;
 			((Container)this).DisposeControl();
-		}
-
-		public TreeView()
-			: this()
-		{
 		}
 	}
 }

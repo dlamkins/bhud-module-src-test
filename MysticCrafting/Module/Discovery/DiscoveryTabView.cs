@@ -18,7 +18,7 @@ using MysticCrafting.Module.Menu;
 using MysticCrafting.Module.RecipeTree;
 using MysticCrafting.Module.RecipeTree.TreeView;
 using MysticCrafting.Module.Services;
-using MysticCrafting.Module.Services.Recurring;
+using MysticCrafting.Module.Services.API;
 using MysticCrafting.Module.Strings;
 
 namespace MysticCrafting.Module.Discovery
@@ -306,7 +306,7 @@ namespace MysticCrafting.Module.Discovery
 			((Control)val).set_Parent(parent);
 			((Control)val).set_Size(new Point(320, 60));
 			((Control)val).set_Location(new Point(parent.get_ContentRegion().Width - 180, parent.get_ContentRegion().Height - 60));
-			_loadingStatusView = new LoadingStatusView(new List<IRecurringService>
+			_loadingStatusView = new LoadingStatusView(new List<IApiService>
 			{
 				ServiceContainer.TradingPostService,
 				ServiceContainer.PlayerItemService,

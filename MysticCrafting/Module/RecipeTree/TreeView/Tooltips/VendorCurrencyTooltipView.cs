@@ -88,7 +88,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Tooltips
 			}
 			IList<Control> controls2 = _controls;
 			Label val2 = new Label();
-			val2.set_Text(Quantity.Currency?.Name);
+			val2.set_Text(Quantity.Currency?.LocalizedName());
 			val2.set_Font(GameService.Content.get_DefaultFont18());
 			((Control)val2).set_Location(new Point(40, 5));
 			val2.set_TextColor(ColorHelper.CurrencyName);

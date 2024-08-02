@@ -23,17 +23,17 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			: base(item.Id, quantity, parent, index, showUnitCount, loadingChildren)
 		{
 			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
 			Item = item;
 			base.Name = (Item.LocalizedName() ?? "").Truncate(34);
 			base.NameLabelColor = ColorHelper.FromRarity(Item.Rarity.ToString());
 			base.IconTexture = ServiceContainer.TextureRepository.GetTexture(item.Icon);
-			base.PlayerUnitCount = ServiceContainer.PlayerItemService.GetItemCount(item.Id);
+			UpdatePlayerUnitCount();
 			base.LoadingChildren = loadingChildren;
 			if (parent is TreeView)
 			{
@@ -97,6 +97,20 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 		{
 			ContextMenuPresenter menuStripPresenter = new ContextMenuPresenter();
 			MenuStrip = menuStripPresenter.BuildMenuStrip(Item, this);
+		}
+
+		public override bool UpdatePlayerUnitCount()
+		{
+			if (Item == null)
+			{
+				return false;
+			}
+			if (ServiceContainer.PlayerItemService.GetItemCount(Item.Id) == base.PlayerUnitCount)
+			{
+				return false;
+			}
+			base.PlayerUnitCount = ServiceContainer.PlayerItemService.GetItemCount(Item.Id);
+			return true;
 		}
 	}
 }

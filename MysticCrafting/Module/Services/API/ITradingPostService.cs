@@ -1,9 +1,8 @@
 using MysticCrafting.Models.TradingPost;
-using MysticCrafting.Module.Services.Recurring;
 
 namespace MysticCrafting.Module.Services.API
 {
-	public interface ITradingPostService : IRecurringService
+	public interface ITradingPostService : IApiService
 	{
 		TradingPostItemPrices GetItemPrices(int itemId);
 	}

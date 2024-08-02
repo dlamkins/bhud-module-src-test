@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD.Modules.Managers;
@@ -10,12 +8,11 @@ using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using MysticCrafting.Models.Account;
 using MysticCrafting.Module.Extensions;
-using MysticCrafting.Module.Services.Recurring;
 using MysticCrafting.Module.Strings;
 
 namespace MysticCrafting.Module.Services.API
 {
-	public class PlayerItemService : RecurringService, IPlayerItemService, IRecurringService
+	public class PlayerItemService : ApiService, IPlayerItemService, IApiService
 	{
 		private readonly Gw2ApiManager _gw2ApiManager;
 
@@ -29,33 +26,38 @@ namespace MysticCrafting.Module.Services.API
 
 		public IDictionary<string, IList<ItemAmount>> CharacterInventoryItems { get; set; }
 
+		public override List<TokenPermission> Permissions => new List<TokenPermission>
+		{
+			(TokenPermission)1,
+			(TokenPermission)5,
+			(TokenPermission)3
+		};
+
 		public PlayerItemService(Gw2ApiManager apiManager)
+			: base(apiManager)
 		{
 			_gw2ApiManager = apiManager;
 		}
 
 		public override async Task<string> LoadAsync()
 		{
-			Gw2ApiManager gw2ApiManager = _gw2ApiManager;
-			TokenPermission[] array = new TokenPermission[3];
-			RuntimeHelpers.InitializeArray(array, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);
-			if (gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)array))
+			if (!_gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)Permissions))
 			{
-				Task<IApiV2ObjectList<AccountMaterial>> apiMaterials = ((IBlobClient<IApiV2ObjectList<AccountMaterial>>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
-					.get_Materials()).GetAsync(default(CancellationToken));
-				Task<IApiV2ObjectList<AccountItem>> bankItems = ((IBlobClient<IApiV2ObjectList<AccountItem>>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
-					.get_Bank()).GetAsync(default(CancellationToken));
-				Task<IApiV2ObjectList<AccountItem>> sharedInventoryItems = ((IBlobClient<IApiV2ObjectList<AccountItem>>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
-					.get_Inventory()).GetAsync(default(CancellationToken));
-				Task<IApiV2ObjectList<string>> characterNames = ((IBulkExpandableClient<Character, string>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Characters()).IdsAsync(default(CancellationToken));
-				await Task.WhenAll(apiMaterials, bankItems, sharedInventoryItems, characterNames);
-				Materials = ((IEnumerable<AccountMaterial>)(await apiMaterials)).Select(ItemAmount.From).ToList();
-				BankItems = ((IEnumerable<AccountItem>)(await bankItems)).Select(ItemAmount.From)?.ToList();
-				SharedInventoryItems = ((IEnumerable<AccountItem>)(await sharedInventoryItems)).Select(ItemAmount.From).ToList();
-				await LoadCharacterInventoriesAsync((IEnumerable<string>)(await characterNames));
-				return $"{Materials.Count()} materials, {BankItems.Count()} bank items, {SharedInventoryItems.Count()} shared inventory items, {CharacterInventoryItems.Count()} characters loaded";
+				return string.Empty;
 			}
-			throw new Exception("One or more of the required permissions are missing: Account, Inventories, Characters.");
+			Task<IApiV2ObjectList<AccountMaterial>> apiMaterials = ((IBlobClient<IApiV2ObjectList<AccountMaterial>>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
+				.get_Materials()).GetAsync(default(CancellationToken));
+			Task<IApiV2ObjectList<AccountItem>> bankItems = ((IBlobClient<IApiV2ObjectList<AccountItem>>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
+				.get_Bank()).GetAsync(default(CancellationToken));
+			Task<IApiV2ObjectList<AccountItem>> sharedInventoryItems = ((IBlobClient<IApiV2ObjectList<AccountItem>>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
+				.get_Inventory()).GetAsync(default(CancellationToken));
+			Task<IApiV2ObjectList<string>> characterNames = ((IBulkExpandableClient<Character, string>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Characters()).IdsAsync(default(CancellationToken));
+			await Task.WhenAll(apiMaterials, bankItems, sharedInventoryItems, characterNames);
+			Materials = ((IEnumerable<AccountMaterial>)(await apiMaterials)).Select(ItemAmount.From).ToList();
+			BankItems = ((IEnumerable<AccountItem>)(await bankItems)).Select(ItemAmount.From)?.ToList();
+			SharedInventoryItems = ((IEnumerable<AccountItem>)(await sharedInventoryItems)).Select(ItemAmount.From).ToList();
+			await LoadCharacterInventoriesAsync((IEnumerable<string>)(await characterNames));
+			return $"{Materials.Count()} materials, {BankItems.Count()} bank items, {SharedInventoryItems.Count()} shared inventory items, {CharacterInventoryItems.Count()} characters loaded";
 		}
 
 		public async Task LoadCharacterInventoriesAsync(IEnumerable<string> characterNames)

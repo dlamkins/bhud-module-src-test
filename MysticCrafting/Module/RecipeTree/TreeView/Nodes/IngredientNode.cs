@@ -267,8 +267,11 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			}
 			set
 			{
-				_playerUnitCount = value;
-				CalculateTotalPlayerCount();
+				if (_playerUnitCount != value)
+				{
+					_playerUnitCount = value;
+					CalculateTotalPlayerCount();
+				}
 			}
 		}
 
@@ -731,6 +734,8 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 				_enoughCollected = false;
 			}
 		}
+
+		public abstract bool UpdatePlayerUnitCount();
 
 		public void UpdateProfessionRequirements()
 		{

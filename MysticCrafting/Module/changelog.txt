@@ -1,4 +1,12 @@
-﻿#Vendor changes
+﻿#1.3.2 - API changes
+- The API will only be called while using the module (window is open). 
+- The player item & currency numbers now update automatically when the data has changed (indicated by the node flashing green).
+- Additional details have been added to the API loading tooltip.
+- Fixed issue with currency localization.
+- Fixed issue with localized search.
+
+
+#1.3 - Vendor & Currency changes
 Vendors have been updated to display the required currencies and items underneath the vendor to make it easier to see the total cost (for example, the cost of acquiring the items to buy things from Lyhr). They are also grouped based on price and have an updated UI.
 #Currency changes
 Currencies are now displayed as nodes in the tree view and they function similarly to items. The number of currency you have is now also divided across the recipes.
@@ -7,6 +15,7 @@ A new window will be displayed after every new update with details about the lat
 #Reduced RAM usage
 The data storage was migrated to significantly reduce the overall RAM usage. Yay!
 #Bugs & other changes
+
 - Home screen has been removed.
 - The Legendary Start Kit (Wizard's Vault) options have been updated.
 - Data has been updated and now includes new vendors, currencies and items such the Wizard's Tower Exchange.

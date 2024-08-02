@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Atzie.MysticCrafting.Models.Crafting;
@@ -9,12 +7,11 @@ using Blish_HUD.Modules.Managers;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
-using MysticCrafting.Module.Services.Recurring;
 using MysticCrafting.Module.Strings;
 
 namespace MysticCrafting.Module.Services.API
 {
-	public class PlayerUnlocksService : RecurringService, IPlayerUnlocksService, IRecurringService
+	public class PlayerUnlocksService : ApiService, IPlayerUnlocksService, IApiService
 	{
 		private readonly Gw2ApiManager _gw2ApiManager;
 
@@ -32,7 +29,15 @@ namespace MysticCrafting.Module.Services.API
 		public IDictionary<int, int> UnlockedLegendaries { get; set; } = new Dictionary<int, int>();
 
 
+		public override List<TokenPermission> Permissions => new List<TokenPermission>
+		{
+			(TokenPermission)1,
+			(TokenPermission)5,
+			(TokenPermission)9
+		};
+
 		public PlayerUnlocksService(Gw2ApiManager apiManager)
+			: base(apiManager)
 		{
 			_gw2ApiManager = apiManager;
 		}
@@ -87,31 +92,24 @@ namespace MysticCrafting.Module.Services.API
 
 		public override async Task<string> LoadAsync()
 		{
-			if (_gw2ApiManager == null)
+			if (!_gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)Permissions))
 			{
-				throw new Exception("Gw2ApiManager object is null.");
+				return string.Empty;
 			}
-			Gw2ApiManager gw2ApiManager = _gw2ApiManager;
-			TokenPermission[] array = new TokenPermission[3];
-			RuntimeHelpers.InitializeArray(array, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);
-			if (gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)array))
-			{
-				Task<IApiV2ObjectList<int>> miniatures = ((IBlobClient<IApiV2ObjectList<int>>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
-					.get_Minis()).GetAsync(default(CancellationToken));
-				Task<IApiV2ObjectList<int>> recipes = ((IBlobClient<IApiV2ObjectList<int>>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
-					.get_Recipes()).GetAsync(default(CancellationToken));
-				Task<IApiV2ObjectList<int>> skins = ((IBlobClient<IApiV2ObjectList<int>>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
-					.get_Skins()).GetAsync(default(CancellationToken));
-				Task<IApiV2ObjectList<AccountLegendaryArmory>> legendaries = ((IBlobClient<IApiV2ObjectList<AccountLegendaryArmory>>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
-					.get_LegendaryArmory()).GetAsync(default(CancellationToken));
-				await Task.WhenAll(miniatures, recipes, skins, legendaries);
-				UnlockedMiniatures = ((IEnumerable<int>)(await miniatures)).ToList();
-				UnlockedRecipes = ((IEnumerable<int>)(await recipes)).ToList();
-				UnlockedSkins = ((IEnumerable<int>)(await skins)).ToList();
-				UnlockedLegendaries = ((IEnumerable<AccountLegendaryArmory>)(await legendaries)).ToDictionary((AccountLegendaryArmory x) => x.get_Id(), (AccountLegendaryArmory x) => x.get_Count());
-				return $"{UnlockedRecipes.Count} recipes, {UnlockedSkins.Count} skins, {UnlockedLegendaries.Count} legendaries.";
-			}
-			throw new Exception("One or more of the required permissions are missing: Account, Inventories, Unlocks.");
+			Task<IApiV2ObjectList<int>> miniatures = ((IBlobClient<IApiV2ObjectList<int>>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
+				.get_Minis()).GetAsync(default(CancellationToken));
+			Task<IApiV2ObjectList<int>> recipes = ((IBlobClient<IApiV2ObjectList<int>>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
+				.get_Recipes()).GetAsync(default(CancellationToken));
+			Task<IApiV2ObjectList<int>> skins = ((IBlobClient<IApiV2ObjectList<int>>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
+				.get_Skins()).GetAsync(default(CancellationToken));
+			Task<IApiV2ObjectList<AccountLegendaryArmory>> legendaries = ((IBlobClient<IApiV2ObjectList<AccountLegendaryArmory>>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
+				.get_LegendaryArmory()).GetAsync(default(CancellationToken));
+			await Task.WhenAll(miniatures, recipes, skins, legendaries);
+			UnlockedMiniatures = ((IEnumerable<int>)(await miniatures)).ToList();
+			UnlockedRecipes = ((IEnumerable<int>)(await recipes)).ToList();
+			UnlockedSkins = ((IEnumerable<int>)(await skins)).ToList();
+			UnlockedLegendaries = ((IEnumerable<AccountLegendaryArmory>)(await legendaries)).ToDictionary((AccountLegendaryArmory x) => x.get_Id(), (AccountLegendaryArmory x) => x.get_Count());
+			return $"{UnlockedRecipes.Count} recipes, {UnlockedSkins.Count} skins, {UnlockedLegendaries.Count} legendaries.";
 		}
 	}
 }

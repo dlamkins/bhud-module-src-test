@@ -1,9 +1,8 @@
 using System.Collections.Generic;
-using MysticCrafting.Module.Services.Recurring;
 
 namespace MysticCrafting.Module.Services.API
 {
-	public interface IPlayerItemService : IRecurringService
+	public interface IPlayerItemService : IApiService
 	{
 		int GetItemCount(int itemId);
 

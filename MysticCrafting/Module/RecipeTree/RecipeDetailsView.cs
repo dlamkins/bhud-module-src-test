@@ -15,7 +15,7 @@ using MysticCrafting.Module.RecipeTree.TreeView;
 using MysticCrafting.Module.RecipeTree.TreeView.Extensions;
 using MysticCrafting.Module.RecipeTree.TreeView.Presenters;
 using MysticCrafting.Module.Services;
-using MysticCrafting.Module.Services.Recurring;
+using MysticCrafting.Module.Services.API;
 
 namespace MysticCrafting.Module.RecipeTree
 {
@@ -98,7 +98,7 @@ namespace MysticCrafting.Module.RecipeTree
 			}
 		}
 
-		public void BuildServicesLoadingPanel(Container parent, List<IRecurringService> services)
+		public void BuildServicesLoadingPanel(Container parent, List<IApiService> services)
 		{
 			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
@@ -117,7 +117,7 @@ namespace MysticCrafting.Module.RecipeTree
 			LoadingViewContainer.Show((IView)(object)loadingView);
 		}
 
-		public void BuildLoadingPanel(Container parent, List<IRecurringService> services)
+		public void BuildLoadingPanel(Container parent, List<IApiService> services)
 		{
 			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)

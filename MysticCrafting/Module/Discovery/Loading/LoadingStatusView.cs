@@ -3,7 +3,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Microsoft.Xna.Framework;
 using MysticCrafting.Module.Services;
-using MysticCrafting.Module.Services.Recurring;
+using MysticCrafting.Module.Services.API;
 
 namespace MysticCrafting.Module.Discovery.Loading
 {
@@ -17,9 +17,9 @@ namespace MysticCrafting.Module.Discovery.Loading
 
 		public Image _statusImage;
 
-		private readonly IList<IRecurringService> _recurringServices;
+		private readonly IList<IApiService> _recurringServices;
 
-		public LoadingStatusView(IList<IRecurringService> recurringServices)
+		public LoadingStatusView(IList<IApiService> recurringServices)
 			: this()
 		{
 			_recurringServices = recurringServices;

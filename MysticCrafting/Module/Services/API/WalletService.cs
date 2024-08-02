@@ -9,12 +9,11 @@ using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using MysticCrafting.Module.Repositories;
-using MysticCrafting.Module.Services.Recurring;
 using MysticCrafting.Module.Strings;
 
 namespace MysticCrafting.Module.Services.API
 {
-	public class WalletService : RecurringService, IWalletService, IRecurringService
+	public class WalletService : ApiService, IWalletService, IApiService
 	{
 		private readonly Gw2ApiManager _gw2ApiManager;
 
@@ -27,7 +26,10 @@ namespace MysticCrafting.Module.Services.API
 		public IList<CurrencyQuantity> CurrencyQuantities { get; set; } = new List<CurrencyQuantity>();
 
 
+		public override List<TokenPermission> Permissions => new List<TokenPermission> { (TokenPermission)10 };
+
 		public WalletService(Gw2ApiManager apiManager, ICurrencyRepository currencyRepository, IPlayerItemService playerItemService)
+			: base(apiManager)
 		{
 			_gw2ApiManager = apiManager;
 			_currencyRepository = currencyRepository;

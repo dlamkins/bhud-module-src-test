@@ -56,6 +56,12 @@ namespace MysticCrafting.Module.Strings
 
 		internal static string LoadingErrorMessage => ResourceManager.GetString("LoadingErrorMessage", resourceCulture);
 
+		internal static string LoadingIntroMessage => ResourceManager.GetString("LoadingIntroMessage", resourceCulture);
+
+		internal static string LoadingMinuteInterval => ResourceManager.GetString("LoadingMinuteInterval", resourceCulture);
+
+		internal static string LoadingPlayerAchievements => ResourceManager.GetString("LoadingPlayerAchievements", resourceCulture);
+
 		internal static string LoadingPlayerItems => ResourceManager.GetString("LoadingPlayerItems", resourceCulture);
 
 		internal static string LoadingPlayerUnlocks => ResourceManager.GetString("LoadingPlayerUnlocks", resourceCulture);

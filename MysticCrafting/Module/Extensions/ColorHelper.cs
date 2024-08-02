@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
-using MysticCrafting.Module.Services.Recurring;
+using MysticCrafting.Module.Services.API;
 
 namespace MysticCrafting.Module.Extensions
 {
@@ -104,7 +104,7 @@ namespace MysticCrafting.Module.Extensions
 			return materialColor;
 		}
 
-		public static Color FromServicesLoading(IEnumerable<IRecurringService> services)
+		public static Color FromServicesLoading(IEnumerable<IApiService> services)
 		{
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
@@ -116,7 +116,7 @@ namespace MysticCrafting.Module.Extensions
 			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
 			Color color = Color.get_White();
-			if (services.All(delegate(IRecurringService s)
+			if (services.All(delegate(IApiService s)
 			{
 				_ = s.LastFailed;
 				_ = s.LastLoaded;
@@ -125,7 +125,7 @@ namespace MysticCrafting.Module.Extensions
 			{
 				color = Color.get_Red();
 			}
-			if (services.Any(delegate(IRecurringService s)
+			if (services.Any(delegate(IApiService s)
 			{
 				_ = s.LastFailed;
 				_ = s.LastLoaded;
@@ -134,7 +134,7 @@ namespace MysticCrafting.Module.Extensions
 			{
 				color = Color.get_Orange();
 			}
-			else if (services.Any((IRecurringService s) => s.Loaded))
+			else if (services.Any((IApiService s) => s.Loaded))
 			{
 				color = Color.get_LightGreen();
 			}

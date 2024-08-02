@@ -60,7 +60,7 @@ namespace MysticCrafting.Module.Repositories
 			}
 			if (!string.IsNullOrEmpty(filter.NameContainsText))
 			{
-				whereClauses.Add("UPPER(Item.Name) LIKE '%" + filter.NameContainsText.ToUpper().Replace("'", "''") + "%'");
+				whereClauses.Add("UPPER(ItemLocalization.Name) LIKE '%" + filter.NameContainsText.ToUpper().Replace("'", "''") + "%'");
 			}
 			if (filter.Weight != 0 && !filter.WeightFilterDisabled)
 			{

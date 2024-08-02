@@ -9,12 +9,11 @@ using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using MysticCrafting.Models.TradingPost;
 using MysticCrafting.Module.Repositories;
-using MysticCrafting.Module.Services.Recurring;
 using MysticCrafting.Module.Strings;
 
 namespace MysticCrafting.Module.Services.API
 {
-	public class TradingPostService : RecurringService, ITradingPostService, IRecurringService
+	public class TradingPostService : ApiService, ITradingPostService, IApiService
 	{
 		private readonly Gw2ApiManager _gw2ApiManager;
 
@@ -25,10 +24,14 @@ namespace MysticCrafting.Module.Services.API
 		private IList<TradingPostItemPrices> ItemPrices { get; set; } = new List<TradingPostItemPrices>();
 
 
+		public override List<TokenPermission> Permissions => new List<TokenPermission> { (TokenPermission)8 };
+
 		public TradingPostService(Gw2ApiManager apiManager, IItemRepository itemRepository)
+			: base(apiManager)
 		{
 			_gw2ApiManager = apiManager;
 			_itemRepository = itemRepository;
+			base.ExecutionIntervalMinutes = 20;
 		}
 
 		public TradingPostItemPrices GetItemPrices(int itemId)
