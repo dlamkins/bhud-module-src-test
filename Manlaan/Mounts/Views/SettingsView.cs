@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Mounts;
+using Mounts.Settings;
 
 namespace Manlaan.Mounts.Views
 {
@@ -467,30 +468,47 @@ namespace Manlaan.Mounts.Views
 			//IL_068a: Expected O, but got Unknown
 			//IL_068b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0690: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0695: Unknown result type (might be due to invalid IL or missing references)
-			//IL_069f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06d8: Expected O, but got Unknown
-			//IL_06ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0709: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0710: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0717: Unknown result type (might be due to invalid IL or missing references)
-			//IL_071e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0725: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0730: Unknown result type (might be due to invalid IL or missing references)
-			//IL_073d: Expected O, but got Unknown
-			//IL_073e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0743: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0748: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0752: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0759: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0769: Unknown result type (might be due to invalid IL or missing references)
-			//IL_077c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_078b: Expected O, but got Unknown
+			//IL_0694: Unknown result type (might be due to invalid IL or missing references)
+			//IL_069e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06d7: Expected O, but got Unknown
+			//IL_06ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0708: Unknown result type (might be due to invalid IL or missing references)
+			//IL_070f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0716: Unknown result type (might be due to invalid IL or missing references)
+			//IL_071d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0724: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0731: Expected O, but got Unknown
+			//IL_0732: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0737: Unknown result type (might be due to invalid IL or missing references)
+			//IL_073c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0746: Unknown result type (might be due to invalid IL or missing references)
+			//IL_074d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_075d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0770: Unknown result type (might be due to invalid IL or missing references)
+			//IL_077f: Expected O, but got Unknown
+			//IL_0796: Unknown result type (might be due to invalid IL or missing references)
+			//IL_079b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07e4: Expected O, but got Unknown
+			//IL_07e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0800: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0810: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0823: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0832: Expected O, but got Unknown
 			Label val = new Label();
 			((Control)val).set_Location(new Point(0, 0));
 			((Control)val).set_Width(labelWidth2);
@@ -600,87 +618,110 @@ namespace Manlaan.Mounts.Views
 			val12.set_AutoSizeHeight(false);
 			val12.set_WrapText(false);
 			((Control)val12).set_Parent((Container)(object)defaultMountPanel);
-			val12.set_Text("Mount automatically after loading screen:");
-			Label settingMountAutomaticallyAfterLoadingScreen_Label = val12;
+			val12.set_Text("Block sequence from GW2:");
+			Label settingBlockSequenceFromGw2_Label = val12;
 			Checkbox val13 = new Checkbox();
 			((Control)val13).set_Size(new Point(labelWidth2, 20));
 			((Control)val13).set_Parent((Container)(object)defaultMountPanel);
-			val13.set_Checked(Module._settingMountAutomaticallyAfterLoadingScreen.get_Value());
-			((Control)val13).set_Location(new Point(((Control)settingMountAutomaticallyAfterLoadingScreen_Label).get_Right() + 5, ((Control)settingMountAutomaticallyAfterLoadingScreen_Label).get_Top() - 1));
-			Checkbox settingMountAutomaticallyAfterLoadingScreen_Checkbox = val13;
-			settingMountAutomaticallyAfterLoadingScreen_Checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+			val13.set_Checked(Module._settingBlockSequenceFromGw2.get_Value());
+			((Control)val13).set_Location(new Point(((Control)settingBlockSequenceFromGw2_Label).get_Right() + 5, ((Control)settingBlockSequenceFromGw2_Label).get_Top() - 1));
+			Checkbox settingBlockSequenceFromGw2_Checkbox = val13;
+			settingBlockSequenceFromGw2_Checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
 			{
-				Module._settingMountAutomaticallyAfterLoadingScreen.set_Value(settingMountAutomaticallyAfterLoadingScreen_Checkbox.get_Checked());
+				Module._settingBlockSequenceFromGw2.set_Value(settingBlockSequenceFromGw2_Checkbox.get_Checked());
+				Module.UserDefinedRadialSettings.ForEach(delegate(UserDefinedRadialThingSettings u)
+				{
+					u.Keybind.get_Value().set_BlockSequenceFromGw2(settingBlockSequenceFromGw2_Checkbox.get_Checked());
+				});
+				Module._settingDefaultMountBinding.get_Value().set_BlockSequenceFromGw2(settingBlockSequenceFromGw2_Checkbox.get_Checked());
 			});
 			Label val14 = new Label();
-			((Control)val14).set_Location(new Point(0, ((Control)settingMountAutomaticallyAfterLoadingScreen_Label).get_Bottom() + 6));
+			((Control)val14).set_Location(new Point(0, ((Control)settingBlockSequenceFromGw2_Label).get_Bottom() + 6));
 			((Control)val14).set_Width(labelWidth2);
 			val14.set_AutoSizeHeight(false);
 			val14.set_WrapText(false);
 			((Control)val14).set_Parent((Container)(object)defaultMountPanel);
-			val14.set_Text("Enable out of combat queueing:");
-			Label settingEnableMountQueueing_Label = val14;
+			val14.set_Text("Mount automatically after loading screen:");
+			Label settingMountAutomaticallyAfterLoadingScreen_Label = val14;
 			Checkbox val15 = new Checkbox();
 			((Control)val15).set_Size(new Point(labelWidth2, 20));
 			((Control)val15).set_Parent((Container)(object)defaultMountPanel);
-			val15.set_Checked(Module._settingEnableMountQueueing.get_Value());
-			((Control)val15).set_Location(new Point(((Control)settingEnableMountQueueing_Label).get_Right() + 5, ((Control)settingEnableMountQueueing_Label).get_Top() - 1));
-			Checkbox settingEnableMountQueueing_Checkbox = val15;
-			settingEnableMountQueueing_Checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+			val15.set_Checked(Module._settingMountAutomaticallyAfterLoadingScreen.get_Value());
+			((Control)val15).set_Location(new Point(((Control)settingMountAutomaticallyAfterLoadingScreen_Label).get_Right() + 5, ((Control)settingMountAutomaticallyAfterLoadingScreen_Label).get_Top() - 1));
+			Checkbox settingMountAutomaticallyAfterLoadingScreen_Checkbox = val15;
+			settingMountAutomaticallyAfterLoadingScreen_Checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
 			{
-				Module._settingEnableMountQueueing.set_Value(settingEnableMountQueueing_Checkbox.get_Checked());
+				Module._settingMountAutomaticallyAfterLoadingScreen.set_Value(settingMountAutomaticallyAfterLoadingScreen_Checkbox.get_Checked());
 			});
 			Label val16 = new Label();
-			((Control)val16).set_Location(new Point(0, ((Control)settingEnableMountQueueing_Label).get_Bottom() + 6));
+			((Control)val16).set_Location(new Point(0, ((Control)settingMountAutomaticallyAfterLoadingScreen_Label).get_Bottom() + 6));
 			((Control)val16).set_Width(labelWidth2);
 			val16.set_AutoSizeHeight(false);
 			val16.set_WrapText(false);
 			((Control)val16).set_Parent((Container)(object)defaultMountPanel);
-			val16.set_Text("Display out of combat queueing:");
-			Label settingDisplayMountQueueing_Label = val16;
+			val16.set_Text("Enable out of combat queueing:");
+			Label settingEnableMountQueueing_Label = val16;
 			Checkbox val17 = new Checkbox();
 			((Control)val17).set_Size(new Point(labelWidth2, 20));
 			((Control)val17).set_Parent((Container)(object)defaultMountPanel);
-			val17.set_Checked(Module._settingDisplayMountQueueing.get_Value());
-			((Control)val17).set_Location(new Point(((Control)settingDisplayMountQueueing_Label).get_Right() + 5, ((Control)settingDisplayMountQueueing_Label).get_Top() - 1));
-			Checkbox settingDisplayMountQueueing_Checkbox = val17;
-			settingDisplayMountQueueing_Checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+			val17.set_Checked(Module._settingEnableMountQueueing.get_Value());
+			((Control)val17).set_Location(new Point(((Control)settingEnableMountQueueing_Label).get_Right() + 5, ((Control)settingEnableMountQueueing_Label).get_Top() - 1));
+			Checkbox settingEnableMountQueueing_Checkbox = val17;
+			settingEnableMountQueueing_Checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
 			{
-				Module._settingDisplayMountQueueing.set_Value(settingDisplayMountQueueing_Checkbox.get_Checked());
+				Module._settingEnableMountQueueing.set_Value(settingEnableMountQueueing_Checkbox.get_Checked());
 			});
 			Label val18 = new Label();
-			((Control)val18).set_Location(new Point(0, ((Control)settingDisplayMountQueueing_Label).get_Bottom() + 6));
+			((Control)val18).set_Location(new Point(0, ((Control)settingEnableMountQueueing_Label).get_Bottom() + 6));
 			((Control)val18).set_Width(labelWidth2);
 			val18.set_AutoSizeHeight(false);
 			val18.set_WrapText(false);
 			((Control)val18).set_Parent((Container)(object)defaultMountPanel);
-			val18.set_Text("Drag out of combat queueing: ");
-			Label dragMountQueueing_Label = val18;
+			val18.set_Text("Display out of combat queueing:");
+			Label settingDisplayMountQueueing_Label = val18;
 			Checkbox val19 = new Checkbox();
-			((Control)val19).set_Size(new Point(20, 20));
+			((Control)val19).set_Size(new Point(labelWidth2, 20));
 			((Control)val19).set_Parent((Container)(object)defaultMountPanel);
-			val19.set_Checked(Module._settingDragMountQueueing.get_Value());
-			((Control)val19).set_Location(new Point(((Control)dragMountQueueing_Label).get_Right() + 5, ((Control)dragMountQueueing_Label).get_Top() - 1));
-			Checkbox dragMountQueueing_Checkbox = val19;
-			dragMountQueueing_Checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+			val19.set_Checked(Module._settingDisplayMountQueueing.get_Value());
+			((Control)val19).set_Location(new Point(((Control)settingDisplayMountQueueing_Label).get_Right() + 5, ((Control)settingDisplayMountQueueing_Label).get_Top() - 1));
+			Checkbox settingDisplayMountQueueing_Checkbox = val19;
+			settingDisplayMountQueueing_Checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
 			{
-				Module._settingDragMountQueueing.set_Value(dragMountQueueing_Checkbox.get_Checked());
+				Module._settingDisplayMountQueueing.set_Value(settingDisplayMountQueueing_Checkbox.get_Checked());
 			});
 			Label val20 = new Label();
-			((Control)val20).set_Location(new Point(0, ((Control)dragMountQueueing_Label).get_Bottom() + 6));
+			((Control)val20).set_Location(new Point(0, ((Control)settingDisplayMountQueueing_Label).get_Bottom() + 6));
 			((Control)val20).set_Width(labelWidth2);
 			val20.set_AutoSizeHeight(false);
 			val20.set_WrapText(false);
 			((Control)val20).set_Parent((Container)(object)defaultMountPanel);
-			val20.set_Text("Combat Launch mastery unlocked: ");
-			((Control)val20).set_BasicTooltipText("EoD and SotO masteries are not detectable in the API yet, see documentation for more info.");
-			Label combatLaunchMasteryUnlocked_Label = val20;
+			val20.set_Text("Drag out of combat queueing: ");
+			Label dragMountQueueing_Label = val20;
 			Checkbox val21 = new Checkbox();
 			((Control)val21).set_Size(new Point(20, 20));
 			((Control)val21).set_Parent((Container)(object)defaultMountPanel);
-			val21.set_Checked(Module._settingCombatLaunchMasteryUnlocked.get_Value());
-			((Control)val21).set_Location(new Point(((Control)combatLaunchMasteryUnlocked_Label).get_Right() + 5, ((Control)combatLaunchMasteryUnlocked_Label).get_Top() - 1));
-			Checkbox combatLaunchMasteryUnlocked_Checkbox = val21;
+			val21.set_Checked(Module._settingDragMountQueueing.get_Value());
+			((Control)val21).set_Location(new Point(((Control)dragMountQueueing_Label).get_Right() + 5, ((Control)dragMountQueueing_Label).get_Top() - 1));
+			Checkbox dragMountQueueing_Checkbox = val21;
+			dragMountQueueing_Checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+			{
+				Module._settingDragMountQueueing.set_Value(dragMountQueueing_Checkbox.get_Checked());
+			});
+			Label val22 = new Label();
+			((Control)val22).set_Location(new Point(0, ((Control)dragMountQueueing_Label).get_Bottom() + 6));
+			((Control)val22).set_Width(labelWidth2);
+			val22.set_AutoSizeHeight(false);
+			val22.set_WrapText(false);
+			((Control)val22).set_Parent((Container)(object)defaultMountPanel);
+			val22.set_Text("Combat Launch mastery unlocked: ");
+			((Control)val22).set_BasicTooltipText("EoD and SotO masteries are not detectable in the API yet, see documentation for more info.");
+			Label combatLaunchMasteryUnlocked_Label = val22;
+			Checkbox val23 = new Checkbox();
+			((Control)val23).set_Size(new Point(20, 20));
+			((Control)val23).set_Parent((Container)(object)defaultMountPanel);
+			val23.set_Checked(Module._settingCombatLaunchMasteryUnlocked.get_Value());
+			((Control)val23).set_Location(new Point(((Control)combatLaunchMasteryUnlocked_Label).get_Right() + 5, ((Control)combatLaunchMasteryUnlocked_Label).get_Top() - 1));
+			Checkbox combatLaunchMasteryUnlocked_Checkbox = val23;
 			combatLaunchMasteryUnlocked_Checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
 			{
 				Module._settingCombatLaunchMasteryUnlocked.set_Value(combatLaunchMasteryUnlocked_Checkbox.get_Checked());

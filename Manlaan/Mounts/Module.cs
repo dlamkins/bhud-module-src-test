@@ -55,6 +55,8 @@ namespace Manlaan.Mounts
 
 		public static SettingEntry<KeyBinding> _settingDefaultMountBinding;
 
+		public static SettingEntry<bool> _settingBlockSequenceFromGw2;
+
 		public static SettingEntry<bool> _settingDisplayMountQueueing;
 
 		public static SettingEntry<bool> _settingEnableMountQueueing;
@@ -292,13 +294,13 @@ namespace Manlaan.Mounts
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			//IL_0225: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026d: Expected O, but got Unknown
-			//IL_0375: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0597: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05df: Expected O, but got Unknown
-			//IL_06d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06e4: Expected O, but got Unknown
+			//IL_023d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0285: Expected O, but got Unknown
+			//IL_0396: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0600: Expected O, but got Unknown
+			//IL_06f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0705: Expected O, but got Unknown
 			settingscollection = settings;
 			List<Thing> obj = new List<Thing>
 			{
@@ -326,9 +328,10 @@ namespace Manlaan.Mounts
 			_things = new Collection<Thing>(obj);
 			List<Thing> thingsForMigration = obj.ToList();
 			_settingsLastRunMigrationVersion = settings.DefineSetting<int>("LastRunMigrationVersion", 0, (Func<string>)null, (Func<string>)null);
+			_settingBlockSequenceFromGw2 = settings.DefineSetting<bool>("BlockSequenceFromGw2", false, (Func<string>)null, (Func<string>)null);
 			_settingDefaultMountBinding = settings.DefineSetting<KeyBinding>("DefaultMountBinding", new KeyBinding((Keys)0), (Func<string>)(() => Strings.Setting_DefaultMountBinding), (Func<string>)(() => ""));
 			_settingDefaultMountBinding.get_Value().set_Enabled(true);
-			_settingDefaultMountBinding.get_Value().set_BlockSequenceFromGw2(true);
+			_settingDefaultMountBinding.get_Value().set_BlockSequenceFromGw2(_settingBlockSequenceFromGw2.get_Value());
 			_settingDefaultMountBinding.get_Value().add_Activated((EventHandler<EventArgs>)async delegate
 			{
 				await DoKeybindActionAsync(KeybindTriggerType.Module);

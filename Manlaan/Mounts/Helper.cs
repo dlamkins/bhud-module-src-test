@@ -126,7 +126,6 @@ namespace Manlaan.Mounts
 			double currentUpdateSeconds = gameTime.get_TotalGameTime().TotalSeconds;
 			double secondsDiff = currentUpdateSeconds - _lastUpdateSeconds;
 			float zPositionDiff = currentZPosition - _lastZPosition;
-			bool shouldUpdate = false;
 			if (NewStuff(zPositionDiff, secondsDiff))
 			{
 				_lastZPosition = currentZPosition;
@@ -149,20 +148,6 @@ namespace Manlaan.Mounts
 			else if (DidPlayerJumpRecently() && velocity < -2.0)
 			{
 				_isPlayerGlidingOrFalling = true;
-			}
-			else
-			{
-				_isPlayerGlidingOrFalling = false;
-			}
-			return true;
-		}
-
-		private bool OldStuff(float zPositionDiff, double secondsDiff)
-		{
-			if ((double)zPositionDiff < -0.0001 && secondsDiff != 0.0)
-			{
-				double velocity = (double)zPositionDiff / secondsDiff;
-				_isPlayerGlidingOrFalling = velocity < -2.5;
 			}
 			else
 			{

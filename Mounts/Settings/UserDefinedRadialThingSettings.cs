@@ -35,7 +35,7 @@ namespace Mounts.Settings
 			{
 				await _callback(KeybindTriggerType.UserDefined);
 			});
-			Keybind.get_Value().set_BlockSequenceFromGw2(true);
+			Keybind.get_Value().set_BlockSequenceFromGw2(Module._settingBlockSequenceFromGw2.get_Value());
 		}
 
 		public override void DeleteFromSettings(SettingCollection settingCollection)
