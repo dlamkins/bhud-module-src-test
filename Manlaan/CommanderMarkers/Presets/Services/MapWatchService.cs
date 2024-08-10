@@ -32,6 +32,8 @@ namespace Manlaan.CommanderMarkers.Presets.Services
 
 		private MarkerPreview? _previewMarkerSet;
 
+		private DateTime _lastTrigger = DateTime.Now;
+
 		public MapWatchService(MapData map, SettingService settings)
 		{
 			ScreenMap screenMap = new ScreenMap(map);
@@ -62,20 +64,23 @@ namespace Manlaan.CommanderMarkers.Presets.Services
 
 		private void _interactKeybind_Activated(object sender, EventArgs e)
 		{
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-			if (_markers.Count <= 0 || !GameService.Gw2Mumble.get_UI().get_IsMapOpen() || !ShouldAttemptPlacement())
+			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+			DateTime now = DateTime.Now;
+			TimeSpan cooldown = TimeSpan.FromSeconds(3.0);
+			if (now - _lastTrigger < cooldown || _markers.Count <= 0 || !GameService.Gw2Mumble.get_UI().get_IsMapOpen() || !ShouldAttemptPlacement())
 			{
 				return;
 			}
+			_lastTrigger = now;
 			Vector3 playerPosition = GameService.Gw2Mumble.get_PlayerCharacter().get_Position();
 			foreach (MarkerSet marker in _markers)
 			{
