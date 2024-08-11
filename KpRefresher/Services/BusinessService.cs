@@ -28,6 +28,8 @@ namespace KpRefresher.Services
 
 		private readonly CornerIcon _cornerIcon;
 
+		private readonly Logger _logger;
+
 		private string _accountName { get; set; }
 
 		private string _kpId { get; set; }
@@ -76,13 +78,14 @@ namespace KpRefresher.Services
 			}
 		}
 
-		public BusinessService(ModuleSettings moduleSettings, Gw2ApiService gw2ApiService, KpMeService kpMeService, Func<LoadingSpinner> getSpinner, CornerIcon cornerIcon)
+		public BusinessService(ModuleSettings moduleSettings, Gw2ApiService gw2ApiService, KpMeService kpMeService, Func<LoadingSpinner> getSpinner, CornerIcon cornerIcon, Logger logger)
 		{
 			_moduleSettings = moduleSettings;
 			_gw2ApiService = gw2ApiService;
 			_kpMeService = kpMeService;
 			_getSpinner = getSpinner;
 			_cornerIcon = cornerIcon;
+			_logger = logger;
 			_raidBossNames = Enum.GetValues(typeof(RaidBoss)).Cast<RaidBoss>().ToList();
 			_raidMapIds = (from RaidMap m in Enum.GetValues(typeof(RaidMap))
 				select (int)m).ToList();
@@ -192,16 +195,23 @@ namespace KpRefresher.Services
 
 		public void MapChanged()
 		{
-			int mapId = GameService.Gw2Mumble.get_CurrentMap().get_Id();
-			if (_raidMapIds.Contains(mapId) || _strikeMapIds.Contains(mapId))
+			try
 			{
-				_playerWasInInstance = true;
+				int mapId = GameService.Gw2Mumble.get_CurrentMap().get_Id();
+				if (_raidMapIds.Contains(mapId) || _strikeMapIds.Contains(mapId))
+				{
+					_playerWasInInstance = true;
+				}
+				else if (_playerWasInInstance)
+				{
+					_playerWasInInstance = false;
+					ScheduleRefresh(_moduleSettings.DelayBeforeRefreshOnMapChange.get_Value() * 60);
+					ScreenNotification.ShowNotification(string.Format(strings.Notification_InstanceExitDetected, _moduleSettings.DelayBeforeRefreshOnMapChange.get_Value(), (_moduleSettings.DelayBeforeRefreshOnMapChange.get_Value() > 1) ? "s" : string.Empty), (NotificationType)0, (Texture2D)null, 4);
+				}
 			}
-			else if (_playerWasInInstance)
+			catch (Exception e)
 			{
-				_playerWasInInstance = false;
-				ScheduleRefresh(_moduleSettings.DelayBeforeRefreshOnMapChange.get_Value() * 60);
-				ScreenNotification.ShowNotification(string.Format(strings.Notification_InstanceExitDetected, _moduleSettings.DelayBeforeRefreshOnMapChange.get_Value(), (_moduleSettings.DelayBeforeRefreshOnMapChange.get_Value() > 1) ? "s" : string.Empty), (NotificationType)0, (Texture2D)null, 4);
+				_logger.Warn("Error while changing map : " + e.Message);
 			}
 		}
 
