@@ -18,11 +18,14 @@ namespace KpRefresher.Services
 	{
 		private readonly Logger _logger;
 
+		private readonly ModuleSettings _moduleSettings;
+
 		private const string _kpMeBaseUrl = "https://killproof.me/";
 
-		public KpMeService(Logger logger)
+		public KpMeService(Logger logger, ModuleSettings moduleSettings)
 		{
 			_logger = logger;
+			_moduleSettings = moduleSettings;
 		}
 
 		public async Task<KpApiModel> GetAccountData(string kpId, bool showNotification = true)
@@ -47,7 +50,7 @@ namespace KpRefresher.Services
 						}
 						if (response.get_StatusCode() == HttpStatusCode.NotFound && showNotification)
 						{
-							ScreenNotification.ShowNotification(string.Format(strings.Notification_KpAccountUnknown, kpId), (NotificationType)2, (Texture2D)null, 4);
+							ShowNotification(string.Format(strings.Notification_KpAccountUnknown, kpId), (NotificationType)2);
 						}
 						else
 						{
@@ -102,7 +105,7 @@ namespace KpRefresher.Services
 						}
 						if (response.get_StatusCode() == HttpStatusCode.NotFound)
 						{
-							ScreenNotification.ShowNotification(string.Format(strings.Notification_KpAccountUnknown, kpId), (NotificationType)2, (Texture2D)null, 4);
+							ShowNotification(string.Format(strings.Notification_KpAccountUnknown, kpId), (NotificationType)2);
 						}
 						else
 						{
@@ -148,11 +151,11 @@ namespace KpRefresher.Services
 						}
 						if (response.get_StatusCode() == HttpStatusCode.Forbidden)
 						{
-							ScreenNotification.ShowNotification(strings.Notification_KpAccountAnonymous, (NotificationType)2, (Texture2D)null, 4);
+							ShowNotification(strings.Notification_KpAccountAnonymous, (NotificationType)2);
 						}
 						else if (response.get_StatusCode() == HttpStatusCode.NotFound)
 						{
-							ScreenNotification.ShowNotification(string.Format(strings.Notification_KpAccountUnknown, kpId), (NotificationType)2, (Texture2D)null, 4);
+							ShowNotification(string.Format(strings.Notification_KpAccountUnknown, kpId), (NotificationType)2);
 						}
 						else
 						{
@@ -175,6 +178,15 @@ namespace KpRefresher.Services
 		public string GetBaseUrl()
 		{
 			return "https://killproof.me/";
+		}
+
+		private void ShowNotification(string message, NotificationType notificationType)
+		{
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			if (!_moduleSettings.HideAllMessages.get_Value())
+			{
+				ScreenNotification.ShowNotification(message, notificationType, (Texture2D)null, 4);
+			}
 		}
 	}
 }

@@ -88,7 +88,7 @@ namespace KpRefresher
 			((CornerIcon)cornerIcon).set_Priority(1283537108);
 			CornerIcon = cornerIcon;
 			Gw2ApiService = new Gw2ApiService(Gw2ApiManager, Logger);
-			KpMeService = new KpMeService(Logger);
+			KpMeService = new KpMeService(Logger, ModuleSettings);
 			BusinessService = new BusinessService(ModuleSettings, Gw2ApiService, KpMeService, () => (LoadingSpinner)(object)_apiSpinner, CornerIcon, Logger);
 			Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)OnApiSubTokenUpdated);
 			GameService.Overlay.get_UserLocale().add_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)OnLocaleChanged);

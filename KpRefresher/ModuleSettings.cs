@@ -19,6 +19,8 @@ namespace KpRefresher
 
 		public SettingEntry<string> CustomId { get; set; }
 
+		public SettingEntry<bool> HideAllMessages { get; set; }
+
 		public ModuleSettings(SettingCollection settings)
 		{
 			SettingCollection internalSettings = settings.AddSubCollection("Internal", false);
@@ -29,6 +31,7 @@ namespace KpRefresher
 			RefreshOnMapChange = internalSettings.DefineSetting<bool>("RefreshOnMapChange", false, (Func<string>)null, (Func<string>)null);
 			DelayBeforeRefreshOnMapChange = internalSettings.DefineSetting<int>("DelayBeforeRefreshOnMapChange", 10, (Func<string>)null, (Func<string>)null);
 			CustomId = internalSettings.DefineSetting<string>("CustomId", string.Empty, (Func<string>)null, (Func<string>)null);
+			HideAllMessages = internalSettings.DefineSetting<bool>("HideAllMessages", false, (Func<string>)null, (Func<string>)null);
 		}
 	}
 }

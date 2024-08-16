@@ -120,6 +120,10 @@ namespace KpRefresher.Ressources
 
 		internal static string MainWindow_EnableRefreshOnKill_Tooltip => ResourceManager.GetString("MainWindow_EnableRefreshOnKill_Tooltip", resourceCulture);
 
+		internal static string MainWindow_HideAllMessages_Label => ResourceManager.GetString("MainWindow_HideAllMessages_Label", resourceCulture);
+
+		internal static string MainWindow_HideAllMessages_Tooltip => ResourceManager.GetString("MainWindow_HideAllMessages_Tooltip", resourceCulture);
+
 		internal static string MainWindow_Notif_LinkedAccounts => ResourceManager.GetString("MainWindow_Notif_LinkedAccounts", resourceCulture);
 
 		internal static string MainWindow_Notif_Loading => ResourceManager.GetString("MainWindow_Notif_Loading", resourceCulture);

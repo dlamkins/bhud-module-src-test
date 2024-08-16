@@ -27,11 +27,13 @@
       </xsd:complexType>
     </xsd:element>
   </xsd:schema>
-<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="MainWindow_ShowScheduleNotification_Label"><value>Show auto-retry notifications</value></data>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="MainWindow_HideAllMessages_Label"><value>Hide All Messages</value></data>
+  <data name="MainWindow_ShowScheduleNotification_Label"><value>Show auto-retry notifications</value></data>
   <data name="Notification_RefreshNotAvailable"><value>[KpRefresher] KillProof.me refresh was not available
 Please retry later.</value></data>
   <data name="MainWindow_Notif_Loading"><value>Loading...</value></data>
   <data name="CornerIcon_CancelNotify"><value>Cancel notification for next refresh</value></data>
+  <data name="MainWindow_HideAllMessages_Tooltip"><value>Hide all notifications, useful when API down</value></data>
   <data name="CornerIcon_Copy"><value>Copy KillProof.me Id to clipboard</value></data>
   <data name="MainWindow_EnableAutoRetry_Tooltip"><value>Schedule automatically a new try when KillProof.me was not available for a refresh</value></data>
   <data name="BusinessService_CustomIdAccountNotMatching"><value>KillProof.me account {0} does not match with current GW2 account {1}.</value></data>

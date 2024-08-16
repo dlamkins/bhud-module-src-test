@@ -122,7 +122,7 @@ namespace KpRefresher.Services
 			CancelSchedule();
 			if (!(await DataLoaded()))
 			{
-				ScreenNotification.ShowNotification(strings.Notification_DataNotAvailable, (NotificationType)1, (Texture2D)null, 4);
+				ShowNotification(strings.Notification_DataNotAvailable, (NotificationType)1);
 				return;
 			}
 			if (!_canRefreshByDates)
@@ -134,18 +134,18 @@ namespace KpRefresher.Services
 					ScheduleRefresh(Math.Ceiling(_nextRefreshInterval.TotalSeconds));
 					if (!fromUpdateLoop || _moduleSettings.ShowScheduleNotification.get_Value())
 					{
-						ScreenNotification.ShowNotification(string.Format(strings.Notification_TryScheduled, baseMsg), (NotificationType)1, (Texture2D)null, 4);
+						ShowNotification(string.Format(strings.Notification_TryScheduled, baseMsg), (NotificationType)1);
 					}
 				}
 				else
 				{
-					ScreenNotification.ShowNotification(baseMsg, (NotificationType)1, (Texture2D)null, 4);
+					ShowNotification(baseMsg, (NotificationType)1);
 				}
 				return;
 			}
 			if (_moduleSettings.EnableRefreshOnKill.get_Value() && !(await CheckRaidClears()))
 			{
-				ScreenNotification.ShowNotification(strings.Notification_NoClearRefreshAborted, (NotificationType)0, (Texture2D)null, 4);
+				ShowNotification(strings.Notification_NoClearRefreshAborted, (NotificationType)0);
 				return;
 			}
 			bool? refreshed = await _kpMeService.RefreshApi(KpId);
@@ -162,7 +162,7 @@ namespace KpRefresher.Services
 						profileNotRefreshed = _nextRefreshSeconds == 0.0;
 					}
 				});
-				ScreenNotification.ShowNotification(strings.Notification_RefreshOk, (NotificationType)0, (Texture2D)null, 4);
+				ShowNotification(strings.Notification_RefreshOk, (NotificationType)0);
 			}
 			else
 			{
@@ -176,12 +176,12 @@ namespace KpRefresher.Services
 					ScheduleRefresh();
 					if (_moduleSettings.ShowScheduleNotification.get_Value())
 					{
-						ScreenNotification.ShowNotification(strings.Notification_RefreshNotAvailableRetry, (NotificationType)1, (Texture2D)null, 4);
+						ShowNotification(strings.Notification_RefreshNotAvailableRetry, (NotificationType)1);
 					}
 				}
 				else
 				{
-					ScreenNotification.ShowNotification(strings.Notification_RefreshNotAvailable, (NotificationType)1, (Texture2D)null, 4);
+					ShowNotification(strings.Notification_RefreshNotAvailable, (NotificationType)1);
 				}
 			}
 		}
@@ -206,7 +206,7 @@ namespace KpRefresher.Services
 				{
 					_playerWasInInstance = false;
 					ScheduleRefresh(_moduleSettings.DelayBeforeRefreshOnMapChange.get_Value() * 60);
-					ScreenNotification.ShowNotification(string.Format(strings.Notification_InstanceExitDetected, _moduleSettings.DelayBeforeRefreshOnMapChange.get_Value(), (_moduleSettings.DelayBeforeRefreshOnMapChange.get_Value() > 1) ? "s" : string.Empty), (NotificationType)0, (Texture2D)null, 4);
+					ShowNotification(string.Format(strings.Notification_InstanceExitDetected, _moduleSettings.DelayBeforeRefreshOnMapChange.get_Value(), (_moduleSettings.DelayBeforeRefreshOnMapChange.get_Value() > 1) ? "s" : string.Empty), (NotificationType)0);
 				}
 			}
 			catch (Exception e)
@@ -220,11 +220,11 @@ namespace KpRefresher.Services
 			if (await DataLoaded())
 			{
 				Clipboard.SetText("KillProof.me id : " + KpId);
-				ScreenNotification.ShowNotification(strings.Notification_CopiedToClipboard, (NotificationType)0, (Texture2D)null, 4);
+				ShowNotification(strings.Notification_CopiedToClipboard, (NotificationType)0);
 			}
 			else
 			{
-				ScreenNotification.ShowNotification(strings.Notification_DataNotAvailable, (NotificationType)1, (Texture2D)null, 4);
+				ShowNotification(strings.Notification_DataNotAvailable, (NotificationType)1);
 			}
 		}
 
@@ -232,7 +232,7 @@ namespace KpRefresher.Services
 		{
 			if (!(await DataLoaded()))
 			{
-				ScreenNotification.ShowNotification(strings.Notification_DataNotAvailable, (NotificationType)1, (Texture2D)null, 4);
+				ShowNotification(strings.Notification_DataNotAvailable, (NotificationType)1);
 			}
 			else
 			{
@@ -244,19 +244,19 @@ namespace KpRefresher.Services
 		{
 			if (!(await DataLoaded()))
 			{
-				ScreenNotification.ShowNotification(strings.Notification_DataNotAvailable, (NotificationType)1, (Texture2D)null, 4);
+				ShowNotification(strings.Notification_DataNotAvailable, (NotificationType)1);
 				return false;
 			}
 			if (_canRefreshByDates)
 			{
-				ScreenNotification.ShowNotification(strings.Notification_RefreshAvailable, (NotificationType)0, (Texture2D)null, 4);
+				ShowNotification(strings.Notification_RefreshAvailable, (NotificationType)0);
 				return false;
 			}
 			double minutesUntilRefreshAvailable = _nextRefreshInterval.TotalMinutes;
 			NotificationNextRefreshAvailabledActivated = true;
 			NotificationNextRefreshAvailabledTimer = 0.0;
 			NotificationNextRefreshAvailabledTimerEndValue = Math.Ceiling(_nextRefreshInterval.TotalSeconds) * 1000.0;
-			ScreenNotification.ShowNotification(string.Format(strings.Notification_NotifyScheduled, minutesUntilRefreshAvailable.ToString("0"), (minutesUntilRefreshAvailable > 1.0) ? "s" : string.Empty), (NotificationType)0, (Texture2D)null, 4);
+			ShowNotification(string.Format(strings.Notification_NotifyScheduled, minutesUntilRefreshAvailable.ToString("0"), (minutesUntilRefreshAvailable > 1.0) ? "s" : string.Empty), (NotificationType)0);
 			return true;
 		}
 
@@ -269,7 +269,7 @@ namespace KpRefresher.Services
 
 		public void NextRefreshIsAvailable()
 		{
-			ScreenNotification.ShowNotification(strings.Notification_RefreshAvailable, (NotificationType)0, (Texture2D)null, 4);
+			ShowNotification(strings.Notification_RefreshAvailable, (NotificationType)0);
 			ResetNotificationNextRefreshAvailable();
 		}
 
@@ -287,7 +287,7 @@ namespace KpRefresher.Services
 		{
 			if (!(await DataLoaded()))
 			{
-				ScreenNotification.ShowNotification(strings.Notification_DataNotAvailable, (NotificationType)1, (Texture2D)null, 4);
+				ShowNotification(strings.Notification_DataNotAvailable, (NotificationType)1);
 				return null;
 			}
 			List<RaidBoss> baseClears = await _kpMeService.GetClearData(KpId);
@@ -322,7 +322,7 @@ namespace KpRefresher.Services
 		{
 			if (!(await DataLoaded()))
 			{
-				ScreenNotification.ShowNotification(strings.Notification_DataNotAvailable, (NotificationType)1, (Texture2D)null, 4);
+				ShowNotification(strings.Notification_DataNotAvailable, (NotificationType)1);
 				return string.Empty;
 			}
 			return await _gw2ApiService.ScanAccountForKp();
@@ -332,7 +332,7 @@ namespace KpRefresher.Services
 		{
 			if (!(await DataLoaded()))
 			{
-				ScreenNotification.ShowNotification(strings.Notification_DataNotAvailable, (NotificationType)1, (Texture2D)null, 4);
+				ShowNotification(strings.Notification_DataNotAvailable, (NotificationType)1);
 				return string.Empty;
 			}
 			List<Task> tasks = new List<Task>();
@@ -394,7 +394,7 @@ namespace KpRefresher.Services
 			{
 				if (isFromInit)
 				{
-					ScreenNotification.ShowNotification(strings.Notification_KPProfileFetchError, (NotificationType)1, (Texture2D)null, 4);
+					ShowNotification(strings.Notification_KPProfileFetchError, (NotificationType)1);
 				}
 				_isRefreshingKpData = false;
 				return;
@@ -402,7 +402,7 @@ namespace KpRefresher.Services
 			if (!string.IsNullOrEmpty(_moduleSettings.CustomId.get_Value()) && accountData.AccountName != _accountName)
 			{
 				_moduleSettings.CustomId.set_Value(string.Empty);
-				ScreenNotification.ShowNotification(string.Format(strings.Notification_CustomIdAccountNotMatching, _moduleSettings.CustomId.get_Value(), _accountName), (NotificationType)1, (Texture2D)null, 4);
+				ShowNotification(string.Format(strings.Notification_CustomIdAccountNotMatching, _moduleSettings.CustomId.get_Value(), _accountName), (NotificationType)1);
 			}
 			_kpId = accountData.Id;
 			_nextRefresh = accountData.NextRefresh;
@@ -480,6 +480,15 @@ namespace KpRefresher.Services
 			}
 			retryCount++;
 			return await DataLoaded(retryCount);
+		}
+
+		private void ShowNotification(string message, NotificationType notificationType)
+		{
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			if (!_moduleSettings.HideAllMessages.get_Value())
+			{
+				ScreenNotification.ShowNotification(message, notificationType, (Texture2D)null, 4);
+			}
 		}
 	}
 }

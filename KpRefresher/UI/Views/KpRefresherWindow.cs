@@ -65,30 +65,30 @@ namespace KpRefresher.UI.Views
 			//IL_003d: Expected O, but got Unknown
 			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07e3: Expected O, but got Unknown
-			//IL_07e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0804: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0810: Expected O, but got Unknown
-			//IL_0828: Unknown result type (might be due to invalid IL or missing references)
-			//IL_082d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0846: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0850: Unknown result type (might be due to invalid IL or missing references)
-			//IL_085c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0863: Unknown result type (might be due to invalid IL or missing references)
-			//IL_086a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_087a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0881: Unknown result type (might be due to invalid IL or missing references)
-			//IL_088d: Expected O, but got Unknown
+			//IL_055d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_056d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0838: Unknown result type (might be due to invalid IL or missing references)
+			//IL_083d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0844: Unknown result type (might be due to invalid IL or missing references)
+			//IL_084b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0852: Unknown result type (might be due to invalid IL or missing references)
+			//IL_085e: Expected O, but got Unknown
+			//IL_085f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0864: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0870: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0875: Unknown result type (might be due to invalid IL or missing references)
+			//IL_087f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_088b: Expected O, but got Unknown
+			//IL_08a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0908: Expected O, but got Unknown
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)this);
 			((Container)val).set_WidthSizingMode((SizingMode)2);
@@ -212,6 +212,12 @@ namespace KpRefresher.UI.Views
 				string value = ((TextInputBase)((s is TextBox) ? s : null)).get_Text().Trim();
 				(bool, string) result = await _businessService.SetCustomId(value);
 				ShowInsideNotification(result.Item2, persistMessage: true);
+			});
+			checkbox_controls = this.CreateLabeledControl<Checkbox>((Func<string>)(() => strings.MainWindow_HideAllMessages_Label), (Func<string>)(() => strings.MainWindow_HideAllMessages_Tooltip), (FlowPanel)(object)configContainer, 2, 50);
+			checkbox_controls.Item3.set_Checked(_moduleSettings.HideAllMessages.get_Value());
+			checkbox_controls.Item3.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object s, CheckChangedEvent e)
+			{
+				_moduleSettings.HideAllMessages.set_Value(e.get_Checked());
 			});
 			FlowPanel flowPanel2 = new FlowPanel();
 			((Control)flowPanel2).set_Parent((Container)(object)mainContainer);
