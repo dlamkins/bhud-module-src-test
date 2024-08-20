@@ -70,9 +70,9 @@ namespace Nekres.ProofLogix.Core
 				if (value - 4 > 1)
 				{
 				}
-				return $"https://wiki-{((Locale)0).Code()}.guildwars2.com?search={wikiPage}";
+				return $"https://wiki-{((Locale)0).TwoLetterISOLanguageName()}.guildwars2.com?search={wikiPage}";
 			}
-			return $"https://wiki-{GameService.Overlay.get_UserLocale().get_Value().Code()}.guildwars2.com?search={wikiPage}";
+			return $"https://wiki-{GameService.Overlay.get_UserLocale().get_Value().TwoLetterISOLanguageName()}.guildwars2.com?search={wikiPage}";
 		}
 	}
 }

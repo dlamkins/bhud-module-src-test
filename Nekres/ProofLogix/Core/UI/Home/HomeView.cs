@@ -4,6 +4,7 @@ using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.Extended;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Gw2Sharp.Models;
@@ -295,7 +296,7 @@ namespace Nekres.ProofLogix.Core.UI.Home
 				{
 					GameService.Content.PlaySoundEffectByName("error");
 				}
-				else if (!ProofLogix.Instance.Gw2WebApi.IsApiAvailable())
+				else if (!ProofLogix.Instance.Gw2ApiManager.IsAuthorized(showMessage: true, ProofLogix.Instance.Gw2WebApi.Requires))
 				{
 					GameService.Content.PlaySoundEffectByName("error");
 				}
@@ -318,7 +319,7 @@ namespace Nekres.ProofLogix.Core.UI.Home
 				{
 					GameService.Content.PlaySoundEffectByName("error");
 				}
-				else if (!ProofLogix.Instance.Gw2WebApi.IsApiAvailable())
+				else if (!ProofLogix.Instance.Gw2ApiManager.IsAuthorized(showMessage: true, ProofLogix.Instance.Gw2WebApi.Requires))
 				{
 					GameService.Content.PlaySoundEffectByName("error");
 				}

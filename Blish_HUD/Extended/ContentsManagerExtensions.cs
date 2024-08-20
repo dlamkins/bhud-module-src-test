@@ -7,8 +7,6 @@ namespace Blish_HUD.Extended
 {
 	public static class ContentsManagerExtensions
 	{
-		private static Logger Logger = Logger.GetLogger<ContentsManager>();
-
 		public static async Task Extract(this ContentsManager contentsManager, string refFilePath, string outFilePath, bool overwrite = true)
 		{
 			if (string.IsNullOrEmpty(refFilePath))
@@ -38,7 +36,7 @@ namespace Blish_HUD.Extended
 			}
 			catch (IOException e)
 			{
-				Logger.Warn((Exception)e, e.Message);
+				Logger.GetLogger<ContentsManager>().Warn((Exception)e, e.Message);
 			}
 		}
 	}

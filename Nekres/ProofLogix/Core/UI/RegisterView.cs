@@ -2,6 +2,7 @@ using System;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.Extended;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
@@ -123,7 +124,7 @@ namespace Nekres.ProofLogix.Core.UI
 			Image checkmark = val3;
 			((TextInputBase)apiInput).add_TextChanged((EventHandler<EventArgs>)delegate
 			{
-				bool flag = ProofLogix.Instance.Gw2WebApi.HasCorrectFormat(((TextInputBase)apiInput).get_Text());
+				bool flag = Gw2ApiUtil.HasCorrectFormat(((TextInputBase)apiInput).get_Text());
 				checkmark.set_Texture(GameService.Content.get_DatAssetCache().GetTextureFromAssetId(flag ? 1234938 : 1234939));
 			});
 			Checkbox val4 = new Checkbox();
@@ -151,7 +152,7 @@ namespace Nekres.ProofLogix.Core.UI
 			StandardButton acceptBttn = val6;
 			((Control)acceptBttn).add_Click((EventHandler<MouseEventArgs>)async delegate
 			{
-				if (!ProofLogix.Instance.Gw2WebApi.HasCorrectFormat(((TextInputBase)apiInput).get_Text()))
+				if (!Gw2ApiUtil.HasCorrectFormat(((TextInputBase)apiInput).get_Text()))
 				{
 					GameService.Content.PlaySoundEffectByName("error");
 					ScreenNotification.ShowNotification("Please enter a valid Guild Wars 2 API key.", (NotificationType)2, (Texture2D)null, 4);

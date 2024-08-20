@@ -195,17 +195,13 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 			int currentValue = 0;
 			int currentRepetitions = 0;
 			bool busy = false;
-			((Control)sendBttn).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
+			((Control)sendBttn).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)async delegate
 			{
-				//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-				//IL_010a: Expected O, but got Unknown
 				if (!busy)
 				{
 					busy = true;
-					int amount2 = ProofLogix.Instance.PartySync.LocalPlayer.KpProfile.GetToken(_config.SelectedToken).Amount;
-					if (!CanSend(amount2, lastTotalReachedTime))
+					int total2 = ProofLogix.Instance.PartySync.LocalPlayer.KpProfile.GetToken(_config.SelectedToken).Amount;
+					if (!CanSend(total2, lastTotalReachedTime))
 					{
 						GameService.Content.PlaySoundEffectByName("error");
 						busy = false;
@@ -219,24 +215,21 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 							currentRepetitions = 0;
 						}
 						lastSendTime = DateTime.UtcNow;
-						ItemChatLink val14 = new ItemChatLink();
-						val14.set_ItemId(_config.SelectedToken);
-						val14.set_Quantity(Convert.ToByte((amount2 <= 250) ? amount2 : GetNext(amount2, ref currentReduction, ref currentValue, ref currentRepetitions, ref lastTotalReachedTime)));
-						ChatUtil.Send(((object)val14).ToString(), ProofLogix.Instance.ChatMessageKey.get_Value());
+						ItemChatLink val13 = new ItemChatLink();
+						val13.set_ItemId(_config.SelectedToken);
+						val13.set_Quantity(Convert.ToByte((total2 <= 250) ? total2 : GetNext(total2, ref currentReduction, ref currentValue, ref currentRepetitions, ref lastTotalReachedTime)));
+						await ChatUtil.Send(((object)val13).ToString(), ProofLogix.Instance.ChatMessageKey.get_Value());
 						busy = false;
 					}
 				}
 			});
-			((Control)sendBttn).add_RightMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
+			((Control)sendBttn).add_RightMouseButtonReleased((EventHandler<MouseEventArgs>)async delegate
 			{
-				//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0086: Expected O, but got Unknown
 				if (!busy)
 				{
 					busy = true;
-					int amount = ProofLogix.Instance.PartySync.LocalPlayer.KpProfile.GetToken(_config.SelectedToken).Amount;
-					if (!CanSend(amount, lastTotalReachedTime))
+					int total = ProofLogix.Instance.PartySync.LocalPlayer.KpProfile.GetToken(_config.SelectedToken).Amount;
+					if (!CanSend(total, lastTotalReachedTime))
 					{
 						GameService.Content.PlaySoundEffectByName("error");
 						busy = false;
@@ -245,23 +238,23 @@ namespace Nekres.ProofLogix.Core.UI.SmartPing
 					{
 						ItemChatLink val12 = new ItemChatLink();
 						val12.set_ItemId(_config.SelectedToken);
-						ItemChatLink val13 = val12;
-						string text;
-						if (amount > 255)
+						ItemChatLink chatLink = val12;
+						string message;
+						if (total > 255)
 						{
-							val13.set_Quantity((byte)1);
-							text = AssetUtil.GetItemDisplayName(((object)val13).ToString(), amount);
+							chatLink.set_Quantity((byte)1);
+							message = AssetUtil.GetItemDisplayName(((object)chatLink).ToString(), total);
 						}
 						else
 						{
-							val13.set_Quantity(Convert.ToByte(amount));
-							text = ((object)val13).ToString();
+							chatLink.set_Quantity(Convert.ToByte(total));
+							message = ((object)chatLink).ToString();
 						}
 						if (_config.SendProfileId)
 						{
-							text = text + " » " + ProofLogix.Instance.PartySync.LocalPlayer.KpProfile.Id;
+							message = message + " » " + ProofLogix.Instance.PartySync.LocalPlayer.KpProfile.Id;
 						}
-						ChatUtil.Send(text, ProofLogix.Instance.ChatMessageKey.get_Value());
+						await ChatUtil.Send(message, ProofLogix.Instance.ChatMessageKey.get_Value());
 						lastTotalReachedTime = DateTime.UtcNow;
 						busy = false;
 					}

@@ -8,7 +8,9 @@
     <LangVersion>Preview</LangVersion>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup />
+  <PropertyGroup>
+    <RootNamespace />
+  </PropertyGroup>
   <ItemGroup />
   <ItemGroup>
     <Reference Include="Newtonsoft.Json" />
@@ -21,9 +23,8 @@
     <Reference Include="System.Core" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="Gapotchenko.FX" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="Flurl.Http" />
     <Reference Include="Flurl" />
+    <Reference Include="Flurl.Http" />
     <Reference Include="AsyncClipboardService" />
   </ItemGroup>
 </Project>
