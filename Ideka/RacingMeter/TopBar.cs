@@ -14,11 +14,13 @@ namespace Ideka.RacingMeter
 	{
 		private const string KoFiUrl = "https://ko-fi.com/ideka";
 
+		private const string DiscordUrl = "https://discord.gg/8MJnhYzbHP";
+
 		private const int Spacing = 10;
 
 		private readonly StandardButton _koFiButton;
 
-		private readonly Label _madeByLabel;
+		private readonly StandardButton _discordButton;
 
 		private readonly Label _statusLabel;
 
@@ -45,55 +47,63 @@ namespace Ideka.RacingMeter
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Expected O, but got Unknown
-			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006e: Expected O, but got Unknown
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e9: Expected O, but got Unknown
-			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0109: Expected O, but got Unknown
-			//IL_010a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Expected O, but got Unknown
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b4: Expected O, but got Unknown
+			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fb: Expected O, but got Unknown
+			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
 			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0129: Expected O, but got Unknown
-			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011b: Expected O, but got Unknown
+			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
 			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0136: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013b: Expected O, but got Unknown
+			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014d: Expected O, but got Unknown
-			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016d: Expected O, but got Unknown
-			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015f: Expected O, but got Unknown
+			//IL_0160: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017f: Expected O, but got Unknown
+			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0191: Expected O, but got Unknown
+			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a3: Expected O, but got Unknown
 			StandardButton val = new StandardButton();
 			((Control)val).set_Parent((Container)(object)this);
 			val.set_Text(Strings.KoFiButton);
+			((Control)val).set_BasicTooltipText(Strings.KoFiTooltip);
 			val.set_Icon(AsyncTexture2D.op_Implicit(RacingModule.ContentsManager.GetTexture("KoFiIcon.png")));
 			_koFiButton = val;
 			((Control)_koFiButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				Process.Start("https://ko-fi.com/ideka");
 			});
-			Label val2 = new Label();
+			StandardButton val2 = new StandardButton();
 			((Control)val2).set_Parent((Container)(object)this);
-			val2.set_AutoSizeWidth(true);
-			val2.set_AutoSizeHeight(true);
-			val2.set_HorizontalAlignment((HorizontalAlignment)1);
-			val2.set_VerticalAlignment((VerticalAlignment)0);
-			val2.set_Text(StringExtensions.Format(Strings.CreatedBy, $"{RacingModule.Name} v{RacingModule.Version}", "Ideka"));
-			_madeByLabel = val2;
+			val2.set_Text(Strings.DiscordButton);
+			((Control)val2).set_BasicTooltipText(Strings.DiscordTooltip);
+			val2.set_Icon(AsyncTexture2D.op_Implicit(RacingModule.ContentsManager.GetTexture("DiscordIcon.png")));
+			_discordButton = val2;
+			((Control)_discordButton).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				Process.Start("https://discord.gg/8MJnhYzbHP");
+			});
 			StandardButton val3 = new StandardButton();
 			((Control)val3).set_Parent((Container)(object)this);
 			val3.set_Text(Strings.OnlineRacing);
@@ -186,21 +196,25 @@ namespace Ideka.RacingMeter
 
 		private void UpdateLayout()
 		{
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
 			if (_koFiButton != null)
 			{
-				((Control)_koFiButton).set_Width(150);
-				((Control)_koFiButton).set_Height(((Container)this).get_ContentRegion().Height);
-				((Control)(object)_koFiButton).ArrangeLeftRight(10, (Control)_madeByLabel, (Control)_onlineButton, (Control)_statusLabel);
+				StandardButton koFiButton = _koFiButton;
+				int width;
+				((Control)_discordButton).set_Width(width = 120);
+				((Control)koFiButton).set_Width(width);
+				StandardButton koFiButton2 = _koFiButton;
+				((Control)_discordButton).set_Height(width = ((Container)this).get_ContentRegion().Height);
+				((Control)koFiButton2).set_Height(width);
+				((Control)(object)_koFiButton).ArrangeLeftRight(10, (Control)_discordButton, (Control)_onlineButton, (Control)_statusLabel);
 				((Control)(object)_koFiButton).AlignMiddle();
-				((Control)(object)_madeByLabel).AlignMiddle();
+				((Control)(object)_discordButton).AlignMiddle();
 				((Control)(object)_onlineButton).AlignMiddle();
 				((Control)(object)_statusLabel).AlignMiddle();
 				StandardButton unloadRaceButton = _unloadRaceButton;
-				int width;
 				((Control)_unloadGhostButton).set_Right(width = ((Container)this).get_ContentRegion().Width);
 				((Control)unloadRaceButton).set_Right(width);
 				((Control)_unloadRaceButton).set_Bottom(((Container)this).get_ContentRegion().Height / 2);
@@ -221,6 +235,7 @@ namespace Ideka.RacingMeter
 		{
 			RacingModule.Server.StatusChanged -= new Action<Server.OnlineStatus>(ServerStatusChanged);
 			_koFiButton.get_Icon().Dispose();
+			_discordButton.get_Icon().Dispose();
 			((Container)this).DisposeControl();
 		}
 	}

@@ -41,31 +41,33 @@ namespace Ideka.RacingMeter
 			});
 		}
 
-		public LineMeterZone AddUpSpeedZone(Projection projection)
+		public LineMeterZone AddUpSpeedZone(Projection projection, Color? color = null)
 		{
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 			return base.Meter.AddChild(new LineMeterZone
 			{
 				Projection = projection,
 				Start = double.NaN,
 				Clamp = true,
-				Color = MeterMaker.UpSpeedColor
+				Color = (Color)(((_003F?)color) ?? MeterMaker.UpSpeedColor)
 			}).WithUpdate(delegate(LineMeterZone x)
 			{
 				x.End = Math.Max(base.Measurer.Speed.UpSpeed, 0f);
 			});
 		}
 
-		public LineMeterZone AddDownSpeedZone(Projection projection)
+		public LineMeterZone AddDownSpeedZone(Projection projection, Color? color = null)
 		{
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
 			Projection projection2 = projection;
 			return base.Meter.AddChild(new LineMeterZone
 			{
 				Projection = projection2,
 				End = double.NaN,
 				Clamp = true,
-				Color = MeterMaker.DownSpeedColor
+				Color = (Color)(((_003F?)color) ?? MeterMaker.DownSpeedColor)
 			}).WithUpdate(delegate(LineMeterZone x)
 			{
 				x.Start = projection2.MaxValue - (double)Math.Max(base.Measurer.Speed.DownSpeed, 0f);
@@ -81,6 +83,17 @@ namespace Ideka.RacingMeter
 				Clamp = true,
 				Thickness = 2f,
 				Color = color
+			});
+		}
+
+		public LineMeterNeedle AddVSpeedNeedle(Projection projection, Color color)
+		{
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			Projection projection2 = projection;
+			return AddNeedle(projection2, color).WithUpdate(delegate(LineMeterNeedle x)
+			{
+				float upSpeed = base.Measurer.Speed.UpSpeed;
+				double num2 = (x.Value = ((upSpeed > 0f) ? (projection2.MinValue + (double)base.Measurer.Speed.UpSpeed) : ((!(upSpeed < 0f)) ? 0.0 : (projection2.MaxValue + (double)base.Measurer.Speed.UpSpeed))));
 			});
 		}
 

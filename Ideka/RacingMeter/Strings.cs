@@ -70,8 +70,6 @@ namespace Ideka.RacingMeter
 
 		internal static string CopyToClipboard => ResourceManager.GetString("CopyToClipboard", resourceCulture);
 
-		internal static string CreatedBy => ResourceManager.GetString("CreatedBy", resourceCulture);
-
 		internal static string CsvImportWarning => ResourceManager.GetString("CsvImportWarning", resourceCulture);
 
 		internal static string Delete => ResourceManager.GetString("Delete", resourceCulture);
@@ -81,6 +79,10 @@ namespace Ideka.RacingMeter
 		internal static string Deselect => ResourceManager.GetString("Deselect", resourceCulture);
 
 		internal static string Disconnect => ResourceManager.GetString("Disconnect", resourceCulture);
+
+		internal static string DiscordButton => ResourceManager.GetString("DiscordButton", resourceCulture);
+
+		internal static string DiscordTooltip => ResourceManager.GetString("DiscordTooltip", resourceCulture);
 
 		internal static string ErrorDisconnect => ResourceManager.GetString("ErrorDisconnect", resourceCulture);
 
@@ -157,6 +159,8 @@ namespace Ideka.RacingMeter
 		internal static string InsertBefore => ResourceManager.GetString("InsertBefore", resourceCulture);
 
 		internal static string KoFiButton => ResourceManager.GetString("KoFiButton", resourceCulture);
+
+		internal static string KoFiTooltip => ResourceManager.GetString("KoFiTooltip", resourceCulture);
 
 		internal static string LabelBest => ResourceManager.GetString("LabelBest", resourceCulture);
 
@@ -436,6 +440,8 @@ namespace Ideka.RacingMeter
 
 		internal static string SettingShowSpeedometerText => ResourceManager.GetString("SettingShowSpeedometerText", resourceCulture);
 
+		internal static string SettingSiegeTurtleMeter => ResourceManager.GetString("SettingSiegeTurtleMeter", resourceCulture);
+
 		internal static string SettingSkiffMeter => ResourceManager.GetString("SettingSkiffMeter", resourceCulture);
 
 		internal static string SettingSkimmerMeter => ResourceManager.GetString("SettingSkimmerMeter", resourceCulture);
@@ -451,6 +457,8 @@ namespace Ideka.RacingMeter
 		internal static string SettingToggleSpeedometer => ResourceManager.GetString("SettingToggleSpeedometer", resourceCulture);
 
 		internal static string SettingToggleSpeedometerText => ResourceManager.GetString("SettingToggleSpeedometerText", resourceCulture);
+
+		internal static string SettingWarclawMeter => ResourceManager.GetString("SettingWarclawMeter", resourceCulture);
 
 		internal static string SupportStatusFaulted => ResourceManager.GetString("SupportStatusFaulted", resourceCulture);
 

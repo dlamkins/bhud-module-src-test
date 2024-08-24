@@ -92,10 +92,10 @@ namespace Ideka.RacingMeter
 		{
 			//IL_0147: Unknown result type (might be due to invalid IL or missing references)
 			//IL_018f: Expected O, but got Unknown
-			//IL_02cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0315: Expected O, but got Unknown
-			//IL_0937: Unknown result type (might be due to invalid IL or missing references)
-			//IL_097f: Expected O, but got Unknown
+			//IL_034a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0392: Expected O, but got Unknown
+			//IL_09b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09fc: Expected O, but got Unknown
 			MumblePollingRate = _dc.Add(settings.Slider("MumblePollingRate", 50, 25, 200, () => Strings.SettingMumblePollingRate, () => Strings.SettingMumblePollingRateText));
 			SpeedometerAnchorY = _dc.Add(settings.PercentageSlider("SpeedometerAnchorY", 0.7f, 0f, 1f, () => Strings.SettingSpeedometerAnchorY, () => Strings.SettingSpeedometerAnchorYText));
 			ShowSpeedometer = _dc.Add(settings.Generic("ShowSpeedometer", defaultValue: true, () => Strings.SettingShowSpeedometer, () => Strings.SettingShowSpeedometerText));
@@ -109,7 +109,9 @@ namespace Ideka.RacingMeter
 				[(MountType)4] = _dc.Add(settings.Generic("SkimmerMeter", defaultValue: true, () => Strings.SettingSkimmerMeter)),
 				[(MountType)2] = _dc.Add(settings.Generic("GriffonMeter", defaultValue: true, () => Strings.SettingGriffonMeter)),
 				[(MountType)6] = _dc.Add(settings.Generic("RollerBeetleMeter", defaultValue: true, () => Strings.SettingRollerBeetleMeter)),
-				[(MountType)9] = _dc.Add(settings.Generic("SkiffMeter", defaultValue: true, () => Strings.SettingSkiffMeter))
+				[(MountType)7] = _dc.Add(settings.Generic("WarclawMeter", defaultValue: true, () => Strings.SettingWarclawMeter)),
+				[(MountType)9] = _dc.Add(settings.Generic("SkiffMeter", defaultValue: true, () => Strings.SettingSkiffMeter)),
+				[(MountType)10] = _dc.Add(settings.Generic("SiegeTurtleMeter", defaultValue: true, () => Strings.SettingSiegeTurtleMeter))
 			};
 			BeetleDriftKey = _dc.Add(settings.KeyBinding("BeetleDriftKey", new KeyBinding(), () => Strings.SettingBeetleDriftKey, () => Strings.SettingBeetleDriftKeyText));
 			SfxVolumeMultiplier = _dc.Add(settings.PercentageSlider("SFXVolumeMultiplier", 1.5f, 0f, 3f, () => Strings.SettingSFXVolumeMultiplier, () => Strings.SettingSFXVolumeMultiplierText));

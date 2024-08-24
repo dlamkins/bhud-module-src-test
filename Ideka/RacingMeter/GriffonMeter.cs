@@ -34,14 +34,14 @@ namespace Ideka.RacingMeter
 		{
 			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0171: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0204: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0213: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0234: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0218: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0227: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0248: Unknown result type (might be due to invalid IL or missing references)
 			IMeasurer measurer2 = measurer;
 			AnchoredRect anchoredRect = new AnchoredRect();
 			ArcMeterMaker arc = new ArcMeterMaker(measurer2);

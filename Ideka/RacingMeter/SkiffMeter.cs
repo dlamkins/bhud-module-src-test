@@ -46,8 +46,8 @@ namespace Ideka.RacingMeter
 				//IL_0058: Unknown result type (might be due to invalid IL or missing references)
 				//IL_005d: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+				//IL_007a: Unknown result type (might be due to invalid IL or missing references)
 				float speed2D = measurer2.Speed.Speed2D;
 				x.Visible = (double)speed2D > 330.0;
 				if (x.Visible)
@@ -56,7 +56,7 @@ namespace Ideka.RacingMeter
 					Vector3 front = measurer2.Pos.Front;
 					float num = DistanceToZero(speed2D);
 					Vector3 val = inches + front * num;
-					val.Z = 0f;
+					val.Z += 41f;
 					x.WorldPosition = val * 0.0254f;
 				}
 			});

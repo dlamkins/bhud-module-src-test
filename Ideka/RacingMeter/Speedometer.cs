@@ -47,9 +47,9 @@ namespace Ideka.RacingMeter
 		{
 			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
 			_measurer = measurer;
 			((Control)this).set_ClipsBounds(false);
 			_meterContainer = new AnchoredRect
@@ -74,7 +74,9 @@ namespace Ideka.RacingMeter
 				[(MountType)4] = SkimmerMeter.Construct(measurer),
 				[(MountType)2] = GriffonMeter.Construct(measurer),
 				[(MountType)6] = BeetleMeter.Construct(measurer, new Func<bool?>(RacingModule.Settings.IsDriftKeyDown)),
-				[(MountType)9] = SkiffMeter.Construct(measurer)
+				[(MountType)7] = WarclawMeter.Construct(measurer),
+				[(MountType)9] = SkiffMeter.Construct(measurer),
+				[(MountType)10] = SiegeTurtleMeter.Construct(measurer)
 			};
 			foreach (KeyValuePair<MountType, GenericSetting<bool>> meter2 in RacingModule.Settings.Meters)
 			{

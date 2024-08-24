@@ -14,7 +14,7 @@ namespace Ideka.RacingMeter
 
 		public static readonly Color MarginColor = Color.get_Black();
 
-		public static readonly Color SoftMaxColor = Color.get_DarkRed();
+		public static readonly Color SoftMaxColor = new Color(153, 17, 0);
 
 		public static readonly Color ForwardOrbColor = Color.get_CornflowerBlue();
 

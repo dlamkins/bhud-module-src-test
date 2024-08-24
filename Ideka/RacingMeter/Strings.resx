@@ -68,6 +68,7 @@ Online features disabled.</value></data>
   <data name="SettingCheckpointAlpha"><value>Checkpoint Alpha</value></data>
   <data name="SettingRacerHAlignment"><value>Racing UI Horizontal Alignment</value></data>
   <data name="Inches"><value>{0}in</value></data>
+  <data name="SettingSiegeTurtleMeter"><value>Siege Turtle Meter</value></data>
   <data name="DeleteRace"><value>Delete This Race</value></data>
   <data name="NotifyNotEnoughCheckpoints"><value>The race doesn't have enough checkpoints and cannot be run.</value></data>
   <data name="TestingModeNotice"><value>Testing mode. No ghost data will be loaded or saved.</value></data>
@@ -83,6 +84,7 @@ Lap time: {2}</value></data>
   <data name="SupportStatusFaulted"><value>Couldn't connect to the server.
 Online features disabled.</value></data>
   <data name="LabelGhostUploaded"><value>Uploaded: {0}</value></data>
+  <data name="DiscordButton"><value>Discord</value></data>
   <data name="ErrorLeaderboardLoad"><value>Leaderboard load failed</value></data>
   <data name="Nothing"><value>Nothing</value></data>
   <data name="LobbyUserIsHost"><value>Is Host</value></data>
@@ -141,8 +143,8 @@ Start a race to see the UI while you adjust it.</value></data>
   <data name="LocalGhosts"><value>Local Ghosts</value></data>
   <data name="SettingSFXVolumeMultiplier"><value>SFX Volume Multiplier</value></data>
   <data name="GhostDescribeRemote"><value>{0} (remote)</value></data>
-  <data name="KoFiButton"><value>Support me
-on Ko-fi</value></data>
+  <data name="KoFiTooltip"><value>Support my work on Ko-fi.</value></data>
+  <data name="KoFiButton"><value>Ko-fi</value></data>
   <data name="SettingRacerAnchorYText"><value>Vertical position of the racing UI, in screen height percentage.
 Start a race to see the UI while you adjust it.</value></data>
   <data name="SettingRacerAnchorXText"><value>Horizontal position of the racing UI, in screen width percentage.
@@ -164,6 +166,7 @@ Start a race to see the UI while you adjust it.</value></data>
   <data name="ExceptionApiAccount"><value>Failed to get GW2 account from API.</value></data>
   <data name="Races"><value>Races</value></data>
   <data name="SettingSkiffMeter"><value>Skiff Meter</value></data>
+  <data name="SettingWarclawMeter"><value>Warclaw Meter</value></data>
   <data name="NoticeCopied"><value>Copied!</value></data>
   <data name="LabelBest"><value>Best: {0}</value></data>
   <data name="LabelLast"><value>Last: {0}</value></data>
@@ -184,8 +187,6 @@ Start a race to see the UI while you adjust it.</value></data>
   <data name="InsertAfter"><value>Insert After</value></data>
   <data name="SettingShowSpeedometer"><value>Show Speedometer</value></data>
   <data name="ExceptionEmptyRaceName"><value>The race's name cannot be empty.</value></data>
-  <data name="CreatedBy"><value>{0}
-created by {1}</value></data>
   <data name="SettingNormalizedOfficialCheckpointsText"><value>When playing an official race, RacingMeter checkpoints will be visually resized to match the in-game look (hitbox is unaffected). Disable this option to see the real size of RacingMeter checkpoints.
 Enabling this option also mutes racing SFX, since official races have SFX already.</value></data>
   <data name="ExceptionInvalidPointType"><value>Invalid point type.</value></data>
@@ -204,6 +205,7 @@ Enabling this option also mutes racing SFX, since official races have SFX alread
   <data name="SettingRacerVAlignmentText"><value>Vertical alignment of the racing UI.
 Start a race to see the UI while you adjust it.</value></data>
   <data name="SettingCheckpointLineThickness"><value>Checkpoint Line Thickness</value></data>
+  <data name="DiscordTooltip"><value>Join my Discord to post questions, comments, suggestions...</value></data>
   <data name="ExceptionStillConnecting"><value>Server connectivity has not yet been verified.</value></data>
   <data name="ConnectGuest"><value>Connect as a Guest</value></data>
   <data name="UnloadGhost"><value>Unload Ghost</value></data>
