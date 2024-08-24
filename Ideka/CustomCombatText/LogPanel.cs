@@ -122,10 +122,26 @@ namespace Ideka.CustomCombatText
 			_messagesMenu.Repopulate(CTextModule.Log);
 			_messagesMenu.SetScroll(1f);
 			CTextModule.EntryLogged += new Action<LogEntry>(EntryLogged);
+			ContextMenuStrip menu = null;
 			((Control)_filterButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-				new ContextMenuStrip((Func<IEnumerable<ContextMenuStripItem>>)build).Show((Control)(object)_filterButton);
+				//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+				//IL_002d: Expected O, but got Unknown
+				ContextMenuStrip obj = menu;
+				if (obj != null)
+				{
+					((Control)obj).Dispose();
+				}
+				menu = new ContextMenuStrip((Func<IEnumerable<ContextMenuStripItem>>)build);
+				((Control)menu).add_Hidden((EventHandler<EventArgs>)delegate
+				{
+					ContextMenuStrip obj2 = menu;
+					if (obj2 != null)
+					{
+						((Control)obj2).Dispose();
+					}
+				});
+				menu.Show((Control)(object)_filterButton);
 				IEnumerable<ContextMenuStripItem> build()
 				{
 					yield return forBool("Unique skills only", () => CTextModule.Settings.LogPanelUniqueSkillsOnly.Value, delegate(bool value)

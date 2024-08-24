@@ -198,25 +198,29 @@ namespace Ideka.CustomCombatText
 				return;
 			}
 			RangeFact rangeFact = fact as RangeFact;
+			string text3;
 			if (rangeFact != null)
 			{
 				float? min2 = rangeFact.Min;
-				string text3;
 				if (min2.HasValue)
 				{
 					float min = min2.GetValueOrDefault();
-					text3 = "Range: " + TooltipUtils.FormatRound(min) + " - " + TooltipUtils.FormatRound(rangeFact.Max);
+					if (min != rangeFact.Max)
+					{
+						text3 = "Range: " + TooltipUtils.FormatRound(min) + " - " + TooltipUtils.FormatRound(rangeFact.Max);
+						goto IL_0a92;
+					}
 				}
-				else
-				{
-					text3 = "Range: " + TooltipUtils.FormatRound(rangeFact.Max);
-				}
-				Text = text3;
+				text3 = "Range: " + TooltipUtils.FormatRound(rangeFact.Max);
+				goto IL_0a92;
 			}
-			else if (fact is StunBreakFact)
+			if (fact is StunBreakFact)
 			{
 				Text = "Breaks Stun";
 			}
+			return;
+			IL_0a92:
+			Text = text3;
 			static Skill getBuffOrFallback(int buffId)
 			{
 				if (!CTextModule.HsSkills.TryGetValue(buffId, out var buff5))
