@@ -29,11 +29,11 @@ namespace Manlaan.Mounts.Views
 			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0056: Expected O, but got Unknown
 			CurrentThingSettings = currentThingSettings;
-			((Control)this).set_Width(600);
-			((Control)this).set_Height(600);
+			((Control)this).set_Width(1000);
+			((Control)this).set_Height(1000);
 			Panel val = new Panel();
 			val.set_CanScroll(false);
-			((Control)val).set_Width(600);
+			((Control)val).set_Width(1000);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
 			((Control)val).set_Parent((Container)(object)this);
 			panel = val;
@@ -86,8 +86,8 @@ namespace Manlaan.Mounts.Views
 			//IL_029e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02a3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c9: Unknown result type (might be due to invalid IL or missing references)
 			((Container)panel).ClearChildren();
 			int curY = 0;
 			List<Thing> thingsNotYetInSettings = (from t in Module._things
@@ -134,7 +134,7 @@ namespace Manlaan.Mounts.Views
 				Thing thing = thingItemAndIndex.value;
 				int index = thingItemAndIndex.i;
 				bool isAvailable = thing.IsAvailable;
-				int curX = ((index % 2 != 0) ? 300 : 0);
+				int curX = ((index % 2 != 0) ? 350 : 0);
 				curY += ((index % 2 == 0) ? 30 : 0);
 				Label val4 = new Label();
 				((Control)val4).set_Location(new Point(curX, curY));
@@ -147,7 +147,7 @@ namespace Manlaan.Mounts.Views
 				Label thingInSettings_Label = val4;
 				StandardButton val5 = new StandardButton();
 				((Control)val5).set_Parent((Container)(object)panel);
-				((Control)val5).set_Location(new Point(((Control)thingInSettings_Label).get_Right(), ((Control)thingInSettings_Label).get_Top()));
+				((Control)val5).set_Location(new Point(curX + 200, ((Control)thingInSettings_Label).get_Top()));
 				val5.set_Text(Strings.Delete);
 				((Control)val5).add_Click((EventHandler<MouseEventArgs>)delegate
 				{

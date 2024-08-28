@@ -16,7 +16,7 @@ namespace Manlaan.Mounts.Views
 {
 	internal class RadialThingSettingsView : View
 	{
-		private int totalWidth = 1000;
+		private int totalWidth = 2500;
 
 		private int labelWidth = 170;
 

@@ -11,5 +11,10 @@ namespace Manlaan.Mounts.Things.Mounts
 			: base(settingCollection, helper, "Warclaw", "Warclaw", "warclaw")
 		{
 		}
+
+		public override bool IsUsableInCombat()
+		{
+			return true;
+		}
 	}
 }

@@ -127,25 +127,25 @@ namespace Manlaan.Mounts
 
 		protected override void Initialize()
 		{
-			//IL_044d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0460: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0465: Unknown result type (might be due to invalid IL or missing references)
-			//IL_046a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0475: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0485: Unknown result type (might be due to invalid IL or missing references)
-			//IL_048a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0494: Unknown result type (might be due to invalid IL or missing references)
-			//IL_049b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04bd: Expected O, but got Unknown
-			//IL_04f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0501: Expected O, but got Unknown
-			//IL_053b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0545: Expected O, but got Unknown
-			//IL_0592: Unknown result type (might be due to invalid IL or missing references)
-			//IL_059c: Expected O, but got Unknown
-			//IL_05d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05e0: Expected O, but got Unknown
+			//IL_046e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0481: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0486: Unknown result type (might be due to invalid IL or missing references)
+			//IL_048b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0496: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04de: Expected O, but got Unknown
+			//IL_0518: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0522: Expected O, but got Unknown
+			//IL_055c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0566: Expected O, but got Unknown
+			//IL_05b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05bd: Expected O, but got Unknown
+			//IL_05f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0601: Expected O, but got Unknown
 			List<string> obj = new List<string>
 			{
 				"griffon-text.png", "griffon-trans.png", "griffon.png", "jackal-text.png", "jackal-trans.png", "jackal.png", "raptor-text.png", "raptor-trans.png", "raptor.png", "roller-text.png",
@@ -155,7 +155,8 @@ namespace Manlaan.Mounts
 				"fishing-trans-color.png", "jadebotwaypoint-trans.png", "jadebotwaypoint-trans-color.png", "scanforrift-trans.png", "scanforrift-trans-color.png", "skiff-trans.png", "skiff-trans-color.png", "skyscaleleap-trans.png", "skyscaleleap-trans-color.png", "tonic-paint.png",
 				"tonic-white.png", "toy-paint.png", "toy-white.png", "chair-paint.png", "chair-whiite.png", "held-paint.png", "held-white.png", "music-paint.png", "music-white.png", "skimmer-remix.png",
 				"skyscaleleap-remix.png", "skyscale-remix.png", "springer-remix.png", "tonic-remix.png", "toy-remix.png", "turtle-remix.png", "unmount-remix.png", "warclaw-remix.png", "chair-remix.png", "fishing-remix.png",
-				"griffon-remix.png", "held-remix.png", "jackal-remix.png", "jadebotwaypoint-remix.png", "music-remix.png", "raptor-remix.png", "roller-remix.png", "scanforrift-remix.png", "skiff-remix.png"
+				"griffon-remix.png", "held-remix.png", "jackal-remix.png", "jadebotwaypoint-remix.png", "music-remix.png", "raptor-remix.png", "roller-remix.png", "scanforrift-remix.png", "skiff-remix.png", "summonconjureddoorway.png",
+				"summonconjureddoorway-trans.png", "summonconjureddoorway-trans-color.png"
 			};
 			thingsDirectory = DirectoriesManager.GetFullDirectoryPath("mounts");
 			obj.ForEach(delegate(string f)
@@ -294,13 +295,13 @@ namespace Manlaan.Mounts
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			//IL_023d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0285: Expected O, but got Unknown
-			//IL_0396: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0600: Expected O, but got Unknown
-			//IL_06f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0705: Expected O, but got Unknown
+			//IL_0254: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029c: Expected O, but got Unknown
+			//IL_03ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0617: Expected O, but got Unknown
+			//IL_0710: Unknown result type (might be due to invalid IL or missing references)
+			//IL_071c: Expected O, but got Unknown
 			settingscollection = settings;
 			List<Thing> obj = new List<Thing>
 			{
@@ -319,6 +320,7 @@ namespace Manlaan.Mounts
 				new JadeBotWaypoint(settings, _helper),
 				new ScanForRift(settings, _helper),
 				new SkyscaleLeap(settings, _helper),
+				new SummonConjuredDoorway(settings, _helper),
 				new Chair(settings, _helper),
 				new Music(settings, _helper),
 				new Held(settings, _helper),
