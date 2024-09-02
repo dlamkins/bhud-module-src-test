@@ -1,0 +1,44 @@
+using System.Text.RegularExpressions;
+
+namespace FarmingTracker
+{
+	public class DrfToken
+	{
+		private static readonly Regex _drfTokenRegex = new Regex("^[a-f0-9]{8}\\-[a-f0-9]{4}\\-[a-f0-9]{4}\\-[a-f0-9]{4}\\-[a-f0-9]{12}$");
+
+		public static string CreateDrfTokenHintText(string drfToken)
+		{
+			DrfTokenFormat drfTokenFormat = ValidateFormat(drfToken);
+			switch (drfTokenFormat)
+			{
+			case DrfTokenFormat.ValidFormat:
+				return "";
+			case DrfTokenFormat.InvalidFormat:
+				return "Incomplete or invalid DRF Token format.\nExpected format:\nxxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx\nwith x = a-f, 0-9";
+			case DrfTokenFormat.EmptyToken:
+				return "DRF Token required.\nModule wont work without it.";
+			default:
+				Module.Logger.Error(Helper.CreateSwitchCaseNotFoundMessage(drfTokenFormat, "DrfTokenFormat", "no hint"));
+				return "";
+			}
+		}
+
+		public static bool HasValidFormat(string drfToken)
+		{
+			return ValidateFormat(drfToken) == DrfTokenFormat.ValidFormat;
+		}
+
+		public static DrfTokenFormat ValidateFormat(string drfToken)
+		{
+			if (string.IsNullOrWhiteSpace(drfToken))
+			{
+				return DrfTokenFormat.EmptyToken;
+			}
+			if (!_drfTokenRegex.IsMatch(drfToken))
+			{
+				return DrfTokenFormat.InvalidFormat;
+			}
+			return DrfTokenFormat.ValidFormat;
+		}
+	}
+}
