@@ -266,7 +266,7 @@ namespace Nekres.ProofLogix.Core.Services
 
 		private void OnPlayerLeft(Player player)
 		{
-			if (!((Player)(ref player)).get_Self())
+			if (!ProofLogix.Instance.TableConfig.get_Value().KeepLeavers && !((Player)(ref player)).get_Self())
 			{
 				RemovePlayer(((Player)(ref player)).get_AccountName());
 			}

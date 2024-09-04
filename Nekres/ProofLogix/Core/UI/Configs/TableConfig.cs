@@ -27,6 +27,10 @@ namespace Nekres.ProofLogix.Core.UI.Configs
 
 		private PartySyncService.ColorGradingMode _colorGradingMode;
 
+		private int _maxPlayerCount = 100;
+
+		private bool _requireProfile = true;
+
 		private ObservableCollection<int> _tokenIds = new ObservableCollection<int>();
 
 		private ObservableCollection<string> _profileIds = new ObservableCollection<string>();
@@ -41,6 +45,8 @@ namespace Nekres.ProofLogix.Core.UI.Configs
 				{
 					_alwaysSortStatus = true,
 					_colorGradingMode = PartySyncService.ColorGradingMode.MedianComparison,
+					_maxPlayerCount = 100,
+					_requireProfile = true,
 					_profileIds = new ObservableCollection<string>()
 				};
 				ObservableCollection<int> obj2 = new ObservableCollection<int>();
@@ -125,6 +131,34 @@ namespace Nekres.ProofLogix.Core.UI.Configs
 			set
 			{
 				_colorGradingMode = value;
+				SaveConfig<TableConfig>(ProofLogix.Instance.TableConfig);
+			}
+		}
+
+		[JsonProperty("max_player_count")]
+		public int MaxPlayerCount
+		{
+			get
+			{
+				return _maxPlayerCount;
+			}
+			set
+			{
+				_maxPlayerCount = value;
+				SaveConfig<TableConfig>(ProofLogix.Instance.TableConfig);
+			}
+		}
+
+		[JsonProperty("require_profile")]
+		public bool RequireProfile
+		{
+			get
+			{
+				return _requireProfile;
+			}
+			set
+			{
+				_requireProfile = value;
 				SaveConfig<TableConfig>(ProofLogix.Instance.TableConfig);
 			}
 		}

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -7,6 +8,7 @@ using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
+using Microsoft.Xna.Framework.Graphics;
 using Nekres.ProofLogix.Core.Services.PartySync.Models;
 using Nekres.ProofLogix.Core.UI.Configs;
 using Nekres.ProofLogix.Core.UI.KpProfile;
@@ -19,12 +21,12 @@ namespace Nekres.ProofLogix.Core.UI.Table
 
 		private const int BULKLOAD_INTERVAL = 1000;
 
-		private readonly SynchronizedCollection<TablePlayerEntry> _bulk;
+		private readonly ConcurrentDictionary<string, TablePlayerEntry> _bulk;
 
 		public TablePresenter(TableView view, TableConfig model)
 			: base(view, model)
 		{
-			_bulk = new SynchronizedCollection<TablePlayerEntry>();
+			_bulk = new ConcurrentDictionary<string, TablePlayerEntry>(Environment.ProcessorCount * 2, base.get_Model().MaxPlayerCount);
 			_bulkLoadTimer = new Timer(1000.0)
 			{
 				AutoReset = false
@@ -42,7 +44,7 @@ namespace Nekres.ProofLogix.Core.UI.Table
 			{
 				return;
 			}
-			List<TablePlayerEntry> list2 = _bulk.ToList();
+			List<TablePlayerEntry> list2 = _bulk.Values.ToList();
 			list2.Sort(Comparer);
 			ControlCollection<Control> list = new ControlCollection<Control>((IEnumerable<Control>)list2);
 			foreach (Control item in list)
@@ -51,6 +53,7 @@ namespace Nekres.ProofLogix.Core.UI.Table
 			}
 			table.GetPrivateField("_children").SetValue(table, list);
 			((Control)table).Invalidate();
+			base.get_View().PlayerCountLbl.set_Text($"{list.get_Count()}");
 		}
 
 		private void ResetBulkLoadTimer()
@@ -62,7 +65,7 @@ namespace Nekres.ProofLogix.Core.UI.Table
 
 		public void CreatePlayerEntry(Player player)
 		{
-			if (!player.HasKpProfile)
+			if (base.get_Model().RequireProfile && !player.HasKpProfile)
 			{
 				return;
 			}
@@ -76,14 +79,21 @@ namespace Nekres.ProofLogix.Core.UI.Table
 			((Control)tablePlayerEntry).set_Height(32);
 			tablePlayerEntry.Remember = ((IEnumerable<string>)base.get_Model().ProfileIds).Any((string id) => id.Equals(player.KpProfile.Id)) || player.Equals(ProofLogix.Instance.PartySync.LocalPlayer);
 			TablePlayerEntry entry = tablePlayerEntry;
-			_bulk.Add(entry);
+			_bulk[player.AccountName] = entry;
 			((Control)entry).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
 			{
-				ProfileView.Open(entry.Player.KpProfile);
+				if (entry.Player.KpProfile.NotFound)
+				{
+					ScreenNotification.ShowNotification("This player has no profile.", (NotificationType)0, (Texture2D)null, 4);
+				}
+				else
+				{
+					ProfileView.Open(entry.Player.KpProfile);
+				}
 			});
 			((Control)entry).add_RightMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
 			{
-				if (!player.Equals(ProofLogix.Instance.PartySync.LocalPlayer))
+				if (!player.Equals(ProofLogix.Instance.PartySync.LocalPlayer) && !player.KpProfile.NotFound)
 				{
 					if (entry.Remember)
 					{
@@ -102,15 +112,10 @@ namespace Nekres.ProofLogix.Core.UI.Table
 
 		private void PlayerRemoved(object sender, ValueEventArgs<Player> e)
 		{
-			TablePlayerEntry playerEntry;
-			if (base.get_Model().KeepLeavers)
+			if (TryGetPlayerEntry(e.get_Value(), out var playerEntry) && !playerEntry.Remember)
 			{
 				ResetBulkLoadTimer();
-			}
-			else if (TryGetPlayerEntry(e.get_Value(), out playerEntry) && !playerEntry.Remember)
-			{
-				ResetBulkLoadTimer();
-				if (_bulk.Remove(playerEntry))
+				if (_bulk.TryRemove(playerEntry.Player.AccountName, out var _))
 				{
 					((Control)playerEntry).Dispose();
 				}
@@ -124,8 +129,7 @@ namespace Nekres.ProofLogix.Core.UI.Table
 
 		private bool TryGetPlayerEntry(Player player, out TablePlayerEntry playerEntry)
 		{
-			playerEntry = _bulk.ToList().FirstOrDefault((TablePlayerEntry ctrl) => ctrl.Player.Equals(player));
-			return playerEntry != null;
+			return _bulk.TryGetValue(player.AccountName, out playerEntry);
 		}
 
 		private int Comparer(TablePlayerEntry x, TablePlayerEntry y)
@@ -190,11 +194,11 @@ namespace Nekres.ProofLogix.Core.UI.Table
 			ProofLogix.Instance.PartySync.PlayerChanged -= PlayerAddedOrChanged;
 			ProofLogix.Instance.PartySync.PlayerRemoved -= PlayerRemoved;
 			_bulkLoadTimer.Dispose();
-			foreach (TablePlayerEntry item in _bulk)
+			foreach (TablePlayerEntry value in _bulk.Values)
 			{
-				if (item != null)
+				if (value != null)
 				{
-					((Control)item).Dispose();
+					((Control)value).Dispose();
 				}
 			}
 			base.Unload();

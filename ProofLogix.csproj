@@ -21,7 +21,6 @@
     <Reference Include="Gw2Sharp" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Core" />
-    <Reference Include="System.ServiceModel" />
     <Reference Include="Gapotchenko.FX" />
     <Reference Include="Flurl" />
     <Reference Include="Flurl.Http" />
