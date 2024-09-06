@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.ArcDps.Common;
@@ -26,6 +27,8 @@ namespace Nekres.ProofLogix.Core.Services
 		public readonly MumblePlayer LocalPlayer;
 
 		private readonly ConcurrentDictionary<string, Player> _members;
+
+		private readonly Timer _overcapCleanUpTimer;
 
 		private readonly Color _redShift = new Color(255, 57, 57);
 
@@ -53,12 +56,13 @@ namespace Nekres.ProofLogix.Core.Services
 			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Expected O, but got Unknown
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bd: Expected O, but got Unknown
+			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cd: Expected O, but got Unknown
+			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e8: Expected O, but got Unknown
 			LocalPlayer = new MumblePlayer();
 			_members = new ConcurrentDictionary<string, Player>();
+			_overcapCleanUpTimer = new Timer(HandleOvercap, null, TimeSpan.Zero, TimeSpan.FromSeconds(30.0));
 			GameService.Gw2Mumble.get_PlayerCharacter().add_NameChanged((EventHandler<ValueEventArgs<string>>)OnPlayerCharacterNameChanged);
 			GameService.ArcDps.get_Common().add_PlayerAdded(new PresentPlayersChange(OnPlayerJoin));
 			GameService.ArcDps.get_Common().add_PlayerRemoved(new PresentPlayersChange(OnPlayerLeft));
@@ -137,8 +141,20 @@ namespace Nekres.ProofLogix.Core.Services
 
 		public void RemovePlayer(string accountName)
 		{
+			if (string.IsNullOrEmpty(accountName))
+			{
+				return;
+			}
 			string key = accountName.ToLowerInvariant();
-			if (!string.IsNullOrEmpty(key) && _members.TryRemove(key, out var member))
+			Player member;
+			if (ProofLogix.Instance.TableConfig.get_Value().KeepLeavers)
+			{
+				if (_members.TryGetValue(key, out member))
+				{
+					member.Status = Player.OnlineStatus.Away;
+				}
+			}
+			else if (_members.TryRemove(key, out member))
 			{
 				member.Status = Player.OnlineStatus.Away;
 				this.PlayerRemoved?.Invoke(this, new ValueEventArgs<Player>(member));
@@ -155,6 +171,7 @@ namespace Nekres.ProofLogix.Core.Services
 			GameService.Overlay.remove_UserLocaleChanged((EventHandler<ValueEventArgs<CultureInfo>>)OnUserLocaleChanged);
 			GameService.ArcDps.get_Common().remove_PlayerAdded(new PresentPlayersChange(OnPlayerJoin));
 			GameService.ArcDps.get_Common().remove_PlayerRemoved(new PresentPlayersChange(OnPlayerLeft));
+			_overcapCleanUpTimer?.Dispose();
 		}
 
 		public void AddKpProfile(Profile kpProfile)
@@ -266,9 +283,26 @@ namespace Nekres.ProofLogix.Core.Services
 
 		private void OnPlayerLeft(Player player)
 		{
-			if (!ProofLogix.Instance.TableConfig.get_Value().KeepLeavers && !((Player)(ref player)).get_Self())
+			if (!((Player)(ref player)).get_Self())
 			{
 				RemovePlayer(((Player)(ref player)).get_AccountName());
+			}
+		}
+
+		private void HandleOvercap(object state)
+		{
+			int count = _members.Count;
+			int maxPlayerCount = Math.Abs(ProofLogix.Instance.TableConfig.get_Value().MaxPlayerCount - 1);
+			if (count <= maxPlayerCount)
+			{
+				return;
+			}
+			foreach (string member in (from kv in _members
+				where kv.Value.Status < Player.OnlineStatus.Online
+				orderby kv.Value.Created
+				select kv.Key).Take(Math.Abs(count - maxPlayerCount)))
+			{
+				_members.TryRemove(member, out var _);
 			}
 		}
 	}

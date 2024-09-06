@@ -27,7 +27,7 @@ namespace Nekres.ProofLogix.Core.UI.Configs
 
 		private PartySyncService.ColorGradingMode _colorGradingMode;
 
-		private int _maxPlayerCount = 100;
+		private int _maxPlayerCount = 50;
 
 		private bool _requireProfile = true;
 
@@ -45,7 +45,7 @@ namespace Nekres.ProofLogix.Core.UI.Configs
 				{
 					_alwaysSortStatus = true,
 					_colorGradingMode = PartySyncService.ColorGradingMode.MedianComparison,
-					_maxPlayerCount = 100,
+					_maxPlayerCount = 50,
 					_requireProfile = true,
 					_profileIds = new ObservableCollection<string>()
 				};

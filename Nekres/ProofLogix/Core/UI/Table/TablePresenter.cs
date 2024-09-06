@@ -8,6 +8,7 @@ using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Nekres.ProofLogix.Core.Services.PartySync.Models;
 using Nekres.ProofLogix.Core.UI.Configs;
@@ -39,21 +40,40 @@ namespace Nekres.ProofLogix.Core.UI.Table
 
 		private void OnBulkLoadTimerElapsed(object sender, ElapsedEventArgs e)
 		{
+			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel table = base.get_View().Table;
 			if (table == null)
 			{
 				return;
 			}
-			List<TablePlayerEntry> list2 = _bulk.Values.ToList();
-			list2.Sort(Comparer);
-			ControlCollection<Control> list = new ControlCollection<Control>((IEnumerable<Control>)list2);
+			List<TablePlayerEntry> bulk = _bulk.Values.ToList();
+			List<TablePlayerEntry> toDisplay = bulk.Where((TablePlayerEntry x) => x.Remember || x.Player.Equals(ProofLogix.Instance.PartySync.LocalPlayer)).ToList();
+			toDisplay.AddRange((from x in bulk.Except(toDisplay)
+				orderby x.Player.Created descending
+				select x).Take(Math.Abs(base.get_Model().MaxPlayerCount - 1)));
+			toDisplay.Sort(Comparer);
+			ControlCollection<Control> list = new ControlCollection<Control>((IEnumerable<Control>)toDisplay);
 			foreach (Control item in list)
 			{
 				item.GetPrivateField("_parent").SetValue(item, table);
 			}
 			table.GetPrivateField("_children").SetValue(table, list);
 			((Control)table).Invalidate();
-			base.get_View().PlayerCountLbl.set_Text($"{list.get_Count()}");
+			base.get_View().PlayerCountLbl.set_Text($"{toDisplay.Count}/{base.get_Model().MaxPlayerCount}");
+			if (toDisplay.Count > base.get_Model().MaxPlayerCount)
+			{
+				base.get_View().PlayerCountLbl.set_TextColor(new Color(255, 57, 57));
+			}
+			else if (toDisplay.Count == base.get_Model().MaxPlayerCount)
+			{
+				base.get_View().PlayerCountLbl.set_TextColor(new Color(128, 255, 128));
+			}
+			else
+			{
+				base.get_View().PlayerCountLbl.set_TextColor(Color.get_White());
+			}
 		}
 
 		private void ResetBulkLoadTimer()
