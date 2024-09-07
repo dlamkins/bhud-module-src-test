@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Timers;
 using Blish_HUD;
 using Blish_HUD.Controls;
@@ -18,96 +19,142 @@ namespace Nekres.ProofLogix.Core.UI.Table
 {
 	public class TablePresenter : Presenter<TableView, TableConfig>
 	{
-		private readonly Timer _bulkLoadTimer;
+		private System.Timers.Timer _bulkLoadTimer;
 
 		private const int BULKLOAD_INTERVAL = 1000;
 
-		private readonly ConcurrentDictionary<string, TablePlayerEntry> _bulk;
+		private ConcurrentQueue<IDisposable> _disposables;
+
+		private readonly System.Timers.Timer _cleanUpTimer;
+
+		private static int _lockFlag;
 
 		public TablePresenter(TableView view, TableConfig model)
 			: base(view, model)
 		{
-			_bulk = new ConcurrentDictionary<string, TablePlayerEntry>(Environment.ProcessorCount * 2, base.get_Model().MaxPlayerCount);
-			_bulkLoadTimer = new Timer(1000.0)
+			_disposables = new ConcurrentQueue<IDisposable>();
+			_cleanUpTimer = new System.Timers.Timer(1000.0)
+			{
+				AutoReset = false
+			};
+			_cleanUpTimer.Elapsed += OnCleanUpTimerElapsed;
+			_bulkLoadTimer = new System.Timers.Timer(1000.0)
 			{
 				AutoReset = false
 			};
 			_bulkLoadTimer.Elapsed += OnBulkLoadTimerElapsed;
-			ProofLogix.Instance.PartySync.PlayerAdded += PlayerAddedOrChanged;
-			ProofLogix.Instance.PartySync.PlayerChanged += PlayerAddedOrChanged;
-			ProofLogix.Instance.PartySync.PlayerRemoved += PlayerRemoved;
+			ProofLogix.Instance.PartySync.PlayerAdded += OnPartyChanged;
+			ProofLogix.Instance.PartySync.PlayerRemoved += OnPartyChanged;
+			ResetBulkLoadTimer();
+		}
+
+		private void OnPartyChanged(object sender, ValueEventArgs<Player> e)
+		{
+			ResetBulkLoadTimer();
+		}
+
+		private void OnCleanUpTimerElapsed(object sender, ElapsedEventArgs e)
+		{
+			_cleanUpTimer.Stop();
+			IDisposable disposable;
+			while (_disposables.TryDequeue(out disposable))
+			{
+				disposable?.Dispose();
+			}
+			_cleanUpTimer.Interval = 1000.0;
+			_cleanUpTimer.Start();
 		}
 
 		private void OnBulkLoadTimerElapsed(object sender, ElapsedEventArgs e)
 		{
-			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0216: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0250: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0267: Unknown result type (might be due to invalid IL or missing references)
+			if (Interlocked.CompareExchange(ref _lockFlag, 1, 0) != 0)
+			{
+				return;
+			}
 			FlowPanel table = base.get_View().Table;
 			if (table == null)
 			{
 				return;
 			}
-			List<TablePlayerEntry> bulk = _bulk.Values.ToList();
-			List<TablePlayerEntry> toDisplay = bulk.Where((TablePlayerEntry x) => x.Remember || x.Player.Equals(ProofLogix.Instance.PartySync.LocalPlayer)).ToList();
-			toDisplay.AddRange((from x in bulk.Except(toDisplay)
-				orderby x.Player.Created descending
-				select x).Take(Math.Abs(base.get_Model().MaxPlayerCount - 1)));
-			toDisplay.Sort(Comparer);
-			ControlCollection<Control> list = new ControlCollection<Control>((IEnumerable<Control>)toDisplay);
-			foreach (Control item in list)
+			using (((Control)table).SuspendLayoutContext())
 			{
-				item.GetPrivateField("_parent").SetValue(item, table);
-			}
-			table.GetPrivateField("_children").SetValue(table, list);
-			((Control)table).Invalidate();
-			base.get_View().PlayerCountLbl.set_Text($"{toDisplay.Count}/{base.get_Model().MaxPlayerCount}");
-			if (toDisplay.Count > base.get_Model().MaxPlayerCount)
-			{
-				base.get_View().PlayerCountLbl.set_TextColor(new Color(255, 57, 57));
-			}
-			else if (toDisplay.Count == base.get_Model().MaxPlayerCount)
-			{
-				base.get_View().PlayerCountLbl.set_TextColor(new Color(128, 255, 128));
-			}
-			else
-			{
-				base.get_View().PlayerCountLbl.set_TextColor(Color.get_White());
+				int scrollOffsetY = ((Container)table).get_VerticalScrollOffset();
+				foreach (Control oldChild in ((Container)table).get_Children().ToList())
+				{
+					_disposables.Enqueue((IDisposable)oldChild);
+				}
+				List<TablePlayerEntry> bulk = (from x in ProofLogix.Instance.PartySync.PlayerList.Prepend(ProofLogix.Instance.PartySync.LocalPlayer).Select(CreatePlayerEntry)
+					where x != null
+					select x).ToList();
+				List<TablePlayerEntry> toDisplay = bulk.Where((TablePlayerEntry x) => x.Remember || x.Player.Equals(ProofLogix.Instance.PartySync.LocalPlayer)).ToList();
+				toDisplay.AddRange((from x in bulk.Except(toDisplay)
+					orderby x.Player.Created descending
+					select x).Take(Math.Abs(base.get_Model().MaxPlayerCount - 1)));
+				toDisplay.Sort(Comparer);
+				ControlCollection<Control> list = new ControlCollection<Control>((IEnumerable<Control>)toDisplay);
+				foreach (Control item in list)
+				{
+					item.GetPrivateField("_parent").SetValue(item, table);
+				}
+				table.GetPrivateField("_children").SetValue(table, list);
+				((Control)table).Invalidate();
+				base.get_View().PlayerCountLbl.set_Text($"{toDisplay.Count}/{base.get_Model().MaxPlayerCount}");
+				if (toDisplay.Count > base.get_Model().MaxPlayerCount)
+				{
+					base.get_View().PlayerCountLbl.set_TextColor(new Color(255, 57, 57));
+				}
+				else if (toDisplay.Count == base.get_Model().MaxPlayerCount)
+				{
+					base.get_View().PlayerCountLbl.set_TextColor(new Color(128, 255, 128));
+				}
+				else
+				{
+					base.get_View().PlayerCountLbl.set_TextColor(Color.get_White());
+				}
+				((Container)table).set_VerticalScrollOffset(scrollOffsetY);
+				Interlocked.Exchange(ref _lockFlag, 0);
 			}
 		}
 
 		private void ResetBulkLoadTimer()
 		{
-			_bulkLoadTimer.Stop();
-			_bulkLoadTimer.Interval = 1000.0;
-			_bulkLoadTimer.Start();
+			if (_bulkLoadTimer != null)
+			{
+				try
+				{
+					_bulkLoadTimer.Stop();
+					_bulkLoadTimer.Interval = 1000.0;
+					_bulkLoadTimer.Start();
+				}
+				catch (ObjectDisposedException)
+				{
+				}
+			}
 		}
 
-		public void CreatePlayerEntry(Player player)
+		public TablePlayerEntry CreatePlayerEntry(Player player)
 		{
 			if (base.get_Model().RequireProfile && !player.HasKpProfile)
 			{
-				return;
+				return null;
 			}
-			if (TryGetPlayerEntry(player, out var playerEntry))
-			{
-				playerEntry.Player = player;
-				return;
-			}
-			ResetBulkLoadTimer();
 			TablePlayerEntry tablePlayerEntry = new TablePlayerEntry(player);
 			((Control)tablePlayerEntry).set_Height(32);
 			tablePlayerEntry.Remember = ((IEnumerable<string>)base.get_Model().ProfileIds).Any((string id) => id.Equals(player.KpProfile.Id)) || player.Equals(ProofLogix.Instance.PartySync.LocalPlayer);
 			TablePlayerEntry entry = tablePlayerEntry;
-			_bulk[player.AccountName] = entry;
 			((Control)entry).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
 			{
 				if (entry.Player.KpProfile.NotFound)
 				{
-					ScreenNotification.ShowNotification("This player has no profile.", (NotificationType)0, (Texture2D)null, 4);
+					GameService.Content.PlaySoundEffectByName("error");
+					ScreenNotification.ShowNotification("This player has no profile.", (NotificationType)2, (Texture2D)null, 4);
 				}
 				else
 				{
+					GameService.Content.PlaySoundEffectByName("button-click");
 					ProfileView.Open(entry.Player.KpProfile);
 				}
 			});
@@ -128,50 +175,29 @@ namespace Nekres.ProofLogix.Core.UI.Table
 					entry.Remember = !entry.Remember;
 				}
 			});
-		}
-
-		private void PlayerRemoved(object sender, ValueEventArgs<Player> e)
-		{
-			if (TryGetPlayerEntry(e.get_Value(), out var playerEntry) && !playerEntry.Remember)
-			{
-				ResetBulkLoadTimer();
-				if (_bulk.TryRemove(playerEntry.Player.AccountName, out var _))
-				{
-					((Control)playerEntry).Dispose();
-				}
-			}
-		}
-
-		private void PlayerAddedOrChanged(object sender, ValueEventArgs<Player> e)
-		{
-			CreatePlayerEntry(e.get_Value());
-		}
-
-		private bool TryGetPlayerEntry(Player player, out TablePlayerEntry playerEntry)
-		{
-			return _bulk.TryGetValue(player.AccountName, out playerEntry);
+			return entry;
 		}
 
 		private int Comparer(TablePlayerEntry x, TablePlayerEntry y)
 		{
 			if (base.get_Model().AlwaysSortStatus && x.Player.Status.CompareTo(y.Player.Status) != 0)
 			{
-				if (x.Player.Status == Player.OnlineStatus.Unknown)
+				if (x.Player.Status < y.Player.Status)
 				{
 					return 1;
 				}
-				if (y.Player.Status == Player.OnlineStatus.Unknown)
+				if (x.Player.Status > y.Player.Status)
 				{
 					return -1;
 				}
-				if (x.Player.Status == Player.OnlineStatus.Online && y.Player.Status == Player.OnlineStatus.Away)
-				{
-					return -1;
-				}
-				if (x.Player.Status == Player.OnlineStatus.Away && y.Player.Status == Player.OnlineStatus.Online)
-				{
-					return 1;
-				}
+			}
+			if (!x.Player.HasKpProfile)
+			{
+				return 1;
+			}
+			if (!y.Player.HasKpProfile)
+			{
+				return -1;
 			}
 			int column = base.get_Model().SelectedColumn;
 			int comparison = 0;
@@ -210,17 +236,13 @@ namespace Nekres.ProofLogix.Core.UI.Table
 
 		protected override void Unload()
 		{
-			ProofLogix.Instance.PartySync.PlayerAdded -= PlayerAddedOrChanged;
-			ProofLogix.Instance.PartySync.PlayerChanged -= PlayerAddedOrChanged;
-			ProofLogix.Instance.PartySync.PlayerRemoved -= PlayerRemoved;
 			_bulkLoadTimer.Dispose();
-			foreach (TablePlayerEntry value in _bulk.Values)
-			{
-				if (value != null)
-				{
-					((Control)value).Dispose();
-				}
-			}
+			_bulkLoadTimer = null;
+			OnCleanUpTimerElapsed(null, null);
+			_cleanUpTimer.Dispose();
+			ProofLogix.Instance.PartySync.PlayerAdded -= OnPartyChanged;
+			ProofLogix.Instance.PartySync.PlayerRemoved -= OnPartyChanged;
+			Interlocked.Exchange(ref _lockFlag, 0);
 			base.Unload();
 		}
 
