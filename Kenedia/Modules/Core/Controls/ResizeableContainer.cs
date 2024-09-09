@@ -57,6 +57,8 @@ namespace Kenedia.Modules.Core.Controls
 		public bool CanChange { get; set; } = true;
 
 
+		public bool ShowCenter { get; set; }
+
 		public override void UpdateContainer(GameTime gameTime)
 		{
 			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
@@ -118,10 +120,19 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintBeforeChildren(spriteBatch, bounds);
 			if (_resizeTexture != null && CanChange && (!ShowResizeOnlyOnMouseOver || ((Control)this).get_MouseOver()))
 			{
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit((_resizing || _mouseOverResizeHandle) ? _resizeTextureHovered : _resizeTexture), new Rectangle(((Rectangle)(ref bounds)).get_Right() - _resizeTexture.get_Width() - 1, ((Rectangle)(ref bounds)).get_Bottom() - _resizeTexture.get_Height() - 1, _resizeTexture.get_Width(), _resizeTexture.get_Height()), (Rectangle?)_resizeTexture.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+			}
+			if (ShowCenter)
+			{
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Control)this).get_Width() / 2 - 2, ((Control)this).get_Height() / 2 - 2, 4, 4), (Rectangle?)Textures.get_Pixel().get_Bounds(), Color.get_Red(), 0f, default(Vector2), (SpriteEffects)0);
 			}
 		}
 

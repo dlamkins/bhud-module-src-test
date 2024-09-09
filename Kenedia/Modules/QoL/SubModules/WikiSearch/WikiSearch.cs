@@ -28,6 +28,8 @@ namespace Kenedia.Modules.QoL.SubModules.WikiSearch
 
 		private SettingEntry<KeyBinding> _modifierToChat;
 
+		private SettingEntry<WikiLocale.Locale> _language;
+
 		public override SubModuleType SubModuleType => SubModuleType.WikiSearch;
 
 		public WikiSearch(SettingCollection settings)
@@ -124,6 +126,7 @@ namespace Kenedia.Modules.QoL.SubModules.WikiSearch
 			_disableOnSearch = settings.DefineSetting<bool>("_disableOnSearch", true, (Func<string>)null, (Func<string>)null);
 			_disableOnRightClick = settings.DefineSetting<bool>("_disableOnRightClick", true, (Func<string>)null, (Func<string>)null);
 			_modifierToChat = settings.DefineSetting<KeyBinding>("_modifierToChat", new KeyBinding((Keys)160), (Func<string>)null, (Func<string>)null);
+			_language = settings.DefineSetting<WikiLocale.Locale>("_language", WikiLocale.Locale.Default, (Func<string>)null, (Func<string>)null);
 		}
 
 		public override void Load()
@@ -186,7 +189,7 @@ namespace Kenedia.Modules.QoL.SubModules.WikiSearch
 				await Task.Delay(delay);
 				Keyboard.Stroke((VirtualKeyShort)37, true);
 				await Task.Delay(delay);
-				bool hasWiki = await ClipboardUtil.get_WindowsClipboardService().SetTextAsync("/wiki ");
+				bool hasWiki = await ClipboardUtil.get_WindowsClipboardService().SetTextAsync(GetWikiCommand());
 				if (hasWiki)
 				{
 					Keyboard.Stroke((VirtualKeyShort)86, true);
@@ -212,6 +215,18 @@ namespace Kenedia.Modules.QoL.SubModules.WikiSearch
 			catch
 			{
 			}
+		}
+
+		private string GetWikiCommand()
+		{
+			return _language.get_Value() switch
+			{
+				WikiLocale.Locale.English => "/wiki en:", 
+				WikiLocale.Locale.German => "/wiki de: ", 
+				WikiLocale.Locale.French => "/wiki fr: ", 
+				WikiLocale.Locale.Spanish => "/wiki es:", 
+				_ => "/wiki ", 
+			};
 		}
 
 		public override void CreateSettingsPanel(FlowPanel flowPanel, int width)
@@ -291,6 +306,19 @@ namespace Kenedia.Modules.QoL.SubModules.WikiSearch
 				_disableOnRightClick.set_Value(b);
 			};
 			UI.WrapWithLabel(localizedLabelContent3, localizedTooltip3, (Container)(object)contentFlowPanel, width4, (Control)(object)checkbox3);
+			Enum.GetValues(typeof(WikiLocale.Locale));
+			Func<string> localizedLabelContent4 = () => strings.Language_Name;
+			Func<string> localizedTooltip4 = () => strings.Language_Tooltip;
+			int width5 = width - 16;
+			Dropdown dropdown = new Dropdown();
+			((Control)dropdown).set_Height(20);
+			((Dropdown)dropdown).set_SelectedItem(WikiLocale.ToDisplayString(_language.get_Value()));
+			dropdown.SetLocalizedItems = () => WikiLocale.Locales.Values.ToList();
+			dropdown.ValueChangedAction = delegate(string s)
+			{
+				_language.set_Value(WikiLocale.FromDisplayString(s));
+			};
+			UI.WrapWithLabel(localizedLabelContent4, localizedTooltip4, (Container)(object)contentFlowPanel, width5, (Control)(object)dropdown);
 		}
 	}
 }

@@ -81,6 +81,11 @@ namespace Kenedia.Modules.Core.Controls
 			return false;
 		}
 
+		protected override CaptureType CapturesInput()
+		{
+			return (CaptureType)0;
+		}
+
 		private void SetAnchor(object sender, ValueChangedEventArgs<Control> e)
 		{
 		}

@@ -8,6 +8,7 @@ using Blish_HUD.Controls.Intern;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
 using Kenedia.Modules.Core.Extensions;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace Kenedia.Modules.Core.Utility
@@ -15,6 +16,31 @@ namespace Kenedia.Modules.Core.Utility
 	public static class Input
 	{
 		public static VirtualKeyShort[] ModKeyMapping { get; }
+
+		public static async Task ClickMouse(MouseButton mouseButton, Point pos, int clicks = 1, bool sendToSystem = false, bool moveMouse = false)
+		{
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			await ClickMouse(mouseButton, pos.X, pos.Y, clicks, sendToSystem, moveMouse);
+		}
+
+		public static async Task ClickMouse(MouseButton mouseButton = 0, int xPos = -1, int yPos = -1, int clicks = 1, bool sendToSystem = false, bool moveMouse = false)
+		{
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			if (moveMouse)
+			{
+				Mouse.SetPosition(xPos, yPos, sendToSystem);
+				await Task.Delay(25);
+			}
+			for (int i = 0; i < clicks; i++)
+			{
+				Mouse.Press(mouseButton, xPos, yPos, sendToSystem);
+				await Task.Delay(25);
+			}
+		}
 
 		public static async Task SendKey(Keys key, bool sendToSystem = false)
 		{

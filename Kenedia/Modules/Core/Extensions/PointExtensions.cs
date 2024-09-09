@@ -1,4 +1,6 @@
 using System;
+using Blish_HUD;
+using Kenedia.Modules.Core.Utility.WindowsUtil;
 using Microsoft.Xna.Framework;
 
 namespace Kenedia.Modules.Core.Extensions
@@ -61,6 +63,28 @@ namespace Kenedia.Modules.Core.Extensions
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
 			return $"X: {p.X}, Y: {p.Y}";
+		}
+
+		public static Point ClientToScreenPos(this Point p, bool scaleToUi = false)
+		{
+			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0004: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			if (scaleToUi)
+			{
+				p = PointExtensions.ScaleToUi(p);
+			}
+			IntPtr gw2WindowHandle = GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle();
+			User32Dll.POINT point = new User32Dll.POINT
+			{
+				X = p.X,
+				Y = p.Y
+			};
+			User32Dll.ClientToScreen(gw2WindowHandle, ref point);
+			return new Point(point.X, point.Y);
 		}
 	}
 }

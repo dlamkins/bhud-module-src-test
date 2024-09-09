@@ -13,11 +13,15 @@ namespace Kenedia.Modules.Core.Extensions
 			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0009: Invalid comparison between Unknown and I4
 			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000e: Invalid comparison between Unknown and I4
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000d: Invalid comparison between Unknown and I4
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0012: Invalid comparison between Unknown and I4
 			MapType type = map.get_Type();
-			return (int)type == 5 || (int)type == 16 || (int)type == 7;
+			if ((int)type == 5 || (int)type == 7 || (int)type == 16)
+			{
+				return true;
+			}
+			return false;
 		}
 
 		public static bool IsPvpMap(this CurrentMap map)

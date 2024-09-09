@@ -10,6 +10,7 @@ namespace Kenedia.Modules.QoL.SubModules
 		EnhancedCrosshair,
 		WaypointPaste,
 		WikiSearch,
-		CopyItemName
+		CopyItemName,
+		SchemanticProcessing
 	}
 }

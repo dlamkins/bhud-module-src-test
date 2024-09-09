@@ -21,9 +21,9 @@ namespace Kenedia.Modules.Core.Services
 
 		private double _lastClickOrKey;
 
-		private List<Keys> _ignoredKeys = new List<Keys> { (Keys)0 };
+		private readonly List<Keys> _ignoredKeys = new List<Keys> { (Keys)0 };
 
-		private List<Keys> _noKeys = new List<Keys>();
+		private readonly List<Keys> _noKeys = new List<Keys>();
 
 		private Point _lastMousePosition;
 

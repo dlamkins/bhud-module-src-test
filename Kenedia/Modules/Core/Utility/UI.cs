@@ -4,12 +4,42 @@ using Blish_HUD.Controls;
 using Kenedia.Modules.Core.Controls;
 using Kenedia.Modules.Core.Interfaces;
 using Microsoft.Xna.Framework;
+using MonoGame.Extended;
 using MonoGame.Extended.BitmapFonts;
 
 namespace Kenedia.Modules.Core.Utility
 {
 	public static class UI
 	{
+		public static string GetDisplayText(BitmapFont font, string text, int maxWidth, string stringOverflow = "...")
+		{
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			int width = 0;
+			string lastMatchingString = string.Empty;
+			string overflowedString = string.Empty;
+			for (int i = 0; i < text.Length; i++)
+			{
+				char c = text[i];
+				if (font.MeasureString(overflowedString + c + stringOverflow).Width <= (float)maxWidth)
+				{
+					overflowedString += c;
+				}
+				Size2 b = font.MeasureString(c.ToString());
+				if ((float)width + b.Width <= (float)maxWidth)
+				{
+					lastMatchingString += c;
+					width += (int)b.Width;
+					continue;
+				}
+				return overflowedString + stringOverflow;
+			}
+			return lastMatchingString;
+		}
+
 		public static BitmapFont GetFont(FontSize fontSize, FontStyle style)
 		{
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)

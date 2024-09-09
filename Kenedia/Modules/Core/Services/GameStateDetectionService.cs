@@ -274,14 +274,16 @@ namespace Kenedia.Modules.Core.Services
 					else
 					{
 						GameStatusType gameStatus = GameStatus;
-						if ((gameStatus == GameStatusType.Ingame || gameStatus == GameStatusType.LoadingScreen) && (cutscene || creationCutscene))
+						bool flag = ((gameStatus == GameStatusType.Ingame || gameStatus == GameStatusType.LoadingScreen) ? true : false);
+						if (flag && (cutscene || creationCutscene))
 						{
 							NewStatus = GameStatusType.Cutscene;
 						}
 						else
 						{
 							gameStatus = GameStatus;
-							if ((gameStatus == GameStatusType.Cutscene || gameStatus == GameStatusType.Ingame || gameStatus == GameStatusType.CharacterSelection) && loadingScreen)
+							flag = (((uint)(gameStatus - 1) <= 1u || gameStatus == GameStatusType.Cutscene) ? true : false);
+							if (flag && loadingScreen)
 							{
 								NewStatus = GameStatusType.LoadingScreen;
 							}

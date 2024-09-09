@@ -28,23 +28,39 @@ namespace Kenedia.Modules.Core.Models
 
 		private void OnValueChanged(TKey key, TValue? oldValue, TValue? newValue, [CallerMemberName] string? propName = null)
 		{
-			if ((!(oldValue?.Equals(newValue))) ?? true)
+			if (!((!(oldValue?.Equals(newValue))) ?? true))
 			{
-				if (oldValue != null)
+				return;
+			}
+			TValue val2;
+			if (oldValue != null)
+			{
+				ref TValue val = ref oldValue;
+				val2 = default(TValue);
+				if (val2 == null)
 				{
-					oldValue!.PropertyChanged -= ItemProperty_Changed;
+					val2 = val;
+					val = ref val2;
 				}
-				if (newValue != null)
+				val.PropertyChanged -= ItemProperty_Changed;
+			}
+			if (newValue != null)
+			{
+				ref TValue val3 = ref newValue;
+				val2 = default(TValue);
+				if (val2 == null)
 				{
-					newValue!.PropertyChanged += ItemProperty_Changed;
+					val2 = val3;
+					val3 = ref val2;
 				}
-				bool num = ContainsKey(key);
-				base[key] = newValue;
-				this.ItemChanged?.Invoke(this, new DictionaryItemChangedEventArgs<TKey, TValue>(key, oldValue, newValue));
-				if (!num)
-				{
-					this.CollectionChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
-				}
+				val3.PropertyChanged += ItemProperty_Changed;
+			}
+			bool num = ContainsKey(key);
+			base[key] = newValue;
+			this.ItemChanged?.Invoke(this, new DictionaryItemChangedEventArgs<TKey, TValue>(key, oldValue, newValue));
+			if (!num)
+			{
+				this.CollectionChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
 			}
 		}
 
@@ -55,16 +71,30 @@ namespace Kenedia.Modules.Core.Models
 
 		public new void Add(TKey key, TValue? value)
 		{
-			if (!ContainsKey(key))
+			if (ContainsKey(key))
 			{
-				if (value != null)
-				{
-					value!.PropertyChanged += ItemProperty_Changed;
-				}
-				base.Add(key, value);
-				this.ItemChanged?.Invoke(this, new DictionaryItemChangedEventArgs<TKey, TValue>(key, default(TValue), value));
-				this.CollectionChanged?.Invoke(this, new PropertyChangedEventArgs("Collection"));
+				return;
 			}
+			TValue val2;
+			if (value != null)
+			{
+				ref TValue val = ref value;
+				val2 = default(TValue);
+				if (val2 == null)
+				{
+					val2 = val;
+					val = ref val2;
+				}
+				val.PropertyChanged += ItemProperty_Changed;
+			}
+			base.Add(key, value);
+			EventHandler<DictionaryItemChangedEventArgs<TKey, TValue?>>? itemChanged = this.ItemChanged;
+			if (itemChanged != null)
+			{
+				val2 = default(TValue);
+				itemChanged!(this, new DictionaryItemChangedEventArgs<TKey, TValue>(key, val2, value));
+			}
+			this.CollectionChanged?.Invoke(this, new PropertyChangedEventArgs("Collection"));
 		}
 
 		public new bool Remove(TKey key)

@@ -56,8 +56,7 @@ namespace Kenedia.Modules.Core.Services
 				}
 			}
 			IntPtr hWnd = GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle();
-			User32Dll.RECT newRect = default(User32Dll.RECT);
-			if (User32Dll.GetWindowRect(hWnd, ref newRect) && !WindowBounds.Matches(newRect))
+			if (User32Dll.GetWindowRect(hWnd, out var newRect) && !WindowBounds.Matches(newRect))
 			{
 				WindowBounds = newRect;
 				if (User32Dll.GetClientRect(hWnd, out var rect))

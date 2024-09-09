@@ -29,7 +29,9 @@
   </xsd:schema>
 <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="HotbarExpandDirection_Name"><value>Hotbar Expand Direction</value></data>
   <data name="ZoomOnCameraChange_Name"><value>Trigger on camera change</value></data>
+  <data name="CopyKeybind_Name"><value>Copy Shortcut</value></data>
   <data name="KeyboardLayout_Name"><value>Keyboard Layout</value></data>
+  <data name="Language_Name"><value>Wiki Language</value></data>
   <data name="ReturnType_Name"><value>Return Type</value></data>
   <data name="ShowWeeklyReset_Tooltip"><value>Show the time until weekly reset on the bottom left of the minimap</value></data>
   <data name="ShowTooltips_Name"><value>Show Tooltips</value></data>
@@ -44,12 +46,14 @@
   <data name="ShowServerTime_Name"><value>Show Server Time</value></data>
   <data name="AllowManualZoom_Tooltip"><value>When using the scroll wheel of your mouse the camera won't zoom out until the next trigger</value></data>
   <data name="DateFormat_Tooltip"><value>Date format to use for the weekly reset.</value></data>
+  <data name="CopyKeybind_Tooltip"><value>Default: Ctrl + C</value></data>
   <data name="AutoPosition_Tooltip"><value>Automatically position the resets over the bottom left of the minimap</value></data>
   <data name="ShowWeeklyReset_Name"><value>Show Weekly Reset</value></data>
   <data name="ZoomOnFoVChange_Tooltip"><value>Trigger on any Field of View change</value></data>
   <data name="WaypointChatcode_Name"><value>Waypoint Chatcode</value></data>
   <data name="CrosshairSize_Name"><value>Crosshair Size</value></data>
   <data name="ShowDailyReset_Name"><value>Show Daily Reset</value></data>
+  <data name="SelectAllKeybind_Name"><value>Select All Shortcut</value></data>
   <data name="PasteWaypointFromClipboard_Tooltip"><value>Check if the clipboard content is a waypoint chatlink, if so use that instead of the waypoint code</value></data>
   <data name="PasteWaypointFromClipboard_Name"><value>Use Clipboard first</value></data>
   <data name="HotkeyEntry_Description"><value>Hotkey to toggle {0}</value></data>
@@ -58,10 +62,12 @@
   <data name="ManualZoom_Name"><value>Manual Max Zoom Out</value></data>
   <data name="ReturnType_Tooltip"><value>Type to return after copying the item name.</value></data>
   <data name="DisableOnRightClick_Tooltip"><value>Disable the sub module when right clicking</value></data>
+  <data name="Language_Tooltip"><value>Which wiki should be used for the search query?</value></data>
   <data name="DisableOnRightClick_Name"><value>Disable on Right Click</value></data>
   <data name="WaypointChatcode_Tooltip"><value>The chatcode of the waypoint to post in chat.</value></data>
   <data name="PasteWaypointHotkey_Name"><value>Paste Waypoint</value></data>
   <data name="ZoomOnFoVChange_Name"><value>Trigger on FoV change</value></data>
+  <data name="ShortcutKeybinds"><value>Shortcut Keybinds</value></data>
   <data name="ZoomOutKey_Tooltip"><value>The games 'Zoom Out' Keybind in the camera section. This must be set and match else things can go bad.</value></data>
   <data name="ModifierToSendToChat_Name"><value>Modifier to link item to chat</value></data>
   <data name="ShowServerTime_Tooltip"><value>Show the server time on the bottom left of the minimap</value></data>
@@ -72,12 +78,16 @@
   <data name="ZoomOutKey_Name"><value>Zoom Out</value></data>
   <data name="KeyboardLayout_Tooltip"><value>Keyboard Layout you use</value></data>
   <data name="DisableOnCopy_Tooltip"><value>Disable the sub module after copying a items name</value></data>
+  <data name="PasteKeybind_Name"><value>Paste Shortcut</value></data>
   <data name="ShowDailyReset_Tooltip"><value>Show the time until daily reset on the bottom left of the minimap</value></data>
   <data name="EditPosition_Name"><value>Edit Position</value></data>
+  <data name="PasteKeybind_Tooltip"><value>Default: Ctrl + V</value></data>
   <data name="DisableOnCopy_Name"><value>Disable after copy</value></data>
   <data name="EditPosition_Tooltip"><value>While checked the resets can be moved</value></data>
   <data name="DateFormat_Name"><value>Date Format</value></data>
+  <data name="SelectAllKeybind_Tooltip"><value>Default: Ctrl + A</value></data>
   <data name="ShowIcons_Tooltip"><value>Show Icons before the reset countdown</value></data>
+  <data name="DefaultWiki"><value>Default Wiki</value></data>
   <data name="AllowManualZoom_Name"><value>Allow manual zoom</value></data>
   <data name="ShowTooltips_Tooltip"><value>Show Tooltips when hovering the reset texts</value></data>
   <data name="Days"><value>days</value></data>

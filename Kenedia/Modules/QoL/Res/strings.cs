@@ -50,6 +50,10 @@ namespace Kenedia.Modules.QoL.Res
 
 		internal static string AutoPosition_Tooltip => ResourceManager.GetString("AutoPosition_Tooltip", resourceCulture);
 
+		internal static string CopyKeybind_Name => ResourceManager.GetString("CopyKeybind_Name", resourceCulture);
+
+		internal static string CopyKeybind_Tooltip => ResourceManager.GetString("CopyKeybind_Tooltip", resourceCulture);
+
 		internal static string CrosshairSize_Name => ResourceManager.GetString("CrosshairSize_Name", resourceCulture);
 
 		internal static string CrosshairSize_Tooltip => ResourceManager.GetString("CrosshairSize_Tooltip", resourceCulture);
@@ -59,6 +63,8 @@ namespace Kenedia.Modules.QoL.Res
 		internal static string DateFormat_Tooltip => ResourceManager.GetString("DateFormat_Tooltip", resourceCulture);
 
 		internal static string Days => ResourceManager.GetString("Days", resourceCulture);
+
+		internal static string DefaultWiki => ResourceManager.GetString("DefaultWiki", resourceCulture);
 
 		internal static string DisableOnCopy_Name => ResourceManager.GetString("DisableOnCopy_Name", resourceCulture);
 
@@ -92,6 +98,10 @@ namespace Kenedia.Modules.QoL.Res
 
 		internal static string KeyboardLayout_Tooltip => ResourceManager.GetString("KeyboardLayout_Tooltip", resourceCulture);
 
+		internal static string Language_Name => ResourceManager.GetString("Language_Name", resourceCulture);
+
+		internal static string Language_Tooltip => ResourceManager.GetString("Language_Tooltip", resourceCulture);
+
 		internal static string ManualZoom_Name => ResourceManager.GetString("ManualZoom_Name", resourceCulture);
 
 		internal static string ManualZoom_Tooltip => ResourceManager.GetString("ManualZoom_Tooltip", resourceCulture);
@@ -99,6 +109,10 @@ namespace Kenedia.Modules.QoL.Res
 		internal static string ModifierToSendToChat_Name => ResourceManager.GetString("ModifierToSendToChat_Name", resourceCulture);
 
 		internal static string ModifierToSendToChat_Tooltip => ResourceManager.GetString("ModifierToSendToChat_Tooltip", resourceCulture);
+
+		internal static string PasteKeybind_Name => ResourceManager.GetString("PasteKeybind_Name", resourceCulture);
+
+		internal static string PasteKeybind_Tooltip => ResourceManager.GetString("PasteKeybind_Tooltip", resourceCulture);
 
 		internal static string PasteWaypointFromClipboard_Name => ResourceManager.GetString("PasteWaypointFromClipboard_Name", resourceCulture);
 
@@ -111,6 +125,12 @@ namespace Kenedia.Modules.QoL.Res
 		internal static string ReturnType_Name => ResourceManager.GetString("ReturnType_Name", resourceCulture);
 
 		internal static string ReturnType_Tooltip => ResourceManager.GetString("ReturnType_Tooltip", resourceCulture);
+
+		internal static string SelectAllKeybind_Name => ResourceManager.GetString("SelectAllKeybind_Name", resourceCulture);
+
+		internal static string SelectAllKeybind_Tooltip => ResourceManager.GetString("SelectAllKeybind_Tooltip", resourceCulture);
+
+		internal static string ShortcutKeybinds => ResourceManager.GetString("ShortcutKeybinds", resourceCulture);
 
 		internal static string ShowDailyReset_Name => ResourceManager.GetString("ShowDailyReset_Name", resourceCulture);
 

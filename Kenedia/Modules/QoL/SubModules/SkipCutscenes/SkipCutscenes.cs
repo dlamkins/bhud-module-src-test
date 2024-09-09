@@ -51,6 +51,8 @@ namespace Kenedia.Modules.QoL.SubModules.SkipCutscenes
 
 		private Point _mousePosition;
 
+		private GameStatusType _loggedInSinceLastCutscene;
+
 		private readonly List<int> _introMaps = new List<int> { 573, 458, 138, 379, 432 };
 
 		private readonly List<int> _starterMaps = new List<int> { 15, 19, 28, 34, 35 };
@@ -120,25 +122,29 @@ namespace Kenedia.Modules.QoL.SubModules.SkipCutscenes
 		private async void On_GameStateChanged(object sender, GameStateChangedEventArgs e)
 		{
 			_logger.Info($"Gamestate changed to {e.Status}");
+			if (!base.Enabled)
+			{
+				return;
+			}
 			switch (e.Status)
 			{
 			case GameStatusType.Vista:
-				if (base.Enabled)
+				if (_loggedInSinceLastCutscene == GameStatusType.Ingame)
 				{
+					_loggedInSinceLastCutscene = GameStatusType.Vista;
 					await SkipVista();
 				}
 				break;
 			case GameStatusType.Cutscene:
-				if (base.Enabled)
+				if (_loggedInSinceLastCutscene == GameStatusType.Ingame)
 				{
+					_loggedInSinceLastCutscene = GameStatusType.Cutscene;
 					await SkipCutscene();
 				}
 				break;
 			default:
-				if (base.Enabled)
-				{
-					Cancel();
-				}
+				Cancel();
+				_loggedInSinceLastCutscene = e.Status;
 				break;
 			}
 		}

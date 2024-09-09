@@ -127,18 +127,18 @@ namespace Kenedia.Modules.Core.Controls
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
 			AsyncTexture2D texture = GetTexture();
 			Color? color = ((ColorHovered.HasValue && ((Control)this).get_MouseOver()) ? ColorHovered : ((ColorClicked.HasValue && Clicked) ? ColorClicked : ImageColor));
 			if (texture != null && color.HasValue)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(texture), (Rectangle)(((_003F?)SizeRectangle) ?? bounds), (Rectangle?)(Rectangle)(((_003F?)TextureRectangle) ?? texture.get_Bounds()), color.Value, TextureRotation.GetValueOrDefault(), default(Vector2), (SpriteEffects)0);
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(texture), SizeRectangle.GetValueOrDefault(bounds), (Rectangle?)(Rectangle)(((_003F?)TextureRectangle) ?? texture.get_Bounds()), color.Value, TextureRotation.GetValueOrDefault(), default(Vector2), (SpriteEffects)0);
 			}
 		}
 
