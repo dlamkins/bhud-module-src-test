@@ -18,6 +18,8 @@ namespace FarmingTracker
 			(TokenPermission)8
 		}.AsReadOnly();
 
+		public const string ADD_GW2_API_KEY_ERROR_DISPLAY_TEXT = "Add GW2 API key!";
+
 		public bool CanAccessApi => ApiTokenState == ApiTokenState.CanAccessApi;
 
 		public bool ApiTokenMissing => ApiTokenState == ApiTokenState.ApiTokenMissing;

@@ -15,7 +15,7 @@ namespace FarmingTracker
 
 		private const long MAX_COIN_DISPLAY_VALUE = 1000000L;
 
-		public CoinPanel(AsyncTexture2D coinTexture, Color textColor, string tooltip, BitmapFont font, bool widthFixed, Container parent)
+		public CoinPanel(AsyncTexture2D coinTexture, Color textColor, Tooltip tooltip, BitmapFont font, bool widthFixed, Container parent)
 			: this()
 		{
 			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
@@ -41,7 +41,7 @@ namespace FarmingTracker
 			((Control)this).set_Parent(parent);
 			Label val = new Label();
 			val.set_Text("?");
-			((Control)val).set_BasicTooltipText(tooltip);
+			((Control)val).set_Tooltip(tooltip);
 			val.set_Font(font);
 			val.set_TextColor(textColor);
 			val.set_AutoSizeHeight(true);
@@ -58,7 +58,7 @@ namespace FarmingTracker
 			}
 			Image val2 = new Image(coinTexture);
 			((Control)val2).set_Size(new Point(((Control)_coinLabel).get_Height() * 11 / 10));
-			((Control)val2).set_BasicTooltipText(tooltip);
+			((Control)val2).set_Tooltip(tooltip);
 			((Control)val2).set_Parent((Container)(object)this);
 			_coinImage = val2;
 		}

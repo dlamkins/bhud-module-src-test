@@ -18,7 +18,7 @@ namespace FarmingTracker
 			((Container)this).set_HeightSizingMode((SizingMode)1);
 			((Container)this).set_WidthSizingMode((SizingMode)1);
 			((Control)this).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			ProfitPanels = new ProfitPanels(services, (Container)(object)this);
+			ProfitPanels = new ProfitPanels(services, isProfitWindow: true, (Container)(object)this);
 			OnProfitWindowBackgroundOpacitySettingChanged();
 			OnIsProfitWindowVisibleSettingChanged();
 			services.SettingService.ProfitWindowBackgroundOpacitySetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)OnProfitWindowBackgroundOpacitySettingChanged);

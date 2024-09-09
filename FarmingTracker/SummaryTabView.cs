@@ -59,15 +59,7 @@ namespace FarmingTracker
 
 		private readonly StatsPanels _statsPanels = new StatsPanels();
 
-		private double _saveFarmingDurationRunningTimeMs;
-
 		private CollapsibleHelp _collapsibleHelp;
-
-		private double _automaticResetCheckRunningTimeMs = 60000.0;
-
-		private readonly double SAVE_FARMING_DURATION_INTERVAL_MS = TimeSpan.FromMinutes(1.0).TotalMilliseconds;
-
-		private const double AUTOMATIC_RESET_CHECK_INTERVAL_MS = 60000.0;
 
 		public const string GW2_API_ERROR_HINT = "GW2 API error";
 
@@ -76,6 +68,12 @@ namespace FarmingTracker
 		public const string ITEMS_PANEL_TITLE = "Items";
 
 		private const string CURRENCIES_PANEL_TITLE = "Currencies";
+
+		private readonly Interval _profitPerHourUpdateInterval = new Interval(TimeSpan.FromMilliseconds(5000.0));
+
+		private readonly Interval _saveFarmingDurationInterval = new Interval(TimeSpan.FromMinutes(1.0));
+
+		private readonly Interval _automaticResetCheckInterval = new Interval(TimeSpan.FromMinutes(1.0), firstIntervalEnded: true);
 
 		public SummaryTabView(FarmingTrackerWindow farmingTrackerWindow, ProfitWindow profitWindow, Model model, Services services)
 			: this()
@@ -127,30 +125,25 @@ namespace FarmingTracker
 		public void Update(GameTime gameTime)
 		{
 			_services.UpdateLoop.AddToRunningTime(gameTime.get_ElapsedGameTime().TotalMilliseconds);
-			_saveFarmingDurationRunningTimeMs += gameTime.get_ElapsedGameTime().TotalMilliseconds;
-			_automaticResetCheckRunningTimeMs += gameTime.get_ElapsedGameTime().TotalMilliseconds;
 			if (!_isUiUpdateTaskRunning && _services.UpdateLoop.HasToUpdateUi())
 			{
 				_isUiUpdateTaskRunning = true;
 				Task.Run(delegate
 				{
 					StatsSnapshot statsSnapshot = _model.StatsSnapshot;
-					statsSnapshot.ItemById.Values.Where((Stat s) => s.Count != 0).ToList();
-					statsSnapshot.CurrencyById.Values.Where((Stat s) => s.Count != 0).ToList();
-					_profitPanels.UpdateProfitLabels(statsSnapshot, _model.IgnoredItemApiIds, _services.FarmingDuration.Elapsed);
-					_profitWindow.ProfitPanels.UpdateProfitLabels(statsSnapshot, _model.IgnoredItemApiIds, _services.FarmingDuration.Elapsed);
+					_services.ProfitCalculator.CalculateProfits(statsSnapshot, _model.IgnoredItemApiIds, _services.FarmingDuration.Elapsed);
+					_profitPanels.ShowProfits(_services.ProfitCalculator.ProfitInCopper, _services.ProfitCalculator.ProfitPerHourInCopper);
+					_profitWindow.ProfitPanels.ShowProfits(_services.ProfitCalculator.ProfitInCopper, _services.ProfitCalculator.ProfitPerHourInCopper);
 					UiUpdater.UpdateStatPanels(_statsPanels, statsSnapshot, _model, _services);
 					_isUiUpdateTaskRunning = false;
 				});
 			}
-			if (_saveFarmingDurationRunningTimeMs > SAVE_FARMING_DURATION_INTERVAL_MS)
+			if (_saveFarmingDurationInterval.HasEnded())
 			{
-				_saveFarmingDurationRunningTimeMs = 0.0;
 				_services.FarmingDuration.SaveFarmingTime();
 			}
-			if (_automaticResetCheckRunningTimeMs > 60000.0)
+			if (_automaticResetCheckInterval.HasEnded())
 			{
-				_automaticResetCheckRunningTimeMs = 0.0;
 				if (_automaticResetService.HasToResetAutomatically())
 				{
 					_resetState = ResetState.ResetRequired;
@@ -183,12 +176,16 @@ namespace FarmingTracker
 				_isTaskRunning = true;
 				Task.Run(async delegate
 				{
-					await _services.FileSaveService.SaveModelToFile(_model);
+					await _services.FileSaver.SaveModelToFile(_model);
 					_isTaskRunning = false;
 				});
 			}
-			_profitPanels.UpdateProfitPerHourEveryFiveSeconds(_services.FarmingDuration.Elapsed);
-			_profitWindow.ProfitPanels.UpdateProfitPerHourEveryFiveSeconds(_services.FarmingDuration.Elapsed);
+			if (_profitPerHourUpdateInterval.HasEnded())
+			{
+				_services.ProfitCalculator.CalculateProfitPerHour(_services.FarmingDuration.Elapsed);
+				_profitPanels.ShowProfits(_services.ProfitCalculator.ProfitInCopper, _services.ProfitCalculator.ProfitPerHourInCopper);
+				_profitWindow.ProfitPanels.ShowProfits(_services.ProfitCalculator.ProfitInCopper, _services.ProfitCalculator.ProfitPerHourInCopper);
+			}
 			_elapsedFarmingTimeLabel.UpdateTimeEverySecond();
 			if (!_services.UpdateLoop.UpdateIntervalEnded())
 			{
@@ -366,7 +363,7 @@ namespace FarmingTracker
 			_farmingRootFlowPanel = val3;
 			CreateHelpResetDrfButtons();
 			CreateTimeAndHintLabels();
-			_profitPanels = new ProfitPanels(_services, (Container)(object)_farmingRootFlowPanel);
+			_profitPanels = new ProfitPanels(_services, isProfitWindow: false, (Container)(object)_farmingRootFlowPanel);
 			_searchPanel = new SearchPanel(_services, (Container)(object)_farmingRootFlowPanel);
 			CreateStatsPanels((Container)(object)_farmingRootFlowPanel);
 			return rootFlowPanel;
@@ -509,8 +506,8 @@ namespace FarmingTracker
 			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
 			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			val.set_FlowDirection((ControlFlowDirection)2);
 			val.set_ControlPadding(new Vector2(5f, 0f));
@@ -540,7 +537,7 @@ namespace FarmingTracker
 			((Control)new OpenUrlInBrowserButton("https://drf.rs/dashboard/livetracker/summary", "DRF", "Open DRF live tracking website in your default web browser.\nThe module and the DRF live tracking web page are both DRF clients. But they are independent of each other. They do not synchronize the data they display. So one client may show less or more data dependend on when the client session started.", _services.TextureService.OpenLinkTexture, (Container)(object)subButtonFlowPanel)).set_Width(60);
 			StandardButton val4 = new StandardButton();
 			val4.set_Text("Export CSV");
-			((Control)val4).set_BasicTooltipText("Export tracked items and currencies to 'Documents\\Guild Wars 2\\addons\\blishhud\\farming-tracker\\<date-time>.csv'.\nThis feature can be used to import the tracked items/currencies in Microsoft Excel for example.");
+			((Control)val4).set_BasicTooltipText("Export tracked items and currencies to '" + _services.CsvFileExporter.ModuleFolderPath + "\\<date-time>.csv'.\nThis feature can be used to import the tracked items/currencies in Microsoft Excel for example.");
 			((Control)val4).set_Width(90);
 			((Control)val4).set_Parent((Container)(object)subButtonFlowPanel);
 			((Control)val4).add_Click((EventHandler<MouseEventArgs>)delegate

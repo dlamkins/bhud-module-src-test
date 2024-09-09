@@ -5,11 +5,11 @@ using Newtonsoft.Json;
 
 namespace FarmingTracker
 {
-	public class FileLoadService
+	public class FileLoader
 	{
 		private readonly string _modelFilePath;
 
-		public FileLoadService(string modelFilePath)
+		public FileLoader(string modelFilePath)
 		{
 			_modelFilePath = modelFilePath;
 		}

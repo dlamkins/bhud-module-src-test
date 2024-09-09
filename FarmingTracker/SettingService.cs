@@ -73,7 +73,9 @@ namespace FarmingTracker
 
 		public SettingEntry<string> ProfitPerHourLabelTextSetting { get; private set; }
 
-		public SettingEntry<string> TotalProfitLabelTextSetting { get; private set; }
+		public SettingEntry<string> ProfitLabelTextSetting { get; private set; }
+
+		public SettingEntry<ProfitWindowDisplayMode> ProfitWindowDisplayModeSetting { get; private set; }
 
 		public SettingEntry<FloatPoint> ProfitWindowRelativeWindowAnchorLocationSetting { get; private set; }
 
@@ -150,16 +152,17 @@ namespace FarmingTracker
 			IsProfitWindowVisibleSetting = settings.DefineSetting<bool>("profit window is visible", true, (Func<string>)(() => "show"), (Func<string>)(() => "Show profit window."));
 			DragProfitWindowWithMouseIsEnabledSetting = settings.DefineSetting<bool>("dragging profit window is allowed", true, (Func<string>)(() => "drag with mouse"), (Func<string>)(() => "Allow dragging the window by moving the mouse when left mouse button is pressed inside window"));
 			WindowAnchorSetting = settings.DefineSetting<WindowAnchor>("window anchor", WindowAnchor.TopLeft, (Func<string>)(() => "window anchor"), (Func<string>)(() => "When the window content grows/shrinks the window anchor is the part of the window that will not move, while the rest of the window will. For example for 'Top..,' the window top will stay in position while the window bottom expands. And for 'Bottom..,' the window bottom will stay in position while the window top expands."));
-			ProfitWindowCanBeClickedThroughSetting = settings.DefineSetting<bool>("profit window is not capturing mouse clicks", false, (Func<string>)(() => "mouse clickthrough (disabled when 'drag with mouse' is checked)"), (Func<string>)(() => "This allows clicking with the mouse through the window to interact with Guild Wars 2 behind the window."));
+			ProfitWindowCanBeClickedThroughSetting = settings.DefineSetting<bool>("profit window is not capturing mouse clicks", true, (Func<string>)(() => "mouse clickthrough (disabled when 'drag with mouse' is checked)"), (Func<string>)(() => "This allows clicking with the mouse through the window to interact with Guild Wars 2 behind the window."));
 			ProfitWindowBackgroundOpacitySetting = settings.DefineSetting<int>("profit window background opacity", 125, (Func<string>)(() => "background opacity"), (Func<string>)(() => "Change background opacity / transparency."));
 			SettingComplianceExtensions.SetRange(ProfitWindowBackgroundOpacitySetting, 0, 255);
+			ProfitWindowDisplayModeSetting = settings.DefineSetting<ProfitWindowDisplayMode>("profit window display mode", ProfitWindowDisplayMode.ProfitAndProfitPerHour, (Func<string>)(() => "display mode"), (Func<string>)(() => "Change what should be displayed inside the profit window."));
 			ProfitWindowRelativeWindowAnchorLocationSetting = internalSettings.DefineSetting<FloatPoint>("profit window relative location", new FloatPoint(0.2f, 0.2f), (Func<string>)null, (Func<string>)null);
 		}
 
 		private void DefineProfitSettings(SettingCollection settings)
 		{
 			ProfitPerHourLabelTextSetting = settings.DefineSetting<string>("profit per hour label text", "Profit per hour", (Func<string>)(() => "profit per hour label"), (Func<string>)(() => "Change the label for profit per hour. This will affect profit display in profit window and summary tab. You have to click somewhere outside of this text input to see your change. This will not affect the value itself."));
-			TotalProfitLabelTextSetting = settings.DefineSetting<string>("total profit label text", "Profit", (Func<string>)(() => "total profit label"), (Func<string>)(() => "Change the label for total profit. This will affect profit display in profit window and summary tab. You have to click somewhere outside of this text input to see your change. This will not affect the value itself."));
+			ProfitLabelTextSetting = settings.DefineSetting<string>("total profit label text", "Profit", (Func<string>)(() => "profit label"), (Func<string>)(() => "Change the label for total profit. This will affect profit display in profit window and summary tab. You have to click somewhere outside of this text input to see your change. This will not affect the value itself."));
 		}
 
 		private static void RemoveUnknownEnumValues<T>(SettingEntry<List<T>> ListSetting) where T : Enum

@@ -7,11 +7,11 @@ namespace FarmingTracker
 {
 	public class CsvFileExporter
 	{
-		private readonly string _moduleFolderPath = "";
+		public string ModuleFolderPath { get; }
 
 		public CsvFileExporter(string moduleFolderPath)
 		{
-			_moduleFolderPath = moduleFolderPath;
+			ModuleFolderPath = moduleFolderPath;
 		}
 
 		public async void ExportSummaryAsCsvFile(Model model)
@@ -20,7 +20,7 @@ namespace FarmingTracker
 			{
 				string csvFileText = CreateCsvFileText(model);
 				string csvFileName = $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss_fff}.csv";
-				await FileSaveService.WriteFileAsync(Path.Combine(_moduleFolderPath, csvFileName), csvFileText);
+				await FileSaver.WriteFileAsync(Path.Combine(ModuleFolderPath, csvFileName), csvFileText);
 			}
 			catch (Exception exception)
 			{
@@ -37,10 +37,16 @@ namespace FarmingTracker
 			int linesCount = Math.Max(items.Count, currencies.Count);
 			for (int i = 0; i < linesCount; i++)
 			{
-				csvFileText += ((i < items.Count) ? $"{items[i].ApiId},{items[i].Details.Name},{items[i].Count}," : ",,,");
+				csvFileText += ((i < items.Count) ? $"{items[i].ApiId},{EscapeCsvField(items[i].Details.Name)},{items[i].Count}," : ",,,");
 				csvFileText += ((i < currencies.Count) ? $"{currencies[i].ApiId},{currencies[i].Count}\n" : ",\n");
 			}
 			return csvFileText;
+		}
+
+		private static string EscapeCsvField(string field)
+		{
+			string csvEscapedField = field.Replace("\"", "\"\"");
+			return "\"" + csvEscapedField + "\"";
 		}
 	}
 }

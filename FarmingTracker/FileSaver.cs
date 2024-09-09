@@ -5,11 +5,11 @@ using Newtonsoft.Json;
 
 namespace FarmingTracker
 {
-	public class FileSaveService
+	public class FileSaver
 	{
 		private readonly string _modelFilePath;
 
-		public FileSaveService(string modelFilePath)
+		public FileSaver(string modelFilePath)
 		{
 			_modelFilePath = modelFilePath;
 		}

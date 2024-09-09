@@ -126,34 +126,34 @@ namespace FarmingTracker
 			val2.set_HorizontalAlignment((HorizontalAlignment)1);
 			((Control)val2).set_Parent((Container)(object)columnFlowPanel);
 			Label headerLabel = val2;
-			List<ProfitPanel> profitPanels = new List<ProfitPanel>();
+			List<CoinsPanel> profitPanels = new List<CoinsPanel>();
 			List<FixedWidthContainer> containers = new List<FixedWidthContainer>();
 			if (stat.Profits.CanBeSoldOnTp)
 			{
 				FixedWidthContainer tpSellProfitContainer = new FixedWidthContainer((Container)(object)columnFlowPanel);
-				ProfitPanel tpSellProfitPanel = new ProfitPanel("", font, services.TextureService, (Container)(object)tpSellProfitContainer, 22);
-				tpSellProfitPanel.SetProfit(stat.CountSign * profit.TpSellProfitInCopper);
+				CoinsPanel tpSellProfitPanel = new CoinsPanel(null, font, services.TextureService, (Container)(object)tpSellProfitContainer, 22);
+				tpSellProfitPanel.SetCoins(stat.CountSign * profit.TpSellProfitInCopper);
 				profitPanels.Add(tpSellProfitPanel);
 				containers.Add(tpSellProfitContainer);
 				FixedWidthContainer tpBuyProfitContainer = new FixedWidthContainer((Container)(object)columnFlowPanel);
-				ProfitPanel tpBuyProfitPanel = new ProfitPanel("", font, services.TextureService, (Container)(object)tpBuyProfitContainer, 22);
-				tpBuyProfitPanel.SetProfit(stat.CountSign * profit.TpBuyProfitInCopper);
+				CoinsPanel tpBuyProfitPanel = new CoinsPanel(null, font, services.TextureService, (Container)(object)tpBuyProfitContainer, 22);
+				tpBuyProfitPanel.SetCoins(stat.CountSign * profit.TpBuyProfitInCopper);
 				profitPanels.Add(tpBuyProfitPanel);
 				containers.Add(tpBuyProfitContainer);
 			}
 			if (stat.Profits.CanBeSoldToVendor)
 			{
 				FixedWidthContainer vendorProfitContainer = new FixedWidthContainer((Container)(object)columnFlowPanel);
-				ProfitPanel vendorProfitPanel = new ProfitPanel("", font, services.TextureService, (Container)(object)vendorProfitContainer, 22);
-				vendorProfitPanel.SetProfit(stat.CountSign * profit.VendorProfitInCopper);
+				CoinsPanel vendorProfitPanel = new CoinsPanel(null, font, services.TextureService, (Container)(object)vendorProfitContainer, 22);
+				vendorProfitPanel.SetCoins(stat.CountSign * profit.VendorProfitInCopper);
 				profitPanels.Add(vendorProfitPanel);
 				containers.Add(vendorProfitContainer);
 			}
-			foreach (ProfitPanel item in profitPanels)
+			foreach (CoinsPanel item in profitPanels)
 			{
 				((Container)item).add_ContentResized((EventHandler<RegionChangedEventArgs>)delegate
 				{
-					int num = profitPanels.Max((ProfitPanel p) => ((Control)p).get_Width()) + 30;
+					int num = profitPanels.Max((CoinsPanel p) => ((Control)p).get_Width()) + 30;
 					((Control)headerLabel).set_Width(num);
 					for (int i = 0; i < containers.Count; i++)
 					{

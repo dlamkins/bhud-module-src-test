@@ -4,7 +4,7 @@ using MonoGame.Extended.BitmapFonts;
 
 namespace FarmingTracker
 {
-	public class ProfitPanel : FlowPanel
+	public class CoinsPanel : FlowPanel
 	{
 		private readonly CoinSignLabel _signLabel;
 
@@ -14,7 +14,7 @@ namespace FarmingTracker
 
 		private readonly CoinPanel _copperPanel;
 
-		public ProfitPanel(string tooltip, BitmapFont font, TextureService textureService, Container parent, int height = 0)
+		public CoinsPanel(Tooltip tooltip, BitmapFont font, TextureService textureService, Container parent, int height = 0)
 			: this()
 		{
 			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
@@ -30,7 +30,7 @@ namespace FarmingTracker
 			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
 			((FlowPanel)this).set_FlowDirection((ControlFlowDirection)2);
-			((Control)this).set_BasicTooltipText(tooltip);
+			((Control)this).set_Tooltip(tooltip);
 			((Container)this).set_WidthSizingMode((SizingMode)1);
 			if (height > 0)
 			{
@@ -45,7 +45,7 @@ namespace FarmingTracker
 			FlowPanel val = new FlowPanel();
 			val.set_FlowDirection((ControlFlowDirection)2);
 			val.set_ControlPadding(new Vector2(5f, 0f));
-			((Control)val).set_BasicTooltipText(tooltip);
+			((Control)val).set_Tooltip(tooltip);
 			((Container)val).set_WidthSizingMode((SizingMode)1);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
 			((Control)val).set_Parent((Container)(object)this);
@@ -55,9 +55,9 @@ namespace FarmingTracker
 			_copperPanel = new CoinPanel(textureService.SmallCopperCoinTexture, Color.get_SandyBrown(), tooltip, font, widthFixed: true, (Container)(object)coinsFlowPanel);
 		}
 
-		public void SetProfit(long profitInCopper)
+		public void SetCoins(long coinsInCopper)
 		{
-			Coin coin = new Coin(profitInCopper);
+			Coin coin = new Coin(coinsInCopper);
 			_signLabel.SetSign(coin.Sign);
 			_goldPanel.SetValue(coin.UnsignedGold, isZeroValueVisible: false);
 			_silverPanel.SetValue(coin.UnsignedSilver, coin.UnsignedGold != 0);
