@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Ideka.HitboxView
 {
-	public class HitboxDraw : Container
+	public class HitboxDraw : Control
 	{
 		private class TimePos
 		{
@@ -173,9 +173,9 @@ namespace Ideka.HitboxView
 			_timePosQueue.Clear();
 		}
 
-		public override void UpdateContainer(GameTime gameTime)
+		public override void DoUpdate(GameTime gameTime)
 		{
-			((Container)this).UpdateContainer(gameTime);
+			((Control)this).DoUpdate(gameTime);
 			if (GameService.Gw2Mumble.get_RawClient().get_Tick() > _lastTick)
 			{
 				_lastTick = GameService.Gw2Mumble.get_RawClient().get_Tick();
@@ -207,7 +207,7 @@ namespace Ideka.HitboxView
 			}
 		}
 
-		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
+		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
 			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
