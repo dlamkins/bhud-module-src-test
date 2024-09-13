@@ -95,7 +95,7 @@ namespace Ideka.RacingMeter
 
 		protected override CaptureType CapturesInput()
 		{
-			return (CaptureType)22;
+			return (CaptureType)0;
 		}
 
 		public void SetMeter(MountType mount, AnchoredRect? meter)

@@ -60,7 +60,7 @@ namespace Ideka.RacingMeter
 
 		protected override CaptureType CapturesInput()
 		{
-			return (CaptureType)22;
+			return (CaptureType)0;
 		}
 
 		public static Matrix GetTRS(float radius)
