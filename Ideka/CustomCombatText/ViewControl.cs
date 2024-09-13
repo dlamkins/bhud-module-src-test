@@ -19,7 +19,7 @@ namespace Ideka.CustomCombatText
 
 		protected override CaptureType CapturesInput()
 		{
-			return (CaptureType)22;
+			return (CaptureType)0;
 		}
 
 		public void ReceiveMessage(Message message)

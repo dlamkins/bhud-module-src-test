@@ -133,11 +133,11 @@ namespace Ideka.CustomCombatText
 							goto IL_041b;
 						case WeaponType.Staff:
 							goto IL_042b;
-						case WeaponType.BowLong:
+						case WeaponType.Longbow:
 							goto IL_043b;
 						case WeaponType.Rifle:
 							goto IL_044b;
-						case WeaponType.BowShort:
+						case WeaponType.Shortbow:
 							goto IL_045b;
 						case WeaponType.Axe:
 							goto IL_046b;
