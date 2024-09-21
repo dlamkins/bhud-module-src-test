@@ -8,7 +8,7 @@ namespace MysticCrafting.Module.Repositories
 {
 	public interface IItemRepository : IDisposable
 	{
-		void Initialize(IDataService service);
+		void Initialize(ISqliteDbService service);
 
 		Item GetItem(int itemId);
 

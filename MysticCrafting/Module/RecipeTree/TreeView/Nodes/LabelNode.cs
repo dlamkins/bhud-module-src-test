@@ -49,14 +49,17 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
 			_text = text;
 			_icon = icon;
 			((Control)this).set_Parent(parent);
 			FrameColor = Color.get_LightYellow();
 			base.ShowBackground = true;
 			base.PanelHeight = 25;
+			BackgroundOpacity = 0.05f;
+			BackgroundOpaqueColor = Color.get_LightYellow();
 			base.ShowFrame = false;
-			base.ShowBackground = false;
 			UpdateControls();
 		}
 
@@ -69,18 +72,18 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004e: Expected O, but got Unknown
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Expected O, but got Unknown
+			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b7: Expected O, but got Unknown
 			Label labelControl = _labelControl;
 			if (labelControl != null)
 			{
@@ -94,7 +97,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 				((Control)val).set_Location(new Point(10, 3));
 				_iconControl = val;
 			}
-			int xPos = ((_iconControl == null) ? 10 : 35);
+			int xPos = ((_iconControl == null) ? 5 : 35);
 			Label val2 = new Label();
 			((Control)val2).set_Parent((Container)(object)this);
 			val2.set_Text(_text);

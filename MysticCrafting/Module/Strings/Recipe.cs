@@ -46,6 +46,8 @@ namespace MysticCrafting.Module.Strings
 
 		internal static string AllRecipes => ResourceManager.GetString("AllRecipes", resourceCulture);
 
+		internal static string BuyingItemsLabel => ResourceManager.GetString("BuyingItemsLabel", resourceCulture);
+
 		internal static string ChoiceOfItem => ResourceManager.GetString("ChoiceOfItem", resourceCulture);
 
 		internal static string ContextMenuBuyAll => ResourceManager.GetString("ContextMenuBuyAll", resourceCulture);
@@ -53,6 +55,10 @@ namespace MysticCrafting.Module.Strings
 		internal static string ContextMenuSellAll => ResourceManager.GetString("ContextMenuSellAll", resourceCulture);
 
 		internal static string ContextMenuUpdateTradingPost => ResourceManager.GetString("ContextMenuUpdateTradingPost", resourceCulture);
+
+		internal static string CopyChatLink => ResourceManager.GetString("CopyChatLink", resourceCulture);
+
+		internal static string CopyName => ResourceManager.GetString("CopyName", resourceCulture);
 
 		internal static string CountInBank => ResourceManager.GetString("CountInBank", resourceCulture);
 
@@ -62,15 +68,31 @@ namespace MysticCrafting.Module.Strings
 
 		internal static string CountInSharedInventory => ResourceManager.GetString("CountInSharedInventory", resourceCulture);
 
+		internal static string CraftingItemsLabel => ResourceManager.GetString("CraftingItemsLabel", resourceCulture);
+
 		internal static string CurrentRecipe => ResourceManager.GetString("CurrentRecipe", resourceCulture);
+
+		internal static string ForgingItemsLabel => ResourceManager.GetString("ForgingItemsLabel", resourceCulture);
+
+		internal static string IgnoreItemSource => ResourceManager.GetString("IgnoreItemSource", resourceCulture);
 
 		internal static string Ingredients => ResourceManager.GetString("Ingredients", resourceCulture);
 
 		internal static string ItemCountBoxTooltipText => ResourceManager.GetString("ItemCountBoxTooltipText", resourceCulture);
 
+		internal static string ItemSourceWarning => ResourceManager.GetString("ItemSourceWarning", resourceCulture);
+
 		internal static string MoreRequired => ResourceManager.GetString("MoreRequired", resourceCulture);
 
 		internal static string MysticForge => ResourceManager.GetString("MysticForge", resourceCulture);
+
+		internal static string OpenFrenchWiki => ResourceManager.GetString("OpenFrenchWiki", resourceCulture);
+
+		internal static string OpenGW2BLTC => ResourceManager.GetString("OpenGW2BLTC", resourceCulture);
+
+		internal static string OpenWiki => ResourceManager.GetString("OpenWiki", resourceCulture);
+
+		internal static string OpenWikiTo => ResourceManager.GetString("OpenWikiTo", resourceCulture);
 
 		internal static string PriceEach => ResourceManager.GetString("PriceEach", resourceCulture);
 
@@ -79,6 +101,8 @@ namespace MysticCrafting.Module.Strings
 		internal static string RandomItemChance => ResourceManager.GetString("RandomItemChance", resourceCulture);
 
 		internal static string RecipeRequiredLevel => ResourceManager.GetString("RecipeRequiredLevel", resourceCulture);
+
+		internal static string RecipeSheetLabel => ResourceManager.GetString("RecipeSheetLabel", resourceCulture);
 
 		internal static string RecipeSource => ResourceManager.GetString("RecipeSource", resourceCulture);
 
@@ -90,7 +114,19 @@ namespace MysticCrafting.Module.Strings
 
 		internal static string Requirement => ResourceManager.GetString("Requirement", resourceCulture);
 
+		internal static string SellerItemCostsLabel => ResourceManager.GetString("SellerItemCostsLabel", resourceCulture);
+
+		internal static string SellerItemsLabel => ResourceManager.GetString("SellerItemsLabel", resourceCulture);
+
 		internal static string SoldByVendors => ResourceManager.GetString("SoldByVendors", resourceCulture);
+
+		internal static string TableHeaderCount => ResourceManager.GetString("TableHeaderCount", resourceCulture);
+
+		internal static string TableHeaderName => ResourceManager.GetString("TableHeaderName", resourceCulture);
+
+		internal static string TableHeaderPrice => ResourceManager.GetString("TableHeaderPrice", resourceCulture);
+
+		internal static string TableHeaderSources => ResourceManager.GetString("TableHeaderSources", resourceCulture);
 
 		internal static string TooltipCollectedItem => ResourceManager.GetString("TooltipCollectedItem", resourceCulture);
 
@@ -105,6 +141,8 @@ namespace MysticCrafting.Module.Strings
 		internal static string TradingPostSell => ResourceManager.GetString("TradingPostSell", resourceCulture);
 
 		internal static string Unavailable => ResourceManager.GetString("Unavailable", resourceCulture);
+
+		internal static string Vendor => ResourceManager.GetString("Vendor", resourceCulture);
 
 		internal static string VendorsMore => ResourceManager.GetString("VendorsMore", resourceCulture);
 

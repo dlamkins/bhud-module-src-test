@@ -24,6 +24,8 @@ namespace MysticCrafting.Module.Models
 
 		public AsyncTexture2D VendorIcon = AsyncTexture2D.FromAssetId(156754);
 
+		public AsyncTexture2D IgnoreIcon = AsyncTexture2D.FromAssetId(156675);
+
 		public AsyncTexture2D SwapIcon = AsyncTexture2D.FromAssetId(784346);
 
 		public AsyncTexture2D MerchantIconColor = AsyncTexture2D.FromAssetId(2015715);
@@ -99,6 +101,10 @@ namespace MysticCrafting.Module.Models
 		public AsyncTexture2D Checkmark8 = AsyncTexture2D.FromAssetId(156950);
 
 		public AsyncTexture2D Checkmark9 = AsyncTexture2D.FromAssetId(157012);
+
+		public AsyncTexture2D CheckmarkSmall = AsyncTexture2D.FromAssetId(1444520);
+
+		public AsyncTexture2D CrossSmall = AsyncTexture2D.FromAssetId(1444524);
 
 		public AsyncTexture2D ItemBackground = AsyncTexture2D.FromAssetId(156900);
 

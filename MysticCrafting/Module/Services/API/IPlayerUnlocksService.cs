@@ -12,6 +12,8 @@ namespace MysticCrafting.Module.Services.API
 
 		bool SkinUnlocked(int itemId);
 
+		bool DyeUnlocked(int itemId);
+
 		bool LegendaryUnlocked(int itemId);
 
 		int LegendaryUnlockedCount(int itemId);

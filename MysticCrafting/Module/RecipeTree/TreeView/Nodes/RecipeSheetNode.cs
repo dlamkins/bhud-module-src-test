@@ -64,17 +64,20 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 
 		private void UpdateIconStyle(bool unlocked)
 		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			if (unlocked)
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			if (base.Icon != null)
 			{
-				((Control)base.Icon).set_Opacity(1f);
-				base.Icon.set_Tint(Color.get_White());
-			}
-			else
-			{
-				((Control)base.Icon).set_Opacity(0.4f);
-				base.Icon.set_Tint(Color.get_Gray());
+				if (unlocked)
+				{
+					((Control)base.Icon).set_Opacity(1f);
+					base.Icon.set_Tint(Color.get_White());
+				}
+				else
+				{
+					((Control)base.Icon).set_Opacity(0.4f);
+					base.Icon.set_Tint(Color.get_Gray());
+				}
 			}
 		}
 
@@ -99,7 +102,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 		{
 			return Recipe.Disciplines.Select((Discipline d) => new CraftingDisciplineRequirement
 			{
-				DisciplineName = LocalizationHelper.TranslateProfession(d),
+				DisciplineName = LocalizationHelper.TranslateDiscipline(d),
 				RequiredLevel = Recipe.RequiredRating
 			}).ToList();
 		}

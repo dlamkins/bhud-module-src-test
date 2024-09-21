@@ -64,7 +64,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Controls
 
 		public void Build(IList<CurrencyQuantity> prices)
 		{
-			int coinPrice = prices.CoinCount();
+			long coinPrice = prices.CoinCount();
 			CoinsControl coinsControl = _coinsControl;
 			if (coinsControl != null)
 			{
@@ -146,13 +146,13 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Controls
 
 		private void BuildCurrencies(IList<CurrencyQuantity> prices)
 		{
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Expected O, but got Unknown
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Expected O, but got Unknown
+			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
 			bool showPlusSign = _coinsControl != null && _coinsControl.UnitPrice != 0;
 			foreach (CurrencyQuantity price in prices.Where((CurrencyQuantity p) => p.Currency != null && p.Currency.Id != 1))
 			{
@@ -195,7 +195,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Controls
 
 		public void Update(IList<CurrencyQuantity> prices)
 		{
-			int coinPrice = prices.CoinCount();
+			long coinPrice = prices.CoinCount();
 			_coinsControl.UnitPrice = coinPrice;
 			DisposeCurrencyControls();
 			if (MinifyPricing)

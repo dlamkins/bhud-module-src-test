@@ -41,14 +41,14 @@ namespace MysticCrafting.Module.Discovery
 				{
 					menuItem.Icon = AsyncTexture2D.FromAssetId(item.Icon.Value);
 				}
-				if (item.SelectedByDefault)
-				{
-					menuItem.Select();
-				}
 				categoryMenuItems.Add(menuItem);
 				if (item.Children != null && item.Children.Any())
 				{
 					GetMenuItemsRecursively(item.Children.ToList(), (Container)(object)menuItem);
+				}
+				if (item.SelectedByDefault)
+				{
+					menuItem.Select();
 				}
 			}
 			return categoryMenuItems;

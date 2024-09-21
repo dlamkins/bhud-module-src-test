@@ -15,11 +15,13 @@ namespace MysticCrafting.Module.Discovery.Loading
 	{
 		private List<LoadingStatusTooltipControl> ServiceControls = new List<LoadingStatusTooltipControl>();
 
-		private IEnumerable<IApiService> _recurringServices;
+		private IEnumerable<IApiService> _apiServices;
 
 		private FlowPanel _panel;
 
 		private Label _introLabel;
+
+		private Label _rightClickLabel;
 
 		public LoadingStatusTooltipView(IEnumerable<IApiService> services)
 			: this()
@@ -35,7 +37,17 @@ namespace MysticCrafting.Module.Discovery.Loading
 			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0069: Expected O, but got Unknown
 			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			_recurringServices = services;
+			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0136: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0150: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0166: Expected O, but got Unknown
+			_apiServices = services;
 			Label val = new Label();
 			val.set_Text(Common.LoadingIntroMessage);
 			val.set_Font(GameService.Content.get_DefaultFont14());
@@ -61,6 +73,15 @@ namespace MysticCrafting.Module.Discovery.Loading
 				service.LoadingStarted += LoadingChanged;
 				service.LoadingFinished += LoadingChanged;
 			}
+			Label val2 = new Label();
+			val2.set_Text(Common.LoadingRightClickLabel);
+			val2.set_Font(GameService.Content.get_DefaultFont14());
+			((Control)val2).set_Width(220);
+			val2.set_WrapText(true);
+			val2.set_AutoSizeHeight(true);
+			val2.set_TextColor(Color.get_LightGray());
+			val2.set_ShowShadow(true);
+			_rightClickLabel = val2;
 		}
 
 		protected override void Build(Container buildPanel)
@@ -83,11 +104,12 @@ namespace MysticCrafting.Module.Discovery.Loading
 			{
 				((Control)serviceControl).set_Parent((Container)(object)_panel);
 			}
+			((Control)_rightClickLabel).set_Parent((Container)(object)_panel);
 		}
 
 		private void LoadingChanged(object sender, EventArgs e)
 		{
-			foreach (IApiService service in _recurringServices)
+			foreach (IApiService service in _apiServices)
 			{
 				LoadingStatusTooltipControl control = ServiceControls.FirstOrDefault((LoadingStatusTooltipControl s) => s.Name.Equals(service.Name, StringComparison.OrdinalIgnoreCase));
 				if (control != null)

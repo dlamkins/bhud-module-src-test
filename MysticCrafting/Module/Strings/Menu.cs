@@ -46,6 +46,8 @@ namespace MysticCrafting.Module.Strings
 
 		internal static string Amulets => ResourceManager.GetString("Amulets", resourceCulture);
 
+		internal static string Architecture => ResourceManager.GetString("Architecture", resourceCulture);
+
 		internal static string Armor => ResourceManager.GetString("Armor", resourceCulture);
 
 		internal static string Armor_Runes => ResourceManager.GetString("Armor Runes", resourceCulture);
@@ -58,11 +60,25 @@ namespace MysticCrafting.Module.Strings
 
 		internal static string Chest => ResourceManager.GetString("Chest", resourceCulture);
 
+		internal static string Consumables => ResourceManager.GetString("Consumables", resourceCulture);
+
+		internal static string Crafting_Materials => ResourceManager.GetString("Crafting Materials", resourceCulture);
+
 		internal static string Daggers => ResourceManager.GetString("Daggers", resourceCulture);
+
+		internal static string Decorations => ResourceManager.GetString("Decorations", resourceCulture);
 
 		internal static string Favorites => ResourceManager.GetString("Favorites", resourceCulture);
 
+		internal static string Festivals => ResourceManager.GetString("Festivals", resourceCulture);
+
 		internal static string Foci => ResourceManager.GetString("Foci", resourceCulture);
+
+		internal static string Food => ResourceManager.GetString("Food", resourceCulture);
+
+		internal static string Furniture => ResourceManager.GetString("Furniture", resourceCulture);
+
+		internal static string Gizmos => ResourceManager.GetString("Gizmos", resourceCulture);
 
 		internal static string Gloves => ResourceManager.GetString("Gloves", resourceCulture);
 
@@ -76,13 +92,31 @@ namespace MysticCrafting.Module.Strings
 
 		internal static string Home => ResourceManager.GetString("Home", resourceCulture);
 
+		internal static string Jade_Bot_Components => ResourceManager.GetString("Jade Bot Components", resourceCulture);
+
 		internal static string Leggings => ResourceManager.GetString("Leggings", resourceCulture);
+
+		internal static string Lighting => ResourceManager.GetString("Lighting", resourceCulture);
 
 		internal static string Longbows => ResourceManager.GetString("Longbows", resourceCulture);
 
 		internal static string Maces => ResourceManager.GetString("Maces", resourceCulture);
 
+		internal static string Materials => ResourceManager.GetString("Materials", resourceCulture);
+
+		internal static string Minis => ResourceManager.GetString("Minis", resourceCulture);
+
+		internal static string Monuments => ResourceManager.GetString("Monuments", resourceCulture);
+
+		internal static string Obstacles => ResourceManager.GetString("Obstacles", resourceCulture);
+
+		internal static string Other => ResourceManager.GetString("Other", resourceCulture);
+
 		internal static string Pistols => ResourceManager.GetString("Pistols", resourceCulture);
+
+		internal static string Plants => ResourceManager.GetString("Plants", resourceCulture);
+
+		internal static string Recipes => ResourceManager.GetString("Recipes", resourceCulture);
 
 		internal static string Relics => ResourceManager.GetString("Relics", resourceCulture);
 
@@ -102,6 +136,8 @@ namespace MysticCrafting.Module.Strings
 
 		internal static string Staffs => ResourceManager.GetString("Staffs", resourceCulture);
 
+		internal static string Statuary => ResourceManager.GetString("Statuary", resourceCulture);
+
 		internal static string Swords => ResourceManager.GetString("Swords", resourceCulture);
 
 		internal static string Torches => ResourceManager.GetString("Torches", resourceCulture);
@@ -110,7 +146,13 @@ namespace MysticCrafting.Module.Strings
 
 		internal static string Trinkets => ResourceManager.GetString("Trinkets", resourceCulture);
 
+		internal static string Trophies => ResourceManager.GetString("Trophies", resourceCulture);
+
+		internal static string Turrets => ResourceManager.GetString("Turrets", resourceCulture);
+
 		internal static string Upgrade_Components => ResourceManager.GetString("Upgrade Components", resourceCulture);
+
+		internal static string Utility => ResourceManager.GetString("Utility", resourceCulture);
 
 		internal static string Warhorns => ResourceManager.GetString("Warhorns", resourceCulture);
 

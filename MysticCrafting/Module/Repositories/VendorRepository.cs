@@ -10,7 +10,7 @@ namespace MysticCrafting.Module.Repositories
 	{
 		private SQLiteConnection Connection { get; set; }
 
-		public void Initialize(IDataService service)
+		public void Initialize(ISqliteDbService service)
 		{
 			Connection = new SQLiteConnection(service.DatabaseFilePath);
 		}

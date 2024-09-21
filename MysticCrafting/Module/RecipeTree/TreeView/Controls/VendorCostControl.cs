@@ -58,18 +58,18 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Controls
 
 		public void Update()
 		{
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
 			Text = AmountToText(Cost.UnitPrice);
 			TextColor = ColorHelper.FromItemCount(PlayerCount, Cost.UnitPrice);
 			Size2 textSize = TextFont.MeasureString(Text);
 			TextWidth = (int)Math.Ceiling(textSize.Width);
 			if (_cost.Currency != null)
 			{
-				PlayerCount = ServiceContainer.WalletService.GetQuantity(_cost.CurrencyId)?.Count ?? 0;
+				PlayerCount = (int)(ServiceContainer.WalletService.GetQuantity(_cost.CurrencyId)?.Count ?? 0);
 				Icon = ServiceContainer.TextureRepository.GetTexture(_cost.Currency.Icon);
 			}
 			else if (_cost.Item != null)

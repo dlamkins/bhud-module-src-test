@@ -48,7 +48,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 			{
 				menuStrip.AddMenuItem(wikiItem);
 			}
-			menuStrip.AddMenuItem(BuildCopyText(currency.LocalizedName(), "Copy Name"));
+			menuStrip.AddMenuItem(BuildCopyText(currency.LocalizedName(), Recipe.CopyName));
 			return menuStrip;
 		}
 
@@ -81,8 +81,8 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 				menuStrip.AddMenuItem(wikiItem);
 			}
 			menuStrip.AddMenuItem(BuildGw2Bltc(item.Id));
-			menuStrip.AddMenuItem(BuildCopyText(item.LocalizedName(), "Copy Name"));
-			menuStrip.AddMenuItem(BuildCopyText(item.ChatLink, "Copy Chat Link"));
+			menuStrip.AddMenuItem(BuildCopyText(item.LocalizedName(), Recipe.CopyName));
+			menuStrip.AddMenuItem(BuildCopyText(item.ChatLink, Recipe.CopyChatLink));
 			menuStrip.AddMenuItem(BuildTradingPostItem(node));
 			return menuStrip;
 		}
@@ -97,7 +97,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 				ContextMenuStripItem wikiItem = BuildWikiItem(vendor.WikiAlias);
 				if (wikiItem != null)
 				{
-					wikiItem.set_Text("Open Wiki to " + vendor.Name);
+					wikiItem.set_Text(Recipe.OpenWikiTo + " " + vendor.Name);
 					menuStrip.AddMenuItem(wikiItem);
 				}
 			}
@@ -169,11 +169,11 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 				return null;
 			}
 			string wikiLink = "http://wiki-en.guildwars2.com/index.php?search=" + name;
-			string text = "Open Wiki";
+			string text = Recipe.OpenWiki;
 			if ((int)locale == 3)
 			{
 				wikiLink = "http://wiki-fr.guildwars2.com/index.php?search=" + name;
-				text = "Open French Wiki";
+				text = Recipe.OpenFrenchWiki;
 			}
 			if ((int)locale == 2)
 			{
@@ -201,7 +201,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 			}
 			string wikiLink = "https://wiki.guildwars2.com/wiki/" + pageAlias;
 			ContextMenuStripItem val = new ContextMenuStripItem();
-			val.set_Text("Open Wiki");
+			val.set_Text(Recipe.OpenWiki);
 			((Control)val).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				LinkHelper.OpenUrl(wikiLink);
@@ -216,7 +216,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0030: Expected O, but got Unknown
 			ContextMenuStripItem val = new ContextMenuStripItem();
-			val.set_Text("Open GW2BLTC");
+			val.set_Text(Recipe.OpenGW2BLTC);
 			((Control)val).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				LinkHelper.OpenGw2Bltc(itemId);
@@ -239,15 +239,61 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 			return val;
 		}
 
-		public ContextMenuStripItem BuildBaseItemsOption(IngredientNode item, IIngredientNodePresenter itemPresenter)
+		public ContextMenuStripItem BuildExpandOption(TradeableItemNode node)
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Expected O, but got Unknown
-			ContextMenuStripItem val = new ContextMenuStripItem();
-			val.set_Text("Show base materials");
-			val.set_CanCheck(true);
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Expected O, but got Unknown
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Expected O, but got Unknown
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Expected O, but got Unknown
+			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006f: Expected O, but got Unknown
+			ContextMenuStrip Submenu = new ContextMenuStrip();
+			ContextMenuStripItem all = new ContextMenuStripItem("All");
+			((Control)all).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				node.ExpandAllActiveNodes();
+			});
+			Submenu.AddMenuItem(all);
+			ContextMenuStripItem sellAll = new ContextMenuStripItem("Incomplete only");
+			((Control)sellAll).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				node.ExpandAllActiveNodes(includeIncomplete: false);
+			});
+			Submenu.AddMenuItem(sellAll);
+			ContextMenuStripItem val = new ContextMenuStripItem("Expand");
+			val.set_Submenu(Submenu);
+			return val;
+		}
+
+		public ContextMenuStripItem BuildCollapseOption(TradeableItemNode node)
+		{
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Expected O, but got Unknown
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Expected O, but got Unknown
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Expected O, but got Unknown
+			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006f: Expected O, but got Unknown
+			ContextMenuStrip Submenu = new ContextMenuStrip();
+			ContextMenuStripItem all = new ContextMenuStripItem("All");
+			((Control)all).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				node.CollapseAllActiveNodes(isComplete: false);
+			});
+			Submenu.AddMenuItem(all);
+			ContextMenuStripItem sellAll = new ContextMenuStripItem("Completed only");
+			((Control)sellAll).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				node.CollapseAllActiveNodes();
+			});
+			Submenu.AddMenuItem(sellAll);
+			ContextMenuStripItem val = new ContextMenuStripItem("Collapse");
+			val.set_Submenu(Submenu);
 			return val;
 		}
 	}

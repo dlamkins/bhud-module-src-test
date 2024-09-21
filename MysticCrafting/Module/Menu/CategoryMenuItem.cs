@@ -55,6 +55,8 @@ namespace MysticCrafting.Module.Menu
 
 		private ScrollingHighlightEffect _scrollEffect;
 
+		public int MaxSelected { get; set; }
+
 		public int MenuItemHeight
 		{
 			get
@@ -336,7 +338,16 @@ namespace MysticCrafting.Module.Menu
 				ServiceContainer.AudioService.PlayMenuItemClick();
 				OnItemClicked(new ControlActivatedEventArgs((Control)(object)this));
 			}
-			if (!Selected || !_overSection)
+			if (Selected && _overSection)
+			{
+				CategoryMenuItem parent = ((Control)this).get_Parent() as CategoryMenuItem;
+				if (parent != null)
+				{
+					Deselect();
+					parent.Select(parent);
+				}
+			}
+			else
 			{
 				Select();
 			}
@@ -468,8 +479,13 @@ namespace MysticCrafting.Module.Menu
 			//IL_0043: Expected O, but got Unknown
 			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
 			int currentLeftSidePadding = LeftSidePadding;
 			if (!base._children.get_IsEmpty())
 			{
@@ -490,13 +506,19 @@ namespace MysticCrafting.Module.Menu
 			}
 			else if (!base._children.get_IsEmpty())
 			{
-				currentLeftSidePadding += 10;
+				currentLeftSidePadding++;
 			}
 			else if (_icon != null)
 			{
 				currentLeftSidePadding += 25;
 			}
 			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, _text, Control.get_Content().get_DefaultFont18(), new Rectangle(currentLeftSidePadding, 0, ((Control)this).get_Width() - (currentLeftSidePadding - 10), MenuItemHeight), _textColor, true, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+			if (MaxSelected != 0)
+			{
+				string text = $"({MaxSelected})";
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, GameService.Content.get_DefaultFont16(), RectangleExtension.OffsetBy(new Rectangle(190, 0, 60, MenuItemHeight), 1, 1), Color.get_Black(), false, (HorizontalAlignment)0, (VerticalAlignment)1);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, Control.get_Content().get_DefaultFont16(), new Rectangle(190, 0, 60, MenuItemHeight), Color.get_White(), false, (HorizontalAlignment)0, (VerticalAlignment)1);
+			}
 		}
 	}
 }

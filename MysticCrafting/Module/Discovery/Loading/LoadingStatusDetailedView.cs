@@ -15,7 +15,7 @@ namespace MysticCrafting.Module.Discovery.Loading
 	{
 		private List<LoadingStatusTooltipControl> ServiceControls = new List<LoadingStatusTooltipControl>();
 
-		private IEnumerable<IApiService> _recurringServices;
+		private IEnumerable<IApiService> _apiServices;
 
 		private FlowPanel _panel;
 
@@ -35,7 +35,7 @@ namespace MysticCrafting.Module.Discovery.Loading
 			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0069: Expected O, but got Unknown
 			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			_recurringServices = services;
+			_apiServices = services;
 			Label val = new Label();
 			val.set_Text(Common.LoadingIntroMessage);
 			val.set_Font(GameService.Content.get_DefaultFont14());
@@ -87,7 +87,7 @@ namespace MysticCrafting.Module.Discovery.Loading
 
 		private void LoadingChanged(object sender, EventArgs e)
 		{
-			foreach (IApiService service in _recurringServices)
+			foreach (IApiService service in _apiServices)
 			{
 				LoadingStatusTooltipControl control = ServiceControls.FirstOrDefault((LoadingStatusTooltipControl s) => s.Name.Equals(service.Name, StringComparison.OrdinalIgnoreCase));
 				if (control != null)

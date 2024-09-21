@@ -5,13 +5,9 @@ namespace MysticCrafting.Module.Services
 {
 	public interface IDataService
 	{
-		string DatabaseFilePath { get; }
-
 		Task LoadAsync();
 
 		Task DownloadRepositoryFilesAsync();
-
-		Task CopyDatabaseResource();
 
 		void RegisterRepository(IRepository repository);
 

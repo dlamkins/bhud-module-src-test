@@ -18,10 +18,14 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 			{
 				totalUnitCount = CalculateRecipeSheetTotalUnitCount(recipeSheetNode);
 			}
-			else if (node != null)
+			else if (node.IsSharedItem)
+			{
+				totalUnitCount = 1;
+			}
+			else
 			{
 				ITradeableItemNode tradeableNode = node.ParentNode as ITradeableItemNode;
-				totalUnitCount = ((tradeableNode == null) ? (node.UnitCountNumber ?? node.UnitCount) : (node.IsSharedItem ? 1 : (node.UnitCount * tradeableNode.OrderUnitCount / tradeableNode.VendorPriceUnitCount)));
+				totalUnitCount = ((tradeableNode == null) ? (node.UnitCountNumber ?? node.UnitCount) : (node.UnitCount * tradeableNode.OrderUnitCount / tradeableNode.VendorPriceUnitCount));
 			}
 			if (totalUnitCount2 == totalUnitCount)
 			{
@@ -89,9 +93,17 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 			{
 				return;
 			}
-			foreach (IngredientNode childNode in node.ChildIngredientNodes)
+			foreach (IngredientNode childNode2 in node.ChildIngredientNodes)
 			{
-				CalculateTotalUnitCount(childNode);
+				CalculateTotalUnitCount(childNode2);
+			}
+			foreach (VendorNode item in ((IEnumerable)((Container)node).get_Children()).OfType<VendorNode>())
+			{
+				item.OrderUnitCount = node.OrderUnitCount;
+				foreach (IngredientNode childNode in ((IEnumerable)((Container)item).get_Children()).OfType<IngredientNode>())
+				{
+					CalculateTotalUnitCount(childNode);
+				}
 			}
 		}
 	}

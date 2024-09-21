@@ -9,7 +9,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 
 		int OrderUnitCount { get; set; }
 
-		int TradingPostPrice { get; set; }
+		long TradingPostPrice { get; set; }
 
 		int VendorPriceUnitCount { get; set; }
 

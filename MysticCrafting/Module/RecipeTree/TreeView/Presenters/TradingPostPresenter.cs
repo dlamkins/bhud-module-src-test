@@ -26,7 +26,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 		public void Build(Container parent, TradingPostSource source)
 		{
 			Source = source;
-			TradingPostNode obj = new TradingPostNode(source.BuyPrice.UnitPrice, Recipe.TradingPostBuy, TradingPostOptions.Buy, parent)
+			TradingPostNode obj = new TradingPostNode(source.Item.TradingPostBuy.GetValueOrDefault(), Recipe.TradingPostBuy, TradingPostOptions.Buy, parent)
 			{
 				PanelHeight = 40,
 				Name = "buy"
@@ -35,7 +35,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 			((Control)obj).set_Width(((Control)parent).get_Width() - 25);
 			obj.PanelExtensionHeight = 0;
 			TradingPostNode buyItem = obj;
-			TradingPostNode tradingPostNode = new TradingPostNode(source.SellPrice.UnitPrice, Recipe.TradingPostSell, TradingPostOptions.Sell, parent);
+			TradingPostNode tradingPostNode = new TradingPostNode(source.Item.TradingPostSell.GetValueOrDefault(), Recipe.TradingPostSell, TradingPostOptions.Sell, parent);
 			((Control)tradingPostNode).set_Parent(parent);
 			tradingPostNode.Name = "sell";
 			tradingPostNode.PanelHeight = 40;
@@ -49,14 +49,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 				string choiceValue = _choiceRepository.GetChoice(GetFullPath(parentNode), ChoiceType.TradingPost)?.Value;
 				if (choiceValue == null)
 				{
-					if (buyItem.UnitPrice != 0 && MysticCraftingModule.Settings.TradingPostPreference.get_Value() == TradingPostOptions.Buy)
-					{
-						choiceValue = buyItem.PathName;
-					}
-					else if (sellItem.UnitPrice != 0)
-					{
-						choiceValue = sellItem.PathName;
-					}
+					choiceValue = ((MysticCraftingModule.Settings.TradingPostPreference.get_Value() != 0) ? sellItem.PathName : buyItem.PathName);
 				}
 				if (choiceValue.Equals(buyItem.PathName))
 				{

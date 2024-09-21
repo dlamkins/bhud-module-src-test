@@ -5,23 +5,23 @@ namespace MysticCrafting.Module.Helpers
 {
 	public static class IconHelper
 	{
-		private static readonly AsyncTexture2D ArmorSmithing = AsyncTexture2D.FromAssetId(156615);
+		public static readonly AsyncTexture2D ArmorSmithing = AsyncTexture2D.FromAssetId(156615);
 
-		private static readonly AsyncTexture2D WeaponSmithing = AsyncTexture2D.FromAssetId(156622);
+		public static readonly AsyncTexture2D WeaponSmithing = AsyncTexture2D.FromAssetId(156622);
 
-		private static readonly AsyncTexture2D Jewelery = AsyncTexture2D.FromAssetId(156619);
+		public static readonly AsyncTexture2D Jewelery = AsyncTexture2D.FromAssetId(156619);
 
-		private static readonly AsyncTexture2D Artificer = AsyncTexture2D.FromAssetId(156616);
+		public static readonly AsyncTexture2D Artificer = AsyncTexture2D.FromAssetId(156616);
 
-		private static readonly AsyncTexture2D Huntsman = AsyncTexture2D.FromAssetId(156618);
+		public static readonly AsyncTexture2D Huntsman = AsyncTexture2D.FromAssetId(156618);
 
-		private static readonly AsyncTexture2D Cooking = AsyncTexture2D.FromAssetId(156617);
+		public static readonly AsyncTexture2D Cooking = AsyncTexture2D.FromAssetId(156617);
 
-		private static readonly AsyncTexture2D Leatherworking = AsyncTexture2D.FromAssetId(156620);
+		public static readonly AsyncTexture2D Leatherworking = AsyncTexture2D.FromAssetId(156620);
 
-		private static readonly AsyncTexture2D Tailoring = AsyncTexture2D.FromAssetId(156621);
+		public static readonly AsyncTexture2D Tailoring = AsyncTexture2D.FromAssetId(156621);
 
-		private static readonly AsyncTexture2D Scribing = AsyncTexture2D.FromAssetId(1228680);
+		public static readonly AsyncTexture2D Scribing = AsyncTexture2D.FromAssetId(1228680);
 
 		private static readonly AsyncTexture2D ArmorSmithingColor = AsyncTexture2D.FromAssetId(102461);
 

@@ -26,6 +26,8 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 	[DebuggerDisplay("Name = {NameLabel?.Text}")]
 	public abstract class IngredientNode : TradeableItemNode, IIngredient, IIngredientContainer
 	{
+		private bool _showIcon = true;
+
 		private bool _isLinked;
 
 		private int _unitCount = 1;
@@ -284,8 +286,8 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 		protected IngredientNode(int id, int quantity, Container parent, int? index = null, bool showUnitCount = true, bool loadingChildren = false)
 			: base(parent)
 		{
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004b: Expected O, but got Unknown
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0052: Expected O, but got Unknown
 			SetParentProperties(parent);
 			((Control)this).set_EffectBehind((ControlEffect)new ScrollingHighlightEffect((Control)(object)this));
 			base.LoadingChildren = loadingChildren;
@@ -348,6 +350,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			if (treeView != null)
 			{
 				IsTopIngredient = true;
+				_showIcon = false;
 				TotalUnitCount = 1;
 				base.TreeView = treeView;
 				Font = GameService.Content.get_DefaultFont18();
@@ -388,15 +391,17 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0066: Expected O, but got Unknown
-			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b3: Expected O, but got Unknown
+			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0072: Expected O, but got Unknown
+			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d0: Expected O, but got Unknown
 			Image icon = Icon;
 			if (icon != null)
 			{
@@ -405,11 +410,13 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			Image val = new Image(ServiceContainer.TextureRepository.Textures.ItemBackground);
 			((Control)val).set_Parent((Container)(object)this);
 			((Control)val).set_Size(new Point(IconSize + 8, IconSize + 8));
+			((Control)val).set_Visible(_showIcon);
 			((Control)val).set_Location(new Point(IsTopIngredient ? 5 : 28, 1));
 			IconBackground = val;
-			Image val2 = new Image(AsyncTexture2D.FromAssetId(1318604));
+			Image val2 = new Image(ServiceContainer.TextureRepository.GetRefTexture("102804_trimmed.png"));
 			((Control)val2).set_Parent((Container)(object)this);
 			((Control)val2).set_Size(new Point(IconSize, IconSize));
+			((Control)val2).set_Visible(_showIcon);
 			((Control)val2).set_Location(new Point(IsTopIngredient ? 9 : 32, 5));
 			Icon = val2;
 		}
@@ -462,18 +469,18 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 
 		public void BuildUnitNumberBox()
 		{
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010f: Expected O, but got Unknown
+			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012b: Expected O, but got Unknown
 			NumberBox unitCountNumberBox = UnitCountNumberBox;
 			if (unitCountNumberBox != null)
 			{
@@ -484,6 +491,8 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			{
 				((Control)unitCountNumberLabel).Dispose();
 			}
+			Image icon = Icon;
+			int xLocation = ((icon != null && ((Control)icon).get_Visible()) ? (((Control)Icon).get_Right() + 5) : 10);
 			NumberBox obj = new NumberBox
 			{
 				Value = TotalUnitCount,
@@ -491,8 +500,8 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			};
 			((TextInputBase)obj).set_Font(GameService.Content.get_DefaultFont18());
 			((Control)obj).set_Parent((Container)(object)this);
-			((Control)obj).set_Location(new Point(((Control)Icon).get_Right() + 5, 7));
-			((Control)obj).set_Size(new Point(30, 27));
+			((Control)obj).set_Location(new Point(xLocation, 7));
+			((Control)obj).set_Size(new Point(50, 27));
 			UnitCountNumberBox = obj;
 			UnitCountNumberBox.AfterTextChanged += delegate(object sender, EventArgs args)
 			{
@@ -511,7 +520,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			Label val = new Label();
 			((Control)val).set_Parent((Container)(object)this);
 			val.set_Text("1");
-			((Control)val).set_Location(new Point(60, 10));
+			((Control)val).set_Location(new Point(xLocation + 15, 10));
 			val.set_Font(Font);
 			val.set_StrokeText(true);
 			val.set_AutoSizeWidth(true);
@@ -533,19 +542,21 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 		{
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Expected O, but got Unknown
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Expected O, but got Unknown
 			UpdateCollectionStatus();
 			Color itemCountColor = Color.get_White();
+			Image icon = Icon;
+			int xLocation = ((icon != null && ((Control)icon).get_Visible()) ? (((Control)Icon).get_Right() + 5) : 10);
 			Label unitCountLabel = UnitCountLabel;
 			if (unitCountLabel != null)
 			{
@@ -554,7 +565,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			Label val = new Label();
 			((Control)val).set_Parent((Container)(object)this);
 			val.set_Text(GetUnitCountText());
-			((Control)val).set_Location(new Point(70, 10));
+			((Control)val).set_Location(new Point(xLocation, 10));
 			val.set_Font(Font);
 			val.set_StrokeText(true);
 			val.set_TextColor(itemCountColor);
@@ -634,19 +645,22 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Expected O, but got Unknown
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Expected O, but got Unknown
 			Image missingTabs = _missingTabs;
 			if (missingTabs != null)
 			{
 				((Control)missingTabs).Dispose();
 			}
-			Image val = new Image(ServiceContainer.TextureRepository.Textures.ExclamationMark);
+			Image val = new Image(ServiceContainer.TextureRepository.Textures.IgnoreIcon);
 			((Control)val).set_Parent((Container)(object)this);
-			((Control)val).set_Location(new Point(((Control)this).get_Width() - 40, 5));
-			val.set_Tint(Color.get_Orange());
-			((Control)val).set_BasicTooltipText("The module does not currently support the methods to acquire this item. Right click on this item to easily open the wiki.");
+			((Control)val).set_Location(new Point(((Control)this).get_Width() - 35, 5));
+			((Control)val).set_Size(new Point(30, 30));
+			val.set_Tint(Color.get_LightYellow());
+			((Control)val).set_BasicTooltipText(Recipe.ItemSourceWarning);
 			_missingTabs = val;
 		}
 
@@ -680,7 +694,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 
 		private void UpdateNameLabelPosition()
 		{
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
 			if (NameLabel == null)
 			{
 				return;
@@ -715,7 +729,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 						else
 						{
 							Image icon = Icon;
-							paddingLeft = ((icon == null || !((Control)icon).get_Visible()) ? 30 : ((Control)Icon).get_Right());
+							paddingLeft = ((icon == null || !((Control)icon).get_Visible()) ? 30 : (((Control)Icon).get_Right() + 5));
 						}
 					}
 				}
@@ -784,6 +798,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 				base.TreeView.RemoveNode(node);
 			}
 			((Container)this).OnChildRemoved(e);
+			e.get_ChangedChild().Dispose();
 		}
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)

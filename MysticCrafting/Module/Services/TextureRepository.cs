@@ -5,6 +5,7 @@ using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Modules.Managers;
+using MysticCrafting.Module.Helpers;
 using MysticCrafting.Module.Models;
 
 namespace MysticCrafting.Module.Services
@@ -79,6 +80,40 @@ namespace MysticCrafting.Module.Services
 				return GetRefTexture("VendorIcons/Merchant.png");
 			}
 			return GetRefTexture("VendorIcons/" + icon.Replace("File:", "")) ?? GetRefTexture("VendorIcons/Merchant.png");
+		}
+
+		public AsyncTexture2D GetItemSourceBackgroundTexture(IList<IItemSource> itemSource)
+		{
+			foreach (RecipeSource source in itemSource.OfType<RecipeSource>())
+			{
+				if (source.Recipe.Disciplines.Count == 1)
+				{
+					AsyncTexture2D texture = GetRefTexture("Disciplines/" + source.Recipe.Disciplines.FirstOrDefault().ToString().ToLower() + ".png");
+					if (texture != null)
+					{
+						return texture;
+					}
+				}
+			}
+			return GetRefTexture("Disciplines/mystic_forge.png");
+		}
+
+		public AsyncTexture2D GetRecipeSourceIcon(IItemSource itemSource)
+		{
+			AsyncTexture2D icon = GetRefTexture("mystic_forge.png");
+			RecipeSource recipeSource = itemSource as RecipeSource;
+			if (recipeSource != null && recipeSource.Recipe.Disciplines != null)
+			{
+				if (recipeSource.Recipe.Disciplines.Count == 1)
+				{
+					icon = IconHelper.GetIcon(recipeSource.Recipe.Disciplines.FirstOrDefault());
+				}
+				else if (recipeSource.Recipe.Disciplines.Count > 1)
+				{
+					icon = Textures.CraftingIcon;
+				}
+			}
+			return icon;
 		}
 
 		public void Dispose()

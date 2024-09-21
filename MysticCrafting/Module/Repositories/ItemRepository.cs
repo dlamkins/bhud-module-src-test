@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Atzie.MysticCrafting.Models.Crafting;
 using Atzie.MysticCrafting.Models.Items;
 using Blish_HUD;
 using MysticCrafting.Models.Items;
@@ -12,15 +13,9 @@ namespace MysticCrafting.Module.Repositories
 {
 	public class ItemRepository : IItemRepository, IDisposable
 	{
-		private List<int> IgnoreIds = new List<int>
-		{
-			85380, 31049, 85406, 91205, 91235, 90986, 91183, 91255, 91231, 91218,
-			91196, 91206, 91115, 91178, 91197, 37104
-		};
-
 		private SQLiteConnection Connection { get; set; }
 
-		public void Initialize(IDataService service)
+		public void Initialize(ISqliteDbService service)
 		{
 			Connection = new SQLiteConnection(service.DatabaseFilePath);
 		}
@@ -38,54 +33,98 @@ namespace MysticCrafting.Module.Repositories
 
 		public IEnumerable<Item> FilterItems(MysticItemFilter filter)
 		{
-			//IL_0179: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0183: Expected I4, but got Unknown
-			List<string> whereClauses = new List<string>();
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Expected I4, but got Unknown
+			string query = "SELECT Item.*, COUNT(Recipe.Id) AS RecipeCount, COUNT(VendorSellsItem.Id) AS VendorSellsItemCount, Recipe.DisciplinesBlobbed, l.* FROM Item LEFT JOIN Recipe ON Item.Id = Recipe.OutputItemId AND OutputQuantity = 1 LEFT JOIN VendorSellsItem ON Item.Id = VendorSellsItem.ItemId AND VendorSellsItem.IsHistorical = 0 LEFT JOIN (SELECT Locale, Name, Description, ItemId FROM ItemLocalization) as l ON l.ItemId = Item.Id AND l.Locale = ? WHERE ";
+			List<object> parameters = new List<object> { (int)GameService.Overlay.get_UserLocale().get_Value() };
 			if (filter.IsFavorite)
 			{
 				IList<int> favoriteIds = ServiceContainer.FavoritesRepository.GetAll();
-				whereClauses.Add("Id IN (" + string.Join(",", favoriteIds) + ")");
+				query = query + "Item.Id IN (" + string.Join(",", favoriteIds.Select((int id) => "?")) + ") AND ";
+				foreach (int id2 in favoriteIds)
+				{
+					parameters.Add(id2);
+				}
 			}
 			if (filter.Type != 0)
 			{
-				whereClauses.Add($"Type = {(int)filter.Type}");
+				query += "Item.Type = ? AND ";
+				parameters.Add((int)filter.Type);
+			}
+			if (filter.Types != null && filter.Types.Any())
+			{
+				query = query + "Item.Type IN (" + string.Join(",", filter.Types.Select((int id) => " ? ")) + ") AND ";
+				foreach (int type in filter.Types)
+				{
+					parameters.Add(type);
+				}
+			}
+			if (filter.Categories.Any())
+			{
+				query = query + "Item.CategoryId IN (" + string.Join(",", filter.Categories.Select((int id) => " ? ")) + ") AND ";
+				foreach (int category in filter.Categories)
+				{
+					parameters.Add(category);
+				}
 			}
 			if (!string.IsNullOrEmpty(filter.DetailsType))
 			{
-				whereClauses.Add("DetailsType = '" + filter.DetailsType + "'");
+				query += "Item.DetailsType = ? AND ";
+				parameters.Add(filter.DetailsType);
 			}
-			if (filter.Rarity != 0)
+			if (filter.Rarities != null && filter.Rarities.Any())
 			{
-				whereClauses.Add($"Rarity = {(int)filter.Rarity}");
-			}
-			if (!string.IsNullOrEmpty(filter.NameContainsText))
-			{
-				whereClauses.Add("UPPER(ItemLocalization.Name) LIKE '%" + filter.NameContainsText.ToUpper().Replace("'", "''") + "%'");
+				query = query + "Rarity IN (" + string.Join(",", filter.Rarities.Select((ItemRarity id) => " ? ")) + ") AND ";
+				foreach (ItemRarity rarity in filter.Rarities)
+				{
+					parameters.Add((int)rarity);
+				}
 			}
 			if (filter.Weight != 0 && !filter.WeightFilterDisabled)
 			{
-				whereClauses.Add($"ArmorWeight = {(int)filter.Weight}");
+				query += "ArmorWeight = ? AND ";
+				parameters.Add((int)filter.Weight);
 			}
-			if (!string.IsNullOrEmpty(filter.LegendaryType) && !filter.WeightFilterDisabled)
+			if ((filter.Disciplines != null && filter.Disciplines.Any()) || filter.IsTradeable || filter.SoldByVendor || filter.HasMysticForgeRecipe)
 			{
-				string type = filter.LegendaryType.Split(' ')[0];
-				if (!string.IsNullOrEmpty(type))
+				query += "(";
+				if (filter.Disciplines != null && filter.Disciplines.Any())
 				{
-					whereClauses.Add("Item.Name LIKE '" + type + "%'");
+					query = query + "EXISTS (SELECT 1 FROM json_each(DisciplinesBlobbed) WHERE value IN (" + string.Join(",", filter.Disciplines.Select((Discipline id) => " ? ")) + ")) OR ";
+					foreach (Discipline discipline in filter.Disciplines)
+					{
+						parameters.Add((int)discipline);
+					}
 				}
+				if (filter.IsTradeable)
+				{
+					query += "CanBeTraded = 1 OR ";
+				}
+				if (filter.SoldByVendor)
+				{
+					query += "SoldByVendor = 1 OR ";
+				}
+				if (filter.HasMysticForgeRecipe)
+				{
+					query += "Item.HasMysticForgeRecipe = 1 OR ";
+				}
+				query = query.Remove(query.LastIndexOf("OR "));
+				query += ") AND ";
 			}
-			string query = "SELECT DISTINCT * from Item LEFT JOIN (SELECT Recipe.OutputItemId, COUNT(1) AS RecipeCount FROM Recipe WHERE Recipe.IsMysticForgeRecipe = 1 OR Recipe.Name LIKE 'Obsidian%' GROUP BY Recipe.Id) as Recipe ON Recipe.OutputItemId = Item.Id" + $" LEFT JOIN (SELECT Locale, Name, Description, ItemId FROM ItemLocalization) as ItemLocalization ON ItemLocalization.ItemId = Item.Id AND ItemLocalization.Locale = {(int)GameService.Overlay.get_UserLocale().get_Value()}" + " WHERE " + string.Join(" AND ", whereClauses) + " AND RecipeCount > 0 GROUP BY Item.Id";
-			return FilterByAvailable(Connection.Query<Item>(query, Array.Empty<object>())).ToList();
-		}
-
-		private IEnumerable<Item> FilterByAvailable(IEnumerable<Item> items)
-		{
-			return items?.Where((Item i) => !IgnoreIds.Contains(i.Id) && !i.Name.Contains("Mistforged") && !i.Name.Contains("Infusion") && !i.Name.Contains("Infused") && !i.Name.Contains("Attuned") && !i.Name.Contains("Rurik") && !i.Name.Contains("Eingestimmt") && !i.Name.Contains("eingestimmt") && !i.Name.Contains("Infundiert") && !i.Name.Contains("infundiert") && !i.Name.Contains("Nebelgeschmiedeter"));
+			if (!string.IsNullOrEmpty(filter.NameContainsText))
+			{
+				query += "UPPER(Item.Name) LIKE ? AND ";
+				parameters.Add("%" + filter.NameContainsText.ToUpper().Replace("'", "''") + "%");
+			}
+			query = query.Remove(query.LastIndexOf("AND "));
+			query += "GROUP BY Item.Id ";
+			query += "limit 300";
+			return Connection.Query<Item>(query, parameters.ToArray());
 		}
 
 		public void Dispose()
 		{
-			Connection.Dispose();
+			Connection?.Dispose();
 		}
 	}
 }

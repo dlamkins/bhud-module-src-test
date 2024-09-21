@@ -10,25 +10,25 @@ namespace MysticCrafting.Module.Repositories
 		{
 			new MysticVaultContainer
 			{
-				ItemId = 101938,
-				ContainedChoiceItemIds = new List<int> { 97238, 97628, 95641, 95695 }
+				ItemId = 102946,
+				ContainedChoiceItemIds = new List<int> { 95641, 95695, 95957, 96764 }
 			},
 			new MysticVaultContainer
 			{
-				ItemId = 97238,
-				ContainedItemIds = new List<int> { 29178, 19660 },
+				ItemId = 95957,
+				ContainedItemIds = new List<int> { 29185, 19648 },
+				ContainedChanceItemIds = new List<int> { 19673, 19672 }
+			},
+			new MysticVaultContainer
+			{
+				ItemId = 96764,
+				ContainedItemIds = new List<int> { 29171, 19657 },
 				ContainedChanceItemIds = new List<int> { 19673, 19672 }
 			},
 			new MysticVaultContainer
 			{
 				ItemId = 95641,
 				ContainedItemIds = new List<int> { 29170, 19649 },
-				ContainedChanceItemIds = new List<int> { 19673, 19672 }
-			},
-			new MysticVaultContainer
-			{
-				ItemId = 97628,
-				ContainedItemIds = new List<int> { 29166, 19625 },
 				ContainedChanceItemIds = new List<int> { 19673, 19672 }
 			},
 			new MysticVaultContainer

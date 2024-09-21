@@ -202,6 +202,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 				base.TreeView.RemoveNode(node);
 			}
 			((Container)this).OnChildRemoved(e);
+			e.get_ChangedChild().Dispose();
 		}
 
 		protected override void OnResized(ResizedEventArgs e)

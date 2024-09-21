@@ -5,6 +5,8 @@ namespace MysticCrafting.Module.Services.API
 {
 	public interface IApiService
 	{
+		bool CanReloadManually { get; }
+
 		string Name { get; }
 
 		bool Loaded { get; set; }
@@ -26,5 +28,7 @@ namespace MysticCrafting.Module.Services.API
 		Task LoadSafeAsync();
 
 		Task<string> LoadAsync();
+
+		bool LastLoadFailed();
 	}
 }

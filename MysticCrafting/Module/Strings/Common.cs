@@ -46,6 +46,8 @@ namespace MysticCrafting.Module.Strings
 
 		internal static string FavoritesEmpty => ResourceManager.GetString("FavoritesEmpty", resourceCulture);
 
+		internal static string Filters => ResourceManager.GetString("Filters", resourceCulture);
+
 		internal static string HideLockedSkins => ResourceManager.GetString("HideLockedSkins", resourceCulture);
 
 		internal static string HideMaxCollectedItems => ResourceManager.GetString("HideMaxCollectedItems", resourceCulture);
@@ -65,6 +67,12 @@ namespace MysticCrafting.Module.Strings
 		internal static string LoadingPlayerItems => ResourceManager.GetString("LoadingPlayerItems", resourceCulture);
 
 		internal static string LoadingPlayerUnlocks => ResourceManager.GetString("LoadingPlayerUnlocks", resourceCulture);
+
+		internal static string LoadingReloadAllServices => ResourceManager.GetString("LoadingReloadAllServices", resourceCulture);
+
+		internal static string LoadingReloadService => ResourceManager.GetString("LoadingReloadService", resourceCulture);
+
+		internal static string LoadingRightClickLabel => ResourceManager.GetString("LoadingRightClickLabel", resourceCulture);
 
 		internal static string LoadingTradingPost => ResourceManager.GetString("LoadingTradingPost", resourceCulture);
 

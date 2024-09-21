@@ -74,56 +74,56 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Tooltips
 			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
 			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0134: Expected O, but got Unknown
-			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0204: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0210: Expected O, but got Unknown
-			//IL_0211: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0216: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0236: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0246: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0254: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0269: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0270: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027c: Expected O, but got Unknown
-			//IL_02cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0309: Unknown result type (might be due to invalid IL or missing references)
-			//IL_030a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0314: Unknown result type (might be due to invalid IL or missing references)
-			//IL_031b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0327: Expected O, but got Unknown
-			//IL_0338: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0353: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0363: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0367: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0371: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0372: Unknown result type (might be due to invalid IL or missing references)
-			//IL_037c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0383: Unknown result type (might be due to invalid IL or missing references)
-			//IL_038f: Expected O, but got Unknown
-			//IL_03a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ee: Expected O, but got Unknown
+			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0212: Expected O, but got Unknown
+			//IL_0213: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0218: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0238: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0248: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0256: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0260: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0261: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0272: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027e: Expected O, but got Unknown
+			//IL_02d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0302: Unknown result type (might be due to invalid IL or missing references)
+			//IL_030c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_030d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0317: Unknown result type (might be due to invalid IL or missing references)
+			//IL_031e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032a: Expected O, but got Unknown
+			//IL_033b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0340: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0356: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0366: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0374: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0375: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0386: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0392: Expected O, but got Unknown
+			//IL_03a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f1: Expected O, but got Unknown
 			if (Quantity.Currency?.Icon != null)
 			{
 				AsyncTexture2D texture = ServiceContainer.TextureRepository.GetTexture(Quantity.Currency.Icon);
@@ -163,9 +163,9 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Tooltips
 			CurrencyQuantity walletQuantity = ServiceContainer.WalletService.GetQuantity(Quantity.Currency.Id);
 			if (walletQuantity != null)
 			{
-				int walletCount = walletQuantity.Count;
+				long walletCount = walletQuantity.Count;
 				int reservedCount = Node.GetReservedQuantity(Quantity.Currency.Id);
-				walletCount = Math.Max(0, walletCount - reservedCount);
+				walletCount = Math.Max(0L, walletCount - reservedCount);
 				int yPosition = 40 + ((Control)descriptionLabel).get_Height();
 				Label val4 = new Label();
 				val4.set_Text($"{walletCount:N0}");
@@ -186,7 +186,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Tooltips
 				yPosition += ((Control)UnitCountLabel).get_Height() + 5;
 				_controls.Add((Control)(object)UnitCountLabel);
 				_controls.Add((Control)(object)TotalUnitCountLabel);
-				int moreRequired = Quantity.Count - walletQuantity.Count;
+				long moreRequired = Quantity.Count - walletQuantity.Count;
 				if (moreRequired > 0)
 				{
 					IList<Control> controls3 = _controls;
@@ -228,13 +228,13 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Tooltips
 
 		public void UpdateReservedQuantity(int nodeIndex)
 		{
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
 			CurrencyQuantity walletQuantity = ServiceContainer.WalletService.GetQuantity(Quantity.Currency.Id);
 			if (walletQuantity != null)
 			{
-				int walletCount = walletQuantity.Count;
+				long walletCount = walletQuantity.Count;
 				int reservedCount = Node.GetReservedQuantity(Quantity.Currency.Id, nodeIndex);
-				walletCount = Math.Max(0, walletCount - reservedCount);
+				walletCount = Math.Max(0L, walletCount - reservedCount);
 				UnitCountLabel.set_Text(walletCount.ToString("N0"));
 				UnitCountLabel.set_TextColor(ColorHelper.FromItemCount(walletCount, Quantity.Count));
 				((Control)TotalUnitCountLabel).set_Left(((Control)UnitCountLabel).get_Width());

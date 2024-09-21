@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Microsoft.Xna.Framework;
@@ -17,13 +18,13 @@ namespace MysticCrafting.Module.Discovery.Loading
 
 		public Image _statusImage;
 
-		private readonly IList<IApiService> _recurringServices;
+		private readonly IList<IApiService> _apiServices;
 
-		public LoadingStatusView(IList<IApiService> recurringServices)
+		public LoadingStatusView(IList<IApiService> apiServices)
 			: this()
 		{
-			_recurringServices = recurringServices;
-			((View)this).WithPresenter((IPresenter)(object)new LoadingStatusPresenter(this, recurringServices));
+			_apiServices = apiServices;
+			((View)this).WithPresenter((IPresenter)(object)new LoadingStatusPresenter(this, apiServices));
 		}
 
 		protected override void Build(Container buildPanel)
@@ -43,49 +44,49 @@ namespace MysticCrafting.Module.Discovery.Loading
 			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009c: Expected O, but got Unknown
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f2: Expected O, but got Unknown
-			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012b: Expected O, but got Unknown
+			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009f: Expected O, but got Unknown
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f8: Expected O, but got Unknown
+			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012e: Expected O, but got Unknown
 			Image val = new Image();
 			((Control)val).set_Parent(buildPanel);
 			((Control)val).set_Size(new Point(16, 16));
 			val.set_Tint(Color.get_White());
 			val.set_Texture(ServiceContainer.TextureRepository.GetRefTexture("157330-cantint.png"));
-			((Control)val).set_Location(new Point(10, 12));
+			((Control)val).set_Location(new Point(110, 12));
 			((Control)val).set_Visible(true);
 			_statusImage = val;
 			Label val2 = new Label();
 			((Control)val2).set_Parent(buildPanel);
 			val2.set_Text("GW2 API");
-			((Control)val2).set_Location(new Point(30, 10));
+			((Control)val2).set_Location(new Point(130, 10));
 			((Control)val2).set_Size(new Point(200, 20));
 			val2.set_ShowShadow(true);
 			_nameLabel = val2;
 			Label val3 = new Label();
 			((Control)val3).set_Parent(buildPanel);
-			((Control)val3).set_Location(new Point(90, 10));
+			((Control)val3).set_Location(new Point(190, 10));
 			val3.set_TextColor(Color.get_White() * 0.7f);
 			((Control)val3).set_Size(new Point(200, 20));
 			val3.set_ShowShadow(true);
@@ -94,9 +95,19 @@ namespace MysticCrafting.Module.Discovery.Loading
 			LoadingSpinner val4 = new LoadingSpinner();
 			((Control)val4).set_Parent(buildPanel);
 			((Control)val4).set_Size(new Point(25, 25));
-			((Control)val4).set_Location(new Point(140, 7));
-			((Control)val4).set_Visible(false);
+			((Control)val4).set_Location(new Point(105, 7));
+			((Control)val4).set_Visible(true);
 			_loadingSpinner = val4;
+			BuildMenuStrip();
+		}
+
+		public void BuildMenuStrip()
+		{
+			ContextMenuStrip menuStrip = new LoadingStatusContextMenuHelper().BuildContextMenu(_apiServices.Where((IApiService s) => s.CanReloadManually).ToList());
+			((Control)_statusImage).set_Menu(menuStrip);
+			((Control)_nameLabel).set_Menu(menuStrip);
+			((Control)_dateLabel).set_Menu(menuStrip);
+			((Control)_loadingSpinner).set_Menu(menuStrip);
 		}
 	}
 }

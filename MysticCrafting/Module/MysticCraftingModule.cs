@@ -17,6 +17,7 @@ using MysticCrafting.Module.Discovery;
 using MysticCrafting.Module.RecipeTree;
 using MysticCrafting.Module.Services;
 using MysticCrafting.Module.Settings;
+using MysticCrafting.Module.Strings;
 using MysticCrafting.Module.Update;
 using SQLitePCL;
 using SemVer;
@@ -52,14 +53,6 @@ namespace MysticCrafting.Module
 
 		private static ServiceContainer ServiceCollection { get; set; }
 
-		private bool TradingPostLoaded { get; set; }
-
-		private bool WalletLoaded { get; set; }
-
-		private bool PlayerItemsLoaded { get; set; }
-
-		private bool PlayerUnlocksLoaded { get; set; }
-
 		[ImportingConstructor]
 		public MysticCraftingModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
 			: this(moduleParameters)
@@ -87,16 +80,21 @@ namespace MysticCrafting.Module
 				{
 					ToggleWindow();
 				});
-				SetIconName();
+				KeyBindingUpdated();
 			}
 		}
 
-		private void SetIconName()
+		private void KeyBindingUpdated()
 		{
 			if (_cornerIcon != null)
 			{
 				_cornerIcon.set_IconName("Mystic Crafting [" + Settings.ToggleWindowSetting.get_Value().GetBindingDisplayText() + "]");
 				((Control)_cornerIcon).set_BasicTooltipText(_cornerIcon.get_IconName());
+			}
+			if (_mainWindow != null)
+			{
+				string keyBind = Settings.ToggleWindowSetting.get_Value().GetBindingDisplayText();
+				((WindowBase2)_mainWindow).set_Subtitle(string.IsNullOrEmpty(keyBind) ? MysticCrafting.Module.Strings.Discovery.DiscoveryWindowSubTitle : (MysticCrafting.Module.Strings.Discovery.DiscoveryWindowSubTitle + " [" + keyBind + "]"));
 			}
 		}
 
@@ -144,7 +142,7 @@ namespace MysticCrafting.Module
 			((Control)val).set_Width(64);
 			((Control)val).set_Height(64);
 			_cornerIcon = val;
-			SetIconName();
+			KeyBindingUpdated();
 			_mainWindow = BuildWindow();
 			_discoveryTabView = new DiscoveryTabView(this);
 			Settings.LastAcknowledgedUpdate.add_SettingChanged((EventHandler<ValueChangedEventArgs<Version>>)delegate
@@ -218,23 +216,26 @@ namespace MysticCrafting.Module
 
 		private StandardWindow BuildWindow()
 		{
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Expected O, but got Unknown
+			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00df: Expected O, but got Unknown
 			AsyncTexture2D refTexture = ServiceContainer.TextureRepository.GetRefTexture("155978.png");
 			int width = refTexture.get_Width() + 80;
 			int height = refTexture.get_Height() - 150;
+			string keyBind = Settings.ToggleWindowSetting.get_Value().GetBindingDisplayText();
 			StandardWindow val = new StandardWindow(refTexture, new Rectangle(40, 26, 925, 730), new Rectangle(50, 50, 900, 720), new Point(width, height));
 			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((WindowBase2)val).set_Title("Mystic Crafting");
 			((WindowBase2)val).set_Emblem(AsyncTexture2D.op_Implicit(ServiceContainer.TextureRepository.GetRefTexture("102529.png")));
+			((WindowBase2)val).set_Subtitle(string.IsNullOrEmpty(keyBind) ? MysticCrafting.Module.Strings.Discovery.DiscoveryWindowSubTitle : (MysticCrafting.Module.Strings.Discovery.DiscoveryWindowSubTitle + " [" + keyBind + "]"));
 			((WindowBase2)val).set_SavesPosition(true);
 			((WindowBase2)val).set_Id("StandardWindow_ExampleModule_38d37290-b5f9-447d-97ea-45b0b50e5f56");
 			return val;
@@ -266,12 +267,17 @@ namespace MysticCrafting.Module
 			Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
 			GameService.Overlay.add_UserLocaleChanged((EventHandler<ValueEventArgs<CultureInfo>>)async delegate
 			{
+				bool visible = ((Control)_mainWindow).get_Visible();
 				StandardWindow mainWindow = _mainWindow;
 				if (mainWindow != null)
 				{
 					((Control)mainWindow).Dispose();
 				}
 				_mainWindow = BuildWindow();
+				if (visible)
+				{
+					ToggleWindow();
+				}
 			});
 			((Module)this).OnModuleLoaded(e);
 		}

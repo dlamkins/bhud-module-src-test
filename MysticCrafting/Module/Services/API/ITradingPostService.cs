@@ -1,9 +1,14 @@
-using MysticCrafting.Models.TradingPost;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Atzie.MysticCrafting.Models.Items;
 
 namespace MysticCrafting.Module.Services.API
 {
 	public interface ITradingPostService : IApiService
 	{
-		TradingPostItemPrices GetItemPrices(int itemId);
+		event EventHandler<ItemPriceChangedEventArgs> ItemPriceChanged;
+
+		Task<IList<Item>> UpdatePricesSafeAsync(IList<Item> items);
 	}
 }

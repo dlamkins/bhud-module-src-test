@@ -5,6 +5,7 @@ using Blish_HUD.Controls;
 using Microsoft.Xna.Framework;
 using MysticCrafting.Module.Models;
 using MysticCrafting.Module.RecipeTree.TreeView.Nodes;
+using MysticCrafting.Module.Strings;
 
 namespace MysticCrafting.Module.RecipeTree.TreeView.Controls
 {
@@ -43,8 +44,25 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Controls
 				tabs.Add(tab);
 				paddingLeft += 35;
 			}
+			IngredientNode ingredientNode = node as IngredientNode;
+			if (ingredientNode != null && !ingredientNode.IsTopIngredient)
+			{
+				tabs.Add(BuildIgnoreTab());
+				paddingLeft += 35;
+			}
 			Tabs = tabs;
 			((Control)this).set_Width(paddingLeft);
+		}
+
+		private ItemTab BuildIgnoreTab()
+		{
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			ItemTab itemTab = new ItemTab(new IgnoreSource("ignore"));
+			((Control)itemTab).set_Parent((Container)(object)this);
+			((Control)itemTab).set_Size(new Point(32, 32));
+			((Control)itemTab).set_BasicTooltipText(Recipe.IgnoreItemSource);
+			itemTab.Activated += Tab_ActiveChanged;
+			return itemTab;
 		}
 
 		private void Tab_ActiveChanged(object sender, CheckChangedEvent e)

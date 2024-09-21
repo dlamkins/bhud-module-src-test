@@ -7,7 +7,7 @@ namespace MysticCrafting.Module.Repositories
 {
 	public interface IVendorRepository : IDisposable
 	{
-		void Initialize(IDataService service);
+		void Initialize(ISqliteDbService service);
 
 		IList<VendorSellsItem> GetVendorItems(int itemId);
 	}

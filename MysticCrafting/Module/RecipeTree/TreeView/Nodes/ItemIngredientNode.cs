@@ -105,11 +105,21 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			{
 				return false;
 			}
-			if (ServiceContainer.PlayerItemService.GetItemCount(Item.Id) == base.PlayerUnitCount)
+			if (base.IsTopIngredient)
+			{
+				if (base.PlayerUnitCount == 0)
+				{
+					return false;
+				}
+				base.PlayerUnitCount = 0;
+				return true;
+			}
+			int newPlayerCount = ServiceContainer.PlayerItemService.GetItemCount(Item.Id);
+			if (newPlayerCount == base.PlayerUnitCount)
 			{
 				return false;
 			}
-			base.PlayerUnitCount = ServiceContainer.PlayerItemService.GetItemCount(Item.Id);
+			base.PlayerUnitCount = newPlayerCount;
 			return true;
 		}
 	}

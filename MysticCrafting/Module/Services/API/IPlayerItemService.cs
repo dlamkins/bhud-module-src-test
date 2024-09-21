@@ -1,8 +1,9 @@
+using System;
 using System.Collections.Generic;
 
 namespace MysticCrafting.Module.Services.API
 {
-	public interface IPlayerItemService : IApiService
+	public interface IPlayerItemService : IApiService, IDisposable
 	{
 		int GetItemCount(int itemId);
 

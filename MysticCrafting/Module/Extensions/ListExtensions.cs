@@ -72,7 +72,7 @@ namespace MysticCrafting.Module.Extensions
 			return $"{cost.UnitPrice}-{cost.CurrencyId}";
 		}
 
-		public static int CoinCount(this IEnumerable<CurrencyQuantity> prices)
+		public static long CoinCount(this IEnumerable<CurrencyQuantity> prices)
 		{
 			return prices.Where((CurrencyQuantity p) => p.Currency != null && p.Currency.Id == 1)?.Sum((CurrencyQuantity p) => p.Count) ?? 0;
 		}

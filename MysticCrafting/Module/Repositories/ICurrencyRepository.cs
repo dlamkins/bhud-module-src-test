@@ -7,7 +7,7 @@ namespace MysticCrafting.Module.Repositories
 {
 	public interface ICurrencyRepository : IDisposable
 	{
-		void Initialize(IDataService service);
+		void Initialize(ISqliteDbService service);
 
 		IList<Currency> GetCurrencies();
 

@@ -72,6 +72,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView
 				RemoveNode(node);
 			}
 			((Container)this).OnChildRemoved(e);
+			e.get_ChangedChild().Dispose();
 		}
 
 		public void RemoveNode(IngredientNode node)

@@ -47,7 +47,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Controls
 			((Control)this).set_Parent(parent);
 		}
 
-		private string AmountToText(int amount)
+		private string AmountToText(long amount)
 		{
 			return amount.ToString("N0");
 		}
@@ -72,13 +72,13 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Controls
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
 			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			if (Quantity != null && Quantity.Count != 0)
+			if (Quantity != null && Quantity.Count != 0L)
 			{
 				PaintCurrency(Quantity.Count, Icon, spriteBatch, bounds);
 			}
 		}
 
-		private int PaintCurrency(int amount, AsyncTexture2D texture, SpriteBatch spriteBatch, Rectangle position)
+		private int PaintCurrency(long amount, AsyncTexture2D texture, SpriteBatch spriteBatch, Rectangle position)
 		{
 			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
@@ -98,7 +98,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Controls
 			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-			if (amount == 0)
+			if (amount == 0L)
 			{
 				return 0;
 			}

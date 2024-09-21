@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Reflection;
-using System.Security.Cryptography;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,10 +33,6 @@ namespace MysticCrafting.Module.Services
 		private IList<IRepository> _repositoryList = new List<IRepository>();
 
 		public static JsonSerializerOptions _serializerOptions;
-
-		public string DatabaseFilePath => GetFilePath(DatabaseFileName);
-
-		public string DatabaseFileResourceName => "MysticCrafting.Module.EmbeddedResources." + DatabaseFileName;
 
 		private string BaseDirectory => _directoriesManager.GetFullDirectoryPath("mystic_crafting");
 
@@ -135,42 +129,6 @@ namespace MysticCrafting.Module.Services
 				Logger.Error(ex.Message);
 			}
 			return await Task.FromResult<T>(null);
-		}
-
-		public async Task CopyDatabaseResource()
-		{
-			string databaseFileName = "data.db";
-			if (!NewDatabaseFileAvailable())
-			{
-				return;
-			}
-			using Stream resourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(DatabaseFileResourceName);
-			if (resourceStream == null)
-			{
-				Logger.Error("Could not find embedded resource " + databaseFileName);
-				return;
-			}
-			using FileStream file = new FileStream(GetFilePath(databaseFileName), FileMode.Create, FileAccess.Write);
-			await resourceStream.CopyToAsync(file);
-		}
-
-		private bool NewDatabaseFileAvailable()
-		{
-			if (!File.Exists(DatabaseFilePath))
-			{
-				return true;
-			}
-			using MD5 md5 = MD5.Create();
-			using FileStream stream = File.OpenRead(DatabaseFilePath);
-			using Stream resourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(DatabaseFileResourceName);
-			if (resourceStream == null)
-			{
-				Logger.Error("Could not find embedded resource " + DatabaseFileName);
-				return false;
-			}
-			byte[] first = md5.ComputeHash(stream);
-			byte[] resourceFileHash = md5.ComputeHash(resourceStream);
-			return !first.SequenceEqual(resourceFileHash);
 		}
 
 		public async Task DownloadRepositoryFilesAsync()

@@ -37,5 +37,12 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Extensions
 			}
 			return nodes.First() == node;
 		}
+
+		public static List<int> GetItemIngredientIds(this IList<IngredientNode> nodes)
+		{
+			return (from n in nodes.OfType<ItemIngredientNode>()
+				where n.Item.CanBeTraded
+				select n.Item.Id).Distinct().ToList();
+		}
 	}
 }

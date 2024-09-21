@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Atzie.MysticCrafting.Models.Items;
 using Blish_HUD;
 using Blish_HUD.Common.UI.Views;
 using Blish_HUD.Content;
@@ -9,6 +10,7 @@ using MysticCrafting.Module.Extensions;
 using MysticCrafting.Module.Models;
 using MysticCrafting.Module.RecipeTree.TreeView.Controls;
 using MysticCrafting.Module.Services;
+using MysticCrafting.Module.Services.API;
 using MysticCrafting.Module.Strings;
 
 namespace MysticCrafting.Module.RecipeTree.TreeView.Tooltips
@@ -18,6 +20,14 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Tooltips
 		private List<Control> _controls = new List<Control>();
 
 		protected bool Initialized;
+
+		private CoinsControl _buyCoinsControl;
+
+		private Label _buyCoinsUnavailableLabel;
+
+		private CoinsControl _sellCoinsControl;
+
+		private Label _sellCoinsUnavailableLabel;
 
 		private TradingPostSource TradingPostSource { get; set; }
 
@@ -56,30 +66,6 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Tooltips
 			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009c: Expected O, but got Unknown
-			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fa: Expected O, but got Unknown
-			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0147: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0158: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a5: Expected O, but got Unknown
-			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
 			AsyncTexture2D icon = ServiceContainer.TextureRepository.Textures.TradingPostIcon;
 			List<Control> controls = _controls;
 			Image val = new Image(icon);
@@ -96,36 +82,156 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Tooltips
 			val2.set_StrokeText(true);
 			val2.set_AutoSizeWidth(true);
 			controls2.Add((Control)val2);
-			Label val3 = new Label();
-			((Control)val3).set_Parent(BuildPanel);
-			val3.set_Text(Recipe.TradingPostBuy + ":");
-			val3.set_Font(GameService.Content.get_DefaultFont14());
-			((Control)val3).set_Location(new Point(5, 40));
-			val3.set_TextColor(Color.get_White());
-			val3.set_StrokeText(true);
-			val3.set_AutoSizeWidth(true);
-			Label buyLabel = val3;
+			BuildBuyPriceControls();
+			BuildSellPriceControls();
+			ServiceContainer.TradingPostService.ItemPriceChanged += TradingPostServiceOnItemPriceChanged;
+		}
+
+		private void TradingPostServiceOnItemPriceChanged(object sender, ItemPriceChangedEventArgs e)
+		{
+			if (e.Item.Id == TradingPostSource.Item.Id)
+			{
+				UpdateBuyPrice(e.Item);
+				UpdateSellPrice(e.Item);
+			}
+		}
+
+		private void BuildBuyPriceControls()
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005e: Expected O, but got Unknown
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014b: Expected O, but got Unknown
+			Label val = new Label();
+			((Control)val).set_Parent(BuildPanel);
+			val.set_Text(Recipe.TradingPostBuy + ":");
+			val.set_Font(GameService.Content.get_DefaultFont14());
+			((Control)val).set_Location(new Point(5, 40));
+			val.set_TextColor(Color.get_White());
+			val.set_StrokeText(true);
+			val.set_AutoSizeWidth(true);
+			Label buyLabel = val;
 			_controls.Add((Control)(object)buyLabel);
-			List<Control> controls3 = _controls;
 			CoinsControl coinsControl = new CoinsControl(BuildPanel);
 			((Control)coinsControl).set_Location(new Point(((Control)buyLabel).get_Right() + 5, 40));
-			coinsControl.UnitPrice = TradingPostSource.BuyPrice.UnitPrice;
-			controls3.Add((Control)(object)coinsControl);
-			Label val4 = new Label();
-			((Control)val4).set_Parent(BuildPanel);
-			val4.set_Text(Recipe.TradingPostSell + ":");
-			val4.set_Font(GameService.Content.get_DefaultFont14());
-			((Control)val4).set_Location(new Point(5, 65));
-			val4.set_TextColor(Color.get_White());
-			val4.set_StrokeText(true);
-			val4.set_AutoSizeWidth(true);
-			Label sellLabel = val4;
+			coinsControl.UnitPrice = TradingPostSource.Item.TradingPostBuy.GetValueOrDefault();
+			_buyCoinsControl = coinsControl;
+			_controls.Add((Control)(object)_buyCoinsControl);
+			Label val2 = new Label();
+			((Control)val2).set_Parent(BuildPanel);
+			val2.set_Text(Recipe.Unavailable);
+			((Control)val2).set_Location(new Point(((Control)buyLabel).get_Right() + 5, 40));
+			val2.set_Font(GameService.Content.get_DefaultFont14());
+			val2.set_TextColor(Color.get_White());
+			val2.set_StrokeText(true);
+			val2.set_AutoSizeWidth(true);
+			((Control)val2).set_Visible(TradingPostSource.Item.TradingPostBuy == 0);
+			_buyCoinsUnavailableLabel = val2;
+			_controls.Add((Control)(object)_buyCoinsUnavailableLabel);
+		}
+
+		private void UpdateBuyPrice(Item item)
+		{
+			if (item.TradingPostBuy.HasValue && item.TradingPostBuy != 0)
+			{
+				_buyCoinsControl.UnitPrice = item.TradingPostBuy.GetValueOrDefault();
+				((Control)_buyCoinsUnavailableLabel).Hide();
+				return;
+			}
+			Label buyCoinsUnavailableLabel = _buyCoinsUnavailableLabel;
+			if (buyCoinsUnavailableLabel != null)
+			{
+				((Control)buyCoinsUnavailableLabel).Show();
+			}
+		}
+
+		private void BuildSellPriceControls()
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005e: Expected O, but got Unknown
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014b: Expected O, but got Unknown
+			Label val = new Label();
+			((Control)val).set_Parent(BuildPanel);
+			val.set_Text(Recipe.TradingPostSell + ":");
+			val.set_Font(GameService.Content.get_DefaultFont14());
+			((Control)val).set_Location(new Point(5, 65));
+			val.set_TextColor(Color.get_White());
+			val.set_StrokeText(true);
+			val.set_AutoSizeWidth(true);
+			Label sellLabel = val;
 			_controls.Add((Control)(object)sellLabel);
-			List<Control> controls4 = _controls;
-			CoinsControl coinsControl2 = new CoinsControl(BuildPanel);
-			((Control)coinsControl2).set_Location(new Point(((Control)sellLabel).get_Right() + 5, 65));
-			coinsControl2.UnitPrice = TradingPostSource.SellPrice.UnitPrice;
-			controls4.Add((Control)(object)coinsControl2);
+			CoinsControl coinsControl = new CoinsControl(BuildPanel);
+			((Control)coinsControl).set_Location(new Point(((Control)sellLabel).get_Right() + 5, 65));
+			coinsControl.UnitPrice = TradingPostSource.Item.TradingPostSell.GetValueOrDefault();
+			_sellCoinsControl = coinsControl;
+			_controls.Add((Control)(object)_sellCoinsControl);
+			Label val2 = new Label();
+			((Control)val2).set_Parent(BuildPanel);
+			val2.set_Text(Recipe.Unavailable);
+			((Control)val2).set_Location(new Point(((Control)sellLabel).get_Right() + 5, 65));
+			val2.set_Font(GameService.Content.get_DefaultFont14());
+			val2.set_TextColor(Color.get_White());
+			val2.set_StrokeText(true);
+			val2.set_AutoSizeWidth(true);
+			((Control)val2).set_Visible(TradingPostSource.Item.TradingPostSell == 0);
+			_sellCoinsUnavailableLabel = val2;
+			_controls.Add((Control)(object)_sellCoinsUnavailableLabel);
+		}
+
+		private void UpdateSellPrice(Item item)
+		{
+			if (item.TradingPostSell.HasValue && item.TradingPostSell != 0)
+			{
+				_sellCoinsControl.UnitPrice = item.TradingPostSell.GetValueOrDefault();
+				((Control)_sellCoinsUnavailableLabel).Hide();
+				return;
+			}
+			Label sellCoinsUnavailableLabel = _sellCoinsUnavailableLabel;
+			if (sellCoinsUnavailableLabel != null)
+			{
+				((Control)sellCoinsUnavailableLabel).Show();
+			}
 		}
 
 		protected override void Unload()
@@ -133,6 +239,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Tooltips
 			_controls?.SafeDispose();
 			_controls?.Clear();
 			BuildPanel = null;
+			ServiceContainer.TradingPostService.ItemPriceChanged -= TradingPostServiceOnItemPriceChanged;
 			((View<IPresenter>)this).Unload();
 		}
 	}

@@ -11,9 +11,15 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Controls
 {
 	public class CoinsControl : Control
 	{
-		private int _unitPrice;
+		private long _unitPrice;
 
-		public int UnitPrice
+		public long Gold;
+
+		public long Silver;
+
+		public long Copper;
+
+		public long UnitPrice
 		{
 			get
 			{
@@ -22,17 +28,14 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Controls
 			set
 			{
 				_unitPrice = value;
+				Gold = value / 10000;
+				Silver = value % 10000 / 100;
+				Copper = value % 100;
 				((Control)this).set_Width(CalculateWidth());
 			}
 		}
 
 		public string SuffixText { get; set; }
-
-		public int Gold => UnitPrice / 10000;
-
-		public int Silver => UnitPrice % 10000 / 100;
-
-		public int Copper => UnitPrice % 100;
 
 		public Point IconSize { get; set; } = new Point(20, 20);
 
@@ -45,31 +48,28 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Controls
 		{
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).set_Parent(parent);
-			new Label().set_ShowShadow(true);
 		}
 
 		public int CalculateWidth()
 		{
 			int width = 0;
-			if (Gold != 0)
+			if (Gold != 0L)
 			{
 				width += CalculateWidth(Gold);
 			}
-			if (Gold != 0 || Silver != 0)
+			if (Gold != 0L || Silver != 0L)
 			{
 				width += CalculateWidth(Silver);
 			}
-			if (Gold != 0 || Silver != 0 || Copper != 0)
+			if (Gold != 0L || Silver != 0L || Copper != 0L)
 			{
 				width += CalculateWidth(Copper);
 			}
 			return width;
 		}
 
-		public int CalculateWidth(int coin)
+		public int CalculateWidth(long coin)
 		{
 			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
@@ -94,19 +94,19 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Controls
 			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
 			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-			if (UnitPrice != 0)
+			if (UnitPrice != 0L)
 			{
 				Rectangle position = default(Rectangle);
 				((Rectangle)(ref position))._002Ector(0, bounds.Y, ((Control)this).get_Width(), ((Control)this).get_Height());
-				if (Gold != 0)
+				if (Gold != 0L)
 				{
 					position.X += PaintCoin(Gold, ServiceContainer.TextureRepository.Textures.CoinGold, new Color(210, 177, 66), spriteBatch, position);
 				}
-				if (Gold != 0 || Silver != 0)
+				if (Gold != 0L || Silver != 0L)
 				{
 					position.X += PaintCoin(Silver, ServiceContainer.TextureRepository.Textures.CoinSilver, new Color(184, 184, 184), spriteBatch, position);
 				}
-				if (Gold != 0 || Silver != 0 || Copper != 0)
+				if (Gold != 0L || Silver != 0L || Copper != 0L)
 				{
 					position.X += PaintCoin(Copper, ServiceContainer.TextureRepository.Textures.CoinCopper, new Color(187, 102, 34), spriteBatch, position);
 				}
@@ -115,7 +115,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Controls
 			}
 		}
 
-		private int PaintCoin(int amount, AsyncTexture2D texture, Color color, SpriteBatch spriteBatch, Rectangle position)
+		private int PaintCoin(long amount, AsyncTexture2D texture, Color color, SpriteBatch spriteBatch, Rectangle position)
 		{
 			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0034: Unknown result type (might be due to invalid IL or missing references)

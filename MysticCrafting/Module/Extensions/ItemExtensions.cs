@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Atzie.MysticCrafting.Models.Crafting;
 using Atzie.MysticCrafting.Models.Items;
+using Atzie.MysticCrafting.Models.Vendor;
 using Blish_HUD;
+using MysticCrafting.Models.Vendor;
 
 namespace MysticCrafting.Module.Extensions
 {
@@ -34,6 +37,10 @@ namespace MysticCrafting.Module.Extensions
 			}
 			if (item.Type == ItemType.Weapon)
 			{
+				if (item.Id == 30691)
+				{
+					return 4;
+				}
 				if (_oneHandedWeapons.Contains(item.DetailsType.ToLower()))
 				{
 					return 4;
@@ -60,6 +67,48 @@ namespace MysticCrafting.Module.Extensions
 				return item.Type == ItemType.Back;
 			}
 			return true;
+		}
+
+		public static bool IsDecoration(this Item item)
+		{
+			return new List<int> { 28, 29, 30, 31, 32, 34, 35, 36, 37 }.Contains(item.CategoryId);
+		}
+
+		public static bool IsDye(this Item item)
+		{
+			return new List<int> { 108, 109, 110, 111, 112 }.Contains(item.CategoryId);
+		}
+
+		public static List<Item> FlattenItems(this Item item)
+		{
+			return new List<Item> { item }.FlattenItems();
+		}
+
+		public static List<Item> FlattenItems(this List<Item> items)
+		{
+			List<Item> recipeItems = (from i in items.Where((Item i) => i != null && i.Recipes != null).SelectMany((Item i) => i.Recipes.Where((Recipe r) => r.Ingredients != null).SelectMany((Recipe r) => r.Ingredients.Select((Ingredient ing) => ing.Item).Concat(r.RecipeSheets))).Except(items)
+				where i != null
+				select i).ToList();
+			List<Item> vendorItems = (from i in items.Where((Item i) => i != null && i.Recipes != null).SelectMany((Item i) => i.VendorListings.Where((VendorSellsItem v) => v.ItemCosts != null).SelectMany((VendorSellsItem v) => from c in v.ItemCosts
+					where c.Item != null
+					select c.Item)).Except(items)
+					.Except(recipeItems)
+				where i != null
+				select i).ToList();
+			if (recipeItems.Any())
+			{
+				items.AddRange(recipeItems);
+			}
+			if (vendorItems.Any())
+			{
+				items.AddRange(vendorItems);
+			}
+			if (!recipeItems.Any() && !vendorItems.Any())
+			{
+				return items;
+			}
+			items.FlattenItems();
+			return items;
 		}
 	}
 }

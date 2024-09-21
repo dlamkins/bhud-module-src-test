@@ -1,11 +1,12 @@
 using Atzie.MysticCrafting.Models.Crafting;
+using Atzie.MysticCrafting.Models.Items;
 using MysticCrafting.Module.Strings;
 
 namespace MysticCrafting.Module.Helpers
 {
 	public class LocalizationHelper
 	{
-		public static string TranslateProfession(string profession)
+		public static string TranslateDiscipline(string profession)
 		{
 			string text = profession.ToLower();
 			if (text != null)
@@ -76,7 +77,7 @@ namespace MysticCrafting.Module.Helpers
 			return string.Empty;
 		}
 
-		public static string TranslateProfession(Discipline profession)
+		public static string TranslateDiscipline(Discipline profession)
 		{
 			return profession switch
 			{
@@ -104,9 +105,28 @@ namespace MysticCrafting.Module.Helpers
 			};
 		}
 
-		public static string TranslateMenuItem(string menuItem)
+		public static string TranslateRarity(ItemRarity rarity)
 		{
-			return MysticCrafting.Module.Strings.Menu.ResourceManager.GetString(menuItem);
+			return rarity switch
+			{
+				ItemRarity.Ascended => Rarities.Ascended, 
+				ItemRarity.Basic => Rarities.Basic, 
+				ItemRarity.Exotic => Rarities.Exotic, 
+				ItemRarity.Fine => Rarities.Fine, 
+				ItemRarity.Legendary => Rarities.Legendary, 
+				ItemRarity.Masterwork => Rarities.Masterwork, 
+				ItemRarity.Rare => Rarities.Rare, 
+				_ => string.Empty, 
+			};
+		}
+
+		public static string TranslateMenuItem(string menuItemName)
+		{
+			if (!string.IsNullOrWhiteSpace(MysticCrafting.Module.Strings.Menu.ResourceManager.GetString(menuItemName)))
+			{
+				return MysticCrafting.Module.Strings.Menu.ResourceManager.GetString(menuItemName);
+			}
+			return menuItemName;
 		}
 	}
 }

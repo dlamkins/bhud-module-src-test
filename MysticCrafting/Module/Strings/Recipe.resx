@@ -27,40 +27,59 @@
       </xsd:complexType>
     </xsd:element>
   </xsd:schema>
-<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="CountInSharedInventory"><value>{0} in Shared Inventory</value></data>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="OpenWiki"><value>Open Wiki</value></data>
+  <data name="CountInSharedInventory"><value>{0} in Shared Inventory</value></data>
   <data name="RecipeSourceAutomatic"><value>Automatic</value></data>
   <data name="Unavailable"><value>Unavailable</value></data>
   <data name="MoreRequired"><value>{0} more required</value></data>
+  <data name="OpenGW2BLTC"><value>Open GW2BLTC</value></data>
   <data name="CountInMaterialStorage"><value>{0} in Material Storage</value></data>
   <data name="PriceEach"><value>each</value></data>
   <data name="ItemCountBoxTooltipText"><value>Limited by item type</value></data>
+  <data name="TableHeaderName"><value>Name</value></data>
   <data name="RecipeSourceOther"><value>Other</value></data>
   <data name="RecipeSourceRecipeSheet"><value>Recipe sheet</value></data>
+  <data name="Vendor"><value>Vendor</value></data>
   <data name="TradingPost"><value>Trading Post</value></data>
+  <data name="ItemSourceWarning"><value>The module does not currently support the methods to acquire this item. Right click on this item to easily open the wiki.</value></data>
   <data name="MysticForge"><value>Mystic forge</value></data>
   <data name="CountInInventoryCharacter"><value>{0} in Inventory {1}</value></data>
   <data name="CurrentRecipe"><value>current</value></data>
+  <data name="OpenWikiTo"><value>Open Wiki to</value></data>
   <data name="TradingPostSell"><value>Sell</value></data>
   <data name="Ingredients"><value>Ingredients</value></data>
   <data name="TooltipUnlockedItem"><value>{0} unlocked out of a maximum of {1}</value></data>
+  <data name="TableHeaderSources"><value>Sources</value></data>
   <data name="TooltipOpenMenuText"><value>Right click for more options</value></data>
   <data name="RecipeRequiredLevel"><value>Required Level</value></data>
   <data name="ContextMenuUpdateTradingPost"><value>Update Trading Post options</value></data>
   <data name="VendorsMore"><value>{0} more</value></data>
+  <data name="BuyingItemsLabel"><value>Bought for</value></data>
   <data name="Account"><value>Account</value></data>
-  <data name="TooltipCollectedItem"><value>I have {0} of this item.</value></data>
+  <data name="OpenFrenchWiki"><value>Open French Wiki</value></data>
+  <data name="TooltipCollectedItem"><value>You have {0} of this item.</value></data>
+  <data name="CraftingItemsLabel"><value>Crafted with</value></data>
   <data name="ContextMenuSellAll"><value>Sell all</value></data>
   <data name="WalletQuantityReserved"><value>{0} reserved for other purchases</value></data>
+  <data name="SellerItemCostsLabel"><value>Sold for</value></data>
   <data name="WalletQuantityReservedShort"><value>{0} reserved</value></data>
   <data name="RandomItemChance"><value>Random chance to get item from container</value></data>
+  <data name="TableHeaderCount"><value>Count</value></data>
+  <data name="TableHeaderPrice"><value>Price</value></data>
+  <data name="CopyName"><value>Copy Name</value></data>
   <data name="WalletLabel"><value>Available in Wallet</value></data>
+  <data name="CopyChatLink"><value>Copy Chat Link</value></data>
   <data name="ContextMenuBuyAll"><value>Buy all</value></data>
   <data name="Requirement"><value>Requirement</value></data>
   <data name="ChoiceOfItem"><value>Item is one of the choices from container</value></data>
+  <data name="RecipeSheetLabel"><value>Learned from</value></data>
   <data name="TradingPostBuy"><value>Buy</value></data>
   <data name="RecipeSource"><value>Source</value></data>
   <data name="CountInBank"><value>{0} in Bank</value></data>
+  <data name="SellerItemsLabel"><value>Sold by</value></data>
   <data name="SoldByVendors"><value>Sold by {0} vendors</value></data>
+  <data name="IgnoreItemSource"><value>Ignore</value></data>
   <data name="PricePerNumber"><value>per {0}</value></data>
+  <data name="ForgingItemsLabel"><value>Forged with</value></data>
   <data name="AllRecipes"><value>All recipes</value></data>
   </root>

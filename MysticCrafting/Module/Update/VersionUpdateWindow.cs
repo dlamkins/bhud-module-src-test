@@ -86,36 +86,40 @@ namespace MysticCrafting.Module.Update
 			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_019f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d0: Expected O, but got Unknown
-			//IL_024a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0263: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0279: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029b: Expected O, but got Unknown
-			//IL_029c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02eb: Expected O, but got Unknown
-			//IL_02ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0309: Unknown result type (might be due to invalid IL or missing references)
-			//IL_030b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_032a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0344: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0352: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0359: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0365: Expected O, but got Unknown
+			//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f5: Expected O, but got Unknown
+			//IL_026f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0274: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0288: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0293: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c0: Expected O, but got Unknown
+			//IL_02c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0304: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0310: Expected O, but got Unknown
+			//IL_0311: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0316: Unknown result type (might be due to invalid IL or missing references)
+			//IL_031d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0330: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0362: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0369: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0370: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0377: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038a: Expected O, but got Unknown
 			_manifest = manifest;
 			Rectangle bounds = _windowTexture.get_Bounds();
 			((Control)this).set_Size(((Rectangle)(ref bounds)).get_Size());
@@ -137,7 +141,7 @@ namespace MysticCrafting.Module.Update
 			((Control)val2).set_Width(((Container)this).get_ContentRegion().Width);
 			((Control)val2).set_Height(82);
 			val2.set_TextColor(Colors.Chardonnay);
-			val2.set_Text("API Changes");
+			val2.set_Text("Items Update");
 			val2.set_Font(GameService.Content.GetFont((FontFace)0, (FontSize)24, (FontStyle)0));
 			val2.set_StrokeText(true);
 			val2.set_VerticalAlignment((VerticalAlignment)1);
@@ -149,6 +153,8 @@ namespace MysticCrafting.Module.Update
 			((Control)val3).set_Height(290);
 			((Control)val3).set_Width(474);
 			((Control)val3).set_Left(((Container)this).get_ContentRegion().Width / 2 - 237);
+			val3.set_ControlPadding(new Vector2(10f, 5f));
+			((Control)val3).set_Padding(new Thickness(10f));
 			((Control)val3).set_Parent((Container)(object)this);
 			((Panel)val3).set_ShowBorder(true);
 			((Panel)val3).set_CanScroll(true);
@@ -178,7 +184,7 @@ namespace MysticCrafting.Module.Update
 					{
 						Label val8 = new Label();
 						val8.set_AutoSizeHeight(true);
-						((Control)val8).set_Width(((Control)_changePanel).get_Width() - 40);
+						((Control)val8).set_Width(((Control)_changePanel).get_Width() - 30);
 						val8.set_WrapText(true);
 						val8.set_Text($"\n{text}");
 						val8.set_Font(GameService.Content.GetFont((FontFace)0, (FontSize)16, (FontStyle)0));

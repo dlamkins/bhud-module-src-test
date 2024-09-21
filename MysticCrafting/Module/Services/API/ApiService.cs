@@ -18,6 +18,8 @@ namespace MysticCrafting.Module.Services.API
 
 		private readonly Gw2ApiManager _apiManager;
 
+		public bool CanReloadManually => true;
+
 		public abstract string Name { get; }
 
 		public DateTime LastLoaded { get; set; }
@@ -37,14 +39,7 @@ namespace MysticCrafting.Module.Services.API
 				if (_loading != value)
 				{
 					_loading = value;
-					if (_loading)
-					{
-						this.LoadingStarted?.Invoke(this, EventArgs.Empty);
-					}
-					else
-					{
-						this.LoadingFinished?.Invoke(this, EventArgs.Empty);
-					}
+					InvokeEvents();
 				}
 			}
 		}
@@ -63,6 +58,32 @@ namespace MysticCrafting.Module.Services.API
 		protected ApiService(Gw2ApiManager manager)
 		{
 			_apiManager = manager;
+		}
+
+		public bool LastLoadFailed()
+		{
+			_ = LastFailed;
+			_ = LastLoaded;
+			return LastFailed > LastLoaded;
+		}
+
+		private void InvokeEvents()
+		{
+			try
+			{
+				if (_loading)
+				{
+					this.LoadingStarted?.Invoke(this, EventArgs.Empty);
+				}
+				else
+				{
+					this.LoadingFinished?.Invoke(this, EventArgs.Empty);
+				}
+			}
+			catch (Exception ex)
+			{
+				Logger.Error($"Failed to invoke API event. Loading = {_loading}. Exception: {ex.Message}");
+			}
 		}
 
 		public async Task StartTimedLoadingAsync(int minutes)

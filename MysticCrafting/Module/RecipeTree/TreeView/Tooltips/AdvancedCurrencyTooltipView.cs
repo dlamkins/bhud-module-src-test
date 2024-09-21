@@ -313,7 +313,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Tooltips
 			((Container)val).set_HeightSizingMode((SizingMode)1);
 			((Container)val).set_WidthSizingMode((SizingMode)1);
 			_linkedNodesPanel = val;
-			int totalPlayerItemCount = ServiceContainer.WalletService.GetQuantity(Node.Id).Count;
+			long totalPlayerItemCount = ServiceContainer.WalletService.GetQuantity(Node.Id).Count;
 			Label val2 = new Label();
 			((Control)val2).set_Parent((Container)(object)_linkedNodesPanel);
 			val2.set_Text(Recipe.AllRecipes);

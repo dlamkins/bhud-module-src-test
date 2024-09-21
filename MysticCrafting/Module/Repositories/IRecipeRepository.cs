@@ -7,7 +7,7 @@ namespace MysticCrafting.Module.Repositories
 {
 	public interface IRecipeRepository : IDisposable
 	{
-		void Initialize(IDataService service);
+		void Initialize(ISqliteDbService service);
 
 		IList<Recipe> GetRecipes(int itemId);
 	}

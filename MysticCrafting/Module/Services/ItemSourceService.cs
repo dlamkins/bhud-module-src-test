@@ -3,7 +3,6 @@ using System.Linq;
 using Atzie.MysticCrafting.Models.Crafting;
 using Atzie.MysticCrafting.Models.Items;
 using Atzie.MysticCrafting.Models.Vendor;
-using MysticCrafting.Models.TradingPost;
 using MysticCrafting.Models.Vendor;
 using MysticCrafting.Module.Extensions;
 using MysticCrafting.Module.Models;
@@ -32,12 +31,6 @@ namespace MysticCrafting.Module.Services
 			new List<int> { 24282, 19684, 19684, 19684, 19684 }
 		} };
 
-		private readonly int[] _wizardsVaultIds = new int[15]
-		{
-			96054, 96697, 93482, 99453, 97519, 19651, 29174, 19673, 19672, 29176,
-			19652, 29180, 19654, 97519, 19655
-		};
-
 		public ItemSourceService(ITradingPostService tradingPostService, IRecipeRepository recipeRepository, IVendorRepository vendorRepository, IChoiceRepository choiceRepository, IItemRepository itemRepository, IWizardsVaultRepository wizardsVaultRepository)
 		{
 			_tradingPostService = tradingPostService;
@@ -50,9 +43,9 @@ namespace MysticCrafting.Module.Services
 
 		public IEnumerable<IItemSource> GetItemSources(Item item)
 		{
-			if (item.Id == 68063 || item.Id == 89105 || item.Id == 92687)
+			if (item.Id == 68063 || item.Id == 92687)
 			{
-				return new List<IItemSource> { GetTradingPostSource(item.Id) };
+				return new List<IItemSource> { GetTradingPostSource(item) };
 			}
 			List<IItemSource> sources = new List<IItemSource>();
 			IEnumerable<RecipeSource> recipes = GetRecipeSources(item);
@@ -60,10 +53,13 @@ namespace MysticCrafting.Module.Services
 			{
 				sources.AddRange(recipes);
 			}
-			TradingPostSource prices = GetTradingPostSource(item.Id);
-			if (prices != null)
+			if (item.CanBeTraded)
 			{
-				sources.Add(prices);
+				TradingPostSource prices = GetTradingPostSource(item);
+				if (prices != null)
+				{
+					sources.Add(prices);
+				}
 			}
 			VendorSource vendorPrices = GetVendorSource(item);
 			if (vendorPrices != null)
@@ -108,21 +104,20 @@ namespace MysticCrafting.Module.Services
 				select new RecipeSource(r.FullText)
 				{
 					Recipe = r,
-					DisplayName = r.Source.ToString()
+					DisplayName = r.Source.ToString(),
+					Source = r.Source
 				});
 		}
 
-		private TradingPostSource GetTradingPostSource(int itemId)
+		private TradingPostSource GetTradingPostSource(Item item)
 		{
-			TradingPostItemPrices prices = _tradingPostService.GetItemPrices(itemId);
-			if (prices == null)
+			if (item == null || !item.CanBeTraded)
 			{
 				return null;
 			}
-			return new TradingPostSource(prices.Id.ToString())
+			return new TradingPostSource(item.Id.ToString())
 			{
-				BuyPrice = prices.BuyPrice,
-				SellPrice = prices.SellPrice,
+				Item = item,
 				DisplayName = "Trading Post"
 			};
 		}

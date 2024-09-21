@@ -61,38 +61,40 @@ namespace MysticCrafting.Module.Discovery.ItemList
 			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0204: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0232: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0237: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0246: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0292: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0297: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0337: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0343: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0369: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0373: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0383: Unknown result type (might be due to invalid IL or missing references)
-			//IL_039a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0240: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0251: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0260: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0279: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0301: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0311: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0386: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_039d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0417: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0425: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0434: Unknown result type (might be due to invalid IL or missing references)
 			if (Item == null)
 			{
 				return;
@@ -103,7 +105,7 @@ namespace MysticCrafting.Module.Discovery.ItemList
 			itemButton.Rarity = Item.Rarity.ToString();
 			itemButton.Type = LocalizationHelper.TranslateMenuItem(Item.DetailsType);
 			itemButton.Item = Item;
-			((Control)itemButton).set_Size(new Point(344, 60));
+			((Control)itemButton).set_Size(new Point(344, 45));
 			ItemButton detailsButton = itemButton;
 			AsyncTexture2D iconTexture = ServiceContainer.TextureRepository.GetTexture(Item.Icon);
 			if (iconTexture != null)
@@ -112,8 +114,8 @@ namespace MysticCrafting.Module.Discovery.ItemList
 				{
 					Image val = new Image(iconTexture);
 					((Control)val).set_Parent(buildPanel);
-					((Control)val).set_Location(new Point(3, 4));
-					((Control)val).set_Size(new Point(52, 52));
+					((Control)val).set_Location(new Point(2, 3));
+					((Control)val).set_Size(new Point(40, 40));
 					((Control)val).set_Tooltip((Tooltip)(object)new DisposableTooltip((ITooltipView)(object)new ItemTooltipView(Item, 0)));
 				}
 				catch (Exception)
@@ -139,13 +141,19 @@ namespace MysticCrafting.Module.Discovery.ItemList
 			if (Item.HasSkin())
 			{
 				_ = Item.DefaultSkin;
-				bool skinUnlocked = ServiceContainer.PlayerUnlocksService.ItemUnlocked(Item.DefaultSkin);
-				Image val4 = new Image(skinUnlocked ? ServiceContainer.TextureRepository.Textures.Checkmark : ServiceContainer.TextureRepository.Textures.Lock);
-				((Control)val4).set_Parent(buildPanel);
-				((Control)val4).set_Location(new Point(((Control)buildPanel).get_Size().X - 190, ((Control)buildPanel).get_Size().Y / 2 - 20));
-				((Control)val4).set_Size(new Point(40, 40));
-				((Control)val4).set_BasicTooltipText(skinUnlocked ? Common.SkinUnlocked : Common.SkinLocked);
 			}
+			else if (!Item.IsDye())
+			{
+				goto IL_0290;
+			}
+			bool skinUnlocked = (Item.IsDye() ? ServiceContainer.PlayerUnlocksService.DyeUnlocked(Item.Id) : ServiceContainer.PlayerUnlocksService.ItemUnlocked(Item.DefaultSkin));
+			Image val4 = new Image(skinUnlocked ? ServiceContainer.TextureRepository.Textures.Checkmark : ServiceContainer.TextureRepository.Textures.Lock);
+			((Control)val4).set_Parent(buildPanel);
+			((Control)val4).set_Location(new Point(((Control)buildPanel).get_Size().X - 210, ((Control)buildPanel).get_Size().Y / 2 - 15));
+			((Control)val4).set_Size(new Point(30, 30));
+			((Control)val4).set_BasicTooltipText(skinUnlocked ? Common.SkinUnlocked : Common.SkinLocked);
+			goto IL_0290;
+			IL_0290:
 			if (Item.Rarity == ItemRarity.Legendary)
 			{
 				int unlockedCount2 = ServiceContainer.PlayerUnlocksService.LegendaryUnlockedCount(Item.Id);
@@ -153,23 +161,24 @@ namespace MysticCrafting.Module.Discovery.ItemList
 				Label val5 = new Label();
 				((Control)val5).set_Parent(buildPanel);
 				val5.set_AutoSizeWidth(true);
-				((Control)val5).set_Location(new Point(((Control)buildPanel).get_Size().X - 110, ((Control)buildPanel).get_Size().Y / 2 - 10));
+				((Control)val5).set_Location(new Point(((Control)buildPanel).get_Size().X - 120, ((Control)buildPanel).get_Size().Y / 2 - 10));
 				val5.set_Font(GameService.Content.get_DefaultFont14());
 				val5.set_Text($"{unlockedCount2}/{maxCount}");
 				((Control)val5).set_BasicTooltipText(string.Format(Recipe.TooltipUnlockedItem, unlockedCount2, maxCount));
 			}
-			else
+			else if (!Item.IsDecoration())
 			{
 				int unlockedCount = ServiceContainer.PlayerItemService.GetItemCount(Item.Id);
 				Label val6 = new Label();
 				((Control)val6).set_Parent(buildPanel);
 				val6.set_AutoSizeWidth(true);
-				((Control)val6).set_Location(new Point(((Control)buildPanel).get_Size().X - 110, ((Control)buildPanel).get_Size().Y / 2 - 10));
-				val6.set_Font(GameService.Content.get_DefaultFont14());
+				((Control)val6).set_Location(new Point(((Control)buildPanel).get_Size().X - 120, ((Control)buildPanel).get_Size().Y / 2 - 10));
+				val6.set_Font(GameService.Content.get_DefaultFont16());
 				val6.set_Text($"{unlockedCount}");
+				val6.set_TextColor(Color.get_LightYellow());
 				((Control)val6).set_BasicTooltipText(string.Format(Recipe.TooltipCollectedItem, unlockedCount));
 			}
-			((Control)new ButtonPresenter().BuildFavoriteButton(Item.Id, buildPanel)).set_Location(new Point(((Control)buildPanel).get_Size().X - 60, ((Control)buildPanel).get_Size().Y / 2 - 20));
+			((Control)new ButtonPresenter().BuildFavoriteButton(Item.Id, buildPanel)).set_Location(new Point(((Control)buildPanel).get_Size().X - 50, ((Control)buildPanel).get_Size().Y / 2 - 20));
 			if (OnClick != null)
 			{
 				((Control)detailsButton).add_Click(OnClick);

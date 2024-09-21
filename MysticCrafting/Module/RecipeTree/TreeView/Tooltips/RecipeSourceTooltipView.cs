@@ -127,7 +127,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Tooltips
 			}
 			if (RecipeSource.Recipe.DisciplineCount == 1)
 			{
-				string disciplineLabel = LocalizationHelper.TranslateProfession(RecipeSource.Recipe.Disciplines.FirstOrDefault());
+				string disciplineLabel = LocalizationHelper.TranslateDiscipline(RecipeSource.Recipe.Disciplines.FirstOrDefault());
 				List<Control> controls2 = _controls;
 				Label val2 = new Label();
 				((Control)val2).set_Parent(BuildPanel);
@@ -179,32 +179,32 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Tooltips
 			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00bc: Expected O, but got Unknown
-			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0139: Expected O, but got Unknown
-			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014e: Expected O, but got Unknown
+			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
 			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018c: Expected O, but got Unknown
-			//IL_0198: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fd: Expected O, but got Unknown
-			//IL_0221: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0188: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0199: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a2: Expected O, but got Unknown
+			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0216: Expected O, but got Unknown
+			//IL_023a: Unknown result type (might be due to invalid IL or missing references)
 			if (RecipeSource.Recipe.IsMysticForgeRecipe)
 			{
 				InitializeMysticForge();
@@ -227,10 +227,15 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Tooltips
 			yPosition += 25;
 			foreach (Ingredient ingredient in RecipeSource.Recipe.Ingredients)
 			{
+				AsyncTexture2D imgTexture = ServiceContainer.TextureRepository.GetRefTexture("102804_trimmed.png");
 				if (ingredient.Item != null)
 				{
+					imgTexture = ServiceContainer.TextureRepository.GetTexture(ingredient.Item.Icon);
+				}
+				if (imgTexture != null)
+				{
 					List<Control> controls2 = _controls;
-					Image val2 = new Image(ServiceContainer.TextureRepository.GetTexture(ingredient.Item.Icon));
+					Image val2 = new Image(imgTexture);
 					((Control)val2).set_Parent(BuildPanel);
 					((Control)val2).set_Size(new Point(20, 20));
 					((Control)val2).set_Location(new Point(5, yPosition));
@@ -247,7 +252,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Tooltips
 				_controls.Add((Control)(object)countLabel);
 				Label val4 = new Label();
 				((Control)val4).set_Parent(BuildPanel);
-				val4.set_Text((ingredient.Item != null) ? ingredient.Item.LocalizedName() : string.Empty);
+				val4.set_Text((ingredient.Item != null) ? ingredient.Item.LocalizedName() : ingredient.Name);
 				val4.set_Font(GameService.Content.get_DefaultFont16());
 				((Control)val4).set_Location(new Point(((Control)countLabel).get_Right() + 5, yPosition));
 				val4.set_StrokeText(true);

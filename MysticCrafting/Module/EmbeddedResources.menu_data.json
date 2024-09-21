@@ -1,236 +1,523 @@
 [
-    {
-        "Name": "Favorites",
-        "Icon": 156331,
-        "Filters": {
-            "IsFavorite": true
-        },
-        "SelectedByDefault": true
+  {
+    "Name": "Favorites",
+    "Icon": 156331,
+    "Filters": {
+      "IsFavorite": true
     },
-    {
-        "Name": "Weapons",
-        "Filters": {
-            "Type": 19
-        },
-        "Children": [
-            {
-                "Name": "Axes",
-                "Filters": {
-                    "DetailsType": "Axe"
-                }
-            },
-            {
-                "Name": "Daggers",
-                "Filters": {
-                    "DetailsType": "Dagger"
-                }
-            },
-            {
-                "Name": "Foci",
-                "Filters": {
-                    "DetailsType": "Focus"
-                }
-            },
-            {
-                "Name": "Greatswords",
-                "Filters": {
-                    "DetailsType": "Greatsword"
-                }
-            },
-            {
-                "Name": "Hammers",
-                "Filters": {
-                    "DetailsType": "Hammer"
-                }
-            },
-            {
-                "Name": "Longbows",
-                "Filters": {
-                    "DetailsType": "LongBow"
-                }
-            },
-            {
-                "Name": "Short Bows",
-                "Filters": {
-                    "DetailsType": "ShortBow"
-                }
-            },
-            {
-                "Name": "Maces",
-                "Filters": {
-                    "DetailsType": "Mace"
-                }
-            },
-            {
-                "Name": "Pistols",
-                "Filters": {
-                    "DetailsType": "Pistol"
-                }
-            },
-            {
-                "Name": "Rifles",
-                "Filters": {
-                    "DetailsType": "Rifle"
-                }
-            },
-            {
-                "Name": "Scepters",
-                "Filters": {
-                    "DetailsType": "Scepter"
-                }
-            },
-            {
-                "Name": "Staffs",
-                "Filters": {
-                    "DetailsType": "Staff"
-                }
-            },
-            {
-                "Name": "Swords",
-                "Filters": {
-                    "DetailsType": "Sword"
-                }
-            },
-            {
-                "Name": "Torches",
-                "Filters": {
-                    "DetailsType": "Torch"
-                }
-            },
-            {
-                "Name": "Warhorns",
-                "Filters": {
-                    "DetailsType": "Warhorn"
-                }
-            },
-            {
-                "Name": "Shields",
-                "Filters": {
-                    "DetailsType": "Shield"
-                }
-            },
-            {
-                "Name": "Spears",
-                "Filters": {
-                    "DetailsType": "Harpoon"
-                }
-            },
-            {
-                "Name": "Harpoon guns",
-                "Filters": {
-                    "DetailsType": "Speargun"
-                }
-            },
-            {
-                "Name": "Tridents",
-                "Filters": {
-                    "DetailsType": "Trident"
-                }
-            }
-        ]
+    "SelectedByDefault": true
+  },
+  {
+    "Name": "Weapons",
+    "Filters": {
+      "Type": 19
     },
-    {
-        "Name": "Armor",
+    "Children": [
+      {
+        "Name": "Axes",
         "Filters": {
-            "Type": 1
-        },
-        "Children": [
-            {
-                "Name": "Headgear",
-                "Filters": {
-                    "DetailsType": "Helm"
-                }
-            },
-            {
-                "Name": "Shoulders",
-                "Filters": {
-                    "DetailsType": "Shoulders"
-                }
-            },
-            {
-                "Name": "Chest",
-                "Filters": {
-                    "DetailsType": "Coat"
-                }
-            },
-            {
-                "Name": "Gloves",
-                "Filters": {
-                    "DetailsType": "Gloves"
-                }
-            },
-            {
-                "Name": "Leggings",
-                "Filters": {
-                    "DetailsType": "Leggings"
-                }
-            },
-            {
-                "Name": "Boots",
-                "Filters": {
-                    "DetailsType": "Boots"
-                }
-            },
-            {
-                "Name": "Backpieces",
-                "Filters": {
-                    "Type": 2
-                }
-            }
-        ]
+          "DetailsType": "Axe"
+        }
+      },
+      {
+        "Name": "Daggers",
+        "Filters": {
+          "DetailsType": "Dagger"
+        }
+      },
+      {
+        "Name": "Foci",
+        "Filters": {
+          "DetailsType": "Focus"
+        }
+      },
+      {
+        "Name": "Greatswords",
+        "Filters": {
+          "DetailsType": "Greatsword"
+        }
+      },
+      {
+        "Name": "Hammers",
+        "Filters": {
+          "DetailsType": "Hammer"
+        }
+      },
+      {
+        "Name": "Longbows",
+        "Filters": {
+          "DetailsType": "LongBow"
+        }
+      },
+      {
+        "Name": "Short Bows",
+        "Filters": {
+          "DetailsType": "ShortBow"
+        }
+      },
+      {
+        "Name": "Maces",
+        "Filters": {
+          "DetailsType": "Mace"
+        }
+      },
+      {
+        "Name": "Pistols",
+        "Filters": {
+          "DetailsType": "Pistol"
+        }
+      },
+      {
+        "Name": "Rifles",
+        "Filters": {
+          "DetailsType": "Rifle"
+        }
+      },
+      {
+        "Name": "Scepters",
+        "Filters": {
+          "DetailsType": "Scepter"
+        }
+      },
+      {
+        "Name": "Staffs",
+        "Filters": {
+          "DetailsType": "Staff"
+        }
+      },
+      {
+        "Name": "Swords",
+        "Filters": {
+          "DetailsType": "Sword"
+        }
+      },
+      {
+        "Name": "Torches",
+        "Filters": {
+          "DetailsType": "Torch"
+        }
+      },
+      {
+        "Name": "Warhorns",
+        "Filters": {
+          "DetailsType": "Warhorn"
+        }
+      },
+      {
+        "Name": "Shields",
+        "Filters": {
+          "DetailsType": "Shield"
+        }
+      },
+      {
+        "Name": "Spears",
+        "Filters": {
+          "DetailsType": "Harpoon"
+        }
+      },
+      {
+        "Name": "Harpoon guns",
+        "Filters": {
+          "DetailsType": "Speargun"
+        }
+      },
+      {
+        "Name": "Tridents",
+        "Filters": {
+          "DetailsType": "Trident"
+        }
+      }
+    ]
+  },
+  {
+    "Name": "Armor",
+    "Filters": {
+      "Type": 1
     },
-    {
-        "Name": "Trinkets",
+    "Children": [
+      {
+        "Name": "Headgear",
         "Filters": {
-            "Type": 16
-        },
-        "Children": [
-            {
-                "Name": "Accessories",
-                "Filters": {
-                    "DetailsType": "Accessory"
-                }
-            },
-            {
-                "Name": "Amulets",
-                "Filters": {
-                    "DetailsType": "Amulet"
-                }
-            },
-            {
-                "Name": "Rings",
-                "Filters": {
-                    "DetailsType": "Ring"
-                }
-            }
-        ]
+          "DetailsType": "Helm"
+        }
+      },
+      {
+        "Name": "Shoulders",
+        "Filters": {
+          "DetailsType": "Shoulders"
+        }
+      },
+      {
+        "Name": "Chest",
+        "Filters": {
+          "DetailsType": "Coat"
+        }
+      },
+      {
+        "Name": "Gloves",
+        "Filters": {
+          "DetailsType": "Gloves"
+        }
+      },
+      {
+        "Name": "Leggings",
+        "Filters": {
+          "DetailsType": "Leggings"
+        }
+      },
+      {
+        "Name": "Boots",
+        "Filters": {
+          "DetailsType": "Boots"
+        }
+      },
+      {
+        "Name": "Backpieces",
+        "Filters": {
+          "Type": 2
+        }
+      }
+    ]
+  },
+  {
+    "Name": "Trinkets",
+    "Filters": {
+      "Categories": [ 22, 23, 24, 25 ]
     },
-    {
-        "Name": "Upgrade Components",
+    "Children": [
+      {
+        "Name": "Accessories",
         "Filters": {
-            "Type": 18
-        },
-        "Children": [
-            {
-                "Name": "Weapon Sigils",
-                "Filters": {
-                    "DetailsType": "Sigil"
-                }
-            },
-            {
-                "Name": "Armor Runes",
-                "Filters": {
-                    "DetailsType": "Rune"
-                }
-            }
-        ]
+          "Categories": [ 22 ]
+        }
+      },
+      {
+        "Name": "Amulets",
+        "Filters": {
+          "Categories": [ 23 ]
+        }
+      },
+      {
+        "Name": "Relic",
+        "Filters": {
+          "Categories": [ 24 ]
+        }
+      },
+      {
+        "Name": "Rings",
+        "Filters": {
+          "Categories": [ 25 ]
+        }
+      }
+    ]
+  },
+  {
+    "Name": "Upgrade Components",
+    "Filters": {
+      "Categories": [ 1, 2, 3, 4, 5, 6 ]
     },
-    {
-        "Name": "Relics",
+    "Children": [
+      {
+        "Name": "Jewels",
         "Filters": {
-            "Type": 13
-        },
-        "Children": [
-        ]
-    }
+          "Categories": [ 1 ]
+        }
+      },
+      {
+        "Name": "Armor Runes",
+        "Filters": {
+          "Categories": [ 2 ]
+        }
+      },
+      {
+        "Name": "Weapon Sigils",
+        "Filters": {
+          "Categories": [ 3 ]
+        }
+      },
+      {
+        "Name": "Infusions",
+        "Filters": {
+          "Categories": [ 4 ]
+        }
+      },
+      {
+        "Name": "Enrichments",
+        "Filters": {
+          "Categories": [ 5 ]
+        }
+      },
+      {
+        "Name": "Glyphs",
+        "Filters": {
+          "Categories": [ 6 ]
+        }
+      }
+    ]
+  },
+
+  {
+    "Name": "Crafting Materials",
+    "Filters": {
+      "Types": [ 6 ]
+    },
+    "Children": [
+      {
+        "Name": "Ascended Crafting",
+        "Filters": {
+          "Categories": [ 94 ]
+        }
+      },
+      {
+        "Name": "Rare Crafting",
+        "Filters": {
+          "Categories": [ 102 ]
+        }
+      },
+      {
+        "Name": "Fine Crafting",
+        "Filters": {
+          "Categories": [ 98 ]
+        }
+      },
+      {
+        "Name": "Basic Crafting",
+        "Filters": {
+          "Categories": [ 95 ]
+        }
+      },
+      {
+        "Name": "Ingredients",
+        "Filters": {
+          "Categories": [ 99 ]
+        }
+      },
+      {
+        "Name": "Mystic Items",
+        "Filters": {
+          "Categories": [ 101 ]
+        }
+      },
+      {
+        "Name": "Inscriptions",
+        "Filters": {
+          "Categories": [ 105 ]
+        }
+      },
+      {
+        "Name": "Insignia",
+        "Filters": {
+          "Categories": [ 106 ]
+        }
+      },
+      {
+        "Name": "Runes of Holding",
+        "Filters": {
+          "Categories": [ 107 ]
+        }
+      }
+    ]
+  },
+  {
+    "Name": "Bags",
+    "Filters": {
+      "Categories": [ 17, 18, 19, 20, 21 ]
+    },
+    "Children": [
+      {
+        "Name": "Basic",
+        "Filters": {
+          "Categories": [ 17 ]
+        }
+      },
+      {
+        "Name": "Craftsman",
+        "Filters": {
+          "Categories": [ 18 ]
+        }
+      },
+      {
+        "Name": "Equipment",
+        "Filters": {
+          "Categories": [ 19 ]
+        }
+      },
+      {
+        "Name": "Invisible",
+        "Filters": {
+          "Categories": [ 20 ]
+        }
+      },
+      {
+        "Name": "Oiled",
+        "Filters": {
+          "Categories": [ 21 ]
+        }
+      }
+    ]
+  },
+  {
+    "Name": "Guild Decorations",
+    "Filters": {
+      "Categories": [ 28, 29, 30, 31, 32, 34, 35, 36, 37]
+    },
+    "Children": [
+      {
+        "Name": "Architecture",
+        "Filters": {
+          "Categories": [ 28 ]
+        }
+      },
+      {
+        "Name": "Festivals",
+        "Filters": {
+          "Categories": [ 29 ]
+        }
+      },
+      {
+        "Name": "Furniture",
+        "Filters": {
+          "Categories": [ 30 ]
+        }
+      },
+      {
+        "Name": "Lighting",
+        "Filters": {
+          "Categories": [ 31 ]
+        }
+      },
+      {
+        "Name": "Monuments",
+        "Filters": {
+          "Categories": [ 32 ]
+        }
+      },
+      {
+        "Name": "Plants",
+        "Filters": {
+          "Categories": [ 35 ]
+        }
+      },
+      {
+        "Name": "Statuary",
+        "Filters": {
+          "Categories": [ 36 ]
+        }
+      },
+      {
+        "Name": "Trophies",
+        "Filters": {
+          "Categories": [ 37 ]
+        }
+      },
+      {
+        "Name": "Other",
+        "Filters": {
+          "Categories": [ 34 ]
+        }
+      }
+    ]
+  },
+  {
+    "Name": "Food",
+    "Filters": {
+      "Categories": [ 7, 8, 9, 10, 11 ]
+    },
+    "Children": [
+      {
+        "Name": "Desserts",
+        "Filters": {
+          "Categories": [ 7 ]
+        }
+      },
+      {
+        "Name": "Feasts",
+        "Filters": {
+          "Categories": [ 8 ]
+        }
+      },
+      {
+        "Name": "Meals",
+        "Filters": {
+          "Categories": [ 9 ]
+        }
+      },
+      {
+        "Name": "Snacks",
+        "Filters": {
+          "Categories": [ 10 ]
+        }
+      },
+      {
+        "Name": "Soups",
+        "Filters": {
+          "Categories": [ 11 ]
+        }
+      }
+    ]
+  },
+  {
+    "Name": "Jade Tech",
+    "Filters": {
+      "Types": [ 9, 12 ]
+    },
+    "Children": [
+      {
+        "Name": "Modules",
+        "Filters": {
+          "Type": 9
+        }
+      },
+      {
+        "Name": "Power Cores",
+        "Filters": {
+          "Type": 12
+        }
+      }
+    ]
+  },
+  {
+    "Name": "Consumables",
+    "Filters": {
+      "Categories": [ 48, 50, 12, 13, 15, 63, 64, 103, 108, 109, 110, 111, 112 ]
+    },
+    "Children": [
+      {
+        "Name": "Alcohol",
+        "Filters": {
+          "Categories": [ 48 ]
+        }
+      },
+      {
+        "Name": "Blueprints",
+        "Filters": {
+          "Categories": [ 50 ]
+        }
+      },
+      {
+        "Name": "Dyes",
+        "Filters": {
+          "Categories": [ 108, 109, 110, 111, 112 ]
+        }
+      },
+      {
+        "Name": "Tonics",
+        "Filters": {
+          "Categories": [ 12, 13, 15, 63 ]
+        }
+      },
+      {
+        "Name": "Utility",
+        "Filters": {
+          "Categories": [ 64 ]
+        }
+      },
+      {
+        "Name": "Schematics",
+        "Filters": {
+          "Categories": [ 103 ]
+        }
+      }
+    ]
+  }
 ]

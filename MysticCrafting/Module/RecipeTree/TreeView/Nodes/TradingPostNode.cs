@@ -9,7 +9,34 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 {
 	public class TradingPostNode : TreeNodeSelect
 	{
-		public int UnitPrice { get; }
+		private long _unitPrice;
+
+		private CoinsControl _priceControl;
+
+		private Label _coinLabel;
+
+		public long UnitPrice
+		{
+			get
+			{
+				return _unitPrice;
+			}
+			set
+			{
+				if (_unitPrice != value)
+				{
+					_unitPrice = value;
+					if (_priceControl != null)
+					{
+						_priceControl.UnitPrice = value;
+					}
+					if (_coinLabel != null)
+					{
+						((Control)_coinLabel).set_Visible(value == 0);
+					}
+				}
+			}
+		}
 
 		public string DisplayName { get; }
 
@@ -19,7 +46,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 
 		public TradingPostOptions Option { get; set; }
 
-		public TradingPostNode(int unitPrice, string displayName, TradingPostOptions option, Container parent)
+		public TradingPostNode(long unitPrice, string displayName, TradingPostOptions option, Container parent)
 			: base(parent)
 		{
 			UnitPrice = unitPrice;
@@ -39,15 +66,17 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00db: Expected O, but got Unknown
 			((Container)this).ClearChildren();
 			Label val = new Label();
 			((Control)val).set_Parent((Container)(object)this);
@@ -59,19 +88,17 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			CoinsControl coinsControl = new CoinsControl((Container)(object)this);
 			((Control)coinsControl).set_Location(new Point(380, 10));
 			coinsControl.UnitPrice = UnitPrice;
-			CoinsControl price = coinsControl;
-			string coinLabelText = Recipe.PriceEach;
-			if (UnitPrice == 0)
-			{
-				coinLabelText = Recipe.Unavailable;
-			}
+			_priceControl = coinsControl;
+			string coinLabelText = Recipe.Unavailable;
 			Label val2 = new Label();
 			((Control)val2).set_Parent((Container)(object)this);
 			val2.set_Text(coinLabelText);
-			((Control)val2).set_Location(new Point(((Control)price).get_Right(), 10));
+			((Control)val2).set_Location(new Point(((Control)_priceControl).get_Right(), 10));
 			val2.set_Font(GameService.Content.get_DefaultFont16());
 			val2.set_StrokeText(true);
 			val2.set_AutoSizeWidth(true);
+			((Control)val2).set_Visible(UnitPrice == 0);
+			_coinLabel = val2;
 			base.Build();
 		}
 	}

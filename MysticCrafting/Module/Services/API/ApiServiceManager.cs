@@ -7,13 +7,13 @@ namespace MysticCrafting.Module.Services.API
 {
 	public class ApiServiceManager : IApiServiceManager
 	{
-		public List<IApiService> RecurringServices { get; set; } = new List<IApiService>();
+		public List<IApiService> ApiServices { get; set; } = new List<IApiService>();
 
 
 		public async Task LoadServicesAsync()
 		{
 			List<Task> tasks = new List<Task>();
-			foreach (IApiService service in RecurringServices)
+			foreach (IApiService service in ApiServices)
 			{
 				if (DateTime.Now > service.LastLoaded.AddMinutes(service.ExecutionIntervalMinutes))
 				{
@@ -25,15 +25,15 @@ namespace MysticCrafting.Module.Services.API
 
 		public void RegisterService(IApiService service)
 		{
-			if (!RecurringServices.Any((IApiService s) => s.Name.Equals(service.Name)))
+			if (!ApiServices.Any((IApiService s) => s.Name.Equals(service.Name)))
 			{
-				RecurringServices.Add(service);
+				ApiServices.Add(service);
 			}
 		}
 
 		public List<IApiService> GetServices()
 		{
-			return RecurringServices;
+			return ApiServices;
 		}
 	}
 }

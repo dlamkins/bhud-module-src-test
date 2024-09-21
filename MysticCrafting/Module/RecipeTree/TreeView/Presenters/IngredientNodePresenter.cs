@@ -51,21 +51,25 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 			}
 			foreach (Ingredient ingredient in recipe.Ingredients.OrderBy((Ingredient i) => i.Index))
 			{
-				ItemIngredientNode node = BuildItemNode(ingredient, parent, loadingChildren: true);
+				IngredientNode node = ((ingredient.Item != null) ? ((IngredientNode)BuildItemNode(ingredient, parent, loadingChildren: true)) : ((IngredientNode)BuildUnknownNode(ingredient, parent, loadingChildren: true)));
 				if (node == null)
 				{
 					continue;
 				}
-				if (!_excludedItems.Contains(node.Item.Id))
+				if (!_excludedItems.Contains(node.Id))
 				{
-					ItemTab selectedTab = BuildTabs(node, node.Item);
-					if (selectedTab != null)
+					ItemIngredientNode itemNode = node as ItemIngredientNode;
+					if (itemNode != null)
 					{
-						BuildChildren(selectedTab.ItemSource, (Container)(object)node);
-					}
-					else
-					{
-						node.BuildMissingTabsLabel();
+						ItemTab selectedTab = BuildTabs(node, itemNode.Item);
+						if (selectedTab != null)
+						{
+							BuildChildren(selectedTab.ItemSource, (Container)(object)node);
+						}
+						else
+						{
+							node.BuildMissingTabsLabel();
+						}
 					}
 				}
 				else
@@ -107,6 +111,24 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 			node.LoadingChildren = false;
 			node.OnChildrenLoaded();
 			return node;
+		}
+
+		public UnknownIngredientNode BuildUnknownNode(Ingredient ingredient, Container parent, bool loadingChildren = false, bool expandable = false)
+		{
+			if (ingredient.Item != null)
+			{
+				return null;
+			}
+			UnknownIngredientNode unknownIngredientNode = new UnknownIngredientNode(ingredient, parent, null, loadingChildren);
+			((Control)unknownIngredientNode).set_Width(((Control)parent).get_Width() - 25);
+			unknownIngredientNode.PanelHeight = 40;
+			unknownIngredientNode.PanelExtensionHeight = 0;
+			unknownIngredientNode.Build(parent);
+			unknownIngredientNode.OnPanelClick += delegate
+			{
+				_recipeDetailsPresenter.SaveScrollDistance();
+			};
+			return unknownIngredientNode;
 		}
 
 		public ItemIngredientNode BuildItemNode(Ingredient ingredient, Container parent, bool loadingChildren = false, bool expandable = false)
@@ -170,8 +192,13 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 
 		public void BuildChildren(IItemSource itemSource, Container parent)
 		{
-			//IL_0242: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0292: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0329: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0379: Unknown result type (might be due to invalid IL or missing references)
 			TreeNodeBase node = parent as TreeNodeBase;
 			if (node != null)
 			{
@@ -185,22 +212,42 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 			RecipeSource recipeSource = itemSource as RecipeSource;
 			if (recipeSource != null && recipeSource.Recipe != null)
 			{
-				if (recipeSource.Recipe.RecipeSheets != null && recipeSource.Recipe.RecipeSheets.Any())
+				if (recipeSource.Recipe.RecipeSheets != null && recipeSource.Recipe.RecipeSheets.Any() && !ServiceContainer.PlayerUnlocksService.RecipeUnlocked(recipeSource.Recipe))
 				{
+					((Control)new LabelNode(MysticCrafting.Module.Strings.Recipe.RecipeSheetLabel, parent)
+					{
+						TextColor = Color.get_White()
+					}).set_Width(((Control)parent).get_Width() - 25);
 					_recipeSheetPresenter.BuildNode(recipeSource.Recipe, parent);
 				}
+				((Control)new LabelNode((recipeSource.Source == RecipeType.MysticForge) ? MysticCrafting.Module.Strings.Recipe.ForgingItemsLabel : MysticCrafting.Module.Strings.Recipe.CraftingItemsLabel, parent)
+				{
+					TextColor = Color.get_White()
+				}).set_Width(((Control)parent).get_Width() - 25);
 				BuildNodes(recipeSource.Recipe, parent);
 			}
 			TradingPostSource tradingPostSource = itemSource as TradingPostSource;
 			if (tradingPostSource != null)
 			{
+				((Control)new LabelNode(MysticCrafting.Module.Strings.Recipe.BuyingItemsLabel, parent)
+				{
+					TextColor = Color.get_White()
+				}).set_Width(((Control)parent).get_Width() - 25);
 				_tradingPostPresenter.Build(parent, tradingPostSource);
 			}
 			VendorSource vendorSource = itemSource as VendorSource;
 			if (vendorSource != null)
 			{
+				((Control)new LabelNode(MysticCrafting.Module.Strings.Recipe.SellerItemsLabel, parent)
+				{
+					TextColor = Color.get_White()
+				}).set_Width(((Control)parent).get_Width() - 25);
 				foreach (VendorNode vendorNode in _vendorPresenter.Build(parent, vendorSource))
 				{
+					((Control)new LabelNode(MysticCrafting.Module.Strings.Recipe.SellerItemCostsLabel, (Container)(object)vendorNode)
+					{
+						TextColor = Color.get_White()
+					}).set_Width(((Control)vendorNode).get_Width() - 25);
 					vendorNode.OnPanelClick += delegate
 					{
 						_recipeDetailsPresenter.SaveScrollDistance();

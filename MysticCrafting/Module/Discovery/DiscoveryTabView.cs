@@ -1,18 +1,16 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
-using Atzie.MysticCrafting.Models.Items;
+using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
-using MysticCrafting.Models.Items;
-using MysticCrafting.Module.Discovery.Home;
 using MysticCrafting.Module.Discovery.ItemList;
 using MysticCrafting.Module.Discovery.ItemList.Controls;
 using MysticCrafting.Module.Discovery.Loading;
+using MysticCrafting.Module.Discovery.Menu;
 using MysticCrafting.Module.Discovery.Version;
 using MysticCrafting.Module.Menu;
 using MysticCrafting.Module.RecipeTree;
@@ -25,6 +23,8 @@ namespace MysticCrafting.Module.Discovery
 {
 	public class DiscoveryTabView : View<IDiscoveryTabPresenter>
 	{
+		private static readonly Logger Logger = Logger.GetLogger<DiscoveryTabView>();
+
 		private TextBox _searchBar;
 
 		private Panel _menuPanel;
@@ -41,6 +41,16 @@ namespace MysticCrafting.Module.Discovery
 
 		private Panel DiscoveryOverviewContainer;
 
+		private FlowPanel _leftSidePanel;
+
+		private readonly List<MenuPanel> _panels = new List<MenuPanel>();
+
+		private SkinsMenuPanel _skinsPanel;
+
+		private SourcesMenuPanel _sourcesPanel;
+
+		private RaritiesMenuPanel _raritiesPanel;
+
 		private RecipeDetailsView RecipeView;
 
 		private Timer _searchTimer;
@@ -52,8 +62,6 @@ namespace MysticCrafting.Module.Discovery
 		public ItemListModel ItemListModel { get; set; }
 
 		public ViewContainer ItemListContainer { get; set; }
-
-		public HomeView HomeView { get; set; }
 
 		public string NameFilter
 		{
@@ -108,6 +116,16 @@ namespace MysticCrafting.Module.Discovery
 			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0077: Expected O, but got Unknown
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fc: Expected O, but got Unknown
 			BuildPanel = buildPanel;
 			ViewContainer val = new ViewContainer();
 			((Control)val).set_Parent(buildPanel);
@@ -120,11 +138,41 @@ namespace MysticCrafting.Module.Discovery
 			val2.set_ShowBorder(false);
 			val2.set_ShowTint(false);
 			DiscoveryOverviewContainer = val2;
-			BuildSearchBar((Container)(object)DiscoveryOverviewContainer);
-			BuildItemList((Container)(object)DiscoveryOverviewContainer);
-			BuildMenu((Container)(object)DiscoveryOverviewContainer);
-			BuildLoadingStatusView(BuildPanel);
-			BuildVersionIndicatorView(BuildPanel);
+			try
+			{
+				BuildSearchBar((Container)(object)DiscoveryOverviewContainer);
+				BuildItemList((Container)(object)DiscoveryOverviewContainer);
+				FlowPanel val3 = new FlowPanel();
+				((Control)val3).set_Parent((Container)(object)DiscoveryOverviewContainer);
+				((Control)val3).set_Size(new Point(((DesignStandard)(ref Panel.MenuStandard)).get_Size().X, ((DesignStandard)(ref Panel.MenuStandard)).get_Size().Y + 50 - ((Control)_searchBar).get_Height()));
+				((Control)val3).set_Location(new Point(0, ((Control)_searchBar).get_Height()));
+				val3.set_FlowDirection((ControlFlowDirection)6);
+				_leftSidePanel = val3;
+				BuildRaritiesPanel((Container)(object)_leftSidePanel);
+				BuildSourcesPanel((Container)(object)_leftSidePanel);
+				BuildMenu((Container)(object)_leftSidePanel);
+				BuildLoadingStatusView(BuildPanel);
+				BuildVersionIndicatorView(BuildPanel);
+			}
+			catch (Exception ex)
+			{
+				Logger.Error("Loading discovery view failed with error: " + ex.Message + ". Stacktrace: " + ex.StackTrace);
+			}
+		}
+
+		public void ResizeMenu()
+		{
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			if (_menuPanel != null && Menu != null)
+			{
+				((Control)_menuPanel).set_Height(((DesignStandard)(ref Panel.MenuStandard)).get_Size().Y - ((Control)_sourcesPanel).get_Height() - ((Control)_raritiesPanel).get_Height());
+				CategoryMenu menu = Menu;
+				Rectangle contentRegion = ((Container)_menuPanel).get_ContentRegion();
+				((Control)menu).set_Size(((Rectangle)(ref contentRegion)).get_Size());
+			}
 		}
 
 		private void BuildItemList(Container parent)
@@ -147,29 +195,7 @@ namespace MysticCrafting.Module.Discovery
 			((Control)val).set_Location(new Point(((DesignStandard)(ref Panel.MenuStandard)).get_Size().X, 0));
 			((Panel)val).set_ShowBorder(true);
 			ItemListContainer = val;
-			ReloadItemList(new ItemListModel(ServiceContainer.ItemRepository));
-		}
-
-		public void ReloadItemList(ItemListModel model)
-		{
-			((Container)ItemListContainer).ClearChildren();
-			ItemRarity? rarity = ItemListModel?.Filter.Rarity;
-			bool? collectionOption1 = ItemListModel?.Filter.HideSkinUnlocked;
-			bool? collectionOption2 = ItemListModel?.Filter.HideSkinUnlocked;
-			bool? collectionOption3 = ItemListModel?.Filter.HideMaxItemsCollected;
-			WeightClass? weightClass = ItemListModel?.Filter.Weight;
-			string legendaryType = ItemListModel?.Filter.LegendaryType;
-			ItemListModel = model;
-			if (ItemListModel.Filter == null)
-			{
-				ItemListModel.Filter = new MysticItemFilter();
-			}
-			ItemListModel.Filter.Rarity = rarity.GetValueOrDefault();
-			ItemListModel.Filter.HideSkinUnlocked = collectionOption1.GetValueOrDefault();
-			ItemListModel.Filter.HideSkinUnlocked = collectionOption2.GetValueOrDefault();
-			ItemListModel.Filter.HideMaxItemsCollected = collectionOption3.GetValueOrDefault();
-			ItemListModel.Filter.Weight = weightClass.GetValueOrDefault();
-			ItemListModel.Filter.LegendaryType = legendaryType ?? string.Empty;
+			ItemListModel = new ItemListModel(ServiceContainer.ItemRepository);
 			ItemList = new ItemListView(ItemListModel);
 			ItemListView itemList = ItemList;
 			itemList.ItemClicked = (EventHandler<EventArgs>)Delegate.Combine(itemList.ItemClicked, new EventHandler<EventArgs>(ItemClicked));
@@ -204,43 +230,6 @@ namespace MysticCrafting.Module.Discovery
 			}
 		}
 
-		public void BuildHomeView()
-		{
-			if (HomeView == null)
-			{
-				HomeView = new HomeView(new HomeViewModel(), base.get_Presenter());
-				HomeView homeView = HomeView;
-				homeView.LightClick = (EventHandler)Delegate.Combine(homeView.LightClick, (EventHandler)delegate
-				{
-					ItemListModel.Filter.Weight = WeightClass.Light;
-					ItemListModel.Filter.Rarity = ItemRarity.Legendary;
-					ItemListModel.Filter.LegendaryType = "Obsidian (PvE)";
-					GoToArmorMenuItem();
-				});
-				HomeView homeView2 = HomeView;
-				homeView2.MediumClick = (EventHandler)Delegate.Combine(homeView2.MediumClick, (EventHandler)delegate
-				{
-					ItemListModel.Filter.Weight = WeightClass.Medium;
-					ItemListModel.Filter.Rarity = ItemRarity.Legendary;
-					ItemListModel.Filter.LegendaryType = "Obsidian (PvE)";
-					GoToArmorMenuItem();
-				});
-				HomeView homeView3 = HomeView;
-				homeView3.HeavyClick = (EventHandler)Delegate.Combine(homeView3.HeavyClick, (EventHandler)delegate
-				{
-					ItemListModel.Filter.Weight = WeightClass.Heavy;
-					ItemListModel.Filter.Rarity = ItemRarity.Legendary;
-					ItemListModel.Filter.LegendaryType = "Obsidian (PvE)";
-					GoToArmorMenuItem();
-				});
-			}
-		}
-
-		private void GoToArmorMenuItem()
-		{
-			((IEnumerable)((Container)Menu).get_Children()).OfType<CategoryMenuItem>().FirstOrDefault((CategoryMenuItem c) => c.ItemFilter.Type == ItemType.Armor)?.Select();
-		}
-
 		private void BuildMenu(Container parent)
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
@@ -249,20 +238,17 @@ namespace MysticCrafting.Module.Discovery
 			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007d: Expected O, but got Unknown
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Expected O, but got Unknown
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
 			Panel val = new Panel();
 			val.set_Title(Common.MenuTitle);
 			val.set_ShowBorder(true);
-			((Control)val).set_Size(new Point(((DesignStandard)(ref Panel.MenuStandard)).get_Size().X, ((DesignStandard)(ref Panel.MenuStandard)).get_Size().Y + 50 - ((Control)_searchBar).get_Height()));
-			((Control)val).set_Location(new Point(0, ((Control)_searchBar).get_Height() + 10));
+			((Control)val).set_Size(new Point(((DesignStandard)(ref Panel.MenuStandard)).get_Size().X, ((DesignStandard)(ref Panel.MenuStandard)).get_Size().Y));
 			((Control)val).set_Parent(parent);
 			val.set_CanScroll(true);
 			_menuPanel = val;
@@ -277,6 +263,85 @@ namespace MysticCrafting.Module.Discovery
 			{
 				this.MenuItemSelected?.Invoke(sender, e);
 			};
+			ResizeMenu();
+		}
+
+		private void BuildRaritiesPanel(Container parent)
+		{
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			RaritiesMenuPanel raritiesPanel = _raritiesPanel;
+			if (raritiesPanel != null)
+			{
+				((Control)raritiesPanel).Dispose();
+			}
+			RaritiesMenuPanel raritiesMenuPanel = new RaritiesMenuPanel(ItemListModel);
+			((Panel)raritiesMenuPanel).set_Title(MysticCrafting.Module.Strings.Discovery.RaritiesPanelHeading);
+			((Panel)raritiesMenuPanel).set_ShowBorder(true);
+			((Control)raritiesMenuPanel).set_Size(new Point(((DesignStandard)(ref Panel.MenuStandard)).get_Size().X, 250));
+			((Control)raritiesMenuPanel).set_Parent(parent);
+			((Panel)raritiesMenuPanel).set_CanCollapse(true);
+			((Panel)raritiesMenuPanel).set_Collapsed(true);
+			((Panel)raritiesMenuPanel).set_CanScroll(true);
+			((FlowPanel)raritiesMenuPanel).set_FlowDirection((ControlFlowDirection)1);
+			_raritiesPanel = raritiesMenuPanel;
+			((Control)_raritiesPanel).add_Resized((EventHandler<ResizedEventArgs>)delegate
+			{
+				ResizeMenu();
+			});
+			((Control)_raritiesPanel).add_Click((EventHandler<MouseEventArgs>)PanelOnClick);
+			_panels.Add(_raritiesPanel);
+		}
+
+		private void BuildSourcesPanel(Container parent)
+		{
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			SourcesMenuPanel sourcesMenuPanel = new SourcesMenuPanel(ItemListModel);
+			((Panel)sourcesMenuPanel).set_Title(MysticCrafting.Module.Strings.Discovery.SourcesPanelHeading);
+			((Panel)sourcesMenuPanel).set_ShowBorder(true);
+			((Control)sourcesMenuPanel).set_Size(new Point(((DesignStandard)(ref Panel.MenuStandard)).get_Size().X, 250));
+			((Control)sourcesMenuPanel).set_Parent(parent);
+			((Panel)sourcesMenuPanel).set_CanCollapse(true);
+			((Panel)sourcesMenuPanel).set_Collapsed(true);
+			((Panel)sourcesMenuPanel).set_CanScroll(true);
+			((FlowPanel)sourcesMenuPanel).set_FlowDirection((ControlFlowDirection)1);
+			_sourcesPanel = sourcesMenuPanel;
+			((Control)_sourcesPanel).add_Resized((EventHandler<ResizedEventArgs>)delegate
+			{
+				ResizeMenu();
+			});
+			((Control)_sourcesPanel).add_Click((EventHandler<MouseEventArgs>)PanelOnClick);
+			_panels.Add(_sourcesPanel);
+		}
+
+		private void PanelOnClick(object sender, MouseEventArgs e)
+		{
+			foreach (MenuPanel item in _panels.Where((MenuPanel p) => p != sender))
+			{
+				((Panel)item).Collapse();
+			}
+		}
+
+		private void BuildSkinsPanel(Container parent)
+		{
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			SkinsMenuPanel skinsMenuPanel = new SkinsMenuPanel(ItemListModel);
+			((Panel)skinsMenuPanel).set_Title(MysticCrafting.Module.Strings.Discovery.SkinsPanelHeading);
+			((Panel)skinsMenuPanel).set_ShowBorder(true);
+			((Control)skinsMenuPanel).set_Size(new Point(((DesignStandard)(ref Panel.MenuStandard)).get_Size().X, 175));
+			((Control)skinsMenuPanel).set_Parent(parent);
+			((Panel)skinsMenuPanel).set_CanCollapse(true);
+			((Panel)skinsMenuPanel).set_Collapsed(true);
+			((Panel)skinsMenuPanel).set_CanScroll(true);
+			((FlowPanel)skinsMenuPanel).set_FlowDirection((ControlFlowDirection)1);
+			_skinsPanel = skinsMenuPanel;
+			((Control)_skinsPanel).add_Resized((EventHandler<ResizedEventArgs>)delegate
+			{
+				ResizeMenu();
+			});
+			((Control)_skinsPanel).add_Click((EventHandler<MouseEventArgs>)PanelOnClick);
 		}
 
 		public void SetMenuItems(IList<CategoryMenuItem> menuItems)
@@ -304,8 +369,8 @@ namespace MysticCrafting.Module.Discovery
 			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
 			ViewContainer val = new ViewContainer();
 			((Control)val).set_Parent(parent);
-			((Control)val).set_Size(new Point(320, 60));
-			((Control)val).set_Location(new Point(parent.get_ContentRegion().Width - 180, parent.get_ContentRegion().Height - 60));
+			((Control)val).set_Size(new Point(420, 60));
+			((Control)val).set_Location(new Point(parent.get_ContentRegion().Width - 280, parent.get_ContentRegion().Height - 60));
 			_loadingStatusView = new LoadingStatusView(new List<IApiService>
 			{
 				ServiceContainer.TradingPostService,

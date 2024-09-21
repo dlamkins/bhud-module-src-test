@@ -10,6 +10,8 @@ namespace MysticCrafting.Module.Services
 	{
 		internal static IDataService DataService { get; set; }
 
+		internal static ISqliteDbService SqliteDbService { get; set; }
+
 		internal static IItemRepository ItemRepository { get; set; }
 
 		internal static IRecipeRepository RecipeRepository { get; set; }
@@ -47,6 +49,7 @@ namespace MysticCrafting.Module.Services
 		internal static void Register(Gw2ApiManager apiManager, DirectoriesManager directoriesManager, ContentsManager contentsManager)
 		{
 			DataService = new DataService(directoriesManager);
+			SqliteDbService = new SqliteDbService(directoriesManager);
 			ItemRepository = new ItemRepository();
 			MenuItemRepository = new LoggingMenuRepository(new MenuRepository());
 			DataService.RegisterRepository(MenuItemRepository);
@@ -59,7 +62,7 @@ namespace MysticCrafting.Module.Services
 			ChoiceRepository = new LoggingChoiceRepository(new ChoiceRepository(DataService));
 			DataService.RegisterRepository(ChoiceRepository);
 			TextureRepository = new TextureRepository(contentsManager);
-			TradingPostService = new TradingPostService(apiManager, ItemRepository);
+			TradingPostService = new TradingPostService(apiManager, SqliteDbService);
 			PlayerItemService = new PlayerItemService(apiManager);
 			PlayerUnlocksService = new PlayerUnlocksService(apiManager);
 			PlayerAchievementsService = new PlayerAchievementsService(apiManager);
@@ -67,10 +70,8 @@ namespace MysticCrafting.Module.Services
 			WalletService = new WalletService(apiManager, CurrencyRepository, PlayerItemService);
 			AudioService = new AudioService(contentsManager);
 			ApiServiceManager = new ApiServiceManager();
-			ApiServiceManager.RegisterService(TradingPostService);
 			ApiServiceManager.RegisterService(PlayerItemService);
 			ApiServiceManager.RegisterService(PlayerUnlocksService);
-			ApiServiceManager.RegisterService(PlayerAchievementsService);
 			ApiServiceManager.RegisterService(WalletService);
 		}
 
@@ -80,7 +81,7 @@ namespace MysticCrafting.Module.Services
 			{
 				await DataService.DownloadRepositoryFilesAsync();
 				await DataService.LoadAsync();
-				await DataService.CopyDatabaseResource();
+				await SqliteDbService.InitializeDatabaseFile();
 				DataService.DeleteFile("currency_data.json");
 				DataService.DeleteFile("items_data.json");
 				DataService.DeleteFile("items_data_de.json");
@@ -97,10 +98,13 @@ namespace MysticCrafting.Module.Services
 				DataService.DeleteFile("data_1.2.0.json");
 				DataService.DeleteFile("menu_data.json");
 				DataService.DeleteFile("menu_data_new.json");
-				ItemRepository.Initialize(DataService);
-				RecipeRepository.Initialize(DataService);
-				CurrencyRepository.Initialize(DataService);
-				VendorRepository.Initialize(DataService);
+			}
+			if (SqliteDbService != null)
+			{
+				ItemRepository.Initialize(SqliteDbService);
+				RecipeRepository.Initialize(SqliteDbService);
+				CurrencyRepository.Initialize(SqliteDbService);
+				VendorRepository.Initialize(SqliteDbService);
 			}
 			if (AudioService != null)
 			{
@@ -125,6 +129,7 @@ namespace MysticCrafting.Module.Services
 			FavoritesRepository = null;
 			ApiServiceManager = null;
 			TradingPostService = null;
+			PlayerItemService?.Dispose();
 			PlayerItemService = null;
 			PlayerUnlocksService = null;
 			ItemSourceService = null;

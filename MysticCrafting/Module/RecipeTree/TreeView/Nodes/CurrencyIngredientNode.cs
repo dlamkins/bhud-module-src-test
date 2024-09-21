@@ -15,12 +15,12 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 	{
 		public CurrencyQuantity CurrencyQuantity { get; set; }
 
-		public CoinsControl CoinsControl { get; set; }
+		public new CoinsControl CoinsControl { get; set; }
 
 		public CurrencyIngredientNode(CurrencyQuantity currencyQuantity, Container parent, int? index = null, bool loadingChildren = false)
-			: base(currencyQuantity.Currency.Id, currencyQuantity.Count, parent, index, showUnitCount: true, loadingChildren)
+			: base(currencyQuantity.Currency.Id, (int)currencyQuantity.Count, parent, index, showUnitCount: true, loadingChildren)
 		{
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
 			CurrencyQuantity = currencyQuantity;
 			base.Name = (currencyQuantity.Currency.LocalizedName() ?? "").Truncate(34);
 			base.NameLabelColor = ColorHelper.CurrencyName;
@@ -38,10 +38,10 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 
 		public override void Build(Container parent)
 		{
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 			base.Build(parent);
 			base.VendorPrice = new List<CurrencyQuantity> { CurrencyQuantity };
-			if (CurrencyQuantity.Currency.Id == 1)
+			if (IsCoin())
 			{
 				((Control)base.UnitCountLabel).set_Visible(false);
 				((Control)base.NameLabel).set_Visible(false);
@@ -92,13 +92,18 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			{
 				return false;
 			}
-			int newPlayerCount = ServiceContainer.WalletService.GetQuantity(CurrencyQuantity.Currency.Id).Count;
+			int newPlayerCount = (int)(ServiceContainer.WalletService.GetQuantity(CurrencyQuantity.Currency.Id)?.Count ?? 0);
 			if (newPlayerCount == base.PlayerUnitCount)
 			{
 				return false;
 			}
 			base.PlayerUnitCount = newPlayerCount;
 			return true;
+		}
+
+		public bool IsCoin()
+		{
+			return CurrencyQuantity.Currency.Id == 1;
 		}
 	}
 }

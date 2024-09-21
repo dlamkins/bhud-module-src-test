@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using MysticCrafting.Module.Services;
@@ -22,48 +21,31 @@ namespace MysticCrafting.Module.RecipeTree
 
 		public void HandleServiceLoading(Container parent)
 		{
-			List<IApiService> _recurringServices = new List<IApiService>
+			new List<IApiService>
 			{
 				ServiceContainer.TradingPostService,
 				ServiceContainer.PlayerItemService,
 				ServiceContainer.PlayerUnlocksService,
 				ServiceContainer.WalletService
 			};
-			if (_recurringServices.Any((IApiService s) => !s.Loaded))
-			{
-				foreach (IApiService item in _recurringServices)
-				{
-					item.LoadingFinished += delegate
-					{
-						if (!_recurringServices.Any((IApiService s) => s.Loading) && !base.get_View().RecipeDetailsLoaded)
-						{
-							base.get_View().LoadRecipeDetails();
-						}
-					};
-				}
-				base.get_View().BuildLoadingPanel(parent, _recurringServices);
-			}
-			else
-			{
-				base.get_View().LoadRecipeDetails();
-			}
+			base.get_View().LoadRecipeDetails();
 		}
 
 		public void SaveScrollDistance()
 		{
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 			if (base.get_View().Scrollbar != null && !float.IsNaN(base.get_View().Scrollbar.get_ScrollDistance()))
 			{
-				TargetScrollDistance = base.get_View().Scrollbar.get_ScrollDistance() * (float)(((Control)base.get_View().TreeView).get_Height() - ((Control)base.get_View().Scrollbar).get_Size().Y);
+				TargetScrollDistance = base.get_View().Scrollbar.get_ScrollDistance() * (float)(((Control)base.get_View().TreeView).get_Height() + 96 - ((Control)base.get_View().Scrollbar).get_Size().Y);
 			}
 		}
 
 		public void UpdateScrollDistance()
 		{
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 			if (base.get_View().Scrollbar != null && !float.IsNaN(TargetScrollDistance))
 			{
-				float distance = TargetScrollDistance / (float)(((Control)base.get_View().TreeView).get_Height() - ((Control)base.get_View().Scrollbar).get_Size().Y);
+				float distance = TargetScrollDistance / (float)(((Control)base.get_View().TreeView).get_Height() + 96 - ((Control)base.get_View().Scrollbar).get_Size().Y);
 				base.get_View().Scrollbar.set_ScrollDistance(distance);
 			}
 		}

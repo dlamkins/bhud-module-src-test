@@ -26,6 +26,12 @@ namespace MysticCrafting.Module.Services.API
 		public IList<int> UnlockedSkins { get; set; } = new List<int>();
 
 
+		public IList<int> UnlockedDyes { get; set; } = new List<int>();
+
+
+		public IDictionary<int, int> Colors { get; set; } = new Dictionary<int, int>();
+
+
 		public IDictionary<int, int> UnlockedLegendaries { get; set; } = new Dictionary<int, int>();
 
 
@@ -79,6 +85,15 @@ namespace MysticCrafting.Module.Services.API
 			return UnlockedSkins.Contains(itemId);
 		}
 
+		public bool DyeUnlocked(int itemId)
+		{
+			if (!Colors.TryGetValue(itemId, out var color))
+			{
+				return false;
+			}
+			return UnlockedDyes.Contains(color);
+		}
+
 		public bool LegendaryUnlocked(int itemId)
 		{
 			return UnlockedLegendaries.ContainsKey(itemId);
@@ -102,14 +117,30 @@ namespace MysticCrafting.Module.Services.API
 				.get_Recipes()).GetAsync(default(CancellationToken));
 			Task<IApiV2ObjectList<int>> skins = ((IBlobClient<IApiV2ObjectList<int>>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
 				.get_Skins()).GetAsync(default(CancellationToken));
+			Task<IApiV2ObjectList<int>> dyes = ((IBlobClient<IApiV2ObjectList<int>>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
+				.get_Dyes()).GetAsync(default(CancellationToken));
 			Task<IApiV2ObjectList<AccountLegendaryArmory>> legendaries = ((IBlobClient<IApiV2ObjectList<AccountLegendaryArmory>>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
 				.get_LegendaryArmory()).GetAsync(default(CancellationToken));
-			await Task.WhenAll(miniatures, recipes, skins, legendaries);
+			List<Task> tasks = new List<Task> { miniatures, recipes, skins, dyes, legendaries };
+			if (Colors == null || !Colors.Any())
+			{
+				tasks.Add(LoadColorsAsync());
+			}
+			await Task.WhenAll(tasks);
 			UnlockedMiniatures = ((IEnumerable<int>)(await miniatures)).ToList();
 			UnlockedRecipes = ((IEnumerable<int>)(await recipes)).ToList();
 			UnlockedSkins = ((IEnumerable<int>)(await skins)).ToList();
+			UnlockedDyes = ((IEnumerable<int>)(await dyes)).ToList();
 			UnlockedLegendaries = ((IEnumerable<AccountLegendaryArmory>)(await legendaries)).ToDictionary((AccountLegendaryArmory x) => x.get_Id(), (AccountLegendaryArmory x) => x.get_Count());
 			return $"{UnlockedRecipes.Count} recipes, {UnlockedSkins.Count} skins, {UnlockedLegendaries.Count} legendaries.";
+		}
+
+		public async Task LoadColorsAsync()
+		{
+			Colors = (from c in (IEnumerable<Color>)(await ((IAllExpandableClient<Color>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Colors()).AllAsync(default(CancellationToken)))
+				group c by c.get_Item() into c
+				where c.Count() == 1
+				select c.FirstOrDefault()).ToDictionary((Color x) => x.get_Item(), (Color x) => x.get_Id());
 		}
 	}
 }

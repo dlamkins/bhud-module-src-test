@@ -152,11 +152,11 @@ namespace MysticCrafting.Module.Discovery.ItemList.Controls
 			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0191: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
 			float num = ((((Control)this).get_MouseOver() && (int)_highlightType == 2) ? 0.1f : 0.3f);
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), bounds, Color.get_Black() * num);
 			int num2 = ((Control)this)._size.Y;
@@ -169,7 +169,7 @@ namespace MysticCrafting.Module.Discovery.ItemList.Controls
 			Texture2D obj = AsyncTexture2D.op_Implicit(_textureBottomSectionSeparator);
 			Rectangle contentRegion = ((Container)this).get_ContentRegion();
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, obj, new Rectangle(((Rectangle)(ref contentRegion)).get_Left(), ((Control)this)._size.Y, ((Container)this).get_ContentRegion().Width, _textureBottomSectionSeparator.get_Height()));
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, Text, Control.get_Content().get_DefaultFont16(), new Rectangle(num2 + 15, 0, ((Control)this)._size.X - num2 - 35, ((Control)this).get_Height()), ColorHelper.FromRarity(Rarity), true, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, Text, Control.get_Content().get_DefaultFont16(), new Rectangle(num2 + 5, 0, ((Control)this)._size.X - num2 - 35, ((Control)this).get_Height()), ColorHelper.FromRarity(Rarity), true, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
 			if (Prices != null)
 			{
 				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, Prices.get_Sells().get_UnitPrice().ToString(), Control.get_Content().get_DefaultFont16(), new Rectangle(num2 + 450, 0, ((Control)this)._size.X - num2 - 35, ((Control)this).get_Height()), Color.get_White(), true, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);

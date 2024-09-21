@@ -15,9 +15,9 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 {
 	public abstract class TradeableItemNode : TreeNodeBase, ITradeableItemNode
 	{
-		private int _tradingPostPrice;
-
 		private bool _active = true;
+
+		private long _tradingPostPrice;
 
 		private IList<CurrencyQuantity> _vendorPurchasePrice = new List<CurrencyQuantity>();
 
@@ -54,7 +54,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 		protected float CoinControlOpacity { get; set; } = 1f;
 
 
-		public int TradingPostPrice
+		public long TradingPostPrice
 		{
 			get
 			{
@@ -139,7 +139,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 
 		protected CurrenciesContainer CurrencyContainer { get; set; }
 
-		private CoinsControl CoinsControl { get; set; }
+		protected CoinsControl CoinsControl { get; set; }
 
 		private VendorCurrencyControl VendorCurrencyControl { get; set; }
 
@@ -166,11 +166,11 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 
 		public void ResetPrices()
 		{
-			_tradingPostPrice = 0;
+			_tradingPostPrice = 0L;
 			_vendorPurchasePrice = new List<CurrencyQuantity>();
 			if (TotalCoinPrice != null)
 			{
-				TotalCoinPrice.Count = 0;
+				TotalCoinPrice.Count = 0L;
 			}
 			TotalVendorPrice = new List<CurrencyQuantity>();
 			_vendorPurchasePrice = new List<CurrencyQuantity>();
@@ -198,7 +198,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			return new Point((_totalCoinPrice.Count != 0) ? (PriceLocation.X + 150) : (PriceLocation.X - 5), PriceLocation.Y);
+			return new Point((_totalCoinPrice.Count != 0L) ? (PriceLocation.X + 150) : (PriceLocation.X - 5), PriceLocation.Y);
 		}
 
 		public void UpdateRequirementsLocation()
@@ -255,11 +255,43 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			SwitchVendorPriceControls();
 		}
 
+		public void ExpandAllActiveNodes(bool includeIncomplete = true)
+		{
+			if (!Active || (OrderUnitCount == 0 && !includeIncomplete))
+			{
+				return;
+			}
+			if (!base.Expanded)
+			{
+				Toggle();
+			}
+			foreach (TradeableItemNode item in ((IEnumerable)((Container)this).get_Children()).OfType<TradeableItemNode>())
+			{
+				item.ExpandAllActiveNodes(includeIncomplete);
+			}
+		}
+
+		public void CollapseAllActiveNodes(bool isComplete = true)
+		{
+			if (OrderUnitCount == 0 && isComplete)
+			{
+				return;
+			}
+			if (base.Expanded)
+			{
+				Toggle();
+			}
+			foreach (TradeableItemNode item in ((IEnumerable)((Container)this).get_Children()).OfType<TradeableItemNode>())
+			{
+				item.ExpandAllActiveNodes(isComplete);
+			}
+		}
+
 		private bool ShowMinifiedVendorCurrencies()
 		{
 			if (HasTradeableChildren || TotalVendorPrice.ExcludingCoins().Count() > 2)
 			{
-				if (CoinsControl.UnitPrice == 0)
+				if (CoinsControl.UnitPrice == 0L)
 				{
 					return TotalVendorPrice.ExcludingCoins().Count() > 2;
 				}

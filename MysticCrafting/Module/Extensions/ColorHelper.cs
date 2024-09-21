@@ -89,7 +89,7 @@ namespace MysticCrafting.Module.Extensions
 			return Color.get_White();
 		}
 
-		public static Color FromItemCount(int totalItemCount, int totalRequiredItemCount)
+		public static Color FromItemCount(long totalItemCount, long totalRequiredItemCount)
 		{
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0017: Unknown result type (might be due to invalid IL or missing references)

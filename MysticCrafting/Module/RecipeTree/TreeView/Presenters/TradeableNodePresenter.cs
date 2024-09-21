@@ -59,7 +59,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 			{
 				return price;
 			}
-			if (item.TradingPostPrice != 0)
+			if (item.TradingPostPrice != 0L)
 			{
 				price.Count = item.TradingPostPrice * item.OrderUnitCount;
 				return price;
@@ -87,7 +87,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 				{
 					new CurrencyQuantity
 					{
-						Count = ((currencyNode.CurrencyQuantity.Currency.Id == 1) ? (currencyNode.CurrencyQuantity.Count * item.OrderUnitCount) : currencyNode.TotalUnitCount),
+						Count = currencyNode.TotalUnitCount,
 						Currency = currencyNode.CurrencyQuantity.Currency
 					}
 				};

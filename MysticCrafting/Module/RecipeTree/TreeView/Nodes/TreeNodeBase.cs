@@ -21,7 +21,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 	{
 		public Color BackgroundOpaqueColor = Color.get_Black();
 
-		public float BackgroundOpacity = 0.2f;
+		public float BackgroundOpacity = 0.3f;
 
 		public Color FrameColor = Color.get_Black();
 
@@ -151,12 +151,12 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 
 		private int ReflowChildLayout(IEnumerable<TreeNodeBase> containerChildren)
 		{
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			int lastBottom = PanelHeight + 3;
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			int lastBottom = PanelHeight;
 			foreach (TreeNodeBase item in containerChildren.Where((TreeNodeBase c) => ((Control)c).get_Visible()))
 			{
 				((Control)item).set_Location(new Point(PaddingLeft, lastBottom));
-				lastBottom = ((Control)item).get_Bottom() + 3;
+				lastBottom = ((Control)item).get_Bottom();
 			}
 			return lastBottom + 5;
 		}
@@ -303,7 +303,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 			if (ShowBackground)
 			{
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), PanelRectangle, BackgroundOpaqueColor * BackgroundOpacity);
@@ -311,10 +311,6 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			if (Expandable)
 			{
 				DrawArrow(spriteBatch);
-			}
-			if (ShowFrame)
-			{
-				DrawFrame(spriteBatch);
 			}
 			DrawPanelExtension(spriteBatch);
 			((Container)this).PaintBeforeChildren(spriteBatch, bounds);
