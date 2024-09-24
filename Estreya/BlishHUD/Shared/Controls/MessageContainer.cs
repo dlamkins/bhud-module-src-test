@@ -172,7 +172,6 @@ namespace Estreya.BlishHUD.Shared.Controls
 				if (!(_openedGuids?.ToArray().Contains(identification) ?? false) && !((Control)_window).get_Visible() && ShouldShowItself(messageType))
 				{
 					_openedGuids?.Add(identification);
-					((Control)_window).Show();
 				}
 			}
 		}

@@ -28,6 +28,8 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		private const string BLISH_HUD_DISCORD_INVITE = "https://discord.gg/nGbd3kU";
 
+		private const int DISCORD_SECTION_HEIGHT = 200;
+
 		private static readonly Point _importantIconSize = new Point(32, 32);
 
 		private readonly IFlurlClient _flurlClient;
@@ -52,29 +54,29 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Expected O, but got Unknown
-			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0124: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012c: Expected O, but got Unknown
-			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0158: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0165: Expected O, but got Unknown
-			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Expected O, but got Unknown
+			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0112: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0126: Expected O, but got Unknown
+			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015f: Expected O, but got Unknown
+			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)parent);
 			val.set_FlowDirection((ControlFlowDirection)3);
 			((Control)val).set_Location(new Point(25, 25));
-			((Control)val).set_Height((int)((double)((Container)parent).get_ContentRegion().Height * 0.75));
+			((Control)val).set_Height(((Container)parent).get_ContentRegion().Height - 200);
 			((Control)val).set_Width(((Container)parent).get_ContentRegion().Width - 50);
 			((Panel)val).set_CanScroll(true);
 			FlowPanel newsList = val;

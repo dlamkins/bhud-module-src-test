@@ -21,6 +21,8 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		public SettingEntry<bool> AcceptWaypointPrompt { get; set; }
 
+		public SettingEntry<bool> HideAfterWaypointNavigation { get; set; }
+
 		public SettingEntry<ChatChannel> WaypointSendingChannel { get; set; }
 
 		public SettingEntry<GuildNumber> WaypointSendingGuild { get; set; }
@@ -134,6 +136,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 			other.ShowTooltips.set_Value(ShowTooltips.get_Value());
 			other.LeftClickAction.set_Value(LeftClickAction.get_Value());
 			other.AcceptWaypointPrompt.set_Value(AcceptWaypointPrompt.get_Value());
+			other.HideAfterWaypointNavigation.set_Value(HideAfterWaypointNavigation.get_Value());
 			other.WaypointSendingChannel.set_Value(WaypointSendingChannel.get_Value());
 			other.WaypointSendingGuild.set_Value(WaypointSendingGuild.get_Value());
 			other.EventChatFormat.set_Value(EventChatFormat.get_Value());

@@ -40,6 +40,8 @@ namespace Estreya.BlishHUD.EventTable.Controls
 {
 	public class EventArea : RenderTarget2DControl
 	{
+		private const int MIN_HEIGHT = 1;
+
 		private readonly Logger _logger = Logger.GetLogger<EventArea>();
 
 		private static TimeSpan _updateEventOccurencesInterval = TimeSpan.FromMinutes(15.0);
@@ -990,7 +992,10 @@ namespace Estreya.BlishHUD.EventTable.Controls
 						_logger.Debug($"Added event {ev2.Name} with occurence {occurence}");
 						using (_controlLock.Lock())
 						{
-							_controlEvents[categoryKey].Add((occurence, newEventControl));
+							if (_controlEvents.ContainsKey(categoryKey))
+							{
+								_controlEvents[categoryKey].Add((occurence, newEventControl));
+							}
 						}
 					}
 				}
@@ -1059,7 +1064,14 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				Task.Run(async delegate
 				{
 					MapUtil.NavigationResult result = await (_mapUtil?.NavigateToPosition(poi, Configuration.AcceptWaypointPrompt.get_Value()) ?? Task.FromResult(new MapUtil.NavigationResult(success: false, "Variable null.")));
-					if (!result.Success)
+					if (result.Success)
+					{
+						if (Configuration.HideAfterWaypointNavigation.get_Value())
+						{
+							Configuration.Enabled.set_Value(false);
+						}
+					}
+					else
 					{
 						ScreenNotification.ShowNotification("Navigation failed: " + (result.Message ?? "Unknown"), ScreenNotification.NotificationType.Error);
 					}

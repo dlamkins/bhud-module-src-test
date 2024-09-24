@@ -604,19 +604,19 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0083: Expected O, but got Unknown
-			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0134: Expected O, but got Unknown
-			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0275: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0151: Expected O, but got Unknown
+			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0188: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0292: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)settingsPanel);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
@@ -630,6 +630,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			FlowPanel groupPanel = val;
 			RenderEnumSetting<LeftClickAction>((Panel)(object)groupPanel, areaConfiguration.LeftClickAction);
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.AcceptWaypointPrompt);
+			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.HideAfterWaypointNavigation);
+			RenderEmptyLine((Panel)(object)groupPanel);
 			RenderEnumSetting<ChatChannel>((Panel)(object)groupPanel, areaConfiguration.WaypointSendingChannel);
 			RenderEnumSetting<GuildNumber>((Panel)(object)groupPanel, areaConfiguration.WaypointSendingGuild);
 			RenderEnumSetting<EventChatFormat>((Panel)(object)groupPanel, areaConfiguration.EventChatFormat);

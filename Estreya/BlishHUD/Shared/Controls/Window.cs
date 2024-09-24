@@ -656,14 +656,14 @@ namespace Estreya.BlishHUD.Shared.Controls
 			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
 			if (Dragging)
 			{
 				Point point = Control.get_Input().get_Mouse().get_Position() - _dragStart;
@@ -674,6 +674,12 @@ namespace Estreya.BlishHUD.Shared.Controls
 			{
 				Point point2 = Control.get_Input().get_Mouse().get_Position() - _dragStart;
 				Size = HandleWindowResize(_resizeStart + point2);
+			}
+			IView currentView = CurrentView;
+			IUpdatable updateView = (IUpdatable)(object)((currentView is IUpdatable) ? currentView : null);
+			if (updateView != null)
+			{
+				updateView.Update(gameTime);
 			}
 		}
 

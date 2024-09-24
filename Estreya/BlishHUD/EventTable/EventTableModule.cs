@@ -106,6 +106,8 @@ namespace Estreya.BlishHUD.EventTable
 
 		public EventTimerHandler EventTimerHandler { get; private set; }
 
+		public SelfHostingEventService SelfHostingEventService { get; private set; }
+
 		[ImportingConstructor]
 		public EventTableModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
 			: base(moduleParameters)
@@ -150,16 +152,10 @@ namespace Estreya.BlishHUD.EventTable
 				}
 			}, () => NowUTC, MapUtil, base.Gw2ApiManager, base.ModuleSettings, base.TranslationService, base.IconService);
 			EventTimerHandler.FoundLostEntities += EventTimerHandler_FoundLostEntities;
-			base.ModuleSettings.IncludeSelfHostedEvents.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)IncludeSelfHostedEvents_SettingChanged);
 			AddAllAreas();
 			await LoadEvents();
 			sw.Stop();
 			base.Logger.Debug("Loaded in " + sw.Elapsed.TotalMilliseconds.ToString(CultureInfo.InvariantCulture) + "ms");
-		}
-
-		private async void IncludeSelfHostedEvents_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
-		{
-			await ReloadEvents();
 		}
 
 		private void DynamicEventHandler_FoundLostEntities(object sender, EventArgs e)
@@ -256,33 +252,6 @@ namespace Estreya.BlishHUD.EventTable
 						base.Logger.Info($"Include {contextEvents.Count} context categories with {contextEvents.Sum((EventCategory ec) => ec.Events?.Count ?? 0)} events.");
 						categories.AddRange(contextEvents);
 					}
-					if (base.ModuleSettings.IncludeSelfHostedEvents.get_Value())
-					{
-						Dictionary<string, List<SelfHostedEventEntry>> selfHostedEvents = await LoadSelfHostedEvents();
-						if (selfHostedEvents != null)
-						{
-							foreach (KeyValuePair<string, List<SelfHostedEventEntry>> selfHostedCategory in selfHostedEvents)
-							{
-								if (!categories.Any((EventCategory c) => c.Key == selfHostedCategory.Key))
-								{
-									continue;
-								}
-								EventCategory category = categories.Find((EventCategory c) => c.Key == selfHostedCategory.Key);
-								foreach (SelfHostedEventEntry selfHostedEvent in selfHostedCategory.Value)
-								{
-									Estreya.BlishHUD.EventTable.Models.Event ev2 = new Estreya.BlishHUD.EventTable.Models.Event
-									{
-										Key = selfHostedEvent.EventKey,
-										Name = (selfHostedEvent.EventName ?? selfHostedEvent.EventKey),
-										Duration = selfHostedEvent.Duration,
-										HostedBySystem = false
-									};
-									ev2.Occurences.Add(selfHostedEvent.StartTime.UtcDateTime);
-									category.OriginalEvents.Add(ev2);
-								}
-							}
-						}
-					}
 					categories.ForEach(delegate(EventCategory ec)
 					{
 						ec.Load(() => NowUTC, base.TranslationService);
@@ -312,28 +281,6 @@ namespace Estreya.BlishHUD.EventTable
 				}
 			}
 			await (EventTimerHandler?.NotifyUpdatedEvents() ?? Task.CompletedTask);
-		}
-
-		private async Task<Dictionary<string, List<SelfHostedEventEntry>>> LoadSelfHostedEvents()
-		{
-			try
-			{
-				Dictionary<string, List<SelfHostedEventEntry>> obj = await GetFlurlClient().Request(base.MODULE_API_URL, "self-hosting").GetJsonAsync<Dictionary<string, List<SelfHostedEventEntry>>>(default(CancellationToken), (HttpCompletionOption)0);
-				int eventCategoryCount = obj.Count;
-				int eventCount = obj.Sum((KeyValuePair<string, List<SelfHostedEventEntry>> ec) => ec.Value.Count);
-				base.Logger.Info($"Loaded {eventCategoryCount} self hosted categories with {eventCount} events.");
-				return obj;
-			}
-			catch (FlurlHttpException ex2)
-			{
-				string message = await ex2.GetResponseStringAsync();
-				base.Logger.Warn((Exception)ex2, "Failed loading self hosted events: " + message);
-			}
-			catch (Exception ex)
-			{
-				base.Logger.Warn(ex, "Failed loading self hosted events.");
-			}
-			return null;
 		}
 
 		private void AssignEventReminderTimes(List<EventCategory> categories)
@@ -708,10 +655,12 @@ namespace Estreya.BlishHUD.EventTable
 			//IL_02dd: Expected O, but got Unknown
 			//IL_0322: Unknown result type (might be due to invalid IL or missing references)
 			//IL_032c: Expected O, but got Unknown
-			//IL_0361: Unknown result type (might be due to invalid IL or missing references)
-			//IL_036b: Expected O, but got Unknown
+			//IL_0371: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037b: Expected O, but got Unknown
 			//IL_03b0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03ba: Expected O, but got Unknown
+			//IL_03ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0409: Expected O, but got Unknown
 			settingWindow.SavesSize = true;
 			settingWindow.CanResize = true;
 			settingWindow.RebuildViewAfterResize = true;
@@ -787,14 +736,18 @@ namespace Estreya.BlishHUD.EventTable
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			}), base.TranslationService.GetTranslation("dynamicEventsSettingsView-title", "Dynamic Events"), (int?)null));
-			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("759448.png"), (Func<IView>)(() => (IView)(object)new EventTimersSettingsView(base.ModuleSettings, GetAllEvents, base.Gw2ApiManager, base.IconService, base.TranslationService, base.SettingEventService, base.AccountService)
+			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("3126786.png"), (Func<IView>)(() => (IView)(object)new EventTimersSettingsView(base.ModuleSettings, GetAllEvents, base.Gw2ApiManager, base.IconService, base.TranslationService, base.SettingEventService, base.AccountService)
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			}), base.TranslationService.GetTranslation("eventTimersSettingsView-title", "Event Timers"), (int?)null));
+			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("156680.png"), (Func<IView>)(() => (IView)(object)new SelfHostingEventsView(base.ModuleSettings, SelfHostingEventService, base.Gw2ApiManager, base.IconService, base.TranslationService, base.AccountService, base.ChatService)
+			{
+				DefaultColor = base.ModuleSettings.DefaultGW2Color
+			}), base.TranslationService.GetTranslation("selfHostingEventsSettingsView-title", "Self Hosting Events"), (int?)null));
 			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("156764.png"), (Func<IView>)(() => (IView)(object)new BlishHUDAPIView(base.Gw2ApiManager, base.IconService, base.TranslationService, base.BlishHUDAPIService, GetFlurlClient())
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
-			}), "Estreya BlishHUD API", (int?)null));
+			}), "Estreya BlishHUD", (int?)null));
 			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("157097.png"), (Func<IView>)(() => (IView)(object)new HelpView(() => _eventCategories, base.MODULE_API_URL, base.Gw2ApiManager, base.IconService, base.TranslationService)
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
@@ -847,8 +800,16 @@ namespace Estreya.BlishHUD.EventTable
 				Enabled = true,
 				SaveInterval = Timeout.InfiniteTimeSpan
 			}, base.Gw2ApiManager, GetFlurlClient(), base.API_ROOT_URL, directoryPath);
+			SelfHostingEventService = new SelfHostingEventService(new APIServiceConfiguration
+			{
+				AwaitLoading = true,
+				Enabled = true,
+				SaveInterval = Timeout.InfiniteTimeSpan,
+				UpdateInterval = TimeSpan.FromMinutes(5.0)
+			}, base.Gw2ApiManager, GetFlurlClient(), base.MODULE_API_URL, base.AccountService, base.BlishHUDAPIService);
 			collection.Add(EventStateService);
 			collection.Add(DynamicEventService);
+			collection.Add(SelfHostingEventService);
 			return collection;
 		}
 
@@ -913,7 +874,6 @@ namespace Estreya.BlishHUD.EventTable
 				base.BlishHUDAPIService.NewLogin -= BlishHUDAPIService_NewLogin;
 				base.BlishHUDAPIService.LoggedOut -= BlishHUDAPIService_LoggedOut;
 			}
-			base.ModuleSettings.IncludeSelfHostedEvents.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)IncludeSelfHostedEvents_SettingChanged);
 			base.Logger.Debug("Unloaded events.");
 			UnloadContext();
 			MapUtil?.Dispose();

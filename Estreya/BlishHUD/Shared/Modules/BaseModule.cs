@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
@@ -208,6 +209,19 @@ namespace Estreya.BlishHUD.Shared.Modules
 				_flurlClient.WithHeader("User-Agent", $"{((Module)this).get_Name()} {((Module)this).get_Version()}").WithHeader("Accept-Encoding", "gzip, delate").Configure(delegate(ClientFlurlHttpSettings c)
 				{
 					c.HttpClientFactory = new FlurlHttpClientFactory();
+					c.OnErrorAsync = async delegate(HttpCall call)
+					{
+						if (call.Response != null && call.FlurlRequest.Url.ToUri().AbsoluteUri.StartsWith(API_ROOT_URL))
+						{
+							IEnumerable<string> headers = default(IEnumerable<string>);
+							((HttpHeaders)call.Response.get_Headers()).TryGetValues("API-TraceId", ref headers);
+							string apiTraceId = headers?.FirstOrDefault();
+							if (apiTraceId != null)
+							{
+								Logger.Warn("Intercepted estreya api error. Please provide trace id \"" + apiTraceId + "\" for support.");
+							}
+						}
+					};
 				});
 			}
 			return _flurlClient;
@@ -283,6 +297,18 @@ namespace Estreya.BlishHUD.Shared.Modules
 			GithubHelper = new GitHubHelper("Tharylia", "Blish-HUD-Modules", "Iv1.9e4dc29d43243704", ((Module)this).get_Name(), PasswordManager, IconService, TranslationService, ModuleSettings);
 			ModuleSettings.UpdateLocalization(TranslationService);
 			ModuleSettings.RegisterCornerIcon.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)RegisterCornerIcon_SettingChanged);
+			BackendConnectionRestored += BaseModule_BackendConnectionRestored;
+		}
+
+		private async Task BaseModule_BackendConnectionRestored(object sender)
+		{
+			try
+			{
+				await BlishHUDAPIService.Reload();
+			}
+			catch (Exception)
+			{
+			}
 		}
 
 		private async Task VerifyModuleState()
@@ -843,11 +869,12 @@ namespace Estreya.BlishHUD.Shared.Modules
 		{
 			_errorStates.AddOrUpdate(group, errorText, (ModuleErrorStateGroup key, string oldVal) => errorText);
 			StringBuilder errorStates = new StringBuilder();
+			bool hasMultipleErrorStates = _errorStates.Where((KeyValuePair<ModuleErrorStateGroup, string> e) => e.Value != null).Count() > 1;
 			foreach (KeyValuePair<ModuleErrorStateGroup, string> errorState in _errorStates)
 			{
 				if (errorState.Value != null)
 				{
-					if (_errorStates.Count > 1)
+					if (hasMultipleErrorStates)
 					{
 						errorStates.AppendLine("- " + errorState.Value.Trim());
 					}
@@ -959,6 +986,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 		protected override void Unload()
 		{
 			_cancellationTokenSource?.Cancel();
+			BackendConnectionRestored -= BaseModule_BackendConnectionRestored;
 			Logger.Debug("Unload settings...");
 			if (ModuleSettings != null)
 			{

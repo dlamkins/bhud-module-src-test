@@ -80,9 +80,25 @@ namespace Estreya.BlishHUD.EventTable
 
 		public SettingEntry<bool> ShowEventTimersInWorld { get; private set; }
 
+		public SettingEntry<KeyBinding> ShowEventTimersOnMapKeybinding { get; private set; }
+
+		public SettingEntry<KeyBinding> ShowEventTimersInWorldKeybinding { get; private set; }
+
 		public SettingEntry<int> EventTimersRenderDistance { get; private set; }
 
 		public SettingEntry<List<string>> DisabledEventTimerSettingKeys { get; private set; }
+
+		public SettingEntry<Color> EventTimersRemainingTextColor { get; private set; }
+
+		public SettingEntry<Color> EventTimersStartsInTextColor { get; private set; }
+
+		public SettingEntry<Color> EventTimersNextOccurenceTextColor { get; private set; }
+
+		public SettingEntry<Color> EventTimersNameTextColor { get; private set; }
+
+		public SettingEntry<Color> EventTimersDurationTextColor { get; private set; }
+
+		public SettingEntry<Color> EventTimersRepeatTextColor { get; private set; }
 
 		public SettingEntry<bool> ShowDynamicEventsOnMap { get; private set; }
 
@@ -95,6 +111,10 @@ namespace Estreya.BlishHUD.EventTable
 		public SettingEntry<int> DynamicEventsRenderDistance { get; private set; }
 
 		public SettingEntry<List<string>> DisabledDynamicEventIds { get; private set; }
+
+		public SettingEntry<KeyBinding> ShowDynamicEventsOnMapKeybinding { get; private set; }
+
+		public SettingEntry<KeyBinding> ShowDynamicEventsInWorldKeybinding { get; private set; }
 
 		public SettingEntry<MenuEventSortMode> MenuEventSortMode { get; private set; }
 
@@ -111,8 +131,6 @@ namespace Estreya.BlishHUD.EventTable
 		public SettingEntry<bool> HideRemindersInWvW { get; private set; }
 
 		public SettingEntry<bool> HideRemindersInPvP { get; private set; }
-
-		public SettingEntry<bool> IncludeSelfHostedEvents { get; private set; }
 
 		public ModuleSettings(SettingCollection settings)
 			: base(settings, new KeyBinding((ModifierKeys)2, (Keys)69))
@@ -132,6 +150,14 @@ namespace Estreya.BlishHUD.EventTable
 		{
 			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0056: Expected O, but got Unknown
+			//IL_0baa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0bf2: Expected O, but got Unknown
+			//IL_0c41: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c89: Expected O, but got Unknown
+			//IL_11fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1243: Expected O, but got Unknown
+			//IL_1292: Unknown result type (might be due to invalid IL or missing references)
+			//IL_12da: Expected O, but got Unknown
 			MapKeybinding = base.GlobalSettings.DefineSetting<KeyBinding>("MapKeybinding", new KeyBinding((Keys)77), (Func<string>)(() => "Open Map Hotkey"), (Func<string>)(() => "Defines the key used to open the fullscreen map."));
 			MapKeybinding.get_Value().set_Enabled(true);
 			MapKeybinding.get_Value().set_BlockSequenceFromGw2(false);
@@ -190,9 +216,23 @@ namespace Estreya.BlishHUD.EventTable
 			ReminderEventChatFormat = base.GlobalSettings.DefineSetting<EventChatFormat>("ReminderEventChatFormat", EventChatFormat.OnlyWaypoint, (Func<string>)(() => "Event Chat Format"), (Func<string>)(() => "Defines the chat format to use when copying events."));
 			ShowEventTimersOnMap = base.GlobalSettings.DefineSetting<bool>("ShowEventTimersOnMap", true, (Func<string>)(() => "Show Event Timers on Map"), (Func<string>)(() => "Whether the event timers should be shown on the map."));
 			ShowEventTimersInWorld = base.GlobalSettings.DefineSetting<bool>("ShowEventTimersInWorld", true, (Func<string>)(() => "Show Event Timers in World"), (Func<string>)(() => "Whether event timers should be shown inside the world."));
+			ShowEventTimersOnMapKeybinding = base.GlobalSettings.DefineSetting<KeyBinding>("ShowEventTimersOnMapKeybinding", new KeyBinding(), (Func<string>)(() => "Show on Map Keybinding"), (Func<string>)(() => "Defines the key used to toggle the on map event timers."));
+			ShowEventTimersOnMapKeybinding.get_Value().set_Enabled(true);
+			ShowEventTimersOnMapKeybinding.get_Value().set_BlockSequenceFromGw2(true);
+			ShowEventTimersOnMapKeybinding.get_Value().add_Activated((EventHandler<EventArgs>)ShowEventTimersOnMapKeybinding_Activated);
+			ShowEventTimersInWorldKeybinding = base.GlobalSettings.DefineSetting<KeyBinding>("ShowEventTimersInWorldKeybinding", new KeyBinding(), (Func<string>)(() => "Show in World Keybinding"), (Func<string>)(() => "Defines the key used to toggle the in world event timers."));
+			ShowEventTimersInWorldKeybinding.get_Value().set_Enabled(true);
+			ShowEventTimersInWorldKeybinding.get_Value().set_BlockSequenceFromGw2(true);
+			ShowEventTimersInWorldKeybinding.get_Value().add_Activated((EventHandler<EventArgs>)ShowEventTimersInWorldKeybinding_Activated);
 			EventTimersRenderDistance = base.GlobalSettings.DefineSetting<int>("EventTimersRenderDistance", 75, (Func<string>)(() => "Event Timer Render Distance"), (Func<string>)(() => "Defines the max render distance for in-world event timers."));
 			SettingComplianceExtensions.SetRange(EventTimersRenderDistance, 25, 500);
 			DisabledEventTimerSettingKeys = base.GlobalSettings.DefineSetting<List<string>>("DisabledEventTimerSettingKeys", new List<string>(), (Func<string>)(() => "Disabled Event Timers"), (Func<string>)(() => "Defines which event timers are disabled."));
+			EventTimersRemainingTextColor = base.GlobalSettings.DefineSetting<Color>("EventTimersRemainingTextColor", base.DefaultGW2Color, (Func<string>)(() => "Remaining Text Color"), (Func<string>)(() => "Defines the text color of the remaining section."));
+			EventTimersStartsInTextColor = base.GlobalSettings.DefineSetting<Color>("EventTimersStartsInTextColor", base.DefaultGW2Color, (Func<string>)(() => "Starts in Text Color"), (Func<string>)(() => "Defines the text color of the starts in section."));
+			EventTimersRepeatTextColor = base.GlobalSettings.DefineSetting<Color>("EventTimersRepeatTextColor", base.DefaultGW2Color, (Func<string>)(() => "Repeat Text Color"), (Func<string>)(() => "Defines the text color of the repeat section."));
+			EventTimersDurationTextColor = base.GlobalSettings.DefineSetting<Color>("EventTimersDurationTextColor", base.DefaultGW2Color, (Func<string>)(() => "Duration Text Color"), (Func<string>)(() => "Defines the text color of the duration section."));
+			EventTimersNameTextColor = base.GlobalSettings.DefineSetting<Color>("EventTimersNameTextColor", base.DefaultGW2Color, (Func<string>)(() => "Name Text Color"), (Func<string>)(() => "Defines the text color of the name section."));
+			EventTimersNextOccurenceTextColor = base.GlobalSettings.DefineSetting<Color>("EventTimersNextOccurenceTextColor", base.DefaultGW2Color, (Func<string>)(() => "Next Occurence Text Color"), (Func<string>)(() => "Defines the text color of the next occurence section."));
 			ShowDynamicEventsOnMap = base.GlobalSettings.DefineSetting<bool>("ShowDynamicEventsOnMap", false, (Func<string>)(() => "Show Dynamic Events on Map"), (Func<string>)(() => "Whether the dynamic events of the map should be shown."));
 			ShowDynamicEventInWorld = base.GlobalSettings.DefineSetting<bool>("ShowDynamicEventInWorld", false, (Func<string>)(() => "Show Dynamic Events in World"), (Func<string>)(() => "Whether dynamic events should be shown inside the world."));
 			ShowDynamicEventInWorld.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowDynamicEventInWorld_SettingChanged);
@@ -202,6 +242,14 @@ namespace Estreya.BlishHUD.EventTable
 			DynamicEventsRenderDistance = base.GlobalSettings.DefineSetting<int>("DynamicEventsRenderDistance", 300, (Func<string>)(() => "Dynamic Event Render Distance"), (Func<string>)(() => "Defines the distance in which dynamic events should be rendered."));
 			SettingComplianceExtensions.SetRange(DynamicEventsRenderDistance, 50, 500);
 			DisabledDynamicEventIds = base.GlobalSettings.DefineSetting<List<string>>("DisabledDynamicEventIds", new List<string>(), (Func<string>)(() => "Disabled Dynamic Events"), (Func<string>)(() => "Defines which dynamic events are disabled."));
+			ShowDynamicEventsOnMapKeybinding = base.GlobalSettings.DefineSetting<KeyBinding>("ShowDynamicEventsOnMapKeybinding", new KeyBinding(), (Func<string>)(() => "Show on Map Keybinding"), (Func<string>)(() => "Defines the key used to toggle the on map dynamic events."));
+			ShowDynamicEventsOnMapKeybinding.get_Value().set_Enabled(true);
+			ShowDynamicEventsOnMapKeybinding.get_Value().set_BlockSequenceFromGw2(true);
+			ShowDynamicEventsOnMapKeybinding.get_Value().add_Activated((EventHandler<EventArgs>)ShowDynamicEventsOnMapKeybinding_Activated);
+			ShowDynamicEventsInWorldKeybinding = base.GlobalSettings.DefineSetting<KeyBinding>("ShowDynamicEventsInWorldKeybinding", new KeyBinding(), (Func<string>)(() => "Show in World Keybinding"), (Func<string>)(() => "Defines the key used to toggle the in world dynamic events."));
+			ShowDynamicEventsInWorldKeybinding.get_Value().set_Enabled(true);
+			ShowDynamicEventsInWorldKeybinding.get_Value().set_BlockSequenceFromGw2(true);
+			ShowDynamicEventsInWorldKeybinding.get_Value().add_Activated((EventHandler<EventArgs>)ShowDynamicEventInWorldKeybinding_Activated);
 			MenuEventSortMode = base.GlobalSettings.DefineSetting<MenuEventSortMode>("MenuEventSortMode", Estreya.BlishHUD.EventTable.Models.MenuEventSortMode.Default, (Func<string>)(() => "Menu Event Sort Mode"), (Func<string>)(() => "Defines the mode by which the events in menu views are sorted by."));
 			HideRemindersOnOpenMap = base.GlobalSettings.DefineSetting<bool>("HideRemindersOnOpenMap", false, (Func<string>)(() => "Hide Reminders on open Map"), (Func<string>)(() => "Whether the reminders should hide when the map is open."));
 			HideRemindersOnMissingMumbleTicks = base.GlobalSettings.DefineSetting<bool>("HideRemindersOnMissingMumbleTicks", true, (Func<string>)(() => "Hide Reminders on Cutscenes"), (Func<string>)(() => "Whether the reminders should hide when cutscenes are played."));
@@ -210,8 +258,27 @@ namespace Estreya.BlishHUD.EventTable
 			HideRemindersInPvE_Competetive = base.GlobalSettings.DefineSetting<bool>("HideRemindersInPvE_Competetive", false, (Func<string>)(() => "Hide Reminders in PvE (Competetive)"), (Func<string>)(() => "Whether the reminders should hide when in PvE (Competetive)."));
 			HideRemindersInWvW = base.GlobalSettings.DefineSetting<bool>("HideRemindersInWvW", false, (Func<string>)(() => "Hide Reminders in WvW"), (Func<string>)(() => "Whether the reminders should hide when in world vs. world."));
 			HideRemindersInPvP = base.GlobalSettings.DefineSetting<bool>("HideRemindersInPvP", false, (Func<string>)(() => "Hide Reminders in PvP"), (Func<string>)(() => "Whether the reminders should hide when in player vs. player."));
-			IncludeSelfHostedEvents = base.GlobalSettings.DefineSetting<bool>("IncludeSelfHostedEvents", true, (Func<string>)(() => "Include Self Hosted Events"), (Func<string>)(() => "Whether to include events hosted by other players inside the areas."));
 			HandleEnabledStates();
+		}
+
+		private void ShowEventTimersInWorldKeybinding_Activated(object sender, EventArgs e)
+		{
+			ShowEventTimersInWorld.set_Value(!ShowEventTimersInWorld.get_Value());
+		}
+
+		private void ShowEventTimersOnMapKeybinding_Activated(object sender, EventArgs e)
+		{
+			ShowEventTimersOnMap.set_Value(!ShowEventTimersOnMap.get_Value());
+		}
+
+		private void ShowDynamicEventInWorldKeybinding_Activated(object sender, EventArgs e)
+		{
+			ShowDynamicEventInWorld.set_Value(!ShowDynamicEventInWorld.get_Value());
+		}
+
+		private void ShowDynamicEventsOnMapKeybinding_Activated(object sender, EventArgs e)
+		{
+			ShowDynamicEventsOnMap.set_Value(!ShowDynamicEventsOnMap.get_Value());
 		}
 
 		private void ShowDynamicEventInWorld_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
@@ -298,6 +365,7 @@ namespace Estreya.BlishHUD.EventTable
 			SettingEntry<bool> useFillers = base.DrawerSettings.DefineSetting<bool>(name + "-useFillers", true, (Func<string>)(() => "Use Filler Events"), (Func<string>)(() => "Whether the empty spaces should be filled by filler events."));
 			SettingEntry<Color> fillerTextColor = base.DrawerSettings.DefineSetting<Color>(name + "-fillerTextColor", base.DefaultGW2Color, (Func<string>)(() => "Filler Text Color"), (Func<string>)(() => "Defines the text color used by filler events."));
 			SettingEntry<bool> acceptWaypointPrompt = base.DrawerSettings.DefineSetting<bool>(name + "-acceptWaypointPrompt", true, (Func<string>)(() => "Accept Waypoint Prompt"), (Func<string>)(() => "Whether the waypoint prompt should be accepted automatically when performing an automated teleport."));
+			SettingEntry<bool> hideAfterWaypointNavigation = base.DrawerSettings.DefineSetting<bool>(name + "-hideAfterWaypointNavigation", false, (Func<string>)(() => "Hide after Waypoint Navigation"), (Func<string>)(() => "If the area should be hidden after a successfull waypoint navigation."));
 			SettingEntry<ChatChannel> waypointSendingChannel = base.DrawerSettings.DefineSetting<ChatChannel>(name + "-waypointSendingChannel", ChatChannel.Private, (Func<string>)(() => "Send Waypoint to Channel"), (Func<string>)(() => "Defines the channel in which the waypoint is pasted automatically."));
 			SettingEntry<GuildNumber> waypointSendingGuild = base.DrawerSettings.DefineSetting<GuildNumber>(name + "-waypointSendingGuild", GuildNumber.Guild_1, (Func<string>)(() => "Send Waypoint to Guild"), (Func<string>)(() => "Defines the guild in which the waypoint is pasted automatically if channel guild is selected."));
 			SettingEntry<EventChatFormat> eventChatFormat = base.DrawerSettings.DefineSetting<EventChatFormat>(name + "-eventChatFormat", EventChatFormat.OnlyWaypoint, (Func<string>)(() => "Event Chat Format"), (Func<string>)(() => "Defines the chat format when event waypoints are copied or pasted."));
@@ -380,6 +448,7 @@ namespace Estreya.BlishHUD.EventTable
 				UseFiller = useFillers,
 				FillerTextColor = fillerTextColor,
 				AcceptWaypointPrompt = acceptWaypointPrompt,
+				HideAfterWaypointNavigation = hideAfterWaypointNavigation,
 				WaypointSendingChannel = waypointSendingChannel,
 				WaypointSendingGuild = waypointSendingGuild,
 				EventChatFormat = eventChatFormat,
@@ -765,6 +834,10 @@ namespace Estreya.BlishHUD.EventTable
 			base.Unload();
 			ShowDynamicEventInWorld.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowDynamicEventInWorld_SettingChanged);
 			ShowDynamicEventsInWorldOnlyWhenInside.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowDynamicEventsInWorldOnlyWhenInside_SettingChanged);
+			ShowDynamicEventsOnMapKeybinding.get_Value().remove_Activated((EventHandler<EventArgs>)ShowDynamicEventsOnMapKeybinding_Activated);
+			ShowDynamicEventsInWorldKeybinding.get_Value().remove_Activated((EventHandler<EventArgs>)ShowDynamicEventInWorldKeybinding_Activated);
+			ShowEventTimersInWorldKeybinding.get_Value().remove_Activated((EventHandler<EventArgs>)ShowEventTimersInWorldKeybinding_Activated);
+			ShowEventTimersOnMapKeybinding.get_Value().remove_Activated((EventHandler<EventArgs>)ShowEventTimersOnMapKeybinding_Activated);
 			EventAreaSettings.RemoveLoggingEvents();
 		}
 	}

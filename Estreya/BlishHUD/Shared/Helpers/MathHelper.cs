@@ -43,5 +43,10 @@ namespace Estreya.BlishHUD.Shared.Helpers
 			double deltaX = Math.Pow(arrival.X - start.X, 2.0);
 			return (float)Math.Sqrt(Math.Pow(arrival.Y - start.Y, 2.0) + deltaX);
 		}
+
+		public static double Scale(double value, double sourceScaleMin, double sourceScaleMax, double destScaleMin, double destScaleMax)
+		{
+			return (value - sourceScaleMin) / (sourceScaleMax - sourceScaleMin) * (destScaleMax - destScaleMin) + destScaleMin;
+		}
 	}
 }

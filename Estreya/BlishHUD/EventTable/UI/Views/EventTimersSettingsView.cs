@@ -52,6 +52,16 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.ShowEventTimersOnMap);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.ShowEventTimersInWorld);
 			RenderEmptyLine((Panel)(object)parent);
+			RenderKeybindingSetting((Panel)(object)parent, _moduleSettings.ShowEventTimersOnMapKeybinding);
+			RenderKeybindingSetting((Panel)(object)parent, _moduleSettings.ShowEventTimersInWorldKeybinding);
+			RenderEmptyLine((Panel)(object)parent);
+			RenderColorSetting((Panel)(object)parent, _moduleSettings.EventTimersRemainingTextColor);
+			RenderColorSetting((Panel)(object)parent, _moduleSettings.EventTimersStartsInTextColor);
+			RenderColorSetting((Panel)(object)parent, _moduleSettings.EventTimersNameTextColor);
+			RenderColorSetting((Panel)(object)parent, _moduleSettings.EventTimersRemainingTextColor);
+			RenderColorSetting((Panel)(object)parent, _moduleSettings.EventTimersNextOccurenceTextColor);
+			RenderColorSetting((Panel)(object)parent, _moduleSettings.EventTimersRepeatTextColor);
+			RenderEmptyLine((Panel)(object)parent);
 			RenderIntSetting((Panel)(object)parent, _moduleSettings.EventTimersRenderDistance);
 		}
 

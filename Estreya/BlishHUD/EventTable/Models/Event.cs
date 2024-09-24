@@ -113,10 +113,6 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 
 		[JsonIgnore]
-		public bool HostedBySystem { get; set; } = true;
-
-
-		[JsonIgnore]
 		public string SettingKey { get; private set; }
 
 		[JsonIgnore]

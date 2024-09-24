@@ -57,5 +57,6 @@
     <Reference Include="Flurl">
       <HintPath>..\..\working\Flurl.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 </Project>

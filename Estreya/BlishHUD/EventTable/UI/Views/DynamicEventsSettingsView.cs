@@ -51,13 +51,16 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		protected override void BuildView(FlowPanel parent)
 		{
-			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.ShowDynamicEventsOnMap);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.ShowDynamicEventInWorld, async (bool oldVal, bool newVal) => !newVal || await new ConfirmDialog("Activate \"" + ((SettingEntry)_moduleSettings.ShowDynamicEventInWorld).get_DisplayName() + "\"?", "You are in the process of activating \"" + ((SettingEntry)_moduleSettings.ShowDynamicEventInWorld).get_DisplayName() + "\".\nThis setting will add event boundaries inside your view (only when applicable events are on your map).\n\nDo you want to continue?", base.IconService).ShowDialog() == DialogResult.OK);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.ShowDynamicEventsInWorldOnlyWhenInside);
 			RenderBoolSetting((Panel)(object)parent, _moduleSettings.IgnoreZAxisOnDynamicEventsInWorld);
 			RenderIntSetting((Panel)(object)parent, _moduleSettings.DynamicEventsRenderDistance);
+			RenderEmptyLine((Panel)(object)parent);
+			RenderKeybindingSetting((Panel)(object)parent, _moduleSettings.ShowDynamicEventsOnMapKeybinding);
+			RenderKeybindingSetting((Panel)(object)parent, _moduleSettings.ShowDynamicEventsInWorldKeybinding);
 			RenderButton((Panel)(object)parent, base.TranslationService.GetTranslation("dynamicEventsSettingsView-btn-manageEvents", "Manage Events"), delegate
 			{
 				if (_manageEventsWindow == null)

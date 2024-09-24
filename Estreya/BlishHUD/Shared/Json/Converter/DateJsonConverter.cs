@@ -1,3 +1,4 @@
+using System.Globalization;
 using Newtonsoft.Json.Converters;
 
 namespace Estreya.BlishHUD.Shared.Json.Converter
@@ -7,6 +8,7 @@ namespace Estreya.BlishHUD.Shared.Json.Converter
 		public DateJsonConverter()
 		{
 			base.DateTimeFormat = "yyyy-MM-dd";
+			base.Culture = CultureInfo.InvariantCulture;
 		}
 	}
 }

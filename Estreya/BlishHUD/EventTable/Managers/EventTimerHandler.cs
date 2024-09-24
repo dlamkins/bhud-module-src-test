@@ -8,6 +8,7 @@ using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Entities;
 using Blish_HUD.Modules.Managers;
+using Blish_HUD._Extensions;
 using Estreya.BlishHUD.EventTable.Controls.Map;
 using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.Shared.Controls.Map;
@@ -36,6 +37,8 @@ namespace Estreya.BlishHUD.EventTable.Managers
 		private AsyncRef<double> _lastReadd = new AsyncRef<double>(0.0);
 
 		private bool _notifiedLostEntities;
+
+		private ConcurrentDictionary<FontSize, BitmapFont> _fonts = new ConcurrentDictionary<FontSize, BitmapFont>();
 
 		private readonly Gw2ApiManager _apiManager;
 
@@ -201,6 +204,12 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			}
 		}
 
+		private BitmapFont GetFont(FontSize fontSize)
+		{
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			return _fonts.GetOrAdd(fontSize, (Func<FontSize, BitmapFont>)((FontSize size) => GameService.Content.GetFont((FontFace)0, size, (FontStyle)0)));
+		}
+
 		public Task AddEventTimerToWorld(Event ev)
 		{
 			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
@@ -218,73 +227,72 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			//IL_0251: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0256: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0281: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0310: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0315: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0348: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0433: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0438: Unknown result type (might be due to invalid IL or missing references)
-			//IL_043a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0487: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0498: Unknown result type (might be due to invalid IL or missing references)
-			//IL_049d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_050b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0510: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0515: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0517: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0526: Unknown result type (might be due to invalid IL or missing references)
-			//IL_052b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0530: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0532: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0541: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0546: Unknown result type (might be due to invalid IL or missing references)
-			//IL_054b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_054d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0561: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0566: Unknown result type (might be due to invalid IL or missing references)
-			//IL_057b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0631: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0635: Unknown result type (might be due to invalid IL or missing references)
-			//IL_066a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_066e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0721: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0725: Unknown result type (might be due to invalid IL or missing references)
-			//IL_075b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_075f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_079b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_079f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0815: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0819: Unknown result type (might be due to invalid IL or missing references)
-			//IL_084f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0853: Unknown result type (might be due to invalid IL or missing references)
-			//IL_088f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0893: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0333: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0380: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0436: Unknown result type (might be due to invalid IL or missing references)
+			//IL_043b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_048d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0492: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0494: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0503: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0518: Unknown result type (might be due to invalid IL or missing references)
+			//IL_051d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0522: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0524: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0533: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0538: Unknown result type (might be due to invalid IL or missing references)
+			//IL_053d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_053f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_054e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0553: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0558: Unknown result type (might be due to invalid IL or missing references)
+			//IL_055a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_056e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0573: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0588: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0609: Unknown result type (might be due to invalid IL or missing references)
+			//IL_063e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0642: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0677: Unknown result type (might be due to invalid IL or missing references)
+			//IL_067b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_072e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0732: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0768: Unknown result type (might be due to invalid IL or missing references)
+			//IL_076c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0822: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0826: Unknown result type (might be due to invalid IL or missing references)
+			//IL_085c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0860: Unknown result type (might be due to invalid IL or missing references)
+			//IL_089c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08da: Unknown result type (might be due to invalid IL or missing references)
 			RemoveEventTimerFromWorld(ev);
 			if (!_moduleSettings.ShowEventTimersInWorld.get_Value() || !GameService.Gw2Mumble.get_IsAvailable() || ev.Timers == null || (_moduleSettings.DisabledEventTimerSettingKeys.get_Value()?.Contains(ev.SettingKey) ?? false))
 			{
@@ -337,45 +345,35 @@ namespace Estreya.BlishHUD.EventTable.Managers
 						}
 						return "Current remaining: " + text;
 					};
-					BitmapFont remainingFont = GameService.Content.GetFont((FontFace)0, (FontSize)36, (FontStyle)0);
+					BitmapFont remainingFont = GetFont((FontSize)36);
 					float remainingScale = 0.4f;
 					float remainingScaleWidth = 2.75f;
-					Color remainingColor = Color.get_Red();
+					Color remainingColor = ColorExtensions.ToXnaColor(_moduleSettings.EventTimersRemainingTextColor.get_Value().get_Cloth());
 					Func<string> startsInText = () => "Next in: " + (ev.GetNextOccurrence() - _getNow()).Humanize(2, null, TimeUnit.Week, TimeUnit.Second);
-					BitmapFont startsInFont = GameService.Content.GetFont((FontFace)0, (FontSize)36, (FontStyle)0);
+					BitmapFont startsInFont = GetFont((FontSize)36);
 					float startsInScale = 0.4f;
 					float startsInScaleWidth = 2.5f;
-					Color startsInColor = Color.get_Red();
+					Color startsInColor = ColorExtensions.ToXnaColor(_moduleSettings.EventTimersStartsInTextColor.get_Value().get_Cloth());
 					float nextOccurrenceScale = 0.4f;
 					float nextOccurrenceScaleWidth = 2f;
 					Func<string> nextOccurrenceText = () => ev.GetNextOccurrence().ToLocalTime().ToString();
-					Color nextOccurrenceColor = Color.get_Red();
-					BitmapFont nextOccurrenceFont = GameService.Content.GetFont((FontFace)0, (FontSize)36, (FontStyle)0);
+					Color nextOccurrenceColor = ColorExtensions.ToXnaColor(_moduleSettings.EventTimersNextOccurenceTextColor.get_Value().get_Cloth());
+					BitmapFont nextOccurrenceFont = GetFont((FontSize)36);
 					Func<string> nameText = () => ev.Name ?? "";
-					BitmapFont nameFont = GameService.Content.GetFont((FontFace)0, (FontSize)36, (FontStyle)0);
+					BitmapFont nameFont = GetFont((FontSize)36);
 					float nameScale = 0.6f;
 					float nameScaleWidth = width / 1.5f;
-					Color nameColor = Color.get_Red();
+					Color nameColor = ColorExtensions.ToXnaColor(_moduleSettings.EventTimersNameTextColor.get_Value().get_Cloth());
 					Func<string> durationText = () => $"Duration: {ev.Duration}min";
-					BitmapFont durationFont = GameService.Content.GetFont((FontFace)0, (FontSize)36, (FontStyle)0);
+					BitmapFont durationFont = GetFont((FontSize)36);
 					float durationScale = 0.4f;
 					float durationScaleWidth = 2f;
-					Color durationColor = Color.get_Red();
+					Color durationColor = ColorExtensions.ToXnaColor(_moduleSettings.EventTimersDurationTextColor.get_Value().get_Cloth());
 					Func<string> repeatText = () => "Repeats every: " + ev.Repeat.Humanize();
-					BitmapFont repeatFont = GameService.Content.GetFont((FontFace)0, (FontSize)36, (FontStyle)0);
+					BitmapFont repeatFont = GetFont((FontSize)36);
 					float repeatScale = 0.4f;
 					float repeatScaleWidth = 2f;
-					Color repeatColor = Color.get_Red();
-					Color.get_Red();
-					if (_003C_003Ec._003C_003E9__30_11 == null)
-					{
-						_003C_003Ec._003C_003E9__30_11 = () => "FRONT";
-					}
-					if (_003C_003Ec._003C_003E9__30_12 == null)
-					{
-						_003C_003Ec._003C_003E9__30_12 = () => "BACK";
-					}
-					GameService.Content.GetFont((FontFace)0, (FontSize)36, (FontStyle)0);
+					Color repeatColor = ColorExtensions.ToXnaColor(_moduleSettings.EventTimersRepeatTextColor.get_Value().get_Cloth());
 					Vector3 namePosition = texturePosition + new Vector3(0f, 0f, -0.75f);
 					Vector3 durationPosition = namePosition + new Vector3(0f, 0f, 0f - (nameScale / 2f + durationScale / 2f));
 					Vector3 repeatPosition = durationPosition + new Vector3(0f, 0f, 0f - (durationScale / 2f + repeatScale / 2f));
@@ -559,6 +557,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			_moduleSettings.ShowEventTimersOnMap.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowEventTimersOnMap_SettingChanged);
 			_moduleSettings.ShowEventTimersInWorld.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowEventTimersInWorld_SettingChanged);
 			_moduleSettings.DisabledEventTimerSettingKeys.remove_SettingChanged((EventHandler<ValueChangedEventArgs<List<string>>>)DisabledEventTimerSettingKeys_SettingChanged);
+			_fonts?.Clear();
 		}
 	}
 }
