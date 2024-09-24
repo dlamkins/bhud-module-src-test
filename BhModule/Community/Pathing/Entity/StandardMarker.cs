@@ -642,7 +642,7 @@ namespace BhModule.Community.Pathing.Entity
 			{
 				attribute.GetValueAsTextureAsync(resourceManager).ContinueWith(delegate(Task<(Texture2D Texture, Color Sample)> textureTaskResult)
 				{
-					if (!textureTaskResult.IsFaulted && textureTaskResult.Result.Texture != null)
+					if (!textureTaskResult.IsFaulted && textureTaskResult.Result.Texture != null && Texture == null)
 					{
 						Texture = AsyncTexture2D.op_Implicit(textureTaskResult.Result.Texture);
 					}
