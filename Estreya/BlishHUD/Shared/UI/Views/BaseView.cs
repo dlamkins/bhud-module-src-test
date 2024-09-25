@@ -21,7 +21,7 @@ using MonoGame.Extended.BitmapFonts;
 
 namespace Estreya.BlishHUD.Shared.UI.Views
 {
-	public abstract class BaseView : View
+	public abstract class BaseView : View, IUpdatable
 	{
 		protected readonly Logger _logger;
 
@@ -349,7 +349,8 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		protected Dropdown<T> RenderDropdown<T>(Panel parent, Point location, int width, T[] values, T value, Action<T> onChangeAction = null, Func<T, T, Task<bool>> onBeforeChangeAction = null)
 		{
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			bool onBeforeChangeActionSubscribed = onBeforeChangeAction != null;
 			if (onBeforeChangeAction == null)
 			{
 				onBeforeChangeAction = (T _, T _) => Task.FromResult(result: true);
@@ -368,12 +369,22 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 				}
 				dropdown.SelectedItem = value;
 			}
-			if (onChangeAction != null)
+			if (onChangeAction != null || onBeforeChangeActionSubscribed)
 			{
 				dropdown.ValueChanged += delegate(object s, ValueChangedEventArgs<T> e)
 				{
-					Dropdown<T> dropdown3 = s as Dropdown<T>;
-					onChangeAction?.Invoke(dropdown3.SelectedItem);
+					Dropdown<T> scopeDropdown = s as Dropdown<T>;
+					onBeforeChangeAction(e.get_PreviousValue(), e.get_NewValue()).ContinueWith(delegate(Task<bool> resultTask)
+					{
+						if (resultTask.Result)
+						{
+							onChangeAction?.Invoke(scopeDropdown.SelectedItem);
+						}
+						else
+						{
+							scopeDropdown.SelectedItem = e.get_PreviousValue();
+						}
+					});
 				};
 			}
 			return dropdown;
@@ -503,6 +514,18 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 				});
 			});
 			return button;
+		}
+
+		protected FormattedLabel RenderFormattedLabel(Panel parent, Action<FormattedLabelBuilder> formattedLabelBuilderAction)
+		{
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+			Panel panel = GetPanel((Container)(object)parent);
+			FormattedLabelBuilder formattedLabelBuilder = new FormattedLabelBuilder().SetVerticalAlignment((VerticalAlignment)0).SetHorizontalAlignment((HorizontalAlignment)0).AutoSizeHeight()
+				.AutoSizeWidth();
+			formattedLabelBuilderAction(formattedLabelBuilder);
+			FormattedLabel obj = formattedLabelBuilder.Build();
+			((Control)obj).set_Parent((Container)(object)panel);
+			return obj;
 		}
 
 		protected (Label TitleLabel, Label ValueLabel) RenderLabel(Panel parent, string title, string value = null, Color? textColorTitle = null, Color? textColorValue = null, int? valueXLocation = null)
@@ -691,6 +714,10 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 				((Control)mainPanel3).Dispose();
 			}
 			MainPanel = null;
+		}
+
+		public virtual void Update(GameTime gameTime)
+		{
 		}
 	}
 }

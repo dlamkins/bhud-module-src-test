@@ -1,4 +1,3 @@
-using Blish_HUD;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -7,8 +6,6 @@ namespace Estreya.BlishHUD.Shared.Controls.Map
 {
 	public class MapCircle : MapEntity
 	{
-		private static Logger Logger = Logger.GetLogger<MapCircle>();
-
 		private readonly Color _color;
 
 		private readonly float _radius;

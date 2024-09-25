@@ -356,6 +356,12 @@ namespace Estreya.BlishHUD.Shared.Utils
 			}
 		}
 
+		public MapEntity AddEntity(MapEntity entity)
+		{
+			_flatMap.AddEntity(entity);
+			return entity;
+		}
+
 		public MapEntity AddCircle(double x, double y, double radius, Color color, float thickness = 1f)
 		{
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
@@ -379,7 +385,15 @@ namespace Estreya.BlishHUD.Shared.Utils
 
 		public void RemoveEntity(MapEntity mapEntity)
 		{
-			_flatMap.RemoveEntity(mapEntity);
+			RemoveEntities(mapEntity);
+		}
+
+		public void RemoveEntities(params MapEntity[] mapEntity)
+		{
+			foreach (MapEntity entity in mapEntity)
+			{
+				_flatMap.RemoveEntity(entity);
+			}
 		}
 
 		private async Task<NavigationResult> MoveMouse(int x, int y, bool sendToSystem = false)

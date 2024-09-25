@@ -107,6 +107,12 @@ namespace Estreya.BlishHUD.LiveMap
 		protected override async Task LoadAsync()
 		{
 			await base.LoadAsync();
+			GlobalSocket.OnConnected += GlobalSocket_OnConnected;
+			GlobalSocket.OnDisconnected += GlobalSocket_OnDisconnected;
+			GlobalSocket.OnError += GlobalSocket_OnError;
+			GlobalSocket.OnReconnectAttempt += GlobalSocket_OnReconnectAttempt;
+			GlobalSocket.OnReconnectFailed += GlobalSocket_OnReconnectFailed;
+			GlobalSocket.OnReconnectError += GlobalSocket_OnReconnectError;
 			GlobalSocket.On("interval", delegate(SocketIOResponse resp)
 			{
 				int value = resp.GetValue<int>();
@@ -116,6 +122,41 @@ namespace Estreya.BlishHUD.LiveMap
 			await FetchAccountName();
 			await FetchGuildId();
 			await FetchWvW();
+		}
+
+		private void GlobalSocket_OnConnected(object sender, EventArgs e)
+		{
+			base.Logger.Info("Connected.");
+		}
+
+		private void GlobalSocket_OnDisconnected(object sender, string e)
+		{
+			base.Logger.Warn("Disconnected: " + e);
+			if (e == DisconnectReason.IOServerDisconnect)
+			{
+				base.Logger.Info("Trying to reconnect...");
+				GlobalSocket.ConnectAsync();
+			}
+		}
+
+		private void GlobalSocket_OnError(object sender, string e)
+		{
+			base.Logger.Warn("Error: " + e);
+		}
+
+		private void GlobalSocket_OnReconnectAttempt(object sender, int e)
+		{
+			base.Logger.Info($"Attempt reconnect: {e}");
+		}
+
+		private void GlobalSocket_OnReconnectFailed(object sender, EventArgs e)
+		{
+			base.Logger.Warn("Reconnect failed.");
+		}
+
+		private void GlobalSocket_OnReconnectError(object sender, Exception e)
+		{
+			base.Logger.Warn(e, "Could not reconnect");
 		}
 
 		public static byte[] Compress(byte[] bytes)
@@ -252,6 +293,12 @@ namespace Estreya.BlishHUD.LiveMap
 			base.Unload();
 			base.Gw2ApiManager.remove_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
 			GameService.Gw2Mumble.get_PlayerCharacter().remove_NameChanged((EventHandler<ValueEventArgs<string>>)PlayerCharacter_NameChanged);
+			GlobalSocket.OnConnected -= GlobalSocket_OnConnected;
+			GlobalSocket.OnDisconnected -= GlobalSocket_OnDisconnected;
+			GlobalSocket.OnError -= GlobalSocket_OnError;
+			GlobalSocket.OnReconnectAttempt -= GlobalSocket_OnReconnectAttempt;
+			GlobalSocket.OnReconnectFailed -= GlobalSocket_OnReconnectFailed;
+			GlobalSocket.OnReconnectError -= GlobalSocket_OnReconnectError;
 			AsyncHelper.RunSync(GlobalSocket.DisconnectAsync);
 		}
 

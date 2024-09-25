@@ -107,9 +107,6 @@ namespace Estreya.BlishHUD.Shared.Controls
 			: this()
 		{
 			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
 			_message = message;
 			_type = type;
 			_icon = icon;
@@ -117,14 +114,13 @@ namespace Estreya.BlishHUD.Shared.Controls
 			((Control)this).set_Opacity(0f);
 			((Control)this).set_Size(new Point(1024, 256));
 			((Control)this).set_ZIndex(2147483615);
-			((Control)this).set_Location(new Point(((Control)Control.get_Graphics().get_SpriteScreen()).get_Width() / 2 - ((Control)this).get_Size().X / 2, ((Control)Control.get_Graphics().get_SpriteScreen()).get_Height() / 4 - ((Control)this).get_Size().Y / 2));
 			_targetTop = ((Control)this).get_Top();
 		}
 
 		public override void DoUpdate(GameTime gameTime)
 		{
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			((Control)this).set_Width(((Control)Control.get_Graphics().get_SpriteScreen()).get_Width());
 			int calculatedNewTop = ((Control)Control.get_Graphics().get_SpriteScreen()).get_Height() / 4 - ((Control)this).get_Size().Y / 2;
 			if (calculatedNewTop > _targetTop)
 			{
@@ -137,7 +133,6 @@ namespace Estreya.BlishHUD.Shared.Controls
 				((TweenerImpl)GameService.Animation.get_Tweener()).Update((float)gameTime.get_ElapsedGameTime().TotalSeconds);
 				((Control)this).set_Top(_targetTop);
 			}
-			((Control)this).set_Left(((Control)Control.get_Graphics().get_SpriteScreen()).get_Width() / 2 - ((Control)this).get_Size().X / 2);
 		}
 
 		protected override CaptureType CapturesInput()
@@ -215,8 +210,8 @@ namespace Estreya.BlishHUD.Shared.Controls
 				{
 					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, notificationBackground, _layoutMessageBounds);
 				}
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, Message, _fontMenomonia36Regular, RectangleExtension.OffsetBy(bounds, 1, 1), Color.get_Black(), false, (HorizontalAlignment)1, (VerticalAlignment)1);
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, Message, _fontMenomonia36Regular, bounds, messageColor, false, (HorizontalAlignment)1, (VerticalAlignment)1);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, Message, _fontMenomonia36Regular, RectangleExtension.OffsetBy(bounds, 1, 1), Color.get_Black(), false, (HorizontalAlignment)1, (VerticalAlignment)0);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, Message, _fontMenomonia36Regular, bounds, messageColor, false, (HorizontalAlignment)1, (VerticalAlignment)0);
 			}
 		}
 
@@ -264,7 +259,7 @@ namespace Estreya.BlishHUD.Shared.Controls
 			((Control)this).DisposeControl();
 		}
 
-		public static void ShowNotification(string message, NotificationType type = NotificationType.Info, Texture2D icon = null, int duration = 4)
+		public static ScreenNotification ShowNotification(string message, NotificationType type = NotificationType.Info, Texture2D icon = null, int duration = 4)
 		{
 			ScreenNotification screenNotification = new ScreenNotification(message, type, icon, duration);
 			((Control)screenNotification).set_Parent((Container)(object)Control.get_Graphics().get_SpriteScreen());
@@ -276,6 +271,7 @@ namespace Estreya.BlishHUD.Shared.Controls
 			}
 			_activeScreenNotifications.Add(nNot);
 			((Control)nNot).Show();
+			return nNot;
 		}
 
 		public static void ShowNotification(string[] messages, NotificationType type = NotificationType.Info, Texture2D icon = null, int duration = 4)

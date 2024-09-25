@@ -23,5 +23,23 @@ namespace Estreya.BlishHUD.Shared.Extensions
 		{
 			return value / 39.37008f;
 		}
+
+		public static int Remap(this int from, int fromMin, int fromMax, int toMin, int toMax)
+		{
+			return (int)((float)from).Remap((float)fromMin, (float)fromMax, (float)toMin, (float)toMax);
+		}
+
+		public static float Remap(this float from, float fromMin, float fromMax, float toMin, float toMax)
+		{
+			return (float)((double)from).Remap((double)fromMin, (double)fromMax, (double)toMin, (double)toMax);
+		}
+
+		public static double Remap(this double from, double fromMin, double fromMax, double toMin, double toMax)
+		{
+			double num = from - fromMin;
+			double fromMaxAbs = fromMax - fromMin;
+			double normal = num / fromMaxAbs;
+			return (toMax - toMin) * normal + toMin;
+		}
 	}
 }

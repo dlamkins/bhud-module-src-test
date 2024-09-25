@@ -263,12 +263,22 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		public async Task<KofiStatus> GetKofiStatus()
 		{
+			if (string.IsNullOrWhiteSpace(AccessToken))
+			{
+				throw new ArgumentNullException("AccessToken", "No access token available.");
+			}
 			return await _flurlClient.Request(_apiRootUrl, $"v{1}", "ko-fi", "status").WithOAuthBearerToken(AccessToken).GetJsonAsync<KofiStatus>(default(CancellationToken), (HttpCompletionOption)0);
 		}
 
 		public async Task<bool> IsSubscriptionActive()
 		{
 			return (await GetKofiStatus()).Active;
+		}
+
+		protected override async Task Clear()
+		{
+			await base.Clear();
+			Logout();
 		}
 	}
 }

@@ -9,9 +9,16 @@ namespace Estreya.BlishHUD.Shared.Controls.Map
 {
 	public abstract class MapEntity : IDisposable
 	{
+		protected Logger Logger;
+
 		public string TooltipText { get; set; }
 
 		public event EventHandler Disposed;
+
+		public MapEntity()
+		{
+			Logger = Logger.GetLogger(GetType());
+		}
 
 		public void Dispose()
 		{

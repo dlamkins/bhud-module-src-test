@@ -211,7 +211,19 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		private async Task SaveMissingSkills()
 		{
-			await FileUtil.WriteStringAsync(Path.Combine(base.DirectoryPath, "missingSkills.json"), JsonConvert.SerializeObject(_missingSkillsFromAPIReportedByArcDPS.OrderBy((MissingArcDPSSkill skill) => skill.ID), Formatting.Indented));
+			if (_missingSkillsFromAPIReportedByArcDPS == null)
+			{
+				return;
+			}
+			string missingSkillPath = Path.Combine(base.DirectoryPath, "missingSkills.json");
+			try
+			{
+				await FileUtil.WriteStringAsync(missingSkillPath, JsonConvert.SerializeObject(_missingSkillsFromAPIReportedByArcDPS.OrderBy((MissingArcDPSSkill skill) => skill.ID), Formatting.Indented));
+			}
+			catch (Exception ex)
+			{
+				Logger.Warn(ex, "Could not save missing arc dps skills.");
+			}
 		}
 
 		private async Task LoadMissingSkills()

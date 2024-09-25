@@ -268,12 +268,15 @@ namespace Estreya.BlishHUD.Shared.Controls
 		public BitmapFont Font { get; set; } = GameService.Content.get_DefaultFont14();
 
 
+		public bool PreselectOnItemsChange { get; set; } = true;
+
+
 		public event EventHandler<ValueChangedEventArgs<TItem>> ValueChanged;
 
 		public Dropdown()
 			: this()
 		{
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 			Items = new ObservableCollection<TItem>();
 			Items.CollectionChanged += delegate
 			{
@@ -318,10 +321,13 @@ namespace Estreya.BlishHUD.Shared.Controls
 
 		private void ItemsUpdated()
 		{
-			TItem selectedItem = SelectedItem;
-			if (selectedItem == null)
+			if (PreselectOnItemsChange)
 			{
-				TItem val2 = (SelectedItem = Items.FirstOrDefault());
+				TItem selectedItem = SelectedItem;
+				if (selectedItem == null)
+				{
+					TItem val2 = (SelectedItem = Items.FirstOrDefault());
+				}
 			}
 		}
 

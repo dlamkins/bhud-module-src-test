@@ -299,7 +299,7 @@ namespace Estreya.BlishHUD.Shared.Controls
 			}
 			if (!string.IsNullOrWhiteSpace(Text))
 			{
-				spriteBatch.DrawStringOnCtrl((Control)(object)this, Text, Font, TextBounds, TextColor, wrap: false, (HorizontalAlignment)0, (VerticalAlignment)1);
+				spriteBatch.DrawStringOnCtrl((Control)(object)this, Text, Font, TextBounds, TextColor, wrap: false, 1f, (HorizontalAlignment)0, (VerticalAlignment)1);
 			}
 		}
 	}

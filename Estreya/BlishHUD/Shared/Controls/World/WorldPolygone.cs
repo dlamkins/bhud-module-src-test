@@ -13,26 +13,35 @@ namespace Estreya.BlishHUD.Shared.Controls.World
 	{
 		private readonly Color _color;
 
-		private readonly Func<WorldEntity, bool> _renderCondition;
+		private VertexPositionColor[] _vertexData;
 
-		private readonly VertexPositionColor[] _vertexData;
+		private Vector3[] _points;
 
-		public Vector3[] Points { get; }
+		public Vector3[] Points
+		{
+			get
+			{
+				return _points;
+			}
+			set
+			{
+				_points = value;
+				_vertexData = BuildVertices();
+			}
+		}
 
-		public WorldPolygone(Vector3 position, Vector3[] points, Color color, Func<WorldEntity, bool> renderCondition = null)
+		public WorldPolygone(Vector3 position, Vector3[] points, Color color)
 			: base(position, 1f)
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 			if (points.Length < 2 || points.Length % 2 != 0)
 			{
 				throw new ArgumentOutOfRangeException("points");
 			}
-			Points = points;
 			_color = color;
-			_renderCondition = renderCondition;
-			_vertexData = BuildVertices();
+			Points = points;
 		}
 
 		public WorldPolygone(Vector3 position, Vector3[] points)
@@ -51,6 +60,7 @@ namespace Estreya.BlishHUD.Shared.Controls.World
 			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Expected O, but got Unknown
 			VertexPositionColor[] verts = (VertexPositionColor[])(object)new VertexPositionColor[Points.Length];
 			for (int i = 0; i < Points.Length; i++)
 			{
@@ -59,8 +69,16 @@ namespace Estreya.BlishHUD.Shared.Controls.World
 			GraphicsDeviceContext ctx = GameService.Graphics.LendGraphicsDeviceContext();
 			try
 			{
-				new VertexBuffer(((GraphicsDeviceContext)(ref ctx)).get_GraphicsDevice(), VertexPositionColor.VertexDeclaration, verts.Length, (BufferUsage)1).SetData<VertexPositionColor>(verts);
-				return verts;
+				VertexBuffer sectionBuffer = new VertexBuffer(((GraphicsDeviceContext)(ref ctx)).get_GraphicsDevice(), VertexPositionColor.VertexDeclaration, verts.Length, (BufferUsage)1);
+				try
+				{
+					sectionBuffer.SetData<VertexPositionColor>(verts);
+					return verts;
+				}
+				finally
+				{
+					((IDisposable)sectionBuffer)?.Dispose();
+				}
 			}
 			finally
 			{
@@ -70,29 +88,14 @@ namespace Estreya.BlishHUD.Shared.Controls.World
 
 		protected override void InternalRender(GraphicsDevice graphicsDevice, IWorld world, ICamera camera)
 		{
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0004: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-			if (_renderCondition != null && !_renderCondition(this))
-			{
-				return;
-			}
-			Matrix modelMatrix = Matrix.CreateScale(base.Scale);
-			Vector3 position = base.Position + new Vector3(0f, 0f, 0f);
-			modelMatrix *= Matrix.CreateTranslation(position);
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+			Matrix modelMatrix = GetMatrix(graphicsDevice, world, camera);
 			base.RenderEffect.set_View(GameService.Gw2Mumble.get_PlayerCamera().get_View());
 			base.RenderEffect.set_Projection(GameService.Gw2Mumble.get_PlayerCamera().get_Projection());
 			base.RenderEffect.set_World(modelMatrix);

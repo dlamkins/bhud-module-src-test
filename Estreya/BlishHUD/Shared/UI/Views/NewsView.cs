@@ -28,6 +28,8 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		private const string BLISH_HUD_DISCORD_INVITE = "https://discord.gg/nGbd3kU";
 
+		private const int DISCORD_SECTION_HEIGHT = 200;
+
 		private static readonly Point _importantIconSize = new Point(32, 32);
 
 		private readonly IFlurlClient _flurlClient;
@@ -52,33 +54,33 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Expected O, but got Unknown
-			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0115: Expected O, but got Unknown
-			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014e: Expected O, but got Unknown
-			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Expected O, but got Unknown
+			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0112: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0126: Expected O, but got Unknown
+			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015f: Expected O, but got Unknown
+			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)parent);
 			val.set_FlowDirection((ControlFlowDirection)3);
 			((Control)val).set_Location(new Point(25, 25));
-			((Control)val).set_Height((int)((double)((Container)parent).get_ContentRegion().Height * 0.75));
+			((Control)val).set_Height(((Container)parent).get_ContentRegion().Height - 200);
 			((Control)val).set_Width(((Container)parent).get_ContentRegion().Width - 50);
 			((Panel)val).set_CanScroll(true);
 			FlowPanel newsList = val;
-			List<News> sortedNews = _newsService.News.OrderByDescending((News n) => n.Timestamp).ToList();
+			List<News> sortedNews = _newsService?.News?.OrderByDescending((News n) => n.Timestamp).ToList() ?? new List<News>();
 			if (sortedNews.Count > 0)
 			{
 				foreach (News news in sortedNews)
