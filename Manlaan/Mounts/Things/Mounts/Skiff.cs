@@ -11,5 +11,15 @@ namespace Manlaan.Mounts.Things.Mounts
 			: base(settingCollection, helper, "Skiff", "Skiff", "skiff")
 		{
 		}
+
+		public override bool IsGroundTargeted()
+		{
+			return true;
+		}
+
+		public override bool ShouldGroundTargetingBeDelayed()
+		{
+			return !_helper.IsPlayerOnWaterSurface();
+		}
 	}
 }

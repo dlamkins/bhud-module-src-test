@@ -34,6 +34,12 @@ namespace Manlaan.Mounts
 
 		public static readonly string AnetIconTextureName = "1441452.png";
 
+		public static readonly string InCombatTextureName = "1636746-cropped.png";
+
+		public static readonly string RangeIndicatorTextureName = "157133.png";
+
+		public static readonly string LaterActivationTextureName = "496252.png";
+
 		public TextureCache(ContentsManager contentsManager)
 		{
 			this.contentsManager = contentsManager;
@@ -56,6 +62,9 @@ namespace Manlaan.Mounts
 			PreCacheTexture(SupportMeTabTextureName, getTextureFromRef);
 			PreCacheTexture(KofiTextureName, getTextureFromRef);
 			PreCacheTexture(AnetIconTextureName, getTextureFromRef);
+			PreCacheTexture(InCombatTextureName, getTextureFromRef);
+			PreCacheTexture(RangeIndicatorTextureName, getTextureFromRef);
+			PreCacheTexture(LaterActivationTextureName, getTextureFromRef);
 		}
 
 		private Texture2D PremultiplyTexture(string textureName)

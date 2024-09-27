@@ -23,6 +23,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Mounts;
 using Mounts.Settings;
+using Newtonsoft.Json;
+using Taimi.UndaDaSea_BlishHUD;
 
 namespace Manlaan.Mounts
 {
@@ -51,6 +53,12 @@ namespace Manlaan.Mounts
 
 		public static string[] _keybindBehaviours = new string[2] { "Default", "Radial" };
 
+		private bool previousTriggeringState;
+
+		private DateTime? lastTriggered;
+
+		private TappedModuleKeybindState tappedModuleKeybind;
+
 		public static SettingEntry<int> _settingsLastRunMigrationVersion;
 
 		public static SettingEntry<KeyBinding> _settingDefaultMountBinding;
@@ -59,11 +67,17 @@ namespace Manlaan.Mounts
 
 		public static SettingEntry<bool> _settingDisplayMountQueueing;
 
+		public static SettingEntry<bool> _settingDisplayLaterActivation;
+
+		public static SettingEntry<bool> _settingDisplayGroundTargetingAction;
+
+		public static SettingEntry<GroundTargeting> _settingGroundTargeting;
+
 		public static SettingEntry<bool> _settingEnableMountQueueing;
 
-		public static SettingEntry<Point> _settingDisplayMountQueueingLocation;
+		public static SettingEntry<Point> _settingInfoPanelLocation;
 
-		public static SettingEntry<bool> _settingDragMountQueueing;
+		public static SettingEntry<bool> _settingDragInfoPanel;
 
 		public static SettingEntry<bool> _settingCombatLaunchMasteryUnlocked;
 
@@ -91,6 +105,8 @@ namespace Manlaan.Mounts
 
 		public static SettingEntry<float> _settingFallingOrGlidingUpdateFrequency;
 
+		public static SettingEntry<int> _settingTapThresholdInMilliseconds;
+
 		private TabbedWindow2 _settingsWindow;
 
 		public static DebugControl _debug;
@@ -99,13 +115,15 @@ namespace Manlaan.Mounts
 
 		private ICollection<DrawIcons> _drawIcons = new List<DrawIcons>();
 
-		private DrawOutOfCombat _drawOutOfCombat;
+		private InfoPanel _drawInfoPanel;
 
 		private DrawMouseCursor _drawMouseCursor;
 
 		private Helper _helper;
 
 		private TextureCache _textureCache;
+
+		public static List<SkyLake> _skyLakes = new List<SkyLake>();
 
 		private bool _lastIsThingSwitchable;
 
@@ -127,25 +145,25 @@ namespace Manlaan.Mounts
 
 		protected override void Initialize()
 		{
-			//IL_046e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0481: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0486: Unknown result type (might be due to invalid IL or missing references)
-			//IL_048b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0496: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04de: Expected O, but got Unknown
-			//IL_0518: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0522: Expected O, but got Unknown
-			//IL_055c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0566: Expected O, but got Unknown
-			//IL_05b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05bd: Expected O, but got Unknown
-			//IL_05f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0601: Expected O, but got Unknown
+			//IL_04dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0504: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0514: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0519: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0523: Unknown result type (might be due to invalid IL or missing references)
+			//IL_052a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0540: Unknown result type (might be due to invalid IL or missing references)
+			//IL_054c: Expected O, but got Unknown
+			//IL_0586: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0590: Expected O, but got Unknown
+			//IL_05ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05d4: Expected O, but got Unknown
+			//IL_0621: Unknown result type (might be due to invalid IL or missing references)
+			//IL_062b: Expected O, but got Unknown
+			//IL_0665: Unknown result type (might be due to invalid IL or missing references)
+			//IL_066f: Expected O, but got Unknown
 			List<string> obj = new List<string>
 			{
 				"griffon-text.png", "griffon-trans.png", "griffon.png", "jackal-text.png", "jackal-trans.png", "jackal.png", "raptor-text.png", "raptor-trans.png", "raptor.png", "roller-text.png",
@@ -156,7 +174,8 @@ namespace Manlaan.Mounts
 				"tonic-white.png", "toy-paint.png", "toy-white.png", "chair-paint.png", "chair-whiite.png", "held-paint.png", "held-white.png", "music-paint.png", "music-white.png", "skimmer-remix.png",
 				"skyscaleleap-remix.png", "skyscale-remix.png", "springer-remix.png", "tonic-remix.png", "toy-remix.png", "turtle-remix.png", "unmount-remix.png", "warclaw-remix.png", "chair-remix.png", "fishing-remix.png",
 				"griffon-remix.png", "held-remix.png", "jackal-remix.png", "jadebotwaypoint-remix.png", "music-remix.png", "raptor-remix.png", "roller-remix.png", "scanforrift-remix.png", "skiff-remix.png", "summonconjureddoorway.png",
-				"summonconjureddoorway-trans.png", "summonconjureddoorway-trans-color.png"
+				"summonconjureddoorway-trans.png", "summonconjureddoorway-trans-color.png", "griffon_natural.png", "jackal_natural.png", "raptor_natural.png", "roller_natural.png", "skimmer_natural.png", "skyscale_natural.png", "springer_natural.png", "turtle_natural.png",
+				"warclaw_natural.png"
 			};
 			thingsDirectory = DirectoriesManager.GetFullDirectoryPath("mounts");
 			obj.ForEach(delegate(string f)
@@ -170,6 +189,7 @@ namespace Manlaan.Mounts
 					Name = file.Substring(thingsDirectory.Length + 1)
 				}).ToList();
 			_textureCache = new TextureCache(ContentsManager);
+			_skyLakes = LoadSkyLakesFromJson();
 			GameService.Gw2Mumble.get_PlayerCharacter().add_IsInCombatChanged((EventHandler<ValueEventArgs<bool>>)async delegate(object sender, ValueEventArgs<bool> e)
 			{
 				await HandleCombatChangeAsync(sender, e);
@@ -189,6 +209,26 @@ namespace Manlaan.Mounts
 			_settingsWindow.get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(_textureCache.GetImgFile(TextureCache.SupportMeTabTextureName)), (Func<IView>)(() => (IView)(object)new SupportMeView(_textureCache)), Strings.Window_SupportMeTab, (int?)null));
 		}
 
+		public List<SkyLake> LoadSkyLakesFromJson()
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Expected O, but got Unknown
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Expected O, but got Unknown
+			JsonSerializer serializer = new JsonSerializer();
+			((Collection<JsonConverter>)(object)serializer.get_Converters()).Add((JsonConverter)(object)new Vector3Converter());
+			using StreamReader stream = new StreamReader(ContentsManager.GetFileStream("SkyLakes.json"));
+			JsonReader reader = (JsonReader)new JsonTextReader((TextReader)stream);
+			try
+			{
+				return serializer.Deserialize<List<SkyLake>>(reader);
+			}
+			finally
+			{
+				((IDisposable)reader)?.Dispose();
+			}
+		}
+
 		private void ExtractFile(string filePath, string directoryToExtractTo)
 		{
 			string fullPath = Path.Combine(directoryToExtractTo, filePath);
@@ -198,6 +238,23 @@ namespace Manlaan.Mounts
 			fs.Read(buffer, 0, (int)fs.Length);
 			Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
 			File.WriteAllBytes(fullPath, buffer);
+		}
+
+		private void MigrateToInfoPanelLocation(SettingCollection settings)
+		{
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			if (settings.ContainsSetting("DisplayMountQueueingLocation"))
+			{
+				SettingEntry<Point> settingDisplayMountQueueingLocation = settings.get_Item("DisplayMountQueueingLocation") as SettingEntry<Point>;
+				_settingInfoPanelLocation.set_Value(new Point(settingDisplayMountQueueingLocation.get_Value().X, settingDisplayMountQueueingLocation.get_Value().Y));
+			}
+			if (settings.ContainsSetting("DragMountQueueing"))
+			{
+				SettingEntry<bool> settingDragMountQueueing = settings.get_Item("DragMountQueueing") as SettingEntry<bool>;
+				_settingDragInfoPanel.set_Value(settingDragMountQueueing.get_Value());
+			}
 		}
 
 		private void MigrateAwayFromMount(SettingCollection settings)
@@ -297,11 +354,11 @@ namespace Manlaan.Mounts
 		{
 			//IL_0254: Unknown result type (might be due to invalid IL or missing references)
 			//IL_029c: Expected O, but got Unknown
-			//IL_03ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0617: Expected O, but got Unknown
-			//IL_0710: Unknown result type (might be due to invalid IL or missing references)
-			//IL_071c: Expected O, but got Unknown
+			//IL_03dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0617: Unknown result type (might be due to invalid IL or missing references)
+			//IL_065f: Expected O, but got Unknown
+			//IL_0758: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0764: Expected O, but got Unknown
 			settingscollection = settings;
 			List<Thing> obj = new List<Thing>
 			{
@@ -330,7 +387,7 @@ namespace Manlaan.Mounts
 			_things = new Collection<Thing>(obj);
 			List<Thing> thingsForMigration = obj.ToList();
 			_settingsLastRunMigrationVersion = settings.DefineSetting<int>("LastRunMigrationVersion", 0, (Func<string>)null, (Func<string>)null);
-			_settingBlockSequenceFromGw2 = settings.DefineSetting<bool>("BlockSequenceFromGw2", false, (Func<string>)null, (Func<string>)null);
+			_settingBlockSequenceFromGw2 = settings.DefineSetting<bool>("BlockSequenceFromGw2", true, (Func<string>)null, (Func<string>)null);
 			_settingDefaultMountBinding = settings.DefineSetting<KeyBinding>("DefaultMountBinding", new KeyBinding((Keys)0), (Func<string>)(() => Strings.Setting_DefaultMountBinding), (Func<string>)(() => ""));
 			_settingDefaultMountBinding.get_Value().set_Enabled(true);
 			_settingDefaultMountBinding.get_Value().set_BlockSequenceFromGw2(_settingBlockSequenceFromGw2.get_Value());
@@ -343,9 +400,12 @@ namespace Manlaan.Mounts
 			_settingKeybindBehaviour = settings.DefineSetting<string>("KeybindBehaviour", "Radial", (Func<string>)null, (Func<string>)null);
 			_settingDisplayMountQueueing = settings.DefineSetting<bool>("DisplayMountQueueing", false, (Func<string>)null, (Func<string>)null);
 			_settingEnableMountQueueing = settings.DefineSetting<bool>("EnableMountQueueing", false, (Func<string>)null, (Func<string>)null);
-			_settingDragMountQueueing = settings.DefineSetting<bool>("DragMountQueueing", false, (Func<string>)null, (Func<string>)null);
+			_settingDisplayLaterActivation = settings.DefineSetting<bool>("DisplayLaterActivation", false, (Func<string>)null, (Func<string>)null);
+			_settingDisplayGroundTargetingAction = settings.DefineSetting<bool>("DisplayGroundTargetingAction", false, (Func<string>)null, (Func<string>)null);
+			_settingGroundTargeting = settings.DefineSetting<GroundTargeting>("GroundTargeting", GroundTargeting.Normal, (Func<string>)null, (Func<string>)null);
 			_settingCombatLaunchMasteryUnlocked = settings.DefineSetting<bool>("CombatLaunchMasteryUnlocked", false, (Func<string>)null, (Func<string>)null);
-			_settingDisplayMountQueueingLocation = settings.DefineSetting<Point>("DisplayMountQueueingLocation", new Point(200, 200), (Func<string>)null, (Func<string>)null);
+			_settingInfoPanelLocation = settings.DefineSetting<Point>("InfoPanelLocation", new Point(200, 200), (Func<string>)null, (Func<string>)null);
+			_settingDragInfoPanel = settings.DefineSetting<bool>("DragInfoPanel", false, (Func<string>)null, (Func<string>)null);
 			_settingMountRadialSpawnAtMouse = settings.DefineSetting<bool>("MountRadialSpawnAtMouse", false, (Func<string>)(() => Strings.Setting_MountRadialSpawnAtMouse), (Func<string>)(() => ""));
 			_settingMountRadialIconSizeModifier = settings.DefineSetting<float>("MountRadialIconSizeModifier", 0.28f, (Func<string>)(() => Strings.Setting_MountRadialIconSizeModifier), (Func<string>)(() => ""));
 			SettingComplianceExtensions.SetRange(_settingMountRadialIconSizeModifier, 0.05f, 1f);
@@ -367,6 +427,7 @@ namespace Manlaan.Mounts
 				_helper.UpdateLastJumped();
 			});
 			_settingFallingOrGlidingUpdateFrequency = settings.DefineSetting<float>("FallingOrGlidingUpdateFrequency", 0.1f, (Func<string>)null, (Func<string>)null);
+			_settingTapThresholdInMilliseconds = settings.DefineSetting<int>("TapThresholdInMilliseconds", 500, (Func<string>)null, (Func<string>)null);
 			ContextualRadialSettings = new List<ContextualRadialThingSettings>
 			{
 				new ContextualRadialThingSettings(settings, "IsPlayerMounted", 0, _helper.IsPlayerMounted, defaultIsEnabled: true, defaultApplyInstantlyIfSingle: true, defaultUnconditionallyDoAction: true, _things.Where((Thing t) => t is Raptor).ToList()),
@@ -392,6 +453,11 @@ namespace Manlaan.Mounts
 				MigrateAwayFromMount(settings);
 				_settingsLastRunMigrationVersion.set_Value(1);
 			}
+			if (_settingsLastRunMigrationVersion.get_Value() < 2)
+			{
+				MigrateToInfoPanelLocation(settings);
+				_settingsLastRunMigrationVersion.set_Value(2);
+			}
 			foreach (Thing thing in _things)
 			{
 				thing.KeybindingSetting.get_Value().add_BindingChanged((EventHandler<EventArgs>)UpdateSettings);
@@ -400,9 +466,10 @@ namespace Manlaan.Mounts
 			_settingDisplayModuleOnLoadingScreen.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
 			_settingMountAutomaticallyAfterLoadingScreen.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
 			_settingDisplayMountQueueing.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
+			_settingDisplayLaterActivation.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
 			_settingEnableMountQueueing.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
-			_settingDragMountQueueing.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
-			_settingDisplayMountQueueingLocation.add_SettingChanged((EventHandler<ValueChangedEventArgs<Point>>)UpdateSettings);
+			_settingDragInfoPanel.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
+			_settingInfoPanelLocation.add_SettingChanged((EventHandler<ValueChangedEventArgs<Point>>)UpdateSettings);
 			_settingMountRadialSpawnAtMouse.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
 			_settingMountRadialIconSizeModifier.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)UpdateSettings);
 			_settingMountRadialRadiusModifier.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)UpdateSettings);
@@ -426,14 +493,23 @@ namespace Manlaan.Mounts
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
-			_debug.Add("GetTriggeredRadialSettings Name", () => _helper.GetTriggeredRadialSettings()?.Name ?? "");
+			_debug.Add("GetTriggeredRadialSettings", delegate
+			{
+				RadialThingSettings triggeredRadialSettings = _helper.GetTriggeredRadialSettings();
+				return (triggeredRadialSettings != null) ? $"Name: {triggeredRadialSettings.Name}, Number of things: {triggeredRadialSettings.AvailableThings.Count}" : "";
+			});
 			ContextualRadialSettings.ForEach(delegate(ContextualRadialThingSettings c)
 			{
-				_debug.Add($"Contextual RadialSettings {c.Order} {c.Name}", () => $"IsApplicable: {c.IsApplicable()}, Center: {c.GetCenterThing()?.Name}, CenterBehavior: {c.CenterThingBehavior.get_Value()}, ApplyInstantlyIfSingle: {c.ApplyInstantlyIfSingle.get_Value()}, LastUsed: {c.GetLastUsedThing()?.Name}");
+				_debug.Add($"Contextual RadialSettings {c.Order} {c.Name} A", () => $"IsApplicable: {c.IsApplicable()}, ApplyInstantlyIfSingle: {c.ApplyInstantlyIfSingle.get_Value()}, ApplyInstantlyOnTap: {c.ApplyInstantlyOnTap.get_Value()}");
 			});
-			_debug.Add("Applicable Contextual RadialSettings Name", () => _helper.GetApplicableContextualRadialThingSettings()?.Name ?? "");
-			_debug.Add("Applicable Contextual RadialSettings Things", () => string.Join(", ", _helper.GetApplicableContextualRadialThingSettings()?.AvailableThings.Select((Thing t) => t.Name)) ?? "");
+			ContextualRadialSettings.ForEach(delegate(ContextualRadialThingSettings c)
+			{
+				_debug.Add($"Contextual RadialSettings {c.Order} {c.Name} B", () => $"Center: {c.GetCenterThing()?.Name}, CenterBehavior: {c.CenterThingBehavior.get_Value()}, LastUsed: {c.GetLastUsedThing()?.Name}");
+			});
+			_debug.Add("Applicable Contextual RadialSettings", () => $"Name: {_helper.GetApplicableContextualRadialThingSettings()?.Name}, Things count: {_helper.GetApplicableContextualRadialThingSettings()?.AvailableThings.Count}");
 			_debug.Add("Queued for out of combat", () => _helper.GetQueuedThing()?.Name ?? "");
+			_debug.Add("TappedModuleKeybind", () => string.Format("{0} {1} {2} {3}", DateTime.Now, tappedModuleKeybind, lastTriggered, lastTriggered.HasValue ? ((object)(int)(DateTime.Now - lastTriggered.Value).TotalMilliseconds) : ""));
+			_helper.IsCombatLaunchUnlockedAsync();
 			Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)async delegate
 			{
 				await _helper.IsCombatLaunchUnlockedAsync();
@@ -444,23 +520,45 @@ namespace Manlaan.Mounts
 
 		protected override void Update(GameTime gameTime)
 		{
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Invalid comparison between Unknown and I4
 			_helper.UpdatePlayerGlidingOrFalling(gameTime);
+			MouseState state = Mouse.GetState();
+			if ((int)((MouseState)(ref state)).get_LeftButton() == 1)
+			{
+				_helper.DoRangedThing();
+			}
+			bool currentTriggeringState = _settingDefaultMountBinding.get_Value().get_IsTriggering();
+			double howLongIsModuleKeybindHeldHown = 0.0;
+			if (lastTriggered.HasValue)
+			{
+				howLongIsModuleKeybindHeldHown = (DateTime.Now - lastTriggered.Value).TotalMilliseconds;
+			}
+			bool isWithinThreshold = howLongIsModuleKeybindHeldHown <= (double)_settingTapThresholdInMilliseconds.get_Value();
+			if (((previousTriggeringState && !currentTriggeringState && isWithinThreshold) || howLongIsModuleKeybindHeldHown > (double)_settingTapThresholdInMilliseconds.get_Value()) && lastTriggered.HasValue)
+			{
+				tappedModuleKeybind = ((!isWithinThreshold) ? TappedModuleKeybindState.Hold : TappedModuleKeybindState.Tap);
+				DoKeybindActionAsync(KeybindTriggerType.Module);
+				lastTriggered = null;
+			}
+			previousTriggeringState = currentTriggeringState;
 			bool isThingSwitchable = CanThingBeActivated();
 			bool moduleHidden = _lastIsThingSwitchable && !isThingSwitchable;
 			bool moduleShown = !_lastIsThingSwitchable && isThingSwitchable;
-			string currentCharacterName = GameService.Gw2Mumble.get_PlayerCharacter().get_Name();
 			int inUseThingsCount = _things.Count((Thing m) => m.IsInUse());
 			if (inUseThingsCount == 0 && _lastInUseThingsCount > 0 && !moduleHidden && !moduleShown)
 			{
-				_helper.ClearSomethingStoredForLaterActivation(currentCharacterName);
+				_helper.ClearSomethingStoredForLaterActivation();
 			}
 			if (moduleHidden && inUseThingsCount == 1 && _settingMountAutomaticallyAfterLoadingScreen.get_Value() && GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus())
 			{
-				_helper.StoreThingForLaterActivation(_things.Single((Thing m) => m.IsInUse()), currentCharacterName, "ModuleHidden");
+				_helper.StoreThingForLaterActivation(_things.Single((Thing m) => m.IsInUse()), "ModuleHidden");
 			}
-			if (moduleShown && inUseThingsCount == 0 && _helper.IsSomethingStoredForLaterActivation(currentCharacterName) && GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus())
+			if (moduleShown && inUseThingsCount == 0 && _helper.IsSomethingStoredForLaterActivation() != null && GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus())
 			{
-				_helper.DoThingActionForLaterActivation(currentCharacterName);
+				_helper.DoThingActionForLaterActivation();
 			}
 			_lastInUseThingsCount = inUseThingsCount;
 			_lastIsThingSwitchable = isThingSwitchable;
@@ -471,6 +569,11 @@ namespace Manlaan.Mounts
 				{
 					((Control)drawIcon).Show();
 				}
+				InfoPanel drawInfoPanel = _drawInfoPanel;
+				if (drawInfoPanel != null)
+				{
+					((Control)drawInfoPanel).Show();
+				}
 			}
 			else
 			{
@@ -478,14 +581,11 @@ namespace Manlaan.Mounts
 				{
 					((Control)drawIcon2).Hide();
 				}
-			}
-			if (_things.Any((Thing m) => m.QueuedTimestamp.HasValue) || _settingDragMountQueueing.get_Value())
-			{
-				_drawOutOfCombat?.ShowSpinner();
-			}
-			else
-			{
-				_drawOutOfCombat?.HideSpinner();
+				InfoPanel drawInfoPanel2 = _drawInfoPanel;
+				if (drawInfoPanel2 != null)
+				{
+					((Control)drawInfoPanel2).Hide();
+				}
 			}
 			if ((((Control)_radial).get_Visible() && !_settingDefaultMountBinding.get_Value().get_IsTriggering() && !UserDefinedRadialSettings.Any((UserDefinedRadialThingSettings s) => s.Keybind.get_Value().get_IsTriggering())) || !shouldShowModule)
 			{
@@ -504,15 +604,12 @@ namespace Manlaan.Mounts
 
 		public static bool CanThingBeActivated()
 		{
-			if (GameService.GameIntegration.get_Gw2Instance().get_IsInGame())
-			{
-				return !GameService.Gw2Mumble.get_UI().get_IsMapOpen();
-			}
-			return false;
+			return GameService.GameIntegration.get_Gw2Instance().get_IsInGame();
 		}
 
 		protected override void Unload()
 		{
+			_skyLakes?.Clear();
 			DebugControl debug = _debug;
 			if (debug != null)
 			{
@@ -534,9 +631,10 @@ namespace Manlaan.Mounts
 				thing.DisposeCornerIcon();
 			}
 			_settingDisplayMountQueueing.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
+			_settingDisplayLaterActivation.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
 			_settingEnableMountQueueing.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
-			_settingDragMountQueueing.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
-			_settingDisplayMountQueueingLocation.remove_SettingChanged((EventHandler<ValueChangedEventArgs<Point>>)UpdateSettings);
+			_settingDragInfoPanel.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
+			_settingInfoPanelLocation.remove_SettingChanged((EventHandler<ValueChangedEventArgs<Point>>)UpdateSettings);
 			_settingMountRadialSpawnAtMouse.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateSettings);
 			_settingMountRadialIconSizeModifier.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)UpdateSettings);
 			_settingMountRadialRadiusModifier.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)UpdateSettings);
@@ -591,12 +689,12 @@ namespace Manlaan.Mounts
 				((Control)drawIcon).Dispose();
 			}
 			_drawIcons = IconThingSettings.Select((IconThingSettings iconSetting) => new DrawIcons(iconSetting, _helper, _textureCache)).ToList();
-			DrawOutOfCombat drawOutOfCombat = _drawOutOfCombat;
-			if (drawOutOfCombat != null)
+			InfoPanel drawInfoPanel = _drawInfoPanel;
+			if (drawInfoPanel != null)
 			{
-				((Control)drawOutOfCombat).Dispose();
+				((Control)drawInfoPanel).Dispose();
 			}
-			_drawOutOfCombat = new DrawOutOfCombat();
+			_drawInfoPanel = new InfoPanel(_textureCache, _helper);
 			DrawMouseCursor drawMouseCursor = _drawMouseCursor;
 			if (drawMouseCursor != null)
 			{
@@ -631,16 +729,38 @@ namespace Manlaan.Mounts
 			ContextualRadialThingSettings selectedRadialSettings = _helper.GetApplicableContextualRadialThingSettings();
 			Logger.Debug("DoKeybindActionAsync radial applicable settings: " + selectedRadialSettings.Name);
 			ICollection<Thing> things = selectedRadialSettings.AvailableThings;
+			if (!lastTriggered.HasValue && selectedRadialSettings.IsTapApplicable())
+			{
+				Logger.Debug("DoKeybindActionAsync radial tap is applicable.");
+				lastTriggered = DateTime.Now;
+				return;
+			}
+			Thing tappedThing = things.FirstOrDefault((Thing t) => t.Name == selectedRadialSettings.ApplyInstantlyOnTap.get_Value());
+			if (selectedRadialSettings.IsTapApplicable())
+			{
+				if (tappedModuleKeybind == TappedModuleKeybindState.Tap)
+				{
+					await (tappedThing?.DoAction(selectedRadialSettings.UnconditionallyDoAction.get_Value(), isActionComingFromMouseActionOnModuleUI: false));
+					Logger.Debug("DoKeybindActionAsync not showing radial selected thing (tappedModuleKeybind): " + tappedThing?.Name);
+					tappedModuleKeybind = TappedModuleKeybindState.Unknown;
+					return;
+				}
+				if (things.Count() > 1 && tappedThing != null)
+				{
+					things.Remove(tappedThing);
+				}
+				tappedModuleKeybind = TappedModuleKeybindState.Unknown;
+			}
 			if (things.Count() == 1 && selectedRadialSettings.ApplyInstantlyIfSingle.get_Value())
 			{
-				await (things.FirstOrDefault()?.DoAction(selectedRadialSettings.UnconditionallyDoAction.get_Value()));
-				Logger.Debug("DoKeybindActionAsync not showing radial selected thing: " + selectedRadialSettings.Things.First().Name);
+				await (things.FirstOrDefault()?.DoAction(selectedRadialSettings.UnconditionallyDoAction.get_Value(), isActionComingFromMouseActionOnModuleUI: false));
+				Logger.Debug("DoKeybindActionAsync not showing radial selected thing (ApplyInstantlyIfSingle): " + things.First().Name);
 				return;
 			}
 			Thing defaultThing = selectedRadialSettings.GetDefaultThing();
 			if (defaultThing != null && GameService.Input.get_Mouse().get_CameraDragging())
 			{
-				await (defaultThing?.DoAction(unconditionallyDoAction: false) ?? Task.CompletedTask);
+				await (defaultThing?.DoAction(unconditionallyDoAction: false, isActionComingFromMouseActionOnModuleUI: false) ?? Task.CompletedTask);
 				Logger.Debug("DoKeybindActionAsync CameraDragging default");
 				return;
 			}
@@ -654,7 +774,7 @@ namespace Manlaan.Mounts
 			}
 			else
 			{
-				await (defaultThing?.DoAction(unconditionallyDoAction: false) ?? Task.CompletedTask);
+				await (defaultThing?.DoAction(unconditionallyDoAction: false, isActionComingFromMouseActionOnModuleUI: false) ?? Task.CompletedTask);
 				Logger.Debug("DoKeybindActionAsync KeybindBehaviour default");
 			}
 		}
@@ -683,7 +803,7 @@ namespace Manlaan.Mounts
 			{
 				Thing thingInCombat = _helper.GetQueuedThing();
 				Logger.Debug("HandleCombatChangeAsync Applied queued for out of combat: " + thingInCombat?.Name);
-				await (thingInCombat?.DoAction(unconditionallyDoAction: false) ?? Task.CompletedTask);
+				await (thingInCombat?.DoAction(unconditionallyDoAction: false, isActionComingFromMouseActionOnModuleUI: false) ?? Task.CompletedTask);
 			}
 			else
 			{

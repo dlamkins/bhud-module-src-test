@@ -45,5 +45,15 @@ namespace Mounts.Settings
 			Keybind.get_Value().set_Enabled(false);
 			base.DeleteFromSettings(settingCollection);
 		}
+
+		public override SettingEntry<KeyBinding> GetKeybind()
+		{
+			return Keybind;
+		}
+
+		public override bool GetIsApplicable()
+		{
+			return true;
+		}
 	}
 }

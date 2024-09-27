@@ -17,6 +17,8 @@ namespace Manlaan.Mounts.Things
 
 		protected readonly Helper _helper;
 
+		private DateTime? _queuedTimestamp;
+
 		public string Name { get; private set; }
 
 		public string DisplayName { get; private set; }
@@ -31,7 +33,25 @@ namespace Manlaan.Mounts.Things
 
 		public CornerIcon CornerIcon { get; private set; }
 
-		public DateTime? QueuedTimestamp { get; internal set; }
+		public DateTime? QueuedTimestamp
+		{
+			get
+			{
+				return _queuedTimestamp;
+			}
+			internal set
+			{
+				//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+				//IL_008e: Expected O, but got Unknown
+				DateTime? oldvalue = _queuedTimestamp;
+				Logger.Debug(string.Format("Setting {0} on {1} to: {2}", "QueuedTimestamp", Name, value));
+				_queuedTimestamp = value;
+				if (this.QueuedTimestampUpdated != null && oldvalue != value)
+				{
+					this.QueuedTimestampUpdated(this, new ValueChangedEventArgs("", ""));
+				}
+			}
+		}
 
 		public DateTime? LastUsedTimestamp { get; internal set; }
 
@@ -51,6 +71,8 @@ namespace Manlaan.Mounts.Things
 		}
 
 		public bool IsAvailable => IsKeybindSet;
+
+		public event EventHandler<ValueChangedEventArgs> QueuedTimestampUpdated;
 
 		public Thing(SettingCollection settingCollection, Helper helper, string name, string displayName, string imageFileName)
 		{
@@ -85,7 +107,7 @@ namespace Manlaan.Mounts.Things
 			CornerIcon = val;
 			((Control)CornerIcon).add_Click((EventHandler<MouseEventArgs>)async delegate
 			{
-				await DoAction(unconditionallyDoAction: false);
+				await DoAction(unconditionallyDoAction: false, isActionComingFromMouseActionOnModuleUI: true);
 			});
 		}
 
@@ -98,26 +120,55 @@ namespace Manlaan.Mounts.Things
 			}
 		}
 
-		public async Task DoAction(bool unconditionallyDoAction)
+		public async Task DoAction(bool unconditionallyDoAction, bool isActionComingFromMouseActionOnModuleUI)
 		{
 			if (unconditionallyDoAction)
 			{
-				await _helper.TriggerKeybind(KeybindingSetting);
+				await _helper.TriggerKeybind(KeybindingSetting, WhichKeybindToRun.Both);
+				return;
 			}
-			else if (GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat() && Module._settingEnableMountQueueing.get_Value() && !IsUsableInCombat())
+			if (GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat() && Module._settingEnableMountQueueing.get_Value() && !IsUsableInCombat() && !_helper.IsPlayerInWvwMap())
 			{
 				Logger.Debug("DoAction Set queued for out of combat: " + Name);
 				QueuedTimestamp = DateTime.UtcNow;
+				return;
 			}
-			else if (!Module.CanThingBeActivated())
+			if (!Module.CanThingBeActivated())
 			{
-				_helper.StoreThingForLaterActivation(this, GameService.Gw2Mumble.get_PlayerCharacter().get_Name(), "NotAbleToActivate");
+				_helper.StoreThingForLaterActivation(this, "NotAbleToActivate");
+				return;
 			}
-			else
+			if (isActionComingFromMouseActionOnModuleUI && IsGroundTargeted())
 			{
-				LastUsedTimestamp = DateTime.UtcNow;
-				await _helper.TriggerKeybind(KeybindingSetting);
+				switch (Module._settingGroundTargeting.get_Value())
+				{
+				case GroundTargeting.Instant:
+					if (ShouldGroundTargetingBeDelayed())
+					{
+						_helper.StoredRangedThing = this;
+						return;
+					}
+					break;
+				case GroundTargeting.FastWithRangeIndicator:
+					_helper.StoredRangedThing = this;
+					break;
+				}
 			}
+			WhichKeybindToRun whichKeybindToRun = WhichKeybindToRun.Both;
+			LastUsedTimestamp = DateTime.UtcNow;
+			switch (Module._settingGroundTargeting.get_Value())
+			{
+			case GroundTargeting.Instant:
+				_helper.StoredRangedThing = null;
+				break;
+			case GroundTargeting.FastWithRangeIndicator:
+				if (IsGroundTargeted())
+				{
+					whichKeybindToRun = (isActionComingFromMouseActionOnModuleUI ? WhichKeybindToRun.Press : WhichKeybindToRun.Release);
+				}
+				break;
+			}
+			await _helper.TriggerKeybind(KeybindingSetting, whichKeybindToRun);
 		}
 
 		public virtual bool IsInUse()
@@ -126,6 +177,16 @@ namespace Manlaan.Mounts.Things
 		}
 
 		public virtual bool IsUsableInCombat()
+		{
+			return false;
+		}
+
+		public virtual bool IsGroundTargeted()
+		{
+			return false;
+		}
+
+		public virtual bool ShouldGroundTargetingBeDelayed()
 		{
 			return false;
 		}

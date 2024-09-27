@@ -17,6 +17,7 @@ using Manlaan.Mounts.Things;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Mounts.Settings;
+using Taimi.UndaDaSea_BlishHUD;
 
 namespace Manlaan.Mounts
 {
@@ -25,6 +26,8 @@ namespace Manlaan.Mounts
 		private static readonly Logger Logger = Logger.GetLogger<Helper>();
 
 		private Dictionary<string, Thing> StoredThingForLater = new Dictionary<string, Thing>();
+
+		private Thing _storedRangedThing;
 
 		private readonly Dictionary<(Keys, ModifierKeys), SemaphoreSlim> _semaphores;
 
@@ -40,20 +43,44 @@ namespace Manlaan.Mounts
 
 		private DateTime lastTimeJumped = DateTime.MinValue;
 
+		public SkyLake _lake;
+
+		public Thing StoredRangedThing
+		{
+			get
+			{
+				return _storedRangedThing;
+			}
+			set
+			{
+				if (this.RangedThingUpdated != null)
+				{
+					this.RangedThingUpdated(this, new ValueChangedEventArgs<Thing>(_storedRangedThing, value));
+				}
+				Logger.Debug("Setting StoredRangedThing to: " + value?.Name);
+				_storedRangedThing = value;
+			}
+		}
+
+		public event EventHandler<ValueChangedEventArgs<Thing>> RangedThingUpdated;
+
+		public event EventHandler<ValueChangedEventArgs<Dictionary<string, Thing>>> StoredThingForLaterUpdated;
+
 		public Helper(Gw2ApiManager gw2ApiManager)
 		{
 			_semaphores = new Dictionary<(Keys, ModifierKeys), SemaphoreSlim>();
 			Gw2ApiManager = gw2ApiManager;
 			Module._debug.Add("StoreThingForLaterActivation", () => string.Join(", ", StoredThingForLater.Select((KeyValuePair<string, Thing> x) => x.Key + "=" + x.Value.Name).ToArray()) ?? "");
+			Module._debug.Add("Lake", () => $"name: {_lake?.Name} surface {_lake?.WaterSurface} Z {GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Z} distance {_lake?.Distance}");
 		}
 
 		public bool IsCombatLaunchUnlocked()
 		{
-			if (!_isCombatLaunchUnlocked)
+			if (_isCombatLaunchUnlocked)
 			{
 				return Module._settingCombatLaunchMasteryUnlocked.get_Value();
 			}
-			return true;
+			return false;
 		}
 
 		public async Task IsCombatLaunchUnlockedAsync()
@@ -62,7 +89,7 @@ namespace Manlaan.Mounts
 			{
 				_isCombatLaunchUnlocked = false;
 			}
-			_isCombatLaunchUnlocked = ((IEnumerable<Mastery>)(await ((IAllExpandableClient<Mastery>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Masteries()).AllAsync(default(CancellationToken)))).Any((Mastery m) => m.get_Name() == "Combat Launch");
+			_isCombatLaunchUnlocked = ((IEnumerable<Mastery>)(await ((IAllExpandableClient<Mastery>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Masteries()).AllAsync(default(CancellationToken)))).Any((Mastery m) => m.get_Levels().Any((MasteryLevel ml) => ml.get_Name() == "Combat Launch"));
 		}
 
 		public bool IsPlayerInWvwMap()
@@ -75,16 +102,45 @@ namespace Manlaan.Mounts
 		public bool IsPlayerUnderWater()
 		{
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			return (double)GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Z <= -1.2;
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			Vector3 playerPosition = GameService.Gw2Mumble.get_PlayerCharacter().get_Position();
+			float waterSurface = GetRelevantWaterSurface(playerPosition);
+			return (double)playerPosition.Z <= (double)waterSurface - 1.2;
+		}
+
+		private float GetRelevantWaterSurface(Vector3 playerPosition)
+		{
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+			int currentMap = GameService.Gw2Mumble.get_CurrentMap().get_Id();
+			SkyLake lake2 = (_lake = (from lake in Module._skyLakes
+				where lake.Map == currentMap
+				where lake.IsNearby(playerPosition)
+				orderby lake.Distance
+				select lake).FirstOrDefault());
+			float waterSurface = 0f;
+			if (lake2 != null && lake2.IsInWater(playerPosition))
+			{
+				waterSurface = lake2.WaterSurface;
+			}
+			return waterSurface;
 		}
 
 		public bool IsPlayerOnWaterSurface()
 		{
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			float zpos = GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Z;
-			if ((double)zpos > -1.2)
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			Vector3 playerPosition = GameService.Gw2Mumble.get_PlayerCharacter().get_Position();
+			float zpos = playerPosition.Z;
+			float waterSurface = GetRelevantWaterSurface(playerPosition);
+			if ((double)zpos > (double)waterSurface - 1.2)
 			{
-				return zpos < 0f;
+				return zpos < waterSurface;
 			}
 			return false;
 		}
@@ -173,32 +229,39 @@ namespace Manlaan.Mounts
 			}
 		}
 
-		public async Task TriggerKeybind(SettingEntry<KeyBinding> keybindingSetting)
+		public async Task TriggerKeybind(SettingEntry<KeyBinding> keybindingSetting, WhichKeybindToRun whichKeyBindToRun)
 		{
 			SemaphoreSlim semaphore = GetOrCreateSemaphore(keybindingSetting.get_Value());
 			await semaphore.WaitAsync();
 			try
 			{
 				Logger.Debug("TriggerKeybind entered");
-				if ((int)keybindingSetting.get_Value().get_ModifierKeys() != 0)
+				if (whichKeyBindToRun == WhichKeybindToRun.Both || whichKeyBindToRun == WhichKeybindToRun.Press)
 				{
-					Logger.Debug($"TriggerKeybind press modifiers {keybindingSetting.get_Value().get_ModifierKeys()}");
-					if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)2))
+					if ((int)keybindingSetting.get_Value().get_ModifierKeys() != 0)
 					{
-						Keyboard.Press((VirtualKeyShort)18, false);
+						Logger.Debug($"TriggerKeybind press modifiers {keybindingSetting.get_Value().get_ModifierKeys()}");
+						if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)2))
+						{
+							Keyboard.Press((VirtualKeyShort)18, false);
+						}
+						if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)1))
+						{
+							Keyboard.Press((VirtualKeyShort)17, false);
+						}
+						if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)4))
+						{
+							Keyboard.Press((VirtualKeyShort)16, false);
+						}
 					}
-					if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)1))
-					{
-						Keyboard.Press((VirtualKeyShort)17, false);
-					}
-					if (((Enum)keybindingSetting.get_Value().get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)4))
-					{
-						Keyboard.Press((VirtualKeyShort)16, false);
-					}
+					Logger.Debug($"TriggerKeybind press PrimaryKey {keybindingSetting.get_Value().get_PrimaryKey()}");
+					Keyboard.Press(ToVirtualKey(keybindingSetting.get_Value().get_PrimaryKey()), false);
+					await Task.Delay(50);
 				}
-				Logger.Debug($"TriggerKeybind press PrimaryKey {keybindingSetting.get_Value().get_PrimaryKey()}");
-				Keyboard.Press(ToVirtualKey(keybindingSetting.get_Value().get_PrimaryKey()), false);
-				await Task.Delay(50);
+				if (whichKeyBindToRun != 0 && whichKeyBindToRun != WhichKeybindToRun.Release)
+				{
+					return;
+				}
 				Logger.Debug($"TriggerKeybind release PrimaryKey {keybindingSetting.get_Value().get_PrimaryKey()}");
 				Keyboard.Release(ToVirtualKey(keybindingSetting.get_Value().get_PrimaryKey()), false);
 				if ((int)keybindingSetting.get_Value().get_ModifierKeys() != 0)
@@ -248,31 +311,54 @@ namespace Manlaan.Mounts
 				select m).FirstOrDefault();
 		}
 
-		internal void StoreThingForLaterActivation(Thing thing, string characterName, string reason)
+		internal async Task DoRangedThing()
 		{
-			Logger.Debug("StoreThingForLaterActivation: " + thing.Name + " for character: " + characterName + " with reason: " + reason);
-			StoredThingForLater[characterName] = thing;
+			if (StoredRangedThing != null)
+			{
+				Thing thing = StoredRangedThing;
+				Logger.Debug("DoRangedThing " + thing?.Name);
+				await (thing?.DoAction(unconditionallyDoAction: false, isActionComingFromMouseActionOnModuleUI: false));
+				StoredRangedThing = null;
+			}
 		}
 
-		internal bool IsSomethingStoredForLaterActivation(string characterName)
+		internal void StoreThingForLaterActivation(Thing thing, string reason)
 		{
-			bool result = StoredThingForLater.ContainsKey(characterName);
-			Logger.Debug(string.Format("{0} for character {1} : {2}", "IsSomethingStoredForLaterActivation", characterName, result));
+			string characterName = GameService.Gw2Mumble.get_PlayerCharacter().get_Name();
+			Logger.Debug("StoreThingForLaterActivation: " + thing.Name + " for character: " + characterName + " with reason: " + reason);
+			StoredThingForLater[characterName] = thing;
+			if (this.StoredThingForLaterUpdated != null)
+			{
+				this.StoredThingForLaterUpdated(this, new ValueChangedEventArgs<Dictionary<string, Thing>>((Dictionary<string, Thing>)null, StoredThingForLater));
+			}
+		}
+
+		internal Thing IsSomethingStoredForLaterActivation()
+		{
+			string characterName = GameService.Gw2Mumble.get_PlayerCharacter().get_Name();
+			StoredThingForLater.TryGetValue(characterName, out var result);
+			Logger.Debug("IsSomethingStoredForLaterActivation for character " + characterName + " : " + result?.Name);
 			return result;
 		}
 
-		internal void ClearSomethingStoredForLaterActivation(string characterName)
+		internal void ClearSomethingStoredForLaterActivation()
 		{
+			string characterName = GameService.Gw2Mumble.get_PlayerCharacter().get_Name();
 			Logger.Debug("ClearSomethingStoredForLaterActivation for character: " + characterName);
 			StoredThingForLater.Remove(characterName);
+			if (this.StoredThingForLaterUpdated != null)
+			{
+				this.StoredThingForLaterUpdated(this, new ValueChangedEventArgs<Dictionary<string, Thing>>((Dictionary<string, Thing>)null, StoredThingForLater));
+			}
 		}
 
-		internal async Task DoThingActionForLaterActivation(string characterName)
+		internal async Task DoThingActionForLaterActivation()
 		{
+			string characterName = GameService.Gw2Mumble.get_PlayerCharacter().get_Name();
 			Thing thing = StoredThingForLater[characterName];
-			Logger.Debug("ClearSomethingStoredForLaterActivation " + thing?.Name + " for character: " + characterName);
-			await (thing?.DoAction(unconditionallyDoAction: false));
-			ClearSomethingStoredForLaterActivation(characterName);
+			Logger.Debug("DoThingActionForLaterActivation " + thing?.Name + " for character: " + characterName);
+			await (thing?.DoAction(unconditionallyDoAction: false, isActionComingFromMouseActionOnModuleUI: false));
+			ClearSomethingStoredForLaterActivation();
 		}
 
 		internal ContextualRadialThingSettings GetApplicableContextualRadialThingSettings()
@@ -280,13 +366,26 @@ namespace Manlaan.Mounts
 			return Module.ContextualRadialSettings.OrderBy((ContextualRadialThingSettings c) => c.Order).FirstOrDefault((ContextualRadialThingSettings c) => c.IsEnabled.get_Value() && c.IsApplicable());
 		}
 
+		internal ContextualRadialThingSettings GetApplicableTriggeringContextualRadialThingSettings()
+		{
+			return Module.ContextualRadialSettings.OrderBy((ContextualRadialThingSettings c) => c.Order).FirstOrDefault((ContextualRadialThingSettings c) => c.IsEnabled.get_Value() && c.IsApplicable() && c.GetKeybind().get_Value().get_IsTriggering());
+		}
+
+		internal IEnumerable<RadialThingSettings> GetAllGenericRadialThingSettings()
+		{
+			List<RadialThingSettings> first = Module.ContextualRadialSettings.ConvertAll((Converter<ContextualRadialThingSettings, RadialThingSettings>)((ContextualRadialThingSettings x) => x));
+			List<RadialThingSettings> userDefinedRadialSettingsCasted = Module.UserDefinedRadialSettings.ConvertAll((Converter<UserDefinedRadialThingSettings, RadialThingSettings>)((UserDefinedRadialThingSettings x) => x));
+			return first.Concat(userDefinedRadialSettingsCasted);
+		}
+
 		internal RadialThingSettings GetTriggeredRadialSettings()
 		{
-			if (!((SettingEntry)Module._settingDefaultMountBinding).get_IsNull() && Module._settingDefaultMountBinding.get_Value().get_IsTriggering())
+			ContextualRadialThingSettings contextual = GetApplicableTriggeringContextualRadialThingSettings();
+			if (contextual != null)
 			{
-				return GetApplicableContextualRadialThingSettings();
+				return contextual;
 			}
-			IEnumerable<UserDefinedRadialThingSettings> userdefinedList = Module.UserDefinedRadialSettings.Where((UserDefinedRadialThingSettings s) => !((SettingEntry)s.Keybind).get_IsNull() && s.Keybind.get_Value().get_IsTriggering());
+			IEnumerable<UserDefinedRadialThingSettings> userdefinedList = Module.UserDefinedRadialSettings.Where((UserDefinedRadialThingSettings s) => s.GetKeybind().get_Value().get_IsTriggering());
 			if (userdefinedList.Count() == 1)
 			{
 				return userdefinedList.Single();

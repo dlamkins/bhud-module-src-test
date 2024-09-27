@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Blish_HUD;
+using Blish_HUD.Input;
 using Blish_HUD.Settings;
 using Manlaan.Mounts.Things;
 using Mounts.Settings;
@@ -70,5 +71,9 @@ namespace Manlaan.Mounts
 				orderby m.LastUsedTimestamp descending
 				select m).FirstOrDefault();
 		}
+
+		public abstract SettingEntry<KeyBinding> GetKeybind();
+
+		public abstract bool GetIsApplicable();
 	}
 }

@@ -122,57 +122,68 @@ namespace Manlaan.Mounts.Controls
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0136: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0159: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0303: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0382: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0388: Unknown result type (might be due to invalid IL or missing references)
-			//IL_038d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0392: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0394: Unknown result type (might be due to invalid IL or missing references)
-			//IL_039c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0458: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0467: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0486: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0348: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_040a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0412: Unknown result type (might be due to invalid IL or missing references)
+			//IL_041a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_041f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f8: Unknown result type (might be due to invalid IL or missing references)
 			RadialThings.Clear();
-			RadialThingSettings applicableRadialSettings = _helper.GetTriggeredRadialSettings();
-			if (applicableRadialSettings == null)
+			RadialThingSettings triggeredRadialSettings = _helper.GetTriggeredRadialSettings();
+			if (triggeredRadialSettings == null)
 			{
+				_errorLabel.set_Text("No triggered radial settings found!!!");
+				((Control)_errorLabel).Show();
 				return;
 			}
-			SelectedSettings = applicableRadialSettings;
-			List<Thing> things = applicableRadialSettings.AvailableThings.ToList();
+			SelectedSettings = triggeredRadialSettings;
+			List<Thing> things = triggeredRadialSettings.AvailableThings.ToList();
 			if (!things.Any())
 			{
-				_errorLabel.set_Text("No actions configured in the " + applicableRadialSettings.Name + " context \n(or no keybinds specified for these actions)\nClick button to go to the relevant settings: ");
+				_errorLabel.set_Text("No actions configured in the " + triggeredRadialSettings.Name + " context \n(or no keybinds specified for these actions)\nClick button to go to the relevant settings: ");
 				((Control)_errorLabel).Show();
 				((Control)_settingsButton).Show();
 				return;
 			}
 			((Control)_errorLabel).Hide();
 			((Control)_settingsButton).Hide();
-			Thing thingToPutInCenter = applicableRadialSettings.GetCenterThing();
+			if (triggeredRadialSettings is ContextualRadialThingSettings)
+			{
+				ContextualRadialThingSettings triggeredContextual = (ContextualRadialThingSettings)triggeredRadialSettings;
+				Thing tapThing = triggeredContextual.GetApplyInstantlyOnTapThing();
+				if (tapThing != null && triggeredContextual.IsTapApplicable())
+				{
+					things.Remove(tapThing);
+				}
+			}
+			Thing thingToPutInCenter = triggeredRadialSettings.GetCenterThing();
 			if (thingToPutInCenter != null && thingToPutInCenter.IsAvailable)
 			{
-				if (applicableRadialSettings.RemoveCenterThing.get_Value())
+				if (triggeredRadialSettings.RemoveCenterThing.get_Value())
 				{
 					things.Remove(thingToPutInCenter);
 				}
@@ -259,7 +270,7 @@ namespace Manlaan.Mounts.Controls
 			{
 				unconditionallyDoAction = ((ContextualRadialThingSettings)SelectedSettings).UnconditionallyDoAction.get_Value();
 			}
-			await (SelectedMount?.Thing.DoAction(unconditionallyDoAction) ?? Task.CompletedTask);
+			await (SelectedMount?.Thing.DoAction(unconditionallyDoAction, isActionComingFromMouseActionOnModuleUI: true) ?? Task.CompletedTask);
 			SelectedSettings = null;
 		}
 
@@ -272,7 +283,7 @@ namespace Manlaan.Mounts.Controls
 				if (!GameService.Input.get_Mouse().get_CursorIsVisible() && !((SettingEntry)Module._settingMountRadialToggleActionCameraKeyBinding).get_IsNull())
 				{
 					IsActionCamToggledOnMount = true;
-					await _helper.TriggerKeybind(Module._settingMountRadialToggleActionCameraKeyBinding);
+					await _helper.TriggerKeybind(Module._settingMountRadialToggleActionCameraKeyBinding, WhichKeybindToRun.Both);
 					Logger.Debug("HandleShown turned off action cam");
 				}
 				_maxRadialDiameter = Math.Min(((Control)GameService.Graphics.get_SpriteScreen()).get_Width(), ((Control)GameService.Graphics.get_SpriteScreen()).get_Height());
@@ -304,7 +315,7 @@ namespace Manlaan.Mounts.Controls
 				Logger.Debug("HandleHidden entered");
 				if (IsActionCamToggledOnMount)
 				{
-					await _helper.TriggerKeybind(Module._settingMountRadialToggleActionCameraKeyBinding);
+					await _helper.TriggerKeybind(Module._settingMountRadialToggleActionCameraKeyBinding, WhichKeybindToRun.Both);
 					IsActionCamToggledOnMount = false;
 					Logger.Debug("HandleHidden turned back on action cam");
 				}
