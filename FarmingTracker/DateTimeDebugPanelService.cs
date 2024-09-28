@@ -52,6 +52,8 @@ namespace FarmingTracker
 			//IL_01f6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01fd: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0209: Expected O, but got Unknown
+			SettingEntry<DateTime> debugDateTimeValueSetting2 = debugDateTimeValueSetting;
+			SettingEntry<bool> debugDateTimeEnabledSetting2 = debugDateTimeEnabledSetting;
 			FlowPanel val = new FlowPanel();
 			((Panel)val).set_Title("DateTime Debug");
 			val.set_FlowDirection((ControlFlowDirection)3);
@@ -62,9 +64,9 @@ namespace FarmingTracker
 			((Container)val).set_HeightSizingMode((SizingMode)1);
 			((Control)val).set_Parent(parent);
 			FlowPanel debugDateTimeFlowPanel = val;
-			new SettingControl((Container)(object)debugDateTimeFlowPanel, (SettingEntry)(object)debugDateTimeEnabledSetting);
+			new SettingControl((Container)(object)debugDateTimeFlowPanel, (SettingEntry)(object)debugDateTimeEnabledSetting2);
 			TextBox val2 = new TextBox();
-			((TextInputBase)val2).set_Text(debugDateTimeValueSetting.get_Value().ToString());
+			((TextInputBase)val2).set_Text(debugDateTimeValueSetting2.get_Value().ToString());
 			((Control)val2).set_BasicTooltipText("new debug UTC for date time mocking. mainly for reset");
 			((Control)val2).set_Width(200);
 			((Control)val2).set_Parent((Container)(object)debugDateTimeFlowPanel);
@@ -85,13 +87,13 @@ namespace FarmingTracker
 			});
 			((Control)setDateTimeButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				DateTimeService.UtcNow = debugDateTimeValueSetting.get_Value();
+				DateTimeService.UtcNow = debugDateTimeValueSetting2.get_Value();
 			});
-			debugDateTimeEnabledSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate
+			debugDateTimeEnabledSetting2.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate
 			{
-				((Control)setDateTimeButton).set_Enabled(debugDateTimeEnabledSetting.get_Value());
+				((Control)setDateTimeButton).set_Enabled(debugDateTimeEnabledSetting2.get_Value());
 			});
-			((Control)setDateTimeButton).set_Enabled(debugDateTimeEnabledSetting.get_Value());
+			((Control)setDateTimeButton).set_Enabled(debugDateTimeEnabledSetting2.get_Value());
 			Dictionary<AutomaticReset, Label> resetDateTimelabelDict = new Dictionary<AutomaticReset, Label>();
 			List<AutomaticReset> dateTimeBasedAutomaticResets = (from AutomaticReset a in Enum.GetValues(typeof(AutomaticReset))
 				where a != 0 && a != AutomaticReset.OnModuleStart
@@ -111,7 +113,7 @@ namespace FarmingTracker
 			{
 				if (DateTime.TryParse(((TextInputBase)dateTimeTextBox).get_Text(), out var result))
 				{
-					debugDateTimeValueSetting.set_Value(result);
+					debugDateTimeValueSetting2.set_Value(result);
 				}
 				UpdateDateTimeButtonText(setDateTimeButton, ((TextInputBase)dateTimeTextBox).get_Text());
 				UpdateResetDateTimeLabels(resetDateTimelabelDict, dateTimeBasedAutomaticResets, ((TextInputBase)dateTimeTextBox).get_Text());

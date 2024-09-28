@@ -6,28 +6,28 @@ namespace FarmingTracker
 {
 	public class ModuleLoadError : IDisposable
 	{
-		private ErrorSettingsView _errorSettingsView;
+		private IView? _errorSettingsView;
 
-		private ErrorWindow _errorWindow;
+		private ErrorWindow? _errorWindow;
 
 		public bool HasModuleLoadFailed { get; set; }
 
 		public void InitializeErrorSettingsViewAndShowErrorWindow(string errorWindowTitle, string errorText)
 		{
 			HasModuleLoadFailed = true;
-			_errorSettingsView = new ErrorSettingsView(errorText);
+			_errorSettingsView = (IView?)(object)new ErrorSettingsView(errorText);
 			_errorWindow = new ErrorWindow(errorWindowTitle, errorText);
 			((Control)_errorWindow).Show();
 		}
 
 		public IView CreateErrorSettingsView()
 		{
-			return (IView)(object)_errorSettingsView;
+			return (IView)(((object)_errorSettingsView) ?? ((object)new ErrorView()));
 		}
 
 		public void Dispose()
 		{
-			ErrorWindow errorWindow = _errorWindow;
+			ErrorWindow? errorWindow = _errorWindow;
 			if (errorWindow != null)
 			{
 				((Control)errorWindow).Dispose();

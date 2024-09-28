@@ -8,7 +8,7 @@ namespace FarmingTracker
 {
 	public class StatTooltip : DisposableTooltip
 	{
-		public StatTooltip(Stat stat, AsyncTexture2D statIconTexture, PanelType panelType, Services services)
+		public StatTooltip(Stat stat, long? customStatProfitInCopper, AsyncTexture2D statIconTexture, PanelType panelType, Services services)
 		{
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
@@ -30,7 +30,7 @@ namespace FarmingTracker
 				AddDescription(stat, font, (Container)(object)rootFlowPanel);
 				if (panelType != PanelType.IgnoredItems)
 				{
-					StatTooltipService.AddProfitTable(stat, font, services, (Container)(object)rootFlowPanel);
+					StatTooltipService.AddProfitTable(stat, customStatProfitInCopper, font, services, (Container)(object)rootFlowPanel);
 					StatTooltipService.AddText("\nRight click for more options.", font, (Container)(object)rootFlowPanel);
 				}
 				else

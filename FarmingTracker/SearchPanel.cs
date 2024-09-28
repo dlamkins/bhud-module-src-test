@@ -11,7 +11,6 @@ namespace FarmingTracker
 		private readonly StandardButton _clearSearchButton;
 
 		public SearchPanel(Services services, Container parent)
-			: this()
 		{
 			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
@@ -30,12 +29,14 @@ namespace FarmingTracker
 			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e8: Expected O, but got Unknown
+			Services services2 = services;
+			((Panel)this)._002Ector();
 			SearchPanel searchPanel = this;
 			((Container)this).set_HeightSizingMode((SizingMode)1);
 			((Container)this).set_WidthSizingMode((SizingMode)1);
 			((Control)this).set_Parent(parent);
 			TextBox val = new TextBox();
-			((TextInputBase)val).set_Text(services.SearchTerm);
+			((TextInputBase)val).set_Text(services2.SearchTerm);
 			((TextInputBase)val).set_PlaceholderText("Search...");
 			((Control)val).set_Left(4);
 			((Control)val).set_Width(300);
@@ -59,8 +60,8 @@ namespace FarmingTracker
 			{
 				bool visible = !string.IsNullOrWhiteSpace(((TextInputBase)searchPanel._searchTextBox).get_Text());
 				((Control)searchPanel._clearSearchButton).set_Visible(visible);
-				services.SearchTerm = ((TextInputBase)searchPanel._searchTextBox).get_Text();
-				services.UpdateLoop.TriggerUpdateUi();
+				services2.SearchTerm = ((TextInputBase)searchPanel._searchTextBox).get_Text();
+				services2.UpdateLoop.TriggerUpdateUi();
 			});
 			SetSize(((Control)parent).get_Width());
 		}

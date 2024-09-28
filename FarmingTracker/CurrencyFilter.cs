@@ -62,6 +62,7 @@ namespace FarmingTracker
 		JadeMinersKeycard = 71,
 		StaticCharge = 72,
 		PinchOfStardust = 73,
-		CalcifiedGasp = 75
+		CalcifiedGasp = 75,
+		UrsusOblige = 76
 	}
 }

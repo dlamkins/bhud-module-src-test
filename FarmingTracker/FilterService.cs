@@ -12,12 +12,12 @@ namespace FarmingTracker
 			return !Enum.IsDefined(typeof(T), currencyId);
 		}
 
-		public static (List<Stat> items, List<Stat> currencies) FilterStatsAndSetFunnelOpacity(List<Stat> items, List<Stat> currencies, StatsPanels statsPanels, SettingService settingService)
+		public static (List<Stat> items, List<Stat> currencies) FilterStatsAndSetFunnelOpacity(List<Stat> items, List<Stat> currencies, List<CustomStatProfit> customStatProfits, StatsPanels statsPanels, SettingService settingService)
 		{
 			int currenciesCountBeforeFiltering = currencies.Count();
 			int itemsCountBeforeFiltering = items.Count();
-			currencies = FilterCurrencies(currencies, settingService);
-			items = FilterItems(items, settingService);
+			currencies = FilterCurrencies(currencies, customStatProfits, settingService);
+			items = FilterItems(items, customStatProfits, settingService);
 			bool noCurrenciesHiddenByFilter = currencies.Count() == currenciesCountBeforeFiltering;
 			bool noItemsHiddenByFilter = items.Count() == itemsCountBeforeFiltering;
 			statsPanels.CurrencyFilterIcon.SetOpacity(noCurrenciesHiddenByFilter);
@@ -25,8 +25,9 @@ namespace FarmingTracker
 			return (items, currencies);
 		}
 
-		private static List<Stat> FilterCurrencies(List<Stat> currencies, SettingService settingService)
+		private static List<Stat> FilterCurrencies(List<Stat> currencies, List<CustomStatProfit> customStatProfits, SettingService settingService)
 		{
+			List<CustomStatProfit> customStatProfits2 = customStatProfits;
 			List<KnownByApiFilter> knownByApi = settingService.KnownByApiFilterSetting.get_Value().ToList();
 			if (knownByApi.Any())
 			{
@@ -37,6 +38,11 @@ namespace FarmingTracker
 			{
 				currencies = currencies.Where((Stat s) => IsShownByCountSignFilter(s, countFilter)).ToList();
 			}
+			List<SellMethodFilter> sellMethodFilter = settingService.SellMethodFilterSetting.get_Value().ToList();
+			if (sellMethodFilter.Any())
+			{
+				currencies = currencies.Where((Stat s) => IsShownBySellMethodFilter(s, sellMethodFilter, customStatProfits2)).ToList();
+			}
 			List<CurrencyFilter> currencyFilter = settingService.CurrencyFilterSetting.get_Value().ToList();
 			if (currencyFilter.Any())
 			{
@@ -45,8 +51,9 @@ namespace FarmingTracker
 			return currencies;
 		}
 
-		private static List<Stat> FilterItems(List<Stat> items, SettingService settingService)
+		private static List<Stat> FilterItems(List<Stat> items, List<CustomStatProfit> customStatProfits, SettingService settingService)
 		{
+			List<CustomStatProfit> customStatProfits2 = customStatProfits;
 			List<KnownByApiFilter> knownByApi = settingService.KnownByApiFilterSetting.get_Value().ToList();
 			if (knownByApi.Any())
 			{
@@ -60,7 +67,7 @@ namespace FarmingTracker
 			List<SellMethodFilter> sellMethodFilter = settingService.SellMethodFilterSetting.get_Value().ToList();
 			if (sellMethodFilter.Any())
 			{
-				items = items.Where((Stat s) => IsShownBySellMethodFilter(s, sellMethodFilter)).ToList();
+				items = items.Where((Stat s) => IsShownBySellMethodFilter(s, sellMethodFilter, customStatProfits2)).ToList();
 			}
 			List<ItemRarity> rarityFilter = settingService.RarityStatsFilterSetting.get_Value().ToList();
 			if (rarityFilter.Any())
@@ -82,11 +89,12 @@ namespace FarmingTracker
 
 		private static bool IsShownByItemFlagFilter(Stat item, List<ItemFlag> flagFilter)
 		{
+			List<ItemFlag> flagFilter2 = flagFilter;
 			if (!((IEnumerable<ApiEnum<ItemFlag>>)item.Details.ItemFlags).Any())
 			{
 				return true;
 			}
-			return item.Details.ItemFlags.get_List().Any((ApiEnum<ItemFlag> f) => flagFilter.Contains(ApiEnum<ItemFlag>.op_Implicit(f)));
+			return item.Details.ItemFlags.get_List().Any((ApiEnum<ItemFlag> f) => flagFilter2.Contains(ApiEnum<ItemFlag>.op_Implicit(f)));
 		}
 
 		private static bool IsShownByCurrencyFilter(Stat c, List<CurrencyFilter> currencyFilter)
@@ -119,17 +127,26 @@ namespace FarmingTracker
 			return false;
 		}
 
-		private static bool IsShownBySellMethodFilter(Stat stat, List<SellMethodFilter> sellMethodFilter)
+		private static bool IsShownBySellMethodFilter(Stat stat, List<SellMethodFilter> sellMethodFilter, List<CustomStatProfit> customStatProfits)
 		{
-			if (sellMethodFilter.Contains(SellMethodFilter.SellableToVendor) && stat.Profits.CanBeSoldToVendor)
+			Stat stat2 = stat;
+			if (stat2.IsCoinOrCustomCoin)
 			{
 				return true;
 			}
-			if (sellMethodFilter.Contains(SellMethodFilter.SellableOnTradingPost) && stat.Profits.CanBeSoldOnTp)
+			if (sellMethodFilter.Contains(SellMethodFilter.SellableToVendor) && stat2.Profits.CanBeSoldToVendor)
 			{
 				return true;
 			}
-			if (sellMethodFilter.Contains(SellMethodFilter.NotSellable) && stat.Profits.CanNotBeSold)
+			if (sellMethodFilter.Contains(SellMethodFilter.SellableOnTradingPost) && stat2.Profits.CanBeSoldOnTp)
+			{
+				return true;
+			}
+			if (sellMethodFilter.Contains(SellMethodFilter.NotSellable) && stat2.Profits.CanNotBeSold)
+			{
+				return true;
+			}
+			if (sellMethodFilter.Contains(SellMethodFilter.CustomProfitIsSet) && customStatProfits.Any((CustomStatProfit c) => c.BelongsToStat(stat2)))
 			{
 				return true;
 			}

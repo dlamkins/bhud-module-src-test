@@ -4,6 +4,7 @@ namespace FarmingTracker
 	{
 		NotSellable,
 		SellableToVendor,
-		SellableOnTradingPost
+		SellableOnTradingPost,
+		CustomProfitIsSet
 	}
 }

@@ -14,7 +14,7 @@ namespace FarmingTracker
 
 		private readonly CoinPanel _copperPanel;
 
-		public CoinsPanel(Tooltip tooltip, BitmapFont font, TextureService textureService, Container parent, int height = 0)
+		public CoinsPanel(Tooltip? tooltip, BitmapFont font, TextureService textureService, Container parent, int height = 0)
 			: this()
 		{
 			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
@@ -59,9 +59,9 @@ namespace FarmingTracker
 		{
 			Coin coin = new Coin(coinsInCopper);
 			_signLabel.SetSign(coin.Sign);
-			_goldPanel.SetValue(coin.UnsignedGold, isZeroValueVisible: false);
-			_silverPanel.SetValue(coin.UnsignedSilver, coin.UnsignedGold != 0);
-			_copperPanel.SetValue(coin.UnsignedCopper, isZeroValueVisible: true);
+			_goldPanel.SetValue(coin.Gold, isZeroValueVisible: false);
+			_silverPanel.SetValue(coin.Silver, coin.Gold > 0);
+			_copperPanel.SetValue(coin.Copper, isZeroValueVisible: true);
 		}
 
 		protected override void DisposeControl()

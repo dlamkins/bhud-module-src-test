@@ -77,7 +77,7 @@ namespace FarmingTracker
 
 		public SortByWithDirection GetSelectedSortBy()
 		{
-			return GetSortByDropDownTexts().First((KeyValuePair<SortByWithDirection, string> d) => d.Value == Dropdown.get_SelectedItem()).Key;
+			return GetSortByDropDownTexts().First<KeyValuePair<SortByWithDirection, string>>((KeyValuePair<SortByWithDirection, string> d) => d.Value == Dropdown.get_SelectedItem()).Key;
 		}
 
 		public void SetLabelText(string text)

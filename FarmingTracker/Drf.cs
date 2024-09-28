@@ -24,7 +24,7 @@ namespace FarmingTracker
 
 		public bool WindowsVersionIsTooLowToSupportWebSockets => _drfWebSocketClient.WindowsVersionIsTooLowToSupportWebSockets;
 
-		public event EventHandler DrfConnectionStatusChanged;
+		public event EventHandler? DrfConnectionStatusChanged;
 
 		public Drf(SettingService settingService)
 		{
@@ -148,7 +148,7 @@ namespace FarmingTracker
 			};
 		}
 
-		private async void OnDrfTokenSettingChanged(object sender = null, ValueChangedEventArgs<string> e = null)
+		private async void OnDrfTokenSettingChanged(object? sender = null, ValueChangedEventArgs<string>? e = null)
 		{
 			string drfToken = _settingService.DrfTokenSetting.get_Value();
 			if (DrfToken.HasValidFormat(drfToken))

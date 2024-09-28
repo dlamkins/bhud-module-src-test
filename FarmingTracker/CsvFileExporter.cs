@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FarmingTracker
 {
@@ -14,13 +16,15 @@ namespace FarmingTracker
 			ModuleFolderPath = moduleFolderPath;
 		}
 
-		public async void ExportSummaryAsCsvFile(Model model)
+		public async Task ExportSummaryAsCsvFile(Model model)
 		{
 			try
 			{
 				string csvFileText = CreateCsvFileText(model);
 				string csvFileName = $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss_fff}.csv";
-				await FileSaver.WriteFileAsync(Path.Combine(ModuleFolderPath, csvFileName), csvFileText);
+				string csvFolderPath = Path.Combine(ModuleFolderPath, "csv");
+				await FileSaver.WriteFileAsync(Path.Combine(csvFolderPath, csvFileName), csvFileText);
+				Process.Start("explorer.exe", csvFolderPath);
 			}
 			catch (Exception exception)
 			{
@@ -30,11 +34,11 @@ namespace FarmingTracker
 
 		private static string CreateCsvFileText(Model model)
 		{
-			string csvFileText = "item_id,item_name,item_amount,currency_id,currency_amount\n";
-			StatsSnapshot statsSnapshot = model.StatsSnapshot;
+			StatsSnapshot statsSnapshot = model.Stats.StatsSnapshot;
 			List<Stat> items = statsSnapshot.ItemById.Values.Where((Stat s) => s.Count != 0).ToList();
 			List<Stat> currencies = statsSnapshot.CurrencyById.Values.Where((Stat s) => s.Count != 0).ToList();
 			int linesCount = Math.Max(items.Count, currencies.Count);
+			string csvFileText = "item_id,item_name,item_amount,currency_id,currency_amount\n";
 			for (int i = 0; i < linesCount; i++)
 			{
 				csvFileText += ((i < items.Count) ? $"{items[i].ApiId},{EscapeCsvField(items[i].Details.Name)},{items[i].Count}," : ",,,");

@@ -15,7 +15,7 @@ namespace FarmingTracker
 
 		private const long MAX_COIN_DISPLAY_VALUE = 1000000L;
 
-		public CoinPanel(AsyncTexture2D coinTexture, Color textColor, Tooltip tooltip, BitmapFont font, bool widthFixed, Container parent)
+		public CoinPanel(AsyncTexture2D coinTexture, Color textColor, Tooltip? tooltip, BitmapFont font, bool widthFixed, Container parent)
 			: this()
 		{
 			//IL_002c: Unknown result type (might be due to invalid IL or missing references)

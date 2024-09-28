@@ -22,7 +22,7 @@ namespace FarmingTracker
 			{
 				return;
 			}
-			if (Module.DebugEnabled)
+			if (DebugMode.DebugLoggingRequired)
 			{
 				Module.Logger.Debug("items      no details " + string.Join(" ", itemIdsWithoutDetails));
 			}
@@ -68,7 +68,7 @@ namespace FarmingTracker
 				stat.Details.SellsUnitPriceInCopper = apiPrice.get_Sells().get_UnitPrice();
 				stat.Details.BuysUnitPriceInCopper = apiPrice.get_Buys().get_UnitPrice();
 			}
-			if (apiItems.Any() && Module.DebugEnabled)
+			if (apiItems.Any() && DebugMode.DebugLoggingRequired)
 			{
 				Module.Logger.Debug("items      from api   " + string.Join(" ", apiItems.Select((Item c) => c.get_Id())));
 			}
@@ -76,7 +76,7 @@ namespace FarmingTracker
 			{
 				Stat stat2 = itemById[apiItem.get_Id()];
 				stat2.Details.Name = apiItem.get_Name();
-				stat2.Details.Description = apiItem.get_Description();
+				stat2.Details.Description = apiItem.get_Description() ?? "";
 				stat2.Details.IconAssetId = TextureService.GetIconAssetId(apiItem.get_Icon());
 				stat2.Details.Rarity = ApiEnum<ItemRarity>.op_Implicit(apiItem.get_Rarity());
 				stat2.Details.ItemFlags = apiItem.get_Flags();
@@ -90,7 +90,7 @@ namespace FarmingTracker
 			{
 				return;
 			}
-			if (Module.DebugEnabled)
+			if (DebugMode.DebugLoggingRequired)
 			{
 				Module.Logger.Debug("items      api MISS   " + string.Join(" ", itemsUnknownByApi.Select((Stat i) => i.ApiId)));
 			}

@@ -33,8 +33,8 @@ namespace FarmingTracker
 			((Container)this).set_HeightSizingMode((SizingMode)1);
 			((Control)this).set_Parent(parent);
 			BitmapFont font = services.FontService.Fonts[(FontSize)16];
-			_profitPanel = new CoinsPanel((Tooltip)(object)_profitTooltip, font, services.TextureService, (Container)(object)this);
-			_profitPerHourPanel = new CoinsPanel((Tooltip)(object)_profitTooltip, font, services.TextureService, (Container)(object)this);
+			_profitPanel = new CoinsPanel((Tooltip?)(object)_profitTooltip, font, services.TextureService, (Container)(object)this);
+			_profitPerHourPanel = new CoinsPanel((Tooltip?)(object)_profitTooltip, font, services.TextureService, (Container)(object)this);
 			_profitLabel = CreateProfitLabel(_profitTooltip, font, _profitPanel);
 			_profitPerHourLabel = CreateProfitLabel(_profitTooltip, font, _profitPerHourPanel);
 			ShowProfits(0L, 0L);
@@ -83,7 +83,7 @@ namespace FarmingTracker
 			return val;
 		}
 
-		private void OnProfitLabelTextSettingChanged(object sender = null, ValueChangedEventArgs<string> e = null)
+		private void OnProfitLabelTextSettingChanged(object? sender = null, ValueChangedEventArgs<string>? e = null)
 		{
 			if (_isProfitWindow)
 			{
@@ -97,22 +97,25 @@ namespace FarmingTracker
 			}
 		}
 
-		private void OnProfitWindowDisplayModeSettingChanged(object sender = null, ValueChangedEventArgs<ProfitWindowDisplayMode> e = null)
+		private void OnProfitWindowDisplayModeSettingChanged(object? sender = null, ValueChangedEventArgs<ProfitWindowDisplayMode>? e = null)
 		{
-			((Control)_profitPanel).set_Parent((Container)null);
-			((Control)_profitPerHourPanel).set_Parent((Container)null);
-			switch (_settingService.ProfitWindowDisplayModeSetting.get_Value())
+			if (_isProfitWindow)
 			{
-			case ProfitWindowDisplayMode.ProfitAndProfitPerHour:
-				((Control)_profitPanel).set_Parent((Container)(object)this);
-				((Control)_profitPerHourPanel).set_Parent((Container)(object)this);
-				break;
-			case ProfitWindowDisplayMode.Profit:
-				((Control)_profitPanel).set_Parent((Container)(object)this);
-				break;
-			case ProfitWindowDisplayMode.ProfitPerHour:
-				((Control)_profitPerHourPanel).set_Parent((Container)(object)this);
-				break;
+				((Control)_profitPanel).set_Parent((Container)null);
+				((Control)_profitPerHourPanel).set_Parent((Container)null);
+				switch (_settingService.ProfitWindowDisplayModeSetting.get_Value())
+				{
+				case ProfitWindowDisplayMode.ProfitAndProfitPerHour:
+					((Control)_profitPanel).set_Parent((Container)(object)this);
+					((Control)_profitPerHourPanel).set_Parent((Container)(object)this);
+					break;
+				case ProfitWindowDisplayMode.Profit:
+					((Control)_profitPanel).set_Parent((Container)(object)this);
+					break;
+				case ProfitWindowDisplayMode.ProfitPerHour:
+					((Control)_profitPerHourPanel).set_Parent((Container)(object)this);
+					break;
+				}
 			}
 		}
 	}

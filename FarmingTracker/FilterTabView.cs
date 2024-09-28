@@ -13,7 +13,9 @@ namespace FarmingTracker
 	{
 		private readonly Services _services;
 
-		private const string MATCH_MULTIPLE_OPTION_HINT = "Some items match several of these options. These items are\nonly hidden if all matching options are unselected.";
+		private FlowPanel? _rootFlowPanel;
+
+		private const string MATCH_MULTIPLE_OPTION_HINT = "Some items match several of these options. These items are only hidden\nif all matching options are unselected.";
 
 		public FilterTabView(Services services)
 			: this()
@@ -21,35 +23,46 @@ namespace FarmingTracker
 			_services = services;
 		}
 
+		protected override void Unload()
+		{
+			FlowPanel? rootFlowPanel = _rootFlowPanel;
+			if (rootFlowPanel != null)
+			{
+				((Control)rootFlowPanel).Dispose();
+			}
+			_rootFlowPanel = null;
+			((View<IPresenter>)this).Unload();
+		}
+
 		protected override void Build(Container buildPanel)
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Expected O, but got Unknown
-			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Expected O, but got Unknown
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ac: Expected O, but got Unknown
-			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d7: Expected O, but got Unknown
-			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bb: Expected O, but got Unknown
+			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Expected O, but got Unknown
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			val.set_FlowDirection((ControlFlowDirection)3);
 			((Panel)val).set_CanScroll(true);
@@ -57,8 +70,8 @@ namespace FarmingTracker
 			((Container)val).set_WidthSizingMode((SizingMode)2);
 			((Container)val).set_HeightSizingMode((SizingMode)2);
 			((Control)val).set_Parent(buildPanel);
-			FlowPanel rootFlowPanel = val;
-			CollapsibleHelp collapsibleHelp = new CollapsibleHelp("- Checked = visible.\n- Unchecked = hidden by filter.\n- Items hidden by filters are still included in the profit calculation.\n- A filter, e.g. rarity filter, will not be applied if all its checkboxes are unchecked. In this case no items will be hidden by the filter.\n- filter icon on filter panel header:\nTRANSPARENT: filter wont hide stats.\nOPAQUE: filter will hide stats.\n- expand/collapse panels: for a better overview expand/collapse the filter panels by using the expand/collapse-all-buttons or by clicking on the filter panel headers.", buildPanel.get_ContentRegion().Width - 30, (Container)(object)rootFlowPanel);
+			_rootFlowPanel = val;
+			CollapsibleHelp collapsibleHelp = new CollapsibleHelp("- Checked = visible.\n- Unchecked = hidden by filter.\n- Items hidden by filters are still included in the profit calculation and are still shown in the 'Favorite Items' panel.\n- A filter, e.g. rarity filter, will not be applied if all its checkboxes are unchecked. In this case no items will be hidden by the filter.\n- filter icon on filter panel header:\nTRANSPARENT: filter wont hide stats.\nOPAQUE: filter will hide stats.\n- expand/collapse panels: for a better overview expand/collapse the filter panels by using the expand/collapse-all-buttons or by clicking on the filter panel headers.", buildPanel.get_ContentRegion().Width - 30, (Container)(object)_rootFlowPanel);
 			buildPanel.add_ContentResized((EventHandler<RegionChangedEventArgs>)delegate(object s, RegionChangedEventArgs e)
 			{
 				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
@@ -69,7 +82,7 @@ namespace FarmingTracker
 			val2.set_ControlPadding(new Vector2(5f, 0f));
 			((Container)val2).set_WidthSizingMode((SizingMode)1);
 			((Container)val2).set_HeightSizingMode((SizingMode)1);
-			((Control)val2).set_Parent((Container)(object)rootFlowPanel);
+			((Control)val2).set_Parent((Container)(object)_rootFlowPanel);
 			FlowPanel buttonFlowPanel = val2;
 			List<FlowPanel> filterPanels = new List<FlowPanel>();
 			StandardButton val3 = new StandardButton();
@@ -95,16 +108,16 @@ namespace FarmingTracker
 					((Panel)item2).Collapse();
 				}
 			});
-			filterPanels.Add(CreateFilterSettingPanel("Count (items & currencies)", Constants.ALL_COUNTS, _services.SettingService.CountFilterSetting, _services, (Container)(object)rootFlowPanel, "Coin will never be hidden."));
-			filterPanels.Add(CreateFilterSettingPanel("Sell Methods (items)", Constants.ALL_SELL_METHODS, _services.SettingService.SellMethodFilterSetting, _services, (Container)(object)rootFlowPanel, "Some items match several of these options. These items are\nonly hidden if all matching options are unselected."));
-			filterPanels.Add(CreateFilterSettingPanel("Rarity (items)", Constants.ALL_ITEM_RARITIES, _services.SettingService.RarityStatsFilterSetting, _services, (Container)(object)rootFlowPanel));
-			filterPanels.Add(CreateFilterSettingPanel("Type (items)", Constants.ALL_ITEM_TYPES, _services.SettingService.TypeStatsFilterSetting, _services, (Container)(object)rootFlowPanel));
-			filterPanels.Add(CreateFilterSettingPanel("Flag (items)", Constants.ALL_ITEM_FLAGS, _services.SettingService.FlagStatsFilterSetting, _services, (Container)(object)rootFlowPanel, "Some items match several of these options. These items are\nonly hidden if all matching options are unselected."));
-			filterPanels.Add(CreateFilterSettingPanel("Currencies", Constants.ALL_CURRENCIES, _services.SettingService.CurrencyFilterSetting, _services, (Container)(object)rootFlowPanel));
-			filterPanels.Add(CreateFilterSettingPanel("GW2 API (items & currencies)", Constants.ALL_KNOWN_BY_API, _services.SettingService.KnownByApiFilterSetting, _services, (Container)(object)rootFlowPanel, "Coin will never be hidden. Some items like the lvl-80-boost or\ncertain reknown heart items are not known by the GW2 API."));
+			filterPanels.Add(CreateFilterSettingPanel("Count (items & currencies)", Constants.ALL_COUNTS, _services.SettingService.CountFilterSetting, _services, (Container)(object)_rootFlowPanel, "Coin will never be hidden."));
+			filterPanels.Add(CreateFilterSettingPanel("Sell Methods (items & currencies)", Constants.ALL_SELL_METHODS, _services.SettingService.SellMethodFilterSetting, _services, (Container)(object)_rootFlowPanel, "Some items match several of these options. These items are only hidden\nif all matching options are unselected.\nRaw gold (coin) will always be visible regardless of which of these filters\nare active or not."));
+			filterPanels.Add(CreateFilterSettingPanel("Rarity (items)", Constants.ALL_ITEM_RARITIES, _services.SettingService.RarityStatsFilterSetting, _services, (Container)(object)_rootFlowPanel));
+			filterPanels.Add(CreateFilterSettingPanel("Type (items)", Constants.ALL_ITEM_TYPES, _services.SettingService.TypeStatsFilterSetting, _services, (Container)(object)_rootFlowPanel));
+			filterPanels.Add(CreateFilterSettingPanel("Flag (items)", Constants.ALL_ITEM_FLAGS, _services.SettingService.FlagStatsFilterSetting, _services, (Container)(object)_rootFlowPanel, "Some items match several of these options. These items are only hidden\nif all matching options are unselected."));
+			filterPanels.Add(CreateFilterSettingPanel("Currencies", Constants.ALL_CURRENCIES, _services.SettingService.CurrencyFilterSetting, _services, (Container)(object)_rootFlowPanel));
+			filterPanels.Add(CreateFilterSettingPanel("GW2 API (items & currencies)", Constants.ALL_KNOWN_BY_API, _services.SettingService.KnownByApiFilterSetting, _services, (Container)(object)_rootFlowPanel, "Coin will never be hidden. Some items like the lvl-80-boost or\ncertain reknown heart items are not known by the GW2 API."));
 		}
 
-		private static FlowPanel CreateFilterSettingPanel<T>(string panelTitel, T[] allPossibleFilterElements, SettingEntry<List<T>> filterSettingEntry, Services services, Container parent, string hintText = "")
+		private static FlowPanel CreateFilterSettingPanel<T>(string panelTitel, T[] allPossibleFilterElements, SettingEntry<List<T>> filterSettingEntry, Services services, Container parent, string hintText = "") where T : notnull
 		{
 			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
@@ -151,6 +164,9 @@ namespace FarmingTracker
 			//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
 			//IL_020c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0218: Expected O, but got Unknown
+			T[] allPossibleFilterElements2 = allPossibleFilterElements;
+			SettingEntry<List<T>> filterSettingEntry2 = filterSettingEntry;
+			Services services2 = services;
 			Panel val = new Panel();
 			((Container)val).set_WidthSizingMode((SizingMode)1);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
@@ -168,10 +184,10 @@ namespace FarmingTracker
 			((Container)val2).set_HeightSizingMode((SizingMode)1);
 			((Control)val2).set_Parent((Container)(object)filterIconPanel);
 			FlowPanel filterFlowPanel = val2;
-			ClickThroughImage filterIcon = new ClickThroughImage(services.TextureService.FilterTabIconTexture, new Point(380, 3), (Container)(object)filterIconPanel);
+			ClickThroughImage filterIcon = new ClickThroughImage(services2.TextureService.FilterTabIconTexture, new Point(380, 3), (Container)(object)filterIconPanel);
 			if (!string.IsNullOrWhiteSpace(hintText))
 			{
-				new HintLabel((Container)(object)filterFlowPanel, hintText);
+				new HintLabel((Container?)(object)filterFlowPanel, hintText);
 			}
 			FlowPanel val3 = new FlowPanel();
 			val3.set_FlowDirection((ControlFlowDirection)2);
@@ -191,9 +207,9 @@ namespace FarmingTracker
 			((Control)val5).set_Parent((Container)(object)buttonFlowPanel);
 			StandardButton hideAllButton = val5;
 			List<Checkbox> filterCheckboxes = new List<Checkbox>();
-			List<T> selectedFilterElements = filterSettingEntry.get_Value().ToList();
-			UpdateOpacity(filterIcon, selectedFilterElements, allPossibleFilterElements);
-			T[] array = allPossibleFilterElements;
+			List<T> selectedFilterElements = filterSettingEntry2.get_Value().ToList();
+			UpdateOpacity(filterIcon, selectedFilterElements, allPossibleFilterElements2);
+			T[] array = allPossibleFilterElements2;
 			for (int i = 0; i < array.Length; i++)
 			{
 				T filterElement = array[i];
@@ -216,9 +232,9 @@ namespace FarmingTracker
 					{
 						selectedFilterElements.Remove(filterElement);
 					}
-					UpdateOpacity(filterIcon, selectedFilterElements, allPossibleFilterElements);
-					filterSettingEntry.set_Value(selectedFilterElements);
-					services.UpdateLoop.TriggerUpdateUi();
+					UpdateOpacity(filterIcon, selectedFilterElements, allPossibleFilterElements2);
+					filterSettingEntry2.set_Value(selectedFilterElements);
+					services2.UpdateLoop.TriggerUpdateUi();
 				});
 			}
 			((Control)hideAllButton).add_Click((EventHandler<MouseEventArgs>)delegate

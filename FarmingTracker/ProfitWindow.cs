@@ -25,12 +25,12 @@ namespace FarmingTracker
 			services.SettingService.IsProfitWindowVisibleSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnIsProfitWindowVisibleSettingChanged);
 		}
 
-		private void OnIsProfitWindowVisibleSettingChanged(object sender = null, ValueChangedEventArgs<bool> e = null)
+		private void OnIsProfitWindowVisibleSettingChanged(object? sender = null, ValueChangedEventArgs<bool>? e = null)
 		{
 			((Control)this).set_Visible(_services.SettingService.IsProfitWindowVisibleSetting.get_Value());
 		}
 
-		private void OnProfitWindowBackgroundOpacitySettingChanged(object sender = null, ValueChangedEventArgs<int> e = null)
+		private void OnProfitWindowBackgroundOpacitySettingChanged(object? sender = null, ValueChangedEventArgs<int>? e = null)
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0022: Unknown result type (might be due to invalid IL or missing references)

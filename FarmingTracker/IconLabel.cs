@@ -20,7 +20,7 @@ namespace FarmingTracker
 			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 			((Container)this).set_HeightSizingMode((SizingMode)1);
-			((Control)this).set_Width(77);
+			((Control)this).set_Width(80);
 			((Control)this).set_Parent(parent);
 			Image val = new Image(texture);
 			((Control)val).set_Size(new Point(height));

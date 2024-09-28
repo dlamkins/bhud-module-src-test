@@ -5,7 +5,7 @@ namespace FarmingTracker
 {
 	public class CoinSignLabel : Label
 	{
-		public CoinSignLabel(Tooltip tooltip, BitmapFont font, Container parent)
+		public CoinSignLabel(Tooltip? tooltip, BitmapFont font, Container parent)
 			: this()
 		{
 			((Label)this).set_Text(" ");

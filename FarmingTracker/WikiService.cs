@@ -24,13 +24,14 @@ namespace FarmingTracker
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Expected I4, but got Unknown
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Expected I4, but got Unknown
 			Locale value = GameService.Overlay.get_UserLocale().get_Value();
-			return (int)value switch
+			return (value - 1) switch
 			{
-				1 => "es", 
-				2 => "de", 
-				3 => "fr", 
+				0 => "es", 
+				1 => "de", 
+				2 => "fr", 
 				_ => "en", 
 			};
 		}

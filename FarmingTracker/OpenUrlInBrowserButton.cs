@@ -9,9 +9,10 @@ namespace FarmingTracker
 {
 	public class OpenUrlInBrowserButton : StandardButton
 	{
-		public OpenUrlInBrowserButton(string url, string buttonText, string buttonTooltip, Texture2D buttonIcon, Container parent)
-			: this()
+		public OpenUrlInBrowserButton(string url, string buttonText, string buttonTooltip, Texture2D? buttonIcon, Container parent)
 		{
+			string url2 = url;
+			((StandardButton)this)._002Ector();
 			((StandardButton)this).set_Text(buttonText);
 			((Control)this).set_BasicTooltipText(buttonTooltip);
 			((StandardButton)this).set_Icon(AsyncTexture2D.op_Implicit(buttonIcon));
@@ -21,7 +22,7 @@ namespace FarmingTracker
 			{
 				Process.Start(new ProcessStartInfo
 				{
-					FileName = url,
+					FileName = url2,
 					UseShellExecute = true
 				});
 			});

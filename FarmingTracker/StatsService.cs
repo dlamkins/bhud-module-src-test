@@ -36,17 +36,19 @@ namespace FarmingTracker
 
 		public static List<Stat> RemoveIgnoredItems(List<Stat> items, List<int> ignoredItemApiIds)
 		{
-			return items.Where((Stat s) => !ignoredItemApiIds.Contains(s.ApiId)).ToList();
+			List<int> ignoredItemApiIds2 = ignoredItemApiIds;
+			return items.Where((Stat s) => !ignoredItemApiIds2.Contains(s.ApiId)).ToList();
 		}
 
 		public static (List<Stat> favoriteItems, List<Stat> regularItems) SplitIntoFavoriteAndRegularItems(List<Stat> items, List<int> favoriteItemApiIds)
 		{
-			if (favoriteItemApiIds.IsEmpty())
+			List<int> favoriteItemApiIds2 = favoriteItemApiIds;
+			if (favoriteItemApiIds2.IsEmpty())
 			{
 				return (new List<Stat>(), items);
 			}
-			List<Stat> item = items.Where((Stat i) => favoriteItemApiIds.Contains(i.ApiId)).ToList();
-			List<Stat> regularItems = items.Where((Stat i) => !favoriteItemApiIds.Contains(i.ApiId)).ToList();
+			List<Stat> item = items.Where((Stat i) => favoriteItemApiIds2.Contains(i.ApiId)).ToList();
+			List<Stat> regularItems = items.Where((Stat i) => !favoriteItemApiIds2.Contains(i.ApiId)).ToList();
 			return (item, regularItems);
 		}
 	}

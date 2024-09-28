@@ -5,13 +5,44 @@ namespace FarmingTracker
 {
 	public class Constants
 	{
+		public static class TabTitles
+		{
+			public const string SUMMARY = "Summary";
+
+			public const string TIMELINE = "Timeline";
+
+			public const string FILTER = "Filter";
+
+			public const string SORT = "Sort Items";
+
+			public const string IGNORED = "Ignored Items";
+
+			public const string CUSTOM_STAT_PROFIT = "Custom Profit";
+
+			public const string SETTINGS = "Settings";
+
+			public const string DEBUG = "Debug";
+		}
+
 		public const int PANEL_WIDTH = 500;
 
+		public const int LABEL_WIDTH = 480;
+
 		public const int SCROLLBAR_WIDTH_OFFSET = 30;
+
+		public const string DRF_CONNECTION_LABEL_TEXT = "DRF Server Connection";
 
 		public const string UPDATING_HINT_TEXT = "Updating...";
 
 		public const string RESETTING_HINT_TEXT = "Resetting...";
+
+		public const string GW2_API_ERROR_HINT = "GW2 API error";
+
+		public const string FAVORITE_ITEMS_PANEL_TITLE = "Favorite Items";
+
+		public const string ITEMS_PANEL_TITLE = "Items";
+
+		public const string CURRENCIES_PANEL_TITLE = "Currencies";
 
 		public const string FULL_HEIGHT_EMPTY_LABEL = " ";
 

@@ -17,8 +17,9 @@ namespace FarmingTracker
 
 		private static List<Stat> FilterBySearchTerm(List<Stat> stats, string searchTerm)
 		{
-			searchTerm = searchTerm.ToLower().Trim();
-			return stats.Where((Stat s) => s.Details.Name.ToLower().Contains(searchTerm)).ToList();
+			string searchTerm2 = searchTerm;
+			searchTerm2 = searchTerm2.ToLower().Trim();
+			return stats.Where((Stat s) => s.Details.Name.ToLower().Contains(searchTerm2)).ToList();
 		}
 	}
 }

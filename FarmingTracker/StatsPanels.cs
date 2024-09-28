@@ -4,14 +4,23 @@ namespace FarmingTracker
 {
 	public class StatsPanels
 	{
-		public FlowPanel CurrenciesFlowPanel { get; internal set; }
+		public FlowPanel CurrenciesFlowPanel { get; }
 
-		public FlowPanel ItemsFlowPanel { get; internal set; }
+		public FlowPanel ItemsFlowPanel { get; }
 
-		public FlowPanel FavoriteItemsFlowPanel { get; internal set; }
+		public FlowPanel FavoriteItemsFlowPanel { get; }
 
-		public ClickThroughImage CurrencyFilterIcon { get; internal set; }
+		public ClickThroughImage CurrencyFilterIcon { get; }
 
-		public ClickThroughImage ItemsFilterIcon { get; internal set; }
+		public ClickThroughImage ItemsFilterIcon { get; }
+
+		public StatsPanels(FlowPanel currenciesFlowPanel, FlowPanel favoriteItemsFlowPanel, FlowPanel itemsFlowPanel, ClickThroughImage currencyFilterIcon, ClickThroughImage itemsFilterIcon)
+		{
+			CurrenciesFlowPanel = currenciesFlowPanel;
+			FavoriteItemsFlowPanel = favoriteItemsFlowPanel;
+			ItemsFlowPanel = itemsFlowPanel;
+			CurrencyFilterIcon = currencyFilterIcon;
+			ItemsFilterIcon = itemsFilterIcon;
+		}
 	}
 }

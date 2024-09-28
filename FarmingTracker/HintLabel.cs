@@ -9,7 +9,7 @@ namespace FarmingTracker
 		{
 		}
 
-		public HintLabel(Container parent, string text)
+		public HintLabel(Container? parent, string text)
 			: this()
 		{
 			((Label)this).set_Text(text);

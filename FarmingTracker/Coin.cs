@@ -8,12 +8,6 @@ namespace FarmingTracker
 
 		public long Sign { get; }
 
-		public long UnsignedGold { get; }
-
-		public long UnsignedSilver { get; }
-
-		public long UnsignedCopper { get; }
-
 		public long Gold { get; }
 
 		public long Silver { get; }
@@ -48,18 +42,11 @@ namespace FarmingTracker
 
 		public Coin(long coinsInCopper)
 		{
-			int sign = Math.Sign(coinsInCopper);
-			long num = Math.Abs(coinsInCopper);
-			long unsignedGold = num / 10000;
-			long unsignedSilver = (num - unsignedGold * 10000) / 100;
-			long unsignedCopper = num % 100;
-			UnsignedGold = unsignedGold;
-			UnsignedSilver = unsignedSilver;
-			UnsignedCopper = unsignedCopper;
-			Gold = sign * unsignedGold;
-			Silver = sign * unsignedSilver;
-			Copper = sign * unsignedCopper;
-			Sign = sign;
+			long unsignedCoinsInCopper = Math.Abs(coinsInCopper);
+			Sign = Math.Sign(coinsInCopper);
+			Gold = unsignedCoinsInCopper / 10000;
+			Silver = unsignedCoinsInCopper % 10000 / 100;
+			Copper = unsignedCoinsInCopper % 100;
 		}
 
 		public object CreateCoinText()
@@ -67,13 +54,13 @@ namespace FarmingTracker
 			string coinText = ((Sign == -1) ? "-" : "");
 			if (Gold != 0L)
 			{
-				coinText += $"{UnsignedGold} g ";
+				coinText += $"{Gold} g ";
 			}
 			if (Silver != 0L)
 			{
-				coinText += $"{UnsignedSilver} s ";
+				coinText += $"{Silver} s ";
 			}
-			return coinText + $"{UnsignedCopper} c";
+			return coinText + $"{Copper} c";
 		}
 	}
 }

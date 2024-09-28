@@ -23,7 +23,7 @@ namespace FarmingTracker
 		{
 			try
 			{
-				return FileModelService.CreateModel(JsonConvert.DeserializeObject<FileModel>(await GetFileContentAndThrowIfFileEmpty(modelFilePath)));
+				return ModelCreator.CreateModel(JsonConvert.DeserializeObject<FileModel>(await GetFileContentAndThrowIfFileEmpty(modelFilePath)) ?? throw new Exception("Deserializing the model.json file failed."));
 			}
 			catch (Exception e)
 			{

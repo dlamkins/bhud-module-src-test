@@ -51,12 +51,12 @@ namespace FarmingTracker
 
 		public bool HasToUpdateStats()
 		{
-			bool statsHaveToBeUpdated = _statsHaveToBeUpdated;
-			if (statsHaveToBeUpdated)
+			if (!_statsHaveToBeUpdated)
 			{
-				_statsHaveToBeUpdated = false;
+				return false;
 			}
-			return statsHaveToBeUpdated;
+			_statsHaveToBeUpdated = false;
+			return true;
 		}
 
 		public void TriggerUpdateUi()
@@ -66,12 +66,12 @@ namespace FarmingTracker
 
 		public bool HasToUpdateUi()
 		{
-			bool uiHasToBeUpdated = _uiHasToBeUpdated;
-			if (uiHasToBeUpdated)
+			if (!_uiHasToBeUpdated)
 			{
-				_uiHasToBeUpdated = false;
+				return false;
 			}
-			return uiHasToBeUpdated;
+			_uiHasToBeUpdated = false;
+			return true;
 		}
 
 		public void TriggerSaveModel()

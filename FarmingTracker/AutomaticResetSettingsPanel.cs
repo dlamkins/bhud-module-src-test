@@ -14,7 +14,7 @@ namespace FarmingTracker
 
 		private readonly Services _services;
 
-		private Panel _resetMinutesPanel;
+		private Panel? _resetMinutesPanel;
 
 		public AutomaticResetSettingsPanel(Container parent, Services services)
 			: this()
@@ -48,22 +48,23 @@ namespace FarmingTracker
 			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e8: Expected O, but got Unknown
+			SettingService settingService2 = settingService;
 			Panel val = new Panel();
-			((Control)val).set_BasicTooltipText(((SettingEntry)settingService.AutomaticResetSetting).get_GetDescriptionFunc()());
+			((Control)val).set_BasicTooltipText(((SettingEntry)settingService2.AutomaticResetSetting).get_GetDescriptionFunc()());
 			((Container)val).set_HeightSizingMode((SizingMode)1);
 			((Container)val).set_WidthSizingMode((SizingMode)1);
 			((Control)val).set_Parent(parent);
 			Panel automaticResetPanel = val;
 			Label val2 = new Label();
-			val2.set_Text(((SettingEntry)settingService.AutomaticResetSetting).get_GetDisplayNameFunc()());
-			((Control)val2).set_BasicTooltipText(((SettingEntry)settingService.AutomaticResetSetting).get_GetDescriptionFunc()());
+			val2.set_Text(((SettingEntry)settingService2.AutomaticResetSetting).get_GetDisplayNameFunc()());
+			((Control)val2).set_BasicTooltipText(((SettingEntry)settingService2.AutomaticResetSetting).get_GetDescriptionFunc()());
 			((Control)val2).set_Location(new Point(5, 4));
 			val2.set_AutoSizeHeight(true);
 			val2.set_AutoSizeWidth(true);
 			((Control)val2).set_Parent((Container)(object)automaticResetPanel);
 			Label automaticResetLabel = val2;
 			Dropdown val3 = new Dropdown();
-			((Control)val3).set_BasicTooltipText(((SettingEntry)settingService.AutomaticResetSetting).get_GetDescriptionFunc()());
+			((Control)val3).set_BasicTooltipText(((SettingEntry)settingService2.AutomaticResetSetting).get_GetDescriptionFunc()());
 			((Control)val3).set_Location(new Point(((Control)automaticResetLabel).get_Right() + 5, 0));
 			((Control)val3).set_Width(370);
 			((Control)val3).set_Parent((Container)(object)automaticResetPanel);
@@ -73,10 +74,10 @@ namespace FarmingTracker
 			{
 				automaticResetDropDown.get_Items().Add(dropDownText);
 			}
-			automaticResetDropDown.set_SelectedItem(dropDownTextDict[settingService.AutomaticResetSetting.get_Value()]);
+			automaticResetDropDown.set_SelectedItem(dropDownTextDict[settingService2.AutomaticResetSetting.get_Value()]);
 			automaticResetDropDown.add_ValueChanged((EventHandler<ValueChangedEventArgs>)delegate(object s, ValueChangedEventArgs e)
 			{
-				settingService.AutomaticResetSetting.set_Value(dropDownTextDict.First((KeyValuePair<AutomaticReset, string> d) => d.Value == e.get_CurrentValue()).Key);
+				settingService2.AutomaticResetSetting.set_Value(dropDownTextDict.First<KeyValuePair<AutomaticReset, string>>((KeyValuePair<AutomaticReset, string> d) => d.Value == e.get_CurrentValue()).Key);
 			});
 		}
 
@@ -102,21 +103,22 @@ namespace FarmingTracker
 			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+			SettingService settingService2 = settingService;
 			Panel val = new Panel();
-			((Control)val).set_BasicTooltipText(((SettingEntry)settingService.MinutesUntilResetAfterModuleShutdownSetting).get_GetDescriptionFunc()());
+			((Control)val).set_BasicTooltipText(((SettingEntry)settingService2.MinutesUntilResetAfterModuleShutdownSetting).get_GetDescriptionFunc()());
 			((Container)val).set_HeightSizingMode((SizingMode)1);
 			((Container)val).set_WidthSizingMode((SizingMode)1);
 			((Control)val).set_Parent(parent);
 			_resetMinutesPanel = val;
 			Dropdown val2 = new Dropdown();
-			((Control)val2).set_BasicTooltipText(((SettingEntry)settingService.MinutesUntilResetAfterModuleShutdownSetting).get_GetDescriptionFunc()());
+			((Control)val2).set_BasicTooltipText(((SettingEntry)settingService2.MinutesUntilResetAfterModuleShutdownSetting).get_GetDescriptionFunc()());
 			((Control)val2).set_Location(new Point(5, 0));
 			((Control)val2).set_Width(60);
 			((Control)val2).set_Parent((Container)(object)_resetMinutesPanel);
 			Dropdown minutesDropDown = val2;
 			Label val3 = new Label();
-			val3.set_Text(((SettingEntry)settingService.MinutesUntilResetAfterModuleShutdownSetting).get_GetDisplayNameFunc()());
-			((Control)val3).set_BasicTooltipText(((SettingEntry)settingService.MinutesUntilResetAfterModuleShutdownSetting).get_GetDescriptionFunc()());
+			val3.set_Text(((SettingEntry)settingService2.MinutesUntilResetAfterModuleShutdownSetting).get_GetDisplayNameFunc()());
+			((Control)val3).set_BasicTooltipText(((SettingEntry)settingService2.MinutesUntilResetAfterModuleShutdownSetting).get_GetDescriptionFunc()());
 			((Control)val3).set_Location(new Point(((Control)minutesDropDown).get_Right() + 5, 4));
 			val3.set_AutoSizeWidth(true);
 			val3.set_AutoSizeHeight(true);
@@ -129,12 +131,12 @@ namespace FarmingTracker
 			{
 				minutesDropDown.get_Items().Add(dropDownValue);
 			}
-			minutesDropDown.set_SelectedItem(settingService.MinutesUntilResetAfterModuleShutdownSetting.get_Value().ToString());
+			minutesDropDown.set_SelectedItem(settingService2.MinutesUntilResetAfterModuleShutdownSetting.get_Value().ToString());
 			minutesDropDown.add_ValueChanged((EventHandler<ValueChangedEventArgs>)delegate
 			{
-				settingService.MinutesUntilResetAfterModuleShutdownSetting.set_Value(int.Parse(minutesDropDown.get_SelectedItem()));
+				settingService2.MinutesUntilResetAfterModuleShutdownSetting.set_Value(int.Parse(minutesDropDown.get_SelectedItem()));
 			});
-			settingService.AutomaticResetSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<AutomaticReset>>)AutomaticResetSettingChanged);
+			settingService2.AutomaticResetSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<AutomaticReset>>)AutomaticResetSettingChanged);
 			AutomaticResetSettingChanged();
 		}
 
@@ -144,9 +146,12 @@ namespace FarmingTracker
 			((FlowPanel)this).DisposeControl();
 		}
 
-		private void AutomaticResetSettingChanged(object sender = null, ValueChangedEventArgs<AutomaticReset> e = null)
+		private void AutomaticResetSettingChanged(object? sender = null, ValueChangedEventArgs<AutomaticReset>? e = null)
 		{
-			((Control)_resetMinutesPanel).set_Opacity((_services.SettingService.AutomaticResetSetting.get_Value() == AutomaticReset.MinutesAfterModuleShutdown) ? 1f : 0f);
+			if (_resetMinutesPanel != null)
+			{
+				((Control)_resetMinutesPanel).set_Opacity((_services.SettingService.AutomaticResetSetting.get_Value() == AutomaticReset.MinutesAfterModuleShutdown) ? 1f : 0f);
+			}
 		}
 
 		private static Dictionary<AutomaticReset, string> GetDropDownTextsForAutomaticResetSetting()

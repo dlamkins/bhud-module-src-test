@@ -14,9 +14,9 @@ namespace FarmingTracker
 
 		private static readonly Stopwatch _stopWatch = new Stopwatch();
 
-		private SettingEntry<bool> _debugDateTimeEnabledSetting;
+		private readonly SettingEntry<bool> _debugDateTimeEnabledSetting;
 
-		private SettingEntry<DateTime> _debugDateTimeValueSetting;
+		private readonly SettingEntry<DateTime> _debugDateTimeValueSetting;
 
 		public static DateTime UtcNow
 		{
@@ -38,7 +38,10 @@ namespace FarmingTracker
 		public DateTimeService(SettingCollection settings)
 		{
 			_stopWatch.Restart();
-			DefineSettings(settings);
+			_debugDateTimeEnabledSetting = settings.DefineSetting<bool>("debug dateTime enabled", false, (Func<string>)(() => "use debug dateTime"), (Func<string>)(() => "Use debug dateTime instead of system time."));
+			_debugDateTimeValueSetting = settings.DefineSetting<DateTime>("debug dateTime value", DateTime.UtcNow, (Func<string>)(() => "use debug dateTime"), (Func<string>)(() => "Use debug dateTime instead of system time."));
+			_debugDateTimeEnabledSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnDebugDateTimeEnabledSettingChanged);
+			OnDebugDateTimeEnabledSettingChanged();
 			_utcNowDebug = _debugDateTimeValueSetting.get_Value();
 		}
 
@@ -47,20 +50,12 @@ namespace FarmingTracker
 			DateTimeDebugPanelService.CreateDateTimeDebugPanel(parent, _debugDateTimeEnabledSetting, _debugDateTimeValueSetting);
 		}
 
-		private void DefineSettings(SettingCollection settings)
-		{
-			_debugDateTimeEnabledSetting = settings.DefineSetting<bool>("debug dateTime enabled", false, (Func<string>)(() => "use debug dateTime"), (Func<string>)(() => "Use debug dateTime instead of system time."));
-			_debugDateTimeValueSetting = settings.DefineSetting<DateTime>("debug dateTime value", DateTime.UtcNow, (Func<string>)(() => "use debug dateTime"), (Func<string>)(() => "Use debug dateTime instead of system time."));
-			_debugDateTimeEnabledSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnDebugDateTimeEnabledSettingChanged);
-			OnDebugDateTimeEnabledSettingChanged();
-		}
-
 		public void Dispose()
 		{
 			_debugDateTimeEnabledSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnDebugDateTimeEnabledSettingChanged);
 		}
 
-		private void OnDebugDateTimeEnabledSettingChanged(object sender = null, ValueChangedEventArgs<bool> e = null)
+		private void OnDebugDateTimeEnabledSettingChanged(object? sender = null, ValueChangedEventArgs<bool>? e = null)
 		{
 			_debugEnabled = _debugDateTimeEnabledSetting.get_Value();
 		}

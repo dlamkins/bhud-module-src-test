@@ -7,20 +7,20 @@ namespace FarmingTracker
 {
 	public class ModuleSettingsView : View
 	{
-		private OpenSettingsButton _openSettingsButton;
+		private OpenSettingsButton? _openSettingsButton;
 
-		private readonly FarmingTrackerWindow _farmingTrackerWindow;
+		private readonly WindowTabSelector _windowTabSelector;
 
-		public ModuleSettingsView(FarmingTrackerWindow farmingTrackerWindow)
+		public ModuleSettingsView(WindowTabSelector windowTabSelector)
 			: this()
 		{
-			_farmingTrackerWindow = farmingTrackerWindow;
+			_windowTabSelector = windowTabSelector;
 		}
 
 		protected override void Build(Container buildPanel)
 		{
 			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			_openSettingsButton = new OpenSettingsButton("Open Settings", _farmingTrackerWindow, buildPanel);
+			_openSettingsButton = new OpenSettingsButton("Open Settings", _windowTabSelector, buildPanel);
 			int x = Math.Max(((Control)buildPanel).get_Width() / 2 - ((Control)_openSettingsButton).get_Width() / 2, 20);
 			int y = Math.Max(((Control)buildPanel).get_Height() / 2 - ((Control)_openSettingsButton).get_Height() / 2, 20);
 			((Control)_openSettingsButton).set_Location(new Point(x, y));
@@ -28,7 +28,7 @@ namespace FarmingTracker
 
 		protected override void Unload()
 		{
-			OpenSettingsButton openSettingsButton = _openSettingsButton;
+			OpenSettingsButton? openSettingsButton = _openSettingsButton;
 			if (openSettingsButton != null)
 			{
 				((Control)openSettingsButton).Dispose();

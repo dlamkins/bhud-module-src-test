@@ -15,9 +15,9 @@ namespace FarmingTracker
 				ControlCollection<Control> oldChildren = parent.get_Children();
 				foreach (Control item in children)
 				{
-					GetPrivateField(item, "_parent").SetValue(item, parent);
+					GetPrivateField(item, "_parent")?.SetValue(item, parent);
 				}
-				GetPrivateField(parent, "_children").SetValue(parent, children);
+				GetPrivateField(parent, "_children")?.SetValue(parent, children);
 				((Control)parent).Invalidate();
 				foreach (Control item2 in oldChildren)
 				{
@@ -30,7 +30,7 @@ namespace FarmingTracker
 			}
 		}
 
-		private static FieldInfo GetPrivateField(object target, string fieldName)
+		private static FieldInfo? GetPrivateField(object target, string fieldName)
 		{
 			if (target == null)
 			{

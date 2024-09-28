@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 
 namespace FarmingTracker
 {
-	public class ColorService
+	public static class ColorService
 	{
 		public static Color JunkColor = new Color(170, 170, 170);
 

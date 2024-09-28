@@ -7,7 +7,7 @@ namespace FarmingTracker
 {
 	public class ErrorSettingsView : View
 	{
-		private FormattedLabel _formattedLabel;
+		private FormattedLabel? _formattedLabel;
 
 		private readonly string _infoText;
 
@@ -31,7 +31,7 @@ namespace FarmingTracker
 
 		protected override void Unload()
 		{
-			FormattedLabel formattedLabel = _formattedLabel;
+			FormattedLabel? formattedLabel = _formattedLabel;
 			if (formattedLabel != null)
 			{
 				((Control)formattedLabel).Dispose();

@@ -65,7 +65,7 @@ namespace FarmingTracker
 		{
 			lock (_lock)
 			{
-				return _list.Any(predicate);
+				return _list.Any<T>(predicate);
 			}
 		}
 

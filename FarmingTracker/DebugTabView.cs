@@ -17,6 +17,8 @@ namespace FarmingTracker
 
 		private readonly Services _services;
 
+		private FlowPanel? _rootFlowPanel;
+
 		public DebugTabView(Model model, Services services)
 			: this()
 		{
@@ -24,17 +26,28 @@ namespace FarmingTracker
 			_services = services;
 		}
 
+		protected override void Unload()
+		{
+			FlowPanel? rootFlowPanel = _rootFlowPanel;
+			if (rootFlowPanel != null)
+			{
+				((Control)rootFlowPanel).Dispose();
+			}
+			_rootFlowPanel = null;
+			((View<IPresenter>)this).Unload();
+		}
+
 		protected override void Build(Container buildPanel)
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Expected O, but got Unknown
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Expected O, but got Unknown
 			FlowPanel val = new FlowPanel();
 			val.set_FlowDirection((ControlFlowDirection)3);
 			((Panel)val).set_CanScroll(true);
@@ -42,10 +55,10 @@ namespace FarmingTracker
 			((Container)val).set_WidthSizingMode((SizingMode)2);
 			((Container)val).set_HeightSizingMode((SizingMode)2);
 			((Control)val).set_Parent(buildPanel);
-			FlowPanel rootFlowPanel = val;
-			new HintLabel((Container)(object)rootFlowPanel, "If you can see this tab, you are running a debug instead of a release version of this module.\nDo not change any settings here. They will not speed up or improve anything.\nThey will rather break the module.\nThis tab just helps the developer to test the module. :-)");
-			CreateDrfDebugPanel((Container)(object)rootFlowPanel);
-			_services.DateTimeService.CreateDateTimeDebugPanel((Container)(object)rootFlowPanel);
+			_rootFlowPanel = val;
+			new HintLabel((Container?)(object)_rootFlowPanel, "If you can see this tab, you are running a debug instead of a release version of this module.\nDo not change any settings here. They will not speed up or improve anything.\nThey will rather break the module.\nThis tab just helps the developer to test the module. :-)");
+			CreateDrfDebugPanel((Container)(object)_rootFlowPanel);
+			_services.DateTimeService.CreateDateTimeDebugPanel((Container)(object)_rootFlowPanel);
 		}
 
 		private void CreateDrfDebugPanel(Container parent)
@@ -91,7 +104,7 @@ namespace FarmingTracker
 
 		private static DrfMessage ConvertToDrfMessage(Model model)
 		{
-			StatsSnapshot statsSnapshot = model.StatsSnapshot;
+			StatsSnapshot statsSnapshot = model.Stats.StatsSnapshot;
 			List<Stat> items = statsSnapshot.ItemById.Values.ToList();
 			List<Stat> currencies = statsSnapshot.CurrencyById.Values.ToList();
 			DrfMessage drfMessage = new DrfMessage();

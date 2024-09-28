@@ -22,17 +22,17 @@ namespace FarmingTracker
 			Coin coin = new Coin(coinStat.Count);
 			if (coin.HasToDisplayGold)
 			{
-				Stat goldStat = CreateCoinStat("Gold", coin.Gold, -3, ApiStatDetailsState.GoldCoinCustomStat, localizedCoinName);
+				Stat goldStat = CreateCoinStat("Gold", coin.Sign * coin.Gold, -3, ApiStatDetailsState.GoldCoinCustomStat, localizedCoinName);
 				currencies.Add(goldStat);
 			}
 			if (coin.HasToDisplaySilver)
 			{
-				Stat silverStat = CreateCoinStat("Silver", coin.Silver, -2, ApiStatDetailsState.SilveCoinCustomStat, localizedCoinName);
+				Stat silverStat = CreateCoinStat("Silver", coin.Sign * coin.Silver, -2, ApiStatDetailsState.SilveCoinCustomStat, localizedCoinName);
 				currencies.Add(silverStat);
 			}
 			if (coin.HasToDisplayCopper)
 			{
-				Stat copperStat = CreateCoinStat("Copper", coin.Copper, -1, ApiStatDetailsState.CopperCoinCustomStat, localizedCoinName);
+				Stat copperStat = CreateCoinStat("Copper", coin.Sign * coin.Copper, -1, ApiStatDetailsState.CopperCoinCustomStat, localizedCoinName);
 				currencies.Add(copperStat);
 			}
 			currencies.Remove(coinStat);
@@ -44,6 +44,7 @@ namespace FarmingTracker
 			return new Stat
 			{
 				ApiId = apiId,
+				StatType = StatType.Currency,
 				Count = count,
 				Details = 
 				{

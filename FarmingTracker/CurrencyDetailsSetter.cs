@@ -43,7 +43,7 @@ namespace FarmingTracker
 			{
 				return;
 			}
-			if (Module.DebugEnabled)
+			if (DebugMode.DebugLoggingRequired)
 			{
 				Module.Logger.Debug("currencies no details " + string.Join(" ", currenciesWithoutDetails.Select((Stat c) => c.ApiId)));
 			}
@@ -64,7 +64,7 @@ namespace FarmingTracker
 					currencyWithoutDetails.Details.State = ApiStatDetailsState.MissingBecauseUnknownByApi;
 				}
 			}
-			if (missingInApiCurrencyIds.Any() && Module.DebugEnabled)
+			if (missingInApiCurrencyIds.Any() && DebugMode.DebugLoggingRequired)
 			{
 				Module.Logger.Debug("currencies api miss   " + string.Join(" ", missingInApiCurrencyIds));
 			}

@@ -15,5 +15,8 @@ namespace FarmingTracker
 
 		public List<int> FavoriteItemApiIds { get; set; } = new List<int>();
 
+
+		public List<CustomStatProfit> CustomStatProfits { get; set; } = new List<CustomStatProfit>();
+
 	}
 }

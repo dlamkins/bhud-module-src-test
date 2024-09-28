@@ -13,6 +13,8 @@ namespace FarmingTracker
 	{
 		private const string DRAG_WITH_MOUSE_LABEL_TEXT = "drag with mouse";
 
+		private const string SETTINGS_VERSION_SETTING_KEY = "settings version";
+
 		public SettingEntry<string> DrfTokenSetting { get; }
 
 		public SettingEntry<AutomaticReset> AutomaticResetSetting { get; }
@@ -22,6 +24,8 @@ namespace FarmingTracker
 		public SettingEntry<KeyBinding> WindowVisibilityKeyBindingSetting { get; }
 
 		public SettingEntry<bool> IsFakeDrfServerUsedSetting { get; }
+
+		public SettingEntry<int> SettingsVersionSetting { get; private set; }
 
 		public SettingEntry<DateTime> NextResetDateTimeUtcSetting { get; private set; }
 
@@ -94,6 +98,7 @@ namespace FarmingTracker
 			DefineProfitSettings(settings);
 			DefineProfitWindowSettings(settings, internalSettings);
 			DefineSortAndFilterSettings(internalSettings);
+			MigrateBlishSettingsService.MigrateSettings(SettingsVersionSetting, CurrencyFilterSetting, SellMethodFilterSetting);
 		}
 
 		private void DefineSortAndFilterSettings(SettingCollection internalSettings)
@@ -123,6 +128,12 @@ namespace FarmingTracker
 		private SettingCollection DefineHiddenSettings(SettingCollection settings)
 		{
 			SettingCollection internalSettings = settings.AddSubCollection("internal settings (not visible in UI)", false);
+			bool num = internalSettings.get_Item("settings version") == null;
+			SettingsVersionSetting = internalSettings.DefineSetting<int>("settings version", 2, (Func<string>)null, (Func<string>)null);
+			if (num)
+			{
+				SettingsVersionSetting.set_Value(1);
+			}
 			NextResetDateTimeUtcSetting = internalSettings.DefineSetting<DateTime>("next reset dateTimeUtc", NextAutomaticResetCalculator.UNDEFINED_RESET_DATE_TIME, (Func<string>)null, (Func<string>)null);
 			FarmingDurationTimeSpanSetting = internalSettings.DefineSetting<TimeSpan>("farming duration time span", TimeSpan.Zero, (Func<string>)null, (Func<string>)null);
 			return internalSettings;

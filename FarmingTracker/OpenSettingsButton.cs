@@ -6,12 +6,12 @@ namespace FarmingTracker
 {
 	public class OpenSettingsButton : StandardButton
 	{
-		private readonly FarmingTrackerWindow _farmingTrackerWindow;
+		private readonly WindowTabSelector _windowTabSelector;
 
-		public OpenSettingsButton(string buttonText, FarmingTrackerWindow farmingTrackerWindow, Container parent)
+		public OpenSettingsButton(string buttonText, WindowTabSelector windowTabSelector, Container parent)
 			: this()
 		{
-			_farmingTrackerWindow = farmingTrackerWindow;
+			_windowTabSelector = windowTabSelector;
 			((StandardButton)this).set_Text(buttonText);
 			((Control)this).set_BasicTooltipText("Open farming tracker settings");
 			((Control)this).set_Width(300);
@@ -27,7 +27,7 @@ namespace FarmingTracker
 
 		private void OnSettingsButtonClick(object sender, MouseEventArgs e)
 		{
-			_farmingTrackerWindow.ShowWindowAndSelectSettingsTab();
+			_windowTabSelector.SelectWindowTab(WindowTab.Settings, WindowVisibility.Show);
 		}
 	}
 }

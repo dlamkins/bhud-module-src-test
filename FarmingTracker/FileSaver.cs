@@ -50,7 +50,7 @@ namespace FarmingTracker
 
 		private static string SerializeModelToJson(Model model)
 		{
-			return JsonConvert.SerializeObject((object)FileModelService.CreateFileModel(model));
+			return JsonConvert.SerializeObject((object)FileModelCreator.CreateFileModel(model));
 		}
 	}
 }

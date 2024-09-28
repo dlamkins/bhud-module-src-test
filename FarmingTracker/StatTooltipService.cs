@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using MonoGame.Extended.BitmapFonts;
 
@@ -25,15 +26,15 @@ namespace FarmingTracker
 			((Control)val).set_Parent(parent);
 		}
 
-		public static void AddProfitTable(Stat stat, BitmapFont font, Services services, Container parent)
+		public static void AddProfitTable(Stat stat, long? customStatProfitInCopper, BitmapFont font, Services services, Container parent)
 		{
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Expected O, but got Unknown
-			if (!stat.Profits.CanNotBeSold)
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Expected O, but got Unknown
+			if (!stat.Profits.CanNotBeSold || customStatProfitInCopper.HasValue)
 			{
 				if (!stat.IsSingleItem)
 				{
@@ -45,15 +46,15 @@ namespace FarmingTracker
 				((Container)val).set_WidthSizingMode((SizingMode)1);
 				((Control)val).set_Parent(parent);
 				FlowPanel profitColumnsFlowPanel = val;
-				AddTitleColumn(stat, font, services, (Container)(object)profitColumnsFlowPanel);
+				AddTitleColumn(stat, customStatProfitInCopper.HasValue, font, services, (Container)(object)profitColumnsFlowPanel);
 				if (stat.IsSingleItem)
 				{
-					AddProfitColumn("", stat.Profits.Each, stat, font, services, (Container)(object)profitColumnsFlowPanel);
+					AddProfitColumn("", stat.Profits.Each, customStatProfitInCopper, stat, font, services, (Container)(object)profitColumnsFlowPanel);
 				}
 				else
 				{
-					AddProfitColumn("all", stat.Profits.All, stat, font, services, (Container)(object)profitColumnsFlowPanel);
-					AddProfitColumn("each", stat.Profits.Each, stat, font, services, (Container)(object)profitColumnsFlowPanel);
+					AddProfitColumn("all", stat.Profits.All, stat.Count * customStatProfitInCopper, stat, font, services, (Container)(object)profitColumnsFlowPanel);
+					AddProfitColumn("each", stat.Profits.Each, customStatProfitInCopper, stat, font, services, (Container)(object)profitColumnsFlowPanel);
 				}
 				if (stat.Profits.CanBeSoldOnTp)
 				{
@@ -62,19 +63,19 @@ namespace FarmingTracker
 			}
 		}
 
-		private static void AddTitleColumn(Stat stat, BitmapFont font, Services services, Container parent)
+		private static void AddTitleColumn(Stat stat, bool hasCustomProfit, BitmapFont font, Services services, Container parent)
 		{
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Expected O, but got Unknown
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Expected O, but got Unknown
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			val.set_FlowDirection((ControlFlowDirection)3);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
@@ -96,9 +97,13 @@ namespace FarmingTracker
 			{
 				new IconLabel("Vendor", services.TextureService.MerchantTexture, 22, font, (Container)(object)titleColumnFlowPanel);
 			}
+			if (hasCustomProfit)
+			{
+				new IconLabel("Custom", AsyncTexture2D.op_Implicit(services.TextureService.CustomStatProfitTabIconTexture), 22, font, (Container)(object)titleColumnFlowPanel);
+			}
 		}
 
-		private static void AddProfitColumn(string columnHeaderText, Profit profit, Stat stat, BitmapFont font, Services services, Container parent)
+		private static void AddProfitColumn(string columnHeaderText, Profit profit, long? customStatProfitInCopper, Stat stat, BitmapFont font, Services services, Container parent)
 		{
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
@@ -109,10 +114,10 @@ namespace FarmingTracker
 			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Expected O, but got Unknown
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0059: Expected O, but got Unknown
 			FlowPanel val = new FlowPanel();
 			val.set_FlowDirection((ControlFlowDirection)3);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
@@ -143,9 +148,17 @@ namespace FarmingTracker
 			}
 			if (stat.Profits.CanBeSoldToVendor)
 			{
+				FixedWidthContainer vendorProfitContainer2 = new FixedWidthContainer((Container)(object)columnFlowPanel);
+				CoinsPanel vendorProfitPanel2 = new CoinsPanel(null, font, services.TextureService, (Container)(object)vendorProfitContainer2, 22);
+				vendorProfitPanel2.SetCoins(stat.CountSign * profit.VendorProfitInCopper);
+				profitPanels.Add(vendorProfitPanel2);
+				containers.Add(vendorProfitContainer2);
+			}
+			if (customStatProfitInCopper.HasValue)
+			{
 				FixedWidthContainer vendorProfitContainer = new FixedWidthContainer((Container)(object)columnFlowPanel);
 				CoinsPanel vendorProfitPanel = new CoinsPanel(null, font, services.TextureService, (Container)(object)vendorProfitContainer, 22);
-				vendorProfitPanel.SetCoins(stat.CountSign * profit.VendorProfitInCopper);
+				vendorProfitPanel.SetCoins(stat.CountSign * customStatProfitInCopper.Value);
 				profitPanels.Add(vendorProfitPanel);
 				containers.Add(vendorProfitContainer);
 			}

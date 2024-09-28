@@ -6,6 +6,8 @@ namespace FarmingTracker
 	{
 		public int ApiId { get; set; }
 
+		public StatType StatType { get; set; }
+
 		public long Count { get; set; }
 
 		public long CountSign => Math.Sign(Count);
@@ -19,5 +21,17 @@ namespace FarmingTracker
 
 
 		public bool IsCoin => ApiId == 1;
+
+		public bool IsCoinOrCustomCoin
+		{
+			get
+			{
+				if (!IsCoin)
+				{
+					return Details.IsCustomCoinStat;
+				}
+				return true;
+			}
+		}
 	}
 }

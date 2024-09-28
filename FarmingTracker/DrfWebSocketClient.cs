@@ -21,7 +21,7 @@ namespace FarmingTracker
 
 		private List<DrfMessage> _drfMessages = new List<DrfMessage>();
 
-		private ClientWebSocket _clientWebSocket;
+		private ClientWebSocket? _clientWebSocket;
 
 		private const char FIRST_LETTER_OF_KIND_SESSION_UPDATE = 's';
 
@@ -48,27 +48,27 @@ namespace FarmingTracker
 
 		public bool WindowsVersionIsTooLowToSupportWebSockets { get; set; }
 
-		public event EventHandler Connecting;
+		public event EventHandler? Connecting;
 
-		public event EventHandler ConnectedAndAuthenticationRequestSent;
+		public event EventHandler? ConnectedAndAuthenticationRequestSent;
 
-		public event EventHandler<GenericEventArgs<Exception>> ConnectFailed;
+		public event EventHandler<GenericEventArgs<Exception>>? ConnectFailed;
 
-		public event EventHandler<GenericEventArgs<Exception>> ConnectCrashed;
+		public event EventHandler<GenericEventArgs<Exception>>? ConnectCrashed;
 
-		public event EventHandler<GenericEventArgs<Exception>> SendAuthenticationFailed;
+		public event EventHandler<GenericEventArgs<Exception>>? SendAuthenticationFailed;
 
-		public event EventHandler<GenericEventArgs<string>> AuthenticationFailed;
+		public event EventHandler<GenericEventArgs<string>>? AuthenticationFailed;
 
-		public event EventHandler<GenericEventArgs<string>> UnexpectedNotOpenWhileReceiving;
+		public event EventHandler<GenericEventArgs<string>>? UnexpectedNotOpenWhileReceiving;
 
-		public event EventHandler<GenericEventArgs<string>> ReceivedMessage;
+		public event EventHandler<GenericEventArgs<string>>? ReceivedMessage;
 
-		public event EventHandler ReceivedUnexpectedBinaryMessage;
+		public event EventHandler? ReceivedUnexpectedBinaryMessage;
 
-		public event EventHandler<GenericEventArgs<Exception>> ReceiveCrashed;
+		public event EventHandler<GenericEventArgs<Exception>>? ReceiveCrashed;
 
-		public event EventHandler<GenericEventArgs<Exception>> ReceiveFailed;
+		public event EventHandler<GenericEventArgs<Exception>>? ReceiveFailed;
 
 		public DrfWebSocketClient()
 		{
@@ -204,11 +204,11 @@ namespace FarmingTracker
 			}
 			catch (OperationCanceledException)
 			{
-				clientWebSocket.Abort();
+				clientWebSocket?.Abort();
 			}
 			catch (Exception e)
 			{
-				clientWebSocket.Abort();
+				clientWebSocket?.Abort();
 				this.ConnectCrashed?.Invoke(this, new GenericEventArgs<Exception>(e));
 			}
 		}
@@ -246,15 +246,21 @@ namespace FarmingTracker
 					case WebSocketMessageType.Text:
 					{
 						string receivedJson = Encoding.UTF8.GetString(_receiveBuffer, 0, offsetInReceiveBuffer);
-						if (receivedJson[9] != 's')
+						if (receivedJson[9] == 's')
 						{
-							DrfMessage drfMessage = JsonConvert.DeserializeObject<DrfMessage>(receivedJson);
-							lock (_drfMessagesLock)
-							{
-								_drfMessages.Add(drfMessage);
-							}
-							this.ReceivedMessage?.Invoke(this, new GenericEventArgs<string>($"({offsetInReceiveBuffer} bytes): {receivedJson}\n"));
+							break;
 						}
+						DrfMessage drfMessage = JsonConvert.DeserializeObject<DrfMessage>(receivedJson);
+						if (drfMessage == null)
+						{
+							Module.Logger.Error("Failed to create drfMessage from json.");
+							break;
+						}
+						lock (_drfMessagesLock)
+						{
+							_drfMessages.Add(drfMessage);
+						}
+						this.ReceivedMessage?.Invoke(this, new GenericEventArgs<string>($"({offsetInReceiveBuffer} bytes): {receivedJson}\n"));
 						break;
 					}
 					case WebSocketMessageType.Close:
@@ -299,9 +305,13 @@ namespace FarmingTracker
 		{
 			try
 			{
-				if (_clientWebSocket.State == WebSocketState.Open || _clientWebSocket.State == WebSocketState.CloseReceived || _clientWebSocket.State == WebSocketState.Connecting)
+				if (_clientWebSocket == null)
 				{
-					await _clientWebSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "closed by blish farming tracker module", default(CancellationToken)).ConfigureAwait(continueOnCapturedContext: false);
+					Module.Logger.Error("Close() expects clientWebSocket to be set.");
+				}
+				else if (_clientWebSocket!.State == WebSocketState.Open || _clientWebSocket!.State == WebSocketState.CloseReceived || _clientWebSocket!.State == WebSocketState.Connecting)
+				{
+					await _clientWebSocket!.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "closed by blish farming tracker module", default(CancellationToken)).ConfigureAwait(continueOnCapturedContext: false);
 				}
 			}
 			catch (Exception)
