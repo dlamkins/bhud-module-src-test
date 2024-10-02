@@ -1,1 +1,0 @@
-The ref folder will be packaged into the module.

@@ -1,10 +1,11 @@
-using System.Numerics;
+using System.Collections.Generic;
 using Gw2Sharp.Models;
 using Gw2Sharp.WebApi.V2.Models;
+using Microsoft.Xna.Framework;
 
-namespace Nekres.Mumble_Info
+namespace Blish_HUD.Extended
 {
-	internal static class Coordinates3Extensions
+	public static class CoordinatesExtensions
 	{
 		private const float INCH_TO_METER = 0.0254f;
 
@@ -74,9 +75,65 @@ namespace Nekres.Mumble_Info
 			return new Coordinates3(num2, ((Coordinates3)(ref mapCoords)).get_Y(), z);
 		}
 
-		public static Vector3 ToVector3(this Coordinates3 coords)
+		public static Vector3 ToXnaVector3(this Coordinates3 coords)
 		{
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 			return new Vector3((float)((Coordinates3)(ref coords)).get_X(), (float)((Coordinates3)(ref coords)).get_Y(), (float)((Coordinates3)(ref coords)).get_Z());
+		}
+
+		public static bool Inside(this Coordinates2 targetPoint, IReadOnlyList<Coordinates2> polygon)
+		{
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+			if (polygon.Count < 3)
+			{
+				return false;
+			}
+			double x = ((Coordinates2)(ref targetPoint)).get_X();
+			double y = ((Coordinates2)(ref targetPoint)).get_Y();
+			bool isInside = false;
+			int i = 0;
+			int j = polygon.Count - 1;
+			while (i < polygon.Count)
+			{
+				Coordinates2 val = polygon[i];
+				bool num = ((Coordinates2)(ref val)).get_Y() > y;
+				val = polygon[j];
+				if (num != ((Coordinates2)(ref val)).get_Y() > y)
+				{
+					val = polygon[j];
+					double x2 = ((Coordinates2)(ref val)).get_X();
+					val = polygon[i];
+					double num2 = x2 - ((Coordinates2)(ref val)).get_X();
+					val = polygon[i];
+					double num3 = num2 * (y - ((Coordinates2)(ref val)).get_Y());
+					val = polygon[j];
+					double y2 = ((Coordinates2)(ref val)).get_Y();
+					val = polygon[i];
+					double num4 = num3 / (y2 - ((Coordinates2)(ref val)).get_Y());
+					val = polygon[i];
+					if (x < num4 + ((Coordinates2)(ref val)).get_X())
+					{
+						isInside = !isInside;
+					}
+				}
+				j = i++;
+			}
+			return isInside;
 		}
 	}
 }

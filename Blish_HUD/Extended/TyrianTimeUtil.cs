@@ -9,19 +9,19 @@ namespace Blish_HUD.Extended
 		private static IReadOnlyDictionary<TyrianTime, (TimeSpan, TimeSpan)> _dayCycleIntervals = new Dictionary<TyrianTime, (TimeSpan, TimeSpan)>
 		{
 			{
-				TyrianTime.Dawn,
+				TyrianTime.DAWN,
 				(new TimeSpan(5, 0, 0), new TimeSpan(6, 0, 0))
 			},
 			{
-				TyrianTime.Day,
+				TyrianTime.DAY,
 				(new TimeSpan(6, 0, 0), new TimeSpan(20, 0, 0))
 			},
 			{
-				TyrianTime.Dusk,
+				TyrianTime.DUSK,
 				(new TimeSpan(20, 0, 0), new TimeSpan(21, 0, 0))
 			},
 			{
-				TyrianTime.Night,
+				TyrianTime.NIGHT,
 				(new TimeSpan(21, 0, 0), new TimeSpan(5, 0, 0))
 			}
 		};
@@ -29,19 +29,19 @@ namespace Blish_HUD.Extended
 		private static IReadOnlyDictionary<TyrianTime, (TimeSpan, TimeSpan)> _canthanDayCycleIntervals = new Dictionary<TyrianTime, (TimeSpan, TimeSpan)>
 		{
 			{
-				TyrianTime.Dawn,
+				TyrianTime.DAWN,
 				(new TimeSpan(7, 0, 0), new TimeSpan(8, 0, 0))
 			},
 			{
-				TyrianTime.Day,
+				TyrianTime.DAY,
 				(new TimeSpan(8, 0, 0), new TimeSpan(19, 0, 0))
 			},
 			{
-				TyrianTime.Dusk,
+				TyrianTime.DUSK,
 				(new TimeSpan(19, 0, 0), new TimeSpan(20, 0, 0))
 			},
 			{
-				TyrianTime.Night,
+				TyrianTime.NIGHT,
 				(new TimeSpan(20, 0, 0), new TimeSpan(7, 0, 0))
 			}
 		};
@@ -87,7 +87,7 @@ namespace Blish_HUD.Extended
 					return key;
 				}
 			}
-			return TyrianTime.None;
+			return TyrianTime.NONE;
 		}
 
 		public static TimeSpan FromRealDateTime(DateTime realTime)

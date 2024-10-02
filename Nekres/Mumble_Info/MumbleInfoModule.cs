@@ -1,24 +1,18 @@
 using System;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
-using System.Management;
-using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
-using Blish_HUD.Extended.Core.Views;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
-using Gw2Sharp.WebApi.V2.Clients;
-using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using Nekres.Mumble_Info.Core.Controls;
 using Nekres.Mumble_Info.Core.Services;
+using Nekres.Mumble_Info.Core.UI;
 
 namespace Nekres.Mumble_Info
 {
@@ -29,25 +23,19 @@ namespace Nekres.Mumble_Info
 
 		internal static MumbleInfoModule Instance;
 
-		private SettingEntry<KeyBinding> _toggleInfoBinding;
+		private Texture2D _cornerIcon;
 
-		private SettingEntry<bool> _showCursorPosition;
+		private Texture2D _cornerIconHover;
 
-		internal SettingEntry<bool> EnablePerformanceCounters;
+		private Texture2D _emblem;
 
-		internal SettingEntry<bool> SwapYZAxes;
+		private CornerIcon _moduleIcon;
 
-		private DataPanel _dataPanel;
+		private StandardWindow _moduleWindow;
 
-		private Label _cursorPos;
+		internal SettingEntry<MumbleConfig> MumbleConfig;
 
-		private PerformanceCounter _ramCounter;
-
-		private PerformanceCounter _cpuCounter;
-
-		private DateTime _timeOutPc;
-
-		private MockService _mockService;
+		internal ApiService Api;
 
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
@@ -56,16 +44,6 @@ namespace Nekres.Mumble_Info
 		internal DirectoriesManager DirectoriesManager => base.ModuleParameters.get_DirectoriesManager();
 
 		internal Gw2ApiManager Gw2ApiManager => base.ModuleParameters.get_Gw2ApiManager();
-
-		internal Map CurrentMap { get; private set; }
-
-		internal Specialization CurrentSpec { get; private set; }
-
-		internal float MemoryUsage { get; private set; }
-
-		internal float CpuUsage { get; private set; }
-
-		internal string CpuName { get; private set; }
 
 		[ImportingConstructor]
 		public MumbleInfoModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
@@ -76,345 +54,107 @@ namespace Nekres.Mumble_Info
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0054: Expected O, but got Unknown
-			_toggleInfoBinding = settings.DefineSetting<KeyBinding>("ToggleInfoBinding", new KeyBinding((Keys)187), (Func<string>)(() => "Toggle display"), (Func<string>)(() => "Toggles the display of data."));
-			_showCursorPosition = settings.DefineSetting<bool>("ShowCursorPosition", false, (Func<string>)(() => "Show cursor position"), (Func<string>)(() => "Whether the cursor's current interface-relative position should be displayed.\nUse [Left Alt] to copy it."));
-			EnablePerformanceCounters = settings.DefineSetting<bool>("PerfCountersEnabled", false, (Func<string>)(() => "Show performance counters"), (Func<string>)(() => "Whether performance counters such as RAM and CPU utilization of the Guild Wars 2 process should be displayed."));
-			SwapYZAxes = settings.DefineSetting<bool>("SwapYZAxes", true, (Func<string>)(() => "Swap YZ Axes"), (Func<string>)(() => "Swaps the values of the Y and Z axes if enabled."));
+			MumbleConfig = settings.DefineSetting<MumbleConfig>("mumble_config", new MumbleConfig(), (Func<string>)null, (Func<string>)null);
 		}
 
 		protected override void Initialize()
 		{
-			_timeOutPc = DateTime.UtcNow;
-			CpuName = string.Empty;
-			_mockService = new MockService();
-		}
-
-		public override IView GetSettingsView()
-		{
-			return (IView)(object)new SocialsSettingsView(new SocialsSettingsModel(SettingsManager.get_ModuleSettings(), "https://pastebin.com/raw/Kk9DgVmL"));
+			Api = new ApiService();
 		}
 
 		protected override async Task LoadAsync()
 		{
-			if (EnablePerformanceCounters.get_Value())
-			{
-				await LoadPerformanceCounters();
-				await QueryManagementObjects();
-			}
+			await Api.Init();
 		}
 
 		protected override void Update(GameTime gameTime)
 		{
-			UpdateCounter();
-			UpdateCursorPos();
-			_mockService.Update();
+			Api.Update(gameTime);
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
-			_toggleInfoBinding.get_Value().set_Enabled(true);
-			_toggleInfoBinding.get_Value().add_Activated((EventHandler<EventArgs>)OnToggleInfoBindingActivated);
-			_showCursorPosition.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnShowCursorPositionSettingChanged);
-			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
-			GameService.Gw2Mumble.get_PlayerCharacter().add_SpecializationChanged((EventHandler<ValueEventArgs<int>>)OnSpecializationChanged);
-			GameService.GameIntegration.get_Gw2Instance().add_Gw2Closed((EventHandler<EventArgs>)OnGw2Closed);
-			GameService.GameIntegration.get_Gw2Instance().add_Gw2Started((EventHandler<EventArgs>)OnGw2Started);
-			EnablePerformanceCounters.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnEnablePerformanceCountersSettingChanged);
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0074: Expected O, but got Unknown
+			_cornerIcon = ContentsManager.GetTexture("icon.png");
+			_cornerIconHover = ContentsManager.GetTexture("hover_icon.png");
+			_emblem = ContentsManager.GetTexture("emblem.png");
+			CornerIcon val = new CornerIcon(AsyncTexture2D.op_Implicit(_cornerIcon), AsyncTexture2D.op_Implicit(_cornerIconHover), ((Module)this).get_Name());
+			val.set_Priority(4861143);
+			_moduleIcon = val;
+			((Control)_moduleIcon).add_Click((EventHandler<MouseEventArgs>)OnModuleIconClick);
 			((Module)this).OnModuleLoaded(e);
 		}
 
-		private Task LoadPerformanceCounters()
+		public void OnModuleIconClick(object o, MouseEventArgs e)
 		{
-			return Task.Run(delegate
-			{
-				if (GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning())
-				{
-					_ramCounter = new PerformanceCounter
-					{
-						CategoryName = "Process",
-						CounterName = "Working Set - Private",
-						InstanceName = GameService.GameIntegration.get_Gw2Instance().get_Gw2Process().ProcessName,
-						ReadOnly = true
-					};
-					_cpuCounter = new PerformanceCounter
-					{
-						CategoryName = "Process",
-						CounterName = "% Processor Time",
-						InstanceName = GameService.GameIntegration.get_Gw2Instance().get_Gw2Process().ProcessName,
-						ReadOnly = true
-					};
-				}
-			});
-		}
-
-		private Task QueryManagementObjects()
-		{
-			return Task.Run(delegate
-			{
-				using ManagementObjectSearcher managementObjectSearcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_Processor");
-				foreach (ManagementObject item in managementObjectSearcher.Get())
-				{
-					string text = (string)item["Name"];
-					if (text.Length >= CpuName.Length)
-					{
-						CpuName = text.Trim();
-					}
-				}
-			});
-		}
-
-		private async void OnEnablePerformanceCountersSettingChanged(object sender, ValueChangedEventArgs<bool> e)
-		{
-			if (e.get_PreviousValue() != e.get_NewValue())
-			{
-				if (!e.get_NewValue())
-				{
-					_ramCounter?.Dispose();
-					_cpuCounter?.Dispose();
-				}
-				else
-				{
-					await LoadPerformanceCounters();
-					await QueryManagementObjects();
-				}
-			}
-		}
-
-		private void OnGw2Closed(object o, EventArgs e)
-		{
-			DataPanel dataPanel = _dataPanel;
-			if (dataPanel != null)
-			{
-				((Control)dataPanel).Dispose();
-			}
-			Label cursorPos = _cursorPos;
-			if (cursorPos != null)
-			{
-				((Control)cursorPos).Dispose();
-			}
-			_ramCounter?.Dispose();
-			_cpuCounter?.Dispose();
-		}
-
-		private async void OnGw2Started(object o, EventArgs e)
-		{
-			await LoadPerformanceCounters();
-		}
-
-		private void UpdateCounter()
-		{
-			if (GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() && _ramCounter != null && _cpuCounter != null && !(DateTime.UtcNow < _timeOutPc))
-			{
-				_timeOutPc = DateTime.UtcNow.AddMilliseconds(1000.0);
-				MemoryUsage = _ramCounter.NextValue() / 1024f / 1024f;
-				CpuUsage = _cpuCounter.NextValue() / (float)Environment.ProcessorCount;
-			}
-		}
-
-		private void UpdateCursorPos()
-		{
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-			if (GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() && _cursorPos != null)
-			{
-				((Control)_cursorPos).set_Visible(!GameService.Input.get_Mouse().get_CameraDragging());
-				_cursorPos.set_Text(PInvoke.IsLControlPressed() ? $"X: {GameService.Input.get_Mouse().get_Position().X - ((Control)GameService.Graphics.get_SpriteScreen()).get_Width() / 2}, Y: {Math.Abs(GameService.Input.get_Mouse().get_Position().Y - ((Control)GameService.Graphics.get_SpriteScreen()).get_Height())}" : $"X: {GameService.Input.get_Mouse().get_Position().X}, Y: {GameService.Input.get_Mouse().get_Position().Y}");
-				((Control)_cursorPos).set_Location(new Point(GameService.Input.get_Mouse().get_Position().X + 50, GameService.Input.get_Mouse().get_Position().Y));
-			}
-		}
-
-		private void OnToggleInfoBindingActivated(object o, EventArgs e)
-		{
-			if (GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() && !GameService.Gw2Mumble.get_UI().get_IsTextInputFocused())
-			{
-				if (_dataPanel != null)
-				{
-					((Control)_dataPanel).Dispose();
-					_dataPanel = null;
-				}
-				else
-				{
-					BuildDisplay();
-				}
-				if (_cursorPos != null)
-				{
-					((Control)_cursorPos).Dispose();
-					_cursorPos = null;
-				}
-				else
-				{
-					BuildCursorPosTooltip();
-				}
-			}
-		}
-
-		private void OnShowCursorPositionSettingChanged(object o, ValueChangedEventArgs<bool> e)
-		{
-			if (!e.get_NewValue())
-			{
-				Label cursorPos = _cursorPos;
-				if (cursorPos != null)
-				{
-					((Control)cursorPos).Dispose();
-				}
-			}
-			else if (_dataPanel != null)
-			{
-				BuildCursorPosTooltip();
-			}
-		}
-
-		private void BuildCursorPosTooltip()
-		{
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
 			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009f: Expected O, but got Unknown
-			if (_showCursorPosition.get_Value())
+			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e7: Expected O, but got Unknown
+			if (_moduleWindow == null)
 			{
-				Label cursorPos = _cursorPos;
-				if (cursorPos != null)
-				{
-					((Control)cursorPos).Dispose();
-				}
-				Label val = new Label();
+				Rectangle windowRegion = default(Rectangle);
+				((Rectangle)(ref windowRegion))._002Ector(40, 26, 913, 691);
+				StandardWindow val = new StandardWindow(GameService.Content.GetTexture("controls/window/502049"), windowRegion, new Rectangle(52, 36, 887, 605));
 				((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-				((Control)val).set_Size(new Point(130, 20));
-				val.set_StrokeText(true);
-				val.set_ShowShadow(true);
-				((Control)val).set_Location(new Point(GameService.Input.get_Mouse().get_Position().X, GameService.Input.get_Mouse().get_Position().Y));
-				val.set_VerticalAlignment((VerticalAlignment)0);
-				((Control)val).set_ZIndex(-9999);
-				_cursorPos = val;
-				GameService.Input.get_Keyboard().add_KeyPressed((EventHandler<KeyboardEventArgs>)OnKeyPressed);
-				GameService.Input.get_Keyboard().add_KeyReleased((EventHandler<KeyboardEventArgs>)OnKeyReleased);
-				((Control)_cursorPos).add_Disposed((EventHandler<EventArgs>)delegate
-				{
-					GameService.Input.get_Keyboard().remove_KeyPressed((EventHandler<KeyboardEventArgs>)OnKeyPressed);
-					GameService.Input.get_Keyboard().remove_KeyReleased((EventHandler<KeyboardEventArgs>)OnKeyReleased);
-				});
+				((WindowBase2)val).set_Emblem(_emblem);
+				((Control)val).set_Size(new Point(435, 900));
+				((WindowBase2)val).set_CanResize(true);
+				((WindowBase2)val).set_SavesPosition(true);
+				((WindowBase2)val).set_SavesSize(true);
+				((WindowBase2)val).set_Title(((Module)this).get_Name());
+				((WindowBase2)val).set_Id("MumbleInfoModule_MainWindow_aeabf2ad8a954af6a0d9c4b95f9682fe");
+				((Control)val).set_Left((((Control)GameService.Graphics.get_SpriteScreen()).get_Width() - windowRegion.Width) / 2);
+				((Control)val).set_Top((((Control)GameService.Graphics.get_SpriteScreen()).get_Height() - windowRegion.Height) / 2);
+				_moduleWindow = val;
 			}
-		}
-
-		private void OnKeyPressed(object o, KeyboardEventArgs e)
-		{
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Invalid comparison between Unknown and I4
-			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			if (_cursorPos != null && !GameService.Input.get_Mouse().get_CameraDragging() && (int)e.get_Key() == 164)
-			{
-				_cursorPos.set_TextColor(new Color(252, 252, 84));
-			}
-		}
-
-		private void OnKeyReleased(object o, KeyboardEventArgs e)
-		{
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Invalid comparison between Unknown and I4
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			if (_cursorPos != null && !GameService.Input.get_Mouse().get_CameraDragging() && (int)e.get_Key() == 164)
-			{
-				_cursorPos.set_TextColor(Color.get_White());
-				ClipboardUtil.get_WindowsClipboardService().SetTextAsync(_cursorPos.get_Text());
-				ScreenNotification.ShowNotification("Copied!", (NotificationType)0, (Texture2D)null, 4);
-			}
-		}
-
-		private void BuildDisplay()
-		{
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			DataPanel dataPanel = _dataPanel;
-			if (dataPanel != null)
-			{
-				((Control)dataPanel).Dispose();
-			}
-			DataPanel dataPanel2 = new DataPanel();
-			((Control)dataPanel2).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)dataPanel2).set_Size(new Point(((Control)GameService.Graphics.get_SpriteScreen()).get_Width(), ((Control)GameService.Graphics.get_SpriteScreen()).get_Height()));
-			((Control)dataPanel2).set_Location(new Point(0, 0));
-			((Control)dataPanel2).set_ZIndex(-9999);
-			_dataPanel = dataPanel2;
-			GetCurrentMap(GameService.Gw2Mumble.get_CurrentMap().get_Id());
-			GetCurrentElite(GameService.Gw2Mumble.get_PlayerCharacter().get_Specialization());
-		}
-
-		private void OnMapChanged(object o, ValueEventArgs<int> e)
-		{
-			GetCurrentMap(e.get_Value());
-		}
-
-		private void OnSpecializationChanged(object o, ValueEventArgs<int> e)
-		{
-			GetCurrentElite(e.get_Value());
-		}
-
-		private async void GetCurrentMap(int id)
-		{
-			await ((IBulkExpandableClient<Map, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Maps()).GetAsync(id, default(CancellationToken)).ContinueWith(delegate(Task<Map> response)
-			{
-				if (response.Exception == null && !response.IsFaulted && !response.IsCanceled)
-				{
-					Map result = response.Result;
-					if (_dataPanel != null)
-					{
-						CurrentMap = result;
-					}
-				}
-			});
-		}
-
-		private async void GetCurrentElite(int id)
-		{
-			await ((IBulkExpandableClient<Specialization, int>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Specializations()).GetAsync(id, default(CancellationToken)).ContinueWith(delegate(Task<Specialization> response)
-			{
-				if (response.Exception == null && !response.IsFaulted && !response.IsCanceled)
-				{
-					Specialization result = response.Result;
-					if (_dataPanel != null)
-					{
-						CurrentSpec = result;
-					}
-				}
-			});
+			_moduleWindow.ToggleWindow((IView)(object)new MumbleView());
 		}
 
 		protected override void Unload()
 		{
-			_mockService?.Dispose();
-			DataPanel dataPanel = _dataPanel;
-			if (dataPanel != null)
+			((Control)_moduleIcon).remove_Click((EventHandler<MouseEventArgs>)OnModuleIconClick);
+			CornerIcon moduleIcon = _moduleIcon;
+			if (moduleIcon != null)
 			{
-				((Control)dataPanel).Dispose();
+				((Control)moduleIcon).Dispose();
 			}
-			Label cursorPos = _cursorPos;
-			if (cursorPos != null)
+			StandardWindow moduleWindow = _moduleWindow;
+			if (moduleWindow != null)
 			{
-				((Control)cursorPos).Dispose();
+				((Control)moduleWindow).Dispose();
 			}
-			_ramCounter?.Dispose();
-			_cpuCounter?.Dispose();
-			_toggleInfoBinding.get_Value().remove_Activated((EventHandler<EventArgs>)OnToggleInfoBindingActivated);
-			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
-			GameService.Gw2Mumble.get_PlayerCharacter().remove_SpecializationChanged((EventHandler<ValueEventArgs<int>>)OnSpecializationChanged);
-			GameService.GameIntegration.get_Gw2Instance().remove_Gw2Closed((EventHandler<EventArgs>)OnGw2Closed);
-			GameService.GameIntegration.get_Gw2Instance().remove_Gw2Started((EventHandler<EventArgs>)OnGw2Started);
+			Texture2D cornerIcon = _cornerIcon;
+			if (cornerIcon != null)
+			{
+				((GraphicsResource)cornerIcon).Dispose();
+			}
+			Texture2D cornerIconHover = _cornerIconHover;
+			if (cornerIconHover != null)
+			{
+				((GraphicsResource)cornerIconHover).Dispose();
+			}
+			Texture2D emblem = _emblem;
+			if (emblem != null)
+			{
+				((GraphicsResource)emblem).Dispose();
+			}
+			Api?.Dispose();
 			Instance = null;
 		}
 	}

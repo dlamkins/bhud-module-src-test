@@ -12,37 +12,17 @@
   <PropertyGroup>
     <RootNamespace />
   </PropertyGroup>
-  <ItemGroup>
-    <None Remove="Nekres\Mumble_Info\_Submodules.Blish_HUD_Extended.Resources.discord_logo.png" />
-    <None Remove="Nekres\Mumble_Info\_Submodules.Blish_HUD_Extended.Resources.github_logo.png" />
-    <None Remove="Nekres\Mumble_Info\_Submodules.Blish_HUD_Extended.Resources.instagram_logo.png" />
-    <None Remove="Nekres\Mumble_Info\_Submodules.Blish_HUD_Extended.Resources.kofi_logo.png" />
-    <None Remove="Nekres\Mumble_Info\_Submodules.Blish_HUD_Extended.Resources.patreon_logo.png" />
-    <None Remove="Nekres\Mumble_Info\_Submodules.Blish_HUD_Extended.Resources.twitch_logo.png" />
-    <None Remove="Nekres\Mumble_Info\_Submodules.Blish_HUD_Extended.Resources.twitter_logo.png" />
-    <None Remove="Nekres\Mumble_Info\_Submodules.Blish_HUD_Extended.Resources.youtube_logo.png" />
-    <EmbeddedResource Include="Nekres\Mumble_Info\_Submodules.Blish_HUD_Extended.Resources.discord_logo.png" />
-    <EmbeddedResource Include="Nekres\Mumble_Info\_Submodules.Blish_HUD_Extended.Resources.github_logo.png" />
-    <EmbeddedResource Include="Nekres\Mumble_Info\_Submodules.Blish_HUD_Extended.Resources.instagram_logo.png" />
-    <EmbeddedResource Include="Nekres\Mumble_Info\_Submodules.Blish_HUD_Extended.Resources.kofi_logo.png" />
-    <EmbeddedResource Include="Nekres\Mumble_Info\_Submodules.Blish_HUD_Extended.Resources.patreon_logo.png" />
-    <EmbeddedResource Include="Nekres\Mumble_Info\_Submodules.Blish_HUD_Extended.Resources.twitch_logo.png" />
-    <EmbeddedResource Include="Nekres\Mumble_Info\_Submodules.Blish_HUD_Extended.Resources.twitter_logo.png" />
-    <EmbeddedResource Include="Nekres\Mumble_Info\_Submodules.Blish_HUD_Extended.Resources.youtube_logo.png" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Reference Include="Blish HUD" />
     <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="Gw2Sharp" />
     <Reference Include="MonoGame.Framework" />
-    <Reference Include="System.Management" />
-    <Reference Include="System.Numerics" />
+    <Reference Include="System.Core" />
+    <Reference Include="Gw2Sharp" />
     <Reference Include="Newtonsoft.Json" />
     <Reference Include="MonoGame.Extended" />
-    <Reference Include="Flurl.Http" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="AsyncClipboardService" />
-    <Reference Include="System.Core" />
     <Reference Include="System.Net.Http" />
+    <Reference Include="Flurl.Http" />
+    <Reference Include="AsyncClipboardService" />
   </ItemGroup>
 </Project>

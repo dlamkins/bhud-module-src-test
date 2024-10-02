@@ -1,4 +1,4 @@
-namespace Nekres.Mumble_Info
+namespace Blish_HUD.Extended
 {
 	public enum CoordsUnit
 	{
