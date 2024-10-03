@@ -1,3 +1,5 @@
+using System;
+using Blish_HUD.Input;
 using Blish_HUD.Settings;
 
 namespace Nekres.Mumble_Info.Core.UI
@@ -21,6 +23,33 @@ namespace Nekres.Mumble_Info.Core.UI
 			}
 			property = newValue;
 			return true;
+		}
+
+		protected bool SetProperty(ref KeyBinding oldBinding, KeyBinding newBinding)
+		{
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+			if (oldBinding == newBinding)
+			{
+				return false;
+			}
+			if (oldBinding != null)
+			{
+				oldBinding.set_Enabled(false);
+				oldBinding.remove_BindingChanged((EventHandler<EventArgs>)OnBindingChanged);
+			}
+			oldBinding = (KeyBinding)(((object)newBinding) ?? ((object)new KeyBinding()));
+			oldBinding.add_BindingChanged((EventHandler<EventArgs>)OnBindingChanged);
+			oldBinding.set_Enabled(true);
+			return true;
+		}
+
+		protected virtual void BindingChanged()
+		{
+		}
+
+		private void OnBindingChanged(object sender, EventArgs e)
+		{
+			BindingChanged();
 		}
 	}
 }

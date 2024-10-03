@@ -11,6 +11,7 @@ using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Nekres.Mumble_Info.Core.Services;
 using Nekres.Mumble_Info.Core.UI;
 
@@ -74,20 +75,65 @@ namespace Nekres.Mumble_Info
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Expected O, but got Unknown
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Expected O, but got Unknown
+			//IL_0026: Expected O, but got Unknown
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c6: Expected O, but got Unknown
+			MumbleConfig value = MumbleConfig.get_Value();
+			if (value.Shortcut == null)
+			{
+				KeyBinding val = new KeyBinding((Keys)187);
+				KeyBinding val2 = val;
+				value.Shortcut = val;
+			}
+			MumbleConfig.get_Value().Shortcut.set_Enabled(true);
+			MumbleConfig.get_Value().Shortcut.set_IgnoreWhenInTextField(true);
 			_cornerIcon = ContentsManager.GetTexture("icon.png");
 			_cornerIconHover = ContentsManager.GetTexture("hover_icon.png");
 			_emblem = ContentsManager.GetTexture("emblem.png");
-			CornerIcon val = new CornerIcon(AsyncTexture2D.op_Implicit(_cornerIcon), AsyncTexture2D.op_Implicit(_cornerIconHover), ((Module)this).get_Name());
-			val.set_Priority(4861143);
-			_moduleIcon = val;
+			CornerIcon val3 = new CornerIcon(AsyncTexture2D.op_Implicit(_cornerIcon), AsyncTexture2D.op_Implicit(_cornerIconHover), ((Module)this).get_Name());
+			val3.set_Priority(4861143);
+			_moduleIcon = val3;
 			((Control)_moduleIcon).add_Click((EventHandler<MouseEventArgs>)OnModuleIconClick);
+			MumbleConfig.get_Value().Shortcut.add_Activated((EventHandler<EventArgs>)OnShortcutActivated);
+			MumbleConfig.add_SettingChanged((EventHandler<ValueChangedEventArgs<MumbleConfig>>)OnMumbleConfigChanged);
+			MumbleConfig.get_Value().Shortcut.add_BindingChanged((EventHandler<EventArgs>)OnShortcutBindingChanged);
 			((Module)this).OnModuleLoaded(e);
 		}
 
+		private void OnShortcutBindingChanged(object sender, EventArgs e)
+		{
+			if (_moduleWindow != null)
+			{
+				((WindowBase2)_moduleWindow).set_Subtitle("[" + MumbleConfig.get_Value().Shortcut.GetBindingDisplayText() + "]");
+			}
+		}
+
+		private void OnMumbleConfigChanged(object sender, ValueChangedEventArgs<MumbleConfig> e)
+		{
+			if (e.get_NewValue()?.Shortcut != null)
+			{
+				e.get_NewValue().Shortcut.remove_Activated((EventHandler<EventArgs>)OnShortcutActivated);
+				e.get_NewValue().Shortcut.remove_BindingChanged((EventHandler<EventArgs>)OnShortcutBindingChanged);
+				e.get_NewValue().Shortcut.add_Activated((EventHandler<EventArgs>)OnShortcutActivated);
+				e.get_NewValue().Shortcut.add_BindingChanged((EventHandler<EventArgs>)OnShortcutBindingChanged);
+			}
+		}
+
+		private void OnShortcutActivated(object sender, EventArgs e)
+		{
+			ToggleWindow();
+		}
+
 		public void OnModuleIconClick(object o, MouseEventArgs e)
+		{
+			ToggleWindow();
+		}
+
+		private void CreateWindow()
 		{
 			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
@@ -101,11 +147,12 @@ namespace Nekres.Mumble_Info
 			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
 			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e7: Expected O, but got Unknown
+			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0111: Expected O, but got Unknown
 			if (_moduleWindow == null)
 			{
 				Rectangle windowRegion = default(Rectangle);
@@ -118,17 +165,31 @@ namespace Nekres.Mumble_Info
 				((WindowBase2)val).set_SavesPosition(true);
 				((WindowBase2)val).set_SavesSize(true);
 				((WindowBase2)val).set_Title(((Module)this).get_Name());
+				((WindowBase2)val).set_Subtitle("[" + MumbleConfig.get_Value().Shortcut.GetBindingDisplayText() + "]");
 				((WindowBase2)val).set_Id("MumbleInfoModule_MainWindow_aeabf2ad8a954af6a0d9c4b95f9682fe");
 				((Control)val).set_Left((((Control)GameService.Graphics.get_SpriteScreen()).get_Width() - windowRegion.Width) / 2);
 				((Control)val).set_Top((((Control)GameService.Graphics.get_SpriteScreen()).get_Height() - windowRegion.Height) / 2);
 				_moduleWindow = val;
 			}
+		}
+
+		public void ToggleWindow()
+		{
+			CreateWindow();
 			_moduleWindow.ToggleWindow((IView)(object)new MumbleView());
+		}
+
+		public override IView GetSettingsView()
+		{
+			return (IView)(object)new CustomSettingsView();
 		}
 
 		protected override void Unload()
 		{
+			MumbleConfig.get_Value().Shortcut.remove_Activated((EventHandler<EventArgs>)OnShortcutActivated);
+			MumbleConfig.get_Value().Shortcut.remove_BindingChanged((EventHandler<EventArgs>)OnShortcutBindingChanged);
 			((Control)_moduleIcon).remove_Click((EventHandler<MouseEventArgs>)OnModuleIconClick);
+			MumbleConfig.remove_SettingChanged((EventHandler<ValueChangedEventArgs<MumbleConfig>>)OnMumbleConfigChanged);
 			CornerIcon moduleIcon = _moduleIcon;
 			if (moduleIcon != null)
 			{

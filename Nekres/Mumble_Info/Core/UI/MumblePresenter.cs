@@ -159,23 +159,23 @@ namespace Nekres.Mumble_Info.Core.UI
 
 		public string GetProcessId()
 		{
-			return $"PID: {GameService.Gw2Mumble.get_Info().get_ProcessId()}";
+			return $"{GameService.Gw2Mumble.get_Info().get_ProcessId()}";
 		}
 
 		public string GetServerAddress()
 		{
-			return $"Server Addr.: {GameService.Gw2Mumble.get_Info().get_ServerAddress()} : {GameService.Gw2Mumble.get_Info().get_ServerPort()}";
+			return $"{GameService.Gw2Mumble.get_Info().get_ServerAddress()} : {GameService.Gw2Mumble.get_Info().get_ServerPort()}";
 		}
 
 		public string GetShardId()
 		{
-			return $"Shard ID: {GameService.Gw2Mumble.get_Info().get_ShardId()}";
+			return $"{GameService.Gw2Mumble.get_Info().get_ShardId()}";
 		}
 
 		public string GetUiSize()
 		{
 			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			return $"UI Size: {GameService.Gw2Mumble.get_UI().get_UISize()}";
+			return $"{GameService.Gw2Mumble.get_UI().get_UISize()}";
 		}
 
 		public string GetCompassBounds()
@@ -187,7 +187,7 @@ namespace Nekres.Mumble_Info.Core.UI
 			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 			Rectangle compass = GameService.Gw2Mumble.get_UI().CompassBounds();
-			return $"Compass: {compass.X} X / {compass.Y} Y / {compass.Width} W / {compass.Height} H";
+			return $"{compass.X} X / {compass.Y} Y / {compass.Width} W / {compass.Height} H";
 		}
 
 		public async Task CopyToClipboard(string text)
@@ -215,8 +215,8 @@ namespace Nekres.Mumble_Info.Core.UI
 
 		public string GetMapPosition(bool markerPackFormat)
 		{
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			return "Position: " + Coords2ToStr(GameService.Gw2Mumble.get_UI().get_MapPosition(), markerPackFormat);
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			return Coords2ToStr(GameService.Gw2Mumble.get_UI().get_MapPosition(), markerPackFormat) ?? "";
 		}
 
 		public string GetMapPosition()
@@ -228,7 +228,7 @@ namespace Nekres.Mumble_Info.Core.UI
 		{
 			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 			string comp = (GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode() ? " (Competitive)" : string.Empty);
-			return $"Type: {GameService.Gw2Mumble.get_CurrentMap().get_Type()}" + comp;
+			return $"{GameService.Gw2Mumble.get_CurrentMap().get_Type()}" + comp;
 		}
 
 		public string GetContinent()
@@ -250,7 +250,7 @@ namespace Nekres.Mumble_Info.Core.UI
 			{
 				return string.Empty;
 			}
-			return string.Format(discordRichPresenceFormat ? "\"{0}\": {1}, // {2} ({1})" : "Hash: {0}", MumbleInfoModule.Instance.Api.Map.GetHash(), MumbleInfoModule.Instance.Api.Map.get_Id(), MumbleInfoModule.Instance.Api.Map.get_Name());
+			return string.Format(discordRichPresenceFormat ? "\"{0}\": {1}, // {2} ({1})" : "{0}", MumbleInfoModule.Instance.Api.Map.GetHash(), MumbleInfoModule.Instance.Api.Map.get_Id(), MumbleInfoModule.Instance.Api.Map.get_Name());
 		}
 
 		public string GetMapHash()
