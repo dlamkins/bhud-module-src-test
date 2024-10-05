@@ -138,6 +138,7 @@ namespace Kenedia.Modules.BuildsManager.Controls
 			base.Size = new Point(64);
 			TemplatePresenter.TemplateChanged += new ValueChangedEventHandler<Template>(TemplatePresenter_TemplateChanged);
 			TemplatePresenter.SkillChanged += new SkillChangedEventHandler(TemplatePresenter_SkillChanged);
+			Skill = TemplatePresenter?.Template?[SkillSlot];
 		}
 
 		private void TemplatePresenter_TemplateChanged(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<Template> e)

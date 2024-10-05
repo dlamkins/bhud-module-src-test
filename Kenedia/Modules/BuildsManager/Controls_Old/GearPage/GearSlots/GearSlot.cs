@@ -106,6 +106,7 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 			base.Menu = new ContextMenuStrip();
 			CreateSubMenus();
 			ItemControl.Parent = this;
+			SetItemFromTemplate();
 		}
 
 		protected virtual void OnTemplatePresenterChanged(object sender, ValueChangedEventArgs<TemplatePresenter> e)

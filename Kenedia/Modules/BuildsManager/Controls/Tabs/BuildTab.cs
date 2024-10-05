@@ -186,6 +186,8 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 			WidthSizingMode = SizingMode.Fill;
 			HeightSizingMode = SizingMode.Fill;
 			SetSelectionTextures();
+			SetProfessionSpecifics();
+			_buildCodeBox.Text = TemplatePresenter?.Template?.ParseBuildCode();
 		}
 
 		public override void Draw(SpriteBatch spriteBatch, Rectangle drawBounds, Rectangle scissor)

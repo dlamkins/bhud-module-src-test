@@ -221,7 +221,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			{
 				SelectionContent.SortChildren((TemplateSelectable a, TemplateSelectable b) => a.Template.Name.CompareTo(b.Template.Name));
 			}
-			if ((!(TemplateSelectables.FirstOrDefault((TemplateSelectable x) => x.Template == TemplatePresenter.Template)?.IsVisible())) ?? true)
+			if ((!(TemplateSelectables.FirstOrDefault((TemplateSelectable x) => x.Template == TemplatePresenter.Template)?.Visible)) ?? true)
 			{
 				TemplateSelectable t = SelectionContent.OfType<TemplateSelectable>().FirstOrDefault((TemplateSelectable x) => x.Visible);
 				if (t != null)

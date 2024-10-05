@@ -203,6 +203,7 @@ namespace Kenedia.Modules.BuildsManager.Controls
 			TemplatePresenter.SpecializationChanged += new SpecializationChangedEventHandler(OnSpecializationChanged);
 			TemplatePresenter.TemplateChanged += new ValueChangedEventHandler<Template>(TemplatePresenter_TemplateChanged);
 			TemplatePresenter.TraitChanged += new TraitChangedEventHandler(TemplatePresenter_TraitChanged);
+			SetSpecialization();
 		}
 
 		private void TemplatePresenter_TraitChanged(object sender, TraitChangedEventArgs e)
