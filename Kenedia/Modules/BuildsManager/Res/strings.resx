@@ -1,0 +1,152 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="SortyByProfession"><value>Sort by profession</value></data>
+  <data name="Weapons"><value>Weapons</value></data>
+  <data name="TerrestrialPets"><value>Terrestrial Pets</value></data>
+  <data name="ArmorSlots"><value>of all armor slots</value></data>
+  <data name="CreateNewTemplate"><value>Create a new Template</value></data>
+  <data name="ConfirmTemplateDelete"><value>Are you sure to delete '{0}'?</value></data>
+  <data name="Enhancement"><value>Enhancement</value></data>
+  <data name="Jewellery"><value>Jewellery</value></data>
+  <data name="AutoSetFilterSpecialization_Name"><value>Auto set Specialization Filter</value></data>
+  <data name="AddTag"><value>Add Tag</value></data>
+  <data name="ConditionDuration"><value>Expertise</value></data>
+  <data name="Amulet"><value>Amulet</value></data>
+  <data name="Armors"><value>Armors</value></data>
+  <data name="Duplicate"><value>Duplicate</value></data>
+  <data name="EliteSkills"><value>Elite Skills</value></data>
+  <data name="Groups"><value>Groups</value></data>
+  <data name="Delete"><value>Delete</value></data>
+  <data name="TraitId"><value>Trait Id</value></data>
+  <data name="PvpSigil"><value>PvP Sigil</value></data>
+  <data name="Templates"><value>Templates</value></data>
+  <data name="ItemId"><value>Item Id</value></data>
+  <data name="AddNewTemplateWithClipboard"><value>Add a new template
+
+If you have any valid build code in your clipboard the build will load from the code</value></data>
+  <data name="SkillId"><value>Skill Id</value></data>
+  <data name="TagName"><value>Tag Name</value></data>
+  <data name="Height"><value>Height</value></data>
+  <data name="Priority"><value>Priority</value></data>
+  <data name="NewTemplate"><value>New Template</value></data>
+  <data name="QuickFiltersPanelFadeDuration_Name"><value>Fade Duration {0} ms</value></data>
+  <data name="QuickFiltersPanelFadeDelay_Name"><value>Fade Quick Filter after {0} s</value></data>
+  <data name="GroupName"><value>Group Name</value></data>
+  <data name="Weapon"><value>Weapon</value></data>
+  <data name="ResetEntry"><value>Reset {0}</value></data>
+  <data name="FillEntry"><value>Fill {0}</value></data>
+  <data name="AutoSetProfession_Tooltip"><value>Automatically set a filter to the current profession on profession change</value></data>
+  <data name="ActiveLegend"><value>Active Legend</value></data>
+  <data name="CritDamage"><value>Ferocity</value></data>
+  <data name="Rename"><value>Rename</value></data>
+  <data name="Skills"><value>Skills</value></data>
+  <data name="Sigils"><value>Sigils</value></data>
+  <data name="Infusions"><value>Infusions</value></data>
+  <data name="Nourishment"><value>Nourishment</value></data>
+  <data name="Enrichment"><value>Enrichment</value></data>
+  <data name="Override"><value>Override</value></data>
+  <data name="Infusion"><value>Infusion</value></data>
+  <data name="EmptyArmorSlots"><value>of all empty armor slots</value></data>
+  <data name="Accessory"><value>Accessory</value></data>
+  <data name="ItemControlClickToCopyItem"><value>CTRL + Left Click to copy the item name</value></data>
+  <data name="ItemControlClickToCopyStat"><value>CTRL + Left Click the stat icon to copy the stat name</value></data>
+  <data name="PvpSigils"><value>PvP Sigils</value></data>
+  <data name="ShowQuickFilterPanelOnWindowOpen_Name"><value>Open Quick Filter with window</value></data>
+  <data name="Vitality"><value>Vitality</value></data>
+  <data name="OverrideEntry"><value>Override {0}</value></data>
+  <data name="QuickFiltersPanelFadeDelay_Tooltip"><value>Fade the Quick Filter Panel after {0} ms</value></data>
+  <data name="GroupNotDefined"><value>Group not defined</value></data>
+  <data name="ToggleQuickFilters"><value>Toggle Quick Filters Window</value></data>
+  <data name="ResetAll"><value>Reset all {0}</value></data>
+  <data name="Precision"><value>Precision</value></data>
+  <data name="EmptyJewellerySlots"><value>of all empty jewellery slots</value></data>
+  <data name="ShowQuickFilterPanelOnTabOpen_Tooltip"><value>Open the Quick Filter Panel whenever the template tab gets selected</value></data>
+  <data name="And"><value>and</value></data>
+  <data name="All"><value>All</value></data>
+  <data name="HealSkills"><value>Heal Skills</value></data>
+  <data name="DeleteTemplate"><value>Delete Template</value></data>
+  <data name="About"><value>About</value></data>
+  <data name="Armor"><value>Armor</value></data>
+  <data name="CurrentlyNotAvailable"><value>Currently not available</value></data>
+  <data name="Group"><value>Group</value></data>
+  <data name="Build"><value>Build</value></data>
+  <data name="Notes"><value>Notes</value></data>
+  <data name="Width"><value>Width</value></data>
+  <data name="Runes"><value>Runes</value></data>
+  <data name="Reset"><value>Reset</value></data>
+  <data name="Relic"><value>Relic</value></data>
+  <data name="Stats"><value>Stats</value></data>
+  <data name="Sigil"><value>Sigil</value></data>
+  <data name="PetId"><value>Pet Id</value></data>
+  <data name="Power"><value>Power</value></data>
+  <data name="JewellerySlots"><value>of all jewellery slots</value></data>
+  <data name="AquaticPets"><value>Aquatic Pets</value></data>
+  <data name="ShowQuickFilterPanelOnTabOpen_Name"><value>Open Quick Filter with template tab</value></data>
+  <data name="LastModified"><value>Last Modified: {0}</value></data>
+  <data name="CreateTemplateToStart"><value>Create a template to start or paste a build code</value></data>
+  <data name="CopyBuildTemplateCode"><value>CTRL + Left Click to copy the Build Template Code</value></data>
+  <data name="AutoSetProfession_Name"><value>Auto set Profession Filter</value></data>
+  <data name="EmptyWeaponSlots"><value>of all empty weapon slots</value></data>
+  <data name="WeaponSlots"><value>of all weapon slots</value></data>
+  <data name="AgonyResistance"><value>Agony Resistance</value></data>
+  <data name="CreateNewTemplateName"><value>Create a new Template named '{0}'</value></data>
+  <data name="AssetId"><value>Asset Id</value></data>
+  <data name="EditTags"><value>Edit Tags</value></data>
+  <data name="InactiveLegend"><value>Inactive Legend</value></data>
+  <data name="BoonDuration"><value>Concentration</value></data>
+  <data name="Toughness"><value>Toughness</value></data>
+  <data name="MissingInfoFromAPI"><value>No data available through the GW2 API from ArenaNet.</value></data>
+  <data name="ShowQuickFilterPanelOnWindowOpen_Tooltip"><value>Open the Quick Filter Panel when the window is opened</value></data>
+  <data name="FadeQuickFiltersPanel_Name"><value>Fade Quick Filter</value></data>
+  <data name="AutoSetFilterSpecialization_Tooltip"><value>Automatically set the a filter to the current specialization on specialization change</value></data>
+  <data name="EquipmentCodeDisclaimer"><value>This code is not the same as the Equipment Template from the game. The games Template can't be read or shared sadly.
+The purpose of this code is to share the modules Equipment Template easily with other module users.</value></data>
+  <data name="ConditionDamage"><value>Condition Damage</value></data>
+  <data name="PowerCore"><value>Power Core</value></data>
+  <data name="Equipment"><value>Equipment</value></data>
+  <data name="FadeQuickFiltersPanel_Tooltip"><value>Fade the Quick Filter Panel after a certain amount inactivity</value></data>
+  <data name="Filters"><value>Filters</value></data>
+  <data name="QuickFiltersPanelFadeDuration_Tooltip"><value>Duration of the fading of the Quick Filter Panel</value></data>
+  <data name="SortByName"><value>Sort by name</value></data>
+  <data name="Specializations"><value>Specializations</value></data>
+  <data name="AddGroup"><value>Add Group</value></data>
+  <data name="Healing"><value>Healing Power</value></data>
+  <data name="TemplateExistsAlready"><value>There is already a template with the name '{0}'.</value></data>
+  <data name="Warning"><value>Warning</value></data>
+  <data name="Fill"><value>Fill</value></data>
+  <data name="Back"><value>Back</value></data>
+  <data name="Copy"><value>Copy</value></data>
+  <data name="None"><value>None</value></data>
+  <data name="Tags"><value>Tags</value></data>
+  <data name="Rune"><value>Rune</value></data>
+  <data name="Ring"><value>Ring</value></data>
+  <data name="Stat"><value>Stat</value></data>
+  <data name="UtilitySkills"><value>Utility Skills</value></data>
+  </root>

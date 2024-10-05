@@ -1,0 +1,30 @@
+using System.IO;
+using Blish_HUD.Modules.Managers;
+using Kenedia.Modules.Core.Models;
+
+namespace Kenedia.Modules.BuildsManager.Models
+{
+	public class Paths : PathCollection
+	{
+		public string TemplatesPath => base.BasePath + "\\" + ModuleName + "\\templates\\";
+
+		public string ItemMapPath => base.ModuleDataPath + "\\itemmap\\";
+
+		public Paths()
+		{
+		}
+
+		public Paths(DirectoriesManager directoriesManager, string moduleName)
+			: base(directoriesManager, moduleName)
+		{
+			if (!Directory.Exists(TemplatesPath))
+			{
+				Directory.CreateDirectory(TemplatesPath);
+			}
+			if (!Directory.Exists(ItemMapPath))
+			{
+				Directory.CreateDirectory(ItemMapPath);
+			}
+		}
+	}
+}

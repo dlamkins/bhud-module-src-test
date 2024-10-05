@@ -1,34 +1,47 @@
-using Kenedia.Modules.BuildsManager.Strings;
+using Gw2Sharp.WebApi.V2.Models;
+using Kenedia.Modules.BuildsManager.DataModels.Professions;
+using Kenedia.Modules.BuildsManager.Models.Templates;
 
 namespace Kenedia.Modules.BuildsManager.Extensions
 {
-	internal static class weaponTypeExtension
+	public static class WeaponTypeExtension
 	{
-		public static string getLocalName(this API.weaponType weaponType)
+		public static bool IsItemWeaponType(this Weapon.WeaponType weaponType, ItemWeaponType type)
 		{
-			string text = weaponType.ToString();
+			return type switch
+			{
+				ItemWeaponType.LongBow => weaponType == Weapon.WeaponType.Longbow, 
+				ItemWeaponType.ShortBow => weaponType == Weapon.WeaponType.Shortbow, 
+				ItemWeaponType.Harpoon => weaponType == Weapon.WeaponType.Harpoon, 
+				_ => weaponType.ToString() == type.ToString(), 
+			};
+		}
+
+		public static bool IsAquatic(this Weapon.WeaponType weaponType, TemplateSlotType templateSlotType = TemplateSlotType.Aquatic)
+		{
 			return weaponType switch
 			{
-				API.weaponType.Axe => common.Axe, 
-				API.weaponType.Dagger => common.Dagger, 
-				API.weaponType.Mace => common.Mace, 
-				API.weaponType.Pistol => common.Pistol, 
-				API.weaponType.Scepter => common.Scepter, 
-				API.weaponType.Sword => common.Sword, 
-				API.weaponType.Focus => common.Focus, 
-				API.weaponType.Shield => common.Shield, 
-				API.weaponType.Torch => common.Torch, 
-				API.weaponType.Warhorn => common.Warhorn, 
-				API.weaponType.Greatsword => common.Greatsword, 
-				API.weaponType.Hammer => common.Hammer, 
-				API.weaponType.Longbow => common.Longbow, 
-				API.weaponType.Rifle => common.Rifle, 
-				API.weaponType.Shortbow => common.Shortbow, 
-				API.weaponType.Staff => common.Staff, 
-				API.weaponType.Harpoon => common.Spear, 
-				API.weaponType.Speargun => common.Speargun, 
-				API.weaponType.Trident => common.Trident, 
-				_ => text, 
+				Weapon.WeaponType.Harpoon => (templateSlotType == TemplateSlotType.Aquatic || templateSlotType == TemplateSlotType.AltAquatic) ? true : false, 
+				Weapon.WeaponType.Trident => true, 
+				Weapon.WeaponType.Speargun => true, 
+				_ => false, 
+			};
+		}
+
+		public static bool IsTwoHanded(this Weapon.WeaponType weaponType)
+		{
+			return weaponType switch
+			{
+				Weapon.WeaponType.Greatsword => true, 
+				Weapon.WeaponType.Hammer => true, 
+				Weapon.WeaponType.Longbow => true, 
+				Weapon.WeaponType.Rifle => true, 
+				Weapon.WeaponType.Shortbow => true, 
+				Weapon.WeaponType.Staff => true, 
+				Weapon.WeaponType.Harpoon => true, 
+				Weapon.WeaponType.Trident => true, 
+				Weapon.WeaponType.Speargun => true, 
+				_ => false, 
 			};
 		}
 	}

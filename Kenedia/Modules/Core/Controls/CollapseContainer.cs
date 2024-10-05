@@ -1,0 +1,479 @@
+using System;
+using Blish_HUD;
+using Blish_HUD.Content;
+using Blish_HUD.Controls;
+using Blish_HUD.Input;
+using Glide;
+using Kenedia.Modules.Core.Structs;
+using Kenedia.Modules.Core.Utility;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Newtonsoft.Json;
+
+namespace Kenedia.Modules.Core.Controls
+{
+	public class CollapseContainer : Container
+	{
+		protected bool _canCollapse = true;
+
+		private Tween _collapseAnim;
+
+		private string _title;
+
+		protected bool _showBorder;
+
+		protected bool _collapsed;
+
+		private readonly AsyncTexture2D _texturePanelHeader = AsyncTexture2D.FromAssetId(1032325);
+
+		private readonly AsyncTexture2D _texturePanelHeaderActive = AsyncTexture2D.FromAssetId(1032324);
+
+		private readonly AsyncTexture2D _textureCornerAccent = AsyncTexture2D.FromAssetId(1002144);
+
+		private readonly AsyncTexture2D _textureLeftSideAccent = AsyncTexture2D.FromAssetId(605025);
+
+		private readonly AsyncTexture2D _textureAccordionArrow = AsyncTexture2D.FromAssetId(155953);
+
+		private readonly BasicTooltip _tooltip = new BasicTooltip
+		{
+			Parent = Control.Graphics.SpriteScreen,
+			ZIndex = 1073741823,
+			Visible = false
+		};
+
+		private Vector2 _layoutAccordionArrowOrigin;
+
+		private Rectangle _layoutTopLeftAccentBounds;
+
+		private Rectangle _layoutBottomRightAccentBounds;
+
+		private Rectangle _layoutCornerAccentSrc;
+
+		private Rectangle _layoutLeftAccentBounds;
+
+		private Rectangle _layoutLeftAccentSrc;
+
+		private Rectangle _layoutHeaderBounds;
+
+		private Rectangle _layoutHeaderTextBounds;
+
+		private Rectangle _layoutHeaderIconBounds;
+
+		private Rectangle _layoutAccordionArrowBounds;
+
+		private RectangleDimensions _contentPadding = new RectangleDimensions(0);
+
+		private RectangleDimensions _titleIconPadding = new RectangleDimensions(3, 3, 5, 3);
+
+		private int _titleBarHeight = 36;
+
+		private Func<string> _setLocalizedTitleTooltip;
+
+		private Func<string> _setLocalizedTitle;
+
+		private Func<string> _setLocalizedTooltip;
+
+		private Control _sizeDeterminingChild;
+
+		private Rectangle _panelBounds;
+
+		[JsonIgnore]
+		public float ArrowRotation { get; set; }
+
+		[JsonIgnore]
+		public float AccentOpacity { get; set; } = 1f;
+
+
+		public RectangleDimensions TitleIconPadding
+		{
+			get
+			{
+				return _titleIconPadding;
+			}
+			set
+			{
+				_titleIconPadding = value;
+				RecalculateLayout();
+			}
+		}
+
+		public int TitleBarHeight
+		{
+			get
+			{
+				return _titleBarHeight;
+			}
+			set
+			{
+				_titleBarHeight = value;
+				RecalculateLayout();
+			}
+		}
+
+		public RectangleDimensions ContentPadding
+		{
+			get
+			{
+				return _contentPadding;
+			}
+			set
+			{
+				_contentPadding = value;
+				RecalculateLayout();
+			}
+		}
+
+		public string TitleTooltipText
+		{
+			get
+			{
+				return _tooltip.Text;
+			}
+			set
+			{
+				_tooltip.Text = value;
+			}
+		}
+
+		public Func<string> SetLocalizedTooltip
+		{
+			get
+			{
+				return _setLocalizedTooltip;
+			}
+			set
+			{
+				_setLocalizedTooltip = value;
+				base.BasicTooltipText = value?.Invoke();
+			}
+		}
+
+		public Func<string> SetLocalizedTitleTooltip
+		{
+			get
+			{
+				return _setLocalizedTitleTooltip;
+			}
+			set
+			{
+				_setLocalizedTitleTooltip = value;
+				TitleTooltipText = value?.Invoke();
+			}
+		}
+
+		public Func<string> SetLocalizedTitle
+		{
+			get
+			{
+				return _setLocalizedTitle;
+			}
+			set
+			{
+				_setLocalizedTitle = value;
+				Title = value?.Invoke();
+			}
+		}
+
+		public string Title
+		{
+			get
+			{
+				return _title;
+			}
+			set
+			{
+				Common.SetProperty(ref _title, value, new Action(RecalculateLayout));
+			}
+		}
+
+		public AsyncTexture2D TitleIcon { get; set; }
+
+		public Point MaxSize { get; set; } = Point.get_Zero();
+
+
+		[JsonIgnore]
+		public bool Collapsed
+		{
+			get
+			{
+				return _collapsed;
+			}
+			set
+			{
+				if (value)
+				{
+					Collapse();
+				}
+				else
+				{
+					Expand();
+				}
+			}
+		}
+
+		public bool CanCollapse
+		{
+			get
+			{
+				return _canCollapse;
+			}
+			set
+			{
+				SetProperty(ref _canCollapse, value, invalidateLayout: true, "CanCollapse");
+			}
+		}
+
+		public bool ShowBorder
+		{
+			get
+			{
+				return _showBorder;
+			}
+			set
+			{
+				SetProperty(ref _showBorder, value, invalidateLayout: true, "ShowBorder");
+			}
+		}
+
+		public Control SizeDeterminingChild
+		{
+			get
+			{
+				return _sizeDeterminingChild;
+			}
+			set
+			{
+				Control temp = _sizeDeterminingChild;
+				if (Common.SetProperty(ref _sizeDeterminingChild, value, new Action(OnChildSet)) && temp != null)
+				{
+					temp.Resized -= SizeDeterminingChild_Resized;
+				}
+			}
+		}
+
+		public void Expand()
+		{
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			if (_collapsed)
+			{
+				_collapseAnim?.CancelAndComplete();
+				SetProperty(ref _collapsed, newValue: false, invalidateLayout: false, "Expand");
+				Point bounds = ((SizeDeterminingChild != null) ? ControlUtil.GetControlBounds(new Control[1] { SizeDeterminingChild }) : Point.get_Zero());
+				int height = ((MaxSize != Point.get_Zero()) ? Math.Min(MaxSize.Y, bounds.Y + ContentPadding.Vertical + _titleBarHeight) : (bounds.Y + ContentPadding.Vertical + _titleBarHeight));
+				_collapseAnim = Control.Animation.Tweener.Tween(this, new
+				{
+					Height = height,
+					ArrowRotation = 0f,
+					AccentOpacity = 1f
+				}, 0.15f).Ease(Ease.QuadOut);
+			}
+		}
+
+		public void Collapse()
+		{
+			if (!_collapsed)
+			{
+				if (_collapseAnim != null && _collapseAnim.Completion < 1f)
+				{
+					_collapseAnim.CancelAndComplete();
+				}
+				SetProperty(ref _canCollapse, newValue: true, invalidateLayout: false, "Collapse");
+				SetProperty(ref _collapsed, newValue: true, invalidateLayout: false, "Collapse");
+				_collapseAnim = Control.Animation.Tweener.Tween(this, new
+				{
+					Height = _titleBarHeight,
+					ArrowRotation = -(float)Math.PI / 2f,
+					AccentOpacity = 0f
+				}, 0.15f).Ease(Ease.QuadOut);
+			}
+		}
+
+		private void OnChildSet()
+		{
+			if (_sizeDeterminingChild != null)
+			{
+				_sizeDeterminingChild.Resized += SizeDeterminingChild_Resized;
+				_sizeDeterminingChild.Hidden += SizeDeterminingChild_Hidden;
+			}
+		}
+
+		private void SizeDeterminingChild_Hidden(object sender, EventArgs e)
+		{
+			Hide();
+		}
+
+		private void SizeDeterminingChild_Resized(object sender, ResizedEventArgs e)
+		{
+			SetHeight();
+		}
+
+		private void SetHeight()
+		{
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+			Point bounds = ((_sizeDeterminingChild != null) ? ControlUtil.GetControlBounds(new Control[1] { _sizeDeterminingChild }) : Point.get_Zero());
+			int height = ((MaxSize != Point.get_Zero()) ? Math.Min(MaxSize.Y, bounds.Y + ContentPadding.Vertical + _titleBarHeight) : (bounds.Y + ContentPadding.Vertical + _titleBarHeight));
+			base.Height = (Collapsed ? _titleBarHeight : height);
+		}
+
+		protected override void OnClick(MouseEventArgs e)
+		{
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			if (_canCollapse && ((Rectangle)(ref _layoutHeaderBounds)).Contains(base.RelativeMousePosition))
+			{
+				ToggleAccordionState();
+			}
+			base.OnClick(e);
+		}
+
+		private bool ToggleAccordionState()
+		{
+			Collapsed = !_collapsed;
+			return _collapsed;
+		}
+
+		public override void RecalculateLayout()
+		{
+			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0222: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0227: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0262: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0277: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b1: Unknown result type (might be due to invalid IL or missing references)
+			base.RecalculateLayout();
+			int num = ((!string.IsNullOrEmpty(_title) || TitleIcon != null) ? _titleBarHeight : 0);
+			int num2 = 0;
+			int num3 = 0;
+			int num4 = 0;
+			if (ShowBorder)
+			{
+				num = Math.Max(7, num);
+				num2 = 4;
+				num3 = 7;
+				num4 = 4;
+				int num5 = Math.Min(_size.X, 256);
+				_layoutTopLeftAccentBounds = new Rectangle(-2, num - 12, num5, _textureCornerAccent.Height);
+				_layoutBottomRightAccentBounds = new Rectangle(_size.X - num5 + 2, _size.Y - 59, num5, _textureCornerAccent.Height);
+				_layoutCornerAccentSrc = new Rectangle(256 - num5, 0, num5, _textureCornerAccent.Height);
+				_layoutLeftAccentBounds = new Rectangle(num4 - 7, num, _textureLeftSideAccent.Width, Math.Min(_size.Y - num - num3, _textureLeftSideAccent.Height));
+				_layoutLeftAccentSrc = new Rectangle(0, 0, _textureLeftSideAccent.Width, _layoutLeftAccentBounds.Height);
+			}
+			_panelBounds = new Rectangle(num4, num, _size.X - num4 - num2, _size.Y - num - num3);
+			base.ContentRegion = new Rectangle(num4 + ContentPadding.Left, num + ContentPadding.Top, _size.X - num4 - num2 - ContentPadding.Horizontal, _size.Y - num - num3 - ContentPadding.Vertical);
+			_layoutHeaderBounds = new Rectangle(0, 0, base.Width, num);
+			_layoutHeaderIconBounds = (Rectangle)((TitleIcon != null) ? new Rectangle(((Rectangle)(ref _layoutHeaderBounds)).get_Left() + _titleIconPadding.Left, _titleIconPadding.Top, num - _titleIconPadding.Vertical, num - _titleIconPadding.Vertical) : Rectangle.get_Empty());
+			_layoutHeaderTextBounds = new Rectangle(((Rectangle)(ref _layoutHeaderIconBounds)).get_Right() + _titleIconPadding.Right, 0, _layoutHeaderBounds.Width - _layoutHeaderIconBounds.Width, num);
+			int arrowSize = num - 4;
+			_layoutAccordionArrowOrigin = new Vector2(16f, 16f);
+			_layoutAccordionArrowBounds = RectangleExtension.OffsetBy(new Rectangle(((Rectangle)(ref _layoutHeaderBounds)).get_Right() - arrowSize, (num - arrowSize) / 2, arrowSize, arrowSize), new Point(arrowSize / 2, arrowSize / 2));
+		}
+
+		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
+		{
+			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0167: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0208: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0220: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0231: Unknown result type (might be due to invalid IL or missing references)
+			_tooltip.Visible = false;
+			if (!string.IsNullOrEmpty(_title))
+			{
+				spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_texturePanelHeader, _layoutHeaderBounds);
+				if (_canCollapse && _mouseOver && base.RelativeMousePosition.Y <= 36)
+				{
+					_tooltip.Visible = true;
+					spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_texturePanelHeaderActive, _layoutHeaderBounds);
+				}
+				else
+				{
+					spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_texturePanelHeader, _layoutHeaderBounds);
+				}
+				spriteBatch.DrawStringOnCtrl(this, _title, Control.Content.DefaultFont16, _layoutHeaderTextBounds, Color.get_White());
+				if (TitleIcon != null)
+				{
+					spriteBatch.DrawOnCtrl(this, TitleIcon, _layoutHeaderIconBounds, TitleIcon.Bounds, Color.get_White());
+				}
+				if (_canCollapse)
+				{
+					spriteBatch.DrawOnCtrl(this, _textureAccordionArrow, _layoutAccordionArrowBounds, null, Color.get_White(), ArrowRotation, _layoutAccordionArrowOrigin, (SpriteEffects)0);
+				}
+			}
+			if (ShowBorder)
+			{
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _panelBounds, Color.get_Black() * (0.1f * AccentOpacity));
+				spriteBatch.DrawOnCtrl(this, _textureCornerAccent, _layoutTopLeftAccentBounds, _layoutCornerAccentSrc, Color.get_White() * AccentOpacity, 0f, Vector2.get_Zero(), (SpriteEffects)1);
+				spriteBatch.DrawOnCtrl(this, _textureCornerAccent, _layoutBottomRightAccentBounds, _layoutCornerAccentSrc, Color.get_White() * AccentOpacity, 0f, Vector2.get_Zero(), (SpriteEffects)2);
+				spriteBatch.DrawOnCtrl(this, _textureLeftSideAccent, _layoutLeftAccentBounds, _layoutLeftAccentSrc, Color.get_Black() * AccentOpacity, 0f, Vector2.get_Zero(), (SpriteEffects)2);
+			}
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _panelBounds, Color.get_Black() * (0.3f * AccentOpacity));
+		}
+
+		protected override void DisposeControl()
+		{
+			base.DisposeControl();
+			_sizeDeterminingChild.Resized -= SizeDeterminingChild_Resized;
+			_sizeDeterminingChild = null;
+		}
+	}
+}
