@@ -575,9 +575,9 @@ namespace Nekres.Mumble_Info.Core.UI
 			((Control)dynamicLabel18).add_MouseEntered((EventHandler<MouseEventArgs>)OnLabelEnter);
 			((Control)dynamicLabel18).add_MouseLeft((EventHandler<MouseEventArgs>)delegate(object o, MouseEventArgs _)
 			{
-				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-				OnLabelLeft(o, Color.get_White(), _cyan);
+				//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+				OnLabelLeft(o, _blue, _cyan);
 			});
 			((Control)dynamicLabel18).add_Click((EventHandler<MouseEventArgs>)async delegate
 			{

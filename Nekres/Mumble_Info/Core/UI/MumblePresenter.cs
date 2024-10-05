@@ -111,10 +111,11 @@ namespace Nekres.Mumble_Info.Core.UI
 		{
 			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
 			string dir = Vec3ToStr(GameService.Gw2Mumble.get_PlayerCharacter().Forward(base.get_Model().SwapYZ), markerPackFormat);
 			if (!markerPackFormat)
 			{
-				return dir + " (" + DirectionUtil.IsFacing(GameService.Gw2Mumble.get_RawClient().get_AvatarFront()).ToString().SplitCamelCase() + ")";
+				return dir + " (" + DirectionUtil.IsFacing(GameService.Gw2Mumble.get_RawClient().get_AvatarFront().SwapYZ()).ToString().SplitCamelCase() + ")";
 			}
 			return dir;
 		}
@@ -139,10 +140,11 @@ namespace Nekres.Mumble_Info.Core.UI
 		{
 			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
 			string dir = Vec3ToStr(GameService.Gw2Mumble.get_PlayerCamera().Forward(base.get_Model().SwapYZ), markerPackFormat);
 			if (!markerPackFormat)
 			{
-				return dir + " (" + DirectionUtil.IsFacing(GameService.Gw2Mumble.get_RawClient().get_CameraFront()).ToString().SplitCamelCase() + ")";
+				return dir + " (" + DirectionUtil.IsFacing(GameService.Gw2Mumble.get_RawClient().get_CameraFront().SwapYZ()).ToString().SplitCamelCase() + ")";
 			}
 			return dir;
 		}
