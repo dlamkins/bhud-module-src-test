@@ -10,10 +10,12 @@ using Gw2Sharp.WebApi.V2.Models;
 using Kenedia.Modules.BuildsManager.Controls.Selection;
 using Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots;
 using Kenedia.Modules.BuildsManager.DataModels;
+using Kenedia.Modules.BuildsManager.DataModels.Professions;
 using Kenedia.Modules.BuildsManager.Extensions;
 using Kenedia.Modules.BuildsManager.Models;
 using Kenedia.Modules.BuildsManager.Models.Templates;
 using Kenedia.Modules.BuildsManager.Res;
+using Kenedia.Modules.BuildsManager.Services;
 using Kenedia.Modules.Core.Controls;
 using Kenedia.Modules.Core.DataModels;
 using Kenedia.Modules.Core.Extensions;
@@ -69,15 +71,18 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 
 		public SelectionPanel SelectionPanel { get; }
 
-		public GearTab(TemplatePresenter templatePresenter, SelectionPanel selectionPanel)
+		public Data Data { get; }
+
+		public GearTab(TemplatePresenter templatePresenter, SelectionPanel selectionPanel, Data data)
 		{
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
 			TemplatePresenter = templatePresenter;
 			SelectionPanel = selectionPanel;
+			Data = data;
 			WidthSizingMode = SizingMode.Fill;
 			HeightSizingMode = SizingMode.Fill;
 			string gearCodeDisclaimer = strings.EquipmentCodeDisclaimer;
@@ -492,31 +497,31 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 			switch (professionType.GetArmorType())
 			{
 			case ItemWeightType.Heavy:
-				_templateSlots[TemplateSlotType.AquaBreather].Item = BuildsManager.Data.Armors[79895];
-				_templateSlots[TemplateSlotType.Head].Item = BuildsManager.Data.Armors[80384];
-				_templateSlots[TemplateSlotType.Shoulder].Item = BuildsManager.Data.Armors[80435];
-				_templateSlots[TemplateSlotType.Chest].Item = BuildsManager.Data.Armors[80254];
-				_templateSlots[TemplateSlotType.Hand].Item = BuildsManager.Data.Armors[80205];
-				_templateSlots[TemplateSlotType.Leg].Item = BuildsManager.Data.Armors[80277];
-				_templateSlots[TemplateSlotType.Foot].Item = BuildsManager.Data.Armors[80557];
+				_templateSlots[TemplateSlotType.AquaBreather].Item = Data.Armors[79895];
+				_templateSlots[TemplateSlotType.Head].Item = Data.Armors[80384];
+				_templateSlots[TemplateSlotType.Shoulder].Item = Data.Armors[80435];
+				_templateSlots[TemplateSlotType.Chest].Item = Data.Armors[80254];
+				_templateSlots[TemplateSlotType.Hand].Item = Data.Armors[80205];
+				_templateSlots[TemplateSlotType.Leg].Item = Data.Armors[80277];
+				_templateSlots[TemplateSlotType.Foot].Item = Data.Armors[80557];
 				break;
 			case ItemWeightType.Medium:
-				_templateSlots[TemplateSlotType.AquaBreather].Item = BuildsManager.Data.Armors[79838];
-				_templateSlots[TemplateSlotType.Head].Item = BuildsManager.Data.Armors[80296];
-				_templateSlots[TemplateSlotType.Shoulder].Item = BuildsManager.Data.Armors[80145];
-				_templateSlots[TemplateSlotType.Chest].Item = BuildsManager.Data.Armors[80578];
-				_templateSlots[TemplateSlotType.Hand].Item = BuildsManager.Data.Armors[80161];
-				_templateSlots[TemplateSlotType.Leg].Item = BuildsManager.Data.Armors[80252];
-				_templateSlots[TemplateSlotType.Foot].Item = BuildsManager.Data.Armors[80281];
+				_templateSlots[TemplateSlotType.AquaBreather].Item = Data.Armors[79838];
+				_templateSlots[TemplateSlotType.Head].Item = Data.Armors[80296];
+				_templateSlots[TemplateSlotType.Shoulder].Item = Data.Armors[80145];
+				_templateSlots[TemplateSlotType.Chest].Item = Data.Armors[80578];
+				_templateSlots[TemplateSlotType.Hand].Item = Data.Armors[80161];
+				_templateSlots[TemplateSlotType.Leg].Item = Data.Armors[80252];
+				_templateSlots[TemplateSlotType.Foot].Item = Data.Armors[80281];
 				break;
 			case ItemWeightType.Light:
-				_templateSlots[TemplateSlotType.AquaBreather].Item = BuildsManager.Data.Armors[79873];
-				_templateSlots[TemplateSlotType.Head].Item = BuildsManager.Data.Armors[80248];
-				_templateSlots[TemplateSlotType.Shoulder].Item = BuildsManager.Data.Armors[80131];
-				_templateSlots[TemplateSlotType.Chest].Item = BuildsManager.Data.Armors[80190];
-				_templateSlots[TemplateSlotType.Hand].Item = BuildsManager.Data.Armors[80111];
-				_templateSlots[TemplateSlotType.Leg].Item = BuildsManager.Data.Armors[80356];
-				_templateSlots[TemplateSlotType.Foot].Item = BuildsManager.Data.Armors[80399];
+				_templateSlots[TemplateSlotType.AquaBreather].Item = Data.Armors[79873];
+				_templateSlots[TemplateSlotType.Head].Item = Data.Armors[80248];
+				_templateSlots[TemplateSlotType.Shoulder].Item = Data.Armors[80131];
+				_templateSlots[TemplateSlotType.Chest].Item = Data.Armors[80190];
+				_templateSlots[TemplateSlotType.Hand].Item = Data.Armors[80111];
+				_templateSlots[TemplateSlotType.Leg].Item = Data.Armors[80356];
+				_templateSlots[TemplateSlotType.Foot].Item = Data.Armors[80399];
 				break;
 			}
 			Template t = TemplatePresenter.Template;
@@ -537,15 +542,18 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 
 		private void SetSpecIcon(ProfessionType professionType)
 		{
-			_framedSpecIcon.Texture = TemplatePresenter.Template?.EliteSpecialization?.ProfessionIconBig ?? BuildsManager.Data.Professions[professionType].IconBig;
+			Kenedia.Modules.BuildsManager.DataModels.Professions.Profession professionForIcon = default(Kenedia.Modules.BuildsManager.DataModels.Professions.Profession);
+			_framedSpecIcon.Texture = TemplatePresenter?.Template?.EliteSpecialization?.ProfessionIconBig ?? ((Data.Professions?.TryGetValue((TemplatePresenter?.Template?.Profession).GetValueOrDefault(ProfessionType.Guardian), out professionForIcon) ?? false) ? professionForIcon.IconBig : null);
+			Kenedia.Modules.BuildsManager.DataModels.Professions.Profession professionForName = default(Kenedia.Modules.BuildsManager.DataModels.Professions.Profession);
+			_framedSpecIcon.BasicTooltipText = TemplatePresenter?.Template?.EliteSpecialization?.Name ?? ((Data.Professions?.TryGetValue((TemplatePresenter?.Template?.Profession).GetValueOrDefault(ProfessionType.Guardian), out professionForName) ?? false) ? professionForName.Name : null);
 		}
 
 		private void SetRaceIcon()
 		{
 			Kenedia.Modules.BuildsManager.DataModels.Race raceIcon = default(Kenedia.Modules.BuildsManager.DataModels.Race);
-			_raceIcon.Texture = ((BuildsManager.Data.Races?.TryGetValue((TemplatePresenter?.Template?.Race).GetValueOrDefault(Races.None), out raceIcon) ?? false) ? raceIcon.Icon : null);
+			_raceIcon.Texture = ((Data.Races?.TryGetValue((TemplatePresenter?.Template?.Race).GetValueOrDefault(Races.None), out raceIcon) ?? false) ? raceIcon.Icon : null);
 			Kenedia.Modules.BuildsManager.DataModels.Race raceName = default(Kenedia.Modules.BuildsManager.DataModels.Race);
-			_raceIcon.BasicTooltipText = ((BuildsManager.Data.Races?.TryGetValue((TemplatePresenter?.Template?.Race).GetValueOrDefault(Races.None), out raceName) ?? false) ? raceName.Name : null);
+			_raceIcon.BasicTooltipText = ((Data.Races?.TryGetValue((TemplatePresenter?.Template?.Race).GetValueOrDefault(Races.None), out raceName) ?? false) ? raceName.Name : null);
 		}
 
 		private void SetVisibility()

@@ -50,19 +50,21 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		public Settings Settings { get; }
 
+		public MainWindowPresenter MainWindowPresenter { get; }
+
 		public TemplatePresenter TemplatePresenter { get; }
 
 		public Tab SettingsViewTab { get; private set; }
 
 		public SettingsView SettingsView { get; private set; }
 
-		public MainWindow(Module module, TemplatePresenter templatePresenter, TemplateTags templateTags, TagGroups tagGroups, SelectionPanel selectionPanel, AboutTab aboutTab, BuildTab buildTab, GearTab gearTab, QuickFiltersPanel quickFiltersPanel, Settings settings)
+		public MainWindow(Module module, MainWindowPresenter mainWindowPresenter, TemplatePresenter templatePresenter, TemplateTags templateTags, TagGroups tagGroups, SelectionPanel selectionPanel, AboutTab aboutTab, BuildTab buildTab, GearTab gearTab, QuickFiltersPanel quickFiltersPanel, Settings settings)
 		{
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
 			SelectionPanel selectionPanel2 = selectionPanel;
 			AboutTab aboutTab2 = aboutTab;
 			BuildTab buildTab2 = buildTab;
@@ -73,6 +75,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 			Settings settings2 = settings;
 			base._002Ector((AsyncTexture2D)TexturesService.GetTextureFromRef("textures\\mainwindow_background.png", "mainwindow_background"), new Rectangle(30, 30, 915, 665), new Rectangle(40, 20, 895, 665));
 			MainWindow mainWindow = this;
+			MainWindowPresenter = mainWindowPresenter;
 			TemplatePresenter = templatePresenter;
 			base.Parent = Control.Graphics.SpriteScreen;
 			AboutTab = aboutTab2;
@@ -93,8 +96,8 @@ namespace Kenedia.Modules.BuildsManager.Views
 			base.Height = 900;
 			TemplatePresenter.TemplateChanged += new ValueChangedEventHandler<Template>(TemplatePresenter_TemplateChanged);
 			TemplatePresenter.NameChanged += new ValueChangedEventHandler<string>(TemplatePresenter_NameChanged);
-			base.Tabs.Add(TemplateViewTab = new Tab(AsyncTexture2D.FromAssetId(156720), () => mainWindow.TemplateView = new TemplateView(mainWindow, selectionPanel2, aboutTab2, buildTab2, gearTab2, quickFiltersPanel2), strings.Templates));
-			base.Tabs.Add(TagEditViewTab = new Tab(TexturesService.GetTextureFromRef(textures_common.Tag, "Tag"), () => mainWindow.TagEditView = new TagEditView(templateTags2, tagGroups2), strings.Tags));
+			base.Tabs.Add(TemplateViewTab = new Tab(AsyncTexture2D.FromAssetId(156720), () => mainWindow.TemplateView = new TemplateView(mainWindow, selectionPanel2, aboutTab2, buildTab2, gearTab2, quickFiltersPanel2, mainWindow.MainWindowPresenter), strings.Templates));
+			base.Tabs.Add(TagEditViewTab = new Tab(TexturesService.GetTextureFromRef(textures_common.Tag, "Tag"), () => mainWindow.TagEditView = new TagEditView(templateTags2, tagGroups2, mainWindow.MainWindowPresenter), strings.Tags));
 			base.Tabs.Add(SettingsViewTab = new Tab(AsyncTexture2D.FromAssetId(157109), () => mainWindow.SettingsView = new SettingsView(settings2), strings_common.Settings));
 		}
 
@@ -110,6 +113,35 @@ namespace Kenedia.Modules.BuildsManager.Views
 			{
 				QuickFiltersPanel.Show();
 			}
+			MainWindowPresenter mainWindowPresenter = MainWindowPresenter;
+			Tab tab = e.NewValue;
+			if (tab == null)
+			{
+				goto IL_0084;
+			}
+			Type selectedTabType;
+			if (tab == TemplateViewTab)
+			{
+				selectedTabType = typeof(TemplateView);
+			}
+			else if (tab == TagEditViewTab)
+			{
+				selectedTabType = typeof(TagEditView);
+			}
+			else
+			{
+				if (tab != SettingsViewTab)
+				{
+					goto IL_0084;
+				}
+				selectedTabType = typeof(SettingsView);
+			}
+			goto IL_0086;
+			IL_0084:
+			selectedTabType = null;
+			goto IL_0086;
+			IL_0086:
+			mainWindowPresenter.SelectedTabType = selectedTabType;
 			base.SubName = ((e.NewValue != TemplateViewTab) ? ((e.NewValue == SettingsViewTab) ? strings_common.Settings : ((e.NewValue == TagEditViewTab) ? strings.Tags : string.Empty)) : TemplatePresenter?.Template?.Name);
 		}
 

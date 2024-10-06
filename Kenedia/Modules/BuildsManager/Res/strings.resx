@@ -70,6 +70,7 @@ If you have any valid build code in your clipboard the build will load from the 
   <data name="Sigils"><value>Sigils</value></data>
   <data name="Infusions"><value>Infusions</value></data>
   <data name="Nourishment"><value>Nourishment</value></data>
+  <data name="SelectTagToEdit"><value>Select a tag to edit</value></data>
   <data name="Enrichment"><value>Enrichment</value></data>
   <data name="Override"><value>Override</value></data>
   <data name="Infusion"><value>Infusion</value></data>
@@ -81,9 +82,11 @@ If you have any valid build code in your clipboard the build will load from the 
   <data name="ShowQuickFilterPanelOnWindowOpen_Name"><value>Open Quick Filter with window</value></data>
   <data name="Vitality"><value>Vitality</value></data>
   <data name="OverrideEntry"><value>Override {0}</value></data>
+  <data name="SortByModified"><value>Sort by Last Modified</value></data>
   <data name="QuickFiltersPanelFadeDelay_Tooltip"><value>Fade the Quick Filter Panel after {0} ms</value></data>
   <data name="GroupNotDefined"><value>Group not defined</value></data>
   <data name="ToggleQuickFilters"><value>Toggle Quick Filters Window</value></data>
+  <data name="SelectGroupToEdit"><value>Select a group to edit</value></data>
   <data name="ResetAll"><value>Reset all {0}</value></data>
   <data name="Precision"><value>Precision</value></data>
   <data name="EmptyJewellerySlots"><value>of all empty jewellery slots</value></data>

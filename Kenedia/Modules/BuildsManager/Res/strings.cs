@@ -224,6 +224,10 @@ namespace Kenedia.Modules.BuildsManager.Res
 
 		internal static string Runes => ResourceManager.GetString("Runes", resourceCulture);
 
+		internal static string SelectGroupToEdit => ResourceManager.GetString("SelectGroupToEdit", resourceCulture);
+
+		internal static string SelectTagToEdit => ResourceManager.GetString("SelectTagToEdit", resourceCulture);
+
 		internal static string ShowQuickFilterPanelOnTabOpen_Name => ResourceManager.GetString("ShowQuickFilterPanelOnTabOpen_Name", resourceCulture);
 
 		internal static string ShowQuickFilterPanelOnTabOpen_Tooltip => ResourceManager.GetString("ShowQuickFilterPanelOnTabOpen_Tooltip", resourceCulture);
@@ -239,6 +243,8 @@ namespace Kenedia.Modules.BuildsManager.Res
 		internal static string SkillId => ResourceManager.GetString("SkillId", resourceCulture);
 
 		internal static string Skills => ResourceManager.GetString("Skills", resourceCulture);
+
+		internal static string SortByModified => ResourceManager.GetString("SortByModified", resourceCulture);
 
 		internal static string SortByName => ResourceManager.GetString("SortByName", resourceCulture);
 

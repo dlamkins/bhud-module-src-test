@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
@@ -50,8 +49,7 @@ namespace Kenedia.Modules.BuildsManager.Controls
 			}
 		}
 
-		public List<Container> Tabs => (from e in _tabs.ToList()
-			select e.Container).ToList();
+		public ObservableCollection<TabbedRegionTab> Tabs => _tabs;
 
 		public BitmapFont HeaderFont
 		{
@@ -121,7 +119,6 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		public void SwitchTab(TabbedRegionTab tab)
 		{
-			OnTabSwitched?.Invoke();
 			if (tab != null)
 			{
 				tab.Container.Visible = true;
@@ -133,6 +130,7 @@ namespace Kenedia.Modules.BuildsManager.Controls
 				item.IsActive = item == _activeTab;
 				item.Container.Visible = item.IsActive;
 			}
+			OnTabSwitched?.Invoke();
 			RecalculateLayout();
 		}
 

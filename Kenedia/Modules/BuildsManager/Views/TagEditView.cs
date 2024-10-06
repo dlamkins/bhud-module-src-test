@@ -48,14 +48,17 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		public TagGroups TagGroups { get; }
 
+		public MainWindowPresenter MainWindowPresenter { get; }
+
 		public TagSelectable SelectedTag { get; set; }
 
 		public GroupSelectable SelectedGroup { get; set; }
 
-		public TagEditView(TemplateTags templateTags, TagGroups tagGroups)
+		public TagEditView(TemplateTags templateTags, TagGroups tagGroups, MainWindowPresenter mainWindowPresenter)
 		{
 			TemplateTags = templateTags;
 			TagGroups = tagGroups;
+			MainWindowPresenter = mainWindowPresenter;
 		}
 
 		protected override void Build(Blish_HUD.Controls.Container buildPanel)
@@ -132,9 +135,9 @@ namespace Kenedia.Modules.BuildsManager.Views
 			{
 				Parent = buildPanel
 			};
-			int x = lbl.LocalBounds.X;
+			int x2 = lbl.LocalBounds.X;
 			Rectangle localBounds = lbl.LocalBounds;
-			obj.Location = Kenedia.Modules.Core.Extensions.PointExtensions.Add(new Point(x, ((Rectangle)(ref localBounds)).get_Bottom()), new Point(0, 2));
+			obj.Location = Kenedia.Modules.Core.Extensions.PointExtensions.Add(new Point(x2, ((Rectangle)(ref localBounds)).get_Bottom()), new Point(0, 2));
 			obj.Width = buildPanel.Width - 25;
 			obj.Height = 2;
 			obj.Color = Color.get_White() * 0.8f;
@@ -143,9 +146,9 @@ namespace Kenedia.Modules.BuildsManager.Views
 			{
 				Parent = buildPanel
 			};
-			int x2 = sep.LocalBounds.X;
+			int x3 = sep.LocalBounds.X;
 			localBounds = sep.LocalBounds;
-			obj2.Location = Kenedia.Modules.Core.Extensions.PointExtensions.Add(new Point(x2, ((Rectangle)(ref localBounds)).get_Bottom()), new Point(0, 10));
+			obj2.Location = Kenedia.Modules.Core.Extensions.PointExtensions.Add(new Point(x3, ((Rectangle)(ref localBounds)).get_Bottom()), new Point(0, 10));
 			obj2.Width = buildPanel.Width - 50;
 			obj2.SetLocalizedPlaceholder = () => strings_common.Search;
 			obj2.FilteringOnTextChange = true;
@@ -198,6 +201,8 @@ namespace Kenedia.Modules.BuildsManager.Views
 			TagGroups.GroupRemoved += new EventHandler<TagGroup>(TagGroups_TagRemoved);
 			TagGroups.GroupChanged += new PropertyChangedEventHandler(TagGroups_TagChanged);
 			buildPanel.Resized += GroupBuildPanel_Resized;
+			TagGroup group = MainWindowPresenter.SelectedGroup ?? _tagsPanel.OfType<GroupSelectable>().FirstOrDefault((GroupSelectable x) => x.Visible)?.Group;
+			SetGroupToEdit(group);
 		}
 
 		private void FilterGroups(string? obj = null)
@@ -260,9 +265,9 @@ namespace Kenedia.Modules.BuildsManager.Views
 			{
 				Parent = buildPanel
 			};
-			int x = lbl.LocalBounds.X;
+			int x2 = lbl.LocalBounds.X;
 			Rectangle localBounds = lbl.LocalBounds;
-			obj.Location = Kenedia.Modules.Core.Extensions.PointExtensions.Add(new Point(x, ((Rectangle)(ref localBounds)).get_Bottom()), new Point(0, 2));
+			obj.Location = Kenedia.Modules.Core.Extensions.PointExtensions.Add(new Point(x2, ((Rectangle)(ref localBounds)).get_Bottom()), new Point(0, 2));
 			obj.Width = buildPanel.Width - 75;
 			obj.Height = 2;
 			obj.Color = Color.get_White() * 0.8f;
@@ -271,9 +276,9 @@ namespace Kenedia.Modules.BuildsManager.Views
 			{
 				Parent = buildPanel
 			};
-			int x2 = sep.LocalBounds.X;
+			int x3 = sep.LocalBounds.X;
 			localBounds = sep.LocalBounds;
-			obj2.Location = Kenedia.Modules.Core.Extensions.PointExtensions.Add(new Point(x2, ((Rectangle)(ref localBounds)).get_Bottom()), new Point(0, 10));
+			obj2.Location = Kenedia.Modules.Core.Extensions.PointExtensions.Add(new Point(x3, ((Rectangle)(ref localBounds)).get_Bottom()), new Point(0, 10));
 			obj2.Width = buildPanel.Width - 75 - 27;
 			obj2.SetLocalizedPlaceholder = () => strings_common.Search;
 			obj2.FilteringOnTextChange = true;
@@ -326,6 +331,8 @@ namespace Kenedia.Modules.BuildsManager.Views
 			TemplateTags.TagRemoved += new EventHandler<TemplateTag>(TemplateTags_TagRemoved);
 			TemplateTags.TagChanged += new PropertyChangedEventHandler(TemplateTags_TagChanged);
 			buildPanel.Resized += TagBuildPanel_Resized;
+			TemplateTag tag = MainWindowPresenter.SelectedTag ?? _tagsPanel.OfType<TagSelectable>().FirstOrDefault((TagSelectable x) => x.Visible)?.Tag;
+			SetTagToEdit(tag);
 		}
 
 		private void GroupBuildPanel_Resized(object sender, ResizedEventArgs e)
@@ -373,7 +380,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 			});
 		}
 
-		public void SetTagToEdit(TemplateTag tag)
+		public void SetTagToEdit(TemplateTag? tag)
 		{
 			TemplateTag tag2 = tag;
 			SelectedTag = _tagSelectables.FirstOrDefault((TagSelectable x) => x.Tag == tag2);
@@ -385,6 +392,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 			{
 				tagSelectable.Selected = tagSelectable == SelectedTag;
 			}
+			MainWindowPresenter.SelectedTag = tag2;
 		}
 
 		private void TemplateTags_TagChanged(object sender, PropertyChangedEventArgs e)
@@ -450,6 +458,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 			{
 				groupSelectable.Selected = groupSelectable == SelectedGroup;
 			}
+			MainWindowPresenter.SelectedGroup = group2;
 		}
 
 		protected override void Unload()

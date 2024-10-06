@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Kenedia.Modules.BuildsManager.Models;
@@ -10,6 +11,8 @@ using Kenedia.Modules.Core.Models;
 using Kenedia.Modules.Core.Structs;
 using Kenedia.Modules.Core.Utility;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
 
 namespace Kenedia.Modules.BuildsManager.Views
 {
@@ -90,7 +93,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 				Location = new Point(0, Control.Content.DefaultFont14.get_LineHeight() + 2),
 				TextChangedAction = delegate(string txt)
 				{
-					if (!string.IsNullOrEmpty(txt))
+					if (!string.IsNullOrEmpty(txt) && Tag != null)
 					{
 						Tag.Name = txt;
 					}
@@ -215,7 +218,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 				Height = 25,
 				ClickAction = delegate
 				{
-					SetTextureRegionToTextureBounds(Tag.Icon.Texture);
+					SetTextureRegionToTextureBounds(Tag?.Icon?.Texture);
 				}
 			};
 			_deleteButton = new Button
@@ -239,6 +242,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 			TagGroups.GroupAdded += new EventHandler<TagGroup>(TagGroups_GroupAdded);
 			TagGroups.GroupChanged += new PropertyChangedEventHandler(TagGroups_GroupChanged);
 			TagGroups.GroupRemoved += new EventHandler<TagGroup>(TagGroups_GroupRemoved);
+			ApplyTag();
 		}
 
 		private void SetGroupDropdownItems()
@@ -297,7 +301,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 			TemplateTags.Remove(Tag);
 		}
 
-		private void OnTagChanged(object sender, ValueChangedEventArgs<TemplateTag> e)
+		private void OnTagChanged(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<TemplateTag> e)
 		{
 			TemplateTag tag = e.OldValue;
 			if (tag != null)
@@ -321,30 +325,39 @@ namespace Kenedia.Modules.BuildsManager.Views
 			}
 		}
 
-		private void ApplyTag(TemplateTag? tag)
+		private void ApplyTag(TemplateTag? tag = null)
 		{
-			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
 			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0160: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
 			_loading = true;
+			bool hasTag = tag != null;
 			Rectangle r = (Rectangle)(((_003F?)tag?.TextureRegion) ?? ((_003F?)tag?.Icon?.Bounds) ?? Rectangle.get_Empty());
 			_icon.SourceRectangle = r;
 			_priority.numberBox.Value = tag?.Priority ?? 1;
+			_priority.numberBox.Enabled = hasTag;
 			_group.textBox.SelectedItem = tag?.Group;
+			_group.textBox.Enabled = hasTag;
 			_name.textBox.Text = tag?.Name;
+			_name.textBox.Enabled = hasTag;
 			_icon.Texture = tag?.Icon?.Texture;
 			_iconId.numberBox.Value = tag?.AssetId ?? 0;
+			_iconId.numberBox.Enabled = hasTag;
 			_x.numberBox.Value = r.X;
+			_x.numberBox.Enabled = hasTag;
 			_y.numberBox.Value = r.Y;
+			_y.numberBox.Enabled = hasTag;
 			_width.numberBox.Value = r.Width;
+			_width.numberBox.Enabled = hasTag;
 			_height.numberBox.Value = r.Height;
+			_height.numberBox.Enabled = hasTag;
 			_loading = false;
 		}
 
@@ -361,9 +374,9 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		private void SetIcon()
 		{
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			if (_loading)
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+			if (_loading || Tag == null)
 			{
 				return;
 			}
@@ -443,6 +456,49 @@ namespace Kenedia.Modules.BuildsManager.Views
 				_deleteButton.Location = new Point(_height.numberBox.Right + 5, _group.textBox.Top);
 				_deleteButton.Width = w;
 			}
+		}
+
+		public override void Draw(SpriteBatch spriteBatch, Rectangle drawBounds, Rectangle scissor)
+		{
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+			if (Tag == null)
+			{
+				Rectangle scissorRectangle = Rectangle.Intersect(scissor, base.AbsoluteBounds.WithPadding(_padding)).ScaleBy(Control.Graphics.UIScaleMultiplier);
+				((GraphicsResource)spriteBatch).get_GraphicsDevice().set_ScissorRectangle(scissorRectangle);
+				base.EffectBehind?.Draw(spriteBatch, drawBounds);
+				spriteBatch.Begin(base.SpriteBatchParameters);
+				ShapeExtensions.FillRectangle(spriteBatch, RectangleF.op_Implicit(base.AbsoluteBounds), (Color)(((_003F?)base.BackgroundColor) ?? (Color.get_Black() * 0.5f)), 0f);
+				spriteBatch.DrawStringOnCtrl(this, strings.SelectTagToEdit, Control.Content.DefaultFont18, drawBounds, Color.get_White(), wrap: false, HorizontalAlignment.Center);
+				spriteBatch.End();
+			}
+			else
+			{
+				base.Draw(spriteBatch, drawBounds, scissor);
+			}
+		}
+
+		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
+		{
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			base.PaintBeforeChildren(spriteBatch, bounds);
 		}
 	}
 }

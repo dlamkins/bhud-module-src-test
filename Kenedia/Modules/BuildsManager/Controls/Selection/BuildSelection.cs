@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Blish_HUD;
@@ -87,8 +88,11 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 				Location = new Point(0, 0),
 				ValueChangedAction = delegate(string s)
 				{
-					BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleInstance.Settings.SortBehavior.Value = GetSortBehaviorFromString(s);
-					FilterTemplates();
+					if (_sortBehavior != null)
+					{
+						BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleInstance.Settings.SortBehavior.Value = GetSortBehaviorFromString(s);
+						FilterTemplates();
+					}
 				},
 				SetLocalizedItems = delegate
 				{
@@ -96,10 +100,11 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 					{
 						_sortBehavior.SelectedItem = GetSortBehaviorString(BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleInstance.Settings.SortBehavior.Value);
 					}
-					return new List<string>(2)
+					return new List<string>(3)
 					{
 						GetSortBehaviorString(TemplateSortBehavior.ByProfession),
-						GetSortBehaviorString(TemplateSortBehavior.ByName)
+						GetSortBehaviorString(TemplateSortBehavior.ByName),
+						GetSortBehaviorString(TemplateSortBehavior.ByModified)
 					};
 				},
 				SelectedItem = GetSortBehaviorString(BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleInstance.Settings.SortBehavior.Value)
@@ -153,9 +158,15 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 				_addBuildsButton.BasicTooltipText = (string.IsNullOrEmpty(txt) ? strings.CreateNewTemplate : string.Format(strings.CreateNewTemplateName, txt));
 			};
 			BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleInstance.TemplatesLoadedDone += new ValueChangedEventHandler<bool>(ModuleInstance_TemplatesLoadedDone);
-			templates.CollectionChanged += Templates_CollectionChanged;
+			templates.CollectionChanged = (NotifyCollectionChangedEventHandler)Delegate.Combine(templates.CollectionChanged, new NotifyCollectionChangedEventHandler(Templates_CollectionChanged));
 			LocalizingService.LocaleChanged += new EventHandler<Blish_HUD.ValueChangedEventArgs<Locale>>(LocalizingService_LocaleChanged);
 			Templates_CollectionChanged(this, null);
+			Templates.TemplateChanged += new PropertyChangedEventHandler(Templates_TemplateChanged);
+		}
+
+		private void Templates_TemplateChanged(object sender, PropertyChangedEventArgs e)
+		{
+			FilterTemplates();
 		}
 
 		private TemplateSortBehavior GetSortBehaviorFromString(string s)
@@ -164,7 +175,11 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			{
 				if (!(s == strings.SortByName))
 				{
-					return TemplateSortBehavior.ByProfession;
+					if (!(s == strings.SortByModified))
+					{
+						return TemplateSortBehavior.ByProfession;
+					}
+					return TemplateSortBehavior.ByModified;
 				}
 				return TemplateSortBehavior.ByName;
 			}
@@ -177,6 +192,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			{
 				TemplateSortBehavior.ByProfession => strings.SortyByProfession, 
 				TemplateSortBehavior.ByName => strings.SortByName, 
+				TemplateSortBehavior.ByModified => strings.SortByModified, 
 				_ => string.Empty, 
 			};
 		}
@@ -208,19 +224,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 				bool nameMatches = anyName || template.Template.Name.ToLower().Contains(lowerTxt);
 				template.Visible = filterQueriesMatches && specMatches && nameMatches;
 			}
-			if (BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleInstance.Settings.SortBehavior.Value == TemplateSortBehavior.ByProfession)
-			{
-				SelectionContent.SortChildren(delegate(TemplateSelectable a, TemplateSelectable b)
-				{
-					int num = a.Template.Profession.CompareTo(b.Template.Profession);
-					int num2 = a.Template.Name.CompareTo(b.Template.Name);
-					return (num != 0) ? num : num2;
-				});
-			}
-			if (BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleInstance.Settings.SortBehavior.Value == TemplateSortBehavior.ByName)
-			{
-				SelectionContent.SortChildren((TemplateSelectable a, TemplateSelectable b) => a.Template.Name.CompareTo(b.Template.Name));
-			}
+			SortTemplates();
 			if ((!(TemplateSelectables.FirstOrDefault((TemplateSelectable x) => x.Template == TemplatePresenter.Template)?.Visible)) ?? true)
 			{
 				TemplateSelectable t = SelectionContent.OfType<TemplateSelectable>().FirstOrDefault((TemplateSelectable x) => x.Visible);
@@ -228,6 +232,32 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 				{
 					TemplatePresenter.SetTemplate(t.Template);
 				}
+			}
+		}
+
+		private void SortTemplates()
+		{
+			switch (BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleInstance.Settings.SortBehavior.Value)
+			{
+			case TemplateSortBehavior.ByProfession:
+				SelectionContent.SortChildren(delegate(TemplateSelectable a, TemplateSelectable b)
+				{
+					int num = a.Template.Profession.CompareTo(b.Template.Profession);
+					int num2 = a.Template.Name.CompareTo(b.Template.Name);
+					return (num != 0) ? num : num2;
+				});
+				break;
+			case TemplateSortBehavior.ByName:
+				SelectionContent.SortChildren((TemplateSelectable a, TemplateSelectable b) => a.Template.Name.CompareTo(b.Template.Name));
+				break;
+			case TemplateSortBehavior.ByModified:
+				SelectionContent.SortChildren(delegate(TemplateSelectable a, TemplateSelectable b)
+				{
+					int num3 = a.Template.LastModified.CompareTo(b.Template.LastModified);
+					int num4 = a.Template.Name.CompareTo(b.Template.Name);
+					return (num3 != 0) ? num3 : num4;
+				});
+				break;
 			}
 		}
 
@@ -255,7 +285,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			_spinner.Hide();
 			bool firstLoad = TemplateSelectables.Count == 0 && (Templates?.Count ?? 0) != 0;
 			IEnumerable<Template> templates = TemplateSelectables.Select((TemplateSelectable e) => e.Template);
-			IEnumerable<Template> removedTemplates = templates.Except(Templates ?? new TemplateCollection());
+			IEnumerable<Template> removedTemplates = templates.Except<Template>(Templates ?? new TemplateCollection());
 			IEnumerable<Template> addedTemplates = Templates?.Except(templates);
 			if (addedTemplates == null)
 			{
@@ -397,7 +427,8 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			base.DisposeControl();
 			_sortBehavior?.Dispose();
 			BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleInstance.TemplatesLoadedDone -= new ValueChangedEventHandler<bool>(ModuleInstance_TemplatesLoadedDone);
-			Templates.CollectionChanged -= Templates_CollectionChanged;
+			TemplateCollection templates = Templates;
+			templates.CollectionChanged = (NotifyCollectionChangedEventHandler)Delegate.Remove(templates.CollectionChanged, new NotifyCollectionChangedEventHandler(Templates_CollectionChanged));
 			Templates_CollectionChanged(this, null);
 			LocalizingService.LocaleChanged -= new EventHandler<Blish_HUD.ValueChangedEventArgs<Locale>>(LocalizingService_LocaleChanged);
 			TemplateSelectables.Clear();
